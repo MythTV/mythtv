@@ -29,6 +29,8 @@
 
 using namespace std;
 
+static QString SetupIconCacheDirectory();
+
 bool interactive = false;
 bool channel_preset = false;
 bool non_us_updating = false;
@@ -213,8 +215,479 @@ void clearDataBySource(int sourceid, QDateTime from, QDateTime to)
     }
 }
 
-// DataDirect stuff
+// icon mapping stuff
+namespace {
+const char * const IM_DOC_TAG = "iconmappings";
 
+const char * const IM_CS_TO_NET_TAG = "callsigntonetwork";
+const char * const IM_CS_TAG = "callsign";
+
+const char * const IM_NET_TAG = "network";
+
+const char * const IM_NET_TO_URL_TAG = "networktourl";
+const char * const IM_NET_URL_TAG = "url";
+
+const char * const BASEURLMAP_START = "mythfilldatabase.urlmap.";
+
+const char * const IM_BASEURL_TAG = "baseurl";
+const char * const IM_BASE_STUB_TAG = "stub";
+
+QString expandURLString(const QString &url)
+{
+    QRegExp expandtarget("\\[([^\\]]+)\\]");
+    QString retval = url;
+
+    int found_at = 0;
+    int start_index = 0;
+    while (found_at != -1)
+    {
+        found_at = expandtarget.search(retval, start_index);
+        if (found_at != -1)
+        {
+            QString no_mapping("no_URL_mapping");
+            QString search_string = expandtarget.cap(1);
+            QString expanded_text = gContext->GetSetting(
+                    QString(BASEURLMAP_START) + search_string, no_mapping);
+            if (expanded_text != no_mapping)
+            {
+                retval.replace(found_at, expandtarget.matchedLength(),
+                        expanded_text);
+            }
+            else
+            {
+                start_index = found_at + expandtarget.matchedLength();
+            }
+        }
+    }
+
+    return retval;
+}
+
+void UpdateSourceIcons(int sourceid)
+{
+    if (!quiet)
+    {
+        QString m = QString("Updating icons for sourceid: %1")
+                .arg(sourceid);
+        cout << m << endl;
+    }
+    QString fileprefix = SetupIconCacheDirectory();
+
+    QSqlQuery query;
+    query.prepare("SELECT ch.chanid, nim.url "
+            "FROM channel ch, callsignnetworkmap csm "
+            "RIGHT JOIN networkiconmap nim ON csm.network = nim.network "
+            "WHERE ch.callsign = csm.callsign AND "
+            "(icon = :NOICON OR icon = '') AND ch.sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":NOICON", "none");
+
+    if (!query.exec())
+        MythContext::DBError("Looking for icons to fetch", query);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        while (query.next())
+        {
+            QString icon_url = expandURLString(query.value(1).toString());
+            QFileInfo qfi(icon_url);
+            QFile localfile(fileprefix + "/" + qfi.fileName());
+            if (!localfile.exists())
+            {
+                QString icon_get_command = QString("wget --timestamping "
+                        "--directory-prefix=") + fileprefix + " " + icon_url;
+                QString m = QString("Attempting to fetch icon with: %1")
+                        .arg(icon_get_command);
+                cerr << m << endl;
+                system(icon_get_command);
+            }
+
+            if (localfile.exists())
+            {
+                int chanid = query.value(0).toInt();
+                QString m = QString("Updating channel icon for chanid: %1")
+                        .arg(chanid);
+                cerr << m << endl;
+                QSqlQuery icon_update_query;
+                icon_update_query.prepare("UPDATE channel SET icon = :ICON "
+                        "WHERE chanid = :CHANID AND sourceid = :SOURCEID");
+                icon_update_query.bindValue(":ICON", localfile.name());
+                icon_update_query.bindValue(":CHANID", query.value(0).toInt());
+                icon_update_query.bindValue(":SOURCEID", sourceid);
+
+                if (!icon_update_query.exec())
+                    MythContext::DBError("Setting the icon file name",
+                            icon_update_query);
+            }
+            else
+            {
+                QString em = QString(
+                        "Error retrieving icon from '%1' to file '%2'")
+                        .arg(icon_url)
+                        .arg(localfile.name());
+
+                cerr << em << endl;
+            }
+        }
+    }
+}
+
+bool dash_open(QFile &file, const QString &filename, int m, FILE *handle = NULL)
+{
+    bool retval = false;
+    if (filename == "-")
+    {
+        if (handle == NULL)
+        {
+            handle = stdout;
+            if (m & IO_ReadOnly)
+            {
+                handle = stdin;
+            }
+        }
+        retval = file.open(m, handle);
+    }
+    else
+    {
+        file.setName(filename);
+        retval = file.open(m);
+    }
+
+    return retval;
+}
+
+class DOMException
+{
+  private:
+    QString message;
+
+  protected:
+    void setMessage(const QString &mes)
+    {
+        message = mes;
+    }
+
+  public:
+    DOMException() : message("Unknown DOMException") {}
+    virtual ~DOMException() {}
+    DOMException(const QString &mes) : message(mes) {}
+    QString getMessage()
+    {
+        return message;
+    }
+};
+
+class DOMBadElementConversion : public DOMException
+{
+  public:
+    DOMBadElementConversion()
+    {
+        setMessage("Unknown DOMBadElementConversion");
+    }
+    DOMBadElementConversion(const QString &mes) : DOMException(mes) {}
+    DOMBadElementConversion(const QDomNode &node)
+    {
+        setMessage(QString("Unable to convert node: '%1' to QDomElement.")
+                .arg(node.nodeName()));
+    }
+};
+
+class DOMUnknownChildElement : public DOMException
+{
+  public:
+    DOMUnknownChildElement()
+    {
+        setMessage("Unknown DOMUnknownChildElement");
+    }
+    DOMUnknownChildElement(const QString &mes) : DOMException(mes) {}
+    DOMUnknownChildElement(const QDomElement &e, QString child_name)
+    {
+        setMessage(QString("Unknown child element '%1' of: '%2'")
+                .arg(child_name)
+                .arg(e.tagName()));
+    }
+};
+
+QDomElement nodeToElement(QDomNode &node)
+{
+    QDomElement retval = node.toElement();
+    if (retval.isNull())
+    {
+        throw DOMBadElementConversion(node);
+    }
+    return retval;
+}
+
+QString getNamedElementText(const QDomElement &e,
+        const QString &child_element_name)
+{
+    QDomNode child_node = e.namedItem(child_element_name);
+    if (child_node.isNull())
+    {
+        throw DOMUnknownChildElement(e, child_element_name);
+    }
+    QDomElement element = nodeToElement(child_node);
+    return element.text();
+}
+
+void ImportIconMap(const QString &filename)
+{
+    if (!quiet)
+    {
+        QString msg = QString("Importing icon mapping from %1...")
+                .arg(filename);
+        cout << msg << endl;
+    }
+    QFile xml_file;
+
+    if (dash_open(xml_file, filename, IO_ReadOnly))
+    {
+        QDomDocument doc;
+        QString de_msg;
+        int de_ln = 0;
+        int de_column = 0;
+        if (doc.setContent(&xml_file, false, &de_msg, &de_ln, &de_column))
+        {
+            QSqlQuery nm_query;
+            nm_query.prepare("REPLACE INTO networkiconmap(network, url) "
+                    "VALUES(:NETWORK, :URL)");
+            QSqlQuery cm_query;
+            cm_query.prepare("REPLACE INTO callsignnetworkmap(callsign, "
+                    "network) VALUES(:CALLSIGN, :NETWORK)");
+            QSqlQuery su_query;
+            su_query.prepare("UPDATE settings SET data = :URL "
+                    "WHERE value = :STUBNAME");
+            QSqlQuery si_query;
+            si_query.prepare("INSERT INTO settings(value, data) "
+                    "VALUES(:STUBNAME, :URL)");
+
+            QDomElement element = doc.documentElement();
+
+            QDomNode node = element.firstChild();
+            while (!node.isNull())
+            {
+                try
+                {
+                    QDomElement e = nodeToElement(node);
+                    if (e.tagName() == IM_NET_TO_URL_TAG)
+                    {
+                        QString net = getNamedElementText(e, IM_NET_TAG);
+                        QString u = getNamedElementText(e, IM_NET_URL_TAG);
+
+                        nm_query.bindValue(":NETWORK", net.stripWhiteSpace());
+                        nm_query.bindValue(":URL", u.stripWhiteSpace());
+                        if (!nm_query.exec())
+                            MythContext::DBError(
+                                    "Inserting network->url mapping", nm_query);
+                    }
+                    else if (e.tagName() == IM_CS_TO_NET_TAG)
+                    {
+                        QString cs = getNamedElementText(e, IM_CS_TAG);
+                        QString net = getNamedElementText(e, IM_NET_TAG);
+
+                        cm_query.bindValue(":CALLSIGN", cs.stripWhiteSpace());
+                        cm_query.bindValue(":NETWORK", net.stripWhiteSpace());
+                        if (!cm_query.exec())
+                            MythContext::DBError("Inserting callsign->network "
+                                    "mapping", cm_query);
+                    }
+                    else if (e.tagName() == IM_BASEURL_TAG)
+                    {
+                        QSqlQuery *qr = &si_query;
+
+                        QString st(BASEURLMAP_START);
+                        st += getNamedElementText(e, IM_BASE_STUB_TAG);
+                        QString u = getNamedElementText(e, IM_NET_URL_TAG);
+
+                        QSqlQuery qc;
+                        qc.prepare("SELECT COUNT(*) FROM settings "
+                                "WHERE value = :STUBNAME");
+                        qc.bindValue(":STUBNAME", st);
+                        qc.exec();
+                        if (qc.isActive() && qc.numRowsAffected() > 0)
+                        {
+                            qc.first();
+                            if (qc.value(0).toInt() != 0)
+                            {
+                                qr = &su_query;
+                            }
+                        }
+
+                        qr->bindValue(":STUBNAME", st);
+                        qr->bindValue(":URL", u);
+
+                        if (!qr->exec())
+                            MythContext::DBError(
+                                    "Inserting callsign->network mapping", *qr);
+                    }
+                }
+                catch (DOMException &e)
+                {
+                    QString em = QString("Error while processing %1: %2")
+                            .arg(node.nodeName())
+                            .arg(e.getMessage());
+                    cerr << em << endl;
+                }
+                node = node.nextSibling();
+            }
+        }
+        else
+        {
+            QString em = QString(
+                    "Error unable to set document content: %1:%2c%3 %4")
+                    .arg(filename)
+                    .arg(de_ln)
+                    .arg(de_column)
+                    .arg(de_msg);
+            cerr << em << endl;
+        }
+    }
+    else
+    {
+        QString em = QString("Error unable to open '%1' for reading.")
+                .arg(filename);
+        cerr << em << endl;
+    }
+}
+
+void ExportIconMap(const QString &filename)
+{
+    if (!quiet)
+    {
+        QString msg = QString("Exporting icon mapping to %1...")
+                .arg(filename);
+        cout << msg << endl;
+    }
+    QFile xml_file(filename);
+    if (dash_open(xml_file, filename, IO_WriteOnly))
+    {
+        QTextStream os(&xml_file);
+        os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        os << "<!-- generated by mythfilldatabase -->\n";
+
+        QDomDocument iconmap;
+        QDomElement roote = iconmap.createElement(IM_DOC_TAG);
+
+        QSqlQuery query;
+        query.exec("SELECT * FROM callsignnetworkmap");
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            while (query.next())
+            {
+                QDomElement cs2nettag = iconmap.createElement(IM_CS_TO_NET_TAG);
+                QDomElement cstag = iconmap.createElement(IM_CS_TAG);
+                QDomElement nettag = iconmap.createElement(IM_NET_TAG);
+                QDomText cs_text = iconmap.createTextNode(
+                        query.value(1).toString());
+                QDomText net_text = iconmap.createTextNode(
+                        query.value(2).toString());
+
+                cstag.appendChild(cs_text);
+                nettag.appendChild(net_text);
+
+                cs2nettag.appendChild(cstag);
+                cs2nettag.appendChild(nettag);
+
+                roote.appendChild(cs2nettag);
+            }
+        }
+
+        query.exec("SELECT * FROM networkiconmap");
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            while (query.next())
+            {
+                QDomElement net2urltag = iconmap.createElement(
+                        IM_NET_TO_URL_TAG);
+                QDomElement nettag = iconmap.createElement(IM_NET_TAG);
+                QDomElement urltag = iconmap.createElement(IM_NET_URL_TAG);
+                QDomText net_text = iconmap.createTextNode(
+                        query.value(1).toString());
+                QDomText url_text = iconmap.createTextNode(
+                        query.value(2).toString());
+
+                nettag.appendChild(net_text);
+                urltag.appendChild(url_text);
+
+                net2urltag.appendChild(nettag);
+                net2urltag.appendChild(urltag);
+
+                roote.appendChild(net2urltag);
+            }
+        }
+
+        query.prepare("SELECT value,data FROM settings WHERE value "
+                "LIKE :URLMAP");
+        query.bindValue(":URLMAP", QString(BASEURLMAP_START) + "%");
+        query.exec();
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            QRegExp baseax("\\.([^\\.]+)$");
+            while (query.next())
+            {
+                QString base_stub = query.value(0).toString();
+                if (baseax.search(base_stub) != -1)
+                {
+                    base_stub = baseax.cap(1);
+                }
+
+                QDomElement baseurltag = iconmap.createElement(IM_BASEURL_TAG);
+                QDomElement stubtag = iconmap.createElement(
+                        IM_BASE_STUB_TAG);
+                QDomElement urltag = iconmap.createElement(IM_NET_URL_TAG);
+                QDomText base_text = iconmap.createTextNode(base_stub);
+                QDomText url_text = iconmap.createTextNode(
+                        query.value(1).toString());
+
+                stubtag.appendChild(base_text);
+                urltag.appendChild(url_text);
+
+                baseurltag.appendChild(stubtag);
+                baseurltag.appendChild(urltag);
+
+                roote.appendChild(baseurltag);
+            }
+        }
+
+        iconmap.appendChild(roote);
+        iconmap.save(os, 4);
+    }
+    else
+    {
+        QString em = QString("Error unable to open '%1' for writing.")
+                .arg(filename);
+        cerr << em << endl;
+    }
+}
+
+void RunSimpleQuery(const QString &query)
+{
+    QSqlQuery q;
+    if (!q.exec(query))
+        MythContext::DBError("RunSimpleQuery ", q);
+}
+
+void ResetIconMap(bool reset_icons)
+{
+    QSqlQuery query;
+    query.prepare("DELETE FROM settings WHERE value LIKE :URLMAPLIKE");
+    query.bindValue(":URLMAPLIKE", QString(BASEURLMAP_START) + '%');
+    if (!query.exec())
+        MythContext::DBError("ResetIconMap", query);
+
+    RunSimpleQuery("TRUNCATE TABLE callsignnetworkmap;");
+    RunSimpleQuery("TRUNCATE TABLE networkiconmap");
+
+    if (reset_icons)
+    {
+        RunSimpleQuery("UPDATE channel SET icon = 'none'");
+    }
+}
+
+} // namespace
+
+// DataDirect stuff
 void DataDirectStationUpdate(Source source)
 {
     QSqlQuery query;
@@ -304,6 +777,8 @@ void DataDirectStationUpdate(Source source)
             }
         } while (dd_station_info.next());
     }
+
+    UpdateSourceIcons(source.id);
 
     // Now, delete any channels which no longer exist
     // (Not currently done in standard program -- need to verify if required)
@@ -878,16 +1353,9 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
     QDomDocument doc;
     QFile f;
 
-    if (filename.compare("-"))
+    if (!dash_open(f, filename, IO_ReadOnly))
     {
-        f.setName(filename);
-        if (!f.open(IO_ReadOnly))
-            return;
-    }
-    else
-    {
-        if (!f.open(IO_ReadOnly, stdin))
-            return;
+        return;
     }
 
     QString errorMsg = "unknown";
@@ -1167,7 +1635,7 @@ unsigned int promptForChannelUpdates(QValueList<ChanInfo>::iterator chaninfo,
     return(chanid);
 }
 
-void handleChannels(int id, QValueList<ChanInfo> *chanlist)
+static QString SetupIconCacheDirectory()
 {
     QString fileprefix = QDir::homeDirPath() + "/.mythtv";
 
@@ -1180,6 +1648,13 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
     dir = QDir(fileprefix);
     if (!dir.exists())
         dir.mkdir(fileprefix);
+
+    return fileprefix;
+}
+
+void handleChannels(int id, QValueList<ChanInfo> *chanlist)
+{
+    QString fileprefix = SetupIconCacheDirectory();
 
     QDir::setCurrent(fileprefix);
 
@@ -1445,6 +1920,8 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
             }
         }
     }
+
+    UpdateSourceIcons(id);
 }
 
 void clearDBAtOffset(int offset, int chanid, QDate *qCurrentDate)
@@ -2329,6 +2806,17 @@ int main(int argc, char *argv[])
     int fromxawfile_id = 1;
     QString fromxawfile_name;
 
+    bool grab_data = true;
+
+    bool export_iconmap = false;
+    bool import_iconmap = false;
+    bool reset_iconmap = false;
+    bool reset_iconmap_icons = false;
+    QString import_icon_map_filename("iconmap.xml");
+    QString export_icon_map_filename("iconmap.xml");
+
+    bool update_icon_map = false;
+
     while (argpos < a.argc())
     {
         // The manual and update flags should be mutually exclusive.
@@ -2436,7 +2924,69 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos], "--quiet"))
         {
              quiet = true;
-             ++argpos;
+        }
+        else if (!strcmp(a.argv()[argpos], "--export-icon-map"))
+        {
+            export_iconmap = true;
+            grab_data = false;
+
+            if ((argpos + 1) >= a.argc() ||
+                    !strncmp(a.argv()[argpos + 1], "--", 2))
+            {
+                if (!isatty(fileno(stdout)))
+                {
+                    quiet = true;
+                    export_icon_map_filename = "-";
+                }
+            }
+            else
+            {
+                export_icon_map_filename = a.argv()[++argpos];
+            }
+        }
+        else if (!strcmp(a.argv()[argpos], "--import-icon-map"))
+        {
+            import_iconmap = true;
+            grab_data = false;
+
+            if ((argpos + 1) >= a.argc() ||
+                    !strncmp(a.argv()[argpos + 1], "--", 2))
+            {
+                if (!isatty(fileno(stdin)))
+                {
+                    import_icon_map_filename = "-";
+                }
+            }
+            else
+            {
+                import_icon_map_filename = a.argv()[++argpos];
+            }
+        }
+        else if (!strcmp(a.argv()[argpos], "--update-icon-map"))
+        {
+            update_icon_map = true;
+            grab_data = false;
+        }
+        else if (!strcmp(a.argv()[argpos], "--reset-icon-map"))
+        {
+            reset_iconmap = true;
+            grab_data = false;
+
+            if ((argpos + 1) < a.argc() &&
+                    strncmp(a.argv()[argpos + 1], "--", 2))
+            {
+                ++argpos;
+                if (QString(a.argv()[argpos]) == "all")
+                {
+                    reset_iconmap_icons = true;
+                }
+                else
+                {
+                    cerr << "Unknown icon group '" << a.argv()[argpos]
+                            << "' for --reset-icon-map option" << endl;
+                    return -1;
+                }
+            }
         }
         else if (!strcmp(a.argv()[argpos], "-h") ||
                  !strcmp(a.argv()[argpos], "--help"))
@@ -2484,6 +3034,17 @@ int main(int argc, char *argv[])
             cout << "   Tomorrow will be refreshed always unless this argument is used\n";
             cout << "--dont-refresh-tba\n";
             cout << "   \"To be announced\" progs will be refreshed always unless this argument is used\n";
+            cout << "--export-icon-map [<filename>]\n";
+            cout << "   Exports your current icon map to <filename> (default: "
+                    << export_icon_map_filename << ")\n";
+            cout << "--import-icon-map [<filename>]\n";
+            cout << "   Imports an icon map from <filename> (default: " <<
+                    import_icon_map_filename << ")\n";
+            cout << "--update-icon-map\n";
+            cout << "   Updates icon map icons only\n";
+            cout << "--reset-icon-map [all]\n";
+            cout << "   Resets your icon map (pass all to reset channel icons as well)\n";
+            cout << "\n";
 #if 0
             cout << "--dd-grab-all\n";
             cout << "   The DataDirect grabber will grab all available data\n";
@@ -2518,7 +3079,10 @@ int main(int argc, char *argv[])
     gContext->LogEntry("mythfilldatabase", LP_INFO,
                        "Listings Download Started", "");
 
-    if (from_xawfile)
+    if (!grab_data)
+    {
+    }
+    else if (from_xawfile)
     {
         readXawtvChannels(fromxawfile_id, fromxawfile_name);
     }
@@ -2584,18 +3148,50 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!quiet)
-         cout << "Adjusting program database end times...\n";
-    int update_count = fix_end_times();
-    if (update_count == -1)
-         cerr << "fix_end_times failed!\a\n";
-    else if (!quiet)
-         cout << update_count << " replacements made.\n";
+    if (reset_iconmap)
+    {
+        ResetIconMap(reset_iconmap_icons);
+    }
 
-    ScheduledRecording::signalChange(db);
+    if (import_iconmap)
+    {
+        ImportIconMap(import_icon_map_filename);
+    }
 
-    gContext->LogEntry("mythfilldatabase", LP_INFO,
-                       "Listings Download Finished", "");
+    if (export_iconmap)
+    {
+        ExportIconMap(export_icon_map_filename);
+    }
+
+    if (update_icon_map)
+    {
+        QSqlQuery query;
+        query.exec("SELECT sourceid FROM videosource ORDER BY sourceid;");
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            while (query.next())
+            {
+                UpdateSourceIcons(query.value(0).toInt());
+            }
+        }
+    }
+
+    if (grab_data)
+    {
+        if (!quiet)
+             cout << "Adjusting program database end times...\n";
+        int update_count = fix_end_times();
+        if (update_count == -1)
+             cerr << "fix_end_times failed!\a\n";
+        else if (!quiet)
+             cout << update_count << " replacements made.\n";
+
+        ScheduledRecording::signalChange(db);
+
+        gContext->LogEntry("mythfilldatabase", LP_INFO,
+                           "Listings Download Finished", "");
+    }
+
     delete gContext;
 
     return 0;
