@@ -123,7 +123,6 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
 
     // Create the local webcam and start it
     webcam = new Webcam();
-    connect(webcam, SIGNAL(webcamFrameReady(uchar *, int, int)), this, SLOT(DrawLocalWebcamImage(uchar *, int, int)));
     QString WebcamDevice = gContext->GetSetting("WebcamDevice");
     getResolution("CaptureResolution", wcWidth, wcHeight);
     getResolution("TxResolution", txWidth, txHeight);
@@ -139,6 +138,8 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     camBrightness = 32768; 
     camColour = 32768; 
     camContrast = 32768;
+    localClient = 0;
+    txClient = 0;
     if (WebcamDevice.length() > 0)
     {
         if (webcam->camOpen(WebcamDevice, wcWidth, wcHeight)) 
@@ -147,7 +148,8 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
             camBrightness = webcam->GetBrightness();
             camContrast = webcam->GetContrast();
             camColour = webcam->GetColour();
-            webcam->SetTargetFps(txFps = atoi((const char *)gContext->GetSetting("TransmitFPS")));
+            txFps = atoi((const char *)gContext->GetSetting("TransmitFPS"));
+            localClient = webcam->RegisterClient(VIDEO_PALETTE_RGB32, 20, this);
         }
     }
 
@@ -417,6 +419,24 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
 }
 
 
+void PhoneUIBox::customEvent(QCustomEvent *event)
+{
+    switch ((int)event->type()) 
+    {
+    case WebcamEvent::FrameReady:
+        {
+            WebcamEvent *we = (WebcamEvent *)event;
+            if (we->getClient() == localClient)
+                DrawLocalWebcamImage();
+            else if (we->getClient() == txClient)
+                TransmitLocalWebcamImage();
+        }
+        break;
+    }
+
+    QWidget::customEvent(event);
+}
+
 
 void PhoneUIBox::PlaceorAnswerCall(QString url, QString name, QString Mode, bool onLocalLan)
 {
@@ -476,6 +496,7 @@ void PhoneUIBox::StartVideo(int lPort, QString remoteIp, int remoteVideoPort, in
     if (h263->H263StartEncoder(txWidth, txHeight, txFps) && 
         h263->H263StartDecoder(rxWidth, rxHeight))
     {
+        txClient = webcam->RegisterClient(VIDEO_PALETTE_YUV420P, txFps, this);
         VideoOn = true;
         rxVideoTimer->start(20); // Max frame rate supported is 30/sec; go slightly faster to accomodate for jitter
     }
@@ -496,6 +517,10 @@ void PhoneUIBox::StopVideo()
         rxVideoTimer->stop();
         VideoOn = false;
     }
+    if (txClient)
+        webcam->UnregisterClient(txClient);
+    txClient = 0;
+
     if (rtpVideo)
         delete rtpVideo;
     rtpVideo = 0;
@@ -531,79 +556,100 @@ void PhoneUIBox::MenuButtonPushed()
 }
 
 
-void PhoneUIBox::DrawLocalWebcamImage(uchar *yuvBuffer, int w, int h)
+void PhoneUIBox::DrawLocalWebcamImage()
 {
-    // Digital Zoom/pan parameters
-    int zx = (w-zoomWidth)/2;
-    zx += (zx*wPan/10);
-    zx = (zx >> 1) << 1; // Make sure its even
-    int zy = (h-zoomHeight)/2;
-    zy += (zy*hPan/10);
-    zy = (zy >> 1) << 1; // Make sure its even
-
-    // Scale the RGB image to fit into the local display window, taking into account the zoom and 
-    // pan settings
-    if (!fullScreen)
+    unsigned char *rgb32Frame = webcam->GetVideoFrame(localClient);
+    if (rgb32Frame != 0)
     {
-        QPixmap Pixmap;
-        QImage ScaledImage;
-
-        YUV420PtoRGB32(w, h, w, yuvBuffer, localRgbBuffer, sizeof(localRgbBuffer)); 
-        QImage Image(localRgbBuffer, w, h, 32, (QRgb *)0, 0, QImage::LittleEndian);
-
-        QRect puthere = localWebcamArea->getScreenArea();
-        if (zoomFactor == 10) // No Zoom; just scale the webcam image to the local window size
+        if (!fullScreen) // In full-screen mode local webcam does not get displayed, only remote webcam
         {
-            ScaledImage = Image.scale(puthere.width(), puthere.height(), QImage::ScaleMin);
-        }
-        else
-        {
-            QImage zoomedImage = Image.copy(zx, zy, zoomWidth, zoomHeight);
-            ScaledImage = zoomedImage.scale(puthere.width(), puthere.height(), QImage::ScaleMin);
-        }
-    
-        // Draw the local webcam image
-        Pixmap = ScaledImage;
-        bitBlt(this, puthere.x(), puthere.y(), &Pixmap);
-    }
-
-    // If we are transmitting video, process the YUV image
-    if (VideoOn && rtpVideo)
-    {
-        int encLen;
-        if (zoomFactor == 10) // No Zoom; just scale the webcam image to the transmit size
-        {
-            scaleYuvImage(yuvBuffer, w, h, txWidth, txHeight, yuvBuffer2);
-        }
-        else
-        {
-            cropYuvImage(yuvBuffer, w, h, zx, zy, zoomWidth, zoomHeight, yuvBuffer1);
-            scaleYuvImage(yuvBuffer1, zoomWidth, zoomHeight, txWidth, txHeight, yuvBuffer2);
-        }
-        uchar *encFrame = h263->H263EncodeFrame(yuvBuffer2, &encLen);
-        VIDEOBUFFER *vb = rtpVideo->getVideoBuffer(encLen);
-        if (vb)
-        {
-            if (encLen > (int)sizeof(vb->video))
+            // Digital Zoom/pan parameters
+            int zx = (wcWidth-zoomWidth)/2;
+            zx += (zx*wPan/10);
+            zx = (zx >> 1) << 1; // Make sure its even
+            int zy = (wcHeight-zoomHeight)/2;
+            zy += (zy*hPan/10);
+            zy = (zy >> 1) << 1; // Make sure its even
+        
+            QPixmap Pixmap;
+            QImage ScaledImage;
+        
+            QImage Image(rgb32Frame, wcWidth, wcHeight, 32, (QRgb *)0, 0, QImage::LittleEndian);
+        
+            QRect puthere = localWebcamArea->getScreenArea();
+            if (zoomFactor == 10) // No Zoom; just scale the webcam image to the local window size
             {
-                cout << "SIP: Encoded H.323 frame size is " << encLen << "; too big for buffer\n";
-                rtpVideo->freeVideoBuffer(vb);
+                ScaledImage = Image.scale(puthere.width(), puthere.height(), QImage::ScaleMin);
             }
             else
             {
-                memcpy(vb->video, encFrame, encLen); // Optimisation to get rid of this copy may be possible, check H.263 stack
-                vb->len = encLen;
-                vb->w = txWidth;
-                vb->h = txHeight;
-                if (!rtpVideo->queueVideo(vb))
+                QImage zoomedImage = Image.copy(zx, zy, zoomWidth, zoomHeight);
+                ScaledImage = zoomedImage.scale(puthere.width(), puthere.height(), QImage::ScaleMin);
+            }
+            
+            // Draw the local webcam image
+            Pixmap = ScaledImage;
+            bitBlt(this, puthere.x(), puthere.y(), &Pixmap);
+        }
+        webcam->FreeVideoBuffer(localClient, rgb32Frame);
+    }
+}
+
+
+
+void PhoneUIBox::TransmitLocalWebcamImage()
+{
+    unsigned char *yuvFrame = webcam->GetVideoFrame(txClient);
+    if (yuvFrame != 0)
+    {
+        // If we are transmitting video, process the YUV image
+        if (VideoOn && rtpVideo)
+        {
+            // Digital Zoom/pan parameters
+            int zx = (wcWidth-zoomWidth)/2;
+            zx += (zx*wPan/10);
+            zx = (zx >> 1) << 1; // Make sure its even
+            int zy = (wcHeight-zoomHeight)/2;
+            zy += (zy*hPan/10);
+            zy = (zy >> 1) << 1; // Make sure its even
+    
+            int encLen;
+            if (zoomFactor == 10) // No Zoom; just scale the webcam image to the transmit size
+            {
+                scaleYuvImage(yuvFrame, wcWidth, wcHeight, txWidth, txHeight, yuvBuffer2);
+            }
+            else
+            {
+                cropYuvImage(yuvFrame, wcWidth, wcHeight, zx, zy, zoomWidth, zoomHeight, yuvBuffer1);
+                scaleYuvImage(yuvBuffer1, zoomWidth, zoomHeight, txWidth, txHeight, yuvBuffer2);
+            }
+            uchar *encFrame = h263->H263EncodeFrame(yuvBuffer2, &encLen);
+            VIDEOBUFFER *vb = rtpVideo->getVideoBuffer(encLen);
+            if (vb)
+            {
+                if (encLen > (int)sizeof(vb->video))
                 {
-                    cout << "Could not queue RTP Video frame for transmission\n";
+                    cout << "SIP: Encoded H.323 frame size is " << encLen << "; too big for buffer\n";
                     rtpVideo->freeVideoBuffer(vb);
+                }
+                else
+                {
+                    memcpy(vb->video, encFrame, encLen); // Optimisation to get rid of this copy may be possible, check H.263 stack
+                    vb->len = encLen;
+                    vb->w = txWidth;
+                    vb->h = txHeight;
+                    if (!rtpVideo->queueVideo(vb))
+                    {
+                        cout << "Could not queue RTP Video frame for transmission\n";
+                        rtpVideo->freeVideoBuffer(vb);
+                    }
                 }
             }
         }
+        webcam->FreeVideoBuffer(txClient, yuvFrame);
     }
 }
+
 
 void PhoneUIBox::rxVideoTimerExpiry()
 {
@@ -783,6 +829,13 @@ void PhoneUIBox::fsmTimerExpiry()
             DirContainer->ChangePresenceStatus(NotifyUrl, (NotifyParam1 == "offline" ? 0 : 1), NotifyParam2, true);
             DirectoryList->refresh();
         }
+
+        // See if the notification is an incoming IM message
+        else if (NotifyType == "IM")
+        {
+            cout << "Got IM from " << NotifyUrl << endl << NotifyParam1 << endl;
+        }
+
         else 
             cerr << "SIP: Unknown Notify type " << NotifyType << endl;
     }
@@ -1580,7 +1633,7 @@ void PhoneUIBox::changeVolume(bool up_or_down)
                 txFps = 30;
             if (txFps < 1)
                 txFps = 1;
-            webcam->SetTargetFps(txFps);
+            //webcam->SetTargetFps(txFps);
             break;
         }
         showVolume(true);
@@ -1859,6 +1912,11 @@ PhoneUIBox::~PhoneUIBox(void)
 {
     sipStack->UiStopWatchAll();
     sipStack->UiClosed();
+    if (localClient != 0)
+        webcam->UnregisterClient(localClient);
+    if (txClient != 0)
+        webcam->UnregisterClient(txClient);
+
     webcam->camClose();
     fsmTimer->stop();
     if (volume_control)

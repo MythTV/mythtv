@@ -37,6 +37,42 @@
 #define _B(y,u,v) (0x2568*(y) + 0x40cf*(v))					     /0x2000
 
 
+#define WC_CLIENT_BUFFERS   2
+
+struct wcClient
+{
+    QObject *eventWindow; // Window to receive frame-ready events
+    int format;
+    int frameSize;
+    int fps;
+    int actualFps;
+    int interframeTime;
+    QPtrList<unsigned char> BufferList;
+    QPtrList<unsigned char> FullBufferList;
+    QTime timeLastCapture;
+
+};
+
+
+class WebcamEvent : public QCustomEvent
+{
+public:
+    enum Type { Decoding = (QEvent::User + 200), FrameReady };
+
+    WebcamEvent(Type t, wcClient *c)
+        : QCustomEvent(t)
+    { client=c; }
+
+    ~WebcamEvent()
+    {
+    }
+
+    wcClient *getClient() { return client; }
+
+private:
+    wcClient *client;
+};
+
 
 class Webcam : public QObject
 {
@@ -56,27 +92,35 @@ class Webcam : public QObject
     int  SetContrast(int v);
     int  SetColour(int v);
     int  SetHue(int v);
-    int  SetTargetFps(int f);
-    int  GetActualFps();
+    int  SetTargetFps(wcClient *client, int fps);
     int  GetBrightness(void) { return (vPic.brightness);};
     int  GetColour(void) { return (vPic.colour);};
     int  GetContrast(void) { return (vPic.contrast);};
     int  GetHue(void) { return (vPic.hue);};
+    int  GetActualFps();
     QString GetName(void) { return vCaps.name; };
     void GetMaxSize(int *x, int *y) { *y=vCaps.maxheight; *x=vCaps.maxwidth; };
     void GetMinSize(int *x, int *y) { *y=vCaps.minheight; *x=vCaps.minwidth; };
     void GetCurSize(int *x, int *y) { *y=vWin.height; *x=vWin.width; };
     int isGreyscale(void) { return ((vCaps.type & VID_TYPE_MONOCHROME) ? true : false); };
-    int grabImage(void);
 
-  signals:
-    void webcamFrameReady(uchar *yuvBuff, int w, int h);
+    wcClient *RegisterClient(int format, int fps, QObject *eventWin);
+    void UnregisterClient(wcClient *client);
+    unsigned char *GetVideoFrame(wcClient *client);
+    void FreeVideoBuffer(wcClient *client, unsigned char *buffer);
 
-  public slots:
-    void grabTimerExpiry();
-    void fpsMeasureTimerExpiry();
 
   private:
+    void StartThread();
+    void KillThread();
+    static void *WebcamThread(void *p);
+    void WebcamThreadWorker();
+
+
+    pthread_t webcamthread;
+    QPtrList<wcClient> wcClientList;
+    QMutex WebcamLock;
+
     void SetSize(int width, int height);
 
     void readCaps(void);
@@ -84,16 +128,11 @@ class Webcam : public QObject
     int hDev;
     QString DevName;
     unsigned char *picbuff1;
-    unsigned char *picbuff2;
-    unsigned char *dispbuff;
     int imageLen;
     int frameSize;
     int fps;
     int actualFps;
-    int frames_last_period;
-
-    QTimer  *grabTimer;              // Timer controlling grab frame rate
-    QTimer  *fpsMeasureTimer;        // Timer measuring actual FPS
+    bool killWebcamThread;
 
     // Camera-reported capabilities
     struct video_capability vCaps;

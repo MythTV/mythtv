@@ -50,6 +50,7 @@ class PhoneUIBox : public MythThemedDialog
     ~PhoneUIBox(void);
 
     void keyPressEvent(QKeyEvent *e);
+    void customEvent(QCustomEvent *);
     
   public slots:
 
@@ -57,7 +58,7 @@ class PhoneUIBox : public MythThemedDialog
     void handleTreeListSignals(int, IntVector*);
     void fsmTimerExpiry();
     void rxVideoTimerExpiry();
-    void DrawLocalWebcamImage(uchar *yuvBuffer, int w, int h);
+    void TransmitLocalWebcamImage(uchar *yuvBuffer, int w, int h);
     void closeUrlPopup();
     void dialUrlVideo();
     void dialUrlVoice();
@@ -94,6 +95,8 @@ class PhoneUIBox : public MythThemedDialog
 
 
   private:
+    void    DrawLocalWebcamImage();
+    void    TransmitLocalWebcamImage();
     void    PlaceorAnswerCall(QString url, QString name, QString Mode, bool onLocalLan=false);
     void    HangUp();
     void    StartVideo(int lPort, QString remoteIp, int remoteVideoPort, int videoPayload, QString rxVidRes);
@@ -126,6 +129,8 @@ class PhoneUIBox : public MythThemedDialog
     Tone   *vmail;
 
     Webcam  *webcam;
+    wcClient *localClient;
+    wcClient *txClient;
     int wcWidth, wcHeight, txWidth, txHeight, rxWidth, rxHeight;
     QString txVideoMode;
     int zoomWidth, zoomHeight, zoomFactor;
