@@ -18,7 +18,8 @@ typedef enum {
     MEDIATYPE_DATA=2,
     MEDIATYPE_MIXED=4,
     MEDIATYPE_AUDIO=8,
-    MEDIATYPE_VIDEO=16
+    MEDIATYPE_DVD=16,
+    MEDIATYPE_VCD=32
 } MediaType;
 
 typedef enum {

@@ -21,6 +21,10 @@ using namespace std;
 #define PATHTO_DVD_DETECT "/VIDEO_TS"
 #endif
 
+#ifndef PATHTO_VCD_DETECT
+#define PATHTO_VCD_DETECT "/vcd"
+#endif
+
 MythCDROM::MythCDROM(QObject* par, const char* DevicePath, bool SuperMount, 
                      bool AllowEject) 
          : MythMediaDevice(par, DevicePath, SuperMount, AllowEject)
@@ -255,12 +259,24 @@ void MythCDROM::onDeviceMounted()
     if (stat(DetectPath, &sbuf) == 0)
     {
         VERBOSE(VB_GENERAL, "Probable DVD detected.");
-        m_MediaType = MEDIATYPE_VIDEO;
+        m_MediaType = MEDIATYPE_DVD;
         // HACK make it possible to eject a DVD by unmounting it
         performMountCmd(false);
         m_Status = MEDIASTAT_USEABLE; 
     }
     
+    DetectPath.sprintf("%s%s", (const char*)m_MountPath, PATHTO_VCD_DETECT);
+    VERBOSE(VB_ALL, QString("Looking for: '%1'").arg(DetectPath));
+
+    if (stat(DetectPath, &sbuf) == 0)
+    {
+        VERBOSE(VB_GENERAL, "Probable VCD detected.");
+        m_MediaType = MEDIATYPE_VCD;
+        // HACK make it possible to eject a VCD by unmounting it
+        performMountCmd(false);
+        m_Status = MEDIASTAT_USEABLE; 
+    }
+
     if (m_AllowEject)
         unlock();
 }

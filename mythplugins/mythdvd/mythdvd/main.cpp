@@ -239,7 +239,7 @@ int mythplugin_run(void);
 int mythplugin_config(void);
 }
 
-void handleMedia(void) 
+void handleDVDMedia(void) 
 {
     switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
     {
@@ -262,12 +262,32 @@ void handleMedia(void)
     }
 }
 
+#ifdef VCD_SUPPORT
+void handleVCDMedia(void) 
+{
+    switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
+    {
+       case 0 : // Do nothing
+           break;
+       case 1 : // Display menu (mythdvd)*/
+           mythplugin_run();
+           break;
+       case 2 : // play VCD
+           playVCD();
+           break;
+       case 3 : // Do nothing, cannot rip VCD?
+           break;
+    }
+}
+#endif
+
 void initKeys(void)
 {
     REG_JUMP("Play DVD", "Play a DVD", "", playDVD);
-    REG_MEDIA_HANDLER("MythDVD Media Handler", "", "", handleMedia, MEDIATYPE_VIDEO);
+    REG_MEDIA_HANDLER("MythDVD DVD Media Handler", "", "", handleDVDMedia, MEDIATYPE_DVD);
 #ifdef VCD_SUPPORT
     REG_JUMP("Play VCD", "Play a VCD", "", playVCD);
+    REG_MEDIA_HANDLER("MythDVD VCD Media Handler", "", "", handleVCDMedia, MEDIATYPE_VCD);
 #endif
 #ifdef TRANSCODE_SUPPORT
     REG_JUMP("Rip DVD", "Import a DVD into your MythVideo database", "", 

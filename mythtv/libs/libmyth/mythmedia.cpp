@@ -22,7 +22,7 @@ using namespace std;
 #define PATHTO_MOUNTS "/proc/mounts"
 
 const char* MythMediaDevice::MediaStatusStrings[] = { "MEDIASTAT_ERROR", "MEDIASTAT_UNKNOWN", "MEDIASTAT_OPEN", "MEDIASTAT_USEABLE", "MEDIASTAT_NOTMOUNTED", "MEDIASTAT_MOUNTED" };
-const char* MythMediaDevice::MediaTypeStrings[] = { "MEDIATYPE_UNKNOWN", "MEDIATYPE_DATA", "MEDIATYPE_MIXED", "MEDIATYPE_AUDIO", "MEDIATYPE_VIDEO" };
+const char* MythMediaDevice::MediaTypeStrings[] = { "MEDIATYPE_UNKNOWN", "MEDIATYPE_DATA", "MEDIATYPE_MIXED", "MEDIATYPE_AUDIO", "MEDIATYPE_DVD", "MEDIATYPE_VCD" };
 const char* MythMediaDevice::MediaErrorStrings[] = { "MEDIAERR_OK", "MEDIAERR_FAILED", "MEDIAERR_UNSUPPORTED" };
 
 MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath, 
