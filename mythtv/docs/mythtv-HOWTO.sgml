@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-27, v2.06
+<date>2003-03-31, v2.06
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -955,17 +955,30 @@ $ aplay /usr/share/sounds/info.wav
 If it works, you're done installing ALSA!
 
 <sect1>Setting the mixer from the command line.
-<p>If you're running Mandrake 9.0 and have installed the alsa-utils package,
-then the <bf>amixer</bf> program can be used to setup the mixer.
+<p>If you have installed the alsa-utils package, then the <bf>amixer</bf>
+program can be used to setup the mixer.  The "Master" volume setting is only
+required on a frontend machine, because it will prepare your machine for
+playing sound.  The "Line" and "Capture" controls are required for your
+sound card to actually capture audio from the external Line-in.
+
+<code>
+Note the spelling in the following commands.
+</code>
 
 <tscreen><verb>
 $ amixer set Master,0 100%,100% unmute
-$ amixer set Line,0 100%,100% mute capture
+$ amixer set Line,0 75%,75% mute captur
+$ amixer set Capture,0 100%,100% mute captur
 $ su
 # alsactl store
 # exit
 $ 
 </verb></tscreen>
+
+If you have multiple sound cards, then use the <tt>-c</tt> parameter to
+specify which card to adjust.  Note that the first card will be "0", the
+second will be "1", etc.
+
 That takes care of setting the volume correctly, and the ALSA startup script
 will restore the volume after a reboot.
 
@@ -976,7 +989,8 @@ master volume to around 75%.  Next, use the left and right cursor keys to
 move around on the screen until you find the "Line" slider.  Press SPACE to
 set it as the capture source, set the level to around 50-75% and press "M"
 to mute it.  You can now press ESC to exit out of the <bf>alsamixer</bf>
-program.  You can also have MythTV manage all volume and mute settings.  See
+program.  You can also have MythTV manage all volume and mute settings, but
+this will only affect the "Master" or PCM volume, not the capture volume.  See
 the mythfrontend setup page for options.
  
 <sect>Setting up a remote control.
@@ -2790,7 +2804,9 @@ installed on it, and that hardware must be wired correctly.  The chip that
 will allow you to use the btaudio module is the MSP34xx.  However, having a
 MSP34xx is no guarantee that you will be able to use the btaudio module.
 
-As of 2003-03-27, the following cards are known to work with btaudio:
+As of 2003-03-31, this is the current list of cards and their status:
+Works with btaudio:
+
 <itemize>
 <item>Hauppauge WinTV-radio with dbx-TV stereo, model 401
 <item>Hauppauge WinTV-Theater, model 495
@@ -2802,7 +2818,7 @@ The following cards do not work:
 <item>Pinnacle Studio PCTV Pro - note: this has a MSP34xx, but it's not
 wired correctly to the BT878 chip.
 <item>ATI TV Wonder VE
-<item>Leadtek Winfast 2000 XP (PAL, UK)
+<item>Leadtek Winfast 2000 XP (PAL, UK and NTSC)
 <item>I/O Magic PC-PVR.  No MSP34xx chip.
 </itemize>
 
@@ -2837,6 +2853,7 @@ v2.05, 2003-03-27.  Reformatted the examples in mythmusic a little.  Added
 Mandrake 9.1 mythmusic prereq.
 v2.06, 2003-03-27.  grammar error.  Added link to Axel Thimm's RPMs. 
 Expanded on the command line parameters to mythbackend.
+v2.07, 2003-03-31.  more b0rken btaudio.  Added to amixer commands.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -191,21 +191,35 @@ $ aplay /usr/share/sounds/info.wav
 <H2><A NAME="ss7.2">7.2</A> <A HREF="mythtv-HOWTO.html#toc7.2">Setting the mixer from the command line.</A>
 </H2>
 
-<P>If you're running Mandrake 9.0 and have installed the alsa-utils package,
-then the <B>amixer</B> program can be used to setup the mixer.</P>
+<P>If you have installed the alsa-utils package, then the <B>amixer</B>
+program can be used to setup the mixer.  The "Master" volume setting is only
+required on a frontend machine, because it will prepare your machine for
+playing sound.  The "Line" and "Capture" controls are required for your
+sound card to actually capture audio from the external Line-in.</P>
+<P>
+<HR>
+<PRE>
+Note the spelling in the following commands.
+</PRE>
+<HR>
+</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ amixer set Master,0 100%,100% unmute
-$ amixer set Line,0 100%,100% mute capture
+$ amixer set Line,0 75%,75% mute captur
+$ amixer set Capture,0 100%,100% mute captur
 $ su
 # alsactl store
 # exit
 $ 
 </PRE>
 </CODE></BLOCKQUOTE>
-
-That takes care of setting the volume correctly, and the ALSA startup script
+</P>
+<P>If you have multiple sound cards, then use the <CODE>-c</CODE> parameter to
+specify which card to adjust.  Note that the first card will be "0", the
+second will be "1", etc.</P>
+<P>That takes care of setting the volume correctly, and the ALSA startup script
 will restore the volume after a reboot.</P>
 <P>You may also use the <B>alsamixer</B> program to set the volume.  First,
 start <B>alsamixer</B> from the command line.  You should start out on the
@@ -214,7 +228,8 @@ master volume to around 75%.  Next, use the left and right cursor keys to
 move around on the screen until you find the "Line" slider.  Press SPACE to
 set it as the capture source, set the level to around 50-75% and press "M"
 to mute it.  You can now press ESC to exit out of the <B>alsamixer</B>
-program.  You can also have MythTV manage all volume and mute settings.  See
+program.  You can also have MythTV manage all volume and mute settings, but
+this will only affect the "Master" or PCM volume, not the capture volume.  See
 the mythfrontend setup page for options.</P>
 
 <HR>

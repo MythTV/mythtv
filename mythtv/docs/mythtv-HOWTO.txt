@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-03-27, v2.06
+  2003-03-31, v2.06
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1104,15 +1104,27 @@
 
   [1m7.2.  Setting the mixer from the command line.[0m
 
-  If you're running Mandrake 9.0 and have installed the alsa-utils
-  package, then the [1mamixer [22mprogram can be used to setup the mixer.
+  If you have installed the alsa-utils package, then the [1mamixer [22mprogram
+  can be used to setup the mixer.  The "Master" volume setting is only
+  required on a frontend machine, because it will prepare your machine
+  for playing sound.  The "Line" and "Capture" controls are required for
+  your sound card to actually capture audio from the external Line-in.
 
-       $ amixer set Master,0 100%,100% unmute
-       $ amixer set Line,0 100%,100% mute capture
-       $ su
-       # alsactl store
-       # exit
-       $
+  ______________________________________________________________________
+  Note the spelling in the following commands.
+  ______________________________________________________________________
+
+  $ amixer set Master,0 100%,100% unmute
+  $ amixer set Line,0 75%,75% mute captur
+  $ amixer set Capture,0 100%,100% mute captur
+  $ su
+  # alsactl store
+  # exit
+  $
+
+  If you have multiple sound cards, then use the -c parameter to specify
+  which card to adjust.  Note that the first card will be "0", the
+  second will be "1", etc.
 
   That takes care of setting the volume correctly, and the ALSA startup
   script will restore the volume after a reboot.
@@ -1125,7 +1137,8 @@
   SPACE to set it as the capture source, set the level to around 50-75%
   and press "M" to mute it.  You can now press ESC to exit out of the
   [1malsamixer [22mprogram.  You can also have MythTV manage all volume and
-  mute settings.  See the mythfrontend setup page for options.
+  mute settings, but this will only affect the "Master" or PCM volume,
+  not the capture volume.  See the mythfrontend setup page for options.
 
   [1m8.  Setting up a remote control.[0m
 
@@ -1220,6 +1233,7 @@
 
   At this point, if you're using a serial receiver, check that the link
   has been correctly made in /dev
+
        $ ls -l /dev/li*
        lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
        srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
@@ -1253,11 +1267,11 @@
   For the impatient: Make sure you have an emergency floppy boot disk
   available!
 
-       $ cd /usr/src/linux
-       $ su
-       # make mrproper
-       # cd configs
-       # ls
+  $ cd /usr/src/linux
+  $ su
+  # make mrproper
+  # cd configs
+  # ls
 
   at this point you must look at the file names and determine which
   config file is right for you. For instance if you have an Athlon XP
@@ -1342,9 +1356,9 @@
   Now, we're going to add the commands necessary for lircd to run each
   time we boot.  Mandrake 9.1 users, you can execute:
 
-       $ su
-       # chkconfig --level 35 lircd on
-       # exit
+  $ su
+  # chkconfig --level 35 lircd on
+  # exit
 
   All other distributions:
 
@@ -1387,7 +1401,7 @@
   [1mirxevent [22misn't a daemon, so if you know that your remote is working
   you need to invoke it like this:
 
-       $ irxevent &
+  $ irxevent &
 
   If [1mirxevent [22misn't running, then MythTV will not respond to your remote
   control.
@@ -1401,17 +1415,17 @@
 
   The lircrc.example file has this:
 
-  begin
-      prog = irxevent
-      button = ChannelUp
-      config = Key Up CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelUp
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = ChannelDown
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelDown
+           config = Key Down CurrentWindow
+       end
 
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
@@ -1436,8 +1450,8 @@
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
-  ple.pinnaclestudiopctv for an example of how to define additional but-
-  tons, and how to debug potential button name conflicts between the
+  ple.pinnaclestudiopctv for an example of how to define additional
+  buttons, and how to debug potential button name conflicts between the
   lircrc.example file and how [1myour [22mremote defines the button names.
 
   By examining the button names defined in /etc/lircd.conf and using the
@@ -1489,8 +1503,8 @@
   command before you load the lirc_sir module. Follow this with the
   install:
 
-       $ su
-       # make install
+  $ su
+  # make install
 
   You will notice that lirc installs the kernel module in
   /lib/modules/uname -a/misc.
@@ -1498,15 +1512,15 @@
   The configuration for starting [1mlircd [22mdiffers if you're going to be
   sending and receiving IR versus just receiving.
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  setserial /dev/ttySx uart none        # (if required)
-  modprobe lirc_sir
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       setserial /dev/ttySx uart none        # (if required)
+       modprobe lirc_sir
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
   At this point you have to populate the /etc/lircd.conf file with the
   proper codes for your A/V remote. You should be able to find your
@@ -1538,19 +1552,20 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-       $ cd /usr/local/bin
-       # su
-       # cat > change_channel.csh
-       #!/bin/csh
-       echo "changing to $1"
-       /usr/local/bin/channel.pl $1 &
-       ^D
-       # chmod a+x change_channel.csh
-       # exit
-       $ exit
+  $ cd /usr/local/bin
+  # su
+  # cat > change_channel.csh
+  #!/bin/csh
+  echo "changing to $1"
+  /usr/local/bin/channel.pl $1 &
+  ^D
+  # chmod a+x change_channel.csh
+  # exit
+  $ exit
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
+
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
   sure to have the IRDA device within a few feet of the box.
@@ -1825,19 +1840,19 @@
   If you want to know what time your job will run, you can do the
   following:
 
-       # cat /etc/crontab
-       SHELL=/bin/bash
-       PATH=/sbin:/bin:/usr/sbin:/usr/bin
-       MAILTO=root
-       HOME=/
+  # cat /etc/crontab
+  SHELL=/bin/bash
+  PATH=/sbin:/bin:/usr/sbin:/usr/bin
+  MAILTO=root
+  HOME=/
 
-       # run-parts
-       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-       # exit
-       $
+  # run-parts
+  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+  # exit
+  $
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.
@@ -1946,10 +1961,10 @@
 
   To determine if you've got SSE, you can:
 
-  $ cat /proc/cpuinfo
-  [snip]
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
-  cmov pat pse36 mmx fxsr sse
+       $ cat /proc/cpuinfo
+       [snip]
+       flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
+       cmov pat pse36 mmx fxsr sse
 
   Notice the [1msse [22mat the end of the line - this tells you that this
   processor will be able to deinterlace correctly.
@@ -2048,13 +2063,13 @@
 
   [1m12.2.  Completing the installation.[0m
 
-       $ tar -xjf mythweb-0.8.tar.bz2
-       $ cd mythweb-0.8
-       $ su
-       # mkdir /var/www/html/mythweb
-       # cp -r . /var/www/html/mythweb
-       # exit
-       $
+  $ tar -xjf mythweb-0.8.tar.bz2
+  $ cd mythweb-0.8
+  $ su
+  # mkdir /var/www/html/mythweb
+  # cp -r . /var/www/html/mythweb
+  # exit
+  $
 
   To access the web page, open a web browser and use [1mhttp://[name or ip[0m
   [1maddress]/mythweb/[0m
@@ -2352,17 +2367,17 @@
 
   These are the keyboard commands for MythWeather:
 
-       Left Key             Goes back one page, and extends the time spent
-                            on the page you are on.
-       Right Key            Goes forward one page, see above.
-       Space                Pause, wait on the current page until space is hit
-                            again.
-       Numeric Keys         You can check other weather by keying in other ZIP codes.
-       Enter Key            Switch between Celsius and Fahrenheit. Can also
-                            be used a way to force a data update.
-       "m" Key              Resets the location to the database default, then updates the data.
-       "i"                  Enter / Save settings
-       ESC                  Exit the settings screen without saving / Exit the program
+  Left Key             Goes back one page, and extends the time spent
+                       on the page you are on.
+  Right Key            Goes forward one page, see above.
+  Space                Pause, wait on the current page until space is hit
+                       again.
+  Numeric Keys         You can check other weather by keying in other ZIP codes.
+  Enter Key            Switch between Celsius and Fahrenheit. Can also
+                       be used a way to force a data update.
+  "m" Key              Resets the location to the database default, then updates the data.
+  "i"                  Enter / Save settings
+  ESC                  Exit the settings screen without saving / Exit the program
 
   MythWeather also has an "Aggressiveness" setting.  This affects how
   long MythWeather waits for data from the msnbc.com website before
@@ -2409,7 +2424,6 @@
   +o  You have an AMD K6-2 or VIA C3 processor.  If you have either of
      these, make sure that you you followed the instructions in this
      ``section''.
-
   +o  You have an early production Intel Celeron, Pentium Pro or Pentium
      II.  If you have any of these processors, make sure that your
      ``deinterlace'' variable is set correctly.  Your CPU needs to
@@ -2469,10 +2483,10 @@
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
 
-       cc1plus: warning: changing search order for system directory
-       "/usr/local/include"
-       cc1plus: warning:   as it has already been specified as a non-system
-       directory
+  cc1plus: warning: changing search order for system directory
+  "/usr/local/include"
+  cc1plus: warning:   as it has already been specified as a non-system
+  directory
 
   then it shouldn't be a problem.
 
@@ -2520,23 +2534,23 @@
 
   Finally, check:
 
-       Section "Monitor"
-           Identifier "monitor1"
-           VendorName "Plug'n Play"
-           HorizSync 30-85
-           VertRefresh 50-160
+  Section "Monitor"
+      Identifier "monitor1"
+      VendorName "Plug'n Play"
+      HorizSync 30-85
+      VertRefresh 50-160
 
-           # Sony Vaio C1(X,XS,VE,VN)?
-           # 1024x480 @ 85.6 Hz, 48 kHz hsync
-           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+      # Sony Vaio C1(X,XS,VE,VN)?
+      # 1024x480 @ 85.6 Hz, 48 kHz hsync
+      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-           # TV fullscreen mode or DVD fullscreen output.
-           # 768x576 @ 79 Hz, 50 kHz hsync
-           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+      # TV fullscreen mode or DVD fullscreen output.
+      # 768x576 @ 79 Hz, 50 kHz hsync
+      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-           # 768x576 @ 100 Hz, 61.6 kHz hsync
-           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-       EndSection
+      # 768x576 @ 100 Hz, 61.6 kHz hsync
+      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+  EndSection
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
@@ -2649,6 +2663,7 @@
   audio data is written to /dev/dsp and converted back to an analog
   signal. This analog signal should then be sent to your speakers. Here
   is what is needed in alsamixer:
+
   CAPTUR source - the analog source to be sent to the DSP. This should
   be set to the input source from the tuner card to the sound card. In
   most cases this is Line but this could also be Aux, CD, Mic, etc.,
@@ -2676,7 +2691,7 @@
   instructions on disabling the sound manager.  If you wish to see what
   application is grabbing a resource, you can use the fuser command:
 
-       # fuser -v /dev/dsp
+  # fuser -v /dev/dsp
 
   To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System
   and uncheck the "Start aRts soundserver on KDE startup" box.  Run #
@@ -2730,11 +2745,11 @@
 
   Download the source to MPlayer and patch:
 
-       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-       $ tar -xjf MPlayer-0.90rc1.tar.bz2
-       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-       $ cd MPlayer-0.90rc1
-       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+  $ tar -xjf MPlayer-0.90rc1.tar.bz2
+  $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+  $ cd MPlayer-0.90rc1
+  $ patch -p1 < mplayer-0.90pre10+mythtv.patch
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
@@ -2944,7 +2959,8 @@
   However, having a MSP34xx is no guarantee that you will be able to use
   the btaudio module.
 
-  As of 2003-03-27, the following cards are known to work with btaudio:
+  As of 2003-03-31, this is the current list of cards and their status:
+  Works with btaudio:
 
   +o  Hauppauge WinTV-radio with dbx-TV stereo, model 401
 
@@ -2959,7 +2975,7 @@
 
   +o  ATI TV Wonder VE
 
-  +o  Leadtek Winfast 2000 XP (PAL, UK)
+  +o  Leadtek Winfast 2000 XP (PAL, UK and NTSC)
 
   +o  I/O Magic PC-PVR.  No MSP34xx chip.
 
