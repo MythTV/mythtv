@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-01-13, v0.13.10
+  2004-01-17, v0.13.11
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -25,7 +25,7 @@
            3.1.5.1 Frame Grabbers.
            3.1.5.2 Hardware MPEG-2 encoders.
            3.1.5.3 DVB capture cards.
-           3.1.5.4 HDTV
+           3.1.5.4 HDTV.
         3.1.6 Hardware known NOT to work and other issues.
         3.1.7 Sound card
         3.1.8 Video Display Card
@@ -513,20 +513,23 @@
   DVB; see the pages maintained by Martin Smith martin@ethics-
   gradient.net <mailto:martin@ethics-gradient.net> at http://www.ethics-
   gradient.net/myth/mythdvb.html <http://www.ethics-
-  gradient.net/myth/mythdvb.html> for more information.
+  gradient.net/myth/mythdvb.html> for more information.  To see if your
+  DVB card is supported, see the list of cards at
+  http://www.linuxtv.org/download/dvb/CARDS
+  <http://www.linuxtv.org/download/dvb/CARDS> for more information.
 
   There are no known satellite systems available in the United States
   which will allow you to use a DVB card and obtain an unencrypted
   stream suitable for use with MythTV.
 
-  [1m3.1.5.4.  HDTV[0m
+  [1m3.1.5.4.  HDTV.[0m
 
   Currently there is only one HDTV card with Linux drivers which is
   known to operate in the United States - the card available from
   http://www.pchdtv.com/ <http://www.pchdtv.com/>.  This card can only
   be used to capture over-the-air HDTV.  There are no known capture
-  devices which will allow you to capture HDTV from a set-top box
-  commonly found with digital cable systems.
+  devices which will allow you to capture the HDTV output from a set-top
+  box commonly found with digital cable systems or satellite systems.
 
   [1m3.1.6.  Hardware known NOT to work and other issues.[0m
 
@@ -535,13 +538,14 @@
 
   +o  Hauppauge WinTV-USB series
 
-  +o  Hauppauge WinTV-PVR-usb, usb2 or pcr cards (no driver - this is not
+  +o  Hauppauge WinTV-PVR-usb, usb2 or pci cards (no driver - this is not
      the PVR-250/350 series of cards supported by the IvyTV driver)
 
   +o  ATI All-in-Wonder series
 
   There are no known capture cards for digital cable.  You must use the
-  set-top box provided by your digital cable provider.
+  set-top box provided by your digital cable provider and capture the
+  analog video output using either composite or S-Video.
 
   There are no known capture cards for HDTV content.
 
@@ -600,9 +604,9 @@
   converts the VGA signal to an appropriate video signal. "Appropriate"
   depends on a number of factors, such as video standard (NTSC vs PAL)
   type of input connection (Composite vs SVideo), etc.
-
   Note that with some video cards and X drivers, Xvideo extensions are
   only supported on the VGA output, and not on the TV output.
+
 
   [1m3.1.9.  Cards with TV out[0m
 
@@ -669,7 +673,6 @@
   http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html
   <http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html> for details.
 
-
   Specific cards:
 
   +o  Matrox G400 AGP. Uses external adapter to provide Composite and
@@ -730,6 +733,7 @@
 
   MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
   driver.
+
 
 
   [1m3.1.9.6.  Other Options[0m
@@ -797,10 +801,12 @@
   commonly found in that distribution.  Any issues with MythTV installed
   via a pre-compiled package [1mMUST [22mbe raised with the packager.
 
+
   If you use any of the pre-compiled packages you may not need to
   perform any additional configuration steps in this HOWTO.  The next
   logical step is ``configuring MySQL'', which you may or may not have
   to perform.  See your package documentation.
+
 
   [1m3.2.1.1.  Red Hat Linux[0m
 
@@ -858,12 +864,14 @@
   party documentation problems should be brought up with the maintainer.
 
 
+
   [1m3.2.1.2.  Mandrake[0m
 
   Thac has created RPMs for MythTV for Mandrake 9.0 and 9.1 which may be
   obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/> If you
   have problems with the RPMs, please send him email directly at
   thac@nyvalls.se <thac@nyvalls.se>.
+
 
   [1m3.2.1.3.  Debian[0m
 
@@ -913,6 +921,7 @@
   package in order to compile [1mlircd [22mif your distribution doesn't have a
   pre-packaged [1mlirc[22m.  If you are using [1mXMLTV [22mas a grabber, you will need
   [1mperl[22m.
+
 
 
   ______________________________________________________________________
@@ -981,8 +990,6 @@
   from the default installation.  Ensure that you install libqt3-mysql.
   ______________________________________________________________________
 
-
-
   Make sure that cdialog is installed if you want to use MythTV with a
   remote control if you need to compile [1mlirc [22mfrom source.
 
@@ -993,7 +1000,6 @@
 
   If you marked anything to install, click on Install Marked.  Click
   "Yes" or OK if you get a message about satisfying dependencies.
-
 
 
   [1m3.2.3.2.  Red Hat Linux 8.0[0m
@@ -1111,8 +1117,8 @@
 
   The "ls -l" command will show you a directory listing.  There should
   be two files, one will be named "qt3" and the other will be
-  "qt3-devel".  The full filenames will vary, so one you know the file-
-  name, you can install them with
+  "qt3-devel".  The full filenames will vary, so one you know the
+  filename, you can install them with
 
 
        # rpm -Uvh [filename1]
@@ -1244,11 +1250,11 @@
 
 
 
-  $ su -
-  # echo /usr/local/lib >> /etc/ld.so.conf
-  # /sbin/ldconfig
-  # exit
-  $
+       $ su -
+       # echo /usr/local/lib >> /etc/ld.so.conf
+       # /sbin/ldconfig
+       # exit
+       $
 
 
 
@@ -1296,6 +1302,8 @@
   Also, check that there has been a link created in /usr/lib/qt3/mkspecs
   called default. If not, you'll get errors during the compile. See the
   Troubleshooting Section for more information.
+
+
 
   [1m4.3.2.  Distribution-Specific Notes[0m
 
@@ -5477,10 +5485,10 @@
   Download the latest IVTV driver from Sourceforge.  Check
   http://sourceforge.net/projects/ivtv/
   <http://sourceforge.net/projects/ivtv/> for the current version.
-  Right now, it's 0.1.7.  Untar the file.
+  Right now, it's 0.1.9.  Untar the file.
 
 
-       $ tar -xzf ivtv-0.1.7.tar.gz
+       $ tar -xzf ivtv-0.1.9.tar.gz
 
 
 

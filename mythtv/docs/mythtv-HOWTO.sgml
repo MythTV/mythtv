@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-13, v0.13.10
+<date>2004-01-17, v0.13.11
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -266,28 +266,31 @@ see the pages maintained by Martin Smith <url
 url="mailto:martin@ethics-gradient.net" name="martin@ethics-gradient.net"> at <url
 url="http://www.ethics-gradient.net/myth/mythdvb.html"
 name="http://www.ethics-gradient.net/myth/mythdvb.html"> for more
-information.
+information.  To see if your DVB card is supported, see the list of cards at
+<url url="http://www.linuxtv.org/download/dvb/CARDS"
+name="http://www.linuxtv.org/download/dvb/CARDS"> for more information.
 
 There are no known satellite systems available in the United States which
 will allow you to use a DVB card and obtain an unencrypted stream suitable
 for use with MythTV.
-<sect3>HDTV
+<sect3>HDTV.
 <p>Currently there is only one HDTV card with Linux drivers which is known
 to operate in the United States - the card available from <url
 url="http://www.pchdtv.com/" name="http://www.pchdtv.com/">.  This card can
 only be used to capture over-the-air HDTV.  There are no known capture
-devices which will allow you to capture HDTV from a set-top box commonly
-found with digital cable systems.
+devices which will allow you to capture the HDTV output from a set-top box
+commonly found with digital cable systems or satellite systems.
 <sect2>Hardware known NOT to work and other issues.
 <p><itemize>
 <item>Hauppauge WinTV-D or -HD (no driver)
 <item>Hauppauge WinTV-USB series
-<item>Hauppauge WinTV-PVR-usb, usb2 or pcr cards (no driver - this is not the PVR-250/350
+<item>Hauppauge WinTV-PVR-usb, usb2 or pci cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)
 <item>ATI All-in-Wonder series
 </itemize>
 <p>There are no known capture cards for digital cable.  You must use the
-set-top box provided by your digital cable provider.
+set-top box provided by your digital cable provider and capture the analog
+video output using either composite or S-Video.
 
 There are no known capture cards for HDTV content.
 
@@ -4431,9 +4434,9 @@ $ su
 Download the latest IVTV driver from Sourceforge.  Check <url
 url="http://sourceforge.net/projects/ivtv/"
 name="http://sourceforge.net/projects/ivtv/"> for the current version. 
-Right now, it's 0.1.7.  Untar the file.
+Right now, it's 0.1.9.  Untar the file.
 <tscreen><verb>
-$ tar -xzf ivtv-0.1.7.tar.gz
+$ tar -xzf ivtv-0.1.9.tar.gz
 </verb></tscreen>
 
 This should create an ivtv directory.  Switch to it and perform the
@@ -5046,6 +5049,8 @@ go.  Hans Kruse's website for non-US MythTV people is a temporary holder?
 Change ivtv section again; tmk is now doing releases on sf, so use that.
 v0.13.10, 2004-01-13.  Add instructions on changing hostname.  Add link to DVB
 docs.  Break some hearts in the video capture card section.
+v0.13.11, 2004-01-17.  Fix typo.  Update ivtv version.  Pointer to DVB
+cardlist.  Fix some wording.
 -->
 
 <!--

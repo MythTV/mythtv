@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-13, v0.13.10
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-17, v0.13.11
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -457,31 +457,33 @@ supported by the IVTV driver.</P>
 see the pages maintained by Martin Smith 
 <A HREF="mailto:martin@ethics-gradient.net">martin@ethics-gradient.net</A> at 
 <A HREF="http://www.ethics-gradient.net/myth/mythdvb.html">http://www.ethics-gradient.net/myth/mythdvb.html</A> for more
-information.</P>
+information.  To see if your DVB card is supported, see the list of cards at
+<A HREF="http://www.linuxtv.org/download/dvb/CARDS">http://www.linuxtv.org/download/dvb/CARDS</A> for more information.</P>
 <P>There are no known satellite systems available in the United States which
 will allow you to use a DVB card and obtain an unencrypted stream suitable
 for use with MythTV.</P>
-<H3>HDTV</H3>
+<H3>HDTV.</H3>
 
 <P>Currently there is only one HDTV card with Linux drivers which is known
 to operate in the United States - the card available from 
 <A HREF="http://www.pchdtv.com/">http://www.pchdtv.com/</A>.  This card can
 only be used to capture over-the-air HDTV.  There are no known capture
-devices which will allow you to capture HDTV from a set-top box commonly
-found with digital cable systems.</P>
+devices which will allow you to capture the HDTV output from a set-top box
+commonly found with digital cable systems or satellite systems.</P>
 <H3>Hardware known NOT to work and other issues.</H3>
 
 <P>
 <UL>
 <LI>Hauppauge WinTV-D or -HD (no driver)</LI>
 <LI>Hauppauge WinTV-USB series</LI>
-<LI>Hauppauge WinTV-PVR-usb, usb2 or pcr cards (no driver - this is not the PVR-250/350
+<LI>Hauppauge WinTV-PVR-usb, usb2 or pci cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)</LI>
 <LI>ATI All-in-Wonder series</LI>
 </UL>
 </P>
 <P>There are no known capture cards for digital cable.  You must use the
-set-top box provided by your digital cable provider.</P>
+set-top box provided by your digital cable provider and capture the analog
+video output using either composite or S-Video.</P>
 <P>There are no known capture cards for HDTV content.</P>
 <P>There are no known capture cards for component (RGB or YPbPr)
 video.</P>
@@ -5042,10 +5044,10 @@ $ su
 <P><B>NOTE</B>:  You do not need to recompile your kernel.</P>
 <P>Download the latest IVTV driver from Sourceforge.  Check 
 <A HREF="http://sourceforge.net/projects/ivtv/">http://sourceforge.net/projects/ivtv/</A> for the current version. 
-Right now, it's 0.1.7.  Untar the file.
+Right now, it's 0.1.9.  Untar the file.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xzf ivtv-0.1.7.tar.gz
+$ tar -xzf ivtv-0.1.9.tar.gz
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
