@@ -292,7 +292,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             struct stat64 st;
     
             long long size = 0;
-            if (stat64(proginfo->pathname.ascii(), &st) == 0)
+            if (stat64(lpath.ascii(), &st) == 0)
                 size = st.st_size;
 
             proginfo->filesize = size;
@@ -752,7 +752,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
 
         retlist << QString::number(isopen);
     }
-    else if (command == "STOP")
+    else if (command == "DONE")
     {
         ft->Stop();
         retlist << "ok";

@@ -40,7 +40,9 @@ int startManaged(MythContext *context)
     ViewScheduled vsb(context, db);
 
     vsb.Show();
+    qApp->unlock();
     vsb.exec();
+    qApp->lock();
 
     return 0;
 }
@@ -50,7 +52,9 @@ int startPlayback(MythContext *context)
     PlaybackBox pbb(context, PlaybackBox::Play);
 
     pbb.Show();
+    qApp->unlock();
     pbb.exec();
+    qApp->lock();
 
     return 0;
 }
@@ -60,7 +64,9 @@ int startDelete(MythContext *context)
     PlaybackBox delbox(context, PlaybackBox::Delete);
    
     delbox.Show();
+    qApp->unlock();
     delbox.exec();
+    qApp->lock();
 
     return 0;
 }
@@ -101,7 +107,9 @@ void themesSettings(MythContext *context)
     ThemeSetup ts(context, db);
     ts.Show();
 
+    qApp->unlock();
     ts.exec();
+    qApp->lock();
 
     menu->ReloadTheme();
 }
@@ -231,6 +239,8 @@ int main(int argc, char **argv)
     }
 
     context->LoadQtConfig();
+
+    qApp->unlock();
 
     int exitstatus = RunMenu(themedir, context);
 

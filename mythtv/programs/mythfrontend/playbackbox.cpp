@@ -447,7 +447,6 @@ void PlaybackBox::play(QListViewItem *lvitem)
 
     ignoreevents = true;
     listview->SetAllowKeypress(false);
-    qApp->unlock();
     while (tv->IsPlaying() || tv->ChangingState())
     {
         qApp->unlock();
@@ -455,7 +454,6 @@ void PlaybackBox::play(QListViewItem *lvitem)
         usleep(50);
         qApp->lock();
     }
-    qApp->lock();
     listview->SetAllowKeypress(true);
     ignoreevents = false;
 
