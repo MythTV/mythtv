@@ -73,6 +73,7 @@ private slots:
   private:
     QAccel *accel;
 
+    bool debug;
     bool validArea;
     bool readReadme;
     bool pastTime;

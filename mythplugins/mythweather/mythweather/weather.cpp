@@ -38,36 +38,64 @@ Weather::Weather(MythContext *context,
            : MythDialog(context, parent, name)
 {
     m_context = context;
+    debug = false;
     validArea = true;
     convertData = false;
     readReadme = false;
     pastTime = false;
     firstRun = true;
     conError = false;
+    if (debug == true)
+	cout << "MythWeather: Reading 'locale' from context.\n";
     locale = context->GetSetting("locale");
     if (locale.length() == 0)
     {
+	if (debug == true)
+		cout << "MythWeather: --- No locale set, using the Bahamas\n";
 	readReadme = true;
 	locale = "BFXX0005"; // Show the weather in the Bahamas for
 			     // those who don't read the docs. heh.
     }
+    else
+    {
+	if (debug == true)
+		cout << "MythWeather: --- Locale: " << locale << endl;
+    }
 
+    if (debug == true)
+	cout << "MythWeather: Reading 'SIUnits' from context.\n";
+    
     QString convertFlag = context->GetSetting("SIUnits");
     if (convertFlag.upper() == "YES")
+    {
+	if (debug == true)
+		cout << "MythWeather: --- Converting Data\n";
    	convertData = true;
+    }
 
+
+    if (debug == true)
+	cout << "MythWeather: Reading InstrallPrefix from context.\n";
     baseDir = context->GetInstallPrefix();
+    if (debug == true)
+	cout << "MythWeather: baseDir = " << baseDir << endl;
 
     updateInterval = 30;
     nextpageInterval = 10;
     nextpageIntArrow = 20;
 
+    if (debug == true)
+	cout << "MythWeather: Loading Weather Types.\n";
     loadWeatherTypes();
    
     con_attempt = 0;
 
+    if (debug == true)
+	cout << "MythWeather: Setting up initial layout.\n";
     firstLayout();
 
+    if (debug == true)
+	cout << "MythWeather: Creating page frames and layouts.\n";
     page0Dia = new QFrame(this);
     page1Dia = new QFrame(this);
     page2Dia = new QFrame(this);
@@ -93,10 +121,14 @@ Weather::Weather(MythContext *context,
     setupLayout(3);
     setupLayout(4);
 
+    if (debug == true)
+	cout << "MythWeather: Creating final layout.\n";
     lastLayout();
 
     showLayout(0);
 
+    if (debug == true)
+	cout << "MythWeather: Setting up timers.\n";
     QTimer *showtime_Timer = new QTimer(this);
     connect(showtime_Timer, SIGNAL(timeout()), SLOT(showtime_timeout()) );
     showtime_Timer->start(1000);
@@ -111,6 +143,8 @@ Weather::Weather(MythContext *context,
     status_Timer = new QTimer(this);
     connect(status_Timer, SIGNAL(timeout()), SLOT(status_timeout()) );
 
+    if (debug == true)
+	cout << "MythWeather: Setting up accelerator keys.\n";
     accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
     accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
@@ -129,11 +163,16 @@ Weather::Weather(MythContext *context,
     accel->connectItem(accel->insertItem(Key_8), this, SLOT(newLocale8()));
     accel->connectItem(accel->insertItem(Key_9), this, SLOT(newLocale9()));
 
+    if (debug == true)
+	cout << "MythWeather: Theming widget, show(), showFullScreen(), setActiveWindow(), setFocus();\n";
     m_context->ThemeWidget(this);
     show();
     showFullScreen();
     setActiveWindow();
     setFocus();
+
+    if (debug == true)
+	cout << "MythWeather: Finish Object Initialization.\n";
 
 }
 
@@ -339,9 +378,17 @@ void Weather::resetLocale()
 void Weather::convertFlip()
 {
 	if (convertData == false)
+        {
+		if (debug == true)	
+			cout << "MythWeather: Converting weather data.\n";
 		convertData = true;
+	}
 	else
+ 	{
+		if (debug == true)
+			cout << "MythWeather: Not converting weather data.\n";
 		convertData = false;
+	}
 
 	update_timeout();
 }
@@ -425,8 +472,15 @@ void Weather::nextpage_timeout()
 
 void Weather::update_timeout()
 {
+    if (debug == true)
+	cout << "MythWeather: update_timeout() : Updating....\n";
+
     if (firstRun == true)
+    {
+	if (debug == true)
+		cout << "MythWeather: First run, reset timer to updateInterval.\n";
     	update_Timer->changeInterval((int)(1000 * 60 * updateInterval));
+    }
 
     UpdateData();
 
@@ -643,6 +697,9 @@ void Weather::update_timeout()
 
 void Weather::showLayout(int pageNum)
 {
+   if (debug == true)
+	cout << "MythWeather: showLayout() : Showing Layout #" << pageNum << endl;
+
 
    QString pageDesc;
    if (pageNum == 0)
@@ -829,6 +886,9 @@ void Weather::lastLayout()
 
 void Weather::setupLayout(int pageNum)
 {
+   if (debug == true)
+	cout << "MythWeather: setupLayout() : Setting up layout for page #" << pageNum << endl;
+
    QFont lohiFont("Arial", (int)(16 * hmult), QFont::Bold);
    QFontMetrics lohiFM(lohiFont);
 
@@ -1478,6 +1538,8 @@ void Weather::UpdateData()
 	accel->setEnabled(false);
 	while (check != 0)
 	{
+		if (debug == true)
+			cout << "MythWeather: COMMS : GetWeatherData() ...\n";
 		check = GetWeatherData();
 		if (check == -2)
 		{
@@ -1508,12 +1570,16 @@ void Weather::UpdateData()
 	    httpData.find("Internal Server Error", 0) > 0 ||
 	    httpData.find("Bad Request", 0) > 0)
 	{
+		if (debug == true)	
+			cout << "MythWeather: COMMS : Invalid Area Data\n";
 		validArea = false;
 		httpData = oldhttpData;
 		return;
 	}
 	else
 	{
+		if (debug == true)
+			cout << "MythWeather: COMMS : Valid Area Data\n";
 		validArea = true;
 		oldhttpData = httpData;
 	}
@@ -1758,6 +1824,8 @@ return ret;
 
 int Weather::GetWeatherData()
 {
+	if (debug == true)
+		cout << "MythWeather: COMMS : Setting status timer and data hook.\n";
 	status_Timer->start(100);
 	gotDataHook = false;
 
@@ -1772,6 +1840,8 @@ int Weather::GetWeatherData()
                 SLOT(socketError(int)) );
 
 	//cerr << "MythWeather: Connecting to host..." << endl;
+	if (debug == true)
+		cout << "MythWeather: Connecting to host...";
 	lbUpdated->setText("Contacting Host...");
 	httpSock->connectToHost("www.msnbc.com", 80);
 
@@ -1786,6 +1856,8 @@ int Weather::GetWeatherData()
          num++;
          if (num > 500)
          {
+	     if (debug == true)
+			cout << "Error.\n";
 	     char tMsg[1024];
 	     sprintf (tMsg, "Connection Timed Out ... Attempt #%d", con_attempt);
 	     updated = tMsg;
@@ -1811,6 +1883,8 @@ int Weather::GetWeatherData()
 
         if (httpSock->state() != QSocket::Connected)
         {
+		if (debug == true)
+			cout << "Error.\n";
 		char tMsg[1024];
 	        sprintf (tMsg, "Error Connecting ... Attempt #%d", con_attempt);
              	updated = tMsg;
@@ -1851,6 +1925,9 @@ int Weather::GetWeatherData()
 		}
 	}
 
+	if (debug == true)
+		cout << "MythWeather: COMMS : Got some data...returning\n";
+
 	con_attempt = 0;
 	lbStatus->setText(" ");
         status_Timer->stop();
@@ -1861,6 +1938,10 @@ int Weather::GetWeatherData()
 
 void Weather::closeConnection()
     {
+
+	if (debug == true)
+		cout << "MythWeather: COMMS (TCP) : Connection Closed.\n";
+
         httpSock->close();
         if ( httpSock->state() == QSocket::Closing ) {
             // We have a delayed close.
@@ -1874,6 +1955,9 @@ void Weather::closeConnection()
 
     void Weather::socketReadyRead()
     {
+	if (debug == true)
+                cout << "MythWeather: COMMS (TCP) : Socket Data Ready.\n";
+
 	char tMsg[1024];
         sprintf (tMsg, "Reading data [%d bytes read]...", httpData.length());
         updated = tMsg;
@@ -1891,6 +1975,9 @@ void Weather::closeConnection()
 
     void Weather::socketConnected()
     {
+	if (debug == true)
+                cout << "MythWeather: COMMS (TCP) : Socket Connected.\n";
+
 	lbUpdated->setText("Connected, requesting weather data...");
 	QTextStream os(httpSock);
 	//cerr << "MythWeather: Connected! Requesting Weather Data ...\n";
@@ -1903,6 +1990,9 @@ void Weather::closeConnection()
 
     void Weather::socketConnectionClosed()
     {
+	if (debug == true)
+                cout << "MythWeather: COMMS (TCP) : Connection Closed from Remote.\n";
+
 	gotDataHook = true;
     }
 
@@ -1912,6 +2002,9 @@ void Weather::closeConnection()
 
     void Weather::socketError( int e )
     {
+ 	if (debug == true)
+                cout << "MythWeather: COMMS (TCP) : Error #" << e << ".\n";
+
 	conError = true;
 	char tMsg[1024];
         sprintf (tMsg, "Error Connecting ... Attempt #%d", con_attempt);
