@@ -73,6 +73,11 @@ signals:
     void Status(dvb_stats_t &stats);
     void Status(QString val);
 
+    void StatusSignalToNoise(int);
+    void StatusSignalStrength(int);
+    void StatusBitErrorRate(int);
+    void StatusUncorrectedBlocks(int);
+
 protected:
     void connectNotify(const char* signal);
     void disconnectNotify(const char* signal);

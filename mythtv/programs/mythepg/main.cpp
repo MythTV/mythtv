@@ -8,8 +8,6 @@
 #include "libmythtv/guidegrid.h"
 #include "libmythtv/tv.h"
 
-MythContext *gContext;
-
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);

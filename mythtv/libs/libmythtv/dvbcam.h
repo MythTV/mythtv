@@ -22,7 +22,7 @@ public:
     static void *CiHandlerThreadHelper(void*self);
     void CiHandlerLoop();
 
-    void SetDatabase(QSqlDatabase* _db, pthread_mutex_t* _db_lock)
+    void SetDatabase(QSqlDatabase* _db, pthread_mutex_t& _db_lock)
         { db = _db; db_lock = _db_lock; };
 
 public slots:
@@ -33,7 +33,7 @@ private:
     void SetPids(cCiCaPmt& capmt, dvb_pids_t& pid);
 
     QSqlDatabase*   db;
-    pthread_mutex_t*  db_lock;
+    pthread_mutex_t db_lock;
 
     int             cardnum;
     cCiHandler      *ciHandler;

@@ -476,7 +476,7 @@ public:
         SpinBoxSetting(0, 188000, 188),
         CCSetting(parent, "pkt_buf_size") {
         setLabel("Packet buffer.");
-    setValue(188*100);
+        setValue(188*100);
         setHelpText("");
     };
 };

@@ -96,7 +96,7 @@ ProgFinder::ProgFinder(MythMainWindow *parent, const char *name)
 
     inSearch = 0;
     pastInitial = false;
-    searchCount = 36;
+    searchCount = 37;
     recordingCount = 0;
 
     initData = new QString[(int)(searchCount*showsPerListing)];
@@ -113,6 +113,9 @@ ProgFinder::ProgFinder(MythMainWindow *parent, const char *name)
         searchData[curLabel] = (char)charNum;
         curLabel++;
     }
+
+    gotInitData[curLabel] = 0;
+    searchData[curLabel] = '@';
 
     update_Timer = new QTimer(this);
     connect(update_Timer, SIGNAL(timeout()), SLOT(update_timeout()) );
@@ -975,16 +978,28 @@ void ProgFinder::selectSearchData()
     QString thequery;
     QString data;
 
-    thequery = QString("SELECT DISTINCT title "
-                       "FROM program "
-                       "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' "
-                       "OR title LIKE 'A %3%' ) "
-                       "AND starttime > %4 "
-                       "ORDER BY title;")
-                        .arg(searchData[curSearch])
-                        .arg(searchData[curSearch])
-                        .arg(searchData[curSearch])
-                        .arg(progStart.toString("yyyyMMddhhmm50"));
+    if (searchData[curSearch].contains('@'))
+    {
+        thequery = QString("SELECT DISTINCT title FROM program WHERE ( "
+                           "title NOT REGEXP '^[A-Z0-9]' AND "
+                           "title NOT REGEXP '^The [A-Z0-9]' AND "
+                           "title NOT REGEXP '^A [A-Z0-9]' AND "
+                           "starttime > %1 ) ORDER BY title;")
+                           .arg(progStart.toString("yyyyMMddhhmm50"));
+    }
+    else
+    {
+        thequery = QString("SELECT DISTINCT title "
+                           "FROM program "
+                           "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' "
+                           "OR title LIKE 'A %3%' ) "
+                           "AND starttime > %4 "
+                           "ORDER BY title;")
+                           .arg(searchData[curSearch])
+                           .arg(searchData[curSearch])
+                           .arg(searchData[curSearch])
+                           .arg(progStart.toString("yyyyMMddhhmm50"));
+    }
 
     QSqlQuery query = m_db->exec(thequery);
  
@@ -1407,16 +1422,28 @@ void ProgFinder::getSearchData(int charNum)
     QString thequery;
     QString data;
 
-    thequery = QString("SELECT DISTINCT title "
-                       "FROM program "
-                       "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' OR "
-                       "title LIKE 'A %3%' ) "
-                       "AND starttime > %4 "
-                       "ORDER BY title;")
-                       .arg(searchData[charNum])
-                       .arg(searchData[charNum])
-                       .arg(searchData[charNum])
-                       .arg(progStart.toString("yyyyMMddhhmm50"));
+    if (searchData[charNum].contains('@'))
+    {
+        thequery = QString("SELECT DISTINCT title FROM program WHERE ( "
+                           "title NOT REGEXP '^[A-Z0-9]' AND "
+                           "title NOT REGEXP '^The [A-Z0-9]' AND "
+                           "title NOT REGEXP '^A [A-Z0-9]' AND "
+                           "starttime > %1 ) ORDER BY title;")
+                           .arg(progStart.toString("yyyyMMddhhmm50"));
+    }
+    else
+    {
+        thequery = QString("SELECT DISTINCT title "
+                           "FROM program "
+                           "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' OR "
+                           "title LIKE 'A %3%' ) "
+                           "AND starttime > %4 "
+                           "ORDER BY title;")
+                           .arg(searchData[charNum])
+                           .arg(searchData[charNum])
+                           .arg(searchData[charNum])
+                           .arg(progStart.toString("yyyyMMddhhmm50"));
+    }
 
     QSqlQuery query = m_db->exec(thequery);
 

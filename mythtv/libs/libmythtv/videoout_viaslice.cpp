@@ -215,8 +215,6 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
     if (!CreateViaBuffers())
         return false;
 
-    colorkey = 0x0821;
-    
     MoveResize();
 
     XSync(data->XJ_disp, false);
@@ -455,10 +453,6 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 
 void VideoOutputVIA::DrawUnusedRects(void)
 {
-    XSetForeground(data->XJ_disp, data->XJ_gc, colorkey);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, dispy,
-                   dispw, disph);
-
     XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
     XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, dispy, 
                    dispw, dispyoff);
@@ -475,8 +469,7 @@ void VideoOutputVIA::DrawUnusedRects(void)
     data->ddUpdateOverlay.rSrc.right = imgx + imgw;
     data->ddUpdateOverlay.rSrc.bottom = imgy + imgh;
 
-    data->ddUpdateOverlay.dwFlags = DDOVER_SHOW | DDOVER_KEYDEST;
-    data->ddUpdateOverlay.dwColorSpaceLowValue = colorkey;
+    data->ddUpdateOverlay.dwFlags = DDOVER_SHOW;
 
     VIADriverProc(UPDATEOVERLAY, &data->ddUpdateOverlay);
 

@@ -39,7 +39,6 @@ using namespace std;
 #define HALT     2
 
 ThemedMenu *menu;
-MythContext *gContext;
 XBox *xbox = NULL;
 
 void startGuide(void)
@@ -566,7 +565,8 @@ QString RandTheme(QString &themename, QSqlDatabase *db)
             themelist.append(theme->fileName());
     }
 
-    themename = themelist[rand() % themelist.size()];
+    if (themelist.size()) 
+        themename = themelist[rand() % themelist.size()];
 
     ThemeSelector Theme;
     Theme.setValue(themename);

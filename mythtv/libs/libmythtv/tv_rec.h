@@ -30,6 +30,14 @@ typedef enum
     BROWSE_FAVORITE
 } BrowseDirections;
 
+typedef struct _dvb_options_t
+{
+    int swfilter;
+    int recordts;
+    int wait_for_seqstart;
+    int dmx_buf_size;
+    int pkt_buf_size;
+} dvb_options_t;
 
 class TVRec
 {
@@ -141,7 +149,7 @@ class TVRec
 
     void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
                     int &rate, QString &defaultinput, QString &startchannel,
-                    QString &type, int &dvb_swfilter, int &dvb_recordts);
+                    QString &type, dvb_options_t &dvb_opts);
 
     void ConnectDB(int cardnum);
     void DisconnectDB(void);
@@ -220,8 +228,7 @@ class TVRec
     QString profileName;
     int autoTranscode;
 
-    int dvb_swfilter;
-    int dvb_recordts;
+    dvb_options_t dvb_options;
 };
 
 #endif

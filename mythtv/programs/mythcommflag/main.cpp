@@ -21,8 +21,6 @@
 
 using namespace std;
 
-MythContext *gContext;
-
 int testmode = 0;
 int show_blanks = 0;
 int just_blanks = 0;

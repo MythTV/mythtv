@@ -16,7 +16,6 @@ using namespace std;
 #include "transcode.h"
 #include "mpeg2trans.h"
 
-MythContext *gContext;
 QSqlDatabase *db;
 
 void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist);

@@ -8,9 +8,6 @@
 	
 	Silly little program to demonstrate how the lcd
 	device class works. 
-	
-	NB: Now works through MythContext *gContext
-
 */
 	
 
@@ -24,7 +21,6 @@ using namespace std;
 #include "mythlcd.h"
 #include "libmyth/mythcontext.h"
 
-MythContext *gContext;
 QSqlDatabase* db;
 
 int main(int argc, char **argv)

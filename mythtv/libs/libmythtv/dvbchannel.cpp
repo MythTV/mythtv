@@ -160,6 +160,8 @@ bool DVBChannel::SetChannelByString(const QString &chan)
         return false;
     }
 
+    GENERAL(QString("Successfully tuned to channel %1.").arg(chan));
+
     ChannelChanged(chan_opts);
 
     curchannelname = chan;
@@ -196,7 +198,7 @@ bool DVBChannel::GetChannelOptions(QString channum)
         return false;
     }
 
-    dvbcam->SetDatabase(db_conn, &db_lock);
+    dvbcam->SetDatabase(db_conn, db_lock);
 
     pthread_mutex_lock(&db_lock);
     MythContext::KickDatabase(db_conn);
@@ -249,8 +251,34 @@ bool DVBChannel::GetChannelOptions(QString channum)
 
     if (query.numRowsAffected() <= 0)
     {
-        ERROR(QString("Could not find dvb tuning parameters for channel %1"
-                      " with id %2.").arg(channum).arg(chanid));
+        thequery += QString("SELECT satid FROM dvb_channel WHERE chanid='%1'")
+                    .arg(chanid);
+        query = db_conn->exec(thequery);
+
+        if (!query.isActive())
+            MythContext::DBError("GetChannelOptions - Channel Check", query);
+
+        if (query.numRowsAffected() <= 0)
+        {
+            ERROR(QString("Could not find dvb tuning parameters for channel %1"
+                          " with id %2.").arg(channum).arg(chanid));
+        }
+        else if (info.type == FE_QPSK)
+        {
+            int satid = query.value(0).toInt();
+            thequery += QString("SELECT * FROM dvb_sat WHERE satid='%1'")
+                        .arg(satid);
+            query = db_conn->exec(thequery);
+
+            if (!query.isActive())
+                MythContext::DBError("GetChannelOptions - Sat Check", query);
+
+            if (query.numRowsAffected() <= 0)
+                ERROR(QString("Channel %1 is configured with satid=%2, but this"
+                              " satellite does not exist, check your setup.")
+                              .arg(channum).arg(satid));
+        }
+
         pthread_mutex_unlock(&db_lock);
         return false;
     }
@@ -616,6 +644,10 @@ void DVBChannel::StatusMonitorLoop()
         if (FillFrontendStats(stats))
         {
             emit Status(stats);
+            emit StatusSignalToNoise(stats.snr);
+            emit StatusSignalStrength(stats.ss);
+            emit StatusBitErrorRate(stats.ber);
+            emit StatusUncorrectedBlocks(stats.ub);
 
             QString str = "";
             if (stats.status & FE_TIMEDOUT)

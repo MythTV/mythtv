@@ -25,7 +25,6 @@
 
 using namespace std;
 
-MythContext* gContext;
 QSqlDatabase* db;
 
 QString getResponse(const QString &query, const QString &def)

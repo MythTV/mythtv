@@ -22,6 +22,7 @@
 #include "mythdialogs.h"
 #include "mythplugin.h"
 
+MythContext *gContext = NULL;
 
 int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
 

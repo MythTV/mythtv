@@ -41,8 +41,6 @@ bool refresh_tomorrow = true;
 bool refresh_second = false;
 int listing_wrap_offset = 0;
 
-MythContext *gContext;
-
 class ChanInfo
 {
   public:

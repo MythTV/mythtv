@@ -103,6 +103,25 @@ public:
     };
 };
 
+class TVFormat: public ComboBoxSetting, public CSetting {
+public:
+    TVFormat(const ChannelID& id):
+       ComboBoxSetting(), CSetting(id, "tvformat") {
+       setLabel("TV Format");
+       setHelpText("If this channel uses a format other than TV Format "
+                   "in the General Backend Setup screen, set it here.");
+       addSelection("Default");
+       addSelection("NTSC");
+       addSelection("ATSC");
+       addSelection("PAL");
+       addSelection("SECAM");
+       addSelection("PAL-NC");
+       addSelection("PAL-M");
+       addSelection("PAL-N");
+       addSelection("NTSC-JP");
+    };
+};
+
 class Rank: public SpinBoxSetting, public CSetting {
 public:
     Rank(const ChannelID& id):
@@ -502,6 +521,7 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id)
 
     VerticalConfigurationGroup* right = new VerticalConfigurationGroup(false, true);
     right->addChild(new Source(id));
+    right->addChild(new TVFormat(id));
     right->addChild(new Rank(id));
     group1->addChild(right);
 

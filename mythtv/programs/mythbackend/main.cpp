@@ -25,7 +25,6 @@ using namespace std;
 #include "libmythtv/dbcheck.h"
 
 QMap<int, EncoderLink *> tvList;
-MythContext *gContext;
 AutoExpire *expirer = NULL;
 Scheduler *sched = NULL;
 Transcoder *trans = NULL;
