@@ -1053,4 +1053,37 @@
 </category>
 
 
+<category name="Electronic Frontier Foundation">
+    <item>
+        <title>EFF Breaking News</title>
+        <url>http://www.eff.org/news/index.xml</url>
+        <ico>http://www.eff.org/favicon.ico</ico>
+    </item>
+    
+    <item>
+        <title>EFF Monthly Events Calendar</title>
+        <url>http://www.eff.org/calendar/rss/rss.php?cal=events&rssview=month</url>
+        <ico>http://www.eff.org/favicon.ico</ico>
+    </item>
+    
+    <item>
+        <title>EFF MiniLinks</title>
+        <url>http://www.eff.org/minilinks/index.xml</url>
+        <ico>http://www.eff.org/favicon.ico</ico>
+    </item>
+    
+    <item>
+        <title>EFF DeepLinks</title>
+        <url>http://www.eff.org/deeplinks/index.xml</url>
+        <ico>http://www.eff.org/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>EFF Action Alerts</title>
+        <url>http://www.eff.org/rss/action.xml</url>
+        <ico>http://www.eff.org/favicon.ico</ico>
+    </item>
+</category>
+
+
 </sites>
