@@ -973,7 +973,8 @@ void NuppelVideoPlayer::ExAVSync(void)
     {
         VideoFrame *buffer = usedVideoBuffers.head();
         // if we get here, we're actually going to do video output
-        videoOutput->PrepareFrame(buffer);
+        if (buffer)
+            videoOutput->PrepareFrame(buffer);
 
         delay = UpdateDelay(&nexttrigger);
 
@@ -1156,8 +1157,11 @@ void NuppelVideoPlayer::OldAVSync(void)
     if (!disablevideo)
     {
         VideoFrame *buffer = usedVideoBuffers.head();
-        videoOutput->PrepareFrame(buffer);
-        videoOutput->Show();
+        if (buffer)
+        {
+            videoOutput->PrepareFrame(buffer);
+            videoOutput->Show();
+        }
     }
     /* a/v sync assumes that when 'Show' returns, that is the instant
        the frame has become visible on screen */
