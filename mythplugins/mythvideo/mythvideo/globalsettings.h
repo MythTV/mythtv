@@ -27,14 +27,14 @@ protected:
 // The real work.
 
 // Temporary dumping ground for things that have not been properly categorized yet
-class GeneralSettings: virtual public ConfigurationWizard {
+class VideoGeneralSettings: virtual public ConfigurationWizard {
 public:
-    GeneralSettings();
+    VideoGeneralSettings();
 };
 
-class PlayerSettings: virtual public ConfigurationWizard {
+class VideoPlayerSettings: virtual public ConfigurationWizard {
 public:
-    PlayerSettings();
+    VideoPlayerSettings();
 };
 
 #endif

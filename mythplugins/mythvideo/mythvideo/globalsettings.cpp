@@ -113,7 +113,7 @@ public:
     };
 };
 
-GeneralSettings::GeneralSettings()
+VideoGeneralSettings::VideoGeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General Settings"));
@@ -128,7 +128,7 @@ GeneralSettings::GeneralSettings()
 
 }
 
-PlayerSettings::PlayerSettings()
+VideoPlayerSettings::VideoPlayerSettings()
 {
     VerticalConfigurationGroup* playersettings = new VerticalConfigurationGroup(false);
     playersettings->setLabel(QObject::tr("Player Settings"));

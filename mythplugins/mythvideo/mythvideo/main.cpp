@@ -70,10 +70,10 @@ int mythplugin_init(const char *libversion)
 
     UpgradeVideoDatabaseSchema();
 
-    GeneralSettings general;
+    VideoGeneralSettings general;
     general.load(QSqlDatabase::database());
     general.save(QSqlDatabase::database());
-    PlayerSettings settings;
+    VideoPlayerSettings settings;
     settings.load(QSqlDatabase::database());
     settings.save(QSqlDatabase::database());
 
@@ -252,19 +252,19 @@ void VideoCallback(void *data, QString &selection)
         {
             if (checkParentPassword())
             {
-                GeneralSettings settings;
+                VideoGeneralSettings settings;
                 settings.exec(QSqlDatabase::database());
             }
         }
         else
         {
-            GeneralSettings settings;
+            VideoGeneralSettings settings;
             settings.exec(QSqlDatabase::database());
         }
     }
     else if (sel == "settings_player")
     {
-        PlayerSettings settings;
+        VideoPlayerSettings settings;
         settings.exec(QSqlDatabase::database());
     }
     else if (sel == "settings_associations")
