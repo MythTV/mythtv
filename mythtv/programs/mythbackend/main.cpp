@@ -22,6 +22,9 @@ using namespace std;
 
 QMap<int, EncoderLink *> tvList;
 MythContext *gContext;
+Scheduler* sched = NULL;
+QString pidfile;
+QString lockfile_location;
 
 void setupTVs(bool ismaster)
 {
@@ -79,6 +82,19 @@ void setupTVs(bool ismaster)
         exit(0);
     }
 }
+
+void cleanup(void) {
+    delete gContext;
+
+    if (sched)
+        delete sched;
+
+    if (pidfile != "")
+        unlink(pidfile.ascii());
+
+    unlink(lockfile_location.ascii());
+
+}
     
 int main(int argc, char **argv)
 {
@@ -88,8 +104,8 @@ int main(int argc, char **argv)
     QApplication a(argc, argv, false);
 
     QString logfile = "";
-    QString pidfile = "";
     bool daemonize = false;
+    bool printsched = false;
     for(int argpos = 1; argpos < a.argc(); ++argpos)
         if (!strcmp(a.argv()[argpos],"-l") ||
             !strcmp(a.argv()[argpos],"--logfile")) {
@@ -115,6 +131,8 @@ int main(int argc, char **argv)
         } else if (!strcmp(a.argv()[argpos],"-v") ||
                    !strcmp(a.argv()[argpos],"--verbose")) {
             print_verbose_messages = true;
+        } else if (!strcmp(a.argv()[argpos],"--printsched")) {
+            printsched = true;
         } else {
             cerr << "Invalid argument: " << a.argv()[argpos] << endl <<
                     "Valid options are: " << endl <<
@@ -196,6 +214,13 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    if (printsched) {
+        sched = new Scheduler(false, &tvList, db);
+        sched->PrintList();
+        cleanup();
+        exit(0);
+    }
+
     int port = gContext->GetNumSetting("BackendServerPort", 6543);
     int statusport = gContext->GetNumSetting("BackendStatusPort", 6544);
 
@@ -224,19 +249,18 @@ int main(int argc, char **argv)
  
     setupTVs(ismaster);
 
-    Scheduler *sched = NULL;
     if (ismaster)
     {
         QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
         sched = new Scheduler(true, &tvList, scdb);
     }
 
-    QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
+//    QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
 //    Transcoder *trans = new Transcoder(&tvList, trandb);
 
     VERBOSE("Verbose mode activated.");
 
-    QString lockfile_location = gContext->GetSetting("RecordFilePrefix") + "/nfslockfile.lock";
+    lockfile_location = gContext->GetSetting("RecordFilePrefix") + "/nfslockfile.lock";
     int nfsfd = -1;
 
     if (ismaster)
@@ -260,17 +284,9 @@ int main(int argc, char **argv)
 
     a.exec();
 
-    delete gContext;
+    // delete trans;
 
-    if (sched)
-        delete sched;
-
-//    delete trans;
-
-    if (pidfile != "")
-        unlink(pidfile.ascii());
-
-    unlink(lockfile_location.ascii());
+    cleanup();
 
     return 0;
 }
