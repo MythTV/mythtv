@@ -702,6 +702,9 @@ int NuppelVideoRecorder::MJPEGInit(void)
 
     close(fd);
 
+    if (vc.maxwidth != 768 && vc.maxwidth != 640)
+        vc.maxwidth = 720;
+
     if (vc.type & VID_TYPE_MJPEG_ENCODER)
     {
         if (vc.maxwidth >= 768)
