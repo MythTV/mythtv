@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS codecparams
     PRIMARY KEY (profile, name)
 );
 
+ALTER TABLE settings ADD COLUMN hostname VARCHAR(255) NULL;
+
 ALTER TABLE capturecard ADD COLUMN hostname VARCHAR(255);
 ALTER TABLE recorded ADD COLUMN hostname VARCHAR(255);
 

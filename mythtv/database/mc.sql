@@ -86,6 +86,7 @@ CREATE TABLE IF NOT EXISTS settings
 (
     value VARCHAR(128) NOT NULL,
     data TEXT NULL,
+    hostname VARCHAR(255) NULL,
     PRIMARY KEY(value)
 );
 CREATE TABLE IF NOT EXISTS conflictresolutionoverride
