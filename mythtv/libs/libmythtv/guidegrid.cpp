@@ -912,7 +912,7 @@ void GuideGrid::paintDate(QPainter *p)
     {
         UITextType *type = (UITextType *)container->GetType("date");
         if (type)
-            type->SetText(m_currentStartTime.toString("ddd M/d"));
+            type->SetText(m_currentStartTime.toString("ddd"));
     }
 
     if (container)

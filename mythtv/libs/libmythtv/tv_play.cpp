@@ -34,12 +34,19 @@ struct SeekSpeedInfo {
 
 SeekSpeedInfo seek_speed_array[] =
 {
-    {"5X",   1.17,  4.00,  3.00},
-    {"20X",  4.00, 20.00, 12.00},
-    {"60X", 12.00, 60.00, 32.00}
+    {"",     0.00,   0.00,  0.00},
+    {"1/4X", 0.25,   0.00,  0.00},
+    {"1/2X", 0.50,   4.00,  4.00},
+    {"1X",   1.00,  12.00,  9.00},
+    {"1.5X", 1.50,  16.00, 11.50},
+    {"2X",   2.24,  20.00, 14.00},
+    {"3X",   3.34,  28.00, 19.00},
+    {"8X",   7.48,  68.00, 44.00},
+    {"10X", 11.18,  84.00, 54.00},
+    {"16X", 16.72, 132.00, 84.00}
 };
 
-const int SSPEED_NORMAL = 0;
+const int SSPEED_NORMAL = 3;
 const int SSPEED_MAX = sizeof seek_speed_array / sizeof seek_speed_array[0];
 
 const int kMuteTimeout = 800;
@@ -1437,12 +1444,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else if (action == "TOGGLEBROWSE")
                 DoProgramMenu();
-#if 0
             else if (action == "CHANNELUP")
                 DoSeek(-jumptime * 60, tr("Jump Back"));
             else if (action == "CHANNELDOWN")
                 DoSeek(jumptime * 60, tr("Jump Ahead"));
-#endif
             else
                 handled = false;
         }
@@ -1621,7 +1626,7 @@ bool TV::UpdatePosOSD(float time, const QString &mesg)
         QString desc = "";
         int pos = nvp->calcSliderPos(desc);
         bool slidertype = (internalState == kState_WatchingLiveTV);
-        int disptime = /*(mesg == tr("Paused")) ? -1 :*/ 2;
+        int disptime = (mesg == tr("Paused")) ? -1 : 2;
         int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
                                          kOSDFunctionalType_Default;
 
