@@ -1355,6 +1355,7 @@ void Scheduler::UpdateMatches(int recordid) {
     struct timeval dbstart, dbend;
 
     MythContext::KickDatabase(db);
+    QSqlQuery query;
     query.prepare("DELETE FROM recordmatch WHERE "
                   "recordid = :RECORDID OR :RECORDID = -1;");
     query.bindValue(":RECORDID", recordid);
