@@ -25,7 +25,7 @@ Options: [defaults in brackets after descriptions]
 echo "Standard options:"
 echo "  --help                   print this message"
 echo "  --enable-fftw            enable fftw visualizers [default=no]"
-echo "  --enable-opengl         disable OpenGL visualizers [default=no]"
+echo "  --enable-opengl          enable OpenGL visualizers [default=no]"
 
 EOF
 exit 1
