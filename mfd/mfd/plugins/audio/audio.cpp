@@ -316,6 +316,16 @@ bool AudioPlugin::playUrl(QUrl url)
     if ( url.isLocalFile())
     {
         QString   path = url.path();
+
+        //
+        //  for filenames with # in them
+        //
+
+        if(url.hasRef())
+        {
+            path += "#";
+            path += url.ref();
+        }
         QFileInfo fi( path );
         if ( ! fi.exists() && fi.extension() != "cda") 
         {
@@ -376,7 +386,13 @@ bool AudioPlugin::playUrl(QUrl url)
 
         if(url.protocol() == "file" || url.protocol() == "cd")
         {
-            input = new QFile(url.path());
+            QString filename = url.path();
+            if(url.hasRef())
+            {
+                filename += "#";
+                filename += url.ref();
+            }
+            input = new QFile(filename);
         }
         else if(url.protocol() == "daap")
         {
@@ -400,13 +416,19 @@ bool AudioPlugin::playUrl(QUrl url)
         
         if(!decoder)
         {
-        
-            decoder = Decoder::create(url.path(), input, output);
+            QString filename = url.path();
+            if(url.hasRef())
+            {
+                filename += "#";
+                filename += url.ref();
+            }
+            
+            decoder = Decoder::create(filename, input, output);
 
             if(!decoder)
             {
                 warning(QString("passed unsupported url in unsupported format: %1")
-                        .arg(url.toString()));
+                        .arg(filename));
                 delete output;
                 output = NULL;
                 delete input;
