@@ -26,7 +26,7 @@ AudioOutputBase::AudioOutputBase(QString audiodevice, int,
     audio_channels = -1;
     audio_samplerate = -1;    
     total_written = 0;
-    current_seconds = 0;
+    current_seconds = -1;
     source_bitrate = -1;
     audio_stretchfactor = 1.0;
     pSoundStretch = NULL;
@@ -160,7 +160,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     effdsp = audio_samplerate * 100;
     gettimeofday(&audiotime_updated, NULL);
     total_written = 0;
-    current_seconds = 0;
+    current_seconds = -1;
     source_bitrate = -1;
 
     // Check if we need the resampler
@@ -262,7 +262,7 @@ void AudioOutputBase::Reset()
     audbuf_timecode = 0;
     audiotime = 0;
     total_written = 0;
-    current_seconds = 0;
+    current_seconds = -1;
     source_bitrate = -1;
     was_paused = !pauseaudio;
 
