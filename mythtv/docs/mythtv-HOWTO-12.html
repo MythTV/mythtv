@@ -94,6 +94,18 @@ address]/mythweb/</B></P>
 otherwise you will get a <CODE>404 Page not Found</CODE> error.</CAPTION>
 </FIGURE>
 </P>
+<H2><A NAME="ss12.3">12.3</A> <A HREF="mythtv-HOWTO.html#toc12.3">Resetting the key binding table.</A>
+</H2>
+
+<P>MythWeb allows you to configure which keys are bound to which actions
+within MythTV.  If you'd like to reset this back to the default, execute the
+following command:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ echo "delete from keybindings ;" | mysql -u mythtv -pmythtv mythconverg
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <HR>
 <A HREF="mythtv-HOWTO-13.html">Next</A>
 <A HREF="mythtv-HOWTO-11.html">Previous</A>

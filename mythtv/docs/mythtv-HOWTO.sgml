@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2004-07-08, v0.15.06
+<date>2004-08-03, v0.15.07
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2664,7 +2664,7 @@ Running mythbackend as a daemon and using the logfile option will allow you
 to have mythbackend automatically start up during the boot process.  For
 example, you may add this to your <tt>rc.local</tt> file, or you can follow
 the steps outlined in the section called <ref id="mythbackend_autostart"
-name="I'd like to automatically start mythbackend at system boot time">.
+name="Automatically starting mythbackend at system boot time">.
 
 <sect1>Configuring a non-master backend <label id="nonmaster_backend">
 <p>Ensure that you've granted access to the master MySQL database for remote
@@ -3827,6 +3827,13 @@ address]/mythweb/</bf>
 otherwise you will get a <tt>404 Page not Found</tt> error.
 </caption>
 </figure>
+<sect1>Resetting the key binding table.
+<p>MythWeb allows you to configure which keys are bound to which actions
+within MythTV.  If you'd like to reset this back to the default, execute the
+following command:
+<tscreen><verb>
+$ echo "delete from keybindings ;" | mysql -u mythtv -pmythtv mythconverg
+</verb></tscreen>
 <sect>MythGallery.
 <p>MythGallery is a photo and slideshow application.  MythGallery is a
 separate application, but it's dependent on MythTV being installed and
@@ -4360,6 +4367,30 @@ $ make
 $ su
 # make install
 </verb></tscreen>
+<sect1>Running the Myth Transcoding Daemon
+<p>Transcoding ("ripping") a DVD requires you to run the Myth Transcoding
+Daemon (mtd).  To ensure that mtd is configured correctly, you should first
+test it at the command line.
+<tscreen><verb>
+$ mtd -n
+</verb></tscreen>
+The last line of text should show something like:
+<tscreen><verb>
+mtd is listening on port 2342
+</verb></tscreen>
+This indicates that mtd is ready for use.  Once you've successfully
+tested mtd in the foreground, type <bf>CTRL-C</bf> to stop mtd.  You may
+then start it as a background (daemon) process.
+<tscreen><verb>
+$ mtd -d
+</verb></tscreen>
+
+Running mtd as a daemon will allow you to automatically start it during the
+boot process.  For example, you may add <tt>mtd -d</tt> to your
+<tt>rc.local</tt> file, or you can adjust the script/steps outlined in the
+section called <ref id="mythbackend_autostart" name="Automatically starting
+mythbackend at system boot time"> to start mtd instead of mythbackend.
+
 <sect>MythNews.
 <p>
 
@@ -6232,8 +6263,8 @@ than traditional physical partitions. This section will provide some brief
 notes on how to use LVM to create storage space for your video files and how
 to add additional disk space in the future. There's lots more that can be
 done with LVM, so check the LVM HOWTO <url
-url="http://tldp.org/HOWTO/lvm-HOWTO/"
-name="http://tldp.org/HOWTO/lvm-HOWTO/"> document for details.
+url="http://tldp.org/HOWTO/LVM-HOWTO/"
+name="http://tldp.org/HOWTO/LVM-HOWTO/"> document for details.
 
 If you don't understand how to partition a drive, or how to change the
 partition type you should stop and look at documentation on how to perform
@@ -6512,6 +6543,9 @@ section)
 v0.15.05, 2004-06-17.  Add "What do those icons mean?".  Update website for
 "lame".
 v0.15.06, 2004-07-08.  Add "What is MythTV"?
+v0.15.07, 2004-08-03.  Update link to LVM HOWTO. (Mark Covington).  Add a
+little on mtd (check that it's working interactively first)(Michael Dean).
+Add a "resetting keys".
 -->
 
 <!--

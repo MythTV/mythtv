@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-07-08, v0.15.06
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-08-03, v0.15.07
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -121,6 +121,7 @@ necessary.</EM>
 <UL>
 <LI><A NAME="toc12.1">12.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.1">Installation and prerequisites</A>
 <LI><A NAME="toc12.2">12.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.2">Completing the installation</A>
+<LI><A NAME="toc12.3">12.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.3">Resetting the key binding table.</A>
 </UL>
 <P>
 <H2><A NAME="toc13">13.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s13">MythGallery.</A></H2>
@@ -157,6 +158,7 @@ necessary.</EM>
 <UL>
 <LI><A NAME="toc18.1">18.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.1">Manual Compilation of Prerequisites</A>
 <LI><A NAME="toc18.2">18.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.2">Pre-compiled binaries</A>
+<LI><A NAME="toc18.3">18.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.3">Running the Myth Transcoding Daemon</A>
 </UL>
 <P>
 <H2><A NAME="toc19">19.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s19">MythNews.</A></H2>
@@ -3094,7 +3096,7 @@ Valid options are:
 to have mythbackend automatically start up during the boot process.  For
 example, you may add this to your <CODE>rc.local</CODE> file, or you can follow
 the steps outlined in the section called 
-<A HREF="#mythbackend_autostart">I'd like to automatically start mythbackend at system boot time</A>.</P>
+<A HREF="#mythbackend_autostart">Automatically starting mythbackend at system boot time</A>.</P>
 
 <H2><A NAME="nonmaster_backend"></A> <A NAME="ss9.3">9.3</A> <A HREF="#toc9.3">Configuring a non-master backend </A>
 </H2>
@@ -4276,6 +4278,18 @@ address]/mythweb/</B></P>
 otherwise you will get a <CODE>404 Page not Found</CODE> error.</CAPTION>
 </FIGURE>
 </P>
+<H2><A NAME="ss12.3">12.3</A> <A HREF="#toc12.3">Resetting the key binding table.</A>
+</H2>
+
+<P>MythWeb allows you to configure which keys are bound to which actions
+within MythTV.  If you'd like to reset this back to the default, execute the
+following command:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ echo "delete from keybindings ;" | mysql -u mythtv -pmythtv mythconverg
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <H2><A NAME="s13">13.</A> <A HREF="#toc13">MythGallery.</A></H2>
 
 <P>MythGallery is a photo and slideshow application.  MythGallery is a
@@ -4860,6 +4874,40 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<H2><A NAME="ss18.3">18.3</A> <A HREF="#toc18.3">Running the Myth Transcoding Daemon</A>
+</H2>
+
+<P>Transcoding ("ripping") a DVD requires you to run the Myth Transcoding
+Daemon (mtd).  To ensure that mtd is configured correctly, you should first
+test it at the command line.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mtd -n
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The last line of text should show something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+mtd is listening on port 2342
+</PRE>
+</CODE></BLOCKQUOTE>
+
+This indicates that mtd is ready for use.  Once you've successfully
+tested mtd in the foreground, type <B>CTRL-C</B> to stop mtd.  You may
+then start it as a background (daemon) process.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mtd -d
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Running mtd as a daemon will allow you to automatically start it during the
+boot process.  For example, you may add <CODE>mtd -d</CODE> to your
+<CODE>rc.local</CODE> file, or you can adjust the script/steps outlined in the
+section called 
+<A HREF="#mythbackend_autostart">Automatically starting mythbackend at system boot time</A> to start mtd instead of mythbackend.</P>
+
 <H2><A NAME="s19">19.</A> <A HREF="#toc19">MythNews.</A></H2>
 
 
@@ -6923,7 +6971,7 @@ than traditional physical partitions. This section will provide some brief
 notes on how to use LVM to create storage space for your video files and how
 to add additional disk space in the future. There's lots more that can be
 done with LVM, so check the LVM HOWTO 
-<A HREF="http://tldp.org/HOWTO/lvm-HOWTO/">http://tldp.org/HOWTO/lvm-HOWTO/</A> document for details.</P>
+<A HREF="http://tldp.org/HOWTO/LVM-HOWTO/">http://tldp.org/HOWTO/LVM-HOWTO/</A> document for details.</P>
 <P>If you don't understand how to partition a drive, or how to change the
 partition type you should stop and look at documentation on how to perform
 these steps.</P>

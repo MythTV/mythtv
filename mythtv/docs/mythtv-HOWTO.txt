@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2004-07-08, v0.15.06
+  2004-08-03, v0.15.07
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -172,6 +172,7 @@
      12.1 Installation and prerequisites
         12.1.1 Mandrake 9.0
      12.2 Completing the installation
+     12.3 Resetting the key binding table.
 
   13. MythGallery.
      13.1 Installation and prerequisites
@@ -195,6 +196,7 @@
   18. MythDVD.
      18.1 Manual Compilation of Prerequisites
      18.2 Pre-compiled binaries
+     18.3 Running the Myth Transcoding Daemon
 
   19. MythNews.
   20. Troubleshooting.
@@ -277,6 +279,7 @@
         22.4.3 ReiserFS
         22.4.4 JFS
         22.4.5 XFS
+
 
   ______________________________________________________________________
 
@@ -398,7 +401,6 @@
 
   There are two IRC channels dedicated to MythTV which can be found on
   irc.freenode.net
-
   +o  mythtv
 
   +o  mythtv-users
@@ -462,8 +464,6 @@
 
   See http://bit.blkbk.com/ <http://bit.blkbk.com/> if you'd like to
   install MythTV on an XBox.
-
-
   [1m3.  Checking prerequisites.[0m
 
   You must ensure that any firewalls (either hardware, or a software
@@ -3297,8 +3297,8 @@
   Running mythbackend as a daemon and using the logfile option will
   allow you to have mythbackend automatically start up during the boot
   process.  For example, you may add this to your rc.local file, or you
-  can follow the steps outlined in the section called ``I'd like to
-  automatically start mythbackend at system boot time''.
+  can follow the steps outlined in the section called ``Automatically
+  starting mythbackend at system boot time''.
 
 
   [1m9.3.  Configuring a non-master backend[0m
@@ -4539,6 +4539,17 @@
         [1mNOTE[22m: Make sure that you have a trailing slash on the URL,
   otherwise you will get a 404 Page not Found error.
 
+  [1m12.3.  Resetting the key binding table.[0m
+
+  MythWeb allows you to configure which keys are bound to which actions
+  within MythTV.  If you'd like to reset this back to the default,
+  execute the following command:
+
+
+       $ echo "delete from keybindings ;" | mysql -u mythtv -pmythtv mythconverg
+
+
+
   [1m13.  MythGallery.[0m
 
   MythGallery is a photo and slideshow application.  MythGallery is a
@@ -5163,6 +5174,40 @@
 
 
 
+  [1m18.3.  Running the Myth Transcoding Daemon[0m
+
+  Transcoding ("ripping") a DVD requires you to run the Myth Transcoding
+  Daemon (mtd).  To ensure that mtd is configured correctly, you should
+  first test it at the command line.
+
+
+       $ mtd -n
+
+
+
+  The last line of text should show something like:
+
+
+       mtd is listening on port 2342
+
+
+
+  This indicates that mtd is ready for use.  Once you've successfully
+  tested mtd in the foreground, type [1mCTRL-C [22mto stop mtd.  You may then
+  start it as a background (daemon) process.
+
+
+       $ mtd -d
+
+
+
+  Running mtd as a daemon will allow you to automatically start it
+  during the boot process.  For example, you may add mtd -d to your
+  rc.local file, or you can adjust the script/steps outlined in the
+  section called ``Automatically starting mythbackend at system boot
+  time'' to start mtd instead of mythbackend.
+
+
   [1m19.  MythNews.[0m
 
 
@@ -5191,6 +5236,7 @@
   your distribution hasn't set it up correctly.  This needs to be fixed
   before MythTV will compile.
 
+
   [1m20.1.2.  error: can't find a register in class 'BREG' while reloading[0m
   [1m'asm'[0m
 
@@ -5217,6 +5263,7 @@
   and then restart the compile,
 
   or
+
 
   2.  Run [1mqmake mythtv.pro [22min the mythtv directory.  Rerunning [1mqmake[0m
   will create a new Makefile for you, however this still doesn't fix the
@@ -5256,9 +5303,10 @@
   Edit the settings.pro file.  Make sure that the top of the file looks
   like this:
 
-  $ cat settings.pro
-  CONFIG += debug
-  #CONFIG += release
+
+       $ cat settings.pro
+       CONFIG += debug
+       #CONFIG += release
 
 
 
@@ -5279,20 +5327,21 @@
   assume that the problem you're having is in the setup program.
 
 
-       $ cd setup
-       $ gdb ./setup
 
-       GNU gdb 5.3-1mdk (Mandrake Linux)
-       Copyright 2002 Free Software Foundation, Inc.
-       GDB is free software, covered by the GNU General Public License, and you are
-       welcome to change it and/or distribute copies of it under certain
-       conditions.
-       Type "show copying" to see the conditions.
-       There is absolutely no warranty for GDB.  Type "show warranty" for details.
-       This GDB was configured as "i586-mandrake-linux-gnu"...
-       (gdb) handle SIGPIPE nostop
-       Signal        Stop      Print   Pass to program Description
-       SIGPIPE       No        Yes     Yes             Broken pipe
+  $ cd setup
+  $ gdb ./setup
+
+  GNU gdb 5.3-1mdk (Mandrake Linux)
+  Copyright 2002 Free Software Foundation, Inc.
+  GDB is free software, covered by the GNU General Public License, and you are
+  welcome to change it and/or distribute copies of it under certain
+  conditions.
+  Type "show copying" to see the conditions.
+  There is absolutely no warranty for GDB.  Type "show warranty" for details.
+  This GDB was configured as "i586-mandrake-linux-gnu"...
+  (gdb) handle SIGPIPE nostop
+  Signal        Stop      Print   Pass to program Description
+  SIGPIPE       No        Yes     Yes             Broken pipe
 
 
 
@@ -5383,7 +5432,6 @@
   [1mLive TV [22moptions to 480 or 576 from their defaults.
 
 
-
   [1m20.4.4.  Screen goes blank but returns when mouse if moved or keyboard[0m
   [1mis used[0m
 
@@ -5409,7 +5457,6 @@
 
   Add Option "NoPM" "true" and Option "BlankTime" "0" to the ServerFlags
   section.
-
   Also, look for:
 
 
@@ -5448,6 +5495,8 @@
            ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
        EndSection
 
+
+
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
   You can also turn off DPMS from the Command Line, but this will not
@@ -5470,7 +5519,7 @@
   You may also combine the command to turn off DPMS and the screensaver:
 
 
-       $ xset -dpms s off
+  $ xset -dpms s off
 
 
 
@@ -5529,6 +5578,7 @@
   You may also setup your PC to do this at boot time, either by adding
   the command to your /etc/rc.local file, or by adding files to
   /etc/sysconfig.
+
 
   On Mandrake and other distributions, if you install [1mhdparm [22mfrom an RPM
   you will most likely get a /etc/sysconfig/harddisks file installed.
@@ -5592,6 +5642,7 @@
   occur. Lowering this level to 75% to 85% may result in better audio
   quality.
 
+
   Master mixer - sets the level for the analog signal sent to line-out
   or the speakers.
 
@@ -5653,6 +5704,7 @@
   as keypresses.  Once the lights were switched to incandescent bulbs,
   the ghost went away.
 
+
   You may have an issue with [1mlirc [22mmisinterpreting IR commands from a
   different remote.  I also have an issue where the TiVo "Peanut" remote
   will eventually cause [1mlircd [22mto stop responding; even though [1mlircd [22mis
@@ -5697,7 +5749,6 @@
   more information.
 
 
-
   [1m20.5.9.  Mythweb is showing a db_open error when I connect to it[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
@@ -5719,7 +5770,6 @@
   Nothing, really.  It's just lame (the mp3 encoder) complaining for
   some obscure reason.  This seems to be fixed in more recent versions
   of the libmp3lame library.
-
 
   [1m20.5.12.  Can't change the channel when watching Live TV.[0m
 
@@ -5764,7 +5814,7 @@
   In KDE, you may want to perform the following:
 
 
-  $ rm ~/.kde/Autostart/Autorun.desktop
+       $ rm ~/.kde/Autostart/Autorun.desktop
 
 
 
@@ -5955,6 +6005,7 @@
   In 0.10 and later, from "mythfrontend" go to Setup->Appearance.  The
   default for the height and width is "0" - this will cause MythTV to
   automatically size itself to full screen.
+
   If the MythTV GUI width and height are not 0, mythfrontend uses these
   GUI dimensions and is anchored to the upper left corner of the X
   Desktop. If the GUI X and/or Y are not 0, the upper left corner is
@@ -6013,11 +6064,10 @@
   To restore: (assuming that you've dropped the database)
 
 
-
-  $ mysql -u root
-  mysql>create database mythconverg;
-  mysql>exit
-  $ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
+       $ mysql -u root
+       mysql>create database mythconverg;
+       mysql>exit
+       $ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
 
 
 
@@ -6199,6 +6249,7 @@
        session.screen0.focusModel:     SloppyFocus
 
 
+
   in it.
 
 
@@ -6219,10 +6270,11 @@
   /etc/rc.d/init.d/:
 
 
-       $ cd contrib
-       $ su
-       # chmod a+x etc.rc.d.init.d.mythbackend
-       # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+
+  $ cd contrib
+  $ su
+  # chmod a+x etc.rc.d.init.d.mythbackend
+  # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
 
 
 
@@ -6261,6 +6313,7 @@
   add your usual MythTV users to that group. If you changed the user
   that starts mythbackend from the default of root you [4mmust[24m perform this
   step.
+
   Create the directory /var/log/mythtv and set its permissions as
   follows:
 
@@ -6379,6 +6432,7 @@
 
   Using this scheme, the master backend will not use both capture cards
   until one of the following happens:
+
   +o  There are four recordings scheduled for the same time
 
   +o  Both slaves are not available
@@ -6444,7 +6498,6 @@
   commercials).  If you change your mind, hitting 'X' again will stop
   the transcoding.
 
-
   Once the transcode is complete, mythbackend will replace the old file
   with the new as soon as it is no longer in use.
 
@@ -6503,8 +6556,7 @@
   hostname you'll be using isn't already in the database.
 
 
-
-  $ grep kidsroom mythtv_backup.sql
+       $ grep kidsroom mythtv_backup.sql
 
 
 
@@ -6520,6 +6572,7 @@
   mythtv_backup.sql file in a text editor and perform a global search
   and replace.  When saving the file, make sure you use the new name,
   mythtv_restore.sql or the rest of the steps below will fail.
+
 
   5.  Drop and recreate the database.
 
@@ -6565,6 +6618,7 @@
   general-purpose computer, and there is no programming information
   available for the custom hardware contained within a TiVo.  TiVo is
   under no obligation to release the source code to their [4mapplication[24m.
+
   The ReplayTV runs VxWorks, a Real Time Operating System from Wind
   River Systems.
 
@@ -6628,11 +6682,10 @@
   example:
 
 
-
-  #!/bin/sh
-  TSIZE=`mkisofs -dvd-video -udf -q -print-size .`
-  mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
-  driveropts=burnfree -dao -v tsize="$TSIZE"s -
+       #!/bin/sh
+       TSIZE=`mkisofs -dvd-video -udf -q -print-size .`
+       mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
+       driveropts=burnfree -dao -v tsize="$TSIZE"s -
 
 
 
@@ -6645,6 +6698,7 @@
 
   The first step is to create a backup of your database using the
   instructions found in ``Saving or restoring the database''
+
 
   [1mNOTE[22m: Examine the contents of the backup file to be sure that the
   backup succeeded before modifying your database.
@@ -6689,20 +6743,21 @@
   line; the command won't be evaluated until you end the statement with
   a semicolon.
 
-  $ mysql -u root mythconverg
-  mysql>create table channel_temp
-  select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
-  c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
-  c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
-  c.commfree, c.visible, c.outputfilters
-  from channel c
-  left join channel_copy cb on (c.callsign = cb.callsign);
-  mysql>truncate channel;
-  mysql>insert channel select * from channel_temp;
-  mysql>drop table channel_temp;
-  mysql>drop table channel_copy;
-  mysql>exit
-  $
+
+       $ mysql -u root mythconverg
+       mysql>create table channel_temp
+       select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
+       c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
+       c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
+       c.commfree, c.visible, c.outputfilters
+       from channel c
+       left join channel_copy cb on (c.callsign = cb.callsign);
+       mysql>truncate channel;
+       mysql>insert channel select * from channel_temp;
+       mysql>drop table channel_temp;
+       mysql>drop table channel_copy;
+       mysql>exit
+       $
 
 
 
@@ -6746,13 +6801,12 @@
   then alter the [1murpmi [22mcommand appropriately.)
 
 
+       $ uname -a
+       Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+       unknown GNU/Linux
 
-  $ uname -a
-  Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-  unknown GNU/Linux
-
-  $ su
-  # urpmi kernel-source
+       $ su
+       # urpmi kernel-source
 
 
 
@@ -6763,7 +6817,7 @@
   Right now (2004-01-21), it's 0.1.9.  Untar the file.
 
 
-       $ tar -xzf ivtv-0.1.9.tar.gz
+  $ tar -xzf ivtv-0.1.9.tar.gz
 
 
 
@@ -6819,7 +6873,6 @@
        $ make
 
 
-
   Compile the [1mtest_ioctl [22mprogram:
 
 
@@ -6848,15 +6901,14 @@
   if you will not be using the IR remote that came with the card.
 
 
-
-  alias char-major-81     videodev
-  alias char-major-81-0   ivtv
-  alias char-major-61 lirc_i2c
-  options ivtv debug=1
-  options tuner type=2
-  options msp3400 once=1 simple=1
-  add below ivtv msp3400 saa7115 tuner
-  add above ivtv lirc_dev lirc_i2c
+       alias char-major-81     videodev
+       alias char-major-81-0   ivtv
+       alias char-major-61 lirc_i2c
+       options ivtv debug=1
+       options tuner type=2
+       options msp3400 once=1 simple=1
+       add below ivtv msp3400 saa7115 tuner
+       add above ivtv lirc_dev lirc_i2c
 
 
 
@@ -6871,11 +6923,12 @@
   located on the same key as the tilde " " and not the single quote.
 
 
-       $ su
-       # cd /lib/modules/`uname -r`
-       # pwd
-       /lib/modules/2.4.21-0.16mdk
-       # find . -name "msp3400*" | xargs rm -f
+
+  $ su
+  # cd /lib/modules/`uname -r`
+  # pwd
+  /lib/modules/2.4.21-0.16mdk
+  # find . -name "msp3400*" | xargs rm -f
 
 
 
@@ -6900,16 +6953,15 @@
   Check that the card is being recognized on the PCI bus:
 
 
+       $ lspci -v
+       <snip>
 
-  $ lspci -v
-  <snip>
-
-  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-  Encoder (rev 01)
-          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-          Flags: bus master, medium devsel, latency 32, IRQ 11
-          Memory at d0000000 (32-bit, prefetchable) [size=64M]
-          Capabilities: <available only to root>
+       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+       Encoder (rev 01)
+               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+               Flags: bus master, medium devsel, latency 32, IRQ 11
+               Memory at d0000000 (32-bit, prefetchable) [size=64M]
+               Capabilities: <available only to root>
 
 
 
@@ -6933,9 +6985,6 @@
   setup directory on the machine hosting the hardware MPEG-2 card.  When
   you add a new capture card, ensure that you are using the video0
   device.
-
-
-
      [1mNOTE[22m:  As of 2003-04-25 the ivtv driver does not support VBI, so
   closed-captioning is not available.  Leave the VBI device, audio
   device and audio sampling rate limit at the default values.  Change
@@ -7279,7 +7328,7 @@
   provide some brief notes on how to use LVM to create storage space for
   your video files and how to add additional disk space in the future.
   There's lots more that can be done with LVM, so check the LVM HOWTO
-  http://tldp.org/HOWTO/lvm-HOWTO/ <http://tldp.org/HOWTO/lvm-HOWTO/>
+  http://tldp.org/HOWTO/LVM-HOWTO/ <http://tldp.org/HOWTO/LVM-HOWTO/>
   document for details.
 
   If you don't understand how to partition a drive, or how to change the

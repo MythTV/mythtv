@@ -58,6 +58,40 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<H2><A NAME="ss18.3">18.3</A> <A HREF="mythtv-HOWTO.html#toc18.3">Running the Myth Transcoding Daemon</A>
+</H2>
+
+<P>Transcoding ("ripping") a DVD requires you to run the Myth Transcoding
+Daemon (mtd).  To ensure that mtd is configured correctly, you should first
+test it at the command line.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mtd -n
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The last line of text should show something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+mtd is listening on port 2342
+</PRE>
+</CODE></BLOCKQUOTE>
+
+This indicates that mtd is ready for use.  Once you've successfully
+tested mtd in the foreground, type <B>CTRL-C</B> to stop mtd.  You may
+then start it as a background (daemon) process.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mtd -d
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Running mtd as a daemon will allow you to automatically start it during the
+boot process.  For example, you may add <CODE>mtd -d</CODE> to your
+<CODE>rc.local</CODE> file, or you can adjust the script/steps outlined in the
+section called 
+<A HREF="mythtv-HOWTO-21.html#mythbackend_autostart">Automatically starting mythbackend at system boot time</A> to start mtd instead of mythbackend.</P>
+
 <HR>
 <A HREF="mythtv-HOWTO-19.html">Next</A>
 <A HREF="mythtv-HOWTO-17.html">Previous</A>
