@@ -191,7 +191,8 @@ void CommDetect::SetVideoParams(float aspect)
     {
         VERBOSE(VB_COMMFLAG,
                 QString("Aspect Ratio changed from %1 to %2 at frame %3")
-                        .arg(currentAspect).arg(newAspect).arg(curFrameNumber));
+                        .arg(currentAspect).arg(newAspect)
+                        .arg((long)curFrameNumber));
 
         if (frameInfo.contains(curFrameNumber))
         {
@@ -206,7 +207,7 @@ void CommDetect::SetVideoParams(float aspect)
             VERBOSE(VB_COMMFLAG, QString("Unable to keep track of Aspect ratio "
                                          "change because frameInfo for frame "
                                          "number %1 does not exist.")
-                                         .arg(curFrameNumber));
+                                         .arg((long)curFrameNumber));
         }
         currentAspect = newAspect;
     }
