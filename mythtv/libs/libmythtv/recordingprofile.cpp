@@ -731,8 +731,8 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting,
                                       int group) {
     if (group == 0)
     {
-       for(int i = 0; availProfiles[i][0] != 0; i++)
-           setting->addSelection(availProfiles[i],availProfiles[i]);
+       for(int i = 0; availProfiles[i] != ""; i++)
+           setting->addSelection(availProfiles[i], availProfiles[i]);
     }
     else
     {

@@ -153,14 +153,16 @@ void ProfileGroupEditor::open(int id) {
                                     "profilegroup = %1").arg(profileID);
             QSqlQuery result = db->exec(query);
             if (result.isActive() && result.numRowsAffected() > 0)
+            {
                 while (result.next())
                 {
-                    for(int i = 0; availProfiles[i][0] != 0; i++)
-                      if (result.value(0).toString() ==
-                              QString(availProfiles[i]))
+                    for (int i = 0; availProfiles[i] != ""; i++)
+                      if (result.value(0).toString() == availProfiles[i])
                           found.push_back(i);
                 }
-            for(int i = 0; availProfiles[i][0] != 0; i++)
+            }
+
+            for(int i = 0; availProfiles[i] != ""; i++)
             {
                 bool skip = false;
                 for (QValueList <int>::Iterator j = found.begin();

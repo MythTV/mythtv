@@ -4,8 +4,8 @@
 #include "libmyth/settings.h"
 #include "libmyth/mythwidgets.h"
 
-const char availProfiles[][20] =
-      {"Default", "Live TV", "High Quality", "Low Quality", 0};
+const QString availProfiles[] =
+      {"Default", "Live TV", "High Quality", "Low Quality", "" };
 
 class RecordingProfile;
 class VideoCompressionSettings;
