@@ -390,7 +390,7 @@ bool RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
 
 void RecordingProfileEditor::load(QSqlDatabase* db) {
     clearSelections();
-    //addSelection("(Create new profile)", "0");
+    addSelection("(Create new profile)", "0");
     RecordingProfile::fillSelections(db, this);
 }
 

@@ -55,7 +55,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     usebttv = 1;
     w = 352;
     h = 240;
-	pip_mode = 0;
+    pip_mode = 0;
 
     deinterlace_mode = DEINTERLACE_NONE;
     framerate_multiplier = 1.0;
