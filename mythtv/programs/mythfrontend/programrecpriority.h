@@ -79,6 +79,7 @@ class ProgramRecPriority : public MythDialog
     QPixmap *bgTransBackup;
 
     bool pageDowner;
+    bool reverseSort;
 
     int inList;
     int inData;

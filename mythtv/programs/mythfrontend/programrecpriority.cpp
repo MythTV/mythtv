@@ -144,6 +144,7 @@ ProgramRecPriority::ProgramRecPriority(QSqlDatabase *ldb, MythMainWindow *parent
     FillList();
     sortType = (SortType)gContext->GetNumSetting("ProgramRecPrioritySorting", 
                                                  (int)byTitle);
+    reverseSort = gContext->GetNumSetting("ProgramRecPriorityReverse", 0);
 
     SortList(); 
     inList = inData = 0;
@@ -190,6 +191,8 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
                 saveRecPriority();
                 gContext->SaveSetting("ProgramRecPrioritySorting",
                                       (int)sortType);
+                gContext->SaveSetting("ProgramRecPriorityReverse",
+                                      (int)reverseSort);
                 done(MythDialog::Accepted);
             }
             else if (action == "1")
@@ -197,21 +200,32 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
                 if (sortType != byTitle)
                 {
                     sortType = byTitle;
-                    SortList();
-                    update(fullRect);
+                    reverseSort = false;
                 }
+                else
+                {
+                    reverseSort = !reverseSort;
+                }
+                SortList();
+                update(fullRect);
             }
             else if (action == "2")
             {
                 if (sortType != byRecPriority)
                 {
                     sortType = byRecPriority;
-                    SortList();
-                    update(fullRect);
+                    reverseSort = false;
                 }
+                else
+                {
+                    reverseSort = !reverseSort;
+                }
+                SortList();
+                update(fullRect);
             }
             else if (action == "PREVVIEW" || action == "NEXTVIEW")
             {
+                reverseSort = false;
                 if (sortType == byTitle)
                     sortType = byRecPriority;
                 else
@@ -691,15 +705,26 @@ typedef struct RecPriorityInfo
 class titleSort 
 {
     public:
+        titleSort(bool reverseSort = false) {m_reverse = reverseSort;}
+
         bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
         {
-            return (a.prog->title > b.prog->title);
+            if (m_reverse)
+                return (a.prog->title < b.prog->title);
+            else
+                return (a.prog->title > b.prog->title);
         }
+
+    private:
+        bool m_reverse;
 };
 
 class programRecPrioritySort 
 {
     public:
+        programRecPrioritySort(bool reverseSort = false)
+                               {m_reverse = reverseSort;}
+
         bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
         {
             int finalA = a.prog->recpriority + 
@@ -710,9 +735,19 @@ class programRecPrioritySort
                          b.prog->recTypeRecPriority;
 
             if (finalA == finalB)
-                return (a.prog->title > b.prog->title);
-            return (finalA < finalB);
+                if (m_reverse)
+                    return (a.prog->title < b.prog->title);
+                else
+                    return (a.prog->title > b.prog->title);
+
+            if (m_reverse)
+                return (finalA > finalB);
+            else
+                return (finalA < finalB);
         }
+
+    private:
+        bool m_reverse;
 };
 
 void ProgramRecPriority::SortList() 
@@ -739,11 +774,21 @@ void ProgramRecPriority::SortList()
     // sort sortedList
     switch(sortType) 
     {
-        case byTitle : sort(sortedList.begin(), sortedList.end(), titleSort());
-                       break;
-        case byRecPriority : sort(sortedList.begin(), sortedList.end(), 
-                           programRecPrioritySort());
-                      break;
+        case byTitle :
+                 if (reverseSort)
+                     sort(sortedList.begin(), sortedList.end(),
+                          titleSort(true));
+                 else
+                     sort(sortedList.begin(), sortedList.end(), titleSort());
+                 break;
+        case byRecPriority :
+                 if (reverseSort)
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programRecPrioritySort(true));
+                 else
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programRecPrioritySort());
+                 break;
     }
 
     programData.clear();
