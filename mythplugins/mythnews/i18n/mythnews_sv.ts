@@ -13,18 +13,18 @@
 <context>
     <name>MythNewsConfig</name>
     <message>
-        <source>Select News Feeds</source>
-        <translation>Välj nyhetskällor</translation>
+        <source>Press MENU to set the update frequency.</source>
+        <translation>Tryck på MENY för att ställa in uppdateringsfrekvensen.</translation>
     </message>
     <message>
-        <source>Set Update Frequency</source>
-        <translation>Sätt uppdateringsfrekvens</translation>
+        <source>Set update frequency by using the up/down arrows.
+The minimum allowed value is 30 Minutes.</source>
+        <translation>Ställ in uppdateringsfrekvensen med knapparna upp och ner.
+Minsta tillåtna värdet är 30 minuter.</translation>
     </message>
     <message>
-        <source>Set Update Frequency in Minutes
-Minimum allowed value is 30 Minutes</source>
-        <translation>Sätt uppdateringsfrekvens i minuter
-Minsta tillåtna värde är 30 minuter</translation>
+        <source>Press MENU to return to feed selection.</source>
+        <translation>Tryck på MENY för att återvända till val av nyhetskällor.</translation>
     </message>
 </context>
 <context>
