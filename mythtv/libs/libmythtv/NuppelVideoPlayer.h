@@ -435,6 +435,8 @@ class NuppelVideoPlayer
     short int *warplbuff;
     short int *warprbuff;
     int warpbuffsize;
+ 
+    int prevtc;
 
     bool delay_clipping;
     struct timeval nexttrigger, now;

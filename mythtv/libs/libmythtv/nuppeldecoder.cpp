@@ -952,6 +952,8 @@ void NuppelDecoder::GetFrame(int avignore)
             }
             else if (frameheader.comptype == 'V')
             {
+                VERBOSE(VB_AUDIO, QString("Video timecode = %1")
+                        .arg(frameheader.timecode));
                 lastKey = frameheader.timecode;
                 framesPlayed = frameheader.timecode - 1;
 

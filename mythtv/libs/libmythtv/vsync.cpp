@@ -308,8 +308,11 @@ void DRMVideoSync::WaitForFrame(int sync_delay)
         //cerr << "Wait " << n << " intervals. Count " << blank.request.sequence;
         //cerr  << " Delay " << m_delay << endl;
     }
-    KeepPhase();
+}
 
+void DRMVideoSync::AdvanceTrigger()
+{
+    KeepPhase();
     UpdateNexttrigger();
 }
 
@@ -387,9 +390,11 @@ void nVidiaVideoSync::WaitForFrame(int sync_delay)
         dopoll();
         m_delay = CalcDelay();
     }
-    
+}
+
+void nVidiaVideoSync::AdvanceTrigger()
+{
     KeepPhase();
-    
     UpdateNexttrigger();
 }
 
@@ -522,8 +527,11 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
         //cerr << "Wait " << n << " intervals. Count " << count;
         //cerr  << " Delay " << m_delay << endl;
     }
-    KeepPhase();
+}
 
+void OpenGLVideoSync::AdvanceTrigger()
+{
+    KeepPhase();
     UpdateNexttrigger();
 }
 
@@ -591,6 +599,10 @@ void RTCVideoSync::WaitForFrame(int sync_delay)
         read(m_rtcfd, &rtcdata, sizeof(rtcdata));
         m_delay = CalcDelay();
     }
+}
+
+void RTCVideoSync::AdvanceTrigger()
+{
     UpdateNexttrigger();
 }
 #endif /* __linux__ */
@@ -639,7 +651,10 @@ void BusyWaitVideoSync::WaitForFrame(int sync_delay)
         if (cnt > 1)
             m_cheat -= 200;
     }
+}
 
+void BusyWaitVideoSync::AdvanceTrigger()
+{
     UpdateNexttrigger();
 }
 
@@ -662,10 +677,12 @@ void USleepVideoSync::WaitForFrame(int sync_delay)
     // Offset for externally-provided A/V sync delay
     OffsetTimeval(m_nexttrigger, sync_delay);
     
-    // Do the wait
     m_delay = CalcDelay();
     if (m_delay > 0)
         usleep(m_delay);
+}
 
+void USleepVideoSync::AdvanceTrigger()
+{
     UpdateNexttrigger();
 }

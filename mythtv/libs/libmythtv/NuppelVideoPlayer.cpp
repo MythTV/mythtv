@@ -1320,9 +1320,6 @@ void NuppelVideoPlayer::AVSync(void)
         }
 
         videosync->WaitForFrame(avsync_adjustment);
-        avsync_adjustment = 0;
-
-        // Display the frame
         videoOutput->Show(m_scan);
 
         if (m_double_framerate)
@@ -1334,10 +1331,8 @@ void NuppelVideoPlayer::AVSync(void)
                     videoOutput->PrepareFrame(buffer, kScan_Intr2ndField);
             }
             // Display the second field
-            videosync->WaitForFrame(avsync_adjustment);
-            avsync_adjustment = 0;
-
-            // Display the frame
+            videosync->AdvanceTrigger();
+            videosync->WaitForFrame(0);
             videoOutput->Show(kScan_Intr2ndField);
         }
     }
@@ -1347,10 +1342,15 @@ void NuppelVideoPlayer::AVSync(void)
     }
 
     if (output_jmeter && output_jmeter->RecordCycleTime())
-        cout << "avsync_delay: " << avsync_delay / 1000
-             << ", avsync_avg: " << avsync_avg / 1000
-             << ", warpfactor: " << warpfactor
-             << ", warpfactor_avg: " << warpfactor_avg << endl;
+    {
+        //cerr << "avsync_delay: " << avsync_delay / 1000
+        //     << ", avsync_avg: " << avsync_avg / 1000
+        //     << ", warpfactor: " << warpfactor
+        //     << ", warpfactor_avg: " << warpfactor_avg << endl;
+    }
+
+    videosync->AdvanceTrigger();
+    avsync_adjustment = 0;
 
     if (diverge > MAXDIVERGE)
     {
@@ -1373,6 +1373,19 @@ void NuppelVideoPlayer::AVSync(void)
         { // lastaudiotime = 0 after a seek
             // The time at the start of this frame (ie, now) is given by
             // last->timecode
+            int delta = buffer->timecode - prevtc - (frame_interval / 1000);
+            prevtc = buffer->timecode;
+            //cerr << delta << " ";
+
+            // If the timecode is off by a frame (dropped frame) wait to sync
+            if (delta > (int) frame_interval / 1200)
+            {
+                //cerr << "+ ";
+                videosync->AdvanceTrigger();
+                if (m_double_framerate)
+                    videosync->AdvanceTrigger();
+            }
+
             avsync_delay = (buffer->timecode - lastaudiotime) * 1000; // uSecs
             avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
             if (!usevideotimebase)
@@ -1797,7 +1810,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (bookmarkseek > 30)
     {
         if (!GetFrame(audioOutput == NULL || !normal_speed))
-	    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);	    
+            pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
 
         bool seeks = exactseeks;
 
@@ -1880,7 +1893,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 DoRewind();
 
                 if (!GetFrame(audioOutput == NULL || !normal_speed))
-                    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);	    
+                    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
                 resetvideo = true;
                 while (resetvideo)
                     usleep(50);
@@ -1894,7 +1907,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 DoFastForward();
 
                 if (!GetFrame(audioOutput == NULL || !normal_speed))
-                    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);	    
+                    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
                 resetvideo = true;
                 while (resetvideo)
                     usleep(50);
@@ -1989,7 +2002,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         }
 
         if (!GetFrame(audioOutput == NULL || !normal_speed))
-	    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this); 
+            pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this); 
 
         if (ffrew_skip != 1)
             continue;

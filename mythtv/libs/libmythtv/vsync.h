@@ -65,7 +65,8 @@ class VideoSync
     virtual void Start();
 
     virtual void WaitForFrame(int sync_delay) = 0;
-    
+    virtual void AdvanceTrigger() = 0;
+
     void SetFrameInterval(int fi, bool interlaced);
     bool isInterlaced() const { return m_interlaced; }
 
@@ -100,7 +101,8 @@ class DRMVideoSync : public VideoSync
     bool TryInit();
     void Start();
     void WaitForFrame(int sync_delay);
-    
+    void AdvanceTrigger();
+
  private:
     int m_dri_fd;
     static char *sm_dri_dev;
@@ -118,6 +120,8 @@ class nVidiaVideoSync : public VideoSync
     bool TryInit();
     void Start();
     void WaitForFrame(int sync_delay);
+    void AdvanceTrigger();
+
  private:
     bool dopoll() const;
     int m_nvidia_fd;
@@ -136,7 +140,9 @@ public:
     bool TryInit();
     void Start();
     void WaitForFrame(int sync_delay);
+    void AdvanceTrigger();
     void Stop();
+
 private:
     Display *m_display;
     GLXDrawable m_drawable;
@@ -155,6 +161,8 @@ public:
     QString getName() const { return QString("RTC"); }
     bool TryInit();
     void WaitForFrame(int sync_delay);
+    void AdvanceTrigger();
+
 private:
     int m_rtcfd;
 };
@@ -173,6 +181,8 @@ public:
     QString getName() const { return QString("USleep with busy wait"); }
     bool TryInit();
     void WaitForFrame(int sync_delay);
+    void AdvanceTrigger();
+
 private:
     int m_cheat;
     int m_fudge;
@@ -192,5 +202,6 @@ public:
     QString getName() const { return QString("USleep"); }
     bool TryInit();
     void WaitForFrame(int sync_delay);
+    void AdvanceTrigger();
 };
 #endif /* VSYNC_H_INCLUDED */
