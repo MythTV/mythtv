@@ -482,7 +482,7 @@ AudioMetadata* CdDecoder::getMetadata(int track)
     {
         retdata->setCompilation(true);
     }
-    retdata->setComment("Served by a Myth Box");
+    retdata->setComment("Served to you by Myth");
     retdata->setSampleRate(44100);
     retdata->setBitrate((176400 * 8) / 1024);
     retdata->setSize(size);

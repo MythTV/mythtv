@@ -306,9 +306,10 @@ void DeviceWatcher::updateAudioCDMetadata()
     for(int i = 0; i < number_of_total_tracks; i++)
     {
         AudioMetadata *new_track = cd_decoder->getMetadata(i+1);
-        new_track->setId(i+1);
         if(new_track)
         {
+            new_track->setId(i+1);
+            new_track->setDbId(i+1);
             new_metadata->insert(new_track->getId(), new_track);
             metadata_additions.push_back(new_track->getId());
             if(songlist.length() < 1)
@@ -368,12 +369,12 @@ void DeviceWatcher::updateAudioCDMetadata()
                                             current_metadata_container->getIdentifier(),
                                             playlist_name,
                                             songlist,
-                                            2
+                                            1
                                          );
 
     new_playlist->mapDatabaseToId(new_metadata);
-    new_playlists->insert(2, new_playlist);
-    playlist_additions.push_back(2);
+    new_playlists->insert(1, new_playlist);
+    playlist_additions.push_back(1);
 
     //
     //  Stuff the new metadata and playlists into the metadata server
