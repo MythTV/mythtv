@@ -33,7 +33,8 @@ case "$cpu" in
   i386|i486|i586|i686|i86pc|BePC)
     cpu="x86"
   ;;
-  armv4l)
+  # armv4l is a subset of armv5tel
+  armv4l|armv5tel)
     cpu="armv4l"
   ;;
   alpha)
@@ -630,22 +631,22 @@ fi
 ##########################################
 # SDL probe
 
-cat > $TMPC << EOF
-#include <SDL.h>
-#undef main /* We don't want SDL to override our main() */
-int main( void ) { return SDL_Init (SDL_INIT_VIDEO); }
-EOF
-
-sdl_too_old=no
-sdl=no
-if $cc -o $TMPE `sdl-config --cflags` $TMPC `sdl-config --libs`  2> /dev/null  ; then
-_sdlversion=`sdl-config --version | sed 's/[^0-9]//g'`
-if test "$_sdlversion" -lt 121 ; then
-sdl_too_old=yes
-else
-sdl=yes
-fi
-fi
+#cat > $TMPC << EOF
+##include <SDL.h>
+##undef main /* We don't want SDL to override our main() */
+#int main( void ) { return SDL_Init (SDL_INIT_VIDEO); }
+#EOF
+#
+#sdl_too_old=no
+#sdl=no
+#if $cc -o $TMPE `sdl-config --cflags` $TMPC `sdl-config --libs`  2> /dev/null  ; then
+#_sdlversion=`sdl-config --version | sed 's/[^0-9]//g'`
+#if test "$_sdlversion" -lt 121 ; then
+#sdl_too_old=yes
+#else
+#sdl=yes
+#fi
+#fi
 
 
 if test "$sdl" = "no" ; then
