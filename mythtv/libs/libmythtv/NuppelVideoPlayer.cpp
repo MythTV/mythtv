@@ -2215,8 +2215,14 @@ void NuppelVideoPlayer::HandleSelect(void)
 
         dialogname = "deletemark";
         dialogtype = 0;
-        osd->NewDialogBox(dialogname, message, option1, option2, option3, 
-                          option4, -1);
+
+        QStringList options;
+        options += option1;
+        options += option2;
+        options += option3;
+        options += option4;
+
+        osd->NewDialogBox(dialogname, message, options, -1); 
     }
     else
     {
@@ -2227,8 +2233,13 @@ void NuppelVideoPlayer::HandleSelect(void)
 
         dialogname = "addmark";
         dialogtype = 1;
-        osd->NewDialogBox(dialogname, message, option1, option2, option3,
-                          "", -1);
+
+        QStringList options;
+        options += option1;
+        options += option2;
+        options += option3;
+       
+        osd->NewDialogBox(dialogname, message, options, -1);
     }
 }
 

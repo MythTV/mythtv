@@ -1042,9 +1042,7 @@ void OSD::SetSettingsText(const QString &text, int length)
 }
 
 void OSD::NewDialogBox(const QString &name, const QString &message, 
-                       const QString &optionone, const QString &optiontwo, 
-                       const QString &optionthree, const QString &optionfour,
-                       int length)
+                       QStringList &options, int length)
 {
     pthread_mutex_lock(&osdlock);
     OSDSet *container = GetSet(name);
@@ -1053,14 +1051,6 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
         cerr << "dialog: " << name << " already exists.\n";
         return;
     }       
-
-    int numoptions = 4;
-    if (optionfour == "")
-        numoptions = 3;
-    if (optionthree == "")
-        numoptions = 2;
-    if (optiontwo == "")
-        numoptions = 1;
 
     OSDSet *base = GetSet("basedialog");
     if (!base)
@@ -1079,41 +1069,32 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
 
     OSDTypeText *question = (OSDTypeText *)container->GetType("message");
     if (question)
-    {
         question->SetText(message);
-    } 
 
-    for (int i = 1; i <= numoptions; i++)
+    int availoptions = 0;
+    OSDTypeText *text = NULL;
+    do
     {
-        int off = 4 - numoptions + i;
+        QString name = QString("option%1").arg(availoptions + 1);
+        text = (OSDTypeText *)container->GetType(name);
+        if (text)
+            availoptions++;
+    }
+    while (text);
 
-        QString name, option;
-        switch (i)
-        {
-            case 1: option = optionone; break;
-            case 2: option = optiontwo; break;
-            case 3: option = optionthree; break;
-            case 4: option = optionfour; break;
-            default: option = "error, unknown option"; break;
-        }
+    int numoptions = options.size();
 
-        switch (off)
-        {
-            case 1: name = "option1"; break;
-            case 2: name = "option2"; break;
-            case 3: name = "option3"; break;
-            case 4: name = "option4"; break;
-            default: name = "blah";
-        }
-
-        OSDTypeText *text = (OSDTypeText *)container->GetType(name);
+    for (int i = 1; i <= numoptions && i <= availoptions; i++)
+    {
+        QString name = QString("option%1").arg(availoptions - numoptions + i);
+        text = (OSDTypeText *)container->GetType(name);
         if (!text)
         {
             cerr << "Couldn't find: " << name << endl;
             exit(0);
         }
 
-        text->SetText(option);
+        text->SetText(options[i - 1]);
         text->SetUseAlt(true);
     }
 
@@ -1125,12 +1106,12 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
         exit(0);
     }
 
-    opr->SetOffset(4 - numoptions);
+    opr->SetOffset(availoptions - numoptions);
     opr->SetPosition(0);
 
     dialogResponseList[name] = 0;
 
-    HighlightDialogSelection(container, 4 - numoptions);
+    HighlightDialogSelection(container, availoptions - numoptions);
 
     if (length > 0)
         container->DisplayFor(length * fps);
@@ -1143,20 +1124,21 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
 
 void OSD::HighlightDialogSelection(OSDSet *container, int num)
 {
-    for (int i = 1; i <= 4; i++)
+    int availoptions = 0;
+    OSDTypeText *text = NULL;
+    do
     {
-        QString name;
+       QString name = QString("option%1").arg(availoptions + 1);
+       text = (OSDTypeText *)container->GetType(name);
+       if (text)
+           availoptions++;
+    }
+    while (text);
 
-        switch (i)
-        {
-            case 1: name = "option1"; break;
-            case 2: name = "option2"; break;
-            case 3: name = "option3"; break;
-            case 4: name = "option4"; break;
-            default: name = "blah";
-        }
-
-        OSDTypeText *text = (OSDTypeText *)container->GetType(name);
+    for (int i = 1; i <= availoptions; i++)
+    {
+        QString name = QString("option%1").arg(i);
+        text = (OSDTypeText *)container->GetType(name);
         if (text)
         {
             if (i == num + 1) 

@@ -227,10 +227,6 @@ int TV::AllowRecording(const QString &message, int timeuntil)
         return 1;
     }
 
-    QString option1 = tr("Record and watch while it records");
-    QString option2 = tr("Let it record and go back to the Main Menu");
-    QString option3 = tr("Don't let it record, I want to watch TV");
-
     dialogname = "allowrecordingbox";
 
     while (!osd)
@@ -241,8 +237,12 @@ int TV::AllowRecording(const QString &message, int timeuntil)
         qApp->lock();
     }
 
-    osd->NewDialogBox(dialogname, message, option1, option2, option3, 
-                      "", timeuntil);
+    QStringList options;
+    options += tr("Record and watch while it records");
+    options += tr("Let it record and go back to the Main Menu");
+    options += tr("Don't let it record, I want to watch TV");
+
+    osd->NewDialogBox(dialogname, message, options, timeuntil); 
 
     while (osd->DialogShowing(dialogname))
     {
@@ -910,16 +910,16 @@ void TV::ProcessKeypress(int keypressed)
             {
                 nvp->Pause();
 
-                QString message = QString("You are exiting this recording");
+                QString message = tr("You are exiting this recording");
 
-                QString option1 = "Save this position and go to the menu";
-                QString option2 = "Do not save, just exit to the menu";
-                QString option3 = "Keep watching";
-                QString option4 = "Delete this recording";
+                QStringList options;
+                options += tr("Save this position and go to the menu");
+                options += tr("Do not save, just exit to the menu");
+                options += tr("Keep watching");
+                options += tr("Delete this recording");
 
                 dialogname = "exitplayoptions";
-                osd->NewDialogBox(dialogname, message, option1, option2, 
-                                  option3, option4, 0);
+                osd->NewDialogBox(dialogname, message, options, 0); 
             } 
             else 
             {

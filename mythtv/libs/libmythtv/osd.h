@@ -2,6 +2,7 @@
 #define OSD_H
 
 #include <qstring.h>
+#include <qstringlist.h>
 #include <qrect.h>
 #include <qpoint.h>
 #include <time.h>
@@ -40,9 +41,7 @@ class OSD
     void SetSettingsText(const QString &text, int length);
 
     void NewDialogBox(const QString &name, const QString &message, 
-                      const QString &optionone, const QString &optiontwo, 
-                      const QString &optionthree, const QString &optionfour,
-                      int length);
+                      QStringList &options, int length);
     void DialogUp(const QString &name);
     void DialogDown(const QString &name);
     bool DialogShowing(const QString &name);
