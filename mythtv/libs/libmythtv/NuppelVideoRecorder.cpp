@@ -38,7 +38,6 @@ pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
 NuppelVideoRecorder::NuppelVideoRecorder(void)
 {
-    sfilename = "output.nuv";
     encoding = false;
     fd = 0;
     lf = tf = 0;
@@ -47,10 +46,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     inputchannel = 1;
     compression = 1;
     compressaudio = 1;
-    ntsc = 1;
     rawmode = 0;
     usebttv = 1;
-    vbimode = 0;
     w = 352;
     h = 240;
 
@@ -81,16 +78,10 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     text_buffer_count = 0;
     text_buffer_size = 0;
 
-    audiodevice = "/dev/dsp";
-    videodevice = "/dev/video";
-    vbidevice = "/dev/vbi";
-
     childrenLive = false;
 
     recording = false;
 
-    ringBuffer = NULL;
-    weMadeBuffer = false;
     paused = false;
     pausewritethread = false;   
  
@@ -110,7 +101,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     mpa_codec = 0;
     mpa_ctx = NULL;
 
-    codec = "rtjpeg";
     useavcodec = false;
 
     targetbitrate = 2200;
@@ -129,7 +119,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     extendeddataOffset = 0;
     seektable = new vector<struct seektable_entry>;
 
-    pip = false;
     hardware_encode = false;
     hmjpg_quality = 80;
     hmjpg_hdecimation = 2;
@@ -204,24 +193,6 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
     }
 }
 
-void NuppelVideoRecorder::SetTVFormat(QString tvformat)
-{
-    if (tvformat.lower() == "ntsc" || tvformat.lower() == "ntsc-jp")
-        ntsc = 1;
-    else 
-        ntsc = 0;
-}
-
-void NuppelVideoRecorder::SetVbiFormat(QString vbiformat)
-{
-    if (vbiformat.lower() == "pal teletext")
-        vbimode = 1;
-    else if (vbiformat.lower().left(4) == "ntsc")
-        vbimode = 2;
-    else
-        vbimode = 0;
-}
-
 void NuppelVideoRecorder::SetEncodingOption(const QString &opt, int value)
 {
     if (opt == "width")
@@ -272,6 +243,46 @@ void NuppelVideoRecorder::SetEncodingOption(const QString &opt, int value)
         audio_samplerate = value;
     else
         cerr << "Unknown encoding setting: " << opt << endl;
+}
+
+void NuppelVideoRecorder::Pause(bool clear)
+{
+    cleartimeonpause = clear;
+    actuallypaused = audiopaused = mainpaused = false;
+    paused = true;
+    pausewritethread = true;
+}
+
+void NuppelVideoRecorder::Unpause(void)
+{
+    paused = false;
+    pausewritethread = true;
+}
+
+bool NuppelVideoRecorder::GetPause(void)
+{
+    return (audiopaused && mainpaused && actuallypaused);
+}
+
+void NuppelVideoRecorder::SetVideoFilters(QString &filters)
+{
+    videoFilterList = filters;
+    InitFilters();
+}
+
+bool NuppelVideoRecorder::IsRecording(void)
+{
+    return recording;
+}
+
+long long NuppelVideoRecorder::GetFramesWritten(void)
+{
+    return framesWritten;
+}
+
+int NuppelVideoRecorder::GetVideoFd(void)
+{
+    return fd;
 }
 
 bool NuppelVideoRecorder::SetupAVCodec(void)
@@ -445,7 +456,7 @@ void NuppelVideoRecorder::Initialize(void)
     if (!ringBuffer)
     {
         cerr << "Warning: Old ringbuf creation\n";
-        ringBuffer = new RingBuffer(NULL, sfilename, true);
+        ringBuffer = new RingBuffer(NULL, "output.nuv", true);
         weMadeBuffer = true;
         livetv = false;
     }
@@ -564,6 +575,11 @@ void NuppelVideoRecorder::InitBuffers(void)
     }
 }
 
+void NuppelVideoRecorder::StopRecording(void)
+{
+    encoding = false;
+}
+
 void NuppelVideoRecorder::StartRecording(void)
 {
     if (lzo_init() != LZO_E_OK)
@@ -573,11 +589,6 @@ void NuppelVideoRecorder::StartRecording(void)
     }
 
     strm = new signed char[w * h * 2 + 10];
-
-    if (ntsc)
-        video_frame_rate = 29.97;
-    else
-        video_frame_rate = 25.0;
 
     if (codec.lower() == "rtjpeg")
         useavcodec = false;

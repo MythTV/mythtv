@@ -16,6 +16,7 @@ class Channel;
 class ProgramInfo;
 class RingBuffer;
 class NuppelVideoRecorder;
+class RecorderBase;
 
 class TVRec
 {
@@ -131,7 +132,7 @@ class TVRec
 
     void SetOption(RecordingProfile &profile, const QString &name);
 
-    NuppelVideoRecorder *nvr;
+    RecorderBase *nvr;
     RingBuffer *rbuffer;
     Channel *channel;
 

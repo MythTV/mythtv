@@ -17,6 +17,8 @@
 #define MMX
 #endif
 
+#include "recorderbase.h"
+
 #include "minilzo.h"
 #include "format.h"
 
@@ -44,60 +46,36 @@ struct MyFilterData
     unsigned char *src;
 };
 
-class NuppelVideoRecorder
+class NuppelVideoRecorder : public RecorderBase
 {
  public:
     NuppelVideoRecorder();
    ~NuppelVideoRecorder();
 
-    void SetRingBuffer(RingBuffer *rbuf) { ringBuffer = rbuf; }
-    void SetAsPIP(void) { pip = true; }
-    
-    void SetCodec(QString desiredcodec) { codec = desiredcodec; }
-
     void SetEncodingOption(const QString &opt, int value);
-
-    void SetFilename(QString filename) { sfilename = filename; }
-    void SetAudioDevice(QString device) { audiodevice = device; }
-    void SetVideoDevice(QString device) { videodevice = device; }
-    void SetVbiDevice(QString device) { vbidevice = device; }
-    void SetTVFormat(QString tvformat);
-    void SetVbiFormat(QString vbiformat);
-
     void ChangeDeinterlacer(int deint_mode);   
  
     void Initialize(void);
     void StartRecording(void);
-    void StopRecording(void) { encoding = false; } 
+    void StopRecording(void); 
     
-    void Pause(bool clear = true) 
-                     { cleartimeonpause = clear;
-                       paused = true; pausewritethread = true;
-                       actuallypaused = audiopaused = mainpaused = false; }
-    void Unpause(void) { paused = false; pausewritethread = false; }
-    bool GetPause(void) { return (audiopaused && mainpaused && 
-                                  actuallypaused); }
+    void Pause(bool clear = true);
+    void Unpause(void);
+    bool GetPause(void); 
     
-    bool IsRecording(void) { return recording; }
+    bool IsRecording(void);
    
-    long long GetFramesWritten(void) { return framesWritten; } 
-    void ResetFramesWritten(void) { framesWritten = 0; }
+    long long GetFramesWritten(void); 
 
-    int GetVideoFd(void) { return fd; }
+    int GetVideoFd(void);
     void Reset(void);
 
-    float GetFrameRate(void) { return video_frame_rate; }
-  
-    void WriteHeader(bool todumpfile = false);
-
-    void SetVideoFilters(QString &filters) { videoFilterList = filters; }
-    void InitFilters(void);
+    void SetVideoFilters(QString &filters);
 
     void TransitionToFile(const QString &lfilename);
     void TransitionToRing(void);
 
     long long GetKeyframePosition(long long desired);
-
     void GetBlankFrameMap(QMap<long long, int> &blank_frame_map);
 
  protected:
@@ -112,13 +90,15 @@ class NuppelVideoRecorder
  private:
     int AudioInit(void);
     void InitBuffers(void);
-    
+    void InitFilters(void);   
+ 
     int SpawnChildren(void);
     void KillChildren(void);
     
     void BufferIt(unsigned char *buf, int len = -1);
     
     int CreateNuppelFile(void);
+    void WriteHeader(bool todumpfile = false);
 
     void WriteVideo(Frame *frame);
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
@@ -136,7 +116,6 @@ class NuppelVideoRecorder
     void FormatTeletextSubtitles(struct VBIData *vbidata);
     void FormatCC(struct ccsubtitle *subtitle, struct cc *cc, int data);
     
-    QString sfilename;
     bool encoding;
     
     int fd; // v4l input file handle
@@ -156,11 +135,9 @@ class NuppelVideoRecorder
     int audio_samplerate; // rate we request from sounddevice
     int effectivedsp; // actual measured rate
 
-    int ntsc;
     int quiet;
     int rawmode;
     int usebttv;
-    char vbimode;
     struct video_audio *origaudio;
 
     int mp3quality;
@@ -178,10 +155,6 @@ class NuppelVideoRecorder
     long __LZO_MMODEL var [ ((size) + (sizeof(long) - 1)) / sizeof(long) ]    
     HEAP_ALLOC(wrkmem, LZO1X_1_MEM_COMPRESS);
 
-    QString audiodevice;
-    QString videodevice;
-    QString vbidevice;
- 
     vector<struct vidbuffertype *> videobuffer;
     vector<struct audbuffertype *> audiobuffer;
     vector<struct txtbuffertype *> textbuffer;
@@ -215,16 +188,12 @@ class NuppelVideoRecorder
 
     bool recording;
 
-    RingBuffer *ringBuffer;
-    bool weMadeBuffer;
-
     int keyframedist;
     vector<struct seektable_entry> *seektable;
 
     long long extendeddataOffset;
 
     long long framesWritten;
-    double video_frame_rate;
 
     bool livetv;
     bool paused;
@@ -270,10 +239,6 @@ class NuppelVideoRecorder
     int minquality;
     int qualdiff;
     int mp4opts;
-
-    QString codec;
-
-    bool pip;
 
     QString videoFilterList;
     vector<VideoFilter *> videoFilters;

@@ -18,6 +18,7 @@ using namespace std;
 #include "recordingprofile.h"
 #include "util.h"
 #include "programinfo.h"
+#include "recorderbase.h"
 #include "NuppelVideoRecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
@@ -25,7 +26,7 @@ using namespace std;
 
 void *SpawnEncode(void *param)
 {
-    NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)param;
+    RecorderBase *nvr = (RecorderBase *)param;
     nvr->StartRecording();
     return NULL;
 }
@@ -431,15 +432,21 @@ void TVRec::SetOption(RecordingProfile &profile, const QString &name)
 void TVRec::SetupRecorder(RecordingProfile &profile) 
 {
     nvr = new NuppelVideoRecorder();
+
     nvr->ChangeDeinterlacer(deinterlace_mode);
+
     nvr->SetRingBuffer(rbuffer);
-    nvr->SetVideoDevice(videodev);
-    nvr->SetVbiDevice(vbidev);
+
+    nvr->SetBaseOption("videodevice", videodev);
+    nvr->SetBaseOption("audiodevice", vbidev);
+    nvr->SetBaseOption("tvformat", gContext->GetSetting("TVFormat"));
+    nvr->SetBaseOption("vbiformat", gContext->GetSetting("VbiFormat"));
+    nvr->SetBaseOption("audiodevice", audiodev);
 
     QString setting = profile.byName("videocodec")->getValue();
     if (setting == "MPEG-4") 
     {
-        nvr->SetCodec("mpeg4");
+        nvr->SetBaseOption("codec", "mpeg4");
 
         SetOption(profile, "mpeg4bitrate");
         SetOption(profile, "mpeg4scalebitrate");
@@ -451,7 +458,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     } 
     else if (setting == "RTjpeg") 
     {
-        nvr->SetCodec("rtjpeg");
+        nvr->SetBaseOption("codec", "rtjpeg");
 
         SetOption(profile, "rtjpegquality");
         SetOption(profile, "rtjpegchromafilter");
@@ -459,7 +466,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     } 
     else if (setting == "Hardware MJPEG") 
     {
-        nvr->SetCodec("hardware-mjpeg");
+        nvr->SetBaseOption("codec", "hardware-mjpeg");
 
         SetOption(profile, "hardwaremjpegquality");
         SetOption(profile, "hardwaremjpeghdecimation");
@@ -483,15 +490,9 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     SetOption(profile, "width");
     SetOption(profile, "height");
 
-    nvr->SetTVFormat(gContext->GetSetting("TVFormat"));
-    nvr->SetVbiFormat(gContext->GetSetting("VbiFormat"));
-
-    nvr->SetAudioDevice(audiodev);
-   
     if (ispip)
     {
-        nvr->SetAsPIP();
-        nvr->SetCodec("rtjpeg");
+        nvr->SetBaseOption("codec", "rtjpeg");
 
         nvr->SetEncodingOption("width", 160);
         nvr->SetEncodingOption("height", 128);
@@ -1048,7 +1049,6 @@ bool TVRec::SetVideoFiltersForChannel(Channel *chan, const QString &channum)
         if (nvr != NULL)
         {
             nvr->SetVideoFilters(videoFilters);
-            nvr->InitFilters();
         }
 
         pthread_mutex_unlock(&db_lock);
