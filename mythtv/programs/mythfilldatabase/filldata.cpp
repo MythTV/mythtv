@@ -1301,11 +1301,8 @@ bool grabData(Source source, int offset)
          command += " --quiet";
 
 
-    if (!quiet) {
-         cout << "Fetching data for " <<
-              QDate::currentDate().addDays(offset).toString() << "...\n";
+    if (!quiet)
          cout << "----------------- Start of XMLTV output -----------------" << endl;
-    }
 
     int status = system(command.ascii());
  
@@ -1411,6 +1408,7 @@ bool fillData(QValueList<Source> &sourcelist)
 
             for (int i = 0; i < 9; i++)
             {
+                QString date(QDate::currentDate().addDays(i).toString());
                 QString querystr;
                 querystr.sprintf("SELECT COUNT(*) as 'hits' "
                                  "FROM channel LEFT JOIN program USING (chanid) "
@@ -1429,8 +1427,16 @@ bool fillData(QValueList<Source> &sourcelist)
                     if (!query.numRowsAffected() ||
                         (query.next() && query.value(0).toInt() <= 1)) 
                     {
+                        if (!quiet)
+                            cout << "Fetching data for " << date << endl;
                         if (!grabData(*it, i))
                             ++failures;
+                    }
+                    else
+                    {
+                        if (!quiet)
+                            cout << "Data is already present for " << date
+                                 << ", skipping\n";
                     }
                 } 
                 else
