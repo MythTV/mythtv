@@ -100,8 +100,7 @@ PreviousBox::PreviousBox(QSqlDatabase *ldb, MythMainWindow *parent,
 
 PreviousBox::~PreviousBox()
 {
-    ProgramInfo *s;
-    for (s = itemList.first(); s; s = itemList.take());
+    itemList.clear();
 
     gContext->removeListener(this);
     delete theme;
@@ -441,12 +440,12 @@ void PreviousBox::fillItemList(void)
         return;
 
     ProgramInfo *s;
-    for (s = itemList.first(); s; s = itemList.take());
     itemList.FromOldRecorded(db, "");
 
     vector<ProgramInfo *> sortedList;
-    for (s = itemList.first(); s; s = itemList.take())
+    while (itemList.count())
     {
+        s = itemList.take();
         s->sortTitle = s->title;
         s->sortTitle.remove(QRegExp("^(The |A |An )"));
         sortedList.push_back(s);
