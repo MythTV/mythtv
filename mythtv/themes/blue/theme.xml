@@ -65,6 +65,66 @@
     <position>750,510</position>
   </downarrow>
 
+<!-- ################################################################ -->
+<!-- ########  Below are all the buttons that's in the menus ######## -->
+<!-- ################################################################ -->
+
+<!-- ####################################-->
+<!-- ########  dvd_settings.xml  ########-->
+<!-- ####################################-->
+
+  <buttondef name="DVD_SETTINGS_GENERAL">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="DVD_SETTINGS_PLAY">
+    <image>watch_dvd.png</image>
+    <offset>10,25</offset>
+  </buttondef>
+
+  <buttondef name="DVD_SETTINGS_RIP">
+    <image>rip_dvd.png</image>
+    <offset>10,25</offset>
+  </buttondef>
+
+<!-- ###############################-->
+<!-- ########  dvdmenu.xml  ########-->
+<!-- ###############################-->
+
+  <buttondef name="DVD_PLAY">
+    <image>watch_dvd.png</image>
+    <offset>10,25</offset>
+  </buttondef>
+
+  <buttondef name="VCD_PLAY">
+    <image>watch_vcd.png</image>
+    <offset>10,25</offset>
+  </buttondef>
+
+  <buttondef name="DVD_RIP">
+    <image>rip_dvd.png</image>
+    <offset>10,25</offset>
+  </buttondef>
+
+<!-- #####################################-->
+<!-- ########  game_settings.xml  ########-->
+<!-- #####################################-->
+
+  <buttondef name="GAME_SETTINGS_GENERAL">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="GAME_SCAN">
+    <image>game.png</image>
+    <offset>15,10</offset>
+  </buttondef>
+
+<!-- ################################-->
+<!-- ########  mainmenu.xml  ########-->
+<!-- ################################-->
+
   <buttondef name="TV">
     <image>watch_tv.png</image>
     <offset>20,10</offset>
@@ -75,34 +135,49 @@
     <offset>15,10</offset>
   </buttondef>
 
-  <buttondef name="TV_SCHEDULE">
-    <image>record.png</image>
-    <offset>20,10</offset>
+  <buttondef name="VIDEO">
+    <image>videobutton.png</image>
+    <offset>20,20</offset>
   </buttondef>
 
-  <buttondef name="TV_PLAYBACK">
-    <image>play.png</image>
-    <offset>20,10</offset>
+  <buttondef name="DVD">
+    <image>dvd.png</image>
+    <offset>62,30</offset>
   </buttondef>
 
-  <buttondef name="TV_STATUS">
-    <image>showstatus.png</image>
-    <offset>15,15</offset>
-  </buttondef>
- 
-  <buttondef name="TV_CONFLICTS">
-    <image>conflict.png</image>
-    <offset>20,10</offset>
-  </buttondef>
- 
-  <buttondef name="TV_RECPRIORITIES">
-    <image>recpriorities.png</image>
-    <offset>20,10</offset>
+  <buttondef name="FM">
+    <image>mv-vmanager.png</image>
+    <offset>20,20</offset>
   </buttondef>
 
-  <buttondef name="TV_PROGFIND">
-    <image>record.png</image>
-    <offset>20,10</offset>
+  <buttondef name="IMAGES">
+    <image>images.png</image>
+    <offset>15,10</offset>
+  </buttondef>
+
+  <buttondef name="GAME">
+    <image>game.png</image>
+    <offset>15,10</offset>
+  </buttondef>
+
+  <buttondef name="WEATHER">
+    <image>weather.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+  <buttondef name="NEWS">
+    <image>news.png</image>
+    <offset>14,22</offset>
+  </buttondef>
+
+  <buttondef name="WEBPAGE">
+    <image>webpage.png</image>
+    <offset>55,30</offset>
+  </buttondef>
+
+  <buttondef name="RECIPE">
+    <image>mv-vmanager.png</image>
+    <offset>20,20</offset>
   </buttondef>
 
   <buttondef name="SETUP">
@@ -110,9 +185,111 @@
     <offset>20,10</offset>
   </buttondef>
 
-  <buttondef name="TV_DELETE">
-    <image>delete.png</image>
+  <buttondef name="SHUTDOWN">
+    <image>mv-vmanager.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+<!-- #####################################-->
+<!-- ########  main_settings.xml  ########-->
+<!-- #####################################-->
+
+  <buttondef name="SETTINGS_GENERAL">
+    <image>setup.png</image>
     <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_APPEARANCE">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_TV">
+    <image>watch_tv.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_MUSIC">
+    <image>cd.png</image>
+    <offset>15,10</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_VIDEO">
+    <image>videobutton.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_DVD">
+    <image>dvd.png</image>
+    <offset>62,30</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_FM">
+    <image>mv-vmanager.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_IMAGES">
+    <image>images.png</image>
+    <offset>15,10</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_GAME">
+    <image>game.png</image>
+    <offset>15,10</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_WEATHER">
+    <image>weather.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_NEWS">
+    <image>news.png</image>
+    <offset>14,22</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_WEBPAGE">
+    <image>webpage.png</image>
+    <offset>55,30</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_RECIPE">
+    <image>mv-vmanager.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_XBOX">
+    <image>mv-vmanager.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+<!-- ######################################-->
+<!-- ########  music_settings.xml  ########-->
+<!-- ######################################-->
+
+  <buttondef name="MUSIC_SETTINGS_GENERAL">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="MUSIC_SETTINGS_PLAYER">
+    <image>cd.png</image>
+    <offset>15,10</offset>
+  </buttondef>
+
+  <buttondef name="MUSIC_SETTINGS_RIP">
+    <image>rip_cd.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+<!-- #################################-->
+<!-- ########  musicmenu.xml  ########-->
+<!-- #################################-->
+
+  <buttondef name="MUSIC_PLAY">
+    <image>cd.png</image>
+    <offset>15,10</offset>
   </buttondef>
 
   <buttondef name="MUSIC_PLAYLIST">
@@ -130,20 +307,197 @@
     <offset>20,10</offset>
   </buttondef>
 
-  <buttondef name="WEATHER">
-    <image>weather.png</image>
-    <offset>20,20</offset>
+<!-- ##############################################-->
+<!-- ########  recpriorities_settings.xml  ########-->
+<!-- ##############################################-->
+
+  <buttondef name="TV_RECPRIORITIES_SETTINGS_GENERAL">
+    <image>recpriorities.png</image>
+    <offset>20,10</offset>
   </buttondef>
 
-  <buttondef name="VIDEO">
+  <buttondef name="TV_RECPRIORITIES_CHANNEL">
+    <image>recpriorities.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+<!-- #############################-->
+<!-- ########  setup.xml  ########-->
+<!-- #############################-->
+
+  <buttondef name="SETUP_GENERAL">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_CAPTURE_CARDS">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_VIDEO_SOURCES">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_INPUT_CONNECTIONS">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_CHANNEL_EDITOR">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+<!-- ###################################-->
+<!-- ########  tv_schedule.xml  ########-->
+<!-- ###################################-->
+
+  <buttondef name="TV_PROGRAM_GUIDE">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_PROGFIND">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_LISTINGS">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_MANUAL_SCHEDULE">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_RECPRIORITIES">
+    <image>recpriorities.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_CONFLICTS">
+    <image>conflict.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+<!-- #################################-->
+<!-- ########  tv_search.xml  ########-->
+<!-- #################################-->
+
+  <buttondef name="TV_SEARCH_TITLES">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_DESCRIPTIONS">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_CHANNELS">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_CATEGORIES">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_MOVIES">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_NEW_TITLES">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+<!-- ###################################-->
+<!-- ########  tv_settings.xml  ########-->
+<!-- ###################################-->
+
+  <buttondef name="TV_SETTINGS_GENERAL">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SETTINGS_PROGRAM_GUIDE">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SETTINGS_PLAYBACK">
+    <image>play.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SETTINGS_RECORDING_PROFILES">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SETTINGS_RECPRIORITIES">
+    <image>recpriorities.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+<!-- ##############################-->
+<!-- ########  tvmenu.xml  ########-->
+<!-- ##############################-->
+
+  <buttondef name="TV_WATCH_TV">
+    <image>watch_tv.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SCHEDULE_RECORDINGS">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_WATCH_RECORDINGS">
+    <image>play.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_DELETE">
+    <image>delete.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_STATUS">
+    <image>showstatus.png</image>
+    <offset>15,15</offset>
+  </buttondef>
+
+<!-- ######################################-->
+<!-- ########  video_settings.xml  ########-->
+<!-- ######################################-->
+
+  <buttondef name="VIDEO_SETTINGS_GENERAL">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="VIDEO_SETTINGS_PLAYER">
     <image>videobutton.png</image>
     <offset>20,20</offset>
   </buttondef>
 
-  <buttondef name="VIDEO_MANAGER">
-    <image>mv-vmanager.png</image>
+  <buttondef name="VIDEO_FILE_TYPES">
+    <image>videobutton.png</image>
     <offset>20,20</offset>
   </buttondef>
+
+<!-- #################################-->
+<!-- ########  videomenu.xml  ########-->
+<!-- #################################-->
 
   <buttondef name="VIDEO_BROWSER">
     <image>mv-vbrowser.png</image>
@@ -155,44 +509,69 @@
     <offset>20,20</offset>
   </buttondef>
 
-  <buttondef name="GAME">
-    <image>game.png</image>
+  <buttondef name="VIDEO_MANAGER">
+    <image>mv-vmanager.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+<!-- ###########################################-->
+<!-- ########  AltMenus Specific Icons  ########-->
+<!-- ###########################################-->
+
+  <buttondef name="TV_UPCOMING_RECORDINGS">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_MEDIA">
+    <image>cd.png</image>
     <offset>15,10</offset>
   </buttondef>
 
-  <buttondef name="IMAGES">
-    <image>images.png</image>
-    <offset>15,10</offset>
-  </buttondef>
-
-  <buttondef name="DVD">
-    <image>dvd.png</image>
-    <offset>62,30</offset>
-  </buttondef>
-
-  <buttondef name="VCD_PLAY">
-    <image>watch_vcd.png</image>
-    <offset>10,25</offset>
-  </buttondef>
-
-  <buttondef name="DVD_PLAY">
-    <image>watch_dvd.png</image>
-    <offset>10,25</offset>
-  </buttondef>
-
-  <buttondef name="DVD_RIP">
-    <image>rip_dvd.png</image>
-    <offset>10,25</offset>
-  </buttondef>
-
-  <buttondef name="NEWS">
+  <buttondef name="SETTINGS_INFO_CENTER">
     <image>news.png</image>
     <offset>14,22</offset>
   </buttondef>
 
-  <buttondef name="WEBPAGE">
-    <image>webpage.png</image>
-    <offset>55,30</offset>
+  <buttondef name="MENU_MEDIA_LIBRARY">
+    <image>cd.png</image>
+    <offset>15,10</offset>
+  </buttondef>
+
+  <buttondef name="MENU_MANAGE_RECORDINGS">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="MENU_INFO_CENTER">
+    <image>news.png</image>
+    <offset>14,22</offset>
+  </buttondef>
+
+  <buttondef name="MENU_OPTICAL_DISKS">
+    <image>dvd.png</image>
+    <offset>62,30</offset>
+  </buttondef>
+
+  <buttondef name="MENU_UTILITIES_SETUP">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_FRONTEND">
+    <image>mv-vmanager.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_BACKEND">
+    <image>mv-vmanager.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_MENU">
+    <image>setup.png</image>
+    <offset>20,10</offset>
   </buttondef>
 
 </myththeme>
+
