@@ -450,7 +450,8 @@ void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
             }
 
             proginfo->title = QString::fromUtf8(result.value(5).toString());
-            proginfo->subtitle = QString::fromUtf8(result.value(6).toString());
+            if (proginfo->rectype == kSingleRecord)
+                proginfo->subtitle = QString::fromUtf8(result.value(6).toString());
             proginfo->description = QString::fromUtf8(result.value(7).toString());
             proginfo->rank = result.value(8).toString();
             proginfo->channame = result.value(10).toString();
