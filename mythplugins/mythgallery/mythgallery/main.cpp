@@ -37,8 +37,7 @@ void runGallery(void)
 
 void setupKeys(void)
 {
-    REG_JUMP("MythGallery", "Image viewer / slideshow", "=", runGallery);
-
+    REG_JUMP("MythGallery", "Image viewer / slideshow", "", runGallery);
 
     REG_KEY("Gallery", "PLAY", "Start/Stop Slideshow", "P");
     REG_KEY("Gallery", "HOME", "Go to the first image in thumbnail view", 
