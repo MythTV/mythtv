@@ -713,21 +713,24 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     MythDialog* dialog = new ConfigurationDialogWidget(parent, name);
     QVBoxLayout* vbox = new QVBoxLayout(dialog, (int)(20 * wmult),
                                                 (int)(10 * wmult));
+    QString searchtitle = "";
 
     if (!m_pginfo || search->intValue() != kNoSearch)
+        searchtitle = title->getValue();
+
+    if (m_pginfo)
     {
-        QLabel *searchlabel = new QLabel(title->getValue(), dialog);
+        QGridLayout *grid = m_pginfo->DisplayWidget(dialog, searchtitle);
+        vbox->addLayout(grid);
+    }
+    else
+    {
+        QLabel *searchlabel = new QLabel(searchtitle, dialog);
         searchlabel->setBackgroundOrigin(QWidget::WindowOrigin);
         searchlabel->setFont(gContext->GetBigFont());
         searchlabel->setMinimumWidth(int(760 * wmult));
         searchlabel->setMaximumWidth(int(760 * wmult));
         vbox->addWidget(searchlabel);
-    }
-
-    if (m_pginfo)
-    {
-        QGridLayout *grid = m_pginfo->DisplayWidget(dialog);
-        vbox->addLayout(grid);
     }
 
     QFrame *f;

@@ -46,7 +46,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
 
     if (myinfo)
     {
-        QGridLayout *grid = myinfo->DisplayWidget(this);
+        QGridLayout *grid = myinfo->DisplayWidget(this, "");
         vbox->addLayout(grid);
     }
 

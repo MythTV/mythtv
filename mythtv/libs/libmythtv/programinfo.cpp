@@ -1858,7 +1858,7 @@ void ProgramInfo::Save(QSqlDatabase *db)
         MythContext::DBError("Saving program", query);
 }
 
-QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent)
+QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent, QString searchtitle)
 {
     int row = 0;
     float wmult, hmult;
@@ -1867,7 +1867,24 @@ QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent)
 
     QGridLayout *grid = new QGridLayout(4, 2, (int)(10*wmult));
     
-    QLabel *titlefield = new QLabel(title, parent);
+    QLabel *titlefield = NULL;
+    QString episode;
+
+    if (searchtitle != "")
+    {
+        titlefield = new QLabel(searchtitle, parent);
+
+        if (subtitle == "")
+            episode = title;
+        else
+            episode = QString("%1 - \"%2\"").arg(title).arg(subtitle);
+    }
+    else
+    {
+        titlefield = new QLabel(title, parent);
+        episode = subtitle;
+    }
+
     titlefield->setBackgroundOrigin(QWidget::WindowOrigin);
     titlefield->setFont(gContext->GetBigFont());
 
@@ -1883,7 +1900,7 @@ QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent)
     airDateField->setBackgroundOrigin(QWidget::WindowOrigin);
     QLabel *subtitlelabel = new QLabel(QObject::tr("Episode:"), parent);
     subtitlelabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    QLabel *subtitlefield = new QLabel(subtitle, parent);
+    QLabel *subtitlefield = new QLabel(episode, parent);
     subtitlefield->setBackgroundOrigin(QWidget::WindowOrigin);
     subtitlefield->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     QLabel *descriptionlabel = new QLabel(QObject::tr("Description:"), parent);
