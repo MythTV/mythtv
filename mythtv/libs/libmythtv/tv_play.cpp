@@ -556,7 +556,31 @@ void TV::HandleStateChange(void)
              (internalState == kState_None &&
               nextState == kState_WatchingRecording))
     {
-        prbuffer = new RingBuffer(inputFilename, false);
+        QString tmpFilename;
+        if ((inputFilename.left(7) == "myth://") &&
+            (inputFilename.length() > 7))
+        {
+            tmpFilename = gContext->GetSettingOnHost("RecordFilePrefix",
+                                                     playbackinfo->hostname);
+
+            int pathLen = inputFilename.find(QRegExp("/"), 7);
+            if (pathLen != -1)
+            {
+                tmpFilename += inputFilename.right(inputFilename.length() -
+                                                   pathLen);
+
+                QFile checkFile(tmpFilename);
+
+                if (!checkFile.exists())
+                    tmpFilename = inputFilename;
+            }
+        }
+        else
+        {
+            tmpFilename = inputFilename;
+        }
+
+        prbuffer = new RingBuffer(tmpFilename, false);
 
         if (nextState == kState_WatchingRecording)
         {
