@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythtv/mythcontext.h"
 
-const QString currentDatabaseVersion = "1001";
+const QString currentDatabaseVersion = "1002";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -1077,5 +1077,14 @@ void UpgradeGameDatabaseSchema(void)
 };
 
         performActualUpdate(updates, "1001", dbver);
+    }
+
+    if (dbver == "1001")
+    {
+        const QString updates[] = {
+"ALTER TABLE mamemetadata ADD image_searched tinyint(1) NOT NULL DEFAULT 0;",
+""
+};
+        performActualUpdate(updates, "1002", dbver);
     }
 }

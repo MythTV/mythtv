@@ -883,37 +883,35 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         else
           *exec+= game_settings.fullscreen ? fullscreen : windowed;
 
-        if(!game_settings.default_options)
-        {
-            *exec+= game_settings.scanlines ? " -scanlines" : " -noscanlines";
-            *exec+= game_settings.extra_artwork ? " -artwork" : " -noartwork";
-            *exec+= game_settings.autoframeskip ? " -autoframeskip" : " -noautoframeskip";
-            *exec+= game_settings.auto_colordepth ? " -bpp 0" : " ";
-            *exec+= game_settings.rot_left ? " -rol" : "";
-            *exec+= game_settings.rot_right ? " -ror" : "";
-            *exec+= game_settings.flipx ? " -flipx" : "";
-            *exec+= game_settings.flipy ? " -flipy" : "";
-            *exec+= " -scale ";
-            *exec+= scale;
-            *exec+= game_settings.antialias ? " -antialias" : " -noantialias";
-            *exec+= game_settings.translucency ? " -translucency" : " -notranslucency";
-            *exec+= vectoropts;
-            *exec+= vectorres;
-            *exec+= game_settings.analog_joy ? " -analogstick" : " -noanalogstick";
-            *exec+= game_settings.mouse ? " -mouse" : " -nomouse";
-            *exec+= game_settings.winkeys ? winkeys : nowinkeys;
-            *exec+= game_settings.grab_mouse ? grabmouse : nograbmouse;
-            *exec+= " -joytype ";
-            *exec+= joytype;
-            *exec+= game_settings.sound ? " -sound" : " -nosound";
-            *exec+= game_settings.samples ? " -samples" : " -nosamples";
-            *exec+= game_settings.fake_sound ? " -fakesound" : "";
-            *exec+= " -volume ";
-            *exec+= volume;
-            *exec+=  " ";
-            *exec+= game_settings.cheat ? " -cheat " : " -nocheat ";
-            //*exec+= game_settings.extra_options ? game_settings.extra_options : " ";
-        }
+        *exec+= game_settings.scanlines ? " -scanlines" : " -noscanlines";
+        *exec+= game_settings.extra_artwork ? " -artwork" : " -noartwork";
+        *exec+= game_settings.autoframeskip ? " -autoframeskip" : " -noautoframeskip";
+        *exec+= game_settings.auto_colordepth ? " -bpp 0" : " ";
+        *exec+= game_settings.rot_left ? " -rol" : "";
+        *exec+= game_settings.rot_right ? " -ror" : "";
+        *exec+= game_settings.flipx ? " -flipx" : "";
+        *exec+= game_settings.flipy ? " -flipy" : "";
+        *exec+= " -scale ";
+        *exec+= scale;
+        *exec+= game_settings.antialias ? " -antialias" : " -noantialias";
+        *exec+= game_settings.translucency ? " -translucency" : " -notranslucency";
+        *exec+= vectoropts;
+        *exec+= vectorres;
+        *exec+= game_settings.analog_joy ? " -analogstick" : " -noanalogstick";
+        *exec+= game_settings.mouse ? " -mouse" : " -nomouse";
+        *exec+= game_settings.winkeys ? winkeys : nowinkeys;
+        *exec+= game_settings.grab_mouse ? grabmouse : nograbmouse;
+        *exec+= " -joytype ";
+        *exec+= joytype;
+        *exec+= game_settings.sound ? " -sound" : " -nosound";
+        *exec+= game_settings.samples ? " -samples" : " -nosamples";
+        *exec+= game_settings.fake_sound ? " -fakesound" : "";
+        *exec+= " -volume ";
+        *exec+= volume;
+        *exec+=  " ";
+        *exec+= game_settings.cheat ? " -cheat " : " -nocheat ";
+        *exec+= game_settings.extra_options ? game_settings.extra_options : " ";
+        
         *exec+= " ";
         *exec+= game;
 }
@@ -930,6 +928,8 @@ void MameHandler::SetGeneralPrefs()
     general_prefs.cheat_file = gContext->GetSetting("MameCheatLocation");
     general_prefs.show_disclaimer = gContext->GetNumSetting("MameShowDisclaimer");
     general_prefs.show_gameinfo = gContext->GetNumSetting("MameShowGameInfo");
+    general_prefs.automatically_download_images = gContext->GetNumSetting("MameAutomaticallyDownloadImages");
+    general_prefs.image_downloader = gContext->GetSetting("MameImageDownloader");
 }
 
 void MameHandler::SetGameSettings(GameSettings &game_settings, MameRomInfo *rominfo)

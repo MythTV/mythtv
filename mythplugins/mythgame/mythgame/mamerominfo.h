@@ -20,8 +20,10 @@ class MameRomInfo : public RomInfo
                 QString lsystem = "",
                 QString lgamename ="",
                 QString lgenre = "",
-                int lyear = 0) :
-            RomInfo(lromname, lsystem, lgamename, lgenre, lyear)
+                int lyear = 0,
+                bool limage_searched = false) :
+            RomInfo(lromname, lsystem, lgamename, lgenre, lyear, 
+                    limage_searched)
             {}
     MameRomInfo(const MameRomInfo &lhs) :
                 RomInfo(lhs)
@@ -48,6 +50,7 @@ class MameRomInfo : public RomInfo
                 vector = lhs.vector;
                 favourite = lhs.favourite;
                 timesplayed = lhs.timesplayed;
+                image_searched = lhs.image_searched;
             }
     MameRomInfo(const RomInfo &lhs) :
                 RomInfo(lhs) {}
@@ -117,6 +120,9 @@ class MameRomInfo : public RomInfo
     bool Favourite() const { return favourite; }
     void setFavourite(bool lfavourite) { favourite = lfavourite; }
 
+    bool ImageSearched() const { return image_searched; }
+    void setImageSearched(bool limage_searched) { image_searched = limage_searched; }
+
     int Timesplayed() const { return timesplayed; }
     void setTimesplayed(int ltimesplayed) { timesplayed = ltimesplayed; }
     virtual void fillData(QSqlDatabase *db);
@@ -146,6 +152,7 @@ class MameRomInfo : public RomInfo
     bool vector;
     bool favourite;
     int timesplayed;
+    bool image_searched;
 };
 
 #endif

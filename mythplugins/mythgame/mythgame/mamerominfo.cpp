@@ -1,4 +1,9 @@
+#include <iostream>
 #include <qsqldatabase.h>
+#include <mythtv/mythcontext.h>
+#include <sys/types.h>
+#include <cstdlib>
+#include <unistd.h>
 #include "mamerominfo.h"
 #include "mametypes.h"
 
@@ -15,7 +20,7 @@ void MameRomInfo::fillData(QSqlDatabase *db)
 
     QString thequery = "SELECT manu,cloneof,romof,driver,"
                        "cpu1,cpu2,cpu3,cpu4,sound1,sound2,sound3,sound4,"
-                       "players,buttons FROM mamemetadata WHERE "
+                       "players,buttons,image_searched FROM mamemetadata WHERE "
                        "romname=\"" + romname + "\";";
 
     QSqlQuery query = db->exec(thequery);
@@ -37,6 +42,7 @@ void MameRomInfo::fillData(QSqlDatabase *db)
         sound1 = query.value(11).toString();
         num_players = query.value(12).toInt();
         num_buttons = query.value(13).toInt();
+        image_searched = query.value(14).toInt();
     }
 }
 

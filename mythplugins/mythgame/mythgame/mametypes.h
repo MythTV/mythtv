@@ -37,7 +37,11 @@ class Prefs
     QString screenshot_url;
     QString flyer_url;
     QString cabinet_url;
+
+    int automatically_download_images;
+    QString image_downloader;
 };
+
 class GameSettings
 {
   public:

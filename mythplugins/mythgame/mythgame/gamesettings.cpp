@@ -121,6 +121,28 @@ public:
     };
 };
 
+class MameImageDownloader: public LineEditSetting, public GlobalSetting {
+public:
+    MameImageDownloader():
+        GlobalSetting("MameImageDownloader") {
+        setLabel(QObject::tr("MAME image downloader"));
+        setValue("");
+        setHelpText(QObject::tr("The path to the MAME image downloader "
+                    "helper.  (See the contrib/ dir in the mythgame source.)"));
+    };
+};
+
+class MameAutomaticallyDownloadImages: public CheckBoxSetting, public GlobalSetting {
+public:
+    MameAutomaticallyDownloadImages():
+        GlobalSetting("MameAutomaticallyDownloadImages") {
+        setLabel(QObject::tr("Automatically download images"));
+        setValue(true);
+        setHelpText(QObject::tr("Attempt to automatically download ROM images "
+                    "if they don't exist."));
+    };
+};
+
 class MameShowDisclaimer: public CheckBoxSetting, public GlobalSetting {
 public:
     MameShowDisclaimer():
@@ -260,6 +282,8 @@ MythGameSettings::MythGameSettings()
     mame2->addChild(new MameCabinetsLocation());
     mame2->addChild(new MameHistoryLocation());
     mame2->addChild(new MameCheatLocation());
+    mame2->addChild(new MameImageDownloader());
+    mame2->addChild(new MameAutomaticallyDownloadImages());
     mame2->addChild(new MameShowDisclaimer());
     mame2->addChild(new MameShowGameInfo());
     addChild(mame2);
