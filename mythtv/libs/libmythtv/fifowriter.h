@@ -16,6 +16,7 @@ class FIFOWriter
 
     int FIFOInit(int id, QString desc, QString name, long size, int num_bufs);
     void FIFOWrite(int id, void *buf, long size);
+    void FIFODrain(void);
 
   private:
     void FIFOWriteThread(void);

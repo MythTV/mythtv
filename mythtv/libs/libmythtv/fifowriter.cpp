@@ -185,3 +185,21 @@ void FIFOWriter::FIFOWrite(int id, void *buffer, long blksize)
     pthread_mutex_unlock(&fifo_lock[id]);
 }
 
+void FIFOWriter::FIFODrain(void)
+{
+    int count = 0;
+    while (count < num_fifos)
+    {
+        count = 0;
+        for (int i = 0; i < num_fifos; i++)
+        {
+            if (fb_inptr[i] == fb_outptr[i])
+            {
+                killwr[i] = 1;
+                pthread_cond_signal(&empty_cond[i]);
+                count++;
+            }
+        }
+        usleep(1000);
+    }
+}

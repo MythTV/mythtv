@@ -308,6 +308,10 @@ void NuppelVideoPlayer::InitVideo(void)
     videoOutput = new VideoOutputXvMC();
     decoder->setLowBuffers();
 #endif
+
+    if (gContext->GetNumSetting("DecodeExtraAudio", 0))
+        decoder->setLowBuffers();
+
     videoOutput->Init(video_width, video_height, video_aspect,
                       MAXVBUFFER + 1, vbuffers, widget->winId(), 
                       0, 0, widget->width(), widget->height(),
@@ -3123,6 +3127,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     delete nvr;
     if (fifow) 
     {
+        fifow->FIFODrain();
         delete fifow;
         unlink(outputname);
     }

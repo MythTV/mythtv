@@ -113,12 +113,24 @@ public:
     Deinterlace():
         GlobalSetting("Deinterlace") {
         setLabel("Deinterlace playback");
-        setValue(true);
+        setValue(false);
         setHelpText("Make the video look normal on a progressive display "
                     "(i.e. monitor).  Deinterlace requires that your CPU "
                     "supports SSE instructions.  Enabling this without "
                     "proper CPU support will cause the program to segfault. "
                     "See the HOWTO document for more information.");
+    };
+};
+
+class DecodeExtraAudio: public CheckBoxSetting, public GlobalSetting {
+public:
+    DecodeExtraAudio():
+        GlobalSetting("DecodeExtraAudio") {
+        setLabel("Extra audio buffering");
+        setValue(false);
+        setHelpText("This attempts to keep extra audio data in the internal "
+                    "buffers.  Try setting this if you're getting crackly "
+                    "audio. (Not used for software encoded video.)");
     };
 };
 
@@ -1064,6 +1076,7 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new Deinterlace());
     general->addChild(new ReduceJitter());
     general->addChild(new ExperimentalSync());
+    general->addChild(new DecodeExtraAudio());
     general->addChild(new PlaybackExitPrompt());
     general->addChild(new EndOfRecordingExitPrompt());
     general->addChild(new ClearSavedPosition());
