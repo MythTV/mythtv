@@ -113,7 +113,7 @@
  */
 
 GLOBAL(void)
-fdct_ifast (FDCTContext *s, DCTELEM * data)
+fdct_ifast (DCTELEM * data)
 {
   DCTELEM tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
   DCTELEM tmp10, tmp11, tmp12, tmp13;

@@ -104,7 +104,7 @@ typedef struct ScanTable{
     UINT8 permutated[64];
     UINT8 raster_end[64];
 #ifdef ARCH_POWERPC
-               /* Used by dct_quantise_alitvec to find last-non-zero */
+		/* Used by dct_quantise_alitvec to find last-non-zero */
     UINT8 __align8 inverse[64];
 #endif
 } ScanTable;
@@ -497,12 +497,11 @@ typedef struct MpegEncContext {
     UINT8 *ptr_lastgob;
     UINT8 *ptr_last_mb_line;
     UINT32 mb_line_avgsize;
+
+    INT16 __align8 dct_quantize_temp_block[64];
     
     DCTELEM (*block)[64]; /* points to one of the following blocks */
     DCTELEM blocks[2][6][64] __align8; // for HQ mode we need to keep the best block
-
-    FDCTContext fdct_ctx;
-
     int (*decode_mb)(struct MpegEncContext *s, DCTELEM block[6][64]); // used by some codecs to avoid a switch()
 #define SLICE_OK         0
 #define SLICE_ERROR     -1
@@ -518,7 +517,7 @@ typedef struct MpegEncContext {
     void (*dct_unquantize)(struct MpegEncContext *s, // unquantizer to use (mpeg4 can use both)
                            DCTELEM *block, int n, int qscale);
     int (*dct_quantize)(struct MpegEncContext *s, DCTELEM *block, int n, int qscale, int *overflow);
-    void (*fdct)(FDCTContext *s, DCTELEM *block/* align 16*/);
+    void (*fdct)(DCTELEM *block/* align 16*/);
     void (*idct_put)(UINT8 *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
     void (*idct_add)(UINT8 *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
 } MpegEncContext;
@@ -544,7 +543,7 @@ void MPV_common_init_mmi(MpegEncContext *s);
 #endif
 #ifdef ARCH_POWERPC
 void MPV_common_init_ppc(MpegEncContext *s);
-#endif 
+#endif
 extern void (*draw_edges)(UINT8 *buf, int wrap, int width, int height, int w);
 void ff_conceal_past_errors(MpegEncContext *s, int conceal_all);
 void ff_copy_bits(PutBitContext *pb, UINT8 *src, int length);

@@ -26,7 +26,12 @@
 /* dct code */
 typedef short DCTELEM;
 
+void fdct_ifast (DCTELEM *data);
+void ff_jpeg_fdct_islow (DCTELEM *data);
+
 void j_rev_dct (DCTELEM *data);
+
+void ff_fdct_mmx(DCTELEM *block);
 
 /* encoding scans */
 extern const UINT8 ff_alternate_horizontal_scan[64];
@@ -264,18 +269,7 @@ void ff_mdct_calc(MDCTContext *s, FFTSample *out,
                const FFTSample *input, FFTSample *tmp);
 void ff_mdct_end(MDCTContext *s);
 
-/* FDCT */
-
-typedef struct FDCTContext {
-    INT16 __align8 dct_quantize_temp_block[64];
-    INT16 __align8 fdct_mmx_block_tmp[64];
-} FDCTContext;
-
-void fdct_ifast(FDCTContext *s, DCTELEM *data);
-void ff_jpeg_fdct_islow(FDCTContext *s, DCTELEM *data);
-void ff_fdct_mmx(FDCTContext *s, DCTELEM *block);
-
-#if !defined(_ISOC9X_SOURCE)
+#ifndef HAVE_LRINTF
 /* XXX: add ISOC specific test to avoid specific BSD testing. */
 /* better than nothing implementation. */
 /* btw, rintf() is existing on fbsd too -- alex */

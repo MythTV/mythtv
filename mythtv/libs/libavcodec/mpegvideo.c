@@ -2622,7 +2622,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
 //printf("Scene change detected, encoding as I Frame %d %d\n", s->mb_var_sum, s->mc_mb_var_sum);
     }
     
-    if(s->pict_type==P_TYPE || s->pict_type==S_TYPE){ 
+    if(s->pict_type==P_TYPE || s->pict_type==S_TYPE){
         s->f_code= ff_get_best_fcode(s, s->p_mv_table, MB_TYPE_INTER);
         ff_fix_long_p_mvs(s);
     }
@@ -3019,7 +3019,7 @@ static int dct_quantize_c(MpegEncContext *s,
     int max=0;
     unsigned int threshold1, threshold2;
 
-    s->fdct (&(s->fdct_ctx), block);
+    s->fdct (block);
 
     if (s->mb_intra) {
         if (!s->h263_aic) {
