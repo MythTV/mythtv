@@ -66,7 +66,7 @@ Dirlist::Dirlist(QString &directory)
 	    //printf("profile:%s\n",gContext->GetSetting("Profile").ascii());
 	    QString prof = gContext->GetSetting("Profile");
 	    QString prof_name = "profile_" + prof;
-	    if (gContext->GetSetting(prof_name).contains(ext))
+	    if (gContext->GetSetting(prof_name).contains(ext, FALSE))
             {
                 data = CheckFile(filename);
                 playlist.append(*data);

@@ -128,7 +128,7 @@ void DatabaseBox::doSelected(QListViewItem *item)
         QString title = mdata->Filename().section('/',-1);
         QString ext = mdata->Filename().section('.',-1);
 	 
-        QString handler = gContext->GetSetting(QString("%1_helper").arg(ext));
+        QString handler = gContext->GetSetting(QString("%1_helper").arg(ext.lower()));
  //	 cout << "handler for" << ext.ascii() << ":" << handler.ascii() << endl;
         QString command = handler.replace(QRegExp("%s"), 
                                           QString("'%1'").arg(filename));
