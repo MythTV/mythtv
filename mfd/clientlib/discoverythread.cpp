@@ -321,10 +321,11 @@ int DiscoveryThread::createMulticastSocket()
     in.sin_port = htons(5353);
     in.sin_addr.s_addr = 0;
 
-    if((s = socket(AF_INET,SOCK_DGRAM,0)) < 0) return 0;
-#ifdef SO_REUSEPORT
-    setsockopt(s, SOL_SOCKET, SO_REUSEPORT, (char*)&flag, sizeof(flag));
-#endif
+    if((s = socket(AF_INET,SOCK_DGRAM,0)) < 0)
+    {
+        return 0;
+    }
+
     setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
     if(bind(s,(struct sockaddr*)&in,sizeof(in))) { close(s); return 0; }
 
