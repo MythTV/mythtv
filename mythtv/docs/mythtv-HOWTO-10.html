@@ -62,7 +62,7 @@ elements displayed, etc.</P>
 deinterlacing, which will improve how the image looks on your screen. 
 Deinterlacing requires that your processor support SSE. (Streaming SIMD
 Extensions, aka "MMX2").  Early Intel Celeron (those that don't use the
-Coppermine 0.18um core and are usually &lt;600Mhz), Pentium Pro and Pentium II
+Coppermine 0.18um core and are usually &lt;600MHz), Pentium Pro and Pentium II
 CPUs do not have SSE, so make sure that you haven't enabled deinterlacing if
 your processor doesn't support it. If you enable it, and your processor
 doesn't support SSE, you will get "Illegal Instruction" errors.</P>
@@ -96,8 +96,8 @@ be used are identified in a "filter string". A filter string is a group of
 filter names and parameters separated by commas.  To include parameters, the
 filter name is followed by "=" and the parameter information. There should
 be no spaces in the filter string. Here is an example filter string:</P>
-<P>With parameters: <CODE>kerneldeint=10:1,denoise3d=12</CODE>
-Without: <CODE>kerneldeint,denoise3d</CODE></P>
+<P>With parameters: <CODE>kerneldeint=10:1,denoise3d=12</CODE></P>
+<P>Without: <CODE>kerneldeint,denoise3d</CODE></P>
 <P>Recording filters are set for each individual channel. These may be used
 when encoding in software (MPEG-4, RTJPEG) but do not apply when using a
 capture card with hardware encoding such as those supported by the ivtv
@@ -107,21 +107,29 @@ enter a filter string in the box titled "Video filters". If you are running
 "mythweb" on your web server, you can click on "Settings" then "Channels"
 and enter filter strings in the "videofilters" column.</P>
 <P>Playback filters are per-host and apply to any recording you watch from the
-frontend where filters have been applied. From "mythfrontend" go to
-Setup->TV Settings->Playback. Enter your filter string in the box titled
-"Custom Filters".</P>
+frontend where filters have been applied. Playback filtering can only
+work with software decoding so the viaslice, xvmc, and ivtv outputs ignore
+filters entirely. From "mythfrontend" go to Setup->TV Settings->Playback.
+Enter your filter string in the box titled "Custom Filters".</P>
 
 <H3>Currently Available Filters</H3>
 
+<P>"Deinterlace Playback" checkbox.</P>
+<P>This implements the linearblend algorithm.  If you don't want linearblend
+included at the head of your custom filter chain, make sure that this box is
+unchecked.</P>
 <P>o  The "invert" filter</P>
 <P>Invert ignores any parameters and inverts the pixel values of the video
 frames.  In other words, a negative image. This would rarely be useful but
 may be a good example to verify that your filter strings take effect.</P>
 <P>o  The "linearblend" filter</P>
-<P>This is the filter that is used when "Deinterlace playback" has been
-checked.  It is a simple deinterlacing filter that ignores parameters and
-works by blending adjacent lines.  It replaces combing in interlaced video
-with a less distracting "ghost" image.</P>
+<P>It is a simple deinterlacing filter that ignores parameters and works by
+blending adjacent lines.  It replaces combing in interlaced video with a
+less distracting "ghost" image.</P>
+<P><B>NOTE</B>: This filter is appended to the filter chain when "Deinterlace
+playback" has been checked. If you use "kerneldeint" or "linearblend" for
+deinterlacing in your filter string, you should not check "Deinterlace
+playback".</P>
 <P>o  The "kerneldeint" filter</P>
 <P>Kerneldeint is a more complex deinterlacing filter, which applies a filter
 kernel using input from several lines.  It generally removes combing without
@@ -201,7 +209,7 @@ The following types of hardware encoding cards are supported:
 <UL>
 <LI>MJPEG - Zoran-based cards; see 
 <A HREF="http://mjpeg.sourceforge.net">http://mjpeg.sourceforge.net</A></LI>
-<LI>MPEG-2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see 
+<LI>MPEG-2 - iTVC15 based cards (Hauppauge PVR-250/PVR-350); see 
 <A HREF="http://ivtv.sourceforge.net">http://ivtv.sourceforge.net</A></LI>
 <LI>HDTV - pcHDTV cards; see 
 <A HREF="http://pchdtv.com">http://pchdtv.com</A></LI>
@@ -225,13 +233,13 @@ Depending on what types of cards you have installed you may see:
 Software Encoders
 Hardware MPEG Encoders
 Hardware MJPEG Encoders
-Trancoders
+Transcoders
 </PRE>
 </CODE></BLOCKQUOTE>
 
 The '(Create new profile group)' option will allow you to create custom
 profiles in case you have multiple backends.  Note that custom profiles
-are per backend and cardtype.  If you have 2 MPEG-2 encoders in a given
+are per backend and card type.  If you have 2 MPEG-2 encoders in a given
 backend system, creating a custom profile will affect both of them.  This
 option should not be needed otherwise.</P>
 <P>The 'Transcoders' group is a little different from the others.  Selecting

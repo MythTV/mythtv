@@ -17,21 +17,6 @@
 <P>The MythWeather module will obtain the weather information for the
 location that you specify.  You must be running MythTV v0.10 or later 
 in order to use MythWeather.</P>
-<P>
-<HR>
-<PRE>
-NOTE for Red Hat Linux 8.0 users: Red Hat 8 users must make the following
-modification, or several weather icons will fail to be installed.
-
-From the mythweather build directory move to the mythweather sub-directory
-and edit the Makefile there.
-
-Find and comment out (using a '#' symbol) the following line:
-
-strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"
-</PRE>
-<HR>
-</P>
 <P>Change into the MythWeather directory, then make and make install:
 <BLOCKQUOTE><CODE>
 <PRE>

@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-29, v0.13.15
+<date>2004-01-30, v0.13.16
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -94,13 +94,13 @@ or capture sizes, etc.
 MythTV has two modes of operation.  First, it can function as a software video
 encoder, which means that it uses a fairly generic "dumb" video capture card
 to get frames of video, encodes them using the CPU on your motherboard and
-writes them to disk.  High-end video capture cards and devices like the Tivo
+writes them to disk.  High-end video capture cards and devices like the TiVo
 and ReplayTV have dedicated encoder chips which use specialized hardware to
 convert the video stream to the MPEG-2 format without using the motherboard
 CPU.  The main CPU has the responsibility of running the Operating System
 and reading and writing the encoded frames to the disk.  These tasks have
 fairly low CPU requirements compared to encoding video, which is why a
-device like a Series 1 Tivo can run with only 16MB of RAM and a 54MHz CPU.
+device like a Series 1 TiVo can run with only 16MB of RAM and a 54MHz CPU.
 
 There are many variables that go into the question: "How fast a CPU do I
 need to run MythTV"?  Obviously, the faster your CPU, the better your
@@ -152,8 +152,8 @@ second, but typical values for MythTV range from 700 megabytes/hour to 2
 gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTJPEG.
 
 <bf>NOTE</bf>:  You <em>must</em> use DMA for hard drive access to prevent
-choppy or jittery video.  Red Hat Linux 8.0 apparently does not enable DMA
-at boot time.  See the Troubleshooting Section for <ref id="Setting_DMA"
+choppy or jittery video.  Not all distributions enable DMA at boot time. 
+See the Troubleshooting Section for <ref id="Setting_DMA"
 name="instructions"> on how to do this.
 
 Writing video to disk is sensitive to timing issues; RTJPEG requires less
@@ -183,7 +183,7 @@ devices with Linux drivers.  There are a number of classes of hardware
 available for capturing video.  
 <sect3>Frame Grabbers.
 <p>This class of card is the simplest and is usually the cheapest.  There is no
-onboard encoding of the analog video; hardware known as a Digital-Analog
+on-board encoding of the analog video; hardware known as a Digital-Analog
 Converter (DAC) takes the video and presents it to the computer in an
 essentially raw digital form.
 
@@ -235,7 +235,7 @@ Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
 use dedicated hardware encoders rather than your CPU. Release 0.13 of MythTV
 is able to use these MPEG-2 encoders as an input device for live TV and for
 scheduled recordings.  (The PVR-350 can simultaneously be used as an output
-device.) Using the onboard MPEG-2 encoder drastically reduces the CPU
+device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
 requirements for encoding.
 
 Here are some data points for encoding:
@@ -283,7 +283,7 @@ commonly found with digital cable systems or satellite systems.
 <p><itemize>
 <item>Hauppauge WinTV-D or -HD (no driver)
 <item>Hauppauge WinTV-USB series
-<item>Hauppauge WinTV-PVR-usb, usb2 or pci cards (no driver - this is not the PVR-250/350
+<item>Hauppauge WinTV-PVR-usb, usb2 or PCI cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)
 <item>ATI All-in-Wonder series
 </itemize>
@@ -296,7 +296,7 @@ There are no known capture cards for HDTV content.
 There are no known capture cards for component (RGB or YPbPr)
 video.
 <sect2>Sound card
-<p>The system needs a sound card or an onboard equivalent on the motherboard
+<p>The system needs a sound card or an on-board equivalent on the motherboard
 to play back and in most cases, to record sound. Any sound card that can be
 operated by the ALSA (Advanced Linux Sound Architecture) kernel modules will
 work with MythTV.  However, some cards and drivers will provide better
@@ -306,7 +306,7 @@ devices included on motherboards can be problematic.
 The usual practice for capturing the audio associated with the video
 is to run a cable from an audio output on the video capture card to
 the Line input on a sound card. However, some video capture cards
-provide onboard audio capabilities that work with the kernel
+provide on-board audio capabilities that work with the kernel
 <tt>btaudio</tt> module instead, thereby eliminating the need for a
 cable.  This is useful if you will be using multiple capture cards in
 a single chassis, since each capture card will not need its own sound
@@ -319,8 +319,8 @@ section for more information.
 a sound card for audio capture.
 
 <bf>NOTE</bf>:  Plugging a Line-level device into the Mic input is not
-recommended.  Line-level devices have higher volatages and can damage the
-soundcard.  In addition, even if it doesn't break your card, you will be
+recommended.  Line-level devices have higher voltages and can damage the
+sound card.  In addition, even if it doesn't break your card, you will be
 getting Mono sound.  See the Linux MP3 HOWTO at <url
 url="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8"
 name="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8">
@@ -346,7 +346,7 @@ VGA signal to an appropriate video signal. "Appropriate" depends on a number
 of factors, such as video standard (NTSC vs PAL) type of input connection
 (Composite vs SVideo), etc.
 
-Note that with some video cards and X drivers, Xvideo extensions are
+Note that with some video cards and X drivers, XVideo extensions are
 only supported on the VGA output, and not on the TV output.
 
 <sect2>Cards with TV out
@@ -413,24 +413,24 @@ Composite and SVideo ports. TV-out implementation does <em>NOT</em> support XVid
 Composite and S-Video ports. TV-out implementation does <em>NOT</em> support XVideo.
 </itemize>
 
-<sect3>nVidia
-<p>Some nVidia cards with TV-out can be run using the standard nv driver in 
+<sect3>NVIDIA
+<p>Some NVIDIA cards with TV-out can be run using the standard nv driver in 
 XFree86, combined with the userspace application <bf>nvtv</bf> to control the TV-out 
 port. See <url url="http://sourceforge.net/projects/nv-tv-out/"
 name="http://sourceforge.net/projects/nv-tv-out/"> for details.  Recent
-versions of the nVidia driver have better support for overscan and other
+versions of the NVIDIA driver have better support for overscan and other
 features useful with TV-Out, so the <bf>nvtv</bf> application may not be
 required.
 
-Some nVidia cards can be run with a proprietary nVidia X driver made
-available by nVidia. See <url url="http://www.nvidia.com/view.asp?IO=linux"
+Some NVIDIA cards can be run with a proprietary NVIDIA X driver made
+available by NVIDIA. See <url url="http://www.nvidia.com/view.asp?IO=linux"
 name="http://www.nvidia.com/view.asp?IO=linux"> for more information.
 
 Specific cards:
 <itemize>
 <item>GeForce4 MX440-SE AGP. Has Composite and SVideo ports. Works using the
-nVidia X driver.
-<item>GeForce2 GTS 64 MB DDR 4x AGP. Has SVideo port. Works using the nVidia X 
+NVIDIA X driver.
+<item>GeForce2 GTS 64 MB DDR 4x AGP. Has SVideo port. Works using the NVIDIA X 
 driver. Reportedly works using the nv driver plus nvtv.
 <item>GeForce4 MX420 PCI (BFG Asylum). Has SVideo port.
 </itemize>
@@ -452,7 +452,7 @@ Specific cards:
 <p>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV driver.
 
 <sect3>Other Options
-<p>Some devices with onboard TV-out capability, such as XBoxes converted to 
+<p>Some devices with on-board TV-out capability, such as XBoxes converted to 
 Linux and some laptops, can be used as MythTV frontends to display on a 
 television screen. Please consult the mythtv-users mailing list for messages 
 that report the details of these special arrangements.
@@ -683,45 +683,6 @@ you can disable native volume support.
 If you marked anything to install, click on Install Marked.  Click "Yes" or
 OK if you get a message about satisfying dependencies.
 
-<sect3>Red Hat Linux 8.0 
-<p>Red Hat Linux 8.0 does not have the same graphical package manager used
-by other distributions, so you will need to use Red Hat's package
-manager.  This is the same utility you saw upon installation from the Red
-Hat Linux 8.0 installation CD, and it allows you to select packages at
-installation time, or once the system is up and running.  You can access
-this program by selecting <verb>RedHatMenu>System Settings>Packages</verb>
-
-If you did a typical Desktop install of Red Hat Linux 8.0 make sure you have
-selected:
-
-<itemize>
-<item>KDE Desktop Environment
-<item>SQL Database Server -  you will have to click on "details" and make 
-sure "mysql-server" is checked.  (only required on the master system)
-<item>Development Tools
-<item>X Software Development
-<item>KDE Software Development
-<item>Kernel Development
-</itemize>
-
-Click Install to continue.
-
-You can not install qt-MySQL, a necessary prerequisite, graphically. To  
-install this package using the command line do
-
-<tscreen><verb>
-$ up2date --solvedeps qt-MySQL
-</verb></tscreen>
-
-<label id="RH_XFree86-devel">
-<bf>NOTE</bf>:  ensure that the correct symlinks have been created for the
-XFree-86 development libraries:
-
-<tscreen<verb>
-# ln -s /usr/X11R6/lib/libXext.so.6 /usr/X11R6/lib/libXext.so
-# ln -s /usr/X11R6/lib/libX11.so.6 /usr/X11R6/lib/libX11.so
-</verb></tscreen>
-
 <sect2>Command-line installation. <label id="CLIinstalltools_">
 <p> This section details the various methods for installing prerequisites
 from the command line.
@@ -833,12 +794,6 @@ $ su -
 $
 </verb></tscreen>
 <sect2>Distribution-Specific Notes
-<sect3>Red Hat
-<p>It appears that Red Hat Linux 8.0 requires that the <bf>ldconfig</bf>
-command be run twice. Red Hat will also frequently "forget" about the path.
-It's recommended to run <bf>/sbin/ldconfig</bf> after installing every
-package. Failing that, always run it if you get an unexpected error about
-not finding libraries.
 <sect1>Environment variable Requirements for MythTV
 <sect2>General requirements
 <sect3>QT libraries and binaries
@@ -895,8 +850,8 @@ $ exit
 The last two commands are to exit out of the shell. This way, when you next 
 open a shell your new commands
 will take effect.
-<sect3>Red Hat Linux 9/8.0
-<p>Red Hat Linux 9/8.0 use a default locale with UTF-8 encoding.
+<sect3>Red Hat Linux 9
+<p>Red Hat Linux 9 use a default locale with UTF-8 encoding.
 Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a result,
 whenever you run setup or mythfilldatabase you will get a lot of UTF-8
 warnings. There is an <url url="http://membled.com/work/patches/DateManip/"
@@ -1088,11 +1043,11 @@ does not have <bf>XMLTV</bf>, so you may install the XMLTV prerequisites by typi
 and skipping straight to the XMLTV compilation step.
 
 <sect2>Other distributions and manual installation.
-<p><bf>NOTE</bf>: Red Hat Linux 8.0 and SuSE 8.1 users, you <em>must</em>
-download and install an updated version of libexpat.  The version that ships
-with Red Hat Linux 8.0 and SuSE 8.1 (version 1.95.4) is buggy, and will
-cause problems with XML::Twig. All other distributions may skip this step
-and proceed with <ref id="untarring_xmltv" name="untar'ing"> the xmltv file.
+<p><bf>NOTE</bf>: SuSE 8.1 users, you <em>must</em> download and install an
+updated version of libexpat.  The version that ships with SuSE 8.1 (version
+1.95.4) is buggy, and will cause problems with XML::Twig. All other
+distributions may skip this step and proceed with <ref id="untarring_xmltv"
+name="untar'ing"> the xmltv file.
 
 If you get errors installing XML::Twig or other XMLTV prerequisites,  
 try deleting the old versions of libexpat
@@ -1165,19 +1120,26 @@ $ su
 $ tar -xjf mythtv-0.13.tar.bz2
 $ cd mythtv-0.13
 $ ./configure
+</verb></tscreen>
+
+On a single cpu machine, you would type the following to compile MythTV:
+<tscreen><verb>
 $ qmake mythtv.pro
 $ make
 </verb></tscreen>
 
-<label id="RH80_OSD_Strip">
-<code>
-NOTE for Red Hat 8 users: You must manually modify a Makefile
-within the themes directory, otherwise your on screen display (OSD) will be
-"generic" rather than themed.  The solution is to edit the Makefile within
-the themes directory and comment out (using a # symbol before each line)
-every line that starts with the word "strip". Make sure you switch back to
-the MythTV build directory before executing the next step.
-</code>
+If you want to build MythTV on a multi-CPU machine (or with distcc), you may
+run into issues with the standard build in MythTV. The easiest solution is
+to build the libraries first.  In the following example, we will have 4
+concurrent jobs executing.  Do not set the number of jobs too high, or your
+compile will actually take longer to complete than it would if you did a
+"normal" build.
+<tscreen><verb>
+$ qmake mythtv.pro
+$ make qmake
+$ make -C libs -j4
+$ make -j4
+</verb></tscreen>
 
 Switch to superuser:
 <tscreen><verb>
@@ -1711,7 +1673,7 @@ if you run into trouble) of how to do this go to
 <url url="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html" 
 name="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html">
 
-<bf>NOTE</bf>: Suitable Red Hat kernels for MythTV (i2c update, v4l2 api,
+<bf>NOTE</bf>: Suitable Red Hat kernels for MythTV (i2c update, v4l2 API,
 CONFIG_SERIAL modularized) are available from ATrpms: <url
 url="http://atrpms.physik.fu-berlin.de/name/kernel/"
 name="http://atrpms.physik.fu-berlin.de/name/kernel/">. You will also find
@@ -1789,7 +1751,7 @@ users, type: <tt># /etc/rc.d/init.d/lircd start</tt> instead of:
 </verb></tscreen>
 
 If this fails, complaining of a missing <tt>lircd.conf</tt> file, then you
-must find or make one. First look for a premade configuration file at <url
+must find or make one. First look for a pre-made configuration file at <url
 url="http://lirc.sourceforge.net/remotes/"
 name="http://lirc.sourceforge.net/remotes/">.  Mandrake 9.1 users, look in
 <tt>/usr/share/lirc-remotes</tt>. If you find one your remotes either on the
@@ -2103,10 +2065,10 @@ and change the first line to the IP address of the database server.
 All other configuration is within the MythTV GUI screens.
 
 <bf>NOTE</bf>:  Users that have been running the frontend and the backend on
-different machines using Red Hat Linux 8.0 have stated that they have been
-having issues with remote access to the MySQL database.  The following
-instructions may or may not work.  Add the following to <tt>/etc/my.cnf</tt>
-on the backend machine and restart MySQL.
+different machines have stated that they have been having issues with remote
+access to the MySQL database.  The following instructions may or may not
+work.  Add the following to <tt>/etc/my.cnf</tt> on the backend machine and
+restart MySQL.
 <tscreen><verb>
 skip-innodb
 set-variable=thread_stack=256k
@@ -2444,7 +2406,7 @@ elements displayed, etc.
 deinterlacing, which will improve how the image looks on your screen. 
 Deinterlacing requires that your processor support SSE. (Streaming SIMD
 Extensions, aka "MMX2").  Early Intel Celeron (those that don't use the
-Coppermine 0.18um core and are usually <600Mhz), Pentium Pro and Pentium II
+Coppermine 0.18um core and are usually <600MHz), Pentium Pro and Pentium II
 CPUs do not have SSE, so make sure that you haven't enabled deinterlacing if
 your processor doesn't support it. If you enable it, and your processor
 doesn't support SSE, you will get "Illegal Instruction" errors.
@@ -2479,6 +2441,7 @@ filter name is followed by "=" and the parameter information. There should
 be no spaces in the filter string. Here is an example filter string:
 
 With parameters: <tt>kerneldeint=10:1,denoise3d=12</tt>
+
 Without: <tt>kerneldeint,denoise3d</tt>
 
 Recording filters are set for each individual channel. These may be used
@@ -2491,11 +2454,17 @@ enter a filter string in the box titled "Video filters". If you are running
 and enter filter strings in the "videofilters" column.
 
 Playback filters are per-host and apply to any recording you watch from the
-frontend where filters have been applied. From "mythfrontend" go to
-Setup->TV Settings->Playback. Enter your filter string in the box titled
-"Custom Filters".
+frontend where filters have been applied. Playback filtering can only
+work with software decoding so the viaslice, xvmc, and ivtv outputs ignore
+filters entirely. From "mythfrontend" go to Setup->TV Settings->Playback.
+Enter your filter string in the box titled "Custom Filters".
 
 <sect2>Currently Available Filters
+<p>"Deinterlace Playback" checkbox.
+
+This implements the linearblend algorithm.  If you don't want linearblend
+included at the head of your custom filter chain, make sure that this box is
+unchecked.
 <p>o  The "invert" filter
 
 Invert ignores any parameters and inverts the pixel values of the video
@@ -2504,10 +2473,14 @@ may be a good example to verify that your filter strings take effect.
 
 o  The "linearblend" filter
 
-This is the filter that is used when "Deinterlace playback" has been
-checked.  It is a simple deinterlacing filter that ignores parameters and
-works by blending adjacent lines.  It replaces combing in interlaced video
-with a less distracting "ghost" image.
+It is a simple deinterlacing filter that ignores parameters and works by
+blending adjacent lines.  It replaces combing in interlaced video with a
+less distracting "ghost" image.
+
+<bf>NOTE</bf>: This filter is appended to the filter chain when "Deinterlace
+playback" has been checked. If you use "kerneldeint" or "linearblend" for
+deinterlacing in your filter string, you should not check "Deinterlace
+playback".
 
 o  The "kerneldeint" filter
 
@@ -2584,7 +2557,6 @@ While this exists in MythTV source code, it is currently not recommended for
 use.
 
 <sect2>Usage Considerations
-
 <p>There are trade-offs to consider when deciding if it would be wise to use
 a filter. Any processing will modify the original image so you should assess
 if the filter has made a noticeable improvement to the picture in order to
@@ -2604,7 +2576,7 @@ For stations with poor signal quality: "kerneldeint,denoise3d=12"
 The following types of hardware encoding cards are supported:
 <itemize>
 <item>MJPEG - Zoran-based cards; see <url url="http://mjpeg.sourceforge.net" name="http://mjpeg.sourceforge.net">
-<item>MPEG-2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see <url url="http://ivtv.sourceforge.net" name="http://ivtv.sourceforge.net">
+<item>MPEG-2 - iTVC15 based cards (Hauppauge PVR-250/PVR-350); see <url url="http://ivtv.sourceforge.net" name="http://ivtv.sourceforge.net">
 <item>HDTV - pcHDTV cards; see <url url="http://pchdtv.com" name="http://pchdtv.com">
 <item>DVB - cards supporting DVB; see <url url="http://linuxtv.org" name="http://linuxtv.org">
 </itemize>
@@ -2624,11 +2596,11 @@ Depending on what types of cards you have installed you may see:
 Software Encoders
 Hardware MPEG Encoders
 Hardware MJPEG Encoders
-Trancoders
+Transcoders
 </verb></tscreen>
 The '(Create new profile group)' option will allow you to create custom
 profiles in case you have multiple backends.  Note that custom profiles
-are per backend and cardtype.  If you have 2 MPEG-2 encoders in a given
+are per backend and card type.  If you have 2 MPEG-2 encoders in a given
 backend system, creating a custom profile will affect both of them.  This
 option should not be needed otherwise.
 
@@ -2713,7 +2685,7 @@ the frontend should poll the backend to determine if the status has changed.
 <sect>Using MythTV.
 <p>The <tt>keys.txt</tt> file describes what the various keyboard commands are.
 
-<bf>NOTE to Red Hat users</bf>:Red Hat Linux 9/8.0 ships with Gnome as
+<bf>NOTE to Red Hat users</bf>:Red Hat Linux 9 ships with Gnome as
 the default desktop environment.  However, Gnome seems to have issues with
 window focus and window switching which sometimes cause mythfrontend to
 obscure the video. KDE does not seem to have any such issues. Therefore you
@@ -3065,7 +3037,7 @@ typing:
 # urpmi libSDL1.2 libSDL1.2-devel
 </verb></tscreen>
 
-<sect1>Red Hat Linux 9/8.0
+<sect1>Red Hat Linux 9
 <p>Red Hat provides packages for several of the prerequisites, making 
 installation very simple. Of the prerequisites, Red Hat provides 
 packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably 
@@ -3112,8 +3084,6 @@ $ make
 $ su
 # make install
 # exit
-$ cd musicdb
-$ mysql -u root < metadata.sql
 </verb></tscreen>
 
 <sect1>Configuring MythMusic.
@@ -3245,18 +3215,6 @@ will be rebuilt as you use CDs.
 location that you specify.  You must be running MythTV v0.10 or later 
 in order to use MythWeather.
 
-<code>
-NOTE for Red Hat Linux 8.0 users: Red Hat 8 users must make the following
-modification, or several weather icons will fail to be installed.
-
-From the mythweather build directory move to the mythweather sub-directory
-and edit the Makefile there.
-
-Find and comment out (using a '#' symbol) the following line:
-
-strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"
-</code>
-
 Change into the MythWeather directory, then make and make install:
 <tscreen><verb>
 $ cd mythweather
@@ -3315,13 +3273,6 @@ $ su
 # exit
 </verb></tscreen>
 
-The next step is to create the create the videometadata table in the
-database.  Simply do the following:
-<tscreen><verb>
-$ cd videodb
-$ mysql -u mythtv -p < metadata.sql
-</verb></tscreen>
-
 See MythVideo's <tt>README</tt> file for additional information.
 
 <sect>MythDVD.
@@ -3343,7 +3294,7 @@ MPEG-4 or xvid you may skip the prerequisite installation step.
 # urpmi mplayer ogle xine
 </verb></tscreen>
 Assuming that you've added a PLF mirror, you may also load the rest of the
-prerequsites using the following command:
+prerequisites using the following command:
 <tscreen><verb>
 # urpmi xvid xvid-devel fame libfame0.9-devel transcode libdvdcss
 </verb></tscreen>
@@ -3358,13 +3309,6 @@ $ make
 $ su
 # make install
 </verb></tscreen>
-Once that's done, ensure that you've added the appropriate table structures
-to the database:
-<tscreen><verb>
-$ cd dvddb
-$ mysql -u root < metadata.sql
-</verb></tscreen>
-
 <sect>MythNews.
 <p>
 
@@ -3391,10 +3335,6 @@ replacing it with "tvlistings".
 <bf>NOTE</bf>:  It is highly recommended to run the latest version of XMLTV
 available.  In North America, zap2it, the listings provider, has been
 making numerous changes to their website which negatively impact XMLTV.
-<sect1>MythTV seems to disappear; can't see video.
-<p>If you're using Gnome as your window manager, try switching to KDE.  For
-Red Hat Linux 8.0 users, edit <tt>/etc/sysconfig/desktop</tt> and
-change "GNOME" to "KDE".
 <sect1>Fast CPU, choppy or jittery video. <label id="Setting_DMA">
 <p>First, you should check that your kernel has been enabled for DMA:
 <tscreen><verb>
@@ -3463,8 +3403,8 @@ then it shouldn't be a problem.
 
 If you get an error like <tt>/usr/bin/ld: cannot find -lXext</tt>, the
 compiler is telling you that you don't have XFree86-devel installed, or that
-your distribution hasn't set it up <ref id="RH_XFree86-devel"
-name="correctly">.  This needs to be fixed before MythTV will compile.
+your distribution hasn't set it up correctly.  This needs to be fixed before
+MythTV will compile.
 
 <sect1>My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
 <p>This is due to DPMS, the Display Power Management System, which is used
@@ -3646,7 +3586,7 @@ you are using the recording function.
 A better test to verify that sound will work for MythTV (and recording with
 <bf>xawtv</bf> for that matter) is to startup <bf>xawtv</bf>, mute the
 line-in then run <tt>aplay /dev/dsp</tt>. You should hear the recorded audio
-slightly delayed behind the realtime video.  Once this test succeeds, MythTV
+slightly delayed behind the real-time video.  Once this test succeeds, MythTV
 should work correctly because it writes to and read from /dev/dsp in
 the same way that <bf>aplay</bf> does.
 
@@ -3700,11 +3640,6 @@ If you're using multiple sound cards and multiple tuners, use <tt>alsamixer
 -c 1</tt> to work with the second sound card.  The first card is #0, the
 second card is #1, etc.
 
-<sect1>I can't see parts of the On Screen Display.
-<p>If you're a Red Hat 8.0 user, make sure that you've followed the
-instructions which tell you how to modify the Themes makefile. <ref id="RH80_OSD_Strip"
-name="Link">.
-
 <sect1>The mythbackend program told me to look at this section.
 <p>mythbackend does a check to see if your sound device is capable of full
 duplex operation.  If it's not, it's most likely that you're going to run
@@ -3713,12 +3648,12 @@ backend is a separate machine than your frontend, then there's no problem,
 since you're only going to be doing one thing at a time with the card. 
 Likewise, if you're running the frontend and backend on the same machine,
 but you're using btaudio or a Hauppauge PVR-250 as your recording source,
-and using the playback function of your soundcard, then you also shouldn't
+and using the playback function of your sound card, then you also shouldn't
 have an issue, since the sound card isn't being asked to perform two
 functions at once.
 
-If you can't get your soundcard to go full duplex and need it to, then check
-your distribution for updated sound drivers.  If your soundcard is not
+If you can't get your sound card to go full duplex and need it to, then check
+your distribution for updated sound drivers.  If your sound card is not
 capable of full-duplex operation, either because the drivers don't support
 it, or it has been designed that way, then you're pretty much out of luck
 and will either need to purchase a new sound card, or will need to get
@@ -3733,9 +3668,9 @@ keypresses.  Once the lights were switched to incandescent bulbs, the ghost
 went away.
 
 You may have an issue with <bf>lirc</bf> misinterpreting IR commands from a
-different remote.  I also have an issue where the Tivo "Peanut" remote will
+different remote.  I also have an issue where the TiVo "Peanut" remote will
 eventually cause <bf>lircd</bf> to stop responding; even though <bf>lircd</bf>
-is configured for the Pinnacle Systems remote, the Tivo remote IR patterns
+is configured for the Pinnacle Systems remote, the TiVo remote IR patterns
 are being seen by the IR receiver.
 
 If your remote has been properly configured, and <bf>irw</bf> and
@@ -3880,7 +3815,7 @@ be a useful tool, directions on using it follow.
 contain any container information such as resolution, frame-rate, or audio
 sampling rate.  In order to process the output, you must supply this
 information to the processing utility.  <bf>mythtranscode</bf> provides the
-relevant information on stdout.
+relevant information on STDOUT.
 
 There are two modes in which <bf>mythtranscode</bf> can create raw streams. 
 The first has no synchronization and assumes that the processing utility
@@ -3899,7 +3834,7 @@ $ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 --profile \
 autodetect --fifodir . &
 </verb></tscreen>
 
-When <bf>mythtranscode</bf> begins executing, it will create two fifos
+When <bf>mythtranscode</bf> begins executing, it will create two FIFO
 ("audout" and "vidout") in the directory specified (in this case ".",
 meaning the current directory) and will print out information about the
 video stream.
@@ -4095,9 +4030,9 @@ mysql> quit
 
 <sect1>btaudio <label id="btaudio">
 <p>btaudio allows you to obtain the audio data from your tuner card directly
-over the PCI bus without using a soundcard.  This is useful if you would
-like to use multiple tuner cards in a system without adding a soundcard for
-each one, or if your existing soundcard is not capable of full-duplex
+over the PCI bus without using a sound card.  This is useful if you would
+like to use multiple tuner cards in a system without adding a sound card for
+each one, or if your existing sound card is not capable of full-duplex
 operation.
 
 In order to use btaudio, your tuner card will need certain hardware
@@ -4387,7 +4322,7 @@ content even if the slave backend that recorded a program is not available.
 <sect1>What is this transcoder thing, and how do I use it?
 <p>The transcoder re-encodes files from one MythTV format to another.  The
 main purpose of the transcoder is to allow users with hardware
-encoders (PVR-250) or systems that can only record in RTJpeg due to
+encoders (PVR-250) or systems that can only record in RTjpeg due to
 performance reasons (multiple capture cards, slow system, etc) to create
 MPEG-4 streams to save space.
 
@@ -4421,7 +4356,7 @@ For either manual or automatic transcoding:
       should match the audio to the 'Default' profile.  If you plan to
       only use the manual transcoder, you can choose to set the video to
       be the same as the default profile too (as long as it is MPEG-4 or
-      RTJpeg)
+      RTjpeg)
 
 Everything should now be setup properly.  If you elected to use the
 Auto-Run feature, the transcoder will automatically launch after each
@@ -4512,7 +4447,7 @@ start them from terminal consoles.
 8.  Quit and restart all frontends.  Delete the <tt>mythtv_backup.sql</tt>
 and <tt>mythtv_restore.sql</tt> files.
 
-<sect1>Can I run MythTV on my Tivo?
+<sect1>Can I run MythTV on my TiVo?
 <sect1>Can I run MythTV on my ReplayTV?
 <p>No.
 
@@ -5224,8 +5159,13 @@ v0.13.14, 2004-01-24.  Add pointer to main mythtv page for PAL problems with
 release 0.13.  Add a little verbiage to the changing hostname instructions. 
 Explicit instructions on removing msp3400 during the ivtv compile.
 v0.13.15, 2004-01-29.  Add Bruce Markey's filter docs.  Add dedicated
-section on running MythTV on Tivo / ReplayTV.  If anyone wants to add text
+section on running MythTV on TiVo / ReplayTV.  If anyone wants to add text
 about tivoweb or dvarchive for the ReplayTV to be more accurater, send it.
+v0.13.16, 2004-01-30.  Add blurb that deinterlace playback checkbox is
+linearblend and to uncheck if you don't want it at the head.  Remove
+references to metadata SQL stuff in other modules.  Standardize some
+spellings.  Add Kenneth Aafloy's multi-CPU/distcc build instructions.  Get
+rid of most of the Red Hat 8.0 stuff.
 -->
 
 <!--

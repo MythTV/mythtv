@@ -30,7 +30,7 @@ be a useful tool, directions on using it follow.</P>
 contain any container information such as resolution, frame-rate, or audio
 sampling rate.  In order to process the output, you must supply this
 information to the processing utility.  <B>mythtranscode</B> provides the
-relevant information on stdout.</P>
+relevant information on STDOUT.</P>
 <P>There are two modes in which <B>mythtranscode</B> can create raw streams. 
 The first has no synchronization and assumes that the processing utility
 will read audio and video at a constant rate.  This method is useful when a
@@ -51,7 +51,7 @@ autodetect --fifodir . &amp;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>When <B>mythtranscode</B> begins executing, it will create two fifos
+<P>When <B>mythtranscode</B> begins executing, it will create two FIFO
 ("audout" and "vidout") in the directory specified (in this case ".",
 meaning the current directory) and will print out information about the
 video stream.</P>
@@ -257,9 +257,9 @@ mysql> quit
 </H2>
 
 <P>btaudio allows you to obtain the audio data from your tuner card directly
-over the PCI bus without using a soundcard.  This is useful if you would
-like to use multiple tuner cards in a system without adding a soundcard for
-each one, or if your existing soundcard is not capable of full-duplex
+over the PCI bus without using a sound card.  This is useful if you would
+like to use multiple tuner cards in a system without adding a sound card for
+each one, or if your existing sound card is not capable of full-duplex
 operation.</P>
 <P>In order to use btaudio, your tuner card will need certain hardware
 installed on it, and that hardware must be wired correctly.  The chip that
@@ -588,7 +588,7 @@ content even if the slave backend that recorded a program is not available.</P>
 
 <P>The transcoder re-encodes files from one MythTV format to another.  The
 main purpose of the transcoder is to allow users with hardware
-encoders (PVR-250) or systems that can only record in RTJpeg due to
+encoders (PVR-250) or systems that can only record in RTjpeg due to
 performance reasons (multiple capture cards, slow system, etc) to create
 MPEG-4 streams to save space.</P>
 <P>The transcoder can be used in two ways:
@@ -619,7 +619,7 @@ set the other parameters as you'd like.  For best performance, you
 should match the audio to the 'Default' profile.  If you plan to
 only use the manual transcoder, you can choose to set the video to
 be the same as the default profile too (as long as it is MPEG-4 or
-RTJpeg)</P>
+RTjpeg)</P>
 <P>Everything should now be setup properly.  If you elected to use the
 Auto-Run feature, the transcoder will automatically launch after each
 recording is complete.  The transcoder thread runs at a low priority, so it
@@ -722,7 +722,7 @@ start them from terminal consoles.
 <P>8.  Quit and restart all frontends.  Delete the <CODE>mythtv_backup.sql</CODE>
 and <CODE>mythtv_restore.sql</CODE> files.</P>
 
-<H2><A NAME="ss21.15">21.15</A> <A HREF="mythtv-HOWTO.html#toc21.15">Can I run MythTV on my Tivo?</A>
+<H2><A NAME="ss21.15">21.15</A> <A HREF="mythtv-HOWTO.html#toc21.15">Can I run MythTV on my TiVo?</A>
 </H2>
 
 <H2><A NAME="ss21.16">21.16</A> <A HREF="mythtv-HOWTO.html#toc21.16">Can I run MythTV on my ReplayTV?</A>

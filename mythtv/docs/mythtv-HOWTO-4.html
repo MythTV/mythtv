@@ -67,13 +67,6 @@ $
 </P>
 <H3>Distribution-Specific Notes</H3>
 
-<H3>Red Hat</H3>
-
-<P>It appears that Red Hat Linux 8.0 requires that the <B>ldconfig</B>
-command be run twice. Red Hat will also frequently "forget" about the path.
-It's recommended to run <B>/sbin/ldconfig</B> after installing every
-package. Failing that, always run it if you get an unexpected error about
-not finding libraries.</P>
 <H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Environment variable Requirements for MythTV</A>
 </H2>
 
@@ -136,9 +129,9 @@ $ exit
 The last two commands are to exit out of the shell. This way, when you next 
 open a shell your new commands
 will take effect.</P>
-<H3>Red Hat Linux 9/8.0</H3>
+<H3>Red Hat Linux 9</H3>
 
-<P>Red Hat Linux 9/8.0 use a default locale with UTF-8 encoding.
+<P>Red Hat Linux 9 use a default locale with UTF-8 encoding.
 Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a result,
 whenever you run setup or mythfilldatabase you will get a lot of UTF-8
 warnings. There is an 

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-01-29, v0.13.15
+  2004-01-30, v0.13.16
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -32,7 +32,7 @@
         3.1.9 Cards with TV out
            3.1.9.1 ATI
            3.1.9.2 Matrox
-           3.1.9.3 nVidia
+           3.1.9.3 NVIDIA
            3.1.9.4 Savage
            3.1.9.5 Hauppauge PVR-350
            3.1.9.6 Other Options
@@ -45,7 +45,6 @@
         3.2.2 Manual installation
         3.2.3 Graphical installation tools.
            3.2.3.1 Mandrake 9.0
-           3.2.3.2 Red Hat Linux 8.0
         3.2.4 Command-line installation.
            3.2.4.1 Mandrake
               3.2.4.1.1 Mandrake 9.0
@@ -58,13 +57,12 @@
      4.2 Shared-Library Requirements for MythTV
         4.2.1 Modifying /etc/ld.so.conf
         4.2.2 Distribution-Specific Notes
-           4.2.2.1 Red Hat
      4.3 Environment variable Requirements for MythTV
         4.3.1 General requirements
            4.3.1.1 QT libraries and binaries
         4.3.2 Distribution-Specific Notes
            4.3.2.1 Mandrake
-           4.3.2.2 Red Hat Linux 9/8.0
+           4.3.2.2 Red Hat Linux 9
            4.3.2.3 Debian
 
   5. Downloading and compiling.
@@ -148,7 +146,7 @@
      15.1 Manual installation of prerequisites.
      15.2 Mandrake 9.0
         15.2.1 Additional options with MythMusic
-     15.3 Red Hat Linux 9/8.0
+     15.3 Red Hat Linux 9
      15.4 Compiling MythMusic.
      15.5 Configuring MythMusic.
      15.6 Using MythMusic.
@@ -165,38 +163,36 @@
   20. Troubleshooting.
      20.1 Illegal Instruction.
      20.2 mythfilldatabase failing.
-     20.3 MythTV seems to disappear; can't see video.
-     20.4 Fast CPU, choppy or jittery video.
-     20.5 I have a MPEG-2 encoder card and my video appears "jittery".
-     20.6 I have a MPEG-2 encoder card and my video is jumping up and down.
-     20.7 I keep losing all of my settings every time I compile!
-     20.8 Compile errors.
-     20.9 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
-     20.10 I get segfaults / MythTV isn't doing anything.
-     20.11 Debugging with GDB.
-     20.12 MythTV makes my system crash.
-     20.13 Troubleshooting audio.
-     20.14 I can't see parts of the On Screen Display.
-     20.15 The mythbackend program told me to look at this section.
-     20.16 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
-     20.17 My PVR-250 card doesn't show inputs in the setup screen.
-     20.18 Where's my "canada-cable" entry gone to?
-     20.19 My channels are off by one.
-     20.20 Mythweb is showing a db_open error when I connect to it.
-     20.21 error: can't find a register in class 'BREG' while reloading 'asm'
-     20.22 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     20.23 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     20.24 My mouse pointer disappears when placed over the MythTV windows.
-     20.25 What does "strange error flushing buffer" mean on my console?
-     20.26 I can't change the channel when watching Live TV.
-     20.27 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
-     20.28 Troubleshooting the Hauppauge PVR-250 IR remote
-     20.29 MySQL not connecting correctly.
-     20.30 My screen goes black when I try to play something.
-     20.31 Poor performance with NVidia cards and XVMC.
-     20.32 My computer is loading a media player application when I insert a CD or DVD.
-     20.33 I'm trying to use an analog capture card with NTSC and MythTV keeps switching to PAL.
-     20.34 My analog capture card has bad colors, large portions of screen green, etc.
+     20.3 Fast CPU, choppy or jittery video.
+     20.4 I have a MPEG-2 encoder card and my video appears "jittery".
+     20.5 I have a MPEG-2 encoder card and my video is jumping up and down.
+     20.6 I keep losing all of my settings every time I compile!
+     20.7 Compile errors.
+     20.8 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
+     20.9 I get segfaults / MythTV isn't doing anything.
+     20.10 Debugging with GDB.
+     20.11 MythTV makes my system crash.
+     20.12 Troubleshooting audio.
+     20.13 The mythbackend program told me to look at this section.
+     20.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
+     20.15 My PVR-250 card doesn't show inputs in the setup screen.
+     20.16 Where's my "canada-cable" entry gone to?
+     20.17 My channels are off by one.
+     20.18 Mythweb is showing a db_open error when I connect to it.
+     20.19 error: can't find a register in class 'BREG' while reloading 'asm'
+     20.20 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     20.21 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     20.22 My mouse pointer disappears when placed over the MythTV windows.
+     20.23 What does "strange error flushing buffer" mean on my console?
+     20.24 I can't change the channel when watching Live TV.
+     20.25 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
+     20.26 Troubleshooting the Hauppauge PVR-250 IR remote
+     20.27 MySQL not connecting correctly.
+     20.28 My screen goes black when I try to play something.
+     20.29 Poor performance with NVidia cards and XVMC.
+     20.30 My computer is loading a media player application when I insert a CD or DVD.
+     20.31 I'm trying to use an analog capture card with NTSC and MythTV keeps switching to PAL.
+     20.32 My analog capture card has bad colors, large portions of screen green, etc.
 
   21. Miscellaneous.
      21.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -221,7 +217,7 @@
      21.12 Advanced Backend Configurations.
      21.13 What is this transcoder thing, and how do I use it?
      21.14 Changing your hostname.
-     21.15 Can I run MythTV on my Tivo?
+     21.15 Can I run MythTV on my TiVo?
      21.16 Can I run MythTV on my ReplayTV?
 
   22. Example Configurations.
@@ -276,14 +272,11 @@
   purpose" workstation / server software packages that may be installed
   by default if you use one of the big-name OS packages.
 
-
   See http://linpvr.org/ <http://linpvr.org/> if you'd like to install
   MythTV onto a VIA Epia M machine.
 
   See http://mysettopbox.tv <http://mysettopbox.tv> if you'd like to
   install a custom version of Knoppix optimized for MythTV.
-
-
   [1m3.  Checking prerequisites.[0m
 
   You must ensure that any firewalls (either hardware, or a software
@@ -326,13 +319,13 @@
   software video encoder, which means that it uses a fairly generic
   "dumb" video capture card to get frames of video, encodes them using
   the CPU on your motherboard and writes them to disk.  High-end video
-  capture cards and devices like the Tivo and ReplayTV have dedicated
+  capture cards and devices like the TiVo and ReplayTV have dedicated
   encoder chips which use specialized hardware to convert the video
   stream to the MPEG-2 format without using the motherboard CPU.  The
   main CPU has the responsibility of running the Operating System and
   reading and writing the encoded frames to the disk.  These tasks have
   fairly low CPU requirements compared to encoding video, which is why a
-  device like a Series 1 Tivo can run with only 16MB of RAM and a 54MHz
+  device like a Series 1 TiVo can run with only 16MB of RAM and a 54MHz
   CPU.
 
   There are many variables that go into the question: "How fast a CPU do
@@ -394,9 +387,8 @@
   RTJPEG.
 
   [1mNOTE[22m:  You [4mmust[24m use DMA for hard drive access to prevent choppy or
-  jittery video.  Red Hat Linux 8.0 apparently does not enable DMA at
-  boot time.  See the Troubleshooting Section for ``instructions'' on
-  how to do this.
+  jittery video.  Not all distributions enable DMA at boot time.  See
+  the Troubleshooting Section for ``instructions'' on how to do this.
 
   Writing video to disk is sensitive to timing issues; RTJPEG requires
   less CPU with the tradeoff being larger files and needing to write to
@@ -405,7 +397,6 @@
   with almost no CPU impact.
 
   See the Troubleshooting ``section'' for more information.
-
 
 
   [1m3.1.4.  Filesystems[0m
@@ -430,7 +421,7 @@
   [1m3.1.5.1.  Frame Grabbers.[0m
 
   This class of card is the simplest and is usually the cheapest.  There
-  is no onboard encoding of the analog video; hardware known as a
+  is no on-board encoding of the analog video; hardware known as a
   Digital-Analog Converter (DAC) takes the video and presents it to the
   computer in an essentially raw digital form.
 
@@ -474,6 +465,8 @@
 
        # lsmod |grep bttv
 
+
+
   You want to see the bttv module listed.
 
   [1m3.1.5.2.  Hardware MPEG-2 encoders.[0m
@@ -487,7 +480,7 @@
   you to use dedicated hardware encoders rather than your CPU. Release
   0.13 of MythTV is able to use these MPEG-2 encoders as an input device
   for live TV and for scheduled recordings.  (The PVR-350 can
-  simultaneously be used as an output device.) Using the onboard MPEG-2
+  simultaneously be used as an output device.) Using the on-board MPEG-2
   encoder drastically reduces the CPU requirements for encoding.
 
   Here are some data points for encoding:
@@ -539,7 +532,6 @@
   devices which will allow you to capture the HDTV output from a set-top
   box commonly found with digital cable systems or satellite systems.
 
-
   [1m3.1.6.  Hardware known NOT to work and other issues.[0m
 
 
@@ -547,7 +539,8 @@
 
   +o  Hauppauge WinTV-USB series
 
-  +o  Hauppauge WinTV-PVR-usb, usb2 or pci cards (no driver - this is not
+
+  +o  Hauppauge WinTV-PVR-usb, usb2 or PCI cards (no driver - this is not
      the PVR-250/350 series of cards supported by the IvyTV driver)
 
   +o  ATI All-in-Wonder series
@@ -562,7 +555,7 @@
 
   [1m3.1.7.  Sound card[0m
 
-  The system needs a sound card or an onboard equivalent on the
+  The system needs a sound card or an on-board equivalent on the
   motherboard to play back and in most cases, to record sound. Any sound
   card that can be operated by the ALSA (Advanced Linux Sound
   Architecture) kernel modules will work with MythTV.  However, some
@@ -573,7 +566,7 @@
   The usual practice for capturing the audio associated with the video
   is to run a cable from an audio output on the video capture card to
   the Line input on a sound card. However, some video capture cards
-  provide onboard audio capabilities that work with the kernel btaudio
+  provide on-board audio capabilities that work with the kernel btaudio
   module instead, thereby eliminating the need for a cable.  This is
   useful if you will be using multiple capture cards in a single
   chassis, since each capture card will not need its own sound card.
@@ -585,8 +578,8 @@
   sound card for audio capture.
 
   [1mNOTE[22m:  Plugging a Line-level device into the Mic input is not
-  recommended.  Line-level devices have higher volatages and can damage
-  the soundcard.  In addition, even if it doesn't break your card, you
+  recommended.  Line-level devices have higher voltages and can damage
+  the sound card.  In addition, even if it doesn't break your card, you
   will be getting Mono sound.  See the Linux MP3 HOWTO at
   http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-
   formats/html_single/MP3-HOWTO.html#toc8
@@ -606,14 +599,14 @@
   card.  You may also run xvinfo; look for your video card to be listed
   as one of the adapters.
 
+
   If you want to use MythTV with a standard television, you will need a
   physical connection from your video card to your TV set, which can
   either be a TV-out port on the card itself or an external adapter that
   converts the VGA signal to an appropriate video signal. "Appropriate"
   depends on a number of factors, such as video standard (NTSC vs PAL)
   type of input connection (Composite vs SVideo), etc.
-
-  Note that with some video cards and X drivers, Xvideo extensions are
+  Note that with some video cards and X drivers, XVideo extensions are
   only supported on the VGA output, and not on the TV output.
 
 
@@ -697,27 +690,27 @@
      XVideo.
 
 
-  [1m3.1.9.3.  nVidia[0m
+  [1m3.1.9.3.  NVIDIA[0m
 
-  Some nVidia cards with TV-out can be run using the standard nv driver
+  Some NVIDIA cards with TV-out can be run using the standard nv driver
   in XFree86, combined with the userspace application [1mnvtv [22mto control
   the TV-out port. See http://sourceforge.net/projects/nv-tv-out/
   <http://sourceforge.net/projects/nv-tv-out/> for details.  Recent
-  versions of the nVidia driver have better support for overscan and
+  versions of the NVIDIA driver have better support for overscan and
   other features useful with TV-Out, so the [1mnvtv [22mapplication may not be
   required.
 
-  Some nVidia cards can be run with a proprietary nVidia X driver made
-  available by nVidia. See http://www.nvidia.com/view.asp?IO=linux
+  Some NVIDIA cards can be run with a proprietary NVIDIA X driver made
+  available by NVIDIA. See http://www.nvidia.com/view.asp?IO=linux
   <http://www.nvidia.com/view.asp?IO=linux> for more information.
 
   Specific cards:
 
   +o  GeForce4 MX440-SE AGP. Has Composite and SVideo ports. Works using
-     the nVidia X driver.
+     the NVIDIA X driver.
 
   +o  GeForce2 GTS 64 MB DDR 4x AGP. Has SVideo port. Works using the
-     nVidia X driver. Reportedly works using the nv driver plus nvtv.
+     NVIDIA X driver. Reportedly works using the nv driver plus nvtv.
 
   +o  GeForce4 MX420 PCI (BFG Asylum). Has SVideo port.
 
@@ -744,9 +737,10 @@
   driver.
 
 
+
   [1m3.1.9.6.  Other Options[0m
 
-  Some devices with onboard TV-out capability, such as XBoxes converted
+  Some devices with on-board TV-out capability, such as XBoxes converted
   to Linux and some laptops, can be used as MythTV frontends to display
   on a television screen. Please consult the mythtv-users mailing list
   for messages that report the details of these special arrangements.
@@ -809,6 +803,7 @@
   commonly found in that distribution.  Any issues with MythTV installed
   via a pre-compiled package [1mMUST [22mbe raised with the packager.
 
+
   If you use any of the pre-compiled packages you may not need to
   perform any additional configuration steps in this HOWTO.  The next
   logical step is ``configuring MySQL'', which you may or may not have
@@ -869,6 +864,7 @@
   Instructions for Fedora may be found at http://wilsonet.com/mythtv/
   <http://wilsonet.com/mythtv/> Just like 3rd-party packages, any 3rd-
   party documentation problems should be brought up with the maintainer.
+
 
 
   [1m3.2.1.2.  Mandrake[0m
@@ -1008,58 +1004,6 @@
   "Yes" or OK if you get a message about satisfying dependencies.
 
 
-  [1m3.2.3.2.  Red Hat Linux 8.0[0m
-
-  Red Hat Linux 8.0 does not have the same graphical package manager
-  used by other distributions, so you will need to use Red Hat's package
-  manager.  This is the same utility you saw upon installation from the
-  Red Hat Linux 8.0 installation CD, and it allows you to select
-  packages at installation time, or once the system is up and running.
-  You can access this program by selecting
-
-  RedHatMenu>System Settings>Packages
-
-
-
-  If you did a typical Desktop install of Red Hat Linux 8.0 make sure
-  you have selected:
-
-
-  +o  KDE Desktop Environment
-
-  +o  SQL Database Server -  you will have to click on "details" and make
-     sure "mysql-server" is checked.  (only required on the master
-     system)
-
-  +o  Development Tools
-
-  +o  X Software Development
-
-  +o  KDE Software Development
-
-  +o  Kernel Development
-
-  Click Install to continue.
-
-  You can not install qt-MySQL, a necessary prerequisite, graphically.
-  To install this package using the command line do
-
-
-
-       $ up2date --solvedeps qt-MySQL
-
-
-
-  [1mNOTE[22m:  ensure that the correct symlinks have been created for the
-  XFree-86 development libraries:
-
-
-
-       # ln -s /usr/X11R6/lib/libXext.so.6 /usr/X11R6/lib/libXext.so
-       # ln -s /usr/X11R6/lib/libX11.so.6 /usr/X11R6/lib/libX11.so
-
-
-
   [1m3.2.4.  Command-line installation.[0m
 
   This section details the various methods for installing prerequisites
@@ -1121,6 +1065,7 @@
 
 
        USE="mysql alsa"
+
 
 
   Next you need to build Qt. If you don't plan on using the ebuilds as
@@ -1206,14 +1151,6 @@
 
   [1m4.2.2.  Distribution-Specific Notes[0m
 
-  [1m4.2.2.1.  Red Hat[0m
-
-  It appears that Red Hat Linux 8.0 requires that the [1mldconfig [22mcommand
-  be run twice. Red Hat will also frequently "forget" about the path.
-  It's recommended to run [1m/sbin/ldconfig [22mafter installing every package.
-  Failing that, always run it if you get an unexpected error about not
-  finding libraries.
-
   [1m4.3.  Environment variable Requirements for MythTV[0m
 
   [1m4.3.1.  General requirements[0m
@@ -1249,8 +1186,6 @@
   called default. If not, you'll get errors during the compile. See the
   Troubleshooting Section for more information.
 
-
-
   [1m4.3.2.  Distribution-Specific Notes[0m
 
   [1m4.3.2.1.  Mandrake[0m
@@ -1282,9 +1217,9 @@
   The last two commands are to exit out of the shell. This way, when you
   next open a shell your new commands will take effect.
 
-  [1m4.3.2.2.  Red Hat Linux 9/8.0[0m
+  [1m4.3.2.2.  Red Hat Linux 9[0m
 
-  Red Hat Linux 9/8.0 use a default locale with UTF-8 encoding.
+  Red Hat Linux 9 use a default locale with UTF-8 encoding.
   Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a
   result, whenever you run setup or mythfilldatabase you will get a lot
   of UTF-8 warnings. There is an
@@ -1516,11 +1451,10 @@
 
   [1m5.3.3.  Other distributions and manual installation.[0m
 
-  [1mNOTE[22m: Red Hat Linux 8.0 and SuSE 8.1 users, you [4mmust[24m download and
-  install an updated version of libexpat.  The version that ships with
-  Red Hat Linux 8.0 and SuSE 8.1 (version 1.95.4) is buggy, and will
-  cause problems with XML::Twig. All other distributions may skip this
-  step and proceed with ``untar'ing'' the xmltv file.
+  [1mNOTE[22m: SuSE 8.1 users, you [4mmust[24m download and install an updated version
+  of libexpat.  The version that ships with SuSE 8.1 (version 1.95.4) is
+  buggy, and will cause problems with XML::Twig. All other distributions
+  may skip this step and proceed with ``untar'ing'' the xmltv file.
 
   If you get errors installing XML::Twig or other XMLTV prerequisites,
   try deleting the old versions of libexpat
@@ -1553,6 +1487,7 @@
 
 
   Continuing on:
+
 
   Untar the xmltv file:
 
@@ -1608,19 +1543,29 @@
        $ tar -xjf mythtv-0.13.tar.bz2
        $ cd mythtv-0.13
        $ ./configure
+
+
+
+  On a single cpu machine, you would type the following to compile
+  MythTV:
+
+  $ qmake mythtv.pro
+  $ make
+
+
+
+  If you want to build MythTV on a multi-CPU machine (or with distcc),
+  you may run into issues with the standard build in MythTV. The easiest
+  solution is to build the libraries first.  In the following example,
+  we will have 4 concurrent jobs executing.  Do not set the number of
+  jobs too high, or your compile will actually take longer to complete
+  than it would if you did a "normal" build.
+
+
        $ qmake mythtv.pro
-       $ make
-
-
-
-  ______________________________________________________________________
-  NOTE for Red Hat 8 users: You must manually modify a Makefile
-  within the themes directory, otherwise your on screen display (OSD) will be
-  "generic" rather than themed.  The solution is to edit the Makefile within
-  the themes directory and comment out (using a # symbol before each line)
-  every line that starts with the word "strip". Make sure you switch back to
-  the MythTV build directory before executing the next step.
-  ______________________________________________________________________
+       $ make qmake
+       $ make -C libs -j4
+       $ make -j4
 
 
 
@@ -1677,10 +1622,9 @@
   official Portage tree.
 
 
-
-  $ su -
-  # emerge --sync # make sure portage is up to date.
-  # vi /etc/make.conf
+       $ su -
+       # emerge --sync # make sure portage is up to date.
+       # vi /etc/make.conf
 
 
 
@@ -1738,6 +1682,7 @@
   which may or may not be one of your MythTV boxes.  If the database is
   on a non-MythTV machine you'll need to copy the database/mc.sql file
   to it.
+
   To setup the initial mysql databases:
 
 
@@ -1785,6 +1730,7 @@
   To allow other hosts access to your master database, you can either
   set it up for no security at all, or with more granularity.  Note that
   the "%" is the wildcard character in MySQL.
+
 
   [1mNOTE[22m:  The "no security" option is [4mvery[24m dangerous unless you're in a
   controlled environment.
@@ -1848,8 +1794,6 @@
 
   RedHat Menu>Sound & Video>Volume Control
 
-
-
   Click on Settings->Configure  Make sure that "Tick Marks" and "Show
   labels" have "X"'s in them.  This will make it easier to find the
   correct audio source.  Click OK.
@@ -1861,6 +1805,7 @@
   click on the red LED so that it turns bright red, indicating that it's
   "ON"; this insures that the Line-in is used as the source.  Click OK,
   and make sure that you save the settings so that this is your default.
+
 
   [1m7.1.1.1.  Using OSS drivers.[0m
 
@@ -1915,9 +1860,9 @@
   Start with the alsa-driver package:
 
 
-       $ tar -xjf alsa-driver-0.9.x.tar.bz2
-       $ cd alsa-driver-0.9.x
-       $ ./configure --with-cards=XXX --with-sequencer=yes
+  $ tar -xjf alsa-driver-0.9.x.tar.bz2
+  $ cd alsa-driver-0.9.x
+  $ ./configure --with-cards=XXX --with-sequencer=yes
 
 
 
@@ -1925,9 +1870,8 @@
   allow the compile to continue:
 
 
-
-  mkdir -p include/linux
-  touch include/linux/workqueue.h
+       mkdir -p include/linux
+       touch include/linux/workqueue.h
 
 
 
@@ -1974,18 +1918,19 @@
   file that has this configuration:
 
 
-       alias char-major-116 snd
-       alias snd-card-0 snd-XXX
-       # module options should go here
-       # OSS/Free portion
-       alias char-major-14 soundcore
-       alias sound-slot-0 snd-card-0
-       # card #1
-       alias sound-service-0-0 snd-mixer-oss
-       alias sound-service-0-1 snd-seq-oss
-       alias sound-service-0-3 snd-pcm-oss
-       alias sound-service-0-8 snd-seq-oss
-       alias sound-service-0-12 snd-pcm-oss
+
+  alias char-major-116 snd
+  alias snd-card-0 snd-XXX
+  # module options should go here
+  # OSS/Free portion
+  alias char-major-14 soundcore
+  alias sound-slot-0 snd-card-0
+  # card #1
+  alias sound-service-0-0 snd-mixer-oss
+  alias sound-service-0-1 snd-seq-oss
+  alias sound-service-0-3 snd-pcm-oss
+  alias sound-service-0-8 snd-seq-oss
+  alias sound-service-0-12 snd-pcm-oss
 
 
 
@@ -2035,6 +1980,7 @@
   If it works, you're done installing ALSA!
 
 
+
   [1m7.2.  Setting the mixer from the command line.[0m
 
   If you have installed the alsa-utils package, then the [1mamixer [22mprogram
@@ -2050,6 +1996,7 @@
   ______________________________________________________________________
   Note the spelling in the following commands.
   ______________________________________________________________________
+
 
 
        $ amixer set Master,0 100%,100% unmute
@@ -2117,6 +2064,8 @@
 
        # emerge lirc
 
+
+
   [1m8.2.  Mandrake 9.0[0m
 
   lircd has two prerequisites:  [1mdialog[22m, available in Mandrake through
@@ -2176,7 +2125,6 @@
   Each remote is different; some remote receivers connect directly to
   your capture card and not to a serial port, so make sure that you've
   got the correct one.
-
 
   You then click "Save Configuration and run configure" to continue.
 
@@ -2281,7 +2229,7 @@
   <http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-
   guide/ch-custom-kernel.html>
 
-  [1mNOTE[22m: Suitable Red Hat kernels for MythTV (i2c update, v4l2 api,
+  [1mNOTE[22m: Suitable Red Hat kernels for MythTV (i2c update, v4l2 API,
   CONFIG_SERIAL modularized) are available from ATrpms:
   http://atrpms.physik.fu-berlin.de/name/kernel/
   <http://atrpms.physik.fu-berlin.de/name/kernel/>. You will also find
@@ -2305,9 +2253,10 @@
   you should choose "kernel-2.4.18-athlon.config" but if you have a dual
   processor P4 you might choose "kernel-2.4.18-i686-smp.config"
 
-  # cp yourconfig.config ../.config
-  # cd ../
-  # make xconfig
+
+       # cp yourconfig.config ../.config
+       # cd ../
+       # make xconfig
 
 
 
@@ -2367,12 +2316,12 @@
   9.1 users, type: # /etc/rc.d/init.d/lircd start instead of:
 
 
-  # /usr/local/sbin/lircd
+       # /usr/local/sbin/lircd
 
 
 
   If this fails, complaining of a missing lircd.conf file, then you must
-  find or make one. First look for a premade configuration file at
+  find or make one. First look for a pre-made configuration file at
   http://lirc.sourceforge.net/remotes/
   <http://lirc.sourceforge.net/remotes/>.  Mandrake 9.1 users, look in
   /usr/share/lirc-remotes. If you find one your remotes either on the
@@ -2463,6 +2412,7 @@
   thing at this point, you need to troubleshoot further by going back to
   the lirc home page and investigating from there.
 
+
   If it is working, then press [1mCTRL-C [22mto abort the program.  Once you
   know that your remote is working, you can either recompile MythTV with
   native lirc support (edit the settings.pro file and remove the "#"
@@ -2487,7 +2437,6 @@
   In my case, (Pinnacle Studio card) the channel up and down functions
   weren't working, due to the fact that the button names were different
   than the default lircrc.example file that came with MythTV.
-
 
   The lircrc.example file has this:
 
@@ -2519,19 +2468,20 @@
   my /home/[yourusername]/.lircrc file:
 
 
-       begin
-           prog = irxevent
-           button = channel+
-           repeat = 3
-           config = Key Up CurrentWindow
-       end
 
-       begin
-           prog = irxevent
-           button = channel-
-           repeat = 3
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      repeat = 3
+      config = Key Up CurrentWindow
+  end
+
+  begin
+      prog = irxevent
+      button = channel-
+      repeat = 3
+      config = Key Down CurrentWindow
+  end
 
 
 
@@ -2551,6 +2501,7 @@
   one keypress to the application, even if you're holding down the key.
   The actual [1mrepeat = [22mnumber will vary from system to system, so
   experiment and see which value works best for you.
+
 
   [1m8.7.  Configuring lirc for use with an IR blaster.[0m
 
@@ -2582,19 +2533,19 @@
   kernel module you might see the following message during make:
 
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
 
 
@@ -2615,15 +2566,16 @@
   sending and receiving IR versus just receiving.
 
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  setserial /dev/ttySx uart none        # (if required)
-  modprobe lirc_sir
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       setserial /dev/ttySx uart none        # (if required)
+       modprobe lirc_sir
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
 
 
@@ -2643,8 +2595,6 @@
        0000000000007ff0 00 1 gi-motorola-dct2000
        000000000000bff8 00 2 gi-motorola-dct2000
        000000000000f7f0 00 ENTER gi-motorola-dct2000
-
-
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -2676,7 +2626,6 @@
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
-
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/DSS box. Make
@@ -2712,7 +2661,6 @@
        # exit
 
 
-
   The first thing to configure is the master backend system.  If you are
   running multiple backend systems, the master backend will make all
   decisions about which programs will be recorded on which tuners.  If
@@ -2740,10 +2688,10 @@
   within the MythTV GUI screens.
 
   [1mNOTE[22m:  Users that have been running the frontend and the backend on
-  different machines using Red Hat Linux 8.0 have stated that they have
-  been having issues with remote access to the MySQL database.  The
-  following instructions may or may not work.  Add the following to
-  /etc/my.cnf on the backend machine and restart MySQL.
+  different machines have stated that they have been having issues with
+  remote access to the MySQL database.  The following instructions may
+  or may not work.  Add the following to /etc/my.cnf on the backend
+  machine and restart MySQL.
 
 
        skip-innodb
@@ -2973,9 +2921,6 @@
   [1mmythfilldatabase --xawchannels [22mis an option if you have used [1mxawtv [22mto
   fine-tune your channels and would like to import the fine tuning
   offsets into MythTV.
-
-
-
   [1m9.4.1.  Setting mythfilldatabase  to run from cron[0m
 
   In order to keep your database filled, [1mmythfilldatabase [22mshould be run
@@ -3000,20 +2945,19 @@
   following:
 
 
+       # cat /etc/crontab
+       SHELL=/bin/bash
+       PATH=/sbin:/bin:/usr/sbin:/usr/bin
+       MAILTO=root
+       HOME=/
 
-  # cat /etc/crontab
-  SHELL=/bin/bash
-  PATH=/sbin:/bin:/usr/sbin:/usr/bin
-  MAILTO=root
-  HOME=/
-
-  # run-parts
-  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-  # exit
-  $
+       # run-parts
+       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+       # exit
+       $
 
 
 
@@ -3035,20 +2979,20 @@
 
 
 
-       $ cp ~/mythtv/configfiles/mythfilldatabasecron ~/.mythtv
-       $ cp ~/mythtv/configfiles/mythcrontab ~/.mythtv
-       $ cd ~/.mythtv
-       $ crontab mythcrontab
-       $ crontab -l  NOTE: this is a lowercase L.
-       # The following will run the mythfilldatabase shell script at 0430
-       # every day.  Format is
-       # minutes hour day_of_month month day_of_week
-       # man 5 crontab for more information
-       # Need to use a shell script because the QTDIR environment variable isn't
-       # being honored by crontab?
-       # The next text should be all on the same line.
-       30 04 * * * /bin/bash $HOME/.mythtv/mythfilldatabasecron
-       $
+  $ cp ~/mythtv/configfiles/mythfilldatabasecron ~/.mythtv
+  $ cp ~/mythtv/configfiles/mythcrontab ~/.mythtv
+  $ cd ~/.mythtv
+  $ crontab mythcrontab
+  $ crontab -l  NOTE: this is a lowercase L.
+  # The following will run the mythfilldatabase shell script at 0430
+  # every day.  Format is
+  # minutes hour day_of_month month day_of_week
+  # man 5 crontab for more information
+  # Need to use a shell script because the QTDIR environment variable isn't
+  # being honored by crontab?
+  # The next text should be all on the same line.
+  30 04 * * * /bin/bash $HOME/.mythtv/mythfilldatabasecron
+  $
 
 
 
@@ -3128,6 +3072,8 @@
   not use the same font settings as defined in Appearance, so if the EPG
   is unreadable this is where you make the adjustments to fonts, number
   of elements displayed, etc.
+
+
   [1m10.4.  Playback[0m
 
   The one configuration item which may cause problems on your system is
@@ -3135,7 +3081,7 @@
   algorithm for deinterlacing, which will improve how the image looks on
   your screen.  Deinterlacing requires that your processor support SSE.
   (Streaming SIMD Extensions, aka "MMX2").  Early Intel Celeron (those
-  that don't use the Coppermine 0.18um core and are usually <600Mhz),
+  that don't use the Coppermine 0.18um core and are usually <600MHz),
   Pentium Pro and Pentium II CPUs do not have SSE, so make sure that you
   haven't enabled deinterlacing if your processor doesn't support it. If
   you enable it, and your processor doesn't support SSE, you will get
@@ -3158,6 +3104,8 @@
   AMD's implementation of SSE instructions, so if your processor has
   3dnow you shouldn't have any issues with deinterlacing.
 
+
+
   [1m10.4.1.  Video Filters[0m
 
   MythTV provides a facility to include video filters while recording
@@ -3176,8 +3124,9 @@
   information. There should be no spaces in the filter string. Here is
   an example filter string:
 
-  With parameters: kerneldeint=10:1,denoise3d=12 Without:
-  kerneldeint,denoise3d
+  With parameters: kerneldeint=10:1,denoise3d=12
+
+  Without: kerneldeint,denoise3d
 
   Recording filters are set for each individual channel. These may be
   used when encoding in software (MPEG-4, RTJPEG) but do not apply when
@@ -3190,10 +3139,20 @@
   "videofilters" column.
 
   Playback filters are per-host and apply to any recording you watch
-  from the frontend where filters have been applied. From "mythfrontend"
-  go to Setup->TV Settings->Playback. Enter your filter string in the
-  box titled "Custom Filters".
+  from the frontend where filters have been applied. Playback filtering
+  can only work with software decoding so the viaslice, xvmc, and ivtv
+  outputs ignore filters entirely. From "mythfrontend" go to Setup->TV
+  Settings->Playback.  Enter your filter string in the box titled
+  "Custom Filters".
+
+
   [1m10.4.3.  Currently Available Filters[0m
+
+  "Deinterlace Playback" checkbox.
+
+  This implements the linearblend algorithm.  If you don't want
+  linearblend included at the head of your custom filter chain, make
+  sure that this box is unchecked.
 
   o  The "invert" filter
 
@@ -3204,10 +3163,14 @@
 
   o  The "linearblend" filter
 
-  This is the filter that is used when "Deinterlace playback" has been
-  checked.  It is a simple deinterlacing filter that ignores parameters
-  and works by blending adjacent lines.  It replaces combing in
-  interlaced video with a less distracting "ghost" image.
+  It is a simple deinterlacing filter that ignores parameters and works
+  by blending adjacent lines.  It replaces combing in interlaced video
+  with a less distracting "ghost" image.
+
+  [1mNOTE[22m: This filter is appended to the filter chain when "Deinterlace
+  playback" has been checked. If you use "kerneldeint" or "linearblend"
+  for deinterlacing in your filter string, you should not check
+  "Deinterlace playback".
 
   o  The "kerneldeint" filter
 
@@ -3275,7 +3238,6 @@
 
   The two RGB formats should not be used because there is no conversion
   filter for them yet.
-
   o  The "convert" filter
 
   It exists but don't use it.  The filter manager uses this filter
@@ -3315,7 +3277,7 @@
   +o  MJPEG - Zoran-based cards; see http://mjpeg.sourceforge.net
      <http://mjpeg.sourceforge.net>
 
-  +o  MPEG-2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see
+  +o  MPEG-2 - iTVC15 based cards (Hauppauge PVR-250/PVR-350); see
      http://ivtv.sourceforge.net <http://ivtv.sourceforge.net>
 
   +o  HDTV - pcHDTV cards; see http://pchdtv.com <http://pchdtv.com>
@@ -3337,17 +3299,18 @@
   types of cards you have installed you may see:
 
 
-       (Create new profile group)
-       Software Encoders
-       Hardware MPEG Encoders
-       Hardware MJPEG Encoders
-       Trancoders
+
+  (Create new profile group)
+  Software Encoders
+  Hardware MPEG Encoders
+  Hardware MJPEG Encoders
+  Transcoders
 
 
 
   The '(Create new profile group)' option will allow you to create cus-
   tom profiles in case you have multiple backends.  Note that custom
-  profiles are per backend and cardtype.  If you have 2 MPEG-2 encoders
+  profiles are per backend and card type.  If you have 2 MPEG-2 encoders
   in a given backend system, creating a custom profile will affect both
   of them.  This option should not be needed otherwise.
 
@@ -3389,7 +3352,6 @@
   best to leave the default as-is until you're sure that MythTV is
   operational.
 
-
   [1mNOTE[22m: although the width and height can be changed to almost anything,
   if you start MythTV and don't see video or you get "segmentation
   fault" errors, it is likely that the video4linux (v4l) subsystem did
@@ -3401,6 +3363,7 @@
 
   MythTV is able to control the LED on the Xbox to indicate backend
   recording status.
+
 
   To control the LED, you will need the [1mblink [22mprogram from the xbox-
   linux project, which is installed as /bin/led on GentooX.  On Xebian
@@ -3444,14 +3407,13 @@
 
   The keys.txt file describes what the various keyboard commands are.
 
-  [1mNOTE to Red Hat users[22m:Red Hat Linux 9/8.0 ships with Gnome as the
-  default desktop environment.  However, Gnome seems to have issues with
-  window focus and window switching which sometimes cause mythfrontend
-  to obscure the video. KDE does not seem to have any such issues.
+  [1mNOTE to Red Hat users[22m:Red Hat Linux 9 ships with Gnome as the default
+  desktop environment.  However, Gnome seems to have issues with window
+  focus and window switching which sometimes cause mythfrontend to
+  obscure the video. KDE does not seem to have any such issues.
   Therefore you will need to switch to KDE by selecting
   RedHatMenu>Extras>System Settings>Desktop Switching Tool and choose
   "KDE".
-
 
 
   [1m11.1.  Using themes with MythTV.[0m
@@ -3464,11 +3426,12 @@
   Once it's on your machine, you must move the file and untar it:
 
 
-       $ su
-       # cp funhouse.tar.gz /usr/local/share/mythtv/themes
-       # cd /usr/local/share/mythtv/themes
-       # tar -xzf funhouse.tar.gz
-       # exit
+
+  $ su
+  # cp funhouse.tar.gz /usr/local/share/mythtv/themes
+  # cd /usr/local/share/mythtv/themes
+  # tar -xzf funhouse.tar.gz
+  # exit
 
 
 
@@ -3518,13 +3481,13 @@
   dependent on MythTV being installed and operational.
 
 
-
   [1m12.1.  Installation and prerequisites.[0m
 
   Download mythweb from http://www.mythtv.org/ <http://www.mythtv.org/>
   and save it to a location where you can find it.  The next step
   depends on whether your distribution has a web server and if you have
   PHP support.
+
 
 
   [1m12.1.1.  Mandrake 9.0[0m
@@ -3652,32 +3615,33 @@
   Here is an example script that a user may want to run on import:
 
 
-       #!/bin/csh
 
-       if ($#argv == 0) then
-               echo "Usage: $0 dest_dir"
-               exit
-       endif
+  #!/bin/csh
 
-       cd $argv[1]
+  if ($#argv == 0) then
+          echo "Usage: $0 dest_dir"
+          exit
+  endif
 
-       # get stuff over the network
-       wget http://www.somesite.dom/dir/file1.jpg
-       wget http://www.somesite.dom/dir/file2.jpg
-       wget http://www.somesite.dom/dir/file3.jpg
+  cd $argv[1]
 
-       # stuff that requires manual module loading and/or fs mounting
-       modprobe camera_module
-       mount /dev/camera /mnt/camera
-       cp /mnt/camera/* $argv[1]
-       umount /mnt/camera
-       rmmod camera_module
+  # get stuff over the network
+  wget http://www.somesite.dom/dir/file1.jpg
+  wget http://www.somesite.dom/dir/file2.jpg
+  wget http://www.somesite.dom/dir/file3.jpg
 
-       # perform some processing
-       foreach pname (`ls *.jpg`)
-               jpegtran -flip vertical $pname > $pname.new
-               mv $pname.new $pname
-       end
+  # stuff that requires manual module loading and/or fs mounting
+  modprobe camera_module
+  mount /dev/camera /mnt/camera
+  cp /mnt/camera/* $argv[1]
+  umount /mnt/camera
+  rmmod camera_module
+
+  # perform some processing
+  foreach pname (`ls *.jpg`)
+          jpegtran -flip vertical $pname > $pname.new
+          mv $pname.new $pname
+  end
 
 
 
@@ -3707,7 +3671,6 @@
   +o  CDParanoia
 
 
-
   [1m15.1.  Manual installation of prerequisites.[0m
 
   These instructions are for distributions which don't have pre-compiled
@@ -3717,15 +3680,14 @@
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
   can find later.
 
-
-       $ tar -xzf mad-0.14.2b.tar.gz
-       $ cd mad-0.14.2b
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+  $ tar -xzf mad-0.14.2b.tar.gz
+  $ cd mad-0.14.2b
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
 
 
@@ -3766,23 +3728,20 @@
   install:
 
 
-
-  $ tar -xzf libcdaudio-0.99.9.tar.gz
-  $ cd libcdaudio-0.99.9
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf libcdaudio-0.99.9.tar.gz
+       $ cd libcdaudio-0.99.9
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
   Download cdparanoia from http://www.xiph.org/paranoia/down.html
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
-
-
        $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
        $ cd cdparanoia-III-alpha9.8
        $ ./configure
@@ -3845,8 +3804,6 @@
 
        # urpmi libfftw2 libfftw2-devel
 
-
-
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
   by typing:
@@ -3865,7 +3822,7 @@
 
 
 
-  [1m15.3.  Red Hat Linux 9/8.0[0m
+  [1m15.3.  Red Hat Linux 9[0m
 
   Red Hat provides packages for several of the prerequisites, making
   installation very simple. Of the prerequisites, Red Hat provides
@@ -3899,6 +3856,7 @@
   prerequisites.  Run ./configure --help for help.
 
 
+
   ______________________________________________________________________
   NOTE for Red Hat users: Before compiling, make the following modification
   to settings.pro, otherwise the compile will fail:
@@ -3919,8 +3877,6 @@
        $ su
        # make install
        # exit
-       $ cd musicdb
-       $ mysql -u root < metadata.sql
 
 
 
@@ -3950,6 +3906,7 @@
 
   Genre/Artist/Album/Title Artist/Genre/Album/Title Artist/Album/Title
   (with Genre left as Unknown)
+
   The track number is optional but can be specified with the title by
   using the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is
   used, then the filename can have a space, hyphen, or underscore
@@ -3959,6 +3916,7 @@
 
   The Ignore_ID3 option does not disable the code that determines the
   track length, just the portion that tries to read ID3 info.
+
 
 
   [1m15.6.  Using MythMusic.[0m
@@ -4065,21 +4023,6 @@
   location that you specify.  You must be running MythTV v0.10 or later
   in order to use MythWeather.
 
-
-  ______________________________________________________________________
-  NOTE for Red Hat Linux 8.0 users: Red Hat 8 users must make the following
-  modification, or several weather icons will fail to be installed.
-
-  From the mythweather build directory move to the mythweather sub-directory
-  and edit the Makefile there.
-
-  Find and comment out (using a '#' symbol) the following line:
-
-  strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"
-  ______________________________________________________________________
-
-
-
   Change into the MythWeather directory, then make and make install:
 
 
@@ -4098,17 +4041,18 @@
   These are the keyboard commands for MythWeather:
 
 
-       Left Key             Goes back one page, and extends the time spent
-                            on the page you are on.
-       Right Key            Goes forward one page, see above.
-       Space                Pause, wait on the current page until space is hit
-                            again.
-       Numeric Keys         You can check other weather by keying in other ZIP codes.
-       Enter Key            Switch between Celsius and Fahrenheit. Can also
-                            be used a way to force a data update.
-       "m" Key              Resets the location to the database default, then updates the data.
-       "i"                  Enter / Save settings
-       ESC                  Exit the settings screen without saving / Exit the program
+
+  Left Key             Goes back one page, and extends the time spent
+                       on the page you are on.
+  Right Key            Goes forward one page, see above.
+  Space                Pause, wait on the current page until space is hit
+                       again.
+  Numeric Keys         You can check other weather by keying in other ZIP codes.
+  Enter Key            Switch between Celsius and Fahrenheit. Can also
+                       be used a way to force a data update.
+  "m" Key              Resets the location to the database default, then updates the data.
+  "i"                  Enter / Save settings
+  ESC                  Exit the settings screen without saving / Exit the program
 
 
 
@@ -4139,22 +4083,12 @@
   Change into the MythVideo directory, then make and make install:
 
 
-
-  $ cd mythvideo
-  $ qmake mythvideo.pro
-  $ make
-  $ su
-  # make install
-  # exit
-
-
-
-  The next step is to create the create the videometadata table in the
-  database.  Simply do the following:
-
-
-       $ cd videodb
-       $ mysql -u mythtv -p < metadata.sql
+       $ cd mythvideo
+       $ qmake mythvideo.pro
+       $ make
+       $ su
+       # make install
+       # exit
 
 
 
@@ -4172,8 +4106,6 @@
   functionality.  If you only wish to play DVDs rather than convert them
   to something like MPEG-4 or xvid you may skip the prerequisite
   installation step.
-
-
   [1m18.1.  Manual Compilation of Prerequisites.[0m
 
 
@@ -4188,7 +4120,7 @@
 
 
   Assuming that you've added a PLF mirror, you may also load the rest of
-  the prerequsites using the following command:
+  the prerequisites using the following command:
 
 
        # urpmi xvid xvid-devel fame libfame0.9-devel transcode libdvdcss
@@ -4200,21 +4132,11 @@
   ./configure
 
 
-
-  $ ./configure --enable-transcode
-  $ qmake mythdvd.pro
-  $ make
-  $ su
-  # make install
-
-
-
-  Once that's done, ensure that you've added the appropriate table
-  structures to the database:
-
-
-       $ cd dvddb
-       $ mysql -u root < metadata.sql
+       $ ./configure --enable-transcode
+       $ qmake mythdvd.pro
+       $ make
+       $ su
+       # make install
 
 
 
@@ -4251,23 +4173,16 @@
   listings provider, has been making numerous changes to their website
   which negatively impact XMLTV.
 
-  [1m20.3.  MythTV seems to disappear; can't see video.[0m
-
-  If you're using Gnome as your window manager, try switching to KDE.
-  For Red Hat Linux 8.0 users, edit /etc/sysconfig/desktop and change
-  "GNOME" to "KDE".
-
-  [1m20.4.  Fast CPU, choppy or jittery video.[0m
+  [1m20.3.  Fast CPU, choppy or jittery video.[0m
 
   First, you should check that your kernel has been enabled for DMA:
 
 
-
-  [mythtv@pvr mythtv]$ dmesg |grep DMA
-      ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
-      ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
-  hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
-  hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
+       [mythtv@pvr mythtv]$ dmesg |grep DMA
+           ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
+           ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
+       hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
+       hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
 
 
 
@@ -4303,9 +4218,9 @@
   your setting will be preserved.
 
 
-  [1m20.5.  I have a MPEG-2 encoder card and my video appears "jittery".[0m
+  [1m20.4.  I have a MPEG-2 encoder card and my video appears "jittery".[0m
 
-  [1m20.6.  I have a MPEG-2 encoder card and my video is jumping up and[0m
+  [1m20.5.  I have a MPEG-2 encoder card and my video is jumping up and[0m
   [1mdown.[0m
 
   This is a different problem than the one discussed in the previous
@@ -4318,16 +4233,19 @@
   [1mLive TV [22moptions to 480 or 576 from their defaults.
 
 
-  [1m20.7.  I keep losing all of my settings every time I compile![0m
+
+  [1m20.6.  I keep losing all of my settings every time I compile![0m
 
   MythTV will overwrite any settings in /usr/local/share/mythtv.  If you
   want to make sure that you don't lose your modifications, make a
   directory ~/.mythtv and copy your mysql.txt file to this location.
 
-  [1m20.8.  Compile errors.[0m
+  [1m20.7.  Compile errors.[0m
 
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
+
+
        cc1plus: warning: changing search order for system directory
        "/usr/local/include"
        cc1plus: warning:   as it has already been specified as a non-system
@@ -4339,11 +4257,11 @@
 
   If you get an error like /usr/bin/ld: cannot find -lXext, the compiler
   is telling you that you don't have XFree86-devel installed, or that
-  your distribution hasn't set it up ``correctly''.  This needs to be
-  fixed before MythTV will compile.
+  your distribution hasn't set it up correctly.  This needs to be fixed
+  before MythTV will compile.
 
 
-  [1m20.9.  My screen goes blank, but comes back when I wiggle the mouse or[0m
+  [1m20.8.  My screen goes blank, but comes back when I wiggle the mouse or[0m
   [1muse the keyboard.[0m
 
   This is due to DPMS, the Display Power Management System, which is
@@ -4380,8 +4298,6 @@
            Option "DPMS"
        EndSection
 
-
-
   In this case, you would need to either delete the Option "DPMS" line,
   or change it to # Option "DPMS" to comment it out.  The next time you
   start XFree this change will take effect.
@@ -4389,24 +4305,23 @@
   Finally, check:
 
 
+       Section "Monitor"
+           Identifier "monitor1"
+           VendorName "Plug'n Play"
+           HorizSync 30-85
+           VertRefresh 50-160
 
-  Section "Monitor"
-      Identifier "monitor1"
-      VendorName "Plug'n Play"
-      HorizSync 30-85
-      VertRefresh 50-160
+           # Sony Vaio C1(X,XS,VE,VN)?
+           # 1024x480 @ 85.6 Hz, 48 kHz hsync
+           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-      # Sony Vaio C1(X,XS,VE,VN)?
-      # 1024x480 @ 85.6 Hz, 48 kHz hsync
-      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+           # TV fullscreen mode or DVD fullscreen output.
+           # 768x576 @ 79 Hz, 50 kHz hsync
+           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-      # TV fullscreen mode or DVD fullscreen output.
-      # 768x576 @ 79 Hz, 50 kHz hsync
-      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
-
-      # 768x576 @ 100 Hz, 61.6 kHz hsync
-      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-  EndSection
+           # 768x576 @ 100 Hz, 61.6 kHz hsync
+           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+       EndSection
 
 
 
@@ -4440,9 +4355,11 @@
   off from within the control panel.
 
 
-  [1m20.10.  I get segfaults / MythTV isn't doing anything.[0m
+  [1m20.9.  I get segfaults / MythTV isn't doing anything.[0m
 
-  [1m20.11.  Debugging with GDB.[0m
+
+
+  [1m20.10.  Debugging with GDB.[0m
 
   Without details, the developers will not be able to determine if you
   have discovered a genuine code-bug,  or if the problem is with your
@@ -4452,6 +4369,8 @@
 
   Edit the settings.pro file.  Make sure that the top of the file looks
   like this:
+
+
        $ cat settings.pro
        CONFIG += debug
        #CONFIG += release
@@ -4520,7 +4439,7 @@
   instructions.
 
 
-  [1m20.12.  MythTV makes my system crash.[0m
+  [1m20.11.  MythTV makes my system crash.[0m
 
   MythTV [4mcan[24m [4mnot[24m crash your system - it is a user-level program.  If
   your system is crashing when you run MythTV, then you have some issue
@@ -4529,7 +4448,7 @@
   perform a CPU intensive task like encoding video.
 
 
-  [1m20.13.  Troubleshooting audio.[0m
+  [1m20.12.  Troubleshooting audio.[0m
 
   By Bruce Markey, mailto:bjm@lvcm.com <mailto:bjm@lvcm.com> [1mNOTE[22m:  the
   following instructions do not apply to PVR-250/350 encoders; the
@@ -4552,7 +4471,7 @@
   A better test to verify that sound will work for MythTV (and recording
   with [1mxawtv [22mfor that matter) is to startup [1mxawtv[22m, mute the line-in then
   run aplay /dev/dsp. You should hear the recorded audio slightly
-  delayed behind the realtime video.  Once this test succeeds, MythTV
+  delayed behind the real-time video.  Once this test succeeds, MythTV
   should work correctly because it writes to and read from /dev/dsp in
   the same way that [1maplay [22mdoes.
 
@@ -4568,7 +4487,6 @@
   depending on how you connect the input cable. This source should be
   muted to prevent patching through the analog sound. The volume of this
   source will not affect the record level.
-
   Capture mixer - this sets the level for the analog to digital
   recording.  While a volume of 100% is recommended for testing,
   distortion may occur.  Lowering this level to 75% to 85% may result in
@@ -4611,14 +4529,7 @@
   #0, the second card is #1, etc.
 
 
-  [1m20.14.  I can't see parts of the On Screen Display.[0m
-
-  If you're a Red Hat 8.0 user, make sure that you've followed the
-  instructions which tell you how to modify the Themes makefile.
-  ``Link''.
-
-
-  [1m20.15.  The mythbackend program told me to look at this section.[0m
+  [1m20.13.  The mythbackend program told me to look at this section.[0m
 
   mythbackend does a check to see if your sound device is capable of
   full duplex operation.  If it's not, it's most likely that you're
@@ -4628,18 +4539,19 @@
   at a time with the card.  Likewise, if you're running the frontend and
   backend on the same machine, but you're using btaudio or a Hauppauge
   PVR-250 as your recording source, and using the playback function of
-  your soundcard, then you also shouldn't have an issue, since the sound
-  card isn't being asked to perform two functions at once.
+  your sound card, then you also shouldn't have an issue, since the
+  sound card isn't being asked to perform two functions at once.
 
-  If you can't get your soundcard to go full duplex and need it to, then
-  check your distribution for updated sound drivers.  If your soundcard
-  is not capable of full-duplex operation, either because the drivers
-  don't support it, or it has been designed that way, then you're pretty
-  much out of luck and will either need to purchase a new sound card, or
-  will need to get btaudio ``operational''.
+  If you can't get your sound card to go full duplex and need it to,
+  then check your distribution for updated sound drivers.  If your sound
+  card is not capable of full-duplex operation, either because the
+  drivers don't support it, or it has been designed that way, then
+  you're pretty much out of luck and will either need to purchase a new
+  sound card, or will need to get btaudio ``operational''.
 
 
-  [1m20.16.  My remote doesn't work / works sometimes and not others /[0m
+
+  [1m20.14.  My remote doesn't work / works sometimes and not others /[0m
   [1m"ghost" keypresses.[0m
 
   This can be due to a number of factors.  The simplest case is the
@@ -4649,9 +4561,9 @@
   the ghost went away.
 
   You may have an issue with [1mlirc [22mmisinterpreting IR commands from a
-  different remote.  I also have an issue where the Tivo "Peanut" remote
+  different remote.  I also have an issue where the TiVo "Peanut" remote
   will eventually cause [1mlircd [22mto stop responding; even though [1mlircd [22mis
-  configured for the Pinnacle Systems remote, the Tivo remote IR
+  configured for the Pinnacle Systems remote, the TiVo remote IR
   patterns are being seen by the IR receiver.
 
   If your remote has been properly configured, and [1mirw [22mand [1mirxevent [22mare
@@ -4665,16 +4577,16 @@
   +o  blackbox  (using "Sloppy Focus" and "Focus New Windows")
 
 
-  [1m20.17.  My PVR-250 card doesn't show inputs in the setup screen.[0m
+  [1m20.15.  My PVR-250 card doesn't show inputs in the setup screen.[0m
 
   See message http://www.mythtv.org/pipermail/mythtv-
   users/2003-April/002527.html <http://www.mythtv.org/pipermail/mythtv-
   users/2003-April/002527.html>
 
 
-  [1m20.18.  Where's my "canada-cable" entry gone to?[0m
+  [1m20.16.  Where's my "canada-cable" entry gone to?[0m
 
-  [1m20.19.  My channels are off by one.[0m
+  [1m20.17.  My channels are off by one.[0m
 
   There is no such thing as "Canada Cable"; Canada uses the same
   frequencies as the United States.  "Canada Cable" was a hack that some
@@ -4688,7 +4600,7 @@
   more information.
 
 
-  [1m20.20.  Mythweb is showing a db_open error when I connect to it.[0m
+  [1m20.18.  Mythweb is showing a db_open error when I connect to it.[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
 
@@ -4697,7 +4609,7 @@
   Restart apache for it to take effect.
 
 
-  [1m20.21.  error: can't find a register in class 'BREG' while reloading[0m
+  [1m20.19.  error: can't find a register in class 'BREG' while reloading[0m
   [1m'asm'[0m
 
   This is due to the broken Qt that is being distributed by Suse.  To
@@ -4705,7 +4617,7 @@
   you find there and then recompile.
 
 
-  [1m20.22.  make: *** No rule to make target[0m
+  [1m20.20.  make: *** No rule to make target[0m
   [1m/usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.[0m
 
   This error happens when there's a missing link in the
@@ -4731,41 +4643,41 @@
   choice is the better solution.
 
 
-  [1m20.23.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
+  [1m20.21.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
   [1mneeded by Makefile'.  Stop.[0m
 
   You didn't set your QTDIR.  Re-read the section on ``Setting up
   paths''.
 
 
-  [1m20.24.  My mouse pointer disappears when placed over the MythTV win-[0m
+  [1m20.22.  My mouse pointer disappears when placed over the MythTV win-[0m
   [1mdows.[0m
 
   This is the intended behavior.  The MythTV interface is meant for use
   with a remote control or a keyboard.
 
 
-  [1m20.25.  What does "strange error flushing buffer" mean on my console?[0m
+  [1m20.23.  What does "strange error flushing buffer" mean on my console?[0m
 
   Nothing, really.  It's just lame (the mp3 encoder) complaining for
   some obscure reason.  This seems to be fixed in more recent versions
   of the libmp3lame library.
 
 
-  [1m20.26.  I can't change the channel when watching Live TV.[0m
+  [1m20.24.  I can't change the channel when watching Live TV.[0m
 
   Something's wrong with your program database.  Did mythfilldatabase
   run with no major errors?
 
 
-  [1m20.27.  When trying to run setup, I get an error like this: "./setup:[0m
+  [1m20.25.  When trying to run setup, I get an error like this: "./setup:[0m
   [1merror while loading shared libraries:"[0m
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
   modifying ``/etc/ld.so.conf''.
 
 
-  [1m20.28.  Troubleshooting the Hauppauge PVR-250 IR remote[0m
+  [1m20.26.  Troubleshooting the Hauppauge PVR-250 IR remote[0m
 
   The most likely issue is that you have incompatible versions of the
   [1mlirc_i2c [22mand [1mlirc_dev [22mmodules and the various [1mlircd [22mprograms.  See the
@@ -4773,14 +4685,13 @@
   support.'' for examples on finding and removing old versions of lirc.
 
 
-
-  [1m20.29.  MySQL not connecting correctly.[0m
+  [1m20.27.  MySQL not connecting correctly.[0m
 
   Your [1mMySQL [22minstallation may have networking turned off.  Check that
   /etc/mysql/my.cnf [4mdoes[24m [4mnot[24m contain skip-networking.  If it does,
   remove it, and restart [1mMySQL[22m.
 
-  [1m20.30.  My screen goes black when I try to play something.[0m
+  [1m20.28.  My screen goes black when I try to play something.[0m
 
   MythTV prints error and status messages to the shell that was used to
   start the application.  If nothing seems to be happening when you try
@@ -4788,7 +4699,7 @@
   messages there.
 
 
-  [1m20.31.  Poor performance with NVidia cards and XVMC.[0m
+  [1m20.29.  Poor performance with NVidia cards and XVMC.[0m
 
   XVMC is a NVidia driver feature which is supposed to help with
   decoding video.  Users have reported that rather than speeding up
@@ -4796,7 +4707,7 @@
   check that your color depth is set for 24bpp.
 
 
-  [1m20.32.  My computer is loading a media player application when I[0m
+  [1m20.30.  My computer is loading a media player application when I[0m
   [1minsert a CD or DVD.[0m
 
   You need to disable any sort of auto-running media player in your
@@ -4810,10 +4721,10 @@
 
 
 
-  [1m20.33.  I'm trying to use an analog capture card with NTSC and MythTV[0m
+  [1m20.31.  I'm trying to use an analog capture card with NTSC and MythTV[0m
   [1mkeeps switching to PAL.[0m
 
-  [1m20.34.  My analog capture card has bad colors, large portions of[0m
+  [1m20.32.  My analog capture card has bad colors, large portions of[0m
   [1mscreen green, etc.[0m
 
   MythTV v0.13 has a bug in it.  There are three ways to fix this issue:
@@ -4845,7 +4756,7 @@
   contain any container information such as resolution, frame-rate, or
   audio sampling rate.  In order to process the output, you must supply
   this information to the processing utility.  [1mmythtranscode [22mprovides
-  the relevant information on stdout.
+  the relevant information on STDOUT.
 
   There are two modes in which [1mmythtranscode [22mcan create raw streams.
   The first has no synchronization and assumes that the processing
@@ -4869,10 +4780,10 @@
 
 
 
-  When [1mmythtranscode [22mbegins executing, it will create two fifos
-  ("audout" and "vidout") in the directory specified (in this case ".",
-  meaning the current directory) and will print out information about
-  the video stream.
+  When [1mmythtranscode [22mbegins executing, it will create two FIFO ("audout"
+  and "vidout") in the directory specified (in this case ".", meaning
+  the current directory) and will print out information about the video
+  stream.
 
   The next step is to start the processing application.  The following
   assumes that the stream is NTSC 640x480 with 32kbps audio.
@@ -4898,8 +4809,6 @@
 
 
   Or to play directly using mplayer (again 1.0PRE1 or later is needed):
-
-
 
   mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
   -rawvideo on:w=640:h=480:fps=29.97 vidout
@@ -5103,10 +5012,10 @@
   [1m21.7.  btaudio[0m
 
   btaudio allows you to obtain the audio data from your tuner card
-  directly over the PCI bus without using a soundcard.  This is useful
+  directly over the PCI bus without using a sound card.  This is useful
   if you would like to use multiple tuner cards in a system without
-  adding a soundcard for each one, or if your existing soundcard is not
-  capable of full-duplex operation.
+  adding a sound card for each one, or if your existing sound card is
+  not capable of full-duplex operation.
 
   In order to use btaudio, your tuner card will need certain hardware
   installed on it, and that hardware must be wired correctly.  The chip
@@ -5453,7 +5362,7 @@
 
   The transcoder re-encodes files from one MythTV format to another.
   The main purpose of the transcoder is to allow users with hardware
-  encoders (PVR-250) or systems that can only record in RTJpeg due to
+  encoders (PVR-250) or systems that can only record in RTjpeg due to
   performance reasons (multiple capture cards, slow system, etc) to
   create MPEG-4 streams to save space.
 
@@ -5485,7 +5394,7 @@
   as you'd like.  For best performance, you should match the audio to
   the 'Default' profile.  If you plan to only use the manual transcoder,
   you can choose to set the video to be the same as the default profile
-  too (as long as it is MPEG-4 or RTJpeg)
+  too (as long as it is MPEG-4 or RTjpeg)
 
   Everything should now be setup properly.  If you elected to use the
   Auto-Run feature, the transcoder will automatically launch after each
@@ -5595,7 +5504,7 @@
   mythtv_restore.sql files.
 
 
-  [1m21.15.  Can I run MythTV on my Tivo?[0m
+  [1m21.15.  Can I run MythTV on my TiVo?[0m
 
   [1m21.16.  Can I run MythTV on my ReplayTV?[0m
 

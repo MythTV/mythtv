@@ -46,13 +46,13 @@ or capture sizes, etc.</P>
 <P>MythTV has two modes of operation.  First, it can function as a software video
 encoder, which means that it uses a fairly generic "dumb" video capture card
 to get frames of video, encodes them using the CPU on your motherboard and
-writes them to disk.  High-end video capture cards and devices like the Tivo
+writes them to disk.  High-end video capture cards and devices like the TiVo
 and ReplayTV have dedicated encoder chips which use specialized hardware to
 convert the video stream to the MPEG-2 format without using the motherboard
 CPU.  The main CPU has the responsibility of running the Operating System
 and reading and writing the encoded frames to the disk.  These tasks have
 fairly low CPU requirements compared to encoding video, which is why a
-device like a Series 1 Tivo can run with only 16MB of RAM and a 54MHz CPU.</P>
+device like a Series 1 TiVo can run with only 16MB of RAM and a 54MHz CPU.</P>
 <P>There are many variables that go into the question: "How fast a CPU do I
 need to run MythTV"?  Obviously, the faster your CPU, the better your
 experience will be with MythTV.  If you are using the software MPEG-4
@@ -102,8 +102,8 @@ on the encoding scheme, the size of the raw images, and the frames per
 second, but typical values for MythTV range from 700 megabytes/hour to 2
 gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTJPEG.</P>
 <P><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
-choppy or jittery video.  Red Hat Linux 8.0 apparently does not enable DMA
-at boot time.  See the Troubleshooting Section for 
+choppy or jittery video.  Not all distributions enable DMA at boot time. 
+See the Troubleshooting Section for 
 <A HREF="mythtv-HOWTO-20.html#Setting_DMA">instructions</A> on how to do this.</P>
 <P>Writing video to disk is sensitive to timing issues; RTJPEG requires less
 CPU with the tradeoff being larger files and needing to write to the disk
@@ -134,7 +134,7 @@ available for capturing video.  </P>
 <H3>Frame Grabbers.</H3>
 
 <P>This class of card is the simplest and is usually the cheapest.  There is no
-onboard encoding of the analog video; hardware known as a Digital-Analog
+on-board encoding of the analog video; hardware known as a Digital-Analog
 Converter (DAC) takes the video and presents it to the computer in an
 essentially raw digital form.</P>
 <P>For a list of video capture cards known to work
@@ -187,7 +187,7 @@ Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
 use dedicated hardware encoders rather than your CPU. Release 0.13 of MythTV
 is able to use these MPEG-2 encoders as an input device for live TV and for
 scheduled recordings.  (The PVR-350 can simultaneously be used as an output
-device.) Using the onboard MPEG-2 encoder drastically reduces the CPU
+device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
 requirements for encoding.</P>
 <P>Here are some data points for encoding:
 <UL>
@@ -236,7 +236,7 @@ commonly found with digital cable systems or satellite systems.</P>
 <UL>
 <LI>Hauppauge WinTV-D or -HD (no driver)</LI>
 <LI>Hauppauge WinTV-USB series</LI>
-<LI>Hauppauge WinTV-PVR-usb, usb2 or pci cards (no driver - this is not the PVR-250/350
+<LI>Hauppauge WinTV-PVR-usb, usb2 or PCI cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)</LI>
 <LI>ATI All-in-Wonder series</LI>
 </UL>
@@ -249,7 +249,7 @@ video output using either composite or S-Video.</P>
 video.</P>
 <H3>Sound card</H3>
 
-<P>The system needs a sound card or an onboard equivalent on the motherboard
+<P>The system needs a sound card or an on-board equivalent on the motherboard
 to play back and in most cases, to record sound. Any sound card that can be
 operated by the ALSA (Advanced Linux Sound Architecture) kernel modules will
 work with MythTV.  However, some cards and drivers will provide better
@@ -258,7 +258,7 @@ devices included on motherboards can be problematic.</P>
 <P>The usual practice for capturing the audio associated with the video
 is to run a cable from an audio output on the video capture card to
 the Line input on a sound card. However, some video capture cards
-provide onboard audio capabilities that work with the kernel
+provide on-board audio capabilities that work with the kernel
 <CODE>btaudio</CODE> module instead, thereby eliminating the need for a
 cable.  This is useful if you will be using multiple capture cards in
 a single chassis, since each capture card will not need its own sound
@@ -270,8 +270,8 @@ section for more information.</P>
 <P><B>NOTE</B>:  The MPEG-2 cards supported by the IVTV driver do not require
 a sound card for audio capture.</P>
 <P><B>NOTE</B>:  Plugging a Line-level device into the Mic input is not
-recommended.  Line-level devices have higher volatages and can damage the
-soundcard.  In addition, even if it doesn't break your card, you will be
+recommended.  Line-level devices have higher voltages and can damage the
+sound card.  In addition, even if it doesn't break your card, you will be
 getting Mono sound.  See the Linux MP3 HOWTO at 
 <A HREF="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8">http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8</A>
 for additional information.</P>
@@ -294,7 +294,7 @@ a TV-out port on the card itself or an external adapter that converts the
 VGA signal to an appropriate video signal. "Appropriate" depends on a number
 of factors, such as video standard (NTSC vs PAL) type of input connection
 (Composite vs SVideo), etc.</P>
-<P>Note that with some video cards and X drivers, Xvideo extensions are
+<P>Note that with some video cards and X drivers, XVideo extensions are
 only supported on the VGA output, and not on the TV output.</P>
 
 <H3>Cards with TV out</H3>
@@ -357,23 +357,23 @@ Composite and S-Video ports. TV-out implementation does <EM>NOT</EM> support XVi
 </UL>
 </P>
 
-<H3>nVidia</H3>
+<H3>NVIDIA</H3>
 
-<P>Some nVidia cards with TV-out can be run using the standard nv driver in 
+<P>Some NVIDIA cards with TV-out can be run using the standard nv driver in 
 XFree86, combined with the userspace application <B>nvtv</B> to control the TV-out 
 port. See 
 <A HREF="http://sourceforge.net/projects/nv-tv-out/">http://sourceforge.net/projects/nv-tv-out/</A> for details.  Recent
-versions of the nVidia driver have better support for overscan and other
+versions of the NVIDIA driver have better support for overscan and other
 features useful with TV-Out, so the <B>nvtv</B> application may not be
 required.</P>
-<P>Some nVidia cards can be run with a proprietary nVidia X driver made
-available by nVidia. See 
+<P>Some NVIDIA cards can be run with a proprietary NVIDIA X driver made
+available by NVIDIA. See 
 <A HREF="http://www.nvidia.com/view.asp?IO=linux">http://www.nvidia.com/view.asp?IO=linux</A> for more information.</P>
 <P>Specific cards:
 <UL>
 <LI>GeForce4 MX440-SE AGP. Has Composite and SVideo ports. Works using the
-nVidia X driver.</LI>
-<LI>GeForce2 GTS 64 MB DDR 4x AGP. Has SVideo port. Works using the nVidia X 
+NVIDIA X driver.</LI>
+<LI>GeForce2 GTS 64 MB DDR 4x AGP. Has SVideo port. Works using the NVIDIA X 
 driver. Reportedly works using the nv driver plus nvtv.</LI>
 <LI>GeForce4 MX420 PCI (BFG Asylum). Has SVideo port.</LI>
 </UL>
@@ -398,7 +398,7 @@ inexpensive Savage card with TV out) is broken. See
 
 <H3>Other Options</H3>
 
-<P>Some devices with onboard TV-out capability, such as XBoxes converted to 
+<P>Some devices with on-board TV-out capability, such as XBoxes converted to 
 Linux and some laptops, can be used as MythTV frontends to display on a 
 television screen. Please consult the mythtv-users mailing list for messages 
 that report the details of these special arrangements.</P>
@@ -626,54 +626,6 @@ external program to adjust your volume settings.  If this is the case, then
 you can disable native volume support.</P>
 <P>If you marked anything to install, click on Install Marked.  Click "Yes" or
 OK if you get a message about satisfying dependencies.</P>
-
-<H3>Red Hat Linux 8.0 </H3>
-
-<P>Red Hat Linux 8.0 does not have the same graphical package manager used
-by other distributions, so you will need to use Red Hat's package
-manager.  This is the same utility you saw upon installation from the Red
-Hat Linux 8.0 installation CD, and it allows you to select packages at
-installation time, or once the system is up and running.  You can access
-this program by selecting 
-<PRE>
-RedHatMenu>System Settings>Packages
-</PRE>
-</P>
-<P>If you did a typical Desktop install of Red Hat Linux 8.0 make sure you have
-selected:</P>
-<P>
-<UL>
-<LI>KDE Desktop Environment</LI>
-<LI>SQL Database Server -  you will have to click on "details" and make 
-sure "mysql-server" is checked.  (only required on the master system)</LI>
-<LI>Development Tools</LI>
-<LI>X Software Development</LI>
-<LI>KDE Software Development</LI>
-<LI>Kernel Development</LI>
-</UL>
-</P>
-<P>Click Install to continue.</P>
-<P>You can not install qt-MySQL, a necessary prerequisite, graphically. To  
-install this package using the command line do</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ up2date --solvedeps qt-MySQL
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<A NAME="RH_XFree86-devel"></A> 
-<B>NOTE</B>:  ensure that the correct symlinks have been created for the
-XFree-86 development libraries:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-# ln -s /usr/X11R6/lib/libXext.so.6 /usr/X11R6/lib/libXext.so
-# ln -s /usr/X11R6/lib/libX11.so.6 /usr/X11R6/lib/libX11.so
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 
 <H3><A NAME="CLIinstalltools_"></A> Command-line installation. </H3>
 
