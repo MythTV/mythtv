@@ -52,10 +52,15 @@ void DecoderBase::Reset(void)
 
 void DecoderBase::setWatchingRecording(bool mode)
 {
+    bool wereWatchingRecording = watchingrecording;
+
     // When we switch from WatchingRecording to WatchingPreRecorded,
     // re-get the positionmap
     posmapStarted = false;
     watchingrecording = mode;
+
+    if (wereWatchingRecording && !watchingrecording)
+        SyncPositionMap();
 }
 
 bool DecoderBase::PosMapFromDb(void)
@@ -204,7 +209,9 @@ bool DecoderBase::SyncPositionMap(void)
     // watching prerecorded:
     // 1. initial fill from db is all that's needed
 
-    //cerr << "Resyncing position map" << endl;
+    //cerr << "Resyncing position map. posmapStarted = "
+    //     << (int) posmapStarted << endl;
+
     unsigned int old_posmap_size = m_positionMap.size();
     
     if (livetv)
