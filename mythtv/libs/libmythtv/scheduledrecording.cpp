@@ -50,9 +50,14 @@ ScheduledRecording::ScheduledRecording()
     m_dialog = NULL;
     recpriority = NULL;
     recgroup = NULL;
-    
+    searchType = "";
+    searchForWhat = "";
+        
     longChannelFormat = gContext->GetSetting("LongChannelFormat", "<num> <name>");
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
     
     addChild(id = new ID());
     
@@ -135,24 +140,23 @@ void ScheduledRecording::loadBySearch(QSqlDatabase *db,
     {
         setDefault(db, false);
         search->setValue(lsearch);
-        QString ltitle = forwhat;
+        searchForWhat = forwhat;
+        
         switch (lsearch)
         {
         case kTitleSearch:
-            ltitle += " (" +  QObject::tr("Title Search") + ")";
+            searchType = "(" +  QObject::tr("Title Search") + ")";
             break;
         case kKeywordSearch:
-            ltitle += " (" +  QObject::tr("Keyword Search") + ")";
+            searchType = "(" +  QObject::tr("Keyword Search") + ")";
             break;
         case kPeopleSearch:
-            ltitle += " (" +  QObject::tr("People Search") + ")";
+            searchType = "(" +  QObject::tr("People Search") + ")";
             break;
         default:
-            ltitle += " (" +  QObject::tr("Unknown Search") + ")";
+            searchType = "(" +  QObject::tr("Unknown Search") + ")";
             break;
         }
-        title->setValue(ltitle);
-        description->setValue(forwhat);
     } 
 }
 
@@ -198,10 +202,6 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
         m_pginfo->ToMap(NULL, progMap);
     else
     {
-        QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-        QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-        QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
-        
         progMap["title"] = title->getValue();
         progMap["subtitle"] = subtitle->getValue();
         progMap["description"] = description->getValue();
@@ -214,15 +214,15 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
         progMap["endtime"] = endTime->getValue();
         progMap["enddate"] = endTime->getValue();
         
-        // DSTODO: are these right?
+        progMap["searchtype"] = searchType;
+        progMap["searchforwhat"] = searchForWhat;
+        
+        
         progMap["channum"] = chanstr;
         progMap["chanid"] = channel->getValue();
         progMap["channel"] = station->getValue();
 
         progMap["longchannel"] = ChannelText(longChannelFormat);
-        
-        
-        
         
         QDateTime startts(startDate->dateValue(), startTime->timeValue());
         QDateTime endts(endDate->dateValue(), endTime->timeValue());

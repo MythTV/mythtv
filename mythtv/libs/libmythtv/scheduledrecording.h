@@ -123,8 +123,9 @@ public:
     virtual void loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo);
     virtual void loadBySearch(QSqlDatabase *db, RecSearchType lsearch, QString what);
 
-    //virtual int exec(QSqlDatabase* db, bool saveOnExec = true, bool doLoad = false);
-
+    virtual int exec(QSqlDatabase* db, bool saveOnExec = true, bool doLoad = false)
+        { return ConfigurationDialog::exec(db, saveOnExec, doLoad); }    
+        
     void remove(QSqlDatabase* db);
     int getRecordID(void) const { return id->intValue(); };
     QString getProfileName(void) const;
@@ -230,8 +231,14 @@ protected:
     QString chanstr;
     QString chansign;
     QString channame;
+    QString searchForWhat;
+    QString searchType;
+    
     QString channelFormat;
     QString longChannelFormat;
+    QString timeFormat;
+    QString dateFormat;
+    QString shortDateFormat;
 };
 
 
