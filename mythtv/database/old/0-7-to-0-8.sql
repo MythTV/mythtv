@@ -16,11 +16,13 @@ CREATE TABLE IF NOT EXISTS codecparams
     PRIMARY KEY (profile, name)
 );
 
-ALTER TABLE allrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 1 REFERENCES recordingprofile(id);
-ALTER TABLE singlerecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 1 REFERENCES recordingprofile(id);
-ALTER TABLE timeslotrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 1 REFERENCES recordingprofile(id);
+ALTER TABLE allrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofile(id);
+ALTER TABLE singlerecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofile(id);
+ALTER TABLE timeslotrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofile(id);
 
-UPDATE allrecord SET profile = 1;
-UPDATE singlerecord SET profile = 1;
-UPDATE timeslotrecord SET profile = 1;
+UPDATE allrecord SET profile = 0;
+UPDATE singlerecord SET profile = 0;
+UPDATE timeslotrecord SET profile = 0;
 
+INSERT INTO recordingprofiles (name) VALUES ('Default');
+INSERT INTO recordingprofiles (name) VALUES ('Live TV');
