@@ -84,7 +84,7 @@ void *__av_mallocz_static(void** location, unsigned int size)
     return ptr;
 }
 /* free all static arrays and reset pointers to 0 */
-void av_free_static()
+void av_free_static(void)
 {
     if (array_static)
     {
@@ -157,8 +157,9 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
         int w, h, pixel_size;
         
         avcodec_get_chroma_sub_sample(s->pix_fmt, &h_chroma_shift, &v_chroma_shift);
-        
         switch(s->pix_fmt){
+        case PIX_FMT_RGB555:
+        case PIX_FMT_RGB565:
         case PIX_FMT_YUV422:
             pixel_size=2;
             break;

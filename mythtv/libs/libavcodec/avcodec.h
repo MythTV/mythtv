@@ -56,6 +56,7 @@ enum CodecID {
     CODEC_ID_AAC,
     CODEC_ID_MPEG4AAC,
     CODEC_ID_ASV1,
+    CODEC_ID_4XM,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -71,6 +72,7 @@ enum CodecID {
     CODEC_ID_ADPCM_IMA_QT,
     CODEC_ID_ADPCM_IMA_WAV,
     CODEC_ID_ADPCM_MS,
+    CODEC_ID_ADPCM_4XM,
 
 	/* AMR */
     CODEC_ID_AMR_NB,
@@ -116,8 +118,11 @@ enum SampleFormat {
 #define AVCODEC_MAX_AUDIO_FRAME_SIZE 131072
 
 /**
- * Required number of zero bytes at the end of the input bitstream for decoding.
- * to avoid overreading (and possibly segfaulting)
+ * Required number of additionally allocated bytes at the end of the input bitstream for decoding.
+ * this is mainly needed because some optimized bitstream readers read 
+ * 32 or 64 bit at once and could read over the end<br>
+ * Note, if the first 23 bits of the additional bytes are not 0 then damaged
+ * MPEG bitstreams could cause overread and segfault
  */
 #define FF_INPUT_BUFFER_PADDING_SIZE 8
 

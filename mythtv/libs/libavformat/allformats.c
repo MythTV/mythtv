@@ -38,6 +38,7 @@ void av_register_all(void)
     avienc_init();
     avidec_init();
     mov_init();
+    fourxm_init();
 
     /* file protocols */
     register_protocol(&file_protocol);

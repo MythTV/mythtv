@@ -329,6 +329,9 @@ int dv_init(void);
 /* ffm.c */
 int ffm_init(void);
 
+/* 4xm.c */
+int fourxm_init(void);
+
 /* rtsp.c */
 extern AVInputFormat redir_demux;
 int redir_open(AVFormatContext **ic_ptr, ByteIOContext *f);

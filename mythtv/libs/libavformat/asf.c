@@ -993,7 +993,7 @@ static int asf_get_packet(AVFormatContext *s)
     int c = get_byte(pb);
     if (c != 0x82) {
         if (!url_feof(pb))
-	    printf("ff asf bad header %x  at:%Ld\n", c, url_ftell(pb));
+	    printf("ff asf bad header %x  at:%lld\n", c, url_ftell(pb));
 	return -EIO;
     }
     if ((c & 0x0f) == 2) { // always true for now
@@ -1153,7 +1153,7 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 	    //printf("COMPRESS size  %d  %d  %d   ms:%d\n", asf->packet_obj_size, asf->packet_frag_timestamp, asf->packet_size_left, asf->packet_multi_size);
 	}
 	if (asf_st->frag_offset == 0) {
-	    /* new packet XXX */
+	    /* new packet */
 	    av_new_packet(&asf_st->pkt, asf->packet_obj_size, 0);
 	    asf_st->seq = asf->packet_seq;
 	    asf_st->pkt.pts = asf->packet_frag_timestamp - asf->hdr.preroll;
@@ -1220,7 +1220,7 @@ static int asf_read_close(AVFormatContext *s)
 
 static int asf_read_seek(AVFormatContext *s, int64_t pts)
 {
-    printf("SEEK TO %Ld", pts);
+    printf("SEEK TO %lld", pts);
     return -1;
 }
 

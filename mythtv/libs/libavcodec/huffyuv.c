@@ -237,17 +237,15 @@ static int generate_bits_table(uint32_t *dst, uint8_t *len_table){
     uint32_t bits=0;
 
     for(len=32; len>0; len--){
-        int bit= 1<<(32-len);
         for(index=0; index<256; index++){
-            if(len_table[index]==len){
-                if(bits & (bit-1)){
-                    fprintf(stderr, "Error generating huffman table\n");
-                    return -1;
-                }
-                dst[index]= bits>>(32-len);
-                bits+= bit;
-            }
+            if(len_table[index]==len)
+                dst[index]= bits++;
         }
+        if(bits & 1){
+            fprintf(stderr, "Error generating huffman table\n");
+            return -1;
+        }
+        bits >>= 1;
     }
     return 0;
 }
@@ -1099,7 +1097,7 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
         char *p= avctx->stats_out;
         for(i=0; i<3; i++){
             for(j=0; j<256; j++){
-                sprintf(p, "%Ld ", s->stats[i][j]);
+                sprintf(p, "%llu ", s->stats[i][j]);
                 p+= strlen(p);
                 s->stats[i][j]= 0;
             }
