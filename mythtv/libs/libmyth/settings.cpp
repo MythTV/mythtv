@@ -169,7 +169,7 @@ QWidget* CheckBoxSetting::configWidget(QWidget* parent,
 }
 
 QDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
-                                           const char* widgetName = 0) {
+                                           const char* widgetName) {
     QDialog* dialog = new QDialog(parent, widgetName, TRUE);
     QVBoxLayout* layout = new QVBoxLayout(dialog);
     layout->addWidget(configWidget(dialog));
@@ -197,7 +197,7 @@ QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
 }
 
 QWidget* ConfigurationWizard::configWidget(QWidget* parent,
-                                           const char* widgetName=0) {
+                                           const char* widgetName) {
     return dialogWidget(parent, widgetName);
 }
 
