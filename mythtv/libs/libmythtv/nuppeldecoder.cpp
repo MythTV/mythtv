@@ -898,7 +898,8 @@ void NuppelDecoder::GetFrame(int avignore)
         {
             if (frameheader.comptype == 'A')
             {
-                if (frameheader.timecode > 0 && frameheader.timecode < 5500000)
+                if (frameheader.timecode > 2000000 && 
+                    frameheader.timecode < 5500000)
                 {
                     effdsp = frameheader.timecode;
                     m_parent->SetEffDsp(effdsp);

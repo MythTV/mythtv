@@ -1457,7 +1457,7 @@ void Scheduler::AddNewRecords(void) {
         p->shareable = result.value(26).toInt();
         p->seriesid = result.value(27).toString();
         p->programid = result.value(28).toString();
-        p->stars =  result.value(29).toString().toFloat();
+        p->stars =  result.value(29).toDouble();
         
         p->repeat = result.value(20).toInt();
         

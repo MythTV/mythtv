@@ -535,7 +535,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                   QDateTime::fromString(query.value(14).toString(),
                                         Qt::ISODate);
         
-        proginfo->stars = query.value(15).toString().toFloat();
+        proginfo->stars = query.value(15).toDouble();
         proginfo->repeat = query.value(16).toInt();
         
         if (query.value(17).isNull() || query.value(17).toString().isEmpty())
