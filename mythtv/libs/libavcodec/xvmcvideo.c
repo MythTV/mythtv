@@ -65,7 +65,7 @@ static void set_block_pattern(const MpegEncContext *, XvMCMacroBlock *);
 static XvMCSurface* find_past_surface(MpegEncContext *, xvmc_render_state_t *);
 static XvMCSurface* find_future_surface(MpegEncContext *);
 static void setup_pmv(MpegEncContext *, XvMCMacroBlock *);
-static void setup_pmv_for_frame(MpegEncContext *, XvMCMacroBlock *);
+static void setup_pmv_frame(MpegEncContext *, XvMCMacroBlock *);
 static void setup_pmv_field(MpegEncContext *, XvMCMacroBlock *);
 static inline XvMCMacroBlock *macroblock(const xvmc_render_state_t *,
                                             int x, int y, int dct);
@@ -73,8 +73,8 @@ static inline void setup_context(MpegEncContext *s);
 static inline void DBG_printPictureStructureChanges(int picture_structure);
 static inline void handle_intra_block(const MpegEncContext *, const XvMCMacroBlock *,
                                       xvmc_render_state_t *render);
-static inline void handle_p_b_blocks(const MpegEncContext *, const XvMCMacroBlock *,
-                                      xvmc_render_state_t *render);
+static inline void handle_p_b_block(const MpegEncContext *, const XvMCMacroBlock *,
+                                    xvmc_render_state_t *render);
 
 //set s->block
 void XVMC_init_block(MpegEncContext *s)
