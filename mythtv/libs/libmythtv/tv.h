@@ -26,6 +26,8 @@ typedef enum
 class QSqlDatabase;
 class QDateTime;
 
+class OSD;
+
 class TV
 {
  public:
@@ -70,11 +72,14 @@ class TV
     void ChannelCommit(void);
 
     void ToggleInputs(void); 
- 
+
+    void DoPause(void);
+    int  calcFreeBufferSpace(void);
+    
     void UpdateOSD(void); 
     void GetChannelInfo(int lchannel, QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime,
-                        QString &endtime);
+                        QString &endtime, QString &callsign, QString &iconpath);
 
     void ConnectDB(void);
     void DisconnectDB(void);
@@ -136,6 +141,8 @@ class TV
     int tvtorecording;
     
     int playbackLen;
+
+    OSD *osd;
 };
 
 #endif

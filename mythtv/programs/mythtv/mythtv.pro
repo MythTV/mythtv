@@ -17,4 +17,5 @@ LIBS += -lmythtv -lNuppelVideo -lXv -lttf -lmp3lame -lavcodec
 TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a ../libmythtv/libmythtv.a
 
 # Input
+HEADERS += ../libmythtv/tv.h
 SOURCES += main.cpp

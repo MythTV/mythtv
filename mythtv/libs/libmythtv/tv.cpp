@@ -7,6 +7,7 @@
 
 #include "XJ.h"
 #include "tv.h"
+#include "osd.h"
 
 char theprefix[] = "/usr/local";
 
@@ -149,12 +150,12 @@ int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
     QString option2 = "Let it record and go back to the Main Menu";
     QString option3 = "Don't let it record, I want to watch TV";
 
-    nvp->SetDialogBox(message, option1, option2, option3, timeuntil);
+    osd->SetDialogBox(message, option1, option2, option3, timeuntil);
 
-    while (nvp->DialogVisible())
+    while (osd->DialogShowing())
         usleep(50);
 
-    int result = nvp->GetDialogSelection();
+    int result = osd->GetDialogSelection();
 
     tvtorecording = result;
 
@@ -448,6 +449,10 @@ void TV::HandleStateChange(void)
     else if (internalState == kState_WatchingLiveTV &&  
              nextState == kState_WatchingRecording)
     {
+        if (paused)
+            osd->EndPause();
+        paused = false;
+
         nvp->Pause();
         while (!nvp->GetPause())
             usleep(5);
@@ -480,6 +485,10 @@ void TV::HandleStateChange(void)
              (internalState == kState_WatchingPreRecorded &&
               nextState == kState_WatchingLiveTV))
     {
+        if (paused)
+            osd->EndPause();
+        paused = false;
+
         nvp->Pause();
         while (!nvp->GetPause())
             usleep(50);
@@ -536,6 +545,7 @@ void TV::HandleStateChange(void)
             usleep(50);
 
         frameRate = nvp->GetFrameRate();
+	osd = nvp->GetOSD();
     }
 
     if (closeRecorder)
@@ -626,6 +636,7 @@ void TV::SetupPlayer(void)
     nvp->SetAudioDevice(settings->GetSetting("AudioDevice"));
     nvp->SetLength(playbackLen);
     osd_display_time = settings->GetNumSetting("OSDDisplayTime");
+    osd = NULL;
 }
 
 void TV::TeardownPlayer(void)
@@ -639,7 +650,8 @@ void TV::TeardownPlayer(void)
     }
     paused = false;
     nvp = NULL;
-
+    osd = NULL;
+    
     if (prbuffer && prbuffer != rbuffer)
     {
         delete prbuffer;
@@ -759,6 +771,7 @@ void TV::RunTV(void)
         {
             if (paused)
             {
+                osd->UpdatePause(calcFreeBufferSpace(), "");
                 //fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
             }
             else
@@ -767,7 +780,7 @@ void TV::RunTV(void)
                 //fprintf(stderr, "\r Playing: %f seconds behind realtime", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate);
             }
 
-            if (channelqueued && !nvp->OSDVisible())
+            if (channelqueued && nvp->GetOSD() && !osd->Visible())
             {
                 ChannelCommit();
             }
@@ -780,13 +793,13 @@ void TV::RunTV(void)
 
 void TV::ProcessKeypress(int keypressed)
 {
-    if (nvp && nvp->DialogVisible())
+    if (nvp->GetOSD() && osd->DialogShowing())
     {
         switch (keypressed)
         {
-            case wsUp: nvp->DialogUp(); break;
-            case wsDown: nvp->DialogDown(); break;
-            case ' ': case wsEnter: case wsReturn: nvp->TurnOffOSD(); break;
+            case wsUp: osd->DialogUp(); break;
+            case wsDown: osd->DialogDown(); break;
+            case ' ': case wsEnter: case wsReturn: osd->TurnOff(); break;
             default: break;
         }
         
@@ -796,7 +809,7 @@ void TV::ProcessKeypress(int keypressed)
     switch (keypressed) 
     {
         case 's': case 'S':
-        case 'p': case 'P': paused = nvp->TogglePause(); break;
+        case 'p': case 'P': DoPause(); break;
 
         case wsRight: case 'd': case 'D': nvp->FastForward(5); break;
 
@@ -836,8 +849,33 @@ void TV::ProcessKeypress(int keypressed)
     }
 }
 
+int TV::calcFreeBufferSpace()
+{
+    float ret = (float)rbuffer->GetFreeSpace() / 
+                ((float)rbuffer->GetFileSize() - rbuffer->GetSmudgeSize());
+    ret *= 1000.0;
+
+    return (int)(1000 - ret);
+}
+
+void TV::DoPause(void)
+{
+    paused = nvp->TogglePause();
+
+    if (paused)
+    {
+        osd->StartPause(calcFreeBufferSpace(), ""); 
+    }
+    else
+        osd->EndPause();
+}
+
 void TV::ToggleInputs(void)
 {
+    if (paused)
+        osd->EndPause();
+    paused = false;
+
     nvp->Pause();
     while (!nvp->GetPause())
         usleep(5);
@@ -866,6 +904,10 @@ void TV::ToggleInputs(void)
 
 void TV::ChangeChannel(bool up)
 {
+    if (paused)
+        osd->EndPause();
+    paused = false;
+
     nvp->Pause();
     while (!nvp->GetPause())
         usleep(5);
@@ -918,7 +960,7 @@ void TV::ChannelKey(int key)
         channelkeysstored++;
     }
     channelKeys[3] = 0;
-    nvp->SetChannelText(channelKeys, 2);
+    osd->SetChannumText(channelKeys, 2);
 
     channelqueued = true;
 }
@@ -939,6 +981,10 @@ void TV::ChangeChannel(char *name)
 {
     if (!CheckChannel(name))
         return;
+
+    if (paused)
+        osd->EndPause();
+    paused = false;
 
     nvp->Pause();
     while (!nvp->GetPause())
@@ -976,24 +1022,25 @@ void TV::UpdateOSD(void)
     if (channelname.length() > 6)
     {
         QString dummy = "";
-        nvp->SetInfoText(channelname, dummy, dummy, dummy, dummy, dummy,
-                         osd_display_time);
+        osd->SetInfoText(channelname, dummy, dummy, dummy, dummy, dummy,
+                         dummy, dummy, osd_display_time);
     }
     else
     {
         QString title, subtitle, desc, category, starttime, endtime;
+        QString callsign, iconpath;
         GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category, 
-                       starttime, endtime);
+                       starttime, endtime, callsign, iconpath);
 
-        nvp->SetInfoText(title, subtitle, desc, category, starttime, endtime,
-                         osd_display_time);
-        nvp->SetChannelText(channel->GetCurrentName(), osd_display_time);
+        osd->SetInfoText(title, subtitle, desc, category, starttime, endtime,
+                         callsign, iconpath, osd_display_time);
+        osd->SetChannumText(channel->GetCurrentName(), osd_display_time);
     }
 }
 
 void TV::GetChannelInfo(int lchannel, QString &title, QString &subtitle,
                         QString &desc, QString &category, QString &starttime,
-                        QString &endtime)
+                        QString &endtime, QString &callsign, QString &iconpath)
 {
     title = "";
     subtitle = "";
@@ -1038,6 +1085,22 @@ void TV::GetChannelInfo(int lchannel, QString &title, QString &subtitle,
         test = query.value(6).toString();
         if (test != QString::null)
             category = test;
+    }
+
+    sprintf(thequery, "SELECT callsign,icon FROM channel WHERE channum = %d", 
+            lchannel);
+
+    query = db_conn->exec(thequery);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        test = query.value(0).toString();
+        if (test != QString::null)
+            callsign = test;
+        test = query.value(1).toString();
+        if (test != QString::null)
+            iconpath = test; 
     }
 }
 

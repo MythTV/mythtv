@@ -1,2 +1,2 @@
-Makefile.*
-.depend
+Makefile
+.qmake.internal.cache

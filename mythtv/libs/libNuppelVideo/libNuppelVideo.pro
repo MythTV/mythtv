@@ -20,6 +20,7 @@ HEADERS += effects.h \
            osd.h \
            RingBuffer.h \
            RTjpegN.h \
+           settings.h \
            ttfont.h \
            XJ.h \
            yuv2rgb.h
@@ -31,6 +32,7 @@ SOURCES += effects.cpp \
            osd.cpp \
            RingBuffer.cpp \
            RTjpegN.cpp \
+           settings.cpp \
            ttfont.cpp \
            XJ.cpp \
            yuv2rgb.cpp

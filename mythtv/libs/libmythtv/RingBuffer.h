@@ -30,7 +30,8 @@ class RingBuffer
     long long GetWritePosition(void) { return writepos; }
     long long GetTotalWritePosition(void) { return totalwritepos; }
     long long GetFileSize(void) { return filesize; }
-
+    long long GetSmudgeSize(void) { return smudgeamount; }
+    
     long long GetFreeSpace(void);
 
     long long GetFreeSpaceWithReadChange(long long readchange);

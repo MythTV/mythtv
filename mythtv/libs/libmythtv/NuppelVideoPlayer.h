@@ -74,33 +74,11 @@ class NuppelVideoPlayer
 
     void SetRecorder(NuppelVideoRecorder *nvcr) { nvr = nvcr; }
 
+    OSD *GetOSD(void) { return osd; }
+
     void SetOSDFontName(QString filename, char *prefix) 
                       { osdfilename = filename; osdprefix = prefix; }
     
-    void SetInfoText(const QString &text, const QString &subtitle,
-                     const QString &desc, const QString &category,
-                     const QString &start, const QString &end, int secs)
-                      { osd->SetInfoText(text, subtitle, desc, category,
-                                         start, end, secs); }
-    void SetChannelText(const QString &text, int secs)
-                      { osd->SetChannumText(text, secs); }
-
-    void SetDialogBox(const QString &message, const QString &optionone,
-                      const QString &optiontwo, const QString &optionthree,
-                      int secs)
-                      { osd->SetDialogBox(message, optionone, optiontwo,
-                                          optionthree, secs); }
-
-    void DialogUp(void) { osd->DialogUp(); }
-    void DialogDown(void) { osd->DialogDown(); }
-    int GetDialogSelection(void) { return osd->GetDialogSelection(); }
-    bool DialogVisible(void) { return osd->DialogShowing(); }
-
-    void ShowLastOSD(int secs) { osd->ShowLast(secs); }
-    void TurnOffOSD(void) { osd->TurnOff(); }
-   
-    bool OSDVisible(void) { if (osd) return osd->Visible(); else return false; }
-
     // don't use this on something you're playing
     char *GetScreenGrab(int secondsin, int &buflen, int &vw, int &vh);
 

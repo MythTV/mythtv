@@ -3,26 +3,12 @@
 
 #include "ttfont.h"
 #include <qstring.h>
+#include <qrect.h>
+#include <qpoint.h>
 #include <time.h>
 
 class QImage;
-
-class OSDImage
-{
-  public:
-    OSDImage(QString pathname);
-   ~OSDImage();
-   
-    unsigned char *yuv;
-    unsigned char *ybuffer;
-    unsigned char *ubuffer;
-    unsigned char *vbuffer;
-
-    unsigned char *alpha;
-
-    int width;
-    int height;
-};
+class OSDImage;
     
 class OSD
 {
@@ -34,7 +20,9 @@ class OSD
     
     void SetInfoText(const QString &text, const QString &subtitle, 
                      const QString &desc, const QString &category,
-                     const QString &start, const QString &end, int length);
+                     const QString &start, const QString &end, 
+                     const QString &callsign, const QString &iconpath,
+                     int length);
     void SetChannumText(const QString &text, int length);
 
     void ShowLast(int length);
@@ -47,57 +35,65 @@ class OSD
     void DialogDown(void);
     bool DialogShowing(void) { return show_dialog; } 
     int GetDialogSelection(void) { return currentdialogoption; }
-  
+
+    // position is 0 - 1000 
+    void StartPause(int position, QString slidertext);
+    void UpdatePause(int position, QString slidertext);
+    void EndPause(void);
+
     bool Visible(void) { return (time(NULL) <= displayframes); }
-   
+  
  private:
     void SetNoThemeDefaults();
     Efont *LoadFont(QString name, int size); 
+    QString FindTheme(QString name);
+   
+    bool LoadTheme();
+    QPoint parsePoint(QString text);
+    QRect parseRect(QString text);
+    void normalizeRect(QRect *rect);
     
-    void DarkenBox(int xstart, int ystart, int xend, int yend,
-                   unsigned char *screen);
-    void DrawStringIntoBox(int xstart, int ystart, int xend, int yend, 
-                           const QString &text, unsigned char *screen);
+    void DarkenBox(QRect &rect, unsigned char *screen);
+    void DrawStringIntoBox(QRect rect, const QString &text, 
+                           unsigned char *screen);
 
-    void DrawStringWithOutline(unsigned char *yuvptr, int x, int y, 
-                               const QString &text, Efont *font, int maxx,
-                               int maxy, bool rightjustify = false);
+    void DrawStringWithOutline(unsigned char *yuvptr, QRect rect, 
+                               const QString &text, Efont *font,
+                               bool rightjustify = false);
 
-    void DrawRectangle(int xstart, int ystart, int xend, int yend,
-                       unsigned char *screen);
+    void DrawRectangle(QRect &rect, unsigned char *screen);
 
     void BlendImage(OSDImage *image, int xstart, int ystart, 
                     unsigned char *screen);
-
+    void BlendFillSlider(OSDImage *image, int xstart, int ystart,
+                         int drawwidth, unsigned char *screen);
     
     void DisplayDialogNoTheme(unsigned char *yuvptr);
-    void DisplayInfoNoTheme(unsigned char *yuvptr);
+    void DisplayInfo(unsigned char *yuvptr);
     void DisplayChannumNoTheme(unsigned char *yuvptr);
+    void DisplayPause(unsigned char *yuvptr);
     
     QString fontname;
 
     int vid_width;
     int vid_height;
 
-    int info_y_start;
-    int info_y_end;
-    int info_x_start;
-    int info_x_end;
-    int info_width;
-    int info_height;
+    QRect infoRect;
     bool show_info;
     QString infotext;
     QString subtitletext;
     QString desctext;
     Efont *info_font;
     int infofontsize;
-
-    int channum_y_start;
-    int channum_x_start;
-    int channum_y_end;
-    int channum_x_end;
-    int channum_width;
-    int channum_height;
+    OSDImage *infobackground;
+ 
+    bool useinfoicon; 
+    QPoint infoiconpos;
+    OSDImage *infoicon;
+    QString infocallsign;
+    QRect callsignRect;
+    
+    QRect channumRect; 
     QString channumtext;
     bool show_channum;
     Efont *channum_font;
@@ -109,12 +105,7 @@ class OSD
 
     bool enableosd;
 
-    int dialog_y_start;
-    int dialog_x_start;
-    int dialog_y_end;
-    int dialog_x_end;
-    int dialog_width;
-    int dialog_height;
+    QRect dialogRect;
     QString dialogmessagetext;
     QString dialogoptionone;
     QString dialogoptiontwo;
@@ -125,10 +116,21 @@ class OSD
 
     QString fontprefix;
     
-    
     bool usingtheme;
-    
-    OSDImage *channelbackground;
+    QString themepath;
+
+    float hmult, wmult;
+
+    bool usepause;
+    bool show_pause;
+    int pauseposition;
+    QString pauseslidertext;
+    OSDImage *pausebackground;
+    OSDImage *pausesliderfill;
+    OSDImage *pausesliderdelete;
+    QRect pausestatusRect;
+    QRect pausesliderRect;
+    QString pausestatus;
 };
     
 #endif

@@ -1,0 +1,14 @@
+str InfoBackground=channelinfo.png
+str InfoPosition=0,-1
+str InfoTextBox=10,60,630,135
+# optional
+int InfoTextFontSize=18
+
+str InfoIconPosition=15,15
+str InfoCallSignRect=55,20,95,45
+
+str SeekBackground=pause.png
+str SeekPosition=0,-1
+str SeekStatusRect=10,20,100,45
+str SeekSliderRect=152,13,470,45
+str SeekSliderNormal=slider-normal.png

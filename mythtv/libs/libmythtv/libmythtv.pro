@@ -21,5 +21,7 @@ installfiles.files = helr.ttf
 INSTALLS = installfiles
  
 # Input
-HEADERS += channel.h frequencies.h programinfo.h settings.h tv.h
-SOURCES += channel.cpp frequencies.c programinfo.cpp settings.cpp tv.cpp
+HEADERS += channel.h frequencies.h programinfo.h tv.h ../libNuppelVideo/osd.h
+HEADERS += ../libNuppelVideo/NuppelVideoPlayer.h 
+HEADERS += ../libNuppelVideo/NuppelVideoRecorder.h
+SOURCES += channel.cpp frequencies.c programinfo.cpp tv.cpp

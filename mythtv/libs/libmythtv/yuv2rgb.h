@@ -46,5 +46,5 @@ yuv2rgb_fun yuv2rgb_init_mlib (int bpp, int mode);
 // actually does to i420
 void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
                       unsigned char *alpha, unsigned char *src, 
-                      int width, int height);
+                      int width, int height, int srcwidth);
 

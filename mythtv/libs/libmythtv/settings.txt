@@ -42,7 +42,7 @@ int ScaleBitrate=1
 # Maximum quality level.  1 is best, 31 is worst
 int MaxQuality=2
 # Minimum quality level.  1 is best, 31 is worst
-int MinQuality=31
+int MinQuality=15
 # Maximum quality difference between frames.
 int QualDiff=3
 # 

@@ -9,9 +9,9 @@ INSTALLS = target
 
 include (../settings.pro)
 
-INCLUDEPATH += ../libmythtv
+INCLUDEPATH += ../libNuppelVideo
 
 # Input
-HEADERS += dialogbox.h ../libmythtv/settings.h
-SOURCES += dialogbox.cpp main.cpp ../libmythtv/settings.cpp
+HEADERS += dialogbox.h ../libNuppelVideo/settings.h
+SOURCES += dialogbox.cpp main.cpp ../libNuppelVideo/settings.cpp
 

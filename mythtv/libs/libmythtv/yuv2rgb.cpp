@@ -247,14 +247,14 @@ yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
 // actually does to i420
 void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
                       unsigned char *alpha, unsigned char *src, 
-                      int width, int height)
+                      int width, int height, int srcwidth)
 {           
     int wrap, wrap4, x, y;
     int r, g, b, r1, g1, b1;
     unsigned char *p;
                       
     wrap = width;
-    wrap4 = width * 4;
+    wrap4 = srcwidth * 4;
     p = src;
     for(y=0;y<height;y+=2) {
         for(x=0;x<width;x+=2) {

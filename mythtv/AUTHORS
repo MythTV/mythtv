@@ -2,13 +2,15 @@ Main Author:
     Isaac Richards <ijr@po.cwru.edu>
 
 Original NuppelVideo version: 
-    Roman HOCHLEITNER <roman@mars.tuwien.ac.at>
+    Roman HOCHLEITNER <roman at mars.tuwien.ac.at>
+libavcodec, from ffmpeg.sf.net:
+    Fabrice Bellard <fabrice.bellard at free.fr>
 Rewritten player class and improved a/v sync code:
-    John Coiner <jcoiner@stanfordalumni.org>
+    John Coiner <jcoiner at stanfordalumni.org>
 TangoBlue theme:
     Forrest Walter - www.forrestwalter.com
-Liquid theme:
+LiquidTV theme:
     jer warren <>
 Selectable GUI sizes:
-    thor@lamedomainname.com
+    thor at lamedomainname.com
 

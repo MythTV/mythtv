@@ -348,7 +348,7 @@ EFont_draw_string(unsigned char *yuvptr, int x, int y, const QString &text,
    int video_width = font->vid_width;
    int video_height = font->vid_height;
 
-   char *ctext = (char *)text.ascii();
+   char *ctext = (char *)text.latin1();
    
    inx = 0;
    iny = 0;
