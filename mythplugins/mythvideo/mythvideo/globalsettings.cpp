@@ -79,7 +79,7 @@ class VideoNewBrowsable: public CheckBoxSetting, public GlobalSetting {
 public:
     VideoNewBrowsable():
         GlobalSetting("VideoNewBrowsable") {
-        setLabel(QObject::tr("Newly scanned files are  by default"));
+        setLabel(QObject::tr("Newly scanned files are browsable by default"));
         setValue(true);
         setHelpText(QObject::tr("If set, newly scanned files in the Video Manager "
                                 "will be marked as browsable and will appear in "
