@@ -241,6 +241,10 @@ Du har ingen DVD-enhet definierad.</translation>
         <translation>Väntar på tillstånd att börja omkodning</translation>
     </message>
     <message>
+        <source>EMT: </source>
+        <translation type="obsolete">EMT:</translation>
+    </message>
+    <message>
         <source>Transcoding Pass 1 of 2 ~</source>
         <translation>Omkodar pass 1 av 2 ~</translation>
     </message>
@@ -258,11 +262,11 @@ Du har ingen DVD-enhet definierad.</translation>
     </message>
     <message>
         <source>Simultaneous Transcode Jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal samtida omkodningsjobb</translation>
     </message>
     <message>
         <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestämmer hur många omkodningsprocesser som kan vara igång samtidigt. Från början är denna 1 vilket ger att endast en omkodning kan göras i taget.</translation>
     </message>
 </context>
 <context>
@@ -289,11 +293,11 @@ Du har ingen DVD-enhet definierad.</translation>
     </message>
     <message>
         <source>0 Process Selected Title</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Processa vald titel</translation>
     </message>
     <message>
         <source>0 Process Selected Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Processa valda titlar</translation>
     </message>
 </context>
 </TS>
