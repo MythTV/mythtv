@@ -423,6 +423,7 @@ public:
         addSelection("MMM d");
         addSelection("MM/dd");
         addSelection("MM.dd");
+	setHelpText("Your preferred date format.");
     };
 };
 
@@ -435,6 +436,10 @@ public:
         addSelection("hh:mm AP");
         addSelection("hh:mm");
         addSelection("h:mm");
+	setHelpText("Your preferred time format.  Choose a format "
+                    "with \"AP\" in it for an AM/PM display, otherwise "
+                    "your time display will be 24-hour or \"military\" "
+                    "time.");
     };
 };
 
