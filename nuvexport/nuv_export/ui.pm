@@ -428,13 +428,13 @@ package nuv_export::ui;
             }
         # Make sure this is a valid directory
             elsif (!-d $path) {
-                $path = undef;
                 print "$path exists, but is not a directory.\n";
+                $path = undef;
             }
         # Not writable
             elsif (!-w $path) {
-                $path = undef;
                 print "$path isn't writable.\n";
+                $path = undef;
             }
         }
         return $path;
