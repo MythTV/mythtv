@@ -77,7 +77,11 @@ bool VideoTree::checkParentPassword()
 {
     QDateTime curr_time = QDateTime::currentDateTime();
     QString last_time_stamp = gContext->GetSetting("VideoPasswordTime");
-
+    QString password = gContext->GetSetting("VideoAdminPassword");
+    if(password.length() < 1)
+    {
+        return true;
+    }
     //
     //  See if we recently (and succesfully)
     //  asked for a password
@@ -111,7 +115,6 @@ bool VideoTree::checkParentPassword()
     //  See if there is a password set
     //
     
-    QString password = gContext->GetSetting("VideoAdminPassword");
     if(password.length() > 0)
     {
         bool ok = false;
