@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-24, v2.81
+  2003-09-29, v2.82
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -260,9 +260,8 @@
   See http://linpvr.org/ <http://linpvr.org/> if you'd like to install
   MythTV onto a VIA Epia M machine.
 
-  See http://knoppmyth.geekweb.net/ <http://knoppmyth.geekweb.net/> if
-  you'd like to install a custom version of Knoppix optimized for
-  MythTV.
+  See http://mysettopbox.tv <http://mysettopbox.tv> if you'd like to
+  install a custom version of Knoppix optimized for MythTV.
 
   The contributors to MythTV are:
 
@@ -276,6 +275,7 @@
 
   +o  Overall structure of HOWTO and Mandrake 9.x documentation: Robert
      Kulagowski,  <mailto:rkulagow@rocketmail.com>
+
 
   +o  Red Hat Linux 8.0 documentation: Cedar McKay,
      <mailto:mythhowto.3.ohthetrees@spamgourmet.com>
@@ -2398,7 +2398,7 @@
   coming from the receiver.
 
   The next step is to convert those signals into something that can be
-  used to control MythTV.  MythTV now inclues native support for lirc
+  used to control MythTV.  MythTV now includes native support for lirc
   and can interact directly with
        $ cd ~/mythtv-0.11/configfiles
        $ cp lircrc.example ~/.lircrc
@@ -5069,7 +5069,7 @@
   The second method can be used on files that have already been
   transcoded (or files which were are already in the correct format), so
   only the frames immediately following a cut section will be re-
-  encoded, resultiing in a very minimal loss of quality.
+  encoded, resulting in a very minimal loss of quality.
 
   To enable automatic transcoding, do the following: start the setup
   program under the host-specific settings: set the Transcoder Auto-run

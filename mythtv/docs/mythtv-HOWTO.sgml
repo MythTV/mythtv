@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-09-24, v2.81
+<date>2003-09-29, v2.82
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -57,8 +57,8 @@ you use one of the big-name OS packages.
 See <url url="http://linpvr.org/" name="http://linpvr.org/"> if you'd like
 to install MythTV onto a VIA Epia M machine.
 
-See <url url="http://knoppmyth.geekweb.net/"
-name="http://knoppmyth.geekweb.net/"> if you'd like to install a custom
+See <url url="http://mysettopbox.tv"
+name="http://mysettopbox.tv"> if you'd like to install a custom
 version of Knoppix optimized for MythTV.
 
 The contributors to MythTV are:<label id="contributors">
@@ -1813,7 +1813,7 @@ maps the buttons on the remote control to the IR pulses coming from the
 receiver.
 
 The next step is to convert those signals into something that can be used
-to control MythTV.  MythTV now inclues native support for lirc and can
+to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
@@ -4072,7 +4072,7 @@ must be invoked on each recording individually.
 
 The second method can be used on files that have already been transcoded (or
 files which were are already in the correct format), so only the frames
-immediately following a cut section will be re-encoded, resultiing in a very
+immediately following a cut section will be re-encoded, resulting in a very
 minimal loss of quality.
 
 To enable automatic transcoding, do the following:
@@ -4860,6 +4860,7 @@ v2.81, 2003-09-24.  Put PVR-250 troubleshooting in the troubleshooting
 section.  Correct troubleshooting step.  Fix section header for PVR-250. 
 Full path for lircd.  Incorporate suggestion from -users on test_ioctl and
 -d parameter.
+v2.82, 2003-09-29.  Changed website for KnoppMyth.  Fix some typos.
 -->
 
 <!--
