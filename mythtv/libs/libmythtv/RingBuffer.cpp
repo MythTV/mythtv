@@ -350,11 +350,7 @@ void RingBuffer::Init(void)
     fill_threshold = -1;
     fill_min = -1;
 
-    readblocksize = 64000; // we only have max. 130k socket buffer size
-                           // we request readblocksize * 2
-                           // averages ~100k/read
-//  readblocksize = 128000;
-    requestedbytes = 0;
+    readblocksize = 128000;
 
     recorder_num = 0;
     remoteencoder = NULL;
@@ -477,68 +473,17 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
 
 int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
 {
-    int ret;
-    unsigned tot = 0;
-    unsigned zerocnt = 0;
-    bool hiteof = false;
-    int reqsize = readblocksize;
+    int ret = 0;
 
-    QSocketDevice *sock = rf->getSocket();
-
-    do 
+    ret = rf->Read(data, sz);
+    if(ret < 0)
     {
-        if (requestedbytes >= reqsize * 2)
-            break;
+        VERBOSE(VB_IMPORTANT, "RemoteFile::Read() failed in RingBuffer::safe_read().");
+        rf->Seek(internalreadpos, SEEK_SET);
+        ret = 0;
+     }
 
-        if (rf->RequestBlock(reqsize))
-        {
-            hiteof = true;
-            VERBOSE(VB_PLAYBACK, "RequestBlock extends beyond EOF.");
-            break;
-        }
-        requestedbytes += reqsize;
-    }
-    while (requestedbytes < reqsize * 2);
-    
-    unsigned int available = sock->bytesAvailable();
-
-    while (available < sz) 
-    {
-        if (hiteof)
-            break;
-
-        zerocnt++;
-        if (zerocnt >= 20)
-        {
-            break;
-        }
-        if (stopreads)
-            break;
-
-        available = sock->bytesAvailable();
-
-        if (available >= sz)
-            break;
-
-        usleep(100);
-    }
-
-    available = sock->bytesAvailable();
-
-    while (available > 0 && tot < sz && !stopreads)
-    {
-        ret = sock->readBlock(((char *)data) + tot, sz - tot);
-        available = sock->bytesAvailable();
-
-        tot += ret;
-    }
-
-    requestedbytes -= tot;
-
-    VERBOSE(VB_NETWORK, QString ("sz: %1 return: %2 requested: %3 avail: %4")
-            .arg(sz).arg(tot).arg(requestedbytes).arg(available));
-
-    return tot;
+    return ret;
 }
 
 #define READ_AHEAD_SIZE (10 * 256000)
@@ -552,6 +497,8 @@ void RingBuffer::CalcReadAheadThresh(int estbitrate)
     fill_threshold = 0;
     fill_min = 0;
 
+    VERBOSE(VB_PLAYBACK, QString("Estimated bitrate = %1").arg(estbitrate));
+
     if (remotefile)
         fill_threshold += 256000;
 
@@ -564,10 +511,8 @@ void RingBuffer::CalcReadAheadThresh(int estbitrate)
     if (estbitrate > 14000)
         fill_threshold += 256000;
 
-/*
     if (estbitrate > 17000)
         readblocksize = 256000;
-*/
 
     fill_min = 1;
 
@@ -619,7 +564,6 @@ void RingBuffer::ResetReadAhead(long long newinternal)
     internalreadpos = newinternal;
     ateof = false;
     readsallowed = false;
-    requestedbytes = 0;
     readAheadLock.unlock();
 }
 
@@ -825,8 +769,7 @@ void RingBuffer::ReadAheadThread(void)
 
         if ((used >= fill_threshold || wantseek) && !pausereadthread)
             usleep(500);
-
-        if (!pausereadthread)
+        else if (!pausereadthread)
             sched_yield();
     }
 

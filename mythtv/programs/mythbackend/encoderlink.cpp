@@ -602,15 +602,15 @@ QSocket *EncoderLink::GetReadThreadSocket(void)
     return NULL;
 }
 
-void EncoderLink::RequestRingBufferBlock(int size)
+int EncoderLink::RequestRingBufferBlock(int size)
 {
     if (local)
     {
-        tv->RequestRingBufferBlock(size);
-        return;
+        return tv->RequestRingBufferBlock(size);
     }
 
     cerr << "Should be local only query: RequestRingBufferBlock\n";
+    return -1;
 }
 
 long long EncoderLink::SeekRingBuffer(long long curpos, long long pos, 

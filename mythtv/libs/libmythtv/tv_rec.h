@@ -120,7 +120,7 @@ class TVRec
 
     void UnpauseRingBuffer(void);
     void PauseClearRingBuffer(void);
-    void RequestRingBufferBlock(int size);
+    int RequestRingBufferBlock(int size);
     long long SeekRingBuffer(long long curpos, long long pos, int whence);
 
     bool isParsingCommercials(ProgramInfo *pginfo);

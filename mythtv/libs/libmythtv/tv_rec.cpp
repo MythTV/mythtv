@@ -2052,28 +2052,44 @@ void TVRec::SetReadThreadSock(QSocket *sock)
     }
 }
 
-void TVRec::RequestRingBufferBlock(int size)
+int TVRec::RequestRingBufferBlock(int size)
 {
-    readthreadLock.lock();
-
     if (!readthreadlive || !rbuffer)
-        return;
+        return -1;
 
     char buffer[256001];
+    int tot = 0;
+    int ret = 0;
 
-    if (size > 256000)
-        size = 256000;
-
-    while (size > 0 && !rbuffer->GetStopReads() && readthreadlive)
+    readthreadLock.lock();
+    while (tot < size && !rbuffer->GetStopReads() && readthreadlive)
     {
-        int ret = rbuffer->Read(buffer, size);
-        if (!rbuffer->GetStopReads() && ret > 0)
-            WriteBlock(readthreadSock, buffer, ret);
+        int request = size - tot;
 
-        size -= ret;
+        if (request > 256000)
+            request = 256000;
+ 
+        ret = rbuffer->Read(buffer, request);
+        
+        if (rbuffer->GetStopReads() || ret <= 0)
+            break;
+        
+        if (!WriteBlock(readthreadSock->socketDevice(), buffer, ret))
+        {
+            tot = -1;
+            break;
+        }
+
+        tot += ret;
+        if (ret < request)
+            break; // we hit eof
     }
-
     readthreadLock.unlock();
+
+    if (ret < 0)
+        tot = -1;
+
+    return tot;
 }
 
 void TVRec::DoFlagCommercialsThread(void)

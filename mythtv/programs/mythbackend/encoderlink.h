@@ -90,7 +90,7 @@ class EncoderLink
     void SetReadThreadSock(QSocket *rsock);
     QSocket *GetReadThreadSocket(void);
 
-    void RequestRingBufferBlock(int size);
+    int RequestRingBufferBlock(int size);
     long long SeekRingBuffer(long long curpos, long long pos, int whence);
 
     char *GetScreenGrab(ProgramInfo *pginfo, const QString &filename, 

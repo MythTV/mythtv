@@ -22,7 +22,7 @@ class FileTransfer
 
     void Pause(void);
     void Unpause(void);
-    bool RequestBlock(int size);
+    int RequestBlock(int size);
 
     long long Seek(long long curpos, long long pos, int whence);
 

@@ -24,6 +24,8 @@ extern "C" {
 #include "lircevent.h"
 #endif
 
+#define SOCKET_BUF_SIZE  128000
+
 bool connectSocket(QSocketDevice *socket, const QString &host, int port)
 {
     QHostAddress hadr;
@@ -34,8 +36,8 @@ bool connectSocket(QSocketDevice *socket, const QString &host, int port)
   
     if (result)
     {
-        socket->setReceiveBufferSize(130000); // defaults to 87k 
-                                              // max is 131k
+        socket->setReceiveBufferSize(SOCKET_BUF_SIZE); // defaults to 87k 
+                                                       // max is 131k
         //cout << "connectSocket - buffsize: " 
         //     << socket->receiveBufferSize() << "\n";
     }                                          
@@ -202,29 +204,50 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
 }
 
 bool WriteBlock(QSocketDevice *socket, void *data, int len)
-{// QSocketDevice (frontend)
-    int size = len;
+{// QSocketDevice
     int written = 0;
-
-    unsigned int errorcount = 0;
-
-    while (size > 0)
+    int errorcount = 0;
+    bool bRet = true;
+    
+    while (written < len)
     {
-        int temp = socket->writeBlock((char *)data + written, size);
-        written += temp;
-        size -= temp;
-        if (size > 0)
+        // Push bytes to client. We may push more than the socket buffer,
+        // in which case this call will continue writing until all data has
+        // been sent. We're counting on the client thread to be pulling data 
+        // from the socket, if not we'll timeout and return false.
+        
+        int btw = len - written >= SOCKET_BUF_SIZE ? 
+                                   SOCKET_BUF_SIZE : len - written;
+        
+        int ret = socket->writeBlock((char *)data + written, btw);
+        if (ret > 0)
         {
-            printf("Partial WriteBlock %u\n", written);
-            if (++errorcount > 50)
+            errorcount = 0;
+            written += ret;
+            if (written < len)
+                usleep(10);
+        }
+        else if (ret < 0 && socket->error() != QSocketDevice::NoError)
+        {
+            VERBOSE(VB_IMPORTANT, QString("WriteBlock(): Socket write error,"
+                                        " error =  %1").arg(socket->error()));
+            bRet = false;
+            break;
+        }
+        else 
+        {
+            if (++errorcount > 150)
             {
-                return false;
-            }
-            usleep(50);
+                bRet = false;
+                VERBOSE(VB_IMPORTANT, "WriteBlock(): Aborting WriteBlock,"
+                                    " write to socket failed!");
+                break;
+            }    
+            usleep(100); // We're waiting on the client.
         }
     }
-
-    return true;
+    
+    return bRet;
 }
 
 int ReadBlock(QSocketDevice *socket, void *data, int maxlen)

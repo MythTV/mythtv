@@ -20,11 +20,10 @@ class RemoteFile
     void Start(void);
 
     void Close(void);
-    bool RequestBlock(int size);
 
     long long Seek(long long pos, int whence, long long curpos = -1);
 
-    int Read(void *data, int size, bool singlefile = false);
+    int Read(void *data, int size);
     void Reset(void);
 
     bool SaveAs(QByteArray &data);

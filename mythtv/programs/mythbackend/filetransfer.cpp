@@ -59,38 +59,44 @@ void FileTransfer::Unpause(void)
     readthreadLock.unlock();
 }
 
-bool FileTransfer::RequestBlock(int size)
+int FileTransfer::RequestBlock(int size)
 {
-    if (!readthreadlive)
-        return true;
-
-    if (size > 256000)
-        size = 256000;
+    if (!readthreadlive || !rbuffer)
+        return -1;
 
     char buffer[256001];
+    int tot = 0;
+    int ret = 0;
 
     readthreadLock.lock();
-
-    while (size > 0 && readthreadlive && !rbuffer->GetStopReads() && !ateof)
+    while (tot < size && !rbuffer->GetStopReads() && readthreadlive)
     {
-        int ret = rbuffer->Read(buffer, size);
-        if (!rbuffer->GetStopReads())
+        int request = size - tot;
+
+        if (request > 256000)
+            request = 256000;
+
+        ret = rbuffer->Read(buffer, request);
+        
+        if (rbuffer->GetStopReads() || ret <= 0)
+            break;
+            
+        if (!WriteBlock(sock->socketDevice(), buffer, ret))
         {
-            if (ret)
-                WriteBlock(sock, buffer, ret);
-            else
-            {
-                ateof = true;
-                size = 0;
-            }
+            tot = -1;
+            break;
         }
 
-        size -= ret;
+        tot += ret;
+        if (ret < request)
+            break; // we hit eof
     }
-
     readthreadLock.unlock();
 
-    return ateof;
+    if (ret < 0)
+        tot = -1;
+
+    return tot;
 }
 
 long long FileTransfer::Seek(long long curpos, long long pos, int whence)

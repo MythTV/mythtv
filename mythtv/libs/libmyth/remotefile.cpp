@@ -184,20 +184,6 @@ void RemoteFile::Reset(void)
         usleep(30000);
     }
 }
-    
-bool RemoteFile::RequestBlock(int size)
-{
-    QStringList strlist = QString(query).arg(recordernum);
-    strlist << "REQUEST_BLOCK" + append;
-    strlist << QString::number(size);
-
-    lock.lock();
-    WriteStringList(controlSock, strlist);
-    ReadStringList(controlSock, strlist, true);
-    lock.unlock();
-    
-    return strlist[0].toInt();
-}
 
 long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 {
@@ -223,42 +209,98 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     return retval;
 }
 
-int RemoteFile::Read(void *data, int size, bool singlefile)
+int RemoteFile::Read(void *data, int size)
 {
-    int ret;
-    unsigned tot = 0;
+    int recv = 0;
+    int sent = 0;
     unsigned zerocnt = 0;
+    bool error = false;
+    bool response = false;
     
-    qApp->lock();
-    while (sock->bytesAvailable() < size)
+    if (!sock->isOpen() || sock->error())
+        return -1;
+   
+    if (!controlSock->isOpen() || controlSock->error())
+        return -1;
+    
+    lock.lock();
+    
+    if (sock->bytesAvailable() > 0)
     {
-        int reqsize = 64000;
-        if (singlefile && size - sock->bytesAvailable() < 64000)
-            reqsize = size - sock->bytesAvailable();
-        qApp->unlock();
-
-        RequestBlock(reqsize);
-
-        zerocnt++;
-        if (zerocnt == 100)
+        VERBOSE(VB_NETWORK, 
+                "RemoteFile::Read(): Read socket not empty to start!");
+        while (sock->waitForMore(5) > 0)
         {
-            printf("EOF %u\n", size);
-            break;
+            int avail = sock->bytesAvailable();
+            char *trash = new char[avail + 1];
+            sock->readBlock(trash, avail);
+            delete [] trash;
         }
-        usleep(50);
-        qApp->lock();
     }
-
-    if (sock->bytesAvailable() >= size)
+    
+    if (controlSock->bytesAvailable() > 0)
     {
-        ret = sock->readBlock(((char *)data) + tot, size - tot);
-        tot += ret;
+        VERBOSE(VB_NETWORK, 
+                "RemoteFile::Read(): Control socket not empty to start!");
+        QStringList tempstrlist;
+        ReadStringList(controlSock, tempstrlist);
+    }
+    
+    QStringList strlist = QString(query).arg(recordernum);
+    strlist << "REQUEST_BLOCK" + append;
+    strlist << QString::number(size);
+    WriteStringList(controlSock, strlist);
+
+    sent = size;
+    
+    while (recv < sent && !error && zerocnt++ < 50)
+    {
+        while (recv < sent && sock->waitForMore(200) > 0)
+        {
+            int ret = sock->readBlock(((char *)data) + recv, sent - recv);
+            if (ret > 0)
+            {
+                recv += ret;
+            }
+            else if (sock->error() != QSocketDevice::NoError)
+            {
+                VERBOSE(VB_IMPORTANT, "RemoteFile::Read(): socket error");
+                error = true;
+                break;
+            }
+        }
+
+        if (controlSock->bytesAvailable() > 0)
+        {
+            ReadStringList(controlSock, strlist, true);
+            sent = strlist[0].toInt(); // -1 on backend error
+            response = true;
+        }
+    } 
+    
+    if (!error && !response)
+    {
+        if (ReadStringList(controlSock, strlist, true))
+        {
+            sent = strlist[0].toInt(); // -1 on backend error
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, 
+                   "RemoteFile::Read(): No response from control socket.");
+            sent = -1;
+        }
     }
 
-    qApp->unlock();
+    lock.unlock();
 
-    readposition += tot;
-    return tot;
+    VERBOSE(VB_NETWORK, QString("Read(): reqd=%1, rcvd=%2, rept=%3, error=%4")
+                                .arg(size).arg(recv).arg(sent).arg(error));
+
+    if (error || sent != recv)
+        recv = -1;
+
+    return recv;
 }
 
 bool RemoteFile::SaveAs(QByteArray &data)

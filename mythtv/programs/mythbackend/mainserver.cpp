@@ -1748,8 +1748,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     {
         int size = slist[2].toInt();
 
-        enc->RequestRingBufferBlock(size);
-        retlist << QString::number(false);
+        int ret = enc->RequestRingBufferBlock(size);
+        retlist << QString::number(ret);
     }
     else if (command == "SEEK_RINGBUF")
     {
