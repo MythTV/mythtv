@@ -30,14 +30,14 @@ public:
     };
 };
 
-class zipcode: public LineEditSetting, public TransientStorage {
-public: zipcode() { setLabel("ZIP/postal code"); };
+class PostalCode: public LineEditSetting, public TransientStorage {
+public: PostalCode() { setLabel("ZIP/postal code"); };
 };
 
-class providerSelector: public ComboBoxSetting, public TransientStorage {
+class ProviderSelector: public ComboBoxSetting, public TransientStorage {
     Q_OBJECT
 public:
-    providerSelector() { setLabel("Provider"); };
+    ProviderSelector() { setLabel("Provider"); };
 
 public slots:
     void fillSelections(const QString& zipcode);
@@ -47,18 +47,22 @@ class XMLTV_na_config: public VerticalConfigurationGroup {
 public:
     XMLTV_na_config(const VideoSource& _parent): parent(_parent) {
         setLabel("tv_grab_na configuration");
-        zipcode* z = new zipcode();
-        addChild(z);
+        postalcode = new PostalCode();
+        addChild(postalcode);
 
-        providerSelector* p = new providerSelector();
-        addChild(p);
+        provider = new ProviderSelector();
+        addChild(provider);
 
-        connect(z, SIGNAL(valueChanged(const QString&)),
-                p, SLOT(fillSelections(const QString&)));
+        connect(postalcode, SIGNAL(valueChanged(const QString&)),
+                provider, SLOT(fillSelections(const QString&)));
     };
+
+    virtual void save(QSqlDatabase* db);
 
 protected:
     const VideoSource& parent;
+    PostalCode* postalcode;
+    ProviderSelector* provider;
 };
 
 class XMLTVConfig: public VerticalConfigurationGroup, public TriggeredConfigurationGroup {
@@ -90,7 +94,7 @@ public:
     VideoSource(MythContext* context): ConfigurationDialog(context) {
         // must be first
         addChild(id = new ID());
-        addChild(new Name(*this));
+        addChild(name = new Name(*this));
         addChild(new XMLTVConfig(*this));
     };
         
@@ -100,6 +104,9 @@ public:
 
     static void fillSelections(QSqlDatabase* db, StringSelectSetting* setting);
     static QString idToName(QSqlDatabase* db, int id);
+
+    QString getSourceName(void) const { return name->getValue(); };
+        
 
 private:
     class ID: virtual public IntegerSetting,
@@ -126,6 +133,7 @@ private:
 
 private:
     ID* id;
+    Name* name;
 };
 
 class CaptureCard;

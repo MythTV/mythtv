@@ -46,7 +46,7 @@ QString CISetting::setClause(void) {
         .arg(getValue());
 }
 
-void providerSelector::fillSelections(const QString& zipcode) {
+void ProviderSelector::fillSelections(const QString& zipcode) {
     if (zipcode.length() < 5)
         return;
 
@@ -70,6 +70,24 @@ void providerSelector::fillSelections(const QString& zipcode) {
 
     f.close();
     fclose(fp);
+}
+
+void XMLTV_na_config::save(QSqlDatabase* db) {
+    (void)db;
+
+    char *home = getenv("HOME");
+    QString filename = QString("%1/.mythtv/%2.xmltv")
+        .arg(home).arg(parent.getSourceName());
+    QString command = QString("tv_grab_na --config-file %1 --configure --retry-limit %2 --retry-delay %3 --postalcode %4 --provider %5 --auto-new-channels add")
+        .arg(filename)
+        .arg(2)
+        .arg(30)
+        .arg(postalcode->getValue())
+        .arg(provider->getValue());
+
+    int ret = system(command);
+    if (ret != 0)
+        cout << command << endl << "exited with status " << ret << endl;
 }
 
 void VideoSource::fillSelections(QSqlDatabase* db,
