@@ -234,8 +234,14 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     {
         int w = DisplayWidth(data->XJ_disp, XJ_screen_num);
         int h = DisplayHeight(data->XJ_disp, XJ_screen_num);
-        w_mm = w_mm * gContext->GetNumSetting("GuiWidth", w) / w;
-        h_mm = h_mm * gContext->GetNumSetting("GuiHeight", h) / h;
+        int gui_w = gContext->GetNumSetting("GuiWidth", w);
+        int gui_h = gContext->GetNumSetting("GuiHeight", h);
+
+		if (gui_w)
+            w_mm = w_mm * gui_w / w;
+		if (gui_h)
+            h_mm = h_mm * gui_h / h;
+
         data->display_aspect = (float)w_mm/h_mm;
     }
     else

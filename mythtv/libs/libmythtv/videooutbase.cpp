@@ -383,14 +383,14 @@ void VideoOutput::MoveResize(void)
 
     if (GetDisplayAspect() > XJ_aspect)
     {
-        float pixNeeded = (h_mm * XJ_aspect) * ((float)dispw / w_mm);
+        float pixNeeded = (h_mm * XJ_aspect) * ((float)dispwoff / w_mm);
 
         dispxoff += (dispwoff - (int)pixNeeded) / 2;
         dispwoff = (int)pixNeeded;
     }
     else
     {
-        float pixNeeded = (w_mm / XJ_aspect) * ((float)disph / h_mm);
+        float pixNeeded = (w_mm / XJ_aspect) * ((float)disphoff / h_mm);
 
         dispyoff += (disphoff - (int)pixNeeded) / 2;
         disphoff = (int)pixNeeded;
