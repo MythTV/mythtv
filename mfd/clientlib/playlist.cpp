@@ -8,6 +8,9 @@
 
 */
 
+#include <iostream>
+using namespace std;
+
 #include "playlist.h"
 
 ClientPlaylist::ClientPlaylist(
@@ -28,6 +31,29 @@ ClientPlaylist::ClientPlaylist(
         entries.push_back((*it));
     }
 
+}
+
+bool ClientPlaylist::containsItem(int item_id)
+{
+    PlaylistEntryList::iterator it;
+    for(it = entries.begin(); it != entries.end(); ++it)
+    {
+        if(item_id < 0)
+        {
+            if ( (*it).isAnotherPlaylist() && (item_id * -1) == (*it).getId())
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if ( item_id == (*it).getId())
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 ClientPlaylist::~ClientPlaylist()

@@ -40,6 +40,7 @@ class ClientPlaylist
     void                       setActualTrackCount(int x){ actual_track_count = x;}
     uint                       getActualTrackCount(){ return actual_track_count; }
     QValueList<PlaylistEntry>* getListPtr(){return &entries;}
+    bool                       containsItem(int item_id);
 
   private:
   

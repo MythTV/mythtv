@@ -55,7 +55,9 @@ class MfdInterface : public QObject
     void startPlaylistCheck(
                             MfdContentCollection *mfd_collection,
                             UIListGenericTree *playlist, 
-                            UIListGenericTree *content
+                            UIListGenericTree *content,
+                            QIntDict<bool> *playlist_additions,
+                            QIntDict<bool> *playlist_deletions
                            );
     void stopPlaylistCheck();
     

@@ -153,7 +153,9 @@ void PlaylistChecker::wakeUp()
 void PlaylistChecker::startChecking(
                                     MfdContentCollection *an_mfd_content,
                                     UIListGenericTree    *a_playlist, 
-                                    UIListGenericTree    *some_content
+                                    UIListGenericTree    *some_content,
+                                    QIntDict<bool>       *some_playlist_additions,
+                                    QIntDict<bool>       *some_playlist_deletions
                                    )
 {
     stopChecking();
@@ -161,6 +163,8 @@ void PlaylistChecker::startChecking(
     mfd_content = an_mfd_content;
     playlist_tree = a_playlist;
     content_tree = some_content;
+    playlist_additions = some_playlist_additions;
+    playlist_deletions = some_playlist_deletions;
 
     keep_checking_mutex.lock();
         keep_checking = true;
@@ -200,6 +204,18 @@ void PlaylistChecker::check()
         return;
     }
 
+    if(playlist_additions == NULL)
+    {
+        cerr << "playlistchecker.o: started to run check(), but playlist_additions is NULL" << endl;
+        return;
+    }
+
+    if(playlist_deletions == NULL)
+    {
+        cerr << "playlistchecker.o: started to run check(), but playlist_deletions is NULL" << endl;
+        return;
+    }
+
 
     //
     //  Ask the MfdContentCollection object to check this content tree
@@ -207,7 +223,13 @@ void PlaylistChecker::check()
     //  not in the main GUI thread!)
     //
 
-    mfd_content->processContentTree(this, playlist_tree, content_tree);
+    mfd_content->processContentTree(
+                                    this, 
+                                    playlist_tree, 
+                                    content_tree, 
+                                    playlist_additions,
+                                    playlist_deletions
+                                   );
 
     
     /*

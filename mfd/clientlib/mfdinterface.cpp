@@ -302,12 +302,20 @@ void MfdInterface::askForStatus(int which_mfd)
 void MfdInterface::startPlaylistCheck(
                                         MfdContentCollection *mfd_collection,
                                         UIListGenericTree *playlist, 
-                                        UIListGenericTree *content
+                                        UIListGenericTree *content,
+                                        QIntDict<bool> *playlist_additions,
+                                        QIntDict<bool> *playlist_deletions
                                      )
 {
     if (playlist_checker)
     {
-        playlist_checker->startChecking(mfd_collection, playlist, content);
+        playlist_checker->startChecking(
+                                        mfd_collection, 
+                                        playlist, 
+                                        content,
+                                        playlist_additions,
+                                        playlist_deletions
+                                       );
     }
     else
     {

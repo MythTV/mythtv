@@ -36,7 +36,9 @@ class PlaylistChecker : public QThread
     void startChecking(
                         MfdContentCollection *an_mfd_content, 
                         UIListGenericTree *a_playlist, 
-                        UIListGenericTree *some_content
+                        UIListGenericTree *some_content,
+                        QIntDict<bool> *some_playlist_additions,
+                        QIntDict<bool> *some_playlist_deletions
                       );
     void stopChecking();
     void check();
@@ -64,6 +66,9 @@ class PlaylistChecker : public QThread
     MfdContentCollection    *mfd_content;
     UIListGenericTree       *playlist_tree;
     UIListGenericTree       *content_tree;
+
+    QIntDict<bool>          *playlist_additions;
+    QIntDict<bool>          *playlist_deletions;
 };
 
 #endif

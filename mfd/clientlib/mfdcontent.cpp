@@ -1076,7 +1076,14 @@ void MfdContentCollection::toggleItem(UIListGenericTree *node, bool turn_on)
         }
 }
 
-void MfdContentCollection::toggleTree(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on)
+void MfdContentCollection::toggleTree(
+                                        UIListTreeType *menu, 
+                                        UIListGenericTree *playlist_tree, 
+                                        UIListGenericTree *node, 
+                                        bool turn_on,
+                                        QIntDict<bool> *playlist_additions,
+                                        QIntDict<bool> *playlist_deletions
+                                     )
 {
 
     //
@@ -1115,6 +1122,7 @@ void MfdContentCollection::toggleTree(UIListTreeType *menu, UIListGenericTree *p
                             checkParent(oit->second);
                             if(at_least_one)
                             {
+                                updatePlaylistDeltas(playlist_additions, playlist_deletions, true, ui_child->getInt());
                                 alterPlaylist(menu, playlist_tree, oit->second, turn_on);
                                 at_least_one = false;
                             }
@@ -1124,10 +1132,12 @@ void MfdContentCollection::toggleTree(UIListTreeType *menu, UIListGenericTree *p
                     {
                         if(oit->second->getCheck() == 2)
                         {
+                            updatePlaylistDeltas(playlist_additions, playlist_deletions, false, ui_child->getInt());
                             oit->second->setCheck(0);
                             checkParent(oit->second);
                             if(at_least_one)
                             {
+                                updatePlaylistDeltas(playlist_additions, playlist_deletions, false, ui_child->getInt());
                                 alterPlaylist(menu, playlist_tree, oit->second, turn_on);
                                 at_least_one = false;
                             }
@@ -1159,6 +1169,7 @@ void MfdContentCollection::toggleTree(UIListTreeType *menu, UIListGenericTree *p
                             checkParent(oit->second);
                             if(at_least_one)
                             {
+                                updatePlaylistDeltas(playlist_additions, playlist_deletions, true, ui_child->getInt());
                                 alterPlaylist(menu, playlist_tree, oit->second, turn_on);
                                 at_least_one = false;
                             }
@@ -1172,6 +1183,7 @@ void MfdContentCollection::toggleTree(UIListTreeType *menu, UIListGenericTree *p
                             checkParent(oit->second);
                             if(at_least_one)
                             {
+                                updatePlaylistDeltas(playlist_additions, playlist_deletions, false, ui_child->getInt());
                                 alterPlaylist(menu, playlist_tree, oit->second, turn_on);
                                 at_least_one = false;
                             }
@@ -1186,11 +1198,73 @@ void MfdContentCollection::toggleTree(UIListTreeType *menu, UIListGenericTree *p
                 //  stuff below it. We iterate downwards.
                 //
             
-                toggleTree(menu, playlist_tree, ui_child, turn_on);
+                toggleTree(menu, playlist_tree, ui_child, turn_on, playlist_additions, playlist_deletions);
             }
         }
     }        
 }
+
+void MfdContentCollection::updatePlaylistDeltas(
+                                                QIntDict<bool> *playlist_additions,
+                                                QIntDict<bool> *playlist_deletions,
+                                                bool addition,
+                                                int item_id
+                                               )
+{
+    if (addition)
+    {
+        //
+        //  Something was just "ticked" on. If it's not something we can
+        //  remove from our deletions list, then add it to additions.
+        //
+        
+        if (playlist_deletions->find(item_id))
+        {
+            playlist_deletions->remove(item_id);
+        }
+        else
+        {
+            playlist_additions->insert(item_id, (const bool *)true);
+        }
+    }
+    else
+    {
+        //
+        //  Something was just "ticked" off. If it's not something we can
+        //  remove from our additions list, then add it to deletions.
+        //
+        
+        if (playlist_additions->find(item_id))
+        {
+            playlist_additions->remove(item_id);
+        }
+        else
+        {
+            playlist_deletions->insert(item_id, (const bool *)true);
+        }
+    }
+    
+    /*
+        Debugging - Turning this on and selecting All in the playlist editor
+        is fun
+    */
+    
+    cout << "playlist +: ";
+    QIntDictIterator<bool> pit( *playlist_additions ); 
+    for ( ; pit.current(); ++pit )
+    {
+        cout << pit.currentKey() << ", ";
+    }
+    cout << endl;
+    
+    cout << "playlist -: ";
+    QIntDictIterator<bool> mit( *playlist_deletions ); 
+    for ( ; mit.current(); ++mit )
+    {
+        cout << mit.currentKey() << ", ";
+    }
+    cout << endl;
+}                                               
 
 void MfdContentCollection::alterPlaylist(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on)
 {
@@ -1245,7 +1319,10 @@ void MfdContentCollection::alterPlaylist(UIListTreeType *menu, UIListGenericTree
                 if (child->getInt() == target_id && child->getAttribute(3) > 0)
                 {
                     UIListGenericTree *ui_child = (UIListGenericTree *)child;
-                    menu->moveAwayFrom(ui_child);
+                    if(menu)
+                    {
+                        menu->moveAwayFrom(ui_child);
+                    }
                     ui_child->RemoveFromParent();   // sortable removeRef() deletes this
                 }
            }
@@ -1254,7 +1331,10 @@ void MfdContentCollection::alterPlaylist(UIListTreeType *menu, UIListGenericTree
                 if (child->getInt() == target_id * -1 && child->getAttribute(3) < 0)
                 {
                     UIListGenericTree *ui_child = (UIListGenericTree *)child;
-                    menu->moveAwayFrom(ui_child);
+                    if(menu)
+                    {
+                        menu->moveAwayFrom(ui_child);
+                    }
                     ui_child->RemoveFromParent();   // sortable removeRef() deletes this
                 }
            }
@@ -1519,7 +1599,13 @@ void MfdContentCollection::turnOffTree(PlaylistChecker* playlist_checker, UIList
     }
 }
 
-void MfdContentCollection::processContentTree(PlaylistChecker *playlist_checker, UIListGenericTree *playlist_tree, UIListGenericTree *content_tree)
+void MfdContentCollection::processContentTree(
+                                                PlaylistChecker *playlist_checker, 
+                                                UIListGenericTree *playlist_tree, 
+                                                UIListGenericTree *content_tree,
+                                                QIntDict<bool> *playlist_additions,
+                                                QIntDict<bool> *playlist_deletions
+                                             )
 {
     //
     //  Make sure the tree starts out all turned off 
@@ -1575,6 +1661,99 @@ void MfdContentCollection::processContentTree(PlaylistChecker *playlist_checker,
     }
     
     //
+    //  Now add anything that's been locally added
+    //
+    
+    QIntDictIterator<bool> pit( *playlist_additions ); 
+    while ( pit.current() && playlist_checker->keepChecking())
+    {
+        if ( playlist->containsItem(pit.currentKey()) )
+        {
+            //
+            //  This is already on the playlists, which probably means the
+            //  user added it, and then an updated version came over the
+            //  wire that already had it added. Remove it from the local
+            //  additions list.
+            //
+            
+            playlist_additions->remove(pit.currentKey());
+        }
+        else
+        {
+            int multiplier = 1;
+            int node_id = pit.currentKey();
+            if ( node_id < 0)
+            {
+                multiplier = -1;
+                node_id = node_id * -1;
+            }
+
+            bool at_least_one = true;
+            SelectableContentMap::iterator it;
+            for (it  = selectable_content_map.lower_bound(((which_collection * METADATA_UNIVERSAL_ID_DIVIDER) + node_id) * multiplier);
+                 it != selectable_content_map.upper_bound(((which_collection * METADATA_UNIVERSAL_ID_DIVIDER) + node_id) * multiplier);
+                 ++it)
+            {
+                it->second->setCheck(2);
+                checkParent(it->second);
+                if(at_least_one)
+                {
+                    alterPlaylist(NULL, playlist_tree, it->second, true);
+                    at_least_one = false;
+                }
+            }
+            ++pit;
+        }
+    }
+    
+    if(!playlist_checker->keepChecking())
+    {
+        return;
+    }
+    
+    //
+    //  And remove anything that's been locally deleted
+    //
+    
+    QIntDictIterator<bool> mit( *playlist_deletions ); 
+    while ( mit.current() && playlist_checker->keepChecking())
+    {
+        if (playlist->containsItem(mit.currentKey()) )
+        {
+
+            int multiplier = 1;
+            int node_id = mit.currentKey();
+            if ( node_id < 0)
+            {
+                multiplier = -1;
+                node_id = node_id * -1;
+            }
+
+            bool at_least_one = true;
+            SelectableContentMap::iterator it;
+            for (it  = selectable_content_map.lower_bound(((which_collection * METADATA_UNIVERSAL_ID_DIVIDER) + node_id) * multiplier);
+                 it != selectable_content_map.upper_bound(((which_collection * METADATA_UNIVERSAL_ID_DIVIDER) + node_id) * multiplier);
+                 ++it)
+            {
+                it->second->setCheck(0);
+                checkParent(it->second);
+                if(at_least_one)
+                {
+                    alterPlaylist(NULL, playlist_tree, it->second, false);
+                    at_least_one = false;
+                }
+            }
+            ++mit;
+        }
+    }
+    
+
+    if(!playlist_checker->keepChecking())
+    {
+        return;
+    }
+    
+    //
     //  Grey out playlists that would lead to infinite recursion
     //
     
@@ -1595,6 +1774,43 @@ void MfdContentCollection::processContentTree(PlaylistChecker *playlist_checker,
         }
         ++pl_it;
     }
+}
+
+int MfdContentCollection::countTracks(UIListGenericTree *playlist_tree)
+{
+    //
+    //  Iterate over it. A track is +1, for a playlist, we need to ask the
+    //  playlist how many tracks it has
+    //
+ 
+    int numb_tracks = 0;   
+    QPtrList<GenericTree> *all_children = playlist_tree->getAllChildren();
+    QPtrListIterator<GenericTree> it(*all_children);
+    GenericTree *child = NULL;
+    while ((child = it.current()) != 0)
+    {
+        if(child->getAttribute(3) > 0)
+        {
+            ++numb_tracks;
+        }
+        else
+        {
+            ClientPlaylist *ref_playlist = getAudioPlaylist(child->getAttribute(0), child->getInt());
+            if(ref_playlist)
+            {
+                numb_tracks += ref_playlist->getActualTrackCount();
+            }
+            else
+            {
+                cerr << "mfdcontent.o: can't find playlist listed on a "
+                     << "playlist (?)"
+                     << endl;
+            }
+        }
+        ++it;
+    }    
+    
+    return numb_tracks;
 }
 
 void MfdContentCollection::printTree(UIListGenericTree *node, int depth)

@@ -307,6 +307,12 @@ void HttpOutResponse::createHeaderBlock(
               )
             {
                 QString file_range_header;
+                
+                //
+                //  Some versions of iTunes want the word "bytes" to appear
+                //  in the Content-Range: header, and some don't
+                //
+
                 if(bytes_in_content_range_header)
                 {                
                     file_range_header = QString("Content-Range: bytes %1-%2/%3\r\n")

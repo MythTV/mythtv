@@ -15,6 +15,7 @@
 using namespace std;
 
 #include <qintdict.h>
+#include <qvaluelist.h>
 
 class Metadata;
 class AudioMetadata;
@@ -62,13 +63,38 @@ class MfdContentCollection
     UIListGenericTree* constructPlaylistTree(ClientPlaylist *playlist);
     UIListGenericTree* getContentTree(int which_collection, bool pristine=false);
     void               toggleItem(UIListGenericTree *node, bool turn_on);
-    void               toggleTree(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
+
+    void               toggleTree(
+                                    UIListTreeType *menu, 
+                                    UIListGenericTree *playlist_tree, 
+                                    UIListGenericTree *node, 
+                                    bool turn_on,
+                                    QIntDict<bool> *playlist_additions,
+                                    QIntDict<bool> *playlist_deletions
+                                 );
+
+    void                updatePlaylistDeltas(
+                                                QIntDict<bool> *playlist_additions,
+                                                QIntDict<bool> *playlist_deletions,
+                                                bool addition,
+                                                int item_id
+                                            );
+
     void               alterPlaylist(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
     void               checkParent(UIListGenericTree *node);
     bool               crossReferenceExists(ClientPlaylist *subject, ClientPlaylist *object, int depth);
     void               markNodeAsHeld(UIListGenericTree *node, bool held_or_not);
     void               turnOffTree(PlaylistChecker *playlist_checker, UIListGenericTree *content_tree);
-    void               processContentTree(PlaylistChecker *playlist_checker, UIListGenericTree *playlist_tree, UIListGenericTree *content_tree);
+
+    void               processContentTree(
+                                            PlaylistChecker *playlist_checker, 
+                                            UIListGenericTree *playlist_tree, 
+                                            UIListGenericTree *content_tree,
+                                            QIntDict<bool> *playlist_additions,
+                                            QIntDict<bool> *playlist_deletions
+                                         );
+
+    int                countTracks(UIListGenericTree *playlist_tree);
     void               printTree(UIListGenericTree *node, int depth=0);  //  for debugging
 
     void sort();
