@@ -2152,10 +2152,7 @@ void ThemedMenuPrivate::Draw(MythPainter *p,
                              int /* yoffset */, 
                              int alphaMod)
 {
-#if 0
-    d->paintLogo(p, alphaMod);
-#endif
-
+    m_state->paintLogo(p, alphaMod);
     m_state->paintTitle(p, alphaMod);
 
     paintWatermark(p, alphaMod);
