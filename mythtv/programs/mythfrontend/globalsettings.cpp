@@ -685,9 +685,15 @@ ThemeSettings::ThemeSettings(MythContext *context)
     theme->addChild(new ThemeSelector());
     theme->addChild(new GuiWidth());
     theme->addChild(new GuiHeight());
-    theme->addChild(new ThemeQt());
     theme->addChild(new MythDateFormat());
     theme->addChild(new MythTimeFormat());
-
     addChild(theme);
+
+    VerticalConfigurationGroup* qttheme = new VerticalConfigurationGroup(false);
+    qttheme->setLabel("QT");
+    qttheme->addChild(new QtFontSmall());
+    qttheme->addChild(new QtFontMedium());
+    qttheme->addChild(new QtFontBig());
+    qttheme->addChild(new ThemeQt());
+    addChild(qttheme);
 }
