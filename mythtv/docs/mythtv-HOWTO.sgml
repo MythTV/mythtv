@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-27, v1.058
+<date>2002-12-28, v1.059
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1728,6 +1728,9 @@ $
 mythtv may cause loss of data on your system.  There is no guarantee that the development
 version of mythtv will work for you.
 
+<bf>THERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR
+OWN RISK.</bf>
+
 Here are some of the features in version 0.8:
 <itemize>
 <item>A front-end and back-end system.  The back-end is responsible for
@@ -1751,23 +1754,35 @@ CPU utilization.
 <bf>NOTE</bf>:  Problem reports for version 0.8 posted to the mailing list
 should have accompanying solutions.
 
-Before you begin, shutdown all running instances of 0.7.
+Before you begin, shutdown all running instances of 0.7.  You should perform
+a <tt>make clean</tt> before starting the compile process.
 
-Next, determine if you are going to upgrade an existing 0.7 system, or if
-you are going to start from scratch.  If you are upgrading an existing
-system, you must run the <tt>database/0-7-to-0-8.sql</tt> script.  This will
-add additional tables to the mythconverg database.
+Compile and install the system as you would a 0.7 system by following the
+instructions found in this HOWTO.  If you are installing mythtv on a new
+system, then install the database by running the <tt>database/mc.sql</tt>
+script as detailed in earlier sections of this document.
 
-Compile the system as you would a 0.7 system by following the instructions
-found in this HOWTO.  If you are upgrading an existing system, skip the step
-where you create the database since you've just done that in the previous
-step.
+However, if you are upgrading an existing 0.7 system, you <em>must</em> run the
+<tt>database/0-7-to-0-8.sql</tt> script before running the setup program to
+ensure that the database structure is up to date.
 
 Next, you must edit the
-<tt>/usr/local/share/mythtv/backend_settings.txt</tt> file on each client. 
-Specify the IP address of the back-end server and port.
+<tt>/usr/local/share/mythtv/backend_settings.txt</tt> file.  Specify the IP
+address of the back-end server and port.  This file is read by the backend
+server during start-up.
 
-To run the new version of mythtv, you must first start the back-end server:
+Once you're done editing the file, start the setup program:
+<tscreen><verb>
+$ cd setup
+$ ./setup
+</verb></tscreen>
+
+This will open the setup wizard which will allow you to configure your
+system.
+
+Once the setup wizard is done: to run the new version of mythtv, you must
+first start the back-end server:
+
 <tscreen><verb>
 $ mythbackend &
 </verb></tscreen>
@@ -1850,6 +1865,10 @@ v1.056, 2002-12-24.  Updated Gentoo mysql instruction.
 v1.057, 2002-12-25.  Added pointer to other window managers.  Added section
 on mythtv-0.8.
 v1.058, 2002-12-27.  Added text on configuring urpmi for Mandrake.
+v1.059, 2002-12-28.  Updated myth-0.8 install docs.  Added big fat warning
+for people that think that development code is supposed to work correctly
+out of the box, or that the initial instructions have any basis in reality. 
+Not that they'll read it.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
