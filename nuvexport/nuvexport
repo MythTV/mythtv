@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Last Updated: 2004.12.14 (xris)
+# Last Updated: 2005.01.20 (xris)
 
 # Autoflush buffers
     $|++;
@@ -11,7 +11,7 @@
     # Annoy people running as root
         if ($< < 1) {
             print "You are running nuvexport as root -- this is not advised.\nPress ENTER if you really want to do this.\n";
-            <>;
+            <STDIN>;
         }
     }
 
