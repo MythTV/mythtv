@@ -270,27 +270,27 @@ Du har ingen DVD-enhet definierad.</translation>
     </message>
     <message>
         <source>On DVD insertion</source>
-        <translation type="unfinished"></translation>
+        <translation>Vid iläggning av DVD</translation>
     </message>
     <message>
         <source>Display mythdvd menu menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa MythDVD-meny</translation>
     </message>
     <message>
         <source>Do nothing</source>
-        <translation type="unfinished"></translation>
+        <translation>Gör ingenting</translation>
     </message>
     <message>
         <source>Play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Spela DVD</translation>
     </message>
     <message>
         <source>Rip DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiera DVD</translation>
     </message>
     <message>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation>Mediaövervakning måste aktiveras för att tillåta denna funktion.</translation>
     </message>
 </context>
 <context>
@@ -341,7 +341,7 @@ Du har ingen DVD-enhet definierad.</translation>
     </message>
     <message>
         <source>0:00:00</source>
-        <translation type="unfinished"></translation>
+        <translation>0:00:00</translation>
     </message>
 </context>
 <context>
