@@ -303,10 +303,6 @@
         <translation>Nee, bewaar de opname, ik heb me bedacht.</translation>
     </message>
     <message>
-        <source>Delete this recording?</source>
-        <translation type="obsolete">Deze opname verwijderen?</translation>
-    </message>
-    <message>
         <source>Allow this program to AutoExpire?</source>
         <translation>Dit programma automatisch laten vervallen?</translation>
     </message>
@@ -329,10 +325,6 @@
     <message>
         <source>No, continue recording it</source>
         <translation>Blijf opnemen</translation>
-    </message>
-    <message>
-        <source>Select action:</source>
-        <translation type="obsolete">Selecteer:</translation>
     </message>
     <message>
         <source>Play</source>
@@ -486,40 +478,8 @@
         <translation>Er zijn geen programma&apos;s gevonden. Probeer een andere zoekopdracht.</translation>
     </message>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Neem enkel deze vertoning op</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Neem enkel vertoningen op dit kanaal op</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Neem alle vertoningen op</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Neem deze vertoning niet op</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fout!</translation>
-    </message>
-    <message>
         <source>       !! No Programs !!</source>
         <translation>       !! Geen programma&apos;s !!</translation>
-    </message>
-    <message>
-        <source>Recording every day when shown in this timeslot</source>
-        <translation type="obsolete">Dagelijkse vertoningen opnemen in dit tijdsblok</translation>
-    </message>
-    <message>
-        <source>Recording every week when shown in this timeslot</source>
-        <translation type="obsolete">Wekelijkse vertoningen opnemen in dit tijdsblok</translation>
-    </message>
-    <message>
-        <source>Recording one showing of this program</source>
-        <translation type="obsolete">Neem dit programma eenmalig op</translation>
     </message>
 </context>
 <context>
@@ -535,10 +495,6 @@
     <message>
         <source>Title Search</source>
         <translation>Zoek programma&apos;s</translation>
-    </message>
-    <message>
-        <source>Description Search</source>
-        <translation type="obsolete">Zoeken op omschrijving</translation>
     </message>
     <message>
         <source>Channel Search</source>
@@ -591,6 +547,14 @@
     <message>
         <source>Record</source>
         <translation>Neem op</translation>
+    </message>
+    <message>
+        <source>Time Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Time</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -763,44 +727,12 @@
         <translation>knip</translation>
     </message>
     <message>
-        <source>Schedule</source>
-        <translation type="obsolete">Plannen</translation>
-    </message>
-    <message>
-        <source>Record only this showing</source>
-        <translation type="obsolete">Enkel deze vertoning van het programma opnemen</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every day</source>
-        <translation type="obsolete">Dit programma dagelijks in dit tijdsblok opnemen</translation>
-    </message>
-    <message>
-        <source>Record at any time on this channel</source>
-        <translation type="obsolete">Dit programma altijd op dit kanaal opnemen</translation>
-    </message>
-    <message>
-        <source>Record at any time on any channel</source>
-        <translation type="obsolete">Dit programma altijd en op alle kanalen opnemen</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every week</source>
-        <translation type="obsolete">Dit programma wekelijks in dit tijdsblok opnemen</translation>
-    </message>
-    <message>
-        <source>Do not record this program</source>
-        <translation type="obsolete">Dit programma niet opnemen</translation>
-    </message>
-    <message>
         <source>Profile</source>
         <translation>Profiel</translation>
     </message>
     <message>
         <source>Rank</source>
         <translation>Rang</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Automatisch vervallen</translation>
     </message>
     <message>
         <source>Not Recording</source>
@@ -1140,14 +1072,6 @@
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Always use Advanced Recording Options screen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Always use the Advanced Recording Options screen when editing a scheduled recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1708,10 +1632,6 @@
         <translation>Wordt opgenomen</translation>
     </message>
     <message>
-        <source>Priority</source>
-        <translation type="obsolete">Prioriteit</translation>
-    </message>
-    <message>
         <source>Enable AC3 to SPDIF passthrough</source>
         <translation>AC3 naar SPDIF geluid</translation>
     </message>
@@ -1790,50 +1710,6 @@
     <message>
         <source>Yes, Exit and Shutdown</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Myth version:</source>
-        <translation>Myth versie:</translation>
-    </message>
-    <message>
-        <source>Last mythfilldatabase guide update:</source>
-        <translation>Laatste programmagids update:</translation>
-    </message>
-    <message>
-        <source>Started:   </source>
-        <translation>Begonnen:    </translation>
-    </message>
-    <message>
-        <source>Finished: </source>
-        <translation>Einde: </translation>
-    </message>
-    <message>
-        <source>Result: </source>
-        <translation>Resultaat: </translation>
-    </message>
-    <message>
-        <source>There&apos;s no guide data available! </source>
-        <translation>De programmagids is leeg! </translation>
-    </message>
-    <message>
-        <source>Have you run mythfilldatabase?</source>
-        <translation>Probleem met je internetconnectie?</translation>
-    </message>
-    <message>
-        <source>There is guide data until </source>
-        <translation>Er is programmadata tot </translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation>dagen</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation>dag</translation>
-    </message>
-    <message>
-        <source>WARNING: is mythfilldatabase running?</source>
-        <translation>Probleem met de programmadata?</translation>
     </message>
     <message>
         <source>Not Flagged</source>
@@ -2914,14 +2790,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Server</translation>
     </message>
     <message>
-        <source>Start Early (minutes)</source>
-        <translation type="obsolete">Begin Vroeger (minuten)</translation>
-    </message>
-    <message>
-        <source>End Late   (minutes)</source>
-        <translation type="obsolete">Stop Later (minuten)</translation>
-    </message>
-    <message>
         <source>Wait for SEQ start header.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2932,10 +2800,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Find One Recording</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record one showing of this program</source>
-        <translation type="obsolete">Dit programma eenmalig opnemen.</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -2990,46 +2854,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Index Gewist</translation>
     </message>
     <message>
-        <source>Duplicate Location</source>
-        <translation type="obsolete">Locatie Dubbels</translation>
-    </message>
-    <message>
-        <source>All places</source>
-        <translation type="obsolete">Overal</translation>
-    </message>
-    <message>
-        <source>Current Recs</source>
-        <translation type="obsolete">Huidige Opnames</translation>
-    </message>
-    <message>
-        <source>Previous Recs</source>
-        <translation type="obsolete">Oude Opnames</translation>
-    </message>
-    <message>
-        <source>Duplicate Check</source>
-        <translation type="obsolete">Dubbels Controleren</translation>
-    </message>
-    <message>
-        <source>Sub &amp; Desc</source>
-        <translation type="obsolete">Aflevering &amp; Beschr</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation type="obsolete">Beschrijving</translation>
-    </message>
-    <message>
-        <source>Max episodes</source>
-        <translation type="obsolete">Max Afleveringen</translation>
-    </message>
-    <message>
-        <source>Delete oldest over Max</source>
-        <translation type="obsolete">Oudste Wissen en Nieuwe Opnemen</translation>
-    </message>
-    <message>
-        <source>Recording Group</source>
-        <translation type="obsolete">Opnamegroep</translation>
-    </message>
-    <message>
         <source>Open DVB card on demand</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3048,10 +2872,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Default Recording Group to display</source>
         <translation>Standaard opnamegroep om weer te geven</translation>
-    </message>
-    <message>
-        <source>Default Recording Group to display on the view recordings screen.</source>
-        <translation type="obsolete">Standaard opnamegroep om weer te geven.</translation>
     </message>
     <message>
         <source>Save current Recording Group view when changed</source>
@@ -3134,22 +2954,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>deze aflevering zal op een vroeger tijdstip opgenomen worden.</translation>
     </message>
     <message>
-        <source>another program with a higher priority will be recorded instead.</source>
-        <translation type="obsolete">een ander programma met een hogere prioriteit zal opgenomen worden.</translation>
-    </message>
-    <message>
-        <source>this episode will be recorded at a later time instead.</source>
-        <translation type="obsolete">deze aflevering zal later opgenomen worden.</translation>
-    </message>
-    <message>
         <source>Clear Override</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The following programs will be recorded instead:
-</source>
-        <translation type="obsolete">Dit programma wordt in de plaats opgenomen: 
-</translation>
     </message>
     <message>
         <source>30m</source>
@@ -3460,14 +3266,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show group name instead of &quot;All Programs&quot;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show group summary.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3656,10 +3454,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Path to use for logging output from the mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DataDirect Status: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3886,10 +3680,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Pre/Post Roll</source>
-        <translation>Start/Stop tijd</translation>
-    </message>
-    <message>
         <source>Scheduling Options</source>
         <translation>Opname schema</translation>
     </message>
@@ -3922,20 +3712,8 @@ Myth will now exit.</source>
         <translation>Maak een nieuwe opnamegroep</translation>
     </message>
     <message>
-        <source>Record this program as shown</source>
-        <translation>Neem op zoals weergegeven</translation>
-    </message>
-    <message>
         <source>Program details</source>
         <translation>Programmadetails</translation>
-    </message>
-    <message>
-        <source>List upcoming episodes</source>
-        <translation>Lijst van volgende afleveringen</translation>
-    </message>
-    <message>
-        <source>Cancel this recording</source>
-        <translation>Anuleer deze opname</translation>
     </message>
     <message>
         <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
@@ -4373,20 +4151,41 @@ Myth will now exit.</source>
         <source>Commercial Detection (Playback)</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ScheduledRecording</name>
     <message>
-        <source>List upcoming episodes</source>
-        <translation type="obsolete">Lijst van volgende afleveringen</translation>
+        <source>(Unassigned)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Anuleer</translation>
+        <source>Save these settings</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Finish</source>
-        <translation type="obsolete">&amp;Beeindig</translation>
+        <source>Show group name instead of &quot;All Programs&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show group summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shows Program Guide when starting Live TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This starts the program guide immediately upon starting to watch Live TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Backlight Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directed By</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4769,6 +4568,22 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Auto-Skip Pre-Notify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to Begining</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are exiting this video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit to the menu</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -327,10 +327,6 @@
         <translation>Nej, fortsätt spela in</translation>
     </message>
     <message>
-        <source>Select action:</source>
-        <translation type="obsolete">Välj åtgärd:</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>Spela upp</translation>
     </message>
@@ -482,48 +478,8 @@
         <translation>Det finns inga program tillgängliga under denna sökning. Välj en annan sökning.</translation>
     </message>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Spelar bara in denna visning</translation>
-    </message>
-    <message>
-        <source>Recording every day when shown in this timeslot</source>
-        <translation type="obsolete">Spelar in varje dag vid visning denna tid</translation>
-    </message>
-    <message>
-        <source>Recording every week when shown in this timeslot</source>
-        <translation type="obsolete">Spelar in varje vecka vid visning denna tid</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Spelar in vid visning på denna kanal</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Spelar in alla visningar</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Spelar inte in denna visning</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fel!</translation>
-    </message>
-    <message>
         <source>       !! No Programs !!</source>
         <translation>      !! Inga program !!</translation>
-    </message>
-    <message>
-        <source>Recording one showing of this program</source>
-        <translation type="obsolete">Spelar in en visning</translation>
-    </message>
-    <message>
-        <source>Recording this showing with override options</source>
-        <translation type="obsolete">Spelar in med överskuggningsinställningar</translation>
-    </message>
-    <message>
-        <source>Manually not recording this showing</source>
-        <translation type="obsolete">Manuellt ställd att inte spela in</translation>
     </message>
 </context>
 <context>
@@ -539,10 +495,6 @@
     <message>
         <source>Title Search</source>
         <translation>Sök titel</translation>
-    </message>
-    <message>
-        <source>Description Search</source>
-        <translation type="obsolete">Sök beskrivning</translation>
     </message>
     <message>
         <source>Channel Search</source>
@@ -599,6 +551,10 @@
     <message>
         <source>Time Search</source>
         <translation>Tidssökning</translation>
+    </message>
+    <message>
+        <source>Select Time</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -671,40 +627,8 @@
         <translation>Ja, avsluta nu</translation>
     </message>
     <message>
-        <source>Schedule</source>
-        <translation type="obsolete">Schemalägg</translation>
-    </message>
-    <message>
-        <source>Record only this showing</source>
-        <translation type="obsolete">Spela bara in denna visning</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every day</source>
-        <translation type="obsolete">Spela in denna tid varje dag</translation>
-    </message>
-    <message>
-        <source>Record at any time on this channel</source>
-        <translation type="obsolete">Spela in när det visas på denna kanal</translation>
-    </message>
-    <message>
-        <source>Record at any time on any channel</source>
-        <translation type="obsolete">Spela in på vilken kanal som helst</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every week</source>
-        <translation type="obsolete">Spela in denna tid varje vecka</translation>
-    </message>
-    <message>
-        <source>Do not record this program</source>
-        <translation type="obsolete">Spela inte in detta program</translation>
-    </message>
-    <message>
         <source>Profile</source>
         <translation>Profil</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Autoradera</translation>
     </message>
     <message>
         <source>Rank</source>
@@ -847,10 +771,6 @@
         <translation>Använd interna volymkontroller</translation>
     </message>
     <message>
-        <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, uncheck this box.</source>
-        <translation type="obsolete">MythTV kan kontrollera PCM- och huvudvolymen. Om du föredrar att justera volymen med ett externt program, deaktivera denna funktion.</translation>
-    </message>
-    <message>
         <source>Mixer Device</source>
         <translation>Enhet för ljudmixern</translation>
     </message>
@@ -871,20 +791,12 @@
         <translation>PCM-volym</translation>
     </message>
     <message>
-        <source>Initial volume for PCM output.  Use of the volume keys in MythTV will adjust this parameter.</source>
-        <translation type="obsolete">Startvärde för PCM-volymen. Volymjustering i MythTV kommer att påverka denna parameter.</translation>
-    </message>
-    <message>
         <source>Deinterlace playback</source>
         <translation>Gör &apos;deinterlace&apos; vid uppspelning</translation>
     </message>
     <message>
         <source>Extra audio buffering</source>
         <translation>Extra ljudbuffring</translation>
-    </message>
-    <message>
-        <source>This attempts to keep extra audio data in the internal buffers.  Try setting this if you&apos;re getting crackly audio. (Not used for software encoded video.)</source>
-        <translation type="obsolete">Denna funktion gör att extra mycket ljud buffras i de interna buffrarna. Försök att slå på denna funktion om du har problem med hack i ljudet. (Funktionen används inte vid mjukvarukodad video.)</translation>
     </message>
     <message>
         <source>Jump amount (in minutes)</source>
@@ -951,24 +863,12 @@
         <translation>Strikt reklamdetektering</translation>
     </message>
     <message>
-        <source>Turn on stricter Commercial Detection code.  If some commercials are not being detected, try turning this setting OFF.</source>
-        <translation type="obsolete">Slå på mer strikt reklamdetektering. Slå av denna om du upplever att viss reklam inte identifieras.</translation>
-    </message>
-    <message>
         <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
         <translation>Tröskelvärde för automatisk radering (Gigabyte)</translation>
     </message>
     <message>
-        <source>Trigger AutoExpire when free space in Gigabytes goes below this value.  Turn OFF AutoExpire by setting to 0.</source>
-        <translation type="obsolete">Automatisk radering av filer startas när ledigt diskutrymme har gått under den specificerade nivån. För att slå av funktionen, sätt värdet till 0.</translation>
-    </message>
-    <message>
         <source>Auto Expire Frequency (in minutes)</source>
         <translation>Kontrollintervall för autoradering (minuter)</translation>
-    </message>
-    <message>
-        <source>Number of minutes the AutoExpire process will wait between each time that it checks for free disk space.</source>
-        <translation type="obsolete">Antalet minuter mellan två kontroller av befintligt diskutrymme.</translation>
     </message>
     <message>
         <source>Auto Expire Method</source>
@@ -985,10 +885,6 @@
     <message>
         <source>Auto-Expire Default</source>
         <translation>Autoradering påslaget som standard</translation>
-    </message>
-    <message>
-        <source>Turn Auto-Expire ON by default when creating new scheduled recordings.  Existing scheduled recordings will keep their current value.</source>
-        <translation type="obsolete">Slå på autoradering på nya schemalagda inspelningar. Autoradering går att slå av för enskilda inspelningar om så önskas. Befintliga schemalagda inspelningar kommer ej påverkas.</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
@@ -1011,16 +907,8 @@
         <translation>Lista nyaste inspelningar först</translation>
     </message>
     <message>
-        <source>If checked (default) the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen. If unchecked the oldest recording will be listed first.</source>
-        <translation type="obsolete">Om funktionen är aktiverad kommer de inspelningar som gjordes senast att listas först under &apos;Titta på inspelningar&apos;.</translation>
-    </message>
-    <message>
         <source>Sticky keys</source>
         <translation>Klistriga tangenter</translation>
-    </message>
-    <message>
-        <source>If this is set, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
-        <translation type="obsolete">Om funktionen är aktiverad kommer ett tryck på framspolnings- eller återsplningstangenterna att göra att funktionen fastnar i aktiverat läge. Ytterligare tryck ökar/minskar spolhastigheten. De alternativa snabbspolningstangenterna fungerar alltid på detta sätt.</translation>
     </message>
     <message>
         <source>Language</source>
@@ -1119,56 +1007,20 @@
         <translation>Justera denna för att flytta bilden vertikalt.</translation>
     </message>
     <message>
-        <source>Jitter reduction</source>
-        <translation type="obsolete">Jitterreducering</translation>
-    </message>
-    <message>
-        <source>If this is set, frame timing will be adjusted for smoother motion.</source>
-        <translation type="obsolete">Om denna funktion är aktiverad kommer tajmingen för bildrutor att justeras för jämnare rörelser.</translation>
-    </message>
-    <message>
-        <source>Experimental A/V Sync</source>
-        <translation type="obsolete">Experimentell bildsynkronisering</translation>
-    </message>
-    <message>
-        <source>If this is set, more experimental code will be in charge of video output. Use at your own risk.</source>
-        <translation type="obsolete">Om denna funktion är aktiverad kommer mer experimentell kod användas vid uppspelning. Använd på egen risk.</translation>
-    </message>
-    <message>
-        <source>Default setting for Closed Captioning</source>
-        <translation type="obsolete">Textning aktiverad som standard</translation>
-    </message>
-    <message>
         <source>Always use Browse mode when changing channels in LiveTV</source>
         <translation>Använd alltid bläddringsläge vid byte av TV-kanal</translation>
-    </message>
-    <message>
-        <source>If this is set, Browse mode will automatically be activated whenever you use Channel UP/DOWN when watching Live TV.</source>
-        <translation type="obsolete">Aktivera denna för att automatiskt komma in i bläddringsläge när UPP/NER-tangenterna används vid TV-tittande.</translation>
     </message>
     <message>
         <source>Aggressive Soundcard Buffering</source>
         <translation>Agressiv ljudkortsbuffring</translation>
     </message>
     <message>
-        <source>If this is set, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
-        <translation type="obsolete">Låtsas att ljudkortsbufferten är mindre än vad den egentligen är. Detta kan snabba upp snabbspolning men kan också orsaka uppspelningsproblem.</translation>
-    </message>
-    <message>
         <source>Clear Saved Position on playback</source>
         <translation>Rensa sparad position vid uppspelning</translation>
     </message>
     <message>
-        <source>Automatically clear saved position on a recording when the recording is played back.  If UNset, you can mark the beginning with rewind then save position.</source>
-        <translation type="obsolete">Rensa automatiskt bort sparad position i en inspelning när den spelas upp. Om denna funktion INTE är aktiverad kan man markera början på en inspelning genom att spola tillbaka och sedan spara denna position.</translation>
-    </message>
-    <message>
         <source>Alternate Clear Saved Position</source>
         <translation>Växla spara/rensa position</translation>
-    </message>
-    <message>
-        <source>If set, during playback the select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If UNset, select will save the current position for each keypress.</source>
-        <translation type="obsolete">Om funktionen aktiveras så kommer OK (enter eller mellanslag) att alternera mellan &quot;Spara position&quot; och &quot;Rensa position&quot;. Om den inte aktiveras kommer den att spara positionen för varje tryck.</translation>
     </message>
     <message>
         <source>Action on playback exit</source>
@@ -1199,28 +1051,12 @@
         <translation>Om funktionen är aktiverad kommer en dialogruta att visas när uppspelningen av ett inspelat program är klar. Dialogrutan innehåller en fråga om inspelningen skall raderas eller sparas.</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images for recordings</source>
-        <translation type="obsolete">Visa förhandsvisningsbilder för inspelningar</translation>
-    </message>
-    <message>
-        <source>If set, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
-        <translation type="obsolete">Aktivera denna funktion för att visa en stillbild tagen ur den markerade inspeningen i uppspelningsvyn.</translation>
-    </message>
-    <message>
         <source>Display live preview of recordings</source>
         <translation>Visa en rörlig förhandsvisning för inspelningar</translation>
     </message>
     <message>
-        <source>If set, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
-        <translation type="obsolete">Aktivera denna funktion för att visa en rörlig förhandsvisning i ett litet fönster för vald inspening i uppspelningsvyn.</translation>
-    </message>
-    <message>
         <source>Use Transparent Boxes</source>
         <translation>Genomskinliga listboxar för inspelningar</translation>
-    </message>
-    <message>
-        <source>If set, the Watch Recording and Delete Recording screens will use transparency. Unset this option if selecting the recordings is slow.</source>
-        <translation type="obsolete">Aktivera denna funktion för att göra listboxarna för inspeningar genomskinliga. Om det går långsamt att välja inspeningar, slå av funktionen.</translation>
     </message>
     <message>
         <source>Popup Background Shading Method</source>
@@ -1237,22 +1073,6 @@
     <message>
         <source>None</source>
         <translation>Ingen</translation>
-    </message>
-    <message>
-        <source>Fill is the quickest method, but it doesn&apos;t look good up close. Image looks good from up close, but is somewhat slow. And of course no shading will be the fastest.</source>
-        <translation type="obsolete">Metoden &quot;Fyll&quot; är den snabbaste men ser inte så bra ut på nära håll, &quot;Bild&quot; ser bra ut på nära håll men är lite långsam och &quot;Ingen&quot; är snabbast.</translation>
-    </message>
-    <message>
-        <source>Always use Advanced Recording Options screen</source>
-        <translation>Använd alltid den avancerade inspelningsvyn</translation>
-    </message>
-    <message>
-        <source>Always use the Advanced Recording Options screen when editing a scheduled recording.</source>
-        <translation>Använd alltid den avancerade vyn för att schemalägga inspelningar.</translation>
-    </message>
-    <message>
-        <source>System shutdown</source>
-        <translation type="obsolete">Nedstängning av systemet</translation>
     </message>
     <message>
         <source>No exit key</source>
@@ -1281,10 +1101,6 @@
     <message>
         <source>Halt command</source>
         <translation>Kommando för avstängning av datorn</translation>
-    </message>
-    <message>
-        <source>If you have configured an exit key on the System Shutdown menu, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is poweroff</source>
-        <translation type="obsolete">Vid nedstängning fås möjligheten att stänga av datorn från den meny som kommer upp. Ange kommandot som skall användas för att stänga av datorn, ex: &quot;halt&quot; eller &quot;poweroff&quot;</translation>
     </message>
     <message>
         <source>Xinerama screen</source>
@@ -1321,10 +1137,6 @@
     <message>
         <source>Run the frontend in a window</source>
         <translation>Kör användargränssnittet i ett fönster</translation>
-    </message>
-    <message>
-        <source>Toggles between borderless operation.</source>
-        <translation type="obsolete">Kör det grafiska gränssnittet i ett fönster i stället för i helskärmsläge.</translation>
     </message>
     <message>
         <source>Use a random theme</source>
@@ -1377,14 +1189,6 @@
     <message>
         <source>&quot;Small&quot; font</source>
         <translation>Litet typsnitt</translation>
-    </message>
-    <message>
-        <source>Program Guide Selection Placement</source>
-        <translation type="obsolete">Rörlig markör i programguiden</translation>
-    </message>
-    <message>
-        <source>If unchecked, the program guide&apos;s selector will stay in the middle of the guide at all times.</source>
-        <translation type="obsolete">Om denna funktion INTE är aktiverad kommer markören i programguiden alltid att vara placerad i mitten på bilden.</translation>
     </message>
     <message>
         <source>Guide Shading Method</source>
@@ -1443,14 +1247,6 @@
         <translation>Annan</translation>
     </message>
     <message>
-        <source>This is used to determine the name of the blink binary led will be used on GentooX, blink otherwise.</source>
-        <translation type="obsolete">Ange vilket lib som skall användas för att styra lysdioden på Xboxen under GentooX. Om inget anges används &quot;blink&quot;.</translation>
-    </message>
-    <message>
-        <source>Default LED mode</source>
-        <translation type="obsolete">Standardläge för LED</translation>
-    </message>
-    <message>
         <source>Off</source>
         <translation>Av</translation>
     </message>
@@ -1467,16 +1263,8 @@
         <translation>Röd</translation>
     </message>
     <message>
-        <source>This sets the LED mode when there is nothing else to display</source>
-        <translation type="obsolete">Sätter läget på LEDen när inget annat skall indikeras</translation>
-    </message>
-    <message>
         <source>Recording LED mode</source>
         <translation>Läge för LED vid inspelning</translation>
-    </message>
-    <message>
-        <source>This sets the LED mode when a backend is recording</source>
-        <translation type="obsolete">Läge för LEDen när en inspelningsserver spelar in</translation>
     </message>
     <message>
         <source>Recording Check Frequency</source>
@@ -1521,14 +1309,6 @@
     <message>
         <source>Localization</source>
         <translation>Lokalisering</translation>
-    </message>
-    <message>
-        <source>This specifies how often in seconds to check if a recording is in progress and update the Xbox LED.</source>
-        <translation type="obsolete">Specificerar hur ofta, i sekunder, en kontroll skall göras för att se om en inspelning är aktiv och i så fall uppdatera lysdioden på Xboxen .</translation>
-    </message>
-    <message>
-        <source>If set, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the v4l controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation type="obsolete">Aktiverar bildkontrollerna för ljusstyrka, kontrast etc vid uppspelning. Dessa kontroller är skiljda från de som används vid inspelning. På vissa system fungerar inte kontrollerna riktigt bra.</translation>
     </message>
     <message>
         <source>Mixer Controls</source>
@@ -1817,16 +1597,8 @@
         <translation>UDP meddelandeport</translation>
     </message>
     <message>
-        <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
-        <translation type="obsolete">Specificerar den port där MythTV kommer att lyssna efter anslutningar från &apos;mythtvosd&apos; eller &apos;mythhudprelay&apos; under uppspelning. Se README i contrib/mythnotify för mer information.</translation>
-    </message>
-    <message>
         <source>Skip blank frames after commercials</source>
         <translation>Hoppa över svarta bildrutor efter reklamer</translation>
-    </message>
-    <message>
-        <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the the commercial break.</source>
-        <translation type="obsolete">När &apos;Svart bild&apos; och autodetektering används, markera svarta rutor som följer reklampausen som reklam.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -1857,16 +1629,8 @@
         <translation>Ska spelas in</translation>
     </message>
     <message>
-        <source>Priority</source>
-        <translation type="obsolete">Prioritet</translation>
-    </message>
-    <message>
         <source>Enable AC3 to SPDIF passthrough</source>
         <translation>Aktivera AC3 till SPDIF</translation>
-    </message>
-    <message>
-        <source>Enable sending AC3 sound directly to your sound card&apos;s SPDIF output, on sources which contain AC3 soundtracks (usually digital TV).  Requires that the audio output device be set to something suitable.</source>
-        <translation type="obsolete">Gör det möjligt för ljudkortet att skicka AC3-ljud direkt via SPDIF-utgången med källor som innehåller AC3-ljud (vanligtvis digital-tv). Förutsätter att ljudenheten är inställt till lämplig enhet.</translation>
     </message>
     <message>
         <source>PIP Video Location</source>
@@ -1945,50 +1709,6 @@
         <translation>Ja, avsluta och stäng av</translation>
     </message>
     <message>
-        <source>Myth version:</source>
-        <translation>Myth-version:</translation>
-    </message>
-    <message>
-        <source>Last mythfilldatabase guide update:</source>
-        <translation>Senaste tablåuppdatering:</translation>
-    </message>
-    <message>
-        <source>Started:   </source>
-        <translation>Startad:   </translation>
-    </message>
-    <message>
-        <source>Finished: </source>
-        <translation>Färdig: </translation>
-    </message>
-    <message>
-        <source>Result: </source>
-        <translation>Resultat: </translation>
-    </message>
-    <message>
-        <source>There&apos;s no guide data available! </source>
-        <translation>Det finns ingen tablåinformation tillgänglig!</translation>
-    </message>
-    <message>
-        <source>Have you run mythfilldatabase?</source>
-        <translation>Har du kört mythfilldatabase?</translation>
-    </message>
-    <message>
-        <source>There is guide data until </source>
-        <translation>Det finns tablåinformation till </translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation>dagar</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation>dag</translation>
-    </message>
-    <message>
-        <source>WARNING: is mythfilldatabase running?</source>
-        <translation>VARNING: körs mythfilldatabase?</translation>
-    </message>
-    <message>
         <source>Not Flagged</source>
         <translation>Inte markerad</translation>
     </message>
@@ -2003,22 +1723,6 @@
     <message>
         <source>Use GUI size for TV playback</source>
         <translation>Använd GUI-storlek för uppspelning</translation>
-    </message>
-    <message>
-        <source>If checked, use the above size for TV. If unchecked, use full screen.</source>
-        <translation type="obsolete">Om funktionen är aktiverad kommer ovanstående storlek användas för avspelning, annars används fullskärmsläge.</translation>
-    </message>
-    <message>
-        <source>If this is set, captions will be on by default when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &apos;T&apos; during playback.</source>
-        <translation type="obsolete">Om denna funktion är aktiverad kommer textning att aktiveras som standard vid uppspelning av inspelningar samt vid Live TV. Textningen kan ändras med &apos;T&apos; under uppspelning.</translation>
-    </message>
-    <message>
-        <source>No Prompt on Exit</source>
-        <translation type="obsolete">Ingen fråga vid avslut</translation>
-    </message>
-    <message>
-        <source>If set, you will not be prompted when pressing the exit key.  Instead, MythTV will immediately exit.</source>
-        <translation type="obsolete">Om denna funktionen aktiveras kommer MythTV avslutas utan något frågefönster.</translation>
     </message>
     <message>
         <source>Alpha - Transparent (CPU Usage - High)</source>
@@ -2041,10 +1745,6 @@
         <translation>Visa genrefärger</translation>
     </message>
     <message>
-        <source>Colorize program guide using  genre colors. (Not available for all grabbers.)</source>
-        <translation type="obsolete">Färglägg programguiden med hjälp av genrefärger. (Inte tillgängligt i alla grabbers.)</translation>
-    </message>
-    <message>
         <source>Display Genre Text</source>
         <translation>Visa genretext</translation>
     </message>
@@ -2059,14 +1759,6 @@
     <message>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them.</source>
         <translation>Denna funktionen aktiverar stöd för att övervaka CD/DVD-enheter efter nya skivor som matas in och starta en lämplig plugin.</translation>
-    </message>
-    <message>
-        <source>Use HW XVMC MPEG Decoding</source>
-        <translation type="obsolete">Använd hårdvaru MPEG-avkodning med XVMC</translation>
-    </message>
-    <message>
-        <source>Use VIA HW MPEG Decoding</source>
-        <translation type="obsolete">Använd VIAs hårdvaru MPEG-avkodning</translation>
     </message>
     <message>
         <source>Hardware Decoding Settings</source>
@@ -2551,15 +2243,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Du behöver troligen uppdatera XMLTV.</translation>
     </message>
     <message>
-        <source>Please wait while MythTV retrieves the list of available channels.
-You may wish to check the output as it
-runs by switching to the terminal from which you started
-this program.</source>
-        <translation type="obsolete">Vänligen vänta medans MythTV hämtar lista med tillfängliga kanaler.
-Du kan kontrollera förloppet genom att byta över till terminalfönstret
-som du startade detta programmet i.</translation>
-    </message>
-    <message>
         <source>Failed to retrieve channel information.</source>
         <translation>Misslyckades med hämtning av kanalinformation.</translation>
     </message>
@@ -2623,10 +2306,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>FEL, inga ingångar hittade</translation>
     </message>
     <message>
-        <source>ERROR, V4L support unavailable on Windows</source>
-        <translation type="obsolete">FEL, stöd för V4L saknas under Windows</translation>
-    </message>
-    <message>
         <source>[All VideoSources]</source>
         <translation>[Alla videokällor]</translation>
     </message>
@@ -2685,10 +2364,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>XMLTV listings grabber</source>
         <translation>XMLTV grabber</translation>
-    </message>
-    <message>
-        <source>ZIP/postal code</source>
-        <translation type="obsolete">Postnummer</translation>
     </message>
     <message>
         <source>Region</source>
@@ -2889,10 +2564,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>Preset tuner to channel</source>
         <translation>Förinställ tuner till kanal</translation>
-    </message>
-    <message>
-        <source>If specified, the tuner will change to this channel when the input is selected.  This is only useful if you use your tuner input with an external channel changer.</source>
-        <translation type="obsolete">Välj vilken kanal som ska väljas när ingången väljs. Endast användbar om du använder ingången med en extern kanalväljare.</translation>
     </message>
     <message>
         <source>Starting channel</source>
@@ -3119,14 +2790,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Huvudinspelningsserver</translation>
     </message>
     <message>
-        <source>Start Early (minutes)</source>
-        <translation type="obsolete">Starta tidigt (min)</translation>
-    </message>
-    <message>
-        <source>End Late   (minutes)</source>
-        <translation type="obsolete">Sluta sent (min)</translation>
-    </message>
-    <message>
         <source>Wait for SEQ start header.</source>
         <translation>Vänta på SEQ-starthuvud.</translation>
     </message>
@@ -3135,16 +2798,8 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Aktivera buffervarning vid kanalbyte</translation>
     </message>
     <message>
-        <source>If set, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation type="obsolete">Om denna funktion aktiveras kommer MythTV att varna dig om du försöker ändra kanal när du ligger efter verklig tid.</translation>
-    </message>
-    <message>
         <source>Find One Recording</source>
         <translation>Hitta en visning</translation>
-    </message>
-    <message>
-        <source>Record one showing of this program</source>
-        <translation type="obsolete">Spela in en visning</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -3155,20 +2810,12 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Tidpunkt för skapande av förhandsgranskningsbild</translation>
     </message>
     <message>
-        <source>How many seconds into the show to capture the static preview images from.</source>
-        <translation type="obsolete">Hur många sekunder in i inspelningen förhandsvisningsbilden ska visa.</translation>
-    </message>
-    <message>
         <source>Find One Recordings Priority</source>
         <translation>Prioritet för &apos;hitta en visning&apos;</translation>
     </message>
     <message>
         <source>Find One Recording types will receive this additional recording priority value.</source>
         <translation>Det angivna värdet kommer att läggas till prioriteten för inspelningar av typen &apos;hitta en visning&apos;.</translation>
-    </message>
-    <message>
-        <source>Interval to sample DVB signal stats at (in seconds, 0 = off)</source>
-        <translation type="obsolete">Intervall för inhämtning av DVB-statistik (sekunder, 0 = av)</translation>
     </message>
     <message>
         <source>Length of time to retain DVB signal data (in days)</source>
@@ -3195,46 +2842,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Kör inte automatisk reklamdetektering på denna kanal. Användbart exempelvis på SVT samt filmkanaler som Canal+ eller TV1000.</translation>
     </message>
     <message>
-        <source>Duplicate Location</source>
-        <translation type="obsolete">Dublettplats</translation>
-    </message>
-    <message>
-        <source>All places</source>
-        <translation type="obsolete">Överallt</translation>
-    </message>
-    <message>
-        <source>Current Recs</source>
-        <translation type="obsolete">Nuvarande inspelningar</translation>
-    </message>
-    <message>
-        <source>Previous Recs</source>
-        <translation type="obsolete">Tidigare inspelningar</translation>
-    </message>
-    <message>
-        <source>Duplicate Check</source>
-        <translation type="obsolete">Dublettkontroll</translation>
-    </message>
-    <message>
-        <source>Sub &amp; Desc</source>
-        <translation type="obsolete">Under &amp; beskr</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation type="obsolete">Beskrivning</translation>
-    </message>
-    <message>
-        <source>Max episodes</source>
-        <translation type="obsolete">Max inspelningar</translation>
-    </message>
-    <message>
-        <source>Delete oldest over Max</source>
-        <translation type="obsolete">Radera äldsta över max</translation>
-    </message>
-    <message>
-        <source>Recording Group</source>
-        <translation type="obsolete">Inspelningsgrupp</translation>
-    </message>
-    <message>
         <source>Password required to view all recordings</source>
         <translation>Lösenord för att visa alla inspelningar</translation>
     </message>
@@ -3245,10 +2852,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>Default Recording Group to display</source>
         <translation>Förvald inspelningsgrupp att visa</translation>
-    </message>
-    <message>
-        <source>Default Recording Group to display on the view recordings screen.</source>
-        <translation type="obsolete">Förvald inspelningsgrupp att visa under &apos;visa inspelningar&apos;.</translation>
     </message>
     <message>
         <source>Save current Recording Group view when changed</source>
@@ -3351,22 +2954,8 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>detta avsnitt kommer att spelas in vid en tidigare tidpunkt istället.</translation>
     </message>
     <message>
-        <source>another program with a higher priority will be recorded instead.</source>
-        <translation type="obsolete">ett annat program med högre prioritet kommer att spelas in istället.</translation>
-    </message>
-    <message>
-        <source>this episode will be recorded at a later time instead.</source>
-        <translation type="obsolete">detta avsnitt kommer att spelas in vid en senare tidpunkt istället.</translation>
-    </message>
-    <message>
         <source>Clear Override</source>
         <translation>Rensa överskuggning</translation>
-    </message>
-    <message>
-        <source>The following programs will be recorded instead:
-</source>
-        <translation type="obsolete">Följande program kommer att spelas in istället:
-</translation>
     </message>
     <message>
         <source>30m</source>
@@ -3401,32 +2990,12 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Slår på tystning av endast vänster eller höger kanal. Användbart om utsändningen innehåller två olika språk i de olika kanalerna. Detta ändrar beteendet för tystnings-knappen.</translation>
     </message>
     <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="obsolete">Detta bestämmer metoden som används för att detektera när reklam börjar och slutar. &apos;Automatisk reklamdetektering&apos; måste vara påslagen för att använda något annant än &apos;Svart bild&apos;.</translation>
-    </message>
-    <message>
-        <source>Display &apos;favorite&apos; channels</source>
-        <translation type="obsolete">Visa favoritkanaler</translation>
-    </message>
-    <message>
-        <source>If set, the EPG will initally display only the channels marked as favorites. &quot;4&quot; will toggle between favorites and all channels.</source>
-        <translation type="obsolete">Visa endast kanaler markerade som favoriter i programguiden. &quot;4&quot; ändrar mellan att visa favoriter och alla kanaler.</translation>
-    </message>
-    <message>
         <source>Reschedule Higher Priorities</source>
         <translation>Flytta högre prioriteter</translation>
     </message>
     <message>
-        <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would not otherwise be recorded, but risks missing a higher priority program if the schedule changes.</source>
-        <translation type="obsolete">Flytta program med högre prioritet till andra kort och visningar när konflikter löses. Detta kan användas för att spela in program med lägre prioritet som annars inte hade spelats in, med risken att missa ett program med högre prioritet om tablån ändras.</translation>
-    </message>
-    <message>
         <source>Use select to change the channel in the program guide</source>
         <translation>Använd OK för att ändra kanal i programguiden</translation>
-    </message>
-    <message>
-        <source>If checked the select key will change the channel while using the program guide during live TV.  If unchecked the select key will bring up the recording options screen.</source>
-        <translation type="obsolete">Avnänd OK-knappen för att ändra kanal i programguiden istället för att visa inspelningsinställningar. Detta påverkar endast programguiden i Live TV-läge.</translation>
     </message>
     <message>
         <source></source>
@@ -3441,18 +3010,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Låt kanalen vara synlig i programguiden.</translation>
     </message>
     <message>
-        <source>DB Logging Enabled</source>
-        <translation type="obsolete">Databasloggning aktiverat</translation>
-    </message>
-    <message>
-        <source>If checked, the Myth modules will send event details to the database, where they can be viewed with MythLog or emailed out periodically.</source>
-        <translation type="obsolete">Låt MythTV&apos;s moduler skicka händelsedetaljer till databasen, där de kan visas med MythLog eller skickas via e-mail.</translation>
-    </message>
-    <message>
-        <source>Max. Number of Entries per Module</source>
-        <translation type="obsolete">Max antal poster per modul</translation>
-    </message>
-    <message>
         <source>If there are more than this number of entries for a module, the oldest log entries will be deleted to reduce the count to this number.  Set to 0 to disable.</source>
         <translation>Om det finns fler antal poster för en modul än detta, rensas gamla poster bort. Sätt till 0 för att avaktivera.</translation>
     </message>
@@ -3461,16 +3018,8 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Automatisk loggboksrensning aktiverad</translation>
     </message>
     <message>
-        <source>This enables the periodic cleanup of the events stored in the Myth database (see &apos;DB Logging Enabled&apos; on the previous page).</source>
-        <translation type="obsolete">Detta aktiverar periodisk rensning av händelser sparade i databasen (se &apos;Databasloggning aktiverat&apos; på föregående sida).</translation>
-    </message>
-    <message>
         <source>Log Cleanup Frequency (Days)</source>
         <translation>Loggrensning (dagar)</translation>
-    </message>
-    <message>
-        <source>The number of days between log cleanup runs</source>
-        <translation type="obsolete">Antal dagar mellan loggrensning</translation>
     </message>
     <message>
         <source>Number of days to keep acknowledged log entries</source>
@@ -3553,16 +3102,8 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>mythfilldatabase exekveringsstart</translation>
     </message>
     <message>
-        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  Ex. setting Min to 11 and Max to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="obsolete">Denna och följande inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13.</translation>
-    </message>
-    <message>
         <source>mythfilldatabase Execution End</source>
         <translation>mythfilldatabase exekveringsstopp</translation>
-    </message>
-    <message>
-        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  Ex. setting Min to 11 and Max to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="obsolete">Denna och föregående inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13.</translation>
     </message>
     <message>
         <source>mythfilldatabase Path</source>
@@ -3721,36 +3262,12 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Inställningar för TV-kort</translation>
     </message>
     <message>
-        <source>If specified, this command will be run to change the channel for inputs which do not have a tuner. The first argument will be the channel number.</source>
-        <translation type="obsolete">Kommando att köra för att byta kanal då en extern tuner används. Första argumentet blir kanalnumret.</translation>
-    </message>
-    <message>
         <source>Data Direct Lineup</source>
         <translation>DataDirect-programutbud</translation>
     </message>
     <message>
         <source>Retrieve Lineups</source>
         <translation>Hämta programutbud</translation>
-    </message>
-    <message>
-        <source>Show group name instead of &quot;All Programs&quot;.</source>
-        <translation>Visa gruppnamn istället för &quot;Alla program&quot;.</translation>
-    </message>
-    <message>
-        <source>Use the name of the display group currently being show in place of the term &quot;All Programs&quot; in theplayback screen.</source>
-        <translation type="obsolete">Använd namnet på aktuell visningsgrupp istället för &quot;Alla program&quot;.</translation>
-    </message>
-    <message>
-        <source>Start in title section.</source>
-        <translation type="obsolete">Fokus på titlar.</translation>
-    </message>
-    <message>
-        <source>If set, focus will initially be on the show titles otherwise focus will be on the recordings.</source>
-        <translation type="obsolete">Börja med fokus på titlarna, istället för med fokus på inspelningarna.</translation>
-    </message>
-    <message>
-        <source>Show group summary.</source>
-        <translation type="unfinished">Visa gruppöversikt</translation>
     </message>
     <message>
         <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
@@ -3849,10 +3366,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Tröskelvärde för inspelning</translation>
     </message>
     <message>
-        <source>If the option to use select to change the channel is on, pressing select on a show that is at least this many minutes into the future will schedule a recording.</source>
-        <translation type="obsolete">Om programmet som väljs i programguiden är så här många minuter fram i tiden schemaläggs en inspelning istället för att byta till den valda kanalen. (Endast då OK används i programguiden).</translation>
-    </message>
-    <message>
         <source>View Recordings (Recording Groups)</source>
         <translation>Visa inspelningar (inspelningsgrupper)</translation>
     </message>
@@ -3919,18 +3432,6 @@ MythTV kommer nu att avslutas.</translation>
         <translation>Spela in ändå</translation>
     </message>
     <message>
-        <source>Record this showing with normal options</source>
-        <translation type="obsolete">Spela in visning med vanliga inställningar</translation>
-    </message>
-    <message>
-        <source>Record this showing with override options</source>
-        <translation type="obsolete">Spela in visning med specifika inställningar</translation>
-    </message>
-    <message>
-        <source>Do not record this showing</source>
-        <translation type="obsolete">Spela inte in denna visning</translation>
-    </message>
-    <message>
         <source>External application or script to run when a keypress is received by LIRC.</source>
         <translation>Externt program eller skript att köra när LIRC tar emot en tangenttryckning.</translation>
     </message>
@@ -3955,10 +3456,6 @@ MythTV kommer nu att avslutas.</translation>
         <translation>Katalog att använda för loggdata från mythfilldatabase. Lämna tomt för att avaktivera loggning.</translation>
     </message>
     <message>
-        <source>DataDirect Status: </source>
-        <translation>DataDirect-status:</translation>
-    </message>
-    <message>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
         <translation>Låt huvudinspelningsservern strömma och ta bort filer om de finns i videokatalogen. Användbart om du använder en central lagringspunkt (ex. NFS) och en andra inspelningsserver inte är igång.</translation>
     </message>
@@ -3967,76 +3464,20 @@ MythTV kommer nu att avslutas.</translation>
         <translation>Separat upplösning för användargränsnittet och TV-uppspelning</translation>
     </message>
     <message>
-        <source>Switch X Window video modes for TV. Requires &apos;xrandr&apos; support.</source>
-        <translation type="obsolete">Ändra upplösning i X för TV-läge. Kräver stöd för &apos;xrandr&apos;.</translation>
-    </message>
-    <message>
-        <source>GUI X size (px)</source>
-        <translation type="obsolete">GUI X-storlek (px)</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="obsolete">Horisontell upplösning för användargränsnittet. Detta läge måste vara konfigurerat i XF86Config.</translation>
-    </message>
-    <message>
-        <source>GUI Y size (px)</source>
-        <translation type="obsolete">GUI Y-storlek (px)</translation>
-    </message>
-    <message>
-        <source>Vertical resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="obsolete">Vertikal upplösning för användargränsnittet. Detta läge måste vara konfigurerat i XF86Config.</translation>
-    </message>
-    <message>
-        <source>TV X size (px)</source>
-        <translation type="obsolete">TV-bredd (px)</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution for playback video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="obsolete">Horisontell upplösning för uppspelning av video. Detta läge måste vara konfigurerat i XF86Config.</translation>
-    </message>
-    <message>
-        <source>TV Y size (px)</source>
-        <translation type="obsolete">TV-höjd (px)</translation>
-    </message>
-    <message>
-        <source>Vertical resolution for playback video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="obsolete">Vertikal upplösning för uppspelning av video. Detta läge måste vara konfigurerat i XF86Config.</translation>
-    </message>
-    <message>
         <source>Video Mode Settings</source>
         <translation>Videolägesinställningar</translation>
-    </message>
-    <message>
-        <source>Wait for ATSC signal lock (msec)</source>
-        <translation type="obsolete">Vänta på ATSC signallåsning (msec)</translation>
-    </message>
-    <message>
-        <source>MythTV can check the signal strength When you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before we give up trying to get an acceptible signal.</source>
-        <translation type="obsolete">Antalet millisekunder att vänta på en acceptabel signal vid användning av ATSC (HDTV).</translation>
     </message>
     <message>
         <source>ATSC Signal Threshold</source>
         <translation>Tröskelvärde för ATSC-signal</translation>
     </message>
     <message>
-        <source>Threshold for a signal to be considered acceptible. If you set this too low Myth may crash, if you set it too low you may not be able to tune to channels on which reception is good.</source>
-        <translation type="obsolete">Tröskelvärde för att signalen ska anses tillräcklig. (Endast ATSC).</translation>
-    </message>
-    <message>
         <source>General (page 2)</source>
         <translation>Generellt (sida 2)</translation>
     </message>
     <message>
-        <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. </source>
-        <translation type="obsolete">Gör så att video ser normal ut i de fall den visas på en monitor. OBS: Kräver att CPUn stödjer SSE-instruktioner. Om den inte stödjer SSE kommer programmet att krasha.</translation>
-    </message>
-    <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
         <translation>När snabbspolning framåt/bakåt m h a &quot;klistriga tangenter&quot; används är det svårt att stoppa på exakt rätt ställe. Denna funktion hoppar framåt/bakåt en bit vid stopp för att kompensera för detta.</translation>
-    </message>
-    <message>
-        <source>If set, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa. If not set, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation type="obsolete">Om denna funktione är aktiverad kommer &quot;Bakåt/Framåt&quot; att ändra riktning vid spolning, annars kommer hastigheten att minskas/ökas eller återställas till normal hastighet.</translation>
     </message>
     <message>
         <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None disables this feature, Auto automatically detects your local timezone</source>
@@ -4142,10 +3583,6 @@ MythTV kommer nu att avslutas.</translation>
         <translation>U</translation>
     </message>
     <message>
-        <source>This setting will change the qt widget style on startup, if this setting is set to anything other than &apos;Desktop Style&apos;. Setting this setting to &apos;Desktop Style&apos; will have no effect on the currently running MythTV session.</source>
-        <translation type="obsolete">Ändrar använd QT-stil för MythTV.</translation>
-    </message>
-    <message>
         <source>Startup command</source>
         <translation>Uppstartskommando</translation>
     </message>
@@ -4174,10 +3611,6 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Commercial Free</source>
         <translation>Reklamfri</translation>
-    </message>
-    <message>
-        <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the commercial break.</source>
-        <translation type="obsolete">När &apos;Svart bild&apos; och autodetektering används, markera svarta rutor som följer reklampausen som reklam.</translation>
     </message>
     <message>
         <source>Title Search</source>
@@ -4271,10 +3704,6 @@ som du startade detta programmet i.</translation>
         <translation>Dubblettkontroll</translation>
     </message>
     <message>
-        <source>Pre/Post Roll</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Scheduling Options</source>
         <translation>Inspelningsinställningar</translation>
     </message>
@@ -4307,20 +3736,8 @@ som du startade detta programmet i.</translation>
         <translation>Skapa ny inspelningsgrupp</translation>
     </message>
     <message>
-        <source>Record this program as shown</source>
-        <translation>Spela in programmet enligt nedanstående inställningar</translation>
-    </message>
-    <message>
         <source>Program details</source>
         <translation>Programdetaljer</translation>
-    </message>
-    <message>
-        <source>List upcoming episodes</source>
-        <translation>Visa kommande avsnitt</translation>
-    </message>
-    <message>
-        <source>Cancel this recording</source>
-        <translation>Avbryt denna inspelning</translation>
     </message>
     <message>
         <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
@@ -4758,20 +4175,41 @@ som du startade detta programmet i.</translation>
         <source>Commercial Detection (Playback)</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ScheduledRecording</name>
     <message>
-        <source>List upcoming episodes</source>
-        <translation type="obsolete">Visa kommande avsnitt</translation>
+        <source>(Unassigned)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Avbryt</translation>
+        <source>Save these settings</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Finish</source>
-        <translation type="obsolete">&amp;Slutför</translation>
+        <source>Show group name instead of &quot;All Programs&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show group summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shows Program Guide when starting Live TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This starts the program guide immediately upon starting to watch Live TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Backlight Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directed By</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5155,6 +4593,22 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Auto-Skip Pre-Notify</source>
         <translation>Auto-hoppförvarning</translation>
+    </message>
+    <message>
+        <source>Audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to Begining</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are exiting this video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit to the menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

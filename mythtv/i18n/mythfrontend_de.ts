@@ -303,10 +303,6 @@
         <translation>Nein. Ich habe meine Meinung geändert.</translation>
     </message>
     <message>
-        <source>Delete this recording?</source>
-        <translation type="obsolete">Diese Aufnahme löschen?</translation>
-    </message>
-    <message>
         <source>Allow this program to AutoExpire?</source>
         <translation>Diese Sendung automatisch löschen?</translation>
     </message>
@@ -329,10 +325,6 @@
     <message>
         <source>No, continue recording it</source>
         <translation>Nein, weiter aufnehmen</translation>
-    </message>
-    <message>
-        <source>Select action:</source>
-        <translation>Bitte wählen:</translation>
     </message>
     <message>
         <source>Play</source>
@@ -462,6 +454,18 @@
         <source>Begin Transcoding</source>
         <translation>Umwandlung starten</translation>
     </message>
+    <message>
+        <source>Stop Commercial Flagging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Begin Commercial Flagging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished">Standard</translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -474,48 +478,8 @@
         <translation>Für diese Suche gibt es keine Sendungen. Bitte eine andere Suche wählen.</translation>
     </message>
     <message>
-        <source>Recording just this showing</source>
-        <translation>Nehme diese Ausstrahlung auf</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation>Nehme auf diesem Sender auf</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation>Nehme alle Ausstrahlungen auf</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation>Wird nicht aufgenommen</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation>Fehler!</translation>
-    </message>
-    <message>
         <source>       !! No Programs !!</source>
         <translation>       !! Keine Programme !!</translation>
-    </message>
-    <message>
-        <source>Recording every day when shown in this timeslot</source>
-        <translation>Nehme täglich zu dieser Zeit auf</translation>
-    </message>
-    <message>
-        <source>Recording every week when shown in this timeslot</source>
-        <translation>Nehme wöchentlich zu dieser Zeit auf</translation>
-    </message>
-    <message>
-        <source>Recording one showing of this program</source>
-        <translation>Nehme eine Ausstrahlung dieser Sendung auf</translation>
-    </message>
-    <message>
-        <source>Recording this showing with override options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Manually not recording this showing</source>
-        <translation>Aufnahme wurde manuell blockiert</translation>
     </message>
 </context>
 <context>
@@ -531,10 +495,6 @@
     <message>
         <source>Title Search</source>
         <translation>Titelsuche</translation>
-    </message>
-    <message>
-        <source>Description Search</source>
-        <translation type="obsolete">Inhaltssuche</translation>
     </message>
     <message>
         <source>Channel Search</source>
@@ -587,6 +547,14 @@
     <message>
         <source>Record</source>
         <translation type="unfinished">Aufnahme</translation>
+    </message>
+    <message>
+        <source>Time Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Time</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -759,44 +727,12 @@
         <translation>Beginn der Sendung</translation>
     </message>
     <message>
-        <source>Schedule</source>
-        <translation>Modus</translation>
-    </message>
-    <message>
-        <source>Record only this showing</source>
-        <translation>Einmalige Aufnahme</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every day</source>
-        <translation>Täglich zu dieser Zeit aufnehmen</translation>
-    </message>
-    <message>
-        <source>Record at any time on this channel</source>
-        <translation>Nur auf diesem Sender aufnehmen</translation>
-    </message>
-    <message>
-        <source>Record at any time on any channel</source>
-        <translation>Auf jedem Sender aufnehmen</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every week</source>
-        <translation>Wöchentlich zu dieser Zeit aufnehmen</translation>
-    </message>
-    <message>
-        <source>Do not record this program</source>
-        <translation>Nicht aufnehmen</translation>
-    </message>
-    <message>
         <source>Profile</source>
         <translation>Profil</translation>
     </message>
     <message>
         <source>Rank</source>
         <translation>Wertung</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation>Automatisch löschen</translation>
     </message>
     <message>
         <source>Not Recording</source>
@@ -835,10 +771,6 @@
         <translation>Interne Lautstärkeregler nutzen</translation>
     </message>
     <message>
-        <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, uncheck this box.</source>
-        <translation>MythTV kann die Master/PCM Lautstärke regeln. Bitte abwählen falls Sie die Lautstärke extern regeln möchten.</translation>
-    </message>
-    <message>
         <source>Mixer Device</source>
         <translation>Mischer Gerät</translation>
     </message>
@@ -859,20 +791,12 @@
         <translation>PCM Lautstärke</translation>
     </message>
     <message>
-        <source>Initial volume for PCM output.  Use of the volume keys in MythTV will adjust this parameter.</source>
-        <translation>Anfangslautstärke für den PCM Ausgang. Die Lautstärkeregler in MythTV verändern diese Einstellung.</translation>
-    </message>
-    <message>
         <source>Deinterlace playback</source>
         <translation>Deinterlace Wiedergabe</translation>
     </message>
     <message>
         <source>Extra audio buffering</source>
         <translation>Großer Audiodatenpuffer</translation>
-    </message>
-    <message>
-        <source>This attempts to keep extra audio data in the internal buffers.  Try setting this if you&apos;re getting crackly audio. (Not used for software encoded video.)</source>
-        <translation>Versucht mehr Audiodaten im internen Datenpuffer zu halten. Testen Sie diese Einstellung bei Audioproblemen. (wird nicht bei Software kodiertem Video verwendet)</translation>
     </message>
     <message>
         <source>Jump amount (in minutes)</source>
@@ -939,24 +863,12 @@
         <translation>Strikte Erkennung</translation>
     </message>
     <message>
-        <source>Turn on stricter Commercial Detection code.  If some commercials are not being detected, try turning this setting OFF.</source>
-        <translation>Aktiviert strikteren Code um Werbung zu finden. Schalten Sie diese Einstellung aus falls manche Werbeblöcke nicht erkannt werden.</translation>
-    </message>
-    <message>
         <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
         <translation>Freier Speicherplatz für autom. Löschen (in GB)</translation>
     </message>
     <message>
-        <source>Trigger AutoExpire when free space in Gigabytes goes below this value.  Turn OFF AutoExpire by setting to 0.</source>
-        <translation>Automatisches Löschen startet falls der freie Speicherplatz diesen Wert (in GB) unterschreitet. &apos;0&apos; schaltet autom. Löschen aus.</translation>
-    </message>
-    <message>
         <source>Auto Expire Frequency (in minutes)</source>
         <translation>Autom. Löschen Interval (in Minuten)</translation>
-    </message>
-    <message>
-        <source>Number of minutes the AutoExpire process will wait between each time that it checks for free disk space.</source>
-        <translation>Wieviele Minuten der Autom. Löschen Prozeß zwischen zwei Durchgängen wartet.</translation>
     </message>
     <message>
         <source>Auto Expire Method</source>
@@ -973,10 +885,6 @@
     <message>
         <source>Auto-Expire Default</source>
         <translation>Automatisch Löschen</translation>
-    </message>
-    <message>
-        <source>Turn Auto-Expire ON by default when creating new scheduled recordings.  Existing scheduled recordings will keep their current value.</source>
-        <translation>Schaltet Autom. Löschen für neue Aufnahmen ein. Alte Aufnahmen behalten ihre aktuelle Einstellung bei.</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
@@ -999,16 +907,8 @@
         <translation>Neue Aufnahmen zuerst</translation>
     </message>
     <message>
-        <source>If checked (default) the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen. If unchecked the oldest recording will be listed first.</source>
-        <translation>Falls gesetzt, so werden im &quot;Aufnahmen ansehen&quot; Menü neue vor älteren Aufnahmen einsortiert.</translation>
-    </message>
-    <message>
         <source>Sticky keys</source>
         <translation>&quot;Klebrige&quot; Tasten</translation>
-    </message>
-    <message>
-        <source>If this is set, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
-        <translation>Falls gesetzt, läuft der schnelle Vor-/Rücklauf weiter nachdem die Taste gelöst wird. Ein weiterer Tastendruck erhöht die Geschwindigkeit. Bei den alternativen Tasten für schnellen Vor-/Rücklauf ist diese Einstellung immer aktiv.</translation>
     </message>
     <message>
         <source>Language</source>
@@ -1107,55 +1007,19 @@
         <translation>Verschiebt das Bild vertikal.</translation>
     </message>
     <message>
-        <source>Jitter reduction</source>
-        <translation>Bildstabilisator</translation>
-    </message>
-    <message>
-        <source>If this is set, frame timing will be adjusted for smoother motion.</source>
-        <translation>Falls gesetzt, wird das Frame Timing für eine gleichmäßigere Bewegung angepasst.</translation>
-    </message>
-    <message>
-        <source>Experimental A/V Sync</source>
-        <translation>Experimentelle A/V Sync</translation>
-    </message>
-    <message>
-        <source>If this is set, more experimental code will be in charge of video output. Use at your own risk.</source>
-        <translation>Falls gesetzt, wird experimenteller Code für die Videoausgabe verwendet. Verwendung auf eigene Gefahr.</translation>
-    </message>
-    <message>
-        <source>Default setting for Closed Captioning</source>
-        <translation>Voreinstellung für Untertitel</translation>
-    </message>
-    <message>
         <source>Always use Browse mode when changing channels in LiveTV</source>
         <translation>Browse Modus nach dem Umschalten</translation>
-    </message>
-    <message>
-        <source>If this is set, Browse mode will automatically be activated whenever you use Channel UP/DOWN when watching Live TV.</source>
-        <translation>Falls gesetzt, wird nach dem Senderwechsel der Browse Modus aktiviert.</translation>
     </message>
     <message>
         <source>Aggressive Soundcard Buffering</source>
         <translation>Aggressiver Audiodatenpuffer</translation>
     </message>
     <message>
-        <source>If this is set, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
-        <translation>Falls gesetzt, wird MythTV annehmen, einen kleineren Audiodatenpuffer zu haben. Dies kann das Positionieren beschleunigen, aber auch Probleme bei der Wiedergabe verursachen.</translation>
-    </message>
-    <message>
         <source>Clear Saved Position on playback</source>
         <translation>Bei der Wiedergabe die gespeicherte Position löschen</translation>
     </message>
     <message>
-        <source>Automatically clear saved position on a recording when the recording is played back.  If UNset, you can mark the beginning with rewind then save position.</source>
-        <translation>Löscht bei der Wiedergabe automatisch die gespeicherte Position in einer Aufnahme. Wenn diese Option nicht gesetzt ist, können Sie die Position durch &quot;Position speichern&quot; abspeichern.</translation>
-    </message>
-    <message>
         <source>Alternate Clear Saved Position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If set, during playback the select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If UNset, select will save the current position for each keypress.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1187,28 +1051,12 @@
         <translation>Falls gesetzt, wird am Ende einer Aufnahme ein Menü eingeblendet.</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images for recordings</source>
-        <translation>Vorschaubild von Aufnahmen</translation>
-    </message>
-    <message>
-        <source>If set, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
-        <translation>Falls gesetzt, wird im &quot;Aufnahmen ansehen&quot; Menü ein Vorschaubild einer Aufnahme angezeigt.</translation>
-    </message>
-    <message>
         <source>Display live preview of recordings</source>
         <translation>Live-Vorschau von Aufnahmen</translation>
     </message>
     <message>
-        <source>If set, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
-        <translation>Falls gesetzt, wird im &quot;Aufnahmen ansehen&quot; Menü eine Aufnahme in einem kleinen Fenster abgespielt.</translation>
-    </message>
-    <message>
         <source>Use Transparent Boxes</source>
         <translation>Transparente Rahmen</translation>
-    </message>
-    <message>
-        <source>If set, the Watch Recording and Delete Recording screens will use transparency. Unset this option if selecting the recordings is slow.</source>
-        <translation>Falls gesetzt, werden die &quot;Aufnahmen ansehen&quot; und &quot;Aufnahmen Löschen&quot; Menüs durchsichtig gezeichnet. Schalten Sie diese Option ab wenn diese Menüs langsam arbeiten sollten.</translation>
     </message>
     <message>
         <source>Popup Background Shading Method</source>
@@ -1225,22 +1073,6 @@
     <message>
         <source>None</source>
         <translation>Keine</translation>
-    </message>
-    <message>
-        <source>Fill is the quickest method, but it doesn&apos;t look good up close. Image looks good from up close, but is somewhat slow. And of course no shading will be the fastest.</source>
-        <translation>&apos;Füllen&apos; ist eine schnelle aber qualitativ durchschnittliche Methode; &apos;Bild&apos; ist langsamer aber besser. Und &apos;Keine&apos; Schattierung ist natürlich am schnellsten.</translation>
-    </message>
-    <message>
-        <source>Always use Advanced Recording Options screen</source>
-        <translation>Nutze immer die erw. Aufnahmeoptionen</translation>
-    </message>
-    <message>
-        <source>Always use the Advanced Recording Options screen when editing a scheduled recording.</source>
-        <translation>Benutze immer das &apos;erweiterte Aufnahmeoptionen&apos; Menü beim Planen einer Aufnahme.</translation>
-    </message>
-    <message>
-        <source>System shutdown</source>
-        <translation>Beenden-Taste</translation>
     </message>
     <message>
         <source>ESC</source>
@@ -1269,10 +1101,6 @@
     <message>
         <source>Halt command</source>
         <translation>Befehl für Systemstop</translation>
-    </message>
-    <message>
-        <source>If you have configured an exit key on the System Shutdown menu, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is poweroff</source>
-        <translation>Geben Sie hier den Befehl an, um den Rechner herunterzufahren, z.B. &quot;halt&quot; oder &quot;poweroff&quot;.</translation>
     </message>
     <message>
         <source>Xinerama screen</source>
@@ -1309,10 +1137,6 @@
     <message>
         <source>Run the frontend in a window</source>
         <translation>MythTV im Fenster starten</translation>
-    </message>
-    <message>
-        <source>Toggles between borderless operation.</source>
-        <translation>Schaltet die rahmenlose Darstellung ein/aus.</translation>
     </message>
     <message>
         <source>Use a random theme</source>
@@ -1365,14 +1189,6 @@
     <message>
         <source>&quot;Small&quot; font</source>
         <translation>&quot;Kleiner&quot; Zeichensatz</translation>
-    </message>
-    <message>
-        <source>Program Guide Selection Placement</source>
-        <translation>Flexibles Auswahlfenster</translation>
-    </message>
-    <message>
-        <source>If unchecked, the program guide&apos;s selector will stay in the middle of the guide at all times.</source>
-        <translation>Falls nicht gesetzt, bleibt das Auswahlfenster stets in der Mitte der Übersicht.</translation>
     </message>
     <message>
         <source>Guide Shading Method</source>
@@ -1431,14 +1247,6 @@
         <translation>Andere</translation>
     </message>
     <message>
-        <source>This is used to determine the name of the blink binary led will be used on GentooX, blink otherwise.</source>
-        <translation>Bestimmt den Namen des Blink Programms. Bei GentooX wird &apos;led&apos; verwendet, ansonsten &apos;blink&apos;.</translation>
-    </message>
-    <message>
-        <source>Default LED mode</source>
-        <translation>Standard LED Modus</translation>
-    </message>
-    <message>
         <source>Off</source>
         <translation>Aus</translation>
     </message>
@@ -1455,24 +1263,12 @@
         <translation>Rot</translation>
     </message>
     <message>
-        <source>This sets the LED mode when there is nothing else to display</source>
-        <translation>Bestimmt den LED Modus wenn es nichts anderes anzuzeigen gibt.</translation>
-    </message>
-    <message>
         <source>Recording LED mode</source>
         <translation>Aufnahme LED Modus</translation>
     </message>
     <message>
-        <source>This sets the LED mode when a backend is recording</source>
-        <translation>Bestimmt den LED Modus während einer Aufnahme</translation>
-    </message>
-    <message>
         <source>Recording Check Frequency</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This specifies how often in seconds to check if a recording is in progress and update the Xbox LED.</source>
-        <translation>Bestimmt wie oft auf eine laufende Aufnahme getestet wird, um den LED Modus anzupassen.</translation>
     </message>
     <message>
         <source>General playback</source>
@@ -1731,10 +1527,6 @@
         <translation>Nutze Xv Bildregler</translation>
     </message>
     <message>
-        <source>If set, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the v4l controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation>Falls gesetzt, können während der Wiedergabe die Xv Bildregler genutzt werden. Diese sind unabhängig von den für die Aufnahme verwendeten V4L Reglern. In manchen Rechnern könnten die Xv Regler nicht funktionieren.</translation>
-    </message>
-    <message>
         <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
         <translation>Nutze den PVR-350 MPEG Dekoder (TV out)</translation>
     </message>
@@ -1804,16 +1596,8 @@
         <translation>UDP Port</translation>
     </message>
     <message>
-        <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
-        <translation>Falls eine Portnummer gesetzt ist, wird MythTV während der Wiedergabe auf Verbindungen von &quot;mythtvosd&quot; oder &quot;mythudprelay&quot; warten. Einzelheiten dazu finden Sie in der README Datei in contrib/mythnotify.</translation>
-    </message>
-    <message>
         <source>Skip blank frames after commercials</source>
         <translation>Dunkle Frames überspringen</translation>
-    </message>
-    <message>
-        <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the the commercial break.</source>
-        <translation type="obsolete">Für die &apos;Dunkle Frames&apos; Methode und bei aktiver &apos;Werbung autom. markieren&apos; Option. Dunkle Frames nach einem Werbeblock werden wie Werbung behandelt.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -1848,16 +1632,8 @@
         <translation>Aufnehmen</translation>
     </message>
     <message>
-        <source>Priority</source>
-        <translation>Priorität</translation>
-    </message>
-    <message>
         <source>Enable AC3 to SPDIF passthrough</source>
         <translation>AC3 nach SPDIF durchschleifen</translation>
-    </message>
-    <message>
-        <source>Enable sending AC3 sound directly to your sound card&apos;s SPDIF output, on sources which contain AC3 soundtracks (usually digital TV).  Requires that the audio output device be set to something suitable.</source>
-        <translation>AC3 Audio am SPDIF Ausgang der Soundkarte bereitstellen. Dies funktioniert nur falls eine AC3 Tonspur verfügbar ist (wie beim Digitalfernsehen). Ihre Soundkarte muß dafür richtig konfiguriert sein.</translation>
     </message>
     <message>
         <source>PIP Video Location</source>
@@ -1936,50 +1712,6 @@
         <translation>Verlassen und den Rechner anhalten</translation>
     </message>
     <message>
-        <source>Myth version:</source>
-        <translation>Myth Version:</translation>
-    </message>
-    <message>
-        <source>Last mythfilldatabase guide update:</source>
-        <translation>Letzte Aktualisierung des TV Programms:</translation>
-    </message>
-    <message>
-        <source>Started:   </source>
-        <translation>Gestartet: </translation>
-    </message>
-    <message>
-        <source>Finished: </source>
-        <translation>Beendet: </translation>
-    </message>
-    <message>
-        <source>Result: </source>
-        <translation>Status: </translation>
-    </message>
-    <message>
-        <source>There&apos;s no guide data available! </source>
-        <translation>Keine Programminformationen verfügbar!</translation>
-    </message>
-    <message>
-        <source>Have you run mythfilldatabase?</source>
-        <translation>Haben Sie mythfilldatabase gestartet?</translation>
-    </message>
-    <message>
-        <source>There is guide data until </source>
-        <translation>Letzter Eintrag für </translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation>Tage</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation>Tag</translation>
-    </message>
-    <message>
-        <source>WARNING: is mythfilldatabase running?</source>
-        <translation>WARNUNG: läuft mythfilldatabase regelmäßig?</translation>
-    </message>
-    <message>
         <source>Not Flagged</source>
         <translation>Nicht markiert</translation>
     </message>
@@ -1994,22 +1726,6 @@
     <message>
         <source>Use GUI size for TV playback</source>
         <translation>GUI Größe für TV-Bild verwenden</translation>
-    </message>
-    <message>
-        <source>If checked, use the above size for TV. If unchecked, use full screen.</source>
-        <translation>Falls gesetzt, wird das Fernsehbild auf GUI Größe angepasst, ansonsten auf Vollbildgröße.</translation>
-    </message>
-    <message>
-        <source>If this is set, captions will be on by default when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &apos;T&apos; during playback.</source>
-        <translation>Falls gesetzt, werden Untertitel (engl. closed caption, CC) beim Fernsehen sowie bei der Wiedergabe von Aufnahmen eingeblendet. Mit der Taste &quot;T&quot; können Untertitel während der Wiedergabe ein- und ausgeblendet werden.</translation>
-    </message>
-    <message>
-        <source>No Prompt on Exit</source>
-        <translation>Sofort beenden</translation>
-    </message>
-    <message>
-        <source>If set, you will not be prompted when pressing the exit key.  Instead, MythTV will immediately exit.</source>
-        <translation>Falls gesetzt, beendet sich MythTV nach Drücken der Beenden-Taste ohne nachzufragen.</translation>
     </message>
     <message>
         <source>Alpha - Transparent (CPU Usage - High)</source>
@@ -2032,10 +1748,6 @@
         <translation>Genrefarben anzeigen</translation>
     </message>
     <message>
-        <source>Colorize program guide using  genre colors. (Not available for all grabbers.)</source>
-        <translation>Kategorien in der Programmübersicht farblich markieren. (nicht bei allen XMLTV Quellen verfügbar)</translation>
-    </message>
-    <message>
         <source>Display Genre Text</source>
         <translation>Kategorien anzeigen</translation>
     </message>
@@ -2050,14 +1762,6 @@
     <message>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them.</source>
         <translation>Aktiviert die Unterstützung zur Überwachung Ihrer CD/DVD Laufwerke für neue Medien und den Start passender Plugins für deren Handhabung.</translation>
-    </message>
-    <message>
-        <source>Use HW XVMC MPEG Decoding</source>
-        <translation>Nutze XVMC H/W MPEG Dekoder</translation>
-    </message>
-    <message>
-        <source>Use VIA HW MPEG Decoding</source>
-        <translation>Nutze Via H/W MPEG Dekoder</translation>
     </message>
     <message>
         <source>Hardware Decoding Settings</source>
@@ -2534,14 +2238,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Vermutlich müssen Sie XMLTV aktualisieren.</translation>
     </message>
     <message>
-        <source>Please wait while MythTV retrieves the list of available channels.
-You may wish to check the output as it
-runs by switching to the terminal from which you started
-this program.</source>
-        <translation type="obsolete">Bitte warten Sie während MythTV eine Liste der verfügbaren Sender einliest.
-Weitere Meldungen finden Sie im Terminal-Fenster von dem aus Sie das Programm gestartet haben.</translation>
-    </message>
-    <message>
         <source>Failed to retrieve channel information.</source>
         <translation>Konnte keine Senderinformationen finden.</translation>
     </message>
@@ -2622,10 +2318,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>FEHLER, Keine Eingänge gefunden</translation>
     </message>
     <message>
-        <source>ERROR, V4L support unavailable on Windows</source>
-        <translation>FEHLER, V4L Unterstützung unter Windows nicht verfügbar</translation>
-    </message>
-    <message>
         <source>[All VideoSources]</source>
         <translation>[Alle Videoquellen]</translation>
     </message>
@@ -2684,10 +2376,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>XMLTV listings grabber</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ZIP/postal code</source>
-        <translation type="obsolete">PLZ</translation>
     </message>
     <message>
         <source>Region</source>
@@ -2887,10 +2575,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Preset tuner to channel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If specified, the tuner will change to this channel when the input is selected.  This is only useful if you use your tuner input with an external channel changer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3118,14 +2802,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>MasterBackend</translation>
     </message>
     <message>
-        <source>Start Early (minutes)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>End Late   (minutes)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Wait for SEQ start header.</source>
         <translation>Warte auf SEQ-Start Header.</translation>
     </message>
@@ -3134,16 +2810,8 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Beim Umschalten warnen</translation>
     </message>
     <message>
-        <source>If set, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation>Falls gesetzt, wird MythTV Sie vor dem Senderwechsel auf den Verlust des Live TV Datenpuffers hinweisen.</translation>
-    </message>
-    <message>
         <source>Find One Recording</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record one showing of this program</source>
-        <translation>Diese Ausstrahlung aufnehmen</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -3154,19 +2822,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Zeitversatz für Vorschaubilder</translation>
     </message>
     <message>
-        <source>How many seconds into the show to capture the static preview images from.</source>
-        <translation>Erzeugt das Vorschaubild einer Aufnahme um so viele Sekunden nach dem Beginn einer Sendung.</translation>
-    </message>
-    <message>
         <source>Find One Recordings Priority</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Find One Recording types will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Interval to sample DVB signal stats at (in seconds, 0 = off)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3206,46 +2866,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Position gelöscht</translation>
     </message>
     <message>
-        <source>Duplicate Location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All places</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Current Recs</source>
-        <translation>Aktuelle Aufnahmen</translation>
-    </message>
-    <message>
-        <source>Previous Recs</source>
-        <translation>Alte Aufnahmen</translation>
-    </message>
-    <message>
-        <source>Duplicate Check</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sub &amp; Desc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation>Inhalt</translation>
-    </message>
-    <message>
-        <source>Max episodes</source>
-        <translation>max. Folgen</translation>
-    </message>
-    <message>
-        <source>Delete oldest over Max</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording Group</source>
-        <translation>Aufnahmegruppe</translation>
-    </message>
-    <message>
         <source>Open DVB card on demand</source>
         <translation>DVB Karte bei Bedarf ansprechen</translation>
     </message>
@@ -3264,10 +2884,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Default Recording Group to display</source>
         <translation>Standard Aufnahmegruppe</translation>
-    </message>
-    <message>
-        <source>Default Recording Group to display on the view recordings screen.</source>
-        <translation>Standard Aufnahmegruppe für das &quot;Aufnahmen ansehen&quot; Menü.</translation>
     </message>
     <message>
         <source>Save current Recording Group view when changed</source>
@@ -3350,23 +2966,8 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>diese Folge wird stattdessen früher aufgenommen.</translation>
     </message>
     <message>
-        <source>another program with a higher priority will be recorded instead.</source>
-        <translation>ein anderes Programm mit höherer Priorität aufgenommen wird.</translation>
-    </message>
-    <message>
-        <source>this episode will be recorded at a later time instead.</source>
-        <translation>diese Folge wird zu einem späteren Zeitpunkt aufgenommen.</translation>
-    </message>
-    <message>
         <source>Clear Override</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The following programs will be recorded instead:
-</source>
-        <translation>Die folgenden Sendungen werden stattdessen aufgenommen:
-
-</translation>
     </message>
     <message>
         <source>30m</source>
@@ -3401,32 +3002,12 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Erlaubt das getrennte Stummschalten des linken oder rechten Kanals. Nützlich für Sendungen die mit Zweikanalton ausgestrahlt werden.</translation>
     </message>
     <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation>Bestimmt die Methode mit der MythTV Beginn und Ende eines Werbeblocks sucht. Sie müssen die &apos;Werbung autom. markieren&apos; Option eingeschaltet haben, um auch andere als die &apos;Dunkle Frames&apos; Methode verwenden zu können.</translation>
-    </message>
-    <message>
-        <source>Display &apos;favorite&apos; channels</source>
-        <translation>Nur Favoriten zeigen</translation>
-    </message>
-    <message>
-        <source>If set, the EPG will initally display only the channels marked as favorites. &quot;4&quot; will toggle between favorites and all channels.</source>
-        <translation>Falls gesetzt, werden im EPG nur die als Favoriten markierten Sender angezeigt. Die Taste &quot;4&quot; schaltet zwischen den Favoriten und allen Sendern um.</translation>
-    </message>
-    <message>
         <source>Reschedule Higher Priorities</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would not otherwise be recorded, but risks missing a higher priority program if the schedule changes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use select to change the channel in the program guide</source>
         <translation>Umschalten bei &apos;Select&apos; (im EPG)</translation>
-    </message>
-    <message>
-        <source>If checked the select key will change the channel while using the program guide during live TV.  If unchecked the select key will bring up the recording options screen.</source>
-        <translation>Falls gesetzt, wird beim Drücken der Select-Taste (Enter) auf den gewählten Sender umgeschaltet. Ansonsten wechselt diese Taste in das Menü mit den Aufnahmeoptionen.</translation>
     </message>
     <message>
         <source>Visible</source>
@@ -3437,18 +3018,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Falls gesetzt, wird dieser Sender im EPG angezeigt.</translation>
     </message>
     <message>
-        <source>DB Logging Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If checked, the Myth modules will send event details to the database, where they can be viewed with MythLog or emailed out periodically.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Max. Number of Entries per Module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>If there are more than this number of entries for a module, the oldest log entries will be deleted to reduce the count to this number.  Set to 0 to disable.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3457,15 +3026,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This enables the periodic cleanup of the events stored in the Myth database (see &apos;DB Logging Enabled&apos; on the previous page).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Log Cleanup Frequency (Days)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The number of days between log cleanup runs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3549,15 +3110,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  Ex. setting Min to 11 and Max to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>mythfilldatabase Execution End</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  Ex. setting Min to 11 and Max to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3717,36 +3270,12 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>TV-Karte einrichten</translation>
     </message>
     <message>
-        <source>If specified, this command will be run to change the channel for inputs which do not have a tuner. The first argument will be the channel number.</source>
-        <translation>Falls angegeben wird für Eingänge ohne Tuner dieses Programm gestartet um den Sender umzuschalten. Als erstes Argument wird der Senderplatz übergeben.</translation>
-    </message>
-    <message>
         <source>Data Direct Lineup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Retrieve Lineups</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show group name instead of &quot;All Programs&quot;.</source>
-        <translation>Zeige Gruppennamen anstatt &quot;Alle Sendungen&quot;</translation>
-    </message>
-    <message>
-        <source>Use the name of the display group currently being show in place of the term &quot;All Programs&quot; in theplayback screen.</source>
-        <translation>Zeigt den Namen der aktuell gewählten Anzeigegruppe statt dem allgemeineren &quot;Alle Sendungen&quot; im Wiedergabemenü.</translation>
-    </message>
-    <message>
-        <source>Start in title section.</source>
-        <translation>Mit Titeln beginnen</translation>
-    </message>
-    <message>
-        <source>If set, focus will initially be on the show titles otherwise focus will be on the recordings.</source>
-        <translation>Falls gesetzt, wird der Auswahlfokus bei den Sendungsnamen liegen, ansonsten bei den Aufnahmen.</translation>
-    </message>
-    <message>
-        <source>Show group summary.</source>
-        <translation>Gruppenzusammenfassung zeigen</translation>
     </message>
     <message>
         <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
@@ -3845,10 +3374,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Aufnahmeschwellwert (Min.)</translation>
     </message>
     <message>
-        <source>If the option to use select to change the channel is on, pressing select on a show that is at least this many minutes into the future will schedule a recording.</source>
-        <translation>Nur bei aktiver &quot;Umschalten bei Select&quot; Option gültig. Liegt der Beginn einer Sendung mindestens so viele Minuten in der Zukunft, so wird beim drücken der &quot;Select&quot;-Taste eine neue Aufnahme geplant statt auf diesen Sender umzuschalten.</translation>
-    </message>
-    <message>
         <source>View Recordings (Recording Groups)</source>
         <translation>Aufnahmen ansehen (Aufnahmegruppen)</translation>
     </message>
@@ -3915,18 +3440,6 @@ Myth wird nun beendet.</translation>
         <translation>Dennoch aufnehmen</translation>
     </message>
     <message>
-        <source>Record this showing with normal options</source>
-        <translation>Diese Ausstrahlung mit normalen Optionen aufnehmen</translation>
-    </message>
-    <message>
-        <source>Record this showing with override options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Do not record this showing</source>
-        <translation>Diese Ausstrahlung nicht aufnehmen</translation>
-    </message>
-    <message>
         <source>External application or script to run when a keypress is received by LIRC.</source>
         <translation>Externes Programm daß nach dem Empfang eines Tastencodes über LIRC gestartet wird.</translation>
     </message>
@@ -3937,42 +3450,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Separate video modes for GUI and TV playback</source>
         <translation>Getrennte Einstellungen für GUI und TV Wiedergabe</translation>
-    </message>
-    <message>
-        <source>Switch X Window video modes for TV. Requires &apos;xrandr&apos; support.</source>
-        <translation>Schaltet die X Window Bildschirmauflösung für die TV Wiedergabe um. Benötigt die &apos;xrandr&apos; Unterstützung im X Window System.</translation>
-    </message>
-    <message>
-        <source>GUI X size (px)</source>
-        <translation>GUI X Größe (px)</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
-        <translation>Horizontale Auflösung für die GUI. Dieser Modus muß in der X Server Konfiguration verfügbar sein.</translation>
-    </message>
-    <message>
-        <source>GUI Y size (px)</source>
-        <translation>GUI Y Größe (px)</translation>
-    </message>
-    <message>
-        <source>Vertical resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
-        <translation>Vertikale Auflösung für die GUI. Dieser Modus muß in der X Server Konfiguration verfügbar sein.</translation>
-    </message>
-    <message>
-        <source>TV X size (px)</source>
-        <translation>TV X Größe (px)</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution for playback video mode. This mode must be already configured in XF86Config.</source>
-        <translation>Horizontale Auflösung für die TV Wiedergabe. Dieser Modus muß in der X Server Konfiguration verfügbar sein.</translation>
-    </message>
-    <message>
-        <source>TV Y size (px)</source>
-        <translation>TV Y Größe (px)</translation>
-    </message>
-    <message>
-        <source>Vertical resolution for playback video mode. This mode must be already configured in XF86Config.</source>
-        <translation>Vertikale Auflösung für die TV Wiedergabe. Dieser Modus muß in der X Server Konfiguration verfügbar sein.</translation>
     </message>
     <message>
         <source>Video Mode Settings</source>
@@ -3995,39 +3472,15 @@ Myth wird nun beendet.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DataDirect Status: </source>
-        <translation>DataDirect Status:</translation>
-    </message>
-    <message>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
         <translation>Falls gesetzt, wird der Master Rechner Aufnahmen löschen oder an ein Frontend übertragen. Nützlich wenn Sie Aufnahmen zentral speichern und ein Slave Rechner nicht eingeschaltet ist.</translation>
-    </message>
-    <message>
-        <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. </source>
-        <translation>Bildkorrektur für die Wiedergabe über einen Monitor u.ä. Diese Option nutzt die SSE Funktionen des Prozessors und führt zum Programmabsturz falls diese fehlen sollten. Sehen Sie in der Dokumentation für weitere Informationen nach.</translation>
     </message>
     <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
         <translation>Beim Beenden des schnellen Vor-/Rücklaufs im &quot;Klebrige Tasten&quot; Modus wird erst neu positioniert bevor die Wiedergabe einsetzt. Dies gleicht die Verzögerung beim Beenden des schnellen Vor-/Rücklaufs aus.</translation>
     </message>
     <message>
-        <source>If set, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa. If not set, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wait for ATSC signal lock (msec)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MythTV can check the signal strength When you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before we give up trying to get an acceptible signal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>ATSC Signal Threshold</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Threshold for a signal to be considered acceptible. If you set this too low Myth may crash, if you set it too low you may not be able to tune to channels on which reception is good.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4142,20 +3595,12 @@ Myth wird nun beendet.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This setting will change the qt widget style on startup, if this setting is set to anything other than &apos;Desktop Style&apos;. Setting this setting to &apos;Desktop Style&apos; will have no effect on the currently running MythTV session.</source>
-        <translation>Wählen Sie hier Ihren bevorzugten Qt Stil. Standardmäßig wird der Desktop Stil verwendet. Eine Änderung wird erst nach einem Neustart berücksichtigt.</translation>
-    </message>
-    <message>
         <source>Startup command</source>
         <translation>Einschaltbefehl</translation>
     </message>
     <message>
         <source>This command is executed right after starting the BE. As a parameter &apos;$status&apos; is replaced by either &apos;auto&apos; if the machine was started automatically or &apos;user&apos; if a user switched it on.</source>
         <translation>Dieses Kommando wird nach dem Start des Backends aufgerufen. Der Parameter &quot;$status&quot; wird, falls der Server automatisch gestartet wurde, durch &quot;auto&quot; ersetzt oder &quot;user&quot; wenn er manuell gestartet wurde.</translation>
-    </message>
-    <message>
-        <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the commercial break.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Title Search</source>
@@ -4173,20 +3618,588 @@ Myth wird nun beendet.</translation>
         <source>Unknown Search</source>
         <translation type="unfinished">Unbekannte Suche</translation>
     </message>
-</context>
-<context>
-    <name>ScheduledRecording</name>
     <message>
-        <source>List upcoming episodes</source>
-        <translation>Zeige kommende Folgen</translation>
+        <source>(Unassigned)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;Abbrechen</translation>
+        <source>GB</source>
+        <comment>GigaBytes</comment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Finish</source>
-        <translation>&amp;Fertig</translation>
+        <source>stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>r</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode is a repeat.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>another program with a higher priority will be recorded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode will be recorded at a later time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Episode Number:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Airdate:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program ID:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filesize:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> The following programs will be recorded instead:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forget Previous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any</source>
+        <translation type="unfinished">Jede</translation>
+    </message>
+    <message>
+        <source>Record using the &quot;%1&quot; profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduling Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create New Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Store in the &quot;%1&quot; recording group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Recording Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create a new recording group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save these settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, V4L support unavailable on this OS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initial volume for PCM output.  Using the volume keys in MythTV will adjust this parameter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable sending AC3 audio directly to your sound card&apos;s SPDIF output, on sources which contain AC3 soundtracks (usually digital TV).  Requires that the audio output device be set to something suitable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the video look normal on a progressive display (i.e. monitor).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Algorithm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Linear blend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Kernel (less motion blur)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bob (2x framerate)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>One field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deinterlace algorithm.  &apos;Linear blend&apos; and &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deinterlace settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this setting if MythTV is playing &quot;crackly&quot; audio and you are using hardware encoding. This setting will have no effect on MPEG-4 or RTJPEG video. MythTV will keep extra audio data in its internal buffers to workaround this bug.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display on the View Recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show group name instead of &quot;All Programs&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the name of the display group currently being shown in place of the term &quot;All Programs&quot; in the playback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start in Title section</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, the selector highlight will start on the Program titles window, otherwise the selector will default to the recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show group summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; enabled to use anything other than &apos;Blank Frame&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CPU Usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting determines approximately how much CPU Commercial Detection threads will consume. On &apos;High&apos;, all available CPU time will be used which may cause problems on slow systems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Detection Processing Host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select &apos;Default&apos; to run Commercial Detection on the same backend which created a recording, or select a hostname to run all detection jobs on a specific host.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable stricter Commercial Detection code.  Disable if some commercials are not being detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When using Blank Frame Detection and Auto-Flagging, include blank frames following commercial breaks as part of the commercial break.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Skip Notify Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, MythTV will act like a commercial begins this many seconds early.  This can be useful when commercial notification is used in place of automatic skipping.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trigger AutoExpire when available disk space is below this value.  Disable AutoExpire by setting to 0.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How often the AutoExpire process checks for free disk space.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen, otherwise the oldest recording will be listed first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa.  If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always display Closed Captioning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, captions will be displayed when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, Browse mode will automatically be activated whenever you use Channel UP/DOWN while watching Live TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically clear saved position on a recording when the recording is played back.  If disabled, you can mark the beginning with rewind then save position.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>During playback the Select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If disabled, the Select key will save the current position for each keypress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate thumbnail preview images of recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV will make a thumbnail image this many seconds from the beginning of the recording. Useful to skip over advertisements.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, the Watch Recording and Delete Recording screens will use transparency. Disable if selecting the recordings is slow due to high CPU usage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;Fill&quot; is the quickest shading method. &quot;Image&quot; is somewhat slow, but has a higher visual quality. No shading will be the fastest.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Exit key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, MythTV will prompt for confirmation when you press the System Exit key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you have configured an exit key using the System Shutdown option, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is &quot;poweroff&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Arrow Key Accelerators</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, Arrow key accelerators will be used, with LEFT performing an exit action and RIGHT selecting the current item.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Size - Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Size - Height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, use the above size for TV, otherwise use full screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution of video mode which needs a special output resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution of video mode which needs a special output resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution for playback video mode. This mode must be defined in your X configuration file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution for playback video mode. This mode must be defined in your X configuration file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt Aspect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If X&apos;s DisplaySize indicates 16:9, fudge vertical size into 4:3, and visa-versa</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI Size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Display (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Physical Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggles between windowed and borderless operation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At startup, MythTV will change the Qt widget style to this setting.  If &quot;Desktop Style&quot; is selected, MythTV will use the existing desktop setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time limit for ATSC signal lock (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV can check the signal strength when you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before MythTV gives up trying to get an acceptable signal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threshold for a signal to be considered acceptable. If you set this too low MythTV may crash, and if you set it too high you may not be able to tune a channel on which reception would be acceptable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Avoid conflicts between live TV and scheduled shows.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, live TV will choose a tuner card that is less likely to have scheduled recordings rather than the best card available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Floating Program Guide Selector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colorize program guide using genre colors. (Not available for all grabbers.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only display &apos;favorite&apos; channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, the Select key will change the channel while using the program guide during live TV.  If disabled, the select key will bring up the recording options screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the option to use Select to change the channel is on, pressing Select on a show that is at least this many minutes into the future will schedule a recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The program used to control the LED on the Xbox is dependant on which distribution is installed. &quot;led&quot; will be used on GentooX, &quot;blink&quot; on other Xbox distributions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default LED color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sets the LED color when it is not being used for status indication.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sets the LED color when a backend is recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This specifies how frequently (in seconds) to check if a recording is in progress in order to update the Xbox LED.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use hardware XvMC MPEG Decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use VIA hardware MPEG Decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sample interval for DVB signal statistics (in seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV will monitor the DVB signal statistics using the specified interval.  Set to &quot;0&quot; to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log MythTV events to database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV modules will send event details to the database, where they can be viewed with MythLog or periodically emailed to the administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Number of Entries per Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This enables the periodic cleanup of the events stored in the Myth database (see &quot;Log MythTV events to database&quot; on the previous page).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of days between log cleanup runs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shows Program Guide when starting Live TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This starts the program guide immediately upon starting to watch Live TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Backlight Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Detection (Playback)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directed By</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4542,6 +4555,50 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Begin Transcoding</source>
         <translation>Umwandlung starten</translation>
+    </message>
+    <message>
+        <source>Audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to Begining</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are exiting this video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit to the menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brightness</source>
+        <translation type="unfinished">Helligkeit</translation>
+    </message>
+    <message>
+        <source>Contrast</source>
+        <translation type="unfinished">Kontrast</translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hue</source>
+        <translation type="unfinished">Farbton</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(REC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Skip Pre-Notify</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
