@@ -42,6 +42,13 @@ void AudioClient::playTrack(int container, int id)
     client_socket_to_service->writeBlock(command.ascii(), command.length());
 }
 
+void AudioClient::stopAudio()
+{
+    QString command = QString("stop");
+
+    client_socket_to_service->writeBlock(command.ascii(), command.length());
+}
+
 void AudioClient::handleIncoming()
 {
     //

@@ -301,6 +301,23 @@ void MfdInstance::playAudio(int container, int type, int which_id)
         
 }
 
+void MfdInstance::stopAudio()
+{
+    for(
+        ServiceClient *an_sc = my_service_clients->first();
+        an_sc;
+        an_sc = my_service_clients->next()
+       )
+    {
+        if(an_sc->getType()    == MFD_SERVICE_AUDIO_CONTROL)
+        {
+            AudioClient *ac = (AudioClient *)an_sc;
+            ac->stopAudio();
+            break;
+        }
+    }
+}
+
 void MfdInstance::readFromMfd()
 {
     char in_buffer[2049];

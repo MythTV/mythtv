@@ -28,6 +28,7 @@ class AudioClient : public ServiceClient
 
 
     void playTrack(int container, int id);
+    void stopAudio();
     void handleIncoming();
     void parseFromAudio(QStringList &tokens);
     ~AudioClient();

@@ -59,6 +59,26 @@ void MfdInterface::playAudio(int which_mfd, int container, int type, int which_i
     }
 }
 
+void MfdInterface::stopAudio(int which_mfd)
+{
+    //
+    //  Find the instance, ask it to play something
+    //  
+
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if(an_mfd->getId() == which_mfd)
+        {
+            an_mfd->stopAudio();
+            break;
+        }
+    }
+}
+
 
 
 void MfdInterface::customEvent(QCustomEvent *ce)

@@ -30,7 +30,8 @@ class MfdInterface : public QObject
     ~MfdInterface();
 
     void playAudio(int which_mfd, int container, int type, int which_id);
-
+    void stopAudio(int which_mfd);
+    
   signals:
 
     //
