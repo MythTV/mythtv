@@ -14,6 +14,7 @@
 #include <qtimer.h>
 #include <qptrlist.h>
 #include <qthread.h>
+#include <qdatetime.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
