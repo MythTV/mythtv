@@ -3325,7 +3325,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This global setting is ignored in case of conflicts with other scheduled programs.</source>
-        <translation>Ta, globalna nastavitev bo spregledana v primeru konflikta z ostalimi ročno nastavljenimi programi.</translation>
+        <translation type="obsolete">Ta, globalna nastavitev bo spregledana v primeru konflikta z ostalimi ročno nastavljenimi programi.</translation>
     </message>
     <message>
         <source>Time to record past end of show (in seconds)</source>
@@ -6093,6 +6093,14 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

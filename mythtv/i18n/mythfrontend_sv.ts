@@ -2306,7 +2306,7 @@
     </message>
     <message>
         <source>This global setting is ignored in case of conflicts with other scheduled programs.</source>
-        <translation>Denna globala inställning ignoreras vid konflikt med andra inspelningar.</translation>
+        <translation type="obsolete">Denna globala inställning ignoreras vid konflikt med andra inspelningar.</translation>
     </message>
     <message>
         <source>Program Guide Alpha</source>
@@ -5629,6 +5629,14 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
         <translation>Använd en LCD-display för att visa statusinformation. Omstart av mythfrontend krävs för att (av)aktivera.</translation>
+    </message>
+    <message>
+        <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
+        <translation>Global inställning som anger hur lång tid innan programmets början inspelningen börjar. Påverkar inte schemaläggaren. Värdet ignoreras då två program schemalagts utan tillräckligt med tid emellan.</translation>
+    </message>
+    <message>
+        <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
+        <translation>Global inställning som anger hur lång tid efter programmets slut inspelningen slutar. Påverkar inte schemaläggaren. Värdet ignoreras då två program schemalagts utan tillräckligt med tid emellan.</translation>
     </message>
 </context>
 <context>
