@@ -795,7 +795,7 @@ void DataDirectStationUpdate(Source source)
             dd_update.bindValue(":CALLSIGN", dd_station_info.value(0));
             dd_update.bindValue(":NAME", dd_station_info.value(1));
             dd_update.bindValue(":STATIONID", dd_station_info.value(2));
-            dd_update.bindValue(":CHANNEL", dd_station_info.value(3));
+            dd_update.bindValue(":CHANNEL", channel);
             dd_update.bindValue(":SOURCEID", source.id);
             dd_update.bindValue(":FREQID", freqid);
             if (!dd_update.exec())
