@@ -171,6 +171,17 @@ public:
     };
 };
 
+class SmartForward: public CheckBoxSetting, public GlobalSetting {
+public:
+    SmartForward():
+        GlobalSetting("SmartForward") {
+        setLabel("Smart Fast Forwarding");
+        setValue(false);
+        setHelpText("If enabled, then immediately after rewinding, only skip "
+                    "forward the same amount as skipping backwards.");
+    };
+};
+
 class ExactSeeking: public CheckBoxSetting, public GlobalSetting {
 public:
     ExactSeeking():
@@ -559,6 +570,19 @@ public:
                    "will alternate between \"Position Saved\" and \"Position "
                    "Cleared\". If UNset, select will save the current "
                    "position for each keypress.");
+    };
+};
+
+class UsePicControls: public CheckBoxSetting, public GlobalSetting {
+public:
+    UsePicControls():
+       GlobalSetting("UseOutputPictureControls") {
+       setLabel("Use Xv picture controls");
+       setValue(false);
+       setHelpText("If set, this allows the user to change the Xv picture "
+                   "controls (brightness, hue, contrast, color) in addition "
+                   "to the normal support for the same v4l controls.  Breaks "
+                   "on some machines.");
     };
 };
 
@@ -1173,9 +1197,8 @@ public:
         GlobalSetting("XboxCheckRec") {
         setLabel("Recording Check Frequency");
         setValue(5);
-        setHelpText("This specifies how often to check if a recording "
-                    "is in progress and update the Xbox LED.");
-
+        setHelpText("This specifies how often in seconds to check if a " 
+                    "recording is in progress and update the Xbox LED.");
     };
 };
 
@@ -1205,12 +1228,14 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new EndOfRecordingExitPrompt());
     general->addChild(new ClearSavedPosition());
     general->addChild(new AltClearSavedPosition());
+    general->addChild(new UsePicControls());
     addChild(general);
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
     seek->setLabel("Seeking");
     seek->addChild(new FastForwardAmount());
     seek->addChild(new RewindAmount());
+    seek->addChild(new SmartForward());
     seek->addChild(new StickyKeys());
     seek->addChild(new FFRewRepos());
     seek->addChild(new ExactSeeking());

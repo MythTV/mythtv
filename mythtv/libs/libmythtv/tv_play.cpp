@@ -23,7 +23,6 @@ using namespace std;
 #include "volumecontrol.h"
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
-#include "avformat.h"
 
 enum SeekSpeeds {
   SSPEED_NORMAL_WITH_DISPLAY = 0,
@@ -90,6 +89,7 @@ TV::TV(QSqlDatabase *db)
     times_pressed = 0;
     last_channel = "";
     picAdjustment = 0;
+    doSmartForward = false;
 
     getRecorderPlaybackInfo = false;
     recorderPlaybackInfo = NULL;
@@ -120,6 +120,7 @@ void TV::Init(bool createWindow)
     fftime = gContext->GetNumSetting("FastForwardAmount", 30);
     rewtime = gContext->GetNumSetting("RewindAmount", 5);
     jumptime = gContext->GetNumSetting("JumpAmount", 10);
+    usePicControls = gContext->GetNumSetting("UseOutputPictureControls", 0);
 
     recorder = piprecorder = activerecorder = NULL;
     nvp = pipnvp = activenvp = NULL;
@@ -703,6 +704,7 @@ void TV::RunTV(void)
 
     stickykeys = gContext->GetNumSetting("StickyKeys");
     ff_rew_repos = gContext->GetNumSetting("FFRewRepos", 1);
+    smartForward = gContext->GetNumSetting("SmartForward", 0);
 
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
@@ -973,7 +975,8 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_F:
         {
-            DoTogglePictureAttribute();
+            if (usePicControls)
+                DoTogglePictureAttribute();
             break;
         }
         case Key_Right: case Key_D: 
@@ -983,7 +986,12 @@ void TV::ProcessKeypress(int keypressed)
             else if (paused)
                 DoSeek(1.001 / frameRate, tr("Forward"));
             else if (!stickykeys)
-                DoSeek(fftime, tr("Skip Ahead"));
+            {
+                if (smartForward && doSmartForward)
+                    DoSeek(rewtime, tr("Skip Ahead"));
+                else
+                    DoSeek(fftime, tr("Skip Ahead"));
+            }
             else
                 ChangeFFRew(1);
             break;
@@ -1003,7 +1011,11 @@ void TV::ProcessKeypress(int keypressed)
             else if (paused)
                 DoSeek(-1.001 / frameRate, tr("Rewind"));
             else if (!stickykeys)
+            {
                 DoSeek(-rewtime, tr("Skip Back"));
+                if (smartForward)
+                    doSmartForward = true;
+            }
             else
                 ChangeFFRew(-1);
             break;
@@ -1367,7 +1379,10 @@ bool TV::UpdatePosOSD(float time, const QString &mesg)
         int pos = nvp->calcSliderPos(time, desc);
         bool slidertype = (internalState == kState_WatchingLiveTV);
         int disptime = (mesg == tr("Paused")) ? -1 : 2;
-        osd->StartPause(pos, slidertype, mesg, desc, disptime);
+        int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
+                                         kOSDFunctionalType_Default;
+
+        osd->StartPause(pos, slidertype, mesg, desc, disptime, osdtype);
         update_osd_pos = true;
     }
 
@@ -2414,6 +2429,9 @@ void TV::HandleOSDClosed(int osdType)
     {
         case kOSDFunctionalType_PictureAdjust:
             picAdjustment = 0;
+            break;
+        case kOSDFunctionalType_SmartForward:
+            doSmartForward = false;
             break;
         case kOSDFunctionalType_Default:
             break;

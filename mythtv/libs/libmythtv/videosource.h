@@ -344,42 +344,23 @@ public:
         SpinBoxSetting(0,3,1),
         CCSetting(parent, "videodevice") {
         setLabel("DVB Card Number");
+        setHelpText("When you change this setting, the text below should change"
+                    " to the name and type of your card. If the card cannot be"
+                    " opened, an error message will be displayed.");
     };
 };
 
-class DVBCardType: public LabelSetting {
-    Q_OBJECT
+class DVBCardType: public LabelSetting, public TransientStorage {
 public:
-    DVBCardType():
-        LabelSetting() {
+    DVBCardType() {
         setLabel("Card Type");
-        setValue("Unknown");
-    };
-
-    void save(QSqlDatabase* db) { (void)db; };
-    void load(QSqlDatabase* db) { (void)db; };
-
-public slots:
-    void setString(const QString& string) {
-        setValue(string);
     };
 };
 
-class DVBCardName: public LabelSetting {
-    Q_OBJECT
+class DVBCardName: public LabelSetting, public TransientStorage {
 public:
-    DVBCardName():
-        LabelSetting() {
+    DVBCardName() {
         setLabel("Card Name");
-        setValue("Unknown");
-    };
-
-    void save(QSqlDatabase* db) { (void)db; };
-    void load(QSqlDatabase* db) { (void)db; };
-
-public slots:
-    void setString(const QString& string) {
-        setValue(string);
     };
 };
 
@@ -388,6 +369,52 @@ public:
     DVBUseTS(const CaptureCard& parent):
         CCSetting(parent, "use_ts") {
         setLabel("Use Transport Stream for recording");
+        setHelpText("This option is to get around filtering limitations on some"
+                    " DVB cards. Most users should not activate this option,"
+                    " because of compatability problems.");
+    };
+};
+
+class DVBAudioDevice: public LineEditSetting, public CCSetting {    
+    Q_OBJECT
+public:
+    DVBAudioDevice(const CaptureCard& parent):
+        CCSetting(parent,"audiodevice") {
+        setVisible(false);
+    };
+
+    void save(QSqlDatabase* db) {
+        changed = true;
+        settingValue = "";
+        SimpleDBStorage::save(db);
+    };
+};
+
+class DVBVbiDevice: public LineEditSetting, public CCSetting {
+    Q_OBJECT
+public:
+    DVBVbiDevice(const CaptureCard& parent):
+        CCSetting(parent,"vbidevice") {
+        setVisible(false);
+    };
+    void save(QSqlDatabase* db) {
+        changed = true;
+        settingValue = "";
+        SimpleDBStorage::save(db);
+    };
+};
+
+class DVBDefaultInput: public LineEditSetting, public CCSetting {
+    Q_OBJECT
+public:
+    DVBDefaultInput(const CaptureCard& parent):
+        CCSetting(parent,"defaultinput") {
+        setVisible(false);
+    };
+    void save(QSqlDatabase* db) {
+        changed = true;
+        settingValue = "DVBInput";
+        SimpleDBStorage::save(db);
     };
 };
 
@@ -395,12 +422,6 @@ class CardType: public ComboBoxSetting, public CCSetting {
 public:
     CardType(const CaptureCard& parent);
     static void fillSelections(SelectSetting* setting);
-};
-
-class CaptureCardGroup: public VerticalConfigurationGroup,
-                        public TriggeredConfigurationGroup {
-public:
-    CaptureCardGroup() {};
 };
 
 class V4LConfigurationGroup: public VerticalConfigurationGroup {
@@ -441,9 +462,13 @@ public:
         addChild(cardname);
         addChild(cardtype);
         addChild(new DVBUseTS(parent));
+        addChild(new DVBAudioDevice(parent));
+        addChild(new DVBVbiDevice(parent));
+        addChild(new DVBDefaultInput(parent));
 
         connect(cardnum, SIGNAL(valueChanged(const QString&)),
                 this, SLOT(probeCard(const QString&)));
+        cardnum->setValue(0);
     };
 
 public slots:
@@ -456,31 +481,30 @@ private:
     DVBCardType* cardtype;
 };
 
+class CaptureCardGroup: public VerticalConfigurationGroup,
+                        public TriggeredConfigurationGroup {
+public:
+    CaptureCardGroup(CaptureCard& parent) {
+        CardType* cardtype = new CardType(parent);
+        addChild(cardtype);
+        setTrigger(cardtype);
+        setSaveAll(false);
+
+        addTarget("V4L", new V4LConfigurationGroup(parent));
+        addTarget("MPEG", new V4LConfigurationGroup(parent));
+        addTarget("MJPEG", new V4LConfigurationGroup(parent));
+        addTarget("HDTV", new V4LConfigurationGroup(parent));
+        addTarget("DVB", new DVBConfigurationGroup(parent));
+    };
+};
+
 class CaptureCard: public ConfigurationWizard {
 public:
     CaptureCard() {
         // must be first
         addChild(id = new ID());
 
-        CaptureCardGroup *cardgroup = new CaptureCardGroup();
-        cardgroup->setLabel("Capture card");
-
-        CardType* cardtype = new CardType(*this);
-        cardgroup->addChild(cardtype);
-        cardgroup->setTrigger(cardtype);
-
-        V4LConfigurationGroup* v4l_group = new V4LConfigurationGroup(*this);
-        DVBConfigurationGroup* dvb_group = new DVBConfigurationGroup(*this);
-        V4LConfigurationGroup* mpeg_group = new V4LConfigurationGroup(*this);
-        V4LConfigurationGroup* mjpeg_group = new V4LConfigurationGroup(*this);
-        V4LConfigurationGroup* hdtv_group = new V4LConfigurationGroup(*this);
-
-        cardgroup->addTarget("V4L", v4l_group);
-        cardgroup->addTarget("DVB", dvb_group);
-        cardgroup->addTarget("MPEG", mpeg_group);
-        cardgroup->addTarget("MJPEG", mjpeg_group);
-        cardgroup->addTarget("HDTV", hdtv_group);
-
+        CaptureCardGroup *cardgroup = new CaptureCardGroup(*this);
         addChild(cardgroup);
 
         addChild(new Hostname(*this));

@@ -254,6 +254,10 @@ class TV : public QObject
     QTimer *keyrepeatTimer;
     
     int picAdjustment;
+    bool usePicControls;
+
+    bool smartForward;
+    bool doSmartForward;
 };
 
 #endif

@@ -21,7 +21,10 @@ void XBox::GetSettings(void)
 
     RecordingLED = gContext->GetSetting("XboxLEDRecording","rrrr");
     DefaultLED = gContext->GetSetting("XboxLEDDefault","gggg");
-    BlinkBIN = gContext->GetSetting("XboxLEDBlinkBIN","blink");
+    BlinkBIN = gContext->GetSetting("XboxLEDBlinkBIN");
+
+    if (!BlinkBIN)
+        return;
     
     QString timelen = gContext->GetSetting("XboxCheckRec","5");
     int timeout = timelen.toInt() * 1000;

@@ -46,6 +46,7 @@ class HDTVRecorder : public RecorderBase
 		       char adaptation_field_control,
 		       bool payload_unit_start_indicator);
 
+    int ResyncStream(unsigned char *buffer, int curr_pos, int len);
     bool recording;
     bool encoding;
 

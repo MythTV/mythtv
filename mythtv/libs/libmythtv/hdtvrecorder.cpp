@@ -48,6 +48,8 @@ extern "C" {
 #define BUFFER_SIZE 255868
 #define PACKETS (BUFFER_SIZE / 188)
 
+#define SYNC_BYTE 0x47
+
 HDTVRecorder::HDTVRecorder()
             : RecorderBase()
 {
@@ -125,7 +127,7 @@ void HDTVRecorder::StartRecording(void)
         if (len == 0) 
             return;  // end of file
 
-        if (data_byte[0] == 0x47)
+        if (data_byte[0] == SYNC_BYTE)
         {
             read(chanfd, buffer, 187); //read next 187 bytes-remainder of packet
             // process next packet
@@ -152,7 +154,7 @@ void HDTVRecorder::StartRecording(void)
                 buf[2] = data_byte[2];
                 buf[3] = data_byte[3];
 
-                if (buf[0] != 0x47) 
+                if (buf[0] != SYNC_BYTE) 
                 {
                     VERBOSE(VB_RECORD, "Bad SYNC byte!!!");
                     errors++;
@@ -164,10 +166,10 @@ void HDTVRecorder::StartRecording(void)
                     insync++;
                     if (insync == 10) 
                     {
+                        int remainder = 0;
                         // TRANSFER DATA
                         while (encoding) 
                         {
-                            int remainder = 0;
                             if (paused)
                             {
                                 mainpaused = true;
@@ -189,6 +191,7 @@ void HDTVRecorder::StartRecording(void)
                             }
                             else if (ret > 0)
                             {
+                                ret += remainder;
                                 remainder = ProcessData(buffer, ret);
                                 if (remainder > 0) // leftover bytes
                                     memmove(&(buffer[0]), 
@@ -381,6 +384,27 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
     }
 }
 
+int HDTVRecorder::ResyncStream(unsigned char *buffer, int curr_pos, int len)
+{
+    // Search for two sync bytes 188 bytes apart, 
+    int pos = curr_pos;
+    int nextpos = pos + 188;
+    //int count = 0;
+    if (nextpos >= len)
+        return -1; // not enough bytes; caller should try again
+    
+    while (buffer[pos] != SYNC_BYTE || buffer[nextpos] != SYNC_BYTE) {
+        pos++;
+        nextpos++;
+        //count++;
+        if (nextpos == len)
+            return -2; // not found
+    }
+    //if (count)
+    //cerr << "Skipped " << count << " bytes to resync" << endl;
+    return pos;
+}
+
 int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
 {
     int pos = 0;
@@ -389,26 +413,20 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
     int pid;
     bool payload_unit_start_indicator;
     char adaptation_field_control;
-    int resync_count = 0;
-
 
     while (pos + 187 < len) // while we have a whole packet left
     {
-        // Find sync byte (0x47)
-        while (buffer[pos] != 0x47)
+        if (buffer[pos] != SYNC_BYTE)
         {
-            pos++;
-            resync_count++;
-            if (pos == len) 
-            {
-                cerr << "Transport stream sync byte not found" << endl;;
-                return 0;
-            }
+            int newpos = ResyncStream(buffer, pos, len);
+            if (newpos == -1)
+                return len - pos;
+            if (newpos == -2)
+                return 188;
+            
+            pos = newpos;
         }
-        if (resync_count)
-            cerr << "Skipped " << resync_count << " bytes to resync" << endl;
-        
-        resync_count = 0;
+
         ts_packets++;
         packet_start_pos = pos;
         packet_end_pos = pos + 188;
@@ -587,7 +605,27 @@ void HDTVRecorder::Reset(void)
     lowest_video_pid = 0x1fff;
     video_pid_packets = 0;
     
+    prev_gop_save_pos = -1;
+
     positionMap.clear();
+
+    if (chanfd > 0) 
+    {
+        int ret = close(chanfd);
+        if (ret < 0) 
+        {
+            perror("close");
+            return;
+        }
+        chanfd = open(videodevice.ascii(), O_RDWR);
+        if (chanfd <= 0)
+        {
+            cerr << "HD1 Can't open video device: " << videodevice 
+                 << " chanfd = "<< chanfd << endl;
+            perror("open video");
+            return;
+        }
+    }
 }
 
 void HDTVRecorder::Pause(bool clear)

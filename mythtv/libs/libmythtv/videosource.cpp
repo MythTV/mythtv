@@ -193,15 +193,16 @@ void VideoSource::loadByID(QSqlDatabase* db, int sourceid) {
 
 void CaptureCard::fillSelections(QSqlDatabase* db,
                                  SelectSetting* setting) {
-    QString query = QString("SELECT videodevice, cardid FROM capturecard "
-                            "WHERE hostname = \"%1\";")
+    QString query = QString("SELECT cardtype, videodevice, cardid "
+                            "FROM capturecard WHERE hostname = \"%1\";")
                             .arg(gContext->GetHostName());
     QSqlQuery result = db->exec(query);
 
     if (result.isActive() && result.numRowsAffected() > 0)
         while (result.next())
-            setting->addSelection(result.value(0).toString(),
-                                  result.value(1).toString());
+            setting->addSelection("[ " + result.value(0).toString() + " : " +
+                                  result.value(1).toString() + " ]",
+                                  result.value(2).toString());
 }
 
 void CaptureCard::loadByID(QSqlDatabase* db, int cardid) {
@@ -213,6 +214,8 @@ CardType::CardType(const CaptureCard& parent)
         : CCSetting(parent, "cardtype") 
 {
     setLabel("Card type");
+    setHelpText("Change the cardtype to the appropriate type for the capture "
+                "card you are configuring.");
     fillSelections(this);
 }
 
@@ -303,17 +306,23 @@ void CardInputEditor::load(QSqlDatabase* db) {
     // SelectSetting provided a facility to edit the labels, we
     // could use CaptureCard::fillSelections
 
-    QString thequery = QString("SELECT cardid, videodevice FROM capturecard "
-                               "WHERE hostname = \"%1\";")
+    QString thequery = QString("SELECT cardid, videodevice, cardtype "
+                               "FROM capturecard WHERE hostname = \"%1\";")
                               .arg(gContext->GetHostName());
 
     QSqlQuery capturecards = db->exec(thequery);
     if (capturecards.isActive() && capturecards.numRowsAffected() > 0)
         while (capturecards.next()) {
             int cardid = capturecards.value(0).toInt();
-            QString videodevice(capturecards.value(1).toString());
+            QString videodevice("[ " + capturecards.value(2).toString() + 
+                                " : " + capturecards.value(1).toString() + 
+                                " ]");
 
-            QStringList inputs = VideoDevice::probeInputs(videodevice);
+            QStringList inputs;
+            if (capturecards.value(2).toString() != "DVB")
+                inputs = VideoDevice::probeInputs(videodevice);
+            else
+                inputs = QStringList("DVBInput");
 
             for(QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i) {
                 CardInput* cardinput = new CardInput();

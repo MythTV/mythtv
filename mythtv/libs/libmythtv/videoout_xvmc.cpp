@@ -16,6 +16,7 @@ using namespace std;
 
 #include "videoout_xvmc.h"
 #include "../libmyth/util.h"
+#include "mythcontext.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -383,10 +384,13 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
 
     MoveResize();
 
-    ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
-    ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
-    ChangePictureAttribute(kPictureAttribute_Colour, colour);
-    ChangePictureAttribute(kPictureAttribute_Hue, hue);
+    if (gContext->GetNumSetting("UseOutputPictureControls", 0))
+    {
+        ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
+        ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
+        ChangePictureAttribute(kPictureAttribute_Colour, colour);
+        ChangePictureAttribute(kPictureAttribute_Hue, hue);
+    }
 
     XJ_started = true;
 

@@ -1306,6 +1306,10 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(), 
                         filename.ascii());
+    else if (xmltv_grabber == "tv_grab_uk_rt")
+        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' > %s",
+	                 xmltv_grabber.ascii(), offset, 
+			 configfile.ascii(), filename.ascii());
     else if (xmltv_grabber == "tv_grab_au")
         command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
@@ -1458,14 +1462,19 @@ bool fillData(QValueList<Source> &sourcelist)
                                          query);
             }
         }
-        else if (xmltv_grabber == "tv_grab_na")
+        else if (xmltv_grabber == "tv_grab_na" || 
+                     xmltv_grabber == "tv_grab_uk_rt")
         {
             QDate qCurrentDate = QDate::currentDate();
 
             if (!grabData(*it, 1, &qCurrentDate))
                 ++failures;
 
-            for (int i = 0; i < 9; i++)
+            int maxday = 9;
+            if (xmltv_grabber == "tv_grab_uk_rt")
+                maxday = 14;
+
+            for (int i = 0; i < maxday; i++)
             {
                 // we need to check and see if the current date has changed 
                 // since we started in this loop.  If it has, we need to adjust

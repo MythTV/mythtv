@@ -18,7 +18,8 @@ using namespace std;
 enum OSDFunctionalType
 {
     kOSDFunctionalType_Default = 0,
-    kOSDFunctionalType_PictureAdjust
+    kOSDFunctionalType_PictureAdjust,
+    kOSDFunctionalType_SmartForward
 };
 
 class QImage;

@@ -19,6 +19,7 @@ using namespace std;
 #include "videoout_xv.h"
 #include "osdsurface.h"
 #include "../libmyth/util.h"
+#include "mythcontext.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -360,11 +361,14 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     pauseFrame.buf = new unsigned char[pauseFrame.size];
 
     MoveResize();
-  
-    ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
-    ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
-    ChangePictureAttribute(kPictureAttribute_Colour, colour);
-    ChangePictureAttribute(kPictureAttribute_Hue, hue);
+ 
+    if (gContext->GetNumSetting("UseOutputPictureControls", 0))
+    {
+        ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
+        ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
+        ChangePictureAttribute(kPictureAttribute_Colour, colour);
+        ChangePictureAttribute(kPictureAttribute_Hue, hue);
+    }
 
     XJ_started = true;
 
