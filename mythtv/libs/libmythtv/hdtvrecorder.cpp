@@ -55,6 +55,7 @@
 #include <pthread.h>
 #include <cstdio>
 #include <cstdlib>
+#include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

@@ -139,8 +139,6 @@ class AvFormatDecoder : public DecoderBase
     int audio_sampling_rate_2nd; ///< Used by CheckAudioParams
     int audio_channels_2nd;      ///< Used by CheckAudioParams
 
-    bool hasbframes;             ///< Set in open but not used.
-
     int bitrate;
 
     bool gopset;
@@ -159,7 +157,6 @@ class AvFormatDecoder : public DecoderBase
 
     unsigned char prvpkt[3];
 
-    long long video_last_P_pts;
     long long lastvpts;
     long long lastapts;
 

@@ -32,7 +32,7 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
 #endif
       ffmpeg_extradatasize(0), ffmpeg_extradata(0), usingextradata(false),
       disablevideo(false), totalLength(0), totalFrames(0), effdsp(0), 
-      directbuf(0), mpa_codec(0), mpa_ctx(0), mpa_pic(0), directrendering(false),
+      directbuf(0), mpa_codec(0), mpa_ctx(0), directrendering(false),
       lastct('1'), strm(0), buf(0), buf2(0), 
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
@@ -41,7 +41,6 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     memset(&frameheader, 0, sizeof(rtframeheader));
     memset(&extradata, 0, sizeof(extendeddata));
     memset(&tmppicture, 0, sizeof(AVPicture));
-    memset(&mpa_pic_tmp, 0, sizeof(AVPicture));
     planes[0] = planes[1] = planes[2] = 0;
 
     // set parent class variables
@@ -616,11 +615,6 @@ bool NuppelDecoder::InitAVCodec(int codec)
     if (mpa_ctx)
         free(mpa_ctx);
 
-    if (mpa_pic)
-        free(mpa_pic);
-
-    mpa_pic = avcodec_alloc_frame();
-
     mpa_ctx = avcodec_alloc_context();
 
     mpa_ctx->codec_id = (enum CodecID)codec;
@@ -662,10 +656,7 @@ void NuppelDecoder::CloseAVCodec(void)
 
     if (mpa_ctx)
         free(mpa_ctx);
-    if (mpa_pic)
-        free(mpa_pic);
     mpa_ctx = NULL;
-    mpa_pic = NULL;
 }
 
 bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
@@ -747,11 +738,13 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         if (!mpa_codec)
             InitAVCodec(frameheader->comptype - '3');
 
+        AVFrame mpa_pic;
+
         int gotpicture = 0;
         pthread_mutex_lock(&avcodeclock);
         // if directrendering, writes into buf
         directbuf = outbuf;
-        int ret = avcodec_decode_video(mpa_ctx, mpa_pic, &gotpicture,
+        int ret = avcodec_decode_video(mpa_ctx, &mpa_pic, &gotpicture,
                                        lstrm, frameheader->packetlength);
         pthread_mutex_unlock(&avcodeclock);
         if (ret < 0)
@@ -791,13 +784,8 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
 
         avpicture_fill(&tmppicture, outbuf, PIX_FMT_YUV420P, video_width,
                        video_height);
-        for (int i = 0; i < 4; i++)
-        {
-            mpa_pic_tmp.data[i] = mpa_pic->data[i];
-            mpa_pic_tmp.linesize[i] = mpa_pic->linesize[i];
-        }
 
-        img_convert(&tmppicture, PIX_FMT_YUV420P, &mpa_pic_tmp,
+        img_convert(&tmppicture, PIX_FMT_YUV420P, (AVPicture *)&mpa_pic,
                     mpa_ctx->pix_fmt, video_width, video_height);
     }
 

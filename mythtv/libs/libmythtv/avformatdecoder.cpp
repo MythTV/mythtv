@@ -29,7 +29,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
 {
     ic = NULL;
     directrendering = false;
-    video_last_P_pts = lastapts = lastvpts = 0;
+    lastapts = lastvpts = 0;
     framesPlayed = 0;
     framesRead = 0;
 
@@ -39,8 +39,6 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     audio_channels = -1;
     audio_sample_size = -1;
     audio_sampling_rate = -1;
-
-    hasbframes = false;
 
     exitafterdecoded = false;
     ateof = false;
@@ -90,7 +88,6 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
 {
     lastapts = 0;
     lastvpts = 0;
-    video_last_P_pts = 0;
 
     av_read_frame_flush(ic);
 
@@ -251,8 +248,6 @@ void AvFormatDecoder::InitByteContext(void)
     ic->pb.is_streamed = 0;
     ic->pb.max_packet_size = 0;
 }
-
-#define ALIGN(x, a) (((x) + (a) - 1) & ~((a) - 1))
 
 static QMap<void*, enum PixelFormat> _PixelFormatsMap;
 
@@ -431,10 +426,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 current_height = enc->height;
                 current_aspect = aspect_ratio;
 
-                m_parent->SetVideoParams(ALIGN(enc->width, 16),
-                                         ALIGN(enc->height, 16), fps,
-                                         keyframedist, aspect_ratio, kScan_Detect);
-
                 enc->error_resilience = FF_ER_COMPLIANT;
                 enc->workaround_bugs = FF_BUG_AUTODETECT;
                 enc->error_concealment = FF_EC_GUESS_MVS | FF_EC_DEBLOCK;
@@ -484,14 +475,23 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     enc->release_buffer = release_avf_buffer;
                     enc->opaque = (void *)this;
                     directrendering = true;
-                    hasbframes = enc->has_b_frames;
                 }
+
+                int align_width = enc->width;
+                int align_height = enc->height;
+
+                if (directrendering)
+                    avcodec_align_dimensions(enc, &align_width, &align_height);
+
+                m_parent->SetVideoParams(align_width, align_height, fps,
+                                         keyframedist, aspect_ratio, kScan_Detect);
                 break;
             }
             case CODEC_TYPE_AUDIO:
             {
                 assert(enc->codec_id);
-                enc->channels = 2;
+                if (enc->channels > 2)
+                    enc->channels = 2;
                 bitrate += enc->bit_rate;
                 break;
             }
@@ -510,22 +510,28 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 break;
             }
         }
-	if (enc->codec_type!=CODEC_TYPE_AUDIO && enc->codec_type!=CODEC_TYPE_VIDEO)
-	    continue;
 
-        VERBOSE(VB_PLAYBACK, QString("AVFD: Looking for decoder for %1").arg(enc->codec_id));
+        if (enc->codec_type != CODEC_TYPE_AUDIO && 
+            enc->codec_type != CODEC_TYPE_VIDEO)
+            continue;
+
+        VERBOSE(VB_PLAYBACK, QString("AVFD: Looking for decoder for %1")
+                                     .arg(enc->codec_id));
         AVCodec *codec = avcodec_find_decoder(enc->codec_id);
         if (!codec)
         {
-            VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Could not find decoder for codec (%1) aborting.")
-                                  .arg(enc->codec_id));
+            VERBOSE(VB_IMPORTANT, 
+                    QString("AvFormatDecoder: Could not find decoder for "
+                            "codec (%1) aborting.")
+                           .arg(enc->codec_id));
             av_close_input_file(ic);
             ic = NULL;
             scanerror = -1;
-	    continue;
+            continue;
         }
 
-        if (enc->codec) {
+        if (enc->codec) 
+        {
             VERBOSE(VB_IMPORTANT, QString("Codec already open, closing first"));
             avcodec_close(enc);
         }
@@ -533,17 +539,19 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         int open_val = avcodec_open(enc, codec);
         if (open_val < 0)
         {
-            VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Could not open codec aborting. reason %1").arg(open_val));
+            VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Could not "
+                    "open codec aborting. reason %1").arg(open_val));
             av_close_input_file(ic);
             ic = NULL;
             scanerror = -1;
-	    continue;
+            continue;
         }
 
         if (enc->codec_type == CODEC_TYPE_AUDIO)
         {
             audioStreams.push_back( i );
-            VERBOSE(VB_AUDIO, QString("Stream #%1 (audio track #%2) is an audio stream with %3 channels.")
+            VERBOSE(VB_AUDIO, QString("Stream #%1 (audio track #%2) is an "
+                    "audio stream with %3 channels.")
                               .arg(i).arg(audioStreams.size()).arg(enc->channels));
         }
     }
@@ -561,8 +569,9 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
     if (width == current_width && height == current_height)
         return false;
 
-    VERBOSE(VB_ALL, QString("AvFormatDecoder: Video has changed from %1x%2 to %3x%4.")
-                                .arg(current_width).arg(current_height).arg(width).arg(height));
+    VERBOSE(VB_ALL, 
+            QString("AvFormatDecoder: Video has changed from %1x%2 to %3x%4.")
+               .arg(current_width).arg(current_height).arg(width).arg(height));
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
@@ -912,8 +921,15 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                         (CheckVideoParams(width, height) ||
                          aspect != current_aspect))
                     {
-                        m_parent->SetVideoParams(ALIGN(width, 16),
-                                                 ALIGN(height, 16), fps,
+                        int align_width = width;
+                        int align_height = height;
+
+                        if (directrendering)
+                            avcodec_align_dimensions(context, &align_width, 
+                                                     &align_height);
+
+                        m_parent->SetVideoParams(align_width,
+                                                 align_height, fps,
                                                  keyframedist, aspect, 
                                                  kScan_Detect, true);
                         current_width = width;
@@ -922,7 +938,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
                         gopset = false;
                         prevgoppos = 0;
-                        video_last_P_pts = lastapts = lastvpts = 0;
+                        lastapts = lastvpts = 0;
                     }
 
                     seq_count++;
@@ -1065,10 +1081,12 @@ bool AvFormatDecoder::autoSelectAudioTrack()
             {
                 currentAudioTrack = track;
                 wantedAudioStream = tempStream;
-                VERBOSE(VB_AUDIO, QString("Auto-selecting audio track #%1 (stream #%2).")
-                                  .arg(track + 1).arg(tempStream));
-                VERBOSE(VB_AUDIO, QString("It has %1 channels and we needed at least %2")
-                                  .arg(e->channels).arg(minChannels + 1));
+                VERBOSE(VB_AUDIO, 
+                        QString("Auto-selecting audio track #%1 (stream #%2).")
+                               .arg(track + 1).arg(tempStream));
+                VERBOSE(VB_AUDIO, 
+                        QString("It has %1 channels and we needed at least %2")
+                               .arg(e->channels).arg(minChannels + 1));
 
                 AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
                 CheckAudioParams(e->sample_rate, e->channels, true);
@@ -1079,13 +1097,13 @@ bool AvFormatDecoder::autoSelectAudioTrack()
         if (minChannels < 0)
             return false;
     }
+
     return false;
 }
 
 void AvFormatDecoder::SetupAudioStream(void)
 {
-    if (wantedAudioStream >= ic->nb_streams ||
-        currentAudioTrack < 0)
+    if (wantedAudioStream >= ic->nb_streams || currentAudioTrack < 0)
         return;
 
     AVStream *curstream = ic->streams[wantedAudioStream];
@@ -1135,8 +1153,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
     bool allowedquit = false;
     bool storevideoframes = false;
 
-    if (currentAudioTrack==-1 || currentAudioTrack>=(int)audioStreams.size())
-	autoSelectAudioTrack();
+    if (currentAudioTrack == -1 || 
+        currentAudioTrack >= (int)audioStreams.size())
+    {
+        autoSelectAudioTrack();
+    }
 
     while (!allowedquit)
     {
@@ -1334,20 +1355,21 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     if (!directrendering)
                     {
                         AVPicture tmppicture;
-                        AVPicture mpa_pic_p;
-
-                        for (int i = 0; i < 4; i++)
-                        {
-                            mpa_pic_p.data[i] = mpa_pic.data[i];
-                            mpa_pic_p.linesize[i] = mpa_pic.linesize[i];
-                        }
-
+ 
                         picframe = m_parent->GetNextVideoFrame();
-                        avpicture_fill(&tmppicture, picframe->buf,
-                                       PIX_FMT_YUV420P,
-                                       context->width,
-                                       context->height);
-                        img_convert(&tmppicture, PIX_FMT_YUV420P, &mpa_pic_p,
+
+                        tmppicture.data[0] = picframe->buf;
+                        tmppicture.data[1] = tmppicture.data[0] + 
+                                        picframe->width * picframe->height;
+                        tmppicture.data[2] = tmppicture.data[1] + 
+                                        picframe->width * picframe->height / 4;
+
+                        tmppicture.linesize[0] = picframe->width;
+                        tmppicture.linesize[1] = picframe->width / 2;
+                        tmppicture.linesize[2] = picframe->width / 2;
+
+                        img_convert(&tmppicture, PIX_FMT_YUV420P, 
+                                    (AVPicture *)&mpa_pic,
                                     context->pix_fmt,
                                     context->width,
                                     context->height);

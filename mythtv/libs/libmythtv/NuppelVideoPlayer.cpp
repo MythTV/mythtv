@@ -123,7 +123,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
 
     commDetect = NULL;
 
-    audio_bits = 16;
+    audio_bits = -1;
     audio_channels = 2;
     audio_samplerate = 44100;
 
@@ -596,12 +596,15 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (!decoder)
     {
-        VERBOSE(VB_IMPORTANT, QString("NVP: Couldn't find a matching decoder for: %1").
+        VERBOSE(VB_IMPORTANT, 
+                QString("NVP: Couldn't find a matching decoder for: %1").
                 arg(ringBuffer->GetFilename()));
         return -1;
-    } else if (decoder->IsErrored())
+    } 
+    else if (decoder->IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, "NVP: NuppelDecoder encountered error during creation.");
+        VERBOSE(VB_IMPORTANT, 
+                "NVP: NuppelDecoder encountered error during creation.");
         delete decoder;
         return -1;
     }
@@ -621,6 +624,9 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
              << endl;
         return -1;
     }
+
+    if (audio_bits == -1)
+        disableaudio = true;
 
     if (ret > 0)
     {

@@ -102,9 +102,7 @@ class NuppelDecoder : public DecoderBase
 
     AVCodec *mpa_codec;
     AVCodecContext *mpa_ctx;
-    AVFrame *mpa_pic;
     AVPicture tmppicture;
-    AVPicture mpa_pic_tmp;
 
     bool directrendering;
 
