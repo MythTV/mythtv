@@ -84,6 +84,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
             proginfo->title = query.value(3).toString();
             proginfo->subtitle = query.value(4).toString();
             proginfo->description = query.value(5).toString();
+            proginfo->conflicting = false;
 
             char startt[128];
             char endt[128];
@@ -232,7 +233,7 @@ void DeleteBox::selected(QListViewItem *lvitem)
 
     int result = diag->exec();
 
-    if (result == 0)
+    if (result == 1)
     {
         string filename;
         recinfo->GetRecordFilename(fileprefix.ascii(), filename);

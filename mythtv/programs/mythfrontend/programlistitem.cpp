@@ -20,6 +20,7 @@ ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
     pginfo = lpginfo;
     recinfo = lrecinfo;
     pixmap = NULL;
+
     setText(0, pginfo->channum);
     setText(1, pginfo->startts.toString("MMMM d h:mm AP"));
     setText(2, pginfo->title);
@@ -77,4 +78,21 @@ QPixmap *ProgramListItem::getPixmap(void)
         return pixmap;
 
     return NULL;
+}
+
+void ProgramListItem::paintCell(QPainter *p, const QColorGroup &cg,
+                                int column, int width, int alignment)
+{
+    QColorGroup _cg(cg);
+    QColor c = _cg.text();
+
+    if (pginfo->conflicting)
+    {
+        _cg.setColor(QColorGroup::Text, Qt::red);
+        _cg.setColor(QColorGroup::HighlightedText, Qt::red);
+    }
+
+    QListViewItem::paintCell(p, _cg, column, width, alignment);
+
+    _cg.setColor(QColorGroup::Text, c);
 }

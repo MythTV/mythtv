@@ -7,14 +7,15 @@
 #include <qlistview.h>
 #include <qdatetime.h>
 
-#include "playbackbox.h"
+#include "viewscheduled.h"
 #include "infostructs.h"
 #include "tv.h"
 #include "programlistitem.h"
+#include "scheduler.h"
 
-PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb, 
-                         QWidget *parent, const char *name)
-           : QDialog(parent, name)
+ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb, 
+                             QWidget *parent, const char *name)
+             : QDialog(parent, name)
 {
     tv = ltv;
     db = ldb;
@@ -31,10 +32,10 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     QVBoxLayout *vbox = new QVBoxLayout(this, 20);
 
-    QLabel *label = new QLabel("Select a recording to view:", this);
-    vbox->addWidget(label);
+    desclabel = new QLabel("Select a recording to view:", this);
+    vbox->addWidget(desclabel);
 
-    QListView *listview = new QListView(this);
+    listview = new QListView(this);
     listview->addColumn("#");
     listview->addColumn("Date");
     listview->addColumn("Title");
@@ -46,6 +47,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     listview->setColumnWidthMode(1, QListView::Manual);
 
     listview->setSorting(-1);
+
     listview->setAllColumnsShowFocus(TRUE);
 
     connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
@@ -57,59 +59,11 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     vbox->addWidget(listview, 1);
 
-    QSqlQuery query;
-    char thequery[512];
-    ProgramListItem *item;
-    
-    sprintf(thequery, "SELECT * FROM recorded;");
+    sched = new Scheduler(db);
 
-    query = db->exec(thequery);
+    listview->setFixedHeight(250);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        while (query.next())
-        {
-            ProgramInfo *proginfo = new ProgramInfo;
- 
-            proginfo->channum = query.value(0).toString();
-            proginfo->startts = QDateTime::fromString(query.value(1).toString(),
-                                                      Qt::ISODate);
-            proginfo->endts = QDateTime::fromString(query.value(2).toString(),
-                                                    Qt::ISODate);
-            proginfo->title = query.value(3).toString();
-            proginfo->subtitle = query.value(4).toString();
-            proginfo->description = query.value(5).toString();
-            proginfo->conflicting = false;
-
-            char startt[128];
-            char endt[128];
-    
-            QString starts = proginfo->startts.toString("yyyyMMddhhmm");
-            QString endts = proginfo->endts.toString("yyyyMMddhhmm");
-
-            sprintf(startt, "%s00", starts.ascii());
-            sprintf(endt, "%s00", endts.ascii());
-        
-            RecordingInfo *tvrec = new RecordingInfo(proginfo->channum.ascii(),
-                                                     startt, endt,
-                                                     proginfo->title.ascii(),
-                                                     proginfo->subtitle.ascii(),
-                                                 proginfo->description.ascii());
-                                                      
-            item = new ProgramListItem(listview, proginfo, tvrec, 3, tv,
-                                       fileprefix); 
-        }
-    }
-    else
-    {
-        // TODO: no recordings
-    }
-   
-    listview->setFixedHeight(300);
-
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, 10);
-
-    QGridLayout *grid = new QGridLayout(hbox, 4, 2, 1);
+    QGridLayout *grid = new QGridLayout(vbox, 4, 2, 1);
     
     title = new QLabel(" ", this);
     title->setFont(QFont("Arial", 25, QFont::Bold));
@@ -134,22 +88,65 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     grid->setColStretch(1, 1);
     grid->setRowStretch(3, 1);
 
-    QPixmap temp(160, 120);
+    FillList();
+}
 
-    pixlabel = new QLabel(this);
-    pixlabel->setPixmap(temp);
+void ViewScheduled::FillList(void)
+{
+    listview->clear();
+    ProgramListItem *item;
 
-    hbox->addWidget(pixlabel);
+    bool conflicts = sched->FillRecordLists();
+
+    list<ProgramInfo *> *recordinglist = sched->getAllPending();
+    list<ProgramInfo *>::reverse_iterator pgiter = recordinglist->rbegin();
+
+    for (; pgiter != recordinglist->rend(); pgiter++)
+    {
+        ProgramInfo *originfo = (*pgiter);
+        ProgramInfo *proginfo = new ProgramInfo;
+
+        proginfo->channum = originfo->channum;
+        proginfo->startts = originfo->startts;
+        proginfo->endts = originfo->endts;
+        proginfo->title = originfo->title;
+        proginfo->subtitle = originfo->subtitle;
+        proginfo->description = originfo->description;
+        proginfo->conflicting = originfo->conflicting;
+
+        char startt[128];
+        char endt[128];
+
+        QString starts = proginfo->startts.toString("yyyyMMddhhmm");
+        QString endts = proginfo->endts.toString("yyyyMMddhhmm");
+
+        sprintf(startt, "%s00", starts.ascii());
+        sprintf(endt, "%s00", endts.ascii());
+
+        RecordingInfo *tvrec = new RecordingInfo(proginfo->channum.ascii(),
+                                                 startt, endt,
+                                                 proginfo->title.ascii(),
+                                                 proginfo->subtitle.ascii(),
+                                                 proginfo->description.ascii());
+
+        item = new ProgramListItem(listview, proginfo, tvrec, 3, tv,
+                                   fileprefix);
+    }
+
+    if (conflicts)
+        desclabel->setText("You've got time conflicts.  All conflicting programs are highlighted in <font color=\"red\">red</font>.");
+    else
+        desclabel->setText("You have no recording conflicts.");
 
     listview->setCurrentItem(listview->firstChild());
 }
 
-void PlaybackBox::Show()
+void ViewScheduled::Show()
 {
     showFullScreen();
 }
 
-void PlaybackBox::changed(QListViewItem *lvitem)
+void ViewScheduled::changed(QListViewItem *lvitem)
 {
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     if (!pgitem)
@@ -178,32 +175,10 @@ void PlaybackBox::changed(QListViewItem *lvitem)
         description->setText(rec->description);
     else
         description->setText("");
-
-    QPixmap *pix = pgitem->getPixmap();
-
-    if (pix)
-        pixlabel->setPixmap(*pix);
 }
 
-void PlaybackBox::selected(QListViewItem *lvitem)
+void ViewScheduled::selected(QListViewItem *lvitem)
 {
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     ProgramInfo *rec = pgitem->getProgramInfo();
-
-    char startt[128];
-    char endt[128];
-    
-    QString starts = rec->startts.toString("yyyyMMddhhmm");
-    QString endts = rec->endts.toString("yyyyMMddhhmm");
-
-    sprintf(startt, "%s00", starts.ascii());
-    sprintf(endt, "%s00", endts.ascii());
-
-    RecordingInfo *tvrec = new RecordingInfo(rec->channum.ascii(),
-                                             startt, endt, rec->title.ascii(),
-                                             rec->subtitle.ascii(),
-                                             rec->description.ascii());
-   
- 
-    tv->Playback(tvrec);
 }

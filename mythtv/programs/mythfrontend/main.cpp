@@ -11,6 +11,7 @@
 #include "recordinginfo.h"
 #include "playbackbox.h"
 #include "deletebox.h"
+#include "viewscheduled.h"
 
 int startGuide(int startchannel)
 {
@@ -20,6 +21,17 @@ int startGuide(int startchannel)
 
     int chan = gg.getLastChannel();
     return chan;
+}
+
+int startManaged(TV *tv, QString prefix)
+{
+    QSqlDatabase *db = QSqlDatabase::database();
+    ViewScheduled vsb(prefix, tv, db);
+
+    vsb.Show();
+    vsb.exec();
+
+    return 0;
 }
 
 int startPlayback(TV *tv, QString prefix)
@@ -179,6 +191,7 @@ int main(int argc, char **argv)
 
         diag->AddButton("Watch TV");
         diag->AddButton("Schedule a Recording");
+        diag->AddButton("View/Edit Scheduled Recordings");
         diag->AddButton("Watch a Previously Recorded Program");  
         diag->AddButton("Delete Recordings");
  
@@ -187,10 +200,11 @@ int main(int argc, char **argv)
 
         switch (result)
         {
-            case 0: startTV(tv); break;
-            case 1: startGuide(3); break;
-            case 2: startPlayback(tv, prefix); break;
-            case 3: startDelete(tv, prefix); break;
+            case 1: startTV(tv); break;
+            case 2: startGuide(3); break;
+            case 3: startManaged(tv, prefix); break;
+            case 4: startPlayback(tv, prefix); break;
+            case 5: startDelete(tv, prefix); break;
             default: break;
         }
 

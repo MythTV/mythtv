@@ -47,5 +47,5 @@ void MenuBox::Show()
 
 void MenuBox::buttonPressed(int which)
 {
-    done(which);
+    done(which + 1);
 }

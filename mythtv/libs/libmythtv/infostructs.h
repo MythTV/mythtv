@@ -50,6 +50,7 @@ class ProgramInfo
     int startCol;
 
     int recordtype;
+    bool conflicting;
 };
 
 ProgramInfo *GetProgramAtDateTime(int channel, const char *time);

@@ -3,8 +3,8 @@
 
 class ProgramInfo;
 class QSqlDatabase;
-
-#include <vector>
+ 
+#include <list>
 using namespace std;
 
 class Scheduler
@@ -16,13 +16,22 @@ class Scheduler
       bool CheckForChanges(void);
       bool FillRecordLists(void);
 
-      void RemoveFirstRecording(); 
+      void RemoveFirstRecording(void ); 
       ProgramInfo *GetNextRecording(void);
-      
+
+      list<ProgramInfo *> *getAllPending(void) { return &recordingList; }
+
   private:
+      void MarkConflicts(void);
+      void PruneList(void);
+
+      bool Conflict(ProgramInfo *a, ProgramInfo *b);
+
       QSqlDatabase *db;
 
-      vector<ProgramInfo *> recordingList;
+      list<ProgramInfo *> recordingList;
+
+      bool hasconflicts;
 };
 
 #endif

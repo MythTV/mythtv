@@ -12,6 +12,7 @@ using namespace std;
 
 Scheduler::Scheduler(QSqlDatabase *ldb)
 {
+    hasconflicts = false;
     db = ldb;
 }
 
@@ -93,6 +94,7 @@ bool Scheduler::FillRecordLists(void)
                                                     Qt::ISODate);
             proginfo->channum = query.value(0).toString();
             proginfo->recordtype = 1;
+            proginfo->conflicting = false;
 
             recordingList.push_back(proginfo);
         }
@@ -147,6 +149,7 @@ bool Scheduler::FillRecordLists(void)
                                                    Qt::ISODate);
                     proginfo->channum = subquery.value(0).toString();
                     proginfo->recordtype = 2;
+                    proginfo->conflicting = false;
 
                     recordingList.push_back(proginfo);
                 }
@@ -198,6 +201,7 @@ bool Scheduler::FillRecordLists(void)
                                                    Qt::ISODate);
                     proginfo->channum = subquery.value(0).toString();
                     proginfo->recordtype = 3;
+                    proginfo->conflicting = false;
 
                     recordingList.push_back(proginfo);
                 }
@@ -207,16 +211,19 @@ bool Scheduler::FillRecordLists(void)
 
     if (recordingList.size() > 0)
     {
-        sort(recordingList.begin(), recordingList.end(), comp_proginfo());
+        recordingList.sort(comp_proginfo());
+        MarkConflicts();
+        PruneList();
+        MarkConflicts();
     }
 
-    return false;
+    return hasconflicts;
 }
 
 ProgramInfo *Scheduler::GetNextRecording(void)
 {
     if (recordingList.size() > 0)
-        return recordingList[0];
+        return recordingList.front();
     return NULL;
 }
 
@@ -225,7 +232,7 @@ void Scheduler::RemoveFirstRecording(void)
     if (recordingList.size() == 0)
         return;
 
-    ProgramInfo *rec = recordingList[0];
+    ProgramInfo *rec = recordingList.front();
 
     if (rec->recordtype == 1)
     {
@@ -249,5 +256,88 @@ void Scheduler::RemoveFirstRecording(void)
     }
 
     delete rec;
-    recordingList.erase(recordingList.begin()); 
+    recordingList.pop_front();
+}
+
+bool Scheduler::Conflict(ProgramInfo *a, ProgramInfo *b)
+{
+    if ((a->startts <= b->startts && b->startts < a->endts) ||
+        (b->endts <= a->endts && a->startts < b->endts))
+        return true;
+    return false;
+}
+ 
+void Scheduler::MarkConflicts(void)
+{
+    hasconflicts = false;
+    list<ProgramInfo *>::iterator i = recordingList.begin();
+    for (; i != recordingList.end(); i++)
+    {
+        ProgramInfo *first = (*i);
+        first->conflicting = false;
+    }
+
+    i = recordingList.begin();
+    for (; i != recordingList.end(); i++)
+    {
+        list<ProgramInfo *>::iterator j = i;
+        j++;
+        for (; j != recordingList.end(); j++)
+        {
+            ProgramInfo *first = (*i);
+            ProgramInfo *second = (*j);
+
+            if (Conflict(first, second))
+            {
+                first->conflicting = true;
+                second->conflicting = true;
+                hasconflicts = true;
+            }
+        }
+    }
+}
+
+void Scheduler::PruneList(void)
+{
+    list<ProgramInfo *>::reverse_iterator i = recordingList.rbegin();
+    list<ProgramInfo *>::iterator deliter;
+
+prunebegin:
+    i = recordingList.rbegin();
+    for (; i != recordingList.rend(); i++)
+    {
+        list<ProgramInfo *>::reverse_iterator j = i;
+        j++;
+        for (; j != recordingList.rend(); j++)
+        {
+            ProgramInfo *first = (*i);
+            ProgramInfo *second = (*j);
+
+            if (first->title == second->title)
+            {
+                if (first->subtitle == second->subtitle)
+                {
+                    if (first->description == second->description)
+                    {
+                        if (second->conflicting && !first->conflicting)
+                        {
+                            delete second;
+                            deliter = j.base();
+                            j++;
+                            deliter--;
+                            recordingList.erase(deliter);
+                        }
+                        else
+                        {
+                            delete first;
+                            deliter = i.base();
+                            deliter--;
+                            recordingList.erase(deliter);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }    
 }

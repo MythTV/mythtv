@@ -14,6 +14,9 @@ class ProgramListItem : public QListViewItem
                     RecordingInfo *lrecinfo, int numcols, TV *ltv,
                     QString lprefix);
    ~ProgramListItem() { delete pginfo; delete recinfo; }
+
+    virtual void paintCell(QPainter *p, const QColorGroup &cg,
+                           int column, int width, int alignment);
     
     ProgramInfo *getProgramInfo(void) { return pginfo; }
     RecordingInfo *getRecordingInfo(void) { return recinfo; }
