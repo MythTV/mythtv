@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS credits
     chanid INT UNSIGNED NOT NULL default '0',
     starttime TIMESTAMP NOT NULL,
     role SET('actor','director','producer','executive_producer','writer','guest_star','host','adapter','presenter','commentator','guest') NOT NULL default '',
-    UNIQUE KEY chanid (chanid, starttime, person, role),
+    UNIQUE KEY chanid (chanid, starttime, person),
     KEY person (person, role)
 ) TYPE=MyISAM;
 
