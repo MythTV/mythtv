@@ -1237,7 +1237,20 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
                 if (positionMap->find(i) == positionMap->end())
                     nvr_enc->FillPositionMap(i, tmpIndex, *positionMap);
             }
-            keyPos = (*positionMap)[tmpIndex];
+
+            if (positionMap->find(tmpIndex) != positionMap->end())
+                keyPos = (*positionMap)[tmpIndex];
+        }
+        else if (!hasFullPositionMap && !livetv && !watchingrecording)
+        {
+            m_db->lock();
+            m_playbackinfo->GetPositionMap(*positionMap, MARK_KEYFRAME,
+                                           m_db->db());
+            m_db->unlock();
+            hasFullPositionMap = true;
+
+            if (positionMap->find(tmpIndex) != positionMap->end())
+                keyPos = (*positionMap)[tmpIndex];
         }
 
         if (keyPos == -1)
