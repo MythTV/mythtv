@@ -14,7 +14,7 @@
 <HR>
 <H2><A NAME="s21">21.</A> <A HREF="mythtv-HOWTO.html#toc21">Miscellaneous. </A></H2>
 
-<H2><A NAME="ss21.1">21.1</A> <A HREF="mythtv-HOWTO.html#toc21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>
+<H2><A NAME="ss21.1">21.1</A> <A HREF="mythtv-HOWTO.html#toc21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format</A>
 </H2>
 
 <P>MythTV comes with a utility called <B>mythtranscode</B> which can
@@ -103,7 +103,7 @@ $ cat vidout > video.yuv
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss21.2">21.2</A> <A HREF="mythtv-HOWTO.html#toc21.2">I'd like to use some other window manager.</A>
+<H2><A NAME="ss21.2">21.2</A> <A HREF="mythtv-HOWTO.html#toc21.2">Using a different window manager</A>
 </H2>
 
 <P>MythTV is not dependent on any particular window manager.  If you wish to
@@ -155,7 +155,7 @@ process all of the frames.</P>
 <P>If you'd like to read more on this, go to the vcdhelp website at 
 <A HREF="http://www.vcdhelp.com/forum/userguides/94382.php">http://www.vcdhelp.com/forum/userguides/94382.php</A>.</P>
 
-<H2><A NAME="ss21.4">21.4</A> <A HREF="mythtv-HOWTO.html#toc21.4">MythTV GUI and X Display Sizes.</A>
+<H2><A NAME="ss21.4">21.4</A> <A HREF="mythtv-HOWTO.html#toc21.4">MythTV GUI and X Display Sizes</A>
 </H2>
 
 <P>MythTV is designed to be run as dedicated full screen TV application
@@ -225,7 +225,7 @@ purpose of these settings are to cut off rough edges and to expand the image
 so that objects will appear to be the same size as a normal overscanned TV
 picture.</P>
 
-<H2><A NAME="backupdb"></A> <A NAME="ss21.5">21.5</A> <A HREF="mythtv-HOWTO.html#toc21.5">I'd like to save or restore my database. </A>
+<H2><A NAME="backupdb"></A> <A NAME="ss21.5">21.5</A> <A HREF="mythtv-HOWTO.html#toc21.5">Saving or restoring the database </A>
 </H2>
 
 <P>See the <B>mysqldump</B> manpage for more information.
@@ -250,7 +250,7 @@ with multiple systems.  See the
 <A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> section for more
 information.</P>
 
-<H2><A NAME="ss21.6">21.6</A> <A HREF="mythtv-HOWTO.html#toc21.6">I'd like to delete the MySQL database.</A>
+<H2><A NAME="ss21.6">21.6</A> <A HREF="mythtv-HOWTO.html#toc21.6">Deleting the MySQL database</A>
 </H2>
 
 <P>
@@ -310,7 +310,7 @@ analog)</LI>
 <CODE>/dev/mixer</CODE> devices.  Typing <CODE>$ dmesg</CODE> will let you know
 what's going on.</P>
 
-<H2><A NAME="ss21.8">21.8</A> <A HREF="mythtv-HOWTO.html#toc21.8">Removing unwanted channels.</A>
+<H2><A NAME="ss21.8">21.8</A> <A HREF="mythtv-HOWTO.html#toc21.8">Removing unwanted channels</A>
 </H2>
 
 <P>If <B>mythfilldatabase</B> grabbed a channel which you do not want to
@@ -356,7 +356,7 @@ mysql> delete from program where chanid = 1015;
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss21.9">21.9</A> <A HREF="mythtv-HOWTO.html#toc21.9">I'd like to use NFS.</A>
+<H2><A NAME="ss21.9">21.9</A> <A HREF="mythtv-HOWTO.html#toc21.9">NFS</A>
 </H2>
 
 <P>You may want to use a central server to store your files.  </P>
@@ -384,7 +384,7 @@ exporting the directory "/var/video", which we're mounting locally at
 performance of NFS; soft mean that NFS will eventually timeout on an error,
 and the nfsvers is required for filesizes over 2GB.</P>
 
-<H2><A NAME="ss21.10">21.10</A> <A HREF="mythtv-HOWTO.html#toc21.10">Automatically starting mythfrontend at system boot time.</A>
+<H2><A NAME="ss21.10">21.10</A> <A HREF="mythtv-HOWTO.html#toc21.10">Automatically starting mythfrontend at system boot time</A>
 </H2>
 
 <P>Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -423,7 +423,7 @@ session.screen0.focusModel:     SloppyFocus
  in it.</P>
 <P>
 <A NAME="mythbackend_autostart"></A> </P>
-<H2><A NAME="ss21.11">21.11</A> <A HREF="mythtv-HOWTO.html#toc21.11">Automatically starting mythbackend at system boot time.</A>
+<H2><A NAME="ss21.11">21.11</A> <A HREF="mythtv-HOWTO.html#toc21.11">Automatically starting mythbackend at system boot time</A>
 </H2>
 
 <H3>Red Hat And Mandrake</H3>
@@ -574,7 +574,7 @@ mythbackend at startup.</P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="advanced_backend_config"></A> <A NAME="ss21.12">21.12</A> <A HREF="mythtv-HOWTO.html#toc21.12">Advanced Backend Configurations. </A>
+<H2><A NAME="advanced_backend_config"></A> <A NAME="ss21.12">21.12</A> <A HREF="mythtv-HOWTO.html#toc21.12">Advanced Backend Configurations </A>
 </H2>
 
 <P>MythTV is flexible in the way that you define multiple backend tuner
@@ -665,7 +665,7 @@ transcoding.</P>
 <P>Once the transcode is complete, mythbackend will replace the old file
 with the new as soon as it is no longer in use.</P>
 
-<H2><A NAME="ss21.14">21.14</A> <A HREF="mythtv-HOWTO.html#toc21.14">Changing your hostname.</A>
+<H2><A NAME="ss21.14">21.14</A> <A HREF="mythtv-HOWTO.html#toc21.14">Changing your hostname</A>
 </H2>
 
 <P>If you need to change the name of the computers used with MythTV you'll
@@ -780,21 +780,23 @@ and <CODE>mythtv_restore.sql</CODE> files.</P>
 <P>While it is true that the TiVo runs the Linux kernel, and TiVo has released
 their changes to the kernel under the GPL, the TiVo is <EM>not</EM> a
 general-purpose computer, and there is no programming information available
-for the custom hardware contained within a TiVo.</P>
+for the custom hardware contained within a TiVo.  TiVo is under no
+obligation to release the source code to their <EM>application</EM>.</P>
 <P>The ReplayTV runs VxWorks, a Real Time Operating System from Wind River
 Systems.</P>
-<H2><A NAME="ss21.17">21.17</A> <A HREF="mythtv-HOWTO.html#toc21.17">Can I use wireless between the frontend and the backend?</A>
+<H2><A NAME="ss21.17">21.17</A> <A HREF="mythtv-HOWTO.html#toc21.17">Can a wireless connection be used between the frontend and the backend?</A>
 </H2>
 
-<P>Yes, you may, assuming that your wireless connection has sufficient
-bandwidth to maintain the datarate between the frontend and the backend. 
-802.11b should be sufficient if the encoded bitrate of the content is less
-than the datarate of your wireless connection, which in the case of 802.11b
-would be approximately 4 Mbps.  (The advertised rate of 11Mbps gives an
-actual throughput of 4 Mbps.)  802.11a and 802.11g, if operating in their
-high-speed modes, or proprietary 802.11b "Turbo" schemes should be
-adequate.  Multiple wireless frontends, poor signal strength or other
-factors can severely impact the viewing experience on the frontend.</P>
+<P>Yes, assuming that your wireless connection has sufficient bandwidth to
+maintain the datarate between the frontend and the backend.  802.11b should
+be sufficient if the encoded bitrate of the content is less than the
+datarate of your wireless connection, which in the case of 802.11b would be
+approximately 4 Mbps.  (The advertised rate of 11Mbps gives an actual
+throughput of 4 Mbps.) 802.11a and 802.11g, if operating in their high-speed
+modes, or proprietary 802.11b "Turbo" schemes should be adequate.  Multiple
+wireless frontends, poor signal strength or other factors can severely
+impact the viewing experience on the frontend.</P>
+
 <H2><A NAME="ss21.18">21.18</A> <A HREF="mythtv-HOWTO.html#toc21.18">How can I burn shows that I have recorded to a DVD?</A>
 </H2>
 
@@ -848,7 +850,7 @@ driveropts=burnfree -dao -v tsize="$TSIZE"s -
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="MigratingtoDD"></A> <A NAME="ss21.19">21.19</A> <A HREF="mythtv-HOWTO.html#toc21.19">Migrating from XMLTV to DataDirect. </A>
+<H2><A NAME="MigratingtoDD"></A> <A NAME="ss21.19">21.19</A> <A HREF="mythtv-HOWTO.html#toc21.19">Migrating from XMLTV to DataDirect </A>
 </H2>
 
 <P>DataDirect will use different information for your video sources and
@@ -857,7 +859,7 @@ information in a way that will allow your EPG and existing recording rules
 to continue to work as you'd expect.</P>
 <P>The first step is to create a backup of your database using the
 instructions found in 
-<A HREF="#backupdb">I'd like to save or restore my database.</A></P>
+<A HREF="#backupdb">Saving or restoring the database</A></P>
 <P><B>NOTE</B>: Examine the contents of the backup file to be sure that the
 backup succeeded before modifying your database.</P>
 <P><B>NOTE</B>: The MythTV DataDirect grabber requires <B>wget</B> version
@@ -877,9 +879,19 @@ $
 like to clear all program/channel settings before starting configuration
 [no]" type "yes".</P>
 <P>Complete the configuration as detailed in the section called 
-<A HREF="mythtv-HOWTO-5.html#ConfigureDD">Configuring the Zap2It.com DataDirect service.</A> and
+<A HREF="mythtv-HOWTO-5.html#ConfigureDD">Configuring the Zap2It.com DataDirect service</A> and
 in 
 <A HREF="mythtv-HOWTO-9.html#VideoSources">Video Sources</A>.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION>You <EM>must</EM> associate your DataDirect information with the inputs on
+your capture device.  If you created "Cable-DD", then don't forget to bind
+<CODE>/dev/video0</CODE> to Cable-DD in the 
+<A HREF="mythtv-HOWTO-9.html#VideoSources">Video Sources</A> portion of setup.</CAPTION>
+</FIGURE>
+</P>
 <P>Once you're done running setup, run <B>mythfilldatabase</B> to populate
 the database with new data.</P>
 <P>To restore the channel icons, you will need to perform one of two steps. 

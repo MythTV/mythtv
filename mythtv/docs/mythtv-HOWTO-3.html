@@ -22,7 +22,7 @@ The ports for MySQL (TCP port 3306) and mythbackend (TCP ports 6543 and
 <EM>not</EM> expose the MythTV and MySQL ports to the Internet or your
 "Outside" LAN.</P>
 
-<H2><A NAME="ss3.1">3.1</A> <A HREF="mythtv-HOWTO.html#toc3.1">Hardware. </A>
+<H2><A NAME="ss3.1">3.1</A> <A HREF="mythtv-HOWTO.html#toc3.1">Hardware</A>
 </H2>
 
 <P>Hardware selection is a complex topic, one this HOWTO will only discuss
@@ -125,15 +125,15 @@ information.</P>
 <P>MythTV creates large files, many in excess of 2GB.  You <EM>must</EM> use a
 filesystem that will allow you to create large files.  Filesystems known to
 have problems with large files are FAT and FAT32.</P>
-<P>Because of the size of these files, it may be useful to plan for future
-expansion right from the beginning.  If your case and power supply have the
-capacity for additional hard drives, read through the 
-<A HREF="mythtv-HOWTO-22.html#LVM">LVM</A> and 
-<A HREF="mythtv-HOWTO-22.html#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
 <P>Because MythTV creates very large files, a filesystem that does well at
 deleting large files is important.  Numerous benchmarks show that XFS and
 JFS do very well at this task.  You are strongly encouraged to consider
 either of these for your MythTV filesystem.</P>
+<P>Because of the size of the MythTV files, it may be useful to plan for future
+expansion right from the beginning.  If your case and power supply have the
+capacity for additional hard drives, read through the 
+<A HREF="mythtv-HOWTO-22.html#LVM">LVM</A> and 
+<A HREF="mythtv-HOWTO-22.html#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
 <P>
 <A NAME="video_capture_device"></A> </P>
 <H3>Video Capture Device </H3>
@@ -261,7 +261,7 @@ Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
 accelleration.  If you enable the hardware accelleration, you may be able to
 use a 1.8GHz processor.</P>
 
-<H3>Hardware known NOT to work and other issues.</H3>
+<H3>Hardware known NOT to work and other issues</H3>
 
 <P>
 <UL>
@@ -468,7 +468,7 @@ the "Plus" version above)</LI>
 </UL>
 </P>
 
-<H2><A NAME="ss3.2">3.2</A> <A HREF="mythtv-HOWTO.html#toc3.2">Software.</A>
+<H2><A NAME="ss3.2">3.2</A> <A HREF="mythtv-HOWTO.html#toc3.2">Software</A>
 </H2>
 
 <P>There are a few ways of installing programs on Linux systems; you can
@@ -497,16 +497,22 @@ successful MythTV installation:</CAPTION>
 </UL>
 </P>
 
-<H3><A NAME="precompiled"></A> Pre-compiled packages. </H3>
+<H3><A NAME="precompiled"></A> Pre-compiled packages </H3>
 
 <P>A number of people have created pre-compiled packages for MythTV that may
 make your installation easier.</P>
-<P><B>BIG FAT WARNING</B>:  This HOWTO assumes that you have <EM>not</EM>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>BIG FAT WARNING</B>:  This HOWTO assumes that you have <EM>not</EM>
 installed MythTV from a package.  All example command lines and file
 locations are based on the MythTV tarball defaults.  Some packagers have
 modified the filenames, binaries and file locations to match what is
 commonly found in that distribution.  Any issues with MythTV installed via a
-pre-compiled package <B>MUST</B> be raised with the packager.</P>
+pre-compiled package <B>MUST</B> be raised with the packager.</CAPTION>
+</FIGURE>
+</P>
 <P>If you use any of the pre-compiled packages you may not need to perform any
 additional configuration steps in this HOWTO.  The next logical step is 
 <A HREF="mythtv-HOWTO-6.html#mysql">configuring MySQL</A>, which you may or may not have to
@@ -628,7 +634,7 @@ components, you should be aware that not all packages include the necessary
 headers for compiling packages.  If you're having trouble compiling, ensure
 that you've installed the -devel version of a prerequisite.
 
-NOTE:  Other than where noted, Mandrake 9.1 users may follow the
+NOTE:  Other than where noted, Mandrake 9.1 and 10.0 users may follow the
 Mandrake 9.0 instructions.
 </PRE>
 <HR>
@@ -640,7 +646,7 @@ trying to use MythTV, then please check the main ALSA website and upgrade to
 the latest version, or see if your distribution has already packaged the
 latest ALSA drivers.</P>
 
-<H3><A NAME="graphicinstalltools_"></A> Graphical installation tools. </H3>
+<H3><A NAME="graphicinstalltools_"></A> Graphical installation tools </H3>
 
 <H3>Mandrake 9.0</H3>
 
@@ -684,7 +690,7 @@ you can disable native volume support.</P>
 <P>If you marked anything to install, click on Install Marked.  Click "Yes" or
 OK if you get a message about satisfying dependencies.</P>
 
-<H3><A NAME="CLIinstalltools_"></A> Command-line installation. </H3>
+<H3><A NAME="CLIinstalltools_"></A> Command-line installation </H3>
 
 <P> This section details the various methods for installing prerequisites
 from the command line.</P>

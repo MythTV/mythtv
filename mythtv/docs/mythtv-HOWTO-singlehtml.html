@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-06-03, v0.15.02
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-06-06, v0.15.03
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -17,12 +17,14 @@ instructions, as well as including distribution-specific instructions where
 necessary.</EM>
 <HR>
 <P>
-<H2><A NAME="toc1">1.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s1">How to obtain this document. </A></H2>
+<H2><A NAME="toc1">1.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s1">First things first.</A></H2>
 
 <UL>
-<LI><A NAME="toc1.1">1.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.1">Mailing lists / getting help.</A>
-<LI><A NAME="toc1.2">1.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.2">IRC.</A>
-<LI><A NAME="toc1.3">1.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.3">Contributing to this document.</A>
+<LI><A NAME="toc1.1">1.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.1">How to obtain this document </A>
+<LI><A NAME="toc1.2">1.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.2">Document conventions</A>
+<LI><A NAME="toc1.3">1.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.3">Mailing lists / getting help</A>
+<LI><A NAME="toc1.4">1.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.4">IRC</A>
+<LI><A NAME="toc1.5">1.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.5">Contributing to this document</A>
 </UL>
 <P>
 <H2><A NAME="toc2">2.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s2">Introduction.</A></H2>
@@ -31,8 +33,8 @@ necessary.</EM>
 <H2><A NAME="toc3">3.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s3">Checking prerequisites. </A></H2>
 
 <UL>
-<LI><A NAME="toc3.1">3.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss3.1">Hardware. </A>
-<LI><A NAME="toc3.2">3.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss3.2">Software.</A>
+<LI><A NAME="toc3.1">3.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss3.1">Hardware</A>
+<LI><A NAME="toc3.2">3.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss3.2">Software</A>
 </UL>
 <P>
 <H2><A NAME="toc4">4.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s4">System Configuration Requirements for Compiling MythTV </A></H2>
@@ -46,12 +48,12 @@ necessary.</EM>
 <H2><A NAME="toc5">5.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s5">Downloading and compiling.</A></H2>
 
 <UL>
-<LI><A NAME="toc5.1">5.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.1">Notes on compiling on a system with non-Intel processors. </A>
-<LI><A NAME="toc5.2">5.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.2">Building LAME.</A>
-<LI><A NAME="toc5.3">5.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.3">XMLTV. </A>
-<LI><A NAME="toc5.4">5.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.4">Configuring the Zap2It.com DataDirect service. </A>
-<LI><A NAME="toc5.5">5.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.5">Manually building MythTV.</A>
-<LI><A NAME="toc5.6">5.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.6">Gentoo. </A>
+<LI><A NAME="toc5.1">5.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.1">Notes on compiling on a system with non-Intel processors </A>
+<LI><A NAME="toc5.2">5.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.2">Building LAME</A>
+<LI><A NAME="toc5.3">5.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.3">XMLTV</A>
+<LI><A NAME="toc5.4">5.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.4">Configuring the Zap2It.com DataDirect service </A>
+<LI><A NAME="toc5.5">5.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.5">Manually building MythTV</A>
+<LI><A NAME="toc5.6">5.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.6">Gentoo </A>
 </UL>
 <P>
 <H2><A NAME="toc6">6.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s6">MySQL.</A></H2>
@@ -60,14 +62,14 @@ necessary.</EM>
 <LI><A NAME="toc6.1">6.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.1">Mandrake 9.0</A>
 <LI><A NAME="toc6.2">6.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.2">Red Hat Linux and Fedora Core</A>
 <LI><A NAME="toc6.3">6.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.3">Gentoo</A>
-<LI><A NAME="toc6.4">6.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.4">Setting up the initial database.</A>
+<LI><A NAME="toc6.4">6.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.4">Setting up the initial database</A>
 </UL>
 <P>
 <H2><A NAME="toc7">7.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s7">Configuring Sound.</A></H2>
 
 <UL>
-<LI><A NAME="toc7.1">7.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss7.1">Graphically setting up the mixer.</A>
-<LI><A NAME="toc7.2">7.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss7.2">Setting the mixer from the command line.</A>
+<LI><A NAME="toc7.1">7.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss7.1">Graphically setting up the mixer</A>
+<LI><A NAME="toc7.2">7.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss7.2">Setting the mixer from the command line</A>
 </UL>
 <P>
 <H2><A NAME="toc8">8.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s8">Setting up a remote control.</A></H2>
@@ -76,19 +78,19 @@ necessary.</EM>
 <LI><A NAME="toc8.1">8.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.1">Gentoo</A>
 <LI><A NAME="toc8.2">8.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.2">Mandrake 9.0</A>
 <LI><A NAME="toc8.3">8.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.3">Red Hat Linux/Fedora Core</A>
-<LI><A NAME="toc8.4">8.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.4">Obtaining and compiling lirc.</A>
-<LI><A NAME="toc8.5">8.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.5">Completing the lirc install. </A>
-<LI><A NAME="toc8.6">8.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.6">Additional information for lirc.</A>
-<LI><A NAME="toc8.7">8.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.7">Configuring lirc for use with an IR blaster.</A>
+<LI><A NAME="toc8.4">8.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.4">Obtaining and compiling lirc</A>
+<LI><A NAME="toc8.5">8.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.5">Completing the lirc install </A>
+<LI><A NAME="toc8.6">8.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.6">Additional information for lirc</A>
+<LI><A NAME="toc8.7">8.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.7">Configuring lirc for use with an IR blaster</A>
 </UL>
 <P>
 <H2><A NAME="toc9">9.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s9">Configuring MythTV. </A></H2>
 
 <UL>
-<LI><A NAME="toc9.1">9.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.1">Configuring the Master backend system.</A>
-<LI><A NAME="toc9.2">9.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.2">Post-configuration.</A>
-<LI><A NAME="toc9.3">9.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.3">Configuring a non-master backend. </A>
-<LI><A NAME="toc9.4">9.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.4">Configuring and running mythfilldatabase.</A>
+<LI><A NAME="toc9.1">9.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.1">Configuring the Master backend system</A>
+<LI><A NAME="toc9.2">9.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.2">Post-configuration</A>
+<LI><A NAME="toc9.3">9.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.3">Configuring a non-master backend </A>
+<LI><A NAME="toc9.4">9.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.4">Configuring and running mythfilldatabase</A>
 </UL>
 <P>
 <H2><A NAME="toc10">10.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s10">Configuring mythfrontend.</A></H2>
@@ -105,25 +107,25 @@ necessary.</EM>
 <H2><A NAME="toc11">11.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s11">Using MythTV.</A></H2>
 
 <UL>
-<LI><A NAME="toc11.1">11.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.1">Keyboard commands.</A>
-<LI><A NAME="toc11.2">11.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.2">Using themes with MythTV.</A>
-<LI><A NAME="toc11.3">11.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.3">Adding DirecTV information to the database.</A>
-<LI><A NAME="toc11.4">11.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.4">Adding support for an external tuner.</A>
+<LI><A NAME="toc11.1">11.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.1">Keyboard commands</A>
+<LI><A NAME="toc11.2">11.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.2">Using themes with MythTV</A>
+<LI><A NAME="toc11.3">11.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.3">Adding DirecTV information to the database</A>
+<LI><A NAME="toc11.4">11.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.4">Adding support for an external tuner</A>
 <LI><A NAME="toc11.5">11.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.5">Using Shutdown/Wakeup</A>
 </UL>
 <P>
 <H2><A NAME="toc12">12.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s12">MythWeb.</A></H2>
 
 <UL>
-<LI><A NAME="toc12.1">12.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.1">Installation and prerequisites.</A>
-<LI><A NAME="toc12.2">12.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.2">Completing the installation.</A>
+<LI><A NAME="toc12.1">12.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.1">Installation and prerequisites</A>
+<LI><A NAME="toc12.2">12.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.2">Completing the installation</A>
 </UL>
 <P>
 <H2><A NAME="toc13">13.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s13">MythGallery.</A></H2>
 
 <UL>
-<LI><A NAME="toc13.1">13.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss13.1">Installation and prerequisites.</A>
-<LI><A NAME="toc13.2">13.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss13.2">Using MythGallery.</A>
+<LI><A NAME="toc13.1">13.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss13.1">Installation and prerequisites</A>
+<LI><A NAME="toc13.2">13.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss13.2">Using MythGallery</A>
 <LI><A NAME="toc13.3">13.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss13.3">Importing Pictures</A>
 </UL>
 <P>
@@ -133,13 +135,13 @@ necessary.</EM>
 <H2><A NAME="toc15">15.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s15">MythMusic. </A></H2>
 
 <UL>
-<LI><A NAME="toc15.1">15.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.1">Manual installation of prerequisites.</A>
+<LI><A NAME="toc15.1">15.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.1">Manual installation of prerequisites</A>
 <LI><A NAME="toc15.2">15.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.2">Mandrake 9.0</A>
 <LI><A NAME="toc15.3">15.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.3">Red Hat Linux 9</A>
-<LI><A NAME="toc15.4">15.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.4">Compiling MythMusic. </A>
-<LI><A NAME="toc15.5">15.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.5">Configuring MythMusic.</A>
-<LI><A NAME="toc15.6">15.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.6">Using MythMusic. </A>
-<LI><A NAME="toc15.7">15.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.7">Troubleshooting MythMusic.</A>
+<LI><A NAME="toc15.4">15.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.4">Compiling MythMusic</A>
+<LI><A NAME="toc15.5">15.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.5">Configuring MythMusic</A>
+<LI><A NAME="toc15.6">15.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.6">Using MythMusic</A>
+<LI><A NAME="toc15.7">15.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.7">Troubleshooting MythMusic</A>
 </UL>
 <P>
 <H2><A NAME="toc16">16.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s16">MythWeather.</A></H2>
@@ -151,8 +153,8 @@ necessary.</EM>
 <H2><A NAME="toc18">18.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s18">MythDVD.</A></H2>
 
 <UL>
-<LI><A NAME="toc18.1">18.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.1">Manual Compilation of Prerequisites.</A>
-<LI><A NAME="toc18.2">18.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.2">Pre-compiled binaries.</A>
+<LI><A NAME="toc18.1">18.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.1">Manual Compilation of Prerequisites</A>
+<LI><A NAME="toc18.2">18.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.2">Pre-compiled binaries</A>
 </UL>
 <P>
 <H2><A NAME="toc19">19.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s19">MythNews.</A></H2>
@@ -161,87 +163,93 @@ necessary.</EM>
 <H2><A NAME="toc20">20.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s20">Troubleshooting.</A></H2>
 
 <UL>
-<LI><A NAME="toc20.1">20.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.1">Illegal Instruction.</A>
-<LI><A NAME="toc20.2">20.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.2">mythfilldatabase failing.</A>
-<LI><A NAME="toc20.3">20.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.3">Fast CPU, choppy or jittery video. </A>
-<LI><A NAME="toc20.4">20.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.4">I have a MPEG-2 encoder card and my video appears "jittery".</A>
-<LI><A NAME="toc20.5">20.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.5">I have a MPEG-2 encoder card and my video is jumping up and down.</A>
-<LI><A NAME="toc20.6">20.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.6">I keep losing all of my settings every time I compile!</A>
-<LI><A NAME="toc20.7">20.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.7">Compile errors.</A>
-<LI><A NAME="toc20.8">20.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.8">My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.</A>
-<LI><A NAME="toc20.9">20.9</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.9">I get segfaults / MythTV isn't doing anything.</A>
-<LI><A NAME="toc20.10">20.10</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.10">Debugging with GDB.</A>
-<LI><A NAME="toc20.11">20.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.11">MythTV makes my system crash. </A>
-<LI><A NAME="toc20.12">20.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.12">Troubleshooting audio. </A>
-<LI><A NAME="toc20.13">20.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.13">The mythbackend program told me to look at this section.</A>
-<LI><A NAME="toc20.14">20.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.14">My remote doesn't work / works sometimes and not others / "ghost"</A>
-<LI><A NAME="toc20.15">20.15</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.15">My PVR-250 card doesn't show inputs in the setup screen.</A>
-<LI><A NAME="toc20.16">20.16</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.16">Where's my "canada-cable" entry gone to?</A>
-<LI><A NAME="toc20.17">20.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.17">My channels are off by one.</A>
-<LI><A NAME="toc20.18">20.18</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.18">Mythweb is showing a db_open error when I connect to it.</A>
-<LI><A NAME="toc20.19">20.19</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.19">error: can't find a register in class 'BREG' while reloading 'asm'</A>
-<LI><A NAME="toc20.20">20.20</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.20">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
-<LI><A NAME="toc20.21">20.21</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.21">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
-<LI><A NAME="toc20.22">20.22</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.22">My mouse pointer disappears when placed over the MythTV windows.</A>
-<LI><A NAME="toc20.23">20.23</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.23">What does "strange error flushing buffer" mean on my console?</A>
-<LI><A NAME="toc20.24">20.24</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.24">I can't change the channel when watching Live TV.</A>
-<LI><A NAME="toc20.25">20.25</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.25">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
-<LI><A NAME="toc20.26">20.26</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.26">Troubleshooting the Hauppauge PVR-250 IR remote</A>
-<LI><A NAME="toc20.27">20.27</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.27">MySQL not connecting correctly.</A>
-<LI><A NAME="toc20.28">20.28</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.28">My screen goes black when I try to play something.</A>
-<LI><A NAME="toc20.29">20.29</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.29">Poor performance with NVidia cards and XvMC.</A>
-<LI><A NAME="toc20.30">20.30</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.30">My computer is loading a media player application when I insert a CD or DVD.</A>
-<LI><A NAME="toc20.31">20.31</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.31">I can't change channels.</A>
+<LI><A NAME="toc20.1">20.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.1">Compiling</A>
+<LI><A NAME="toc20.2">20.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.2">Debugging</A>
+<LI><A NAME="toc20.3">20.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.3">Installing</A>
+<LI><A NAME="toc20.4">20.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.4">Using</A>
+<LI><A NAME="toc20.5">20.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.5">Miscellaneous</A>
 </UL>
 <P>
 <H2><A NAME="toc21">21.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s21">Miscellaneous. </A></H2>
 
 <UL>
-<LI><A NAME="toc21.1">21.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>
-<LI><A NAME="toc21.2">21.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.2">I'd like to use some other window manager.</A>
+<LI><A NAME="toc21.1">21.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format</A>
+<LI><A NAME="toc21.2">21.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.2">Using a different window manager</A>
 <LI><A NAME="toc21.3">21.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.3">What capture resolution should I use?  How does video work?</A>
-<LI><A NAME="toc21.4">21.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.4">MythTV GUI and X Display Sizes.</A>
-<LI><A NAME="toc21.5">21.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.5">I'd like to save or restore my database. </A>
-<LI><A NAME="toc21.6">21.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.6">I'd like to delete the MySQL database.</A>
+<LI><A NAME="toc21.4">21.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.4">MythTV GUI and X Display Sizes</A>
+<LI><A NAME="toc21.5">21.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.5">Saving or restoring the database </A>
+<LI><A NAME="toc21.6">21.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.6">Deleting the MySQL database</A>
 <LI><A NAME="toc21.7">21.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.7">btaudio </A>
-<LI><A NAME="toc21.8">21.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.8">Removing unwanted channels.</A>
-<LI><A NAME="toc21.9">21.9</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.9">I'd like to use NFS.</A>
-<LI><A NAME="toc21.10">21.10</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.10">Automatically starting mythfrontend at system boot time.</A>
-<LI><A NAME="toc21.11">21.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.11">Automatically starting mythbackend at system boot time.</A>
-<LI><A NAME="toc21.12">21.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.12">Advanced Backend Configurations. </A>
+<LI><A NAME="toc21.8">21.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.8">Removing unwanted channels</A>
+<LI><A NAME="toc21.9">21.9</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.9">NFS</A>
+<LI><A NAME="toc21.10">21.10</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.10">Automatically starting mythfrontend at system boot time</A>
+<LI><A NAME="toc21.11">21.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.11">Automatically starting mythbackend at system boot time</A>
+<LI><A NAME="toc21.12">21.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.12">Advanced Backend Configurations </A>
 <LI><A NAME="toc21.13">21.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.13">What is this transcoder thing, and how do I use it?</A>
-<LI><A NAME="toc21.14">21.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.14">Changing your hostname.</A>
+<LI><A NAME="toc21.14">21.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.14">Changing your hostname</A>
 <LI><A NAME="toc21.15">21.15</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.15">Can I run MythTV on my TiVo?</A>
 <LI><A NAME="toc21.16">21.16</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.16">Can I run MythTV on my ReplayTV?</A>
-<LI><A NAME="toc21.17">21.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.17">Can I use wireless between the frontend and the backend?</A>
+<LI><A NAME="toc21.17">21.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.17">Can a wireless connection be used between the frontend and the backend?</A>
 <LI><A NAME="toc21.18">21.18</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.18">How can I burn shows that I have recorded to a DVD?</A>
-<LI><A NAME="toc21.19">21.19</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.19">Migrating from XMLTV to DataDirect. </A>
+<LI><A NAME="toc21.19">21.19</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.19">Migrating from XMLTV to DataDirect </A>
 </UL>
 <P>
 <H2><A NAME="toc22">22.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s22">Example Configurations.</A></H2>
 
 <UL>
-<LI><A NAME="toc22.1">22.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.1">Hauppauge PVR-250/350 hardware MPEG-2 encoder. </A>
-<LI><A NAME="toc22.2">22.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.2">Hauppauge PVR-250 remote and MythTV's native LIRC support.</A>
-<LI><A NAME="toc22.3">22.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.3">Logical Volume Manager (LVM). </A>
-<LI><A NAME="toc22.4">22.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.4">Advanced Partition Formatting. </A>
+<LI><A NAME="toc22.1">22.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.1">Hauppauge PVR-250/350 hardware MPEG-2 encoder </A>
+<LI><A NAME="toc22.2">22.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.2">Hauppauge PVR-250 remote and MythTV's native LIRC support</A>
+<LI><A NAME="toc22.3">22.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.3">Logical Volume Manager (LVM) </A>
+<LI><A NAME="toc22.4">22.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.4">Advanced Partition Formatting </A>
 </UL>
 
 <HR>
-<H2><A NAME="how_to_obtain"></A> <A NAME="s1">1.</A> <A HREF="#toc1">How to obtain this document. </A></H2>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">First things first.</A></H2>
+
+<H2><A NAME="how_to_obtain"></A> <A NAME="ss1.1">1.1</A> <A HREF="#toc1.1">How to obtain this document </A>
+</H2>
 
 <P>This HOWTO document is maintained at the primary MythTV website: 
 <A HREF="http://www.mythtv.org">http://www.mythtv.org</A> by Robert
 Kulagowski 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A>.  (Please note that I
-am <EM>NOT</EM> the author/programmer of the MythTV application!)</P>
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A>.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: Please note that I am <EM>NOT</EM> the author/programmer of
+the MythTV application!</CAPTION>
+</FIGURE>
+</P>
 <P>This document is available as a single-page HTML document at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html">http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html</A> or as a PDF
 at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">http://www.mythtv.org/docs/mythtv-HOWTO.pdf</A>.</P>
 <P>This HOWTO is for MythTV v0.15.1.</P>
 
-<H2><A NAME="ss1.1">1.1</A> <A HREF="#toc1.1">Mailing lists / getting help.</A>
+<H2><A NAME="ss1.2">1.2</A> <A HREF="#toc1.2">Document conventions</A>
+</H2>
+
+<P>The following conventions are used throughout this document.<BR>
+<B>boldface</B> - used for program names.<BR>
+<CODE>typewriter</CODE> - used for program paths.<BR>
+<EM>emphasis</EM> - Pay attention here.<BR></P>
+<P>
+<FIGURE>
+<EPS FILE="warning.eps">
+<IMG SRC="warning.png">
+<CAPTION>Pay more attention.</CAPTION>
+</FIGURE>
+</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION>Ignore at your own peril.</CAPTION>
+</FIGURE>
+</P>
+
+<H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Mailing lists / getting help</A>
 </H2>
 
 <P>It's recommended that you join the user list at 
@@ -252,7 +260,7 @@ the developer list strictly for development-related issues.</P>
 <P>Searchable archives for the lists are available at 
 <A HREF="http://www.gossamer-threads.com/lists/mythtv/">http://www.gossamer-threads.com/lists/mythtv/</A>.</P>
 
-<H2><A NAME="ss1.2">1.2</A> <A HREF="#toc1.2">IRC.</A>
+<H2><A NAME="ss1.4">1.4</A> <A HREF="#toc1.4">IRC</A>
 </H2>
 
 <P>There are two IRC channels dedicated to MythTV which can be found on
@@ -262,21 +270,36 @@ irc.freenode.net
 <LI>mythtv-users</LI>
 </UL>
 </P>
-<P>The <CODE>mythtv</CODE> channel is where the developers discuss code.  It is not
-a user-support channel.  Please don't ask non-development related questions
-there.</P>
+<P>The <CODE>mythtv</CODE> channel is where the developers discuss code.  It is
+<EM>not</EM> a user-support channel.  Please don't ask non-development
+related questions there.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION>Really.  Even if there's no one in the mythtv-users IRC group or everyone
+seems to be ignoring you.</CAPTION>
+</FIGURE>
+</P>
 
-<H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Contributing to this document.</A>
+<H2><A NAME="ss1.5">1.5</A> <A HREF="#toc1.5">Contributing to this document</A>
 </H2>
 
-<P>Contributions to the HOWTO are welcome, but as the maintainer I retain
-the right to edit or choose not to use your submission.</P>
+<P>Contributions to the HOWTO are welcome, especially if you find a
+grammatical or spelling error, or if the wording of something is just plain
+confusing.</P>
+<P>If you'd like to make a new contribution, feel free to email it to me (url
+url="mailto:rkulagow@rocketmail.com" name="mailto:rkulagow@rocketmail.com">, but
+as the maintainer I retain the right to edit or choose not to use your
+submission.</P>
 <P>If you would like to submit an update or contribution, please send it as
 either SGML or as plain text. <EM>NO HTML</EM>.  The source used to create
 the HOWTO is in SGML / Linuxdoc.  See the Linuxdoc HOWTO at 
 <A HREF="http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html">http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html</A> for information
 on the linuxdoc format itself, or look at the <CODE>mythtv-HOWTO.sgml</CODE>
 file as an example.</P>
+<P>Do not be afraid of SGML.  A quick look at the source of this HOWTO will
+show that it is not difficult, so at least try to submit as SGML.</P>
 <P>SGML patch files are the easiest.  Run a <B>diff -u origfile newfile >
 doc.patch</B> and mail it to the address above.</P>
 
@@ -314,7 +337,7 @@ The ports for MySQL (TCP port 3306) and mythbackend (TCP ports 6543 and
 <EM>not</EM> expose the MythTV and MySQL ports to the Internet or your
 "Outside" LAN.</P>
 
-<H2><A NAME="ss3.1">3.1</A> <A HREF="#toc3.1">Hardware. </A>
+<H2><A NAME="ss3.1">3.1</A> <A HREF="#toc3.1">Hardware</A>
 </H2>
 
 <P>Hardware selection is a complex topic, one this HOWTO will only discuss
@@ -417,15 +440,15 @@ information.</P>
 <P>MythTV creates large files, many in excess of 2GB.  You <EM>must</EM> use a
 filesystem that will allow you to create large files.  Filesystems known to
 have problems with large files are FAT and FAT32.</P>
-<P>Because of the size of these files, it may be useful to plan for future
-expansion right from the beginning.  If your case and power supply have the
-capacity for additional hard drives, read through the 
-<A HREF="#LVM">LVM</A> and 
-<A HREF="#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
 <P>Because MythTV creates very large files, a filesystem that does well at
 deleting large files is important.  Numerous benchmarks show that XFS and
 JFS do very well at this task.  You are strongly encouraged to consider
 either of these for your MythTV filesystem.</P>
+<P>Because of the size of the MythTV files, it may be useful to plan for future
+expansion right from the beginning.  If your case and power supply have the
+capacity for additional hard drives, read through the 
+<A HREF="#LVM">LVM</A> and 
+<A HREF="#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
 <P>
 <A NAME="video_capture_device"></A> </P>
 <H3>Video Capture Device </H3>
@@ -553,7 +576,7 @@ Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
 accelleration.  If you enable the hardware accelleration, you may be able to
 use a 1.8GHz processor.</P>
 
-<H3>Hardware known NOT to work and other issues.</H3>
+<H3>Hardware known NOT to work and other issues</H3>
 
 <P>
 <UL>
@@ -760,7 +783,7 @@ the "Plus" version above)</LI>
 </UL>
 </P>
 
-<H2><A NAME="ss3.2">3.2</A> <A HREF="#toc3.2">Software.</A>
+<H2><A NAME="ss3.2">3.2</A> <A HREF="#toc3.2">Software</A>
 </H2>
 
 <P>There are a few ways of installing programs on Linux systems; you can
@@ -789,16 +812,22 @@ successful MythTV installation:</CAPTION>
 </UL>
 </P>
 
-<H3><A NAME="precompiled"></A> Pre-compiled packages. </H3>
+<H3><A NAME="precompiled"></A> Pre-compiled packages </H3>
 
 <P>A number of people have created pre-compiled packages for MythTV that may
 make your installation easier.</P>
-<P><B>BIG FAT WARNING</B>:  This HOWTO assumes that you have <EM>not</EM>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>BIG FAT WARNING</B>:  This HOWTO assumes that you have <EM>not</EM>
 installed MythTV from a package.  All example command lines and file
 locations are based on the MythTV tarball defaults.  Some packagers have
 modified the filenames, binaries and file locations to match what is
 commonly found in that distribution.  Any issues with MythTV installed via a
-pre-compiled package <B>MUST</B> be raised with the packager.</P>
+pre-compiled package <B>MUST</B> be raised with the packager.</CAPTION>
+</FIGURE>
+</P>
 <P>If you use any of the pre-compiled packages you may not need to perform any
 additional configuration steps in this HOWTO.  The next logical step is 
 <A HREF="#mysql">configuring MySQL</A>, which you may or may not have to
@@ -920,7 +949,7 @@ components, you should be aware that not all packages include the necessary
 headers for compiling packages.  If you're having trouble compiling, ensure
 that you've installed the -devel version of a prerequisite.
 
-NOTE:  Other than where noted, Mandrake 9.1 users may follow the
+NOTE:  Other than where noted, Mandrake 9.1 and 10.0 users may follow the
 Mandrake 9.0 instructions.
 </PRE>
 <HR>
@@ -932,7 +961,7 @@ trying to use MythTV, then please check the main ALSA website and upgrade to
 the latest version, or see if your distribution has already packaged the
 latest ALSA drivers.</P>
 
-<H3><A NAME="graphicinstalltools_"></A> Graphical installation tools. </H3>
+<H3><A NAME="graphicinstalltools_"></A> Graphical installation tools </H3>
 
 <H3>Mandrake 9.0</H3>
 
@@ -976,7 +1005,7 @@ you can disable native volume support.</P>
 <P>If you marked anything to install, click on Install Marked.  Click "Yes" or
 OK if you get a message about satisfying dependencies.</P>
 
-<H3><A NAME="CLIinstalltools_"></A> Command-line installation. </H3>
+<H3><A NAME="CLIinstalltools_"></A> Command-line installation </H3>
 
 <P> This section details the various methods for installing prerequisites
 from the command line.</P>
@@ -1127,9 +1156,6 @@ of how to install the required environment for many distributions.</P>
 have to adjust by hand before you compile MythTV.</P>
 <P>The reference compilation system for MythTV is Debian.</P>
 
-<H3>Distribution-Specific Notes </H3>
-
-<P>None </P>
 <H2><A NAME="ss4.2">4.2</A> <A HREF="#toc4.2">Shared-Library Requirements for MythTV </A>
 </H2>
 
@@ -1156,9 +1182,6 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H3>Distribution-Specific Notes</H3>
-
-<P>None.</P>
 <H2><A NAME="ss4.3">4.3</A> <A HREF="#toc4.3">Environment variable Requirements for MythTV</A>
 </H2>
 
@@ -1311,7 +1334,7 @@ export PATH QTDIR
 </CODE></BLOCKQUOTE>
 </P>
 
-<H3><A NAME="devperms"></A> Device Permissions.</H3>
+<H3><A NAME="devperms"></A> Device Permissions </H3>
 
 <P>MythTV will need access to the video4linux devices on your system.  By
 default, your distribution may restrict access to these devices to the
@@ -1406,7 +1429,7 @@ After downloading, be sure to install both:
 <A HREF="http://www.mp3dev.org/mp3">http://www.mp3dev.org/mp3</A>.  Download the source code to v3.93.1 by
 following the links to sourceforge.net</P>
 
-<H2><A NAME="nonintelcpu_"></A> <A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Notes on compiling on a system with non-Intel processors. </A>
+<H2><A NAME="nonintelcpu_"></A> <A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Notes on compiling on a system with non-Intel processors </A>
 </H2>
 
 <P>If you've got a system with an AMD K6-2 or a VIA C3 processor, make the
@@ -1425,7 +1448,7 @@ before you compile.</P>
 <P>Recent AMD processors, like the Duron, Thunderbird and Athlon don't need this
 change.</P>
 
-<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Building LAME.</A>
+<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Building LAME</A>
 </H2>
 
 <P>Open a shell and switch to the directory where you saved lame.
@@ -1460,7 +1483,7 @@ $
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">XMLTV. </A>
+<H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">XMLTV</A>
 </H2>
 
 <H3>Red Hat Linux and Fedora Core:</H3>
@@ -1497,9 +1520,8 @@ does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing
 </P>
 <P>and skip straight to the XMLTV compilation step.</P>
 
-<H3>Other distributions and manual installation.</H3>
+<H3>Manual installation</H3>
 
-<P>Continuing on:</P>
 <P>
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
@@ -1508,7 +1530,9 @@ $ tar -xjf xmltv-0.5.34.tar.bz2
 </PRE>
 </CODE></BLOCKQUOTE>
 
-Install the xmltv prerequisites:</P>
+Install the xmltv prerequisites.  The following prerequisites are the
+minimum required; when you actually start running the xmltv setup program it
+may alert you to other modules that are required.:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -1533,9 +1557,9 @@ $ perl Makefile.PL
 
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
 the grabber required for your location.</P>
-<P>You may get errors about modules not being installed.  They shouldn't matter
-if you're installing North America and have followed the instructions to
-this point.
+<P>You may get errors about modules not being installed.  You will need to
+resolve any missing dependencies at this point, or your grabber may not work
+correctly.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ make
@@ -1547,10 +1571,10 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ConfigureDD"></A> <A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Configuring the Zap2It.com DataDirect service. </A>
+<H2><A NAME="ConfigureDD"></A> <A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Configuring the Zap2It.com DataDirect service </A>
 </H2>
 
-<H3>Introduction.</H3>
+<H3>Introduction</H3>
 
 <P>Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
 Tribune Media Services.  TMS is one of the primary providers for program
@@ -1586,7 +1610,7 @@ configuration will be imported into MythTV when you first run the
 currently using XMLTV.  If you are starting from a fresh installation, the
 simplest thing is to immediately start using DataDirect.</P>
 
-<H3>Grabbing channel icons for DataDirect users.</H3>
+<H3>Grabbing channel icons for DataDirect users</H3>
 
 <P>While the DataDirect TV listings service has several advantages, it does
 not support grabbing logo icons for the stations you receive. However, there
@@ -1619,7 +1643,7 @@ $ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
 </CODE></BLOCKQUOTE>
 
 <A NAME="manually_building_mythtv"></A> </P>
-<H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Manually building MythTV.</A>
+<H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Manually building MythTV</A>
 </H2>
 
 <P>Unpack MythTV
@@ -1735,7 +1759,7 @@ to the real external IP address - 127.0.0.1 is the loopback address and no
 external machine can access it. Change the Master Server IP setting to the
 same IP address as well.</P>
 
-<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.6">5.6</A> <A HREF="#toc5.6">Gentoo. </A>
+<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.6">5.6</A> <A HREF="#toc5.6">Gentoo </A>
 </H2>
 
 <P>Installation of MythTV on Gentoo consists of simply emerging the desired
@@ -1804,7 +1828,7 @@ Click Save, then close the window.</P>
 <P>After installing MySQL you need to initialize the database by running
 mysql_install_db as root. </P>
 
-<H2><A NAME="ss6.4">6.4</A> <A HREF="#toc6.4">Setting up the initial database.</A>
+<H2><A NAME="ss6.4">6.4</A> <A HREF="#toc6.4">Setting up the initial database</A>
 </H2>
 
 <P>This step is only required on the system maintaining the database, which
@@ -1919,7 +1943,7 @@ audio output, like <B>arts</B> or <B>esd</B>.</P>
 set it as the recording source.</P>
 <P>There are two ways to do this.  Graphically, and from the command line.</P>
 
-<H2><A NAME="ss7.1">7.1</A> <A HREF="#toc7.1">Graphically setting up the mixer.</A>
+<H2><A NAME="ss7.1">7.1</A> <A HREF="#toc7.1">Graphically setting up the mixer</A>
 </H2>
 
 <H3>Mandrake 9.0 and Red Hat Linux/Fedora Core</H3>
@@ -2103,7 +2127,7 @@ $ aplay /usr/share/sounds/info.wav
 </P>
 <P>If it works, you're done installing ALSA!</P>
 
-<H2><A NAME="ss7.2">7.2</A> <A HREF="#toc7.2">Setting the mixer from the command line.</A>
+<H2><A NAME="ss7.2">7.2</A> <A HREF="#toc7.2">Setting the mixer from the command line</A>
 </H2>
 
 <P>If you have installed the alsa-utils package, then the <B>amixer</B>
@@ -2207,7 +2231,7 @@ or go to
 download the full 2.4.19 tar file from 
 <A HREF="http://www.kernel.org/pub/linux/kernel/v2.4/">http://www.kernel.org/pub/linux/kernel/v2.4/</A>.</P>
 
-<H3>Obtaining the kernel.</H3>
+<H3>Obtaining the kernel</H3>
 
 <P>Install using urpmi.
 <BLOCKQUOTE><CODE>
@@ -2233,7 +2257,7 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss8.4">8.4</A> <A HREF="#toc8.4">Obtaining and compiling lirc.</A>
+<H2><A NAME="ss8.4">8.4</A> <A HREF="#toc8.4">Obtaining and compiling lirc</A>
 </H2>
 
 <P>You're going to need to download and compile <B>lircd</B>.  Go to 
@@ -2415,7 +2439,7 @@ according to
 <A HREF="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html">http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html</A> Remember, if you have any custom  
 kernel modules (ALSA, etc) you will have to recompile/reinstall those.</P>
 
-<H2><A NAME="completing_lirc_install"></A> <A NAME="ss8.5">8.5</A> <A HREF="#toc8.5">Completing the lirc install. </A>
+<H2><A NAME="completing_lirc_install"></A> <A NAME="ss8.5">8.5</A> <A HREF="#toc8.5">Completing the lirc install </A>
 </H2>
 
 <P>
@@ -2560,7 +2584,7 @@ $ irxevent &amp;
 If <B>irxevent</B> isn't running, then MythTV will not respond to your remote
 control unless you're using native lirc support.</P>
 
-<H2><A NAME="ss8.6">8.6</A> <A HREF="#toc8.6">Additional information for lirc.</A>
+<H2><A NAME="ss8.6">8.6</A> <A HREF="#toc8.6">Additional information for lirc</A>
 </H2>
 
 <P>Take a look at the lircrc.example files in the <CODE>configfiles/</CODE>
@@ -2629,7 +2653,7 @@ will only send one keypress to the application, even if you're holding down
 the key.  The actual <B>repeat =</B> number will vary from system to
 system, so experiment and see which value works best for you.</P>
 
-<H2><A NAME="ss8.7">8.7</A> <A HREF="#toc8.7">Configuring lirc for use with an IR blaster.</A>
+<H2><A NAME="ss8.7">8.7</A> <A HREF="#toc8.7">Configuring lirc for use with an IR blaster</A>
 </H2>
 
 <P>By Carlos Talbot, 
@@ -2776,7 +2800,7 @@ $ su -
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss9.1">9.1</A> <A HREF="#toc9.1">Configuring the Master backend system.</A>
+<H2><A NAME="ss9.1">9.1</A> <A HREF="#toc9.1">Configuring the Master backend system</A>
 </H2>
 
 <P>Open a shell and decide where you will store your video files.  By
@@ -2984,7 +3008,7 @@ America shouldn't run the channel editor until after completing initial
 setup and running <B>mythfilldatabase</B> at least once to populate the
 database.</P>
 
-<H2><A NAME="ss9.2">9.2</A> <A HREF="#toc9.2">Post-configuration.</A>
+<H2><A NAME="ss9.2">9.2</A> <A HREF="#toc9.2">Post-configuration</A>
 </H2>
 
 <P>Run the <CODE>mythfilldatabase</CODE> program as directed.  The master
@@ -3053,7 +3077,7 @@ example, you may add this to your <CODE>rc.local</CODE> file, or you can follow
 the steps outlined in the section called 
 <A HREF="#mythbackend_autostart">I'd like to automatically start mythbackend at system boot time</A>.</P>
 
-<H2><A NAME="nonmaster_backend"></A> <A NAME="ss9.3">9.3</A> <A HREF="#toc9.3">Configuring a non-master backend. </A>
+<H2><A NAME="nonmaster_backend"></A> <A NAME="ss9.3">9.3</A> <A HREF="#toc9.3">Configuring a non-master backend </A>
 </H2>
 
 <P>Ensure that you've granted access to the master MySQL database for remote
@@ -3076,7 +3100,7 @@ provider to obtain guide data for all the non-master backends.</P>
 <CAPTION><B>NOTE</B>: Do not run <CODE>mythfilldatabase</CODE> on a non-master backend.</CAPTION>
 </FIGURE>
 </P>
-<H2><A NAME="ss9.4">9.4</A> <A HREF="#toc9.4">Configuring and running mythfilldatabase.</A>
+<H2><A NAME="ss9.4">9.4</A> <A HREF="#toc9.4">Configuring and running mythfilldatabase</A>
 </H2>
 
 <P>
@@ -3582,7 +3606,7 @@ will need to switch to KDE by selecting RedHatMenu>Extras>System
 Settings>Desktop Switching Tool and choose "KDE".</CAPTION>
 </FIGURE>
 </P>
-<H2><A NAME="ss11.1">11.1</A> <A HREF="#toc11.1">Keyboard commands.</A>
+<H2><A NAME="ss11.1">11.1</A> <A HREF="#toc11.1">Keyboard commands</A>
 </H2>
 
 <P>The <CODE>keys.txt</CODE> file describes what the various keyboard commands are.
@@ -3852,8 +3876,7 @@ Other key 2 </TD><TD> c </TD><TD> Change tuner card input
 </CENTER><BR>
 </P>
 
-
-<H2><A NAME="ss11.2">11.2</A> <A HREF="#toc11.2">Using themes with MythTV.</A>
+<H2><A NAME="ss11.2">11.2</A> <A HREF="#toc11.2">Using themes with MythTV</A>
 </H2>
 
 <P>MythTV is "themeable", meaning that the visual appearance of the program
@@ -3880,7 +3903,7 @@ $ su
 <CODE>tar -xjf</CODE> rather than <CODE>tar -xzf</CODE>.</CAPTION>
 </FIGURE>
 </P>
-<H2><A NAME="ss11.3">11.3</A> <A HREF="#toc11.3">Adding DirecTV information to the database.</A>
+<H2><A NAME="ss11.3">11.3</A> <A HREF="#toc11.3">Adding DirecTV information to the database</A>
 </H2>
 
 <P>A script for adding DirecTV information into the database has been
@@ -3891,7 +3914,7 @@ available at
 user-supplied program, so if you have issues with the script, please contact
 the author.</P>
 
-<H2><A NAME="ss11.4">11.4</A> <A HREF="#toc11.4">Adding support for an external tuner.</A>
+<H2><A NAME="ss11.4">11.4</A> <A HREF="#toc11.4">Adding support for an external tuner</A>
 </H2>
 
 <P>MythTV supports changing the channel on an external tuner.  If you have
@@ -4100,7 +4123,7 @@ allows 3rd parties to run arbitrary code on your server!</P>
 <P>Since I don't use this, I cannot say much about this. If your motherboard
 supports any wakeup tool you have to call that tool as "Set wakeuptime
 command" with the "Wakeup time format" suitable for that tool.</P>
-<H3>Wakeup the MySQL server using WOL.</H3>
+<H3>Wakeup the MySQL server using WOL</H3>
 
 <P>If your MySQL server and your Master backend are not on the same machine,
 you can have the Master backend wake your MySQL server using WOL. You will
@@ -4125,7 +4148,7 @@ setting the wakeuptime.</P>
 aspects of your MythTV system.  MythWeb is a separate application, but it's
 dependent on MythTV being installed and operational.</P>
 
-<H2><A NAME="ss12.1">12.1</A> <A HREF="#toc12.1">Installation and prerequisites.</A>
+<H2><A NAME="ss12.1">12.1</A> <A HREF="#toc12.1">Installation and prerequisites</A>
 </H2>
 
 <P>Download mythweb from 
@@ -4159,7 +4182,7 @@ Mandrake Control Center.</P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss12.2">12.2</A> <A HREF="#toc12.2">Completing the installation.</A>
+<H2><A NAME="ss12.2">12.2</A> <A HREF="#toc12.2">Completing the installation</A>
 </H2>
 
 <P>
@@ -4206,7 +4229,7 @@ otherwise you will get a <CODE>404 Page not Found</CODE> error.</CAPTION>
 <P>MythGallery is a photo and slideshow application.  MythGallery is a
 separate application, but it's dependent on MythTV being installed and
 operational.</P>
-<H2><A NAME="ss13.1">13.1</A> <A HREF="#toc13.1">Installation and prerequisites.</A>
+<H2><A NAME="ss13.1">13.1</A> <A HREF="#toc13.1">Installation and prerequisites</A>
 </H2>
 
 <P>Download MythGallery from 
@@ -4241,7 +4264,7 @@ in mythfrontend.  Make sure you set your pictures directory to wherever
 you're storing your photos.</P>
 <P>The controls for MythGallery can be found in the README that comes with the
 application.</P>
-<H2><A NAME="ss13.2">13.2</A> <A HREF="#toc13.2">Using MythGallery.</A>
+<H2><A NAME="ss13.2">13.2</A> <A HREF="#toc13.2">Using MythGallery</A>
 </H2>
 
 <P>When you first start MythGallery, you will see a thumbnail view of any
@@ -4339,7 +4362,7 @@ instructions for manually compiling and installing the software.</P>
 </UL>
 </P>
 
-<H2><A NAME="ss15.1">15.1</A> <A HREF="#toc15.1">Manual installation of prerequisites.</A>
+<H2><A NAME="ss15.1">15.1</A> <A HREF="#toc15.1">Manual installation of prerequisites</A>
 </H2>
 
 <P>These instructions are for distributions which don't have pre-compiled
@@ -4525,7 +4548,7 @@ will cause an error, so use the source package instead.</P>
 step.</CAPTION>
 </FIGURE>
 </P>
-<H2><A NAME="ss15.4">15.4</A> <A HREF="#toc15.4">Compiling MythMusic. </A>
+<H2><A NAME="ss15.4">15.4</A> <A HREF="#toc15.4">Compiling MythMusic</A>
 </H2>
 
 <P>Once all the prerequisites have been installed, you can proceed with
@@ -4560,7 +4583,7 @@ $ ./configure
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss15.5">15.5</A> <A HREF="#toc15.5">Configuring MythMusic.</A>
+<H2><A NAME="ss15.5">15.5</A> <A HREF="#toc15.5">Configuring MythMusic</A>
 </H2>
 
 <P>Configuration of MythMusic occurs in two places.  The main mythfrontend
@@ -4590,7 +4613,7 @@ you specify GENRE it's the same as Genre in the format field.</P>
 <P>The Ignore_ID3 option does not disable the code that determines the track
 length, just the portion that tries to read ID3 info.</P>
 
-<H2><A NAME="ss15.6">15.6</A> <A HREF="#toc15.6">Using MythMusic. </A>
+<H2><A NAME="ss15.6">15.6</A> <A HREF="#toc15.6">Using MythMusic</A>
 </H2>
 
 <P>MythMusic is fairly simple to use.  It is recommended that you insert the
@@ -4641,7 +4664,7 @@ again.</P>
 A: Highlight the playlist in the selection tree and hit the "i" key then
 select "Delete this Playlist" from the popup.</P>
 
-<H2><A NAME="ss15.7">15.7</A> <A HREF="#toc15.7">Troubleshooting MythMusic.</A>
+<H2><A NAME="ss15.7">15.7</A> <A HREF="#toc15.7">Troubleshooting MythMusic</A>
 </H2>
 
 <P>You may run into errors when running MythMusic.</P>
@@ -4749,11 +4772,11 @@ material takes up on your hard drive.</P>
 If you only wish to play DVDs rather than convert them to something like
 MPEG-4 or xvid you may skip the prerequisite installation step.</P>
 
-<H2><A NAME="ss18.1">18.1</A> <A HREF="#toc18.1">Manual Compilation of Prerequisites.</A>
+<H2><A NAME="ss18.1">18.1</A> <A HREF="#toc18.1">Manual Compilation of Prerequisites</A>
 </H2>
 
 
-<H2><A NAME="ss18.2">18.2</A> <A HREF="#toc18.2">Pre-compiled binaries.</A>
+<H2><A NAME="ss18.2">18.2</A> <A HREF="#toc18.2">Pre-compiled binaries</A>
 </H2>
 
 <P>Mandrake users may install the prerequisites this way:
@@ -4791,101 +4814,10 @@ $ su
 
 <H2><A NAME="s20">20.</A> <A HREF="#toc20">Troubleshooting.</A></H2>
 
-<H2><A NAME="ss20.1">20.1</A> <A HREF="#toc20.1">Illegal Instruction.</A>
+<H2><A NAME="ss20.1">20.1</A> <A HREF="#toc20.1">Compiling</A>
 </H2>
 
-<P>This error can happen for the following reasons:
-<UL>
-<LI>You have an AMD K6-2 or VIA C3 processor.  If you have either of
-these, make sure that you you followed the instructions in this 
-<A HREF="#nonintelcpu_">section</A>.</LI>
-<LI>You have an early production Intel Celeron, Pentium Pro or Pentium II.  If you have any
-of these processors, make sure that your 
-<A HREF="#deinterlace_">deinterlace</A>
-variable is set correctly.  Your CPU needs to support SSE instructions for
-deinterlace support.  You may check this by doing a <CODE>$ cat
-/proc/cpuinfo</CODE> and looking for "sse" in the processor flags section.</LI>
-</UL>
-</P>
-<H2><A NAME="ss20.2">20.2</A> <A HREF="#toc20.2">mythfilldatabase failing.</A>
-</H2>
-
-<P>If mythfilldatabase suddenly appears to be failing, check to see what version of
-XMLTV you're running.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  It is highly recommended to run the latest version of XMLTV
-available.  In North America, zap2it, the listings provider, has been
-making numerous changes to their website which negatively impact XMLTV.</CAPTION>
-</FIGURE>
-</P>
-<H2><A NAME="Setting_DMA"></A> <A NAME="ss20.3">20.3</A> <A HREF="#toc20.3">Fast CPU, choppy or jittery video. </A>
-</H2>
-
-<P>First, you should check that your kernel has been enabled for DMA:
-<BLOCKQUOTE><CODE>
-<PRE>
-[mythtv@pvr mythtv]$ dmesg |grep DMA
-    ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
-    ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
-hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
-hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>From the listing above, you can see that hda, hdb and hdc are set for DMA,
-and hdd is set for pio.  If your kernel is not reporting DMA being enabled,
-you may need to recompile your kernel. Check your motherboard's chipset
-(look in the "ATA/IDE/MFM/RLL support" section in "make menuconfig") for more
-information.</P>
-<P>Next, check that the hard drive has DMA enabled.  Use the <B>hdparm</B>
-program to check and enable DMA.
-<BLOCKQUOTE><CODE>
-<PRE>
-# hdparm -d /dev/hd?
-</PRE>
-</CODE></BLOCKQUOTE>
- will tell you the DMA status for your hard drives.  If you run
-<B>hdparm</B> with the <CODE>-d1</CODE> parameter, it will turn DMA on.</P>
-
-<P>You may also setup your PC to do this at boot time, either by adding the
-command to your <CODE>/etc/rc.local</CODE> file, or by adding files to
-/etc/sysconfig.</P>
-<P>On Mandrake and other distributions, if you install <B>hdparm</B> from an RPM you
-will most likely get a <CODE>/etc/sysconfig/harddisks</CODE> file installed. 
-This file will be parsed by the <CODE>/etc/rc.sysinit</CODE> script.  If you use
-the default <CODE>harddisks</CODE> file, your changes will affect all IDE devices
-(including CD ROMs).  If you wish to use different parameters for various
-devices, rename and/or copy the file to <CODE>harddiskhda</CODE>,
-<CODE>harddiskhdb</CODE>, etc.  Edit the file to your liking and on the next
-reboot your setting will be preserved.</P>
-
-<H2><A NAME="ss20.4">20.4</A> <A HREF="#toc20.4">I have a MPEG-2 encoder card and my video appears "jittery".</A>
-</H2>
-
-<H2><A NAME="ss20.5">20.5</A> <A HREF="#toc20.5">I have a MPEG-2 encoder card and my video is jumping up and down.</A>
-</H2>
-
-<P>This is a different problem than the one discussed in the previous
-section.  Currently, the ivtv driver or firmware appear to have some issues
-if the vertical capture resolution is not the full screen height.  If you
-are having a jitter problem then ensure that you are capturing either 480
-lines (for NTSC) or 576 lines (for PAL).  The default capture profiles may
-need to be edited for your setup.  Go to Settings->TV Settings->Recording
-Profiles and adjust the <B>Default</B> and <B>Live TV</B> options to
-480 or 576 from their defaults.</P>
-
-<H2><A NAME="ss20.6">20.6</A> <A HREF="#toc20.6">I keep losing all of my settings every time I compile!</A>
-</H2>
-
-<P>MythTV will overwrite any settings in <CODE>/usr/local/share/mythtv</CODE>.
-If you want to make sure that you don't lose your modifications, make a
-directory <CODE>~/.mythtv</CODE> and copy your mysql.txt file to this
-location.</P>
-<H2><A NAME="ss20.7">20.7</A> <A HREF="#toc20.7">Compile errors.</A>
-</H2>
+<H3>Compile errors</H3>
 
 <P>Some compile errors are worse than others.  If you get an error that
 doesn't abort the compilation, and says something like:
@@ -4904,100 +4836,54 @@ compiler is telling you that you don't have XFree86-devel installed, or that
 your distribution hasn't set it up correctly.  This needs to be fixed before
 MythTV will compile.</P>
 
-<H2><A NAME="ss20.8">20.8</A> <A HREF="#toc20.8">My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.</A>
+<H3>error: can't find a register in class 'BREG' while reloading 'asm'</H3>
+
+<P>This is due to the broken Qt that is being distributed by Suse.  To work
+around this, edit <CODE>libs/libavcodec/Makefile</CODE> and remove any
+"-fPIC" you find there and then recompile.</P>
+
+<H3><A NAME="mkspecs_error"></A> make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</H3>
+
+<P>This error happens when there's a missing link in the
+<CODE>/usr/lib/qt3/mkspecs</CODE> directory.  There are two ways to fix this
+error:</P>
+<P>1.  Create the link manually:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cd /usr/lib/qt3/mkspecs
+# ln -sf linux-g++ default
+</PRE>
+</CODE></BLOCKQUOTE>
+
+and then restart the compile,</P>
+<P>or</P>
+<P>2.  Run <B>qmake mythtv.pro</B> in the mythtv directory.  Rerunning
+<B>qmake</B> will create a new Makefile for you, however this still
+doesn't fix the root cause of the issue, which is that your distribution
+didn't create the symlink for you when the qt3 package was installed.  The
+first choice is the better solution.</P>
+
+<H3>make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</H3>
+
+<P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
+<A HREF="#Setting_up_paths">Setting up paths</A>.</P>
+
+<H3>Settings get reset at every compile.</H3>
+
+<P>MythTV will overwrite any settings in <CODE>/usr/local/share/mythtv</CODE>.
+If you want to make sure that you don't lose your modifications, make a
+directory <CODE>~/.mythtv</CODE> and copy your mysql.txt file to this
+location.</P>
+
+<H2><A NAME="ss20.2">20.2</A> <A HREF="#toc20.2">Debugging</A>
 </H2>
 
-<P>This is due to DPMS, the Display Power Management System, which is used
-to save power by turning off your monitor when the system decides that it's
-not being used or to a screensaver that has defaulted to a blank screen. 
-Since it's likely that watching TV will not generate keyboard or mouse
-events for a time, you need to turn off DPMS and the screensaver.  There are a few ways to do
-this.  You may also need to check your BIOS for power saving modes and
-disable screen blanking there as well.</P>
-<P>Edit your <CODE>/etc/X11/XF86Config-4</CODE> file, and look for:
-<BLOCKQUOTE><CODE>
-<PRE>
-Section "ServerFlags"
-    #DontZap # disable &lt;Crtl>&lt;Alt>&lt;BS> (server abort)
-    #DontZoom # disable &lt;Crtl>&lt;Alt>&lt;KP_+>/&lt;KP_-> (resolution switching)
-    AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
-EndSection
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Add <CODE>Option "NoPM" "true"</CODE> and <CODE>Option "BlankTime" "0"</CODE>to the ServerFlags section.</P>
-<P>Also, look for:
-<BLOCKQUOTE><CODE>
-<PRE>
-Section "Device"
-    Identifier "device1"
-    VendorName "nVidia Corporation"
-    BoardName "NVIDIA GeForce 256 (generic)"
-    Driver "nv"
-    Option "DPMS"
-EndSection
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>In this case, you would need to either delete the <CODE>Option "DPMS"</CODE>
-line, or change it to <CODE># Option "DPMS"</CODE> to comment it out.  The next
-time you start XFree this change will take effect.</P>
-<P>Finally, check:
-<BLOCKQUOTE><CODE>
-<PRE>
-Section "Monitor"
-    Identifier "monitor1"
-    VendorName "Plug'n Play"
-    HorizSync 30-85
-    VertRefresh 50-160
+<H3>MythTV segfaults</H3>
 
-    # Sony Vaio C1(X,XS,VE,VN)?
-    # 1024x480 @ 85.6 Hz, 48 kHz hsync
-    ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+<H3>MythTV isn't doing anything</H3>
 
-    # TV fullscreen mode or DVD fullscreen output.
-    # 768x576 @ 79 Hz, 50 kHz hsync
-    ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
-
-    # 768x576 @ 100 Hz, 61.6 kHz hsync
-    ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-EndSection
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Ensure that there isn't an <CODE>Option "DPMS"</CODE> in the Monitor
-configuration.</P>
-<P>You can also turn off DPMS from the Command Line, but this will not survive
-a reboot.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ xset -dpms
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Using <CODE>xset +dpms</CODE> will turn it back on.</P>
-<P>Another technique to try, which will turn off the screensaver:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ xset s off
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>You may also combine the command to turn off DPMS and the screensaver:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ xset -dpms s off
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Finally, depending on your distribution, you may be able to turn it off from
-within the control panel.</P>
-
-<H2><A NAME="ss20.9">20.9</A> <A HREF="#toc20.9">I get segfaults / MythTV isn't doing anything.</A>
-</H2>
-
-<H2><A NAME="ss20.10">20.10</A> <A HREF="#toc20.10">Debugging with GDB.</A>
-</H2>
+<H3>Debugging with GDB</H3>
 
 <P>Without details, the developers will not be able to determine if you have
 discovered a genuine code-bug,  or if the problem is with your system.  In
@@ -5071,8 +4957,23 @@ session, or by switching back to the text console by pressing CTRL-ALT-F1.
 You can now continue troubleshooting using <B>gdb</B> as detailed in the
 instructions.</P>
 
-<H2><A NAME="ss20.11">20.11</A> <A HREF="#toc20.11">MythTV makes my system crash. </A>
-</H2>
+<H3>Illegal Instruction</H3>
+
+<P>This error can happen for the following reasons:
+<UL>
+<LI>You have an AMD K6-2 or VIA C3 processor.  If you have either of
+these, make sure that you you followed the instructions in this 
+<A HREF="#nonintelcpu_">section</A>.</LI>
+<LI>You have an early production Intel Celeron, Pentium Pro or Pentium II.  If you have any
+of these processors, make sure that your 
+<A HREF="#deinterlace_">deinterlace</A>
+variable is set correctly.  Your CPU needs to support SSE instructions for
+deinterlace support.  You may check this by doing a <CODE>$ cat
+/proc/cpuinfo</CODE> and looking for "sse" in the processor flags section.</LI>
+</UL>
+</P>
+
+<H3>MythTV is crashing your system</H3>
 
 <P>MythTV <EM>can not</EM> crash your system - it is a user-level program. 
 If your system is crashing when you run MythTV, then you have some
@@ -5080,8 +4981,189 @@ issue with the drivers for your capture card or other hardware, or the CPU
 fan has fallen off/broken and your system is overheating when asked to
 perform a CPU intensive task like encoding video.</P>
 
-<H2><A NAME="Troubleshooting_Audio"></A> <A NAME="ss20.12">20.12</A> <A HREF="#toc20.12">Troubleshooting audio. </A>
+<H2><A NAME="ss20.3">20.3</A> <A HREF="#toc20.3">Installing</A>
 </H2>
+
+<H3>When trying to run setup, you get an error like this: "./setup: error while loading shared libraries:"</H3>
+
+<P>You didn't add <CODE>/usr/local/lib</CODE> to <CODE>/etc/ld.so.conf</CODE>.  See the
+section on modifying 
+<A HREF="#modifying_ld.so.conf">/etc/ld.so.conf</A>.</P>
+
+<H2><A NAME="ss20.4">20.4</A> <A HREF="#toc20.4">Using</A>
+</H2>
+
+<H3>MySQL not connecting correctly</H3>
+
+<P>Your <B>MySQL</B> installation may have networking turned off. 
+Check that <CODE>/etc/mysql/my.cnf</CODE> <EM>does not</EM> contain
+<CODE>skip-networking</CODE>.  If it does, remove it.  Also verify that 
+<CODE>bind-address</CODE> is set to your IP address instead of 
+<CODE>127.0.0.1</CODE>.  If you change either of these items, restart 
+<B>MySQL</B>.</P>
+
+<H3>Using a MPEG-2 encoder card and the video appears "jittery"</H3>
+
+<H3>Using a MPEG-2 encoder card and the video is jumping up and down</H3>
+
+<P>This is a different problem than the one discussed in the previous
+section.  Currently, the ivtv driver or firmware appear to have some issues
+if the vertical capture resolution is not the full screen height.  If you
+are having a jitter problem then ensure that you are capturing either 480
+lines (for NTSC) or 576 lines (for PAL).  The default capture profiles may
+need to be edited for your setup.  Go to Settings->TV Settings->Recording
+Profiles and adjust the <B>Default</B> and <B>Live TV</B> options to
+480 or 576 from their defaults.</P>
+
+<H3>Screen goes blank but returns when mouse if moved or keyboard is used</H3>
+
+<P>This is due to DPMS, the Display Power Management System, which is used
+to save power by turning off your monitor when the system decides that it's
+not being used or due to a screensaver that has defaulted to a blank screen. 
+Since it's likely that watching TV will not generate keyboard or mouse
+events for a time, you need to turn off DPMS and the screensaver.  There are
+a few ways to do this.  You may also need to check your BIOS for power
+saving modes and disable screen blanking there as well.</P>
+<P>Edit your <CODE>/etc/X11/XF86Config-4</CODE> file, and look for:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "ServerFlags"
+    #DontZap # disable &lt;Crtl>&lt;Alt>&lt;BS> (server abort)
+    #DontZoom # disable &lt;Crtl>&lt;Alt>&lt;KP_+>/&lt;KP_-> (resolution switching)
+    AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+EndSection
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Add <CODE>Option "NoPM" "true"</CODE> and <CODE>Option "BlankTime" "0"</CODE> to the
+ServerFlags section.</P>
+<P>Also, look for:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "Device"
+    Identifier "device1"
+    VendorName "nVidia Corporation"
+    BoardName "NVIDIA GeForce 256 (generic)"
+    Driver "nv"
+    Option "DPMS"
+EndSection
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In this case, you would need to either delete the <CODE>Option "DPMS"</CODE>
+line, or change it to <CODE># Option "DPMS"</CODE> to comment it out.  The next
+time you start XFree this change will take effect.</P>
+<P>Finally, check:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "Monitor"
+    Identifier "monitor1"
+    VendorName "Plug'n Play"
+    HorizSync 30-85
+    VertRefresh 50-160
+
+    # Sony Vaio C1(X,XS,VE,VN)?
+    # 1024x480 @ 85.6 Hz, 48 kHz hsync
+    ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+
+    # TV fullscreen mode or DVD fullscreen output.
+    # 768x576 @ 79 Hz, 50 kHz hsync
+    ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+    # 768x576 @ 100 Hz, 61.6 kHz hsync
+    ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+EndSection
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Ensure that there isn't an <CODE>Option "DPMS"</CODE> in the Monitor
+configuration.</P>
+<P>You can also turn off DPMS from the Command Line, but this will not survive
+a reboot.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ xset -dpms
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Using <CODE>xset +dpms</CODE> will turn it back on.</P>
+<P>Another technique to try, which will turn off the screensaver:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ xset s off
+</PRE>
+</CODE></BLOCKQUOTE>
+
+You may also combine the command to turn off DPMS and the screensaver:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ xset -dpms s off
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Finally, depending on your distribution, you may be able to turn it off from
+within the control panel.</P>
+<H2><A NAME="ss20.5">20.5</A> <A HREF="#toc20.5">Miscellaneous</A>
+</H2>
+
+<H3>mythfilldatabase failing</H3>
+
+<P>If mythfilldatabase suddenly appears to be failing, there are at least
+two things to check.  </P>
+<P>First, if you are in North America, ensure that your DataDirect subscription
+is still valid, otherwise, check to see what version of XMLTV you're
+running and that it's the latest version.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  It is highly recommended that you run the latest
+version of XMLTV available.  Your listings provider may have made changes
+which negatively impact XMLTV.</CAPTION>
+</FIGURE>
+</P>
+
+<H3><A NAME="Setting_DMA"></A> Fast CPU, choppy or jittery video </H3>
+
+<P>First, you should check that your kernel has been enabled for DMA:
+<BLOCKQUOTE><CODE>
+<PRE>
+[mythtv@pvr mythtv]$ dmesg |grep DMA
+    ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
+    ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
+hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
+hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>From the listing above, you can see that hda, hdb and hdc are set for DMA,
+and hdd is set for pio.  If your kernel is not reporting DMA being enabled,
+you may need to recompile your kernel. Check your motherboard's chipset
+(look in the "ATA/IDE/MFM/RLL support" section in "make menuconfig") for more
+information.</P>
+<P>Next, check that the hard drive has DMA enabled.  Use the <B>hdparm</B>
+program to check and enable DMA.
+<BLOCKQUOTE><CODE>
+<PRE>
+# hdparm -d /dev/hd?
+</PRE>
+</CODE></BLOCKQUOTE>
+ will tell you the DMA status for your hard drives.  If you run
+<B>hdparm</B> with the <CODE>-d1</CODE> parameter, it will turn DMA on.</P>
+
+<P>You may also setup your PC to do this at boot time, either by adding the
+command to your <CODE>/etc/rc.local</CODE> file, or by adding files to
+/etc/sysconfig.</P>
+<P>On Mandrake and other distributions, if you install <B>hdparm</B> from an RPM you
+will most likely get a <CODE>/etc/sysconfig/harddisks</CODE> file installed. 
+This file will be parsed by the <CODE>/etc/rc.sysinit</CODE> script.  If you use
+the default <CODE>harddisks</CODE> file, your changes will affect all IDE devices
+(including CD ROMs).  If you wish to use different parameters for various
+devices, rename and/or copy the file to <CODE>harddiskhda</CODE>,
+<CODE>harddiskhdb</CODE>, etc.  Edit the file to your liking and on the next
+reboot your setting will be preserved.</P>
+
+<H3><A NAME="Troubleshooting_Audio"></A> Troubleshooting audio </H3>
 
 <P>
 <FIGURE>
@@ -5159,8 +5241,7 @@ artsd</CODE> from the command line to stop the artsd program.</P>
 -c 1</CODE> to work with the second sound card.  The first card is #0, the
 second card is #1, etc.</P>
 
-<H2><A NAME="ss20.13">20.13</A> <A HREF="#toc20.13">The mythbackend program told me to look at this section.</A>
-</H2>
+<H3>The mythbackend program told me to look at this section</H3>
 
 <P>mythbackend does a check to see if your sound device is capable of full
 duplex operation.  If it's not, it's most likely that you're going to run
@@ -5180,8 +5261,7 @@ and will either need to purchase a new sound card, or will need to get
 btaudio 
 <A HREF="#btaudio">operational</A>.</P>
 
-<H2><A NAME="ss20.14">20.14</A> <A HREF="#toc20.14">My remote doesn't work / works sometimes and not others / "ghost"</A>
-keypresses.</H2>
+<H3>My remote doesn't work / works sometimes and not others / "ghost"keypresses</H3>
 
 <P>This can be due to a number of factors.  The simplest case is the
 "ghost" keypresses.  For me, it was due to compact fluorescent lights in
@@ -5204,17 +5284,14 @@ they run.  The following window managers are known to work correctly:</P>
 </UL>
 </P>
 
-<H2><A NAME="ss20.15">20.15</A> <A HREF="#toc20.15">My PVR-250 card doesn't show inputs in the setup screen.</A>
-</H2>
+<H3>PVR-250 card doesn't show inputs in the setup screen.</H3>
 
 <P>See message 
 <A HREF="http://www.mythtv.org/pipermail/mythtv-users/2003-April/002527.html">http://www.mythtv.org/pipermail/mythtv-users/2003-April/002527.html</A></P>
 
-<H2><A NAME="ss20.16">20.16</A> <A HREF="#toc20.16">Where's my "canada-cable" entry gone to?</A>
-</H2>
+<H3>Where's "canada-cable"?</H3>
 
-<H2><A NAME="ss20.17">20.17</A> <A HREF="#toc20.17">My channels are off by one.</A>
-</H2>
+<H3>Channels are off by one</H3>
 
 <P>There is no such thing as "Canada Cable"; Canada uses the same
 frequencies as the United States.  "Canada Cable" was a hack that some
@@ -5226,77 +5303,31 @@ See the video4linux mailing list (
 <A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
 more information.</P>
 
-<H2><A NAME="ss20.18">20.18</A> <A HREF="#toc20.18">Mythweb is showing a db_open error when I connect to it.</A>
-</H2>
+<H3>Mythweb is showing a db_open error when I connect to it</H3>
 
-<P>Find your php.ini file. Make sure you've got a line in it like this:</P>
+<P>Find your <CODE>php.ini</CODE> file. Make sure you've got a line in it like this:</P>
 <P><CODE>extension=mysql.so</CODE></P>
-<P>Restart apache for it to take effect.</P>
+<P>Restart <B>apache</B> for it to take effect.</P>
 
-<H2><A NAME="ss20.19">20.19</A> <A HREF="#toc20.19">error: can't find a register in class 'BREG' while reloading 'asm'</A>
-</H2>
-
-<P>This is due to the broken Qt that is being distributed by Suse.  To work
-around this, edit <CODE>libs/libavcodec/Makefile</CODE> and remove any
-"-fPIC" you find there and then recompile.</P>
-
-<H2><A NAME="mkspecs_error"></A> <A NAME="ss20.20">20.20</A> <A HREF="#toc20.20">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
-</H2>
-
-<P>This error happens when there's a missing link in the
-<CODE>/usr/lib/qt3/mkspecs</CODE> directory.  There are two ways to fix this
-error:</P>
-<P>1.  Create the link manually:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# cd /usr/lib/qt3/mkspecs
-# ln -sf linux-g++ default
-</PRE>
-</CODE></BLOCKQUOTE>
-
-and then restart the compile,</P>
-<P>or</P>
-<P>2.  Run <B>qmake mythtv.pro</B> in the mythtv directory.  Rerunning
-<B>qmake</B> will create a new Makefile for you, however this still
-doesn't fix the root cause of the issue, which is that your distribution
-didn't create the symlink for you when the qt3 package was installed.  The
-first choice is the better solution.</P>
-
-<H2><A NAME="ss20.21">20.21</A> <A HREF="#toc20.21">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
-</H2>
-
-<P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
-<A HREF="#Setting_up_paths">Setting up paths</A>.</P>
-
-<H2><A NAME="ss20.22">20.22</A> <A HREF="#toc20.22">My mouse pointer disappears when placed over the MythTV windows.</A>
-</H2>
+<H3>Mouse pointer disappears when placed over the MythTV windows</H3>
 
 <P>This is the intended behavior.  The MythTV interface is meant for use
 with a remote control or a keyboard.</P>
 
-<H2><A NAME="ss20.23">20.23</A> <A HREF="#toc20.23">What does "strange error flushing buffer" mean on my console?</A>
-</H2>
+<H3>What does "strange error flushing buffer" mean on the console?</H3>
 
 <P>Nothing, really.  It's just lame (the mp3 encoder) complaining for some
 obscure reason.  This seems to be fixed in more recent versions of the
 libmp3lame library.</P>
 
-<H2><A NAME="ss20.24">20.24</A> <A HREF="#toc20.24">I can't change the channel when watching Live TV.</A>
-</H2>
+<H3>Can't change the channel when watching Live TV.</H3>
 
 <P>Something's wrong with your program database.  Did mythfilldatabase run
-with no major errors?</P>
+with no major errors?  Or, MythTV may not have permissions to the
+appropriate video4linux devices.  See the section titled 
+<A HREF="#devperms">Device Permissions</A> for an example.</P>
 
-<H2><A NAME="ss20.25">20.25</A> <A HREF="#toc20.25">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
-</H2>
-
-<P>You didn't add <CODE>/usr/local/lib</CODE> to <CODE>/etc/ld.so.conf</CODE>.  See the
-section on modifying 
-<A HREF="#modifying_ld.so.conf">/etc/ld.so.conf</A>.</P>
-
-<H2><A NAME="ss20.26">20.26</A> <A HREF="#toc20.26">Troubleshooting the Hauppauge PVR-250 IR remote</A>
-</H2>
+<H3>Troubleshooting the Hauppauge PVR-250 IR remote</H3>
 
 <P>The most likely issue is that you have incompatible versions of the
 <B>lirc_i2c</B> and <B>lirc_dev</B> modules and the various
@@ -5304,33 +5335,21 @@ section on modifying
 <A HREF="#hauppauge_remote">Hauppauge PVR-250 remote and MythTV's native LIRC support.</A> for
 examples on finding and removing old versions of lirc.</P>
 
-<H2><A NAME="ss20.27">20.27</A> <A HREF="#toc20.27">MySQL not connecting correctly.</A>
-</H2>
-
-<P>Your <B>MySQL</B> installation may have networking turned off. 
-Check that <CODE>/etc/mysql/my.cnf</CODE> <EM>does not</EM> contain
-<CODE>skip-networking</CODE>.  If it does, remove it.  Also verify that 
-<CODE>bind-address</CODE> is set to your IP address instead of 
-<CODE>127.0.0.1</CODE>.  If you change either of these items, restart 
-<B>MySQL</B>.</P>
-<H2><A NAME="ss20.28">20.28</A> <A HREF="#toc20.28">My screen goes black when I try to play something.</A>
-</H2>
+<H3>Screen goes black when you try to play something</H3>
 
 <P>MythTV prints error and status messages to the shell that was used to
 start the application.  If nothing seems to be happening when you try to
 view a program, try switching back to the shell and look for error messages
-there.</P>
+there, or, if you're running from a startup script, check the log file.</P>
 
-<H2><A NAME="ss20.29">20.29</A> <A HREF="#toc20.29">Poor performance with NVidia cards and XvMC.</A>
-</H2>
+<H3>Poor performance with NVidia cards and XvMC</H3>
 
 <P>XvMC is a NVidia driver feature which is supposed to help with decoding
 video.  Users have reported that rather than speeding up their video it
 appears to be doing the opposite.  You may want to check that your color
 depth is set for 24bpp.</P>
 
-<H2><A NAME="ss20.30">20.30</A> <A HREF="#toc20.30">My computer is loading a media player application when I insert a CD or DVD.</A>
-</H2>
+<H3>Computer is loading a media player application when you insert a CD or DVD</H3>
 
 <P>You need to disable any sort of auto-running media player in your
 environment, otherwise MythDVD or MythMusic will not be able to work
@@ -5342,15 +5361,9 @@ $ rm ~/.kde/Autostart/Autorun.desktop
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H2><A NAME="ss20.31">20.31</A> <A HREF="#toc20.31">I can't change channels.</A>
-</H2>
-
-<P>This may be due to MythTV not having permissions to the appropriate
-video4linux devices.  See the section titled 
-<A HREF="#devperms">Device Permissons</A> for an example.</P>
 <H2><A NAME="s21">21.</A> <A HREF="#toc21">Miscellaneous. </A></H2>
 
-<H2><A NAME="ss21.1">21.1</A> <A HREF="#toc21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>
+<H2><A NAME="ss21.1">21.1</A> <A HREF="#toc21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format</A>
 </H2>
 
 <P>MythTV comes with a utility called <B>mythtranscode</B> which can
@@ -5439,7 +5452,7 @@ $ cat vidout > video.yuv
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss21.2">21.2</A> <A HREF="#toc21.2">I'd like to use some other window manager.</A>
+<H2><A NAME="ss21.2">21.2</A> <A HREF="#toc21.2">Using a different window manager</A>
 </H2>
 
 <P>MythTV is not dependent on any particular window manager.  If you wish to
@@ -5491,7 +5504,7 @@ process all of the frames.</P>
 <P>If you'd like to read more on this, go to the vcdhelp website at 
 <A HREF="http://www.vcdhelp.com/forum/userguides/94382.php">http://www.vcdhelp.com/forum/userguides/94382.php</A>.</P>
 
-<H2><A NAME="ss21.4">21.4</A> <A HREF="#toc21.4">MythTV GUI and X Display Sizes.</A>
+<H2><A NAME="ss21.4">21.4</A> <A HREF="#toc21.4">MythTV GUI and X Display Sizes</A>
 </H2>
 
 <P>MythTV is designed to be run as dedicated full screen TV application
@@ -5561,7 +5574,7 @@ purpose of these settings are to cut off rough edges and to expand the image
 so that objects will appear to be the same size as a normal overscanned TV
 picture.</P>
 
-<H2><A NAME="backupdb"></A> <A NAME="ss21.5">21.5</A> <A HREF="#toc21.5">I'd like to save or restore my database. </A>
+<H2><A NAME="backupdb"></A> <A NAME="ss21.5">21.5</A> <A HREF="#toc21.5">Saving or restoring the database </A>
 </H2>
 
 <P>See the <B>mysqldump</B> manpage for more information.
@@ -5586,7 +5599,7 @@ with multiple systems.  See the
 <A HREF="#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> section for more
 information.</P>
 
-<H2><A NAME="ss21.6">21.6</A> <A HREF="#toc21.6">I'd like to delete the MySQL database.</A>
+<H2><A NAME="ss21.6">21.6</A> <A HREF="#toc21.6">Deleting the MySQL database</A>
 </H2>
 
 <P>
@@ -5646,7 +5659,7 @@ analog)</LI>
 <CODE>/dev/mixer</CODE> devices.  Typing <CODE>$ dmesg</CODE> will let you know
 what's going on.</P>
 
-<H2><A NAME="ss21.8">21.8</A> <A HREF="#toc21.8">Removing unwanted channels.</A>
+<H2><A NAME="ss21.8">21.8</A> <A HREF="#toc21.8">Removing unwanted channels</A>
 </H2>
 
 <P>If <B>mythfilldatabase</B> grabbed a channel which you do not want to
@@ -5692,7 +5705,7 @@ mysql> delete from program where chanid = 1015;
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss21.9">21.9</A> <A HREF="#toc21.9">I'd like to use NFS.</A>
+<H2><A NAME="ss21.9">21.9</A> <A HREF="#toc21.9">NFS</A>
 </H2>
 
 <P>You may want to use a central server to store your files.  </P>
@@ -5720,7 +5733,7 @@ exporting the directory "/var/video", which we're mounting locally at
 performance of NFS; soft mean that NFS will eventually timeout on an error,
 and the nfsvers is required for filesizes over 2GB.</P>
 
-<H2><A NAME="ss21.10">21.10</A> <A HREF="#toc21.10">Automatically starting mythfrontend at system boot time.</A>
+<H2><A NAME="ss21.10">21.10</A> <A HREF="#toc21.10">Automatically starting mythfrontend at system boot time</A>
 </H2>
 
 <P>Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -5759,7 +5772,7 @@ session.screen0.focusModel:     SloppyFocus
  in it.</P>
 <P>
 <A NAME="mythbackend_autostart"></A> </P>
-<H2><A NAME="ss21.11">21.11</A> <A HREF="#toc21.11">Automatically starting mythbackend at system boot time.</A>
+<H2><A NAME="ss21.11">21.11</A> <A HREF="#toc21.11">Automatically starting mythbackend at system boot time</A>
 </H2>
 
 <H3>Red Hat And Mandrake</H3>
@@ -5910,7 +5923,7 @@ mythbackend at startup.</P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="advanced_backend_config"></A> <A NAME="ss21.12">21.12</A> <A HREF="#toc21.12">Advanced Backend Configurations. </A>
+<H2><A NAME="advanced_backend_config"></A> <A NAME="ss21.12">21.12</A> <A HREF="#toc21.12">Advanced Backend Configurations </A>
 </H2>
 
 <P>MythTV is flexible in the way that you define multiple backend tuner
@@ -6001,7 +6014,7 @@ transcoding.</P>
 <P>Once the transcode is complete, mythbackend will replace the old file
 with the new as soon as it is no longer in use.</P>
 
-<H2><A NAME="ss21.14">21.14</A> <A HREF="#toc21.14">Changing your hostname.</A>
+<H2><A NAME="ss21.14">21.14</A> <A HREF="#toc21.14">Changing your hostname</A>
 </H2>
 
 <P>If you need to change the name of the computers used with MythTV you'll
@@ -6116,21 +6129,23 @@ and <CODE>mythtv_restore.sql</CODE> files.</P>
 <P>While it is true that the TiVo runs the Linux kernel, and TiVo has released
 their changes to the kernel under the GPL, the TiVo is <EM>not</EM> a
 general-purpose computer, and there is no programming information available
-for the custom hardware contained within a TiVo.</P>
+for the custom hardware contained within a TiVo.  TiVo is under no
+obligation to release the source code to their <EM>application</EM>.</P>
 <P>The ReplayTV runs VxWorks, a Real Time Operating System from Wind River
 Systems.</P>
-<H2><A NAME="ss21.17">21.17</A> <A HREF="#toc21.17">Can I use wireless between the frontend and the backend?</A>
+<H2><A NAME="ss21.17">21.17</A> <A HREF="#toc21.17">Can a wireless connection be used between the frontend and the backend?</A>
 </H2>
 
-<P>Yes, you may, assuming that your wireless connection has sufficient
-bandwidth to maintain the datarate between the frontend and the backend. 
-802.11b should be sufficient if the encoded bitrate of the content is less
-than the datarate of your wireless connection, which in the case of 802.11b
-would be approximately 4 Mbps.  (The advertised rate of 11Mbps gives an
-actual throughput of 4 Mbps.)  802.11a and 802.11g, if operating in their
-high-speed modes, or proprietary 802.11b "Turbo" schemes should be
-adequate.  Multiple wireless frontends, poor signal strength or other
-factors can severely impact the viewing experience on the frontend.</P>
+<P>Yes, assuming that your wireless connection has sufficient bandwidth to
+maintain the datarate between the frontend and the backend.  802.11b should
+be sufficient if the encoded bitrate of the content is less than the
+datarate of your wireless connection, which in the case of 802.11b would be
+approximately 4 Mbps.  (The advertised rate of 11Mbps gives an actual
+throughput of 4 Mbps.) 802.11a and 802.11g, if operating in their high-speed
+modes, or proprietary 802.11b "Turbo" schemes should be adequate.  Multiple
+wireless frontends, poor signal strength or other factors can severely
+impact the viewing experience on the frontend.</P>
+
 <H2><A NAME="ss21.18">21.18</A> <A HREF="#toc21.18">How can I burn shows that I have recorded to a DVD?</A>
 </H2>
 
@@ -6184,7 +6199,7 @@ driveropts=burnfree -dao -v tsize="$TSIZE"s -
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="MigratingtoDD"></A> <A NAME="ss21.19">21.19</A> <A HREF="#toc21.19">Migrating from XMLTV to DataDirect. </A>
+<H2><A NAME="MigratingtoDD"></A> <A NAME="ss21.19">21.19</A> <A HREF="#toc21.19">Migrating from XMLTV to DataDirect </A>
 </H2>
 
 <P>DataDirect will use different information for your video sources and
@@ -6193,7 +6208,7 @@ information in a way that will allow your EPG and existing recording rules
 to continue to work as you'd expect.</P>
 <P>The first step is to create a backup of your database using the
 instructions found in 
-<A HREF="#backupdb">I'd like to save or restore my database.</A></P>
+<A HREF="#backupdb">Saving or restoring the database</A></P>
 <P><B>NOTE</B>: Examine the contents of the backup file to be sure that the
 backup succeeded before modifying your database.</P>
 <P><B>NOTE</B>: The MythTV DataDirect grabber requires <B>wget</B> version
@@ -6213,9 +6228,19 @@ $
 like to clear all program/channel settings before starting configuration
 [no]" type "yes".</P>
 <P>Complete the configuration as detailed in the section called 
-<A HREF="#ConfigureDD">Configuring the Zap2It.com DataDirect service.</A> and
+<A HREF="#ConfigureDD">Configuring the Zap2It.com DataDirect service</A> and
 in 
 <A HREF="#VideoSources">Video Sources</A>.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION>You <EM>must</EM> associate your DataDirect information with the inputs on
+your capture device.  If you created "Cable-DD", then don't forget to bind
+<CODE>/dev/video0</CODE> to Cable-DD in the 
+<A HREF="#VideoSources">Video Sources</A> portion of setup.</CAPTION>
+</FIGURE>
+</P>
 <P>Once you're done running setup, run <B>mythfilldatabase</B> to populate
 the database with new data.</P>
 <P>To restore the channel icons, you will need to perform one of two steps. 
@@ -6258,7 +6283,7 @@ $
 <H2><A NAME="s22">22.</A> <A HREF="#toc22">Example Configurations.</A></H2>
 
 <P>This section contains configurations which you may find useful.</P>
-<H2><A NAME="pvr250"></A> <A NAME="ss22.1">22.1</A> <A HREF="#toc22.1">Hauppauge PVR-250/350 hardware MPEG-2 encoder. </A>
+<H2><A NAME="pvr250"></A> <A NAME="ss22.1">22.1</A> <A HREF="#toc22.1">Hauppauge PVR-250/350 hardware MPEG-2 encoder </A>
 </H2>
 
 <P>
@@ -6570,7 +6595,7 @@ firmware issue, apparently.  There are two ways around this:</CAPTION>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="hauppauge_remote"></A> <A NAME="ss22.2">22.2</A> <A HREF="#toc22.2">Hauppauge PVR-250 remote and MythTV's native LIRC support.</A>
+<H2><A NAME="hauppauge_remote"></A> <A NAME="ss22.2">22.2</A> <A HREF="#toc22.2">Hauppauge PVR-250 remote and MythTV's native LIRC support</A>
 </H2>
 
 <P>
@@ -6831,7 +6856,7 @@ $ su
 </P>
 <P>You should now have native LIRC support within MythTV.</P>
 
-<H2><A NAME="LVM"></A> <A NAME="ss22.3">22.3</A> <A HREF="#toc22.3">Logical Volume Manager (LVM). </A>
+<H2><A NAME="LVM"></A> <A NAME="ss22.3">22.3</A> <A HREF="#toc22.3">Logical Volume Manager (LVM) </A>
 </H2>
 
 <P>LVM greatly increases the flexibility you have in managing your storage
@@ -6843,8 +6868,14 @@ done with LVM, so check the LVM HOWTO
 <P>If you don't understand how to partition a drive, or how to change the
 partition type you should stop and look at documentation on how to perform
 these steps.</P>
-<P><B>BIG FAT WARNING</B>:  Using an incorrect parameter can make your files
-inaccessible, prevent your computer from booting, etc.  Be careful!</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>BIG FAT WARNING</B>:  Using an incorrect parameter can make your files
+inaccessible, prevent your computer from booting, etc.  Be careful!</CAPTION>
+</FIGURE>
+</P>
 <P>Make sure your kernel configuration includes LVM support or that it's
 available as a module. Today, most vendors include this by default. You'll
 also want to ensure that you have a copy of the LVM utilities; check your
@@ -7006,7 +7037,7 @@ unmounted during this procedure.
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss22.4">22.4</A> <A HREF="#toc22.4">Advanced Partition Formatting. </A>
+<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss22.4">22.4</A> <A HREF="#toc22.4">Advanced Partition Formatting </A>
 </H2>
 
 <P>The partitions that your distribution sets up for you may not be

@@ -82,7 +82,7 @@ After downloading, be sure to install both:
 <A HREF="http://www.mp3dev.org/mp3">http://www.mp3dev.org/mp3</A>.  Download the source code to v3.93.1 by
 following the links to sourceforge.net</P>
 
-<H2><A NAME="nonintelcpu_"></A> <A NAME="ss5.1">5.1</A> <A HREF="mythtv-HOWTO.html#toc5.1">Notes on compiling on a system with non-Intel processors. </A>
+<H2><A NAME="nonintelcpu_"></A> <A NAME="ss5.1">5.1</A> <A HREF="mythtv-HOWTO.html#toc5.1">Notes on compiling on a system with non-Intel processors </A>
 </H2>
 
 <P>If you've got a system with an AMD K6-2 or a VIA C3 processor, make the
@@ -101,7 +101,7 @@ before you compile.</P>
 <P>Recent AMD processors, like the Duron, Thunderbird and Athlon don't need this
 change.</P>
 
-<H2><A NAME="ss5.2">5.2</A> <A HREF="mythtv-HOWTO.html#toc5.2">Building LAME.</A>
+<H2><A NAME="ss5.2">5.2</A> <A HREF="mythtv-HOWTO.html#toc5.2">Building LAME</A>
 </H2>
 
 <P>Open a shell and switch to the directory where you saved lame.
@@ -136,7 +136,7 @@ $
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">XMLTV. </A>
+<H2><A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">XMLTV</A>
 </H2>
 
 <H3>Red Hat Linux and Fedora Core:</H3>
@@ -173,9 +173,8 @@ does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing
 </P>
 <P>and skip straight to the XMLTV compilation step.</P>
 
-<H3>Other distributions and manual installation.</H3>
+<H3>Manual installation</H3>
 
-<P>Continuing on:</P>
 <P>
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
@@ -184,7 +183,9 @@ $ tar -xjf xmltv-0.5.34.tar.bz2
 </PRE>
 </CODE></BLOCKQUOTE>
 
-Install the xmltv prerequisites:</P>
+Install the xmltv prerequisites.  The following prerequisites are the
+minimum required; when you actually start running the xmltv setup program it
+may alert you to other modules that are required.:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -209,9 +210,9 @@ $ perl Makefile.PL
 
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
 the grabber required for your location.</P>
-<P>You may get errors about modules not being installed.  They shouldn't matter
-if you're installing North America and have followed the instructions to
-this point.
+<P>You may get errors about modules not being installed.  You will need to
+resolve any missing dependencies at this point, or your grabber may not work
+correctly.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ make
@@ -223,10 +224,10 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ConfigureDD"></A> <A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Configuring the Zap2It.com DataDirect service. </A>
+<H2><A NAME="ConfigureDD"></A> <A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Configuring the Zap2It.com DataDirect service </A>
 </H2>
 
-<H3>Introduction.</H3>
+<H3>Introduction</H3>
 
 <P>Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
 Tribune Media Services.  TMS is one of the primary providers for program
@@ -262,7 +263,7 @@ configuration will be imported into MythTV when you first run the
 currently using XMLTV.  If you are starting from a fresh installation, the
 simplest thing is to immediately start using DataDirect.</P>
 
-<H3>Grabbing channel icons for DataDirect users.</H3>
+<H3>Grabbing channel icons for DataDirect users</H3>
 
 <P>While the DataDirect TV listings service has several advantages, it does
 not support grabbing logo icons for the stations you receive. However, there
@@ -295,7 +296,7 @@ $ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
 </CODE></BLOCKQUOTE>
 
 <A NAME="manually_building_mythtv"></A> </P>
-<H2><A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Manually building MythTV.</A>
+<H2><A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Manually building MythTV</A>
 </H2>
 
 <P>Unpack MythTV
@@ -411,7 +412,7 @@ to the real external IP address - 127.0.0.1 is the loopback address and no
 external machine can access it. Change the Master Server IP setting to the
 same IP address as well.</P>
 
-<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.6">5.6</A> <A HREF="mythtv-HOWTO.html#toc5.6">Gentoo. </A>
+<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.6">5.6</A> <A HREF="mythtv-HOWTO.html#toc5.6">Gentoo </A>
 </H2>
 
 <P>Installation of MythTV on Gentoo consists of simply emerging the desired
