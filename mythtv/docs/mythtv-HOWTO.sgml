@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-05-05, v0.14.09
+<date>2004-05-05, v0.14.10
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1078,8 +1078,9 @@ name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
 </caption>
 </figure>
 
-If you are in North America you will use the DataDirect grabber which is
-built-in to MythTV.  You <em>do not</em> need to install XMLTV.
+<bf>CVS only</bf>: If you are in North America you will use the DataDirect
+grabber which is built-in to MythTV.  You <em>do not</em> need to install
+XMLTV.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
 name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.32).
@@ -1246,7 +1247,8 @@ $ su
 # exit
 </verb></tscreen>
 
-<sect1>Configuring the Zap2It.com DataDirect service.
+<sect1>Configuring the Zap2It.com DataDirect service. <label id="ConfigureDD">
+<p><bf>CVS Only</bf>
 <p>Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
 Tribune Media Services.  TMS is one of the primary providers for program
 listing data in the United States and Canada.  There are a number of
@@ -1259,7 +1261,11 @@ HTML pages and trying to parse the program data out of the HTML.
 <item>It contains more program information.
 <item>It's easier on the Zap2It servers, since they're not generating
 hundreds of custom HTML pages when you scrape their listings.
-<item>As of right now, it's free.
+<item>The <tt>tv_grab_na</tt> grabber is no longer supported and will not be
+fixed when problems occur.
+<item>The service is available free of charge by periodically filling in
+surveys similar to the one presented during registration, and the data
+provider has no intention of charging for it in the future.
 </itemize>
 
 If you wish to use Zap2It DataDirect, you'll need to establish a user
@@ -2425,19 +2431,21 @@ if you have additional capture cards in this machine, press the space bar
 when the highlight is on the (New Capture Card) row to define another card. 
 Once you have no additional cards to setup, press ESC.
 
-<sect2>Video Sources
+<sect2>Video Sources <label id="VideoSources">
 <p>When you start, the highlight should be on (New Video Source).  Press the
 space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
-you've chosen a name, press the down arrow to move to the next field.  If
-you're in North America, change the grabber to "DataDirect", then continue
-pressing the down arrow to move to the next field.  Fill in the username and
-password that you have established with DataDirect, then move to the
-"Retrieve Listings" button and press the space bar.  The setup program will
-contact the Zap2It servers and get your account information.  Once you're
-done, you may click the Finish button and skip the next few paragraphs,
-since they only apply to users that are using the external XMLTV script to
-get their guide data.
+you've chosen a name, press the down arrow to move to the next field.  
+
+<bf>CVS Only</bf>
+If you're in North America, change the grabber to "DataDirect", then
+continue pressing the down arrow to move to the next field.  Fill in the
+username and password that you have established with DataDirect, then move
+to the "Retrieve Listings" button and press the space bar.  The setup
+program will contact the Zap2It servers and get your account information. 
+Once you're done, you may click the Finish button and skip the next few
+paragraphs, since they only apply to users that are using the external XMLTV
+script to get their guide data.
 
 If you wish to continue using the XMLTV grabber, then move to the Zip/postal
 code field and put in the appropriate value.
@@ -5417,6 +5425,8 @@ driveropts=burnfree -dao -v tsize="$TSIZE"s -
 </verb></tscreen>
 
 <sect1>Migrating from XMLTV to DataDirect. <label id="MigratingtoDD">
+<!-- Mostly from a post by Bruce Markey -->
+<p><bf>CVS Only</bf>
 <p>The first step is to create a backup of your database using the
 instructions found in <ref id="backupdb" name="I'd like to save or restore
 my database.">.
@@ -5430,10 +5440,15 @@ mysql>drop table videosource;
 </verb></tscreen>
 
 At this point we need to recreate the two tables that we just deleted.  This
-will ensure that the channel numbers will lineup like they used to.  Open
-the mysqldump file you created in the backup step and search for the
-<tt>CREATE TABLE channel</tt> and <tt>CREATE TABLE videosource</tt>
-commands.  You should perform a cut-and-paste:
+will ensure that the channel numbers will lineup like they used to - if we
+had not deleted the tables, the <tt>autoincrement</tt> would throw
+everything off.  Open the mysqldump file you created in the backup step and
+search for the <tt>CREATE TABLE channel</tt> and <tt>CREATE TABLE
+videosource</tt> commands.
+
+Cut-and-paste from the mysqldump file into the <bf>mysql</bf> monitor.  Here
+is an example, but make sure you use the one that's on <em>your</em>
+machine.
 <tscreen><verb>
 mysql>CREATE TABLE videosource (
   sourceid int(10) unsigned NOT NULL auto_increment,
@@ -5449,9 +5464,13 @@ mysql>CREATE TABLE videosource (
 </verb></tscreen>
 
 Do the same for the <tt>CREATE TABLE channel</tt> section.  Once that's been
-completed, exit from <bf>mysql</bf> and run <bf>mythfilldatabase</bf> to
-populate the database with new data.
+completed, exit from <bf>mysql</bf>.  Run the MythTV setup program and
+complete the configuration as detailed in the section called <ref
+id="ConfigureDD" name="Configuring the Zap2It.com DataDirect service."> and
+in <ref id="VideoSources" name="Video Sources">.
 
+Once you're done running setup, run <bf>mythfilldatabase</bf> to populate
+the database with new data.
 <sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
 <sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder. <label id="pvr250">
@@ -6266,7 +6285,8 @@ already got the 0.5.32 grabber installed.  Alter DataDirect instructions.
 Add section on modifying /etc/security/console.perms; put troubleshooting
 pointer back to it.  Add a section on migrating to DataDirect.  Add section
 on using the native mythfilldatabase scheduler.
-
+v0.14.10, 2004-05-05.  Update migration instructions for DataDirect.  It's for
+CVS.  Add some forward and backwards pointers in the Migration document.
 -->
 
 <!--

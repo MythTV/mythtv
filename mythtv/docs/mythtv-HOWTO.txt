@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-05-05, v0.14.09
+  2004-05-05, v0.14.10
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1471,8 +1471,9 @@
   http://www.mythtv.org/mailman/listinfo/mythtv-dev/
   <http://www.mythtv.org/mailman/listinfo/mythtv-dev/> mailing lists.
 
-  If you are in North America you will use the DataDirect grabber which
-  is built-in to MythTV.  You [4mdo[24m [4mnot[24m need to install XMLTV.
+  [1mCVS only[22m: If you are in North America you will use the DataDirect
+  grabber which is built-in to MythTV.  You [4mdo[24m [4mnot[24m need to install
+  XMLTV.
 
   Get XMLTV from http://xmltv.sourceforge.net
   <http://xmltv.sourceforge.net>.  Download the latest version (0.5.32).
@@ -1682,6 +1683,8 @@
 
   [1m5.4.  Configuring the Zap2It.com DataDirect service.[0m
 
+  [1mCVS Only[0m
+
   Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
   Tribune Media Services.  TMS is one of the primary providers for
   program listing data in the United States and Canada.  There are a
@@ -1697,7 +1700,13 @@
   +o  It's easier on the Zap2It servers, since they're not generating
      hundreds of custom HTML pages when you scrape their listings.
 
-  +o  As of right now, it's free.
+  +o  The tv_grab_na grabber is no longer supported and will not be fixed
+     when problems occur.
+
+  +o  The service is available free of charge by periodically filling in
+     surveys similar to the one presented during registration, and the
+     data provider has no intention of charging for it in the future.
+
 
   If you wish to use Zap2It DataDirect, you'll need to establish a user
   account.  Go to http://labs.zap2it.com <http://labs.zap2it.com> and
@@ -1705,7 +1714,6 @@
   you agree with them click "Accept".  The next screen is the
   subscription registration.  In the "Certificate Code" field, enter
   [1mZIYN-DQZO-SBUT[22m.
-
 
   Fill in the survey, then proceed to the lineup choices and configure
   your account for your particular location and the channels that you
@@ -3046,9 +3054,11 @@
   the space bar to begin.  The first field asks for the name of the
   video source.  You may choose something easy to remember, like
   "Antenna" or "Cable".  Once you've chosen a name, press the down arrow
-  to move to the next field.  If you're in North America, change the
-  grabber to "DataDirect", then continue pressing the down arrow to move
-  to the next field.  Fill in the username and password that you have
+  to move to the next field.
+
+  [1mCVS Only [22mIf you're in North America, change the grabber to
+  "DataDirect", then continue pressing the down arrow to move to the
+  next field.  Fill in the username and password that you have
   established with DataDirect, then move to the "Retrieve Listings"
   button and press the space bar.  The setup program will contact the
   Zap2It servers and get your account information.  Once you're done,
@@ -3155,7 +3165,6 @@
                                       channel,osd,file,schedule,network
        --printexpire                  List of auto-expire programs
        --printsched                   Upcoming scheduled programs
-
 
 
   Running mythbackend as a daemon and using the logfile option will
@@ -6422,6 +6431,8 @@
 
   [1m21.19.  Migrating from XMLTV to DataDirect.[0m
 
+  [1mCVS Only[0m
+
   The first step is to create a backup of your database using the
   instructions found in ``I'd like to save or restore my database.''.
 
@@ -6437,9 +6448,13 @@
 
   At this point we need to recreate the two tables that we just deleted.
   This will ensure that the channel numbers will lineup like they used
-  to.  Open the mysqldump file you created in the backup step and search
-  for the CREATE TABLE channel and CREATE TABLE videosource commands.
-  You should perform a cut-and-paste:
+  to - if we had not deleted the tables, the autoincrement would throw
+  everything off.  Open the mysqldump file you created in the backup
+  step and search for the CREATE TABLE channel and CREATE TABLE
+  videosource commands.
+
+  Cut-and-paste from the mysqldump file into the [1mmysql [22mmonitor.  Here is
+  an example, but make sure you use the one that's on [4myour[24m machine.
 
 
        mysql>CREATE TABLE videosource (
@@ -6457,9 +6472,12 @@
 
 
   Do the same for the CREATE TABLE channel section.  Once that's been
-  completed, exit from [1mmysql [22mand run [1mmythfilldatabase [22mto populate the
-  database with new data.
+  completed, exit from [1mmysql[22m.  Run the MythTV setup program and complete
+  the configuration as detailed in the section called ``Configuring the
+  Zap2It.com DataDirect service.'' and in ``Video Sources''.
 
+  Once you're done running setup, run [1mmythfilldatabase [22mto populate the
+  database with new data.
 
   [1m22.  Example Configurations.[0m
 
@@ -6585,15 +6603,14 @@
   if you will not be using the IR remote that came with the card.
 
 
-
-  alias char-major-81     videodev
-  alias char-major-81-0   ivtv
-  alias char-major-61 lirc_i2c
-  options ivtv debug=1
-  options tuner type=2
-  options msp3400 once=1 simple=1
-  add below ivtv msp3400 saa7115 tuner
-  add above ivtv lirc_dev lirc_i2c
+       alias char-major-81     videodev
+       alias char-major-81-0   ivtv
+       alias char-major-61 lirc_i2c
+       options ivtv debug=1
+       options tuner type=2
+       options msp3400 once=1 simple=1
+       add below ivtv msp3400 saa7115 tuner
+       add above ivtv lirc_dev lirc_i2c
 
 
 
