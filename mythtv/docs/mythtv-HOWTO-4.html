@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <TITLE>Installing and using mythtv: Setting up paths, ldconfig and other shell variables. </TITLE>
+ <LINK HREF="mythtv-HOWTO-5.html" REL=next>
+ <LINK HREF="mythtv-HOWTO-3.html" REL=previous>
+ <LINK HREF="mythtv-HOWTO.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="mythtv-HOWTO-5.html">Next</A>
+<A HREF="mythtv-HOWTO-3.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="Setting_up_paths"></A> <A NAME="s4">4.</A> <A HREF="mythtv-HOWTO.html#toc4">Setting up paths, ldconfig and other shell variables. </A></H2>
+
+<P>There are some paths that need to be modified before starting the main
+compile of mythtv, otherwise you will get errors.</P>
+
+<H2><A NAME="Distribution-specific_information"></A> <A NAME="ss4.1">4.1</A> <A HREF="mythtv-HOWTO.html#toc4.1">Distribution-specific information. </A>
+</H2>
+
+<H3>Mandrake 9.0</H3>
+
+<P>As root, create the following file in <CODE>/etc/profile.d</CODE>  On my system
+I call it "mythtv.sh".</P>
+<P>Open a shell, and switch to superuser mode.
+<B>NOTE: ^D</B> means press <B>CTRL</B> and <B>d</B> at the same time.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cd /etc/profile.d
+cat > mythtv.sh
+export QTDIR=/usr/lib/qt3
+export PATH=$PATH:/usr/lib/qt3/bin
+^D
+
+# chmod a+x mythtv.sh
+# exit
+$ exit
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The last two commands are to exit out of the shell.  This way, when you next
+open a shell your new commands will take effect.</P>
+
+<H3><A NAME="RH80-LANG"></A> Red Hat Linux 8.0 </H3>
+
+<P>Red Hat Linux 8.0 uses an unusual character encoding scheme which causes
+problems when running certain programs. As a result, whenever you run setup
+or mythfilldatabase you will have to set a variable to correct this problem.
+Failure to set this variable will result in a lot of UTF-8 errors.</P>
+<P>There are two modifications that you can make to your system to avoid 
+this problem. The first is a system wide solution, the second will only 
+apply to your current user.</P>
+<P>The global change is to modify the <CODE>/etc/sysconfig/i18n</CODE> file and set
+<CODE>LANG="en_US"</CODE>.  If you want the change to only affect a single user,
+you could create a file called <CODE>~/.i18n</CODE>:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat > ~/.i18n
+LANG="en_US"
+^D
+$ exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="Checking_that_it_worked"></A> <A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Checking that it worked. </A>
+</H2>
+
+<P>Open a shell and switch to superuser mode.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# set
+
+[lots of text]
+QTDIR=/usr/lib/qt3
+PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+</PRE>
+</CODE></BLOCKQUOTE>
+
+You should see QTDIR and the path changes you made.</P>
+<P>Next, we need to make sure that the libraries that we're building will be
+found when we need them.</P>
+
+<H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Modifying <CODE>/etc/ld.so.conf</CODE></A>
+</H2>
+
+<P>Switch to /etc and execute the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+# cd /etc
+# cat >> ld.so.conf
+/usr/local/lib
+^D
+
+# /sbin/ldconfig
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>:  It appears that Red Hat Linux 8.0 requires that the
+<B>ldconfig</B> command needs to be run twice. Red Hat will also
+frequently "forget" about the path. It's recommended to run
+<B>/sbin/ldconfig</B> after installing every package. Failing that, always
+run it if you get an unexpected error about not finding libraries.</P>
+
+<HR>
+<A HREF="mythtv-HOWTO-5.html">Next</A>
+<A HREF="mythtv-HOWTO-3.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc4">Contents</A>
+</BODY>
+</HTML>

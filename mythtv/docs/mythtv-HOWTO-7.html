@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <TITLE>Installing and using mythtv: Setting up ALSA and the mixer.</TITLE>
+ <LINK HREF="mythtv-HOWTO-8.html" REL=next>
+ <LINK HREF="mythtv-HOWTO-6.html" REL=previous>
+ <LINK HREF="mythtv-HOWTO.html#toc7" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="mythtv-HOWTO-8.html">Next</A>
+<A HREF="mythtv-HOWTO-6.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc7">Contents</A>
+<HR>
+<H2><A NAME="s7">7.</A> <A HREF="mythtv-HOWTO.html#toc7">Setting up ALSA and the mixer.</A></H2>
+
+<P>If your video doesn't appear to be in-sync with your audio, it could be
+because you are listening to the real-time audio from your video card rather
+than after it's been processed and synchronized to the video by mythtv.</P>
+<P>What you need to do is to mute the "line-in" of your sound card and also
+set it as the recording source.</P>
+<P>There are two ways to do this.  Graphically, and from the command line.</P>
+
+<H2><A NAME="ss7.1">7.1</A> <A HREF="mythtv-HOWTO.html#toc7.1">Graphically setting up the mixer.</A>
+</H2>
+
+<H3>Mandrake 9.0</H3>
+
+<P>Open Kmix by K->Multimedia->Sound->Kmix</P>
+<P>Click on Settings->Configure  Make sure that "Tick Marks" and "Show
+labels" have "X"'s in them.  This will make it easier to find the correct
+audio source.  Click OK.</P>
+<P>On the mixer page, look for Line-In on your sound card.  You should see
+two LED's - a green one at the top, and a red one at the bottom.  The green
+one at the top is for muting; you want to make sure that the green LED is a
+dark green, meaning that it's "off".  You also want to click on the red LED
+so that it turns bright red, indicating that it's "ON"; this insures that
+the Line-in is used as the source.  Click OK, and make sure that you save
+the settings so that this is your default.</P>
+
+<H3>Red Hat Linux 8.0</H3>
+
+<H3>Using OSS drivers.</H3>
+
+<P>Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
+drivers recommended by the mythtv team. The OSS drivers do work for some
+people, and for some cards, but others report problems (sync and jitter)
+with OSS. In addition, OSS does not support full duplex on some cards, which
+is required if you want to record and play sound using just one sound card.
+ALSA has good full duplex support, and also has drivers for some built-in
+(motherboard) sound cards that OSS does not. Installing ALSA is less painful
+than you might think, so we encourgage you to go that route. For those of
+you who do not wish to install ALSA you must do this:</P>
+<P>To configure sound to work with mythtv, select 
+<PRE>
+RedHat Menu>Sound &amp; Video>Volume Control
+</PRE>
+
+to open up a mixer. Make sure your global volume (on the far left)
+is up. Also make sure that the "line in" section has "mute" and "record"
+checked and that the gain is turned up. You may have to experiment with
+volume/gain levels to get the best sound.  If you experience difficulty with
+sound try moving your patch cord from "Line in" to "Mic in". You will need
+to go back to the mixer and select "mute" and "record" on the "Mic in" and
+turn up the gain for the Mic rather than Line.</P>
+
+<H3>Using ALSA drivers.</H3>
+
+<P>For those of you who do want to install ALSA please follow the 
+directions below, compiled with much assistance from Gregorio Gervasio.</P>
+<P>First you must find out the name of your driver, which isn't necessarily the
+same as the name of your sound card. Go to 
+<A HREF="http://www.alsa-project.org/alsa-doc/">http://www.alsa-project.org/alsa-doc/</A>, find your sound card on the
+list and click "details". Near the top it will say something like "The
+module options for snd-XXX", where XXX is the name of your driver. In the
+instructions below, replace "XXX" with the name of your driver.</P>
+<P>Download the development release (0.9.x) from the ALSA web site 
+<A HREF="http://www.alsa-project.org">http://www.alsa-project.org</A>.  You
+need at least three files:
+<UL>
+<LI>alsa-driver-0.9.x.tar.bz2</LI>
+<LI>alsa-lib-0.9.x.tar.bz2</LI>
+<LI>alsa-utils-0.9.x.tar.bz2</LI>
+</UL>
+</P>
+<P>Start with the alsa-driver package:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xjf alsa-driver-0.9.x.tar.bz2
+$ cd alsa-driver-0.9.x
+$ ./configure --with-cards=XXX --with-sequencer=yes
+$ make
+$ su
+# make install
+# ./snddevices
+# exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This will compile and install the kernel modules and initialization
+scripts, as well as create device nodes in /dev.</P>
+<P>Install the rest of the packages:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd ~
+$ tar -xjf alsa-lib-0.9.x.tar.bz2
+$ cd alsa-lib-0.9.x
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ cd ..
+$ tar -xjf alsa-utils-0.9.x.tar.bz2
+$ cd alsa-utils-0.9.x
+$ ./configure
+$ make
+$ su
+# make install
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Next, you must edit <CODE>/etc/modules.conf</CODE> so that the ALSA modules are
+loaded automatically. The first step is to remove your old OSS
+configuration to ensure that you don't end up with mysterious conflicts in
+the future.  You should end up with a <CODE>/etc/modules.conf</CODE> file that has
+this configuration:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+alias char-major-116 snd
+alias snd-card-0 snd-XXX
+# module options should go here
+# OSS/Free portion
+alias char-major-14 soundcore
+alias sound-slot-0 snd-card-0
+# card #1
+alias sound-service-0-0 snd-mixer-oss
+alias sound-service-0-1 snd-seq-oss
+alias sound-service-0-3 snd-pcm-oss
+alias sound-service-0-8 snd-seq-oss
+alias sound-service-0-12 snd-pcm-oss
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>"XXX" should be the ALSA driver name for your sound card/chip. In some rare
+cases you need to supply extra options to the driver. These options are
+descried in the "INSTALL" file in the alsa-driver directory or at 
+<A HREF="http://www.alsa-project.org/alsa-doc/">http://www.alsa-project.org/alsa-doc/</A>.</P>
+<P>For now we will assume that no extra options are required.  The next step is
+to ensure that the ALSA drivers are started during boot-up.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cd /etc/rc.d/init.d
+# /sbin/chkconfig --add alsasound
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The next set of instructions will cause the ALSA volume/mixer/etc. state to
+be saved when the machine is shut down properly. Note that the mixer
+settings won't get restored the next time you boot unless you ran the
+shutdown script or you've explicitly saved the state which you can do
+as root with:
+<BLOCKQUOTE><CODE>
+<PRE>
+# alsactl -f /etc/asound.state store
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Reboot your machine.  Login and adjust the sound levels using "alsamixer". 
+You should increase the main volume (the first slider) and the PCM volume,
+and unmute them by hitting "m".  For MythTV, if your tuner card audio output
+is patched to the Line-In input of your sound card, set the Line input for
+capture by pressing SPACE at the slider and mute it by pressing "M". If
+you've patched your tuner card to the Mic-In port of your soundcard, follow
+the same instructions but make sure that you're on the Mic slider.</P>
+<P>Test the driver by playing a simple file:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ aplay /usr/share/sounds/info.wav
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If it works, you're done installing ALSA!</P>
+
+<H2><A NAME="ss7.2">7.2</A> <A HREF="mythtv-HOWTO.html#toc7.2">Setting the mixer from the command line.</A>
+</H2>
+
+<P>If you're running Mandrake 9.0 and have installed the alsa-utils package,
+then the <B>amixer</B> program can be used to setup the mixer.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ amixer set Master,0 100%,100% unmute
+$ amixer set Line,0 100%,100% mute capture
+$ su
+# alsactl store
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+
+That takes care of setting the volume correctly, and the ALSA startup script
+will restore the volume after a reboot.</P>
+<P>You may also use the <B>alsamixer</B> program to set the volume.  First,
+start <B>alsamixer</B> from the command line.  You should start out on the
+"Master" volume control slider.  Use the up and down cursor to set the
+master volume to around 75%.  Next, use the left and right cursor keys to
+move around on the screen until you find the "Line" slider.  Press SPACE to
+set it as the capture source, set the level to around 50-75% and press "M"
+to mute it.  You can now press ESC to exit out of the <B>alsamixer</B>
+program.</P>
+
+<HR>
+<A HREF="mythtv-HOWTO-8.html">Next</A>
+<A HREF="mythtv-HOWTO-6.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc7">Contents</A>
+</BODY>
+</HTML>

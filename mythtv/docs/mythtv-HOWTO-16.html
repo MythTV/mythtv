@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <TITLE>Installing and using mythtv: Miscellaneous.</TITLE>
+ <LINK HREF="mythtv-HOWTO-15.html" REL=previous>
+ <LINK HREF="mythtv-HOWTO.html#toc16" REL=contents>
+</HEAD>
+<BODY>
+Next
+<A HREF="mythtv-HOWTO-15.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc16">Contents</A>
+<HR>
+<H2><A NAME="s16">16.</A> <A HREF="mythtv-HOWTO.html#toc16">Miscellaneous.</A></H2>
+
+<H2><A NAME="ss16.1">16.1</A> <A HREF="mythtv-HOWTO.html#toc16.1">I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.</A>
+</H2>
+
+<P>Matthew Zimmerman has created a patch for MPlayer / Mencoder
+<A HREF="http://www.mplayerhq.hu">http://www.mplayerhq.hu</A> that allows
+you view the files created by mythtv.  Mythtv doesn't use standard
+Nupplevideo files, which is why you MPlayer complains if you try to view
+them.</P>
+<P>Download the patch to MPlayer from Matt's website. 
+<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/</A>.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download the source to MPlayer and patch:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+$ tar -xjf MPlayer-0.90rc1.tar.bz2
+$ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+$ cd MPlayer-0.90rc1
+$ patch -p1 &lt; mplayer-0.90pre10+mythtv.patch
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>At this point, you can read the MPlayer documentation and start the compile
+process.</P>
+
+<H2><A NAME="ss16.2">16.2</A> <A HREF="mythtv-HOWTO.html#toc16.2">I'd like to use some other window manager.</A>
+</H2>
+
+<P>mythtv is not dependent on any particular window manager.  If you wish to
+run a lightweight window manager, the <CODE>configfiles/</CODE> directory has an
+example of a <CODE>.twmrc</CODE> file you may use.</P>
+
+<H2><A NAME="ss16.3">16.3</A> <A HREF="mythtv-HOWTO.html#toc16.3">I'd like mythtv to automatically startup.</A>
+</H2>
+
+<P>Here's an example submitted to the mythtv-dev list by Pat Pflaum
+<A HREF="mailto:pat@netburp.com">mailto:pat@netburp.com</A> using fvwm:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat > .xinitrc
+fvwm &amp;
+mythfrontend
+^D
+$ cat > .fvwmrc
+Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+^D
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss16.4">16.4</A> <A HREF="mythtv-HOWTO.html#toc16.4">I'd like to delete the mysql database.</A>
+</H2>
+
+<P><B>NOTE</B>:  Performing this step will remove the entire database. 
+You will lose all of your settings and will need to re-run the mc.sql script
+to setup the database structure before running the setup program.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root
+mysql> drop database mythconverg;
+mysql> quit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss16.5">16.5</A> <A HREF="mythtv-HOWTO.html#toc16.5">I'd like to start using the development version of mythtv.</A>
+</H2>
+
+<P>[Content under development]</P>
+<P><B>NOTE</B>:It should be clear that using the development version of
+mythtv may cause loss of data on your system.  There is no guarantee that the development
+version of mythtv will work for you.</P>
+<P><B>THERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR
+OWN RISK.</B></P>
+<P>Here are some of the features in version 0.8:
+<UL>
+<LI>A front-end and back-end system.  The back-end is responsible for
+maintaining the database and capturing and encoding the video.  The
+front-end is responsible for displaying the video.  This allows you to put a
+lightweight, quiet, diskless and fanless machine in "the living room", with a large server-type
+machine in "the basement".  The front-end and back-end communicate over TCP
+on a specified port.</LI>
+<LI>GUI-based configuration.  Much of the configuration of mythtv can now
+be done using a GUI-based setup, avoiding the necessity to edit the
+<CODE>settings.txt</CODE> file.</LI>
+<LI>Themes.  mythtv now has more themes for the user to choose from.</LI>
+<LI>Recording profiles.  You may now setup various encoder profiles from
+the GUI, giving you the flexibility to record programs using various quality
+levels.</LI>
+<LI>Increased hardware encoder support.  mythtv can now use the MJPEG
+encoder/decoder found on Matrox G200 series cards.  This greatly reduces the
+CPU utilization.</LI>
+</UL>
+</P>
+<P><B>NOTE</B>:  Problem reports for version 0.8 posted to the mailing list
+should have accompanying solutions.</P>
+<P>Before you begin, shutdown all running instances of 0.7.  You should perform
+a <CODE>make clean distclean</CODE> before starting the compile process.</P>
+<P>Compile and install the system as you would mythtv 0.7 by following the
+instructions found in this HOWTO.  If you are installing mythtv on a new
+machine, install the database by running the <CODE>database/mc.sql</CODE>
+script as detailed in earlier sections of this document.</P>
+<P>However, if you are upgrading an existing 0.7 system, you <EM>must</EM> run the
+<CODE>database/0-7-to-0-8.sql</CODE> script before running the setup program to
+ensure that the database structure is up to date.</P>
+<P>Next, you must edit the
+<CODE>/usr/local/share/mythtv/backend_settings.txt</CODE> file.  Specify the IP
+address or hostname of the back-end server and port.  You may specify
+<CODE>localhost</CODE> if the front-end and back-end programs will be running on
+the same machine.  This file is read by the backend server during start-up.</P>
+<P>Once you're done editing the file, start the setup program:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd setup
+$ ./setup
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This will open the setup wizard which will allow you to graphically
+configure your system.</P>
+<P>Once the setup wizard is done: to run the new version of mythtv, you must
+first start the back-end server:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythbackend &amp;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>and then run the front-end client:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythfrontend
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You should see the connection established between the front-end and back-end
+systems by examining the mythbackend window; it will display the client
+connection attempts.</P>
+
+<HR>
+Next
+<A HREF="mythtv-HOWTO-15.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc16">Contents</A>
+</BODY>
+</HTML>
