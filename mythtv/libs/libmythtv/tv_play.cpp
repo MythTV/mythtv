@@ -40,12 +40,15 @@ void *SpawnDecode(void *param)
 }
 
 TV::TV(MythContext *lcontext)
+  : QObject()
 {
     m_context = lcontext;
     dialogname = "";
     editmode = false;
     prbuffer = NULL;
     nvp = NULL;
+
+    m_context->addListener(this);
 }
 
 void TV::Init(void)
@@ -79,6 +82,8 @@ void TV::Init(void)
 
 TV::~TV(void)
 {
+    m_context->removeListener(this);
+
     runMainLoop = false;
     pthread_join(event, NULL);
 
@@ -159,8 +164,6 @@ int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
     int result = osd->GetDialogResponse(dialogname);
     dialogname = "";
 
-    //tvtorecording = result;
-
     return result;
 }
 
@@ -170,16 +173,13 @@ void TV::Playback(ProgramInfo *rcinfo)
     {
         inputFilename = rcinfo->pathname;
         playbackLen = rcinfo->CalculateLength();
+        playbackinfo = rcinfo;
 
-        if (internalState == kState_None)
+        if (rcinfo->conflicting)
+            nextState = kState_WatchingRecording;
+        else
             nextState = kState_WatchingPreRecorded;
-        else if (internalState == kState_RecordingOnly)
-        {
-            //if (inputFilename == outputFilename)
-            //    nextState = kState_WatchingRecording;
-            //else
-                nextState = kState_WatchingOtherRecording;
-        }
+
         changeState = true;
     }
 }
@@ -192,8 +192,6 @@ void TV::StateToString(TVState state, QString &statestr)
         case kState_WatchingPreRecorded: statestr = "WatchingPreRecorded";
                                          break;
         case kState_WatchingRecording: statestr = "WatchingRecording"; break;
-        case kState_WatchingOtherRecording: statestr = "WatchingOtherRecording";
-                                            break;
         case kState_RecordingOnly: statestr = "RecordingOnly"; break;
         default: statestr = "Unknown"; break;
     }
@@ -204,8 +202,7 @@ bool TV::StateIsRecording(TVState state)
     bool retval = false;
 
     if (state == kState_RecordingOnly || 
-        state == kState_WatchingRecording ||
-        state == kState_WatchingOtherRecording)
+        state == kState_WatchingRecording)
     {
         retval = true;
     }
@@ -218,8 +215,7 @@ bool TV::StateIsPlaying(TVState state)
     bool retval = false;
 
     if (state == kState_WatchingPreRecorded || 
-        state == kState_WatchingRecording ||
-        state == kState_WatchingOtherRecording)
+        state == kState_WatchingRecording)
     {
         retval = true;
     }
@@ -304,35 +300,32 @@ void TV::HandleStateChange(void)
 
         watchingLiveTV = false;
     }
-/*
-    else if ((internalState == kState_WatchingRecording &&
-              nextState == kState_WatchingPreRecorded) ||
-             (internalState == kState_WatchingOtherRecording &&
-              nextState == kState_WatchingPreRecorded))
+    else if (internalState == kState_WatchingRecording &&
+             nextState == kState_WatchingPreRecorded)
     {
-        closeRecorder = true;
-
-        if (internalState == kState_WatchingRecording)
-        {
-            nvp->SetWatchingRecording(false);
-            nvp->SetLength((int)(((float)nvr->GetFramesWritten() / frameRate)));
-        }
-
         internalState = nextState;
         changed = true;
-        inoverrecord = false;
 
         watchingLiveTV = false;
     }
-*/
     else if ((internalState == kState_None && 
               nextState == kState_WatchingPreRecorded) ||
-             (internalState == kState_RecordingOnly &&
-              nextState == kState_WatchingOtherRecording) ||
-             (internalState == kState_RecordingOnly &&
+             (internalState == kState_None &&
               nextState == kState_WatchingRecording))
     {
         prbuffer = new RingBuffer(m_context, inputFilename, false);
+
+        if (nextState == kState_WatchingRecording)
+        {
+            recorder_num = m_context->GetRecorderNum(playbackinfo);
+            if (recorder_num < 0)
+            {
+                cout << "ERROR: couldn't find recorder for in-progress "
+                     << "recording\n";
+                nextState = kState_WatchingPreRecorded;
+            }
+            activerecorder_num = recorder_num;
+        }
 
         internalState = nextState;
         changed = true;
@@ -341,10 +334,8 @@ void TV::HandleStateChange(void)
     }
     else if ((internalState == kState_WatchingPreRecorded && 
               nextState == kState_None) || 
-             (internalState == kState_WatchingOtherRecording &&
-              nextState == kState_RecordingOnly) ||
              (internalState == kState_WatchingRecording &&
-              nextState == kState_RecordingOnly))
+              nextState == kState_None))
     {
         closePlayer = true;
         
@@ -548,7 +539,9 @@ void TV::TeardownPlayer(void)
 
     nvp = NULL;
     osd = NULL;
-    
+   
+    recorder_num = activerecorder_num = -1;
+ 
     if (prbuffer)
     {
         delete prbuffer;
@@ -645,7 +638,8 @@ void TV::RunTV(void)
             exitPlayer = false;
         }
 
-        if (internalState == kState_WatchingLiveTV)
+        if (internalState == kState_WatchingLiveTV || 
+            internalState == kState_WatchingRecording)
         {
             if (paused)
             {
@@ -1333,3 +1327,30 @@ void TV::ChangeColour(bool up)
     if (activenvp == nvp)
         osd->SetSettingsText(text, text.length() );
 }
+
+void TV::customEvent(QCustomEvent *e)
+{
+    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)e;
+        QString message = me->Message();
+
+        if (internalState == kState_WatchingRecording &&
+            message.left(14) == "DONE_RECORDING")
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            int cardnum = tokens[1].toInt();
+            int filelen = tokens[2].toInt();
+
+            if (cardnum == recorder_num)
+            {
+                nvp->SetWatchingRecording(false);
+                nvp->SetLength(filelen);
+                nextState = kState_WatchingPreRecorded;
+                changeState = true;
+            }
+        }
+    }
+}
+

@@ -104,7 +104,7 @@ QSocket *RemoteFile::openSocket(bool control)
 
     if (control)
     {
-        strlist = QString("ANN Playback %1").arg(localhostname);
+        strlist = QString("ANN Playback %1 %2").arg(localhostname).arg(false);
         WriteStringList(sock, strlist);
         ReadStringList(sock, strlist);
     }

@@ -108,6 +108,10 @@ void MainServer::readSocket(void)
                 else
                     HandleRecorderQuery(listline, tokens, pbs);
             }
+            else if (command == "GET_RECORDER_NUM")
+            {
+                HandleGetRecorderNum(listline, pbs);
+            }
             else if (command == "QUERY_FILETRANSFER")
             {
                 if (tokens.size() != 2)
@@ -129,11 +133,28 @@ void MainServer::readSocket(void)
 
 void MainServer::customEvent(QCustomEvent *e)
 {
-    if (e->type() == MythEvent::MythEventType)
+    QStringList broadcast;
+    bool sendstuff = false;
+
+    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
- 
-        cout << me->Message() << endl;
+
+        broadcast = me->Message();
+        sendstuff = true;
+    }
+
+    if (sendstuff)
+    {
+        vector<PlaybackSock *>::iterator iter = playbackList.begin();
+        for (; iter != playbackList.end(); iter++)
+        {
+            PlaybackSock *pbs = (*iter);
+            if (pbs->wantsEvents())
+            {
+                WriteStringList(pbs->getSocket(), broadcast);
+            }
+        }
     }
 }
 
@@ -144,8 +165,10 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
     if (commands[1] == "Playback")
     {
+        bool wantevents = commands[3];
+
         cout << "adding: " << commands[2] << " as a player\n";
-        PlaybackSock *pbs = new PlaybackSock(socket, commands[2]);
+        PlaybackSock *pbs = new PlaybackSock(socket, commands[2], wantevents);
         playbackList.push_back(pbs);
     }
     else if (commands[1] == "RingBuffer")
@@ -283,51 +306,74 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     WriteStringList(pbs->getSocket(), outputlist);
 }
 
+struct DeleteStruct
+{
+    QString filename;
+    MythContext *context;
+};
+
 static void *SpawnDelete(void *param)
 {
-    QString *filenameptr = (QString *)param;
-    QString filename = *filenameptr;
+    DeleteStruct *ds = (DeleteStruct *)param;
+    QString filename = ds->filename;
     
     unlink(filename.ascii());
     
     filename += ".png";
     unlink(filename.ascii());
     
-    filename = *filenameptr;
+    filename = ds->filename;
     filename += ".bookmark";
     unlink(filename.ascii());
     
-    filename = *filenameptr;
+    filename = ds->filename;
     filename += ".cutlist";
     unlink(filename.ascii());
 
-    delete filenameptr;
+    MythEvent me("RECORDING_LIST_CHANGE");
+    ds->context->dispatch(me);
+
+    delete ds;
 
     return NULL;
 }
 
 void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 {
-    ProgramInfo pginfo;
-    pginfo.FromStringList(slist, 1);
+    ProgramInfo *pginfo = new ProgramInfo();
+    pginfo->FromStringList(slist, 1);
+
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = iter.data();
+
+        if (elink->isBusy() && elink->MatchesRecording(pginfo))
+        {
+            elink->StopRecording();
+
+            while (elink->isBusy())
+                usleep(50);
+        }
+    }
 
     QString fileprefix = m_context->GetFilePrefix();
 
-    QString filename = pginfo.GetRecordFilename(fileprefix);
+    QString filename = pginfo->GetRecordFilename(fileprefix);
 
     QSqlQuery query;
     QString thequery;
 
-    QString startts = pginfo.startts.toString("yyyyMMddhhmm");
+    QString startts = pginfo->startts.toString("yyyyMMddhhmm");
     startts += "00";
-    QString endts = pginfo.endts.toString("yyyyMMddhhmm");
+    QString endts = pginfo->endts.toString("yyyyMMddhhmm");
     endts += "00";
 
     m_context->KickDatabase(QSqlDatabase::database());
 
     thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
                        "= \"%2\" AND starttime = %3 AND endtime = %4;")
-                       .arg(pginfo.chanid).arg(pginfo.title).arg(startts)
+                       .arg(pginfo->chanid).arg(pginfo->title).arg(startts)
                        .arg(endts);
 
     query.exec(thequery);
@@ -338,14 +384,16 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
         cerr << thequery << endl;
     }
 
-    QString *fileptr = new QString(filename);
+    DeleteStruct *ds = new DeleteStruct;
+    ds->filename = filename;
+    ds->context = m_context;
 
     pthread_t deletethread;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-    pthread_create(&deletethread, &attr, SpawnDelete, fileptr);
+    pthread_create(&deletethread, &attr, SpawnDelete, ds);
 
     QStringList outputlist = "OK";
 
@@ -440,8 +488,21 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
 void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 {
     QStringList strlist;
+    int retval = -1;
 
-    strlist << QString::number(1);
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = iter.data();
+
+        if (!elink->isBusy())
+        {
+            retval = iter.key();
+            break;
+        }
+    }
+
+    strlist << QString::number(retval);
 
     WriteStringList(pbs->getSocket(), strlist);
 }
@@ -726,6 +787,27 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     }
 
     WriteStringList(pbs->getSocket(), retlist);
+}
+
+void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
+{
+    int retval = -1;
+
+    ProgramInfo *pginfo = new ProgramInfo();
+    pginfo->FromStringList(slist, 1);
+
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = iter.data();
+
+        if (elink->isBusy() && elink->MatchesRecording(pginfo))
+            retval = iter.key(); 
+    }
+    
+    QStringList retlist = QString::number(retval);
+
+    WriteStringList(pbs->getSocket(), retlist);    
 }
 
 void MainServer::endConnection(QSocket *socket)

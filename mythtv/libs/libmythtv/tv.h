@@ -18,8 +18,7 @@ typedef enum
     kState_None = 0,
     kState_WatchingLiveTV,
     kState_WatchingPreRecorded,
-    kState_WatchingRecording,       // watching _what_ you're recording
-    kState_WatchingOtherRecording,  // watching something else
+    kState_WatchingRecording,       // watching what you're recording
     kState_RecordingOnly
 } TVState;
 

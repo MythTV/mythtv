@@ -29,7 +29,7 @@ EncoderLink::~EncoderLink()
 
 bool EncoderLink::isBusy(void)
 {
-    bool retval = true;
+    bool retval = false;
 
     if (local)
     {
@@ -56,6 +56,31 @@ TVState EncoderLink::GetState(void)
     return retval;
 }
 
+bool EncoderLink::MatchesRecording(ProgramInfo *rec)
+{
+    bool retval = false;
+
+    ProgramInfo *tvrec = NULL;
+    if (local)
+    {
+        tvrec = tv->GetRecording();
+    }
+    else
+    {
+    }
+
+    if (tvrec)
+    {
+        if (tvrec->chanid == rec->chanid && tvrec->startts == rec->startts &&
+            tvrec->endts == rec->endts)
+        {
+            retval = true;
+        }
+    }
+
+    return retval;
+}
+
 int EncoderLink::AllowRecording(ProgramInfo *rec, int timeuntil)
 {
     int retval = 0;
@@ -73,6 +98,12 @@ void EncoderLink::StartRecording(ProgramInfo *rec)
 {
     if (local)
         tv->StartRecording(rec);
+}
+
+void EncoderLink::StopRecording(void)
+{
+    if (local)
+        tv->StopRecording();
 }
 
 bool EncoderLink::IsReallyRecording(void)

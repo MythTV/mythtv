@@ -5,7 +5,7 @@ using namespace std;
 
 #include "playbacksock.h"
 
-PlaybackSock::PlaybackSock(QSocket *lsock, QString lhostname)
+PlaybackSock::PlaybackSock(QSocket *lsock, QString lhostname, bool wantevents)
 {
     char localhostname[256];
     if (gethostname(localhostname, 256))
@@ -16,6 +16,7 @@ PlaybackSock::PlaybackSock(QSocket *lsock, QString lhostname)
 
     sock = lsock;
     hostname = lhostname;
+    events = wantevents;
 
     if (hostname == localhostname)
         local = true;

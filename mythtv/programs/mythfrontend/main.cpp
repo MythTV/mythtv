@@ -84,8 +84,7 @@ void startTV(MythContext *context)
 
         while (nextstate == kState_WatchingLiveTV ||
                nextstate == kState_WatchingRecording ||
-               nextstate == kState_WatchingPreRecorded ||
-               nextstate == kState_WatchingOtherRecording)
+               nextstate == kState_WatchingPreRecorded) 
         {
             usleep(500);
             qApp->unlock();

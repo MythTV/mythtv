@@ -151,6 +151,8 @@ class TVRec
     QSocket *readthreadSock;
     bool readthreadlive;
     pthread_mutex_t readthreadLock;
+
+    int m_capturecardnum;
 };
 
 #endif

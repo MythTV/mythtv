@@ -114,7 +114,7 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     }
     m_localhostname = localhostname;
 
-    QString str = QString("ANN Playback %1").arg(m_localhostname);
+    QString str = QString("ANN Playback %1 %2").arg(m_localhostname).arg(true);
     QStringList strlist = str;
     WriteStringList(serverSock, strlist);
     ReadStringList(serverSock, strlist);
@@ -518,6 +518,16 @@ list<ProgramInfo *> *MythContext::GetConflictList(ProgramInfo *pginfo,
     return retlist;
 }
 
+int MythContext::GetRecorderNum(ProgramInfo *pginfo)
+{
+    QStringList strlist = "GET_RECORDER_NUM";
+    pginfo->ToStringList(strlist);
+
+    SendReceiveStringList(strlist);
+
+    return strlist[0].toInt();
+}
+
 int MythContext::RequestRecorder(void)
 {
     QStringList strlist = "GET_FREE_RECORDER";
@@ -745,9 +755,26 @@ void MythContext::readSocket(void)
     if (expectingReply)
         return;
 
-    if (serverSock->bytesAvailable() > 0)
-        cout << "ready read\n";
+    pthread_mutex_lock(&serverSockLock);
 
+    while (serverSock->bytesAvailable() > 0)
+    {
+        QStringList strlist;
+        ReadStringList(serverSock, strlist);
+
+        QString message = strlist[0];
+
+        if (message == "BLAH")
+        {
+        }
+        else
+        {
+            MythEvent me(message);
+            dispatch(me);
+        }
+    }
+
+    pthread_mutex_unlock(&serverSockLock);
 }
 
 void MythContext::addListener(QObject *obj)

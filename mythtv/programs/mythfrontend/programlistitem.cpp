@@ -40,6 +40,11 @@ ProgramListItem::ProgramListItem(MythContext *context, QListView *parent,
 
             setText(2, filesize);
         }
+ 
+        QDateTime curtime = QDateTime::currentDateTime();
+
+        if (curtime < pginfo->endts && curtime > pginfo->startts)
+            pginfo->conflicting = true;
     }
     else
     {

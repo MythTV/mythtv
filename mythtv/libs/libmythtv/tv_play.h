@@ -17,7 +17,7 @@ class QDateTime;
 class MythContext;
 class OSD;
 
-class TV
+class TV : public QObject
 {
  public:
     TV(MythContext *lcontext);
@@ -42,6 +42,8 @@ class TV
 
     void EmbedOutput(unsigned long wid, int x, int y, int w, int h);
     void StopEmbeddingOutput(void);
+
+    void customEvent(QCustomEvent *e);
 
  protected:
     void doLoadMenu(void);
@@ -151,6 +153,7 @@ class TV
 
     QString dialogname;
     bool editmode;
+    ProgramInfo *playbackinfo;
 };
 
 #endif

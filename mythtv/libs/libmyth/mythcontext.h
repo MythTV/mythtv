@@ -21,9 +21,9 @@ class ProgramInfo;
 class MythEvent : public QCustomEvent
 {
   public:
-    enum Type { MythEventType = (User + 1000) };
+    enum Type { MythEventMessage = (User + 1000) };
 
-    MythEvent(const QString &lmessage) : QCustomEvent(MythEventType)
+    MythEvent(const QString &lmessage) : QCustomEvent(MythEventMessage)
     {
         message = lmessage;
     }
@@ -87,6 +87,7 @@ class MythContext : public QObject
                                          bool removenonplaying);
 
     int RequestRecorder(void);
+    int GetRecorderNum(ProgramInfo *pginfo);
     bool RecorderIsRecording(int recorder);
     float GetRecorderFrameRate(int recorder);
     long long GetRecorderFramesWritten(int recorder);

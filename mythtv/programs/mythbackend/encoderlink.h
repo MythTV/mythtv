@@ -25,8 +25,10 @@ class EncoderLink
 
     bool isBusy();
     TVState GetState();
+    bool MatchesRecording(ProgramInfo *rec);
     int AllowRecording(ProgramInfo *rec, int timeuntil);
     void StartRecording(ProgramInfo *rec);
+    void StopRecording(void);
 
     bool IsReallyRecording(void);
     float GetFramerate(void);

@@ -83,17 +83,8 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     vbox->addWidget(listview, 1);
 
     ProgramListItem *item = NULL;
-  
-    vector<ProgramInfo *> *infoList = context->GetRecordedList(type == Delete);
-    if (infoList)
-    {
-        vector<ProgramInfo *>::iterator i = infoList->begin();
-        for (; i != infoList->end(); i++)
-        {
-            item = new ProgramListItem(context, listview, (*i), type == Delete);
-        }
-        delete infoList;
-    }
+ 
+    item = (ProgramListItem *)FillList(false); 
 
     if (type == Delete)
         listview->setFixedHeight((int)(225 * hmult));
@@ -191,12 +182,68 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
 
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
     timer->start(1000 / 30);
+
+    m_context->addListener(this);
 }
 
 PlaybackBox::~PlaybackBox(void)
 {
+    m_context->removeListener(this);
     killPlayer();
     delete timer;
+}
+
+QListViewItem *PlaybackBox::FillList(bool selectsomething)
+{
+    QString chanid = "";
+    QDateTime startts;
+
+    QListViewItem *curitem = listview->selectedItem();
+
+    if (curitem)
+    {
+        ProgramListItem *pgitem = (ProgramListItem *)curitem;
+        ProgramInfo *rec = pgitem->getProgramInfo();
+        startts = rec->startts;
+        chanid = rec->chanid;
+    }
+
+    listview->clear();
+
+    ProgramListItem *selected = NULL;
+    ProgramListItem *item = NULL;
+
+    vector<ProgramInfo *> *infoList;
+    infoList = m_context->GetRecordedList(type == Delete);
+    if (infoList)
+    {
+        vector<ProgramInfo *>::iterator i = infoList->begin();
+        for (; i != infoList->end(); i++)
+        {
+            item = new ProgramListItem(m_context, listview, (*i), 
+                                       type == Delete);
+            if (startts == (*i)->startts && chanid == (*i)->chanid)
+            {
+                selected = item;
+            }
+        }
+        delete infoList;
+    }
+
+    if (selected)
+    {
+        listview->setCurrentItem(selected);
+        listview->setSelected(selected, true);
+    }
+    else if (selectsomething && item)
+    {
+        listview->setCurrentItem(item);
+        listview->setSelected(item, true);
+    }
+
+    lastUpdateTime = QDateTime::currentDateTime();
+
+    return item;
 }
 
 static void *SpawnDecoder(void *param)
@@ -214,9 +261,14 @@ void PlaybackBox::killPlayer(void)
 
     if (nvp)
     {
+        QTime curtime = QTime::currentTime();
+        curtime = curtime.addSecs(2);
+
         listview->SetAllowKeypress(false);
         while (!nvp->IsPlaying())
         {
+            if (QTime::currentTime() > curtime)
+                break;
             usleep(50);
             qApp->unlock();
             qApp->processEvents();
@@ -294,9 +346,6 @@ void PlaybackBox::changed(QListViewItem *lvitem)
    
     ProgramInfo *rec = pgitem->getProgramInfo();
 
-    if (m_context->GetNumSetting("PlaybackPreview") == 1)
-        startPlayer(rec);
-
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
        
@@ -368,19 +417,20 @@ void PlaybackBox::play(QListViewItem *lvitem)
     tv->Playback(tvrec);
 
     listview->SetAllowKeypress(false);
+    qApp->unlock();
     while (tv->IsPlaying() || tv->ChangingState())
     {
-        usleep(50);
         qApp->unlock();
         qApp->processEvents();
+        usleep(50);
         qApp->lock();
     }
+    qApp->lock();
     listview->SetAllowKeypress(true);
 
     delete tv;
 
-    if (m_context->GetNumSetting("PlaybackPreview") == 1)
-        startPlayer(rec);
+    FillList(true);
 
     timer->start(1000 / 30);
 }
@@ -447,11 +497,7 @@ void PlaybackBox::remove(QListViewItem *lvitem)
             changed(NULL);
 
         delete lvitem;
-        if (type == Delete)
-            UpdateProgressBar();
     }    
-    else if (m_context->GetNumSetting("PlaybackPreview") == 1)
-        startPlayer(rec);
 
     setActiveWindow();
     raise();
@@ -470,12 +516,9 @@ void PlaybackBox::UpdateProgressBar(void)
     GetFreeSpaceStats(total, used);
 
     QString usestr;
-    char text[128];
-    sprintf(text, "Storage: %d,%03d MB used out of %d,%03d MB total", 
-            used / 1000, used % 1000, 
-            total / 1000, total % 1000);
-
-    usestr = text;
+    usestr.sprintf("Storage: %d,%03d MB used out of %d,%03d MB total", 
+                   used / 1000, used % 1000, 
+                   total / 1000, total % 1000);
 
     freespace->setText(usestr);
     progressbar->setTotalSteps(total);
@@ -484,6 +527,22 @@ void PlaybackBox::UpdateProgressBar(void)
 
 void PlaybackBox::timeout(void)
 {
+    if (!nvp && pixlabel)
+    {
+        if (m_context->GetNumSetting("PlaybackPreview") == 1)
+        {
+            QListViewItem *curitem = listview->selectedItem();
+
+            if (curitem)
+            {
+                ProgramListItem *pgitem = (ProgramListItem *)curitem;
+                ProgramInfo *rec = pgitem->getProgramInfo();
+
+                startPlayer(rec);
+            }
+        }
+    }
+
     if (!nvp || !pixlabel)
         return;
 
@@ -512,4 +571,21 @@ void PlaybackBox::timeout(void)
     bitBlt(pixlabel, 0, 
            (int)((pixlabel->contentsRect().height() - 120 * hmult) / 2), 
            pmap);
+}
+
+void PlaybackBox::customEvent(QCustomEvent *e)
+{
+    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)e;
+        QString message = me->Message();
+ 
+        if (message == "RECORDING_LIST_CHANGE")
+        {
+            if (QDateTime::currentDateTime() > lastUpdateTime.addSecs(1))
+                FillList(true);      
+            if (type == Delete)
+                UpdateProgressBar();
+        }
+    }
 }
