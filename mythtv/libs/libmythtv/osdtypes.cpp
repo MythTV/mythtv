@@ -509,7 +509,7 @@ void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         tmp_msg.replace(QRegExp("%BR%"), "\n");
         tmp_msg.replace(QRegExp("\n")," \n ");
 
-        QStringList wordlist = QStringList::split(" ", tmp_msg.ascii());
+        QStringList wordlist = QStringList::split(" ", tmp_msg);
         int length = 0;
         int lines = 0;
 

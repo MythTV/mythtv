@@ -1350,6 +1350,7 @@ public:
         addSelection(QString::fromUtf8("Dansk"), "DK");       // Danish
         addSelection(QString::fromUtf8("Svenska"), "SV");     // Swedish
         addSelection(QString::fromUtf8("Português"), "PT");   // Portuguese
+        //addSelection(QString::fromUtf8("日本語"), "JA");    // Japanese
         addSelection(QString::fromUtf8("Nihongo"), "JA");     // Japanese
         setHelpText(QObject::tr("Your preferred language.") );
     };

@@ -585,6 +585,7 @@
         <value lang="DK">Planlagte optagelser:</value>
         <value lang="PT">Gravações Marcadas:</value>
         <value lang="SV">Schemalagda inspelningar:</value>
+        <value lang="JA">録画予約:</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>cr-background.png</filename>
@@ -594,6 +595,7 @@
         <area>360,330,140,40</area>
         <font>message</font>
         <value>Highlighting:</value>
+        <value lang="JA">強調:</value>
       </textarea>
       <textarea name="conyellow" draworder="0" align="right">
         <area>505,330,130,40</area>
@@ -607,6 +609,7 @@
         <value lang="DK">Konflikter</value>
         <value lang="PT">Conflito</value>
         <value lang="SV">Konflikter</value>
+        <value lang="JA">衝突</value>
       </textarea>
       <textarea name="disgray" draworder="0" align="right">
         <area>650,330,130,40</area>
@@ -620,11 +623,13 @@
         <value lang="DK">Deaktiverede</value>
         <value lang="PT">Desactivadas</value>
         <value lang="SV">Deaktiverade</value>
+        <value lang="JA">無効</value>
       </textarea>
       <textarea name="showinstr" align="center" draworder="0">
         <area>0,570,800,30</area>
         <font>message</font>
         <value>Show  (1) All  (2) Important</value>
+        <value lang="JA">表示  (1) 全て  (2) 重要な物のみ</value>
       </textarea>
     </container>
  
@@ -642,6 +647,7 @@
         <area>0,0,105,30</area>
         <font>message</font>
         <value>Showing:</value>
+        <value lang="JA">表示:</value>
       </textarea>
       <textarea name="showlevel" draworder="4">
         <area>110,0,150,30</area>
@@ -697,6 +703,7 @@
         <value lang="DK">Sendt:</value>
         <value lang="PT">Emitido em:</value>
         <value lang="SV">Sänt:</value>
+        <value lang="JA">日付:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,600,30</area>
@@ -714,6 +721,7 @@
         <value lang="DK">Kanal:</value>
         <value lang="PT">Canal:</value>
         <value lang="SV">Kanal:</value>
+        <value lang="JA">チャンネル:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -731,6 +739,7 @@
         <value lang="DK">Beskrivelse:</value>
         <value lang="PT">Descrição:</value>
         <value lang="SV">Beskrivning:</value>
+        <value lang="JA">内容:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,600,80</area>
@@ -753,6 +762,7 @@
          <value lang="DK">Du har ikke optaget nogen udsendelser</value>
          <value lang="PT">Não tem programada nenhuma gravação</value>
          <value lang="SV">Du har inte schemalagt något program för inspelning</value>
+         <value lang="JA">予約で録画された番組がありません</value>
          <multiline>yes</multiline> 
       </textarea>
     </container>
@@ -770,6 +780,7 @@
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
          <value lang="PT">Para programar uma gravação, saia deste menu e</value>
          <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
+         <value lang="JA">録画予約するには、この画面を終了して</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,70,760,30</area>
@@ -783,6 +794,7 @@
          <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
          <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
          <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
+         <value lang="JA">'番組ガイド'か'番組検索'を選択してください</value>
       </textarea>
     </container>
 
@@ -841,6 +853,7 @@
         <area>20,10,800,40</area>
         <font>info</font>
         <value>Channel Recording Priorities</value>
+        <value lang="JA">チャンネル録画優先順位</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>rk-background.png</filename>
@@ -856,6 +869,7 @@
         <value lang="SV">(1) Sortera efter titel  (2) Sortera efter rank</value>
         <value lang="ES">(1) Ordenar por Canal  (2) Ordenar por Preferencia</value>
         <value lang="CA">(1) Ordenar per Canal  (2) Ordenar per Preferència</value>
+        <value lang="JA">(1) チャンネルで並び替え  (2) 優先順位で並び替え</value>
       </textarea>
     </container>
 
@@ -903,6 +917,7 @@
         <value lang="SV">Rank:</value>
         <value lang="ES">Ranking:</value>
         <value lang="CA">Rànquing:</value>
+        <value lang="JA">優先順位:</value>
       </textarea>
       <textarea name="recpriority" draworder="6">
         <area>200,90,400,30</area>
@@ -924,6 +939,7 @@
          <value lang="DK">Du har ikke optaget nogen udsendelser</value>
          <value lang="PT">Não tem programada nenhuma gravação</value>
          <value lang="SV">Du har inte schemalagt några program för inspelning</value>
+         <value lang="JA">予約で録画された番組がありません</value>
          <multiline>yes</multiline>
       </textarea>
     </container>
@@ -941,6 +957,7 @@
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
          <value lang="PT">Para programar uma gravação, saia deste menu e</value>
          <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
+         <value lang="JA">録画予約するには、この画面を終了して</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,70,760,30</area>
@@ -954,6 +971,7 @@
          <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
          <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
          <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
+         <value lang="JA">'番組ガイド'か'番組検索'を選択してください</value>
       </textarea>
     </container>
 
@@ -1036,16 +1054,19 @@
         <area>20,10,800,40</area>
         <font>info</font>
         <value>Program Recording Priorities</value>
+        <value lang="JA">番組録画優先順位</value>
       </textarea>
       <textarea name="recprioritylabel" draworder="0">
         <area>625,20,800,40</area>
         <font>tinyinfo</font>
         <value>Priority</value>
+        <value lang="JA">優先順位</value>
       </textarea>
       <textarea name="finalrecprioritylabel" draworder="0">
         <area>690,20,800,40</area>
         <font>tinyinfo</font>
         <value>Final Priority</value>
+        <value lang="JA">最終優先順位</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>rk-background.png</filename>
@@ -1061,6 +1082,7 @@
         <value lang="SV">(1) Sortera efter titel  (2) Sortera efter rank</value>
         <value lang="ES">(1) Ordenar por Título  (2) Ordenar por Preferencia</value>
         <value lang="CA">(1) Ordenar per Títol  (2) Ordenar per Preferència</value>
+        <value lang="JA">(1) タイトルで並び替え  (2) 優先順位で並び替え</value>
       </textarea>
     </container>
 
@@ -1108,6 +1130,7 @@
         <value lang="SV">Inspelningstyp:</value>
         <value lang="CA">Tipus de gravació:</value>
         <value lang="ES">Tipo de grabación:</value>
+        <value lang="JA">録画タイプ:</value>
       </textarea>
       <textarea name="type" draworder="6">
         <area>200,70,430,30</area>
@@ -1141,6 +1164,7 @@
         <value lang="SV">Kanal:</value>
         <value lang="ES">Canal:</value>
         <value lang="CA">Canal:</value>
+        <value lang="JA">チャンネル:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>200,100,400,30</area>
@@ -1210,6 +1234,7 @@
          <value lang="DK">Du har ikke optaget nogen udsendelser</value>
          <value lang="PT">Não tem programada nenhuma gravação</value>
          <value lang="SV">Du har inte schemalagt några inspelningar</value>
+         <value lang="JA">予約で録画された番組がありません</value>
          <multiline>yes</multiline>
       </textarea>
     </container>
@@ -1227,6 +1252,7 @@
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
          <value lang="PT">Para programar uma gravação, saia deste menu e</value>
          <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
+         <value lang="JA">録画予約するには、この画面を終了して</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,70,760,30</area>
@@ -1240,6 +1266,7 @@
          <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
          <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
          <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
+         <value lang="JA">'番組ガイド'か'番組検索'を選択してください</value>
       </textarea>
     </container>
 
@@ -1325,6 +1352,7 @@
         <value lang="DK">Vælg en optagelse du vil slette permanent:</value>
         <value lang="PT">Selecione uma gravação para apagar:</value>
         <value lang="SV">Välj en inspelning du vill radera permanent:</value>
+        <value lang="JA">完全に削除する録画を選択してください:</value>
         <context>1</context>
       </textarea>
       <textarea name="messageplay" draworder="0">
@@ -1339,6 +1367,7 @@
         <value lang="DK">Vælg den optagelse du ønsker at se:</value>
         <value lang="PT">Selecione uma gravação para ver:</value>
         <value lang="SV">Välj den inspelning du önskar se:</value>
+        <value lang="JA">再生する録画を選択してください:</value>
         <context>0</context>
       </textarea>
     </container>
@@ -1414,6 +1443,7 @@
         <value lang="DK">Sendt:</value>
         <value lang="PT">Data de Emissão:</value>
         <value lang="SV">Sänt:</value>
+        <value lang="JA">日付:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -1432,6 +1462,7 @@
         <value lang="DK">Kanal:</value>
         <value lang="PT">Canal:</value>
         <value lang="SV">Kanal:</value>
+        <value lang="JA">チャンネル:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -1449,6 +1480,7 @@
         <value lang="DK">Beskrivelse:</value>
         <value lang="PT">Descrição:</value>
         <value lang="SV">Beskrivning:</value>
+        <value lang="JA">内容:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,600,120</area>
@@ -1503,6 +1535,7 @@
         <value lang="DK">Sendt:</value>
         <value lang="PT">Data de Emissão:</value>
         <value lang="SV">Sänt:</value>
+        <value lang="JA">日付:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -1521,6 +1554,7 @@
         <value lang="DK">Kanal:</value>
         <value lang="PT">Canal:</value>
         <value lang="SV">Kanal:</value>
+        <value lang="JA">チャンネル:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -1538,6 +1572,7 @@
         <value lang="DK">Beskrivelse:</value>
         <value lang="PT">Descrição:</value>
         <value lang="SV">Beskrivning:</value>
+        <value lang="JA">内容:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,600,90</area>
@@ -1583,6 +1618,7 @@
          <value lang="DK">Beklager, ingen optagelser fundet</value>
          <value lang="PT">Não há nenhuma gravação disponível</value>
          <value lang="SV">Inga inspelningar hittades</value>
+         <value lang="JA">利用可能な録画がありません</value>
       </textarea>
     </container>
 
@@ -1599,6 +1635,7 @@
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
          <value lang="PT">Para programar uma gravação, saia deste menu e</value>
          <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
+         <value lang="JA">録画予約は、この画面を終了して</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,110,580,30</area>
@@ -1612,6 +1649,7 @@
          <value lang="DK">vælg 'Optag en udsendelse'</value>
          <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
          <value lang="SV">välj 'Schemalägg inspelningar' från huvudmenyn</value>
+         <value lang="JA">'録画予約'をメインメニューから選択してください</value>
       </textarea>
     </container>
 
@@ -1693,6 +1731,7 @@
         <value lang="DK">(4) Program Guide     **(6) Program Finder **</value>
         <value lang="PT">(4) Guia de Programação  **(6) Procurar Programas **</value>
         <value lang="SV">(4) Programguide      **(6) Sök program **</value>
+        <value lang="JA">(4) 番組ガイド        **(6) 番組検索    **</value>
         <context>1</context>
       </textarea>
     </container>
@@ -1777,6 +1816,7 @@
         <value lang="DK">Vælg et bogstav...</value>
         <value lang="PT">Selecione uma letra...</value>
         <value lang="SV">Välj en bokstav...</value>
+        <value lang="JA">文字選択してください...</value>
       </textarea>
       <textarea name="pickinfo" draworder="6">
         <area>10,75,500,60</area>
@@ -1790,6 +1830,7 @@
         <value lang="DK">Vælg det bogstav udsendelsen starter med og tryk ENTER eller pil til højre</value>
         <value lang="PT">Escolha a letra inicial do programa, e depois ENTER ou o cursor para a direita</value>
         <value lang="SV">Välj den bokstav som programnamnet börjar med. Tryck sedan ENTER eller högerpil</value>
+        <value lang="JA">文字を選んでENTERキーか右矢印キーを押してください｡</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -1808,6 +1849,7 @@
         <value lang="DK">Vælg en udsendelse...</value>
         <value lang="PT">Selecione um Programa...</value>
         <value lang="SV">Välj ett program...</value>
+        <value lang="JA">番組を選択してください...</value>
       </textarea>
       <textarea name="pickprog" draworder="6">
         <area>10,75,500,120</area>
@@ -1821,6 +1863,7 @@
         <value lang="DK">Vælg titlen på det den udsendelse du ønsker at finde og tryk ENTER eller Pil til venstre. Med 'Info' kan du vælge optagelsetype.</value>
         <value lang="PT">Selecione o título do programa que deseja procurar. Para voltar, use o cursor para a esquerda. Para opções de gravação, use 'info'.</value>
         <value lang="SV">Välj titeln på det program du vill hitta. När du är klar, återgå med vänsterpil. Genom att trycka på infoknappen kan du göra inspelningsinställningar.</value>
+        <value lang="JA">見つけたいタイトルを選択したら左矢印キーで戻ってください｡'情報'をクリックすると録画オプションを設定することが出来ます｡.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -1839,6 +1882,7 @@
         <value lang="DK">Ingen udsendelser</value>
         <value lang="PT">Sem Programas</value>
         <value lang="SV">Inga program</value>
+        <value lang="JA">番組がありません</value>
       </textarea>
       <textarea name="research" draworder="6">
         <area>10,75,500,120</area>
@@ -1852,6 +1896,7 @@
         <value lang="DK">Ingen udsendelser under denne søgning. Prøv venligst en anden.</value>
         <value lang="PT">Não existem programas disponíveis para esta procura.</value>
         <value lang="SV">Inga program funna. Välj något annat att söka på.</value>
+        <value lang="JA">検索に利用できる番組がありません｡他の検索を選んでください｡.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -1930,6 +1975,7 @@
         <value lang="SV">Programlistning</value>
         <value lang="CA">Llista de programes</value>
         <value lang="ES">Lista de Programas</value>
+        <value lang="JA">情報</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>rk-background.png</filename>
@@ -2000,6 +2046,7 @@
          <value lang="SV">Inga visningar funna av detta program. </value>
          <value lang="ES">No se encuentra este programa en la lista.</value>
          <value lang="CA">Aquest programa no el trovo llistat.</value>
+         <value lang="JA">番組を見つけられませんでした.</value>
          <multiline>yes</multiline>
       </textarea>
     </container>

@@ -430,16 +430,20 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter Phrase</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation type="unfinished">Ok</translation>
     </message>
     <message>
         <source>Movie</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Search Phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Löschen</translation>
     </message>
 </context>
 <context>
@@ -1906,11 +1910,11 @@
     </message>
     <message>
         <source>Recording on cardid: </source>
-        <translation>Benutze Tuner (cardid):</translation>
+        <translation type="obsolete">Benutze Tuner (cardid):</translation>
     </message>
     <message>
         <source>Not Recording: </source>
-        <translation>Keine Aufnahme:</translation>
+        <translation type="obsolete">Keine Aufnahme:</translation>
     </message>
     <message>
         <source>Manual Override</source>
@@ -1918,11 +1922,11 @@
     </message>
     <message>
         <source>Previously Recorded</source>
-        <translation>Schon aufgenommen</translation>
+        <translation type="obsolete">Schon aufgenommen</translation>
     </message>
     <message>
         <source>Currently Recording</source>
-        <translation>Momentan aufnehmen</translation>
+        <translation type="obsolete">Momentan aufnehmen</translation>
     </message>
     <message>
         <source>Other Showing</source>
@@ -1930,15 +1934,7 @@
     </message>
     <message>
         <source>Too Many Recordings</source>
-        <translation>Zu viele Aufnahmen</translation>
-    </message>
-    <message>
-        <source>Don&apos;t Record List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lower Rec Priority</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Zu viele Aufnahmen</translation>
     </message>
     <message>
         <source>Manual Conflict</source>
@@ -1954,7 +1950,7 @@
     </message>
     <message>
         <source>Reason Unknown</source>
-        <translation>Ursache unbekannt</translation>
+        <translation type="obsolete">Ursache unbekannt</translation>
     </message>
     <message>
         <source>Repeat</source>
@@ -2006,7 +2002,7 @@
     </message>
     <message>
         <source>Won&apos;t Record</source>
-        <translation>Keine Aufnahme</translation>
+        <translation type="obsolete">Keine Aufnahme</translation>
     </message>
     <message>
         <source>Don&apos;t record it</source>
@@ -2266,6 +2262,138 @@
     </message>
     <message>
         <source>Hardware Decoding Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording</source>
+        <translation type="unfinished">Aufnehmen</translation>
+    </message>
+    <message>
+        <source>Previous Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Disk Space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner Busy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing conflicts with one or more other scheduled programs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing will be recorded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing is being recorded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was recorded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was recorded but was stopped before recording was completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was recorded but was deleted before recording was completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The status of this showing is unknown.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing will not be recorded because </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was not recorded because </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>it was manually set to not record.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode was previously recorded according to the duplicate policy chosen for this title.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode was previously recorded and is still available in the list of recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode will be recorded at another time instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>too many recordings of this program have already been recorded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>it was manually cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>another program with a higher recording priority will be recorded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>another program was manually chosen to be recorded instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>another program was automatically chosen to be recorded instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>it is covered by another scheduled recording for the same program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>there wasn&apos;t enough disk space available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the tuner card was already being used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>you should never see this.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2641,6 +2769,10 @@
     </message>
     <message>
         <source>Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump To</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

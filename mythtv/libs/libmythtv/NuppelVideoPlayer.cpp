@@ -3340,7 +3340,7 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
             }
         }
 
-        desc = text;
+        desc = QString::fromUtf8(text);
         return (int)(1000 - ret);
     }
 

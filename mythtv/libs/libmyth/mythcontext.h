@@ -179,7 +179,8 @@ class MythContext : public QObject
 
     void ClearOldImageCache(void);
     void CacheThemeImages(void);
-    void CacheThemeImagesDirectory(const QString &dirname);
+    void CacheThemeImagesDirectory(const QString &dirname, 
+                                   const QString &subdirname = "");
     void RemoveCacheDir(const QString &dirname);
 
     MythContextPrivate *d;

@@ -575,13 +575,15 @@ void ThemedMenuPrivate::parseButtonDefinition(const QString &dir,
             {
                 setting = dir + getFirstText(info);
                 buttonnormal = gContext->LoadScaleImage(setting);
-                hasnormal = true;
+                if (buttonnormal)
+                    hasnormal = true;
             }
             else if (info.tagName() == "active")
             {
                 setting = dir + getFirstText(info);
                 buttonactive = gContext->LoadScaleImage(setting);
-                hasactive = true;
+                if (buttonactive)
+                    hasactive = true;
             }
             else if (info.tagName() == "text")
             {
@@ -657,7 +659,8 @@ void ThemedMenuPrivate::parseLogo(const QString &dir, QDomElement &element)
             {
                 QString logopath = dir + getFirstText(info);
                 logo = gContext->LoadScalePixmap(logopath); 
-                hasimage = true;
+                if (logo)
+                    hasimage = true;
             }
             else if (info.tagName() == "position")
             {
@@ -705,6 +708,9 @@ void ThemedMenuPrivate::parseTitle(const QString &dir, QDomElement &element)
             {
                 QString titlepath = dir + getFirstText(info);
                 QPixmap *tmppix = gContext->LoadScalePixmap(titlepath);
+
+                if (!tmppix)
+                    continue;
 
                 QString name = info.attribute("mode", "");
                 if (name != "")
@@ -770,7 +776,8 @@ void ThemedMenuPrivate::parseArrow(const QString &dir, QDomElement &element,
             {
                 QString arrowpath = dir + getFirstText(info);
                 pix = gContext->LoadScalePixmap(arrowpath);
-                hasimage = true;
+                if (pix)
+                    hasimage = true;
             }
             else if (info.tagName() == "position")
             {
@@ -840,7 +847,8 @@ void ThemedMenuPrivate::parseButton(const QString &dir, QDomElement &element)
             {
                 QString imagepath = dir + getFirstText(info); 
                 image = gContext->LoadScaleImage(imagepath);
-                hasicon = true;
+                if (image)
+                    hasicon = true;
             }
             else if (info.tagName() == "activeimage")
             {
@@ -1617,7 +1625,11 @@ void ThemedMenuPrivate::paintButton(unsigned int button, QPainter *p,
     buttonTextRect.moveBy(newRect.x(), newRect.y());
 
     QString message = tbutton->text;
-    QRect testBound = tmp.boundingRect(buttonTextRect, attributes.textflags, 
+
+    QRect testBoundRect = buttonTextRect;
+    testBoundRect.addCoords(0, 0, 0, 40);
+    tmp.setFont(attributes.font);
+    QRect testBound = tmp.boundingRect(testBoundRect, attributes.textflags, 
                                        message);
 
     if (testBound.height() > buttonTextRect.height() && tbutton->altText != "")

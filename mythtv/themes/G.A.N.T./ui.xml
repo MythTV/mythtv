@@ -1,0 +1,2009 @@
+<mythuitheme>
+
+  <window name="programguide">
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>25</size>
+      <size:small>14</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>13</size:small>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="descinfo" face="Arial">
+      <shadow>2,2</shadow>
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>9</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="chaninfo" face="Arial">
+      <shadow>1,1</shadow>
+      <color>#ffffff</color>
+      <size>15</size>
+      <size:small>12</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="recstatus" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>12</size:small>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="small" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:small>10</size:small>
+    </font>
+
+    <container name="background">
+      <image name="backup" draworder="0" fleximage="no">
+        <context>0</context>
+        <position>0,0</position>
+        <filename>gg-background.png</filename>
+      </image>
+    </container>
+
+    <container name="date_info">
+      <area>20,176,115,25</area>
+      <textarea name="date" draworder="4" align="center">
+         <font>info</font>
+         <area>0,0,115,25</area>
+         <cutdown>no</cutdown>
+      </textarea>
+    </container>
+
+    <container name="chanbar">
+      <area>20,206,123,386</area>
+      <bar name="chans" draworder="4">
+        <area>0,0,123,386</area>
+        <textoffset>38,0</textoffset>
+        <iconoffset>3,10</iconoffset>
+        <iconsize>30,30</iconsize>
+        <orientation>vertical</orientation>
+        <align>allcenter</align>
+        <font>chaninfo</font>
+        <imagefile>gg-chans.png</imagefile>
+      </bar>
+    </container>
+
+    <container name="timebar">
+      <area>142,175,640,31</area>
+      <bar name="times" draworder="4">
+        <area>0,0,640,31</area>
+        <align>allcenter</align>
+        <imagefile>gg-times.png</imagefile>
+        <font>descinfo</font>
+      </bar>
+    </container>
+
+    <container name="guide">
+      <area>143,206,645,386</area>
+      <guidegrid name="guidegrid" draworder="4">
+        <area>0,0,645,386</area>
+        <solidcolor>#003256</solidcolor>
+        <selector type="box" color="#ffff33"></selector>
+        <recordingcolor>#00aa00</recordingcolor>
+        <conflictingcolor>#ff6600</conflictingcolor>
+        <cutdown>no</cutdown>
+        <multiline>yes</multiline>
+        <textoffset>9,6</textoffset>
+        <catcolor category="Educational" color="CornflowerBlue"></catcolor>
+        <catcolor category="Adult" color="thistle3"></catcolor>
+        <catcolor category="Musical" color="turquoise3"></catcolor>
+        <catcolor category="News" color="DarkOrange3"></catcolor>
+        <catcolor category="Reality" color="sienna"></catcolor>
+        <catcolor category="Cooking" color="tan3"></catcolor>
+        <catcolor category="Documentary" color="goldenrod"></catcolor>
+        <catcolor category="Doc" color="goldenrod"></catcolor>
+        <catcolor category="Sports" color="DarkCyan"></catcolor>
+        <catcolor category="Mystery" color="SlateGrey"></catcolor>
+        <catcolor category="Crime/Mystery" color="SlateGrey"></catcolor>
+        <catcolor category="Music" color="DarkRed"></catcolor>
+        <catcolor category="Movies" color="Blue"></catcolor>
+        <catcolor category="Drama" color="rosybrown3"></catcolor>
+        <catcolor category="Classic" color="grey62"></catcolor>
+        <catcolor category="Crime" color="MediumVioletRed"></catcolor>
+        <catcolor category="Talk" color="MediumTurquoise"></catcolor>
+        <catcolor category="Comedy" color="DarkOrchid"></catcolor>
+        <catcolor category="Animals" color="ForestGreen"></catcolor>
+        <catcolor category="Nature" color="#33ff99"></catcolor>
+        <catcolor category="Science/Nature" color="#33ff99"></catcolor>
+        <catcolor category="SciFi" color="DarkBlue"></catcolor>
+        <catcolor category="Sci-fi/Fantasy" color="DarkBlue"></catcolor>
+        <catcolor category="Horror" color="firebrick3"></catcolor>
+        <catcolor category="Action" color="maroon"></catcolor>
+        <catcolor category="Action/Adv" color="maroon"></catcolor>
+        <catcolor category="Food/Travel" color="#aa00aa"></catcolor>
+        <catcolor category="Home/How-to" color="Red"></catcolor>
+        <catcolor category="Game" color="orchid"></catcolor>
+        <catcolor category="Children's" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="CINE" color="Blue"></catcolor>
+        <catcolor category="SERIE" color="DarkOrchid"></catcolor>
+        <catcolor category="DOCUMENTAL" color="goldenrod"></catcolor>
+        <catcolor category="INFORMATIVO" color="DarkOrange3"></catcolor>
+        <catcolor category="DEPORTES" color="DarkCyan"></catcolor>
+        <catcolor category="FUTBOL" color="DarkCyan"></catcolor>
+        <catcolor category="MUSICAL" color="turquoise3"></catcolor>
+        <catcolor category="INFANTIL" color="MediumSlateBlue"></catcolor>
+        <catcolor category="MAGAZINE" color="MediumTurquoise"></catcolor>
+        <catcolor category="TIEMPO" color="#33ff99"></catcolor>
+        <catcolor category="SHOW" color="sienna"></catcolor>
+
+        <!-- Categories introduced by tv_grab_au -->
+        <catcolor category="Childrens" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Movie" color="Blue"></catcolor>
+        <catcolor category="Live" color="DarkOrange3"></catcolor>
+
+        <!-- categories used by the NextView EPG service -->
+        <!-- (available in some european countries) -->
+        <catcolor category="news" color="DarkOrange3"></catcolor>
+        <catcolor category="music/ballet/dance" color="DarkRed"></catcolor>
+        <catcolor category="sports" color="DarkCyan"></catcolor>
+        <catcolor category="series" color="DarkOrchid"></catcolor>
+        <catcolor category="social/political/economics" color="DarkOrange3"></catcolor>
+        <catcolor category="show/game show" color="MediumTurquoise"></catcolor>
+        <catcolor category="science" color="#33ff99"></catcolor>
+        <catcolor category="technology" color="#33ff99"></catcolor>
+        <catcolor category="kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="leisure hobbies" color="Red"></catcolor>
+        <catcolor category="tourism/travel" color="#aa00aa"></catcolor>
+        <catcolor category="arts/culture" color="goldenrod"></catcolor>
+        <catcolor category="movie" color="Blue"></catcolor>
+
+       <!-- Categories introduced by tv_grab_uk_rt -->
+        <catcolor category="Animation" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Business" color="DarkOrange3"></catcolor>
+        <catcolor category="Children's Show" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Consumer" color="goldenrod"></catcolor>
+        <catcolor category="Cookery" color="#aa00aa"></catcolor>
+        <catcolor category="Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Drama Series" color="rosybrown3"></catcolor>
+        <catcolor category="Entertainment" color="DarkOrchid"></catcolor>
+        <catcolor category="Environment" color="#33ff99"></catcolor>
+        <catcolor category="Film" color="Blue"></catcolor>
+        <catcolor category="Game Show" color="orchid"></catcolor>
+        <catcolor category="Gardening" color="Red"></catcolor>
+        <catcolor category="Interests" color="Red"></catcolor>
+        <catcolor category="Music &amp; Arts" color="goldenrod"></catcolor>
+        <catcolor category="News &amp; Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Religious" color="goldenrod"></catcolor>
+        <catcolor category="Sitcoms" color="DarkOrchid"></catcolor>
+        <catcolor category="Soaps" color="DarkOrchid"></catcolor>
+        <catcolor category="Sport" color="DarkCyan"></catcolor>
+        <catcolor category="Talk Show" color="MediumTurquoise"></catcolor>
+        <catcolor category="Transport" color="#33ff99"></catcolor>
+        <catcolor category="Travel" color="#aa00aa"></catcolor>
+
+        <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
+        <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
+        <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
+        <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
+        <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
+        <arrow direction="left" image="gg-arrow-left.png"></arrow>
+        <arrow direction="right" image="gg-arrow-right.png"></arrow>
+        <font>descinfo</font>
+      </guidegrid>
+    </container>
+
+    <container name="current_info">
+      <area>660,20,120,60</area>
+      <textarea name="time" draworder="4" align="allcenter">
+        <area>0,0,120,32</area>
+        <cutdown>no</cutdown>
+        <font>info</font>
+      </textarea>
+    </container>
+
+    <container name="program_info">
+      <area>20,12,760,151</area>
+      <textarea name="misicon" draworder="5" align="allcenter">
+        <cutdown>no</cutdown>
+        <area>5,2,56,60</area>
+        <font>small</font>
+      </textarea>
+      <image name="icon" draworder="6">
+        <position>3,2</position>
+        <staticsize>60,60</staticsize>
+      </image>
+      <textarea name="title" draworder="4" align="vcenter">
+        <area>69,0,590,60</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>4,62,376,30</area>
+        <font>info</font>
+        <value>%SUBTITLE|"|"%</value>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>4,96,690,60</area>
+        <font>descinfo</font>
+        <multiline>yes</multiline>
+      </textarea>
+      <textarea name="recordingstatus" draworder="6" align="center">
+        <area>380,62,380,30</area>
+        <font>recstatus</font>
+      </textarea>
+    </container>
+
+  </window>  
+
+   <window name="programguide-video">
+    
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>25</size>
+      <size:small>12</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="descinfo" face="Arial">
+      <shadow>2,2</shadow>
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>8</size:small>
+      <bold>yes</bold>
+    </font>
+ 
+    <font name="chaninfo" face="Arial">
+      <shadow>1,1</shadow>
+      <color>#ffffff</color>
+      <size>15</size>
+      <size:small>10</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="recstatus" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>12</size:small>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="small" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:small>8</size:small>
+    </font>
+
+    <container name="background">
+      <image name="backup" draworder="0" fleximage="no">
+        <context>0</context>
+        <position>0,0</position>
+        <filename>gg-vid-background.png</filename>
+      </image>
+    </container>
+
+    <container name="current_video">
+      <area>540,30,240,180</area>
+    </container>
+
+    <container name="date_info">
+      <area>20,296,115,25</area>
+      <textarea name="date" draworder="4" align="center">
+         <font>info</font>
+         <area>0,0,115,25</area>
+         <cutdown>no</cutdown>
+      </textarea>
+    </container>
+   
+    <container name="chanbar">
+      <area>20,325,123,266</area>
+      <bar name="chans" draworder="4">
+        <area>0,0,123,266</area>
+        <textoffset>38,0</textoffset>
+        <iconoffset>3,10</iconoffset>
+        <iconsize>30,30</iconsize>
+        <orientation>vertical</orientation>
+        <align>allcenter</align>
+        <font>chaninfo</font>
+        <imagefile>gg-chans.png</imagefile>
+      </bar>
+    </container> 
+ 
+    <container name="timebar">
+      <area>142,295,640,31</area>
+      <bar name="times" draworder="4">
+        <area>0,0,640,31</area>
+        <align>allcenter</align>
+        <imagefile>gg-times.png</imagefile>
+        <font>descinfo</font>
+      </bar>
+    </container>
+ 
+    <container name="guide">
+      <area>143,326,645,266</area>
+      <guidegrid name="guidegrid" draworder="4">
+        <area>0,0,645,266</area>
+        <solidcolor>#003256</solidcolor>
+        <selector type="box" color="#ffff33"></selector>
+        <recordingcolor>#00aa00</recordingcolor>
+        <conflictingcolor>#ff6600</conflictingcolor>
+        <textoffset>9,6</textoffset>
+        <catcolor category="Educational" color="CornflowerBlue"></catcolor>
+        <catcolor category="Adult" color="thistle3"></catcolor>
+        <catcolor category="Musical" color="turquoise3"></catcolor>
+        <catcolor category="News" color="DarkOrange3"></catcolor>
+        <catcolor category="Reality" color="sienna"></catcolor>
+        <catcolor category="Cooking" color="tan3"></catcolor>
+        <catcolor category="Documentary" color="goldenrod"></catcolor>
+        <catcolor category="Doc" color="goldenrod"></catcolor>
+        <catcolor category="Sports" color="DarkCyan"></catcolor>
+        <catcolor category="Mystery" color="SlateGrey"></catcolor>
+        <catcolor category="Crime/Mystery" color="SlateGrey"></catcolor>
+        <catcolor category="Music" color="DarkRed"></catcolor>
+        <catcolor category="Movies" color="Blue"></catcolor>
+        <catcolor category="Drama" color="rosybrown3"></catcolor>
+        <catcolor category="Classic" color="grey62"></catcolor>
+        <catcolor category="Crime" color="MediumVioletRed"></catcolor>
+        <catcolor category="Talk" color="MediumTurquoise"></catcolor>
+        <catcolor category="Comedy" color="DarkOrchid"></catcolor>
+        <catcolor category="Animals" color="ForestGreen"></catcolor>
+        <catcolor category="Nature" color="#33ff99"></catcolor>
+        <catcolor category="Science/Nature" color="#33ff99"></catcolor>
+        <catcolor category="SciFi" color="DarkBlue"></catcolor>
+        <catcolor category="Sci-fi/Fantasy" color="DarkBlue"></catcolor>
+        <catcolor category="Horror" color="firebrick3"></catcolor>
+        <catcolor category="Action" color="maroon"></catcolor>
+        <catcolor category="Action/Adv" color="maroon"></catcolor>
+        <catcolor category="Food/Travel" color="#aa00aa"></catcolor>
+        <catcolor category="Home/How-to" color="Red"></catcolor>
+        <catcolor category="Game" color="orchid"></catcolor>
+        <catcolor category="Children's" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="CINE" color="Blue"></catcolor>
+        <catcolor category="SERIE" color="DarkOrchid"></catcolor>
+        <catcolor category="DOCUMENTAL" color="goldenrod"></catcolor>
+        <catcolor category="INFORMATIVO" color="DarkOrange3"></catcolor>
+        <catcolor category="DEPORTES" color="DarkCyan"></catcolor>
+        <catcolor category="FUTBOL" color="DarkCyan"></catcolor>
+        <catcolor category="MUSICAL" color="turquoise3"></catcolor>
+        <catcolor category="INFANTIL" color="MediumSlateBlue"></catcolor>
+        <catcolor category="MAGAZINE" color="MediumTurquoise"></catcolor>
+        <catcolor category="TIEMPO" color="#33ff99"></catcolor>
+        <catcolor category="SHOW" color="sienna"></catcolor>
+
+        <!-- categories used by the NextView EPG service -->
+        <!-- (available in some european countries) -->
+        <catcolor category="news" color="DarkOrange3"></catcolor>
+        <catcolor category="music/ballet/dance" color="DarkRed"></catcolor>
+        <catcolor category="sports" color="DarkCyan"></catcolor>
+        <catcolor category="series" color="DarkOrchid"></catcolor>
+        <catcolor category="social/political/economics" color="DarkOrange3"></catcolor>
+        <catcolor category="show/game show" color="MediumTurquoise"></catcolor>
+        <catcolor category="science" color="#33ff99"></catcolor>
+        <catcolor category="technology" color="#33ff99"></catcolor>
+        <catcolor category="kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="leisure hobbies" color="Red"></catcolor>
+        <catcolor category="tourism/travel" color="#aa00aa"></catcolor>
+        <catcolor category="arts/culture" color="goldenrod"></catcolor>
+        <catcolor category="movie" color="Blue"></catcolor>
+
+        <!-- Categories introduced by tv_grab_uk_rt -->
+        <catcolor category="Animation" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Business" color="DarkOrange3"></catcolor>
+        <catcolor category="Children's Show" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Consumer" color="goldenrod"></catcolor>
+        <catcolor category="Cookery" color="#aa00aa"></catcolor>
+        <catcolor category="Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Drama Series" color="rosybrown3"></catcolor>
+        <catcolor category="Entertainment" color="DarkOrchid"></catcolor>
+        <catcolor category="Environment" color="#33ff99"></catcolor>
+        <catcolor category="Film" color="Blue"></catcolor>
+        <catcolor category="Game Show" color="orchid"></catcolor>
+        <catcolor category="Gardening" color="Red"></catcolor>
+        <catcolor category="Interests" color="Red"></catcolor>
+        <catcolor category="Music &amp; Arts" color="goldenrod"></catcolor>
+        <catcolor category="News &amp; Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Religious" color="goldenrod"></catcolor>
+        <catcolor category="Sitcoms" color="DarkOrchid"></catcolor>
+        <catcolor category="Soaps" color="DarkOrchid"></catcolor>
+        <catcolor category="Sport" color="DarkCyan"></catcolor>
+        <catcolor category="Talk Show" color="MediumTurquoise"></catcolor>
+        <catcolor category="Transport" color="#33ff99"></catcolor>
+        <catcolor category="Travel" color="#aa00aa"></catcolor>
+
+        <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
+        <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
+        <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
+        <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
+        <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
+        <arrow direction="left" image="gg-arrow-left.png"></arrow>
+        <arrow direction="right" image="gg-arrow-right.png"></arrow>
+        <font>descinfo</font>
+      </guidegrid>
+    </container>
+
+    <container name="current_info">
+      <area>541,227,240,32</area>
+      <textarea name="time" draworder="4" align="center">
+        <area>0,0,120,32</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="channel" draworder="4" align="center">
+        <area>0,0,120,32</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+    <container name="program_info">
+      <area>20,20,494,275</area>
+      <textarea name="misicon" draworder="5" align="allcenter">
+        <cutdown>no</cutdown>
+        <area>5,2,56,60</area>
+        <font>small</font>
+      </textarea>
+      <image name="icon" draworder="6">
+        <position>3,2</position>
+        <staticsize>60,60</staticsize>
+      </image>
+      <textarea name="title" draworder="4" align="vcenter">
+        <area>69,1,445,79</area>
+        <font>title</font> 
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>4,72,489,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>4,108,489,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>4,140,489,79</area>
+        <font>descinfo</font>
+        <multiline>yes</multiline>
+      </textarea>
+      <textarea name="recordingstatus" draworder="6">
+        <area>4,230,489,30</area>
+        <font>recstatus</font>
+      </textarea>
+    </container>
+ 
+  </window>
+
+  <window name="conflict">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="record_font" face="Arial">
+      <color>#F7862B</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="norecordfnt" face="Arial">
+      <color>#999999</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="conflictfnt" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>18</size>
+      <size:small>12</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>27</size>
+      <size:small>13</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>8</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="messagegray" face="Arial">
+      <color>#999999</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="messageyellow" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Scheduled Recordings:</value>
+        <value lang="IT">Registrazioni programmate:</value>
+        <value lang="ES">Grabaciones programadas</value>
+        <value lang="CA">Gravacions programades</value>
+        <value lang="NL">Geplande Opnames</value>
+        <value lang="DE">Geplante Aufnahmen:</value>
+        <value lang="DK">Planlagte optagelser:</value>
+        <value lang="PT">Gravações Marcadas:</value>
+        <value lang="SV">Schemalagda inspelningar:</value>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>cr-background.png</filename>
+        <position>0,39</position>
+      </image>
+      <textarea name="highlighting" draworder="0" align="right">
+        <area>360,330,140,40</area>
+        <font>message</font>
+        <value>Highlighting:</value>
+      </textarea>
+      <textarea name="conyellow" draworder="0" align="right">
+        <area>505,330,130,40</area>
+        <font>messageyellow</font>
+        <value>Conflicting</value>
+        <value lang="IT">Conflitto</value>
+        <value lang="ES">Conflicto</value>
+        <value lang="CA">Conflicte</value>
+        <value lang="NL">Conflicterende</value>
+        <value lang="DE">Überschneidungen</value>
+        <value lang="DK">Konflikter</value>
+        <value lang="PT">Conflito</value>
+        <value lang="SV">Konflikter</value>
+      </textarea>
+      <textarea name="disgray" draworder="0" align="right">
+        <area>650,330,130,40</area>
+        <font>messagegray</font>
+        <value>Deactivated</value>
+        <value lang="IT">Disattivate</value>
+        <value lang="ES">Desactivadas</value>
+        <value lang="CA">Desactivades</value>
+        <value lang="NL">Gedesactiveerde</value>
+        <value lang="DE">Blockierte</value>
+        <value lang="DK">Deaktiverede</value>
+        <value lang="PT">Desactivadas</value>
+        <value lang="SV">Deaktiverade</value>
+      </textarea>
+      <textarea name="showinstr" align="center" draworder="0">
+        <area>0,570,800,30</area>
+        <font>message</font>
+        <value>Show  (1) All  (2) Important</value>
+      </textarea>
+    </container>
+ 
+    <container name="conflict_info">
+      <area>400,10,380,30</area>
+      <textarea name="status" align="right" draworder="4">
+        <area>0,0,380,30</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+    <container name="showlevel_info">
+      <area>10,330,280,30</area>
+      <textarea name="showing" draworder="4">
+        <area>0,0,105,30</area>
+        <font>message</font>
+        <value>Showing:</value>
+      </textarea>
+      <textarea name="showlevel" draworder="4">
+        <area>110,0,150,30</area>
+        <font>message</font>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>0,39,800,290</area>
+      <listarea name="conflictlist" draworder="4">
+        <area>20,12,760,265</area>
+        <fcnfont name="conflictfnt" function="conflictingrecording"></fcnfont>
+        <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>10</columnpadding>
+        <column number="1" width="60" context="-1"></column>
+        <column number="2" width="170" context="-1"></column>
+        <column number="3" width="440" context="-1"></column>
+        <column number="4" width="30" context="-1"></column>
+        <items>9</items>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,230"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>cr-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,360,800,210</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,800,40</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,40,579,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infotime" draworder="6">
+        <area>20,70,160,30</area>
+        <font>info</font>
+        <value>Airdate:</value>
+        <value lang="IT">Trasmissione del:</value>
+        <value lang="ES">Fecha de emisión:</value>
+        <value lang="CA">Data d'emisió:</value>
+        <value lang="NL">Uitzenddatum:</value>
+        <value lang="DE">Sendezeit:</value>
+        <value lang="DK">Sendt:</value>
+        <value lang="PT">Emitido em:</value>
+        <value lang="SV">Sänt:</value>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>180,70,600,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infochan" draworder="6">
+        <area>20,100,160,30</area>
+        <font>info</font>
+        <value>Channel:</value>
+        <value lang="IT">Canale:</value>
+        <value lang="ES">Canal:</value>
+        <value lang="CA">Canal:</value>
+        <value lang="NL">Kanaal:</value>
+        <value lang="DE">Sender:</value>
+        <value lang="DK">Kanal:</value>
+        <value lang="PT">Canal:</value>
+        <value lang="SV">Kanal:</value>
+      </textarea>
+      <textarea name="channel" draworder="6">
+        <area>180,100,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infodesc" draworder="6">
+        <area>20,130,160,30</area>
+        <font>info</font>
+        <value>Description:</value>
+        <value lang="IT">Descrizione:</value>
+        <value lang="ES">Descripción:</value>
+        <value lang="CA">Descripció:</value>
+        <value lang="NL">Beschrijving:</value>
+        <value lang="DE">Inhalt:</value>
+        <value lang="DK">Beskrivelse:</value>
+        <value lang="PT">Descrição:</value>
+        <value lang="SV">Beskrivning:</value>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>180,130,600,80</area>
+        <font>info</font>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+ 
+
+   <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+         <value lang="IT">Non hai programmato nessuna registrazione</value>
+         <value lang="ES">No tiene programada ninguna grabación</value>
+         <value lang="CA">No hi ha prevista cap gravació</value>
+         <value lang="NL">Er zijn geen geplande opnames</value>
+         <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
+         <value lang="DK">Du har ikke optaget nogen udsendelser</value>
+         <value lang="PT">Não tem programada nenhuma gravação</value>
+         <value lang="SV">Du har inte schemalagt något program för inspelning</value>
+         <multiline>yes</multiline> 
+      </textarea>
+    </container>
+
+    <container name="norecordings_info">
+      <textarea name="topline" align="center" draworder="8">
+         <area>20,40,760,30</area>
+         <font>info</font>
+         <value>To schedule a recording, exit this screen and</value>
+         <value lang="IT">Per programmare una registrazione,</value>
+         <value lang="ES">Para programar una grabación salga y</value>
+         <value lang="CA">Per programar una gravació surti i</value>
+         <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
+         <value lang="DE">Um eine Aufnahme zu planen wählen Sie</value>
+         <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
+         <value lang="PT">Para programar uma gravação, saia deste menu e</value>
+         <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
+      </textarea>
+      <textarea name="botline" align="center" draworder="8">
+         <area>20,70,760,30</area>
+         <font>info</font>
+         <value>Select 'Program Guide' or 'Program Finder'</value>
+         <value lang="IT">esci e seleziona "Guida Programmi" o "Ricerca Programmi"</value>
+         <value lang="ES">"seleccione "Guia de Programas" o "Busqueda de programas"</value>
+         <value lang="CA">vagi a "Guia de programes" o "Cercar Programes"</value>
+         <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
+         <value lang="DE">'Übersicht' oder 'Sendung suchen'</value>
+         <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
+         <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
+         <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="recprioritychannels">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>18</size>
+      <size:small>12</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>29</size>
+      <size:small>13</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Channel Recording Priorities</value>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>rk-background.png</filename>
+        <position>0,35</position>
+      </image>
+      <textarea name="keyinstr" align="center" draworder="0">
+        <area>0,570,800,30</area>
+        <font>message</font>
+        <value>(1) Sort by Channel    (2) Sort by Priority</value>
+        <value lang="DE">(1) Sortiert nach Sender (2) Sortiert nach Rang</value>
+        <value lang="DK">(1) Sortér efter Titel  (2) Sortér efter Rang</value>
+        <value lang="PT">(1) Ordenar por Canal  (2) Ordenar por Preferência</value>
+        <value lang="SV">(1) Sortera efter titel  (2) Sortera efter rank</value>
+        <value lang="ES">(1) Ordenar por Canal  (2) Ordenar por Preferencia</value>
+        <value lang="CA">(1) Ordenar per Canal  (2) Ordenar per Preferència</value>
+      </textarea>
+    </container>
+
+    <container name="selector">
+     <area>0,39,800,375</area>
+      <listarea name="recprioritylist" draworder="4">
+        <area>20,12,760,330</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>1</columnpadding>
+        <column number="1" width="75" context="-1"></column>
+        <column number="2" width="590" context="-1"></column>
+        <column number="3" width="17" context="-1"></column>
+        <column number="4" width="50" context="-1"></column>
+        <items>11</items>
+        <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>rk-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="channel_info">
+      <area>0,414,800,240</area>
+      <image name="icon" draworder="6">
+        <position>20,0</position>
+               <filename>blankicon.jpg</filename>
+        <staticsize>60,60</staticsize>
+      </image>
+      <textarea name="title" draworder="6">
+        <area>120,12,800,40</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="inforecpriority" draworder="6">
+        <area>20,90,160,30</area>
+        <font>info</font>
+        <value>Priority:</value>
+        <value lang="DE">Rang:</value>
+        <value lang="DK">Rang:</value>
+        <value lang="PT">Preferência:</value>
+        <value lang="SV">Rank:</value>
+        <value lang="ES">Ranking:</value>
+        <value lang="CA">Rànquing:</value>
+      </textarea>
+      <textarea name="recpriority" draworder="6">
+        <area>200,90,400,30</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+
+   <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+         <value lang="IT">Non hai programmato nessuna registrazione</value>
+         <value lang="ES">No tiene programada ninguna grabación</value>
+         <value lang="CA">No hi ha prevista cap gravació</value>
+         <value lang="NL">Er zijn geen geplande opnames</value>
+         <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
+         <value lang="DK">Du har ikke optaget nogen udsendelser</value>
+         <value lang="PT">Não tem programada nenhuma gravação</value>
+         <value lang="SV">Du har inte schemalagt några program för inspelning</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="norecordings_info">
+      <textarea name="topline" align="center" draworder="8">
+         <area>20,40,760,30</area>
+         <font>info</font>
+         <value>To schedule a recording, exit this screen and</value>
+         <value lang="IT">Per programmare una registrazione,</value>
+         <value lang="ES">Para programar una grabación salga y</value>
+         <value lang="CA">Per programar una gravació surti i</value>
+         <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
+         <value lang="DE">Um eine Aufnahme zu planen, verlassen Sie dieses Menü und</value>
+         <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
+         <value lang="PT">Para programar uma gravação, saia deste menu e</value>
+         <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
+      </textarea>
+      <textarea name="botline" align="center" draworder="8">
+         <area>20,70,760,30</area>
+         <font>info</font>
+         <value>Select 'Program Guide' or 'Program Finder'</value>
+         <value lang="IT">esci e seleziona "Guida Programmi" o "Ricerca Programmi"</value>
+         <value lang="ES">"seleccione "Guia de Programas" o "Busqueda de programas"</value>
+         <value lang="CA">vagi a "Guia de programes" o "Cercar Programes"</value>
+         <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
+         <value lang="DE">wählen Sie 'Übersicht' oder 'Sendung suchen'</value>
+         <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
+         <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
+         <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="recpriorityprograms">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>18</size>
+      <size:small>12</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>27</size>
+      <size:small>13</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="tinyinfo" face="Arial">
+      <color>#cccccc</color>
+      <size>10</size>
+      <size:small>8</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="grayinfo" face="Arial">
+      <color>#777777</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="yellowinfo" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Program Recording Priorities</value>
+      </textarea>
+      <textarea name="recprioritylabel" draworder="0">
+        <area>625,20,800,40</area>
+        <font>tinyinfo</font>
+        <value>Priority</value>
+      </textarea>
+      <textarea name="finalrecprioritylabel" draworder="0">
+        <area>690,20,800,40</area>
+        <font>tinyinfo</font>
+        <value>Final Priority</value>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>rk-background.png</filename>
+        <position>0,35</position>
+      </image>
+      <textarea name="keyinstr" align="center" draworder="0">
+        <area>0,570,800,30</area>
+        <font>message</font>
+        <value>(1) Sort by Title    (2) Sort by Priority</value>
+        <value lang="DE">(1) Sortiert nach Sender (2) Sortiert nach Rang</value>
+        <value lang="DK">(1) Sortér efter Titel  (2) Sortér efter Rang</value>
+        <value lang="PT">(1) Ordenar por Título  (2) Ordenar por Preferência</value>
+        <value lang="SV">(1) Sortera efter titel  (2) Sortera efter rank</value>
+        <value lang="ES">(1) Ordenar por Título  (2) Ordenar por Preferencia</value>
+        <value lang="CA">(1) Ordenar per Títol  (2) Ordenar per Preferència</value>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>0,39,800,375</area>
+      <listarea name="recprioritylist" draworder="4">
+        <area>20,12,760,330</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>1</columnpadding>
+        <column number="1" width="608" context="-1"></column>
+        <column number="2" width="17" context="-1"></column>
+        <column number="3" width="56" context="-1"></column>
+        <column number="4" width="17" context="-1"></column>
+        <column number="5" width="50" context="-1"></column>
+        <items>11</items>
+        <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>rk-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,410,800,240</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,800,50</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,40,579,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infotype" draworder="6">
+        <area>20,70,280,30</area>
+        <font>info</font>
+        <value>Record Type:</value>
+        <value lang="DE">Modus:</value>
+        <value lang="DK">Optagelsestype:</value>
+        <value lang="PT">Tipo de Gravação:</value>
+        <value lang="SV">Inspelningstyp:</value>
+        <value lang="CA">Tipus de gravació:</value>
+        <value lang="ES">Tipo de grabación:</value>
+      </textarea>
+      <textarea name="type" draworder="6">
+        <area>200,70,430,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="typebracketA" draworder="6">
+        <area>620,70,100,30</area>
+        <font>grayinfo</font>
+        <value>[</value>
+      </textarea>
+      <textarea name="typesign" draworder="6">
+        <area>630,70,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="typerecpriority" draworder="6">
+        <area>643,70,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="typebracketB" draworder="6">
+        <area>668,70,100,30</area>
+        <font>grayinfo</font>
+        <value>]</value>
+      </textarea>
+      <textarea name="infochannel" draworder="6">
+        <area>20,100,160,30</area>
+        <font>info</font>
+        <value>Channel:</value>
+        <value lang="DE">Sender:</value>
+        <value lang="DK">Kanal:</value>
+        <value lang="PT">Canal:</value>
+        <value lang="SV">Kanal:</value>
+        <value lang="ES">Canal:</value>
+        <value lang="CA">Canal:</value>
+      </textarea>
+      <textarea name="channel" draworder="6">
+        <area>200,100,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="channelbracketA" draworder="6">
+        <area>620,100,100,30</area>
+        <font>grayinfo</font>
+        <value>[</value>
+      </textarea>
+      <textarea name="channelsign" draworder="6">
+        <area>630,100,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="channelrecpriority" draworder="6">
+        <area>643,100,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="channelbracketB" draworder="6">
+        <area>668,100,100,30</area>
+        <font>grayinfo</font>
+        <value>]</value>
+      </textarea>
+      <textarea name="inforecpriority" draworder="6">
+        <area>20,130,160,30</area>
+        <font>info</font>
+        <value>Priority:</value>
+      </textarea>
+      <textarea name="recpriority" draworder="6">
+        <area>200,130,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="recprioritybracketA" draworder="6">
+        <area>620,130,100,30</area>
+        <font>grayinfo</font>
+        <value>[</value>
+      </textarea>
+      <textarea name="recprioritysign" draworder="6">
+        <area>630,130,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="recpriorityB" draworder="6">
+        <area>643,130,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="recprioritybracketB" draworder="6">
+        <area>668,130,100,30</area>
+        <font>grayinfo</font>
+        <value>]  = </value>
+      </textarea>
+      <textarea name="finalrecpriority" draworder="6">
+        <area>709,130,150,30</area>
+        <font>yellowinfo</font>
+      </textarea>
+    </container>
+
+    <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+         <value lang="IT">Non hai programmato nessuna registrazione</value>
+         <value lang="ES">No tiene programada ninguna grabación</value>
+         <value lang="CA">No hi ha prevista cap gravació</value>
+         <value lang="NL">Er zijn geen geplande opnames</value>
+         <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
+         <value lang="DK">Du har ikke optaget nogen udsendelser</value>
+         <value lang="PT">Não tem programada nenhuma gravação</value>
+         <value lang="SV">Du har inte schemalagt några inspelningar</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="norecordings_info">
+      <textarea name="topline" align="center" draworder="8">
+         <area>20,40,760,30</area>
+         <font>info</font>
+         <value>To schedule a recording, exit this screen and</value>
+         <value lang="IT">Per programmare una registrazione,</value>
+         <value lang="ES">Para programar una grabación salga y</value>
+         <value lang="CA">Per programar una gravació surti i</value>
+         <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
+         <value lang="DE">Um eine Aufnahme zu planen, verlassen Sie dieses Menü und</value>
+         <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
+         <value lang="PT">Para programar uma gravação, saia deste menu e</value>
+         <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
+      </textarea>
+      <textarea name="botline" align="center" draworder="8">
+         <area>20,70,760,30</area>
+         <font>info</font>
+         <value>Select 'Program Guide' or 'Program Finder'</value>
+         <value lang="IT">esci e seleziona "Guida Programmi" o "Ricerca Programmi"</value>
+         <value lang="ES">"seleccione "Guia de Programas" o "Busqueda de programas"</value>
+         <value lang="CA">vagi a "Guia de programes" o "Cercar Programes"</value>
+         <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
+         <value lang="DE">wählen Sie 'Übersicht' oder 'Sendung suchen'</value>
+         <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
+         <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
+         <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="playback">
+
+    <font name="active" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+  
+    <font name="record_font" face="Arial">
+      <color>#F7862B</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="overunderrecfont" face="Arial">
+      <color>#ffffAA</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>18</size>
+      <size:small>12</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>27</size>
+      <size:small>14</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>12</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>background.png</filename>
+        <position>0,50</position>
+      </image>
+      <textarea name="messagedel" draworder="0">
+        <area>20,15,800,35</area>
+        <font>message</font>
+        <value>Select a recording to permanently delete:</value>
+        <value lang="IT">Seleziona una registrazione da cancellare:</value>
+        <value lang="ES">Seleccione una grabación a borrar:</value>
+        <value lang="CA">Esculli una gravació a esborrar:</value>
+        <value lang="NL">Kies een opname om te verwijderen:</value>
+	<value lang="DE">Welche Aufnahme soll gelöscht werden:</value>
+        <value lang="DK">Vælg en optagelse du vil slette permanent:</value>
+        <value lang="PT">Selecione uma gravação para apagar:</value>
+        <value lang="SV">Välj en inspelning du vill radera permanent:</value>
+        <context>1</context>
+      </textarea>
+      <textarea name="messageplay" draworder="0">
+        <area>20,15,800,35</area>
+        <font>message</font>
+        <value>Select a recording to view:</value>
+        <value lang="IT">Seleziona una registrazione da vedere:</value>
+        <value lang="ES">Seleccione una grabación a ver:</value>
+        <value lang="CA">Esculli la gravació que vol veure:</value>
+        <value lang="NL">Kies een opname om te bekijken:</value>
+        <value lang="DE">Welche Aufnahme möchten Sie sehen:</value>
+        <value lang="DK">Vælg den optagelse du ønsker at se:</value>
+        <value lang="PT">Selecione uma gravação para ver:</value>
+        <value lang="SV">Välj den inspelning du önskar se:</value>
+        <context>0</context>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>0,50,800,310</area>
+      <listarea name="toptitles" draworder="2">
+        <area>30,22,190,105</area>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <items>3</items>
+      </listarea>
+      <image name="titlelines" draworder="3" fleximage="no">
+        <filename>trans-titles.png</filename>
+        <position>0,0</position>
+      </image>
+      <listarea name="bottomtitles" draworder="2">
+        <area>30,172,190,105</area>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <items>3</items>
+      </listarea>
+      <listarea name="showing" draworder="4">
+        <area>240,18,600,265</area>
+        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="overunderrecfont" function="overunderrecording"></fcnfont>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <columnpadding>10</columnpadding>
+        <column number="1" width="320" context="-1"></column>
+        <column number="2" width="60" context="-1"></column>
+        <column number="3" width="110" context="0"></column>
+        <column number="4" width="110" context="1"></column>
+        <items>7</items>
+        <image function="selectionbar" filename="bar.png" location="-13,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,230"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="yes">
+        <filename>showings.png</filename>
+        <position>0,0</position>
+      </image>
+      <textarea name="current" draworder="6">
+        <area>34,131,185,40</area>
+        <font>currenttitle</font>
+      </textarea>
+    </container>
+
+    <container name="program_info_play">
+      <context>0</context>
+      <area>0,360,799,240</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,579,45</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,40,579,30</area>
+        <altarea>20,40,779,30</altarea>
+        <font>info</font>
+      </textarea>
+      <textarea name="infotime" draworder="6">
+        <area>20,70,160,30</area>
+        <font>info</font>
+        <value>Airdate:</value>
+        <value lang="IT">Trasmissione del:</value>
+        <value lang="ES">Fecha de emisión:</value>
+        <value lang="CA">Data d'emisió:</value>
+        <value lang="NL">Uitzenddatum:</value>
+        <value lang="DE">Sendezeit:</value>
+        <value lang="DK">Sendt:</value>
+        <value lang="PT">Data de Emissão:</value>
+        <value lang="SV">Sänt:</value>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>180,70,430,30</area>
+        <altarea>180,70,600,30</altarea>
+        <font>info</font>
+      </textarea>
+      <textarea name="infochan" draworder="6">
+        <area>20,100,160,30</area>
+        <font>info</font>
+        <value>Channel:</value>
+        <value lang="IT">Canale:</value>
+        <value lang="ES">Canal:</value>
+        <value lang="CA">Canal:</value>
+        <value lang="NL">Kanaal:</value>
+        <value lang="DE">Sender:</value>
+        <value lang="DK">Kanal:</value>
+        <value lang="PT">Canal:</value>
+        <value lang="SV">Kanal:</value>
+      </textarea>
+      <textarea name="channel" draworder="6">
+        <area>180,100,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infodesc" draworder="6">
+        <area>20,130,160,30</area>
+        <font>info</font>
+        <value>Description:</value>
+        <value lang="IT">Descrizione:</value>
+        <value lang="ES">Descripción:</value>
+        <value lang="CA">Descripció:</value>
+        <value lang="NL">Beschrijving:</value>
+        <value lang="DE">Inhalt:</value>
+        <value lang="DK">Beskrivelse:</value>
+        <value lang="PT">Descrição:</value>
+        <value lang="SV">Beskrivning:</value>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>180,130,600,120</area>
+        <altarea>180,130,600,90</altarea>
+        <font>info</font>
+        <multiline>yes</multiline>
+      </textarea>
+
+      <image name="commflagged" draworder="6">
+        <filename>type/commflagged.png</filename>
+        <position>20,160</position>
+      </image>
+      <image name="cutlist" draworder="6">
+        <filename>type/cutlist.png</filename>
+        <position>55,160</position>
+      </image>
+      <image name="autoexpire" draworder="6">
+        <filename>type/autoexpire.png</filename>
+        <position>90,160</position>
+      </image>
+      <image name="processing" draworder="6">
+        <filename>type/processing.png</filename>
+        <position>20,195</position>
+      </image>
+      <image name="bookmark" draworder="6">
+        <filename>type/bookmark.png</filename>
+        <position>55,195</position>
+      </image>
+
+    </container>
+
+    <container name="program_info_del">
+      <context>1</context>
+      <area>0,360,799,190</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,579,40</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,40,579,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infotime" draworder="6">
+        <area>20,70,160,30</area>
+        <font>info</font>
+        <value>Airdate:</value>
+        <value lang="IT">Trasmissione del:</value>
+        <value lang="ES">Fecha de emisión:</value>
+        <value lang="CA">Data d'emisió:</value>
+        <value lang="NL">Uitzenddatum:</value>
+        <value lang="DE">Sendezeit:</value>
+        <value lang="DK">Sendt:</value>
+        <value lang="PT">Data de Emissão:</value>
+        <value lang="SV">Sänt:</value>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>180,70,430,30</area>
+        <altarea>180,70,600,30</altarea>
+        <font>info</font>
+      </textarea>
+      <textarea name="infochan" draworder="6">
+        <area>20,100,160,30</area>
+        <font>info</font>
+        <value>Channel:</value>
+        <value lang="IT">Canale:</value>
+        <value lang="ES">Canal:</value>
+        <value lang="CA">Canal:</value>
+        <value lang="NL">Kanaal:</value>
+        <value lang="DE">Sender:</value>
+        <value lang="DK">Kanal:</value>
+        <value lang="PT">Canal:</value>
+        <value lang="SV">Kanal:</value>
+      </textarea>
+      <textarea name="channel" draworder="6">
+        <area>180,100,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infodesc" draworder="6">
+        <area>20,130,160,30</area>
+        <font>info</font>
+        <value>Description:</value>
+        <value lang="IT">Descrizione:</value>
+        <value lang="ES">Descripción:</value>
+        <value lang="CA">Descripció:</value>
+        <value lang="NL">Beschrijving:</value>
+        <value lang="DE">Inhalt:</value>
+        <value lang="DK">Beskrivelse:</value>
+        <value lang="PT">Descrição:</value>
+        <value lang="SV">Beskrivning:</value>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>180,130,600,90</area>
+        <altarea>180,130,600,90</altarea>
+        <font>info</font>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="video">
+      <area>610,355,160,120</area>
+    </container>
+
+    <!-- Confirm delete and legend help popup -->
+    <popup name="confirmdelete">
+      <foreground>#ffffff</foreground>
+      <highlight>#ffffff</highlight>
+    </popup>
+
+    <container name="usage">
+      <context>1</context>
+      <area>0,550,800,50</area>
+      <statusbar name="usedbar" draworder="5">
+        <container fleximage="yes">container.png</container>
+	<fill>filler.png</fill>
+        <position>20,0</position>
+      </statusbar>
+      <textarea name="freereport" draworder="6">
+        <area>430,3,370,30</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+    <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>200,140,600,30</area>
+         <font>info</font>
+         <value>Sorry, No Recordings Available</value>
+         <value lang="IT">Spiacente, nessuna registrazione disponibile</value>
+         <value lang="ES">Lo siento, no hay ninguna grabación disponible</value>
+         <value lang="CA">Ho sento, no hi ha cap gravació disponible</value>
+         <value lang="NL">Sorry, geen opnames aanwezig</value>
+         <value lang="DE">Keine Aufnahmen verfügbar</value>
+         <value lang="DK">Beklager, ingen optagelser fundet</value>
+         <value lang="PT">Não há nenhuma gravação disponível</value>
+         <value lang="SV">Inga inspelningar hittades</value>
+      </textarea>
+    </container>
+
+    <container name="norecordings_info">
+      <textarea name="topline" align="center" draworder="8">
+         <area>20,80,580,30</area>
+         <font>info</font>
+         <value>To schedule a recording, exit this screen and</value>
+         <value lang="IT">Per programmare una registrazione,</value>
+         <value lang="ES">Para programar una grabación, salga y</value>
+         <value lang="CA">Per a programar una gravació, surti i</value>
+         <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
+         <value lang="DE">Um eine Aufnahme zu planen wählen Sie</value>
+         <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
+         <value lang="PT">Para programar uma gravação, saia deste menu e</value>
+         <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
+      </textarea>
+      <textarea name="botline" align="center" draworder="8">
+         <area>20,110,580,30</area>
+         <font>info</font>
+         <value>Select 'Schedule a Recording' from the Main Menu</value>
+         <value lang="IT">esci e seleziona 'Programma una registrazione'</value>
+         <value lang="ES">seleccione 'Programar grabaciones'</value>
+         <value lang="CA">esculli 'Programar gravacions'</value>
+         <value lang="NL">kies 'Opname plannen'</value>
+         <value lang="DE">'Aufnahme planen' im Hauptmenü</value>
+         <value lang="DK">vælg 'Optag en udsendelse'</value>
+         <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
+         <value lang="SV">välj 'Schemalägg inspelningar' från huvudmenyn</value>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="programfind">
+
+    <font name="active" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive" face="Arial">
+      <color>#999999</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="record_font" face="Arial">
+      <color>#F7862B</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="titleinfo" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>18</size>
+      <size:small>12</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="recinfo" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="channel" face="Arial">
+      <color>#ffffff</color>
+      <size>22</size>
+      <size:small>14</size:small>
+      <bold>yes</bold>
+    </font>
+  
+    <container name="background">
+      <image name="filler" draworder="0" fleximage="no">
+        <filename>pf-top.png</filename>
+        <position>26,28</position>
+      </image>
+      <image name="lineback" draworder="0" fleximage="no">
+        <filename>pf-background.png</filename>
+        <position>25,265</position>
+      </image>
+      <textarea name="prgrambar" align="center">
+        <area>0,570,800,30</area>
+        <font>info</font>
+        <value>(4) Program Guide   **(6) Program Finder **</value>
+        <value lang="IT">(4) Guida Programmi   **(6) Ricerca Programmi **</value>
+        <value lang="ES">(4) Guia de Programas **(6) Busqueda de programas **</value>
+        <value lang="CA">(4) Guia de programes **(6) Cerca Programes **</value>
+        <value lang="NL">(4) Programmagids     **(6) Programma Zoeker **</value>
+        <value lang="DE">(4) Übersicht         **(6) Sendung suchen **</value>
+        <value lang="DK">(4) Program Guide     **(6) Program Finder **</value>
+        <value lang="PT">(4) Guia de Programação  **(6) Procurar Programas **</value>
+        <value lang="SV">(4) Programguide      **(6) Sök program **</value>
+        <context>1</context>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>25,260,770,310</area>
+      <listarea name="alphabet" draworder="2">
+        <area>23,8,65,295</area>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <items>9</items>
+        <image function="selectionbar" filename="pf-sel1.png" location="-14,-7"></image>
+      </listarea>
+      <listarea name="shows" draworder="2">
+        <area>88,8,380,295</area>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <column number="1" width="380" context="-1"></column>
+        <items>9</items>
+        <image function="selectionbar" filename="pf-sel2.png" location="-14,-7"></image>
+      </listarea>
+      <listarea name="times" draworder="2">
+        <area>470,8,280,295</area>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
+        <items>9</items>
+        <image function="selectionbar" filename="pf-sel3.png" location="-8,-7"></image>
+      </listarea>
+      <image name="lines" draworder="5" fleximage="no">
+        <filename>pf-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>25,25,750,220</area>
+      <textarea name="title" draworder="6">
+        <area>13,5,500,30</area>
+        <font>titleinfo</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>13,35,500,27</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>13,62,500,27</area>
+       <font>info</font>
+      </textarea>
+      <textarea name="channelnum" draworder="6" align="center">
+        <area>500,60,250,40</area>
+        <font>channel</font>
+      </textarea>
+      <textarea name="channelname" draworder="6" align="center">
+        <area>500,95,250,40</area>
+        <font>channel</font>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>13,89,500,85</area>
+        <font>info</font>
+        <multiline>yes</multiline>
+      </textarea>
+      <textarea name="recordingstatus" draworder="6">
+        <area>13,185,500,27</area>
+        <font>recinfo</font>
+      </textarea>
+    </container>
+
+    <container name="help_info_1">
+      <area>25,25,750,220</area>
+      <textarea name="selectinfo" draworder="6">
+        <area>10,5,500,30</area>
+        <font>info</font>
+        <value>Select a letter...</value>
+        <value lang="ES">Seleccione una letra...</value>
+        <value lang="CA">Esculli una lletra...</value>
+        <value lang="NL">Kies een letter...</value>
+        <value lang="DE">Wählen Sie einen Buchstaben...</value>
+        <value lang="DK">Vælg et bogstav...</value>
+        <value lang="PT">Selecione uma letra...</value>
+        <value lang="SV">Välj en bokstav...</value>
+      </textarea>
+      <textarea name="pickinfo" draworder="6">
+        <area>10,75,500,60</area>
+        <font>info</font>
+        <value>Pick the letter in which the show starts with, then hit ENTER or the right arrow</value>
+        <value lang="IT">Seleziona la lettera iniziale del programma e premi OK oppure la freccia destra</value>
+        <value lang="ES">Seleccione la letra inicial del programa y pulse OK o cursor derecha</value>
+        <value lang="CA">Esculli la lletra inicial del programa i premi OK o fletxa dreta</value>
+        <value lang="NL">Kies de eerste letter van het programma, en druk OK of pijl naar rechts</value>
+        <value lang="DE">Wählen Sie den Anfangsbuchstaben der Sendung, danach ENTER oder Cursor-Rechts</value>
+        <value lang="DK">Vælg det bogstav udsendelsen starter med og tryk ENTER eller pil til højre</value>
+        <value lang="PT">Escolha a letra inicial do programa, e depois ENTER ou o cursor para a direita</value>
+        <value lang="SV">Välj den bokstav som programnamnet börjar med. Tryck sedan ENTER eller högerpil</value>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="help_info_2">
+      <area>25,25,750,220</area>
+      <textarea name="selectprog" draworder="6">
+        <area>10,5,500,30</area>
+        <font>info</font>
+        <value>Select a program...</value>
+        <value lang="IT">Seleziona un programma...</value>
+        <value lang="ES">Seleccione un programa...</value>
+        <value lang="CA">Esculli un programa...</value>
+        <value lang="NL">Kies een programma...</value>
+        <value lang="DE">Wählen Sie eine Sendung...</value>
+        <value lang="DK">Vælg en udsendelse...</value>
+        <value lang="PT">Selecione um Programa...</value>
+        <value lang="SV">Välj ett program...</value>
+      </textarea>
+      <textarea name="pickprog" draworder="6">
+        <area>10,75,500,120</area>
+        <font>info</font>
+        <value>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'info' will allow you to setup recording options.</value>
+        <value lang="IT">Seleziona il titolo del programma che vuoi trovare. Quando hai finito torna indietro con la freccia a sinistra. Premendo 'info' potrai impostare la registrazione.</value>
+        <value lang="ES">Seleccione el nombre del programa que busca. Cuando lo encuentre vuelva con flecha izquierda. Pulsando 'info' podra determinar las opciones de grabacion.</value>
+        <value lang="CA">Cerqui el nom del programa. Quan el trovi retorni amb fletxa esquerra. Prement 'info' podra determinar les opcions de gravacio.</value>
+        <value lang="NL">Kies de titel van het programma dat U zoekt. Druk op pijl naar links wanneer U klaar bent. Druk 'info' als U de opname-opties wilt wijzigen.</value>
+        <value lang="DE">Wählen Sie den Titel der gesuchten Sendung. Weiter mit ENTER oder Cursor-Rechts. Mit 'info' können Sie eine Aufnahme planen.</value>
+        <value lang="DK">Vælg titlen på det den udsendelse du ønsker at finde og tryk ENTER eller Pil til venstre. Med 'Info' kan du vælge optagelsetype.</value>
+        <value lang="PT">Selecione o título do programa que deseja procurar. Para voltar, use o cursor para a esquerda. Para opções de gravação, use 'info'.</value>
+        <value lang="SV">Välj titeln på det program du vill hitta. När du är klar, återgå med vänsterpil. Genom att trycka på infoknappen kan du göra inspelningsinställningar.</value>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="noprograms">
+      <area>25,25,750,220</area>
+      <textarea name="noprog" draworder="6">
+        <area>10,5,500,30</area>
+        <font>info</font>
+        <value>No Programs</value>
+        <value lang="IT">Nessun programma</value>
+        <value lang="ES">Ningún progrma</value>
+        <value lang="CA">Cap programa</value>
+        <value lang="NL">Geen programma's</value>
+        <value lang="DE">Keine Sendungen</value>
+        <value lang="DK">Ingen udsendelser</value>
+        <value lang="PT">Sem Programas</value>
+        <value lang="SV">Inga program</value>
+      </textarea>
+      <textarea name="research" draworder="6">
+        <area>10,75,500,120</area>
+        <font>info</font>
+        <value>There are no available programs under this search. Please select another search.</value>
+        <value lang="IT">Non ci sono programmi disponibili con questa ricerca. Seleziona un'altra ricerca.</value>
+        <value lang="ES">No encuentro programas con esta busqueda. Pruebe otra.</value>
+        <value lang="CA">No trovo cap programa amb aquest criteri. Continui cercant.</value>
+        <value lang="NL">Er zijn geen programma's gevonden. Probeer een andere zoekopdracht.</value>
+        <value lang="DE">Keine Sendungen gefunden. Bitte wählen Sie eine andere Suche.</value>
+        <value lang="DK">Ingen udsendelser under denne søgning. Prøv venligst en anden.</value>
+        <value lang="PT">Não existem programas disponíveis para esta procura.</value>
+        <value lang="SV">Inga program funna. Välj något annat att söka på.</value>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+ 
+  </window>
+
+  <window name="programlist">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="record_font" face="Arial">
+      <color>#F7862B</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="conflict_font" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>27</size>
+      <size:small>12</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="yellowinfo" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Program Listings</value>
+        <value lang="PT">Lista de Programas</value>
+        <value lang="SV">Programlistning</value>
+        <value lang="CA">Llista de programes</value>
+        <value lang="ES">Lista de Programas</value>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>rk-background.png</filename>
+        <position>0,35</position>
+      </image>
+    </container>
+
+    <container name="view">
+      <area>300,10,480,30</area>
+      <textarea name="curview" draworder="4" align="right">
+        <area>0,0,480,30</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>0,39,800,375</area>
+      <listarea name="proglist" draworder="4">
+        <area>20,12,760,330</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="conflict_font" function="conflicting"></fcnfont>
+        <columnpadding>5</columnpadding>
+        <column number="1" width="170" context="-1"></column>
+        <column number="2" width="130" context="-1"></column>
+        <column number="3" width="450" context="-1"></column>
+        <items>11</items>
+        <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>rk-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,410,800,240</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,800,50</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,40,579,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>20,70,579,90</area>
+        <font>info</font>
+       <multiline>yes</multiline>
+      </textarea>
+      <textarea name="type" draworder="6">
+        <area>20,160,430,30</area>
+        <font>yellowinfo</font>
+      </textarea>
+    </container>
+
+    <container name="noprograms_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>No listings found for this program. </value>
+         <value lang="DK">Ingen visninger af dette program fundet. </value>
+         <value lang="PT">Não foram encontradas listas para este programa.</value>
+         <value lang="SV">Inga visningar funna av detta program. </value>
+         <value lang="ES">No se encuentra este programa en la lista.</value>
+         <value lang="CA">Aquest programa no el trovo llistat.</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+  </window>
+
+</mythuitheme>

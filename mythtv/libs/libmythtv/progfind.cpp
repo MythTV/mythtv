@@ -13,7 +13,7 @@
 #include <qtimer.h>
 #include <qapplication.h>
 #include <qsqldatabase.h>
-#include <qstringlist.h> 
+#include <qstringlist.h>
 #include <qcursor.h>
 #include <qregexp.h>
 #include <unistd.h>
@@ -36,25 +36,42 @@ void RunProgramFind(bool thread)
     if (thread)
         qApp->lock();
 
-    ProgFinder programFind(gContext->GetMainWindow(), "program finder");
+    // Language specific progfinder, if needed
 
-    programFind.Show();
+    ProgFinder *programFind = NULL;
+    if (gContext->GetLanguage() == "ja")
+        programFind = new JaProgFinder(gContext->GetMainWindow(),
+                                       "program finder");
+    else
+        programFind = new ProgFinder(gContext->GetMainWindow(),
+                                     "program finder");
+
+    programFind->Initialize();
+    programFind->Show();
 
     if (thread)
     {
         qApp->unlock();
 
-        while (programFind.isVisible())
+        while (programFind->isVisible())
             usleep(50);
     }
     else
-        programFind.exec();
+        programFind->exec();
+
+    delete programFind;
 
     return;
 }
 
 ProgFinder::ProgFinder(MythMainWindow *parent, const char *name)
           : MythDialog(parent, name)
+{
+    curSearch = 10;
+    searchCount = 37;
+}
+
+void ProgFinder::Initialize(void)
 {
     running = true;
     m_db = QSqlDatabase::database();
@@ -86,7 +103,6 @@ ProgFinder::ProgFinder(MythMainWindow *parent, const char *name)
 
     updateBackground();
 
-    curSearch = 10;
     progData = new QString[1];
     listCount = 1;
     if (showsPerListing < 1)
@@ -102,20 +118,8 @@ ProgFinder::ProgFinder(MythMainWindow *parent, const char *name)
     initData = new QString[(int)(searchCount*showsPerListing)];
     gotInitData = new int[searchCount];
     searchData = new QString[searchCount];
-    int curLabel = 0;
 
-    for (int charNum = 48; charNum < 91; charNum++)
-    {
-        if (charNum == 58)
-                charNum = 65;
-
-        gotInitData[curLabel] = 0; 
-        searchData[curLabel] = (char)charNum;
-        curLabel++;
-    }
-
-    gotInitData[curLabel] = 0;
-    searchData[curLabel] = '@';
+    fillSearchData();
 
     update_Timer = new QTimer(this);
     connect(update_Timer, SIGNAL(timeout()), SLOT(update_timeout()) );
@@ -137,7 +141,7 @@ ProgFinder::~ProgFinder()
     if (inSearch == 2)
             delete [] showData;
     delete [] searchData;
-    delete [] initData; 
+    delete [] initData;
 
     delete [] gotInitData;
 
@@ -244,7 +248,7 @@ void ProgFinder::updateList(QPainter *p)
                 ltype->SetItemCurrent((int)(ltype->GetItems() / 2));
                 ltype->SetActive(true);
             }
-            else 
+            else
             {
                 ltype->SetItemCurrent(-1);
                 ltype->SetActive(false);
@@ -331,11 +335,11 @@ void ProgFinder::updateInfo(QPainter *p)
         channum = showData[curShow].channelNum;
         channame = showData[curShow].channelCallsign;
         title = progData[curProgram];
-        timedate = showData[curShow].startDisplay + " - " + 
+        timedate = showData[curShow].startDisplay + " - " +
                    showData[curShow].endDisplay;
         if (showData[curShow].subtitle.stripWhiteSpace().length() > 0)
             subtitle = "\"" + showData[curShow].subtitle + "\"";
-        else 
+        else
             subtitle = "";
         description = showData[curShow].description;
         recording = showData[curShow].recText;
@@ -543,13 +547,13 @@ void ProgFinder::update_timeout()
             {
                 if (gotInitData[j] > 1)
                     cnt++;
-            } 
+            }
 
-            int amountDone = (int)(100.0 * (float)((float)cnt / 
+            int amountDone = (int)(100.0 * (float)((float)cnt /
                                    (float)searchCount));
             QString data = QString(" Loading Data...%1% Complete")
                                   .arg(amountDone);
-          
+
             LayerSet *container = theme->GetSet("selector");
             if (container)
             {
@@ -567,7 +571,7 @@ void ProgFinder::cursorLeft()
     inSearch--;
     if (inSearch == -1)
         inSearch = 0;
-    else 
+    else
     {
         if (inSearch == 0)
             showSearchList();
@@ -598,7 +602,7 @@ void ProgFinder::cursorRight()
                 {
                     UIListType *ltype = (UIListType *)container->GetType("shows");
                     if (ltype)
-                        ltype->SetItemText((int)(showsPerListing / 2), 
+                        ltype->SetItemText((int)(showsPerListing / 2),
                                            tr("       !! No Programs !!"));
                 }
                 inSearch = 0;
@@ -618,7 +622,7 @@ void ProgFinder::cursorRight()
 
 void ProgFinder::select()
 {
-    if (inSearch == 2) 
+    if (inSearch == 2)
         getInfo();
     else
         cursorRight();
@@ -626,7 +630,7 @@ void ProgFinder::select()
 
 void ProgFinder::quickRecord()
 {
-    if (inSearch == 2) 
+    if (inSearch == 2)
         getInfo(true);
     else
         cursorRight();
@@ -770,7 +774,7 @@ void ProgFinder::cursorDown()
     {
         if ((curShow + 1) >= showCount)
             curShow = -1;
-        
+
         if (showData[curShow + 1].title != "**!0")
         {
             curShow++;
@@ -837,18 +841,18 @@ void ProgFinder::showSearchList()
                 if (update_Timer->isActive() == true)
                     update_Timer->stop();
 
-                curLabel = 0; 
+                curLabel = 0;
 
-                for (int i = (int)(tempSearch * showsPerListing); 
+                for (int i = (int)(tempSearch * showsPerListing);
                      i < (int)((tempSearch + 1) * showsPerListing); i++)
-                {    
+                {
                     if (initData[i] != NULL)
                     {
                         if (curLabel == (int)(showsPerListing / 2))
-                            ltype->SetItemText(curLabel, " " + initData[i] + 
+                            ltype->SetItemText(curLabel, " " + initData[i] +
                                                " ");
                         else
-                            ltype->SetItemText(curLabel, " " + initData[i] + 
+                            ltype->SetItemText(curLabel, " " + initData[i] +
                                                " ");
                      }
                      else
@@ -880,7 +884,7 @@ void ProgFinder::showProgramList()
             {
                 int curLabel = 0;
                 int t = 0;
-                for (int i = (curProgram - ((showsPerListing - 1) / 2)); 
+                for (int i = (curProgram - ((showsPerListing - 1) / 2));
                         i < (curProgram + ((showsPerListing + 1) / 2)); i++)
                 {
                     t = i;
@@ -888,16 +892,16 @@ void ProgFinder::showProgramList()
                         t = i + listCount;
                     if (i >= listCount)
                         t = i - listCount;
-        
+
                     if (progData[t] != NULL)
                     {
                         if (progData[t] != "**!0")
                         {
                             if (curLabel == (int)(showsPerListing / 2))
-                                ltype->SetItemText(curLabel, " " + progData[t] 
+                                ltype->SetItemText(curLabel, " " + progData[t]
                                                    + " ");
                             else
-                                ltype->SetItemText(curLabel, " " + progData[t] 
+                                ltype->SetItemText(curLabel, " " + progData[t]
                                                    + " ");
                         }
                         else
@@ -942,24 +946,24 @@ void ProgFinder::showShowingList()
                     {
                         if (showData[t].title != "**!0")
                         {
-                            ltype->SetItemText(curLabel, " " + 
+                            ltype->SetItemText(curLabel, " " +
                                                showData[t].startDisplay);
-                        
+
                             if (curLabel != (int)(showsPerListing / 2) &&
                                 showData[t].recording > 0)
                                 ltype->EnableForcedFont(curLabel, "recording");
 
-                        }  
+                        }
                         else
                             ltype->SetItemText(curLabel, "");
-                    }        
+                    }
                     else
                     {
                         ltype->SetItemText(curLabel, "");
                     }
                     curLabel++;
                 }
-            } 
+            }
         }
         curChannel = showData[curShow].channelID;
         curDateTime = showData[curShow].starttime;
@@ -974,41 +978,19 @@ void ProgFinder::selectSearchData()
         return;
 
     allowkeypress = false;
-    QDateTime progStart = QDateTime::currentDateTime();
     QString thequery;
     QString data;
 
-    if (searchData[curSearch].contains('@'))
-    {
-        thequery = QString("SELECT DISTINCT title FROM program WHERE ( "
-                           "title NOT REGEXP '^[A-Z0-9]' AND "
-                           "title NOT REGEXP '^The [A-Z0-9]' AND "
-                           "title NOT REGEXP '^A [A-Z0-9]' AND "
-                           "starttime > %1 ) ORDER BY title;")
-                           .arg(progStart.toString("yyyyMMddhhmm50"));
-    }
-    else
-    {
-        thequery = QString("SELECT DISTINCT title "
-                           "FROM program "
-                           "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' "
-                           "OR title LIKE 'A %3%' ) "
-                           "AND starttime > %4 "
-                           "ORDER BY title;")
-                           .arg(searchData[curSearch])
-                           .arg(searchData[curSearch])
-                           .arg(searchData[curSearch])
-                           .arg(progStart.toString("yyyyMMddhhmm50"));
-    }
+    thequery = whereClauseGetSearchData(curSearch);
 
     QSqlQuery query = m_db->exec(thequery);
- 
+
     int rows = query.numRowsAffected();
 
     if (rows == -1)
     {
         cerr << "MythProgFind: Error executing query! (selectSearchData)\n";
-        cerr << "MythProgFind: QUERY = " << thequery << endl;
+        cerr << "MythProgFind: QUERY = " << thequery.local8Bit() << endl;
         return;
     }
 
@@ -1027,46 +1009,8 @@ void ProgFinder::selectSearchData()
                 return;
             data = QString::fromUtf8(query.value(0).toString());
 
-            if (searchData[curSearch] == "T" || searchData[curSearch] == "A")
+            if (formatSelectedData(data))
             {
-                if (data.left(5) == "The T" && searchData[curSearch] == "T")
-                {
-                    data = data.mid(4) + ", The";
-                    tempList[data.lower()] = data;
-                    listCount++;
-                }
-                else if (data.left(5) == "The A" && 
-                         searchData[curSearch] == "A")
-                {
-                    data = data.mid(4) + ", The";
-                    tempList[data.lower()] = data;
-                    listCount++;
-                }
-                else if (data.left(3) == "A T" && searchData[curSearch] == "T")
-                {
-                    data = data.mid(2) + ", A";
-                    tempList[data.lower()] = data;
-                    listCount++;
-                }
-                else if (data.left(3) == "A A" && searchData[curSearch] == "A")
-                {
-                    data = data.mid(2) + ", A";
-                    tempList[data.lower()] = data;
-                    listCount++;
-                }
-                else if (data.left(4) != "The " && data.left(2) != "A ")
-                {
-                    tempList[data.lower()] = data;
-                    listCount++;
-                }
-            }        
-            else
-            {
-                if (data.left(4) == "The ")
-                    data = data.mid(4) + ", The";
-                if (data.left(2) == "A ")
-                    data = data.mid(2) + ", A";
-
                 tempList[data.lower()] = data;
                 listCount++;
             }
@@ -1086,14 +1030,10 @@ void ProgFinder::selectSearchData()
         ShowData::Iterator it;
         for (it = tempList.begin(); it != tempList.end(); ++it)
         {
-            progData[cnt] = it.data();
+            QString tmpProgData = it.data();
+            restoreSelectedData(tmpProgData);
 
-            if (progData[cnt].right(5) == ", The")
-                progData[cnt] = "The " + 
-                                progData[cnt].left(progData[cnt].length() - 5);
-            if (progData[cnt].right(3) == ", A")
-                progData[cnt] = "A " + 
-                                progData[cnt].left(progData[cnt].length() - 3);
+            progData[cnt] = tmpProgData;
 
             cnt++;
         }
@@ -1129,7 +1069,7 @@ void ProgFinder::clearProgramList()
                 cnt++;
         }
 
-        int amountDone = (int)(100.0 * (float)((float)cnt / 
+        int amountDone = (int)(100.0 * (float)((float)cnt /
                                                (float)searchCount));
 
         QString data = QString(" Loading Data...%1% Complete").arg(amountDone);
@@ -1178,8 +1118,8 @@ int ProgFinder::checkRecordingStatus(int showNum)
             {
                 if (curRecordings[j].type == kSingleRecord)
                 {
-                    if (showData[showNum].startdatetime == 
-                        curRecordings[j].startdatetime)        
+                    if (showData[showNum].startdatetime ==
+                        curRecordings[j].startdatetime)
                     {
                         return curRecordings[j].type;
                     }
@@ -1187,7 +1127,7 @@ int ProgFinder::checkRecordingStatus(int showNum)
             }
             if (curRecordings[j].type == kTimeslotRecord)
             {
-                if ((showData[showNum].startdatetime).time() == 
+                if ((showData[showNum].startdatetime).time() ==
                      (curRecordings[j].startdatetime).time()
                     && showData[showNum].channelID == curRecordings[j].chanid)
                 {
@@ -1196,9 +1136,9 @@ int ProgFinder::checkRecordingStatus(int showNum)
             }
             if (curRecordings[j].type == kWeekslotRecord)
             {
-                if ((showData[showNum].startdatetime).time() == 
+                if ((showData[showNum].startdatetime).time() ==
                      (curRecordings[j].startdatetime).time()
-                    && (showData[showNum].startdatetime).toString("dddd") == 
+                    && (showData[showNum].startdatetime).toString("dddd") ==
                      (curRecordings[j].startdatetime).toString("dddd")
                     && showData[showNum].channelID == curRecordings[j].chanid)
                 {
@@ -1252,7 +1192,7 @@ void ProgFinder::getRecordingInfo()
             while (query.next())
             {
                 recDateTime = QDateTime::fromString(query.value(2).toString() +
-                                                    "T" + 
+                                                    "T" +
                                                     query.value(1).toString(),
                                                     Qt::ISODate);
 
@@ -1305,12 +1245,12 @@ void ProgFinder::selectShowData(QString progTitle)
     if (rows == -1)
     {
         cerr << "MythProgFind: Error executing query! (selectShowData)\n";
-        cerr << "MythProgFind: QUERY = " << thequery << endl;
+        cerr << "MythProgFind: QUERY = " << thequery.local8Bit() << endl;
         return;
     }
 
     showCount = 0;
- 
+
     if (rows < showsPerListing)
     {
         showData = new showRecord[showsPerListing];
@@ -1377,7 +1317,7 @@ void ProgFinder::selectShowData(QString progTitle)
                     data = tr("Error!");
                     break;
             }
-                
+
             showData[showCount].recText = data;
 
             showCount++;
@@ -1395,19 +1335,7 @@ void ProgFinder::selectShowData(QString progTitle)
 void ProgFinder::getInitialProgramData()
 {
     getRecordingInfo();
-
-    getSearchData(8);
-    getSearchData(9);
-    getSearchData(11);
-    getSearchData(12);
-
-    for (int charNum = 0; charNum < searchCount; charNum++)
-    {
-        if (charNum == 8)
-            charNum = 13;
-
-        getSearchData(charNum);
-    }
+    getAllProgramData();
 }
 
 void ProgFinder::getSearchData(int charNum)
@@ -1418,32 +1346,10 @@ void ProgFinder::getSearchData(int charNum)
     int cnts = 0;
     int dataNum = 0;
     int startPlace = 0;
-    QDateTime progStart = QDateTime::currentDateTime();
     QString thequery;
     QString data;
 
-    if (searchData[charNum].contains('@'))
-    {
-        thequery = QString("SELECT DISTINCT title FROM program WHERE ( "
-                           "title NOT REGEXP '^[A-Z0-9]' AND "
-                           "title NOT REGEXP '^The [A-Z0-9]' AND "
-                           "title NOT REGEXP '^A [A-Z0-9]' AND "
-                           "starttime > %1 ) ORDER BY title;")
-                           .arg(progStart.toString("yyyyMMddhhmm50"));
-    }
-    else
-    {
-        thequery = QString("SELECT DISTINCT title "
-                           "FROM program "
-                           "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' OR "
-                           "title LIKE 'A %3%' ) "
-                           "AND starttime > %4 "
-                           "ORDER BY title;")
-                           .arg(searchData[charNum])
-                           .arg(searchData[charNum])
-                           .arg(searchData[charNum])
-                           .arg(progStart.toString("yyyyMMddhhmm50"));
-    }
+    thequery = whereClauseGetSearchData(charNum);
 
     QSqlQuery query = m_db->exec(thequery);
 
@@ -1467,46 +1373,9 @@ void ProgFinder::getSearchData(int charNum)
         while (query.next())
         {
             data = QString::fromUtf8(query.value(0).toString());
-                
-            if (charNum == 29 || charNum == 10)
-            {
-                if (data.left(5) == "The T" && charNum == 29)
-                {
-                    data = data.mid(4) + ", The";
-                    tempList[data.lower()] = data;
-                    cnts++;
-                }
-                else if (data.left(5) == "The A" && charNum == 10)
-                {
-                    data = data.mid(4) + ", The";
-                    tempList[data.lower()] = data;
-                    cnts++;
-                }
-                else if (data.left(3) == "A T" && charNum == 29)
-                {
-                    data = data.mid(2) + ", A";
-                    tempList[data.lower()] = data;
-                    cnts++;
-                }
-                else if (data.left(3) == "A A" && charNum == 10)
-                {
-                    data = data.mid(2) + ", A";
-                    tempList[data.lower()] = data;
-                    cnts++;
-                }
-                else if (data.left(4) != "The " && data.left(2) != "A ")
-                {
-                    tempList[data.lower()] = data;
-                    cnts++;
-                }
-            }
-            else
-            {
-                if (data.left(4) == "The ")
-                    data = data.mid(4) + ", The";
-                if (data.left(2) == "A ")
-                    data = data.mid(2) + ", A";
 
+            if (formatSelectedData(data, charNum))
+            {
                 tempList[data.lower()] = data;
                 cnts++;
             }
@@ -1521,26 +1390,16 @@ void ProgFinder::getSearchData(int charNum)
             if (cnt <= (int)(showsPerListing / 2))
             {
                 data = it.data();
-
-                if (data.right(5) == ", The")
-                    data = "The " + data.left(data.length() - 5);
-                if (data.right(3) == ", A")
-                    data = "A " + data.left(data.length() - 3);
-
+                restoreSelectedData(data);
                 initData[startPlace + dataNum] = data;
                 dataNum++;
-            }        
+            }
 
-            if (cnt >= (cnts - (int)(showsPerListing / 2)) && 
+            if (cnt >= (cnts - (int)(showsPerListing / 2)) &&
                 rows >= showsPerListing)
             {
                 data = it.data();
-
-                if (data.right(5) == ", The")
-                    data = "The " + data.left(data.length() - 5);
-                if (data.right(3) == ", A")
-                    data = "A " + data.left(data.length() - 3);
-
+                restoreSelectedData(data);
                 initData[startPlace + dNum] = data;
                 dNum++;
             }
@@ -1560,3 +1419,236 @@ void ProgFinder::getSearchData(int charNum)
         showSearchList();
 }
 
+void ProgFinder::fillSearchData(void)
+{
+    int curLabel = 0;
+
+    for (int charNum = 48; charNum < 91; charNum++)
+    {
+        if (charNum == 58)
+            charNum = 65;
+
+        gotInitData[curLabel] = 0;
+        searchData[curLabel] = (char)charNum;
+        curLabel++;
+    }
+
+    gotInitData[curLabel] = 0;
+    searchData[curLabel] = '@';
+}
+
+QString ProgFinder::whereClauseGetSearchData(int charNum)
+{
+    QDateTime progStart = QDateTime::currentDateTime();
+    QString thequery;
+
+    if (searchData[charNum].contains('@'))
+    {
+        thequery = QString("SELECT DISTINCT title FROM program WHERE ( "
+                           "title NOT REGEXP '^[A-Z0-9]' AND "
+                           "title NOT REGEXP '^The [A-Z0-9]' AND "
+                           "title NOT REGEXP '^A [A-Z0-9]' AND "
+                           "starttime > %1 ) ORDER BY title;")
+                           .arg(progStart.toString("yyyyMMddhhmm50"));
+    }
+    else
+    {
+        thequery = QString("SELECT DISTINCT title "
+                           "FROM program "
+                           "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' "
+                           "OR title LIKE 'A %3%' ) "
+                           "AND starttime > %4 "
+                           "ORDER BY title;")
+                           .arg(searchData[charNum])
+                           .arg(searchData[charNum])
+                           .arg(searchData[charNum])
+                           .arg(progStart.toString("yyyyMMddhhmm50"));
+    }
+
+    return thequery;
+}
+
+bool ProgFinder::formatSelectedData(QString& data)
+{
+    bool retval = true;
+
+    if (searchData[curSearch] == "T" || searchData[curSearch] == "A")
+    {
+        if (data.left(5) == "The T" && searchData[curSearch] == "T")
+            data = data.mid(4) + ", The";
+        else if (data.left(5) == "The A" && searchData[curSearch] == "A")
+            data = data.mid(4) + ", The";
+        else if (data.left(3) == "A T" && searchData[curSearch] == "T")
+            data = data.mid(2) + ", A";
+        else if (data.left(3) == "A A" && searchData[curSearch] == "A")
+             data = data.mid(2) + ", A";
+        else if (data.left(4) != "The " && data.left(2) != "A ")
+        {
+             // nothing, use as is
+        }
+        else
+        {
+            // don't add
+            retval = false;
+        }
+    }
+    else
+    {
+        if (data.left(4) == "The ")
+            data = data.mid(4) + ", The";
+        if (data.left(2) == "A ")
+            data = data.mid(2) + ", A";
+    }
+
+    return retval;
+}
+
+bool ProgFinder::formatSelectedData(QString& data, int charNum)
+{
+    bool retval = true;
+
+    if (charNum == 29 || charNum == 10)
+    {
+        if (data.left(5) == "The T" && charNum == 29)
+            data = data.mid(4) + ", The";
+        else if (data.left(5) == "The A" && charNum == 10)
+            data = data.mid(4) + ", The";
+        else if (data.left(3) == "A T" && charNum == 29)
+            data = data.mid(2) + ", A";
+        else if (data.left(3) == "A A" && charNum == 10)
+            data = data.mid(2) + ", A";
+        else if (data.left(4) != "The " && data.left(2) != "A ")
+        {
+            // use as is
+        }
+        else
+        {
+            // don't add
+            retval = false;
+        }
+    }
+    else
+    {
+        if (data.left(4) == "The ")
+            data = data.mid(4) + ", The";
+        if (data.left(2) == "A ")
+            data = data.mid(2) + ", A";
+    }
+
+    return retval;
+}
+
+void ProgFinder::restoreSelectedData(QString &data)
+{
+    if (data.right(5) == ", The")
+        data = "The " + data.left(data.length() - 5);
+    if (data.right(3) == ", A")
+        data = "A " + data.left(data.length() - 3);
+}
+
+void ProgFinder::getAllProgramData()
+{
+    getSearchData(8);
+    getSearchData(9);
+    getSearchData(11);
+    getSearchData(12);
+
+    for (int charNum = 0; charNum < searchCount; charNum++)
+    {
+        if (charNum == 8)
+            charNum = 13;
+
+        getSearchData(charNum);
+    }
+}
+
+
+// Japanese specific program finder
+
+// japanese HIRAGANA list and more
+const char* JaProgFinder::searchChars[] = {
+    "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+    "あ", "い", "う", "え", "お",
+    "か", "き", "く", "け", "こ",
+    "さ", "し", "す", "せ", "そ",
+    "た", "ち", "つ", "て", "と",
+    "な", "に", "ぬ", "ね", "の",
+    "は", "ひ", "ふ", "へ", "ほ",
+    "ま", "み", "む", "め", "も",
+    "や",       "ゆ",       "よ",
+    "ら", "り", "る", "れ", "ろ",
+    "わ", "を", "ん",
+    "(ス)",  "(字)", "(多)",
+    0,
+};
+
+JaProgFinder::JaProgFinder(MythMainWindow *parent, const char *name)
+            : ProgFinder(parent, name)
+{
+    for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
+         numberOfSearchChars++)
+         ;
+
+    searchCount = numberOfSearchChars;
+    curSearch = 10;
+}
+
+void JaProgFinder::fillSearchData()
+{
+    int curLabel = 0;
+    for (int charNum = 0; charNum < searchCount; charNum++)
+    {
+        gotInitData[curLabel] = 0;
+        searchData[curLabel] = QString::fromUtf8(searchChars[charNum]);
+        curLabel++;
+    }
+}
+
+// searching subtitle, i hope subtitle inserted japanese HIRAGANA
+QString JaProgFinder::whereClauseGetSearchData(int charNum)
+{
+    QDateTime progStart = QDateTime::currentDateTime();
+    QString thequery;
+    thequery = QString("SELECT DISTINCT title "
+                       "FROM program "
+                       "WHERE ( title LIKE '%1%' OR subtitle LIKE '(す)%2%' "
+                       "OR subtitle LIKE '(じ)%3%' "
+                       "OR subtitle LIKE '(じ)(す)%4%' "
+                       "OR subtitle LIKE '(た)%5%' ) "
+                       "AND starttime > %6 "
+                       "ORDER BY title;")
+                        .arg(searchData[charNum].utf8())
+                        .arg(searchData[charNum].utf8())
+                        .arg(searchData[charNum].utf8())
+                        .arg(searchData[charNum].utf8())
+                        .arg(searchData[charNum].utf8())
+                        .arg(progStart.toString("yyyyMMddhhmm50"));
+    return thequery;
+}
+
+
+bool JaProgFinder::formatSelectedData(QString& data)
+{
+    (void)data;
+    return true;
+}
+
+bool JaProgFinder::formatSelectedData(QString& data, int charNum)
+{
+    (void)data;
+    (void)charNum;
+    return true;
+}
+
+void JaProgFinder::restoreSelectedData(QString& data)
+{
+    (void)data;
+}
+
+void JaProgFinder::getAllProgramData()
+{
+    for (int charNum = 0; charNum < searchCount; charNum++)
+    {
+        getSearchData(charNum);
+    }
+}

@@ -456,7 +456,7 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
         ret = read(fd, (char *)data + tot, sz - tot);
         if (ret < 0)
         {
-            perror("ERROR: file I/O problem in 'safe_read()'\n");
+            perror("ERROR: file I/O problem in 'safe_read()'");
             errcnt++;
             if (errcnt == 3) 
                 break;

@@ -270,7 +270,7 @@ void Scheduler::PrintList(void)
 
         totrecpriority = QString::number(totalRecPriority(first));
 
-        cout << first->title.leftJustify(22, ' ', true)
+        cout << first->title.local8Bit().leftJustify(22, ' ', true)
              << first->chanstr.rightJustify(4, ' ') << "  " << first->chanid 
              << first->recstartts.toString("  MMM dd hh:mmap  ")
              << first->sourceid 
@@ -1510,7 +1510,7 @@ void Scheduler::RunScheduler(void)
                 }
 
                 msg += QString(" \"%1\" on channel: %2 on cardid: %3, "
-                               "sourceid %4").arg(nextRecording->title)
+                               "sourceid %4").arg(nextRecording->title.utf8())
                                              .arg(nextRecording->chanid)
                                              .arg(nextRecording->cardid)
                                              .arg(nextRecording->sourceid);

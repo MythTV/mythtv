@@ -657,11 +657,11 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
 
             cerr << "removing conflicting program: "
                  << (*todelete).channel << " "
-                 << (*todelete).title << " "
+                 << (*todelete).title.local8Bit() << " "
                  << (*todelete).startts << "-" << (*todelete).endts << endl;
             cerr << "conflicted with             : "
                  << (*tokeep).channel << " "
-                 << (*tokeep).title << " "
+                 << (*tokeep).title.local8Bit() << " "
                  << (*tokeep).startts << "-" <<   (*tokeep).endts << endl;
             cerr << endl;
 
@@ -678,13 +678,13 @@ QString getResponse(const QString &query, const QString &def)
 
     if (def != "")
     {
-        cout << " [" << def << "]  ";
+        cout << " [" << (const char *)def.local8Bit() << "]  ";
     }
     
     char response[80];
     cin.getline(response, 80);
 
-    QString qresponse = response;
+    QString qresponse = QString::fromLocal8Bit(response);
 
     if (qresponse == "")
         qresponse = def;
@@ -824,16 +824,16 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 cout << "### " << endl;
                 cout << "### Existing channel found" << endl;
                 cout << "### " << endl;
-                cout << "### xmltvid  = " << (*i).xmltvid.ascii() << endl;
-                cout << "### chanid   = " << chanid.ascii()       << endl;
-                cout << "### name     = " << name.ascii()         << endl;
-                cout << "### callsign = " << callsign.ascii()     << endl;
-                cout << "### channum  = " << chanstr.ascii()      << endl;
+                cout << "### xmltvid  = " << (*i).xmltvid.local8Bit() << endl;
+                cout << "### chanid   = " << chanid.local8Bit()       << endl;
+                cout << "### name     = " << name.local8Bit()         << endl;
+                cout << "### callsign = " << callsign.local8Bit()     << endl;
+                cout << "### channum  = " << chanstr.local8Bit()      << endl;
                 if (channel_preset)
-                    cout << "### freqid   = " << freqid.ascii()   << endl;
-                cout << "### finetune = " << finetune.ascii()     << endl;
-                cout << "### tvformat = " << tvformat.ascii()     << endl;
-                cout << "### icon     = " << icon.ascii()         << endl;
+                    cout << "### freqid   = " << freqid.local8Bit()   << endl;
+                cout << "### finetune = " << finetune.local8Bit()     << endl;
+                cout << "### tvformat = " << tvformat.local8Bit()     << endl;
+                cout << "### icon     = " << icon.local8Bit()         << endl;
                 cout << "### " << endl;
 
                 (*i).name = name;
@@ -853,23 +853,23 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                     icon     != localfile ||
                     tvformat != (*i).tvformat)
                 {
-                    querystr.sprintf("UPDATE channel SET chanid = %s, "
-                                     "name = \"%s\", callsign = \"%s\", "
-                                     "channum = \"%s\", finetune = %d, "
-                                     "icon = \"%s\", freqid = \"%s\", "
-                                     "tvformat = \"%s\" "
-                                     "WHERE xmltvid = \"%s\" "
-                                     "AND sourceid = %d;",
-                                     chanid.ascii(),
-                                     (*i).name.ascii(),
-                                     (*i).callsign.ascii(),
-                                     (*i).chanstr.ascii(),
-                                     atoi((*i).finetune.ascii()),
-                                     localfile.ascii(),
-                                     (*i).freqid.ascii(),
-                                     (*i).tvformat.ascii(),
-                                     (*i).xmltvid.ascii(),
-                                     id);
+                     querystr = QString("UPDATE channel SET chanid = %0, "
+                                        "name = \"%1\", callsign = \"%2\", "
+                                        "channum = \"%3\", finetune = %4, "
+                                        "icon = \"%5\", freqid = \"%6\", "
+                                        "tvformat = \"%7\" "
+                                        " WHERE xmltvid = \"%8\" "
+                                        "AND sourceid = %9;")
+                                        .arg(chanid.utf8())
+                                        .arg((*i).name.utf8())
+                                        .arg((*i).callsign.utf8())
+                                        .arg((*i).chanstr.utf8())
+                                        .arg(atoi((*i).finetune.utf8()))
+                                        .arg(localfile.utf8())
+                                        .arg((*i).freqid.utf8())
+                                        .arg((*i).tvformat.utf8())
+                                        .arg((*i).xmltvid.utf8())
+                                        .arg(id);
 
                     if (!query.exec(querystr))
                     {
@@ -915,34 +915,35 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 cout << "### " << endl;
                 cout << "### New channel found" << endl;
                 cout << "### " << endl;
-                cout << "### name     = " << (*i).name.ascii()         << endl;
-                cout << "### callsign = " << (*i).callsign.ascii()     << endl;
-                cout << "### channum  = " << (*i).chanstr.ascii()      << endl;
+                cout << "### name     = " << (*i).name.local8Bit()     << endl;
+                cout << "### callsign = " << (*i).callsign.local8Bit() << endl;
+                cout << "### channum  = " << (*i).chanstr.local8Bit()  << endl;
                 if (channel_preset)
-                    cout << "### freqid   = " << (*i).freqid.ascii()   << endl;
-                cout << "### finetune = " << (*i).finetune.ascii()     << endl;
-                cout << "### tvformat = " << (*i).tvformat.ascii()     << endl;
-                cout << "### icon     = " << localfile.ascii()         << endl;
+                    cout << "### freqid   = " << (*i).freqid.local8Bit() << endl;
+                cout << "### finetune = " << (*i).finetune.local8Bit() << endl;
+                cout << "### tvformat = " << (*i).tvformat.local8Bit() << endl;
+                cout << "### icon     = " << localfile.local8Bit()     << endl;
                 cout << "### " << endl;
 
                 unsigned int chanid = promptForChannelUpdates(i,0);
 
                 if (chanid > 0)
                 {
-                    querystr.sprintf("INSERT INTO channel (chanid,name,"
-                                     "callsign,channum,finetune,icon,"
-                                     "xmltvid,sourceid,freqid,tvformat) "
-                                     "VALUES(%d,\"%s\",\"%s\",\"%s\",%d,"
-                                     "\"%s\",\"%s\",%d,\"%s\",\"%s\");", 
-                                     chanid,
-                                     (*i).name.ascii(),
-                                     (*i).callsign.ascii(),
-                                     (*i).chanstr.ascii(),
-                                     atoi((*i).finetune.ascii()),
-                                     localfile.ascii(),
-                                     (*i).xmltvid.ascii(),
-                                     id, (*i).freqid.ascii(),
-                                     (*i).tvformat.ascii());
+                    querystr = QString("INSERT INTO channel (chanid,name"
+                                       ",callsign,channum,finetune,icon"
+                                       ",xmltvid,sourceid,freqid,tvformat) "
+                                       "VALUES(%0,\"%1\",\"%2\",\"%3\",%4,"
+                                       "\"%5\",\"%6\",%7,\"%8\",\"%9\");")
+                                       .arg(chanid)
+                                       .arg((*i).name.utf8())
+                                       .arg((*i).callsign.utf8())
+                                       .arg((*i).chanstr.utf8())
+                                       .arg(atoi((*i).finetune))
+                                       .arg(localfile.utf8())
+                                       .arg((*i).xmltvid.utf8())
+                                       .arg(id)
+                                       .arg((*i).freqid.utf8())
+                                       .arg((*i).tvformat.utf8());
 
                     if (!query.exec(querystr))
                     {
@@ -986,20 +987,21 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                         break;
                 }
 
-                querystr.sprintf("INSERT INTO channel (chanid,name,callsign,"
-                                 "channum,finetune,icon,xmltvid,sourceid,"
-                                 "freqid,tvformat) "
-                                 "VALUES(%d,\"%s\",\"%s\",\"%s\",%d,\"%s\","
-                                 "\"%s\",%d,\"%s\",\"%s\");", 
-                                 chanid,
-                                 (*i).name.ascii(),
-                                 (*i).callsign.ascii(),
-                                 (*i).chanstr.ascii(),
-                                 atoi((*i).finetune.ascii()),
-                                 localfile.ascii(),
-                                 (*i).xmltvid.ascii(),
-                                 id, (*i).freqid.ascii(),
-                                 (*i).tvformat.ascii());
+                querystr = QString("INSERT INTO channel (chanid,name,callsign,"
+                                   "channum,finetune,icon,xmltvid,sourceid,"
+                                   "freqid,tvformat) "
+                                   "VALUES(%0,\"%1\",\"%2\",\"%3\",%4,\"%5\","
+                                   "\"%6\",%7,\"%8\",\"%9\");")
+                                   .arg(chanid)
+                                   .arg((*i).name.utf8())
+                                   .arg((*i).callsign)
+                                   .arg((*i).chanstr)
+                                   .arg(atoi((*i).finetune))
+                                   .arg(localfile)
+                                   .arg((*i).xmltvid)
+                                   .arg(id)
+                                   .arg((*i).freqid)
+                                   .arg((*i).tvformat);
 
                 if (!query.exec(querystr))
                     MythContext::DBError("channel insert", query);
@@ -1151,7 +1153,7 @@ void handlePrograms(int id, int offset, QMap<QString,
 
                     cerr << "inserting new program    : "
                          << (*i).channel << " "
-                         << (*i).title << " "
+                         << (*i).title.local8Bit() << " "
                          << (*i).startts << "-" << (*i).endts << endl;
                     cerr << endl;
 
@@ -1370,8 +1372,12 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         command.sprintf("nice %s --days=4 --offset %d --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), offset,
                         configfile.ascii(), filename.ascii());
+     else if (xmltv_grabber == "tv_grab_ja")
+         // Use fixed interval of 3 days for Japanese grabber
+         command.sprintf("nice %s --days 3 --config-file '%s' --output %s",
+                         xmltv_grabber.ascii(), configfile.ascii(),
+                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_sn")
-        // Use fixed interval of 14 days for Swedish/Norwegian grabber
         command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), offset, configfile.ascii(),
                         filename.ascii());
@@ -1400,7 +1406,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          xmltv_grabber == "tv_grab_uk_rt" ||
          xmltv_grabber == "tv_grab_nl" ||
          xmltv_grabber == "tv_grab_fr" ||
-         xmltv_grabber == "tv_grab_fi"))
+         xmltv_grabber == "tv_grab_fi" ||
+         xmltv_grabber == "tv_grab_ja"))
          command += " --quiet";
 
 
@@ -1515,7 +1522,7 @@ bool fillData(QValueList<Source> &sourcelist)
         if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de" ||
             xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
             xmltv_grabber == "tv_grab_nl" || xmltv_grabber == "tv_grab_au" ||
-            xmltv_grabber == "tv_grab_fr")
+            xmltv_grabber == "tv_grab_fr" || xmltv_grabber == "tv_grab_ja")
         {
             // tv_grab_uk|de doesn't support the --offset option, so just grab a 
             // week.

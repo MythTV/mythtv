@@ -10,7 +10,7 @@ TEMPLATE = app
 CONFIG -= moc qt
 
 themes.path = $${PREFIX}/share/mythtv/themes/
-themes.files = blue defaultosd blueosd oldosd default
+themes.files = blue defaultosd blueosd oldosd default G.A.N.T.
 
 fonts.path = $${PREFIX}/share/mythtv
 fonts.files = FreeSans.ttf FreeMono.ttf

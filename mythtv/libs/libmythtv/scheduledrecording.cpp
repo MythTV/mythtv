@@ -356,7 +356,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->description = QString::fromUtf8(result.value(6).toString());
              proginfo->chanstr = result.value(7).toString();
              proginfo->chansign = result.value(8).toString();
-             proginfo->channame = result.value(9).toString();
+             proginfo->channame = QString::fromUtf8(result.value(9).toString());
              proginfo->category = QString::fromUtf8(result.value(11).toString());
              proginfo->recpriority = result.value(12).toString();
              proginfo->recdups = RecordingDupsType(result.value(13).toInt());
@@ -476,7 +476,7 @@ void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
                 proginfo->subtitle = QString::fromUtf8(result.value(6).toString());
             proginfo->description = QString::fromUtf8(result.value(7).toString());
             proginfo->recpriority = result.value(8).toString();
-            proginfo->channame = result.value(10).toString();
+            proginfo->channame = QString::fromUtf8(result.value(10).toString());
             proginfo->recstartts = proginfo->startts;
             proginfo->recendts = proginfo->endts;
 

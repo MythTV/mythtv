@@ -11,6 +11,7 @@
       <text lang="DK">Generelt</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
+      <text lang="JA">一般</text>
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -26,6 +27,7 @@
       <text lang="DK">Program Guide</text>
       <text lang="PT">Configurações do Guia</text>
       <text lang="SV">Programguide</text>
+      <text lang="JA">番組ガイド</text>
       <action>SETTINGS EPG</action>
    </button>
 
@@ -41,6 +43,7 @@
       <text lang="DK">Afspilning</text>
       <text lang="PT">Configurações de Leitura</text>
       <text lang="SV">Avspelning</text>
+      <text lang="JA">再生</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -56,6 +59,7 @@
       <text lang="DK">Optagelse</text>
       <text lang="PT">Configurações de Gravação</text>
       <text lang="SV">Inspelning</text>
+      <text lang="JA">録画プロフィール</text>
       <action>SETTINGS RECORDING</action>
    </button>
 
@@ -63,6 +67,7 @@
       <type>TV_RECPRIORITIES</type>
       <text>Recording Priorities</text>
       <text lang="DE">Aufnahme- prioritäten</text>
+      <text lang="JA">録画優先順位</text>
       <action>MENU recpriorities_settings.xml</action>
    </button>
 

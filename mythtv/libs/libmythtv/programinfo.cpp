@@ -1940,7 +1940,7 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
     message += "\n\n";
     message += RecStatusDesc();
 
-    DialogBox diag(gContext->GetMainWindow(), QObject::tr(message));
+    DialogBox diag(gContext->GetMainWindow(), message);
     diag.AddButton(QObject::tr("OK"));
 
     if (recstatus == rsWillRecord)

@@ -80,7 +80,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
 
     if (query.isActive() && query.numRowsAffected()) {
       while(query.next()) {
-	QString channel = query.value(0).toString();
+	QString channel = QString::fromUtf8(query.value(0).toString());
 	m_channel->insertItem(channel);
       }
       
@@ -476,7 +476,8 @@ void ManualSchedule::saveScheduledRecording(void)
 
     QString channame=m_channel->currentText();
 
-    QString thequery=QString("SELECT chanid FROM channel WHERE name=\"%1\";").arg(channame);
+    QString thequery=QString("SELECT chanid FROM channel WHERE name=\"%1\";")
+                            .arg(channame.utf8());
 
     query.exec(thequery);
     

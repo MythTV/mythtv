@@ -632,7 +632,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             if (!query.value(7).toString().isNull())
             {
                 proginfo->chanstr = query.value(7).toString();
-                proginfo->channame = query.value(8).toString();
+                proginfo->channame = QString::fromUtf8(query.value(8).toString());
                 proginfo->chansign = query.value(9).toString();
             }
             else

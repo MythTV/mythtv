@@ -693,6 +693,7 @@ void SimpleDBStorage::load(QSqlDatabase* db) {
         query.next();
         QString result = query.value(0).toString();
         if (result != QString::null) {
+          result = QString::fromUtf8(query.value(0).toString());
           setValue(result);
           setUnchanged();
         }

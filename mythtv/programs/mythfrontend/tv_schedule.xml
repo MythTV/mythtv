@@ -12,6 +12,7 @@
       <text lang="DK">Program Guide</text>
       <text lang="PT">Guia de Programação</text>
       <text lang="SV">Programguide</text>
+      <text lang="JA">番組ガイド</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Parilla</alttext>
@@ -21,6 +22,7 @@
       <alttext lang="NL">Gids</alttext>
       <alttext lang="NL">Guia</alttext>
       <alttext lang="SV">Guide</alttext>
+      <alttext lang="JA">ガイド</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -36,6 +38,7 @@
       <text lang="DK">Program Finder</text>
       <text lang="PT">Procurar Programa</text>
       <text lang="SV">Sök program</text>
+      <text lang="JA">番組検索</text>
       <alttext>Finder</alttext>
       <alttext lang="FR">Recherche</alttext>
       <alttext lang="ES">Buscar</alttext>
@@ -45,6 +48,7 @@
       <alttext lang="NL">Zoeker</alttext>
       <alttext lang="PT">Procurar</alttext>
       <alttext lang="SV">Sökaren</alttext>
+      <alttext lang="JA">検索</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -68,6 +72,7 @@
       <text lang="DK">Optag lige nu</text>
       <text lang="PT">Gravar Agora</text>
       <text lang="SV">Omedelbar inspelning</text>
+      <text lang="JA">簡単録画</text>
       <alttext>Instant Record</alttext>
       <alttext lang="FR">Enreg. manuel</alttext>
       <alttext lang="ES">Grab. inst.</alttext>
@@ -76,6 +81,7 @@
       <alttext lang="NL">Instant</alttext>
       <alttext lang="PT">Gravar Agora</alttext>
       <alttext lang="SV">Omedelbar</alttext>
+      <alttext lang="JA">簡単録画</alttext>
       <action>TV_MANUAL</action>
    </button>
 -->
@@ -90,6 +96,7 @@
       <text lang="NL">Manuele Opname</text>
       <text lang="PT">Gravação Manual</text>
       <text lang="SV">Manuell schemaläggning</text>
+      <text lang="JA">手動予約</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
@@ -98,6 +105,7 @@
       <alttext lang="NL">Manueel</alttext>
       <alttext lang="PT">Manual</alttext>
       <alttext lang="SV">Manuell</alttext>
+      <alttext lang="JA">手動</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 
@@ -105,6 +113,7 @@
       <type>TV_RECPRIORITIES</type>
       <text>Recording Priorities</text>
       <text lang="DE">Sendungen bewerten</text>
+      <text lang="JA">録画優先順位</text>
       <alttext>Priorities</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
@@ -121,7 +130,8 @@
       <text lang="DK">Løs optagelseskonflikter</text>
       <text lang="PT">Resolver Conflitos</text>
       <text lang="SV">Åtgärda schemakonflikter</text>
-      <alttext>Fix Conflicts</alttext>
+      <text lang="JA">予約衝突修正</text>
+      <alttext>Fix Schedule</alttext>
       <alttext lang="FR">Conflits</alttext>
       <alttext lang="ES">Conflictos</alttext>
       <alttext lang="FR">Conflictes</alttext>
@@ -130,6 +140,7 @@
       <alttext lang="NL">Conflicten</alttext>
       <alttext lang="PT">Conflitos</alttext>
       <alttext lang="SV">Konflikter</alttext>
+      <alttext lang="JA">衝突修正</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

@@ -59,7 +59,9 @@ class ProgFinder : public MythDialog
     Q_OBJECT
   public:
     ProgFinder(MythMainWindow *parent, const char *name = 0);
-   ~ProgFinder();
+    virtual ~ProgFinder();
+
+    void Initialize(void);
 
   private slots:
     void update_timeout();
@@ -79,7 +81,13 @@ class ProgFinder : public MythDialog
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
 
-  private:
+    virtual void fillSearchData(void);
+    virtual void getAllProgramData(void);
+    virtual bool formatSelectedData(QString &data);
+    virtual bool formatSelectedData(QString &data, int charNum);
+    virtual void restoreSelectedData(QString &data);
+    virtual QString whereClauseGetSearchData(int canNum);
+
     void LoadWindow(QDomElement &);
     void parseContainer(QDomElement &);
     XMLParse *theme;
@@ -138,6 +146,24 @@ class ProgFinder : public MythDialog
     QString timeFormat;
 
     bool allowkeypress;
+};
+
+class JaProgFinder : public ProgFinder
+{
+  public:
+    JaProgFinder(MythMainWindow *parent, const char *name = 0);
+
+  protected:
+    virtual void fillSearchData();
+    virtual void getAllProgramData();
+    virtual bool formatSelectedData(QString &data);
+    virtual bool formatSelectedData(QString &data, int charNum);
+    virtual void restoreSelectedData(QString &data);
+    virtual QString whereClauseGetSearchData(int canNum);
+
+  private:
+    static const char* searchChars[];
+    int numberOfSearchChars;
 };
 
 #endif

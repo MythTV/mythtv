@@ -39,6 +39,7 @@ using namespace std;
 #define HALT     2
 
 ThemedMenu *menu;
+QTranslator *translator;
 XBox *xbox = NULL;
 
 void startGuide(void)
@@ -392,6 +393,13 @@ void TVMenuCallback(void *data, QString &selection)
     {
         AppearanceSettings settings;
         settings.exec(QSqlDatabase::database());
+
+        qApp->removeTranslator(translator);
+        translator->load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") +
+                         QString(gContext->GetSetting("Language").lower()) +
+                         QString(".qm"), ".");
+        qApp->installTranslator(translator);
+
         gContext->LoadQtConfig();
         gContext->GetMainWindow()->Init();
         gContext->UpdateImageCache();
@@ -633,7 +641,7 @@ int main(int argc, char **argv)
     int lcd_port;
 
     QApplication a(argc, argv);
-    QTranslator translator( 0 );
+    translator = new QTranslator(0);
 
     QString logfile = "";
     QString verboseString = QString(" important general");
@@ -818,10 +826,10 @@ int main(int argc, char **argv)
 
     VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") + 
-                    QString(gContext->GetSetting("Language").lower()) + 
-                    QString(".qm"), ".");
-    a.installTranslator(&translator);
+    translator->load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") + 
+                     QString(gContext->GetSetting("Language").lower()) + 
+                     QString(".qm"), ".");
+    a.installTranslator(translator);
 
     WriteDefaults(db);
 

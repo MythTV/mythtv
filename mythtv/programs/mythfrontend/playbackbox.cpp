@@ -2106,6 +2106,13 @@ void PlaybackBox::showIconHelp(void)
         return;
     }
 
+    timer->stop();
+    playingVideo = false;
+
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
+
     iconhelp->addLayout(grid);
 
     QButton *button = iconhelp->addButton("Ok");
@@ -2114,4 +2121,16 @@ void PlaybackBox::showIconHelp(void)
     iconhelp->ExecPopup();
 
     delete iconhelp;
+
+    backup.begin(this);
+    backup.drawPixmap(0, 0, myBackground);
+    backup.end();
+
+    skipUpdate = false;
+    skipCnt = 2;
+    update(fullRect);
+
+    setActiveWindow();
+
+    timer->start(500);
 }

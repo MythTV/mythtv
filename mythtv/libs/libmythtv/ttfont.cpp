@@ -106,26 +106,26 @@ void TTFFont::destroy_font_raster(Raster_Map * rmap)
    delete rmap;
 }
 
-Raster_Map *TTFFont::calc_size(int *width, int *height, char *text)
+Raster_Map *TTFFont::calc_size(int *width, int *height, const QString &text)
 {
-   int                 i, pw, ph;
-   Raster_Map         *rtmp;
+   unsigned int i, pw, ph;
+   Raster_Map *rtmp;
 
    pw = 0;
    ph = ((max_ascent) - max_descent) / 64;
 
-   for (i = 0; text[i]; i++)
+   for (i = 0; i < text.length(); i++)
    {
-       unsigned char       j = text[i];
+       unsigned short j = text[i].unicode();
 
-       if (!FT_VALID(glyphs[j]))
+       if (!cache_glyph(j))
            continue;
        if (i == 0)
        {
            FT_Load_Glyph(face, j, FT_LOAD_DEFAULT);
            pw += 2; //((face->glyph->metrics.horiBearingX) / 64);
        }
-       if (text[i + 1] == 0)
+       if ((i + 1) == text.length())
        {
            FT_BBox bbox;
            FT_Glyph_Get_CBox(glyphs[j], ft_glyph_bbox_subpixels, &bbox);
@@ -139,7 +139,7 @@ Raster_Map *TTFFont::calc_size(int *width, int *height, char *text)
                pw += glyphs[j]->advance.x / 65535;
        }
    }
-   *width = pw;
+   *width = pw + 4;
    *height = ph;
 
    rtmp = create_font_raster(face->size->metrics.x_ppem + 32, 
@@ -147,16 +147,16 @@ Raster_Map *TTFFont::calc_size(int *width, int *height, char *text)
    return rtmp;
 }
 
-void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, char *text,
-	                  int *xorblah, int *yor)
+void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr,
+	                  const QString &text, int *xorblah, int *yor)
 {
-   FT_F26Dot6          x, y, xmin, ymin, xmax, ymax;
-   FT_BBox             bbox;
-   int                 i, ioff, iread;
-   char               *off, *read, *_off, *_read;
-   int                 x_offset, y_offset;
-   unsigned char       j, previous;
-   Raster_Map         *rtmp;
+   FT_F26Dot6 x, y, xmin, ymin, xmax, ymax;
+   FT_BBox bbox;
+   unsigned int i, ioff, iread;
+   char *off, *read, *_off, *_read;
+   int x_offset, y_offset;
+   unsigned short j, previous;
+   Raster_Map *rtmp;
 
    j = text[0];
    FT_Load_Glyph(face, j, FT_LOAD_DEFAULT);
@@ -170,9 +170,9 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, char *text,
    rtmp = NULL;
    previous = 0;
 
-   for (i = 0; text[i]; i++)
+   for (i = 0; i < text.length(); i++)
    {
-       j = text[i];
+       j = text[i].unicode();
 
        if (!FT_VALID(glyphs[j]))
            continue;
@@ -396,12 +396,10 @@ void TTFFont::DrawString(OSDSurface *surface, int x, int y,
    if (text.length() < 1)
         return;
 
-   char *ctext = (char *)text.latin1(); 
-
    inx = 0;
    iny = 0;
 
-   rtmp = calc_size(&w, &h, (char *)ctext);
+   rtmp = calc_size(&w, &h, text);
    if (w <= 0 || h <= 0)
    {
        destroy_font_raster(rtmp);
@@ -409,7 +407,7 @@ void TTFFont::DrawString(OSDSurface *surface, int x, int y,
    }
    rmap = create_font_raster(w, h);
 
-   render_text(rmap, rtmp, ctext, &inx, &iny);
+   render_text(rmap, rtmp, text, &inx, &iny);
 
    is_pixmap = 1;
 
@@ -499,18 +497,20 @@ TTFFont::~TTFFont()
 
 void TTFFont::KillFace(void)
 {
-   FT_Done_Face(face);
-   for (int i = 0; i < num_glyph; i++)
-   {
-	if (glyphs_cached[i])
-	   destroy_font_raster(glyphs_cached[i]);
-	if (FT_VALID(glyphs[i]))
-	   FT_Done_Glyph(glyphs[i]);
-   }
-   if (glyphs)
-      free(glyphs);
-   if (glyphs_cached)
-      free(glyphs_cached);
+    FT_Done_Face(face);
+    for (QMap<ushort, Raster_Map*>::Iterator it = glyphs_cached.begin();
+         it != glyphs_cached.end(); it++)
+    {
+        destroy_font_raster(it.data());
+    }
+    glyphs_cached.clear();
+
+    for (QMap<ushort, FT_Glyph>::Iterator it = glyphs.begin();
+         it != glyphs.end(); it++)
+    {
+        FT_Done_Glyph(it.data());
+    }
+    glyphs.clear();
 }
 
 TTFFont::TTFFont(char *file, int size, int video_width, int video_height,
@@ -547,13 +547,40 @@ TTFFont::TTFFont(char *file, int size, int video_width, int video_height,
    Init();
 }
 
+bool TTFFont::cache_glyph(unsigned short c)
+{
+    FT_BBox         bbox;
+    unsigned short  code;
+
+    if (FT_VALID(glyphs[c]))
+        return true;
+
+    code = FT_Get_Char_Index(face, c);
+
+    FT_Load_Glyph(face, code, FT_LOAD_DEFAULT);
+    FT_Glyph& glyph = glyphs[c];
+    if (FT_Get_Glyph(face->glyph, &glyph))
+    {
+        cerr << "cannot load glyph:" << hex << c << "\n";
+        return false;
+    }
+
+    FT_Glyph_Get_CBox(glyph, ft_glyph_bbox_subpixels, &bbox);
+
+    if ((bbox.yMin & -64) < max_descent)
+        max_descent = (bbox.yMin & -64);
+    if (((bbox.yMax + 63) & -64) > max_ascent)
+        max_ascent = ((bbox.yMax + 63) & -64);
+
+    return true;
+}
+
 void TTFFont::Init(void)
 {
-   FT_Error            error;
-   FT_CharMap          char_map;
-   FT_BBox             bbox;
-   int                 xdpi = 96, ydpi = 96;
-   unsigned short      i, n, code;
+   FT_Error error;
+   FT_CharMap char_map;
+   int xdpi = 96, ydpi = 96;
+   unsigned short i, n;
 
    error = FT_New_Face(library, m_file, 0, &face);
    if (error)
@@ -586,33 +613,11 @@ void TTFFont::Init(void)
    if (i == n)
       FT_Set_Charmap(face, face->charmaps[0]);
 
-   num_glyph = face->num_glyphs;
-   num_glyph = 256;
-   glyphs = (FT_Glyph *) malloc((num_glyph + 1) * sizeof(FT_Glyph));
-   memset(glyphs, 0, num_glyph * sizeof(FT_Glyph));
-   glyphs_cached = (Raster_Map **) malloc(num_glyph * sizeof(Raster_Map *));
-   memset(glyphs_cached, 0, num_glyph * sizeof(Raster_Map *));
-
    max_descent = 0;
    max_ascent = 0;
 
-   for (i = 0; i < num_glyph; ++i)
-   {
-	if (FT_VALID(glyphs[i]))
-	   continue;
-
-	code = FT_Get_Char_Index(face, i);
-
-	FT_Load_Glyph(face, code, FT_LOAD_DEFAULT);
-        FT_Get_Glyph(face->glyph, &glyphs[i]);
-
-        FT_Glyph_Get_CBox(glyphs[i], ft_glyph_bbox_subpixels, &bbox);
-
-	if ((bbox.yMin & -64) < max_descent)
-	   max_descent = (bbox.yMin & -64);
-	if (((bbox.yMax + 63) & -64) > max_ascent)
-	   max_ascent = ((bbox.yMax + 63) & -64);
-   }
+   for (i = 0; i < 256; ++i)
+        cache_glyph(i);
 
    use_kerning = 0; //FT_HAS_KERNING(face);
 
@@ -635,20 +640,20 @@ void TTFFont::Reinit(int width, int height, float hmult)
     Init();
 }
 
+
 void TTFFont::CalcWidth(const QString &text, int *width_return)
 {
-   int                 i, pw;
+   unsigned int i, pw;
 
-   char *ctext = (char *)text.ascii();
-   
    pw = 0;
 
-   for (i = 0; ctext[i]; i++)
+   for (i = 0; i < text.length(); i++)
    {
-	unsigned char       j = ctext[i];
+	unsigned short j = text[i].unicode();
 
-	if (!FT_VALID(glyphs[j]))
+	if (!cache_glyph(j))
 	   continue;
+
         if (glyphs[j]->advance.x == 0)
             pw += 4;
         else

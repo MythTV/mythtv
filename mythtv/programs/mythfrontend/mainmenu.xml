@@ -19,6 +19,7 @@
      <text lang="DK">Musik</text>
      <text lang="PT">Música</text>
      <text lang="SV">Musik</text>
+     <text lang="JA">ミュージック</text>
      <action>PLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -35,6 +36,7 @@
      <text lang="DK">Spil</text>
      <text lang="PT">Jogos</text>
      <text lang="SV">Spel</text>
+     <text lang="JA">ゲーム</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -51,6 +53,7 @@
      <text lang="DK">Billeder</text>
      <text lang="PT">Fotos</text>
      <text lang="SV">Bilder</text>
+     <text lang="JA">イメージ</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
    </button>
@@ -67,6 +70,7 @@
      <text lang="DK">Film</text>
      <text lang="PT">Filmes</text>
      <text lang="SV">Filmer</text>
+     <text lang="JA">ビデオ</text>
      <action>PLUGIN mythvideo</action>
      <depends>mythvideo</depends>
    </button>
@@ -83,6 +87,7 @@
      <text lang="DK">Vejret</text>
      <text lang="PT">Meteorologia</text>
      <text lang="SV">Vädret</text>
+     <text lang="JA">天気</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -103,6 +108,7 @@
      <text lang="CA">Notícies</text>
      <text lang="ES">Noticias</text>
      <text lang="NL">Nieuws</text>
+     <text lang="JA">ニュース</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -110,6 +116,7 @@
    <button>
       <type>WEBPAGE</type>
       <text>Web</text>
+      <text lang="JA">ウェブ</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -126,6 +133,7 @@
      <text lang="NL">Instellingen</text>
      <text lang="PT">Configurações</text>
      <text lang="SV">Inställningar</text>
+     <text lang="JA">設定</text>
      <action>MENU main_settings.xml</action>
    </button>
 

@@ -6,6 +6,7 @@
 #include FT_GLYPH_H
 
 #include <qstring.h>
+#include <qmap.h>
 
 struct Raster_Map;
 class OSDSurface;
@@ -42,19 +43,19 @@ class TTFFont
      Raster_Map *duplicate_raster(FT_BitmapGlyph bmap);
      void clear_raster(Raster_Map *rmap);
      void destroy_font_raster(Raster_Map *rmap);
-     Raster_Map *calc_size(int *width, int *height, char *text);
-     void render_text(Raster_Map *rmap, Raster_Map *rchr, char *text, 
+     Raster_Map *calc_size(int *width, int *height, const QString &text);
+     void render_text(Raster_Map *rmap, Raster_Map *rchr, const QString &text, 
                       int *xorblah, int *yor);
      void merge_text(OSDSurface *surface, Raster_Map *rmap, int offset_x, 
                      int offset_y, int xstart, int ystart, int width, 
                      int height, int color, int alphamod);
+     bool cache_glyph(unsigned short c);
 
      bool         valid;
      FT_Library   library;
      FT_Face      face;
-     int          num_glyph;
-     FT_Glyph    *glyphs;
-     Raster_Map **glyphs_cached;
+     QMap<unsigned short, FT_Glyph> glyphs;
+     QMap<unsigned short, Raster_Map *> glyphs_cached;
      int          max_descent;
      int          max_ascent;
      int          fontsize;

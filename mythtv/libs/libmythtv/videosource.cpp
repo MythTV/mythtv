@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 
@@ -274,7 +275,7 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
 
     if (grabber == "tv_grab_de" || grabber == "tv_grab_sn" || 
         grabber == "tv_grab_fi" || grabber == "tv_grab_es" ||
-        grabber == "tv_grab_nl") 
+        grabber == "tv_grab_nl" || grabber == "tv_grab_ja")
     {
         cerr << "You _MUST_ run 'mythfilldatabase --manual the first time, "
              << "instead\n";
