@@ -119,7 +119,7 @@ class TVRec
     void TeardownRecorder(bool killFile = false);
     
     void StateToString(TVState state, QString &statestr);
-    void HandleStateChange();
+    void HandleStateChange(void);
     bool StateIsRecording(TVState state);
     bool StateIsPlaying(TVState state);
     TVState RemovePlaying(TVState state);
@@ -127,7 +127,9 @@ class TVRec
 
     void FlagCommercials(void);
 
-    void WriteRecordedRecord();
+    void WriteRecordedRecord(void);
+
+    void SetOption(RecordingProfile &profile, const QString &name);
 
     NuppelVideoRecorder *nvr;
     RingBuffer *rbuffer;

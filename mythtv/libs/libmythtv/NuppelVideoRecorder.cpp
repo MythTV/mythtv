@@ -222,6 +222,58 @@ void NuppelVideoRecorder::SetVbiFormat(QString vbiformat)
         vbimode = 0;
 }
 
+void NuppelVideoRecorder::SetEncodingOption(const QString &opt, int value)
+{
+    if (opt == "width")
+        w = value;
+    else if (opt == "height")
+        h = value;
+    else if (opt == "rtjpegchromafilter")
+        M1 = value;
+    else if (opt == "rtjpeglumafilter")
+        M2 = value;
+    else if (opt == "rtjpegquality")
+        Q = value;
+    else if (opt == "mpeg4bitrate")
+        targetbitrate = value;
+    else if (opt == "mpeg4scalebitrate")
+        scalebitrate = value;
+    else if (opt == "mpeg4maxquality")
+        maxquality = value;
+    else if (opt == "mpeg4minquality")
+        minquality = value;
+    else if (opt == "mpeg4qualdiff")
+        qualdiff = value;
+    else if (opt == "mpeg4optionvhq")
+    {
+        if (value)
+            mp4opts |= CODEC_FLAG_HQ;
+        else
+            mp4opts &= ~CODEC_FLAG_HQ;
+    }
+    else if (opt == "mpeg4option4mv")
+    {
+        if (value)
+            mp4opts |= CODEC_FLAG_4MV;
+        else
+            mp4opts &= ~CODEC_FLAG_4MV;
+    }
+    else if (opt == "hardwaremjpegquality")
+        hmjpg_quality = value;
+    else if (opt == "hardwaremjpeghdecimation")
+        hmjpg_hdecimation = value;
+    else if (opt == "hardwaremjpegvdecimation")
+        hmjpg_vdecimation = value;
+    else if (opt == "audiocompression")
+        compressaudio = value;
+    else if (opt == "mp3quality")
+        mp3quality = value;
+    else if (opt == "samplerate")
+        audio_samplerate = value;
+    else
+        cerr << "Unknown encoding setting: " << opt << endl;
+}
+
 bool NuppelVideoRecorder::SetupAVCodec(void)
 {
     if (mpa_codec)

@@ -422,7 +422,13 @@ void TVRec::HandleStateChange(void)
     changeState = false;
 }
 
-void TVRec::SetupRecorder(RecordingProfile& profile) 
+void TVRec::SetOption(RecordingProfile &profile, const QString &name)
+{
+    int value = profile.byName(name)->getValue().toInt();
+    nvr->SetEncodingOption(name, value);
+}
+
+void TVRec::SetupRecorder(RecordingProfile &profile) 
 {
     nvr = new NuppelVideoRecorder();
     nvr->ChangeDeinterlacer(deinterlace_mode);
@@ -431,43 +437,51 @@ void TVRec::SetupRecorder(RecordingProfile& profile)
     nvr->SetVbiDevice(vbidev);
 
     QString setting = profile.byName("videocodec")->getValue();
-    if (setting == "MPEG-4") {
-      nvr->SetCodec("mpeg4");
-      nvr->SetMP4TargetBitrate(profile.byName("mpeg4bitrate")->getValue().toInt());
-      nvr->SetMP4ScaleBitrate(profile.byName("mpeg4scalebitrate")->getValue().toInt() ?
-                              1 : 0);
-      nvr->SetMP4Quality(profile.byName("mpeg4maxquality")->getValue().toInt(),
-                         profile.byName("mpeg4minquality")->getValue().toInt(),
-                         profile.byName("mpeg4qualdiff")->getValue().toInt());
-      nvr->SetMP4OptionVHQ(profile.byName("mpeg4optionvhq")->getValue().toInt() ? 1 : 0);
-      nvr->SetMP4OptionVHQ(profile.byName("mpeg4option4mv")->getValue().toInt() ? 1 : 0);
-    } else if (setting == "RTjpeg") {
-      nvr->SetCodec("rtjpeg");
-      nvr->SetRTJpegQuality(profile.byName("rtjpegquality")->getValue().toInt());
-      nvr->SetRTJpegMotionLevels(profile.byName("rtjpegchromafilter")->getValue().toInt(),
-                                 profile.byName("rtjpeglumafilter")->getValue().toInt());
-    } else if (setting == "Hardware MJPEG") {
-      nvr->SetCodec("hardware-mjpeg");
-      nvr->SetHMJPGQuality(profile.byName("hardwaremjpegquality")->getValue().toInt());
-      nvr->SetHMJPGHDecimation(profile.byName("hardwaremjpeghdecimation")->getValue().toInt());
-      nvr->SetHMJPGVDecimation(profile.byName("hardwaremjpegvdecimation")->getValue().toInt());
-    } else {
-      cerr << "Unknown video codec: " << setting << endl;
-    }
+    if (setting == "MPEG-4") 
+    {
+        nvr->SetCodec("mpeg4");
+
+        SetOption(profile, "mpeg4bitrate");
+        SetOption(profile, "mpeg4scalebitrate");
+        SetOption(profile, "mpeg4maxquality");
+        SetOption(profile, "mpeg4minquality");
+        SetOption(profile, "mpeg4qualdiff");
+        SetOption(profile, "mpeg4optionvhq");
+        SetOption(profile, "mpeg4option4mv");
+    } 
+    else if (setting == "RTjpeg") 
+    {
+        nvr->SetCodec("rtjpeg");
+
+        SetOption(profile, "rtjpegquality");
+        SetOption(profile, "rtjpegchromafilter");
+        SetOption(profile, "rtjpeglumafilter");
+    } 
+    else if (setting == "Hardware MJPEG") 
+    {
+        nvr->SetCodec("hardware-mjpeg");
+
+        SetOption(profile, "hardwaremjpegquality");
+        SetOption(profile, "hardwaremjpeghdecimation");
+        SetOption(profile, "hardwaremjpegvdecimation");
+    } 
+    else 
+        cerr << "Unknown video codec: " << setting << endl;
 
     setting = profile.byName("audiocodec")->getValue();
-    if (setting == "MP3") {
-      nvr->SetAudioCompression(1);
-      nvr->SetMP3Quality(profile.byName("mp3quality")->getValue().toInt());
-      nvr->SetAudioSampleRate(profile.byName("samplerate")->getValue().toInt());
-    } else if (setting == "Uncompressed") {
-      nvr->SetAudioCompression(0);
-    } else {
-      cerr << "Unknown audio codec: " << setting << endl;
-    }
+    if (setting == "MP3") 
+    {
+        nvr->SetEncodingOption("audiocompression", 1);
+        SetOption(profile, "mp3quality");
+        SetOption(profile, "samplerate");
+    } 
+    else if (setting == "Uncompressed") 
+        nvr->SetEncodingOption("audiocompression", 0);
+    else 
+        cerr << "Unknown audio codec: " << setting << endl;
 
-    nvr->SetResolution(profile.byName("width")->getValue().toInt(),
-                       profile.byName("height")->getValue().toInt());
+    SetOption(profile, "width");
+    SetOption(profile, "height");
 
     nvr->SetTVFormat(gContext->GetSetting("TVFormat"));
     nvr->SetVbiFormat(gContext->GetSetting("VbiFormat"));
@@ -477,11 +491,14 @@ void TVRec::SetupRecorder(RecordingProfile& profile)
     if (ispip)
     {
         nvr->SetAsPIP();
-        nvr->SetResolution(160, 128);
         nvr->SetCodec("rtjpeg");
-        nvr->SetRTJpegMotionLevels(0, 0);
-        nvr->SetRTJpegQuality(255);
-        nvr->SetAudioCompression(false);
+
+        nvr->SetEncodingOption("width", 160);
+        nvr->SetEncodingOption("height", 128);
+        nvr->SetEncodingOption("rtjpegchromafilter", 0);
+        nvr->SetEncodingOption("rtjpeglumafilter", 0);
+        nvr->SetEncodingOption("rtjpegquality", 255);
+        nvr->SetEncodingOption("audiocompression", 0);
     }
  
     nvr->Initialize();
@@ -493,9 +510,6 @@ void TVRec::TeardownRecorder(bool killFile)
     QMap<long long, int> comm_breaks;
 
     int filelen = -1;
-
-    if (prevRecording)
-        delete prevRecording;
 
     if (curRecording)
         prevRecording = new ProgramInfo(*curRecording);
@@ -568,7 +582,10 @@ void TVRec::TeardownRecorder(bool killFile)
             while (!flagthreadstarted)
                 usleep(50);
         }
+    }
 
+    if (prevRecording)
+    {
         delete prevRecording;
         prevRecording = NULL;
     }

@@ -560,7 +560,11 @@ QImage *MythContext::CacheRemotePixmap(const QString &url, bool needevents)
     RemoteFile *rf = new RemoteFile(url, true);
 
     QByteArray data;
-    if (rf->SaveAs(data, needevents))
+    bool ret = rf->SaveAs(data, needevents);
+
+    delete rf;
+
+    if (ret)
     {
         QImage image(data);
         if (image.width() > 0)

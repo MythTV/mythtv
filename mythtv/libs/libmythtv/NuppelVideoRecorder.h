@@ -55,33 +55,14 @@ class NuppelVideoRecorder
     
     void SetCodec(QString desiredcodec) { codec = desiredcodec; }
 
-    void SetRTJpegMotionLevels(int lM1, int lM2) { M1 = lM1; M2 = lM2; }
-    void SetRTJpegQuality(int quality) { Q = quality; }
+    void SetEncodingOption(const QString &opt, int value);
 
-    void SetMP4TargetBitrate(int rate) { targetbitrate = rate; }
-    void SetMP4ScaleBitrate(int scale) { scalebitrate = scale;}
-    void SetMP4Quality(int max, int min, int diff) 
-                       { maxquality = max; minquality = min; qualdiff = diff; }
-    void SetMP4OptionVHQ(int value) 
-                       { mp4opts = (value) ? mp4opts | CODEC_FLAG_HQ : 
-                                             mp4opts & ~CODEC_FLAG_HQ; }
-    void SetMP4Option4MV(int value) 
-                       { mp4opts = (value) ? mp4opts | CODEC_FLAG_4MV :
-                                             mp4opts & ~CODEC_FLAG_4MV; }
-
-    void SetResolution(int width, int height) { w = width; h = height; }
-    void SetAudioSampleRate(int rate) { audio_samplerate = rate; }   
-    void SetAudioCompression(bool compress) { compressaudio = compress; }
- 
     void SetFilename(QString filename) { sfilename = filename; }
     void SetAudioDevice(QString device) { audiodevice = device; }
     void SetVideoDevice(QString device) { videodevice = device; }
     void SetVbiDevice(QString device) { vbidevice = device; }
     void SetTVFormat(QString tvformat);
     void SetVbiFormat(QString vbiformat);
-    void SetHMJPGQuality(int quality) { hmjpg_quality = quality; }
-    void SetHMJPGHDecimation(int deci) { hmjpg_hdecimation = deci; }
-    void SetHMJPGVDecimation(int deci) { hmjpg_vdecimation = deci; }
 
     void ChangeDeinterlacer(int deint_mode);   
  
@@ -101,8 +82,6 @@ class NuppelVideoRecorder
    
     long long GetFramesWritten(void) { return framesWritten; } 
     void ResetFramesWritten(void) { framesWritten = 0; }
-
-    void SetMP3Quality(int quality) { mp3quality = quality; }
 
     int GetVideoFd(void) { return fd; }
     void Reset(void);
