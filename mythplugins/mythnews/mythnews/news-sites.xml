@@ -167,6 +167,13 @@
 <ico>http://www.freshports.org/favicon.ico</ico>
 </item>
 
+<item> 
+<title>Groklaw</title>
+<url>http://www.groklaw.net/backend/GrokLaw.rdf</url>
+<ico>http://www.groklaw.net/favicon.ico</ico>
+</item>
+http://www.groklaw.net/backend/GrokLaw.rdf
+
 </category>
 
 <category name="Miscellaneous">
