@@ -1071,7 +1071,6 @@ Playlist *PlaylistsContainer::getPlaylist(int id)
 
 void PlaylistsContainer::showRelevantPlaylists(TreeCheckItem *alllists)
 {
-
     QString templevel, temptitle;
     int id;
     //  Deleting anything that's there
@@ -1109,12 +1108,20 @@ void PlaylistsContainer::showRelevantPlaylists(TreeCheckItem *alllists)
 
         some_list->putYourselfOnTheListView(some_item);
     }
+
+    if (alllists->childCount() == 0)
+        alllists->setCheckable(false);
+    else
+        alllists->setCheckable(true);
 }
 
 void PlaylistsContainer::refreshRelevantPlaylists(TreeCheckItem *alllists)
 {
     if (alllists->childCount() == 0)
+    {
+        alllists->setCheckable(false);
         return;
+    }
 
     UIListGenericTree *walker = (UIListGenericTree *)(alllists->getChildAt(0));
     while (walker)
@@ -1138,6 +1145,8 @@ void PlaylistsContainer::refreshRelevantPlaylists(TreeCheckItem *alllists)
         }
         walker = (UIListGenericTree *)(walker->nextSibling(1));
     }
+
+    alllists->setCheckable(true);
 }
 
 void PlaylistsContainer::postLoad()
