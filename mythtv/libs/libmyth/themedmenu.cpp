@@ -526,16 +526,19 @@ void ThemedMenuPrivate::parseText(TextAttributes &attributes,
             }
             else if (info.tagName() == "centered")
             {
-                if (getFirstText(info) == "yes" && 
-                    gContext->GetLanguage() != "ja")
+                if (getFirstText(info) == "yes")
                 {
-                    attributes.textflags = Qt::AlignTop | Qt::AlignHCenter |
-                                           Qt::WordBreak;
-                }
-                else
-                {
-                    attributes.textflags = Qt::AlignVCenter | Qt::AlignHCenter |
-                                           Qt::WordBreak;
+                    if (gContext->GetLanguage() == "ja")
+                    {
+                        attributes.textflags = Qt::AlignVCenter | 
+                                               Qt::AlignHCenter |
+                                               Qt::WordBreak;
+                    }
+                    else
+                    {
+                        attributes.textflags = Qt::AlignTop | Qt::AlignHCenter |
+                                               Qt::WordBreak;
+                    }
                 }
             } 
             else if (info.tagName() == "outline")
