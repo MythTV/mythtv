@@ -4,14 +4,11 @@
 #include <qdialog.h>
 #include <qlayout.h>
 #include <qlabel.h>
-#include <qlineedit.h>
 #include <qcursor.h>
 #include <qcheckbox.h>
 #include <qpushbutton.h>
 #include <qvbox.h>
 #include <qprogressbar.h>
-#include <qtable.h>
-#include <qbuttongroup.h>
 #include <qradiobutton.h>
 
 #include <unistd.h>
@@ -29,134 +26,14 @@ extern "C" {
 #include "flacencoder.h"
 
 #include <mythtv/mythcontext.h>
-
-class MyLineEdit : public QLineEdit
-{
-  public:
-    MyLineEdit(QWidget *parent) : QLineEdit(parent) { }
-
-    void keyPressEvent(QKeyEvent *e);
-};
-
-void MyLineEdit::keyPressEvent(QKeyEvent *e)
-{
-    bool handled = false;;
-
-    switch (e->key())
-    {
-        case Key_Up:
-        {
-            focusNextPrevChild(FALSE);
-            handled = true;
-            break;
-        }
-        case Key_Down:
-        {
-            focusNextPrevChild(TRUE);
-            handled = true;
-            break;
-        }
-        default: break;
-    }
-
-    if (!handled)
-        QLineEdit::keyPressEvent(e);
-}
-
-class MyTable : public QTable
-{
-  public:
-    MyTable(QWidget *parent) : QTable(parent) { }
-  
-    void keyPressEvent(QKeyEvent *e);
-};
-
-void MyTable::keyPressEvent(QKeyEvent *e)
-{
-    bool handled = false;
-
-    if (isEditing() && item(currEditRow(), currEditCol()) &&
-        item(currEditRow(), currEditCol())->editType() == QTableItem::OnTyping)
-        return;
-
-    int tmpRow = currentRow();
-
-    switch (e->key())
-    {
-        case Key_Left:
-        case Key_Right:
-        {
-            handled = true;
-            break;
-        }
-        case Key_Up:
-        {
-            if (tmpRow == 0)
-            {
-                focusNextPrevChild(FALSE);
-                handled = true;
-            }
-            break;
-        }
-        case Key_Down:
-        {
-            if (tmpRow == numRows() - 1)
-            {
-                focusNextPrevChild(TRUE);
-                handled = true;
-            }
-            break;
-        }
-    }
-
-    if (!handled)
-        QTable::keyPressEvent(e);
-}
-
-class MyButtonGroup : public QButtonGroup
-{
-  public:
-    MyButtonGroup(QWidget *parent = 0) : QButtonGroup(parent) { }
-
-    void moveFocus(int key);
-};
-
-void MyButtonGroup::moveFocus(int key)
-{
-    QButton *currentSel = selected();
- 
-    QButtonGroup::moveFocus(key);
-
-    if (selected() == currentSel)
-    {
-        switch (key)
-        {
-            case Key_Up: focusNextPrevChild(FALSE); break;
-            case Key_Down: focusNextPrevChild(TRUE); break;
-            default: break;
-        }
-    }
-}
+#include <mythtv/mythwidgets.h>
 
 Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent, 
                const char *name)
-      : QDialog(parent, name)
+      : MythDialog(context, parent, name)
 {
     db = ldb;
-    m_context = context;
     
-    int screenheight = 0, screenwidth = 0;
-    float wmult = 0, hmult = 0;
-
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setFont(QFont("Arial", (int)(context->GetMediumFontSize() * hmult), 
-            QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
-
     CdDecoder *decoder = new CdDecoder(context, "cda", NULL, NULL, NULL);
     Metadata *track = decoder->getMetadata(db, 1);
 
@@ -174,7 +51,7 @@ Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent,
     vbox->addWidget(inst);
 
     QHBoxLayout *qualbox = new QHBoxLayout(vbox, 10);
-    qualitygroup = new MyButtonGroup(firstdiag);
+    qualitygroup = new MythButtonGroup(firstdiag);
     qualitygroup->setFrameStyle(QFrame::NoFrame);
     qualitygroup->hide();
 
@@ -200,7 +77,7 @@ Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent,
     QGridLayout *grid = new QGridLayout(vbox, 1, 1, 20);
     
     QLabel *artistl = new QLabel("Artist: ", firstdiag);
-    artistedit = new MyLineEdit(firstdiag);
+    artistedit = new MythLineEdit(firstdiag);
     if (track)
     {
         artistedit->setText(track->Artist());
@@ -210,7 +87,7 @@ Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent,
             this, SLOT(artistChanged(const QString &)));
 
     QLabel *albuml = new QLabel("Album: ", firstdiag);
-    albumedit = new MyLineEdit(firstdiag);
+    albumedit = new MythLineEdit(firstdiag);
     if (track)
     {
         albumedit->setText(track->Album());
@@ -224,7 +101,7 @@ Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent,
     grid->addMultiCellWidget(albuml, 1, 1, 0, 0);
     grid->addMultiCellWidget(albumedit,  1, 1, 1, 2);
 
-    table = new MyTable(firstdiag);
+    table = new MythTable(firstdiag);
     grid->addMultiCellWidget(table, 2, 2, 0, 2);
     table->setNumCols(3);
     table->setTopMargin(0);    
@@ -276,7 +153,7 @@ Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent,
 
     totaltracks = tracknum;
 
-    QPushButton *ripit = new QPushButton("Import this CD", firstdiag);
+    MythPushButton *ripit = new MythPushButton("Import this CD", firstdiag);
     vbox->addWidget(ripit);
 
     connect(ripit, SIGNAL(clicked()), this, SLOT(ripthedisc())); 
@@ -289,12 +166,6 @@ Ripper::~Ripper(void)
 QSizePolicy Ripper::sizePolicy(void)
 {
     return QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-}
-
-void Ripper::Show(void)
-{
-    showFullScreen();
-    setActiveWindow();
 }
 
 void Ripper::artistChanged(const QString &newartist)
@@ -367,7 +238,7 @@ void Ripper::ripthedisc(void)
 
     m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    QDialog *newdiag = new QDialog(NULL, 0, TRUE);
+    MythDialog *newdiag = new MythDialog(m_context, NULL, 0, TRUE);
     newdiag->setGeometry(0, 0, screenwidth, screenheight);
     newdiag->setFixedSize(QSize(screenwidth, screenheight));
     

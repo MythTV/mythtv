@@ -8,6 +8,8 @@
 #include <qtoolbutton.h>
 #include <qmutex.h>
 
+#include <mythtv/mythwidgets.h>
+
 #include "metadata.h"
 
 class QLabel;
@@ -18,7 +20,6 @@ class Decoder;
 class Output;
 class QIODevice;
 class QSqlDatabase;
-class QListView;
 class QListViewItem;
 class QSlider;
 class ScrollLabel;
@@ -26,7 +27,7 @@ class MyToolButton;
 class MainVisual;
 class MythContext;
 
-class PlaybackBox : public QDialog
+class PlaybackBox : public MythDialog
 {
     Q_OBJECT
   public:
@@ -35,8 +36,6 @@ class PlaybackBox : public QDialog
                 QWidget *parent = 0, const char *name = 0);
 
     ~PlaybackBox(void);
-
-    void Show(void);
 
     void closeEvent(QCloseEvent *);
     void customEvent(QCustomEvent *);
@@ -71,8 +70,6 @@ class PlaybackBox : public QDialog
 
     QPixmap scalePixmap(const char **xpmdata);
 
-    float wmult, hmult;
-
     QIODevice *input;
     Output *output;
     Decoder *decoder;
@@ -97,13 +94,13 @@ class PlaybackBox : public QDialog
     QLabel *timelabel;
     ScrollLabel *titlelabel;
 
-    QListView *playview;
+    MythListView *playview;
     QPtrList<QListViewItem> listlist;
 
     QSlider *seekbar;
 
-    MyToolButton *randomize;
-    MyToolButton *repeat;
+    MythToolButton *randomize;
+    MythToolButton *repeat;
 
     bool shufflemode;
     bool repeatmode;
@@ -111,7 +108,6 @@ class PlaybackBox : public QDialog
     bool isplaying;
 
     MainVisual *mainvisual;
-    MythContext *m_context;
 };
 
 #endif

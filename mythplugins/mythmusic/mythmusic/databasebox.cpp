@@ -17,29 +17,14 @@
 DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb, 
                          QString &paths, QValueList<Metadata> *playlist, 
                          QWidget *parent, const char *name)
-           : QDialog(parent, name)
+           : MythDialog(context, parent, name)
 {
     db = ldb;
     plist = playlist;
-    m_context = context;
-
-    int screenheight = 0, screenwidth = 0;
-    float wmult = 0, hmult = 0;
-
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    context->ThemeWidget(this);
-
-    setFont(QFont("Arial", (int)(m_context->GetMediumFontSize() * hmult), 
-            QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
-    QListView *listview = new QListView(this);
+    MythListView *listview = new MythListView(this);
     listview->addColumn("Select music to be played:");
 
     listview->setSorting(-1);
@@ -47,12 +32,6 @@ DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb,
     listview->setAllColumnsShowFocus(true);
     listview->setColumnWidth(0, (int)(730 * wmult));
     listview->setColumnWidthMode(0, QListView::Manual);
-
-    listview->viewport()->setPalette(palette());
-    listview->horizontalScrollBar()->setPalette(palette());
-    listview->verticalScrollBar()->setPalette(palette());
-    listview->header()->setPalette(palette());
-    listview->header()->setFont(font());
 
     connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));
@@ -66,11 +45,6 @@ DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb,
     vbox->addWidget(listview, 1);
 
     listview->setCurrentItem(listview->firstChild());
-}
-
-void DatabaseBox::Show()
-{
-    showFullScreen();
 }
 
 void DatabaseBox::fillCD(void)

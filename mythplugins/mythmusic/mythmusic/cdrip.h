@@ -7,18 +7,17 @@
 
 #include "metadata.h"
 
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythwidgets.h>
+
 class QSqlDatabase;
 class QFrame;
 class QVBoxLayout;
 class QPushButton;
 class QLabel;
 class QProgressBar;
-class MyButtonGroup;
-class MyLineEdit;
-class MyTable;
-class MythContext;
 
-class Ripper : public QDialog
+class Ripper : public MythDialog
 {
     Q_OBJECT
   public:
@@ -26,8 +25,6 @@ class Ripper : public QDialog
            const char *name = 0);
    ~Ripper(void);
   
-    void Show(void);
-
     QSizePolicy sizePolicy(void);
 
   protected slots:
@@ -44,12 +41,12 @@ class Ripper : public QDialog
     QVBoxLayout *bigvb;
     QFrame *firstdiag;
 
-    MyLineEdit *artistedit;
-    MyLineEdit *albumedit;
+    MythLineEdit *artistedit;
+    MythLineEdit *albumedit;
 
-    MyTable *table;
+    MythTable *table;
 
-    MyButtonGroup *qualitygroup;
+    MythButtonGroup *qualitygroup;
 
     QLabel *statusline;
     QProgressBar *overall;
@@ -58,8 +55,6 @@ class Ripper : public QDialog
     int totaltracks;
 
     QString albumname, artistname;
-
-    MythContext *m_context;
 };
 
 #endif

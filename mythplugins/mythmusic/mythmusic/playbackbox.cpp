@@ -42,23 +42,10 @@ using namespace std;
 PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb, 
                          QValueList<Metadata> *playlist,
                          QWidget *parent, const char *name)
-           : QDialog(parent, name)
+           : MythDialog(context, parent, name)
 {
     db = ldb;
     m_context = context;
-
-    int screenwidth = 0, screenheight = 0;
-    
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setFont(QFont("Arial", (int)((context->GetMediumFontSize() + 2) * hmult), 
-            QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
-
-    context->ThemeWidget(this);
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -104,37 +91,37 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
 
     QHBoxLayout *controlbox = new QHBoxLayout(vbox2, (int)(2 * wmult));
 
-    MyToolButton *prevfileb = new MyToolButton(this);
+    MythToolButton *prevfileb = new MythToolButton(this);
     prevfileb->setAutoRaise(true);
     prevfileb->setIconSet(scalePixmap((const char **)prevfile_pix));  
     connect(prevfileb, SIGNAL(clicked()), this, SLOT(previous()));
  
-    MyToolButton *prevb = new MyToolButton(this);
+    MythToolButton *prevb = new MythToolButton(this);
     prevb->setAutoRaise(true);
     prevb->setIconSet(scalePixmap((const char **)prev_pix));
     connect(prevb, SIGNAL(clicked()), this, SLOT(seekback()));
 
-    MyToolButton *pauseb = new MyToolButton(this);
+    MythToolButton *pauseb = new MythToolButton(this);
     pauseb->setAutoRaise(true);
     pauseb->setIconSet(scalePixmap((const char **)pause_pix));
     connect(pauseb, SIGNAL(clicked()), this, SLOT(pause()));
 
-    MyToolButton *playb = new MyToolButton(this);
+    MythToolButton *playb = new MythToolButton(this);
     playb->setAutoRaise(true);
     playb->setIconSet(scalePixmap((const char **)play_pix));
     connect(playb, SIGNAL(clicked()), this, SLOT(play()));
 
-    MyToolButton *stopb = new MyToolButton(this);
+    MythToolButton *stopb = new MythToolButton(this);
     stopb->setAutoRaise(true);
     stopb->setIconSet(scalePixmap((const char **)stop_pix));
     connect(stopb, SIGNAL(clicked()), this, SLOT(stop()));
     
-    MyToolButton *nextb = new MyToolButton(this);
+    MythToolButton *nextb = new MythToolButton(this);
     nextb->setAutoRaise(true);
     nextb->setIconSet(scalePixmap((const char **)next_pix));
     connect(nextb, SIGNAL(clicked()), this, SLOT(seekforward()));
 
-    MyToolButton *nextfileb = new MyToolButton(this);
+    MythToolButton *nextfileb = new MythToolButton(this);
     nextfileb->setAutoRaise(true);
     nextfileb->setIconSet(scalePixmap((const char **)nextfile_pix));
     connect(nextfileb, SIGNAL(clicked()), this, SLOT(next()));    
@@ -152,35 +139,35 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
     QFont buttonfont("Arial", (int)((context->GetSmallFontSize() + 2) * hmult),
                      QFont::Bold);
 
-    randomize = new MyToolButton(this);
+    randomize = new MythToolButton(this);
     randomize->setAutoRaise(true);
     randomize->setText("Shuffle: Normal");
     randomize->setFont(buttonfont); 
     secondcontrol->addWidget(randomize);
     connect(randomize, SIGNAL(clicked()), this, SLOT(toggleShuffle()));
 
-    repeat = new MyToolButton(this);
+    repeat = new MythToolButton(this);
     repeat->setAutoRaise(true);
     repeat->setText("Repeat: Playlist");
     repeat->setFont(buttonfont);
     secondcontrol->addWidget(repeat);
     connect(repeat, SIGNAL(clicked()), this, SLOT(toggleRepeat()));
 
-    MyToolButton *pledit = new MyToolButton(this);
+    MythToolButton *pledit = new MythToolButton(this);
     pledit->setAutoRaise(true);
     pledit->setText("Edit Playlist");
     pledit->setFont(buttonfont);
     secondcontrol->addWidget(pledit);
     connect(pledit, SIGNAL(clicked()), this, SLOT(editPlaylist()));
 
-    MyToolButton *vis = new MyToolButton(this);
+    MythToolButton *vis = new MythToolButton(this);
     vis->setAutoRaise(true);
     vis->setText("Visualize");
     vis->setFont(buttonfont);
     secondcontrol->addWidget(vis);
     connect(vis, SIGNAL(clicked()), this, SLOT(visEnable()));
 
-    playview = new QListView(this);
+    playview = new MythListView(this);
     playview->addColumn("#");
     playview->addColumn("Artist");  
     playview->addColumn("Title");
@@ -202,12 +189,6 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
 
     playview->setSorting(-1);
     playview->setAllColumnsShowFocus(true);
-
-    playview->viewport()->setPalette(palette());
-    playview->horizontalScrollBar()->setPalette(palette());
-    playview->verticalScrollBar()->setPalette(palette());
-    playview->header()->setPalette(palette());
-    playview->header()->setFont(font());
 
     plist = playlist;
     playlistindex = 0;
@@ -257,11 +238,6 @@ QPixmap PlaybackBox::scalePixmap(const char **xpmdata)
     ret.convertFromImage(tmp2);
 
     return ret;
-}
-
-void PlaybackBox::Show(void)
-{
-    showFullScreen();
 }
 
 void PlaybackBox::setupListView(void)

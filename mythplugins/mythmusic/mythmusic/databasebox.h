@@ -6,23 +6,21 @@
 #include <qstringlist.h>
 
 #include "metadata.h"
+#include <mythtv/mythwidgets.h>
 
 class QSqlDatabase;
 class QListViewItem;
 class TreeCheckItem;
 class QLabel;
-class QListView;
 class MythContext;
 
-class DatabaseBox : public QDialog
+class DatabaseBox : public MythDialog
 {
     Q_OBJECT
   public:
     DatabaseBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
                 QValueList<Metadata> *playlist,
                 QWidget *parent = 0, const char *name = 0);
-
-    void Show();
 
   protected slots:
     void selected(QListViewItem *);
@@ -45,8 +43,6 @@ class DatabaseBox : public QDialog
     TreeCheckItem *cditem;
 
     QValueList<Metadata> *plist;
-
-    MythContext *m_context;
 };
 
 #endif
