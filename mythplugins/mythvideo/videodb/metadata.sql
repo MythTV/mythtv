@@ -14,7 +14,10 @@ CREATE TABLE videometadata
     filename TEXT NOT NULL,
     coverfile TEXT NOT NULL,
     childid INT UNSIGNED NOT NULL DEFAULT 0,
-    INDEX (director)
+    browse BOOL NOT NULL DEFAULT 1,
+    playcommand VARCHAR(255),
+    INDEX (director),
+    INDEX (title)
 );
  
 CREATE TABLE videotypes

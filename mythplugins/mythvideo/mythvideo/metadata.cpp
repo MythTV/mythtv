@@ -39,6 +39,28 @@ void Metadata::setField(QString field, QString data)
         inetref = data;
     else if (field == "childid")
         childID = data.toUInt();
+    else if (field == "browse")
+    {
+        bool browse_setting = false;
+        bool ok;
+        int browse_int_setting = data.toUInt(&ok);
+        if(!ok)
+        {
+            cerr << "metadata.o: Problems setting the browse flag from this data: " << data << endl;
+        }
+        else
+        {
+            if(browse_int_setting)
+            {
+                browse_setting = true;
+            }
+        }
+        browse = browse_setting;
+    }
+    else if (field == "playcommand")
+    {
+        playcommand = data;
+    }
 }
 
 void Metadata::fillData(QSqlDatabase *db)
@@ -48,7 +70,7 @@ void Metadata::fillData(QSqlDatabase *db)
 
     QString thequery = "SELECT title,director,plot,rating,year,userrating,"
                        "length,filename,showlevel,intid,coverfile,inetref,"
-                       "childid FROM videometadata WHERE title=\"" + 
+                       "childid, browse, playcommand FROM videometadata WHERE title=\"" + 
                         title + "\"";
 
     if (director != "")
@@ -77,6 +99,8 @@ void Metadata::fillData(QSqlDatabase *db)
         coverfile = query.value(10).toString();
         inetref = query.value(11).toString();
         childID = query.value(12).toUInt();
+        browse = query.value(13).toBool();
+        playcommand = query.value(14).toString();
     }
 }
 
@@ -87,8 +111,9 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
         
     QString thequery;
     thequery = QString("SELECT title,director,plot,rating,year,userrating,"
-                       "length,filename,showlevel,coverfile,inetref,childid "
-                       " FROM videometadata WHERE intid=%1;").arg(id);
+                       "length,filename,showlevel,coverfile,inetref,childid,"
+                       "browse,playcommand FROM videometadata WHERE intid=%1;")
+                       .arg(id);
         
     QSqlQuery query = db->exec(thequery);
 
@@ -108,6 +133,8 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
         coverfile = query.value(9).toString();
         inetref = query.value(10).toString();
         childID = query.value(11).toUInt();
+        browse = query.value(12).toBool();
+        playcommand = query.value(13).toString();
     }
 }
 
@@ -184,7 +211,7 @@ void Metadata::updateDatabase(QSqlDatabase *db)
     director.replace(QRegExp("\""), QString("\\\""));
     plot.replace(QRegExp("\""), QString("\\\""));
     rating.replace(QRegExp("\""), QString("\\\""));
-
+    playcommand.replace(QRegExp("\""), QString("\\\""));
     QString sqlfilename = filename;
     sqlfilename.replace(QRegExp("\""), QString("\\\""));
 
@@ -195,12 +222,19 @@ void Metadata::updateDatabase(QSqlDatabase *db)
     thequery.sprintf("UPDATE videometadata SET title=\"%s\",director=\"%s\","
                      "plot=\"%s\",rating=\"%s\",year=%d,userrating=%f,"
                      "length=%d,filename=\"%s\",showlevel=%d,coverfile=\"%s\","
-                     "inetref=\"%s\" WHERE intid=%d",
+                     "inetref=\"%s\",browse=%d,playcommand=\"%s\",childid=%d"
+                     " WHERE intid=%d",
                      title.utf8().data(), director.utf8().data(),
                      plot.utf8().data(), rating.utf8().data(), year,
                      userrating, length, sqlfilename.utf8().data(), showlevel,
-                     sqlcoverfile.utf8().data(), inetref.utf8().data(), id);
+                     sqlcoverfile.utf8().data(), inetref.utf8().data(), browse,
+                     playcommand.utf8().data(), childID, id);
 
-    db->exec(thequery);
+    QSqlQuery a_query(thequery, db);
+    if(!a_query.isActive())
+    {
+        
+        cerr << "metadata.o: The following metadata update failed: " << thequery << endl;
+    }
 }
 

@@ -19,7 +19,7 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
          : MythThemedDialog(parent, window_name, theme_filename, name)
 {
     db = ldb;
-    currentParentalLevel = gContext->GetNumSetting("VideoDefaultParentalLevel", 4);
+    current_parental_level = gContext->GetNumSetting("VideoDefaultParentalLevel", 1);
 
     file_browser = gContext->GetNumSetting("VideoTreeNoDB", 0);
     browser_mode_files.clear();
@@ -64,7 +64,108 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
         case Key_PageUp: video_tree_list->pageUp(); break;
         case Key_PageDown: video_tree_list->pageDown(); break;
        
+        case Key_1: setParentalLevel(1); break;
+        case Key_2: setParentalLevel(2); break;
+        case Key_3: setParentalLevel(3); break;
+        case Key_4: setParentalLevel(4); break;
+       
         default: MythThemedDialog::keyPressEvent(e); break;
+    }
+}
+
+bool VideoTree::checkParentPassword()
+{
+    QDateTime curr_time = QDateTime::currentDateTime();
+    QString last_time_stamp = gContext->GetSetting("VideoPasswordTime");
+
+    //
+    //  See if we recently (and succesfully)
+    //  asked for a password
+    //
+    
+    if(last_time_stamp.length() < 1)
+    {
+        //
+        //  Probably first time used
+        //
+
+        cerr << "videotree.o: Could not read password/pin time stamp. "
+             << "This is only an issue if it happens repeatedly. " << endl;
+    }
+    else
+    {
+        QDateTime last_time = QDateTime::fromString(last_time_stamp, Qt::TextDate);
+        if(last_time.secsTo(curr_time) < 120)
+        {
+            //
+            //  Two minute window
+            //
+            last_time_stamp = curr_time.toString(Qt::TextDate);
+            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
+            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
+            return true;
+        }
+    }
+    
+    //
+    //  See if there is a password set
+    //
+    
+    QString password = gContext->GetSetting("VideoAdminPassword");
+    if(password.length() > 0)
+    {
+        bool ok = false;
+        MythPasswordDialog *pwd = new MythPasswordDialog("Parental Pin:",
+                                                         &ok,
+                                                         password,
+                                                         gContext->GetMainWindow());
+        pwd->exec();
+        delete pwd;
+        if(ok)
+        {
+            //
+            //  All is good
+            //
+
+            last_time_stamp = curr_time.toString(Qt::TextDate);
+            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
+            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
+            return true;
+        }
+    }   
+    else
+    {
+        return true;
+    } 
+    return false;
+}
+
+void VideoTree::setParentalLevel(int which_level)
+{
+    if(which_level < 1)
+    {
+        which_level = 1;
+    }
+    if(which_level > 4)
+    {
+        which_level = 4;
+    }
+    
+    if(checkParentPassword())
+    {
+        current_parental_level = which_level;
+        pl_value->SetText(QString("%1").arg(current_parental_level));
+        video_tree_data->deleteAllChildren();
+        buildVideoList();
+    
+        //  
+        //  Tell the tree list to highlight the 
+        //  first leaf and then draw the GUI as
+        //  it now stands
+        //
+    
+        video_tree_list->enter();
+        updateForeground();
     }
 }
 
@@ -137,10 +238,12 @@ void VideoTree::buildVideoList()
         
         buildFileList(gContext->GetSetting("VideoStartupDir"));
 
+        /*
         if(browser_mode_files.count() < 1)
         {
             video_tree_data->addNode("No files found", -1, false);
-        }        
+        }
+        */        
         
         for(uint i=0; i < browser_mode_files.count(); i++)
         {
@@ -178,7 +281,14 @@ void VideoTree::buildVideoList()
                 ++a_counter;
             }
         }
-        
+        if(video_tree_data->childCount() < 1)
+        {
+            //
+            //  Nothing survived the requirements
+            //
+
+            video_tree_data->addNode("No files found", -1, false);
+        }        
     }
     else
     {
@@ -191,8 +301,12 @@ void VideoTree::buildVideoList()
 
         QSqlQuery query("SELECT intid FROM videometadata ;", db);
         Metadata *myData;
-
-        if (query.isActive() && query.numRowsAffected() > 0)
+    
+        if(!query.isActive())
+        {
+            cerr << "videotree.o: Your database sucks" << endl;
+        }
+        else if (query.numRowsAffected() > 0)
         {
             while (query.next())
             {
@@ -205,7 +319,7 @@ void VideoTree::buildVideoList()
                 myData = new Metadata();
                 myData->setID(idnum);
                 myData->fillDataFromID(db);
-                if (myData->ShowLevel() <= currentParentalLevel && myData->ShowLevel() != 0)
+                if (myData->ShowLevel() <= current_parental_level && myData->ShowLevel() != 0)
                 {
                     QString file_string = myData->Filename();
                     QString prefix = gContext->GetSetting("VideoStartupDir");
@@ -253,6 +367,7 @@ void VideoTree::buildVideoList()
             video_tree_data->addNode("No files found", -1, false);
         }
     }
+    
     video_tree_list->assignTreeData(video_tree_root);
     video_tree_list->sortTreeByString();
     video_tree_list->sortTreeBySelectable();
@@ -269,6 +384,7 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
         
         QString extension = "";
         QString player = "";
+        QString unique_player;
             
         if(file_browser)
         {
@@ -298,8 +414,16 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
             video_poster->SetImage(node_data->CoverFile());
             video_poster->LoadImage();
             extension = node_data->Filename().section(".", -1, -1);
+            unique_player = node_data->PlayCommand();
+            if(unique_player.length() > 0)
+            {
+                player = unique_player;
+            }
+            else
+            {
+                player = gContext->GetSetting("VideoDefaultPlayer");
+            }
             delete node_data;
-            player = gContext->GetSetting("VideoDefaultPlayer");
         }
 
         //
@@ -317,7 +441,7 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
         if(a_query.isActive() && a_query.numRowsAffected() > 0)
         {
             a_query.next();
-            if(!a_query.value(1).toBool())
+            if(!a_query.value(1).toBool() && unique_player.length() < 1)
             {
                 //
                 //  This file type is defined and
@@ -345,30 +469,42 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
     
 }
 
-void VideoTree::handleTreeListSelection(int node_int, IntVector *)
+void VideoTree::playVideo(int node_number)
 {
-    if(node_int >= 0)
+    if(node_number > 0)
     {
         //
         //  User has selected a video file
         //
     
         QString filename = "";
+        QString handler = gContext->GetSetting("VideoDefaultPlayer");
+        QString unique_handler = "";
         
         if(file_browser)
         {
-            filename = *(browser_mode_files.at(node_int));
+            filename = *(browser_mode_files.at(node_number));
         }
         else
         {
             Metadata *node_data;
             node_data = new Metadata();
-            node_data->setID(node_int);
+            node_data->setID(node_number);
             node_data->fillDataFromID(db);
             filename = node_data->Filename();
+            
+            //
+            //  Player command unique to this file?
+            //
+
+            unique_handler = node_data->PlayCommand();
+            if(unique_handler.length() > 0)
+            {
+                handler = unique_handler;
+            }
+            delete node_data;
         }
         
-        QString handler = gContext->GetSetting("VideoDefaultPlayer");
 
         //
         //  Do we have a specialized player for this
@@ -383,7 +519,9 @@ void VideoTree::handleTreeListSelection(int node_int, IntVector *)
 
         QSqlQuery a_query(q_string, db);
         
-        if(a_query.isActive() && a_query.numRowsAffected() > 0)
+        if( a_query.isActive() && 
+            a_query.numRowsAffected() > 0 && 
+            unique_handler.length() < 1)
         {
             a_query.next();
             if(!a_query.value(1).toBool())
@@ -423,6 +561,54 @@ void VideoTree::handleTreeListSelection(int node_int, IntVector *)
         
         myth_system((QString("%1 ").arg(command)).local8Bit());
 
+        
+    }
+}
+
+
+void VideoTree::handleTreeListSelection(int node_int, IntVector *)
+{
+    if(node_int >= 0)
+    {
+        //
+        //  Play this (chain of?) file(s) 
+        //
+        
+        int which_file = node_int;
+        QTime playing_time;
+
+        while(which_file > 0)
+        {
+            playing_time.start();
+            playVideo(which_file);
+            if(!file_browser)
+            {
+                if(playing_time.elapsed() > 10000)
+                {
+                    //
+                    //  More than ten seconds have gone by,
+                    //  so we'll keep following the chain of
+                    //  files to play
+                    //
+
+                    Metadata *node_data = new Metadata();
+                    node_data->setID(which_file);
+                    node_data->fillDataFromID(db);
+                    which_file = node_data->ChildID();
+                    cout << "Just set which file to " << which_file << endl;
+                    delete node_data;
+                }
+                else
+                {
+                    which_file = 0;
+                }
+            }
+            else
+            {
+                which_file = 0;
+            }
+        }
+        
         //
         //  Go back to tree browsing
         //
@@ -484,5 +670,16 @@ void VideoTree::wireUpTheme()
     {
         cerr << "videotree.o: Couldn't find an image called video_poster in your theme" << endl;
     }
+    
+    //
+    //  Status of Parental Level
+    //
+    
+    pl_value = getUITextType("pl_value");
+    if(pl_value)
+    {
+        pl_value->SetText(QString("%1").arg(current_parental_level));
+    }
+    
 }
 

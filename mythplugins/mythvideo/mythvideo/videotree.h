@@ -33,6 +33,9 @@ class VideoTree : public MythThemedDialog
   
     void handleTreeListSelection(int, IntVector*);
     void handleTreeListEntry(int, IntVector*);
+    void playVideo(int node_number);
+    bool checkParentPassword();
+    void setParentalLevel(int which_level);
 
   protected:
     void keyPressEvent(QKeyEvent *e);
@@ -40,7 +43,7 @@ class VideoTree : public MythThemedDialog
   private:
 
     void         wireUpTheme();
-    int          currentParentalLevel;
+    int          current_parental_level;
     QSqlDatabase *db;
     bool         file_browser;
     QStringList  browser_mode_files;
@@ -55,6 +58,7 @@ class VideoTree : public MythThemedDialog
     UITextType            *video_title;
     UITextType            *video_file;
     UITextType            *video_player;
+    UITextType            *pl_value;
     UIImageType           *video_poster;
 };
 

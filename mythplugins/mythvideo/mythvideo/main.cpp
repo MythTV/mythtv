@@ -136,6 +136,73 @@ void runMenu(QString themedir, const QString &menuname,
     delete diag;
 }
 
+bool checkParentPassword()
+{
+    QDateTime curr_time = QDateTime::currentDateTime();
+    QString last_time_stamp = gContext->GetSetting("VideoPasswordTime");
+
+    //
+    //  See if we recently (and succesfully)
+    //  asked for a password
+    //
+    
+    if(last_time_stamp.length() < 1)
+    {
+        //
+        //  Probably first time used
+        //
+
+        cerr << "main.o: Could not read password/pin time stamp. "
+             << "This is only an issue if it happens repeatedly. " << endl;
+    }
+    else
+    {
+        QDateTime last_time = QDateTime::fromString(last_time_stamp, Qt::TextDate);
+        if(last_time.secsTo(curr_time) < 120)
+        {
+            //
+            //  Two minute window
+            //
+            last_time_stamp = curr_time.toString(Qt::TextDate);
+            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
+            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
+            return true;
+        }
+    }
+    
+    //
+    //  See if there is a password set
+    //
+    
+    QString password = gContext->GetSetting("VideoAdminPassword");
+    if(password.length() > 0)
+    {
+        bool ok = false;
+        MythPasswordDialog *pwd = new MythPasswordDialog("Parental Pin:",
+                                                         &ok,
+                                                         password,
+                                                         gContext->GetMainWindow());
+        pwd->exec();
+        delete pwd;
+        if(ok)
+        {
+            //
+            //  All is good
+            //
+
+            last_time_stamp = curr_time.toString(Qt::TextDate);
+            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
+            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
+            return true;
+        }
+    }
+    else
+    {
+        return true;
+    }
+    return false;
+}
+
 void VideoCallback(void *data, QString &selection)
 {
     GenericData *mdata = (GenericData *)data;
@@ -144,13 +211,16 @@ void VideoCallback(void *data, QString &selection)
 
     if (sel == "manager")
     {
-        SearchDir(mdata->db, mdata->startdir);
+        if(checkParentPassword())
+        {
+            SearchDir(mdata->db, mdata->startdir);
 
-        VideoManager *manage = new VideoManager(mdata->db, 
-                                                gContext->GetMainWindow(),
-                                                "video manager");
-        manage->exec();
-        delete manage;
+            VideoManager *manage = new VideoManager(mdata->db, 
+                                                    gContext->GetMainWindow(),
+                                                    "video manager");
+            manage->exec();
+            delete manage;
+        }
     }
     else if (sel == "browser")
     {
@@ -169,8 +239,26 @@ void VideoCallback(void *data, QString &selection)
     }
     else if (sel == "settings_general")
     {
-        GeneralSettings settings;
-        settings.exec(QSqlDatabase::database());
+        //
+        //  If we are doing aggressive 
+        //  Parental Control, then junior
+        //  is going to have to try harder
+        //  than that!
+        //
+        
+        if(gContext->GetNumSetting("VideoAggressivePC", 0))
+        {
+            if(checkParentPassword())
+            {
+                GeneralSettings settings;
+                settings.exec(QSqlDatabase::database());
+            }
+        }
+        else
+        {
+            GeneralSettings settings;
+            settings.exec(QSqlDatabase::database());
+        }
     }
     else if (sel == "settings_player")
     {

@@ -32,6 +32,8 @@ class VideoBrowser : public MythDialog
     void cursorDown();
     void cursorUp();
     void exitWin();
+    void setParentalLevel(int which_level);
+    bool checkParentPassword();
 
   protected:
     void paintEvent(QPaintEvent *);

@@ -25,9 +25,9 @@ INSTALLS += installfiles trans uifiles installimages
 # Input
 
 HEADERS += metadata.h videomanager.h videobrowser.h 
-HEADERS += globalsettings.h videotree.h fileassoc.h
+HEADERS += globalsettings.h videotree.h fileassoc.h editmetadata.h
 
-SOURCES += main.cpp metadata.cpp videomanager.cpp 
-SOURCES += videobrowser.cpp globalsettings.cpp videotree.cpp fileassoc.cpp
+SOURCES += main.cpp metadata.cpp videomanager.cpp videobrowser.cpp
+SOURCES += globalsettings.cpp videotree.cpp fileassoc.cpp editmetadata.cpp
 
 TRANSLATIONS = mythvideo_it.ts

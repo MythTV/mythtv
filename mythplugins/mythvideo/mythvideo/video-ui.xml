@@ -8,16 +8,23 @@
       <bold>yes</bold>
     </font>
 
-    <font name="directorfnt" face="Arial">
+    <font name="labels" face="Arial">
       <color>#ffffff</color>
-      <size>18</size>
+      <size>16</size>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
 
-    <font name="labels" face="Arial">
+    <font name="keysfont" face="Arial">
       <color>#ffffff</color>
-      <size>16</size>
+      <size>12</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="directorfnt" face="Arial">
+      <color>#ffffff</color>
+      <size>18</size>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -76,31 +83,31 @@
     <container name="background">
       <image name="filler" draworder="0" fleximage="yes">
         <filename>cr-background.png</filename>
-        <position>0,310</position>
+        <position>0,285</position>
         <staticsize>800,290</staticsize>
       </image>
     </container>
 
     <container name="info">
-      <area>0,0,800,290</area>
+      <area>0,0,800,280</area>
       <textarea name="title" draworder="4">
         <area>20,10,800,80</area>
         <font>leadfnt</font>
       </textarea>
       <textarea name="dirlbl" draworder="4">
-        <area>20,80,150,35</area>
-        <font>directorfnt</font>
-        <value>Directed by</value>
+        <area>20,75,150,35</area>
+        <font>labels</font>
+        <value>Director:</value>
         <value lang="ES">Director</value>
         <value lang="CA">Director</value>
         <value lang="DK">Instruktør:</value>
       </textarea>
       <textarea name="director" draworder="4">
-        <area>166,80,350,35</area>
-        <font>directorfnt</font>
+        <area>170,75,350,35</area>
+        <font>moviedata</font>
       </textarea>
       <textarea name="yrlbl" draworder="4" align="right">
-        <area>560,90,90,35</area>
+        <area>500,75,170,35</area>
         <font>labels</font>
         <value>Year:</value>
         <value lang="ES">Año:</value>
@@ -108,11 +115,11 @@
         <value lang="DK">Udgivet:</value>
       </textarea>
       <textarea name="year" draworder="4">
-        <area>660,90,100,45</area>
+        <area>680,75,100,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="ratlbl" draworder="4">
-        <area>20,120,150,35</area>
+        <area>20,105,150,35</area>
         <font>labels</font>
         <value>Rated:</value>
         <value lang="ES">Clasificación:</value>
@@ -120,11 +127,11 @@
         <value lang="DK">Klassifikation:</value>
       </textarea>
       <textarea name="rating" draworder="4">
-        <area>170,120,600,35</area>
+        <area>170,105,600,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="lvllbl" draworder="4" align="right">
-        <area>500,150,170,35</area>
+        <area>500,105,170,35</area>
         <font>labels</font>
         <value>Parental Level:</value>
         <value lang="ES">Nivel de acceso:</value>
@@ -132,11 +139,20 @@
         <value lang="DK">Voksen niveau:</value>
       </textarea>
       <textarea name="level" draworder="4">
-        <area>680,150,350,35</area>
+        <area>680,105,100,35</area>
+        <font>moviedata</font>
+      </textarea>
+      <textarea name="browselbl" draworder="4" align="right">
+        <area>500,135,170,35</area>
+        <font>labels</font>
+        <value>Browsable:</value>
+      </textarea>
+      <textarea name="browseable" draworder="4">
+        <area>680,135,100,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="lenlbl" draworder="4">
-        <area>20,150,150,35</area>
+        <area>20,135,150,35</area>
         <font>labels</font>
         <value>Runtime:</value>
         <value lang="ES">Duración:</value>
@@ -144,11 +160,11 @@
         <value lang="DK">Længde:</value>
       </textarea>
       <textarea name="length" draworder="4">
-        <area>170,150,350,35</area>
+        <area>170,135,350,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="pltlbl" draworder="4">
-        <area>20,180,150,35</area>
+        <area>20,165,150,35</area>
         <font>labels</font>
         <value>Plot:</value>
         <value lang="ES">Resumen:</value>
@@ -156,11 +172,11 @@
         <value lang="DK">Resumé:</value>
       </textarea>
       <textarea name="plot" draworder="4">
-        <area>170,180,600,35</area>
+        <area>170,165,600,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="fillbl" draworder="4">
-        <area>20,210,150,35</area>
+        <area>20,195,150,35</area>
         <font>labels</font>
         <value>Filename:</value>
         <value lang="ES">Nombre del archivo:</value>
@@ -168,11 +184,11 @@
         <value lang="DK">Filnavn:</value>
       </textarea>
       <textarea name="filename" draworder="4">
-        <area>170,210,600,35</area>
+        <area>170,195,600,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="cvflbl" draworder="4">
-        <area>20,240,150,35</area>
+        <area>20,225,150,35</area>
         <font>labels</font>
         <value>Cover File:</value>
         <value lang="ES">Carátula:</value>
@@ -180,22 +196,22 @@
         <value lang="DK">Omslagsfil:</value>
       </textarea>
       <textarea name="coverfile" draworder="4">
-        <area>170,240,600,35</area>
+        <area>170,225,600,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="imdblbl" draworder="4">
-        <area>20,270,155,35</area>
+        <area>20,255,155,35</area>
         <font>labels</font>
         <value>IMDB Num.:</value>
       </textarea>
       <textarea name="inetref" draworder="4">
-        <area>170,270,500,35</area>
+        <area>170,255,500,35</area>
         <font>moviedata</font>
       </textarea>
     </container>
  
     <container name="selector">
-      <area>0,310,800,290</area>
+      <area>0,285,800,320</area>
       <listarea name="listing" draworder="4">
         <area>20,12,760,242</area>
         <fcnfont name="active_font" function="active"></fcnfont>
@@ -215,8 +231,23 @@
         <position>0,0</position>
         <staticsize>800,290</staticsize>
       </image>
+      <textarea name="keyslbl_one" draworder="4" align="left">
+        <area>15,275,200,15</area>
+        <font>keysfont</font>
+        <value>0-9: Edit</value>
+      </textarea>
+      <textarea name="keyslbl_two" draworder="4" align="center">
+        <area>300,275,200,15</area>
+        <font>keysfont</font>
+        <value>Menu/Info: Manual IMDB</value>
+      </textarea>
+      <textarea name="keyslbl_three" draworder="4" align="right">
+        <area>580,275,200,15</area>
+        <font>keysfont</font>
+        <value>Enter/OK: Auto IMDB</value>
+      </textarea>
     </container>
-
+    
     <container name="inetwait">
       <area>0,0,800,600</area>
       <textarea name="ld1" draworder="0">
@@ -405,6 +436,16 @@
         <area>10,64,500,35</area>
         <font>directorfnt</font>
       </textarea>  
+      <textarea name="pl_label" draworder="4" align="right">
+        <area>680,105,60,40</area>
+        <font>labels</font>
+        <value>PL</value>
+      </textarea>
+      <textarea name="pl_value" draworder="4" align="right">
+        <area>740,105,20,40</area>
+        <font>labels</font>
+        <value>1</value>
+      </textarea>
     </container>
 
     <container name="info">
@@ -629,6 +670,16 @@
                 <position>551,18</position>
                 <staticsize>166,260</staticsize>
             </image>
+            <textarea name="pl_label" draworder="0" align="right">
+                <area>700,255,60,40</area>
+                <font>labelfont</font>
+                <value>PL </value>
+            </textarea>
+            <textarea name="pl_value" draworder="0">
+                <area>760,255,20,40</area>
+                <font>labelfont</font>
+                <value>1</value>
+            </textarea>
         </container>
 
     </window>
@@ -748,5 +799,187 @@
  
     </window>
 
+    <window name="edit_metadata">
+
+        <font name="title" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>18</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
+        
+        <font name="display" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>16</size>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+        </font>
+
+    <container name="editing_container">
+
+            <area>10,10,780,580</area>
+ 
+            <textarea name="title" draworder="0" align="center">
+                <area>10,10,760,50</area>
+                <font>title</font>
+                <value>Edit Video Information</value>
+            </textarea>
+
+            <!--
+                    Labels  
+            -->
+
+            <textarea name="title_text" draworder="0" align="right">
+                <area>50,150,250,40</area>
+                <font>display</font>
+                <value>Name:</value>
+            </textarea>
+
+            <textarea name="level_text" draworder="0" align="right">
+                <area>50,200,250,40</area>
+                <font>display</font>
+                <value>Parental Control:</value>
+            </textarea>
+
+            <textarea name="child_text" draworder="0" align="right">
+                <area>50,250,250,40</area>
+                <font>display</font>
+                <value>File to Always Play Next:</value>
+            </textarea>
+
+            <textarea name="browse_text" draworder="0" align="right">
+                <area>50,300,250,40</area>
+                <font>display</font>
+                <value>Include while Browsing:</value>
+            </textarea>
+
+            <textarea name="coverart_text_label" draworder="0" align="right">
+                <area>50,350,250,40</area>
+                <font>display</font>
+                <value>Cover Art:</value>
+            </textarea>
+
+            <textarea name="player_text" draworder="0" align="right">
+                <area>50,400,250,40</area>
+                <font>display</font>
+                <value>Unique Player Command:</value>
+            </textarea>
+
+            <!--
+                    Widgets
+            -->
+
+            <blackhole name="title_hack" draworder="0">
+                <area>310,145,300,40</area>
+            </blackhole>
+
+            <selector name="level_select" draworder="0">
+                <area>310,195,300,40</area>
+                <font>display</font>
+                <image function="on" filename="mv_leftright_on.png"></image>
+                <image function="off" filename="mv_leftright_off.png"></image>
+                <image function="pushed" filename="mv_leftright_pushed.png"></image>
+            </selector>
+
+            <selector name="child_select" draworder="0">
+                <area>310,245,300,40</area>
+                <font>display</font>
+                <image function="on" filename="mv_leftright_on.png"></image>
+                <image function="off" filename="mv_leftright_off.png"></image>
+                <image function="pushed" filename="mv_leftright_pushed.png"></image>
+            </selector>
+
+            <checkbox name="browse_check" draworder="0">
+                <position>310,295</position>
+                <image function="checked" filename="mv_checked.png"></image>
+                <image function="unchecked" filename="mv_unchecked.png"></image>
+                <image function="checked_high" filename="mv_checked_high.png"></image>
+                <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+            </checkbox>      
+
+            <pushbutton name="coverart_button" draworder="0">
+                <position>310,345</position>
+                <image function="on" filename="mv_blankbutton_on.png"></image>
+                <image function="off" filename="mv_blankbutton_off.png"></image>
+                <image function="pushed" filename="mv_blankbutton_pushed.png"></image>
+            </pushbutton>
+            <textarea name="coverart_text" draworder="0" align="left">
+                <area>350,350,250,40</area>
+                <font>display</font>
+                <value>/path/to/the/thing.jpg</value>
+            </textarea>
+
+            <blackhole name="player_hack" draworder="0">
+                <area>310,395,300,40</area>
+            </blackhole>
+
+            <textbutton name="done_button" draworder="0">
+                <position>310,455</position>
+                <font>display</font>
+                <image function="on" filename="mv_large_text_button_on.png"></image>
+                <image function="off" filename="mv_large_text_button_off.png"></image>
+                <image function="pushed" filename="mv_large_text_button_pushed.png"></image>
+            </textbutton>
+
+
+    </container>
+
+    </window>
+
+    <!--
+        NB: You don't want to mess with this very much.
+            There *must* be a container called background.
+            It *must* have an image called file_browser_background.
+            And there has to be a managedtreelist called file_browser.
+    -->
+    <window name="file_chooser">
+        <font name="chooser_font" face="Arial">
+            <color>#ffffff</color>
+            <size>18</size>
+            <shadow>1,1</shadow>
+            <bold>yes</bold>
+        </font>
+
+        <container name="background">
+            <image name="file_browser_background" draworder="0" fleximage="no">
+                <filename>mv_filerequest.png</filename>
+                <position>0,0</position>
+            </image>
+        </container>
+        
+        <container name="chooser_area">
+            <area>0,0,600,250</area>
+            <managedtreelist name="file_browser" draworder="1" bins="2">
+                <area>185,20,400,210</area>
+                <image function="selectionbar" filename="cr-selectbar.png"></image>
+                <image function="uparrow" filename="mv_up_arrow.png"></image>
+                <image function="downarrow" filename="mv_down_arrow.png"></image>
+                <image function="leftarrow" filename="mv_left_arrow.png"></image>
+                <image function="rightarrow" filename="mv_right_arrow.png"></image>
+                <bin number="1">
+                    <area>185,20,145,210</area>
+                    <fcnfont name="chooser_font" function="active"></fcnfont>
+                    <fcnfont name="chooser_font" function="inactive"></fcnfont>
+                    <fcnfont name="chooser_font" function="selected"></fcnfont>
+                    <fcnfont name="chooser_font" function="selectable"></fcnfont>
+                </bin>
+                <bin number="2">
+                    <area>350,20,235,210</area>
+                    <fcnfont name="chooser_font" function="active"></fcnfont>
+                    <fcnfont name="chooser_font" function="inactive"></fcnfont>
+                    <fcnfont name="chooser_font" function="selected"></fcnfont>
+                    <fcnfont name="chooser_font" function="selectable"></fcnfont>
+                </bin>
+            </managedtreelist>
+            <image name="image_box" draworder="1" fleximage="no">
+                <position>19,20</position>
+                <staticsize>143,209</staticsize>
+            </image>
+
+        </container>
+        
+    </window>
 
 </mythuitheme>

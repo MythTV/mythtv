@@ -13,7 +13,8 @@ class Metadata
              QString ltitle = "", int lyear = 0, QString linetref = "", 
              QString ldirector = "", QString lplot = "", 
              float luserrating = 0.0, QString lrating = "", int llength = 0, 
-             int lid = 0, int lshowlevel = 1, unsigned int lchildID = 0)
+             int lid = 0, int lshowlevel = 1, unsigned int lchildID = 0,
+             bool lbrowse = true, QString lplaycommand = "")
     {
         filename = lfilename;
         coverfile = lcoverfile;
@@ -28,6 +29,8 @@ class Metadata
         showlevel = lshowlevel;
         id = lid;
         childID = lchildID;
+        browse = lbrowse;
+        playcommand = lplaycommand;
     }
 
     Metadata(const Metadata &other) 
@@ -45,6 +48,8 @@ class Metadata
         showlevel = other.showlevel;
         id = other.id;
         childID = other.childID;
+        browse = other.browse;
+        playcommand = other.playcommand;
     }
 
    ~Metadata() {}
@@ -78,7 +83,13 @@ class Metadata
 
     unsigned int ChildID() { return childID; }
     void setChildID(int lchildID) { childID = lchildID; }
+    
+    bool Browse() {return browse; }
+    void setBrowse(bool y_or_n){ browse = y_or_n;}
    
+    QString PlayCommand() {return playcommand;}
+    void setPlayCommand(const QString &new_command){playcommand = new_command;}
+    
     int ShowLevel() { return showlevel; }
     void setShowLevel(int lshowlevel) { showlevel = lshowlevel; }
 
@@ -106,6 +117,8 @@ class Metadata
     float userrating;
     int length;
     int showlevel;
+    bool browse;
+    QString playcommand;
 
     unsigned int id;
     

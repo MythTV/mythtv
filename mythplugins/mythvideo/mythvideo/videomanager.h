@@ -29,6 +29,7 @@ class VideoManager : public MythDialog
   protected slots:
     void selected();
     void videoMenu();
+    void editMetadata();
     void cursorLeft();
     void cursorRight();
     void cursorDown(bool page = false);

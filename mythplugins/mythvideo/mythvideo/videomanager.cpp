@@ -16,6 +16,7 @@ using namespace std;
 
 #include "metadata.h"
 #include "videomanager.h"
+#include "editmetadata.h"
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 
@@ -119,7 +120,28 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
     {
         switch (e->key())
         {
-            case Key_Space: case Key_Enter: case Key_Return: selected(); return;
+            case Key_Space: 
+            case Key_Enter: 
+            case Key_Return: 
+                selected(); 
+                return;
+                break;
+
+            case Key_0:
+            case Key_1:
+            case Key_2:
+            case Key_3:
+            case Key_4:
+            case Key_5:
+            case Key_6:
+            case Key_7:
+            case Key_8:
+            case Key_9:
+                if(m_state == 0)
+                {
+                    editMetadata();
+                }
+                break;
             default: break;
         }
     }
@@ -134,8 +156,24 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
         case Key_PageDown: pageDown(); break;
         case Key_Escape: exitWin(); break;
         case Key_M: case Key_I: videoMenu(); break;
-        case Key_0: case Key_1: case Key_2: case Key_3: case Key_4: case Key_5:
-        case Key_6: case Key_7: case Key_8: case Key_9: num(e); break;
+
+        case Key_0: 
+        case Key_1: 
+        case Key_2: 
+        case Key_3: 
+        case Key_4: 
+        case Key_5: 
+        case Key_6: 
+        case Key_7: 
+        case Key_8: 
+        case Key_9: 
+        
+            if(m_state != 0)
+            {
+                num(e); 
+            }
+            break;
+
         default: MythDialog::keyPressEvent(e);
     }
 }
@@ -826,6 +864,15 @@ void VideoManager::updateInfo(QPainter *p)
        QString rating = curitem->Rating();
        QString length = QString("%1").arg(curitem->Length()) + " minutes";
        QString level = QString("%1").arg(curitem->ShowLevel());
+       QString browseable = "";
+       if(curitem->Browse())
+       {
+         browseable = "Yes";
+       }
+       else
+       {
+         browseable = "No";
+       }
 
        LayerSet *container = NULL;
        container = theme->GetSet("info");
@@ -874,6 +921,10 @@ void VideoManager::updateInfo(QPainter *p)
            type = (UITextType *)container->GetType("level");
            if (type)
                type->SetText(level);
+  
+           type = (UITextType *)container->GetType("browseable");
+           if (type)
+               type->SetText(browseable);
   
            container->Draw(&tmp, 1, 0); 
            container->Draw(&tmp, 2, 0);
@@ -1217,8 +1268,24 @@ void VideoManager::videoMenu()
 }
 
 
+void VideoManager::editMetadata()
+{
+    EditMetadataDialog *md_editor = new EditMetadataDialog(db,
+                                                           curitem,
+                                                           gContext->GetMainWindow(),
+                                                           "edit_metadata",
+                                                           "video-",
+                                                           "edit metadata dialog");
+    md_editor->exec();
+    delete md_editor;
+    curitem->fillDataFromID(db);
+    RefreshMovieList();
+    update(infoRect);
+}
+
 void VideoManager::selected()
 {
+
 // Do IMDB Connections and Stuff
     QPainter p(this);
     if (m_state == 0 || m_state == 1)

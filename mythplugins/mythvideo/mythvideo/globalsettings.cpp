@@ -30,10 +30,10 @@ public:
         addSelection("1 - Lowest", "1");
         addSelection("2", "2"); 
         addSelection("3", "3");
-        setHelpText("This is the 'level' that MythVideo starts at. Any videos"
-                    " with a level at or below this will be shown in the list"
-                    " or while browsing. Passwords should be set to ensure this" 
-                    " is useful. Any video/file set to level 0 will not be shown");
+        setHelpText("This is the 'level' that MythVideo starts at. Any videos "
+                    "with a level at or below this will be shown in the list "
+                    "or while browsing by default. The Parental PIN should be "
+                    "set to limit changing of the default level.");
     }
 };
 
@@ -41,10 +41,25 @@ class VideoAdminPassword: public LineEditSetting, public GlobalSetting {
 public:
     VideoAdminPassword():
         GlobalSetting("VideoAdminPassword") {
-        setLabel("Video Manager Password");
-        setHelpText("This password is used to enter the 'Video Manager' "
-                    "section. The 'Video Manager' is where the video's"
-                    " parental level is set."); 
+        setLabel("Parental Control PIN");
+        setHelpText("This PIN is used to control the current Parental Level. "
+                    "If you want to use this feature, then setting the value "
+                    "to all numbers will make your life much easier. If you "
+                    "don't want to be bothered by PC dialogs, please "
+                    "set it to be blank."); 
+    };
+};
+
+class VideoAggressivePC: public CheckBoxSetting, public GlobalSetting {
+public:
+    VideoAggressivePC():
+        GlobalSetting("VideoAggressivePC") {
+        setLabel("Aggresive Parental Control");
+        setValue(false);
+        setHelpText("If set, you will not be able to return "
+                    "to this screen and reset the Parental "
+                    "PIN without first entering the current PIN. You have "
+                    "been warned.");
     };
 };
 
@@ -93,6 +108,7 @@ GeneralSettings::GeneralSettings()
     general->addChild(new VideoStartupDirectory());
     general->addChild(new VideoDefaultParentalLevel());
     general->addChild(new VideoAdminPassword());
+    general->addChild(new VideoAggressivePC());
     general->addChild(new VideoListUnknownFiletypes());
     general->addChild(new VideoTreeNoDB());
     addChild(general);

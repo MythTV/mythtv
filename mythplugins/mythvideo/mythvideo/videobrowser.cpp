@@ -60,6 +60,102 @@ VideoBrowser::~VideoBrowser()
         delete curitem;
 }
 
+bool VideoBrowser::checkParentPassword()
+{
+    QDateTime curr_time = QDateTime::currentDateTime();
+    QString last_time_stamp = gContext->GetSetting("VideoPasswordTime");
+
+    //
+    //  See if we recently (and succesfully)
+    //  asked for a password
+    //
+    
+    if(last_time_stamp.length() < 1)
+    {
+        //
+        //  Probably first time used
+        //
+
+        cerr << "videobrowser.o: Could not read password/pin time stamp. "
+             << "This is only an issue if it happens repeatedly. " << endl;
+    }
+    else
+    {
+        QDateTime last_time = QDateTime::fromString(last_time_stamp, Qt::TextDate);
+        if(last_time.secsTo(curr_time) < 120)
+        {
+            //
+            //  Two minute window
+            //
+            last_time_stamp = curr_time.toString(Qt::TextDate);
+            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
+            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
+            return true;
+        }
+    }
+    
+    //
+    //  See if there is a password set
+    //
+    
+    QString password = gContext->GetSetting("VideoAdminPassword");
+    if(password.length() > 0)
+    {
+        bool ok = false;
+        MythPasswordDialog *pwd = new MythPasswordDialog("Parental Pin:",
+                                                         &ok,
+                                                         password,
+                                                         gContext->GetMainWindow());
+        pwd->exec();
+        delete pwd;
+        if(ok)
+        {
+            //
+            //  All is good
+            //
+
+            last_time_stamp = curr_time.toString(Qt::TextDate);
+            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
+            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
+            return true;
+        }
+    }    
+    else
+    {
+        return true;
+    }
+    return false;
+}
+
+void VideoBrowser::setParentalLevel(int which_level)
+{
+    if(which_level < 1)
+    {
+        which_level = 1;
+    }
+    if(which_level > 4)
+    {
+        which_level = 4;
+    }
+    
+    if(checkParentPassword())
+    {
+        currentParentalLevel = which_level;
+        LayerSet *container = theme->GetSet("browsing");
+        if(container)
+        {
+            UITextType *pl_value = (UITextType *)container->GetType("pl_value");
+            if (pl_value)
+            {
+               pl_value->SetText(QString("%1").arg(currentParentalLevel));
+            }
+        }
+        RefreshMovieList();
+        SetCurrentItem();
+        repaint();
+    }
+}
+
 void VideoBrowser::keyPressEvent(QKeyEvent *e)
 { 
     if (allowselect)
@@ -78,6 +174,12 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
         case Key_Up: cursorUp(); break;
         case Key_Left: cursorLeft(); break;
         case Key_Right: cursorRight(); break;
+
+        case Key_1: setParentalLevel(1); break;
+        case Key_2: setParentalLevel(2); break;
+        case Key_3: setParentalLevel(3); break;
+        case Key_4: setParentalLevel(4); break;
+
         default: MythDialog::keyPressEvent(e);
     }
 }
@@ -106,7 +208,7 @@ void VideoBrowser::RefreshMovieList()
     updateML = true;
     m_list.clear();
 
-    QSqlQuery query("SELECT intid FROM videometadata ORDER BY title;", db);
+    QSqlQuery query("SELECT intid FROM videometadata WHERE browse = 1 ORDER BY title;", db);
     Metadata *myData;
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -183,13 +285,16 @@ void VideoBrowser::updatePlayWait(QPainter *p)
   }
   else if (m_state == 4)
   {
+    QTime playing_time;
+    playing_time.start();
+
     // Play the movie
     myth_system((QString("%1 ") .arg(m_cmd)).local8Bit());
 
     Metadata *childItem = new Metadata;
     Metadata *parentItem = new Metadata(*curitem);
 
-    while (parentItem->ChildID())
+    while (parentItem->ChildID() && playing_time.elapsed() > 10000)
     {
         childItem->setID(parentItem->ChildID());
         childItem->fillDataFromID(db);
@@ -198,6 +303,7 @@ void VideoBrowser::updatePlayWait(QPainter *p)
         {
             //Load up data about this child
             selected(childItem);
+            playing_time.start();
             myth_system((QString("%1 ") .arg(m_cmd)).local8Bit());
         }
 
@@ -232,15 +338,32 @@ void VideoBrowser::SetCurrentItem()
     end = m_list.end();
     int cnt = 0;
 
+    if(curitem)
+    {
+        delete curitem;
+        curitem = NULL;
+    }
+
     for (it = start; it != end; ++it)
     {
          if (cnt == inData)
          {
-             if (curitem)
-                 delete curitem;
              curitem = new Metadata(*(it));
          }
          cnt++;
+    }
+    if(!curitem)
+    {
+        if(cnt > 1)
+        {
+            inData = 0;
+            curitem = new Metadata(*(start));
+        }
+        else
+        {
+            inData = 0;
+            allowselect = false;
+        }
     }
 }
 
@@ -250,9 +373,16 @@ void VideoBrowser::updateBrowsing(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
-  
-    QString vidnum = QString("%1 of %2").arg(inData + 1).arg(m_list.count());
-    QString plevel = QString("%1").arg(currentParentalLevel);
+
+    QString vidnum = "The law of the exluded middle is officially OVER!";  
+    if(m_list.count() > 0)
+    {
+        vidnum = QString("%1 of %2").arg(inData + 1).arg(m_list.count());
+    }
+    else
+    {
+        vidnum = "No Videos";
+    }
 
     LayerSet *container = NULL;
     container = theme->GetSet("browsing");
@@ -262,10 +392,6 @@ void VideoBrowser::updateBrowsing(QPainter *p)
         if (type)
             type->SetText(vidnum);
 
-        type = (UITextType *)container->GetType("currentlevel");
-        if (type)
-            type->SetText(plevel);
-  
         container->Draw(&tmp, 1, 0);
         container->Draw(&tmp, 2, 0);
         container->Draw(&tmp, 3, 0);
@@ -486,28 +612,43 @@ void VideoBrowser::selected(Metadata *someItem)
     QString handler = gContext->GetSetting("VideoDefaultPlayer");
 
     //
-    //  Do we have a specialized player for this
-    //  type of file?
+    //  Does this specific metadata have its own
+    //  unique player command?
     //
-        
-    QString extension = filename.section(".", -1, -1);
-
-    QString q_string = QString("SELECT playcommand, use_default FROM "
-                               "videotypes WHERE extension = \"%1\" ;")
-                               .arg(extension);
-
-    QSqlQuery a_query(q_string, db);
     
-    if(a_query.isActive() && a_query.numRowsAffected() > 0)
+    QString special_handler = someItem->PlayCommand();
+    if(special_handler.length() > 1)
     {
-        a_query.next();
-        if(!a_query.value(1).toBool())
+        handler = special_handler;
+    }
+    
+    else
+    {
+        //
+        //  Do we have a specialized player for this
+        //  type of file?
+        //
+        
+        QString extension = filename.section(".", -1, -1);
+
+        QString q_string = QString("SELECT playcommand, use_default FROM "
+                                   "videotypes WHERE extension = \"%1\" ;")
+                                   .arg(extension);
+
+        QSqlQuery a_query(q_string, db);
+    
+        if(a_query.isActive() && a_query.numRowsAffected() > 0)
         {
-            //
-            //  This file type is defined and
-            //  it is not set to use default player
-            //
-            handler = a_query.value(0).toString();                
+            a_query.next();
+            if(!a_query.value(1).toBool())
+            {
+                //
+                //  This file type is defined and
+                //  it is not set to use default player
+                //
+
+                handler = a_query.value(0).toString();                
+            }
         }
     }
 
