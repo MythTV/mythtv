@@ -1783,7 +1783,13 @@ void TV::DoPlay(void)
 void TV::DoPause(void)
 {
     speed_index = 0;
-    float time = StopFFRew();
+    float time = 0.0;
+
+    if(doing_ff_rew)
+    {
+        time = StopFFRew();
+        activenvp->Play(1.0, true);
+    }
 
     if (paused)
         activenvp->Play(1.0, true);
