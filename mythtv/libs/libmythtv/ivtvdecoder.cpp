@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -64,7 +65,7 @@ void IvtvDecoder::Reset(void)
 bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
 {
     // remove to enable..
-    return false;
+//    return false;
 
     int testfd = open("/dev/video16", O_RDWR);
     if (testfd <= 0)
