@@ -1,7 +1,7 @@
 <mythmenu name="VIDEO_SETTINGS">
 
    <button>
-      <type>VIDEO</type>
+      <type>SETUP</type>
       <text>General Settings</text>
       <text lang="ES">Opciones Generales</text>
       <text lang="CA">Opcions Generals</text>

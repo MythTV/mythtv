@@ -1,19 +1,19 @@
 <mythmenu name="VIDEO">
 
    <button>
-     <type>BROWSER</type>
+     <type>VIDEO_BROWSER</type>
      <text>Browse Videos</text>
      <action>BROWSER</action>
    </button>
 
   <button>
-     <type>LISTING</type>
+     <type>VIDEO_LIST</type>
      <text>Video List</text>
      <action>LISTING</action>
    </button>
 
    <button>
-     <type>MANAGER</type>
+     <type>VIDEO_MANAGER</type>
      <text>Video Manager</text>
      <action>MANAGER</action>
    </button>
