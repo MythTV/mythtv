@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-10-21, v2.85
+<date>2003-10-24, v2.86
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2545,11 +2545,14 @@ Once it's on your machine, you must move the file and untar it:
 $ su
 # cp funhouse.tar.gz /usr/local/share/mythtv/themes
 # cd /usr/local/share/mythtv/themes
-# tar -xjf funhouse.tar.gz
+# tar -xzf funhouse.tar.gz
 # exit
 </verb></tscreen>
 
 The theme will now be available in the mythfrontend Appearance section.
+
+<bf>NOTE</bf>:  if the theme file you downloaded is a <tt>bz2</tt> file, use
+<tt>tar -xjf</tt> rather than <tt>tar -xzf</tt>.
 
 <sect1>Adding DirecTV information to the database.
 <p>A script for adding DirecTV information into the database has been
@@ -3626,42 +3629,85 @@ name="Hauppauge PVR-250 remote and MythTV's native LIRC support."> for
 examples on finding and removing old versions of lirc.
 
 <sect>Miscellaneous. 
-<sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. 
-<p>Matthew Zimmerman has created a patch for MPlayer / Mencoder <url
-url="http://www.mplayerhq.hu" name="http://www.mplayerhq.hu"> that allows
-you view the files created by MythTV.  MythTV doesn't use standard
-Nupplevideo files, which is why you MPlayer complains if you try to view
-them.
+<sect1>I'd like to watch the files without using MythTV / I'd like to
+convert the files to some other format.  
 
-<bf>NOTE</bf>:  If you're using a hardware MPEG-2 encoder like the
-PVR-250/350 you don't need to convert - the files are actually standard
-MPEG-2 with a <tt>.nuv</tt> extension.  Change it to <tt>.mpg</tt> and the
-files should display properly in other media players.
+<p>MythTV comes with a utility called <bf>mythtranscode</bf> which can
+decode nuv files into raw format for use with other applications.  This
+command-line utility was not designed to be used by the end-user, but
+instead to be called by other applications or scripts.  Programs like
+<bf>mkmovie</bf> (<url url="http://www.icelus.org/"
+name="http://www.icelus.org/">) and <bf>nuvexport</bf> are better suited for
+the end user.  However, since <bf>mythtranscode</bf> can be a useful tool,
+directions on using it follow.  
 
-Download the patch to MPlayer from Matt's website. 
-<url url="http://dijkstra.csh.rit.edu/~mdz/mythtv/"
-name="http://dijkstra.csh.rit.edu/~mdz/mythtv/">.
+<bf>mythtranscode</bf> creates raw streams, which means that they do not
+contain any container information such as resolution, frame-rate, or audio
+sampling rate.  In order to process the output, you must supply this
+information to the processing utility.  <bf>mythtranscode</bf> provides the
+relevant information on stdout.
+
+There are two modes in which <bf>mythtranscode</bf> can create raw streams. 
+The first has no synchronization and assumes that the processing utility
+will read audio and video at a constant rate.  This method is useful when a
+single application will be processing the raw output, such as
+<bf>mencoder</bf> or <bf>ffmpeg</bf>.  The second method assumes that two
+separate applications will be processing the audio and video streams
+independently, and there is no rate control between them which means that
+the two programs don't coordinate their efforts to maintain synchronization.
+
+<sect2>mythtranscode example
+<p>First, start <bf>mythtranscode</bf>.  You will need to determine the
+channel and the start time manually.
 <tscreen><verb>
-$ wget http://dijkstra.csh.rit.edu/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
+$ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 --profile \
+autodetect --fifodir . &
 </verb></tscreen>
 
-Download the source to MPlayer and patch:
+When <bf>mythtranscode</bf> begins executing, it will create two fifos
+("audout" and "vidout") in the directory specified (in this case ".",
+meaning the current directory) and will print out information about the
+video stream.
+
+The next step is to start the processing application.  The following assumes
+that the stream is NTSC 640x480 with 32kbps audio.
+
+To use <bf>mencoder</bf> you would enter a command like:
 <tscreen><verb>
-$ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
-$ tar -xjf MPlayer-0.90.tar.bz2
-$ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
-$ cd MPlayer-0.90
-$ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
+mencoder -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
+-rawvideo on:w=640:h=480:fps=29.97 -ovc lavc -oac mp3lame -o out.avi \
+vidout
 </verb></tscreen>
 
-At this point, you can read the MPlayer documentation and start the compile
-process.
+<bf>NOTE</bf>: You must use mencoder 1.0PRE1 or later. <bf>mencoder</bf>
+version 0.9x <em>WILL NOT WORK!</em>
+
+Using ffmepg:
+<tscreen><verb>
+ffmpeg -f u16le -ar 32000 -ac 2 -i audout -f rawvideo -s 640x480 -r 29.97 \
+-i vidout -vcodec mpeg4 -b 2000 -acodec mp3 -ab 128 out.avi
+</verb></tscreen>
+
+Or to play directly using mplayer (again 1.0PRE1 or later is needed):
+<tscreen><verb>
+mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
+-rawvideo on:w=640:h=480:fps=29.97 vidout
+</verb></tscreen>
+
+If you wanted to write the raw data to separate audio and video files for
+later processing, the following would work (note the use of --fifosync
+for rate-control):
+<tscreen><verb>
+$ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 \
+--profile autodetect --fifodir . --fifosync &
+$ cat audout > audio.raw &
+$ cat vidout > video.yuv
+</verb></tscreen>
 
 <sect1>I'd like to use some other window manager.
 <p>MythTV is not dependent on any particular window manager.  If you wish to
 run a lightweight window manager, the <tt>configfiles/</tt> directory has an
 example of a <tt>.twmrc</tt> and <tt>.fvwmrc</tt> file you may use.
-
 
 <sect1>What capture resolution should I use?  How does video work?
 <label id="capture_resolution_">
@@ -4906,6 +4952,8 @@ for Xbox frontend.  Fix tag in section 3.  Bump to v 0.12.  Get rid of
 database upgrade step since it's now done automatically.  Add a thing in the
 hardware section about the PVR-350 as a TV-out.
 v2.85, 2003-10-21.  Update Gentoo section; mythtv is now "stable".
+v2.86, 2003-10-24.  Fix typo in themes example.  Replace section on patching
+MPlayer.
 -->
 
 <!--

@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-10-21, v2.85
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-10-24, v2.86
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -183,7 +183,7 @@ necessary.</EM>
 <H2><A NAME="toc21">21.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s21">Miscellaneous. </A></H2>
 
 <UL>
-<LI><A NAME="toc21.1">21.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>
+<LI><A NAME="toc21.1">21.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.1">I'd like to watch the files without using MythTV / I'd like to</A>
 <LI><A NAME="toc21.2">21.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.2">I'd like to use some other window manager.</A>
 <LI><A NAME="toc21.3">21.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.3">What capture resolution should I use?  How does video work?</A>
 <LI><A NAME="toc21.4">21.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.4">MythTV GUI and X Display Sizes.</A>
@@ -2971,12 +2971,14 @@ like to use and download it to your system.</P>
 $ su
 # cp funhouse.tar.gz /usr/local/share/mythtv/themes
 # cd /usr/local/share/mythtv/themes
-# tar -xjf funhouse.tar.gz
+# tar -xzf funhouse.tar.gz
 # exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>The theme will now be available in the mythfrontend Appearance section.</P>
+<P><B>NOTE</B>:  if the theme file you downloaded is a <CODE>bz2</CODE> file, use
+<CODE>tar -xjf</CODE> rather than <CODE>tar -xzf</CODE>.</P>
 
 <H2><A NAME="ss11.2">11.2</A> <A HREF="#toc11.2">Adding DirecTV information to the database.</A>
 </H2>
@@ -4175,39 +4177,87 @@ examples on finding and removing old versions of lirc.</P>
 
 <H2><A NAME="s21">21.</A> <A HREF="#toc21">Miscellaneous. </A></H2>
 
-<H2><A NAME="ss21.1">21.1</A> <A HREF="#toc21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>
-</H2>
+<H2><A NAME="ss21.1">21.1</A> <A HREF="#toc21.1">I'd like to watch the files without using MythTV / I'd like to</A>
+convert the files to some other format. </H2>
 
-<P>Matthew Zimmerman has created a patch for MPlayer / Mencoder 
-<A HREF="http://www.mplayerhq.hu">http://www.mplayerhq.hu</A> that allows
-you view the files created by MythTV.  MythTV doesn't use standard
-Nupplevideo files, which is why you MPlayer complains if you try to view
-them.</P>
-<P><B>NOTE</B>:  If you're using a hardware MPEG-2 encoder like the
-PVR-250/350 you don't need to convert - the files are actually standard
-MPEG-2 with a <CODE>.nuv</CODE> extension.  Change it to <CODE>.mpg</CODE> and the
-files should display properly in other media players.</P>
-<P>Download the patch to MPlayer from Matt's website. 
-<A HREF="http://dijkstra.csh.rit.edu/~mdz/mythtv/">http://dijkstra.csh.rit.edu/~mdz/mythtv/</A>.
+<P>MythTV comes with a utility called <B>mythtranscode</B> which can
+decode nuv files into raw format for use with other applications.  This
+command-line utility was not designed to be used by the end-user, but
+instead to be called by other applications or scripts.  Programs like
+<B>mkmovie</B> (
+<A HREF="http://www.icelus.org/">http://www.icelus.org/</A>) and <B>nuvexport</B> are better suited for
+the end user.  However, since <B>mythtranscode</B> can be a useful tool,
+directions on using it follow.  </P>
+<P><B>mythtranscode</B> creates raw streams, which means that they do not
+contain any container information such as resolution, frame-rate, or audio
+sampling rate.  In order to process the output, you must supply this
+information to the processing utility.  <B>mythtranscode</B> provides the
+relevant information on stdout.</P>
+<P>There are two modes in which <B>mythtranscode</B> can create raw streams. 
+The first has no synchronization and assumes that the processing utility
+will read audio and video at a constant rate.  This method is useful when a
+single application will be processing the raw output, such as
+<B>mencoder</B> or <B>ffmpeg</B>.  The second method assumes that two
+separate applications will be processing the audio and video streams
+independently, and there is no rate control between them which means that
+the two programs don't coordinate their efforts to maintain synchronization.</P>
+
+<H3>mythtranscode example</H3>
+
+<P>First, start <B>mythtranscode</B>.  You will need to determine the
+channel and the start time manually.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ wget http://dijkstra.csh.rit.edu/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
+$ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 --profile \
+autodetect --fifodir . &amp;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Download the source to MPlayer and patch:
+<P>When <B>mythtranscode</B> begins executing, it will create two fifos
+("audout" and "vidout") in the directory specified (in this case ".",
+meaning the current directory) and will print out information about the
+video stream.</P>
+<P>The next step is to start the processing application.  The following assumes
+that the stream is NTSC 640x480 with 32kbps audio.</P>
+<P>To use <B>mencoder</B> you would enter a command like:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
-$ tar -xjf MPlayer-0.90.tar.bz2
-$ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
-$ cd MPlayer-0.90
-$ patch -p1 &lt; mplayer-0.90rc5-mythtv-20030407.diff
+mencoder -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
+-rawvideo on:w=640:h=480:fps=29.97 -ovc lavc -oac mp3lame -o out.avi \
+vidout
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>At this point, you can read the MPlayer documentation and start the compile
-process.</P>
+<P><B>NOTE</B>: You must use mencoder 1.0PRE1 or later. <B>mencoder</B>
+version 0.9x <EM>WILL NOT WORK!</EM></P>
+<P>Using ffmepg:
+<BLOCKQUOTE><CODE>
+<PRE>
+ffmpeg -f u16le -ar 32000 -ac 2 -i audout -f rawvideo -s 640x480 -r 29.97 \
+-i vidout -vcodec mpeg4 -b 2000 -acodec mp3 -ab 128 out.avi
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Or to play directly using mplayer (again 1.0PRE1 or later is needed):
+<BLOCKQUOTE><CODE>
+<PRE>
+mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
+-rawvideo on:w=640:h=480:fps=29.97 vidout
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you wanted to write the raw data to separate audio and video files for
+later processing, the following would work (note the use of --fifosync
+for rate-control):
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 \
+--profile autodetect --fifodir . --fifosync &amp;
+$ cat audout > audio.raw &amp;
+$ cat vidout > video.yuv
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <H2><A NAME="ss21.2">21.2</A> <A HREF="#toc21.2">I'd like to use some other window manager.</A>
 </H2>
@@ -4215,7 +4265,6 @@ process.</P>
 <P>MythTV is not dependent on any particular window manager.  If you wish to
 run a lightweight window manager, the <CODE>configfiles/</CODE> directory has an
 example of a <CODE>.twmrc</CODE> and <CODE>.fvwmrc</CODE> file you may use.</P>
-
 
 <H2><A NAME="capture_resolution_"></A> <A NAME="ss21.3">21.3</A> <A HREF="#toc21.3">What capture resolution should I use?  How does video work?</A>
 </H2>

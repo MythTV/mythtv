@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-10-21, v2.85
+  2003-10-24, v2.86
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -185,6 +185,7 @@
 
   21. Miscellaneous.
      21.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
+        21.1.1 mythtranscode example
      21.2 I'd like to use some other window manager.
      21.3 What capture resolution should I use?  How does video work?
      21.4 MythTV GUI and X Display Sizes.
@@ -274,6 +275,7 @@
   +o  Developer:  Matt Zimmerman,  <mailto:mdz@debian.org>
 
   +o  Developer:  John Danner,  <mailto:jdanner@untzuntz.com>
+
 
   +o  Developer:  Chris Pinkham,  <mailto:cpinkham@bc2va.org>
 
@@ -3255,7 +3257,7 @@
        $ su
        # cp funhouse.tar.gz /usr/local/share/mythtv/themes
        # cd /usr/local/share/mythtv/themes
-       # tar -xjf funhouse.tar.gz
+       # tar -xzf funhouse.tar.gz
        # exit
 
 
@@ -3263,8 +3265,8 @@
   The theme will now be available in the mythfrontend Appearance
   section.
 
-
-
+  [1mNOTE[22m:  if the theme file you downloaded is a bz2 file, use tar -xjf
+  rather than tar -xzf.
   [1m11.2.  Adding DirecTV information to the database.[0m
 
   A script for adding DirecTV information into the database has been
@@ -4549,39 +4551,89 @@
   [1m21.1.  I'd like to watch the files without using MythTV / I'd like to[0m
   [1mconvert the files to some other format.[0m
 
-  Matthew Zimmerman has created a patch for MPlayer / Mencoder
-  http://www.mplayerhq.hu <http://www.mplayerhq.hu> that allows you view
-  the files created by MythTV.  MythTV doesn't use standard Nupplevideo
-  files, which is why you MPlayer complains if you try to view them.
+  MythTV comes with a utility called [1mmythtranscode [22mwhich can decode nuv
+  files into raw format for use with other applications.  This command-
+  line utility was not designed to be used by the end-user, but instead
+  to be called by other applications or scripts.  Programs like [1mmkmovie[0m
+  (http://www.icelus.org/ <http://www.icelus.org/>) and [1mnuvexport [22mare
+  better suited for the end user.  However, since [1mmythtranscode [22mcan be a
+  useful tool, directions on using it follow.
 
-  [1mNOTE[22m:  If you're using a hardware MPEG-2 encoder like the PVR-250/350
-  you don't need to convert - the files are actually standard MPEG-2
-  with a .nuv extension.  Change it to .mpg and the files should display
-  properly in other media players.
+  [1mmythtranscode [22mcreates raw streams, which means that they do not
+  contain any container information such as resolution, frame-rate, or
+  audio sampling rate.  In order to process the output, you must supply
+  this information to the processing utility.  [1mmythtranscode [22mprovides
+  the relevant information on stdout.
 
-  Download the patch to MPlayer from Matt's website.
-  http://dijkstra.csh.rit.edu/~mdz/mythtv/
-  <http://dijkstra.csh.rit.edu/~mdz/mythtv/>.
-
-
-       $ wget http://dijkstra.csh.rit.edu/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
-
-
-
-  Download the source to MPlayer and patch:
-
-
-
-  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
-  $ tar -xjf MPlayer-0.90.tar.bz2
-  $ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
-  $ cd MPlayer-0.90
-  $ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
+  There are two modes in which [1mmythtranscode [22mcan create raw streams.
+  The first has no synchronization and assumes that the processing
+  utility will read audio and video at a constant rate.  This method is
+  useful when a single application will be processing the raw output,
+  such as [1mmencoder [22mor [1mffmpeg[22m.  The second method assumes that two
+  separate applications will be processing the audio and video streams
+  independently, and there is no rate control between them which means
+  that the two programs don't coordinate their efforts to maintain
+  synchronization.
 
 
 
-  At this point, you can read the MPlayer documentation and start the
-  compile process.
+  [1m21.1.1.  mythtranscode example[0m
+
+  First, start [1mmythtranscode[22m.  You will need to determine the channel
+  and the start time manually.
+
+
+       $ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 --profile \
+       autodetect --fifodir . &
+
+
+
+  When [1mmythtranscode [22mbegins executing, it will create two fifos
+  ("audout" and "vidout") in the directory specified (in this case ".",
+  meaning the current directory) and will print out information about
+  the video stream.
+
+  The next step is to start the processing application.  The following
+  assumes that the stream is NTSC 640x480 with 32kbps audio.
+
+  To use [1mmencoder [22myou would enter a command like:
+
+
+       mencoder -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
+       -rawvideo on:w=640:h=480:fps=29.97 -ovc lavc -oac mp3lame -o out.avi \
+       vidout
+
+
+
+  [1mNOTE[22m: You must use mencoder 1.0PRE1 or later. [1mmencoder [22mversion 0.9x
+  [4mWILL[24m [4mNOT[24m [4mWORK![0m
+
+  Using ffmepg:
+
+
+       ffmpeg -f u16le -ar 32000 -ac 2 -i audout -f rawvideo -s 640x480 -r 29.97 \
+       -i vidout -vcodec mpeg4 -b 2000 -acodec mp3 -ab 128 out.avi
+
+
+
+  Or to play directly using mplayer (again 1.0PRE1 or later is needed):
+
+
+       mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
+       -rawvideo on:w=640:h=480:fps=29.97 vidout
+
+
+
+  If you wanted to write the raw data to separate audio and video files
+  for later processing, the following would work (note the use of
+  --fifosync for rate-control):
+
+
+       $ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 \
+       --profile autodetect --fifodir . --fifosync &
+       $ cat audout > audio.raw &
+       $ cat vidout > video.yuv
+
 
 
   [1m21.2.  I'd like to use some other window manager.[0m
@@ -4589,7 +4641,6 @@
   MythTV is not dependent on any particular window manager.  If you wish
   to run a lightweight window manager, the configfiles/ directory has an
   example of a .twmrc and .fvwmrc file you may use.
-
 
 
   [1m21.3.  What capture resolution should I use?  How does video work?[0m
@@ -4716,6 +4767,7 @@
   image inside the screen. Underscan is useful for computer monitors so
   that toolbars and scrollbars at the edges can be seen.
 
+
   For best results, match the X display area as close as possible to the
   edges of the physical screen. This can only be adjusted by your tv-out
   device or by the settings for the television set. Many sets have these
@@ -4833,8 +4885,8 @@
   channel 15:
 
 
-  $ mysql -u root mythconverg
-  mysql> delete from channel where chanid = '1015';
+       $ mysql -u root mythconverg
+       mysql> delete from channel where chanid = '1015';
 
 
 
@@ -4843,8 +4895,8 @@
   the channel that has been removed:
 
 
-       $ mysql -u root mythconverg
-       mysql> delete from program where chanid = '1015';
+  $ mysql -u root mythconverg
+  mysql> delete from program where chanid = '1015';
 
 
 
@@ -4894,14 +4946,17 @@
        ^D
        $
 
+
+
   The following also works with blackbox:
 
 
-       $ cat > .xinitrc
-       xset -dpms s off &
-       irxevent &
-       mythfrontend &
-       blackbox
+
+  $ cat > .xinitrc
+  xset -dpms s off &
+  irxevent &
+  mythfrontend &
+  blackbox
 
 
 
@@ -4955,6 +5010,7 @@
 
   Use [1mchkconfig [22mto make sure the script is called when entering
   runlevels 3, 4 or 5:
+
 
 
   $ su
