@@ -33,4 +33,6 @@ SOURCES += videogallery.cpp videoselected.cpp videodlg.cpp
 
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress
+    # need C99 flag for isnan() to work
+    DEFINES += _GLIBCPP_USE_C99
 }
