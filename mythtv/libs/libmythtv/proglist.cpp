@@ -457,6 +457,8 @@ void ProgLister::chooseView(void)
     }
     else if (type == plTitleSearch || type == plDescSearch)
     {
+        int oldView = curView;
+
         choosePopup = new MythPopupBox(gContext->GetMainWindow(), "");
         choosePopup->addLabel(tr("Select Phrase"));
 
@@ -514,7 +516,7 @@ void ProgLister::chooseView(void)
         delete choosePopup;
         choosePopup = NULL;
 
-        if (viewCount < 1)
+        if (viewCount < 1 || (oldView < 0 && curView < 0))
             reject();
         else if (curView < 0)
         {
