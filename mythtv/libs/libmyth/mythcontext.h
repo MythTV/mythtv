@@ -12,7 +12,6 @@
 #include <qsocketdevice.h>
 #include <qstringlist.h>
 #include <qnetwork.h> 
-#include <DisplayRes.h>
 
 #include <iostream>
 #include <vector>
@@ -34,6 +33,7 @@ class MythMainWindow;
 class MythPluginManager;
 class MediaMonitor;
 class MythMediaDevice;
+class DisplayRes;
 
 enum VerboseMask {
     VB_IMPORTANT = 0x0001,

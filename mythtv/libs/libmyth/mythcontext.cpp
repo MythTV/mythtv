@@ -24,6 +24,7 @@
 #include "mythdialogs.h"
 #include "mythplugin.h"
 #include "screensaver.h"
+#include "DisplayRes.h"
 
 MythContext *gContext = NULL;
 
