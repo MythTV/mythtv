@@ -19,7 +19,7 @@ using namespace std;
 MythContext *gContext;
 QSqlDatabase *db;
 
-void StoreTranscodeState(ProgramInfo *pginfo, int createdelete);
+void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist);
 
 void usage(char *progname) 
 {
@@ -41,7 +41,7 @@ void usage(char *progname)
 int main(int argc, char *argv[])
 {
     QString chanid, starttime, profilename;
-    bool honorcutlist = false, keyframesonly = false, use_db = false;
+    bool useCutlist = false, keyframesonly = false, use_db = false;
     srand(time(NULL));
 
     QApplication a(argc, argv, false);
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-l") ||
                  !strcmp(a.argv()[argpos],"--honorcutlist")) 
         {
-            honorcutlist = true;
+            useCutlist = true;
         }
         else if (!strcmp(a.argv()[argpos],"-k") ||
                  !strcmp(a.argv()[argpos],"--allkeys")) 
@@ -171,26 +171,26 @@ int main(int argc, char *argv[])
     QString tmpfile = infile + ".tmp";
 
     if (use_db) 
-        StoreTranscodeState(pginfo, TRANSCODE_STARTED);
+        StoreTranscodeState(pginfo, TRANSCODE_STARTED, useCutlist);
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer(db, pginfo);
 
     cout << "Transcoding from " << infile << " to " << tmpfile << "\n";
 
     int result = nvp->ReencodeFile((char *)infile.ascii(),
-                          (char *)tmpfile.ascii(),
-                          profile, honorcutlist, keyframesonly);
+                                   (char *)tmpfile.ascii(),
+                                   profile, useCutlist, keyframesonly, use_db);
     int retval;
     if (result == REENCODE_OK)
     {
         if (use_db)
-            StoreTranscodeState(pginfo, TRANSCODE_FINISHED);
+            StoreTranscodeState(pginfo, TRANSCODE_FINISHED, useCutlist);
         cout << "Transcoding " << infile << " done\n";
         retval = 0;
     } 
     else if (result == REENCODE_CUTLIST_CHANGE)
     {
         if (use_db)
-            StoreTranscodeState(pginfo, TRANSCODE_RETRY);
+            StoreTranscodeState(pginfo, TRANSCODE_RETRY, useCutlist);
         cout << "Transcoding " << infile 
              << " aborted because of cutlist update\n";
         retval = 1;
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
     else
     {
         if (use_db)
-            StoreTranscodeState(pginfo, TRANSCODE_FAILED);
+            StoreTranscodeState(pginfo, TRANSCODE_FAILED, useCutlist);
         cout << "Transcoding " << infile << " failed\n";
         retval = -1;
     }
@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
     return retval;
 }
 
-void StoreTranscodeState(ProgramInfo *pginfo, int status)
+void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist)
 {
     // status can have values:
     // -2 : Transcode failed because cutlist changed
@@ -233,15 +233,16 @@ void StoreTranscodeState(ProgramInfo *pginfo, int status)
                         "VALUES ('%1','%2','%3','%4');")
                         .arg(pginfo->chanid)
                         .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
-                        .arg(status).arg(gContext->GetHostName());
+                        .arg(status | (useCutlist) ? TRANSCODE_USE_CUTLIST : 0)
+                        .arg(gContext->GetHostName());
     } 
     else 
     {
-        query = QString("UPDATE transcoding SET status = '%1', "
+        query = QString("UPDATE transcoding SET status = ((status & %1) | %2), "
                         "starttime = starttime "
-                        "WHERE chanid = '%2' AND starttime = '%3' "
-                        "AND hostname = '%3';")
-                        .arg(status).arg(pginfo->chanid)
+                        "WHERE chanid = '%3' AND starttime = '%4' "
+                        "AND hostname = '%5';")
+                        .arg(TRANSCODE_FLAGS).arg(status).arg(pginfo->chanid)
                         .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
                         .arg(gContext->GetHostName());
     }

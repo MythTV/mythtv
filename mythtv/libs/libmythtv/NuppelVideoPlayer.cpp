@@ -2747,7 +2747,8 @@ void NuppelVideoPlayer::ReencoderAddKFA(
 
 int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                                     RecordingProfile &profile,
-                                    bool honorCutList, bool forceKeyFrames)
+                                    bool honorCutList, bool forceKeyFrames,
+                                    bool chkTranscodeDB)
 { 
     NuppelVideoRecorder *nvr;
 
@@ -2825,6 +2826,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         !deleteMap.isEmpty() && honorCutList)
     {
         decoder->SetRawVideoState(true);
+        cout << "Reencoding video in 'raw' mode\n";
     }
 
     setting = profile.byName("audiocodec")->getValue();
@@ -2918,12 +2920,16 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         frame.timecode = timecodes[vpos];
         if ((!deleteMap.isEmpty()) && honorCutList) 
         {
-            if (frame.frameNumber >= i.key()) 
+            if (framesPlayed >= i.key()) 
             {
                 while((i.data() == 1) && (i != last))
                 {
+                    cout << "ReencodeFile: Fast-Forwarding from " << i.key();
                     i++;
+                    cout << " to " << i.key() << endl;
                     decoder->DoFastForward(i.key());
+                    frame.buf = vbuffers[vpos].buf;
+                    frame.timecode = timecodes[vpos];
                     did_ff = 1;
                 }
                 while((i.data() == 0) && (i != last))
@@ -3027,14 +3033,38 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             nvr->WriteVideo(&frame, true, writekeyframe);
         }
 
-        if (honorCutList && QDateTime::currentDateTime() > curtime) 
+        if (QDateTime::currentDateTime() > curtime) 
         {
-            if (m_playbackinfo->CheckMarkupFlag(MARK_UPDATED_CUT, m_db)) 
+            if (honorCutList && 
+                m_playbackinfo->CheckMarkupFlag(MARK_UPDATED_CUT, m_db)) 
             {
                 delete outRingBuffer;
                 delete nvr;
                 unlink(outputname);
                 return REENCODE_CUTLIST_CHANGE;
+            }
+
+            if (chkTranscodeDB)
+            {
+                QString query = QString("SELECT * FROM transcoding WHERE "
+                        "chanid = '%1' AND starttime = '%2' AND "
+                        "((status & %3) = %4) AND hostname = '%5';")
+                        .arg(m_playbackinfo->chanid)
+                        .arg(m_playbackinfo->startts.toString("yyyyMMddhhmmss"))
+                        .arg(TRANSCODE_STOP)
+                        .arg(TRANSCODE_STOP)
+                        .arg(gContext->GetHostName());
+                db_lock.lock();
+                MythContext::KickDatabase(m_db);
+                QSqlQuery result = m_db->exec(query);
+                db_lock.unlock();
+                if (result.isActive() && result.numRowsAffected() > 0)
+                {
+                    delete outRingBuffer;
+                    delete nvr;
+                    unlink(outputname);
+                    return REENCODE_ERROR;
+                }
             }
             curtime = QDateTime::currentDateTime();
             curtime = curtime.addSecs(60);

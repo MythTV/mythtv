@@ -114,6 +114,9 @@ QString NuppelDecoder::GetEncodingType(void)
         if (QString(mpa_codec->name) == "mpeg4")
             value = "MPEG-4";
     }
+    else if (usingextradata &&
+             extradata.video_fourcc == MKTAG('D', 'I', 'V', 'X'))
+        value = "MPEG-4";
     else
         value = "RTjpeg";
     return (value);

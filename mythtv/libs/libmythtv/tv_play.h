@@ -205,6 +205,7 @@ class TV : public QObject
     bool editmode;
     bool requestDelete;
     bool endOfRecording;
+    bool queuedTranscode;
 
     bool browsemode;
     QString browsechannum;

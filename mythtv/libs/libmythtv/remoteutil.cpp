@@ -55,9 +55,14 @@ bool RemoteCheckFile(ProgramInfo *pginfo)
     return exists;
 }
 
-void RemoteQueueTranscode(ProgramInfo *pginfo)
+void RemoteQueueTranscode(ProgramInfo *pginfo, int state)
 {
-    QStringList strlist = QString("QUEUE_TRANSCODE");
+    QStringList strlist;
+    if (state & TRANSCODE_STOP)
+        strlist = QString("QUEUE_TRANSCODE_STOP");
+    else
+        strlist = QString("QUEUE_TRANSCODE_CUTLIST");
+
     pginfo->ToStringList(strlist);
 
     gContext->SendReceiveStringList(strlist);

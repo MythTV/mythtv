@@ -77,6 +77,7 @@ TV::TV(QSqlDatabase *db)
     dialogname = "";
     playbackinfo = NULL;
     editmode = false;
+    queuedTranscode = false;
     browsemode = false;
     prbuffer = NULL;
     nvp = NULL;
@@ -1524,19 +1525,41 @@ void TV::DoJumpBack(void)
 
 void TV::DoQueueTranscode(void)
 {
-     if (internalState == kState_WatchingPreRecorded &&
-         gContext->GetNumSetting("MaxTranscoders", 0) > 0 &&
-         gContext->GetNumSetting("TranscoderUseCutlist", 0) > 0)
-     {
-         RemoteQueueTranscode(playbackinfo);
-         if (activenvp == nvp)
-         {
-             QString dummy = "";
-             QString desc = "";
-             int pos = calcSliderPos(0, dummy);
-             osd->StartPause(pos, false, tr("Transcode"), desc, 3);
-         }
-     }
+    if (internalState == kState_WatchingPreRecorded)
+    {
+        bool stop = false, abort = false;
+        if (queuedTranscode)
+            stop = true;
+        else
+        {
+            QString query = QString("SELECT * FROM transcoding WHERE "
+                                    "chanid = '%1' AND starttime = '%2';")
+                                   .arg(playbackinfo->chanid)
+                         .arg(playbackinfo->startts.toString("yyyyMMddhhmmss"));
+            MythContext::KickDatabase(m_db);
+            QSqlQuery result = m_db->exec(query);
+            if (result.isActive() && result.numRowsAffected() > 0)
+            {
+                stop = true;
+                abort = true;
+            }
+        }
+        if (stop)
+        {
+            RemoteQueueTranscode(playbackinfo, TRANSCODE_STOP);
+            queuedTranscode = false;
+            if (activenvp == nvp)
+                osd->SetSettingsText(tr("Stopping Transcode"), 3);
+        }
+        else
+        {
+            RemoteQueueTranscode(playbackinfo, TRANSCODE_QUEUED |
+                                               TRANSCODE_USE_CUTLIST);
+            queuedTranscode = true;
+            if (activenvp == nvp)
+                osd->SetSettingsText(tr("Transcoding"), 3);
+        }
+    }
 }
 
 void TV::DoSkipCommercials(int direction)

@@ -10,7 +10,7 @@ class RemoteEncoder;
 vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype);
 void RemoteGetFreeSpace(int &totalspace, int &usedspace);
 bool RemoteCheckFile(ProgramInfo *pginfo);
-void RemoteQueueTranscode(ProgramInfo *pginfo);
+void RemoteQueueTranscode(ProgramInfo *pginfo, int state);
 void RemoteDeleteRecording(ProgramInfo *pginfo);
 bool RemoteGetAllPendingRecordings(vector<ProgramInfo *> &recordinglist);
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist);

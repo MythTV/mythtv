@@ -687,7 +687,7 @@ void TVRec::TeardownRecorder(bool killFile)
 
             if (gContext->GetNumSetting("TranscoderAutoRun", 0))
             {
-                QString message = QString("LOCAL_READY_TO_TRANSCODE %1 %2")
+                QString message = QString("LOCAL_TRANSCODE %1 %2")
                            .arg(prevRecording->chanid)
                            .arg(prevRecording->startts.toString(Qt::ISODate));
                 MythEvent me(message);

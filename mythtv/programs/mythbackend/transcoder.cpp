@@ -22,19 +22,12 @@ using namespace std;
 Transcoder::Transcoder(QMap<int, EncoderLink *> *tvList,
                        QSqlDatabase *ldb)
 {
-    pthread_mutex_init(&transqlock, NULL);
     m_tvList = tvList;
     db_conn = ldb;
 
-    maxTranscoders = gContext->GetNumSetting("MaxTranscoders", 0);
-    if (!maxTranscoders)
-        return;
-
     dblock = new QMutex(true);
 
-    useCutlist = gContext->GetNumSetting("TranscoderUseCutlist", 0);
-    ClearTranscodeTable(false);
-//    RestartTranscoding();
+    CheckTranscodeTable(false);
 
     transcodePoll = false;
 
@@ -60,7 +53,7 @@ void Transcoder::customEvent(QCustomEvent *e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 
-        if (message.left(24) == "LOCAL_READY_TO_TRANSCODE")
+        if (message.left(15) == "LOCAL_TRANSCODE")
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
@@ -69,7 +62,6 @@ void Transcoder::customEvent(QCustomEvent *e)
             ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(db_conn,
                                                                      tokens[1], 
                                                                      startts);
-            dblock->unlock();
             if (pinfo == NULL) 
             {
                 cerr << "Could not read program from database, skipping "
@@ -77,12 +69,20 @@ void Transcoder::customEvent(QCustomEvent *e)
                 return;
             }
             // cout << "DEBUG: Received transcode message\n";
-            EnqueueTranscode(pinfo);
+            if (message.left(20) == "LOCAL_TRANSCODE_STOP")
+                StopTranscoder(pinfo);
+            else if (message.left(23) == "LOCAL_TRANSCODE_CUTLIST")
+                EnqueueTranscode(pinfo, true);
+            else
+                EnqueueTranscode(pinfo, false);
+
+            dblock->unlock();
+            delete pinfo;
         }
     }
 }
 
-pid_t Transcoder::Transcode(ProgramInfo *pginfo)
+pid_t Transcoder::Transcode(ProgramInfo *pginfo, bool useCutlist)
 {
     QString fileprefix = gContext->GetFilePrefix();
     QString infile = pginfo->GetRecordFilename(fileprefix);
@@ -90,7 +90,8 @@ pid_t Transcoder::Transcode(ProgramInfo *pginfo)
     tmpfile += ".tmp";
     pid_t child = 0;
 
-    InitTranscoder(pginfo);
+    UpdateTranscoder(pginfo, TRANSCODE_LAUNCHED |
+                             ((useCutlist) ? TRANSCODE_USE_CUTLIST : 0));
     QString path = "mythtranscode";
     QString command = QString("%1 -c %2 -s %3 -p %4 -d %5").arg(path.ascii())
                       .arg(pginfo->chanid)
@@ -116,21 +117,98 @@ pid_t Transcoder::Transcode(ProgramInfo *pginfo)
     return child;
 }
 
-void Transcoder::InitTranscoder(ProgramInfo *pginfo)
+void Transcoder::EnqueueTranscode(ProgramInfo *pinfo, bool useCutlist)
 {
-     QString query;
-     query = QString("UPDATE transcoding "
-                     "SET starttime = starttime, status = %1;")
-                     .arg(TRANSCODE_LAUNCHED);
+    QString query = QString("SELECT status FROM transcoding "
+                            "WHERE chanid = '%1' AND starttime = '%2';")
+                            .arg(pinfo->chanid)
+                            .arg(pinfo->startts.toString("yyyyMMddhhmmss"));
+
+    dblock->lock();
+    QSqlQuery result = db_conn->exec(query);
+    if (result.isActive() && result.numRowsAffected() > 0 && result.next())
+    {
+        int old_status = result.value(0).toInt();
+        if (old_status & ~TRANSCODE_FLAGS < TRANSCODE_LAUNCHED)
+            UpdateTranscoder(pinfo, TRANSCODE_QUEUED |
+                                    ((useCutlist) ? TRANSCODE_USE_CUTLIST : 0));
+        // if the transcode is already started, do nothing
+    }
+    else
+    {
+        // only transcode if this program is not already transcoding
+
+        query = QString("INSERT into transcoding "
+                        "(chanid,starttime,status,hostname) "
+                        "VALUES ('%1','%2','%3','%4');")
+                        .arg(pinfo->chanid)
+                        .arg(pinfo->startts.toString("yyyyMMddhhmmss"))
+                        .arg(TRANSCODE_QUEUED |
+                              ((useCutlist) ? TRANSCODE_USE_CUTLIST : 0))
+                        .arg(gContext->GetHostName());
+
+        db_conn->exec(query);
+    }
+    dblock->unlock();
+}
+
+void Transcoder::StopTranscoder(ProgramInfo *pinfo)
+{
+    QString query = QString("SELECT status FROM transcoding "
+                            "WHERE chanid = '%1' AND starttime = '%2';")
+                            .arg(pinfo->chanid)
+                            .arg(pinfo->startts.toString("yyyyMMddhhmmss"));
+    dblock->lock();
+    MythContext::KickDatabase(db_conn);
+    QSqlQuery result = db_conn->exec(query);
+    if (result.isActive() && result.numRowsAffected() > 0 && result.next())
+    {
+        int status = (result.value(0).toInt() & ~TRANSCODE_FLAGS);
+        if (status == TRANSCODE_LAUNCHED || status == TRANSCODE_STARTED)
+        {
+            UpdateTranscoder(pinfo, result.value(0).toInt() | TRANSCODE_STOP);
+        }
+        else
+            DeleteTranscode(pinfo);
+    }
+    dblock->unlock();
+}
+
+void Transcoder::UpdateTranscoder(ProgramInfo *pginfo, int status)
+{
+    QString query;
+    query = QString("UPDATE transcoding "
+                     "SET starttime = starttime, status = %1 WHERE "
+                     "chanid = '%1' AND starttime = '%2' "
+                     "AND hostname = '%3';")
+                     .arg(status)
+                     .arg(pginfo->chanid)
+                     .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
+                     .arg(gContext->GetHostName());
      dblock->lock();
      MythContext::KickDatabase(db_conn);
      db_conn->exec(query);
      dblock->unlock();
 }
 
-void Transcoder::ClearTranscodeTable(bool skipPartial)
+void Transcoder::DeleteTranscode(ProgramInfo *pinfo)
+{
+     QString query = QString("DELETE FROM transcoding WHERE "
+                             "chanid = '%1' AND starttime = '%2' "
+                             "AND hostname = '%3';")
+                             .arg(pinfo->chanid)
+                             .arg(pinfo->startts.toString("yyyyMMddhhmmss"))
+                             .arg(gContext->GetHostName());
+     dblock->lock();
+     MythContext::KickDatabase(db_conn);
+     db_conn->exec(query);
+     dblock->unlock();
+}
+
+struct TranscodeData *Transcoder::CheckTranscodeTable(bool skipPartial)
 {
      QString query;
+     struct TranscodeData *transData = NULL;
      QString fileprefix = gContext->GetFilePrefix();
      dblock->lock();
      MythContext::KickDatabase(db_conn);
@@ -141,45 +219,52 @@ void Transcoder::ClearTranscodeTable(bool skipPartial)
      {
         while (result.next())
         {
-            int status = result.value(2).toInt();
-            if ((!skipPartial && status != 2) || status == -2)
-            {
-                // transcode didn't finish delete partial transcode
-                QDateTime dtstart = result.value(1).toDateTime();
-                ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
+            int status = (result.value(2).toInt() & ~TRANSCODE_FLAGS);
+            int flags = (result.value(2).toInt() & TRANSCODE_FLAGS);
+
+            QDateTime dtstart = result.value(1).toDateTime();
+            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
                                               db_conn,
                                               result.value(0).toString(),
                                               dtstart);
-                if (!pinfo)
-                {
-                    cerr << "Bad transcoding info\n";
-                    continue;
-                }
-                QString filename = pinfo->GetRecordFilename(fileprefix);
-                filename += ".tmp";
-                cout << "Deleting " << filename << endl;
-                unlink(filename);
+            if (!pinfo)
+            {
+                cerr << "Bad transcoding info\n";
                 query = QString("DELETE FROM transcoding WHERE "
-                                "chanid = '%1' AND starttime = '%2' "
-                                "AND hostname = '%3';")
+                                "chanid = '%1' AND starttime = '%2' AND "
+                                "hostname = '%3';")
                                 .arg(result.value(0).toString())
                                 .arg(dtstart.toString("yyyyMMddhhmmss"))
                                 .arg(gContext->GetHostName());
                 db_conn->exec(query);
-                EnqueueTranscode(pinfo);
+                continue;
             }
-            else if (status == 2)
-            {
-                QDateTime dtstart = result.value(1).toDateTime();
-                ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
-                                                  db_conn,
-                                                  result.value(0).toString(), 
-                                                  dtstart);
 
-                if (!pinfo) {
-                    cerr << "Bad transcoding info\n";
-                    continue;
-                }
+            if ((flags & TRANSCODE_STOP) &&
+                (!skipPartial ||
+                 (status != TRANSCODE_LAUNCHED &&
+                  status != TRANSCODE_STARTED)))
+            {
+                // Discard this transcoding, and do nothing
+                QString filename = pinfo->GetRecordFilename(fileprefix);
+                filename += ".tmp";
+                cout << "Deleting " << filename << endl;
+                unlink(filename);
+                DeleteTranscode(pinfo);
+            }
+            else if ((!skipPartial && status != TRANSCODE_FINISHED) ||
+                     status == TRANSCODE_RETRY)
+            {
+                // transcode didn't finish delete partial transcode
+                QString filename = pinfo->GetRecordFilename(fileprefix);
+                filename += ".tmp";
+                cout << "Deleting " << filename << endl;
+                unlink(filename);
+                UpdateTranscoder(pinfo, TRANSCODE_QUEUED |
+                                        (flags & TRANSCODE_USE_CUTLIST));
+            }
+            else if (status == TRANSCODE_FINISHED)
+            {
                 if (!isFileInUse(pinfo))
                 {
                     QString filename = pinfo->GetRecordFilename(fileprefix);
@@ -191,14 +276,8 @@ void Transcoder::ClearTranscodeTable(bool skipPartial)
                     rename (filename, oldfile);
                     // unlink(filename);
                     rename (tmpfile, filename);
-                    query = QString("DELETE FROM transcoding WHERE "
-                                    "chanid = '%1' AND starttime = '%2' "
-                                    "AND hostname = '%3';")
-                                    .arg(result.value(0).toString())
-                                    .arg(dtstart.toString("yyyyMMddhhmmss"))
-                                    .arg(gContext->GetHostName());
-                    db_conn->exec(query);
-                    if (useCutlist)
+                    DeleteTranscode(pinfo);
+                    if (flags & TRANSCODE_USE_CUTLIST)
                     {
                         query = QString("DELETE FROM recordedmarkup WHERE "
                                         "chanid = '%1' AND starttime = '%2';")
@@ -206,9 +285,10 @@ void Transcoder::ClearTranscodeTable(bool skipPartial)
                                         .arg(dtstart.toString("yyyyMMddhhmmss"))
 ;
                         db_conn->exec(query);
-                        query = QString("UPDATE recorded WHERE "
-                                        "chanid = '%1' AND starttime = '%2' "
-                                        "SET cutlist = NULL, bookmark = NULL;")
+                        query = QString("UPDATE recorded SET cutlist = NULL, "
+                                        "bookmark = NULL, "
+                                        "starttime = starttime WHERE "
+                                        "chanid = '%1' AND starttime = '%2';")
                                         .arg(result.value(0).toString())
                                         .arg(dtstart.toString("yyyyMMddhhmmss"));
                         db_conn->exec(query);
@@ -223,15 +303,25 @@ void Transcoder::ClearTranscodeTable(bool skipPartial)
                     }
                 }
             }
-            else if (status == -1)
+            else if (status == TRANSCODE_FAILED)
             {
                  // transcoding failed for an unknown reason,
                  // it is likely that this cannot be recoverable.
                  // Do nothing for now.
             }
+            else if (status == TRANSCODE_QUEUED && transData == NULL)
+            {
+                 transData = new struct TranscodeData;
+                 transData->pinfo = pinfo;
+                 transData->useCutlist =
+                                 (flags & TRANSCODE_USE_CUTLIST ) ? 1 : 0;
+                 continue;
+            }
+            delete pinfo;
         }
     }
     dblock->unlock();
+    return transData;
 }
 
 bool Transcoder::isFileInUse(ProgramInfo *pginfo)
@@ -250,95 +340,28 @@ bool Transcoder::isFileInUse(ProgramInfo *pginfo)
     return false;
 }
 
-void Transcoder::EnqueueTranscode(ProgramInfo *pinfo)
-{
-    QString query = QString("SELECT * FROM transcoding "
-                            "WHERE chanid = '%1' AND starttime = '%2';")
-                            .arg(pinfo->chanid)
-                            .arg(pinfo->startts.toString("yyyyMMddhhmmss"));
-
-    dblock->lock();
-    QSqlQuery result = db_conn->exec(query);
-    if (result.isActive() && result.numRowsAffected() > 0)
-    {
-        dblock->unlock();
-        return;
-    }
-
-    // Be careful in the future that we never try to aquire the
-    // dblock while holding transqlock otherwise we could deadlock.
-    pthread_mutex_lock(&transqlock);
-    if (!TranscodeQueue.isEmpty())
-    {
-        for (ProgramInfo *pg_iter = TranscodeQueue.first(); pg_iter;
-             pg_iter = TranscodeQueue.next())
-        {
-            if (pg_iter->chanid == pinfo->chanid &&
-                pg_iter->startts == pinfo->startts)
-            {
-                pthread_mutex_unlock(&transqlock);
-                dblock->unlock();
-                return;
-            }
-        }
-    }
-
-    // only transcode if this program is not already transcoding
-      
-    ProgramInfo *pinfo_copy = new ProgramInfo(*pinfo);
-    query = QString("INSERT into transcoding "
-                    "(chanid,starttime,status,hostname) "
-                    "VALUES ('%1','%2','%3','%4');")
-                    .arg(pinfo->chanid)
-                    .arg(pinfo->startts.toString("yyyyMMddhhmmss"))
-                    .arg(TRANSCODE_QUEUED)
-                    .arg(gContext->GetHostName());
-
-    db_conn->exec(query);
-    TranscodeQueue.append(pinfo_copy);
-    pthread_mutex_unlock(&transqlock);
-    dblock->unlock();
-}
-
 void Transcoder::TranscodePoll()
 {
     transcodePoll = true;
+    struct TranscodeData *transData = NULL;
     while (transcodePoll) 
     {
-        if (maxTranscoders) 
+        transData = CheckTranscodeTable(true);
+        CheckDoneTranscoders();
+
+        if (transData)
         {
-            ClearTranscodeTable(true);
-            ProgramInfo *pinfo = NULL;
-            CheckDoneTranscoders();
-
-            if (Transcoders.count() < (unsigned int)maxTranscoders) 
+            if (!transData->useCutlist || !isFileInUse(transData->pinfo))
             {
-                pthread_mutex_lock(&transqlock);
-                if (!TranscodeQueue.isEmpty()) 
-                {
-                    pinfo = TranscodeQueue.first();
-                    TranscodeQueue.removeFirst();
-                }
-                pthread_mutex_unlock(&transqlock);
-            }
-
-            if (pinfo) 
-            {
-                if (!useCutlist || !isFileInUse(pinfo))
-                {
-                    pid_t pid = Transcode(pinfo);
-                    delete pinfo;
-                    if (pid > 0)
-                        Transcoders.append(pid);
-                }
-                else
-                {
-                    EnqueueTranscode(pinfo);
-                }
+                pid_t pid = Transcode(transData->pinfo, transData->useCutlist);
+                delete transData->pinfo;
+                delete transData;
+                if (pid > 0)
+                    Transcoders.append(pid);
             }
         }
 
-        sleep(30);
+        sleep(60);
     }
 }
 
@@ -360,37 +383,3 @@ void *Transcoder::TranscodePollThread(void *param)
 
     return NULL;
 }
-
-void Transcoder::RestartTranscoding()
-{
-    QString fileprefix = gContext->GetFilePrefix();
-    QString query = QString("SELECT recorded.chanid,starttime from recorded;");
-
-    dblock->lock();
-    QSqlQuery result = db_conn->exec(query);
-    if (result.isActive() && result.numRowsAffected() > 0)
-    {
-        while (result.next())
-        {
-             QDateTime dtstart = result.value(1).toDateTime();
-             // This is backwards (calling a query for something we just queried)
-             // but it is a simple way to get all recordings
-             ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
-                                               db_conn,
-                                               result.value(0).toString(), 
-                                               dtstart);
-
-             if (pinfo == NULL)
-                 continue;
-             QString path = pinfo->GetRecordFilename(fileprefix);
-             struct stat st;
-             if (stat(path.ascii(), &st) == 0)
-             {
-                 // File exists
-                 EnqueueTranscode(pinfo);
-             }
-         }
-    }
-    dblock->unlock();
-}
-

@@ -13,6 +13,12 @@ class EncoderLink;
 
 using namespace std;
 
+struct TranscodeData
+{
+    ProgramInfo *pinfo;
+    bool useCutlist;
+};
+
 class Transcoder : public QObject
 {
   public:
@@ -25,25 +31,21 @@ class Transcoder : public QObject
     void TranscodePoll(void);
 
   private:
-    void EnqueueTranscode(ProgramInfo *pginfo);
-    void ClearTranscodeTable(bool skipPartial);
-    void RestartTranscoding();
-    pid_t Transcode(ProgramInfo *pginfo);
-    void InitTranscoder(ProgramInfo *pginfo);
+    struct TranscodeData *CheckTranscodeTable(bool skipPartial);
+    pid_t Transcode(ProgramInfo *pginfo, bool useCutlist);
+    void EnqueueTranscode(ProgramInfo *pginfo, bool useCutlist);
+    void UpdateTranscoder(ProgramInfo *pginfo, int status);
+    void StopTranscoder(ProgramInfo *pinfo);
+    void DeleteTranscode(ProgramInfo *pinfo);
     void CheckDoneTranscoders(void);
     bool isFileInUse(ProgramInfo *pginfo);
 
-    pthread_mutex_t transqlock;
-
     bool transcodePoll;
-    int maxTranscoders;
-    int useCutlist;
 
     QMap<int, EncoderLink *> *m_tvList;
     QMutex *dblock;
     QSqlDatabase *db_conn;
 
-    QPtrList <ProgramInfo> TranscodeQueue;
     QValueList <pid_t> Transcoders;
 
     pthread_t transpoll;

@@ -68,7 +68,8 @@ class MainServer : public QObject
     void HandleMessage(QStringList &slist, PlaybackSock *pbs);
     void HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs);
     void HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs);
-    void HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs);
+    void HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs,
+                              int state);
     void HandleRemoteEncoder(QStringList &slist, QStringList &commands,
                              PlaybackSock *pbs);
     void HandleLockTuner(PlaybackSock *pbs);

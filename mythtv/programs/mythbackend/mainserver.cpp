@@ -216,7 +216,16 @@ void MainServer::ProcessRequest(QSocket *sock)
     }
     else if (command == "QUEUE_TRANSCODE")
     {
-        HandleQueueTranscode(listline, pbs);
+        HandleQueueTranscode(listline, pbs, TRANSCODE_QUEUED);
+    }
+    else if (command == "QUEUE_TRANSCODE_CUTLIST")
+    {
+        HandleQueueTranscode(listline, pbs, TRANSCODE_QUEUED |
+                                            TRANSCODE_USE_CUTLIST);
+    }
+    else if (command == "QUEUE_TRANSCODE_STOP")
+    {
+        HandleQueueTranscode(listline, pbs, TRANSCODE_STOP);
     }
     else if (command == "DELETE_RECORDING")
     {
@@ -690,14 +699,24 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
-void MainServer::HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs)
+void MainServer::HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs,
+                                      int state)
 {
     QSocket *pbssock = pbs->getSocket();
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
 
-    QString message = QString("LOCAL_READY_TO_TRANSCODE %1 %2")
+    QString cmd;
+    if (state & TRANSCODE_STOP)
+       cmd = QString("LOCAL_TRANSCODE_STOP");
+    else if (state & TRANSCODE_USE_CUTLIST)
+       cmd = QString("LOCAL_TRANSCODE_CUTLIST");
+    else
+       cmd = QString("LOCAL_TRANSCODE");
+
+    QString message = QString("%1 %2 %3")
+                            .arg(cmd)
                             .arg(pginfo->chanid)
                             .arg(pginfo->startts.toString(Qt::ISODate));
     MythEvent me(message);

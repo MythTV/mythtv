@@ -15,12 +15,14 @@ INSERT INTO settings VALUES ('DBSchemaVer', 1003, NULL);
 #   when a previously executed command is encountered.
 #
 
+DELETE FROM settings WHERE value="MaxTranscoders";
+UPDATE transcoding SET status = 1, starttime = starttime;
+
 ALTER TABLE record ADD recorddups INT DEFAULT 0 NOT NULL;
 ALTER TABLE record ADD maxnewest INT DEFAULT 0 NOT NULL;
 
 INSERT INTO settings SET value="TranscoderAutoRun", data=0;
 DELETE FROM settings WHERE value="TranscoderUseCutlist";
-INSERT INTO settings SET value="TranscoderUseCutlist", data=1;
 
 ALTER TABLE record ADD maxepisodes INT DEFAULT 0 NOT NULL;
 
