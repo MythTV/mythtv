@@ -121,17 +121,14 @@ SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* 
                                        _parent, "schedOpts"),
                      schedRec(_rec)
 {
-    profile = new SRProfileSelector(_rec, _parentList, this);
-    addItem(profile->getItem(), -1);
+    recPriority = new SRRecPriority(_rec, _parentList);
+    addItem(recPriority->getItem(), -1);
     
     startOffset = new SRStartOffset(_rec, _parentList);
     addItem(startOffset->getItem());
     
     endOffset = new SREndOffset(_rec, _parentList);
     addItem(endOffset->getItem());        
-    
-    recPriority = new SRRecPriority(_rec, _parentList);
-    addItem(recPriority->getItem(), -1);
     
     dupMethItem = new SRDupMethod(_rec, _parentList, this);
     addItem(dupMethItem->getItem(), -1);
@@ -182,6 +179,9 @@ SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedLi
                                         _parent, "storageOpts"),
                        schedRec(_rec)
 {
+    profile = new SRProfileSelector(_rec, _parentList, this);
+    addItem(profile->getItem(), -1);
+    
     recGroup = new SRRecGroup(_rec, _parentList, this);
     addItem(recGroup->getItem(), -1);
     

@@ -52,7 +52,7 @@ RootSRGroup::RootSRGroup(ScheduledRecording& _rec,ManagedList* _parentList, QObj
     storageOptions = new SRStorageOptionsGroup(_rec, _parentList, this, this);
     addItem(storageOptions, -1);
 
-    upcomingButton = new ManagedListItem(QString("[ %1 ]").arg(QObject::tr("View upcoming episodes")), 
+    upcomingButton = new ManagedListItem(QString("[ %1 ]").arg(QObject::tr("List upcoming episodes")), 
                                          _parentList, this, "viewUpcoming");
     addItem(upcomingButton, -1);
     connect(upcomingButton, SIGNAL(selected(ManagedListItem*)), &_rec, SLOT(runProgList()));

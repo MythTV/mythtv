@@ -303,10 +303,9 @@ class SRSchedOptionsGroup : public ManagedListGroup
         void itemChanged(ManagedListItem*);
             
     protected:
-        class SRProfileSelector* profile;
+        class SRRecPriority* recPriority;
         class SRStartOffset* startOffset;
         class SREndOffset* endOffset;
-        class SRRecPriority* recPriority;
         class SRDupMethod* dupMethItem;
         class SRDupIn* dupLocItem;
         
@@ -327,6 +326,7 @@ class SRStorageOptionsGroup : public ManagedListGroup
         void itemChanged(ManagedListItem*);
         
     protected:
+        class SRProfileSelector* profile;
         class SRRecGroup* recGroup;
         class SRAutoExpire* autoExpire;
         class SRMaxEpisodes* maxEpisodes;
@@ -528,7 +528,7 @@ class SRMaxEpisodes : public SRBoundedIntegerSetting
 {
     public:
     SRMaxEpisodes(ScheduledRecording& _parent, ManagedList* _list)
-                 : SRBoundedIntegerSetting( 0, 100, 1, 10, _parent, "maxepisodesList", "maxepisodes", _list) 
+                 : SRBoundedIntegerSetting( 0, 100, 5, 1, _parent, "maxepisodesList", "maxepisodes", _list) 
     {
         setTemplates("", "", "No episode limit", "Keep only one episode.", "Keep at most %1 episodes");
         setShortTemplates("", "", "No episode limit", "one episode", "%1 episodes");
@@ -595,7 +595,7 @@ public:
     }
 
     virtual void fillSelections(QSqlDatabase *db) {
-        addSelection("Store in the \"default\" recording group", QObject::tr("Default"), false);
+        addSelection("Store in the \"Default\" recording group", QObject::tr("Default"), false);
 
         QString thequery = QString("SELECT DISTINCT recgroup from recorded "
                                    "WHERE recgroup <> '%1'")
