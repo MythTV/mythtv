@@ -1446,11 +1446,13 @@ void clearOldDBEntries(void)
     if (no_delete)
         offset=7;
 
-    querystr.sprintf("INSERT INTO oldprogram (oldtitle,airdate) "
+    querystr.sprintf("DELETE FROM oldprogram WHERE airdate < "
+                     "DATE_SUB(CURRENT_DATE, INTERVAL 320 DAY);");
+    query.exec(querystr);
+
+    querystr.sprintf("REPLACE INTO oldprogram (oldtitle,airdate) "
                      "SELECT title,starttime FROM program "
-                     "LEFT JOIN oldprogram ON title=oldtitle "
-                     "WHERE oldtitle IS NULL AND starttime < NOW() "
-                     "group by title;");
+                     "WHERE starttime < NOW() group by title;");
     query.exec(querystr);
 
     querystr.sprintf("DELETE FROM program WHERE starttime <= "
