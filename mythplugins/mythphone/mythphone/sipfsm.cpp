@@ -35,6 +35,7 @@ QTextStream *debugStream;
 QObject *eventWindow;
 QStringList NotifyQ;
 QMutex EventQLock;
+QString localIp;
 
 
 
@@ -198,6 +199,19 @@ void SipContainer::CheckUIEvents(SipFsm *sipFsm)
     }
     else if (event == "UISTOPWATCHALL")
         sipFsm->StopWatchers();
+    else if (event == "SENDIM")
+    {
+        EventQLock.lock();
+        it = EventQ.begin();
+        QString DestUrl = *it;
+        it = EventQ.remove(it);
+        QString CallId = *it;
+        it = EventQ.remove(it);
+        QString imMsg = *it;
+        EventQ.remove(it);
+        EventQLock.unlock();
+        sipFsm->SendIM(DestUrl, CallId, imMsg);
+    }
 
     ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
 }
@@ -361,6 +375,25 @@ void SipContainer::UiStopWatchAll()
     EventQLock.lock();
     EventQ.append("UISTOPWATCHALL");
     EventQLock.unlock();
+}
+
+QString SipContainer::UiSendIMMessage(QString DestUrl, QString CallId, QString Msg)
+{
+    SipCallId sipCallId;
+    
+    if (CallId.length() == 0)
+    {
+        sipCallId.Generate(localIp);
+        CallId = sipCallId.string();
+    }
+
+    EventQLock.lock();
+    EventQ.append("SENDIM");
+    EventQ.append(DestUrl);
+    EventQ.append(CallId);
+    EventQ.append(Msg);
+    EventQLock.unlock();
+    return CallId;
 }
 
 int SipContainer::GetSipState()
@@ -887,9 +920,9 @@ SipWatcher *SipFsm::CreateWatcherFsm(QString Url)
     return watcher;
 }
 
-SipIM *SipFsm::CreateIMFsm()
+SipIM *SipFsm::CreateIMFsm(QString Url, QString callIdStr)
 {
-    SipIM *im = new SipIM(this, natIp, localPort, sipRegistration);
+    SipIM *im = new SipIM(this, natIp, localPort, sipRegistration, Url, callIdStr);
     FsmList.append(im);
     return im;
 }
@@ -904,6 +937,35 @@ void SipFsm::StopWatchers()
         it=FsmList.next();
         if ((thisone->type() == "WATCHER") && (thisone->FSM(SIP_STOPWATCH) == SIP_IDLE))
             DestroyFsm(thisone);
+    }
+}
+
+void SipFsm::SendIM(QString destUrl, QString CallId, QString imMsg)
+{
+    SipCallId sipCallId;
+    sipCallId.setValue(CallId);
+    SipFsmBase *Fsm = MatchCallId(sipCallId);
+    if ((Fsm) && (Fsm->type() == "IM"))
+    {
+        if ((Fsm->FSM(SIP_USER_MESSAGE, 0, &imMsg)) == SIP_IDLE)
+            DestroyFsm(Fsm);
+    }
+    
+    // Did not match a call-id, create new FSM entry
+    else if (Fsm == 0)
+    {
+        SipIM *imFsm = CreateIMFsm(destUrl, CallId);
+        if (imFsm)
+        {
+            if ((imFsm->FSM(SIP_USER_MESSAGE, 0, &imMsg)) == SIP_IDLE)
+                DestroyFsm(imFsm);
+        }
+    }
+    
+    // Matched a call-id, but it was not an IM FSM, should not happen with random call-ids
+    else 
+    {
+        cerr << "SIP: call-id used by non-IM FSM\n";
     }
 }
 
@@ -1110,6 +1172,7 @@ QString SipFsmBase::EventtoString(int Event)
     case SIP_INFO:                return "INFO";
     case SIP_INFOSTATUS:          return "INFOSTATUS";
     case SIP_IM_TIMEOUT:          return "IM_TIMEOUT";
+    case SIP_USER_MESSAGE:        return "USER_IM";
     default:
         break;
     }
@@ -1168,8 +1231,6 @@ SipCall::~SipCall()
 
 void SipCall::initialise()
 {
-    char myHostname[64];
-
     // Initialise Local Parameters.  We get info from the database on every new
     // call in case it has been changed
     myDisplayName = gContext->GetSetting("MySipName");
@@ -1246,6 +1307,7 @@ void SipCall::initialise()
 
 int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
 {
+    (void)Value;
     int oldState = State;
 
     // Parse SIP messages for general relevant data
@@ -1501,6 +1563,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
 
 bool SipCall::UseNat(QString destIPAddress)
 {
+    (void)destIPAddress;
     // User to check subnets but this was a flawed concept; now checks a configuration item per-remote user
     return !disableNat;
 }
@@ -2016,6 +2079,7 @@ SipRegistration::~SipRegistration()
 
 int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
 {
+    (void)Value;
     switch (Event | State)
     {
     case SIP_REG_TRYING_STATUS:
@@ -2311,6 +2375,7 @@ SipWatcher::~SipWatcher()
 
 int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
 {
+    (void)Value;
     int OldState = State;
     SipXpidf *xpidf;
 
@@ -2489,15 +2554,30 @@ SipIM
 FSM to handle Instant Messaging
 **********************************************************************/
 
-SipIM::SipIM(SipFsm *par, QString localIp, int localPort, SipRegistration *reg) : SipFsmBase(par)
+SipIM::SipIM(SipFsm *par, QString localIp, int localPort, SipRegistration *reg, QString destUrl, QString callIdStr) : SipFsmBase(par)
 {
     sipLocalIp = localIp;
     sipLocalPort = localPort;
     regProxy = reg;
 
     State = SIP_IDLE;
-    cseq = 1;
-    CallId.Generate(sipLocalIp);
+    rxCseq = -1;
+    txCseq = 1;
+    if (callIdStr.length() > 0)
+        CallId.setValue(callIdStr);
+    else
+        CallId.Generate(sipLocalIp);
+    imUrl = 0;
+    if (destUrl.length() > 0)
+    {
+        // If the dialled number if just a username and we are registered to a proxy, append 
+        // the proxy hostname
+        if ((!destUrl.contains('@')) && (regProxy != 0))
+            destUrl.append(QString("@") + gContext->GetSetting("SipProxyName"));
+    
+        imUrl = new SipUrl(destUrl, "");
+    }
+    
     if (regProxy)
         MyUrl = new SipUrl("", regProxy->registeredAs(), regProxy->registeredTo(), 5060);
     else
@@ -2508,6 +2588,8 @@ SipIM::SipIM(SipFsm *par, QString localIp, int localPort, SipRegistration *reg) 
 SipIM::~SipIM()
 {
     (parent->Timer())->StopAll(this); 
+    if (imUrl)
+        delete imUrl;
     if (MyUrl)
         delete MyUrl;
     if (MyContactUrl)
@@ -2522,10 +2604,22 @@ int SipIM::FSM(int Event, SipMsg *sipMsg, void *Value)
 
     switch (Event)
     {
+    case SIP_USER_MESSAGE:
+        msgToSend = *((QString *)Value);
+        SendMessage(0, msgToSend);
+        State = SIP_IM_ACTIVE;
+        break;
+        
     case SIP_MESSAGE:
         ParseSipMsg(Event, sipMsg);
-        textContent = sipMsg->getPlainText();
-        parent->SetNotification("IM", remoteUrl->getUser(), textContent, "");
+        if (rxCseq != sipMsg->getCSeqValue()) // Check for retransmissions
+        {
+            rxCseq = sipMsg->getCSeqValue();
+            textContent = sipMsg->getPlainText();
+            parent->SetNotification("IM", remoteUrl->getUser(), CallId.string(), textContent);
+        }
+        if (imUrl == 0)
+            imUrl = new SipUrl(sipMsg->getFromUrl());
         BuildSendStatus(200, "MESSAGE", sipMsg->getCSeqValue(), SIP_OPT_CONTACT);
         State = SIP_IM_ACTIVE;
         (parent->Timer())->Start(this, 30*60*1000, SIP_IM_TIMEOUT); // 30 min of inactivity and IM session clears
@@ -2536,6 +2630,22 @@ int SipIM::FSM(int Event, SipMsg *sipMsg, void *Value)
         BuildSendStatus(200, "INFO", sipMsg->getCSeqValue(), SIP_OPT_CONTACT);
         State = SIP_IM_ACTIVE;
         (parent->Timer())->Start(this, 30*60*1000, SIP_IM_TIMEOUT); 
+        break;
+
+    case SIP_MESSAGESTATUS:
+        (parent->Timer())->Stop(this, SIP_RETX); 
+        if (sipMsg->getStatusCode() == 407)
+            SendMessage(sipMsg, msgToSend); // Note - this "could" have changed if the user is typing quickly
+        else if (sipMsg->getStatusCode() != 200)
+            cout << "SIP: Send IM got status code " << sipMsg->getStatusCode() << endl;
+        (parent->Timer())->Start(this, 30*60*1000, SIP_IM_TIMEOUT); // 30 min of inactivity and IM session clears
+        break;
+
+    case SIP_RETX:
+        if (Retransmit(false))
+            (parent->Timer())->Start(this, t1, SIP_RETX);
+        else
+            cout << "SIP: Send IM failed to get a response\n";
         break;
 
     case SIP_IM_TIMEOUT:
@@ -2555,38 +2665,37 @@ int SipIM::FSM(int Event, SipMsg *sipMsg, void *Value)
 void SipIM::SendMessage(SipMsg *authMsg, QString Text)
 {
     SipMsg Message("MESSAGE");
-/*    Subscribe.addRequestLine(*watchedUrl);
-    Subscribe.addVia(sipLocalIp, sipLocalPort);
-    Subscribe.addFrom(*MyUrl);
-    Subscribe.addTo(*watchedUrl);
-    Subscribe.addCallId(CallId);
+    Message.addRequestLine(*imUrl);
+    Message.addVia(sipLocalIp, sipLocalPort);
+    Message.addFrom(*MyUrl);
+    Message.addTo(*imUrl, remoteTag, remoteEpid);
+    Message.addCallId(CallId);
     if (authMsg == 0)
-        cseq++;
-    Subscribe.addCSeq(cseq);
-    if (State == SIP_WATCH_STOPPING)
-        Subscribe.addExpires(0);
+        txCseq++;
+    Message.addCSeq(txCseq);
 
     if (authMsg)
     {
         if (authMsg->getAuthMethod() == "Digest")
-            Subscribe.addProxyAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + regProxy->registeredTo());
+            Message.addProxyAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + regProxy->registeredTo());
         else
             cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
     }
 
-    Subscribe.addUserAgent();
-    Subscribe.addContact(MyContactUrl);
+    Message.addUserAgent();
+    Message.addContact(MyContactUrl);
 
-    Subscribe.addEvent("presence");
-    Subscribe.addGenericLine("Accept: application/xpidf+xml\r\n");
-    //Subscribe.addGenericLine("Accept: application/xpidf+xml, text/xml+msrtc.pidf\r\n");
-    //Subscribe.addGenericLine("Supported: com.microsoft.autoextend\r\n");
-    Subscribe.addNullContent();
+    Message.addContent("text/plain", Text);
 
-    parent->Transmit(Subscribe.string(), retxIp = watchedUrl->getHostIp(), retxPort = watchedUrl->getPort());
-    retx = Subscribe.string();
+    if (recRouteUrl != 0)
+        parent->Transmit(Message.string(), retxIp = recRouteUrl->getHostIp(), 
+                         retxPort = recRouteUrl->getPort());
+    else
+        parent->Transmit(Message.string(), retxIp = imUrl->getHostIp(), 
+                         retxPort = imUrl->getPort());
+    retx = Message.string();
     t1 = 500;
-    (parent->Timer())->Start(this, t1, SIP_RETX);*/
+    (parent->Timer())->Start(this, t1, SIP_RETX);
 }
 
 

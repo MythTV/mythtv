@@ -33,6 +33,7 @@
 extern SipContainer *sipStack;
 class PhoneUIStatusBar;
 
+#define MAX_DISPLAY_IM_MSGS    5        // No lines of IM per mythdialog box
 
 class PhoneUIBox : public MythThemedDialog
 {
@@ -70,6 +71,7 @@ class PhoneUIBox : public MythThemedDialog
     void closeCallPopup();
     void incallDialVoiceSelected();
     void incallDialVideoSelected();
+    void incallSendIMSelected();
     void menuCallUrl();
     void menuAddContact();
     void menuDirAdd();
@@ -84,6 +86,8 @@ class PhoneUIBox : public MythThemedDialog
     void vmailEntryDelete();
     void vmailEntryDeleteAll();
     void closeMenuPopup();
+    void closeIMPopup();
+    void imSendReply();
     void changeVolumeControl(bool up_or_down);
     void changeVolume(bool up_or_down);
     void toggleMute();
@@ -111,6 +115,8 @@ class PhoneUIBox : public MythThemedDialog
     const char *videoResToCifMode(int w);
     void    doMenuPopup();
     void    doUrlPopup(char key, bool DigitsOrUrl);
+    void    doIMPopup(QString otherParty, QString callId, QString Msg);
+    void    scrollIMText(QString Msg, bool msgReceived);
     void    doAddEntryPopup(DirEntry *edit=0, QString nn="", QString Url="");
     void    doAddDirectoryPopup();
     void    addNewDirectoryEntry(QString Name, QString Url, QString Dir, QString fn, QString sn, QString ph, bool isSpeed, bool OnHomeLan);
@@ -182,6 +188,12 @@ class PhoneUIBox : public MythThemedDialog
     MythLineEdit          *urlField;
     QLabel                *callLabelUrl;
     QLabel                *callLabelName;
+    MythPopupBox          *imPopup;
+    MythRemoteLineEdit    *imReplyField;
+    QMap<int,QLabel *>     imLine;
+    int                    displayedIMMsgs;
+    QString                imCallid;
+    QString                imUrl;
 
 
     MythPopupBox          *addEntryPopup;

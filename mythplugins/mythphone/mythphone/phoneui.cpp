@@ -857,8 +857,7 @@ void PhoneUIBox::ProcessSipNotification()
         // See if the notification is an incoming IM message
         else if (NotifyType == "IM")
         {
-            cout << "Got IM from " << NotifyUrl << endl << NotifyParam1 << endl;
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(), "IM:"+NotifyUrl, NotifyParam1);
+            doIMPopup(NotifyUrl, NotifyParam1, NotifyParam2);
         }
 
         else 
@@ -1244,6 +1243,81 @@ void PhoneUIBox::dialUrlSwitchToUrl()
     doUrlPopup(0, false);
 }
 
+void PhoneUIBox::doIMPopup(QString otherParty, QString callId, QString Msg)
+{
+    if (imPopup)
+        scrollIMText(Msg, true);
+    else
+    {
+        imPopup = new MythPopupBox(gContext->GetMainWindow(), "IM_popup");
+        QLabel *title = imPopup->addLabel("IM: "+otherParty, MythPopupBox::Medium);
+        title->setAlignment(Qt::AlignHCenter);
+        for (int i=0; i<MAX_DISPLAY_IM_MSGS; i++)
+            imLine[i] = imPopup->addLabel("", MythPopupBox::Small, true);
+        displayedIMMsgs = 0;
+        if (callId.length() > 0)
+        {
+            imCallid = callId;
+            scrollIMText(Msg, true);
+        }
+        else
+            imCallid = "";
+        imUrl = otherParty;
+        imReplyField = new MythRemoteLineEdit(imPopup);
+        imPopup->addWidget(imReplyField);
+        imReplyField->setFocus();
+        imPopup->addButton(tr("Send IM"), this, SLOT(imSendReply()));
+        
+        imPopup->ShowPopupAtXY(200, 100, this, SLOT(closeIMPopup()));
+    }
+}
+
+void PhoneUIBox::scrollIMText(QString Msg, bool msgReceived)
+{
+    if (imPopup)
+    {
+        // See if we need to scroll
+        if (displayedIMMsgs >= MAX_DISPLAY_IM_MSGS)
+        {
+            for (int i=0;i<displayedIMMsgs-1;i++)
+            {
+                imLine[i]->setPaletteForegroundColor(imLine[i+1]->paletteForegroundColor());
+                imLine[i]->setText(imLine[i+1]->text());
+            }
+        }
+        else
+            displayedIMMsgs++;
+        
+        // Display latest msg 
+        if (msgReceived)
+            imLine[displayedIMMsgs-1]->setPaletteForegroundColor(Qt::white);
+        else
+            imLine[displayedIMMsgs-1]->setPaletteForegroundColor(Qt::yellow);
+        imLine[displayedIMMsgs-1]->setText(Msg);
+    }
+}
+
+void PhoneUIBox::closeIMPopup()
+{
+    if (!imPopup)
+        return;
+
+    imPopup->hide();
+    delete imPopup;
+    imPopup = NULL;
+}
+
+void PhoneUIBox::imSendReply()
+{
+    if (!imPopup)
+        return;
+    imCallid = sipStack->UiSendIMMessage(imUrl, imCallid, imReplyField->text());
+    scrollIMText(imReplyField->text(), false);
+    imReplyField->setText("");
+    imReplyField->setFocus();
+}
+
+
 void PhoneUIBox::doAddEntryPopup(DirEntry *edit, QString nn, QString Url)
 {
     if (addEntryPopup)
@@ -1533,6 +1607,9 @@ void PhoneUIBox::doCallPopup(DirEntry *entry, QString DialorAnswer, bool audioOn
             button1->setFocus();
         }
         QButton *button2 = incallPopup->addButton(DialorAnswer + " Voice-Only", this, SLOT(incallDialVoiceSelected()));
+        if (DialorAnswer == "Dial")
+            incallPopup->addButton("Send an Instant Message", this, SLOT(incallSendIMSelected()));
+        
         if (audioOnly)
             button2->setFocus();
         incallPopup->ShowPopup(this, SLOT(closeCallPopup()));
@@ -1560,6 +1637,13 @@ void PhoneUIBox::incallDialVoiceSelected()
 {
     PlaceorAnswerCall(callLabelUrl->text(), callLabelName->text(), "AUDIOONLY", entryIsOnLocalLan);
     closeCallPopup();
+}
+
+void PhoneUIBox::incallSendIMSelected()
+{
+    QString OtherParty = callLabelUrl->text();
+    closeCallPopup();
+    doIMPopup(OtherParty, "", "");
 }
  
 

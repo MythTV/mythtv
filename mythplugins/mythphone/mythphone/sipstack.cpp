@@ -720,6 +720,13 @@ SipUrl::SipUrl(QString dispName, QString User, QString Hostname, int Port)
     thisUser = User;
     thisHostname = Hostname;
     thisPort = Port;
+    
+    if (Hostname.contains(':'))
+    {
+        thisHostname = Hostname.section(':', 0, 0);
+        thisPort = atoi(Hostname.section(':', 1, 1));
+    }
+    
     HostnameToIpAddr();
     encode();
 }

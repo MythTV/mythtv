@@ -103,6 +103,7 @@ public:
 #define SIP_INFO                0x1C00
 #define SIP_INFOSTATUS          0x1D00
 #define SIP_IM_TIMEOUT          0x1E00
+#define SIP_USER_MESSAGE        0x1F00
 
 #define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER) || ((s)==SIP_SUBSCRIBE) || ((s)==SIP_NOTIFY) || ((s)==SIP_MESSAGE) || ((s)==SIP_INFO))
 #define SIP_STATUS(s)           (((s)==SIP_INVITESTATUS_2xx) || ((s)==SIP_INVITESTATUS_1xx) || ((s)==SIP_INVITESTATUS_3456xx) || ((s)==SIP_BYTESTATUS) || ((s)==SIP_CANCELSTATUS) || ((s)==SIP_SUBSTATUS) || ((s)==SIP_NOTSTATUS) || ((s)==SIP_MESSAGESTATUS) || ((s)==SIP_INFOSTATUS) )
@@ -216,6 +217,7 @@ class SipContainer
     void UiClosed();
     void UiWatch(QStrList uriList);
     void UiStopWatchAll();
+    QString UiSendIMMessage(QString DestUrl, QString CallId, QString Msg);
     bool GetNotification(QString &type, QString &url, QString &param1, QString &param2);
     void GetRegistrationStatus(bool &Registered, QString &RegisteredTo, QString &RegisteredAs);
     int  GetSipState();
@@ -265,10 +267,10 @@ class SipFsmBase
   public:
     SipFsmBase(SipFsm *p);
     virtual ~SipFsmBase();
-    virtual int     FSM(int Event, SipMsg *sipMsg=0, void *Value=0) { return 0; };
-    virtual QString type()       { return "BASE"; };
-    virtual int     getCallRef() { return -1; };
-    QString callId()   { return CallId.string(); };
+    virtual int     FSM(int Event, SipMsg *sipMsg=0, void *Value=0) { (void)Event; (void)sipMsg; (void)Value; return 0; }
+    virtual QString type()       { return "BASE"; }
+    virtual int     getCallRef() { return -1; }
+    QString callId()   { return CallId.string(); }
 
   protected:
     void BuildSendStatus(int Code, QString Method, int statusCseq, int Option=0, int statusExpires=-1, QString sdp="");
@@ -451,7 +453,7 @@ class SipWatcher : public SipFsmBase
 class SipIM : public SipFsmBase
 {
   public:
-    SipIM(SipFsm *par, QString localIp, int localPort, SipRegistration *reg);
+    SipIM(SipFsm *par, QString localIp, int localPort, SipRegistration *reg, QString destUrl="", QString callIdStr="");
     ~SipIM();
     virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
     virtual QString type() { return "IM"; };
@@ -459,11 +461,14 @@ class SipIM : public SipFsmBase
   private:
     void SendMessage(SipMsg *authMsg, QString Text);
 
+    QString msgToSend;
     QString sipLocalIp;
     int sipLocalPort;
+    SipUrl *imUrl;
     SipRegistration *regProxy;
     int State;
-    int cseq;
+    int rxCseq;
+    int txCseq;
 };
 
 
@@ -487,8 +492,9 @@ class SipFsm : public QWidget
     SipCall *CreateCallFsm();
     SipSubscriber *CreateSubscriberFsm();
     SipWatcher *CreateWatcherFsm(QString Url);
-    SipIM *CreateIMFsm();
+    SipIM *CreateIMFsm(QString Url="", QString callIdStr="");
     void StopWatchers();
+    void SendIM(QString destUrl, QString CallId, QString imMsg);
     int numCalls();
     int getPrimaryCall() { return primaryCall; };
     int getPrimaryCallState();
@@ -511,7 +517,6 @@ class SipFsm : public QWidget
     int MsgToEvent(SipMsg *sipMsg);
     QString DetermineNatAddress();
 
-    QString localIp;
     QString natIp;
     int localPort;
     QPtrList<SipFsmBase> FsmList;
