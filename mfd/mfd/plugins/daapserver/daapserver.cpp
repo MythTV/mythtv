@@ -135,8 +135,6 @@ void DaapServer::run()
 
 void DaapServer::parseIncomingRequest(httpd *server)
 {
-    cout << "GOT SOMETHING" << endl;
-
     //
     //  Create a DaapRequest object that will be built up to understand the
     //  request that has just come in from a client
