@@ -991,12 +991,12 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 
                 pthread_mutex_lock(&audio_buflock); // begin critical section
 
-                do 
+                do
                 {
                     lameret = lame_decode(strm, packetlen, pcmlbuffer, 
                                           pcmrbuffer);
 
-                    if (lameret > 0) 
+                    if (lameret > 0)
                     {
                         int itemp = 0;
                         int afree = audiofree(false);
@@ -1033,8 +1033,8 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                 lastaudiolen = audiolen(false);
                
                 pthread_mutex_unlock(&audio_buflock); // end critical section
-            } 
-            else 
+            }
+            else
             {
                 int bdiff, len = frameheader.packetlength;
                 int afree = audiofree(true);
@@ -1051,13 +1051,14 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                 {
                     memcpy(audiobuffer + waud, strm, bdiff);
                     memcpy(audiobuffer, strm + bdiff, len - bdiff);
-                    waud = len - bdiff;
                 }
                 else
                 {
                     memcpy(audiobuffer + waud, strm, len);
-                    waud += len;
                 }
+
+		waud = (waud + len) % AUDBUFSIZE;
+
                 lastaudiolen = audiolen(false);
                 audbuf_timecode = frameheader.timecode + (int)((double)len *
                                   25000.0 / (double)effdsp); // time at end
