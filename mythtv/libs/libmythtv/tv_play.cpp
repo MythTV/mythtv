@@ -318,11 +318,9 @@ bool TV::Init(bool createWindow)
         bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
 
         int   xbase, width, ybase, height;
-        float wmult, hmult;
 
         if (fullscreen)
-            gContext->GetScreenSettings(xbase, width, wmult,
-                                        ybase, height, hmult);
+            gContext->GetScreenBounds(xbase, ybase, width, height);
 
         if (switchMode)
         {

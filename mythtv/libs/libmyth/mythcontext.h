@@ -168,12 +168,17 @@ class MythContext : public QObject
 
     void RefreshBackendConfig(void);
 
+    // Note that these give the dimensions for the GUI,
+    // which the user may have set to be different from the raw screen size
     void GetScreenSettings(float &wmult, float &hmult);
     void GetScreenSettings(int &width, float &wmult,
                            int &height, float &hmult);
     void GetScreenSettings(int &xbase, int &width, float &wmult,
                            int &ybase, int &height, float &hmult);
-   
+
+    // This returns the raw (drawable) screen size
+    void GetScreenBounds(int &xbase, int &ybase, int &width, int &height);
+
     QString FindThemeDir(const QString &themename);
     QString GetThemeDir(void);
 

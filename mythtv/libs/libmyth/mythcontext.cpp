@@ -58,6 +58,7 @@ class MythContextPrivate
     void SetSquareMode() {m_baseWidth = 800; m_baseHeight = 600;}
 
     void GetScreenBounds(void);
+    void StoreGUIsettings(void);
 
     void LoadLogSettings(void);
     void LoadDatabaseSettings(bool reload);
@@ -86,8 +87,12 @@ class MythContextPrivate
     QPixmap *m_backgroundimage;
     QPalette m_palette;
 
+    // Drawable area of the full screen. May cover several screens,
+    // or exclude windowing system fixtures (like Mac menu bar)
     int m_xbase, m_ybase;
     int m_height, m_width;
+
+    // Dimensions of the theme
     int m_baseWidth, m_baseHeight;
     
     QString m_localhostname;
@@ -105,6 +110,10 @@ class MythContextPrivate
     MythMainWindow *mainWindow;
 
     float m_wmult, m_hmult;
+
+    // The part of the screen(s) allocated for the GUI. Unless
+    // overridden by the user, defaults to drawable area above.
+    int m_screenxbase, m_screenybase;
     int m_screenwidth, m_screenheight;
 
     QString themecachedir;
@@ -176,10 +185,15 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     screensaver = ScreenSaverControl::get();
     m_baseHeight = 600;
     m_baseWidth = 800;
+
+    m_xbase = m_ybase = 0;
+    m_height = m_width = 0;
+    m_screenxbase = m_screenybase = 0;
+    m_screenheight = m_screenwidth = 0;
 }
 
-// Get screen size from Qt.
-// If the GUI environment has multiple screens (e.g. Xinerama or Mac OS X),
+// Get screen size from Qt. If the windowing system environment
+// has multiple screens (e.g. Xinerama or Mac OS X),
 // QApplication::desktop()->width() will span all of them,
 // so we usually need to get the geometry of a specific screen.
 
@@ -242,17 +256,6 @@ bool MythContextPrivate::Init(bool gui)
     m_gui = gui;
     LoadDatabaseSettings(false);
 
-    m_xbase = m_ybase = 0;
-
-    if (gui)
-    {
-        GetScreenBounds();
-    }
-    else
-    {
-        m_height = m_width = 0;
-    }
-
     serverSock = NULL;
     eventSock = new QSocket(0);
 
@@ -285,13 +288,11 @@ bool MythContextPrivate::Init(bool gui)
 
     // ---- keep all DB-using stuff below this line ----
 
-    int tmpwidth = parent->GetNumSetting("GuiWidth");
-    int tmpheight = parent->GetNumSetting("GuiHeight");
-
-    if (tmpwidth > 0)
-        m_width = tmpwidth;
-    if (tmpheight > 0)
-        m_height = tmpheight;
+    if (gui)
+    {
+        GetScreenBounds();
+        StoreGUIsettings();
+    }
 
     return true;
 }
@@ -311,6 +312,47 @@ MythContextPrivate::~MythContextPrivate()
     if (m_priv_mutex)
         delete m_priv_mutex;
 }
+
+// Apply any user overrides to the screen geometry
+
+void MythContextPrivate::StoreGUIsettings()
+{
+    m_screenxbase  = parent->GetNumSetting("GuiOffsetX");
+    m_screenybase  = parent->GetNumSetting("GuiOffsetY");
+    m_screenwidth  = parent->GetNumSetting("GuiWidth");
+    m_screenheight = parent->GetNumSetting("GuiHeight");
+
+    // If any of these was _not_ set by the user,
+    // (i.e. they are 0) use the whole-screen defaults
+
+    if (!m_screenxbase)
+        m_screenxbase = m_xbase;
+    if (!m_screenybase)
+        m_screenybase = m_ybase;
+    if (!m_screenwidth)
+        m_screenwidth = m_width;
+    if (!m_screenheight)
+        m_screenheight = m_height;
+
+    if (m_screenheight < 160 || m_screenwidth < 160)
+    {
+        VERBOSE(VB_ALL, "Somehow, your screen size settings are bad.");
+        VERBOSE(VB_ALL, QString("GuiWidth: %1")
+                        .arg(parent->GetNumSetting("GuiWidth")));
+        VERBOSE(VB_ALL, QString("GuiHeight: %1")
+                        .arg(parent->GetNumSetting("GuiHeight")));
+        VERBOSE(VB_ALL, QString("m_width: %1").arg(m_width));
+        VERBOSE(VB_ALL, QString("m_height: %1").arg(m_height));
+        VERBOSE(VB_ALL, "Falling back to 640x480");
+
+        m_screenwidth  = 640;
+        m_screenheight = 480;
+    }
+
+    m_wmult = m_screenwidth  / (float)m_baseWidth;
+    m_hmult = m_screenheight / (float)m_baseHeight;
+}
+
 
 void MythContextPrivate::LoadLogSettings(void)
 {
@@ -862,12 +904,6 @@ void MythContext::LoadQtConfig(void)
     d->language = "";
     d->themecachedir = "";
 
-    d->m_xbase = GetNumSetting("GuiOffsetX", 0);
-    d->m_ybase = GetNumSetting("GuiOffsetY", 0);
-
-    d->m_width = GetNumSetting("GuiWidth", 0);
-    d->m_height = GetNumSetting("GuiHeight", 0);
-
     if ((d->display_res = DisplayRes::getDisplayRes()))
     {
         // Make sure DisplayRes has current context info
@@ -876,13 +912,11 @@ void MythContext::LoadQtConfig(void)
         // Switch to desired GUI resolution
         d->display_res->switchToGUI();
 
-        d->m_width = d->display_res->Width();
-        d->m_height = d->display_res->Height();
-    }
-    else if (d->m_width <= 0 || d->m_height <= 0)
-    {
+        // Note the possibly changed screen settings
         d->GetScreenBounds();
     }
+    // Recalculate GUI dimensions
+    d->StoreGUIsettings();
 
     if (d->m_qtThemeSettings)
         delete d->m_qtThemeSettings;
@@ -920,8 +954,10 @@ void MythContext::LoadQtConfig(void)
 
     themename = GetSetting("MenuTheme");
     d->m_menuthemepathname = FindThemeDir(themename) +"/";
-    
-    InitializeScreenSettings();
+
+    d->bigfontsize    = GetNumSetting("QtFontBig",    25);
+    d->mediumfontsize = GetNumSetting("QtFontMedium", 16);
+    d->smallfontsize  = GetNumSetting("QtFontSmall",  12);
 }
 
 void MythContext::RefreshBackendConfig(void)
@@ -1118,6 +1154,16 @@ void MythContext::CacheThemeImagesDirectory(const QString &dirname,
     }
 }
 
+void MythContext::GetScreenBounds(int &xbase, int &ybase,
+                                  int &width, int &height)
+{
+    xbase  = d->m_xbase;
+    ybase  = d->m_ybase;
+    
+    width  = d->m_width;
+    height = d->m_height;
+}
+
 void MythContext::GetScreenSettings(float &wmult, float &hmult)
 {
     wmult = d->m_wmult;
@@ -1137,70 +1183,14 @@ void MythContext::GetScreenSettings(int &width, float &wmult,
 void MythContext::GetScreenSettings(int &xbase, int &width, float &wmult, 
                                     int &ybase, int &height, float &hmult)
 {
-    xbase  = d->m_xbase;
-    ybase  = d->m_ybase;
+    xbase  = d->m_screenxbase;
+    ybase  = d->m_screenybase;
     
     height = d->m_screenheight;
     width = d->m_screenwidth;
 
     wmult = d->m_wmult;
     hmult = d->m_hmult;
-}
-
-void MythContext::InitializeScreenSettings()
-{
-    int x = 0, y = 0, w = 0, h = 0;
-
-    d->m_xbase = x + GetNumSetting("GuiOffsetX", 0);
-    d->m_ybase = y + GetNumSetting("GuiOffsetY", 0);
-
-    int height = GetNumSetting("GuiHeight", d->m_height);
-    int width = GetNumSetting("GuiWidth", d->m_width);
-
-    if (width == 0 && height == 0 && d->display_res)
-    {
-        // If using custom, full-screen resolution, note the size
-        height = d->display_res->Height();
-        width  = d->display_res->Width();
-    }
-    else
-    {
-        if (w != 0 && h != 0 && height == 0 && width == 0)
-        {
-            width = w;
-            height = h;
-        }
-        else
-        {
-            if (height == 0)
-                height = d->m_height;
-            if (width == 0)
-                width = d->m_width;
-        }
-    }
-
-    
-    if (height < 160 || width < 160)
-    {
-        cerr << "Somehow, your screen size settings are bad.\n";
-        cerr << "GuiHeight: " << GetNumSetting("GuiHeight") << endl;
-        cerr << "GuiWidth: " << GetNumSetting("GuiWidth") << endl;
-        cerr << "m_height: " << d->m_height << endl;
-        cerr << "m_width: " << d->m_width << endl;
-        cerr << "Falling back to 640x480\n";
-
-        width = 640;
-        height = 480;
-    }
-
-    d->m_wmult = width / (float)d->m_baseWidth;
-    d->m_hmult = height / (float)d->m_baseHeight;
-    d->m_screenwidth = width;   
-    d->m_screenheight = height;
-
-    d->bigfontsize = GetNumSetting("QtFontBig", 25);
-    d->mediumfontsize = GetNumSetting("QtFontMedium", 16);
-    d->smallfontsize = GetNumSetting("QtFontSmall", 12);
 }
 
 QString MythContext::FindThemeDir(const QString &themename)
