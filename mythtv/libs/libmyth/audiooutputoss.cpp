@@ -327,7 +327,7 @@ void AudioOutputOSS::SetAudiotime(void)
 void AudioOutputOSS::AddSamples(char *buffers[], int samples, 
                                 long long timecode)
 {
-    //printf("AddSamples[]\n");
+    //printf("AddSamples[] %d\n", samples * audio_bytes_per_sample);
     pthread_mutex_lock(&audio_buflock);
 
     int audio_bytes = audio_bits / 8;
@@ -375,7 +375,7 @@ void AudioOutputOSS::AddSamples(char *buffers[], int samples,
 
 void AudioOutputOSS::AddSamples(char *buffer, int samples, long long timecode)
 {
-    //printf("AddSamples\n");
+    //printf("AddSamples %d\n", samples * audio_bytes_per_sample);
     pthread_mutex_lock(&audio_buflock);
 
     int afree = audiofree(false);

@@ -63,7 +63,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     eof = 0;
 
     keyframedist = 30;
-    usepre = 18;
+    usepre = 12;
 
     wtxt = rtxt = 0;
 
@@ -198,7 +198,7 @@ void NuppelVideoPlayer::SetRecorder(RemoteEncoder *recorder)
         decoder->setRecorder(recorder);
 }
 
-void NuppelVideoPlayer::Pause(void)
+void NuppelVideoPlayer::Pause(bool waitvideo)
 {
     actuallypaused = false;
 
@@ -208,7 +208,7 @@ void NuppelVideoPlayer::Pause(void)
     while (!actuallypaused)
         usleep(50);
 
-    PauseVideo();
+    PauseVideo(waitvideo);
     if (audioOutput)
         audioOutput->Pause(true);
 
@@ -216,11 +216,11 @@ void NuppelVideoPlayer::Pause(void)
         ringBuffer->Pause();
 }
 
-void NuppelVideoPlayer::Unpause(void)
+void NuppelVideoPlayer::Unpause(bool unpauseaudio)
 {
     paused = false;
     UnpauseVideo();
-    if (audioOutput)
+    if (audioOutput && unpauseaudio)
         audioOutput->Pause(false);
 
     if (ringBuffer)
@@ -240,12 +240,12 @@ inline bool NuppelVideoPlayer::GetVideoPause(void)
     return video_actually_paused;
 }
 
-void NuppelVideoPlayer::PauseVideo(void)
+void NuppelVideoPlayer::PauseVideo(bool wait)
 {
     video_actually_paused = false;
     pausevideo = true;
 
-    while (!video_actually_paused)
+    while (wait && !video_actually_paused)
         usleep(50);
 }
 
@@ -1350,6 +1350,15 @@ void NuppelVideoPlayer::SkipCommercials(int direction)
         skipcommercials = direction;
 }
 
+void NuppelVideoPlayer::ResetPlaying(void)
+{
+    ClearAfterSeek();
+
+    framesPlayed = 0;
+
+    decoder->Reset();
+}
+
 void NuppelVideoPlayer::StartPlaying(void)
 {
     consecutive_blanks = 0;
@@ -1386,8 +1395,6 @@ void NuppelVideoPlayer::StartPlaying(void)
     rewindtime = fftime = 0;
     skipcommercials = 0;
 
-    resetplaying = false;
-    
     pthread_mutex_init(&video_buflock, NULL);
     pthread_mutex_init(&text_buflock, NULL);
 
@@ -1455,18 +1462,6 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     while (!eof && !killplayer)
     {
-	if (resetplaying)
-	{
-            ClearAfterSeek();
-
-	    framesPlayed = 0;
-
-            decoder->Reset();
-
-	    resetplaying = false;
-	    actuallyreset = true;
-        }
-	    
         if (paused)
 	{ 
             actuallypaused = true;

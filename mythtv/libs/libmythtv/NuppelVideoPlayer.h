@@ -68,17 +68,16 @@ class NuppelVideoPlayer
     bool TogglePause(void) { if (paused) Unpause(); else Pause(); 
                              return paused; 
                            }
-    void Pause(void);
-    void Unpause(void); 
+    void Pause(bool waitvideo = true);
+    void Unpause(bool unpauseaudio = true); 
     bool GetPause(void);
-   
+
     bool FastForward(float seconds);
     bool Rewind(float seconds);
 
     void SkipCommercials(int direction);
 
-    void ResetPlaying(void) { resetplaying = true; actuallyreset = false; }
-    bool ResetYet(void) { return actuallyreset; }
+    void ResetPlaying(void);
 
     float GetFrameRate(void) { return video_frame_rate; } 
     long long GetFramesPlayed(void) { return framesPlayed; }
@@ -162,7 +161,7 @@ class NuppelVideoPlayer
     void InitFilters(void);
    
     bool GetVideoPause(void);
-    void PauseVideo(void);
+    void PauseVideo(bool wait = true);
     void UnpauseVideo(void);
 
     void setPrebuffering(bool prebuffer);
@@ -305,9 +304,6 @@ class NuppelVideoPlayer
     RemoteEncoder *nvr_enc;
 
     CommDetect *commDetect;
-
-    bool resetplaying;
-    bool actuallyreset;
 
     int totalLength;
     long long totalFrames;

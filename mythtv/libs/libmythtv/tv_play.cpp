@@ -491,9 +491,6 @@ void TV::StartPlayerAndRecorder(bool startPlayer, bool startRecorder)
         frameRate = recorder->GetFrameRate();
     }
 
-    if (startPlayer && startRecorder) 
-        usleep(300000);
-
     if (startPlayer)
     {
         SetupPlayer();
@@ -1580,7 +1577,7 @@ void TV::ToggleInputs(void)
         paused = false;
     }
 
-    activenvp->Pause();
+    activenvp->Pause(false);
     while (!activenvp->GetPause())
         usleep(5);
 
@@ -1589,15 +1586,11 @@ void TV::ToggleInputs(void)
     activerecorder->ToggleInputs();
 
     activenvp->ResetPlaying();
-    while (!activenvp->ResetYet())
-        usleep(5);
-
-    usleep(300000);
 
     if (activenvp == nvp)
         UpdateOSDInput();
 
-    activenvp->Unpause();
+    activenvp->Unpause(false);
 }
 
 void TV::ToggleChannelFavorite(void)
@@ -1622,7 +1615,7 @@ void TV::ChangeChannel(int direction)
         paused = false;
     }
 
-    activenvp->Pause();
+    activenvp->Pause(false);
     while (!activenvp->GetPause())
         usleep(5);
 
@@ -1637,15 +1630,11 @@ void TV::ChangeChannel(int direction)
     AddPreviousChannel();
 
     activenvp->ResetPlaying();
-    while (!activenvp->ResetYet())
-        usleep(5);
-
-    usleep(300000);
 
     if (activenvp == nvp)
         UpdateOSD();
 
-    activenvp->Unpause();
+    activenvp->Unpause(false);
 
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
@@ -1722,7 +1711,7 @@ void TV::ChangeChannelByString(QString &name)
         paused = false;
     }
 
-    activenvp->Pause();
+    activenvp->Pause(false);
     while (!activenvp->GetPause())
         usleep(5);
 
@@ -1737,15 +1726,11 @@ void TV::ChangeChannelByString(QString &name)
     AddPreviousChannel();
 
     activenvp->ResetPlaying();
-    while (!activenvp->ResetYet())
-        usleep(5);
-
-    usleep(300000);
 
     if (activenvp == nvp)
         UpdateOSD();
 
-    activenvp->Unpause();
+    activenvp->Unpause(false);
 }
 
 void TV::AddPreviousChannel(void)

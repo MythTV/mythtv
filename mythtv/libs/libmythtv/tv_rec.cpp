@@ -1592,14 +1592,15 @@ void TVRec::PauseRecorder(void)
         return;
 
     nvr->Pause();
-    while (!nvr->GetPause())
-        usleep(5);
-
-    PauseClearRingBuffer();
 } 
 
 void TVRec::ToggleInputs(void)
 {
+    while (!nvr->GetPause())
+        usleep(5);
+
+    PauseClearRingBuffer();
+
     rbuffer->Reset();
 
     channel->ToggleInputs();
@@ -1612,6 +1613,11 @@ void TVRec::ToggleInputs(void)
 
 void TVRec::ChangeChannel(int channeldirection)
 {
+    while (!nvr->GetPause())
+        usleep(5);
+
+    PauseClearRingBuffer();
+
     rbuffer->Reset();
     
     if (channeldirection == CHANNEL_DIRECTION_FAVORITE)
@@ -1728,6 +1734,11 @@ int TVRec::ChangeHue(bool direction)
 
 void TVRec::SetChannel(QString name)
 {
+    while (!nvr->GetPause())
+        usleep(5);
+
+    PauseClearRingBuffer();
+
     rbuffer->Reset();
 
     QString chan = name.stripWhiteSpace();
