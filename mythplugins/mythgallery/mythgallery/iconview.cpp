@@ -17,19 +17,8 @@ QPixmap *IconView::foldericon = NULL;
 
 IconView::IconView(MythContext *context, const QString &startdir, 
                    QWidget *parent, const char *name)
-        : QDialog(parent, name)
+        : MythDialog(context, parent, name)
 {
-    m_context = context;
-
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setCursor(QCursor(Qt::BlankCursor));
-
-    context->ThemeWidget(this);
-
     fgcolor = paletteForegroundColor();
     highlightcolor = fgcolor;
 

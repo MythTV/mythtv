@@ -2,12 +2,13 @@
 #define ICONVIEW_H_
 
 #include <qwidget.h>
-#include <qdialog.h>
 #include <qstring.h>
 #include <qpixmap.h>
 
 #include <vector>
 using namespace std;
+
+#include <mythtv/mythwidgets.h>
 
 class QFont;
 
@@ -32,7 +33,7 @@ class Thumbnail
     bool isdir;
 };
 
-class IconView : public QDialog
+class IconView : public MythDialog
 {
     Q_OBJECT
   public:
@@ -50,9 +51,6 @@ class IconView : public QDialog
 
     QFont *m_font;
 
-    int screenwidth, screenheight;
-    float wmult, hmult;
-
     QColor fgcolor;
     QColor highlightcolor;
 
@@ -65,8 +63,6 @@ class IconView : public QDialog
     int currow, curcol;
 
     static QPixmap *foldericon;
-
-    MythContext *m_context;
 };
 
 #endif

@@ -2,8 +2,9 @@
 #define SINGLEVIEW_H_
 
 #include <qwidget.h>
-#include <qdialog.h>
 #include <qstring.h>
+
+#include <mythtv/mythwidgets.h>
 
 class QImage;
 class QFont;
@@ -12,7 +13,7 @@ class MythContext;
 
 #include "iconview.h"
 
-class SingleView : public QDialog
+class SingleView : public MythDialog
 {
     Q_OBJECT
   public:
@@ -31,9 +32,6 @@ class SingleView : public QDialog
 
     QImage *image;
 
-    int screenwidth, screenheight;
-    float wmult, hmult;
-
     QFont *m_font;
 
     vector<Thumbnail> *images;
@@ -44,8 +42,6 @@ class SingleView : public QDialog
     int timersecs;
 
     bool timerrunning;
-
-    MythContext *m_context;
 };
 
 #endif

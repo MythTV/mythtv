@@ -13,19 +13,8 @@
 
 SingleView::SingleView(MythContext *context, vector<Thumbnail> *imagelist, 
                        int pos, QWidget *parent, const char *name)
-	  : QDialog(parent, name)
+	  : MythDialog(context, parent, name)
 {
-    m_context = context;
-
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setCursor(QCursor(Qt::BlankCursor));
-
-    context->ThemeWidget(this);
-
     m_font = new QFont("Arial", (int)(context->GetSmallFontSize() * hmult), 
                        QFont::Bold);
 
