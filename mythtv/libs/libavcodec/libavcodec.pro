@@ -127,3 +127,9 @@ contains( TARGET_ALTIVEC, yes ) {
     QMAKE_CFLAGS_RELEASE += -maltivec -mabi=altivec
   }
 }
+
+macx {
+    LIBS               += -lz
+    QMAKE_LFLAGS_SHLIB += -single_module
+  }
+}

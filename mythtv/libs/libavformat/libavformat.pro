@@ -54,3 +54,10 @@ INSTALLS += inc
 
 LIBS += -L../libavcodec -lmythavcodec-$$LIBVERSION
 
+macx {
+    LIBS               += -lz
+    QMAKE_LFLAGS_SHLIB += -single_module
+    SOURCES            -= audio.c
+#    SOURCES            += audio-darwin.c
+}
+
