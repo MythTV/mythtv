@@ -421,7 +421,10 @@ they run.  The following window managers are known to work correctly:</P>
 <P>See message 
 <A HREF="http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html">http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html</A></P>
 
-<H2><A NAME="ss18.16">18.16</A> <A HREF="mythtv-HOWTO.html#toc18.16">Where's my "canada-cable" entry gone to? </A>
+<H2><A NAME="ss18.16">18.16</A> <A HREF="mythtv-HOWTO.html#toc18.16">Where's my "canada-cable" entry gone to?</A>
+</H2>
+
+<H2><A NAME="ss18.17">18.17</A> <A HREF="mythtv-HOWTO.html#toc18.17">My channels are off by one.</A>
 </H2>
 
 <P>There is no such thing as "Canada Cable"; Canada uses the same
@@ -434,21 +437,21 @@ See the video4linux mailing list (
 <A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
 more information.</P>
 
-<H2><A NAME="ss18.17">18.17</A> <A HREF="mythtv-HOWTO.html#toc18.17">Mythweb is showing a db_open error when I connect to it.</A>
+<H2><A NAME="ss18.18">18.18</A> <A HREF="mythtv-HOWTO.html#toc18.18">Mythweb is showing a db_open error when I connect to it.</A>
 </H2>
 
 <P>Find your php.ini file. Make sure you've got a line in it like this:</P>
 <P><CODE>extension=mysql.so</CODE></P>
 <P>Restart apache for it to take effect.</P>
 
-<H2><A NAME="ss18.18">18.18</A> <A HREF="mythtv-HOWTO.html#toc18.18">error: can't find a register in class 'BREG' while reloading 'asm'</A>
+<H2><A NAME="ss18.19">18.19</A> <A HREF="mythtv-HOWTO.html#toc18.19">error: can't find a register in class 'BREG' while reloading 'asm'</A>
 </H2>
 
 <P>This is due to the broken Qt that is being distributed by Suse.  To work
 around this, edit <CODE>libs/libavcodec/Makefile</CODE> and remove any
 "-fPIC" you find there and then recompile.</P>
 
-<H2><A NAME="mkspecs_error"></A> <A NAME="ss18.19">18.19</A> <A HREF="mythtv-HOWTO.html#toc18.19">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+<H2><A NAME="mkspecs_error"></A> <A NAME="ss18.20">18.20</A> <A HREF="mythtv-HOWTO.html#toc18.20">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
 </H2>
 
 <P>This error happens when there's a missing link in the
@@ -471,41 +474,41 @@ doesn't fix the root cause of the issue, which is that your distribution
 didn't create the symlink for you when the qt3 package was installed.  The
 first choice is the better solution.</P>
 
-<H2><A NAME="ss18.20">18.20</A> <A HREF="mythtv-HOWTO.html#toc18.20">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+<H2><A NAME="ss18.21">18.21</A> <A HREF="mythtv-HOWTO.html#toc18.21">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
 </H2>
 
 <P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
 <A HREF="mythtv-HOWTO-4.html#Setting_up_paths">Setting up paths</A>.</P>
 
-<H2><A NAME="ss18.21">18.21</A> <A HREF="mythtv-HOWTO.html#toc18.21">My mouse pointer disappears when placed over the MythTV windows.</A>
+<H2><A NAME="ss18.22">18.22</A> <A HREF="mythtv-HOWTO.html#toc18.22">My mouse pointer disappears when placed over the MythTV windows.</A>
 </H2>
 
 <P>This is the intended behavior.  The MythTV interface is meant for use
 with a remote control or a keyboard.</P>
 
-<H2><A NAME="ss18.22">18.22</A> <A HREF="mythtv-HOWTO.html#toc18.22">What does "strange error flushing buffer" mean on my console?</A>
+<H2><A NAME="ss18.23">18.23</A> <A HREF="mythtv-HOWTO.html#toc18.23">What does "strange error flushing buffer" mean on my console?</A>
 </H2>
 
 <P>Nothing, really.  It's just lame (the mp3 encoder) complaining for some
 obscure reason.  This seems to be fixed in more recent versions of the
 libmp3lame library.</P>
 
-<H2><A NAME="ss18.23">18.23</A> <A HREF="mythtv-HOWTO.html#toc18.23">I can't change the channel when watching Live TV.</A>
+<H2><A NAME="ss18.24">18.24</A> <A HREF="mythtv-HOWTO.html#toc18.24">I can't change the channel when watching Live TV.</A>
 </H2>
 
 <P>Something's wrong with your program database.  Did mythfilldatabase run
 with no major errors?</P>
 
-<H2><A NAME="ss18.24">18.24</A> <A HREF="mythtv-HOWTO.html#toc18.24">Colors are wrong, people have blue faces.</A>
+<H2><A NAME="ss18.25">18.25</A> <A HREF="mythtv-HOWTO.html#toc18.25">Colors are wrong, people have blue faces.</A>
 </H2>
 
 <P>If you are using the binary nVidia drivers, make sure you're using at
 least version 1.0-2960.</P>
 
-<H2><A NAME="ss18.25">18.25</A> <A HREF="mythtv-HOWTO.html#toc18.25">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
+<H2><A NAME="ss18.26">18.26</A> <A HREF="mythtv-HOWTO.html#toc18.26">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
 </H2>
 
-<P>You didn't add <CODE>/usr/local/lib</CODE> to <CODE>ld.so.conf</CODE>.  See the
+<P>You didn't add <CODE>/usr/local/lib</CODE> to <CODE>/etc/ld.so.conf</CODE>.  See the
 section on modifying 
 <A HREF="mythtv-HOWTO-4.html#modifying_ld.so.conf">/etc/ld.so.conf</A>.</P>
 

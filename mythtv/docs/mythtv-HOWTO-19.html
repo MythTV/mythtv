@@ -21,6 +21,10 @@ Next
 you view the files created by MythTV.  MythTV doesn't use standard
 Nupplevideo files, which is why you MPlayer complains if you try to view
 them.</P>
+<P><B>NOTE</B>:  If you're using a hardware MPEG2 encoder like the
+PVR-250/350 you don't need to convert - the files are actually standard
+MPEG2 with a <CODE>.nuv</CODE> extension.  Change it to <CODE>.mpg</CODE> and the
+files should display properly in other media players.</P>
 <P>Download the patch to MPlayer from Matt's website. 
 <A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/</A>.
 <BLOCKQUOTE><CODE>
@@ -385,6 +389,8 @@ $ make
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>: You may get warnings about i2c during the compile.  Ignore
+them.</P>
 <P>Add the following to <CODE>/etc/modules.conf</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -844,9 +850,15 @@ it type 0x8e using your partition editor.</P>
 <P><CODE># pvcreate /dev/hdb1</CODE></P>
 <P>Add the new physical volume to the volume group:</P>
 <P><CODE># vgextend VGforMyth /dev/hdb1</CODE></P>
+<P>Once you've completed one of the following two procedures, use <B>df</B>
+to check that you've got more space.</P>
+
+<H3>ReiserFS</H3>
+
 <P>Make the logical volume used for video bigger:</P>
 <P><CODE># lvextend --size +50G /dev/VGforMyth/video</CODE></P>
-<P>Unmount, resize and remount the filesystem (non destructively):
+<P>Unmount, resize and remount the filesystem.  Technically, you don't need to
+unmount and remount the ReiserFS. 
 <BLOCKQUOTE><CODE>
 <PRE>
 # umount /var/video
@@ -855,7 +867,20 @@ it type 0x8e using your partition editor.</P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>And check that you now have more space in /var/video using <B>df</B>.</P>
+
+<H3>ext2 or ext3</H3>
+
+<P>LVM comes with a program called <B>e2fsadm</B>.</P>
+<P>Unmount, resize and remount the filesystem.  The filesystem <EM>must</EM> be
+unmounted during this procedure.
+<BLOCKQUOTE><CODE>
+<PRE>
+# umount /var/video
+# e2fsadm --size +50G /dev/VGforMyth/video
+# mount /dev/VGforMyth/video /var/video
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <HR>
 Next

@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-07-09, v2.52
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-07-13, v2.53
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -157,16 +157,17 @@ necessary.</EM>
 <LI><A NAME="toc18.13">18.13</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.13">The mythbackend program told me to look at this section.</A>
 <LI><A NAME="toc18.14">18.14</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.14">My remote doesn't work / works sometimes and not others / "ghost"</A>
 <LI><A NAME="toc18.15">18.15</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.15">My PVR-250 card doesn't show inputs in the setup screen.</A>
-<LI><A NAME="toc18.16">18.16</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.16">Where's my "canada-cable" entry gone to? </A>
-<LI><A NAME="toc18.17">18.17</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.17">Mythweb is showing a db_open error when I connect to it.</A>
-<LI><A NAME="toc18.18">18.18</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.18">error: can't find a register in class 'BREG' while reloading 'asm'</A>
-<LI><A NAME="toc18.19">18.19</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.19">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
-<LI><A NAME="toc18.20">18.20</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.20">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
-<LI><A NAME="toc18.21">18.21</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.21">My mouse pointer disappears when placed over the MythTV windows.</A>
-<LI><A NAME="toc18.22">18.22</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.22">What does "strange error flushing buffer" mean on my console?</A>
-<LI><A NAME="toc18.23">18.23</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.23">I can't change the channel when watching Live TV.</A>
-<LI><A NAME="toc18.24">18.24</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.24">Colors are wrong, people have blue faces.</A>
-<LI><A NAME="toc18.25">18.25</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.25">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
+<LI><A NAME="toc18.16">18.16</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.16">Where's my "canada-cable" entry gone to?</A>
+<LI><A NAME="toc18.17">18.17</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.17">My channels are off by one.</A>
+<LI><A NAME="toc18.18">18.18</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.18">Mythweb is showing a db_open error when I connect to it.</A>
+<LI><A NAME="toc18.19">18.19</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.19">error: can't find a register in class 'BREG' while reloading 'asm'</A>
+<LI><A NAME="toc18.20">18.20</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.20">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+<LI><A NAME="toc18.21">18.21</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.21">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+<LI><A NAME="toc18.22">18.22</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.22">My mouse pointer disappears when placed over the MythTV windows.</A>
+<LI><A NAME="toc18.23">18.23</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.23">What does "strange error flushing buffer" mean on my console?</A>
+<LI><A NAME="toc18.24">18.24</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.24">I can't change the channel when watching Live TV.</A>
+<LI><A NAME="toc18.25">18.25</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.25">Colors are wrong, people have blue faces.</A>
+<LI><A NAME="toc18.26">18.26</A> <A HREF="mythtv-HOWTO-htmlsingle.html#ss18.26">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
 </UL>
 <P>
 <H2><A NAME="toc19">19.</A> <A HREF="mythtv-HOWTO-htmlsingle.html#s19">Miscellaneous. </A></H2>
@@ -217,8 +218,6 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 This documentation will be in the <CODE>docs/</CODE> subdirectory.</P>
 <P>The other MythTV modules may be downloaded from CVS the same way; replace
 "mythtv" with "mythweather", "mythgallery", "mythmusic", etc.</P>
-<P>A PDF version of this documentation can be obtained from 
-<A HREF="http://www.smalltime.com/mythtv/mythtv-HOWTO.pdf">http://www.smalltime.com/mythtv/mythtv-HOWTO.pdf</A></P>
 <P><B>NOTE</B>: If you are going to use CVS to compile MythTV rather than
 using the distribution tarball, it is <B>strongly</B> recommended that you
 join the 
@@ -226,6 +225,8 @@ join the
 <A HREF="http://www.snowman.net/mailman/listinfo/mythtv-dev/">http://www.snowman.net/mailman/listinfo/mythtv-dev/</A> mailing list.</P>
 <P>It's recommended that you join the user list at 
 <A HREF="http://www.snowman.net/mailman/listinfo/mythtv-users">http://www.snowman.net/mailman/listinfo/mythtv-users</A>.</P>
+<P>Searchable archives for the lists are available at 
+<A HREF="http://www.gossamer-threads.com/archive/MythTV_C2/">http://www.gossamer-threads.com/archive/MythTV_C2/</A>.</P>
 <P>This HOWTO is for MythTV v0.10.</P>
 
 <H2><A NAME="s2">2.</A> <A HREF="#toc2">Introduction.</A></H2>
@@ -1098,8 +1099,11 @@ $ echo LANG="en_US" > ~/.i18n
 <A HREF="http://www.mythtv.org">mythtv.org</A>
 web site.  Save the tarball to a directory you can find.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.15 if you're in
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.14 if you're in
 North America.</P>
+<P><B>NOTE</B>:  0.5.14 is the last version that will work with MythTV 0.10. 
+XMLTV 0.5.15 will only work with CVS versions of MythTV.  Don't install the
+latest version of XMLTV if you're not running CVS.</P>
 <P>
 <HR>
 <PRE>
@@ -1736,7 +1740,8 @@ the mythfrontend setup page for options.</P>
 built-in.  Instead, remote control functions are implemented by cooperating
 with <B>lirc</B>, the Linux Infrared Remote Control program.  <B>lirc</B>
 handles the IR hardware and passes keystrokes to MythTV, which then acts as
-if the user had pressed the keys on the keyboard.</P>
+if the user had pressed the keys on the keyboard.  The file
+<CODE>keys.txt</CODE> describes the keys used to control MythTV.</P>
 <P><B>NOTE</B>:If you are running Mandrake 9.1, you may install
 <B>lirc</B> by executing: <CODE># urpmi lirc lirc-remotes</CODE> and bypass
 the manual compilation steps described below by jumping to the 
@@ -2680,13 +2685,13 @@ default as-is until you're sure that MythTV is operational.</P>
 
 <H2><A NAME="s11">11.</A> <A HREF="#toc11">Using MythTV.</A></H2>
 
+<P>The <CODE>keys.txt</CODE> file describes what the various keyboard commands are.</P>
 <P><B>NOTE to Red Hat 8.0 users</B>:Red Hat Linux 8.0 ships with Gnome as
 the default desktop environment.  However, Gnome seems to have issues with
 window focus and window switching which sometimes cause mythfrontend to
 obscure the video. KDE does not seem to have any such issues. Therefore you
 will need to switch to KDE by selecting RedHatMenu>Extras>System
 Settings>Desktop Switching Tool and choose "KDE".</P>
-<P>The <CODE>keys.txt</CODE> file describes what the various keyboard commands are.</P>
 
 <H2><A NAME="ss11.1">11.1</A> <A HREF="#toc11.1">Using themes with MythTV.</A>
 </H2>
@@ -3714,7 +3719,10 @@ they run.  The following window managers are known to work correctly:</P>
 <P>See message 
 <A HREF="http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html">http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html</A></P>
 
-<H2><A NAME="ss18.16">18.16</A> <A HREF="#toc18.16">Where's my "canada-cable" entry gone to? </A>
+<H2><A NAME="ss18.16">18.16</A> <A HREF="#toc18.16">Where's my "canada-cable" entry gone to?</A>
+</H2>
+
+<H2><A NAME="ss18.17">18.17</A> <A HREF="#toc18.17">My channels are off by one.</A>
 </H2>
 
 <P>There is no such thing as "Canada Cable"; Canada uses the same
@@ -3727,21 +3735,21 @@ See the video4linux mailing list (
 <A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
 more information.</P>
 
-<H2><A NAME="ss18.17">18.17</A> <A HREF="#toc18.17">Mythweb is showing a db_open error when I connect to it.</A>
+<H2><A NAME="ss18.18">18.18</A> <A HREF="#toc18.18">Mythweb is showing a db_open error when I connect to it.</A>
 </H2>
 
 <P>Find your php.ini file. Make sure you've got a line in it like this:</P>
 <P><CODE>extension=mysql.so</CODE></P>
 <P>Restart apache for it to take effect.</P>
 
-<H2><A NAME="ss18.18">18.18</A> <A HREF="#toc18.18">error: can't find a register in class 'BREG' while reloading 'asm'</A>
+<H2><A NAME="ss18.19">18.19</A> <A HREF="#toc18.19">error: can't find a register in class 'BREG' while reloading 'asm'</A>
 </H2>
 
 <P>This is due to the broken Qt that is being distributed by Suse.  To work
 around this, edit <CODE>libs/libavcodec/Makefile</CODE> and remove any
 "-fPIC" you find there and then recompile.</P>
 
-<H2><A NAME="mkspecs_error"></A> <A NAME="ss18.19">18.19</A> <A HREF="#toc18.19">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+<H2><A NAME="mkspecs_error"></A> <A NAME="ss18.20">18.20</A> <A HREF="#toc18.20">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
 </H2>
 
 <P>This error happens when there's a missing link in the
@@ -3764,41 +3772,41 @@ doesn't fix the root cause of the issue, which is that your distribution
 didn't create the symlink for you when the qt3 package was installed.  The
 first choice is the better solution.</P>
 
-<H2><A NAME="ss18.20">18.20</A> <A HREF="#toc18.20">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+<H2><A NAME="ss18.21">18.21</A> <A HREF="#toc18.21">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
 </H2>
 
 <P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
 <A HREF="#Setting_up_paths">Setting up paths</A>.</P>
 
-<H2><A NAME="ss18.21">18.21</A> <A HREF="#toc18.21">My mouse pointer disappears when placed over the MythTV windows.</A>
+<H2><A NAME="ss18.22">18.22</A> <A HREF="#toc18.22">My mouse pointer disappears when placed over the MythTV windows.</A>
 </H2>
 
 <P>This is the intended behavior.  The MythTV interface is meant for use
 with a remote control or a keyboard.</P>
 
-<H2><A NAME="ss18.22">18.22</A> <A HREF="#toc18.22">What does "strange error flushing buffer" mean on my console?</A>
+<H2><A NAME="ss18.23">18.23</A> <A HREF="#toc18.23">What does "strange error flushing buffer" mean on my console?</A>
 </H2>
 
 <P>Nothing, really.  It's just lame (the mp3 encoder) complaining for some
 obscure reason.  This seems to be fixed in more recent versions of the
 libmp3lame library.</P>
 
-<H2><A NAME="ss18.23">18.23</A> <A HREF="#toc18.23">I can't change the channel when watching Live TV.</A>
+<H2><A NAME="ss18.24">18.24</A> <A HREF="#toc18.24">I can't change the channel when watching Live TV.</A>
 </H2>
 
 <P>Something's wrong with your program database.  Did mythfilldatabase run
 with no major errors?</P>
 
-<H2><A NAME="ss18.24">18.24</A> <A HREF="#toc18.24">Colors are wrong, people have blue faces.</A>
+<H2><A NAME="ss18.25">18.25</A> <A HREF="#toc18.25">Colors are wrong, people have blue faces.</A>
 </H2>
 
 <P>If you are using the binary nVidia drivers, make sure you're using at
 least version 1.0-2960.</P>
 
-<H2><A NAME="ss18.25">18.25</A> <A HREF="#toc18.25">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
+<H2><A NAME="ss18.26">18.26</A> <A HREF="#toc18.26">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
 </H2>
 
-<P>You didn't add <CODE>/usr/local/lib</CODE> to <CODE>ld.so.conf</CODE>.  See the
+<P>You didn't add <CODE>/usr/local/lib</CODE> to <CODE>/etc/ld.so.conf</CODE>.  See the
 section on modifying 
 <A HREF="#modifying_ld.so.conf">/etc/ld.so.conf</A>.</P>
 
@@ -3812,6 +3820,10 @@ section on modifying
 you view the files created by MythTV.  MythTV doesn't use standard
 Nupplevideo files, which is why you MPlayer complains if you try to view
 them.</P>
+<P><B>NOTE</B>:  If you're using a hardware MPEG2 encoder like the
+PVR-250/350 you don't need to convert - the files are actually standard
+MPEG2 with a <CODE>.nuv</CODE> extension.  Change it to <CODE>.mpg</CODE> and the
+files should display properly in other media players.</P>
 <P>Download the patch to MPlayer from Matt's website. 
 <A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/</A>.
 <BLOCKQUOTE><CODE>
@@ -4176,6 +4188,8 @@ $ make
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>: You may get warnings about i2c during the compile.  Ignore
+them.</P>
 <P>Add the following to <CODE>/etc/modules.conf</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -4635,9 +4649,15 @@ it type 0x8e using your partition editor.</P>
 <P><CODE># pvcreate /dev/hdb1</CODE></P>
 <P>Add the new physical volume to the volume group:</P>
 <P><CODE># vgextend VGforMyth /dev/hdb1</CODE></P>
+<P>Once you've completed one of the following two procedures, use <B>df</B>
+to check that you've got more space.</P>
+
+<H3>ReiserFS</H3>
+
 <P>Make the logical volume used for video bigger:</P>
 <P><CODE># lvextend --size +50G /dev/VGforMyth/video</CODE></P>
-<P>Unmount, resize and remount the filesystem (non destructively):
+<P>Unmount, resize and remount the filesystem.  Technically, you don't need to
+unmount and remount the ReiserFS. 
 <BLOCKQUOTE><CODE>
 <PRE>
 # umount /var/video
@@ -4646,7 +4666,20 @@ it type 0x8e using your partition editor.</P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>And check that you now have more space in /var/video using <B>df</B>.</P>
+
+<H3>ext2 or ext3</H3>
+
+<P>LVM comes with a program called <B>e2fsadm</B>.</P>
+<P>Unmount, resize and remount the filesystem.  The filesystem <EM>must</EM> be
+unmounted during this procedure.
+<BLOCKQUOTE><CODE>
+<PRE>
+# umount /var/video
+# e2fsadm --size +50G /dev/VGforMyth/video
+# mount /dev/VGforMyth/video /var/video
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 </BODY>
 </HTML>

@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-07-09, v2.52
+<date>2003-07-13, v2.53
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -45,6 +45,10 @@ name="http://www.snowman.net/mailman/listinfo/mythtv-dev/"> mailing list.
 It's recommended that you join the user list at <url
 url="http://www.snowman.net/mailman/listinfo/mythtv-users"
 name="http://www.snowman.net/mailman/listinfo/mythtv-users">.
+
+Searchable archives for the lists are available at <url
+url="http://www.gossamer-threads.com/archive/MythTV_C2/"
+name="http://www.gossamer-threads.com/archive/MythTV_C2/">.
 
 This HOWTO is for MythTV v0.10.
 
@@ -848,8 +852,12 @@ $ echo LANG="en_US" > ~/.i18n
 web site.  Save the tarball to a directory you can find.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.15 if you're in
+name="http://xmltv.sourceforge.net">.  Download version 0.5.14 if you're in
 North America.
+
+<bf>NOTE</bf>:  0.5.14 is the last version that will work with MythTV 0.10. 
+XMLTV 0.5.15 will only work with CVS versions of MythTV.  Don't install the
+latest version of XMLTV if you're not running CVS.
 
 <code>
 NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
@@ -1386,7 +1394,8 @@ the mythfrontend setup page for options.
 built-in.  Instead, remote control functions are implemented by cooperating
 with <bf>lirc</bf>, the Linux Infrared Remote Control program.  <bf>lirc</bf>
 handles the IR hardware and passes keystrokes to MythTV, which then acts as
-if the user had pressed the keys on the keyboard.
+if the user had pressed the keys on the keyboard.  The file
+<tt>keys.txt</tt> describes the keys used to control MythTV.
 
 <bf>NOTE</bf>:If you are running Mandrake 9.1, you may install
 <bf>lirc</bf> by executing: <tt># urpmi lirc lirc-remotes</tt> and bypass
@@ -2260,14 +2269,14 @@ like the height and width parameters specified.  It's best to leave the
 default as-is until you're sure that MythTV is operational.
 
 <sect>Using MythTV.
-<p><bf>NOTE to Red Hat 8.0 users</bf>:Red Hat Linux 8.0 ships with Gnome as
+<p>The <tt>keys.txt</tt> file describes what the various keyboard commands are.
+
+<bf>NOTE to Red Hat 8.0 users</bf>:Red Hat Linux 8.0 ships with Gnome as
 the default desktop environment.  However, Gnome seems to have issues with
 window focus and window switching which sometimes cause mythfrontend to
 obscure the video. KDE does not seem to have any such issues. Therefore you
 will need to switch to KDE by selecting RedHatMenu>Extras>System
 Settings>Desktop Switching Tool and choose "KDE".
-
-The <tt>keys.txt</tt> file describes what the various keyboard commands are.
 
 <sect1>Using themes with MythTV.
 <p>MythTV is "themeable", meaning that the visual appearance of the program
@@ -3204,7 +3213,8 @@ they run.  The following window managers are known to work correctly:
 "http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html"
 name="http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html">
 
-<sect1>Where's my "canada-cable" entry gone to? 
+<sect1>Where's my "canada-cable" entry gone to?
+<sect1>My channels are off by one.
 <p>There is no such thing as "Canada Cable"; Canada uses the same
 frequencies as the United States.  "Canada Cable" was a hack that some
 people used when they would discover that their channels were off-by-one,
@@ -3273,7 +3283,7 @@ with no major errors?
 least version 1.0-2960.
 
 <sect1>When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
-<p>You didn't add <tt>/usr/local/lib</tt> to <tt>ld.so.conf</tt>.  See the
+<p>You didn't add <tt>/usr/local/lib</tt> to <tt>/etc/ld.so.conf</tt>.  See the
 section on modifying <ref id="modifying_ld.so.conf" name="/etc/ld.so.conf">.
 
 <sect>Miscellaneous. 
@@ -3283,6 +3293,11 @@ url="http://www.mplayerhq.hu" name="http://www.mplayerhq.hu"> that allows
 you view the files created by MythTV.  MythTV doesn't use standard
 Nupplevideo files, which is why you MPlayer complains if you try to view
 them.
+
+<bf>NOTE</bf>:  If you're using a hardware MPEG2 encoder like the
+PVR-250/350 you don't need to convert - the files are actually standard
+MPEG2 with a <tt>.nuv</tt> extension.  Change it to <tt>.mpg</tt> and the
+files should display properly in other media players.
 
 Download the patch to MPlayer from Matt's website. 
 <url url="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/"
@@ -3625,6 +3640,9 @@ Next, compile the driver:
 $ cd ~/ivtv/ivtv/driver
 $ make
 </verb></tscreen>
+
+<bf>NOTE</bf>: You may get warnings about i2c during the compile.  Ignore
+them.
 
 Add the following to <tt>/etc/modules.conf</tt>:
 <tscreen><verb>
@@ -4048,18 +4066,32 @@ Add the new physical volume to the volume group:
 
 <tt># vgextend VGforMyth /dev/hdb1</tt>
 
-Make the logical volume used for video bigger:
+Once you've completed one of the following two procedures, use <bf>df</bf>
+to check that you've got more space.
+
+<sect2>ReiserFS
+<p>Make the logical volume used for video bigger:
 
 <tt># lvextend --size +50G /dev/VGforMyth/video</tt>
 
-Unmount, resize and remount the filesystem (non destructively):
+Unmount, resize and remount the filesystem.  Technically, you don't need to
+unmount and remount the ReiserFS. 
 <tscreen><verb>
 # umount /var/video
 # resize_reiserfs /dev/VGforMyth/video
 # mount /dev/VGforMyth/video /var/video
 </verb></tscreen>
 
-And check that you now have more space in /var/video using <bf>df</bf>.
+<sect2>ext2 or ext3
+<p>LVM comes with a program called <bf>e2fsadm</bf>.
+
+Unmount, resize and remount the filesystem.  The filesystem <em>must</em> be
+unmounted during this procedure.
+<tscreen><verb>
+# umount /var/video
+# e2fsadm --size +50G /dev/VGforMyth/video
+# mount /dev/VGforMyth/video /var/video
+</verb></tscreen>
 
 </article>
 <!-- Revision History
@@ -4172,6 +4204,12 @@ Lou's mythgallery doc update.  Updated XMLTV version.  Martin Smith's LVM
 contribution.  More detailed instructions on upgrading the database from one
 release to another.  Remove the "can't start early" from 10.1.  Put back the
 PDF version.
+v2.53, 2003-07-13.  Add link to searchable archive right near the top.  Added
+"Channels off by one".  Added a little more details about the "error" in the
+ivtv make.  Moved/added keys.txt to more prominent positions in the HOWTO. 
+Added note that you don't need to transcode .nuv files if they're made by a
+PVR-250/350.  Added example for LVM/ext2 and ext3.  Added note to not run
+XMLTV 0.5.15 if you're not running CVS.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-07-09, v2.52
+  2003-07-13, v2.53
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -163,15 +163,16 @@
      18.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
      18.15 My PVR-250 card doesn't show inputs in the setup screen.
      18.16 Where's my "canada-cable" entry gone to?
-     18.17 Mythweb is showing a db_open error when I connect to it.
-     18.18 error: can't find a register in class 'BREG' while reloading 'asm'
-     18.19 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     18.20 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     18.21 My mouse pointer disappears when placed over the MythTV windows.
-     18.22 What does "strange error flushing buffer" mean on my console?
-     18.23 I can't change the channel when watching Live TV.
-     18.24 Colors are wrong, people have blue faces.
-     18.25 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
+     18.17 My channels are off by one.
+     18.18 Mythweb is showing a db_open error when I connect to it.
+     18.19 error: can't find a register in class 'BREG' while reloading 'asm'
+     18.20 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     18.21 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     18.22 My mouse pointer disappears when placed over the MythTV windows.
+     18.23 What does "strange error flushing buffer" mean on my console?
+     18.24 I can't change the channel when watching Live TV.
+     18.25 Colors are wrong, people have blue faces.
+     18.26 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
 
   19. Miscellaneous.
      19.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -198,6 +199,8 @@
      19.14 Advanced Partition Formatting.
         19.14.1 Ext3
      19.15 I'd like to have more flexible disk storage with LVM.
+        19.15.1 ReiserFS
+        19.15.2 ext2 or ext3
 
 
   ______________________________________________________________________
@@ -229,10 +232,6 @@
   The other MythTV modules may be downloaded from CVS the same way;
   replace "mythtv" with "mythweather", "mythgallery", "mythmusic", etc.
 
-  A PDF version of this documentation can be obtained from
-  http://www.smalltime.com/mythtv/mythtv-HOWTO.pdf
-  <http://www.smalltime.com/mythtv/mythtv-HOWTO.pdf>
-
   [1mNOTE[22m: If you are going to use CVS to compile MythTV rather than using
   the distribution tarball, it is [1mstrongly [22mrecommended that you join the
   http://www.snowman.net/mailman/listinfo/mythtv-commits/
@@ -243,6 +242,10 @@
   It's recommended that you join the user list at
   http://www.snowman.net/mailman/listinfo/mythtv-users
   <http://www.snowman.net/mailman/listinfo/mythtv-users>.
+
+  Searchable archives for the lists are available at
+  http://www.gossamer-threads.com/archive/MythTV_C2/
+  <http://www.gossamer-threads.com/archive/MythTV_C2/>.
 
   This HOWTO is for MythTV v0.10.
 
@@ -273,9 +276,9 @@
 
   +o  Red Hat Linux 8.0 documentation: Cedar McKay,
      <mailto:mythhowto.3.ohthetrees@spamgourmet.com>
-
   +o  Gentoo documentation and package: Tony Clark,
      <mailto:tclark@telia.com>
+
   +o  Debian package: Matthew Zimmerman,  <mailto:mdz@debian.org>
 
   +o  Mandrake 8.2 documentation: Harondel J. Sibble,
@@ -407,7 +410,6 @@
   <https://listman.redhat.com/mailman/listinfo/video4linux-list>) for
   more information and for specific hardware questions.
 
-
   The most common inexpensive cards available use the Bt848 or Bt878
   video capture chip; examples are the "Hauppauge WinTV Go" card and the
   "AverTV Desktop PVR" card, both of which use the bttv kernel module.
@@ -536,6 +538,7 @@
   official support for their use with Linux. The standard XFree86 ati
   driver does not support TV-out.
 
+
   The enhanced ati.2 X driver created by the GATOS
   http://gatos.sourceforge.net <http://gatos.sourceforge.net> project
   offers some support for TV-out, but only in its "experimental"
@@ -604,7 +607,6 @@
   other features useful with TV-Out, so the [1mnvtv [22mapplication may not be
   required.
 
-
   Some nVidia cards can be run with a proprietary nVidia X driver made
   available by nVidia. See http://www.nvidia.com/view.asp?IO=linux
   <http://www.nvidia.com/view.asp?IO=linux> for more information.
@@ -671,6 +673,7 @@
 
   +o  TVIEW Gold (mentioned once, favorably)
 
+
   [1m3.2.  Software.[0m
 
   There are a few ways of installing programs on Linux systems; you can
@@ -735,7 +738,7 @@
   And finally:
 
 
-  # apt-get install mythtv-suite
+       # apt-get install mythtv-suite
 
 
 
@@ -866,6 +869,7 @@
   Red Hat Linux 8.0 installation CD, and it allows you to select
   packages at installation time, or once the system is up and running.
   You can access this program by selecting
+
   RedHatMenu>System Settings>Packages
 
 
@@ -986,14 +990,15 @@
   The simplest tool for installing packages from the command line is
   [1murpmi[22m.
 
+
   Open a shell, and execute the following, all on the same line. You may
   get asked a number of questions regarding dependencies.  It's best to
   answer "YES".
 
 
-  $ su
-  # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
-  # urpmi XFree86-devel perl
+       $ su
+       # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
+       # urpmi XFree86-devel perl
 
 
 
@@ -1045,8 +1050,7 @@
   Next you need to build Qt. If you don't plan on using the ebuilds as
   described in the Gentoo section then you also need to install lame.
 
-
-       $ emerge qt lame mysql
+  $ emerge qt lame mysql
 
 
 
@@ -1105,6 +1109,8 @@
   [1m4.1.2.  Distribution-Specific Notes[0m
 
   None
+
+
 
   [1m4.2.  Shared-Library Requirements for MythTV[0m
 
@@ -1234,11 +1240,13 @@
 
   Get MythTV from the mythtv.org <http://www.mythtv.org> web site.  Save
   the tarball to a directory you can find.
-
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.15 if you're in
+  <http://xmltv.sourceforge.net>.  Download version 0.5.14 if you're in
   North America.
 
+  [1mNOTE[22m:  0.5.14 is the last version that will work with MythTV 0.10.
+  XMLTV 0.5.15 will only work with CVS versions of MythTV.  Don't
+  install the latest version of XMLTV if you're not running CVS.
 
 
   ______________________________________________________________________
@@ -1297,21 +1305,18 @@
 
 
   Check that it worked:
+       # ls -l /usr/local/lib
+       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+       libmp3lame.so.0.0.0*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+       libmp3lame.so.0.0.0*
+       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+       libmp3lame.so.0.0.0*
 
-
-
-  # ls -l /usr/local/lib
-  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-  libmp3lame.so.0.0.0*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-  libmp3lame.so.0.0.0*
-  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-  libmp3lame.so.0.0.0*
-
-  # exit
-  $
+       # exit
+       $
 
 
 
@@ -1906,14 +1911,14 @@
   software built-in.  Instead, remote control functions are implemented
   by cooperating with [1mlirc[22m, the Linux Infrared Remote Control program.
   [1mlirc [22mhandles the IR hardware and passes keystrokes to MythTV, which
-  then acts as if the user had pressed the keys on the keyboard.
+  then acts as if the user had pressed the keys on the keyboard.  The
+  file keys.txt describes the keys used to control MythTV.
 
   [1mNOTE[22m:If you are running Mandrake 9.1, you may install [1mlirc [22mby
   executing: # urpmi lirc lirc-remotes and bypass the manual compilation
   steps described below by jumping to the ``Completing the lirc
   install'' section.  See the contrib/mandrake91.etc.sysconfig.lircd
   file for an example of how to configure lircd.
-
 
   Some IR devices require a kernel recompile, and some don't. However,
   all at least require having the kernel source available as a resource
@@ -2931,6 +2936,8 @@
 
   [1m11.  Using MythTV.[0m
 
+  The keys.txt file describes what the various keyboard commands are.
+
   [1mNOTE to Red Hat 8.0 users[22m:Red Hat Linux 8.0 ships with Gnome as the
   default desktop environment.  However, Gnome seems to have issues with
   window focus and window switching which sometimes cause mythfrontend
@@ -2938,8 +2945,6 @@
   Therefore you will need to switch to KDE by selecting
   RedHatMenu>Extras>System Settings>Desktop Switching Tool and choose
   "KDE".
-
-  The keys.txt file describes what the various keyboard commands are.
 
 
   [1m11.1.  Using themes with MythTV.[0m
@@ -4043,6 +4048,8 @@
 
   [1m18.16.  Where's my "canada-cable" entry gone to?[0m
 
+  [1m18.17.  My channels are off by one.[0m
+
   There is no such thing as "Canada Cable"; Canada uses the same
   frequencies as the United States.  "Canada Cable" was a hack that some
   people used when they would discover that their channels were off-by-
@@ -4055,7 +4062,7 @@
   more information.
 
 
-  [1m18.17.  Mythweb is showing a db_open error when I connect to it.[0m
+  [1m18.18.  Mythweb is showing a db_open error when I connect to it.[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
 
@@ -4064,7 +4071,8 @@
   Restart apache for it to take effect.
 
 
-  [1m18.18.  error: can't find a register in class 'BREG' while reloading[0m
+
+  [1m18.19.  error: can't find a register in class 'BREG' while reloading[0m
   [1m'asm'[0m
 
   This is due to the broken Qt that is being distributed by Suse.  To
@@ -4072,7 +4080,7 @@
   you find there and then recompile.
 
 
-  [1m18.19.  make: *** No rule to make target[0m
+  [1m18.20.  make: *** No rule to make target[0m
   [1m/usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.[0m
 
   This error happens when there's a missing link in the
@@ -4098,44 +4106,41 @@
   choice is the better solution.
 
 
-  [1m18.20.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
+  [1m18.21.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
   [1mneeded by Makefile'.  Stop.[0m
 
   You didn't set your QTDIR.  Re-read the section on ``Setting up
   paths''.
 
 
-  [1m18.21.  My mouse pointer disappears when placed over the MythTV win-[0m
+  [1m18.22.  My mouse pointer disappears when placed over the MythTV win-[0m
   [1mdows.[0m
 
   This is the intended behavior.  The MythTV interface is meant for use
   with a remote control or a keyboard.
 
 
-  [1m18.22.  What does "strange error flushing buffer" mean on my console?[0m
+  [1m18.23.  What does "strange error flushing buffer" mean on my console?[0m
 
   Nothing, really.  It's just lame (the mp3 encoder) complaining for
   some obscure reason.  This seems to be fixed in more recent versions
   of the libmp3lame library.
 
 
-  [1m18.23.  I can't change the channel when watching Live TV.[0m
+  [1m18.24.  I can't change the channel when watching Live TV.[0m
 
   Something's wrong with your program database.  Did mythfilldatabase
   run with no major errors?
 
 
-  [1m18.24.  Colors are wrong, people have blue faces.[0m
+  [1m18.25.  Colors are wrong, people have blue faces.[0m
 
   If you are using the binary nVidia drivers, make sure you're using at
   least version 1.0-2960.
-
-
-
-  [1m18.25.  When trying to run setup, I get an error like this: "./setup:[0m
+  [1m18.26.  When trying to run setup, I get an error like this: "./setup:[0m
   [1merror while loading shared libraries:"[0m
 
-  You didn't add /usr/local/lib to ld.so.conf.  See the section on
+  You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
   modifying ``/etc/ld.so.conf''.
 
 
@@ -4148,6 +4153,11 @@
   http://www.mplayerhq.hu <http://www.mplayerhq.hu> that allows you view
   the files created by MythTV.  MythTV doesn't use standard Nupplevideo
   files, which is why you MPlayer complains if you try to view them.
+
+  [1mNOTE[22m:  If you're using a hardware MPEG2 encoder like the PVR-250/350
+  you don't need to convert - the files are actually standard MPEG2 with
+  a .nuv extension.  Change it to .mpg and the files should display
+  properly in other media players.
 
   Download the patch to MPlayer from Matt's website.
   http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/
@@ -4186,14 +4196,16 @@
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
 
 
-       $ cat > .xinitrc
-       fvwm &
-       mythfrontend
-       ^D
-       $ cat > .fvwmrc
-       Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
-       ^D
-       $
+
+  $ cat > .xinitrc
+  fvwm &
+  mythfrontend
+  ^D
+  $ cat > .fvwmrc
+  Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
+  ^D
+  $
+
 
 
   The following also works with blackbox:
@@ -4248,6 +4260,7 @@
 
   +o  480x480 (Video CD resolution)
 
+
   +o  352x480 (ReplayTV "Standard" quality)
 
   +o  320x480
@@ -4259,7 +4272,6 @@
   +o  352x240
 
   +o  320x240
-
 
   As you can see, the lower quality values are half of the better ones.
   720x240 is possible, but isn't a good tradeoff relative to the number
@@ -4381,19 +4393,17 @@
 
   See the [1mmysqldump [22mmanpage for more information.
 
-
-       $ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
+  $ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
 
 
 
   To restore: (assuming that you've dropped the database)
 
 
-
-  $ mysql -u root
-  mysql>create database mythconverg;
-  mysql>exit
-  $ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
+       $ mysql -u root
+       mysql>create database mythconverg;
+       mysql>exit
+       $ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
 
 
 
@@ -4444,6 +4454,7 @@
   +o  Pinnacle Studio PCTV Pro - note: this has a MSP34xx, but it's not
      wired correctly to the BT878 chip.
 
+
   +o  ATI TV Wonder VE
 
   +o  Leadtek Winfast 2000 XP (PAL, UK and NTSC)
@@ -4451,7 +4462,6 @@
   +o  I/O Magic PC-PVR.  No MSP34xx chip.
 
   The following cards have been reported to work, but have issues:
-
 
   +o  Avermedia AVerTV Studio (no digital DSP output, "whiney noise" on
      analog)
@@ -4513,13 +4523,12 @@
   then alter the [1murpmi [22mcommand appropriately.)
 
 
+       $ uname -a
+       Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+       unknown GNU/Linux
 
-  $ uname -a
-  Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-  unknown GNU/Linux
-
-  $ su
-  # urpmi kernel-source
+       $ su
+       # urpmi kernel-source
 
 
 
@@ -4558,6 +4567,8 @@
 
 
 
+  [1mNOTE[22m: You may get warnings about i2c during the compile.  Ignore them.
+
   Add the following to /etc/modules.conf:
 
 
@@ -4569,12 +4580,12 @@
        add below ivtv msp3400 saa7115 tuner
 
 
-
   [1mNOTE[22m:  You must specify the tuner type manually.  See
   ~/ivtv/ivtv/driver/tuner.h for a listing of tuners.  In the above
   example, tuner type=2 is a Phillips NTSC.  Use an appropriate tuner
   type for your system and video standard.  The debug=1 parameter on the
   ivtv line actually means less debugging output will be printed.
+
   Next, copy the files that were compiled in the driver directory into
   the appropriate modules directory:
 
@@ -4635,7 +4646,6 @@
   the default values.  Change the default input to an appropriate
   setting for your configuration.  Change the card type to "Hardware
   MPEG Encoder Card" and press ENTER.
-
 
   The remaining setup is just like a standard V4L card; define a video
   source if you have not already done so, and assign the video source to
@@ -4698,8 +4708,7 @@
   you'll want to edit your /etc/exports file and use something like:
 
 
-
-  /var/video (rw)
+       /var/video (rw)
 
 
 
@@ -4759,7 +4768,6 @@
   Edit /etc/sysconfig/mythbackend if you want to change the defaults
   (the userid that should start mythbackend, location of the logfile and
   (if required) the name and location of the mythbackend binary).
-
 
   Use [1mchkconfig [22mto make sure the script is called when entering
   runlevels 3, 4 or 5:
@@ -4822,10 +4830,11 @@
   A copy of the above has been included in the contrib/ directory.  You
   may add it by typing:
 
-  $ cd contrib
-  $ su
-  # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-  # exit
+
+       $ cd contrib
+       $ su
+       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+       # exit
 
 
 
@@ -4876,6 +4885,7 @@
   Backend [4mmust[24m have a capture device defined, but shouldn't imply that
   the capture device in the MBE must be the first capture card defined
   in the database.
+
 
   One example of an advanced configuration is the round-robin scheme.
   Rather than defining all of the cards on the master, you could first
@@ -4947,7 +4957,8 @@
   You may also modify some aspects of a filesystem such as the reserved
   block percentage after it has been created using the [1mtune2fs [22mprogram:
 
-  # tune2fs -m 0 /dev/hdb1
+
+       # tune2fs -m 0 /dev/hdb1
 
 
 
@@ -5006,12 +5017,11 @@
        # pvcreate /dev/hda5
 
 
-
   Create a LVM volume group out of this physical volume called
   "VGforMyth" that is allocated in chunks that are a multiple of 64MB
 
 
-  # vgcreate --name VGforMyth -s 64m /dev/hda5
+       # vgcreate --name VGforMyth -s 64m /dev/hda5
 
 
 
@@ -5053,20 +5063,38 @@
 
   # vgextend VGforMyth /dev/hdb1
 
+  Once you've completed one of the following two procedures, use [1mdf [22mto
+  check that you've got more space.
+
+
+  [1m19.15.1.  ReiserFS[0m
+
   Make the logical volume used for video bigger:
 
   # lvextend --size +50G /dev/VGforMyth/video
 
-  Unmount, resize and remount the filesystem (non destructively):
+  Unmount, resize and remount the filesystem.  Technically, you don't
+  need to unmount and remount the ReiserFS.
+
+
+
+  # umount /var/video
+  # resize_reiserfs /dev/VGforMyth/video
+  # mount /dev/VGforMyth/video /var/video
+
+
+
+  [1m19.15.2.  ext2 or ext3[0m
+
+  LVM comes with a program called [1me2fsadm[22m.
+
+  Unmount, resize and remount the filesystem.  The filesystem [4mmust[24m be
+  unmounted during this procedure.
 
 
        # umount /var/video
-       # resize_reiserfs /dev/VGforMyth/video
+       # e2fsadm --size +50G /dev/VGforMyth/video
        # mount /dev/VGforMyth/video /var/video
-
-
-
-  And check that you now have more space in /var/video using [1mdf[22m.
 
 
 
