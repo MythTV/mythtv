@@ -216,7 +216,7 @@
 
   <buttondef name="RECIPE">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/stop.png</watermarkimage>
+     <watermarkimage>watermark/pizza.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
@@ -274,7 +274,7 @@
 
   <buttondef name="SETTINGS_FM">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/stop.png</watermarkimage>
+     <watermarkimage>watermark/wrench.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
@@ -310,13 +310,13 @@
 
   <buttondef name="SETTINGS_RECIPE">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/stop.png</watermarkimage>
+     <watermarkimage>watermark/pizza.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_XBOX">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/stop.png</watermarkimage>
+     <watermarkimage>watermark/wrench.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
@@ -500,9 +500,9 @@
     <offset>0,0</offset>
   </buttondef>
 
-<!-- #################################-->
+<!-- ################################-->
 <!-- ########  tv_lists.xml  ########-->
-<!-- #################################-->
+<!-- ################################-->
 
   <buttondef name="TV_SEARCH_NEW_TITLES">
     <image>text-blank.png</image>
