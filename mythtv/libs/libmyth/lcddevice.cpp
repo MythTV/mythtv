@@ -313,6 +313,7 @@ void LCD::init()
     lcd_showgeneric=(gContext->GetSetting("LCDShowGeneric", "1")=="1");
     lcd_showvolume=(gContext->GetSetting("LCDShowVolume", "1")=="1");
     lcd_showmenu=(gContext->GetSetting("LCDShowMenu", "1")=="1");
+    lcd_backlighton=(gContext->GetSetting("LCDBacklightOn", "1")=="1");
 
     connected = TRUE;
 
@@ -329,6 +330,10 @@ void LCD::init()
     sendToServer("screen_add Time");
     sendToServer("widget_del Time heartbeat");
     sendToServer("screen_set Time priority 255");
+    if (lcd_backlighton)
+        sendToServer("screen_set Time backlight on");
+    else
+        sendToServer("screen_set Time backlight off");
     sendToServer("widget_add Time timeWidget string");
     sendToServer("widget_add Time topWidget string");
 
@@ -339,6 +344,7 @@ void LCD::init()
     sendToServer("screen_add Menu");
     sendToServer("widget_del Menu heartbeat");
     sendToServer("screen_set Menu priority 255");
+    sendToServer("screen_set Menu backlight on");
     sendToServer("widget_add Menu topWidget string");
     sendToServer("widget_add Menu menuWidget1 string");
     sendToServer("widget_add Menu menuWidget2 string");
@@ -351,6 +357,7 @@ void LCD::init()
     sendToServer("screen_add Music");
     sendToServer("widget_del Music heartbeat");
     sendToServer("screen_set Music priority 255");
+    sendToServer("screen_set Music backlight on");
     sendToServer("widget_add Music topWidget string");
     
     // Have to put in 10 bars for equalizer
@@ -368,6 +375,7 @@ void LCD::init()
     sendToServer("screen_add Channel");
     sendToServer("widget_del Channel heartbeat");
     sendToServer("screen_set Channel priority 255");
+    sendToServer("screen_set Channel backlight on");
     sendToServer("widget_add Channel topWidget string");
     sendToServer("widget_add Channel botWidget string");
     sendToServer("widget_add Channel progressBar hbar");
@@ -377,6 +385,7 @@ void LCD::init()
     sendToServer("screen_add Generic");
     sendToServer("widget_del Generic heartbeat");
     sendToServer("screen_set Generic priority 255");
+    sendToServer("screen_set Generic backlight on");
     sendToServer("widget_add Generic textWidget1 string");
     sendToServer("widget_add Generic textWidget2 string");
     sendToServer("widget_add Generic textWidget3 string");
@@ -387,14 +396,11 @@ void LCD::init()
     sendToServer("screen_add Volume");
     sendToServer("widget_del Volume heartbeat");
     sendToServer("screen_set Volume priority 255");
+    sendToServer("screen_set Volume backlight on");
     sendToServer("widget_add Volume topWidget string");
     sendToServer("widget_add Volume botWidget string");
     sendToServer("widget_add Volume progressBar hbar");
 
-    // Turn on the backlight
-
-    sendToServer("backlight 255");
-    
     lcd_ready = true;
  
     switchToTime();    // clock is on by default
@@ -512,8 +518,7 @@ void LCD::stopAll()
 
 void LCD::startTime()
 {
-    if (lcd_showtime)
-        sendToServer("screen_set Time priority 128");
+    sendToServer("screen_set Time priority 128");
     timeTimer->start(1000, FALSE);
     outputTime();
     theMode = 0;    
@@ -1256,15 +1261,18 @@ void LCD::outputTime()
     aString += " ";
     aString += QString::number(y);
     aString += " \"";
-    aString += QTime::currentTime().toString(timeformat).left(8) + "\"";
-    if (timeFlash)
-    {
-        aString = aString.replace(QRegExp(":"), " ");
-        timeFlash = false;
+    if (lcd_showtime) {
+        aString += QTime::currentTime().toString(timeformat).left(8) + "\"";
+        if (timeFlash)
+        {
+            aString = aString.replace(QRegExp(":"), " ");
+            timeFlash = false;
+        }
+        else
+            timeFlash = true;
     }
     else
-        timeFlash = true;
-
+        aString += " \"";
     sendToServer(aString);
 }
 

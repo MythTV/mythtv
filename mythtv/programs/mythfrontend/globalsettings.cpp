@@ -2538,6 +2538,17 @@ public:
     };
 };
 
+class LCDBacklightOn: public CheckBoxSetting, public GlobalSetting {
+public:
+    LCDBacklightOn(): 
+        GlobalSetting("LCDBacklightOn") {
+        setLabel(QObject::tr("LCD Backlight Always On"));
+        setHelpText(QObject::tr("Turn on the backlight permanently. Need to "
+                    "restart mythfrontend to (de)activate it."));
+        setValue(true);
+    };
+};
+
 MainGeneralSettings::MainGeneralSettings()
 {
     AudioSettings *audio = new AudioSettings();
@@ -2792,6 +2803,7 @@ AppearanceSettings::AppearanceSettings()
     lcdscreen->addChild(new LCDShowChannel());
     lcdscreen->addChild(new LCDShowVolume());
     lcdscreen->addChild(new LCDShowGeneric());
+    lcdscreen->addChild(new LCDBacklightOn());
     addChild(lcdscreen);
 #endif
 }

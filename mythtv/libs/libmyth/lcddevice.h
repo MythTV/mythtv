@@ -273,6 +273,7 @@ class LCD : public QObject
     bool lcd_showmusic;
     bool lcd_showchannel;
     bool lcd_showvolume;
+    bool lcd_backlighton;
 
     int (*GetLEDMask)(void);
 };
