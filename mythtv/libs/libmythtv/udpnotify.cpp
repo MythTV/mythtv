@@ -353,7 +353,7 @@ void UDPNotify::incomingData(int socket)
             if (e.tagName() == "container")
             {
                 UDPNotifyOSDSet *container = parseContainer(e);
-                if (container)
+                if (osd && container)
                     osd->StartNotify(container, displaytime);
             }
             else
