@@ -172,7 +172,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         else
         {
             VERBOSE(VB_IMPORTANT,QString("FilterManager: failed to load "
-                    "filter '%1'").arg(FiltName));
+                    "filter '%1', no such filter exists").arg(FiltName));
             FiltInfoChain.clear();
             break;
         }
@@ -249,8 +249,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, "FilterManager: failed to allocate FC "
-                        "for conver filter");
+                VERBOSE(VB_IMPORTANT, "FilterManager: memory allocation "
+                        "failure, returning empty filter chain");
                 FiltInfoChain.clear();
                 break;
             }
@@ -263,7 +263,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "FilterManager: failed to allocate FC");
+            VERBOSE(VB_IMPORTANT, "FilterManager: memory allocation failure, "
+                    "returning empty filter chain");
             FiltInfoChain.clear();
             break;
         }
@@ -291,8 +292,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, "FilterManager: failed to allocate FC "
-                        "for conver filter");
+                VERBOSE(VB_IMPORTANT, "FilterManager: memory allocation "
+                        "failure, returning empty filter chain");
                 FiltInfoChain.clear();
             }
         }
@@ -418,19 +419,41 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
 
     if (FiltInfo == NULL)
     {
-        cerr << "FilterManager::LoadFilter: called with NULL FilterInfo"
-             << endl;
+        VERBOSE(VB_IMPORTANT, "FilterManager: LoadFilter called with NULL"
+                "FilterInfo");
+        return NULL;
+    }
+
+    if (FiltInfo->libname == NULL)
+    {
+        VERBOSE(VB_IMPORTANT, "FilterManager: LoadFilter called with invalid "
+                "FilterInfo (libname is NULL)");
+        return NULL;
+    }
+
+    if (FiltInfo->symbol == NULL)
+    {
+        VERBOSE(VB_IMPORTANT, "FilterManager: LoadFilter called with invalid "
+                "FilterInfo (symbol is NULL)");
         return NULL;
     }
 
     handle = dlopen(FiltInfo->libname, RTLD_NOW);
 
-    if (!handle)
+    if ((error = dlerror()))
     {
-        cerr << "FilterManager::LoadFilter: unable to load shared library "
-             << FiltInfo->libname << endl;
-        if ((error = dlerror()))
-            cerr << "Dlopen error: " << error << endl;
+        VERBOSE(VB_IMPORTANT, QString("FilterManager: unable to load "
+                "shared library '%1', dlopen reports error '%2'")
+                .arg(FiltInfo->libname)
+                .arg(error));
+        return NULL;
+    }
+
+    if (handle == NULL)
+    {
+        VERBOSE(VB_IMPORTANT, QString("FilterManager: dlopen did not report "
+                "an error, but returned a NULL handle for shared library '%1'")
+                .arg(FiltInfo->libname));
         return NULL;
     }
 
@@ -441,16 +464,26 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
 
     if ((error = dlerror()))
     {
-        cerr << "FilterManager::LoadFilter: failed to load symbol "
-             << FiltInfo->symbol << " from " << FiltInfo->libname << endl
-             << "Dlopen error: " << error << endl;
-        dlclose (handle);
+        VERBOSE(VB_IMPORTANT, QString("FilterManager: unable to load symbol "
+                "'%1' from shared library '%2', dlopen reports error '%3'")
+                .arg(FiltInfo->symbol)
+                .arg(FiltInfo->libname)
+                .arg(error));
+        return NULL;
+    }
+
+    if (InitFilter == NULL)
+    {
+        VERBOSE(VB_IMPORTANT, QString("FilterManager: dlopen did not report "
+                "an error, but returned NULL for symbol '%1' from shared "
+                "library '%2'")
+                .arg(FiltInfo->symbol,FiltInfo->libname));
         return NULL;
     }
 
     Filter = (*InitFilter)(inpixfmt, outpixfmt, &width, &height, opts);
 
-    if (!Filter)
+    if (Filter == NULL)
     {
         return NULL;
     }
@@ -465,4 +498,3 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
     Filter->info = FiltInfo;
     return Filter;
 }
-
