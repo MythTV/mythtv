@@ -24,4 +24,6 @@ HEADERS += config.h settings.h dbcheck.h
 
 SOURCES += main.cpp settings.cpp dbcheck.cpp
 
-
+macx {
+    QMAKE_LFLAGS += -flat_namespace -undefined suppress
+}

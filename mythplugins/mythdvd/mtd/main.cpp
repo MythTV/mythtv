@@ -21,7 +21,9 @@ using namespace std;
 
 #include "../mythdvd/config.h"
 #include "../mythdvd/dbcheck.h"
+#if TRANSCODE_SUPPORT
 #include "mtd.h"
+#endif
 
 int main(int argc, char **argv)
 {
@@ -143,7 +145,7 @@ int main(int argc, char **argv)
     //
    
     QTranslator translator( 0 );
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythdvd_") +
+    translator.load(gContext->GetTranslationsDir() + QString("mythdvd_") +
                     QString(gContext->GetSetting("Language").lower()) +
                     QString(".qm"), ".");
     qApp->installTranslator(&translator); 
