@@ -15,6 +15,11 @@ DEFINES += PREFIX=\"$${PREFIX}\"
 release {
         DEFINES += MMX
         QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
+    macx {
+        DEFINES -= MMX
+        # Don't use -O3, it causes some Qt moc methods to go missing
+        QMAKE_CXXFLAGS_RELEASE = -O2
+    }
         QMAKE_CFLAGS_RELEASE = $${QMAKE_CXXFLAGS_RELEASE}
 }
 
@@ -84,6 +89,14 @@ DEFINES += USING_OSS
 # Windows support
 #CONFIG += win32
 #DEFINES += _WIN32
+
+# Mac OS X support
+macx {
+    # For source that uses Qt, Q_OS_MACX is defined.
+    # For source that uses config.h, CONFIG_DARWIN is defined.
+    # For other source (e.g. libmythtv), we define this
+    DEFINES += CONFIG_DARWIN
+}
 
 # DirectX support
 #CONFIG += using_directx
