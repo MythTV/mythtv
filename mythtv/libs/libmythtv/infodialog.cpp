@@ -81,7 +81,6 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
 
     QVBoxLayout *middleBox = new QVBoxLayout(vbox);
 
-
     norec = new QCheckBox("Don't record this program", this);
     middleBox->addWidget(norec);
     connect(norec, SIGNAL(clicked()), this, SLOT(norecPressed()));
@@ -107,7 +106,11 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     else
         rectimeslot->hide();
 
-    recevery = new QCheckBox("Record this program whenever it's shown", this);
+    recchannel = new QCheckBox("Record this program whenever it's shown on this channel", this);
+    middleBox->addWidget(recchannel);
+    connect(recchannel, SIGNAL(clicked()), this, SLOT(recchannelPressed()));
+
+    recevery = new QCheckBox("Record this program whenever it's shown anywhere", this);
     middleBox->addWidget(recevery);
     connect(recevery, SIGNAL(clicked()), this, SLOT(receveryPressed()));
 
@@ -135,6 +138,8 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
         recone->setChecked(true);
     else if (recordstatus == kTimeslotRecord)
         rectimeslot->setChecked(true);
+    else if (recordstatus == kChannelRecord)
+        recchannel->setChecked(true);
     else if (recordstatus == kAllRecord)
         recevery->setChecked(true);
     else
@@ -171,6 +176,8 @@ void InfoDialog::norecPressed(void)
         rectimeslot->setChecked(false);
     if (recevery->isChecked())
         recevery->setChecked(false);
+    if (recchannel->isChecked())
+        recchannel->setChecked(false);
 }
 
 void InfoDialog::reconePressed(void)
@@ -185,6 +192,8 @@ void InfoDialog::reconePressed(void)
             norec->setChecked(false);
         if (rectimeslot->isChecked())
             rectimeslot->setChecked(false);
+        if (recchannel->isChecked())
+            recchannel->setChecked(false);
         if (recevery->isChecked())
             recevery->setChecked(false);
     }
@@ -202,6 +211,27 @@ void InfoDialog::rectimeslotPressed(void)
             norec->setChecked(false);
         if (recone->isChecked())
             recone->setChecked(false);
+        if (recchannel->isChecked())
+            recchannel->setChecked(false);
+        if (recevery->isChecked())
+            recevery->setChecked(false);
+    }
+}
+
+void InfoDialog::recchannelPressed(void)
+{   
+    if (!recchannel->isChecked())
+    {
+        norec->setChecked(true);
+    }
+    else 
+    {
+        if (norec->isChecked())
+            norec->setChecked(false);
+        if (recone->isChecked())
+            recone->setChecked(false);
+        if (rectimeslot->isChecked())
+            rectimeslot->setChecked(false);
         if (recevery->isChecked())
             recevery->setChecked(false);
     }
@@ -221,6 +251,8 @@ void InfoDialog::receveryPressed(void)
             recone->setChecked(false);
         if (rectimeslot->isChecked())
             rectimeslot->setChecked(false);
+        if (recchannel->isChecked())
+            recchannel->setChecked(false);
     }
 }
 
@@ -231,6 +263,8 @@ void InfoDialog::okPressed(void)
         currentSelected = kSingleRecord;
     else if (rectimeslot->isChecked())
         currentSelected = kTimeslotRecord;
+    else if (recchannel->isChecked())
+        currentSelected = kChannelRecord;
     else if (recevery->isChecked())
         currentSelected = kAllRecord;
 

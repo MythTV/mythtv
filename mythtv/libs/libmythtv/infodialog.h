@@ -19,6 +19,7 @@ class InfoDialog : public QDialog
     void norecPressed(void);
     void reconePressed(void);
     void rectimeslotPressed(void);
+    void recchannelPressed(void);
     void receveryPressed(void);
     void okPressed(void);
 
@@ -28,6 +29,7 @@ class InfoDialog : public QDialog
     QCheckBox *norec;
     QCheckBox *recone;
     QCheckBox *rectimeslot;
+    QCheckBox *recchannel;
     QCheckBox *recevery;
 
     int programtype;

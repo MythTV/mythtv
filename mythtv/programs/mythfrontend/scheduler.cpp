@@ -284,7 +284,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         }
     }
 
-    thequery = "SELECT title FROM allrecord;";
+    thequery = "SELECT title,chanid FROM allrecord;";
     query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -292,7 +292,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         while (query.next())
         {
             QString title = query.value(0).toString();
-   
+            int chanid = query.value(1).toInt();   
+
             if (title == QString::null)
                 continue;
 
@@ -314,8 +315,12 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                                "channel.channum "
                                "FROM program,channel WHERE starttime >= %1 AND "
                                "endtime < %2 AND title = \"%3\" AND "
-                               "channel.chanid = program.chanid;")
+                               "channel.chanid = program.chanid")
                                .arg(startquery).arg(endquery).arg(title);
+
+            if (chanid > 0)
+                thequery += QString(" AND channel.chanid = %1").arg(chanid);
+            thequery += ";";
 
             subquery = db->exec(thequery);
 
@@ -338,7 +343,10 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                     proginfo->description = subquery.value(6).toString();
                     proginfo->chanstr = subquery.value(7).toString();
 
-                    proginfo->recordtype = kAllRecord;
+                    if (chanid > 0)
+                        proginfo->recordtype = kChannelRecord;
+                    else
+                        proginfo->recordtype = kAllRecord;
 
                     if (proginfo->title == QString::null)
                         proginfo->title = "";
@@ -386,7 +394,7 @@ void Scheduler::PrintList(void)
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
-        cout << first->title << " " << first->chanstr << " " << first->chanid << " " << " \"" << first->startts.toString() << "\" " << first->sourceid << " " << first->inputid << " " << first->cardid << " --\t"  << first->conflicting << " " << first->recording << endl;
+        cout << first->title << " " << first->chanstr << " " << first->chanid << " " << first->recordtype << " \"" << first->startts.toString() << "\" " << first->sourceid << " " << first->inputid << " " << first->cardid << " --\t"  << first->conflicting << " " << first->recording << endl;
     }
 
     cout << endl << endl;

@@ -47,7 +47,8 @@ CREATE TABLE timeslotrecord
 );
 CREATE TABLE allrecord
 (
-    title VARCHAR(128) NULL
+    title VARCHAR(128) NULL,
+    chanid INT UNSIGNED NULL
 );
 CREATE TABLE recorded
 (

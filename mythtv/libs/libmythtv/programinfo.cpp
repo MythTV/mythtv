@@ -164,7 +164,7 @@ RecordingType ProgramInfo::GetProgramRecordingStatus(void)
     {
         query.next();
         recordtype = kSingleRecord;
-        return kSingleRecord;
+        return recordtype;
     }
 
     for (int i = 0; i < 8; i++)
@@ -184,10 +184,10 @@ RecordingType ProgramInfo::GetProgramRecordingStatus(void)
     {
         query.next();
         recordtype = kTimeslotRecord;
-        return kTimeslotRecord;
+        return recordtype;
     }
 
-    thequery = QString("SELECT NULL FROM allrecord WHERE title = \"%1\";")
+    thequery = QString("SELECT chanid FROM allrecord WHERE title = \"%1\";")
                        .arg(title);
 
     query.exec(thequery);
@@ -195,12 +195,18 @@ RecordingType ProgramInfo::GetProgramRecordingStatus(void)
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
+
+        if (query.value(0).toInt() > 0)
+        {
+            recordtype = kChannelRecord;
+            return recordtype;
+        }    
         recordtype = kAllRecord;
-        return kAllRecord;
+        return recordtype;
     }
 
     recordtype = kNotRecording;
-    return kNotRecording;
+    return recordtype;
 }
 
 // newstate uses same values as return of GetProgramRecordingState
@@ -244,6 +250,13 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
 
         query.exec(thequery);
     }
+    else if (recordtype == kChannelRecord)
+    {
+        thequery = QString("DELETE FROM allrecord WHERE title = \"%1\" AND "
+                           "chanid = %2;").arg(title).arg(chanid);
+
+        query.exec(thequery);
+    }
     else if (recordtype == kAllRecord)
     {
         thequery = QString("DELETE FROM allrecord WHERE title = \"%1\";")
@@ -273,6 +286,12 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
                            "endtime,title) VALUES(%1,%2,%3,\"%4\");")
                            .arg(chanid).arg(sqlstarttime).arg(sqlendtime)
                            .arg(title);
+        query.exec(thequery);
+    }
+    else if (newstate == kChannelRecord)
+    {
+        thequery = QString("INSERT INTO allrecord (title,chanid) VALUES("
+                           "\"%1\",%2);").arg(title).arg(chanid);
         query.exec(thequery);
     }
     else if (newstate == kAllRecord)

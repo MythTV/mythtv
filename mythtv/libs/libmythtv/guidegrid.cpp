@@ -627,6 +627,8 @@ void GuideGrid::paintPrograms(QPainter *p)
                         text = "R";
                     else if (pginfo->recordtype == kTimeslotRecord)
                         text = "T";
+                    else if (pginfo->recordtype == kChannelRecord)
+                        text = "C";
                     else if (pginfo->recordtype == kAllRecord) 
                         text = "A";
 

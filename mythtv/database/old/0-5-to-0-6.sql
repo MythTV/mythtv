@@ -23,6 +23,7 @@ ALTER TABLE conflictresolutionoverride CHANGE channum chanid INT UNSIGNED NOT NU
 ALTER TABLE conflictresolutionsingle CHANGE preferchannum preferchanid INT UNSIGNED NOT NULL;
 ALTER TABLE conflictresolutionsingle CHANGE dislikechannum dislikechanid INT UNSIGNED NOT NULL;
 ALTER TABLE oldrecorded CHANGE channum chanid INT UNSIGNED NOT NULL;
+ALTER TABLE allrecord ADD chanid INT UNSIGNED NULL;
 
 CREATE TABLE capturecard
 (
