@@ -1349,7 +1349,8 @@ void Weather::UpdateData()
 
 	if (httpData.find("<html>", 0) > 0 || 
 	    httpData.find("Microsoft VBScript runtime", 0) > 0 ||
-	    httpData.find("Internal Server Error", 0) > 0)
+	    httpData.find("Internal Server Error", 0) > 0 ||
+	    httpData.find("Bad Request", 0) > 0)
 	{
 		validArea = false;
 		httpData = oldhttpData;
@@ -1685,8 +1686,10 @@ void Weather::closeConnection()
     {
 	QTextStream os(httpSock);
 	//cerr << "Connected! Requesting Weather Data ...\n";
-        os << "GET /m/chnk/d/weather_d_src.asp?acid=" << locale << " HTTP/1.1";
-	os << "\nhostname:www.msnbc.com\n\n";
+        os << "GET /m/chnk/d/weather_d_src.asp?acid=" 
+	   << locale << " HTTP/1.1\n"
+	   << "Connection: close\n"
+	   << "Host: www.msnbc.com\n\n\n";
 	httpData = "";
     }
 
