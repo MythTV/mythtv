@@ -56,6 +56,11 @@ class AudioOutput : public VolumeBase, public OutputListeners
 
     QString GetError() { return lastError; };
 
+    //  Only really used by the AudioOutputNULL object
+    
+    virtual void bufferOutputData(bool y) = 0;
+    virtual int readOutputData(unsigned char *read_buffer, int max_length) = 0;
+
  protected:
     void Error(QString msg) 
      { lastError = msg; VERBOSE(VB_ALL, lastError); };

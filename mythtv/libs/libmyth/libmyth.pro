@@ -17,7 +17,7 @@ HEADERS += mythdialogs.h audiooutput.h inetcomms.h httpcomms.h mythmedia.h
 HEADERS += uilistbtntype.h uiphoneentry.h generictree.h screensaver.h
 HEADERS += managedlist.h DisplayRes.h volumebase.h audiooutputbase.h
 HEADERS += dbsettings.h screensaver-null.h output.h visual.h
-HEADERS += langsettings.h
+HEADERS += langsettings.h audiooutputnull.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
@@ -27,7 +27,7 @@ SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp uiphoneentry.cpp
 SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp
 SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
-SOURCES += langsettings.cpp mythdbcon.cpp
+SOURCES += langsettings.cpp mythdbcon.cpp audiooutputnull.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../..
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch

@@ -6,6 +6,7 @@ using namespace std;
 
 #include "config.h"
 #include "audiooutput.h"
+#include "audiooutputnull.h"
 #ifdef USING_DIRECTX
 #include "audiooutputdx.h"
 #endif
@@ -39,6 +40,11 @@ AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits,
                               "but ALSA support is not compiled in!");
         return NULL;
 #endif
+    }
+    else if (audiodevice.startsWith("NULL"))
+    {
+        return new AudioOutputNULL(audiodevice, audio_bits,
+                                   audio_channels, audio_samplerate, source, set_initial_vol);
     }
     else if (audiodevice.startsWith("ARTS:"))
     {

@@ -18,7 +18,7 @@ class AudioOutputBase : public AudioOutput
  public:
     AudioOutputBase(QString audiodevice, int laudio_bits,
                     int laudio_channels, int laudio_samplerate,
-                    AudioOutputSource source, bool set_initial_vol);    
+                    AudioOutputSource source, bool set_initial_vol);
     virtual ~AudioOutputBase();
 
     // reconfigure sound out for new params
@@ -55,6 +55,11 @@ class AudioOutputBase : public AudioOutput
 
     virtual void SetSourceBitrate(int rate);
 
+    //  Only really used by the AudioOutputNULL object
+    
+    virtual void bufferOutputData(bool y){ buffer_output_data_for_use = y; }
+    virtual int readOutputData(unsigned char *read_buffer, int max_length);
+    
  protected:
 
     // You need to implement the following functions
@@ -108,6 +113,7 @@ class AudioOutputBase : public AudioOutput
 
     bool pauseaudio, audio_actually_paused, was_paused;
     bool set_initial_vol;
+    bool buffer_output_data_for_use; //  used by AudioOutputNULL
     
  private:
     QString lastError;
@@ -152,6 +158,8 @@ class AudioOutputBase : public AudioOutput
 
     long current_seconds;
     long source_bitrate;    
+    
+
 };
 
 #endif

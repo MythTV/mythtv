@@ -34,6 +34,8 @@ AudioOutputBase::AudioOutputBase(QString audiodevice, int,
     this->source = source;
     this->set_initial_vol = set_initial_vol;
     soundcard_buffer_size = 0;
+    buffer_output_data_for_use = false; // used by AudioOutputNULL
+
 
     src_ctx = NULL;
 
@@ -859,6 +861,7 @@ void AudioOutputBase::Drain()
 {
     while (audiolen(true) > fragment_size)
     {
+        cout << "I'm in mythlib draining" << endl; 
         usleep(1000);
     }
 }
@@ -870,5 +873,12 @@ void *AudioOutputBase::kickoffOutputAudioLoop(void *player)
     ((AudioOutputBase *)player)->OutputAudioLoop();
     VERBOSE(VB_AUDIO, "kickoffOutputAudioLoop exiting");
     return NULL;
+}
+
+int AudioOutputBase::readOutputData(unsigned char*, int)
+{
+    VERBOSE(VB_IMPORTANT, "base AudioOutputBase should not be "
+                          "getting asked to readOutputData()");
+    return 0;
 }
 
