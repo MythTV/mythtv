@@ -119,10 +119,10 @@ void LayerSet::SetText(QMap<QString, QString> &infoMap)
             else if (new_text.contains(QRegExp("%.*%")))
                 for (; riter != infoMap.end(); riter++)
                 {
-                   full_regex = "%" + riter.key().upper() + 
+                   full_regex = "%" + riter.key().upper() +
                      "(\\|([^%|]*))?" + "(\\|([^%|]*))?" + "(\\|([^%]*))?%";
                    if (riter.data() != "")
-                       new_text.replace(QRegExp(full_regex), 
+                       new_text.replace(QRegExp(full_regex),
                                         "\\2" + riter.data() + "\\4");
                    else
                        new_text.replace(QRegExp(full_regex), "\\6");
@@ -200,14 +200,14 @@ void UIType::DrawRegion(QPainter *dr, QRect &area, int drawlayer, int context)
     (void)context;
 }
 
-void UIType::SetParent(LayerSet *parent) 
-{ 
-    m_parent = parent; 
+void UIType::SetParent(LayerSet *parent)
+{
+    m_parent = parent;
 }
 
-QString UIType::Name() 
-{ 
-    return m_name; 
+QString UIType::Name()
+{
+    return m_name;
 }
 
 bool UIType::takeFocus()
@@ -247,7 +247,7 @@ void UIType::show()
     //  though, and inherited fancy classes like UIListBttn can/will/should
     //  set a timer and fade things on a show()
     //
-    
+
     hidden = false;
     refresh();
 }
@@ -268,11 +268,11 @@ bool UIType::toggleShow()
     {
         hide();
     }
-    
+
     return !hidden;
 }
 
-QString UIType::cutDown(const QString &data, QFont *testFont, bool multiline, 
+QString UIType::cutDown(const QString &data, QFont *testFont, bool multiline,
                         int overload_width, int overload_height)
 {
     int length = data.length();
@@ -288,28 +288,28 @@ QString UIType::cutDown(const QString &data, QFont *testFont, bool multiline,
 
     int justification = Qt::AlignLeft | Qt::WordBreak;
     QFontMetrics fm(*testFont);
-       
+
     int margin = length - 1;
     int index = 0;
     int diff = 0;
 
-    while (margin > 0) 
+    while (margin > 0)
     {
         if (multiline)
-            diff = maxheight - fm.boundingRect(0, 0, maxwidth, maxheight, 
-                                               justification, data, 
+            diff = maxheight - fm.boundingRect(0, 0, maxwidth, maxheight,
+                                               justification, data,
                                                index + margin).height();
         else
-            diff = maxwidth - fm.width(data, index + margin);                      
+            diff = maxwidth - fm.width(data, index + margin);
         if (diff >= 0)
             index += margin;
 
         margin /= 2;
-       
+
         if (index + margin >= length - 1)
             margin = (length - 1) - index;
     }
-    
+
     if (index < length - 1)
     {
         QString tmpStr(data);
@@ -317,8 +317,8 @@ QString UIType::cutDown(const QString &data, QFont *testFont, bool multiline,
         if (index >= 3)
             tmpStr.replace(index - 3, 3, "...");
         return tmpStr;
-    }    
-    
+    }
+
     return data;
 }
 
@@ -336,7 +336,7 @@ UIBarType::UIBarType(const QString &name, QString imgfile,
     m_displaysize = displayrect;
     m_order = dorder;
     m_justification = (Qt::AlignLeft | Qt::AlignVCenter);
-  
+
     m_textoffset = QPoint(0, 0);
     m_iconoffset = QPoint(0, 0);
 
@@ -344,7 +344,7 @@ UIBarType::UIBarType(const QString &name, QString imgfile,
 
 UIBarType::~UIBarType()
 {
-} 
+}
 
 void UIBarType::SetText(int num, QString myText)
 {
@@ -457,7 +457,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
 
       if (m_size < 0)
          cerr << "uitypes.cpp:UIBarType:Size is < 0!\n";
- 
+
       int xdrop = 0;
       int ydrop = 0;
       int drawx = 0;
@@ -476,7 +476,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
 
       for (int i = 0; i < m_size; i++)
       {
-        if (m_debug == true) 
+        if (m_debug == true)
             cerr << "    +UIBarType::Drawing Item # " << i << endl;
         QPoint fontdrop = m_font->shadowOffset;
         QString msg = textData[i];
@@ -494,8 +494,8 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
         dr->drawPixmap(drawx, drawy, m_image);
         if (!iconData[i].isNull() && iconData[i].width() > 0)
         {
-            dr->drawPixmap(drawx + m_iconoffset.x(), 
-                           drawy + (int)(ydrop / 2) - (int)(m_iconsize.y() / 2), 
+            dr->drawPixmap(drawx + m_iconoffset.x(),
+                           drawy + (int)(ydrop / 2) - (int)(m_iconsize.y() / 2),
                            iconData[i]);
         }
 
@@ -515,7 +515,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
                 drawy = m_displaysize.top() + fontdrop.y() + (int)(i * ydrop);
             }
             if (m_debug == true)
-                cerr << "    +UIBarType::Drawing Shadow @ (" << drawx 
+                cerr << "    +UIBarType::Drawing Shadow @ (" << drawx
                      << ", " << drawy << ")" << endl;
             dr->drawText(drawx + m_textoffset.x(), drawy + m_textoffset.y(),
                            xdrop - m_textoffset.x(), ydrop - (int)(2 * m_textoffset.y()),
@@ -534,7 +534,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
             drawx = m_displaysize.left();
             drawy = m_displaysize.top() + (int)(i * ydrop);
         }
-        if (m_debug == true) 
+        if (m_debug == true)
         {
             cerr << "    +UIBarType::Drawing @ (" << drawx << ", " << drawy << ")" << endl;
             cerr << "     +UIBarType::Data = " << msg << endl;
@@ -552,7 +552,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
         {
              cerr << "   +UIBarType::Draw() <- outside (layer = " << drawlayer
                   << ", widget layer = " << m_order << "\n";
-        }      
+        }
   }
 }
 
@@ -571,19 +571,19 @@ UIGuideType::UIGuideType(const QString &name, int order)
     cutdown = true;
     drawCategoryColors = true;
     drawCategoryText = true;
-    
+
     font = NULL;
     window = NULL;
     seltype = 1;
     filltype = Alpha;
-    
+
     allData = new QPtrList<UIGTCon>[maxRows];
-    
+
     for (int i = 0; i < maxRows; i++)
         allData[i].setAutoDelete(true);
-        
+
     int alphalevel = 80;
-    alphaBlender.init(alphalevel, 307);    
+    alphaBlender.init(alphalevel, 307);
     prog_past_col = 0;
 }
 
@@ -593,8 +593,8 @@ UIGuideType::~UIGuideType()
 }
 
 void UIGuideType::SetJustification(int jst)
-{ 
-    justification = jst; 
+{
+    justification = jst;
     multilineText = (justification & Qt::WordBreak) > 0;
 }
 
@@ -602,7 +602,7 @@ void UIGuideType::Draw(QPainter *dr, int drawlayer, int context)
 {
     if ((m_context != context && m_context != -1) || drawlayer != m_order)
         return;
-    
+
     UIGTCon *data;
     for (int i = 0; i < numRows; i++)
     {
@@ -612,19 +612,19 @@ void UIGuideType::Draw(QPainter *dr, int drawlayer, int context)
                 drawBackground(dr, data);
             else if (data->recStat == 1)
                 drawBox(dr, data, reccolor);
-            else    
+            else
                 drawBox(dr, data, concolor);
         }
     }
 
-    drawCurrent(dr, &selectedItem);        
-    
+    drawCurrent(dr, &selectedItem);
+
     for (int i = 0; i < numRows; i++)
     {
         for (data = allData[i].first(); data; data = allData[i].next())
         {
             drawText(dr, data);
-            
+
             if (data->recType != 0 || data->arrow != 0)
                 drawRecType(dr, data);
         }
@@ -639,15 +639,15 @@ void UIGuideType::drawCurrent(QPainter *dr, UIGTCon *data)
 
     dr->setBrush(QBrush(Qt::NoBrush));
     dr->setPen(QPen(selcolor, 2));
-    
+
     dr->drawRect(area);
-    dr->drawLine(area.left(), area.top() - 1, 
+    dr->drawLine(area.left(), area.top() - 1,
                  area.right(), area.top() - 1);
-    dr->drawLine(area.left() - 1, area.top(), 
+    dr->drawLine(area.left() - 1, area.top(),
                  area.left() - 1, area.bottom());
-    dr->drawLine(area.left(), area.bottom() + 1, 
+    dr->drawLine(area.left(), area.bottom() + 1,
                  area.right(), area.bottom() + 1);
-    dr->drawLine(area.right() + 1, area.top(), 
+    dr->drawLine(area.right() + 1, area.top(),
                  area.right() + 1, area.bottom());
 }
 
@@ -656,11 +656,11 @@ void UIGuideType::drawRecType(QPainter *dr, UIGTCon *data)
     int breakin = 1;
     QRect area = data->drawArea;
     area.addCoords(breakin, breakin, -breakin, -breakin);
-    
+
     if (data->recType != 0)
     {
         QPixmap *recImg = &recImages[data->recType];
-        dr->drawPixmap(area.right() - recImg->width(), 
+        dr->drawPixmap(area.right() - recImg->width(),
                        area.bottom() - recImg->height(), *recImg);
     }
 
@@ -672,7 +672,7 @@ void UIGuideType::drawRecType(QPainter *dr, UIGTCon *data)
             arrowImg = &arrowImages[0];
             dr->drawPixmap(area.left(), area.top() + (area.height() / 2) -
                            (arrowImg->height() / 2), *arrowImg);
-        }    
+        }
         if (data->arrow == 2 || data->arrow == 3)
         {
             arrowImg = &arrowImages[1];
@@ -692,17 +692,17 @@ void UIGuideType::drawBox(QPainter *dr, UIGTCon *data, const QColor &color)
     if (filltype == Alpha)
     {
         QPixmap orig(area.width(), area.height());
-        orig.fill(window, screenloc.x() + area.left(), 
-                            screenloc.y() + area.top());                
-        QImage tmpimg = orig.convertToImage(); 
-      
+        orig.fill(window, screenloc.x() + area.left(),
+                            screenloc.y() + area.top());
+        QImage tmpimg = orig.convertToImage();
+
         alphaBlender.blendImage(tmpimg, color);
         dr->drawImage(area.left(), area.top(), tmpimg);
     }
     else if (filltype == Dense)
     {
         dr->fillRect(area, QBrush(color, Qt::Dense4Pattern));
-    }     
+    }
     else if (filltype == Eco)
     {
         dr->fillRect(area, QBrush(color, Qt::Dense4Pattern));
@@ -710,7 +710,7 @@ void UIGuideType::drawBox(QPainter *dr, UIGTCon *data, const QColor &color)
     else if (filltype == Solid)
     {
         dr->fillRect(area, QBrush(color, Qt::SolidPattern));
-    }     
+    }
 }
 
 void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
@@ -720,7 +720,7 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
 
     int breakin = 1;
     QRect area = data->drawArea;
- 
+
     QColor fillColor = solidcolor;
     if (drawCategoryColors && data->categoryColor.isValid())
         fillColor = data->categoryColor;
@@ -748,13 +748,13 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
     }
     else
         area.addCoords(breakin, breakin, -breakin, -breakin);
-    
-    if (filltype == Alpha) 
+
+    if (filltype == Alpha)
     {
         QPixmap orig(area.width(), area.height());
-        orig.fill(window, screenloc.x() + area.left(), 
-                          screenloc.y() + area.top());                
-        QImage tmpimg = orig.convertToImage(); 
+        orig.fill(window, screenloc.x() + area.left(),
+                          screenloc.y() + area.top());
+        QImage tmpimg = orig.convertToImage();
 
         alphaBlender.blendImage(tmpimg, fillColor);
         dr->drawImage(area.left(), area.top(), tmpimg);
@@ -762,20 +762,20 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
         if (overArea.width())
         {
             orig = QPixmap(overArea.width(), overArea.height());
-            orig.fill(window, screenloc.x() + overArea.left(), 
-                              screenloc.y() + overArea.top());                
-            tmpimg = orig.convertToImage(); 
+            orig.fill(window, screenloc.x() + overArea.left(),
+                              screenloc.y() + overArea.top());
+            tmpimg = orig.convertToImage();
 
             alphaBlender.blendImage(tmpimg, overColor);
             dr->drawImage(overArea.left(), overArea.top(), tmpimg);
         }
-    }     
-    else if (filltype == Dense) 
+    }
+    else if (filltype == Dense)
     {
         dr->fillRect(area, QBrush(fillColor, Qt::Dense4Pattern));
         if (overArea.width())
             dr->fillRect(overArea, QBrush(overColor, Qt::Dense4Pattern));
-    }     
+    }
     else if (filltype == Eco)
     {
         dr->fillRect(area, QBrush(fillColor, Qt::Dense4Pattern));
@@ -787,37 +787,37 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
         dr->fillRect(area, QBrush(fillColor, Qt::SolidPattern));
         if (overArea.width())
             dr->fillRect(overArea, QBrush(overColor, Qt::SolidPattern));
-    }   
+    }
 }
 
 void UIGuideType::drawText(QPainter *dr, UIGTCon *data)
 {
     QString msg = data->title;
-    
+
     if (drawCategoryText && data->category.length() > 0)
         msg += " (" + data->category + ")";
 
     QRect area = data->drawArea;
-    area.addCoords(textoffset.x(), textoffset.y(), 
+    area.addCoords(textoffset.x(), textoffset.y(),
                    -textoffset.x(), -textoffset.y());
-    
+
     if (data->arrow == 1 || data->arrow == 3)
         area.setLeft(area.left() + arrowImages[0].width());
     if (data->arrow == 2 || data->arrow == 3)
         area.setRight(area.right() - arrowImages[1].width());
 
     if (cutdown)
-        msg = cutDown(msg, &font->face, multilineText, 
+        msg = cutDown(msg, &font->face, multilineText,
                       area.width(), area.height());
 
     dr->setFont(font->face);
-    
-    if (drawFontShadow && 
+
+    if (drawFontShadow &&
         (font->shadowOffset.x() != 0 || font->shadowOffset.y() != 0))
     {
         dr->setBrush(font->dropColor);
         dr->setPen(QPen(font->dropColor, (int)(2 * m_wmult)));
-        dr->drawText(area.left() + font->shadowOffset.x(), 
+        dr->drawText(area.left() + font->shadowOffset.x(),
                      area.top() + font->shadowOffset.y(),
                      area.width(), area.height(), justification, msg);
     }
@@ -827,33 +827,33 @@ void UIGuideType::drawText(QPainter *dr, UIGTCon *data)
     dr->drawText(area, justification, msg);
 }
 
-void UIGuideType::SetProgramInfo(int row, int col, const QRect &area, 
-                                 const QString &title, const QString &genre, 
+void UIGuideType::SetProgramInfo(int row, int col, const QRect &area,
+                                 const QString &title, const QString &genre,
                                  int arrow, int recType, int recStat,
                                  bool selected)
 {
     (void)col;
     UIGTCon *data = new UIGTCon(area, title, genre, arrow, recType, recStat);
-    
+
     allData[row].append(data);
-    
+
     if (drawCategoryColors)
     {
         data->categoryColor = categoryColors[data->category];
         if (!data->categoryColor.isValid())
             data->categoryColor = categoryColors["none"];
     }
-    
+
     if (selected)
         selectedItem = *data;
 }
 
 void UIGuideType::SetCategoryColors(const QMap<QString, QString> &catC)
 {
-    for (QMap<QString, QString>::const_iterator it = catC.begin(); 
+    for (QMap<QString, QString>::const_iterator it = catC.begin();
          it != catC.end(); ++it)
-    {     
-        QColor tmp(it.data()); 
+    {
+        QColor tmp(it.data());
         categoryColors[it.key()] = tmp;
     }
 }
@@ -864,7 +864,7 @@ void UIGuideType::LoadImage(int recType, const QString &file)
     QString filename = themeDir + file;
 
     QPixmap *pix = gContext->LoadScalePixmap(filename);
-    
+
     if (pix)
     {
         recImages[recType] = *pix;
@@ -1005,6 +1005,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
         fontProp *tmpfont = NULL;
         bool lastShown = true;
         QPoint fontdrop = QPoint(0, 0);
+        int tempArrows = 0;
 
         if (m_debug == true)
             cerr << "   +UIListType::Draw() <- within Layer\n";
@@ -1019,19 +1020,22 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
             if (forceFonts[i] != "")
                 tmpfont = &m_fontfcns[forceFonts[i]];
 
-            fontdrop = tmpfont->shadowOffset;  
+            fontdrop = tmpfont->shadowOffset;
 
             dr->setFont(tmpfont->face);
 
             left = m_area.left();
             for (int j = 1; j <= m_columns; j++)
             {
+                int offsetRight = 0;
+                int offsetLeft = 0;
+
                 if (j > 1 && lastShown == true)
                     left = left + columnWidth[j - 1] + m_pad;
 
                 if (m_debug == true)
                 {
-                    cerr << "      -Column #" << j 
+                    cerr << "      -Column #" << j
                          << ", Column Context: " << columnContext[j]
                          << ", Draw Context: " << context << endl;
                 }
@@ -1043,36 +1047,61 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                 else
                 {
                     tempWrite = listData[i + (int)(100*j)];
+                    tempArrows = listArrows[i + 100];
+
+                    if (j == 1)
+                    {
+                        offsetLeft = m_leftarrow.width();
+                        if (tempArrows & ARROW_LEFT)
+                            dr->drawPixmap(left + m_leftarrow_loc.x(),
+                                       m_area.top() + (int)(i * m_selheight) + m_leftarrow_loc.y(),
+                                       m_leftarrow);
+
+                    }
+
+                    if (j == m_columns)
+                    {
+                        offsetRight = m_rightarrow.width();
+                        if (tempArrows & ARROW_RIGHT)
+                            dr->drawPixmap(m_area.right() - offsetRight + m_rightarrow_loc.x(),
+                                       m_area.top() + (int)(i * m_selheight) + m_rightarrow_loc.y(),
+                                       m_rightarrow);
+                    }
 
                     if (tempWrite != "***FILLER***")
                     {
                         if (columnWidth[j] > 0)
                             tempWrite = cutDown(tempWrite, &(tmpfont->face),
-                                                false, columnWidth[j]);
+                                                false, columnWidth[j] - offsetRight - offsetLeft);
                     }
                     else
                         tempWrite = "";
 
-                    if (drawFontShadow && 
+
+
+                    if (drawFontShadow &&
                         (fontdrop.x() != 0 || fontdrop.y() != 0))
                     {
                         dr->setBrush(tmpfont->dropColor);
-                        dr->setPen(QPen(tmpfont->dropColor, 
+                        dr->setPen(QPen(tmpfont->dropColor,
                                         (int)(2 * m_wmult)));
-                        dr->drawText((int)(left + fontdrop.x()),
+                        dr->drawText((int)(left + fontdrop.x()) + offsetRight,
                                      (int)(m_area.top() + (int)(i*m_selheight) +
-                                     fontdrop.y()), m_area.width(), m_selheight,
+                                     fontdrop.y()), m_area.width() - offsetLeft, m_selheight,
                                      m_justification, tempWrite);
                     }
                     dr->setBrush(tmpfont->color);
                     dr->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
 
-                    dr->drawText(left, m_area.top() + (int)(i*m_selheight),
-                                 m_area.width(), m_selheight, m_justification, 
+
+
+
+                    dr->drawText(left + offsetLeft, m_area.top() + (int)(i*m_selheight),
+                                 m_area.width() - offsetRight, m_selheight, m_justification,
                                  tempWrite);
                     dr->setFont(tmpfont->face);
                     if (m_debug == true)
-                        cerr << "   +UIListType::Draw() Data: " 
+                        cerr << "   +UIListType::Draw() Data: "
                              << tempWrite << "\n";
                     lastShown = true;
                  }
@@ -1090,6 +1119,10 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
         int left = 0;
         int i = m_current;
         fontProp *tmpfont = NULL;
+        int tempArrows;
+        int offsetRight = 0;
+        int offsetLeft = 0;
+
         if (m_active == true)
             tmpfont = &m_fontfcns[m_fonts["selected"]];
         else
@@ -1105,49 +1138,75 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
 
         if (m_active == true || m_showSelAlways)
             dr->drawPixmap(m_area.left() + m_selection_loc.x(),
-                           m_area.top() + m_selection_loc.y() + 
+                           m_area.top() + m_selection_loc.y() +
                            (int)(m_current * m_selheight),
                            m_selection);
 
         left = m_area.left();
         for (int j = 1; j <= m_columns; j++)
         {
-             if (j > 1 && lastShown == true)
-                    left = left + columnWidth[j - 1] + m_pad;
+            int offsetRight = 0;
+            int offsetLeft = 0;
 
-             if (m_debug == true)
-             {
-                 cerr << "      -Column #" << j 
-                      << ", Column Context: " << columnContext[j]
-                      << ", Draw Context: " << context << endl;
-             }
-             if (columnContext[j] != context && columnContext[j] != -1)
-             {
-                 lastShown = false;
-             }
-             else
-             {
-                 tempWrite = listData[i + (int)(100*j)];
+            if (j > 1 && lastShown == true)
+                left = left + columnWidth[j - 1] + m_pad;
+
+            if (m_debug == true)
+            {
+                cerr << "      -Column #" << j
+                     << ", Column Context: " << columnContext[j]
+                     << ", Draw Context: " << context << endl;
+            }
+            if (columnContext[j] != context && columnContext[j] != -1)
+            {
+                lastShown = false;
+            }
+            else
+            {
+                tempWrite = listData[i + (int)(100*j)];
+                tempArrows = listArrows[i + 100];
+
+                if (j == 1)
+                {
+                    offsetLeft = m_leftarrow.width();
+                    if (tempArrows & ARROW_LEFT)
+                    {
+                        dr->drawPixmap(left + m_leftarrow_loc.x(),
+                                       m_area.top() + (int)(i * m_selheight) + m_leftarrow_loc.y(),
+                                       m_leftarrow);
+                    }
+                }
+
+                if (j == m_columns)
+                {
+                    offsetRight = m_rightarrow.width();
+                    if (tempArrows & ARROW_RIGHT)
+                    {
+                        dr->drawPixmap(m_area.right() - offsetRight + m_rightarrow_loc.x(),
+                                       m_area.top() + (int)(i * m_selheight) + m_rightarrow_loc.y(),
+                                       m_rightarrow);
+                    }
+                }
 
                  if (columnWidth[j] > 0)
-                     tempWrite = cutDown(tempWrite, &(tmpfont->face), false, 
-                                         columnWidth[j]);
-        
+                     tempWrite = cutDown(tempWrite, &(tmpfont->face), false,
+                                         columnWidth[j] - offsetLeft - offsetRight);
+
                  if (drawFontShadow &&
                      (fontdrop.x() != 0 || fontdrop.y() != 0))
                  {
                      dr->setBrush(tmpfont->dropColor);
                      dr->setPen(QPen(tmpfont->dropColor, (int)(2 * m_wmult)));
-                     dr->drawText((int)(left + fontdrop.x()),
-                                  (int)(m_area.top() + (int)(i*m_selheight) + 
-                                  fontdrop.y()), m_area.width(), m_selheight, 
+                     dr->drawText((int)(left + fontdrop.x()) + offsetLeft,
+                                  (int)(m_area.top() + (int)(i*m_selheight) +
+                                  fontdrop.y()), m_area.width() - offsetRight, m_selheight,
                                   m_justification, tempWrite);
                  }
                  dr->setBrush(tmpfont->color);
                  dr->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
 
-                 dr->drawText(left, m_area.top() + (int)(i*m_selheight),
-                              m_area.width(), m_selheight, m_justification, 
+                 dr->drawText(left + offsetLeft, m_area.top() + (int)(i*m_selheight),
+                              m_area.width() - offsetRight, m_selheight, m_justification,
                               tempWrite);
 
                  dr->setFont(tmpfont->face);
@@ -1182,6 +1241,13 @@ void UIListType::SetItemText(int num, QString data)
     m_columns = 1;
     listData[num + 100] = data;
 }
+
+void UIListType::SetItemArrow(int num, int which)
+{
+    m_columns = 1;
+    listArrows[num + 100] = which;
+}
+
 
 // *****************************************************************
 
@@ -1231,7 +1297,7 @@ void UIImageType::LoadImage()
         {
             img = *tmppix;
             m_show = true;
-            
+
             delete tmppix;
             refresh();
         }
@@ -1295,12 +1361,12 @@ void UIImageType::LoadImage()
         }
         delete sourceImg;
     }
-    
+
     //
-    //  On the odd chance we are owned by a 
+    //  On the odd chance we are owned by a
     //  MythThemedDialog, ask to be re-painted
     //
-    
+
     refresh();
 }
 
@@ -1344,12 +1410,12 @@ void UIImageType::refresh()
     //  and where we are in screen
     //  coordinates
     //
-    
+
     QRect r = QRect(m_displaypos.x(),
                     m_displaypos.y(),
                     img.width(),
                     img.height());
-    
+
     if (m_parent)
     {
         r.moveBy(m_parent->GetAreaRect().left(),
@@ -1358,13 +1424,13 @@ void UIImageType::refresh()
         //
         //  Tell someone who cares
         //
-    
+
         emit requestUpdate(r);
     }
     else
     {
         //
-        //  This happens when parent isn't set, 
+        //  This happens when parent isn't set,
         //  usually during initial parsing.
         //
         emit requestUpdate();
@@ -1709,13 +1775,13 @@ void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
                         p->drawPixmap(m_displaypos.x(),  m_displaypos.y() + (i * img.height()), img, m_drop_x, m_drop_y);
                     }
                 }
-            } 
+            }
             else if (m_debug == true)
             {
                 cerr << "   +UIImageType::Draw() <= Image is null\n";
             }
         }
-      
+
     }
     else
     {
@@ -1757,9 +1823,9 @@ void UIRepeatedImageType::refresh()
     //  and where we are in screen
     //  coordinates
     //
-    
+
     QRect r = QRect(0,0,0,0);
-    
+
     if (m_orientation == 0)
     {
         r = QRect(m_displaypos.x(),
@@ -1773,21 +1839,21 @@ void UIRepeatedImageType::refresh()
                   m_displaypos.y(),
                   img.width() * (m_highest_repeat + 1),
                   img.height());
-    }    
+    }
     else if (m_orientation == 2)
     {
         r = QRect(m_displaypos.x(),
                   m_displaypos.y() - (m_highest_repeat * img.height()),
                   img.width(),
                   img.height() * (m_highest_repeat + 1));
-    }    
+    }
     else if (m_orientation == 3)
     {
         r = QRect(m_displaypos.x(),
                   m_displaypos.y(),
                   img.width(),
                   img.height() * m_highest_repeat);
-    }    
+    }
     if (m_parent)
     {
         r.moveBy(m_parent->GetAreaRect().left(),
@@ -1796,13 +1862,13 @@ void UIRepeatedImageType::refresh()
         //
         //  Tell someone who cares
         //
-    
+
         emit requestUpdate(r);
     }
     else
     {
         //
-        //  This happens when parent isn't set, 
+        //  This happens when parent isn't set,
         //  usually during initial parsing.
         //
         emit requestUpdate();
@@ -1824,8 +1890,8 @@ UITextType::UITextType(const QString &name, fontProp *font,
     if(text.length())
         m_message = text;
     else
-        m_message = " ";    
-    
+        m_message = " ";
+
     m_default_msg = text;
     m_font = font;
     m_displaysize = displayrect;
@@ -1877,24 +1943,24 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
         if (drawFontShadow && (fontdrop.x() != 0 || fontdrop.y() != 0))
         {
             if (m_debug == true)
-                cerr << "    +UITextType::Drawing shadow @ (" 
+                cerr << "    +UITextType::Drawing shadow @ ("
                      << (int)(m_displaysize.left() + fontdrop.x()) << ", "
                      << (int)(m_displaysize.top() + fontdrop.y()) << ")" << endl;
             dr->setBrush(m_font->dropColor);
             dr->setPen(QPen(m_font->dropColor, (int)(2 * m_wmult)));
             dr->drawText((int)(m_displaysize.left() + fontdrop.x()),
                            (int)(m_displaysize.top() + fontdrop.y()),
-                           m_displaysize.width(), 
+                           m_displaysize.width(),
                            m_displaysize.height(), m_justification, msg);
         }
 
         dr->setBrush(m_font->color);
         dr->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
         if (m_debug == true)
-                cerr << "    +UITextType::Drawing @ (" 
-                     << (int)(m_displaysize.left()) << ", " << (int)(m_displaysize.top()) 
+                cerr << "    +UITextType::Drawing @ ("
+                     << (int)(m_displaysize.left()) << ", " << (int)(m_displaysize.top())
                      << ")" << endl;
-        dr->drawText(m_displaysize.left(), m_displaysize.top(), 
+        dr->drawText(m_displaysize.left(), m_displaysize.top(),
                       m_displaysize.width(), m_displaysize.height(), m_justification, msg);
         if (m_debug == true)
         {
@@ -1933,12 +1999,12 @@ UIMultiTextType::UIMultiTextType(
             this, SLOT(animate()));
 
     m_justification = (Qt::AlignCenter | Qt::AlignBottom);
-            
+
     vertical_transform = 0;
     horizontal_transform = 0;
     m_cutdown = false;
-    
-    
+
+
     drop_timing_length = 10;
     drop_timing_pause = 500;
     scroll_timing_length = 40;
@@ -1975,7 +2041,7 @@ void UIMultiTextType::setTexts(QStringList new_messages)
             animation_stage = Animation_DropPause;
             vertical_transform = 0;
         }
-        
+
         horizontal_transform = 0;
         QFontMetrics fm(m_font->face);
         max_horizontal_transform = fm.width(m_message) - m_displaysize.width();
@@ -2014,7 +2080,7 @@ void UIMultiTextType::Draw(QPainter *dr, int drawlayer, int context)
 {
     if (m_context == context || m_context == -1)
     {
-    
+
         if (drawlayer == m_order)
         {
             dr->save();
@@ -2038,7 +2104,7 @@ void UIMultiTextType::Draw(QPainter *dr, int drawlayer, int context)
             {
                 if (m_debug == true)
                 {
-                    cerr << "    +UITextType::Drawing shadow @ (" 
+                    cerr << "    +UITextType::Drawing shadow @ ("
                          << (int)(m_displaysize.left() + fontdrop.x()) << ", "
                          << (int)(m_displaysize.top() + fontdrop.y()) << ")" << endl;
                 }
@@ -2046,17 +2112,17 @@ void UIMultiTextType::Draw(QPainter *dr, int drawlayer, int context)
                 dr->setPen(QPen(m_font->dropColor, (int)(2 * m_wmult)));
                 dr->drawText((int)(m_displaysize.left() + fontdrop.x()),
                                (int)(m_displaysize.top() + fontdrop.y()),
-                               m_displaysize.width(), 
+                               m_displaysize.width(),
                                m_displaysize.height(), m_justification, msg);
             }
 
             dr->setBrush(m_font->color);
             dr->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
             if (m_debug == true)
-                    cerr << "    +UITextType::Drawing @ (" 
-                         << (int)(m_displaysize.left()) << ", " << (int)(m_displaysize.top()) 
+                    cerr << "    +UITextType::Drawing @ ("
+                         << (int)(m_displaysize.left()) << ", " << (int)(m_displaysize.top())
                          << ")" << endl;
-            dr->drawText(m_displaysize.left(), m_displaysize.top(), 
+            dr->drawText(m_displaysize.left(), m_displaysize.top(),
                           m_displaysize.width() + horizontal_transform, m_displaysize.height(), m_justification, msg);
             if (m_debug == true)
             {
@@ -2083,7 +2149,7 @@ void UIMultiTextType::animate()
     //
     //  Check which animation stage we're in and move things along appropriately
     //
-    
+
     if (animation_stage == Animation_Drop)
     {
         if (vertical_transform > 0)
@@ -2093,11 +2159,11 @@ void UIMultiTextType::animate()
         }
         else
         {
-        
+
             //
             //  The drop down is finished.
             //
-            
+
             animation_stage = Animation_DropPause;
             transition_timer.changeInterval(drop_timing_pause);
         }
@@ -2108,7 +2174,7 @@ void UIMultiTextType::animate()
         //
         //  Done pausing after drop
         //
-        
+
         animation_stage = Animation_Scroll;
         transition_timer.changeInterval(scroll_timing_length);
         return;
@@ -2149,7 +2215,7 @@ void UIMultiTextType::animate()
                 animation_stage = Animation_DropPause;
                 vertical_transform = 0;
             }
-        
+
             horizontal_transform = 0;
             QFontMetrics fm(m_font->face);
             max_horizontal_transform = fm.width(m_message) - m_displaysize.width();
@@ -2168,7 +2234,7 @@ void UIMultiTextType::animate()
         {
             transition_timer.stop();
         }
-        
+
     }
     else
     {
@@ -2228,10 +2294,10 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
             else if (m_orientation == 2)
             {
                 dr->drawPixmap(m_location.x(), m_location.y(), m_container);
-                dr->drawPixmap( m_location.x(), 
-                                (m_location.y() + m_container.height()) - height, 
-                                m_filler, 
-                                0, 
+                dr->drawPixmap( m_location.x(),
+                                (m_location.y() + m_container.height()) - height,
+                                m_filler,
+                                0,
                                 (m_filler.height() - height) - m_fillerSpace);
             }
             else if (m_orientation == 3)
@@ -2245,7 +2311,7 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
 
 void UIStatusBarType::calculateScreenArea()
 {
-    QRect r = QRect(m_location.x(), 
+    QRect r = QRect(m_location.x(),
                     m_location.y(),
                     m_container.width(),
                     m_container.height());
@@ -2291,10 +2357,10 @@ UIManagedTreeListType::~UIManagedTreeListType()
 {
 }
 
-void UIManagedTreeListType::drawText(QPainter *p, 
-                                    QString the_text, 
-                                    QString font_name, 
-                                    int x, int y, 
+void UIManagedTreeListType::drawText(QPainter *p,
+                                    QString the_text,
+                                    QString font_name,
+                                    int x, int y,
                                     int bin_number)
 {
     fontProp *temp_font = NULL;
@@ -2302,7 +2368,7 @@ void UIManagedTreeListType::drawText(QPainter *p,
     temp_font = &m_fontfcns[m_fonts[a_string]];
     p->setFont(temp_font->face);
     p->setPen(QPen(temp_font->color, (int)(2 * m_wmult)));
-    
+
     if (!show_whole_tree)
     {
         the_text = cutDown(the_text, &(temp_font->face), false, area.width() - 80, area.height());
@@ -2359,7 +2425,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 
     int starting_bin = 0;
     int ending_bin = 0;
-    
+
     if (show_whole_tree)
     {
         starting_bin = bins;
@@ -2405,11 +2471,11 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 }
             }
         }
-        
+
         //
         //  OK, we have the starting node for this bin (if it exists)
         //
-        
+
         if (hotspot_node)
         {
             QString a_string = QString("bin%1-active").arg(i);
@@ -2417,7 +2483,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             int x_location = bin_corners[i].left();
             int y_location = bin_corners[i].top() + (bin_corners[i].height() / 2)
                              + (QFontMetrics(tmpfont->face).height() / 2);
-                             
+
             if (!show_whole_tree)
             {
                 x_location = area.left();
@@ -2433,10 +2499,10 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 //  if required, move the hotspot up or down
                 //  (beginning of list, end of list, etc.)
                 //
-                
+
                 int position_in_list = hotspot_node->getPosition(visual_order);
                 int number_in_list = hotspot_node->siblingCount();
-    
+
                 int number_of_slots = 0;
                 int another_y_location = y_location - QFontMetrics(tmpfont->face).height();
                 int a_limit = bin_corners[i].top();
@@ -2449,7 +2515,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                     another_y_location -= QFontMetrics(tmpfont->face).height();
                     ++number_of_slots;
                 }
-                
+
                 if (position_in_list <= number_of_slots)
                 {
                     draw_up_arrow = false;
@@ -2466,7 +2532,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 {
                     draw_down_arrow = false;
                     if (number_in_list >= number_of_slots * 2 + 1)
-                    { 
+                    {
                         for(int j = 0; j <= number_of_slots - (number_in_list - position_in_list); j++)
                         {
                             y_location += QFontMetrics(tmpfont->face).height();
@@ -2490,7 +2556,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                     draw_up_arrow = false;
                 }
             }
-            
+
             QString font_name = "active";
             if (i > active_bin)
             {
@@ -2505,14 +2571,14 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 font_name = "selectable";
             }
 
-            
+
 
             if (i == active_bin)
             {
                 //
                 //  Draw the highlight pixmap for this bin
                 //
-                
+
                 if (show_whole_tree)
                 {
                     p->drawPixmap(x_location, y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent(), (*highlight_map[i]));
@@ -2542,7 +2608,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             //
             //  Move this down for people with (slightly) broken fonts
             //
-            
+
             QString msg = hotspot_node->getString();
             drawText(p, msg, font_name, x_location, y_location, i);
 
@@ -2551,19 +2617,19 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 //
                 //  Draw up/down arrows
                 //
-                
+
                 if (draw_up_arrow)
                 {
                     if (show_whole_tree)
                     {
-                        p->drawPixmap(bin_corners[i].right() - up_arrow_image.width(), 
-                                      bin_corners[i].top(), 
+                        p->drawPixmap(bin_corners[i].right() - up_arrow_image.width(),
+                                      bin_corners[i].top(),
                                       up_arrow_image);
                     }
                     else
                     {
-                        p->drawPixmap(area.right() - up_arrow_image.width(), 
-                                      area.top(), 
+                        p->drawPixmap(area.right() - up_arrow_image.width(),
+                                      area.top(),
                                       up_arrow_image);
                     }
                 }
@@ -2583,11 +2649,11 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                     }
                 }
             }
-            
+
             //
             //  Do the ones above
             //
-            
+
             int numb_above = 1;
             int still_yet_another_y_location = y_location - QFontMetrics(tmpfont->face).height();
             int a_limit = bin_corners[i].top();
@@ -2618,16 +2684,16 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                     }
                     msg = above->getString();
                     drawText(p, msg, font_name, x_location, still_yet_another_y_location, i);
-                }    
+                }
                 still_yet_another_y_location -= QFontMetrics(tmpfont->face).height();
                 numb_above++;
             }
-            
+
 
             //
             //  Do the ones below
             //
-            
+
             int numb_below = 1;
             y_location += QFontMetrics(tmpfont->face).height();
             a_limit = bin_corners[i].bottom();
@@ -2658,7 +2724,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                     }
                     msg = below->getString();
                     drawText(p, msg, font_name, x_location, y_location, i);
-                }    
+                }
                 y_location += QFontMetrics(tmpfont->face).height();
                 numb_below++;
             }
@@ -2720,7 +2786,7 @@ void UIManagedTreeListType::moveToNodesFirstChild(QValueList<int> route_of_branc
             active_node = NULL;
             active_parent = NULL;
             emit nodeSelected(current_node->getInt(), current_node->getAttributes());
-        }    
+        }
     }
     else
     {
@@ -2735,15 +2801,15 @@ QValueList <int> * UIManagedTreeListType::getRouteToActive()
     {
         route_to_active.clear();
         GenericTree *climber = active_node;
-        
+
         route_to_active.push_front(climber->getInt());
         while( (climber = climber->getParent()) )
         {
             route_to_active.push_front(climber->getInt());
         }
-        return &route_to_active;   
+        return &route_to_active;
     }
-    return NULL;    
+    return NULL;
 }
 
 QStringList UIManagedTreeListType::getRouteToCurrent()
@@ -2788,10 +2854,10 @@ bool UIManagedTreeListType::tryToSetCurrent(QStringList route)
 
     current_node = my_tree_data;
 
-    //  
-    //  
     //
-    
+    //
+    //
+
     if (route.count() > 0)
     {
         if (route[0] == my_tree_data->getString())
@@ -2816,7 +2882,7 @@ bool UIManagedTreeListType::tryToSetCurrent(QStringList route)
         }
     }
     return false;
-    
+
 }
 
 void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
@@ -2829,7 +2895,7 @@ void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
         //  By default, current_node is first branch at every
         //  level down till we hit a leaf node.
         //
-    
+
         current_node = my_tree_data->findLeaf();
         active_bin = bins;
     }
@@ -2846,7 +2912,7 @@ void UIManagedTreeListType::setCurrentNode(GenericTree *a_node)
     //  We should really do a recursive check of the tree
     //  to see if this node exists somewhere...
     //
-    
+
     if (a_node)
     {
         current_node = a_node;
@@ -2890,11 +2956,11 @@ void UIManagedTreeListType::makeHighlights()
         resized_highlight_images.append(temp_pixmap);
         highlight_map[i] = temp_pixmap;
     }
-    
+
     //
     //  Make no tree version
     //
-    
+
     QImage temp_image = highlight_image.convertToImage();
     QPixmap *temp_pixmap = new QPixmap();
     fontProp *tmpfont = NULL;
@@ -2903,46 +2969,46 @@ void UIManagedTreeListType::makeHighlights()
     temp_pixmap->convertFromImage(temp_image.smoothScale(area.width(), QFontMetrics(tmpfont->face).height() ));
     resized_highlight_images.append(temp_pixmap);
     highlight_map[0] = temp_pixmap;
-    
-    
+
+
 }
 
 bool UIManagedTreeListType::popUp()
 {
     //
     //  Move the active node to the
-    //  current active node's parent  
+    //  current active node's parent
     //
-    
+
     if (!current_node)
     {
         return false;
     }
-    
+
     if (!current_node->getParent())
     {
         return false;
     }
-    
+
     if (!current_node->getParent()->getParent())
     {
         //
         //  I be ultimate root
         //
-        
+
         return false;
-        
+
     }
-    
+
     if (!show_whole_tree)
     {
         //
         //  Oh no you don't
         //
-        
+
         return false;
     }
-    
+
     if (active_bin > 1)
     {
         --active_bin;
@@ -2975,7 +3041,7 @@ bool UIManagedTreeListType::pushDown()
         //  I be leaf
         return false;
     }
-    
+
     if (!show_whole_tree)
     {
         //
@@ -2995,7 +3061,7 @@ bool UIManagedTreeListType::pushDown()
         --active_bin;
     }
 
-    refresh();    
+    refresh();
     return true;
 }
 
@@ -3008,7 +3074,7 @@ bool UIManagedTreeListType::moveUp(bool do_refresh)
     //
     //  Move the active node to the
     //  current active node's previous
-    //  sibling  
+    //  sibling
     //
 
     GenericTree *new_node = current_node->prevSibling(1, visual_order);
@@ -3082,18 +3148,18 @@ int UIManagedTreeListType::calculateEntriesInBin(int bin_number)
     //  the draw() method would use to know how many
     //  entries can appear in a given bin
     //
-    
+
     if (bin_number < 1 || bin_number > bins)
     {
         return 0;
     }
     int return_value = 1;
-    
-    
+
+
     QString a_string = QString("bin%1-active").arg(bin_number);
     fontProp *tmpfont = &m_fontfcns[m_fonts[a_string]];
-    int y_location =    bin_corners[bin_number].top() 
-                        + (bin_corners[bin_number].height() / 2) 
+    int y_location =    bin_corners[bin_number].top()
+                        + (bin_corners[bin_number].height() / 2)
                         + (QFontMetrics(tmpfont->face).height() / 2);
     if (!show_whole_tree)
     {
@@ -3137,7 +3203,7 @@ bool UIManagedTreeListType::pageUp()
         {
             i = entries_to_jump;
         }
-        
+
     }
     if (show_whole_tree)
     {
@@ -3170,7 +3236,7 @@ bool UIManagedTreeListType::pageDown()
         {
             i = entries_to_jump;
         }
-        
+
     }
     if (show_whole_tree)
     {
@@ -3250,14 +3316,14 @@ bool UIManagedTreeListType::nextActive(bool wrap_around, bool traverse_up_down)
     //
     //  set a flag if active and current are sync'd
     //
-    
+
     bool in_sync = false;
-    
+
     if (current_node == active_node)
     {
         in_sync = true;
     }
-    
+
     if (active_node)
     {
         GenericTree *test_node = active_node->nextSibling(1, tree_order);
@@ -3318,12 +3384,12 @@ bool UIManagedTreeListType::prevActive(bool wrap_around, bool traverse_up_down)
         return complexInternalNextPrevActive(false, wrap_around);
     }
     bool in_sync = false;
-    
+
     if (current_node == active_node)
     {
         in_sync = true;
     }
-    
+
     if (active_node)
     {
         GenericTree *test_node = active_node->prevSibling(1, tree_order);
@@ -3419,7 +3485,7 @@ void UIManagedTreeListType::calculateScreenArea()
         ++i;
         screen_corners[i] = r;
     }
-    
+
     screen_area = m_parent->GetAreaRect();
 }
 
@@ -3469,7 +3535,7 @@ void UIPushButtonType::Draw(QPainter *p, int drawlayer, int context)
             p->drawPixmap(m_displaypos.x(), m_displaypos.y(), off_pixmap);
         }
     }
-    
+
 }
 
 void UIPushButtonType::push()
@@ -3486,14 +3552,14 @@ void UIPushButtonType::push()
 
 void UIPushButtonType::unPush()
 {
-    currently_pushed = false;    
+    currently_pushed = false;
     refresh();
 }
 
 void UIPushButtonType::calculateScreenArea()
 {
     int x, y, width, height;
-    
+
     x  = m_displaypos.x();
     x += m_parent->GetAreaRect().left();
 
@@ -3519,7 +3585,7 @@ void UIPushButtonType::calculateScreenArea()
     {
         height = pushed_pixmap.height();
     }
-    
+
     screen_area = QRect(x, y, width, height);
 }
 
@@ -3577,7 +3643,7 @@ void UITextButtonType::Draw(QPainter *p, int drawlayer, int context)
                 off_pixmap.height(),
                 Qt::AlignCenter,
                 m_text);
-    }    
+    }
 }
 
 void UITextButtonType::push()
@@ -3594,7 +3660,7 @@ void UITextButtonType::push()
 
 void UITextButtonType::unPush()
 {
-    currently_pushed = false;    
+    currently_pushed = false;
     refresh();
 }
 
@@ -3607,7 +3673,7 @@ void UITextButtonType::setText(const QString some_text)
 void UITextButtonType::calculateScreenArea()
 {
     int x, y, width, height;
-    
+
     x  = m_displaypos.x();
     x += m_parent->GetAreaRect().left();
 
@@ -3633,13 +3699,13 @@ void UITextButtonType::calculateScreenArea()
     {
         height = pushed_pixmap.height();
     }
-    
+
     screen_area = QRect(x, y, width, height);
 }
 
 // ********************************************************************
 
-UICheckBoxType::UICheckBoxType(const QString &name, 
+UICheckBoxType::UICheckBoxType(const QString &name,
                                QPixmap checkedp, QPixmap uncheckedp,
                                QPixmap checked_highp, QPixmap unchecked_highp)
                :UIType(name)
@@ -3663,7 +3729,7 @@ void UICheckBoxType::Draw(QPainter *p, int drawlayer, int context)
         }
     }
     if (drawlayer != m_order)
-    {   
+    {
     }
     if (has_focus)
     {
@@ -3692,7 +3758,7 @@ void UICheckBoxType::Draw(QPainter *p, int drawlayer, int context)
 void UICheckBoxType::calculateScreenArea()
 {
     int x, y, width, height;
-    
+
     x  = m_displaypos.x();
     x += m_parent->GetAreaRect().left();
 
@@ -3726,7 +3792,7 @@ void UICheckBoxType::calculateScreenArea()
     {
         height = unchecked_pixmap_high.height();
     }
-    
+
     screen_area = QRect(x, y, width, height);
 
 }
@@ -3746,9 +3812,9 @@ void UICheckBoxType::setState(bool checked_or_not)
 
 // ********************************************************************
 
-UISelectorType::UISelectorType(const QString &name, 
-                               QPixmap on, 
-                               QPixmap off, 
+UISelectorType::UISelectorType(const QString &name,
+                               QPixmap on,
+                               QPixmap off,
                                QPixmap pushed,
                                QRect area)
                :UIPushButtonType(name, on, off, pushed)
@@ -3852,7 +3918,7 @@ void UISelectorType::push(bool up_or_down)
             {
                 current_data = my_data.first();
             }
-            
+
         }
         else
         {
@@ -3868,7 +3934,7 @@ void UISelectorType::push(bool up_or_down)
 
 void UISelectorType::unPush()
 {
-    currently_pushed = false;    
+    currently_pushed = false;
     refresh();
 }
 
@@ -3898,7 +3964,7 @@ UIKeyType::UIKeyType(const QString &name)
          : UIType(name)
 {
     m_container = NULL;
-    m_action = m_clicked = m_notclicked = m_subtitle = m_chars = 
+    m_action = m_clicked = m_notclicked = m_subtitle = m_chars =
     m_font = "";
     m_pos = QPoint(0, 0);
 }

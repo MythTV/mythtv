@@ -2101,15 +2101,17 @@
         <area>20,10,760,274</area>
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
-	<fcnfont name="inactive_font" function="disabled"></fcnfont>
+        <fcnfont name="inactive_font" function="disabled"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
-	<fcnfont name="enabled_state_0_font" function="enabled_state_0"></fcnfont>
+        <fcnfont name="enabled_state_0_font" function="enabled_state_0"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="745" context="-1"></column>
         <items>8</items>
         <image function="selectionbar" filename="tit-trk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="755,15"></image>
         <image function="downarrow" filename="downarrow.png" location="755,235"></image>
+        <image function="rightarrow" filename="rightarrow.png" location="-30,5"></image>
+        <image function="leftarrow" filename="leftarrow.png" location="-5,5"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>ro-lines.png</filename>

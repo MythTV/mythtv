@@ -10,7 +10,7 @@ using namespace std;
 XMLParse::XMLParse(void)
 {
     allTypes = new vector<LayerSet *>;
-} 
+}
 
 XMLParse::~XMLParse()
 {
@@ -29,7 +29,7 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
     usetrans = gContext->GetNumSetting("PlayBoxTransparency", 1);
 
     fontSizeType = gContext->GetSetting("ThemeFontSizeType", "default");
-    
+
     QString themepath = gContext->GetThemeDir();
     QString themefile = themepath + specialfile + "ui.xml";
 
@@ -81,7 +81,7 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 
                 if (name == winName)
                 {
-		    ele = e;
+            ele = e;
                     return true;
                 }
             }
@@ -196,7 +196,7 @@ void XMLParse::parseFont(QDomElement &element)
         if (sizeBig > 0)
             size = sizeBig;
     }
-    
+
     if (size < 0)
     {
         cerr << "Error: font size must be > 0\n";
@@ -619,9 +619,9 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
                     inttype = 2;
                 else if (typ == "ChannelRecord")
                     inttype = 3;
-                else if (typ == "AllRecord") 
+                else if (typ == "AllRecord")
                     inttype = 4;
-                else if (typ == "WeekslotRecord") 
+                else if (typ == "WeekslotRecord")
                     inttype = 5;
                 else if (typ == "FindOneRecord")
                     inttype = 6;
@@ -639,7 +639,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
 
                 if (dir == "left")
                     arrows[0] = imag;
-                else 
+                else
                     arrows[1] = imag;
             }
             else if (info.tagName() == "catcolor")
@@ -704,7 +704,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
         else if (align.lower() == "hcenter")
             guide->SetJustification(Qt::AlignHCenter | jst);
     }
-    else 
+    else
         guide->SetJustification(jst);
 
     align = "";
@@ -811,7 +811,7 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
     bar->SetTextOffset(textoff);
     bar->SetIconOffset(iconoff);
     bar->SetIconSize(iconsize);
-    if (orientation == "horizontal") 
+    if (orientation == "horizontal")
        bar->SetOrientation(1);
     else if (orientation == "vertical")
        bar->SetOrientation(2);
@@ -828,7 +828,7 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
             bar->SetJustification(Qt::AlignVCenter);
         else if (align.lower() == "hcenter")
             bar->SetJustification(Qt::AlignHCenter);
-    
+
     }
     align = "";
 
@@ -1065,12 +1065,12 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
             }
             else if (info.tagName() == "value")
             {
-                if ((value.isNull() || value.isEmpty()) && 
+                if ((value.isNull() || value.isEmpty()) &&
                     info.attribute("lang","") == "")
                 {
                     value = qApp->translate("ThemeUI", getFirstText(info));
                 }
-                else if (info.attribute("lang","").lower() == 
+                else if (info.attribute("lang","").lower() ==
                          gContext->GetLanguage())
                 {
                     value = getFirstText(info);
@@ -1233,8 +1233,8 @@ void XMLParse::parseMultiTextArea(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in multitext area: " 
-                     << info.tagName() 
+                cerr << "Unknown tag in multitext area: "
+                     << info.tagName()
                      << endl;
                 return;
             }
@@ -1248,7 +1248,7 @@ void XMLParse::parseMultiTextArea(LayerSet *container, QDomElement &element)
         return;
     }
 
-    UIMultiTextType *multitext = new UIMultiTextType(name, testfont, draworder, 
+    UIMultiTextType *multitext = new UIMultiTextType(name, testfont, draworder,
                                       area, altArea);
     multitext->SetScreen(wmult, hmult);
     if (context != -1)
@@ -1276,7 +1276,7 @@ void XMLParse::parseMultiTextArea(LayerSet *container, QDomElement &element)
     {
         multitext->setScrollTimingPause(scroll_pause);
     }
-    
+
     multitext->SetParent(container);
     multitext->calculateScreenArea();
     container->AddType(multitext);
@@ -1305,9 +1305,14 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
     QPoint uparrow_loc;
     QPoint dnarrow_loc;
     QPoint select_loc;
+    QPoint rightarrow_loc;
+    QPoint leftarrow_loc;
+
     QPixmap *uparrow_img = NULL;
     QPixmap *dnarrow_img = NULL;
     QPixmap *select_img = NULL;
+    QPixmap *right_img = NULL;
+    QPixmap *left_img = NULL;
 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -1364,13 +1369,13 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                 fontfcn = info.attribute("function", "");
 
                 if (fontname.isNull() || fontname.isEmpty())
-                {   
+                {
                     cerr << "FcnFont needs a name\n";
                     return;
                 }
 
                 if (fontfcn.isNull() || fontfcn.isEmpty())
-                {   
+                {
                     cerr << "FcnFont needs a function\n";
                     return;
                 }
@@ -1382,9 +1387,9 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                 QString fillcolor = "";
                 QString fillarea = "";
                 QString filltype = "";
- 
+
                 fillfcn = info.attribute("function", "");
-                fillcolor = info.attribute("color", "#ffffff"); 
+                fillcolor = info.attribute("color", "#ffffff");
                 fillarea = info.attribute("area", "");
                 filltype = info.attribute("type", "");
 
@@ -1405,7 +1410,7 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
 
                 if (fillarea.isNull() || fillarea.isEmpty())
                 {
-                    fill_select_area = area; 
+                    fill_select_area = area;
                 }
                 else
                 {
@@ -1413,7 +1418,7 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                     normalizeRect(fill_select_area);
                 }
                 fill_select_color = QColor(fillcolor);
- 
+
             }
             else if (info.tagName() == "image")
             {
@@ -1434,6 +1439,8 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                     cerr << "Image needs a filename\n";
                     return;
                 }
+
+
 
                 imgpoint = info.attribute("location", "");
                 if (imgpoint.isNull() && imgpoint.isEmpty())
@@ -1463,6 +1470,22 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                     dnarrow_loc.setX((int)(dnarrow_loc.x() * wmult));
                     dnarrow_loc.setY((int)(dnarrow_loc.y() * hmult));
                 }
+                if (imgname.lower() == "leftarrow")
+                {
+                    left_img = gContext->LoadScalePixmap(imgfile);
+                    leftarrow_loc = parsePoint(imgpoint);
+                    leftarrow_loc.setX((int)(leftarrow_loc.x() * wmult));
+                    leftarrow_loc.setY((int)(leftarrow_loc.y() * hmult));
+
+                }
+                else if (imgname.lower() == "rightarrow")
+                {
+                    right_img = gContext->LoadScalePixmap(imgfile);
+                    rightarrow_loc = parsePoint(imgpoint);
+                    rightarrow_loc.setX((int)(rightarrow_loc.x() * wmult));
+                    rightarrow_loc.setY((int)(rightarrow_loc.y() * hmult));
+                }
+
             }
             else if (info.tagName() == "column")
             {
@@ -1512,21 +1535,35 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
         list->SetImageSelection(*select_img, select_loc);
         delete select_img;
     }
+
     if (uparrow_img)
     {
         list->SetImageUpArrow(*uparrow_img, uparrow_loc);
         delete uparrow_img;
     }
+
     if (dnarrow_img)
     {
         list->SetImageDownArrow(*dnarrow_img, dnarrow_loc);
         delete dnarrow_img;
     }
 
+    if (right_img)
+    {
+        list->SetImageRightArrow(*right_img, rightarrow_loc);
+        delete right_img;
+    }
+
+    if (left_img)
+    {
+        list->SetImageLeftArrow(*left_img, leftarrow_loc);
+        delete left_img;
+    }
+
     typedef QMap<QString,QString> fontdata;
     fontdata::Iterator it;
     for ( it = fontFunctions.begin(); it != fontFunctions.end(); ++it )
-    {   
+    {
         fontProp *testFont = GetFont(it.data());
         if (testFont)
             theFonts[it.data()] = *testFont;
@@ -1573,7 +1610,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
     int imgFillSpace = 0;
     QPixmap *imgFiller = NULL;
     QPixmap *imgContainer = NULL;
- 
+
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
@@ -1687,7 +1724,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
     if (imgContainer)
     {
         sb->SetContainerImage(*imgContainer);
-        delete imgContainer; 
+        delete imgContainer;
     }
     if (imgFiller)
     {
@@ -1726,11 +1763,11 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     typedef QMap<int, QRect> CornerMap;
     CornerMap bin_corners;
     bin_corners.clear();
-    
+
     //
     //  Some maps to store fonts as we parse
     //
-    
+
     QMap<QString, QString> fontFunctions;
     QMap<QString, fontProp> theFonts;
 
@@ -1783,7 +1820,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     cerr << "Image needs a filename\n";
                     return;
                 }
-    
+
                 if (info.tagName() == "context")
                 {
                     context = getFirstText(info).toInt();
@@ -1869,13 +1906,13 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                             fontfcn = info.attribute("function", "");
 
                             if (fontname.isNull() || fontname.isEmpty())
-                            {   
+                            {
                                 cerr << "FcnFont needs a name\n";
                                 return;
                             }
 
                             if (fontfcn.isNull() || fontfcn.isEmpty())
-                            {   
+                            {
                                 cerr << "FcnFont needs a function\n";
                                 return;
                             }
@@ -1915,7 +1952,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     typedef QMap<QString,QString> fontdata;
     fontdata::Iterator it;
     for ( it = fontFunctions.begin(); it != fontFunctions.end(); ++it )
-    {   
+    {
         fontProp *testFont = GetFont(it.data());
         if (testFont)
             theFonts[it.data()] = *testFont;
@@ -1939,7 +1976,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     if (!rightarrow_img)
         rightarrow_img = new QPixmap();
 
-    mtl->setArrowImages(*uparrow_img, *downarrow_img, *leftarrow_img, 
+    mtl->setArrowImages(*uparrow_img, *downarrow_img, *leftarrow_img,
                         *rightarrow_img);
 
     delete uparrow_img;
@@ -2049,7 +2086,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
     if (!image_pushed)
         image_pushed = new QPixmap();
 
-    UIPushButtonType *pbt = new UIPushButtonType(name, *image_on, *image_off, 
+    UIPushButtonType *pbt = new UIPushButtonType(name, *image_on, *image_off,
                                                  *image_pushed);
 
     delete image_on;
@@ -2178,7 +2215,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
     if (!image_pushed)
         image_pushed = new QPixmap();
 
-    UITextButtonType *tbt = new UITextButtonType(name, *image_on, *image_off, 
+    UITextButtonType *tbt = new UITextButtonType(name, *image_on, *image_off,
                                                  *image_pushed);
 
     delete image_on;
@@ -2306,8 +2343,8 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
     if (!image_unchecked_high)
         image_unchecked_high = new QPixmap();
 
-    UICheckBoxType *cbt = new UICheckBoxType(name, 
-                                             *image_checked, *image_unchecked, 
+    UICheckBoxType *cbt = new UICheckBoxType(name,
+                                             *image_checked, *image_unchecked,
                                              *image_checked_high, *image_unchecked_high);
 
     delete image_checked;
@@ -2436,7 +2473,7 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
     if (!image_pushed)
         image_pushed = new QPixmap();
 
-    UISelectorType *st = new UISelectorType(name, *image_on, *image_off, 
+    UISelectorType *st = new UISelectorType(name, *image_on, *image_off,
                                                  *image_pushed, area);
 
     delete image_on;
@@ -2525,7 +2562,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
         cerr << "ListBtn area needs a draworder\n";
         return;
     }
-    
+
     draworder = layerNum.toInt();
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling()) {
@@ -2548,7 +2585,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
                     fontInactive = fontFcn;
                 else {
                     std::cerr << "Unknown font function for listbtn area: "
-                              << fontFcn 
+                              << fontFcn
                               << std::endl;
                     return;
                 }
@@ -2604,7 +2641,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
                           << info.tagName() << endl;
                 return;
             }
-            
+
         }
     }
 
@@ -2615,7 +2652,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
              << " in listbtn area: " << name << endl;
         return;
     }
-    
+
     fontProp *fpInactive = GetFont(fontInactive);
     if (!fpInactive)
     {
@@ -2623,7 +2660,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
              << " in listbtn area: " << name << endl;
         return;
     }
-    
+
 
     UIListBtnType *l = new UIListBtnType(name, area, draworder, showArrow,
                                          showScrollArrows);
@@ -2792,7 +2829,7 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
     l->SetMargin((int)(margin*wmult));
     l->SetParent(container);
     l->calculateScreenArea();
-    
+
     container->AddType(l);
     container->bumpUpLayers(0);
 }

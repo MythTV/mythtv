@@ -8,7 +8,7 @@ using namespace std;
 // ManagedListItem
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ManagedListItem::ManagedListItem(const QString& startingText, ManagedList* _parentList, QObject* _parent, const char* _name) 
+ManagedListItem::ManagedListItem(const QString& startingText, ManagedList* _parentList, QObject* _parent, const char* _name)
                : QObject(_parent, _name)
 {
     text = startingText;
@@ -19,12 +19,12 @@ ManagedListItem::ManagedListItem(const QString& startingText, ManagedList* _pare
     valueText = " ";
 }
 
-void ManagedListItem::setParentList(ManagedList* _parentList) 
-{ 
-    parentList = _parentList;  
+void ManagedListItem::setParentList(ManagedList* _parentList)
+{
+    parentList = _parentList;
     connect(this, SIGNAL(changed(ManagedListItem*)), parentList, SLOT(itemChanged(ManagedListItem*)));
 }
- 
+
 
 
 
@@ -45,7 +45,7 @@ void BoolManagedListItem::setLabels(const QString& trueLbl, const QString& false
 {
     trueLabel = trueLbl;
     falseLabel = falseLbl;
-    
+
     syncTextToValue();
 }
 
@@ -57,7 +57,7 @@ void BoolManagedListItem::syncTextToValue()
     else
         text = falseLabel;
 
-    ManagedListItem::syncTextToValue();    
+    ManagedListItem::syncTextToValue();
 }
 
 
@@ -71,15 +71,15 @@ IntegerManagedListItem::IntegerManagedListItem(int _bigStep, int _step, ManagedL
 {
     step = _step;
     bigStep = _bigStep;
-    
+
     setTemplates("-%1","-%1", "%1", "%1", "%1");
     setShortTemplates("-%1","-%1", "%1", "%1", "%1");
-    
+
     ManagedListItem::setValue(QString("0"));
 }
 
 
-void IntegerManagedListItem::setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr, 
+void IntegerManagedListItem::setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
                                           const QString& oneStr, const QString& posStr)
 {
     negTemplate = negStr;
@@ -90,7 +90,7 @@ void IntegerManagedListItem::setTemplates(const QString& negStr, const QString& 
     syncTextToValue();
 }
 
-void IntegerManagedListItem::setShortTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr, 
+void IntegerManagedListItem::setShortTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
                                                const QString& oneStr, const QString& posStr)
 {
     shortNegTemplate = negStr;
@@ -106,8 +106,8 @@ void IntegerManagedListItem::setShortTemplates(const QString& negStr, const QStr
         y = QString(tr(x)).arg(abs(z)); \
     else \
         y = tr(x);
-        
-        
+
+
 
 void IntegerManagedListItem::syncTextToValue()
 {
@@ -138,7 +138,7 @@ void IntegerManagedListItem::syncTextToValue()
         ASSIGN_TEMPLATE(shortNegTemplate, shortText, v);
     }
 
-    ManagedListItem::syncTextToValue();    
+    ManagedListItem::syncTextToValue();
 }
 
 
@@ -150,14 +150,14 @@ void IntegerManagedListItem::syncTextToValue()
 // BoundedIntegerListItem
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(int minValIn, int maxValIn, int _bigStep, int stepIn, ManagedList* pList, 
+BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(int minValIn, int maxValIn, int _bigStep, int stepIn, ManagedList* pList,
                                                              QObject* _parent, const char* _name)
                              : IntegerManagedListItem(_bigStep, stepIn, pList, _parent, _name)
 {
     minVal = minValIn;
     maxVal = maxValIn;
     setValue(0);
-} 
+}
 
 
 void BoundedIntegerManagedListItem::setValue(int val)
@@ -166,7 +166,7 @@ void BoundedIntegerManagedListItem::setValue(int val)
         val = maxVal;
     else if ( val < minVal)
         val = minVal;
-        
+
     IntegerManagedListItem::setValue(val);
 }
 
@@ -177,9 +177,9 @@ void BoundedIntegerManagedListItem::setValue(int val)
 // ManagedListGroup
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ManagedListGroup::ManagedListGroup(const QString& txt, ManagedListGroup* pGroup, ManagedList* pList, QObject* _parent, 
+ManagedListGroup::ManagedListGroup(const QString& txt, ManagedListGroup* pGroup, ManagedList* pList, QObject* _parent,
                                    const char* _name)
-                : ManagedListItem(txt, pList, _parent, _name) 
+                : ManagedListItem(txt, pList, _parent, _name)
 {
     parentGroup = pGroup;
     if (pGroup)
@@ -199,18 +199,18 @@ ManagedListGroup::ManagedListGroup(const QString& txt, ManagedListGroup* pGroup,
 
 }
 
-void ManagedListGroup::setCurIndex(int newVal) 
-{ 
-    if (newVal < 0) 
+void ManagedListGroup::setCurIndex(int newVal)
+{
+    if (newVal < 0)
         newVal = 0;
     else if (newVal >= itemCount)
         newVal = itemCount - 1;
 
     curItem = newVal;
-    valueText = QString::number(curItem);  
+    valueText = QString::number(curItem);
     getCurItem()->gotFocus();
-    
-    changed();        
+
+    changed();
 }
 
 
@@ -218,22 +218,22 @@ bool ManagedListGroup::addItem(ManagedListItem* item, int where)
 {
     if (!item)
         return false;
-        
+
     if (item->name() == "unnamed")
         item->setName( QString( "ITEM-%1").arg(itemList.count()));
-        
+
     if (!child(item->name()) && !item->parent())
         insertChild(item);
-    
+
     int listSize = itemList.count();
-                       
+
     if ((where == -2) || (listSize ==0))
         itemList.append(item);
     else if (where == -1)
         itemList.insert(itemList.count() - 1, item);
-    else 
+    else
         itemList.insert(where, item);
-    
+
     itemCount = itemList.count();
     if (parentList)
         connect(item, SIGNAL(changed(ManagedListItem*)), parentList, SLOT(itemChanged(ManagedListItem*)));
@@ -263,11 +263,11 @@ void ManagedListGroup::clear()
     ManagedListItem* tempItem = NULL;
     for(tempItem = itemList.first(); tempItem; tempItem = itemList.next() )
     {
-        delete tempItem;   
+        delete tempItem;
     }
-    
+
     itemList.clear();
-    
+
     if (parentGroup)
     {
         goBack = new ManagedListItem(QString("[ %1 ]").arg(QObject::tr("Go Back")), parentList, this, "goBack");
@@ -276,7 +276,7 @@ void ManagedListGroup::clear()
         connect(goBack, SIGNAL(selected(ManagedListItem*)), this, SLOT(doGoBack()));
         connect(goBack, SIGNAL(canceled(ManagedListItem*)), this, SLOT(doGoBack()));
     }
-    
+
 }
 
 
@@ -295,23 +295,23 @@ void ManagedListGroup::setParentList(ManagedList* _parent)
 // SelectManagedListItem
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SelectManagedListItem::SelectManagedListItem(const QString& baseTxt, ManagedListGroup* pGroup, ManagedList* pList, 
+SelectManagedListItem::SelectManagedListItem(const QString& baseTxt, ManagedListGroup* pGroup, ManagedList* pList,
                                              QObject* _parent, const char* _name)
                      : ManagedListGroup(baseTxt, pGroup, pList, _parent, _name)
 {
     baseText = baseTxt;
     goBack->setText(QString("[ %1 ]").arg(QObject::tr("No Change")));
 }
-        
+
 ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QString value, bool select)
 {
     ManagedListItem* ret = NULL;
-    
+
     if (value == QString::null)
         value = label;
-    
+
     bool found = false;
-    
+
     for(ManagedListItem* tempItem = itemList.first(); tempItem; tempItem = itemList.next() )
     {
         if ((tempItem->getText() == label) || (tempItem->getValue() == value))
@@ -322,25 +322,25 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QStri
             ret = tempItem;
             break;
         }
-    
+
     }
-    
+
     if (!found)
     {
         ManagedListItem* newItem = new ManagedListItem(label, parentList, this, label);
-        newItem->setValue(value);        
+        newItem->setValue(value);
         addItem(newItem);
         ret = newItem;
         connect(newItem, SIGNAL(selected(ManagedListItem*)), this, SLOT(itemSelected(ManagedListItem* )));
-    } 
-   
+    }
+
     //cerr << "adding '" << label << "' value == " << value << " curval == " << valueText << endl;
-    
+
     // If we're adding an item with the same value as what we have selected
     // go trhough the selection process so the list gets updated.
-    if (value == valueText) 
+    if (value == valueText)
     {
-        
+
         int index = getValueIndex(value);
         //cerr << "new item matches cur value and is at: " << index << endl;
         if (index > 0)
@@ -352,32 +352,32 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QStri
     }
     else if (select)
         selectValue(value);
-    
+
 
     emit selectionAdded(label, value);
-    
+
     return ret;
 }
 
 ManagedListItem* SelectManagedListItem::addButton(const QString& label, QString value, bool select)
 {
     ManagedListItem* newItem = new ManagedListItem(label, parentList, this, label);
-    newItem->setValue(value);        
+    newItem->setValue(value);
     addItem(newItem);
-    
-    
+
+
     connect(newItem, SIGNAL(selected(ManagedListItem*)), this, SLOT(buttonSelected(ManagedListItem* )));
     if (select)
         selectValue(value);
     return newItem;
 }
 
-        
+
 void SelectManagedListItem::clearSelections(void)
 {
-    ManagedListGroup::clear();    
+    ManagedListGroup::clear();
     isSet = false;
-    
+
     text = baseText;
     emit selectionsCleared();
     changed();
@@ -392,10 +392,10 @@ void SelectManagedListItem::cursorRight(bool)
     ++curItem;
     if (curItem >= (itemCount-1))
         curItem = 0;
-    
+
     text = getCurItemText();
     valueText = getCurItemValue();
-    
+
     changed();
 }
 
@@ -407,12 +407,12 @@ void SelectManagedListItem::cursorLeft(bool)
     --curItem;
     if (curItem < 0)
         curItem =  itemCount - 2;
-    
+
     text = getCurItemText();
     valueText = getCurItemValue();
     changed();
 }
-        
+
 void SelectManagedListItem::setValue(const QString& newValue)
 {
     int index = getValueIndex(newValue);
@@ -428,13 +428,13 @@ void SelectManagedListItem::setValue(const QString& newValue)
 void SelectManagedListItem::select(const QString& newValue, bool bValue)
 {
     int index = 1;
-    
+
     if (bValue)
         index = getValueIndex(newValue);
     else
         index = getTextIndex(newValue);
 
-    
+
     if (index > -1)
     {
         curItem = index;
@@ -447,7 +447,7 @@ void SelectManagedListItem::select(const QString& newValue, bool bValue)
 void SelectManagedListItem::select()
 {
     lastItem = curItem;
-    ManagedListGroup::select();    
+    ManagedListGroup::select();
 }
 
 void SelectManagedListItem::doGoBack()
@@ -457,14 +457,14 @@ void SelectManagedListItem::doGoBack()
         curItem = lastItem;
     else
         text = QString( "[ %1 ]").arg(getCurItemText());
-    
+
     if (curItem != lastItem)
     {
         text = getCurItemText();
         valueText = getCurItemValue();
         changed();
-    }   
-    
+    }
+
     ManagedListGroup::doGoBack();
 }
 
@@ -480,8 +480,8 @@ void SelectManagedListItem::buttonSelected(ManagedListItem* itm)
     doGoBack();
     parentList->setLocked(false);
 }
-        
-        
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // ManagedList
@@ -506,24 +506,24 @@ void ManagedList::paintEvent(const QRect& r, QPainter *p, bool force)
 
 void ManagedList::update(QPainter *p)
 {
-    
+
     LayerSet *container = theme->GetSet(containerName);
     if (container && curGroup)
     {
-        
+
         int itemCount = curGroup->getItemCount();
         int curItem = curGroup->getCurIndex();
 
-        
+
         QRect pr = listRect;
         QPixmap pix(pr.size());
         pix.fill(getParent(), pr.topLeft());
         QPainter tmp(&pix);
-        
+
         QString tmptitle;
-        
-        
-        
+
+
+
         UIListType *ltype = (UIListType *)container->GetType(listName);
         if (ltype)
         {
@@ -536,25 +536,41 @@ void ManagedList::update(QPainter *p)
                 skip = itemCount - listSize;
             else
                 skip = curItem - listSize / 2;
-            
-            ltype->SetUpArrow(skip > 0);
-            ltype->SetDownArrow(skip + listSize < itemCount);    
 
-        
+            ltype->SetUpArrow(skip > 0);
+            ltype->SetDownArrow(skip + listSize < itemCount);
+
+
             for (int i = 0; i < listSize; i++)
             {
                 if (i + skip >= itemCount)
                     break;
-                
+
                 ManagedListItem *itm = curGroup->getItem(i+skip);
-                
+
                 ltype->SetItemText(i, 1, itm->getText());
+                int arrowsWanted = 0;
+
+                if (itm->hasLeft())
+                {
+                    arrowsWanted = UIListType::ARROW_LEFT;
+                }
+
+                if (itm->hasRight())
+                {
+                    arrowsWanted |= UIListType::ARROW_RIGHT;
+
+                }
+
+                ltype->SetItemArrow(i, arrowsWanted);
+                ltype->SetItemText(i, itm->getText());
+
                 int state = itm->getState();
                 if (state == MLS_NORMAL)
                 {
                     if ( !itm->getEnabled())
                         ltype->EnableForcedFont(i, "disabled");
-                    
+
                 }
                 else
                 {
@@ -563,17 +579,17 @@ void ManagedList::update(QPainter *p)
                         fntName = QString("enabled_state_%1").arg(state - MLS_BOLD);
                     else
                         fntName = QString("disabled_state_%1").arg(state - MLS_BOLD);
-                    
+
                     ltype->EnableForcedFont(i, fntName);
                 }
-                
+
                 if (i + skip == curItem)
                     ltype->SetItemCurrent(i);
-                
+
             }
-            
+
         }
-        
+
         container->Draw(&tmp, 0, 0);
         container->Draw(&tmp, 1, 0);
         container->Draw(&tmp, 2, 0);
@@ -583,11 +599,11 @@ void ManagedList::update(QPainter *p)
         container->Draw(&tmp, 6, 0);
         container->Draw(&tmp, 7, 0);
         container->Draw(&tmp, 8, 0);
-    
+
         tmp.end();
         p->drawPixmap(pr.topLeft(), pix);
     }
-    
+
 }
 
 
@@ -597,13 +613,13 @@ void ManagedList::cursorDown(bool page)
     {
         int newIndex = curGroup->getCurIndex();
         int itemCount = curGroup->getItemCount();
-                
+
         newIndex += (page ? itemCount : 1);
-        
+
         if (newIndex >= itemCount)
             newIndex = newIndex - itemCount;
-        
-        
+
+
         while(curGroup->getItem(newIndex)->getEnabled() == false)
         {
             ++newIndex;
@@ -623,18 +639,18 @@ void ManagedList::cursorUp(bool page)
     {
         int newIndex = curGroup->getCurIndex();
         int itemCount = curGroup->getItemCount();
-        
+
         newIndex -= (page ? itemCount : 1);
         if (newIndex < 0)
             newIndex = itemCount + newIndex;
-                
+
         while(curGroup->getItem(newIndex)->getEnabled() == false)
         {
             --newIndex;
             if (newIndex <= 0 )
                 newIndex = itemCount - 1;
         }
-        
+
         curGroup->setCurIndex(newIndex);
         getParent()->update(listRect);
     }
@@ -662,7 +678,7 @@ void ManagedList::select()
 void ManagedList::itemChanged(ManagedListItem* itm)
 {
     if (itm)
-        getParent()->update(listRect);    
+        getParent()->update(listRect);
 }
 
 
@@ -671,42 +687,42 @@ bool ManagedList::init(XMLParse *themeIn, const QString& containerNameIn, const 
     UIListType *ltype = NULL;
     LayerSet *container = NULL;
 
-   
+
     if (!themeIn || containerNameIn.isEmpty() || listNameIn.isEmpty())
     {
-        cerr << "sanity check failed" << endl;    
+        cerr << "sanity check failed" << endl;
         return false;
     }
-    
+
     theme = themeIn;
     containerName = containerNameIn;
-    
+
     container = theme->GetSet(containerName);
     if (!container)
     {
         cerr << "Failed to get container " << containerName << endl;
         return false;
     }
-    
+
     listName = listNameIn;
-    
+
     ltype = (UIListType *)container->GetType(listName);
     if (!ltype)
     {
         cerr << "Failed to get list " << listName << endl;
         return false;
     }
-  
+
     listSize = ltype->GetItems();
     listRect = r;
-        
+
     return true;
 }
 
-void ManagedList::setCurGroup(ManagedListGroup* newGroup) 
-{ 
-    curGroup = newGroup; 
-    getParent()->update(listRect); 
+void ManagedList::setCurGroup(ManagedListGroup* newGroup)
+{
+    curGroup = newGroup;
+    getParent()->update(listRect);
 }
 
 bool ManagedList::goBack()
@@ -716,7 +732,7 @@ bool ManagedList::goBack()
         curGroup->doGoBack();
         return true;
     }
-    
+
     return false;
 }
 

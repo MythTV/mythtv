@@ -37,7 +37,7 @@ class LayerSet
   public:
     LayerSet(const QString &name);
    ~LayerSet();
- 
+
     void    Draw(QPainter *, int, int);
     void    DrawRegion(QPainter *, QRect &, int, int);
 
@@ -83,7 +83,7 @@ class LayerSet
 class UIType : public QObject
 {
   Q_OBJECT
-  
+
   public:
     UIType(const QString &name);
     virtual ~UIType();
@@ -105,15 +105,15 @@ class UIType : public QObject
     virtual void DrawRegion(QPainter *, QRect &, int, int);
     virtual void calculateScreenArea();
     QRect   getScreenArea(){return screen_area;}
-    QString cutDown(const QString &data, QFont *font, bool multiline = false, 
+    QString cutDown(const QString &data, QFont *font, bool multiline = false,
                     int overload_width = -1, int overload_height = -1);
     QString getName(){return m_name;}
 
     bool    isShown(){return !hidden;}
     bool    isHidden(){return hidden;}
-    
+
   public slots:
-  
+
     virtual bool takeFocus();
     virtual void looseFocus();
     virtual void activate(){}
@@ -121,10 +121,10 @@ class UIType : public QObject
     virtual void show();
     virtual void hide();
     virtual bool toggleShow();
-    
+
 
   signals:
-  
+
     //
     //  Ask my container to ask Qt to repaint
     //
@@ -136,7 +136,7 @@ class UIType : public QObject
     void loosingFocus();
 
   protected:
-  
+
     double   m_wmult;
     double   m_hmult;
     int      m_context;
@@ -197,10 +197,10 @@ class AlphaTable
     AlphaTable();
     ~AlphaTable();
     AlphaTable(const QColor &color, int alpha);
-   
+
     unsigned char r[256], g[256], b[256];
-  
-  private:  
+
+  private:
     void maketable(unsigned char* data, int channel, int alpha);
 };
 
@@ -212,7 +212,7 @@ class AlphaBlender
     void init(int alpha = 96, int cacheSize = 30);
     void addColor(const QColor &color);
     void blendImage(const QImage &image, const QColor &color);
-  
+
   private:
     QDict<AlphaTable> alphaTables;
     int alpha;
@@ -237,13 +237,13 @@ class UIGuideType : public UIType
     void SetSelectorType(int type) { seltype = type; }
     void SetNumRows(int numRows) { this->numRows = numRows; }
     void SetWindow(MythDialog *win) { window = win; }
-    
-    void SetRecordingColors(const QString &reccol, const QString &concol) 
+
+    void SetRecordingColors(const QString &reccol, const QString &concol)
                   { reccolor = QColor(reccol); concolor = QColor(concol); }
     void SetSelectorColor(const QString &col) { selcolor = QColor(col); }
     void SetSolidColor(const QString &col) { solidcolor = QColor(col); }
     void SetCategoryColors(const QMap<QString, QString> &catColors);
-    
+
     void SetArea(const QRect &area) { this->area = area; }
     void SetScreenLocation(const QPoint &sl) { screenloc = sl; }
     void SetTextOffset(const QPoint &to) { textoffset = to; }
@@ -262,7 +262,7 @@ class UIGuideType : public UIType
     {
       public:
         UIGTCon() { arrow = recType = recStat = 0; };
-        UIGTCon(const QRect &drawArea, const QString &title, 
+        UIGTCon(const QRect &drawArea, const QString &title,
                 const QString &category, int arrow, int recType, int recStat)
         {
             this->drawArea = drawArea;
@@ -282,8 +282,8 @@ class UIGuideType : public UIType
             arrow = o.arrow;
             recType = o.recType;
             recStat = o.recStat;
-        }        
-        
+        }
+
         QRect drawArea;
         QString title;
         QString category;
@@ -292,22 +292,22 @@ class UIGuideType : public UIType
         int recType;
         int recStat;
     };
-    
-    void drawBackground(QPainter *dr, UIGTCon *data); 
+
+    void drawBackground(QPainter *dr, UIGTCon *data);
     void drawBox(QPainter *dr, UIGTCon *data, const QColor &color);
     void drawText(QPainter *dr, UIGTCon *data);
     void drawRecType(QPainter *dr, UIGTCon *data);
     void drawCurrent(QPainter *dr, UIGTCon *data);
-    
+
     QPtrList<UIGTCon> *allData;
     UIGTCon selectedItem;
-    
+
     QPixmap recImages[15];
     QPixmap arrowImages[15];
-    
+
     int maxRows;
     int numRows;
-    
+
     MythDialog *window;
     QRect area;
     QPoint textoffset;
@@ -317,13 +317,13 @@ class UIGuideType : public UIType
     bool multilineText;
     fontProp *font;
     QColor solidcolor;
-    
+
     QColor selcolor;
     int seltype;
-    
+
     QColor reccolor;
     QColor concolor;
-    
+
     int filltype;
     bool cutdown;
     bool drawCategoryColors;
@@ -340,44 +340,50 @@ class UIListType : public UIType
   public:
     UIListType(const QString &, QRect, int);
     ~UIListType();
-  
-    void SetCount(int cnt) { m_count = cnt; 
+
+    enum ItemArrows  { ARROW_NONE, ARROW_LEFT, ARROW_RIGHT, ARROW_BOTH };
+
+    void SetCount(int cnt) { m_count = cnt;
                              m_selheight = (int)(m_area.height() / m_count); }
 
     void SetItemText(int, int, QString);
     void SetItemText(int, QString);
- 
+    void SetItemArrow(int, int);
+
     void SetActive(bool act) { m_active = act; }
     void SetItemCurrent(int cur) { m_current = cur; }
 
     void SetColumnWidth(int col, int width) { columnWidth[col] = width; }
     void SetColumnContext(int col, int context) { columnContext[col] = context; }
     void SetColumnPad(int pad) { m_pad = pad; }
-
-    void SetImageUpArrow(QPixmap img, QPoint loc) { 
+    void SetImageLeftArrow(QPixmap img, QPoint loc) {
+                           m_leftarrow = img; m_leftarrow_loc = loc; }
+    void SetImageRightArrow(QPixmap img, QPoint loc) {
+                           m_rightarrow = img; m_rightarrow_loc = loc;}
+    void SetImageUpArrow(QPixmap img, QPoint loc) {
                          m_uparrow = img; m_uparrow_loc = loc; }
-    void SetImageDownArrow(QPixmap img, QPoint loc) { 
+    void SetImageDownArrow(QPixmap img, QPoint loc) {
                            m_downarrow = img; m_downarrow_loc = loc; }
-    void SetImageSelection(QPixmap img, QPoint loc) { 
+    void SetImageSelection(QPixmap img, QPoint loc) {
                            m_selection = img; m_selection_loc = loc; }
 
     void SetUpArrow(bool arrow) { m_uarrow = arrow; }
     void SetDownArrow(bool arrow) { m_darrow = arrow; }
- 
+
     void SetFill(QRect area, QColor color, int type) {
-                          m_fill_area = area; m_fill_color = color; 
+                          m_fill_area = area; m_fill_color = color;
                           m_fill_type = type; }
 
-    void SetFonts(QMap<QString, QString> fonts, QMap<QString, fontProp> fontfcn) { 
+    void SetFonts(QMap<QString, QString> fonts, QMap<QString, fontProp> fontfcn) {
                           m_fonts = fonts; m_fontfcns = fontfcn; }
     void EnableForcedFont(int num, QString func) { forceFonts[num] = m_fonts[func]; }
 
     int GetCurrentItem() { return m_current; }
     int GetItems() { return m_count; }
     QString GetItemText(int, int col = 1);
-    void ResetList() { listData.clear(); forceFonts.clear(); 
+    void ResetList() { listData.clear(); forceFonts.clear();
                        m_current = -1; m_columns = 0; }
- 
+
     void Draw(QPainter *, int drawlayer, int);
     bool ShowSelAlways() const { return m_showSelAlways; }
     void ShowSelAlways(bool bnew) { m_showSelAlways = bnew; }
@@ -399,14 +405,19 @@ class UIListType : public UIType
     QPixmap m_selection;
     QPixmap m_downarrow;
     QPixmap m_uparrow;
+    QPixmap m_leftarrow;
+    QPixmap m_rightarrow;
     QPoint m_selection_loc;
     QPoint m_downarrow_loc;
     QPoint m_uparrow_loc;
+    QPoint m_rightarrow_loc;
+    QPoint m_leftarrow_loc;
     QRect m_area;
     QMap<QString, QString> m_fonts;
     QMap<QString, fontProp> m_fontfcns;
     QMap<int, QString> forceFonts;
     QMap<int, QString> listData;
+    QMap<int, int> listArrows;
     QMap<int, int> columnWidth;
     QMap<int, int> columnContext;
 };
@@ -421,7 +432,7 @@ class UIImageType : public UIType
 
     QPoint DisplayPos() { return m_displaypos; }
     void SetPosition(QPoint pos) { m_displaypos = pos; }
-  
+
     void SetFlex(bool flex) { m_flex = flex; }
     void ResetFilename() { m_filename = orig_filename; };
     void SetImage(QString file) { m_filename = file; }
@@ -434,11 +445,11 @@ class UIImageType : public UIType
     QPixmap GetImage() { return img; }
     int GetSize() { return m_force_x; }
     virtual void Draw(QPainter *, int, int);
-    
+
     const QString& GetImageFilename() const { return m_filename; }
-    
+
   public slots:
-  
+
     //
     //  We have to redefine this, as pixmaps
     //  are not of a fixed size. And it has to
@@ -525,32 +536,32 @@ class UIAnimatedImageType : public UIType
 class UIRepeatedImageType : public UIImageType
 {
     Q_OBJECT
-    
+
   public:
-  
+
     UIRepeatedImageType(const QString &, const QString &, int, QPoint);
     void setRepeat(int how_many);
     void Draw(QPainter *, int, int);
     void setOrientation(int x);
 
   public slots:
-  
+
     void refresh();
-    
+
   protected:
-  
+
     int m_repeat;
     int m_highest_repeat;
-    
+
   private:
-  
+
     //  0 = left to right
     //  1 = right to left
     //  2 = bottom to top
     //  3 = top to bottom
-    
+
     int m_orientation;
-    
+
 };
 
 
@@ -601,7 +612,7 @@ class UIMultiTextType : public UITextType
 
   Q_OBJECT
 
-  public: 
+  public:
 
     enum AnimationStage
     {
@@ -612,32 +623,32 @@ class UIMultiTextType : public UITextType
     };
 
     UIMultiTextType(
-                    const QString &, 
-                    fontProp *, 
+                    const QString &,
+                    fontProp *,
                     int,
-                    QRect displayrect, 
+                    QRect displayrect,
                     QRect altdisplayrect
                    );
 
     void setTexts(QStringList new_messagep);
     void clearTexts();
     void Draw(QPainter*, int, int);
-  
+
     void setDropTimingLength(int x){drop_timing_length = x;}
     void setDropTimingPause(int x){drop_timing_pause = x;}
     void setScrollTimingLength(int x){scroll_timing_length = x;}
     void setScrollTimingPause(int x){scroll_timing_pause = x;}
-    
+
     void setMessageSpacePadding(int x){message_space_padding = x;}
-    
-  
+
+
   private slots:
 
     void        animate();
 
   private:
 
-    QStringList     messages;  
+    QStringList     messages;
     int             current_text_index;
     QTimer          transition_timer;
     AnimationStage  animation_stage;
@@ -648,8 +659,8 @@ class UIMultiTextType : public UITextType
     int             drop_timing_pause;
     int             scroll_timing_length;
     int             scroll_timing_pause;
-    
-    int             message_space_padding;    
+
+    int             message_space_padding;
 
 };
 
@@ -680,14 +691,14 @@ class UIStatusBarType : public UIType
     QPixmap m_container;
     QPixmap m_filler;
     QPoint m_location;
-    
+
     // 0 = left to right
     // 1 = left to right
     // 2 = left to right
     // 3 = left to right
-    
+
     int m_orientation;
-    
+
 };
 
 class UIManagedTreeListType : public UIType
@@ -730,7 +741,7 @@ class UIManagedTreeListType : public UIType
                             left_arrow_image = left;
                             right_arrow_image = right;
                           }
-    void    setFonts(QMap<QString, QString> fonts, QMap<QString, fontProp> fontfcn) { 
+    void    setFonts(QMap<QString, QString> fonts, QMap<QString, fontProp> fontfcn) {
                           m_fonts = fonts; m_fontfcns = fontfcn; }
     void    drawText(QPainter *p, QString the_text, QString font_name, int x, int y, int bin_number);
     void    setJustification(int jst) { m_justification = jst; }
@@ -740,7 +751,7 @@ class UIManagedTreeListType : public UIType
     void    forceLastBin(){active_bin = bins; refresh();}
     void    calculateScreenArea();
     void    setTreeOrdering(int an_int){tree_order = an_int;}
-    void    setVisualOrdering(int an_int){visual_order = an_int;}    
+    void    setVisualOrdering(int an_int){visual_order = an_int;}
     void    showWholeTree(bool yes_or_no){ show_whole_tree = yes_or_no; }
     void    scrambleParents(bool yes_or_no){ scrambled_parents = yes_or_no; }
     void    colorSelectables(bool yes_or_no){color_selectables = yes_or_no; }
@@ -765,7 +776,7 @@ class UIManagedTreeListType : public UIType
     void    activate();
     void    enter();
     void    deactivate(){active_node = NULL;}
-    
+
   signals:
 
     void    nodeSelected(int, IntVector*); //  emit int and attributes when user selects a node
@@ -774,7 +785,7 @@ class UIManagedTreeListType : public UIType
   private:
 
     int   calculateEntriesInBin(int bin_number);
-    bool  complexInternalNextPrevActive(bool forward_or_reverse, bool wrap_around);    
+    bool  complexInternalNextPrevActive(bool forward_or_reverse, bool wrap_around);
     QRect area;
     int   bins;
     int   active_bin;
@@ -808,42 +819,42 @@ class UIManagedTreeListType : public UIType
 class UIPushButtonType : public UIType
 {
     Q_OBJECT
-    
+
   public:
-    
+
     UIPushButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed);
 
     virtual void Draw(QPainter *, int drawlayer, int context);
     void    setPosition(QPoint pos){m_displaypos = pos;}
     virtual void calculateScreenArea();
-    
-  public slots:  
-  
+
+  public slots:
+
     virtual void push();
     virtual void unPush();
     virtual void activate(){push();}
- 
+
   signals:
-  
+
     void    pushed();
-  
+
   protected:
-  
+
     QPoint  m_displaypos;
     QPixmap on_pixmap;
     QPixmap off_pixmap;
     QPixmap pushed_pixmap;
     bool    currently_pushed;
     QTimer  push_timer;
-    
+
 };
 
 class UITextButtonType : public UIType
 {
     Q_OBJECT
-    
+
   public:
-  
+
     UITextButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed);
 
     void    Draw(QPainter *, int drawlayer, int context);
@@ -851,19 +862,19 @@ class UITextButtonType : public UIType
     void    setText(const QString some_text);
     void    setFont(fontProp *font) { m_font = font; }
     void    calculateScreenArea();
-    
-  public slots:  
-  
+
+  public slots:
+
     void    push();
     void    unPush();
     void    activate(){push();}
- 
+
   signals:
-  
+
     void    pushed();
-  
+
   private:
-  
+
     QPoint   m_displaypos;
     QPixmap  on_pixmap;
     QPixmap  off_pixmap;
@@ -872,7 +883,7 @@ class UITextButtonType : public UIType
     fontProp *m_font;
     bool     currently_pushed;
     QTimer   push_timer;
-    
+
 };
 
 
@@ -880,36 +891,36 @@ class UITextButtonType : public UIType
 class UICheckBoxType : public UIType
 {
     Q_OBJECT
-    
+
     //
     //  A simple, theme-able check box
     //
 
-  public: 
-     
-    UICheckBoxType(const QString &name, 
-                   QPixmap checkedp, 
+  public:
+
+    UICheckBoxType(const QString &name,
+                   QPixmap checkedp,
                    QPixmap uncheckedp,
                    QPixmap checked_highp,
                    QPixmap unchecked_highp);
-                   
+
     void    Draw(QPainter *, int drawlayer, int context);
     void    setPosition(QPoint pos){m_displaypos = pos;}
     void    calculateScreenArea();
-  
+
   public slots:
-  
+
     void    push();
     void    setState(bool checked_or_not);
     void    toggle(){push();}
     void    activate(){push();}
-    
+
   signals:
-  
+
     void    pushed(bool state);
 
   private:
-  
+
     QPoint  m_displaypos;
     QPixmap checked_pixmap;
     QPixmap unchecked_pixmap;
@@ -923,19 +934,19 @@ class IntStringPair
 {
     //  Miniscule class for holding data
     //  in a UISelectorType (below)
-    
+
   public:
-  
+
     IntStringPair(int an_int, const QString a_string){my_int = an_int; my_string = a_string;}
 
     void    setString(const QString &a_string){my_string = a_string;}
     void    setInt(int an_int){my_int = an_int;}
     QString getString(){return my_string;}
     int     getInt(){return my_int;}
-    
+
 
   private:
-  
+
     int     my_int;
     QString my_string;
 
@@ -945,9 +956,9 @@ class IntStringPair
 class UISelectorType : public UIPushButtonType
 {
     Q_OBJECT
-    
+
     //
-    //  A theme-able "thingy" (that's the 
+    //  A theme-able "thingy" (that's the
     //  offical term) that can hold a list
     //  of strings and emit an int and/or
     //  the string when the user selects
@@ -955,29 +966,29 @@ class UISelectorType : public UIPushButtonType
     //
 
   public:
-  
+
     UISelectorType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed, QRect area);
     ~UISelectorType();
-        
+
     void    Draw(QPainter *, int drawlayer, int context);
     void    calculateScreenArea();
     void    addItem(int an_int, const QString &a_string);
     void    setFont(fontProp *font) { m_font = font; }
-    
-  public slots:  
-  
+
+  public slots:
+
     void push(bool up_or_down);
     void unPush();
     void activate(){push(true);}
     void cleanOut(){current_data = NULL; my_data.clear();}
     void setToItem(int which_item);
- 
+
   signals:
-  
+
     void    pushed(int);
-  
+
   private:
-  
+
     QRect                   m_area;
     fontProp                *m_font;
     QPtrList<IntStringPair> my_data;
@@ -991,7 +1002,7 @@ class UISelectorType : public UIPushButtonType
 class UIBlackHoleType : public UIType
 {
     Q_OBJECT
-    
+
     //
     //  This just holds a blank area of the screen
     //  originally designed to "hold" the place where
@@ -999,14 +1010,14 @@ class UIBlackHoleType : public UIType
     //
 
   public:
-      
+
     UIBlackHoleType(const QString &name);
     void calculateScreenArea();
     void setArea(QRect an_area) { area = an_area; }
     virtual void Draw(QPainter *, int, int){}
 
   protected:
-  
+
     QRect area;
 };
 
