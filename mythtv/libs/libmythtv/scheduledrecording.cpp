@@ -396,6 +396,7 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo,
     programid->setValue(proginfo->programid);
 
     profile->fillSelections(db);
+    recgroup->fillSelections(db);
     dupin->setValue(0);
     dupmethod->setValue(0);
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
