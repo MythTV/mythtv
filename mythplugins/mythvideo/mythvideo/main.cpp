@@ -311,7 +311,7 @@ void SearchDir(QSqlDatabase *db, QString &directory)
     {
         while (query.next())
         {
-            QString name = query.value(0).toString();
+            QString name = QString::fromUtf8(query.value(0).toString());
             if (name != QString::null)
             {
                 if ((iter = video_files.find(name)) != video_files.end())
