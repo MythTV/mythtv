@@ -270,7 +270,9 @@ public:
         BackendSetting("AutoExpireDefault") {
         setLabel("Auto-Expire Default");
         setValue(true);
-        setHelpText("Turn Auto-Expire ON by default on new recordings.");
+        setHelpText("Turn Auto-Expire ON by default when creating "
+                    "new scheduled recordings.  Existing scheduled "
+                    "recordings will keep their current value.");
     };
 };
 
