@@ -12,7 +12,7 @@ class Metadata;
 class MadDecoder : public Decoder
 {
   public:
-    MadDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
+    MadDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
     virtual ~MadDecoder(void);
 
     bool initialize();

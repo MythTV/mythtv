@@ -27,11 +27,11 @@ LIBS += -lmad -lid3tag -logg -lvorbisfile -lvorbis -lvorbisenc -lcdaudio -lFLAC
 LIBS += -lmp3lame -lcdda_paranoia -lcdda_interface
 
 # Input
-HEADERS += audiooutput.h buffer.h cddecoder.h cdrip.h constants.h databasebox.h 
+HEADERS += cddecoder.h cdrip.h constants.h databasebox.h
 HEADERS += decoder.h flacdecoder.h flacencoder.h maddecoder.h mainvisual.h
-HEADERS += metadata.h playbackbox.h playlist.h polygon.h output.h recycler.h 
+HEADERS += metadata.h playbackbox.h playlist.h polygon.h 
 HEADERS += streaminput.h synaesthesia.h encoder.h visualize.h avfdecoder.h
-HEADERS += treecheckitem.h visual.h vorbisdecoder.h vorbisencoder.h polygon.h
+HEADERS += treecheckitem.h vorbisdecoder.h vorbisencoder.h polygon.h
 HEADERS += bumpscope.h globalsettings.h lameencoder.h dbcheck.h
 HEADERS += metaio.h metaioid3v2.h vcedit.h metaiooggvorbiscomment.h
 HEADERS += metaioflacvorbiscomment.h metaioavfcomment.h metaio_libid3hack.h
@@ -40,10 +40,10 @@ HEADERS += goom/ifs.h goom/lines.h goom/mythgoom.h goom/drawmethods.h
 HEADERS += goom/mmx.h goom/mathtools.h goom/tentacle3d.h goom/v3d.h
 HEADERS += editmetadata.h
 
-SOURCES += audiooutput.cpp cddecoder.cpp cdrip.cpp decoder.cpp 
+SOURCES += cddecoder.cpp cdrip.cpp decoder.cpp 
 SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp
-SOURCES += mainvisual.cpp metadata.cpp playbackbox.cpp playlist.cpp output.cpp 
-SOURCES += recycler.cpp streaminput.cpp encoder.cpp resample.c dbcheck.cpp
+SOURCES += mainvisual.cpp metadata.cpp playbackbox.cpp playlist.cpp 
+SOURCES += streaminput.cpp encoder.cpp resample.c dbcheck.cpp
 SOURCES += synaesthesia.cpp treecheckitem.cpp vorbisdecoder.cpp lameencoder.cpp
 SOURCES += vorbisencoder.cpp visualize.cpp bumpscope.cpp globalsettings.cpp
 SOURCES += databasebox.cpp

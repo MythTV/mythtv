@@ -10,7 +10,7 @@ class Metadata;
 class FlacDecoder : public Decoder
 {
   public:
-    FlacDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
+    FlacDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
     virtual ~FlacDecoder(void);
 
     bool initialize();
@@ -42,7 +42,6 @@ class FlacDecoder : public Decoder
     long len, freq, bitrate;
     int chan;
     int bitspersample;
-    unsigned long output_size;
     double totalTime, seekTime;
     unsigned long totalsamples;
 

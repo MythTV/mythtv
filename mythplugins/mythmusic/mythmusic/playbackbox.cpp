@@ -5,10 +5,9 @@
 using namespace std;
 
 #include "metadata.h"
-#include "audiooutput.h"
+#include <mythtv/audiooutput.h>
 #include "constants.h"
 #include "streaminput.h"
-#include "output.h"
 #include "decoder.h"
 #include "playbackbox.h"
 #include "databasebox.h"
@@ -71,11 +70,11 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
 
     // Possibly (user-defined) control the volume
     
-    volume_control = NULL;
+    volume_control = false;
     volume_display_timer = new QTimer(this);
     if (gContext->GetNumSetting("MythControlsVolume", 0))
     {
-        volume_control = new VolumeControl(true);
+        volume_control = true;
         volume_display_timer->start(2000);
         connect(volume_display_timer, SIGNAL(timeout()), this, SLOT(hideVolume()));
     }
@@ -186,8 +185,6 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
 PlaybackBox::~PlaybackBox(void)
 {
     stopAll();
-    if (volume_control)
-        delete volume_control;
     if (playlist_tree)
         delete playlist_tree;
 
@@ -495,9 +492,9 @@ void PlaybackBox::changeVolume(bool up_or_down)
     if (volume_control)
     {
         if (up_or_down)
-            volume_control->AdjustCurrentVolume(2);
+            output->AdjustCurrentVolume(2);
         else
-            volume_control->AdjustCurrentVolume(-2);
+            output->AdjustCurrentVolume(-2);
         showVolume(true);
     }
 }
@@ -506,7 +503,7 @@ void PlaybackBox::toggleMute()
 {
     if (volume_control)
     {
-        volume_control->ToggleMute();
+        output->ToggleMute();
         showVolume(true);
     }
 }
@@ -520,7 +517,7 @@ void PlaybackBox::showVolume(bool on_or_off)
         {
             if(on_or_off)
             {
-                volume_status->SetUsed(volume_control->GetCurrentVolume());
+                volume_status->SetUsed(output->GetCurrentVolume());
                 volume_status->SetOrder(0);
                 volume_status->refresh();
                 volume_display_timer->changeInterval(2000);
@@ -530,10 +527,10 @@ void PlaybackBox::showVolume(bool on_or_off)
                     if (class LCD * lcd = LCD::Get())
                         lcd->switchToVolume("Music");
                 }
-                if (volume_control->GetMute())
+                if (output->GetMute())
                     volume_level = 0.0;
                 else
-                    volume_level = (float)volume_control->GetCurrentVolume() / 
+                    volume_level = (float)output->GetCurrentVolume() / 
                                    (float)100;
 
                 if (class LCD * lcd = LCD::Get())
@@ -598,19 +595,20 @@ void PlaybackBox::play()
     {
         QString adevice = gContext->GetSetting("AudioDevice");
 
-        output = new MMAudioOutput(outputBufferSize * 1024, adevice);
+        // TODO: Error checking that device is opened correctly!
+        output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, 
+	                                 AUDIOOUTPUT_MUSIC, true );	
         output->setBufferSize(outputBufferSize * 1024);
+        output->SetBlocking(true);
         output->addListener(this);
         output->addListener(mainvisual);
         output->addVisual(mainvisual);
 	
         startoutput = true;
 
-        if (!output->initialize())
-            return;
     }
    
-    if (output->isPaused())
+    if (output->GetPause())
     {
         pause();
         return;
@@ -658,10 +656,7 @@ void PlaybackBox::play()
     {
         if (output)
         {
-            if (startoutput)
-                output->start();
-            else
-                output->resetTime();
+            output->Reset();
         }
 
         decoder->start();
@@ -736,12 +731,9 @@ void PlaybackBox::pause(void)
 {
     if (output) 
     {
-        output->mutex()->lock();
-        output->pause();
         isplaying = !isplaying;
-        output->mutex()->unlock();
+        output->Pause(!isplaying); //Note pause doesn't take effet instantly
     }
-
     // wake up threads
     if (decoder) 
     {
@@ -750,12 +742,6 @@ void PlaybackBox::pause(void)
         decoder->mutex()->unlock();
     }
 
-    if (output) 
-    {
-        output->recycler()->mutex()->lock();
-        output->recycler()->cond()->wakeAll();
-        output->recycler()->mutex()->unlock();
-    }
 }
 
 void PlaybackBox::stopDecoder(void)
@@ -787,13 +773,6 @@ void PlaybackBox::stop(void)
         decoder->mutex()->unlock();
     }
 
-    if (output && output->running()) 
-    {
-        output->mutex()->lock();
-        output->stop();
-        output->mutex()->unlock();
-    }
-
     // wake up threads
     if (decoder) 
     {
@@ -802,18 +781,8 @@ void PlaybackBox::stop(void)
         decoder->mutex()->unlock();
     }
 
-    if (output) 
-    {
-        output->recycler()->mutex()->lock();
-        output->recycler()->cond()->wakeAll();
-        output->recycler()->mutex()->unlock();
-    }
-
     if (decoder)
         decoder->wait();
-
-    if (output)
-        output->wait();
 
     if (output)
     {
@@ -927,10 +896,10 @@ void PlaybackBox::seekback()
 
 void PlaybackBox::seek(int pos)
 {
-    if (output && output->running()) 
+    if (output)
     {
-        output->mutex()->lock();
-        output->seek(pos);
+        output->Reset();
+        output->SetTimecode(pos*1000);
 
         if (decoder && decoder->running()) 
         {
@@ -946,7 +915,6 @@ void PlaybackBox::seek(int pos)
 
             decoder->mutex()->unlock();
         }
-        output->mutex()->unlock();
     }
 }
 
@@ -1364,7 +1332,7 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
                 ratings_image->setRepeat(curMeta->Rating());
         }
 
-        if (output && output->isPaused())
+        if (output && output->GetPause())
         {
             stop();
             if(play_button)

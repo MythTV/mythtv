@@ -12,7 +12,7 @@
 #ifndef VISUALIZE_H
 #define VISUALIZE_H
 
-#include "visual.h"
+#include <mythtv/visual.h>
 #include "mainvisual.h"
 #include "constants.h"
 #include "config.h"

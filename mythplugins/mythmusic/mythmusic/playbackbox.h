@@ -7,7 +7,7 @@
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
-#include <mythtv/volumecontrol.h>
+#include <mythtv/audiooutput.h>
 
 #include "mainvisual.h"
 #include "metadata.h"
@@ -83,7 +83,7 @@ class PlaybackBox : public MythThemedDialog
     void CycleVisualizer(void);
 
     QIODevice *input;
-    Output *output;
+    AudioOutput *output;
     Decoder *decoder;
 
     QString playfile;
@@ -140,7 +140,7 @@ class PlaybackBox : public MythThemedDialog
     bool show_whole_tree;
     bool keyboard_accelerators;
 
-    VolumeControl   *volume_control;
+    bool volume_control;
 
     //
     //  Theme-related "widgets"

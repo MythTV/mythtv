@@ -7,7 +7,7 @@
 #ifndef __mainvisual_h
 #define __mainvisual_h
 
-#include "visual.h"
+#include <mythtv/visual.h>
 #include "polygon.h"
 #include "constants.h"
 
@@ -78,7 +78,7 @@ public:
     QString getCurrentVisualDesc() const;
     int numVisualizers() const;
 
-    void add(Buffer *, unsigned long, int, int);
+    void add(uchar *, unsigned long, unsigned long, int, int);
     void prepare();
 
     QSize minimumSizeHint() const { return sizeHint(); }

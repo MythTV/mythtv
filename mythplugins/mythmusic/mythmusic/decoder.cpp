@@ -6,9 +6,8 @@
 
 #include "decoder.h"
 #include "constants.h"
-#include "buffer.h"
-#include "output.h"
-#include "visual.h"
+#include <mythtv/output.h>
+#include <mythtv/visual.h>
 
 #include <qobject.h>
 #include <qptrlist.h>
@@ -18,7 +17,7 @@
 
 #include <mythtv/mythcontext.h>
 
-Decoder::Decoder(DecoderFactory *d, QIODevice *i, Output *o)
+Decoder::Decoder(DecoderFactory *d, QIODevice *i, AudioOutput *o)
        : fctry(d), in(i), out(o), blksize(0)
 {
 }
@@ -38,7 +37,7 @@ void Decoder::setInput(QIODevice *i)
     mutex()->unlock();
 }
 
-void Decoder::setOutput(Output *o)
+void Decoder::setOutput(AudioOutput *o)
 {
     mutex()->lock();
     out = o;
@@ -159,7 +158,7 @@ void Decoder::registerFactory(DecoderFactory *fact)
 }
 
 Decoder *Decoder::create(const QString &source, QIODevice *input,
-                         Output *output, bool deletable)
+                         AudioOutput *output, bool deletable)
 {
     checkFactories();
 

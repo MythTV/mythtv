@@ -6,8 +6,7 @@
 
 #include "mainvisual.h"
 #include "constants.h"
-#include "buffer.h"
-#include "output.h"
+#include <mythtv/audiooutput.h>
 #include "synaesthesia.h"
 #include "bumpscope.h"
 #include "visualize.h"
@@ -186,9 +185,9 @@ void MainVisual::prepare()
     nodes.setAutoDelete(FALSE);
 }
 
-void MainVisual::add(Buffer *b, unsigned long w, int c, int p)
+void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int p)
 {
-    long len = b->nbytes, cnt;
+    long len = b_len, cnt;
     short *l = 0, *r = 0;
 
     len /= c;
@@ -205,18 +204,18 @@ void MainVisual::add(Buffer *b, unsigned long w, int c, int p)
         r = new short[len];
 
         if (p == 8)
-            stereo16_from_stereopcm8(l, r, b->data, cnt);
+            stereo16_from_stereopcm8(l, r, b, cnt);
         else if (p == 16)
-            stereo16_from_stereopcm16(l, r, (short *) b->data, cnt);
+            stereo16_from_stereopcm16(l, r, (short *) b, cnt);
     } 
     else if (c == 1) 
     {
         l = new short[len];
 
         if (p == 8)
-            mono16_from_monopcm8(l, b->data, cnt);
+            mono16_from_monopcm8(l, b, cnt);
         else if (p == 16)
-            mono16_from_monopcm16(l, (short *) b->data, cnt);
+            mono16_from_monopcm16(l, (short *) b, cnt);
     } 
     else
         len = 0;
@@ -229,10 +228,7 @@ void MainVisual::timeout()
     VisualNode *node = 0;
 
     if (playing && output()) {
-	long olat = output()->latency();
-	long owrt = output()->written();
-	long synctime = owrt < olat ? 0 : owrt - olat;
-
+        long synctime = output()->GetAudiotime();
 	mutex()->lock();
 	VisualNode *prev = 0;
 	while ((node = nodes.first())) {

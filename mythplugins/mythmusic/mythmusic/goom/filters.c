@@ -50,14 +50,14 @@ static void select_zoom_filter () {
 	if (firsttime){
 		if (zoom_filter_xmmx_supported()) {
 			zf_use_xmmx = 1;
-			printf ("Extented MMX detected. Using the fastest method !\n");
+			//printf ("Extended MMX detected. Using the fastest method !\n");
 		}
 		else if (zoom_filter_mmx_supported()) {
 			zf_use_mmx = 1;
-			printf ("MMX detected. Using fast method !\n");
+			//printf ("MMX detected. Using fast method !\n");
 		}
 		else {
-			printf ("Too bad ! No MMX detected.\n");
+			//printf ("Too bad ! No MMX detected.\n");
 		}
 		firsttime = 0;
 	}

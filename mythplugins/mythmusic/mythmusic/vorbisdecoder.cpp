@@ -8,9 +8,7 @@ using namespace std;
 
 #include "vorbisdecoder.h"
 #include "constants.h"
-#include "buffer.h"
-#include "output.h"
-#include "recycler.h"
+#include <mythtv/audiooutput.h>
 #include "metadata.h"
 #include "metaiooggvorbiscomment.h"
 
@@ -67,7 +65,7 @@ static long oggtell(void *src)
 }
 
 VorbisDecoder::VorbisDecoder(const QString &file, DecoderFactory *d, 
-                             QIODevice *i, Output *o) 
+                             QIODevice *i, AudioOutput *o) 
              : Decoder(d, i, o)
 {
     filename = file;
@@ -86,7 +84,6 @@ VorbisDecoder::VorbisDecoder(const QString &file, DecoderFactory *d,
     seekTime = -1.0;
     totalTime = 0.0;
     chan = 0;
-    output_size = 0;
 }
 
 VorbisDecoder::~VorbisDecoder(void)
@@ -109,42 +106,26 @@ void VorbisDecoder::flush(bool final)
     ulong min = final ? 0 : bks;
             
     while ((! done && ! finish) && output_bytes > min) {
-        output()->recycler()->mutex()->lock();
-            
-        while ((! done && ! finish) && output()->recycler()->full()) {
-            mutex()->unlock();
-
-            output()->recycler()->cond()->wait(output()->recycler()->mutex());
-
-            mutex()->lock();
-            done = user_stop;
-        }
 
         if (user_stop || finish) {
             inited = FALSE;
             done = TRUE;
         } else {
             ulong sz = output_bytes < bks ? output_bytes : bks;
-            Buffer *b = output()->recycler()->get();
 
-            memcpy(b->data, output_buf, sz);
-            if (sz != bks) memset(b->data + sz, 0, bks - sz);
-
-            b->nbytes = bks;
-            b->rate = bitrate;
-            output_size += b->nbytes;
-            output()->recycler()->add();
-
-            output_bytes -= sz;
-            memmove(output_buf, output_buf + sz, output_bytes);
-            output_at = output_bytes;
+            int samples = (sz*8)/(chan*16);
+            if (output()->AddSamples(output_buf, samples, -1))
+            {
+                output_bytes -= sz;
+                memmove(output_buf, output_buf + sz, output_bytes);
+                output_at = output_bytes;
+            } else {
+                mutex()->unlock();
+                usleep(500);
+                mutex()->lock();
+                done = user_stop;
+            }
         }
-
-        if (output()->recycler()->full()) {
-            output()->recycler()->cond()->wakeOne();
-        }
-
-        output()->recycler()->mutex()->unlock();
     }
 }
 
@@ -155,7 +136,6 @@ bool VorbisDecoder::initialize()
     inited = user_stop = done = finish = FALSE;
     len = freq = bitrate = 0;
     stat = chan = 0;
-    output_size = 0;
     seekTime = -1.0;
     totalTime = 0.0;
 
@@ -205,7 +185,7 @@ bool VorbisDecoder::initialize()
     }
 
     if (output())
-        output()->configure(freq, chan, 16, bitrate);
+        output()->Reconfigure(16, chan, freq);
 
     inited = TRUE;
     return TRUE;
@@ -223,7 +203,6 @@ void VorbisDecoder::deinit()
     inited = user_stop = done = finish = FALSE;
     len = freq = bitrate = 0;
     stat = chan = 0;
-    output_size = 0;
     setInput(0);
     setOutput(0);
 }
@@ -256,8 +235,6 @@ void VorbisDecoder::run()
         if (seekTime >= 0.0) {
             ov_time_seek(&oggfile, double(seekTime));
             seekTime = -1.0;
-
-            output_size = long(ov_time_tell(&oggfile)) * long(freq * chan * 2);
         }
 
         len = ov_read(&oggfile, (char *) (output_buf + output_at), bks, 0, 2, 1,
@@ -275,15 +252,7 @@ void VorbisDecoder::run()
             flush(TRUE);
 
             if (output()) {
-                output()->recycler()->mutex()->lock();
-                while (! output()->recycler()->empty() && ! user_stop) {
-                    output()->recycler()->cond()->wakeOne();
-                    mutex()->unlock();
-                    output()->recycler()->cond()->wait(
-                                                output()->recycler()->mutex());
-                    mutex()->lock();
-                }
-                output()->recycler()->mutex()->unlock();
+		output()->Drain();
             }
 
             done = TRUE;
@@ -373,7 +342,7 @@ const QString &VorbisDecoderFactory::description() const
 }
 
 Decoder *VorbisDecoderFactory::create(const QString &file, QIODevice *input, 
-                                      Output *output, bool deletable)
+                                      AudioOutput *output, bool deletable)
 {
     if (deletable)
         return new VorbisDecoder(file, this, input, output);

@@ -18,7 +18,7 @@ class OutputEvent;
 
 class Buffer;
 class Recycler;
-class Output;
+class AudioOutput;
 
 class DecoderEvent : public QCustomEvent
 {
@@ -61,9 +61,9 @@ class Decoder : public QThread
     void removeListener(QObject *);
 
     QIODevice *input() { return in; }
-    Output *output() { return out; }
+    AudioOutput *output() { return out; }
     void setInput(QIODevice *);
-    void setOutput(Output *);
+    void setOutput(AudioOutput *);
     void setFilename(const QString &newName) { filename = newName; }
 
     QMutex *mutex() { return &mtx; }
@@ -76,7 +76,7 @@ class Decoder : public QThread
     static QStringList all();
     static bool supports(const QString &);
     static void registerFactory(DecoderFactory *);
-    static Decoder *create(const QString &, QIODevice *, Output *, 
+    static Decoder *create(const QString &, QIODevice *, AudioOutput *, 
                            bool = FALSE);
 
     virtual Metadata *getMetadata(QSqlDatabase *db) = 0;
@@ -87,7 +87,7 @@ class Decoder : public QThread
     QString getFilename(void) { return filename; }
 
   protected:
-    Decoder(DecoderFactory *, QIODevice *, Output *);
+    Decoder(DecoderFactory *, QIODevice *, AudioOutput *);
 
     void dispatch(const DecoderEvent &);
     void dispatch(const OutputEvent &);
@@ -104,7 +104,7 @@ class Decoder : public QThread
 
     QPtrList<QObject> listeners;
     QIODevice *in;
-    Output *out;
+    AudioOutput *out;
 
     QMutex mtx;
     QWaitCondition cnd;
@@ -118,7 +118,7 @@ public:
     virtual bool supports(const QString &source) const = 0;
     virtual const QString &extension() const = 0; // file extension, ie. ".mp3" or ".ogg"
     virtual const QString &description() const = 0; // file type, ie. "MPEG Audio Files"
-    virtual Decoder *create(const QString &, QIODevice *, Output *, bool) = 0;
+    virtual Decoder *create(const QString &, QIODevice *, AudioOutput *, bool) = 0;
 };
 
 class VorbisDecoderFactory : public DecoderFactory
@@ -127,7 +127,7 @@ public:
     bool supports(const QString &) const;
     const QString &extension() const;
     const QString &description() const;
-    Decoder *create(const QString &, QIODevice *, Output *, bool);
+    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
 };
 
 class MadDecoderFactory : public DecoderFactory
@@ -136,7 +136,7 @@ public:
     bool supports(const QString &) const;
     const QString &extension() const;
     const QString &description() const;
-    Decoder *create(const QString &, QIODevice *, Output *, bool);
+    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
 };
 
 class CdDecoderFactory : public DecoderFactory
@@ -145,7 +145,7 @@ public:
     bool supports(const QString &) const;
     const QString &extension() const;
     const QString &description() const;
-    Decoder *create(const QString &, QIODevice *, Output *, bool);
+    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
 };
 
 class FlacDecoderFactory : public DecoderFactory
@@ -154,7 +154,7 @@ public:
     bool supports(const QString &) const;
     const QString &extension() const;
     const QString &description() const;
-    Decoder *create(const QString &, QIODevice *, Output *, bool);
+    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
 };
 
 class avfDecoderFactory : public DecoderFactory
@@ -163,7 +163,7 @@ public:
     bool supports(const QString &) const;
     const QString &extension() const;
     const QString &description() const;
-    Decoder *create(const QString &, QIODevice *, Output *, bool);
+    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
 };
 
 #endif
