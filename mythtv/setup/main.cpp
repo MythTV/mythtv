@@ -153,10 +153,11 @@ int main(int argc, char *argv[])
     usleep(750000);
     
     DialogBox dboxProg(mainWindow, QObject::tr("Would you like to clear all "
-                                   "program and channel settings before "
-                                   "starting configuration?"));
-    dboxProg.AddButton(QObject::tr("No, leave my program settings alone"));
-    dboxProg.AddButton(QObject::tr("Yes, delete my program settings"));
+                                   "program data and channel settings before "
+                                   "starting configuration? This will not "
+                                   "affect any existing recordings."));
+    dboxProg.AddButton(QObject::tr("No, leave my channel settings alone"));
+    dboxProg.AddButton(QObject::tr("Yes, delete my channel settings"));
     if (dboxProg.exec() == 2)
         clearAllDB();
 
