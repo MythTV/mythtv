@@ -451,7 +451,21 @@ void ViewScheduled::updateList(QPainter *p)
                         if (tempInfo->recording)
                             tempCard = QString::number(tempInfo->cardid);
                         else
-                            tempCard = "-";
+                        {
+                            switch (tempInfo->norecord)
+                            {
+                            case nrManualOverride:    tempCard = "X"; break;
+                            case nrPreviousRecording: tempCard = "P"; break;
+                            case nrCurrentRecording:  tempCard = "C"; break;
+                            case nrOtherShowing:      tempCard = "O"; break;
+                            case nrTooManyRecordings: tempCard = "T"; break;
+                            case nrDontRecordList:    tempCard = "D"; break;
+                            case nrLowerRanking:      tempCard = "R"; break;
+                            case nrManualConflict:    tempCard = "M"; break;
+                            case nrAutoConflict:      tempCard = "A"; break;
+                            default:                  tempCard = "-"; break;
+                            }
+                        }
 
                         if (cnt == inList)
                         {
