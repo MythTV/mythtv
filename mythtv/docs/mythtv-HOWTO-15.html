@@ -193,6 +193,47 @@ issue with the drivers for your capture card or other hardware, or the CPU
 fan has fallen off/broken and your system is overheating when asked to
 perform a CPU intensive task like encoding video.</P>
 
+<H2><A NAME="ss15.11">15.11</A> <A HREF="mythtv-HOWTO.html#toc15.11">Troubleshooting audio</A>
+</H2>
+
+<P>By Bruce Markey, 
+<A HREF="mailto:bjm@lvcm.com">mailto:bjm@lvcm.com</A></P>
+<P>Audio appears to be one of the bigger issues that users run into on the
+mailing list.  If the audio isn't configured correctly, then mythtv will
+often appear to hang, when in fact it is trying to manipulate the audio
+subsystem and failing.  You may or may not receive error messages indicating
+that the source of the error is the audio subsystem.</P>
+<P>You can not use <B>xawtv</B> to determine if your audio is working
+correctly, since <B>xawtv</B> is simply using the the analog sound patched
+through line-in to line-out. It doesn't need to digitize the sound unless
+you are using the recording function.</P>
+<P>A better test to verify that sound will work for MythTV (and recording with
+<B>xawtv</B> for that matter) is to startup <B>xawtv</B>, mute the
+line-in then run <CODE>aplay /dev/dsp</CODE>. Once this test succeeds, MythTV
+should also work correctly because it writes to and read from /dev/dsp in
+the same way that <B>aplay</B> does.</P>
+<P>To record audio along with video the audio signal must be digitized by a DSP
+so that the audio data can be stored in a file. On playback, the audio data
+is written to /dev/dsp and converted back to an analog signal. This analog
+signal should then be sent to your speakers. Here is what is needed in
+alsamixer:</P>
+<P>CAPTUR source - the analog source to be sent to the DSP. This should be set
+to the input source from the tuner card to the sound card. In most cases
+this is Line but this could also be Aux, CD, Mic, etc., depending on how you
+connect the input cable. This source should be muted to prevent patching
+through the analog sound. The volume of this source will not affect the
+record level.</P>
+<P>Capture mixer - this sets the level for the analog to digital recording.
+While a volume of 100% is recommended for testing, distortion may occur.
+Lowering this level to 75% to 85% may result in better audio quality.
+"Capture" should be marked as the CAPTUR destination.</P>
+<P>PCM mixer - this sets the level for the digital to analog playback. While a
+volume of 100% is recommended for testing, distortion may occur. Lowering
+this level to 75% to 85% may result in better audio quality.</P>
+<P>Master mixer - sets the level for the analog signal sent to line-out or the
+speakers.</P>
+
+
 <HR>
 <A HREF="mythtv-HOWTO-16.html">Next</A>
 <A HREF="mythtv-HOWTO-14.html">Previous</A>

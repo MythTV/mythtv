@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-01, v1.060
+  2003-01-01, v1.061
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -101,12 +101,14 @@
      15.8 I can't checkout using CVS anymore!
      15.9 I get segfaults / mythtv isn't doing anything.
      15.10 Mythtv makes my system crash.
+     15.11 Troubleshooting audio
 
   16. Miscellaneous.
      16.1 I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
      16.2 I'd like to use some other window manager.
      16.3 I'd like mythtv to automatically startup.
-     16.4 I'd like to start using the development version of mythtv.
+     16.4 I'd like to delete the mysql database.
+     16.5 I'd like to start using the development version of mythtv.
 
   ______________________________________________________________________
 
@@ -1841,6 +1843,55 @@
   fan has fallen off/broken and your system is overheating when asked to
   perform a CPU intensive task like encoding video.
 
+  [1m15.11.  Troubleshooting audio[0m
+
+  By Bruce Markey, mailto:bjm@lvcm.com <mailto:bjm@lvcm.com>
+
+  Audio appears to be one of the bigger issues that users run into on
+  the mailing list.  If the audio isn't configured correctly, then
+  mythtv will often appear to hang, when in fact it is trying to
+  manipulate the audio subsystem and failing.  You may or may not
+  receive error messages indicating that the source of the error is the
+  audio subsystem.
+
+  You can not use [1mxawtv [22mto determine if your audio is working correctly,
+  since [1mxawtv [22mis simply using the the analog sound patched through line-
+  in to line-out. It doesn't need to digitize the sound unless you are
+  using the recording function.
+
+  A better test to verify that sound will work for MythTV (and recording
+  with [1mxawtv [22mfor that matter) is to startup [1mxawtv[22m, mute the line-in then
+  run aplay /dev/dsp. Once this test succeeds, MythTV should also work
+  correctly because it writes to and read from /dev/dsp in the same way
+  that [1maplay [22mdoes.
+
+  To record audio along with video the audio signal must be digitized by
+  a DSP so that the audio data can be stored in a file. On playback, the
+  audio data is written to /dev/dsp and converted back to an analog
+  signal. This analog signal should then be sent to your speakers. Here
+  is what is needed in alsamixer:
+
+  CAPTUR source - the analog source to be sent to the DSP. This should
+  be set to the input source from the tuner card to the sound card. In
+  most cases this is Line but this could also be Aux, CD, Mic, etc.,
+  depending on how you connect the input cable. This source should be
+  muted to prevent patching through the analog sound. The volume of this
+  source will not affect the record level.
+
+  Capture mixer - this sets the level for the analog to digital
+  recording.  While a volume of 100% is recommended for testing,
+  distortion may occur.  Lowering this level to 75% to 85% may result in
+  better audio quality.  "Capture" should be marked as the CAPTUR
+  destination.
+
+  PCM mixer - this sets the level for the digital to analog playback.
+  While a volume of 100% is recommended for testing, distortion may
+  occur. Lowering this level to 75% to 85% may result in better audio
+  quality.
+
+  Master mixer - sets the level for the analog signal sent to line-out
+  or the speakers.
+
   [1m16.  Miscellaneous.[0m
 
   [1m16.1.  I'd like to watch the files without using mythtv / I'd like to[0m
@@ -1888,7 +1939,17 @@
        ^D
        $
 
-  [1m16.4.  I'd like to start using the development version of mythtv.[0m
+  [1m16.4.  I'd like to delete the mysql database.[0m
+
+  [1mNOTE[22m:  Performing this step will remove the entire database.  You will
+  lose all of your settings and will need to re-run the mc.sql script to
+  setup the database structure before running the setup program.
+
+       $ mysql -u root
+       mysql> drop database mythconverg;
+       mysql> quit
+
+  [1m16.5.  I'd like to start using the development version of mythtv.[0m
 
   [Content under development]
 
@@ -1928,9 +1989,9 @@
   Before you begin, shutdown all running instances of 0.7.  You should
   perform a make clean before starting the compile process.
 
-  Compile and install the system as you would a 0.7 system by following
+  Compile and install the system as you would mythtv 0.7 by following
   the instructions found in this HOWTO.  If you are installing mythtv on
-  a new system, then install the database by running the database/mc.sql
+  a new machine, install the database by running the database/mc.sql
   script as detailed in earlier sections of this document.
 
   However, if you are upgrading an existing 0.7 system, you [4mmust[24m run the
@@ -1938,8 +1999,10 @@
   ensure that the database structure is up to date.
 
   Next, you must edit the /usr/local/share/mythtv/backend_settings.txt
-  file.  Specify the IP address of the back-end server and port.  This
-  file is read by the backend server during start-up.
+  file.  Specify the IP address or hostname of the back-end server and
+  port.  You may specify localhost if the front-end and back-end
+  programs will be running on the same machine.  This file is read by
+  the backend server during start-up.
 
   Once you're done editing the file, start the setup program:
 
@@ -1952,7 +2015,7 @@
   Once the setup wizard is done: to run the new version of mythtv, you
   must first start the back-end server:
 
-       $ mythbackend &
+  $ mythbackend &
 
   and then run the front-end client:
 

@@ -71,7 +71,23 @@ $
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss16.4">16.4</A> <A HREF="mythtv-HOWTO.html#toc16.4">I'd like to start using the development version of mythtv.</A>
+<H2><A NAME="ss16.4">16.4</A> <A HREF="mythtv-HOWTO.html#toc16.4">I'd like to delete the mysql database.</A>
+</H2>
+
+<P><B>NOTE</B>:  Performing this step will remove the entire database. 
+You will lose all of your settings and will need to re-run the mc.sql script
+to setup the database structure before running the setup program.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root
+mysql> drop database mythconverg;
+mysql> quit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss16.5">16.5</A> <A HREF="mythtv-HOWTO.html#toc16.5">I'd like to start using the development version of mythtv.</A>
 </H2>
 
 <P>[Content under development]</P>
@@ -104,17 +120,18 @@ CPU utilization.</LI>
 should have accompanying solutions.</P>
 <P>Before you begin, shutdown all running instances of 0.7.  You should perform
 a <CODE>make clean</CODE> before starting the compile process.</P>
-<P>Compile and install the system as you would a 0.7 system by following the
+<P>Compile and install the system as you would mythtv 0.7 by following the
 instructions found in this HOWTO.  If you are installing mythtv on a new
-system, then install the database by running the <CODE>database/mc.sql</CODE>
+machine, install the database by running the <CODE>database/mc.sql</CODE>
 script as detailed in earlier sections of this document.</P>
 <P>However, if you are upgrading an existing 0.7 system, you <EM>must</EM> run the
 <CODE>database/0-7-to-0-8.sql</CODE> script before running the setup program to
 ensure that the database structure is up to date.</P>
 <P>Next, you must edit the
 <CODE>/usr/local/share/mythtv/backend_settings.txt</CODE> file.  Specify the IP
-address of the back-end server and port.  This file is read by the backend
-server during start-up.</P>
+address or hostname of the back-end server and port.  You may specify
+<CODE>localhost</CODE> if the front-end and back-end programs will be running on
+the same machine.  This file is read by the backend server during start-up.</P>
 <P>Once you're done editing the file, start the setup program:
 <BLOCKQUOTE><CODE>
 <PRE>
