@@ -4,7 +4,7 @@ TEMPLATE = subdirs
 
 # Directories
 SUBDIRS += mythepg mythprogfind mythtv mythfrontend mythcommflag mythlcd 
-SUBDIRS += mythtvosd
+SUBDIRS += mythtvosd mythuitest
 
 backend {
     SUBDIRS += mythbackend mythfilldatabase mythtranscode

@@ -1,0 +1,366 @@
+#include <qfontmetrics.h>
+
+#include "mythuitype.h"
+#include "mythpainter.h"
+#include "mythmainwindow.h"
+
+MythUIType::MythUIType(QObject *parent, const char *name)
+          : QObject(parent, name)
+{
+    m_Visible = true;
+    m_HasFocus = false;
+    m_Area = QRect(0, 0, 0, 0);
+    m_NeedsRedraw = false;
+    m_Alpha = 255;
+    m_AlphaChangeMode = m_AlphaChange = m_AlphaMin = 0;
+    m_AlphaMax = 255;
+    m_Moving = false;
+    m_XYDestination = QPoint(0, 0);
+    m_XYSpeed = QPoint(0, 0);
+
+    m_Parent = NULL;
+    if (parent)
+    {
+        m_Parent = dynamic_cast<MythUIType *>(parent);
+        if (m_Parent)
+            m_Parent->AddChild(this);
+    }
+}
+
+MythUIType::~MythUIType()
+{
+}
+
+void MythUIType::AddChild(MythUIType *child)
+{
+    if (!child)
+        return;
+
+    m_ChildrenList.push_back(child);
+}
+
+MythUIType *MythUIType::GetChild(const char *name, const char *inherits)
+{
+    QObject *ret = child(name, inherits);
+    if (ret)
+        return dynamic_cast<MythUIType *>(ret);
+    return NULL;
+}
+
+QValueVector<MythUIType *> *MythUIType::GetAllChildren(void)
+{
+    return &m_ChildrenList;
+}
+
+bool MythUIType::NeedsRedraw(void)
+{
+    return m_NeedsRedraw;
+}
+
+void MythUIType::SetRedraw(bool set)
+{
+    m_NeedsRedraw = set;
+    if (m_Parent)
+        m_Parent->SetRedraw(set);
+}
+
+bool MythUIType::CanTakeFocus(void)
+{
+    return m_CanHaveFocus;
+}
+
+void MythUIType::SetCanTakeFocus(bool set)
+{
+    m_CanHaveFocus = set;
+}
+
+void MythUIType::HandleMovementPulse(void)
+{
+    if (!m_Moving)
+        return;
+
+    QPoint curXY = m_Area.topLeft();
+
+    int xdir = m_XYDestination.x() - curXY.x();
+    int ydir = m_XYDestination.y() - curXY.y();
+
+    curXY.setX(curXY.x() + m_XYSpeed.x());
+    curXY.setY(curXY.y() + m_XYSpeed.y());
+
+    if ((xdir > 0 && curXY.x() >= m_XYDestination.x()) ||
+        (xdir < 0 && curXY.x() <= m_XYDestination.x()) ||
+        (xdir == 0))
+    {
+        m_XYSpeed.setX(0);
+    }
+
+    if ((ydir > 0 && curXY.y() >= m_XYDestination.y()) ||
+        (ydir <= 0 && curXY.y() <= m_XYDestination.y()) ||
+        (ydir == 0))
+    {
+        m_XYSpeed.setY(0);
+    }
+
+    SetRedraw();
+
+    if (m_XYSpeed.x() == 0 && m_XYSpeed.y() == 0)
+    {
+        m_Moving = false;
+        emit FinishedMoving();
+    }
+
+    m_Area.moveTopLeft(curXY);
+}
+
+void MythUIType::HandleAlphaPulse(void)
+{
+    if (m_AlphaChangeMode == 0)
+        return;
+
+    m_Alpha += m_AlphaChange;
+    if (m_Alpha > 255)
+        m_Alpha = 255;
+    if (m_Alpha < 0)
+        m_Alpha = 0;
+
+    if (m_Alpha >= m_AlphaMax || m_Alpha <= m_AlphaMin)
+    {
+        if (m_AlphaChangeMode == 2)
+        {
+            m_AlphaChange *= -1;
+        }
+        else
+        {
+            m_AlphaChangeMode = 0;
+            m_AlphaChange = 0;
+        }
+    }
+
+    SetRedraw();
+}
+
+void MythUIType::Pulse(void)
+{
+    HandleMovementPulse();
+    HandleAlphaPulse();
+
+    QValueVector<MythUIType *>::Iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+        (*it)->Pulse();
+}
+
+int MythUIType::CalcAlpha(int alphamod)
+{
+    return (int)(m_Alpha * (alphamod / 255.0));
+}
+
+void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
+{
+    if (!m_Visible)
+        return;
+
+    QValueVector<MythUIType *>::Iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    {
+        (*it)->Draw(p, xoffset + m_Area.x(), yoffset + m_Area.y(), 
+                    CalcAlpha(alphaMod));
+    }
+
+    SetRedraw(false);
+}
+
+void MythUIType::SetPosition(QPoint pos)
+{
+    m_Area.moveTopLeft(pos);
+    SetRedraw();
+}
+
+QRect MythUIType::CalculateScreenArea(void)
+{
+    if (m_Area != QRect(0, 0, 0, 0))
+        return m_Area;
+
+    QRegion region;
+
+    QValueVector<MythUIType *>::Iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    {
+        QRect childArea = (*it)->CalculateScreenArea();
+        childArea.moveBy(m_Area.x(), m_Area.y());
+
+        region = region.unite(childArea);
+    }
+
+    int x = m_Area.x();
+    int y = m_Area.y();
+
+    m_Area = region.boundingRect();
+    m_Area.setX(x);
+    m_Area.setY(y);
+
+    return m_Area;
+}
+
+QString MythUIType::cutDown(const QString &data, QFont *font,
+                            bool multiline, int overload_width,
+                            int overload_height)
+{
+    int length = data.length();
+    if (length == 0)
+        return data;
+
+    int maxwidth = m_Area.width();
+    if (overload_width != -1)
+        maxwidth = overload_width;
+    int maxheight = m_Area.height();
+    if (overload_height != -1)
+        maxheight = overload_height;
+
+    int justification = Qt::AlignLeft | Qt::WordBreak;
+    QFontMetrics fm(*font);
+
+    int margin = length - 1;
+    int index = 0;
+    int diff = 0;
+
+    while (margin > 0)
+    {
+        if (multiline)
+            diff = maxheight - fm.boundingRect(0, 0, maxwidth, maxheight,
+                                               justification, data,
+                                               index + margin).height();
+        else
+            diff = maxwidth - fm.width(data, index + margin);
+        if (diff >= 0)
+            index += margin;
+
+        margin /= 2;
+
+        if (index + margin >= length - 1)
+            margin = (length - 1) - index;
+    }
+
+    if (index < length - 1)
+    {
+        QString tmpStr(data);
+        tmpStr.truncate(index);
+        if (index >= 3)
+            tmpStr.replace(index - 3, 3, "...");
+        return tmpStr;
+    }
+
+    return data;
+
+}
+
+bool MythUIType::IsVisible(void)
+{
+    return m_Visible;
+}
+
+void MythUIType::MoveTo(QPoint destXY, QPoint speedXY)
+{
+    if (!GetMythPainter()->SupportsAnimation())
+        return;
+
+    if (destXY.x() == m_Area.x() && destXY.y() == m_Area.y())
+        return;
+
+    m_Moving = true;
+
+    m_XYDestination = destXY;
+    m_XYSpeed = speedXY;
+}
+
+void MythUIType::AdjustAlpha(int mode, int alphachange, int minalpha,
+                             int maxalpha)
+{
+    if (!GetMythPainter()->SupportsAlpha())
+        return;
+
+    m_AlphaChangeMode = mode;
+    m_AlphaChange = alphachange;
+    m_AlphaMin = minalpha;
+    m_AlphaMax = maxalpha;
+
+    if (m_Alpha > m_AlphaMax)
+        m_Alpha = m_AlphaMax;
+    if (m_Alpha < m_AlphaMin)
+        m_Alpha = m_AlphaMin;
+}
+
+void MythUIType::SetAlpha(int newalpha)
+{
+    m_Alpha = newalpha;
+    SetRedraw();
+}
+
+int MythUIType::GetAlpha(void)
+{
+    return m_Alpha;
+}
+
+bool MythUIType::keyPressEvent(QKeyEvent *)
+{
+    return false;
+}
+
+void MythUIType::customEvent(QCustomEvent *)
+{
+    return;
+}
+
+void MythUIType::LoseFocus(void)
+{
+    if (!m_CanHaveFocus || !m_HasFocus)
+        return;
+
+    emit LosingFocus();
+    m_HasFocus = false;
+    Refresh();
+}
+
+bool MythUIType::TakeFocus(void)
+{
+    if (!m_CanHaveFocus || m_HasFocus)
+        return false;
+
+    m_HasFocus = true;
+    Refresh();
+    emit TakingFocus();
+    return true;
+}
+
+void MythUIType::Activate(void)
+{
+}
+
+void MythUIType::Refresh(void)
+{
+    SetRedraw();
+}
+
+void MythUIType::Hide(void)
+{
+    m_Visible = false;
+    SetRedraw();
+    emit Hiding();
+}
+
+void MythUIType::Show(void)
+{
+    m_Visible = true;
+    SetRedraw();
+    emit Showing();
+}
+
+void MythUIType::AddFocusableChildrenToList(QPtrList<MythUIType> &focusList)
+{
+    if (m_HasFocus)
+        focusList.append(this);
+
+    QValueVector<MythUIType *>::Iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+        (*it)->AddFocusableChildrenToList(focusList);
+}
+
