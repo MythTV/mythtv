@@ -14,7 +14,7 @@
 #include <qstring.h>
 #include <qurl.h>
 #include <qdatetime.h>
-
+#include <qvaluelist.h>
 
 enum metadata_type
 {
@@ -125,6 +125,21 @@ class AudioMetadata : public Metadata
     bool changed;
 };
 
-
+class MPlaylist
+{
+  public:
+  
+    MPlaylist(QString new_name, QString raw_songlist, uint new_id);
+    uint    getId(){return id;}
+    QString getName(){return name;}
+    uint    getCount(){return song_references.count();}
+    QValueList<uint> getList(){return song_references;}    
+    
+  private:
+  
+    QString          name;
+    QValueList<uint> song_references;
+    uint             id;
+};
 
 #endif

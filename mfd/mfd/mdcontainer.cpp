@@ -38,6 +38,8 @@ MetadataMonitor::MetadataMonitor(MFD *owner, QSqlDatabase *ldb)
     current_metadata_generation = 0;
     new_metadata = NULL;
     
+    current_playlists = new QPtrList<MPlaylist>;
+    
 }
 
 void MetadataMonitor::forceSweep()
@@ -351,6 +353,31 @@ bool MetadataMonitor::sweepAudio()
         }
     }
 
+    QString b_query = QString("SELECT name, songlist FROM musicplaylist WHERE "
+                             "name != \"backup_playlist_storage\" "
+                             "AND hostname = \"%1\" ;")
+                             .arg(gContext->GetHostName());
+
+
+    QSqlQuery bquery = db->exec(b_query);
+
+
+        
+    uint how_many = 1;
+    MPlaylist *all_music_playlist = new MPlaylist("Everything", "-1", how_many);
+    current_playlists->append(all_music_playlist);
+    if(bquery.isActive() && bquery.numRowsAffected() > 0)
+    {
+        while(bquery.next())
+        {
+            ++how_many;
+            MPlaylist *new_playlist = new MPlaylist(bquery.value(0).toString(), bquery.value(1).toString(), how_many);
+            current_playlists->append(new_playlist);
+        }
+    }
+    
+    
+
     return true;
 }
 
@@ -367,7 +394,12 @@ MetadataContainer::MetadataContainer(MFD *owner, QSqlDatabase *ldb)
     metadata_monitor->start();
     metadata_monitor->wait();   //  HACK
     current_audio_metadata = metadata_monitor->getCurrent(&current_generation);
+    
+    current_audio_playlists = metadata_monitor->getCurrentPlaylists();
+    
     current_metadata_mutex = new QMutex(true);
+    
+    
     
     cout << "metadata has loaded and the metadata container sees a collection of size " << current_audio_metadata->count() << endl;
     mp3_count = 0;

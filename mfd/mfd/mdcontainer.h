@@ -13,6 +13,7 @@
 #include <qstring.h>
 #include <qsqldatabase.h>
 #include <qintdict.h>
+#include <qptrlist.h>
 #include <qthread.h>
 #include <qmutex.h>
 #include <qwaitcondition.h>
@@ -39,7 +40,7 @@ class MetadataMonitor : public QThread
     int  bumpMetadataGeneration();
     int  bumpMetadataItem();
     QIntDict<AudioMetadata>* getCurrent(int *generation_value);
-
+    QPtrList<MPlaylist>*     getCurrentPlaylists(){return current_playlists;}
     
     bool sweepAudio();
     bool checkAudio();
@@ -67,6 +68,9 @@ class MetadataMonitor : public QThread
 
     QIntDict<AudioMetadata>  *current_metadata;
     QIntDict<AudioMetadata>  *new_metadata;
+
+    QPtrList<MPlaylist>      *current_playlists;
+
     
     int     metadata_generation;
     int     current_metadata_generation;
@@ -105,6 +109,7 @@ class MetadataContainer
 
     AudioMetadata*           getMetadata(int *generation_value, int metadata_index);
     QIntDict<AudioMetadata>* getCurrentMetadata();
+    QPtrList<MPlaylist>*     getCurrentPlaylists(){return current_audio_playlists;}
     void                     lockMetadata();
     void                     unlockMetadata();
     uint                     getCurrentGeneration(){return 3;}  // HACK
@@ -116,6 +121,7 @@ class MetadataContainer
     MFD                      *parent;
     QSqlDatabase             *db;
     QIntDict<AudioMetadata>  *current_audio_metadata;
+    QPtrList<MPlaylist>      *current_audio_playlists;
     QMutex                   *current_metadata_mutex;
     MetadataMonitor          *metadata_monitor;
     int                      current_generation;

@@ -11,6 +11,8 @@
 #include <iostream>
 using namespace std;
 
+#include <qstringlist.h>
+
 #include "metadata.h"
 
 Metadata::Metadata(
@@ -75,3 +77,26 @@ AudioMetadata::AudioMetadata(
     changed = false;    
 }                            
 
+/*
+---------------------------------------------------------------------
+*/
+
+MPlaylist::MPlaylist(QString new_name, QString raw_songlist, uint new_id)
+{
+    id = new_id;
+    name = new_name;
+    if(name == "default_playlist_storage")
+    {
+        name = "Active Play Queue";
+    }
+    
+    QStringList list = QStringList::split(",",raw_songlist);
+    QStringList::iterator it = list.begin();
+    for (; it != list.end(); it++)
+    {
+        if((*it).toInt() > 0)
+        {
+            song_references.append((*it).toUInt());
+        }
+    }
+}
