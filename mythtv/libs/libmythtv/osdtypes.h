@@ -265,6 +265,8 @@ class OSDTypeBox : public OSDType
     OSDTypeBox(const OSDTypeBox &other);
    ~OSDTypeBox();
 
+    void SetRect(QRect newrect) { size = newrect; }
+
     void Draw(unsigned char *screenptr, int vid_width, int vid_height, 
               int fade, int maxfade, int xoff, int yoff);
 
@@ -327,6 +329,8 @@ class OSDTypeCC : public OSDType
   private:
     TTFFont *m_font;
     vector<ccText *> *m_textlist;
+    OSDTypeBox *m_box;
+
     int xoffset, yoffset, displaywidth, displayheight;
 };
 

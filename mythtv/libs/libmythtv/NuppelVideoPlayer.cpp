@@ -180,6 +180,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     pauseaudio = false;
 
     cc = false;
+    lastccrow = 0;
 
     numbadioctls = 0;
     numlowbuffer = 0;
@@ -1566,7 +1567,7 @@ void NuppelVideoPlayer::ShowText(void)
             if (subtitle.clr)
             {
                 //printf ("erase displayed memory\n");
-                for (j = 0; j < 3; j++)
+                for (j = 0; j < 4; j++)
                 {
                     cclines[j] = "";
                 }
@@ -1576,9 +1577,43 @@ void NuppelVideoPlayer::ShowText(void)
             if (subtitle.len)
             {
                 unsigned char *end = inpos + subtitle.len;
-                int row = 0;
+                int row;
+
+                if (subtitle.row == 0)
+                    subtitle.row = lastccrow;
+
+                lastccrow = subtitle.row;
+
+                if (subtitle.rowcount == 0)
+                {
+                    // overwrite
+                    row = 0;
+                }
+                else
+                {
+                    if (subtitle.rowcount > 4)
+                    {
+                        subtitle.rowcount = 4;
+                    }
+                    // scroll up one line
+                    for (j = 0; j < subtitle.rowcount - 1 && j < 4; j++)
+                    {
+                        cclines[j] = cclines[j + 1];
+                        ccindent[j] = ccindent[j + 1];
+                    }
+                    cclines[subtitle.rowcount - 1] = "";
+                    row = subtitle.rowcount - 1;
+                }
+
                 while (inpos < end)
                 {
+                    ccindent[row] = 0;
+                    while ((inpos < end) && *inpos != 0 && (char)*inpos == ' ')
+                    {
+                        inpos++;
+                        ccindent[row]++;
+                    }
+
                     unsigned char *cur = inpos;
 
                     //null terminate at EOL
@@ -1586,27 +1621,46 @@ void NuppelVideoPlayer::ShowText(void)
                         cur++;
                     *cur = 0;
 
-                    if (row < 3)
+                    if (subtitle.rowcount > 0 && row >= subtitle.rowcount)
+                    {
+                        // multi-line in scroll mode -- shouldn't happen?
+                        // scroll up again
+                        for (j = 0; j < subtitle.rowcount - 1 && j < 4; j++)
+                        {
+                             cclines[j] = cclines[j + 1];
+                             ccindent[j] = ccindent[j + 1];
+                        }
+                        row = subtitle.rowcount - 1;
+                    }
+
+                    if (row < 4)
                     {
                         cclines[row++] = QString((const char *)inpos);
                         //printf ("CC text: %s\n", inpos);
                     }
+#if 0
+                    else
+                    {
+                        printf("CC overflow: %s\n", inpos);
+                    }
+#endif
 
                     inpos = cur + 1;
                 }
 
-                if (subtitle.rowcount != row)
+                if (subtitle.rowcount == 0)
                     subtitle.rowcount = row;
 
             }
 
             //redraw
             osd->ClearAllCCText ();
-            for (j = 0; j < subtitle.rowcount && j < 3; j++)
+            for (j = 0; j < subtitle.rowcount && j < 4; j++)
             {
                 if (cclines[j].isNull() || cclines[j].isEmpty())
                     continue;
-                osd->AddCCText(cclines[j], 5, subtitle.row + j, 1, false);
+                osd->AddCCText(cclines[j], ccindent[j], subtitle.row + j, 
+                               1, false);
             }
         }
 

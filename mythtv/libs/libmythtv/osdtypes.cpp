@@ -1150,11 +1150,15 @@ OSDTypeCC::OSDTypeCC(const QString &name, TTFFont *font, int xoff, int yoff,
     yoffset = yoff;
     displaywidth = dispw;
     displayheight = disph;
+
+    QRect rect = QRect(0, 0, 0, 0);
+    m_box = new OSDTypeBox("cc_background", rect);
 }
 
 OSDTypeCC::~OSDTypeCC()
 {
     ClearAllCCText();
+    delete m_box;
 }
 
 void OSDTypeCC::AddCCText(const QString &text, int x, int y, int color, 
@@ -1168,7 +1172,7 @@ void OSDTypeCC::AddCCText(const QString &text, int x, int y, int color,
     cc->teletextmode = teletextmode;
 
     if (!m_textlist)
-        m_textlist = new vector<ccText*>;
+        m_textlist = new vector<ccText *>;
 
     m_textlist->push_back(cc);
 }
@@ -1218,7 +1222,7 @@ void OSDTypeCC::Draw(unsigned char *screenptr, int vid_width, int vid_height,
             }
             else
             {
-                x = cc->x * displaywidth / 40 + xoffset;
+                x = (cc->x + 1) * displaywidth / 34 + xoffset;
                 y = cc->y * displayheight / 18 + yoffset;
             }
 
@@ -1230,6 +1234,11 @@ void OSDTypeCC::Draw(unsigned char *screenptr, int vid_width, int vid_height,
 
             if (maxy > vid_height)
                 maxy = vid_height;
+
+            QRect rect = QRect(0, 0, textlength + 4, 
+                               (m_font->Size() * 3 / 2) + 4);
+            m_box->SetRect(rect);
+            m_box->Draw(screenptr, vid_width, vid_height, 0, 0, x - 2, y - 2);
 
             m_font->DrawString(screenptr, x, y, cc->text, maxx, maxy, 255); 
         }

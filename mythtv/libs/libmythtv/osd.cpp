@@ -101,7 +101,7 @@ void OSD::SetDefaults(void)
     if (!ccfont)
     {
         QString name = "cc_font";
-        int fontsize = vid_height / 24;
+        int fontsize = vid_height / 27;
         fontsize = (int)(fontsize * hmult);
 
         ccfont = LoadFont(ccfontname, fontsize);

@@ -414,6 +414,8 @@ class NuppelVideoPlayer
     int commercialskipeverywhere;
 
     QString cclines[4];
+    int ccindent[4];
+    int lastccrow;
 };
 
 #endif

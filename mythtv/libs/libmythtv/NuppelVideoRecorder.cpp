@@ -1760,11 +1760,9 @@ void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle,
     {
         cc->ccbuf[cc->ccmode][len++] = b1;
         if (b2 & 0x60)
+        {
             cc->ccbuf[cc->ccmode][len++] = b2;
-        /* TODO: I don't think we need this for just showing CC?
-        if (b1 == ']' || b2 == ']')
-            webtv_check(cc->ccbuf[cc->ccmode], len);
-        */
+        }
     }
     else if ((b1 & 0x10) && (b2 > 0x1F) && (data != cc->lastcode))
         // codes are always transmitted twice (apparently not,
@@ -1815,13 +1813,13 @@ void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle,
                            cc->ccbuf[cc->ccmode][len--] = 0;
                            break;
                        case 0x25:      //2 row caption
-                           subtitle->rowcount = 1;
-                           break;
-                       case 0x26:      //3 row caption
                            subtitle->rowcount = 2;
                            break;
-                       case 0x27:      //4 row caption
+                       case 0x26:      //3 row caption
                            subtitle->rowcount = 3;
+                           break;
+                       case 0x27:      //4 row caption
+                           subtitle->rowcount = 4;
                            break;
                        case 0x29:      //resume direct caption
                            printf ("\nresume direct caption\n");
@@ -1907,8 +1905,6 @@ static void vbi_event(struct VBIData *data, struct vt_event *ev)
     }
 }
 
-// for now just european teletext support,
-// should be easy to add US closed captioning
 void NuppelVideoRecorder::doVbiThread(void)
 {
     struct vbi *vbi = NULL;
@@ -2912,7 +2908,6 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
         ringBuffer->Write(&pagenr, sizeof(int));
         ringBuffer->Write(buf, len);
-        printf((char*) buf);
     }
     else if (vbimode == 2)
     {
@@ -2921,7 +2916,6 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
 
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
         ringBuffer->Write(buf, len);
-        printf((char *)buf);
     }
 }
 
