@@ -24,13 +24,11 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
+#include <mythtv/util.h>
 
 #include "config.h"
 #include "settings.h"
 #include "dvdripbox.h"
-
-
-
 
 //
 //  Transcode stuff only if we were ./configure'd for it
@@ -96,7 +94,7 @@ void playDVD()
                 command_string = command_string.replace( QRegExp("%d"), dvd_device );
             }
         }
-        system(command_string);
+        myth_system(command_string);
         gContext->GetMainWindow()->raise();
         gContext->GetMainWindow()->setActiveWindow();
         gContext->GetMainWindow()->currentWidget()->setFocus();

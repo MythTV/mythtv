@@ -15,8 +15,9 @@ using namespace std;
 #include <qframe.h>
 #include <qregexp.h>
 
-#include "titledialog.h"
+#include <mythtv/util.h>
 
+#include "titledialog.h"
 
 TitleDialog::TitleDialog(QSqlDatabase *ldb,
                          QSocket *a_socket, 
@@ -423,7 +424,7 @@ void TitleDialog::viewTitle()
     player_string = player_string.replace(QRegExp("%a"), QString("%1").arg(audio_track));
     player_string = player_string.replace(QRegExp("%c"), QString("%1").arg(channels));
 
-    system(player_string);
+    myth_system(player_string);
     gContext->GetMainWindow()->raise();
     gContext->GetMainWindow()->setActiveWindow();
     gContext->GetMainWindow()->currentWidget()->setFocus();

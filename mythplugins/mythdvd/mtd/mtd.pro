@@ -11,8 +11,7 @@ TARGET = mtd
 target.path = $${PREFIX}/bin
 INSTALLS += target
 
-
-LIBS += -lmyth-$$LIBVERSION
+LIBS += -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
 HEADERS += ../mythdvd/config.h
 
