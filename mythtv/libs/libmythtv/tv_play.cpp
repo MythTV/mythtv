@@ -1536,47 +1536,32 @@ void TV::LoadMenu(void)
 
 void TV::ChangeBrightness(bool up)
 {
-    QString text;
+    int brightness = activerecorder->ChangeBrightness(up);
 
-    if (up)
-        text = "Brightness +";
-    else
-        text = "Brightness -";
+    QString text = QString("Brightness %1 %").arg(brightness);
 
-    activerecorder->ChangeBrightness(up);
-
-    if (activenvp == nvp)
-        osd->SetSettingsText(text, text.length() );
+    if (osd)
+        osd->StartPause(brightness * 10, true, "", text, 5);
 }
 
 void TV::ChangeContrast(bool up)
 {
-    QString text;
+    int contrast = activerecorder->ChangeContrast(up);
 
-    if (up)
-        text = "Contrast +";
-    else
-        text = "Contrast -";
+    QString text = QString("Contrast %1 %").arg(contrast);
 
-    activerecorder->ChangeContrast(up);
-
-    if (activenvp == nvp)
-        osd->SetSettingsText(text, text.length() );
+    if (osd)
+        osd->StartPause(contrast * 10, true, "", text, 5);
 }
 
 void TV::ChangeColour(bool up)
 {
-    QString text;
+    int colour = activerecorder->ChangeColour(up);
 
-    if (up)
-        text = "Color +";
-    else
-        text = "Color -";
+    QString text = QString("Colour %1 %").arg(colour);
 
-    activerecorder->ChangeColour(up);
-
-    if (activenvp == nvp)
-        osd->SetSettingsText(text, text.length() );
+    if (osd)
+        osd->StartPause(colour * 10, true, "", text, 5);
 }
 
 void TV::ChangeVolume(bool up)

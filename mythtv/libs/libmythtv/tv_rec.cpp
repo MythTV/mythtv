@@ -1451,19 +1451,22 @@ void TVRec::ToggleChannelFavorite(void)
     pthread_mutex_unlock(&db_lock);
 }
 
-void TVRec::ChangeContrast(bool direction)
+int TVRec::ChangeContrast(bool direction)
 {
-    channel->ChangeContrast(direction);
+    int ret = channel->ChangeContrast(direction);
+    return ret;
 }
 
-void TVRec::ChangeBrightness(bool direction)
+int TVRec::ChangeBrightness(bool direction)
 {
-    channel->ChangeBrightness(direction);
+    int ret = channel->ChangeBrightness(direction);
+    return ret;
 }
 
-void TVRec::ChangeColour(bool direction)
+int TVRec::ChangeColour(bool direction)
 {
-    channel->ChangeColour(direction);
+    int ret = channel->ChangeColour(direction);
+    return ret;
 }
 
 void TVRec::SetChannel(QString name)

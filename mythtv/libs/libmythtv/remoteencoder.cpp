@@ -252,31 +252,40 @@ void RemoteEncoder::SetChannel(QString channel)
     SendReceiveStringList(strlist);
 }
 
-void RemoteEncoder::ChangeContrast(bool direction)
+int RemoteEncoder::ChangeContrast(bool direction)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "CHANGE_CONTRAST";
     strlist << QString::number((int)direction);
 
     SendReceiveStringList(strlist);
+
+    int retval = strlist[0].toInt();
+    return retval;
 }
 
-void RemoteEncoder::ChangeBrightness(bool direction)
+int RemoteEncoder::ChangeBrightness(bool direction)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "CHANGE_BRIGHTNESS";
     strlist << QString::number((int)direction);
 
     SendReceiveStringList(strlist);
+
+    int retval = strlist[0].toInt();
+    return retval;
 }
 
-void RemoteEncoder::ChangeColour(bool direction)
+int RemoteEncoder::ChangeColour(bool direction)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "CHANGE_COLOUR";
     strlist << QString::number((int)direction);
 
     SendReceiveStringList(strlist);
+
+    int retval = strlist[0].toInt();
+    return retval;
 }
 
 bool RemoteEncoder::CheckChannel(QString channel)

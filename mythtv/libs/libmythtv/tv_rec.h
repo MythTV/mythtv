@@ -71,9 +71,9 @@ class TVRec
     void ToggleChannelFavorite(void);
     void ChangeChannel(int channeldirection);
     void SetChannel(QString name);
-    void ChangeColour(bool direction);
-    void ChangeContrast(bool direction);
-    void ChangeBrightness(bool direction);
+    int ChangeColour(bool direction);
+    int ChangeContrast(bool direction);
+    int ChangeBrightness(bool direction);
     bool CheckChannel(QString name);
     void GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime, 

@@ -499,7 +499,7 @@ int Channel::ChangeContrast(bool up)
         return -1;
     }
 
-    return vid_pic.contrast;
+    return vid_pic.contrast / 655;
 }
 
 int Channel::ChangeBrightness(bool up)
@@ -557,9 +557,8 @@ int Channel::ChangeBrightness(bool up)
         perror("VIDIOCSPICT: ");
         return -1;
     }
-    
 
-    return vid_pic.brightness;
+    return vid_pic.brightness / 655;
 }
 
 int Channel::ChangeColour(bool up)
@@ -617,7 +616,7 @@ int Channel::ChangeColour(bool up)
         return -1;
     }
     
-    return vid_pic.colour;
+    return vid_pic.colour / 655;
 }
 
 bool Channel::ChangeExternalChannel(const QString &channum)

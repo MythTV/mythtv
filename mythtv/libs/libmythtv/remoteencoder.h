@@ -32,9 +32,9 @@ class RemoteEncoder
     void Pause(void);
 
     void ToggleInputs(void);
-    void ChangeContrast(bool direction);
-    void ChangeBrightness(bool direction);
-    void ChangeColour(bool direction);
+    int ChangeContrast(bool direction);
+    int ChangeBrightness(bool direction);
+    int ChangeColour(bool direction);
     void ChangeChannel(int channeldirection);
     void ToggleChannelFavorite(void);
     void SetChannel(QString channel);
