@@ -27,7 +27,7 @@ class DVDSubTitle
   
   public:
     
-    DVDSubTitle(int subtitle_id, const QString &a_language){id = subtitle_id; language = a_language;}
+    DVDSubTitle(int subtitle_id, const QString &a_language);
 
     void    setName(const QString &a_name){name = a_name;}
     QString getLanguage(){return language;}

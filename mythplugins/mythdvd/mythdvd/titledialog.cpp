@@ -112,9 +112,9 @@ void TitleDialog::showCurrentTitle()
             QPtrList<DVDAudioInfo> *audio_tracks = current_title->getAudioTracks();
             for(uint j = 0; j < audio_tracks->count(); j++)
             {
-                audio_select->addItem(j, audio_tracks->at(j)->getAudioString());
+                audio_select->addItem(j + 1, audio_tracks->at(j)->getAudioString());
             }
-            audio_select->setToItem(current_title->getAudio());           
+            audio_select->setToItem(current_title->getAudio());
         }
         if(quality_select)
         {

@@ -907,7 +907,6 @@ void DVDRipBox::handleMedia(QStringList tokens)
         }
         DVDSubTitleInfo *new_subtitle = new DVDSubTitleInfo(tokens[4].toInt(), name_string);
         which_title->addSubTitle(new_subtitle);
-        //cout << "Just added a subtitle of id " << new_subtitle->getID() << " and name of " << new_subtitle->getName() << endl;
     }
     
 }

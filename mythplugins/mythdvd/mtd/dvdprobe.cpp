@@ -18,6 +18,16 @@ using namespace std;
 #include <unistd.h>
 #include "dvdprobe.h"
 
+DVDSubTitle::DVDSubTitle(int subtitle_id, const QString &a_language)
+{
+    id = subtitle_id; 
+    language = a_language.utf8();
+    if(language.length() < 1)
+    {
+        language = "unknown";
+    }    
+}
+
 DVDAudio::DVDAudio()
 {
     audio_format = "";
@@ -659,10 +669,16 @@ bool DVDProbe::probe()
                             }
                             else
                             {
+                                //
+                                //  The Freakin Disney Corporation seems to think it's
+                                //  useful to set language codes with weird ass 
+                                //  characters. This should probably handle that.
+                                //
+                                
                                 QString zee_language = "";
                                 zee_language.sprintf("%c%c", sub_attributes->lang_code>>8, 
                                                              sub_attributes->lang_code & 0xff);
-                                DVDSubTitle *new_subtitle = new DVDSubTitle(j, zee_language);
+                                DVDSubTitle *new_subtitle = new DVDSubTitle(j, zee_language.utf8());
                                 new_title->addSubTitle(new_subtitle);
                                 //printf("subtitle %02d=<%c%c> ", j, sub_attributes->lang_code>>8, sub_attributes->lang_code & 0xff);
                                 //if(sub_attributes->lang_extension) printf("ext=%d", sub_attributes->lang_extension);
