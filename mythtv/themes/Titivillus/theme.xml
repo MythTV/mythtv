@@ -482,7 +482,7 @@
 
   <buttondef name="TV_SEARCH_TITLES">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/search_new_titles.png</watermarkimage>
+    <watermarkimage>watermark/search_titles.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
