@@ -25,7 +25,7 @@ void usage(char *progname)
 {
     cerr << "Usage: " << progname << " <--chanid <channelid>>\n";
     cerr << "\t<--starttime <starttime>> <--profile <profile>>\n";
-    cerr << "\t<--honorcutlist> <--allkeys> <--database> <--help>\n\n";
+    cerr << "\t[options]\n\n";
     cerr << "\t--chanid       or -c: Takes a channel id. REQUIRED\n";
     cerr << "\t--starttime    or -s: Takes a starttime for the\n";
     cerr << "\t\trecording. REQUIRED\n";
@@ -35,12 +35,16 @@ void usage(char *progname)
     cerr << "\t--allkeys      or -k: Specifies that the output file\n";
     cerr << "\t\tshould be made entirely of keyframes.\n";
     cerr << "\t--database     or -d: Store status in the db\n";
+    cerr << "\t--fifodir      or -f: Directory to write fifos to\n";
+    cerr << "\t\tIf --fifodir is specified, 'audout' and 'vidout'\n";
+    cerr << "\t\twill be created in the specified directory\n";
     cerr << "\t--help         or -h: Prints this help statement.\n";
 }
 
 int main(int argc, char *argv[])
 {
     QString chanid, starttime, profilename;
+    QString fifodir = NULL;
     bool useCutlist = false, keyframesonly = false, use_db = false;
     srand(time(NULL));
 
@@ -118,6 +122,21 @@ int main(int argc, char *argv[])
         {
             use_db = true;
         }
+        else if (!strcmp(a.argv()[argpos],"-f") ||
+                 !strcmp(a.argv()[argpos],"--fifodir"))
+        {
+            if (a.argc() > argpos)
+            {
+                fifodir = a.argv()[argpos + 1];
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -f/--fifodir option\n";
+                usage(a.argv()[0]);
+                return -1;
+            }
+        }
         else if (!strcmp(a.argv()[argpos],"-h") ||
                  !strcmp(a.argv()[argpos],"--help")) 
         {
@@ -178,7 +197,8 @@ int main(int argc, char *argv[])
 
     int result = nvp->ReencodeFile((char *)infile.ascii(),
                                    (char *)tmpfile.ascii(),
-                                   profile, useCutlist, keyframesonly, use_db);
+                                   profile, useCutlist, keyframesonly, use_db,
+                                   fifodir);
     int retval;
     if (result == REENCODE_OK)
     {

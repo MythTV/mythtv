@@ -23,6 +23,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "programinfo.h"
 #include "mythcontext.h"
+#include "fifowriter.h"
 
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
@@ -2752,7 +2753,7 @@ void NuppelVideoPlayer::ReencoderAddKFA(
 int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                                     RecordingProfile &profile,
                                     bool honorCutList, bool forceKeyFrames,
-                                    bool chkTranscodeDB)
+                                    bool chkTranscodeDB, QString fifodir)
 { 
     NuppelVideoRecorder *nvr;
 
@@ -2916,6 +2917,27 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         }
     }
 
+    FIFOWriter::FIFOWriter *fifow = NULL;
+
+    if (fifodir != NULL) 
+    {
+        QString audfifo = fifodir + QString("/audout");
+        QString vidfifo = fifodir + QString("/vidout");
+        fifow = new FIFOWriter::FIFOWriter(2);
+
+        if (!fifow->FIFOInit(0, QString("video"), vidfifo, frame.size, 50) ||
+            !fifow->FIFOInit(1, QString("audio"), audfifo, 128000, 25))
+        {
+           cerr << "Error initializing fifo writer.  Aborting" << endl;
+           delete fifow;
+           delete outRingBuffer;
+           delete nvr;
+           unlink(outputname);
+           return REENCODE_ERROR;
+        }
+        cout << "CreatedThreads\n";
+    }
+
     frame.frameNumber = 0;
     long lastKeyFrame = 0;
     while (!eof)
@@ -2953,6 +2975,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             if (!decoder->GetRawAudioState()) 
             {
                 // The Raw state changed during decode.  This is not good
+                if (fifow)
+                    delete fifow;
                 delete outRingBuffer;
                 delete nvr;
                 unlink(outputname);
@@ -2995,8 +3019,18 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 decoder->WriteStoredData(outRingBuffer, true);
             else
             {
-                decoder->WriteStoredData(outRingBuffer, false);
-                nvr->WriteVideo(&frame, true, writekeyframe);
+                if (fifow) 
+                { 
+                   AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
+                    fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
+                    fifow->FIFOWrite(0, frame.buf,frame.size);
+                    arb->audiobuffer_len = 0;
+                } 
+                else 
+                {
+                    decoder->WriteStoredData(outRingBuffer, false);
+                    nvr->WriteVideo(&frame, true, writekeyframe);
+                }
             }
             audioOutput->Reset();
             rtxt = wtxt;
@@ -3042,6 +3076,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             if (honorCutList && 
                 m_playbackinfo->CheckMarkupFlag(MARK_UPDATED_CUT, m_db)) 
             {
+                if (fifow)
+                    delete fifow;
                 delete outRingBuffer;
                 delete nvr;
                 unlink(outputname);
@@ -3064,6 +3100,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 db_lock.unlock();
                 if (result.isActive() && result.numRowsAffected() > 0)
                 {
+                    if (fifow)
+                        delete fifow;
                     delete outRingBuffer;
                     delete nvr;
                     unlink(outputname);
@@ -3083,6 +3121,11 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         nvr->WriteKeyFrameAdjustTable(&kfa_table);
     delete outRingBuffer;
     delete nvr;
+    if (fifow) 
+    {
+        delete fifow;
+        unlink(outputname);
+    }
     return REENCODE_OK;
 }
 

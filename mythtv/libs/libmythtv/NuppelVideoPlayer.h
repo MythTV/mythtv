@@ -105,7 +105,8 @@ class NuppelVideoPlayer
 
     int ReencodeFile(char *inputname, char *outputname,
                      RecordingProfile &profile, bool honorCutList = false,
-                     bool forceKeyFrames = false, bool chkTranscodeDB = false);
+                     bool forceKeyFrames = false, bool chkTranscodeDB = false,
+                     QString fifodir = NULL);
 
     int FlagCommercials(bool showPercentage = false, bool fullSpeed = false);
 
