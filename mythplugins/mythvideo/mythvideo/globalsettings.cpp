@@ -9,18 +9,6 @@
 
 // General Settings
 
-class VideoStartupDirectory: public LineEditSetting, public GlobalSetting {
-public:
-    VideoStartupDirectory():
-        GlobalSetting("VideoStartupDir") {
-        setLabel(QObject::tr("Directory that holds videos"));
-        setValue("/share/Movies/dvd");
-        setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running MythVideo only needs to have read permission "
-                    "to the directory."));
-    };
-};
-
 class VideoDefaultParentalLevel: public ComboBoxSetting, public GlobalSetting {
 public:
     VideoDefaultParentalLevel() :
@@ -100,6 +88,55 @@ public:
     };
 };
 
+
+class SearchListingsCommand: public LineEditSetting, public GlobalSetting {
+public:
+    SearchListingsCommand():
+        GlobalSetting("MovieListCommandLine") {
+        setLabel(QObject::tr("Command to search for movie listings"));
+        setValue(PREFIX "/share/mythtv/mythvideo/scripts/imdb.pl -M tv=no;video=no");
+        setHelpText(QObject::tr("This command must be "
+                    "executable by the user running MythVideo."));
+    };
+};
+
+
+class GetPostersCommand: public LineEditSetting, public GlobalSetting {
+public:
+    GetPostersCommand():
+        GlobalSetting("MoviePosterCommandLine") {
+        setLabel(QObject::tr("Command to search for movie posters"));
+        setValue(PREFIX "/share/mythtv/mythvideo/scripts/imdb.pl -P");
+        setHelpText(QObject::tr("This command must be "
+                    "executable by the user running MythVideo."));
+    };
+};
+
+
+class GetDataCommand: public LineEditSetting, public GlobalSetting {
+public:
+    GetDataCommand():
+        GlobalSetting("MovieDataCommandLine") {
+        setLabel(QObject::tr("Command to extract data for movies"));
+        setValue(PREFIX "/share/mythtv/mythvideo/scripts/imdb.pl -D");
+        setHelpText(QObject::tr("This command must be "
+                    "executable by the user running MythVideo."));
+    };
+};
+
+
+class VideoStartupDirectory: public LineEditSetting, public GlobalSetting {
+public:
+    VideoStartupDirectory():
+        GlobalSetting("VideoStartupDir") {
+        setLabel(QObject::tr("Directory that holds videos"));
+        setValue("/share/Movies/dvd");
+        setHelpText(QObject::tr("This directory must exist, and the user "
+                    "running MythVideo only needs to have read permission "
+                    "to the directory."));
+    };
+};
+
 //Player Settings
 
 class VideoDefaultPlayer: public LineEditSetting, public GlobalSetting {
@@ -128,6 +165,12 @@ VideoGeneralSettings::VideoGeneralSettings()
     general->addChild(new VideoNewBrowsable());
     addChild(general);
 
+    VerticalConfigurationGroup* vman = new VerticalConfigurationGroup(false);
+    vman->setLabel(QObject::tr("Video Manager"));
+    vman->addChild(new SearchListingsCommand());
+    vman->addChild(new GetPostersCommand());
+    vman->addChild(new GetDataCommand());
+    addChild(vman);
 }
 
 VideoPlayerSettings::VideoPlayerSettings()

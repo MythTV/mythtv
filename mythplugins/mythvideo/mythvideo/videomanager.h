@@ -45,7 +45,6 @@ class VideoManager : public MythDialog
     void pageDown();
     void pageUp();
     void exitWin();
-    void GetMovieListingTimeOut();
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -54,6 +53,7 @@ class VideoManager : public MythDialog
 
   private slots:
     void num(const QString &text);
+    void copyFinished(QNetworkOperation *op);
 
   private:
     bool updateML;
@@ -69,9 +69,6 @@ class VideoManager : public MythDialog
     XMLParse *theme;
     QDomElement xmldata;
 
-    QString parseData(QString, QString, QString);
-    QString parseDataAnchorEnd(QString, QString, QString);
-    QMap<QString, QString> parseMovieList(QString);
     void ResetCurrentItem();
 
     void RefreshMovieList();
@@ -79,9 +76,9 @@ class VideoManager : public MythDialog
     void GetMovieData(QString);
     int GetMovieListing(QString);
     QString GetMoviePoster(QString);
-    void ParseMovieData(QString);
-    QMap<QString, QString> movieList;
+    QStringList movieList;
     QString curIMDBNum;
+    QString executeExternal(QStringList args, QString purpose = "");
 
     void updateBackground(void);
     void updateList(QPainter *);
@@ -136,6 +133,8 @@ class VideoManager : public MythDialog
     QString theMovieName;
     bool allowselect;
     bool isbusy;
+    bool iscopycomplete;
+    bool iscopysuccess;
 };
 
 #endif

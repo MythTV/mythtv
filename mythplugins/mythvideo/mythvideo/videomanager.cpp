@@ -11,6 +11,7 @@
 #include <qurl.h>
 #include <qdir.h>
 #include <qurloperator.h>
+#include <qprocess.h>
 
 using namespace std;
 
@@ -35,7 +36,6 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
 
     noUpdate = false;
     curIMDBNum = "";
-    ratingCountry = "USA";
     curitem = NULL;
     curitemMovie = "";
     can_do_page_down = false;
@@ -204,143 +204,6 @@ void VideoManager::RefreshMovieList()
     updateML = false;
 }
 
-// Replace the numeric character references
-// See http://www.w3.org/TR/html4/charset.html#h-5.3.1
-static void replaceNumCharRefs(QString &str)
-{
-    QString &ret = str;
-    int pos = 0;
-    QRegExp re("&#(\\d+|(x|X)[0-9a-fA-F]+);");
-
-    while ((pos = re.search(ret, pos)) != -1) 
-    {
-        int len = re.matchedLength();
-        QString numStr = re.cap(1);
-        bool ok = false;
-        int num = -1;
-
-        if (numStr[0] == 'x' || numStr[0] == 'X') 
-        {
-            QString hexStr = numStr.right(numStr.length() - 1);
-            num = hexStr.toInt(&ok, 16);
-        } 
-        else 
-            num = numStr.toInt(&ok, 10);
-
-        QChar rep('X');
-
-        if (ok)
-           rep = QChar(num);
-
-        ret.replace(pos, len, rep);
-
-        pos += 1;
-    }
-}
-
-// returns text within 'data' between 'beg' and 'end' matching strings
-QString VideoManager::parseData(QString data, QString beg, QString end)
-{
-    QString ret;
-
-    if (debug > 2)
-    {
-        cout << "MythVideo: Parse HTML : Looking for: " << beg << ", ending with: " << end << endl;
-    }
-    int start = data.find(beg, 0, false) + beg.length();
-    int endint = data.find(end, start + 1, false);
-    if (start != ((int)beg.length() - 1) && endint != -1)
-    {
-        ret = data.mid(start, endint - start);
-
-        replaceNumCharRefs(ret);
-
-        if (debug > 2)
-            cout << "MythVideo: Parse HTML : Returning : " << ret << endl;
-        return ret;
-    }
-    else
-    {
-        if (debug > 2)
-            cout << "MythVideo: Parse HTML : Parse Failed...returning <NULL>\n";
-        ret = "<NULL>";
-        return ret;
-    }
-}
-
-QString VideoManager::parseDataAnchorEnd(QString data, QString beg, QString end)
-{
-    QString ret;
-
-    if (debug > 2)
-    {
-        cout << "MythVideo: Parse (Anchor End) HTML : Looking for: " << beg << ", ending with: " << end << endl;
-    }
-    int endint = data.find(end);
-    int start = data.findRev(beg, endint + 1);
-    if (start != - 1 && endint != -1)
-    {
-	start = start + beg.length();
-        ret = data.mid(start, endint - start);
-
-        replaceNumCharRefs(ret);
-
-        if (debug > 2)
-            cout << "MythVideo: Parse HTML : Returning : " << ret << endl;
-        return ret;
-    }
-    else
-    {
-        if (debug > 2)
-            cout << "MythVideo: Parse HTML : Parse Failed...returning <NULL>\n";
-        ret = "<NULL>";
-        return ret;
-    }
-}
-
-QMap<QString, QString> VideoManager::parseMovieList(QString data)
-{
-    QMap<QString, QString> listing;
-    QString beg = "<A HREF=\"/Title";
-    QString end = "</A>";
-    QString ret = "";
-
-    QString movieNumber = "";
-    QString movieTitle = "";
- 
-    int count = 0;
- 
-    if (data.find("Sorry there were no matches for the title") > 0)
-    {
-        listing["ERROR"] = tr("Sorry there were no matches for the title");
-        return listing;
-    }
-
-    int start = data.find(beg, 0, false) + beg.length();
-    int endint = data.find(end, start + 1, false);
-
-    while (start != ((int)beg.length() - 1))
-    {
-        ret = data.mid(start, endint - start);
-  
-	int fnd = ret.find("title/tt") + 4; 
-        movieNumber = ret.mid(fnd, ret.find("/\">") - fnd);
-	
-        movieTitle = ret.right(ret.length() - ret.find("\">") - 2);
-
-        listing[movieNumber] = movieTitle;
-  
-        data = data.right(data.length() - endint);
-        start = data.find(beg, 0, false) + beg.length();
-        endint = data.find(end, start + 1, false);
-        count++;
-        if (count == 10)
-    	break;
-    }
-    return listing;
-
-}
-
 void VideoManager::updateBackground(void)
 {
     QPixmap bground(size());
@@ -358,12 +221,11 @@ void VideoManager::updateBackground(void)
     setPaletteBackgroundPixmap(myBackground);
 }
 
+// Copy movie poster to appropriate directory and return full pathname to it
 QString VideoManager::GetMoviePoster(QString movieNum)
 {
-    QString movieFile = curitem->Filename();
+    QString movieFile = curitem->Filename().section('.', 0, -2);
     QStringList images = QImage::inputFormatList();
-
-    movieFile = movieFile.left(movieFile.findRev("."));
 
     QStringList::Iterator an_image_item = images.begin();
     for (; an_image_item != images.end(); ++an_image_item)
@@ -382,71 +244,25 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     if (movieNum == "Local")
         return(QString("<NULL>"));
 
-    QString host = "www.imdb.com";
-    QString path = "";
+    // Obtain movie poster
+    QStringList args = QStringList::split(' ', 
+              gContext->GetSetting("MoviePosterCommandLine", 
+              "/usr/local/share/mythtv/mythvideo/scripts/imdb.pl -P"));
+    args += movieNum;
 
-    QString url = "http://" + host + "/title/tt" + movieNum + "/posters";
-    if (debug > 0)
-        cout << "Grabbing Poster HTML From: " << url.latin1() << endl;
-    isbusy = true;
-    QString res = HttpComms::getHttp(url);
-    isbusy = false;
-    if (debug > 0)
-        cout << "Got " << res.length() << " byte result: " << res.latin1() 
-             << endl;
-
-    QString beg, end, filename = "<NULL>";
-
-    // Check for posters on impawards.com first, since their posters
-    // are usually much better quality
-
-    beg = "<a href=\"http://www.impawards.com";
-    end = "\">http://www.impawards.com";
-    QString impsite = parseDataAnchorEnd(res, beg, end);
-    if (impsite != "<NULL>")
-    {
-
-        impsite = "http://www.impawards.com" + impsite;
-        if (debug > 0)
-            cout << "Retreiving poster from " << impsite << endl; 
-        isbusy = true;
-        QString impres = HttpComms::getHttp(impsite);
-        isbusy = false;
-        if (debug > 0)
-            cout << "Got " << impres.length() << " bytes: " 
-                 << impres.latin1() << endl; 
-
-        beg = "<img SRC=\"posters/";
-	end = "\" ALT";
-
-	filename = parseData(impres, beg, end);
-        if (debug > 0)
-            cout << "Imp found: " << filename << endl;
-
-	host = parseData(impsite, "//", "/");
-	path = impsite.replace(QRegExp("http://" + host), QString(""));
-	path = path.left(impsite.findRev("/") + 1) + "posters/";
+    // execute external command to obtain url of movie poster
+    QStringList lines = QStringList::split('\n', 
+                                    executeExternal(args, "Poster Query"));
+    QString uri = "";
+    for (QStringList::Iterator it = lines.begin();it != lines.end(); ++it) {
+        if ( (*it).at(0) == '#')  // treat lines beg w/ # as a comment
+            continue; 
+        uri = *it;
+        break;  // just take the first result
     }
 
-    // If the impawards site failed or wasn't available
-    // just grab the poster from imdb
-    if (filename == "<NULL>")
-    {
-        host = "posters.imdb.com";
-	path = "/posters/";
-
-	//cout << "Retreiving poster from imdb.com" << endl;
-        beg = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-                  "background=\"http://posters.imdb.com/posters/";
-        end = "\"><td><td><a href=\"";
-
-	filename = parseData(res, beg, end);
-    }
-    
-    if (filename == "<NULL>")
-    {
-        cout << "MyhVideo: Error parsing poster filename.\n";
-        return filename;
+    if (uri == "") {
+       return "";
     }
 
     char *home = getenv("HOME");
@@ -462,157 +278,224 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    //cout << "Copying (" << filename << ")...";
+    VERBOSE(VB_ALL, QString("Copying '%1' -> '%2'...").arg(uri)
+           .arg(fileprefix));
     QUrlOperator *op = new QUrlOperator();
-    op->copy(QString("http://" + host + path + filename),
-             "file:" + fileprefix);
-    //cout << "Done.\n";
+    connect(op, SIGNAL(finished(QNetworkOperation*)), 
+          this, SLOT(copyFinished(QNetworkOperation*)) );
+    iscopycomplete = false;
+    iscopysuccess = false;
+    op->copy(uri, "file:" + fileprefix);
+    // wait for completion for up to 5 seconds
+    for (int i = 0; i < 500; i++) {
+       if (!iscopycomplete) {
+          qApp->processEvents();
+          usleep(10000);
+       } else {
+          break;
+       }
+    }
 
-    filename = filename.right(filename.length() - filename.findRev("/") - 1);
-    fileprefix = fileprefix + "/" + filename;
+    QString localfile = "";
+    if (iscopycomplete) {
+        if (iscopysuccess)
+           localfile = fileprefix + "/" + uri.section('/', -1);
+    } else {
+       op->stop();
+       QString err = QString("Copying of '%1' timed out").arg(uri);
+       cerr << err << endl;
+       VERBOSE(VB_ALL, err);
+    }
+    delete op;
+    return localfile;
+}
 
-    return fileprefix;
-
+void VideoManager::copyFinished(QNetworkOperation* op) {
+   QString state, operation;
+   switch(op->operation()) {
+      case QNetworkProtocol::OpMkDir: operation = "MkDir"; break;
+      case QNetworkProtocol::OpRemove: operation = "Remove"; break; 
+      case QNetworkProtocol::OpRename: operation = "Rename"; break; 
+      case QNetworkProtocol::OpGet: operation = "Get"; break;
+      case QNetworkProtocol::OpPut: operation = "Put"; break; 
+      default: operation = "Uknown"; break;
+   }
+   switch(op->state()) {
+      case QNetworkProtocol::StWaiting:
+         state = "The operation is in the QNetworkProtocol's queue waiting to be prcessed.";
+         break;
+      case QNetworkProtocol::StInProgress:
+         state = "The operation is being processed.";
+         break;
+      case QNetworkProtocol::StDone:
+         state = "The operation has been processed succesfully.";
+         iscopycomplete = true;
+         iscopysuccess = true;
+         break;
+      case QNetworkProtocol::StFailed:
+         state = "The operation has been processed but an error occurred.";
+         iscopycomplete = true;
+         break;
+      case QNetworkProtocol::StStopped:
+         state = "The operation has been processed but has been stopped before it finished, and is waiting to be processed.";
+         break;
+      default: state = "Uknown"; break;
+   }
+   VERBOSE(VB_ALL, QString("%1: %2: %3")
+           .arg(operation)
+           .arg(state)
+           .arg(op->protocolDetail()) );
 }
 
 void VideoManager::GetMovieData(QString movieNum)
 {
-    movieNumber = movieNum;
-    QString host = "www.imdb.com";
+    QStringList args = QStringList::split(' ',
+              gContext->GetSetting("MovieDataCommandLine", 
+              "/usr/local/share/mythtv/mythvideo/scripts/imdb.pl -D"));
+    args += movieNum;
 
-    QString url = "http://" + host + "/title/tt" + movieNum + "/";
-    if (debug > 0)
-        cout << "Grabbing Data From: " << url.latin1() << endl;
-    isbusy = true;
-    QString res = HttpComms::getHttp(url);
-    isbusy = false;
+    // execute external command to obtain list of possible movie matches 
+    QString results = executeExternal(args, "Movie Data Query");
 
-    //cout << "Outputting Movie Data Page\n" << res << endl;
-
-    ParseMovieData(res);
-}
-
-// Obtain a movie listing via popular website(s)
-int VideoManager::GetMovieListing(QString movieName)
-{
-    int ret = -1;
-    QString host = "us.imdb.com";
-    theMovieName = movieName;
-
-    QString url = "http://" + host + "/Tsearch?title=" + movieName 
-       + "&from_year=1890&to_year=2010&sort=smart&tv=off&x=12&y=14";
-
-    if (debug > 0) 
-        cout << "Grabbing Listing From: " << url.latin1() << endl;
-    isbusy = true;
-    QString res = HttpComms::getHttp(url);
-    isbusy = false;
-
-    // If URL has been redirected to a movie then it was an only match 
-    if (url.find("title/tt") != -1) 
-    {
-        int fnd = url.find("title/tt") + 8;
-        movieNumber = url.mid(fnd, url.findRev("/") - fnd);
-        return 1;  // this does a re-request but simplest for now
+    // parse results
+    QMap<QString,QString> data;
+    QStringList lines = QStringList::split('\n', results);
+    if (lines.size() > 0) {
+        for (QStringList::Iterator it = lines.begin();it != lines.end(); ++it) {
+            if ( (*it).at(0) == '#')  // treat lines beg w/ # as a comment
+                continue; 
+            QString name = (*it).section(':', 0, 0);
+            QString vale = (*it).section(':', 1);
+            data[name] = vale;
+        }
+        // set known values 
+        curitem->setTitle(data["Title"]);
+        curitem->setYear(data["Year"].toInt());
+        curitem->setDirector(data["Director"]);
+        curitem->setPlot(data["Plot"]);
+        curitem->setUserRating(data["UserRating"].toFloat());
+        curitem->setRating(data["MovieRating"]);
+        curitem->setLength(data["Runtime"].toInt());
+        curitem->setInetRef(movieNumber);
+        QString movieCoverFile = "";
+        movieCoverFile = GetMoviePoster(movieNumber);
+        curitem->setCoverFile(movieCoverFile);
+    } else {
+        ResetCurrentItem();
     }
 
-    QString exact = parseData(res, "<b>Exact Matches</b>", "</table>");
-    QString partial = parseData(res, "<b>Partial Matches</b>", "</table>");
-    QString movies = exact + partial;
-    if (debug > 0)
-        cout << "Got " << movies.length() << " bytes of movies:" 
-             << movies.latin1() << endl;
+    curitem->updateDatabase(db);
+    RefreshMovieList();
+}
 
-    movieList.clear();
+// Execute an external command and return results in string
+//   probably should make this routing async vs polling like this
+//   but it would require a lot more code restructuring
+QString VideoManager::executeExternal(QStringList args, QString purpose) 
+{
+    QString ret = "";
+    QString err = "";
 
-    if (movies != "<NULL>")
-    {
-        movieList = parseMovieList(movies);
+    VERBOSE(VB_GENERAL, QString("%1: Executing '%2'").arg(purpose).
+                      arg(args.join(" ")) );
+    QProcess proc(args, this);
 
-        QMap<QString, QString>::Iterator it;
+    QString cmd = args[0];
+    QFileInfo info(cmd);
+    if (!info.exists()) {
+       err.sprintf("\"%s\" failed: does not exist", cmd.latin1());
+    } else if (!info.isExecutable()) {
+       err.sprintf("\"%s\" failed: not executable", cmd.latin1());
+    } else if (proc.start()) {
+        while (true) {
+           while (proc.canReadLineStdout() || proc.canReadLineStderr()) {
+              if (proc.canReadLineStdout()) {
+                 ret += proc.readLineStdout() + "\n";
+              } 
+              if (proc.canReadLineStderr()) {
+                 if (err == "") err = cmd + ": ";
+                 err += proc.readLineStderr() + "\n";
+              }
+           }
+           if (proc.isRunning()) {
+              qApp->processEvents();
+              usleep(10000);
+           } else {
+              if (!proc.normalExit()) {
+                 err.sprintf("\"%s\" failed: Process exited abnormally", 
+                     cmd.latin1());
+              } 
+              break;
+           }
+       }
+    } else {
+       err.sprintf("\"%s\" failed: Could not start process", cmd.latin1());
+    }
 
-        //cout << endl << endl;
-        for (it = movieList.begin(); it != movieList.end(); ++it)
-        {
-            if (movieList.count() == 1)
-            {
-                movieNumber = it.key();
-                if (movieNumber == "ERROR")
-                    ret = -1;
-                else 
-                    ret = 1;
-                return ret;
-            }
-            //cout << it.data() << endl;
+    while (proc.canReadLineStdout() || proc.canReadLineStderr()) {
+        if (proc.canReadLineStdout()) {
+            ret += proc.readLineStdout() + "\n";
+        }
+        if (proc.canReadLineStderr()) {
+           if (err == "") err = cmd + ": ";
+           err += proc.readLineStderr() + "\n";
         }
     }
 
-    movieList["manual"] = tr("Manually Enter IMDB #");
-    movieList["reset"] = tr("Reset Entry");
-    movieList["cancel"] = tr("Cancel");
-    ret = 2;
-
+    if (err != "") {
+        if (purpose == "")
+            purpose = "Command";
+        cerr << err << endl;
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+			QObject::tr(purpose + " failed"),
+                        QObject::tr(err + "\n\nCheck VideoManager Settings"));
+        ret = "#ERROR";
+    }
+    VERBOSE(VB_ALL, ret); 
     return ret;
 }
 
-void VideoManager::ParseMovieData(QString data)
+// Obtain a movie listing via popular website(s) and populates movieList 
+//   returns: number of possible matches returned, -1 for error
+int VideoManager::GetMovieListing(QString movieName)
 {
-    movieTitle = parseData(data, "<title>", "(");
-    QString mYear = parseData(data, "(", ")");
-    if (mYear.find("/") > 0)
-        movieYear = mYear.left(mYear.find("/")).toInt();
-    else 
-        movieYear = mYear.toInt();
- 
-    movieDirector = parseData(data, ">Directed by</b><br>\n<a href=\"/name/nm", "</a><br>");
-    if (movieDirector != "<NULL>")
-        movieDirector = movieDirector.right(movieDirector.length() - movieDirector.find("\">") - 2);
-    moviePlot = parseData(data, "<b class=\"ch\">Plot Outline:</b> ", "<a href=\"");
-    if (moviePlot == "<NULL>")
-        moviePlot = parseData(data, "<b class=\"ch\">Plot Summary:</b> ", "<a href=\"");
+    QStringList args = QStringList::split(' ', 
+              gContext->GetSetting("MovieListCommandLine", 
+              "/usr/local/share/mythtv/mythvideo/scripts/imdb.pl -M tv=no;video=no"));
+    args += movieName;
 
-    QString rating = parseData(data, "<b class=\"ch\">User Rating:</b>", " (");
-    rating = parseData(rating, "<b>", "/");
-    movieUserRating = rating.toFloat();
-
-    movieRating = parseData(data, "<b class=\"ch\"><a href=\"/mpaa\">MPAA</a>:</b> ", "<br>");
-    if (movieRating == "<NULL>")
-    {
-        movieRating = parseData(data, "<b class=\"ch\">Certification:</b>", "<br>");
-        movieRating = parseData(movieRating, "<a href=\"/List?certificates=" + ratingCountry, "/a>");
-        movieRating = parseData(movieRating, "\">", "<");
+    // execute external command to obtain list of possible movie matches 
+    QString results = executeExternal(args, "Movie Search");
+/* let error parse as 0 hits, so user gets chance to enter one in manually 
+    if (results == "#ERROR") {
+        return -1;
     }
-    movieRuntime = parseData(data, "<b class=\"ch\">Runtime:</b>", " min").toInt();
-    QString movieCoverFile = "";
-    movieCoverFile = GetMoviePoster(movieNumber);
+*/
 
-    /*
-    cout << "      Title:\t" << movieTitle << endl;
-    cout << "       Year:\t" << movieYear << endl;
-    cout << "   Director:\t" << movieDirector << endl;
-    cout << "       Plot:\t" << moviePlot << endl;
-    cout << "User Rating:\t" << movieUserRating << endl;
-    cout << "     Rating:\t" << movieRating << endl;
-    cout << "    Runtime:\t" << movieRuntime << endl;
-    cout << " Cover File:\t" << movieCoverFile << endl;
-    */
-
-    if (movieTitle == "<NULL>")
-        ResetCurrentItem();
-    else 
-    {
-       curitem->setTitle(movieTitle);
-       curitem->setYear(movieYear);
-       curitem->setDirector(movieDirector);
-       curitem->setPlot(moviePlot);
-       curitem->setUserRating(movieUserRating);
-       curitem->setRating(movieRating);
-       curitem->setLength(movieRuntime);
-       curitem->setInetRef(movieNumber);
-       curitem->setCoverFile(movieCoverFile);
+    // parse results
+    movieList.clear();
+    int count = 0;
+    QStringList lines = QStringList::split('\n', results);
+    for (QStringList::Iterator it = lines.begin();it != lines.end(); ++it) {
+        if ( (*it).at(0) == '#')  // treat lines beg w/ # as a comment
+            continue; 
+        movieList.push_back(*it);
+        count++;
     }
-    curitem->updateDatabase(db);
-    RefreshMovieList();
+
+    // if only a single match, assume this is it
+    if (count == 1) {
+        movieNumber = movieList[0].section(':', 0, 0);
+    }
+
+    if (count > 0) {
+        movieList.push_back(""); // visual separator - can't get selected
+    }
+    movieList.push_back("manual:Manually Enter IMDB #");
+    movieList.push_back("reset:Reset Entry");
+    movieList.push_back("cancel:Cancel");
+
+    return count;
 }
 
 void VideoManager::grayOut(QPainter *tmp)
@@ -699,7 +582,7 @@ void VideoManager::updateList(QPainter *p)
                       {
                           title = filename.section('/', -1);
                           if (!gContext->GetNumSetting("ShowFileExtensions"))
-                          title = title.section('.',0,-2);
+                              title = title.section('.',0,-2);
                       }
                       else
                           title = (*it).Title();
@@ -768,8 +651,6 @@ void VideoManager::updateMovieList(QPainter *p)
 
     QString title = "";
 
-    QMap<QString, QString>::Iterator it;
-
     LayerSet *container = NULL;
     container = theme->GetSet("moviesel");
     if (container)
@@ -781,19 +662,22 @@ void VideoManager::updateMovieList(QPainter *p)
             ltype->ResetList();
             ltype->SetActive(true);
 
-            for (it = movieList.begin(); it != movieList.end(); ++it)
+            for (QStringList::Iterator it = movieList.begin(); 
+                 it != movieList.end(); ++it)
             {
+               QString data = (*it).data();
+               QString moviename = data.section(':', 1);
                if (cnt < listsizeMovie)
                {
                   if (pastSkip <= 0)
                   {
                       if (cnt == inListMovie)
                       {
-                          curitemMovie = (*it).data();
+                          curitemMovie = moviename;
                           ltype->SetItemCurrent(cnt);
                       }
 
-                      ltype->SetItemText(cnt, 1, (*it).data());
+                      ltype->SetItemText(cnt, 1, moviename);
 
                       cnt++;
                       listCountMovie++;
@@ -1374,9 +1258,9 @@ void VideoManager::videoMenu()
        backup.end();
 
        movieList.clear();
-       movieList["manual"] = tr("Manually Enter IMDB #");
-       movieList["reset"] = tr("Reset Entry");
-       movieList["cancel"] = tr("Cancel");
+       movieList.push_back("manual:Manually Enter IMDB #");
+       movieList.push_back("reset:Reset Entry");
+       movieList.push_back("cancel:Cancel");
        inListMovie = 0;
        inDataMovie = 0;
        listCountMovie = 0;
@@ -1404,14 +1288,11 @@ void VideoManager::editMetadata()
 
 void VideoManager::selected()
 {
-
-// Do IMDB Connections and Stuff
+    // Do queries 
     QPainter p(this);
     if (m_state == SHOWING_MAINWINDOW || m_state == SHOWING_EDITWINDOW)
     {
-       QString movieTitle = curitem->Title();
-       movieTitle.replace(QRegExp(" "), "+");
-       movieTitle.replace(QRegExp("_"), "+");
+//       QString movieTitle = curitem->Title();
        m_state = SHOWING_EDITWINDOW;
  
        backup.flush();
@@ -1419,6 +1300,7 @@ void VideoManager::selected()
        grayOut(&backup);
        backup.end();
 
+       // set the title for the wait background
        LayerSet *container = NULL;
        container = theme->GetSet("inetwait");
        if (container)
@@ -1432,19 +1314,13 @@ void VideoManager::selected()
           container->Draw(&p, 2, 0);
           container->Draw(&p, 3, 0);
        }
+       backup.flush();
 
-      int ret = GetMovieListing(movieTitle);
-      if (ret == 2)
-      {
-          inListMovie = 0;
-          inDataMovie = 0;
-          listCountMovie = 0;
-          dataCountMovie = 0;
-          m_state = SHOWING_IMDBLIST;
-          update(movieListRect);
-      }
-      else if (ret == 1)
-      {
+//      int ret = GetMovieListing(movieTitle);
+      int ret = GetMovieListing(curitem->Filename().section('/', -1));
+      VERBOSE(VB_ALL, 
+              QString("GetMovieList returned %1 possible matches").arg(ret));
+      if (ret == 1) {
           if (movieNumber.isNull() || movieNumber.length() == 0)
           {
               ResetCurrentItem();
@@ -1463,9 +1339,14 @@ void VideoManager::selected()
           m_state = SHOWING_MAINWINDOW;
           update(infoRect);
           update(listRect);
-      }
-      else if (ret == -1)
-      {
+      } else if (ret >= 0) {
+          inListMovie = 0;
+          inDataMovie = 0;
+          listCountMovie = 0;
+          dataCountMovie = 0;
+          m_state = SHOWING_IMDBLIST;
+          update(movieListRect);
+      } else {
           //cout << "Error, movie not found.\n";
           backup.begin(this);
           backup.drawPixmap(0, 0, myBackground);
@@ -1477,13 +1358,14 @@ void VideoManager::selected()
    }
    else if (m_state == SHOWING_IMDBLIST)
    {
-       QMap<QString, QString>::Iterator it;
-
-       for (it = movieList.begin(); it != movieList.end(); ++it)
+       for (QStringList::Iterator it = movieList.begin(); 
+            it != movieList.end(); ++it)
        {
-           if (curitemMovie == it.data())
+           QString data = (*it).data();
+           QString movie = data.section(':', 1);
+           if (curitemMovie == movie)
            {
-               movieNumber = it.key();
+               movieNumber = data.section(':', 0, 0);
                break;
            }
        }
@@ -1520,7 +1402,6 @@ void VideoManager::selected()
        else if (movieNumber == "reset")
        {
            ResetCurrentItem();
-
            QString movieCoverFile = GetMoviePoster(QString("Local"));
            if (movieCoverFile != "<NULL>")
            {
@@ -1536,6 +1417,9 @@ void VideoManager::selected()
            m_state = SHOWING_MAINWINDOW;
            update(fullRect);
            movieNumber = "";
+           return;
+       }
+       else if (movieNumber == "") {
            return;
        }
        else
