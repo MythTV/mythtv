@@ -16,6 +16,8 @@
 #include <mfdclient/mfdcontent.h>
 
 #include "mfdinfo.h"
+#include "netflasher.h"
+#include "playlistdialog.h"
 
 typedef QValueVector<int> IntVector;
 
@@ -47,6 +49,7 @@ class MfeDialog : public MythThemedDialog
     void stopped(int which_mfd);
     void playing(int, int, int, int, int, int, int, int, int);
     void changeMetadata(int, MfdContentCollection*);
+    void playlistCheckDone();
     void cycleMfd();
     void stopAudio();
     void togglePause();
@@ -110,6 +113,23 @@ class MfeDialog : public MythThemedDialog
     UIPushButtonType *next_button;
     UIPushButtonType *prev_button;
 
+    UIImageType *network_icon;
+
+    //
+    //  Thing that flashes to indicate network (ie. mdcap data arrival)
+    //  activity.
+    //
+    
+    NetFlasher *net_flasher;
+
+    //
+    //  A pointer to the playlist editing dialog (so we can see if it's
+    //  active when, for example, new data arrives)
+    //
+    
+    PlaylistDialog *playlist_dialog;
+    int mfd_id_for_playlist_dialog;    
+    
 };
 
 

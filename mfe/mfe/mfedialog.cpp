@@ -9,7 +9,6 @@
 #include <mythtv/mythcontext.h>
 #include <mfdclient/playlist.h>
 #include "mfedialog.h"
-#include "playlistdialog.h"
 
 MfeDialog::MfeDialog(
                         MythMainWindow *parent, 
@@ -20,6 +19,19 @@ MfeDialog::MfeDialog(
           :MythThemedDialog(parent, window_name, theme_filename)
 {
     
+    //
+    //  In the beginning, we don't have one of these
+    //
+    
+    net_flasher = NULL;
+
+    //
+    //  Or one of these
+    //
+    
+    playlist_dialog = NULL;
+    mfd_id_for_playlist_dialog = -1;
+
     //
     //  Pointer to the mfd client library
     //
@@ -45,6 +57,7 @@ MfeDialog::MfeDialog(
     //
 
     updateForeground();
+
 } 
 
 void MfeDialog::keyPressEvent(QKeyEvent *e)
@@ -304,35 +317,63 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
             
             if(current_mfd)
             {
-                UIListGenericTree *playlist_tree
-                    = current_mfd->constructPlaylistTree(
-                                                         node->getAttribute(0),
-                                                         node->getInt()
-                                                        );
-                UIListGenericTree *possible_content_tree
-                    = current_mfd->constructContentTree(
-                                                        node->getAttribute(0),
-                                                        node->getInt()
-                                                       );
-                if(possible_content_tree && playlist_tree)
+                UIListGenericTree *pristine_playlist_tree
+                    = current_mfd->getPlaylistTree(
+                                                    node->getAttribute(0),
+                                                    node->getInt(),
+                                                    true
+                                                  );
+                                                  
+                UIListGenericTree *working_playlist_tree
+                    = current_mfd->getPlaylistTree(
+                                                    node->getAttribute(0),
+                                                    node->getInt(),
+                                                    false
+                                                  );
+                                                  
+                
+
+                UIListGenericTree *pristine_content_tree
+                    = current_mfd->getContentTree(
+                                                    node->getAttribute(0),
+                                                    true
+                                                 );
+                
+                UIListGenericTree *working_content_tree
+                    = current_mfd->getContentTree(
+                                                    node->getAttribute(0),
+                                                    false
+                                                 );
+                
+                if(
+                    pristine_content_tree && 
+                    pristine_playlist_tree &&
+                    working_content_tree &&
+                    working_playlist_tree
+                  )
                 {
 
-                    PlaylistDialog *pldiag = new PlaylistDialog(
+                    mfd_id_for_playlist_dialog = current_mfd->getId();
+                    playlist_dialog = new PlaylistDialog(
                                                         gContext->GetMainWindow(),
                                                         "playlist_dialog",
                                                         "mfe-",
+                                                        mfd_interface,
                                                         current_mfd,
-                                                        playlist_tree,
-                                                        possible_content_tree,
-                                                        current_mfd->getAudioPlaylist(
-                                                                                    node->getAttribute(0),
-                                                                                    node->getInt()
-                                                                                     )
-                                                                   ->getName()
-                                                               );
-                    pldiag->exec();
-                    delete pldiag;
-                    delete playlist_tree;
+                                                        pristine_playlist_tree,
+                                                        pristine_content_tree,
+                                                        working_playlist_tree,
+                                                        working_content_tree,
+                                                        node->getString()
+                                                        );
+                    playlist_dialog->exec();
+                    if(playlist_dialog->commitEdits())
+                    {
+                        cout << "we should now be commiting edits" << endl;
+                    }
+                    delete playlist_dialog;
+                    playlist_dialog = NULL;
+                    mfd_id_for_playlist_dialog = -1;
                 }
                 else
                 {
@@ -397,6 +438,13 @@ void MfeDialog::wireUpTheme()
     next_button = getUIPushButtonType("next_button");
     prev_button = getUIPushButtonType("prev_button");
  
+    network_icon = getUIImageType("net_flasher");
+    if(network_icon)
+    {
+        network_icon->hide();
+        net_flasher = new NetFlasher(network_icon);
+    }
+ 
     //
     // Make the first few nodes in the tree that everything else hangs off
     // as children
@@ -442,6 +490,8 @@ void MfeDialog::connectUpMfd()
     connect(mfd_interface, SIGNAL(metadataChanged(int, MfdContentCollection *)),
             this, SLOT(changeMetadata(int, MfdContentCollection *)));
 
+    connect(mfd_interface, SIGNAL(playlistCheckDone()),
+            this, SLOT(playlistCheckDone()));
 }
 
 void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool found)
@@ -502,6 +552,11 @@ void MfeDialog::audioPluginDiscovered(int which_mfd)
 
 void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collection)
 {
+    if(net_flasher)
+    {
+        net_flasher->flash();
+    }
+
     if(available_mfds.find(which_mfd))
     {
         available_mfds[which_mfd]->setMfdContentCollection(new_collection);
@@ -572,11 +627,36 @@ void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collecti
                 time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
             }    
         }
+        
+        //
+        //  If we have playlist dialog open that is using data from the mfd
+        //  that just updated, we need to tell it to swap to the pristine
+        //  playlist and content tree
+        //
+        
+        if(playlist_dialog && mfd_id_for_playlist_dialog == which_mfd)
+        {
+            playlist_dialog->swapToNewPristine();
+        }
     }
     else
     {
         cerr << "mfedialog.o: seem to be getting metadata for an mfd that "
              << "does not exist"
+             << endl;
+    }
+}
+
+void MfeDialog::playlistCheckDone()
+{
+    if(playlist_dialog)
+    {
+        playlist_dialog->playlistCheckDone();
+    }
+    else
+    {
+        cerr << "mfedialog.o: I got a sorted playlist back, but have no "
+             << "playlist dialog (?)"
              << endl;
     }
 }
@@ -906,6 +986,12 @@ MfeDialog::~MfeDialog()
     {
         delete menu_root_node;
         menu_root_node = NULL;
+    }
+    
+    if(net_flasher)
+    {
+        delete net_flasher;
+        net_flasher = NULL;
     }
 }
 

@@ -24,6 +24,12 @@
             <size>12</size>
         </font>
 
+        <font name="temp_font" face="Arial">
+            <color>#a0a0a0</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+    
         <container name="background">
             <area>0,0,800,600</area>
             <image name="mfe_background" draworder="0" fleximage="no">
@@ -38,6 +44,11 @@
                 <filename>mfe_brushed_bottom.png</filename>
                 <position>0,520</position>
             </image>
+            <textarea name="temp_message" draworder="0" align="center">
+                <font>temp_font</font>
+                <area>0,285,800,30</area>
+                <value>This will be the main display area. For now, hit M for menu</value>
+            </textarea>
         </container>
 
         <container name="nowplaying">
@@ -89,16 +100,6 @@
 
         </container>
 
-        <!--
-        <container name="musicnavigator">
-            <area>0,110,800,400</area>
-            <image name="mfe_navback_upperleft" draworder="0" fleximage="no">
-                <filename>mfe_navback_upperleft.png</filename>
-                <position>0,0</position>
-            </image>
-        </container>    
-        -->
-        
         <container name="musictree">
             <area>20,110,780,400</area>
             <listtreearea name="musictree" draworder="0">
@@ -163,6 +164,11 @@
                 <image function="off" filename="mfe_1x1_blank.png"></image>
                 <image function="pushed" filename="mfe_prev_on.png"></image>
             </pushbutton>
+
+            <image name="net_flasher" draworder="0" fleximage="no">
+                <filename>mfe_network.png</filename>
+                <position>690,15</position>
+            </image>
 
 
         </container>
@@ -265,6 +271,11 @@
                 <position>367,28</position>
             </image>
             
+            <image name="playlist_greyout" draworder="0" fleximage="no">
+                <filename>mfe_greylistbox.png</filename>
+                <position>0,0</position>
+            </image>
+
             <listtreearea name="content_tree" draworder="0">
                 <area>390,0,360,340</area>
                 <listsize>390,0,360,340</listsize>
@@ -276,6 +287,11 @@
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
             </listtreearea>
+
+            <image name="content_greyout" draworder="0" fleximage="no">
+                <filename>mfe_greylistbox.png</filename>
+                <position>390,0</position>
+            </image>
 
         </container>
 
@@ -372,6 +388,10 @@
                 <area>260,110,500,35</area>
             </textarea>
             
+            <image name="net_flasher" draworder="0" fleximage="no">
+                <filename>mfe_network.png</filename>
+                <position>60,50</position>
+            </image>
 
 
         </container>

@@ -47,34 +47,30 @@ ClientPlaylist*  MfdInfo::getAudioPlaylist(int collection_id, int item_id)
     return NULL;
 }
 
-UIListGenericTree* MfdInfo::constructPlaylistTree(
+UIListGenericTree* MfdInfo::getPlaylistTree(
                                     int collection_id, 
-                                    int playlist_id
+                                    int playlist_id,
+                                    bool pristine
                                    )
 {
+
     if (mfd_content_collection)
     {
     
-        return mfd_content_collection->constructPlaylistTree(
-                                                                collection_id, 
-                                                                playlist_id
-                                                            );
+        return mfd_content_collection->getPlaylistTree(
+                                                        collection_id, 
+                                                        playlist_id,
+                                                        pristine
+                                                      );
     }
     return NULL;
 }
 
-UIListGenericTree* MfdInfo::constructContentTree(
-                                    int collection_id, 
-                                    int playlist_id
-                                   )
+UIListGenericTree* MfdInfo::getContentTree(int collection_id, bool pristine)
 {
     if (mfd_content_collection)
     {
-    
-        return mfd_content_collection->constructContentTree(
-                                                            collection_id, 
-                                                            playlist_id
-                                                           );
+        return mfd_content_collection->getContentTree(collection_id, pristine);
     }
     return NULL;
 }
@@ -158,6 +154,14 @@ void MfdInfo::markNodeAsHeld(UIListGenericTree *node, bool held_or_not)
     if (mfd_content_collection)
     {
         mfd_content_collection->markNodeAsHeld(node, held_or_not);
+    }
+}
+
+void MfdInfo::printTree(UIListGenericTree *node, int depth)
+{
+    if (mfd_content_collection)
+    {
+        mfd_content_collection->printTree(node, depth);
     }
 }
 

@@ -13,6 +13,7 @@
 #include <mfdclient/mfdinterface.h>
 
 #include "mfdinfo.h"
+#include "netflasher.h"
 
 class PlaylistDialog : public MythThemedDialog
 {
@@ -25,25 +26,34 @@ class PlaylistDialog : public MythThemedDialog
                     MythMainWindow *parent, 
                     QString window_name,
                     QString theme_filename,
+                    MfdInterface *an_mfd_interface,
                     MfdInfo *an_mfd,
-                    UIListGenericTree *a_playlist_tree,
-                    UIListGenericTree *all_content_tree,
+                    UIListGenericTree *a_pristine_playlist_tree,
+                    UIListGenericTree *a_pristine_content_tree,
+                    UIListGenericTree *a_working_playlist_tree,
+                    UIListGenericTree *a_working_content_tree,
                     const QString&  playlist_name
                   ); 
 
     void keyPressEvent(QKeyEvent *e);
-
+    void playlistCheckDone();
+    void swapToNewPristine();
+    bool commitEdits();
     ~PlaylistDialog();
 
   public slots:
   
     void handlePlaylistEntered(UIListTreeType*, UIListGenericTree*);
     void handlePlaylistSelected(UIListTreeType*, UIListGenericTree*);
+    void handleContentEntered(UIListTreeType*, UIListGenericTree*);
+    void handleContentSelected(UIListTreeType*, UIListGenericTree*);
+
+  private:
+  
+    void allowEditing(bool yes_or_no);
     void startHoldingTrack(UIListGenericTree *node);
     void stopHoldingTrack();
     void moveHeldUpDown(bool up_or_down);
-    void handleContentEntered(UIListTreeType*, UIListGenericTree*);
-    void handleContentSelected(UIListTreeType*, UIListGenericTree*);
     void setDisplayInfo(
                         bool is_a_playlist,
                         const QString &string1 = "", 
@@ -61,9 +71,6 @@ class PlaylistDialog : public MythThemedDialog
 
     void toggleItem(UIListGenericTree *node, bool turn_on);
     void toggleTree(UIListGenericTree *node, bool turn_on);
-
-  private:
-  
     void wireUpTheme();
 
     //
@@ -99,19 +106,42 @@ class PlaylistDialog : public MythThemedDialog
     UITextType          *playlist_type_label;
     UITextType          *playlist_numtracks_label;
     UITextType          *edit_title;
+    UIImageType         *network_icon;
 
+    UIImageType         *playlist_greyout;
+    UIImageType         *content_greyout;
+    
     //
-    //  The playlist tree that gets handed to us
+    //  Thing that flashes to indicate network (ie. mdcap data arrival)
+    //  activity.
     //
     
-    UIListGenericTree   *playlist_tree;
-    UIListGenericTree   *content_tree;
+    NetFlasher *net_flasher;
+
+    //
+    //  Pointers to uneditable, editable, and current playlist and content
+    //  tree
+    //
+    
+    UIListGenericTree   *working_playlist_tree;
+    UIListGenericTree   *working_content_tree;
+
+    UIListGenericTree   *pristine_playlist_tree;
+    UIListGenericTree   *pristine_content_tree;
+    
+    UIListGenericTree   *current_playlist_tree;
+    UIListGenericTree   *current_content_tree;
+    
 
 
-    MfdInfo    *current_mfd;   
+    MfdInterface        *mfd_interface;
+    MfdInfo             *current_mfd;   
 
     bool                holding_track;
     UIListGenericTree*  held_track;
+
+    bool                editing_allowed;
+    bool                something_changed;
 };
 
 

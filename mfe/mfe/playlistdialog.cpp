@@ -17,26 +17,52 @@ PlaylistDialog::PlaylistDialog(
                                 MythMainWindow *parent, 
                                 QString window_name,
                                 QString theme_filename,
+                                MfdInterface *an_mfd_interface,
                                 MfdInfo *an_mfd,
-                                UIListGenericTree *a_playlist_tree,
-                                UIListGenericTree *all_content_tree,
+                                UIListGenericTree *a_pristine_playlist_tree,
+                                UIListGenericTree *a_pristine_content_tree,
+                                UIListGenericTree *a_working_playlist_tree,
+                                UIListGenericTree *a_working_content_tree,
                                 const QString& playlist_name
                               )
           :MythThemedDialog(parent, window_name, theme_filename)
 {
-    
+
     //
     //  Pointer to the mfd client library
+    //
+    
+    mfd_interface = an_mfd_interface;
+    
+    //
+    //  Pointer to object that holds information about content in "current" mfd
     //
         
     current_mfd = an_mfd;
 
     //
-    //  We need the tree data for the playlist
+    //  What the hell is all this? Well ... we get two copies of the
+    //  playlist (thing on the left) and two copies of the selectable data
+    //  (thing on the right). We only show the first copy (pristine), but
+    //  don't let the user edit it. This is just a trick to show that the
+    //  system is being responsive while another thread is busy ticking off
+    //  the content tree to reflect the current state of the playlist. Once
+    //  that's ready (if you have a fast computer and/or small amounts of
+    //  tracks you probably won't even notice), the editable data gets
+    //  swapped in. We can't show the editable data at startup because the
+    //  other thread (PlaylistChecker object in mfd client library) is busy
+    //  writing to it.
     //
 
-    playlist_tree = a_playlist_tree;
-    content_tree = all_content_tree;
+
+    pristine_playlist_tree = a_pristine_playlist_tree;
+    pristine_content_tree = a_pristine_content_tree;
+
+    working_playlist_tree = a_working_playlist_tree;
+    working_content_tree = a_working_content_tree;
+
+    current_playlist_tree = pristine_playlist_tree;
+    current_content_tree = pristine_content_tree;
 
     //
     //  We do not start out holding a track
@@ -57,12 +83,65 @@ PlaylistDialog::PlaylistDialog(
 
     edit_title->SetText(QString("Edit Playlist: %1").arg(playlist_name));
 
+    //
+    //  On startup, we do not allow editing
+    //
+
+    allowEditing(false);
+
+    //
+    //  Almost tautologically, at startup, nothing has been edited
+    //
+    
+    something_changed = false;
+
+    //
+    //  Now that the user is effectively locked out of touching anything,
+    //  ask the mfd client library to find, sort, and pre-check the data we
+    //  need
+    //
+
+    mfd_interface->startPlaylistCheck(
+                                        current_mfd->getMfdContentCollection(),
+                                        working_playlist_tree,
+                                        working_content_tree
+                                     );
 } 
+
+void PlaylistDialog::allowEditing(bool yes_or_no)
+{
+    editing_allowed = yes_or_no;
+    
+    if (editing_allowed)
+    {
+        playlist_greyout->hide();
+        content_greyout->hide();
+
+        if(net_flasher)
+        {
+            net_flasher->stop();
+        }
+
+        playlist_tree_menu->RedrawCurrent();
+        content_tree_menu->RedrawCurrent();
+        
+    }
+    else
+    {
+        playlist_greyout->show();
+        content_greyout->show();
+
+        if(net_flasher)
+        {
+            net_flasher->flash(0);
+        }
+    }
+}
 
 void PlaylistDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-
+    
     if(holding_track)
     {
         //
@@ -190,8 +269,131 @@ void PlaylistDialog::keyPressEvent(QKeyEvent *e)
         MythThemedDialog::keyPressEvent(e);
 }
 
+void PlaylistDialog::playlistCheckDone()
+{
+    //
+    //  We get handed this announcement via an event that bubbles up from
+    //  the mfd client library. Until something else tells us otherwise, it
+    //  is now fine to let the user edit things.
+    //
+    
+    QStringList route_to_playlist = playlist_tree_menu->getRouteToCurrent();
+    QStringList route_to_content = content_tree_menu->getRouteToCurrent();
+    
+    
+    current_playlist_tree = working_playlist_tree;
+    current_content_tree = working_content_tree;
+    
+    playlist_tree_menu->SetTree(working_playlist_tree);
+    content_tree_menu->SetTree(working_content_tree);
+
+    playlist_tree_menu->tryToSetCurrent(route_to_playlist);
+    content_tree_menu->tryToSetCurrent(route_to_content);
+    
+    playlist_tree_menu->RefreshCurrentLevel();
+    content_tree_menu->RefreshCurrentLevel();
+
+
+    allowEditing(true);
+
+    current_menu->enter();
+}
+
+void PlaylistDialog::swapToNewPristine()
+{
+    //
+    //  DAMN. Mfd sent us new data, and we were in the middle of something.
+    //  Oh well.
+    //
+    
+    allowEditing(false);
+
+    QStringList route_to_playlist = playlist_tree_menu->getRouteToCurrent();
+    QStringList route_to_content = content_tree_menu->getRouteToCurrent();
+
+    int which_collection = pristine_playlist_tree->getAttribute(0);
+    int which_playlist = pristine_playlist_tree->getInt();
+
+    pristine_playlist_tree = current_mfd->getPlaylistTree(
+                                                            which_collection,
+                                                            which_playlist,
+                                                            true
+                                                         );
+                                                         
+    working_playlist_tree = current_mfd->getPlaylistTree(
+                                                            which_collection,
+                                                            which_playlist,
+                                                            false
+                                                         );
+                                                         
+    pristine_content_tree = current_mfd->getContentTree(
+                                                        which_collection,
+                                                        true
+                                                       );
+    
+
+    working_content_tree = current_mfd->getContentTree(
+                                                        which_collection,
+                                                        false
+                                                       );
+    current_playlist_tree = pristine_playlist_tree;
+    current_content_tree = pristine_content_tree;
+
+    playlist_tree_menu->SetTree(current_playlist_tree);
+    content_tree_menu->SetTree(current_content_tree);
+
+    playlist_tree_menu->tryToSetCurrent(route_to_playlist);
+    content_tree_menu->tryToSetCurrent(route_to_content);
+    
+    playlist_tree_menu->RefreshCurrentLevel();
+    content_tree_menu->RefreshCurrentLevel();
+
+    current_menu->enter();
+
+    //
+    //  Set the tree checking thread working again
+    //
+
+    mfd_interface->startPlaylistCheck(
+                                        current_mfd->getMfdContentCollection(),
+                                        working_playlist_tree,
+                                        working_content_tree
+                                     );
+
+}
+
+bool PlaylistDialog::commitEdits()
+{
+    //
+    //  If someone is asking us this question, it means that we are about to
+    //  disappear. As long as we're not running pristine and at least one
+    //  change occured, say YUP.
+    //
+    //
+    
+    if(current_content_tree == working_content_tree)
+    {
+        if(something_changed)
+        {
+            return true;
+        }
+    }
+    else
+    {
+        //
+        //  The Playlist Checking thread must still be running then ... shut
+        //  that puppy down
+        //
+        
+        mfd_interface->stopPlaylistCheck();
+
+    }
+    return false;
+}
+
 void PlaylistDialog::handlePlaylistEntered(UIListTreeType*, UIListGenericTree *node)
 {
+
     if(current_menu != playlist_tree_menu)
     {
         return;
@@ -259,6 +461,17 @@ void PlaylistDialog::handlePlaylistEntered(UIListTreeType*, UIListGenericTree *n
 
 void PlaylistDialog::handlePlaylistSelected(UIListTreeType*, UIListGenericTree *node)
 {
+
+    //
+    //  If editing is not currently allowed (our data is out of sync with
+    //  reality), then user should not be able to  select anything
+    //
+
+    if(!editing_allowed)
+    {
+        return;
+    }
+
     //
     //  Deal with moving tracks up and down within the playlist column
     //
@@ -309,6 +522,7 @@ void PlaylistDialog::stopHoldingTrack()
 
 void PlaylistDialog::moveHeldUpDown(bool up_or_down)
 {
+    something_changed = true;
     if(held_track)
     {
         held_track->movePositionUpDown(up_or_down);
@@ -320,18 +534,6 @@ void PlaylistDialog::moveHeldUpDown(bool up_or_down)
              << "but *held_track is NULL ?!?"
              << endl;
     }
-/*
-
-    if(up_or_down)
-    {
-        cout << "moving it up" << endl;
-    }
-    else
-    {
-        cout << "moving it down" << endl;
-    }
-*/
-
 }
 
 void PlaylistDialog::handleContentEntered(UIListTreeType*, UIListGenericTree *node)
@@ -438,6 +640,17 @@ void PlaylistDialog::handleContentEntered(UIListTreeType*, UIListGenericTree *no
 
 void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *node)
 {
+
+    //
+    //  If editing is not currently allowed (our data is out of sync with
+    //  reality), then user should not be able to check anything
+    //
+
+    if(!editing_allowed)
+    {
+        return;
+    }
+
     if(!node)
     {
         cerr << "PlaylistDialog::handleContentSelected() called with a NULL node!" << endl;
@@ -452,6 +665,8 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
     //  User selected this node. First step is to figure out what kind of
     //  node it is.
     //
+    
+    something_changed = true;
     
     if(node->getInt() != 0)
     {
@@ -489,7 +704,7 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
     
         if(current_state == 0)
         {
-            playlist_tree_menu->SetTree(playlist_tree);
+            playlist_tree_menu->SetTree(current_playlist_tree);
             playlist_tree_menu->MoveDown(UIListTreeType::MoveMax);
         }
         else
@@ -501,7 +716,7 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
             //  visible.
             //
 
-            if(playlist_tree->childCount() <= playlist_tree_menu->getNumbItemsVisible())
+            if(current_playlist_tree->childCount() <= playlist_tree_menu->getNumbItemsVisible())
             {
                 playlist_tree_menu->MoveUp(UIListTreeType::MoveMax);
             }
@@ -538,7 +753,7 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
 
         if(current_state == 0 || current_state == 1)
         {
-            playlist_tree_menu->SetTree(playlist_tree);
+            playlist_tree_menu->SetTree(current_playlist_tree);
             playlist_tree_menu->MoveDown(UIListTreeType::MoveMax);
         }
         else
@@ -550,7 +765,7 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
             //  visible.
             //
 
-            if(playlist_tree->childCount() <= playlist_tree_menu->getNumbItemsVisible())
+            if(current_playlist_tree->childCount() <= playlist_tree_menu->getNumbItemsVisible())
             {
                 playlist_tree_menu->MoveUp(UIListTreeType::MoveMax);
             }
@@ -706,7 +921,7 @@ void PlaylistDialog::toggleItem(UIListGenericTree *node, bool turn_on)
     //  playlist list
     //
 
-    current_mfd->alterPlaylist(playlist_tree_menu, playlist_tree, node, turn_on);
+    current_mfd->alterPlaylist(playlist_tree_menu, current_playlist_tree, node, turn_on);
     
 }                                   
 
@@ -720,7 +935,7 @@ void PlaylistDialog::toggleTree(UIListGenericTree *node, bool turn_on)
     //  or deleted entries
     //
 
-    current_mfd->toggleTree(playlist_tree_menu, playlist_tree, node, turn_on);
+    current_mfd->toggleTree(playlist_tree_menu, current_playlist_tree, node, turn_on);
     
 }                                   
 
@@ -768,13 +983,25 @@ void PlaylistDialog::wireUpTheme()
     rightarrow_on = getUIImageType("mfe_rightarrow_on");
 
 
-    playlist_tree_menu->SetTree(playlist_tree);
+    
+    playlist_tree_menu->SetTree(current_playlist_tree);
     playlist_tree_menu->setActive(true);
     current_menu = playlist_tree_menu;
     leftarrow_on->hide();
     leftarrow_off->show();
     rightarrow_on->show();
     rightarrow_off->hide();
+    
+
+    network_icon = getUIImageType("net_flasher");
+    if(network_icon)
+    {
+        network_icon->hide();
+        net_flasher = new NetFlasher(network_icon);
+    }
+ 
+    playlist_greyout = getUIImageType("playlist_greyout");
+    content_greyout = getUIImageType("content_greyout");
     
     connect(
             playlist_tree_menu, 
@@ -790,7 +1017,7 @@ void PlaylistDialog::wireUpTheme()
             SLOT(handlePlaylistSelected(UIListTreeType*, UIListGenericTree*))
            );
     
-    content_tree_menu->SetTree(content_tree);
+    content_tree_menu->SetTree(current_content_tree);
     content_tree_menu->setActive(false);
 
     connect(
@@ -808,10 +1035,16 @@ void PlaylistDialog::wireUpTheme()
            );
     
     clearDisplayInfo();
+    
     playlist_tree_menu->enter();
 }
 
 
 PlaylistDialog::~PlaylistDialog()
 {
+    if(net_flasher)
+    {
+        delete net_flasher;
+        net_flasher = NULL;
+    }
 }
