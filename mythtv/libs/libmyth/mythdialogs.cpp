@@ -2035,6 +2035,16 @@ void MythImageFileDialog::buildFileList(QString directory)
 {
     QStringList imageExtensions = QImage::inputFormatList();
 
+    //
+    //  Expand the list Qt gives us, working off what we know was built into
+    //  Qt based on the list it gave us
+    // 
+
+    if(imageExtensions.contains("jpeg"))
+    {
+        imageExtensions += "jpg";
+    }
+
     QDir d(directory);
        
     if (!d.exists())
