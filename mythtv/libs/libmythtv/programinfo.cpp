@@ -1569,75 +1569,51 @@ void ProgramInfo::setOverride(QSqlDatabase *db, int override)
 
 QString ProgramInfo::RecTypeChar(void)
 {
-    QString recstring = "";
-
     switch (rectype)
     {
     case kSingleRecord:
-        recstring = QObject::tr("S");
-        break;
+        return QObject::tr("S", "RecTypeChar");
     case kTimeslotRecord:
-        recstring = QObject::tr("T");
-        break;
+        return QObject::tr("T", "RecTypeChar");
     case kWeekslotRecord:
-        recstring = QObject::tr("W");
-        break;
+        return QObject::tr("W", "RecTypeChar");
     case kChannelRecord:
-        recstring = QObject::tr("C");
-        break;
+        return QObject::tr("C", "RecTypeChar");
     case kAllRecord:
-        recstring = QObject::tr("A");
-        break;
+        return QObject::tr("A", "RecTypeChar");
     case kFindOneRecord:
-        recstring = QObject::tr("F");
-        break;
+        return QObject::tr("F", "RecTypeChar");
     case kOverrideRecord:
     case kDontRecord:
-        recstring = QObject::tr("O");
-        break;
+        return QObject::tr("O", "RecTypeChar");
     case kNotRecording:
     default:
-        recstring = QObject::tr("");
-        break;
+        return " ";
     }
-
-    return recstring;
 }
 
 QString ProgramInfo::RecTypeText(void)
 {
-    QString recstring;
-
     switch (rectype)
     {
     case kSingleRecord:
-        recstring = QObject::tr("Single Recording");
-        break;
+        return QObject::tr("Single Recording");
     case kTimeslotRecord:
-        recstring = QObject::tr("Daily Recording");
-        break;
+        return QObject::tr("Daily Recording");
     case kWeekslotRecord:
-        recstring = QObject::tr("Weekly Recording");
-        break;
+        return QObject::tr("Weekly Recording");
     case kChannelRecord:
-        recstring = QObject::tr("Channel Recording");
-        break;
+        return QObject::tr("Channel Recording");
     case kAllRecord:
-        recstring = QObject::tr("All Recording");
-        break;
+        return QObject::tr("All Recording");
     case kFindOneRecord:
-        recstring = QObject::tr("Find One Recording");
-        break;
+        return QObject::tr("Find One Recording");
     case kOverrideRecord:
     case kDontRecord:
-        recstring = QObject::tr("Override Recording");
-        break;
+        return QObject::tr("Override Recording");
     default:
-        recstring = QObject::tr("Not Recording");
-        break;
+        return QObject::tr("Not Recording");
     }
-
-    return recstring;
 }
 
 QString ProgramInfo::RecStatusChar(void)
@@ -1645,35 +1621,35 @@ QString ProgramInfo::RecStatusChar(void)
     switch (recstatus)
     {
     case rsDeleted:
-        return "D";
+        return QObject::tr("D", "RecStatusChar");
     case rsStopped:
-        return "S";
+        return QObject::tr("S", "RecStatusChar");
     case rsRecorded:
-        return "R";
+        return QObject::tr("R", "RecStatusChar");
     case rsRecording:
         return QString::number(cardid);
     case rsWillRecord:
         return QString::number(cardid);
     case rsDontRecord:
-        return "X";
+        return QObject::tr("X", "RecStatusChar");
     case rsPreviousRecording:
-        return "P";
+        return QObject::tr("P", "RecStatusChar");
     case rsCurrentRecording:
-        return "R";
+        return QObject::tr("R", "RecStatusChar");
     case rsEarlierShowing:
-        return "E";
+        return QObject::tr("E", "RecStatusChar");
     case rsTooManyRecordings:
-        return "T";
+        return QObject::tr("T", "RecStatusChar");
     case rsCancelled:
-        return "N";
+        return QObject::tr("N", "RecStatusChar");
     case rsConflict:
-        return "C";
+        return QObject::tr("C", "RecStatusChar");
     case rsLaterShowing:
-        return "L";
+        return QObject::tr("L", "RecStatusChar");
     case rsLowDiskSpace:
-        return "K";
+        return QObject::tr("K", "RecStatusChar");
     case rsTunerBusy:
-        return "B";
+        return QObject::tr("B", "RecStatusChar");
     default:
         return "-";
     }

@@ -1030,13 +1030,12 @@ void GuideGrid::paintChannels(QPainter *p)
             }
         }
 
-        QString favstr = "";
+        QString tmpChannelFormat = channelFormat;
         if (chinfo->favid > 0)
-            favstr = "*";
-
-        QString write = "";
-        QString callsignstr = favstr + " " + chinfo->callsign + " " +
-                              favstr;
+        {
+            tmpChannelFormat.insert(tmpChannelFormat.find('<'), "* ");
+            tmpChannelFormat.insert(tmpChannelFormat.find('>') + 1, " *");
+        }
 
         if (type)
         {
@@ -1054,7 +1053,7 @@ void GuideGrid::paintChannels(QPainter *p)
                 type->ResetImage(y);
             }
 
-            type->SetText(y, chinfo->Text(channelFormat));
+            type->SetText(y, chinfo->Text(tmpChannelFormat));
         }
     }
 
