@@ -291,7 +291,7 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
         directory = curdir;
         // Get filter
         QString namefilter = gContext->GetSetting("AlbumArtFilter",
-                                                  "*.png;*.jpg;*.jpeg;*.gif");
+                                              "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
         // Get directory contents based on filter
         QDir folder(curdir, namefilter, QDir::Name | QDir::IgnoreCase, 
                     QDir::Files | QDir::Hidden);
