@@ -507,6 +507,8 @@ int RunMenu(QString themedir)
         cerr << "Couldn't find theme " << themedir << endl;
     }
 
+    delete menu;
+    menu = NULL;
     return exitstatus;
 }   
 
