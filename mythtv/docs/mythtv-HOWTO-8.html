@@ -223,6 +223,171 @@ the <B>irw</B> program to make sure that your remote is working, you can
 create the appropriate mappings in <CODE>.lircrc</CODE> to get excellent remote
 functionality with mythtv.</P>
 
+<H2><A NAME="ss8.4">8.4</A> <A HREF="mythtv-HOWTO.html#toc8.4">Configuring lirc for use with an IR blaster.</A>
+</H2>
+
+<P>By Carlos Talbot, 
+<A HREF="mailto:carlos@talbot.net">mailto:carlos@talbot.net</A></P>
+<P>Lirc has support for various IR transmitters. A popular model is the Actisys
+IR-200L 
+<A HREF="http://store.yahoo.com/snapstreammedia/irblasbun.html">http://store.yahoo.com/snapstreammedia/irblasbun.html</A>. It was
+originally designed for IRDA communication, but can be used to transmit A/V remote
+control codes. By using the lirc SIR driver, this device can easily be
+integrated with mythtv. I have tested this device with an AT&amp;T DCT2000
+digital cable box but the instructions can be used to configure other IRDA
+devices and A/V remotes.</P>
+<P>Follow the steps in the previous section.  When you run setup.sh, select
+option 1, driver configuration. From here select option 6, IrDA hardware.
+Select your appropriate device and the corresponding serial port, then Save
+configuration &amp; run configure from the main menu. Once configure is done
+type:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% make
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Please note: unlike the Pinnacle receiver above you will be compiling lircd
+in addition to a kernel module for the SIR transmitter. Depending on whether
+you have your serial port driver configured as a kernel module you might see
+the following message during make:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+lirc_sir.c:56:2: warning: #warning
+"******************************************"
+
+lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+
+lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+
+lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+
+lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+
+lirc_sir.c:61:2: warning: #warning
+"******************************************"
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you do receive this statement make sure to run the <B>setserial</B> command
+before you load the lirc_sir module. Follow this with the install:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% su
+# make install
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You will notice that lirc installs the kernel module in
+<CODE>/lib/modules/uname -a/misc</CODE>. </P>
+<P>The configuration for starting <B>lircd</B> differs if you're going to be
+sending and receiving IR versus just receiving.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+ 
+# cd /etc/rc.d
+# cat >> rc.local
+echo "Starting lircd"
+setserial /dev/ttySx uart none        # (if required)
+modprobe lirc_sir
+/usr/local/sbin/lircd
+^D
+# exit
+%
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>At this point you have to populate the <CODE>/etc/lircd.conf</CODE> file with the proper
+codes for your A/V remote. You should be able to find your remote within the
+lirc remote tar file located at 
+<A HREF="http://www.lirc.org/remotes.tar.bz2">http://www.lirc.org/remotes.tar.bz2</A>. In my case I
+extracted the file from remotes/motorola/DCT2000 (gi-motorola-dct2000)</P>
+<P>To test the lirc_sir module you can run <B>irw</B> to verify the codes are being
+received. If everything is configured correctly
+you should see something similar to the following:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% irw
+0000000000007ff0 00 1 gi-motorola-dct2000
+000000000000bff8 00 2 gi-motorola-dct2000
+000000000000f7f0 00 ENTER gi-motorola-dct2000
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Once you've verified lirc is working you can press <B>CTRL-C</B> to exit
+<B>irw</B> and configure the channel changing script.</P>
+<P>Within <CODE>/usr/local/share/mythtv/settings.txt</CODE>  (or
+<CODE>~/.mythtv/settings.txt</CODE>) you
+need to add the following line:
+<BLOCKQUOTE><CODE>
+<PRE>
+str ExternalChannelCommand=/usr/local/bin/change_channel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This csh script will be called each time mythtv needs to change the channel.
+Below is a copy of the script followed by the corresponding perl script.
+Make sure both are in your path. Also make sure you leave the #!/bin/csh
+setting and not change it to bourne or bash. This will create a frustrating
+symptom to diagnose where mythtv cannot open /dev/device. Unlike bourne or
+bash, csh scripts automatically close parent file descriptors before they
+start.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% cd /usr/local/bin
+# su
+# cat > change_channel.csh
+#!/bin/csh
+echo "changing to $1"
+/usr/local/bin/channel.pl $1 &amp;
+^D
+# chmod a+x change_channel.csh
+# exit
+% exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The following file should be saved as /usr/local/bin/channel.pl
+<BLOCKQUOTE><CODE>
+<PRE>
+#!/usr/bin/perl
+ 
+# make sure to set this string to
+# the corresponding remote in /etc/lircd.conf
+$remote_name = "gi-motorola-dct2000";   
+ 
+sub change_channel {
+        my($channel_digit) = @_;
+        system ("rc SEND_ONCE $remote_name $channel_digit");
+        sleep 1;
+}
+ 
+$channel=$ARGV[0];
+sleep 1;
+if (length($channel) > 2) {
+        change_channel(substr($channel,0,1));
+        change_channel(substr($channel,1,1));
+        change_channel(substr($channel,2,1));
+} elsif (length($channel) > 1) {
+        change_channel(substr($channel,0,1));
+        change_channel(substr($channel,1,1));
+} else {
+        change_channel(substr($channel,0,1));
+}
+system ("rc SEND_ONCE $remote_name ENTER");
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The last statement within the perl script is the lirc rc command. This is
+the command that transmits the code to your cable/dss box. Make sure to have
+the IRDA device within a few feet of the box.</P>
+
 <HR>
 <A HREF="mythtv-HOWTO-9.html">Next</A>
 <A HREF="mythtv-HOWTO-7.html">Previous</A>

@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-25, v1.035
+  2002-11-27, v1.036
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -59,6 +59,7 @@
      8.1 Obtaining the kernel.
      8.2 Obtaining and compiling lirc.
      8.3 Additional information for lirc.
+     8.4 Configuring lirc for use with an IR blaster.
 
   9. Configuring mythtv.
      9.1 Editing the settings.txt file.
@@ -859,6 +860,144 @@
   the appropriate mappings in .lircrc to get excellent remote
   functionality with mythtv.
 
+  [1m8.4.  Configuring lirc for use with an IR blaster.[0m
+
+  By Carlos Talbot,  <mailto:carlos@talbot.net>
+
+  Lirc has support for various IR transmitters. A popular model is the
+  Actisys IR-200L http://store.yahoo.com/snapstreammedia/irblasbun.html
+  <http://store.yahoo.com/snapstreammedia/irblasbun.html>. It was
+  originally designed for IRDA communication, but can be used to
+  transmit A/V remote control codes. By using the lirc SIR driver, this
+  device can easily be integrated with mythtv. I have tested this device
+  with an AT&T DCT2000 digital cable box but the instructions can be
+  used to configure other IRDA devices and A/V remotes.
+
+  Follow the steps in the previous section.  When you run setup.sh,
+  select option 1, driver configuration. From here select option 6, IrDA
+  hardware.  Select your appropriate device and the corresponding serial
+  port, then Save configuration & run configure from the main menu. Once
+  configure is done type:
+
+       % make
+
+  Please note: unlike the Pinnacle receiver above you will be compiling
+  lircd in addition to a kernel module for the SIR transmitter.
+  Depending on whether you have your serial port driver configured as a
+  kernel module you might see the following message during make:
+
+       lirc_sir.c:56:2: warning: #warning
+       "******************************************"
+
+       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+
+       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+
+       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+
+       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+
+       lirc_sir.c:61:2: warning: #warning
+       "******************************************"
+
+  If you do receive this statement make sure to run the [1msetserial[0m
+  command before you load the lirc_sir module. Follow this with the
+  install:
+
+       % su
+       # make install
+
+  You will notice that lirc installs the kernel module in
+  /lib/modules/uname -a/misc.
+
+  The configuration for starting [1mlircd [22mdiffers if you're going to be
+  sending and receiving IR versus just receiving.
+
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       setserial /dev/ttySx uart none        # (if required)
+       modprobe lirc_sir
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       %
+
+  At this point you have to populate the /etc/lircd.conf file with the
+  proper codes for your A/V remote. You should be able to find your
+  remote within the lirc remote tar file located at
+  http://www.lirc.org/remotes.tar.bz2
+  <http://www.lirc.org/remotes.tar.bz2>. In my case I extracted the file
+  from remotes/motorola/DCT2000 (gi-motorola-dct2000)
+
+  To test the lirc_sir module you can run [1mirw [22mto verify the codes are
+  being received. If everything is configured correctly you should see
+  something similar to the following:
+
+       % irw
+       0000000000007ff0 00 1 gi-motorola-dct2000
+       000000000000bff8 00 2 gi-motorola-dct2000
+       000000000000f7f0 00 ENTER gi-motorola-dct2000
+
+  Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
+  and configure the channel changing script.
+
+  Within /usr/local/share/mythtv/settings.txt  (or
+  ~/.mythtv/settings.txt) you need to add the following line:
+
+       str ExternalChannelCommand=/usr/local/bin/change_channel
+
+  This csh script will be called each time mythtv needs to change the
+  channel.  Below is a copy of the script followed by the corresponding
+  perl script.  Make sure both are in your path. Also make sure you
+  leave the #!/bin/csh setting and not change it to bourne or bash. This
+  will create a frustrating symptom to diagnose where mythtv cannot open
+  /dev/device. Unlike bourne or bash, csh scripts automatically close
+  parent file descriptors before they start.
+
+  % cd /usr/local/bin
+  # su
+  # cat > change_channel.csh
+  #!/bin/csh
+  echo "changing to $1"
+  /usr/local/bin/channel.pl $1 &
+  ^D
+  # chmod a+x change_channel.csh
+  # exit
+  % exit
+
+  The following file should be saved as /usr/local/bin/channel.pl
+
+       #!/usr/bin/perl
+
+       # make sure to set this string to
+       # the corresponding remote in /etc/lircd.conf
+       $remote_name = "gi-motorola-dct2000";
+
+       sub change_channel {
+               my($channel_digit) = @_;
+               system ("rc SEND_ONCE $remote_name $channel_digit");
+               sleep 1;
+       }
+
+       $channel=$ARGV[0];
+       sleep 1;
+       if (length($channel) > 2) {
+               change_channel(substr($channel,0,1));
+               change_channel(substr($channel,1,1));
+               change_channel(substr($channel,2,1));
+       } elsif (length($channel) > 1) {
+               change_channel(substr($channel,0,1));
+               change_channel(substr($channel,1,1));
+       } else {
+               change_channel(substr($channel,0,1));
+       }
+       system ("rc SEND_ONCE $remote_name ENTER");
+
+  The last statement within the perl script is the lirc rc command. This
+  is the command that transmits the code to your cable/dss box. Make
+  sure to have the IRDA device within a few feet of the box.
+
   [1m9.  Configuring mythtv.[0m
 
   By this point, all of the prerequisites have been installed, [1mmysql [22mis
@@ -1000,18 +1139,18 @@
   you like.  Once you're satisfied with the time that [1mmythfilldatabase[0m
   will run, save and exit, and return to the shell prompt.
 
-  % cd configfiles
-  % crontab mythcrontab
-  % crontab -l  NOTE: this is a lowercase L.
-  # The following will run the mythfilldatabase shell script at 0430
-  # every day.  Format is
-  # minutes hour day_of_month month day_of_week
-  # man 5 crontab for more information
-  # Need to use a shell script because the QTDIR environment variable isn't
-  # being honored by crontab?
-  # The next text should be all on the same line.
-  30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/configfiles/mythfilldatabasecron
-  %
+       % cd configfiles
+       % crontab mythcrontab
+       % crontab -l  NOTE: this is a lowercase L.
+       # The following will run the mythfilldatabase shell script at 0430
+       # every day.  Format is
+       # minutes hour day_of_month month day_of_week
+       # man 5 crontab for more information
+       # Need to use a shell script because the QTDIR environment variable isn't
+       # being honored by crontab?
+       # The next text should be all on the same line.
+       30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/configfiles/mythfilldatabasecron
+       %
 
   As you can see, [1mmythfilldatabase [22mwill now be run at 0430 every day.
 
@@ -1105,6 +1244,7 @@
   and save it to a location where you can find it.  The next step
   depends on whether your distribution has a web server and if you have
   php support.
+
   [1m11.1.1.  Mandrake 9.0[0m
 
   Mandrake 9.0 has [1mapache [22mand [1mphp [22mpre-packaged, so installation is quite
@@ -1213,14 +1353,14 @@
   Download FLAC from http://flac.sourceforge.net
   <http://flac.sourceforge.net> and install:
 
-  % tar -xzf flac-1.0.4.tar.gz
-  % cd flac-1.0.4
-  % ./configure
-  % make
-  % su
-  # make install
-  # exit
-  %
+       % tar -xzf flac-1.0.4.tar.gz
+       % cd flac-1.0.4
+       % ./configure
+       % make
+       % su
+       # make install
+       # exit
+       %
 
   Download and install libcdaudio:
 
