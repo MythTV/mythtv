@@ -1,0 +1,26 @@
+MythBrowser
+===========
+
+V0.1	Initial release
+
+V0.11	- Improved build procedure (qmake style)
+	- Automatic detection of the physical screen size
+	- Preliminary support of the button icon (not yet
+	  installed automatically)
+
+V0.2	- Allow tab-browsing (changes args interface to mythbrowser)
+	- Add a mythplugin that manages websites/groups and
+	  starts up mythbrowser.
+
+V0.3	- Uses libmyth to display popup menus,....
+	- PopupMenu with 'Next/Prev Tab' and 'Back'
+        - when selecting a link or group the first item was only highlighted
+          but the focus was not on the listview widget.
+
+V0.31   - tab-label now reflects the current URL
+        - Added 'Save Link in Bookmarks' menu option
+        - Right mouse button opens & closes the popup menu
+          (this enables know full mouse driven navigation)
+
+V0.32   - Zoom In and Zoom Out added to the Popup Menu
+
