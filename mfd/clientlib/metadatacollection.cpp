@@ -296,6 +296,7 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
 {
 
     int new_list_id = -1;
+    bool new_list_editable = false;
     QString new_list_name;
     QValueList<PlaylistEntry> list_entries;
     
@@ -314,6 +315,10 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
 
             case MarkupCodes::list_name:
                 new_list_name = mdcap_input.popListName();
+                break;
+                
+            case MarkupCodes::list_is_editable:
+                new_list_editable = mdcap_input.popListEditable();
                 break;
                 
             case MarkupCodes::added_list_item_group:
@@ -393,6 +398,7 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
                                                             &list_entries,
                                                             new_list_id
                                                          );
+        new_playlist->isEditable(new_list_editable);
         playlists.insert(new_list_id, new_playlist);
     }
 }

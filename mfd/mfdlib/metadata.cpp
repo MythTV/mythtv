@@ -201,6 +201,8 @@ Playlist::Playlist(
     flat_tree_item_count = 0;
     collection_id = l_collection_id;
     id = new_id;
+    db_id = -1;
+    is_editable = false;
     name = new_name;
 
     raw_song_list = raw_songlist;
@@ -239,6 +241,8 @@ Playlist::Playlist(
     flat_tree_item_count = 0;
     collection_id = l_collection_id;
     id = new_id;
+    db_id = -1;
+    is_editable = false;
     name = new_name;
 
     QValueList<int>::iterator it;
@@ -258,7 +262,8 @@ void Playlist::mapDatabaseToId(
                                 QValueList<int> *song_list,
                                 QIntDict<Playlist> *the_playlists,
                                 int depth,
-                                bool flatten_playlists
+                                bool flatten_playlists,
+                                bool prune_dead
                               )
 {
     if(depth == 0)
@@ -280,8 +285,9 @@ void Playlist::mapDatabaseToId(
     }
 
     QValueList<int>::iterator iter;
-    for ( iter = reference_list->begin(); iter != reference_list->end(); ++iter )
+    for ( iter = reference_list->begin(); iter != reference_list->end(); )
     {
+        bool advance_iter = true;
         if((*iter) > 0)
         {
             Metadata *which_one = NULL;
@@ -301,7 +307,19 @@ void Playlist::mapDatabaseToId(
             }
             else
             {
-                //warning("playlist has entry that does not map to metadata");
+                //
+                //  Something here doesn't map to any metadata
+                //
+                
+                if(prune_dead)
+                {
+                    iter = reference_list->remove(iter);
+                    advance_iter = false;
+                }
+                else
+                {
+                    is_editable = false;
+                }
             }
         }
         else
@@ -325,7 +343,9 @@ void Playlist::mapDatabaseToId(
                                                 which_one->getDbList(),
                                                 song_list,
                                                 the_playlists,
-                                                 depth + 1
+                                                depth + 1,
+                                                flatten_playlists,
+                                                prune_dead
                                               );
                     flat_tree_item_count = song_list->count();
                 }
@@ -352,7 +372,8 @@ void Playlist::mapDatabaseToId(
                                                 which_one->getListPtr(),
                                                 the_playlists,
                                                 0,
-                                                false
+                                                false,
+                                                prune_dead
                                               );
                     flat_tree_item_count += which_one->getFlatCount();
                 }
@@ -360,6 +381,54 @@ void Playlist::mapDatabaseToId(
             else
             {
                 cerr << "playlist had a reference to another playlist "
+                     << "that does not exist" 
+                     << endl;
+            }
+        }
+        if(advance_iter)
+        {
+            ++iter;
+        }
+    }
+}
+
+void Playlist::mapIdToDatabase(
+                                QIntDict<Metadata> *the_metadata, 
+                                QIntDict<Playlist> *the_playlists
+                              )
+{
+    //
+    //  Use the song_references list to (re-)create db_references
+    //
+
+    db_references.clear();
+    QValueList<int>::iterator iter;
+    for ( iter = song_references.begin(); iter != song_references.end(); ++iter )
+    {
+        if((*iter) > 0)
+        {
+            Metadata *which_one = NULL;
+            which_one = the_metadata->find( (*iter) );
+            if(which_one)
+            {
+                db_references.append(which_one->getDbId());
+            }
+            else
+            {
+                warning("playlist has a track entry that does not map to a DB entry");
+            }
+        }
+        else
+        {
+            Playlist *which_one = NULL;
+            which_one = the_playlists->find( (*iter) * -1 );
+            if(which_one)
+            {
+                db_references.append(which_one->getDbId() * -1);
+            }
+            else
+            {
+                cerr << "playlist had a track reference to another playlist "
                      << "that does not exist" 
                      << endl;
             }

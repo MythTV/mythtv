@@ -132,7 +132,8 @@ void MetadataContainer::dataSwap(
                                     QIntDict<Playlist>* new_playlists,
                                     QValueList<int> playlist_in,
                                     QValueList<int> playlist_out,
-                                    bool rewrite_playlists
+                                    bool rewrite_playlists,
+                                    bool prune_dead
                                 )
 {
     if(current_metadata)
@@ -168,7 +169,7 @@ void MetadataContainer::dataSwap(
         //  metadata is
         //
     
-        mapPlaylists(new_playlists, playlist_in, playlist_out, false);
+        mapPlaylists(new_playlists, playlist_in, playlist_out, false, prune_dead);
     }
     else
     {
@@ -196,7 +197,8 @@ void MetadataContainer::dataDelta(
                                     QIntDict<Playlist>* new_playlists,
                                     QValueList<int> playlist_in,
                                     QValueList<int> playlist_out,
-                                    bool rewrite_playlists
+                                    bool rewrite_playlists,
+                                    bool prune_dead
                                 )
 {
 
@@ -248,7 +250,7 @@ void MetadataContainer::dataDelta(
         //  metadata is
         //
     
-        mapPlaylists(new_playlists, playlist_in, playlist_out, true);
+        mapPlaylists(new_playlists, playlist_in, playlist_out, true, prune_dead);
     }
     else
     {
@@ -297,7 +299,8 @@ void MetadataContainer::mapPlaylists(
                                         QIntDict<Playlist>* new_playlists, 
                                         QValueList<int> playlist_in,
                                         QValueList<int> playlist_out,
-                                        bool delta
+                                        bool delta,
+                                        bool prune_dead
                                     )
 
 {
@@ -384,6 +387,13 @@ void MetadataContainer::mapPlaylists(
         QValueList<int> old_list = mapout_it.current()->getList();
         
         //
+        //  And if it is currently editable
+        //
+        
+        bool was_editable = mapout_it.current()->isEditable();
+        mapout_it.current()->isEditable(true);
+
+        //
         //  Make it map out
         //
 
@@ -393,7 +403,8 @@ void MetadataContainer::mapPlaylists(
                                                 mapout_it.current()->getListPtr(),
                                                 current_playlists, 
                                                 0,   // initial depth is 0
-                                                !editable    // editable containers should not flatten playlist
+                                                !editable,    // editable containers should not flatten playlist
+                                                prune_dead
                                             );
                                             
         //
@@ -406,7 +417,8 @@ void MetadataContainer::mapPlaylists(
         //  See if the lists have changed
         //
         
-        if(old_list != new_list)
+        if ( old_list != new_list ||
+             was_editable != mapout_it.current()->isEditable())
         {
             //
             //  This goes on the list of changed/added playlists
@@ -415,7 +427,6 @@ void MetadataContainer::mapPlaylists(
             playlist_in.push_back(mapout_it.current()->getId());
 
         } 
-                                           
     }
                                                                 
 

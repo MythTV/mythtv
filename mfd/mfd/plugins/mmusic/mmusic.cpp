@@ -105,6 +105,12 @@ void MMusicWatcher::initialize()
     force_sweep = true;
 
     //
+    //  we have not yet swept through all the available content
+    //
+    
+    first_sweep_done = false;
+
+    //
     //  Clear warning flags
     //
     
@@ -144,7 +150,7 @@ void MMusicWatcher::initialize()
     container_id = metadata_container->getIdentifier();
     
     //
-    //  Since this is local files, it is editable
+    //  Since this is local files, it is editable.
     //
     
     metadata_container->setEditable(true);
@@ -198,6 +204,28 @@ void MMusicWatcher::run()
     while(keep_going)
     {
         //
+        //  See if any metadata change events have come through
+        //
+
+        if(metadata_changed_flag)
+        {
+            //
+            //  The mfd has "pushed" us the information that some collection
+            //  of metadata has changed. Deal with it (default
+            //  implementation is to do nothing)
+            //
+
+            int which_collection;
+            bool external_flag;
+            metadata_changed_mutex.lock();
+                which_collection = metadata_collection_last_changed;
+                external_flag = metadata_change_external_flag;
+                metadata_changed_flag = false;
+            metadata_changed_mutex.unlock();
+            handleMetadataChange(which_collection, external_flag);
+        }
+
+        //
         //  Check to see if our sweep interval has elapsed (default is 15
         //  minutes). Set to 0 to only sweep when a sweep is forced
         //
@@ -229,6 +257,7 @@ void MMusicWatcher::run()
             
             if(sweepMetadata())
             {
+
                 //
                 //  Do the atomic delta (sing it with me now ...)
                 //
@@ -241,7 +270,12 @@ void MMusicWatcher::run()
                                                     new_playlists,
                                                     playlist_additions,
                                                     playlist_deletions,
-                                                    true
+                                                    true,
+                                                    first_sweep_done    
+                                                            // ^^ prune dead 
+                                                            // content if 
+                                                            // we've swept 
+                                                            // at least once
                                                   );
                 
                 //
@@ -255,7 +289,7 @@ void MMusicWatcher::run()
                 //
                 //  Something changed. Fire off an event (this will tell the
                 //  mfd to tell all the plugins (that care) that it's time
-                //  to update)
+                //  to update).
                 //
                 
                 MetadataChangeEvent *mce = new MetadataChangeEvent(container_id);
@@ -266,7 +300,7 @@ void MMusicWatcher::run()
             {
                 //
                 //  Nothing changed, so delete the storage that would have
-                //  been used if something changed
+                //  been used if something had changed
                 //
                 
                 delete new_metadata;
@@ -285,6 +319,13 @@ void MMusicWatcher::run()
         }
         else
         {
+            //
+            //  Check if there is anything in a changed state that should be
+            //  saved back to the database
+            //
+            
+            possiblySaveToDb();
+        
             //
             //  Sleep for a while, unless someone wakes us up. But only
             //  sleep to a time close to our next sweep time
@@ -434,7 +475,6 @@ bool MMusicWatcher::sweepMetadata()
         compareToMasterList(latest_sweep, startdir);
     }
 
-
     //
     //  Now go through the new metadata and make sure it's in the database
     //  with all the correct fields
@@ -443,6 +483,16 @@ bool MMusicWatcher::sweepMetadata()
     if(keep_going)
     {
         checkDatabaseAgainstMaster(startdir);
+    }
+
+    //
+    //  If we've got to here and our latest_sweep is empty, we must have
+    //  down at least one full sweep
+    //
+
+    if(latest_sweep.count() < 1)
+    {
+        first_sweep_done = true;
     }
 
 
@@ -1457,6 +1507,15 @@ void MMusicWatcher::loadPlaylists()
                                                         query.value(1).toString(),
                                                         0
                                                      );
+                //
+                //  We mark playlists as not editable on load. Once all
+                //  their elements point to actual loaded metadata/playlists
+                //  (which can take a few minutes), the AtomicDataSwap (with
+                //  rewrite_playlists as true) will figure out they are
+                //  complete and mark them as editable.
+                //                                                     
+
+                new_playlist->isEditable(false);
                 new_playlist->setDbId(query.value(2).toUInt());
                 new_playlists->insert(query.value(2).toUInt(), new_playlist);
             }
@@ -1472,6 +1531,92 @@ void MMusicWatcher::loadPlaylists()
     {
         warning("fairly certain your playlist table is hosed ... not good");
     }
+}
+
+void MMusicWatcher::handleMetadataChange(int which_collection, bool external)
+{
+    //
+    //  We only care if the change was to the collection we're responsible
+    //  for, and the change was external (which means something else changed
+    //  our metadata on us). Typically, this would mean a user edited
+    //  something, so we need to persist changed back to the database.
+    //
+
+    if(which_collection == container_id && external)
+    {
+        possiblySaveToDb();
+    }
+}
+
+void MMusicWatcher::possiblySaveToDb()
+{
+    //
+    //  Check all the playlists, and persist to db any that are marked as
+    //  having changed
+    //
+    
+    metadata_server->lockMetadata();
+        QIntDict<Playlist> *the_playlists = metadata_container->getPlaylists();
+        
+        QIntDictIterator<Playlist> it( *the_playlists ); 
+        for ( ; it.current(); ++it )
+        {
+            if(it.current()->internalChange())
+            {
+                persistPlaylist(it.current());
+                it.current()->internalChange(false);
+            }
+        }
+    metadata_server->unlockMetadata();
+}
+
+void MMusicWatcher::persistPlaylist(Playlist *a_playlist)
+{
+
+    //
+    //  Make a string of the database id entries that comprise this playlist
+    //
+ 
+    QValueList<int> *db_song_list = a_playlist->getDbList();
+    QString db_song_list_string = "";
+    
+    if(db_song_list->size() > 0)
+    {
+        db_song_list_string = QString("%1").arg(db_song_list->first());
+    }
+    if(db_song_list->size() > 1)
+    {
+        QValueList<int>::iterator it;
+        it = db_song_list->begin();
+        ++it;
+        for ( ; it != db_song_list->end(); ++it )
+        {
+            db_song_list_string.append( QString(",%1").arg((*it)) );
+        }
+    }
+    
+    QSqlQuery query(NULL, db);
+
+    query.prepare("UPDATE musicplaylist SET songlist = ?, name = ? WHERE "
+                  "playlistid = ? ;");
+
+    query.bindValue(0, db_song_list_string);
+    query.bindValue(1, a_playlist->getName());
+    query.bindValue(2, a_playlist->getDbId());
+        
+    query.exec();
+    
+    if(!query.isActive())
+    {
+        warning(QString("bad response from database when trying to persist "
+                        "a playlist called \"%1\"")
+                       .arg(a_playlist->getName()));
+        return;
+    }
+    log(QString("persisted playlist called \"%1\" to the database "
+                "(%2 entries)")
+               .arg(a_playlist->getName())
+               .arg(db_song_list->size()), 3);
 }
 
 MMusicWatcher::~MMusicWatcher()

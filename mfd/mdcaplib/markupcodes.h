@@ -92,8 +92,9 @@ class MarkupCodes
     static const char item_dup_flag          = 122;
     static const char list_id                = 123;
     static const char list_item              = 124;
-    static const char deleted_list           = 125;
-    static const char commit_list_type       = 126;  // new or edit of existing
+    static const char list_is_editable       = 125;
+    static const char deleted_list           = 126;
+    static const char commit_list_type       = 127;  // new or edit of existing
 
   private:
 

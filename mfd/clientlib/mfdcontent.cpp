@@ -238,7 +238,7 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
     //  editing a playlist)
     //
 
-    if (collection->isEditable())
+    if (collection->isEditable() && new_playlist->isEditable())
     {
         //
         //  Make the root editable playlists node (this could be the first

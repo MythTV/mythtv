@@ -284,8 +284,16 @@ class Playlist
                                         QValueList<int>* song_list,
                                         QIntDict<Playlist> *the_playlists,
                                         int depth,
-                                        bool flatten_playlists = true
-                                    );    
+                                        bool flatten_playlists = true,
+                                        bool prune_dead = false
+                                    );
+
+
+    void             mapIdToDatabase(
+                                        QIntDict<Metadata> *the_metadata,
+                                        QIntDict<Playlist> *the_playlists
+                                    );
+
 
     uint             getCollectionId(){return collection_id;}    
     bool             internalChange(){ return internal_change; }
@@ -297,6 +305,8 @@ class Playlist
     int              getFromIndirectMap(int key);
     void             removeFromIndirectMap(int key);
     QMap<int, int>*  getIndirectMap(){return &indirect_map;}
+    bool             isEditable(){return is_editable;}
+    void             isEditable(bool yes_or_no){is_editable = yes_or_no;}
 
   private:
   
@@ -309,6 +319,7 @@ class Playlist
     uint             flat_tree_item_count;
     bool             internal_change;
     bool             waiting_for_list;
+    bool             is_editable;
     QString          raw_song_list;
 
     //

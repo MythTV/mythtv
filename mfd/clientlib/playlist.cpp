@@ -24,6 +24,7 @@ ClientPlaylist::ClientPlaylist(
     collection_id = l_collection_id;
     id = my_id;
     name = new_name;
+    is_editable = false;
 
     PlaylistEntryList::iterator it;
     for(it = my_entries->begin(); it != my_entries->end(); ++it)

@@ -77,7 +77,8 @@ class MetadataServer : public MFDHttpPlugin
                                                     QIntDict<Playlist>* new_playlists,
                                                     QValueList<int> playlist_additions,
                                                     QValueList<int> playlist_deletions,
-                                                    bool rewrite_playlists = false
+                                                    bool rewrite_playlists = false,
+                                                    bool prune_dead = false
                                                  );
 
 
@@ -89,7 +90,8 @@ class MetadataServer : public MFDHttpPlugin
                                                     QIntDict<Playlist>* new_playlists,
                                                     QValueList<int> playlist_additions,
                                                     QValueList<int> playlist_deletions,
-                                                    bool rewrite_playlists = false
+                                                    bool rewrite_playlists = false,
+                                                    bool prune_dead = false
                                                  );
 
     int                         getLastDestroyedCollection();

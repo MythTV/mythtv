@@ -664,7 +664,8 @@ void MetadataServer::doAtomicDataSwap(
                                         QIntDict<Playlist>* new_playlists,
                                         QValueList<int> playlist_additions,
                                         QValueList<int> playlist_deletions,
-                                        bool rewrite_playlists
+                                        bool rewrite_playlists,
+                                        bool prune_dead
                                      )
 {
 
@@ -726,7 +727,8 @@ void MetadataServer::doAtomicDataSwap(
                                     new_playlists,
                                     playlist_additions,
                                     playlist_deletions,
-                                    rewrite_playlists
+                                    rewrite_playlists,
+                                    prune_dead
                                     );
                            
                     new_metadata = NULL;
@@ -781,7 +783,8 @@ void MetadataServer::doAtomicDataDelta(
                                         QIntDict<Playlist>* new_playlists,
                                         QValueList<int> playlist_additions,
                                         QValueList<int> playlist_deletions,
-                                        bool rewrite_playlists
+                                        bool rewrite_playlists,
+                                        bool prune_dead
                                      )
 {
 
@@ -839,7 +842,7 @@ void MetadataServer::doAtomicDataDelta(
                         updateDictionary(target, metadata_deletions, new_metadata);
 
                     }
-
+                    
                     target->dataDelta(
                                     new_metadata, 
                                     metadata_additions,
@@ -847,7 +850,8 @@ void MetadataServer::doAtomicDataDelta(
                                     new_playlists,
                                     playlist_additions,
                                     playlist_deletions,
-                                    rewrite_playlists
+                                    rewrite_playlists,
+                                    prune_dead
                                     );
                                    
                     new_metadata = NULL;
@@ -1549,6 +1553,7 @@ void MetadataServer::addAudioList(
     response->addAddedListGroup();
         response->addListId(a_playlist->getId());
         response->addListName(a_playlist->getName());
+        response->addListEditable(a_playlist->isEditable());
         QValueList<int> *list_items = a_playlist->getListPtr();
         QValueList<int>::iterator item_it;
         for(item_it = list_items->begin(); item_it != list_items->end(); ++item_it)
@@ -1860,6 +1865,8 @@ void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapReques
                     unlockMetadata();
                     return;
                 }
+            
+                int new_db_id = existing_playlist->getDbId();
 
             unlockMetadata();
 
@@ -1873,12 +1880,67 @@ void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapReques
                                                     "",
                                                     parsed_list_id
                                                  );
+            //
+            //  Add the items passed in the mdcap commit request
+            //
 
             MdcapInput actual_list(list_contents);
             while(actual_list.size() > 0)
             {
                 new_playlist->addToList(actual_list.popListItem());
             }
+            
+            //
+            //  Set it's database id to the same as it was before the edit
+            //
+            
+            new_playlist->setDbId(new_db_id);
+
+            //
+            //  If the db is not -1, this came out of a database. So .... we
+            //  need to map the item/list entries we just stuffed into it
+            //  to database id entries.
+            //
+
+            if(new_db_id > 0)
+            {
+                lockMetadata();
+    
+                    MetadataContainer *metadata_container = getMetadataContainer(parsed_collection_id);
+
+                    if(!metadata_container)
+                    {
+                        warning("could not get metadata container needed for"
+                                "mdcap commit request");
+
+                        delete new_playlist;
+                        delete group_contents;
+                        if(list_contents)
+                        {
+                            delete list_contents;
+                            list_contents = NULL;
+                        }
+                        unlockMetadata();
+                        return;
+                    }
+                    new_playlist->mapIdToDatabase(
+                                                    metadata_container->getMetadata(),
+                                                    metadata_container->getPlaylists()
+                                                );
+                unlockMetadata();
+            }
+
+            //
+            //  Now mark the playlist as internally changed. We do this so
+            //  that the plugin that originally created this collection can
+            //  discover (via querying after a MetadataChanged event) that
+            //  the collection it "owns" has changed. This is typically used
+            //  by, say, the mmusic plugin to realize that a playlist has
+            //  changed and so it should really save it back to the
+            //  database.
+            //
+
+            new_playlist->internalChange(true);
 
             //
             //  We create enough bits and pieces to do our own internal
@@ -1907,8 +1969,16 @@ void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapReques
                                 false
                              );
 
+            //
+            //  Announce to anyone who cares that metadata has changed
+            //
+
             MetadataChangeEvent *mce = new MetadataChangeEvent(parsed_collection_id, true);
             QApplication::postEvent(parent, mce);    
+            
+            //
+            //  Push the changes out to any and all mdcap connected clients
+            //
             
             dealWithHangingUpdates();
         }

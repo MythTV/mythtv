@@ -76,7 +76,7 @@ class MFDBasePlugin : public QThread
     virtual void sendMessage(const QString &message);
     virtual void huh(const QStringList &tokens, int socket_identifier);
     bool         keepGoing();
-    void         metadataChanged(int which_collection);
+    void         metadataChanged(int which_collection, bool external=false);
     MFD*         getMfd(){return parent;}
     
 
@@ -101,6 +101,7 @@ class MFDBasePlugin : public QThread
     
     bool                    metadata_changed_flag;
     int                     metadata_collection_last_changed;
+    bool                    metadata_change_external_flag;
     QMutex                  metadata_changed_mutex;
     
 };
@@ -167,7 +168,7 @@ class MFDServicePlugin : public MFDBasePlugin
 
     virtual void    processRequest(MFDServiceClientSocket *a_client);
     void            markUnused(ServiceRequestThread *which_one);
-    virtual void    handleMetadataChange(int which_collection);
+    virtual void    handleMetadataChange(int which_collection, bool external=false);
 
   protected:
 

@@ -68,6 +68,7 @@ class MdcapInput
     QString     popListName();
     uint32_t    popListItem();
     uint32_t    popDeletedList();
+    bool        popListEditable();
     uint32_t    popDeletedItem();
     QString     popListItemName();
     bool        popCommitListType();

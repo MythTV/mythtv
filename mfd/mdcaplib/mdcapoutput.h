@@ -119,6 +119,7 @@ class MdcapOutput
     void addListName(const QString &list_name);
     void addListItem(int list_item);
     void addDeletedList(int list_id);
+    void addListEditable(bool yes_or_no);
 
   private:
 

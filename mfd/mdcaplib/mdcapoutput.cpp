@@ -670,6 +670,23 @@ void MdcapOutput::addDeletedList(int list_id)
     append((uint32_t) list_id);
 }
 
+void MdcapOutput::addListEditable(bool yes_or_no)
+{
+    //
+    //  Editable is 2 bytes
+    //
+
+    append(MarkupCodes::list_is_editable);
+    if(yes_or_no)
+    {
+        append((uint8_t) 1);
+    }    
+    else
+    {
+        append((uint8_t) 0);
+    }
+}
+
 
 
 void MdcapOutput::append(char a_char)

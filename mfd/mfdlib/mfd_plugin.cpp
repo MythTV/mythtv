@@ -26,6 +26,7 @@ MFDBasePlugin::MFDBasePlugin(MFD *owner, int identifier, const QString &a_name)
     keep_going = true;
     name = a_name;
     metadata_changed_flag = false;
+    metadata_change_external_flag = false;
     metadata_collection_last_changed = 0;
 }
 
@@ -129,10 +130,11 @@ bool MFDBasePlugin::keepGoing()
     return return_value;
 }
 
-void MFDBasePlugin::metadataChanged(int which_collection)
+void MFDBasePlugin::metadataChanged(int which_collection, bool external)
 {
     metadata_changed_mutex.lock();
         metadata_changed_flag = true;
+        metadata_change_external_flag = external;
         metadata_collection_last_changed = which_collection;
     metadata_changed_mutex.unlock();
     wakeUp();
@@ -318,11 +320,13 @@ void MFDServicePlugin::run()
             //
 
             int which_collection;
+            bool external_flag;
             metadata_changed_mutex.lock();
                 which_collection = metadata_collection_last_changed;
+                external_flag = metadata_change_external_flag;
                 metadata_changed_flag = false;
             metadata_changed_mutex.unlock();
-            handleMetadataChange(which_collection);
+            handleMetadataChange(which_collection, external_flag);
         }
     }
 
@@ -895,7 +899,7 @@ void MFDServicePlugin::doSomething(const QStringList&, int)
     warning("has not re-implemented doSomething()");
 }
 
-void MFDServicePlugin::handleMetadataChange(int)
+void MFDServicePlugin::handleMetadataChange(int, bool)
 {
     //
     //  Default implementation is to do nothing

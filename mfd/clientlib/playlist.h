@@ -41,6 +41,8 @@ class ClientPlaylist
     uint                       getActualTrackCount(){ return actual_track_count; }
     QValueList<PlaylistEntry>* getListPtr(){return &entries;}
     bool                       containsItem(int item_id);
+    bool                       isEditable(){return is_editable;}
+    void                       isEditable(bool y_or_n){ is_editable = y_or_n; }
 
   private:
   
@@ -49,7 +51,7 @@ class ClientPlaylist
     uint              id;
     uint              collection_id;
     uint              actual_track_count;
-
+    bool              is_editable;
 };
 
 #endif

@@ -1147,6 +1147,49 @@ uint32_t MdcapInput::popDeletedList()
     return popU32();    
 }
 
+bool MdcapInput::popListEditable()
+{
+    //
+    //  Editable is 2 bytes
+    //  1 - content markup code
+    //  2 - int; 0 is false
+    //           1 is true
+    //
+    
+    if(amountLeft() < 2)
+    {
+        cerr << "mdcapinput.o: asked to popListEditable(), but not enough "
+             << "bytes left";
+        return false;
+    }
+    
+    char content_code = popByte();
+    if(content_code != MarkupCodes::list_is_editable)
+    {
+        cerr << "mdcapinput.o: asked to popListEditable(), but "
+             << "content code is not list_is_editable "
+             << endl;
+        return false;
+    }
+    
+    uint8_t result = popByte();
+    if(result == 1)
+    {
+        return true;
+    }
+    else if(result == 0)
+    {
+        return false;
+    }
+    
+    cerr << "mdcapinput.o: asked to popListEditable(), but value was "
+         << "neither true not false"
+         << endl;
+    return false;
+}
+
+
+
 uint32_t MdcapInput::popDeletedItem()
 {
     //

@@ -104,7 +104,8 @@ class MetadataContainer
                                     QIntDict<Playlist>* new_playlists,
                                     QValueList<int> playlist_in,
                                     QValueList<int> playlist_out,
-                                    bool rewrite_playlists = false
+                                    bool rewrite_playlists = false,
+                                    bool prune_dead = false
                                     
                                 );
 
@@ -115,7 +116,8 @@ class MetadataContainer
                                     QIntDict<Playlist>* new_playlists,
                                     QValueList<int> playlist_in,
                                     QValueList<int> playlist_out,
-                                    bool rewrite_playlists = false
+                                    bool rewrite_playlists = false,
+                                    bool prune_dead = false
                                 );
 
     MetadataCollectionContentType  getContentType(){ return content_type;}
@@ -128,7 +130,8 @@ class MetadataContainer
                             QIntDict<Playlist>* new_playlists, 
                             QValueList<int> playlist_in,
                             QValueList<int> playlist_out,
-                            bool delta
+                            bool delta,
+                            bool prune_dead = false
                         );
     int     bumpPlaylistId(){current_playlist_id++; return current_playlist_id;}
     void    checkPlaylists();

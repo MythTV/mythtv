@@ -77,7 +77,10 @@ class MMusicWatcher: public MFDServicePlugin
     AudioMetadata*  getMetadataFromFile(QString file_path);
     void            persistMetadata(AudioMetadata* an_item);
     void            loadPlaylists();
-
+    void            handleMetadataChange(int which_collection, bool external);
+    void            possiblySaveToDb();
+    void            persistPlaylist(Playlist *a_playlist);
+    
   private:
 
     int             bumpMetadataId();
@@ -117,7 +120,8 @@ class MMusicWatcher: public MFDServicePlugin
 
     QMutex  current_metadata_id_mutex;
     int     current_metadata_id;
-    
+
+    bool    first_sweep_done;
 };
 
 
