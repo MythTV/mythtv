@@ -261,11 +261,13 @@ sub getMoviePoster {
    my $request = "http://www.allocine.fr/film/galerie_gen_cfilm=" . $movieid . ".html";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
    my $response = get $request;
-   my $page=parseBetween($response,"page=",".html\" class=\"link1\"><span class=\"text2\">Dernière photo");
+   my $page=parseBetween($response,"&page=",".html\" class=\"link1\"><span class=\"text2\">>>");
    my @pages = split ("page=",$page);
    $request = "";
 
    my $uri = "";
+   my $furi = "";
+   my $first= 1;
    for $page (@pages ) { 
         $request = $page;
   	
@@ -280,17 +282,34 @@ sub getMoviePoster {
         
              $uri = parseBetween($response,"<table style=\"padding:0 0 0 0\" border=\"0\" >","Ko\" />");
              $uri = parseBetween($uri ,"<img src=\"","\" border=\"0\" class=\"galerie\" ");
+	     if ($first && ! ($uri eq ""))
+	     {
+		     $furi = $uri;
+		     $first = 0;
+	     }
+
+
         }
 	#
 	# stop when we have an poster...
 	#
-	last if ($uri =~ /affiche/)
+	last if (($uri =~ /affiche/) or ($uri =~ /_af/))
+   }
+
+   # if $uri =~ affiche or _af then get the first poster if exist
+
+   if (($uri !~ /affiche/) or ($uri !~ /_af/))
+   {
+	   if ($first == 0)
+	   {
+		   $uri = $furi;
+	   }
    }
 
    #
    # in case nothing was found fall back to the little poster...
    #
-   if ($uri eq "" || $uri !~ /affiche/)
+   if ($uri eq "")
    {
 	$request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid .".html";
 	$response = get $request;
@@ -298,9 +317,17 @@ sub getMoviePoster {
 	$uri = parseBetween($response, "<img src=\"","\"");
    
         #
-        # filter default Allocine background...
+	# in case no little poster was found get the small DVD poster
+	# if exists !
         #
-        return if ($uri =~ /AffichetteAllocine/)
+        if ($uri =~ /AffichetteAllocine/)
+	{
+		$request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid .".html";
+		$response = get $request;
+		$response = parseBetween($response, "Disponible en","Zone");
+		$uri = parseBetween($response, "<img src=\"","\"");
+		return if ($uri eq "");
+	}
    }
  
    print "$uri\n";
