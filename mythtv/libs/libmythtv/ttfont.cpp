@@ -46,6 +46,7 @@
 
 using namespace std;
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "ttfont.h"
@@ -287,13 +288,20 @@ render_text(TT_Raster_Map *rmap, TT_Raster_Map *rchr, Efont *f, char *text,
 
 static void
 merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
-	   int xstart, int ystart, int width, int height, int video_width, 
-	   bool white)
+           int xstart, int ystart, int width, int height, int video_width, 
+           int video_height, bool white)
 {
    int                 x, y;
    unsigned char      *ptr, *src;
    unsigned char       a;
 
+   unsigned char *uptr, *usrc;
+   unsigned char *vptr, *vsrc;
+
+   uptr = yuv + video_height * video_width;
+   vptr = uptr + (video_height * video_width) / 4;   
+   int offset; 
+ 
    for (y = 0; y < height; y++)
      {
 	ptr = (unsigned char *)rmap->bitmap + offset_x + 
@@ -307,6 +315,15 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
                   {
 		      if (*src < a)
                           *src = a;
+                      if (a == 255)
+                      {
+                          offset = ((y + ystart) / 2) * (video_width / 2) + 
+                                   (x + xstart) / 2;
+                          usrc = uptr + offset; 
+                          vsrc = vptr + offset; 
+                          *usrc = 128;
+                          *vsrc = 128;
+                      }
                   }
 		  else
                   {
@@ -322,7 +339,7 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
 void
 EFont_draw_string(unsigned char *yuvptr, int x, int y, const string &text,
 		  Efont * font, int maxx, int maxy, int video_width,
-                  bool white, bool rightjustify)
+                  int video_height, bool white, bool rightjustify)
 {
    int                  width, height, w, h, inx, iny, clipx, clipy;
    TT_Raster_Map       *rmap, *rtmp;
@@ -391,7 +408,7 @@ EFont_draw_string(unsigned char *yuvptr, int x, int y, const string &text,
    }
 
    merge_text(yuvptr, rmap, clipx, clipy, x, y, width, height, 
-              video_width, white);
+              video_width, video_height, white);
 
    destroy_font_raster(rmap);
    destroy_font_raster(rtmp);

@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <math.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -310,7 +311,10 @@ void XJ_toggleFullscreen(void)
   } else {
     XJ_fullscreen = 1;
     oldx = curx; oldy = cury; oldw = curw; oldh = curh;
-    curx = 0; cury = 0; curw = XJ_screenwidth; curh = XJ_screenheight;
+    curx = 0 - (int)ceil(XJ_screenwidth * .03); 
+    cury = 0 - (int)ceil(XJ_screenheight * 0.03); 
+    curw = (int)ceil(XJ_screenwidth * 1.06); 
+    curh = (int)ceil(XJ_screenheight * 1.06);
     hide_cursor();
     decorate(0);
   }
