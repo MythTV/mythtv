@@ -1329,6 +1329,7 @@ void GuideGrid::scrollLeft()
 
     update(infoRect());
     update(timeRect());
+    update(dateRect());
     update(programRect());
 }
 
@@ -1348,6 +1349,7 @@ void GuideGrid::scrollRight()
     fillProgramInfos();
 
     update(infoRect());
+    update(dateRect());
     update(timeRect());
     update(programRect());
 }

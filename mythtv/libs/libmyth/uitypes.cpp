@@ -712,7 +712,12 @@ void UIGuideType::Blender(QPainter *dr, QRect area, int num, QString force)
 void UIGuideType::drawText(QPainter *dr, int num)
 {
     QRect area = drawArea[num];
-    QString msg = dataMap[num] + " (" + categoryMap[num] + ")";
+    QString msg;
+    if (categoryMap[num].stripWhiteSpace().length() > 0)
+        msg = dataMap[num] + " (" + categoryMap[num] + ")";
+    else  
+        msg = dataMap[num];
+
     QPoint fontdrop = m_font->shadowOffset;
 
     area.setLeft(area.left() + m_textoffset.x());
