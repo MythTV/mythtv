@@ -75,6 +75,7 @@ bool mfdplugin_stop()
     if(zero_config_responder)
     {
         zero_config_responder->stop();
+        zero_config_responder->wakeUp();
     }
     if(zero_config_supervisor)
     {
