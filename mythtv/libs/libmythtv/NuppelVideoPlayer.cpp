@@ -134,6 +134,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
 
     hasFullPositionMap = false;
 
+    framesPlayed = 0;
     totalLength = 0;
     totalFrames = 0;
     play_speed = 1.0;
