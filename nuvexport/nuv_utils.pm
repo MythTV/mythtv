@@ -155,6 +155,8 @@ package nuv_utils;
 		my $program = find_program('tcprobe', 'mpgtx');
 	# Nothing found?  Die
 		die "You need tcprobe (transcode) or mpgtx to use this script on mpeg-based nuv files.\n\n" unless ($program);
+	# Set the is_mpeg flag
+		$info{is_mpeg} = 1;
 	# Grab tcprobe info
 		if ($program =~ /tcprobe$/) {
 			my $data = `$program -i '$file'`;
