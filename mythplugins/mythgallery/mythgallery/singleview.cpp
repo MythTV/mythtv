@@ -11,10 +11,16 @@
 
 #include <mythtv/mythcontext.h>
 
-SingleView::SingleView(MythContext *context, vector<Thumbnail> *imagelist, 
+SingleView::SingleView(MythContext *context, QSqlDatabase *db,
+                       vector<Thumbnail> *imagelist, 
                        int pos, QWidget *parent, const char *name)
 	  : MythDialog(context, parent, name)
 {
+    m_db = db;
+    redraw = false;
+    rotateAngle = 0; 
+    imageRotateAngle = 0;
+
     m_font = new QFont("Arial", (int)(context->GetSmallFontSize() * hmult), 
                        QFont::Bold);
 
@@ -61,12 +67,30 @@ void SingleView::paintEvent(QPaintEvent *e)
 
     QPainter p(this);
 
-    if (displaypos != imagepos)
+    if (displaypos != imagepos || redraw)
     {
         QString filename = (*images)[imagepos].filename;
 
+        // retrieve metadata for new image
+        if (displaypos != imagepos) 
+        {
+            QString querystr = "SELECT angle FROM gallerymetadata WHERE "
+                               "image=\"" + filename + "\";";
+            QSqlQuery query = m_db->exec(querystr);
+			
+            if (query.isActive()  && query.numRowsAffected() > 0) 
+            {
+                query.next();
+                imageRotateAngle = rotateAngle = query.value(0).toInt();
+            }
+        }
+
         QImage tmpimage(filename);
-        QImage tmp2 = tmpimage.smoothScale(screenwidth, screenheight,
+        QWMatrix matrix;
+        matrix.rotate(rotateAngle);
+        QImage tmp1 = tmpimage.xForm(matrix);
+
+        QImage tmp2 = tmp1.smoothScale(screenwidth, screenheight,
                                            QImage::ScaleMin);
 
         if (image)
@@ -75,6 +99,19 @@ void SingleView::paintEvent(QPaintEvent *e)
         image = new QImage(tmp2);
     
         displaypos = imagepos;
+
+        // save settings for image
+        QString querystr = "REPLACE INTO gallerymetadata SET image=\"" +
+                           filename + "\", angle=" + 
+                           QString::number(rotateAngle) + ";";
+        QSqlQuery query = m_db->exec(querystr);
+
+        // invalidate thumbnail for this image
+        if (imageRotateAngle != rotateAngle) 
+        {
+            delete (*images)[imagepos].pixmap;
+            (*images)[imagepos].pixmap = 0;
+        }
     }
 
     p.drawImage((screenwidth - image->width()) / 2, 
@@ -90,13 +127,28 @@ void SingleView::keyPressEvent(QKeyEvent *e)
 
     switch (e->key())
     {
-        case Key_Up:
+        case ']':
+        {
+            rotateAngle += 90;
+            handled = true;
+            redraw = true;
+            break;
+        }
+        case '[':
+        {
+            rotateAngle -= 90;
+            handled = true;
+            redraw = true;
+            break;
+        }
         case Key_Left:
+        case Key_Up:
         {
             imagepos--;
             if (imagepos < 0)
                 imagepos = images->size() - 1;
             handled = true;
+            rotateAngle = 0;
             break;
         }
         case Key_Right:
@@ -109,12 +161,14 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             if (imagepos == (int)images->size())
                 imagepos = 0;
             handled = true;
+            rotateAngle = 0;
             break;
         }
         case 'P':
         {
             timerrunning = !timerrunning;
             handled = true;
+            rotateAngle = 0;
             break;
         }
         default: break;

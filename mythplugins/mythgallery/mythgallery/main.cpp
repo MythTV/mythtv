@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     QString startdir = context->GetSetting("GalleryDir");
 
-    IconView icv(context, startdir);
+    IconView icv(context, db, startdir);
 
     icv.exec();
 

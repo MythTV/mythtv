@@ -15,10 +15,13 @@
 
 QPixmap *IconView::foldericon = NULL;
 
-IconView::IconView(MythContext *context, const QString &startdir, 
+IconView::IconView(MythContext *context, QSqlDatabase *db,
+                   const QString &startdir, 
                    QWidget *parent, const char *name)
         : MythDialog(context, parent, name)
 {
+    m_db = db;
+
     fgcolor = paletteForegroundColor();
     highlightcolor = fgcolor;
 
@@ -175,10 +178,103 @@ void IconView::loadThumbPixmap(Thumbnail *thumb)
     if (tmpimage.width() == 0 || tmpimage.height() == 0)
         return;
 
+    QString querystr = "SELECT angle FROM gallerymetadata WHERE image =\"" +
+                       thumb->filename + "\";";
+    QSqlQuery query = m_db->exec(querystr);
+
+    int rotateAngle = 0;
+
+    if (query.isActive() && query.numRowsAffected() > 0) 
+    {
+        query.next();
+        rotateAngle = query.value(0).toInt();
+    }
+
+    if (rotateAngle)
+    {
+        QWMatrix matrix;
+        matrix.rotate(rotateAngle);
+        tmpimage = tmpimage.xForm(matrix);
+    }
+
     QImage tmp2 = tmpimage.smoothScale(thumbw, thumbh, QImage::ScaleMin);
 
     thumb->pixmap = new QPixmap();
     thumb->pixmap->convertFromImage(tmp2);
+}
+
+bool IconView::moveDown() 
+{
+    currow++;
+    if (currow >= THUMBS_H)
+    {
+        if (screenposition < thumbs.size() - 1)  
+            screenposition += 3;
+        currow = THUMBS_H - 1;
+    }
+
+    if (screenposition + currow * THUMBS_H + curcol >= thumbs.size())
+    {
+        if (screenposition + currow * THUMBS_H < thumbs.size())
+        {
+            curcol = 0;
+            return true;
+        }
+        else
+            return false;
+    }
+    else
+        return true;
+}
+
+bool IconView::moveUp() 
+{
+    currow--;
+    if (currow < 0)
+    {
+        if (screenposition > 0)
+            screenposition -= 3;
+        currow = 0;
+    }
+    return true;
+}
+
+bool IconView::moveLeft() 
+{
+    curcol--;
+    if (curcol < 0)
+    {
+        currow--;
+        if (currow < 0)
+        {
+            if (screenposition > 0)
+                screenposition -= 3;
+            currow = 0;
+        }
+        curcol = THUMBS_W - 1;
+    }
+    return true;
+}
+
+bool IconView::moveRight() 
+{
+    curcol++;
+    if (curcol >= THUMBS_W)
+    {
+        currow++;
+        if (currow >= THUMBS_H)
+        {
+            if (screenposition < thumbs.size() - 1)
+                screenposition += 3;
+            currow = THUMBS_H - 1;
+        }
+        curcol = 0;
+    }
+
+    if (screenposition + currow * THUMBS_H + curcol >= thumbs.size())
+        return false;
+    else 
+        return true;
 }
 
 void IconView::keyPressEvent(QKeyEvent *e)
@@ -193,76 +289,22 @@ void IconView::keyPressEvent(QKeyEvent *e)
     {
         case Key_Up:
         {
-            currow--;
-            if (currow < 0)
-            {
-                if (screenposition > 0)
-                    screenposition -= 3;
-                currow = 0;
-            }
-            handled = true;
+            handled = moveUp();
             break;
         }
         case Key_Left:
         {
-            curcol--;
-            if (curcol < 0)
-            {
-                currow--;
-                if (currow < 0)
-                {
-                    if (screenposition > 0)
-                        screenposition -= 3;
-                    currow = 0;
-                }
-                curcol = THUMBS_W - 1;
-            }
-            handled = true;
+            handled = moveLeft();
             break;
         }
         case Key_Down:
         {
-            currow++;
-            if (currow >= THUMBS_H)
-            {
-                if (screenposition < thumbs.size() - 1)  
-                    screenposition += 3;
-                currow = THUMBS_H - 1;
-            }
-
-            if (screenposition + currow * THUMBS_H + curcol >= thumbs.size())
-            {
-                if (screenposition + currow * THUMBS_H < thumbs.size())
-                {
-                    curcol = 0;
-                    handled = true;
-                }
-                else
-                    handled = false;
-            }
-            else
-                handled = true;
+            handled = moveDown();
             break;
         }
         case Key_Right:
         {
-            curcol++;
-            if (curcol >= THUMBS_W)
-            {
-                currow++;
-                if (currow >= THUMBS_H)
-                {
-                    if (screenposition < thumbs.size() - 1)
-                        screenposition += 3;
-                    currow = THUMBS_H - 1;
-                }
-                curcol = 0;
-            }
-
-            if (screenposition + currow * THUMBS_H + curcol >= thumbs.size())
-                handled = false;
-            else 
-                handled = true;
+            handled = moveRight();
             break;
         }
         case Key_Space:
@@ -273,14 +315,45 @@ void IconView::keyPressEvent(QKeyEvent *e)
 
             if (thumbs[pos].isdir)
             {
-                IconView iv(m_context, thumbs[pos].filename); 
+                IconView iv(m_context, m_db, thumbs[pos].filename); 
                 iv.exec();
             }
             else
             {
-                SingleView sv(m_context, &thumbs, pos);
+                SingleView sv(m_context, m_db, &thumbs, pos);
                 sv.exec();
             }
+            handled = true;
+            break;
+        }
+        case Key_PageUp:
+        {
+            for (int i = 0; i < THUMBS_H; ++i) 
+                 moveUp();
+            handled = true;
+            break;
+        }
+        case Key_PageDown:
+        {
+            for (int i = 0; i < THUMBS_H; ++i) 
+                 moveDown();
+            handled = true;
+            break;
+        }
+        case Key_Home:
+        {
+            screenposition = curcol = currow = 0;
+            handled = true;
+            break;
+        }
+        case Key_End:
+        {
+            screenposition = ((thumbs.size() - 1) / (THUMBS_W * THUMBS_H)) * 
+                             (THUMBS_W * THUMBS_H);
+            currow = (thumbs.size() - screenposition) / THUMBS_W;
+            if (screenposition + currow * THUMBS_W + curcol >= thumbs.size())
+                curcol = thumbs.size() - (screenposition + currow * THUMBS_W) -
+                         1;
             handled = true;
             break;
         }

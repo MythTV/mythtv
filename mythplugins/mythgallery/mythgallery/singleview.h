@@ -17,7 +17,8 @@ class SingleView : public MythDialog
 {
     Q_OBJECT
   public:
-    SingleView(MythContext *context, vector<Thumbnail> *imagelist, int pos, 
+    SingleView(MythContext *context, QSqlDatabase *db,
+               vector<Thumbnail> *imagelist, int pos, 
                QWidget *parent = 0, const char *name = 0);
    ~SingleView();
 
@@ -42,6 +43,10 @@ class SingleView : public MythDialog
     int timersecs;
 
     bool timerrunning;
+    int rotateAngle, imageRotateAngle;
+    bool redraw;
+
+    QSqlDatabase *m_db;
 };
 
 #endif

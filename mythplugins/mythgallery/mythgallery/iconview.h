@@ -3,6 +3,7 @@
 
 #include <qwidget.h>
 #include <qstring.h>
+#include <qsqldatabase.h>
 #include <qpixmap.h>
 
 #include <vector>
@@ -37,7 +38,8 @@ class IconView : public MythDialog
 {
     Q_OBJECT
   public:
-    IconView(MythContext *context, const QString &startdir, QWidget *parent = 0,
+    IconView(MythContext *context, QSqlDatabase *db, 
+             const QString &startdir, QWidget *parent = 0,
              const char *name = 0);
    ~IconView();
 
@@ -48,6 +50,11 @@ class IconView : public MythDialog
   private:
     void fillList(const QString &dir);
     void loadThumbPixmap(Thumbnail *thumb);
+
+    bool moveDown();
+    bool moveUp();
+    bool moveLeft();
+    bool moveRight();
 
     QFont *m_font;
 
@@ -63,6 +70,8 @@ class IconView : public MythDialog
     int currow, curcol;
 
     static QPixmap *foldericon;
+
+    QSqlDatabase *m_db;
 };
 
 #endif
