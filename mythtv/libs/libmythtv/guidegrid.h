@@ -164,7 +164,10 @@ class GuideGrid : public MythDialog
     QSqlDatabase *m_db;
 
     bool ignoreevents;
+    bool doProgramInfoUpdate;
     bool keyDown;
+    
+    QMutex *updateLock;
 };
 
 #endif

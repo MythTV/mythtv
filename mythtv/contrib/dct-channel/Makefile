@@ -22,8 +22,6 @@ serial.o: crc.h serial.h debug.h
 
 channel: channel.o crc.o opt.o packet.o serial.o
 
-test: test.o crc.o opt.o packet.o serial.o
-
 channel.1: channel.c version.h
 	make channel
 	if ! help2man -N --output=channel.1 ./channel ; then \

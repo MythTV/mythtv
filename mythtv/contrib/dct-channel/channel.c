@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	while(tries < 4) {
+	while(tries < 5) {
 		tries++;
 		if(initialize()<0) {
 			verb("Initialization failed\n");
@@ -331,7 +331,9 @@ int main(int argc, char *argv[])
 				int i;
 
 				verb("Failed to set new channel\n");
-				if(tries==1 || tries==3) {
+				switch(tries) {
+				case 1:
+				case 3:
 					/* Try sending exit key a few
 					   times to make sure we're
 					   not in a menu or something */
@@ -339,18 +341,33 @@ int main(int argc, char *argv[])
 					for(i=0;i<4;i++)
 						if(send_keypress(KEY_EXIT)<0)
 							break;
-				} else if(tries==2 && !nopower) {
-					/* Try sending power button,
+					break;
+				case 2:
+					/* Try increasing timeouts by 50%,
+					   which will also increase the
+					   delay between keypresses */
+					timeout_scale *= 1.5;
+					verb("Increased timeout_scale to %f\n",
+					     timeout_scale);
+					break;
+				case 4:
+					/* After 4 unsuccessful tries,
+					   try sending power button,
 					   in case the box is turned
 					   off.  Need to wait for it
 					   to actually power on, and
 					   flush buffers since it will
 					   probably send garbage. */
+					if(nopower) 
+						break;
 					verb("Attempting to turn box on\n");
 					if(send_keypress(KEY_POWER)>=0) {
 						usleep(POWER_SLEEP*1000);
 					}
  					serial_flush();
+					break;
+				default:
+					break;
 				}
 				continue;
 			}

@@ -122,6 +122,8 @@ class VideoOutput
  
     virtual int ChangePictureAttribute(int attributeType, int newValue);
 
+    void CopyFrame(VideoFrame* to, VideoFrame* from);
+
     int XJ_width, XJ_height;
     float XJ_aspect;
 

@@ -69,6 +69,16 @@ void PlaybackSock::GetFreeSpace(int &totalspace, int &usedspace)
     usedspace = strlist[1].toInt();
 }
 
+int PlaybackSock::CheckRecordingActive(ProgramInfo *pginfo)
+{
+    QStringList strlist = QString("CHECK_RECORDING");
+    pginfo->ToStringList(strlist);
+
+    SendReceiveStringList(strlist);
+
+    return strlist[0].toInt();
+}
+
 int PlaybackSock::StopRecording(ProgramInfo *pginfo)
 {
     QStringList strlist = QString("STOP_RECORDING");

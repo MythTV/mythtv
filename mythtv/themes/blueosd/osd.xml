@@ -6,17 +6,20 @@
   <font name="infofont">
     <color>255</color>
     <size>16</size>
+    <size:small>14</size:small>
     <outline>yes</outline>
   </font>
 
   <font name="infofontgray">
     <color>128</color>
     <size>16</size>
+    <size:small>14</size:small>
   </font>
 
   <font name="channelfont">
     <color>255</color>
     <size>50</size>
+    <size:small>30</size:small>
     <outline>yes</outline>
     <shadow>5,5</shadow>
   </font>
@@ -24,6 +27,7 @@
   <font name="timefont">
     <color>255</color>
     <size>40</size>
+    <size:small>22</size:small>
     <outline>yes</outline>
     <shadow>5,5</shadow>
   </font>
@@ -31,6 +35,7 @@
   <font name="settings">
     <color>255</color>
     <size>24</size>
+    <size:small>18</size:small>
     <outline>yes</outline>
   </font>
 

@@ -274,4 +274,39 @@ int RemoteGetRecordingMask(void)
     return mask;
 }
 
+int RemoteCheckForRecording(ProgramInfo *pginfo)
+{  //returns recordernum if pginfo recording in progress, else 0
+    QStringList strlist = QString("CHECK_RECORDING");
+    pginfo->ToStringList(strlist);
+
+    gContext->SendReceiveStringList(strlist);
+
+    return strlist[0].toInt();
+}
+
+int RemoteGetRecordingStatus(ProgramInfo *pginfo, int overrecsecs,
+                             int underrecsecs)
+{ //returns 0: not recording, 1: recording, 2: underrecord, 3: overrecord
+    QDateTime curtime = QDateTime::currentDateTime();
+
+    int retval = 0;
+
+    if (pginfo)
+    {
+        if (curtime >= pginfo->startts.addSecs(-underrecsecs) &&
+            curtime < pginfo->endts.addSecs(overrecsecs))
+        {
+            if (curtime >= pginfo->startts && curtime < pginfo->endts)
+                retval = 1;
+            else if (curtime < pginfo->startts && 
+                     RemoteCheckForRecording(pginfo) > 0)
+                retval = 2;
+            else if (curtime > pginfo->endts && 
+                     RemoteCheckForRecording(pginfo) > 0)
+                retval = 3;
+        }
+    }
+
+    return retval;
+}
 

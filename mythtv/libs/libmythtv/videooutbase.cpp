@@ -205,6 +205,11 @@ VideoOutput::VideoOutput()
 
 VideoOutput::~VideoOutput()
 {
+    QMap<VideoFrame*, int>::iterator iter = vbufferMap.begin();
+    for (;iter != vbufferMap.end(); iter++)
+        if (iter.key()->qscale_table != NULL)
+            delete [] iter.key()->qscale_table;
+
     if (vbuffers)
         delete [] vbuffers;
 }
@@ -641,6 +646,8 @@ void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause,
         vbuffers[i].bpp = vbuffers[i].size = 0;
         vbuffers[i].buf = NULL;
         vbuffers[i].timecode = 0;
+        vbuffers[i].qscale_table = NULL;
+        vbuffers[i].qstride = 0;
     }
 
     numbuffers = numdecode;
@@ -1000,6 +1007,29 @@ blendimageargbend:
                 }
             }
         }
+    }
+}
+
+void VideoOutput::CopyFrame(VideoFrame* to, VideoFrame* from)
+{
+    if (to == NULL || from == NULL)
+        return;
+
+    // guaranteed to be correct sizes.
+    memcpy(to->buf, from->buf, from->size);
+
+    if (from->qstride > 0 && from->qscale_table != NULL)
+    {
+        if (to->qstride != from->qstride || to->qscale_table == NULL)
+        {
+            to->qstride = from->qstride;
+            if (to->qscale_table)
+                delete [] to->qscale_table;
+
+            to->qscale_table = new unsigned char[to->qstride * to->height];
+        }
+
+        memcpy(to->qscale_table, from->qscale_table, to->qstride * to->height);
     }
 }
 

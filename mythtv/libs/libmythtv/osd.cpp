@@ -52,6 +52,8 @@ OSD::OSD(int width, int height, int frint, const QString &font,
 
     setList = new vector<OSDSet *>;
 
+    fontSizeType = gContext->GetSetting("OSDThemeFontSizeType", "default");
+    
     themepath = FindTheme(osdtheme);
 
     if (themepath == "")
@@ -147,6 +149,8 @@ void OSD::SetDefaults(void)
 void OSD::Reinit(int width, int height, int frint, int dispx, int dispy, 
                  int dispw, int disph)
 {
+    osdlock.lock();
+
     vid_width = width;
     vid_height = height;
     if (frint != -1)
@@ -179,6 +183,8 @@ void OSD::Reinit(int width, int height, int frint, int dispx, int dispy,
 
     delete drawSurface;
     drawSurface = new OSDSurface(width, height);
+
+    osdlock.unlock();
 }
 
 QString OSD::FindTheme(QString name)
@@ -263,6 +269,8 @@ void OSD::parseFont(QDomElement &element)
     QString name;
     QString fontfile = fontname;
     int size = -1;
+    int sizeSmall = -1;
+    int sizeBig = -1;    
     bool outline = false;
     QPoint shadowOffset = QPoint(0, 0);
     int color = 255;
@@ -283,6 +291,14 @@ void OSD::parseFont(QDomElement &element)
             if (info.tagName() == "size")
             {
                 size = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "size:small")
+            {
+                sizeSmall = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "size:big")
+            {
+                sizeBig = getFirstText(info).toInt();
             }
             else if (info.tagName() == "color")
             {
@@ -318,6 +334,17 @@ void OSD::parseFont(QDomElement &element)
         exit(0);
     }
 
+    if (fontSizeType == "small")
+    {
+        if(sizeSmall > 0)
+            size = sizeSmall;
+    }
+    else if (fontSizeType == "big")
+    {
+        if(sizeBig > 0)
+            size = sizeBig;
+    }
+    
     if (size < 0) 
     {
         cerr << "Error: font size must be > 0\n";

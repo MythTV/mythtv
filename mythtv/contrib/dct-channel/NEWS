@@ -1,3 +1,7 @@
+1.6, 2003-10-31
+	Try 5 times instead of 4, and increase timeouts by 50% after
+	second failed attempt to change channel.
+
 1.5, 2003-10-26
 	Wait for extra status messages after changing channel; without
         it, clearing the OSD would usually fail because we wouldn't

@@ -6,6 +6,7 @@
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
       <size>25</size>
+      <size:small>14</size:small>
       <shadow>3,3</shadow>
       <bold>yes</bold>
     </font>
@@ -13,6 +14,7 @@
     <font name="info" face="Arial">
       <color>#ffffff</color>
       <size>17</size>
+      <size:small>13</size:small>
       <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
@@ -21,6 +23,7 @@
       <shadow>2,2</shadow>
       <color>#ffffff</color>
       <size>16</size>
+      <size:small>9</size:small>
       <bold>yes</bold>
     </font>
 
@@ -28,12 +31,14 @@
       <shadow>1,1</shadow>
       <color>#ffffff</color>
       <size>15</size>
+      <size:small>12</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="recstatus" face="Arial">
       <color>#ffff33</color>
       <size>17</size>
+      <size:small>12</size:small>
       <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
@@ -41,6 +46,7 @@
     <font name="small" face="Arial">
       <color>#ffff33</color>
       <size>16</size>
+      <size:small>10</size:small>
     </font>
 
     <container name="background">
@@ -183,6 +189,7 @@
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
       <size>25</size>
+      <size:small>12</size:small>
       <shadow>3,3</shadow>
       <bold>yes</bold>
     </font>
@@ -198,6 +205,7 @@
       <shadow>2,2</shadow>
       <color>#ffffff</color>
       <size>16</size>
+      <size:small>8</size:small>
       <bold>yes</bold>
     </font>
  
@@ -205,12 +213,14 @@
       <shadow>1,1</shadow>
       <color>#ffffff</color>
       <size>15</size>
+      <size:small>10</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="recstatus" face="Arial">
       <color>#ffff33</color>
       <size>17</size>
+      <size:small>12</size:small>
       <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
@@ -218,6 +228,7 @@
     <font name="small" face="Arial">
       <color>#ffff33</color>
       <size>16</size>
+      <size:small>8</size:small>
     </font>
 
     <container name="background">
@@ -364,30 +375,35 @@
     <font name="active_font" face="Arial">
       <color>#ffffff</color>
       <size>16</size>
+      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="inactive_font" face="Arial">
       <color>#9999cc</color>
       <size>16</size>
+      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="norecordfnt" face="Arial">
       <color>#000000</color>
       <size>16</size>
+      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="conflictfnt" face="Arial">
       <color>#ff3333</color>
       <size>16</size>
+      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="currenttitle" face="Arial">
       <color>#ffffff</color>
       <size>18</size>
+      <size:small>12</size:small>
       <bold>yes</bold>
     </font>
 
@@ -395,6 +411,7 @@
       <color>#000000</color>
       <dropcolor>#999999</dropcolor>
       <size>27</size>
+      <size:small>13</size:small>
       <shadow>3,3</shadow>
       <bold>yes</bold>
     </font>
@@ -403,6 +420,7 @@
       <color>#000000</color>
       <dropcolor>#999999</dropcolor>
       <size>17</size>
+      <size:small>8</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -411,6 +429,7 @@
       <color>#999999</color>
       <dropcolor>#000000</dropcolor>
       <size>16</size>
+      <size:small>10</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -418,6 +437,7 @@
     <font name="messagegray" face="Arial">
       <color>#000000</color>
       <size>16</size>
+      <size:small>10</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -425,6 +445,7 @@
     <font name="messageyellow" face="Arial">
       <color>#ff3333</color>
       <size>16</size>
+      <size:small>10</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -598,6 +619,7 @@
       <dropcolor>#000000</dropcolor>
       <shadow>1,1</shadow>
       <size>16</size>
+      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
@@ -606,20 +628,30 @@
       <dropcolor>#000000</dropcolor>
       <shadow>1,1</shadow>
       <size>16</size>
+      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
+    <font name="overunderrecfont" face="Arial">
+      <color>#ff33AA</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+    
     <font name="inactive" face="Arial">
       <color>#9999cc</color>
       <dropcolor>#000000</dropcolor>
       <shadow>1,1</shadow>
       <size>16</size>
+      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="currenttitle" face="Arial">
       <color>#ffffff</color>
       <size>18</size>
+      <size:small>12</size:small>
       <bold>yes</bold>
     </font>
 
@@ -627,6 +659,7 @@
       <color>#000000</color>
       <dropcolor>#bbbbbb</dropcolor>
       <size>27</size>
+      <size:small>14</size:small>
       <shadow>3,3</shadow>
       <bold>yes</bold>
     </font>
@@ -635,6 +668,7 @@
       <color>#000000</color>
       <dropcolor>#bbbbbb</dropcolor>
       <size>17</size>
+      <size:small>10</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -643,6 +677,7 @@
       <color>#000000</color>
       <dropcolor>#bbbbbb</dropcolor>
       <size>18</size>
+      <size:small>12</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -693,6 +728,7 @@
       <listarea name="showing" draworder="4">
         <area>240,18,600,265</area>
         <fcnfont name="recordfnt" function="recording"></fcnfont>
+        <fcnfont name="overunderrecfont" function="overunderrecording"></fcnfont>
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
         <fcnfont name="active" function="selected"></fcnfont>
@@ -879,6 +915,7 @@
       <dropcolor>#000000</dropcolor>
       <shadow>1,1</shadow>
       <size>16</size>
+      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
@@ -887,6 +924,7 @@
       <dropcolor>#000000</dropcolor>
       <shadow>1,1</shadow>
       <size>16</size>
+      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
@@ -895,6 +933,7 @@
       <dropcolor>#000000</dropcolor>
       <shadow>1,1</shadow>
       <size>16</size>
+      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
@@ -902,6 +941,7 @@
       <color>#000000</color>
       <dropcolor>#bbbbbb</dropcolor>
       <size>18</size>
+      <size:small>12</size:small>
       <shadow>3,3</shadow>
       <bold>yes</bold>
     </font>
@@ -910,6 +950,7 @@
       <color>#000000</color>
       <dropcolor>#bbbbbb</dropcolor>
       <size>17</size>
+      <size:small>10</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -918,6 +959,7 @@
       <color>#3344ee</color>
       <dropcolor>#bbbbbb</dropcolor>
       <size>17</size>
+      <size:small>10</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -925,6 +967,7 @@
     <font name="channel" face="Arial">
       <color>#ffffff</color>
       <size>22</size>
+      <size:small>14</size:small>
       <bold>yes</bold>
     </font>
 

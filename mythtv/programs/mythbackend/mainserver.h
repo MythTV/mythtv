@@ -70,6 +70,7 @@ class MainServer : public QObject
     void HandleMessage(QStringList &slist, PlaybackSock *pbs);
     void HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs);
     void HandleIsRecording(QStringList &slist, PlaybackSock *pbs);
+    void HandleCheckRecordingActive(QStringList &slist, PlaybackSock *pbs);
     void HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs);
     void HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs,
                               int state);

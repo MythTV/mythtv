@@ -79,10 +79,14 @@ int pp(VideoFilter *vf, VideoFrame *frame)
     tf->src[1] = tf->dst[1] = frame->buf + tf->ysize;
     tf->src[2] = tf->dst[2] = frame->buf + tf->ysize + tf->csize;
 
+    if (frame->qscale_table == NULL)
+        frame->qstride = 0;
+
     pp_postprocess( tf->src, tf->srcStride,
                     tf->dst, tf->dstStride,
                     frame->width, frame->height,
-                    NULL, 0, tf->mode, tf->context, PP_FORMAT_420);
+                    frame->qscale_table, frame->qstride,
+                    tf->mode, tf->context, PP_FORMAT_420);
 
     return 0;
 }

@@ -81,6 +81,7 @@ VideoOutputXv::VideoOutputXv(void)
     scratchspace = NULL; 
 
     pauseFrame.buf = NULL;
+    pauseFrame.qscale_table = NULL;
 
     data = new XvData();
 }
@@ -89,6 +90,12 @@ VideoOutputXv::~VideoOutputXv()
 {
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
+
+    if (pauseFrame.qscale_table)
+    {
+        delete [] pauseFrame.qscale_table;
+        pauseFrame.qscale_table = NULL;
+    }
 
     Exit();
     delete data;
@@ -139,6 +146,8 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
     pauseFrame.bpp = scratchFrame->bpp;
     pauseFrame.size = scratchFrame->size;
     pauseFrame.buf = new unsigned char[pauseFrame.size];
+    pauseFrame.qscale_table = scratchFrame->qscale_table = NULL;
+    pauseFrame.qstride = scratchFrame->qstride = 0;
 
     pthread_mutex_unlock(&lock);
 }
@@ -359,6 +368,8 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     pauseFrame.bpp = scratchFrame->bpp;
     pauseFrame.size = scratchFrame->size;
     pauseFrame.buf = new unsigned char[pauseFrame.size];
+    pauseFrame.qscale_table = NULL;
+    pauseFrame.qstride = 0;
 
     MoveResize();
  
@@ -411,6 +422,8 @@ bool VideoOutputXv::CreateXvBuffers(void)
         vbuffers[i].bpp = 12;
         vbuffers[i].size = XJ_height * XJ_width * 3 / 2;
         vbuffers[i].codec = FMT_YV12;
+        vbuffers[i].qscale_table = NULL;
+        vbuffers[i].qstride = 0;
     }
 
     XSync(data->XJ_disp, 0);
@@ -466,6 +479,8 @@ bool VideoOutputXv::CreateShmBuffers(void)
         vbuffers[i].size = XJ_height * XJ_width * 3 / 2;
         vbuffers[i].codec = FMT_YV12;
         vbuffers[i].buf = new unsigned char[vbuffers[i].size];
+        vbuffers[i].qscale_table = NULL;
+        vbuffers[i].qstride = 0;
     }
 
     XSync(data->XJ_disp, 0);
@@ -492,6 +507,8 @@ bool VideoOutputXv::CreateXBuffers(void)
         vbuffers[i].size = XJ_height * XJ_width * 3 / 2;
         vbuffers[i].codec = FMT_YV12;
         vbuffers[i].buf = new unsigned char[vbuffers[i].size];
+        vbuffers[i].qscale_table = NULL;
+        vbuffers[i].qstride = 0;
     }
 
     XSync(data->XJ_disp, 0);
@@ -533,6 +550,15 @@ void VideoOutputXv::DeleteXvBuffers()
         XFree(iter->second);
     }
 
+    for (int i = 0; i < numbuffers + 1; i++)
+    {
+        if (vbuffers[i].qscale_table)
+        {
+            delete [] vbuffers[i].qscale_table;
+            vbuffers[i].qscale_table = NULL;
+        }
+    }
+
     delete [] (data->XJ_SHMInfo);
 
     if (scratchspace)
@@ -557,6 +583,12 @@ void VideoOutputXv::DeleteShmBuffers()
     {
         delete [] vbuffers[i].buf;
         vbuffers[i].buf = NULL;
+
+        if (vbuffers[i].qscale_table)
+        {
+            delete [] vbuffers[i].qscale_table;
+            vbuffers[i].qscale_table = NULL;
+        }
     }
 }
 
@@ -568,6 +600,12 @@ void VideoOutputXv::DeleteXBuffers()
     {
         delete [] vbuffers[i].buf;
         vbuffers[i].buf = NULL;
+
+        if (vbuffers[i].qscale_table)
+        {
+            delete [] vbuffers[i].qscale_table;
+            vbuffers[i].qscale_table = NULL;
+        }
     }
 }
 
@@ -745,7 +783,7 @@ void VideoOutputXv::UpdatePauseFrame(void)
     VideoFrame *pauseb = scratchFrame;
     if (usedVideoBuffers.count() > 0)
         pauseb = usedVideoBuffers.head();
-    memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
+    CopyFrame(&pauseFrame, pauseb);
 
     pthread_mutex_unlock(&lock);
 }
@@ -759,7 +797,7 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
     if (!frame)
     {
         frame = scratchFrame;
-        memcpy(scratchFrame->buf, pauseFrame.buf, pauseFrame.size);
+        CopyFrame(scratchFrame, &pauseFrame);
     }
 
     process_video_filters(frame, &filterList[0], filterList.size());

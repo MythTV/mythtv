@@ -28,6 +28,9 @@ typedef struct VideoFrame_
     long long timecode;
 
     unsigned char *priv[4]; // random empty storage
+
+    unsigned char *qscale_table;
+    int            qstride;
 } VideoFrame;
 
 #endif

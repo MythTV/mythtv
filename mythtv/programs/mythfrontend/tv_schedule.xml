@@ -25,7 +25,7 @@
    </button>
 
    <button>
-      <type>TV_SCHEDULE</type>
+      <type>TV_PROGFIND</type>
       <text>Program Finder</text>
       <text lang="IT">Ricerca programmi</text>
       <text lang="ES">Buscar programas</text>

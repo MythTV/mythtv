@@ -128,6 +128,7 @@ class OSD : public QObject
 
     QString fontname;
     QString ccfontname;
+    QString fontSizeType;
 
     int vid_width;
     int vid_height;

@@ -449,6 +449,18 @@ public:
     };
 };
 
+class OSDThemeFontSizeType: public ComboBoxSetting, public GlobalSetting {
+public:
+    OSDThemeFontSizeType():
+        GlobalSetting("OSDThemeFontSizeType") {
+        setLabel(QObject::tr("Font size"));
+        addSelection(QObject::tr("default"), "default");
+        addSelection(QObject::tr("small"), "small");
+        addSelection(QObject::tr("big"), "big");
+        setHelpText(QObject::tr("default: TV, small: monitor, big:"));
+    };
+};
+
 class ChannelOrdering: public ComboBoxSetting, public GlobalSetting {
 public:
     ChannelOrdering():
@@ -1368,6 +1380,7 @@ PlaybackSettings::PlaybackSettings()
     osd->addChild(new OSDDisplayTime());
     osd->addChild(new OSDFont());
     osd->addChild(new OSDCCFont());
+    osd->addChild(new OSDThemeFontSizeType());
     osd->addChild(new DefaultCCMode());
     osd->addChild(new PersistentBrowseMode());
     addChild(osd);

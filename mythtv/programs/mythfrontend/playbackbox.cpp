@@ -582,7 +582,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     QString tempDate;
     QString tempTime;
     QString tempSize;
-    bool tempCurrent;
+    int tempCurrent = 0;
 
     QString match;
     QRect pr = listRect;
@@ -612,6 +612,9 @@ void PlaybackBox::updateShowTitles(QPainter *p)
         start = showDateData.begin();
         end = showDateData.end();
     }
+
+    int overrectime = gContext->GetNumSetting("RecordOverTime", 0);
+    int underrectime = gContext->GetNumSetting("RecordPreRoll", 0);
 
     if (container)
     {
@@ -682,10 +685,9 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                      {
                          tempInfo = &(it.data());
 
-                         if (curtime < tempInfo->endts)
-                             tempCurrent = true;
-                         else
-                             tempCurrent = false;
+                         tempCurrent = RemoteGetRecordingStatus(tempInfo,
+                                                                overrectime,
+                                                                underrectime);
 
                          if (titleData[curTitle] == tr("All Programs"))
                              tempSubTitle = tempInfo->title; 
@@ -719,10 +721,12 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                          ltype->SetItemText(cnt, 2, tempDate);
                          ltype->SetItemText(cnt, 3, tempTime);
                          ltype->SetItemText(cnt, 4, tempSize);
-                         if (tempCurrent == true)
+                         if (tempCurrent == 1)
                              ltype->EnableForcedFont(cnt, "recording");
+                         else if (tempCurrent > 1)
+                             ltype->EnableForcedFont(cnt, "recording"); // FIXME: change to overunderrecording, fall back to recording. 
 
-                            cnt++;
+                         cnt++;
                      }
                      pastSkip--;
                      titleitems++;
@@ -1542,7 +1546,10 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     QButton *playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
 
-    if ((curtime >= program->startts) && (curtime < program->endts))
+    int overrectime = gContext->GetNumSetting("RecordOverTime", 0);
+    int underrectime = gContext->GetNumSetting("RecordPreRoll", 0);
+
+    if (RemoteGetRecordingStatus(program, overrectime, underrectime) > 0)
         popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
 
     if (delitem->GetAutoExpireFromRecorded(db))

@@ -128,6 +128,8 @@ void ProfileGroupEditor::open(int id) {
 
     bool isdefault = false;
     bool show_profiles = true;
+    bool newgroup = false;
+    int profileID;
     QString pgName;
     if (id != 0)
     {
@@ -140,6 +142,7 @@ void ProfileGroupEditor::open(int id) {
     {
         pgName = QString("New Profile Group Name");
         profilegroup->setName(pgName);
+        newgroup = true;
     }
     if (! isdefault)
     {
@@ -147,7 +150,7 @@ void ProfileGroupEditor::open(int id) {
             profilegroup->allowedGroupName())
         {
             profilegroup->save(db);
-            int profileID = profilegroup->getProfileNum();
+            profileID = profilegroup->getProfileNum();
             QValueList <int> found;
             QString query = QString("SELECT name FROM recordingprofiles WHERE "
                                     "profilegroup = %1").arg(profileID);
@@ -178,13 +181,14 @@ void ProfileGroupEditor::open(int id) {
                 }
             }
         }
-        else
+        else if (newgroup)
             show_profiles = false;
     }
     if (show_profiles)
     {
         pgName = profilegroup->getName();
-        RecordingProfileEditor editor(db,id,pgName);
+        profileID = profilegroup->getProfileNum();
+        RecordingProfileEditor editor(db,profileID,pgName);
         editor.exec(db);
     }
     delete profilegroup;

@@ -724,6 +724,24 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             return false;
         }
 
+        if (mpa_pic->qscale_table != NULL && mpa_pic->qstride > 0)
+        {
+            int tablesize = mpa_pic->qstride * video_height;
+
+            if (frame->qstride != mpa_pic->qstride ||
+                frame->qscale_table == NULL)
+            {
+                frame->qstride = mpa_pic->qstride;
+
+                if (frame->qscale_table)
+                    delete [] frame->qscale_table;
+
+                frame->qscale_table = new unsigned char[tablesize]; 
+            }
+
+            memcpy(frame->qscale_table, mpa_pic->qscale_table, tablesize);
+        }
+
         if (directrendering)
             return true;
 

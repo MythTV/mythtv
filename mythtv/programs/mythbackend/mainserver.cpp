@@ -234,6 +234,10 @@ void MainServer::ProcessRequest(QSocket *sock)
     {
         HandleStopRecording(listline, pbs);
     }
+    else if (command == "CHECK_RECORDING")
+    {
+        HandleCheckRecordingActive(listline, pbs);
+    }
     else if (command == "DELETE_RECORDING")
     {
         HandleDeleteRecording(listline, pbs);
@@ -772,6 +776,45 @@ static void *SpawnDelete(void *param)
     return NULL;
 }
 
+void MainServer::HandleCheckRecordingActive(QStringList &slist, 
+                                            PlaybackSock *pbs)
+{
+    QSocket *pbssock = NULL;
+    if (pbs)
+        pbssock = pbs->getSocket();
+
+    ProgramInfo *pginfo = new ProgramInfo();
+    pginfo->FromStringList(slist, 1);
+
+    int result = 0;
+
+    if (ismaster && pginfo->hostname != gContext->GetHostName())
+    {
+        PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
+
+        if (slave)
+            result = slave->CheckRecordingActive(pginfo);
+    }
+    else
+    {
+        QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+        for (; iter != encoderList->end(); ++iter)
+        {
+            EncoderLink *elink = iter.data();
+
+            if (elink->isLocal() && elink->MatchesRecording(pginfo))
+                result = iter.key();
+        }
+    }
+
+    QStringList outputlist = QString::number(result);
+    if (pbssock)
+        SendResponse(pbssock, outputlist);
+
+    delete pginfo;
+    return;
+}
+
 void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
 {
     ProgramInfo *pginfo = new ProgramInfo();
@@ -829,6 +872,17 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
                 usleep(100);
             }
         }
+    }
+
+    if (QDateTime::currentDateTime() > pginfo->endts)
+    { //don't update filename if in overrecord
+        if (pbssock)
+        {
+            QStringList outputlist = QString::number(recnum);
+            SendResponse(pbssock, outputlist);
+        }
+        delete pginfo;
+        return;
     }
 
     QString thequery;

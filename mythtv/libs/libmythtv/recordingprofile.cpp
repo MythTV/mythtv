@@ -745,7 +745,8 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting,
     else
     {
         QString query = QString("SELECT name, id FROM recordingprofiles "
-                                "WHERE profilegroup = %1;").arg(group);
+                                "WHERE profilegroup = %1 ORDER BY id;")
+                                .arg(group);
        QSqlQuery result = db->exec(query);
         if (result.isActive() && result.numRowsAffected() > 0)
             while (result.next())

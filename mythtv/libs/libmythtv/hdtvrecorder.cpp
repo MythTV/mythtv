@@ -18,6 +18,17 @@
    * Rewrite PIDs after channel change to be the same as before, so
      decoder can follow
 
+   Oct. 27, 2003 by Jason Hoos:
+   * if no GOP is detected within the first 30 frames of the stream, then
+     assume that it's safe to treat a picture start as a GOP.
+
+   Oct. 30, 2003 by Jason Hoos:
+   * added code to rewrite PIDs in the MPEG PAT and PMT tables.  fixes 
+     a problem with stations (particularly, WGN in Chicago) that list their 
+     programs in reverse order in the PAT, which was confusing ffmpeg 
+     (ffmpeg was looking for program 5, but only program 2 was left in 
+     the stream, so it choked).
+
    References / example code: 
      ATSC standards a.54, a.69 (www.atsc.org)
      ts2pes from mpegutils from dvb (www.linuxtv.org)
@@ -47,6 +58,7 @@ using namespace std;
 extern "C" {
 #include "../libavcodec/avcodec.h"
 #include "../libavformat/avformat.h"
+#include "../libavformat/mpegts.h"
 }
 
 //#define BUFFER_SIZE 4096
@@ -74,6 +86,7 @@ HDTVRecorder::HDTVRecorder()
 
     keyframedist = 15;
     gopset = false;
+    pict_start_is_gop = false;
 
     firstgoppos = 0;
 
@@ -344,9 +357,19 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                         if (buffer[i+1] == 0x00) // picture_start
                         {
                             framesWritten++;
+                            if (framesWritten >= 30 && firstgoppos <= 0)
+                            {
+                                // seen 30 frames with no GOP; assume that
+                                // each GOP only contains one I-frame, and
+                                // treat the I-frame as the beginning of the
+                                // GOP.
+                                pict_start_is_gop = true;
+                            }
                         }
-                        else if (buffer[i+1] == 0xB8) // group_of_pictures
+                        if (buffer[i+1] == 0xB8 || 
+                            (pict_start_is_gop && buffer[i+1] == 0x00))
                         {
+                            // group_of_pictures
                             int frameNum = framesWritten - 1;
                             
                             if (!gopset && frameNum > 0)
@@ -427,6 +450,119 @@ void HDTVRecorder::RewritePID(unsigned char *buffer, int pid)
     buffer[2] = b2;
 }
 
+bool HDTVRecorder::RewritePAT(unsigned char *buffer, int pid)
+{
+    int pos = 0;
+    int sec_len = ((buffer[1] << 8) | buffer[2]) & 0x0fff;
+    sec_len += 3;  // adjust for 3 header bytes
+
+    // Rewrite the PAT table, eliminating any other streams that the old
+    // one may have described so that ffmpeg can only find ours (useful since
+    // some stations put programs in their PAT tables in descending order 
+    // instead of ascending, which would confuse ffmpeg).  While we're at it
+    // change the program number to 1 in case it wasn't that already.
+    
+    // PAT format: 2-byte TSID, 2-byte PID, repeated for each PID
+    // TODO: typically PIDs seem to be padded with 1-bits.  Someone 
+    // with better knowledge of PAT table formats should confirm this.
+    // If it is wrong, fix the '0xe0' values in RewritePMT too.
+    
+    pos = 8;
+
+    buffer[pos] = 0x00;
+    buffer[pos+1] = 0x01;
+    buffer[pos+2] = 0xe0 | ((pid & 0x1f00) >> 8);
+    buffer[pos+3] = pid & 0xff;
+    pos += 4;
+
+    // rewrite section length, add 4 for checksum bytes
+    int new_len = (pos + 4) - 3;
+    buffer[1] = (buffer[1] & 0xf0) | ((new_len & 0x0f00) >> 8);
+    buffer[2] = new_len & 0xff;
+
+    // fix the checksum
+    unsigned int crc = mpegts_crc32(buffer, pos);
+    buffer[pos++] = (crc & 0xff000000) >> 24;
+    buffer[pos++] = (crc & 0x00ff0000) >> 16;
+    buffer[pos++] = (crc & 0x0000ff00) >> 8;
+    buffer[pos++] = (crc & 0x000000ff);
+
+    // pad the rest of the packet with 0xff
+    memset(buffer + pos, 0xff, sec_len - pos);
+
+    return true;
+}
+
+bool HDTVRecorder::RewritePMT(unsigned char *buffer, int old_pid, int new_pid)
+{
+    // TODO: if it's possible for a PMT to span packets, then this function
+    // doesn't know how to deal with anything after the first packet.  On the
+    // other hand, neither does ffmpeg as near as I can tell.
+    
+    int pos = 8;
+    int pid;
+    int sec_len = ((buffer[1] & 0x0f) << 8) + buffer[2];
+    sec_len += 3;  // adjust for 3 header bytes
+
+    // rewrite program number to 1
+    buffer[3] = 0x00;
+    buffer[4] = 0x01;
+
+    // rewrite pcr_pid
+    pid = ((buffer[pos] << 8) | buffer[pos+1]) & 0x1fff;
+    if (pid == VIDEO_PID(old_pid)) {
+        pid = VIDEO_PID(new_pid);
+    } 
+    else if (pid == AUDIO_PID(old_pid)) {
+        pid = AUDIO_PID(new_pid);
+    }
+    else {
+        return false;  // don't know how to rewrite
+    }
+    buffer[pos] = ((pid & 0x1f00) >> 8) | 0xe0;
+    buffer[pos+1] = pid & 0x00ff;
+    pos += 2;
+
+    // skip program info
+    if (buffer[pos] == 0xff)
+	return false;  // premature end of packet
+    pos += 2 + (((buffer[pos] << 8) | buffer[pos+1]) & 0x0fff);
+
+    // rewrite other pids
+    while (pos < sec_len - 4) {
+        if (buffer[pos] == 0xff)
+            break;  // hit end of packet, ok here
+        pos++;
+
+        pid = ((buffer[pos] << 8) | buffer[pos+1]) & 0x1fff;
+        if (pid == VIDEO_PID(old_pid)) {
+            pid = VIDEO_PID(new_pid);
+        } 
+        else if (pid == AUDIO_PID(old_pid)) {
+            pid = AUDIO_PID(new_pid);
+        }
+
+        buffer[pos] = ((pid & 0x1f00) >> 8) | 0xe0;
+        buffer[pos+1] = pid & 0x00ff;
+        pos += 2;
+
+        if (buffer[pos] == 0xff)
+            return false;  // premature end of packet
+	// bounds checked at top of while loop
+        pos += 2 + (((buffer[pos] << 8) | buffer[pos+1]) & 0x0fff);
+    }
+
+    // fix the checksum
+    unsigned int crc = mpegts_crc32(buffer, sec_len - 4);
+    buffer[sec_len - 4] = (crc & 0xff000000) >> 24;
+    buffer[sec_len - 3] = (crc & 0x00ff0000) >> 16;
+    buffer[sec_len - 2] = (crc & 0x0000ff00) >> 8;
+    buffer[sec_len - 1] = (crc & 0x000000ff);
+
+    return true;
+}
+
+    
 int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
 {
     int pos = 0;
@@ -534,8 +670,8 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
             // PID 0: Program Association Table -- lists all other
             // PIDs that make up the program(s) in the whole stream.
             // Based on info in this table, and on which subprogram
-            // the user // desires, we should determine which PIDs'
-            // payloads to write // to the ring buffer.
+            // the user desires, we should determine which PIDs'
+            // payloads to write to the ring buffer.
 
             // Example PAT scan code is in the pcHDTV's dtvscan.c,
             // demux_ts_parse_pat
@@ -550,11 +686,17 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
             
             // We should rewrite the PAT to describe just the one
             // stream we are recording.  Always use the same set of
-            // PIDs // so the decoder has an easier time following
+            // PIDs so the decoder has an easier time following
             // channel changes.
+            if (base_pid) {
+                // sec_start should pretty much always be pos + 1, but
+                // just in case...
+                int sec_start = pos + buffer[pos] + 1;
 
-            // decoder needs PAT, write it to the stream
-            ringBuffer->Write(&buffer[packet_start_pos], 188);
+                // write to ringbuffer if pids gets rewritten successfully.
+                if (RewritePAT(&buffer[sec_start], first_base_pid))
+                    ringBuffer->Write(&buffer[packet_start_pos], 188);
+            }
         }
         else if (pid == psip_pid)
         {
@@ -578,8 +720,8 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
                  // delay until first GOP to avoid decoder crash on res change
                 RewritePID(&(buffer[packet_start_pos]), 
                            VIDEO_PID(first_base_pid));
-            ringBuffer->Write(&buffer[packet_start_pos], 188);
-        }
+                ringBuffer->Write(&buffer[packet_start_pos], 188);
+            }
         }
         else if (pid == AUDIO_PID(base_pid))
         {
@@ -588,14 +730,26 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
             {
                 RewritePID(&(buffer[packet_start_pos]), 
                            AUDIO_PID(first_base_pid));
-            ringBuffer->Write(&buffer[packet_start_pos], 188);
-        }
+                ringBuffer->Write(&buffer[packet_start_pos], 188);
+            }
         }
         else if (pid == base_pid)
         {
             // decoder needs base PID
+            int sec_start = pos + buffer[pos] + 1;
             RewritePID(&(buffer[packet_start_pos]), first_base_pid);
-            ringBuffer->Write(&buffer[packet_start_pos], 188);
+
+            // if it's a PMT table, rewrite the PIDs contained in it too
+            if (buffer[sec_start] == 0x02) {
+                if (RewritePMT(&(buffer[sec_start]), base_pid, first_base_pid))
+                {
+                    ringBuffer->Write(&buffer[packet_start_pos], 188);
+                }
+            }
+            else {
+                // some other kind of packet?  possible?  do we care?
+                ringBuffer->Write(&buffer[packet_start_pos], 188);
+            }
         }
         else 
         {

@@ -48,6 +48,8 @@ class HDTVRecorder : public RecorderBase
 
     int ResyncStream(unsigned char *buffer, int curr_pos, int len);
     void RewritePID(unsigned char *buffer, int pid);
+    bool RewritePAT(unsigned char *buffer, int pid);
+    bool RewritePMT(unsigned char *buffer, int old_pid, int new_pid);
     bool recording;
     bool encoding;
 
@@ -63,6 +65,7 @@ class HDTVRecorder : public RecorderBase
 
     int keyframedist;
     bool gopset;
+    bool pict_start_is_gop;
 
     QMap<long long, long long> positionMap;
 

@@ -73,11 +73,14 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
                      const char *name)
          : MythDialog(parent, name)
 {
+    updateLock = new QMutex(true);
+    
     desiredDisplayChans = DISPLAY_CHANS = 6;
     DISPLAY_TIMES = 30;
     int maxchannel = 0;
     m_currentStartChannel = 0;
     ignoreevents = false;
+    doProgramInfoUpdate = false;
 
     m_player = player;
     m_db = QSqlDatabase::database();
@@ -236,6 +239,7 @@ GuideGrid::~GuideGrid()
     m_channelInfos.clear();
 
     delete theme;
+    delete updateLock;
 }
 
 void GuideGrid::keyPressEvent(QKeyEvent *e)
@@ -254,46 +258,61 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
     if(e->key() != Key_Control)
         keyDown = true;    
     
+    ignoreevents = true;  //prevent customEvent from updating
+    updateLock->lock();    //wait if customEvent is updating 
+    
     if (e->state() == Qt::ControlButton)
     {
         switch (e->key())
         {
-            case Key_Left: pageLeft(); return;
-            case Key_Right: pageRight(); return;
-            case Key_Up: pageUp(); return;
-            case Key_Down: pageDown(); return;
+            case Key_Left: pageLeft(); break;
+            case Key_Right: pageRight(); break;
+            case Key_Up: pageUp(); break;
+            case Key_Down: pageDown(); break;
             default: break;
         }
     }
-
-    switch (e->key())
+    else
     {
-        case Key_Left: case Key_A: cursorLeft(); break;
-        case Key_Right: case Key_D: cursorRight(); break;
-        case Key_Down: case Key_S: cursorDown(); break;
-        case Key_Up: case Key_W: cursorUp(); break;
+        switch (e->key())
+        {
+            case Key_Left: case Key_A: cursorLeft(); break;
+            case Key_Right: case Key_D: cursorRight(); break;
+            case Key_Down: case Key_S: cursorDown(); break;
+            case Key_Up: case Key_W: cursorUp(); break;
 
-        case Key_Home: case Key_7: dayLeft(); break;
-        case Key_End: case Key_1: dayRight(); break;
-        case Key_PageUp: case Key_3: pageUp(); break;
-        case Key_PageDown: case Key_9: pageDown(); break;
-      
-        case Key_4: toggleGuideListing(); break;
-        case Key_6: showProgFinder(); break;   
-      
-        case Key_Slash: toggleChannelFavorite(); break;
- 
-        case Key_C: case Key_Escape: escape(); break;
-        case Key_M: enter(); break;
+            case Key_Home: case Key_7: dayLeft(); break;
+            case Key_End: case Key_1: dayRight(); break;
+            case Key_PageUp: case Key_3: pageUp(); break;
+            case Key_PageDown: case Key_9: pageDown(); break;
 
-        case Key_I: case Key_Space: 
-        case Key_Enter: case Key_Return:  displayInfo(); break;
+            case Key_4: toggleGuideListing(); break;
+            case Key_6: showProgFinder(); break;   
 
-        case Key_R: quickRecord(); break;
-        case Key_X: channelUpdate(); break;
+            case Key_Slash: toggleChannelFavorite(); break;
 
-        default: MythDialog::keyPressEvent(e);
+            case Key_C: case Key_Escape: escape(); break;
+            case Key_M: enter(); break;
+
+            case Key_I: case Key_Space: 
+            case Key_Enter: case Key_Return:  displayInfo(); break;
+
+            case Key_R: quickRecord(); break;
+            case Key_X: channelUpdate(); break;
+
+            default: MythDialog::keyPressEvent(e);
+        }
     }
+    
+    if(doProgramInfoUpdate) 
+    {
+        fillProgramInfos();
+        update(fullRect);
+    }
+    
+    ignoreevents = false;
+    
+    updateLock->unlock();
 }
 
 void GuideGrid::keyReleaseEvent(QKeyEvent *e)
@@ -561,6 +580,8 @@ void GuideGrid::fillProgramInfos(void)
     {
         fillProgramRowInfos(y);
     }
+    
+    doProgramInfoUpdate = false;        
 }
 
 void GuideGrid::fillProgramRowInfos(unsigned int row)
@@ -778,9 +799,6 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
 
 void GuideGrid::customEvent(QCustomEvent *e)
 {
-    if (ignoreevents)
-        return;
-
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
@@ -788,7 +806,14 @@ void GuideGrid::customEvent(QCustomEvent *e)
 
         if (message == "SCHEDULE_CHANGE")
         {
+            if (ignoreevents)
+            {
+                doProgramInfoUpdate = true;
+                return;
+            }    
+            updateLock->lock();
             fillProgramInfos();
+            updateLock->unlock();
             update(fullRect);
         }
     }
