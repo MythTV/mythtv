@@ -12,6 +12,8 @@ using namespace std;
 #include <mythtv/mythwidgets.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/util.h>
+#include <mythtv/mythmedia.h>
+#include <mythtv/mythmediamonitor.h>
 
 #include "videofilter.h"
 const long WATCHED_WATERMARK = 10000; // Less than this and the chain of videos will 
@@ -39,7 +41,6 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
 
     wireUpTheme();
     video_tree_root = new GenericTree("video root", -2, false);
-    video_tree_data = video_tree_root->addNode("videos", -2, false);
     
     currentVideoFilter = new VideoFilterSettings(db, true);
     
@@ -285,21 +286,74 @@ void VideoTree::buildVideoList()
         //  Fill metadata from directory structure
         //
         
-        buildFileList(gContext->GetSetting("VideoStartupDir"));
+        QStringList nodesname;
+        QStringList nodespath;
+
+        nodespath.append(gContext->GetSetting("VideoStartupDir"));
+        nodesname.append("videos");
+
+
+        //
+        // See if there are removable media available, so we can add them
+        // to the tree.
+        //
+        MediaMonitor * mon = MediaMonitor::getMediaMonitor();
+        if (mon)
+        {
+            QValueList <MythMediaDevice*> medias =
+                                        mon->getMedias(MEDIATYPE_DATA);
+            QValueList <MythMediaDevice*>::Iterator itr = medias.begin();
+            MythMediaDevice *pDev;
+
+            while(itr != medias.end())
+            {
+                pDev = *itr;
+                if (pDev)
+                {
+                    QString path = pDev->getMountPath();
+                    QString name = path.right(path.length()
+                                                - path.findRev("/")-1);
+                    nodespath.append(path);
+                    nodesname.append(name);
+                }
+                itr++;
+            }
+        }
+
+        for (uint j=0; j < nodesname.count(); j++)
+        {
+            video_tree_data = video_tree_root->addNode(nodesname[j], -2, false);
+            buildFileList(nodespath[j]);
+        }
+
+        unsigned int mainnodeindex = 0;
+        QString prefix = nodespath[mainnodeindex];
+        GenericTree *where_to_add = video_tree_root->getChildAt(mainnodeindex);
 
         for(uint i=0; i < browser_mode_files.count(); i++)
         {
+            
             QString file_string = *(browser_mode_files.at(i));
-            QString prefix = gContext->GetSetting("VideoStartupDir");
+            if (prefix.compare(file_string.left(prefix.length())) != 0)
+            {
+                if (mainnodeindex++ < nodespath.count()) {
+                    prefix = nodespath[mainnodeindex];
+                }
+                else {
+                    cerr << "videotree.o: mainnodeindex out of bounds" << endl;
+                    break;
+                }
+            }
+            where_to_add = video_tree_root->getChildAt(mainnodeindex);
             if(prefix.length() < 1)
             {
-                cerr << "videotree.o: Seems unlikely that this is going to work" << endl;
+                cerr << "videotree.o: weird prefix.lenght" << endl;
+                break;
             }
+
             file_string.remove(0, prefix.length());
             QStringList list(QStringList::split("/", file_string));
 
-            GenericTree *where_to_add;
-            where_to_add = video_tree_data;
             int a_counter = 0;
             QStringList::Iterator an_it = list.begin();
             for( ; an_it != list.end(); ++an_it)
@@ -308,7 +362,6 @@ void VideoTree::buildVideoList()
                 {
                     QString title = (*an_it);
                     where_to_add->addNode(title.section(".",0,-2), i, true);
-                    
                 }
                 else
                 {
@@ -451,16 +504,31 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
                     
                 QString the_file = *(browser_mode_files.at(node_int));
                 QString base_name = the_file.section("/", -1);
-                video_title->SetText(base_name.section(".", 0, -2));
-                video_file->SetText(base_name);
+
+		/* See if we can find this filename in DB */
+                curitem->setFilename(the_file);
+                if(curitem->fillDataFromFilename(db)) {
+		    video_title->SetText(curitem->Title());
+                    video_file->SetText(curitem->Filename().section("/", -1));
+                    video_poster->SetImage(curitem->CoverFile());
+                    video_poster->LoadImage();
+                    if (video_plot)
+                        video_plot->SetText(curitem->Plot());
+		}
+		else
+		{
+                    /* Nope, let's make the best of the situation */
+		    video_title->SetText(base_name.section(".", 0, -2));
+                    video_file->SetText(base_name);
+		    video_poster->ResetImage();
+                    curitem->setTitle(base_name.section(".", 0, -2));
+                    curitem->setPlayer(player);
+                    if (video_plot)
+                        video_plot->SetText(" ");
+		}
                 extension = the_file.section(".", -1);
                 player = gContext->GetSetting("VideoDefaultPlayer");
                 
-                curitem->setFilename(the_file);
-                curitem->setTitle(base_name.section(".", 0, -2));
-                curitem->setPlayer(player);
-                if (video_plot)
-                    video_plot->SetText(" ");
             }
         }
         else

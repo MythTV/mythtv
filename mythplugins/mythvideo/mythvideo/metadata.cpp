@@ -161,10 +161,10 @@ void Metadata::fillCountries(QSqlDatabase *db)
 
 }
 
-void Metadata::fillData(QSqlDatabase *db)
+bool Metadata::fillData(QSqlDatabase *db)
 {
     if (title == "")
-        return;
+        return false;
 
     QString thequery = "SELECT title,director,plot,rating,year,userrating,"
                        "length,filename,showlevel,intid,coverfile,inetref,"
@@ -199,14 +199,20 @@ void Metadata::fillData(QSqlDatabase *db)
         childID = query.value(12).toUInt();
         browse = query.value(13).toBool();
         playcommand = query.value(14).toString();
+	return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
-void Metadata::fillDataFromID(QSqlDatabase *db)
+bool Metadata::fillDataFromID(QSqlDatabase *db)
 {       
     if (id == 0)
-        return; 
+        return false; 
         
+    
     QString thequery;
     thequery = QString("SELECT title,director,plot,rating,year,userrating,"
                        "length,filename,showlevel,coverfile,inetref,childid,"
@@ -215,7 +221,6 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
                        " ON videometadata.category = videocategory.intid"
                        "  WHERE videometadata.intid=%1;")
                        .arg(id);
-        
     QSqlQuery query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -237,16 +242,69 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
         browse = query.value(12).toBool();
         playcommand = query.value(13).toString();
         category = query.value(14).toString();
-        
-        // Genres
+
+	// Genres
         fillGenres(db);
     
         //Countries
         fillCountries(db);
+
+	return true;
     }
     else
     {
-        cerr << "metadata.o : SELECT Failed : " << thequery << endl;
+        cerr << "metadata.o : SELECT by id failed : " << thequery << endl;
+	return false;
+    }
+}
+
+bool Metadata::fillDataFromFilename(QSqlDatabase *db)
+{       
+    if (filename == "")
+        return false; 
+        
+    
+    QString thequery;
+    thequery = QString("SELECT videometadata.intid,title,director,plot"
+		       ",rating,year,userrating,length,showlevel,coverfile"
+		       ",inetref,childid,browse,playcommand"
+		       ", videocategory.category "
+                       " FROM videometadata LEFT JOIN videocategory"
+                       " ON videometadata.category = videocategory.intid"
+                       "  WHERE videometadata.filename='%1';")
+                       .arg(filename.utf8());
+    QSqlQuery query = db->exec(thequery);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+	id = query.value(0).toInt();
+        title = QString::fromUtf8(query.value(1).toString());
+        director = QString::fromUtf8(query.value(2).toString());
+        plot = QString::fromUtf8(query.value(3).toString());
+        rating = query.value(4).toString();
+        year = query.value(5).toInt();
+        userrating = (float)query.value(6).toDouble();
+        length = query.value(7).toInt();
+        showlevel = query.value(8).toInt();
+        coverfile = QString::fromUtf8(query.value(9).toString());
+        inetref = QString::fromUtf8(query.value(10).toString());
+        childID = query.value(11).toUInt();
+        browse = query.value(12).toBool();
+        playcommand = query.value(13).toString();
+        category = query.value(14).toString();
+
+	// Genres
+        fillGenres(db);
+    
+        //Countries
+        fillCountries(db);
+	return true;
+    }
+    else
+    {
+        cerr << "metadata.o : SELECT by filename failed : " << thequery << endl;
+	return false;
     }
 }
 
