@@ -1,0 +1,78 @@
+.\" Comments
+.Dd Sept 26, 2004 
+.ds volume-operating-system NuvExport
+.Os 
+.Dt NUVEXPORT-XVID 1 1
+.Sh NAME
+.Nm nuvexport-xvid
+.Nd export nuv files created by mythtv to xvid
+.Sh SYNOPSIS
+.Nm
+.Op Fl Fl title string
+.Op Fl Fl subtitle string
+.Op Fl Fl description string
+.Op Fl Fl debug
+
+.Sh DESCRIPTION
+.Nm
+is a perl script built to assist in exporting .NUV files from mythtv into xvid directly, it runs nuvexport using the xvid export option
+
+.Sh OPTIONS
+The following command line options are available:
+.Bl -tag -width indent
+.It Fl Fl title
+search on title for programs
+.It Fl Fl subtitle
+search on subtitle for programs
+.It Fl Fl description
+search on description for programs
+.It Fl Fl debug
+enables debugging information, as well as changes reencode behavior to print out actions rather then executing them. useful for understanding what programs are being run by nuvexport to do the reencoding work
+.El
+
+.Sh USAGE
+As mentioned, the program is interactive, and is fairly self explanitory.  The following are the basic steps to export a file from mythtv.
+.Bd -literal
+1) Choose from the show titles.
+2) Choose a specific show from the titles.
+3) hit "c" to continue and begin the reencode process
+4) work through the options specific to the xvid export process.
+.Ed 
+.Bd -literal
+Details of export options:
+
+.Ed
+
+.Sh DIAGNOSTICS
+.Ex -std
+
+.Sh DEPENDANCIES
+.Nm
+depends on nuvexport, and all of it's dependancies
+.Ed
+
+.Sh SEE ALSO
+.Xr transcode 1 ,
+.Xr ffmpeg 1 ,
+.Xr mythtranscode 1 ,
+.Xr mythtv 1 ,
+.Xr nuvexport-xvid 1 ,
+.Xr nuvexport-svcd 1 ,
+.Xr nuvexport-vcd 1 ,
+.Xr nuvexport-dvcd 1 ,
+.Xr nuvexport-dvd 1 ,
+.Xr nuvexport-wmv 1
+
+.Sh HISTORY
+This program was written a while ago, now it's getting better
+.Pp
+
+.Sh AUTHOR
+.Bd -literal
+Main code by:  Chris Petersen
+WMV code by:  Gavin Hurlbut
+ManPage by: Paul Greidanus (paul@majestik.org)
+.Ed
+
+.Sh BUGS
+Please check http://www.forevermore.net/nuvexport to check on current status of nuvexport, and to check on any bugs

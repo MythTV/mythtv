@@ -1,4 +1,5 @@
 .\" Comments
+.\" $Id$
 .Dd Sept 26, 2004 
 .ds volume-operating-system NuvExport
 .Os 
@@ -12,7 +13,7 @@
 .Op Fl Fl subtitle string
 .Op Fl Fl description string
 .Op Fl Fl debug
-.Op Fl Fl mode=mode
+.Op Fl Fl mode mode
 .Op Fl Fl search-only
 .Op Fl Fl confirm
 .Op Fl Fl nice
@@ -40,8 +41,8 @@ sets the nicelevel for nuvexport to run at (values from 0-20)
 brings up help
 .It Fl Fl debug
 enables debugging information, as well as changes reencode behavior to print out actions rather then executing them. useful for understanding what programs are being run by nuvexport to do the reencoding work
-.It Fl Fl mode=mode
-used for running nuvexport in a given mode, current accepted values are : xvid, dvd, vcd, dvcd, wmv exporters
+.It Fl Fl mode mode
+used for running nuvexport in a given mode, current accepted values are : xvid, dvd, vcd, dvcd, wmv, mp3, mpeg2_cut and nuv_sql
 .El
 
 .Sh USAGE
@@ -105,7 +106,7 @@ nuv and sql - dumps mysql database so it can be moved to another
 .Xr nuvexport-wmv 1
 
 .Sh HISTORY
-This program was written a while ago, now it's getting better
+Once upon a time, Chris wrote nuvexport, then Gavin helped, then Paul came along to make documentation.  And there was much rejoicing.
 .Pp
 
 .Sh AUTHOR
