@@ -664,7 +664,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     AVFrame mpa_pic;
 
                     int gotpicture = 0;
-                    unsigned char *picdata = NULL;
 
                     pthread_mutex_lock(&avcodeclock);
                     ret = avcodec_decode_video(context, &mpa_pic,

@@ -17,7 +17,6 @@
 using namespace std;
 
 #include "videoout_xv.h"
-#include "../libmyth/mythcontext.h"
 #include "../libmyth/util.h"
 
 extern "C" {
@@ -85,9 +84,7 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect,
 {
     pthread_mutex_lock(&lock);
 
-    XJ_width = width;
-    XJ_height = height;
-    XJ_aspect = aspect;
+    VideoOutput::InputChanged(width, height, aspect, num_buffers, out_buffers);
 
     if (xv_port != -1)
     {
@@ -147,10 +144,8 @@ bool VideoOutputXv::Init(int width, int height, float aspect, int num_buffers,
 
     XvAdaptorInfo *ai;
 
-    XJ_width = width;
-    XJ_height = height;
-
-    XJ_aspect = aspect;
+    VideoOutput::Init(width, height, aspect, num_buffers, out_buffers, winid,
+                      winx, winy, winw, winh, embedid);
 
     data->XJ_disp = XOpenDisplay(NULL);
     if (!data->XJ_disp) 
@@ -161,30 +156,6 @@ bool VideoOutputXv::Init(int width, int height, float aspect, int num_buffers,
  
     data->XJ_screen = DefaultScreenOfDisplay(data->XJ_disp);
     XJ_screen_num = DefaultScreen(data->XJ_disp);
-
-    QString HorizScanMode = gContext->GetSetting("HorizScanMode", "overscan");
-    QString VertScanMode = gContext->GetSetting("VertScanMode", "overscan");
-
-    img_hscanf = gContext->GetNumSetting("HorizScanPercentage", 5) / 100.0;
-    img_vscanf = gContext->GetNumSetting("VertScanPercentage", 5) / 100.0;
-   
-    img_xoff = gContext->GetNumSetting("xScanDisplacement", 0);
-    img_yoff = gContext->GetNumSetting("yScanDisplacement", 0);
-
-
-    if (VertScanMode == "underscan") 
-    {
-        img_vscanf = 0 - img_vscanf;
-    }
-    if (HorizScanMode == "underscan") 
-    {
-        img_hscanf = 0 - img_hscanf;
-    }
-
-    printf("Over/underscanning. V: %f, H: %f, XOff: %d, YOff: %d\n", 
-           img_vscanf, img_hscanf, img_xoff, img_yoff);
- 
-    XJ_fixedaspect = gContext->GetNumSetting("FixedAspectRatio", 0);
 
     XJ_white = XWhitePixel(data->XJ_disp, XJ_screen_num);
     XJ_black = XBlackPixel(data->XJ_disp, XJ_screen_num);
@@ -251,18 +222,6 @@ bool VideoOutputXv::Init(int width, int height, float aspect, int num_buffers,
                       &XJ_screenwidth, &XJ_screenheight);
 #endif
 
-    oldx = curx = winx; 
-    oldy = cury = winy;
-    oldw = curw = winw;
-    oldh = curh = winh;
-
-    dispx = 0; dispy = 0;
-    dispw = curw; disph = curh;
-    imgx = curx; imgy = cury;
-    imgw = XJ_width; imgh = XJ_height;
-
-    embedding = false;
-
     if (winid <= 0)
     {
         cerr << "Bad winid given to output\n";
@@ -270,8 +229,6 @@ bool VideoOutputXv::Init(int width, int height, float aspect, int num_buffers,
     }
 
     data->XJ_curwin = data->XJ_win = winid;
-    dispx = 0;
-    dispy = 0;
     
     if (embedid > 0)
         data->XJ_curwin = data->XJ_win = embedid;
@@ -300,7 +257,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect, int num_buffers,
     XvImageFormatValues *fo;
     bool foundimageformat = false;
 
-    if ( xv_port != -1 )
+    if (xv_port != -1)
     {
         fo = XvListImageFormats(data->XJ_disp, xv_port, &formats);
         for (i = 0; i < formats; i++)
@@ -340,7 +297,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect, int num_buffers,
     data->XJ_gc = XCreateGC(data->XJ_disp, data->XJ_win, 0, 0);
     XJ_depth = DefaultDepthOfScreen(data->XJ_screen);
 
-    if (xv_port != -1 )
+    if (xv_port != -1)
     {
         if (!CreateXvBuffers(num_buffers, out_buffers))
             return false;
@@ -427,7 +384,7 @@ bool VideoOutputXv::CreateShmBuffers(int num_buffers, VideoFrame *out_buffers)
                                                       XJ_screen_num),
                                         XJ_depth, ZPixmap, 0, 
                                         &(data->XJ_SHMInfo)[i],
-                                        curw, curh);
+                                        dispw, disph);
 
         (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE, image->bytes_per_line
                                              * image->height, IPC_CREAT|0777);
@@ -476,7 +433,7 @@ bool VideoOutputXv::CreateXBuffers(int num_buffers, VideoFrame *out_buffers)
         XImage *image = XCreateImage(data->XJ_disp,
                                         DefaultVisual(data->XJ_disp, 0),
                                         XJ_depth, ZPixmap, 0, sbuf,
-                                        curw, curh,
+                                        dispw, disph,
                                         XJ_depth, 0);
 
         data->xbuffers[(unsigned char *)image->data] = image;
@@ -567,40 +524,6 @@ void VideoOutputXv::DeleteXBuffers()
     data->xbuffers.clear();
 }
 
-void VideoOutputXv::ToggleFullScreen(void)
-{
-    if ( xv_port == -1 )
-        return;
-
-    pthread_mutex_lock(&lock);
-
-    if (XJ_fullscreen)
-    {
-        XJ_fullscreen = 0; 
-
-        curx = oldx; cury = oldy; curw = oldw; curh = oldh;
-    } 
-    else 
-    {
-        XJ_fullscreen = 1;
-        oldx = curx; oldy = cury; oldw = curw; oldh = curh;
-
-        curx = XJ_screenx;
-        cury = XJ_screeny;
-        curw = XJ_screenwidth;
-        curh = XJ_screenheight + 4;
-    }
-
-    dispx = 0;
-    dispy = 0;
-    dispw = curw;
-    disph = curh;
-
-    MoveResize();
-
-    pthread_mutex_unlock(&lock);
-}
-  
 void VideoOutputXv::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
 {
     if (embedding)
@@ -609,19 +532,7 @@ void VideoOutputXv::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
     pthread_mutex_lock(&lock);
     data->XJ_curwin = wid;
 
-    olddispx = dispx;
-    olddispy = dispy;
-    olddispw = dispw;
-    olddisph = disph;
-
-    dispxoff = dispx = x;
-    dispyoff = dispy = y;
-    dispwoff = dispw = w;
-    disphoff = disph = h;
-
-    embedding = true;
-
-    MoveResize();
+    VideoOutput::EmbedInWidget(wid, x, y, w, h);
 
     pthread_mutex_unlock(&lock);
 }
@@ -633,16 +544,8 @@ void VideoOutputXv::StopEmbedding(void)
 
     pthread_mutex_lock(&lock);
 
-    dispx = olddispx;
-    dispy = olddispy;
-    dispw = olddispw;
-    disph = olddisph;
-
     data->XJ_curwin = data->XJ_win;
-
-    embedding = false;
-
-    MoveResize();
+    VideoOutput::StopEmbedding();
 
     pthread_mutex_unlock(&lock);
 }
@@ -693,8 +596,7 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
         if (framesShown == 0)
             stop_time = time(NULL) + 4;
 
-        if ((!fps) &&
-            (time(NULL) > stop_time))
+        if ((!fps) && (time(NULL) > stop_time))
         {
             fps = (int)(framesShown / 4);
 
@@ -702,21 +604,20 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
             {
                 showFrame = 120 / framesShown + 1;
                 printf("***\n" );
-                printf( "* Your system is not capable of displaying the\n" );
-                printf( "* full framerate at %dx%d resolution.  Frames\n",
-                    curw, curh );
-                printf( "* will be skipped in order to keep the audio and\n" );
-                printf( "* video in sync.\n" );
+                printf("* Your system is not capable of displaying the\n");
+                printf("* full framerate at %dx%d resolution.  Frames\n",
+                       dispw, disph );
+                printf("* will be skipped in order to keep the audio and\n");
+                printf("* video in sync.\n");
             }
         }
 
         framesShown++;
 
-        if ((showFrame != 1) &&
-            (framesShown % showFrame))
+        if ((showFrame != 1) && (framesShown % showFrame))
             return;
 
-        unsigned char *sbuf = new unsigned char[curw * curh * 4];
+        unsigned char *sbuf = new unsigned char[dispw * disph * 4];
         XImage *image = data->xbuffers[buffer->buf];
         AVPicture image_in, image_out;
         ImgReSampleContext *scontext;
@@ -725,20 +626,19 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
         int height = buffer->height;
 
         avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
-            curw, curh );
+                       dispw, disph);
 
        
-        if (( curw == width ) &&
-            ( curh == height ))
+        if ((dispw == width) && (disph == height))
         {
-            memcpy( sbuf, image->data, width * height * 3 / 2 );
+            memcpy(sbuf, image->data, width * height * 3 / 2);
         }
         else
         {
             avpicture_fill(&image_in, (uint8_t *)image->data, PIX_FMT_YUV420P,
-                width, height );
-            scontext = img_resample_init(curw, curh, width, height);
-            img_resample( scontext, &image_out, &image_in );
+                           width, height);
+            scontext = img_resample_init(dispw, disph, width, height);
+            img_resample(scontext, &image_out, &image_in);
         }
 
         switch (image->bits_per_pixel)
@@ -752,19 +652,19 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
         }
 
         avpicture_fill(&image_in, (uint8_t *)image->data, av_format,
-            curw, curh );
+                       dispw, disph);
 
         img_convert(&image_in, av_format, &image_out, PIX_FMT_YUV420P,
-            curw, curh);
+                    dispw, disph);
 
         pthread_mutex_lock(&lock);
 
         if (use_shm)
             XShmPutImage(data->XJ_disp, data->XJ_curwin, data->XJ_gc, image,
-                      0, 0, 0, 0, curw, curh, False );
+                         0, 0, 0, 0, dispw, disph, False );
         else
             XPutImage(data->XJ_disp, data->XJ_curwin, data->XJ_gc, image, 
-                      0, 0, 0, 0, curw, curh );
+                      0, 0, 0, 0, dispw, disph );
 
         pthread_mutex_unlock(&lock);
 
@@ -775,158 +675,4 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
 void VideoOutputXv::Show()
 {
     XSync(data->XJ_disp, False);
-}
-
-void VideoOutputXv::ResizeVideo(int x, int y, int w, int h)
-{
-    if (XEventsQueued(data->XJ_disp, QueuedAlready))
-        return;
-
-    if (XJ_fullscreen || h >= XJ_screenheight && w >= XJ_screenwidth)
-        return;
-
-    if (oldx == x && oldy == y && oldw == w && oldh == h)
-        return;
-
-    if (oldx == (x+1) && oldy == (y+1) && oldw == w && oldh == h)
-        return;
-
-    if (XJ_fixedaspect)
-    {
-        if (w * 3 / 4 > h)
-        {
-            w = (int) (h * 4 / 3);
-        }
-        else
-        {
-            h = (int) (w * 3 / 4);
-        }
-    }
-
-    oldx = curx = x;
-    oldy = cury = y;
-    oldw = curw = w;
-    oldh = curh = h;
-
-    dispx = 0;
-    dispy = 0;
-    dispw = curw;
-    disph = curh;
-    
-    MoveResize();
-    return;
-}
-
-void VideoOutputXv::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
-{
-    xoff = imgx;
-    yoff = imgy;
-    width = imgw;
-    height = imgh;
-}
-
-void VideoOutputXv::MoveResize(void)
-{
-    int yoff, xoff;
-
-    XMoveResizeWindow(data->XJ_disp, data->XJ_win, curx, cury, curw, curh);
-    XMapRaised(data->XJ_disp, data->XJ_win);
-
-    XRaiseWindow(data->XJ_disp, data->XJ_win);
-    XFlush(data->XJ_disp);
-
-    // Preset all image placement and sizing variables.
-    imgx = 0; imgy = 0;
-    imgw = XJ_width; imgh = XJ_height;
-    xoff = img_xoff; yoff = img_yoff;
-    dispxoff = dispx; dispyoff = dispy;
-    dispwoff = dispw; disphoff = disph;
-
-/*
-    Here we apply playback over/underscanning and offsetting (if any apply).
-
-    It doesn't make any sense to me to offset an image such that it is clipped.
-    Therefore, we only apply offsets if there is an underscan or overscan which
-    creates "room" to move the image around. That is, if we overscan, we can 
-    move the "viewport". If we underscan, we change where we place the image 
-    into the display window. If no over/underscanning is performed, you just 
-    get the full original image scaled into the full display area.
-*/
-
-    if (img_vscanf > 0) {
-        // Veritcal overscan. Move the Y start point in original image.
-        imgy = (int)ceil(XJ_height * img_vscanf);
-        imgh = (int)ceil(XJ_height * (1 - 2 * img_vscanf));
-
-        // If there is an offset, apply it now that we have a room.
-        // To move the image down, move the start point up.
-        if(yoff > 0) {
-            // Can't offset the image more than we have overscanned.
-            if(yoff > imgy) yoff = imgy;
-            imgy -= yoff;
-        }
-        // To move the image up, move the start point down.
-        if(yoff < 0) {
-            // Again, can't offset more than overscanned.
-            if( abs(yoff) > imgy ) yoff = 0 - imgy;
-            imgy -= yoff;
-        }
-    }
-
-    if (img_hscanf > 0) {
-        // Horizontal overscan. Move the X start point in original image.
-        imgx = (int)ceil(XJ_width * img_hscanf);
-        imgw = (int)ceil(XJ_width * (1 - 2 * img_hscanf));
-        if(xoff > 0) {
-            if(xoff > imgx) xoff = imgx;
-            imgx -= xoff;
-        }
-        if(xoff < 0) {
-            if( abs(xoff) > imgx ) xoff = 0 - imgx;
-            imgx -= xoff;
-        }
-    }
-
-    float vscanf, hscanf;
-    if (img_vscanf < 0) {
-        // Veritcal underscan. Move the starting Y point in the display window.
-        // Use the abolute value of scan factor.
-        vscanf = fabs(img_vscanf);
-        dispyoff = (int)ceil(disph * vscanf);
-        disphoff = (int)ceil(disph * (1 - 2 * vscanf));
-        // Now offset the image within the extra blank space created by 
-        // underscanning.
-        // To move the image down, increase the Y offset inside the display 
-        // window.
-        if(yoff > 0) {
-            // Can't offset more than we have underscanned.
-            if(yoff > dispyoff) yoff = dispyoff;
-            dispyoff += yoff;
-        }
-        if(yoff < 0) {
-            if( abs(yoff) > dispyoff ) yoff = 0 - dispyoff;
-            dispyoff += yoff;
-        }
-    }
-
-    if (img_hscanf < 0) {
-        hscanf = fabs(img_hscanf);
-        dispxoff = (int)ceil(dispw * hscanf);
-        dispwoff = (int)ceil(dispw * (1 - 2 * hscanf));
-        if(xoff > 0) {
-            if(xoff > dispxoff) xoff = dispxoff;
-            dispxoff += xoff;
-        }
-        if(xoff < 0) {
-            if( abs(xoff) > dispxoff ) xoff = 0 - dispxoff;
-            dispxoff += xoff;
-        }
-    }
-
-    if (XJ_aspect >= 1.34)
-    {
-        int oldheight = disphoff;
-        disphoff = (int)(dispwoff / XJ_aspect);
-        dispyoff = (oldheight - disphoff) / 2;
-    }
 }

@@ -724,12 +724,6 @@ void NuppelVideoPlayer::StopEmbedding(void)
     }
 }
 
-void NuppelVideoPlayer::ToggleFullScreen(void)
-{
-    if (videoOutput)
-        videoOutput->ToggleFullScreen();
-}
-
 void NuppelVideoPlayer::ToggleCC(void)
 {
     if (cc)

@@ -24,7 +24,7 @@ using namespace std;
 #define REENCODE_CUTLIST_CHANGE -1
 #define REENCODE_ERROR           0
 
-class VideoOutputXv;
+class VideoOutput;
 class OSDSet;
 class RemoteEncoder;
 class QSqlDatabase;
@@ -115,8 +115,6 @@ class NuppelVideoPlayer
     void SetBookmark(void);
     void ClearBookmark(void);
     long long GetBookmark(void);
-
-    void ToggleFullScreen(void);
 
     void ToggleCC(void);
 
@@ -332,7 +330,7 @@ class NuppelVideoPlayer
 
     bool exactseeks;
 
-    VideoOutputXv *videoOutput;
+    VideoOutput *videoOutput;
 
     int seekamount;
     int seekamountpos;

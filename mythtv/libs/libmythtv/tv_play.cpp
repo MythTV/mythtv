@@ -895,13 +895,6 @@ void TV::ProcessKeypress(int keypressed)
 
     switch (keypressed) 
     {
-/*
-        case Key_F:
-        {
-            nvp->ToggleFullScreen();
-            break;
-        }
-*/
         case Key_T:
         {
             nvp->ToggleCC();

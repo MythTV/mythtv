@@ -24,7 +24,7 @@ HEADERS += ttfont.h tv_play.h tv_rec.h videosource.h yuv2rgb.h
 HEADERS += progfind.h decoderbase.h nuppeldecoder.h avformatdecoder.h
 HEADERS += recorderbase.h mpegrecorder.h channelbase.h dvbrecorder.h
 HEADERS += dvbchannel.h vsync.h proglist.h hdtvrecorder.h
-HEADERS += videoout_xv.h
+HEADERS += videooutbase.h videoout_xv.h
 
 SOURCES += channel.cpp commercial_skip.cpp filter.c frequencies.c guidegrid.cpp
 SOURCES += infodialog.cpp infostructs.cpp jitterometer.cpp minilzo.cpp 
@@ -34,4 +34,4 @@ SOURCES += remoteutil.cpp RingBuffer.cpp RTjpegN.cpp scheduledrecording.cpp
 SOURCES += ttfont.cpp tv_play.cpp tv_rec.cpp videosource.cpp yuv2rgb.cpp
 SOURCES += progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp recorderbase.cpp
 SOURCES += mpegrecorder.cpp channelbase.cpp dvbrecorder.cpp dvbchannel.cpp
-SOURCES += vsync.c proglist.cpp hdtvrecorder.cpp videoout_xv.cpp
+SOURCES += vsync.c proglist.cpp hdtvrecorder.cpp videooutbase.cpp videoout_xv.cpp
