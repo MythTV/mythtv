@@ -51,7 +51,7 @@ class NuppelVideoRecorder
     bool GetPause(void) { return (audiopaused && mainpaused && 
                                   actuallypaused); }
     
-    bool IsRecording(void) { return childrenLive; }
+    bool IsRecording(void) { return recording; }
    
     long long GetFramesWritten(void) { return framesWritten; } 
 

@@ -348,6 +348,7 @@ void NuppelVideoRecorder::StartRecording(void)
     int frame = 0;
 
     encoding = true;
+    recording = true;
 
     struct timeval startt, nowt;
     int framesdisplayed = 0;
@@ -508,6 +509,7 @@ again:
         perror("VIDIOCMCAPTUREi1");
 
     encoding = true;
+    recording = true;
 
     while (encoding) {
         if (paused)
@@ -545,6 +547,7 @@ again:
     munmap(buf, vm.size);
 #endif
     KillChildren();
+    recording = false;
     close(fd);
 }
 
