@@ -450,7 +450,7 @@ void SelectManagedListItem::select()
 
 void SelectManagedListItem::doGoBack()
 {
-    if(curItem == 0)
+    if(curItem == (itemCount - 1) )
         curItem = lastItem;
     else
         text = QString( "[ %1 ]").arg(getCurItemText());
