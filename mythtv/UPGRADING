@@ -28,4 +28,7 @@ UPGRADING FROM RELEASE 0.5
 --------------------------
 You'll need to insert the 0-5-to-0-6.sql file in the database/ subdir into
 your database.  Run the setup program included in the setup/ directory after
-compiling, and you should be all set.
+compiling, and you should be all set.  Please note that upgrading will wipe 
+out most scheduled recordings in your database.  Sorry about that, but there
+really wasn't any clean way to migrate the data over to the new database
+format.

@@ -29,7 +29,7 @@ This is what you need, software wise, to have installed:
            be best.  I don't know, though, I'm utterly new to it.  Get it from
            your distro, or from http://www.mysql.com
 
-   XMLTV - You need the latest version 0.5.  This will do the work of actually
+   XMLTV - You need at least version 0.5.  This will do the work of actually
            grabbing the program information.  Get it from:
            http://membled.com/work/apps/xmltv/
            Installing this was rather a pain for me on Debian, but I don't have
@@ -137,9 +137,8 @@ The mysql.txt file located in there controls the database settings, mainly in
 case you want to run the mysql server on another machine.
 
 If you want to check out the theme format, and perhaps make your own, just
-look at the .menu files in the /usr/local/share/mythtv/themes/[themename]
-subdirs.  global.menu and tv.menu should be fully commented in both of the
-distributed themes.  
+look at the .xml files in the /usr/local/share/mythtv/themes/[themename]
+subdirs. 
 
 Feel free to subscribe to the development mailing list at:
 http://www.snowman.net/mailman/listinfo/mythtv-dev
