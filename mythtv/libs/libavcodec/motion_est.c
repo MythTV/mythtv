@@ -176,10 +176,19 @@ if((x) >= xmin && 2*(x) + (dx) <= 2*xmax && (y) >= ymin && 2*(y) + (dy) <= 2*yma
     }else{\
         int fx = s->me.direct_basis_mv[0][0] + hx;\
         int fy = s->me.direct_basis_mv[0][1] + hy;\
-        int bx = hx ? fx - s->me.co_located_mv[0][0] : s->me.co_located_mv[0][0]*(time_pb - time_pp)/time_pp;\
-        int by = hy ? fy - s->me.co_located_mv[0][1] : s->me.co_located_mv[0][1]*(time_pb - time_pp)/time_pp;\
+        int bx = hx ? fx - s->me.co_located_mv[0][0] : (s->me.co_located_mv[0][0]*(time_pb - time_pp)/time_pp);\
+        int by = hy ? fy - s->me.co_located_mv[0][1] : (s->me.co_located_mv[0][1]*(time_pb - time_pp)/time_pp);\
         int fxy= (fx&1) + 2*(fy&1);\
         int bxy= (bx&1) + 2*(by&1);\
+        \
+        assert((fx>>1) + 16*s->mb_x >= -16);\
+        assert((fy>>1) + 16*s->mb_y >= -16);\
+        assert((fx>>1) + 16*s->mb_x <= s->width);\
+        assert((fy>>1) + 16*s->mb_y <= s->height);\
+        assert((bx>>1) + 16*s->mb_x >= -16);\
+        assert((by>>1) + 16*s->mb_y >= -16);\
+        assert((bx>>1) + 16*s->mb_x <= s->width);\
+        assert((by>>1) + 16*s->mb_y <= s->height);\
 \
         hpel_put[0][fxy](s->me.scratchpad, (ref_y ) + (fx>>1) + (fy>>1)*(stride), stride, 16);\
         hpel_avg[0][bxy](s->me.scratchpad, (ref2_y) + (bx>>1) + (by>>1)*(stride), stride, 16);\
@@ -232,8 +241,14 @@ if((x) >= xmin && 4*(x) + (dx) <= 4*xmax && (y) >= ymin && 4*(y) + (dy) <= 4*yma
         int fxy= (fx&3) + 4*(fy&3);\
         int bxy= (bx&3) + 4*(by&3);\
 \
-        qpel_put[0][fxy](s->me.scratchpad, (ref_y ) + (fx>>2) + (fy>>2)*(stride), stride);\
-        qpel_avg[0][bxy](s->me.scratchpad, (ref2_y) + (bx>>2) + (by>>2)*(stride), stride);\
+        qpel_put[1][fxy](s->me.scratchpad               , (ref_y ) + (fx>>2) + (fy>>2)*(stride)               , stride);\
+        qpel_put[1][fxy](s->me.scratchpad + 8           , (ref_y ) + (fx>>2) + (fy>>2)*(stride) + 8           , stride);\
+        qpel_put[1][fxy](s->me.scratchpad     + 8*stride, (ref_y ) + (fx>>2) + (fy>>2)*(stride)     + 8*stride, stride);\
+        qpel_put[1][fxy](s->me.scratchpad + 8 + 8*stride, (ref_y ) + (fx>>2) + (fy>>2)*(stride) + 8 + 8*stride, stride);\
+        qpel_avg[1][bxy](s->me.scratchpad               , (ref2_y) + (bx>>2) + (by>>2)*(stride)               , stride);\
+        qpel_avg[1][bxy](s->me.scratchpad + 8           , (ref2_y) + (bx>>2) + (by>>2)*(stride) + 8           , stride);\
+        qpel_avg[1][bxy](s->me.scratchpad     + 8*stride, (ref2_y) + (bx>>2) + (by>>2)*(stride)     + 8*stride, stride);\
+        qpel_avg[1][bxy](s->me.scratchpad + 8 + 8*stride, (ref2_y) + (bx>>2) + (by>>2)*(stride) + 8 + 8*stride, stride);\
     }\
     d = cmp_func(s, s->me.scratchpad, src_y, stride);\
 }else\
@@ -1406,15 +1421,15 @@ static inline int direct_search(MpegEncContext * s,
 
         max= FFMAX(s->me.direct_basis_mv[i][0], s->me.direct_basis_mv[i][0] - s->me.co_located_mv[i][0])>>shift;
         min= FFMIN(s->me.direct_basis_mv[i][0], s->me.direct_basis_mv[i][0] - s->me.co_located_mv[i][0])>>shift;
-        max+= (2*mb_x + (i& 1))*8 - 1; // +-1 is for the simpler rounding
-        min+= (2*mb_x + (i& 1))*8 + 1;
+        max+= (2*mb_x + (i& 1))*8 + 1; // +-1 is for the simpler rounding
+        min+= (2*mb_x + (i& 1))*8 - 1;
         xmax= FFMIN(xmax, s->width - max);
         xmin= FFMAX(xmin, - 16     - min);
 
         max= FFMAX(s->me.direct_basis_mv[i][1], s->me.direct_basis_mv[i][1] - s->me.co_located_mv[i][1])>>shift;
         min= FFMIN(s->me.direct_basis_mv[i][1], s->me.direct_basis_mv[i][1] - s->me.co_located_mv[i][1])>>shift;
-        max+= (2*mb_y + (i>>1))*8 - 1; // +-1 is for the simpler rounding
-        min+= (2*mb_y + (i>>1))*8 + 1;
+        max+= (2*mb_y + (i>>1))*8 + 1; // +-1 is for the simpler rounding
+        min+= (2*mb_y + (i>>1))*8 - 1;
         ymax= FFMIN(ymax, s->height - max);
         ymin= FFMAX(ymin, - 16      - min);
         
@@ -1484,12 +1499,13 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
     fbmin= bidir_refine(s, mb_x, mb_y) + penalty_factor;
 //printf("%d %d %d %d\n", dmin, fmin, bmin, fbmin);
     {
-        int score= dmin;
-        type=MB_TYPE_DIRECT;
+        int score= fmin;
+        type = MB_TYPE_FORWARD;
         
-        if(fmin<score){
-            score=fmin;
-            type= MB_TYPE_FORWARD; 
+        // RAL: No MB_TYPE_DIRECT in MPEG-1 video (only MPEG-4)
+        if (s->codec_id != CODEC_ID_MPEG1VIDEO && dmin <= score){
+            score = dmin;
+            type = MB_TYPE_DIRECT;
         }
         if(bmin<score){
             score=bmin;
@@ -1634,21 +1650,32 @@ void ff_fix_long_b_mvs(MpegEncContext * s, int16_t (*mv_table)[2], int f_code, i
     int y;
     UINT8 * fcode_tab= s->fcode_tab;
 
+    // RAL: 8 in MPEG-1, 16 in MPEG-4
+    int range = (((s->codec_id == CODEC_ID_MPEG1VIDEO) ? 8 : 16) << f_code);
+
     /* clip / convert to intra 16x16 type MVs */
     for(y=0; y<s->mb_height; y++){
         int x;
         int xy= (y+1)* (s->mb_width+2)+1;
         int i= y*s->mb_width;
-        for(x=0; x<s->mb_width; x++){
-            if(   fcode_tab[mv_table[xy][0] + MAX_MV] > f_code
-               || fcode_tab[mv_table[xy][0] + MAX_MV] == 0){
-                if(mv_table[xy][0]>0) mv_table[xy][0]=  (16<<f_code)-1;
-                else                  mv_table[xy][0]= -(16<<f_code);
+        for(x=0; x<s->mb_width; x++)
+            {
+            if (s->mb_type[i] & type)    // RAL: "type" test added...
+                {
+                if (fcode_tab[mv_table[xy][0] + MAX_MV] > f_code || fcode_tab[mv_table[xy][0] + MAX_MV] == 0)
+                    {
+                    if(mv_table[xy][0]>0) 
+                        mv_table[xy][0]=  range-1;
+                    else
+                        mv_table[xy][0]= -range;
+                    }
+                if (fcode_tab[mv_table[xy][1] + MAX_MV] > f_code || fcode_tab[mv_table[xy][1] + MAX_MV] == 0)
+                    {
+                    if(mv_table[xy][1]>0) 
+                        mv_table[xy][1]=  range-1;
+                    else                  
+                        mv_table[xy][1]= -range;
             }
-            if(   fcode_tab[mv_table[xy][1] + MAX_MV] > f_code
-               || fcode_tab[mv_table[xy][1] + MAX_MV] == 0){
-                if(mv_table[xy][1]>0) mv_table[xy][1]=  (16<<f_code)-1;
-                else                  mv_table[xy][1]= -(16<<f_code);
             }
             xy++;
             i++;

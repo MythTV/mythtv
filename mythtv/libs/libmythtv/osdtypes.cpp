@@ -381,6 +381,9 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
         m_alpha = NULL;
     }
 
+    if (filename.length() < 2)
+        return;
+
     QImage tmpimage(filename);
 
     if (tmpimage.width() == 0)

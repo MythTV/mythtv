@@ -16,8 +16,8 @@ extern "C" {
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4654
-#define LIBAVCODEC_BUILD_STR   "4654"
+#define LIBAVCODEC_BUILD       4655
+#define LIBAVCODEC_BUILD_STR   "4655"
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -47,6 +47,7 @@ enum CodecID {
     CODEC_ID_MACE3,
     CODEC_ID_MACE6,
     CODEC_ID_HUFFYUV,
+    CODEC_ID_CYUV,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -531,6 +532,7 @@ typedef struct AVCodecContext {
 #define FF_BUG_QPEL_CHROMA      64
 #define FF_BUG_STD_QPEL         128
 #define FF_BUG_QPEL_CHROMA2     256
+#define FF_BUG_DIRECT_BLOCKSIZE 512
 //#define FF_BUG_FAKE_SCALABILITY 16 //autodetection should work 100%
         
     /**
@@ -1010,6 +1012,7 @@ extern AVCodec mace3_decoder;
 extern AVCodec mace6_decoder;
 extern AVCodec huffyuv_decoder;
 extern AVCodec oggvorbis_decoder;
+extern AVCodec cyuv_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
