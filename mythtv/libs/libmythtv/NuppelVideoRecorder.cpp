@@ -872,8 +872,6 @@ bool NuppelVideoRecorder::Open(void)
         usingv4l2 = false;
     }
 
-    usingv4l2 = false;
-
     if (usingv4l2)
     {
         if (vcap.card[0] == 'B' && vcap.card[1] == 'T' &&

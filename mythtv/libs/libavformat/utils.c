@@ -1067,11 +1067,12 @@ static int is_raw_stream(AVFormatContext *s)
 /**
  * gets the index for a specific timestamp.
  * @param backward if non zero then the returned index will correspond to
- *                 the timestamp which is <= the requested one, if backward is0
+ *                 the timestamp which is <= the requested one, if backward is 0
  *                 then it will be >=
  * @return < 0 if no such timestamp could be found
  */
-int av_index_search_timestamp(AVStream *st, int wanted_timestamp, int backward)
+int av_index_search_timestamp(AVStream *st, int64_t wanted_timestamp, 
+                              int backward)
 {
     AVIndexEntry *entries= st->index_entries;
     int nb_entries= st->nb_index_entries;

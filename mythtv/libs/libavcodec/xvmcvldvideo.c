@@ -181,6 +181,9 @@ void XVMC_VLD_field_end(MpegEncContext* s)
     render = (xvmc_render_state_t *)s->current_picture.data[2];
     assert(render != NULL);
 
+    XvMCFlushSurface(render->disp, render->p_surface);
+    XvMCSyncSurface(render->disp, render->p_surface);
+
     s->error_count = 0;
 }
 

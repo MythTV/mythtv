@@ -144,7 +144,7 @@ typedef struct AVOutputFormat {
     int flags;
     /* currently only used to set pixel format if not YUV420P */
     int (*set_parameters)(struct AVFormatContext *, AVFormatParameters *);
-    int (*interleave_packet)(struct AVFormatContext *, AVPacket *out, AVPacket*in, int flush);
+    int (*interleave_packet)(struct AVFormatContext *, AVPacket *out, AVPacket *in, int flush);
     /* private fields */
     struct AVOutputFormat *next;
 } AVOutputFormat;
@@ -170,10 +170,10 @@ typedef struct AVInputFormat {
        freed by this function */
     int (*read_close)(struct AVFormatContext *);
     /** 
-     * seek to a given timestamp relative to the frames in
+     * seek to a given timestamp relative to the frames in 
      * stream component stream_index
      * @param stream_index must not be -1
-     * @param flags selects which direction should be preferred if no exact
+     * @param flags selects which direction should be preferred if no exact 
      *              match is available
      */
     int (*read_seek)(struct AVFormatContext *, 
@@ -314,7 +314,7 @@ typedef struct AVFormatContext {
     /* av_seek_frame() support */
     int64_t data_offset; /* offset of the first packet */
     int index_built;
-
+    
     int mux_rate;
     int packet_size;
     int preload;
@@ -519,6 +519,9 @@ int sol_init(void);
 /* electronicarts.c */
 int ea_init(void);
 
+/* nsvdec.c */
+int nsvdec_init(void);
+
 //#include "rtp.h"
 
 //#include "rtsp.h"
@@ -533,7 +536,7 @@ AVOutputFormat *guess_stream_format(const char *short_name,
                                     const char *filename, const char *mime_type);
 AVOutputFormat *guess_format(const char *short_name, 
                              const char *filename, const char *mime_type);
-enum CodecID av_guess_codec(AVOutputFormat *fmt, const char *short_name,
+enum CodecID av_guess_codec(AVOutputFormat *fmt, const char *short_name, 
                             const char *filename, const char *mime_type, enum CodecType type);
 
 void av_hex_dump(FILE *f, uint8_t *buf, int size);
@@ -593,7 +596,7 @@ void av_set_pts_info(AVStream *s, int pts_wrap_bits,
 #define AVSEEK_FLAG_BYTE     2 ///< seeking based on position in bytes
 
 int av_find_default_stream_index(AVFormatContext *s);
-int av_index_search_timestamp(AVStream *st, int timestamp, int flags);
+int av_index_search_timestamp(AVStream *st, int64_t timestamp, int flags);
 int av_add_index_entry(AVStream *st,
                        int64_t pos, int64_t timestamp, int distance, int flags);
 int av_seek_frame_binary(AVFormatContext *s, int stream_index, int64_t target_ts, int flags);

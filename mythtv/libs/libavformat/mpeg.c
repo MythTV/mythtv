@@ -44,6 +44,8 @@ typedef struct {
     int packet_number;
     uint8_t lpcm_header[3];
     int lpcm_align;
+    uint8_t *fifo_iframe_ptr;
+    int align_iframe;
 } StreamInfo;
 
 typedef struct {
@@ -161,7 +163,7 @@ static int put_system_header(AVFormatContext *ctx, uint8_t *buf,int only_for_str
         put_bits(&pb, 1, 0); /* non constrainted bit stream */
     }
     
-    if (s->is_vcd) {
+    if (s->is_vcd || s->is_dvd) {
         /* see VCD standard p IV-7 */
         put_bits(&pb, 1, 1); /* audio locked */
         put_bits(&pb, 1, 1); /* video locked */
@@ -178,40 +180,98 @@ static int put_system_header(AVFormatContext *ctx, uint8_t *buf,int only_for_str
     } else
         put_bits(&pb, 5, s->video_bound);
 
-    put_bits(&pb, 8, 0xff); /* reserved byte */
-    
-    /* audio stream info */
-    private_stream_coded = 0;
-    for(i=0;i<ctx->nb_streams;i++) {
-        StreamInfo *stream = ctx->streams[i]->priv_data;
+    if (s->is_dvd) {
+        put_bits(&pb, 1, 0);    /* packet_rate_restriction_flag */
+        put_bits(&pb, 7, 0x7f); /* reserved byte */
+    } else
+        put_bits(&pb, 8, 0xff); /* reserved byte */
+
+    /* DVD-Video Stream_bound entries
+    id (0xB9) video, maximum P-STD for stream 0xE0. (P-STD_buffer_bound_scale = 1)
+    id (0xB8) audio, maximum P-STD for any MPEG audio (0xC0 to 0xC7) streams. If there are none set to 4096 (32x128). (P-STD_buffer_bound_scale = 0)
+    id (0xBD) private stream 1 (audio other than MPEG and subpictures). (P-STD_buffer_bound_scale = 1)
+    id (0xBF) private stream 2, NAV packs, set to 2x1024. */
+    if (s->is_dvd) {
         
-        /* For VCDs, only include the stream info for the stream
-           that the pack which contains this system belongs to.
-           (see VCD standard p. IV-7) */
-        if ( !s->is_vcd || stream->id==only_for_stream_id
-            || only_for_stream_id==0) {
+        int P_STD_max_video = 0;
+        int P_STD_max_mpeg_audio = 0;
+        int P_STD_max_mpeg_PS1 = 0;
+
+        for(i=0;i<ctx->nb_streams;i++) {
+            StreamInfo *stream = ctx->streams[i]->priv_data;
 
             id = stream->id;
-            if (id < 0xc0) {
-                /* special case for private streams (AC3 use that) */
-                if (private_stream_coded)
-                    continue;
-                private_stream_coded = 1;
-                id = 0xbd;
+            if (id == 0xbd && stream->max_buffer_size > P_STD_max_mpeg_PS1) {
+                P_STD_max_mpeg_PS1 = stream->max_buffer_size;
+            } else if (id >= 0xc0 && id <= 0xc7 && stream->max_buffer_size > P_STD_max_mpeg_audio) {
+                P_STD_max_mpeg_audio = stream->max_buffer_size;
+            } else if (id == 0xe0 && stream->max_buffer_size > P_STD_max_video) {
+                P_STD_max_video = stream->max_buffer_size;
             }
-            put_bits(&pb, 8, id); /* stream ID */
-            put_bits(&pb, 2, 3);
-            if (id < 0xe0) {
-                /* audio */
-                put_bits(&pb, 1, 0);
-                put_bits(&pb, 13, stream->max_buffer_size / 128);
-            } else {
-                /* video */
-                put_bits(&pb, 1, 1);
-                put_bits(&pb, 13, stream->max_buffer_size / 1024);
+        }
+
+        /* video */
+        put_bits(&pb, 8, 0xb9); /* stream ID */
+        put_bits(&pb, 2, 3);
+        put_bits(&pb, 1, 1);
+        put_bits(&pb, 13, P_STD_max_video / 1024);
+
+        /* audio */
+        if (P_STD_max_mpeg_audio == 0)
+            P_STD_max_mpeg_audio = 4096;
+        put_bits(&pb, 8, 0xb8); /* stream ID */
+        put_bits(&pb, 2, 3);
+        put_bits(&pb, 1, 0);
+        put_bits(&pb, 13, P_STD_max_mpeg_audio / 128);
+
+        /* private stream 1 */
+        put_bits(&pb, 8, 0xbd); /* stream ID */
+        put_bits(&pb, 2, 3);
+        put_bits(&pb, 1, 0);
+        put_bits(&pb, 13, P_STD_max_mpeg_PS1 / 128);
+
+        /* private stream 2 */
+        put_bits(&pb, 8, 0xbf); /* stream ID */
+        put_bits(&pb, 2, 3);
+        put_bits(&pb, 1, 1);
+        put_bits(&pb, 13, 2);
+    }
+    else {
+        /* audio stream info */
+        private_stream_coded = 0;
+        for(i=0;i<ctx->nb_streams;i++) {
+            StreamInfo *stream = ctx->streams[i]->priv_data;
+
+
+            /* For VCDs, only include the stream info for the stream
+            that the pack which contains this system belongs to.
+            (see VCD standard p. IV-7) */
+            if ( !s->is_vcd || stream->id==only_for_stream_id
+                || only_for_stream_id==0) {
+
+                id = stream->id;
+                if (id < 0xc0) {
+                    /* special case for private streams (AC3 use that) */
+                    if (private_stream_coded)
+                        continue;
+                    private_stream_coded = 1;
+                    id = 0xbd;
+                }
+                put_bits(&pb, 8, id); /* stream ID */
+                put_bits(&pb, 2, 3);
+                if (id < 0xe0) {
+                    /* audio */
+                    put_bits(&pb, 1, 0);
+                    put_bits(&pb, 13, stream->max_buffer_size / 128);
+                } else {
+                    /* video */
+                    put_bits(&pb, 1, 1);
+                    put_bits(&pb, 13, stream->max_buffer_size / 1024);
+                }
             }
         }
     }
+
     flush_put_bits(&pb);
     size = pbBufPtr(&pb) - pb.buf;
     /* patch packet size */
@@ -225,6 +285,10 @@ static int get_system_header_size(AVFormatContext *ctx)
 {
     int buf_index, i, private_stream_coded;
     StreamInfo *stream;
+    MpegMuxContext *s = ctx->priv_data;
+
+    if (s->is_dvd)
+       return 18; // DVD-Video system headers are 18 bytes fixed length.
 
     buf_index = 12;
     private_stream_coded = 0;
@@ -620,6 +684,55 @@ static int flush_packet(AVFormatContext *ctx, int stream_index,
                 size = put_system_header(ctx, buf_ptr, id);
                 buf_ptr += size;
             }
+        } else if (s->is_dvd) {
+            if (stream->align_iframe || s->packet_number == 0){
+                int bytes_to_iframe;
+                int PES_bytes_to_fill;
+                if (stream->fifo_iframe_ptr >= stream->fifo.rptr) {
+                    bytes_to_iframe = stream->fifo_iframe_ptr - stream->fifo.rptr;
+                } else {
+                    bytes_to_iframe = (stream->fifo.end - stream->fifo.rptr) + (stream->fifo_iframe_ptr - stream->fifo.buffer);
+                }
+                PES_bytes_to_fill = s->packet_size - size - 10;
+
+                if (pts != AV_NOPTS_VALUE) {
+                    if (dts != pts)
+                        PES_bytes_to_fill -= 5 + 5;
+                    else
+                        PES_bytes_to_fill -= 5;
+                }
+
+                if (bytes_to_iframe == 0 || s->packet_number == 0) {
+                    size = put_system_header(ctx, buf_ptr, 0);
+                    buf_ptr += size;
+                    size = buf_ptr - buffer;
+                    put_buffer(&ctx->pb, buffer, size);
+
+                    put_be32(&ctx->pb, PRIVATE_STREAM_2);
+                    put_be16(&ctx->pb, 0x03d4);         // length
+                    put_byte(&ctx->pb, 0x00);           // substream ID, 00=PCI
+                    for (i = 0; i < 979; i++)
+                        put_byte(&ctx->pb, 0x00);
+
+                    put_be32(&ctx->pb, PRIVATE_STREAM_2);
+                    put_be16(&ctx->pb, 0x03fa);         // length
+                    put_byte(&ctx->pb, 0x01);           // substream ID, 01=DSI
+                    for (i = 0; i < 1017; i++)
+                        put_byte(&ctx->pb, 0x00);
+
+                    memset(buffer, 0, 128);
+                    buf_ptr = buffer;
+                    s->packet_number++;
+                    stream->align_iframe = 0;
+                    scr += s->packet_size*90000LL / (s->mux_rate*50LL); //FIXME rounding and first few bytes of each packet
+                    size = put_pack_header(ctx, buf_ptr, scr);
+                    s->last_scr= scr;
+                    buf_ptr += size;
+                    /* GOP Start */
+                } else if (bytes_to_iframe < PES_bytes_to_fill) {
+                    pad_packet_bytes = PES_bytes_to_fill - bytes_to_iframe;
+                }
+            }
         } else {
             if ((s->packet_number % s->system_header_freq) == 0) {
                 size = put_system_header(ctx, buf_ptr, 0);
@@ -697,10 +810,26 @@ static int flush_packet(AVFormatContext *ctx, int stream_index,
                 timestamp_len += s->is_mpeg2 ? 5 : 4;
             pts=dts= AV_NOPTS_VALUE;
             header_len -= timestamp_len;
-            payload_size += timestamp_len;
+            if (s->is_dvd && stream->align_iframe) {
+                pad_packet_bytes += timestamp_len;
+                packet_size -= timestamp_len;
+            } else {
+                payload_size += timestamp_len;
+            }
             stuffing_size += timestamp_len;
             if(payload_size > trailer_size)
                 stuffing_size += payload_size - trailer_size;
+        }
+
+        if (pad_packet_bytes > 0 && pad_packet_bytes <= 7) { // can't use padding, so use stuffing
+            packet_size += pad_packet_bytes;
+            payload_size += pad_packet_bytes; // undo the previous adjustment
+            if (stuffing_size < 0) {
+                stuffing_size = pad_packet_bytes;
+            } else {
+                stuffing_size += pad_packet_bytes;
+            }
+            pad_packet_bytes = 0;
         }
 
         if (stuffing_size < 0)
@@ -1024,7 +1153,8 @@ static int mpeg_mux_write_packet(AVFormatContext *ctx, AVPacket *pkt)
     int64_t pts, dts;
     PacketDesc *pkt_desc;
     const int preload= av_rescale(ctx->preload, 90000, AV_TIME_BASE);
-    
+    const int is_iframe = st->codec.codec_type == CODEC_TYPE_VIDEO && (pkt->flags & PKT_FLAG_KEY);   
+
     pts= pkt->pts;
     dts= pkt->dts;
 
@@ -1046,6 +1176,16 @@ static int mpeg_mux_write_packet(AVFormatContext *ctx, AVPacket *pkt)
         av_log(ctx, AV_LOG_ERROR, "fifo overflow\n");
         return -1;
     }
+
+    if (s->is_dvd){
+        if (is_iframe) {
+            stream->fifo_iframe_ptr = stream->fifo.wptr;
+            stream->align_iframe = 1;
+        } else {
+            stream->align_iframe = 0;
+        }
+    }
+
     fifo_write(&stream->fifo, buf, size, &stream->fifo.wptr);
 
     for(;;){
@@ -1093,7 +1233,7 @@ static int mpeg_mux_end(AVFormatContext *ctx)
 static int mpegps_probe(AVProbeData *p)
 {
     int i;
-    int size= FFMIN(120, p->buf_size);
+    int size= FFMIN(256, p->buf_size);
     uint32_t code=0xFF;
 
     /* we search the first start code. If it is a packet start code,

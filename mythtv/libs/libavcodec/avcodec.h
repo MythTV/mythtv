@@ -17,7 +17,7 @@ extern "C" {
 
 #define FFMPEG_VERSION_INT     0x000409
 #define FFMPEG_VERSION         "0.4.9-pre1"
-#define LIBAVCODEC_BUILD       4732
+#define LIBAVCODEC_BUILD       4734
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -39,10 +39,6 @@ enum CodecID {
     CODEC_ID_H263,
     CODEC_ID_RV10,
     CODEC_ID_RV20,
-    CODEC_ID_MP2,
-    CODEC_ID_MP3, /* prefered ID for MPEG Audio layer 1, 2 or3 decoding */
-    CODEC_ID_VORBIS,
-    CODEC_ID_AC3,
     CODEC_ID_MJPEG,
     CODEC_ID_MJPEGB,
     CODEC_ID_LJPEG,
@@ -60,19 +56,12 @@ enum CodecID {
     CODEC_ID_SVQ1,
     CODEC_ID_SVQ3,
     CODEC_ID_DVVIDEO,
-    CODEC_ID_DVAUDIO,
-    CODEC_ID_WMAV1,
-    CODEC_ID_WMAV2,
-    CODEC_ID_MACE3,
-    CODEC_ID_MACE6,
     CODEC_ID_HUFFYUV,
     CODEC_ID_CYUV,
     CODEC_ID_H264,
     CODEC_ID_INDEO3,
     CODEC_ID_VP3,
     CODEC_ID_THEORA,
-    CODEC_ID_AAC,
-    CODEC_ID_MPEG4AAC,
     CODEC_ID_ASV1,
     CODEC_ID_ASV2,
     CODEC_ID_FFV1,
@@ -95,11 +84,8 @@ enum CodecID {
     CODEC_ID_FLIC,
     CODEC_ID_TRUEMOTION1,
     CODEC_ID_VMDVIDEO,
-    CODEC_ID_VMDAUDIO,
     CODEC_ID_MSZH,
     CODEC_ID_ZLIB,
-    CODEC_ID_SONIC,
-    CODEC_ID_SONIC_LS,
     CODEC_ID_QTRLE,
     CODEC_ID_SNOW,
     CODEC_ID_TSCC,
@@ -107,9 +93,17 @@ enum CodecID {
     CODEC_ID_QDRAW,
     CODEC_ID_VIXL,
     CODEC_ID_QPEG,
+    CODEC_ID_XVID,
+    CODEC_ID_PNG,
+    CODEC_ID_PPM,
+    CODEC_ID_PBM,
+    CODEC_ID_PGM,
+    CODEC_ID_PGMYUV,
+    CODEC_ID_PAM,
+    CODEC_ID_FFVHUFF,
 
     /* various pcm "codecs" */
-    CODEC_ID_PCM_S16LE,
+    CODEC_ID_PCM_S16LE= 0x10000,
     CODEC_ID_PCM_S16BE,
     CODEC_ID_PCM_U16LE,
     CODEC_ID_PCM_U16BE,
@@ -119,7 +113,7 @@ enum CodecID {
     CODEC_ID_PCM_ALAW,
 
     /* various adpcm codecs */
-    CODEC_ID_ADPCM_IMA_QT,
+    CODEC_ID_ADPCM_IMA_QT= 0x11000,
     CODEC_ID_ADPCM_IMA_WAV,
     CODEC_ID_ADPCM_IMA_DK3,
     CODEC_ID_ADPCM_IMA_DK4,
@@ -133,34 +127,39 @@ enum CodecID {
     CODEC_ID_ADPCM_G726,
     CODEC_ID_ADPCM_CT,
 
-	/* AMR */
-    CODEC_ID_AMR_NB,
+    /* AMR */
+    CODEC_ID_AMR_NB= 0x12000,
     CODEC_ID_AMR_WB,
 
     /* RealAudio codecs*/
-    CODEC_ID_RA_144,
+    CODEC_ID_RA_144= 0x13000,
     CODEC_ID_RA_288,
 
     /* various DPCM codecs */
-    CODEC_ID_ROQ_DPCM,
+    CODEC_ID_ROQ_DPCM= 0x14000,
     CODEC_ID_INTERPLAY_DPCM,
     CODEC_ID_XAN_DPCM,
     CODEC_ID_SOL_DPCM,
     
+    CODEC_ID_MP2= 0x15000,
+    CODEC_ID_MP3, /* prefered ID for MPEG Audio layer 1, 2 or3 decoding */
+    CODEC_ID_AAC,
+    CODEC_ID_MPEG4AAC,
+    CODEC_ID_AC3,
+    CODEC_ID_DTS,
+    CODEC_ID_VORBIS,
+    CODEC_ID_DVAUDIO,
+    CODEC_ID_WMAV1,
+    CODEC_ID_WMAV2,
+    CODEC_ID_MACE3,
+    CODEC_ID_MACE6,
+    CODEC_ID_VMDAUDIO,
+    CODEC_ID_SONIC,
+    CODEC_ID_SONIC_LS,
     CODEC_ID_FLAC,
     
-    CODEC_ID_MPEG2TS, /* _FAKE_ codec to indicate a raw MPEG2 transport
+    CODEC_ID_MPEG2TS= 0x20000, /* _FAKE_ codec to indicate a raw MPEG2 transport
                          stream (only used by libavformat) */
-
-    CODEC_ID_DTS,
-    CODEC_ID_XVID,
-
-    CODEC_ID_PNG,    
-    CODEC_ID_PPM,
-    CODEC_ID_PBM,
-    CODEC_ID_PGM,
-    CODEC_ID_PGMYUV,
-    CODEC_ID_PAM,
 };
 
 /* CODEC_ID_MP3LAME is absolete */
@@ -1827,6 +1826,7 @@ extern AVCodec msmpeg4v3_encoder;
 extern AVCodec wmv1_encoder;
 extern AVCodec wmv2_encoder;
 extern AVCodec huffyuv_encoder;
+extern AVCodec ffvhuff_encoder;
 extern AVCodec h264_encoder;
 extern AVCodec asv1_encoder;
 extern AVCodec asv2_encoder;
@@ -1851,7 +1851,6 @@ extern AVCodec mpeg1video_decoder;
 extern AVCodec mpeg2video_decoder;
 extern AVCodec mpegvideo_decoder;
 extern AVCodec mpeg_xvmc_decoder;
-extern AVCodec mpeg_xvmc_vld_decoder;
 extern AVCodec h263i_decoder;
 extern AVCodec flv_decoder;
 extern AVCodec rv10_decoder;
@@ -1870,6 +1869,7 @@ extern AVCodec mp3_decoder;
 extern AVCodec mace3_decoder;
 extern AVCodec mace6_decoder;
 extern AVCodec huffyuv_decoder;
+extern AVCodec ffvhuff_decoder;
 extern AVCodec oggvorbis_decoder;
 extern AVCodec cyuv_decoder;
 extern AVCodec h264_decoder;
@@ -2210,6 +2210,7 @@ void *av_fast_realloc(void *ptr, unsigned int *size, unsigned int min_size);
 /* call av_free_static to release all staticaly allocated tables */
 void av_free_static(void);
 void *av_mallocz_static(unsigned int size);
+void *av_realloc_static(void *ptr, unsigned int size);
 
 /* add by bero : in adx.c */
 int is_adx(const unsigned char *buf,size_t bufsize);
