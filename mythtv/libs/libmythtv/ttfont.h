@@ -39,6 +39,8 @@ typedef struct _efont
      int                 max_ascent;
      int                 ascent;
      int                 descent;
+
+     int                 fontsize;
   }
 Efont;
 

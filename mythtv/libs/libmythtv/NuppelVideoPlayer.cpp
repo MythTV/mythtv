@@ -43,6 +43,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
 
     ringBuffer = NULL;
     weMadeBuffer = false;
+
+    osd = NULL;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -53,6 +55,8 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
         delete rtjd;
     if (weMadeBuffer)
         delete ringBuffer;
+    if (osd)
+        delete osd;
 }
 
 void NuppelVideoPlayer::InitSound(void)
@@ -618,7 +622,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                           "NuppelVideo");
     videobuf3 = new unsigned char[videosize];
 
-    InitializeOSD(video_width, video_height);
+    osd = new OSD(video_width, video_height, osdfilename);
 
     playing = true;
     killplayer = false;
@@ -747,7 +751,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         {
             if (deinterlace)
                 linearBlendYUV420(videobuf3, video_width, video_height);
-	    DisplayOSD(videobuf3);
+	    osd->Display(videobuf3);
             memcpy(X11videobuf, videobuf3, video_width * video_height);
             memcpy(X11videobuf + video_width * video_height, videobuf3 +
                    video_width * video_height * 5 / 4, video_width * 
@@ -982,10 +986,10 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
 
 void NuppelVideoPlayer::SetInfoText(char *text, int secs)
 {
-    SetOSDInfoText(text, (int)(secs * ceil(video_frame_rate)));
+    osd->SetInfoText(text, (int)(secs * ceil(video_frame_rate)));
 }
 
 void NuppelVideoPlayer::SetChannelText(char *text, int secs)
 {
-    SetOSDChannumText(text, (int)(secs * ceil(video_frame_rate)));
+    osd->SetChannumText(text, (int)(secs * ceil(video_frame_rate)));
 }

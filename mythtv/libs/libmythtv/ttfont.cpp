@@ -296,16 +296,15 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
 
    for (y = 0; y < height; y++)
      {
-	ptr = (unsigned char *)rmap->bitmap + offset_x + ((y + offset_y) * rmap->cols);
+	ptr = (unsigned char *)rmap->bitmap + offset_x + 
+              ((y + offset_y) * rmap->cols);
 	for (x = 0; x < width; x++)
 	  {
 	     if ((a = alpha_lut[*ptr]) > 0)
 	       {
 		  src = yuv + (y + ystart) * video_width + (x + xstart);
-		  //if (a == 255)
+		  if (*src < a)
                       *src = a;
-		  //else
-                  //    *src = ((*src * a) >> 8) + *src; 
 	       }
 	     ptr++;
 	  }
@@ -339,10 +338,10 @@ EFont_draw_string(unsigned char *yuvptr, int x, int y, char *text,
 
    is_pixmap = 1;
 
-   y += 20;
+   y += font->fontsize;
    
    width = maxx;
-   height = maxy - 20;
+   height = maxy - font->fontsize;
 
    clipx = 0;
    clipy = 0;
@@ -434,6 +433,7 @@ Efont_load(char *file, int size)
      }
    have_engine++;
    f = (Efont *)malloc(sizeof(Efont));
+   f->fontsize = size;
    f->engine = engine;
    error = TT_Open_Face(f->engine, file, &f->face);
    if (error)

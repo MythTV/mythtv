@@ -17,12 +17,16 @@ int LumaFilter=0
 int ChromaFilter=0
 # Quality level for the MP3 compression (0 best - 9 worst)
 int MP3Quality=7
+# V4L device
+str V4LDevice=/dev/video
 
 # Playback options
 # Deinterlace playback (1 for on, 0 for no) -- adds to CPU usage
 int Deinterlace=1
 # How long should the OSD stay up for in seconds?
 int OSDDisplayTime=3
+# Path to the TTF 
+str OSDFont=/usr/share/fonts/truetype/Arial.ttf
 
 # TV options
 str TVFormat=NTSC

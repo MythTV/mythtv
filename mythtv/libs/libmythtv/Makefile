@@ -23,7 +23,7 @@ NUVLIBS = `libNuppelVideo/nuppelvideo-config --libs`
 
 all: libNuppelVideo.a examples tv 
 
-TVOBJ = tv.o settings.o channel.o frequencies.o
+TVOBJ = main.o tv.o settings.o channel.o frequencies.o
 TVLDF = -LlibNuppelVideo/ -lNuppelVideo $(NUVLIBS)
 
 libNuppelVideo.a:

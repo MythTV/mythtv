@@ -16,6 +16,7 @@
 #include "RTjpegN.h"
 #include "format.h"
 #include "RingBuffer.h"
+#include "osd.h"
 
 using namespace std;
 
@@ -58,6 +59,8 @@ class NuppelVideoPlayer
 
     void SetRecorder(NuppelVideoRecorder *nvcr) { nvr = nvcr; }
 
+    void SetOSDFontName(char *filename) { osdfilename = filename; }
+    
     void SetInfoText(char *text, int secs);
     void SetChannelText(char *text, int secs);
     
@@ -147,6 +150,9 @@ class NuppelVideoPlayer
 
     bool resetplaying;
     bool actuallyreset;
+
+    string osdfilename;
+    OSD *osd;
 };
 
 #endif
