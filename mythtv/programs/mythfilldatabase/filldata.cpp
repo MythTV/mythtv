@@ -280,14 +280,29 @@ void DataDirectStationUpdate(Source source)
     }
 
     // Now, update the data for channels which do exist
-    querystr = QString("UPDATE channel,dd_v_station "
-                       "SET channel.callsign = dd_v_station.callsign , "
-                       "channel.name = dd_v_station.stationname "
-                       "WHERE ( (channel.xmltvid = dd_v_station.stationid) "
-                       "AND (channel.sourceid = \"%1\"));").arg(source.id);
 
-    if (!query.exec(querystr))
-        MythContext::DBError("Updating channel table", query);
+    QSqlQuery dd_station_info("SELECT callsign, stationname, stationid"
+            " FROM dd_v_station;");
+
+    if (dd_station_info.first())
+    {
+        QSqlQuery dd_update;
+        dd_update.prepare("UPDATE channel SET callsign = :CALLSIGN,"
+                " name = :NAME WHERE xmltvid = :STATIONID"
+                " AND sourceid = :SOURCEID;");
+        do
+        {
+            dd_update.bindValue(":CALLSIGN", dd_station_info.value(0));
+            dd_update.bindValue(":NAME", dd_station_info.value(1));
+            dd_update.bindValue(":STATIONID", dd_station_info.value(2));
+            dd_update.bindValue(":SOURCEID", source.id);
+            if (!dd_update.exec())
+            {
+                MythContext::DBError("Updating channel table",
+                        dd_update.lastQuery());
+            }
+        } while (dd_station_info.next());
+    }
 
     // Now, delete any channels which no longer exist
     // (Not currently done in standard program -- need to verify if required)

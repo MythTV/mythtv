@@ -44,18 +44,70 @@ bool setupTVs(bool ismaster)
         // Hack to make sure record.station gets set if the user
         // downgrades to a prior version and creates new entries
         // without it.
-        query.exec("UPDATE channel SET callsign=chanid "
-                   "WHERE callsign IS NULL OR callsign='';");
-        query.exec("UPDATE record,channel "
-                   "SET record.station=channel.callsign "
-                   "WHERE record.station='' "
-                   "AND record.chanid=channel.chanid;");
-        query.exec("UPDATE recordoverride,channel "
-                   "SET recordoverride.station=channel.callsign, "
-                   "    recordoverride.starttime=recordoverride.starttime, "
-                   "    recordoverride.endtime=recordoverride.endtime "
-                   "WHERE recordoverride.station='' "
-                   "AND recordoverride.chanid=channel.chanid;");
+        if (!query.exec("UPDATE channel SET callsign=chanid "
+                        "WHERE callsign IS NULL OR callsign='';"))
+            MythContext::DBError("Updating channel callsign",
+                                 query.lastQuery());
+
+        if (query.exec("SELECT MIN(chanid) FROM channel;"))
+        {
+            query.first();
+            int min_chanid = query.value(0).toInt();
+            if (!query.exec(QString("UPDATE record SET chanid = %1 "
+                                    "WHERE chanid IS NULL;").arg(min_chanid)))
+                MythContext::DBError("Updating record chanid",
+                                     query.lastQuery());
+        }
+        else
+            MythContext::DBError("Querying minimum chanid",
+                                 query.lastQuery());
+
+        QSqlQuery records_without_station("SELECT record.chanid,"
+                " channel.callsign FROM record LEFT JOIN channel"
+                " ON record.chanid = channel.chanid WHERE record.station='';");
+        if (records_without_station.first())
+        {
+            QSqlQuery update_record;
+            update_record.prepare("UPDATE record SET station = :CALLSIGN"
+                    " WHERE chanid = :CHANID;");
+            do
+            {
+                update_record.bindValue(":CALLSIGN",
+                        records_without_station.value(1));
+                update_record.bindValue(":CHANID",
+                        records_without_station.value(0));
+                if (!update_record.exec())
+                {
+                    MythContext::DBError("Updating record station",
+                            update_record.lastQuery());
+                }
+            } while (records_without_station.next());
+        }
+
+        QSqlQuery overrides_without_station("SELECT recordoverride.recordid,"
+                " channel.callsign FROM recordoverride LEFT JOIN channel"
+                " ON recordoverride.chanid = channel.chanid"
+                " WHERE recordoverride.station='';");
+        if (overrides_without_station.first())
+        {
+            QSqlQuery update_override;
+            update_override.prepare("UPDATE recordoverride"
+                    " SET station = :CALLSIGN,"
+                    " starttime=starttime, endtime=endtime"
+                    " WHERE recordid = :RECORDID;");
+            do
+            {
+                update_override.bindValue(":CALLSIGN",
+                        overrides_without_station.value(1));
+                update_override.bindValue(":RECORDID",
+                        overrides_without_station.value(0));
+                if (!update_override.exec())
+                {
+                    MythContext::DBError("Updating recordoverride station",
+                            update_override.lastQuery());
+                }
+            } while (overrides_without_station.next());
+        }
     }
 
     query.exec("SELECT cardid,hostname FROM capturecard ORDER BY cardid;");
