@@ -188,6 +188,15 @@ void TV::StartRecording(RecordingInfo *rcinfo)
     }  
 }
 
+void TV::StopRecording(void)
+{
+    if (StateIsRecording(internalState))
+    {
+        nextState = RemoveRecording(internalState);
+        changeState = true;
+    }
+}
+
 void TV::Playback(RecordingInfo *rcinfo)
 {
     if (internalState == kState_None || internalState == kState_RecordingOnly)

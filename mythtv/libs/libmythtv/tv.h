@@ -33,7 +33,10 @@ class TV
    ~TV(void);
 
     void LiveTV(void);
+
     void StartRecording(RecordingInfo *rcinfo);
+    void StopRecording(void);
+
     void Playback(RecordingInfo *rcinfo);
 
     bool IsRunning(void) { return runMainLoop; }
@@ -43,6 +46,7 @@ class TV
 
     bool CheckChannel(int channum); 
 
+    string GetFilePrefix() { return settings->GetSetting("RecordFilePrefix"); }
  protected:
     void doLoadMenu(void);
     static void *MenuHandler(void *param);

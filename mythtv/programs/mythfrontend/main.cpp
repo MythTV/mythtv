@@ -10,6 +10,7 @@
 #include "infostructs.h"
 #include "recordinginfo.h"
 #include "playbackbox.h"
+#include "deletebox.h"
 
 int startGuide(int startchannel)
 {
@@ -29,6 +30,18 @@ int startPlayback(TV *tv)
     pbb.Show();
 
     pbb.exec();
+
+    return 0;
+}
+
+int startDelete(TV *tv, QString prefix)
+{
+    QSqlDatabase *db = QSqlDatabase::database();
+    DeleteBox delbox(prefix, tv, db);
+   
+    delbox.Show();
+    
+    delbox.exec();
 
     return 0;
 }
@@ -158,6 +171,9 @@ int main(int argc, char **argv)
     }
 
     TV *tv = new TV("3");
+
+    string recprefix = tv->GetFilePrefix();
+    QString prefix = recprefix.c_str();
  
     pthread_t scthread;
     pthread_create(&scthread, NULL, runScheduler, tv);
@@ -168,8 +184,8 @@ int main(int argc, char **argv)
 
         diag->AddButton("Watch TV");
         diag->AddButton("Schedule a Recording");
-        diag->AddButton("Manage Scheduled Recordings");
         diag->AddButton("Watch a Previously Recorded Program");  
+        diag->AddButton("Delete Recordings");
  
         diag->Show();
         int result = diag->exec();
@@ -178,7 +194,8 @@ int main(int argc, char **argv)
         {
             case 0: startTV(tv); break;
             case 1: startGuide(3); break;
-            case 3: startPlayback(tv); break;
+            case 2: startPlayback(tv); break;
+            case 3: startDelete(tv, prefix); break;
             default: break;
         }
     }

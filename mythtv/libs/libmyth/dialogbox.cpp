@@ -6,7 +6,7 @@
 
 #include "dialogbox.h"
 
-DialogBox::DialogBox(const char *text, QWidget *parent = 0, 
+DialogBox::DialogBox(const QString &text, QWidget *parent = 0, 
                      const char *name = 0)
          : QDialog(parent, name)
 {
@@ -29,7 +29,7 @@ DialogBox::DialogBox(const char *text, QWidget *parent = 0,
     connect(buttongroup, SIGNAL(clicked(int)), this, SLOT(buttonPressed(int)));
 }
 
-void DialogBox::AddButton(const char *title)
+void DialogBox::AddButton(const QString &title)
 {
     QPushButton *button = new QPushButton(title, this);
     buttongroup->insert(button);

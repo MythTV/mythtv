@@ -6,14 +6,15 @@
 
 class QVBoxLayout;
 class QButtonGroup;
+class QString;
 
 class DialogBox : public QDialog
 {
     Q_OBJECT
   public:
-    DialogBox(const char *text, QWidget *parent = 0, const char *name = 0);
+    DialogBox(const QString &text, QWidget *parent = 0, const char *name = 0);
 
-    void AddButton(const char *title);
+    void AddButton(const QString &title);
     void Show();
 
   protected slots:
