@@ -34,6 +34,9 @@ class Metadata
                 tracknum = other.tracknum;
                 length = other.length;
                 id = other.id;
+                rating = other.rating;
+                lastplay = other.lastplay;
+                playcount = other.playcount;
             }
 
    ~Metadata() {}
@@ -65,10 +68,22 @@ class Metadata
     QString Filename() const { return filename; }
     void setFilename(QString &lfilename) { filename = lfilename; }
 
+    int Rating() { return rating; }
+    void decRating(QSqlDatabase *db);
+    void incRating(QSqlDatabase *db);
+
+    double LastPlay();
+    void setLastPlay(QSqlDatabase *db);
+
+    int PlayCount() { return playcount; }
+    void incPlayCount(QSqlDatabase *db);
+
     bool isInDatabase(QSqlDatabase *db);
     void dumpToDatabase(QSqlDatabase *db);
 
-    void setField(QString field, QString data);
+    void setFieldDB(QSqlDatabase *db, const QString &field, 
+                    const QString &data);
+    void setField(const QString &field, const QString &data);
     void fillData(QSqlDatabase *db);
     void fillDataFromID(QSqlDatabase *db);
 
@@ -80,6 +95,9 @@ class Metadata
     int year;
     int tracknum;
     int length;
+    int rating;
+    QString lastplay;
+    int playcount;
 
     unsigned int id;
     

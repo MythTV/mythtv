@@ -1,7 +1,10 @@
 #include <qsqldatabase.h>
 #include <qregexp.h>
+#include <qdatetime.h>
 
 #include "metadata.h"
+
+#include <mythtv/mythcontext.h>
 
 bool operator==(const Metadata& a, const Metadata& b)
 {
@@ -25,8 +28,9 @@ bool Metadata::isInDatabase(QSqlDatabase *db)
     sqlfilename.replace(QRegExp("\""), QString("\\\""));
 
     QString thequery = QString("SELECT artist,album,title,genre,year,tracknum,"
-                               "length,intid FROM musicmetadata WHERE "
-                               "filename = \"%1\";").arg(sqlfilename);
+                               "length,intid,rating,playcount,lastplay FROM "
+                               "musicmetadata WHERE filename = \"%1\";")
+                               .arg(sqlfilename);
 
     QSqlQuery query = db->exec(thequery);
 
@@ -42,6 +46,9 @@ bool Metadata::isInDatabase(QSqlDatabase *db)
         tracknum = query.value(5).toInt();
         length = query.value(6).toInt();
         id = query.value(7).toUInt();
+        rating = query.value(8).toInt();
+        playcount = query.value(9).toInt();
+        lastplay = query.value(10).toString();
 
         retval = true;
     }
@@ -80,7 +87,7 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
     fillData(db);
 }
 
-void Metadata::setField(QString field, QString data)
+void Metadata::setField(const QString &field, const QString &data)
 {
     if (field == "artist")
         artist = data;
@@ -109,8 +116,8 @@ void Metadata::fillData(QSqlDatabase *db)
     sqltitle.replace(QRegExp("\""), QString("\\\""));
 
     QString thequery = "SELECT artist,album,title,genre,year,tracknum,length,"
-                       "filename,intid FROM musicmetadata WHERE title=\"" + 
-                       sqltitle + "\"";
+                       "filename,intid,rating,playcount,lastplay FROM "
+                       "musicmetadata WHERE title=\"" + sqltitle + "\"";
 
     if (album != "")
     {
@@ -142,6 +149,9 @@ void Metadata::fillData(QSqlDatabase *db)
         length = query.value(6).toInt();
         filename = query.value(7).toString();
         id = query.value(8).toUInt();
+        rating = query.value(9).toInt();
+        playcount = query.value(10).toInt();
+        lastplay = query.value(11).toString();
     }
 }
 
@@ -152,8 +162,8 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
         
     QString thequery;
     thequery = QString("SELECT title,artist,album,title,genre,year,tracknum,"
-                       "length,filename FROM musicmetadata WHERE intid=%1;")
-                      .arg(id);
+                       "length,filename,rating,playcount,lastplay FROM "
+                       "musicmetadata WHERE intid=%1;").arg(id);
         
     QSqlQuery query = db->exec(thequery);
 
@@ -170,6 +180,65 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
         tracknum = query.value(6).toInt();
         length = query.value(7).toInt();
         filename = query.value(8).toString();
+        rating = query.value(9).toInt();
+        playcount = query.value(10).toInt();
+        lastplay = query.value(11).toString();
     }
 }
 
+void Metadata::decRating(QSqlDatabase *db)
+{
+    if (rating > 0)
+    {
+        rating--;
+        setFieldDB(db, "rating", QString::number(rating));
+    }
+}
+
+void Metadata::incRating(QSqlDatabase *db)
+{
+    if (rating < 10)
+    {
+        rating++;
+        setFieldDB(db, "rating", QString::number(rating));
+    }
+}
+
+double Metadata::LastPlay()
+{
+    QDateTime lTime = QDateTime::fromString(lastplay, Qt::ISODate);
+    double lastDateTime = lTime.toString("yyyyMMddhhmmss").toDouble();
+    return lastDateTime;
+}
+
+void Metadata::setLastPlay(QSqlDatabase *db)
+{
+    QDateTime cTime = QDateTime::currentDateTime();
+    double currentDateTime = cTime.toString("yyyyMMddhhmmss").toDouble();
+    lastplay = QString::number(currentDateTime);
+    setFieldDB(db, "lastplay", lastplay);
+}
+
+void Metadata::incPlayCount(QSqlDatabase *db)
+{
+    if (playcount < 50)
+    {
+        playcount++;
+
+        setFieldDB(db, "playcount", QString::number(playcount));
+    }
+}
+
+void Metadata::setFieldDB(QSqlDatabase *db, const QString &field, 
+                          const QString &data)
+{
+    QString sqldata = data;
+    sqldata.replace(QRegExp("\""), QString("\\\""));
+
+    QString thequery = QString("UPDATE musicmetadata SET %1=\"%2\" WHERE "
+                               "intid=%3;").arg(field).arg(sqldata).arg(id);
+    QSqlQuery query = db->exec(thequery);
+
+    if (!query.isActive())
+        MythContext::DBError("musicmetadata update", thequery);
+}

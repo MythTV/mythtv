@@ -10,6 +10,9 @@ CREATE TABLE musicmetadata
     tracknum INT UNSIGNED NOT NULL,
     length INT UNSIGNED NOT NULL,
     filename TEXT NOT NULL,
+    rating INT UNSIGNED NOT NULL DEFAULT 5,
+    lastplay TIMESTAMP NOT NULL;
+    playcount INT UNSIGNED NOT NULL DEFAULT 0;
     INDEX (artist),
     INDEX (album),
     INDEX (title),

@@ -13,6 +13,7 @@
 #include <qstyle.h>
 #include <qimage.h>
 #include <qheader.h>
+#include <stdlib.h>
 
 #include <iostream>
 using namespace std;
@@ -38,6 +39,8 @@ using namespace std;
 #include "res/prevfile.xpm"
 #include "res/prev.xpm"
 #include "res/stop.xpm"
+#include "res/rateup.xpm"
+#include "res/ratedn.xpm"
 
 PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
                          QWidget *parent, const char *name)
@@ -125,6 +128,23 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     nextfileb->setIconSet(scalePixmap((const char **)nextfile_pix));
     connect(nextfileb, SIGNAL(clicked()), this, SLOT(next()));    
 
+    showrating = gContext->GetNumSetting("MusicShowRatings", 0);
+
+    MythToolButton *rateup = NULL, *ratedn = NULL;
+
+    if (showrating)
+    {    
+        rateup = new MythToolButton(this);
+        rateup->setAutoRaise(true);
+        rateup->setIconSet(scalePixmap((const char **)rateup_pix));
+        connect(rateup, SIGNAL(clicked()), this, SLOT(increaseRating()));
+
+        ratedn = new MythToolButton(this);
+        ratedn->setAutoRaise(true);
+        ratedn->setIconSet(scalePixmap((const char **)ratedn_pix));
+        connect(ratedn, SIGNAL(clicked()), this, SLOT(decreaseRating()));
+    }
+
     controlbox->addWidget(prevfileb);
     controlbox->addWidget(prevb);
     controlbox->addWidget(pauseb);
@@ -132,6 +152,12 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     controlbox->addWidget(stopb);
     controlbox->addWidget(nextb);
     controlbox->addWidget(nextfileb);
+
+    if (showrating)
+    {
+        controlbox->addWidget(rateup);
+        controlbox->addWidget(ratedn);
+    }
 
     QHBoxLayout *secondcontrol = new QHBoxLayout(vbox2, (int)(2 * wmult));
 
@@ -166,8 +192,8 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     secondcontrol->addWidget(vis);
     connect(vis, SIGNAL(clicked()), this, SLOT(visEnable()));
 
-    keyboard_accelerator_flag = gContext->GetSetting("KeyboardAccelerators").lower();
-    if(keyboard_accelerator_flag == "true")
+    keyboard_accelerator_flag = gContext->GetNumSetting("KeyboardAccelerators");
+    if(keyboard_accelerator_flag)
     {
         // There may be a better key press
         // mapping, but I have a pretty
@@ -188,7 +214,15 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
         nextb->setFocusPolicy( QWidget::NoFocus);
         nextfileb->setAccel(Key_Down);
         nextfileb->setFocusPolicy( QWidget::NoFocus);
-		
+
+        if (showrating)
+        {
+            rateup->setAccel(Key_U);
+            rateup->setFocusPolicy( QWidget::NoFocus);
+            ratedn->setAccel(Key_D);
+            ratedn->setFocusPolicy( QWidget::NoFocus);	
+        }
+	
         randomize->setAccel(Key_1);
         randomize->setFocusPolicy( QWidget::NoFocus);
         repeat->setAccel(Key_2);
@@ -199,8 +233,12 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
         vis->setFocusPolicy( QWidget::NoFocus);
     }
 
+    showrating = gContext->GetNumSetting("MusicShowRatings", 0);
+
     playview = new MythListView(this);
     playview->addColumn("#");
+    if (showrating)
+        playview->addColumn("Rating");
     playview->addColumn("Artist");  
     playview->addColumn("Title");
     playview->addColumn("Length");
@@ -208,16 +246,34 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     playview->setFocusPolicy(NoFocus);
 
-    playview->setColumnWidth(0, (int)(50 * wmult));
-    playview->setColumnWidth(1, (int)(210 * wmult));
-    playview->setColumnWidth(2, (int)(385 * wmult));
-    playview->setColumnWidth(3, (int)(90 * wmult));
-    playview->setColumnWidthMode(0, QListView::Manual);
-    playview->setColumnWidthMode(1, QListView::Manual);
-    playview->setColumnWidthMode(2, QListView::Manual);
-    playview->setColumnWidthMode(3, QListView::Manual);
+    if (showrating)
+    {
+        playview->setColumnWidth(0, (int)(50 * wmult));
+        playview->setColumnWidth(1, (int)(60 * wmult));
+        playview->setColumnWidth(2, (int)(195 * wmult));
+        playview->setColumnWidth(3, (int)(355 * wmult));
+        playview->setColumnWidth(4, (int)(80 * wmult));
+        playview->setColumnWidthMode(0, QListView::Manual);
+        playview->setColumnWidthMode(1, QListView::Manual);
+        playview->setColumnWidthMode(2, QListView::Manual);
+        playview->setColumnWidthMode(3, QListView::Manual);
+        playview->setColumnWidthMode(4, QListView::Manual);
 
-    playview->setColumnAlignment(3, Qt::AlignRight);
+        playview->setColumnAlignment(4, Qt::AlignRight);
+    }
+    else
+    {
+        playview->setColumnWidth(0, (int)(50 * wmult));
+        playview->setColumnWidth(1, (int)(210 * wmult));
+        playview->setColumnWidth(2, (int)(385 * wmult));
+        playview->setColumnWidth(3, (int)(90 * wmult));
+        playview->setColumnWidthMode(0, QListView::Manual);
+        playview->setColumnWidthMode(1, QListView::Manual);
+        playview->setColumnWidthMode(2, QListView::Manual);
+        playview->setColumnWidthMode(3, QListView::Manual);
+
+        playview->setColumnAlignment(3, Qt::AlignRight);
+    }
 
     playview->setSorting(-1);
     playview->setAllColumnsShowFocus(true);
@@ -229,7 +285,7 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     vbox->addWidget(playview, 1);
 
-    if(keyboard_accelerator_flag.lower() != "true")
+    if (!keyboard_accelerator_flag)
     {
         playb->setFocus();
     }
@@ -237,7 +293,7 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     input = 0; decoder = 0; seeking = false; remainingTime = false;
     output = 0; outputBufferSize = 256;
 
-    shufflemode = false;
+    shufflemode = 0;
     repeatmode = false;  
 
     curMeta = Metadata("dummy.music");
@@ -245,6 +301,11 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     QString playmode = gContext->GetSetting("PlayMode");
     if (playmode.lower() == "random")
         toggleShuffle();
+    else if (playmode.lower() == "intelligent")
+    {
+        shufflemode++;
+        toggleShuffle();
+    }
     else
         setupPlaylist();
 
@@ -291,6 +352,11 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
         connect(repeat, SIGNAL(clicked()), this, SLOT(resetTimer()));
         connect(pledit, SIGNAL(clicked()), this, SLOT(resetTimer()));
         connect(vis, SIGNAL(clicked()), this, SLOT(resetTimer()));
+        if (showrating)
+        {
+            connect(rateup, SIGNAL(clicked()), this, SLOT(resetTimer()));
+            connect(ratedn, SIGNAL(clicked()), this, SLOT(resetTimer()));
+        }
     }
 
     visualizer_is_active = false;
@@ -309,7 +375,7 @@ PlaybackBox::~PlaybackBox(void)
 
 void PlaybackBox::keyPressFromVisual(QKeyEvent *e)
 {
-    if(keyboard_accelerator_flag == "true")
+    if (keyboard_accelerator_flag)
     {
         //  This is really stupid ... I cannot for the life of me
         //  force Qt to have this (object) accept the keypresses
@@ -406,9 +472,17 @@ void PlaybackBox::setupListView(void)
         
         QString timestr;
         timestr.sprintf("%2d:%02d", min, secs);
-        
-        litem = new QListViewItem(playview, position, (*it).Artist(),
-                                  (*it).Title(), timestr);
+       
+        QString rating;
+        for (int i = 0; i < (*it).Rating(); i++)
+            rating.append("|");
+
+        if (showrating)
+            litem = new QListViewItem(playview, position, rating, 
+                                      (*it).Artist(), (*it).Title(), timestr);
+        else
+            litem = new QListViewItem(playview, position, (*it).Artist(),
+                                      (*it).Title(), timestr);
         listlist.prepend(litem);
         it--; count--;
     }
@@ -455,7 +529,7 @@ void PlaybackBox::setupPlaylist(void)
         return;
     }
 
-    if (!shufflemode)
+    if (shufflemode == 0)
     {
         for (int i = 0; i < (int)plist->size(); i++)
         {
@@ -464,7 +538,7 @@ void PlaybackBox::setupPlaylist(void)
                 shuffleindex = playlistindex = i;
         } 
     }
-    else
+    else if (shufflemode == 1)
     {
         int max = plist->size();
         srand((unsigned int)time(NULL));
@@ -495,6 +569,63 @@ void PlaybackBox::setupPlaylist(void)
                 playlistindex = i;
             if (curMeta == (*plist)[index])
                 shuffleindex = i;
+        }
+    }
+    else if (shufflemode == 2)
+    {
+        int max = plist->size();
+        srand((unsigned int)time(NULL));
+
+        int i, j, temp;
+        double tempd;
+        int rating;
+        int playcount;
+        double lastplay;
+        QDateTime cTime = QDateTime::currentDateTime();
+        double currentDateTime = cTime.toString("yyyyMMddhhmmss").toDouble();
+        double ratingValue = 0;
+        double playcountValue = 0;
+        double lastplayValue = 0;
+        double weight;
+
+        QValueList<double> playlistweight;
+
+        for (i = 0; i < max; i++)
+            playlistweight.push_back(0);
+
+        for (i = 0; i < max; i++)
+        {
+            curMeta = (*plist)[i];
+            rating = curMeta.Rating();
+            playcount = curMeta.PlayCount();
+            lastplay = curMeta.LastPlay();
+            ratingValue = (double)rating / 10;
+            playcountValue = (double)playcount / 50;
+            lastplayValue = (currentDateTime - lastplay) / 
+                            currentDateTime * 2000;
+            weight = (35 * ratingValue - 25 * playcountValue + 
+                      25 * lastplayValue + 
+                      15 * (double)rand() / (RAND_MAX + 1.0));
+
+            playlistweight[i] = weight;
+            playlistorder.push_back(i);
+        }
+
+        for (i = 0; i < (max - i); i++)
+        {
+            for (j = i + 1; j < max; j++)
+            {
+                if (playlistweight[j] > playlistweight[i])
+                {
+                    tempd = playlistweight[i];
+                    playlistweight[i] = playlistweight[j];
+                    playlistweight[j] = tempd;
+ 
+                    temp = playlistorder[i];
+                    playlistorder[i] = playlistorder[j];
+                    playlistorder[j] = temp;
+                }
+            }
         }
     }
 
@@ -598,7 +729,9 @@ void PlaybackBox::play()
         decoder->start();
 
         isplaying = true;
-       
+        curMeta.setLastPlay(db);
+        curMeta.incPlayCount(db);    
+   
         playlist_timer->start(1, true);
  
         gContext->LCDswitchToChannel(curMeta.Artist(), curMeta.Title(), "");
@@ -743,6 +876,9 @@ void PlaybackBox::next()
 {
     listlock.lock();
 
+    if (isplaying == true)
+        curMeta.decRating(db);
+
     shuffleindex++;
     if (shuffleindex >= (int)plist->size())
         shuffleindex = 0;
@@ -819,17 +955,41 @@ void PlaybackBox::seek(int pos)
 
 void PlaybackBox::toggleShuffle()
 {
-    shufflemode = !shufflemode;
+    shufflemode = (shufflemode + 1) % 3;
 
     setupPlaylist();
 
-    if (shufflemode)
+    if (shufflemode == 2)
+        randomize->setText("Shuffle: Intelligent");
+    else if (shufflemode == 1)
         randomize->setText("Shuffle: Random");
     else
         randomize->setText("Shuffle: Normal"); 
 
-    if (keyboard_accelerator_flag == "true")
+    if (keyboard_accelerator_flag)
         randomize->setAccel(Key_1);
+}
+
+void PlaybackBox::increaseRating()
+{
+    curMeta.incRating(db);
+
+    QString rating;
+    for (int i = 0; i < curMeta.Rating(); i++)
+        rating.append("|");
+//    QListViewItem *curItem = listlist.at(playlistindex);
+//    curItem->setText(1, rating);
+}
+
+void PlaybackBox::decreaseRating()
+{
+    curMeta.decRating(db);
+
+    QString rating;
+    for (int i = 0; i < curMeta.Rating(); i++)
+        rating.append("|");
+//    QListViewItem *curItem = listlist.at(playlistindex);
+//    curItem->setText(1, rating);
 }
 
 void PlaybackBox::toggleRepeat()
@@ -841,7 +1001,7 @@ void PlaybackBox::toggleRepeat()
     else
         repeat->setText("Repeat: Playlist");
 
-    if (keyboard_accelerator_flag == "true")
+    if (keyboard_accelerator_flag)
         repeat->setAccel(Key_2);
 }
 

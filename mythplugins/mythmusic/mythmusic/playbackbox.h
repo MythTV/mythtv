@@ -52,6 +52,8 @@ class PlaybackBox : public MythDialog
     void seek(int);
     void stopAll();
     void toggleShuffle();
+    void increaseRating();
+    void decreaseRating();
     void toggleRepeat();
     void editPlaylist();
     void nextAuto();
@@ -108,7 +110,7 @@ class PlaybackBox : public MythDialog
     MythToolButton *vis;
     MythToolButton *pauseb;
 
-    bool shufflemode;
+    int shufflemode;
     bool repeatmode;
 
     bool isplaying;
@@ -121,7 +123,9 @@ class PlaybackBox : public MythDialog
     QTimer *lcd_update_timer;
     QTimer *playlist_timer;
     bool visualizer_is_active;
-    QString keyboard_accelerator_flag;
+    bool keyboard_accelerator_flag;
+
+    bool showrating;
 };
 
 #endif

@@ -68,7 +68,10 @@ VisualScaleHeight=1
 
 # Use keyboard (ie. remote control) accelerators in the playback screen
 # (true, false) You probably want to make this true.
-KeyboardAccelerators=false
+KeyboardAccelerators=0
 
 # Eject the CD after ripping
-EjectCDAfterRipping=true
+EjectCDAfterRipping=1
+
+# Show ratings in the playlist view (used by the 'Intelligent' randomizer)
+MusicShowRatings=0
