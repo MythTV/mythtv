@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.10.02 (xris)
+#Last Updated: 2004.12.14 (xris)
 #
 #  nuv_export::shared_utils
 #
@@ -14,7 +14,7 @@ package nuv_export::shared_utils;
         use Exporter;
         our @ISA = qw/ Exporter /;
 
-        our @EXPORT = qw/ &clear &find_program &num_cpus &shell_escape &wrap &system &wipe_tmpfiles
+        our @EXPORT = qw/ &clear &find_program &shell_escape &wrap &system &mkdir &wipe_tmpfiles
                           @Exporters %Prog %Args %cli_args $DEBUG
                           $num_cpus $is_child
                           @tmpfiles %children
@@ -65,7 +65,6 @@ package nuv_export::shared_utils;
     while ($cpuinfo =~ /^processor\s*:\s*\d+/mg) {
         $num_cpus++;
     }
-    return $num_cpus;
 
 # Clear the screen
     sub clear {
@@ -186,11 +185,23 @@ package nuv_export::shared_utils;
     sub system {
         my $command = shift;
         if ($DEBUG) {
-            $command =~ s#\ 2>/dev/null##sg;
+            $command =~ s#\ [12]\s*>\s*/dev/null##sg;
             print "\nsystem call:\n$command\n";
         }
         else {
-            CORE::system($command);
+            return CORE::system($command);
+        }
+    }
+
+# Overload mkdir() so we can print debug messages
+    sub mkdir {
+        my $path = shift;
+        my $mode = shift;
+        if ($DEBUG) {
+            print "\nsystem call:\nmkdir -m ", sprintf("%#o", 493), " $path\n";
+        }
+        else {
+            return CORE::mkdir($path, $mode);
         }
     }
 
@@ -207,5 +218,7 @@ package nuv_export::shared_utils;
         @tmpfiles = ();
     }
 
+# Return true
+    return 1;
 
 # vim:ts=4:sw=4:ai:et:si:sts=4

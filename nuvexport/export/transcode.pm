@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.10.03 (xris)
+#Last Updated: 2004.12.14 (xris)
 #
 #  transcode.pm
 #
@@ -183,7 +183,7 @@ package export::transcode;
             push @tmpfiles, "/tmp/fifodir_$$", "/tmp/fifodir_$$/audout", "/tmp/fifodir_$$/vidout";
         }
     # Execute transcode
-        print "Starting transcode.\n";
+        print "Starting transcode.\n" unless ($DEBUG);
         ($trans_pid, $trans_h) = fork_command("$transcode 2>&1");
         $children{$trans_pid} = 'transcode' if ($trans_pid);
     # Get ready to count the frames that have been processed
@@ -222,7 +222,7 @@ package export::transcode;
         # The pid?
             $pid = waitpid(-1, &WNOHANG);
             if ($children{$pid}) {
-                print "\n$children{$pid} finished.\n";
+                print "\n$children{$pid} finished.\n" unless ($DEBUG);
                 delete $children{$pid};
                 ##### do something here to track the time for the next process to die.
                 ##### If we wait too long, something obviously ended too early.

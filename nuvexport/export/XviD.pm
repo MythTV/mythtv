@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.11.02 (xris)
+#Last Updated: 2004.12.14 (xris)
 #
 #  export::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -18,8 +18,6 @@ package export::XviD;
     $cli_args{'quantisation|q=i'} = 1; # Quantisation
     $cli_args{'a_bitrate|a=i'}    = 1; # Audio bitrate
     $cli_args{'v_bitrate|v=i'}    = 1; # Video bitrate
-    $cli_args{'height|v_res|h=i'} = 1; # Height
-    $cli_args{'width|h_res|w=i'}  = 1; # Width
     $cli_args{'multipass'}        = 1; # Two-pass encoding
 
     sub new {
@@ -116,30 +114,8 @@ package export::XviD;
                                               'int',
                                               $self->{'v_bitrate'});
         }
-    # Ask the user what resolution he/she wants
-        if ($Args{'width'}) {
-            die "Width must be > 0\n" unless ($Args{'width'} > 0);
-            $self->{'width'} = $Args{'width'};
-        }
-        else {
-            $self->{'width'} = query_text('Width?',
-                                          'int',
-                                          $self->{'width'});
-        }
-    # Height will default to whatever is the appropriate aspect ratio for the width
-    # someday, we should check the aspect ratio here, too...
-        $self->{'height'} = sprintf('%.0f', $self->{'width'} * 3/4);
-        $self->{'height'}++ if ($self->{'height'} % 2);
-    # Ask about the height
-        if ($Args{'height'}) {
-            die "Height must be > 0\n" unless ($Args{'height'} > 0);
-            $self->{'height'} = $Args{'height'};
-        }
-        else {
-            $self->{'height'} = query_text('Height?',
-                                           'int',
-                                           $self->{'height'});
-        }
+    # Query the resolution
+        $self->query_resolution();
     }
 
     sub export {

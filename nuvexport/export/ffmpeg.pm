@@ -182,7 +182,7 @@ package export::ffmpeg;
         push @tmpfiles, "/tmp/fifodir_$$", "/tmp/fifodir_$$/audout", "/tmp/fifodir_$$/vidout";
 
     # Execute ffmpeg
-        print "Starting ffmpeg.\n";
+        print "Starting ffmpeg.\n" unless ($DEBUG);
         ($ffmpeg_pid, $ffmpeg_h) = fork_command("$ffmpeg 2>&1");
         $children{$ffmpeg_pid} = 'ffmpeg' if ($ffmpeg_pid);
 
@@ -224,7 +224,7 @@ package export::ffmpeg;
         # The pid?
             $pid = waitpid(-1, &WNOHANG);
             if ($children{$pid}) {
-                print "\n$children{$pid} finished.\n";
+                print "\n$children{$pid} finished.\n" unless ($DEBUG);
                 delete $children{$pid};
                 ##### do something here to track the time for the next process to die.
                 ##### If we wait too long, something obviously ended too early.

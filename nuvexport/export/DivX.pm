@@ -1,10 +1,10 @@
 #Last Updated: 2004.12.14 (xris)
 #
-#  export::ASF
+#  export::DivX
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
 #
 
-package export::ASF;
+package export::DivX;
     use base 'export::ffmpeg';
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
@@ -20,19 +20,19 @@ package export::ASF;
     sub new {
         my $class = shift;
         my $self  = {
-                     'cli'             => qr/\basf\b/i,
-                     'name'            => 'Export to ASF',
+                     'cli'             => qr/\bdivx\b/i,
+                     'name'            => 'Export to DivX',
                      'enabled'         => 1,
                      'errors'          => [],
                     # ffmpeg-related settings
                      'noise_reduction' => 1,
                      'deinterlace'     => 1,
                      'crop'            => 1,
-                    # ASF-specific settings
-                     'a_bitrate'       => 64,
-                     'v_bitrate'       => 256,
-                     'width'           => 320,
-                     'height'          => 240,
+                    # DivX-specific settings
+                     'a_bitrate'       => 128,
+                     'v_bitrate'       => 960,
+                     'width'           => 624,
+                     'height'          => 464,
                     };
         bless($self, $class);
 
@@ -82,13 +82,13 @@ package export::ASF;
         load_finfo($episode);
     # Build the ffmpeg string
         $self->{'ffmpeg_xtra'} = " -b "  . $self->{'v_bitrate'}
-                               . " -vcodec msmpeg4"
+                               . " -vcodec mpeg4"
                                . " -ab " . $self->{'a_bitrate'}
                                . " -acodec mp3"
                                . " -s "  . $self->{'width'} . "x" . $self->{'height'}
-                               . " -f asf";
+                               ;
     # Execute the parent method
-        $self->SUPER::export($episode, ".asf");
+        $self->SUPER::export($episode, ".avi");
     }
 
 1;  #return true

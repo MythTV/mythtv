@@ -11,6 +11,7 @@ MANS	          = man/nuvexport.1 \
 EXPORT_MODULES	  = export/generic.pm   \
 		    export/ffmpeg.pm    \
 		    export/transcode.pm \
+		    export/DivX.pm      \
 		    export/DVCD.pm      \
 		    export/DVD.pm       \
 		    export/MP3.pm       \
@@ -28,7 +29,7 @@ NUVEXPORT_MODULES = nuv_export/shared_utils.pm \
 		    nuv_export/ui.pm
 MODULES		  = ${EXPORT_MODULES} ${MYTHTV_MODULES} ${NUVEXPORT_MODULES}
 
-NUVEXPORT_LINKS   = dvcd dvd mp3 mpeg2cut nuvsql svcd vcd asf xvid
+NUVEXPORT_LINKS   = divx dvcd dvd mp3 mpeg2cut nuvsql svcd vcd asf xvid
 
 OWNER	= -o root -g root
 
@@ -53,7 +54,7 @@ install:
 	done
 	# Install the mode symlinks
 	@for i in ${NUVEXPORT_LINKS} ; do \
-	   ln -fs ${bindir}/nuvexport ${bindir}/nuvexport-$$i; \
+	   ln -fs nuvexport ${bindir}/nuvexport-$$i; \
 	done
 	# Install the modules
 	@for i in ${MODULES} ; do \

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.10.02 (xris)
+#Last Updated: 2004.12.14 (xris)
 #
 #  generic.pm
 #
@@ -26,6 +26,10 @@ package export::generic;
     $cli_args{'path:s'}              = 1; # Save path (only used with the noserver option)
     $cli_args{'cutlist|use_cutlist'} = 1; # Use the myth cutlist
 
+# These aren't used by all modules, but the routine to define them is here, so here they live
+    $cli_args{'height|v_res|h=i'} = 1; # Height
+    $cli_args{'width|h_res|w=i'}  = 1; # Width
+
 # Gather generic export settings
     sub gather_settings {
         my $self = shift;
@@ -35,6 +39,62 @@ package export::generic;
         $self->{'use_cutlist'} = query_text('Enable Myth cutlist?',
                                             'yesno',
                                             'Yes');
+    }
+
+# A routine to grab resolutions
+    sub query_resolution {
+        my $self = shift;
+    # Ask the user what resolution he/she wants
+        if ($Args{'width'}) {
+            die "Width must be > 0\n" unless ($Args{'width'} > 0);
+            $self->{'width'} = $Args{'width'};
+        }
+        else {
+            while (1) {
+                my $w = query_text('Width?',
+                                   'int',
+                                   $self->{'width'});
+            # Make sure this is a multiple of 16
+                if ($w % 16 == 0) {
+                    $self->{'width'} = $w;
+                    last;
+                }
+            # Alert the user
+                print "Width must be a multiple of 16.\n";
+            }
+        }
+    # Height will default to whatever is the appropriate aspect ratio for the width
+    # someday, we should check the aspect ratio here, too...  Round up/down as needed.
+        $self->{'height'} = sprintf('%.0f', $self->{'width'} * 3/4);
+        if ($self->{'height'} % 16 > 8) {
+            while ($self->{'height'} % 16 > 0) {
+                $self->{'height'}++;
+            }
+        }
+        elsif ($self->{'height'} % 16 > 0) {
+            while ($self->{'height'} % 16 > 0) {
+                $self->{'height'}--;
+            }
+        }
+    # Ask about the height
+        if ($Args{'height'}) {
+            die "Height must be > 0\n" unless ($Args{'height'} > 0);
+            $self->{'height'} = $Args{'height'};
+        }
+        else {
+            while (1) {
+                my $h = query_text('Height?',
+                                   'int',
+                                   $self->{'height'});
+            # Make sure this is a multiple of 16
+                if ($h % 16 == 0) {
+                    $self->{'height'} = $h;
+                    last;
+                }
+            # Alert the user
+                print "Height must be a multiple of 16.\n";
+            }
+        }
     }
 
 # This subroutine forks and executes one system command - nothing fancy

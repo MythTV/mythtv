@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Last Updated: 2004.11.22 (xris)
+# Last Updated: 2004.12.14 (xris)
 
 # Autoflush buffers
     $|++;
@@ -8,6 +8,11 @@
     BEGIN {
         $SIG{'INT'}  = sub { print "\n"; exit; };
         $SIG{'QUIT'} = sub { print "\n"; exit; };
+    # Annoy people running as root
+        if ($< < 1) {
+            print "You are running nuvexport as root -- this is not advised.\n";
+            <>;
+        }
     }
 
 # Add a couple of include paths so we can load the various export and gui modules
@@ -43,8 +48,8 @@
     use export::DVD;
         push @Exporters, export::DVD->new;
 # This is disabled until someone shows me how to get transcode to export divx
-#    use export::DivX;
-#        push @Exporters, export::DivX->new;
+    use export::DivX;
+        push @Exporters, export::DivX->new;
     use export::ASF;
         push @Exporters, export::ASF->new;
     use export::MP3;
@@ -88,16 +93,24 @@
     if ($Args{'noserver'}) {
         foreach my $episode (@episodes) {
         # Keep track of when we started
-            print "\nNow encoding:  ", $episode->{'show_name'};
-            print ':  ', $episode->{'title'} if ($episode->{'title'});
-            print "\nEncode started:  ".localtime()."\n";
+            if ($DEBUG) {
+                print "\n--------------------------------",
+                      "\nTo encode:  ", $episode->{'show_name'};
+                print ':  ', $episode->{'title'} if ($episode->{'title'});
+                print "\nUse the following commands:\n";
+            }
+            else {
+                print "\nNow encoding:  ", $episode->{'show_name'};
+                print ':  ', $episode->{'title'} if ($episode->{'title'});
+                print "\nEncode started:  ".localtime()."\n";
+            }
             my $start = time();
         # Encode
             $exporter->export($episode);
         # Remove tmpfiles
             wipe_tmpfiles();
         # Report how long the encode lasted
-            print "\nEncode finished:  ".localtime()."\n";
+            print "\nEncode finished:  ".localtime()."\n" unless ($DEBUG);
             my $seconds = time() - $start;
             my $timestr = '';
         # How many hours?
@@ -111,7 +124,7 @@
         # Generate a nice
             $timestr .= $seconds.'s' if ($seconds > 0 || $timestr eq '');
         # Notify the user
-            print "Encode lasted: $timestr\n";
+            print "Encode lasted: $timestr\n" unless ($DEBUG);
         }
     }
 # Store in the DB
