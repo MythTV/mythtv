@@ -92,7 +92,7 @@ str OSDFont=helr.ttf
 # channum is the default, channel 4 follows channel 3
 # chanid sorts according to the internal database order
 # callsign sorts according to the channel's callsign, like TVLAN, TWC, USA
-str ChannelOrdering=channum
+str ChannelOrdering=channum + 0
 
 # TV options
 # 

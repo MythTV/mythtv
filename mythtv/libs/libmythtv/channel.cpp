@@ -15,12 +15,11 @@ Channel::Channel(TV *parent, const QString &videodevice)
     device = videodevice;
     isopen = false;
     videofd = -1;
-    curchannel = -1;
+    curchannelname = "";
     currentcapchannel = 0;
     
     pParent = parent;
-    orderedchannels = false;
-    channelorder = "";
+    channelorder = "channum + 0";
 }
 
 Channel::~Channel(void)
@@ -89,7 +88,7 @@ void Channel::SetFormat(const QString &format)
         test.channel = i;
         ioctl(videofd, VIDIOCGCHAN, &test);
 
-        cout << "Probed: " << test.name << endl;
+        cout << "Probed: " << device << " - " << test.name << endl;
         channelnames[i] = test.name;
     }
 
@@ -132,49 +131,30 @@ bool Channel::SetChannelByString(const QString &chan)
         Open();
     if (!isopen)
         return false;
-   
-    bool foundit = false;
-    int i;
-    for (i = 0; i < totalChannels; i++)
-    {
-        if (chan == curList[i].name)
-        {
-            foundit = true;
-            break;
-        }
-    }
-    
-    if (!foundit)
-        return false;
-
-    return SetChannel(i);
-}
-   
-bool Channel::SetChannel(int i)
-{
-    QString channame;
- 
-    channame = curList[i].name;
 
     int finetune = 0;
 
-    if (pParent->CheckChannel(channame, finetune))
+    if (pParent->CheckChannel(chan, finetune))
     {
         if (GetCurrentInput() == "Television")
         {
+            int i = GetCurrentChannelNum(chan);
+            if (i == -1)
+                return false;
+
             int frequency = curList[i].freq * 16 / 1000 + finetune;
             if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
                 perror("channel set:");
 
-	    curchannel = i;
+            curchannelname = chan;
+
 	    return true;
         }
         else
         {
-            channame = curList[i].name;
-            if (pParent->ChangeExternalChannel(channame))
+            if (pParent->ChangeExternalChannel(chan))
             {
-                curchannel = i;
+                curchannelname = chan;
                 return true;
             }
         }
@@ -183,18 +163,34 @@ bool Channel::SetChannel(int i)
     return false;
 }
 
+int Channel::GetCurrentChannelNum(const QString &channame)
+{
+    bool foundit = false;
+    int i;
+    for (i = 0; i < totalChannels; i++)
+    {
+        if (channame == curList[i].name)
+        {
+            foundit = true;
+            break;
+        }
+    }
+
+    if (foundit)
+        return i;
+    
+    return -1;
+}
+
 bool Channel::ChannelUp(void)
 {
-    if (orderedchannels)
-    {
-        QString nextchan = pParent->GetNextChannel(true);
-        if (SetChannelByString(nextchan))
-            return true;
-    }
+    QString nextchan = pParent->GetNextChannel(true);
+    if (SetChannelByString(nextchan))
+        return true;
 
     bool finished = false;
     int chancount = 0;
-    int startchannel = curchannel;
+    int curchannel = GetCurrentChannelNum(curchannelname);
 
     while (!finished)
     {
@@ -204,7 +200,9 @@ bool Channel::ChannelUp(void)
         if (curchannel == totalChannels)
             curchannel = 0;
 
-        finished = SetChannel(curchannel);
+        nextchan = curList[curchannel].name;
+
+        finished = SetChannelByString(nextchan);
 
         if (chancount > totalChannels)
         {
@@ -214,24 +212,18 @@ bool Channel::ChannelUp(void)
         }
     }
 
-    if (!finished)
-        curchannel = startchannel;
-
     return finished;
 }
 
 bool Channel::ChannelDown(void)
 {
-    if (orderedchannels)
-    {
-        QString nextchan = pParent->GetNextChannel(false);
-        if (SetChannelByString(nextchan))
-            return true;
-    }
+    QString nextchan = pParent->GetNextChannel(false);
+    if (SetChannelByString(nextchan))
+        return true;
 
     bool finished = false;
     int chancount = 0;
-    int startchannel = curchannel;
+    int curchannel = GetCurrentChannelNum(curchannelname);
 
     while (!finished)
     {
@@ -241,7 +233,9 @@ bool Channel::ChannelDown(void)
         if (curchannel < 0)
             curchannel = totalChannels - 1;
 
-        finished = SetChannel(curchannel);
+        nextchan = curList[curchannel].name;
+
+        finished = SetChannelByString(nextchan);
 
         if (chancount > totalChannels)
         {
@@ -251,15 +245,12 @@ bool Channel::ChannelDown(void)
         }
     }
 
-    if (!finished)
-        curchannel = startchannel;
-
-    return finished;
+    return false;
 }
 
 QString Channel::GetCurrentName(void)
 {
-    return curList[curchannel].name;
+    return curchannelname;
 }
 
 QString Channel::GetCurrentInput(void)

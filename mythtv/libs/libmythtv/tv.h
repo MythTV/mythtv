@@ -55,8 +55,8 @@ class TV
     bool IsPlaying(void) { return StateIsPlaying(internalState); }
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
-    bool CheckChannel(QString &channum, int &finetuning); 
-    bool ChangeExternalChannel(QString &channum);
+    bool CheckChannel(const QString &channum, int &finetuning); 
+    bool ChangeExternalChannel(const QString &channum);
     QString GetNextChannel(bool direction);
 
     QString GetFilePrefix() { return settings->GetSetting("RecordFilePrefix"); }

@@ -18,14 +18,12 @@ class Channel
     bool Open(void);
     void Close(void);
 
-    void SetChannelOrdering(bool order, QString chanorder) 
-                         { orderedchannels = order; channelorder = chanorder; }
+    void SetChannelOrdering(QString chanorder) { channelorder = chanorder; }
 
     void SetFormat(const QString &format);
     void SetFreqTable(const QString &name);
 
     bool SetChannelByString(const QString &chan); 
-    bool SetChannel(int i);
     bool ChannelUp(void);
     bool ChannelDown(void);
  
@@ -35,19 +33,18 @@ class Channel
     QString GetCurrentName(void);
     QString GetCurrentInput(void);
 
-    int GetCurrent(void) { return curchannel + 1; }
-    
     void SetFd(int fd) { videofd = fd; } 
     QString GetDevice() { return device; }
 
     QString GetOrdering() { return channelorder; }
 
   private:
-    
+    int GetCurrentChannelNum(const QString &channame);
+ 
     QString device;
     bool isopen;  
     int videofd;
-    int curchannel;
+    QString curchannelname;
 
     struct CHANLIST *curList;  
     int totalChannels;
@@ -60,7 +57,6 @@ class Channel
     int currentcapchannel;
     map<int, QString> channelnames;
 
-    bool orderedchannels;
     QString channelorder;
 };
 

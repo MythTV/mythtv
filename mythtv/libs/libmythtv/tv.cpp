@@ -54,10 +54,9 @@ TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
     db_conn = NULL;
     ConnectDB(capturecardnum);
  
-    bool orderbychanid = false;
     QString chanorder = settings->GetSetting("ChannelOrdering");
-    if (chanorder != "" && chanorder != "channum")
-        orderbychanid = true;
+    if (chanorder == "")
+        chanorder = "channum + 0";
  
     audiosamplerate = pipaudiosamplerate = -1;
  
@@ -74,7 +73,7 @@ TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
     channel->SetFormat(settings->GetSetting("TVFormat"));
     channel->SetFreqTable(settings->GetSetting("FreqTable"));
     channel->SetChannelByString(startchannel);
-    channel->SetChannelOrdering(orderbychanid, chanorder);
+    channel->SetChannelOrdering(chanorder);
     channel->Close();  
 
     pipchannel = new Channel(this, pipvideodev);
@@ -83,7 +82,7 @@ TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
         pipchannel->SetFormat(settings->GetSetting("TVFormat"));
         pipchannel->SetFreqTable(settings->GetSetting("FreqTable"));
         pipchannel->SetChannelByString(startchannel);
-        pipchannel->SetChannelOrdering(orderbychanid, chanorder);
+        pipchannel->SetChannelOrdering(chanorder);
         pipchannel->Close();
     }
 
@@ -1676,7 +1675,7 @@ void TV::GetDevices(int cardnum, QString &video, QString &audio, int &rate)
     }
 }
 
-bool TV::CheckChannel(QString &channum, int &finetuning)
+bool TV::CheckChannel(const QString &channum, int &finetuning)
 {
     finetuning = 0;
 
@@ -1809,7 +1808,7 @@ QString TV::GetNextChannel(bool direction)
     return ret;
 }
 
-bool TV::ChangeExternalChannel(QString &channum)
+bool TV::ChangeExternalChannel(const QString &channum)
 {
     QString command = settings->GetSetting("ExternalChannelCommand");
 
