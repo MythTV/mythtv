@@ -95,30 +95,9 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 
-If you've already got a copy of the database installed and need to update the
-schema, use the <CODE>-f</CODE> flag to force <B>mysql</B> to continue setting
-up the tables even if they already exist.  By default, <B>mysql</B> will
-stop at the first error.</P>
-<P><B>NOTE</B>: It is good practice to set a root password for mysql. 
+<B>NOTE</B>: It is good practice to set a root password for mysql. 
 Instructions for doing so can be found on MySQL's web site at 
 <A HREF="http://www.mysql.com/doc/en/Security.html">http://www.mysql.com/doc/en/Security.html</A>.</P>
-
-<H2><A NAME="ss6.5">6.5</A> <A HREF="mythtv-HOWTO.html#toc6.5">Upgrading the database</A>
-</H2>
-
-<P>If you need to upgrade the database, either because you're using the CVS
-version of MythTV, or because you're moving from one release to another,
-you'll need to run the appropriate <B>mysql</B> script found in
-the <CODE>database/</CODE> directory.  Use the same format as above, replacing
-"mc.sql" with the appropriate .sql file:</P>
-<P>So, if you're upgrading from MythTV 0.10 to 0.11 on a Mandrake system:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd database
-$ mysql -u root &lt; 0.10-to-0.11.sql
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 
 <H3><A NAME="modify_perm_mysql"></A> Modifying access to the MySQL database for multiple systems </H3>
 

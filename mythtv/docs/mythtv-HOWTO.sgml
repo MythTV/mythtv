@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-10-05, v2.83
+<date>2003-10-15, v2.84
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -33,7 +33,7 @@ Searchable archives for the lists are available at <url
 url="http://www.gossamer-threads.com/archive/MythTV_C2/"
 name="http://www.gossamer-threads.com/archive/MythTV_C2/">.
 
-This HOWTO is for MythTV v0.11.
+This HOWTO is for MythTV v0.12.
 
 <sect>Introduction.
 <p>This HOWTO document will focus on manually building MythTV in a North
@@ -101,7 +101,7 @@ configuration, and how happy they are with the results.
 
 If you have specific questions about the suitability of specific hardware
 choices, you can consult the archives of the mythtv-users mailing list at
-(url url="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"
+<url url="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"
 name="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"> or
 post a question to the list.
 <sect2>CPU Type and Speed
@@ -153,6 +153,10 @@ video encoder, such as a Matrox G200 or a Hauppauge WinTV-PVR-250/350.  In
 this mode, because the video encoding is being done externally, the CPU
 requirements are quite low.  See the <ref id="video_capture_device"
 name="Video Capture Device"> section for details.
+
+If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use the
+hardware-based video decoder for playback, which further reduces CPU
+requirements.
 
 <sect2>Memory
 <p>A MythTV host that is both a backend and a frontend and using software
@@ -233,7 +237,7 @@ encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250 or 350
 from Hauppauge and the driver from the IvyTV project <url
 url="http://ivtv.sourceforge.net/" name="http://ivtv.sourceforge.net/"> will
 allow you to use dedicated hardware encoders rather than your CPU. Release
-0.11 of MythTV is able to use the PVR-250/350 cards as an input device for
+0.12 of MythTV is able to use the PVR-250/350 cards as an input device for
 live TV and for scheduled recordings.  Using the onboard MPEG-2 encoder
 drastically reduces the CPU requirements for encoding.
 
@@ -259,7 +263,8 @@ section for information on installing a PVR-250 on Mandrake 9.1.
 
 <bf>NOTE</bf>: The ATI All-in-Wonder cards (which are not the same as the ATI
 TV Wonder, TV Wonder VE or TV Wonder Pro) <em>will not</em> work as a MythTV
-capture device, as the <url url="http://gatos.sourceforge.net" name="GATOS">
+capture device because the GATOS <url url="http://gatos.sourceforge.net"
+name="http://gatos.sourceforge.net">
 drivers that are available provide only a limited subset of the V4L API. 
 The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.
 
@@ -308,11 +313,11 @@ of the adapters.
 <!-- Updated information  from "Ray Olszewski" <ray@comarre.com> -->
 
 If you want to use MythTV with a standard television, you will need a
-physical connection from your video card to your TV set, which can
-either be a TV-out port on the card itself, or an external adapter that
-converts the VGA signal to an appropriate video signal. "Appropriate"
-depends on a number of factors, such as video standard (NTSC vs PAL) type of
-input connection (Composite vs SVideo), etc.
+physical connection from your video card to your TV set, which can either be
+a TV-out port on the card itself or an external adapter that converts the
+VGA signal to an appropriate video signal. "Appropriate" depends on a number
+of factors, such as video standard (NTSC vs PAL) type of input connection
+(Composite vs SVideo), etc.
 
 Note that with some video cards and X drivers, Xvideo extensions are
 only supported on the VGA output, and not on the TV output.
@@ -415,6 +420,9 @@ Specific cards:
 <item>Savage 2000 AGP. Has Composite and SVideo ports. Does not support XVideo.
 <item>S3 Savage IX 8MB AGP. Has SVideo output. Reported to work.
 </itemize>
+
+<sect3>Hauppauge PVR-350
+<p>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV driver.
 
 <sect3>Other Options
 <p>Some devices with onboard TV-out capability, such as XBoxes converted to 
@@ -1165,8 +1173,8 @@ $ su
 <sect1>Manually building MythTV.
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.11.tar.bz2
-$ cd mythtv-0.11
+$ tar -xjf mythtv-0.12.tar.bz2
+$ cd mythtv-0.12
 $ ./configure
 $ qmake mythtv.pro
 $ make
@@ -1287,28 +1295,10 @@ $ mysql < mc.sql
 $ su
 # mysql < /usr/share/mythtv/database/mc.sql
 </verb></tscreen>
-If you've already got a copy of the database installed and need to update the
-schema, use the <tt>-f</tt> flag to force <bf>mysql</bf> to continue setting
-up the tables even if they already exist.  By default, <bf>mysql</bf> will
-stop at the first error.
-
 <bf>NOTE</bf>: It is good practice to set a root password for mysql. 
 Instructions for doing so can be found on MySQL's web site at <url
 url="http://www.mysql.com/doc/en/Security.html"
 name="http://www.mysql.com/doc/en/Security.html">.
-
-<sect1>Upgrading the database
-<p>If you need to upgrade the database, either because you're using the CVS
-version of MythTV, or because you're moving from one release to another,
-you'll need to run the appropriate <bf>mysql</bf> script found in
-the <tt>database/</tt> directory.  Use the same format as above, replacing
-"mc.sql" with the appropriate .sql file:
-
-So, if you're upgrading from MythTV 0.10 to 0.11 on a Mandrake system:
-<tscreen><verb>
-$ cd database
-$ mysql -u root < 0.10-to-0.11.sql
-</verb></tscreen>
 
 <sect2>Modifying access to the MySQL database for multiple systems <label
 id="modify_perm_mysql">
@@ -1857,7 +1847,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.11/configfiles
+$ cd ~/mythtv-0.12/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2381,7 +2371,7 @@ $ crontab -l  NOTE: this is a lowercase L.
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.11/configfiles/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/mythtv-0.12/configfiles/mythfilldatabasecron
 $ 
 </verb></tscreen>
 
@@ -2496,6 +2486,44 @@ fault" errors, it is likely that the video4linux (v4l) subsystem did not
 like the height and width parameters specified.  It's best to leave the
 default as-is until you're sure that MythTV is operational.
 
+<sect1>Xbox Frontends
+<p>MythTV is able to control the LED on the Xbox to indicate backend
+recording status.  
+
+To control the LED, you will need the <bf>blink</bf> program from the
+xbox-linux project, which is installed as <tt>/bin/led</tt> on GentooX.  On
+Xebian (the new Ed's Debian) you must install it yourself.  On other
+distributions it may or may not be installed as a program called
+<bf>blink</bf> and should be located in your path.  (Type <tt>which
+blink</tt> to see if the program is available.) If you do not have
+<bf>blink</bf>, you may obtain it from the Xbox-Linux project site at <url
+url="http://xbox-linux.sf.net/" name="http://xbox-linux.sf.net/">. The
+program you need is part of the <tt>eds_i2c_staff</tt> module in CVS.  Note
+the spelling.
+
+Once you have installed <bf>blink</bf> you will need to set permissions. 
+<bf>blink</bf> needs write permission to the i2c device to function
+properly.  There are three methods to accomplish this.  First, you could run
+<tt>mythfrontend</tt> as root, which is the simplest method, but could
+potentially be a security risk.  Next, you may make the <bf>blink</bf>
+binary setuid root, which allows non-privileged users to run a program with
+root capability.  This is done by typing the command:
+<tscreen><verb>
+$ su
+# chmod u+s /path/to/blink
+</verb></tscreen>
+The final technique would be to set the <tt>/dev/i2c/0</tt> device read/write
+for all users, but this is the least preferred method.
+
+Now it's time to setup MythTV for Xbox hardware.  Enter Setup -> General. 
+On the second page check the 'Enable Xbox Hardware' option.  Upon reentering
+the settings, you should have a new option named 'Xbox'.  Within this option
+you may select the distribution, LED colors for recording and the update
+interval.  If you select GentooX as the distribution <bf>led</bf> will be
+used as the <bf>blink</bf> binary name, otherwise, <bf>blink</bf> is used. 
+Colors should be self explanatory.  The update interval determines how often
+the frontend should poll the backend to determine if the status has changed.
+
 <sect>Using MythTV.
 <p>The <tt>keys.txt</tt> file describes what the various keyboard commands are.
 
@@ -2582,8 +2610,8 @@ Mandrake Control Center.
 <sect1>Completing the installation.
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.11.tar.bz2
-$ cd mythweb-0.11
+$ tar -xjf mythweb-0.12.tar.bz2
+$ cd mythweb-0.12
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -2623,8 +2651,8 @@ operational.
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.
 <tscreen><verb>
-$ tar -xjf mythgallery-0.11.tar.bz2
-$ cd mythgallery-0.11
+$ tar -xjf mythgallery-0.12.tar.bz2
+$ cd mythgallery-0.12
 $ qmake mythgallery.pro
 $ make
 # su
@@ -3691,24 +3719,8 @@ name="http://www.vcdhelp.com/forum/userguides/94382.php">.
 
 <sect1>MythTV GUI and X Display Sizes.
 <p>MythTV is designed to be run as dedicated full screen TV application
-but can also be run as a desktop application on a computer
-monitor. Here are a few consideration for configuring sizes to best
-suit you needs.
-
-There are three sizes that are important for matching the MythTV GUI and
-full screen TV playback to fit the screen:
-
-<itemize>
-<item>the X display size
-<item>the X Desktop (virtual) dimensions
-<item>the MythTV GUI dimensions
-</itemize>
-
-The MythTV GUI uses its GUI dimensions regardless of the other two and is
-anchored to the upper left corner of the X Desktop.
-
-The MythTV full screen mode uses the X display size dimensions regardless of
-the other two and is anchored to the upper left corner of the X display.
+but can also be run as a desktop application on a computer monitor. Here
+are a few consideration for configuring sizes to best suit you needs.
 
 <sect2>X Dimensions
 <p>For output to a Television, common resolutions are 640x480, 800x600, and
@@ -3728,51 +3740,48 @@ restart X.
 <sect2>MythTV Dimensions
 <p>In 0.10 and later, from "mythfrontend" go to Setup->Appearance.
 The default for the height and width is "0" - this will cause
-MythTV to automatically size itself to full screen. To ensure that
-your new dimension settings take effect, exit and restart MythTV.
+MythTV to automatically size itself to full screen.
 
-<bf>NOTE</bf>: When the GUI is full screen, you may need to set your window
-manager to 'Click to Focus' for windows to stack properly.
+If the MythTV GUI width and height are not 0, mythfrontend uses these GUI
+dimensions and is anchored to the upper left corner of the X Desktop. If
+the GUI X and/or Y are not 0, the upper left corner is positioned at the
+specified coordinates. If the "Run the frontend in a window" box is checked,
+the window will have a frame and can then be dragged to any position on the
+desktop.
+
+<bf>NOTE</bf>: When the GUI is full screen, you may see windows rapidly
+flipping on top of each other. If this happens you will need to set your
+window manager to 'Click to Focus' for windows to stack properly.
 
 The fonts for the GUI and OSD will scale to whatever sizes you use. Most
-font sizes can be changed in setup selections. Make sure to use fonts large
-enough to be read on a TV screen from a distance.
+font sizes can be changed in setup selections or in the .xml files under
+<tt>/usr/local/share/mythtv/</tt> . Make sure to use fonts large enough
+to be read on a TV screen from a distance.
 
 The full screen TV size is based on the X display size. For Xinerama, you
-can specify a screen in Setup->General. The picture will be stretched to fit
-the entire screen regardless of the <ref id="capture_resolution_"
-name="capture resolutions"> used.
+can specify a screen in Setup->General. The TV picture will be stretched
+to fit the entire GUI area regardless of the <ref id="capture_resolution_"
+name="capture resolutions"> used. However, during playback, the "W" key can
+to used to correct differences between 16:9 and 4:3.
 
 <sect2>Overscan Dimensions
 <p>Because picture edges can be ragged and screen edges aren't straight,
 Television is designed to project an image larger than the physical screen.
 This is called "overscan". Underscan is fitting the entire image inside the
-screen. This is useful for computer monitors so that toolbars and scrollbars
-at the edges can be seen.
+screen. Underscan is useful for computer monitors so that toolbars and
+scrollbars at the edges can be seen.
 
 For best results, match the X display area as close as possible to the edges
 of the physical screen. This can only be adjusted by your tv-out device or
 by the settings for the television set. Many sets have these adjustments in
-a 'service mode'.
+a 'service mode'. If you cannot make these adjustments, there will be black
+borders around the edges of the X desktop, MythTV GUI and TV playback.
 
 MythTV has settings for "Overscan" in Setup->Playback. These can not, and do
 not, cause the image to display beyond the edge of the X display area. The
 purpose of these settings are to cut off rough edges and to expand the image
 so that objects will appear to be the same size as a normal overscanned TV
 picture.
-
-<sect2>MythTV on the Desktop
-<p>When using MythTV on a high resolution desktop monitor, set the MythTV
-GUI dimensions to something much smaller than your X display resolution but
-still large enough to read the fonts. The GUI screens will always be in the
-upper left hand corner. However, your window manager may be able to minimize
-these (ALT-F4 in KDE for example).
-
-The TV picture will start in full screen mode. Press "f" to put the picture
-in a window that can be moved and resized. By default, the picture uses the
-recording resolution for its dimensions. If you check the box "Fixed
-Aspect Ratio" in Setup->Playback, the windowed picture will always be
-resized to normal 4:3 shape.
 
 <sect1>I'd like to save or restore my database.
 <p>See the <bf>mysqldump</bf> manpage for more information.
@@ -4892,6 +4901,10 @@ v2.83, 2003-10-05.  Incorporate frontend-only docs.  Update XMLTV version.
 Differentiate between ATI All-in-Wonder and TV Wonder cards for people that
 don't know the difference.  Remove the manual test_ioctl stuff for PVR-250
 bitrate since we now have profile support.
+v2.84, 2003-10-15.  Bruce's updates to docs; contribution from Michael Greb
+for Xbox frontend.  Fix tag in section 3.  Bump to v 0.12.  Get rid of
+database upgrade step since it's now done automatically.  Add a thing in the
+hardware section about the PVR-350 as a TV-out.
 -->
 
 <!--

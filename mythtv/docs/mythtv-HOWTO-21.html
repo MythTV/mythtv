@@ -105,22 +105,8 @@ process all of the frames.</P>
 </H2>
 
 <P>MythTV is designed to be run as dedicated full screen TV application
-but can also be run as a desktop application on a computer
-monitor. Here are a few consideration for configuring sizes to best
-suit you needs.</P>
-<P>There are three sizes that are important for matching the MythTV GUI and
-full screen TV playback to fit the screen:</P>
-<P>
-<UL>
-<LI>the X display size</LI>
-<LI>the X Desktop (virtual) dimensions</LI>
-<LI>the MythTV GUI dimensions</LI>
-</UL>
-</P>
-<P>The MythTV GUI uses its GUI dimensions regardless of the other two and is
-anchored to the upper left corner of the X Desktop.</P>
-<P>The MythTV full screen mode uses the X display size dimensions regardless of
-the other two and is anchored to the upper left corner of the X display.</P>
+but can also be run as a desktop application on a computer monitor. Here
+are a few consideration for configuring sizes to best suit you needs.</P>
 
 <H3>X Dimensions</H3>
 
@@ -141,47 +127,43 @@ restart X.</P>
 
 <P>In 0.10 and later, from "mythfrontend" go to Setup->Appearance.
 The default for the height and width is "0" - this will cause
-MythTV to automatically size itself to full screen. To ensure that
-your new dimension settings take effect, exit and restart MythTV.</P>
-<P><B>NOTE</B>: When the GUI is full screen, you may need to set your window
-manager to 'Click to Focus' for windows to stack properly.</P>
+MythTV to automatically size itself to full screen.</P>
+<P>If the MythTV GUI width and height are not 0, mythfrontend uses these GUI
+dimensions and is anchored to the upper left corner of the X Desktop. If
+the GUI X and/or Y are not 0, the upper left corner is positioned at the
+specified coordinates. If the "Run the frontend in a window" box is checked,
+the window will have a frame and can then be dragged to any position on the
+desktop.</P>
+<P><B>NOTE</B>: When the GUI is full screen, you may see windows rapidly
+flipping on top of each other. If this happens you will need to set your
+window manager to 'Click to Focus' for windows to stack properly.</P>
 <P>The fonts for the GUI and OSD will scale to whatever sizes you use. Most
-font sizes can be changed in setup selections. Make sure to use fonts large
-enough to be read on a TV screen from a distance.</P>
+font sizes can be changed in setup selections or in the .xml files under
+<CODE>/usr/local/share/mythtv/</CODE> . Make sure to use fonts large enough
+to be read on a TV screen from a distance.</P>
 <P>The full screen TV size is based on the X display size. For Xinerama, you
-can specify a screen in Setup->General. The picture will be stretched to fit
-the entire screen regardless of the 
-<A HREF="#capture_resolution_">capture resolutions</A> used.</P>
+can specify a screen in Setup->General. The TV picture will be stretched
+to fit the entire GUI area regardless of the 
+<A HREF="#capture_resolution_">capture resolutions</A> used. However, during playback, the "W" key can
+to used to correct differences between 16:9 and 4:3.</P>
 
 <H3>Overscan Dimensions</H3>
 
 <P>Because picture edges can be ragged and screen edges aren't straight,
 Television is designed to project an image larger than the physical screen.
 This is called "overscan". Underscan is fitting the entire image inside the
-screen. This is useful for computer monitors so that toolbars and scrollbars
-at the edges can be seen.</P>
+screen. Underscan is useful for computer monitors so that toolbars and
+scrollbars at the edges can be seen.</P>
 <P>For best results, match the X display area as close as possible to the edges
 of the physical screen. This can only be adjusted by your tv-out device or
 by the settings for the television set. Many sets have these adjustments in
-a 'service mode'.</P>
+a 'service mode'. If you cannot make these adjustments, there will be black
+borders around the edges of the X desktop, MythTV GUI and TV playback.</P>
 <P>MythTV has settings for "Overscan" in Setup->Playback. These can not, and do
 not, cause the image to display beyond the edge of the X display area. The
 purpose of these settings are to cut off rough edges and to expand the image
 so that objects will appear to be the same size as a normal overscanned TV
 picture.</P>
-
-<H3>MythTV on the Desktop</H3>
-
-<P>When using MythTV on a high resolution desktop monitor, set the MythTV
-GUI dimensions to something much smaller than your X display resolution but
-still large enough to read the fonts. The GUI screens will always be in the
-upper left hand corner. However, your window manager may be able to minimize
-these (ALT-F4 in KDE for example).</P>
-<P>The TV picture will start in full screen mode. Press "f" to put the picture
-in a window that can be moved and resized. By default, the picture uses the
-recording resolution for its dimensions. If you check the box "Fixed
-Aspect Ratio" in Setup->Playback, the windowed picture will always be
-resized to normal 4:3 shape.</P>
 
 <H2><A NAME="ss21.5">21.5</A> <A HREF="mythtv-HOWTO.html#toc21.5">I'd like to save or restore my database.</A>
 </H2>

@@ -35,8 +35,7 @@ website will let you browse what other users have reported as their hardware
 configuration, and how happy they are with the results.</P>
 <P>If you have specific questions about the suitability of specific hardware
 choices, you can consult the archives of the mythtv-users mailing list at
-(url url="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"
-name="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"> or
+<A HREF="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/">http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/</A> or
 post a question to the list.</P>
 <H3>CPU Type and Speed</H3>
 
@@ -85,6 +84,9 @@ video encoder, such as a Matrox G200 or a Hauppauge WinTV-PVR-250/350.  In
 this mode, because the video encoding is being done externally, the CPU
 requirements are quite low.  See the 
 <A HREF="#video_capture_device">Video Capture Device</A> section for details.</P>
+<P>If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use the
+hardware-based video decoder for playback, which further reduces CPU
+requirements.</P>
 
 <H3>Memory</H3>
 
@@ -166,7 +168,7 @@ encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250 or 350
 from Hauppauge and the driver from the IvyTV project 
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> will
 allow you to use dedicated hardware encoders rather than your CPU. Release
-0.11 of MythTV is able to use the PVR-250/350 cards as an input device for
+0.12 of MythTV is able to use the PVR-250/350 cards as an input device for
 live TV and for scheduled recordings.  Using the onboard MPEG-2 encoder
 drastically reduces the CPU requirements for encoding.</P>
 <P>Here are some data points for encoding:
@@ -191,8 +193,8 @@ for Live TV at 416x480.</LI>
 section for information on installing a PVR-250 on Mandrake 9.1.</P>
 <P><B>NOTE</B>: The ATI All-in-Wonder cards (which are not the same as the ATI
 TV Wonder, TV Wonder VE or TV Wonder Pro) <EM>will not</EM> work as a MythTV
-capture device, as the 
-<A HREF="http://gatos.sourceforge.net">GATOS</A>
+capture device because the GATOS 
+<A HREF="http://gatos.sourceforge.net">http://gatos.sourceforge.net</A>
 drivers that are available provide only a limited subset of the V4L API. 
 The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.</P>
 
@@ -238,11 +240,11 @@ also run <CODE>xvinfo</CODE>; look for your video card to be listed as one
 of the adapters.</P>
 
 <P>If you want to use MythTV with a standard television, you will need a
-physical connection from your video card to your TV set, which can
-either be a TV-out port on the card itself, or an external adapter that
-converts the VGA signal to an appropriate video signal. "Appropriate"
-depends on a number of factors, such as video standard (NTSC vs PAL) type of
-input connection (Composite vs SVideo), etc.</P>
+physical connection from your video card to your TV set, which can either be
+a TV-out port on the card itself or an external adapter that converts the
+VGA signal to an appropriate video signal. "Appropriate" depends on a number
+of factors, such as video standard (NTSC vs PAL) type of input connection
+(Composite vs SVideo), etc.</P>
 <P>Note that with some video cards and X drivers, Xvideo extensions are
 only supported on the VGA output, and not on the TV output.</P>
 
@@ -340,6 +342,10 @@ inexpensive Savage card with TV out) is broken. See
 <LI>S3 Savage IX 8MB AGP. Has SVideo output. Reported to work.</LI>
 </UL>
 </P>
+
+<H3>Hauppauge PVR-350</H3>
+
+<P>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV driver.</P>
 
 <H3>Other Options</H3>
 
