@@ -469,7 +469,7 @@ QString VideoManager::GetMoviePoster(QString movieNum)
            + " HTTP/1.1\nHost: " + host + "\nUser-Agent: Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en)"
            + " Gecko/25250101 Netscape/5.432b1\n");
 
-    cout << "Grabbing Poster HTML From: " << url.toString() << endl;
+    //cout << "Grabbing Poster HTML From: " << url.toString() << endl;
 
     if (InetGrabber)
     {
@@ -608,7 +608,7 @@ int VideoManager::GetMovieListing(QString movieName)
 
         QMap<QString, QString>::Iterator it;
 
-        cout << endl << endl;
+        //cout << endl << endl;
         for (it = movieList.begin(); it != movieList.end(); ++it)
         {
             if (movieList.count() == 1)
@@ -620,7 +620,7 @@ int VideoManager::GetMovieListing(QString movieName)
                     ret = 1;
                 return ret;
             }
-            cout << it.data() << endl;
+            //cout << it.data() << endl;
         }
         movieList["manual"] = "Manually Enter IMDB #";
         movieList["reset"] = "Reset Entry";
@@ -661,6 +661,7 @@ void VideoManager::ParseMovieData(QString data)
     QString movieCoverFile = "";
     movieCoverFile = GetMoviePoster(movieNumber);
 
+    /*
     cout << "      Title:\t" << movieTitle << endl;
     cout << "       Year:\t" << movieYear << endl;
     cout << "   Director:\t" << movieDirector << endl;
@@ -669,6 +670,7 @@ void VideoManager::ParseMovieData(QString data)
     cout << "     Rating:\t" << movieRating << endl;
     cout << "    Runtime:\t" << movieRuntime << endl;
     cout << " Cover File:\t" << movieCoverFile << endl;
+    */
 
     if (movieTitle == "<NULL>")
         ResetCurrentItem();
@@ -1478,7 +1480,7 @@ void VideoManager::selected()
               update(fullRect());
               return;
           }
-          cout << "GETTING MOVIE #" << movieNumber << endl;
+          //cout << "GETTING MOVIE #" << movieNumber << endl;
           GetMovieData(movieNumber);
           backup.begin(this);
           backup.drawPixmap(0, 0, myBackground);
@@ -1489,7 +1491,7 @@ void VideoManager::selected()
       }
       else if (ret == -1)
       {
-          cout << "Error, movie not found.\n";
+          //cout << "Error, movie not found.\n";
           backup.begin(this);
           backup.drawPixmap(0, 0, myBackground);
           backup.end();
@@ -1559,7 +1561,7 @@ void VideoManager::selected()
                update(fullRect());
                return;
            }
-           cout << "GETTING MOVIE #" << movieNumber << endl;
+           //cout << "GETTING MOVIE #" << movieNumber << endl;
            GetMovieData(movieNumber);
            backup.begin(this);
            backup.drawPixmap(0, 0, myBackground);
