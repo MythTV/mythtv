@@ -45,9 +45,11 @@ void RipFile::close()
     {
         QString new_name = base_name + extension;
         QDir stupid_qdir("this_is_stupid");
-        if(!stupid_qdir.rename(active_file->name(), new_name));
+        if(!stupid_qdir.rename(active_file->name(), new_name))
         {
             cerr << "fileobs.o: Couldn't rename a ripped file on close ... that sucks." << endl;
+            cerr << "   old name: \"" << active_file->name() << "\"" << endl;
+            cerr << "   new name: \"" << new_name << "\"" << endl;
         }
     }
     else
