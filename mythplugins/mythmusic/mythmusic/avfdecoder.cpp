@@ -12,6 +12,7 @@
 
     Revision History
         - Initial release
+        - 1/9/2004 - Improved seek support
 */
 
 #include <assert.h>
@@ -299,15 +300,10 @@ void avfDecoder::run()
         // Look to see if user has requested a seek
         if (seekTime >= 0.0) 
         {
-            // curpos = (int)(((seekTime * 44100) / CD_FRAMESAMPLES) + start);
-            // Add seeking here
             cerr << "avfdecoder.o: seek time " << seekTime << endl;
-            //ifmt->read_seek(ic, (int64_t)(pkt->pts + ((seekTime * 1000)*AV_TIME_BASE)));
-            //ifmt->read_seek(ic, 0, (int64_t)((seekTime * 1000) * AV_TIME_BASE));
-            if (av_seek_frame(ic, 0, (int64_t)((seekTime * 1000) * 
-                              AV_TIME_BASE)) < 0)
+            if (av_seek_frame(ic, 0, (int64_t)(seekTime * AV_TIME_BASE)) < 0)
             {
-                cerr << "error seeking" << endl;
+                cerr << "avfdecoder.o: error seeking" << endl;
             }
 
             seekTime = -1.0;
@@ -328,7 +324,7 @@ void avfDecoder::run()
         len = pkt->size;
         mutex()->unlock();
 
-        while (len > 0 && !done && !finish && !user_stop)  
+        while (len > 0 && !done && !finish && !user_stop && seekTime <= 0.0)  
         {
             mutex()->lock();
             // Decode the stream to the output codec
@@ -386,7 +382,7 @@ void avfDecoder::run()
             len -= dec_len;
             mutex()->unlock();
         }
-        // av_free_packet(pkt);
+        av_free_packet(pkt);
     }
 
     flush(TRUE);
@@ -433,92 +429,10 @@ Metadata* avfDecoder::getMetadata(QSqlDatabase *x)
     title += (char *)ic->title;
     genre += (char *)ic->genre;
     year = ic->year;
+    tracknum = ic->track;
     length = (ic->duration / AV_TIME_BASE) * 1000;
 
-    // Only mess around with this is the format is ASF
-    if (strcmp(ic->iformat->name, "asf") == 0 && !ignore_id3)
-    {
-        // Raw code for reading album from extended information not supported
-        // by libavformat.  Should be included in library because it is specific
-        // to wma which this decoder may not (hopefully)
-
-        // This is mostly stripped from asf.c from the libavformat library
-        ByteIOContext *pb = &ic->pb;
-        GUID g;
-        int64_t gsize; 
-
-        if (pb->pos > 0) 
-            url_fseek(pb, 0, SEEK_SET);
-        av_set_pts_info(ic, 32, 1, 1000);
-        get_guid(pb, &g);
-        get_le64(pb); 
-        get_le32(pb);
-        get_byte(pb);
-        get_byte(pb);
-        for (;;) 
-        {
-            get_guid(pb, &g);
-            gsize = get_le64(pb);
-            if (gsize < 24) 
-                break;
-
-            if (!memcmp(&g, &extended_content_header, sizeof(GUID))) 
-            {
-                int desc_count, i;
-
-                desc_count = get_le16(pb);
-                for (i = 0; i < desc_count; i++)
-                {
-                    int name_len, value_type, value_len, value_num = 0;
-                    char *name, *value;
-
-                    name_len = get_le16(pb);
-                    name = new char[name_len];
-                    get_str16_nolen(pb, name_len, name, name_len);
-                    value_type = get_le16(pb);
-                    value_len = get_le16(pb);
-
-                    // unicode or byte
-                    if ((value_type == 0) || (value_type == 1))
-                    {
-                        value = new char[value_len];
-                        get_str16_nolen(pb, value_len, value, value_len); 
-                        if (strcmp(name,"WM/AlbumTitle") == 0) 
-                        { 
-                            album += value; 
-                        }
-                        free(value);
-                    }
-                    // boolean or DWORD or QWORD or WORD
-                    if ((value_type >= 2) || (value_type <= 5))
-                    {
-                        if (value_type==2) 
-                            value_num = get_le32(pb);
-                        if (value_type==3) 
-                            value_num = get_le32(pb);
-                        if (value_type==4) 
-                            value_num = get_le64(pb);
-                        if (value_type==5) 
-                            value_num = get_le16(pb);
-                        if (strcmp(name,"WM/Track") == 0) 
-                            tracknum = value_num + 1;
-                        if (strcmp(name,"WM/TrackNumber") == 0) 
-                            tracknum = value_num;
-                    }
-                    free(name);
-                }
-            } 
-            else if (url_feof(pb)) 
-            {
-                break;
-            } 
-            else 
-            {
-                url_fseek(pb, gsize - 24, SEEK_CUR);
-            }
-        }
-    }
-    else
+    if (ignore_id3)
     {
         getMetadataFromFilename(filename, QString(".wma$"), artist, album,
                                 title, genre, tracknum);
