@@ -880,6 +880,15 @@ void OSD::SetTextByRegexp(const QString &name,
             container->DisplayFor(length * fps);
         else
             container->Display();
+
+        if ((regexpMap.contains("iconpath")) &&
+            (regexpMap["iconpath"] != ""))
+        {
+            OSDTypeImage *cs = (OSDTypeImage *)container->GetType("channelicon");
+            if (cs)
+                cs->LoadImage(regexpMap["iconpath"], wmult, hmult, 30, 30);
+        }
+
         m_setsvisible = true;
     }
     pthread_mutex_unlock(&osdlock);

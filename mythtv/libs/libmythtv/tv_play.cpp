@@ -1267,15 +1267,17 @@ void TV::DoInfo(void)
     oset = osd->GetSet("status");
     if ((oset) && (oset->Displaying()))
     {
-        osd->HideSet("status");
+        oset->Display(false);
 
         QMap<QString, QString> regexpMap;
         playbackinfo->ToMap(regexpMap);
-        osd->SetInfoText(regexpMap, osd_display_time);
+        osd->SetTextByRegexp("program_info", regexpMap, osd_display_time);
     }
     else
     {
-        osd->HideSet("program_info");
+        oset = osd->GetSet("program_info");
+        if ((oset) && (oset->Displaying()))
+            oset->Display(false);
 
         QString desc = "";
         int pos = calcSliderPos(0, desc);
@@ -1650,7 +1652,7 @@ void TV::UpdateOSD(void)
 
     GetChannelInfo(activerecorder, regexpMap);
 
-    osd->SetInfoText(regexpMap, osd_display_time);
+    osd->SetTextByRegexp("program_info", regexpMap, osd_display_time);
     osd->SetTextByRegexp("channel_number", regexpMap, osd_display_time);
 }
 
@@ -2021,8 +2023,7 @@ void TV::BrowseStart(void)
 
 void TV::BrowseEnd(bool change)
 {
-    osd->HideSet("program_info");
-    osd->HideSet("channel_number");
+    osd->HideSet("browse_info");
 
     if (change)
     {
@@ -2038,7 +2039,6 @@ void TV::BrowseDispInfo(int direction)
     QDateTime maxtime = curtime.addSecs(60 * 60 * 4);
     QDateTime lastprogtime =
                   QDateTime::fromString(browsestarttime, Qt::ISODate);
-    OSDSet *oset;
     QMap<QString, QString> regexpMap;
 
     if (paused)
@@ -2064,14 +2064,6 @@ void TV::BrowseDispInfo(int direction)
     browsechanid = regexpMap["chanid"];
     browsestarttime = regexpMap["dbstarttime"];
 
-    osd->SetInfoText(regexpMap, osd_display_time);
-    oset = osd->GetSet("program_info");
-    if (oset)
-        osd->SetVisible(oset, 0);
-
-    osd->SetTextByRegexp("channel_number", regexpMap, osd_display_time);
-    oset = osd->GetSet("channel_number");
-    if (oset)
-        osd->SetVisible(oset, 0);
+    osd->SetTextByRegexp("browse_info", regexpMap, -1);
 }
 

@@ -75,6 +75,36 @@
   -->
   </container>
 
+  <container name="browse_info">
+    <image name="background">
+      <filename>osd-browse.png</filename>
+      <position>0,355</position>
+    </image>
+    <textarea name="title">
+      <area>182,369,350,27</area>
+      <font>infofont</font>
+    </textarea>
+    <textarea name="description">
+      <multiline>yes</multiline>
+      <area>14,419,615,122</area>
+      <font>infofont</font>
+      <value>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS% minutes)</value>
+    </textarea>
+    <image name="channelicon">
+      <position>7,363</position>
+      <staticsize>36,36</staticsize>
+    </image>
+    <textarea name="callsign">
+       <area>48,369,112,27</area>
+       <font>infofont</font>
+       <value>%CALLSIGN% - %CHANNUM%</value>
+    </textarea>
+    <textarea name="time">
+       <area>568,369,60,27</area>
+       <font>infofont</font>
+    </textarea>
+  </container>
+
   <container name="status" priority="10" fademovement="0,6">
     <image name="background">
       <filename>osd-small.png</filename>
