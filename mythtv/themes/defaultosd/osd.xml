@@ -35,8 +35,8 @@
   </font>
 
   <container name="channel_number">
-    <textarea name="channum">
-      <area>460,20,160,90</area>
+    <textarea name="channum" align="right">
+      <area>440,30,160,90</area>
       <font>channelfont</font>
     </textarea>
   </container> 
@@ -44,29 +44,29 @@
   <container name="program_info">
     <image name="background">
       <filename>osd-big.png</filename>
-      <position>0,280</position>
+      <position>30,260</position>
     </image>
     <textarea name="title">
-      <area>182,294,350,27</area>
+      <area>212,274,290,27</area>
       <font>infofont</font>
     </textarea>
     <textarea name="description"> <!-- since there's no 'subtitle' present,
                                        this will be a combined description 
                                        and subtitle -->
       <multiline>yes</multiline>
-      <area>14,344,615,122</area>
+      <area>44,324,555,122</area>
       <font>infofont</font>
     </textarea>
     <image name="channelicon"> <!-- set internally, doesn't need a filename -->
-      <position>7,288</position>
+      <position>37,268</position>
       <staticsize>36,36</staticsize> <!-- resize the image to these dimensions -->
     </image>
     <textarea name="callsign">
-       <area>48,294,112,27</area>
+       <area>78,274,112,27</area>
        <font>infofont</font>
     </textarea>
     <textarea name="time">
-       <area>568,294,60,27</area>
+       <area>538,274,60,27</area>
        <font>infofont</font>
     </textarea>
  <!-- just some examples.  The textarea is displaying a static message.
@@ -86,29 +86,29 @@
   <container name="browse_info">
     <image name="background">
       <filename>osd-browse.png</filename>
-      <position>0,355</position>
+      <position>30,335</position>
     </image>
     <textarea name="title">
-      <area>182,369,350,27</area>
+      <area>212,349,290,27</area>
       <font>infofont</font>
     </textarea>
     <textarea name="description">
       <multiline>yes</multiline>
-      <area>14,419,615,122</area>
+      <area>44,399,555,122</area>
       <font>infofont</font>
       <value>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS%)</value>
     </textarea>
     <image name="channelicon">
-      <position>7,363</position>
+      <position>37,343</position>
       <staticsize>36,36</staticsize>
     </image>
     <textarea name="callsign">
-       <area>48,369,112,27</area>
+       <area>78,349,112,27</area>
        <font>infofont</font>
        <value>%CALLSIGN% - %CHANNUM%</value>
     </textarea>
     <textarea name="time">
-       <area>568,369,60,27</area>
+       <area>538,349,60,27</area>
        <font>infofont</font>
     </textarea>
   </container>
@@ -116,50 +116,50 @@
   <container name="status" priority="10" fademovement="0,6">
     <image name="background">
       <filename>osd-small.png</filename>
-      <position>0,392</position>
+      <position>30,372</position>
     </image>
     <textarea name="status">
-      <area>175,406,140,27</area>
+      <area>205,386,140,27</area>
       <font>infofont</font>
     </textarea>
     <slider name="statusslider" type="fill">
-      <area>312,446,318,20</area>
+      <area>342,426,258,20</area>
       <filename>fill-blue.png</filename>
     </slider>
     <textarea name="slidertext">
-      <area>14,446,280,26</area>
+      <area>44,426,280,26</area>
       <font>infofont</font>
     </textarea>
   </container>
 
   <container name="editmode">
     <slider name="editslider" type="edit">
-      <area>25,425,590,65</area>
+      <area>40,405,560,65</area>
       <filename>fill-blue.png</filename>
       <altfilename>red.png</altfilename>
     </slider>
     <slider name="editposition" type="position">
-      <area>25,415,590,65</area>
+      <area>40,395,560,65</area>
       <filename>position-indicator.png</filename>
     </slider>
     <editarrow name="left">
       <filename>cut-end.png</filename>
-      <area>25,400,590,65</area>
+      <area>40,380,560,65</area>
     </editarrow>
     <editarrow name="right">
       <filename>cut-start.png</filename>
-      <area>25,400,590,65</area>
+      <area>40,380,560,65</area>
     </editarrow>
     <textarea name="timedisplay" align="right">
-      <area>270,30,330,30</area>
+      <area>255,30,330,30</area>
       <font>settings</font>
     </textarea>
     <textarea name="cutindicator">
-      <area>40,30,100,30</area>
+      <area>55,30,100,30</area>
       <font>settings</font>
     </textarea>
     <textarea name="seekamount" align="right">
-      <area>200,390,400,30</area>
+      <area>185,370,400,30</area>
       <font>infofont</font>
     </textarea>
   </container>
@@ -256,10 +256,10 @@
 
   <container name="news_scroller" priority="20">
     <box name="background">
-      <area>0,434,640,40</area>
+      <area>0,414,640,40</area>
     </box>
     <textarea name="text_scroll">
-      <area>0,440,640,40</area>
+      <area>0,420,640,40</area>
       <font>settings</font>
       <scroller>yes</scroller>
       <scrollmovement>-3,0</scrollmovement> <!-- only x movement for now -->

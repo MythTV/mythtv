@@ -22,6 +22,7 @@
 using namespace std;
 
 #include "playbackbox.h"
+#include "proglist.h"
 #include "tv.h"
 #include "oldsettings.h"
 #include "NuppelVideoPlayer.h"
@@ -1286,6 +1287,20 @@ void PlaybackBox::expireSelected()
     expire(curitem);
 }
 
+void PlaybackBox::upcoming()
+{
+    state = kStopping;
+
+    if (!curitem)
+        return;
+
+    ProgLister *pl = new ProgLister(plTitle, curitem->title,
+                                   QSqlDatabase::database(),
+                                   gContext->GetMainWindow(), "proglist");
+    pl->exec();
+    delete pl;
+}
+
 void PlaybackBox::details()
 {
     state = kStopping;
@@ -1512,7 +1527,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     if ((types == EndOfRecording || types == DeleteRecording) &&
         (program->IsSameProgram(*program)))
     {
-        tmpmessage = tr("Yes, but allow future recordings of this episode"); 
+        tmpmessage = tr("Yes, and allow re-record"); 
         tmpslot = SLOT(doDeleteForgetHistory());
         popup->addButton(tmpmessage, this, tmpslot);
     }
@@ -1997,6 +2012,8 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 showActionsSelected();
             else if (action == "DETAILS")
                 details();
+            else if (action == "UPCOMING")
+                upcoming();
             else if (action == "SELECT")
                 selected();
             else if (action == "UP")
