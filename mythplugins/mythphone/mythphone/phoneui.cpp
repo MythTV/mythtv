@@ -133,6 +133,7 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     camContrast = 32768;
     localClient = 0;
     txClient = 0;
+    txFps = atoi((const char *)gContext->GetSetting("TransmitFPS"));
     if (WebcamDevice.length() > 0)
     {
         if (webcam->camOpen(WebcamDevice, wcWidth, wcHeight)) 
@@ -141,7 +142,6 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
             camBrightness = webcam->GetBrightness();
             camContrast = webcam->GetContrast();
             camColour = webcam->GetColour();
-            txFps = atoi((const char *)gContext->GetSetting("TransmitFPS"));
             localClient = webcam->RegisterClient(VIDEO_PALETTE_RGB32, 20, this);
         }
     }

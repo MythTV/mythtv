@@ -324,6 +324,12 @@ wcClient *Webcam::RegisterClient(int format, int fps, QObject *eventWin)
 {
     wcClient *client = new wcClient;
 
+    if (fps == 0)
+    {
+        fps = 10;
+        cerr << "Webcam requested fps of zero\n";
+    }
+
     client->eventWindow = eventWin;
     client->fps = fps;
     client->actualFps = fps;
