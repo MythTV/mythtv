@@ -640,7 +640,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
 
     if (!buf2)
     {
-        buf2 = new unsigned char[video_size];
+        buf2 = new unsigned char[video_size + 64];
         planes[0] = buf;
         planes[1] = planes[0] + video_width * video_height;
         planes[2] = planes[1] + (video_width * video_height) / 4;

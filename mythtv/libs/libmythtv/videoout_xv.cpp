@@ -412,7 +412,8 @@ bool VideoOutputXv::CreateXvBuffers(void)
                                           colorid, 0, XJ_width, XJ_height,
                                           &(data->XJ_SHMInfo)[i]);
 
-        (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE, image->data_size,
+        (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE, 
+                                             image->data_size + 64,
                                              IPC_CREAT|0777);
 
         if ((data->XJ_SHMInfo)[i].shmid < 0)
@@ -495,7 +496,7 @@ bool VideoOutputXv::CreateShmBuffers(void)
         vbuffers[i].bpp = 12;
         vbuffers[i].size = XJ_height * XJ_width * 3 / 2;
         vbuffers[i].codec = FMT_YV12;
-        vbuffers[i].buf = new unsigned char[vbuffers[i].size];
+        vbuffers[i].buf = new unsigned char[vbuffers[i].size + 64];
         vbuffers[i].qscale_table = NULL;
         vbuffers[i].qstride = 0;
     }
@@ -523,7 +524,7 @@ bool VideoOutputXv::CreateXBuffers(void)
         vbuffers[i].bpp = 12;
         vbuffers[i].size = XJ_height * XJ_width * 3 / 2;
         vbuffers[i].codec = FMT_YV12;
-        vbuffers[i].buf = new unsigned char[vbuffers[i].size];
+        vbuffers[i].buf = new unsigned char[vbuffers[i].size + 64];
         vbuffers[i].qscale_table = NULL;
         vbuffers[i].qstride = 0;
     }

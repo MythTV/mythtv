@@ -76,6 +76,11 @@ OSDSet::OSDSet(const OSDSet &other)
     m_xoff = other.m_xoff;
     m_yoff = other.m_yoff;
     m_allowfade = other.m_allowfade;
+    m_wantsupdates = other.m_wantsupdates;
+    m_lastupdate = other.m_lastupdate;
+    m_needsupdate = other.m_needsupdate;
+    m_draweveryframe = other.m_draweveryframe;
+
     currentOSDFunctionalType = 0;
 
     allTypes = new vector<OSDType *>;
