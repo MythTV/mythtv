@@ -778,7 +778,8 @@ void NuppelVideoPlayer::AddTextData(char *buffer, int len,
         memcpy(tbuffer[wtxt], buffer, len);
         txttimecodes[wtxt] = timecode;
         txttype[wtxt] = type;
-   
+        txtlen[wtxt] = len;  
+ 
         pthread_mutex_lock(&text_buflock);
         wtxt = (wtxt+1) % MAXTBUFFER;
         pthread_mutex_unlock(&text_buflock);

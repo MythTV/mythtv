@@ -164,7 +164,14 @@ void MpegRecorder::StartRecording(void)
 
         ret = read(readfd, buffer, 256000);
 
-        ringBuffer->Write(buffer, ret);
+        if (ret < 0)
+        {
+            cerr << "error reading from: " << videodevice << endl;
+            perror("read");
+            continue;
+        }
+        else if (ret > 0)
+            ringBuffer->Write(buffer, ret);
 
         gettimeofday(&now, NULL);
     }

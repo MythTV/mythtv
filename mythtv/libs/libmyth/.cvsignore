@@ -11,3 +11,4 @@ moc_settings.cpp
 moc_mythwidgets.cpp
 moc_mythcontext.cpp
 moc_mythwizard.cpp
+moc_uitypes.cpp

@@ -205,16 +205,6 @@ void Channel::SetFreqTable(const QString &name)
     }
 }
  
-void Channel::ForceCurrentChannel(void)
-{ 
-    if (!isopen)
-        return;
-    if (!externalChanger[currentcapchannel].isEmpty())
-        return;
-    ChannelUp();
-    ChannelDown();
-}
- 
 bool Channel::SetChannelByString(const QString &chan)
 {
     if (!isopen)
