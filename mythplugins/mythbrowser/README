@@ -39,7 +39,7 @@ simple mythplugin.
 2.1 Prerequisits
 ----------------
 
-You have to have kde development package installed
+You have to have the KDE development package installed.
 
 
 2.2 Compilation/Installation
@@ -97,7 +97,7 @@ via the popup menu.
 4. Hints
 ========
 
-I recommend to reconfigure .lircrc so that the myth activation button
+I recommend you reconfigure .lircrc so that the myth activation button
 issues a 'Return' rather than the 'Space' key-event.
 Add the 'Pause' key to your .lircrc in order to enable fast switching
 between different tabs. Alternatively you can also map the popup menu

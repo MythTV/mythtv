@@ -1,11 +1,11 @@
                                    MythVideo
-                                 Version 0.16
+                                 Version 0.17
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-	MythTV 0.14 installed and working
+	MythTV 0.14 or higher installed and working
 
 If you have met the requirements above, simply type 'qmake mythvideo.pro' then 
 'make' in the main directory to begin compiling.
@@ -45,7 +45,7 @@ page. Otherwise, MythVideo will present you with a list of movies and the
 year of the movie.
 
 IF MYTHVIDEO DOES NOT FIND YOUR MOVIE OR JUST SEEMS TO DO NOTHING - Do not
-dispare! MythVideo also allows you to enter the IMDB Movie number manually.
+despair! MythVideo also allows you to enter the IMDB Movie number manually.
 To enter a movie number manually or reset an entry in the event of bad
 information, simply hit 'M' and select either 'Reset Entry' or 'Manually
 Enter IMDB #' (depending on what you want to do).

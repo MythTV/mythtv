@@ -1,4 +1,4 @@
-MythNews (A RSS News Feed Plugin for MythTV) v0.2 for MythTV 0.16
+MythNews (A RSS News Feed Plugin for MythTV) v0.2 for MythTV 0.17
 ---------------------------------------------------------------------
 
 
@@ -48,7 +48,3 @@ force updating news from all sites (WARNING: Don't use this key
 frequently unless you want to DOS the news sites and get locked). The
 news gets updated automatically depending on the frequency which you
 set in the setup page.
-
-
-
-	

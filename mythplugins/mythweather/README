@@ -1,11 +1,11 @@
                                    MythWeather 
-			          Release 0.16
+			          Release 0.17
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-	MythTV (v0.14) installed and working
+	MythTV (v0.14 or higher) installed and working
 	Internet Access (to get the weather!)
 
 
