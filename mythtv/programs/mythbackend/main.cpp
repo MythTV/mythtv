@@ -77,8 +77,9 @@ int main(int argc, char **argv)
                 cerr << "Missing argument to -p/--pidfile option\n";
                 return -1;
             }
-        } else if (!strcmp(a.argv()[argpos],"-f")) {
-            daemonize = false;
+        } else if (!strcmp(a.argv()[argpos],"-d") ||
+                   !strcmp(a.argv()[argpos],"--daemon")) {
+            daemonize = true;
         } else {
             cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             return -1;
