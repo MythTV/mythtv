@@ -1096,6 +1096,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
             }
             else if (frameheader.comptype=='3') 
             {
+		int new_audio_samps = 0;
                 int lameret = 0;
                 short int pcmlbuffer[audio_samplerate]; 
                 short int pcmrbuffer[audio_samplerate];
@@ -1131,6 +1132,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                             if (waud >= AUDBUFSIZE)
                                 waud -= AUDBUFSIZE;
                         }
+			new_audio_samps += lameret;
                     }
                     else if (lameret < 0)
                     {
@@ -1140,7 +1142,11 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                     packetlen = 0;
                 } while (lameret > 0);
 
-                audbuf_timecode = frameheader.timecode; // time at end 
+		/* we want the time at the end -- but the file format stores
+		   time at the start of the chunk. */
+                audbuf_timecode = frameheader.timecode + 
+		    (int)( (new_audio_samps*100000.0) / effdsp );
+
                 lastaudiolen = audiolen(false);
                
                 pthread_mutex_unlock(&audio_buflock); // end critical section
@@ -1171,7 +1177,11 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 		waud = (waud + len) % AUDBUFSIZE;
 
                 lastaudiolen = audiolen(false);
-                audbuf_timecode = frameheader.timecode; // time at end
+
+		/* we want the time at the end -- but the file format stores
+		   time at the start of the chunk. */
+                audbuf_timecode = frameheader.timecode + 
+		    (int)( (len*100000.0) / (audio_bytes_per_sample*effdsp) ); 
 
                 pthread_mutex_unlock(&audio_buflock); // end critical section
             }
@@ -1277,6 +1287,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     gettimeofday(&nexttrigger, NULL);
   
+
     //Jitterometer *output_jmeter = new Jitterometer("video_output", 100);
 
     if (!disablevideo)
@@ -1389,7 +1400,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
                 (nexttrigger.tv_usec - now.tv_usec); // uSecs
 
-
 	/* If delay is something silly, like > 200ms or < 0ms, 
 	   we clip it to these amounts. */
         if ( delay > 200000 )
@@ -1403,7 +1413,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         if (delay > 0)
             usleep(delay);
 	else
+	{
+	    //printf("clipped negative delay %d.\n", delay);
 	    delay_clipping = 1;
+	}
 
 	/* The time right now is a good approximation of nexttrigger. */
 	/* It's not perfect, because usleep() is only pseudo-
@@ -1444,16 +1457,14 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 	    
 	    if (laudiotime != 0) // laudiotime = 0 after a seek
 	    {
-		/* The time at the start of this frame (ie, now) is
-		   given by (timecodes[rpos] - frame_time). Because the
-		   timecode was taken at the end of the frame. */
-
 		/* if we were perfect, (timecodes[rpos] - frame_time) 
 		   and laudiotime would match, and this adjustment 
 		   wouldn't do anything */
-		avsync_delay = ((timecodes[rpos] - 
-                                 (int)(1000.0 / video_frame_rate))
-				 - laudiotime) * 1000; // uSecs
+
+		/* The time at the start of this frame (ie, now) is
+		   given by timecodes[rpos] */
+
+		avsync_delay = (timecodes[rpos] - laudiotime) * 1000; // uSecs
 
 		if(avsync_delay < -100000 || avsync_delay > 100000)
 		    nexttrigger.tv_usec += avsync_delay / 3; // re-syncing
@@ -1915,8 +1926,10 @@ bool NuppelVideoPlayer::DoRewind(void)
             framesPlayed++;
             normalframes--;
 
+	    pthread_mutex_lock(&video_buflock);
             DecodeFrame(&frameheader, strm, vbuffer[wpos]);
             wpos = (wpos + 1) % MAXVBUFFER;
+	    pthread_mutex_unlock(&video_buflock);
         }
     }
 
@@ -2062,8 +2075,10 @@ bool NuppelVideoPlayer::DoFastForward(void)
             framesPlayed++;
             normalframes--;
 
+	    pthread_mutex_lock(&video_buflock);
             DecodeFrame(&frameheader, strm, vbuffer[wpos]);
             wpos = (wpos + 1) % MAXVBUFFER;
+	    pthread_mutex_unlock(&video_buflock);
         }
     }
 
