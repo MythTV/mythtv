@@ -1,5 +1,7 @@
 #include "mythtv/mythcontext.h"
 
+#include <unistd.h>
+
 #include "globalsettings.h"
 #include <qfile.h>
 #include <qdialog.h>
