@@ -1963,50 +1963,50 @@ void Weather::showLayout(int pageNum)
 bool Weather::UpdateData()
 {
 
-        timeoutCounter = 0;
-        LayerSet *container = theme->GetSet("weatherpages");
-        if (container)
-        {
-            SetText(container, "updatetime", tr("Updating..."));
-        }
+    timeoutCounter = 0;
+    LayerSet *container = theme->GetSet("weatherpages");
+    if (container)
+    {
+        SetText(container, "updatetime", tr("Updating..."));
+    }
+    
+    bool haveData = false;
+    allowkeys = false;
+    if (debug == true)
+        cerr << "MythWeather: COMMS : GetWeatherData() ...\n";
+    
+    int cnt = 3;
+    while (cnt > 0)
+    {
+        stopProcessing = false;
+        urlTimer->start(weatherTimeoutInt);
+        haveData = GetWeatherData();
+        urlTimer->stop();
+        if (haveData == true)
+            cnt = 0;
+        else
+            cnt--;
+    }
+    
+    if (haveData == false)
+        cout << "MythWeather: Failed to get weather data.\n"; 
+    
+    update(fullRect);
+    allowkeys = true;
 
-        bool result = false;
-        allowkeys = false;
-        if (debug == true)
-            cerr << "MythWeather: COMMS : GetWeatherData() ...\n";
-
-        int cnt = 3;
-        while (cnt > 0)
-        {
-            stopProcessing = false;
-            urlTimer->start(weatherTimeoutInt);
-            result = GetWeatherData();
-            urlTimer->stop();
-            if (result == true)
-                cnt = 0;
-            else
-                cnt--;
-        }
-
-        if (result == false)
-            cout << "MythWeather: Failed to get weather data.\n"; 
-
-        update(fullRect);
-        allowkeys = true;
-
-        if (result == true)
-        {
+    if (haveData == true)
+    {
 
         updated = GetString("this.swLastUp");
-
+    
         city = GetString("this.swCity");
         state = GetString("this.swSubDiv");
         country = GetString("this.swCountry");
         curTemp = GetString("this.swTemp");
         if (curTemp.length() == 0)
         {
-                curTemp = "-na-";
-                updated = updated + tr(" (Not All Information Available)");
+            curTemp = "-na-";
+            updated = updated + tr(" (Not All Information Available)");
         }
         else
         {
@@ -2019,388 +2019,399 @@ bool Weather::UpdateData()
                 curTemp = tempHold;
             }
         }
-
+    
         curIcon = GetString("this.swCIcon");
         curWind = GetString("this.swWindS");
         if (convertData == true)
         {
-                char tempHold[32];
-                double tTemp = curWind.toDouble();
-                double nTemp = (double)(tTemp*1.6);
-                sprintf (tempHold, "%d", (int)nTemp);
-                curWind = tempHold;
+            char tempHold[32];
+            double tTemp = curWind.toDouble();
+            double nTemp = (double)(tTemp*1.6);
+            sprintf (tempHold, "%d", (int)nTemp);
+            curWind = tempHold;
         }
-
+    
         winddir = GetString("this.swWindD");
-
+    
         barometer = GetString("this.swBaro");
         if (convertData == true)
         {
-                char tempHold[32];
-                double tTemp = barometer.toDouble();
-                double nTemp = (double)(tTemp*3.386);
-                sprintf (tempHold, "%.1f", nTemp);
-                barometer = tempHold;
+            char tempHold[32];
+            double tTemp = barometer.toDouble();
+            double nTemp = (double)(tTemp*3.386);
+            sprintf (tempHold, "%.1f", nTemp);
+            barometer = tempHold;
         }
+        
         curHumid = GetString("this.swHumid");
         curFeel = GetString("this.swReal");
         if (convertData == true)
         {
-                char tempHold[32];
-                double tTemp = curFeel.toDouble();
-                double nTemp = (5.0/9.0)*(tTemp - 32.0);
-                sprintf (tempHold, "%d", (int)nTemp);
-                curFeel = tempHold;
+            char tempHold[32];
+            double tTemp = curFeel.toDouble();
+            double nTemp = (5.0/9.0)*(tTemp - 32.0);
+            sprintf (tempHold, "%d", (int)nTemp);
+            curFeel = tempHold;
         }
+        
         uvIndex = GetString("this.swUV");
         visibility = GetString("this.swVis");
         if (convertData == true && visibility.toDouble() != 999.0)
         {
-                char tempHold[32];
-                double tTemp = visibility.toDouble();
-                double nTemp = (double)(tTemp*1.6);
-                sprintf (tempHold, "%.1f", nTemp);
-                visibility = tempHold;
+            char tempHold[32];
+            double tTemp = visibility.toDouble();
+            double nTemp = (double)(tTemp*1.6);
+            sprintf (tempHold, "%.1f", nTemp);
+            visibility = tempHold;
         }
+        
         description = GetString("this.swConText");
         if (description.length() == 0)
-                description = curIcon;
+            description = curIcon;
         
         QString forecastData;
         forecastData = GetString("this.swFore");
-
+    
         QStringList holdings = QStringList::split("|", forecastData);
-  
+    
         int years, mons, days;
-
+    
         int dayNum = (holdings[0]).toInt();
         QDate curDay(QDate::currentDate());
         int curDayNum = curDay.dayOfWeek();
         if (curDayNum == 7)
-                curDayNum = 1;
+            curDayNum = 1;
         else
-                curDayNum++;
-
+            curDayNum++;
+    
         if (curDayNum != dayNum)
-                pastTime = true;
+            pastTime = true;
         else
-                pastTime = false;
-
+            pastTime = false;
+    
         for (int i = 5; i < 9; i++)
         {
-                QStringList dates = QStringList::split("/", holdings[i]);
-                years = dates[2].toInt();
-                mons = dates[0].toInt();
-                days = dates[1].toInt();
-                QDate doDate(years, mons, days);
-                switch (doDate.dayOfWeek())
-                {
-                        case 1: date[i - 5] = QString("MON"); break;
-                        case 2: date[i - 5] = QString("TUE"); break;
-                        case 3: date[i - 5] = QString("WED"); break;
-                        case 4: date[i - 5] = QString("THU"); break;
-                        case 5: date[i - 5] = QString("FRI"); break;
-                        case 6: date[i - 5] = QString("SAT"); break;
-                        case 7: date[i - 5] = QString("SUN"); break;
-                }
+            QStringList dates = QStringList::split("/", holdings[i]);
+            years = dates[2].toInt();
+            mons = dates[0].toInt();
+            days = dates[1].toInt();
+            QDate doDate(years, mons, days);
+            switch (doDate.dayOfWeek())
+            {
+                case 1: date[i - 5] = QString("MON"); break;
+                case 2: date[i - 5] = QString("TUE"); break;
+                case 3: date[i - 5] = QString("WED"); break;
+                case 4: date[i - 5] = QString("THU"); break;
+                case 5: date[i - 5] = QString("FRI"); break;
+                case 6: date[i - 5] = QString("SAT"); break;
+                case 7: date[i - 5] = QString("SUN"); break;
+            }
         }
-
+    
         for (int i = 9; i < 13; i++)
-                weatherIcon[i - 9] = holdings[i];
-
+            weatherIcon[i - 9] = holdings[i];
+    
         for (int i = 20; i < 24; i++)
         {
-                if (convertData == true)
-                {
-                        char tempHold[32];
-                        double tTemp = holdings[i].toDouble();
-                        double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
-                        sprintf (tempHold, "%d", (int)nTemp);
-                        holdings[i] = tempHold;
-                }
-                highTemp[i - 20] = holdings[i];
+            if (convertData == true)
+            {
+                char tempHold[32];
+                double tTemp = holdings[i].toDouble();
+                double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
+                sprintf (tempHold, "%d", (int)nTemp);
+                holdings[i] = tempHold;
+            }
+            highTemp[i - 20] = holdings[i];
         }
-
+    
         for (int i = 40; i < 44; i++)
-        {	
-                if (convertData == true)
-                {
-                        char tempHold[32];
-                        double tTemp = holdings[i].toDouble();
-                        double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
-                        sprintf (tempHold, "%d", (int)nTemp);
-                        holdings[i] = tempHold;
-                }
-                lowTemp[i - 40] = holdings[i];
+        {
+            if (convertData == true)
+            {
+                char tempHold[32];
+                double tTemp = holdings[i].toDouble();
+                double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
+                sprintf (tempHold, "%d", (int)nTemp);
+                holdings[i] = tempHold;
+            }
+            lowTemp[i - 40] = holdings[i];
         }
-
+    
         for (int i = 15; i < 19; i++)
-                weatherType[i - 15] = holdings[i];
-
+            weatherType[i - 15] = holdings[i];
+    
         setWeatherTypeIcon(weatherType);
         setWeatherIcon(description);
-
+    
         return true;
 
-        }
-        return false;
-
+    }
+    
+    return false;
 }
 
 void Weather::setWeatherTypeIcon(QString wt[5])
 {
-        bool isSet = false;
-        int start = 1;
-        if (pastTime == true)
-                start = 0;
+    bool isSet = false;
+    int start = 1;
+    if (pastTime == true)
+            start = 0;
 
-        for (int i = start; i < 5; i++)
+    for (int i = start; i < 5; i++)
+    {
+        isSet = false;
+        for (int j = 0; j < 128; j++)
         {
-                isSet = false;
-                for (int j = 0; j < 128; j++)
-                {
-                        if (wt[i].toInt() == wData[j].typeNum)
-                        {
-                                wt[i] = tr(wData[j].typeName);
-                                weatherIcon[i] = wData[j].typeIcon;
-                                isSet = true;
-                                j = 128;
-                        }
-                }
-
-                if (isSet == false)
-                {
-                        wt[i] = tr("Unknown") + " [" + wt[i] + "]";
-                        weatherIcon[i] = "unknown.png";
-                }
+            if (wt[i].toInt() == wData[j].typeNum)
+            {
+                wt[i] = tr(wData[j].typeName);
+                weatherIcon[i] = wData[j].typeIcon;
+                isSet = true;
+                j = 128;
+            }
         }
+
+        if (isSet == false)
+        {
+            wt[i] = tr("Unknown") + " [" + wt[i] + "]";
+            weatherIcon[i] = "unknown.png";
+        }
+    }
 }
 
 void Weather::setWeatherIcon(QString txtType)
 {
-        for (int j = 0; j < 128; j++)
+    for (int j = 0; j < 128; j++)
+    {
+        if (txtType.replace(QRegExp("  "),  "" ) == 
+            (wData[j].typeName).replace(QRegExp("  "),  "" ))
         {
-                if (txtType.replace(QRegExp("  "),  "" ) == 
-                    (wData[j].typeName).replace(QRegExp("  "),  "" ))
-                {
-                        curIcon = wData[j].typeIcon;
-                        description = tr(wData[j].typeName);
-                        return;
-                }
-                if (txtType.toInt() == wData[j].typeNum)
-                {
-                        curIcon = wData[j].typeIcon;
-                        description = tr(wData[j].typeName);
-                        return;
-                }
+            curIcon = wData[j].typeIcon;
+            description = tr(wData[j].typeName);
+            return;
         }
         
-        curIcon = "unknown.png";
-        
+        if (txtType.toInt() == wData[j].typeNum)
+        {
+            curIcon = wData[j].typeIcon;
+            description = tr(wData[j].typeName);
+            return;
+        }
+    }
+    
+    curIcon = "unknown.png";
 }
 
 QString Weather::GetString(QString tag)
 {
-        QString data;
-        int start = 0;
-        int len = 0;
+    QString data;
+    int start = 0;
+    int len = 0;
+    
+    start = httpData.find(tag, 0);
+    len = httpData.find("\"", start + tag.length() + 4) - start - tag.length() - 4;
+    
+    data = httpData.mid(start + tag.length() + 4, len);
 
-        start = httpData.find(tag, 0);
-        len = httpData.find("\"", start + tag.length() + 4) - start - tag.length() - 4;
-        
-        data = httpData.mid(start + tag.length() + 4, len);
-
-return data;
-
+    return data;
 }
 
 int Weather::GetInt(QString tag)
 {
-        QString data;
-        int start = 0;
-        int len = 0;
+    QString data;
+    int start = 0;
+    int len = 0;
+    
+    start = httpData.find(tag, 0);
+    len = httpData.find("\"", start + tag.length() + 4) - start - tag.length() - 4;
+    data = httpData.mid(start + tag.length() + 4, len);
+    int ret = data.toInt();
 
-        start = httpData.find(tag, 0);
-        len = httpData.find("\"", start + tag.length() + 4) - start - tag.length() - 4;
-        data = httpData.mid(start + tag.length() + 4, len);
-        int ret = data.toInt();
-
-return ret;
+    return ret;
 }
 
 float Weather::GetFloat(QString tag)
 {
-        QString data;
-        int start = 0;
-        int len = 0;
+    QString data;
+    int start = 0;
+    int len = 0;
 
-        start = httpData.find(tag, 0);
-        len = httpData.find("\"", start + tag.length() + 4) - start - tag.length() - 4;
-        data = httpData.mid(start + tag.length() + 4, len);
-        float ret = data.toFloat();
+    start = httpData.find(tag, 0);
+    len = httpData.find("\"", start + tag.length() + 4) - start - tag.length() - 4;
+    data = httpData.mid(start + tag.length() + 4, len);
+    float ret = data.toFloat();
 
-return ret;
-
+    return ret;
 }
 
 bool Weather::GetWeatherData()
 {
-     QUrl weatherDataURL("http://www.msnbc.com/m/chnk/d/weather_d_src.asp?acid=" + locale);
-     QUrl weatherMapLink1URL("http://w3.weather.com/weather/map/" + locale 
-                          + "?from=LAPmaps&setcookie=1 HTTP/1.1\nConnection: close\nHost: w3.weather.com\n\n\n");
+    QUrl weatherDataURL("http://www.msnbc.com/m/chnk/d/weather_d_src.asp?acid=" + locale);
+    QUrl weatherMapLink1URL(QString("http://w3.weather.com/weather/map/%1"
+                                    "?from=LAPmaps&setcookie=1 HTTP/1.1\n"
+                                    "Connection: close\nHost: w3.weather.com\n\n\n")
+                                    .arg(locale));
 
 
-     INETComms *weatherData = new INETComms(weatherDataURL);
-     INETComms *weatherMapLink1 = new INETComms(weatherMapLink1URL);
+    INETComms *weatherData = new INETComms(weatherDataURL);
+    INETComms *weatherMapLink1 = new INETComms(weatherMapLink1URL);
 
-     if (debug)
-     { 
-         cerr << "MythWeather: Grabbing Weather From: " << weatherDataURL.toString() << endl;
-         cerr << "MythWeather: Grabbing Weather Map Link (part 1) From: " 
-                  << weatherMapLink1URL.toString() << endl;
-     }
+    if (debug)
+    { 
+    cerr << "MythWeather: Grabbing Weather From: " << weatherDataURL.toString() << endl;
+    cerr << "MythWeather: Grabbing Weather Map Link (part 1) From: " 
+         << weatherMapLink1URL.toString() << endl;
+    }
+    VERBOSE(VB_NETWORK, QString("Grabbing weather from: %1").arg(weatherDataURL.toString()));
+    VERBOSE(VB_NETWORK, QString("Grabbing weather map(1) from: %1").arg(weatherMapLink1URL.toString()));
 
-     while (!weatherData->isDone())
-     {
-          qApp->processEvents();
-          if (stopProcessing)
-              return false;
-
-     }
-     while (!weatherMapLink1->isDone())
-     {
-          qApp->processEvents();
-          if (stopProcessing)
-              return false;
-     }
-     
-     LayerSet *container = theme->GetSet("weatherpages");
-     if (container)
-         SetText(container, "updatetime", updated);
-
-
-     httpData = weatherData->getData();
-     if (httpData.find("this.swAcid = \"\";") != -1 ||
-         httpData.find("<html>") != -1 ||
-         httpData.find("Microsoft VBScript runtime") != -1 ||
-         httpData.find("Internal Server Error") != -1  ||
-         httpData.find("Bad Request", 0) != -1)
-     {
-           cerr << "MythWeather: Invalid Area ID or server error.\n";
-           if (debug)
-               cerr << "MythWeather: HTTP Data Dump: " + httpData << endl;
-           if (container)
-               SetText(container, "updatetime", tr("*** Invalid Area ID or Server Error ***"));
-
+    while (!weatherData->isDone())
+    {
+        qApp->processEvents();
+        if (stopProcessing)
             return false;
-     }
 
-     QString tempData = "";
-     tempData = weatherMapLink1->getData();
-
-     delete weatherData;
-     delete weatherMapLink1;
-     weatherData = NULL;
-     weatherMapLink1 = NULL;
-
-     QString mapLoc = parseData(tempData, "if (isMinNS4) var mapNURL = \"", "\";");
-     if (mapLoc == "<NULL>")
-         return true;
+    }
+    
+    while (!weatherMapLink1->isDone())
+    {
+        qApp->processEvents();
+        if (stopProcessing)
+            return false;
+    }
      
-     QUrl weatherMapLink2URL("http://w3.weather.com/" + mapLoc); 
+    LayerSet *container = theme->GetSet("weatherpages");
+    if (container)
+        SetText(container, "updatetime", updated);
+
+
+    httpData = weatherData->getData();
+    if (httpData.find("this.swAcid = \"\";") != -1 ||
+        httpData.find("<html>") != -1 ||
+        httpData.find("Microsoft VBScript runtime") != -1 ||
+        httpData.find("Internal Server Error") != -1  ||
+        httpData.find("Bad Request", 0) != -1)
+    {
+        VERBOSE(VB_IMPORTANT, "MythWeather: Invalid area ID or server error.");
+        if (debug)
+            cerr << "MythWeather: HTTP Data Dump: " + httpData << endl;
+        
+        if (container)
+            SetText(container, "updatetime", tr("*** Invalid Area ID or Server Error ***"));
+
+        return false;
+    }
+
+    QString tempData = "";
+    tempData = weatherMapLink1->getData();
+
+    delete weatherData;
+    delete weatherMapLink1;
+    weatherData = NULL;
+    weatherMapLink1 = NULL;
+
+    QString mapLoc = parseData(tempData, "if (isMinNS4) var mapNURL = \"", "\";");
+    if (mapLoc == "<NULL>")
+        return true;
      
-     if (debug)
-         cerr << "MythWeather: Grabbing Weather Map Link (part 2) From: " 
-                 << weatherMapLink2URL.toString() << endl;
+    QUrl weatherMapLink2URL("http://w3.weather.com/" + mapLoc); 
+     
+    if (debug)
+        cerr << "MythWeather: Grabbing Weather Map Link (part 2) From: " 
+             << weatherMapLink2URL.toString() << endl;
+    
+    VERBOSE(VB_NETWORK, QString("Grabbing weather map(2) from: %1").arg(weatherMapLink2URL.toString()));
+              
+    INETComms *weatherMapLink2 = new INETComms(weatherMapLink2URL);
+    while (!weatherMapLink2->isDone())
+    {
+        qApp->processEvents();
+        if (stopProcessing)
+            return false;
 
-     INETComms *weatherMapLink2 = new INETComms(weatherMapLink2URL);
-     while (!weatherMapLink2->isDone())
-     {
-           qApp->processEvents();
-           if (stopProcessing)
-               return false;
+    }
 
-     }
+    QString tempData2 = weatherMapLink2->getData();
 
-     QString tempData2 = weatherMapLink2->getData();
+    delete weatherMapLink2;
+    weatherMapLink2 = NULL;
 
-     delete weatherMapLink2;
-     weatherMapLink2 = NULL;
+    QString imageLoc = parseData(tempData2, "<IMG NAME=\"mapImg\" SRC=\"http://image.weather.com", "\"");
+    if (imageLoc == "<NULL>")
+    {
+        VERBOSE(VB_IMPORTANT, "MythWeather: Warning: Failed to find link to map image.");
+        return true;
+    }
 
-     QString imageLoc = parseData(tempData2, "<IMG NAME=\"mapImg\" SRC=\"http://image.weather.com", "\"");
-     if (imageLoc == "<NULL>")
-     {
-         if (debug)
-             cerr << "MythWeather: Warning: Failed to find link to map image.\n";
+    char *home = getenv("HOME");
+    QString fileprefix = QString(home) + "/.mythtv";
 
-         return true;
-     }
+    QDir dir(fileprefix);
+    if (!dir.exists())
+        dir.mkdir(fileprefix);
 
-     char *home = getenv("HOME");
-     QString fileprefix = QString(home) + "/.mythtv";
+    fileprefix += "/MythWeather";
 
-     QDir dir(fileprefix);
-     if (!dir.exists())
-         dir.mkdir(fileprefix);
+    dir = QDir(fileprefix);
+    if (!dir.exists())
+        dir.mkdir(fileprefix);
 
-     fileprefix += "/MythWeather";
+    if (debug)
+        cerr << "MythWeather: Map File Prefix: " << fileprefix << endl;
 
-     dir = QDir(fileprefix);
-     if (!dir.exists())
-         dir.mkdir(fileprefix);
-
-     if (debug)
-         cerr << "MythWeather: Map File Prefix: " << fileprefix << endl;
-
-     if (debug)
-         cerr << "MythWeather: Copying Map File from Server (" << imageLoc << ")...";
-
-     QUrlOperator *op = new QUrlOperator();
-     connect(op, SIGNAL(finished(QNetworkOperation *)), SLOT(radarImgDone(QNetworkOperation *)));
-     op->copy(QString("http://image.weather.com/" + imageLoc),
+    if (debug)
+        cerr << "MythWeather: Copying Map File from Server (" << imageLoc << ")...";
+    
+    VERBOSE(VB_NETWORK, QString("MythWeather: Copying map file from server (%1)").arg(imageLoc));
+     
+    QUrlOperator *op = new QUrlOperator();
+    connect(op, SIGNAL(finished(QNetworkOperation *)), SLOT(radarImgDone(QNetworkOperation *)));
+    op->copy(QString("http://image.weather.com/" + imageLoc),
                       "file:" + fileprefix);
 
-     if (debug)
-         cerr << "Done.\n";
+    if (debug)
+        cerr << "Done.\n";
 
-     if (container)
-     {
-         QString filename = imageLoc.mid(imageLoc.findRev("/"), imageLoc.length() - imageLoc.findRev("/"));
-         UIImageType *type = (UIImageType *)container->GetType("radarimg");
-         if (type)
-         {
-             QString fullfile = fileprefix + filename;
-             if (debug)
-             cerr << "MythWeather: Full path to radar image: " << fullfile << endl;
-             type->SetImage(fullfile);
-         }
-     }
-     return true;
+    if (container)
+    {
+        QString filename = imageLoc.mid(imageLoc.findRev("/"), imageLoc.length() - imageLoc.findRev("/"));
+        UIImageType *type = (UIImageType *)container->GetType("radarimg");
+        if (type)
+        {
+            QString fullfile = fileprefix + filename;
+            if (debug)
+                cerr << "MythWeather: Full path to radar image: " << fullfile << endl;
+            
+            type->SetImage(fullfile);
+        }
+    }
+    
+    return true;
 }
 
 void Weather::radarImgDone(QNetworkOperation *op)
 {
-
-      if (op->operation() == QNetworkProtocol::OpListChildren) 
-      {
-          if (op->state() == QNetworkProtocol::StFailed)
-          {
-              cerr << "MythWeather: Error while grabbing the radar map." << endl;
-              return;
-          }
-      }
+    if (op->operation() == QNetworkProtocol::OpListChildren) 
+    {
+        if (op->state() == QNetworkProtocol::StFailed)
+        {
+            VERBOSE(VB_IMPORTANT, "MythWeather: Error while grabbing the radar map.");
+            cerr << "MythWeather: Error while grabbing the radar map." << endl;
+            return;
+        }
+    }
       
-      LayerSet *container = theme->GetSet("weatherpages");
+    LayerSet *container = theme->GetSet("weatherpages");
 
-      if (debug)
-          cerr << "MythWeather: Radar Image Done. (Loading...)\n";
+    if (debug)
+        cerr << "MythWeather: Radar Image Done. (Loading...)\n";
 
-      if (container)
-      {
-          UIImageType *type = (UIImageType *)container->GetType("radarimg");
-          if (type)
-              type->LoadImage();
-      }
+    if (container)
+    {    
+        UIImageType *type = (UIImageType *)container->GetType("radarimg");
+        if (type)
+            type->LoadImage();
+    }
 
 }
 
@@ -2410,10 +2421,15 @@ QString Weather::parseData(QString data, QString beg, QString end)
 
     if (debug == true)
     {
-          cout << "MythWeather: Parse HTML : Looking for: " << beg << ", ending with: " << end << endl;
-          if (data.length() == 0)
-              cout << "MythWeather: Parse HTML : No Data!\n";
+        cout << "MythWeather: Parse HTML : Looking for: " << beg << ", ending with: " << end << endl;
+        if (data.length() == 0)
+        {
+            cout << "MythWeather: Parse HTML : No Data!\n";
+            ret = "<NULL>";
+            return ret;
+        }
     }
+    
     int start = data.find(beg) + beg.length();
     int endint = data.find(end, start + 1);
     if (start != -1 && endint != -1)
