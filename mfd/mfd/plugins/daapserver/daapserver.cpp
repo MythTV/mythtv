@@ -1093,7 +1093,7 @@ DaapServer::~DaapServer()
     //  iTunes sends
     //
         
-    HttpResponse *going_away_response = new HttpResponse(NULL);
+    HttpResponse *going_away_response = new HttpResponse(this, NULL);
     going_away_response->setError(404);
 
     QValueList<int>::iterator it;

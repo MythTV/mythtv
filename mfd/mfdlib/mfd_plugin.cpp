@@ -481,7 +481,7 @@ void MFDServicePlugin::readClients()
                                 thread_pool.push_back(new_srt);
                             thread_pool_mutex.unlock();
                             ++thread_pool_size;
-                            log(QString("added another request thread on demand (there are now %1 of them)")
+                            log(QString("added another request thread on demand (total now %1)")
                                 .arg(thread_pool_size), 1);
                         
                         }
@@ -953,8 +953,9 @@ void MFDHttpPlugin::sendResponse(int client_id, HttpResponse *http_response)
     if(!which_client)
     {
         log("wanted to send an http response, but the client socket in question went away", 7);
+        return;
     }
-    a_client->lockWriteMutex();
+    which_client->lockWriteMutex();
         
         //
         //  Assemble and send the message
@@ -962,7 +963,7 @@ void MFDHttpPlugin::sendResponse(int client_id, HttpResponse *http_response)
 
         http_response->send(a_client);
 
-    a_client->unlockWriteMutex();
+    which_client->unlockWriteMutex();
 }
 
 MFDHttpPlugin::~MFDHttpPlugin()

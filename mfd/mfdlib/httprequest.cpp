@@ -98,7 +98,7 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
     //  Every request gets a response
     //
     
-    my_response = new HttpResponse(this);
+    my_response = new HttpResponse(parent, this);
     
     if(incoming_length > MAX_CLIENT_INCOMING)
     {
