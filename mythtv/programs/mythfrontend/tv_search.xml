@@ -41,7 +41,7 @@
       <text>Categories</text>
       <text lang="DE">Kategorie</text>
       <text lang="SV">Kategori</text>
-      <text lang="NL">Catergorie</text>
+      <text lang="NL">Categorie</text>
       <text lang="JA">カテゴリー</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
