@@ -80,63 +80,36 @@ inputs on the TV tuner card.  These keybindings aren't configurable yet.
 Additional Configuration
 ------------------------
 
-Ok.  Once you have all these additional dependencies installed, you need to 
-configure XMLTV.  Just run 'tv_grab_na --configure'  and answer the questions.
-I haven't used the other tv listing grabbers included in XMLTV, so if you're 
-outside of the US or Canada, you're going to have to figure stuff out on your
-own.  You'll probably also have to edit the 'grabdata' script to change the
-hardcoded reference to tv_grab_na.  Patches are welcome to fix that.
-
-Anyway.  The next thing to do is set up the mysql database that the program data
+The next thing to do is set up the mysql database that the program data
 will be stored in.  Change to the 'database' subdir of this distribution.
 You need to run the mc.sql script.  So, something like mysql < mc.sql
 might work.  I dunno.  It worked for me with the default mysql installation on
 debian, might not work elsewhere.  Better instructions welcome.
 
-UPGRADING FROM PREVIEW RELEASE 1
---------------------------------
-You need to add the record.sql script to the database, so, mysql < record.sql
-This is not needed on a new install.
+See the UPGRADING file for information on upgrading between releases.
 
-UPGRADING FROM PREVIEW RELEASE 2
---------------------------------
-Follow the above instructions to add record.sql.  Do the same thing for 
-conflict.sql.  Again, not needed for a new install.
+Next, you need to run the setup program that should be located in the setup/ 
+subdir.  It will ask you some questions about your hardware, and then run 
+xmltv's 'tv_grab_na' to configure your channels.  If you live in an area where
+'tv_grab_na' doesn't work, you're outta luck until someone bothers to write 
+support for other xmltv grabbers.
 
-UPGRADING FROM PREVIEW RELEASE 3
---------------------------------
-Do the same thing for conflictupdate.sql.  Not needed for a new install.
-The channel icons were moved from /usr/local/share/mythtv/ to ~/.mythtv/channels
-They'll be updated the next time you run the filldata script.  You can remove
-all the .jpg and .gif files from the /usr/local/share/mythtv/ directory, if
-you want.
+Once you've run the setup program, just run 'mythfilldata' to download and
+insert a week's worth of program data into the database.  'mythfilldata' should
+be run once a day, if you want to keep your database current.  
 
-UPGRADING FROM RELEASE 0.4
---------------------------
-You don't need to do anything other than re-edit the settings.txt file.
-
-Once the database is setup, run the filldata script also in the same directory.
-This'll take awhile, as it's populating the database with the next week's worth
-of program information.
-
-The 'filldata' script should be run every day, around 10 pm or so.  If you want
-updated program info, that is.  You don't have to run it at all, but then, 
-what's the point of doing all this?  Probably should be crontab'd, but that's
-for the future.
-
-Once 'filldata' has finished, try running the 'mythepg' binary.  It should be 
-populated with program info.  Use the arrow keys to move around in the grid.  
+Once 'mythfilldata' has finished, try running the 'mythepg' binary.  It should 
+be populated with program info.  Use the arrow keys to move around in the grid.
 'M' and 'Enter' quit.  So does 'C', but it's 'quit without selecting the 
 channel'. 
 
-Anyway.  Now that you have the 'mythepg' binary built, and the program database
-configured, try running the 'mythtv' binary again.  When you change channels, 
-it should show the proper information on the OSD.  Hitting 'M' should pop up 
-the program guide.  Exiting the program guide with 'Enter' or 'M' will change 
-to the channel it currently was on, exiting with 'Escape' will just exit 
-without changing the channel.  Pressing 'I' will let you get more information 
-about a program, and if you're running mythfrontend, will allow you to schedule
-recordings.
+Anyway.  Now that you have the program database populated and configured, try
+running the 'mythtv' binary again.  When you change channels, it should show the
+proper information on the OSD.  Hitting 'M' should pop up the program guide.  
+Exiting the program guide with 'Enter' or 'M' will change to the channel it 
+currently was on, exiting with 'Escape' will just exit without changing the 
+channel.  Pressing 'I' will let you get more information about a program, and 
+if you're running mythfrontend, will allow you to schedule recordings.
 
 Ok, so try running 'mythfrontend'.  You should see a nice menu show up.
 This should be pretty simple to figure out.  mythfrontend is designed to be the
@@ -153,7 +126,8 @@ any patch sent my way that improves it.
 Ok, some more configuration.  There are a couple .txt files in 
 /usr/local/share/mythtv/.  The theme.txt will let you switch between themes
 for the menus.  There's also settings for the size the GUI is displayed at. 
-Change em if you want.
+Change em if you want.  You can copy the various settings files to your 
+~/.mythtv/ directory if you want.
 
 The mysql.txt file located in there controls the database settings, mainly in 
 case you want to run the mysql server on another machine.

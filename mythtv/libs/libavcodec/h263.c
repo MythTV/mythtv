@@ -458,6 +458,13 @@ void mpeg4_encode_mb(MpegEncContext * s,
                     put_bits(&s->pb, 1, 0);
             }else
                 s->qscale -= s->dquant;
+            
+            if(!s->progressive_sequence){
+                if(cbp)
+                    put_bits(&s->pb, 1, s->interlaced_dct);
+                if(mb_type) // not diect mode
+                    put_bits(&s->pb, 1, 0); // no interlaced ME yet
+            }
 
             if(interleaved_stats){
                 bits= get_bit_count(&s->pb);
@@ -580,6 +587,12 @@ void mpeg4_encode_mb(MpegEncContext * s,
                 put_bits(pb2, cbpy_tab[cbpy][1], cbpy_tab[cbpy][0]);
                 if(s->dquant)
                     put_bits(pb2, 2, dquant_code[s->dquant+2]);
+
+                if(!s->progressive_sequence){
+                    if(cbp)
+                        put_bits(pb2, 1, s->interlaced_dct);
+                    put_bits(pb2, 1, 0); // no interlaced ME yet
+                }
                     
                 if(interleaved_stats){
                     bits= get_bit_count(&s->pb);
@@ -700,6 +713,10 @@ void mpeg4_encode_mb(MpegEncContext * s,
         put_bits(pb2, cbpy_tab[cbpy][1], cbpy_tab[cbpy][0]);
         if(s->dquant)
             put_bits(dc_pb, 2, dquant_code[s->dquant+2]);
+
+        if(!s->progressive_sequence){
+            put_bits(dc_pb, 1, s->interlaced_dct);
+        }
 
         if(interleaved_stats){
             bits= get_bit_count(&s->pb);
@@ -1062,7 +1079,7 @@ INT16 *h263_pred_motion(MpegEncContext * s, int block,
 
 static void h263_encode_motion(MpegEncContext * s, int val, int f_code)
 {
-    int range, l, m, bit_size, sign, code, bits;
+    int range, l, bit_size, sign, code, bits;
 
     if (val == 0) {
         /* zero vector */
@@ -1073,12 +1090,20 @@ static void h263_encode_motion(MpegEncContext * s, int val, int f_code)
         range = 1 << bit_size;
         /* modulo encoding */
         l = range * 32;
-        m = 2 * l;
+#if 1
+        val+= l;
+        val&= 2*l-1;
+        val-= l;
+        sign = val>>31;
+        val= (val^sign)-sign;
+        sign&=1;
+#else
         if (val < -l) {
-            val += m;
+            val += 2*l;
         } else if (val >= l) {
-            val -= m;
+            val -= 2*l;
         }
+
         assert(val>=-l && val<l);
 
         if (val >= 0) {
@@ -1087,6 +1112,7 @@ static void h263_encode_motion(MpegEncContext * s, int val, int f_code)
             val = -val;
             sign = 1;
         }
+#endif
         val--;
         code = (val >> bit_size) + 1;
         bits = val & (range - 1);
@@ -1511,7 +1537,7 @@ static void mpeg4_encode_vol_header(MpegEncContext * s)
     put_bits(&s->pb, 1, 1);		/* marker bit */
     put_bits(&s->pb, 13, s->height);	/* vol height */
     put_bits(&s->pb, 1, 1);		/* marker bit */
-    put_bits(&s->pb, 1, 0);		/* interlace */
+    put_bits(&s->pb, 1, s->progressive_sequence ? 0 : 1);
     put_bits(&s->pb, 1, 1);		/* obmc disable */
     if (vo_ver_id == 1) {
         put_bits(&s->pb, 1, s->vol_sprite_usage=0);		/* sprite enable */
@@ -1586,6 +1612,10 @@ void mpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
 	put_bits(&s->pb, 1, s->no_rounding);	/* rounding type */
     }
     put_bits(&s->pb, 3, 0);	/* intra dc VLC threshold */
+    if(!s->progressive_sequence){
+         put_bits(&s->pb, 1, s->top_field_first);
+         put_bits(&s->pb, 1, s->alternate_scan);
+    }
     //FIXME sprite stuff
 
     put_bits(&s->pb, 5, s->qscale);
@@ -1602,8 +1632,15 @@ void mpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
      s->v_edge_pos= s->height;
 }
 
-static void h263_dc_scale(MpegEncContext * s)
+static void change_qscale(MpegEncContext * s, int dquant)
 {
+    s->qscale += dquant;
+
+    if (s->qscale < 1)
+        s->qscale = 1;
+    else if (s->qscale > 31)
+        s->qscale = 31;
+
     s->y_dc_scale= s->y_dc_scale_table[ s->qscale ];
     s->c_dc_scale= s->c_dc_scale_table[ s->qscale ];
 }
@@ -2364,12 +2401,7 @@ int ff_mpeg4_decode_partitions(MpegEncContext *s)
                 s->mb_intra = 1;
 
                 if(cbpc & 4) {
-                    s->qscale += quant_tab[get_bits(&s->gb, 2)];
-                    if (s->qscale < 1)
-                        s->qscale = 1;
-                    else if (s->qscale > 31)
-                        s->qscale = 31;
-                    h263_dc_scale(s);
+                    change_qscale(s, quant_tab[get_bits(&s->gb, 2)]);
                 }
                 s->qscale_table[xy]= s->qscale;
 
@@ -2546,12 +2578,7 @@ int ff_mpeg4_decode_partitions(MpegEncContext *s)
                     }
                     
                     if(s->cbp_table[xy] & 8) {
-                        s->qscale += quant_tab[get_bits(&s->gb, 2)];
-                        if (s->qscale < 1)
-                            s->qscale = 1;
-                        else if (s->qscale > 31)
-                            s->qscale = 31;
-                        h263_dc_scale(s);
+                        change_qscale(s, quant_tab[get_bits(&s->gb, 2)]);
                     }
                     s->qscale_table[xy]= s->qscale;
 
@@ -2580,13 +2607,7 @@ int ff_mpeg4_decode_partitions(MpegEncContext *s)
                     }
                     
                     if(s->cbp_table[xy] & 8) {
-//fprintf(stderr, "dquant\n");
-                        s->qscale += quant_tab[get_bits(&s->gb, 2)];
-                        if (s->qscale < 1)
-                            s->qscale = 1;
-                        else if (s->qscale > 31)
-                            s->qscale = 31;
-                        h263_dc_scale(s);
+                        change_qscale(s, quant_tab[get_bits(&s->gb, 2)]);
                     }
                     s->qscale_table[xy]= s->qscale;
 
@@ -2622,7 +2643,8 @@ static int mpeg4_decode_partitioned_mb(MpegEncContext *s,
         s->mb_x= s->resync_mb_x;
         s->mb_y= s->resync_mb_y;
         s->qscale= qscale;
-        h263_dc_scale(s);
+        s->y_dc_scale= s->y_dc_scale_table[ s->qscale ];
+        s->c_dc_scale= s->c_dc_scale_table[ s->qscale ];
 
         if(s->decoding_error==DECODING_DESYNC) return -1;
     }
@@ -2635,7 +2657,8 @@ static int mpeg4_decode_partitioned_mb(MpegEncContext *s,
 
     if(s->decoding_error!=DECODING_ACDC_LOST && s->qscale_table[xy] != s->qscale){
         s->qscale= s->qscale_table[xy];
-        h263_dc_scale(s);
+        s->y_dc_scale= s->y_dc_scale_table[ s->qscale ];
+        s->c_dc_scale= s->c_dc_scale_table[ s->qscale ];
     }
 
     if (s->pict_type == P_TYPE || s->pict_type==S_TYPE) {
@@ -2822,12 +2845,7 @@ int h263_decode_mb(MpegEncContext *s,
         cbpy = get_vlc2(&s->gb, cbpy_vlc.table, CBPY_VLC_BITS, 1);
         cbp = (cbpc & 3) | ((cbpy ^ 0xf) << 2);
         if (dquant) {
-            s->qscale += quant_tab[get_bits(&s->gb, 2)];
-            if (s->qscale < 1)
-                s->qscale = 1;
-            else if (s->qscale > 31)
-                s->qscale = 31;
-            h263_dc_scale(s);
+            change_qscale(s, quant_tab[get_bits(&s->gb, 2)]);
         }
         if((!s->progressive_sequence) && (cbp || s->workaround_bugs==2))
             s->interlaced_dct= get_bits1(&s->gb);
@@ -2976,12 +2994,7 @@ int h263_decode_mb(MpegEncContext *s,
 
             if (mb_type!=MB_TYPE_B_DIRECT && cbp) {
                 if(get_bits1(&s->gb)){
-                    s->qscale +=get_bits1(&s->gb)*4 - 2;
-                    if (s->qscale < 1)
-                        s->qscale = 1;
-                    else if (s->qscale > 31)
-                        s->qscale = 31;
-                    h263_dc_scale(s);
+                    change_qscale(s, get_bits1(&s->gb)*4 - 2);
                 }
             }
             field_mv=0;
@@ -3141,12 +3154,7 @@ intra:
         if(cbpy<0) return -1;
         cbp = (cbpc & 3) | (cbpy << 2);
         if (dquant) {
-            s->qscale += quant_tab[get_bits(&s->gb, 2)];
-            if (s->qscale < 1)
-                s->qscale = 1;
-            else if (s->qscale > 31)
-                s->qscale = 31;
-            h263_dc_scale(s);
+            change_qscale(s, quant_tab[get_bits(&s->gb, 2)]);
         }
         if(!s->progressive_sequence)
             s->interlaced_dct= get_bits1(&s->gb);
@@ -4148,8 +4156,9 @@ int mpeg4_decode_picture_header(MpegEncContext * s)
             }
 
             s->scalability= get_bits1(&s->gb);
-            if(s->workaround_bugs==1) s->scalability=0;
+
             if (s->scalability) {
+                GetBitContext bak= s->gb;
                 int dummy= s->hierachy_type= get_bits1(&s->gb);
                 int ref_layer_id= get_bits(&s->gb, 4);
                 int ref_layer_sampling_dir= get_bits1(&s->gb);
@@ -4158,6 +4167,17 @@ int mpeg4_decode_picture_header(MpegEncContext * s)
                 int v_sampling_factor_n= get_bits(&s->gb, 5);
                 int v_sampling_factor_m= get_bits(&s->gb, 5);
                 s->enhancement_type= get_bits1(&s->gb);
+                
+                if(   h_sampling_factor_n==0 || h_sampling_factor_m==0 
+                   || v_sampling_factor_n==0 || v_sampling_factor_m==0 || s->workaround_bugs==1){
+                   
+//                    fprintf(stderr, "illegal scalability header (VERY broken encoder), trying to workaround\n");
+                    s->scalability=0;
+                   
+                    s->gb= bak;
+                    goto redo;
+                }
+                
                 // bin shape stuff FIXME
                 printf("scalability not supported\n");
             }
@@ -4215,15 +4235,17 @@ int mpeg4_decode_picture_header(MpegEncContext * s)
 
     check_marker(&s->gb, "before time_increment");
     time_increment= get_bits(&s->gb, s->time_increment_bits);
-//printf(" type:%d incr:%d increment:%d\n", s->pict_type, time_incr, time_increment);
+//printf(" type:%d modulo_time_base:%d increment:%d\n", s->pict_type, time_incr, time_increment);
     if(s->pict_type!=B_TYPE){
         s->last_time_base= s->time_base;
         s->time_base+= time_incr;
         s->time= s->time_base*s->time_increment_resolution + time_increment;
-        if(s->time < s->last_non_b_time && s->workaround_bugs==3){
-            fprintf(stderr, "header is not mpeg4 compatible, broken encoder, trying to workaround\n");
-            s->time_base++;
-            s->time+= s->time_increment_resolution;
+        if(s->workaround_bugs==3 || s->avctx->fourcc == ff_get_fourcc("UMP4")){
+            if(s->time < s->last_non_b_time){
+//                fprintf(stderr, "header is not mpeg4 compatible, broken encoder, trying to workaround\n");
+                s->time_base++;
+                s->time+= s->time_increment_resolution;
+            }
         }
         s->pp_time= s->time - s->last_non_b_time;
         s->last_non_b_time= s->time;

@@ -19,7 +19,6 @@
  * alternative bitstream reader & writer by Michael Niedermayer <michaelni@gmx.at>
  */
 #include "avcodec.h"
-#include "common.h"
 
 const UINT8 ff_sqrt_tab[128]={
         0, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5,
@@ -33,7 +32,6 @@ void init_put_bits(PutBitContext *s,
                    void *opaque,
                    void (*write_data)(void *, UINT8 *, int))
 {
-    opaque = opaque;
     s->buf = buffer;
     s->buf_end = s->buf + buffer_size;
     s->data_out_size = 0;

@@ -5,8 +5,8 @@
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4626
-#define LIBAVCODEC_BUILD_STR   "4626"
+#define LIBAVCODEC_BUILD       4628
+#define LIBAVCODEC_BUILD_STR   "4628"
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -28,7 +28,7 @@ enum CodecID {
     CODEC_ID_H263I,
     CODEC_ID_SVQ1,
     CODEC_ID_VORBIS,
-    
+
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
     CODEC_ID_PCM_S16BE,
@@ -124,6 +124,7 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_FLAG_NOT_TRUNCATED  0x00010000 /* input bitstream is not truncated, except before a startcode 
                                                 allows the last part of a frame to be decoded earlier */
 #define CODEC_FLAG_NORMALIZE_AQP  0x00020000 /* normalize adaptive quantization */
+#define CODEC_FLAG_INTERLACED_DCT 0x00040000 /* use interlaced dct */
 
 /* codec capabilities */
 
@@ -674,6 +675,14 @@ typedef struct AVCodecContext {
      * decoding: unused
      */
     float dark_masking;
+    
+    /**
+     * fourcc (LSB first, so "ABCD" -> ('D'<<24) + ('C'<<16) + ('B'<<8) + 'A')
+     * this is used to workaround some encoder bugs
+     * encoding: unused
+     * decoding: set by user, will be converted to upper case by lavc during init
+     */
+    int fourcc;
 
     //FIXME this should be reordered after kabis API is finished ...
     //TODO kill kabi

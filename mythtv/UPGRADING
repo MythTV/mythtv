@@ -23,3 +23,9 @@ UPGRADING FROM RELEASE 0.4
 You don't need to do anything other than re-edit the settings.txt file.
 Just remember to run the ./configure script to setup libavcodec before
 making MythTV.
+
+UPGRADING FROM RELEASE 0.5
+--------------------------
+You'll need to insert the 0-5-to-0-6.sql file in the database/ subdir into
+your database.  Run the setup program included in the setup/ directory after
+compiling, and you should be all set.

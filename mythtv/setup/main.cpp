@@ -2,6 +2,7 @@
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
 #include <qstring.h>
+#include <qdir.h>
 #include <qfile.h>
 #include <qstringlist.h>
 
@@ -336,6 +337,13 @@ int main(int argc, char *argv[])
         printf("couldn't open db\n");
         return -1;
     }
+
+    char *home = getenv("HOME");
+    QString fileprefix = QString(home) + "/.mythtv";
+
+    QDir dir(fileprefix);
+    if (!dir.exists())
+        dir.mkdir(fileprefix);
 
     clearDB();
 
