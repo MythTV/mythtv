@@ -133,7 +133,7 @@ public:
     TitlePlayCommand():
         GlobalSetting("TitlePlayCommand"){
         setLabel(QObject::tr("Title Playing Command"));
-        setValue("mplayer -dvd-device %d -fs -zoom -vo xv -dvd %t -aid %a -channels %c");
+        setValue("mplayer dvd://%t -dvd-device %d -fs -zoom -vo xv -aid %a -channels %c");
         setHelpText(QObject::tr("This is a command used to preview a given "
                     "title on a DVD. If present %t will be set "
                     "to the title, %d for device, %a for audio "
