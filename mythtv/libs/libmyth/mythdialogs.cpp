@@ -76,7 +76,7 @@ struct JumpData
 
 struct MHData
 {
-    void (*callback)(void);
+    void (*callback)(MythMediaDevice *mediadevice);
     int MediaType;
     QString destination;
     QString description;
@@ -109,6 +109,9 @@ class MythMainWindowPrivate
     QMap<QString, MPData> mediaPluginMap;
 
     void (*exitmenucallback)(void);
+
+    void (*exitmenumediadevicecallback)(MythMediaDevice* mediadevice);
+    MythMediaDevice * mediadeviceforcallback;
 
     int escapekey;
 };
@@ -147,6 +150,8 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
     d->ignore_lirc_keys = false;
     d->exitingtomain = false;
     d->exitmenucallback = false;
+    d->exitmenumediadevicecallback = false;
+    d->mediadeviceforcallback = NULL;
     d->escapekey = Key_Escape;
 
 #ifdef USE_LIRC
@@ -305,6 +310,13 @@ void MythMainWindow::ExitToMainMenu(void)
                 d->exitmenucallback = NULL;
 
                 callback();
+            }
+            else if (d->exitmenumediadevicecallback)
+            {
+                void (*callback)(MythMediaDevice*) = d->exitmenumediadevicecallback;
+                MythMediaDevice * mediadevice = d->mediadeviceforcallback;
+                d->mediadeviceforcallback = NULL;
+                callback(mediadevice);
             }
         }
     }
@@ -499,7 +511,7 @@ bool MythMainWindow::DestinationExists(const QString& destination) const
 void MythMainWindow::RegisterMediaHandler(const QString &destination,
                                           const QString &description,
                                           const QString &key, 
-                                          void (*callback)(void),
+                              void (*callback)(MythMediaDevice*mediadevice),
                                           int mediaType)
 {
     (void)key;
@@ -597,7 +609,8 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
                 {
                     VERBOSE(VB_ALL, "Found a handler");
                     d->exitingtomain = true;
-                    d->exitmenucallback = itr.data().callback;
+                    d->exitmenumediadevicecallback = itr.data().callback;
+                    d->mediadeviceforcallback = pDev;
                     QApplication::postEvent(this, new ExitToMainMenuEvent());
                     break;
                 }

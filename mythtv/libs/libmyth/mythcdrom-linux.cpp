@@ -3,6 +3,8 @@
 #include <linux/cdrom.h>        // old ioctls for cdrom
 #include <errno.h>
 #include "mythcontext.h"
+#include <linux/iso_fs.h>
+#include <unistd.h>
 
 #define ASSUME_WANT_AUDIO 1
 
@@ -125,6 +127,15 @@ MediaStatus MythCDROMLinux::checkMedia()
                     case CDS_DATA_2:
                         m_MediaType = MEDIATYPE_DATA;
                         //cout << "found a data disk" << endl;
+                        //grab information from iso9660 (& udf)
+                        struct iso_primary_descriptor buf;
+                        lseek(this->m_DeviceHandle,(off_t) 2048*16,SEEK_SET);
+                        read(this->m_DeviceHandle, &buf,2048);
+                        this->m_VolumeID = QString(buf.volume_id)
+                                                       .stripWhiteSpace();
+                        this->m_KeyID = QString("%1%2")
+                                      .arg(this->m_VolumeID)
+                                      .arg(QString(buf.creation_date).left(16));
                         // We'll return NOTMOUNTED  here because we're switching media.
                         // The base class will try to mount the deivce causing the next pass to pick up the MOUNTED status.
                         return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);

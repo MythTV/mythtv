@@ -45,6 +45,7 @@ class MythMediaDevice : public QObject
     MediaStatus getStatus() const { return m_Status; }
 
     const QString& getVolumeID() const { return m_VolumeID; }
+    const QString& getKeyID() const { return m_KeyID; }
 
     bool getAllowEject() const { return m_AllowEject; }
     void setAllowEject(bool allowEject) { m_AllowEject = allowEject; }
@@ -91,6 +92,8 @@ class MythMediaDevice : public QObject
     QString m_DevicePath;       ///< The path to this media's device (i.e. /dev/cdrom). Read/write.
     MediaStatus m_Status;       ///< The status of the media as of the last call to checkMedia. Read only.
     QString m_VolumeID;         ///< The volume ID of the media. Read Only.
+    QString m_KeyID;            ///< KeyID of the media. Read Only
+                                ///< for iso9660 volumeid + creation_date
     bool m_Locked;              ///< Is this media locked? Read only.
     bool m_AllowEject;          ///< Allow the user to eject the media? Read/write.
     int m_DeviceHandle;         ///< A file handle for opening and closing the device.

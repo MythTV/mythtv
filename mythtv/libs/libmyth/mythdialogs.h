@@ -91,7 +91,8 @@ class MythMainWindow : public QDialog
                       const QString &key, void (*callback)(void));
     void RegisterMediaHandler(const QString &destination, 
                               const QString &description, const QString &key, 
-                              void (*callback)(void), int mediaType);
+                              void (*callback)(MythMediaDevice* mediadevice), 
+                              int mediaType);
 
     void RegisterMediaPlugin(const QString &name, const QString &desc, 
                              MediaPlayCallback fn);
