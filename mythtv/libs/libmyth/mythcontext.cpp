@@ -28,7 +28,7 @@ MythContext::MythContext(const QString &binversion, bool gui)
         cerr << "You probably want to recompile everything, and do a\n"
              << "'make distclean' first.\n";
         cerr << "exiting\n";
-        exit(0);
+        exit(1);
     }
 
     m_installprefix = PREFIX;
