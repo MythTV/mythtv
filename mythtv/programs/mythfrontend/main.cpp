@@ -670,6 +670,11 @@ int main(int argc, char **argv)
     QString lcd_host;
     int lcd_port;
 
+#ifdef Q_WS_MACX
+    // Without this, we can't set focus to any of the CheckBoxSetting, and most
+    // of the MythPushButton widgets, and they don't use the themed background.
+    QApplication::setDesktopSettingsAware(FALSE);
+#endif
     QApplication a(argc, argv);
     translator = new QTranslator(0);
 
