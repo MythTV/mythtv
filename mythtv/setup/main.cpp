@@ -19,6 +19,7 @@
 #include "libmyth/mythcontext.h"
 #include "libmythtv/videosource.h"
 #include "libmyth/themedmenu.h"
+#include "backendsettings.h"
 
 using namespace std;
 
@@ -62,7 +63,10 @@ void SetupMenuCallback(void* data, QString& selection) {
     MythContext* context = (MythContext*)data;
     QString sel = selection.lower();
 
-    if (sel == "capture cards") {
+    if (sel == "general") {
+        BackendSettings be(context);
+        be.exec(db);
+    } else if (sel == "capture cards") {
         CaptureCardEditor cce(context, db);
         cce.exec(db);
     } else if (sel == "video sources") {
@@ -71,8 +75,6 @@ void SetupMenuCallback(void* data, QString& selection) {
     } else if (sel == "card inputs") {
         CardInputEditor cie(context, db);
         cie.exec(db);
-    } else if (sel == "exit") {
-        return;
     }
 }
 

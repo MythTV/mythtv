@@ -2,6 +2,12 @@
 
    <button>
      <type>SETUP</type>
+     <text>General</text>
+     <action>GENERAL</action>
+   </button>
+
+   <button>
+     <type>SETUP</type>
      <text>Capture cards</text>
      <action>CAPTURE CARDS</action>
    </button>
@@ -17,4 +23,5 @@
      <text>Capture card inputs</text>
      <action>CARD INPUTS</action>
    </button>
+
 </mythmenu>

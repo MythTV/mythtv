@@ -55,17 +55,6 @@ public:
     };
 };
 
-
-class RecordFilePrefix: public LineEditSetting, public GlobalSetting {
-public:
-    RecordFilePrefix():
-        GlobalSetting("RecordFilePrefix") {
-        setLabel("Directory to hold recordings");
-        setValue("/mnt/store/");
-        setHelpText("All recordings get stored in this directory");
-    };
-};
-
 class AudioOutputDevice: public ComboBoxSetting, public GlobalSetting {
 public:
     AudioOutputDevice();
@@ -205,46 +194,6 @@ public:
         addSelection("Composite1");
         addSelection("Composite3");
         addSelection("S-Video");
-    };
-};
-
-class TVFormat: public ComboBoxSetting, public GlobalSetting {
-public:
-    TVFormat():
-        GlobalSetting("TVFormat") {
-        setLabel("TV format");
-        addSelection("NTSC");
-        addSelection("PAL");
-        addSelection("SECAM");
-        addSelection("PAL-NC");
-        addSelection("PAL-M");
-        addSelection("PAL-N");
-        addSelection("NTSC-JP");
-    };
-};
-
-class FreqTable: public ComboBoxSetting, public GlobalSetting {
-public:
-    FreqTable():
-        GlobalSetting("FreqTable") {
-        setLabel("Channel frequency table");
-        addSelection("us-cable");
-        addSelection("us-bcast");
-        addSelection("us-cable-hrc");
-        addSelection("japan-bcast");
-        addSelection("japan-cable");
-        addSelection("europe-west");
-        addSelection("europe-east");
-        addSelection("italy");
-        addSelection("newzealand");
-        addSelection("australia");
-        addSelection("ireland");
-        addSelection("france");
-        addSelection("china-bcast");
-        addSelection("southafrica");
-        addSelection("argentina");
-        addSelection("canada-cable");
-        addSelection("australia-optus");
     };
 };
 
@@ -733,9 +682,6 @@ GeneralSettings::GeneralSettings(MythContext *context)
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel("General");
-    general->addChild(new RecordFilePrefix());
-    general->addChild(new TVFormat());
-    general->addChild(new FreqTable());
     general->addChild(new RecordOverTime());
     general->addChild(new TimeOffset());
     addChild(general);

@@ -14,7 +14,7 @@ LIBS += -lmyth-$$LIBVERSION -lmythtv -lXinerama -L../libs/libmyth -L../libs/libm
 DEPENDPATH += ../../libs/libmyth
 
 # Input
-SOURCES += main.cpp
+SOURCES += main.cpp backendsettings.cpp
 
 menu.path = $${PREFIX}/share/mythtv/
 menu.files += setup.xml
