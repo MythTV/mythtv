@@ -11,6 +11,7 @@
 24,Sunny,sunny.png
 25,Scattered Flurries,flurries.png
 26,AM Clouds/PM Sun,acloudpsun.png
+28,Scattered Thunderstorms,showers.png
 29,PM Showers,showers.png
 31,Rain/Snow Showers,rainsnow.png
 32,Few Snow Showers,flurries.png
@@ -24,6 +25,7 @@
 45,Flurries,flurries.png
 47,Rain/Wind,showers.png
 49,Sct Flurries/Wind,flurries.png
+53,Thunderstorms,showers.png
 55,Sunny/Windy,sunny.png
 65,Rain/Snow,rainsnow.png
 67,AM Showers/Wind,showers.png
