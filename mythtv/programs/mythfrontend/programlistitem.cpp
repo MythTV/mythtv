@@ -32,31 +32,39 @@ void MyListView::keyPressEvent(QKeyEvent *e)
 }
 
 ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
-                                 int numcols, TV *ltv, QString lprefix)
+                                 int type, TV *ltv, QString lprefix)
                : QListViewItem(parent)
 {
     prefix = lprefix;
     tv = ltv;
     pginfo = lpginfo;
     pixmap = NULL;
+   
+    if (type == 0 || type == 1)
+    { 
+        setText(0, pginfo->startts.toString("ddd MMM d h:mmap"));
+        setText(1, pginfo->title);
 
-    setText(0, pginfo->chanstr);
-    setText(1, pginfo->startts.toString("ddd MMM d h:mmap"));
-    setText(2, pginfo->title);
+        if (type == 1)
+        {
+            QString filename = pginfo->GetRecordFilename(prefix);
 
-    if (numcols == 4)
-    {
-        QString filename = pginfo->GetRecordFilename(prefix);
-
-        struct stat64 st;
+            struct stat64 st;
  
-        long long size = 0;
-        if (stat64(filename.ascii(), &st) == 0)
-            size = st.st_size;
-        long int mbytes = size / 1024 / 1024;
-        QString filesize = QString("%1 MB").arg(mbytes);
+            long long size = 0;
+            if (stat64(filename.ascii(), &st) == 0)
+                size = st.st_size;
+            long int mbytes = size / 1024 / 1024;
+            QString filesize = QString("%1 MB").arg(mbytes);
 
-        setText(3, filesize);
+            setText(2, filesize);
+        }
+    }
+    else
+    {
+        setText(0, pginfo->chanstr);
+        setText(1, pginfo->startts.toString("ddd MMM d h:mmap"));
+        setText(2, pginfo->title);
     }
 }
 

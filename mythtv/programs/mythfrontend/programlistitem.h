@@ -19,7 +19,7 @@ class ProgramListItem : public QListViewItem
 {   
   public:
     ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
-                    int numcols, TV *ltv, QString lprefix);
+                    int type, TV *ltv, QString lprefix);
    ~ProgramListItem() { delete pginfo; if (pixmap) delete pixmap; }
 
     virtual void paintCell(QPainter *p, const QColorGroup &cg,

@@ -43,6 +43,7 @@ class DeleteBox : public QDialog
     QLabel *subtitle;
     QLabel *description;
     QLabel *date;
+    QLabel *chan;
     QLabel *pixlabel;
 
     MyListView *listview;

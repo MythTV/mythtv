@@ -131,7 +131,7 @@ void ViewScheduled::FillList(void)
         ProgramInfo *originfo = (*pgiter);
         ProgramInfo *proginfo = new ProgramInfo(*originfo);
 
-        item = new ProgramListItem(listview, proginfo, 3, tv, fileprefix);
+        item = new ProgramListItem(listview, proginfo, 2, tv, fileprefix);
     }
 
     if (conflicts)

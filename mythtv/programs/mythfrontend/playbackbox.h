@@ -40,6 +40,7 @@ class PlaybackBox : public QDialog
     QLabel *subtitle;
     QLabel *description;
     QLabel *date;
+    QLabel *chan;
     QLabel *pixlabel;
 
     float wmult, hmult;

@@ -57,13 +57,11 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     vbox->addWidget(label);
 
     QListView *listview = new QListView(this);
-    listview->addColumn("#");
     listview->addColumn("Date");
     listview->addColumn("Title");
  
-    listview->setColumnWidth(0, (int)(40 * wmult));
-    listview->setColumnWidth(1, (int)(210 * wmult)); 
-    listview->setColumnWidth(2, (int)(500 * wmult));
+    listview->setColumnWidth(0, (int)(220 * wmult)); 
+    listview->setColumnWidth(1, (int)(530 * wmult));
     listview->setColumnWidthMode(0, QListView::Manual);
     listview->setColumnWidthMode(1, QListView::Manual);
 
@@ -127,7 +125,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
             else
                 proginfo->chanstr = proginfo->chanid;
 
-            item = new ProgramListItem(listview, proginfo, 3, tv, fileprefix);
+            item = new ProgramListItem(listview, proginfo, 0, tv, fileprefix);
         }
     }
     else
@@ -139,13 +137,16 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
 
-    QGridLayout *grid = new QGridLayout(hbox, 4, 2, 1);
+    QGridLayout *grid = new QGridLayout(hbox, 5, 2, 1);
  
     title = new QLabel(" ", this);
     title->setFont(QFont("Arial", (int)(25 * hmult), QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
     date = new QLabel(" ", this);
+
+    QLabel *chanlabel = new QLabel("Channel: ", this);
+    chan = new QLabel(" ", this);
 
     QLabel *sublabel = new QLabel("Episode: ", this);
     subtitle = new QLabel(" ", this);
@@ -157,13 +158,15 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     grid->addMultiCellWidget(title, 0, 0, 0, 1, Qt::AlignLeft);
     grid->addWidget(datelabel, 1, 0, Qt::AlignLeft);
     grid->addWidget(date, 1, 1, Qt::AlignLeft);
-    grid->addWidget(sublabel, 2, 0, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(subtitle, 2, 1, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(desclabel, 3, 0, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(description, 3, 1, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(chanlabel, 2, 0, Qt::AlignLeft);
+    grid->addWidget(chan, 2, 1, Qt::AlignLeft);
+    grid->addWidget(sublabel, 3, 0, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(subtitle, 3, 1, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(desclabel, 4, 0, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(description, 4, 1, Qt::AlignLeft | Qt::AlignTop);
     
     grid->setColStretch(1, 1);
-    grid->setRowStretch(3, 1);
+    grid->setRowStretch(4, 1);
 
     QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
 
@@ -174,7 +177,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     nvp = NULL;
     timer = new QTimer(this);
- 
+
     listview->setCurrentItem(listview->firstChild());
 
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
@@ -265,6 +268,9 @@ void PlaybackBox::changed(QListViewItem *lvitem)
         
     date->setText(timedate);
 
+    QString chantext = rec->chanstr;
+    chan->setText(chantext);
+
     title->setText(rec->title);
     if (rec->subtitle != "(null)")
         subtitle->setText(rec->subtitle);
@@ -274,6 +280,13 @@ void PlaybackBox::changed(QListViewItem *lvitem)
         description->setText(rec->description);
     else
         description->setText("");
+
+    int width = date->width();
+    if (width < (int)(350 * wmult))
+        width = (int)(350 * wmult);
+
+    description->setMinimumWidth(width);
+    description->setMaximumHeight((int)(80 * hmult));
 
     QPixmap *pix = pgitem->getPixmap();
 

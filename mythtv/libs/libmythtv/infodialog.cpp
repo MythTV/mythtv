@@ -60,6 +60,8 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     descriptionfield->setAlignment(Qt::WordBreak | Qt::AlignLeft | 
                                    Qt::AlignTop);
 
+    descriptionfield->setMinimumWidth((int)(800 * wmult) - 
+                                      descriptionlabel->width() - 100);
     grid->addMultiCellWidget(titlefield, 0, 0, 0, 1, Qt::AlignLeft);
     grid->addMultiCellWidget(date, 1, 1, 0, 1, Qt::AlignLeft);
     grid->addWidget(subtitlelabel, 2, 0, Qt::AlignLeft | Qt::AlignTop);
