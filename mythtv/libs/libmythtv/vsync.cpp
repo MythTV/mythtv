@@ -130,7 +130,7 @@ void VideoSync::UpdateNexttrigger()
         OffsetTimeval(m_nexttrigger, m_frame_interval);
 }
 
-int VideoSync::CalcDelay() const
+int VideoSync::CalcDelay()
 {
     struct timeval now;
     gettimeofday(&now, NULL);
@@ -141,19 +141,40 @@ int VideoSync::CalcDelay() const
                   (m_nexttrigger.tv_usec - now.tv_usec);
 
     //cout << "delay " << ret_val << endl;
+
+    // Regardless of the timing method, if delay is greater than two full
+    // frames (could be greater than 20 or greater than 200), we don't want
+    // to freeze while waiting for a huge delay. Instead, contine playing 
+    // video at half speed and continue to read new audio and video frames
+    // from the file until the sync is 'in the ballpark'.
+
+    if (ret_val > m_frame_interval * 2)
+    {
+        if (m_interlaced)
+            ret_val = m_frame_interval; // same as / 2 * 2.
+        else
+            ret_val = m_frame_interval * 2;
+
+        // set nexttrigger to our new target time
+        m_nexttrigger.tv_sec = now.tv_sec;
+        m_nexttrigger.tv_usec = now.tv_usec;
+        OffsetTimeval(m_nexttrigger, ret_val);
+    }
     return ret_val;
 }
 
 void VideoSync::KeepPhase()
 {
     m_delay = CalcDelay();
-    // Keep our nexttrigger from drifting too far from the exact retrace
-    // This method is only useful for those sync methods that maintain
-    // proper phase relationship with the displayed frame
-    if (m_delay > -1000) 
+    // Keep our nexttrigger from drifting too close to the exact retrace.
+    // If delay is near 0, some frames will be delay < 0 and others delay > 0.
+    // This will cause continous rapid fire stuttering. Nexttrigger only
+    // needs to be shifted "out of the way" once on the first time delay
+    // falls in the DMZ. Otherwise, nexttrigger should be left alone.
+    // This method is only useful for those sync methods where WaitForFrame
+    // targets hardware retrace rather than targeting nexttrigger.
+    if (m_delay > -1000)
         OffsetTimeval(m_nexttrigger, -2000);
-    else if (m_delay < -(m_refresh_interval/4))
-        OffsetTimeval(m_nexttrigger, 2000);
 }
 
 #define DRM_VBLANK_RELATIVE 0x1;
@@ -579,18 +600,8 @@ void BusyWaitVideoSync::WaitForFrame(int sync_delay)
     OffsetTimeval(m_nexttrigger, sync_delay);
 
     m_delay = CalcDelay();
-    // If delay is somewhat more than 2 frames or negative, clip it to
-    // these amounts and reset nexttrigger.  We use 2 frames so a/v sync
-    // has some slack to work in.
-    int threshold = 2*(m_interlaced ? m_frame_interval/2 : m_frame_interval);
-    if (m_delay > threshold)
-    {
-        m_delay = threshold;
-        usleep(m_delay);
-        UpdateNexttrigger();
-        return;
-    }
-    else if (m_delay <= 0)
+
+    if (m_delay <= 0)
     {
         UpdateNexttrigger();
         return;

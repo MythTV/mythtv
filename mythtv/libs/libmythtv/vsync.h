@@ -73,7 +73,7 @@ class VideoSync
  protected:
     static void OffsetTimeval(struct timeval& tv, int offset);
     void UpdateNexttrigger();
-    int CalcDelay() const;
+    int CalcDelay();
     void KeepPhase();
 
     int m_frame_interval; // of video
