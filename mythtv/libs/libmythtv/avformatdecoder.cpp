@@ -584,7 +584,8 @@ bool AvFormatDecoder::CheckAudioParams(int freq, int channels)
     if (channels == 1)
         chan = "mono";
 
-    cerr << "Audio has changed: " << freq << "hz " << chan << endl;
+    cerr << "Audio has changed: " << freq << "hz "
+         << chan << "(" << channels << ")" << endl;
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
@@ -793,6 +794,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             {
                 //cerr << "KeyFrameDistance has changed to "
                 //     << tempKeyFrameDist << " from " << keyframedist << endl;
+
                 keyframedist = tempKeyFrameDist;
                 m_parent->SetVideoParams(-1, -1, -1, keyframedist, 
                                          current_aspect);
@@ -800,6 +802,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                 long long index = m_positionMap[m_positionMap.size() - 1].index;
                 long long totframes = index * keyframedist;
                 int length = (int)((totframes * 1.0) / fps);
+
                 cerr << "Setting(2) length to " << length
                      << " " << totframes << endl;
                 m_parent->SetFileLength(length, totframes);
@@ -816,6 +819,10 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             last_frame = m_positionMap[m_positionMap.size() - 1].index;
         if (keyframedist > 1)
             last_frame *= keyframedist;
+
+        //cerr << "framesRead: " << framesRead << " last_frame: " << last_frame
+        //    << " keyframedist: " << keyframedist << endl;
+
         // if we don't have an entry, fill it in with what we've just parsed
         if (framesRead > last_frame && keyframedist > 0)
         {
@@ -823,6 +830,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
 
             // cerr << "positionMap[" << prevgoppos / keyframedist <<
             //         "] = " << startpos << "." << endl;
+
             // Grow positionMap vector several entries at a time
             if (m_positionMap.capacity() == m_positionMap.size())
                 m_positionMap.reserve(m_positionMap.size() + 60);
@@ -855,7 +863,6 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
     unsigned char *bufptr = pkt->data;
     //unsigned char *bufend = pkt->data + pkt->size;
     unsigned int state = 0xFFFFFFFF, v = 0;
-    
     int prvcount = -1;
 
     while (bufptr < pkt->data + pkt->size)
@@ -993,6 +1000,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     int data_size = 0;
     long long pts;
     bool firstloop = false, have_err = false;
+    bool preProcessed = false;
+
 
     gotvideo = false;
 
@@ -1079,6 +1088,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                 context->codec_id == CODEC_ID_MPEG2VIDEO_VIA)
             {
                 MpegPreProcessPkt(curstream, pkt);
+                preProcessed = true;
             }
         }
 
@@ -1126,41 +1136,44 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
                     if (data_size <= 0)
                         continue;
-
+                    bool audioChanged = false;
                     if (!do_ac3_passthru)
                     {
-                        if (CheckAudioParams(curstream->codec.sample_rate,
-                                             curstream->codec.channels))
+                        audioChanged = CheckAudioParams(curstream->codec.sample_rate,
+                                                        curstream->codec.channels);
+                        if (audioChanged)
                         {
-                            audio_sampling_rate = curstream->codec.sample_rate;
-                            audio_channels = curstream->codec.channels;
-                            audio_sample_size = audio_channels * 2;
+                             audio_sampling_rate = curstream->codec.sample_rate;
+                             audio_channels = curstream->codec.channels;
+                             audio_sample_size = audio_channels * 2;
 
-                            m_parent->SetEffDsp(audio_sampling_rate * 100);
-                            m_parent->SetAudioParams(16, audio_channels,
-                                                     audio_sampling_rate);
-                            m_parent->ReinitAudio();
+                             m_parent->SetEffDsp(audio_sampling_rate * 100);
+                             m_parent->SetAudioParams(16, audio_channels,
+                                                  audio_sampling_rate);
+                             m_parent->ReinitAudio();
+                             audioChanged = false;
+
                         }
                     }
 
                     long long temppts = lastapts;
                     // calc for next frame
                     lastapts += (long long)((double)(data_size * 1000) /
-                                audio_sample_size / audio_sampling_rate);
-
-                    m_parent->AddAudioData((char *)audioSamples, data_size, 
+                                (curstream->codec.channels * 2) / curstream->codec.sample_rate);
+                    m_parent->AddAudioData((char *)audioSamples, data_size,
                                            temppts);
+
                     break;
                 }
                 case CODEC_TYPE_VIDEO:
                 {
-                    if (onlyvideo < 0)
+                    /*if (onlyvideo < 0)
                     {
                         ptr += pkt->size;
                         len -= pkt->size;
                         continue;
                     }
-
+                        */
                     AVCodecContext *context = &(curstream->codec);
                     AVFrame mpa_pic;
 
@@ -1178,6 +1191,26 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
                     }
 
+
+                    if (preProcessed == false)
+                    {
+                        
+                        if  (mpa_pic.key_frame)
+                        {
+                            HandleGopStart(pkt);
+                            seen_gop = true;
+                        }
+                        else
+                        {
+                            seq_count++;
+                            if (!seen_gop && seq_count > 1)
+                            {
+                                HandleGopStart(pkt);
+                            }
+                        }
+                    }
+                    
+                   
                     if (!gotpicture)
                     {
                         ptr += ret;
