@@ -45,18 +45,18 @@ void AudioOutputALSA::Reconfigure(int laudio_bits, int laudio_channels,
 
     int err;
 
-    if (laudio_bits == audio_bits && laudio_channels == audio_channels &&
-        laudio_samplerate == audio_samplerate)
-    {
+    // if pcm_handle is NULL allow Reconfigure
+    if (pcm_handle != NULL && laudio_bits == audio_bits &&
+          laudio_channels == audio_channels &&
+          laudio_samplerate == audio_samplerate)
         return;
-    }
 
     KillAudio();
     
     new_pcm_handle = pcm_handle;
     pcm_handle = NULL;
 
-    if (new_pcm_handle)
+    if (new_pcm_handle != NULL)
         snd_pcm_hw_free(new_pcm_handle);
 
     pthread_mutex_lock(&audio_buflock);
@@ -92,8 +92,8 @@ void AudioOutputALSA::Reconfigure(int laudio_bits, int laudio_channels,
 
     if (err < 0)
     { 
-        Error(QString("Error opening audio device (%1), the"
-               " error was: %2").arg(audiodevice).arg(strerror(errno)));
+        Error(QString("snd_pcm_open(%1) error %2")
+              .arg(audiodevice).arg(snd_strerror(err)));
     }
 
     SetFragSize();
@@ -102,12 +102,15 @@ void AudioOutputALSA::Reconfigure(int laudio_bits, int laudio_channels,
     
     fragment_size = 4096;
 
-    VERBOSE(VB_GENERAL, QString("Audio fragment size: %1")
-                                 .arg(fragment_size));
+    VERBOSE(VB_GENERAL, QString("Audio: fragment_size=%1, bytes_per_sample=%2")
+            .arg(fragment_size).arg(audio_bytes_per_sample));
 
     snd_pcm_uframes_t avail = 0;
     snd_pcm_hw_params_t *hw_params;
-    snd_pcm_hw_params_malloc(&hw_params);
+    if ((err = snd_pcm_hw_params_malloc(&hw_params)) < 0) {
+        Error(QString("cannot allocate hardware parameter structure (%1)")
+              .arg(snd_strerror(err)));
+    }
     snd_pcm_hw_params_current(pcm_handle, hw_params);
     snd_pcm_hw_params_get_buffer_size(hw_params, &avail); // frames
     snd_pcm_hw_params_free(hw_params);
@@ -115,7 +118,9 @@ void AudioOutputALSA::Reconfigure(int laudio_bits, int laudio_channels,
     audio_buffer_unused = (avail * audio_bytes_per_sample) - 
                           (fragment_size * 4);
 
-    // VERBOSE(VB_AUDIO, QString("Audio buffer unused: %1").arg(audio_buffer_unused));
+    VERBOSE(VB_AUDIO, QString("Audio buffer size=%1 bytes unused=%2")
+            .arg(avail*audio_bytes_per_sample).arg(audio_buffer_unused));
+    
     if (audio_buffer_unused < 0)
         audio_buffer_unused = 0;
 
@@ -142,6 +147,7 @@ void AudioOutputALSA::Reconfigure(int laudio_bits, int laudio_channels,
     if (err < 0) 
     {
         snd_pcm_close(pcm_handle);
+        pcm_handle = NULL;
         return;
     }    
 
@@ -150,7 +156,8 @@ void AudioOutputALSA::Reconfigure(int laudio_bits, int laudio_channels,
     effdsp = audio_samplerate * 100;
     gettimeofday(&audiotime_updated, NULL);
 
-    pthread_create(&output_audio, NULL, kickoffOutputAudioLoop, this);
+    if (output_audio == 0)  // in case we already started thread
+        pthread_create(&output_audio, NULL, kickoffOutputAudioLoop, this);
     
     pthread_mutex_unlock(&avsync_lock);
     pthread_mutex_unlock(&audio_buflock);
@@ -205,7 +212,7 @@ void AudioOutputALSA::KillAudio()
 
     if (pcm_handle != NULL)
     {
-	snd_pcm_close(pcm_handle);
+        snd_pcm_close(pcm_handle);
         pcm_handle = NULL;
     }
 
@@ -243,31 +250,32 @@ void AudioOutputALSA::WriteAudio(unsigned char *aubuf, int size)
         return;
 
     unsigned char *tmpbuf;
-    int written = 0, lw = 0;
+    int lw = 0;
     int frames = size / audio_bytes_per_sample;
 
     tmpbuf = aubuf;
 
-    // VERBOSE(VB_AUDIO, QString("Preparing %1 (%2) bytes in WriteAudio").arg(size).arg(frames));
+    VERBOSE(VB_AUDIO, QString("Preparing %1 bytes (%2 frames) in WriteAudio")
+            .arg(size).arg(frames));
+    
     while (frames > 0) 
     {
         lw = snd_pcm_mmap_writei(pcm_handle, tmpbuf, frames);
-        // VERBOSE(VB_AUDIO, QString("Wrote %1 frames in WriteAudio").arg(lw));
         if (lw >= 0)
         {
-	    frames -= lw;
+        // VERBOSE(VB_AUDIO, QString("Wrote %1 frames in WriteAudio").arg(lw));
+            frames -= lw;
             tmpbuf += lw * audio_bytes_per_sample; // bytes
         } 
         else if (lw == -EAGAIN)
         {
             VERBOSE(VB_AUDIO, QString("Soundcard is blocked.  Waiting for card to become ready"));
-	    snd_pcm_wait(pcm_handle, 10);
+            snd_pcm_wait(pcm_handle, 10);
         }  
         else if (lw < 0)
         {
-            Error(QString("Error writing to audio device (%1), unable to"
-                  " continue. The error was: %2").arg(audiodevice)
-                  .arg(strerror(errno)));
+            Error(QString("snd_pcm_mmap_writei(%1,frames=%2) error %3")
+                  .arg(audiodevice).arg(frames).arg(snd_strerror(lw)));
             snd_pcm_close(pcm_handle);
             pcm_handle = NULL;
             return;
@@ -354,7 +362,7 @@ void AudioOutputALSA::SetAudiotime(void)
     if (audbuf_timecode == 0)
         return;
 
-    int totalbuffer;
+    int totalbuffer, err;
 
     /* We want to calculate 'audiotime', which is the timestamp of the audio
        which is leaving the sound card at this instant.
@@ -378,7 +386,10 @@ void AudioOutputALSA::SetAudiotime(void)
  
     snd_pcm_uframes_t soundcard_buffer = 0;
     snd_pcm_hw_params_t *hw_params;
-    snd_pcm_hw_params_malloc(&hw_params);
+    if ((err = snd_pcm_hw_params_malloc(&hw_params)) < 0) {
+        Error(QString("cannot allocate hardware parameter structure (%1)")
+              .arg(snd_strerror(err)));
+    }
     snd_pcm_hw_params_current(pcm_handle, hw_params);
     snd_pcm_hw_params_get_buffer_size(hw_params, &soundcard_buffer); // frames
     snd_pcm_hw_params_free(hw_params);
@@ -397,14 +408,15 @@ void AudioOutputALSA::SetAudiotime(void)
 void AudioOutputALSA::AddSamples(char *buffers[], int samples, 
                                 long long timecode)
 {
-    VERBOSE(VB_AUDIO, QString("AddSamples[] %1")
-                              .arg(samples * audio_bytes_per_sample));
     pthread_mutex_lock(&audio_buflock);
 
     int audio_bytes = audio_bits / 8;
     // VERBOSE(VB_AUDIO, QString("audio_bytes : %1").arg(audio_bytes));
     int afree = audiofree(false);
     // VERBOSE(VB_AUDIO, QString("afree : %1").arg(afree));
+
+    VERBOSE(VB_AUDIO, QString("AddSamples[] bytes=%1, free=%2")
+            .arg(samples * audio_bytes_per_sample).arg(afree));
     
     while (samples * audio_bytes_per_sample > afree)
     {
@@ -417,7 +429,9 @@ void AudioOutputALSA::AddSamples(char *buffers[], int samples,
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
+            VERBOSE(VB_IMPORTANT, QString("Audio buffer overflow, audio data lost!"
+                                          "[] afree=%1 need=%2")
+                    .arg(afree).arg(samples * audio_bytes_per_sample));
             samples = afree / audio_bytes_per_sample;
         }
     }
@@ -448,11 +462,12 @@ void AudioOutputALSA::AddSamples(char *buffers[], int samples,
 
 void AudioOutputALSA::AddSamples(char *buffer, int samples, long long timecode)
 {
-    VERBOSE(VB_AUDIO, QString("AddSamples %1")
-                              .arg(samples * audio_bytes_per_sample));
     pthread_mutex_lock(&audio_buflock);
 
     int afree = audiofree(false);
+
+    VERBOSE(VB_AUDIO, QString("AddSamples bytes=%1 free=%2")
+            .arg(samples * audio_bytes_per_sample).arg(afree));
 
     int len = samples * audio_bytes_per_sample;
     
@@ -467,7 +482,9 @@ void AudioOutputALSA::AddSamples(char *buffer, int samples, long long timecode)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
+            VERBOSE(VB_IMPORTANT, QString("Audio buffer overflow, audio data lost!"
+                                          "[] afree=%1 need=%2")
+                    .arg(afree).arg(samples * audio_bytes_per_sample));
             len = afree;
         }
     }
@@ -503,11 +520,14 @@ inline int AudioOutputALSA::getSpaceOnSoundcard(void)
     int err = 0;
 
     if (pcm_handle == NULL)
-	return 0;
+      return 0;
 
-    snd_pcm_uframes_t soundcard_buffer; // total buffer on soundcard
+    snd_pcm_uframes_t soundcard_buffer = 0; // total buffer on soundcard
     snd_pcm_hw_params_t *hw_params;
-    snd_pcm_hw_params_malloc(&hw_params);
+    if ((err = snd_pcm_hw_params_malloc(&hw_params)) < 0) {
+        Error(QString("cannot allocate hardware parameter structure (%1)")
+              .arg(snd_strerror(err)));
+    }
     snd_pcm_hw_params_current(pcm_handle, hw_params);
     snd_pcm_hw_params_get_buffer_size(hw_params, &soundcard_buffer); // frames
     snd_pcm_hw_params_free(hw_params);
@@ -516,9 +536,16 @@ inline int AudioOutputALSA::getSpaceOnSoundcard(void)
     snd_pcm_avail_update(pcm_handle);
     snd_pcm_delay(pcm_handle, &avail);
 
-    // Free space is the total buffer minues the frames waiting to be written
+    // make sure that we are actually in the running state otherwise
+    // snd_pcm_delay return is meaningless
+    if (snd_pcm_state(pcm_handle) < SND_PCM_STATE_RUNNING)
+        VERBOSE(VB_IMPORTANT, QString("Not in the running state, state=%1")
+                .arg(snd_pcm_state(pcm_handle)));
+
+    // Free space is the total buffer minus the frames waiting to be written
     space = ((soundcard_buffer - avail) * audio_bytes_per_sample) - audio_buffer_unused;
-    // VERBOSE(VB_AUDIO, QString("getSpaceOnSoundcard : %1 %2 %3 %4").arg(soundcard_buffer).arg(avail).arg(audio_buffer_unused).arg(space));
+    VERBOSE(VB_AUDIO, QString("getSpaceOnSoundcard : %1 %2 %3 %4")
+            .arg(soundcard_buffer).arg(avail).arg(audio_buffer_unused).arg(space));
 
     if (space < 0)
     {
@@ -547,6 +574,12 @@ void AudioOutputALSA::OutputAudioLoop(void)
 
     while (!killaudio)
     {
+        // if we don't have an audio output handle try to open again
+        // this can happen if WriteAudio fails and we close pcm_handle
+        if (pcm_handle == NULL)
+            Reconfigure(audio_bits, audio_channels, audio_samplerate);
+
+        // if pcm_handle still NULL break the loop
         if (pcm_handle == NULL) 
             break;
 
@@ -564,9 +597,8 @@ void AudioOutputALSA::OutputAudioLoop(void)
             }
             else
             {
-                VERBOSE(VB_AUDIO, QString("waiting for space to write 1024 "
-                        "zeros on soundcard which has %1 bytes free")
-                        .arg(space_on_soundcard));
+                VERBOSE(VB_AUDIO, QString("waiting for space on soundcard to write zeros: have %1 need %2")
+                        .arg(space_on_soundcard).arg(fragment_size));
                 usleep(50);
             }
 
@@ -580,9 +612,10 @@ void AudioOutputALSA::OutputAudioLoop(void)
         // wait for the buffer to fill with enough to play
         if (fragment_size > audiolen(true))
         {
-            VERBOSE(VB_AUDIO, QString("audio thread waiting for buffer to fill"
-                                      " fragment_size=%1, audiolen=%2")
-                                      .arg(fragment_size).arg(audiolen(true)));
+             if (audiolen(true) > 0)  // don't log unless we are sending some audio
+                 VERBOSE(VB_AUDIO, QString("audio waiting for buffer to fill: have %1 want %2")
+                         .arg(audiolen(true)).arg(fragment_size));
+
             usleep(200);
             continue;
         }
@@ -593,8 +626,8 @@ void AudioOutputALSA::OutputAudioLoop(void)
         space_on_soundcard = getSpaceOnSoundcard();
         if (fragment_size > space_on_soundcard)
         {
-            VERBOSE(VB_AUDIO, QString("Waiting for space on soundcard: "
-                                 "space=%1").arg(space_on_soundcard));
+            VERBOSE(VB_AUDIO, QString("audio waiting for space on soundcard: have %1 need %2")
+                    .arg(space_on_soundcard).arg(fragment_size));
             numlowbuffer++;
             if (numlowbuffer > 5 && audio_buffer_unused)
             {
@@ -648,9 +681,9 @@ void *AudioOutputALSA::kickoffOutputAudioLoop(void *player)
 }
 
 int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_access_t access,
-                        snd_pcm_format_t format, unsigned int channels,
-                        unsigned int rate, unsigned int buffer_time,
-                        unsigned int period_time)
+                                   snd_pcm_format_t format, unsigned int channels,
+                                   unsigned int rate, unsigned int buffer_time,
+                                   unsigned int period_time)
 {
     int err, dir;
     snd_pcm_hw_params_t *params;
@@ -658,6 +691,10 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_access_t access,
     snd_pcm_uframes_t buffer_size;
     snd_pcm_uframes_t period_size;
 
+    VERBOSE(VB_AUDIO, QString("in SetParameters(format=%1, channels=%2, "
+                              "rate=%3, buffer_time=%4, period_time=%5")
+            .arg(format).arg(channels).arg(rate).arg(buffer_time).arg(period_time));
+    
     snd_pcm_hw_params_alloca(&params);
     snd_pcm_sw_params_alloca(&swparams);
     
@@ -705,7 +742,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_access_t access,
     if (rrate != rate)
     {
         Error(QString("Rate doesn't match (requested %1Hz, got %2Hz)")
-              .arg(rate).arg(err));
+              .arg(rate).arg(rrate));
         return -EINVAL;
     }
 
@@ -723,6 +760,8 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_access_t access,
         Error(QString("Unable to get buffer size for playback: %1")
               .arg(snd_strerror(err)));
         return err;
+    } else {
+        VERBOSE(VB_AUDIO, QString("get_buffer_size returned %1").arg(buffer_size));
     }
 
     /* set the period time */
@@ -732,6 +771,8 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_access_t access,
         Error(QString("Unable to set period time %1 for playback: %2")
               .arg(period_time).arg(snd_strerror(err)));
         return err;
+    } else {
+        VERBOSE(VB_AUDIO, QString("set_period_time_near returned %1").arg(period_time));
     }
 
     if ((err = snd_pcm_hw_params_get_period_size(params, &period_size,
@@ -739,6 +780,8 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_access_t access,
         Error(QString("Unable to get period size for playback: %1")
               .arg(snd_strerror(err)));
         return err;
+    } else {
+        VERBOSE(VB_AUDIO, QString("get_period_size returned %1").arg(period_size));
     }
 
     /* write the parameters to device */
