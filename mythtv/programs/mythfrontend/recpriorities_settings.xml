@@ -6,6 +6,7 @@
       <text lang="DE">Allgemeines</text>
       <text lang="DK">Generelt</text>
       <text lang="NL">Algemeen</text>
+      <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
       <action>SETTINGS GENERALRANKING</action>
    </button>
@@ -18,6 +19,7 @@
       <text lang="DE">Sender bewerten</text>
       <text lang="DK">Sæt kanal rangering</text>
       <text lang="NL">Kanalen Rangeren</text>
+      <text lang="PT">Ordenação de Canais</text>
       <text lang="SV">Sätt upp kanalrankning</text>
       <action>SETTINGS CHANNELRANKING</action>
    </button>

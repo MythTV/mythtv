@@ -160,6 +160,25 @@
     </message>
 </context>
 <context>
+    <name>MythWizard</name>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt; &amp;Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Next &gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NuppelVideoPlayer</name>
     <message>
         <source>SKIP</source>
@@ -561,6 +580,262 @@
         <source>Description:</source>
         <translation type="unfinished">Descripción:</translation>
     </message>
+    <message>
+        <source>Pre-scaling theme images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio output device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use internal volume controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, uncheck this box.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mixer Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PCM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changing the volume adjusts the selected mixer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master Mixer Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PCM Mixer Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initial volume for PCM output.  Use of the volume keys in MythTV will adjust this parameter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deinterlace playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extra audio buffering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This attempts to keep extra audio data in the internal buffers.  Try setting this if you&apos;re getting crackly audio. (Not used for software encoded video.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump amount (in minutes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many minutes to jump forward or backward when the jump keys are pressed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast forward amount (in seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds to skip forward on a fast forward.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind amount (in seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds to skip backward on a rewind.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seek to exact frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, seeking is frame exact, but slower.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Skip Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blank Frame Detection (default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blank Frame + Scene Change Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scene Change Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Skip Commercials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Flag Commercials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically flag commercials after a recording completes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Strict Commercial Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on stricter Commercial Detection code.  If some commercials are not being detected, try turning this setting OFF.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trigger AutoExpire when free space in Gigabytes goes below this value.  Turn OFF AutoExpire by setting to 0.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire Frequency (in minutes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of minutes the AutoExpire process will wait between each time that it checks for free disk space.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Oldest Show First</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Method used to determine which recorded shows to AutoExpire first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire ON by default when creating new scheduled recordings.  Existing scheduled recordings will keep their current value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV will stop scheduling new recordings on a backend when its free disk space falls below this value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time to record before start of show (in seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time to record past end of show (in seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List Newest Recording First</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked (default) the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen. If unchecked the oldest recording will be listed first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sticky keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is set, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>English</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Italian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Catalan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spanish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dutch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>French</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>German</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Danish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swedish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Portuguese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred language.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -605,6 +880,13 @@
     </message>
     <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Scheduler</name>
+    <message>
+        <source>the maximum number of episodes have already been recorded.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

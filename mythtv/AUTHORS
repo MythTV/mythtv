@@ -41,3 +41,5 @@ Windowed TV features, jump keys, jitter reduction, bug fixes, tech notes:
     Bruce Markey <bjm at lvcm.com>
 Commercial skipping, non-Xv display support:
     Chris Pinkham <cpinkham at bc2va.org>
+Portuguese localization and i18n patches:
+    Bruno Rodrigues <bruno dot rodrigues at litux dot org>

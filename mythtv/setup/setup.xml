@@ -3,24 +3,28 @@
    <button>
      <type>SETUP</type>
      <text>1. General</text>
+     <text LANG="PT">1. Geral</text>
      <action>GENERAL</action>
    </button>
 
    <button>
      <type>SETUP</type>
      <text>2. Capture cards</text>
+     <text LANG="PT">2. Placas de Captura</text>
      <action>CAPTURE CARDS</action>
    </button>
 
    <button>
      <type>SETUP</type>
      <text>3. Video sources</text>
+     <text LANG="PT">3. Fontes de Vídeo</text>
      <action>VIDEO SOURCES</action>
    </button>
 
    <button>
      <type>SETUP</type>
      <text>4. Input connections</text>
+     <text LANG="PT">4. Ligações de Entrada</text>
      <action>CARD INPUTS</action>
    </button>
 

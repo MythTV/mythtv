@@ -436,6 +436,7 @@
         <value>Scheduled Recordings:</value>
         <value lang="DE">Geplante Aufnahmen:</value>
         <value lang="DK">Planlagte optagelser:</value>
+        <value lang="PT">Gravações Programadas:</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>cr-background.png</filename>
@@ -447,6 +448,7 @@
         <value>Conflicting recordings are highlighted in</value>
         <value lang="DE">Überschneidungen sind markiert in</value>
         <value lang="DK">Optagelser med konflikter er markeret med</value>
+        <value lang="PT">As gravações em conflito estão salientadas a</value>
       </textarea>
       <textarea name="conyellow" draworder="0">
         <area>452,330,800,40</area>
@@ -454,6 +456,7 @@
         <value>red</value>
         <value lang="DE">rot</value>
         <value lang="DK">rød</value>
+        <value lang="PT">vermelho</value>
       </textarea>
       <textarea name="disingray" draworder="0">
         <area>20,357,800,40</area>
@@ -461,6 +464,7 @@
         <value>Deactivated recordings are highlighted in</value>
         <value lang="DE">Blockierte Aufnahmen sind markiert in</value>
         <value lang="DK">Deaktiverede optagelser er markeret med</value>
+	<value lang="PT">As gravaçoes desactivadas estão salientadas a</value>
       </textarea>
       <textarea name="disgray" draworder="0">
         <area>458,357,800,40</area>
@@ -468,6 +472,7 @@
         <value>black</value>
         <value lang="DE">schwarz</value>
         <value lang="DK">sort</value>
+        <value lang="PT">preto</value>
       </textarea>
     </container>
 
@@ -519,6 +524,7 @@
         <value>Airdate:</value>
         <value lang="DE">Sendezeit:</value>
         <value lang="DK">Sendt:</value>
+        <value lang="PT">Emitido em:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -530,6 +536,7 @@
         <value>Channel:</value>
         <value lang="DE">Sender:</value>
         <value lang="DK">Kanal:</value>
+        <value lang="PT">Canal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -541,6 +548,7 @@
         <value>Description:</value>
         <value lang="DE">Inhalt:</value>
         <value lang="DK">Beskrivelse:</value>
+        <value lang="PT">Descrição:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,600,120</area>
@@ -556,6 +564,7 @@
          <value>You Haven't Scheduled Any Programs To Be Recorded</value>
          <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
          <value lang="DK">Du har ikke optaget nogen udsendelser</value>
+	 <value lang="PT">Não tem programada nenhuma gravação</value>
          <multiline>yes</multiline>
       </textarea>
     </container>
@@ -567,6 +576,7 @@
          <value>To schedule a recording, exit this screen and</value>
          <value lang="DE">Um eine Aufnahme zu planen wählen Sie</value>
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
+	 <value lang="PT">Para programar uma gravação, saia deste menu e</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,70,760,30</area>
@@ -574,6 +584,7 @@
          <value>Select 'Program Guide' or 'Program Finder'</value>
          <value lang="DE">'TV Planer' oder 'Sendung suchen'</value>
          <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
+	 <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
       </textarea>
     </container>
 
@@ -647,6 +658,7 @@
         <value>Select a recording to permanently delete:</value>
         <value lang="DE">Welche Aufnahme soll gelöscht werden:</value>
         <value lang="DK">Vælg en optagelse du vil slette permanent:</value>
+	<value lang="PT">Selecione uma gravação para apagar:</value>
         <context>1</context>
       </textarea>
       <textarea name="messageplay" draworder="0">
@@ -655,6 +667,7 @@
         <value>Select a recording to view:</value>
         <value lang="DE">Welche Aufnahme möchten Sie sehen:</value>
         <value lang="DK">Vælg den optagelse du ønsker at se:</value>
+	<value lang="PT">Selecione uma gravação para ver:</value>
         <context>0</context>
       </textarea>
     </container>
@@ -720,6 +733,7 @@
         <value>Airdate:</value>
         <value lang="DE">Sendezeit:</value>
         <value lang="DK">Sendt:</value>
+        <value lang="PT">Emitido em:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -731,6 +745,7 @@
         <value>Channel:</value>
         <value lang="DE">Sender:</value>
         <value lang="DK">Kanal:</value>
+        <value lang="PT">Canal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -742,6 +757,7 @@
         <value>Description:</value>
         <value lang="DE">Inhalt:</value>
         <value lang="DK">Beskrivelse:</value>
+        <value lang="PT">Descrição:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,400,120</area>
@@ -767,6 +783,7 @@
         <value>Airdate:</value>
         <value lang="DE">Sendezeit:</value>
         <value lang="DK">Sendt:</value>
+        <value lang="PT">Emitido em:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -778,6 +795,7 @@
         <value>Channel:</value>
         <value lang="DE">Sender:</value>
         <value lang="DK">Kanal:</value>
+        <value lang="PT">Canal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -789,6 +807,7 @@
         <value>Description:</value>
         <value lang="DE">Inhalt:</value>
         <value lang="DK">Beskrivelse:</value>
+        <value lang="PT">Descrição:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,400,90</area>
@@ -828,6 +847,7 @@
          <value>Sorry, No Recordings Available</value>
          <value lang="DE">Keine Aufnahmen verfügbar</value>
          <value lang="DK">Beklager, ingen optagelser fundet</value>
+	 <value lang="PT">Não há nenhuma gravação disponível</value>
       </textarea>
     </container>
 
@@ -838,6 +858,7 @@
          <value>To schedule a recording, exit this screen and</value>
          <value lang="DE">Um eine Aufnahme zu planen wählen Sie</value>
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
+	 <value lang="PT">Para programar uma gravação, saia deste menu e</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,110,580,30</area>
@@ -845,6 +866,7 @@
          <value>Select 'Schedule a Recording' from the Main Menu</value>
          <value lang="DE">'Aufnahme planen' im Hauptmenü</value>
          <value lang="DK">vælg 'Optag en udsendelse'</value>
+	 <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
       </textarea>
     </container>
 
@@ -921,6 +943,7 @@
         <value>(4) Program Guide   **(6) Program Finder **</value>
         <value lang="DE">(4) TV Planer         **(6) Sendung suchen **</value>
         <value lang="DK">(4) Program Guide     **(6) Program Finder **</value>
+        <value lang="PT">(4) Guia de Programação  **(6) Procurar Programas **</value>
         <context>1</context>
       </textarea>
     </container>
@@ -1000,6 +1023,7 @@
         <value>Select a letter...</value>
         <value lang="DE">Wählen Sie einen Buchstaben...</value>
         <value lang="DK">Vælg et bogstav...</value>
+        <value lang="PT">Selecione uma letra...</value>
       </textarea>
       <textarea name="pickinfo" draworder="6">
         <area>10,75,500,60</area>
@@ -1007,6 +1031,7 @@
         <value>Pick the letter in which the show starts with, then hit ENTER or the right arrow</value>
         <value lang="DE">Wählen Sie den Anfangsbuchstaben der Sendung, danach ENTER oder Cursor-Rechts</value>
         <value lang="DK">Vælg det bogstav udsendelsen starter med og tryk ENTER eller pil til højre</value>
+        <value lang="PT">Escolha a letra inicial do programa, e depois ENTER ou o cursor para a direita</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -1019,6 +1044,7 @@
         <value>Select a program...</value>
         <value lang="DE">Wählen Sie eine Sendung...</value>
         <value lang="DK">Vælg en udsendelse...</value>
+        <value lang="PT">Selecione um Programa...</value>
       </textarea>
       <textarea name="pickprog" draworder="6">
         <area>10,75,500,120</area>
@@ -1026,6 +1052,7 @@
         <value>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'info' will allow you to setup recording options.</value>
         <value lang="DE">Wählen Sie den Titel der gesuchten Sendung. Weiter mit ENTER oder Cursor-Rechts. Mit 'info' können Sie eine Aufnahme planen.</value>
         <value lang="DK">Vælg titlen på det den udsendelse du ønsker at finde og tryk ENTER eller Pil til venstre. Med 'Info' kan du vælge optagelsetype.</value>
+        <value lang="PT">Selecione o título do programa que deseja procurar. Para voltar, use o cursor para a esquerda. Para opções de gravação, use 'info'.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -1045,6 +1072,7 @@
         <value>There are no available programs under this search. Please select another search.</value>
         <value lang="DE">Keine Sendungen gefunden. Bitte wählen Sie eine andere Suche.</value>
         <value lang="DK">Ingen udsendelser under denne søgning. Prøv venligst en anden.</value>
+        <value lang="PT">Não existem programas disponíveis para esta procura.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>

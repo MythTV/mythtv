@@ -18,7 +18,7 @@ AudioOutputDevice::AudioOutputDevice():
     ComboBoxSetting(true),
     GlobalSetting("AudioOutputDevice") {
 
-    setLabel("Audio output device");
+    setLabel(QObject::tr("Audio output device"));
     QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
     fillSelectionsFromDir(dev);
     dev.setNameFilter("adsp*");
@@ -35,11 +35,11 @@ class MythControlsVolume: public CheckBoxSetting, public GlobalSetting {
 public:
     MythControlsVolume():
         GlobalSetting("MythControlsVolume") {
-        setLabel("Use internal volume controls");
+        setLabel(QObject::tr("Use internal volume controls"));
         setValue(true);
-        setHelpText("MythTV can control the PCM and master "
+        setHelpText(QObject::tr("MythTV can control the PCM and master "
                     "mixer volume.  If you prefer to use an external mixer "
-                    "program, uncheck this box.");
+                    "program, uncheck this box."));
     };
 };
 
@@ -54,7 +54,7 @@ MixerDevice::MixerDevice():
     ComboBoxSetting(true),
     GlobalSetting("MixerDevice") {
 
-    setLabel("Mixer Device");
+    setLabel(QObject::tr("Mixer Device"));
     QDir dev("/dev", "mixer*", QDir::Name, QDir::System);
     fillSelectionsFromDir(dev);
 
@@ -67,8 +67,11 @@ public:
     MixerControl();
 protected:
     static const char* controls[];
+    static const char* controlNames[];
 };
 
+const char* MixerControl::controlNames[] = { QObject::tr("PCM"),
+        QObject::tr("Master") };
 const char* MixerControl::controls[] = { "PCM",
                                          "Master" };
 
@@ -78,9 +81,9 @@ MixerControl::MixerControl():
 
     setLabel("Mixer Controls");
     for(unsigned int i = 0; i < sizeof(controls) / sizeof(char*); ++i) {
-        addSelection(controls[i]);
+        addSelection(controlNames[i], controls[i]);
     }
-    setHelpText("Changing the volume adjusts the selected mixer.");
+    setHelpText(QObject::tr("Changing the volume adjusts the selected mixer."));
 }
 
 class MixerVolume: public SliderSetting, public GlobalSetting {
@@ -88,11 +91,11 @@ public:
     MixerVolume():
 	SliderSetting(0, 100, 1),
         GlobalSetting("MasterMixerVolume") {
-        setLabel("Master Mixer Volume");
+        setLabel(QObject::tr("Master Mixer Volume"));
         setValue(70);
-        setHelpText("Initial volume for the Master Mixer.  This affects "
-                    "all sound created by the soundcard.  Note: Do not "
-                    "set this too low." );
+        setHelpText(QObject::tr("Initial volume for the Master Mixer.  "
+                    "This affects all sound created by the soundcard.  "
+                    "Note: Do not set this too low." ));
         };
 };
 
@@ -101,10 +104,10 @@ public:
     PCMVolume():
         SliderSetting(0, 100, 1),
         GlobalSetting("PCMMixerVolume") {
-        setLabel("PCM Mixer Volume");
+        setLabel(QObject::tr("PCM Mixer Volume"));
         setValue(70);
-        setHelpText("Initial volume for PCM output.  Use of the volume "
-                    "keys in MythTV will adjust this parameter.");
+        setHelpText(QObject::tr("Initial volume for PCM output.  Use of the "
+                    "volume keys in MythTV will adjust this parameter."));
         };
 };
 
@@ -112,13 +115,13 @@ class Deinterlace: public CheckBoxSetting, public GlobalSetting {
 public:
     Deinterlace():
         GlobalSetting("Deinterlace") {
-        setLabel("Deinterlace playback");
+        setLabel(QObject::tr("Deinterlace playback"));
         setValue(false);
-        setHelpText("Make the video look normal on a progressive display "
-                    "(i.e. monitor).  Deinterlace requires that your CPU "
-                    "supports SSE instructions.  Enabling this without "
+        setHelpText(QObject::tr("Make the video look normal on a progressive "
+                    "display (i.e. monitor).  Deinterlace requires that your "
+                    "CPU supports SSE instructions.  Enabling this without "
                     "proper CPU support will cause the program to segfault. "
-                    "See the HOWTO document for more information.");
+                    "See the HOWTO document for more information."));
     };
 };
 
@@ -126,11 +129,11 @@ class DecodeExtraAudio: public CheckBoxSetting, public GlobalSetting {
 public:
     DecodeExtraAudio():
         GlobalSetting("DecodeExtraAudio") {
-        setLabel("Extra audio buffering");
+        setLabel(QObject::tr("Extra audio buffering"));
         setValue(false);
-        setHelpText("This attempts to keep extra audio data in the internal "
-                    "buffers.  Try setting this if you're getting crackly "
-                    "audio. (Not used for software encoded video.)");
+        setHelpText(QObject::tr("This attempts to keep extra audio data in "
+                    "the internal buffers.  Try setting this if you're getting "
+                    "crackly audio. (Not used for software encoded video.)"));
     };
 };
 
@@ -139,10 +142,10 @@ public:
     JumpAmount():
         SpinBoxSetting(1, 30, 1),
         GlobalSetting("JumpAmount") {
-        setLabel("Jump amount (in minutes)");
+        setLabel(QObject::tr("Jump amount (in minutes)"));
         setValue(10);
-        setHelpText("How many minutes to jump forward or backward "
-                   "when the jump keys are pressed.");
+        setHelpText(QObject::tr("How many minutes to jump forward or backward "
+                   "when the jump keys are pressed."));
     };
 };
 
@@ -151,9 +154,10 @@ public:
     FastForwardAmount():
         SpinBoxSetting(1, 600, 1),
         GlobalSetting("FastForwardAmount") {
-        setLabel("Fast forward amount (in seconds)");
+        setLabel(QObject::tr("Fast forward amount (in seconds)"));
         setValue(30);
-        setHelpText("How many seconds to skip forward on a fast forward.");
+        setHelpText(QObject::tr("How many seconds to skip forward on a fast "
+                    "forward."));
     };
 };
 
@@ -162,9 +166,10 @@ public:
     RewindAmount():
         SpinBoxSetting(1, 600, 1),
         GlobalSetting("RewindAmount") {
-        setLabel("Rewind amount (in seconds)");
+        setLabel(QObject::tr("Rewind amount (in seconds)"));
         setValue(5);
-        setHelpText("How many seconds to skip backward on a rewind.");
+        setHelpText(QObject::tr("How many seconds to skip backward on a "
+                    "rewind."));
     };
 };
 
@@ -172,9 +177,10 @@ class ExactSeeking: public CheckBoxSetting, public GlobalSetting {
 public:
     ExactSeeking():
         GlobalSetting("ExactSeeking") {
-        setLabel("Seek to exact frame");
+        setLabel(QObject::tr("Seek to exact frame"));
         setValue(false);
-        setHelpText("If enabled, seeking is frame exact, but slower.");
+        setHelpText(QObject::tr("If enabled, seeking is frame exact, but "
+                    "slower."));
     };
 };
 
@@ -183,14 +189,14 @@ public:
     CommercialSkipMethod():
         BackendSetting("CommercialSkipMethod") {
 
-        setLabel("Commercial Skip Method");
-        addSelection("Blank Frame Detection (default)", "1");
-        addSelection("Blank Frame + Scene Change Detection", "3");
-        addSelection("Scene Change Detection", "2");
-        setHelpText("This determines the method used by MythTV to detect "
-                    "when commercials start and end.  You must have "
+        setLabel(QObject::tr("Commercial Skip Method"));
+        addSelection(QObject::tr("Blank Frame Detection (default)"), "1");
+        addSelection(QObject::tr("Blank Frame + Scene Change Detection"), "3");
+        addSelection(QObject::tr("Scene Change Detection"), "2");
+        setHelpText(QObject::tr("This determines the method used by MythTV to "
+                    "detect when commercials start and end.  You must have "
                     "automatic commercial turned on to use anything "
-                    "other than 'Blank Frame'." );
+                    "other than 'Blank Frame'." ));
     };
 };
 
@@ -198,11 +204,11 @@ class AutoCommercialSkip: public CheckBoxSetting, public GlobalSetting {
 public:
     AutoCommercialSkip():
         GlobalSetting("AutoCommercialSkip") {
-        setLabel("Automatically Skip Commercials");
+        setLabel(QObject::tr("Automatically Skip Commercials"));
         setValue(false);
-        setHelpText("Automatically skip commercial breaks that have been "
-                    "flagged during Automatic Commercial Flagging or by "
-                    "the mythcommflag program.");
+        setHelpText(QObject::tr("Automatically skip commercial breaks that "
+                    "have been flagged during Automatic Commercial Flagging "
+                    "or by the mythcommflag program."));
     };
 };
 
@@ -210,10 +216,10 @@ class AutoCommercialFlag: public CheckBoxSetting, public BackendSetting {
 public:
     AutoCommercialFlag():
         BackendSetting("AutoCommercialFlag") {
-        setLabel("Automatically Flag Commercials");
+        setLabel(QObject::tr("Automatically Flag Commercials"));
         setValue(true);
-        setHelpText("Automatically flag commercials after a recording "
-                    "completes.");
+        setHelpText(QObject::tr("Automatically flag commercials after a "
+                    "recording completes."));
     };
 };
 
@@ -221,11 +227,11 @@ class AggressiveCommDetect: public CheckBoxSetting, public BackendSetting {
 public:
     AggressiveCommDetect():
         BackendSetting("AggressiveCommDetect") {
-        setLabel("Strict Commercial Detection");
+        setLabel(QObject::tr("Strict Commercial Detection"));
         setValue(true);
-        setHelpText("Turn on stricter Commercial Detection code.  If some "
-                    "commercials are not being detected, try turning this "
-                    "setting OFF.");
+        setHelpText(QObject::tr("Turn on stricter Commercial Detection code.  "
+                    "If some commercials are not being detected, try turning "
+                    "this setting OFF."));
     };
 };
 
@@ -234,9 +240,11 @@ public:
     AutoExpireDiskThreshold():
         SpinBoxSetting(0, 200, 1),
         BackendSetting("AutoExpireDiskThreshold") {
-        setLabel("Auto Expire Free Disk Space Threshold (in Gigabytes)");
-        setHelpText("Trigger AutoExpire when free space in Gigabytes goes "
-                    "below this value.  Turn OFF AutoExpire by setting to 0.");
+        setLabel(QObject::tr("Auto Expire Free Disk Space Threshold "
+                 "(in Gigabytes)"));
+        setHelpText(QObject::tr("Trigger AutoExpire when free space in "
+                    "Gigabytes goes below this value.  Turn OFF AutoExpire "
+                    "by setting to 0."));
         setValue(0);
     };
 };
@@ -246,9 +254,10 @@ public:
     AutoExpireFrequency():
         SpinBoxSetting(1, 60, 1),
         BackendSetting("AutoExpireFrequency") {
-        setLabel("Auto Expire Frequency (in minutes)");
-        setHelpText("Number of minutes the AutoExpire process will wait "
-                    "between each time that it checks for free disk space.");
+        setLabel(QObject::tr("Auto Expire Frequency (in minutes)"));
+        setHelpText(QObject::tr("Number of minutes the AutoExpire process "
+                    "will wait between each time that it checks for free disk "
+                    "space."));
         setValue(10);
     };
 };
@@ -257,10 +266,10 @@ class AutoExpireMethod: public ComboBoxSetting, public BackendSetting {
 public:
     AutoExpireMethod():
         BackendSetting("AutoExpireMethod") {
-        setLabel("Auto Expire Method");
-        addSelection("Oldest Show First", "1");
-        setHelpText("Method used to determine which recorded shows to "
-                    "AutoExpire first.");
+        setLabel(QObject::tr("Auto Expire Method"));
+        addSelection(QObject::tr("Oldest Show First"), "1");
+        setHelpText(QObject::tr("Method used to determine which recorded "
+                    "shows to AutoExpire first."));
     };
 };
 
@@ -268,11 +277,11 @@ class AutoExpireDefault: public CheckBoxSetting, public BackendSetting {
 public:
     AutoExpireDefault():
         BackendSetting("AutoExpireDefault") {
-        setLabel("Auto-Expire Default");
+        setLabel(QObject::tr("Auto-Expire Default"));
         setValue(true);
-        setHelpText("Turn Auto-Expire ON by default when creating "
+        setHelpText(QObject::tr("Turn Auto-Expire ON by default when creating "
                     "new scheduled recordings.  Existing scheduled "
-                    "recordings will keep their current value.");
+                    "recordings will keep their current value."));
     };
 };
 
@@ -281,9 +290,11 @@ public:
     MinRecordDiskThreshold():
         SpinBoxSetting(0, 1000000, 100),
         BackendSetting("MinRecordDiskThreshold") {
-        setLabel("New Recording Free Disk Space Threshold (in Megabytes)");
-        setHelpText("MythTV will stop scheduling new recordings on a backend "
-                    "when its free disk space falls below this value.");
+        setLabel(QObject::tr("New Recording Free Disk Space Threshold "
+                 "(in Megabytes)"));
+        setHelpText(QObject::tr("MythTV will stop scheduling new recordings on "
+                    "a backend when its free disk space falls below this "
+                    "value."));
         setValue(300);
     };
 };
@@ -294,6 +305,8 @@ public:
         SpinBoxSetting(0, 600, 1),
         BackendSetting("RecordPreRoll") {
         setLabel("Time to record before start of show (in seconds)");
+        setLabel(QObject::tr("Time to record before start of show "
+                 "(in seconds)"));
         setValue(0);
     };
 };
@@ -303,7 +316,7 @@ public:
     RecordOverTime():
         SpinBoxSetting(0, 600, 1),
         BackendSetting("RecordOverTime") {
-        setLabel("Time to record past end of show (in seconds)");
+        setLabel(QObject::tr("Time to record past end of show (in seconds)"));
         setValue(0);
     };
 };
@@ -312,11 +325,12 @@ class PlayBoxOrdering: public CheckBoxSetting, public GlobalSetting {
 public:
     PlayBoxOrdering():
         GlobalSetting("PlayBoxOrdering") {
-        setLabel("List Newest Recording First");
+        setLabel(QObject::tr("List Newest Recording First"));
         setValue(true);
-        setHelpText("If checked (default) the most recent recording will be "
-                    "listed first in the 'Watch Recordings' screen. If "
-                    "unchecked the oldest recording will be listed first.");
+        setHelpText(QObject::tr("If checked (default) the most recent "
+                    "recording will be listed first in the 'Watch Recordings' "
+                    "screen. If unchecked the oldest recording will be listed "
+                    "first."));
     };
 };
 
@@ -324,12 +338,13 @@ class StickyKeys: public CheckBoxSetting, public GlobalSetting {
 public:
     StickyKeys():
         GlobalSetting("StickyKeys") {
-        setLabel("Sticky keys");
+        setLabel(QObject::tr("Sticky keys"));
         setValue(false);
-        setHelpText("If this is set, fast forward and rewind continue after "
-                    "the key is released.  Pressing the key again increases "
-                    "the fast forward or rewind speed.  The alternate fast "
-                    "forward and rewind keys always behave in this way.");
+        setHelpText(QObject::tr("If this is set, fast forward and rewind "
+                    "continue after the key is released.  Pressing the key "
+                    "again increases the fast forward or rewind speed.  The "
+                    "alternate fast forward and rewind keys always behave in "
+                    "this way."));
     };
 };
 
@@ -427,7 +442,8 @@ public:
         GlobalSetting("VertScanPercentage") {
         setLabel("Vertical over/underscan percentage");
         setValue(0);
-        setHelpText("Adjust this if the image does not fill your screen vertically.");
+        setHelpText("Adjust this if the image does not fill your screen "
+                    "vertically.");
     };
 };
 
@@ -438,7 +454,8 @@ public:
         GlobalSetting("HorizScanPercentage") {
         setLabel("Horizontal over/underscan percentage");
         setValue(0);
-        setHelpText("Adjust this if the image does not fill your screen horizontally.");
+        setHelpText("Adjust this if the image does not fill your screen "
+                    "horizontally.");
     };
 };
 
@@ -1059,17 +1076,18 @@ class MythLanguage: public ComboBoxSetting, public GlobalSetting {
 public:
     MythLanguage():
         ComboBoxSetting(true), GlobalSetting("Language") {
-        setLabel("Language");
-        addSelection("English", "EN");
-        addSelection("Italian", "IT");
-        addSelection("Catalan", "CA");
-        addSelection("Spanish", "ES");
-        addSelection("Dutch", "NL");
-        addSelection("French", "FR");
-        addSelection("German", "DE");
-        addSelection("Danish", "DK");
-        addSelection("Swedish", "SV");
-        setHelpText("Your preferred language.");
+        setLabel(QObject::tr("Language"));
+        addSelection(QObject::tr("English"), "EN");
+        addSelection(QObject::tr("Italian"), "IT");
+        addSelection(QObject::tr("Catalan"), "CA");
+        addSelection(QObject::tr("Spanish"), "ES");
+        addSelection(QObject::tr("Dutch"), "NL");
+        addSelection(QObject::tr("French"), "FR");
+        addSelection(QObject::tr("German"), "DE");
+        addSelection(QObject::tr("Danish"), "DK");
+        addSelection(QObject::tr("Swedish"), "SV");
+        addSelection(QObject::tr("Portuguese"), "PT");
+        setHelpText(QObject::tr("Your preferred language.") );
     };
 };
 

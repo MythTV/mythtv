@@ -503,6 +503,7 @@
         <value lang="NL">Geplande Opnames</value>
         <value lang="DE">Geplante Aufnahmen:</value>
         <value lang="DK">Planlagte optagelser:</value>
+        <value lang="PT">Gravações Marcadas:</value>
         <value lang="SV">Schemalagda inspelningar:</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
@@ -519,6 +520,7 @@
         <value lang="NL">Conflicterende opnames zijn gekleurd in</value>
         <value lang="DE">Überschneidungen sind markiert in</value>
         <value lang="DK">Optagelser med konflikter er markeret med</value>
+        <value lang="PT">As gravações em conflito estão salientadas a</value>
         <value lang="SV">Inspelningar med konflikter visas med</value>
       </textarea>
       <textarea name="conyellow" draworder="0">
@@ -531,6 +533,7 @@
         <value lang="NL">geel</value>
         <value lang="DE">gelb</value>
         <value lang="DK">gul</value>
+        <value lang="PT">amarelo</value>
         <value lang="SV">gult</value>
       </textarea>
       <textarea name="disingray" draworder="0">
@@ -543,6 +546,7 @@
         <value lang="NL">Gedesactiveerde opnames zijn gekleurd in</value>
         <value lang="DE">Blockierte Aufnahmen sind markiert in</value>
         <value lang="DK">Deaktiverede optagelser er markeret med</value>
+        <value lang="PT">As gravaçoes desactivadas estão salientadas a</value>
         <value lang="SV">Deaktiverade inspelningar visas med</value>
       </textarea>
       <textarea name="disgray" draworder="0">
@@ -555,6 +559,7 @@
         <value lang="NL">grijs</value>
         <value lang="DE">grau</value>
         <value lang="DK">grå</value>
+        <value lang="PT">cinzento</value>
         <value lang="SV">grått</value>
       </textarea>
     </container>
@@ -612,6 +617,7 @@
         <value lang="NL">Uitzenddatum:</value>
         <value lang="DE">Sendezeit:</value>
         <value lang="DK">Sendt:</value>
+        <value lang="PT">Emitido em:</value>
         <value lang="SV">Sänt:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
@@ -628,6 +634,7 @@
         <value lang="NL">Kanaal:</value>
         <value lang="DE">Sender:</value>
         <value lang="DK">Kanal:</value>
+        <value lang="PT">Canal:</value>
         <value lang="SV">Kanal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
@@ -644,6 +651,7 @@
         <value lang="NL">Beschrijving:</value>
         <value lang="DE">Inhalt:</value>
         <value lang="DK">Beskrivelse:</value>
+        <value lang="PT">Descrição:</value>
         <value lang="SV">Beskrivning:</value>
       </textarea>
       <textarea name="description" draworder="6">
@@ -665,6 +673,7 @@
          <value lang="NL">Er zijn geen geplande opnames</value>
          <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
          <value lang="DK">Du har ikke optaget nogen udsendelser</value>
+         <value lang="PT">Não tem programada nenhuma gravação</value>
          <value lang="SV">Du har inte schemalagt något program för inspelning</value>
          <multiline>yes</multiline> 
       </textarea>
@@ -681,6 +690,7 @@
          <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
          <value lang="DE">Um eine Aufnahme zu planen wählen Sie</value>
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
+         <value lang="PT">Para programar uma gravação, saia deste menu e</value>
          <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
@@ -693,6 +703,7 @@
          <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
          <value lang="DE">'TV Planer' oder 'Sendung suchen'</value>
          <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
+         <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
          <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
       </textarea>
     </container>
@@ -748,6 +759,7 @@
         <value>Channel Rankings</value>
         <value lang="DE">Sender Bewertungen</value>
         <value lang="DK">Kanal rangering</value>
+        <value lang="PT">Ordenação de Canais</value>
         <value lang="SV">Kanalrankning</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
@@ -760,6 +772,7 @@
         <value>(1) Sort by Channel    (2) Sort by Rank</value>
         <value lang="DE">(1) Sortiert nach Sender (2) Sortiert nach Rang</value>
         <value lang="DK">(1) Sortér efter Titel  (2) Sortér efter Rang</value>
+        <value lang="PT">(1) Ordenar por Canal  (2) Ordenar por Preferência</value>
         <value lang="SV">(1) Sortera efter titel  (2) Sortera efter rank</value>
       </textarea>
     </container>
@@ -804,6 +817,7 @@
         <value>Rank:</value>
         <value lang="DE">Rang:</value>
         <value lang="DK">Rang:</value>
+        <value lang="PT">Preferência:</value>
         <value lang="SV">Rank:</value>
       </textarea>
       <textarea name="rank" draworder="6">
@@ -824,6 +838,7 @@
          <value lang="NL">Er zijn geen geplande opnames</value>
          <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
          <value lang="DK">Du har ikke optaget nogen udsendelser</value>
+         <value lang="PT">Não tem programada nenhuma gravação</value>
          <value lang="SV">Du har inte schemalagt några program för inspelning</value>
          <multiline>yes</multiline>
       </textarea>
@@ -840,6 +855,7 @@
          <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
          <value lang="DE">Um eine Aufnahme zu planen, verlassen Sie dieses Menü und</value>
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
+         <value lang="PT">Para programar uma gravação, saia deste menu e</value>
          <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
@@ -852,6 +868,7 @@
          <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
          <value lang="DE">wählen Sie 'TV Planer' oder 'Sendung suchen'</value>
          <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
+         <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
          <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
       </textarea>
     </container>
@@ -928,6 +945,7 @@
         <value>Program Rankings</value>
         <value lang="DE">Sendungen Bewertungen</value>
         <value lang="DK">Program rangering</value>
+        <value lang="PT">Programas Preferenciais</value>
         <value lang="SV">Programrankning</value>
       </textarea>
       <textarea name="ranklabel" draworder="0">
@@ -936,6 +954,7 @@
         <value>Rank</value>
         <value lang="DE">Rang</value>
         <value lang="DK">Rang</value>
+        <value lang="PT">Preferência</value>
         <value lang="SV">Rank</value>
       </textarea>
       <textarea name="finalranklabel" draworder="0">
@@ -944,6 +963,7 @@
         <value>Final Rank</value>
         <value lang="DE">Endbewertung</value>
         <value lang="DK">Slutrang</value>
+        <value lang="PT">Preferência Final</value>
         <value lang="SV">Slutrank</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
@@ -956,6 +976,7 @@
         <value>(1) Sort by Title    (2) Sort by Rank</value>
         <value lang="DE">(1) Sortiert nach Sender (2) Sortiert nach Rang</value>
         <value lang="DK">(1) Sortér efter Titel  (2) Sortér efter Rang</value>
+        <value lang="PT">(1) Ordenar por Título  (2) Ordenar por Preferência</value>
         <value lang="SV">(1) Sortera efter titel  (2) Sortera efter rank</value>
       </textarea>
     </container>
@@ -1000,6 +1021,7 @@
         <value>Record Type:</value>
         <value lang="DE">Aufnahmemodus:</value>
         <value lang="DK">Optagelsestype:</value>
+        <value lang="PT">Tipo de Gravação:</value>
         <value lang="SV">Inspelningstyp:</value>
       </textarea>
       <textarea name="type" draworder="6">
@@ -1030,6 +1052,7 @@
         <value>Channel:</value>
         <value lang="DE">Sender:</value>
         <value lang="DK">Kanal:</value>
+        <value lang="PT">Canal:</value>
         <value lang="SV">Kanal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
@@ -1060,6 +1083,7 @@
         <value>Rank:</value>
         <value lang="DE">Rang:</value>
         <value lang="DK">Rang:</value>
+        <value lang="PT">Preferência:</value>
         <value lang="SV">Rank:</value>
       </textarea>
       <textarea name="rank" draworder="6">
@@ -1101,6 +1125,7 @@
          <value lang="NL">Er zijn geen geplande opnames</value>
          <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
          <value lang="DK">Du har ikke optaget nogen udsendelser</value>
+         <value lang="PT">Não tem programada nenhuma gravação</value>
          <value lang="SV">Du har inte schemalagt några inspelningar</value>
          <multiline>yes</multiline>
       </textarea>
@@ -1117,6 +1142,7 @@
          <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
          <value lang="DE">Um eine Aufnahme zu planen, verlassen Sie dieses Menü und</value>
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
+         <value lang="PT">Para programar uma gravação, saia deste menu e</value>
          <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
@@ -1129,6 +1155,7 @@
          <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
          <value lang="DE">wählen Sie 'TV Planer' oder 'Sendung suchen'</value>
          <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
+         <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
          <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
       </textarea>
     </container>
@@ -1198,6 +1225,7 @@
         <value lang="NL">Kies een opname om te verwijderen:</value>
 	<value lang="DE">Welche Aufnahme soll gelöscht werden:</value>
         <value lang="DK">Vælg en optagelse du vil slette permanent:</value>
+        <value lang="PT">Selecione uma gravação para apagar:</value>
         <value lang="SV">Välj en inspelning du vill radera permanent:</value>
         <context>1</context>
       </textarea>
@@ -1211,6 +1239,7 @@
         <value lang="NL">Kies een opname om te bekijken:</value>
         <value lang="DE">Welche Aufnahme möchten Sie sehen:</value>
         <value lang="DK">Vælg den optagelse du ønsker at se:</value>
+        <value lang="PT">Selecione uma gravação para ver:</value>
         <value lang="SV">Välj den inspelning du önskar se:</value>
         <context>0</context>
       </textarea>
@@ -1283,6 +1312,7 @@
         <value lang="NL">Uitzenddatum:</value>
         <value lang="DE">Sendezeit:</value>
         <value lang="DK">Sendt:</value>
+        <value lang="PT">Data de Emissão:</value>
         <value lang="SV">Sänt:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
@@ -1299,6 +1329,7 @@
         <value lang="NL">Kanaal:</value>
         <value lang="DE">Sender:</value>
         <value lang="DK">Kanal:</value>
+        <value lang="PT">Canal:</value>
         <value lang="SV">Kanal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
@@ -1315,6 +1346,7 @@
         <value lang="NL">Beschrijving:</value>
         <value lang="DE">Inhalt:</value>
         <value lang="DK">Beskrivelse:</value>
+        <value lang="PT">Descrição:</value>
         <value lang="SV">Beskrivning:</value>
       </textarea>
       <textarea name="description" draworder="6">
@@ -1367,6 +1399,7 @@
         <value lang="NL">Uitzenddatum:</value>
         <value lang="DE">Sendezeit:</value>
         <value lang="DK">Sendt:</value>
+        <value lang="PT">Data de Emissão:</value>
         <value lang="SV">Sänt:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
@@ -1383,6 +1416,7 @@
         <value lang="NL">Kanaal:</value>
         <value lang="DE">Sender:</value>
         <value lang="DK">Kanal:</value>
+        <value lang="PT">Canal:</value>
         <value lang="SV">Kanal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
@@ -1399,6 +1433,7 @@
         <value lang="NL">Beschrijving:</value>
         <value lang="DE">Inhalt:</value>
         <value lang="DK">Beskrivelse:</value>
+        <value lang="PT">Descrição:</value>
         <value lang="SV">Beskrivning:</value>
       </textarea>
       <textarea name="description" draworder="6">
@@ -1442,6 +1477,7 @@
          <value lang="NL">Sorry, geen opnames aanwezig</value>
          <value lang="DE">Keine Aufnahmen verfügbar</value>
          <value lang="DK">Beklager, ingen optagelser fundet</value>
+         <value lang="PT">Não há nenhuma gravação disponível</value>
          <value lang="SV">Inga inspelningar hittades</value>
       </textarea>
     </container>
@@ -1457,6 +1493,7 @@
          <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
          <value lang="DE">Um eine Aufnahme zu planen wählen Sie</value>
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
+         <value lang="PT">Para programar uma gravação, saia deste menu e</value>
          <value lang="SV">För att schemalägga en inspelning, gå tillbaka och</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
@@ -1469,6 +1506,7 @@
          <value lang="NL">kies 'Opname plannen'</value>
          <value lang="DE">'Aufnahme planen' im Hauptmenü</value>
          <value lang="DK">vælg 'Optag en udsendelse'</value>
+         <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
          <value lang="SV">välj 'Schemalägg inspelningar' från huvudmenyn</value>
       </textarea>
     </container>
@@ -1542,6 +1580,7 @@
         <value lang="NL">(4) Programmagids     **(6) Programma Zoeker **</value>
         <value lang="DE">(4) TV Planer         **(6) Sendung suchen **</value>
         <value lang="DK">(4) Program Guide     **(6) Program Finder **</value>
+        <value lang="PT">(4) Guia de Programação  **(6) Procurar Programas **</value>
         <value lang="SV">(4) Programguide      **(6) Sök program **</value>
         <context>1</context>
       </textarea>
@@ -1625,6 +1664,7 @@
         <value lang="NL">Kies een letter...</value>
         <value lang="DE">Wählen Sie einen Buchstaben...</value>
         <value lang="DK">Vælg et bogstav...</value>
+        <value lang="PT">Selecione uma letra...</value>
         <value lang="SV">Välj en bokstav...</value>
       </textarea>
       <textarea name="pickinfo" draworder="6">
@@ -1637,6 +1677,7 @@
         <value lang="NL">Kies de eerste letter van het programma, en druk OK of pijl naar rechts</value>
         <value lang="DE">Wählen Sie den Anfangsbuchstaben der Sendung, danach ENTER oder Cursor-Rechts</value>
         <value lang="DK">Vælg det bogstav udsendelsen starter med og tryk ENTER eller pil til højre</value>
+        <value lang="PT">Escolha a letra inicial do programa, e depois ENTER ou o cursor para a direita</value>
         <value lang="SV">Välj den bokstav som programnamnet börjar med. Tryck sedan ENTER eller högerpil</value>
         <multiline>yes</multiline>
       </textarea>
@@ -1654,6 +1695,7 @@
         <value lang="NL">Kies een programma...</value>
         <value lang="DE">Wählen Sie eine Sendung...</value>
         <value lang="DK">Vælg en udsendelse...</value>
+        <value lang="PT">Selecione um Programa...</value>
         <value lang="SV">Välj ett program...</value>
       </textarea>
       <textarea name="pickprog" draworder="6">
@@ -1666,6 +1708,7 @@
         <value lang="NL">Kies de titel van het programma dat U zoekt. Druk op pijl naar links wanneer U klaar bent. Druk 'info' als U de opname-opties wilt wijzigen.</value>
         <value lang="DE">Wählen Sie den Titel der gesuchten Sendung. Weiter mit ENTER oder Cursor-Rechts. Mit 'info' können Sie eine Aufnahme planen.</value>
         <value lang="DK">Vælg titlen på det den udsendelse du ønsker at finde og tryk ENTER eller Pil til venstre. Med 'Info' kan du vælge optagelsetype.</value>
+        <value lang="PT">Selecione o título do programa que deseja procurar. Para voltar, use o cursor para a esquerda. Para opções de gravação, use 'info'.</value>
         <value lang="SV">Välj titeln på det program du vill hitta. När du är klar, återgå med vänsterpil. Genom att trycka på infoknappen kan du göra inspelningsinställningar.</value>
         <multiline>yes</multiline>
       </textarea>
@@ -1683,6 +1726,7 @@
         <value lang="NL">Geen programma's</value>
         <value lang="DE">Keine Sendungen</value>
         <value lang="DK">Ingen udsendelser</value>
+        <value lang="PT">Sem Programas</value>
         <value lang="SV">Inga program</value>
       </textarea>
       <textarea name="research" draworder="6">
@@ -1695,6 +1739,7 @@
         <value lang="NL">Er zijn geen programma's gevonden. Probeer een andere zoekopdracht.</value>
         <value lang="DE">Keine Sendungen gefunden. Bitte wählen Sie eine andere Suche.</value>
         <value lang="DK">Ingen udsendelser under denne søgning. Prøv venligst en anden.</value>
+        <value lang="PT">Não existem programas disponíveis para esta procura.</value>
         <value lang="SV">Inga program funna. Välj något annat att söka på.</value>
         <multiline>yes</multiline>
       </textarea>
@@ -1756,6 +1801,7 @@
         <area>20,10,800,40</area>
         <font>info</font>
         <value>Program Listings</value>
+        <value lang="PT">Lista de Programas</value>
         <value lang="SV">Programlistning</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
@@ -1814,6 +1860,7 @@
          <font>info</font>
          <value>No listings found for this program. </value>
          <value lang="DK">Ingen visninger af dette program fundet. </value>
+         <value lang="PT">Não foram encontradas listas para este programa.</value>
          <value lang="SV">Inga visningar funna av detta program. </value>
          <multiline>yes</multiline>
       </textarea>

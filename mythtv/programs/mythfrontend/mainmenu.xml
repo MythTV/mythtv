@@ -3,6 +3,7 @@
    <button>
      <type>TV</type>
      <text>TV</text>
+     <text lang="PT">Televisão</text>
      <action>MENU tvmenu.xml</action>
    </button>
 
@@ -16,6 +17,7 @@
      <text lang="FR">Musique</text>
      <text lang="DE">Musik</text>
      <text lang="DK">Musik</text>
+     <text lang="PT">Música</text>
      <text lang="SV">Musik</text>
      <action>PLUGIN mythmusic</action>
      <depends>mythmusic</depends>
@@ -31,6 +33,7 @@
      <text lang="FR">Jeux</text>
      <text lang="DE">Spiele</text>
      <text lang="DK">Spil</text>
+     <text lang="PT">Jogos</text>
      <text lang="SV">Spel</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
@@ -46,6 +49,7 @@
      <text lang="FR">Images</text>
      <text lang="DE">Photos</text>
      <text lang="DK">Billeder</text>
+     <text lang="PT">Fotos</text>
      <text lang="SV">Bilder</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
@@ -61,6 +65,7 @@
      <text lang="FR">Vidéos</text>
      <text lang="DE">Videos</text>
      <text lang="DK">Film</text>
+     <text lang="PT">Filmes</text>
      <text lang="SV">Filmer</text>
      <action>PLUGIN mythvideo</action>
      <depends>mythvideo</depends>
@@ -76,6 +81,7 @@
      <text lang="FR">Météo</text>
      <text lang="DE">Wetter</text>
      <text lang="DK">Vejret</text>
+     <text lang="PT">Meteorologia</text>
      <text lang="SV">Vädret</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
@@ -84,22 +90,24 @@
    <button>
      <type>DVD</type>
      <text>DVD</text>
+     <text lang="PT">DVD</text>
      <action>PLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
 
    <button>
-      <type>SETUP</type>
-      <text>Setup</text>
-      <text lang="IT">Impostazioni</text>
-      <text lang="ES">Configurar</text>
-      <text lang="CA">Configurar</text>
-      <text lang="FR">Configuration</text>
-      <text lang="DE">Konfiguration</text>
-      <text lang="DK">Konfiguration</text>
-      <text lang="NL">Configuratie</text>
-      <text lang="SV">Inställningar</text>
-      <action>MENU main_settings.xml</action>
+     <type>SETUP</type>
+     <text>Setup</text>
+     <text lang="IT">Impostazioni</text>
+     <text lang="ES">Configurar</text>
+     <text lang="CA">Configurar</text>
+     <text lang="FR">Configuration</text>
+     <text lang="DE">Konfiguration</text>
+     <text lang="DK">Konfiguration</text>
+     <text lang="NL">Configuratie</text>
+     <text lang="PT">Configurações</text>
+     <text lang="SV">Inställningar</text>
+     <action>MENU main_settings.xml</action>
    </button>
 
 </mythmenu>
