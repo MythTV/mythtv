@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.21 (xris)
+#Last Updated: 2005.01.28 (xris)
 #
 #  ffmpeg.pm
 #
@@ -166,7 +166,7 @@ package export::ffmpeg;
 
     # Create a directory for mythtranscode's fifo's
         mkdir("/tmp/fifodir_$$/", 0755) or die "Can't create /tmp/fifodir_$$/:  $!\n\n";
-        ($mythtrans_pid, $mythtrans_h) = fork_command("$mythtranscode 2>&1 > /dev/null");
+        ($mythtrans_pid, $mythtrans_h) = fork_command("$mythtranscode 2>&1");
         $children{$mythtrans_pid} = 'mythtranscode' if ($mythtrans_pid);
         fifos_wait("/tmp/fifodir_$$/");
         push @tmpfiles, "/tmp/fifodir_$$", "/tmp/fifodir_$$/audout", "/tmp/fifodir_$$/vidout";
@@ -181,7 +181,7 @@ package export::ffmpeg;
         $frames = 0;
         $fps = 0.0;
         $start = time();
-        my $total_frames = $episode->{'lastgop'} ? ($episode->{'lastgop'} * (($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 12 : 15)) : 0;
+        my $total_frames = $episode->{'lastgop'} * (($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 12 : 15);
     # Keep track of any warnings
         my $warnings    = '';
         my $death_timer = 0;
@@ -215,7 +215,7 @@ package export::ffmpeg;
             while (has_data($mythtrans_h) and $l = <$mythtrans_h>) {
                 if ($l =~ /Processed:\s*(\d+)\s*of\s*(\d+)\s*frames\s*\((\d+)\s*seconds\)/) {
                     if ($self->{'audioonly'}) {
-                        $frames       = int($1);
+                        $frames = int($1);
                     }
                     $total_frames = $2;
                 }
