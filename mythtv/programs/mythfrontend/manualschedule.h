@@ -31,11 +31,8 @@ class ManualSchedule : public MythDialog
 
   protected slots:
     void textChanged(void);
-    void weekdayChanged(void);
-    void monthChanged(void);
     void hourChanged(void);
     void minuteChanged(void);
-    void dayChanged(void);
     void channelChanged(void);
     void durationChanged(void);
     void dateChanged(void);
@@ -60,10 +57,7 @@ class ManualSchedule : public MythDialog
     MythPushButton *m_saveButton;
     MythPushButton *m_exitButton;
     MythPushButton *m_cancelButton;
-    MythComboBox *m_weekday;
-    MythSpinBox *m_startday;
-    MythComboBox *m_startmonth;
-    int m_startyear;
+    MythComboBox *m_startdate;
     MythSpinBox *m_starthour;
     MythSpinBox *m_startminute;
 

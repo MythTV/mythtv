@@ -35,8 +35,6 @@ using namespace std;
 ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
               : MythDialog(parent, name)
 {
-    int m_index; 
-
     m_nowDateTime = QDateTime::currentDateTime();
     m_startDateTime = m_nowDateTime;
     daysahead = 0;
@@ -105,59 +103,46 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(label);
-  
-    m_weekday = new MythComboBox(false, this, "weekday" );
-    for(m_index = 0; m_index < 7; m_index++) 
-        m_weekday->insertItem(
-		m_nowDateTime.addDays(m_index).toString("dddd"));
-    m_weekday->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(m_weekday);
 
-    m_startday = new MythSpinBox( this, "startday" );
-    m_startday->setMinValue(0);
-    m_startday->setMaxValue(m_nowDateTime.date().daysInMonth() + 1);        
-    m_startday->setValue(m_nowDateTime.date().day());
-    m_startday->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(m_startday);
+    m_startdate = new MythComboBox(false, this, "startdate");
 
-    m_startmonth = new MythComboBox(false, this, "startmonth" );
-    for(m_index = 0; m_index < 12; m_index++) 
-        m_startmonth->insertItem(
-		m_nowDateTime.addMonths(m_index).toString("MMMM"));
-    m_startmonth->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(m_startmonth);
-
-    m_startyear = m_nowDateTime.date().year();
-
-    //Program Time
-//     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    for(int m_index = 0; m_index <= 60; m_index++)
+    {
+        m_startdate->insertItem(m_nowDateTime.addDays(m_index)
+                              .toString(dateformat));
+        if (m_nowDateTime.addDays(m_index).toString("MMdd") ==
+            m_startDateTime.toString("MMdd"))
+            m_startdate->setCurrentItem(m_startdate->count() - 1);
+    }
+    hbox->addWidget(m_startdate);
 
     QTime thisTime = m_nowDateTime.time();
+    thisTime = thisTime.addSecs((30 - thisTime.minute() % 30) * 60);
+    
+    if (thisTime < QTime::QTime(0,30))
+        m_startdate->setCurrentItem(m_startdate->currentItem() + 1);
 
-    message = tr("Time:");
-    label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
+    //message = tr("Time:");
+    //label = new QLabel(message, this);
+    //label->setBackgroundOrigin(WindowOrigin);
+    //label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    //hbox->addWidget(label);
 
-    m_starthour = new MythSpinBox( this, "starthour" );
+    m_starthour = new MythSpinBox( this, "starthour", true );
     m_starthour->setBackgroundOrigin(WindowOrigin);
-    m_starthour->setMinValue(-1);
-    m_starthour->setMaxValue(24);
+    m_starthour->setMinValue(-4);
+    m_starthour->setMaxValue(28);
+    m_starthour->setLineStep(4);
     m_starthour->setValue(thisTime.hour());
     m_starthour->setSuffix(tr("hr"));
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(m_starthour);
 
-
     m_startminute = new MythSpinBox( this, "startminute", true );
     m_startminute->setBackgroundOrigin(WindowOrigin);
-    m_startminute->setMinValue(-1);
-    m_startminute->setMaxValue(60);
-    m_startminute->setLineStep(5);
+    m_startminute->setMinValue(-10);
+    m_startminute->setMaxValue(70);
+    m_startminute->setLineStep(10);
     m_startminute->setValue(thisTime.minute());
     m_startminute->setSuffix(tr("min"));
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -165,8 +150,6 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
 
 
     // Duration spin box
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
-
     message = tr("Duration:");
     label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
@@ -175,9 +158,9 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
 
     m_duration = new MythSpinBox( this, "duration", true );
     m_duration->setMinValue(1);
-    m_duration->setMaxValue(300);
-    m_duration->setValue(120);
-    m_duration->setLineStep(5);
+    m_duration->setMaxValue(600);
+    m_duration->setValue(60);
+    m_duration->setLineStep(10);
     m_duration->setSuffix(tr("min"));
     m_duration->setBackgroundOrigin(WindowOrigin);
     hbox->addWidget(m_duration);
@@ -211,13 +194,13 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     // Description edit box
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
 
-    message = tr("Description:");
-    label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
+    //message = tr("Description:");
+    //label = new QLabel(message, this);
+    //label->setBackgroundOrigin(WindowOrigin);
+    //label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    // hbox->addWidget(label);
 
-    m_description = new MythRemoteLineEdit( this, "description" );
+    m_description = new MythRemoteLineEdit(4, this, "description" );
     m_description->setBackgroundOrigin(WindowOrigin);
     hbox->addWidget(m_description);
 
@@ -226,24 +209,20 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
 
     m_exitButton = new MythPushButton( this, "Program" );
     m_exitButton->setBackgroundOrigin(WindowOrigin);
-    m_exitButton->setText( tr( "Save this scheduled recording and exit" ) );
+    m_exitButton->setText( tr( "Save and exit" ) );
     m_exitButton->setEnabled(false);
 
     hbox->addWidget(m_exitButton);
 
     //  Save Button
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
-
     m_saveButton = new MythPushButton( this, "Program" );
     m_saveButton->setBackgroundOrigin(WindowOrigin);
-    m_saveButton->setText( tr( "Save this scheduled recording and set another" ) );
+    m_saveButton->setText( tr( "Save and set another" ) );
     m_saveButton->setEnabled(false);
 
     hbox->addWidget(m_saveButton);
 
     //  Cancel Button
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
-
     m_cancelButton = new MythPushButton( this, "Program" );
     m_cancelButton->setBackgroundOrigin(WindowOrigin);
     m_cancelButton->setText( tr( "Cancel" ) );
@@ -258,11 +237,8 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
      
     connect(m_channel, SIGNAL(activated(int)), this, SLOT(channelChanged(void)));
     connect(m_channel, SIGNAL(highlighted(int)), this, SLOT(channelChanged(void)));
-    connect(m_weekday, SIGNAL(activated(int)), this, SLOT(weekdayChanged(void)));
-    connect(m_weekday, SIGNAL(highlighted(int)), this, SLOT(weekdayChanged(void)));
-    connect(m_startday, SIGNAL(valueChanged(const QString &)), this, SLOT(dayChanged(void)));
-    connect(m_startmonth, SIGNAL(highlighted(const QString &)), this, SLOT(monthChanged(void)));
-    connect(m_startmonth, SIGNAL(activated(const QString &)), this, SLOT(monthChanged(void)));
+    connect(m_startdate, SIGNAL(activated(int)), this, SLOT(dateChanged(void)));
+    connect(m_startdate, SIGNAL(highlighted(int)), this, SLOT(dateChanged(void)));
     connect(m_starthour, SIGNAL(valueChanged(const QString &)), this, SLOT(hourChanged(void)));
     connect(m_startminute, SIGNAL(valueChanged(const QString &)), this, SLOT(minuteChanged(void)));
     connect(m_duration, SIGNAL(valueChanged(const QString &)), this, SLOT(durationChanged(void)));
@@ -293,80 +269,28 @@ void ManualSchedule::textChanged(void)
 
 void ManualSchedule::minuteChanged(void)
 {
-   if ( atoi(m_startminute->text()) == -1 ) {
-     m_starthour->stepDown(); 
-     m_startminute->setValue(55);
-   }
-   if ( atoi(m_startminute->text()) == 60 ) {
-     m_starthour->stepUp(); 
-     m_startminute->setValue(0);
-   }
-   dateChanged();
+    if (m_startminute->value() < 0 ) {
+        m_startminute->setValue(m_startminute->value() + 60);
+        m_starthour->setValue(m_starthour->value() - 1);
+    }
+    if (m_startminute->value() > 59 ) {
+        m_starthour->setValue(m_starthour->value() + 1);
+        m_startminute->setValue(m_startminute->value() - 60);
+    }
+    dateChanged();
 }
 
 void ManualSchedule::hourChanged(void)
 {
-   if ( atoi(m_starthour->text()) == -1 ) {
-     m_startday->stepDown(); 
-     m_starthour->setValue(23);
+   if (m_starthour->value() < 0 ) { 
+       m_starthour->setValue(m_starthour->value() + 24);
+       m_startdate->setCurrentItem(m_startdate->currentItem() - 1);
    }
-   if ( atoi(m_starthour->text()) == 24 ) {
-     m_startday->stepUp(); 
-     m_starthour->setValue(0);
+   if (m_starthour->value() > 23 ) {
+       m_startdate->setCurrentItem(m_startdate->currentItem() + 1);
+       m_starthour->setValue(m_starthour->value() - 24);
    }
-
    dateChanged();
-}
-
-void ManualSchedule::dayChanged(void)
-{
-   if ( atoi(m_startday->text()) == 0 ) {
-     m_startDateTime = m_startDateTime.addDays(-1);
-     m_startmonth->setCurrentText(m_startDateTime.date().toString("MMMM"));
-     m_startday->setMaxValue(m_startDateTime.date().daysInMonth() + 1);
-     m_startday->setValue(m_startDateTime.date().day());
-   }
-   if ( atoi(m_startday->text()) == m_startday->maxValue() ) {
-     m_startDateTime = m_startDateTime.addDays(1);
-     m_startmonth->setCurrentText(m_startDateTime.date().toString("MMMM"));
-     m_startday->setValue(1);
-     m_startday->setMaxValue(m_startDateTime.date().daysInMonth() + 1);
-   }
-
-   dateChanged();
-}
-
-void ManualSchedule::weekdayChanged(void)
-{
-    if (m_startDateTime.toString("dddd") ==
-	m_weekday->currentText() ) {
- 	// That's OK, weekdate and startdate already synched
-	prev_weekday = 99;
-	return;
-    }
-
-    prev_weekday = m_startDateTime.date().dayOfWeek() -
-	m_nowDateTime.date().dayOfWeek();
-    if (prev_weekday < 0)
-	prev_weekday = 7 + prev_weekday;
-
-    if ((prev_weekday + 1 == m_weekday->currentItem()) ||
-       ((prev_weekday == 6 ) && (m_weekday->currentItem()==0))) {
-        // It's going forward
-	m_startday->stepUp();
-        return;
-    }
-
-    if ((prev_weekday == m_weekday->currentItem() + 1 ) ||
-       ((prev_weekday == 0 ) && (m_weekday->currentItem()==6))) {
-        // It's going backwards
-	m_startday->stepDown();
-        return;
-    }
-
-    m_startday->setValue(
-       m_startDateTime.addDays(
-              m_weekday->currentItem()-prev_weekday).date().day());
 }
 
 void ManualSchedule::channelChanged(void)
@@ -380,7 +304,7 @@ void ManualSchedule::channelChanged(void)
         if (m_title->text().length() > m_lastChannel.length() &&
             (!m_lastChannel.isEmpty() && !m_title->text().isEmpty()) )
             user_text = m_title->text().right(
-		m_title->text().length() - m_lastChannel.length());
+                m_title->text().length() - m_lastChannel.length());
         m_lastChannel = m_channel->currentText();
         m_title->setText( m_channel->currentText() + user_text ); 
     }
@@ -398,57 +322,38 @@ void ManualSchedule::durationChanged(void)
       if (!userText.isEmpty())
         m_description->setText( m_startDateTime.toString(dateformat) + 
                         " - (" +
-			m_duration->text() +
-			") - " +
-			userText );
+                        m_duration->text() +
+                        ") - " +
+                        userText );
       
    } else
    m_description->setText( m_startDateTime.toString(dateformat) + " - (" +
-			m_duration->text() +
-			") - " +
-			tr("Manual recording") );
-}
-
-void ManualSchedule::monthChanged(void)
-{ 
-   if ((m_startmonth->currentItem() + m_nowDateTime.date().month() ) > 12 )
-     m_startyear = m_nowDateTime.date().year() + 1;
-   else
-     m_startyear = m_nowDateTime.date().year();
+                        m_duration->text() +
+                        ") - " +
+                        tr("Manual recording") );
 }
 
 void ManualSchedule::dateChanged(void)
 {
-   QDate thisDate;
-
-   thisDate.setYMD(
-     m_startyear,
-     m_nowDateTime.addMonths(m_startmonth->currentItem()).date().month(),
-     atoi(m_startday->text()) );
-
-   m_startDateTime.setDate(thisDate);
+   daysahead = m_startdate->currentItem();
+   m_startDateTime.setDate(m_nowDateTime.addDays(daysahead).date());
    
-   daysahead = m_nowDateTime.date().daysTo(m_startDateTime.date());
-
-   m_weekday->setCurrentText(thisDate.toString("dddd"));
 
    m_startDateTime.setTime(QTime(00,00));
-   m_startDateTime = m_startDateTime.addSecs( (atoi(m_starthour->text()) * 3600)
-					+ (atoi(m_startminute->text()) * 60) );
-					 
+   m_startDateTime = m_startDateTime.addSecs((m_starthour->value() * 3600) +
+                                             (m_startminute->value() * 60));
+
+   VERBOSE(VB_SCHEDULE, QString("Start Date Time: %1")
+                                .arg(m_startDateTime.toString()));
 
 // don't know how to record the past, do you? :P
    if (m_startDateTime < m_nowDateTime)
    {
-        QDate thisDate = m_nowDateTime.date();
-        m_startyear = thisDate.year();
-        m_startmonth->setCurrentItem(thisDate.month() -
-		m_nowDateTime.date().month() );
-        m_startday->setValue(thisDate.day());
-	QTime thisTime = m_nowDateTime.time();
+        QTime thisTime = m_nowDateTime.time();
         m_starthour->setValue(thisTime.hour());
-        m_startminute->setValue(thisTime.minute());
-	m_startDateTime = m_nowDateTime;
+        m_startDateTime.setDate(m_nowDateTime.date());
+        m_startDateTime.setTime(QTime(m_starthour->value(),
+                                      m_startminute->value()));
   } 
     
 //  if edited, preserves user entered text
@@ -460,9 +365,9 @@ void ManualSchedule::dateChanged(void)
         if (m_subtitle->text().length() > m_lastSubtitle.length() &&
             (!m_lastSubtitle.isEmpty() && !m_subtitle->text().isEmpty()) )
             user_text = m_subtitle->text().right(
-		m_subtitle->text().length() - m_lastSubtitle.length());
+                m_subtitle->text().length() - m_lastSubtitle.length());
         m_lastSubtitle = m_startDateTime.toString("yyyy/MM/dd") + " " +
-			m_startDateTime.toString(timeformat);
+                        m_startDateTime.toString(timeformat);
         m_subtitle->setText( m_lastSubtitle + user_text ); 
     }
     textChanged();
@@ -473,6 +378,8 @@ void ManualSchedule::saveScheduledRecording(void)
 {
     ProgramInfo progInfo;
     
+    // int dayOffset = chooseDay->currentItem() - 1;
+    // searchTime.setDate(startTime.addDays(dayOffset).date());
     progInfo.startts = m_startDateTime;
 
     progInfo.endts = progInfo.startts.addSecs(m_duration->value() * 60);
@@ -510,7 +417,7 @@ void ManualSchedule::saveScheduledRecording(void)
                  << " at "
                  << progInfo.startts.toString("yyyy/MM/dd hh:mm") 
                  << " to "
-	         << progInfo.endts.toString("hh:mm") << endl;
+                 << progInfo.endts.toString("hh:mm") << endl;
 
             progInfo.Save(db);
         }
