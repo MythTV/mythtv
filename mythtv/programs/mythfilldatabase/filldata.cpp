@@ -3477,7 +3477,6 @@ int main(int argc, char *argv[])
     gContext->LogEntry("mythfilldatabase", LP_INFO,
                        "Listings Download Started", "");
     
-    MSqlQuery query(MSqlQuery::InitCon());
     
     if (!grab_data)
     {
@@ -3491,6 +3490,7 @@ int main(int argc, char *argv[])
         QString status = "currently running.";
         QDateTime GuideDataBefore, GuideDataAfter;
 
+        MSqlQuery query(MSqlQuery::InitCon());
         query.exec(QString("UPDATE settings SET data ='%1' "
                            "WHERE value='mythfilldatabaseLastRunStart'")
                            .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
@@ -3615,6 +3615,7 @@ int main(int argc, char *argv[])
 
     if (update_icon_map)
     {
+        MSqlQuery query(MSqlQuery::InitCon());
         query.exec("SELECT sourceid FROM videosource ORDER BY sourceid;");
         if (query.isActive() && query.numRowsAffected() > 0)
         {
@@ -3646,6 +3647,7 @@ int main(int argc, char *argv[])
        
         int newEpiWindow = gContext->GetNumSetting( "NewEpisodeWindow", 14);
         
+        MSqlQuery query(MSqlQuery::InitCon());
         query.exec( QString( "UPDATE program SET previouslyshown = 1 "
                     "WHERE previouslyshown = 0 "
                     "AND originalairdate is not null "
@@ -3668,14 +3670,18 @@ int main(int argc, char *argv[])
             cout << "found " << query.numRowsAffected() << endl;
     }
 
-    query.exec( "SELECT count(previouslyshown) FROM program WHERE previouslyshown = 1;");
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (1) // limit MSqlQuery's lifetime
     {
-        query.next();
-        if (query.value(0).toInt() != 0)
-            query.exec("UPDATE settings SET data = '1' WHERE value = 'HaveRepeats';");
-        else
-            query.exec("UPDATE settings SET data = '0' WHERE value = 'HaveRepeats';");
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.exec( "SELECT count(previouslyshown) FROM program WHERE previouslyshown = 1;");
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            query.next();
+            if (query.value(0).toInt() != 0)
+                query.exec("UPDATE settings SET data = '1' WHERE value = 'HaveRepeats';");
+            else
+                query.exec("UPDATE settings SET data = '0' WHERE value = 'HaveRepeats';");
+        }
     }
 
     if (grab_data || mark_repeats)

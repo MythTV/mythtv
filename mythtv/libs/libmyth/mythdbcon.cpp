@@ -113,7 +113,7 @@ MDBManager::~MDBManager()
 
 MSqlDatabase *MDBManager::popConnection()
 {
-    *m_sem++;
+    (*m_sem)++;
     m_lock.lock();
 
     MSqlDatabase *db = m_pool.getLast();
@@ -142,7 +142,7 @@ void MDBManager::pushConnection(MSqlDatabase *db)
     }
 
     m_lock.unlock();
-    *m_sem--;
+    (*m_sem)--;
 }
 
 MSqlDatabase *MDBManager::getSchedCon()
