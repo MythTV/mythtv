@@ -22,7 +22,7 @@ ServiceRequestThread::ServiceRequestThread(MFDServicePlugin *owner)
 
     parent = owner;
     keep_going = true;
-    do_stuff = false;
+    // do_stuff = false;
     client_socket = NULL;
 }
 
@@ -33,8 +33,10 @@ void ServiceRequestThread::handleIncoming(MFDServiceClientSocket *socket)
     //  to process the incoming data on that socket
     //
     
-    client_socket = socket;
-    do_stuff = true;
+    prt_mutex.lock();
+        client_socket = socket;
+        //do_stuff = true;
+    prt_mutex.unlock();
     wait_condition.wakeOne();
 }
 
@@ -44,9 +46,12 @@ void ServiceRequestThread::killMe()
     //  Turn off the keep_going flag, so we will exit.
     //
     
-    keep_going_mutex.lock();
-        keep_going = false;
-    keep_going_mutex.unlock();
+    prt_mutex.lock();
+        keep_going_mutex.lock();
+            keep_going = false;
+        keep_going_mutex.unlock();
+    prt_mutex.unlock();
+
     wait_condition.wakeOne();
 }
 
@@ -58,20 +63,27 @@ void ServiceRequestThread::run()
     //  thought out.
     //
 
-    while (keep_going)
+    keep_going_mutex.lock();
+        keep_going = true;
+    keep_going_mutex.unlock();
+    
+    prt_mutex.lock();
+
+    while (true)
     {
-        if (!do_stuff)
+        wait_condition.wait(&prt_mutex);
+        if(!keep_going)
         {
-            wait_condition.wait();
+            break;
         }
-        if (do_stuff)
-        {
-            parent->processRequest(client_socket);
-            do_stuff = false;
-            client_socket = NULL;
-            parent->markUnused(this);
-            parent->wakeUp();
-        }
+
+        parent->processRequest(client_socket);
+        //do_stuff = false;
+        client_socket = NULL;
+        parent->markUnused(this);
+        parent->wakeUp();
     }
+    
+    prt_mutex.unlock();
 }
 

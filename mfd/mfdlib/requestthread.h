@@ -30,9 +30,10 @@ class ServiceRequestThread : public QThread
     MFDServicePlugin        *parent;
     MFDServiceClientSocket  *client_socket;
     QWaitCondition          wait_condition;
-    bool                    do_stuff;
+    //bool                    do_stuff;
     bool                    keep_going;
     QMutex                  keep_going_mutex;
+    QMutex                  prt_mutex;
 };
 
 
