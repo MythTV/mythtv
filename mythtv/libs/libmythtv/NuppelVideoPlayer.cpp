@@ -2687,6 +2687,16 @@ bool NuppelVideoPlayer::EnableEdit(void)
         for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
              AddMark(it.key(), it.data());
     }
+    else
+        if (hascommbreaktable)
+        {
+            QMap<long long, int>::Iterator it;
+            for (it = commBreakMap.begin(); it != commBreakMap.end(); ++it)
+                if (it.data() == MARK_COMM_START)
+                    AddMark(it.key(), 1);
+                else
+                    AddMark(it.key(), 0);
+        }
 
     m_playbackinfo->SetEditing(true, m_db);
 
