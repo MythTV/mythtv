@@ -301,9 +301,9 @@ QWidget* ComboBoxSetting::configWidget(QWidget* parent,
     QComboBox* widget = new MythComboBox(rw, box);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
-    for(unsigned int i = 0 ; i < labels.size() ; ++i) {
+    for(unsigned int i = 0 ; i < labels.size() ; ++i)
         widget->insertItem(labels[i]);
-    }
+
     if (isSet)
         widget->setCurrentItem(current);
 
@@ -526,4 +526,46 @@ void ListBoxSetting::setValueByLabel(const QString& label) {
             return;
         }
     cerr << "BUG: ListBoxSetting::setValueByLabel called for unknown label " << label << endl;
+}
+
+void ImageSelectSetting::addImageSelection(const QString& label,
+                                           QImage* image,
+                                           QString value,
+                                           bool select) {
+    images.push_back(image);
+    addSelection(label, value, select);
+    emit imageSelectionAdded(label, image, value);
+}
+
+ImageSelectSetting::~ImageSelectSetting() {
+    while (images.size() > 0) {
+        delete images.back();
+        images.pop_back();
+    }
+}
+
+QWidget* ImageSelectSetting::configWidget(QWidget* parent, const char* widgetName) {
+    QWidget* box = new QVBox(parent, widgetName);
+    box->setBackgroundOrigin(QWidget::WindowOrigin);
+
+    QLabel* label = new QLabel(box);
+    label->setText(getLabel());
+    label->setBackgroundOrigin(QWidget::WindowOrigin);
+    MythImageSelector* widget = new MythImageSelector(box);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+
+    for(unsigned int i = 0 ; i < images.size() ; ++i)
+        widget->insertItem(labels[i], images[i]);
+
+    if (isSet)
+        widget->setCurrentItem(current);
+
+    connect(widget, SIGNAL(selectionChanged(int)),
+            this, SLOT(setValue(int)));
+    connect(this, SIGNAL(imageSelectionAdded(const QString&,QImage*,QString)),
+            widget, SLOT(insertItem(const QString&,QImage*)));
+    connect(this, SIGNAL(selectionsCleared()),
+            widget, SLOT(clear()));
+
+    return box;
 }

@@ -303,15 +303,22 @@ public:
     virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
 };
 
-// class ImageSelectSetting: public StringSelectSetting {
-// public:
-//     virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+class ImageSelectSetting: public StringSelectSetting {
+    Q_OBJECT
+public:
+    virtual ~ImageSelectSetting();
+    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
 
-//     virtual void addImageSelection(const QString& label,
-//                                    QString value=QString::null,
-//                                    bool select=false);
-//     virtual void addSelection(
-// };
+    virtual void addImageSelection(const QString& label,
+                                   QImage* image,
+                                   QString value=QString::null,
+                                   bool select=false);
+signals:
+    void imageSelectionAdded(const QString& label, QImage* image, QString value);
+
+protected:
+    vector<QImage*> images;
+};
 
 class BooleanSetting: virtual public Setting {
     Q_OBJECT
@@ -370,11 +377,15 @@ public:
     PathSetting(bool _mustexist):
         ComboBoxSetting(true), mustexist(_mustexist) {
     };
+
+    // TODO: this should support globbing of some sort
     virtual void addSelection(const QString& label,
                               QString value=QString::null,
                               bool select=false);
-    // Use combobox for now, maybe a modified file dialog later
+
+    // Use a combobox for now, maybe a modified file dialog later
     //virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+
 protected:
     bool mustexist;
 };

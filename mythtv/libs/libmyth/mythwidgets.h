@@ -15,6 +15,9 @@
 #include <qlistbox.h>
 #include <qcheckbox.h>
 #include <qwizard.h>
+#include <qimage.h>
+
+#include <vector>
 
 class MythContext;
 
@@ -177,6 +180,43 @@ public:
     virtual void showPage(QWidget* page);
 
     virtual void keyPressEvent(QKeyEvent* e);
+};
+
+class MythImageSelector: public QWidget {
+    Q_OBJECT
+public:
+    MythImageSelector(QWidget* parent=NULL, const char* name=0);
+    virtual ~MythImageSelector();
+
+public slots:
+void insertItem(const QString& label, QImage* image);
+    void setCurrentItem(int item);
+    void clear(void);
+
+signals:
+    void selectionChanged(int);
+
+protected:
+    virtual void paintEvent(QPaintEvent *e);
+    virtual void keyPressEvent(QKeyEvent *e);
+
+private:
+    QColor fgcolor;
+    QColor highlightcolor;
+
+    unsigned int rows;
+    unsigned int columns;
+
+    struct Selection {
+        QImage image;
+        QString label;
+    };
+
+    std::vector<Selection> selections;
+
+    unsigned int topleft;
+    unsigned int current;
+    bool isSet;
 };
 
 #endif

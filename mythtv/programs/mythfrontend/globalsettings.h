@@ -301,7 +301,7 @@ public:
 
 // Theme settings
 
-class ThemeSelector: public PathSetting, public GlobalSetting {
+class ThemeSelector: public ImageSelectSetting, public GlobalSetting {
 public:
     ThemeSelector();
 };
@@ -311,6 +311,7 @@ public:
     GuiWidth():
         SpinBoxSetting(160, 1600, 16), GlobalSetting("GuiWidth") {
         setLabel("GUI width");
+        setValue(800);
     };
 };
 
@@ -319,6 +320,7 @@ public:
     GuiHeight():
         SpinBoxSetting(160, 1600, 16), GlobalSetting("GuiHeight") {
         setLabel("GUI height");
+        setValue(600);
     };
 };
 
