@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-12-25, v1.057
+  2002-12-27, v1.058
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -316,6 +316,14 @@
 
   [1m3.2.2.1.  Mandrake[0m
 
+  [1murpmi [22mis the simplest tool for installation of packages from the
+  command line.  The difficult part is the configuration aspect.  The
+  following website http://plf.zarb.org/~nanardon/urpmiweb.php
+  <http://plf.zarb.org/~nanardon/urpmiweb.php> will allow you to choose
+  a mirror site and then present the command-line configuration text for
+  that mirror.  You will most likely need to add a "Contrib" mirror to
+  your setup.
+
   [1m3.2.2.1.1.  Special instructions for Mandrake 8.2[0m
 
   Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must
@@ -326,8 +334,8 @@
   Open a shell, and execute the following.  You may get asked a number
   of questions regarding dependencies.  It's best to answer "YES".
 
-  $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-  $ urpmi postgresql-devel xfree86-static-libs
+       $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
+       $ urpmi postgresql-devel xfree86-static-libs
 
   Once all of the pre-requisites have been installed, the next step is
   to obtain and compile the source RPM.
@@ -374,7 +382,7 @@
   [1mNOTE[22m: Mandrake 8.2 users, [4mdo[24m [4mnot[24m execute the following command.
   You've already manually installed the files in the previous section.
 
-  # urpmi libqt3-devel
+       # urpmi libqt3-devel
 
   However, you might get this when you execute the command above:
 
@@ -408,7 +416,7 @@
 
   Install MySQL if this is the master system:
 
-       $ emerge mysql
+  $ emerge mysql
 
   All the necessary files will be downloaded and built. This will take a
   lot of time, even on a fast machine if you have to do a full KDE
@@ -459,10 +467,10 @@
   LANG="en_US".  If you want the change to only affect a single user,
   you could create a file called ~/.i18n:
 
-       $ cat > ~/.i18n
-       LANG="en_US"
-       ^D
-       $ exit
+  $ cat > ~/.i18n
+  LANG="en_US"
+  ^D
+  $ exit
 
   [1m4.2.  Checking that it worked.[0m
 
@@ -567,14 +575,14 @@
 
   Open a shell prompt:
 
-  $ tar -xzf expat-1.95.5.tar.gz
-  $ cd expat-1.95.5
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf expat-1.95.5.tar.gz
+       $ cd expat-1.95.5
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
   [1mNOTE[22m:  Red Hat Linux 8.0 users, make sure that you set your LANG as
   described in ``Section 4''.
@@ -609,11 +617,11 @@
   matter if you're installing North America and have followed the
   instructions to this point.
 
-       $ make
-       $ make test
-       $ su
-       # make install
-       # exit
+  $ make
+  $ make test
+  $ su
+  # make install
+  # exit
 
   [1m5.4.  Manually building mythtv.[0m
 
@@ -660,7 +668,7 @@
 
   emerge mythtv:
 
-  $ emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
+       $ emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
 
   It should download the source then complain about a missing digest.
   To fix this,
@@ -702,7 +710,6 @@
   started at boot.  Click on Mandrake Control Center->System->Services,
   find mysql and click the "On Boot" button and the "Start" button if
   the mysql status shows that it isn't running yet.
-
   [1m6.2.  Red Hat Linux 8.0[0m
 
   If this is the master system, make sure that mysql is running and
@@ -861,19 +868,18 @@
   configuration to ensure that you don't end up with mysterious
   conflicts in the future.  You should end up with a /etc/modules.conf
   file that has this configuration:
-
-  alias char-major-116 snd
-  alias snd-card-0 snd-XXX
-  # module options should go here
-  # OSS/Free portion
-  alias char-major-14 soundcore
-  alias sound-slot-0 snd-card-0
-  # card #1
-  alias sound-service-0-0 snd-mixer-oss
-  alias sound-service-0-1 snd-seq-oss
-  alias sound-service-0-3 snd-pcm-oss
-  alias sound-service-0-8 snd-seq-oss
-  alias sound-service-0-12 snd-pcm-oss
+       alias char-major-116 snd
+       alias snd-card-0 snd-XXX
+       # module options should go here
+       # OSS/Free portion
+       alias char-major-14 soundcore
+       alias sound-slot-0 snd-card-0
+       # card #1
+       alias sound-service-0-0 snd-mixer-oss
+       alias sound-service-0-1 snd-seq-oss
+       alias sound-service-0-3 snd-pcm-oss
+       alias sound-service-0-8 snd-seq-oss
+       alias sound-service-0-12 snd-pcm-oss
 
   "XXX" should be the ALSA driver name for your sound card/chip. In some
   rare cases you need to supply extra options to the driver. These
@@ -1646,17 +1652,18 @@
   Mandrake 9.0 has a number of the pre-requisites available on the
   installation CD.  Some of the software you're going to need will have
   to be obtained from the "contrib" or "cooker" development
-  repositories.  Applications downloaded from " cooker" come from the
+  repositories.  Applications downloaded from "cooker" come from the
   development branch, so there may be issues with some software.
 
-       # urpmi.addmedia stealth-contrib ftp://ftp.stealth.net/pub/mirrors/ftp.mandrake.com/Mandrake/9.0/contrib/RPMS
-       with ./synthesis.hdlist2.cz
+  [1murpmi [22mis the simplest tool for installation of packages from the
+  command line.  The difficult part is the configuration aspect.  The
+  following website http://plf.zarb.org/~nanardon/urpmiweb.php
+  <http://plf.zarb.org/~nanardon/urpmiweb.php> will allow you to choose
+  a mirror site and then present the command-line configuration text for
+  that mirror.  You will most likely need to add a "Contrib" mirror to
+  your setup.  Once you have done that, you can proceed.
+
        # urpmi mad flac libcdaudio cdparanoia libvorbis-devel libcdda0-devel
-
-  Install libvorbis-devel using urpmi or the Mandrake Control Center
-  installer.
-
-  Install cdparanoia using urpmi or the Mandrake Control Center.
 
   [1m14.3.  Compiling mythmusic.[0m
 
