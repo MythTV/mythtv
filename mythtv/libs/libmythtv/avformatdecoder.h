@@ -72,8 +72,6 @@ class AvFormatDecoder : public DecoderBase
 
     URLContext readcontext;
 
-    unsigned char *directbuf;
-
     int frame_decoded;
 
     bool directrendering;
@@ -110,6 +108,8 @@ class AvFormatDecoder : public DecoderBase
     bool validvpts;
 
     double ptsmultiplier;
+
+    QPtrList<unsigned char> inUseBuffers;
 };
 
 #endif

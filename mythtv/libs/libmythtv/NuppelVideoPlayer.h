@@ -4,6 +4,7 @@
 #include <vector>
 #include <qstring.h>
 #include <qmutex.h>
+#include <qptrqueue.h>
 
 #include "RingBuffer.h"
 #include "osd.h"
@@ -111,8 +112,6 @@ class NuppelVideoPlayer
  
     void SetVideoFilters(QString &filters) { videoFilterList = filters; }
 
-    int CheckEvents(void); 
-
     void SetWatchingRecording(bool mode);
     void SetBookmark(void);
     long long GetBookmark(void);
@@ -137,7 +136,8 @@ class NuppelVideoPlayer
     void SetEffDsp(int dsprate);
     void SetFileLength(int total, int frames);
     unsigned char *GetNextVideoFrame(void);
-    void ReleaseNextVideoFrame(bool good, long long timecode);
+    void ReleaseNextVideoFrame(unsigned char *buffer, long long timecode);
+    void DiscardVideoFrame(unsigned char *buffer);
     void AddAudioData(char *buffer, int len, long long timecode);
     void AddAudioData(short int *lbuffer, short int *rbuffer, int samples,
                       long long timecode);
@@ -239,12 +239,16 @@ class NuppelVideoPlayer
     int text_size;
 
     /* Video circular buffer */
-    int wpos;		/* next slot to write */
-    int rpos;		/* next slot to read */
     int usepre;		/* number of slots to keep full */
     bool prebuffering;	/* don't play until done prebuffering */ 
     int timecodes[MAXVBUFFER];	/* timecode for each slot */
     unsigned char *vbuffer[MAXVBUFFER+1];	/* decompressed video data */
+
+    QMap<unsigned char *, int> vbufferMap;
+    QPtrQueue<unsigned char> availableVideoBuffers;
+    QPtrQueue<unsigned char> usedVideoBuffers;
+
+    int rpos;
 
     /* Text circular buffer */
     int wtxt;          /* next slot to write */
@@ -323,8 +327,6 @@ class NuppelVideoPlayer
     bool exactseeks;
 
     XvVideoOutput *videoOutput;
-    pthread_mutex_t eventLock;
-    bool eventvalid;
 
     int seekamount;
     int seekamountpos;

@@ -884,11 +884,11 @@ void NuppelDecoder::GetFrame(int onlyvideo)
             ret = DecodeFrame(&frameheader, strm, buf);
             if (!ret)
             {
-                m_parent->ReleaseNextVideoFrame(false, 0);
+                m_parent->DiscardVideoFrame(buf);
                 continue;
             }
 
-            m_parent->ReleaseNextVideoFrame(true, frameheader.timecode);
+            m_parent->ReleaseNextVideoFrame(buf, frameheader.timecode);
             gotvideo = 1;
             if (getrawframes && getrawvideo)
                 StoreRawData(strm);
@@ -1099,7 +1099,7 @@ bool NuppelDecoder::DoRewind(long long desiredFrame)
 
             unsigned char *buf = m_parent->GetNextVideoFrame();
             DecodeFrame(&frameheader, strm, buf);
-            m_parent->ReleaseNextVideoFrame(true, frameheader.timecode);
+            m_parent->ReleaseNextVideoFrame(buf, frameheader.timecode);
 
             framesPlayed++;
         }
@@ -1263,7 +1263,7 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
 
             unsigned char *buf = m_parent->GetNextVideoFrame();
             DecodeFrame(&frameheader, strm, buf);
-            m_parent->ReleaseNextVideoFrame(true, frameheader.timecode);
+            m_parent->ReleaseNextVideoFrame(buf, frameheader.timecode);
 
             framesPlayed++;
         }

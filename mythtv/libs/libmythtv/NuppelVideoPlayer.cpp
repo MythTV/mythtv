@@ -46,6 +46,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
 
     playing = false;
     filename = "output.nuv";
+    prebuffering = false;
 
     vbimode = ' ';
     vbipagenr = 0x08880000;
@@ -64,7 +65,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     keyframedist = 30;
     usepre = 12;
 
-    wpos = rpos = 0;
     wtxt = rtxt = 0;
 
     embedid = 0;
@@ -113,8 +113,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     commercialskipmethod =
         gContext->GetNumSetting("CommercialSkipMethod", 1);
 
-    eventvalid = false;
-
     timedisplay = NULL;
     seekamount = 30;
     seekamountpos = 4;
@@ -143,8 +141,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
 
     cc = false;
     lastccrow = 0;
-
-    pthread_mutex_init(&eventLock, NULL);
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -261,7 +257,7 @@ void NuppelVideoPlayer::setPrebuffering(bool prebuffer)
     if (prebuffer != prebuffering)
     {
         prebuffering = prebuffer;
-        if(audioOutput && !paused)
+        if (audioOutput && !paused)
             audioOutput->Pause(prebuffering);
     }
 }
@@ -287,6 +283,7 @@ void NuppelVideoPlayer::InitVideo(void)
                       MAXVBUFFER + 1, vbuffer, widget->winId(), 
                       0, 0, widget->width(), widget->height(),
                       embedid);
+
     if (embedid > 0)
     {
         videoOutput->EmbedInWidget(embedid, embx, emby, embw, embh);
@@ -427,10 +424,7 @@ int NuppelVideoPlayer::vbuffer_numvalid(void)
     int ret;
     pthread_mutex_lock(&video_buflock);
 
-    if (wpos >= rpos)
-        ret = wpos - rpos;
-    else
-        ret = MAXVBUFFER - (rpos - wpos);
+    ret = (int)usedVideoBuffers.count();
 
     pthread_mutex_unlock(&video_buflock);
     return ret;
@@ -438,10 +432,7 @@ int NuppelVideoPlayer::vbuffer_numvalid(void)
 
 int NuppelVideoPlayer::vbuffer_numfree(void)
 {
-    return MAXVBUFFER - vbuffer_numvalid() - 1;
-    /* There's one wasted slot, because the case when rpos = wpos is 
-       interpreted as an empty buffer. So the fullest the buffer can be is
-       MAXVBUFFER - 1. */
+    return (int)availableVideoBuffers.count();
 }
 
 int NuppelVideoPlayer::tbuffer_numvalid(void)
@@ -470,22 +461,33 @@ int NuppelVideoPlayer::tbuffer_numfree(void)
 unsigned char *NuppelVideoPlayer::GetNextVideoFrame(void)
 {
     pthread_mutex_lock(&video_buflock);
+    unsigned char *next = availableVideoBuffers.dequeue();
 
-    return vbuffer[wpos];
+    // only way this should be triggered if we're in unsafe mode
+    if (!next)
+        next = usedVideoBuffers.dequeue();
+
+    pthread_mutex_unlock(&video_buflock);
+
+    return next;
 }
 
-void NuppelVideoPlayer::ReleaseNextVideoFrame(bool good, long long timecode)
+void NuppelVideoPlayer::ReleaseNextVideoFrame(unsigned char *buffer,
+                                              long long timecode)
 {
-    if (!good)
-        pthread_mutex_unlock(&video_buflock);
-    else
-    {
-        timecodes[wpos] = timecode;
-        vpos = wpos;
-        wpos = (wpos + 1) % MAXVBUFFER;
+    vpos = vbufferMap[buffer];
+    timecodes[vpos] = timecode;
 
-        pthread_mutex_unlock(&video_buflock);
-    }
+    pthread_mutex_lock(&video_buflock);
+    usedVideoBuffers.enqueue(buffer);
+    pthread_mutex_unlock(&video_buflock);
+}
+
+void NuppelVideoPlayer::DiscardVideoFrame(unsigned char *buffer)
+{
+    pthread_mutex_lock(&video_buflock);
+    availableVideoBuffers.enqueue(buffer);
+    pthread_mutex_unlock(&video_buflock);
 }
 
 void NuppelVideoPlayer::AddTextData(char *buffer, int len, 
@@ -605,7 +607,9 @@ unsigned char *NuppelVideoPlayer::GetCurrentFrame(int &w, int &h)
 {
     w = video_width;
     h = video_height;
-    return vbuffer[rpos];
+    if (usedVideoBuffers.count() > 0)
+        return usedVideoBuffers.head();
+    return vbuffer[MAXVBUFFER];
 }
 
 void NuppelVideoPlayer::ShowPip(unsigned char *xvidbuf)
@@ -642,19 +646,6 @@ void NuppelVideoPlayer::ShowPip(unsigned char *xvidbuf)
         memcpy(uptr + (i + yoff) * vidw + xoff, pipuptr + i * pipw, pipw);
         memcpy(vptr + (i + yoff) * vidw + xoff, pipvptr + i * pipw, pipw);
     }
-}
-
-int NuppelVideoPlayer::CheckEvents(void)
-{
-    int ret = 0;
-    if (videoOutput && eventvalid)
-    {
-        pthread_mutex_lock(&eventLock);
-        if (videoOutput && eventvalid)
-            ret = videoOutput->CheckEvents();
-        pthread_mutex_unlock(&eventLock);
-    } 
-    return ret;
 }
 
 void NuppelVideoPlayer::EmbedInWidget(unsigned long wid, int x, int y, int w, 
@@ -913,8 +904,9 @@ void NuppelVideoPlayer::ExAVSync(void)
     }
     else
     {
+        unsigned char *buffer = usedVideoBuffers.head();
         // if we get here, we're actually going to do video output
-        videoOutput->PrepareFrame(vbuffer[rpos], video_width, video_height);
+        videoOutput->PrepareFrame(buffer, video_width, video_height);
 
         delay = UpdateDelay(&nexttrigger);
 
@@ -1096,7 +1088,8 @@ void NuppelVideoPlayer::OldAVSync(void)
 
     if (!disablevideo)
     {
-        videoOutput->PrepareFrame(vbuffer[rpos], video_width, video_height);
+        unsigned char *buffer = usedVideoBuffers.head();
+        videoOutput->PrepareFrame(buffer, video_width, video_height);
         videoOutput->Show();
     }
     /* a/v sync assumes that when 'Show' returns, that is the instant
@@ -1161,11 +1154,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     output_jmeter = NULL;
     //output_jmeter = new Jitterometer("video_output", 100);
 
-    if (!disablevideo)
-    {
-        eventvalid = true;
-    }
-
     frame_interval = (int)(1000000.0/video_frame_rate);
     refreshrate = frame_interval;
 
@@ -1177,7 +1165,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     frame.bpp = -1;
     frame.frameNumber = framesPlayed;
 
-    int pause_rpos = 0;
     unsigned char *pause_buf = new unsigned char[video_size];
 
     gettimeofday(&nexttrigger, NULL);
@@ -1197,13 +1184,18 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         {
             if (!video_actually_paused)
             {
-                pause_rpos = rpos;
-                memcpy(pause_buf, vbuffer[pause_rpos], video_size);
+                unsigned char *pauseb = vbuffer[MAXVBUFFER];
+                if (usedVideoBuffers.count() > 0)
+                    pauseb = usedVideoBuffers.head();
+                memcpy(pause_buf, pauseb, video_size);
             }
             if (resetvideo)
             {
-                pause_rpos = vpos;
-                memcpy(pause_buf, vbuffer[pause_rpos], video_size);
+                unsigned char *pauseb = vbuffer[MAXVBUFFER];
+                if (usedVideoBuffers.count() > 0)
+                    pauseb = usedVideoBuffers.head();
+
+                memcpy(pause_buf, pauseb, video_size);
                 resetvideo = false;
             }
 
@@ -1247,19 +1239,21 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             continue;
         }
 
+        rpos = vbufferMap[usedVideoBuffers.head()];
+
         if (!disablevideo)
         {
-            frame.buf = vbuffer[rpos];
+            frame.buf = usedVideoBuffers.head();
             if (videoFilters.size() > 0)
                 process_video_filters(&frame, &videoFilters[0],
                                       videoFilters.size());
             if (pipplayer)
-                ShowPip(vbuffer[rpos]);
+                ShowPip(frame.buf);
 
             if (cc)
                 ShowText();
 
-            osd->Display(vbuffer[rpos]);
+            osd->Display(frame.buf);
         }
 
         if (experimentalsync)
@@ -1271,9 +1265,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         /* update rpos */
         pthread_mutex_lock(&video_buflock);
-        if (rpos != wpos) // if a seek occurred, rpos == wpos, in this case do
-                          // nothing
-            rpos = (rpos + 1) % MAXVBUFFER;
+        unsigned char *buf = usedVideoBuffers.dequeue();
+        availableVideoBuffers.enqueue(buf);
         pthread_mutex_unlock(&video_buflock);
 
         //sched_yield();
@@ -1283,11 +1276,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
  
     if (!disablevideo)
     {
-        pthread_mutex_lock(&eventLock);
         delete videoOutput;
         videoOutput = NULL;
-        eventvalid = false;
-        pthread_mutex_unlock(&eventLock);
     }
 
     if (experimentalsync)
@@ -1369,7 +1359,12 @@ void NuppelVideoPlayer::StartPlaying(void)
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];
 
-    wpos = 0;
+    for (int i = 0; i < MAXVBUFFER; i++)
+    {
+        availableVideoBuffers.enqueue(vbuffer[i]);
+        vbufferMap[vbuffer[i]] = i;
+    }
+
     ClearAfterSeek();
 
     /* This thread will fill the video and audio buffers, it does all CPU
@@ -1716,8 +1711,22 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     {
         timecodes[i] = 0;
     }
-    vpos = wpos;
-    rpos = wpos;
+
+    while (usedVideoBuffers.count() > 1)
+    {
+        unsigned char *buffer = usedVideoBuffers.dequeue();
+        availableVideoBuffers.enqueue(buffer);
+    }
+
+    if (usedVideoBuffers.count() > 0)
+    {
+        vpos = vbufferMap[usedVideoBuffers.head()];
+        rpos = vpos;
+    }
+    else
+    {
+        vpos = rpos = 0;
+    }
 
     for (int i = 0; i < MAXTBUFFER; i++)
     {
@@ -2458,7 +2467,12 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];
 
-    wpos = 0;
+    for (int i = 0; i < MAXVBUFFER; i++)
+    {
+        availableVideoBuffers.enqueue(vbuffer[i]);
+        vbufferMap[vbuffer[i]] = i;
+    }
+
     ClearAfterSeek();
 
     int number = (int)(secondsin * video_frame_rate);
@@ -2735,7 +2749,12 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];
 
-    wpos = 0;
+    for (int i = 0; i < MAXVBUFFER; i++)
+    {
+        availableVideoBuffers.enqueue(vbuffer[i]);
+        vbufferMap[vbuffer[i]] = i;
+    }
+
     ClearAfterSeek();
 
     Frame frame;
@@ -2939,7 +2958,12 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];
 
-    wpos = 0;
+    for (int i = 0; i < MAXVBUFFER; i++)
+    {
+        availableVideoBuffers.enqueue(vbuffer[i]);
+        vbufferMap[vbuffer[i]] = i;
+    }
+
     ClearAfterSeek();
 
     if ( ! (commercialskipmethod & 0x01))

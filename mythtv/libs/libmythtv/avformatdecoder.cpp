@@ -80,6 +80,14 @@ void AvFormatDecoder::SeekReset(void)
         AVCodecContext *enc = &ic->streams[i]->codec;
         avcodec_flush_buffers(enc);
     }
+
+    unsigned char *buffer;
+    for (buffer = inUseBuffers.first(); buffer; buffer = inUseBuffers.next())
+    {
+        m_parent->DiscardVideoFrame(buffer);
+    }
+
+    inUseBuffers.clear();
 }
 
 void AvFormatDecoder::Reset(void)
@@ -280,7 +288,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                     enc->flags |= CODEC_FLAG_TRUNCATED;
 
                 if (codec && codec->capabilities & CODEC_CAP_DR1 && 
-                    enc->codec_id != CODEC_ID_SVQ3 && !(enc->width % 16))
+                    !(enc->width % 16))
                 {
                     enc->flags |= CODEC_FLAG_EMU_EDGE;
                     enc->draw_horiz_band = NULL;
@@ -363,12 +371,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
     int width = c->width;
     int height = c->height;
 
-    if (pic->reference && nd->hasbframes)
-    {
-       return avcodec_default_get_buffer(c, pic);
-    }
-
-    pic->data[0] = nd->directbuf;
+    pic->data[0] = nd->m_parent->GetNextVideoFrame();
     pic->data[1] = pic->data[0] + width * height;
     pic->data[2] = pic->data[1] + width * height / 4;
 
@@ -380,6 +383,8 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
     pic->type = FF_BUFFER_TYPE_USER;
 
     pic->age = 256 * 256 * 256 * 64;
+
+    nd->inUseBuffers.append(pic->data[0]);
 
     return 1;
 }
@@ -543,11 +548,10 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     AVCodecContext *context = &(curstream->codec);
                     AVFrame mpa_pic;
 
-                    unsigned char *buf = m_parent->GetNextVideoFrame();
                     int gotpicture = 0;
+                    unsigned char *picdata = NULL;
 
                     pthread_mutex_lock(&avcodeclock);
-                    directbuf = buf;
                     ret = avcodec_decode_video(context, &mpa_pic,
                                                &gotpicture, ptr, len);
                     pthread_mutex_unlock(&avcodeclock);
@@ -566,13 +570,14 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
                     if (!gotpicture)
                     {
-                        m_parent->ReleaseNextVideoFrame(false, 0);
                         ptr += ret;
                         len -= ret;
                         continue;
                     }
 
-                    if (!directrendering || (mpa_pic.reference && hasbframes))
+                    picdata = mpa_pic.data[0];
+
+                    if (!directrendering)
                     {
                         AVPicture tmppicture;
                         AVPicture mpa_pic_p;
@@ -583,7 +588,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                             mpa_pic_p.linesize[i] = mpa_pic.linesize[i];
                         }
 
-                        avpicture_fill(&tmppicture, buf, PIX_FMT_YUV420P,
+                        picdata = m_parent->GetNextVideoFrame();
+                        avpicture_fill(&tmppicture, picdata, PIX_FMT_YUV420P,
                                        context->width,
                                        context->height);
                         img_convert(&tmppicture, PIX_FMT_YUV420P, &mpa_pic_p,
@@ -591,6 +597,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                                     context->width,
                                     context->height);
                     }
+
                     if (mpa_pic.pict_type == FF_I_TYPE ||
                         mpa_pic.pict_type == FF_P_TYPE)
                     {
@@ -616,7 +623,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     else
                         lastvpts += (int)(1000.0 / fps);
 
-                    m_parent->ReleaseNextVideoFrame(true, lastvpts);
+                    m_parent->ReleaseNextVideoFrame(picdata, lastvpts);
+                    inUseBuffers.removeRef(picdata);
                     gotvideo = 1;
                     framesPlayed++;
 

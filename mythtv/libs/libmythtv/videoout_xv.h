@@ -14,7 +14,6 @@ class XvVideoOutput
               int winx, int winy, int winw, int winh, unsigned int embedid = 0);
     void PrepareFrame(unsigned char *buffer, int width, int height);
     void Show();
-    int CheckEvents(void);
 
     void ToggleFullScreen();
 

@@ -672,42 +672,6 @@ void XvVideoOutput::Show()
         XSync(data->XJ_disp, False);
 }
 
-int XvVideoOutput::CheckEvents(void)
-{
-    if (!XJ_started)
-        return 0;
-
-    XEvent Event;
-    char buf[100];
-    KeySym keySym;
-    static XComposeStatus stat;
-    int key = 0;
- 
-    while (XPending(data->XJ_disp))
-    {
-        XNextEvent(data->XJ_disp, &Event);
-
-        switch (Event.type)
-        {
-            case KeyPress: 
-            {
-                XLookupString(&Event.xkey, buf, sizeof(buf), &keySym, &stat);
-                key = ((keySym&0xff00) != 0?((keySym&0x00ff) + 256):(keySym));
-                return key;
-            } break;
-            case ConfigureNotify: 
-            {
-                ResizeVideo(Event.xconfigure.x, Event.xconfigure.y,
-                            Event.xconfigure.width, Event.xconfigure.height);
-                return key;
-            } break;
-            default: break;
-        }
-    }
-
-    return key;
-}
-
 void XvVideoOutput::ResizeVideo(int x, int y, int w, int h)
 {
     if (XEventsQueued(data->XJ_disp, QueuedAlready))
