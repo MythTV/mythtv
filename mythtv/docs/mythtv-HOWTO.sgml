@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-10-15, v2.84
+<date>2003-10-21, v2.85
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1240,7 +1240,7 @@ $ su -
 </verb></tscreen>
 Add mysql to your USE variable.  i.e. <tt>USE="mysql ...."</tt>
 <tscreen><verb>
-# ACCEPT_KEYWORDS="~x86" emerge mythtv
+# emerge mythtv
 </verb></tscreen>
 <sect>MySQL.<label id="mysql">
 <sect1>Mandrake 9.0
@@ -4905,6 +4905,7 @@ v2.84, 2003-10-15.  Bruce's updates to docs; contribution from Michael Greb
 for Xbox frontend.  Fix tag in section 3.  Bump to v 0.12.  Get rid of
 database upgrade step since it's now done automatically.  Add a thing in the
 hardware section about the PVR-350 as a TV-out.
+v2.85, 2003-10-21.  Update Gentoo section; mythtv is now "stable".
 -->
 
 <!--

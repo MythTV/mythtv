@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-10-15, v2.84
+  2003-10-21, v2.85
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1704,7 +1704,7 @@
   Add mysql to your USE variable.  i.e. USE="mysql ...."
 
 
-       # ACCEPT_KEYWORDS="~x86" emerge mythtv
+       # emerge mythtv
 
   [1m6.  MySQL.[0m
 
