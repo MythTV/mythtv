@@ -725,6 +725,7 @@ int main(int argc, char **argv)
     QString verboseString = QString(" important general");
 
     QString pluginname = "";
+    QString geometry = "";
 
     QFileInfo finfo(a.argv()[0]);
 
@@ -738,7 +739,7 @@ int main(int argc, char **argv)
         if (!strcmp(a.argv()[argpos],"-l") ||
             !strcmp(a.argv()[argpos],"--logfile"))
         {
-            if (a.argc() > argpos)
+            if (a.argc()-1 > argpos)
             {
                 logfile = a.argv()[argpos+1];
                 if (logfile.startsWith("-"))
@@ -751,10 +752,15 @@ int main(int argc, char **argv)
                     ++argpos;
                 }
             }
+            else
+            {
+                cerr << "Missing argument to -l/--logfile option\n";
+                return -1;
+            }
         } else if (!strcmp(a.argv()[argpos],"-v") ||
             !strcmp(a.argv()[argpos],"--verbose"))
         {
-            if (a.argc() > argpos)
+            if (a.argc()-1 > argpos)
             {
                 QString temp = a.argv()[argpos+1];
                 if (temp.startsWith("-"))
@@ -764,7 +770,7 @@ int main(int argc, char **argv)
                 } else
                 {
                     QStringList verboseOpts;
-                    verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
+                    verboseOpts = QStringList::split(',', temp);
                     ++argpos;
                     for (QStringList::Iterator it = verboseOpts.begin(); 
                          it != verboseOpts.end(); ++it )
@@ -852,6 +858,26 @@ int main(int argc, char **argv)
             cout << MYTH_BINARY_VERSION << endl;
             exit(0);
         }
+        else if (!strcmp(a.argv()[argpos],"-geometry") ||
+                 !strcmp(a.argv()[argpos],"--geometry"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                geometry = a.argv()[argpos+1];
+                if (geometry.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -geometry option\n";
+                    return -1;
+                }
+                else
+                    ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -geometry option\n";
+                return -1;
+            }
+        }
         else if ((argpos + 1 == a.argc()) &&
                     !QString(a.argv()[argpos]).startsWith("-"))
         {
@@ -863,6 +889,7 @@ int main(int argc, char **argv)
                 !strcmp(a.argv()[argpos],"--help")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             cerr << "Valid options are: " << endl <<
+                    "-geometry WxH+X+Y              Override window size settings\n" <<
                     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
                     "-v or --verbose debug-level    Prints more information" << endl <<
                     "                               Accepts any combination (separated by comma)" << endl << 
@@ -913,6 +940,11 @@ int main(int argc, char **argv)
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
+
+    if (geometry != "")
+        if (!gContext->ParseGeometryOverride(geometry))
+            cerr << "Illegal -geometry argument '"
+                 << geometry <<"' (ignored)\n";
 
     if(!gContext->Init())
     {

@@ -179,6 +179,9 @@ class MythContext : public QObject
     // This returns the raw (drawable) screen size
     void GetScreenBounds(int &xbase, int &ybase, int &width, int &height);
 
+    // Parse an X11 style command line (-geometry) string
+    bool ParseGeometryOverride(const QString geometry);
+
     QString FindThemeDir(const QString &themename);
     QString GetThemeDir(void);
 

@@ -116,6 +116,10 @@ class MythContextPrivate
     int m_screenxbase, m_screenybase;
     int m_screenwidth, m_screenheight;
 
+    // Command-line GUI size, which overrides both the above sets of sizes
+    int m_geometry_x, m_geometry_y;
+    int m_geometry_w, m_geometry_h;
+
     QString themecachedir;
 
     int bigfontsize, mediumfontsize, smallfontsize;
@@ -190,6 +194,8 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     m_height = m_width = 0;
     m_screenxbase = m_screenybase = 0;
     m_screenheight = m_screenwidth = 0;
+    m_geometry_x = m_geometry_y = 0;
+    m_geometry_w = m_geometry_h = 0;
 }
 
 // Get screen size from Qt. If the windowing system environment
@@ -199,6 +205,16 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 
 void MythContextPrivate::GetScreenBounds()
 {
+    if (m_geometry_w)
+    {
+        // Geometry on the command-line overrides everything
+        m_xbase  = m_geometry_x;
+        m_ybase  = m_geometry_y;
+        m_width  = m_geometry_w;
+        m_height = m_geometry_h;
+        return;
+    }
+
     QDesktopWidget * desktop = QApplication::desktop();
 
     int screen = parent->GetNumSetting("XineramaScreen", 0);
@@ -317,10 +333,21 @@ MythContextPrivate::~MythContextPrivate()
 
 void MythContextPrivate::StoreGUIsettings()
 {
-    m_screenxbase  = parent->GetNumSetting("GuiOffsetX");
-    m_screenybase  = parent->GetNumSetting("GuiOffsetY");
-    m_screenwidth  = parent->GetNumSetting("GuiWidth");
-    m_screenheight = parent->GetNumSetting("GuiHeight");
+    if (m_geometry_w)
+    {
+        // Geometry on the command-line overrides everything
+        m_screenxbase  = m_geometry_x;
+        m_screenybase  = m_geometry_y;
+        m_screenwidth  = m_geometry_w;
+        m_screenheight = m_geometry_h;
+    }
+    else
+    {
+        m_screenxbase  = parent->GetNumSetting("GuiOffsetX");
+        m_screenybase  = parent->GetNumSetting("GuiOffsetY");
+        m_screenwidth  = parent->GetNumSetting("GuiWidth");
+        m_screenheight = parent->GetNumSetting("GuiHeight");
+    }
 
     // If any of these was _not_ set by the user,
     // (i.e. they are 0) use the whole-screen defaults
@@ -1202,6 +1229,63 @@ void MythContext::GetScreenSettings(int &xbase, int &width, float &wmult,
 
     wmult = d->m_wmult;
     hmult = d->m_hmult;
+}
+
+// Parse an X11 style command line geometry string, like
+//  -geometry 800x600+112+22
+// and override the fullscreen and user default screen dimensions
+
+bool MythContext::ParseGeometryOverride(const QString geometry)
+{
+    QRegExp re("^(\\d+)x(\\d+)([+-]\\d+)([+-]\\d+)$");
+
+    if (!re.exactMatch(geometry))
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Geometry does not match form WIDTHxHEIGHT+XOFF+YOFF");
+        return false;
+    }
+
+    re.search(geometry);
+
+    QStringList geo = re.capturedTexts();
+    bool parsed;
+
+    d->m_geometry_w = geo[1].toInt(&parsed);
+    if (!parsed)
+    {
+        VERBOSE(VB_IMPORTANT, "Could not parse width of geometry override");
+        return false;
+    }
+
+    d->m_geometry_h = geo[2].toInt(&parsed);
+    if (!parsed)
+    {
+        VERBOSE(VB_IMPORTANT, "Could not parse height of geometry override");
+        return false;
+    }
+
+    d->m_geometry_x = geo[3].toInt(&parsed);
+    if (!parsed)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Could not parse horizontal offset of geometry override");
+        return false;
+    }
+
+    d->m_geometry_y = geo[4].toInt(&parsed);
+    if (!parsed)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Could not parse vertical offset of geometry override");
+        return false;
+    }
+
+    VERBOSE(VB_IMPORTANT, QString("Overriding GUI, width=%1,"
+                                  " height=%2 at %3,%4")
+                          .arg(d->m_geometry_w).arg(d->m_geometry_h)
+                          .arg(d->m_geometry_x).arg(d->m_geometry_y));
+    return true;
 }
 
 QString MythContext::FindThemeDir(const QString &themename)
