@@ -4,7 +4,7 @@
 #
 # Cut MPEG2 files to remove cutlists...
 # Written by Gavin Hurlbut <gjhurlbu@gmail.com>
-# $Rev$
+# $Revision$
 #
 # Prerequisites:
 #    avidemux2   - http://fixounet.free.fr/avidemux/
@@ -67,7 +67,7 @@ FILENAME=$1
 BASENAME=`basename ${FILENAME} .nuv`
 OUTFILE=$2
 LASTGOP=$3
-VERSION=`echo '$Rev$' | sed -e 's/\$Rev\(\: \)*\([^ $]*\).*\$/\2/'`
+VERSION=`echo '$Revision$' | sed -e 's/\$Revision\(\: \)*\([^ $]*\).*\$/\2/'`
 
 echo mpeg2cut v${VERSION}
 echo Using mode ${MODE}
