@@ -5,8 +5,8 @@ PREFIX = /usr/local
 
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH *= /usr/local/include
-INCLUDEPATH += /usr/include/cdda
-INCLUDEPATH += /usr/include/FLAC
+#INCLUDEPATH += /usr/include/cdda
+#INCLUDEPATH += /usr/include/FLAC
 
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
