@@ -69,8 +69,8 @@ public:
     AudioCompressionSettings(const RecordingProfile& parent)
            : VerticalConfigurationGroup(false)
     {
-
         setLabel("Audio Compression");
+        setUseLabel(false);
 
         AudioCodecName* codecName = new AudioCodecName(parent);
         addChild(codecName);
@@ -206,6 +206,7 @@ public:
                TriggeredConfigurationGroup(false)
     {
         setName("Video Compression");
+        setUseLabel(false);
 
         VideoCodecName* codecName = new VideoCodecName(parent);
         addChild(codecName);
@@ -267,6 +268,7 @@ public:
          : HorizontalConfigurationGroup(false) 
     {
         setLabel("Image size");
+        setUseLabel(false);
 
         QString fullsize, halfsize;
         int maxwidth, maxheight;

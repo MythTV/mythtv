@@ -81,13 +81,13 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     if (uselabel)
     {
-        layout = new QVBoxLayout(widget, 10);
+        layout = new QVBoxLayout(widget, 30);
         // This makes weird and bad things happen in qt -mdz 2002/12/28
         //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
     }
     else
-        layout = new QVBoxLayout(widget, 5);
+        layout = new QVBoxLayout(widget, 10);
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
@@ -113,13 +113,13 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     if (uselabel)
     {
-        layout = new QHBoxLayout(widget, 10);
+        layout = new QHBoxLayout(widget, 30);
         // This makes weird and bad things happen in qt -mdz 2002/12/28
         //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
     }
     else
-        layout = new QHBoxLayout(widget, 5);
+        layout = new QHBoxLayout(widget, 10);
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())

@@ -135,7 +135,8 @@ public:
 BackendSettings::BackendSettings(MythContext* context):
     ConfigurationWizard(context) {
 
-    VerticalConfigurationGroup* group1 = new VerticalConfigurationGroup();
+    VerticalConfigurationGroup* group1 = new VerticalConfigurationGroup(false);
+    group1->setLabel("General");
     group1->addChild(new RecordFilePrefix());
     group1->addChild(new BufferName());
     group1->addChild(new BufferSize());
@@ -144,7 +145,7 @@ BackendSettings::BackendSettings(MythContext* context):
     group1->addChild(new FreqTable());
     addChild(group1);
 
-    VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup();
+    VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
     group2->setLabel("Picture-in-picture");
     group2->addChild(new PIPBufferSize());
     group2->addChild(new PIPMaxBufferFill());

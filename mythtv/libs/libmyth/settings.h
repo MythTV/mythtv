@@ -100,6 +100,8 @@ class ConfigurationGroup: virtual public Configurable
 
     virtual void save(QSqlDatabase* db);
 
+    void setUseLabel(bool useit) { uselabel = useit; }
+
   signals:
     void changeHelpText(QString);
     
