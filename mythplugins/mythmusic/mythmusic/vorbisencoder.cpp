@@ -62,6 +62,15 @@ void VorbisEncode(const char *infile, const char *outfile,
     progressbar->setProgress(0);
     qApp->processEvents();
 
+    FILE *in = fopen(infile, "r");
+    FILE *out = fopen(outfile, "w");
+
+    if (!out)
+    {
+        cerr << "ERROR: Couldn't write to " << outfile << ".\n";
+        return;
+    }
+
     vorbis_comment vc;
     vorbis_comment_init(&vc);
 
@@ -80,9 +89,6 @@ void VorbisEncode(const char *infile, const char *outfile,
     char tracknum[10];
     sprintf(tracknum, "%d", metadata->Track());
     vorbis_comment_add_tag(&vc, (char *)"tracknumber", tracknum);
-
-    FILE *in = fopen(infile, "r");
-    FILE *out = fopen(outfile, "w");
 
     ogg_stream_state os;
     ogg_page og;
