@@ -183,7 +183,7 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
         url_fclose(f);
  fail:
     av_free(s);
-    return -EIO;
+    return AVERROR_IO;
 }
 
 static int read_packet_alloc_cb(void *opaque, AVImageInfo *info)
@@ -211,14 +211,14 @@ static int img_read_packet(AVFormatContext *s1, AVPacket *pkt)
         }
         if (get_frame_filename(filename, sizeof(filename),
                                s->path, s->img_number) < 0)
-            return -EIO;
+            return AVERROR_IO;
         f = &f1;
         if (url_fopen(f, filename, URL_RDONLY) < 0)
-            return -EIO;
+            return AVERROR_IO;
     } else {
         f = &s1->pb;
         if (url_feof(f))
-            return -EIO;
+            return AVERROR_IO;
     }
 
     av_new_packet(pkt, s->img_size);
@@ -232,11 +232,11 @@ static int img_read_packet(AVFormatContext *s1, AVPacket *pkt)
 
     if (ret < 0) {
         av_free_packet(pkt);
-        return -EIO; /* signal EOF */
+        return AVERROR_IO; /* signal EOF */
     } else {
         /* XXX: computing this pts is not necessary as it is done in
            the generic code too */
-        pkt->pts = av_rescale((int64_t)s->img_count * s1->streams[0]->codec.frame_rate_base, s1->pts_den, s1->streams[0]->codec.frame_rate) / s1->pts_num;
+        pkt->pts = av_rescale((int64_t)s->img_count * s1->streams[0]->codec.frame_rate_base, s1->streams[0]->time_base.den, s1->streams[0]->codec.frame_rate) / s1->streams[0]->time_base.num;
         s->img_count++;
         s->img_number++;
         return 0;
@@ -300,11 +300,10 @@ static int img_write_header(AVFormatContext *s)
     return 0;
 }
 
-static int img_write_packet(AVFormatContext *s, int stream_index,
-                            const uint8_t *buf, int size, int64_t pts)
+static int img_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     VideoData *img = s->priv_data;
-    AVStream *st = s->streams[stream_index];
+    AVStream *st = s->streams[pkt->stream_index];
     ByteIOContext pb1, *pb;
     AVPicture *picture;
     int width, height, ret;
@@ -314,15 +313,15 @@ static int img_write_packet(AVFormatContext *s, int stream_index,
     width = st->codec.width;
     height = st->codec.height;
     
-    picture = (AVPicture *)buf;
+    picture = (AVPicture *)pkt->data;
 
     if (!img->is_pipe) {
         if (get_frame_filename(filename, sizeof(filename), 
                                img->path, img->img_number) < 0)
-            return -EIO;
+            return AVERROR_IO;
         pb = &pb1;
         if (url_fopen(pb, filename, URL_WRONLY) < 0)
-            return -EIO;
+            return AVERROR_IO;
     } else {
         pb = &s->pb;
     }

@@ -77,6 +77,7 @@ typedef struct {
 #define AUDIO_ID 0xc0
 #define VIDEO_ID 0xe0
 #define AC3_ID   0x80
+#define DTS_ID   0x8a
 #define LPCM_ID  0xa0
 
 static const int lpcm_freq_tab[4] = { 48000, 96000, 44100, 32000 };
@@ -235,7 +236,7 @@ static int get_system_header_size(AVFormatContext *ctx)
 static int mpeg_mux_init(AVFormatContext *ctx)
 {
     MpegMuxContext *s = ctx->priv_data;
-    int bitrate, i, mpa_id, mpv_id, ac3_id, lpcm_id, j;
+    int bitrate, i, mpa_id, mpv_id, ac3_id, dts_id, lpcm_id, j;
     AVStream *st;
     StreamInfo *stream;
     int audio_bitrate;
@@ -258,6 +259,7 @@ static int mpeg_mux_init(AVFormatContext *ctx)
     s->video_bound = 0;
     mpa_id = AUDIO_ID;
     ac3_id = AC3_ID;
+    dts_id = DTS_ID;
     mpv_id = VIDEO_ID;
     lpcm_id = LPCM_ID;
     s->scr_stream_index = -1;
@@ -272,6 +274,8 @@ static int mpeg_mux_init(AVFormatContext *ctx)
         case CODEC_TYPE_AUDIO:
             if (st->codec.codec_id == CODEC_ID_AC3) {
                 stream->id = ac3_id++;
+            } else if (st->codec.codec_id == CODEC_ID_DTS) {
+                stream->id = dts_id++;
             } else if (st->codec.codec_id == CODEC_ID_PCM_S16BE) {
                 stream->id = lpcm_id++;
                 for(j = 0; j < 4; j++) {
@@ -730,6 +734,15 @@ static void flush_packet(AVFormatContext *ctx, int stream_index,
             }
         }
 
+        if (s->is_mpeg2) {
+            /* special stuffing byte that is always written
+               to prevent accidental generation of start codes. */
+            put_byte(&ctx->pb, 0xff);
+
+            for(i=0;i<stuffing_size;i++)
+                put_byte(&ctx->pb, 0xff);
+        }
+
         if (startcode == PRIVATE_STREAM_1) {
             put_byte(&ctx->pb, id);
             if (id >= 0xa0) {
@@ -744,15 +757,6 @@ static void flush_packet(AVFormatContext *ctx, int stream_index,
                 put_byte(&ctx->pb, stream->nb_frames);
                 put_be16(&ctx->pb, stream->frame_start_offset);
             }
-        }
-
-        if (s->is_mpeg2) {
-            /* special stuffing byte that is always written
-               to prevent accidental generation of start codes. */
-            put_byte(&ctx->pb, 0xff);
-
-            for(i=0;i<stuffing_size;i++)
-                put_byte(&ctx->pb, 0xff);
         }
 
         /* output data */
@@ -801,51 +805,6 @@ static void put_vcd_padding_sector(AVFormatContext *ctx)
        sector (it represents the sector index, not the MPEG pack index)
        (see VCD standard p. IV-6)*/
     s->packet_number++;
-}
-
-/* XXX: move that to upper layer */
-/* XXX: we assume that there are always 'max_b_frames' between
-   reference frames. A better solution would be to use the AVFrame pts
-   field */
-static void compute_pts_dts(AVStream *st, int64_t *ppts, int64_t *pdts, 
-                            int64_t timestamp)
-{
-    int frame_delay;
-    int64_t pts, dts;
-
-    if (st->codec.codec_type == CODEC_TYPE_VIDEO && 
-        st->codec.max_b_frames != 0) {
-        frame_delay = (st->codec.frame_rate_base * 90000LL) / 
-            st->codec.frame_rate;
-        if (timestamp == 0) {
-            /* specific case for first frame : DTS just before */
-            pts = timestamp;
-            dts = timestamp - frame_delay;
-        } else {
-            timestamp -= frame_delay;
-            if (st->codec.coded_frame->pict_type == FF_B_TYPE) {
-                /* B frames has identical pts/dts */
-                pts = timestamp;
-                dts = timestamp;
-            } else {
-                /* a reference frame has a pts equal to the dts of the
-                   _next_ one */
-                dts = timestamp;
-                pts = timestamp + (st->codec.max_b_frames + 1) * frame_delay;
-            }
-        }
-#if 1
-        av_log(&st->codec, AV_LOG_DEBUG, "pts=%0.3f dts=%0.3f pict_type=%c\n", 
-               pts / 90000.0, dts / 90000.0, 
-               av_get_pict_type_char(st->codec.coded_frame->pict_type));
-#endif
-    } else {
-        pts = timestamp;
-        dts = timestamp;
-    }
-
-    *ppts = pts & ((1LL << 33) - 1);
-    *pdts = dts & ((1LL << 33) - 1);
 }
 
 static int64_t update_scr(AVFormatContext *ctx,int stream_index,int64_t pts)
@@ -912,17 +871,19 @@ static int64_t update_scr(AVFormatContext *ctx,int stream_index,int64_t pts)
 }    
 
 
-static int mpeg_mux_write_packet(AVFormatContext *ctx, int stream_index,
-                                 const uint8_t *buf, int size, 
-                                 int64_t timestamp)
+static int mpeg_mux_write_packet(AVFormatContext *ctx, AVPacket *pkt)
 {
     MpegMuxContext *s = ctx->priv_data;
+    int stream_index= pkt->stream_index;
+    int size= pkt->size;
+    uint8_t *buf= pkt->data;
     AVStream *st = ctx->streams[stream_index];
     StreamInfo *stream = st->priv_data;
     int64_t pts, dts, new_start_pts, new_start_dts;
     int len, avail_size;
     
-    compute_pts_dts(st, &pts, &dts, timestamp);
+    pts= pkt->pts;
+    dts= pkt->dts;
 
     if(s->is_svcd) {
         /* offset pts and dts slightly into the future to be able
@@ -986,7 +947,7 @@ static int mpeg_mux_write_packet(AVFormatContext *ctx, int stream_index,
     stream->start_dts = new_start_dts;
     stream->nb_frames++;
     if (stream->frame_start_offset == 0)
-        stream->frame_start_offset = stream->buffer_ptr;
+        stream->frame_start_offset = stream->buffer_ptr + 1;
     while (size > 0) {
         avail_size = get_packet_payload_size(ctx, stream_index,
                                              stream->start_pts, 
@@ -1208,7 +1169,7 @@ static int mpegps_read_pes_header(AVFormatContext *s,
         startcode = find_next_start_code(&s->pb, &size, &m->header_state);
     //printf("startcode=%x pos=0x%Lx\n", startcode, url_ftell(&s->pb));
     if (startcode < 0)
-        return -EIO;
+        return AVERROR_IO;
     if (startcode == PACK_START_CODE)
         goto redo;
     if (startcode == SYSTEM_HEADER_START_CODE)
@@ -1313,7 +1274,7 @@ static int mpegps_read_pes_header(AVFormatContext *s,
         int i;
         for(i=0; i<s->nb_streams; i++){
             if(startcode == s->streams[i]->id) {
-                av_add_index_entry(s->streams[i], *ppos, dts*AV_TIME_BASE/90000, 0, 0 /* FIXME keyframe? */);
+                av_add_index_entry(s->streams[i], *ppos, dts, 0, 0 /* FIXME keyframe? */);
             }
         }
     }
@@ -1328,8 +1289,8 @@ static int mpegps_read_packet(AVFormatContext *s,
                               AVPacket *pkt)
 {
     AVStream *st;
-    int len, startcode, i, type, codec_id;
-    int64_t pts, dts, ppos = 0; 
+    int len, startcode, i, type, codec_id = 0;
+    int64_t pts, dts, ppos = 0;
 
  redo:
     len = mpegps_read_pes_header(s, &ppos, &startcode, &pts, &dts);
@@ -1348,9 +1309,12 @@ static int mpegps_read_packet(AVFormatContext *s,
     } else if (startcode >= 0x1c0 && startcode <= 0x1df) {
         type = CODEC_TYPE_AUDIO;
         codec_id = CODEC_ID_MP2;
-    } else if (startcode >= 0x80 && startcode <= 0x9f) {
+    } else if (startcode >= 0x80 && startcode <= 0x89) {
         type = CODEC_TYPE_AUDIO;
         codec_id = CODEC_ID_AC3;
+    } else if (startcode >= 0x8a && startcode <= 0x9f) {
+        type = CODEC_TYPE_AUDIO;
+        codec_id = CODEC_ID_DTS;
     } else if (startcode >= 0xa0 && startcode <= 0xbf) {
         type = CODEC_TYPE_AUDIO;
         codec_id = CODEC_ID_PCM_S16BE;
@@ -1392,9 +1356,10 @@ static int mpegps_read_packet(AVFormatContext *s,
     pkt->stream_index = st->index;
     pkt->startpos = ppos;
 #if 0
-    printf("%d: pts=%0.3f dts=%0.3f\n",
+    av_log(s, AV_LOG_DEBUG, "%d: pts=%0.3f dts=%0.3f\n",
            pkt->stream_index, pkt->pts / 90000.0, pkt->dts / 90000.0);
 #endif
+
     return 0;
 }
 
@@ -1432,7 +1397,7 @@ static int64_t mpegps_read_dts(AVFormatContext *s, int stream_index,
     printf("pos=0x%llx dts=0x%llx %0.3f\n", pos, dts, dts / 90000.0);
 #endif
     *ppos = pos;
-    return dts*AV_TIME_BASE/90000;
+    return dts;
 }
 
 #ifdef CONFIG_ENCODERS

@@ -78,9 +78,9 @@ DEFINES += USING_OSS
 #LIRC_LIBS = -llirc_client
 
 # XvMC support, modify as necessary.
-#CONFIG += using_xvmc
-#DEFINES += USING_XVMC
-#EXTRA_LIBS += -lXvMCNVIDIA -lXvMC
+CONFIG += using_xvmc
+DEFINES += USING_XVMC
+EXTRA_LIBS += -lXvMCNVIDIA -lXvMC
 
 # VIA cle266 support
 #CONFIG += using_viahwslice

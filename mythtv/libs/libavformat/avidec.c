@@ -49,8 +49,11 @@ typedef struct {
     int64_t  movi_end;
     offset_t movi_list;
     int index_loaded;
+    int is_odml;
     DVDemuxContext* dv_demux;
 } AVIContext;
+
+static int avi_load_index(AVFormatContext *s);
 
 #ifdef DEBUG
 static void print_tag(const char *str, unsigned int tag, int size)
@@ -93,8 +96,6 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
     AVIStream *ast;
     int xan_video = 0;  /* hack to support Xan A/V */
 
-    av_set_pts_info(s, 64, 1, AV_TIME_BASE);
-
     if (get_riff(avi, pb) < 0)
         return -1;
 
@@ -120,13 +121,18 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
 #endif
             if (tag1 == MKTAG('m', 'o', 'v', 'i')) {
                 avi->movi_list = url_ftell(pb) - 4;
-                avi->movi_end = avi->movi_list + size;
+                if(size) avi->movi_end = avi->movi_list + size;
+                else     avi->movi_end = url_filesize(url_fileno(pb));
 #ifdef DEBUG
                 printf("movi end=%Lx\n", avi->movi_end);
 #endif
                 goto end_of_header;
             }
             break;
+        case MKTAG('d', 'm', 'l', 'h'):
+	    avi->is_odml = 1;
+	    url_fskip(pb, size + (size & 1));
+	    break;
         case MKTAG('a', 'v', 'i', 'h'):
 	    /* avi header */
             /* using frame_period is bad idea */
@@ -139,6 +145,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 st = av_new_stream(s, i);
                 if (!st)
                     goto fail;
+
                 ast = av_mallocz(sizeof(AVIStream));
                 if (!ast)
                     goto fail;
@@ -151,6 +158,9 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
             stream_index++;
             tag1 = get_le32(pb);
             handler = get_le32(pb); /* codec tag */
+#ifdef DEBUG
+        print_tag("strh", tag1, -1);
+#endif
             switch(tag1) {
             case MKTAG('i', 'a', 'v', 's'):
 	    case MKTAG('i', 'v', 'a', 's'):
@@ -204,14 +214,15 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 }
                 ast->rate = rate;
                 ast->scale = scale;
+                av_set_pts_info(st, 64, scale, rate);
                 st->codec.frame_rate = rate;
                 st->codec.frame_rate_base = scale;
                 get_le32(pb); /* start */
                 nb_frames = get_le32(pb);
                 st->start_time = 0;
-                st->duration = (double)nb_frames * 
-                    st->codec.frame_rate_base * AV_TIME_BASE / 
-                    st->codec.frame_rate;
+                st->duration = av_rescale(nb_frames,
+                    st->codec.frame_rate_base * AV_TIME_BASE,
+                    st->codec.frame_rate);
 		url_fskip(pb, size - 9 * 4);
                 break;
             case MKTAG('a', 'u', 'd', 's'):
@@ -233,6 +244,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                     get_le32(pb); /* initial frame */
                     ast->scale = get_le32(pb); /* scale */
                     ast->rate = get_le32(pb);
+                    av_set_pts_info(st, 64, ast->scale, ast->rate);
                     ast->start= get_le32(pb); /* start */
                     length = get_le32(pb); /* length, in samples or bytes */
                     get_le32(pb); /* buffer size */
@@ -244,6 +256,11 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                         st->duration = (int64_t)length * AV_TIME_BASE / ast->rate;
                     url_fskip(pb, size - 12 * 4);
                 }
+                break;
+            case MKTAG('t', 'x', 't', 's'):
+                //FIXME 
+                codec_type = CODEC_TYPE_DATA; //CODEC_TYPE_SUB ?  FIXME
+                url_fskip(pb, size - 8);
                 break;
             default:
                 goto fail;
@@ -314,6 +331,9 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                         st->codec.codec_id = CODEC_ID_XAN_DPCM;
                     break;
                 default:
+                    st->codec.codec_type = CODEC_TYPE_DATA;
+                    st->codec.codec_id= CODEC_ID_NONE;
+                    st->codec.codec_tag= 0;
                     url_fskip(pb, size);
                     break;
                 }
@@ -337,6 +357,10 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
         return -1;
     }
 
+    assert(!avi->index_loaded);
+    avi_load_index(s);
+    avi->index_loaded = 1;
+ 
     return 0;
 }
 
@@ -344,7 +368,8 @@ static int avi_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
     AVIContext *avi = s->priv_data;
     ByteIOContext *pb = &s->pb;
-    int n, d[8], size, i;
+    int n, d[8], size;
+    offset_t i;
     void* dstr;
 
     memset(d, -1, sizeof(int)*8);
@@ -358,19 +383,12 @@ static int avi_read_packet(AVFormatContext *s, AVPacket *pkt)
     for(i=url_ftell(pb); !url_feof(pb); i++) {
         int j;
 
-	if (i >= avi->movi_end) { /* Let's see if it's an OpenDML AVI */
-	    uint32_t tag, size, tag2;
-	    url_fskip(pb, avi->riff_end - url_ftell(pb));
-	    if (get_riff(avi, pb) < 0)
-	        return -1;
-	    
-	    tag = get_le32(pb);
-	    size = get_le32(pb);
-	    tag2 = get_le32(pb);
-	    if (tag == MKTAG('L','I','S','T') && tag2 == MKTAG('m','o','v','i'))
-	        avi->movi_end = url_ftell(pb) + size - 4; 
-	    else
-	        return -1;
+	if (i >= avi->movi_end) {
+	    if (avi->is_odml) {
+		url_fskip(pb, avi->riff_end - i);
+	        avi->riff_end = avi->movi_end = url_filesize(url_fileno(pb));
+	    } else
+	        break;
 	}
 
         for(j=0; j<7; j++)
@@ -386,6 +404,13 @@ static int avi_read_packet(AVFormatContext *s, AVPacket *pkt)
             && d[0] == 'i' && d[1] == 'x'
             && n < s->nb_streams
             && i + size <= avi->movi_end){
+            
+            url_fskip(pb, size);
+        }
+
+	//parse JUNK
+        if(d[0] == 'J' && d[1] == 'U' && d[2] == 'N' && d[3] == 'K' &&
+           i + size <= avi->movi_end) {
             
             url_fskip(pb, size);
         }
@@ -419,13 +444,13 @@ static int avi_read_packet(AVFormatContext *s, AVPacket *pkt)
                 AVIStream *ast;
                 st = s->streams[n];
                 ast = st->priv_data;
-
+                
                 /* XXX: how to handle B frames in avi ? */
+                pkt->dts = ast->frame_offset;
+//                pkt->dts += ast->start;
                 if(ast->sample_size)
-                    pkt->pts = ((int64_t)ast->frame_offset * ast->scale* AV_TIME_BASE) / (ast->rate * ast->sample_size);
-                else
-                    pkt->pts = ((int64_t)ast->frame_offset * ast->scale* AV_TIME_BASE) / ast->rate;
-//printf("%Ld %d %d %d %d\n", pkt->pts, ast->frame_offset, ast->scale,  AV_TIME_BASE,  ast->rate);
+                    pkt->dts /= ast->sample_size;
+//av_log(NULL, AV_LOG_DEBUG, "dts:%Ld offset:%d %d/%d smpl_siz:%d base:%d st:%d size:%d\n", pkt->dts, ast->frame_offset, ast->scale, ast->rate, ast->sample_size, AV_TIME_BASE, n, size);
                 pkt->stream_index = n;
                 /* FIXME: We really should read index for that */
                 if (st->codec.codec_type == CODEC_TYPE_VIDEO) {
@@ -597,8 +622,7 @@ static int avi_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp
         return -1;
     ast = st->priv_data;
     /* compute the frame number */
-    frame_number = (timestamp * ast->rate) /
-        (ast->scale * (int64_t)AV_TIME_BASE);
+    frame_number = timestamp;
 #ifdef DEBUG_SEEK
     printf("timestamp=%0.3f nb_indexes=%d frame_number=%d\n", 
            (double)timestamp / AV_TIME_BASE,

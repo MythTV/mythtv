@@ -203,11 +203,10 @@ static int wav_write_header(AVFormatContext *s)
     return 0;
 }
 
-static int wav_write_packet(AVFormatContext *s, int stream_index_ptr,
-                            const uint8_t *buf, int size, int64_t pts)
+static int wav_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     ByteIOContext *pb = &s->pb;
-    put_buffer(pb, buf, size);
+    put_buffer(pb, pkt->data, pkt->size);
     return 0;
 }
 
@@ -312,7 +311,7 @@ static int wav_read_packet(AVFormatContext *s,
     AVStream *st;
 
     if (url_feof(&s->pb))
-        return -EIO;
+        return AVERROR_IO;
     st = s->streams[0];
 
     size = MAX_SIZE;
@@ -322,7 +321,7 @@ static int wav_read_packet(AVFormatContext *s,
         size = (size / st->codec.block_align) * st->codec.block_align;
     }
     if (av_new_packet(pkt, size))
-        return -EIO;
+        return AVERROR_IO;
     pkt->stream_index = 0;
 
     ret = get_buffer(&s->pb, pkt->data, pkt->size);
@@ -349,6 +348,7 @@ static int wav_read_seek(AVFormatContext *s,
     case CODEC_ID_MP2:
     case CODEC_ID_MP3:
     case CODEC_ID_AC3:
+    case CODEC_ID_DTS:
         /* use generic seeking with dynamically generated indexes */
         return -1;
     default:

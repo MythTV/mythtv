@@ -252,7 +252,8 @@ const CodecTag codec_movaudio_tags[] = {
 
 static int mov_write_audio_tag(ByteIOContext *pb, MOVTrack* track)
 {
-    int pos = url_ftell(pb), tag;
+    int pos = url_ftell(pb);
+    int tag;
     
     put_be32(pb, 0); /* size */
 
@@ -261,13 +262,9 @@ static int mov_write_audio_tag(ByteIOContext *pb, MOVTrack* track)
     if (!tag)
     {
 	int tmp = codec_get_tag(codec_wav_tags, track->enc->codec_id);
-	if (tmp)
-	    tag = MKTAG('m', 's', ((tmp >> 8) & 0xff), (tmp & 0xff));
+        tag = MKTAG('m', 's', ((tmp >> 8) & 0xff), (tmp & 0xff));
     }
-    if (!tag)
-	put_tag(pb, "    ");
-    else
-	put_le32(pb, tag); // store it byteswapped
+    put_le32(pb, tag); // store it byteswapped
 
     put_be32(pb, 0); /* Reserved */
     put_be16(pb, 0); /* Reserved */
@@ -285,7 +282,16 @@ static int mov_write_audio_tag(ByteIOContext *pb, MOVTrack* track)
     /* TODO: Currently hard-coded to 16-bit, there doesn't seem
                  to be a good way to get number of bits of audio */
     put_be16(pb, 0x10); /* Reserved */
-    put_be16(pb, 0); /* compression ID (= 0) */
+
+    if(track->enc->codec_id == CODEC_ID_AAC ||
+       track->enc->codec_id == CODEC_ID_MP3)
+    {
+        put_be16(pb, 0xfffe); /* compression ID (vbr)*/
+    }
+    else
+    {
+        put_be16(pb, 0); /* compression ID (= 0) */
+    }
     put_be16(pb, 0); /* packet size (= 0) */
     put_be16(pb, track->timescale); /* Time scale */
     put_be16(pb, 0); /* Reserved */
@@ -442,7 +448,8 @@ const CodecTag codec_movvideo_tags[] = {
 
 static int mov_write_video_tag(ByteIOContext *pb, MOVTrack* track)
 {
-    int pos = url_ftell(pb), tag;
+    int pos = url_ftell(pb);
+    int tag;
 
     put_be32(pb, 0); /* size */
 
@@ -450,10 +457,7 @@ static int mov_write_video_tag(ByteIOContext *pb, MOVTrack* track)
     // if no mac fcc found, try with Microsoft tags
     if (!tag)
 	tag = codec_get_tag(codec_bmp_tags, track->enc->codec_id);
-    if (!tag)
-	put_tag(pb, "    ");
-    else
-	put_le32(pb, tag); // store it byteswapped
+    put_le32(pb, tag); // store it byteswapped
 
     put_be32(pb, 0); /* Reserved */
     put_be16(pb, 0); /* Reserved */
@@ -772,6 +776,219 @@ static int mov_write_mvhd_tag(ByteIOContext *pb, MOVContext *mov)
     return 0x6c;
 }
 
+static int mov_write_itunes_hdlr_tag(ByteIOContext *pb, MOVContext* mov,
+                                     AVFormatContext *s)
+{
+    int pos = url_ftell(pb);
+    put_be32(pb, 0); /* size */
+    put_tag(pb, "hdlr");
+    put_be32(pb, 0);
+    put_be32(pb, 0);
+    put_tag(pb, "mdir");
+    put_tag(pb, "appl");
+    put_be32(pb, 0);
+    put_be32(pb, 0);
+    put_be16(pb, 0);
+    return updateSize(pb, pos);
+}
+
+/* helper function to write a data tag with the specified string as data */
+static int mov_write_string_data_tag(ByteIOContext *pb, MOVContext* mov,
+                                     AVFormatContext *s, const char *data)
+{
+    int pos = url_ftell(pb);
+    put_be32(pb, 0); /* size */
+    put_tag(pb, "data");
+    put_be32(pb, 1);
+    put_be32(pb, 0);
+    put_buffer(pb, data, strlen(data));
+    return updateSize(pb, pos);
+}
+
+/* iTunes name of the song/movie */
+static int mov_write_nam_tag(ByteIOContext *pb, MOVContext* mov,
+                             AVFormatContext *s)
+{
+    int size = 0;
+    if ( s->title[0] ) {
+        int pos = url_ftell(pb);
+        put_be32(pb, 0); /* size */
+        put_tag(pb, "\251nam");
+        mov_write_string_data_tag(pb, mov, s, s->title);
+        size = updateSize(pb, pos);
+    }
+    return size;
+}
+
+/* iTunes name of the artist/performer */
+static int mov_write_ART_tag(ByteIOContext *pb, MOVContext* mov,
+                             AVFormatContext *s)
+{
+    int size = 0;
+    if ( s->author[0] ) {
+        int pos = url_ftell(pb);
+        put_be32(pb, 0); /* size */
+        put_tag(pb, "\251ART");
+        // we use the author here as this is the only thing that we have...
+        mov_write_string_data_tag(pb, mov, s, s->author);
+        size = updateSize(pb, pos);
+    }
+    return size;
+}
+
+/* iTunes name of the writer */
+static int mov_write_wrt_tag(ByteIOContext *pb, MOVContext* mov,
+                             AVFormatContext *s)
+{
+    int size = 0;
+    if ( s->author[0] ) {
+        int pos = url_ftell(pb);
+        put_be32(pb, 0); /* size */
+        put_tag(pb, "\251wrt");
+        mov_write_string_data_tag(pb, mov, s, s->author);
+        size = updateSize(pb, pos);
+    }
+    return size;
+}
+
+/* iTunes name of the album */
+static int mov_write_alb_tag(ByteIOContext *pb, MOVContext* mov,
+                             AVFormatContext *s)
+{
+    int size = 0;
+    if ( s->album[0] ) {
+        int pos = url_ftell(pb);
+        put_be32(pb, 0); /* size */
+        put_tag(pb, "\251alb");
+        mov_write_string_data_tag(pb, mov, s, s->album);
+        size = updateSize(pb, pos);
+    }
+    return size;
+}
+
+/* iTunes year */
+static int mov_write_day_tag(ByteIOContext *pb, MOVContext* mov,
+                             AVFormatContext *s)
+{
+    char year[5];
+    int size = 0;
+    if ( s->year ) {
+        int pos = url_ftell(pb);
+        put_be32(pb, 0); /* size */
+        put_tag(pb, "\251day");
+        snprintf(year, 5, "%04d", s->year);
+        mov_write_string_data_tag(pb, mov, s, year);
+        size = updateSize(pb, pos);
+    }
+    return size;
+}
+
+/* iTunes tool used to create the file */
+static int mov_write_too_tag(ByteIOContext *pb, MOVContext* mov,
+                             AVFormatContext *s)
+{
+    int pos = url_ftell(pb);
+    put_be32(pb, 0); /* size */
+    put_tag(pb, "\251too");
+    mov_write_string_data_tag(pb, mov, s, LIBAVFORMAT_IDENT);
+    return updateSize(pb, pos);
+}
+
+/* iTunes comment */
+static int mov_write_cmt_tag(ByteIOContext *pb, MOVContext* mov,
+                             AVFormatContext *s)
+{
+    int size = 0;
+    if ( s->comment[0] ) {
+        int pos = url_ftell(pb);
+        put_be32(pb, 0); /* size */
+        put_tag(pb, "\251cmt");
+        mov_write_string_data_tag(pb, mov, s, s->comment);
+        size = updateSize(pb, pos);
+    }
+    return size;
+}
+
+/* iTunes custom genre */
+static int mov_write_gen_tag(ByteIOContext *pb, MOVContext* mov,
+                             AVFormatContext *s)
+{
+    int size = 0;
+    if ( s->genre[0] ) {
+        int pos = url_ftell(pb);
+        put_be32(pb, 0); /* size */
+        put_tag(pb, "\251gen");
+        mov_write_string_data_tag(pb, mov, s, s->genre);
+        size = updateSize(pb, pos);
+    }
+    return size;
+}
+
+/* iTunes track number */
+static int mov_write_trkn_tag(ByteIOContext *pb, MOVContext* mov,
+                              AVFormatContext *s)
+{
+    int size = 0;
+    if ( s->track ) {
+        int pos = url_ftell(pb);
+        put_be32(pb, 0); /* size */
+        put_tag(pb, "trkn");
+        {
+            int pos = url_ftell(pb);
+            put_be32(pb, 0); /* size */
+            put_tag(pb, "data");
+            put_be32(pb, 0);        // 8 bytes empty
+            put_be32(pb, 0);
+            put_be16(pb, 0);        // empty
+            put_be16(pb, s->track); // track number
+            put_be16(pb, 0);        // total track number
+            put_be16(pb, 0);        // empty
+            updateSize(pb, pos);
+        }
+        size = updateSize(pb, pos);
+    }
+    return size;
+}
+
+/* iTunes meta data list */
+static int mov_write_ilst_tag(ByteIOContext *pb, MOVContext* mov,
+                              AVFormatContext *s)
+{
+    int pos = url_ftell(pb);
+    put_be32(pb, 0); /* size */
+    put_tag(pb, "ilst");
+    mov_write_nam_tag(pb, mov, s);
+    mov_write_ART_tag(pb, mov, s);
+    mov_write_wrt_tag(pb, mov, s);
+    mov_write_alb_tag(pb, mov, s);
+    mov_write_day_tag(pb, mov, s);
+    mov_write_too_tag(pb, mov, s);
+    mov_write_cmt_tag(pb, mov, s);
+    mov_write_gen_tag(pb, mov, s);
+    mov_write_trkn_tag(pb, mov, s);
+    return updateSize(pb, pos);
+}
+
+/* iTunes meta data tag */
+static int mov_write_meta_tag(ByteIOContext *pb, MOVContext* mov,
+                              AVFormatContext *s)
+{
+    int size = 0;
+
+    // only save meta tag if required
+    if ( s->title[0] || s->author[0] || s->album[0] || s->year || 
+         s->comment[0] || s->genre[0] || s->track ) {
+        int pos = url_ftell(pb);
+        put_be32(pb, 0); /* size */
+        put_tag(pb, "meta");
+        put_be32(pb, 0);
+        mov_write_itunes_hdlr_tag(pb, mov, s);
+        mov_write_ilst_tag(pb, mov, s);
+        size = updateSize(pb, pos);
+    }
+    return size;
+}
+    
 static int mov_write_udta_tag(ByteIOContext *pb, MOVContext* mov,
                               AVFormatContext *s)
 {
@@ -780,6 +997,9 @@ static int mov_write_udta_tag(ByteIOContext *pb, MOVContext* mov,
 
     put_be32(pb, 0); /* size */
     put_tag(pb, "udta");
+
+    /* iTunes meta data */
+    mov_write_meta_tag(pb, mov, s);
 
     /* Requirements */
     for (i=0; i<MAX_STREAMS; i++) {
@@ -930,6 +1150,26 @@ static int mov_write_header(AVFormatContext *s)
     MOVContext *mov = s->priv_data;
     int i;
 
+    for(i=0; i<s->nb_streams; i++){
+        AVCodecContext *c= &s->streams[i]->codec;
+
+        if      (c->codec_type == CODEC_TYPE_VIDEO){
+            if (!codec_get_tag(codec_movvideo_tags, c->codec_id)){
+                if(!codec_get_tag(codec_bmp_tags, c->codec_id))
+                    return -1;
+                else
+                    av_log(s, AV_LOG_INFO, "Warning, using MS style video codec tag, the file may be unplayable!\n");
+            }
+        }else if(c->codec_type == CODEC_TYPE_AUDIO){
+            if (!codec_get_tag(codec_movaudio_tags, c->codec_id)){
+                if(!codec_get_tag(codec_wav_tags, c->codec_id))
+                    return -1;
+                else
+                    av_log(s, AV_LOG_INFO, "Warning, using MS style audio codec tag, the file may be unplayable!\n");
+            }
+        }
+    }
+
     /* Default mode == MP4 */
     mov->mode = MODE_MP4;
 
@@ -950,15 +1190,15 @@ static int mov_write_header(AVFormatContext *s)
     return 0;
 }
 
-static int mov_write_packet(AVFormatContext *s, int stream_index,
-                            const uint8_t *buf, int size, int64_t pts)
+static int mov_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     MOVContext *mov = s->priv_data;
     ByteIOContext *pb = &s->pb;
-    AVCodecContext *enc = &s->streams[stream_index]->codec;
-    MOVTrack* trk = &mov->tracks[stream_index];
+    AVCodecContext *enc = &s->streams[pkt->stream_index]->codec;
+    MOVTrack* trk = &mov->tracks[pkt->stream_index];
     int cl, id;
     unsigned int samplesInChunk = 0;
+    int size= pkt->size;
 
     if (url_is_streamed(&s->pb)) return 0; /* Can't handle that */
     if (!size) return 0; /* Discard 0 sized packets */
@@ -974,7 +1214,7 @@ static int mov_write_packet(AVFormatContext *s, int stream_index,
             int len = 0;
 
             while (len < size && samplesInChunk < 100) {
-                len += packed_size[(buf[len] >> 3) & 0x0F];
+                len += packed_size[(pkt->data[len] >> 3) & 0x0F];
                 samplesInChunk++;
             }
         }
@@ -1021,8 +1261,8 @@ static int mov_write_packet(AVFormatContext *s, int stream_index,
     trk->cluster[cl][id].size = size;
     trk->cluster[cl][id].entries = samplesInChunk;
     if(enc->codec_type == CODEC_TYPE_VIDEO) {
-        trk->cluster[cl][id].key_frame = enc->coded_frame->key_frame;
-        if(enc->coded_frame->pict_type == FF_I_TYPE)
+        trk->cluster[cl][id].key_frame = !!(pkt->flags & PKT_FLAG_KEY);
+        if(trk->cluster[cl][id].key_frame)
             trk->hasKeyframes = 1;
     }
     trk->enc = enc;
@@ -1030,7 +1270,7 @@ static int mov_write_packet(AVFormatContext *s, int stream_index,
     trk->sampleCount += samplesInChunk;
     trk->mdat_size += size;
 
-    put_buffer(pb, buf, size);
+    put_buffer(pb, pkt->data, size);
 
     put_flush_packet(pb);
     return 0;

@@ -48,8 +48,6 @@ static int flv_read_header(AVFormatContext *s,
     
     s->ctx_flags |= AVFMTCTX_NOHEADER; //ok we have a header but theres no fps, codec type, sample_rate, ...
 
-    av_set_pts_info(s, 24, 1, 1000); /* 24 bit pts in ms */
-
     url_fskip(&s->pb, 4);
     flags = get_byte(&s->pb);
 
@@ -71,7 +69,7 @@ static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
     pts = get_be24(&s->pb);
 //    av_log(s, AV_LOG_DEBUG, "type:%d, size:%d, pts:%d\n", type, size, pts);
     if (url_feof(&s->pb))
-        return -EIO;
+        return AVERROR_IO;
     url_fskip(&s->pb, 4); /* reserved */
     flags = 0;
     
@@ -103,6 +101,8 @@ static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
         st = av_new_stream(s, is_audio);
         if (!st)
             return AVERROR_NOMEM;
+
+        av_set_pts_info(st, 24, 1, 1000); /* 24 bit pts in ms */
         st->codec.frame_rate_base= 0;
     }
     break;
@@ -139,12 +139,12 @@ static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
     }
 
     if (av_new_packet(pkt, size) < 0)
-        return -EIO;
+        return AVERROR_IO;
 
     ret = get_buffer(&s->pb, pkt->data, size);
     if (ret <= 0) {
         av_free_packet(pkt);
-        return -EIO;
+        return AVERROR_IO;
     }
     /* note: we need to modify the packet size here to handle the last
        packet */

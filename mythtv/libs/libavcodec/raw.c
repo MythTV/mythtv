@@ -47,7 +47,7 @@ const PixelFormatTag pixelFormatTags[] = {
 
 
     { PIX_FMT_YUV422,  MKTAG('Y', '4', '2', '2') }, /* Packed formats */
-    { PIX_FMT_YUV422,  MKTAG('U', 'Y', 'V', 'Y') },
+    { PIX_FMT_UYVY422, MKTAG('U', 'Y', 'V', 'Y') },
     { PIX_FMT_GRAY8,   MKTAG('G', 'R', 'E', 'Y') },
 
     { -1, 0 },
@@ -83,6 +83,14 @@ static int raw_init_decoder(AVCodecContext *avctx)
 
     if (avctx->codec_tag)
         avctx->pix_fmt = findPixelFormat(avctx->codec_tag);
+    else if (avctx->bits_per_sample){
+        switch(avctx->bits_per_sample){
+        case 15: avctx->pix_fmt= PIX_FMT_RGB555; break;
+        case 16: avctx->pix_fmt= PIX_FMT_RGB565; break;
+        case 24: avctx->pix_fmt= PIX_FMT_BGR24 ; break;
+        case 32: avctx->pix_fmt= PIX_FMT_RGBA32; break;
+        }
+    }
     
     context->length = avpicture_get_size(avctx->pix_fmt, avctx->width, avctx->height);
     context->buffer = av_malloc(context->length);
@@ -118,7 +126,6 @@ static int raw_decode(AVCodecContext *avctx,
     if (buf_size < bytesNeeded) {
         memcpy(context->p, buf, buf_size);
         context->p += buf_size;
-        *data_size = 0;
         return buf_size;
     }
 
@@ -144,7 +151,8 @@ static int raw_init_encoder(AVCodecContext *avctx)
     avctx->coded_frame = (AVFrame *)avctx->priv_data;
     avctx->coded_frame->pict_type = FF_I_TYPE;
     avctx->coded_frame->key_frame = 1;
-    avctx->codec_tag = findFourCC(avctx->pix_fmt);
+    if(!avctx->codec_tag)
+        avctx->codec_tag = findFourCC(avctx->pix_fmt);
     return 0;
 }
 

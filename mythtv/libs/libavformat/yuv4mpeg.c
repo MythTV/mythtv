@@ -58,10 +58,9 @@ static int yuv4_generate_header(AVFormatContext *s, char* buf)
     return n;
 }
 
-static int yuv4_write_packet(AVFormatContext *s, int stream_index,
-                             const uint8_t *buf, int size, int64_t pts)
+static int yuv4_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
-    AVStream *st = s->streams[stream_index];
+    AVStream *st = s->streams[pkt->stream_index];
     ByteIOContext *pb = &s->pb;
     AVPicture *picture;
     int* first_pkt = s->priv_data;
@@ -71,14 +70,14 @@ static int yuv4_write_packet(AVFormatContext *s, int stream_index,
     char buf1[20];
     uint8_t *ptr, *ptr1, *ptr2;
 
-    picture = (AVPicture *)buf;
+    picture = (AVPicture *)pkt->data;
 
     /* for the first packet we have to output the header as well */
     if (*first_pkt) {
         *first_pkt = 0;
 	if (yuv4_generate_header(s, buf2) < 0) {
 	    av_log(s, AV_LOG_ERROR, "Error. YUV4MPEG stream header write failed.\n");
-	    return -EIO;
+	    return AVERROR_IO;
 	} else {
 	    put_buffer(pb, buf2, strlen(buf2)); 
 	}
@@ -119,14 +118,14 @@ static int yuv4_write_header(AVFormatContext *s)
     int* first_pkt = s->priv_data;
     
     if (s->nb_streams != 1)
-        return -EIO;
+        return AVERROR_IO;
     
     if (s->streams[0]->codec.pix_fmt == PIX_FMT_YUV411P) {
         av_log(s, AV_LOG_ERROR, "Warning: generating non-standard 4:1:1 YUV stream, some mjpegtools might not work.\n");
     } 
     else if (s->streams[0]->codec.pix_fmt != PIX_FMT_YUV420P) {
         av_log(s, AV_LOG_ERROR, "ERROR: yuv4mpeg only handles 4:2:0, 4:1:1 YUV data. Use -pix_fmt to select one.\n");
-	return -EIO;
+	return AVERROR_IO;
     }
     
     *first_pkt = 1;
@@ -218,13 +217,13 @@ static int yuv4_read_packet(AVFormatContext *s, AVPacket *pkt)
         av_abort();
 
     if (av_new_packet(pkt, packet_size) < 0)
-        return -EIO;
+        return AVERROR_IO;
 
     pkt->stream_index = 0;
     ret = get_buffer(&s->pb, pkt->data, pkt->size);
     if (ret != pkt->size) {
         av_free_packet(pkt);
-        return -EIO;
+        return AVERROR_IO;
     } else {
         return 0;
     }

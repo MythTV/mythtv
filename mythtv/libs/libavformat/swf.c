@@ -53,12 +53,8 @@
 #define VIDEO_ID 0
 #define SHAPE_ID  1
 
-typedef struct SWFFrame_s {
-    void *data;
-    int size;
-    struct SWFFrame_s *prev;
-    struct SWFFrame_s *next;
-} SWFFrame;
+#undef NDEBUG
+#include <assert.h>
 
 typedef struct {
 
@@ -68,7 +64,6 @@ typedef struct {
     int samples_per_frame;
     int sound_samples;
     int video_samples;
-    int skip_samples;
     int swf_frame_number;
     int video_frame_number;
     int ms_per_frame;
@@ -82,9 +77,6 @@ typedef struct {
 
     int video_type;
     int audio_type;
-    
-    SWFFrame *frame_head;
-    SWFFrame *frame_tail;
 } SWFContext;
 
 static const int sSampleRates[3][4] = {
@@ -323,13 +315,10 @@ static int swf_write_header(AVFormatContext *s)
     swf->audio_out_pos = 0;
     swf->audio_size = 0;
     swf->audio_fifo = av_malloc(AUDIO_FIFO_SIZE);
-    swf->frame_head = 0;
-    swf->frame_tail = 0;
     swf->sound_samples = 0;
     swf->video_samples = 0;
     swf->swf_frame_number = 0;
     swf->video_frame_number = 0;
-    swf->skip_samples = 0;
 
     video_enc = NULL;
     audio_enc = NULL;
@@ -482,20 +471,6 @@ static int swf_write_video(AVFormatContext *s,
         av_log(enc, AV_LOG_INFO, "warning: Flash Player limit of 16000 frames reached\n");
     }
 
-    /* Store video data in queue */
-    if ( enc->codec_type == CODEC_TYPE_VIDEO ) {
-        SWFFrame *new_frame = av_malloc(sizeof(SWFFrame));
-        new_frame->prev = 0;
-        new_frame->next = swf->frame_head;
-        new_frame->data = av_malloc(size);
-        new_frame->size = size;
-        memcpy(new_frame->data,buf,size);
-        swf->frame_head = new_frame;
-        if ( swf->frame_tail == 0 ) {
-            swf->frame_tail = new_frame;
-        }
-    }
-    
     if ( swf->audio_type ) {
         /* Prescan audio data for this swf frame */
 retry_swf_audio_packet:
@@ -534,18 +509,8 @@ retry_swf_audio_packet:
         if ( ( swf->sound_samples + outSamples + swf->samples_per_frame ) < swf->video_samples ) {
             return 0;
         }
-
-        /* compute audio/video drift */
-        if ( enc->codec_type == CODEC_TYPE_VIDEO ) {
-            swf->skip_samples = (int)( ( (double)(swf->swf_frame_number) * (double)enc->frame_rate_base * 44100. ) / (double)(enc->frame_rate) );
-            swf->skip_samples -=  swf->video_samples;
-        }
     }
 
-    /* check if we need to insert a padding frame */
-    if (swf->skip_samples <= ( swf->samples_per_frame / 2 ) ) {
-        /* no, it is time for a real frame, check if one is available */
-        if ( swf->frame_tail ) {
             if ( swf->video_type == CODEC_ID_FLV1 ) {
                 if ( swf->video_frame_number == 0 ) {
                     /* create a new video object */
@@ -581,16 +546,12 @@ retry_swf_audio_packet:
                     put_swf_end_tag(s);
                 }
     
-                // write out pending frames
-                for (; ( enc->frame_number - swf->video_frame_number ) > 0;) {
                     /* set video frame data */
                     put_swf_tag(s, TAG_VIDEOFRAME | TAG_LONG);
                     put_le16(pb, VIDEO_ID); 
                     put_le16(pb, swf->video_frame_number++ );
-                    put_buffer(pb, swf->frame_tail->data, swf->frame_tail->size);
+                    put_buffer(pb, buf, size);
                     put_swf_end_tag(s);
-                }
-
             } else if ( swf->video_type == CODEC_ID_MJPEG ) {
                 if (swf->swf_frame_number > 0) {
                     /* remove the shape */
@@ -615,7 +576,7 @@ retry_swf_audio_packet:
                 put_byte(pb, 0xff);
                 put_byte(pb, 0xd9);
                 /* write the jpeg image */
-                put_buffer(pb, swf->frame_tail->data, swf->frame_tail->size);
+                put_buffer(pb, buf, size);
         
                 put_swf_end_tag(s);
         
@@ -630,19 +591,7 @@ retry_swf_audio_packet:
                 /* invalid codec */
             }
     
-            av_free(swf->frame_tail->data);
-            swf->frame_tail = swf->frame_tail->prev;
-            if ( swf->frame_tail ) {
-                if ( swf->frame_tail->next ) {
-                    av_free(swf->frame_tail->next);
-                }
-                swf->frame_tail->next = 0;
-            } else {
-                swf->frame_head = 0;
-            }
             swf->swf_frame_number ++;
-        }
-    }
 
     swf->video_samples += swf->samples_per_frame;
 
@@ -700,14 +649,13 @@ static int swf_write_audio(AVFormatContext *s,
     return 0;
 }
 
-static int swf_write_packet(AVFormatContext *s, int stream_index, 
-                           const uint8_t *buf, int size, int64_t pts)
+static int swf_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
-    AVCodecContext *codec = &s->streams[stream_index]->codec;
+    AVCodecContext *codec = &s->streams[pkt->stream_index]->codec;
     if (codec->codec_type == CODEC_TYPE_AUDIO)
-        return swf_write_audio(s, codec, buf, size);
+        return swf_write_audio(s, codec, pkt->data, pkt->size);
     else
-        return swf_write_video(s, codec, buf, size);
+        return swf_write_video(s, codec, pkt->data, pkt->size);
 }
 
 static int swf_write_trailer(AVFormatContext *s)
@@ -796,7 +744,7 @@ static int swf_read_header(AVFormatContext *s, AVFormatParameters *ap)
     s->priv_data = swf;
 
     if ((get_be32(pb) & 0xffffff00) != MKBETAG('F', 'W', 'S', 0))
-        return -EIO;
+        return AVERROR_IO;
     get_le32(pb);
     /* skip rectangle size */
     nbits = get_byte(pb) >> 3;
@@ -804,8 +752,6 @@ static int swf_read_header(AVFormatContext *s, AVFormatParameters *ap)
     url_fskip(pb, len);
     frame_rate = get_le16(pb);
     get_le16(pb); /* frame count */
-    
-    av_set_pts_info(s, 24, 1, 1000); /* 24 bit pts in ms */
     
     /* The Flash Player converts 8.8 frame rates 
        to milliseconds internally. Do the same to get 
@@ -826,7 +772,7 @@ static int swf_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 break;
             }
             av_log(s, AV_LOG_ERROR, "No media found in SWF\n");
-            return -EIO;
+            return AVERROR_IO;
         }
         if ( tag == TAG_VIDEOSTREAM && !vst) {
             swf->ch_id = get_le16(pb);
@@ -837,6 +783,8 @@ static int swf_read_header(AVFormatContext *s, AVFormatParameters *ap)
             /* Check for FLV1 */
             if ( get_byte(pb) == SWF_VIDEO_CODEC_FLV1 ) {
                 vst = av_new_stream(s, 0);
+                av_set_pts_info(vst, 24, 1, 1000); /* 24 bit pts in ms */
+    
                 vst->codec.codec_type = CODEC_TYPE_VIDEO;
                 vst->codec.codec_id = CODEC_ID_FLV1;
                 if ( swf->samples_per_frame ) {
@@ -857,6 +805,7 @@ static int swf_read_header(AVFormatContext *s, AVFormatParameters *ap)
                     get_le16(pb);
                 }
                 ast = av_new_stream(s, 1);
+                av_set_pts_info(ast, 24, 1, 1000); /* 24 bit pts in ms */
                 if (!ast)
                     return -ENOMEM;
 
@@ -877,7 +826,7 @@ static int swf_read_header(AVFormatContext *s, AVFormatParameters *ap)
                     break;
                 default:
                     av_free(ast);
-                    return -EIO;
+                    return AVERROR_IO;
                 }
                 ast->codec.codec_type = CODEC_TYPE_AUDIO;
                 ast->codec.codec_id = CODEC_ID_MP3;
@@ -901,7 +850,7 @@ static int swf_read_packet(AVFormatContext *s, AVPacket *pkt)
     for(;;) {
         tag = get_swf_tag(pb, &len);
         if (tag < 0) 
-            return -EIO;
+            return AVERROR_IO;
         if (tag == TAG_VIDEOFRAME) {
             for( i=0; i<s->nb_streams; i++ ) {
         	st = s->streams[i];

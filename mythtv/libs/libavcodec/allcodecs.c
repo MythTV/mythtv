@@ -52,6 +52,9 @@ void avcodec_register_all(void)
 #ifdef CONFIG_FAAC
     register_avcodec(&faac_encoder);
 #endif
+#ifdef CONFIG_XVID
+    register_avcodec(&xvid_encoder);
+#endif
     register_avcodec(&mpeg1video_encoder);
 //    register_avcodec(&h264_encoder);
 #ifdef CONFIG_RISKY
@@ -74,6 +77,7 @@ void avcodec_register_all(void)
     register_avcodec(&asv1_encoder);
     register_avcodec(&asv2_encoder);
     //register_avcodec(&ffv1_encoder);
+    register_avcodec(&snow_encoder);
     register_avcodec(&zlib_encoder);
     register_avcodec(&dvvideo_encoder);
 #endif /* CONFIG_ENCODERS */
@@ -84,6 +88,7 @@ void avcodec_register_all(void)
 #ifdef CONFIG_DECODERS
 #ifdef CONFIG_RISKY
     register_avcodec(&h263_decoder);
+    register_avcodec(&h261_decoder);
     register_avcodec(&mpeg4_decoder);
     register_avcodec(&msmpeg4v1_decoder);
     register_avcodec(&msmpeg4v2_decoder);
@@ -123,6 +128,7 @@ void avcodec_register_all(void)
     register_avcodec(&mace6_decoder);
     register_avcodec(&huffyuv_decoder);
     //register_avcodec(&ffv1_decoder);
+    register_avcodec(&snow_decoder);
     register_avcodec(&cyuv_decoder);
     register_avcodec(&h264_decoder);
     register_avcodec(&vp3_decoder);
@@ -153,6 +159,9 @@ void avcodec_register_all(void)
 #ifdef CONFIG_AC3
     register_avcodec(&ac3_decoder);
 #endif
+#ifdef CONFIG_DTS
+    register_avcodec(&dts_decoder);
+#endif
     register_avcodec(&ra_144_decoder);
     register_avcodec(&ra_288_decoder);
     register_avcodec(&roq_dpcm_decoder);
@@ -160,6 +169,7 @@ void avcodec_register_all(void)
     register_avcodec(&xan_dpcm_decoder);
     register_avcodec(&qtrle_decoder);
     register_avcodec(&flac_decoder);
+    register_avcodec(&tscc_decoder);
 #endif /* CONFIG_DECODERS */
 
 #ifdef AMR_NB
@@ -209,13 +219,14 @@ PCM_CODEC(CODEC_ID_ADPCM_4XM, adpcm_4xm);
 PCM_CODEC(CODEC_ID_ADPCM_XA, adpcm_xa);
 PCM_CODEC(CODEC_ID_ADPCM_ADX, adpcm_adx);
 PCM_CODEC(CODEC_ID_ADPCM_EA, adpcm_ea);
-PCM_CODEC(CODEC_ID_ADPCM_EA, adpcm_g726);
+PCM_CODEC(CODEC_ID_ADPCM_G726, adpcm_g726);
 
 #undef PCM_CODEC
 
     /* parsers */ 
     av_register_codec_parser(&mpegvideo_parser);
     av_register_codec_parser(&mpeg4video_parser);
+    av_register_codec_parser(&h261_parser);
     av_register_codec_parser(&h263_parser);
     av_register_codec_parser(&h264_parser);
 

@@ -164,6 +164,7 @@ static int fourxm_read_header(AVFormatContext *s,
             st = av_new_stream(s, 0);
             if (!st)
                 return AVERROR_NOMEM;
+            av_set_pts_info(st, 33, 1, 90000);
 
             fourxm->video_stream_index = st->index;
 
@@ -202,6 +203,9 @@ static int fourxm_read_header(AVFormatContext *s,
             if (!st)
                 return AVERROR_NOMEM;
 
+            /* set the pts reference (1 pts = 1/90000) */
+            av_set_pts_info(st, 33, 1, 90000);
+
             fourxm->tracks[current_track].stream_index = st->index;
 
             st->codec.codec_type = CODEC_TYPE_AUDIO;
@@ -232,10 +236,6 @@ static int fourxm_read_header(AVFormatContext *s,
     fourxm->video_pts = -fourxm->video_pts_inc;  /* first frame will push to 0 */
     fourxm->audio_pts = 0;
 
-    /* set the pts reference (1 pts = 1/90000) */
-    s->pts_num = 1;
-    s->pts_den = 90000;
-
     return 0;
 }
 
@@ -260,7 +260,7 @@ static int fourxm_read_packet(AVFormatContext *s,
         fourcc_tag = LE_32(&header[0]);
         size = LE_32(&header[4]);
         if (url_feof(pb))
-            return -EIO;
+            return AVERROR_IO;
         switch (fourcc_tag) {
 
         case LIST_TAG:
@@ -278,7 +278,7 @@ static int fourxm_read_packet(AVFormatContext *s,
             /* allocate 8 more bytes than 'size' to account for fourcc
              * and size */
             if (av_new_packet(pkt, size + 8))
-                return -EIO;
+                return AVERROR_IO;
             pkt->stream_index = fourxm->video_stream_index;
             pkt->pts = fourxm->video_pts;
             memcpy(pkt->data, header, 8);
@@ -298,7 +298,7 @@ static int fourxm_read_packet(AVFormatContext *s,
 
             if (track_number == fourxm->selected_track) {
                 if (av_new_packet(pkt, size))
-                    return -EIO;
+                    return AVERROR_IO;
                 pkt->stream_index = 
                     fourxm->tracks[fourxm->selected_track].stream_index;
                 pkt->pts = fourxm->audio_pts;

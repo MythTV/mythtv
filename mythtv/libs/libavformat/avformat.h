@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define LIBAVFORMAT_BUILD       4612
+#define LIBAVFORMAT_BUILD       4616
 
 #define LIBAVFORMAT_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVFORMAT_VERSION     FFMPEG_VERSION
@@ -133,9 +133,7 @@ typedef struct AVOutputFormat {
     enum CodecID audio_codec; /* default audio codec */
     enum CodecID video_codec; /* default video codec */
     int (*write_header)(struct AVFormatContext *);
-    int (*write_packet)(struct AVFormatContext *, 
-                        int stream_index,
-                        const uint8_t *buf, int size, int64_t pts);
+    int (*write_packet)(struct AVFormatContext *, AVPacket *pkt);
     int (*write_trailer)(struct AVFormatContext *);
     /* can use flags: AVFMT_NOFILE, AVFMT_NEEDNUMBER */
     int flags;
@@ -216,6 +214,8 @@ typedef struct AVStream {
     int codec_info_nb_frames;
     /* encoding: PTS generation when outputing stream */
     AVFrac pts;
+    AVRational time_base;
+    int pts_wrap_bits; /* number of bits in pts (used for wrapping control) */
     /* ffmpeg.c private use */
     int stream_copy; /* if TRUE, just copy stream */
     /* quality, as it has been removed from AVCodecContext and put in AVVideoFrame
@@ -234,6 +234,7 @@ typedef struct AVStream {
 
     int64_t cur_dts;
     int last_IP_duration;
+    int64_t last_IP_pts;
     /* av_seek_frame() support */
     AVIndexEntry *index_entries; /* only used if the format does not
                                     support seeking natively */
@@ -273,8 +274,6 @@ typedef struct AVFormatContext {
 
     int ctx_flags; /* format specific flags, see AVFMTCTX_xx */
     /* private data for pts handling (do not modify directly) */
-    int pts_wrap_bits; /* number of bits in pts (used for wrapping control) */
-    int pts_num, pts_den; /* value to convert to seconds */
     /* This buffer is only needed when packets were already buffered but
        not decoded, for example to get the codec parameters in mpeg
        streams */
@@ -300,14 +299,6 @@ typedef struct AVFormatContext {
     const uint8_t *cur_ptr;
     int cur_len;
     AVPacket cur_pkt;
-
-    /* the following are used for pts/dts unit conversion */
-    int64_t last_pkt_stream_pts;
-    int64_t last_pkt_stream_dts;
-    int64_t last_pkt_pts;
-    int64_t last_pkt_dts;
-    int last_pkt_pts_frac;
-    int last_pkt_dts_frac;
 
     /* av_seek_frame() support */
     int64_t data_offset; /* offset of the first packet */
@@ -400,6 +391,9 @@ int crc_init(void);
 
 /* img.c */
 int img_init(void);
+
+/* img2.c */
+int img2_init(void);
 
 /* asf.c */
 int asf_init(void);
@@ -562,7 +556,7 @@ int av_read_play(AVFormatContext *s);
 int av_read_pause(AVFormatContext *s);
 void av_close_input_file(AVFormatContext *s);
 AVStream *av_new_stream(AVFormatContext *s, int id);
-void av_set_pts_info(AVFormatContext *s, int pts_wrap_bits,
+void av_set_pts_info(AVStream *s, int pts_wrap_bits,
                      int pts_num, int pts_den);
 
 int av_find_default_stream_index(AVFormatContext *s);
@@ -574,8 +568,9 @@ int av_seek_frame_binary(AVFormatContext *s, int stream_index, int64_t target_ts
 /* media file output */
 int av_set_parameters(AVFormatContext *s, AVFormatParameters *ap);
 int av_write_header(AVFormatContext *s);
-int av_write_frame(AVFormatContext *s, int stream_index, const uint8_t *buf, 
-                   int size);
+int av_write_frame(AVFormatContext *s, AVPacket *pkt);
+int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt);
+
 int av_write_trailer(AVFormatContext *s);
 
 void dump_format(AVFormatContext *ic,
@@ -634,6 +629,7 @@ do {\
 #endif
 
 time_t mktimegm(struct tm *tm);
+struct tm *brktimegm(time_t secs, struct tm *tm);
 const char *small_strptime(const char *p, const char *fmt, 
                            struct tm *dt);
 
@@ -641,6 +637,7 @@ struct in_addr;
 int resolve_host(struct in_addr *sin_addr, const char *hostname);
 
 void url_split(char *proto, int proto_size,
+               char *authorization, int authorization_size,
                char *hostname, int hostname_size,
                int *port_ptr,
                char *path, int path_size,

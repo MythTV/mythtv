@@ -29,12 +29,12 @@ SOURCES += h263dec.c svq1.c rv10.c mpegaudiodec.c pcm.c simple_idct.c
 SOURCES += ratecontrol.c adpcm.c eval.c jfdctint.c dv.c error_resilience.c
 SOURCES += wmadec.c fft.c mdct.c mace.c huffyuv.c opts.c cyuv.c
 SOURCES += golomb.c h264.c raw.c indeo3.c asv1.c vp3.c 4xm.c cabac.c
-SOURCES += ra144.c ra288.c vcr1.c cljr.c roqvideo.c dpcm.c
+SOURCES += ra144.c ra288.c vcr1.c cljr.c roqvideo.c dpcm.c tscc.c
 SOURCES += interplayvideo.c xan.c rpza.c cinepak.c msrle.c msvideo1.c
-SOURCES += vqavideo.c idcinvideo.c adx.c rational.c faandct.c
+SOURCES += vqavideo.c idcinvideo.c adx.c rational.c faandct.c snow.c
 SOURCES += 8bps.c parser.c smc.c flicvideo.c truemotion1.c vmdav.c lcl.c
-SOURCES += qtrle.c g726.c flac.c vp3dsp.c integer.c
-SOURCES += libpostproc/postprocess.c #ffv1.c
+SOURCES += qtrle.c g726.c flac.c vp3dsp.c integer.c h261.c resample2.c
+SOURCES += libpostproc/postprocess.c #ffv1.c 
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
 inc.files = avcodec.h rational.h common.h
@@ -75,6 +75,10 @@ contains( CONFIG_FAAD, yes) {
     
 contains( CONFIG_VORBIS, yes ) {
      SOURCES += oggvorbis.c
+}
+
+contains( CONFIC_DTS, yes ) {
+    SOURCES += dts.c
 }
 
 contains( CONFIG_FAAC, yes ) {

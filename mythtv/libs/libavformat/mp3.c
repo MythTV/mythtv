@@ -298,13 +298,13 @@ static int mp3_read_packet(AVFormatContext *s, AVPacket *pkt)
     size= MP3_PACKET_SIZE;
 
     if (av_new_packet(pkt, size) < 0)
-        return -EIO;
+        return AVERROR_IO;
 
     pkt->stream_index = 0;
     ret = get_buffer(&s->pb, pkt->data, size);
     if (ret <= 0) {
         av_free_packet(pkt);
-        return -EIO;
+        return AVERROR_IO;
     }
     /* note: we need to modify the packet size here to handle the last
        packet */
@@ -324,10 +324,9 @@ static int mp3_write_header(struct AVFormatContext *s)
     return 0;
 }
 
-static int mp3_write_packet(struct AVFormatContext *s, int stream_index,
-			    const uint8_t *buf, int size, int64_t pts)
+static int mp3_write_packet(struct AVFormatContext *s, AVPacket *pkt)
 {
-    put_buffer(&s->pb, buf, size);
+    put_buffer(&s->pb, pkt->data, pkt->size);
     put_flush_packet(&s->pb);
     return 0;
 }

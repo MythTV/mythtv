@@ -32,6 +32,16 @@
 
 #define VLC_BITS 11
 
+#ifdef WORDS_BIGENDIAN
+#define B 3
+#define G 2
+#define R 1
+#else
+#define B 0
+#define G 1
+#define R 2
+#endif
+
 typedef enum Predictor{
     LEFT= 0,
     PLANE,
@@ -157,13 +167,13 @@ static inline void add_left_prediction_bgr32(uint8_t *dst, uint8_t *src, int w, 
     b= *blue;
 
     for(i=0; i<w; i++){
-        b+= src[4*i+0];
-        g+= src[4*i+1];
-        r+= src[4*i+2];
+        b+= src[4*i+B];
+        g+= src[4*i+G];
+        r+= src[4*i+R];
         
-        dst[4*i+0]= b;
-        dst[4*i+1]= g;
-        dst[4*i+2]= r;
+        dst[4*i+B]= b;
+        dst[4*i+G]= g;
+        dst[4*i+R]= r;
     }
 
     *red= r;
@@ -475,10 +485,6 @@ static int encode_init(AVCodecContext *avctx)
     
     switch(avctx->pix_fmt){
     case PIX_FMT_YUV420P:
-        if(avctx->strict_std_compliance>=0){
-            av_log(avctx, AV_LOG_ERROR, "YV12-huffyuv is experimental, there WILL be no compatbility! (use (v)strict=-1)\n");
-            return -1;
-        }
         s->bitstream_bpp= 12;
         break;
     case PIX_FMT_YUV422P:
@@ -617,30 +623,30 @@ static void decode_bgr_bitstream(HYuvContext *s, int count){
     if(s->decorrelate){
         if(s->bitstream_bpp==24){
             for(i=0; i<count; i++){
-                s->temp[0][4*i+1]= get_vlc2(&s->gb, s->vlc[1].table, VLC_BITS, 3); 
-                s->temp[0][4*i  ]= get_vlc2(&s->gb, s->vlc[0].table, VLC_BITS, 3) + s->temp[0][4*i+1];
-                s->temp[0][4*i+2]= get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3) + s->temp[0][4*i+1];
+                s->temp[0][4*i+G]= get_vlc2(&s->gb, s->vlc[1].table, VLC_BITS, 3); 
+                s->temp[0][4*i+B]= get_vlc2(&s->gb, s->vlc[0].table, VLC_BITS, 3) + s->temp[0][4*i+G];
+                s->temp[0][4*i+R]= get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3) + s->temp[0][4*i+G];
             }
         }else{
             for(i=0; i<count; i++){
-                s->temp[0][4*i+1]= get_vlc2(&s->gb, s->vlc[1].table, VLC_BITS, 3); 
-                s->temp[0][4*i  ]= get_vlc2(&s->gb, s->vlc[0].table, VLC_BITS, 3) + s->temp[0][4*i+1];
-                s->temp[0][4*i+2]= get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3) + s->temp[0][4*i+1]; 
+                s->temp[0][4*i+G]= get_vlc2(&s->gb, s->vlc[1].table, VLC_BITS, 3); 
+                s->temp[0][4*i+B]= get_vlc2(&s->gb, s->vlc[0].table, VLC_BITS, 3) + s->temp[0][4*i+G];
+                s->temp[0][4*i+R]= get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3) + s->temp[0][4*i+G]; 
                                    get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3); //?!
             }
         }
     }else{
         if(s->bitstream_bpp==24){
             for(i=0; i<count; i++){
-                s->temp[0][4*i  ]= get_vlc2(&s->gb, s->vlc[0].table, VLC_BITS, 3);
-                s->temp[0][4*i+1]= get_vlc2(&s->gb, s->vlc[1].table, VLC_BITS, 3); 
-                s->temp[0][4*i+2]= get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3); 
+                s->temp[0][4*i+B]= get_vlc2(&s->gb, s->vlc[0].table, VLC_BITS, 3);
+                s->temp[0][4*i+G]= get_vlc2(&s->gb, s->vlc[1].table, VLC_BITS, 3); 
+                s->temp[0][4*i+R]= get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3); 
             }
         }else{
             for(i=0; i<count; i++){
-                s->temp[0][4*i  ]= get_vlc2(&s->gb, s->vlc[0].table, VLC_BITS, 3);
-                s->temp[0][4*i+1]= get_vlc2(&s->gb, s->vlc[1].table, VLC_BITS, 3); 
-                s->temp[0][4*i+2]= get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3); 
+                s->temp[0][4*i+B]= get_vlc2(&s->gb, s->vlc[0].table, VLC_BITS, 3);
+                s->temp[0][4*i+G]= get_vlc2(&s->gb, s->vlc[1].table, VLC_BITS, 3); 
+                s->temp[0][4*i+R]= get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3); 
                                    get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3); //?!
             }
         }
@@ -683,8 +689,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
     AVFrame * const p= &s->picture;
 
     AVFrame *picture = data;
-
-    *data_size = 0;
 
     /* no supplementary picture */
     if (buf_size == 0)
@@ -860,14 +864,14 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
         const int last_line= (height-1)*p->linesize[0];
         
         if(s->bitstream_bpp==32){
-                   p->data[0][last_line+3]= get_bits(&s->gb, 8);
-            leftr= p->data[0][last_line+2]= get_bits(&s->gb, 8);
-            leftg= p->data[0][last_line+1]= get_bits(&s->gb, 8);
-            leftb= p->data[0][last_line+0]= get_bits(&s->gb, 8);
+            skip_bits(&s->gb, 8);
+            leftr= p->data[0][last_line+R]= get_bits(&s->gb, 8);
+            leftg= p->data[0][last_line+G]= get_bits(&s->gb, 8);
+            leftb= p->data[0][last_line+B]= get_bits(&s->gb, 8);
         }else{
-            leftr= p->data[0][last_line+2]= get_bits(&s->gb, 8);
-            leftg= p->data[0][last_line+1]= get_bits(&s->gb, 8);
-            leftb= p->data[0][last_line+0]= get_bits(&s->gb, 8);
+            leftr= p->data[0][last_line+R]= get_bits(&s->gb, 8);
+            leftg= p->data[0][last_line+G]= get_bits(&s->gb, 8);
+            leftb= p->data[0][last_line+B]= get_bits(&s->gb, 8);
             skip_bits(&s->gb, 8);
         }
         
@@ -883,7 +887,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
                     
                     add_left_prediction_bgr32(p->data[0] + p->linesize[0]*y, s->temp[0], width, &leftr, &leftg, &leftb);
                     if(s->predictor == PLANE){
-                        if((y&s->interlaced)==0){
+                        if((y&s->interlaced)==0 && y<s->height-2){
                             s->dsp.add_bytes(p->data[0] + p->linesize[0]*y, 
                                              p->data[0] + p->linesize[0]*y + fake_ystride, fake_ystride);
                         }

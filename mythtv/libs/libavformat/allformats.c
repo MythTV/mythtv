@@ -34,6 +34,7 @@ void av_register_all(void)
 #ifdef CONFIG_ENCODERS
     crc_init();
     img_init();
+    img2_init();
 #endif //CONFIG_ENCODERS
     raw_init();
     mp3_init();
@@ -49,12 +50,12 @@ void av_register_all(void)
     swf_init();
     au_init();
 #ifdef CONFIG_ENCODERS
-//    gif_init();
+    //gif_init();
 #endif //CONFIG_ENCODERS
     mov_init();
 #ifdef CONFIG_ENCODERS
     movenc_init();
-//    jpeg_init();
+    //jpeg_init();
 #endif //CONFIG_ENCODERS
     ff_dv_init();
     fourxm_init();

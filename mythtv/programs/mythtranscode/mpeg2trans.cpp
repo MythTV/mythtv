@@ -42,9 +42,9 @@ class SetBits
 #define READ_PTS ((GETBITS(0, 3)<<30) | (marker_bit() & 0) | (GETBITS(0, 15) << 15) | \
                   (marker_bit() & 0) | GETBITS(0, 15) | (marker_bit() & 0))
 #define READ_PTS_EXT (GETBITS(0, 9) | (marker_bit() & 0))
-#define PTS2FLOAT(pts) ((float)(pts).val * (outputContext->pts_num) / (outputContext->pts_den))
-#define PTS2INT(pts) ((int64_t)(pts).val * AV_TIME_BASE * (outputContext->pts_num) / (outputContext->pts_den))
-#define INT2PTS(val) ((val) * (outputContext->pts_den) / (outputContext->pts_num) / AV_TIME_BASE)
+#define PTS2FLOAT(pts) ((float)(pts).val * (outputContext->time_base.num) / (outputContext->time_base.den))
+#define PTS2INT(pts, st) ((int64_t)(pts).val * AV_TIME_BASE * (st->time_base.num) / (st->time_base.den))
+#define INT2PTS(val, st) ((val) * (st->time_base.den) / (st->time_base.num) / AV_TIME_BASE)
 
 const int ac3_ratetable[] = { 32,  40,  48,  56,  64,  80,  96, 112,
                          128, 160, 192, 224, 256, 320, 384, 448,
@@ -72,6 +72,7 @@ void FrameBuffer::setPkt(AVPacket *newpkt, int64_t del)
     memcpy(pkt.data + pkt.size, newpkt->data, newpkt->size);
     pkt.size += newpkt->size;
     pkt.pts = newpkt->pts;
+    pkt.flags = newpkt->flags;
     delta = del;
 }
 
@@ -254,7 +255,7 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
         /* write the stream header, if any */
         av_write_header(outputContext);
         dump_format(outputContext, 0, outputContext->filename, 1);
-        videoout_st->pts.val = INT2PTS(videoQueue.head()->getPTS());
+        videoout_st->pts.val = INT2PTS(videoQueue.head()->getPTS(), videoout_st);
     }
 
     while ((vidpts < audpts && ! videoQueue.isEmpty()) ||
@@ -266,18 +267,16 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
         if (audpts <= vidpts) {
             FrameBuffer *buf = audioQueue.dequeue();
             int64_t bufpts = buf->getPTS() - buf->getDelta();
-            audioout_st->pts.val = INT2PTS(bufpts);
-//            long long orig = PTS2INT(audioout_st->pts);
+            audioout_st->pts.val = INT2PTS(bufpts, audioout_st);
+//            long long orig = PTS2INT(audioout_st->pts, audioout_st);
             audioout_st->codec.coded_frame= &avframe;
-            if (av_write_frame(outputContext, audioout_st->index, 
-                               buf->getData(), buf->getSize()) != 0)
+            if (av_write_frame(outputContext, buf->getPkt()) != 0)
             {
                 cerr << "Error while writing audio frame\n";
                 exit(35);
             }
-            DPRINTF(1, "AUDIO PTS (initial): %lld (stored): %lld\n", buf->getPTS(), PTS2INT(audioout_st->pts));
-//            DPRINTF(1, "AUDIO PTS (initial): %lld (stored): %lld %d\n", orig, PTS2INT(audioout_st->pts), outputContext->pts_den);
-            audpts += PTS2INT(audioout_st->pts) - bufpts;
+            DPRINTF(1, "AUDIO PTS (initial): %lld (stored): %lld\n", buf->getPTS(), PTS2INT(audioout_st->pts, audioout_st));
+            audpts += PTS2INT(audioout_st->pts, audioout_st) - bufpts;
             buf->Reset();
             audioPool.push(buf);
         }
@@ -285,17 +284,16 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
         {
             FrameBuffer *buf = videoQueue.dequeue();
             int64_t bufpts = buf->getPTS() - buf->getDelta();
-            videoout_st->pts.val = INT2PTS(bufpts);
-//            int64_t oldpts = PTS2INT(videoout_st->pts);
+            videoout_st->pts.val = INT2PTS(bufpts, videoout_st);
+//            int64_t oldpts = PTS2INT(videoout_st->pts, videoout_st);
             videoout_st->codec.coded_frame= &avframe;
-            if (av_write_frame(outputContext, videoout_st->index, buf->getData(), buf->getSize()) != 0)
+            if (av_write_frame(outputContext, buf->getPkt()) != 0)
             {
                 cerr << "Error while writing audio frame\n";
                 exit(36);
             }
-            DPRINTF(1, "VIDEO PTS (initial): %lld (stored): %lld\n", buf->getPTS(), PTS2INT(videoout_st->pts));
-            vidpts += PTS2INT(videoout_st->pts) - bufpts;
-//            vidpts += PTS2INT(videoout_st->pts) - oldpts;
+            DPRINTF(1, "VIDEO PTS (initial): %lld (stored): %lld\n", buf->getPTS(), PTS2INT(videoout_st->pts, videoout_st));
+            vidpts += PTS2INT(videoout_st->pts, videoout_st) - bufpts;
             buf->Reset();
             videoPool.push(buf);
         }

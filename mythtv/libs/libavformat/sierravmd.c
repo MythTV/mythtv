@@ -119,7 +119,7 @@ static int vmd_read_header(AVFormatContext *s,
     /* fetch the main header, including the 2 header length bytes */
     url_fseek(pb, 0, SEEK_SET);
     if (get_buffer(pb, vmd->vmd_header, VMD_HEADER_SIZE) != VMD_HEADER_SIZE)
-        return -EIO;
+        return AVERROR_IO;
 
     vmd->audio_sample_counter = 0;
     vmd->audio_frame_divisor = 1;
@@ -129,6 +129,7 @@ static int vmd_read_header(AVFormatContext *s,
     st = av_new_stream(s, 0);
     if (!st)
         return AVERROR_NOMEM;
+    av_set_pts_info(st, 33, 1, 90000);
     vmd->video_stream_index = st->index;
     st->codec.codec_type = CODEC_TYPE_VIDEO;
     st->codec.codec_id = CODEC_ID_VMDVIDEO;
@@ -145,6 +146,7 @@ static int vmd_read_header(AVFormatContext *s,
         st = av_new_stream(s, 0);
         if (!st)
             return AVERROR_NOMEM;
+        av_set_pts_info(st, 33, 1, 90000);
         vmd->audio_stream_index = st->index;
         st->codec.codec_type = CODEC_TYPE_AUDIO;
         st->codec.codec_id = CODEC_ID_VMDAUDIO;
@@ -198,7 +200,7 @@ static int vmd_read_header(AVFormatContext *s,
         raw_frame_table_size) {
         av_free(raw_frame_table);
         av_free(vmd->frame_table);
-        return -EIO;
+        return AVERROR_IO;
     }
 
     current_offset = LE_32(&vmd->vmd_header[20]);
@@ -243,10 +245,6 @@ static int vmd_read_header(AVFormatContext *s,
 
     av_free(raw_frame_table);
 
-    /* set the pts reference at 1 pts = 1/90000 sec */
-    s->pts_num = 1;
-    s->pts_den = 90000;
-
     vmd->current_frame = 0;
 
     return 0;
@@ -261,7 +259,7 @@ static int vmd_read_packet(AVFormatContext *s,
     vmd_frame_t *frame;
 
     if (vmd->current_frame >= vmd->frame_count)
-        return -EIO;
+        return AVERROR_IO;
 
     frame = &vmd->frame_table[vmd->current_frame];
     /* position the stream (will probably be there already) */
@@ -275,7 +273,7 @@ static int vmd_read_packet(AVFormatContext *s,
 
     if (ret != frame->frame_size) {
         av_free_packet(pkt);
-        ret = -EIO;
+        ret = AVERROR_IO;
     }
     pkt->stream_index = frame->stream_index;
     if (frame->frame_record[0] == 0x02)

@@ -72,11 +72,10 @@ static int au_write_header(AVFormatContext *s)
     return 0;
 }
 
-static int au_write_packet(AVFormatContext *s, int stream_index_ptr,
-                           const uint8_t *buf, int size, int64_t pts)
+static int au_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     ByteIOContext *pb = &s->pb;
-    put_buffer(pb, buf, size);
+    put_buffer(pb, pkt->data, pkt->size);
     return 0;
 }
 
@@ -160,9 +159,9 @@ static int au_read_packet(AVFormatContext *s,
     int ret;
 
     if (url_feof(&s->pb))
-        return -EIO;
+        return AVERROR_IO;
     if (av_new_packet(pkt, MAX_SIZE))
-        return -EIO;
+        return AVERROR_IO;
     pkt->stream_index = 0;
 
     ret = get_buffer(&s->pb, pkt->data, pkt->size);

@@ -223,19 +223,26 @@ static inline int get_penalty_factor(MpegEncContext *s, int type){
     switch(type&0xFF){
     default:
     case FF_CMP_SAD:
-        return s->qscale*2;
+        return s->lambda>>FF_LAMBDA_SHIFT;
     case FF_CMP_DCT:
-        return s->qscale*3;
+        return (3*s->lambda)>>(FF_LAMBDA_SHIFT+1);
     case FF_CMP_SATD:
-        return s->qscale*6;
-    case FF_CMP_SSE:
-        return s->qscale*s->qscale*2;
-    case FF_CMP_BIT:
-        return 1;
+        return (2*s->lambda)>>FF_LAMBDA_SHIFT;
     case FF_CMP_RD:
     case FF_CMP_PSNR:
-        return (s->qscale*s->qscale*185 + 64)>>7;
+    case FF_CMP_SSE:
+    case FF_CMP_NSSE:
+        return s->lambda2>>FF_LAMBDA_SHIFT;
+    case FF_CMP_BIT:
+        return 1;
     }
+}
+
+static int zero_cmp(void *s, uint8_t *a, uint8_t *b, int stride, int h){
+    return 0;
+}
+
+static void zero_hpel(uint8_t *a, const uint8_t *b, int stride, int h){
 }
 
 void ff_init_me(MpegEncContext *s){
@@ -266,10 +273,11 @@ void ff_init_me(MpegEncContext *s){
             c->sub_motion_search= sad_hpel_motion_search; // 2050 vs. 2450 cycles
         else
             c->sub_motion_search= hpel_motion_search;
-        c->hpel_avg= s->dsp.avg_pixels_tab;
-        if(s->no_rounding) c->hpel_put= s->dsp.put_no_rnd_pixels_tab;
-        else               c->hpel_put= s->dsp.put_pixels_tab;
     }
+    c->hpel_avg= s->dsp.avg_pixels_tab;
+    if(s->no_rounding) c->hpel_put= s->dsp.put_no_rnd_pixels_tab;
+    else               c->hpel_put= s->dsp.put_pixels_tab;
+
     if(s->linesize){
         c->stride  = s->linesize; 
         c->uvstride= s->uvlinesize;
@@ -277,6 +285,16 @@ void ff_init_me(MpegEncContext *s){
         c->stride  = 16*s->mb_width + 32;
         c->uvstride=  8*s->mb_width + 16;
     }
+
+    // 8x8 fullpel search would need a 4x4 chroma compare, which we dont have yet, and even if we had the motion estimation code doesnt expect it
+    if((c->avctx->me_cmp&FF_CMP_CHROMA) && !s->dsp.me_cmp[2]){
+        s->dsp.me_cmp[2]= zero_cmp;
+    }
+    if((c->avctx->me_sub_cmp&FF_CMP_CHROMA) && !s->dsp.me_sub_cmp[2]){
+        s->dsp.me_sub_cmp[2]= zero_cmp;
+    }
+    c->hpel_put[2][0]= c->hpel_put[2][1]=
+    c->hpel_put[2][2]= c->hpel_put[2][3]= zero_hpel;
 
     c->temp= c->scratchpad;
 }
@@ -980,6 +998,16 @@ static int interlaced_search(MpegEncContext *s, int ref_index,
     }
 }
 
+static void clip_input_mv(MpegEncContext * s, int16_t *mv, int interlaced){
+    int ymax= s->me.ymax>>interlaced;
+    int ymin= s->me.ymin>>interlaced;
+    
+    if(mv[0] < s->me.xmin) mv[0] = s->me.xmin;
+    if(mv[0] > s->me.xmax) mv[0] = s->me.xmax;
+    if(mv[1] <       ymin) mv[1] =       ymin;
+    if(mv[1] >       ymax) mv[1] =       ymax;
+}
+
 static inline int check_input_motion(MpegEncContext * s, int mb_x, int mb_y, int p_type){
     MotionEstContext * const c= &s->me;
     Picture *p= s->current_picture_ptr;
@@ -994,9 +1022,18 @@ static inline int check_input_motion(MpegEncContext * s, int mb_x, int mb_y, int
     me_cmp_func cmpf= s->dsp.sse[0];
     me_cmp_func chroma_cmpf= s->dsp.sse[1];
     
-    assert(p_type==0 || !USES_LIST(mb_type, 1));
+    if(p_type && USES_LIST(mb_type, 1)){
+        av_log(c->avctx, AV_LOG_ERROR, "backward motion vector in P frame\n");
+        return INT_MAX;
+    }
     assert(IS_INTRA(mb_type) || USES_LIST(mb_type,0) || USES_LIST(mb_type,1));
     
+    for(i=0; i<4; i++){
+        int xy= s->block_index[i];
+        clip_input_mv(s, p->motion_val[0][xy], !!IS_INTERLACED(mb_type));
+        clip_input_mv(s, p->motion_val[1][xy], !!IS_INTERLACED(mb_type));
+    }
+
     if(IS_INTERLACED(mb_type)){
         int xy2= xy  + s->b8_stride;
         s->mb_type[mb_xy]=CANDIDATE_MB_TYPE_INTRA;
@@ -1005,7 +1042,7 @@ static inline int check_input_motion(MpegEncContext * s, int mb_x, int mb_y, int
         
         if(!(s->flags & CODEC_FLAG_INTERLACED_ME)){
             av_log(c->avctx, AV_LOG_ERROR, "Interlaced macroblock selected but interlaced motion estimation disabled\n");
-            return -1;
+            return INT_MAX;
         }
 
         if(USES_LIST(mb_type, 0)){
@@ -1066,7 +1103,7 @@ static inline int check_input_motion(MpegEncContext * s, int mb_x, int mb_y, int
     }else if(IS_8X8(mb_type)){
         if(!(s->flags & CODEC_FLAG_4MV)){
             av_log(c->avctx, AV_LOG_ERROR, "4MV macroblock selected but 4MV encoding disabled\n");
-            return -1;
+            return INT_MAX;
         }
         cmpf= s->dsp.sse[1];
         chroma_cmpf= s->dsp.sse[1];
@@ -1723,6 +1760,7 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
     const int xy = mb_y*s->mb_stride + mb_x;
     init_ref(c, s->new_picture.data, s->last_picture.data, s->next_picture.data, 16*mb_x, 16*mb_y, 2);
 
+    get_limits(s, 16*mb_x, 16*mb_y);
     
     c->skip=0;
     if(c->avctx->me_threshold){

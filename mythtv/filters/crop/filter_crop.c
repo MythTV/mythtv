@@ -130,6 +130,8 @@ int mm_support(void) // From linearblend
       rval |= MM_MMX;
     if( edx & ( 1 << 24) )
       rval |= MM_MMXEXT;
+    if(rval==0)
+      goto inteltest;
     return rval;
   } else if (ebx == 0x69727943 &&
 	     edx == 0x736e4978 &&
@@ -152,6 +154,17 @@ int mm_support(void) // From linearblend
     if (eax & 0x01000000)
       rval |= MM_MMXEXT;
     return rval;
+  } else if (ebx == 0x756e6547 &&
+             edx == 0x54656e69 &&
+             ecx == 0x3638784d) {
+     /* Tranmeta Crusoe */
+     cpuid(0x80000000, eax, ebx, ecx, edx);
+     if ((unsigned)eax < 0x80000001)
+       return 0;
+     cpuid(0x80000001, eax, ebx, ecx, edx);
+     if ((edx & 0x00800000) == 0)
+       return 0;
+     return MM_MMX;
   } else {
     return 0;
   }

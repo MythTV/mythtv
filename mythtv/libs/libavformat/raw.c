@@ -25,10 +25,9 @@ static int raw_write_header(struct AVFormatContext *s)
     return 0;
 }
 
-static int raw_write_packet(struct AVFormatContext *s, int stream_index,
-			    const uint8_t *buf, int size, int64_t pts)
+static int raw_write_packet(struct AVFormatContext *s, AVPacket *pkt)
 {
-    put_buffer(&s->pb, buf, size);
+    put_buffer(&s->pb, pkt->data, pkt->size);
     put_flush_packet(&s->pb);
     return 0;
 }
@@ -88,13 +87,13 @@ static int raw_read_packet(AVFormatContext *s, AVPacket *pkt)
     size= RAW_PACKET_SIZE;
 
     if (av_new_packet(pkt, size) < 0)
-        return -EIO;
+        return AVERROR_IO;
 
     pkt->stream_index = 0;
     ret = get_buffer(&s->pb, pkt->data, size);
     if (ret <= 0) {
         av_free_packet(pkt);
-        return -EIO;
+        return AVERROR_IO;
     }
     /* note: we need to modify the packet size here to handle the last
        packet */
@@ -109,13 +108,13 @@ static int raw_read_partial_packet(AVFormatContext *s, AVPacket *pkt)
     size = RAW_PACKET_SIZE;
 
     if (av_new_packet(pkt, size) < 0)
-        return -EIO;
+        return AVERROR_IO;
 
     pkt->stream_index = 0;
     ret = get_partial_buffer(&s->pb, pkt->data, size);
     if (ret <= 0) {
         av_free_packet(pkt);
-        return -EIO;
+        return AVERROR_IO;
     }
     pkt->size = ret;
     return ret;
@@ -159,11 +158,11 @@ int pcm_read_seek(AVFormatContext *s,
         return -1;
 
     /* compute the position by aligning it to block_align */
-    pos = (timestamp * byte_rate) / AV_TIME_BASE;
+    pos = av_rescale(timestamp * byte_rate, st->time_base.num, st->time_base.den);
     pos = (pos / block_align) * block_align;
 
     /* recompute exact position */
-    st->cur_dts = (pos * AV_TIME_BASE) / byte_rate;
+    st->cur_dts = av_rescale(pos, st->time_base.den, byte_rate * (int64_t)st->time_base.num);
     url_fseek(&s->pb, pos + s->data_offset, SEEK_SET);
     return 0;
 }
@@ -180,6 +179,23 @@ static int ac3_read_header(AVFormatContext *s,
 
     st->codec.codec_type = CODEC_TYPE_AUDIO;
     st->codec.codec_id = CODEC_ID_AC3;
+    st->need_parsing = 1;
+    /* the parameters will be extracted from the compressed bitstream */
+    return 0;
+}
+
+/* dts read */
+static int dts_read_header(AVFormatContext *s,
+                           AVFormatParameters *ap)
+{
+    AVStream *st;
+
+    st = av_new_stream(s, 0);
+    if (!st)
+        return AVERROR_NOMEM;
+
+    st->codec.codec_type = CODEC_TYPE_AUDIO;
+    st->codec.codec_id = CODEC_ID_DTS;
     st->need_parsing = 1;
     /* the parameters will be extracted from the compressed bitstream */
     return 0;
@@ -260,6 +276,21 @@ static int h263_probe(AVProbeData *p)
     return 0;
 }
 
+static int h261_probe(AVProbeData *p)
+{
+    int code;
+    const uint8_t *d;
+
+    if (p->buf_size < 6)
+        return 0;
+    d = p->buf;
+    code = (d[0] << 12) | (d[1] << 4) | (d[2] >> 4);
+    if (code == 0x10) {
+        return 50;
+    }
+    return 0;
+}
+
 AVInputFormat ac3_iformat = {
     "ac3",
     "raw ac3",
@@ -285,6 +316,29 @@ AVOutputFormat ac3_oformat = {
     raw_write_trailer,
 };
 #endif //CONFIG_ENCODERS
+
+AVInputFormat dts_iformat = {
+    "dts",
+    "raw dts",
+    0,
+    NULL,
+    dts_read_header,
+    raw_read_partial_packet,
+    raw_read_close,
+    .extensions = "dts",
+};
+
+AVInputFormat h261_iformat = {
+    "h261",
+    "raw h261",
+    0,
+    h261_probe,
+    video_read_header,
+    raw_read_partial_packet,
+    raw_read_close,
+    .extensions = "h261",
+    .value = CODEC_ID_H261,
+};
 
 AVInputFormat h263_iformat = {
     "h263",
@@ -506,7 +560,7 @@ static int rawvideo_read_packet(AVFormatContext *s, AVPacket *pkt)
         av_abort();
 
     if (av_new_packet(pkt, packet_size) < 0)
-        return -EIO;
+        return AVERROR_IO;
 
     pkt->stream_index = 0;
 #if 0
@@ -517,7 +571,7 @@ static int rawvideo_read_packet(AVFormatContext *s, AVPacket *pkt)
 #endif
     if (ret != pkt->size) {
         av_free_packet(pkt);
-        return -EIO;
+        return AVERROR_IO;
     } else {
         return 0;
     }
@@ -551,9 +605,7 @@ AVOutputFormat rawvideo_oformat = {
 #endif //CONFIG_ENCODERS
 
 #ifdef CONFIG_ENCODERS
-static int null_write_packet(struct AVFormatContext *s, 
-                             int stream_index,
-                             const uint8_t *buf, int size, int64_t pts)
+static int null_write_packet(struct AVFormatContext *s, AVPacket *pkt)
 {
     return 0;
 }
@@ -588,6 +640,10 @@ int raw_init(void)
 {
     av_register_input_format(&ac3_iformat);
     av_register_output_format(&ac3_oformat);
+
+    av_register_input_format(&dts_iformat);
+
+    av_register_input_format(&h261_iformat);
 
     av_register_input_format(&h263_iformat);
     av_register_output_format(&h263_oformat);

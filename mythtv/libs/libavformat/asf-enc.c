@@ -285,6 +285,8 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
     for(n=0;n<s->nb_streams;n++) {
         enc = &s->streams[n]->codec;
 
+        av_set_pts_info(s->streams[n], 32, 1, 1000); /* 32 bit pts in ms */
+
         bit_rate += enc->bit_rate;
     }
 
@@ -308,7 +310,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
     put_le64(pb, asf->nb_packets); /* number of packets */
     put_le64(pb, asf->duration); /* end time stamp (in 100ns units) */
     put_le64(pb, asf->duration); /* duration (in 100ns units) */
-    put_le32(pb, 0); /* start time stamp */
+    put_le32(pb, preroll_time); /* start time stamp */
     put_le32(pb, 0); /* ??? */
     put_le32(pb, asf->is_streamed ? 1 : 0); /* ??? */
     put_le32(pb, asf->packet_size); /* packet size */
@@ -469,8 +471,6 @@ static int asf_write_header(AVFormatContext *s)
 {
     ASFContext *asf = s->priv_data;
 
-    av_set_pts_info(s, 32, 1, 1000); /* 32 bit pts in ms */
-
     asf->packet_size = PACKET_SIZE;
     asf->nb_packets = 0;
 
@@ -586,7 +586,8 @@ static void put_payload_header(
                                 int             presentation_time,
                                 int             m_obj_size,
                                 int             m_obj_offset,
-                                int             payload_len
+                                int             payload_len,
+                                int             flags
             )
 {
     ASFContext *asf = s->priv_data;
@@ -594,7 +595,7 @@ static void put_payload_header(
     int val;
     
     val = stream->num;
-    if (s->streams[val - 1]->codec.coded_frame->key_frame)
+    if (flags & PKT_FLAG_KEY)
         val |= ASF_PL_FLAG_KEY_FRAME;
     put_byte(pb, val);
         
@@ -621,7 +622,8 @@ static void put_frame(
                     ASFStream       *stream,
 		    int             timestamp,
                     const uint8_t   *buf,
-		    int             m_obj_size
+		    int             m_obj_size,
+                    int             flags
 		)
 {
     ASFContext *asf = s->priv_data;
@@ -662,7 +664,7 @@ static void put_frame(
             else if (payload_len == (frag_len1 - 1))
                 payload_len = frag_len1 - 2;  //additional byte need to put padding length
             
-            put_payload_header(s, stream, timestamp+preroll_time, m_obj_size, m_obj_offset, payload_len);
+            put_payload_header(s, stream, timestamp+preroll_time, m_obj_size, m_obj_offset, payload_len, flags);
             put_buffer(&asf->pb, buf, payload_len);
 
             if (asf->multi_payloads_present)
@@ -686,17 +688,17 @@ static void put_frame(
     stream->seq++;
 }
 
-static int asf_write_packet(AVFormatContext *s, int stream_index,
-                            const uint8_t *buf, int size, int64_t timestamp)
+static int asf_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     ASFContext *asf = s->priv_data;
     ASFStream *stream;
     int64_t duration;
     AVCodecContext *codec;
 
-    codec = &s->streams[stream_index]->codec;
-    stream = &asf->streams[stream_index];
+    codec = &s->streams[pkt->stream_index]->codec;
+    stream = &asf->streams[pkt->stream_index];
 
+    //XXX /FIXME use duration from AVPacket
     if (codec->codec_type == CODEC_TYPE_AUDIO) {
         duration = (codec->frame_number * codec->frame_size * int64_t_C(10000000)) /
             codec->sample_rate;
@@ -706,7 +708,7 @@ static int asf_write_packet(AVFormatContext *s, int stream_index,
     if (duration > asf->duration)
         asf->duration = duration;
 
-    put_frame(s, stream, timestamp, buf, size);
+    put_frame(s, stream, pkt->pts, pkt->data, pkt->size, pkt->flags);
     return 0;
 }
 

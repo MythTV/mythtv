@@ -543,7 +543,7 @@ static int ipmovie_read_header(AVFormatContext *s,
      * it; if it is the first video chunk, this is a silent file */
     if (get_buffer(pb, chunk_preamble, CHUNK_PREAMBLE_SIZE) !=
         CHUNK_PREAMBLE_SIZE)
-        return -EIO;
+        return AVERROR_IO;
     chunk_type = LE_16(&chunk_preamble[2]);
     url_fseek(pb, -CHUNK_PREAMBLE_SIZE, SEEK_CUR);
 
@@ -552,14 +552,11 @@ static int ipmovie_read_header(AVFormatContext *s,
     else if (process_ipmovie_chunk(ipmovie, pb, &pkt) != CHUNK_INIT_AUDIO)
         return AVERROR_INVALIDDATA;
 
-    /* set the pts reference (1 pts = 1/90000) */
-    s->pts_num = 1;
-    s->pts_den = 90000;
-
     /* initialize the stream decoders */
     st = av_new_stream(s, 0);
     if (!st)
         return AVERROR_NOMEM;
+    av_set_pts_info(st, 33, 1, 90000);
     ipmovie->video_stream_index = st->index;
     st->codec.codec_type = CODEC_TYPE_VIDEO;
     st->codec.codec_id = CODEC_ID_INTERPLAY_VIDEO;
@@ -574,6 +571,7 @@ static int ipmovie_read_header(AVFormatContext *s,
         st = av_new_stream(s, 0);
         if (!st)
             return AVERROR_NOMEM;
+        av_set_pts_info(st, 33, 1, 90000);
         ipmovie->audio_stream_index = st->index;
         st->codec.codec_type = CODEC_TYPE_AUDIO;
         st->codec.codec_id = ipmovie->audio_type;
@@ -602,7 +600,7 @@ static int ipmovie_read_packet(AVFormatContext *s,
     if (ret == CHUNK_BAD)
         ret = AVERROR_INVALIDDATA;
     else if (ret == CHUNK_EOF)
-        ret = -EIO;
+        ret = AVERROR_IO;
     else if (ret == CHUNK_NOMEM)
         ret = AVERROR_NOMEM;
     else

@@ -195,7 +195,7 @@ static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* bu
     case dv_timecode:
           ct = (time_t)(c->frames / ((float)c->sys->frame_rate / 
                                      (float)c->sys->frame_rate_base));
-          localtime_r(&ct, &tc);
+          brktimegm(ct, &tc);
           /* 
            * LTC drop-frame frame counter drops two frames (0 and 1) every 
            * minute, unless it is exactly divisible by 10
@@ -253,14 +253,15 @@ static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* bu
     case dv_viedo_recdate:  /* VAUX recording date */
           ct = c->start_time + (time_t)(c->frames / 
 	       ((float)c->sys->frame_rate / (float)c->sys->frame_rate_base));
-          localtime_r(&ct, &tc);
+          brktimegm(ct, &tc);
 	  buf[1] = 0xff; /* ds, tm, tens of time zone, units of time zone */
 	                 /* 0xff is very likely to be "unknown" */
 	  buf[2] = (3 << 6) | /* reserved -- always 1 */
 		   ((tc.tm_mday / 10) << 4) | /* Tens of day */
 		   (tc.tm_mday % 10);         /* Units of day */
 	  buf[3] = /* we set high 4 bits to 0, shouldn't we set them to week? */
-		   (tc.tm_mon % 10);         /* Units of month */
+	           ((tc.tm_mon / 10) << 4) |    /* Tens of month */
+		   (tc.tm_mon  % 10);           /* Units of month */
 	  buf[4] = (((tc.tm_year % 100) / 10) << 4) | /* Tens of year */
 		   (tc.tm_year % 10);                 /* Units of year */
           break;
@@ -268,7 +269,7 @@ static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* bu
     case dv_video_rectime:  /* VAUX recording time */
           ct = c->start_time + (time_t)(c->frames / 
 	       ((float)c->sys->frame_rate / (float)c->sys->frame_rate_base));
-          localtime_r(&ct, &tc);
+	  brktimegm(ct, &tc);
 	  buf[1] = (3 << 6) | /* reserved -- always 1 */
 		   0x3f; /* tens of frame, units of frame: 0x3f - "unknown" ? */
 	  buf[2] = (1 << 7) | /* reserved -- always 1 */ 
@@ -391,12 +392,16 @@ static void dv_format_frame(DVMuxContext *c, uint8_t* buf)
 
 static void dv_inject_audio(DVMuxContext *c, const uint8_t* pcm, uint8_t* frame_ptr)
 {
-    int i, j, d, of;
+    int i, j, d, of, size;
+    size = 4 * dv_audio_frame_size(c->sys, c->frames);
     for (i = 0; i < c->sys->difseg_size; i++) {
        frame_ptr += 6 * 80; /* skip DIF segment header */
        for (j = 0; j < 9; j++) {
           for (d = 8; d < 80; d+=2) {
 	     of = c->sys->audio_shuffle[i][j] + (d - 8)/2 * c->sys->audio_stride;
+	     if (of*2 >= size)
+	         continue;
+	     
 	     frame_ptr[d] = pcm[of*2+1]; // FIXME: may be we have to admit
 	     frame_ptr[d+1] = pcm[of*2]; //        that DV is a big endian PCM       
           }
@@ -550,6 +555,7 @@ static int dv_extract_audio_info(DVDemuxContext* c, uint8_t* frame)
     if (c->ach == 2 && !c->ast[1]) {
         c->ast[1] = av_new_stream(c->fctx, 0);
 	if (c->ast[1]) {
+            av_set_pts_info(c->ast[1], 64, 1, 30000);
 	    c->ast[1]->codec.codec_type = CODEC_TYPE_AUDIO;
 	    c->ast[1]->codec.codec_id = CODEC_ID_PCM_S16LE;
 	} else
@@ -721,6 +727,9 @@ DVDemuxContext* dv_init_demux(AVFormatContext *s)
     c->ast[0] = av_new_stream(s, 0);
     if (!c->vst || !c->ast[0])
         goto fail;
+    av_set_pts_info(c->vst, 64, 1, 30000);
+    av_set_pts_info(c->ast[0], 64, 1, 30000);
+
     c->fctx = s;
     c->ast[1] = NULL;
     c->ach = 0;
@@ -737,8 +746,6 @@ DVDemuxContext* dv_init_demux(AVFormatContext *s)
     c->ast[0]->codec.codec_id = CODEC_ID_PCM_S16LE;
    
     s->ctx_flags |= AVFMTCTX_NOHEADER; 
-    
-    av_set_pts_info(s, 64, 1, 30000);
     
     return c;
     
@@ -848,11 +855,11 @@ static int dv_read_packet(AVFormatContext *s, AVPacket *pkt)
     
     if (size < 0) {
         if (get_buffer(&s->pb, c->buf, 4) <= 0) 
-            return -EIO;
+            return AVERROR_IO;
     
         size = dv_frame_profile(c->buf)->frame_size;
         if (get_buffer(&s->pb, c->buf + 4, size - 4) <= 0)
-	    return -EIO;
+	    return AVERROR_IO;
 
 	size = dv_produce_packet(c->dv_demux, pkt, c->buf, size);
     } 
@@ -886,15 +893,13 @@ static int dv_write_header(AVFormatContext *s)
     return 0;
 }
 
-static int dv_write_packet(struct AVFormatContext *s, 
-                           int stream_index,
-                           const uint8_t *buf, int size, int64_t pts)
+static int dv_write_packet(struct AVFormatContext *s, AVPacket *pkt)
 {
     uint8_t* frame;
     int fsize;
    
-    fsize = dv_assemble_frame((DVMuxContext *)s->priv_data, s->streams[stream_index],
-                              buf, size, &frame);
+    fsize = dv_assemble_frame((DVMuxContext *)s->priv_data, s->streams[pkt->stream_index],
+                              pkt->data, pkt->size, &frame);
     if (fsize > 0) {
         put_buffer(&s->pb, frame, fsize); 
         put_flush_packet(&s->pb);

@@ -43,6 +43,7 @@ typedef struct {
     offset_t frames_hdr_all, frames_hdr_strm[MAX_STREAMS];
     int audio_strm_length[MAX_STREAMS];
     int riff_id;
+    int packet_count[MAX_STREAMS];
 
     AVIIndex indexes[MAX_STREAMS];
 } AVIContext;
@@ -130,6 +131,8 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_MPEG2VIDEO, MKTAG('m', 'p', 'g', '2') }, 
     { CODEC_ID_MPEG1VIDEO, MKTAG('P', 'I', 'M', '1') }, 
     { CODEC_ID_MPEG1VIDEO, MKTAG('V', 'C', 'R', '2') }, 
+    { CODEC_ID_MPEG1VIDEO, 0x10000001 }, 
+    { CODEC_ID_MPEG2VIDEO, 0x10000002 }, 
     { CODEC_ID_MJPEG, MKTAG('M', 'J', 'P', 'G') },
     { CODEC_ID_MJPEG, MKTAG('L', 'J', 'P', 'G') },
     { CODEC_ID_LJPEG, MKTAG('L', 'J', 'P', 'G') },
@@ -158,9 +161,12 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_TRUEMOTION1, MKTAG('D', 'U', 'C', 'K') },
     { CODEC_ID_MSZH, MKTAG('M', 'S', 'Z', 'H') },
     { CODEC_ID_ZLIB, MKTAG('Z', 'L', 'I', 'B') },
+    { CODEC_ID_SNOW, MKTAG('S', 'N', 'O', 'W') },
     { CODEC_ID_4XM, MKTAG('4', 'X', 'M', 'V') },
     { CODEC_ID_FLV1, MKTAG('F', 'L', 'V', '1') },
     { CODEC_ID_SVQ1, MKTAG('s', 'v', 'q', '1') },
+    { CODEC_ID_TSCC, MKTAG('t', 's', 'c', 'c') },
+    { CODEC_ID_RAWVIDEO, 0 },
     { 0, 0 },
 };
 
@@ -380,6 +386,7 @@ static int avi_write_header(AVFormatContext *s)
             
             put_le32(pb, stream->frame_rate_base); /* scale */
             put_le32(pb, stream->frame_rate); /* rate */
+            av_set_pts_info(s->streams[i], 64, stream->frame_rate_base, stream->frame_rate);
 
             put_le32(pb, 0); /* start */
             avi->frames_hdr_strm[i] = url_ftell(pb); /* remember this offset to fill later */
@@ -402,6 +409,7 @@ static int avi_write_header(AVFormatContext *s)
             parse_specific_params(stream, &au_byterate, &au_ssize, &au_scale);
             put_le32(pb, au_scale); /* scale */
             put_le32(pb, au_byterate); /* rate */
+//            av_set_pts_info(&s->streams[i], 64, au_scale, au_byterate);
             put_le32(pb, 0); /* start */
             avi->frames_hdr_strm[i] = url_ftell(pb); /* remember this offset to fill later */
             put_le32(pb, 0); /* length, XXX: filled later */
@@ -607,14 +615,28 @@ static int avi_write_idx1(AVFormatContext *s)
     return 0;
 }
 
-static int avi_write_packet(AVFormatContext *s, int stream_index,
-                            const uint8_t *buf, int size, int64_t pts)
+static int avi_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     AVIContext *avi = s->priv_data;
     ByteIOContext *pb = &s->pb;
     unsigned char tag[5];
-    unsigned int flags;
-    AVCodecContext *enc;
+    unsigned int flags=0;
+    const int stream_index= pkt->stream_index;
+    AVCodecContext *enc= &s->streams[stream_index]->codec;
+    int size= pkt->size;
+
+//    av_log(s, AV_LOG_DEBUG, "%lld %d %d\n", pkt->dts, avi->packet_count[stream_index], stream_index);
+    while(enc->codec_type == CODEC_TYPE_VIDEO && pkt->dts != AV_NOPTS_VALUE && pkt->dts > avi->packet_count[stream_index]){
+        AVPacket empty_packet;
+
+        av_init_packet(&empty_packet);
+        empty_packet.size= 0;
+        empty_packet.data= NULL;
+        empty_packet.stream_index= stream_index;
+        avi_write_packet(s, &empty_packet);
+//        av_log(s, AV_LOG_DEBUG, "dup %lld %d\n", pkt->dts, avi->packet_count[stream_index]);
+    }
+    avi->packet_count[stream_index]++;
 
     if (url_ftell(pb) - avi->riff_start > AVI_MAX_RIFF_SIZE) { 
         avi_write_ix(s);
@@ -627,13 +649,12 @@ static int avi_write_packet(AVFormatContext *s, int stream_index,
 	avi->movi_list = avi_start_new_riff(avi, pb, "AVIX", "movi");
     }
     
-    enc = &s->streams[stream_index]->codec;
     avi_stream2fourcc(&tag[0], stream_index, enc->codec_type);
+    if(pkt->flags&PKT_FLAG_KEY)
+        flags = 0x10;
     if (enc->codec_type == CODEC_TYPE_AUDIO) {
        avi->audio_strm_length[stream_index] += size;
-       flags = 0x10;
-    } else
-       flags = enc->coded_frame->key_frame ? 0x10 : 0x00;
+    }
 
     if (!url_is_streamed(&s->pb)) {
         AVIIndex* idx = &avi->indexes[stream_index];
@@ -657,7 +678,7 @@ static int avi_write_packet(AVFormatContext *s, int stream_index,
     
     put_buffer(pb, tag, 4);
     put_le32(pb, size);
-    put_buffer(pb, buf, size);
+    put_buffer(pb, pkt->data, size);
     if (size & 1)
         put_byte(pb, 0);
 

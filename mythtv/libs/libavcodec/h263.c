@@ -1395,7 +1395,7 @@ void ff_h263_loop_filter(MpegEncContext * s){
                 const int chroma_qp= s->chroma_qscale_table[qp_dt];
                 s->dsp.h263_h_loop_filter(dest_y -8*linesize  ,   linesize, qp_dt);
                 s->dsp.h263_h_loop_filter(dest_cb-8*uvlinesize, uvlinesize, chroma_qp);
-                s->dsp.h263_h_loop_filter(dest_cb-8*uvlinesize, uvlinesize, chroma_qp);
+                s->dsp.h263_h_loop_filter(dest_cr-8*uvlinesize, uvlinesize, chroma_qp);
             }
         }
     }
@@ -1630,30 +1630,12 @@ void ff_h263_encode_motion(MpegEncContext * s, int val, int f_code)
         bit_size = f_code - 1;
         range = 1 << bit_size;
         /* modulo encoding */
-        l = range * 32;
-#if 1
-        val+= l;
-        val&= 2*l-1;
-        val-= l;
+        l= INT_BIT - 6 - bit_size;
+        val = (val<<l)>>l;
         sign = val>>31;
         val= (val^sign)-sign;
         sign&=1;
-#else
-        if (val < -l) {
-            val += 2*l;
-        } else if (val >= l) {
-            val -= 2*l;
-        }
 
-        assert(val>=-l && val<l);
-
-        if (val >= 0) {
-            sign = 0;
-        } else {
-            val = -val;
-            sign = 1;
-        }
-#endif
         val--;
         code = (val >> bit_size) + 1;
         bits = val & (range - 1);
@@ -2172,13 +2154,26 @@ static void mpeg4_encode_visual_object_header(MpegEncContext * s){
     int profile_and_level_indication;
     int vo_ver_id;
     
-    if(s->max_b_frames || s->quarter_sample){
-        profile_and_level_indication= 0xF1; // adv simple level 1
+    if(s->avctx->profile != FF_PROFILE_UNKNOWN){
+        profile_and_level_indication = s->avctx->profile << 4;
+    }else if(s->max_b_frames || s->quarter_sample){
+        profile_and_level_indication= 0xF0; // adv simple
+    }else{
+        profile_and_level_indication= 0x00; // simple
+    }
+
+    if(s->avctx->level != FF_LEVEL_UNKNOWN){
+        profile_and_level_indication |= s->avctx->level;
+    }else{
+        profile_and_level_indication |= 1; //level 1
+    }
+
+    if(profile_and_level_indication>>4 == 0xF){
         vo_ver_id= 5;
     }else{
-        profile_and_level_indication= 0x01; // simple level 1
         vo_ver_id= 1;
     }
+
     //FIXME levels
 
     put_bits(&s->pb, 16, 0);
@@ -4375,8 +4370,8 @@ static int h263_decode_motion(MpegEncContext * s, int pred, int f_code)
 
     /* modulo decoding */
     if (!s->h263_long_vectors) {
-        l = 1 << (f_code + 4);
-        val = ((val + l)&(l*2-1)) - l;
+        l = INT_BIT - 5 - f_code;
+        val = (val<<l)>>l;
     } else {
         /* horrible h263 long vector mode */
         if (pred < -31 && val < -63)
@@ -4717,8 +4712,6 @@ static inline int mpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
 
             if (cache&0x80000000) {
                 if (cache&0x40000000) {
-                    int ulevel;
-
                     /* third escape */
                     SKIP_CACHE(re, &s->gb, 2);
                     last=  SHOW_UBITS(re, &s->gb, 1); SKIP_CACHE(re, &s->gb, 1);
@@ -4744,16 +4737,6 @@ static inline int mpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
                         SKIP_COUNTER(re, &s->gb, 1+12+1);
                     }
  
-                    if(s->mpeg_quant){
-                        if(intra) ulevel= level*s->qscale*s->intra_matrix[scan_table[1]];
-                        else      ulevel= level*s->qscale*s->inter_matrix[scan_table[0]];
-                    }else
-                        ulevel= level*s->qscale*16;
-                    if(ulevel>1030*16 || ulevel<-1030*16){
-                        av_log(s->avctx, AV_LOG_ERROR, "|level| overflow in 3. esc, qp=%d\n", s->qscale);
-                        return -1;
-                    }
-
 #if 0
                     if(s->error_resilience >= FF_ER_COMPLIANT){
                         const int abs_level= ABS(level);
@@ -4778,6 +4761,16 @@ static inline int mpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
 #endif
 		    if (level>0) level= level * qmul + qadd;
                     else         level= level * qmul - qadd;
+
+                    if((unsigned)(level + 2048) > 4095){
+                        if(s->error_resilience > FF_ER_COMPLIANT){
+                            if(level > 2560 || level<-2560){
+                                av_log(s->avctx, AV_LOG_ERROR, "|level| overflow in 3. esc, qp=%d\n", s->qscale);
+                                return -1;
+                            }
+                        }
+                        level= level<0 ? -2048 : 2047;
+                    }
 
                     i+= run + 1;
                     if(last) i+=192;
@@ -5418,6 +5411,8 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
     if (get_bits1(gb) != 0) {   /* fixed_vop_rate  */
         skip_bits(gb, s->time_increment_bits);
     }
+    
+    s->t_frame=0;
 
     if (s->shape != BIN_ONLY_SHAPE) {
         if (s->shape == RECT_SHAPE) {
@@ -5691,7 +5686,7 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
     else time_increment= get_bits(gb, s->time_increment_bits);
     
 //    printf("%d %X\n", s->time_increment_bits, time_increment);
-//printf(" type:%d modulo_time_base:%d increment:%d\n", s->pict_type, time_incr, time_increment);
+//av_log(s->avctx, AV_LOG_DEBUG, " type:%d modulo_time_base:%d increment:%d t_frame %d\n", s->pict_type, time_incr, time_increment, s->t_frame);
     if(s->pict_type!=B_TYPE){
         s->last_time_base= s->time_base;
         s->time_base+= time_incr;
@@ -5713,19 +5708,19 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
             return FRAME_SKIPED;
         }
         
-        if(s->t_frame==0) s->t_frame= s->time - s->last_time_base;
+        if(s->t_frame==0) s->t_frame= s->pb_time;
         if(s->t_frame==0) s->t_frame=1; // 1/0 protection
-//printf("%Ld %Ld %d %d\n", s->last_non_b_time, s->time, s->pp_time, s->t_frame); fflush(stdout);
         s->pp_field_time= (  ROUNDED_DIV(s->last_non_b_time, s->t_frame) 
                            - ROUNDED_DIV(s->last_non_b_time - s->pp_time, s->t_frame))*2;
         s->pb_field_time= (  ROUNDED_DIV(s->time, s->t_frame) 
                            - ROUNDED_DIV(s->last_non_b_time - s->pp_time, s->t_frame))*2;
     }
+//av_log(s->avctx, AV_LOG_DEBUG, "last nonb %Ld last_base %d time %Ld pp %d pb %d t %d ppf %d pbf %d\n", s->last_non_b_time, s->last_time_base, s->time, s->pp_time, s->pb_time, s->t_frame, s->pp_field_time, s->pb_field_time);
     
     s->current_picture_ptr->pts= s->time*(int64_t)AV_TIME_BASE / s->time_increment_resolution;
     if(s->avctx->debug&FF_DEBUG_PTS)
         av_log(s->avctx, AV_LOG_DEBUG, "MPEG4 PTS: %f\n", s->current_picture_ptr->pts/(float)AV_TIME_BASE);
-    
+
     check_marker(gb, "before vop_coded");
     
     /* vop coded */
@@ -6060,7 +6055,7 @@ int flv_h263_decode_picture_header(MpegEncContext *s)
     s->dropable= s->pict_type > P_TYPE;
     if (s->dropable)
         s->pict_type = P_TYPE;
-
+    
     skip_bits1(&s->gb);	/* deblocking flag */
     s->chroma_qscale= s->qscale = get_bits(&s->gb, 5);
 

@@ -57,7 +57,7 @@ int rtp_set_remote_url(URLContext *h, const char *uri)
     char buf[1024];
     char path[1024];
     
-    url_split(NULL, 0, hostname, sizeof(hostname), &port, 
+    url_split(NULL, 0, NULL, 0, hostname, sizeof(hostname), &port, 
               path, sizeof(path), uri);
 
     snprintf(buf, sizeof(buf), "udp://%s:%d%s", hostname, port, path);
@@ -122,7 +122,7 @@ static int rtp_open(URLContext *h, const char *uri, int flags)
         return -ENOMEM;
     h->priv_data = s;
     
-    url_split(NULL, 0, hostname, sizeof(hostname), &port, 
+    url_split(NULL, 0, NULL, 0, hostname, sizeof(hostname), &port, 
               path, sizeof(path), uri);
     /* extract parameters */
     is_multicast = 0;
@@ -168,7 +168,7 @@ static int rtp_open(URLContext *h, const char *uri, int flags)
     if (s->rtcp_hd)
         url_close(s->rtcp_hd);
     av_free(s);
-    return -EIO;
+    return AVERROR_IO;
 }
 
 static int rtp_read(URLContext *h, uint8_t *buf, int size)
@@ -185,7 +185,7 @@ static int rtp_read(URLContext *h, uint8_t *buf, int size)
         if (len < 0) {
             if (errno == EAGAIN || errno == EINTR)
                 continue;
-            return -EIO;
+            return AVERROR_IO;
         }
         break;
     }
@@ -208,7 +208,7 @@ static int rtp_read(URLContext *h, uint8_t *buf, int size)
                 if (len < 0) {
                     if (errno == EAGAIN || errno == EINTR)
                         continue;
-                    return -EIO;
+                    return AVERROR_IO;
                 }
                 break;
             }
@@ -220,7 +220,7 @@ static int rtp_read(URLContext *h, uint8_t *buf, int size)
                 if (len < 0) {
                     if (errno == EAGAIN || errno == EINTR)
                         continue;
-                    return -EIO;
+                    return AVERROR_IO;
                 }
                 break;
             }

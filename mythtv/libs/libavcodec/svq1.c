@@ -600,7 +600,6 @@ static uint16_t svq1_packet_checksum (uint8_t *data, int length, int value) {
   return value;
 }
 
-#if 0
 static uint16_t svq1_component_checksum (uint16_t *pixels, int pitch,
                                          int width, int height, int value) {
   int x, y;
@@ -615,7 +614,6 @@ static uint16_t svq1_component_checksum (uint16_t *pixels, int pitch,
 
   return value;
 }
-#endif
 
 static void svq1_parse_string (GetBitContext *bitbuf, uint8_t *out) {
   uint8_t seed;
@@ -715,8 +713,6 @@ static int svq1_decode_frame(AVCodecContext *avctx,
   int		result, i, x, y, width, height;
   AVFrame *pict = data; 
 
-  *data_size=0;
-  
   if(buf==NULL && buf_size==0){
       return 0;
   }
@@ -918,6 +914,9 @@ static void svq1_write_header(SVQ1Context *s, int frame_type)
 #define QUALITY_THRESHOLD 100
 #define THRESHOLD_MULTIPLIER 0.6
 
+#if defined(HAVE_ALTIVEC)
+#undef vector
+#endif
 
 static int encode_block(SVQ1Context *s, uint8_t *src, uint8_t *ref, uint8_t *decoded, int stride, int level, int threshold, int lambda, int intra){
     int count, y, x, i, j, split, best_mean, best_score, best_count;
@@ -1068,6 +1067,8 @@ static int encode_block(SVQ1Context *s, uint8_t *src, uint8_t *ref, uint8_t *dec
     return best_score;
 }
 
+#ifdef CONFIG_ENCODERS
+
 static void svq1_encode_plane(SVQ1Context *s, int plane, unsigned char *src_plane, unsigned char *ref_plane, unsigned char *decoded_plane,
     int width, int height, int src_stride, int stride)
 {
@@ -1107,10 +1108,10 @@ static void svq1_encode_plane(SVQ1Context *s, int plane, unsigned char *src_plan
         s->m.me_method= s->avctx->me_method;
         
         if(!s->motion_val8[plane]){
-            s->motion_val8 [plane]= av_mallocz(s->m.b8_stride*block_height*2*2*sizeof(int16_t));
-            s->motion_val16[plane]= av_mallocz(s->m.mb_stride*block_height*2*sizeof(int16_t));
+            s->motion_val8 [plane]= av_mallocz((s->m.b8_stride*block_height*2 + 2)*2*sizeof(int16_t));
+            s->motion_val16[plane]= av_mallocz((s->m.mb_stride*(block_height + 2) + 1)*2*sizeof(int16_t));
         }
-        
+
         s->m.mb_type= s->mb_type;
         
         //dummies, to avoid segfaults
@@ -1119,8 +1120,8 @@ static void svq1_encode_plane(SVQ1Context *s, int plane, unsigned char *src_plan
         s->m.current_picture.mc_mb_var= (uint16_t*)s->dummy;
         s->m.current_picture.mb_type= s->dummy;
         
-        s->m.current_picture.motion_val[0]= s->motion_val8[plane];
-        s->m.p_mv_table= s->motion_val16[plane];
+        s->m.current_picture.motion_val[0]= s->motion_val8[plane] + 2;
+        s->m.p_mv_table= s->motion_val16[plane] + s->m.mb_stride + 1;
         s->m.dsp= s->dsp; //move
         ff_init_me(&s->m);
     
@@ -1293,11 +1294,6 @@ static int svq1_encode_init(AVCodecContext *avctx)
     s->dummy          = av_mallocz((s->y_block_width+1)*s->y_block_height*sizeof(int32_t));
     h263_encode_init(&s->m); //mv_penalty
     
-av_log(s->avctx, AV_LOG_INFO, " Hey: %d x %d, %d x %d, %d x %d\n",
-  s->frame_width, s->frame_height,
-  s->y_block_width, s->y_block_height,
-  s->c_block_width, s->c_block_height);
-
     return 0;
 }
 
@@ -1367,6 +1363,8 @@ static int svq1_encode_end(AVCodecContext *avctx)
 
     return 0;
 }
+
+#endif //CONFIG_ENCODERS
 
 AVCodec svq1_decoder = {
     "svq1",

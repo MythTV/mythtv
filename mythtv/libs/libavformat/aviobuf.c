@@ -148,7 +148,8 @@ offset_t url_fseek(ByteIOContext *s, offset_t offset, int whence)
                 return -EPIPE;
             s->buf_ptr = s->buffer;
             s->buf_end = s->buffer;
-            s->seek(s->opaque, offset, SEEK_SET);
+            if (s->seek(s->opaque, offset, SEEK_SET) == (offset_t)-EPIPE)
+                return -EPIPE;
             s->pos = offset;
         }
         s->eof_reached = 0;
@@ -449,8 +450,8 @@ static int url_read_packet(void *opaque, uint8_t *buf, int buf_size)
 static int url_seek_packet(void *opaque, int64_t offset, int whence)
 {
     URLContext *h = opaque;
-    url_seek(h, offset, whence);
-    return 0;
+    return url_seek(h, offset, whence);
+    //return 0;
 }
 
 int url_fdopen(ByteIOContext *s, URLContext *h)
@@ -473,7 +474,7 @@ int url_fdopen(ByteIOContext *s, URLContext *h)
                       (h->flags & URL_WRONLY || h->flags & URL_RDWR), h,
                       url_read_packet, url_write_packet, url_seek_packet) < 0) {
         av_free(buffer);
-        return -EIO;
+        return AVERROR_IO;
     }
     s->is_streamed = h->is_streamed;
     s->max_packet_size = max_packet_size;

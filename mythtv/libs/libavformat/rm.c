@@ -324,7 +324,7 @@ static int rm_write_header(AVFormatContext *s)
     return 0;
 }
 
-static int rm_write_audio(AVFormatContext *s, const uint8_t *buf, int size)
+static int rm_write_audio(AVFormatContext *s, const uint8_t *buf, int size, int flags)
 {
     uint8_t *buf1;
     RMContext *rm = s->priv_data;
@@ -335,7 +335,7 @@ static int rm_write_audio(AVFormatContext *s, const uint8_t *buf, int size)
     /* XXX: suppress this malloc */
     buf1= (uint8_t*) av_malloc( size * sizeof(uint8_t) );
     
-    write_packet_header(s, stream, size, stream->enc->coded_frame->key_frame);
+    write_packet_header(s, stream, size, !!(flags & PKT_FLAG_KEY));
     
     /* for AC3, the words seems to be reversed */
     for(i=0;i<size;i+=2) {
@@ -349,12 +349,12 @@ static int rm_write_audio(AVFormatContext *s, const uint8_t *buf, int size)
     return 0;
 }
 
-static int rm_write_video(AVFormatContext *s, const uint8_t *buf, int size)
+static int rm_write_video(AVFormatContext *s, const uint8_t *buf, int size, int flags)
 {
     RMContext *rm = s->priv_data;
     ByteIOContext *pb = &s->pb;
     StreamInfo *stream = rm->video_stream;
-    int key_frame = stream->enc->coded_frame->key_frame;
+    int key_frame = !!(flags & PKT_FLAG_KEY);
 
     /* XXX: this is incorrect: should be a parameter */
 
@@ -389,14 +389,13 @@ static int rm_write_video(AVFormatContext *s, const uint8_t *buf, int size)
     return 0;
 }
 
-static int rm_write_packet(AVFormatContext *s, int stream_index, 
-                           const uint8_t *buf, int size, int64_t pts)
+static int rm_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
-    if (s->streams[stream_index]->codec.codec_type == 
+    if (s->streams[pkt->stream_index]->codec.codec_type == 
         CODEC_TYPE_AUDIO)
-        return rm_write_audio(s, buf, size);
+        return rm_write_audio(s, pkt->data, pkt->size, pkt->flags);
     else
-        return rm_write_video(s, buf, size);
+        return rm_write_video(s, pkt->data, pkt->size, pkt->flags);
 }
         
 static int rm_write_trailer(AVFormatContext *s)
@@ -564,7 +563,7 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
         /* very old .ra format */
         return rm_read_header_old(s, ap);
     } else if (tag != MKTAG('.', 'R', 'M', 'F')) {
-        return -EIO;
+        return AVERROR_IO;
     }
 
     get_be32(pb); /* header size */
@@ -640,7 +639,8 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
                     goto fail;
                 }
                 st->codec.codec_tag = get_le32(pb);
-                if (st->codec.codec_tag != MKTAG('R', 'V', '1', '0'))
+                if (   st->codec.codec_tag != MKTAG('R', 'V', '1', '0')
+                    && st->codec.codec_tag != MKTAG('R', 'V', '2', '0'))
                     goto fail1;
                 st->codec.width = get_be16(pb);
                 st->codec.height = get_be16(pb);
@@ -657,10 +657,11 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 case 0x10000000:
                 case 0x10003000:
                 case 0x10003001:
+                default:
                     st->codec.sub_id = h263_hack_version;
                     st->codec.codec_id = CODEC_ID_RV10;
                     break;
-                default:
+//                default:
                     /* not handled */
                     st->codec.codec_id = CODEC_ID_NONE;
                     break;
@@ -689,7 +690,7 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
     for(i=0;i<s->nb_streams;i++) {
         av_free(s->streams[i]);
     }
-    return -EIO;
+    return AVERROR_IO;
 }
 
 static int get_num(ByteIOContext *pb, int *len)
@@ -727,18 +728,18 @@ static int rm_read_packet(AVFormatContext *s, AVPacket *pkt)
         len = get_buffer(pb, pkt->data, len);
         if (len <= 0) {
             av_free_packet(pkt);
-            return -EIO;
+            return AVERROR_IO;
         }
         pkt->size = len;
         st = s->streams[0];
     } else {
     redo:
         if (rm->nb_packets == 0)
-            return -EIO;
+            return AVERROR_IO;
         get_be16(pb);
         len = get_be16(pb);
         if (len < 12)
-            return -EIO;
+            return AVERROR_IO;
         num = get_be16(pb);
         timestamp = get_be32(pb);
         get_byte(pb); /* reserved */

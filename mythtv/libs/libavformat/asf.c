@@ -148,8 +148,6 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
     int size, i;
     int64_t gsize;
 
-    av_set_pts_info(s, 32, 1, 1000); /* 32 bit pts in ms */
-
     get_guid(pb, &g);
     if (memcmp(&g, &asf_header, sizeof(GUID)))
         goto fail;
@@ -193,6 +191,7 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
             st = av_new_stream(s, 0);
             if (!st)
                 goto fail;
+            av_set_pts_info(st, 32, 1, 1000); /* 32 bit pts in ms */
             asf_st = av_mallocz(sizeof(ASFStream));
             if (!asf_st)
                 goto fail;
@@ -435,13 +434,13 @@ static int asf_get_packet(AVFormatContext *s)
 	if (get_le16(pb) != 0) {
             if (!url_feof(pb))
 		av_log(s, AV_LOG_ERROR, "ff asf bad non zero\n");
-	    return -EIO;
+	    return AVERROR_IO;
 	}
         rsize+=2;
 /*    }else{
         if (!url_feof(pb))
 	    printf("ff asf bad header %x  at:%lld\n", c, url_ftell(pb));
-	return -EIO;*/
+	return AVERROR_IO;*/
     }
 
     asf->packet_flags = get_byte(pb);
@@ -491,7 +490,7 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 	    ret = asf_get_packet(s);
 	    //printf("READ ASF PACKET  %d   r:%d   c:%d\n", ret, asf->packet_size_left, pc++);
 	    if (ret < 0 || url_feof(pb))
-		return -EIO;
+		return AVERROR_IO;
             asf->packet_time_start = 0;
             continue;
 	}
@@ -733,7 +732,7 @@ static int64_t asf_read_pts(AVFormatContext *s, int stream_index, int64_t *ppos,
     	    return AV_NOPTS_VALUE;
         }
         
-        pts= pkt->pts;
+        pts= pkt->pts * 1000 / AV_TIME_BASE;
 
         av_free_packet(pkt);
         if(pkt->flags&PKT_FLAG_KEY){
