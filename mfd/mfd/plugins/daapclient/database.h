@@ -21,6 +21,8 @@
 #include "../daapserver/daaplib/taginput.h"
 #include "../daapserver/daaplib/tagoutput.h"
 
+#include "server_types.h"
+
 class DaapClient;
 
 class Database
@@ -37,7 +39,8 @@ class Database
                 DaapClient *owner,
                 int l_session_id,
                 QString l_host_address,
-                int l_host_port
+                int l_host_port,
+                DaapServerType l_daap_server_type
             );
     ~Database();
 
@@ -102,8 +105,9 @@ class Database
     QValueList<int>         previous_metadata;
     QValueList<int>         previous_playlists;
 
-    int     generation_delta;
-    bool    full_data_update;
-    bool    update_type_set;
+    int                     generation_delta;
+    bool                    full_data_update;
+    bool                    update_type_set;
+    DaapServerType          daap_server_type;
 };
 #endif  // database_h_

@@ -387,6 +387,7 @@ bool AudioPlugin::playUrl(QUrl url)
     }
     else if(
             url.protocol() == "daap" ||
+            url.protocol() == "mdaap" ||
             url.protocol() == "cd"
            )
     {
@@ -448,6 +449,10 @@ bool AudioPlugin::playUrl(QUrl url)
         else if(url.protocol() == "daap")
         {
             input = new DaapInput(this, url);
+        }
+        else if(url.protocol() == "mdaap")
+        {
+            input = new DaapInput(this, url, DAAP_SERVER_MYTH);
         }
         else
         {

@@ -401,7 +401,9 @@ void DaapInstance::handleIncoming()
                 //
                 //  Server has gone away. Well that sucks!
                 //
-    
+                
+                log("while doing waitForMore(), socket to the "
+                    "server seems to have disappeared", 3);
                 delete client_socket_to_daap_server;
                 client_socket_to_daap_server = NULL;
                 return;
@@ -1600,7 +1602,8 @@ void DaapInstance::parseDatabaseListings(TagInput& dmap_data, int how_many)
                                                     parent,
                                                     session_id,
                                                     server_address,
-                                                    server_port
+                                                    server_port,
+                                                    daap_server_type
                                              );
             service_details_mutex.unlock();
             log(QString("creating new database with daap server id of %1")

@@ -22,7 +22,7 @@ using namespace std;
 //  Set up the structure to make daap calls
 //
 
-DaapInput::DaapInput(MFDServicePlugin *owner, QUrl a_url)
+DaapInput::DaapInput(MFDServicePlugin *owner, QUrl a_url, DaapServerType l_daap_server_type)
           :QIODevice()
 {
     socket_to_daap_server = NULL;
@@ -31,6 +31,7 @@ DaapInput::DaapInput(MFDServicePlugin *owner, QUrl a_url)
     setFlags(IO_Direct);    //  Lie!
     all_is_well = true;
     my_url = a_url;
+    daap_server_type = l_daap_server_type;
     connected = false;
     payload_size = 0;
     payload_bytes_read = 0;
@@ -121,12 +122,12 @@ bool DaapInput::open(int)
     //
     
     int daap_request_id =  parent->getMfd()->getPluginManager()->bumpDaapRequestId();
-    
+
     DaapRequest initial_request(
                                 NULL, 
                                 QString("daap://%1:%2%3").arg(my_host).arg(my_port).arg(my_path_and_query),
                                 my_host,
-                                DAAP_SERVER_ITUNES45,
+                                daap_server_type,
                                 parent->getMfd()->getPluginManager(),
                                 daap_request_id
                                );
@@ -337,7 +338,7 @@ bool DaapInput::at(unsigned long int an_offset)
                                 NULL, 
                                 QString("daap://%1:%2%3").arg(my_host).arg(my_port).arg(my_path_and_query),
                                 my_host,
-                                DAAP_SERVER_ITUNES45,
+                                daap_server_type,
                                 parent->getMfd()->getPluginManager(),
                                 daap_request_id
                                );

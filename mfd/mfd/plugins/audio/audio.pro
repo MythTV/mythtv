@@ -12,7 +12,7 @@ INSTALLS += target
 HEADERS +=          audio.h   
 SOURCES += main.cpp audio.cpp 
 
-HEADERS += audiooutput.h   daapinput.h   ../daapclient/daaprequest.h
+HEADERS += audiooutput.h   daapinput.h   ../daapclient/daaprequest.h   ../daapclient/server_types.h 
 SOURCES += audiooutput.cpp daapinput.cpp ../daapclient/daaprequest.cpp
 
 LIBS += -logg -lvorbisfile -lvorbis -mfdlib

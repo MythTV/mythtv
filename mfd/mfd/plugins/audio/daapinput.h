@@ -20,12 +20,14 @@
 #include "mfd_plugin.h"
 #include "httpheader.h"
 
+#include "../daapclient/server_types.h"
+
 class DaapInput: public QIODevice
 {
 
   public:
 
-    DaapInput(MFDServicePlugin*, QUrl);
+    DaapInput(MFDServicePlugin*, QUrl, DaapServerType l_daap_server_type = DAAP_SERVER_ITUNES45);
     ~DaapInput();
 
     bool              open(int mode );
@@ -72,7 +74,7 @@ class DaapInput: public QIODevice
     uint                fake_seek_position;
     MFDServicePlugin    *parent;
     int                 connection_count;
-
+    DaapServerType      daap_server_type;
 };
 
 #endif  // daapinput_h_

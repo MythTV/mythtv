@@ -28,7 +28,8 @@ Database::Database(
                     DaapClient *owner,
                     int l_session_id,
                     QString l_host_address,
-                    int l_host_port
+                    int l_host_port,
+                    DaapServerType l_daap_server_type
                   )
 {
     //
@@ -52,6 +53,7 @@ Database::Database(
     expected_numb_playlists = l_expected_numb_playlists;
     host_address = l_host_address;
     host_port = l_host_port;
+    daap_server_type = l_daap_server_type;
 
     //
     //  Ask the mfd for the metadata server, then ask the metadata server to
@@ -708,13 +710,29 @@ void Database::parseItems(TagInput& dmap_data, int how_many_now)
                 //  filename)
                 //  
             
-                QString new_url = QString("daap://%1:%2/databases/%3/items/%4.%5?session-id=%6")
+                QString new_url = QString("://%1:%2/databases/%3/items/%4.%5?session-id=%6")
                                   .arg(host_address)
                                   .arg(host_port)
                                   .arg(daap_id)
                                   .arg(new_item_id)
                                   .arg(new_item_format)
                                   .arg(session_id);
+                                  
+                //
+                //  If the server is iTunes (or other) the url's protocol
+                //  should be daap. If it's another myth box, it should be
+                //  mdaap (which just lets the audio plugin realize that the
+                //  content is on another myth box when it sees the url)
+                //
+                
+                if(daap_server_type == DAAP_SERVER_MYTH)
+                {
+                    new_url.prepend("mdaap");
+                }
+                else
+                {
+                    new_url.prepend("daap");
+                }
 
 
                 AudioMetadata *new_item = new AudioMetadata

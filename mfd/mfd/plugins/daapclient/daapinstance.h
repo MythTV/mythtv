@@ -23,14 +23,7 @@
 class DaapClient;
 class DaapResponse;
 
-enum DaapServerType {
-    DAAP_SERVER_UNKNOWN = 0,
-    DAAP_SERVER_ITUNES4X,
-    DAAP_SERVER_ITUNES45,
-    DAAP_SERVER_MYTH
-};
-    
-
+#include "server_types.h"
 
 class DaapInstance: public QThread
 {
