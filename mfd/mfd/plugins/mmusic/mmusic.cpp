@@ -37,6 +37,17 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     force_sweep = true;
 
     //
+    //  We just came into existence, so obviously we have not sent any
+    //  warning yet
+    //
+    
+    sent_directory_warning = false;
+    sent_dir_is_not_dir_warning = false;
+    sent_dir_is_not_readable_warning = false;
+    sent_musicmetadata_table_warning = false;
+    sent_playlist_table_warning = false;
+
+    //
     //  At startup we have no new data and no history. We create these lists
     //  (during a sweep), but the metadata server deletes them
     //
@@ -141,12 +152,99 @@ void MMusicWatcher::run()
 
 }
 
+bool MMusicWatcher::checkDataSources(const QString &startdir, QSqlDatabase *a_db)
+{
+
+    //
+    //  Make sure the place to look exists, is a directory, and is readable
+    //            
+
+    QFileInfo starting_directory(startdir);
+    if (!starting_directory.exists())
+    {
+        if(!sent_directory_warning)
+        {
+            warning(QString("cannot look for files, directory "
+                            "does not exist: \"%1\"")
+                            .arg(startdir));
+            sent_directory_warning = true;
+        }
+        return false;
+    }
+
+    if (!starting_directory.isDir())
+    {
+        if(!sent_dir_is_not_dir_warning)
+        {
+            warning(QString("cannot look for files, starting "
+                            "point is not a directory: \"%1\"")
+                            .arg(startdir));
+            sent_dir_is_not_dir_warning = true;
+        }
+        return false;
+    }
+
+    if (!starting_directory.isReadable())
+    {
+        if(!sent_dir_is_not_readable_warning)
+        {
+            warning(QString("cannot look for files, starting "
+                            "directory is not readable "
+                            "(permissions?): \"%1\"")
+                            .arg(startdir));
+            sent_dir_is_not_readable_warning = true;
+        }
+        return false;
+    }
+    
+    //
+    //  Make sure the db exists, and we can see the two tables. At some
+    //  point, do version checking (FIX)
+    //
+    
+
+    
+    QSqlQuery query("SELECT COUNT(filename) FROM musicmetadata;", a_db);
+    
+    if(!query.isActive())
+    {
+        if(!sent_musicmetadata_table_warning)
+        {
+            warning("cannot get data from a table called musicmetadata");
+            sent_musicmetadata_table_warning = true;
+        }
+        return false;
+        
+    }
+    
+    QSqlQuery pl_query("SELECT COUNT(playlistid) FROM musicplaylist ", a_db);
+
+    if(!pl_query.isActive())
+    {
+        if(!sent_playlist_table_warning)
+        {
+            warning("cannot get data from a table called musisplaylist");
+            sent_playlist_table_warning = true;
+        }
+        return false;
+        
+    }
+    
+    sent_directory_warning = false;
+    sent_dir_is_not_dir_warning = false;
+    sent_dir_is_not_readable_warning = false;
+    sent_musicmetadata_table_warning = false;
+    sent_playlist_table_warning = false;
+    return true;
+}
+
 bool MMusicWatcher::sweepMetadata()
 {
 
     //
-    //  Make sure we have somewhere to look
+    //  Figure out where the file are.
     //
+    
 
     QString startdir = mfdContext->GetSetting("MusicLocation");
     if(startdir.length() < 1)
@@ -161,44 +259,23 @@ bool MMusicWatcher::sweepMetadata()
         startdir += "/";
     }
 
-    //
-    //  Make sure the place to look exists, is a directory, and is readable
-    //            
 
-    QFileInfo starting_directory(startdir);
-    if (!starting_directory.exists())
+    //
+    //  Check that the file location is valid and that the db is there and
+    //  sensible
+    //
+
+    if(!checkDataSources(startdir, db))
     {
-        warning(QString("cannot look for files, directory "
-                        "does not exist: \"%1\"")
-                        .arg(startdir));
         return false;
     }
 
-    if (!starting_directory.isDir())
-    {
-        warning(QString("cannot look for files, starting "
-                        "point is not a directory: \"%1\"")
-                        .arg(startdir));
-        return false;
-    }
 
-    if (!starting_directory.isReadable())
-    {
-        warning(QString("cannot look for files, starting "
-                        "directory is not readable "
-                        "(permissions?): \"%1\"")
-                        .arg(startdir));
-        return false;
-    }
 
-    //
-    //  FIX see if we can talk to the database up here before wasting more
-    //  CPU time
-    //
 
     QTime sweep_timer;
     sweep_timer.start();
-    log("beginning content sweep", 3);
+    log("beginning content sweep", 7);
 
     bool something_changed = false;
     
@@ -242,7 +319,8 @@ bool MMusicWatcher::sweepMetadata()
     }
     else
     {
-        warning("fairly certain your playlist table is hosed ... not good");
+        warning("fairly certain your playlist table is hosed ... giving up");
+        return false;
     }
     
 
@@ -296,7 +374,8 @@ bool MMusicWatcher::sweepMetadata()
     }
     else
     {
-        warning("could not seem to open your musicmetadata table");
+        warning("could not seem to open your musicmetadata table ... giving up");
+        return false;
     }
 
 
@@ -318,7 +397,7 @@ bool MMusicWatcher::sweepMetadata()
             
             QString name(mf_iterator.key());
             log(QString("removed metadata from db, file no longer exists: \"%1\"")
-                        .arg(name), 8);
+                        .arg(name), 2);
             name.replace(quote_regex, "\"\"");
             name.remove(0,startdir.length());
             QString querystr = QString("DELETE FROM musicmetadata WHERE "
@@ -332,7 +411,7 @@ bool MMusicWatcher::sweepMetadata()
             if(checkNewMusicFile(mf_iterator.key(), startdir))
             {
                 //
-                //  If we've scanned say ... 20 files ... someone or
+                //  If we've scanned say ... 10 files ... someone or
                 //  something may well be waiting for music data to show up
                 //  ... so we stop. The rest will get caught on the next
                 //  sweep. Really. And the next sweep will come soon,
@@ -345,7 +424,7 @@ bool MMusicWatcher::sweepMetadata()
                 
                 something_changed = true;
                 ++files_scanned;
-                if(files_scanned >= 20)
+                if(files_scanned >= 10)
                 {
                     force_sweep_mutex.lock();
                         force_sweep = true;
@@ -358,8 +437,8 @@ bool MMusicWatcher::sweepMetadata()
 
     if(!something_changed)
     {
-        log(QString("sweep results: with no changes in %1 second(s)")
-                    .arg(sweep_timer.elapsed() / 1000.0), 3);
+        log(QString("sweep results: no changes in %1 second(s)")
+                    .arg(sweep_timer.elapsed() / 1000.0), 6);
         return false;
     }
 
@@ -618,7 +697,7 @@ bool MMusicWatcher::sweepMetadata()
                     .arg(playlist_deletions.count())
         
                     .arg(sweep_timer.elapsed() / 1000.0)
-                    , 2);
+                    , 8);
 
         return true;
     }
@@ -749,7 +828,7 @@ bool MMusicWatcher::checkNewMusicFile(const QString &filename, const QString &st
                               .arg(insert_filename);
             db->exec(thequery);
             log(QString("found and inserted new music item called \"%1\"")
-                        .arg(insert_title), 8);
+                        .arg(insert_title), 2);
             delete new_metadata;
             return true;
         }
