@@ -4408,8 +4408,10 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             return true;
         }
 
-        if ((commBreakIter == commBreakMap.end()) &&
-            (direction > 0))
+        if ((direction > 0) &&
+            ((commBreakIter == commBreakMap.end()) ||
+             ((totalFrames) &&
+              ((commBreakIter.key() + (10 * video_frame_rate)) > totalFrames))))
         {
             QString comm_msg = QString(QObject::tr("At End, can not Skip."));
             QString desc;
