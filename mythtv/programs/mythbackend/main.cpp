@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
     QString logfile = "";
     QString pidfile = "";
-    bool daemonize = false;
+    bool daemonize = true;
     for(int argpos = 1; argpos < a.argc(); ++argpos)
         if (!strcmp(a.argv()[argpos],"-l") ||
             !strcmp(a.argv()[argpos],"--logfile")) {
@@ -104,11 +104,6 @@ int main(int argc, char **argv)
         }
     }
 
-    if (pidfs) {
-        pidfs << getpid() << endl;
-        pidfs.close();
-    }
-
     close(0);
 
     if (daemonize)
@@ -116,6 +111,12 @@ int main(int argc, char **argv)
             perror("daemon");
             return -1;
         }
+
+
+    if (pidfs) {
+        pidfs << getpid() << endl;
+        pidfs.close();
+    }
 
     if (logfd != -1) {
         // Send stdout and stderr to the logfile
