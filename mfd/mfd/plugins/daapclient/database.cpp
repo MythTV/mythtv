@@ -10,6 +10,8 @@
 
 */
 
+#include "../../../config.h"
+
 #include <iostream>
 using namespace std;
 
@@ -325,8 +327,7 @@ void Database::parseItems(TagInput& dmap_data, int how_many_now)
                 case 'asdk':
             
                     //
-                    //  data kind ... I think this is file vs. network
-                    //  stream or something (1 = radio, 2 = file) ... dunno
+                    //  data kind ... never seen anything but 0
                     //
                 
                     internal_listing >> a_u8_variable;
@@ -656,82 +657,95 @@ void Database::parseItems(TagInput& dmap_data, int how_many_now)
         //  If we have enough data, make a Metadata object
         //
 
+        if(
+                new_item_format == "ogg"  ||
+                new_item_format == "wav"  ||
+                new_item_format == "flac" ||
+                new_item_format == "fla"  ||
+#ifdef AAC_AUDIO_SUPPORT
+                new_item_format == "m4a"  ||
+#endif
 
-        if(new_item_id > -1 && new_item_name.length() > 0)
+                new_item_format == "mp3")
         {
-
-
-            //
-            //  Make new metadata with a rather special URL (instead of a
-            //  filename)
-            //  
-            
-            QString new_url = QString("daap://%1:%2/databases/%3/items/%4.%5?revision-number=0&session-id=%6")
-                              .arg(host_address)
-                              .arg(host_port)
-                              .arg(daap_id)
-                              .arg(new_item_id)
-                              .arg(new_item_format)
-                              .arg(session_id);
-
-
-            AudioMetadata *new_item = new AudioMetadata
-                                (
-                                    new_url,
-                                    new_item_artist_name,
-                                    new_item_album_name,
-                                    new_item_name,
-                                    new_item_genre,
-                                    new_item_year,
-                                    new_item_track_number,
-                                    new_item_total_time
-                                );
-
-            //
-            //  Add in whatever else the daap server told us about
-            //            
-            
-            new_item->setCollectionId(container_id);
-            new_item->setId(new_item_id);
-
-            QDateTime when;
-            when.setTime_t(new_item_date_added);
-            new_item->setDateAdded(when);
-            
-            when.setTime_t(new_item_date_modified);
-            new_item->setDateModified(when);
-
-            new_item->setBpm(new_item_bpm);
-            new_item->setBitrate(new_item_bitrate);
-            new_item->setComment(new_item_comment);
-            new_item->setCompilation(new_item_compilation);
-            new_item->setComposer(new_item_composer_name);
-            new_item->setDiscCount(new_item_disc_count);            
-            new_item->setDiscNumber(new_item_disc_number);
-            new_item->setEqPreset(new_item_eqpreset);
-            new_item->setFormat(new_item_format);
-            new_item->setDescription(new_item_description);
-            new_item->setRelativeVolume(new_item_relative_volume);
-            new_item->setSampleRate(new_item_sample_rate);
-            new_item->setSize(new_item_size);
-            new_item->setStartTime(new_item_start_time);
-            new_item->setStopTime(new_item_stop_time);
-            new_item->setTrackCount(new_item_track_count);
-            new_item->setRating(new_item_rating);
-            if(new_item_myth_digest.length() > 0)
+            if(new_item_id > -1 && new_item_name.length() > 0)
             {
-                new_item->setMythDigest(new_item_myth_digest);
-            }
+                //
+                //  Make new metadata with a rather special URL (instead of a
+                //  filename)
+                //  
             
-            new_metadata->insert(new_item->getId(), new_item);
+                QString new_url = QString("daap://%1:%2/databases/%3/items/%4.%5?revision-number=0&session-id=%6")
+                                  .arg(host_address)
+                                  .arg(host_port)
+                                  .arg(daap_id)
+                                  .arg(new_item_id)
+                                  .arg(new_item_format)
+                                  .arg(session_id);
 
+
+                AudioMetadata *new_item = new AudioMetadata
+                                    (
+                                        new_url,
+                                        new_item_artist_name,
+                                        new_item_album_name,
+                                        new_item_name,
+                                        new_item_genre,
+                                        new_item_year,
+                                        new_item_track_number,
+                                        new_item_total_time
+                                    );
+
+                //
+                //  Add in whatever else the daap server told us about
+                //            
+            
+                new_item->setCollectionId(container_id);
+                new_item->setId(new_item_id);
+
+                QDateTime when;
+                when.setTime_t(new_item_date_added);
+                new_item->setDateAdded(when);
+            
+                when.setTime_t(new_item_date_modified);
+                new_item->setDateModified(when);
+
+                new_item->setBpm(new_item_bpm);
+                new_item->setBitrate(new_item_bitrate);
+                new_item->setComment(new_item_comment);
+                new_item->setCompilation(new_item_compilation);
+                new_item->setComposer(new_item_composer_name);
+                new_item->setDiscCount(new_item_disc_count);            
+                new_item->setDiscNumber(new_item_disc_number);
+                new_item->setEqPreset(new_item_eqpreset);
+                new_item->setFormat(new_item_format);
+                new_item->setDescription(new_item_description);
+                new_item->setRelativeVolume(new_item_relative_volume);
+                new_item->setSampleRate(new_item_sample_rate);
+                new_item->setSize(new_item_size);
+                new_item->setStartTime(new_item_start_time);
+                new_item->setStopTime(new_item_stop_time);
+                new_item->setTrackCount(new_item_track_count);
+                new_item->setRating(new_item_rating);
+                if(new_item_myth_digest.length() > 0)
+                {
+                    new_item->setMythDigest(new_item_myth_digest);
+                }
+            
+                new_metadata->insert(new_item->getId(), new_item);
+
+            }
+            else
+            {
+                warning("got incomplete data for an item, going to ignore it");
+            }        
         }
         else
         {
-            warning("got incomplete data for an item, going to ignore it");
-        }        
-        
-        
+            log(QString("got an unsupported music format (%1), ignoring item")
+                        .arg(new_item_format), 5);
+                
+        }
     }
     
     double elapsed_time = loading_time.elapsed() / 1000.0;
@@ -777,7 +791,7 @@ void Database::parseDeletions(TagInput& dmap_data)
 
             default:
                     
-                warning("unknown tag while parsing database item");
+                warning("unknown tag while parsing database item deletion");
                 dmap_data >> emergency_throwaway_chunk;
         }
         dmap_data >> end;
@@ -977,7 +991,9 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
                 
                 default:
                     
-                    warning("unknown tag while parsing database playlist");
+                    warning("unknown tag while parsing "
+                            "database playlist container");
+                            
                     internal_listing >> emergency_throwaway_chunk;
             }
             internal_listing >> end;
@@ -1182,8 +1198,10 @@ void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_
 
     u8  a_u8_variable;
     u32 a_u32_variable;
+    std::string a_string;
 
     Chunk listing;
+    QString new_name;
 
     for(int i = 0; i < how_many; i++)
     {
@@ -1205,7 +1223,7 @@ void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_
         {
     
             internal_listing >> a_tag;
-        
+
             switch(a_tag.type)
             {
 
@@ -1241,12 +1259,35 @@ void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_
                     
                     internal_listing >> a_u32_variable;
                     break;
+                    
+                case 'minm':
+                
+                    //
+                    //  Why are we getting names here ?
+                    //  We already know everything about this song. 
+                    //  Stupid iTunes
+                    //
+                    
+                    internal_listing >> a_string;
+                    break;
+                
+                case 'asdk':
+                
+                    //
+                    //  Why are we getting a data type here ?
+                    //  Silly iTunes
+                    //
+                    
+                    internal_listing >> a_u8_variable;
+                    break;
                 
                 default:
                     
-                    warning("unknown tag while parsing database playlist");
+                    warning("unknown tag while parsing "
+                            "database playlist");
                     internal_listing >> emergency_throwaway_chunk;
             }
+
             internal_listing >> end;
         }
     }

@@ -342,7 +342,9 @@ bool AudioPlugin::playUrl(QUrl url)
     state_of_play_mutex->lock();
         if(is_playing || is_paused)
         {
+            state_of_play_mutex->unlock();
             stopAudio();
+            state_of_play_mutex->lock();
         }
 
         bool start_output = false;
@@ -371,6 +373,7 @@ bool AudioPlugin::playUrl(QUrl url)
         //  Choose the QIODevice (derived) to serve as input
         // 
     
+
         if(url.protocol() == "file" || url.protocol() == "cd")
         {
             input = new QFile(url.path());

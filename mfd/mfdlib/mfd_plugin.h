@@ -77,6 +77,7 @@ class MFDBasePlugin : public QThread
     virtual void huh(const QStringList &tokens, int socket_identifier);
     bool         keepGoing();
     void         metadataChanged(int which_collection);
+    MFD*         getMfd(){return parent;}
     
 
   protected:

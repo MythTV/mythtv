@@ -22,7 +22,7 @@ using namespace std;
 //  class DaapInstance;
 
 #include "daapinstance.h"
-
+#include "../../pluginmanager.h"
 
 class DaapRequest : public HttpOutRequest
 {
@@ -33,17 +33,20 @@ class DaapRequest : public HttpOutRequest
                 DaapInstance *owner,
                 const QString& l_base_url, 
                 const QString& l_host_address,
-                DaapServerType l_server_type = DAAP_SERVER_UNKNOWN
+                DaapServerType l_server_type = DAAP_SERVER_UNKNOWN,
+                MFDPluginManager *l_plugin_manager = NULL
                );
                
     ~DaapRequest();
 
+    bool send(QSocketDevice *where_to_send, bool add_validation = false);
     void warning(const QString &warn_text);
     
   private:
 
-    DaapInstance *parent;
-    DaapServerType           server_type;
+    DaapInstance        *parent;
+    DaapServerType      server_type;
+    MFDPluginManager    *plugin_manager;    
     
 };
 

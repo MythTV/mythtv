@@ -20,12 +20,14 @@ DaapRequest::DaapRequest(
                             DaapInstance *owner,
                             const QString& l_base_url, 
                             const QString& l_host_address,
-                            DaapServerType l_server_type
+                            DaapServerType l_server_type,
+                            MFDPluginManager *l_plugin_manager
                         )
             :HttpOutRequest(l_base_url, l_host_address)
 {
     parent = owner;
     server_type = l_server_type;
+    plugin_manager = l_plugin_manager;
 
 
     //
@@ -70,6 +72,33 @@ DaapRequest::DaapRequest(
 
 
 }
+
+bool DaapRequest::send(QSocketDevice *where_to_send, bool add_validation)
+{
+
+    if(!add_validation || server_type == DAAP_SERVER_MYTH)
+    {
+        return HttpOutRequest::send(where_to_send);
+    }
+
+    //
+    //  If we can manage to do so, try and add a Client-DAAP-Validation header
+    //
+
+
+    if(plugin_manager)
+    {
+        unsigned char hash[33] = {0};
+        plugin_manager->fillValidationHeader(getRequestString().ascii(), hash);
+        QString validation_header = QString("Client-DAAP-Validation: %1").arg((char *)hash);
+        addHeader(validation_header);
+        addHeader("Client-DAAP-Access-Index: 1");
+    }
+
+    return HttpOutRequest::send(where_to_send);
+}
+
+
 
 void DaapRequest::warning(const QString &warn_text)
 {

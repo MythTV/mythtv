@@ -15,6 +15,7 @@
 #include <qstringlist.h>
 #include <qsocket.h>
 #include <qtimer.h>
+#include <qmutex.h>
 
 class MFD;
 
@@ -106,6 +107,13 @@ class MFDPluginManager : public QObject
     void setShutdownFlag(bool true_or_false){shutdown_flag = true_or_false;}
 
     //
+    //  Bit odd to have this sitting here, but it has to go somewhere that
+    //  is accesible by all the plugins
+    //
+
+    void fillValidationHeader(const QString &request, unsigned char *resulting_hash );
+
+    //
     //  debugging
     //
     
@@ -136,7 +144,19 @@ class MFDPluginManager : public QObject
     QTimer                     *dead_plugin_timer;
     bool                       very_first_time;
     bool                       shutdown_flag;
+
+    //
+    //  One outside library that different plugins may want to use if it is
+    //  (dynamically) available
+    //
+
+    QLibrary                   *lib_open_daap;
+    typedef void (*Generate_Hash_Function)
+            (const unsigned char*, unsigned char, unsigned char*);
+    Generate_Hash_Function generateHashFunction;
+    QMutex hashing_mutex;
 };
+
 
 
 #endif

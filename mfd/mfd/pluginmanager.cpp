@@ -237,6 +237,7 @@ void MFDPluginWrapper::metadataChanged(int which_collection)
 
 MFDPluginManager::MFDPluginManager(MFD *owner)
 {
+
     //
     //  Set some defaults
     //
@@ -245,6 +246,8 @@ MFDPluginManager::MFDPluginManager(MFD *owner)
     available_plugins.clear();
     dead_plugins.clear();
     parent = owner;
+    lib_open_daap = NULL;
+    generateHashFunction = NULL;
 
     //
     //  Start a timer to check for dead 
@@ -281,6 +284,44 @@ void MFDPluginManager::reloadPlugins()
     
 void MFDPluginManager::afterStopLoad()
 {    
+    //
+    //  If we can, find libopendaap
+    //
+    
+    if(!lib_open_daap)
+    {
+        lib_open_daap = new QLibrary("opendaap");
+        if(lib_open_daap->load())
+        {
+            //
+            //  Well, the library is there ... get a reference to the
+            //  GenerateHash() function (the magic bit of code that knows how to
+            //  do Apple Daap client validation headers)
+            //
+
+            generateHashFunction = (Generate_Hash_Function) 
+                     lib_open_daap->resolve("GenerateHash");
+
+            if (!generateHashFunction )
+            {
+                warning("libopendaap was loaded, but could not "
+                        "resolve GenerateHash()");
+            }
+            else
+            {
+                log("libopendaap loaded, will be used for client daap validation (iTunes)", 2);
+            }
+        
+        }
+        else
+        {
+            log("did not find libopendaap, no talking to iTunes", 2);
+            delete lib_open_daap;
+            lib_open_daap = NULL;
+            generateHashFunction = NULL;
+        }
+    }
+
     plugin_file_list.clear();
     QString where_to_look = QDir::currentDirPath() + "/plugins/";
     buildPluginFileList(where_to_look);
@@ -577,6 +618,22 @@ void MFDPluginManager::doListCapabilities(int socket_identifier)
         }
     }
 }
+
+void MFDPluginManager::fillValidationHeader(const QString &request, unsigned char *resulting_hash)
+{
+    hashing_mutex.lock();
+        if(generateHashFunction)
+        {
+            generateHashFunction((const unsigned char *)request.ascii(), 1, resulting_hash);
+        }
+        else
+        {
+            resulting_hash[0] = '\0';
+        }
+    hashing_mutex.unlock();
+}
+
+
 
 //
 //  This is only for debugging

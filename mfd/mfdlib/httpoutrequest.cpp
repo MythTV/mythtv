@@ -242,7 +242,31 @@ QString HttpOutRequest::getRequestString()
     QString return_value;
     if(stored_request.length() < 1)
     {
-        return_value = "ERROR request not yet sent ERROR";
+        //
+        //  It hasn't been sent yet, we have to assemble it ourself
+        //
+
+        QString extended_url = base_url;
+        bool first_get = true;
+    
+        QDictIterator<HttpGetVariable> it( get_variables );
+        for( ; it.current(); ++it )
+        {
+            if(first_get)
+            {
+                extended_url.append("?");
+                first_get = false;
+            }
+            else
+            {
+                extended_url.append("&");
+            }
+            extended_url.append(it.current()->getField());
+            extended_url.append("=");
+            extended_url.append(it.current()->getValue());
+        }
+
+        return_value = extended_url;
     }
     else
     {

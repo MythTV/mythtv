@@ -36,9 +36,9 @@ class MFD : public QObject
     MFD(QSqlDatabase *db, int port, bool log_stdout, int logging_verbosity);
     ~MFD();
     
-    QSqlDatabase*   getDatabase(){return db;}
-    MetadataServer* getMetadataServer(){return metadata_server;}
-
+    QSqlDatabase*       getDatabase(){return db;}
+    MetadataServer*     getMetadataServer(){return metadata_server;}
+    MFDPluginManager*   getPluginManager(){return plugin_manager;}
     
   public slots:
   

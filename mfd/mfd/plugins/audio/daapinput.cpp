@@ -120,9 +120,15 @@ bool DaapInput::open(int)
     //  know we're going to close this connection whenever we feel like it.
     //
     
-    DaapRequest initial_request(NULL, my_path_and_query, my_host);
+    DaapRequest initial_request(
+                                NULL, 
+                                my_path_and_query, 
+                                my_host,
+                                DAAP_SERVER_ITUNES,
+                                parent->getMfd()->getPluginManager()
+                               );
     initial_request.addHeader("Connection: close");
-    initial_request.send(socket_to_daap_server);
+    initial_request.send(socket_to_daap_server, true);
 
 
     //
@@ -319,10 +325,16 @@ bool DaapInput::at(unsigned long int an_offset)
     //  Send a request that positions us exactly where the at(int) seek call asked to be
     //
     
-    DaapRequest initial_request(NULL, my_path_and_query, my_host);
+    DaapRequest initial_request(
+                                NULL, 
+                                my_path_and_query, 
+                                my_host,
+                                DAAP_SERVER_ITUNES,
+                                parent->getMfd()->getPluginManager()
+                               );
     initial_request.addHeader("Connection: close");
     initial_request.addHeader(QString("Range: bytes=%1-").arg(an_offset));
-    initial_request.send(socket_to_daap_server);
+    initial_request.send(socket_to_daap_server, true);
     // fake_seek_position = an_offset;
 
     //
@@ -433,13 +445,25 @@ void DaapInput::eatThroughHeadersAndGetToPayload()
                 
             bool ok = true;
             int status_code = line_tokens[1].toInt(&ok);
-            if(!ok || status_code != 200)
+            if(!ok)
+            {
+                //
+                //  Couldn't parse status code
+                //
+
+                warning("daap server sent us un-parse-able status code");
+                all_is_well = false;
+                return;
+                
+            }
+            if(status_code != 200 && status_code !=206)
             {
                 //
                 //  Bad status code
                 //  
                 
-                warning("daap server sent us bad status code (not HTTP OK == 200)");
+                warning("daap server sent us bad status code (not HTTP OK == 200|206)");
+                cout << "raw is: " << endl << "***************************" << endl << incoming << endl;
                 all_is_well = false;
                 return;
             }
@@ -515,11 +539,13 @@ void DaapInput::eatThroughHeadersAndGetToPayload()
     HttpHeader *content_range_header = headers.find("Content-Range");
     if(content_range_header)
     {
+        
         //
         //  Parse the content range into useable variables
         //
     
         QString range_begin_string          = content_range_header->getValue().section('-', 0, 0);
+        range_begin_string = range_begin_string.remove("bytes ");
         QString range_end_string            = content_range_header->getValue().section('-', 1, 1);
                 range_end_string            = range_end_string.section('/', 0, 0);
         QString total_possible_range_string = content_range_header->getValue().section('/', -1, -1);
@@ -536,8 +562,8 @@ void DaapInput::eatThroughHeadersAndGetToPayload()
             range_begin = 0;
             all_is_well = false;
             warning(QString("could not set range begin from "
-                            "this Content-Range header: %1")
-                            .arg(content_range_header->getValue()));
+                            "this string: \"%1\"")
+                            .arg(range_begin_string));
         }
         
 

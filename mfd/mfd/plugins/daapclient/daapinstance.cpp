@@ -505,7 +505,7 @@ bool DaapInstance::checkServerType(const QString &server_description)
         
         if(server_description.left(6) == "iTunes")
         {
-            if(daap_server_type != DAAP_SERVER_ITUNESLESSTHAN401)
+            if(daap_server_type != DAAP_SERVER_ITUNES)
             {
                 copasetic = false;
             }
@@ -537,42 +537,13 @@ bool DaapInstance::checkServerType(const QString &server_description)
     {
         if(server_description.left(6) == "iTunes")
         {
-            //
-            //  Figure out if this is 4.0.1 or greater, in which case, we
-            //  can't talk to it.
-            //
-            
-            QString itunes_version_string = server_description.section('/', -1, -1);
-            itunes_version_string = itunes_version_string.section(' ',0,0);
-            bool ok;
-            float itunes_version = itunes_version_string.toFloat(&ok);
-            if(!ok)
-            {
-                warning(QString("could not determine iTunes version from: %1")
-                                .arg(server_description));
-                daap_server_type = DAAP_SERVER_ITUNES401ORGREATER;
-                return false;
-            }
-            else
-            {
-                if(itunes_version >= 4.1)
-                {
-                    daap_server_type = DAAP_SERVER_ITUNES401ORGREATER;
-                    return false;
-                }
-                else
-                {
-                    service_details_mutex.lock();
-                    daap_server_type = DAAP_SERVER_ITUNESLESSTHAN401;
-                    log(QString("discovered service "
-                                "named \"%1\" is being served by "
-                                "iTunes (v < 4.1 !!)")
-                                .arg(service_name), 2);
-                    service_details_mutex.unlock();
-                    return true;
-                }
-            }
-            
+            service_details_mutex.lock();
+            daap_server_type = DAAP_SERVER_ITUNES;
+            log(QString("discovered service "
+                        "named \"%1\" is being served by "
+                        "iTunes :-)")
+                        .arg(service_name), 2);
+            service_details_mutex.unlock();
         }
         else if(server_description.left(6) == "MythTV")
         {
@@ -597,27 +568,6 @@ bool DaapInstance::checkServerType(const QString &server_description)
 
 void DaapInstance::processResponse(DaapResponse *daap_response)
 {
-
-    //
-    //  Check the type of server
-    //
-    
-    if(!checkServerType(daap_response->getHeader("DAAP-Server")))
-    {
-        //
-        //  We got an iTunes 4.1 or greater server.
-        //
-        
-        warning("cannot talk to iTunes because\n"
-                "                   it uses a totally undocumented Client-DAAP-Validation header\n\n"
-                "                   Please complain to Apple at:\n\n"
-                "                   Apple Customer Relations, (800) 767-2775\n" 
-                "                   http://www.apple.com/feedback/itunes.html\n"
-               ); 
-        delete client_socket_to_daap_server;
-        client_socket_to_daap_server = NULL;
-        return;
-    }
 
     //
     //  Sanity check ... is the payload xdmap-tagged ?
@@ -760,18 +710,24 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
         {
             int which_database = a_database->getDaapId();
             QString request_string = QString("/databases/%1/items").arg(which_database);
-            DaapRequest update_request(this, request_string, server_address, daap_server_type);
-            update_request.addGetVariable("session-id", session_id);
+            DaapRequest database_request(
+                                            this, 
+                                            request_string, 
+                                            server_address, 
+                                            daap_server_type, 
+                                            parent->getMfd()->getPluginManager()
+                                        );
+            database_request.addGetVariable("session-id", session_id);
             
             int generation_delta = a_database->getKnownGeneration();
             if(generation_delta > 0)
             {
-                update_request.addGetVariable("delta", generation_delta);
-                update_request.addGetVariable("revision-number", metadata_generation);
+                database_request.addGetVariable("delta", generation_delta);
+                database_request.addGetVariable("revision-number", metadata_generation);
             }
             else
             {
-                update_request.addGetVariable("revision-number", metadata_generation);
+                database_request.addGetVariable("revision-number", metadata_generation);
             }
             
             //
@@ -780,7 +736,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             //  back
             //
             
-            update_request.addGetVariable("meta", 
+            database_request.addGetVariable("meta", 
                                           QString(
                                                     "dmap.itemname,"
                                                     "dmap.itemid,"
@@ -815,9 +771,9 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
                                                  ));
 
             current_request_db = a_database;            
-            update_request.send(client_socket_to_daap_server);
+            database_request.send(client_socket_to_daap_server, true);
             log(QString("sent daap request: \"%1\"")
-                .arg(update_request.getRequestString()), 9);
+                .arg(database_request.getRequestString()), 9);
             
             //
             //  We've already sent a request, don't send another one
@@ -829,26 +785,32 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
         {
             int which_database = a_database->getDaapId();
             QString request_string = QString("/databases/%1/containers").arg(which_database);
-            DaapRequest update_request(this, request_string, server_address, daap_server_type);
-            update_request.addGetVariable("session-id", session_id);
+            DaapRequest database_request(
+                                            this, 
+                                            request_string, 
+                                            server_address, 
+                                            daap_server_type,
+                                            parent->getMfd()->getPluginManager()
+                                        );
+            database_request.addGetVariable("session-id", session_id);
 
             int generation_delta = a_database->getKnownGeneration();
             if(generation_delta > 0)
             {
-                update_request.addGetVariable("delta", generation_delta);
-                update_request.addGetVariable("revision-number", metadata_generation);
+                database_request.addGetVariable("delta", generation_delta);
+                database_request.addGetVariable("revision-number", metadata_generation);
             }
             else
             {
-                update_request.addGetVariable("revision-number", metadata_generation);
+                database_request.addGetVariable("revision-number", metadata_generation);
             }
             
 
             
             current_request_db = a_database;            
-            update_request.send(client_socket_to_daap_server);
+            database_request.send(client_socket_to_daap_server, true);
             log(QString("sent daap request: \"%1\"")
-                .arg(update_request.getRequestString()), 9);
+                .arg(database_request.getRequestString()), 9);
             
             //
             //  We've already sent a request, don't send another one
@@ -865,25 +827,32 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
                                     .arg(which_database)
                                     .arg(current_request_playlist);
 
-            DaapRequest update_request(this, request_string, server_address, daap_server_type);
-            update_request.addGetVariable("session-id", session_id);
+            DaapRequest database_request(
+                                            this, 
+                                            request_string, 
+                                            server_address, 
+                                            daap_server_type,
+                                            parent->getMfd()->getPluginManager()
+                                        );
+
+            database_request.addGetVariable("session-id", session_id);
 
             int generation_delta = a_database->getKnownGeneration();
             if(generation_delta > 0)
             {
-                update_request.addGetVariable("delta", generation_delta);
-                update_request.addGetVariable("revision-number", metadata_generation);
+                database_request.addGetVariable("delta", generation_delta);
+                database_request.addGetVariable("revision-number", metadata_generation);
             }
             else
             {
-                update_request.addGetVariable("revision-number", metadata_generation);
+                database_request.addGetVariable("revision-number", metadata_generation);
             }
             
             
             current_request_db = a_database;            
-            update_request.send(client_socket_to_daap_server);
+            database_request.send(client_socket_to_daap_server, true);
             log(QString("sent daap request: \"%1\"")
-                .arg(update_request.getRequestString()), 9);
+                .arg(database_request.getRequestString()), 9);
             
             //
             //  We've already sent a request, don't send another one
@@ -903,10 +872,16 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             //  If there's nothing to send, do a hanging update request
             //
 
-            DaapRequest update_request(this, "/update", server_address, daap_server_type);
+            DaapRequest update_request(
+                                        this, 
+                                        "/update", 
+                                        server_address, 
+                                        daap_server_type,
+                                        parent->getMfd()->getPluginManager()
+                                      );
             update_request.addGetVariable("session-id", session_id);
             update_request.addGetVariable("revision-number", metadata_generation);
-            update_request.send(client_socket_to_daap_server);
+            update_request.send(client_socket_to_daap_server, true);
             log(QString("sent daap request: \"%1\"")
                 .arg(update_request.getRequestString()), 9);
         }
@@ -1196,10 +1171,16 @@ void DaapInstance::doLoginResponse(TagInput& dmap_data)
         //  Time to use our new session id to get ourselves an /update
         //
         
-        DaapRequest update_request(this, "/update", server_address, daap_server_type);
+        DaapRequest update_request(
+                                    this, 
+                                    "/update", 
+                                    server_address, 
+                                    daap_server_type,
+                                    parent->getMfd()->getPluginManager()
+                                  );
         update_request.addGetVariable("session-id", session_id);
         update_request.addGetVariable("revision-number", metadata_generation);
-        update_request.send(client_socket_to_daap_server);
+        update_request.send(client_socket_to_daap_server, true);
         log(QString("sent daap request: \"%1\"")
             .arg(update_request.getRequestString()), 9);
                 
@@ -1300,7 +1281,13 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
                     .arg(server_port)
                     .arg(new_metadata_generation), 4);
         
-        DaapRequest database_request(this, "/databases", server_address, daap_server_type);
+        DaapRequest database_request(
+                                        this, 
+                                        "/databases", 
+                                        server_address, 
+                                        daap_server_type,
+                                        parent->getMfd()->getPluginManager()
+                                    );
         database_request.addGetVariable("session-id", session_id);
         database_request.addGetVariable("revision-number", new_metadata_generation);
         service_details_mutex.unlock();
@@ -1311,7 +1298,7 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
         }
 
 
-        database_request.send(client_socket_to_daap_server);
+        database_request.send(client_socket_to_daap_server, true);
         log(QString("sent daap request: \"%1\"")
             .arg(database_request.getRequestString()), 9);
         

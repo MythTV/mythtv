@@ -22,7 +22,6 @@
 
 #include "registry.h"
 
-
 //////
 // type registry 
 
@@ -154,7 +153,9 @@ TypeRegistry::Init::Init() {
 		Tag( 'mstt' ) << (u32)0xC8 << end;
 
 		for( u32 i=0; i<sizeof(TypeRegistry::list)/sizeof(TypeRegistry::list[0]); ++i )
+		{
 			registerVar( TypeRegistry::list + i );
+        }
 
 	TypeRegistry::container << end;
 }
