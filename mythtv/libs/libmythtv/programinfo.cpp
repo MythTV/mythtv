@@ -165,15 +165,13 @@ QString ProgramInfo::MakeUniqueKey(void) const
 #define LONGLONG_TO_LIST(x)  INT_TO_LIST((int)((x) >> 32))  \
                              INT_TO_LIST((int)((x) & 0xffffffffLL))
 
-#define STR_TO_LIST(x)       list << (x);
+#define STR_TO_LIST(x)       if ((x).isNull()) list << ""; else list << (x);
 
 #define FLOAT_TO_LIST(x)     sprintf(tmp, "%f", (x)); list << tmp;
 
-
 void ProgramInfo::ToStringList(QStringList &list)
 {
-
-    char tmp[11];
+    char tmp[64];
 
     STR_TO_LIST(title)
     STR_TO_LIST(subtitle)
@@ -188,9 +186,9 @@ void ProgramInfo::ToStringList(QStringList &list)
 
     DATETIME_TO_LIST(startts)
     DATETIME_TO_LIST(endts)
-    STR_TO_LIST("")  // dummy place holder
+    STR_TO_LIST(QString::null) // dummy place holder
     INT_TO_LIST(shareable)
-    INT_TO_LIST(0);  // dummy place holder
+    INT_TO_LIST(0);            // dummy place holder
     STR_TO_LIST(hostname)
     INT_TO_LIST(sourceid)
     INT_TO_LIST(cardid)
@@ -213,7 +211,6 @@ void ProgramInfo::ToStringList(QStringList &list)
     DATETIME_TO_LIST(lastmodified)
     FLOAT_TO_LIST(stars)
     DATETIME_TO_LIST(QDateTime(originalAirDate))
-
 }
 
 bool ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -222,32 +219,38 @@ bool ProgramInfo::FromStringList(QStringList &list, int offset)
     return FromStringList(list, it);
 }
 
-#define _INT_FROM_LIST()       atoi( (*(it++)).ascii() )
-#define INT_FROM_LIST(x)       (x) = _INT_FROM_LIST();
-#define ENUM_FROM_LIST(x, y)   (x) = (y)_INT_FROM_LIST();
+#define NEXT_STR()             if (it == listend)     \
+                               {                      \
+                                   cerr << listerror; \
+                                   return false;      \
+                               }                      \
+                               ts = *it++;            \
+                               if (ts.isNull())       \
+                                   ts = "";           
+                               
+#define INT_FROM_LIST(x)       NEXT_STR() (x) = atoi(ts.ascii());
+#define ENUM_FROM_LIST(x, y)   NEXT_STR() (x) = (y)atoi(ts.ascii());
 
-#define DATETIME_FROM_LIST(x)  (x).setTime_t((uint)_INT_FROM_LIST());
-#define DATE_FROM_LIST(x)      DATETIME_FROM_LIST(tmp); (x) = tmp.date();
+#define DATETIME_FROM_LIST(x)  NEXT_STR() (x).setTime_t((uint)atoi(ts.ascii()));
+#define DATE_FROM_LIST(x)      DATETIME_FROM_LIST(td); (x) = td.date();
 
-#define LONGLONG_FROM_LIST(x)  (x) = ((long long)(_INT_FROM_LIST()) << 32) | \
-                               ((long long)(_INT_FROM_LIST()) & 0xffffffffLL);
+#define LONGLONG_FROM_LIST(x)  INT_FROM_LIST(ti); NEXT_STR() \
+                               (x) = ((long long)(ti) << 32) | \
+                               ((long long)(atoi(ts.ascii())) & 0xffffffffLL);
 
-#define STR_FROM_LIST(x)       (x) = *(it++);
+#define STR_FROM_LIST(x)       NEXT_STR() (x) = ts;
 
-#define FLOAT_FROM_LIST(x)     (x) = atof( (*(it++)).ascii() );
+#define FLOAT_FROM_LIST(x)     NEXT_STR() (x) = atof(ts.ascii());
 
 
 bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
 {
-    QStringList::iterator checkit = it;
-    checkit += (NUMPROGRAMLINES - 1);
-    if (checkit == list.end())
-    {
-        cerr << "Not enough items in list for ProgramInfo object" << endl;
-        return false;
-    }
-
-    QDateTime tmp;
+    const char* listerror = "ProgramInfo::FromStringList, not enough items"
+                            " in list. \n"; 
+    QStringList::iterator listend = list.end();
+    QString ts;
+    QDateTime td;
+    int ti;
 
     STR_FROM_LIST(title)
     STR_FROM_LIST(subtitle)
@@ -262,9 +265,9 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
 
     DATETIME_FROM_LIST(startts)
     DATETIME_FROM_LIST(endts)
-    it++; // dummy place holder
+    NEXT_STR() // dummy place holder
     INT_FROM_LIST(shareable)
-    it++; // dummy place holder
+    NEXT_STR() // dummy place holder
     STR_FROM_LIST(hostname)
     INT_FROM_LIST(sourceid)
     INT_FROM_LIST(cardid)
@@ -287,9 +290,6 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     DATETIME_FROM_LIST(lastmodified)
     FLOAT_FROM_LIST(stars)
     DATE_FROM_LIST(originalAirDate);
-
-    seriesid += "";
-    programid += "";
 
     return true;
 }
@@ -2623,6 +2623,7 @@ bool ProgramList::FromScheduler(bool &hasConflicts)
     if (count() != slist[1].toUInt())
     {
         cerr << "length mismatch in ProgramList::FromScheduler" << endl;
+        clear();
         result = false;
     }
 
