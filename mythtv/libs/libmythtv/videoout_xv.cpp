@@ -227,6 +227,8 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
 {
     pthread_mutex_init(&lock, NULL);
 
+    needrepaint = true;
+
     int (*old_handler)(Display *, XErrorEvent *);
     int i, ret;
     XJ_caught_error = 0;
@@ -504,7 +506,9 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     pauseFrame.frameNumber = scratchFrame->frameNumber;
 
     InitColorKey(true);
-    
+   
+    MoveResize();
+ 
     if (gContext->GetNumSetting("UseOutputPictureControls", 0))
     {
         ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
@@ -564,8 +568,6 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
             }
         }
     }
-
-    MoveResize();
 }
 
 bool VideoOutputXv::SetupDeinterlace(bool interlaced)
@@ -1047,8 +1049,8 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
     // boboff assumes the smallest interlaced resolution is 480 lines
     int boboff = (int)round(((float)disphoff) / 480 - 0.001f);
     boboff = (m_deinterlacing && m_deintfiltername == "bobdeint") ? boboff : 0;
-//    VERBOSE(VB_PLAYBACK, QString("disphoff(%1) boboff(%2) ndc(%3)")
-//            .arg(disphoff).arg(boboff).arg((data->needdrawcolor?"yes":"no")));
+    //VERBOSE(VB_PLAYBACK, QString("disphoff(%1) boboff(%2) ndc(%3)")
+    //        .arg(disphoff).arg(boboff).arg((data->needdrawcolor?"yes":"no")));
 
     if (data->needdrawcolor)
     {

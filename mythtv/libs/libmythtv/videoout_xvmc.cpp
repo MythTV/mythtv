@@ -238,6 +238,8 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
 {
     pthread_mutex_init(&lock, NULL);
 
+    needrepaint = true;
+
     int (*old_handler)(Display *, XErrorEvent *);
     int i, ret;
     XJ_caught_error = 0;
@@ -515,6 +517,8 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
 
     InitColorKey(true);
 
+    MoveResize();
+
     if (gContext->GetNumSetting("UseOutputPictureControls", 0))
     {
         ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
@@ -574,8 +578,6 @@ void VideoOutputXvMC::InitColorKey(bool turnoffautopaint)
             }
         }
     }
-
-    MoveResize();
 }
 
 bool VideoOutputXvMC::SetupDeinterlace(bool interlaced)
@@ -1115,24 +1117,24 @@ void VideoOutputXvMC::DrawUnusedRects(bool sync)
     {
         XSetForeground(data->XJ_disp, data->XJ_gc, data->colorkey);
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc,
-                       dispx, dispy+boboff, dispw, disph);
+                       dispx, dispy + boboff, dispw, disph - 2 * boboff);
     }
 
     XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
     if (dispxoff > dispx) // left
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
-                       dispx, dispy, dispxoff-dispx, disph);
-    if (dispxoff+dispwoff < dispx+dispw) // right
+                       dispx, dispy, dispxoff - dispx, disph);
+    if (dispxoff + dispwoff < dispx + dispw) // right
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
-                       dispxoff+dispwoff, dispy, 
-                       (dispx+dispw)-(dispxoff+dispwoff), disph);
-    if (dispyoff+boboff > dispy) // top of screen
+                       dispxoff + dispwoff, dispy, 
+                       (dispx + dispw) - (dispxoff + dispwoff), disph);
+    if (dispyoff + boboff > dispy) // top of screen
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
-                       dispx, dispy, dispw, dispyoff+boboff-dispy);
-    if (dispyoff+disphoff < dispy+disph) // bottom of screen
+                       dispx, dispy, dispw, dispyoff + boboff - dispy);
+    if (dispyoff + disphoff < dispy + disph + boboff) // bottom of screen
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
-                       dispx, dispyoff+disphoff, 
-                       dispw, (dispy+disph)-(dispyoff+disphoff));
+                       dispx, dispyoff + disphoff - boboff, 
+                       dispw, (dispy + disph + boboff) - (dispyoff + disphoff));
 
     if (sync)
         XSync(data->XJ_disp, false);

@@ -256,6 +256,9 @@ void AvFormatDecoder::Reset(void)
     SeekReset();
 
     //
+    // This breaks channel changes on normal XvMC (and possibly XvMC VLD)
+    //
+#if 0
     // Clear out the existing mpeg streams
     // so we can get a clean set from the 
     // new seek position.
@@ -263,6 +266,8 @@ void AvFormatDecoder::Reset(void)
     {
         av_remove_stream(ic, ic->streams[i]->id);
     }
+#endif
+
     m_positionMap.clear();
     framesPlayed = 0;
     framesRead = 0;
