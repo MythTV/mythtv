@@ -469,16 +469,16 @@ void MythImageSelector::paintEvent(QPaintEvent* e)
     tmp.setFont(font());
     tmp.setPen(QPen(fgcolor, 2 * r.width() / 800));
 
-    cout << "I think I am " << r.width() << "x" << r.height() << endl;
+//     cout << "I think I am " << r.width() << "x" << r.height() << endl;
 
     unsigned int thumbw = r.width() / (columns + 1);
     unsigned int thumbh = r.height() / (rows + 1);
 
-    cout << "I want " << thumbw << "x" << thumbh << " pixmaps\n";
+//     cout << "I want " << thumbw << "x" << thumbh << " pixmaps\n";
 
     unsigned int spacew = thumbw / (columns + 1);
     unsigned int spaceh = (thumbh) / (rows + 1);
-    cout << "Spaced " << spacew << "x" << spaceh << " apart\n";
+//     cout << "Spaced " << spacew << "x" << spaceh << " apart\n";
 
     unsigned int currow = current / columns;
     unsigned int curcol = current % columns;
@@ -502,9 +502,9 @@ void MythImageSelector::paintEvent(QPaintEvent* e)
              QImage tmpimage = sel->image;
              tmpimage = tmpimage.smoothScale(thumbw, thumbh, QImage::ScaleMin);
 
-             cout << "pixmap came out "
-                  << tmpimage.width() << "x" << tmpimage.height()
-                  << endl;
+//              cout << "pixmap came out "
+//                   << tmpimage.width() << "x" << tmpimage.height()
+//                   << endl;
              QPixmap tmppixmap(tmpimage);
 
              int ximagepos = xpos + (thumbw - tmppixmap.width()) / 2;
