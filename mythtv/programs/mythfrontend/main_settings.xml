@@ -97,4 +97,11 @@
      <depends>mythweather</depends>
    </button>
 
+   <button>
+     <type>DVD</type>
+     <text>DVD Settings</text>
+     <action>CONFIGPLUGIN mythdvd</action>
+     <depends>mythdvd</depends>
+   </button>
+
 </mythmenu>
