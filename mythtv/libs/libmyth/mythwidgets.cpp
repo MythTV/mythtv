@@ -93,7 +93,6 @@ void MythComboBox::focusOutEvent(QFocusEvent *e)
         {
             insertItem(curText);
             setCurrentItem(count()-1);
-            removeItem(count()-1);
         }
     }
 

@@ -318,7 +318,7 @@ void VideoOutput::MoveResize(void)
         // Vertical underscan. Move the starting Y point in the display window.
         // Use the abolute value of scan factor.
         vscanf = fabs(img_vscanf);
-        dispyoff = (int)floor(0.5 + disph * vscanf);
+        dispyoff = (int)floor(0.5 + disph * vscanf) + dispy;
         disphoff = (int)floor(0.5 + disph * (1 - 2 * vscanf));
         // Now offset the image within the extra blank space created by
         // underscanning.
@@ -342,7 +342,7 @@ void VideoOutput::MoveResize(void)
     if (img_hscanf < 0) 
     {
         hscanf = fabs(img_hscanf);
-        dispxoff = (int)floor(0.5 + dispw * hscanf);
+        dispxoff = (int)floor(0.5 + dispw * hscanf) + dispx;
         dispwoff = (int)floor(0.5 + dispw * (1 - 2 * hscanf));
         if (xoff > 0) 
         {
@@ -445,7 +445,7 @@ void VideoOutput::MoveResize(void)
 
  
     VERBOSE(VB_PLAYBACK,
-            QString("Image size. dispxoff %1, dispxoff: %2, dispwoff: %3, "
+            QString("Image size. dispxoff %1, dispyoff: %2, dispwoff: %3, "
                     "disphoff: %4")
             .arg(dispxoff).arg(dispyoff).arg(dispwoff).arg(disphoff));
 
