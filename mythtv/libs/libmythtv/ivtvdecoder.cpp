@@ -55,11 +55,8 @@ IvtvDecoder::~IvtvDecoder()
 
 void IvtvDecoder::SeekReset(long long newkey, int skipframes, bool needFlush)
 {
-    //VERBOSE(VB_PLAYBACK, QString("IvtvDecoder::SeekReset frame = %1, "
-    //                             "skip = %2, exact = %3")
-    //                             .arg((long)newkey)
-    //                             .arg(skipframes)
-    //                             .arg(exactseeks));
+    //fprintf(stderr, "seek reset frame = %llu, skip = %d, exact = %d\n", 
+    //        newkey, skipframes, exactseeks);
 
     if (!exactseeks)
         skipframes = 0;
@@ -441,9 +438,8 @@ bool IvtvDecoder::ReadWrite(int onlyvideo)
 
     if (videndofframe)
     {
-        //VERBOSE(VB_PLAYBACK, QString("queued: r = %1, p = %2")
-        //                             .arg(nexttoqueue)
-        //                             .arg(framesScanned));
+        //cout << "queued: r=" << nexttoqueue 
+        //     << ", p=" << framesScanned << endl;
         queuedlist.push_back(IvtvQueuedFrame(nexttoqueue++, framesScanned));
     }
 
@@ -534,9 +530,9 @@ void IvtvDecoder::UpdateFramesPlayed(void)
             lastdequeued = queuedlist.front().raw;
             videoPlayed = queuedlist.front().actual;
             queuedlist.pop_front();
-            //VERBOSE(VB_PLAYBACK, QString("dequeued: r = %1, p = %2")
-            //                             .arg(lastdequeued)
-            //                             .arg(videoPlayed));
+            //cout << "                        "
+            //     << "dequeued: r=" << lastdequeued 
+            //     << ", p=" << videoPlayed << endl;
         }
     }
 
@@ -549,14 +545,14 @@ bool IvtvDecoder::StepFrames(int start, int count)
 
     int step, cur = 0, last = start;
 
-    //VERBOSE(VB_PLAYBACK, QString("stepping %1 from %2").arg(count).arg(last));
+    //fprintf(stderr, "stepping %d from %d\n", count, last);
 
     for (step = 0; step < count && !ateof; step++)
     {
         while (ReadWrite(1))
             ;
 
-        //VERBOSE(VB_PLAYBACK, QString("  step %1 at %2").arg(step).arg(last));
+        //fprintf(stderr, "    step %d at %d\n", step, last);
         videoout->Step();
         usleep(1000);
 
@@ -586,7 +582,7 @@ bool IvtvDecoder::StepFrames(int start, int count)
 
         videoout->Pause();
 
-        //VERBOSE(VB_PLAYBACK, QString("  %1 tries to %2").arg(tries).arg(cur));
+        //fprintf(stderr, "        %d tries to %d\n", tries, cur);
 
         if (tries >= maxtries)
         {
@@ -598,7 +594,7 @@ bool IvtvDecoder::StepFrames(int start, int count)
         last = cur;
     }
 
-    //VERBOSE(VB_PLAYBACK, QString("  stepped to %1").arg(cur));
+    //fprintf(stderr, "    stepped to %d\n", cur);
 
     return true;
 }
