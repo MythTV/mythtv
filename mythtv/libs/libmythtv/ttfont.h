@@ -43,15 +43,16 @@ typedef struct _efont
      int                 ascent;
      int                 descent;
      int                 fontsize;
+     int                 vid_width;
+     int                 vid_height;
   }
 Efont;
 
 void EFont_draw_string(unsigned char *yuvptr, int x, int y, const string &text,
-                       Efont *font, int maxx, int maxy, int video_width, 
-                       int video_height, bool white = true, 
+                       Efont *font, int maxx, int maxy, bool white = true, 
                        bool rightjustify = false);
 void Efont_free(Efont * f);
-Efont *Efont_load(char *file, int size);
+Efont *Efont_load(char *file, int size, int video_width, int video_height);
 void Efont_extents(Efont * f, const string &text, int *font_ascent_return,
                    int *font_descent_return, int *width_return,
                    int *max_ascent_return, int *max_descent_return,

@@ -58,7 +58,7 @@ static TT_Engine    engine;
 #define TT_VALID(handle) ((handle).z != NULL)
 
 static unsigned char alpha_lut[5] =
-{0, 64, 128, 192, 255};
+{0, 128, 196, 224, 255};
 static unsigned char bounded_palette[9] =
 {0, 1, 2, 3, 4, 4, 4, 4, 4};
 
@@ -301,7 +301,7 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
    uptr = yuv + video_height * video_width;
    vptr = uptr + (video_height * video_width) / 4;   
    int offset; 
- 
+
    for (y = 0; y < height; y++)
      {
 	ptr = (unsigned char *)rmap->bitmap + offset_x + 
@@ -338,12 +338,15 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
 
 void
 EFont_draw_string(unsigned char *yuvptr, int x, int y, const string &text,
-		  Efont * font, int maxx, int maxy, int video_width,
-                  int video_height, bool white, bool rightjustify)
+		  Efont * font, int maxx, int maxy, bool white, 
+                  bool rightjustify)
 {
    int                  width, height, w, h, inx, iny, clipx, clipy;
    TT_Raster_Map       *rmap, *rtmp;
    char                 is_pixmap = 0;
+
+   int video_width = font->vid_width;
+   int video_height = font->vid_height;
 
    char *ctext = (char *)text.c_str();
    
@@ -444,12 +447,12 @@ Efont_free(Efont * f)
 }
 
 Efont              *
-Efont_load(char *file, int size)
+Efont_load(char *file, int size, int video_width, int video_height)
 {
    TT_Error            error;
    TT_CharMap          char_map;
    TT_Glyph_Metrics    metrics;
-   int                 dpi = 96;
+   int                 xdpi = 96, ydpi = 96;
    Efont              *f;
    unsigned short      i, n, code, load_flags;
    unsigned short      num_glyphs = 0, no_cmap = 0;
@@ -503,7 +506,17 @@ Efont_load(char *file, int size)
 /*      fprintf(stderr, "Unable to create instance\n"); */
 	return NULL;
      }
-   TT_Set_Instance_Resolutions(f->instance, dpi, dpi);
+
+   if (video_width != video_height * 4 / 3)
+   {
+       xdpi = (int)(xdpi * 
+              (float)(video_width / (float)(video_height * 4 / 3)));
+   }
+
+   f->vid_width = video_width;
+   f->vid_height = video_height;
+
+   TT_Set_Instance_Resolutions(f->instance, xdpi, ydpi);
    TT_Set_Instance_CharSize(f->instance, size * 64);
 
    n = f->properties.num_CharMaps;

@@ -37,14 +37,16 @@ OSD::OSD(int width, int height, const string &filename)
     infofontsize = 16;
     channumfontsize = 40;
 
-    if (vid_width < 600)
+    if (vid_width < 400)
     {
         infofontsize /= 2;
         channumfontsize /= 2;
     }
     
-    info_font = Efont_load((char *)fontname.c_str(), infofontsize);
-    channum_font = Efont_load((char *)fontname.c_str(), channumfontsize);
+    info_font = Efont_load((char *)fontname.c_str(), infofontsize, vid_width,
+                           vid_height);
+    channum_font = Efont_load((char *)fontname.c_str(), channumfontsize,
+                              vid_width, vid_height);
 
     int mwidth, twidth;
     Efont_extents(info_font, "M M", NULL, NULL, &twidth, NULL, NULL, NULL, 
@@ -116,12 +118,11 @@ void OSD::Display(unsigned char *yuvptr)
         }
 
 	EFont_draw_string(yuvptr, info_x_start + 5, info_y_start + 5, infotext,
-                          info_font, info_x_end - 5, info_y_end - 5, 
-                          vid_width, vid_height);
+                          info_font, info_x_end - 5, info_y_end - 5);
         EFont_draw_string(yuvptr, info_x_start + 5, info_y_start + 5 + 
                           infofontsize * 3 / 2, subtitletext, info_font, 
-                          info_x_end - 5, info_y_end - 5 - infofontsize * 3 / 2,
-                          vid_width, vid_height);
+                          info_x_end - 5, 
+                          info_y_end - 5 - infofontsize * 3 / 2);
         int textlength = 0;
         Efont_extents(info_font, desctext, NULL, NULL, &textlength, NULL, NULL,
                       NULL, NULL);
@@ -145,7 +146,7 @@ void OSD::Display(unsigned char *yuvptr)
                     EFont_draw_string(yuvptr, info_x_start + 5, info_y_start +
                                       5 + infofontsize * (lines + 2) * 3 / 2,
                                       line, info_font, info_x_end - 5, 
-                                      info_y_end - 5, vid_width, vid_height);
+                                      info_y_end - 5);
                     length = 0;
                     memset(line, '\0', 512);
                     lines++;
@@ -165,8 +166,7 @@ void OSD::Display(unsigned char *yuvptr)
             }
             EFont_draw_string(yuvptr, info_x_start + 5, info_y_start + 5 +
                               infofontsize * (lines + 2) * 3 / 2, line, 
-                              info_font, info_x_end - 5, info_y_end - 5, 
-                              vid_width, vid_height);
+                              info_font, info_x_end - 5, info_y_end - 5);
             free(orig);
         }
         else
@@ -174,7 +174,7 @@ void OSD::Display(unsigned char *yuvptr)
             EFont_draw_string(yuvptr, info_x_start + 5, info_y_start + 5 +
                               infofontsize * 3, desctext, info_font,
                               info_x_end - 5, info_y_end - 5 - 
-                              infofontsize * 3, vid_width, vid_height);
+                              infofontsize * 3);
         }
     }
 
@@ -182,18 +182,18 @@ void OSD::Display(unsigned char *yuvptr)
     {
 	EFont_draw_string(yuvptr, channum_x_start - 1, channum_y_start - 1, 
                           channumtext, channum_font, channum_x_end, 
-                          channum_y_end, vid_width, vid_height, false);
+                          channum_y_end, false);
         EFont_draw_string(yuvptr, channum_x_start + 1, channum_y_start + 1,
                           channumtext, channum_font, channum_x_end,
-                          channum_y_end, vid_width, vid_height, false); 
+                          channum_y_end, false); 
         EFont_draw_string(yuvptr, channum_x_start + 1, channum_y_start - 1,
                           channumtext, channum_font, channum_x_end,
-                          channum_y_end, vid_width, vid_height, false);
+                          channum_y_end, false);
         EFont_draw_string(yuvptr, channum_x_start - 1, channum_y_start + 1,
                           channumtext, channum_font, channum_x_end,
-                          channum_y_end, vid_width, vid_height, false); 
+                          channum_y_end, false); 
         EFont_draw_string(yuvptr, channum_x_start, channum_y_start, channumtext,
                           channum_font, channum_x_end, channum_y_end, 
-                          vid_width, vid_height, true, true);
+                          true, true);
     }
 }
