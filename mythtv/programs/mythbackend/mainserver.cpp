@@ -2807,8 +2807,10 @@ QString MainServer::LocalFilePath(QUrl &url)
     else
     {
         lpath = lpath.section('/', -1);
-        lpath = gContext->GetFilePrefix() + lpath;
+        lpath = gContext->GetFilePrefix() + "/" + lpath;
     }
+    VERBOSE(VB_FILE, QString("Local file path: %1").arg(lpath));
+
     return lpath;
 }
 
