@@ -55,7 +55,7 @@ void Decoder::dispatch(const DecoderEvent &e)
     QObject *object = listeners.first();
     while (object) 
     {
-        QThread::postEvent(object, new DecoderEvent(e));
+        QApplication::postEvent(object, new DecoderEvent(e));
         object = listeners.next();
     }
 }
@@ -65,7 +65,7 @@ void Decoder::dispatch(const OutputEvent &e)
     QObject *object = listeners.first();
     while (object) 
     {
-        QThread::postEvent(object, new OutputEvent(e));
+        QApplication::postEvent(object, new OutputEvent(e));
         object = listeners.next();
     }
 }
@@ -76,7 +76,7 @@ void Decoder::error(const QString &e)
     while (object) 
     {
         QString *str = new QString(e.utf8());
-        QThread::postEvent(object, new DecoderEvent(str));
+        QApplication::postEvent(object, new DecoderEvent(str));
         object = listeners.next();
     }
 }

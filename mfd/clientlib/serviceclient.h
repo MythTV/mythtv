@@ -20,6 +20,7 @@ enum MfdServiceType
 };
 
 
+class MfdInterface;
 
 class ServiceClient
 {
@@ -27,6 +28,8 @@ class ServiceClient
   public:
 
     ServiceClient(
+                    MfdInterface *the_mfd,
+                    int which_mfd,
                     MfdServiceType l_service_type,
                     const QString &l_ip_address,
                     uint l_port
@@ -45,6 +48,8 @@ class ServiceClient
   protected:
   
     QSocketDevice  *client_socket_to_service;
+    int            mfd_id;
+    MfdInterface   *mfd_interface;
 
   private:
   

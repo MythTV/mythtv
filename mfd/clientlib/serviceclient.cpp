@@ -13,13 +13,18 @@
 using namespace std;
 
 #include "serviceclient.h"
+#include "mfdinterface.h"
 
 ServiceClient::ServiceClient(
+                                MfdInterface *the_mfd,
+                                int an_mfd,
                                 MfdServiceType l_service_type,
                                 const QString &l_ip_address,
                                 uint l_port
                             )
 {
+    mfd_interface = the_mfd;
+    mfd_id = an_mfd;
     service_type = l_service_type;
     ip_address = l_ip_address;
     port = l_port;

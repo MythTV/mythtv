@@ -20,6 +20,8 @@ class AudioClient : public ServiceClient
   public:
 
     AudioClient(
+                MfdInterface *the_mfd,
+                int an_mfd,
                 const QString &l_ip_address,
                 uint l_port
                );

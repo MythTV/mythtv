@@ -19,11 +19,25 @@ class MfdInstance;
 class MfdInterface : public QObject
 {
 
+  Q_OBJECT
+
   public:
 
     MfdInterface();
     ~MfdInterface();
 
+
+  signals:
+
+    //
+    //  Signals we send out when something happens. Linking client wants to
+    //  connect to all or some of these
+    //
+
+    void mfdDiscovery(int, QString, QString, bool);
+    void audioPaused(int, bool);
+    void audioStopped(int);
+    void audioPlaying(int, int, int, int, int, int, int, int, int);
 
   protected:
   
@@ -32,6 +46,7 @@ class MfdInterface : public QObject
 
   private:
 
+    int             bumpMfdId(){ ++mfd_id_counter; return mfd_id_counter;}
     MfdInstance*    findMfd(
                             const QString &a_host,
                             const QString &an_ip_addesss,
@@ -40,6 +55,7 @@ class MfdInterface : public QObject
   
     DiscoveryThread       *discovery_thread;
     QPtrList<MfdInstance> *mfd_instances;
+    int                   mfd_id_counter;
 };
 
 #endif

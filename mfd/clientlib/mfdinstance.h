@@ -17,12 +17,17 @@
 
 #include "serviceclient.h"
 
+class MfdInterface;
+
 class MfdInstance : public QThread
 {
 
   public:
 
     MfdInstance(
+                int an_id,
+                MfdInterface *the_interface,
+                const QString &l_name,
                 const QString &l_hostname, 
                 const QString &l_ip_address,
                 int l_port
@@ -33,12 +38,16 @@ class MfdInstance : public QThread
     void stop();
     void wakeUp();
     
+    QString getName(){return name;}
     QString getHostname(){return hostname;}
     QString getAddress(){return ip_address;}
     int     getPort(){return port;}
     void    readFromMfd();
     void    parseFromMfd(QStringList &tokens);
-
+    void    announceMyDemise();
+    int     getId(){return mfd_id;}
+    
+    
     //
     //  Adding and removing interfaces to services _this_ mfd offers
     //
@@ -55,6 +64,7 @@ class MfdInstance : public QThread
  
   private:
   
+    QString name;
     QString hostname;
     QString ip_address;
     int     port;
@@ -68,6 +78,9 @@ class MfdInstance : public QThread
     QSocketDevice *client_socket_to_mfd;
 
     QPtrList<ServiceClient> *my_service_clients;
+    
+    MfdInterface *mfd_interface;
+    int mfd_id;
     
 };
 

@@ -36,10 +36,17 @@ MfdInterface::MfdInterface()
     
     mfd_instances = new QPtrList<MfdInstance>;
     mfd_instances->setAutoDelete(true);
+    mfd_id_counter = 0;
 }
 
 void MfdInterface::customEvent(QCustomEvent *ce)
 {
+    //
+    //  This is pretty critical. It receives events from the mfd instances
+    //  (and their service client interfaces) and emits Qt signals to let
+    //  the client application code know what is going on
+    //
+
     if(ce->type() == MFD_CLIENTLIB_EVENT_DISCOVERY)
     {
         //
@@ -69,12 +76,21 @@ void MfdInterface::customEvent(QCustomEvent *ce)
             else
             {
                 MfdInstance *new_mfd = new MfdInstance(
+                                                        bumpMfdId(),
+                                                        this,
+                                                        de->getName(),
                                                         de->getHost(),
                                                         de->getAddress(),
                                                         de->getPort()
                                                       );
                 new_mfd->start();
                 mfd_instances->append(new_mfd);
+                emit mfdDiscovery(
+                                    new_mfd->getId(), 
+                                    new_mfd->getName().section(".", 0, 0), 
+                                    new_mfd->getHostname(),
+                                    true
+                                 );
             }
                                                
         }
@@ -90,9 +106,49 @@ void MfdInterface::customEvent(QCustomEvent *ce)
                 mfd_to_kill->stop();
                 mfd_to_kill->wait();
                 mfd_instances->remove(mfd_to_kill);
+                emit mfdDiscovery(
+                                    mfd_to_kill->getId(), 
+                                    mfd_to_kill->getName().section(".", 0, 0), 
+                                    mfd_to_kill->getHostname(),
+                                    false
+                                 );
             }
-
+            else
+            {
+                cerr << "told to kill an mfd that I have no record of "
+                     << endl;
+            }
         }
+    }
+    else if(ce->type() == MFD_CLIENTLIB_EVENT_AUDIOPAUSE)
+    {
+        MfdAudioPausedEvent *ape = (MfdAudioPausedEvent*)ce;
+        emit audioPaused(ape->getMfd(), ape->getPaused());
+    }
+    else if(ce->type() == MFD_CLIENTLIB_EVENT_AUDIOSTOP)
+    {
+        MfdAudioStoppedEvent *ase = (MfdAudioStoppedEvent*)ce;
+        emit audioStopped(ase->getMfd());
+    }
+    else if(ce->type() == MFD_CLIENTLIB_EVENT_AUDIOPLAY)
+    {
+        MfdAudioPlayingEvent *ape = (MfdAudioPlayingEvent*)ce;
+        emit audioPlaying(
+                            ape->getMfd(),
+                            ape->getPlaylist(),
+                            ape->getPlaylistIndex(),
+                            ape->getCollectionId(),
+                            ape->getMetadataId(),
+                            ape->getSeconds(),
+                            ape->getChannels(),
+                            ape->getBitrate(),
+                            ape->getSampleFrequency()
+                         );
+    }
+    else
+    {
+        cerr << "mfdinterface is getting CustomEvent's it does not understand" 
+             << endl;
     }
 }
 

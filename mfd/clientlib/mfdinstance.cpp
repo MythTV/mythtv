@@ -12,16 +12,26 @@
 #include <iostream>
 using namespace std;
 
+#include <qapplication.h>
+
+#include "mfdinterface.h"
 #include "mfdinstance.h"
 #include "audioclient.h"
 #include "metadataclient.h"
+#include "events.h"
 
 MfdInstance::MfdInstance(
+                            int an_mfd,
+                            MfdInterface *the_interface,
+                            const QString &l_name,
                             const QString &l_hostname,
                             const QString &l_ip_address,
                             int l_port
                         )
 {
+    mfd_id = an_mfd;
+    mfd_interface = the_interface;
+    name = l_name;
     hostname= l_hostname;
     ip_address = l_ip_address;
     port = l_port;
@@ -60,6 +70,7 @@ void MfdInstance::run()
     if(!this_address.setAddress(ip_address))
     {
         cerr << "mfdinstance.o: can't set address to mfd" << endl;
+        announceMyDemise();
         return;
     }
 
@@ -75,29 +86,53 @@ void MfdInstance::run()
         //
 
         ++connect_tries;
+
         if(connect_tries > 10)
         {
             cerr << "mfdinstance.o: could not connect to mfd on \""
                  << hostname
                  << "\""
                  << endl;
-                            
+                  
+            announceMyDemise();          
             return;
         }
         msleep(300);
     }
 
     QString first_and_only_command = "services list\n\r";
-    if(client_socket_to_mfd->writeBlock(
-                                        first_and_only_command.ascii(), 
-                                        first_and_only_command.length()
-                                       )
-       != (int) first_and_only_command.length())
+
+
+    //
+    //  We try up to 10 times to write our only message. If that fails, we bail.
+    //
+
+
+    int write_tries = 0;
+    while(
+            client_socket_to_mfd->writeBlock(
+                                                first_and_only_command.ascii(),
+                                                first_and_only_command.length()
+                                            )
+            < 0)
     {
-        cerr << "mfdinstance.o: error writing to my mfd, "
-             << "giving up"
-             << endl;
-        return;
+        ++write_tries;
+
+        if(write_tries > 10)
+        {
+            cerr << "mfdinstance.o: tried to write "
+                 << first_and_only_command.length()
+                 << " bytes to mfd at "
+                 << ip_address
+                 << ":"
+                 << port
+                 << ", but failed repeatedly and is giving up "
+                 << endl;
+        
+            announceMyDemise();
+            return;
+        }
+        msleep(300);
     }
 
     while(keep_going)
@@ -352,7 +387,7 @@ void MfdInstance::parseFromMfd(QStringList &tokens)
 
 void MfdInstance::addAudioClient(const QString &address, uint a_port)
 {
-    AudioClient *new_audio = new AudioClient(address, a_port);
+    AudioClient *new_audio = new AudioClient(mfd_interface, mfd_id, address, a_port);
     if(new_audio->connect())
     {
         my_service_clients->append(new_audio);
@@ -368,7 +403,7 @@ void MfdInstance::addAudioClient(const QString &address, uint a_port)
 
 void MfdInstance::addMetadataClient(const QString &address, uint a_port)
 {
-    MetadataClient *new_metadata = new MetadataClient(address, a_port);
+    MetadataClient *new_metadata = new MetadataClient(mfd_interface, mfd_id, address, a_port);
     if(new_metadata->connect())
     {
         my_service_clients->append(new_metadata);
@@ -424,6 +459,19 @@ void MfdInstance::removeServiceClient(
              << "doesn't exist"
              << endl;
     }
+}
+
+void MfdInstance::announceMyDemise()
+{
+    MfdDiscoveryEvent *de = new MfdDiscoveryEvent(
+                                                    false, 
+                                                    getName(),
+                                                    getHostname(),
+                                                    getAddress(),
+                                                    getPort()
+                                                 );
+
+    QApplication::postEvent( mfd_interface, de );
 }
 
 MfdInstance::~MfdInstance()    

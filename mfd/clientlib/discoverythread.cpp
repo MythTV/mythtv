@@ -15,11 +15,10 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <errno.h>
-
-
-
 #include <iostream>
 using namespace std;
+
+#include <qapplication.h>
 
 #include "discoverythread.h"
 #include "events.h"
@@ -448,12 +447,13 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
             {
                 MfdDiscoveryEvent *de = new
                 MfdDiscoveryEvent(
-                                    false, 
+                                    false,
+                                    dead_mfd->getFullServiceName(), 
                                     dead_mfd->getHostName(),
                                     dead_mfd->getAddress(),
                                     dead_mfd->getPort()
                                  );
-                postEvent(mfd_interface, de);
+                QApplication::postEvent( mfd_interface, de );
                 discovered_mfds->remove(dead_mfd);
             }
             else
@@ -504,11 +504,12 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
                     MfdDiscoveryEvent *de = new
                     MfdDiscoveryEvent(
                                         true, 
+                                        which_one->getFullServiceName(),
                                         which_one->getHostName(),
                                         which_one->getAddress(),
                                         which_one->getPort()
                                      );
-                    postEvent(mfd_interface, de);
+                    QApplication::postEvent(mfd_interface, de);
                     which_one->isResolved(true);
                 }
                 else
@@ -544,11 +545,12 @@ void DiscoveryThread::cleanDeadMfds()
                 MfdDiscoveryEvent *de = new
                 MfdDiscoveryEvent(
                                     false, 
+                                    an_mfd->getFullServiceName(),
                                     an_mfd->getHostName(),
                                     an_mfd->getAddress(),
                                     an_mfd->getPort()
                                  );
-                postEvent(mfd_interface, de);
+                QApplication::postEvent(mfd_interface, de);
                 discovered_mfds->remove(it);
             }
             else
@@ -564,11 +566,12 @@ void DiscoveryThread::cleanDeadMfds()
                             MfdDiscoveryEvent *de = new
                             MfdDiscoveryEvent(
                                                 false, 
+                                                an_mfd->getFullServiceName(),
                                                 an_mfd->getHostName(),
                                                 an_mfd->getAddress(),
                                                 an_mfd->getPort()
                                              );
-                            postEvent(mfd_interface, de);
+                            QApplication::postEvent(mfd_interface, de);
                             discovered_mfds->remove(it);
                         }
                         else
@@ -594,6 +597,7 @@ void DiscoveryThread::cleanDeadMfds()
             ++it;
         }
     }
+    
 }
 
 DiscoveryThread::~DiscoveryThread()

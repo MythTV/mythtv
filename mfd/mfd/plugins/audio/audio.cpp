@@ -38,23 +38,40 @@ void AudioPlugin::swallowOutputUpdate(int numb_seconds, int channels, int bitrat
     //  Get the latest data about the state of play
     //
 
-    play_data_mutex.lock();
-        elapsed_time = numb_seconds;
-        current_channels = channels;
-        current_bitrate = bitrate;
-        current_frequency = frequency;
-    play_data_mutex.unlock();
+    int current_playlist = -1;
+    int current_playlist_item = -1;
+
+    playlist_mode_mutex.lock();
+        play_data_mutex.lock();
+            elapsed_time = numb_seconds;
+            current_channels = channels;
+            current_bitrate = bitrate;
+            current_frequency = frequency;
+            if(playlist_mode)
+            {
+                current_playlist = current_playlist_id;
+                current_playlist_item = current_playlist_item_index;
+            }
+        play_data_mutex.unlock();
+    playlist_mode_mutex.unlock();
 
     //
-    //  Tell the clients
+    //  Tell the clients what's going on
     //
     
-    sendMessage(QString("playing %1 %2 %3 %4")
-                        .arg(elapsed_time)
-                        .arg(current_channels)
-                        .arg(current_bitrate)
-                        .arg(current_frequency));
 
+    if(is_playing)
+    {
+        sendMessage(QString("playing %1 %2 %3 %4 %5 %6 %7 %8")
+                            .arg(current_playlist)
+                            .arg(current_playlist_item)
+                            .arg(current_collection)
+                            .arg(current_metadata)
+                            .arg(elapsed_time)
+                            .arg(current_channels)
+                            .arg(current_bitrate)
+                            .arg(current_frequency));
+    }
 }
 
 void AudioPlugin::run()
@@ -485,7 +502,15 @@ bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
 
         QUrl url_to_play = audio_metadata_to_play->getUrl();
         metadata_server->unlockMetadata();
-        return playUrl(url_to_play);
+        bool result = playUrl(url_to_play);
+        if(result)
+        {
+            play_data_mutex.lock();
+                current_collection = collection_id;
+                current_metadata = metadata_id;
+            play_data_mutex.unlock();
+        }
+        return result;
     }
     else
     {
@@ -560,6 +585,8 @@ void AudioPlugin::stopAudio()
         is_paused = false;
 
     state_of_play_mutex->unlock();
+
+    sendMessage("stop");
     
 }
 
@@ -673,7 +700,7 @@ void AudioPlugin::handleInternalMessage(QString the_message)
         //  reached the end of a file), nothing to do
         //
 
-        sendMessage("stop");
+        stopAudio();
     }
     if(the_message == "decoder finish")
     {
@@ -689,7 +716,6 @@ void AudioPlugin::handleInternalMessage(QString the_message)
         else
         {
             stopAudio();
-            sendMessage("stop");
         }
     }
 }
@@ -761,7 +787,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
         metadata_server->unlockMetadata();
         playlist_mode_mutex.unlock();
         stopPlaylistMode();
-        sendMessage("stop");
+        stopAudio();
         return;
     }
     
@@ -787,7 +813,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
         metadata_server->unlockMetadata();
         playlist_mode_mutex.unlock();
         stopPlaylistMode();
-        sendMessage("stop");
+        stopAudio();
         return;
     }
    
@@ -820,7 +846,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
                     .arg(current_playlist_container)
                     .arg(playlist_size), 8);
         stopPlaylistMode();
-        sendMessage("stop");
+        stopAudio();
     }
 }
 

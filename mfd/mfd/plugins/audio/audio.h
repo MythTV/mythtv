@@ -59,6 +59,8 @@ class AudioPlugin: public MFDServicePlugin
     int     current_channels;
     int     current_bitrate;
     int     current_frequency;
+    int     current_collection;
+    int     current_metadata;
     QMutex  play_data_mutex;
 
 

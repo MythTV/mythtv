@@ -19,6 +19,8 @@ class MetadataClient : public ServiceClient
   public:
 
     MetadataClient(
+                    MfdInterface *the_mfd,
+                    int an_mfd,
                     const QString &l_ip_address,
                     uint l_port
                   );

@@ -11,14 +11,21 @@
 #include <iostream>
 using namespace std;
 
-#include "audioclient.h"
+#include <qapplication.h>
 
+#include "audioclient.h"
+#include "events.h"
+#include "mfdinterface.h"
 
 AudioClient::AudioClient(
+                            MfdInterface *the_mfd,
+                            int an_mfd,
                             const QString &l_ip_address,
                             uint l_port
                         )
             :ServiceClient(
+                            the_mfd,
+                            an_mfd,
                             MFD_SERVICE_AUDIO_CONTROL,
                             l_ip_address,
                             l_port
@@ -64,7 +71,74 @@ void AudioClient::handleIncoming()
 
 void AudioClient::parseFromAudio(QStringList &tokens)
 {
-    cout << "getting these tokens: " << tokens.join(" ") << endl; 
+    if(tokens.count() < 1)
+    {
+        cerr << "audioclient.o: got no tokens to parse" 
+             << endl;
+        return;
+    }
+    
+    if(tokens[0] == "pause")
+    {
+        if(tokens.count() < 2)
+        {
+            cerr << "audioclient.o: got pause token, but no on or off"
+                 << endl;
+            return;
+        }
+        if(tokens[1] == "on")
+        {
+            MfdAudioPausedEvent *ape = new MfdAudioPausedEvent(mfd_id, true);
+            QApplication::postEvent(mfd_interface, ape);
+            return;
+        }
+        else if(tokens[1] == "off")
+        {
+            MfdAudioPausedEvent *ape = new MfdAudioPausedEvent(mfd_id, false);
+            QApplication::postEvent(mfd_interface, ape);
+            return;
+        }
+        cerr << "audioclinet.cpp: don't understand these tokens: "
+             << tokens.join(" ")
+             << endl;
+        return;
+    }
+    
+    if(tokens[0] == "stop")
+    {
+        MfdAudioStoppedEvent *ase = new MfdAudioStoppedEvent(mfd_id);
+        QApplication::postEvent(mfd_interface, ase);
+        return;
+    }
+    
+    if(tokens[0] == "playing")
+    {
+        if(tokens.count() < 9)
+        {
+            cerr << "audio server seems to be playing, but it's not "
+                 << "sending the correct number of tokens"
+                 << endl;
+            return;
+        }
+
+        MfdAudioPlayingEvent *ape = new MfdAudioPlayingEvent(
+                                        mfd_id,
+                                        tokens[1].toInt(),
+                                        tokens[2].toInt(),
+                                        tokens[3].toInt(),
+                                        tokens[4].toInt(),
+                                        tokens[5].toInt(),
+                                        tokens[6].toInt(),
+                                        tokens[7].toInt(),
+                                        tokens[8].toInt()
+                                                            );
+        QApplication::postEvent(mfd_interface, ape);
+        return;
+    }
+    
+    cerr << "getting tokens from audio server I don't understand: "
+         << tokens.join(" ")
+         << endl;
 }
 
 AudioClient::~AudioClient()
