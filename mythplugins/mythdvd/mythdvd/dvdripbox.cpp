@@ -279,117 +279,71 @@ void DVDRipBox::connectToMtd(bool try_to_run_mtd)
 void DVDRipBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-    
-    if(getContext() == 1)
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("DVD", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        switch (e->key())
+        QString action = actions[i];
+    
+        if (getContext() == 1)
         {
-            case Key_0:
-            case Key_1:
-            case Key_2:
-            case Key_3:
-            case Key_4:
-            case Key_5:
-            case Key_6:
-            case Key_7:
-            case Key_8:
-            case Key_9:
+            if (action == "0" || action == "1" || action == "2" ||
+                action == "3" || action == "4" || action == "5" ||
+                action == "6" || action == "7" || action == "8" ||
+                action == "9")
+            {
                 connectToMtd(true);
                 handled = true;
-                break;
+            }
         }    
-    }
-    else if(getContext() == 2 && have_disc)
-    {
-        switch (e->key())
+        else if(getContext() == 2 && have_disc)
         {
-            case Key_0:
-                if(ripscreen_button)
-                {
-                    if(ripscreen_button->GetContext() == -1)
-                    {
-                        ripscreen_button->push();
-                    }
-                }
+            if (action == "0")
+            {
+                if (ripscreen_button && ripscreen_button->GetContext() == -1)
+                    ripscreen_button->push();
                 handled=true;
-                break;
+            }
         }
-    }
-    else if(getContext() == 3)
-    {
-        switch (e->key())
+        else if(getContext() == 3)
         {
-            case Key_Right:
+            if (action == "RIGHT")
+            {
                 handled = true;
-                if(nextjob_button)
-                {
+                if (nextjob_button)
                     nextjob_button->push();
-                }
-                break;
-            case Key_Left:
+            }
+            else if (action == "LEFT")
+            {
                 handled = true;
-                if(prevjob_button)
-                {
+                if (prevjob_button)
                     prevjob_button->push();
-                }
-                break;
-            case Key_0:
-                handled=true;
-                if(ripscreen_button)
-                {
-                    if(ripscreen_button->GetContext() != -2)
-                    {
-                        ripscreen_button->push();
-                    }
-                }
-                break;
-                
-            case Key_9:
-                handled=true;
-                if(cancel_button)
-                {
+            }
+            else if (action == "0")
+            {
+                handled = true;
+                if (ripscreen_button && ripscreen_button->GetContext() != -2)
+                    ripscreen_button->push();
+            }
+            else if (action == "9")
+            {
+                handled = true;
+                if (cancel_button)
                     cancel_button->push();
-                }
-                break;
-                
-            case Key_1:
-                handled=true;
-                goToJob(1);
-                break;
-            case Key_2:
-                handled=true;
-                goToJob(2);
-                break;
-            case Key_3:
-                handled=true;
-                goToJob(3);
-                break;
-            case Key_4:
-                handled=true;
-                goToJob(4);
-                break;
-            case Key_5:
-                handled=true;
-                goToJob(5);
-                break;
-            case Key_6:
-                handled=true;
-                goToJob(6);
-                break;
-            case Key_7:
-                handled=true;
-                goToJob(7);
-                break;
-            case Key_8:
-                handled=true;
-                goToJob(8);
-                break;
+            }
+            else if (action == "1" || action == "2" || action == "3" ||
+                     action == "4" || action == "5" || action == "6" ||
+                     action == "7" || action == "8")
+            {
+                handled = true;
+                goToJob(action.toInt());
+            }
         }
     }
-    if(!handled)
-    {
+
+    if (!handled)
         MythThemedDialog::keyPressEvent(e);
-    }
 }
 
 void DVDRipBox::nextJob()

@@ -35,9 +35,10 @@ using namespace std;
 //  Transcode stuff only if we were ./configure'd for it
 //
 #ifdef TRANSCODE_SUPPORT
-void startDVDRipper(QSqlDatabase *db)
+void startDVDRipper(void)
 {
-    DVDRipBox *drb = new DVDRipBox(db, gContext->GetMainWindow(),
+    DVDRipBox *drb = new DVDRipBox(QSqlDatabase::database(), 
+                                   gContext->GetMainWindow(),
                                    "dvd_rip", "dvd-"); 
     qApp->unlock();
     drb->exec();
@@ -106,7 +107,7 @@ void playVCD()
 }
 #endif
 
-void playDVD()
+void playDVD(void)
 {
     //
     //  Get the command string to play a DVD
@@ -160,14 +161,9 @@ void playDVD()
     }
 }
 
-struct DVDData
-{
-    QSqlDatabase *db;
-};
-
 void DVDCallback(void *data, QString &selection)
 {
-    DVDData *ddata = (DVDData *)data;
+    (void)data;
     QString sel = selection.lower();
 
     if (sel == "dvd_play")
@@ -183,9 +179,8 @@ void DVDCallback(void *data, QString &selection)
     else if (sel == "dvd_rip")
     {
 #ifdef TRANSCODE_SUPPORT
-        startDVDRipper(ddata->db);
+        startDVDRipper();
 #else
-        ddata = ddata; // -Wall
         cerr << "main.o: TRANSCODE_SUPPORT is not on, but I still got asked to start the DVD ripper" << endl ;
 #endif
     }
@@ -209,15 +204,11 @@ void DVDCallback(void *data, QString &selection)
 void runMenu(QString which_menu)
 {
     QString themedir = gContext->GetThemeDir();
-    QSqlDatabase *db = QSqlDatabase::database();
 
     ThemedMenu *diag = new ThemedMenu(themedir.ascii(), which_menu, 
                                       gContext->GetMainWindow(), "dvd menu");
 
-    DVDData data;
-    data.db = db;
-
-    diag->setCallback(DVDCallback, &data);
+    diag->setCallback(DVDCallback, NULL);
     diag->setKillable();
 
     if (diag->foundTheme())
@@ -239,9 +230,20 @@ int mythplugin_run(void);
 int mythplugin_config(void);
 }
 
+void initKeys(void)
+{
+    REG_JUMP("Play DVD", "Play a DVD", "", playDVD);
+#ifdef VCD_SUPPORT
+    REG_JUMP("Play VCD", "Play a VCD", "", playVCD);
+#endif
+#ifdef TRANSCODE_SUPPORT
+    REG_JUMP("Rip DVD", "Import a DVD into your MythVideo database", "", 
+             startDVDRipper);
+#endif
+}
+
 int mythplugin_init(const char *libversion)
 {
-
     if (!gContext->TestPopupVersion("mythdvd", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
@@ -259,6 +261,8 @@ int mythplugin_init(const char *libversion)
     rsettings.load(QSqlDatabase::database());
     rsettings.save(QSqlDatabase::database());
 #endif
+
+    initKeys();
 
     return 0;
 }

@@ -165,132 +165,72 @@ void TitleDialog::showCurrentTitle()
 void TitleDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-    
-    switch (e->key())
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("DVD", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        //
-        //  Accelerated Next button
-        //
-        
-        case Key_F:
-        case Key_PageDown:
+        QString action = actions[i];
+        if (action == "PAGEDOWN")
+        { 
             handled = true;
-            if(next_title_button)
+            if (next_title_button)
             {
                 next_title_button->push();
             }
-            break;
-
-        //
-        //  Accelerated Prev Button
-        //
-        case Key_R:
-        case Key_PageUp:
+        }
+        else if (action == "PAGEUP")
+        {
             handled = true;
-            if(prev_title_button)
+            if (prev_title_button)
             {
                 prev_title_button->push();
             }
-            break;
-            
-        //
-        //  Widget Navigation
-        //
-        
-        case Key_Up:
+        }
+        else if (action == "UP")
+        {
             nextPrevWidgetFocus(false);
             handled = true;
-            break;
-        case Key_Down:
+        }
+        else if (action == "DOWN")
+        {
             nextPrevWidgetFocus(true);
             handled = true;
-            break;
-            
-        //
-        //  Widget Activation
-        //
-        
-        case Key_Space:
-        case Key_Enter:
-        case Key_Return:
+        }
+        else if (action == "SELECT")   
+        {
             activateCurrent();
             handled = true;
-            break;
-
-        //
-        //  Title Paging/Navigation
-        //
-
-        case Key_1:
-            gotoTitle(1);
+        }
+        else if (action == "1" || action == "2" || action == "3" ||
+                 action == "4" || action == "5" || action == "6" ||
+                 action == "7" || action == "8" || action == "9")
+        {
+            gotoTitle(action.toInt());
             handled = true;
-            break;
-
-        case Key_2:
-            gotoTitle(2);
-            handled = true;
-            break;
-
-        case Key_3:
-            gotoTitle(3);
-            handled = true;
-            break;
-
-        case Key_4:
-            gotoTitle(4);
-            handled = true;
-            break;
-
-        case Key_5:
-            gotoTitle(5);
-            handled = true;
-            break;
-
-        case Key_6:
-            gotoTitle(6);
-            handled = true;
-            break;
-
-        case Key_7:
-            gotoTitle(7);
-            handled = true;
-            break;
-
-        case Key_8:
-            gotoTitle(8);
-            handled = true;
-            break;
-
-        case Key_9:
-            gotoTitle(9);
-            handled = true;
-            break;
-
-        case Key_Left:
+        }
+        else if (action == "LEFT")
+        {
             prev_title_button->push();
             handled = true;
-            break;
-        case Key_Right:
+        }
+        else if (action == "RIGHT")
+        {
             next_title_button->push();
             handled = true;
-            break;
-            
-        //
-        //  Go ripping
-        //
-        
-        case Key_0:
-            if(ripaway_button->GetContext() == -1)
+        }
+        else if (action == "0") 
+        {
+            if (ripaway_button->GetContext() == -1)
             {
                 ripaway_button->push();
             }
             handled = true;
-            break;
+        }
     }
-    if(!handled)
-    {
+
+    if (!handled)
         MythThemedDialog::keyPressEvent(e);
-    }
 }
 
 void TitleDialog::nextTitle()
