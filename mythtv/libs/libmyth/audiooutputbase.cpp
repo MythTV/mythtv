@@ -263,7 +263,6 @@ void AudioOutputBase::Reset()
     audiotime = 0;
     total_written = 0;
     current_seconds = -1;
-    source_bitrate = -1;
     was_paused = !pauseaudio;
 
     // Setup visualisations, zero the visualisations buffers
