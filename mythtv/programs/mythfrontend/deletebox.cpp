@@ -352,7 +352,10 @@ static void *SpawnDelete(void *param)
     unlink(filename.ascii());
 
     filename += ".png";
+    unlink(filename.ascii());
 
+    filename = *filenameptr;
+    filename += ".bookmark";
     unlink(filename.ascii());
 
     delete filenameptr;
