@@ -968,11 +968,11 @@
   Red Hat 8.0 users, ensure that you do this:
 
 
-       % env LANG=C
+       % env LANG=C ./setup
 
 
 
-  Before continuing to the next step.
+  instead of what all the other distributions should use:
 
 
 
@@ -992,11 +992,11 @@
   Red Hat 8.0 users, ensure that you do this:
 
 
-       % env LANG=C
+       % env LANG=C ./mythfilldatabase
 
 
 
-  Before continuing to the next step.
+  All other distributions can execute the following:
 
 
 

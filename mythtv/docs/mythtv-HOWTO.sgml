@@ -739,10 +739,10 @@ Failure to set this variable will result in a lot of UTF-8 errors.
 
 Red Hat 8.0 users, ensure that you do this:
 <tscreen><verb>
-% env LANG=C 
+% env LANG=C ./setup 
 </verb></tscreen>
 
-Before continuing to the next step.
+instead of what all the other distributions should use:
 
 <tscreen><verb>
 % ./setup
@@ -757,10 +757,10 @@ get one week of data inserted into the database.
 
 Red Hat 8.0 users, ensure that you do this:
 <tscreen><verb>
-% env LANG=C 
+% env LANG=C ./mythfilldatabase
 </verb></tscreen>
 
-Before continuing to the next step.
+All other distributions can execute the following:
 
 <tscreen><verb>
 % mythfilldatabase
