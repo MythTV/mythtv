@@ -1,6 +1,8 @@
 /*
         MythProgramFind
 	January 19th, 2003
+        Updated: 4/8/2003, John Danner
+                 Updated code to use new ui.xml file.
 
         By John Danner
 */
@@ -60,9 +62,6 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
 
     baseDir = gContext->GetInstallPrefix();
 
-    // The 'Current Listings' and 'Future Programs' bar at the bottom of the screen.
-    showProgramBar = gContext->GetNumSetting("EPGProgramBar", 1);
-
     accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
     accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
@@ -80,14 +79,31 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
     accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(escape()));
     connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
-    topFrame = new QFrame(this);
-    topFrame->setPaletteForegroundColor(prog_fgColor);
-    topFrameLayout = new QHBoxLayout(topFrame, 0);
+    theme = new XMLParse();
+    theme->SetWMult(wmult);
+    theme->SetHMult(hmult);
+    theme->LoadTheme(xmldata, "programfind");
+    LoadWindow(xmldata);
+
+    LayerSet *container = theme->GetSet("selector");
+    if (container)
+    {
+        UIListType *ltype = (UIListType *)container->GetType("alphabet");
+        if (ltype)
+        {
+            showsPerListing = ltype->GetItems();
+        }
+    }
+    else
+    {
+        cerr << "Failed to get selector object.\n";
+        exit(0);
+    }
+    updateBackground();
 
     curSearch = 10;
     progData = new QString[1];
     listCount = 1;
-    showsPerListing = gContext->GetNumSetting("showsPerListing");;
     if (showsPerListing < 1)
         showsPerListing = 7;
     if (showsPerListing % 2 == 0)
@@ -116,9 +132,6 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
     update_Timer = new QTimer(this);
     connect(update_Timer, SIGNAL(timeout()), SLOT(update_timeout()) );
 
-    setupColorScheme();
-    setupLayout();
-
     getSearchData(curSearch);
     showSearchList();
 
@@ -146,27 +159,209 @@ ProgFinder::~ProgFinder()
     	delete [] showData;
     delete [] searchData;
     delete [] initData; 
-    delete [] abcList;
-    delete [] progList;
-    delete [] showList;
-    delete programTitle;
-    delete subTitle;
-    delete description;
-    delete callChan;
-    delete recordingInfo;
 
     delete [] gotInitData;
 
     delete update_Timer;
 
-    delete topDataLayout;
-    delete topFrameLayout;
-    delete topFrame;
-    delete programFrame;
-    delete main;
-
     delete accel;
 
+}
+
+void ProgFinder::updateBackground(void)
+{
+    QPixmap bground(size());
+    bground.fill(this, 0, 0);
+
+    QPainter tmp(&bground);
+
+    LayerSet *container = theme->GetSet("background");
+    if (container)
+    {
+        if (gContext->GetNumSetting("EPGProgramBar", 1) == 1)
+            container->Draw(&tmp, 0, 1);
+        else
+            container->Draw(&tmp, 0, 0);
+    }
+
+    tmp.end();
+
+    setPaletteBackgroundPixmap(bground);
+}
+
+void ProgFinder::paintEvent(QPaintEvent *e)
+{
+    QRect r = e->rect();
+    QPainter p(this);
+
+    if (r.intersects(listRect()))
+    {
+        updateList(&p);
+    }
+    if (r.intersects(infoRect()))
+    {
+        updateInfo(&p);
+    }
+}
+
+void ProgFinder::updateList(QPainter *p)
+{
+    QRect pr = listRect();
+    QPixmap pix(pr.size());
+    pix.fill(this, pr.topLeft());
+    QPainter tmp(&pix);
+
+    LayerSet *container = NULL;
+    container = theme->GetSet("selector");
+    if (container)
+    {
+        UIListType *ltype = (UIListType *)container->GetType("alphabet");
+        if (ltype)
+        {
+            if (inSearch == 0)
+            {
+                ltype->SetItemCurrent((int)(ltype->GetItems() / 2));
+                ltype->SetActive(true);
+            }
+            else 
+            {
+                ltype->SetItemCurrent(-1);
+                ltype->SetActive(false);
+            }
+        }
+
+        ltype = (UIListType *)container->GetType("shows");
+        if (ltype)
+        {
+            if (inSearch == 1)
+            {
+                ltype->SetItemCurrent((int)(ltype->GetItems() / 2));
+                ltype->SetActive(true);
+            }
+            else
+            {
+                ltype->SetItemCurrent(-1);
+                ltype->SetActive(false);
+            }
+        }
+
+        ltype = (UIListType *)container->GetType("times");
+        if (ltype)
+        {
+            if (inSearch == 2)
+            {
+                ltype->SetItemCurrent((int)(ltype->GetItems() / 2));
+                ltype->SetActive(true);
+            }
+            else
+            {
+                ltype->SetItemCurrent(-1);
+                ltype->SetActive(false);
+            }
+        }
+
+        container->Draw(&tmp, 0, 0);
+        container->Draw(&tmp, 1, 0);
+        container->Draw(&tmp, 2, 0);
+        container->Draw(&tmp, 3, 0);
+        container->Draw(&tmp, 4, 0);
+        container->Draw(&tmp, 5, 0);
+        container->Draw(&tmp, 6, 0);
+        container->Draw(&tmp, 7, 0);
+        container->Draw(&tmp, 8, 0);
+    }
+
+    tmp.end();
+    p->drawPixmap(pr.topLeft(), pix);
+}
+
+void ProgFinder::updateInfo(QPainter *p)
+{
+    QRect pr = infoRect();
+    QPixmap pix(pr.size());
+    pix.fill(this, pr.topLeft());
+    QPainter tmp(&pix);
+
+    LayerSet *container = NULL;
+
+    if (inSearch == 0)
+    {
+        QString title = "";
+        QString description = "";
+        if (gotInitData[curSearch] == 1)
+            container = theme->GetSet("noprograms");
+        else
+            container = theme->GetSet("help_info_1");
+    }
+    else if (inSearch == 1)
+    {
+        container = theme->GetSet("help_info_2");
+    }
+    else if (inSearch == 2)
+    {
+        QString title = "";
+        QString subtitle = "";
+        QString timedate = "";
+        QString description = "";
+        QString channum = "";
+        QString channame = "";
+        QString recording = "";
+
+        channum = showData[curShow].channelNum;
+        channame = showData[curShow].channelCallsign;
+        title = progData[curProgram];
+        timedate = showData[curShow].startDisplay + " - " + showData[curShow].endDisplay;
+        if (showData[curShow].subtitle.stripWhiteSpace().length() > 0)
+            subtitle = "\"" + showData[curShow].subtitle + "\"";
+        else 
+            subtitle = "";
+        description = showData[curShow].description;
+        recording = showData[curShow].recText;
+
+        if (gotInitData[curSearch] == 1)
+        {
+            title = "No Programs";
+            description = "There are no available programs under this search. Please select another search.";
+        }
+
+        container = theme->GetSet("program_info");
+        if (container)
+        {
+            UITextType *type = (UITextType *)container->GetType("title");
+            if (type)
+                type->SetText(title);
+
+            type = (UITextType *)container->GetType("subtitle");
+            if (type)
+                type->SetText(subtitle);
+
+            type = (UITextType *)container->GetType("timedate");
+            if (type)
+                type->SetText(timedate);
+
+            type = (UITextType *)container->GetType("description");
+            if (type)
+                type->SetText(description);
+
+            type = (UITextType *)container->GetType("channelnum");
+            if (type)
+                type->SetText(channum);
+
+            type = (UITextType *)container->GetType("channelname");
+            if (type)
+                type->SetText(channame);
+
+            type = (UITextType *)container->GetType("recordingstatus");
+            if (type)
+                type->SetText(recording);
+        }
+    }
+
+    if (container)
+        container->Draw(&tmp, 6, 0);
+
+    tmp.end();
+    p->drawPixmap(pr.topLeft(), pix);
 }
 
 void ProgFinder::escape()
@@ -190,6 +385,56 @@ void ProgFinder::showGuide()
 
     unsetCursor();
     emit killTheApp();
+}
+
+
+void ProgFinder::LoadWindow(QDomElement &element)
+{
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement e = child.toElement();
+        if (!e.isNull())
+        {
+            if (e.tagName() == "font")
+            {
+                theme->parseFont(e);
+            }
+            else if (e.tagName() == "container")
+            {
+                parseContainer(e);
+            }
+            else
+            {
+                cerr << "Unknown element: " << e.tagName() << endl;
+                exit(0);
+            }
+        }
+    }
+}
+
+void ProgFinder::parseContainer(QDomElement &element)
+{
+    QRect area;
+    QString name;
+    int context;
+    theme->parseContainer(element, name, context, area);
+
+    if (name.lower() == "selector")
+    {
+        rectListLeft = area.left();
+        rectListTop = area.top();
+        rectListWidth = area.width();
+        rectListHeight = area.height();
+    }
+    if (name.lower() == "program_info")
+    {
+        rectInfoLeft = area.left();
+        rectInfoTop = area.top();
+        rectInfoWidth = area.width();
+        rectInfoHeight = area.height();
+    }
 }
 
 void ProgFinder::getInfo()
@@ -278,378 +523,76 @@ void ProgFinder::update_timeout()
  	    int amountDone = (int)(100.0 * (float)((float)cnt / (float)searchCount));
 
  	    QString data = QString(" Loading Data...%1% Complete").arg(amountDone);
-
-	    (&progList[(int)(showsPerListing / 2)])->setText(data);
+            cout << data << endl;
+          
+            LayerSet *container = theme->GetSet("selector");
+            if (container)
+            {
+                UIListType *ltype = (UIListType *)container->GetType("shows");
+                if (ltype)
+                    ltype->SetItemText((int)(showsPerListing / 2), data);
+            }
+            update(listRect());
    	  }
 	}
 }
 
-void ProgFinder::setupColorScheme()
-{
-
-    Settings *themed = gContext->qtconfig();
-    QString curColor = "";
-    curColor = themed->GetSetting("time_bgColor");
-    if (curColor != "")
-        time_bgColor = QColor(curColor);
-
-    curColor = themed->GetSetting("time_fgColor");
-    if (curColor != "")
-        time_fgColor = QColor(curColor);
-
-    curColor = themed->GetSetting("curProg_bgColor");
-    if (curColor != "")
-        curProg_bgColor = QColor(curColor);
-
-    curColor = themed->GetSetting("curProg_fgColor");
-    if (curColor != "")
-        curProg_fgColor = QColor(curColor);
-
-    curColor = themed->GetSetting("prog_bgColor");
-    if (curColor != "")
-        prog_bgColor = QColor(curColor);
-
-    curColor = themed->GetSetting("prog_fgColor");
-    if (curColor != "")
-        prog_fgColor = QColor(curColor);
-
-    curColor = themed->GetSetting("chan_bgColor");
-    if (curColor != "")
-        abc_bgColor = QColor(curColor);
-	
-    curColor = themed->GetSetting("chan_fgColor");
-    if (curColor != "")
-        abc_fgColor = QColor(curColor);
-
-    curColor = themed->GetSetting("curRecProg_bgColor");
-    if (curColor != "")
-        recording_bgColor = QColor(curColor);
-
-    curColor = themed->GetSetting("progFindMid_bgColor");
-    if (curColor != "")
-        progFindMid_bgColor = QColor(curColor);
-    else
-	progFindMid_bgColor = QColor(0, 0, 0);
-
-    curColor = themed->GetSetting("progFindMid_fgColor");
-    if (curColor != "")
-        progFindMid_fgColor = QColor(curColor);
-    else
-        progFindMid_fgColor = curProg_fgColor;
-
-    curColor = themed->GetSetting("misChanIcon_bgColor");
-    if (curColor != "")
-	misChanIcon_bgColor = QColor(curColor);
-    else
-        misChanIcon_bgColor = QColor(0, 0, 0);
-
-    curColor = themed->GetSetting("misChanIcon_fgColor");
-    if (curColor != "")
-        misChanIcon_fgColor = QColor(curColor);
-    else
-        misChanIcon_fgColor = QColor(255, 255, 255);
- 
-
-}
-
-void ProgFinder::setupLayout()
-{
-	 QFont callFont("Arial", (int)(24 * hmult), QFont::Bold);
-
-	QFont titleFont("Arial", (int)(20 * hmult), QFont::Bold);
-	QFontMetrics titleMetric(titleFont);
-
-	QFont subtFont("Arial", (int)(20 * hmult), QFont::Bold);
-	QFontMetrics subtMetric(subtFont);
-
-	QFont descFont("Arial", (int)(18 * hmult), QFont::Bold);
-	QFontMetrics descMetric(descFont);
-
-	QFont listFont("Arial", (int)(18 * hmult), QFont::Bold);
-    	QFontMetrics fontMet(listFont);
-
-	programFrame = new QFrame(this);
-	QFrame *topDataFrame = new QFrame(this);
-	programFrame->setBackgroundOrigin(WindowOrigin);
-
-        QVBoxLayout *superLayout = new QVBoxLayout(this, 0, 0);
-
-	main = new QVBoxLayout(0, (int)(30 * hmult), (int)(10 * hmult));
-	superLayout->addLayout(main, 0);
-        
-	topDataLayout = new QHBoxLayout(topDataFrame, 0, 0);
-	topDataFrame->setPaletteBackgroundColor(prog_bgColor);
-
-	topDataFrame->setMaximumWidth((int)(735*wmult));
-  	topDataFrame->setMinimumWidth((int)(735*wmult));
-	topDataFrame->setFrameStyle( QFrame::Panel | QFrame::Raised );
-
-	if (showProgramBar == 1)
-	{
-
-   		QLabel *leftFiller = new QLabel("   ", this);
-    		QLabel *currentButton = new QLabel(tr("   (4) Current Programs   "), this);
-    		QLabel *futureButton = new QLabel(tr("   (6) Program Finder   "), this);
-    		QLabel *rightFiller = new QLabel("   ", this);
-
-    		leftFiller->setMaximumWidth((int)(800*wmult));
-    		leftFiller->setMaximumHeight((int)(1.5*25*hmult));
-    		leftFiller->setMinimumHeight((int)(1.5*25*hmult));
-    		leftFiller->setPaletteForegroundColor(abc_fgColor);
-    		leftFiller->setPaletteBackgroundColor(abc_bgColor);
-    		leftFiller->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-
-    		currentButton->setMaximumWidth((int)(800*wmult));
-    		currentButton->setMaximumHeight((int)(1.5*25*hmult));
-    		currentButton->setMinimumHeight((int)(1.5*25*hmult));
-    		currentButton->setPaletteForegroundColor(abc_fgColor);
-    		currentButton->setPaletteBackgroundColor(abc_bgColor);
-    		currentButton->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-
-    		futureButton->setMaximumWidth((int)(800*wmult));
-    		futureButton->setMaximumHeight((int)(1.5*25*hmult));
-    		futureButton->setMinimumHeight((int)(1.5*25*hmult));
-    		futureButton->setPaletteForegroundColor(time_fgColor);
-    		futureButton->setPaletteBackgroundColor(time_bgColor);
-    		futureButton->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-
-    		rightFiller->setMaximumWidth((int)(800*wmult));
-    		rightFiller->setMaximumHeight((int)(1.5*25*hmult));
-    		rightFiller->setMinimumHeight((int)(1.5*25*hmult));
-    		rightFiller->setPaletteForegroundColor(abc_fgColor);
-    		rightFiller->setPaletteBackgroundColor(abc_bgColor);
-    		rightFiller->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-
-    		QHBoxLayout *bottomInfo = new QHBoxLayout(0, 0, 0);
-    		bottomInfo->addWidget(leftFiller, 0, 0);
-    		bottomInfo->addWidget(currentButton, 0, 0);
-    		bottomInfo->addWidget(futureButton, 0, 0);
-    		bottomInfo->addWidget(rightFiller, 0, 0);
-
- 		superLayout->addLayout(bottomInfo, 0);
-	}
-
-	main->addWidget(topDataFrame, 0, 0);
-	main->addWidget(programFrame, 0, 0);
-
-	topDataLayout->addStrut((int)(125*hmult));
-
-	QVBoxLayout *leftSide = new QVBoxLayout(0, 0, 0);
-	
-	programTitle = new QLabel(tr("Select a letter..."), topDataFrame);
-	programTitle->setFont(titleFont);
-	programTitle->setMaximumWidth((int)(500*wmult));
-	programTitle->setMaximumHeight(titleMetric.height());
-	programTitle->setPaletteForegroundColor(prog_fgColor);
-	programTitle->setPaletteBackgroundColor(prog_bgColor);
-
-    	subTitle = new QLabel("", topDataFrame);
-	subTitle->setFont(subtFont);
-	subTitle->setMaximumWidth((int)(500*wmult));
-	subTitle->setMaximumHeight(subtMetric.height());
-	subTitle->setPaletteForegroundColor(prog_fgColor);
-	subTitle->setPaletteBackgroundColor(prog_bgColor);
-
-    	description = new QLabel(tr("Pick the letter in which the show starts with, then hit ENTER or the right arrow."), topDataFrame);
-	description->setFont(descFont);
-	description->setMaximumWidth((int)(500*wmult));
-	description->setMaximumHeight((int)(130*hmult));
-	description->setAlignment(Qt::WordBreak);
-	description->setPaletteForegroundColor(prog_fgColor);
-	description->setPaletteBackgroundColor(prog_bgColor);
-
-	recordingInfo = new QLabel("", topDataFrame);
-        recordingInfo->setFont(descFont);
-        recordingInfo->setMaximumWidth((int)(500*wmult));
-        recordingInfo->setPaletteForegroundColor(prog_fgColor);
-        recordingInfo->setPaletteBackgroundColor(prog_bgColor);
-	recordingInfo->setMaximumHeight(descMetric.height() + (int)(2*hmult));
-	recordingInfo->setPaletteForegroundColor(curProg_fgColor);
-
-    	callChan = new QLabel("", topDataFrame);
-	callChan->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
-	callChan->setMaximumWidth((int)(200*wmult));
-	callChan->setMinimumWidth((int)(200*wmult));
-	callChan->setMaximumHeight((int)(200*hmult));
-	callChan->setMinimumHeight((int)(200*hmult));
-	callChan->setPaletteBackgroundColor(misChanIcon_bgColor);
-	callChan->setPaletteForegroundColor(misChanIcon_fgColor);
-	callChan->setFont(callFont);
-
-	leftSide->addWidget(programTitle, 0, 0);
-	leftSide->addWidget(subTitle, 0, 0);
-	leftSide->addWidget(description, 0, 0);
-	leftSide->addWidget(recordingInfo, 0, 0);
-
-	topDataLayout->addLayout(leftSide, 0);
-	topDataLayout->addWidget(callChan, 0, 0);
-
-	QHBoxLayout *programListLayout  = new QHBoxLayout(programFrame, 0);
-	QVBoxLayout *abcVert  = new QVBoxLayout(0, 0, 0);
-	QVBoxLayout *progVert  = new QVBoxLayout(0, 0, 0);
-	QVBoxLayout *showVert  = new QVBoxLayout(0, 0, 0);
-
-	abcVert->addStrut((int)(65*wmult));
-	progVert->addStrut((int)(380*wmult));
-	showVert->addStrut((int)(280*wmult));
-
-	programListLayout->setResizeMode(QLayout::Minimum);
-	programListLayout->addLayout(abcVert, 0);
-	programListLayout->addLayout(progVert, 0);
-	programListLayout->addLayout(showVert, 0);
-	
-	if (showProgramBar == 1)
-		programListLayout->addStrut((int)(278*hmult));
-	else
-		programListLayout->addStrut((int)(310*hmult));
-
-	QLabel *BlankLbl = new QLabel(" ", programFrame);
-	QLabel *ProgramTitleLbl = new QLabel(tr("Program Title"), programFrame);
-	QLabel *ShowTimesLbl = new QLabel(tr("Show Times"), programFrame);
-
-	BlankLbl->setPaletteBackgroundColor(time_bgColor);
-	BlankLbl->setPaletteForegroundColor(prog_fgColor);
-	ProgramTitleLbl->setPaletteBackgroundColor(time_bgColor);
-	ProgramTitleLbl->setPaletteForegroundColor(prog_fgColor);
-	ProgramTitleLbl->setAlignment( Qt::AlignHCenter);
-	ShowTimesLbl->setPaletteForegroundColor(prog_fgColor);
-	ShowTimesLbl->setPaletteBackgroundColor(time_bgColor);
-	ShowTimesLbl->setAlignment( Qt::AlignHCenter);
-
-	BlankLbl->setMaximumHeight(fontMet.height() + (int)(4*hmult));
-	ProgramTitleLbl->setMaximumHeight(fontMet.height() + (int)(4*hmult));
-	ShowTimesLbl->setMaximumHeight(fontMet.height() + (int)(4*hmult));
-	
-	BlankLbl->setFrameStyle( QFrame::Panel | QFrame::Raised );
-	ProgramTitleLbl->setFrameStyle( QFrame::Panel | QFrame::Raised );
-	ShowTimesLbl->setFrameStyle( QFrame::Panel | QFrame::Raised );
-
-	BlankLbl->setFont(listFont);
-	ProgramTitleLbl->setFont(listFont);
-	ShowTimesLbl->setFont(listFont);
-
-	abcVert->addWidget(BlankLbl, 0, 0);
-	progVert->addWidget(ProgramTitleLbl, 0, 0);
-	showVert->addWidget(ShowTimesLbl, 0, 0);
-
-	abcList = new QLabel[showsPerListing](" ", programFrame);
-	progList = new QLabel[showsPerListing](" ", programFrame);
-	showList = new QLabel[showsPerListing](" ", programFrame);
-
-	for (int i = 0; i < showsPerListing; i++)
-	{
-		if (i == (int)(showsPerListing / 2))
-		{
-			(&abcList[i])->setPaletteBackgroundColor(progFindMid_bgColor);
-			(&progList[i])->setPaletteBackgroundColor(curProg_bgColor);
-			(&showList[i])->setPaletteBackgroundColor(curProg_bgColor);
-			(&abcList[i])->setPaletteForegroundColor(progFindMid_fgColor);
-			(&progList[i])->setPaletteForegroundColor(curProg_fgColor);
-			(&showList[i])->setPaletteForegroundColor(curProg_fgColor);
-		}
-		else
-		{
-			(&abcList[i])->setPaletteForegroundColor(abc_fgColor);
-                        (&progList[i])->setPaletteForegroundColor(prog_fgColor);
-                        (&showList[i])->setPaletteForegroundColor(prog_fgColor);
-		        (&abcList[i])->setPaletteBackgroundColor(abc_bgColor);
-                        (&progList[i])->setPaletteBackgroundColor(prog_bgColor);
-                        (&showList[i])->setPaletteBackgroundColor(prog_bgColor);
-		}
-
-		(&abcList[i])->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
-		(&abcList[i])->setMaximumWidth((int)(65*wmult));
-                (&progList[i])->setMaximumWidth((int)(380*wmult));
-                (&showList[i])->setMaximumWidth((int)(280*wmult));
-
-		(&abcList[i])->setFont(listFont);
-                (&progList[i])->setFont(listFont);
-                (&showList[i])->setFont(listFont);
-
-		abcVert->addWidget(&(abcList[i]), 0, 0);
-		progVert->addWidget(&(progList[i]), 0, 0);
-		showVert->addWidget(&(showList[i]), 0, 0);
-	}
-
-	
-}
 
 void ProgFinder::cursorLeft()
 {
-	inSearch--;
-	if (inSearch == -1)
-		inSearch = 0;
-	else {
-		if (inSearch == 0)
-		{
-			programTitle->setText("Select a letter...");
-			description->setText("Pick the letter in which the show starts with, then hit ENTER or the right arrow.");
-			(&abcList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(progFindMid_bgColor);
-			(&abcList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(progFindMid_fgColor);
-                        (&progList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(curProg_bgColor);
-			(&progList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(curProg_fgColor);
-			showSearchList();
-		}
-		if (inSearch == 1)
-		{
-                        (&progList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(progFindMid_bgColor);
-			(&progList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(progFindMid_fgColor);
-                        (&showList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(curProg_bgColor);
-			(&showList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(curProg_fgColor);
-			
-			showProgramList();
-			clearShowData();
-		}
-	}
+    inSearch--;
+    if (inSearch == -1)
+        inSearch = 0;
+    else 
+    {
+        if (inSearch == 0)
+            showSearchList();
+        else if (inSearch == 1)
+        {
+            showProgramList();
+            clearShowData();
+        }
+    }
+    update(infoRect());
+    update(listRect());
 }
 
 void ProgFinder::cursorRight()
 {
-	if (inSearch == 2) {
-             getInfo();
-	} else
-	{
-            inSearch++;
-		if (inSearch == 1)
-		{
-		    if (gotInitData[curSearch] == 0)
-		    {
-			getSearchData(curSearch);
-		    }
-		    if (gotInitData[curSearch] >= 10)
-		    {
-			programTitle->setText(tr("Select a program..."));
-			description->setText(tr("Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'Info' will allow you to setup recording options."));
-			(&abcList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(curProg_fgColor);
-			(&abcList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(curProg_bgColor);
-                        (&progList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(progFindMid_bgColor);
-			(&progList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(progFindMid_fgColor);
-			selectSearchData();
-		    }
-		    if (gotInitData[curSearch] == 1)
-		    {
-			programTitle->setText("No Programs");
-			description->setText("There are no available programs under this search. Please select another search.");
-			(&progList[(int)(showsPerListing / 2)])->setText("      !! No Programs !!");
-			inSearch = 0;
-		    }
-		}
-		if (inSearch == 2)
-		{
-			if (gotInitData[curSearch] > 10)
-			{
-                            (&progList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(curProg_bgColor);
-			    (&progList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(curProg_fgColor);
-                            (&showList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(progFindMid_bgColor);
-			    (&showList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(progFindMid_fgColor);
-			    selectShowData(progData[curProgram]);
-			}
-			else
-			{
-				inSearch = 1;
-			}
-		}
-	}
+    if (inSearch == 2) {
+        getInfo();
+    }
+    else
+    {
+        inSearch++;
+        if (inSearch == 1)
+        {
+            if (gotInitData[curSearch] == 0)
+		getSearchData(curSearch);
+            if (gotInitData[curSearch] >= 10)
+                selectSearchData();
+            if (gotInitData[curSearch] == 1)
+            {
+                LayerSet *container = theme->GetSet("selector");
+                if (container)
+                {
+                    UIListType *ltype = (UIListType *)container->GetType("shows");
+                    if (ltype)
+                        ltype->SetItemText((int)(showsPerListing / 2), "       !! No Programs !!");
+                }
+		inSearch = 0;
+	    }
+        }
+        if (inSearch == 2)
+        {
+            if (gotInitData[curSearch] > 10)
+                selectShowData(progData[curProgram]);
+            else
+	        inSearch = 1;
+        }
+    }
+    update(infoRect());
+    update(listRect());
 }
 
 void ProgFinder::pageUp()
@@ -811,22 +754,33 @@ void ProgFinder::cursorDown()
 
 void ProgFinder::showSearchList()
 {
+/*
 	if (programTitle->text() == "No Programs")
 	{
 		programTitle->setText(tr("Select a program..."));
     		description->setText(tr("Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'Info' will allow you to setup recording options"));
 	}
+*/
 
-	int curLabel = 0;
-	int t = 0;
-	int tempSearch;
-	QString placeHold;
+    int curLabel = 0;
+    int t = 0;
+    int tempSearch;
+    QString placeHold;
 
-	tempSearch = curSearch;
+    tempSearch = curSearch;
 
-	for (int i = (tempSearch - ((showsPerListing - 1) / 2));
-	     i < (tempSearch + ((showsPerListing + 1) / 2)); i++)
-	{
+    LayerSet *container = NULL;
+    container = theme->GetSet("selector");
+    if (container)
+    {
+
+        UIListType *ltype = (UIListType *)container->GetType("alphabet");
+        if (ltype)
+        {
+            ltype->ResetList();
+	    for (int i = (tempSearch - ((showsPerListing - 1) / 2));
+	         i < (tempSearch + ((showsPerListing + 1) / 2)); i++)
+	    {
 		t = i;
                 if (i < 0)
                         t = i + searchCount;
@@ -838,47 +792,49 @@ void ProgFinder::showSearchList()
                 if (searchData[t] != NULL)
                 {
 			if (curLabel == (int)(showsPerListing / 2))
-			{
-                        	(&abcList[curLabel])->setText(" " + searchData[t] + " ");
-			}
-			else
-				(&abcList[curLabel])->setText(" " + searchData[t] + " ");
+                                ltype->SetItemText(curLabel, " " + searchData[t] + " ");
+		        else
+                                ltype->SetItemText(curLabel, " " + searchData[t] + " ");
                 }
                 else
-                {
-                        (&abcList[curLabel])->setText("");
-                }
+                        ltype->SetItemText(curLabel, "");
                 curLabel++;
-
+            }
 	}
 
-	if (gotInitData[curSearch] > 1)
-	{
-	   if (update_Timer->isActive() == true)
-		update_Timer->stop();
+        ltype = (UIListType *)container->GetType("shows");
+        if (ltype)
+        {
+            ltype->ResetList();
+	    if (gotInitData[curSearch] > 1)
+	    {
+                if (update_Timer->isActive() == true)
+		   update_Timer->stop();
 
-	   curLabel = 0; 
+                curLabel = 0; 
 
-	   for (int i = (int)(tempSearch*showsPerListing); i < (int)((tempSearch+1)*showsPerListing); i++)
-	   { 
-		if (initData[i] != NULL)
-		{
+	        for (int i = (int)(tempSearch*showsPerListing); i < (int)((tempSearch+1)*showsPerListing); i++)
+	        {    
+		     if (initData[i] != NULL)
+		     {
 			if (curLabel == (int)(showsPerListing / 2))
-				(&progList[curLabel])->setText(" " + initData[i] + " ");
-			else
-				(&progList[curLabel])->setText(" " + initData[i] + " ");	
-		}
-		else
-		{
-			(&progList[curLabel])->setText("");
-		}
-		curLabel++;
-	   }
+                            ltype->SetItemText(curLabel, " " + initData[i] + " ");
+                        else
+                            ltype->SetItemText(curLabel, " " + initData[i] + " ");
+		     }
+		     else
+                        ltype->SetItemText(curLabel, "");
+		     curLabel++;
+	        }
+            }
 	}
 	else
 	{
 		update_Timer->start((int)250);
 	}
+    }
+    update(listRect());
+    update(infoRect());
 }
 
 void ProgFinder::showProgramList()
@@ -886,35 +842,45 @@ void ProgFinder::showProgramList()
 
     if (gotInitData[curSearch] > 1)
     {
-	int curLabel = 0;
-	int t = 0;
-	for (int i = (curProgram - ((showsPerListing - 1) / 2)); 
-   	     i < (curProgram + ((showsPerListing + 1) / 2)); i++)
-	{
-		t = i;
-		if (i < 0)
-			t = i + listCount;
-		if (i >= listCount)
-			t = i - listCount;
+         LayerSet *container = NULL;
+        container = theme->GetSet("selector");
+        if (container)
+        {
+
+            UIListType *ltype = (UIListType *)container->GetType("shows");
+            if (ltype)
+            {
+
+	        int curLabel = 0;
+	        int t = 0;
+	        for (int i = (curProgram - ((showsPerListing - 1) / 2)); 
+   	             i < (curProgram + ((showsPerListing + 1) / 2)); i++)
+	        {
+		     t = i;
+		     if (i < 0)
+			 t = i + listCount;
+		     if (i >= listCount)
+			 t = i - listCount;
 	
-		if (progData[t] != NULL)
-		{
-		   if (progData[t] != "**!0")
-		   {
-			if (curLabel == (int)(showsPerListing / 2))
-				(&progList[curLabel])->setText(" " + progData[t] + " ");
-			else
-				(&progList[curLabel])->setText(" " + progData[t] + " ");
-  		   }
-		   else
-		   	(&progList[curLabel])->setText("");
-		}
-		else
-		{
-			(&progList[curLabel])->setText("");
-		}
-		curLabel++;
-	}
+                     if (progData[t] != NULL)
+                     {
+		         if (progData[t] != "**!0")
+		         {
+		             if (curLabel == (int)(showsPerListing / 2))
+                                 ltype->SetItemText(curLabel, " " + progData[t] + " ");
+			     else
+                                ltype->SetItemText(curLabel, " " + progData[t] + " ");
+  		         }
+		         else
+	                     ltype->SetItemText(curLabel, "");
+		     }
+		     else
+                         ltype->SetItemText(curLabel, "");
+		     curLabel++;
+                }
+            }
+        }
+        update(listRect());
 
     }
 }
@@ -926,59 +892,51 @@ void ProgFinder::showShowingList()
 
     if (showCount > 0)
     {
-        int t = 0;
-        for (int i = (curShow - ((showsPerListing - 1) / 2));
-             i < (curShow + ((showsPerListing + 1) / 2)); i++)
+        LayerSet *container = NULL;
+        container = theme->GetSet("selector");
+        if (container)
         {
-                t = i;
-                if (i < 0)
-                        t = i + showCount;
-                if (i >= showCount)
-                        t = i - showCount;
+            UIListType *ltype = (UIListType *)container->GetType("times");
+            if (ltype)
+            {
+                ltype->ResetList();
+                int t = 0;
+                for (int i = (curShow - ((showsPerListing - 1) / 2));
+                     i < (curShow + ((showsPerListing + 1) / 2)); i++)
+                {
+                     t = i;
+                     if (i < 0)
+                         t = i + showCount;
+                     if (i >= showCount)
+                         t = i - showCount;
 
-		if ((&showData[t]) != NULL)
-		{
-		   if (showData[t].title != "**!0")
-		   {
-			(&showList[curLabel])->setText(" " + showData[t].startDisplay);
+	  	     if ((&showData[t]) != NULL)
+		     {
+		         if (showData[t].title != "**!0")
+		         {
+                             ltype->SetItemText(curLabel, " " + showData[t].startDisplay);
 			
-			if (curLabel != (int)(showsPerListing / 2))
-			{
-			    if (showData[t].recording > 0)
-				(&showList[curLabel])->setPaletteBackgroundColor(recording_bgColor);
-			    else
-				(&showList[curLabel])->setPaletteBackgroundColor(prog_bgColor);
-			}
+		  	     if (curLabel != (int)(showsPerListing / 2) &&
+                                 showData[t].recording > 0)
+                                 ltype->EnableForcedColor(curLabel);
 
-		   }
-		   else
-		   {
-			(&showList[curLabel])->setText("");
-			(&showList[curLabel])->setPaletteBackgroundColor(prog_bgColor);
-		   }
-		}	
-		else
-		{
-			(&showList[curLabel])->setText("");
-		}
-		curLabel++;
+                         }  
+		         else
+                             ltype->SetItemText(curLabel, "");
+		      }	
+		      else
+		      {
+                        ltype->SetItemText(curLabel, "");
+		      }
+		      curLabel++;
+                 }
+             } 
         }
 	curChannel = showData[curShow].channelID;
         curDateTime = showData[curShow].starttime;
-	callChan->setText(showData[curShow].channelNum + "\n" + showData[curShow].channelCallsign);
-	programTitle->setText(progData[curProgram]);
-	if ((showData[curShow].subtitle).length() == 0)
-		subTitle->hide();
-	else
-		subTitle->show();
-	subTitle->setText("\"" + showData[curShow].subtitle + "\"");
-	if ((showData[curShow].description).length() > 1)
-		description->setText(showData[curShow].startDisplay + " - " + showData[curShow].endDisplay +
-				     "\n" + showData[curShow].description);
-	else
-		description->setText(showData[curShow].startDisplay + " - " + showData[curShow].endDisplay + ".");
-	recordingInfo->setText(showData[curShow].recText);
     }
+    update(infoRect());
+    update(listRect());
 }
 
 void ProgFinder::selectSearchData()
@@ -1112,8 +1070,16 @@ void ProgFinder::clearProgramList()
   if (gotInitData[curSearch] == 0)
   {
     int cnt = 0;
-    for (int i = 0; i < showsPerListing; i++)
-	(&progList[i])->setText("");
+    LayerSet *container = theme->GetSet("selector");
+    if (container)
+    {
+        UIListType *ltype = (UIListType *)container->GetType("shows");
+        if (ltype)
+            for (int i = 0; i < showsPerListing; i++)
+            {
+                ltype->SetItemText(i, "");
+            }
+    }
 
     for (int j = 0; j < searchCount; j++)
     {
@@ -1125,17 +1091,17 @@ void ProgFinder::clearProgramList()
 
     QString data = QString(" Loading Data...%1% Complete").arg(amountDone);
 
-    (&progList[(int)(showsPerListing / 2)])->setText(data);
+    if (container)
+    {
+        UIListType *ltype = (UIListType *)container->GetType("shows");
+        if (ltype)
+            ltype->SetItemText((int)(showsPerListing / 2), data);
+    }
     showSearchList();
   }
   else
   {
     showSearchList();
-
-    programTitle->setText("No Programs");
-    description->setText("There are no available programs under this search. Please select another search.");
-    for (int i = 0; i < showsPerListing; i++)
-        (&progList[i])->setText("");
   }
 }
 
@@ -1143,19 +1109,20 @@ void ProgFinder::clearShowData()
 {
     delete [] showData;
 
-    for (int i = 0; i < showsPerListing; i++)
+    LayerSet *container = theme->GetSet("selector");
+    if (container)
     {
-	if (i != (int)(showsPerListing / 2))
-		(&showList[i])->setPaletteBackgroundColor(prog_bgColor);
-	(&showList[i])->setText("");
+        UIListType *ltype = (UIListType *)container->GetType("times");
+        if (ltype)
+        {
+
+            for (int i = 0; i < showsPerListing; i++)
+            {
+                 ltype->SetItemText(i, "");
+            }
+        }
     }
-
-    programTitle->setText(tr("Select a program..."));
-    subTitle->setText("");
-    description->setText(tr("Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'Info' will allow you to setup recording options"));
-    callChan->setText("");
-    recordingInfo->setText("");
-
+    update(infoRect());
 }
 
 int ProgFinder::checkRecordingStatus(int showNum)
@@ -1536,6 +1503,19 @@ void ProgFinder::getSearchData(int charNum)
     if (charNum == curSearch)
 	showSearchList();
 
+}
+
+
+QRect ProgFinder::listRect() const
+{
+    QRect r(rectListLeft, rectListTop, rectListWidth, rectListHeight);
+    return r;
+}
+
+QRect ProgFinder::infoRect() const
+{
+    QRect r(rectInfoLeft, rectInfoTop, rectInfoWidth, rectInfoHeight);
+    return r;
 }
 
 /*

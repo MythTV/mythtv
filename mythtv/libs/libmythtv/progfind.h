@@ -2,12 +2,11 @@
         MythProgramFind
         Version 0.8
         January 19th, 2003
+        Updated: 4/8/2003, Added support for new ui.xml 
 
         By John Danner
 
         Note: Portions of this code taken from MythMusic
-
-
 */
 
 
@@ -16,15 +15,14 @@
 
 #include <qdatetime.h>
 
+#include "libmyth/uitypes.h"
+#include "libmyth/xmlparse.h"
 #include "libmyth/mythwidgets.h"
 
-class QLabel;
 class QListView;
 class ProgramInfo;
 class QSqlDatabase;
 class QWidget;
-class QVBoxLayout;
-class QHBoxLayout;
 class TV;
 
 void RunProgramFind(bool thread = false);
@@ -82,7 +80,19 @@ struct recordingRecord {
     void pageUp();
     void pageDown();
 
+  protected:
+    void paintEvent(QPaintEvent *);
+
   private:
+    void LoadWindow(QDomElement &);
+    void parseContainer(QDomElement &);
+    XMLParse *theme;
+    QDomElement xmldata;
+
+    void updateBackground();
+    void updateList(QPainter *);
+    void updateInfo(QPainter *);
+   
     int showProgramBar;
     int showsPerListing;
     int curSearch;
@@ -100,30 +110,12 @@ struct recordingRecord {
 
     QTimer *update_Timer;
 
-    QFrame *topFrame;
-    QFrame *programFrame;
-
-    QVBoxLayout *main;
-    QHBoxLayout *topDataLayout;
-    QHBoxLayout *topFrameLayout;
-
     showRecord *showData;
     recordingRecord *curRecordings;
 
     QAccel *accel;
-    QLabel *dTime;
 
-    QLabel *abcList;
-    QLabel *progList;
-    QLabel *showList;
- 
     TV *m_player;
-
-    QLabel *programTitle;
-    QLabel *subTitle;
-    QLabel *description;
-    QLabel *callChan;
-    QLabel *recordingInfo;
 
     QString baseDir;
     QString curDateTime;
@@ -134,24 +126,15 @@ struct recordingRecord {
 
     QSqlDatabase *m_db;
 
-    QColor curProg_bgColor;
-    QColor curProg_dsColor;
-    QColor curProg_fgColor;
-    QColor time_bgColor;
-    QColor time_dsColor;
-    QColor time_fgColor;
-    QColor prog_bgColor;
-    QColor prog_fgColor;
-    QColor abc_bgColor;
-    QColor abc_fgColor;
-    QColor recording_bgColor;
-    QColor progFindMid_bgColor;
-    QColor progFindMid_fgColor;
-    QColor misChanIcon_bgColor;
-    QColor misChanIcon_fgColor;
+    int rectListLeft;
+    int rectListTop;
+    int rectListWidth;
+    int rectListHeight;
+    int rectInfoLeft;
+    int rectInfoTop;
+    int rectInfoWidth;
+    int rectInfoHeight;
 
-    void setupColorScheme();
-    void setupLayout();
     void showSearchList();
     void showProgramList();
     void showShowingList();
@@ -163,6 +146,9 @@ struct recordingRecord {
     void getRecordingInfo();
     void getSearchData(int);
     void getInitialProgramData();
+
+    QRect infoRect() const;
+    QRect listRect() const;
 };
 
 #endif
