@@ -117,6 +117,7 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 	use export_VCD;
 	use export_DVD;
 	use export_WMV;
+	use export_MP3;
 	use export_Trans_XviD;
 	use export_Trans_VCD;
 	use export_Trans_SVCD;
@@ -140,6 +141,7 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 					 export_WMV->new,
 					 export_VCD->new,
 					 export_DVD->new,
+					 export_MP3->new,
 					 export_Trans_XviD->new,
 					 export_Trans_VCD->new,
 					 export_Trans_SVCD->new;
