@@ -408,7 +408,10 @@ AllMusic::AllMusic(QSqlDatabase *ldb, QString path_assignment, QString a_startdi
 
     //  How should we sort?
     setSorting(path_assignment);
-    root_node = new MusicNode("root", startdir, paths, tree_levels, 0);
+
+    MusicNode::SetStaticData(startdir, paths);
+
+    root_node = new MusicNode("root", tree_levels, 0);
 
     //
     //  Start a thread to do data
@@ -761,7 +764,7 @@ MusicNode* AllMusic::findRightNode(Metadata* inserter, uint depth)
     }
     //  If we made it here, no appropriate top level node exists
     
-    MusicNode *new_one = new MusicNode(a_field, startdir, paths, tree_levels, 0);
+    MusicNode *new_one = new MusicNode(a_field, tree_levels, 0);
     top_nodes.append(new_one);
     return ( new_one->findRightNode(tree_levels, inserter, depth + 1) );
 }
@@ -920,23 +923,17 @@ void AllMusic::setSorting(QString a_paths)
     }
 }
 
-MusicNode::MusicNode(QString a_title, const QString& a_startdir, 
-                     const QString& a_paths, QStringList tree_levels, 
-                     uint depth)
+MusicNode::MusicNode(QString a_title, QStringList tree_levels, uint depth)
 {
     my_title = a_title;
-    startdir = a_startdir;
-    paths = a_paths;
-    if(paths == "directory")
+    if (m_paths == "directory")
     {
         my_level = "directory";
     }
     else
     {
-        if(depth < tree_levels.count())
-        {
+        if (depth < tree_levels.count())
             my_level = tree_levels[depth];
-        }
         else
         {
             my_level = "I am confused";
@@ -953,6 +950,25 @@ MusicNode::~MusicNode()
     my_subnodes.clear();
 }
 
+// static member vars
+
+QString MusicNode::m_startdir = "";
+QString MusicNode::m_paths = "";
+int MusicNode::m_RatingWeight = 2;
+int MusicNode::m_PlayCountWeight = 2;
+int MusicNode::m_LastPlayWeight = 2;
+int MusicNode::m_RandomWeight = 2;
+
+void MusicNode::SetStaticData(const QString &startdir, const QString &paths)
+{
+    m_startdir = startdir;
+    m_paths = paths;
+    m_RatingWeight = gContext->GetNumSetting("IntelliRatingWeight", 2);
+    m_PlayCountWeight = gContext->GetNumSetting("IntelliPlayCountWeight", 2);
+    m_LastPlayWeight = gContext->GetNumSetting("IntelliLastPlayWeight", 2);
+    m_RandomWeight = gContext->GetNumSetting("IntelliRandomWeight", 2);
+}
+    
 void MusicNode::insert(Metadata* inserter)
 {
     my_tracks.append(inserter);
@@ -968,13 +984,13 @@ MusicNode* MusicNode::findRightNode(QStringList tree_levels,
     //
 
 
-    if(inserter->areYouFinished(depth, tree_levels.count(), paths, startdir))
+    if(inserter->areYouFinished(depth, tree_levels.count(), m_paths, m_startdir))
     {
         return this;
     }
     else
     {
-        inserter->getField(tree_levels, &a_field, paths, startdir, depth);
+        inserter->getField(tree_levels, &a_field, m_paths, m_startdir, depth);
         QPtrListIterator<MusicNode> iter(my_subnodes);
         MusicNode *search;
         while( (search = iter.current() ) != 0)
@@ -985,7 +1001,7 @@ MusicNode* MusicNode::findRightNode(QStringList tree_levels,
             }
             ++iter;
         }
-        MusicNode *new_one = new MusicNode(a_field, startdir, paths, tree_levels, depth);
+        MusicNode *new_one = new MusicNode(a_field, tree_levels, depth);
         my_subnodes.append(new_one);
         return (new_one->findRightNode(tree_levels, inserter, depth + 1) );                
     }
@@ -1044,10 +1060,6 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
     Metadata *a_track;
     int track_counter = 0;
     anit.toFirst();
-    int RatingWeight = gContext->GetNumSetting("IntelliRatingWeight", 2);
-    int PlayCountWeight = gContext->GetNumSetting("IntelliPlayCountWeight", 2);
-    int LastPlayWeight = gContext->GetNumSetting("IntelliLastPlayWeight", 2);
-    int RandomWeight = gContext->GetNumSetting("IntelliRandomWeight", 2);
     while( (a_track = anit.current() ) != 0)
     {
         QString title_temp = QString(QObject::tr("%1 - %2")).arg(a_track->Track()).arg(a_track->Title());
@@ -1068,8 +1080,8 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
         else { playcountValue = ((playcountMin - (double)playcount) / (playcountMax - playcountMin) + 1); }
         if (lastplayMax == lastplayMin) { lastplayValue = 0; }
         else { lastplayValue = ((lastplayMin - lastplaydbl) / (lastplayMax - lastplayMin) + 1); }
-        double rating_value =  (RatingWeight * ratingValue + PlayCountWeight * playcountValue +
-                                LastPlayWeight * lastplayValue + RandomWeight * (double)rand() /
+        double rating_value =  (m_RatingWeight * ratingValue + m_PlayCountWeight * playcountValue +
+                                m_LastPlayWeight * lastplayValue + m_RandomWeight * (double)rand() /
                                 (RAND_MAX + 1.0));
         int integer_rating = (int) (4000001 - rating_value * 10000);
         subsub_node->setAttribute(3, integer_rating);   //  "intelligent" order

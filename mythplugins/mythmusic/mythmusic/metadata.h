@@ -136,8 +136,7 @@ class MusicNode
     
   public:
   
-    MusicNode(QString a_title, const QString& a_startdir, 
-              const QString& a_paths, QStringList tree_levels, uint depth);
+    MusicNode(QString a_title, QStringList tree_levels, uint depth);
    ~MusicNode();
 
     void        insert(Metadata* inserter);
@@ -153,6 +152,8 @@ class MusicNode
     void        setPlayCountMax(int tmp_max) { playcountMax = tmp_max; }
     void        setLastPlayMin(double tmp_min) { lastplayMin = tmp_min; }
     void        setLastPlayMax(double tmp_max) { lastplayMax = tmp_max; }
+
+    static void SetStaticData(const QString &startdir, const QString &paths);
  
   private:
   
@@ -160,8 +161,13 @@ class MusicNode
     QPtrList<MusicNode> my_subnodes;
     QString             my_title;
     QString             my_level;
-    QString             startdir;
-    QString             paths;
+
+    static QString      m_startdir;
+    static QString      m_paths;
+    static int          m_RatingWeight;
+    static int          m_PlayCountWeight;
+    static int          m_LastPlayWeight;
+    static int          m_RandomWeight;
 
     int                 playcountMin;
     int                 playcountMax;

@@ -305,6 +305,11 @@ PlaylistsContainer::PlaylistsContainer(QSqlDatabase *db_ptr, AllMusic *all_music
 
     done_loading = false;
 
+    RatingWeight = gContext->GetNumSetting("IntelliRatingWeight", 2);
+    PlayCountWeight = gContext->GetNumSetting("IntelliPlayCountWeight", 2);
+    LastPlayWeight = gContext->GetNumSetting("IntelliLastPlayWeight", 2);
+    RandomWeight = gContext->GetNumSetting("IntelliRandomWeight", 2);
+
     playlists_loader = new PlaylistLoadingThread(this, all_music);
     playlists_loader->start();
     
@@ -322,6 +327,15 @@ PlaylistsContainer::~PlaylistsContainer()
 
     playlists_loader->wait();
     delete playlists_loader;
+}
+
+void PlaylistsContainer::FillIntelliWeights(int &rating, int &playcount,
+                                            int &lastplay, int &random)
+{
+    rating = RatingWeight;
+    playcount = PlayCountWeight;
+    lastplay = LastPlayWeight;
+    random = RandomWeight;
 }
 
 void PlaylistsContainer::load()
@@ -743,10 +757,14 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
         }
     }
 
-    int RatingWeight = gContext->GetNumSetting("IntelliRatingWeight", 2); 
-    int PlayCountWeight = gContext->GetNumSetting("IntelliPlayCountWeight", 2); 
-    int LastPlayWeight = gContext->GetNumSetting("IntelliLastPlayWeight", 2); 
-    int RandomWeight = gContext->GetNumSetting("IntelliRandomWeight", 2); 
+    int RatingWeight = 2;
+    int PlayCountWeight = 2;
+    int LastPlayWeight = 2;
+    int RandomWeight = 2;
+
+    parent->FillIntelliWeights(RatingWeight, PlayCountWeight, LastPlayWeight,
+                               RandomWeight);
+
     for(it = songs.first(); it; it = songs.next())
     {
         if(!it->getCDFlag())

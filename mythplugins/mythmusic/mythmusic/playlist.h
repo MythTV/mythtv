@@ -151,6 +151,8 @@ class PlaylistsContainer
     bool            doneLoading(){return done_loading;}
     bool            cleanOutThreads();
 
+    void            FillIntelliWeights(int &rating, int &playcount,
+                                       int &lastplay, int &random);
   private:
   
     Playlist            *active_playlist;
@@ -165,6 +167,11 @@ class PlaylistsContainer
     PlaylistLoadingThread  *playlists_loader;
     bool                    done_loading;
     QString                 my_host;
+
+    int RatingWeight;
+    int PlayCountWeight;
+    int LastPlayWeight;
+    int RandomWeight;
 };
 
 
