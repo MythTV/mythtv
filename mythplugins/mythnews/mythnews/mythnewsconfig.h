@@ -25,6 +25,7 @@
 #include <qsqldatabase.h>
 
 #include <mythtv/uitypes.h>
+#include <mythtv/uilistbtntype.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/mythdialogs.h>
 
@@ -76,6 +77,7 @@ private:
     void cursorLeft();
     void cursorRight();
     
+    void toggleItem(UIListBtnTypeItem* item);
     bool findInDB(const QString& name);
     bool insertInDB(NewsSiteItem* site);
     bool removeFromDB(NewsSiteItem* site);
@@ -105,9 +107,8 @@ private slots:
 
     void slotUpdateFreqChanged();
     void slotUpdateFreqTimerTimeout();
-    void slotContextChanged(int);
-    void slotCategoryChanged(int);
-    void slotSiteChecked(int,bool);
+    void slotContextChanged(UIListBtnTypeItem* item);
+    void slotCategoryChanged(UIListBtnTypeItem* item);
 };
 
 #endif /* MYTHNEWSCONFIG_H */

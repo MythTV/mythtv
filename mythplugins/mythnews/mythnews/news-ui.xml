@@ -128,7 +128,7 @@
         </gradient>
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
-        <showscrollarrows>no</showscrollarrows>
+        <showscrollarrows>yes</showscrollarrows>
       </listbtnarea>
 
       <listbtnarea name="sites"  draworder="0">
@@ -140,7 +140,6 @@
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
         <showarrow>no</showarrow>
-        <showchecks>yes</showchecks>
         <showscrollarrows>yes</showscrollarrows>
       </listbtnarea>
 

@@ -25,6 +25,7 @@
 #include <qsqldatabase.h>
 
 #include <mythtv/uitypes.h>
+#include <mythtv/uilistbtntype.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/mythdialogs.h>
 
@@ -86,8 +87,8 @@ private slots:
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite* site);
 
-    void slotSiteSelected(int itemPos);
-    void slotArticleSelected(int itemPos);
+    void slotSiteSelected(UIListBtnTypeItem *item);
+    void slotArticleSelected(UIListBtnTypeItem *item);
 };
 
 #endif /* MYTHNEWS_H */

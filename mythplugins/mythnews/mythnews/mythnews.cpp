@@ -64,7 +64,8 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
 
     // Load sites from database
 
-    QSqlQuery query("SELECT name, url, updated FROM newssites ORDER BY name", db);
+    QSqlQuery query("SELECT name, url, updated FROM newssites ORDER BY name",
+                    db);
     if (!query.isActive()) {
         cerr << "MythNews: Error in loading Sites from DB" << endl;
     }
@@ -80,9 +81,11 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
         }
     }
 
-    for (unsigned int i=0; i<m_NewsSites.count(); i++) {
-        NewsSite* site = m_NewsSites.at(i);
-        m_UISites->AddItem(site->name());
+    for (NewsSite *site = m_NewsSites.first(); site; site = m_NewsSites.next())
+    {
+        UIListBtnTypeItem* item =
+            new UIListBtnTypeItem(m_UISites, site->name());
+        item->setData(site);
     }
     
     // Now do the actual work
@@ -101,6 +104,7 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
 MythNews::~MythNews()
 {
     m_RetrieveTimer->stop();
+    delete m_Theme;
 }
 
 void MythNews::loadTheme()
@@ -154,23 +158,25 @@ void MythNews::loadTheme()
         exit(-1);
     }
         
-    connect(m_UISites, SIGNAL(itemSelected(int)),
-            SLOT(slotSiteSelected(int)));
+    connect(m_UISites, SIGNAL(itemSelected(UIListBtnTypeItem*)),
+            SLOT(slotSiteSelected(UIListBtnTypeItem*)));
 
     container = m_Theme->GetSet("articles");
     if (!container) {
-        std::cerr << "MythNews: Failed to get articles container." << std::endl;
+        std::cerr << "MythNews: Failed to get articles container."
+                  << std::endl;
         exit(-1);
     }
 
     m_UIArticles = (UIListBtnType*)container->GetType("articleslist");
     if (!m_UIArticles) {
-        std::cerr << "MythNews: Failed to get articles list area." << std::endl;
+        std::cerr << "MythNews: Failed to get articles list area."
+                  << std::endl;
         exit(-1);
     }
     
-    connect(m_UIArticles, SIGNAL(itemSelected(int)),
-            SLOT(slotArticleSelected(int)));
+    connect(m_UIArticles, SIGNAL(itemSelected(UIListBtnTypeItem*)),
+            SLOT(slotArticleSelected(UIListBtnTypeItem*)));
     
     m_UISites->SetActive(true);
     m_UIArticles->SetActive(false);
@@ -247,12 +253,17 @@ void MythNews::updateInfoView()
     LayerSet* container = m_Theme->GetSet("info");
     if (container)
     {
-        NewsSite    *site     = m_NewsSites.at(m_UISites->GetItemCurrent());
+        NewsSite    *site     = 0;
         NewsArticle *article  = 0;
-        if (site) {
-            article = site->articleList().at(m_UIArticles->GetItemCurrent());
-        }
 
+        UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
+        if (siteUIItem && siteUIItem->getData()) 
+            site = (NewsSite*) siteUIItem->getData();
+        
+        UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+        if (articleUIItem && articleUIItem->getData())
+            article = (NewsArticle*) articleUIItem->getData();
+        
         if (m_InColumn == 1) {
 
             if (article)
@@ -266,22 +277,22 @@ void MythNews::updateInfoView()
                     (UITextType *)container->GetType("description");
                 if (ttype)
                     ttype->SetText(article->description());
-             }
+            }
         }
         else {
 
-             if (site)
-             {
-                 UITextType *ttype =
-                     (UITextType *)container->GetType("title");
-                 if (ttype)
-                     ttype->SetText(site->name());
+            if (site)
+            {
+                UITextType *ttype =
+                    (UITextType *)container->GetType("title");
+                if (ttype)
+                    ttype->SetText(site->name());
 
-                 ttype =
-                     (UITextType *)container->GetType("description");
-                 if (ttype)
-                     ttype->SetText(site->description());
-             }
+                ttype =
+                    (UITextType *)container->GetType("description");
+                if (ttype)
+                    ttype->SetText(site->description());
+            }
         }
 
         UITextType *ttype =
@@ -318,7 +329,6 @@ void MythNews::updateInfoView()
 
     bitBlt(this, m_InfoRect.left(), m_InfoRect.top(),
            &pix, 0, 0, -1, -1, Qt::CopyROP);
-    
 }
 
 void MythNews::keyPressEvent(QKeyEvent *e)
@@ -413,18 +423,16 @@ void MythNews::slotRetrieveNews()
 
     m_RetrieveTimer->stop();
 
-    for (unsigned int i=0; i<m_NewsSites.count(); i++) {
-        NewsSite* site = m_NewsSites.at(i);
-        if (site) {
-            site->stop();
-            connect(site, SIGNAL(finished(NewsSite*)),
-                    this, SLOT(slotNewsRetrieved(NewsSite*)));
-        }
+    for (NewsSite* site = m_NewsSites.first(); site; site = m_NewsSites.next())
+    {
+        site->stop();
+        connect(site, SIGNAL(finished(NewsSite*)),
+                this, SLOT(slotNewsRetrieved(NewsSite*)));
     }
 
-    for (unsigned int i=0; i<m_NewsSites.count(); i++) {
-        NewsSite* site = m_NewsSites.at(i);
-        if (site && site->timeSinceLastUpdate() > m_UpdateFreq)
+    for (NewsSite* site = m_NewsSites.first(); site; site = m_NewsSites.next())
+    {
+        if (site->timeSinceLastUpdate() > m_UpdateFreq)
             site->retrieve();
         else
             processAndShowNews(site);
@@ -459,31 +467,45 @@ void MythNews::cancelRetrieve()
 
 void MythNews::processAndShowNews(NewsSite* site)
 {
-    if (!site) return;
+    if (!site)
+        return;
 
     site->process();
+
+    UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
+    if (!siteUIItem || !siteUIItem->getData())
+        return;
     
-    if (m_NewsSites.find(site) == m_UISites->GetItemCurrent()) {
+    if (site == (NewsSite*) siteUIItem->getData()) {
+
         m_UIArticles->Reset();
-        for (unsigned int i=0; i<site->articleList().count(); i++) {
-            NewsArticle* article = site->articleList().at(i);
-            m_UIArticles->AddItem(article->title());
+
+        for (NewsArticle* article = site->articleList().first(); article;
+             article = site->articleList().next()) {
+            UIListBtnTypeItem* item =
+                new UIListBtnTypeItem(m_UIArticles, article->title());
+            item->setData(article);
         }
+
         update(m_ArticlesRect);
         update(m_InfoRect);
-    }
+    } 
 }
 
-void MythNews::slotSiteSelected(int itemPos)
+void MythNews::slotSiteSelected(UIListBtnTypeItem *item)
 {
+    if (!item || !item->getData())
+        return;
+    
     m_UIArticles->Reset();
 
-    NewsSite *site = m_NewsSites.at(itemPos);
-    if (!site) return;
+    NewsSite *site = (NewsSite*) item->getData();
 
-    for (unsigned int i=0; i<site->articleList().count(); i++) {
-        NewsArticle* article = site->articleList().at(i);
-        m_UIArticles->AddItem(article->title());
+    for (NewsArticle* article = site->articleList().first(); article;
+         article = site->articleList().next()) {
+        UIListBtnTypeItem* item =
+            new UIListBtnTypeItem(m_UIArticles, article->title());
+        item->setData(article);
     }
 
     update(m_SitesRect);
@@ -491,9 +513,8 @@ void MythNews::slotSiteSelected(int itemPos)
     update(m_InfoRect);
 }
 
-void MythNews::slotArticleSelected(int)
+void MythNews::slotArticleSelected(UIListBtnTypeItem*)
 {
     update(m_ArticlesRect);
     update(m_InfoRect);
 }
-

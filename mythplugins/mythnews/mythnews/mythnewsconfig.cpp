@@ -55,7 +55,7 @@ public:
 
     typedef QPtrList<NewsCategory> List;
 
-    QString         name;
+    QString             name;
     NewsSiteItem::List  siteList;
 
     NewsCategory() {
@@ -122,23 +122,20 @@ MythNewsConfig::MythNewsConfig(QSqlDatabase *db,
     m_UICategory  = 0;
     m_UISite      = 0;
     m_SpinBox     = 0;
+
+    m_Context     = 0;
+    m_InColumn    = 0;
     
     populateSites();
 
     setNoErase();
     loadTheme();
-
-    m_Context     = 0;
-    m_InColumn    = 0;
-
-    m_UISelector->AddItem(tr("Select News Feeds"));
-    m_UISelector->AddItem(tr("Set Update Frequency"));
-    m_UISelector->SetActive(true);
 }
 
 MythNewsConfig::~MythNewsConfig()
 {
     delete m_priv;
+    delete m_Theme;
 }
 
 void MythNewsConfig::populateSites()
@@ -242,13 +239,15 @@ void MythNewsConfig::loadTheme()
 
     LayerSet *container = m_Theme->GetSet("config-selector");
     if (!container) {
-        std::cerr << "MythNews: Failed to get selector container." << std::endl;
+        std::cerr << "MythNews: Failed to get selector container."
+                  << std::endl;
         exit(-1);
     }
 
     m_UISelector = (UIListBtnType*)container->GetType("selector");
     if (!m_UISelector) {
-        std::cerr << "MythNews: Failed to get selector list area." << std::endl;
+        std::cerr << "MythNews: Failed to get selector list area."
+                  << std::endl;
         exit(-1);
     }
 
@@ -260,7 +259,8 @@ void MythNewsConfig::loadTheme()
 
     m_UICategory = (UIListBtnType*)container->GetType("category");
     if (!m_UICategory) {
-        std::cerr << "MythNews: Failed to get category list area." << std::endl;
+        std::cerr << "MythNews: Failed to get category list area."
+                  << std::endl;
         exit(-1);
     }
 
@@ -272,17 +272,21 @@ void MythNewsConfig::loadTheme()
 
     for (NewsCategory* cat = m_priv->categoryList.first();
          cat; cat = m_priv->categoryList.next() ) {
-        m_UICategory->AddItem(cat->name);
+        UIListBtnTypeItem* item =
+            new UIListBtnTypeItem(m_UICategory, cat->name);
+        item->setData(cat);
     }
-    slotCategoryChanged(0);
+    slotCategoryChanged(m_UICategory->GetItemFirst());
 
     container = m_Theme->GetSet("config-freq");
     if (!container) {
-        std::cerr << "MythNews: Failed to get frequency container." << std::endl;
+        std::cerr << "MythNews: Failed to get frequency container."
+                  << std::endl;
         exit(-1);
     }
 
-    UIBlackHoleType* spinboxHolder = (UIBlackHoleType*)container->GetType("spinbox_holder");
+    UIBlackHoleType* spinboxHolder =
+        (UIBlackHoleType*)container->GetType("spinbox_holder");
     if (spinboxHolder) {
         m_SpinBox = new MythNewsSpinBox(this);
         m_SpinBox->setRange(30,1000);
@@ -303,13 +307,15 @@ void MythNewsConfig::loadTheme()
                           "Minimum allowed value is 30 Minutes"));
     }
         
+    connect(m_UISelector, SIGNAL(itemSelected(UIListBtnTypeItem*)),
+            SLOT(slotContextChanged(UIListBtnTypeItem*)));
+    connect(m_UICategory, SIGNAL(itemSelected(UIListBtnTypeItem*)),
+            SLOT(slotCategoryChanged(UIListBtnTypeItem*)));
+
+    new UIListBtnTypeItem(m_UISelector, "Select News Feed");
+    new UIListBtnTypeItem(m_UISelector, "Set Update Frequency");
     
-    connect(m_UISelector, SIGNAL(itemSelected(int)),
-            SLOT(slotContextChanged(int)));
-    connect(m_UICategory, SIGNAL(itemSelected(int)),
-            SLOT(slotCategoryChanged(int)));
-    connect(m_UISite, SIGNAL(itemChecked(int,bool)),
-            SLOT(slotSiteChecked(int,bool)));
+    m_UISelector->SetActive(true);
 }
 
 
@@ -433,6 +439,39 @@ void MythNewsConfig::updateBot()
            &pix, 0, 0, -1, -1, Qt::CopyROP);
 }
 
+void MythNewsConfig::toggleItem(UIListBtnTypeItem *item)
+{
+    if (!item || !item->getData())
+        return;
+
+    NewsSiteItem* site = (NewsSiteItem*) item->getData();
+
+    bool checked = (item->state() == UIListBtnTypeItem::FullChecked);
+
+    if (!checked) {
+        if (insertInDB(site)) {
+            site->inDB = true;
+            item->setChecked(UIListBtnTypeItem::FullChecked);
+        }
+        else {
+            site->inDB = false;
+            item->setChecked(UIListBtnTypeItem::NotChecked);
+        }
+    }
+    else {
+        if (removeFromDB(site)) {
+            site->inDB = false;
+            item->setChecked(UIListBtnTypeItem::NotChecked);
+        } 
+        else {
+            site->inDB = true;
+            item->setChecked(UIListBtnTypeItem::FullChecked);
+        }
+    }
+    
+    updateSites();
+}
+
 bool MythNewsConfig::findInDB(const QString& name)
 {
     bool val = false;
@@ -485,9 +524,15 @@ bool MythNewsConfig::removeFromDB(NewsSiteItem* site)
     return (query.numRowsAffected() > 0);
 }
 
-void MythNewsConfig::slotContextChanged(int context)
+void MythNewsConfig::slotContextChanged(UIListBtnTypeItem *item)
 {
-    if (m_Context == (uint)context) return;
+    if (!item)
+        return;
+
+    uint context = (uint) m_UISelector->GetItemPos(item);
+
+    if (m_Context == context)
+        return;
 
     m_Context = context;
     if (m_Context == 0)
@@ -498,40 +543,26 @@ void MythNewsConfig::slotContextChanged(int context)
     update();    
 }
 
-void MythNewsConfig::slotCategoryChanged(int c)
+void MythNewsConfig::slotCategoryChanged(UIListBtnTypeItem *item)
 {
+    if (!item)
+        return;
+    
     m_UISite->Reset();
-    NewsCategory* cat = m_priv->categoryList.at(c);
+
+    NewsCategory* cat = (NewsCategory*) item->getData();
     if (cat) {
+
         for (NewsSiteItem* site = cat->siteList.first();
              site; site = cat->siteList.next() ) {
-            m_UISite->AddItem(site->name, site->inDB);
+            UIListBtnTypeItem* item =
+                new UIListBtnTypeItem(m_UISite, site->name, 0, true,
+                                      site->inDB ?
+                                      UIListBtnTypeItem::FullChecked :
+                                      UIListBtnTypeItem::NotChecked);
+            item->setData(site);
         }
     }
-}
-
-void MythNewsConfig::slotSiteChecked(int s, bool checked)
-{
-    NewsCategory* cat = m_priv->categoryList.at(m_UICategory->GetItemCurrent());
-    if (!cat) return;
-
-    NewsSiteItem* site = cat->siteList.at(s);
-    if (!site) return;
-
-    if (checked) {
-        if (insertInDB(site))
-            site->inDB = true;
-        else
-            m_UISite->SetItemChecked(s,false);
-    }
-    else {
-        if (removeFromDB(site))
-            site->inDB = false;
-        else
-            m_UISite->SetItemChecked(s,true);
-    }
-    
-    update();
 }
 
 void MythNewsConfig::slotUpdateFreqChanged()
@@ -577,8 +608,11 @@ void MythNewsConfig::keyPressEvent(QKeyEvent *e)
             cursorRight();
         }
         else if (action == "SELECT") {
-            if (m_InColumn == 2 && m_Context == 0)
-                m_UISite->Toggle();
+            if (m_InColumn == 2 && m_Context == 0) {
+                UIListBtnTypeItem *item = m_UISite->GetItemCurrent();
+                if (item)
+                    toggleItem(item);
+            }
         }
         else
             handled = false;
@@ -718,16 +752,17 @@ bool MythNewsSpinBox::eventFilter(QObject* o, QEvent* e)
             else if (action == "LEFT") {
                 QKeyEvent *ev = (QKeyEvent*)e;
                 QApplication::postEvent(parentWidget(),
-                                        new QKeyEvent(ev->type(),ev->key(),ev->ascii(),ev->state()));
+                                        new QKeyEvent(ev->type(),ev->key(),
+                                                      ev->ascii(),
+                                                      ev->state()));
             }
             else if (action == "SELECT" || action == "ESCAPE")
-                return FALSE;
+                return false;
             else
                 handled = false;
         }
     }
 
-    return TRUE;
+    return true;
 }
-
 
