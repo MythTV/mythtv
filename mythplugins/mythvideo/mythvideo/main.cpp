@@ -388,6 +388,8 @@ void BuildFileList(QSqlDatabase *db,
 {
     QDir d(directory);
 
+    d.setSorting(QDir::DirsFirst | QDir::Name | QDir::IgnoreCase );
+
     if (!d.exists())
         return;
 

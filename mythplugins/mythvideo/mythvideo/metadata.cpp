@@ -201,8 +201,23 @@ void Metadata::guessTitle()
     title.replace(QRegExp("%20"), " ");
     title = title.left(title.findRev("."));
     title.replace(QRegExp("\\."), " ");
-    title = title.left(title.find("["));
-    title = title.left(title.find("("));
+    while ((title.find("[") != -1) && (title.find("]") != -1))
+    {
+        title = title.left(title.find("[")) + 
+                title.right(title.length() - title.find("]") - 1);
+    }
+    while ((title.find("(") != -1) && (title.find(")") != -1))
+    {
+        title = title.left(title.find("(")) + 
+                title.right(title.length() - title.find(")") - 1);
+    }
+    while ((title.find("{") != -1) && (title.find("}") != -1))
+    {
+        title = title.left(title.find("{")) + 
+                title.right(title.length() - title.find("}") - 1);
+    }
+
+    title = title.stripWhiteSpace();
 }
 
 void Metadata::updateDatabase(QSqlDatabase *db)

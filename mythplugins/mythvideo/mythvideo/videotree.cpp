@@ -213,6 +213,8 @@ void VideoTree::buildFileList(QString directory)
 {
     QDir d(directory);
 
+    d.setSorting(QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
+
     if (!d.exists())
         return;
 
@@ -282,7 +284,7 @@ void VideoTree::buildVideoList()
                 if(a_counter + 1 >= (int) list.count())
                 {
                     QString title = (*an_it);
-                    where_to_add->addNode(title.section(".",0,0), i, true);
+                    where_to_add->addNode(title.section(".",0,-2), i, true);
                     
                 }
                 else
