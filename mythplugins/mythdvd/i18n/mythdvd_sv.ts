@@ -274,7 +274,7 @@ Du har ingen DVD-enhet definierad.</translation>
     </message>
     <message>
         <source>Display mythdvd menu menu</source>
-        <translation>Visa MythDVD-meny</translation>
+        <translation type="obsolete">Visa MythDVD-meny</translation>
     </message>
     <message>
         <source>Do nothing</source>
@@ -291,6 +291,10 @@ Du har ingen DVD-enhet definierad.</translation>
     <message>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
         <translation>Mediaövervakning måste aktiveras för att tillåta denna funktion.</translation>
+    </message>
+    <message>
+        <source>Display mythdvd menu</source>
+        <translation>Visa MythDVD-menyn</translation>
     </message>
 </context>
 <context>

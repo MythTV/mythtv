@@ -85,6 +85,30 @@
         <source>Clear CD-RW Disk</source>
         <translation>Slet CD-RW disk</translation>
     </message>
+    <message>
+        <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre: </source>
+        <translation type="unfinished">Genre:</translation>
+    </message>
 </context>
 <context>
     <name>PlaybackBox</name>
@@ -249,7 +273,7 @@
     </message>
     <message>
         <source>CDRom device used for ripping/playback.</source>
-        <translation>CDROM-enhed der anvendes til kopiering (rip) og afspilning af CD'er.</translation>
+        <translation>CDROM-enhed der anvendes til kopiering (rip) og afspilning af CD&apos;er.</translation>
     </message>
     <message>
         <source>Tree Sorting</source>
@@ -285,7 +309,7 @@
     </message>
     <message>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
-        <translation>Hvis dette felt er markeret, vil MythMusic automatisk hente information om CD'er i drevet og vise denne.</translation>
+        <translation>Hvis dette felt er markeret, vil MythMusic automatisk hente information om CD&apos;er i drevet og vise denne.</translation>
     </message>
     <message>
         <source>Use Keyboard/Remote Accelerated Buttons</source>
@@ -309,7 +333,7 @@
     </message>
     <message>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
-        <translation>Formatet der anvendes ved kopiering (rip) af CD'er. Bemærk, at kvalitetsniveauet &apos;Perfekt&apos; vil resultere i anvendelsen af FLAC-formatet.</translation>
+        <translation>Formatet der anvendes ved kopiering (rip) af CD&apos;er. Bemærk, at kvalitetsniveauet &apos;Perfekt&apos; vil resultere i anvendelsen af FLAC-formatet.</translation>
     </message>
     <message>
         <source>File storage location</source>
@@ -353,7 +377,7 @@
     </message>
     <message>
         <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
-        <translation>Fastsætter trade-off imellem hastighed og antal fejl ved kopiering (rip) af CD'er. Sæt dette til &apos;hurtigt&apos; hvis du er ligeglad med eventuelle fejl i de færdige lyd-filer.</translation>
+        <translation>Fastsætter trade-off imellem hastighed og antal fejl ved kopiering (rip) af CD&apos;er. Sæt dette til &apos;hurtigt&apos; hvis du er ligeglad med eventuelle fejl i de færdige lyd-filer.</translation>
     </message>
     <message>
         <source>Automatically eject CDs after ripping</source>
@@ -649,7 +673,7 @@
     </message>
     <message>
         <source>Enable CD Writing.</source>
-        <translation>Anvend skrivning af CD'er</translation>
+        <translation>Anvend skrivning af CD&apos;er</translation>
     </message>
     <message>
         <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>

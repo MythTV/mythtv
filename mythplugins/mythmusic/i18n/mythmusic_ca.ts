@@ -124,6 +124,30 @@
         <source>Clear CD-RW Disk</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre: </source>
+        <translation type="unfinished">Gènere: </translation>
+    </message>
 </context>
 <context>
     <name>PlaybackBox</name>

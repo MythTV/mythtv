@@ -94,35 +94,63 @@
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le thème que vous utilisez ne contient pas d&apos;élément &apos;musictree&apos;. Veuillez contacter le créateur du thème et lui demander de le mettre à jour.
+
+L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Couldn&apos;t create CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de créer le CD</translation>
     </message>
     <message>
         <source>CD Created</source>
-        <translation type="unfinished"></translation>
+        <translation>CD créé</translation>
     </message>
     <message>
         <source>CD-RW Blanking Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacement du CD-RW en cours</translation>
     </message>
     <message>
         <source>Create Audio CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer un CD audio à partir de la playlist</translation>
     </message>
     <message>
         <source>Create MP3 CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer un CD MP3 à partir de la playlist</translation>
     </message>
     <message>
         <source>Clear CD-RW Disk</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer le CD-RW</translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
+        <translation>Le thème que vous utilisez ne contient aucune lignes d&apos;informations dans l&apos;élément de musique. Veuillez contacter le créateur du thème et lui demander de le mettre à jour.
+
+L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </translation>
+    </message>
+    <message>
+        <source>Artist:<byte value="x9"/></source>
+        <translation>Artiste: </translation>
+    </message>
+    <message>
+        <source>Album:<byte value="x9"/></source>
+        <translation>Album: </translation>
+    </message>
+    <message>
+        <source>Title:<byte value="x9"/></source>
+        <translation>Titre: </translation>
+    </message>
+    <message>
+        <source>Length:<byte value="x9"/></source>
+        <translation>Durée: </translation>
+    </message>
+    <message>
+        <source>Genre: </source>
+        <translation>Genre: </translation>
     </message>
 </context>
 <context>
@@ -265,15 +293,15 @@
     </message>
     <message>
         <source>kbps</source>
-        <translation></translation>
+        <translation>kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation></translation>
+        <translation>kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation></translation>
+        <translation type="unfinished">can.</translation>
     </message>
 </context>
 <context>
@@ -288,7 +316,7 @@
     </message>
     <message>
         <source>BumpScope</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -308,11 +336,11 @@
     </message>
     <message>
         <source>Directory to hold music</source>
-        <translation>Dossier où prendre la Musique</translation>
+        <translation>Dossier où stocker la Musique</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation>Ce Dossier n&apos;existe pas, et l&apos;utilisateur qui a lancer MythMusic doit avoir les droits d&apos;ecriture sur ce dossier.</translation>
+        <translation>Ce Dossier doit exister, et l&apos;utilisateur qui a lancé MythMusic doit avoir les droits d&apos;ecriture sur ce dossier.</translation>
     </message>
     <message>
         <source>Audio device</source>
@@ -344,7 +372,7 @@
     </message>
     <message>
         <source>If present this script will be executed after a CD Rip is completed.</source>
-        <translation>Si un script est présent, il sera executé aprés l&apos;import de CD.</translation>
+        <translation>Si le script est renseigné, il sera executé après l&apos;import de CD.</translation>
     </message>
     <message>
         <source>Filename Format</source>
@@ -352,7 +380,7 @@
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
-        <translation>Répertoire et Format de fichier sont utilisé pour obtenir les information , si aucun ID3 n&apos;est trouvé.</translation>
+        <translation>Répertoire et Format de fichier utilisé pour obtenir des informations, si aucun ID3 n&apos;est trouvé.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
@@ -368,7 +396,7 @@
     </message>
     <message>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
-        <translation>Regarde Automatiquement les CDs Audio, Si c&apos;est le cas, MythMusic montre les information dans l&apos;Arborescence de Choix Musicales.</translation>
+        <translation>Regarde Automatiquement les CDs Audio et montre les information dans l&apos;Arborescence de Choix Musicaux.</translation>
     </message>
     <message>
         <source>Use Keyboard/Remote Accelerated Buttons</source>
@@ -400,7 +428,7 @@
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation>Defineix la carpeta/nom per a les noves cançons. GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / i - són valors vàlids. &apos;-&apos; serà substituït pel caràcter separador</translation>
+        <translation type="unfinished">Définit le chemin/nom pour les nouvelles chansons. GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, /  sont des valeurs possibles et -, &apos;-&apos; sera remplacé par le caractère de séparation</translation>
     </message>
     <message>
         <source>Token separator</source>
@@ -408,11 +436,11 @@
     </message>
     <message>
         <source> - </source>
-        <translation></translation>
+        <translation>-</translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
-        <translation>Els noms dels arxius seràn separats per aquesta marca.</translation>
+        <translation>Les caractères de séparation des noms de fichiers seront remplacés par cette chaîne.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
@@ -420,11 +448,11 @@
     </message>
     <message>
         <source>If set, whitespace characters in filenames will be replaced with underscore characters.</source>
-        <translation>Quan està actiu, els blancs en els noms dels arxius es substitueixen pel subratllat.</translation>
+        <translation>Si coché, les caractères d&apos;espaces dans les noms de fichiers seront remplacés par des underscores.</translation>
     </message>
     <message>
         <source>Paranoia Level</source>
-        <translation>Niveau Parano</translation>
+        <translation>Niveau de Paranoia</translation>
     </message>
     <message>
         <source>Full</source>
@@ -440,11 +468,11 @@
     </message>
     <message>
         <source>Automatically eject CDs after ripping</source>
-        <translation>Ejection Automatique des CDs aprés l&apos; Import</translation>
+        <translation>Éjection Automatique des CDs après l&apos; Import</translation>
     </message>
     <message>
         <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
-        <translation>Quan s&apos;activa, el CD s&apos;expulsa automàticament quan finalitza el volcat.</translation>
+        <translation>Si coché, le CD est automatiquement éjecté après le RIP.</translation>
     </message>
     <message>
         <source>Rating Weight</source>
@@ -452,23 +480,23 @@
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
-        <translation>Es fa servir en la reproducció segons &quot;Preferit&quot;. És el pès assignat en el moment d&apos;ordenar grups de cançons.</translation>
+        <translation>Utilisé dans le mode aléatoire intelligent. Ce poids affecte l&apos;importance donnée à votre évaluation d&apos;une chanson lors du tri d&apos;un groupe de chansons.</translation>
     </message>
     <message>
         <source>Play Count Weight</source>
-        <translation>Pes del comptador de reproduccions</translation>
+        <translation>Poids du nombre de lecture</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
-        <translation>En el mode de reproducció &apos;Preferit&apos;. Aquest valor afecta a la puntuació atorgada segons el nombre de reproduccions de la cançó.</translation>
+        <translation>Utilisé dans le mode aléatoire intelligent. Ce poids affecte l&apos;importance donnée au nombre de fois qu&apos;une chanson à été jouée lors du tri d&apos;un groupe de chansons.</translation>
     </message>
     <message>
         <source>Last Play Weight</source>
-        <translation>Pes per la última reproducció</translation>
+        <translation>Poids de la dernière lecture</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
-        <translation>En el mode de reproducció &apos;Preferit&apos;. Aquest valor puntúa segons el temps que fa que ha estat reproduida la cançó.</translation>
+        <translation>Utilisé dans le mode aléatoire intelligent. Ce poids affecte l&apos;importance donnée au temps depuis lequel une piste à été jouée lors du tri d&apos;un groupe de chansons.</translation>
     </message>
     <message>
         <source>Random Weight</source>
@@ -476,7 +504,7 @@
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation>En el mode de reproducció &apos;Preferit&apos;. Aquest valor és el que s&apos;assigna al reproduïr aleatòriament les cançons.</translation>
+        <translation>Utilisé dans le mode aléatoire intelligent. Ce poids affecte l&apos;importance donnée aux anciens bon choix (pseudo-)aléatoire lors du tri d&apos;un groupe de chansons.</translation>
     </message>
     <message>
         <source>Show Song Ratings</source>
@@ -496,11 +524,11 @@
     </message>
     <message>
         <source>Show entire music tree</source>
-        <translation>Montrer l&apos;Arborescence Musicales Entiére</translation>
+        <translation>Montrer l&apos;Arborescence Musicales Entière</translation>
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen.</source>
-        <translation>Si séléctionné, vous pouvez naviger dans l&apos;arborescence musicale entiére dans la fenêtre de lecture.</translation>
+        <translation>Si sélectionné, vous pouvez naviger dans l&apos;arborescence musicale entière dans la fenêtre de lecture.</translation>
     </message>
     <message>
         <source>Play mode</source>
@@ -508,7 +536,7 @@
     </message>
     <message>
         <source>Normal</source>
-        <translation></translation>
+        <translation>Normal</translation>
     </message>
     <message>
         <source>Random</source>
@@ -520,7 +548,7 @@
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
-        <translation>Mode inicial del reproductor: Pot ser normal, aleatori o intel·ligent.</translation>
+        <translation>Mode de lecture initiale du lecteur. Peut être Normal, Aléatoire ou Intelligent (aléatoire).</translation>
     </message>
     <message>
         <source>Delay before Visualizations start (seconds)</source>
@@ -544,7 +572,7 @@
     </message>
     <message>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
-        <translation>Si &quot;2&quot; est configuré, la visualisation est à l&apos;echelle 1/2. Actuellement celan&apos;est utilisé que par la visualisation Goom. Diminuer la consommation CPU sur les machines lentes.</translation>
+        <translation>Si &quot;2&quot; est configuré, la visualisation est à l&apos;echelle 1/2. Actuellement cela n&apos;est utilisé que par la visualisation Goom. Cela diminue la consommation CPU sur les machines lentes.</translation>
     </message>
     <message>
         <source>Height for Visual Scaling</source>
@@ -718,7 +746,7 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Something is Wrong</source>
-        <translation>Quelques choses est incorrecte</translation>
+        <translation>Quelques choses est incorrect</translation>
     </message>
     <message>
         <source>Visualization requires FFT library</source>
@@ -734,134 +762,134 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Use variable bitrates</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser des bitrates variables</translation>
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si coché, l&apos;encodeur MP3 utilisera des bitrates variables (VBR) sauf pour les réglages basses qualité. L&apos;encodeur Ogg utilisera toujours du bitrate variable.</translation>
     </message>
     <message>
         <source>AlbumArt</source>
-        <translation type="unfinished"></translation>
+        <translation>Jaquette</translation>
     </message>
     <message>
         <source>CD Ripper Settings (part 2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramétres de l&apos;import de CD (partie 2)</translation>
     </message>
     <message>
         <source>Enable CD Writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Permettre la gravure de CD.</translation>
     </message>
     <message>
         <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nécessite un graveur SCSI ou IDE-SCSI.</translation>
     </message>
     <message>
         <source>CD-Writer Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique CD-RW</translation>
     </message>
     <message>
         <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation type="unfinished"></translation>
+        <translation>Choix du périphérique SCSI de gravure. Si votre périphérique IDE n&apos;est pas présent, essayez d&apos;ajouter hdd(ou hd/hdb)=ide-scsi à vos options de boot</translation>
     </message>
     <message>
         <source>Disk Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille du disque</translation>
     </message>
     <message>
         <source>650MB/75min</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>700MB/80min</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Default CD Capacity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Capacité par défaut du CD.</translation>
     </message>
     <message>
         <source>Enable directories on MP3 Creation</source>
-        <translation type="unfinished"></translation>
+        <translation>Authoriser les répertoires sur les CD MP3</translation>
     </message>
     <message>
         <source>CD Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse de gravure</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto</translation>
     </message>
     <message>
         <source>1x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>2x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>4x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>8x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>16x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse de gravure. Auto utilisera la vitesse recommandée.</translation>
     </message>
     <message>
         <source>CD Blanking Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Type d&apos;effaçage du CD</translation>
     </message>
     <message>
         <source>Fast</source>
-        <translation type="unfinished"></translation>
+        <translation>Rapide</translation>
     </message>
     <message>
         <source>Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Complet</translation>
     </message>
     <message>
         <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Méthode de mise à blanc du CD. Rapide prend 1 minute. Complet jusqu&apos;à 20 minutes.</translation>
     </message>
     <message>
         <source>CD Recording Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramétres de gravure CD</translation>
     </message>
     <message>
         <source>Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Artistes</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
-        <translation type="unfinished"></translation>
+        <translation>Création du système de fichiers du CD</translation>
     </message>
     <message>
         <source>Burning CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravure du CD</translation>
     </message>
     <message>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordre dans lequel trier l&apos;arborescence de musique. Les valeurs possibles sont une liste séparé d&apos;espaces des valeurs genre, splitartist, artist, album, et title OU le mot clef &quot;directory&quot; qui indique que l&apos;arborescense affichée reflète le système de fichiers.</translation>
     </message>
 </context>
 <context>
     <name>Ripper</name>
     <message>
         <source>Please select a quality level and check the album information below:</source>
-        <translation>Merci de séléctionner un niveau de qualité et de vérifier les informations de l&apos;album en dessous:</translation>
+        <translation>Merci de sélectionner un niveau de qualité et de vérifier les informations de l&apos;album ci dessous:</translation>
     </message>
     <message>
         <source>Low</source>

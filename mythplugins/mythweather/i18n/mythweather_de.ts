@@ -905,5 +905,13 @@
         <source> - PAUSED -</source>
         <translation> - PAUSIERT -</translation>
     </message>
+    <message>
+        <source>doppler radar</source>
+        <translation type="unfinished">Dopplerradar</translation>
+    </message>
+    <message>
+        <source>satellite image</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

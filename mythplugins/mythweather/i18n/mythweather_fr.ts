@@ -38,7 +38,7 @@
     </message>
     <message>
         <source>Mostly Cloudy</source>
-        <translation>Très Nuageux</translation>
+        <translation>Très nuageux</translation>
     </message>
     <message>
         <source>Partly Cloudy</source>
@@ -46,7 +46,7 @@
     </message>
     <message>
         <source>Light Rain</source>
-        <translation>Pluie Légère</translation>
+        <translation>Pluie légère</translation>
     </message>
     <message>
         <source>Showers</source>
@@ -58,7 +58,7 @@
     </message>
     <message>
         <source>AM Showers</source>
-        <translation>Averses Matinales</translation>
+        <translation>Averses matinales</translation>
     </message>
     <message>
         <source>Fog</source>
@@ -66,11 +66,11 @@
     </message>
     <message>
         <source>Few Showers</source>
-        <translation>Averses Éparses</translation>
+        <translation>Quelques averses</translation>
     </message>
     <message>
         <source>Mostly Sunny</source>
-        <translation>Plutôt Ensoleillé</translation>
+        <translation>Plutôt ensoleillé</translation>
     </message>
     <message>
         <source>Sunny</source>
@@ -540,11 +540,11 @@
     </message>
     <message>
         <source>[ retrieving weather data ... ]</source>
-        <translation>[ Recherche des données météo... ]</translation>
+        <translation>[ recherche des prévisions météo... ]</translation>
     </message>
     <message>
         <source>current conditions</source>
-        <translation>Conditions Actuelles</translation>
+        <translation>Conditions actuelles</translation>
     </message>
     <message>
         <source>Humidity</source>
@@ -572,7 +572,7 @@
     </message>
     <message>
         <source>extended forecast</source>
-        <translation>Les 3 Prochains Jours</translation>
+        <translation>Les 3 prochains jours</translation>
     </message>
     <message>
         <source>LO</source>
@@ -584,11 +584,11 @@
     </message>
     <message>
         <source>today&apos;s forecast</source>
-        <translation>Prévisions du Jour</translation>
+        <translation>Prévisions du jour</translation>
     </message>
     <message>
         <source>tomorrow&apos;s outlook</source>
-        <translation>Prévisions pour Demain</translation>
+        <translation>Prévisions pour demain</translation>
     </message>
     <message>
         <source>Forecast for</source>
@@ -596,11 +596,11 @@
     </message>
     <message>
         <source>doppler radar</source>
-        <translation>Image Satellite</translation>
+        <translation>Image satellite</translation>
     </message>
     <message>
         <source>Map Unavailable</source>
-        <translation>Carte Indisponible</translation>
+        <translation>Carte indisponible</translation>
     </message>
     <message>
         <source>RAIN</source>
@@ -628,7 +628,7 @@
     </message>
     <message>
         <source>weather setup</source>
-        <translation>paramétrage Météo</translation>
+        <translation>Paramétrage météo</translation>
     </message>
     <message>
         <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
@@ -663,11 +663,11 @@
     </message>
     <message>
         <source>Aggressiveness</source>
-        <translation>Type de Connexion</translation>
+        <translation>Type de connexion</translation>
     </message>
     <message>
         <source>Configuration Saved...</source>
-        <translation>Configuration Enregistrée...</translation>
+        <translation>Configuration enregistrée...</translation>
     </message>
     <message>
         <source>Retrieving weather data...</source>
@@ -735,7 +735,7 @@
     </message>
     <message>
         <source> and a low of </source>
-        <translation> °C et les minimales de </translation>
+        <translation> °C et la minimale de </translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
@@ -867,11 +867,11 @@
     </message>
     <message>
         <source>doppler radar</source>
-        <translation>Image Satellite</translation>
+        <translation>radar doppler</translation>
     </message>
     <message>
         <source>satellite image</source>
-        <translation>Image Satellite</translation>
+        <translation>image satellite</translation>
     </message>
 </context>
 </TS>

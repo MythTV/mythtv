@@ -106,7 +106,7 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>Display mythdvd menu menu</source>
-        <translation>Prikaži mythdvd menu</translation>
+        <translation type="obsolete">Prikaži mythdvd menu</translation>
     </message>
     <message>
         <source>Do nothing</source>
@@ -287,6 +287,10 @@ Nimate definirane DVD naprave.</translation>
     <message>
         <source>Transcode is thinking </source>
         <translation>Transkodiranje premišljuje</translation>
+    </message>
+    <message>
+        <source>Display mythdvd menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

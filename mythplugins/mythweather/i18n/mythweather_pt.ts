@@ -1028,5 +1028,13 @@
         <source> - PAUSED -</source>
         <translation>- PARADO -</translation>
     </message>
+    <message>
+        <source>doppler radar</source>
+        <translation type="unfinished">Imagem de Satélite</translation>
+    </message>
+    <message>
+        <source>satellite image</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

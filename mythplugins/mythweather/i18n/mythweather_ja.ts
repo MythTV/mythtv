@@ -865,5 +865,13 @@
         <source> - PAUSED -</source>
         <translation>- 一時停止 -</translation>
     </message>
+    <message>
+        <source>doppler radar</source>
+        <translation type="unfinished">レーダー画像</translation>
+    </message>
+    <message>
+        <source>satellite image</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

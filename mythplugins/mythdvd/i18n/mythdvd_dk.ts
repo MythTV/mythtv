@@ -261,10 +261,6 @@ You have no DVD Device defined.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Display mythdvd menu menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Do nothing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -278,6 +274,10 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display mythdvd menu</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
