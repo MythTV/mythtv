@@ -1541,6 +1541,9 @@ void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
 
 bool NuppelVideoPlayer::FastForward(float seconds)
 {
+    if (!videoOutput)
+        return false;
+
     if (fftime == 0)
     {
         fftime = (int)(seconds * video_frame_rate);
@@ -1569,6 +1572,9 @@ bool NuppelVideoPlayer::FastForward(float seconds)
 
 bool NuppelVideoPlayer::Rewind(float seconds)
 {
+    if (!videoOutput)
+        return false;
+
     if (rewindtime == 0)
     {
         rewindtime = (int)(seconds * video_frame_rate);
