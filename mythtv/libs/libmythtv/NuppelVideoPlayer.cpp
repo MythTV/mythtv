@@ -3642,7 +3642,7 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
 
 bool NuppelVideoPlayer::DoSkipCommercials(int direction)
 {
-    if (( ! hasblanktable) ||
+    if (( !hasblanktable && !hascommbreaktable) ||
         (livetv) ||
         (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
     {
