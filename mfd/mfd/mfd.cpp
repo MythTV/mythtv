@@ -490,15 +490,6 @@ void MFD::registerMFDService()
         warning("mfd could not register itself (perhaps no plugin handling services tokens?)");
     }
     
-    //
-    //  TEMPORARY HACK
-    //
-    
-    self_registration_string = QString("services add daap %1 MythMusic daap server on %2")
-                                       .arg(3689)
-                                       .arg(local_hostname);
-    self_registration_tokens = QStringList::split(" ", self_registration_string);
-    plugin_manager->parseTokens(self_registration_tokens, -1);
 }
 
 MFD::~MFD()
