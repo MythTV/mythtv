@@ -49,6 +49,7 @@ class MetadataServer : public MFDServicePlugin
 
     Metadata*                    getMetadataByUniversalId(uint id);
     Metadata*                    getMetadataByContainerAndId(int container_id, int metadata_id);
+    Metadata*                    getLocalEquivalent(Metadata *which_item);
     Playlist*                    getPlaylistByUniversalId(uint id);
     Playlist*                    getPlaylistByContainerAndId(int container_id, int playlist_id);
     
@@ -89,7 +90,11 @@ class MetadataServer : public MFDServicePlugin
 
   private:
 
-    void                        pruneNewMetadata(MetadataContainer *container);
+    void                        updateDictionary(
+                                                    MetadataContainer *target, 
+                                                    QValueList<int> metadata_deletions, 
+                                                    QIntDict<Metadata>* new_metadata
+                                                );
 
     int                         bumpContainerId();
 
@@ -118,6 +123,8 @@ class MetadataServer : public MFDServicePlugin
     int                         last_destroyed_container;
     QValueList<int>             last_destroyed_metadata;
     QValueList<int>             last_destroyed_playlists;
+
+    QDict<Metadata>             *local_mythdigest_dictionary;
 };
 
 

@@ -61,6 +61,7 @@ class MMusicWatcher: public MFDServicePlugin
     MMusicWatcher(MFD *owner, int identity);
     ~MMusicWatcher();
 
+    void            initialize();
     void            run();
     bool            sweepMetadata();
     void            checkForDeletions(MusicFileMap &music_files, const QString &startdir);
@@ -79,7 +80,6 @@ class MMusicWatcher: public MFDServicePlugin
   private:
 
     int             bumpMetadataId();
-    bool            first_time;
   
     QTime           metadata_sweep_time;
     bool            force_sweep;

@@ -784,33 +784,41 @@ void ClientHttpServer::showTracks(HttpRequest *http_request)
                     {
                         AudioMetadata *which_item = (AudioMetadata*)iterator.current();
                     
-                        if(counter % 2 == 0)
+                        if(!a_container->isLocal() && metadata_server->getLocalEquivalent(which_item))
                         {
-                            http_request->getResponse()->addToPayload("<tr bgcolor=\"ccccee\">");
+                            //
+                            //  No need to list this, as a local equivalent will appear instead
+                            //
                         }
                         else
                         {
-                            http_request->getResponse()->addToPayload("<tr>");
+                            if(counter % 2 == 0)
+                            {
+                                http_request->getResponse()->addToPayload("<tr bgcolor=\"ccccee\">");
+                            }
+                            else
+                            {
+                                http_request->getResponse()->addToPayload("<tr>");
+                            }
+                            ++counter;
+
+                            http_request->getResponse()->addToPayload("<td>");
+                            http_request->getResponse()->addToPayload(which_item->getArtist());
+                            http_request->getResponse()->addToPayload("</td>");
+
+                            http_request->getResponse()->addToPayload("<td>");
+                            http_request->getResponse()->addToPayload(which_item->getTitle());
+                            http_request->getResponse()->addToPayload("</td>");
+
+                            http_request->getResponse()->addToPayload("<td>");
+                            http_request->getResponse()->addToPayload(
+                                QString("<a href=\"/audio/tracks?playtrack=%1&container=%2\">play</a>")
+                                .arg(which_item->getId())
+                                .arg(a_container->getIdentifier()));
+                            http_request->getResponse()->addToPayload("</td>");
+
+                            http_request->getResponse()->addToPayload("</tr>");
                         }
-                        ++counter;
-
-
-                        http_request->getResponse()->addToPayload("<td>");
-                        http_request->getResponse()->addToPayload(which_item->getArtist());
-                        http_request->getResponse()->addToPayload("</td>");
-
-                        http_request->getResponse()->addToPayload("<td>");
-                        http_request->getResponse()->addToPayload(which_item->getTitle());
-                        http_request->getResponse()->addToPayload("</td>");
-
-                        http_request->getResponse()->addToPayload("<td>");
-                        http_request->getResponse()->addToPayload(
-                            QString("<a href=\"/audio/tracks?playtrack=%1&container=%2\">play</a>")
-                            .arg(which_item->getId())
-                            .arg(a_container->getIdentifier()));
-                        http_request->getResponse()->addToPayload("</td>");
-
-                        http_request->getResponse()->addToPayload("</tr>");
                     }
                 }
             }

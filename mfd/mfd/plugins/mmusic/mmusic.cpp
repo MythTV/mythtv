@@ -71,15 +71,29 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     metadata_server = parent->getMetadataServer();
     
     //
+    //  This is a "magic" number signifying what we want to see
+    //
+    
+    desired_database_version = "1002";
+
+    //
+    //  Initialize our contianer and set things up for a clean slate
+    //
+    
+    initialize();
+}
+
+void MMusicWatcher::initialize()
+{
+
+    //
     //  On startup, we want it to sweep
     //
 
-    first_time = true;
     force_sweep = true;
 
     //
-    //  We just came into existence, so obviously we have not sent any
-    //  warning yet
+    //  Clear warning flags
     //
     
     sent_directory_warning = false;
@@ -90,13 +104,7 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     sent_database_version_warning = false;
 
     //
-    //  This is a "magic" number signifying what we want to see
-    //
-    
-    desired_database_version = "1002";
-
-    //
-    //  At startup we have no new data and no history. We create these lists
+    //  Set to have no new data and no history. We create these lists
     //  (during a sweep), but the metadata server deletes them
     //
 
@@ -110,18 +118,23 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     previous_playlists.clear();
     playlist_additions.clear();
     playlist_deletions.clear();
+    
+    master_list.clear();
+    latest_sweep.clear();
+    files_to_ignore.clear();
 
     //
-    //  Get a metadata
-    //  provides us
+    //  Get a metadata container
     //
     
-    metadata_container = metadata_server->createContainer(MCCT_audio, MCLT_host);
+    metadata_container = 
+        metadata_server->createContainer(MCCT_audio, MCLT_host);
     container_id = metadata_container->getIdentifier();
     current_metadata_id = 0;
     
     //
-    //  Fill our container with an empty set of metadata and an empty set of playlists
+    //  Fill our container with an empty set of metadata and an empty set of
+    //  playlists
     //
     
     metadata_server->doAtomicDataSwap(  
@@ -135,7 +148,8 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
                                      );
                                      
     //
-    //  Now that we have handed the metadat to the metadata server, dereference it
+    //  Now that we have handed the metadata to the metadata server,
+    //  dereference it
     //
     
     new_metadata = NULL;
@@ -176,7 +190,7 @@ void MMusicWatcher::run()
         //  minutes). Set to 0 to only sweep when a sweep is forced
         //
 
-        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 15) * 60 * 1000;  
+        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 1) * 60 * 1000;  
         if( ( metadata_sweep_time.elapsed() > sweep_wait  &&
               sweep_wait > 0 && keep_going ) || ( force_sweep && keep_going) )
         {
@@ -327,6 +341,27 @@ bool MMusicWatcher::sweepMetadata()
     //  If we made it this far, we may need a container (in case we
     //  recovered from previous checkDataSources() failues)
     //
+    
+    if(!metadata_container)
+    {
+        if(new_metadata)
+        {
+            delete new_metadata;
+            new_metadata = NULL;
+        }
+        if(new_playlists)
+        {
+            delete new_playlists;
+            new_playlists = NULL;
+        }
+
+        initialize();
+
+        new_metadata = new QIntDict<Metadata>;
+        new_metadata->resize(9973);  // big prime
+        new_playlists = new QIntDict<Playlist>;
+
+    }
 
 
     //
@@ -339,9 +374,21 @@ bool MMusicWatcher::sweepMetadata()
         QTime build_file_list_timer;
         build_file_list_timer.start();
         buildFileList(startdir, latest_sweep);
-        log(QString("built simple list of %1 audio files in %2 second(s)")
-            .arg(latest_sweep.count())
-            .arg(build_file_list_timer.elapsed() / 1000.0), 9);
+
+        if(latest_sweep.count() < 1)
+        {
+            warning(QString("not updating music files as none were "
+                            "found in \"%1\"")
+                            .arg(startdir));
+            return false;
+        }
+        else
+        {
+            log(QString("built simple list of %1 audio files in %2 second(s)")
+                .arg(latest_sweep.count())
+                .arg(build_file_list_timer.elapsed() / 1000.0), 9);
+        }
+
 
         //
         //  If there's anything in our database and/or master file list which

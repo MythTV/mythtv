@@ -33,6 +33,15 @@ MetadataServer::MetadataServer(MFD* owner, int port)
     local_audio_playlist_count = 0;
     metadata_container_count = 0;
     last_destroyed_container = -1;
+
+    //
+    //  We keep a dictionary (lookup table) of local metadata organized by
+    //  mythdigest. That way, if we see a request for non local metadata and
+    //  we have the same content locally (based on the myth digest
+    //  persistent id), we can return the local content instead.
+    //
+
+    local_mythdigest_dictionary = new QDict<Metadata>(9973, false);
 }
 
 void MetadataServer::run()
@@ -184,6 +193,24 @@ Metadata* MetadataServer::getMetadataByUniversalId(uint universal_id)
         if(a_container->getIdentifier() == collection_id)
         {
             return_value = a_container->getMetadata(item_id);
+            
+            //
+            //  if this container is not local, check and see if we can
+            //  return something local instead
+            //
+            
+            if(!a_container->isLocal())
+            {
+                QString myth_digest = return_value->getMythDigest();
+                if(myth_digest.length() > 0)
+                {
+                    Metadata *alternative = local_mythdigest_dictionary->find(myth_digest);
+                    if(alternative)
+                    {
+                        return_value = alternative;
+                    }
+                }
+            }
             break; 
         }
     }
@@ -221,6 +248,24 @@ Metadata* MetadataServer::getMetadataByContainerAndId(int container_id, int meta
         if(a_container->getIdentifier() == container_id)
         {
             return_value = a_container->getMetadata(metadata_id);
+
+            //
+            //  if this container is not local, check and see if we can
+            //  return something local instead
+            //
+            
+            if(!a_container->isLocal())
+            {
+                QString myth_digest = return_value->getMythDigest();
+                if(myth_digest.length() > 0)
+                {
+                    Metadata *alternative = local_mythdigest_dictionary->find(myth_digest);
+                    if(alternative)
+                    {
+                        return_value = alternative;
+                    }
+                }
+            }
             break; 
         }
     }
@@ -427,6 +472,22 @@ void MetadataServer::deleteContainer(int container_id)
             {
                 int an_integer = iter.currentKey();
                 last_destroyed_metadata.push_back(an_integer);
+                if(ex_type == MCCT_audio && ex_location == MCLT_host)
+                {
+                    //
+                    //  Take off the mythdigest dictionary
+                    //
+                    
+                    QString myth_digest = iter.current()->getMythDigest();
+                    if(myth_digest.length() > 0)
+                    {
+                        if(!local_mythdigest_dictionary->remove(myth_digest))
+                        {
+                            warning("digest for item being destroyed was not "
+                                    "in the dictionary");
+                        }
+                    }
+                }
             }
         }
             
@@ -540,11 +601,15 @@ void MetadataServer::doAtomicDataSwap(
                         local_audio_playlist_count = 
                                 local_audio_playlist_count 
                                 - target->getPlaylistCount();
+
+                        //
+                        //  Update local mythdigest dictionary
+                        //
+
+                        updateDictionary(target, metadata_deletions, new_metadata);
+                        
                     }
                     
-                    //
-                    //  Reverse any pruning that we need to
-                    //
                     
                     //
                     //  Actually swap the data
@@ -562,12 +627,6 @@ void MetadataServer::doAtomicDataSwap(
                     new_metadata = NULL;
                     new_playlists = NULL;
 
-
-                    //
-                    //  Perform any new pruning we need to
-                    //
-                    
-                    pruneNewMetadata(target);
 
                     log(QString("container %1 swapped in new data: "
                                 "%2 items (+%3/-%4) and "
@@ -648,14 +707,29 @@ void MetadataServer::doAtomicDataDelta(
             local_audio_metadata_count_mutex.lock();
                 local_audio_playlist_count_mutex.lock();
             
+                    //
+                    //  Keep track of how many we have in total
+                    //
+                    
                     if(target->isLocal() && target->isAudio())
                     {
+                        //
+                        //  Keep track of how many we have in total
+                        //
+
                         local_audio_metadata_count = 
                                 local_audio_metadata_count 
                                 - target->getMetadataCount();
                         local_audio_playlist_count = 
                                 local_audio_playlist_count 
                                 - target->getPlaylistCount();
+
+                        //
+                        //  Update local mythdigest dictionary
+                        //
+
+                        updateDictionary(target, metadata_deletions, new_metadata);
+
                     }
 
                     target->dataDelta(
@@ -701,7 +775,7 @@ void MetadataServer::doAtomicDataDelta(
         }
         else
         {
-            warning("can not do a an AtomicDataSwap()"
+            warning("can not do a an AtomicDataDelta()"
                     " on a Container I don't own");
         }
         
@@ -745,27 +819,101 @@ int MetadataServer::getLastDestroyedCollection()
     return return_value;
 }
 
-void MetadataServer::pruneNewMetadata(MetadataContainer *container)
+void MetadataServer::updateDictionary(
+                                        MetadataContainer *target, 
+                                        QValueList<int> metadata_deletions, 
+                                        QIntDict<Metadata>* new_metadata
+                                     )
 {
     //
-    //  Check and make sure we are locked
+    //  Metadata should be locked _before_ calling this method
     //
-
+    
     if(metadata_mutex.tryLock())
     {
         metadata_mutex.unlock();
-        warning("pruneNewMetadata() called without "
+        warning("updateDictionary() called without "
                 "metadata_mutex being locked");
     }
 
-    if(container)
+
+    if(!target)
     {
-        //
-        //  Look at the new metadata and see if we can map non-local to
-        //  local based on mythdigest persistent id's
-        //
-    }    
+        warning("updateDictionary() called with bad reference to "
+                "target container");
+        return;
+    }
+
+
+    //
+    //  Make sure anything being removed comes off our
+    //  myth digest dictionary
+    //
+                        
+    QValueList<int>::iterator d_iter;
+    for(
+        d_iter = metadata_deletions.begin(); 
+        d_iter != metadata_deletions.end(); 
+        ++d_iter 
+       )
+    {
+        Metadata *d_metadata = target->getMetadata((*d_iter));
+        if(d_metadata)
+        {
+            QString myth_digest =  d_metadata->getMythDigest();
+            if(myth_digest.length() > 0)
+            {
+                if(!local_mythdigest_dictionary->remove(myth_digest))
+                {
+                    warning("digest for item to be removed was not "
+                            "in the dictionary");
+                }
+            }
+        }
+        else
+        {
+            warning("could not find metadata from "
+                    "integer on deletion list");
+        }
+    }
+                        
+    //
+    //  While we're dealing with the digest dictionary,
+    //  put all the new metadata in
+    //
+                        
+    QIntDictIterator<Metadata> a_iter(*new_metadata);
+    for (; a_iter.current(); ++a_iter)
+    {
+        QString myth_digest = a_iter.current()->getMythDigest();
+        if(myth_digest.length() > 0)
+        {
+            local_mythdigest_dictionary->insert(myth_digest, a_iter.current());
+        }
+    }
+}
+
+Metadata* MetadataServer::getLocalEquivalent(Metadata *which_item)
+{
+    //
+    //  Metadata should be locked _before_ calling this method
+    //
     
+    if(metadata_mutex.tryLock())
+    {
+        metadata_mutex.unlock();
+        warning("getLocalEquivalent() called without "
+                "metadata_mutex being locked");
+    }
+
+    Metadata* return_value = NULL;
+    
+    QString myth_digest = which_item->getMythDigest();
+    if(myth_digest.length() > 0)
+    {
+        return_value = local_mythdigest_dictionary->find(myth_digest);
+    }
+    return return_value;
 }
 
 MetadataServer::~MetadataServer()
@@ -773,5 +921,10 @@ MetadataServer::~MetadataServer()
     if(metadata_containers)
     {
         delete metadata_containers;
+    }
+    
+    if(local_mythdigest_dictionary)
+    {
+        delete local_mythdigest_dictionary;
     }
 }
