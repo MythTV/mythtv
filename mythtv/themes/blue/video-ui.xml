@@ -219,7 +219,7 @@
         <value></value>
       </textarea>
       <textarea name="keyslbl_three" draworder="4" align="right">
-        <area>580,275,200,30</area>
+        <area>580,275,230,30</area>
         <font>keysfont</font>
         <value>INFO - Action Menu</value>        
       </textarea>
@@ -798,7 +798,7 @@
             <bold>yes</bold>
         </font>
         <font name="largetitle" face="Arial">
-            <color>#ffffff</color>
+            <color>#ffffdd</color>
             <dropcolor>#000000</dropcolor>
             <size>32</size>
             <shadow>3,3</shadow>
@@ -813,6 +813,14 @@
             <bold>yes</bold>
         </font>
         
+        <font name="smalllabelfont" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>14</size>
+            <shadow>1,1</shadow>
+            <bold>yes</bold>
+        </font>
+        
         <font name="infofont" face="Arial">
             <color>#ffff33</color>
             <size>16</size>
@@ -822,27 +830,27 @@
         <container name="background">
             <image name="filler" draworder="0" fleximage="yes">
                 <filename>background.png</filename>
-                <position>0,10</position>
+                <position>0,20</position>
             </image>
             <image name="titlelines" draworder="0" fleximage="no">
                 <filename>trans-titles.png</filename>
                 <position>0,10</position>
             </image>
-            <image name="morefiller" draworder="0" fleximage="no">
+            <!--<image name="morefiller" draworder="0" fleximage="no">
                 <filename>mv_other_background.png</filename>
                 <position>0,300</position>
-            </image>
+            </image> -->
         </container>
 
         <container name="videoselector">
             <area>0,10,800,310</area>
             <managedtreelist name="videotreelist" draworder="4" bins="2">
                 <area>40,10,720,270</area>
-                <image function="selectionbar" filename="mv_selectionbar.png"></image>
-                <image function="uparrow" filename="mv_up_arrow.png"></image>
-                <image function="downarrow" filename="mv_down_arrow.png"></image>
-                <image function="leftarrow" filename="mv_left_arrow.png"></image>
-                <image function="rightarrow" filename="mv_right_arrow.png"></image>
+                <image function="selectionbar" filename="bar.png" location="-15,-5" padding="12" fleximage="no"></image>
+                <image function="uparrow" filename="uparrow.png"></image>
+                <image function="downarrow" filename="downarrow.png"></image>
+                <image function="leftarrow" filename="leftarrow.png"></image>
+                <image function="rightarrow" filename="rightarrow.png"></image>
                 <bin number="1">
                     <area>30,16,190,250</area>
                     <fcnfont name="active" function="active"></fcnfont>
@@ -867,41 +875,52 @@
         </container>
 
         <container name="videoinfo">
-            <area>0,321,800,300</area>
+            <area>0,301,800,300</area>
             <textarea name="video_title" draworder="4">
-                <area>50,70,530,60</area>
+                <area>50,20,530,60</area>
                 <font>largetitle</font>
             </textarea>
             <textarea name="file_label" draworder="4" align="right">
-                <area>30,153,90,40</area>
+                <area>30,73,90,40</area>
                 <font>labelfont</font>
                 <value>File:</value>
             </textarea>
             <textarea name="player_label" draworder="4" align="right">
-                <area>30,196,90,40</area>
+                <area>30,106,90,40</area>
                 <font>labelfont</font>
                 <value>Player:</value>
             </textarea>
+            <textarea name="plot" draworder="4">
+              <area>30,146,570,145</area>
+              <font>infofont</font>
+              <multiline>yes</multiline>
+            </textarea>
+
             <textarea name="video_file" draworder="4">
-                <area>130,155,380,40</area>
+                <area>130,73,380,40</area>
                 <font>infofont</font>
             </textarea>
             <textarea name="video_player" draworder="4">
-                <area>130,198,380,40</area>
+                <area>130,106,570,40</area>
                 <font>infofont</font>
             </textarea>
             <image name="video_poster" draworder="1" fleximage="no">
-                <position>551,18</position>
-                <staticsize>166,260</staticsize>
+                <position>605,20</position>
+                <staticsize>166,235</staticsize>
             </image>
+            <textarea name="help" draworder="4" align="left">
+                <area>30,267,360,40</area>
+                <font>smalllabelfont</font>
+                <value>MENU - Options    INFO - Action Menu</value>
+            </textarea>
             <textarea name="pl_label" draworder="4" align="right">
-                <area>700,255,60,40</area>
+                <area>512,267,260,40</area>
                 <font>labelfont</font>
-                <value>PL </value>
+                <value>Current Parental Level: </value>
             </textarea>
             <textarea name="pl_value" draworder="4">
-                <area>760,255,20,40</area>
-                <font>labelfont</font>
+                <area>770,267,20,40</area>
+                <font>smalllabelfont</font>
                 <value>1</value>
             </textarea>
         </container>
