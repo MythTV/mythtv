@@ -157,7 +157,7 @@
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos; or &apos;MythXine&apos;.</source>
-        <translation>Detta är kommandot som används för att spela upp filer som har en filändelse som inte specifikt har associerats med en spelare. Du kan även skriva in namnet på en av avspelningspluginerna, exempelvis &apos;Internal&apos; eller &apos;MythXine&apos;.</translation>
+        <translation type="obsolete">Detta är kommandot som används för att spela upp filer som har en filändelse som inte specifikt har associerats med en spelare. Du kan även skriva in namnet på en av avspelningspluginerna, exempelvis &apos;Internal&apos; eller &apos;MythXine&apos;.</translation>
     </message>
     <message>
         <source>New category</source>
@@ -207,6 +207,58 @@
     <message>
         <source>Aggressive Parental Control</source>
         <translation>Lås även vy för barnlåskonfigurationen</translation>
+    </message>
+    <message>
+        <source>Default View</source>
+        <translation>Standardvy</translation>
+    </message>
+    <message>
+        <source>Gallery</source>
+        <translation>Galleri</translation>
+    </message>
+    <message>
+        <source>Browser</source>
+        <translation>Bläddrare</translation>
+    </message>
+    <message>
+        <source>Listings</source>
+        <translation>Listningar</translation>
+    </message>
+    <message>
+        <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
+        <translation>Standardvy för MythVideo. Andra vyer kan nås genom popup-menyn tillgänglig via MENY-knappen.</translation>
+    </message>
+    <message>
+        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
+        <translation>Detta är standardkommandot för uppspelning av filer. &apos;Internal&apos; använder Myth&apos;s egna uppspelningsmetod.</translation>
+    </message>
+    <message>
+        <source>Rows to display</source>
+        <translation>Rader att visa</translation>
+    </message>
+    <message>
+        <source>Columns to display</source>
+        <translation>Kolumner att visa</translation>
+    </message>
+    <message>
+        <source>Show title below thumbnails</source>
+        <translation>Visa titel under miniatyrbild</translation>
+    </message>
+    <message>
+        <source>If set, the additional text will make the thumbnails smaller.</source>
+        <translation>Om denna funktion aktiveras kommer texten att göra miniatyrbilderna mindre.</translation>
+    </message>
+    <message>
+        <source>Maintain aspect ratio of thumbnails</source>
+        <translation>Bibehåll aspekt på miniatyrbilder</translation>
+    </message>
+    <message>
+        <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
+        <translation>Låt miniatyrbilderna bibehålla sin ursprungliga aspekt, annars skalas de för att matcha storleken på bakgrundsikonen.</translation>
+    </message>
+    <message>
+        <source>Video Gallery</source>
+        <translation>Videogalleri</translation>
     </message>
 </context>
 <context>
@@ -432,7 +484,7 @@
     <name>VideoBrowser</name>
     <message>
         <source>Parental Pin:</source>
-        <translation>PIN-kod (barnlås):</translation>
+        <translation type="obsolete">PIN-kod (barnlås):</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -452,11 +504,11 @@
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation>Välj åtgärd</translation>
+        <translation type="obsolete">Välj åtgärd</translation>
     </message>
     <message>
         <source>Watch This Video</source>
@@ -472,7 +524,7 @@
     </message>
     <message>
         <source>Switch to Video Listings</source>
-        <translation>Växla till filmlista</translation>
+        <translation type="obsolete">Växla till filmlista</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -563,6 +615,38 @@
     <message>
         <source>No files found</source>
         <translation>Inga filer funna</translation>
+    </message>
+    <message>
+        <source>Select action</source>
+        <translation>Välj åtgärd</translation>
+    </message>
+    <message>
+        <source>Watch This Video</source>
+        <translation>Spela upp denna film</translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation>Visa full beskrivning</translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation>Filtervisning</translation>
+    </message>
+    <message>
+        <source>Switch to Browse View</source>
+        <translation>Byt till bläddringsläge</translation>
+    </message>
+    <message>
+        <source>Switch to Gallery View</source>
+        <translation>Byt till galleriläge</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation>OK</translation>
     </message>
 </context>
 </TS>
