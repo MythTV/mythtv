@@ -21,7 +21,8 @@
 enum MusicFileLocation
 {
     MFL_on_file_system = 0,
-    MFL_in_myth_database
+    MFL_in_myth_database,
+    MFL_both_file_and_database
 };
     
 typedef QMap <QString, MusicFileLocation> MusicLoadedMap;

@@ -283,7 +283,7 @@ bool MMusicWatcher::sweepMetadata()
                 {
                     if ((mf_iterator = music_files.find(name)) != music_files.end())
                     {
-                        music_files.remove(mf_iterator);
+                        music_files[name] = MFL_both_file_and_database;
                     }
                     else
                     {
@@ -324,7 +324,7 @@ bool MMusicWatcher::sweepMetadata()
             QString querystr = QString("DELETE FROM musicmetadata WHERE "
                                        "filename=\"%1\"").arg(name);
             query.exec(querystr);
-            music_files.remove(mf_iterator);
+            //music_files.remove(mf_iterator);
             something_changed = true;
         }
         else if(*mf_iterator == MFL_on_file_system)
