@@ -304,14 +304,16 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (err < 0)
     {
         cerr << "avformat error: " << err << endl;
-        exit(1);
+        return -1;
     }
 
     int ret = av_find_stream_info(ic);
     if (ret < 0)
     {
         cerr << "could not find codec parameters: " << filename << endl;
-        exit(1);
+        av_close_input_file(ic);
+        ic = NULL;
+        return -1;
     }
 
     fmt->flags &= ~AVFMT_NOFILE;
@@ -457,13 +459,17 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         if (!codec)
         {
             cerr << "Unknown codec: " << enc->codec_id << endl;
-            exit(1);
+            av_close_input_file(ic);
+            ic = NULL;
+            return -1;
         }
 
         if (avcodec_open(enc, codec) < 0)
         {
             cerr << "Couldn't find lavc codec\n";
-            exit(1);
+            av_close_input_file(ic);
+            ic = NULL;
+            return -1;
         }
     }
 
@@ -1037,7 +1043,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     unsigned char *ptr;
     int data_size = 0;
     long long pts;
-    bool firstloop = false;
+    bool firstloop = false, have_err = false;
 
     gotvideo = false;
 
@@ -1135,8 +1141,9 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
         }
  
         firstloop = true;
+        have_err = false;
 
-        while (len > 0)
+        while (!have_err && len > 0)
         {
             switch (curstream->codec.codec_type)
             {
@@ -1218,7 +1225,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (ret < 0)
                     {
                         cerr << "decoding error\n";
-                        exit(1);
+                        have_err = true;
+                        continue;
                     }
 
                     if (!gotpicture)
@@ -1312,13 +1320,17 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                 default:
                     cerr << "error decoding - " << curstream->codec.codec_type 
                          << endl;
-                    exit(1);
+                    have_err = true;
+                    break;
             }
 
-            ptr += ret;
-            len -= ret;
-            frame_decoded = 1;
-            firstloop = false;
+            if (!have_err)
+            {
+                ptr += ret;
+                len -= ret;
+                frame_decoded = 1;
+                firstloop = false;
+            }
         }
        
         av_free_packet(pkt);
@@ -1327,7 +1339,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     if (pkt)
         delete pkt;
 
-    m_parent->SetFramesPlayed(framesPlayed);
+    if (!have_err)
+        m_parent->SetFramesPlayed(framesPlayed);
 }
 
 bool AvFormatDecoder::DoRewind(long long desiredFrame)
