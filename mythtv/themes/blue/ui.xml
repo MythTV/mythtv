@@ -1336,10 +1336,6 @@
         <altarea>20,0,760,40</altarea>
         <font>title</font>
       </textarea>
-      <textarea name="subtitle" draworder="6">
-        <area>20,40,579,30</area>
-        <font>info</font>
-      </textarea>
       <textarea name="channel" draworder="6">
         <area>20,40,120,30</area>
         <font>info</font>
