@@ -383,12 +383,14 @@ void UIImageType::LoadImage()
             if (m_force_x != -1)
             {
                 doX = m_force_x;
-                cerr << "         +Force X: " << doX << endl;
+                if (m_debug == true)
+                    cerr << "         +Force X: " << doX << endl;
             }
             if (m_force_y != -1)
             {
                 doY = m_force_y;
-                cerr << "         +Force Y: " << doY << endl;
+                if (m_debug == true)
+                    cerr << "         +Force Y: " << doY << endl;
             }
 
             scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),

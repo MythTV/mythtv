@@ -490,6 +490,10 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
         {
             text->SetJustification(jst | Qt::AlignRight);
         }
+        if (align.lower() == "allcenter")
+        {
+            text->SetJustification(jst | Qt::AlignHCenter | Qt::AlignVCenter);
+        }
     }
 }
 
