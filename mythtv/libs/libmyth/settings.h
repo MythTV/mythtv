@@ -6,6 +6,7 @@
 #include <qstring.h>
 #include <iostream>
 #include <vector>
+#include <map>
 
 #include "mythwidgets.h"
 
