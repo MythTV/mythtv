@@ -265,10 +265,14 @@ void DatabaseBox::doSelected(QListViewItem *item)
     }
     else 
     {
-        if (tcitem->isOn())
-            plist->push_back(*(tcitem->getMetadata()));
-        else
-            plist->remove(*(tcitem->getMetadata()));
+        Metadata *mdata = tcitem->getMetadata();
+        if (mdata != NULL)
+        {
+            if (tcitem->isOn())
+                plist->push_back(*(tcitem->getMetadata()));
+            else
+                plist->remove(*(tcitem->getMetadata()));
+        }
     }
 }
 

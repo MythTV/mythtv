@@ -96,6 +96,8 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
+    context->ThemeWidget(this);
+
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
     mainvisual = new MainVisual(context);

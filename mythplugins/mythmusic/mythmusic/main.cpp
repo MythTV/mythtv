@@ -191,6 +191,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     MythContext *context = new MythContext();
+    context->LoadQtConfig();
 
     context->LoadSettingsFiles("mythmusic-settings.txt");
 
