@@ -230,7 +230,7 @@ void XMLParse::parseFont(QDomElement &element)
                 haveBold = true;
                 bold = getFirstText(info);
             }
-            else if (info.tagName() == "italic")
+            else if (info.tagName() == "italics")
             {
                 haveItal = true;
                 ital = getFirstText(info);
