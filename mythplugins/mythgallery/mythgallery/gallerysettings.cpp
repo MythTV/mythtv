@@ -60,6 +60,7 @@ public:
         addSelection("inout (gl)");
         addSelection("slide (gl)");
         addSelection("flutter (gl)");
+        addSelection("cube (gl)");
         addSelection("random (gl)");
         setHelpText(QObject::tr("This is the type of OpenGL transition used "
                     "between pictures in slideshow mode."));

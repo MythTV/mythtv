@@ -111,7 +111,6 @@ private:
     EffectMethod                m_effectMethod;
     QMap<QString,EffectMethod>  m_effectMap;
     bool                        m_effectRandom;
-    
 
 private:
     
@@ -133,6 +132,7 @@ private:
     void effectInOut();
     void effectSlide();
     void effectFlutter();
+    void effectCube();
 
 private slots:
 

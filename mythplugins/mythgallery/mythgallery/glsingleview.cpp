@@ -115,7 +115,7 @@ GLSingleView::GLSingleView(QSqlDatabase *db, ThumbList itemList,
     if (!transType.isEmpty() && m_effectMap.contains(transType))
         m_effectMethod = m_effectMap[transType];
     
-    if (!m_effectMethod || transType == "random") {
+    if (!m_effectMethod || transType == QString("random (gl)")) {
         m_effectMethod = getRandomEffect();
         m_effectRandom = true;
     }
@@ -168,12 +168,15 @@ void GLSingleView::initializeGL()
     // Enable Texture Mapping
     glEnable(GL_TEXTURE_2D);
     // Clear The Background Color
-    glClearColor(0.0, 0.0, 0.0, 0.0f);
+    glClearColor(0.0, 0.0, 0.0, 1.0f);
 
     // Turn Blending On
     glEnable(GL_BLEND);
     // Blending Function For Translucency Based On Source Alpha Value
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+    // Enable perspective vision
+    glClearDepth(1.0f);
 
     loadImage();
 }
@@ -189,7 +192,14 @@ void GLSingleView::resizeGL( int w, int h )
 
 void GLSingleView::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -571,6 +581,7 @@ void GLSingleView::registerEffects()
     m_effectMap.insert("inout (gl)", &GLSingleView::effectInOut);
     m_effectMap.insert("slide (gl)", &GLSingleView::effectSlide);
     m_effectMap.insert("flutter (gl)", &GLSingleView::effectFlutter);
+    m_effectMap.insert("cube (gl)", &GLSingleView::effectCube);
 }
 
 GLSingleView::EffectMethod GLSingleView::getRandomEffect()
@@ -1111,6 +1122,174 @@ void GLSingleView::effectFlutter()
     m_i++;
 }
 
+void GLSingleView::effectCube()
+{
+    int tot = 200;
+    int rotStart = 50;
+    
+    if (m_i > tot) {
+        paintTexture();
+        m_effectRunning = false;
+        m_tmout = -1;
+        return;
+    }
+
+    // Enable perspective vision
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+    int a = (m_curr == 0) ? 1 : 0;
+    int b =  m_curr;
+    
+    TexItem& ta = m_texItem[a];
+    TexItem& tb = m_texItem[b];
+
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    float PI = 4.0 * atan(1.0);
+    float znear = 3.0;
+    float theta = 2.0 * atan2((float)2.0/(float)2.0, (float)znear);
+    theta = theta * 180.0/PI;
+
+    glFrustum(-1.0,1.0,-1.0,1.0, znear-0.01,10.0);
+
+
+    static float xrot;
+    static float yrot;
+    static float zrot;
+
+    if (m_i == 0) {
+        xrot = 0.0;
+        yrot = 0.0;
+        zrot = 0.0;
+    }
+
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+
+    float trans = 5.0 * (float)((m_i <= tot/2) ? m_i : tot-m_i)/(float)tot;
+    glTranslatef(0.0,0.0, -znear - 1.0 - trans);
+
+    glRotatef(xrot, 1.0f, 0.0f, 0.0f);
+    glRotatef(yrot, 0.0f, 1.0f, 0.0f);
+    
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBegin(GL_QUADS);
+    {
+        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+
+        /* Front Face */
+        glVertex3f( -1.00f, -1.00f,  0.99f );
+        glVertex3f(  1.00f, -1.00f,  0.99f );
+        glVertex3f(  1.00f,  1.00f,  0.99f );
+        glVertex3f( -1.00f,  1.00f,  0.99f );
+
+        /* Back Face */
+        glVertex3f( -1.00f, -1.00f, -0.99f );
+        glVertex3f( -1.00f,  1.00f, -0.99f );
+        glVertex3f(  1.00f,  1.00f, -0.99f );
+        glVertex3f(  1.00f, -1.00f, -0.99f );
+  
+        /* Top Face */
+        glVertex3f( -1.00f,  0.99f, -1.00f );
+        glVertex3f( -1.00f,  0.99f,  1.00f );
+        glVertex3f(  1.00f,  0.99f,  1.00f );
+        glVertex3f(  1.00f,  0.99f, -1.00f );
+
+        /* Bottom Face */
+        glVertex3f( -1.00f, -0.99f, -1.00f );
+        glVertex3f(  1.00f, -0.99f, -1.00f );
+        glVertex3f(  1.00f, -0.99f,  1.00f );
+        glVertex3f( -1.00f, -0.99f,  1.00f );
+
+        /* Right face */
+        glVertex3f( 0.99f, -1.00f, -1.00f );
+        glVertex3f( 0.99f,  1.00f, -1.00f );
+        glVertex3f( 0.99f,  1.00f,  1.00f );
+        glVertex3f( 0.99f, -1.00f,  1.00f );
+
+        /* Left Face */
+        glVertex3f( -0.99f, -1.00f, -1.00f );
+        glVertex3f( -0.99f, -1.00f,  1.00f );
+        glVertex3f( -0.99f,  1.00f,  1.00f );
+        glVertex3f( -0.99f,  1.00f, -1.00f );
+        
+    }
+    glEnd();
+
+    glMatrixMode(GL_TEXTURE);
+    glLoadIdentity();
+    glRotatef(ta.angle, 0.0, 0.0, 1.0);
+
+
+    glBindTexture(GL_TEXTURE_2D, ta.tex);
+    glBegin(GL_QUADS);
+    {
+        glColor4d(1.0, 1.0, 1.0, 1.0);
+
+        // Front Face 
+        glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -ta.cx, -ta.cy,  1.00f );
+        glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  ta.cx, -ta.cy,  1.00f );
+        glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  ta.cx,  ta.cy,  1.00f );
+        glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -ta.cx,  ta.cy,  1.00f );
+
+  
+        // Top Face 
+        glTexCoord2f( 1.0f, 1.0f ); glVertex3f( -ta.cx,  1.00f, -ta.cy );
+        glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -ta.cx,  1.00f,  ta.cy );
+        glTexCoord2f( 0.0f, 0.0f ); glVertex3f(  ta.cx,  1.00f,  ta.cy );
+        glTexCoord2f( 0.0f, 1.0f ); glVertex3f(  ta.cx,  1.00f, -ta.cy );
+
+        // Bottom Face 
+        glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -ta.cx, -1.00f, -ta.cy );
+        glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  ta.cx, -1.00f, -ta.cy );
+        glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  ta.cx, -1.00f,  ta.cy );
+        glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -ta.cx, -1.00f,  ta.cy );
+
+        // Right face 
+        glTexCoord2f( 0.0f, 0.0f ); glVertex3f( 1.00f, -ta.cx, -ta.cy );
+        glTexCoord2f( 0.0f, 1.0f ); glVertex3f( 1.00f, -ta.cx,  ta.cy );
+        glTexCoord2f( 1.0f, 1.0f ); glVertex3f( 1.00f,  ta.cx,  ta.cy );
+        glTexCoord2f( 1.0f, 0.0f ); glVertex3f( 1.00f,  ta.cx, -ta.cy );
+
+        // Left Face 
+        glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -1.00f, -ta.cx, -ta.cy );
+        glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -1.00f,  ta.cx, -ta.cy );
+        glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -1.00f,  ta.cx,  ta.cy );
+        glTexCoord2f( 1.0f, 1.0f ); glVertex3f( -1.00f, -ta.cx,  ta.cy );
+        
+    }
+    glEnd();
+
+    glMatrixMode(GL_TEXTURE);
+    glLoadIdentity();
+    glRotatef(tb.angle, 0.0, 0.0, 1.0);
+
+    glBindTexture(GL_TEXTURE_2D, tb.tex);
+    glBegin(GL_QUADS);
+    {
+        glColor4d(1.0, 1.0, 1.0, 1.0);
+        
+        // Back Face 
+        glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -tb.cx, -tb.cy, -1.00f );
+        glTexCoord2f( 1.0f, 1.0f ); glVertex3f( -tb.cx,  tb.cy, -1.00f );
+        glTexCoord2f( 0.0f, 1.0f ); glVertex3f(  tb.cx,  tb.cy, -1.00f );
+        glTexCoord2f( 0.0f, 0.0f ); glVertex3f(  tb.cx, -tb.cy, -1.00f );
+    }
+    glEnd();
+    
+    if (m_i >= rotStart && m_i < (tot-rotStart)) {
+        xrot += 360.0f/(float)(tot-2*rotStart);
+        yrot += 180.0f/(float)(tot-2*rotStart);
+    }
+
+    m_i++;
+
+}
 
 void GLSingleView::slotTimeOut()
 {
@@ -1202,3 +1381,4 @@ void GLSingleView::createTexInfo()
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 }
+
