@@ -871,20 +871,25 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    if (!pip_mode)
+    if ((!pip_mode) && (curRecording->chancommfree == 0))
     {
         int commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
                                                        COMM_DETECT_BLANKS);
-        
-        if (commDetect)
-            commDetect->Init(w_out, h_out, video_frame_rate, commDetectMethod);
-        else
-            commDetect = new CommDetect(w_out, h_out, video_frame_rate,
-                                        commDetectMethod);
 
-        commDetect->SetAggressiveDetection(
-                        gContext->GetNumSetting("AggressiveCommDetect", 1));
+        if ((commDetectMethod == COMM_DETECT_BLANKS) ||
+            (commDetectMethod == COMM_DETECT_BLANK_SCENE) ||
+            (commDetectMethod == COMM_DETECT_ALL))
+        {
+            if (commDetect)
+                commDetect->Init(w_out, h_out, video_frame_rate,
+                                 commDetectMethod);
+            else
+                commDetect = new CommDetect(w_out, h_out, video_frame_rate,
+                                            commDetectMethod);
 
+            commDetect->SetAggressiveDetection(
+                            gContext->GetNumSetting("AggressiveCommDetect", 1));
+        }
     }
 
     // save the start time

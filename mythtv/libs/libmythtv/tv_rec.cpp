@@ -350,6 +350,10 @@ void TVRec::StartedRecording(void)
     MythContext::KickDatabase(db_conn);
 
     curRecording->StartedRecording(db_conn);
+
+    if (curRecording->chancommfree != 0)
+        curRecording->SetCommFlagged(COMM_FLAG_COMMFREE, db_conn);
+
     pthread_mutex_unlock(&db_lock);
 
     MythEvent me("RECORDING_LIST_CHANGE");
@@ -724,13 +728,6 @@ void TVRec::TeardownRecorder(bool killFile)
                            .arg(detectionHost);
                 MythEvent me(message);
                 gContext->dispatch(me);
-            }
-
-            if (prevRecording->chancommfree != 0)
-            {
-                pthread_mutex_lock(&db_lock);
-                prevRecording->SetCommFlagged(COMM_FLAG_COMMFREE, db_conn);
-                pthread_mutex_unlock(&db_lock);
             }
 
             if (autoTranscode)
