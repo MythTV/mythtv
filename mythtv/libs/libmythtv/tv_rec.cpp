@@ -346,8 +346,8 @@ void TVRec::SetupRecorder(RecordingProfile& profile) {
     if (setting == "MPEG-4") {
       nvr->SetCodec("mpeg4");
       nvr->SetMP4TargetBitrate(profile.byName("mpeg4bitrate")->getValue().toInt());
-      nvr->SetMP4ScaleBitrate(profile.byName("mpeg4scalebitrate")->getValue().isNull() ?
-                              0 : 1);
+      nvr->SetMP4ScaleBitrate(profile.byName("mpeg4scalebitrate")->getValue().toInt() ?
+                              1 : 0);
       nvr->SetMP4Quality(profile.byName("mpeg4maxquality")->getValue().toInt(),
                          profile.byName("mpeg4minquality")->getValue().toInt(),
                          profile.byName("mpeg4qualdiff")->getValue().toInt());
@@ -357,6 +357,7 @@ void TVRec::SetupRecorder(RecordingProfile& profile) {
       nvr->SetRTJpegMotionLevels(profile.byName("rtjpegchromafilter")->getValue().toInt(),
                                  profile.byName("rtjpeglumafilter")->getValue().toInt());
     } else if (setting == "Hardware MJPEG") {
+      nvr->SetCodec("hardware-mjpeg");
       nvr->SetHMJPGQuality(profile.byName("hardwaremjpegquality")->getValue().toInt());
       nvr->SetHMJPGDecimation(profile.byName("hardwaremjpegdecimation")->getValue().toInt());
     } else {
