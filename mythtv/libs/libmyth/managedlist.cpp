@@ -452,18 +452,15 @@ void SelectManagedListItem::select()
 
 void SelectManagedListItem::doGoBack()
 {
-
     if (curItem == (itemCount - 1) )
         curItem = lastItem;
     else
         text = getCurItemText();
 
-    if (curItem != lastItem)
-    {
-        text = getCurItemText();
-        valueText = getCurItemValue();
-        changed();
-    }
+    valueText = getCurItemValue();
+    text = getCurItemText();
+    changed();
+
 
     ManagedListGroup::doGoBack();
 }
