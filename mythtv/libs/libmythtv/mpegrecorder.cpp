@@ -6,6 +6,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <time.h>
 #include <linux/videodev.h>
 
 using namespace std;
@@ -31,6 +34,9 @@ MpegRecorder::MpegRecorder()
 
     chanfd = -1; 
     readfd = -1;
+
+    width = 720;
+    height = 480;
 }
 
 MpegRecorder::~MpegRecorder()
@@ -43,7 +49,12 @@ MpegRecorder::~MpegRecorder()
 
 void MpegRecorder::SetEncodingOption(const QString &opt, int value)
 {
-    cerr << "Unknown option: " << opt << ": " << value << endl;
+    if (opt == "width")
+        width = value;
+    else if (opt == "height")
+        height = value;
+    else
+        cerr << "Unknown option: " << opt << ": " << value << endl;
 }
 
 void MpegRecorder::ChangeDeinterlacer(int deint_mode)
@@ -83,6 +94,28 @@ void MpegRecorder::StartRecording(void)
         return;
     }
 
+    struct v4l2_format vfmt;
+    memset(&vfmt, 0, sizeof(vfmt));
+
+    if (ioctl(chanfd, VIDIOC_G_FMT, &vfmt) < 0)
+    {
+        cerr << "Error getting format\n";
+        perror("VIDIOC_G_FMT:");
+        KillChildren();
+        return;
+    }
+
+    vfmt.fmt.pix.width = width;
+    vfmt.fmt.pix.height = height;
+
+    if (ioctl(chanfd, VIDIOC_S_FMT, &vfmt) < 0)
+    {
+        cerr << "Error setting format\n";
+        perror("VIDIOC_S_FMT:");
+        KillChildren();
+        return;
+    }
+
     readfd = open(videodevice.ascii(), O_RDWR);
     if (readfd <= 0)
     {
@@ -98,6 +131,9 @@ void MpegRecorder::StartRecording(void)
     encoding = true;
     recording = true;
 
+    struct timeval stm, now;
+    gettimeofday(&stm, NULL);
+
     while (encoding)
     {
         if (paused)
@@ -109,6 +145,8 @@ void MpegRecorder::StartRecording(void)
             }
             mainpaused = true;
             usleep(50);
+            if (cleartimeonpause)
+                gettimeofday(&stm, NULL);
             continue;
         }
 
@@ -117,6 +155,8 @@ void MpegRecorder::StartRecording(void)
 
         ret = read(readfd, buffer, 128000);
         ringBuffer->Write(buffer, ret);
+
+        gettimeofday(&now, NULL);
     }
 
     KillChildren();
@@ -136,6 +176,7 @@ void MpegRecorder::Reset(void)
 
 void MpegRecorder::Pause(bool clear)
 {
+    cleartimeonpause = clear;
     actuallypaused = mainpaused = false;
     paused = true;
     pausewritethread = true;
@@ -179,7 +220,7 @@ void MpegRecorder::TransitionToRing(void)
 
 long long MpegRecorder::GetKeyframePosition(long long desired)
 {
-    return 0;
+    return framesWritten;
 }
 
 void MpegRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)

@@ -444,6 +444,9 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         nvr->SetBaseOption("tvformat", gContext->GetSetting("TVFormat"));
         nvr->SetBaseOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
+        SetOption(profile, "width");
+        SetOption(profile, "height");
+
         nvr->Initialize();
         return;
     }

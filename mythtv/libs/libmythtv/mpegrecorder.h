@@ -53,8 +53,11 @@ class MpegRecorder : public RecorderBase
     bool pausewritethread;
     bool actuallypaused;
     bool mainpaused;
+    bool cleartimeonpause;
 
     long long framesWritten;
+
+    int width, height;
 
     int chanfd;
     int readfd;
