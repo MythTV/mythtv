@@ -544,10 +544,10 @@ if test "$mp3lame" = "yes" ; then
   echo "CONFIG_MP3LAME=yes" >> config.mak
 fi
 
-if test "$vorbis" = "yes" ; then
-  echo "#define CONFIG_VORBIS 1" >> $TMPH
-  echo "CONFIG_VORBIS=yes" >> config.mak
-fi
+#if test "$vorbis" = "yes" ; then
+#  echo "#define CONFIG_VORBIS 1" >> $TMPH
+#  echo "CONFIG_VORBIS=yes" >> config.mak
+#fi
 
 if test "$win32" = "yes" ; then
   echo "#define CONFIG_WIN32 1" >> $TMPH

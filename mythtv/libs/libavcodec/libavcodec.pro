@@ -23,7 +23,7 @@ SOURCES += common.c utils.c mem.c allcodecs.c mpegvideo.c h263.c jrevdct.c
 SOURCES += jfdctfst.c mpegaudio.c ac3enc.c mjpeg.c resample.c dsputil.c
 SOURCES += motion_est.c imgconvert.c imgresample.c msmpeg4.c mpeg12.c
 SOURCES += h263dec.c svq1.c rv10.c mpegaudiodec.c pcm.c simple_idct.c
-SOURCES += ratecontrol.c adpcm.c eval.c jfdctint.c oggvorbis.c dv.c
+SOURCES += ratecontrol.c adpcm.c eval.c jfdctint.c dv.c
 
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c
@@ -37,6 +37,10 @@ contains( CONFIG_AC3, yes ) {
 #    SOURCES += mp3lameaudio.c
 #    LIBS += -lmp3lame
 #}
+
+contains( CONFIG_VORBIS, yes ) {
+     SOURCES += oggvorbis.c
+}
 
 contains( TARGET_GPROF, yes ) {
     QMAKE_CFLAGS_RELEASE += -p

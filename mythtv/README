@@ -9,8 +9,10 @@ BUILD/CONFIGURATION INSTRUCTIONS
 
 This is what you need, software wise, to have installed:
 
-   libttf - Freetype v1.  Can't use v2, sorry.  This is used for the on-screen
-            display.  Get it from your distro, or from http://freetype.sf.net
+   libttf - Freetype 2 is now required (it used to only be able to use 
+            freetype 1).  I _think_ any release will work, but I'm using 2.1.2.
+            This is used for the on-screen display.  Get it from your distro, 
+            or from http://freetype.sf.net
 
    libmp3lame - The shared library for the LAME mp3 encoder.  This might become
                 optional in the future, or I may switch to vorbis if they speed
@@ -21,22 +23,17 @@ This is what you need, software wise, to have installed:
 
    QT - You need at least QT 3.0.  Again, the best way to get this is from your
         distro.  You need it compiled threadsafe version, and the mysql bindings
-        as well.  http://www.trolltech.com
-
-If you want the program guide, scheduled recordings, and basically all the neat
-functionality of MythTV, you also need to install:
+        as well.  I'm using version 3.0.5.  http://www.trolltech.com
 
    MySQL - You need this setup and working.  A recent version, I think, would
            be best.  I don't know, though, I'm utterly new to it.  Get it from
            your distro, or from http://www.mysql.com
 
-   XMLTV - You need the latest, version 0.5.  This will do the work of actually
+   XMLTV - You need the latest version 0.5.  This will do the work of actually
            grabbing the program information.  Get it from:
-           http://www.doc.ic.ac.uk/~epa98/work/apps/xmltv/
+           http://membled.com/work/apps/xmltv/
            Installing this was rather a pain for me on Debian, but I don't have
            any directions to do so.
-
-   Perl - everyone should have this already, but hey, it's a requirement.
 
 You also need v4l setup and working properly.  If xawtv works, this should, too.
 
@@ -71,15 +68,6 @@ Look through the rest of the file and change whatever else you want.  If you
 change the Width/Height settings and you don't get any video, then the 
 resolution you selected wasn't liked by the v4l subsystem.
 
-If you just want to watch live tv, without the fancy-schmancy features, 
-just run 'mythtv'.  Use the arrow keys to change channels up and down, type in 
-channel numbers to directly skip channels, use the 'p' key to pause/unpause, 
-and the right/left arrow keys to ff/rew.  Escape quits.  'c' will change
-inputs on the TV tuner card.  These keybindings aren't configurable yet.
-
-Additional Configuration
-------------------------
-
 The next thing to do is set up the mysql database that the program data
 will be stored in.  Change to the 'database' subdir of this distribution.
 You need to run the mc.sql script.  So, something like mysql < mc.sql
@@ -110,21 +98,27 @@ be populated with program info.  Use the arrow keys to move around in the grid.
 channel'. 
 
 Anyway.  Now that you have the program database populated and configured, try
-running the 'mythtv' binary again.  When you change channels, it should show the
-proper information on the OSD.  Hitting 'M' should pop up the program guide.  
-Exiting the program guide with 'Enter' or 'M' will change to the channel it 
-currently was on, exiting with 'Escape' will just exit without changing the 
-channel.  Pressing 'I' will let you get more information about a program, and 
-if you're running mythfrontend, will allow you to schedule recordings.
+running the 'mythtv' binary.  Use the arrow keys to change channels up and 
+down, type in channel numbers to directly skip channels, use the 'p' key to 
+pause/unpause, and the right/left arrow keys to ff/rew.  Escape quits.  
+'c' will change inputs on the TV tuner card.  These keybindings aren't 
+configurable yet.
+
+When you change channels, it should show the proper information on the OSD.  
+Hitting 'M' should pop up the program guide.  Exiting the program guide with 
+'Enter' or 'M' will change to the channel it currently was on, exiting with 
+'Escape' will just exit without changing the channel.  Pressing 'I' will let 
+you get more information about a program, and if you're running mythfrontend, 
+will allow you to schedule recordings.
 
 If you have two tuner cards setup properly, you can hit 'V' to turn on/off the
 Picture-in-Picture support, 'B' to toggle the active window (for channel 
 changes and the like), and 'N' to swap the two active channels.
 
-Ok, so try running 'mythfrontend'.  You should see a nice menu show up.
-This should be pretty simple to figure out.  mythfrontend is designed to be the
-main interface of the application.  It also provides all the support for
-scheduled recordings, so keep in mind, that it needs to be running for 
+Ok, so try running 'mythfrontend'.  You should see a nice graphical menu show 
+up. This should be pretty simple to figure out.  mythfrontend is designed to 
+be the main interface of the application.  It also provides all the support for
+scheduled recordings, so keep in mind that it needs to be running for 
 shows to get recorded.
 
 In the 'configfiles' subdir there are some example lirc config files to get a
