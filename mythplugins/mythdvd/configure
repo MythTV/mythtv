@@ -13,6 +13,8 @@ for opt do
   ;;
   --enable-vcd) vcdsupport="yes"
   ;;
+  --enable-all) vcdsupport="yes"; transcode="yes";
+  ;;
   esac
 done
 
@@ -26,7 +28,7 @@ Standard options:
   --help                   print this message
   --enable-transcode       enable DVD ripping and transcoding [default=no]
   --enable-vcd		   enable VCD playing [default=no]
-
+  --enable-all		   enable all of the above
 EOF
 exit 1
 fi
