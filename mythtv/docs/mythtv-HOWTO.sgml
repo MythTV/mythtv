@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2004-11-26, v0.16.04
+<date>2005-01-04, v0.16.05
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -69,7 +69,9 @@ Kulagowski <url url="mailto:rkulagow@rocketmail.com">.
 <img src="stop.png">
 <caption>
 <bf>NOTE</bf>: Please note that I am <em>NOT</em> the author/programmer of
-the MythTV application!
+the MythTV application!  I can not give you personalized installation
+support.  If you are having issues installing MythTV you should examine the
+archives, or post your question to the MythTV-users mailing list.  
 </caption>
 </figure>
 
@@ -419,12 +421,14 @@ In the United States, you may use a card such as the TwinHan to obtain
 unencrypted Free-To-Air satellite channels.
 
 <sect3>HDTV.
-<p>Currently there is only one HDTV card with Linux drivers which is known
-to operate in the United States - the card available from <url
-url="http://www.pchdtv.com/" name="http://www.pchdtv.com/">.  This card can
-only be used to capture over-the-air HDTV.  There are no known capture
-devices which will allow you to capture the HDTV output from a set-top box
-commonly found with digital cable systems or satellite systems.
+<p>Currently there are two HDTV card with Linux drivers which are known to
+operate in the United States - the HD-2000 and HD-3000 cards available from
+<url url="http://www.pchdtv.com/" name="http://www.pchdtv.com/"> and the
+Air2PC-ATSC-PCI available from <url url="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103"
+name="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">
+These cards can only be used to capture over-the-air HDTV.  There are no known
+capture devices which will allow you to capture the HDTV output from a
+set-top box commonly found with digital cable systems or satellite systems.
 
 To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
@@ -1248,25 +1252,64 @@ Get lame from <url url="http://lame.sourceforge.net/"
 name="http://lame.sourceforge.net/">.  Download the source code to v3.93.1
 by following the links from "About".
 
-<sect1>Notes on compiling on a system with non-Intel processors <label
-id="nonintelcpu_">
-<p>If you've got a system with an AMD K6-2 or a VIA C3 processor, make the
-following change in the <tt>settings.pro</tt> file.
+<sect1>Notes on compiling for different processors
+<label id="cpuspecificoptimizations">
+<P>By default, MythTV is compiled for a Pentium Pro or i686 processor. This
+generates good code for most CPUs, but does not take advantage of MMX or
+SSE, and does not work with recent processors that are compatible with older
+Intel processors, such as the Via or IDT low power processors. So you may
+wish to, or need to, change this before compiling. The flags in bold are
+required if you have that CPU.
 
-Look for 
-<verb>-march=pentiumpro</verb> 
-and replace it with
-<verb>-march=i586</verb> 
-before you compile.
+If you have a system with an AMD processor change the following in the
+<tt>settings.pro</tt> file. Replace <verb>-march=pentiumpro</verb> before
+you compile with one of:
+<itemize>
+<item><bf>-march=K6</bf>        for the AMD K6 with MMX (i586 compatible)
+<item><bf>-march=K6-2</bf>      for the AMD K6 CPU with MMX and 3dNOW! (i586 compatible)
+<item>-march=athlon             for the AMD Athlon CPU with MMX, 3dNOW!, enhanced 3dNOW! and some of SSE. (pentium2 compatible)
+<item>-march=pentiumpro -mmmx   for the AMD Athlon XP CPU with MMX, 3dNOW!, enhanced 3dNOW! and SSE. (pentium3 compatible)
+<item>-march=k8                 for the AMD K8 core based CPUs with x86-64 instruction set support
+                                with MMX, 3dNOW!, enhanced 3dNOW!, SSE and SSE2. (pentium4 compatible)
+</itemize>
 
-Recent AMD processors, like the Duron, Thunderbird and Athlon don't need this
-change.
+If you have a Via processor change the following in the
+<tt>settings.pro</tt> file. Replace <verb>-march=pentiumpro</verb> before
+you compile with one of:
+<itemize>
+<item><bf>-march=c3</bf>        for the Via C3 CPU with MMX and 3dNOW! instruction set support. (pentium-mmx compatible)
+<item><bf>-march=c3-2</bf>      for the Via C3-2 CPU with MMX and SSE instruction set support. (pentium2 compatible)
+</itemize>
 
-If you have an AMD64, look for 
-<verb>-march=pentiumpro</verb> 
-and replace it with
-<verb>-march=opteron</verb> 
-before you compile.
+If you have an IDT Winchip processor change the following in the
+<tt>settings.pro</tt> file. Replace <verb>-march=pentiumpro</verb> before
+you compile with one of:
+<itemize>
+<item><bf>-march=winchip-c6</bf>  for the IDT Winchip C6 CPU with MMX (i486 compatible)
+<item><bf>-march=winchip2</bf>    for the IDT Winchip2 CPU, with MMX and 3dNOW! (i486 compatible)
+</itemize>
+
+Finally, if you have an Intel processor other than the Pentium Pro you may
+wish to specify your particular model. Replace
+<verb>-march=pentiumpro</verb> before you compile with one of:
+<itemize>
+<item><bf>-march=i586</bf>        for the Intel Pentium CPU without MMX
+<item><bf>-march=pentium-mmx</bf> for the Intel PentiumMMX CPU based on Pentium core with MMX
+<item>-march=pentium2    for the Intel Pentium2 CPU based on Pentium Pro core with MMX
+<item>-march=pentium3    for the Intel Pentium3 CPU based on Pentium Pro core with MMX and SSE
+<item>-march=pentium-m   for the Low power version of Intel Pentium3 CPU with MMX, SSE and SSE2
+<item>-march=pentium4    for the Intel Pentium4 CPU with MMX, SSE and SSE2
+<item>-march=prescott    for the Intel Pentium4 CPU with MMX, SSE, SSE2 and SSE3
+<item>-march=nocona      for the Intel Pentium4 CPU with 64-bit extensions, MMX, SSE, SSE2 and SSE3
+</itemize>
+
+<bf>NOTE</bf>: If your version of gcc does not support your processor,
+choose the most recent processor supported by your compiler and add any
+extra features, for instance the <tt>-march=winchip-c6</tt> would become
+<tt>-march=i486 -mmmx</tt> for the IDT Winchip C6 CPU. It's also recommended
+that when compiling for the for the Athlon XP you leave the default of
+<verb>-march=pentiumpro</verb> because gcc doesn't properly optimize for the
+Athlon XP.
 
 <sect1>Building LAME
 <p>Open a shell and switch to the directory where you saved lame.
@@ -4868,7 +4911,7 @@ instructions.
 <p>This error can happen for the following reasons:
 <itemize>
 <item>You have an AMD K6-2 or VIA C3 processor.  If you have either of
-these, make sure that you you followed the instructions in this <ref id="nonintelcpu_"
+these, make sure that you you followed the instructions in this <ref id="cpuspecificoptimizations"
 name="section">.
 <item>You have an early production Intel Celeron, Pentium Pro or Pentium II.  If you have any
 of these processors, make sure that your <ref id="deinterlace_" name="deinterlace">
@@ -7238,6 +7281,10 @@ Bruce Markey's scheduler description.
 v0.16.02, 2004-10-20.  Fix double mention of /usr/local/share/mythtv/mysql.txt
 v0.16.03, 2004-10-31.  Tyler Drake's "Y" key.
 v0.16.04, 2004-11-26.  Change NFS recommendation to hard,intr
+v0.16.05, 2005-01-04.  Update to HDTV card list.  Daniel Thor Kristjannson's
+alteration of "compiling for non-intel CPUs" section.  Add in a few
+sentences that people shouldn't email me to ask for tech support, not that
+anyone will read that part.
 -->
 
 <!--

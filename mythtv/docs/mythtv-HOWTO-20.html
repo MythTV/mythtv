@@ -69,6 +69,13 @@ first choice is the better solution.</P>
 <P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
 <A HREF="mythtv-HOWTO-4.html#Setting_up_paths">Setting up paths</A>.</P>
 
+<H3>Settings get reset at every compile.</H3>
+
+<P>MythTV will overwrite any settings in <CODE>/usr/local/share/mythtv</CODE>.
+If you want to make sure that you don't lose your modifications, make a
+directory <CODE>~/.mythtv</CODE> and copy your mysql.txt file to this
+location.</P>
+
 <H2><A NAME="ss20.2">20.2</A> <A HREF="mythtv-HOWTO.html#toc20.2">Debugging</A>
 </H2>
 
@@ -156,7 +163,7 @@ instructions.</P>
 <UL>
 <LI>You have an AMD K6-2 or VIA C3 processor.  If you have either of
 these, make sure that you you followed the instructions in this 
-<A HREF="mythtv-HOWTO-5.html#nonintelcpu_">section</A>.</LI>
+<A HREF="mythtv-HOWTO-5.html#cpuspecificoptimizations">section</A>.</LI>
 <LI>You have an early production Intel Celeron, Pentium Pro or Pentium II.  If you have any
 of these processors, make sure that your 
 <A HREF="mythtv-HOWTO-10.html#deinterlace_">deinterlace</A>

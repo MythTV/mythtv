@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2004-11-26, v0.16.04
+  2005-01-04, v0.16.05
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -75,7 +75,7 @@
         4.3.3 Device Permissions
 
   5. Downloading and compiling.
-     5.1 Notes on compiling on a system with non-Intel processors
+     5.1 Notes on compiling for different processors
      5.2 Building LAME
      5.3 XMLTV
         5.3.1 Red Hat Linux and Fedora Core:
@@ -384,7 +384,10 @@
 
 
          [1mNOTE[22m: Please note that I am [4mNOT[24m the author/programmer of
-  the MythTV application!
+  the MythTV application!  I can not give you personalized installation
+  support.  If you are having issues installing MythTV you should
+  examine the archives, or post your question to the MythTV-users
+  mailing list.
 
   This document is available as a single-page HTML document at
   http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html
@@ -759,12 +762,16 @@
 
   [1m3.1.5.4.  HDTV.[0m
 
-  Currently there is only one HDTV card with Linux drivers which is
-  known to operate in the United States - the card available from
-  http://www.pchdtv.com/ <http://www.pchdtv.com/>.  This card can only
-  be used to capture over-the-air HDTV.  There are no known capture
-  devices which will allow you to capture the HDTV output from a set-top
-  box commonly found with digital cable systems or satellite systems.
+  Currently there are two HDTV card with Linux drivers which are known
+  to operate in the United States - the HD-2000 and HD-3000 cards
+  available from http://www.pchdtv.com/ <http://www.pchdtv.com/> and the
+  Air2PC-ATSC-PCI available from
+  http://www.cyberestore.com/product_info.php?cPath=28&products_id=103
+  <http://www.cyberestore.com/product_info.php?cPath=28&products_id=103>
+  These cards can only be used to capture over-the-air HDTV.  There are
+  no known capture devices which will allow you to capture the HDTV
+  output from a set-top box commonly found with digital cable systems or
+  satellite systems.
 
   To playback HDTV content, plan on a powerful CPU.  "How powerful?"
   depends on a number of factors, such as the capture resolution,
@@ -777,6 +784,7 @@
   and Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2
   hardware accelleration.  If you enable the hardware accelleration, you
   may be able to use a 1.8GHz processor.
+
 
   [1m3.1.6.  Hardware known NOT to work and other issues[0m
 
@@ -834,7 +842,6 @@
   formats/html_single/MP3-HOWTO.html#toc8
   <http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-
   formats/html_single/MP3-HOWTO.html#toc8> for additional information.
-
 
 
   [1m3.1.8.  Video Display Card[0m
@@ -900,9 +907,9 @@
 
   +o  ATI Rage II+DVD (Mach 64). Ports not described. Reported to work,
      but no details reported.
-
   +o  Rage 128 VIVO. Ports not described. Reported to work, but no
      details reported.
+
   +o  Radeon 7500. Ports not described. Reported to work, but no details
      reported.
 
@@ -962,6 +969,7 @@
      NVIDIA X driver. Reportedly works using the nv driver plus nvtv.
 
   +o  GeForce4 MX420 PCI (BFG Asylum). Has SVideo port.
+
 
 
   [1m3.1.9.4.  Savage[0m
@@ -1032,6 +1040,9 @@
       [1mNOTE[22m: you must have the MySQL database software installed on a
   system to store the master database.  This does not necessarily mean
   that MySQL must run on one of the MythTV boxes.
+
+
+
     [1mNOTE[22m:  The following distributions have issues which may prevent a
   successful MythTV installation:
 
@@ -1085,17 +1096,17 @@
   <http://ATrpms.net/name/atrpms-kickstart/>.  Install the package with:
 
 
-       # rpm -Uvh atrpms-kickstart*
+
+  # rpm -Uvh atrpms-kickstart*
 
 
 
   Then run:
 
 
-
-  # apt-get update
-  # apt-get dist-upgrade
-  # apt-get update
+       # apt-get update
+       # apt-get dist-upgrade
+       # apt-get update
 
 
 
@@ -1148,11 +1159,10 @@
   to your /etc/apt/sources.list file.  Running [1mapt-get update [22mand then
   executing [1mapt-get build-dep mythtv [22mshould install all the pre-
   requisites required to compile MythTV.
-
-
-
    [1mNOTE[22m:  Due to the requirement for Qt 3.1, there are no packages for
   Debian woody/stable.
+
+
   The Debian packages are configured such that MythTV programs should be
   run as the mythtv user, which is automatically created during
   installation.  This user has access to write new recordings to disk in
@@ -1213,6 +1223,7 @@
   While the graphical tools are nice, the command line tool is actually
   easier to use.  It's strongly recommended that you use the command
   line tool.
+
 
   There are many inter-related modules, so make sure that you've got the
   main package for each one, and not a sub package for an unrelated
@@ -1276,11 +1287,11 @@
   source.
 
 
+
   [1m3.2.4.1.1.  Mandrake 9.0[0m
 
   The simplest tool for installing packages from the command line is
   [1murpmi[22m.
-
 
   Open a shell, and execute the following, all on the same line. You may
   get asked a number of questions regarding dependencies.  It's best to
@@ -1338,8 +1349,7 @@
   MythTV.  To enable SQL support, add "mysql" to your USE variable in
   /etc/make.conf and rebuild Qt by running
 
-
-       # emerge qt
+  # emerge qt
 
 
 
@@ -1404,8 +1414,6 @@
 
   [1m4.1.  Software requirements for compiling MythTV[0m
 
-
-
   [1m4.1.1.  General requirements[0m
 
   MythTV is written in C++ and requires a fairly complete, but standard,
@@ -1463,12 +1471,14 @@
   Open a shell and execute the following:
 
 
-       $ echo $PATH
-       /usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
-       $ echo $QTDIR
-       /usr/lib/qt3
-       $ which qmake
-       /usr/lib/qt3/bin/qmake
+
+  $ echo $PATH
+  /usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+  $ echo $QTDIR
+  /usr/lib/qt3
+  $ which qmake
+  /usr/lib/qt3/bin/qmake
+
 
 
   For Mandrake, you should see a value like /usr/lib/qt3 for QTDIR and
@@ -1520,8 +1530,6 @@
        # chmod a+x mythtv.sh
        # exit
        $ exit
-
-
 
   The last two commands are to exit out of the shell. This way, when you
   next open a shell your new commands will take effect.
@@ -1586,12 +1594,14 @@
   using your favorite text editor and add something like:
 
 
-       PATH="/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games"
-       QTDIR="/usr/share/qt3"
-       .
-       .
-       .
-       export PATH QTDIR
+
+  PATH="/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games"
+  QTDIR="/usr/share/qt3"
+  .
+  .
+  .
+  export PATH QTDIR
+
 
 
   [1m4.3.3.  Device Permissions[0m
@@ -1688,37 +1698,105 @@
   by following the links from "About".
 
 
-  [1m5.1.  Notes on compiling on a system with non-Intel processors[0m
+  [1m5.1.  Notes on compiling for different processors[0m
 
-  If you've got a system with an AMD K6-2 or a VIA C3 processor, make
-  the following change in the settings.pro file.
+  By default, MythTV is compiled for a Pentium Pro or i686 processor.
+  This generates good code for most CPUs, but does not take advantage of
+  MMX or SSE, and does not work with recent processors that are
+  compatible with older Intel processors, such as the Via or IDT low
+  power processors. So you may wish to, or need to, change this before
+  compiling. The flags in bold are required if you have that CPU.
 
-  Look for
-
-  -march=pentiumpro
-
-
-  and replace it with
-
-  -march=i586
-
-
-  before you compile.
-
-  Recent AMD processors, like the Duron, Thunderbird and Athlon don't
-  need this change.
-
-  If you have an AMD64, look for
+  If you have a system with an AMD processor change the following in the
+  settings.pro file. Replace
 
   -march=pentiumpro
 
 
-  and replace it with
+  you compile with one of:
 
-  -march=opteron
+  +o  [1m-march=K6        [22mfor the AMD K6 with MMX (i586 compatible)
+
+  +o  [1m-march=K6-2      [22mfor the AMD K6 CPU with MMX and 3dNOW! (i586
+     compatible)
+
+  +o  -march=athlon             for the AMD Athlon CPU with MMX, 3dNOW!,
+     enhanced 3dNOW! and some of SSE. (pentium2 compatible)
+
+  +o  -march=pentiumpro -mmmx   for the AMD Athlon XP CPU with MMX,
+     3dNOW!, enhanced 3dNOW! and SSE. (pentium3 compatible)
+
+  +o  -march=k8                 for the AMD K8 core based CPUs with
+     x86-64 instruction set support with MMX, 3dNOW!, enhanced 3dNOW!,
+     SSE and SSE2. (pentium4 compatible)
+
+  If you have a Via processor change the following in the settings.pro
+  file. Replace
+
+  -march=pentiumpro
 
 
-  before you compile.
+  you compile with one of:
+
+  +o  [1m-march=c3        [22mfor the Via C3 CPU with MMX and 3dNOW! instruction
+     set support. (pentium-mmx compatible)
+
+  +o  [1m-march=c3-2      [22mfor the Via C3-2 CPU with MMX and SSE instruction
+     set support. (pentium2 compatible)
+
+  If you have an IDT Winchip processor change the following in the
+  settings.pro file. Replace
+
+  -march=pentiumpro
+
+
+  you compile with one of:
+
+  +o  [1m-march=winchip-c6  [22mfor the IDT Winchip C6 CPU with MMX (i486
+     compatible)
+
+  +o  [1m-march=winchip2    [22mfor the IDT Winchip2 CPU, with MMX and 3dNOW!
+     (i486 compatible)
+
+  Finally, if you have an Intel processor other than the Pentium Pro you
+  may wish to specify your particular model. Replace
+
+  -march=pentiumpro
+
+
+
+  +o  [1m-march=i586        [22mfor the Intel Pentium CPU without MMX
+
+  +o  [1m-march=pentium-mmx [22mfor the Intel PentiumMMX CPU based on Pentium
+     core with MMX
+
+  +o  -march=pentium2    for the Intel Pentium2 CPU based on Pentium Pro
+     core with MMX
+
+  +o  -march=pentium3    for the Intel Pentium3 CPU based on Pentium Pro
+     core with MMX and SSE
+
+  +o  -march=pentium-m   for the Low power version of Intel Pentium3 CPU
+     with MMX, SSE and SSE2
+
+  +o  -march=pentium4    for the Intel Pentium4 CPU with MMX, SSE and
+     SSE2
+  +o  -march=prescott    for the Intel Pentium4 CPU with MMX, SSE, SSE2
+     and SSE3
+
+  +o  -march=nocona      for the Intel Pentium4 CPU with 64-bit
+     extensions, MMX, SSE, SSE2 and SSE3
+
+  [1mNOTE[22m: If your version of gcc does not support your processor, choose
+  the most recent processor supported by your compiler and add any extra
+  features, for instance the -march=winchip-c6 would become -march=i486
+  -mmmx for the IDT Winchip C6 CPU. It's also recommended that when
+  compiling for the for the Athlon XP you leave the default of
+
+  -march=pentiumpro
+
+
+  Athlon XP.
 
 
   [1m5.2.  Building LAME[0m
@@ -1766,8 +1844,6 @@
 
        # rpm -Uvh xmltv* perl*
 
-
-
   If you install from this location you may skip to ``Manually building
   MythTV''.
 
@@ -1778,6 +1854,7 @@
 
 
        # urpmi xmltv xmltv-grabbers
+
 
 
   If this does not work, it is possible that contrib for your Mandrake
@@ -1828,7 +1905,6 @@
 
   You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes"
   to the grabber required for your location.
-
   You may get errors about modules not being installed.  You will need
   to resolve any missing dependencies at this point, or your grabber may
   not work correctly.
@@ -1891,9 +1967,10 @@
   Unpack MythTV
 
 
-       $ tar -xjf mythtv-0.16.tar.bz2
-       $ cd mythtv-0.16
-       $ ./configure
+
+  $ tar -xjf mythtv-0.16.tar.bz2
+  $ cd mythtv-0.16
+  $ ./configure
 
 
 
@@ -1953,7 +2030,6 @@
   Some timing information.  The following should only be used for
   illustration; your actual results may vary.  The test involves a
   complete make distclean to the final binary.
-
   +o  Celeron 2.4Ghz and PIII/733 running distcc, -j4:  17m:57s
 
   +o  Celeron 2.4Ghz, -j4:  26m:57s
@@ -1969,6 +2045,8 @@
        $ su
        # make install
        # exit
+
+
 
      [1mNOTE[22m:  subsequent configuration steps assume that you are within
   the MythTV directory that you cd'd to above.
@@ -2008,7 +2086,6 @@
   computers can simultaneously access content on a Myth system.  Live
   TV, watching and scheduling recordings, etc. are all possible from
   multiple frontends.
-
   To get a better picture of what is needed to run a frontend, note the
   following:
 
@@ -2091,8 +2168,9 @@
 
   This can be done from the command line by typing:
 
-  # /sbin/chkconfig mysqld on
-  # /sbin/service mysqld start
+
+       # /sbin/chkconfig mysqld on
+       # /sbin/service mysqld start
 
 
 
@@ -2130,8 +2208,6 @@
 
        $ mysql < mc.sql
 
-
-
   [1m6.4.3.  Gentoo[0m
 
 
@@ -2144,7 +2220,6 @@
   [1mNOTE[22m: It is good practice to set a root password for MySQL. Instruc-
   tions for doing so can be found on MySQL's web site at
   http://www.mysql.com/doc/en/Security.html <http://www.mysql.com/doc/en/Security.html>.
-
 
   [1m6.4.4.  Modifying access to the MySQL database for multiple systems[0m
 
@@ -2186,7 +2261,6 @@
        $ mysql -u root mythconverg
        mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
        mysql> flush privileges;
-
 
 
   [1m7.  Configuring Sound.[0m
@@ -2254,6 +2328,7 @@
 
   To configure sound to work with MythTV, select
 
+
   RedHat Menu>Sound &
   Video>Volume Control
 
@@ -2308,12 +2383,13 @@
   Continuing on:
 
 
-       $ make
-       $ su
-       # make install
-       # ./snddevices
-       # exit
-       $
+
+  $ make
+  $ su
+  # make install
+  # ./snddevices
+  # exit
+  $
 
 
 
@@ -2323,22 +2399,21 @@
   Install the rest of the packages:
 
 
-
-  $ cd ~
-  $ tar -xjf alsa-lib-0.9.x.tar.bz2
-  $ cd alsa-lib-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $ cd ..
-  $ tar -xjf alsa-utils-0.9.x.tar.bz2
-  $ cd alsa-utils-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
+       $ cd ~
+       $ tar -xjf alsa-lib-0.9.x.tar.bz2
+       $ cd alsa-lib-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $ cd ..
+       $ tar -xjf alsa-utils-0.9.x.tar.bz2
+       $ cd alsa-utils-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
 
 
 
@@ -2372,8 +2447,6 @@
 
   For now we will assume that no extra options are required.  The next
   step is to ensure that the ALSA drivers are started during boot-up.
-
-
        $ su
        # cd /etc/rc.d/init.d
        # /sbin/chkconfig --add alsasound
@@ -2387,7 +2460,7 @@
   you can do as root with:
 
 
-  # alsactl -f /etc/asound.state store
+       # alsactl -f /etc/asound.state store
 
 
 
@@ -2435,8 +2508,6 @@
        # alsactl store
        # exit
        $
-
-
 
   If you have multiple sound cards, then use the -c parameter to specify
   which card to adjust.  Note that the first card will be "0", the
@@ -2507,6 +2578,8 @@
   and download the full 2.4.19 tar file from
   http://www.kernel.org/pub/linux/kernel/v2.4/
   <http://www.kernel.org/pub/linux/kernel/v2.4/>.
+
+
   [1m8.2.1.  Obtaining the kernel[0m
 
   Install using urpmi.
@@ -2556,6 +2629,7 @@
   your capture card and not to a serial port, so make sure that you've
   got the correct one.
 
+
   You then click "Save Configuration and run configure" to continue.
 
   Make sure you read the last text generated by the configure step. It
@@ -2568,10 +2642,11 @@
 
   Once the configuration step is complete:
 
-  $ make
-  $ su
-  # make install
-  # chmod 666 /dev/lircd
+
+       $ make
+       $ su
+       # make install
+       # chmod 666 /dev/lircd
 
 
 
@@ -2625,7 +2700,7 @@
   pipe:
 
 
-  # mknod /dev/lirc c 61 0
+       # mknod /dev/lirc c 61 0
 
 
 
@@ -2684,10 +2759,9 @@
   processor P4 you might choose "kernel-2.4.18-i686-smp.config"
 
 
-
-  # cp yourconfig.config ../.config
-  # cd ../
-  # make xconfig
+       # cp yourconfig.config ../.config
+       # cd ../
+       # make xconfig
 
 
 
@@ -2739,10 +2813,10 @@
   replace XXX with the name which you determined earlier, which in this
   example was "lirc_serial"
 
+  $ su
+  # modprobe lirc_serial
+  # /sbin/ldconfig
 
-       $ su
-       # modprobe lirc_serial
-       # /sbin/ldconfig
 
 
   Next, we're going to manually start lircd the first time.  Mandrake
@@ -2797,7 +2871,6 @@
 
 
   All other distributions:
-
 
 
   # cd /etc/rc.d
