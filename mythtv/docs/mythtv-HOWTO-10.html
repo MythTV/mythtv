@@ -82,12 +82,21 @@ processor will be able to deinterlace correctly.</P>
 implementation of SSE instructions, so if your processor has 3dnow you
 shouldn't have any issues with deinterlacing.</P>
 
-<H2><A NAME="ss10.5">10.5</A> <A HREF="mythtv-HOWTO.html#toc10.5">Recording</A>
+<H2><A NAME="ss10.5">10.5</A> <A HREF="mythtv-HOWTO.html#toc10.5">Recording </A>
 </H2>
 
-<P>Currently, MythTV supports two different video encoders, MPEG-4 and RTJPEG. 
-Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG-4
-has high CPU demands, but makes smaller files.</P>
+<P>Currently, MythTV supports a number of different video encoders. There
+are two software options and two hardware options. The software options are
+MPEG-4 and RTJPEG. The hardware options are MPEG-2 and Hardware MJPEG. Take
+note that RTJPEG has lower CPU demands than MPEG-4, but makes large files,
+while MPEG-4 has higher CPU demands than RTJPEG, but makes smaller files.
+Hardware MJPEG is only for use with MJPEG capture devices (Zoran-based
+cards; see 
+<A HREF="http://mjpeg.sourceforge.net">http://mjpeg.sourceforge.net</A>). MPEG-2 is the format used by the
+hardware-based PVR-x50 encoder. Note that MPEG-2 is not a selectable option
+in the Recording setup option, but this is what PVR-x50 cards will always
+use for initial video capture (which can later be transcoded), regardless of
+what codec you choose for Default and/or Live TV.</P>
 <P><B>NOTE</B>: although the width and height can be changed to almost
 anything, if you start MythTV and don't see video or you get "segmentation
 fault" errors, it is likely that the video4linux (v4l) subsystem did not

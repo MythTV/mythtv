@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-08-23, v2.66
+  2003-08-31, v2.67
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -777,6 +777,13 @@
   MythTV database. Check ATrpms <http://atrpms.physik.fu-
   berlin.de/topic/multimedia/> for the drivers you need.
 
+  Further documentation on using ATrpms packages can be found in Jarod
+  Wilson <mailto:jcw@wilsonet.com>'s "HOWTO Build a MythTV System on Red
+  Hat Linux 9 w/ATrpms" document, http://pvrhw.goldfish.org/tiki-
+  page.php?pageName=rh9pvr250 <http://pvrhw.goldfish.org/tiki-
+  page.php?pageName=rh9pvr250>. Just like 3rd-party packages, any 3rd-
+  party documentation problems should be brought up with the maintainer.
+
 
   [1m3.2.1.2.  Mandrake[0m
 
@@ -799,6 +806,7 @@
   unstable).  Installation instructions can be found on those pages as
   well.  All of the prerequisites for MythTV are available as Debian
   packages, most of them from the official Debian archive.
+
 
   If you are running woody, be sure to follow the instructions on the
   above page to ensure that the MySQL server starts up immediately after
@@ -857,6 +865,7 @@
   packaged the latest ALSA drivers.
 
 
+
   [1m3.2.3.  Graphical installation tools.[0m
 
   [1m3.2.3.1.  Mandrake 9.0[0m
@@ -864,7 +873,6 @@
   On systems running KDE, a tool which will allow you to see what
   packages are available and if they're installed on your system can be
   accessed by clicking K->Configuration->Packaging->KPackage
-
 
   While the graphical tools are nice, the command line tool is actually
   easier to use.  It's strongly recommended that you use the command
@@ -924,13 +932,13 @@
   Red Hat Linux 8.0 installation CD, and it allows you to select
   packages at installation time, or once the system is up and running.
   You can access this program by selecting
-
   RedHatMenu>System Settings>Packages
 
 
 
   If you did a typical Desktop install of Red Hat Linux 8.0 make sure
   you have selected:
+
 
   +o  KDE Desktop Environment
 
@@ -993,7 +1001,6 @@
   the prerequisites for qt3, so don't skip this step.  The simplest tool
   for installing packages from the command line is urpmi.
 
-
   Open a shell, and execute the following.  You may get asked a number
   of questions regarding dependencies.  It's best to answer "YES".
 
@@ -1050,9 +1057,9 @@
   answer "YES".
 
 
-       $ su
-       # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
-       # urpmi XFree86-devel perl
+  $ su
+  # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
+  # urpmi XFree86-devel perl
 
 
 
@@ -1115,8 +1122,7 @@
   /etc/make.conf and rebuild Qt by running
 
 
-
-  # emerge qt
+       # emerge qt
 
 
 
@@ -1175,11 +1181,13 @@
 
 
 
-       $ su -
-       # echo /usr/local/lib >> /etc/ld.so.conf
-       # /sbin/ldconfig
-       # exit
-       $
+  $ su -
+  # echo /usr/local/lib >> /etc/ld.so.conf
+  # /sbin/ldconfig
+  # exit
+  $
+
+
 
   [1m4.2.2.  Distribution-Specific Notes[0m
 
@@ -1241,17 +1249,16 @@
   and d at the same time.
 
 
+       $ su
+       # cd /etc/profile.d
+       cat > mythtv.sh
+       export QTDIR=/usr/lib/qt3
+       export PATH=$PATH:/usr/lib/qt3/bin
+       ^D
 
-  $ su
-  # cd /etc/profile.d
-  cat > mythtv.sh
-  export QTDIR=/usr/lib/qt3
-  export PATH=$PATH:/usr/lib/qt3/bin
-  ^D
-
-  # chmod a+x mythtv.sh
-  # exit
-  $ exit
+       # chmod a+x mythtv.sh
+       # exit
+       $ exit
 
 
 
@@ -1278,7 +1285,7 @@
   section''.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.16 if you're in
+  <http://xmltv.sourceforge.net>.  Download version 0.5.17 if you're in
   North America.
 
 
@@ -1296,10 +1303,10 @@
   ______________________________________________________________________
 
 
+   Get lame from http://www.mp3dev.org/mp3 <http://www.mp3dev.org/mp3>.
+  Download the source code to v3.93.1 by following the links to source-
+  forge.net
 
-  Get lame from http://www.mp3dev.org/mp3 <http://www.mp3dev.org/mp3>.
-  Download the source code to v3.93.1 by following the links to
-  sourceforge.net
 
 
   [1m5.1.  Notes on compiling on a system with non-Intel processors.[0m
@@ -1365,8 +1372,7 @@
   <http://atrpms.physik.fu-berlin.de/name/xmltv/>. The web page has a
   list of all the dependent packages you must download and install.
 
-
-       # rpm -Uvh xmltv* perl*
+  # rpm -Uvh xmltv* perl*
 
 
 
@@ -1428,9 +1434,9 @@
 
   Untar the xmltv file:
 
+  $ tar -xjf xmltv-0.5.17.tar.bz2
+  $ cd xmltv-0.5.17
 
-       $ tar -xjf xmltv-0.5.16.tar.bz2
-       $ cd xmltv-0.5.16
 
 
   Install the xmltv prerequisites:
@@ -1451,7 +1457,7 @@
   Change to the XMLTV directory and compile it:
 
 
-       $ cd xmltv-0.5.16
+       $ cd xmltv-0.5.17
        $ perl Makefile.PL
 
 
@@ -3004,9 +3010,19 @@
 
   [1m10.5.  Recording[0m
 
-  Currently, MythTV supports two different video encoders, MPEG-4 and
-  RTJPEG.  Take note that RTJPEG has lower CPU demands, but makes large
-  files, and MPEG-4 has high CPU demands, but makes smaller files.
+  Currently, MythTV supports a number of different video encoders. There
+  are two software options and two hardware options. The software
+  options are MPEG-4 and RTJPEG. The hardware options are MPEG-2 and
+  Hardware MJPEG. Take note that RTJPEG has lower CPU demands than
+  MPEG-4, but makes large files, while MPEG-4 has higher CPU demands
+  than RTJPEG, but makes smaller files.  Hardware MJPEG is only for use
+  with MJPEG capture devices (Zoran-based cards; see
+  http://mjpeg.sourceforge.net <http://mjpeg.sourceforge.net>). MPEG-2
+  is the format used by the hardware-based PVR-x50 encoder. Note that
+  MPEG-2 is not a selectable option in the Recording setup option, but
+  this is what PVR-x50 cards will always use for initial video capture
+  (which can later be transcoded), regardless of what codec you choose
+  for Default and/or Live TV.
 
   [1mNOTE[22m: although the width and height can be changed to almost anything,
   if you start MythTV and don't see video or you get "segmentation
@@ -3028,6 +3044,7 @@
   "KDE".
 
 
+
   [1m11.1.  Using themes with MythTV.[0m
 
   MythTV is "themeable", meaning that the visual appearance of the
@@ -3038,12 +3055,11 @@
   Once it's on your machine, you must move the file and untar it:
 
 
-
-  $ su
-  # cp funhouse.tar.gz /usr/local/share/mythtv/themes
-  # cd /usr/local/share/mythtv/themes
-  # tar -xjf funhouse.tar.gz
-  # exit
+       $ su
+       # cp funhouse.tar.gz /usr/local/share/mythtv/themes
+       # cd /usr/local/share/mythtv/themes
+       # tar -xjf funhouse.tar.gz
+       # exit
 
 
 
@@ -3220,6 +3236,7 @@
   automount howto at www.linuxdoc.org <www.linuxdoc.org> for info on how
   to get it working.
 
+
   If the item in the import path is an executable file, MythGallery will
   attempt to execute it with the destination directory as its sole
   argument.  Be careful when using executable scripts that the script
@@ -3231,32 +3248,32 @@
   Here is an example script that a user may want to run on import:
 
 
-  #!/bin/csh
+       #!/bin/csh
 
-  if ($#argv == 0) then
-          echo "Usage: $0 dest_dir"
-          exit
-  endif
+       if ($#argv == 0) then
+               echo "Usage: $0 dest_dir"
+               exit
+       endif
 
-  cd $argv[1]
+       cd $argv[1]
 
-  # get stuff over the network
-  wget http://www.somesite.dom/dir/file1.jpg
-  wget http://www.somesite.dom/dir/file2.jpg
-  wget http://www.somesite.dom/dir/file3.jpg
+       # get stuff over the network
+       wget http://www.somesite.dom/dir/file1.jpg
+       wget http://www.somesite.dom/dir/file2.jpg
+       wget http://www.somesite.dom/dir/file3.jpg
 
-  # stuff that requires manual module loading and/or fs mounting
-  modprobe camera_module
-  mount /dev/camera /mnt/camera
-  cp /mnt/camera/* $argv[1]
-  umount /mnt/camera
-  rmmod camera_module
+       # stuff that requires manual module loading and/or fs mounting
+       modprobe camera_module
+       mount /dev/camera /mnt/camera
+       cp /mnt/camera/* $argv[1]
+       umount /mnt/camera
+       rmmod camera_module
 
-  # perform some processing
-  foreach pname (`ls *.jpg`)
-          jpegtran -flip vertical $pname > $pname.new
-          mv $pname.new $pname
-  end
+       # perform some processing
+       foreach pname (`ls *.jpg`)
+               jpegtran -flip vertical $pname > $pname.new
+               mv $pname.new $pname
+       end
 
 
 
@@ -3283,6 +3300,7 @@
 
   +o  libcdaudio
 
+
   +o  CDParanoia
 
 
@@ -3295,14 +3313,15 @@
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
   can find later.
 
-  $ tar -xzf mad-0.14.2b.tar.gz
-  $ cd mad-0.14.2b
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+
+       $ tar -xzf mad-0.14.2b.tar.gz
+       $ cd mad-0.14.2b
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -3343,14 +3362,15 @@
   install:
 
 
-       $ tar -xzf libcdaudio-0.99.9.tar.gz
-       $ cd libcdaudio-0.99.9
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+
+  $ tar -xzf libcdaudio-0.99.9.tar.gz
+  $ cd libcdaudio-0.99.9
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
 
 
@@ -3418,7 +3438,8 @@
   fftw may be obtained from http://www.fftw.org/ <http://www.fftw.org/>.
   In Mandrake 9.1 it may be installed by typing:
 
-  # urpmi libfftw2 libfftw2-devel
+
+       # urpmi libfftw2 libfftw2-devel
 
 
 
@@ -3472,7 +3493,6 @@
   getting MythMusic going. Make sure that you run ./configure first.  If
   you wish to use the new visualizations, make sure you install the
   prerequisites.  Run ./configure --help for help.
-
 
 
   ______________________________________________________________________
@@ -3535,7 +3555,6 @@
 
   The Ignore_ID3 option does not disable the code that determines the
   track length, just the portion that tries to read ID3 info.
-
 
 
   [1m15.6.  Using MythMusic.[0m
@@ -3721,8 +3740,6 @@
        # make install
        # exit
 
-
-
   The next step is to create the create the videometadata table in the
   database.  Simply do the following:
 
@@ -3785,8 +3802,8 @@
   structures to the database:
 
 
-       $ cd dvddb
-       $ mysql -u root < metadata.sql
+  $ cd dvddb
+  $ mysql -u root < metadata.sql
 
 
 
@@ -3848,12 +3865,13 @@
   program to check and enable DMA.
 
 
-       # hdparm -d /dev/hd?
+  # hdparm -d /dev/hd?
 
 
 
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
   with the -d1 parameter, it will turn DMA on.
+
 
   You may also setup your PC to do this at boot time, either by adding
   the command to your /etc/rc.local file, or by adding files to
@@ -3911,11 +3929,12 @@
   Edit your /etc/X11/XF86Config-4 file, and look for:
 
 
-       Section "ServerFlags"
-           #DontZap # disable <Crtl><Alt><BS> (server abort)
-           #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
-           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
-       EndSection
+
+  Section "ServerFlags"
+      #DontZap # disable <Crtl><Alt><BS> (server abort)
+      #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+      AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+  EndSection
 
 
 
@@ -4037,21 +4056,20 @@
   assume that the problem you're having is in the setup program.
 
 
+       $ cd setup
+       $ gdb ./setup
 
-  $ cd setup
-  $ gdb ./setup
-
-  GNU gdb 5.3-1mdk (Mandrake Linux)
-  Copyright 2002 Free Software Foundation, Inc.
-  GDB is free software, covered by the GNU General Public License, and you are
-  welcome to change it and/or distribute copies of it under certain
-  conditions.
-  Type "show copying" to see the conditions.
-  There is absolutely no warranty for GDB.  Type "show warranty" for details.
-  This GDB was configured as "i586-mandrake-linux-gnu"...
-  (gdb) handle SIGPIPE nostop
-  Signal        Stop      Print   Pass to program Description
-  SIGPIPE       No        Yes     Yes             Broken pipe
+       GNU gdb 5.3-1mdk (Mandrake Linux)
+       Copyright 2002 Free Software Foundation, Inc.
+       GDB is free software, covered by the GNU General Public License, and you are
+       welcome to change it and/or distribute copies of it under certain
+       conditions.
+       Type "show copying" to see the conditions.
+       There is absolutely no warranty for GDB.  Type "show warranty" for details.
+       This GDB was configured as "i586-mandrake-linux-gnu"...
+       (gdb) handle SIGPIPE nostop
+       Signal        Stop      Print   Pass to program Description
+       SIGPIPE       No        Yes     Yes             Broken pipe
 
 
 
@@ -4166,7 +4184,6 @@
   #0, the second card is #1, etc.
 
 
-
   [1m19.12.  I can't see parts of the On Screen Display.[0m
 
   If you're a Red Hat 8.0 user, make sure that you've followed the
@@ -4229,9 +4246,8 @@
   users/2003-April/002527.html>
 
 
+
   [1m19.16.  Where's my "canada-cable" entry gone to?[0m
-
-
 
   [1m19.17.  My channels are off by one.[0m
 
@@ -4295,8 +4311,6 @@
 
   You didn't set your QTDIR.  Re-read the section on ``Setting up
   paths''.
-
-
 
   [1m19.22.  My mouse pointer disappears when placed over the MythTV win-[0m
   [1mdows.[0m
@@ -4737,9 +4751,9 @@
 
 
        $ cd ivtv/ivtv/utils
-       $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_16_21062.exe
+       $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21199.exe
        $ su
-       # ./ivtvfwextract.pl pvr250_16_21062.exe
+       # ./ivtvfwextract.pl pvr250_17_21199.exe
        # exit
 
 

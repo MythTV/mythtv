@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-08-23, v2.66
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-08-31, v2.67
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -93,7 +93,7 @@ necessary.</EM>
 <LI><A NAME="toc10.2">10.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss10.2">Appearance</A>
 <LI><A NAME="toc10.3">10.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss10.3">Program Guide</A>
 <LI><A NAME="toc10.4">10.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss10.4">Playback </A>
-<LI><A NAME="toc10.5">10.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss10.5">Recording</A>
+<LI><A NAME="toc10.5">10.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss10.5">Recording </A>
 </UL>
 <P>
 <H2><A NAME="toc11">11.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s11">Using MythTV.</A></H2>
@@ -677,6 +677,12 @@ for <B>ALSA</B>, capture cards, <B>lirc</B>, etc., nor do they set up
 your MythTV database. Check 
 <A HREF="http://atrpms.physik.fu-berlin.de/topic/multimedia/">ATrpms</A> for
 the drivers you need.</P>
+<P>Further documentation on using ATrpms packages can be found in 
+<A HREF="mailto:jcw@wilsonet.com">Jarod Wilson</A>'s "HOWTO Build a MythTV
+System on Red Hat Linux 9 w/ATrpms" document, 
+<A HREF="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250">http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250</A>. Just
+like 3rd-party packages, any 3rd-party documentation problems should be
+brought up with the maintainer.</P>
 
 <H3>Mandrake</H3>
 
@@ -1134,7 +1140,7 @@ web site.  Save the tarball to a directory you can find.  If you would like
 to run the CVS version of MythTV, follow the instructions located in the
 <A HREF="#cvs">first section</A>.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.16 if you're in
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.17 if you're in
 North America.</P>
 <P>
 <HR>
@@ -1151,8 +1157,9 @@ After downloading, be sure to install both:
 # rpm -Uvh lame*
 </PRE>
 <HR>
-</P>
-<P>Get lame from 
+
+&nbsp;
+Get lame from 
 <A HREF="http://www.mp3dev.org/mp3">http://www.mp3dev.org/mp3</A>.  Download the source code to v3.93.1 by
 following the links to sourceforge.net</P>
 
@@ -1279,8 +1286,8 @@ $
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf xmltv-0.5.16.tar.bz2
-$ cd xmltv-0.5.16
+$ tar -xjf xmltv-0.5.17.tar.bz2
+$ cd xmltv-0.5.17
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -1302,7 +1309,7 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd xmltv-0.5.16
+$ cd xmltv-0.5.17
 $ perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2741,12 +2748,21 @@ processor will be able to deinterlace correctly.</P>
 implementation of SSE instructions, so if your processor has 3dnow you
 shouldn't have any issues with deinterlacing.</P>
 
-<H2><A NAME="ss10.5">10.5</A> <A HREF="#toc10.5">Recording</A>
+<H2><A NAME="ss10.5">10.5</A> <A HREF="#toc10.5">Recording </A>
 </H2>
 
-<P>Currently, MythTV supports two different video encoders, MPEG-4 and RTJPEG. 
-Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG-4
-has high CPU demands, but makes smaller files.</P>
+<P>Currently, MythTV supports a number of different video encoders. There
+are two software options and two hardware options. The software options are
+MPEG-4 and RTJPEG. The hardware options are MPEG-2 and Hardware MJPEG. Take
+note that RTJPEG has lower CPU demands than MPEG-4, but makes large files,
+while MPEG-4 has higher CPU demands than RTJPEG, but makes smaller files.
+Hardware MJPEG is only for use with MJPEG capture devices (Zoran-based
+cards; see 
+<A HREF="http://mjpeg.sourceforge.net">http://mjpeg.sourceforge.net</A>). MPEG-2 is the format used by the
+hardware-based PVR-x50 encoder. Note that MPEG-2 is not a selectable option
+in the Recording setup option, but this is what PVR-x50 cards will always
+use for initial video capture (which can later be transcoded), regardless of
+what codec you choose for Default and/or Live TV.</P>
 <P><B>NOTE</B>: although the width and height can be changed to almost
 anything, if you start MythTV and don't see video or you get "segmentation
 fault" errors, it is likely that the video4linux (v4l) subsystem did not
@@ -4336,9 +4352,9 @@ following commands:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd ivtv/ivtv/utils
-$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_16_21062.exe
+$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21199.exe
 $ su
-# ./ivtvfwextract.pl pvr250_16_21062.exe
+# ./ivtvfwextract.pl pvr250_17_21199.exe
 # exit
 </PRE>
 </CODE></BLOCKQUOTE>

@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-08-23, v2.66
+<date>2003-08-31, v2.67
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -485,6 +485,14 @@ your MythTV database. Check <url
 url="http://atrpms.physik.fu-berlin.de/topic/multimedia/" name="ATrpms"> for
 the drivers you need.
 
+Further documentation on using ATrpms packages can be found in <url
+url="mailto:jcw@wilsonet.com" name="Jarod Wilson">'s "HOWTO Build a MythTV
+System on Red Hat Linux 9 w/ATrpms" document, <url
+url="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250"
+name="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250">. Just
+like 3rd-party packages, any 3rd-party documentation problems should be
+brought up with the maintainer.
+
 <sect3>Mandrake
 <p>Thac has created RPMs for MythTV for Mandrake 9.0 and 9.1 which may be
 obtained from <url url="http://rpm.nyvalls.se/"
@@ -889,7 +897,7 @@ to run the CVS version of MythTV, follow the instructions located in the
 <ref id="cvs" name="first section">.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.16 if you're in
+name="http://xmltv.sourceforge.net">.  Download version 0.5.17 if you're in
 North America.
 
 <code>
@@ -905,7 +913,7 @@ After downloading, be sure to install both:
 # rpm -Uvh lame*
 
 </code>
-
+~
 Get lame from <url url="http://www.mp3dev.org/mp3"
 name="http://www.mp3dev.org/mp3">.  Download the source code to v3.93.1 by
 following the links to sourceforge.net
@@ -1009,8 +1017,8 @@ Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.16.tar.bz2
-$ cd xmltv-0.5.16
+$ tar -xjf xmltv-0.5.17.tar.bz2
+$ cd xmltv-0.5.17
 </verb></tscreen>
 Install the xmltv prerequisites:
 
@@ -1027,7 +1035,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.16
+$ cd xmltv-0.5.17
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -2325,10 +2333,19 @@ On an AMD processor, look for "3dnow" in the cpuinfo line; "3dnow" is AMD's
 implementation of SSE instructions, so if your processor has 3dnow you
 shouldn't have any issues with deinterlacing.
 
-<sect1>Recording
-<p>Currently, MythTV supports two different video encoders, MPEG-4 and RTJPEG. 
-Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG-4
-has high CPU demands, but makes smaller files.
+<sect1>Recording 
+<p>Currently, MythTV supports a number of different video encoders. There
+are two software options and two hardware options. The software options are
+MPEG-4 and RTJPEG. The hardware options are MPEG-2 and Hardware MJPEG. Take
+note that RTJPEG has lower CPU demands than MPEG-4, but makes large files,
+while MPEG-4 has higher CPU demands than RTJPEG, but makes smaller files.
+Hardware MJPEG is only for use with MJPEG capture devices (Zoran-based
+cards; see <url url="http://mjpeg.sourceforge.net"
+name="http://mjpeg.sourceforge.net">). MPEG-2 is the format used by the
+hardware-based PVR-x50 encoder. Note that MPEG-2 is not a selectable option
+in the Recording setup option, but this is what PVR-x50 cards will always
+use for initial video capture (which can later be transcoded), regardless of
+what codec you choose for Default and/or Live TV.
 
 <bf>NOTE</bf>: although the width and height can be changed to almost
 anything, if you start MythTV and don't see video or you get "segmentation
@@ -3776,9 +3793,9 @@ This should create an ivtv directory.  Switch to it and perform the
 following commands:
 <tscreen><verb>
 $ cd ivtv/ivtv/utils
-$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_16_21062.exe
+$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21199.exe
 $ su
-# ./ivtvfwextract.pl pvr250_16_21062.exe
+# ./ivtvfwextract.pl pvr250_17_21199.exe
 # exit
 </verb></tscreen>
 
@@ -4450,6 +4467,8 @@ v2.65, 2003-08-21.  Change "add below" to "above" in PVR section.  Guess
 they flip-flopped at some point. Add some advice about mixer levels.  Add
 libid3tag to MythMusic section.
 v2.66, 2003-08-23.  Move transcoder docs to Misc section.
+v2.67, 2003-08-31.  Update XMLTV version.  Jarod Wilson's update.  New
+Hauppauge firmware version.
 -->
 
 <!--
