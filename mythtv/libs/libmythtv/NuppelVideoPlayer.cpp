@@ -3102,6 +3102,12 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
         {
             long long int new_frame = saved_position + 
                        (long long int)((*comm_length - 1) * video_frame_rate);
+            if (SkipTooCloseToEnd(new_frame))
+            {
+                comm_length++;
+                continue;
+            }
+
             JumpToFrame(new_frame);
 
             scanned_frames = blanks_found = found_blank_seq = 0;
