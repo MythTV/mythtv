@@ -25,21 +25,8 @@ Once the make is completed, do a 'make install'.
 - images and weathertype file will be put into the newly created
   /usr/local/share/mythtv/mythweather directory
 
-The software is now installed, one simple configuration must be made:
-
-1. Connect to your SQL server you already have running for MythTV.
-2. Issue the following commands (be sure to replace the YOUR_ZIPCODE_OR_AREA_ID,
-   see below for more information):
-
-use mythconverg;
-insert into settings (value, data) VALUES ('locale', 'YOUR_ZIPCODE_OR_AREA_ID');
-
-  2A. If you want to default to SI units, do the following, if not, skip to #3:
-      insert into settings (value, data) VALUES ('SIUnits', 'Yes');
-
-3. Exit out of the SQL server
-4. You're done! Enjoy! See below if you have any problems, ideas, concerns...
-
+The software is now installed; use Mythfrontend->TV->Settings->Weather to
+customize the MythWeather module for your setup.
 
 MYTHWEATHER KEYBOARD COMMANDS
 -----------------------------
