@@ -1,0 +1,82 @@
+                                   MythMusic
+			             0.4
+
+
+There'll be more information here later, but for now:
+
+BUILD/CONFIGURATION INSTRUCTIONS
+--------------------------------
+
+First, you need MythTV to be installed.  At the very least, you need MythTV's
+database stuff setup properly.  If you don't have that done, don't even bother
+with this, as it won't work.
+
+In addition to MythTV's requirements, you'll need these software packages:
+(note: _all_ of these exist as software packages in Debian).
+
+   MAD - mp3 decoder library, and it's libid3tag library.  
+         http://www.mars.org/home/rob/proj/mpeg/
+
+   Vorbis - I've just used this with version 1.0.  You'll need a full install,
+            encoding and decoding support.  http://www.vorbis.com
+
+   FLAC - lossless encoder/decoder.  Version 1.0.3 is needed.
+          http://flac.sourceforge.net
+
+   libcdaudio - Used to play CDs and to hit FreeDB for CD information.
+                I'm using 0.99.6.  http://libcdaudio.sourceforge.net
+
+   cdparanoia - The integrated ripping support uses the libraries from this.
+                I'm using cdparanoia III 9.8.  http://www.xiph.org/paranoia/
+
+Phew.  Lotta stuff required, and once again I didn't write a configure script
+to try and find out if you have it or not.  So if you're missing a dependency,
+the compile will fail.
+
+Ok.  Once you've got all the prerequisites installed, on to compiling.
+Just type 'make' in the main distribution directory.
+
+Compiling note:  If you get an error on building this, that says something
+                 about 'mkspecs', then you don't have the QTDIR environment
+                 variable set.  On debian, this should be set to /usr/share/qt.
+                 I hear on mandrake, it's /usr/lib/qt3.  You'll need to figure
+                 out what it should be on your system, set the variable,
+                 and attempt to compile again.
+
+If you get any errors about missing references, etc, you most likely don't have
+one of the required pieces of software installed.
+
+Follow this by a 'make install'.  It'll put a 'mythmusic' binary in your
+/usr/local/bin directory, and stuff mythmusic-settings.txt in your
+existing /usr/local/share/mythtv/ directory.
+
+You'll probably want to edit the mythmusic-settings.txt file to set where
+your existing music is stored.  This'll also be where new music shows up after
+it's ripped.
+
+MythMusic will also read the theme.txt and mysql.txt settings files used by
+MythTV, so any changes you made to those will be carried over into this.
+
+The final thing to do is add the musicdb/metadata.sql file to your existing
+database setup from MythTV.
+
+So, now you can run mythmusic.  The first time you run it, it'll seem to just 
+sit there at first, while it searches the directory you told it music was 
+stored in.  This may take a while, depends on how much music you've already got
+there.  It'll read all the metadata (vorbis comments, id3 tags, etc) and stash 
+the information in the database.  If it's looking over a network, the process 
+might take a _long_ time.  Actually, running over a network isn't recommended 
+for now, as there's little input buffering, so you'll probably have jerky 
+playback.
+
+Once it's done searching for your music, the interface will show up.  It should
+be fairly easy to figure out..  The playlists you select won't be saved across
+runs of the program, for now.
+
+Feel free to subscribe to the development mailing list at:
+http://www.snowman.net/mailman/listinfo/mythtv-dev
+
+A list that's restricted to the CVS commit messages is available at:
+http://www.snowman.net/mailman/listinfo/mythtv-commits
+
+or, just email me directly:  Isaac Richards <ijr@po.cwru.edu>
