@@ -369,11 +369,11 @@ void Scheduler::PruneList(void)
         {
             if (FindInOldRecordings(first))
             {
-                cout << "Pruning duplicate program (already recorded):" << endl
-                     << first->title << endl
-                     << first->subtitle << endl
-                     << first->description << endl
-                     << first->startts.toString() << endl;
+//                 cout << "Pruning duplicate program (already recorded):" << endl
+//                      << first->title << endl
+//                      << first->subtitle << endl
+//                      << first->description << endl
+//                      << first->startts.toString() << endl;
                 delete first;
                 deliter = i.base();
                 deliter--;
