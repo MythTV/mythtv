@@ -168,7 +168,7 @@ void ApplyRecordStateChange(ProgramInfo *pginfo, int newstate)
     sprintf(sqlstarttime, "%s00", starts.ascii());
 
     char sqlendtime[128];
-    sprintf(sqlendtime, "%s00", starts.ascii());
+    sprintf(sqlendtime, "%s00", endts.ascii());
 
     char thequery[512];
     QSqlQuery query;
