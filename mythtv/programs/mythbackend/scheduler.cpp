@@ -192,6 +192,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     {
         recordingList.sort(comp_proginfo());
         MarkKnownInputs();
+        PruneOverlaps();
         MarkConflicts();
         PruneList();
         MarkConflicts();
@@ -373,6 +374,43 @@ void Scheduler::MarkConflicts(list<ProgramInfo *> *uselist)
             }
         }
     }
+}
+
+void Scheduler::PruneOverlaps(void)
+{
+    list<ProgramInfo *>::iterator i;
+    for (i = recordingList.begin(); i != recordingList.end(); i++)
+    {
+        ProgramInfo *first = (*i);
+        if (first->norecord == nrOverlap)
+            continue;
+
+        list<ProgramInfo *>::iterator j = i;
+        for (j++; j != recordingList.end(); j++)
+        {
+            ProgramInfo *second = (*j);
+            if (second->norecord == nrOverlap)
+                continue;
+
+            if (first->IsSameTimeslot(*second))
+            {
+                int pfirst = RecTypePriority(first->rectype);
+                int psecond = RecTypePriority(second->rectype);
+                if (pfirst < psecond || 
+                    (pfirst == psecond && first->recordid < second->recordid))
+                {
+                    second->recording = false;
+                    second->norecord = nrOverlap;
+                }
+                else
+                {
+                    first->recording = false;
+                    first->norecord = nrOverlap;
+                    break;
+                }
+            }
+        }
+    }    
 }
 
 void Scheduler::PruneList(void)

@@ -491,6 +491,7 @@ void ViewScheduled::updateList(QPainter *p)
                             case nrLowerRanking:      tempCard = "R"; break;
                             case nrManualConflict:    tempCard = "M"; break;
                             case nrAutoConflict:      tempCard = "A"; break;
+                            case nrOverlap:           tempCard = "V"; break;
                             default:                  tempCard = "-"; break;
                             }
                         }
@@ -784,7 +785,8 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 
     if (rec->norecord != nrTooManyRecordings &&
         rec->norecord != nrDontRecordList &&
-        rec->norecord != nrLowerRanking)
+        rec->norecord != nrLowerRanking &&
+        rec->norecord != nrOverlap)
         diag.AddButton(tr("Record it anyway"));
 
     int ret = diag.exec();

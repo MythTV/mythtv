@@ -17,6 +17,8 @@ enum RecordingType
     kWeekslotRecord
 };
 
+int RecTypePriority(RecordingType rectype);
+
 enum RecordingDupsType
 {
     kRecordDupsNever = 0,

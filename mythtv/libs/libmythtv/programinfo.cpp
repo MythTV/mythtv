@@ -1317,6 +1317,8 @@ QString ProgramInfo::NoRecordText(void)
         return "another program was manually chosen to be recorded instead";
     case nrAutoConflict:
         return "another program was automatically chosen to be recorded instead";
+    case nrOverlap:
+        return "it is covered by another scheduled recording for the same program";
     case nrUnknown:
     default:
         return "you should never see this";
@@ -1326,6 +1328,8 @@ QString ProgramInfo::NoRecordText(void)
 void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
 {
     vector<ProgramInfo *>::iterator i;
+    ProgramInfo *found = NULL;
+    int pfound = 0;
 
     for (i = reclist.begin(); i != reclist.end(); i++)
     {
@@ -1337,17 +1341,27 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
             subtitle == p->subtitle && 
             description == p->description)
         {
-            conflicting = p->conflicting;
-            recording = p->recording;
-            override = p->override;
-            norecord = p->norecord;
-            recordid = p->recordid;
-            rectype = p->rectype;
-            recdups = p->recdups;
-            recstartts = p->recstartts;
-            recendts = p->recendts;
-            return;
+            int pp = RecTypePriority(p->rectype);
+            if (!found || pp < pfound || 
+                (pp == pfound && p->recordid < found->recordid))
+            {
+                found = p;
+                pfound = pp;
+            }
         }
+    }
+                
+    if (found)
+    {
+        conflicting = found->conflicting;
+        recording = found->recording;
+        override = found->override;
+        norecord = found->norecord;
+        recordid = found->recordid;
+        rectype = found->rectype;
+        recdups = found->recdups;
+        recstartts = found->recstartts;
+        recendts = found->recendts;
     }
 }
 

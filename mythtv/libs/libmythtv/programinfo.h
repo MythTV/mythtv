@@ -46,7 +46,8 @@ enum NoRecordType {
     nrDontRecordList = 6,
     nrLowerRanking = 7,
     nrManualConflict = 8,
-    nrAutoConflict = 9
+    nrAutoConflict = 9,
+    nrOverlap = 10
 };
 
 class QSqlDatabase;

@@ -9,6 +9,17 @@
 #include <qapplication.h>
 #include <qregexp.h>
 
+// Convert a RecordingType to a simple integer so it's specificity can
+// be compared to another.  Lower number means more specific.
+int RecTypePriority(RecordingType rectype)
+{
+    if (rectype == kChannelRecord ||
+        rectype == kAllRecord)
+        return rectype+2;
+    else
+        return rectype;
+}
+
 class SRSetting: public SimpleDBStorage {
 protected:
     SRSetting(const ScheduledRecording& _parent, QString name):
@@ -471,9 +482,15 @@ void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
 
 bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
                                        ProgramInfo* proginfo) {
-    QString sqltitle(proginfo->title);
-
     m_pginfo = proginfo;
+
+    if (proginfo->recordid)
+    {
+        loadByID(db, proginfo->recordid);
+        return true;
+    }
+
+    QString sqltitle(proginfo->title);
 
     // this doesn't have to be a QRegexp in qt 3.1+
     sqltitle.replace(QRegExp("\'"), "\\'");

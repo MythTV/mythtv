@@ -47,6 +47,7 @@ class Scheduler : public QObject
 
     void MarkKnownInputs(void);
     void MarkConflicts(list<ProgramInfo *> *uselist = NULL);
+    void PruneOverlaps(void);
     void PruneList(void);
 
     void MarkConflictsToRemove(void);
