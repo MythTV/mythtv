@@ -15,7 +15,7 @@
     <message>
         <source>Press the &apos;New Bookmark&apos; button to add a new site/group.
 Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
-        <translation>&apos;Neuer Eintrag&apos; Fügt eine Gruppe oder Webpage hinzu.
+        <translation>&apos;Neuer Eintrag&apos; fügt eine Gruppe oder Webpage hinzu.
 SPACE/Enter löscht den selektierten Eintrag.</translation>
     </message>
     <message>
