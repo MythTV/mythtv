@@ -42,48 +42,7 @@ site at the following URL:
 there, fill in your location.  After the MSNBC server completes your request,
 check the URL in the address bar for "accid=XXXXX".  The "XXXXX" portion
 is the area id you will need for the next configuration step.</P>
-<P>For now, you must manually configure MythWeather:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root
-mysql> use mythconverg;
-mysql> insert into settings (value, data) VALUES ('locale','YOUR_ZIPCODE_OR_AREA_ID_OR_AIRPORTCODE');
-mysql> exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>So, as an example for zipcode 60561:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root
-mysql> use mythconverg;
-mysql> insert into settings (value, data) VALUES ('locale','60561');
-mysql> exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>An example for Paris, France:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root
-mysql> use mythconverg;
-mysql> insert into settings (value, data) VALUES ('locale','FRXX0076');
-mysql> exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you wish to use Celsius as the default:
-<BLOCKQUOTE><CODE>
-<PRE>
-mysql> insert into settings (value, data) VALUES ('SIUnits', 'Yes');
-mysql>
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>To configure MythWeather, go to Mythfrontend->Watch TV->Setup->Weather</P>
 <P>These are the keyboard commands for MythWeather:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -93,7 +52,7 @@ Right Key            Goes forward one page, see above.
 Space                Pause, wait on the current page until space is hit
                      again.
 Numeric Keys         You can check other weather by keying in other ZIP codes.
-Enter Key            Switch between celsius and fahrenheit. Can also
+Enter Key            Switch between Celsius and Fahrenheit. Can also
                      be used a way to force a data update.
 "m" Key              Resets the location to the database default, then updates the data.
 </PRE>

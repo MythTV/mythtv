@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-02-18, v1.098
+  2003-02-24, v1.099
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1891,7 +1891,8 @@
   that mirror.  You will most likely need to add a "Contrib" mirror to
   your setup.  Once you have done that, you can proceed.
 
-       # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia libcdda0-devel libvorbis-devel
+       # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia
+       # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
 
   [1m14.2.1.  Additional options with CVS MythMusic[0m
 
@@ -1980,34 +1981,7 @@
   "XXXXX" portion is the area id you will need for the next
   configuration step.
 
-  For now, you must manually configure MythWeather:
-
-       $ mysql -u root
-       mysql> use mythconverg;
-       mysql> insert into settings (value, data) VALUES ('locale','YOUR_ZIPCODE_OR_AREA_ID_OR_AIRPORTCODE');
-       mysql> exit
-       $
-
-  So, as an example for zipcode 60561:
-
-       $ mysql -u root
-       mysql> use mythconverg;
-       mysql> insert into settings (value, data) VALUES ('locale','60561');
-       mysql> exit
-       $
-
-  An example for Paris, France:
-
-       $ mysql -u root
-       mysql> use mythconverg;
-       mysql> insert into settings (value, data) VALUES ('locale','FRXX0076');
-       mysql> exit
-       $
-
-  If you wish to use Celsius as the default:
-
-       mysql> insert into settings (value, data) VALUES ('SIUnits', 'Yes');
-       mysql>
+  To configure MythWeather, go to Mythfrontend->Watch TV->Setup->Weather
 
   These are the keyboard commands for MythWeather:
 
@@ -2017,7 +1991,7 @@
        Space                Pause, wait on the current page until space is hit
                             again.
        Numeric Keys         You can check other weather by keying in other ZIP codes.
-       Enter Key            Switch between celsius and fahrenheit. Can also
+       Enter Key            Switch between Celsius and Fahrenheit. Can also
                             be used a way to force a data update.
        "m" Key              Resets the location to the database default, then updates the data.
 
@@ -2029,6 +2003,7 @@
   parameter.  This parameter is inverse; a higher number actually means
   that MythWeather will be less aggressive, and will therefore wait
   longer before timing out.
+
   MythWeather will print debugging information on the terminal.  If you
   wish to see additional debugging information while MythWeather is
   running, you'll need to modify the source and recompile.
@@ -2125,10 +2100,10 @@
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
 
-       cc1plus: warning: changing search order for system directory
-       "/usr/local/include"
-       cc1plus: warning:   as it has already been specified as a non-system
-       directory
+  cc1plus: warning: changing search order for system directory
+  "/usr/local/include"
+  cc1plus: warning:   as it has already been specified as a non-system
+  directory
 
   then it shouldn't be a problem.
 
@@ -2175,30 +2150,30 @@
 
   Finally, check:
 
-       Section "Monitor"
-           Identifier "monitor1"
-           VendorName "Plug'n Play"
-           HorizSync 30-85
-           VertRefresh 50-160
+  Section "Monitor"
+      Identifier "monitor1"
+      VendorName "Plug'n Play"
+      HorizSync 30-85
+      VertRefresh 50-160
 
-           # Sony Vaio C1(X,XS,VE,VN)?
-           # 1024x480 @ 85.6 Hz, 48 kHz hsync
-           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+      # Sony Vaio C1(X,XS,VE,VN)?
+      # 1024x480 @ 85.6 Hz, 48 kHz hsync
+      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-           # TV fullscreen mode or DVD fullscreen output.
-           # 768x576 @ 79 Hz, 50 kHz hsync
-           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+      # TV fullscreen mode or DVD fullscreen output.
+      # 768x576 @ 79 Hz, 50 kHz hsync
+      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-           # 768x576 @ 100 Hz, 61.6 kHz hsync
-           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-       EndSection
+      # 768x576 @ 100 Hz, 61.6 kHz hsync
+      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+  EndSection
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
   You can also turn off DPMS from the Command Line, but this will not
   survive a reboot.
 
-  $ xset -dpms
+       $ xset -dpms
 
   Using xset +dpms will turn it back on.
 
@@ -2240,18 +2215,18 @@
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-  $ cd setup
-  $ gdb ./setup
+       $ cd setup
+       $ gdb ./setup
 
-  GNU gdb 5.3-1mdk (Mandrake Linux)
-  Copyright 2002 Free Software Foundation, Inc.
-  GDB is free software, covered by the GNU General Public License, and you are
-  welcome to change it and/or distribute copies of it under certain
-  conditions.
-  Type "show copying" to see the conditions.
-  There is absolutely no warranty for GDB.  Type "show warranty" for details.
-  This GDB was configured as "i586-mandrake-linux-gnu"...
-  (gdb)
+       GNU gdb 5.3-1mdk (Mandrake Linux)
+       Copyright 2002 Free Software Foundation, Inc.
+       GDB is free software, covered by the GNU General Public License, and you are
+       welcome to change it and/or distribute copies of it under certain
+       conditions.
+       Type "show copying" to see the conditions.
+       There is absolutely no warranty for GDB.  Type "show warranty" for details.
+       This GDB was configured as "i586-mandrake-linux-gnu"...
+       (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
@@ -2357,7 +2332,7 @@
   http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/
   <http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/>.
 
-  $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
+       $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
 
   Download the source to MPlayer and patch:
 
@@ -2472,6 +2447,7 @@
   The MythTV full screen mode uses the X display size dimensions
   regardless of the other two and is anchored to the upper left corner
   of the X display.
+
   [1m18.5.1.  X Dimensions[0m
 
   For output to a Television, common resolutions are 640x480, 800x600,
@@ -2585,6 +2561,10 @@
      encoder/decoder found on Matrox G200 series cards.  This greatly
      reduces the CPU utilization.
 
+  +o  Commercial Skipping
+
+  +o  Mixer control for volume and muting functionality
+
   [1mNOTE[22m:  Problem reports for version 0.8 posted to the mailing list
   should have accompanying solutions.
 
@@ -2646,6 +2626,7 @@
   not yet a supported configuration.  The following instructions may or
   may not work.  Add the following to /etc/my.cnf on the backend
   machine.
+
        skip-innodb
        set-variable=thread_stack=256k
 

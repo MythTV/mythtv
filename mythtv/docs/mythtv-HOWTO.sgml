@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-02-18, v1.098
+<date>2003-02-24, v1.099
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1782,7 +1782,8 @@ mirror.  You will most likely need to add a "Contrib" mirror to your setup.
 Once you have done that, you can proceed.
 
 <tscreen><verb>
-# urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia libcdda0-devel libvorbis-devel 
+# urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia
+# urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
 </verb></tscreen>
 
 <sect2>Additional options with CVS MythMusic
@@ -1868,39 +1869,7 @@ there, fill in your location.  After the MSNBC server completes your request,
 check the URL in the address bar for "accid=XXXXX".  The "XXXXX" portion
 is the area id you will need for the next configuration step.
 
-For now, you must manually configure MythWeather:
-
-<tscreen><verb>
-$ mysql -u root
-mysql> use mythconverg;
-mysql> insert into settings (value, data) VALUES ('locale','YOUR_ZIPCODE_OR_AREA_ID_OR_AIRPORTCODE');
-mysql> exit
-$
-</verb></tscreen>
-
-So, as an example for zipcode 60561:
-<tscreen><verb>
-$ mysql -u root
-mysql> use mythconverg;
-mysql> insert into settings (value, data) VALUES ('locale','60561');
-mysql> exit
-$
-</verb></tscreen>
-
-An example for Paris, France:
-<tscreen><verb>
-$ mysql -u root
-mysql> use mythconverg;
-mysql> insert into settings (value, data) VALUES ('locale','FRXX0076');
-mysql> exit
-$
-</verb></tscreen>
-
-If you wish to use Celsius as the default:
-<tscreen><verb>
-mysql> insert into settings (value, data) VALUES ('SIUnits', 'Yes');
-mysql>
-</verb></tscreen>
+To configure MythWeather, go to Mythfrontend->Watch TV->Setup->Weather
 
 These are the keyboard commands for MythWeather:
 <tscreen><verb>
@@ -1910,7 +1879,7 @@ Right Key            Goes forward one page, see above.
 Space                Pause, wait on the current page until space is hit
                      again.
 Numeric Keys         You can check other weather by keying in other ZIP codes.
-Enter Key            Switch between celsius and fahrenheit. Can also
+Enter Key            Switch between Celsius and Fahrenheit. Can also
                      be used a way to force a data update.
 "m" Key              Resets the location to the database default, then updates the data.
 </verb></tscreen>
@@ -2450,6 +2419,8 @@ levels.
 <item>Increased hardware encoder support.  MythTV can now use the MJPEG
 encoder/decoder found on Matrox G200 series cards.  This greatly reduces the
 CPU utilization.
+<item>Commercial Skipping
+<item>Mixer control for volume and muting functionality
 </itemize>
 
 <bf>NOTE</bf>:  Problem reports for version 0.8 posted to the mailing list
@@ -2667,6 +2638,8 @@ requisistes for MythMusic.  Added note for MythMusic configure.  Added note
 for Mandrake 9.1 lirc install.  Added Erik Arendse's European MythTV website
 link.  Added a little to the MythMusic usage instructions.  Added some more
 developers.
+v1.099, 2003-02-24.  More on mythmusic.  Added some more MythTV v0.8 items. 
+Update MythWeather now that there's a config page.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
