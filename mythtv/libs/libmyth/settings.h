@@ -157,10 +157,7 @@ public:
     ConfigurationDialogWidget(QWidget* parent = NULL, const char* widgetName = 0):
         QDialog(parent, widgetName, TRUE) {};
 
-    virtual void closeEvent(QCloseEvent* e) {
-        e->accept();
-        accept();
-    };
+    virtual void keyPressEvent(QKeyEvent* e);
 };
 
 class ConfigurationDialog: virtual public Configurable {

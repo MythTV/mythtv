@@ -238,6 +238,13 @@ QWidget* CheckBoxSetting::configWidget(QWidget* parent,
     return widget;
 }
 
+void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e) {
+    if (e->key() == Key_Escape)
+        accept();
+    else
+        e->ignore();
+}
+
 QDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
                                            const char* widgetName) {
     QDialog* dialog = new ConfigurationDialogWidget(parent, widgetName);
