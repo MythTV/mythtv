@@ -13,6 +13,9 @@
 .Op Fl Fl description string
 .Op Fl Fl debug
 .Op Fl Fl mode=mode
+.Op Fl Fl search-only
+.Op Fl Fl confirm
+.Op Fl Fl nice
 
 .Sh DESCRIPTION
 .Nm
@@ -47,7 +50,8 @@ As mentioned, the program is interactive, and is fairly self explanitory.  The f
 1) Choose export type from the prompts, detaisl of the choices are below 
     in EXPORT TYPES section
 2) Choose from the show titles.
-3) Choose a specific show from the titles, you may select a number of different shows, and batch them for re-encode
+3) Choose a specific show from the titles, you may select a number of 
+    different shows, and batch them for re-encode
 4) hit "c" to continue and begin the reencode process
 5) the following questions are usually ok to leave with defaults, 
     especially if you are unsure as to their function
@@ -81,8 +85,11 @@ DVCD - export to VCD format, but using 48kHz audio, useful for DVDs
 DVD - export to DVD
 WMV - Windows Media Player files, exports ASF files with the mpeg4 codec
 MP3 - Export audio track to a Mp3
-MPEG2->MPEG2 cut - cuts commercials tagged by mythtv and gives you a mpeg file.  This only works for MPEG-2 recorded media, like that recorded by a Hauppage PVR-x50 card.
-nuv and sql - dumps mysql database so it can be moved to another backend
+MPEG2->MPEG2 cut - cuts commercials tagged by mythtv and gives 
+    you a mpeg file. This only works for Mpeg-2 recorded media,
+    like that recorded with a PVR-x25 card
+nuv and sql - dumps mysql database so it can be moved to another 
+    mythtv backend
 .Ed
 
 .Sh SEE ALSO
