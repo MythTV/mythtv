@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-17, v1.079
+  2003-01-17, v1.080
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1577,6 +1577,14 @@
 
   [1m10.  Using MythTV.[0m
 
+  [1mNOTE to Red Hat 8.0 users[22m:Red Hat Linux 8.0 ships with Gnome as the
+  default desktop environment.  However, Gnome seems to have issues with
+  window focus and window switching which sometimes cause mythfrontend
+  to obscure the video. KDE does not seem to have any such issues.
+  Therefore you will need to switch to KDE by selecting
+  RedHatMenu>Extras>System Settings>Desktop Switching Tool and choose
+  "KDE".
+
   [1mmythfrontend [22mis the main interface to the MythTV program.  This
   program allows you to choose which of the other modules you'd like to
   run and ensures that programs that you've scheduled for recording
@@ -1612,7 +1620,7 @@
   have an external tuner, such as a DirecTV or digital cable set top
   box, the following command should be added to your settings.txt file:
 
-       str ExternalChannelCommand=/usr/local/bin/changechannel
+  str ExternalChannelCommand=/usr/local/bin/changechannel
 
   The [1mchangechannel [22mprogram is not supplied with MythTV, so this is
   going to be dependent on what sort of external tuner you have.
@@ -1666,12 +1674,12 @@
 
   [1mNOTE[22m: Make sure that you have a trailing slash on the URL, otherwise
   you will get a 404 Page not Found error.
-
   [1m12.  MythGallery.[0m
 
   MythGallery is a photo and slideshow application.  MythGallery is a
   separate application, but it's dependent on MythTV being installed and
   operational.
+
   [1m12.1.  Installation and pre-requisites.[0m
 
   Download MythGallery from http://www.mythtv.org/

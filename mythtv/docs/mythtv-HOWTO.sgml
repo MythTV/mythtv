@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-17, v1.079
+<date>2003-01-17, v1.080
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1477,7 +1477,14 @@ grid, the "I" key will give you more information on a program and ESC will
 exit out back to the shell.
 
 <sect>Using MythTV.
-<p><bf>mythfrontend</bf> is the main interface to the MythTV program.  This
+<p><bf>NOTE to Red Hat 8.0 users</bf>:Red Hat Linux 8.0 ships with Gnome as
+the default desktop environment.  However, Gnome seems to have issues with
+window focus and window switching which sometimes cause mythfrontend to
+obscure the video. KDE does not seem to have any such issues. Therefore you
+will need to switch to KDE by selecting RedHatMenu>Extras>System
+Settings>Desktop Switching Tool and choose "KDE".
+
+<bf>mythfrontend</bf> is the main interface to the MythTV program.  This
 program allows you to choose which of the other modules you'd like to run
 and ensures that programs that you've scheduled for recording actually get
 recorded, so it's important that this program is always running.
@@ -2339,8 +2346,10 @@ v1.077, 2003-01-16.  Added "Can't see OSD" to troubleshooting with pointer
 back to RH80 strip instructions.
 v1.078, 2003-01-16.  Added initial mythvideo instructions.  Added
 instruction not to mess with port setting in backend for mythtv-0.8.
-v1.079, 2003-01-17.  More stuff on disabling DPMS in the XF86Config file. (Who new it was so
-difficult?)
+v1.079, 2003-01-17.  More stuff on disabling DPMS in the XF86Config file. (Who
+knew it was so difficult?)
+v1.080, 2003-01-17.  Adjustment to RH80 docs by Cedar.  Added recommendation
+to use KDE vs. Gnome for RH8.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
