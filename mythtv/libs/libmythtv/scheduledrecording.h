@@ -33,9 +33,7 @@ enum RecordingDupMethodType
     kDupCheckNone     = 0x01,
     kDupCheckSub      = 0x02,
     kDupCheckDesc     = 0x04,
-    kDupCheckSubDesc  = 0x06,
-    kDupAllowEmpty    = 0x10,
-    kDupEmptySubDesc  = 0x16
+    kDupCheckSubDesc  = 0x06
 };
 
 class ProgramInfo;

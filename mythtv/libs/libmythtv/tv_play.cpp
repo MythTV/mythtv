@@ -2330,6 +2330,21 @@ void TV::UpdateOSD(void)
 
     GetChannelInfo(activerecorder, infoMap);
 
+    int behind = activenvp->GetSecondsBehind();
+    QDateTime now = QDateTime::currentDateTime();
+    QDateTime infoMapTime = QDateTime::fromString(infoMap["startts"],
+                                                  Qt::ISODate);
+    QDateTime curPlaybackTime = now.addSecs(0-behind);
+    ProgramInfo *curPlaybackInfo;
+
+    if (curPlaybackTime < infoMapTime)
+    {
+        curPlaybackInfo = ProgramInfo::GetProgramAtDateTime(m_db,
+                             infoMap["chanid"], curPlaybackTime);
+        if (curPlaybackInfo)
+            curPlaybackInfo->ToMap(m_db, infoMap);
+    }
+
     osd->ClearAllText("program_info");
     osd->SetText("program_info", infoMap, osd_display_time);
     osd->ClearAllText("channel_number");
@@ -2427,6 +2442,8 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
     QString length;
     int hours, minutes, seconds;
 
+    infoMap["startts"] = starttime;
+    infoMap["endts"] = endtime;
     infoMap["dbstarttime"] = starttime;
     infoMap["dbendtime"] = endtime;
     infoMap["title"] = title;

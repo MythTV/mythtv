@@ -111,8 +111,6 @@ public:
         setLabel(QObject::tr("Duplicate Check"));
         addSelection(QObject::tr("Sub & Desc"),
                  QString::number(kDupCheckSubDesc));
-        addSelection(QObject::tr("Even if Empty"),
-                 QString::number(kDupEmptySubDesc));
         addSelection(QObject::tr("Subtitle"),
                  QString::number(kDupCheckSub));
         addSelection(QObject::tr("Description"),

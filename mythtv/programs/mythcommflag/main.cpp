@@ -35,6 +35,8 @@ double fps = 29.97;
 
 void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
 {
+    int commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
+                                                   COMMERCIAL_SKIP_BLANKS);
     QMap<long long, int> blanks;
     ProgramInfo *program_info =
         ProgramInfo::GetProgramFromRecorded(db, chanid, starttime);
@@ -132,7 +134,8 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
             printf( "\n" );
 
             // build break list and print what it would be
-            CommDetect *commDetect = new CommDetect(0, 0, fps);
+            CommDetect *commDetect = new CommDetect(0, 0, fps,
+                                                    commDetectMethod);
             commDetect->SetBlankFrameMap(blanks);
             commDetect->GetBlankCommMap(comms);
             printf( "Commercials (computed using only blank frame detection)\n" );
@@ -186,7 +189,8 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
             QMap<long long, int> comms;
             QMap<long long, int> breaks;
             QMap<long long, int> orig_breaks;
-            CommDetect *commDetect = new CommDetect(0, 0, fps);
+            CommDetect *commDetect = new CommDetect(0, 0, fps,
+                                                    commDetectMethod);
 
             comms.clear();
             breaks.clear();

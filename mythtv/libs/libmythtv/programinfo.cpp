@@ -799,32 +799,24 @@ void ProgramInfo::ToggleRecord(QSqlDatabase *db)
 
 bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 {
-    if (title != other.title)
+    if ((title != other.title) ||
+        (dupmethod & kDupCheckNone))
         return false;
 
     if (rectype == kFindOneRecord)
         return true;
 
-    QString tmpsubtitle = subtitle;
-    QString tmpdescription = description;
-
-    tmpsubtitle.replace(QRegExp("^ *"),"");
-    tmpdescription.replace(QRegExp("^ *"),"");
-
-    if ((~dupmethod & kDupCheckNone) &&
-        (((dupmethod & kDupCheckSub) &&
-          ((dupmethod & kDupAllowEmpty) ||
-           (tmpsubtitle != "")) &&
-          (subtitle == other.subtitle)) ||
-         (~dupmethod & kDupCheckSub)) &&
-        (((dupmethod & kDupCheckDesc) &&
-          ((dupmethod & kDupAllowEmpty) ||
-           (tmpdescription != "")) &&
-          (description == other.description)) ||
-         (~dupmethod & kDupCheckDesc)))
-        return true;
-    else
+    if ((dupmethod & kDupCheckSub) &&
+        ((subtitle == "") ||
+         (subtitle != other.subtitle)))
         return false;
+
+    if ((dupmethod & kDupCheckDesc) &&
+        ((description == "") &&
+         (description != other.description)))
+        return false;
+
+    return true;
 }
  
 bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
@@ -2007,11 +1999,9 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
         diag.AddButton(QObject::tr("Don't record it"));
         if ((dupmethod & kDupCheckNone) ||
             ((dupmethod & kDupCheckSub) &&
-             ((subtitle != "") ||
-              (dupmethod & kDupAllowEmpty))) ||
+             (subtitle != "")) ||
             ((dupmethod & kDupCheckDesc) &&
-             ((description != "") ||
-              (dupmethod & kDupAllowEmpty))))
+             (description != "")))
             diag.AddButton(QObject::tr("Never record this episode"));
     }
 

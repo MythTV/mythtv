@@ -9,13 +9,13 @@
 
 //#include "commercial_debug.h"
 
-CommDetect::CommDetect(int w, int h, double fps)
+CommDetect::CommDetect(int w, int h, double fps, int method)
 {
 #ifdef SHOW_DEBUG_WIN
     comm_debug_init(w, h);
 #endif
 
-    Init(w, h, fps);
+    Init(w, h, fps, method);
 }
 
 CommDetect::~CommDetect(void)
@@ -27,15 +27,18 @@ CommDetect::~CommDetect(void)
 #endif
 }
 
-void CommDetect::Init(int w, int h, double fps)
+void CommDetect::Init(int w, int h, double fps, int method)
 {
+    commDetectMethod = method;
+
     width = w;
     height = h;
     frame_rate = fps;
+    fpm = fps * 60;
 
     framesProcessed = 0;
 
-    border = 10;
+    border = gContext->GetNumSetting("CommBorder", 10);
 
     detectBlankFrames = true;
     detectSceneChanges = false;
@@ -49,6 +52,9 @@ void CommDetect::Init(int w, int h, double fps)
     memset(histogram, 0, sizeof(histogram));
     lastHistogram[0] = -1;
     histogram[0] = -1;
+
+    SetBlankFrameDetection(commDetectMethod & COMMERCIAL_SKIP_BLANKS);
+    SetSceneChangeDetection(commDetectMethod & COMMERCIAL_SKIP_SCENE);
 
     frameIsBlank = false;
     sceneHasChanged = false;
@@ -88,7 +94,7 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
     framesProcessed++;
 
 #ifdef SHOW_DEBUG_WIN
-    comm_debug_show(buf);
+    comm_debug_show(frame_ptr);
 #endif
 }
 

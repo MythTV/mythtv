@@ -146,8 +146,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     exactseeks = false;
 
     autocommercialskip = 0;
-    commercialskipmethod =
-        gContext->GetNumSetting("CommercialSkipMethod", 1);
+    commercialskipmethod = gContext->GetNumSetting("CommercialSkipMethod",
+                                                   COMMERCIAL_SKIP_BLANKS);
 
     timedisplay = NULL;
     seekamount = 30;
@@ -533,7 +533,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         bookmarkseek = GetBookmark();
     }
 
-    commDetect = new CommDetect(video_width, video_height, video_frame_rate);
+    commDetect = new CommDetect(video_width, video_height, video_frame_rate,
+                                commercialskipmethod);
 
     commDetect->SetAggressiveDetection(
                     gContext->GetNumSetting("AggressiveCommDetect", 1));
@@ -2261,10 +2262,10 @@ void NuppelVideoPlayer::SetDeleteIter(void)
                 break;
         }
 
-        if ((deleteIter == deleteMap.end()) &&
-            (deleteIter != deleteMap.begin()))
+        if (deleteIter != deleteMap.begin())
             --deleteIter;
-        else if (deleteIter.data() == 0)
+
+        if (deleteIter.data() == 0)
             ++deleteIter;
     }
 }
@@ -3183,11 +3184,6 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
 
     ClearAfterSeek();
 
-    if (!(commercialskipmethod & 0x01))
-        commDetect->SetBlankFrameDetection(false);
-    if (commercialskipmethod & 0x02)
-        commDetect->SetSceneChangeDetection(true);
-
     commDetect->SetCommSkipAllBlanks(
         gContext->GetNumSetting("CommSkipAllBlanks", 1));
 
@@ -3249,7 +3245,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
         printf( "\b\b\b\b        \b\b\b\b\b\b" );
     }
 
-    if (commercialskipmethod & 0x01)
+    if (commercialskipmethod & COMMERCIAL_SKIP_BLANKS)
     {
         commDetect->GetBlankFrameMap(blankMap);
 
@@ -3732,8 +3728,8 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
                     commBreakIter--;
             }
         }
-		else if (commBreakIter.data() == MARK_COMM_START)
-		{
+        else if (commBreakIter.data() == MARK_COMM_START)
+        {
             int skipped_seconds = (int)((commBreakIter.key() -
                     framesPlayed) / video_frame_rate);
 
@@ -3752,7 +3748,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
                     return false;
                 }
             }
-		}
+        }
 
         if (osd)
         {

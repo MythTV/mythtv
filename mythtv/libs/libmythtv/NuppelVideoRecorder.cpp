@@ -860,10 +860,14 @@ void NuppelVideoRecorder::StartRecording(void)
 
     if (!pip_mode)
     {
+        int commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
+                                                       COMMERCIAL_SKIP_BLANKS);
+        
         if (commDetect)
-            commDetect->Init(w_out, h_out, video_frame_rate);
+            commDetect->Init(w_out, h_out, video_frame_rate, commDetectMethod);
         else
-            commDetect = new CommDetect(w_out, h_out, video_frame_rate);
+            commDetect = new CommDetect(w_out, h_out, video_frame_rate,
+                                        commDetectMethod);
 
         commDetect->SetAggressiveDetection(
                         gContext->GetNumSetting("AggressiveCommDetect", 1));

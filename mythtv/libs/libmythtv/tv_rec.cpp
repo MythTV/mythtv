@@ -23,7 +23,6 @@ using namespace std;
 #include "hdtvrecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
-#include "commercial_skip.h"
 
 #ifdef USING_IVTV
 #include "mpegrecorder.h"
