@@ -7,7 +7,7 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 31
+#define NUMPROGRAMLINES 32
 
 enum MarkTypes {
     MARK_UPDATED_CUT = -3,

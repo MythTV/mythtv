@@ -347,7 +347,12 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     progMap["time"] = timeNow.time().toString(timeFormat);
 
     if (gContext->GetNumSetting("DisplayChanNum") != 0)
-        progMap["channel"] = channame + " [" + chansign + "]";
+    {
+        if (channame != chansign)
+            progMap["channel"] = channame + " [" + chansign + "]";
+        else
+            progMap["channel"] = channame;
+    }
     else
         progMap["channel"] = chanstr;
 
