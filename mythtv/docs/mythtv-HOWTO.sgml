@@ -1486,8 +1486,19 @@ the MythTV directory that you <tt>cd</tt>'d to above.
 <p>MythTV supports real-time scheduling of the video output thread if it is
 installed SUID root.
 
-This is an optional, but recommended step.  It can make the video display
-more smoothly.
+This is an optional, but recommended step, if you understand the potential
+negative impact.  As a positive, It can make the video display more
+smoothly, especially if you are decoding HDTV.
+
+<figure loc="here">
+<eps file="stop.eps" height="1cm">
+<img src="stop.png">
+<caption>
+<bf>NOTE</bf>: Please note that this opens a security hole in your system.
+</caption>
+</figure>
+
+If the tradeoff is acceptable:
 
 <tscreen><verb>
 $ su 
@@ -1495,6 +1506,10 @@ $ su
 # exit
 $
 </verb></tscreen>
+
+<bf>NOTE</bf>:  Making this change will affect your ability to run
+<bf>mythfrontend</bf> within <bf>gdb</bf> for debugging purposes.  If you
+need to debug, you will need to run as root.
 
 <sect2>Frontend-only configuration <label id="frontend-only">
 <p>Since MythTV uses a client/server architecture, multiple frontend

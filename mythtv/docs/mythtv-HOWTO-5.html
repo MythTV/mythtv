@@ -369,8 +369,17 @@ the MythTV directory that you <CODE>cd</CODE>'d to above.</CAPTION>
 
 <P>MythTV supports real-time scheduling of the video output thread if it is
 installed SUID root.</P>
-<P>This is an optional, but recommended step.  It can make the video display
-more smoothly.</P>
+<P>This is an optional, but recommended step, if you understand the potential
+negative impact.  As a positive, It can make the video display more
+smoothly, especially if you are decoding HDTV.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: Please note that this opens a security hole in your system.</CAPTION>
+</FIGURE>
+</P>
+<P>If the tradeoff is acceptable:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -381,6 +390,9 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>:  Making this change will affect your ability to run
+<B>mythfrontend</B> within <B>gdb</B> for debugging purposes.  If you
+need to debug, you will need to run as root.</P>
 
 <H3><A NAME="frontend-only"></A> Frontend-only configuration </H3>
 

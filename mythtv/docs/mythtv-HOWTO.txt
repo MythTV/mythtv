@@ -1972,8 +1972,15 @@
   MythTV supports real-time scheduling of the video output thread if it
   is installed SUID root.
 
-  This is an optional, but recommended step.  It can make the video
-  display more smoothly.
+  This is an optional, but recommended step, if you understand the
+  potential negative impact.  As a positive, It can make the video
+  display more smoothly, especially if you are decoding HDTV.
+
+
+
+    [1mNOTE[22m: Please note that this opens a security hole in your system.
+
+  If the tradeoff is acceptable:
 
 
 
@@ -1982,6 +1989,11 @@
        # exit
        $
 
+
+
+  [1mNOTE[22m:  Making this change will affect your ability to run [1mmythfrontend[0m
+  within [1mgdb [22mfor debugging purposes.  If you need to debug, you will
+  need to run as root.
 
 
   [1m5.5.2.  Frontend-only configuration[0m
@@ -2028,6 +2040,8 @@
        # emerge --sync # make sure portage is up to date.
        # vi /etc/make.conf
 
+
+
   Add mysql to your USE variable.  i.e. USE="mysql ...."
 
 
@@ -2070,8 +2084,6 @@
 
        # /sbin/chkconfig mysqld on
        # /sbin/service mysqld start
-
-
 
   [1m6.3.  Gentoo[0m
 
@@ -2139,10 +2151,9 @@
   all, and allows access from any host.
 
 
-
-  $ mysql -u root mythconverg
-  mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
-  mysql> flush privileges;
+       $ mysql -u root mythconverg
+       mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+       mysql> flush privileges;
 
 
 
@@ -2189,7 +2200,6 @@
 
   There are two ways to do this.  Graphically, and from the command
   line.
-
 
   [1m7.1.  Graphically setting up the mixer[0m
 
@@ -2257,7 +2267,6 @@
   Download the development release (0.9.x) from the ALSA web site
   http://www.alsa-project.org <http://www.alsa-project.org>.  You need
   at least three files:
-
   +o  alsa-driver-0.9.x.tar.bz2
 
   +o  alsa-lib-0.9.x.tar.bz2
@@ -2267,9 +2276,9 @@
   Start with the alsa-driver package:
 
 
-  $ tar -xjf alsa-driver-0.9.x.tar.bz2
-  $ cd alsa-driver-0.9.x
-  $ ./configure --with-cards=XXX --with-sequencer=yes
+       $ tar -xjf alsa-driver-0.9.x.tar.bz2
+       $ cd alsa-driver-0.9.x
+       $ ./configure --with-cards=XXX --with-sequencer=yes
 
 
 
@@ -2316,26 +2325,25 @@
        $ su
        # make install
 
-
-
   Next, you must edit /etc/modules.conf so that the ALSA modules are
   loaded automatically. The first step is to remove your old OSS
   configuration to ensure that you don't end up with mysterious
   conflicts in the future.  You should end up with a /etc/modules.conf
   file that has this configuration:
 
-  alias char-major-116 snd
-  alias snd-card-0 snd-XXX
-  # module options should go here
-  # OSS/Free portion
-  alias char-major-14 soundcore
-  alias sound-slot-0 snd-card-0
-  # card #1
-  alias sound-service-0-0 snd-mixer-oss
-  alias sound-service-0-1 snd-seq-oss
-  alias sound-service-0-3 snd-pcm-oss
-  alias sound-service-0-8 snd-seq-oss
-  alias sound-service-0-12 snd-pcm-oss
+
+       alias char-major-116 snd
+       alias snd-card-0 snd-XXX
+       # module options should go here
+       # OSS/Free portion
+       alias char-major-14 soundcore
+       alias sound-slot-0 snd-card-0
+       # card #1
+       alias sound-service-0-0 snd-mixer-oss
+       alias sound-service-0-1 snd-seq-oss
+       alias sound-service-0-3 snd-pcm-oss
+       alias sound-service-0-8 snd-seq-oss
+       alias sound-service-0-12 snd-pcm-oss
 
 
 
@@ -2380,10 +2388,7 @@
 
        $ aplay /usr/share/sounds/info.wav
 
-
-
   If it works, you're done installing ALSA!
-
 
 
   [1m7.2.  Setting the mixer from the command line[0m
@@ -2445,7 +2450,6 @@
   [1mlirc [22mhandles the IR hardware and passes keystrokes to MythTV, which
   then acts as if the user had pressed the keys on the keyboard.  The
   file keys.txt describes the keys used to control MythTV.
-
 
 
           [1mNOTE[22m:If you are running Mandrake 9.1, you may install
