@@ -18,6 +18,9 @@ CREATE TABLE IF NOT EXISTS credits
     KEY person (person, role)
 ) TYPE=MyISAM;
 
+alter table credits drop index chanid;
+alter table credits add unique index (chanid,starttime,person);
+
 ALTER TABLE program ADD COLUMN previouslyshown TINYINT NOT NULL default '0';
 
 ALTER TABLE videosource ADD COLUMN userid VARCHAR(128) NOT NULL default '';

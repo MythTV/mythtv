@@ -252,11 +252,25 @@ void MythContext::KickDatabase(QSqlDatabase *db)
     }
 }
 
-void MythContext::DBError(QString where, const QSqlQuery& query) {
-    cerr << "DB Error (" << where << "):\n"
-         << "Query was:" << endl
+void MythContext::DBError(QString where, const QSqlQuery& query) 
+{
+    if(query.lastError().type())
+    {
+        cerr << "DB Error (" << where << "):" << endl;
+    }
+    else
+    {
+        cerr << "MythContext::DBError() saw non-error in "
+             << where << ":" << endl;
+    }
+
+    cerr << "Query was:" << endl
          << query.lastQuery() << endl
-         << "Driver error was:" << endl
+         << "Driver error was ["
+             << query.lastError().type()
+             << "/"
+             << query.lastError().number()
+         << "]:" << endl
          << query.lastError().driverText() << endl
          << "Database error was:" << endl
          << query.lastError().databaseText() << endl;
