@@ -25,6 +25,7 @@
 #include "osdtypes.h"
 #include "ttfont.h"
 #include <qcolor.h>
+#include <qptrlist.h>
 
 class OSDListBtnTypeItem;
 
