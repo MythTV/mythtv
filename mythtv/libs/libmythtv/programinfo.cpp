@@ -870,11 +870,11 @@ int ProgramInfo::getRecordID(QSqlDatabase *db)
 
 bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 {
+    if (rectype == kFindOneRecord)
+        return recordid == other.recordid;
+
     if (title != other.title)
         return false;
-
-    if (rectype == kFindOneRecord)
-        return true;
 
     if (findid && other.findid)
         return findid == other.findid;
