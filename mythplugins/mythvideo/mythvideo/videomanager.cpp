@@ -543,7 +543,7 @@ void VideoManager::ParseMovieData(QString data)
     else 
         movieYear = mYear.toInt();
  
-    movieDirector = parseData(data, ">Directed by</b><br>\n<a href=\"/name/nm?", "</a><br>");
+    movieDirector = parseData(data, ">Directed by</b><br>\n<a href=\"/name/nm", "</a><br>");
     if (movieDirector != "<NULL>")
         movieDirector = movieDirector.right(movieDirector.length() - movieDirector.find("\">") - 2);
     moviePlot = parseData(data, "<b class=\"ch\">Plot Outline:</b> ", "<a href=\"");
