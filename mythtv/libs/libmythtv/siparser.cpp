@@ -2207,9 +2207,8 @@ void SIParser::ParseVCT(tablehead_t* head, uint8_t* buffer, int size)
 
         pos += (32 + descriptors_length);
 
-        /* Do not add in minor_channel 0 since its the analog version */
-        if (minor_channel_number != 0)
-            ((ServiceHandler*) Table[SERVICES])->Services[0][s.ServiceID] = s;
+        /* TODO: Need different method to detect analog channels in the VCT */
+        ((ServiceHandler*) Table[SERVICES])->Services[0][s.ServiceID] = s;
         s.Reset();
 
     }
