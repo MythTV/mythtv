@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.22 (xris)
+#Last Updated: 2005.01.23 (xris)
 #
 #  mythtv::nuvinfo.pm
 #
@@ -123,7 +123,7 @@ package mythtv::nuvinfo;
     # Set the is_mpeg flag
         $info{'is_mpeg'} = 1;
     # Grab the info we want from mplayer (go uber-verbose to override --really-quiet)
-        my $data = `$program -v -v -v -v -vo null -ao null -frames 0 -identify '$file' 2>/dev/null`;
+        my $data = `$program -v -v -v -v -nolirc -nojoystick -vo null -ao null -frames 0 -identify '$file' 2>/dev/null`;
         study $data;
         ($info{'video_type'})            = $data =~ m/^VIDEO:\s*(MPEG[12])/m;
         ($info{'width'})                 = $data =~ m/^ID_VIDEO_WIDTH=(\d+)/m;
