@@ -212,6 +212,23 @@ int RunMenu(QString themedir, MythContext *context)
     return exitstatus;
 }   
 
+void WriteDefaults(MythContext* context, QSqlDatabase* db) {
+    // If any settings are missing from the database, this will write
+    // the default values
+    PlaybackSettings ps(context);
+    ps.load(db);
+    ps.save(db);
+    GeneralSettings gs(context);
+    gs.load(db);
+    gs.save(db);
+    EPGSettings es(context);
+    es.load(db);
+    es.save(db);
+    ThemeSettings ts(context);
+    ts.load(db);
+    ts.save(db);
+}
+
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
@@ -243,6 +260,8 @@ int main(int argc, char **argv)
     context->LoadQtConfig();
 
     qApp->unlock();
+
+    WriteDefaults(context, db);
 
     int exitstatus = RunMenu(themedir, context);
 
