@@ -1279,7 +1279,6 @@ void NuppelVideoPlayer::InitAVSync(void)
             warpfactor_avg = 1;
 
         warpfactor = warpfactor_avg;
-        avsync_oldavg = 0;
     }
 
     refreshrate = videoOutput->GetRefreshRate();
@@ -1487,6 +1486,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     delay = 0;
     avsync_delay = 0;
     avsync_avg = 0;
+    avsync_oldavg = 0;
 
     delay_clipping = false;
 
