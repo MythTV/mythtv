@@ -5,6 +5,7 @@
       <text>General Settings</text>
       <text lang="ES">Opciones Generales</text>
       <text lang="CA">Opcions Generals</text>
+      <text lang="DK">Generelle indstillinger</text>
       <action>SETTINGS_GENERAL</action>
    </button>
 
@@ -13,6 +14,7 @@
       <text>Player Settings</text>
       <text lang="ES">Opciones de reproducción</text>
       <text lang="CA">Opcions de reproducció</text>
+      <text lang="DK">Afspiller indstillinger</text>
       <action>SETTINGS_PLAYER</action>
    </button>
 

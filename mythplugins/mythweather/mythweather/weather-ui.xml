@@ -92,6 +92,7 @@
         <value lang="ES">Cargando...</value>
         <value lang="CA">Carregant�...</value>
         <value lang="NL">Bezig laden...</value>
+        <value lang="DK">Indlæser...</value>
       </textarea>
       <textarea name="retrieve" draworder="3" align="center">
         <font>timedate</font>
@@ -100,6 +101,7 @@
         <value lang="ES">[ obteniendo datos meteorológicos ... ]</value>
         <value lang="CA">[ recuperant dades meteorològiques ... ]</value>
         <value lang="NL">[ bezig ophalen weerbericht ... ]</value>
+        <value lang="DK">[ henter vejr data ... ]</value>
       </textarea>
     </container>
 
@@ -159,6 +161,7 @@
         <value lang="ES">el tiempo ahora</value>
         <value lang="CA">dades actuals</value>
         <value lang="NL">vandaag</value>
+        <value lang="DK">Nuværende forhold</value>
       </textarea>
       <textarea name="humiditylbl" draworder="5">
         <context>1</context>
@@ -168,6 +171,7 @@
         <value lang="ES">Humedad</value>
         <value lang="CA">Humitat</value>
         <value lang="NL">Vochtigheid</value>
+        <value lang="DK">Luftfugtighed</value>
       </textarea>
       <textarea name="humidity" draworder="5" align="right">
         <context>1</context>
@@ -182,6 +186,7 @@
         <value lang="ES">Presión</value>
         <value lang="CA">Pressió</value>
         <value lang="NL">Luchtdruk</value>
+        <value lang="DK">Lufttryk</value>
       </textarea>
       <textarea name="barometer" draworder="5" align="right">
         <context>1</context>
@@ -196,6 +201,7 @@
         <value lang="ES">Viento</value>
         <value lang="CA">Vent</value>
         <value lang="NL">Wind</value>
+        <value lang="DK">Vind</value>
       </textarea>
       <textarea name="winddata" draworder="5" align="right">
         <context>1</context>
@@ -209,7 +215,7 @@
         <value>Visibility</value>
         <value lang="ES">Visibilidat</value>
         <value lang="CA">Visibilitat</value>
-        <value lang="NL">Zichtbaarheid</value>
+        <value lang="DK">Sigtbarhed</value>
       </textarea>
       <textarea name="visibility" draworder="5" align="right">
         <context>1</context>
@@ -224,6 +230,7 @@
         <value lang="ES">Sensación</value>
         <value lang="CA">Sensació</value>
         <value lang="NL">Lucht Koelte</value>
+        <value lang="DK">Vindafkølet luft</value>
       </textarea>
       <textarea name="windchill" draworder="5" align="right">
         <context>1</context>
@@ -238,6 +245,7 @@
         <value lang="ES">Radiación solar (UV)</value>
         <value lang="CA">Radiació solar (UV)</value>
         <value lang="NL">UV Index</value>
+        <value lang="DK">UV Indeks</value>
       </textarea>
       <textarea name="uvlevel" draworder="5" align="right">
         <context>1</context>
@@ -288,6 +296,7 @@
         <value lang="ES">próximos días</value>
         <value lang="CA">propers dies</value>
         <value lang="NL">komende dagen</value>
+        <value lang="DK">De kommende dage</value>
       </textarea>
       <textarea name="date1" draworder="5" align="center">
         <context>2</context>
@@ -313,6 +322,7 @@
         <value lang="ES">MIN</value>
         <value lang="CA">MIN</value>
         <value lang="NL">MIN</value>
+        <value lang="DK">MIN</value>
       </textarea>
       <textarea name="hilbl1" draworder="5" align="center">
         <context>2</context>
@@ -322,6 +332,7 @@
         <value lang="CA">MAX</value>
         <value lang="ES">MAX</value>
         <value lang="NL">MAX</value>
+        <value lang="DK">MAX</value>
       </textarea>
       <textarea name="low1" draworder="5" align="center">
         <context>2</context>
@@ -359,6 +370,7 @@
         <value lang="ES">MIN</value>
         <value lang="CA">MIN</value>
         <value lang="NL">MIN</value>
+        <value lang="DK">MIN</value>
       </textarea>
       <textarea name="hilbl2" draworder="5" align="center">
         <context>2</context>
@@ -368,6 +380,7 @@
         <value lang="ES">MAX</value>
         <value lang="CA">MAX</value>
         <value lang="NL">MAX</value>
+        <value lang="DK">MAX</value>
       </textarea>
       <textarea name="low2" draworder="5" align="center">
         <context>2</context>
@@ -405,6 +418,7 @@
         <value lang="ES">MIN</value>
         <value lang="CA">MIN</value>
         <value lang="NL">MIN</value>
+        <value lang="DK">MIN</value>
       </textarea>
       <textarea name="hilbl3" draworder="5" align="center">
         <context>2</context>
@@ -414,6 +428,7 @@
         <value lang="ES">MAX</value>
         <value lang="CA">MAX</value>
         <value lang="NL">MAX</value>
+        <value lang="DK">MAX</value>
       </textarea>
       <textarea name="low3" draworder="5" align="center">
         <context>2</context>
@@ -448,6 +463,7 @@
         <value lang="ES">previsión para hoy</value>
         <value lang="CA">previsió per a avui</value>
         <value lang="NL">vandaag</value>
+        <value lang="DK">Dagens vejrudsigt</value>
       </textarea>
       <textarea name="updatetime-3" draworder="5">
         <context>3</context>
@@ -482,6 +498,7 @@
         <value lang="ES">previsión para mañana</value>
         <value lang="CA">previsió per demà</value>
         <value lang="NL">morgen</value>
+        <value lang="DK">Smugkig p� i morgen</value>
       </textarea>
       <textarea name="forecastlbl" draworder="5">
         <context>4</context>
@@ -491,6 +508,7 @@
         <value lang="ES">Previsión para el</value>
         <value lang="ES">Previsió per al</value>
         <value lang="NL">Verwachtingen voor</value>
+        <value lang="NL">Vejrudsigt for</value>
       </textarea>
       <textarea name="forecastdate" draworder="5">
         <context>4</context>
@@ -534,6 +552,7 @@
         <value lang="ES">Imagen del radar</value>
         <value lang="CA">Imatge del radar</value>
         <value lang="NL">Doppler Radar</value>
+        <value lang="DK">Doppler Radar</value>
       </textarea>
       <textarea name="err1" draworder="5" align="center">
         <context>5</context>
@@ -543,6 +562,7 @@
         <value lang="ES">Mapa no disponible</value>
         <value lang="CA">Mapa no disponible</value>
         <value lang="NL">Weerkaart niet beschikbaar</value>
+        <value lang="DK">Kortet er ikke tilg�ngeligt</value>
       </textarea>
       <image name="radarbk" draworder="4">
         <context>5</context>
@@ -588,6 +608,7 @@
         <value lang="ES">Configuración de "El Tiempo"</value>
         <value lang="CA">Configuració de "El Temps"</value>
         <value lang="NL">Configuratie "Het Weer"</value>
+        <value lang="DK">Vejr ops�tning"</value>
       </textarea>
       <textarea name="help" draworder="7" align="center">
         <font>weatherdata</font>
@@ -611,6 +632,7 @@
         <value lang="ES">Para guardar, pulse 'i' - para cancelar, para cancelar salga</value>
         <value lang="CA">Per a guardar, premi 'i' - per cancel-lar, surti</value>
         <value lang="NL">Druk 'i' om op te slaan - druk escape om te annuleren</value>
+        <value lang="DK">Gem med 'i' - afbryd med ESCape</value>
         <area>47,350,200,150</area>
         <multiline>yes</multiline>
       </textarea>

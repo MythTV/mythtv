@@ -5,6 +5,7 @@
      <text>Browse Videos</text>
      <text lang="ES">Ver vídeos</text>
      <text lang="CA">Veure vídeos</text>
+     <text lang="DK">Gennemse film</text>
      <action>BROWSER</action>
    </button>
 
@@ -13,6 +14,7 @@
      <text>Video List</text>
      <text lang="ES">Listar vídeos</text>
      <text lang="CA">Llistar vídeos</text>
+     <text lang="DK">Film oversigt</text>
      <action>LISTING</action>
    </button>
 
@@ -21,6 +23,7 @@
      <text>Video Manager</text>
      <text lang="ES">Gestionar vídeos</text>
      <text lang="CA">Gestionar vídeos</text>
+     <text lang="DK">Film opsætning</text>
      <action>MANAGER</action>
    </button>
   

@@ -93,6 +93,7 @@
         <value>Directed by</value>
         <value lang="ES">Director</value>
         <value lang="CA">Director</value>
+        <value lang="DK">Instruktør:</value>
       </textarea>
       <textarea name="director" draworder="4">
         <area>166,80,350,35</area>
@@ -104,6 +105,7 @@
         <value>Year:</value>
         <value lang="ES">Año:</value>
         <value lang="CA">Any:</value>
+        <value lang="DK">Udgivet:</value>
       </textarea>
       <textarea name="year" draworder="4">
         <area>660,90,100,45</area>
@@ -115,6 +117,7 @@
         <value>Rated:</value>
         <value lang="ES">Clasificación:</value>
         <value lang="CA">Classificació:</value>
+        <value lang="DK">Klassifikation:</value>
       </textarea>
       <textarea name="rating" draworder="4">
         <area>170,120,600,35</area>
@@ -126,6 +129,7 @@
         <value>Parental Level:</value>
         <value lang="ES">Nivel de acceso:</value>
         <value lang="CA">Nivell d'accés:</value>
+        <value lang="DK">Voksen niveau:</value>
       </textarea>
       <textarea name="level" draworder="4">
         <area>680,150,350,35</area>
@@ -137,6 +141,7 @@
         <value>Runtime:</value>
         <value lang="ES">Duración:</value>
         <value lang="CA">Duració:</value>
+        <value lang="DK">Længde:</value>
       </textarea>
       <textarea name="length" draworder="4">
         <area>170,150,350,35</area>
@@ -148,6 +153,7 @@
         <value>Plot:</value>
         <value lang="ES">Resumen:</value>
         <value lang="CA">Resum:</value>
+        <value lang="DK">Resumé:</value>
       </textarea>
       <textarea name="plot" draworder="4">
         <area>170,180,600,35</area>
@@ -159,6 +165,7 @@
         <value>Filename:</value>
         <value lang="ES">Nombre del archivo:</value>
         <value lang="CA">Nom de l'arxiu:</value>
+        <value lang="DK">Filnavn:</value>
       </textarea>
       <textarea name="filename" draworder="4">
         <area>170,210,600,35</area>
@@ -170,6 +177,7 @@
         <value>Cover File:</value>
         <value lang="ES">Carátula:</value>
         <value lang="CA">Caràtula:</value>
+        <value lang="DK">Omslagsfil:</value>
       </textarea>
       <textarea name="coverfile" draworder="4">
         <area>170,240,600,35</area>
@@ -217,6 +225,7 @@
         <value>retrieving data...</value>
         <value lang="ES">obteniendo información...</value>
         <value lang="CA">obtenient informació...</value>
+        <value lang="DK">Henter information...</value>
       </textarea>
       <textarea name="finder" draworder="0" align="center">
         <area>0,270,800,60</area>
@@ -224,6 +233,7 @@
         <value>[ looking for ]</value>
         <value lang="ES">[ buscando ]</value>
         <value lang="CA">[ cercant ]</value>
+        <value lang="DK">[ leder efter ]</value>
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>
@@ -262,6 +272,7 @@
         <value>Enter IMDB #</value>
         <value lang="ES">Introducir IMDB #</value>
         <value lang="CA">IntroduÏr IMDB #</value>
+        <value lang="DK">Indtast IMDB #</value>
         <area>0,15,360,25</area>
       </textarea>
       <textarea name="numhold" draworder="7" align="center">
@@ -278,6 +289,7 @@
         <value>loading...</value>
         <value lang="ES">cargando...</value>
         <value lang="CA">carregant...</value>
+        <value lang="DK">Indlæser...</value>
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>
@@ -292,6 +304,7 @@
          <value>No Videos Found</value>
          <value lang="ES">No encuentro vídeos</value>
          <value lang="CA">No trovo vídeos</value>
+         <value lang="DK">Ingen videoer fundet</value>
          <multiline>yes</multiline> 
       </textarea>
     </container>
@@ -386,6 +399,7 @@
         <value>Use the left and right arrows</value>
         <value lang="ES">Cursor izq/der para navegar</value>
         <value lang="CA">Cursor esq/dreta per navegar</value>
+        <value lang="DK">Brug venstre og højre piletast</value>
       </textarea>
       <textarea name="currentvideo" draworder="3" align="center">
         <area>10,64,500,35</area>
@@ -405,6 +419,7 @@
         <value>Directed by</value>
         <value lang="ES">Director</value>
         <value lang="CA">Director</value>
+        <value lang="DK">Instrueret af:</value>
       </textarea>
       <textarea name="director" draworder="4">
         <area>166,80,350,35</area>
@@ -416,6 +431,7 @@
         <value>Year:</value>
         <value lang="ES">Año:</value>
         <value lang="CA">Any:</value>
+        <value lang="DK">Udgivet:</value>
       </textarea>
       <textarea name="year" draworder="4">
         <area>680,90,100,45</area>
@@ -427,6 +443,7 @@
         <value>Plot:</value>
         <value lang="ES">Resumen:</value>
         <value lang="CA">Resum:</value>
+        <value lang="DK">Resumé:</value>
       </textarea>
       <textarea name="plot" draworder="4">
         <area>240,150,500,105</area>
@@ -439,6 +456,7 @@
         <value>Rated:</value>
         <value lang="ES">Clasificación:</value>
         <value lang="CA">Classificació:</value>
+        <value lang="DK">Klassifikation:</value>
       </textarea>
       <textarea name="rating" draworder="4">
         <area>240,285,500,90</area>
@@ -451,6 +469,7 @@
         <value>Runtime:</value>
         <value lang="ES">Duración:</value>
         <value lang="CA">Duració:</value>
+        <value lang="DK">Længde:</value>
       </textarea>
       <textarea name="length" draworder="4">
         <area>240,405,350,35</area>
@@ -470,6 +489,7 @@
         <value>loading...</value>
         <value lang="ES">cargando...</value>
         <value lang="CA">carregant...</value>
+        <value lang="DK">Indl�ser...</value>
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>
@@ -484,6 +504,7 @@
          <value>No Videos Found</value>
          <value lang="ES">No encuentro vídeos</value>
          <value lang="CA">No trovo vídeos</value>
+         <value lang="DK">Ingen videoer fundet</value>
          <multiline>yes</multiline>
       </textarea>
     </container>
@@ -588,11 +609,13 @@
                 <area>30,153,90,40</area>
                 <font>labelfont</font>
                 <value>File:</value>
+                <value lang="DK">Fil:</value>
             </textarea>
             <textarea name="player_label" draworder="0" align="right">
                 <area>30,196,90,40</area>
                 <font>labelfont</font>
                 <value>Player:</value>
+                <value lang="DK">Afspiller:</value>
             </textarea>
             <textarea name="video_file" draworder="0">
                 <area>130,155,380,40</area>
