@@ -1,6 +1,8 @@
 #ifndef CC_H
 #define CC_H
 
+#include <qstring.h>
+
 #define CC_VBIBUFSIZE 65536
 
 //cc is 32 columns per row, this allows for extra characters
@@ -12,7 +14,7 @@ struct cc
     char buffer[CC_VBIBUFSIZE];
     int lastcode;
     int ccmode;	// 0=cc1 or 1=cc2
-    char ccbuf[2][CC_BUFSIZE];
+    QString ccbuf[2];
 };
 
 int cc_decode(unsigned char *vbiline);

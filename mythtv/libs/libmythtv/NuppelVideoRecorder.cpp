@@ -17,10 +17,10 @@ using namespace std;
 
 #include "NuppelVideoRecorder.h"
 #include "commercial_skip.h"
+#include "../libvbitext/cc.h"
 
 extern "C" {
 #include "../libvbitext/vbi.h"
-#include "../libvbitext/cc.h"
 }
 
 #include <linux/videodev.h>
@@ -33,6 +33,14 @@ extern "C" {
 
 #include "RingBuffer.h"
 #include "RTjpegN.h"
+
+#ifdef HAVE_V4L2
+#ifdef V4L2_CAP_VIDEO_CAPTURE
+#define USING_V4L2 1
+#else
+#warning old broken version of v4l2 detected.
+#endif
+#endif
 
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -130,6 +138,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     origaudio = new struct video_audio;
 
     memset(&subtitle, 0, sizeof(subtitle));
+
+    usingv4l2 = false;
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -650,16 +660,11 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-#ifdef V4L2
-    struct v4l2_capability vcap;
-    struct v4l2_format     vfmt;
-    struct v4l2_buffer     vbuf;
-    struct v4l2_requestbuffers vrbuf;
+#ifdef USING_V4L2
+    usingv4l2 = true;
 
+    struct v4l2_capability vcap;
     memset(&vcap, 0, sizeof(vcap));
-    memset(&vfmt, 0, sizeof(vfmt));
-    memset(&vbuf, 0, sizeof(vbuf));
-    memset(&vrbuf, 0, sizeof(vrbuf));
 
     if (ioctl(fd, VIDIOC_QUERYCAP, &vcap) < 0)
     {
@@ -667,128 +672,25 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    if (vcap.type != V4L2_TYPE_CAPTURE)
+    if (!(vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
     {
         printf("Not a capture device\n");
-        exit(0);
+        usingv4l2 = false;
     }
 
-    if (!(vcap.flags & V4L2_FLAG_STREAMING) ||
-        !(vcap.flags & V4L2_FLAG_SELECT))
+    if (!(vcap.capabilities & V4L2_CAP_STREAMING))
     {
         printf("Won't work with the streaming interface, failing\n");
-        exit(0);
+        usingv4l2 = false;
     }
 
-    vfmt.type = V4L2_BUF_TYPE_CAPTURE;
-    vfmt.fmt.pix.width = w;
-    vfmt.fmt.pix.height = h;
-    vfmt.fmt.pix.depth = 12;
-    vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
-    vfmt.fmt.pix.flags = V4L2_FMT_FLAG_INTERLACED;
-
-    if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
+    if (usingv4l2)
     {
-        printf("Unable to set desired format\n");
-        exit(0);
+        DoV4L2();
+        return;
     }
+#endif
 
-    int numbuffers = 2;
-    
-    vrbuf.type = V4L2_BUF_TYPE_CAPTURE;
-    vrbuf.count = numbuffers;
-
-    if (ioctl(fd, VIDIOC_REQBUFS, &vrbuf) < 0)
-    {
-        printf("Not able to get any capture buffers\n");
-        exit(0);
-    }
-
-    unsigned char *buffers[numbuffers];
-    int bufferlen[numbuffers];
-
-    for (int i = 0; i < numbuffers; i++)
-    {
-        vbuf.type = V4L2_BUF_TYPE_CAPTURE;
-        vbuf.index = i;
-
-        if (ioctl(fd, VIDIOC_QUERYBUF, &vbuf) < 0)
-        {
-            printf("unable to query capture buffer %d\n", i);
-            exit(0);
-        }
-
-        buffers[i] = (unsigned char *)mmap(NULL, vbuf.length,
-                                           PROT_READ|PROT_WRITE, MAP_SHARED,
-                                           fd, vbuf.offset);
-        bufferlen[i] = vbuf.length;
-    }
-
-    for (int i = 0; i < numbuffers; i++)
-    {
-        memset(buffers[i], 0, bufferlen[i]);
-        vbuf.type = V4L2_BUF_TYPE_CAPTURE;
-        vbuf.index = i;
-        ioctl(fd, VIDIOC_QBUF, &vbuf);
-    }
-
-    int turnon = V4L2_BUF_TYPE_CAPTURE;
-    ioctl(fd, VIDIOC_STREAMON, &turnon);
-
-    struct timeval tv;
-    fd_set rdset;
-    int frame = 0;
-
-    encoding = true;
-    recording = true;
-
-    struct timeval startt, nowt;
-    while (encoding) {
-        if (paused)
-        {
-            mainpaused = true;
-            usleep(50);
-            if (cleartimeonpause)
-                gettimeofday(&stm, &tzone);
-            continue;
-        }
-again:
-        tv.tv_sec = 5;
-        tv.tv_usec = 0;
-        FD_ZERO(&rdset);
-        FD_SET(fd, &rdset);
-
-        switch (select(fd+1, &rdset, NULL, NULL, &tv))
-        {
-            case -1:
-                  if (errno == EINTR)
-                      goto again;
-                  perror("select");
-                  continue;
-            case 0:
-                  printf("select timeout\n");
-                  continue;
-           default: break;
-        }
-
-        memset(&vbuf, 0, sizeof(vbuf));
-        vbuf.type = V4L2_BUF_TYPE_CAPTURE;
-        ioctl(fd, VIDIOC_DQBUF, &vbuf);
-
-        frame = vbuf.index;
-        BufferIt(buffers[frame], video_buffer_size);
-    
-        vbuf.type = V4L2_BUF_TYPE_CAPTURE;
-        ioctl(fd, VIDIOC_QBUF, &vbuf);
-    }
-
-    ioctl(fd, VIDIOC_STREAMOFF, &turnon);
-
-    munmap(buffers[0], bufferlen[frame]);
-    munmap(buffers[1], bufferlen[frame]);
-
-#else
-    
     struct video_capability vc;
     struct video_mmap mm;
     struct video_mbuf vm;
@@ -939,7 +841,142 @@ again:
     }
 
     munmap(buf, vm.size);
+
+    KillChildren();
+
+    if (!livetv)
+        WriteSeekTable(false);
+
+    recording = false;
+    close(fd);
+}
+
+void NuppelVideoRecorder::DoV4L2(void)
+{
+#ifdef USING_V4L2
+    struct v4l2_format     vfmt;
+    struct v4l2_buffer     vbuf;
+    struct v4l2_requestbuffers vrbuf;
+
+    memset(&vfmt, 0, sizeof(vfmt));
+    memset(&vbuf, 0, sizeof(vbuf));
+    memset(&vrbuf, 0, sizeof(vrbuf));
+
+    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    vfmt.fmt.pix.width = w;
+    vfmt.fmt.pix.height = h;
+    vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
+    vfmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
+
+    if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
+    {
+        printf("Unable to set desired format\n");
+        exit(0);
+    }
+
+    int numbuffers = 5;
+
+    vrbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    vrbuf.memory = V4L2_MEMORY_MMAP;
+    vrbuf.count = numbuffers;
+
+    if (ioctl(fd, VIDIOC_REQBUFS, &vrbuf) < 0)
+    {
+        printf("Not able to get any capture buffers\n");
+        exit(0);
+    }
+
+    unsigned char *buffers[numbuffers];
+    int bufferlen[numbuffers];
+
+    for (int i = 0; i < numbuffers; i++)
+    {
+        vbuf.type = vrbuf.type;
+        vbuf.index = i;
+
+        if (ioctl(fd, VIDIOC_QUERYBUF, &vbuf) < 0)
+        {
+            printf("unable to query capture buffer %d\n", i);
+            exit(0);
+        }
+
+        buffers[i] = (unsigned char *)mmap(NULL, vbuf.length,
+                                           PROT_READ|PROT_WRITE, MAP_SHARED,
+                                           fd, vbuf.m.offset);
+
+        if (buffers[i] == MAP_FAILED)
+        {
+            perror("mmap");
+            exit(-1);
+        }
+        bufferlen[i] = vbuf.length;
+    }
+
+    for (int i = 0; i < numbuffers; i++)
+    {
+        memset(buffers[i], 0, bufferlen[i]);
+        vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        vbuf.index = i;
+        ioctl(fd, VIDIOC_QBUF, &vbuf);
+    }
+
+    int turnon = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    ioctl(fd, VIDIOC_STREAMON, &turnon);
+
+    struct timeval tv;
+    fd_set rdset;
+    int frame = 0;
+
+    encoding = true;
+    recording = true;
+
+    while (encoding) {
+        if (paused)
+        {
+            mainpaused = true;
+            usleep(50);
+            if (cleartimeonpause)
+                gettimeofday(&stm, &tzone);
+            continue;
+        }
+again:
+        tv.tv_sec = 5;
+        tv.tv_usec = 0;
+        FD_ZERO(&rdset);
+        FD_SET(fd, &rdset);
+
+        switch (select(fd+1, &rdset, NULL, NULL, &tv))
+        {
+            case -1:
+                  if (errno == EINTR)
+                      goto again;
+                  perror("select");
+                  continue;
+            case 0:
+                  printf("select timeout\n");
+                  continue;
+           default: break;
+        }
+
+        memset(&vbuf, 0, sizeof(vbuf));
+        vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        ioctl(fd, VIDIOC_DQBUF, &vbuf);
+
+        frame = vbuf.index;
+        BufferIt(buffers[frame], video_buffer_size);
+
+        vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        ioctl(fd, VIDIOC_QBUF, &vbuf);
+    }
+
+    ioctl(fd, VIDIOC_STREAMOFF, &turnon);
+
+    for (int i = 0; i < numbuffers; i++)
+    {
+        munmap(buffers[i], bufferlen[i]);
+    }
 #endif
+
     KillChildren();
 
     if (!livetv)
@@ -1133,10 +1170,8 @@ void NuppelVideoRecorder::KillChildren(void)
 {
     childrenLive = false;
    
-#ifndef V4L2
-    if (ioctl(fd, VIDIOCSAUDIO, origaudio) < 0)
+    if (!usingv4l2 && ioctl(fd, VIDIOCSAUDIO, origaudio) < 0)
         perror("VIDIOCSAUDIO");
-#endif
 
     pthread_join(write_tid, NULL);
     pthread_join(audio_tid, NULL);
@@ -1812,20 +1847,23 @@ void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle,
         // TODO: write textbuffer[act]
         //printf (" TODO: write textbuffer[act]\n");
         memset(subtitle, 0, sizeof(subtitle));
-        memset(cc->ccbuf, 0, 2 * CC_BUFSIZE);
+        cc->ccbuf[0] = "";
+        cc->ccbuf[1] = "";
         return;
     }
 
     b1 = data & 0x7f;
     b2 = (data >> 8) & 0x7f;
-    len = strlen (cc->ccbuf[cc->ccmode]);
+    len = cc->ccbuf[cc->ccmode].length();
 
     if (b1 & 0x60 && data != cc->lastcode)       // text
     {
-        cc->ccbuf[cc->ccmode][len++] = b1;
+        cc->ccbuf[cc->ccmode] += (char)b1;
+        len++;
         if (b2 & 0x60)
         {
-            cc->ccbuf[cc->ccmode][len++] = b2;
+            cc->ccbuf[cc->ccmode] += (char)b2;
+            len++;
         }
     }
     else if ((b1 & 0x10) && (b2 > 0x1F) && (data != cc->lastcode))
@@ -1833,18 +1871,24 @@ void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle,
         // ignore the second occurance)
     {
         cc->ccmode = (b1 >> 3) & 1;
-        len = strlen(cc->ccbuf[cc->ccmode]);
+        len = cc->ccbuf[cc->ccmode].length();
 
         if (b2 & 0x40)           //preamble address code (row & indent)
         {
             row = rowdata[((b1 << 1) & 14) | ((b2 >> 5) & 1)];
             subtitle->row = row;
             if (len != 0)
-                cc->ccbuf[cc->ccmode][len++] = '\n';
+            {
+                cc->ccbuf[cc->ccmode] += (char)'\n';
+                len++;
+            }
 
             if (b2 & 0x10)        //row contains indent flag
                 for (x = 0; x < (b2 & 0x0F) << 1; x++)
-                    cc->ccbuf[cc->ccmode][len++] = ' ';
+                {
+                    cc->ccbuf[cc->ccmode] += ' ';
+                    len++;
+                }
         }
         else
         {
@@ -1863,8 +1907,8 @@ void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle,
                            // TODO: we _do_ want colors, is that an attribute?
                            break;
                        case 0x30:      //special character..
-                           strcat(cc->ccbuf[cc->ccmode], 
-                                  specialchar[b2 & 0x0f]);
+                           cc->ccbuf[cc->ccmode] += specialchar[b2 & 0x0f];
+                           len = cc->ccbuf[cc->ccmode].length();
                            break;
                    }
                    break;
@@ -1874,7 +1918,8 @@ void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle,
                    switch (b2)
                    {
                        case 0x21:      //backspace
-                           cc->ccbuf[cc->ccmode][len--] = 0;
+                           cc->ccbuf[cc->ccmode].remove(len - 1, 1);
+                           len = cc->ccbuf[cc->ccmode].length();
                            break;
                        case 0x25:      //2 row caption
                            subtitle->rowcount = 2;
@@ -1886,7 +1931,7 @@ void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle,
                            subtitle->rowcount = 4;
                            break;
                        case 0x29:      //resume direct caption
-                           printf ("\nresume direct caption\n");
+                           //printf ("\nresume direct caption\n");
                            subtitle->resumedirect = 1;
                            break;
                        case 0x2B:      //resume text display
@@ -1914,7 +1959,8 @@ void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle,
                            memcpy(textbuffer[act]->buffer, subtitle,
                                   sizeof(ccsubtitle));
                            memcpy((char *)textbuffer[act]->buffer +
-                                  sizeof(ccsubtitle), cc->ccbuf[cc->ccmode],
+                                  sizeof(ccsubtitle), 
+                                  cc->ccbuf[cc->ccmode].ascii(),
                                   subtitle->len);
                            textbuffer[act]->bufferlen = subtitle->len + 
                                                         sizeof(ccsubtitle);
@@ -1934,13 +1980,16 @@ void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle,
                        case 0x2A:      //text restart
                        case 0x2E:      //erase non-displayed memory
                            memset(subtitle, 0, sizeof(ccsubtitle));
-                           memset(cc->ccbuf[cc->ccmode], 0, CC_BUFSIZE);
+                           cc->ccbuf[cc->ccmode] = "";
                        break;
                    }
                    break;
                case 0x07:          //misc (TAB)
                    for (x = 0; x < (b2 & 0x03); x++)
-                       cc->ccbuf[cc->ccmode][len++] = ' ';
+                   {
+                       cc->ccbuf[cc->ccmode] += ' ';
+                       len++;
+                   }
                    break;
            }
         }
@@ -2057,9 +2106,11 @@ void NuppelVideoRecorder::doVbiThread(void)
         case 1:
             vbi_del_handler(vbi, (void*) vbi_event, &vbicallbackdata);
             vbi_close(vbi);
+            vbi = NULL;
             break;
         case 2:
              cc_close(cc);
+             cc = NULL;
              break;
         default:
              return;

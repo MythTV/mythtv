@@ -111,7 +111,8 @@ class NuppelVideoRecorder : public RecorderBase
 
     void WriteSeekTable(bool todumpfile);
 
-    void DoMJPEG();
+    void DoV4L2(void);
+    void DoMJPEG(void);
 
     void FormatTeletextSubtitles(struct VBIData *vbidata);
     void FormatCC(struct ccsubtitle *subtitle, struct cc *cc, int data);
@@ -254,6 +255,8 @@ class NuppelVideoRecorder : public RecorderBase
     bool cleartimeonpause;
 
     struct ccsubtitle subtitle;
+
+    bool usingv4l2;
 };
 
 #endif

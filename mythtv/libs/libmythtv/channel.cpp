@@ -250,10 +250,11 @@ bool Channel::TuneTo(const QString &chan, int finetune)
         struct v4l2_frequency vf;
         memset(&vf, 0, sizeof(vf));
         vf.frequency = frequency;
+        vf.type = V4L2_TUNER_ANALOG_TV;
 
         if (ioctl(videofd, VIDIOC_S_FREQUENCY, &vf) < 0)
         {
-            perror("channel set:");
+            perror("VIDIOC_S_FREQUENCY");
             return false;
         }
         return true;
@@ -262,7 +263,7 @@ bool Channel::TuneTo(const QString &chan, int finetune)
 
     if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
     {
-        perror("channel set:");
+        perror("VIDIOCSFREQ");
         return false;
     }
 
@@ -426,10 +427,10 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
     if (usingv4l2)
     {
         if (ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel) < 0)
-            perror("VIDIOC_S_INPUT:");
+            perror("VIDIOC_S_INPUT");
     
         if (ioctl(videofd, VIDIOC_S_STD, &videomode) < 0)
-            perror("VIDIOC_S_STD:");
+            perror("VIDIOC_S_STD");
     }
     else
 #endif
@@ -440,7 +441,7 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
         set.channel = newcapchannel;
         set.norm = videomode;
         if (ioctl(videofd, VIDIOCSCHAN, &set) < 0)
-           perror("VIDIOCSCHAN: ");
+           perror("VIDIOCSCHAN");
     }
 
     currentcapchannel = newcapchannel;
@@ -460,7 +461,7 @@ void Channel::SetContrast()
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT: ");
+        perror("VIDIOCGPICT");
         return;
     }
 
@@ -472,7 +473,7 @@ void Channel::SetContrast()
 
         if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
         {
-            perror("VIDIOCSPICT: ");
+            perror("VIDIOCSPICT");
             return;
         }
     }
@@ -487,7 +488,7 @@ void Channel::SetBrightness()
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT: ");
+        perror("VIDIOCGPICT");
         return;
     }
 
@@ -499,7 +500,7 @@ void Channel::SetBrightness()
 
         if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
         {
-            perror("VIDIOCSPICT: ");
+            perror("VIDIOCSPICT");
             return;
         }
     }
@@ -514,7 +515,7 @@ void Channel::SetColour()
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT: ");
+        perror("VIDIOCGPICT");
         return;
     }
 
@@ -526,7 +527,7 @@ void Channel::SetColour()
 
         if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
         {
-            perror("VIDIOCSPICT: ");
+            perror("VIDIOCSPICT");
             return;
         }
     }
@@ -548,7 +549,7 @@ int Channel::ChangeContrast(bool up)
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT: ");
+        perror("VIDIOCGPICT");
         return -1;
     }
     if (current_contrast < -1) // Couldn't get from database
@@ -585,7 +586,7 @@ int Channel::ChangeContrast(bool up)
 
     if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCSPICT: ");
+        perror("VIDIOCSPICT");
         return -1;
     }
 
@@ -606,7 +607,7 @@ int Channel::ChangeBrightness(bool up)
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT: ");
+        perror("VIDIOCGPICT");
         return -1;
     }
     if (current_brightness < -1) // Couldn't get from database
@@ -644,7 +645,7 @@ int Channel::ChangeBrightness(bool up)
 
     if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCSPICT: ");
+        perror("VIDIOCSPICT");
         return -1;
     }
 
@@ -665,7 +666,7 @@ int Channel::ChangeColour(bool up)
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT: ");
+        perror("VIDIOCGPICT");
         return -1;
     }
     if (current_colour < -1) // Couldn't get from database
@@ -702,7 +703,7 @@ int Channel::ChangeColour(bool up)
 
     if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCSPICT: ");
+        perror("VIDIOCSPICT");
         return -1;
     }
     

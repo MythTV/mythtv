@@ -13,5 +13,5 @@ QMAKE_CFLAGS_DEBUG = -g -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEF
 
 # Input
 HEADERS += cc.h dllist.h hamm.h lang.h vbi.h vt.h
-SOURCES += cc.c vbi.c hamm.c lang.c
+SOURCES += cc.cpp vbi.c hamm.c lang.c
 

@@ -177,7 +177,7 @@ struct cc *cc_open(const char *vbi_name)
 {
     struct cc *cc;
 
-    if (!(cc = malloc(sizeof(*cc))))
+    if (!(cc = new struct cc))
     {
 	printf("out of memory\n");
 	return 0;
@@ -192,7 +192,9 @@ struct cc *cc_open(const char *vbi_name)
 
     cc->lastcode = -1;
     cc->ccmode = 0;
-    memset(cc->ccbuf, 0, 2 * CC_BUFSIZE);
+
+    cc->ccbuf[0] = "";
+    cc->ccbuf[1] = "";
 
     return cc;
 }
@@ -200,7 +202,7 @@ struct cc *cc_open(const char *vbi_name)
 void cc_close(struct cc *cc)
 {
     close(cc->fd);
-    free(cc);
+    delete cc;
 }
 
 // returns:
@@ -218,6 +220,6 @@ int cc_handler(struct cc *cc)
     }
     else
     {
-        return decode(cc->buffer + (2048 * 11));
+        return decode((unsigned char *)(cc->buffer + (2048 * 11)));
     }
 }
