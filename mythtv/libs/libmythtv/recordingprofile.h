@@ -87,11 +87,11 @@ public:
         ConfigurationGroup* params = new VerticalConfigurationGroup();
         params->setLabel("MP3");
         params->addChild(new MP3Quality(parent));
-        codecName->addSelection("MP3");
         addTrigger("MP3", params);
+        codecName->addSelection("MP3");
 
-        codecName->addSelection("Uncompressed");
         addTrigger("Uncompressed", new VerticalConfigurationGroup());
+        codecName->addSelection("Uncompressed");
     };
 };
 
@@ -233,8 +233,8 @@ public:
 
         allParams->addChild(params);
 
-        codecName->addSelection("RTjpeg");
         addTrigger("RTjpeg", allParams);
+        codecName->addSelection("RTjpeg");
 
         allParams = new VerticalConfigurationGroup();
         allParams->setLabel("MPEG-4");
@@ -254,8 +254,8 @@ public:
 
         allParams->addChild(params);
 
-        codecName->addSelection("MPEG-4");
         addTrigger("MPEG-4", allParams);
+        codecName->addSelection("MPEG-4");
 
         allParams = new VerticalConfigurationGroup();
         allParams->setLabel("Hardware MJPEG");
@@ -266,8 +266,8 @@ public:
 
         allParams->addChild(params);
 
-        codecName->addSelection("Hardware MJPEG");
         addTrigger("Hardware MJPEG", allParams);
+        codecName->addSelection("Hardware MJPEG");
     };
 };
 
