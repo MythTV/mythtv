@@ -133,6 +133,7 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     camContrast = 32768;
     localClient = 0;
     txClient = 0;
+    wcDeliveredFrames = 0;
     txFps = atoi((const char *)gContext->GetSetting("TransmitFPS"));
     if (WebcamDevice.length() > 0)
     {
@@ -157,6 +158,9 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     addEntryPopup = NULL;
     addDirectoryPopup = NULL;
     incallPopup = NULL;
+    statsPopup = NULL;
+    audioPkInOutLabel = audioBytesInOutLabel = audioAvgBwLabel = 0;
+    videoResLabel = videoPkInOutLabel = videoBytesInOutLabel = videoAvgBwLabel = videoFramesInOutDiscLabel = videoAvgFpsLabel = videoWebcamFpsLabel = 0;
     currentCallEntry = 0;
 
 
@@ -301,6 +305,8 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
             keypadPressed('*');
         else if (action == "MENU")
             MenuButtonPushed();
+        else if (action == "INFO")
+            InfoButtonPushed();
         // Volume controls
         else if (action == "VOLUMEDOWN") 
             changeVolume(false);
@@ -440,6 +446,16 @@ void PhoneUIBox::customEvent(QCustomEvent *event)
         }
         break;
 
+    case RtpEvent::RtpStatisticsEv:
+        {
+            RtpEvent *re = (RtpEvent *)event;
+            if (re->owner() == rtpAudio)
+                ProcessAudioRtpStatistics(re);
+            else if (re->owner() == rtpVideo)
+                ProcessVideoRtpStatistics(re);
+        }
+        break;
+
     case SipEvent::SipStateChange:
         {
             ProcessSipStateChange();
@@ -517,6 +533,7 @@ void PhoneUIBox::StartVideo(int lPort, QString remoteIp, int remoteVideoPort, in
         h263->H263StartDecoder(rxWidth, rxHeight))
     {
         txClient = webcam->RegisterClient(VIDEO_PALETTE_YUV420P, txFps, this);
+        wcDeliveredFrames = 0;
         VideoOn = true;
     }
     else
@@ -574,6 +591,13 @@ void PhoneUIBox::MenuButtonPushed()
 }
 
 
+void PhoneUIBox::InfoButtonPushed()
+{
+    if (State == SIP_CONNECTED) 
+        showStatistics(rtpVideo != 0);
+}
+
+
 void PhoneUIBox::DrawLocalWebcamImage()
 {
     unsigned char *rgb32Frame = webcam->GetVideoFrame(localClient);
@@ -623,6 +647,7 @@ void PhoneUIBox::TransmitLocalWebcamImage()
     unsigned char *yuvFrame = webcam->GetVideoFrame(txClient);
     if (yuvFrame != 0)
     {
+        wcDeliveredFrames++;
         // If we are transmitting video, process the YUV image
         if (VideoOn && rtpVideo)
         {
@@ -897,29 +922,31 @@ void PhoneUIBox::ProcessSipNotification()
 
 void PhoneUIBox::OnScreenClockTick()
 {
-    int pIn=0, pMiss=0, pLate=0, bIn=0, bOut=0, bPlayed=0, pOut = 0;        
-    int bvIn=0, bvOut=0;
     if (rtpAudio)
-    {
-        ConnectTime++; 
-        phoneUIStatusBar->updateMidCallTime(ConnectTime);
-    
-        rtpAudio->getRxStats(pIn, pMiss, pLate, bIn, bPlayed, bOut);
-        rtpAudio->getTxStats(pOut);
-        phoneUIStatusBar->updateMidCallAudioStats(pIn, pMiss, pLate, pOut);
-    }
+        phoneUIStatusBar->updateMidCallTime(++ConnectTime);
+}
 
-    if (rtpVideo)
-    {
-        pIn=0, pMiss=0, pLate=0, bPlayed=0, pOut = 0;        
-        rtpVideo->getRxStats(pIn, pMiss, pLate, bvIn, bPlayed, bvOut);
-        rtpVideo->getTxStats(pOut);
-        phoneUIStatusBar->updateMidCallVideoStats(pIn, pMiss, pLate, pOut);
-        bIn += bvIn;
-        bOut += bvOut;
-    }
 
-    phoneUIStatusBar->updateMidCallBandwidth(bIn, bOut);
+void PhoneUIBox::ProcessAudioRtpStatistics(RtpEvent *stats)
+{
+    phoneUIStatusBar->updateMidCallAudioStats(stats->getPkIn(), stats->getPkMissed(),
+                                              stats->getPkLate(), stats->getPkOut(),
+                                              stats->getBytesIn(), stats->getBytesOut(),
+                                              stats->getPeriod());
+    updateAudioStatistics(stats->getPkIn(), stats->getPkMissed(), stats->getPkLate(), 
+                          stats->getPkOut(), stats->getBytesIn(), stats->getBytesOut());
+}
+
+
+void PhoneUIBox::ProcessVideoRtpStatistics(RtpEvent *stats)
+{
+    phoneUIStatusBar->updateMidCallVideoStats(stats->getPkIn(), stats->getPkMissed(),
+                                              stats->getPkLate(), stats->getPkOut(),
+                                              stats->getBytesIn(), stats->getBytesOut(),
+                                              stats->getPeriod());
+    updateVideoStatistics(stats->getPkIn(), stats->getPkMissed(), stats->getPkLate(), 
+                          stats->getPkOut(), stats->getBytesIn(), stats->getBytesOut(),
+                          stats->getFramesIn(), stats->getFramesOut(), stats->getFramesDiscarded());
 }
 
 
@@ -1708,6 +1735,90 @@ void PhoneUIBox::drawCallPopupCallHistory(MythPopupBox *popup, CallRecord *call)
     }
 }
 
+
+void PhoneUIBox::showStatistics(bool showVideo)
+{
+    if (statsPopup)
+    {
+        closeStatisticsPopup();
+        return;
+    }
+
+    statsPopup = new MythPopupBox(gContext->GetMainWindow(), "statistics_popup");
+
+    statsPopup->addLabel("Audio", MythPopupBox::Medium);
+    audioPkInOutLabel    = statsPopup->addLabel("Packets In/Out/Lost/Late:             ", MythPopupBox::Small);
+    // (not useful) audioBytesInOutLabel = statsPopup->addLabel("KBytes In/Out: ", MythPopupBox::Small);
+    audioAvgBwLabel      = statsPopup->addLabel("Average Kbps In/Out: ", MythPopupBox::Small);
+
+    if (showVideo)
+    {
+        statsPopup->addLabel("Video", MythPopupBox::Medium);
+        videoResLabel         = statsPopup->addLabel("Resolution In/Out: " + 
+                                                     QString::number(rxWidth) + "x" + QString::number(rxHeight) + " / " +  
+                                                     QString::number(txWidth) + "x" + QString::number(txHeight),
+                                                     MythPopupBox::Small);
+        videoPkInOutLabel     = statsPopup->addLabel("Packets In/Out/Lost/Late: ", MythPopupBox::Small);
+        // (not useful) videoBytesInOutLabel  = statsPopup->addLabel("KBytes In/Out: ", MythPopupBox::Small);
+        videoAvgBwLabel       = statsPopup->addLabel("Average Kbps In/Out: ", MythPopupBox::Small);
+        videoFramesInOutDiscLabel = statsPopup->addLabel("Video Frames In/Out/Discarded: ", MythPopupBox::Small);
+        videoAvgFpsLabel      = statsPopup->addLabel("Average FPS In/Out: ", MythPopupBox::Small);
+        videoWebcamFpsLabel   = statsPopup->addLabel("Webcam FPS Actual/Used: ", MythPopupBox::Small);
+
+    }
+
+//    QButton *btn = statsPopup->addButton(tr("Done"), this, SLOT(closeStatisticsPopup()));
+//    btn->setFocus();
+    statsPopup->ShowPopup(this, SLOT(closeStatisticsPopup()));
+}
+
+
+void PhoneUIBox::updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int bIn, int bOut)
+{
+    if (!statsPopup)
+        return;
+
+    audioPkInOutLabel->setText("Packets In/Out/Lost/Late: " + QString::number(pkIn) + " / " + 
+                               QString::number(pkOut) + " / " + QString::number(pkLost)
+                               + " / " + QString::number(pkLate));
+    //audioBytesInOutLabel->setText("KBytes In/Out: " + QString::number(bIn/1000) + "K / " + QString::number(bOut/1000) + "K");
+    if (ConnectTime != 0)
+        audioAvgBwLabel->setText ("Average Kbps In/Out:" + QString::number(bIn/ConnectTime*8/1000) + "kbps / " + QString::number(bOut/ConnectTime*8/1000) + "kbps");
+}
+
+
+void PhoneUIBox::updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int bIn, int bOut, int fIn, int fOut, int fDisc)
+{
+    if ((!statsPopup) || (videoPkInOutLabel == 0))
+        return;
+
+    videoPkInOutLabel->setText("Packets In/Out/Lost/Late: " + QString::number(pkIn) + " / " + 
+                               QString::number(pkOut) + " / " + QString::number(pkLost)
+                                + " / " + QString::number(pkLate));
+    //videoBytesInOutLabel->setText("KBytes In/Out: " + QString::number(bIn/1000) + "K / " + QString::number(bOut/1000) + "K");
+    if (ConnectTime != 0)
+        videoAvgBwLabel->setText("Average Kbps In/Out: " + QString::number(bIn/ConnectTime*8/1000) + "kbps / " + QString::number(bOut/ConnectTime*8/1000) + "kbps");
+    videoFramesInOutDiscLabel->setText("Video Frames In/Out/Discarded: " + QString::number(fIn) + " / " + QString::number(fOut) + " / " + QString::number(fDisc));
+    if (ConnectTime != 0)
+        videoAvgFpsLabel->setText("Average FPS In/Out: " + QString::number(fIn/ConnectTime) + " / " + QString::number(fOut/ConnectTime));
+    if ((ConnectTime != 0) && (txClient != 0))
+        videoWebcamFpsLabel->setText("Webcam FPS Hw/Driver/Used: " + QString::number(webcam->GetActualFps()) + " / " + QString::number(txClient->framesDelivered/ConnectTime) + " / " + QString::number(wcDeliveredFrames/ConnectTime));
+}
+
+
+void PhoneUIBox::closeStatisticsPopup()
+{
+    if (!statsPopup)
+        return;
+
+    statsPopup->hide();
+    delete statsPopup;
+    statsPopup = NULL;
+    audioPkInOutLabel = audioBytesInOutLabel = audioAvgBwLabel = 0;
+    videoResLabel = videoPkInOutLabel = videoBytesInOutLabel = videoAvgBwLabel = videoFramesInOutDiscLabel = videoAvgFpsLabel = 0;
+}
+
+
 void PhoneUIBox::changeVolume(bool up_or_down)
 {
     if (volume_control)
@@ -2109,6 +2220,10 @@ PhoneUIStatusBar::PhoneUIStatusBar(UITextType *a, UITextType *b, UITextType *c, 
     vidLast_pIn = 0;
     vidLast_pLoss = 0;
     vidLast_pTotal = 0;
+    audLast_bIn = 0;
+    audLast_bOut = 0;
+    vidLast_bIn = 0;
+    vidLast_bOut = 0;
     modeInCallStats = false;
     modeNotification = false;
     callStateString = "";
@@ -2116,7 +2231,7 @@ PhoneUIStatusBar::PhoneUIStatusBar(UITextType *a, UITextType *b, UITextType *c, 
     callTimeText->SetText("");
     audioStatsText->SetText("");
     videoStatsText->SetText("");
-    bwStatsText->SetText("");
+//    bwStatsText->SetText("");
     statusMsgText->SetText("");
     lastPoll = QTime::currentTime();
     last_bOut = 0;
@@ -2136,6 +2251,10 @@ void PhoneUIStatusBar::DisplayInCallStats(bool initialise)
     {
         statsVideoCodec = "";
         statsAudioCodec = "";
+        audLast_bIn = 0;
+        audLast_bOut = 0;
+        vidLast_bIn = 0;
+        vidLast_bOut = 0;
         audLast_pIn = 0;
         audLast_pLoss = 0;
         audLast_pTotal = 0;
@@ -2153,7 +2272,7 @@ void PhoneUIStatusBar::DisplayInCallStats(bool initialise)
         callTimeText->SetText(TimeString);
         audioStatsText->SetText(audioStatsString);
         videoStatsText->SetText(videoStatsString);
-        bwStatsText->SetText(bwStatsString);
+//        bwStatsText->SetText(bwStatsString);
         statusMsgText->SetText("");
     }
 }
@@ -2168,7 +2287,7 @@ void PhoneUIStatusBar::DisplayCallState(QString s)
         callTimeText->SetText("");
         audioStatsText->SetText("");
         videoStatsText->SetText("");
-        bwStatsText->SetText("");
+//        bwStatsText->SetText("");
         statusMsgText->SetText(s);
     }
 }
@@ -2180,7 +2299,7 @@ void PhoneUIStatusBar::DisplayNotification(QString s, int Seconds)
     callTimeText->SetText("");
     audioStatsText->SetText("");
     videoStatsText->SetText("");
-    bwStatsText->SetText("");
+//    bwStatsText->SetText("");
     statusMsgText->SetText(s);
 
     notificationTimer->start(Seconds*1000, true);
@@ -2213,68 +2332,41 @@ void PhoneUIStatusBar::updateMidCallTime(int Seconds)
         callTimeText->SetText(TimeString);
 }
 
-void PhoneUIStatusBar::updateMidCallAudioStats(int pIn, int pMiss, int pLate, int pOut)
+void PhoneUIStatusBar::updateMidCallAudioStats(int pIn, int pMiss, int pLate, int pOut, int bIn, int bOut, int msPeriod)
 {
     audioStatsString = statsAudioCodec;
+    (void)pIn;
     (void)pOut;
+    (void)pMiss;
+    (void)pLate;
 
-    // Estimate line quality
-    int pLoss = pMiss + pLate;
-    int pTotal = pLoss + pIn;
-    if (pIn == audLast_pIn)
-        audioStatsString += "; Not Receiving";
-    else
-    {
-        int totalPercentPacketLoss = (pLoss*100)/pTotal;
-        int lastPeriodPacketLoss = ((pLoss-audLast_pLoss)*100)/(pTotal-audLast_pTotal);
-        QString LossString;
-        LossString.sprintf("; Loss %d%%/%d%%", lastPeriodPacketLoss, totalPercentPacketLoss);
-        audioStatsString += LossString;
-    }
+    QString StatsString;
+    
+    StatsString.sprintf("; %dkbps / %dkbps", (bOut-audLast_bOut)*8*msPeriod/1000/1000,
+                                             (bIn-audLast_bIn)*8*msPeriod/1000/1000);
+    audLast_bIn = bIn;
+    audLast_bOut = bOut;
+    audioStatsString += StatsString;
     if (modeInCallStats && !modeNotification)
         audioStatsText->SetText(audioStatsString);
-    audLast_pIn = pIn;
-    audLast_pLoss = pLoss;
-    audLast_pTotal = pTotal;
 }
 
-void PhoneUIStatusBar::updateMidCallVideoStats(int pIn, int pMiss, int pLate, int pOut)
+void PhoneUIStatusBar::updateMidCallVideoStats(int pIn, int pMiss, int pLate, int pOut, int bIn, int bOut, int msPeriod)
 {
     videoStatsString = statsVideoCodec;
+    (void)pIn;
     (void)pOut;
+    (void)pMiss;
+    (void)pLate;
 
-    // Estimate line quality
-    int pLoss = pMiss + pLate;
-    int pTotal = pLoss + pIn;
-    if (pIn == vidLast_pIn)
-        videoStatsString += "; Not Receiving";
-    else
-    {
-        int totalPercentPacketLoss = (pLoss*100)/pTotal;
-        int lastPeriodPacketLoss = ((pLoss-vidLast_pLoss)*100)/(pTotal-vidLast_pTotal);
-        QString LossString;
-        LossString.sprintf("; Loss %d%%/%d%%", lastPeriodPacketLoss, totalPercentPacketLoss);
-        videoStatsString += LossString;
-    }
-
+    QString StatsString;
+    StatsString.sprintf("; %dkbps / %dkbps", (bOut-vidLast_bOut)*8*msPeriod/1000/1000,
+                                             (bIn-vidLast_bIn)*8*msPeriod/1000/1000);
+    vidLast_bIn = bIn;                                           
+    vidLast_bOut = bOut;                                           
+    videoStatsString += StatsString;
     if (modeInCallStats && !modeNotification)
         videoStatsText->SetText(videoStatsString);
-    vidLast_pIn = pIn;
-    vidLast_pLoss = pLoss;
-    vidLast_pTotal = pTotal;
-}
-
-void PhoneUIStatusBar::updateMidCallBandwidth(int bIn, int bOut)
-{
-    (void)bIn;
-    int duration = lastPoll.msecsTo(QTime::currentTime());
-    lastPoll = QTime::currentTime();
-
-    bwStatsString.sprintf("B/w: %dk", (bOut-last_bOut)*8/duration);
-    last_bOut = bOut;
-
-    if (modeInCallStats && !modeNotification)
-        bwStatsText->SetText(bwStatsString);
 }
 
 void PhoneUIStatusBar::updateMidCallVideoCodec(QString c)

@@ -513,6 +513,7 @@ wcClient *Webcam::RegisterClient(int format, int fps, QObject *eventWin)
     client->actualFps = fps;
     client->interframeTime = 1000/fps;
     client->timeLastCapture = QTime::currentTime();
+    client->framesDelivered = 0;
 
     switch (format)
     {
@@ -615,6 +616,9 @@ void Webcam::WebcamThreadWorker()
     {
         if ((len = read(hDev, picbuff1, frameSize)) == frameSize)
         {
+            if (killWebcamThread)
+                break;
+                
             ProcessFrame(picbuff1, frameSize);
         }
         else
@@ -625,7 +629,6 @@ void Webcam::WebcamThreadWorker()
 
 void Webcam::ProcessFrame(unsigned char *frame, int fSize)
 {
-    QTime cameraTime;
     static unsigned char tempBuffer[MAX_RGB_704_576];
 
     WebcamLock.lock(); // Prevent changes to client registration structures whilst processing
@@ -682,6 +685,7 @@ void Webcam::ProcessFrame(unsigned char *frame, int fSize)
             {
                 it->BufferList.remove(buffer);
                 it->FullBufferList.append(buffer);
+                it->framesDelivered++;
 
                 // Format conversion
                 if (wcFormat != it->format)

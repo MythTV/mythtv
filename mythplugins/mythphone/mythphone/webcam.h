@@ -71,6 +71,7 @@ struct wcClient
     int fps;
     int actualFps;
     int interframeTime;
+    int framesDelivered;
     QPtrList<unsigned char> BufferList;
     QPtrList<unsigned char> FullBufferList;
     QTime timeLastCapture;
@@ -170,6 +171,7 @@ class Webcam : public QThread
     int wcFormat;
     bool wcFlip;
 
+    QTime cameraTime;
     int frameCount;
     int totalCaptureMs;
 

@@ -60,6 +60,7 @@ class PhoneUIBox : public MythThemedDialog
   public slots:
 
     void MenuButtonPushed();
+    void InfoButtonPushed();
     void handleTreeListSignals(int, IntVector*);
     void TransmitLocalWebcamImage(uchar *yuvBuffer, int w, int h);
     void OnScreenClockTick();
@@ -92,6 +93,7 @@ class PhoneUIBox : public MythThemedDialog
     void closeMenuPopup();
     void closeIMPopup();
     void imSendReply();
+    void closeStatisticsPopup();
     void changeVolumeControl(bool up_or_down);
     void changeVolume(bool up_or_down);
     void toggleMute();
@@ -117,6 +119,8 @@ class PhoneUIBox : public MythThemedDialog
     void    getResolution(QString setting, int &width, int &height);
     void    videoCifModeToRes(QString cifMode, int &w, int &h);
     const char *videoResToCifMode(int w);
+    void    ProcessAudioRtpStatistics(RtpEvent *stats);
+    void    ProcessVideoRtpStatistics(RtpEvent *stats);
     void    doMenuPopup();
     void    doUrlPopup(char key, bool DigitsOrUrl);
     void    doIMPopup(QString otherParty, QString callId, QString Msg);
@@ -127,6 +131,9 @@ class PhoneUIBox : public MythThemedDialog
     void    doCallPopup(DirEntry *entry, QString DialorAnswer, bool audioOnly);
     void    drawCallPopupCallHistory(MythPopupBox *popup, CallRecord *call);
     void    startRTP();
+    void    showStatistics(bool showVideo);
+    void    updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int bIn, int bOut);
+    void    updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int bIn, int bOut, int fIn, int fOut, int fDisc);
 
     void    wireUpTheme();
     DirectoryContainer *DirContainer;
@@ -143,6 +150,7 @@ class PhoneUIBox : public MythThemedDialog
     wcClient *localClient;
     wcClient *txClient;
     int wcWidth, wcHeight, txWidth, txHeight, rxWidth, rxHeight;
+    int wcDeliveredFrames;
     QString txVideoMode;
     int zoomWidth, zoomHeight, zoomFactor;
     int hPan, wPan;
@@ -200,6 +208,18 @@ class PhoneUIBox : public MythThemedDialog
     QString                imCallid;
     QString                imUrl;
 
+    MythPopupBox *statsPopup;
+    QLabel *audioPkInOutLabel;
+    QLabel *audioBytesInOutLabel;
+    QLabel *audioAvgBwLabel;
+    QLabel *videoPkInOutLabel;
+    QLabel *videoBytesInOutLabel;
+    QLabel *videoAvgBwLabel;
+    QLabel *videoFramesInOutDiscLabel;
+    QLabel *videoAvgFpsLabel;
+    QLabel *videoWebcamFpsLabel;
+    QLabel *videoResLabel;
+
 
     MythPopupBox          *addEntryPopup;
     MythRemoteLineEdit    *entryNickname;
@@ -237,8 +257,8 @@ class PhoneUIStatusBar : public QObject
     void DisplayNotification(QString s, int Seconds);
     void updateMidCallCaller(QString t);
     void updateMidCallTime(int Seconds);
-    void updateMidCallAudioStats(int pIn, int pMiss, int pLate, int pOut);
-    void updateMidCallVideoStats(int pIn, int pMiss, int pLate, int pOut);
+    void updateMidCallAudioStats(int pIn, int pMiss, int pLate, int pOut, int bIn, int bOut, int msPeriod);
+    void updateMidCallVideoStats(int pIn, int pMiss, int pLate, int pOut, int bIn, int bOut, int msPeriod);
     void updateMidCallBandwidth(int bIn, int bOut);
     void updateMidCallVideoCodec(QString c);
     void updateMidCallAudioCodec(QString c);
@@ -265,6 +285,10 @@ class PhoneUIStatusBar : public QObject
     int audLast_pIn;
     int audLast_pLoss;
     int audLast_pTotal;
+    int audLast_bIn;
+    int audLast_bOut;
+    int vidLast_bIn;
+    int vidLast_bOut;
     int vidLast_pIn;
     int vidLast_pLoss;
     int vidLast_pTotal;

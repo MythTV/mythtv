@@ -66,6 +66,9 @@ rtp::rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, i
     pkOut = 0;
     pkMissed = 0;
     pkLate = 0;
+    framesIn = 0;
+    framesOut = 0;
+    framesOutDiscarded = 0;
     txBuffer = 0;
     recBuffer = 0;
     dtmfIn = "";
@@ -86,6 +89,8 @@ rtp::~rtp()
     killRtpThread = true;
     SpeakerOn = false;
     MicrophoneOn = false;
+    if (eventCond) 
+        eventCond->wakeAll();
     wait();
     destroyVideoBuffers();
 }
@@ -116,17 +121,18 @@ void rtp::rtpAudioThreadWorker()
 
     timeNextTx = (QTime::currentTime()).addMSecs(rxMsPacketSize);
 
+    int pollLoop=0;
+    int sleepMs = 0;
     while(!killRtpThread)
     {
         // Awake every 10ms to see if we need to rx/tx anything
         // May need to revisit this; as I'd much prefer it to be event driven
         // usleep(10000) seems to cause a 20ms sleep whereas usleep(0)
         // seems to sleep for ~10ms
-#ifdef WIN32
+        QTime t1 = QTime::currentTime();    
         usleep(10000);  
-#else
-        usleep(0);  
-#endif
+        sleepMs += t1.msecsTo(QTime::currentTime());
+        pollLoop++;
 
         if (killRtpThread)
             break;
@@ -135,9 +141,9 @@ void rtp::rtpAudioThreadWorker()
         StreamInAudio();
 
         // Write audio to the speaker, but keep in dejitter buffer as long as possible
-        while (isSpeakerHungry() && pJitter->AnyData()  && !killRtpThread)
+        while (isSpeakerHungry() && pJitter->AnyData() && !killRtpThread)
             PlayOutAudio();
-
+        
         // For mic. data, the microphone determines the transmit rate
         // Mic. needs kicked the first time through
         while ((txMode == RTP_TX_AUDIO_FROM_MICROPHONE) && 
@@ -164,6 +170,7 @@ void rtp::rtpAudioThreadWorker()
         }
 
         SendWaitingDtmf();
+        CheckSendStatistics();        
     }
 
     StopTxRx();
@@ -174,6 +181,9 @@ void rtp::rtpAudioThreadWorker()
         delete Codec;
     if (ToneToSpk != 0)
         delete ToneToSpk;
+        
+    if ((pollLoop != 0) && ((sleepMs/pollLoop)>30))
+        cout << "Mythphone: \"sleep 10000\" is sleeping for more than 30ms; please report\n";
 }
 
 void rtp::rtpVideoThreadWorker()
@@ -185,14 +195,16 @@ void rtp::rtpVideoThreadWorker()
 
     while(!killRtpThread)
     {
-        // Suspend for events, waking every 2 secs to see if we need to kill ourselves
-        eventCond->wait(2000);
+        // Suspend for events
+        eventCond->wait();
 
         if (killRtpThread)
             break;
 
         StreamInVideo();
         transmitQueuedVideo();
+
+        CheckSendStatistics();        
     }
 
     delete videoListener;
@@ -257,9 +269,16 @@ void rtp::rtpInitialise()
     bytesIn = 0;
     bytesOut = 0;
     bytesToSpeaker = 0;
+    framesIn = 0;
+    framesOut = 0;
+    framesOutDiscarded = 0;
     micPower = 0;
     spkPower = 0;
-	spkInBuffer = 0;
+    spkInBuffer = 0;
+    
+    timeNextStatistics = QTime::currentTime().addSecs(RTP_STATS_INTERVAL);
+    timeLastStatistics = QTime::currentTime();
+
 
     pJitter = new Jitter();
     //pJitter->Debug();
@@ -678,6 +697,22 @@ void rtp::Debug(QString dbg)
 #endif
 }
 
+void rtp::CheckSendStatistics()
+{
+    QTime now = QTime::currentTime();
+    if (timeNextStatistics <= now)
+    {
+        int statsMsPeriod = timeLastStatistics.msecsTo(now);
+        timeLastStatistics = now;
+        timeNextStatistics = now.addSecs(RTP_STATS_INTERVAL);
+        if (eventWindow)
+            QApplication::postEvent(eventWindow, 
+                        new RtpEvent(RtpEvent::RtpStatisticsEv, this, now, statsMsPeriod,
+                                     pkIn, pkOut, pkMissed, pkLate, bytesIn, bytesOut, 
+                                     bytesToSpeaker, framesIn, framesOut, framesOutDiscarded));
+    }
+}
+
 void rtp::OpenSocket()
 {
     rtpSocket = new QSocketDevice (QSocketDevice::Datagram);
@@ -746,10 +781,16 @@ bool rtp::isSpeakerHungry()
     {
 #ifndef WIN32
         int bytesQueued;
+        audio_buf_info info;
         ioctl(speakerFd, SNDCTL_DSP_GETODELAY, &bytesQueued);
+        ioctl(speakerFd, SNDCTL_DSP_GETOSPACE, &info);
     
         if (bytesQueued > 0)
             spkSeenData = true;
+
+        // Never return true if it will result in the speaker blocking
+        if (info.bytes <= (int)(rxPCMSamplesPerPacket*sizeof(short)))
+            return false;
 
         // Always push packets from the jitter buffer into the Speaker buffer 
         // if the correct packet is available
@@ -1072,7 +1113,10 @@ void rtp::StreamInVideo()
             if (PAYLOAD(JBuf) == rtpMPT)
             {
                 if (JBuf->RtpMPT & RTP_PAYLOAD_MARKER_BIT)
+                {
                     MarketBitSet = true;
+                    framesIn++;
+                }
                 pkIn++;
                 JBuf->RtpSequenceNumber = ntohs(JBuf->RtpSequenceNumber);
                 JBuf->RtpTimeStamp = ntohl(JBuf->RtpTimeStamp);
@@ -1376,6 +1420,8 @@ void rtp::transmitQueuedVideo()
 
     if (queuedVideo)
     {
+        framesOut++;
+        
         RTPPACKET videoPacket;
         uchar *v = queuedVideo->video;
         int queuedLen = queuedVideo->len;

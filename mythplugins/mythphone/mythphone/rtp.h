@@ -35,18 +35,48 @@
 #define NUM_SPK_BUFFERS		16	
 #define SPK_BUFFER_SIZE		MIC_BUFFER_SIZE // Need to keep these the same (see RTPPACKET)
 
+#define RTP_STATS_INTERVAL        1 // Seconds between sending statistics 
+
+class rtp;
 
 class RtpEvent : public QCustomEvent
 {
 public:
-    enum Type { RxVideoFrame = (QEvent::User + 300), RtpDebugEv };
+    enum Type { RxVideoFrame = (QEvent::User + 300), RtpDebugEv, RtpStatisticsEv };
 
     RtpEvent(Type t, QString s="") : QCustomEvent(t) { text=s; }
-    ~RtpEvent() {  }
-    QString msg() { return text;}
+    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2, int s3, int s4, int s5, int s6, int s7, int s8, int s9, int s10) : QCustomEvent(t) { rtpThread=r; timestamp=tm; msPeriod = ms; pkIn=s1; pkOut=s2; pkMiss=s3; pkLate=s4; byteIn=s5; byteOut=s6; bytePlayed=s7; framesIn=s8; framesOut=s9; framesDisc=s10;}
+    ~RtpEvent()                 {  }
+    QString msg()               { return text;}
+    rtp *owner()                { return rtpThread; }
+    int getPkIn()               { return pkIn; }
+    int getPkMissed()           { return pkMiss; }
+    int getPkLate()             { return pkLate; }
+    int getPkOut()              { return pkOut; }
+    int getBytesIn()            { return byteIn; }
+    int getBytesOut()           { return byteOut; }
+    int getFramesIn()           { return framesIn; }
+    int getFramesOut()          { return framesOut; }
+    int getFramesDiscarded()    { return framesDisc; }
+    int getPeriod()             { return msPeriod; }
+
 
 private:
     QString text;
+    
+    rtp *rtpThread;
+    QTime timestamp;
+    int msPeriod;
+    int pkIn;
+    int pkOut;
+    int pkMiss;
+    int pkLate;
+    int framesIn;
+    int framesOut;
+    int framesDisc;
+    int byteIn;
+    int byteOut;
+    int bytePlayed;
 
 };
 
@@ -147,7 +177,7 @@ public:
     RTPPACKET *DequeueJBuffer(ushort seqNum, int &reason);  
     int     DumpAllJBuffers(bool StopAtMarkerBit);
     virtual int compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2);
-    bool AnyData() { return (count()>0); };
+    int AnyData() { return count(); };
     bool isPacketQueued(ushort Seq);
     int GotAllBufsInFrame(ushort seq, int offset);
     void Debug();
@@ -194,9 +224,7 @@ public:
     void sendDtmf(char d)     { rtpMutex.lock(); dtmfOut.append(d); rtpMutex.unlock(); }
     bool toggleMute()         { micMuted = !micMuted; return micMuted; }
     void getPower(short &m, short &s) { m = micPower; s = spkPower; micPower = 0; spkPower = 0; }
-    void getRxStats(int &pIn, int &pMiss, int &pLt, int &bIn, int &bPlayed, int &bOut) { pIn = pkIn; pMiss = pkMissed; pLt = pkLate; bIn = bytesIn; bPlayed = bytesToSpeaker; bOut = bytesOut; }
-    void getTxStats(int &pOut) { pOut = pkOut; }
-    bool queueVideo(VIDEOBUFFER *v) { bool res=false; rtpMutex.lock(); if (videoToTx==0) {videoToTx=v; if (eventCond) eventCond->wakeAll(); res=true; } rtpMutex.unlock(); return res; }
+    bool queueVideo(VIDEOBUFFER *v) { bool res=false; rtpMutex.lock(); if (videoToTx==0) {videoToTx=v; if (eventCond) eventCond->wakeAll(); res=true; } else framesOutDiscarded++; rtpMutex.unlock(); return res; }
     VIDEOBUFFER *getRxedVideo()     { rtpMutex.lock(); VIDEOBUFFER *b=rxedVideoFrames.take(0); rtpMutex.unlock(); return b; }
     VIDEOBUFFER *getVideoBuffer(int len=0);
     void freeVideoBuffer(VIDEOBUFFER *Buf);
@@ -232,6 +260,7 @@ private:
     void transmitQueuedVideo();
     void AddToneToAudio(short *buffer, int Samples);
     void Debug(QString dbg);
+    void CheckSendStatistics();
 
 #ifdef WIN32
     bool StartTx();
@@ -318,6 +347,8 @@ private:
     int videoFrameFirstSeqNum;
 
     // Stats
+    QTime timeNextStatistics;
+    QTime timeLastStatistics;
     int pkIn;
     int pkOut;
     int pkMissed;
@@ -325,6 +356,9 @@ private:
     int bytesIn;
     int bytesOut;
     int bytesToSpeaker;
+    int framesIn;
+    int framesOut;
+    int framesOutDiscarded;
     short micPower;
     short spkPower;
 };
