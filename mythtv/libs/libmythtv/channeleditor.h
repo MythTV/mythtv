@@ -53,7 +53,7 @@ public:
     void save(QSqlDatabase* _db) { (void)_db; };
     void load(QSqlDatabase* _db) {
         db = _db;
-        fillSelections(currentSourceID);
+        fillSelections();
     };
 
     QString getSourceID() { return currentSourceID; };
@@ -61,15 +61,26 @@ public:
     bool getHideMode() { return currentHideMode; };
 
 public slots:
-    void fillSelections(const QString& sourceid = "");
+    void fillSelections(void);
     void setSortMode(const QString& sort) {
-        currentSortMode = sort;
-        fillSelections(currentSourceID);
+        if (currentSortMode != sort) {
+            currentSortMode = sort;
+            fillSelections();
+        }
+    };
+
+    void setSourceID(const QString& sourceID) {
+        if (currentSourceID != sourceID) {
+            currentSourceID = sourceID;
+            fillSelections();
+        }
     };
 
     void setHideMode(bool hide) {
-        currentHideMode = hide;
-        fillSelections(currentSourceID);
+        if (currentHideMode != hide) {
+            currentHideMode = hide;
+            fillSelections();
+        }
     };
 
 private:

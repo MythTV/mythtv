@@ -100,14 +100,13 @@ int ChannelWizard::countCardtypes() {
         return 0;
 }
 
-void ChannelListSetting::fillSelections(const QString& sourceid) 
+void ChannelListSetting::fillSelections(void) 
 {
-    currentSourceID = sourceid;
     clearSelections();
     addSelection("(New Channel)");
     QString querystr = QString("SELECT name, channum, chanid FROM channel");
-    if (sourceid != "")
-        querystr += QString(" WHERE sourceid='%1'").arg(sourceid);
+    if (currentSourceID != "")
+        querystr += QString(" WHERE sourceid='%1'").arg(currentSourceID);
         
     if (currentSortMode == QObject::tr("Channel Name"))
         querystr += " ORDER BY name";
@@ -136,7 +135,7 @@ void ChannelListSetting::fillSelections(const QString& sourceid)
                     name = "???. " + name;
             }
 
-            addSelection(name, chanid);
+            addSelection(name, chanid, (chanid == current) ? true : false);
         }
 }
 
@@ -193,7 +192,7 @@ ChannelEditor::ChannelEditor():
     addChild(source);
     addChild(hide);
     connect(source, SIGNAL(valueChanged(const QString&)),
-            list, SLOT(fillSelections(const QString&)));
+            list, SLOT(setSourceID(const QString&)));
     connect(sort, SIGNAL(valueChanged(const QString&)),
             list, SLOT(setSortMode(const QString&)));
     connect(hide, SIGNAL(valueChanged(bool)),
@@ -213,8 +212,8 @@ void ChannelEditor::edit() {
     ChannelWizard cw(id,db);
     cw.exec(db);
 
-    if (list != NULL)
-        list->setFocus();
+    list->fillSelections();
+    list->setFocus();
 }
 
 void ChannelEditor::edit(int /*iSelected*/) {
@@ -241,7 +240,7 @@ void ChannelEditor::del() {
                                  "WHERE chanid ='%1'").arg(id));
         if (!query.isActive())
             MythContext::DBError("ChannelEditor Delete DVBChannel", query);
-        list->fillSelections(list->getSourceID());
+        list->fillSelections();
     }
 }
 
@@ -260,6 +259,8 @@ void ChannelEditor::menu(int /*iSelected*/) {
             emit edit();
         else if (val == 1)
             emit del();
+        else
+            list->setFocus();
     }
 }
 
