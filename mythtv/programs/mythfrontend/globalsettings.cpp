@@ -417,7 +417,6 @@ public:
         setLabel(QObject::tr("Automatically Skip Commercials"));
         addSelection(QObject::tr("Off"), "0");
         addSelection(QObject::tr("Notify, but do not skip"), "2");
-        addSelection(QObject::tr("Pre-Notify, but do not skip"), "3");
         addSelection(QObject::tr("Automatically Skip"), "1");
         setHelpText(QObject::tr("Automatically skip commercial breaks that "
                     "have been flagged during Automatic Commercial Flagging "
@@ -482,6 +481,20 @@ public:
         setLabel(QObject::tr("Commercial Skip Auto-Rewind Amount"));
         setHelpText(QObject::tr("If set, Myth will automatically rewind "
                     "this many seconds after performing a commercial skip."));
+        setValue(0);
+    };
+};
+
+class CommNotifyAmount: public SpinBoxSetting, public GlobalSetting {
+public:
+    CommNotifyAmount():
+        SpinBoxSetting(0, 10, 1),
+        GlobalSetting("CommNotifyAmount") {
+        setLabel(QObject::tr("Commercial Skip Notify Amount"));
+        setHelpText(QObject::tr("If set, Myth will act like a commercial "
+                    "begins this many seconds early.  This can be useful "
+                    "when commercial notification is used in place of "
+                    "automatic skipping."));
         setValue(0);
     };
 };
@@ -2444,6 +2457,7 @@ PlaybackSettings::PlaybackSettings()
     comms->addChild(new AggressiveCommDetect());
     comms->addChild(new CommSkipAllBlanks());
     comms->addChild(new CommRewindAmount());
+    comms->addChild(new CommNotifyAmount());
     comms->addChild(new AutoCommercialSkip());
     comms->addChild(new TryUnflaggedSkip());
     addChild(comms);

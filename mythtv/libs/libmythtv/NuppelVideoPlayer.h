@@ -386,6 +386,8 @@ class NuppelVideoPlayer
     int skipcommercials;
     int autocommercialskip;
     int commercialskipmethod;
+    int commrewindamount;
+    int commnotifyamount;
     bool tryunflaggedskip;
 
     QString ccline;
