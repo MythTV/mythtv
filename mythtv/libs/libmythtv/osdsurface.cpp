@@ -616,8 +616,10 @@ dithertoia44_8_fun dithertoia44_8_init(OSDSurface* /*surface*/)
     return dithertoia44_8_c;
 }
 
+#if i386
 static mmx_t mask_0f = {0x0f0f0f0f0f0f0f0fLL};
 static mmx_t mask_f0 = {0xf0f0f0f0f0f0f0f0LL};
+#endif
 
 dither8_context *init_dithertoia44_8_context(bool first)
 {
