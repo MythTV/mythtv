@@ -29,10 +29,10 @@ using namespace std;
 #define MAXVBUFFER 21
 #define AUDBUFSIZE 512000
 
-class NuppelVideoRecorder;
 class NuppelVideoPlayer;
 class XvVideoOutput;
 class OSDSet;
+class MythContext;
 
 class NuppelVideoPlayer
 {
@@ -75,7 +75,8 @@ class NuppelVideoPlayer
     long long GetFramesPlayed(void) { return framesPlayed; }
     void ResetFramesPlayed(void) { framesPlayed = 0; }
 
-    void SetRecorder(NuppelVideoRecorder *nvcr) { nvr = nvcr; }
+    void SetRecorder(MythContext *context, int recordernum) 
+                    { m_context = context; nvr_num = recordernum; }
 
     OSD *GetOSD(void) { return osd; }
 
@@ -274,7 +275,7 @@ class NuppelVideoPlayer
     long long lastKey;
     
     long long rewindtime, fftime;
-    NuppelVideoRecorder *nvr;
+    int nvr_num;
 
     bool resetplaying;
     bool actuallyreset;
@@ -335,6 +336,8 @@ class NuppelVideoPlayer
     char *ffmpeg_extradata;
 
     bool own_vidbufs;
+
+    MythContext *m_context;
 };
 
 #endif

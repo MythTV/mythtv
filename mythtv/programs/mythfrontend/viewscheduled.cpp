@@ -8,6 +8,7 @@
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
+#include <qheader.h>
 
 #include <iostream>
 using namespace std;
@@ -15,24 +16,21 @@ using namespace std;
 #include "viewscheduled.h"
 #include "tv.h"
 #include "programlistitem.h"
-#include "scheduler.h"
 
 #include "libmyth/dialogbox.h"
 #include "libmyth/mythcontext.h"
     
-ViewScheduled::ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb, 
+ViewScheduled::ViewScheduled(MythContext *context, QSqlDatabase *ldb,
                              QWidget *parent, const char *name)
              : QDialog(parent, name)
 {
-    tv = ltv;
     db = ldb;
-    fileprefix = context->GetFilePrefix();
     m_context = context;
 
     title = NULL;
 
     int screenwidth = 0, screenheight = 0;
-    float wmult = 0, hmult = 0;
+    wmult = 0, hmult = 0;
 
     context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
@@ -69,8 +67,13 @@ ViewScheduled::ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb,
     listview->setColumnWidthMode(1, QListView::Manual);
 
     listview->setSorting(-1);
-
     listview->setAllColumnsShowFocus(TRUE);
+
+    listview->viewport()->setPalette(palette());
+    listview->horizontalScrollBar()->setPalette(palette());
+    listview->verticalScrollBar()->setPalette(palette());
+    listview->header()->setPalette(palette());
+    listview->header()->setFont(font());
 
     connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));
@@ -80,8 +83,6 @@ ViewScheduled::ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb,
             SLOT(changed(QListViewItem *)));
 
     vbox->addWidget(listview, 1);
-
-    sched = new Scheduler(db);
 
     listview->setFixedHeight((int)(250 * hmult));
 
@@ -147,21 +148,16 @@ ViewScheduled::ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb,
 void ViewScheduled::FillList(void)
 {
     listview->clear();
-    ProgramListItem *item;
 
-    bool conflicts = sched->FillRecordLists(false);
+    bool conflicts = false;
+    list<ProgramInfo *> recordinglist;
 
-    list<ProgramInfo *> *recordinglist = sched->getAllPending();
-    list<ProgramInfo *>::reverse_iterator pgiter = recordinglist->rbegin();
+    m_context->GetAllPendingRecordings(recordinglist);
 
-    for (; pgiter != recordinglist->rend(); pgiter++)
-    {
-        ProgramInfo *originfo = (*pgiter);
-        ProgramInfo *proginfo = new ProgramInfo(*originfo);
+    list<ProgramInfo *>::reverse_iterator pgiter = recordinglist.rbegin();
 
-        item = new ProgramListItem(m_context, listview, proginfo, 2, tv, 
-                                   fileprefix);
-    }
+    for (; pgiter != recordinglist.rend(); pgiter++)
+        new ProgramListItem(m_context, listview, (*pgiter), 2);
 
     if (conflicts)
         desclabel->setText("You have time conflicts.");
@@ -221,6 +217,8 @@ void ViewScheduled::changed(QListViewItem *lvitem)
         description->setText(rec->description);
     else
         description->setText("");
+
+    description->setMinimumWidth((int)(500 * wmult));
 }
 
 void ViewScheduled::selected(QListViewItem *lvitem)
@@ -277,7 +275,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
         cerr << thequery << endl;
     }
 
-    list<ProgramInfo *> *conflictlist = sched->getConflicting(rec, false);
+    list<ProgramInfo *> *conflictlist = m_context->GetConflictList(rec, false);
 
     QString dstart, dend;
     list<ProgramInfo *>::iterator i;
@@ -302,6 +300,11 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
         }
     }
 
+    list<ProgramInfo *>::iterator iter = conflictlist->begin();
+    for (; iter != conflictlist->end(); iter++)
+    {
+        delete (*iter);
+    }
     delete conflictlist;
 
     thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
@@ -313,7 +316,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 
 void ViewScheduled::handleConflicting(ProgramInfo *rec)
 {
-    list<ProgramInfo *> *conflictlist = sched->getConflicting(rec, true);
+    list<ProgramInfo *> *conflictlist = m_context->GetConflictList(rec, true);
 
     QString dateformat = m_context->GetSetting("DateFormat");
     if (dateformat == "")
@@ -359,6 +362,12 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 
     if (ret == 0)
     {
+        list<ProgramInfo *>::iterator iter = conflictlist->begin();
+        for (; iter != conflictlist->end(); iter++)
+        {
+            delete (*iter);
+        }
+
         delete conflictlist;
         return;
     }
@@ -389,6 +398,12 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
     {
         printf("Ack, no preferred recording\n");
         delete dislike;
+        list<ProgramInfo *>::iterator iter = conflictlist->begin();
+        for (; iter != conflictlist->end(); iter++)
+        {
+            delete (*iter);
+        }
+
         delete conflictlist;
         return;
     }
@@ -475,6 +490,11 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
     }
 
     delete dislike;
+    list<ProgramInfo *>::iterator iter = conflictlist->begin();
+    for (; iter != conflictlist->end(); iter++)
+    {
+        delete (*iter);
+    }
     delete conflictlist;
 
     thequery = "UPDATE settings SET data = \"yes\" WHERE value = "

@@ -249,6 +249,7 @@ public:
         params->addChild(new MPEG4MaxQuality(parent));
         params->addChild(new MPEG4MinQuality(parent));
         params->addChild(new MPEG4QualDiff(parent));
+        params->addChild(new MPEG4ScaleBitrate(parent));
 
         allParams->addChild(params);
 

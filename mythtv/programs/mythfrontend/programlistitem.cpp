@@ -31,12 +31,9 @@ void MyListView::keyPressEvent(QKeyEvent *e)
 }
 
 ProgramListItem::ProgramListItem(MythContext *context, QListView *parent, 
-                                 ProgramInfo *lpginfo, int type, TV *ltv, 
-                                 QString lprefix)
+                                 ProgramInfo *lpginfo, int type)
                : QListViewItem(parent)
 {
-    prefix = lprefix;
-    tv = ltv;
     pginfo = lpginfo;
     pixmap = NULL;
     m_context = context;
@@ -55,13 +52,7 @@ ProgramListItem::ProgramListItem(MythContext *context, QListView *parent,
 
         if (type == 1)
         {
-            QString filename = pginfo->GetRecordFilename(prefix);
-
-            struct stat64 st;
- 
-            long long size = 0;
-            if (stat64(filename.ascii(), &st) == 0)
-                size = st.st_size;
+            long long size = pginfo->filesize;
             long int mbytes = size / 1024 / 1024;
             QString filesize = QString("%1 MB").arg(mbytes);
 
@@ -82,13 +73,14 @@ ProgramListItem::ProgramListItem(MythContext *context, QListView *parent,
 
 QPixmap *ProgramListItem::getPixmap(void)
 {
+/*
     if (m_context->GetNumSetting("GeneratePreviewPixmaps") != 1)
         return NULL;
 
     if (pixmap)
         return pixmap;
 
-    QString filename = pginfo->GetRecordFilename(prefix);
+    QString filename = pginfo->pathname;
     filename += ".png";
 
     int screenheight = 0, screenwidth = 0;
@@ -102,9 +94,11 @@ QPixmap *ProgramListItem::getPixmap(void)
 
     int len = 0;
     int video_width, video_height;
+    TV *tv = new TV(m_context);
     unsigned char *data = (unsigned char *)tv->GetScreenGrab(pginfo, 65, len,
                                                              video_width,
                                                              video_height);
+    delete tv;
 
     if (data)
     {
@@ -120,7 +114,7 @@ QPixmap *ProgramListItem::getPixmap(void)
         if (pixmap)
             return pixmap;
     }
-
+*/
     return NULL;
 }
 

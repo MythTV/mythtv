@@ -1,5 +1,7 @@
 #include "programinfo.h"
 #include <iostream>
+#include <qsocket.h>
+
 using namespace std;
 
 ProgramInfo::ProgramInfo(void)
@@ -10,6 +12,9 @@ ProgramInfo::ProgramInfo(void)
     chanstr = "";
     chansign = "";
     channame = "";
+
+    pathname = "";
+    filesize = 0;
 
     recordtype = kUnknown;
     conflicting = false;
@@ -31,6 +36,8 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     chanstr = other.chanstr;
     chansign = other.chansign;
     channame = other.channame;
+    pathname = other.pathname;
+    filesize = other.filesize;
 
     startts = other.startts;
     endts = other.endts;
@@ -46,6 +53,85 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     cardid = other.cardid;
     recordingprofileid = other.recordingprofileid;
 }   
+
+void ProgramInfo::ToStringList(QStringList &list)
+{
+    if (title == "")
+        title = " ";
+    if (subtitle == "")
+        subtitle = " ";
+    if (description == "")
+        description = " ";
+    if (category == "")
+        category = " ";
+    if (pathname == "")
+        pathname = " ";
+    if (chanid == "")
+        chanid = " ";
+    if (chanstr == "")
+        chanstr = " ";
+    if (pathname == "")
+        pathname = " ";
+
+    list << title;
+    list << subtitle;
+    list << description;
+    list << category;
+    list << chanid;
+    list << chanstr;
+    list << chansign;
+    list << pathname;
+    list << QString::number((int)(filesize & 0xffffffff));
+    list << QString::number((int)((filesize >> 32) & 0xffffffff));
+    list << startts.toString();
+    list << endts.toString();
+    list << QString::number((int)recordtype);
+    list << QString::number(conflicting);
+    list << QString::number(recording);
+}
+
+void ProgramInfo::FromStringList(QStringList &list, int offset)
+{
+    if (offset + NUMPROGRAMLINES > (int)list.size())
+    {
+        cerr << "offset is: " << offset << " but size is " << list.size() 
+             << endl;
+        return;
+    }
+
+    title = list[offset];
+    subtitle = list[offset + 1];
+    description = list[offset + 2];
+    category = list[offset + 3];
+    chanid = list[offset + 4];
+    chanstr = list[offset + 5];
+    chansign = list[offset + 6];
+    pathname = list[offset + 7];
+    filesize = list[offset + 8].toInt();
+    filesize |= ((long long)list[offset + 9].toInt()) << 32;
+    startts = QDateTime::fromString(list[offset + 10]);
+    endts = QDateTime::fromString(list[offset + 11]);
+    recordtype = (RecordingType)(list[offset + 12].toInt());
+    conflicting = list[offset + 13].toInt();
+    recording = list[offset + 14].toInt();
+
+    if (title == " ")
+        title = "";
+    if (subtitle == " ")
+        subtitle = "";
+    if (description == " ")
+        description = "";
+    if (category == " ")
+        category = "";
+    if (pathname == " ")
+        pathname = "";
+    if (chanid == " ")
+        chanid = "";
+    if (chanstr == " ")
+        chanstr = "";
+    if (pathname == " ")
+        pathname = "";
+}
 
 int ProgramInfo::CalculateLength(void)
 {
@@ -432,6 +518,31 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
     }
 
     recordtype = newstate;
+}
+
+bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
+{
+    if (title == other.title &&
+        subtitle.length() > 2 &&
+        description.length() > 2 &&
+        subtitle == other.subtitle &&
+        description == other.description)
+        return true;
+    else
+        return false;
+}
+ 
+bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
+{
+    if (chanid == other.chanid &&
+        startts == other.startts &&
+        endts == other.endts &&
+        sourceid == other.sourceid &&
+        cardid == other.cardid &&
+	inputid == other.inputid)
+        return true;
+    else
+        return false;
 }
 
 QString ProgramInfo::GetRecordFilename(const QString &prefix)

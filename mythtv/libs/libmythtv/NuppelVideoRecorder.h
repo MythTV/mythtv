@@ -86,6 +86,9 @@ class NuppelVideoRecorder
     void TransitionToFile(const QString &lfilename);
     void TransitionToRing(void);
 
+    long long GetKeyframePosition(long long desired);
+
+
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);

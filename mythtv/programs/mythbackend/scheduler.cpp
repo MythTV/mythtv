@@ -164,7 +164,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
 
     thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title,"
                "subtitle,description,channel.channum,channel.callsign,"
-               "channel.name,profile FROM singlerecord,channel "
+               "channel.name FROM singlerecord,channel "
                "WHERE channel.chanid = singlerecord.chanid;";
 
     query = db->exec(thequery);
@@ -194,8 +194,6 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             if (proginfo->description == QString::null)
                 proginfo->description = "";
 
-            proginfo->recordingprofileid = query.value(10).toInt();
-
             if (proginfo->endts < curDateTime)
                 delete proginfo;
             else 
@@ -203,9 +201,9 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         }
     }
 
-    thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title,profile "
-      "FROM timeslotrecord,channel "
-      "WHERE channel.chanid = timeslotrecord.chanid;";
+    thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title FROM "
+               "timeslotrecord,channel WHERE "
+               "channel.chanid = timeslotrecord.chanid;";
 
     query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -217,7 +215,6 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             QString starttime = query.value(2).toString();
             QString endtime = query.value(3).toString();
             QString title = query.value(4).toString();
-            int profile = query.value(5).toInt();
 
             if (title == QString::null)
                 continue;
@@ -289,8 +286,6 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                         if (proginfo->description == QString::null)
                             proginfo->description = "";
 
-                        proginfo->recordingprofileid = profile;
-
                         recordingList.push_back(proginfo);
                     }
                 }
@@ -298,8 +293,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         }
     }
 
-    thequery = "SELECT title,chanid,profile "
-      "FROM allrecord;";
+    thequery = "SELECT title,chanid FROM allrecord;";
     query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -307,8 +301,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         while (query.next())
         {
             QString title = query.value(0).toString();
-            int chanid = query.value(1).toInt();
-            int profile = query.value(2).toInt();
+            int chanid = query.value(1).toInt();   
 
             if (title == QString::null)
                 continue;
@@ -372,8 +365,6 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                         proginfo->subtitle = "";
                     if (proginfo->description == QString::null)
                         proginfo->description = "";
-
-                    proginfo->recordingprofileid = profile;
 
                     recordingList.push_back(proginfo);
                 }
@@ -511,7 +502,7 @@ bool Scheduler::FindInOldRecordings(ProgramInfo *pginfo)
     QSqlQuery query;
     QString thequery;
    
-    if (pginfo->subtitle == "" || pginfo->description == "")
+    if (pginfo->subtitle.length() <= 2 || pginfo->description.length() < 2)
         return false;
 
     thequery = QString("SELECT NULL FROM oldrecorded WHERE "
@@ -554,10 +545,15 @@ void Scheduler::PruneList(void)
                 for (; j != recordingList.rend(); j++)
                 {
                     ProgramInfo *second = (*j);
-                    if ((first->title == second->title) && 
-                        (first->subtitle == second->subtitle) &&
-                        (first->description == second->description) &&
-                        first->subtitle != "" && first->description != "")
+                    if (first->IsSameTimeslot(*second)) 
+                    {
+                        delete second;
+                        deliter = j.base();
+                        j++;
+                        deliter--;
+                        recordingList.erase(deliter);
+                    }
+                    else if (first->IsSameProgram(*second))
                     {
                         if (second->conflicting && !first->conflicting)
                         {

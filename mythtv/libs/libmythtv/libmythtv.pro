@@ -18,7 +18,5 @@ installfiles.files += settings.txt
 INSTALLS = installfiles
  
 # Input
-HEADERS += channel.h frequencies.h tv.h recordingprofile.h ../libNuppelVideo/osd.h
-HEADERS += ../libNuppelVideo/NuppelVideoPlayer.h 
-HEADERS += ../libNuppelVideo/NuppelVideoRecorder.h
-SOURCES += channel.cpp frequencies.c tv.cpp recordingprofile.cpp
+HEADERS += channel.h frequencies.h recordingprofile.h tv_play.h tv_rec.h
+SOURCES += channel.cpp frequencies.c recordingprofile.cpp tv_play.cpp tv_rec.cpp

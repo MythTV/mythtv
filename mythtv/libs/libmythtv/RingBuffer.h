@@ -4,6 +4,9 @@
 #include <qstring.h>
 #include <pthread.h>
 
+class MythContext;
+class QSocket;
+
 class ThreadedFileWriter
 {
 public:
@@ -33,12 +36,13 @@ private:
 class RingBuffer
 {
  public:
-    RingBuffer(const QString &lfilename, bool write);
-    RingBuffer(const QString &lfilename, long long size, long long smudge);
+    RingBuffer(MythContext *context, const QString &lfilename, bool write);
+    RingBuffer(MythContext *context, const QString &lfilename, long long size, 
+               long long smudge, int recordernum = 0);
     
    ~RingBuffer();
 
-    bool IsOpen(void) { return (tfw || fd2 > 0); }
+    bool IsOpen(void) { return (tfw || fd2 > 0 || sock); }
     
     int Read(void *buf, int count);
     int Write(const void *buf, int count);
@@ -52,10 +56,10 @@ class RingBuffer
     long long Seek(long long pos, int whence);
     long long WriterSeek(long long pos, int whence);
 
-    long long GetReadPosition(void) { return readpos; }
-    long long GetTotalReadPosition(void) { return totalreadpos; }
-    long long GetWritePosition(void) { return writepos; }
-    long long GetTotalWritePosition(void) { return totalwritepos; }
+    long long GetReadPosition(void);
+    long long GetTotalReadPosition(void);
+    long long GetWritePosition(void);
+    long long GetTotalWritePosition(void);
     long long GetFileSize(void) { return filesize; }
     long long GetSmudgeSize(void) { return smudgeamount; }
 
@@ -68,6 +72,7 @@ class RingBuffer
     void Reset(void);
 
     void StopReads(void) { stopreads = true; }
+    void StartReads(void) { stopreads = false; }
     bool LiveMode(void) { return !normalfile; }
 
     const QString GetFilename(void) { return filename; }
@@ -75,6 +80,9 @@ class RingBuffer
     bool IsIOBound(void);
 
  private:
+    int safe_read(int fd, void *data, unsigned sz);
+    int safe_read(QSocket *sock, void *data, unsigned sz);
+
     QString filename;
 
     ThreadedFileWriter *tfw, *dumpfw;
@@ -98,6 +106,10 @@ class RingBuffer
     bool stopreads;
 
     pthread_rwlock_t rwlock;
+
+    MythContext *m_context;
+    int recorder_num;
+    QSocket *sock;
 };
 
 #endif

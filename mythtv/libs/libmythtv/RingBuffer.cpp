@@ -10,6 +10,7 @@
 using namespace std;
 
 #include "RingBuffer.h"
+#include "../libmyth/mythcontext.h"
 
 #define TFW_BUF_SIZE (2*1024*1024)
 
@@ -22,7 +23,7 @@ static unsigned safe_write(int fd, const void *data, unsigned sz)
 	ret=write(fd, (char *)data+tot, sz-tot);
 	if(ret<0)
 	{
-	    perror("ERROR: file I/O problem in 'safe_write()' (RingBuffer.cpp)\n");
+	    perror("ERROR: file I/O problem in 'safe_write()'\n");
 	    errcnt++;
 	    if(errcnt==3) break;
 	}
@@ -31,31 +32,6 @@ static unsigned safe_write(int fd, const void *data, unsigned sz)
 	    tot += ret;
 	}
 	if(tot < sz) usleep(1000);
-    }
-    return tot;
-}
-
-static unsigned safe_read(int fd, void *data, unsigned sz)
-{
-    int ret;
-    unsigned tot=0;
-    unsigned errcnt=0;
-    while(tot < sz) {
-	ret = read(fd, (char *)data+tot, sz-tot);
-	if(ret<0)
-	{
-	    perror("ERROR: file I/O problem in 'safe_read()' (RingBuffer.cpp)\n");
-	    errcnt++;
-	    if(errcnt==3) break;
-	}
-	else
-	{
-	    tot+=ret;
-	}
-        if (ret == 0) // EOF returns 0
-            break;
-	if(tot < sz) 
-           usleep(1000);
     }
     return tot;
 }
@@ -217,11 +193,16 @@ unsigned ThreadedFileWriter::BufFree()
 
 /**********************************************************************/
 
-RingBuffer::RingBuffer(const QString &lfilename, bool write)
+RingBuffer::RingBuffer(MythContext *context, const QString &lfilename, 
+                       bool write)
 {
+    m_context = context;
+    recorder_num = 0;   
+ 
     normalfile = true;
     filename = (QString)lfilename;
     tfw = NULL;
+    sock = NULL;
     fd2 = -1;
 
     if (write)
@@ -233,7 +214,10 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write)
     }
     else
     {
-        fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
+        if (filename.left(4) == "myth")
+            sock = m_context->SetupRemoteFile(filename);
+        else
+            fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
         writemode = false;
     }
 
@@ -248,19 +232,31 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write)
     pthread_rwlock_init(&rwlock, NULL);
 }
 
-RingBuffer::RingBuffer(const QString &lfilename, long long size, 
-                       long long smudge)
+RingBuffer::RingBuffer(MythContext *context, const QString &lfilename, 
+                       long long size, long long smudge, int recordernum)
 {
+    m_context = context;
+    recorder_num = recordernum;
+
     normalfile = false;
     filename = (QString)lfilename;
     filesize = size;
    
+    sock = NULL;
     tfw = NULL;
     fd2 = -1;
 
-    tfw = new ThreadedFileWriter(filename.ascii(), 
-				 O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
-    fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
+    if (recorder_num == 0)
+    {
+        tfw = new ThreadedFileWriter(filename.ascii(), 
+                                     O_WRONLY|O_CREAT|O_TRUNC|O_LARGEFILE, 
+                                     0644);
+        fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
+    }
+    else
+    {
+        sock = m_context->SetupRemoteRingBuffer(recorder_num, filename);
+    }
 
     totalwritepos = writepos = 0;
     totalreadpos = readpos = 0;
@@ -278,6 +274,13 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
 RingBuffer::~RingBuffer(void)
 {
     pthread_rwlock_wrlock(&rwlock);
+    if (sock)
+    {
+        if (normalfile)
+            m_context->CloseRemoteFile(sock);
+        else
+            m_context->CloseRemoteRingBuffer(recorder_num, sock);
+    }
     if (tfw)
     {
 	delete tfw;
@@ -322,13 +325,24 @@ void RingBuffer::Reset(void)
 
     if (!normalfile)
     {
-	delete tfw;
-        close(fd2);
+        if (sock)
+        {
+            int avail = sock->bytesAvailable();
+            char *trash = new char[avail + 1];
+            sock->readBlock(trash, avail);
+            delete [] trash;
+        }
+        else
+        {
+	    delete tfw;
+            close(fd2);
 
-        tfw = new ThreadedFileWriter(filename.ascii(),
-				     O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
-        fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
- 
+            tfw = new ThreadedFileWriter(filename.ascii(),
+                                         O_WRONLY|O_CREAT|O_TRUNC|O_LARGEFILE, 
+                                         0644);
+            fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
+        }
+
         totalwritepos = writepos = 0;
         totalreadpos = readpos = 0;
 
@@ -337,6 +351,71 @@ void RingBuffer::Reset(void)
     
     pthread_rwlock_unlock(&rwlock);
 }
+
+int RingBuffer::safe_read(int fd, void *data, unsigned sz)
+{
+    int ret;
+    unsigned tot = 0;
+    unsigned errcnt = 0;
+    unsigned zerocnt = 0;
+
+    while(tot < sz) {
+        ret = read(fd, (char *)data+tot, sz-tot);
+        if(ret<0)
+        {
+            perror("ERROR: file I/O problem in 'safe_read()'\n");
+            errcnt++;
+            if(errcnt==3) break;
+        }
+        else if (ret > 0)
+        {
+            tot += ret;
+        }
+
+        if (ret == 0) // EOF returns 0
+        {
+            zerocnt++;
+            if (zerocnt == 100)
+            {
+                printf("EOF\n");
+                break;
+            }
+        }
+        if(tot < sz)
+           usleep(1000);
+        if (stopreads)
+           break;
+    }
+    return tot;
+}
+
+int RingBuffer::safe_read(QSocket *sock, void *data, unsigned sz)
+{
+    int ret;
+    unsigned tot = 0;
+    unsigned zerocnt = 0;
+
+    while (sock->bytesAvailable() < sz) 
+    {
+        zerocnt++;
+        if (zerocnt == 100)
+        {
+            printf("EOF %d %d\n", sock->bytesAvailable(), sz);
+            break;
+        }
+        usleep(1000);
+        if (stopreads)
+            break;
+    }
+
+    if (sock->bytesAvailable() >= sz)
+    {
+        ret = sock->readBlock((char *)data+tot, sz-tot);
+        tot += ret;
+    }
+    return tot;
+}
+
 
 int RingBuffer::Read(void *buf, int count)
 {
@@ -347,9 +426,16 @@ int RingBuffer::Read(void *buf, int count)
     {
         if (!writemode)
         {
-            ret = safe_read(fd2, buf, count);
-	    totalreadpos += ret;
-            readpos += ret;
+            if (sock)
+            {
+                ret = m_context->ReadRemoteFile(sock, buf, count); 
+            }
+            else
+            {
+                ret = safe_read(fd2, buf, count);
+	        totalreadpos += ret;
+                readpos += ret;
+            }
         }
         else
         {
@@ -358,18 +444,13 @@ int RingBuffer::Read(void *buf, int count)
     }
     else
     {
-        while ( totalreadpos + count >= 
-		totalwritepos - tfw->BufUsed() )
+        if (sock)
         {
-            usleep(1000);
-            if (stopreads)
-            {
-                pthread_rwlock_unlock(&rwlock);
-                return 0;
-            }
-	}
-
-	if (readpos + count > filesize)
+            ret = safe_read(sock, buf, count);
+            readpos += ret;
+            totalreadpos += ret;
+        } 
+        else if (readpos + count > filesize)
         {
 	    int toread = filesize - readpos;
 
@@ -494,19 +575,28 @@ long long RingBuffer::Seek(long long pos, int whence)
     long long ret = -1;
     if (normalfile)
     {
-        ret = lseek64(fd2, pos, whence);
-	if (whence == SEEK_SET)
+        if (sock)
+            ret = m_context->SeekRemoteFile(sock, readpos, pos, whence);
+        else
+            ret = lseek64(fd2, pos, whence);
+
+        if (whence == SEEK_SET)
             readpos = ret;
-	else if (whence == SEEK_CUR)
+        else if (whence == SEEK_CUR)
             readpos += pos;
         totalreadpos = readpos;
     }
     else
     {
-        ret = lseek64(fd2, pos, whence);
+        if (sock)
+            ret = m_context->SeekRemoteRing(recorder_num, sock, readpos,
+                                            pos, whence);
+        else
+            ret = lseek64(fd2, pos, whence);
+
 	if (whence == SEEK_SET)
         {
-	    // FIXME: set totalreadpos too
+	    totalreadpos = pos; // only used for file open
 	    readpos = ret;
         }
 	else if (whence == SEEK_CUR)
@@ -535,7 +625,11 @@ long long RingBuffer::WriterSeek(long long pos, int whence)
 long long RingBuffer::GetFreeSpace(void)
 {
     if (!normalfile)
-        return (totalreadpos + filesize - totalwritepos - smudgeamount);
+    {
+        if (sock)
+            return m_context->GetRecorderFreeSpace(recorder_num, totalreadpos);
+        return totalreadpos + filesize - totalwritepos - smudgeamount;
+    }
     else
         return -1;
 }
@@ -547,12 +641,32 @@ long long RingBuffer::GetFreeSpaceWithReadChange(long long readchange)
         if (readchange > 0)
             readchange = 0 - (filesize - readchange);
 
-	return (totalreadpos + readchange + filesize - totalwritepos - 
-                smudgeamount);
+	return GetFreeSpace() + readchange; 
     }
     else
     {
         return readpos + readchange;
     }
 }
+
+long long RingBuffer::GetReadPosition(void)
+{
+    return readpos;
+}
+
+long long RingBuffer::GetTotalReadPosition(void)
+{
+    return totalreadpos;
+}
+
+long long RingBuffer::GetWritePosition(void)
+{
+    return writepos;
+}
+
+long long RingBuffer::GetTotalWritePosition(void) 
+{ 
+    return totalwritepos; 
+}
+
 

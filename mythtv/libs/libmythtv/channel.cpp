@@ -13,7 +13,7 @@
 #include <iostream>
 using namespace std;
 
-Channel::Channel(TV *parent, const QString &videodevice)
+Channel::Channel(TVRec *parent, const QString &videodevice)
 {
     device = videodevice;
     isopen = false;

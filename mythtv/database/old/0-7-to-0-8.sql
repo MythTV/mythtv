@@ -1,3 +1,5 @@
+USE mythconverg;
+
 CREATE TABLE IF NOT EXISTS recordingprofiles
 (
     id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,

@@ -358,9 +358,6 @@ uint64_t time= rdtsc();
     printf("bytes=%x %x %x %x\n", buf[0], buf[1], buf[2], buf[3]);
 #endif
 
-    s->hurry_up= avctx->hurry_up;
-    s->error_resilience= avctx->error_resilience;
-
     s->flags= avctx->flags;
 
     *data_size = 0;
@@ -498,10 +495,10 @@ retry:
         /* FIXME: By the way H263 decoder is evolving it should have */
         /* an H263EncContext                                         */
     if(s->aspected_height)
-        new_aspect= (float)s->aspected_width / (float)s->aspected_height;
+        new_aspect= s->aspected_width*s->width / (float)(s->height*s->aspected_height);
     else
         new_aspect=0;
-
+    
     if (   s->width != avctx->width || s->height != avctx->height 
         || ABS(new_aspect - avctx->aspect_ratio) > 0.001) {
         /* H.263 could change picture size any time */
@@ -509,6 +506,8 @@ retry:
         s->context_initialized=0;
     }
     if (!s->context_initialized) {
+        avctx->width = s->width;
+        avctx->height = s->height;
         avctx->aspect_ratio= new_aspect;
 
         goto retry;
@@ -530,9 +529,9 @@ retry:
     /* skip b frames if we dont have reference frames */
     if(s->num_available_buffers<2 && s->pict_type==B_TYPE) return get_consumed_bytes(s, buf_size);
     /* skip b frames if we are in a hurry */
-    if(s->hurry_up && s->pict_type==B_TYPE) return get_consumed_bytes(s, buf_size);
+    if(avctx->hurry_up && s->pict_type==B_TYPE) return get_consumed_bytes(s, buf_size);
     /* skip everything if we are in a hurry>=5 */
-    if(s->hurry_up>=5) return get_consumed_bytes(s, buf_size);
+    if(avctx->hurry_up>=5) return get_consumed_bytes(s, buf_size);
     
     if(s->next_p_frame_damaged){
         if(s->pict_type==B_TYPE)

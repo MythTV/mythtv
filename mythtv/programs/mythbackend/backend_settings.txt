@@ -1,0 +1,5 @@
+ServerIP=192.168.1.101
+ServerPort=6543
+
+#ServerMode=Master
+

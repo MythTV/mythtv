@@ -6,12 +6,15 @@
 #include <qpainter.h>
 #include <unistd.h>
 #include <qsqldatabase.h>
+#include <qurl.h>
 
 #include "mythcontext.h"
 //#include "settings.h"
 #include "oldsettings.h"
 #include "themedmenu.h"
 #include "guidegrid.h"
+#include "programinfo.h"
+#include "util.h"
 
 using namespace libmyth;
 
@@ -56,6 +59,8 @@ MythContext::MythContext(bool gui)
 
     m_wmult = m_width / 800.0;
     m_hmult = m_height / 600.0;
+
+    serverSock = NULL;
 }
 
 MythContext::~MythContext()
@@ -64,6 +69,54 @@ MythContext::~MythContext()
         delete m_settings;
     if (m_qtThemeSettings)
         delete m_qtThemeSettings;
+    if (serverSock)
+    {
+        serverSock->close();
+        delete serverSock;
+    }
+}
+
+bool MythContext::ConnectServer(const QString &hostname, int port)
+{
+    pthread_mutex_init(&serverSockLock, NULL);
+    serverSock = new QSocket();
+
+    cout << "connecting to backend server: " << hostname << ":" << port << endl;
+    serverSock->connectToHost(hostname, port);
+
+    int num = 0;
+    while (serverSock->state() == QSocket::HostLookup ||
+           serverSock->state() == QSocket::Connecting)
+    {
+        qApp->processEvents();
+        usleep(50);
+        num++;
+        if (num > 100)
+        {
+            cerr << "Connection timed out.\n";
+            exit(0);
+        }
+    }
+
+    if (serverSock->state() != QSocket::Connected)
+    {
+        cout << "Could not connect to backend server\n";
+        exit(0);
+    }
+
+    char localhostname[256];
+    if (gethostname(localhostname, 256))
+    {
+        cerr << "Error getting local hostname\n";
+        exit(0);
+    }
+    m_localhostname = localhostname;
+
+    QString str = QString("ANN Playback %1").arg(m_localhostname);
+    QStringList strlist = str;
+    WriteStringList(serverSock, strlist);
+
+    return true;
 }
 
 QString MythContext::GetFilePrefix(void)
@@ -334,5 +387,476 @@ QPixmap *MythContext::LoadScalePixmap(QString filename)
 void MythContext::SetSetting(const QString &key, const QString &newValue)
 {
     m_settings->SetSetting(key, newValue);
+}
+
+vector<ProgramInfo *> *MythContext::GetRecordedList(bool deltype)
+{
+    QString str = "QUERY_RECORDINGS ";
+    if (deltype)
+        str += "Delete";
+    else
+        str += "Play";
+
+    QStringList strlist = str;
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    int numrecordings = strlist[0].toInt();
+
+    vector<ProgramInfo *> *info = new vector<ProgramInfo *>;
+    int offset = 1;
+
+    for (int i = 0; i < numrecordings; i++)
+    {
+        ProgramInfo *pginfo = new ProgramInfo();
+        pginfo->FromStringList(strlist, offset);
+        info->push_back(pginfo);
+
+        offset += NUMPROGRAMLINES;
+    }
+
+    return info;
+} 
+
+void MythContext::GetFreeSpace(int &totalspace, int &usedspace)
+{
+    QStringList strlist = QString("QUERY_FREESPACE");
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    totalspace = strlist[0].toInt();
+    usedspace = strlist[1].toInt();
+}
+
+bool MythContext::GetAllPendingRecordings(list<ProgramInfo *> &recordinglist)
+{
+    QStringList strlist = QString("QUERY_GETALLPENDING");
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    bool conflicting = strlist[0].toInt();
+    int numrecordings = strlist[1].toInt();
+
+    int offset = 2;
+
+    for (int i = 0; i < numrecordings; i++)
+    {
+        ProgramInfo *pginfo = new ProgramInfo();
+        pginfo->FromStringList(strlist, offset);
+        recordinglist.push_back(pginfo);
+
+        offset += NUMPROGRAMLINES;
+    }
+
+    return conflicting;
+}
+
+list<ProgramInfo *> *MythContext::GetConflictList(ProgramInfo *pginfo, 
+                                                  bool removenonplaying)
+{
+    QString cmd = QString("QUERY_GETCONFLICTING %1").arg(removenonplaying);
+    QStringList strlist = cmd;
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+
+    strlist.clear();
+    pginfo->ToStringList(strlist);
+
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    int numrecordings = strlist[0].toInt();
+    int offset = 1;
+
+    list<ProgramInfo *> *retlist = new list<ProgramInfo *>;
+
+    for (int i = 0; i < numrecordings; i++)
+    {
+        ProgramInfo *pginfo = new ProgramInfo();
+        pginfo->FromStringList(strlist, offset);
+        retlist->push_back(pginfo);
+
+        offset += NUMPROGRAMLINES;
+    }
+
+    return retlist;
+}
+
+int MythContext::RequestRecorder(void)
+{
+    QStringList strlist = "GET_FREE_RECORDER";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    int retval = strlist[0].toInt();
+    return retval;
+}
+
+bool MythContext::RecorderIsRecording(int recorder)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "IS_RECORDING";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    bool retval = strlist[0].toInt();
+    return retval;
+}
+
+float MythContext::GetRecorderFrameRate(int recorder)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "GET_FRAMERATE";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    float retval = strlist[0].toFloat();
+    return retval;
+}
+
+long long MythContext::GetRecorderFramesWritten(int recorder)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "GET_FRAMES_WRITTEN";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    long long retval = strlist[0].toInt();
+    retval |= ((long long)strlist[1].toInt()) << 32;
+
+    return retval;
+}
+
+long long MythContext::GetRecorderFilePosition(int recorder)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "GET_FILE_POSITION";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    long long retval = strlist[0].toInt();
+    retval |= ((long long)strlist[1].toInt()) << 32;
+
+    return retval;
+}
+
+long long MythContext::GetRecorderFreeSpace(int recorder, 
+                                            long long totalreadpos)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "GET_FREE_SPACE";
+    strlist << QString::number((int)(totalreadpos & 0xffffffff));
+    strlist << QString::number((int)((totalreadpos >> 32) & 0xffffffff));
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    long long retval = strlist[0].toInt();
+    retval |= ((long long)strlist[1].toInt()) << 32;
+
+    return retval;
+}
+
+long long MythContext::GetKeyframePosition(int recorder, long long desired)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "GET_KEYFRAME_POS";
+    strlist << QString::number((int)(desired & 0xffffffff));
+    strlist << QString::number((int)((desired >> 32) & 0xffffffff));
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    long long retval = strlist[0].toInt();
+    retval |= ((long long)strlist[1].toInt()) << 32;
+
+    return retval;
+}
+
+void MythContext::SetupRecorderRingBuffer(int recorder, QString &path,
+                                          long long &filesize, 
+                                          long long &fillamount,
+                                          bool pip)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "SETUP_RING_BUFFER";
+    strlist << QString::number((int)pip);
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    path = strlist[0];
+
+    filesize = strlist[1].toInt();
+    filesize |= ((long long)strlist[2].toInt()) << 32;
+
+    fillamount = strlist[3].toInt();
+    fillamount |= ((long long)strlist[4].toInt()) << 32;
+}
+
+void MythContext::SpawnLiveTVRecording(int recorder)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "SPAWN_LIVETV";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+}
+
+void MythContext::StopLiveTVRecording(int recorder)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "STOP_LIVETV";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+}
+
+void MythContext::PauseRecorder(int recorder)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "PAUSE";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+}
+
+void MythContext::ToggleRecorderInputs(int recorder)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "TOGGLE_INPUTS";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+}
+
+void MythContext::RecorderChangeChannel(int recorder, bool direction)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "CHANGE_CHANNEL";
+    strlist << QString::number((int)direction);    
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+}
+
+void MythContext::RecorderSetChannel(int recorder, QString channel)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "SET_CHANNEL";
+    strlist << channel;
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+}
+
+bool MythContext::CheckChannel(int recorder, QString channel)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "CHECK_CHANNEL";
+    strlist << channel;
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    bool retval = strlist[0].toInt();
+    return retval;
+}
+
+void MythContext::GetRecorderChannelInfo(int recorder, QString &title, 
+                                         QString &subtitle,
+                                         QString &desc, QString &category,
+                                         QString &starttime, QString &endtime,
+                                         QString &callsign, QString &iconpath,
+                                         QString &channelname)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "GET_PROGRAM_INFO";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    title = strlist[0];
+    subtitle = strlist[1];
+    desc = strlist[2];
+    category = strlist[3];
+    starttime = strlist[4];
+    endtime = strlist[5];
+    callsign = strlist[6];
+    iconpath = strlist[7];
+    channelname = strlist[8];
+}
+
+void MythContext::GetRecorderInputName(int recorder, QString &inputname)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "GET_INPUT_NAME";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    inputname = strlist[0];
+}
+
+QSocket *MythContext::SetupRemoteRingBuffer(int recorder, QString url)
+{
+    QUrl qurl(url);
+
+    QString host = qurl.host();
+    int port = qurl.port();
+
+    QString dir = qurl.path();
+
+    QSocket *sock = new QSocket();
+
+    cout << "connecting to server: " << host << ":" << port << endl;
+    sock->connectToHost(host, port);
+
+    int num = 0;
+    while (sock->state() == QSocket::HostLookup ||
+           sock->state() == QSocket::Connecting)
+    {
+        usleep(50);
+        num++;
+        if (num > 100)
+        {
+            cerr << "Connection timed out.\n";
+            exit(0);
+        }
+    }
+
+    if (sock->state() != QSocket::Connected)
+    {
+        cout << "Could not connect to server\n";
+        return NULL;
+    }
+
+    QStringList list = QString("ANN RingBuffer %1 %2").arg(m_localhostname) 
+                       .arg(recorder);
+
+    WriteStringList(sock, list);
+
+    return sock;
+}
+
+void MythContext::CloseRemoteRingBuffer(int recorder, QSocket *sock)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "DONE_RINGBUF";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    sock->close();
+}
+
+long long MythContext::SeekRemoteRing(int recorder, QSocket *sock,
+                                      long long curpos,
+                                      long long pos, int whence)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "PAUSECLEAR_RINGBUF";
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    strlist.clear();
+
+    int avail = sock->bytesAvailable();
+    char *trash = new char[avail + 1];
+    sock->readBlock(trash, avail);
+    delete [] trash;
+
+    strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "SEEK_RINGBUF";
+    strlist << QString::number((int)(pos & 0xffffffff));
+    strlist << QString::number((int)((pos >> 32) & 0xffffffff));
+    strlist << QString::number(whence);
+    strlist << QString::number((int)(curpos & 0xffffffff));
+    strlist << QString::number((int)((curpos >> 32) & 0xffffffff));
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+
+    long long ret = strlist[0].toInt();
+    ret |= ((long long)strlist[1].toInt()) << 32;
+
+    return ret;
+}
+
+QSocket *MythContext::SetupRemoteFile(QString url)
+{
+    return NULL;
+}
+
+void MythContext::CloseRemoteFile(QSocket *sock)
+{
+}
+
+int MythContext::ReadRemoteFile(QSocket *sock, void *data, int size)
+{
+    return -1;
+}
+
+long long MythContext::SeekRemoteFile(QSocket *sock, long long curpos, 
+                                      long long pos, int whence)
+{
+    return -1;
 }
 

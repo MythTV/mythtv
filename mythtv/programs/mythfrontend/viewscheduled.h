@@ -8,8 +8,6 @@ class QSqlDatabase;
 class QListViewItem;
 class MyListView;
 class QLabel;
-class TV;
-class Scheduler;
 class ProgramInfo;
 class MythContext;
 
@@ -17,8 +15,8 @@ class ViewScheduled : public QDialog
 {
     Q_OBJECT
   public:
-    ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb, 
-                  QWidget *parent = 0, const char *name = 0);
+    ViewScheduled(MythContext *context, QSqlDatabase *ldb, QWidget *parent = 0, 
+                  const char *name = 0);
 
     void Show();
   
@@ -32,9 +30,6 @@ class ViewScheduled : public QDialog
     void handleNotRecording(ProgramInfo *rec);
 
     QSqlDatabase *db;
-    TV *tv;
-
-    QString fileprefix;
 
     QLabel *desclabel;
 
@@ -44,11 +39,11 @@ class ViewScheduled : public QDialog
     QLabel *date;
     QLabel *chan;
 
-    Scheduler *sched;
-
     MyListView *listview;
 
     MythContext *m_context;
+
+    float wmult, hmult;
 };
 
 #endif

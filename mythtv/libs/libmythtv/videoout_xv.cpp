@@ -19,12 +19,30 @@ using namespace std;
 
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/extensions/XShm.h>
+#include <X11/extensions/Xv.h>
+#include <X11/extensions/Xvlib.h>
+
 
 extern "C" {
 extern int      XShmQueryExtension(Display*);
 extern int      XShmGetEventBase(Display*);
 extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
 }
+
+struct XvData
+{
+    Window XJ_root;
+    Window XJ_win;
+    GC XJ_gc;
+    XSizeHints hints;
+    Screen *XJ_screen;
+    Display *XJ_disp;
+    XShmSegmentInfo *XJ_SHMInfo;
+    map<unsigned char *, XvImage *> buffers;
+};
 
 #define GUID_I420_PLANAR 0x30323449
 #define GUID_YV12_PLANAR 0x32315659
@@ -36,233 +54,270 @@ int XJ_error_catcher(Display * d, XErrorEvent * xeev)
   return 0;
 }
 
+XvVideoOutput::XvVideoOutput(void)
+{
+    XJ_started = 0; 
+    xv_port = -1; 
+    scratchspace = NULL; 
+
+    data = new XvData();
+}
+
+XvVideoOutput::~XvVideoOutput()
+{
+    Exit();
+    delete data;
+}
+
 void XvVideoOutput::sizehint(int x, int y, int width, int height, int max)
 {
-   hints.flags = PPosition | PSize | PWinGravity | PBaseSize;
-   hints.x = x; hints.y = y; hints.width = width; hints.height = height;
-   if (max)
-   {
-      hints.max_width = width; hints.max_height=height;
-      hints.flags |= PMaxSize;
-   }
-   else
-   {
-      hints.max_width = 0; hints.max_height = 0; 
-   }
-   hints.base_width = width; hints.base_height = height;
-   hints.win_gravity = StaticGravity;
-   XSetWMNormalHints(XJ_disp, XJ_win, &hints);
+    data->hints.flags = PPosition | PSize | PWinGravity | PBaseSize;
+    data->hints.x = x; 
+    data->hints.y = y; 
+    data->hints.width = width; 
+    data->hints.height = height;
+    if (max)
+    {
+        data->hints.max_width = width; 
+        data->hints.max_height = height;
+        data->hints.flags |= PMaxSize;
+    }
+    else
+    {
+        data->hints.max_width = 0; 
+        data->hints.max_height = 0; 
+    }
+    data->hints.base_width = width; 
+    data->hints.base_height = height;
+    data->hints.win_gravity = StaticGravity;
+    XSetWMNormalHints(data->XJ_disp, data->XJ_win, &(data->hints));
 }
 
 bool XvVideoOutput::Init(int width, int height, char *window_name, 
                          char *icon_name, int num_buffers, 
                          unsigned char **out_buffers)
 {
-  XWMHints wmhints;
-  XTextProperty windowName, iconName;
-  int (*old_handler)(Display *, XErrorEvent *);
-  int i, ret;
-  XJ_caught_error = 0;
+    XWMHints wmhints;
+    XTextProperty windowName, iconName;
+    XClassHint hint;
+    int (*old_handler)(Display *, XErrorEvent *);
+    int i, ret;
+    XJ_caught_error = 0;
   
-  unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
-  int p_num_adaptors;
+    unsigned int p_version, p_release, p_request_base, p_event_base, 
+                 p_error_base;
+    int p_num_adaptors;
 
-  XvAdaptorInfo *ai;
+    XvAdaptorInfo *ai;
 
-  XJ_width=width;
-  XJ_height=height;
+    hint.res_name = window_name;
+    hint.res_class = window_name;
 
-  XInitThreads();
+    XJ_width = width;
+    XJ_height = height;
 
-  XJ_disp=XOpenDisplay(NULL);
-  if(!XJ_disp) {printf("open display failed\n"); return false;}
-  
-  XJ_screen=DefaultScreenOfDisplay(XJ_disp);
-  XJ_screen_num=DefaultScreen(XJ_disp);
+    XInitThreads();
 
-  XJ_screenwidth = DisplayWidth(XJ_disp, XJ_screen_num);
-  XJ_screenheight = DisplayHeight(XJ_disp, XJ_screen_num);
-  
-  XJ_white=XWhitePixel(XJ_disp,XJ_screen_num);
-  XJ_black=XBlackPixel(XJ_disp,XJ_screen_num);
-  
-  XJ_fullscreen = 0;
-  
-  XJ_root=DefaultRootWindow(XJ_disp);
-  
-  XJ_win=XCreateSimpleWindow(XJ_disp,XJ_root,0,0,XJ_width,XJ_height,0,XJ_white,XJ_black);
-  if(!XJ_win) {  
-    printf("create window failed\n");
-    return false; 
-  }
- 
-  curx = 0; cury = 0;
-  curw = XJ_width; curh = XJ_height;
-  
-  /* tell window manager about our window */
-
-  sizehint(curx, cury, curw, curh, 0);
-  
-  wmhints.input=True;
-  wmhints.flags=InputHint;
-
-  XStringListToTextProperty(&window_name, 1 ,&windowName);
-  XStringListToTextProperty(&icon_name, 1 ,&iconName);
-
-  XSetWMProperties(XJ_disp, XJ_win, 
-		   &windowName, &iconName,
-		   NULL, 0,
-		   &hints, &wmhints, NULL);
-  
-  XSelectInput(XJ_disp, XJ_win, ExposureMask|KeyPressMask);
-  XMapRaised(XJ_disp, XJ_win);
-  
-  old_handler = XSetErrorHandler(XJ_error_catcher);
-  XSync(XJ_disp, 0);
-
-  ret = XvQueryExtension(XJ_disp, &p_version, &p_release, &p_request_base,
-                         &p_event_base, &p_error_base);
-  if (ret != Success) {
-    printf("XvQueryExtension failed.\n");
-  }
-
-  ret = XvQueryAdaptors(XJ_disp, DefaultRootWindow(XJ_disp),
-                        (unsigned int *)&p_num_adaptors, &ai);
-
-  if (ret != Success) {
-    printf("XvQueryAdaptors failed.\n");
-  }
-
-  xv_port = -1;
-  for (i = 0; i < p_num_adaptors; i++) 
-  {
-    if ((ai[i].type & XvInputMask) &&
-        (ai[i].type & XvImageMask))
+    data->XJ_disp = XOpenDisplay(NULL);
+    if (!data->XJ_disp) 
     {
-        xv_port = ai[i].base_id;
-        break;
+        printf("open display failed\n"); 
+        return false;
     }
-  }
- 
-  if (p_num_adaptors > 0)
-    XvFreeAdaptorInfo(ai);
-  if (xv_port == -1)
-  {
-    printf("Couldn't find Xv support, exiting\n");
-    exit (0);
-  }
-
-  int formats;
-  XvImageFormatValues *fo;
-  bool foundimageformat = false;
-
-  fo = XvListImageFormats(XJ_disp, xv_port, &formats);
-  for (i = 0; i < formats; i++)
-  {
-      if (fo[i].id == GUID_I420_PLANAR)
-      {
-          foundimageformat = true;
-          colorid = GUID_I420_PLANAR;
-      }
-  }
-
-  if (!foundimageformat)
-  {
-      for (i = 0; i < formats; i++)
-      {
-          if (fo[i].id == GUID_YV12_PLANAR)
-          {
-              foundimageformat = true;
-              colorid = GUID_YV12_PLANAR;
-          }
-      }
-  }
-
-  if (!foundimageformat)
-  {
-      printf("Couldn't find the proper Xv image format\n");
-      exit(0);
-  }
-
-  if (fo)
-      XFree(fo);
-
-  printf("Using XV port %d\n", xv_port);
-  XvGrabPort(XJ_disp, xv_port, CurrentTime);
-
-  XJ_gc = XCreateGC(XJ_disp, XJ_win, 0, 0);
-  XJ_depth = DefaultDepthOfScreen(XJ_screen);
-  XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
-  for (int i = 0; i < num_buffers; i++)
-  {
-      XvImage *image = XvShmCreateImage(XJ_disp, xv_port, colorid, 0,
-                                        XJ_width, XJ_height, &XJ_SHMInfo[i]);
-      XJ_SHMInfo[i].shmid = shmget(IPC_PRIVATE, image->data_size,
-                                   IPC_CREAT|0777);
-      if (XJ_SHMInfo[i].shmid < 0)
-      {
-          perror("shmget failed:");
-          return false;
-      }
- 
-      image->data = XJ_SHMInfo[i].shmaddr = (char *)shmat(XJ_SHMInfo[i].shmid,
-                                                          0, 0);
-      buffers[(unsigned char *)image->data] = image;
-      out_buffers[i] = (unsigned char *)image->data;
-
-      XJ_SHMInfo[i].readOnly = False;
-
-      XShmAttach(XJ_disp, &XJ_SHMInfo[i]);
-      XSync(XJ_disp, 0);
-  }
-
-  XSetErrorHandler(old_handler);
-
-  if (XJ_caught_error) {
-      return false;
-  }
   
-  XJ_started=1;
+    data->XJ_screen = DefaultScreenOfDisplay(data->XJ_disp);
+    XJ_screen_num = DefaultScreen(data->XJ_disp);
 
-  ToggleFullScreen();
+    XJ_screenwidth = DisplayWidth(data->XJ_disp, XJ_screen_num);
+    XJ_screenheight = DisplayHeight(data->XJ_disp, XJ_screen_num);
+  
+    XJ_white=XWhitePixel(data->XJ_disp, XJ_screen_num);
+    XJ_black=XBlackPixel(data->XJ_disp, XJ_screen_num);
+  
+    XJ_fullscreen = 0;
+  
+    data->XJ_root = DefaultRootWindow(data->XJ_disp);
+  
+    data->XJ_win = XCreateSimpleWindow(data->XJ_disp, data->XJ_root, 0, 0,
+                                       XJ_width, XJ_height, 0, XJ_white,
+                                       XJ_black);
 
-  if (colorid != GUID_I420_PLANAR)
-  {
-      scratchspace = new unsigned char[width * height * 3 / 2];
-  }
+    if (!data->XJ_win) 
+    {  
+        printf("create window failed\n");
+        return false; 
+    }
 
-  return true;
+    XSetClassHint(data->XJ_disp, data->XJ_win, &hint);
+ 
+    curx = 0; cury = 0;
+    curw = XJ_width; curh = XJ_height;
+  
+    /* tell window manager about our window */
+
+    sizehint(curx, cury, curw, curh, 0);
+  
+    wmhints.input=True;
+    wmhints.flags=InputHint;
+
+    XStringListToTextProperty(&window_name, 1 ,&windowName);
+    XStringListToTextProperty(&icon_name, 1 ,&iconName);
+
+    XSetWMProperties(data->XJ_disp, data->XJ_win, 
+                     &windowName, &iconName,
+                     NULL, 0, &(data->hints), &wmhints, NULL);
+  
+    XSelectInput(data->XJ_disp, data->XJ_win, ExposureMask|KeyPressMask);
+    XMapRaised(data->XJ_disp, data->XJ_win);
+  
+    old_handler = XSetErrorHandler(XJ_error_catcher);
+    XSync(data->XJ_disp, 0);
+
+    ret = XvQueryExtension(data->XJ_disp, &p_version, &p_release, 
+                           &p_request_base, &p_event_base, &p_error_base);
+    if (ret != Success) 
+    {
+        printf("XvQueryExtension failed.\n");
+    }
+
+    ret = XvQueryAdaptors(data->XJ_disp, data->XJ_root,
+                          (unsigned int *)&p_num_adaptors, &ai);
+
+    if (ret != Success) 
+    {
+        printf("XvQueryAdaptors failed.\n");
+    }
+
+    xv_port = -1;
+    for (i = 0; i < p_num_adaptors; i++) 
+    {
+        if ((ai[i].type & XvInputMask) &&
+            (ai[i].type & XvImageMask))
+        {
+            xv_port = ai[i].base_id;
+            break;
+        }
+    }
+ 
+    if (p_num_adaptors > 0)
+        XvFreeAdaptorInfo(ai);
+    if (xv_port == -1)
+    {
+        printf("Couldn't find Xv support, exiting\n");
+        exit (0);
+    }
+
+    int formats;
+    XvImageFormatValues *fo;
+    bool foundimageformat = false;
+
+    fo = XvListImageFormats(data->XJ_disp, xv_port, &formats);
+    for (i = 0; i < formats; i++)
+    {
+        if (fo[i].id == GUID_I420_PLANAR)
+        {
+            foundimageformat = true;
+            colorid = GUID_I420_PLANAR;
+        }
+    }
+
+    if (!foundimageformat)
+    {
+        for (i = 0; i < formats; i++)
+        {
+            if (fo[i].id == GUID_YV12_PLANAR)
+            {
+                foundimageformat = true;
+                colorid = GUID_YV12_PLANAR;
+            }
+        }
+    } 
+
+    if (!foundimageformat)
+    {
+        printf("Couldn't find the proper Xv image format\n");
+        exit(0);
+    }
+
+    if (fo)
+        XFree(fo);
+
+    printf("Using XV port %d\n", xv_port);
+    XvGrabPort(data->XJ_disp, xv_port, CurrentTime);
+
+    data->XJ_gc = XCreateGC(data->XJ_disp, data->XJ_win, 0, 0);
+    XJ_depth = DefaultDepthOfScreen(data->XJ_screen);
+    data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
+    for (int i = 0; i < num_buffers; i++)
+    {
+        XvImage *image = XvShmCreateImage(data->XJ_disp, xv_port, colorid, 0,
+                                          XJ_width, XJ_height, 
+                                          &(data->XJ_SHMInfo)[i]);
+        (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE, image->data_size,
+                                             IPC_CREAT|0777);
+        if ((data->XJ_SHMInfo)[i].shmid < 0)
+        {
+            perror("shmget failed:");
+            return false;
+        }
+ 
+        image->data = (data->XJ_SHMInfo)[i].shmaddr = 
+                         (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
+        data->buffers[(unsigned char *)image->data] = image;
+        out_buffers[i] = (unsigned char *)image->data;
+
+        (data->XJ_SHMInfo)[i].readOnly = False;
+
+        XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
+        XSync(data->XJ_disp, 0);
+    }
+
+    XSetErrorHandler(old_handler);
+
+    if (XJ_caught_error) 
+    {
+        return false;
+    }
+  
+    XJ_started = 1;
+
+    ToggleFullScreen();
+
+    if (colorid != GUID_I420_PLANAR)
+    {
+        scratchspace = new unsigned char[width * height * 3 / 2];
+    }
+
+    return true;
 }
 
 void XvVideoOutput::Exit(void)
 {
-  if(XJ_started) {
-    XJ_started = false;
-
-    //if (XJ_image)
-    //  XvDestroyImage(XJ_image);
-    int i = 0;
-    for(map<unsigned char *, XvImage *>::iterator iter = buffers.begin() ;
-        iter != buffers.end() ; 
-        ++iter, ++i) 
+    if (XJ_started) 
     {
-       XShmDetach(XJ_disp, &XJ_SHMInfo[i]);
-       if(XJ_SHMInfo[i].shmaddr)
-         shmdt(XJ_SHMInfo[i].shmaddr);
-       if(XJ_SHMInfo[i].shmid > 0)
-         shmctl(XJ_SHMInfo[i].shmid, IPC_RMID, 0);
-       XFree(iter->second);
+        XJ_started = false;
+
+        int i = 0;
+        map<unsigned char *, XvImage *>::iterator iter = data->buffers.begin();
+        for(; iter != data->buffers.end(); ++iter, ++i) 
+        {
+            XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
+            if ((data->XJ_SHMInfo)[i].shmaddr)
+                shmdt((data->XJ_SHMInfo)[i].shmaddr);
+            if ((data->XJ_SHMInfo)[i].shmid > 0)
+            shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
+            XFree(iter->second);
+        }
+
+        delete [] (data->XJ_SHMInfo);
+
+        if (scratchspace)
+            delete [] scratchspace;
+
+        XvUngrabPort(data->XJ_disp, xv_port, CurrentTime);
+        XDestroyWindow(data->XJ_disp, data->XJ_win);
+        XCloseDisplay(data->XJ_disp);
     }
-
-    delete [] XJ_SHMInfo;
-
-    if (scratchspace)
-        delete [] scratchspace;
-
-    XvUngrabPort(XJ_disp, xv_port, CurrentTime);
-    XDestroyWindow(XJ_disp, XJ_win);
-    XCloseDisplay(XJ_disp);
-  }
 }
 
 void XvVideoOutput::decorate(int dec)
@@ -272,24 +327,25 @@ void XvVideoOutput::decorate(int dec)
 
 void XvVideoOutput::hide_cursor(void)
 {
-  Cursor no_ptr;
-  Pixmap bm_no;
-  XColor black, dummy;
-  Colormap colormap;
-  static char no_data[] = { 0,0,0,0,0,0,0,0 };
+    Cursor no_ptr;
+    Pixmap bm_no;
+    XColor black, dummy;
+    Colormap colormap;
+    static char no_data[] = { 0,0,0,0,0,0,0,0 };
 
-  colormap = DefaultColormap(XJ_disp, DefaultScreen(XJ_disp));
-  XAllocNamedColor(XJ_disp, colormap, "black", &black, &dummy);
-  bm_no = XCreateBitmapFromData(XJ_disp, XJ_win, no_data, 8, 8);
-  no_ptr = XCreatePixmapCursor(XJ_disp, bm_no, bm_no, &black, &black, 0, 0);
+    colormap = DefaultColormap(data->XJ_disp, DefaultScreen(data->XJ_disp));
+    XAllocNamedColor(data->XJ_disp, colormap, "black", &black, &dummy);
+    bm_no = XCreateBitmapFromData(data->XJ_disp, data->XJ_win, no_data, 8, 8);
+    no_ptr = XCreatePixmapCursor(data->XJ_disp, bm_no, bm_no, &black, &black, 
+                                 0, 0);
 
-  XDefineCursor(XJ_disp, XJ_win, no_ptr);
-  XFreeCursor(XJ_disp, no_ptr);
+    XDefineCursor(data->XJ_disp, data->XJ_win, no_ptr);
+    XFreeCursor(data->XJ_disp, no_ptr);
 }
 
 void XvVideoOutput::show_cursor(void)
 {
-  XDefineCursor(XJ_disp, XJ_win, 0);
+    XDefineCursor(data->XJ_disp, data->XJ_win, 0);
 }
 
 void XvVideoOutput::ToggleFullScreen(void)
@@ -363,66 +419,66 @@ void XvVideoOutput::ToggleFullScreen(void)
 
     int hclamp = XJ_height / 4;
 
-    curh = ((curh) / hclamp) * hclamp + 4;
-    curw = ((curw) / 2) * 2 - 4;
+    curh = (int)((rintf(curh) / hclamp) * hclamp) + 4;
+    curw = ((curw) / 2) * 2 + 4;
 
     delete settings;
 
     sizehint(curx, cury, curw, curh, 0);
  
-    XMoveResizeWindow(XJ_disp, XJ_win, curx, cury, curw, curh);
-    XMapRaised(XJ_disp, XJ_win);
+    XMoveResizeWindow(data->XJ_disp, data->XJ_win, curx, cury, curw, curh);
+    XMapRaised(data->XJ_disp, data->XJ_win);
 
-    XRaiseWindow(XJ_disp, XJ_win);
-    XFlush(XJ_disp);
+    XRaiseWindow(data->XJ_disp, data->XJ_win);
+    XFlush(data->XJ_disp);
 }
    
 void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
 {
-  XvImage *image = buffers[buffer];
+    XvImage *image = data->buffers[buffer];
 
-  if (colorid == GUID_YV12_PLANAR)
-  {
-      memcpy(scratchspace, (unsigned char *)image->data + (width * height),
-             width * height / 4);
-      memcpy((unsigned char *)image->data + (width * height),
-             (unsigned char *)image->data + (width * height) * 5 / 4,
-             width * height / 4);
-      memcpy((unsigned char *)image->data + (width * height) * 5 / 4,
-             scratchspace, width * height / 4);
-  }
+    if (colorid == GUID_YV12_PLANAR)
+    {
+        memcpy(scratchspace, (unsigned char *)image->data + (width * height),
+               width * height / 4);
+        memcpy((unsigned char *)image->data + (width * height),
+               (unsigned char *)image->data + (width * height) * 5 / 4,
+               width * height / 4);
+        memcpy((unsigned char *)image->data + (width * height) * 5 / 4,
+               scratchspace, width * height / 4);
+    }
     
-  XvShmPutImage(XJ_disp, xv_port, XJ_win, XJ_gc, image, 0, 0, width, 
-                height, 0, 0, curw, curh, False);
-  XSync(XJ_disp, False);
+    XvShmPutImage(data->XJ_disp, xv_port, data->XJ_win, data->XJ_gc, image, 
+                  0, 0, width, height, 0, 0, curw, curh, False);
+    XSync(data->XJ_disp, False);
 }
 
 int XvVideoOutput::CheckEvents(void)
 {
-  if (!XJ_started)
-      return 0;
+    if (!XJ_started)
+        return 0;
 
-  XEvent Event;
-  char buf[100];
-  KeySym keySym;
-  static XComposeStatus stat;
-  int key = 0;
+    XEvent Event;
+    char buf[100];
+    KeySym keySym;
+    static XComposeStatus stat;
+    int key = 0;
  
-  while (XPending(XJ_disp))
-  {
-    XNextEvent(XJ_disp, &Event);
-
-    switch (Event.type)
+    while (XPending(data->XJ_disp))
     {
-      case KeyPress: 
-      {
-	 XLookupString(&Event.xkey, buf, sizeof(buf), &keySym, &stat);
-	 key = ((keySym&0xff00) != 0?((keySym&0x00ff) + 256):(keySym));
-	 return key;
-      } break;
-      default: break;
-    }
-  }
+        XNextEvent(data->XJ_disp, &Event);
 
-  return key;
+        switch (Event.type)
+        {
+            case KeyPress: 
+            {
+	        XLookupString(&Event.xkey, buf, sizeof(buf), &keySym, &stat);
+                key = ((keySym&0xff00) != 0?((keySym&0x00ff) + 256):(keySym));
+                return key;
+            } break;
+            default: break;
+        }
+    }
+
+    return key;
 }

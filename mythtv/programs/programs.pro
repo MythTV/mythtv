@@ -5,4 +5,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS += mythepg menutest mythfilldatabase mythtv mythfrontend
+SUBDIRS += mythepg menutest mythfilldatabase mythtv mythbackend mythfrontend

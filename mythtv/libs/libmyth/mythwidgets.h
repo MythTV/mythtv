@@ -1,7 +1,12 @@
+#ifndef MYTHWIDGETS_H_
+#define MYTHWIDGETS_H_
+
 #include <qcombobox.h>
 #include <qspinbox.h>
 #include <qslider.h>
 #include <qlineedit.h>
+#include <qpushbutton.h>
+#include <qtoolbutton.h>
 
 // These widgets follow these general navigation rules:
 //
@@ -123,3 +128,31 @@ protected:
           }
   };
 };
+
+class MyToolButton : public QToolButton
+{
+  public:
+    MyToolButton(QWidget *parent) : QToolButton(parent)
+                    { setFocusPolicy(StrongFocus);
+                      setBackgroundOrigin(WindowOrigin); }
+
+    void drawButton(QPainter *p);
+
+  private:
+    QColor origcolor;
+};
+
+class MyPushButton : public QPushButton
+{
+  public:
+    MyPushButton(const QString &text, QWidget *parent)
+               : QPushButton(text, parent)
+                { setBackgroundOrigin(WindowOrigin); }
+
+    void drawButton(QPainter *p);
+
+  private:
+    QColor origcolor;
+};
+
+#endif

@@ -25,6 +25,8 @@ extern "C" {
 #include "../libavcodec/mythav.h"
 }
 
+#include "../libs/libmyth/mythcontext.h"
+
 extern pthread_mutex_t avcodeclock;
 
 #define wsUp            0x52 + 256
@@ -71,6 +73,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     strm = NULL;
     wpos = rpos = 0;
     waud = raud = 0;
+
+    nvr_num = -1;
 
     paused = 0;
 
@@ -355,7 +359,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     {
         if (!ringBuffer)
         {
-            ringBuffer = new RingBuffer(filename, false);
+            cerr << "Warning: Old player ringbuf creation\n";
+            ringBuffer = new RingBuffer(NULL, filename, false);
             weMadeBuffer = true;
 	    livetv = false;
         }
@@ -369,7 +374,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             return -1;
         }
     }
-    startpos = ringBuffer->Seek(0, SEEK_CUR);
+    startpos = ringBuffer->GetReadPosition();
     
     if (ringBuffer->Read(&fileheader, FILEHEADERSIZE) != FILEHEADERSIZE)
     {
@@ -384,7 +389,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         char dummychar;
         ringBuffer->Read(&dummychar, 1);
 
-        startpos = ringBuffer->Seek(0, SEEK_CUR);
+        startpos = ringBuffer->GetReadPosition();
  
         if (ringBuffer->Read(&fileheader, FILEHEADERSIZE) != FILEHEADERSIZE)
         {
@@ -461,7 +466,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         return 0;
     }
 
-    startpos = ringBuffer->Seek(0, SEEK_CUR);
+    startpos = ringBuffer->GetReadPosition();
 
     ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
     
@@ -481,7 +486,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (usingextradata && extradata.seektable_offset > 0 && !disablevideo)
     {
-        long long currentpos = ringBuffer->Seek(0, SEEK_CUR);
+        long long currentpos = ringBuffer->GetReadPosition();
         struct rtframeheader seek_frameheader;
 
         int seekret = ringBuffer->Seek(extradata.seektable_offset, SEEK_SET);
@@ -494,7 +499,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     
         if (seek_frameheader.frametype != 'Q')
         {
-          cerr << "Invalid seektable (frametype " << (int)seek_frameheader.frametype << ")\n";
+          cerr << "Invalid seektable (frametype " 
+               << (int)seek_frameheader.frametype << ")\n";
         }
         else
         {
@@ -537,7 +543,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         char dummychar;
         ringBuffer->Read(&dummychar, 1);
 
-        startpos = ringBuffer->Seek(0, SEEK_CUR);
+        startpos = ringBuffer->GetReadPosition();
 
         if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
         {
@@ -560,6 +566,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         audio_channels = extradata.audio_channels;
         audio_bits = extradata.audio_bits_per_sample;
         audio_bytes_per_sample = audio_channels * audio_bits / 8;
+        foundit = 1;
     }
 
     while (!foundit) 
@@ -587,7 +594,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             }
         }
 
-        long long startpos2 = ringBuffer->Seek(0, SEEK_CUR);
+        long long startpos2 = ringBuffer->GetReadPosition();
 
         foundit = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, 
                                                        FRAMEHEADERSIZE));
@@ -601,7 +608,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             char dummychar;
             ringBuffer->Read(&dummychar, 1);
         
-            startpos2 = ringBuffer->Seek(0, SEEK_CUR);
+            startpos2 = ringBuffer->GetReadPosition();
         
             foundit = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, 
                                                            FRAMEHEADERSIZE));
@@ -1004,7 +1011,8 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
     while (!gotvideo)
     {
 	long long currentposition = ringBuffer->GetReadPosition();
-        if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
+        if ((ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
+            || (frameheader.frametype == 'Q'))
         {
             eof = 1;
             return;
@@ -1014,6 +1022,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                frameheader.frametype != 'S' && frameheader.frametype != 'T' &&
                frameheader.frametype != 'R' && frameheader.frametype != 'X')
         {
+cout << "unknown frameheader: " << frameheader.frametype << endl;
 	  /* we didnt get a known frametype! 
 	     so move down one char and look again... */
             ringBuffer->Seek((long long)1-FRAMEHEADERSIZE, SEEK_CUR);
@@ -1749,7 +1758,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             while (!GetVideoPause())
                 usleep(50);
 
-            if (rewindtime >= 5)
+            if (rewindtime >= 1)
                 DoRewind();
 
             UnpauseVideo();
@@ -1950,14 +1959,15 @@ bool NuppelVideoPlayer::DoRewind(void)
 long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
 {
     long long maxtime = (long long)(1.0 * video_frame_rate);
-    if (watchingrecording && nvr)
+    if (watchingrecording && nvr_num > 0)
         maxtime = (long long)(3.0 * video_frame_rate);
     
     long long ret = ff;
 
-    if (livetv || (watchingrecording && nvr))
+    if (livetv || (watchingrecording && nvr_num > 0))
     {
-        long long behind = nvr->GetFramesWritten() - framesPlayed;
+        long long behind = m_context->GetRecorderFramesWritten(nvr_num) - 
+                           framesPlayed;
 	if (behind < maxtime) // if we're close, do nothing
 	    ret = 0;
 	else if (behind - fftime <= maxtime)
@@ -1997,11 +2007,22 @@ bool NuppelVideoPlayer::DoFastForward(void)
     if (desiredKey == lastKey)
         normalframes = number;
 
+    long long keyPos = -1;
+
     if (positionMap->find(desiredKey / keyframedist) != positionMap->end() &&
         desiredKey != lastKey)
     {
+        keyPos = (*positionMap)[desiredKey / keyframedist];
+    }
+    else if (livetv || (watchingrecording && nvr_num > 0))
+    {
+        keyPos = m_context->GetKeyframePosition(nvr_num, desiredKey / 
+                                                keyframedist);
+    }
+
+    if (keyPos != -1)
+    {
         lastKey = desiredKey;
-        long long keyPos = (*positionMap)[lastKey / keyframedist];
         long long diff = keyPos - ringBuffer->GetReadPosition();
 
         ringBuffer->Seek(diff, SEEK_CUR);

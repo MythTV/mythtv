@@ -119,6 +119,10 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
     lview->setFixedHeight((int)(225 * hmult));
     lview->header()->hide();
 
+    lview->viewport()->setPalette(palette());
+    lview->horizontalScrollBar()->setPalette(palette());
+    lview->verticalScrollBar()->setPalette(palette());
+
     connect(lview, SIGNAL(returnPressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));
     connect(lview, SIGNAL(spacePressed(QListViewItem *)), this,

@@ -7,6 +7,7 @@
 
 #include "dialogbox.h"
 #include "mythcontext.h"
+#include "mythwidgets.h"
 
 DialogBox::DialogBox(MythContext *context, const QString &text, 
                      const char *checkboxtext,
@@ -25,7 +26,7 @@ DialogBox::DialogBox(MythContext *context, const QString &text,
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    //context->ThemeWidget(this);
+    context->ThemeWidget(this);
 
     QLabel *maintext = new QLabel(text, this);
     maintext->setBackgroundOrigin(WindowOrigin);
@@ -39,6 +40,7 @@ DialogBox::DialogBox(MythContext *context, const QString &text,
     if (checkboxtext)
     {
         checkbox = new QCheckBox(checkboxtext, this);
+        checkbox->setBackgroundOrigin(WindowOrigin);
         box->addWidget(checkbox, 0);
     }
 
@@ -51,7 +53,9 @@ DialogBox::DialogBox(MythContext *context, const QString &text,
 
 void DialogBox::AddButton(const QString &title)
 {
-    QPushButton *button = new QPushButton(title, this);
+    MyPushButton *button = new MyPushButton(title, this);
+    button->setBackgroundMode(X11ParentRelative);
+
     buttongroup->insert(button);
 
     box->addWidget(button, 0);

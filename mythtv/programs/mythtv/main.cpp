@@ -36,11 +36,9 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    QString startChannel = context->GetSetting("DefaultTVChannel");
-    if (startChannel == "")
-        startChannel = "3";
+    TV *tv = new TV(context);
+    tv->Init();
 
-    TV *tv = new TV(context, startChannel, 1, 2);
     tv->LiveTV();
 
     while (tv->GetState() == kState_None)

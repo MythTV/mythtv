@@ -3,7 +3,6 @@
 #include <qbuttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
-#include <qsqldatabase.h>
 #include <qlistview.h>
 #include <qdatetime.h>
 #include <qprogressbar.h>
@@ -11,6 +10,8 @@
 #include <qtimer.h>
 #include <qimage.h>
 #include <qpainter.h>
+#include <qheader.h>
+
 #include <unistd.h>
 
 #include <iostream>
@@ -26,15 +27,11 @@ using namespace std;
 #include "libmyth/dialogbox.h"
 #include "libmyth/programinfo.h"
 
-PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb, 
-                         PlaybackBox::BoxType ltype, QWidget *parent, 
+PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent, 
                          const char *name)
            : QDialog(parent, name)
 {
     type = ltype;
-    tv = ltv;
-    db = ldb;
-    fileprefix = context->GetFilePrefix();
     m_context = context;
 
     title = NULL;
@@ -84,6 +81,12 @@ PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb,
     listview->setSorting(-1, false);
     listview->setAllColumnsShowFocus(TRUE);
 
+    listview->viewport()->setPalette(palette());
+    listview->horizontalScrollBar()->setPalette(palette());
+    listview->verticalScrollBar()->setPalette(palette());
+    listview->header()->setPalette(palette());
+    listview->header()->setFont(font());
+
     connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));
     connect(listview, SIGNAL(spacePressed(QListViewItem *)), this,
@@ -97,73 +100,19 @@ PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb,
 
     vbox->addWidget(listview, 1);
 
-    QSqlQuery query;
-    QString thequery;
     ProgramListItem *item = NULL;
-   
-    thequery = "SELECT chanid,starttime,endtime,title,subtitle,description "
-               "FROM recorded ORDER BY starttime";
-
-    if (type == Delete)
-        thequery += " DESC";
-    thequery += ";";
-
-    query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        while (query.next())
-        {
-            ProgramInfo *proginfo = new ProgramInfo;
- 
-            proginfo->chanid = query.value(0).toString();
-            proginfo->startts = QDateTime::fromString(query.value(1).toString(),
-                                                      Qt::ISODate);
-            proginfo->endts = QDateTime::fromString(query.value(2).toString(),
-                                                    Qt::ISODate);
-            proginfo->title = query.value(3).toString();
-            proginfo->subtitle = query.value(4).toString();
-            proginfo->description = query.value(5).toString();
-            proginfo->conflicting = false;
-
-            if (proginfo->title == QString::null)
-                proginfo->title = "";
-            if (proginfo->subtitle == QString::null)
-                proginfo->subtitle = "";
-            if (proginfo->description == QString::null)
-                proginfo->description = "";
-
-            QSqlQuery subquery;
-            QString subquerystr;
-
-            subquerystr = QString("SELECT channum,name,callsign FROM channel "
-                                  "WHERE chanid = %1").arg(proginfo->chanid);
-            subquery = db->exec(subquerystr);
-
-            if (subquery.isActive() && subquery.numRowsAffected() > 0)
-            {
-                subquery.next();
- 
-                proginfo->chanstr = subquery.value(0).toString();
-                proginfo->channame = subquery.value(1).toString();
-                proginfo->chansign = subquery.value(2).toString();
-            }
-            else
-            {
-                proginfo->chanstr = "#" + proginfo->chanid;
-                proginfo->channame = "#" + proginfo->chanid;
-                proginfo->chansign = "#" + proginfo->chanid;
-            }
-
-            item = new ProgramListItem(context, listview, proginfo, 
-                                       type == Delete, tv, fileprefix);
-        }
-    }
-    else
-    {
-        // TODO: no recordings
-    }
   
+    vector<ProgramInfo *> *infoList = context->GetRecordedList(type == Delete);
+    if (infoList)
+    {
+        vector<ProgramInfo *>::iterator i = infoList->begin();
+        for (; i != infoList->end(); i++)
+        {
+            item = new ProgramListItem(context, listview, (*i), type == Delete);
+        }
+        delete infoList;
+    }
+
     if (type == Delete)
         listview->setFixedHeight((int)(225 * hmult));
     else 
@@ -301,7 +250,7 @@ void PlaybackBox::killPlayer(void)
 
 void PlaybackBox::startPlayer(ProgramInfo *rec)
 {
-    rbuffer = new RingBuffer(rec->GetRecordFilename(fileprefix), false);
+    rbuffer = new RingBuffer(m_context, rec->pathname, false);
 
     nvp = new NuppelVideoPlayer();
     nvp->SetRingBuffer(rbuffer);
@@ -393,31 +342,11 @@ void PlaybackBox::changed(QListViewItem *lvitem)
     timer->start(1000 / 30);
 }
 
-static void *SpawnDelete(void *param)
-{
-    QString *filenameptr = (QString *)param;
-    QString filename = *filenameptr;
-
-    unlink(filename.ascii());
-
-    filename += ".png";
-    unlink(filename.ascii());
-
-    filename = *filenameptr;
-    filename += ".bookmark";
-    unlink(filename.ascii());
-
-    filename = *filenameptr;
-    filename += ".cutlist";
-    unlink(filename.ascii());
-
-    delete filenameptr;
-
-    return NULL;
-}
-
 void PlaybackBox::selected(QListViewItem *lvitem)
 {
+    if (!lvitem)
+        return;
+
     switch (type) 
     {
         case Play: play(lvitem); break;
@@ -433,10 +362,15 @@ void PlaybackBox::play(QListViewItem *lvitem)
     ProgramInfo *rec = pgitem->getProgramInfo();
 
     ProgramInfo *tvrec = new ProgramInfo(*rec);
+
+    TV *tv = new TV(m_context);
+    tv->Init();
     tv->Playback(tvrec);
 
     while (tv->IsPlaying() || tv->ChangingState())
         usleep(50);
+
+    delete tv;
 
     startPlayer(rec);
     timer->start(1000 / 30);
@@ -488,38 +422,6 @@ void PlaybackBox::remove(QListViewItem *lvitem)
 
     if (result == 1)
     {
-        QString filename = rec->GetRecordFilename(fileprefix);
-
-        QSqlQuery query;
-        QString thequery;
-
-        QString startts = rec->startts.toString("yyyyMMddhhmm");
-        startts += "00";
-        QString endts = rec->endts.toString("yyyyMMddhhmm");
-        endts += "00";
-
-        thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
-                           "= \"%2\" AND starttime = %3 AND endtime = %4;")
-                           .arg(rec->chanid).arg(rec->title).arg(startts)
-                           .arg(endts);
-
-        query = db->exec(thequery);
-        if (!query.isActive())
-        {
-            cerr << "DB Error: recorded program deletion failed, SQL query "
-                 << "was:" << endl;
-            cerr << thequery << endl;
-        }
-
-        QString *fileptr = new QString(filename);
-
-        pthread_t deletethread;
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-
-        pthread_create(&deletethread, &attr, SpawnDelete, fileptr);
-
         if (lvitem->itemBelow())
         {
             listview->setCurrentItem(lvitem->itemBelow());
@@ -548,31 +450,7 @@ void PlaybackBox::remove(QListViewItem *lvitem)
 
 void PlaybackBox::GetFreeSpaceStats(int &totalspace, int &usedspace)
 {
-    QString command;
-    command.sprintf("df -k -P %s", fileprefix.ascii());
-
-    FILE *file = popen(command.ascii(), "r");
-
-    if (!file)
-    {
-        totalspace = -1;
-        usedspace = -1;
-    }
-    else
-    {
-        char buffer[1024];
-        fgets(buffer, 1024, file);
-        fgets(buffer, 1024, file);
-
-        char dummy[1024];
-        int dummyi;
-        sscanf(buffer, "%s %d %d %d %s %s\n", dummy, &totalspace, &usedspace,
-               &dummyi, dummy, dummy);
-
-        totalspace /= 1000;
-        usedspace /= 1000; 
-        pclose(file);
-    }
+    m_context->GetFreeSpace(totalspace, usedspace);
 }
  
 void PlaybackBox::UpdateProgressBar(void)

@@ -7,12 +7,12 @@
 
 using namespace std;
 
-class TV;
+class TVRec;
 
 class Channel
 {
  public:
-    Channel(TV *parent, const QString &videodevice);
+    Channel(TVRec *parent, const QString &videodevice);
    ~Channel(void);
 
     bool Open(void);
@@ -49,7 +49,7 @@ class Channel
     struct CHANLIST *curList;  
     int totalChannels;
 
-    TV *pParent;
+    TVRec *pParent;
 
     int videomode;
 

@@ -328,7 +328,8 @@ void NuppelVideoRecorder::Initialize(void)
 
     if (!ringBuffer)
     {
-        ringBuffer = new RingBuffer(sfilename, true);
+        cerr << "Warning: Old ringbuf creation\n";
+        ringBuffer = new RingBuffer(NULL, sfilename, true);
 	weMadeBuffer = true;
 	livetv = false;
     }
@@ -1456,6 +1457,23 @@ void NuppelVideoRecorder::doWriteThread(void)
             }
         }
     }
+}
+
+long long NuppelVideoRecorder::GetKeyframePosition(long long desired)
+{
+    long long ret = -1;
+
+    vector<struct seektable_entry>::iterator i = seektable->begin();
+    for (; i != seektable->end(); i++)
+    {
+        if ((*i).keyframe_number == desired)
+        {
+            ret = (*i).file_offset;
+            break;
+        }        
+    }
+
+    return ret;
 }
 
 void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum, 

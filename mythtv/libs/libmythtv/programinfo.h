@@ -16,6 +16,8 @@ enum RecordingType
     kAllRecord
 };
 
+#define NUMPROGRAMLINES 15
+
 class ProgramInfo
 {
   public:
@@ -24,6 +26,9 @@ class ProgramInfo
 
     // returns 0 for one-time, 1 for weekdaily, 2 for weekly
     int IsProgramRecurring(void);
+
+    bool IsSameProgram(const ProgramInfo& other) const;
+    bool IsSameTimeslot(const ProgramInfo& other) const;
 
     RecordingType GetProgramRecordingStatus(void);
     void ApplyRecordStateChange(RecordingType newstate);
@@ -34,6 +39,9 @@ class ProgramInfo
 
     int CalculateLength(void);
 
+    void ToStringList(QStringList &list);
+    void FromStringList(QStringList &list, int offset);
+
     QString title;
     QString subtitle;
     QString description;
@@ -43,6 +51,9 @@ class ProgramInfo
     QString chanstr;
     QString chansign;
     QString channame;
+
+    QString pathname;
+    long long filesize;
 
     QDateTime startts;
     QDateTime endts;

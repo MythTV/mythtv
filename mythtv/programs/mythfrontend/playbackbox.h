@@ -6,12 +6,10 @@
 
 #include <pthread.h>
 
-class QSqlDatabase;
 class QListViewItem;
 class MyListView;
 class QLabel;
 class QProgressBar;
-class TV;
 class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
@@ -24,8 +22,8 @@ class PlaybackBox : public QDialog
   public:
     typedef enum { Play, Delete } BoxType;
 
-    PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb, 
-                BoxType ltype, QWidget *parent = 0, const char *name = 0);
+    PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent = 0, 
+                const char *name = 0);
    ~PlaybackBox(void);
     
     void Show();
@@ -42,10 +40,6 @@ class PlaybackBox : public QDialog
     void UpdateProgressBar(void);
 
     BoxType type;
-    QSqlDatabase *db;
-    TV *tv;
-
-    QString fileprefix;
 
     QLabel *title;
     QLabel *subtitle;
