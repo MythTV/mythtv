@@ -217,9 +217,11 @@ void IconView::fillList(const QString &dir)
                     thumb.thumbfilename = subdir.entryInfoList()->getFirst()->absFilePath();
                 }
             }
+            thumb.name = fi->fileName();
         }
+        else
+            thumb.name = fi->baseName(true);
 
-        thumb.name = fi->baseName();
         thumbs.push_back(thumb);
     }
 }
@@ -242,7 +244,8 @@ void IconView::loadThumbPixmap(Thumbnail *thumb)
         thumb->thumbfilename.isNull()))
     {
         if (!cacheprogress)
-            cacheprogress = new MythProgressDialog("Caching thumbnails...", 0);
+            cacheprogress = new MythProgressDialog(tr("Caching thumbnails..."),
+                                                   0);
         tmpimage.load(thumb->filename);
         if (tmpimage.width() == 0 || tmpimage.height() == 0)
             return;

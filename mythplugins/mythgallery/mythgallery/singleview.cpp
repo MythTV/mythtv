@@ -177,7 +177,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
 
     switch (e->key())
     {
-        case ']':
+        case ']': case Key_3:
         {
             rotateAngle += 90;
             handled = true;
@@ -185,7 +185,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             newzoom = 0;
             break;
         }
-        case '[':
+        case '[': case Key_1:
         {
             rotateAngle -= 90;
             handled = true;
@@ -207,16 +207,20 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             QString filename = (*images)[imagepos].filename;
             QFileInfo fi(filename);
             QString info((*images)[imagepos].name);
-            info += "\n\nFilename: " + filename;
-            info += "\nCreated: " + fi.created().toString();
-            info += "\nModified: " + fi.lastModified().toString();
-            info += QString("\nBytes: %1").arg(fi.size());
-            info += QString("\nWidth: %1 pixels").arg(origWidth);
-            info += QString("\nHeight: %1 pixels").arg(origHeight);
-            info += QString("\nPixel Count: %1 megapixels")
-                            .arg((float)origHeight * origWidth / 1000000, 0, 
-                                  'f', 2);
-            info += QString("\nRotation Angle: %1 degrees").arg(rotateAngle);
+            info += "\n\n" + tr("Filename: ") + filename;
+            info += "\n" + tr("Created: ") + fi.created().toString();
+            info += "\n" + tr("Modified: ") + fi.lastModified().toString();
+            info += "\n" + QString(tr("Bytes") + ": %1").arg(fi.size());
+            info += "\n" + QString(tr("Width") + ": %1 " + tr("pixels"))
+                                   .arg(origWidth);
+            info += "\n" + QString(tr("Height") + ": %1 " + tr("pixels"))
+                                   .arg(origHeight);
+            info += "\n" + QString(tr("Pixel Count") + ": %1 " + 
+                                   tr("megapixels"))
+                                   .arg((float)origHeight * origWidth / 1000000,
+                                   0, 'f', 2);
+            info += "\n" + QString(tr("Rotation Angle") + ": %1 " +
+                                   tr("degrees")).arg(rotateAngle);
             DialogBox fiDlg(gContext->GetMainWindow(), info);
             fiDlg.AddButton(tr("OK"));
             fiDlg.exec();

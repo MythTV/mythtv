@@ -34,19 +34,33 @@ int mythplugin_init(const char *libversion)
 
 int mythplugin_run(void)
 {
+    QTranslator translator( 0 );
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythgallery_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    qApp->installTranslator(&translator);
+
     QString startdir = gContext->GetSetting("GalleryDir");
     IconView icv(QSqlDatabase::database(), startdir, 
                  gContext->GetMainWindow(), "icon view");
     icv.exec();
 
+    qApp->removeTranslator(&translator);
     return 0;
 }
 
 int mythplugin_config(void)
 {
+    QTranslator translator( 0 );
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythgallery_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    qApp->installTranslator(&translator);
+
     GallerySettings settings;
     settings.exec(QSqlDatabase::database());
 
+    qApp->removeTranslator(&translator);
     return 0;
 }
 
