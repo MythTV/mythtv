@@ -38,6 +38,8 @@ class LayerSet
     QRect GetAreaRect() { return m_area; }
 
     void SetContext(int con) { m_context = con; }
+    int GetContext(void) { return m_context; }
+
     void SetDebug(bool db) { m_debug = db; }
 
     void AddType(UIType *);
