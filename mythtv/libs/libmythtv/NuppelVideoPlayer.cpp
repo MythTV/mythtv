@@ -856,7 +856,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     if (fileheader.audioblocks != 0)
         InitSound();
-  
+
     osd = new OSD(video_width, video_height, osdfilename);
 
     playing = true;
@@ -896,6 +896,7 @@ void NuppelVideoPlayer::StartPlaying(void)
        intensive operations. We fork two other threads which do nothing but
        write to the audio and video output devices.  These should use a 
        minimum of CPU. */
+
     pthread_t output_audio, output_video;
     pthread_create(&output_audio, NULL, kickoffOutputAudioLoop, this);
     pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
@@ -960,6 +961,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     pthread_join(output_video, NULL);
     pthread_join(output_audio, NULL);
 
+    close(audiofd);
     playing = false;
 }
 

@@ -899,6 +899,7 @@ void NuppelVideoRecorder::doAudioThread(void)
     }
 
     delete [] buffer;
+    close(afd);
 }
 
 void NuppelVideoRecorder::doWriteThread(void)
