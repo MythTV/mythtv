@@ -399,21 +399,22 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                                 ringBuffer->GetFileWritePosition();
 
                             if (!positionMap.contains(frameNum))
-                                positionMapDelta[frameNum] = startpos;
-                            positionMap[frameNum] = startpos;
-                            
-                            if (curRecording && db_lock && db_conn &&
-                                ((positionMapDelta.size() % 30) == 0))
                             {
-                                pthread_mutex_lock(db_lock);
-                                MythContext::KickDatabase(db_conn);
-                                curRecording->SetPositionMapDelta(
-                                    positionMapDelta, MARK_GOP_BYFRAME,
-                                    db_conn);
-                                pthread_mutex_unlock(db_lock);
-                                positionMapDelta.clear();
-                            }
+                                positionMapDelta[frameNum] = startpos;
                             
+                                if (curRecording && db_lock && db_conn &&
+                                    ((positionMapDelta.size() % 30) == 0))
+                                {
+                                    pthread_mutex_lock(db_lock);
+                                    MythContext::KickDatabase(db_conn);
+                                    curRecording->SetPositionMapDelta(
+                                        positionMapDelta, MARK_GOP_BYFRAME,
+                                        db_conn);
+                                    pthread_mutex_unlock(db_lock);
+                                    positionMapDelta.clear();
+                                }
+                            }
+                            positionMap[frameNum] = startpos;
                         }
                         if (buffer[i+1] >= 0x01 && buffer[i+1] <= 0xAF)
                         {

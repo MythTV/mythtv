@@ -606,19 +606,21 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                 long long keyCount = frameNum / keyframedist;
 
                 if (!positionMap.contains(keyCount))
-                    positionMapDelta[keyCount] = startpos;
-                positionMap[keyCount] = startpos;
-
-                if (curRecording && db_lock && db_conn &&
-                    ((positionMapDelta.size() % 30) == 0))
                 {
-                    pthread_mutex_lock(db_lock);
-                    MythContext::KickDatabase(db_conn);
-                    curRecording->SetPositionMapDelta(positionMapDelta,
-                            MARK_GOP_START, db_conn);
-                    pthread_mutex_unlock(db_lock);
-                    positionMapDelta.clear();
+                    positionMapDelta[keyCount] = startpos;
+
+                    if (curRecording && db_lock && db_conn &&
+                        ((positionMapDelta.size() % 30) == 0))
+                    {
+                        pthread_mutex_lock(db_lock);
+                        MythContext::KickDatabase(db_conn);
+                        curRecording->SetPositionMapDelta(positionMapDelta,
+                                MARK_GOP_START, db_conn);
+                        pthread_mutex_unlock(db_lock);
+                        positionMapDelta.clear();
+                    }
                 }
+                positionMap[keyCount] = startpos;
             }
         }
 

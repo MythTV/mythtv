@@ -1809,23 +1809,24 @@ void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db, long offse
     struct seektable_entry ste;
     ste.file_offset = position;
     ste.keyframe_number = frame_num;
-
-    if (!positionMap.contains(ste.keyframe_number))
-        positionMapDelta[ste.keyframe_number] = position;
-    positionMap[ste.keyframe_number] = position;
-
     seektable->push_back(ste);
 
-    if (use_db && curRecording && db_lock && db_conn &&
-        (positionMapDelta.size() % 15) == 0)
+    if (!positionMap.contains(ste.keyframe_number))
     {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME,
-                                          db_conn);
-        pthread_mutex_unlock(db_lock);
-        positionMapDelta.clear();
+        positionMapDelta[ste.keyframe_number] = position;
+
+        if (use_db && curRecording && db_lock && db_conn &&
+            (positionMapDelta.size() % 15) == 0)
+        {
+            pthread_mutex_lock(db_lock);
+            MythContext::KickDatabase(db_conn);
+            curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME,
+                                              db_conn);
+            pthread_mutex_unlock(db_lock);
+            positionMapDelta.clear();
+        }
     }
+    positionMap[ste.keyframe_number] = position;
 }
 
 int NuppelVideoRecorder::CreateNuppelFile(void)

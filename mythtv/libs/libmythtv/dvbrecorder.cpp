@@ -670,20 +670,22 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
                         long long startpos = ringBuffer->GetFileWritePosition();
 
                         if (!positionMap.contains(framesWritten))
-                            positionMapDelta[framesWritten] = startpos;
-                        positionMap[framesWritten] = startpos;
-
-                        if (curRecording && db_lock && db_conn &&
-                            ((positionMapDelta.size() % 30) == 0))
                         {
-                            pthread_mutex_lock(db_lock);
-                            MythContext::KickDatabase(db_conn);
-                            curRecording->SetPositionMapDelta(
-                                            positionMapDelta, MARK_GOP_BYFRAME,
-                                            db_conn);
-                            pthread_mutex_unlock(db_lock);
-                            positionMapDelta.clear();
+                            positionMapDelta[framesWritten] = startpos;
+
+                            if (curRecording && db_lock && db_conn &&
+                                ((positionMapDelta.size() % 30) == 0))
+                            {
+                                pthread_mutex_lock(db_lock);
+                                MythContext::KickDatabase(db_conn);
+                                curRecording->SetPositionMapDelta(
+                                                positionMapDelta, MARK_GOP_BYFRAME,
+                                                db_conn);
+                                pthread_mutex_unlock(db_lock);
+                                positionMapDelta.clear();
+                            }
                         }
+                        positionMap[framesWritten] = startpos;
                     }
                     break;
 
