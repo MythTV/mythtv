@@ -1,0 +1,27 @@
+# Color of the background
+str BackgroundColor=SteelBlue
+# Color of lines, text, etc
+str ForegroundColor=white
+
+# Colors for the different program categories
+str Cat_Comedy=DarkOrchid
+str Cat_Animals=ForestGreen
+str Cat_Nature=SprintGreen
+str Cat_SciFi=DarkBlue
+str Cat_Horror=firebrick3
+str Cat_Action=maroon
+str Cat_Game=orchid
+str Cat_Children's=MediumSlateBlue
+str Cat_Edu=CornflowerBlue
+str Cat_Adult=thistle3
+str Cat_Musical=turquoise3
+str Cat_News=DarkOrange3
+str Cat_Reality=sienna
+str Cat_Cooking=tan3
+str Cat_Doc=goldenrod
+str Cat_Sports=DarkCyan
+str Cat_Mystery=SlateGrey
+str Cat_Drama=rosybrown3
+str Cat_Classic=grey62
+str Cat_Crime=MediumVioletRed
+str Cat_Talk=MediumTurquoise

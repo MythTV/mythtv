@@ -4,6 +4,7 @@
 
 #include "guidegrid.h"
 #include "settings.h"
+#include "themedmenu.h"
 
 Settings *globalsettings;
 char installprefix[] = "/usr/local";
@@ -35,6 +36,12 @@ int main(int argc, char **argv)
     {
         startchannel = a.argv()[1];
     }
+
+    QString themename = globalsettings->GetSetting("Theme");
+    QString themedir = findThemeDir(themename, installprefix);
+  
+    themedir += "/qtlook.txt";
+    globalsettings->ReadSettings(themedir);
 
     GuideGrid gg(startchannel);
 

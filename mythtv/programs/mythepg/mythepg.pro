@@ -9,11 +9,12 @@ INSTALLS = target
 
 include (../settings.pro)
 
-INCLUDEPATH += ../libmythtv ../libNuppelVideo
+INCLUDEPATH += ../libmythtv ../libNuppelVideo ../mythfrontend
 
 # Input
 HEADERS += guidegrid.h infodialog.h infostructs.h ../libmythtv/programinfo.h
-HEADERS += ../libNuppelVideo/settings.h
+HEADERS += ../libNuppelVideo/settings.h ../mythfrontend/themedmenu.h
 
 SOURCES += guidegrid.cpp infodialog.cpp infostructs.cpp main.cpp
 SOURCES += ../libmythtv/programinfo.cpp ../libNuppelVideo/settings.cpp
+SOURCES += ../mythfrontend/themedmenu.cpp

@@ -38,7 +38,20 @@ GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
 
     setCursor(QCursor(Qt::BlankCursor));
 
-    setPalette(QPalette(QColor(250, 250, 250)));
+    usetheme = globalsettings->GetNumSetting("ThemeQt");
+
+    if (usetheme)
+    {
+        bgcolor = QColor(globalsettings->GetSetting("BackgroundColor"));
+        fgcolor = QColor(globalsettings->GetSetting("ForegroundColor"));
+    }
+    else
+    {
+        bgcolor = QColor("white");
+        fgcolor = QColor("black");
+    }
+
+    setPalette(QPalette(bgcolor));
     m_font = new QFont("Arial", 11 * hmult, QFont::Bold);
     m_largerFont = new QFont("Arial", 13 * hmult, QFont::Bold);
 
@@ -315,8 +328,8 @@ void GuideGrid::paintChannels(QPainter *p)
     pix.fill(this, cr.topLeft());
 
     QPainter tmp(&pix);
-    tmp.setBrush(black);
-    tmp.setPen(QPen(black, 2 * wmult));
+    tmp.setBrush(fgcolor);
+    tmp.setPen(QPen(fgcolor, 2 * wmult));
     tmp.setFont(*m_largerFont);
 
     QString date = m_currentStartTime.toString("ddd");
@@ -392,8 +405,8 @@ void GuideGrid::paintTimes(QPainter *p)
     pix.fill(this, cr.topLeft());
 
     QPainter tmp(&pix);
-    tmp.setBrush(black);
-    tmp.setPen(QPen(black, 2 * wmult));
+    tmp.setBrush(fgcolor);
+    tmp.setPen(QPen(fgcolor, 2 * wmult));
     tmp.setFont(*m_largerFont);
 
     int xdifference = (int)(cr.right() / 6);
@@ -423,6 +436,24 @@ void GuideGrid::paintTimes(QPainter *p)
     p->drawPixmap(cr.topLeft(), pix);
 }
 
+QBrush GuideGrid::getBGColor(const QString &category)
+{
+    QBrush br = QBrush(bgcolor);
+   
+    if (!usetheme)
+        return br;
+
+    QString cat = "Cat_" + category;
+
+    QString color = globalsettings->GetSetting(cat);
+    if (color != "")
+    {
+        br = QBrush(color);
+    }
+
+    return br;
+}
+
 void GuideGrid::paintPrograms(QPainter *p)
 {
     QRect cr = programRect();
@@ -430,7 +461,7 @@ void GuideGrid::paintPrograms(QPainter *p)
     pix.fill(this, cr.topLeft());
 
     QPainter tmp(&pix);
-    tmp.setPen(QPen(black, 2 * wmult));
+    tmp.setPen(QPen(fgcolor, 2 * wmult));
 
     tmp.setFont(*m_largerFont);
 
@@ -488,15 +519,26 @@ void GuideGrid::paintPrograms(QPainter *p)
                     }
                 }
 
+                QBrush br = getBGColor(pginfo->category);
+
+                tmp.fillRect(x * xdifference + 1 * wmult, 
+                             ydifference * y + 1 * hmult,
+                             (x + spread) * xdifference - 2 * wmult, 
+                             ydifference - 2 * hmult, br);
+
                 int maxwidth = (int)(spread * xdifference - (15 * wmult));
 
+                QString info = pginfo->title;
+                if (pginfo->category != "" && usetheme)
+                    info += " (" + pginfo->category + ")";
+                
                 tmp.drawText(x * xdifference + 10 * wmult, 
-                             height / 8 + y * ydifference, 
+                             height / 8 + y * ydifference + 1 * hmult, 
                              maxwidth, ydifference,
                              AlignLeft | WordBreak,
-                             pginfo->title);
+                             info);
 
-                tmp.setPen(QPen(black, 2 * wmult));
+                tmp.setPen(QPen(fgcolor, 2 * wmult));
 
                 tmp.drawLine((x + spread) * xdifference, ydifference * y, 
                              (x + spread) * xdifference, 
@@ -520,25 +562,27 @@ void GuideGrid::paintPrograms(QPainter *p)
                                  (y + 1) * ydifference - height, width * 1.5, 
                                  height, AlignLeft, text);
              
-                    tmp.setPen(QPen(black, 2 * wmult));
+                    tmp.setPen(QPen(fgcolor, 2 * wmult));
                 }
 
                 if (m_currentRow == (int)y)
                 {
                     if ((m_currentCol >= x) && (m_currentCol < (x + spread)))
                     {
-                        tmp.setPen(QPen(red, 2 * wmult));
+                        tmp.setPen(QPen(red, 3.75 * wmult));
                   
-                        int rectheight = (int)(ydifference - 2 * hmult);
+                        int rectheight = (int)(ydifference - 4 * hmult);
                         int xstart = 1;
                         if (x != 0)
-                            xstart = x * xdifference + 2;
-
+                            xstart = (int)(x * xdifference + 2 * wmult);
+                        int xend = (int)(xdifference * spread - 4 * wmult);
+                        if (x == 0)
+                            xend += (int)(1 * wmult);
+			
                         tmp.drawRect(xstart, 
                                      ydifference * y + 2 * hmult, 
-                                     xdifference * (spread) - 2, 
-                                     rectheight);
-                        tmp.setPen(QPen(black, 2 * wmult));
+                                     xend, rectheight); 
+                        tmp.setPen(QPen(fgcolor, 2 * wmult));
                     }
                 }
             }

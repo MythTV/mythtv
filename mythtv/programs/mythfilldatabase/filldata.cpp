@@ -441,7 +441,7 @@ void fillData(void)
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication a(argc, argv, false);
 
     globalsettings = new Settings;
     globalsettings->LoadSettingsFiles("mysql.txt", installprefix);

@@ -79,6 +79,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
 
     QVBoxLayout *middleBox = new QVBoxLayout(vbox);
 
+
     norec = new QCheckBox("Don't record this program", this);
     middleBox->addWidget(norec);
     connect(norec, SIGNAL(clicked()), this, SLOT(norecPressed()));

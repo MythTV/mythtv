@@ -5,3 +5,7 @@ str Theme=blue
 # the GUI will resize to be fullscreen.
 int GuiWidth=800
 int GuiHeight=600
+
+# Do we color the Qt widgets according to the 'qtlook.txt' file in the theme?
+# (only works for the program guide, currently)
+int ThemeQt=0

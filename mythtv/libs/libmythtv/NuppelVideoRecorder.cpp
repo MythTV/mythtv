@@ -204,7 +204,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx.rc_buffer_size = 0;
     mpa_ctx.i_quant_factor = 1.25;
     mpa_ctx.b_quant_factor = 1.25;
-    mpa_ctx.i_quant_offset = 0.8;
+    mpa_ctx.i_quant_offset = -0.5;
     mpa_ctx.b_quant_offset = 0;
     mpa_ctx.dct_algo = FF_DCT_AUTO;
     

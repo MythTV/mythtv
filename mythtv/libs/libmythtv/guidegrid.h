@@ -62,6 +62,8 @@ class GuideGrid : public QDialog
     ProgramInfo *getProgramInfo(unsigned int row, unsigned int col);
     void fillProgramInfos(void);
 
+    QBrush getBGColor(const QString &category);
+    
     QFont *m_font;
     QFont *m_largerFont;
 
@@ -82,6 +84,10 @@ class GuideGrid : public QDialog
 
     int screenwidth, screenheight;
     float wmult, hmult;
+
+    bool usetheme;
+    QColor fgcolor;
+    QColor bgcolor;
 };
 
 #define CHANNUM_MAX  128

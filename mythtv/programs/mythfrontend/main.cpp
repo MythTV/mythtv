@@ -302,6 +302,8 @@ int main(int argc, char **argv)
     globalsettings->LoadSettingsFiles("theme.txt", installprefix);
     globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
 
+
+    
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
     {
@@ -341,6 +343,12 @@ int main(int argc, char **argv)
     bool usetheme = true;
     if (themedir == "")
         usetheme = false;
+
+    if (usetheme)
+    {
+        qttheme = themedir + "/qtlook.txt";
+        globalsettings->ReadSettings(qttheme);
+    }
  
     pthread_t scthread;
     pthread_create(&scthread, NULL, runScheduler, tv);
