@@ -1244,7 +1244,7 @@ void SIParser::ParseDVBEIT(tablehead_t* head, uint8_t* buffer ,int size)
 
 #ifdef EIT_DEBUG_SID
 if (e.ServiceID == EIT_DEBUG_SID) {
-    fprintf(sdtout,"EIT_DEBUG: sid:%d nid:%04X tid:%04X lseg:%02X ltab:%02X tab:%02X sec:%02X lsec: %02X size:%d\n",
+    fprintf(stdout,"EIT_DEBUG: sid:%d nid:%04X tid:%04X lseg:%02X ltab:%02X tab:%02X sec:%02X lsec: %02X size:%d\n",
            e.ServiceID,
            e.NetworkID,
            e.TransportID,
