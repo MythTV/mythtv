@@ -768,8 +768,6 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     hbox = new QHBoxLayout(vbox, (int)(20 * wmult));
     proglistButton = new MythPushButton(tr("List upcoming episodes"),
                                                 dialog);
-    if (!m_pginfo)
-        proglistButton->setEnabled(false);
     hbox->addWidget(proglistButton);
     hbox->addStretch( 42 );
     MythPushButton *cancel = new MythPushButton(tr("&Cancel"), dialog);
@@ -830,9 +828,31 @@ void ScheduledRecording::setAvailableOptions(void)
 
 void ScheduledRecording::runProgList(void)
 {
-    ProgLister *pl = new ProgLister(plTitle, title->getValue(),
-                                    QSqlDatabase::database(),
-                                    gContext->GetMainWindow(), "proglist");
+    ProgLister *pl;
+
+    switch (search->getValue().toInt())
+    {
+    case kTitleSearch:
+        pl = new ProgLister(plTitleSearch, description->getValue(),
+                            QSqlDatabase::database(),
+                            gContext->GetMainWindow(), "proglist");
+	break;
+    case kKeywordSearch:
+        pl = new ProgLister(plKeywordSearch, description->getValue(),
+                            QSqlDatabase::database(),
+                            gContext->GetMainWindow(), "proglist");
+	break;
+    case kPeopleSearch:
+        pl = new ProgLister(plPeopleSearch, description->getValue(),
+                            QSqlDatabase::database(),
+                            gContext->GetMainWindow(), "proglist");
+	break;
+    default:
+        pl = new ProgLister(plTitle, title->getValue(),
+                            QSqlDatabase::database(),
+                            gContext->GetMainWindow(), "proglist");
+	break;
+        }
     pl->exec();
     delete pl;
     proglistButton->setFocus();
