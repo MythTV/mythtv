@@ -148,6 +148,13 @@ class comp_proginfo
 
 bool Scheduler::FillRecordLists(bool doautoconflicts)
 {
+    if (rankMap.size() > 0)
+        rankMap.clear();
+    if (channelRankMap.size() > 0)
+        channelRankMap.clear();
+    if (recTypeRankMap.size() > 0)
+        recTypeRankMap.clear();
+
     while (recordingList.size() > 0)
     {
         ProgramInfo *pginfo = recordingList.back();
@@ -507,24 +514,53 @@ void Scheduler::CheckRank(ProgramInfo *info,
                           list<ProgramInfo *> *conflictList)
 {
     int rank, srank, resolved = 0;
+    QString chanid;
+    ScheduledRecording::RecordingType rectype;
 
-    rank = info->rank.toInt();
-    rank += info->GetChannelRank(info->chanid, db);
-    rank += info->GetRecordingTypeRank(info->GetProgramRecordingStatus(db));
+    if (!channelRankMap.contains(info->chanid))
+        channelRankMap[info->chanid] = info->GetChannelRank(info->chanid, db);
+
+    rectype = info->GetProgramRecordingStatus(db);
+    if (!recTypeRankMap.contains(rectype))
+        recTypeRankMap[rectype] = info->GetRecordingTypeRank(rectype);
+
+    if (!rankMap.contains(info->schedulerid))
+    {
+        rank = info->rank.toInt();
+        rank += channelRankMap[info->chanid];
+        rank += recTypeRankMap[rectype];
+        rankMap[info->schedulerid] = rank;
+    }
+    else
+        rank = rankMap[info->schedulerid];
 
     list<ProgramInfo *>::iterator i = conflictList->begin();
     for (; i != conflictList->end(); i++)
     {
         ProgramInfo *second = (*i);
 
-        srank = second->rank.toInt();
-        srank += info->GetChannelRank(second->chanid, db);
-        srank += info->GetRecordingTypeRank(second->GetProgramRecordingStatus(db));
+        if (!channelRankMap.contains(second->chanid))
+            channelRankMap[second->chanid] =
+                second->GetChannelRank(second->chanid, db);
+
+        rectype = second->GetProgramRecordingStatus(db);
+        if (!recTypeRankMap.contains(rectype))
+            recTypeRankMap[rectype] = second->GetRecordingTypeRank(rectype);
+
+        if (!rankMap.contains(second->schedulerid))
+        {
+            srank = second->rank.toInt();
+            srank += channelRankMap[second->chanid];
+            srank += recTypeRankMap[rectype];
+            rankMap[second->schedulerid] = srank;
+        }
+        else
+            srank = rankMap[second->schedulerid];
 
         if (rank == srank)
             continue;
 
-        if(rank > srank)
+        if (rank > srank)
         {
             second->recording = false;
             resolved++;

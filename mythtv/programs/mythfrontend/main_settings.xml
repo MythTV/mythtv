@@ -39,6 +39,7 @@
      <text>Music Settings</text>
      <text lang="ES">Configurar Música</text>
      <text lang="CA">Configurar Música</text>
+     <text lang="DE">Musik Einstellungen</text>
      <text lang="DK">Musik indstillinger</text>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
@@ -49,6 +50,7 @@
      <text>Game Settings</text>
      <text lang="ES">Configurar Juegos</text>
      <text lang="CA">Configurar Jocs</text>
+     <text lang="DE">Spiele Einstellungen</text>
      <text lang="DK">Spil indstillinger</text>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
@@ -59,6 +61,7 @@
       <text>Images Settings</text>
       <text lang="ES">Configurar Fotos</text>
       <text lang="CA">Configurar Imatges</text>
+      <text lang="DE">Bilder Einstellungen</text>
       <text lang="DK">Billed indstillinger</text>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
@@ -69,6 +72,7 @@
        <text>Videos Settings</text>
        <text lang="ES">Configurar Videos</text>
        <text lang="CA">Configurar Videos</text>
+       <text lang="DE">Videos Einstellungen</text>
        <text lang="DK">Video indstillinger</text>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
@@ -79,6 +83,7 @@
      <text>Weather Settings</text>
      <text lang="ES">Configurar El Tiempo</text>
      <text lang="CA">Configurar El Temps</text>
+     <text lang="DE">Wetter Einstellungen</text>
      <text lang="DK">Vejr indstililnger</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>

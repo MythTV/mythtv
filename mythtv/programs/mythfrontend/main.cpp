@@ -219,6 +219,7 @@ void TVMenuCallback(void *data, QString &selection)
     {
         GeneralRankingSettings settings;
         settings.exec(QSqlDatabase::database());
+        ScheduledRecording::signalChange(QSqlDatabase::database());
     } 
     else if (sel == "settings channelranking") 
     {

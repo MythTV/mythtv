@@ -1,6 +1,8 @@
 #include "mythcontext.h"
 
 #include "globalsettings.h"
+#include "scheduledrecording.h"
+#include <qsqldatabase.h>
 #include <qfile.h>
 #include <qdialog.h>
 #include <qcursor.h>
@@ -820,7 +822,7 @@ public:
 class GRSingleRecordRank: public SpinBoxSetting, public BackendSetting {
 public:
     GRSingleRecordRank():
-        SpinBoxSetting(-1000, 1000, 1), BackendSetting("SingleRecordRank") {
+        SpinBoxSetting(-99, 99, 1), BackendSetting("SingleRecordRank") {
         setLabel("Single Recordings Rank");
         setHelpText("Single Recordings will receive this additional "
                     "ranking value.");
@@ -831,7 +833,7 @@ public:
 class GRWeekslotRecordRank: public SpinBoxSetting, public BackendSetting {
 public:
     GRWeekslotRecordRank():
-        SpinBoxSetting(-1000, 1000, 1), BackendSetting("WeekslotRecordRank") {
+        SpinBoxSetting(-99, 99, 1), BackendSetting("WeekslotRecordRank") {
         setLabel("Weekslot Recordings Rank");
         setHelpText("Weekslot Recordings will receive this additional "
                     "ranking value.");
@@ -842,7 +844,7 @@ public:
 class GRTimeslotRecordRank: public SpinBoxSetting, public BackendSetting {
 public:
     GRTimeslotRecordRank():
-        SpinBoxSetting(-1000, 1000, 1), BackendSetting("TimeslotRecordRank") {
+        SpinBoxSetting(-99, 99, 1), BackendSetting("TimeslotRecordRank") {
         setLabel("Timeslot Recordings Rank");
         setHelpText("Timeslot Recordings will receive this additional "
                     "ranking value.");

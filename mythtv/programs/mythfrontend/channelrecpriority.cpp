@@ -386,6 +386,7 @@ void RankChannels::saveRank(void)
             applyChannelRankChange(db, QString::number(chanInfo->chanid), 
                                    chanInfo->rank);
     }
+    ScheduledRecording::signalChange(db);
 }
 
 void RankChannels::FillList(void)

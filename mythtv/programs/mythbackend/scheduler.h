@@ -10,6 +10,8 @@ class EncoderLink;
 #include <vector>
 #include <qobject.h>
 
+#include "scheduledrecording.h"
+
 using namespace std;
 
 class Scheduler : public QObject
@@ -69,6 +71,10 @@ class Scheduler : public QObject
 
     list<ProgramInfo *> recordingList;
     list<ProgramInfo *> scheduledList;
+
+    QMap<QString, int> rankMap;
+    QMap<QString, int> channelRankMap;
+    QMap<ScheduledRecording::RecordingType, int> recTypeRankMap;
 
     bool hasconflicts;
 
