@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-12-04, v1.048
+  2002-12-16, v1.049
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -332,7 +332,15 @@
        # cd /usr/src/RPMS/SRPMS
        # rpm --rebuild qt3-3.0.5-7mdk.src.rpm
        # cd ../RPMS
-       # rpm -Uvh qt3-3.0.5-7mdk.i386.rpm
+       # ls -l
+
+  The "ls -l" command will show you a directory listing.  There should
+  be two files, one will be named "qt3" and the other will be
+  "qt3-devel".  The full filenames will vary, so one you know the file-
+  name, you can install them with
+
+       # rpm -Uvh [filename1]
+       # rpm -Uvh [filename2]
 
   Once this has completed (it can take a while, so please be patient),
   continue by following the Mandrake 9.0 instructions.
@@ -357,7 +365,7 @@
   [1mNOTE[22m: Mandrake 8.2 users, [4mdo[24m [4mnot[24m execute the following command.
   You've already manually installed the files in the previous section.
 
-       # urpmi libqt3-devel
+  # urpmi libqt3-devel
 
   However, you might get this when you execute the command above:
 
@@ -411,6 +419,7 @@
 
   Open a shell, and switch to superuser mode.  [1mNOTE: ^D [22mmeans press [1mCTRL[0m
   and [1md [22mat the same time.
+
        $ su
        # cd /etc/profile.d
        cat > mythtv.sh
@@ -567,14 +576,14 @@
 
   Install the xmltv prerequisites:
 
-  $ su
-  # perl -MCPAN -e shell
-  cpan> install XML::Twig
-  cpan> install Date::Manip
-  Date::Manip is up to date.
-  cpan> install LWP
-  cpan> install XML::Writer
-  cpan> exit
+       $ su
+       # perl -MCPAN -e shell
+       cpan> install XML::Twig
+       cpan> install Date::Manip
+       Date::Manip is up to date.
+       cpan> install LWP
+       cpan> install XML::Writer
+       cpan> exit
 
   Change to the XMLTV directory and compile it:
 
@@ -651,13 +660,13 @@
   Do the same for xmltv but an additional step will be required first to
   fool it into thinking XML-Twig is installed.
 
-  $ su
-  # emerge inject dev-perl/XML-Twig
-  # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
-  # ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
-  # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
-  # exit
-  $
+       $ su
+       # emerge inject dev-perl/XML-Twig
+       # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+       # ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
+       # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+       # exit
+       $
 
   [1m5.6.  Debian.[0m
 
@@ -804,15 +813,15 @@
 
   Start with the alsa-driver package:
 
-       $ tar -xjf alsa-driver-0.9.x.tar.bz2
-       $ cd alsa-driver-0.9.x
-       $ ./configure --with-cards=XXX --with-sequencer=yes
-       $ make
-       $ su
-       # make install
-       # ./snddevices
-       # exit
-       $
+  $ tar -xjf alsa-driver-0.9.x.tar.bz2
+  $ cd alsa-driver-0.9.x
+  $ ./configure --with-cards=XXX --with-sequencer=yes
+  $ make
+  $ su
+  # make install
+  # ./snddevices
+  # exit
+  $
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
@@ -964,10 +973,10 @@
 
   Once the configuration step is complete:
 
-  $ make
-  $ su
-  # make install
-  # chmod 666 /dev/lircd
+       $ make
+       $ su
+       # make install
+       # chmod 666 /dev/lircd
 
   Next, we're going to manually start lircd the first time:
 
@@ -1002,12 +1011,13 @@
 
   if you've got a Pinnacle Studio PCTV remote.
 
-       $ irw
+  $ irw
 
   Start pressing the keys on your remote; [1mirw [22mwill print the name of the
   button as it is defined in your /etc/lircd.conf. If you don't see any-
   thing at this point, you need to troubleshoot further by going back to
   the lirc home page and investigating from there.
+
   If it is working, then press [1mCTRL-C [22mto abort the program.  Once you
   know that your remote is working, you need to run the [1mirxevent[0m
   program, which takes the key presses and sends them to mythtv.
@@ -1056,17 +1066,17 @@
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
 
-  begin
-      prog = irxevent
-      button = channel+
-      config = Key Up CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel+
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = channel-
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel-
+           config = Key Down CurrentWindow
+       end
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
@@ -1250,10 +1260,20 @@
   leave the default as-is until you're sure that mythtv is operational.
 
   [1mNOTE[22m: the int Deinterlace=1 variable controls the deinterlacer.
-  Support for deinterlacing requires that your processor has MMX2.
-  Intel Celeron and Pentium Pro CPUs do not have MMX2, so make sure that
-  you've got this set to "0" if you have one of these.  If you don' t,
-  you will get "Illegal Instruction" errors.
+  Support for deinterlacing requires that your processor has SSE
+  (Streaming SIMD Extensions, aka "MMX2").  Intel Celeron, Pentium Pro
+  and Pentium II CPUs do not have SSE, so make sure that you've got this
+  set to "0" if you have one of these.  If you don't, you will get
+  "Illegal Instruction" errors.
+
+  To determine if you've got SSE, you can:
+
+       $ cat /proc/cpuinfo
+       [snip]
+       flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
+       cmov pat pse36 mmx fxsr sse
+
+  Notice the [1msse [22mat the end of the line.
 
   Users in North America can now exit and save the file.  Users in other
   parts of the world need to modify the first line and modify the
@@ -1339,25 +1359,24 @@
 
   If you wish to specify a custom time, then the user-based cron job is
   the better method.
-
   The default [1mconfigfiles/mythcrontab [22mfile will run the [1mmythfilldatabase[0m
   program every day at 0430.  If you want to change this, then open the
   configfiles/mythcrontab file in your favorite editor and modify it as
   you like.  Once you're satisfied with the time that [1mmythfilldatabase[0m
   will run, save and exit, and return to the shell prompt.
 
-  $ cd configfiles
-  $ crontab mythcrontab
-  $ crontab -l  NOTE: this is a lowercase L.
-  # The following will run the mythfilldatabase shell script at 0430
-  # every day.  Format is
-  # minutes hour day_of_month month day_of_week
-  # man 5 crontab for more information
-  # Need to use a shell script because the QTDIR environment variable isn't
-  # being honored by crontab?
-  # The next text should be all on the same line.
-  30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/configfiles/mythfilldatabasecron
-  $
+       $ cd configfiles
+       $ crontab mythcrontab
+       $ crontab -l  NOTE: this is a lowercase L.
+       # The following will run the mythfilldatabase shell script at 0430
+       # every day.  Format is
+       # minutes hour day_of_month month day_of_week
+       # man 5 crontab for more information
+       # Need to use a shell script because the QTDIR environment variable isn't
+       # being honored by crontab?
+       # The next text should be all on the same line.
+       30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/configfiles/mythfilldatabasecron
+       $
 
   As you can see, [1mmythfilldatabase [22mwill now be run at 0430 every day.
 
@@ -1643,9 +1662,9 @@
      these, make sure that you you followed the instructions in this
      ``section''.
 
-  +o  You have an Intel Celeron or Pentium Pro.  If you have either of
-     these processors, make sure that your ``deinterlace'' variable is
-     set correctly.
+  +o  You have an Intel Celeron, Pentium Pro or Pentium II.  If you have
+     any of these processors, make sure that your ``deinterlace''
+     variable is set correctly.
 
   [1m15.2.  mythfilldatabase failing.[0m
 

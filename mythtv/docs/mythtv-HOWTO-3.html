@@ -184,7 +184,17 @@ $ su
 # cd /usr/src/RPMS/SRPMS
 # rpm --rebuild qt3-3.0.5-7mdk.src.rpm
 # cd ../RPMS
-# rpm -Uvh qt3-3.0.5-7mdk.i386.rpm
+# ls -l
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The "ls -l" command will show you a directory listing.  There should be two
+files, one will be named "qt3" and the other will be "qt3-devel".  The full
+filenames will vary, so one you know the filename, you can install them with
+<BLOCKQUOTE><CODE>
+<PRE>
+# rpm -Uvh [filename1]
+# rpm -Uvh [filename2]
 </PRE>
 </CODE></BLOCKQUOTE>
 

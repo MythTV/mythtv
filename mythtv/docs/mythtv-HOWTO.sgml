@@ -44,6 +44,9 @@ v1.047, 2002-12-02.  Removed reference to advanced functions; IJR says that
 it's going to be changing soon.
 v1.048, 2002-12-04.  Modified the RH instructions, normalized the user shell
 prompt.
+v1.049, 2002-12-16.  Added Pentium 2 to list of boxes that don't support
+MMX2 (but really known as SSE).  (Needed for deinterlacer.)  Changed RH8.2 instructions per Harondel
+Sipple.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -54,7 +57,7 @@ To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-04, v1.048
+<date>2002-12-16, v1.049
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -273,7 +276,14 @@ $ su
 # cd /usr/src/RPMS/SRPMS
 # rpm --rebuild qt3-3.0.5-7mdk.src.rpm
 # cd ../RPMS
-# rpm -Uvh qt3-3.0.5-7mdk.i386.rpm
+# ls -l
+</verb></tscreen>
+The "ls -l" command will show you a directory listing.  There should be two
+files, one will be named "qt3" and the other will be "qt3-devel".  The full
+filenames will vary, so one you know the filename, you can install them with
+<tscreen><verb>
+# rpm -Uvh [filename1]
+# rpm -Uvh [filename2]
 </verb></tscreen>
 Once this has completed (it can take a while, so please be patient),
 continue by following the Mandrake 9.0 instructions.
@@ -1210,11 +1220,22 @@ fault" errors, it is likely that the video4linux (v4l) subsystem did not
 like the height and width parameters specified.  It's best to leave the
 default as-is until you're sure that mythtv is operational.
 
-<label id="deinterlace_"><bf>NOTE</bf>: the <tt>int Deinterlace=1</tt> variable
-controls the deinterlacer.  Support for deinterlacing requires that your
-processor has MMX2.  Intel Celeron and Pentium Pro CPUs do not have MMX2, so
-make sure that you've got this set to "0" if you have one of these.  If you don'
-t, you will get "Illegal Instruction" errors.
+<label id="deinterlace_"><bf>NOTE</bf>: the <tt>int Deinterlace=1</tt>
+variable controls the deinterlacer.  Support for deinterlacing requires that
+your processor has SSE (Streaming SIMD Extensions, aka "MMX2").  Intel
+Celeron, Pentium Pro and Pentium II CPUs do not have SSE, so make sure that
+you've got this set to "0" if you have one of these.  If you don't, you will
+get "Illegal Instruction" errors.
+
+To determine if you've got SSE, you can:
+<tscreen><verb>
+$ cat /proc/cpuinfo
+[snip]
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
+cmov pat pse36 mmx fxsr sse
+</verb></tscreen>
+
+Notice the <bf>sse</bf> at the end of the line.
 
 Users in North America can now exit and save the file.  Users in other parts
 of the world need to modify the first line and modify the XMLTVGrabber
@@ -1610,8 +1631,8 @@ your particular system.
 <item>You have an AMD K6-2 or VIA C3 processor.  If you have either of
 these, make sure that you you followed the instructions in this <ref id="nonintelcpu_"
 name="section">.
-<item>You have an Intel Celeron or Pentium Pro.  If you have either of these
-processors, make sure that your <ref id="deinterlace_" name="deinterlace">
+<item>You have an Intel Celeron, Pentium Pro or Pentium II.  If you have any
+of these processors, make sure that your <ref id="deinterlace_" name="deinterlace">
 variable is set correctly.
 </itemize>
 <sect1>mythfilldatabase failing.
