@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-29, v1.085
+<date>2003-01-29, v1.086
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2204,9 +2204,11 @@ From "best" to "worst", in NTSC:
 <itemize>
 <item>720x480 (but more commonly, 704x480.  "DVD" resolution)
 <item>640x480 4:3
+<item>544x480 (TiVo high resolution)
 <item>480x480 (Video CD resolution)
 <item>352x480 (ReplayTV "Standard" quality)
 <item>320x480 
+<item>544x240
 <item>480x240 
 <item>352x240 
 <item>320x240
@@ -2214,9 +2216,17 @@ From "best" to "worst", in NTSC:
 
 As you can see, the lower quality values are half of the better ones. 
 720x240 is possible, but isn't a good tradeoff relative to the number of
-vertical lines lost.
+vertical lines lost.  In a PAL country, the you would use values like
+720x576 or x288.
 
-The higher resolutions will be more CPU intensive.
+The higher resolutions will be more CPU intensive. If the CPU is overtaxed,
+frames will be dropped causing uneven motion. You will likely see the best
+results at resolutions which average at least 10% CPU idle time (meaning
+that the first value shown in the load average using <tt>w</tt> or
+<tt>top</tt> is no more than .90) while recording.  If the load average is
+consistently exceeding .90, your CPU will not have enough cycles to service
+other system events, thereby causing frame drops when it context switches
+away from MythTV to service other processes.
 
 As an example, if you are capturing at 640x480, you may wish to run X
 Windows and the MythTV GUI at 640x480.
@@ -2444,6 +2454,7 @@ hints.
 v1.085, 2003-01-29.  Instructions for setting /etc/sysconfig/harddiskhda,
 etc.  Adjusted section 4 again; didn't know that RH8 sets the paths in the
 RPM install.
+v1.086, 2003-01-29.  More on resolution hints.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

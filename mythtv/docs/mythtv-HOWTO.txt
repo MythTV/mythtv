@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-29, v1.085
+  2003-01-29, v1.086
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -2300,11 +2300,15 @@
 
   +o  640x480 4:3
 
+  +o  544x480 (TiVo high resolution)
+
   +o  480x480 (Video CD resolution)
 
   +o  352x480 (ReplayTV "Standard" quality)
 
   +o  320x480
+
+  +o  544x240
 
   +o  480x240
 
@@ -2314,9 +2318,17 @@
 
   As you can see, the lower quality values are half of the better ones.
   720x240 is possible, but isn't a good tradeoff relative to the number
-  of vertical lines lost.
+  of vertical lines lost.  In a PAL country, the you would use values
+  like 720x576 or x288.
 
-  The higher resolutions will be more CPU intensive.
+  The higher resolutions will be more CPU intensive. If the CPU is
+  overtaxed, frames will be dropped causing uneven motion. You will
+  likely see the best results at resolutions which average at least 10%
+  CPU idle time (meaning that the first value shown in the load average
+  using w or top is no more than .90) while recording.  If the load
+  average is consistently exceeding .90, your CPU will not have enough
+  cycles to service other system events, thereby causing frame drops
+  when it context switches away from MythTV to service other processes.
 
   As an example, if you are capturing at 640x480, you may wish to run X
   Windows and the MythTV GUI at 640x480.
@@ -2355,6 +2367,7 @@
   +o  GUI-based configuration.  Much of the configuration of MythTV can
      now be done using a GUI-based setup, avoiding the necessity to edit
      the settings.txt file.
+
   +o  Themes.  MythTV now has more themes for the user to choose from.
 
   +o  Recording profiles.  You may now setup various encoder profiles
@@ -2408,6 +2421,7 @@
   You should see the connection established between the front-end and
   back-end systems by examining the mythbackend window; it will display
   the client connection attempts.
+
   The cvs version of MythTV now supports pressing the ESC key to exit
   the application.  If you wish to configure MythTV to exit on ESC, go
   to the mythfrontend setup screen (not the setup program used to

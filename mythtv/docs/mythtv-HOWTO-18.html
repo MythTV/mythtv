@@ -90,9 +90,11 @@ to be repeated or dropped.</P>
 <UL>
 <LI>720x480 (but more commonly, 704x480.  "DVD" resolution)</LI>
 <LI>640x480 4:3</LI>
+<LI>544x480 (TiVo high resolution)</LI>
 <LI>480x480 (Video CD resolution)</LI>
 <LI>352x480 (ReplayTV "Standard" quality)</LI>
 <LI>320x480 </LI>
+<LI>544x240</LI>
 <LI>480x240 </LI>
 <LI>352x240 </LI>
 <LI>320x240</LI>
@@ -100,8 +102,16 @@ to be repeated or dropped.</P>
 </P>
 <P>As you can see, the lower quality values are half of the better ones. 
 720x240 is possible, but isn't a good tradeoff relative to the number of
-vertical lines lost.</P>
-<P>The higher resolutions will be more CPU intensive.</P>
+vertical lines lost.  In a PAL country, the you would use values like
+720x576 or x288.</P>
+<P>The higher resolutions will be more CPU intensive. If the CPU is overtaxed,
+frames will be dropped causing uneven motion. You will likely see the best
+results at resolutions which average at least 10% CPU idle time (meaning
+that the first value shown in the load average using <CODE>w</CODE> or
+<CODE>top</CODE> is no more than .90) while recording.  If the load average is
+consistently exceeding .90, your CPU will not have enough cycles to service
+other system events, thereby causing frame drops when it context switches
+away from MythTV to service other processes.</P>
 <P>As an example, if you are capturing at 640x480, you may wish to run X
 Windows and the MythTV GUI at 640x480.</P>
 
