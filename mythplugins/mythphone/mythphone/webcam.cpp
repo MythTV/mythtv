@@ -93,9 +93,11 @@ bool Webcam::camOpen(QString WebcamName, int width, int height)
   {
     readCaps();
 
-    if (!SetPalette(VIDEO_PALETTE_YUV420P) && !SetPalette(VIDEO_PALETTE_YUV422P))
+    if (!SetPalette(VIDEO_PALETTE_YUV420P) && 
+        !SetPalette(VIDEO_PALETTE_YUV422P) &&
+        !SetPalette(VIDEO_PALETTE_RGB24))
     {
-      cout << "Webcam does not support YUV420P or YUV422P modes; these are the only ones currently supported. Closing webcam.\n";
+      cout << "Webcam does not support YUV420P, YUV422P, or RGB24 modes; these are the only ones currently supported. Closing webcam.\n";
       camClose();
       return false;
     }
@@ -105,9 +107,7 @@ bool Webcam::camOpen(QString WebcamName, int width, int height)
     GetCurSize(&actWidth, &actHeight);
     if ((width != actWidth) || (height != actHeight))
     {
-      cout << "Could not set webcam to " << width << "x" << height << "; got " << actWidth << "x" << actHeight << " instead. Closing webcam.\n";
-      camClose();
-      return false;
+      cout << "Could not set webcam to " << width << "x" << height << "; got " << actWidth << "x" << actHeight << " instead.\n";
     }
 
     //Allocate picture buffer memory
@@ -365,18 +365,27 @@ void Webcam::grabTimerExpiry()
     grabImage();
     if (imageLen > 0)
     {
+        int srcFmt = 0;
         switch(GetPalette())
         {
-        case VIDEO_PALETTE_YUV420P: // Logitech / Phillips webcam native format
-            break;
-        case VIDEO_PALETTE_YUV422P: 
-            YUV422PtoYUV420P(vWin.width, vWin.height, picbuff1); 
-            break;
+        case VIDEO_PALETTE_YUV420P:    srcFmt = PIX_FMT_YUV420P;    break;
+        case VIDEO_PALETTE_YUV422P:    srcFmt = PIX_FMT_YUV422P;    break;
+        case VIDEO_PALETTE_RGB24:      srcFmt = PIX_FMT_RGB24;      break;
         default:
             cerr << "Webcam: Unsupported palette mode " << GetPalette() << endl; // Should not get here, caught earlier
             break;
         }
-        emit webcamFrameReady(picbuff1, (int)vWin.width, (int)vWin.height );
+
+        if (srcFmt != PIX_FMT_YUV420P) // Need to reformat image to YUV420P 
+        {
+            AVPicture image_in, image_out;
+            avpicture_fill(&image_in,  (uint8_t *)picbuff1, srcFmt, vWin.width, vWin.height);
+            avpicture_fill(&image_out, (uint8_t *)dispbuff, PIX_FMT_YUV420P, vWin.width, vWin.height);
+            img_convert(&image_out, PIX_FMT_YUV420P, &image_in, srcFmt, vWin.width, vWin.height);
+            emit webcamFrameReady(dispbuff, (int)vWin.width, (int)vWin.height );
+        }
+        else
+            emit webcamFrameReady(picbuff1, (int)vWin.width, (int)vWin.height );
     }
     frames_last_period++;
 
