@@ -82,8 +82,23 @@
             <textarea name="current_mfd_text" draworder="0" align="center">
                 <font>current_mfd_font</font>
                 <area>19,33,114,40</area>
-                <value>SomewhereatSomethinglong</value>
             </textarea>
+
+            <image name="stop_button" draworder="0" fleximage="no">
+                <filename>mfe_stop_on.png</filename>
+                <position>300,0</position>
+            </image>
+
+            <image name="play_button" draworder="0" fleximage="no">
+                <filename>mfe_play_on.png</filename>
+                <position>370,0</position>
+            </image>
+
+            <image name="pause_button" draworder="0" fleximage="no">
+                <filename>mfe_pause_on.png</filename>
+                <position>440,0</position>
+            </image>
+
         </container>
 
     </window>

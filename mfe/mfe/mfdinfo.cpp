@@ -19,6 +19,7 @@ MfdInfo::MfdInfo( int an_id, const QString &a_name, const QString &a_host)
     mfd_content_collection = NULL;
     showing_menu = false;
     played_percentage = 0;
+    pause_state = false;
 }
 
 AudioMetadata*  MfdInfo::getAudioMetadata(int collection_id, int item_id)

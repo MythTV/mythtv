@@ -48,6 +48,9 @@ class MfeDialog : public MythThemedDialog
     void changeMetadata(int, MfdContentCollection*);
     void cycleMfd();
     void stopAudio();
+    void togglePause();
+    void seekAudio(bool forward_or_back);
+    void nextPrevAudio(bool next_or_prev);
 
   private:
 
@@ -95,6 +98,10 @@ class MfeDialog : public MythThemedDialog
     UITextType       *current_mfd_text;
     UITextType       *now_playing_text;
     UIStatusBarType  *time_progress;
+
+    UIImageType *stop_button;
+    UIImageType *play_button;
+    UIImageType *pause_button;
 };
 
 

@@ -43,6 +43,9 @@ class MfdInfo
     void                    clearCurrentPlayingData(){playing_string = "";}
     double                  getPercentPlayed(){return played_percentage;}
     
+    void                    setPauseState(bool new_state){ pause_state = new_state; }
+    bool                    getPauseState(){return pause_state;}
+    
   private:
   
     int         id;
@@ -54,6 +57,7 @@ class MfdInfo
     QStringList previous_tree_position;
     QString playing_string;
     double      played_percentage;
+    bool        pause_state;
 };
 
 

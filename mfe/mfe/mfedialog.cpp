@@ -104,6 +104,42 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
             handled = true;
             break;
 
+        case Key_P:
+        
+            togglePause();
+            handled = true;
+            break;
+            
+        case Key_PageDown:
+
+            seekAudio(true);
+            handled = true;
+            break;
+            
+        case Key_PageUp:
+        
+            seekAudio(false);
+            handled = true;            
+            break;
+            
+        case Key_Greater:
+        case Key_Period:
+        case Key_Z:
+        case Key_End:
+        
+            nextPrevAudio(true);
+            handled = true;
+            break;
+
+        case Key_Less:
+        case Key_Comma:
+        case Key_Q:
+        case Key_Home:
+        
+            nextPrevAudio(false);
+            handled = true;
+            break;
+
         case Key_Enter:
         case Key_Space:
         case Key_Return:
@@ -226,6 +262,15 @@ void MfeDialog::wireUpTheme()
     time_progress->SetTotal(1000);
     time_progress->SetUsed(0);
  
+    stop_button = getUIImageType("stop_button");
+    stop_button->show();
+ 
+    play_button = getUIImageType("play_button");
+    play_button->hide();
+
+    pause_button = getUIImageType("pause_button");
+    pause_button->hide();
+ 
     //
     // Make the first few nodes in the tree that everything else hangs off
     // as children
@@ -235,7 +280,7 @@ void MfeDialog::wireUpTheme()
 
     browse_node =  new UIListGenericTree(menu_root_node, "Browse");
     manage_node =  new UIListGenericTree(menu_root_node, "Manage");
-    connect_node = new UIListGenericTree(menu_root_node, "Connect");
+    connect_node = new UIListGenericTree(menu_root_node, "Control");
     setup_node   = new UIListGenericTree(menu_root_node, "Setup");
     
     menu->SetTree(menu_root_node);
@@ -403,18 +448,68 @@ void MfeDialog::stopAudio()
     }
 }
 
+void MfeDialog::togglePause()
+{
+    if(current_mfd)
+    {
+        mfd_interface->pauseAudio(current_mfd->getId(), !current_mfd->getPauseState());
+    }
+}
+
+void MfeDialog::seekAudio(bool forward_or_back)
+{
+    if(current_mfd)
+    {
+        if(forward_or_back)
+        {
+            mfd_interface->seekAudio(current_mfd->getId(), 5);
+        }
+        else
+        {
+            mfd_interface->seekAudio(current_mfd->getId(), -5);
+        }
+    }
+}
+
+void MfeDialog::nextPrevAudio(bool next_or_prev)
+{
+    if(current_mfd)
+    {
+        if(next_or_prev)
+        {
+            mfd_interface->nextAudio(current_mfd->getId());
+        }
+        else
+        {
+            mfd_interface->prevAudio(current_mfd->getId());
+        }
+    }
+}
+
 void MfeDialog::paused(int which_mfd, bool paused)
 {
 
-    if(paused)
+    MfdInfo *relevant_mfd = available_mfds.find(which_mfd);
+    
+    if(relevant_mfd)
     {
-        cout << "mfd #" << which_mfd << " is paused" << endl;
+        relevant_mfd->setPauseState(paused);
+        if(relevant_mfd == current_mfd)
+        {
+            if(paused)
+            {
+                pause_button->show();
+            }
+            else
+            {
+                pause_button->hide();
+            }
+        }
     }
     else
     {
-        cout << "mfd #" << which_mfd << " is unpaused" << endl;
-    }
-
+        cerr << "getting pause information for non-existant mfd" << endl;
+    }    
 }
 
 void MfeDialog::stopped(int which_mfd)
@@ -425,16 +520,27 @@ void MfeDialog::stopped(int which_mfd)
     if(relevant_mfd)
     {
         relevant_mfd->clearCurrentPlayingData();
+        relevant_mfd->setPauseState(false);
         if(relevant_mfd == current_mfd)
         {
             now_playing_text->SetText("");
             time_progress->SetUsed(0);
+
+            //
+            //  Make buttons reflect the fact that the audio plugin in the mfd is
+            //  stopped
+            //
+    
+            play_button->hide();
+            pause_button->hide();
+            stop_button->show();
         }
     }
     else
     {
         cerr << "getting stopped() data for a non-existent mfd" << endl;
     }
+    
 }
 
 void MfeDialog::playing(
@@ -464,12 +570,16 @@ void MfeDialog::playing(
         {
             now_playing_text->SetText(current_mfd->getPlayingString());
             time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
+            
+            stop_button->hide();
+            play_button->show();
         }
     }
     else
     {
         cerr << "getting playing() data for a non-existent mfd" << endl;
     }
+    
 }
 
 void MfeDialog::syncToCurrentMfd()
