@@ -324,6 +324,9 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
             case nrOverlap:
                     recstatus += QObject::tr("Overlap");
                     break;
+            case nrUnknown:
+                    recstatus += QObject::tr("Reason Unknown");
+                    break;
         }
     }
     progMap["RECSTATUS"] = recstatus;
