@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-12-10, v0.13.00
+<date>2003-12-13, v0.13.01
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1439,6 +1439,15 @@ Start with the alsa-driver package:
 $ tar -xjf alsa-driver-0.9.x.tar.bz2
 $ cd alsa-driver-0.9.x
 $ ./configure --with-cards=XXX --with-sequencer=yes
+</verb></tscreen>
+<bf>NOTE</bf>: Red Hat users, you may need to perform the following step to
+allow the compile to continue:
+<tscreen><verb>
+mkdir -p include/linux
+touch include/linux/workqueue.h
+</verb></tscreen>
+Continuing on:
+<tscreen><verb>
 $ make
 $ su
 # make install
@@ -4862,6 +4871,8 @@ XMLTV as a Mandrake package.  Add troubleshooting step: "Look at the shell
 for error messages".  Add a warning for Mandrake 8.2: docs are going to get
 dumped unless a maintainer comes forward.  Look out, Redhat 8.0.  You're
 next.
+v0.13.01, 2003-12-13.  Add step for alsa compile for Red Hat. Mike Smith,
+easygreenus at yahoo.com
 -->
 
 <!--

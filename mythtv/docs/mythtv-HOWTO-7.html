@@ -102,6 +102,21 @@ need at least three files:
 $ tar -xjf alsa-driver-0.9.x.tar.bz2
 $ cd alsa-driver-0.9.x
 $ ./configure --with-cards=XXX --with-sequencer=yes
+</PRE>
+</CODE></BLOCKQUOTE>
+
+<B>NOTE</B>: Red Hat users, you may need to perform the following step to
+allow the compile to continue:
+<BLOCKQUOTE><CODE>
+<PRE>
+mkdir -p include/linux
+touch include/linux/workqueue.h
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Continuing on:
+<BLOCKQUOTE><CODE>
+<PRE>
 $ make
 $ su
 # make install
