@@ -56,6 +56,7 @@ struct ThemedButton
 {
     QPoint pos;
     QRect  posRect;
+    QRect  paintRect;
 
     ButtonIcon *buttonicon;
     QPoint iconPos;
@@ -1564,8 +1565,8 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
     {
         drawTitle = false;
     }
-
-    drawInactiveButtons();
+    clearToBackground();
+    
 
     if (LCD::Get())
     {
@@ -1776,7 +1777,8 @@ void ThemedMenuPrivate::positionButtons(bool resetpos)
             tbutton->posRect = QRect(tbutton->pos.x(), tbutton->pos.y(),
                                      buttonnormal->width(),
                                      buttonnormal->height());
-
+                
+                
             if (tbutton->buttonicon)
             {
                 tbutton->iconPos = tbutton->buttonicon->offset + tbutton->pos;
@@ -1784,6 +1786,12 @@ void ThemedMenuPrivate::positionButtons(bool resetpos)
                                           tbutton->iconPos.y(),
                                           tbutton->buttonicon->icon->width(),
                                           tbutton->buttonicon->icon->height());
+                
+                tbutton->paintRect = tbutton->posRect.unite(tbutton->iconRect);
+            }
+            else
+            {
+                tbutton->paintRect = tbutton->posRect;
             }
             
             col++;
@@ -1946,6 +1954,7 @@ void ThemedMenuPrivate::paintButton(unsigned int button, QPainter *p,
     else
         cr = tbutton->posRect;
 
+    parent->erase(tbutton->paintRect);
     if (!erased)
     {
         if (tbutton->status == 1 && activebutton == tbutton)
@@ -2229,6 +2238,9 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
         {
             if (currentcolumn > 0)
                 currentcolumn--;
+            else
+                currentcolumn = buttonRows[currentrow].numitems - 1;
+            clearToBackground();                
         }
         else if (action == "DOWN")
         {
@@ -2252,6 +2264,9 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
         {
             if (currentcolumn < buttonRows[currentrow].numitems - 1)
                 currentcolumn++;
+            else
+                currentcolumn = 0;
+            clearToBackground();                
         }
         else if (action == "SELECT")
         {
@@ -2298,8 +2313,8 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 
     parent->update(watermarkRect);
     if (lastbutton)
-        parent->update(lastbutton->posRect);
-    parent->update(activebutton->posRect);
+        parent->update(lastbutton->paintRect);
+    parent->update(activebutton->paintRect);
 
     return true;
 } 
@@ -2612,7 +2627,7 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
 
     for (unsigned int i = 0; i < d->buttonList.size(); i++)
     {
-        if (r.intersects(d->buttonList[i].posRect))
+        if (r.intersects(d->buttonList[i].paintRect))
             d->paintButton(i, &p, e->erased());
     }
 
