@@ -802,18 +802,6 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
     tc_arguments.clear();
     tc_arguments.append(tc_command);
     
-    //
-    //  Check if we are doing subtitles
-    //
-    
-    if(subtitle_track > -1)
-    {
-        tc_arguments.append("-x");
-        tc_arguments.append("vob");
-        tc_arguments.append("-J");
-        tc_arguments.append(QString("extsub=%1").arg(subtitle_track));
-    }
-    
     
     //
     //  Now *that* is a query string !
@@ -907,6 +895,27 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
     int input_hsize = second_query.value(0).toInt();
     int input_vsize = second_query.value(1).toInt();
     int fr_code = second_query.value(2).toInt();
+    
+    //
+    //  Check if we are doing subtitles
+    //
+    
+    if(subtitle_track > -1)
+    {
+    
+        QString subtitle_arguments = QString("extsub:track=%1")
+                                            .arg(subtitle_track);
+        if(cliptbottom > 0)
+        {
+            subtitle_arguments.append(QString(":vershift=%1")
+                                             .arg(cliptbottom));
+        }
+        tc_arguments.append("-x");
+        tc_arguments.append("vob");
+        tc_arguments.append("-J");
+        
+        tc_arguments.append(subtitle_arguments);
+    }
     
     
     tc_arguments.append("-i");

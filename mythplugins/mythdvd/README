@@ -58,13 +58,14 @@ software packages installed for *transcoding* to work:
                 Currently 0.9.0
                 http://fame.sourceforge.net/
 
-    transcode - The core of the re-encoding process (most
-                of the items above are actually things that
-                transcode wants for full functionality). The
-                more codecs you have installed, the better. You
-	        almost certainly want to install the divx codec,
-	        even if you plan to use xvid (see below).
-                Developers currently using 0.6.8.
+    transcode - The core of the re-encoding process (most of the items above
+                are actually things that transcode wants for full
+                functionality). The more codecs you have installed, the
+                better. You almost certainly want to install the divx codec,
+                even if you plan to use xvid (see below).  Developers
+                currently using 0.6.12, but you can probably use an earlier
+                version (unless you're using subtitles, in which case you'll
+                almost certainly want 0.6.11 or later).
                 http://www.theorie.physik.uni-goettingen.de/
                 ~ostreich/transcode/
 

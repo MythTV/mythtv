@@ -30,4 +30,20 @@
       <action>DVD_SETTINGS_PLAY</action>
    </button>
 
+
+   <button>
+      <type>DVD_RIP</type>
+      <text>Rip Settings</text>
+      <text lang="DK">Genkodnings indstillinger</text>
+      <text lang="PT">Configurações de Cópia</text>
+      <text lang="DE">Rippen Einstellungen</text>
+      <text lang="SV">Inställningar för kopiering</text>
+      <text lang="ES">Opciones de "ripear"</text>
+      <text lang="CA">Opcions de volcat</text>
+      <text lang="FR">Options de copie/endodage</text>
+      <text lang="NL">DVD RIP instellingen</text>
+      <text lang="JA">再生設定</text>
+      <action>DVD_SETTINGS_RIP</action>
+   </button>
+
 </mythmenu>
