@@ -12,12 +12,9 @@
 
 class QImage;
 
-#define LogSize 9 
-#define Overlap 1 
+#define LogSize 10
 #define Brightness 150
-#define Frequency 22050
 #define NumSamples (1<<LogSize)
-#define RecSize (1<<LogSize-Overlap)
 
 #define Flame 0
 #define Wave 1
@@ -72,6 +69,7 @@ private:
     unsigned char palette[768];
     double fgRedSlider, fgGreenSlider, bgRedSlider, bgGreenSlider;
 
+    double energy_avg;
 #ifdef SDL_SUPPORT
     SDL_Surface *surface;
 #endif

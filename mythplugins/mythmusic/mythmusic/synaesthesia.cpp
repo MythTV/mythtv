@@ -13,6 +13,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include <iostream>
 using namespace std;
@@ -22,16 +23,17 @@ Synaesthesia::Synaesthesia(long int winid)
     fps = 29;
     fadeMode = Stars;
     pointsAreDiamonds = true;
+    energy_avg = 80.0;
 
     coreInit();
-    starSize = 0.125;
+    starSize = 0.5;
     setStarSize(starSize);
-    brightnessTwiddler = 0.33;
+    brightnessTwiddler = 0.3;
     outputImage = NULL;
     fgRedSlider = 0.0;
     fgGreenSlider = 0.5;
-    bgRedSlider = 1.0;
-    bgGreenSlider = 0.2;
+    bgRedSlider = 0.75;
+    bgGreenSlider = 0.4;
 
 #ifdef SDL_SUPPORT
     surface = NULL;
@@ -72,7 +74,8 @@ void Synaesthesia::setupPalette(void)
     fgRed = fgRedSlider;
     fgGreen = fgGreenSlider;
     fgBlue = 1.0 - sMAX(fgRedSlider,fgGreenSlider);
-    scale = sMAX(sMAX(fgRed,fgGreen),fgBlue);
+    //scale = sMAX(sMAX(fgRed,fgGreen),fgBlue);
+    scale = (fgRed + fgGreen + fgBlue) / 2.0;
     fgRed /= scale;
     fgGreen /= scale;
     fgBlue /= scale;
@@ -80,16 +83,44 @@ void Synaesthesia::setupPalette(void)
     bgRed = bgRedSlider;
     bgGreen = bgGreenSlider;
     bgBlue = 1.0 - sMAX(bgRedSlider,bgGreenSlider);
-    scale = sMAX(sMAX(bgRed,bgGreen),bgBlue);
+    //scale = sMAX(sMAX(bgRed,bgGreen),bgBlue);
+    scale = (bgRed + bgGreen + bgBlue) / 2.0;
     bgRed /= scale;
     bgGreen /= scale;
     bgBlue /= scale;
 
     for (i = 0; i < 256; i++) {
         int f = i & 15, b = i / 16;
-        palette[i * 3 + 0] = sPEAKIFY(b*bgRed*16+f*fgRed*16);
-        palette[i * 3 + 1] = sPEAKIFY(b*bgGreen*16+f*fgGreen*16);
-        palette[i * 3 + 2] = sPEAKIFY(b*bgBlue*16+f*fgBlue*16);
+        //palette[i * 3 + 0] = sPEAKIFY(b*bgRed*16+f*fgRed*16);
+        //palette[i * 3 + 1] = sPEAKIFY(b*bgGreen*16+f*fgGreen*16);
+        //palette[i * 3 + 2] = sPEAKIFY(b*bgBlue*16+f*fgBlue*16);
+
+        double red = b * bgRed * 16 + f * fgRed * 16;
+        double green = b * bgGreen * 16 + f * fgGreen * 16;
+        double blue = b * bgBlue * 16 + f * fgBlue * 16;
+
+        double excess = 0.0;
+        for (int j = 0; j < 5; j++)
+        {
+            red += excess / 3;
+            green += excess / 3;
+            blue += excess / 3;
+            excess = 0.0;
+
+
+            if (red > 255) { excess += red - 255; red = 255; }
+            if (green > 255) { excess += green - 255; green = 255; }
+            if (blue > 255) { excess += blue - 255; blue = 255; }
+        }
+
+        double scale = (0.5 + (red + green + blue) / 768.0) / 1.5;
+        red *= scale;
+        green *= scale;
+        blue *= scale;
+
+        palette[i * 3 + 0] = sBOUND(int(red));
+        palette[i * 3 + 1] = sBOUND(int(green));
+        palette[i * 3 + 2] = sBOUND(int(blue));
     }
 }
 
@@ -246,12 +277,13 @@ unsigned char Synaesthesia::getPixel(int x, int y, int where)
 
 void Synaesthesia::fadeFade(void)
 {
-    register unsigned long *ptr = (unsigned long *)output;
-    int i = outWidth * outHeight * 2 / 4;
+    register uint32_t *ptr = (uint32_t *)output;
+    int i = outWidth * outHeight * 2 / sizeof(uint32_t);
     do {
-        if (*ptr)
-            *(ptr++) -= ((*ptr & 0xf0f0f0f0ul) >> 4) + 
-                        ((*ptr & 0xe0e0e0e0ul) >> 5);
+        uint32_t x = *ptr;
+        if (x)
+            *(ptr++) = x - ((x & 0xf0f0f0f0ul) >> 4) -
+                           ((x & 0xe0e0e0e0ul) >> 5);
         else
             ptr++;
     } while (--i > 0);
@@ -418,6 +450,7 @@ bool Synaesthesia::process(VisualNode *node)
 
     double x[NumSamples], y[NumSamples];
     double a[NumSamples], b[NumSamples];
+    double energy;
     int clarity[NumSamples];
     int i, j, k;
 
@@ -425,7 +458,7 @@ bool Synaesthesia::process(VisualNode *node)
 
     int numSamps = NumSamples;
     if (node->length < NumSamples)
-        numSamps = 0;
+        numSamps = node->length;
 
     memset(x, 0, sizeof(x));
     memset(y, 0, sizeof(y));
@@ -441,7 +474,9 @@ bool Synaesthesia::process(VisualNode *node)
    
     fft(x, y);
 
-    for (i = 0 + 1; i < NumSamples; i++)
+    energy = 0.0;
+
+    for (i = 0 + 1; i < NumSamples / 2; i++)
     {
         double x1 = x[bitReverse[i]], 
                y1 = y[bitReverse[i]],
@@ -455,14 +490,22 @@ bool Synaesthesia::process(VisualNode *node)
                          (aa + bb) * 256);
         else
             clarity[i] = 0;
+
+        energy += (aa + bb) * i * i;
     }
 
-    int heightFactor = NumSamples / 2 / outHeight + 1;
-    int actualHeight = NumSamples / 2 / heightFactor;
-    int heightAdd = (outHeight + actualHeight) >> 1;
+    energy = sqrt(energy / NumSamples) / 65536.0;
+
+    //int heightFactor = NumSamples / 2 / outHeight + 1;
+    //int actualHeight = NumSamples / 2 / heightFactor;
+    //int heightAdd = (outHeight + actualHeight) >> 1;
 
     double brightFactor2 = (brightFactor / 65536.0 / NumSamples) *
-                           sqrt(actualHeight * outWidth / (320.0 * 200.0));
+                           sqrt(outHeight * outWidth / (320.0 * 200.0));
+
+    energy_avg = energy_avg * 0.95 + energy * 0.05;
+    if (energy_avg > 0.0)
+        brightFactor2 *= 80.0 / (energy_avg + 5.0);
 
     for(i = 1; i < NumSamples / 2; i++) 
     {
@@ -476,7 +519,7 @@ bool Synaesthesia::process(VisualNode *node)
             if (br2 < 0) br2 = 0; else if (br2 > 255) br2 = 255;
 
             int px = h,
-                py = heightAdd - i / heightFactor;
+                py = outHeight - i * outHeight / (NumSamples / 2);
 
             if (pointsAreDiamonds) 
             {
