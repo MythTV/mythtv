@@ -87,6 +87,8 @@ class ProgInfo
                                       endts = other.endts;
                                       channel = other.channel;
                                       title = other.title;
+                                      clumpidx = other.clumpidx;
+                                      clumpmax = other.clumpmax;
                                       subtitle = other.subtitle;
                                       desc = other.desc;
                                       category = other.category;
@@ -114,6 +116,9 @@ class ProgInfo
 
     QDateTime start;
     QDateTime end;
+
+    QString clumpidx;
+    QString clumpmax;
 
     bool repeat;
     QValueList<ProgCredit> credits;
@@ -398,6 +403,14 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
  
     pginfo->channel = split[0];
 
+    text = element.attribute("clumpidx", "");
+    if (!text.isEmpty()) 
+    {
+        split = QStringList::split("/", text);
+        pginfo->clumpidx = split[0];
+        pginfo->clumpmax = split[1];
+    }
+
     pginfo->start = fromXMLTVDate(pginfo->startts);
     pginfo->end = fromXMLTVDate(pginfo->endts);
 
@@ -578,6 +591,11 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
 
     QUrl baseUrl(docElem.attribute("source-data-url", ""));
 
+    QString aggregatedTitle;
+    QString aggregatedDesc;
+    QString groupingTitle;
+    QString groupingDesc;
+
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
     {
@@ -593,7 +611,65 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
             else if (e.tagName() == "programme")
             {
                 ProgInfo *pginfo = parseProgram(e, localTimezoneOffset);
-                (*proglist)[pginfo->channel].push_back(*pginfo);
+
+                if (pginfo->startts == pginfo->endts)
+                {
+                    /* Not a real program : just a grouping marker */
+                    if (!pginfo->title.isEmpty())
+                        groupingTitle = pginfo->title + " : ";
+
+                    if (!pginfo->desc.isEmpty())
+                        groupingDesc = pginfo->desc + " : ";
+                }
+                else
+                {
+                    if (pginfo->clumpidx.isEmpty())
+                    {
+                        if (!groupingTitle.isEmpty())
+                        {
+                            pginfo->title.prepend(groupingTitle);
+                            groupingTitle = "";
+                        }
+
+                        if (!groupingDesc.isEmpty())
+                        {
+                            pginfo->desc.prepend(groupingDesc);
+                            groupingDesc = "";
+                        }
+
+                        (*proglist)[pginfo->channel].push_back(*pginfo);
+                    }
+                    else
+                    {
+                        /* append all titles/descriptions from one clump */
+                        if (pginfo->clumpidx.toInt() == 0)
+                        {
+                            aggregatedTitle = "";
+                            aggregatedDesc = "";
+                        }
+
+                        if (!pginfo->title.isEmpty())
+                        {
+                            if (!aggregatedTitle.isEmpty())
+                                aggregatedTitle.append(" | ");
+                            aggregatedTitle.append(pginfo->title);
+                        }
+
+                        if (!pginfo->desc.isEmpty())
+                        {
+                            if (!aggregatedDesc.isEmpty())
+                                aggregatedDesc.append(" | ");
+                            aggregatedDesc.append(pginfo->desc);
+                        }    
+                        if (pginfo->clumpidx.toInt() == 
+                            pginfo->clumpmax.toInt() - 1)
+                        {
+                            pginfo->title = aggregatedTitle;
+                            pginfo->desc = aggregatedDesc;
+                            (*proglist)[pginfo->channel].push_back(*pginfo);
+                        }
+                    }
+                }
                 delete pginfo;
             }
         }
