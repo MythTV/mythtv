@@ -41,10 +41,10 @@ class Jitterometer
         }
   */
 
-  void RecordCycleTime();
+  bool RecordCycleTime();
 
   void RecordStartTime();
-  void RecordEndTime();
+  bool RecordEndTime();
 
  private:
   int count;

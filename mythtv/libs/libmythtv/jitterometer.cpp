@@ -23,13 +23,15 @@ Jitterometer::~Jitterometer()
   free(name);
 }
 
-void Jitterometer::RecordCycleTime()
+bool Jitterometer::RecordCycleTime()
 {
-  RecordEndTime();
+  bool ret = RecordEndTime();
   RecordStartTime();
+
+  return ret;
 }
 
-void Jitterometer::RecordEndTime()
+bool Jitterometer::RecordEndTime()
 {
   struct timeval timenow;
 
@@ -45,6 +47,8 @@ void Jitterometer::RecordEndTime()
 
       count++;
     }
+
+  starttime_valid = 0;
 
   if(count==num_cycles)
     {
@@ -77,8 +81,10 @@ void Jitterometer::RecordEndTime()
       printf("'%s' mean = '%f', std. dev. = '%f', fps = '%f'\n", name, mean, standard_deviation, fps);
 
       count = 0;
+
+      return true;
     }
-  starttime_valid = 0;
+    return false;
 }
 
 void Jitterometer::RecordStartTime()

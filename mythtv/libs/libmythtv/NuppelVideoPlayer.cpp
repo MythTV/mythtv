@@ -30,8 +30,13 @@ using namespace std;
 #include "nuppeldecoder.h"
 #include "avformatdecoder.h"
 
+//#define VSYNCTEST 1
+
 extern "C" {
 #include "../libvbitext/vbi.h"
+#ifdef VSYNCTEST
+#include "vsync.h"
+#endif
 }
 
 #include "remoteencoder.h"
@@ -1148,8 +1153,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     bool delay_clipping = false;
 
     struct timeval nexttrigger, now; 
-  
-    //Jitterometer *output_jmeter = new Jitterometer("video_output", 100);
+ 
+#ifdef VSYNCTEST 
+    Jitterometer *output_jmeter = new Jitterometer("video_output", 100);
+#endif
 
     bool reducejitter = gContext->GetNumSetting("ReduceJitter", 0);
 
@@ -1172,6 +1179,11 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     unsigned char *pause_buf = new unsigned char[video_size];
 
     gettimeofday(&nexttrigger, NULL);
+
+#ifdef VSYNCTEST
+    vsync_init();
+    nice(-19);
+#endif
 
     while (!eof && !killvideo)
     {
@@ -1317,12 +1329,20 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         if (!disablevideo)
         {
+#ifdef VSYNCTEST
+            vsync_wait_for_retrace();
+            videoOutput->Show(vbuffer[rpos], video_width, video_height);
+            vsync_wait_for_retrace();
+#endif
             videoOutput->Show(vbuffer[rpos], video_width, video_height);
         }
         /* a/v sync assumes that when 'Show' returns, that is the instant
            the frame has become visible on screen */
 
-        //output_jmeter->RecordCycleTime();
+#ifdef VSYNCTEST
+        if (output_jmeter->RecordCycleTime())
+            cout << avsync_delay / 1000 << endl;
+#endif
 
 	/* The value of nexttrigger is perfect -- we calculated it to
 	   be exactly one frame time after the previous frame,
@@ -1379,6 +1399,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         eventvalid = false;
         pthread_mutex_unlock(&eventLock);
     }
+
+#ifdef VSYNCTEST
+    vsync_shutdown();
+#endif
 }
 
 inline int NuppelVideoPlayer::getSpaceOnSoundcard(void)
