@@ -47,4 +47,8 @@ QString cutDownString(QString text, QFont *testFont, int maxwidth);
 
 long long stringToLongLong(const QString &str);
 QString longLongToString(long long ll);
+
+bool diskUsage(const char *path, double &total, double &used, double &free);
+bool getUptime(time_t &uptime);
+bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 #endif

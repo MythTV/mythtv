@@ -238,6 +238,18 @@ void MainServer::ProcessRequest(RefSocket *sock)
     {
         HandleQueryFreeSpace(pbs);
     }
+    else if (command == "QUERY_LOAD")
+    {
+        HandleQueryLoad(pbs);
+    }
+    else if (command == "QUERY_UPTIME")
+    {
+        HandleQueryUptime(pbs);
+    }
+    else if (command == "QUERY_MEMSTATS")
+    {
+        HandleQueryMemStats(pbs);
+    }
     else if (command == "QUERY_CHECKFILE")
     {
         HandleQueryCheckFile(listline, pbs);
@@ -1519,6 +1531,52 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
 
     QStringList strlist;
     strlist << QString::number(totalspace) << QString::number(usedspace);
+    SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleQueryLoad(PlaybackSock *pbs)
+{
+    QSocket *pbssock = pbs->getSocket();
+
+    QStringList strlist;
+
+    double loads[3];
+    if (getloadavg(loads,3) == -1)
+        strlist << "getloadavg() failed";
+    else
+        strlist << QString::number(loads[0])
+                << QString::number(loads[1])
+                << QString::number(loads[2]);
+
+    SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleQueryUptime(PlaybackSock *pbs)
+{
+    QSocket    *pbssock = pbs->getSocket();
+    QStringList strlist;
+    time_t      uptime;
+
+    if (getUptime(uptime))
+        strlist << QString::number(uptime);
+    else
+        strlist << "Could not determine uptime.";
+
+    SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
+{
+    QSocket    *pbssock = pbs->getSocket();
+    QStringList strlist;
+    int         totalMB, freeMB, totalVM, freeVM;
+
+    if (getMemStats(totalMB, freeMB, totalVM, freeVM))
+        strlist << QString::number(totalMB) << QString::number(freeMB)
+                << QString::number(totalVM) << QString::number(freeVM);
+    else
+        strlist << "Could not determine memory stats.";
+
     SendResponse(pbssock, strlist);
 }
 

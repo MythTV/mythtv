@@ -5,6 +5,19 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#ifdef __linux__
+#include <sys/statvfs.h>
+#include <sys/sysinfo.h>
+#endif
+#if defined(__FreeBSD__) || defined(CONFIG_DARWIN)
+#include <sys/sysctl.h>
+#include <sys/param.h>
+#include <sys/mount.h>
+#endif
+#ifdef CONFIG_DARWIN
+#include <mach/mach.h>
+#endif
+
 #include <iostream>
 using namespace std;
 
@@ -743,4 +756,124 @@ QString longLongToString(long long ll)
     snprintf(str, 20, "%lld", ll);
     str[20] = '\0';
     return str;
+}
+
+bool getUptime(time_t &uptime)
+{
+#ifdef __linux__
+    struct sysinfo sinfo;
+    if (sysinfo(&sinfo) == -1)
+    {
+        VERBOSE(VB_ALL, "sysinfo() error");
+        return false;
+    }
+    else
+        uptime = sinfo.uptime;
+
+#elif defined(__FreeBSD__) || defined(CONFIG_DARWIN)
+
+    int            mib[2];
+    struct timeval bootTime;
+    size_t         len;
+
+    // Uptime is calculated. Get this machine's boot time
+    // and subtract it from the current machine time
+    len    = sizeof(bootTime);
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_BOOTTIME;
+    if (sysctl(mib, 2, &bootTime, &len, NULL, 0) == -1)
+    {
+        VERBOSE(VB_ALL, "sysctl() error");
+        return false;
+    }
+    else
+        uptime = time(NULL) - bootTime.tv_sec;
+
+#else
+    // Hmmm. Not Linux, not FreeBSD or Darwin. What else is there :-)
+    VERBOSE(VB_ALL, "Unknown platform. How do I get the uptime?");
+    return false;
+#endif
+
+    return true;
+}
+
+#define MB (1024*1024)
+
+static bool diskUsage(const char *fs,
+                      double &total, double &used, double &free)
+{
+    // stat the file system
+
+#ifdef __linux__
+#define STAT statvfs
+#elif defined(__FreeBSD__) || defined(CONFIG_DARWIN)
+#define STAT statfs
+#endif
+
+    struct STAT sbuff;
+    if (STAT(fs, &sbuff) == -1)
+        return false;
+
+    // see http://en.wikipedia.org/wiki/Megabyte
+
+    total = (double)sbuff.f_blocks * sbuff.f_bsize / MB;
+    free  = (double)sbuff.f_bfree  * sbuff.f_bsize / MB;
+    used   = total - free;
+    return true;
+}
+
+bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
+{
+#ifdef __linux__
+    struct sysinfo sinfo;
+    if (sysinfo(&sinfo) == -1)
+    {
+        VERBOSE(VB_ALL, "sysinfo() error");
+        return false;
+    }
+    else
+        totalMB = sinfo.totalram/MB,
+        freeMB  = sinfo.freeram/MB,
+        totalVM = sinfo.totalswap/MB,
+        freeVM  = sinfo.freeswap/MB;
+
+#elif defined(CONFIG_DARWIN)
+    mach_port_t             mp;
+    mach_msg_type_number_t  count, pageSize;
+    vm_statistics_data_t    s;
+    
+    mp = mach_host_self();
+    
+    // VM page size
+    if (host_page_size(mp, &pageSize) != KERN_SUCCESS)
+        pageSize = 4096;   // If we can't look it up, 4K is a good guess
+
+    count = HOST_VM_INFO_COUNT;
+    if (host_statistics(mp, HOST_VM_INFO,
+                        (host_info_t)&s, &count) != KERN_SUCCESS)
+    {
+        VERBOSE(VB_ALL, "Failed to get vm statistics.");
+        return false;
+    }
+
+    pageSize >>= 10;  // This gives usages in KB
+    totalMB = (s.active_count + s.inactive_count
+               + s.wire_count + s.free_count) * pageSize / 1024;
+    freeMB  = s.free_count * pageSize / 1024;
+
+
+    // This is a real hack. I have not found a way to ask the kernel how much
+    // swap it is using, and the dynamic_pager daemon doesn't even seem to be
+    // able to report what filesystem it is using for the swapfiles. So, we do:
+    double total, used, free;
+    diskUsage("/private/var/vm", total, used, free);
+    totalVM = (int)total, freeVM = (int)free;
+
+#else
+    VERBOSE(VB_ALL, "Unknown platform. How do I get the memory stats?");
+    return false;
+#endif
+
+    return true;
 }

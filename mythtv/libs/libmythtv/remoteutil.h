@@ -9,6 +9,9 @@ class RemoteEncoder;
 
 vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype);
 void RemoteGetFreeSpace(int &totalspace, int &usedspace);
+bool RemoteGetLoad(float load[3]);
+bool RemoteGetUptime(time_t &uptime);
+bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 bool RemoteCheckFile(ProgramInfo *pginfo);
 void RemoteStopRecording(ProgramInfo *pginfo);
 void RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory);

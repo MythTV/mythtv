@@ -58,6 +58,57 @@ void RemoteGetFreeSpace(int &totalspace, int &usedspace)
     }
 }
 
+bool RemoteGetLoad(float load[3])
+{
+    QStringList strlist = QString("QUERY_LOAD");
+
+    if (gContext->SendReceiveStringList(strlist))
+    {
+        load[0] = strlist[0].toFloat();
+        load[1] = strlist[1].toFloat();
+        load[2] = strlist[2].toFloat();
+        return true;
+    }
+
+    return false;
+}
+
+bool RemoteGetUptime(time_t &uptime)
+{
+    QStringList strlist = QString("QUERY_UPTIME");
+
+    if (!gContext->SendReceiveStringList(strlist))
+        return false;
+
+    if (!strlist[0].at(0).isNumber())
+        return false;
+
+    if (sizeof(time_t) == sizeof(int))
+        uptime = strlist[0].toUInt();
+    else if (sizeof(time_t) == sizeof(long))
+        uptime = strlist[0].toULong();
+    else if (sizeof(time_t) == sizeof(long long))
+        uptime = strlist[0].toULongLong();
+
+    return false;
+}
+
+bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
+{
+    QStringList strlist = QString("QUERY_MEMSTATS");
+
+    if (gContext->SendReceiveStringList(strlist))
+    {
+        totalMB = strlist[0].toInt();
+        freeMB  = strlist[1].toInt();
+        totalVM = strlist[2].toInt();
+        freeVM  = strlist[3].toInt();
+        return true;
+    }
+
+    return false;
+}
+
 bool RemoteCheckFile(ProgramInfo *pginfo)
 {
     QStringList strlist = "QUERY_CHECKFILE";
