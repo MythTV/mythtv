@@ -4057,17 +4057,14 @@ void TV::BuildOSDTreeMenu(void)
     subitem = new OSDGenericTree(item, tr("2.0X"), "TOGGLESTRETCH2.0");
 
     // add sleep items to menu
-    QString SleepOn = tr("Sleep 60");
-    QString SleepOff = tr("Sleep Off");
 
-    QString sleepval = sleepTimer->isActive() ? SleepOff : SleepOn;
-
-    item = new OSDGenericTree(treeMenu, tr("Sleep"), "TOGGLESLEEP");
-    subitem = new OSDGenericTree(item, sleepval, "TOGGLESLEEPONOFF");
-    subitem = new OSDGenericTree(item, "30", "TOGGLESLEEP30");
-    subitem = new OSDGenericTree(item, "60", "TOGGLESLEEP60");
-    subitem = new OSDGenericTree(item, "90", "TOGGLESLEEP90");
-    subitem = new OSDGenericTree(item, "120", "TOGGLESLEEP120");
+    item = new OSDGenericTree(treeMenu, tr("Sleep"), "TOGGLESLEEPON");
+    if (sleepTimer->isActive())
+        subitem = new OSDGenericTree(item, tr("Sleep Off"), "TOGGLESLEEPON");
+    subitem = new OSDGenericTree(item, "30 " + tr("minutes"), "TOGGLESLEEP30");
+    subitem = new OSDGenericTree(item, "60 " + tr("minutes"), "TOGGLESLEEP60");
+    subitem = new OSDGenericTree(item, "90 " + tr("minutes"), "TOGGLESLEEP90");
+    subitem = new OSDGenericTree(item, "120 " + tr("minutes"), "TOGGLESLEEP120");
 }
 
 void TV::ToggleAutoExpire(void)
