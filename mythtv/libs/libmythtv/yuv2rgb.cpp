@@ -34,7 +34,11 @@
 #define CPU_MMX 1
 #endif
 #ifdef HAVE_ALTIVEC
+#ifdef HAVE_ALTIVEC_H
+#include <altivec.h>
+#else
 #include <Accelerate/Accelerate.h>
+#endif
 #endif
 #include "yuv2rgb.h"
 

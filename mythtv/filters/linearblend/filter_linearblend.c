@@ -268,7 +268,11 @@ void linearBlend3DNow(unsigned char *src, int stride) {(void)src;(void)stride;};
 
 #ifdef HAVE_ALTIVEC
 
+#ifdef HAVE_ALTIVEC_H
+#include <altivec.h>
+#else
 #include <Accelerate/Accelerate.h>
+#endif
 
 // we fall back to the default routines in some situations
 void linearBlend(unsigned char *src, int stride);
