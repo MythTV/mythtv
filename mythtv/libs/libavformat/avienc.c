@@ -142,6 +142,10 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_CYUV, MKTAG('c', 'y', 'u', 'v') },
     { CODEC_ID_RAWVIDEO, MKTAG('Y', '4', '2', '2') },
     { CODEC_ID_RAWVIDEO, MKTAG('I', '4', '2', '0') },
+    { CODEC_ID_INDEO3, MKTAG('i', 'v', '3', '1') },
+    { CODEC_ID_INDEO3, MKTAG('i', 'v', '3', '2') },
+    { CODEC_ID_INDEO3, MKTAG('I', 'V', '3', '1') },
+    { CODEC_ID_INDEO3, MKTAG('I', 'V', '3', '2') },
     { 0, 0 },
 };
 
@@ -378,7 +382,8 @@ static int avi_write_header(AVFormatContext *s)
     put_tag(pb, "odml");
     put_tag(pb, "dmlh");
     put_le32(pb, 248);
-    url_fskip(pb, 248);
+    for (i = 0; i < 248; i+= 4)
+        put_le32(pb, 0);
     end_tag(pb, avi->odml_list);
 
     end_tag(pb, list1);
@@ -555,7 +560,7 @@ static AVOutputFormat avi_oformat = {
     "avi",
     sizeof(AVIContext),
     CODEC_ID_MP2,
-    CODEC_ID_MSMPEG4V3,
+    CODEC_ID_MPEG4,
     avi_write_header,
     avi_write_packet,
     avi_write_trailer,

@@ -61,6 +61,7 @@ class AvFormatDecoder : public DecoderBase
     int frame_decoded;
 
     bool directrendering;
+    bool drawband;
     long long framesPlayed;
 
     int audio_sample_size;
@@ -68,6 +69,8 @@ class AvFormatDecoder : public DecoderBase
 
     long long lastapts;
     long long lastvpts;
+
+    bool hasbframes;
 };
 
 #endif

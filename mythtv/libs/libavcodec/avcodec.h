@@ -15,8 +15,8 @@ extern "C" {
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4663
-#define LIBAVCODEC_BUILD_STR   "4663"
+#define LIBAVCODEC_BUILD       4664
+#define LIBAVCODEC_BUILD_STR   "4664"
 
 #define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" LIBAVCODEC_BUILD_STR
 
@@ -50,6 +50,7 @@ enum CodecID {
     CODEC_ID_HUFFYUV,
     CODEC_ID_CYUV,
     CODEC_ID_H264,
+    CODEC_ID_INDEO3,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -181,7 +182,11 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 /* codec capabilities */
 
 #define CODEC_CAP_DRAW_HORIZ_BAND 0x0001 ///< decoder can use draw_horiz_band callback 
-#define CODEC_CAP_DR1             0x0002 ///< direct rendering method 1 
+/**
+ * Codec uses get_buffer() for allocating buffers.
+ * direct rendering method 1
+ */
+#define CODEC_CAP_DR1             0x0002
 /* if 'parse_only' field is true, then avcodec_parse_frame() can be
    used */
 #define CODEC_CAP_PARSE_ONLY      0x0004
@@ -309,8 +314,15 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
      * - encoding: unused\
      * - decoding: set by lavc\
      */\
-    int repeat_pict;
+    int repeat_pict;\
+    \
+    /**\
+     * \
+     */\
+    int qscale_type;\
 
+#define FF_QSCALE_TYPE_MPEG1	0
+#define FF_QSCALE_TYPE_MPEG2	1
 
 #define FF_BUFFER_TYPE_INTERNAL 1
 #define FF_BUFFER_TYPE_USER     2 ///< Direct rendering buffers
@@ -1183,6 +1195,7 @@ extern AVCodec huffyuv_decoder;
 extern AVCodec oggvorbis_decoder;
 extern AVCodec cyuv_decoder;
 extern AVCodec h264_decoder;
+extern AVCodec indeo3_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \

@@ -25,13 +25,13 @@ SOURCES += motion_est.c imgconvert.c imgresample.c msmpeg4.c mpeg12.c
 SOURCES += h263dec.c svq1.c rv10.c mpegaudiodec.c pcm.c simple_idct.c
 SOURCES += ratecontrol.c adpcm.c eval.c jfdctint.c dv.c error_resilience.c
 SOURCES += wmadec.c fft.c mdct.c mace.c huffyuv.c opts.c cyuv.c
-SOURCES += golomb.c h264.c raw.c
+SOURCES += golomb.c h264.c raw.c indeo3.c
 
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c
     !contains( CONFIG_A52BIN, yes ) {
         SOURCES += liba52/bit_allocate.c liba52/bitstream.c liba52/downmix.c
-        SOURCES += liba52/imdct.c liba52/parse.c
+        SOURCES += liba52/imdct.c liba52/parse.c liba52/crc.c liba52/resample.c
     }
 }
 

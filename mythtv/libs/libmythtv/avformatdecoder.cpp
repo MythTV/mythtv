@@ -18,6 +18,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent)
 
     audio_sample_size = 4;
     audio_sampling_rate = 48000;
+
+    hasbframes = false;
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -213,7 +215,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             {
                 double fps = (double)enc->frame_rate / enc->frame_rate_base;
                 m_parent->SetVideoParams(enc->width, enc->height, fps, 30);
-               
+              
                 enc->error_resilience = 2;
                 enc->workaround_bugs = FF_BUG_AUTODETECT;
                 enc->error_concealment = 3;
@@ -228,8 +230,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 }
 
                 AVCodec *codec = avcodec_find_decoder(enc->codec_id);
-                if (codec && codec->capabilities & CODEC_CAP_DR1 &&
-                    enc->codec_id != CODEC_ID_MPEG1VIDEO)
+                if (codec && codec->capabilities & CODEC_CAP_DR1)
                 {
                     enc->flags |= CODEC_FLAG_EMU_EDGE;
                     enc->draw_horiz_band = NULL;
@@ -237,7 +238,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                     enc->release_buffer = release_avf_buffer;
                     enc->opaque = (void *)this;
                     directrendering = true;
-                } 
+                    hasbframes = enc->has_b_frames;
+                }
                 break;
             }
             case CODEC_TYPE_AUDIO:
@@ -282,6 +284,11 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
     int width = c->width;
     int height = c->height;
 
+    if (pic->reference && nd->hasbframes)
+    {
+       return avcodec_default_get_buffer(c, pic);
+    }
+
     pic->data[0] = nd->directbuf;
     pic->data[1] = pic->data[0] + width * height;
     pic->data[2] = pic->data[1] + width * height / 4;
@@ -301,7 +308,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 {
     (void)c;
-    assert(pic->type == FF_BUFFER_TYPE_USER);
+    //assert(pic->type == FF_BUFFER_TYPE_USER);
 
     int i;
     for (i = 0; i < 4; i++)
@@ -414,7 +421,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
                     }
 
-                    if (!directrendering)
+                    if (!directrendering || (mpa_pic.reference && hasbframes))
                     {
                         AVPicture tmppicture;
                         AVPicture mpa_pic_p;
