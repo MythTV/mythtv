@@ -293,6 +293,155 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr,
     }
 }
 
+#if 0
+// doesn't calc layer alpha properly.  Doesn't do u/v planes at all.
+#include "mmx.h"
+void blendText_8(unsigned char *src, unsigned char *dest, 
+                 unsigned char *destalpha, 
+                 int alphamod, int color)
+{
+    unsigned char colors[8];
+    colors[0] = colors[2] = colors[4] = colors[6] = (unsigned char)color;
+    colors[1] = colors[3] = colors[5] = colors[7] = 0;
+
+    unsigned char amod[8];
+    amod[0] = amod[2] = amod[4] = amod[6] = (unsigned char)alphamod;
+    amod[1] = amod[3] = amod[5] = amod[7] = 0;
+
+    static mmx_t mmx_80w = {0x0080008000800080LL};
+    static mmx_t mmx_fs  = {0xffffffffffffffffLL};
+
+    // calc modified alpha / alphamod
+    movq_m2r(*src, mm5);
+    movq_r2r(mm5, mm1);
+
+    pxor_r2r(mm7, mm7);
+
+    punpcklbw_r2r(mm7, mm5);
+    punpckhbw_r2r(mm7, mm1);
+
+    movq_m2r(*amod, mm2);
+
+    pmullw_r2r(mm2, mm5);
+    pmullw_r2r(mm2, mm1);
+
+    movq_m2r(mmx_80w, mm4);
+
+    paddw_r2r(mm4, mm5);
+    paddw_r2r(mm4, mm1);
+
+    psrlw_i2r(8, mm5);
+    psrlw_i2r(8, mm1);
+
+    packuswb_r2r(mm1, mm5);
+
+    // should do layer transparency here (surf->pow_lut)
+
+    // calc dest b (255 - a)
+    movq_m2r(*dest, mm0);
+    movq_r2r(mm0, mm1);
+    movq_m2r(mmx_fs, mm2);
+
+    psubw_r2r(mm5, mm2);
+    punpcklbw_r2r(mm7, mm0);
+    punpckhbw_r2r(mm7, mm1);
+
+    movq_r2r(mm2, mm3);
+    punpcklbw_r2r(mm7, mm2);
+    punpckhbw_r2r(mm7, mm3);
+
+    pmullw_r2r(mm2, mm0);
+    pmullw_r2r(mm3, mm1);
+
+    paddw_r2r(mm4, mm0);
+    paddw_r2r(mm4, mm1);
+
+    movq_r2r(mm0, mm2);
+    movq_r2r(mm1, mm3);
+
+    psrlw_i2r(8, mm0);
+    psrlw_i2r(8, mm1);
+
+    paddw_r2r(mm2, mm0);
+    paddw_r2r(mm3, mm1);
+
+    psrlw_i2r(8, mm0);
+    psrlw_i2r(8, mm1);
+
+    // calc source b a
+    movq_m2r(*colors, mm2);
+    movq_r2r(mm2, mm3);
+
+    movq_r2r(mm5, mm6);
+
+    punpcklbw_r2r(mm7, mm5);
+    punpckhbw_r2r(mm7, mm6);
+
+    pmullw_r2r(mm5, mm2);
+    pmullw_r2r(mm6, mm3);
+
+    paddw_r2r(mm4, mm2);
+    paddw_r2r(mm4, mm3);
+
+    movq_r2r(mm2, mm4);
+    movq_r2r(mm3, mm5);
+
+    psrlw_i2r(8, mm2);
+    psrlw_i2r(8, mm3);
+
+    paddw_r2r(mm4, mm2);
+    paddw_r2r(mm5, mm3);
+
+    psrlw_i2r(8, mm2);
+    psrlw_i2r(8, mm3);
+
+    paddw_r2r(mm2, mm0);
+    paddw_r2r(mm3, mm1);
+
+    packuswb_r2r(mm1, mm0);
+
+    movq_r2m(mm0, *dest);
+
+    // calc new destination alpha
+    movq_m2r(*src, mm0);
+    movq_r2r(mm0, mm1);
+    movq_m2r(*destalpha, mm5);
+    movq_m2r(mmx_fs, mm2);
+    movq_m2r(mmx_80w, mm4);
+
+    psubw_r2r(mm5, mm2);
+
+    punpcklbw_r2r(mm7, mm0);
+    punpckhbw_r2r(mm7, mm1);
+
+    movq_r2r(mm2, mm3);
+    punpcklbw_r2r(mm7, mm2);
+    punpckhbw_r2r(mm7, mm3);
+
+    pmullw_r2r(mm2, mm0);
+    pmullw_r2r(mm3, mm1);
+
+    paddw_r2r(mm4, mm0);
+    paddw_r2r(mm4, mm1);
+
+    movq_r2r(mm5, mm6);
+    punpcklbw_r2r(mm7, mm5);
+    punpckhbw_r2r(mm7, mm6);
+
+    psrlw_i2r(8, mm0);
+    psrlw_i2r(8, mm1);
+
+    paddw_r2r(mm5, mm0);
+    paddw_r2r(mm6, mm1);
+
+    packuswb_r2r(mm1, mm0);
+
+    movq_r2m(mm0, *destalpha);
+
+    emms();
+}
+#endif
+
 void TTFFont::merge_text(OSDSurface *surface, Raster_Map * rmap, int offset_x, 
                          int offset_y, int xstart, int ystart, int width, 
                          int height, int color, int alphamod)
@@ -338,14 +487,14 @@ void TTFFont::merge_text(OSDSurface *surface, Raster_Map * rmap, int offset_x,
             if (x + xstart < 0)
                 continue;
 
-	    if ((a = *ptr) > 0)
-	    {
-                a = ((a * alphamod) + 0x80) >> 8;
+            if ((a = *ptr) > 0)
+            {
                 offset = (y + ystart) * surface->width + (x + xstart);
-
+ 
                 destalpha = surface->alpha + offset;
-		src = surface->y + offset;
+                src = surface->y + offset;
 
+                a = ((a * alphamod) + 0x80) >> 8;
                 newalpha = a;
 
                 if (*destalpha != 0)

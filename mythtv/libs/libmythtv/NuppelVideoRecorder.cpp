@@ -143,6 +143,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     videoFilters = NULL;
     FiltMan = new FilterManager;
     inpixfmt = FMT_YV12;
+    correct_bttv = false;
 
     setorigaudio = false;
     origaudio = new struct video_audio;
@@ -703,10 +704,23 @@ void NuppelVideoRecorder::InitFilters(void)
     if (videoFilters)
         delete videoFilters;
 
+    QString tmpVideoFilterList;
+
     w_out = w;
     h_out = h;
     VideoFrameType tmp = FMT_YV12;
-    videoFilters = FiltMan->LoadFilters(videoFilterList, inpixfmt, tmp, 
+
+    if (correct_bttv && !videoFilterList.contains("adjust"))
+    {
+        if (videoFilterList.isEmpty())
+            tmpVideoFilterList = "adjust";
+        else
+            tmpVideoFilterList = "adjust," + videoFilterList;
+    }
+    else
+        tmpVideoFilterList = videoFilterList;
+
+    videoFilters = FiltMan->LoadFilters(tmpVideoFilterList, inpixfmt, tmp, 
                                         w_out, h_out, btmp);
     if (video_buffer_size && btmp != video_buffer_size)
     {
@@ -904,6 +918,9 @@ void NuppelVideoRecorder::StartRecording(void)
 
     if (usingv4l2)
     {
+        if (vcap.card[0] == 'B' && vcap.card[1] == 'T' &&
+            vcap.card[2] == '8' && vcap.card[4] == '8')
+            correct_bttv = true;
         channelfd = open(videodevice.ascii(), O_RDWR);
         if (channelfd < 0)
         {
@@ -941,6 +958,10 @@ void NuppelVideoRecorder::StartRecording(void)
         KillChildren(); 
         return;
     }
+
+    if (vc.name[0] == 'B' && vc.name[1] == 'T' && vc.name[2] == '8' &&
+        vc.name[4] == '8')
+        correct_bttv = true;
 
     if ((vc.type & VID_TYPE_MJPEG_ENCODER) && hardware_encode)
     {

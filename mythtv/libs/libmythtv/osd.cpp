@@ -1681,6 +1681,8 @@ OSDSurface *OSD::Display(void)
 
     drawSurface->SetChanged(false);
 
+    //actuallydraw = true;
+
     if (actuallydraw)
     {
         drawSurface->SetChanged(true);

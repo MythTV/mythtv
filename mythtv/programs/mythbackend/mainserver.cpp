@@ -659,12 +659,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             proginfo->description = QString::fromUtf8(query.value(5).toString());
             proginfo->hostname = query.value(6).toString();
 
-            if (query.value(16) != NULL)
-                proginfo->dupin = RecordingDupInType(query.value(16).toInt());
-            if (query.value(17) != NULL)
-                proginfo->dupmethod = RecordingDupMethodType(query.value(17).toInt());
-            if (query.value(18) != NULL)
-                proginfo->recordid = query.value(18).toInt();
+            proginfo->dupin = RecordingDupInType(query.value(16).toInt());
+            proginfo->dupmethod = RecordingDupMethodType(query.value(17).toInt());
+            proginfo->recordid = query.value(18).toInt();
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();

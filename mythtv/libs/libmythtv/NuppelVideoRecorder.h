@@ -266,6 +266,8 @@ class NuppelVideoRecorder : public RecorderBase
     bool setorigaudio;
 
     bool skip_btaudio;
+
+    bool correct_bttv;
 };
 
 #endif

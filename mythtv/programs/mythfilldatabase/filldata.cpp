@@ -39,6 +39,7 @@ bool interrupted = false;
 bool refresh_today = false;
 bool refresh_tomorrow = true;
 bool refresh_second = false;
+bool refresh_tba = true;
 int listing_wrap_offset = 0;
 
 class ChanInfo
@@ -1609,6 +1610,10 @@ bool fillData(QValueList<Source> &sourcelist)
 
             for (int i = 0; i < maxday; i++)
             {
+                if ((i == 0 && refresh_today) || (i == 1 && refresh_tomorrow) ||
+                    (i == 2 && refresh_second))
+                    continue;
+
                 // we need to check and see if the current date has changed 
                 // since we started in this loop.  If it has, we need to adjust
                 // the value of 'i' to compensate for this.
@@ -1652,7 +1657,8 @@ bool fillData(QValueList<Source> &sourcelist)
                                          query);
 
                 // Now look for programs marked as "To Be Announced"
-                if (!download_needed && xmltv_grabber == "tv_grab_uk_rt") 
+                if (refresh_tba && !download_needed && 
+                    xmltv_grabber == "tv_grab_uk_rt") 
                 {
                     querystr.sprintf("SELECT COUNT(*) as 'hits' "
                                      "FROM channel LEFT JOIN program USING (chanid) "
@@ -1966,6 +1972,10 @@ int main(int argc, char *argv[])
         {
             refresh_second = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--dont-refresh-tba"))
+        {
+            refresh_tba = false;
+        }
         else if (!strcmp(a.argv()[argpos], "--quiet"))
         {
              quiet = true;
@@ -2012,6 +2022,8 @@ int main(int argc, char *argv[])
             cout << "   Force a refresh today or two days from now, to catch the latest changes\n";
             cout << "--dont-refresh-tomorrow\n";
             cout << "   Tomorrow will be refreshed always unless this argument is used\n";
+            cout << "--dont-refresh-tba\n";
+            cout << "   \"To be announced\" progs will be refreshed always unless this argument is used\n";
             cout << "--help\n";
             cout << "   This text\n";
             cout << "\n";

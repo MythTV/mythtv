@@ -3202,7 +3202,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
         if (totalFrames)
             printf( "%3d%%/      ", 0 );
         else
-            printf( "%6lld", 0 );
+            printf( "%6lld", 0LL );
     }
 
     while (!eof)
