@@ -629,7 +629,8 @@ public:
         setValue(false);
         setHelpText(QObject::tr("If this is set, captions will be on by "
                     "default when playing back recordings or watching "
-                    "live TV."));
+                    "live TV.  Closed Captioning can be turned on or off "
+                    "by pressing 'T' during playback."));
     };
 };
 
