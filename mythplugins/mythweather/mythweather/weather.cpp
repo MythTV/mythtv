@@ -272,7 +272,6 @@ void Weather::saveConfig()
 	{
 	    if (cityList[4].text().stripWhiteSpace().length() != 0)
 	    {
-		cout << "GREATER THAN ZERO\n";
 	    	config_accid = findAccidbyName(cityList[4].text().stripWhiteSpace());
 	    	gContext->SetSetting("locale", config_accid);
 	    	locale = config_accid;
@@ -441,7 +440,7 @@ QString Weather::findNamebyAccid(QString accid)
 				}
 			}
 
-			curCity = cnt;
+			curCity = cnt - 1;
 
 			name = hold;
 			accidFile.seekg(startData);
@@ -1382,6 +1381,9 @@ void Weather::cursorLeft()
 	{
 		if (gotLetter == false)
                 {
+			if (noACCID == false)
+                              lbUpdated->setText("Configuring MythWeather...");
+
 			lbLocale->setText("Use the right arrow key to select your location...");
                 	lbLocal->setPaletteBackgroundColor(topbot_bgColor);
 			
@@ -1456,6 +1458,9 @@ void Weather::cursorRight()
    {
 	if (curConfig == 2)
 	{
+		if (noACCID == false)
+                     lbUpdated->setText("More Keys: 1,7 +/- 25   2,8 +/- 50   3,9 +/- 100   4-Start  5-Mid  6-End");
+
 		lbLocale->setText("Use the up and down arrow keys to select your city...");
 		gotLetter = true;
                 letterList[4].setPaletteBackgroundColor(QColor(0, 0, 0));
