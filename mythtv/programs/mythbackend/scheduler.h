@@ -14,7 +14,8 @@ using namespace std;
 class Scheduler : public QObject
 {
   public:
-    Scheduler(QMap<int, EncoderLink *> *tvList, QSqlDatabase *ldb);
+    Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList, 
+              QSqlDatabase *ldb);
    ~Scheduler();
 
     bool CheckForChanges(void);
@@ -84,6 +85,8 @@ class Scheduler : public QObject
     QMap<QString, bool> responseList;
 
     pthread_mutex_t schedulerLock;
+
+    bool threadrunning;
 };
 
 #endif

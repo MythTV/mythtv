@@ -211,7 +211,7 @@ int main(int argc, char **argv)
     if (ismaster)
     {
         QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
-        sched = new Scheduler(&tvList, scdb);
+        sched = new Scheduler(true, &tvList, scdb);
     }
 
     new MainServer(ismaster, port, statusport, &tvList);
