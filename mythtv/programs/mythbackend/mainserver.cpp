@@ -723,6 +723,7 @@ void MainServer::endConnection(QSocket *socket)
         if (sock == socket)
         {
             ringBufList.erase(rt);
+            delete sock;
             return;
         }
     }

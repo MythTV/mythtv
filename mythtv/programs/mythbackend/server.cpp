@@ -26,6 +26,8 @@ void MythServer::newConnection(int socket)
 void MythServer::discardClient(void)
 {
     QSocket *socket = (QSocket *)sender();
-    emit(endConnect(socket));
-    delete socket;
+    if (socket)
+    {
+        emit(endConnect(socket));
+    }
 }
