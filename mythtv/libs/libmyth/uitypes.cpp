@@ -117,6 +117,8 @@ UIListType::UIListType(const QString &name, QRect area, int dorder, UIFontPairTy
     m_current = -1;
     m_count = 0;
     m_justification = 0;
+    m_uarrow = false;
+    m_darrow = false;
 }
 
 UIListType::~UIListType()

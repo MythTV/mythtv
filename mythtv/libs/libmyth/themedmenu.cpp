@@ -1469,6 +1469,9 @@ void ThemedMenu::handleAction(QString &action)
             callback(callbackdata, selection);
         }
     }   
+
+    showFullScreen();
+    setActiveWindow();
 }
 
 bool ThemedMenu::findDepends(QString file)

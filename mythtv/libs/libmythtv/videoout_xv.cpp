@@ -511,6 +511,7 @@ void XvVideoOutput::Exit(void)
         }
         else
         {
+            // XXX Check this later -- XDestroyImage instead?
             map<unsigned char *, XImage *>::iterator iter =
                 data->xbuffers.begin();
             for(; iter != data->xbuffers.end(); ++iter, ++i) 
@@ -546,6 +547,7 @@ void XvVideoOutput::hide_cursor(void)
 
     XDefineCursor(data->XJ_disp, data->XJ_win, no_ptr);
     XFreeCursor(data->XJ_disp, no_ptr);
+    XFreePixmap(data->XJ_disp, bm_no);
 }
 
 void XvVideoOutput::show_cursor(void)

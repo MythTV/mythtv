@@ -829,6 +829,8 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
 
 OSDTypeEditSlider::~OSDTypeEditSlider()
 {
+    delete [] m_drawMap;
+
     if (m_ryuv)
         delete [] m_ryuv;
     if (m_ralpha)

@@ -18,6 +18,7 @@ XMLParse::~XMLParse()
         if (type)
             delete type;
     }
+    delete allTypes;
 }
 
 bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)

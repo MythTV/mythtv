@@ -170,6 +170,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 cerr << "File not big enough for first frame data\n";
                 delete [] ffmpeg_extradata;
                 ffmpeg_extradata = NULL;
+                delete [] space;
+                return -1;
             }
         }
     }
@@ -179,6 +181,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                                                      frameheader.packetlength))
         {
             cerr << "File not big enough for first frame data\n";
+            delete [] space;
             return -1;
         }
     }
@@ -250,6 +253,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                                      video_frame_rate);
                 totalFrames = (long long)ste.keyframe_number * keyframedist;
                 m_parent->SetFileLength(totalLength, totalFrames);
+
+                delete [] seekbuf;
             }
             else
                 cerr << "0 length seek table\n";
@@ -659,9 +664,12 @@ void NuppelDecoder::GetFrame(int onlyvideo)
 
             if (ringBuffer->Read(dummy, sizetoskip) != sizetoskip)
             {
+                delete [] dummy;
                 m_parent->SetEof();
                 return;
             }
+
+            delete [] dummy;
             continue;
         }
 

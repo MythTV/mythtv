@@ -1309,6 +1309,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         pthread_mutex_unlock(&video_buflock);
     }
 
+    delete [] pause_buf;
+ 
     if (!disablevideo)
     {
         pthread_mutex_lock(&eventLock);
