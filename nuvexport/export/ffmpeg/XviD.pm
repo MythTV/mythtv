@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.03.01 (xris)
+#Last Updated: 2005.03.07 (xris)
 #
 #  export::ffmpeg::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -24,16 +24,16 @@ package export::ffmpeg::XviD;
     sub new {
         my $class = shift;
         my $self  = {
-                     'cli'             => qr/\bxvid\b/i,
-                     'name'            => 'Export to XviD',
-                     'enabled'         => 1,
-                     'errors'          => [],
-                    # Transcode-related settings
-                     'noise_reduction' => 1,
-                     'deinterlace'     => 1,
-                     'crop'            => 1,
+                     'cli'      => qr/\bxvid\b/i,
+                     'name'     => 'Export to XviD',
+                     'enabled'  => 1,
+                     'errors'   => [],
+                     'defaults' => {},
                     };
         bless($self, $class);
+
+    # Initialize the default parameters
+        $self->load_defaults();
 
     # Verify any commandline or config file options
         die "Audio bitrate must be > 0\n" unless (!defined $self->val('a_bitrate') || $self->{'a_bitrate'} > 0);
@@ -65,6 +65,18 @@ package export::ffmpeg::XviD;
         return $self;
     }
 
+# Load default settings
+    sub load_defaults {
+        my $self = shift;
+    # Load the parent module's settings
+        $self->SUPER::load_defaults();
+    # Default bitrates and resolution
+        $self->{'defaults'}{'a_bitrate'} = 128;
+        $self->{'defaults'}{'v_bitrate'} = 960;
+        $self->{'defaults'}{'width'}     = 624;
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
     # Load the parent module's settings
@@ -84,7 +96,9 @@ package export::ffmpeg::XviD;
                                                   $self->val('multipass'));
                 if (!$self->{'multipass'}) {
                     while (1) {
-                        my $quantisation = query_text('VBR quality/quantisation (1-31)?', 'float', $self->val('quantisation'));
+                        my $quantisation = query_text('VBR quality/quantisation (1-31)?',
+                                                      'float',
+                                                      $self->val('quantisation'));
                         if ($quantisation < 1) {
                             print "Too low; please choose a number between 1 and 31.\n";
                         }
@@ -98,7 +112,7 @@ package export::ffmpeg::XviD;
                     }
                 }
             }
-        # Ask the user what audio and video bitrates he/she wants
+        # Ask the user what video bitrate he/she wants
             if ($self->{'multipass'} || !$self->{'vbr'}) {
                 $self->{'v_bitrate'} = query_text('Video bitrate?',
                                                   'int',

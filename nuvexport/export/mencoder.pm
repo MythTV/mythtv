@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.27 (icemaann)
+#Last Updated: 2005.03.02 (xris)
 #
 #  mencoder.pm
 #
-#    routines for setting up mencoder 
+#    routines for setting up mencoder
 #
 
 package export::mencoder;
@@ -19,48 +19,30 @@ package export::mencoder;
     use nuv_export::ui;
     use mythtv::recordings;
 
-# Load the following extra parameters from the commandline
-    add_arg('zoom_filter:s', 'Which zoom filter to use.');
-
-# This superclass defines several object variables:
-#
-#   path        (defined by generic)
-#   use_cutlist (defined by generic)
-#   noise_reduction
-#   deinterlace
-#   crop
-#   zoom_filter
-#
-
 # Check for mencoder
     sub init_mencoder {
         my $self = shift;
-    # Make sure we have mencoder 
+    # Make sure we have mencoder
         find_program('mencoder')
             or push @{$self->{'errors'}}, 'You need mencoder to use this exporter.';
     }
 
-# Gather data for mencoder
+# Load default settings
+    sub load_defaults {
+        my $self = shift;
+    # Load the parent module's settings
+        $self->SUPER::load_defaults();
+    # Not really anything to add
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
-        my $skip = shift;
     # Gather generic settings
         $self->SUPER::gather_settings($skip ? $skip - 1 : 0);
         return if ($skip);
-    # Zoom Filter
-        if (defined arg('zoom_filter')) {
-            if (!arg('zoom_filter')) {
-                $self->{'zoom_filter'} = 'B_spline';
-            }
-            elsif (arg('zoom_filter') =~ /^(?:Lanczos3|Bell|Box|Mitchell|Hermite|B_spline|Triangle)$/) {
-                $self->{'zoom_filter'} = arg('zoom_filter');
-            }
-            else {
-                die "Unknown zoom_filter:  ".arg('zoom_filter')."\n";
-            }
-        }
     }
-    
+
     #Fix/build mencoder filter chain
     sub build_vop_line{
         my $cmdline    = shift;
@@ -74,7 +56,6 @@ package export::mencoder;
         $cmdline .= " -vop $vop ";
         return $cmdline;
     }
-        
 
     sub export {
         my $self       = shift;
@@ -112,14 +93,14 @@ package export::mencoder;
             if (-e "/tmp/fifodir_$$/vidout" || -e "/tmp/fifodir_$$/audout") {
                 die "Possibly stale mythtranscode fifo's in /tmp/fifodir_$$/.\nPlease remove them before running nuvexport.\n\n";
             }
-        # Here, we have to fork off a copy of mythtranscode (need to use --fifosync with mencoder? needs testing) 
+        # Here, we have to fork off a copy of mythtranscode (need to use --fifosync with mencoder? needs testing)
             $mythtranscode = "$NICE mythtranscode --showprogress -p autodetect -c $episode->{'channel'} -s $episode->{'start_time_sep'} -f \"/tmp/fifodir_$$/\"";
         # On no-audio encodes, we need to do something to keep mythtranscode's audio buffers from filling up available RAM
         #    $mythtranscode .= ' --fifosync' if ($skip_audio);
         # let mythtranscode handle the cutlist
             $mythtranscode .= ' --honorcutlist' if ($self->{'use_cutlist'});
         }
-    # Figure out the input files 
+    # Figure out the input files
         if ($episode->{'finfo'}{'is_mpeg'} && !$self->{'use_cutlist'}) {
             $mencoder .= " -idx $episode->{'filename'} ";
         }
@@ -146,7 +127,7 @@ package export::mencoder;
     # Use the cutlist?  (only for mpeg files -- nuv files are handled by mythtranscode)
     # Can we cut with mencoder?
     # Filters (remember, mencoder reads these in reverse order (so deint should be last if used)
-    # Normally you would do -vop filter1=<val>,filter2=<val>,lavcdeint... 
+    # Normally you would do -vop filter1=<val>,filter2=<val>,lavcdeint...
         if ($self->{'noise_reduction'}) {
             $mencoder .= " -vop denoise3d";
         }

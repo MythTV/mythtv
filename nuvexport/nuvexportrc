@@ -10,7 +10,9 @@
 #
 
 #
-#   Anything placed within the <nuvexport> section
+#  Anything placed within the <nuvexport> section will be interpreted
+#    as a global option.  Use this section for options that don't relate
+#    specifically to any particular exporter.
 #
 <nuvexport>
 
@@ -19,7 +21,7 @@
 #    preference of program for exports.  This is equivalent to --ffmpeg,
 #    --transcode or --mencoder
 #
-export_prog=transcode
+    export_prog=transcode
 
 #
 #  Any other parameters set in this file are equivalent to using the equivalent
@@ -33,12 +35,12 @@ export_prog=transcode
 #    would like to do.  Use --mode or any of the mode symlinks (like
 #    nuvexport-xvid) to override.
 #
-# mode=xvid
+#    mode=xvid
 
 #
 #  Setting underscores to yes will convert whitespace in filenames to an
 #    underscore character (which some people seem to prefer)
-underscores=no
+    underscores=no
 
 </nuvexport>
 

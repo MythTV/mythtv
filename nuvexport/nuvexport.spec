@@ -23,6 +23,7 @@ Requires:  perl-Time-HiRes
 Requires:  transcode >= 0.6.12
 Requires:  ffmpeg >= 0.4.9
 Requires:  mjpegtools >= 1.6.2
+Requires:  id3tag
 Requires:  mplayer
 Requires:  divx4linux
 # mpeg2cut needs some others:

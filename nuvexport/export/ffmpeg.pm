@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.23 (xris)
+#Last Updated: 2005.03.02 (xris)
 #
 #  ffmpeg.pm
 #
@@ -19,15 +19,6 @@ package export::ffmpeg;
     use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::recordings;
-
-# This superclass defines several object variables:
-#
-#   path        (defined by generic)
-#   use_cutlist (defined by generic)
-#   noise_reduction
-#   deinterlace
-#   crop
-#
 
 # Check for ffmpeg
     sub init_ffmpeg {
@@ -58,7 +49,15 @@ package export::ffmpeg;
         return ($self->{'codecs'}{$codec} && $self->{'codecs'}{$codec} =~ /^.E/) ? 1 : 0;
     }
 
-# Gather data for ffmpeg
+# Load default settings
+    sub load_defaults {
+        my $self = shift;
+    # Load the parent module's settings
+        $self->SUPER::load_defaults();
+    # Not really anything to add
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
         my $skip = shift;

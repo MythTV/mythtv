@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.26 (xris)
+#Last Updated: 2005.03.02 (xris)
 #
 #  export::MPEG2_cut
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -46,10 +46,11 @@ package export::MPEG2_cut;
         return $self;
     }
 
+# Gather settings from the user
     sub gather_settings {
         my $self    = shift;
     # Load the parent module's settings
-        $self->{'path'} = query_savepath();
+        $self->{'path'} = query_savepath($self->val('path'));
     }
 
     sub export {

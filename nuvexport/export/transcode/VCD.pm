@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.17 (xris)
+#Last Updated: 2005.03.02 (xris)
 #
 #  export::transcode::VCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -20,24 +20,23 @@ package export::transcode::VCD;
     sub new {
         my $class = shift;
         my $self  = {
-                     'cli'             => qr/\bvcd\b/i,
-                     'name'            => 'Export to VCD',
-                     'enabled'         => 1,
-                     'errors'          => [],
-                    # Transcode-related settings
-                     'noise_reduction' => 1,
-                     'deinterlace'     => 1,
-                     'crop'            => 1,
-                    # VCD-specific settings
-                     'split_every'     => 795,		# Split every 795 megs
+                     'cli'      => qr/\bvcd\b/i,
+                     'name'     => 'Export to VCD',
+                     'enabled'  => 1,
+                     'errors'   => [],
+                     'defaults' => {},
                     };
         bless($self, $class);
 
+    # Initialize the default parameters
+        $self->load_defaults();
+
     # Initialize and check for transcode
         $self->init_transcode();
+
     # Make sure that we have an mplexer
-        find_program('tcmplex', 'mplex')
-            or push @{$self->{'errors'}}, 'You need tcmplex or mplex to export a vcd.';
+        find_program('tcmplex')
+            or push @{$self->{'errors'}}, 'You need tcmplex to export a vcd.';
 
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);
@@ -45,6 +44,16 @@ package export::transcode::VCD;
         return $self;
     }
 
+# Load default settings
+    sub load_defaults {
+        my $self = shift;
+    # Load the parent module's settings
+        $self->SUPER::load_defaults();
+    # Split every 795 megs
+        $self->{'defaults'}{'split_every'} = 795;
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
     # Load the parent module's settings
@@ -52,8 +61,8 @@ package export::transcode::VCD;
     # Split every # megs?
         $self->{'split_every'} = query_text('Split after how many MB?',
                                             'int',
-                                            $self->{'split_every'});
-        $self->{'split_every'} = 795 if ($self->{'split_every'} < 1);
+                                            $self->val('split_every'));
+        $self->{'split_every'} = $self->{'defaults'}{'split_every'} if ($self->val('split_every') < 1);
     }
 
     sub export {

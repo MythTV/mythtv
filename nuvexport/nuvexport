@@ -19,8 +19,9 @@
     }
 
 # Add a couple of include paths so we can load the various export and gui modules
+    use English;
     use File::Basename;
-    use lib dirname($ENV{'_'}), '/usr/share/nuvexport', '/usr/local/share/nuvexport';
+    use lib dirname($ENV{'_'} or $PROGRAM_NAME), '/usr/share/nuvexport', '/usr/local/share/nuvexport';
 
 # Load the myth and nuv utilities, and connect to the database
     use nuv_export::shared_utils;

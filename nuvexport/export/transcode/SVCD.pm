@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.17 (xris)
+#Last Updated: 2005.03.07 (xris)
 #
 #  export::transcode::SVCD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -23,21 +23,20 @@ package export::transcode::SVCD;
     sub new {
         my $class = shift;
         my $self  = {
-                     'cli'             => qr/\bsvcd\b/i,
-                     'name'            => 'Export to SVCD',
-                     'enabled'         => 1,
-                     'errors'          => [],
-                    # Transcode-related settings
-                     'noise_reduction' => 1,
-                     'deinterlace'     => 1,
-                     'crop'            => 1,
-                    # SVCD-specific settings
-                     'quantisation'    => 5,		# 4 through 6 is probably right...
-                     'split_every'     => 795,		# Split every 795 megs
-                     'a_bitrate'       => 192,
-                     'v_bitrate'       => 2500,
+                     'cli'      => qr/\bsvcd\b/i,
+                     'name'     => 'Export to SVCD',
+                     'enabled'  => 1,
+                     'errors'   => [],
+                     'defaults' => {},
                     };
         bless($self, $class);
+
+    # Initialize the default parameters
+        $self->load_defaults();
+
+    # Verify any commandline or config file options
+        die "Audio bitrate must be > 0\n" unless (!defined $self->val('a_bitrate') || $self->{'a_bitrate'} > 0);
+        die "Video bitrate must be > 0\n" unless (!defined $self->val('v_bitrate') || $self->{'v_bitrate'} > 0);
 
     # Initialize and check for transcode
         $self->init_transcode();
@@ -48,44 +47,57 @@ package export::transcode::SVCD;
         return $self;
     }
 
+# Load default settings
+    sub load_defaults {
+        my $self = shift;
+    # Load the parent module's settings
+        $self->SUPER::load_defaults();
+    # Split every 795 megs
+        $self->{'defaults'}{'split_every'} = 795;
+    # Add the svcd preferred bitrates
+        $self->{'defaults'}{'quantisation'} = 5;
+        $self->{'defaults'}{'a_bitrate'}    = 192;
+        $self->{'defaults'}{'v_bitrate'}    = 2500;
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
     # Load the parent module's settings
         $self->SUPER::gather_settings();
-    # Ask the user what audio bitrate he/she wants
-        $self->{'a_bitrate'} = arg('a_bitrate') if (arg('a_bitrate'));
-        if (!arg('a_bitrate') || arg('confirm')) {
-            while (1) {
-                my $a_bitrate = query_text('Audio bitrate?',
-                                           'int',
-                                           $self->{'a_bitrate'});
-                if ($a_bitrate < 64) {
-                    print "Too low; please choose a bitrate >= 64.\n";
-                }
-                elsif ($a_bitrate > 384) {
-                    print "Too high; please choose a bitrate <= 384.\n";
-                }
-                else {
-                    $self->{'a_bitrate'} = $a_bitrate;
-                    last;
-                }
+    # Audio Bitrate
+        while (1) {
+            my $a_bitrate = query_text('Audio bitrate?',
+                                       'int',
+                                       $self->val('a_bitrate'));
+            if ($a_bitrate < 64) {
+                print "Too low; please choose a bitrate between 64 and 384.\n";
+            }
+            elsif ($a_bitrate > 384) {
+                print "Too high; please choose a bitrate between 64 and 384.\n";
+            }
+            else {
+                $self->{'a_bitrate'} = $a_bitrate;
+                last;
             }
         }
-    # Ask the user what video bitrate he/she wants, or calculate the max bitrate (2756 max, though we round down a bit since some dvd players can't handle the max)
-    # Then again, mpeg2enc seems to have trouble with bitrates > 2500
-        my $max_v_bitrate = 2742 - $self->{'a_bitrate'};
-        $self->{'v_bitrate'} = arg('v_bitrate') if (arg('v_bitrate'));
-        if (!arg('v_bitrate') || arg('confirm')) {
-            $self->{'v_bitrate'} = ($max_v_bitrate < 2500) ? 2742 - $self->{'a_bitrate'} : 2500;
+    # Ask the user what video bitrate he/she wants, or calculate the max bitrate
+    # (2756 max, though we round down a bit since some dvd players can't handle
+    # the max). Then again, mpeg2enc seems to have trouble with bitrates > 2500.
+        my $max_v_bitrate = min(2500, 2742 - $self->{'a_bitrate'});
+        if ($self->val('v_bitrate') > $max_v_bitrate || $self->val('confirm')) {
+            if ($self->val('v_bitrate') > $max_v_bitrate) {
+                 $self->{'v_bitrate'} = $max_v_bitrate;
+            }
             while (1) {
                 my $v_bitrate = query_text('Maximum video bitrate for VBR?',
                                            'int',
-                                           $self->{'v_bitrate'});
+                                           $self->val('v_bitrate'));
                 if ($v_bitrate < 1000) {
-                    print "Too low; please choose a bitrate >= 1000.\n";
+                    print "Too low; please choose a bitrate between 1000 and $max_v_bitrate.\n";
                 }
                 elsif ($v_bitrate > $max_v_bitrate) {
-                    print "Too high; please choose a bitrate <= $self->{'v_bitrate'}.\n";
+                    print "Too high; please choose a bitrate between 1000 and $max_v_bitrate.\n";
                 }
                 else {
                     $self->{'v_bitrate'} = $v_bitrate;
@@ -93,28 +105,27 @@ package export::transcode::SVCD;
                 }
             }
         }
-    # Ask the user what vbr quality (quantisation) he/she wants - 2..31
-        $self->{'quantisation'} = arg('quantisation') if (arg('quantisation'));
-        if (!arg('quantisation') || arg('confirm')) {
-            while (1) {
-                my $quantisation = query_text('VBR quality/quantisation (2-31)?', 'float', $self->{'quantisation'});
-                if ($quantisation < 2) {
-                    print "Too low; please choose a number between 2 and 31.\n";
-                }
-                elsif ($quantisation > 31) {
-                    print "Too high; please choose a number between 2 and 31\n";
-                }
-                else {
-                    $self->{'quantisation'} = $quantisation;
-                    last;
-                }
+    # Ask the user what vbr quality (quantisation) he/she wants - 1..31
+        while (1) {
+            my $quantisation = query_text('VBR quality/quantisation (1-31)?',
+                                          'float',
+                                          $self->val('quantisation'));
+            if ($quantisation < 1) {
+                print "Too low; please choose a number between 1 and 31.\n";
+            }
+            elsif ($quantisation > 31) {
+                print "Too high; please choose a number between 1 and 31\n";
+            }
+            else {
+                $self->{'quantisation'} = $quantisation;
+                last;
             }
         }
     # Split every # megs?
         $self->{'split_every'} = query_text('Split after how many MB?',
                                             'int',
-                                            $self->{'split_every'});
-        $self->{'split_every'} = 795 if ($self->{'split_every'} < 1);
+                                            $self->val('split_every'));
+        $self->{'split_every'} = $self->{'defaults'}{'split_every'} if ($self->val('split_every') < 1);
     }
 
     sub export {

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.16 (xris)
+#Last Updated: 2005.03.02 (xris)
 #
 #  export::ffmpeg::MP3
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -21,20 +21,28 @@ package export::ffmpeg::MP3;
     sub new {
         my $class = shift;
         my $self  = {
-                     'cli'             => qr/\bmp3\b/i,
-                     'name'            => 'Export to MP3',
-                     'enabled'         => 1,
-                     'errors'          => [],
-                    # Options
-                     'bitrate'         => 128,
+                     'cli'      => qr/\bmp3\b/i,
+                     'name'     => 'Export to MP3',
+                     'enabled'  => 1,
+                     'errors'   => [],
+                     'defaults' => {},
                     };
         bless($self, $class);
 
+    # Initialize the default parameters
+        $self->load_defaults();
+
+    # Verify any commandline or config file options
+        $self->{'bitrate'} = $self->val('a_bitrate') unless (defined $self->val('bitrate'));
+        die "Bitrate must be > 0\n" unless (!defined $self->val('bitrate') || $self->{'bitrate'} > 0);
+
     # Initialize and check for transcode
         $self->init_ffmpeg(1);
+
     # Make sure that we have an mplexer
         find_program('id3tag')
             or push @{$self->{'errors'}}, 'You need id3tag to export an mp3.';
+
     # Can we even encode vcd?
         if (!$self->can_encode('mp3')) {
             push @{$self->{'errors'}}, "Your ffmpeg installation doesn't support encoding to mp3 audio.";
@@ -45,20 +53,24 @@ package export::ffmpeg::MP3;
         return $self;
     }
 
+# Load default settings
+    sub load_defaults {
+        my $self = shift;
+    # Load the parent module's settings
+        $self->SUPER::load_defaults();
+    # MP3 bitrate
+        $self->{'defaults'}{'bitrate'} = 128;
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
     # Load the parent module's settings (skipping one parent, since we don't need the ffmpeg-specific options)
         $self->SUPER::gather_settings(1);
     # Audio Bitrate
-        if (arg('bitrate')) {
-            $self->{'bitrate'} = (arg('bitrate') or arg('a_bitrate'));
-            die "Audio bitrate must be > 0\n" unless ($self->{'bitrate'} > 0);
-        }
-        else {
-            $self->{'bitrate'} = query_text('Audio bitrate?',
-                                            'int',
-                                            $self->{'bitrate'});
-        }
+        $self->{'bitrate'} = query_text('Audio bitrate?',
+                                        'int',
+                                        $self->val('bitrate'));
     }
 
     sub export {

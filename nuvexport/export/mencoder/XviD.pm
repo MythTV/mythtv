@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.03.01 (xris)
+#Last Updated: 2005.03.02 (xris)
 #
 #  export::mencoder::XviD
 #  Copied from transcode.pm
@@ -25,16 +25,16 @@ package export::mencoder::XviD;
     sub new {
         my $class = shift;
         my $self  = {
-                     'cli'             => qr/\bxvidmen\b/i,
-                     'name'            => 'Export to XviD (using mencoder)',
-                     'enabled'         => 1,
-                     'errors'          => [],
-                    #Mencoder-related settings
-                     'noise_reduction' => 1,
-                     'deinterlace'     => 1,
-                     'crop'            => 1,
+                     'cli'      => qr/\bxvidmen\b/i,
+                     'name'     => 'Export to XviD (using mencoder)',
+                     'enabled'  => 1,
+                     'errors'   => [],
+                     'defaults' => {},
                     };
         bless($self, $class);
+
+    # Initialize the default parameters
+        $self->load_defaults();
 
     # Verify any commandline or config file options
         die "Audio bitrate must be > 0\n" unless (!defined $self->val('a_bitrate') || $self->{'a_bitrate'} > 0);
@@ -60,6 +60,15 @@ package export::mencoder::XviD;
         return $self;
     }
 
+# Load default settings
+    sub load_defaults {
+        my $self = shift;
+    # Load the parent module's settings
+        $self->SUPER::load_defaults();
+    # Not really anything to add
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
     # Load the parent module's settings

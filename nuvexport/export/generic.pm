@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.28 (xris)
+#Last Updated: 2005.03.07 (xris)
 #
 #  generic.pm
 #
@@ -35,7 +35,17 @@ package export::generic;
     add_arg('noise_reduction|denoise|nr!',   'Enable noise reduction.');
     add_arg('crop!',                         'Crop out broadcast overscan.');
 
-# Gather generic export settings
+# Load defaults
+    sub load_defaults {
+        my $self = shift;
+    # These defaults apply to all modules
+        $self->{'defaults'}{'use_cutlist'}     = 1;
+        $self->{'defaults'}{'noise_reduction'} = 1;
+        $self->{'defaults'}{'deinterlace'}     = 1;
+        $self->{'defaults'}{'crop'}            = 1;
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
     # Load the save path, if requested
@@ -55,14 +65,9 @@ package export::generic;
                                                 'yesno',
                                                 $self->val('deinterlace'));
         # Crop video to get rid of broadcast padding
-            if (arg('crop')) {
-                $self->{'crop'} = 1;
-            }
-            else {
-                $self->{'crop'} = query_text('Crop broadcast overscan (2% border)?',
-                                             'yesno',
-                                             $self->val('crop'));
-            }
+            $self->{'crop'} = query_text('Crop broadcast overscan (2% border)?',
+                                         'yesno',
+                                         $self->val('crop'));
         }
     }
 
@@ -92,7 +97,7 @@ package export::generic;
             $outfile =~ s/(?:[\/\\\:\*\?\<\>\|\-]+\s*)+(?=[^\s\/\\\:\*\?\<\>\|\-])/- /sg;
             $outfile =~ tr/"/'/s;
         # add underscores?
-            if (arg('underscores')) {
+            if ($self->val('underscores')) {
                 $outfile =~ tr/ /_/s;
             }
         # Make sure we don't have a duplicate filename
@@ -260,8 +265,12 @@ package export::generic;
         my $self = shift;
         my $arg  = shift;
         if (!defined $self->{$arg}) {
+        # Config option?
+            my $val = rc_arg($arg, $self);
+        # Use the default for this object
+            $val = $self->{'defaults'}{$arg} unless (defined $val);
         # Look for a config option, or a commandline option
-            $self->{$arg} = arg($arg, rc_arg($arg, $self));
+            $self->{$arg} = arg($arg, $val);
         }
         return $self->{$arg};
     }

@@ -39,6 +39,15 @@ package export::NUV_SQL;
         return $self;
     }
 
+# Load default settings
+    sub load_defaults {
+        my $self = shift;
+    # Load the parent module's settings
+        $self->SUPER::gather_settings();
+    # Not really anything to add
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
     # Let the user know what's going on
@@ -56,7 +65,7 @@ package export::NUV_SQL;
                                            'No');
         }
     # Load the save path, if requested
-        $self->{'path'} = query_savepath();
+        $self->{'path'} = query_savepath($self->val('path'));
     # Create a
         $self->{'create_dir'} = query_text('Create a directory with the show name?',
                                            'yesno',

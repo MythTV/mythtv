@@ -1,4 +1,4 @@
-#Last Updated: 2005.02.16 (xris)
+#Last Updated: 2005.03.07 (xris)
 #
 #  export::ffmpeg::ASF
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -15,30 +15,34 @@ package export::ffmpeg::ASF;
     use mythtv::recordings;
 
 # Load the following extra parameters from the commandline
+    add_arg('quantisation|q=i', 'Quantisation');
     add_arg('a_bitrate|a=i',    'Audio bitrate');
     add_arg('v_bitrate|v=i',    'Video bitrate');
+    add_arg('multipass!',       'Enably two-pass encoding.');
 
     sub new {
         my $class = shift;
         my $self  = {
-                     'cli'             => qr/\basf\b/i,
-                     'name'            => 'Export to ASF',
-                     'enabled'         => 1,
-                     'errors'          => [],
-                    # ffmpeg-related settings
-                     'noise_reduction' => 1,
-                     'deinterlace'     => 1,
-                     'crop'            => 1,
-                    # ASF-specific settings
-                     'a_bitrate'       => 64,
-                     'v_bitrate'       => 256,
-                     'width'           => 320,
-                     'height'          => 240,
+                     'cli'      => qr/\basf\b/i,
+                     'name'     => 'Export to ASF',
+                     'enabled'  => 1,
+                     'errors'   => [],
+                     'defaults' => {},
                     };
         bless($self, $class);
 
+    # Initialize the default parameters
+        $self->load_defaults();
+
+    # Verify any commandline or config file options
+        die "Audio bitrate must be > 0\n" unless (!defined $self->val('a_bitrate') || $self->{'a_bitrate'} > 0);
+        die "Video bitrate must be > 0\n" unless (!defined $self->val('v_bitrate') || $self->{'v_bitrate'} > 0);
+        die "Width must be > 0\n"         unless (!defined $self->val('width')     || $self->{'width'} =~ /^\s*\D/  || $self->{'width'}  > 0);
+        die "Height must be > 0\n"        unless (!defined $self->val('height')    || $self->{'height'} =~ /^\s*\D/ || $self->{'height'} > 0);
+
     # Initialize and check for ffmpeg
         $self->init_ffmpeg();
+
     # Can we even encode asf?
         if (!$self->can_encode('msmpeg4')) {
             push @{$self->{'errors'}}, "Your ffmpeg installation doesn't support encoding to msmpeg4.";
@@ -52,31 +56,57 @@ package export::ffmpeg::ASF;
         return $self;
     }
 
+# Load default settings
+    sub load_defaults {
+        my $self = shift;
+    # Load the parent module's settings
+        $self->SUPER::load_defaults();
+    # Default bitrates and resolution
+        $self->{'defaults'}{'a_bitrate'} = 64;
+        $self->{'defaults'}{'v_bitrate'} = 256;
+        $self->{'defaults'}{'width'}     = 320;
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
     # Load the parent module's settings
         $self->SUPER::gather_settings();
-
     # Audio Bitrate
-        if (arg('a_bitrate')) {
-            $self->{'a_bitrate'} = arg('a_bitrate');
-            die "Audio bitrate must be > 0\n" unless (arg('a_bitrate') > 0);
-        }
-        else {
-            $self->{'a_bitrate'} = query_text('Audio bitrate?',
-                                              'int',
-                                              $self->{'a_bitrate'});
-        }
-    # Ask the user what video bitrate he/she wants
-        if (arg('v_bitrate')) {
-            die "Video bitrate must be > 0\n" unless (arg('v_bitrate') > 0);
-            $self->{'v_bitrate'} = arg('v_bitrate');
-        }
-        elsif ($self->{'multipass'} || !$self->{'vbr'}) {
-            # make sure we have v_bitrate on the commandline
-            $self->{'v_bitrate'} = query_text('Video bitrate?',
-                                              'int',
-                                              $self->{'v_bitrate'});
+        $self->{'a_bitrate'} = query_text('Audio bitrate?',
+                                          'int',
+                                          $self->val('a_bitrate'));
+    # VBR options
+        if (!$is_cli) {
+            $self->{'vbr'} = query_text('Variable bitrate video?',
+                                        'yesno',
+                                        $self->val('vbr'));
+            if ($self->{'vbr'}) {
+                $self->{'multipass'} = query_text('Multi-pass (slower, but better quality)?',
+                                                  'yesno',
+                                                  $self->val('multipass'));
+                if (!$self->{'multipass'}) {
+                    while (1) {
+                        my $quantisation = query_text('VBR quality/quantisation (1-31)?', 'float', $self->val('quantisation'));
+                        if ($quantisation < 1) {
+                            print "Too low; please choose a number between 1 and 31.\n";
+                        }
+                        elsif ($quantisation > 31) {
+                            print "Too high; please choose a number between 1 and 31\n";
+                        }
+                        else {
+                            $self->{'quantisation'} = $quantisation;
+                            last;
+                        }
+                    }
+                }
+            }
+        # Ask the user what audio and video bitrates he/she wants
+            if ($self->{'multipass'} || !$self->{'vbr'}) {
+                $self->{'v_bitrate'} = query_text('Video bitrate?',
+                                                  'int',
+                                                  $self->val('v_bitrate'));
+            }
         }
     # Query the resolution
         $self->query_resolution();
@@ -85,17 +115,48 @@ package export::ffmpeg::ASF;
     sub export {
         my $self    = shift;
         my $episode = shift;
-    # Load nuv info
+    # Make sure we have finfo
         load_finfo($episode);
-    # Build the ffmpeg string
-        $self->{'ffmpeg_xtra'} = " -b "  . $self->{'v_bitrate'}
-                               . " -vcodec msmpeg4"
-                               . " -ab " . $self->{'a_bitrate'}
-                               . " -acodec mp3"
-                               . " -s "  . $self->{'width'} . "x" . $self->{'height'}
-                               . " -f asf";
-    # Execute the parent method
-        $self->SUPER::export($episode, ".asf");
+    # Dual pass?
+        if ($self->{'multipass'}) {
+        # Add the temporary file to the list
+            push @tmpfiles, "/tmp/asf.$$.log";
+        # Back up the path and use /dev/null for the first pass
+            my $path_bak = $self->{'path'};
+            $self->{'path'} = '/dev/null';
+        # First pass
+            print "First pass...\n";
+            $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
+                                   . ' -vcodec msmpeg4'
+                                   . " -s $self->{'width'}x$self->{'height'}"
+                                   . " -pass 1 -passlogfile '/tmp/asf.$$.log'"
+                                   . ' -f asf';
+            $self->SUPER::export($episode, '');
+        # Restore the path
+            $self->{'path'} = $path_bak;
+        # Second pass
+            print "Final pass...\n";
+            $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
+                                   . ' -vcodec msmpeg4'
+                                   . ' -ab ' . $self->{'a_bitrate'}
+                                   . ' -acodec mp3'
+                                   . " -s $self->{'width'}x$self->{'height'}"
+                                   . " -pass 2 -passlogfile '/tmp/asf.$$.log'"
+                                   . ' -f asf';
+        }
+    # Single Pass
+        else {
+            $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
+                                   . (($self->{'vbr'}) ?
+                                     " -qmin $self->{'quantisation'} -qmax 31" : '')
+                                   . ' -vcodec msmpeg4'
+                                   . ' -ab ' . $self->{'a_bitrate'}
+                                   . ' -acodec mp3'
+                                   . " -s $self->{'width'}x$self->{'height'}"
+                                   . ' -f asf';
+        }
+    # Execute the (final pass) encode
+        $self->SUPER::export($episode, '.asf');
     }
 
 1;  #return true

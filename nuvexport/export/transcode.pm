@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.17 (xris)
+#Last Updated: 2005.03.02 (xris)
 #
 #  transcode.pm
 #
@@ -22,16 +22,6 @@ package export::transcode;
 # Load the following extra parameters from the commandline
     add_arg('zoom_filter:s', 'Which zoom filter to use.');
 
-# This superclass defines several object variables:
-#
-#   path        (defined by generic)
-#   use_cutlist (defined by generic)
-#   noise_reduction
-#   deinterlace
-#   crop
-#   zoom_filter
-#
-
 # Check for transcode
     sub init_transcode {
         my $self = shift;
@@ -40,7 +30,15 @@ package export::transcode;
             or push @{$self->{'errors'}}, 'You need transcode to use this exporter.';
     }
 
-# Gather data for transcode
+# Load default settings
+    sub load_defaults {
+        my $self = shift;
+    # Load the parent module's settings
+        $self->SUPER::load_defaults();
+    # Not really anything to add
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
         my $skip = shift;
@@ -48,15 +46,12 @@ package export::transcode;
         $self->SUPER::gather_settings($skip ? $skip - 1 : 0);
         return if ($skip);
     # Zoom Filter
-        if (defined arg('zoom_filter')) {
-            if (!arg('zoom_filter')) {
+        if (defined $self->val('zoom_filter')) {
+            if (!$self->val('zoom_filter')) {
                 $self->{'zoom_filter'} = 'B_spline';
             }
-            elsif (arg('zoom_filter') =~ /^(?:Lanczos3|Bell|Box|Mitchell|Hermite|B_spline|Triangle)$/) {
-                $self->{'zoom_filter'} = arg('zoom_filter');
-            }
-            else {
-                die "Unknown zoom_filter:  ".arg('zoom_filter')."\n";
+            elsif ($self->val('zoom_filter') !~ /^(?:Lanczos3|Bell|Box|Mitchell|Hermite|B_spline|Triangle)$/) {
+                die "Unknown zoom_filter:  ".$self->val('zoom_filter')."\n";
             }
         }
     }

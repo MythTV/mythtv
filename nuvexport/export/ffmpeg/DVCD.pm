@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.15 (xris)
+#Last Updated: 2005.03.02 (xris)
 #
 #  export::ffmpeg::DVCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -20,19 +20,20 @@ package export::ffmpeg::DVCD;
     sub new {
         my $class = shift;
         my $self  = {
-                     'cli'             => qr/\bdvcd\b/i,
-                     'name'            => 'Export to DVCD (VCD with 48kHz audio for making DVDs)',
-                     'enabled'         => 1,
-                     'errors'          => [],
-                    # Transcode-related settings
-                     'noise_reduction' => 1,
-                     'deinterlace'     => 1,
-                     'crop'            => 1,
+                     'cli'      => qr/\bdvcd\b/i,
+                     'name'     => 'Export to DVCD (VCD with 48kHz audio for making DVDs)',
+                     'enabled'  => 1,
+                     'errors'   => [],
+                     'defaults' => {},
                     };
         bless($self, $class);
 
+    # Initialize the default parameters
+        $self->load_defaults();
+
     # Initialize and check for ffmpeg
         $self->init_ffmpeg();
+
     # Can we even encode vcd?
         if (!$self->can_encode('mpeg1video')) {
             push @{$self->{'errors'}}, "Your ffmpeg installation doesn't support encoding to mpeg1video.";
@@ -46,6 +47,15 @@ package export::ffmpeg::DVCD;
         return $self;
     }
 
+# Load default settings
+    sub load_defaults {
+        my $self = shift;
+    # Load the parent module's settings
+        $self->SUPER::load_defaults();
+    # Not really anything to add
+    }
+
+# Gather settings from the user
     sub gather_settings {
         my $self = shift;
     # Load the parent module's settings

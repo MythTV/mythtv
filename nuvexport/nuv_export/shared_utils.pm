@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.28 (xris)
+#Last Updated: 2005.03.07 (xris)
 #
 #  nuv_export::shared_utils
 #
@@ -14,7 +14,8 @@ package nuv_export::shared_utils;
         use Exporter;
         our @ISA = qw/ Exporter /;
 
-        our @EXPORT = qw/ &clear        &find_program       &shell_escape
+        our @EXPORT = qw/ &min
+                          &clear        &find_program       &shell_escape
                           &wrap         &wipe_tmpfiles
                           &system       &mkdir
                           @Exporters    @episodes
@@ -120,6 +121,13 @@ BEGIN {
         return $find_program_cache{$hash_id};
     }
 }
+
+# Returns the smaller of two numbers
+    sub min {
+        my $a = shift;
+        my $b = shift;
+        return ($a < $b) ? $a : $b;
+    }
 
 # Escape a parameter for safe use in a commandline call
     sub shell_escape {
