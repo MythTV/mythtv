@@ -136,9 +136,9 @@ void DiscoveryThread::run()
 
         fd_set fds;
         int nfds = 0;
-
-
         FD_ZERO(&fds);
+
+
         FD_SET(multicast_socket,&fds);
         if(nfds <= multicast_socket)
         {

@@ -191,7 +191,7 @@ const QString& MFDService::getFormalServiceDescription()
     }
     else if(service_type == "_mdcap._tcp.")
     {
-        formal_type = "mmdp";
+        formal_type = "mdcap";
     }
     else if(service_type == "_mhttp._tcp.")
     {
@@ -246,7 +246,7 @@ const QString& MFDService::getFormalServiceRemoval()
     }
     else if(service_type == "_mdcap._tcp.")
     {
-        formal_type = "mmdp";
+        formal_type = "mdcap";
     }
     else if(service_type == "_mhttp._tcp.")
     {

@@ -60,7 +60,7 @@ void DaapClient::run()
     }
     
 
-    QString first_and_only_command = "services list";
+    QString first_and_only_command = "services list\n\r";
     client_socket_to_mfd->writeBlock(first_and_only_command.ascii(), first_and_only_command.length());
     
     while(keep_going)
@@ -220,7 +220,6 @@ void DaapClient::readSocket()
                         warning("daap client got a services update where 2nd token was neither \"found\" nor \"lost\"");
                     }
                 }
-                   
             }
         }
     }

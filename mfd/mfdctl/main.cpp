@@ -173,7 +173,7 @@ int main(int argc, char **argv)
             cerr << "I can't restart the mfd on another machine." << endl;
             return -1;
         }
-        MFDCTL *mfdctl = new MFDCTL(special_port, logging_verbosity, host, "stop");
+        MFDCTL *mfdctl = new MFDCTL(special_port, logging_verbosity, host, "restart");
         while(mfdctl->keepRunning())
         {
             a.processEvents();

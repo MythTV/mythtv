@@ -11,8 +11,10 @@
 */
 
 #include <qobject.h>
+#include <qptrlist.h>
 
 class DiscoveryThread;
+class MfdInstance;
 
 class MfdInterface : public QObject
 {
@@ -22,14 +24,22 @@ class MfdInterface : public QObject
     MfdInterface();
     ~MfdInterface();
 
+
   protected:
   
     void customEvent(QCustomEvent *ce);
  
+
   private:
+
+    MfdInstance*    findMfd(
+                            const QString &a_host,
+                            const QString &an_ip_addesss,
+                            int a_port
+                           );
   
-    DiscoveryThread *discovery_thread;
-    
+    DiscoveryThread       *discovery_thread;
+    QPtrList<MfdInstance> *mfd_instances;
 };
 
 #endif

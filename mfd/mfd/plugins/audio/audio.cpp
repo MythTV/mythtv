@@ -445,7 +445,6 @@ bool AudioPlugin::playUrl(QUrl url)
 
 bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
 {
-
     //
     //  See if this id's lead to a real metadata object before we mess with
     //  anything else
@@ -723,8 +722,10 @@ void AudioPlugin::stopPlaylistMode()
 
 void AudioPlugin::playFromPlaylist(int augment_index)
 {
+    uint playlist_size = 0;
     if(!playlist_mode)
     {
+        warning("platFromPlaylist() called, but we're not in playlist mode");
         return;
     }
     
@@ -763,13 +764,14 @@ void AudioPlugin::playFromPlaylist(int augment_index)
         sendMessage("stop");
         return;
     }
+    
+    playlist_size = playlist_to_play->getCount();
         
     //
     //  Get the list of references.
     //
         
     QValueList<int> song_list = playlist_to_play->getList();
-
 
     //
     //  At some point, do something about shuffle modes here
@@ -780,6 +782,8 @@ void AudioPlugin::playFromPlaylist(int augment_index)
         //
         //  No point in trying to cycle through a playlist of 0 length
         //
+        
+        log("stopping playlist mode, playlist has no songs", 8);
         metadata_server->unlockMetadata();
         playlist_mode_mutex.unlock();
         stopPlaylistMode();
@@ -810,6 +814,11 @@ void AudioPlugin::playFromPlaylist(int augment_index)
 
     if(!playMetadata(collection_to_play_from, song_to_play))
     {
+        log(QString("in playlist mode, could not find item number "
+                    "%1 in playlist %2 (of size %3)")
+                    .arg(current_playlist_item_index)
+                    .arg(current_playlist_container)
+                    .arg(playlist_size), 8);
         stopPlaylistMode();
         sendMessage("stop");
     }

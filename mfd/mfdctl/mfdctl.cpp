@@ -9,6 +9,8 @@
 
 */
 
+#include <unistd.h>
+
 #include <qregexp.h>
 
 #include "mfdctl.h"
@@ -35,7 +37,8 @@ MFDCTL::MFDCTL(int port_number, int logging_verbosity, QString host_name, QStrin
     host = host_name;
     mode = command;
     if(mode != "reload" &&
-       mode != "stop")
+       mode != "stop" &&
+       mode != "restart")
     {
         cerr << "the mfdctl object does know how to do \"" << mode << "\"" << endl;
         keep_running = false;
@@ -64,7 +67,7 @@ MFDCTL::MFDCTL(int port_number, int logging_verbosity, QString host_name, QStrin
 
 void MFDCTL::socketConnected()
 {
-    if(mode == "stop")
+    if(mode == "stop" || mode =="restart")
     {
         QTextStream os(my_client_socket);
         os << "shutdown \n";
@@ -96,6 +99,23 @@ void MFDCTL::readFromServer()
         {
             if(incoming == "bye")
             {
+                keep_running = false;
+                return;
+            }
+        }
+        if(mode == "restart")
+        {
+            if(incoming == "bye")
+            {
+                //
+                //  sleep for 30 seconds ... a stupid hack (FIX), but
+                //  without a .pid somewhere (for which we must be root),
+                //  not sure how else to do this
+                //
+                
+                cout << "this will take at least 30 seconds ..." << endl;
+                usleep(30000000);
+
                 keep_running = false;
                 return;
             }
