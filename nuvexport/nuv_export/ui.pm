@@ -49,7 +49,6 @@ package nuv_export::ui;
 
 # Look for certain commandline options to determine if this is cli-mode
     our $is_cli = 0;
-    $is_cli = 1 if (!$Args{'confirm'} && ($Args{'title'} || $Args{'subtitle'} || $Args{'description'} || $Args{'infile'} || $Args{'starttime'} || $Args{'chanid'}));
 
 # Load the commandline arguments
     sub load_cli_args {
@@ -61,6 +60,10 @@ package nuv_export::ui;
         }
         else {
             $Args{'nice'} = 19;
+        }
+    # Is this a commandline-only request?
+        if (!$Args{'confirm'} and ($Args{'title'} or $Args{'subtitle'} or $Args{'description'} or $Args{'infile'} or $Args{'starttime'} or $Args{'chanid'})) {
+            $is_cli = 1;
         }
     }
 
@@ -296,8 +299,6 @@ package nuv_export::ui;
     sub confirm_shows {
         my @episodes = @_;
         my $num_episodes = @episodes;
-    # CLI-only?  Just return the "continue" choice
-        return ('x', @episodes) if ($is_cli);
     # Define a newline + whitespace so we can tab out extra lines of episode description
         my $newline = "\n" . ' ' x (4 + length $num_episodes);
     # Build the query
