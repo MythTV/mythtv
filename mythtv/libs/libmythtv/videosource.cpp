@@ -471,7 +471,7 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
                                               "information"));
     }
 
-    if (grabber == "tv_grab_de" || grabber == "tv_grab_se" || 
+    if (grabber == "tv_grab_de" || grabber == "tv_grab_se_swedb" || 
         grabber == "tv_grab_fi" || grabber == "tv_grab_es" ||
         grabber == "tv_grab_nl" || grabber == "tv_grab_jp" ||
         grabber == "tv_grab_no" || grabber == "tv_grab_pt")
@@ -513,8 +513,8 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent)
     addTarget("tv_grab_de", new XMLTV_generic_config(parent, "tv_grab_de"));
     grabber->addSelection("Germany/Austria", "tv_grab_de");
 
-    addTarget("tv_grab_se", new XMLTV_generic_config(parent, "tv_grab_se"));
-    grabber->addSelection("Sweden","tv_grab_se");
+    addTarget("tv_grab_se_swedb", new XMLTV_generic_config(parent, "tv_grab_se_swedb"));
+    grabber->addSelection("Sweden (tv.swedb.se)","tv_grab_se_swedb");
 
     addTarget("tv_grab_no", new XMLTV_generic_config(parent, "tv_grab_no"));
     grabber->addSelection("Norway","tv_grab_no");
