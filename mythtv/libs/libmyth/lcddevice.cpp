@@ -11,13 +11,13 @@
 
 #include "lcddevice.h"
 
-LCD::LCD(QString hostname, unsigned int port)
+LCD::LCD()
 	:QObject()
 {
     //
     //  Constructor for LCD
     //
-    //  Note that this does include opening the 
+    //  Note that this does *not* include opening the 
     //  socket and initiating communications with the
     //	LDCd daemon.
     //
@@ -41,6 +41,7 @@ LCD::LCD(QString hostname, unsigned int port)
 	
 	scrollingText = "";
 	progress = 0.0;
+	connected = FALSE;
 
 	timeTimer = new QTimer(this);
 	connect(timeTimer, SIGNAL(timeout()), this, SLOT(outputTime()));	
@@ -57,13 +58,24 @@ LCD::LCD(QString hostname, unsigned int port)
 	channelTimer = new QTimer(this);
 	connect(channelTimer, SIGNAL(timeout()), this, SLOT(outputChannel()));
 
+}
+
+void LCD::connectToHost(QString hostname, unsigned int port)
+{
+	//
+	//	Open communications
+	//
+
+	if(!connected)
+	{
 #ifdef LCD_DEVICE	
-	socket->connectToHost(hostname, port);
-	this->sendToServer("hello");
+		socket->connectToHost(hostname, port);
+		this->sendToServer("hello");
 #else
-	hostname = hostname;
-	port = port;
+		hostname = hostname;
+		port = port;
 #endif
+	}
 }
 
 void LCD::beginScrollingText()
@@ -89,16 +101,19 @@ void LCD::sendToServer(QString someText)
 {
 #ifdef LCD_DEVICE
 	QTextStream os(socket);
-
+	
+	if(connected || someText == "hello")
+	{
 #ifdef LCD_DEVICE_DEBUG
-    cout << "lcddevice: Sending to Server: " << someText << endl ;
+    	cout << "lcddevice: Sending to Server: " << someText << endl ;
 #endif
 
-	//
-	//	Just stream the text out the socket
-	//
+		//
+		//	Just stream the text out the socket
+		//
 
-	os << someText << "\n";
+		os << someText << "\n";
+	}
 #else
 	someText = someText;
 #endif
@@ -196,7 +211,6 @@ void LCD::serverSendingData()
 #ifdef LCD_DEVICE_DEBUG
 			describeServer();	
 #endif
-
 		}
 		if(aList.first() == "huh?")
 		{
@@ -210,6 +224,7 @@ void LCD::init()
 	QString aString, bString;
 	int i;
 	
+	connected = TRUE;
 	//
 	//	This gets called when we receive the 
 	//	"connect" string from the server

@@ -29,13 +29,21 @@ class LCD : public QObject
 
     public:
     
-        LCD(QString hostname, unsigned int port);
+        LCD();
 		~LCD();
 		
 		//
 		//	The following public methods are all you need to
 		//	know to interface with LCD. 
 		//
+		
+				//
+				//	Used to actually connect to an LCD
+				//	device (in early versions of this code,
+				//	the constructor did the connecting).
+				//
+				
+		void	connectToHost(QString hostname, unsigned int port);
 
 				//
 				//	When nothing else going on, show the time
@@ -142,7 +150,7 @@ class LCD : public QObject
 		QString scrollingText;
 		unsigned int	scrollPosition;
 		
-		
+		bool	connected;
 
 };
 
