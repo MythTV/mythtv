@@ -410,6 +410,9 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
  
             image->data = (data->XJ_SHMInfo)[i].shmaddr = 
                              (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
+            // mark for delete immediately - it won't be removed until detach
+            shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
+
             data->buffers[(unsigned char *)image->data] = image;
             out_buffers[i] = (unsigned char *)image->data;
 
@@ -440,6 +443,9 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
  
             image->data = (data->XJ_SHMInfo)[i].shmaddr = 
                              (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
+            // mark for delete immediately - it won't be removed until detach
+            shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
+
             data->xbuffers[(unsigned char *)image->data] = image;
             out_buffers[i] = (unsigned char *)image->data;
 
@@ -509,8 +515,6 @@ void XvVideoOutput::Exit(void)
                 XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
                 if ((data->XJ_SHMInfo)[i].shmaddr)
                     shmdt((data->XJ_SHMInfo)[i].shmaddr);
-                if ((data->XJ_SHMInfo)[i].shmid > 0)
-                    shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
                 XFree(iter->second);
             }
 

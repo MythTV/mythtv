@@ -286,7 +286,11 @@ int main(int argc, char **argv)
        nfsfd = open(lockfile_location.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
        if (nfsfd < 0) 
        { 
-          perror("Error opening nfs lock file"); 
+          cerr << "Unable to write to " 
+               << gContext->GetSetting("RecordFilePrefix") << endl;
+          cerr << "Check to make sure that this directory exists and is "
+               << "writeable by this user.\n";
+          perror("open lockfile"); 
           return -1;
        }
        close(nfsfd);
