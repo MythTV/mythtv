@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dvbsignalmonitor.h"
@@ -10,7 +11,10 @@ DVBSignalMonitor::DVBSignalMonitor(int _cardnum, int _fd_frontend):
     cardnum(_cardnum), fd_frontend(_fd_frontend)
 {
     running = false;
+    exit = false;
 
+    if (fd_frontend >=0)
+       fd_frontend = dup(fd_frontend);
     //signal_monitor_interval = 0;
     //expire_data_days = 3;
 }
@@ -42,7 +46,7 @@ void DVBSignalMonitor::MonitorLoop()
 
     GENERAL("DVB Signal Monitor Starting");
 
-    while (!exit)
+    while (!exit && (fd_frontend >= 0))
     {
         if (FillFrontendStats(stats))
         {
@@ -83,6 +87,8 @@ void DVBSignalMonitor::MonitorLoop()
 
         usleep(250 * 1000);
     }
+    if (fd_frontend>=0)
+       close(fd_frontend);
 
     running = false;
     GENERAL("DVB Signal Monitor Stopped");

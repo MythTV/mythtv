@@ -99,12 +99,7 @@ void DVBChannel::CloseDVB()
     VERBOSE(VB_ALL, "Closing DVB channel");
     if (fd_frontend >= 0)
     {
-        if (monitor)
-        {
-            monitor->Stop();
-            delete monitor;
-            monitor = NULL;
-        }
+        StopMonitor();
 
         close(fd_frontend);
         fd_frontend = -1;
@@ -125,6 +120,22 @@ void DVBChannel::CloseDVB()
             diseqc = NULL;
         }
     }
+}
+
+void DVBChannel::StopMonitor()
+{
+    if (monitor)
+    {
+        monitor->Stop();
+        delete monitor;
+        monitor = NULL;
+    }
+}
+
+void DVBChannel::StartMonitor()
+{
+    monitor = new DVBSignalMonitor(cardnum, fd_frontend);
+    monitor->Start();
 }
 
 void DVBChannel::StopTuning()
@@ -183,9 +194,6 @@ bool DVBChannel::Open()
     }
     
     dvbcam->Start();
-
-    monitor = new DVBSignalMonitor(cardnum, fd_frontend);
-    monitor->Start();
 
     force_channel_change = true;
     first_tune = true;

@@ -19,7 +19,7 @@ public:
 
 signals:
     void Status(dvb_stats_t &stats);
-    void Status(QString val);
+    void Status(const QString &val);
 
     void StatusSignalToNoise(int);
     void StatusSignalStrength(int);

@@ -80,6 +80,9 @@ public:
 
     void SetCAPMT(PMTObject pmt);
 
+    void StartMonitor();
+    void StopMonitor();
+
     DVBSIParser*        siparser;
     DVBSignalMonitor*   monitor;
 

@@ -308,7 +308,7 @@ protected slots:
 
     void TableLoaded();
 
-    void dvbStatus(QString str);
+    void dvbStatus(const QString& str);
     void dvbSNR(int);
     void dvbSignalStrength(int);
 

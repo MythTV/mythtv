@@ -861,7 +861,7 @@ void ScanWizardScanner::updateText(const QString& str)
     QApplication::postEvent(this,e);
 }
 
-void ScanWizardScanner::dvbStatus(QString str)
+void ScanWizardScanner::dvbStatus(const QString& str)
 {
     ScannerEvent* e=new ScannerEvent(ScanWizardScanner::ScannerEvent::DVBStatus);
     e->strValue(str);
@@ -965,6 +965,7 @@ void ScanWizardScanner::scan()
     if(!dvbchannel->Open())
        return;
 
+    dvbchannel->StartMonitor();
     scanner = new SIScan(dvbchannel, parent->videoSource());
     
     scanner->SetForceUpdate(true);
@@ -1000,7 +1001,7 @@ void ScanWizardScanner::scan()
             this,SLOT(serviceScanPctComplete(int)));
 
     // Signal Meters Need connecting here
-    connect(dvbchannel->monitor,SIGNAL(Status(QString)),this,SLOT(dvbStatus(QString)));
+    connect(dvbchannel->monitor,SIGNAL(Status(const QString&)),this,SLOT(dvbStatus(const QString&)));
     connect(dvbchannel->monitor,SIGNAL(StatusSignalToNoise(int)),this,SLOT(dvbSNR(int)));
     connect(dvbchannel->monitor,SIGNAL(StatusSignalStrength(int)),this,SLOT(dvbSignalStrength(int)));
 

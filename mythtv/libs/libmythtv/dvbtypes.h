@@ -76,8 +76,8 @@ typedef struct dvbchannel
 
 typedef struct dvbstats
 {
-    uint16_t snr;
-    uint16_t ss;
+    uint32_t snr;
+    uint32_t ss;
     uint32_t ber;
     uint32_t ub;
 
