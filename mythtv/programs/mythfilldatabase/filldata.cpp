@@ -49,6 +49,8 @@ bool refresh_tba = true;
 int listing_wrap_offset = 0;
 bool dd_grab_all = false;
 bool dddataretrieved = false;
+bool mark_repeats = false;
+
 QString lastdduserid;
 DataDirectProcessor ddprocessor;
 QString graboptions = "";
@@ -2945,6 +2947,10 @@ int main(int argc, char *argv[])
         {
              quiet = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--mark-repeats"))
+        {
+             mark_repeats = true;
+        }
         else if (!strcmp(a.argv()[argpos], "--export-icon-map"))
         {
             export_iconmap = true;
@@ -3064,6 +3070,8 @@ int main(int argc, char *argv[])
             cout << "   Updates icon map icons only\n";
             cout << "--reset-icon-map [all]\n";
             cout << "   Resets your icon map (pass all to reset channel icons as well)\n";
+            cout << "--mark-repeats\n";
+            cout << "   Marks any programs with a OriginalAirDate earlier than their start date as a repeat\n";
             cout << "\n";
 #if 0
             cout << "--dd-grab-all\n";
@@ -3098,7 +3106,9 @@ int main(int argc, char *argv[])
 
     gContext->LogEntry("mythfilldatabase", LP_INFO,
                        "Listings Download Started", "");
-
+    
+    QSqlQuery query;
+    
     if (!grab_data)
     {
     }
@@ -3185,7 +3195,6 @@ int main(int argc, char *argv[])
 
     if (update_icon_map)
     {
-        QSqlQuery query;
         query.exec("SELECT sourceid FROM videosource ORDER BY sourceid;");
         if (query.isActive() && query.numRowsAffected() > 0)
         {
@@ -3211,7 +3220,33 @@ int main(int argc, char *argv[])
         gContext->LogEntry("mythfilldatabase", LP_INFO,
                            "Listings Download Finished", "");
     }
+    
+    if (mark_repeats)
+    {
+       if (!quiet)
+             cout << "Marking repeats...";
+       
+        
+        query.exec( "UPDATE program SET previouslyshown = 1 "
+                    "WHERE previouslyshown = 0 "
+                    "AND originalairdate is not null "
+                    "AND to_days(starttime) > to_days(originalairdate);");
+        
+        if (!quiet)
+            cout << "found " << query.numRowsAffected() << endl;
+    }
 
+    query.exec( "SELECT count(previouslyshown) FROM program WHERE previouslyshown = 1;");
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        if(query.value(0).toInt() != 0)
+            query.exec("UPDATE settings SET data = '1' WHERE value = 'HaveRepeats';");
+        else
+            query.exec("UPDATE settings SET data = '0' WHERE value = 'HaveRepeats';");
+    }
+
+    
     delete gContext;
 
     return 0;
