@@ -41,6 +41,7 @@ bool mfdplugin_stop()
     if(audio_plugin)
     {
         audio_plugin->stop();
+        audio_plugin->wakeUp();
     }
     return true;
 }

@@ -72,6 +72,7 @@ void DaapClient::run()
 
 void DaapClient::readSocket()
 {
+
     char incoming[2049];
 
     int length = client_socket_to_mfd->readBlock(incoming, 2048);

@@ -208,9 +208,11 @@ MFDCapabilityPlugin::~MFDCapabilityPlugin()
 ---------------------------------------------------------------------
 */
 
-MFDServicePlugin::MFDServicePlugin(MFD *owner, int identifier, int port)
+MFDServicePlugin::MFDServicePlugin(MFD *owner, int identifier, int port, bool l_use_thread_pool, uint l_thread_pool_size)
                  :MFDBasePlugin(owner, identifier)
 {
+    use_thread_pool = l_use_thread_pool;
+    thread_pool_size = l_thread_pool_size;
     client_socket_identifier = 0;
     port_number = port;
     core_server_socket = NULL;
@@ -224,19 +226,22 @@ MFDServicePlugin::MFDServicePlugin(MFD *owner, int identifier, int port)
     //  Set default timeout values for select()'ing
     //
     
-    time_wait_seconds = 5;
+    time_wait_seconds = 60;
     time_wait_usecs = 0;
     
     //
     //  Create a pool of threads to handle incoming data/request from
-    //  clients
+    //  clients if the object inheriting this class wants a thread pool
     //
     
-    for (int i = 0; i < 5; i++)  // if you change that number, change the desctructor
+    if(use_thread_pool)
     {
-        ServiceRequestThread *srt = new ServiceRequestThread(this);
-        srt->start();
-        thread_pool.push_back(srt);
+        for (uint i = 0; i < thread_pool_size; i++) 
+        {
+            ServiceRequestThread *srt = new ServiceRequestThread(this);
+            srt->start();
+            thread_pool.push_back(srt);
+        }
     }
 
 
@@ -299,10 +304,18 @@ void MFDServicePlugin::findNewClients()
                                     new_socket_id,
                                     QSocketDevice::Stream
                                    );
-            client_sockets.append(new_client);
+                                   
+            //
+            //  Add this client to the list
+            //
+            
+            client_sockets_mutex.lock();
+                client_sockets.append(new_client);
+            client_sockets_mutex.unlock();
+
             log(QString("%1 plugin has new client (total now %2)")
                 .arg(name)
-                .arg(client_sockets.count()), 10);
+                .arg(client_sockets.count()), 3);
             
         }
         else
@@ -314,83 +327,84 @@ void MFDServicePlugin::findNewClients()
 
 void MFDServicePlugin::dropDeadClients()
 {
-    QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
-    MFDServiceClientSocket *a_client;
-    while ( (a_client = iterator.current()) != 0 )
-    {
-        ++iterator;
-        bool still_there;
-        if(a_client->waitForMore(30, &still_there) < 1)
-        {
-            if(!still_there)
-            {
-                //
-                //  No bytes to read, and we didn't even make it through
-                //  the 30 msec's .... client gone away.
-                //
 
-                client_sockets.remove(a_client);
-                log(QString("%1 plugin lost a client (total now %2)")
-                    .arg(name)
-                    .arg(client_sockets.count()), 10);
+    client_sockets_mutex.lock();
+        QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
+        MFDServiceClientSocket *a_client;
+        while ( (a_client = iterator.current()) != 0 )
+        {
+            ++iterator;
+            bool still_there;
+            if(a_client->waitForMore(30, &still_there) < 1)
+            {
+                if(!still_there)
+                {
+                    //
+                    //  No bytes to read, and we didn't even make it through the
+                    //  30 msec's .... client gone away. Remove it from the list.
+                    //
+
+                    client_sockets.remove(a_client);
+
+                    log(QString("%1 plugin lost a client (total now %2)")
+                        .arg(name)
+                        .arg(client_sockets.count()), 3);
+                }
             }
         }
-    }
+    client_sockets_mutex.unlock();
 }
-
-/*
-void MFDServicePlugin::addToDo(QString new_stuff_todo, int client_id)
-{
-    things_to_do_mutex.lock();
-        SocketBuffer *new_request = new SocketBuffer(QStringList::split(" ", new_stuff_todo), client_id);
-        things_to_do.append(new_request);
-    things_to_do_mutex.unlock();
-    wakeUp();
-}
-*/
 
 void MFDServicePlugin::readClients()
 {
+    if(!use_thread_pool)
+    {
+        warning(QString("%1 plugin is calling readClients(), but it asked that there be no thread pool")
+                .arg(name));
+        return;
+    }
     //
     //  Find anything with pending data and launch a thread to deal with the
     //  incoming request/command
     //
 
-    QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
-    MFDServiceClientSocket *a_client;
-    while ( (a_client = iterator.current()) != 0 )
-    {
-        ++iterator;
-        if(a_client->bytesAvailable() > 0 && !a_client->isReading())
+    client_sockets_mutex.lock();
+        QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
+        MFDServiceClientSocket *a_client;
+        while ( (a_client = iterator.current()) != 0 )
         {
-            //
-            //  Find a free processing thread and ask it to deal
-            //  with this incoming data
-            //
-            
-            ServiceRequestThread *srt = NULL;
-            while (!srt)
+            ++iterator;
+            if(a_client->bytesAvailable() > 0 && !a_client->isReading())
             {
-                thread_pool_mutex.lock();
-                    if (!thread_pool.empty())
-                    {
-                        srt = thread_pool.back();
-                        thread_pool.pop_back();
-                    }
-                thread_pool_mutex.unlock();
-
-                if (!srt)
+                //
+                //  Find a free processing thread and ask it to deal
+                //  with this incoming data
+                //
+            
+                ServiceRequestThread *srt = NULL;
+                while (!srt)
                 {
-                    warning("service plugin is waiting for a free thread");
-                    usleep(50);
+                    thread_pool_mutex.lock();
+                        if (!thread_pool.empty())
+                        {
+                            srt = thread_pool.back();
+                            thread_pool.pop_back();
+                        }
+                    thread_pool_mutex.unlock();
+
+                    if (!srt)
+                    {
+                        warning(QString("%1 plugin is waiting for free threads ... increase its pool size?")
+                                .arg(name));
+                        usleep(50);
+                    }
                 }
+
+                a_client->setReading(true);
+                srt->handleIncoming(a_client);
             }
-
-            a_client->setReading(true);
-            srt->handleIncoming(a_client);
         }
-    }
-
+    client_sockets_mutex.unlock();
 }
 
 void MFDServicePlugin::sendMessage(const QString &message, int socket_identifier)
@@ -398,31 +412,38 @@ void MFDServicePlugin::sendMessage(const QString &message, int socket_identifier
     bool message_sent = false;
     QString newlined_message = message;
     newlined_message.append("\n");
-    QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
-    MFDServiceClientSocket *a_client;
-    while ( (a_client = iterator.current()) != 0 )
-    {
-        ++iterator;
-        if(a_client->getIdentifier() == socket_identifier)
+
+    client_sockets_mutex.lock();
+        QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
+        MFDServiceClientSocket *a_client;
+        while ( (a_client = iterator.current()) != 0 )
         {
-            message_sent = true;
-            a_client->lockWriteMutex();
-                int length = a_client->writeBlock(newlined_message.ascii(), newlined_message.length());
-            a_client->unlockWriteMutex();
-            if(length < 0)
+            ++iterator;
+            if(a_client->getIdentifier() == socket_identifier)
             {
-                warning("service plugin client socket could not accept data");
+                message_sent = true;
+                a_client->lockWriteMutex();
+                    int length = a_client->writeBlock(newlined_message.ascii(), newlined_message.length());
+                a_client->unlockWriteMutex();
+                if(length < 0)
+                {
+                    warning(QString("%1 plugin client socket could not accept data")
+                            .arg(name));
+                }
+                else if(length != (int) newlined_message.length())
+                {
+                    warning(QString("%1 plugin client socket did not consume correct amount of data")
+                            .arg(name));
+                }
+                break;
             }
-            else if(length != (int) newlined_message.length())
-            {
-                warning("service plugin client socket did not consume correct amount of data");
-            }
-            break;
         }
-    }
+    client_sockets_mutex.unlock();
+
     if(!message_sent)
     {
-        log("wanted to send a message, but the service client socket in question went away", 8);
+        log(QString("%1 plugin wanted to send a message, but the client socket in question went away")
+            .arg(name), 8);
     }
 }
 
@@ -431,23 +452,38 @@ void MFDServicePlugin::sendMessage(const QString &message)
 {
     QString newlined_message = message;
     newlined_message.append("\n");
-    QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
-    MFDServiceClientSocket *a_client;
-    while ( (a_client = iterator.current()) != 0 )
-    {
-        ++iterator;
-        a_client->lockWriteMutex();
-        int length = a_client->writeBlock(newlined_message.ascii(), newlined_message.length());
-        a_client->unlockWriteMutex();
-        if(length < 0)
+
+    client_sockets_mutex.lock();
+        QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
+        MFDServiceClientSocket *a_client;
+        while ( (a_client = iterator.current()) != 0 )
         {
-            warning("service plugin client socket could not accept data");
+            ++iterator;
+            a_client->lockWriteMutex();
+            int length = a_client->writeBlock(newlined_message.ascii(), newlined_message.length());
+            a_client->unlockWriteMutex();
+            if(length < 0)
+            {
+                warning(QString("%1 plugin client socket could not accept data")
+                        .arg(name));
+            }
+            else if(length != (int) newlined_message.length())
+            {
+                warning(QString("%1 plugin client socket did not consume correct amount of data")
+                        .arg(name));
+            }
         }
-        else if(length != (int) newlined_message.length())
-        {
-            warning("service plugin client socket did not consume correct amount of data");
-        }
-    }
+    client_sockets_mutex.unlock();
+}
+
+void MFDServicePlugin::sendCoreMFDMessage(const QString &message, int socket_identifier)
+{
+    MFDBasePlugin::sendMessage(message, socket_identifier);
+}
+
+void MFDServicePlugin::sendCoreMFDMessage(const QString &message)
+{
+    MFDBasePlugin::sendMessage(message);
 }
 
 void MFDServicePlugin::wakeUp()
@@ -484,20 +520,22 @@ void MFDServicePlugin::waitForSomethingToHappen()
     //  Next, add any client sockets that are already busy being read
     //
             
-    QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
-    MFDServiceClientSocket *a_client;
-    while ( (a_client = iterator.current()) != 0 )
-    {
-        ++iterator;
-        if(!a_client->isReading())
+    client_sockets_mutex.lock();
+        QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
+        MFDServiceClientSocket *a_client;
+        while ( (a_client = iterator.current()) != 0 )
         {
-            FD_SET(a_client->socket(), &readfds);
-            if(nfds <= a_client->socket())
+            ++iterator;
+            if(!a_client->isReading())
             {
-                nfds = a_client->socket() + 1;
+                FD_SET(a_client->socket(), &readfds);
+                if(nfds <= a_client->socket())
+                {
+                    nfds = a_client->socket() + 1;
+                }
             }
         }
-    }
+    client_sockets_mutex.unlock();
 
     //
     //  Finally, add the control pipe
@@ -550,6 +588,14 @@ void MFDServicePlugin::setTimeout(int numb_seconds, int numb_useconds)
 
 int MFDServicePlugin::bumpClient()
 {
+    //
+    //  Why do we have these identifiers? Because if a client sends a
+    //  request, goes away before the response is ready, and then a totally
+    //  different client connects, that new client may get the same socket
+    //  that the client that disappeared left behind. This makes sure (?)
+    //  that responses only go to the client that actually sent the request.
+    //
+
     ++client_socket_identifier;
     return client_socket_identifier;
 }
@@ -566,6 +612,14 @@ void MFDServicePlugin::processRequest(MFDServiceClientSocket *a_client)
     char incoming[2049];    // FIX
 
     int length = 0;
+    
+    if(!a_client)
+    {
+        warning(QString("%1 plugin tried to run a processRequest() on a client that does not exist")
+                .arg(name));
+        return;
+    }
+
     a_client->lockReadMutex();
         length = a_client->readBlock(incoming, 2048);
     a_client->unlockReadMutex();
@@ -576,7 +630,8 @@ void MFDServicePlugin::processRequest(MFDServiceClientSocket *a_client)
         if(length >= 2048)
         {
             // oh crap
-            warning("metadata server plugin client socket is getting too much data");
+            warning(QString("%1 plugin client socket is getting too much data")
+                    .arg(name));
             length = 2048;
         }
     
@@ -611,21 +666,25 @@ MFDServicePlugin::~MFDServicePlugin()
     //  Shut down all the processing threads
     //
     
-    while(thread_pool.size() < 5)
+    if(use_thread_pool)
     {
-        sleep(1);
-        warning(QString("%1 plugin is waiting for request threads to finish so it can exit")
-                .arg(name));
-    }
-
-    for(int i = 0; i < 5; i++)
-    {
-        ServiceRequestThread *srt = thread_pool[i];
-        if(srt)
+        while(thread_pool.size() < thread_pool_size)
         {
-            srt->killMe();
-            srt->wait();
-            delete srt;
+            sleep(1);
+            warning(QString("%1 plugin is waiting for request threads to finish so it can exit")
+                    .arg(name));
+        }
+
+        for(uint i = 0; i < thread_pool_size; i++)
+        {
+            ServiceRequestThread *srt = thread_pool[i];
+            if(srt)
+            {
+                srt->killMe();
+                srt->wait();
+                delete srt;
+                srt = NULL;
+            }
         }
     }
     

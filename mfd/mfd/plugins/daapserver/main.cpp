@@ -41,6 +41,7 @@ bool mfdplugin_stop()
     if(daap_server)
     {
         daap_server->stop();
+        daap_server->wakeUp();
     }
     return true;
 }

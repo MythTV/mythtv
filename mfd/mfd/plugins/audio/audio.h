@@ -37,20 +37,21 @@ class AudioPlugin: public MFDServicePlugin
         
   private:
   
+    QString     audio_device;
+
     QIODevice   *input;
     Output      *output;
     Decoder     *decoder;
-    
-    int         output_buffer_size;
     bool        is_playing;
     bool        is_paused;
-    QString     audio_device;
+    QMutex      *state_of_play_mutex;
+
+    int         output_buffer_size;
 
     int     elapsed_time;
     int     current_channels;
     int     current_bitrate;
     int     current_frequency;
-    
     QMutex play_data_mutex;
 };
 

@@ -52,7 +52,7 @@ extern "C" void parseRequest( httpd *server, void *)
 DaapServer::DaapServer(MFD *owner, int identity)
       :MFDHttpPlugin(owner, identity, 3689)
 {
-
+    setName("daap server");
     metadata_containers = owner->getMetadataContainers();    
     QString local_hostname = "unknown";
     char my_hostname[2049];

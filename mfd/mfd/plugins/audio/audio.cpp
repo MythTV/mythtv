@@ -27,7 +27,7 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     is_playing = false;
     is_paused = false;
     audio_device = "/dev/dsp";  //  <--- ewww ... change that soon
-    
+    state_of_play_mutex = new QMutex(true);    
 }
 
 void AudioPlugin::swallowOutputUpdate(int numb_seconds, int channels, int bitrate, int frequency)
@@ -95,7 +95,6 @@ void AudioPlugin::run()
         
         updateSockets();
         waitForSomethingToHappen();
-
     }
 
     stopAudio();
@@ -177,7 +176,7 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
 
     if(!ok)
     {
-        warning(QString("audio did not understand these tokens: %1").arg(tokens.join(" ")));
+        warning(QString("audio plugin did not understand these tokens: %1").arg(tokens.join(" ")));
         huh(tokens, socket_identifier);
     }
 }
@@ -212,249 +211,283 @@ bool AudioPlugin::playAudio(QUrl url)
     //  If we are currently playing, we need to stop
     //
     
-    if(is_playing || is_paused)
-    {
-        stopAudio();
-    }
 
-    bool start_output = false;
-
-    if(!output)
-    {
-        //
-        //  output may not exist because this is a first run
-        //  or stopAudio() killed it off.
-        //
-        
-        output = new MMAudioOutput(this, output_buffer_size * 1024, "/dev/dsp");
-        output->setBufferSize(output_buffer_size * 1024);
-        if(!output->initialize())
+    state_of_play_mutex->lock();
+        if(is_playing || is_paused)
         {
-            warning("audio could not initialize an output object");
-            delete output;
-            output = NULL;
-            return false;
+            stopAudio();
         }
-        start_output = true;
-    }
+
+        bool start_output = false;
+
+        if(!output)
+        {
+            //
+            //  output may not exist because this is a first run
+            //  or stopAudio() killed it off.
+            //
+        
+            output = new MMAudioOutput(this, output_buffer_size * 1024, "/dev/dsp");
+            output->setBufferSize(output_buffer_size * 1024);
+            if(!output->initialize())
+            {
+                warning("audio could not initialize an output object");
+                delete output;
+                output = NULL;
+                state_of_play_mutex->unlock();
+                return false;
+            }
+            start_output = true;
+        }
     
-    if(url.protocol() == "file")
-    {
-        QString file_path = url.path();
-        
-        //
-        //  Correct Qt *always* wanting a "/" in a url path.
-        //
-
-        QFileInfo fi( file_path );
-        if( fi.extension() == "cda")
+        if(url.protocol() == "file")
         {
-            file_path = file_path.section('/', -1, -1);
-        }        
-
-
-
-        input = new QFile(file_path);
-
-        if(decoder && !decoder->factory()->supports(file_path))
-        {
-            decoder = 0;
-        }
+            QString file_path = url.path();
         
-        if(!decoder)
-        {
+            //
+            //  Correct Qt *always* wanting a "/" in a url path.
+            //
+
+            QFileInfo fi( file_path );
+            if( fi.extension() == "cda")
+            {
+                file_path = file_path.section('/', -1, -1);
+            }        
+
+
+
+            input = new QFile(file_path);
+
+            if(decoder && !decoder->factory()->supports(file_path))
+            {
+                decoder = 0;
+            }
         
-            decoder = Decoder::create(file_path, input, output);
             if(!decoder)
             {
-                warning(QString("audio passed unsupported file in unsupported format: %1")
-                        .arg(file_path));
+        
+                decoder = Decoder::create(file_path, input, output);
+                if(!decoder)
+                {
+                    warning(QString("audio passed unsupported file in unsupported format: %1")
+                            .arg(file_path));
+                    delete output;
+                    output = NULL;
+                    delete input;
+                    input = NULL;
+                    state_of_play_mutex->unlock();
+                    return false;
+                }
+                decoder->setBlockSize(globalBlockSize);
+            }
+            else
+            {
+                decoder->setInput(input);
+                decoder->setOutput(output);
+            }
+        
+            play_data_mutex.lock();
+                elapsed_time = 0;
+            play_data_mutex.unlock();
+        
+            if(decoder->initialize())
+            {
+                if(output)
+                {
+                    if(start_output)
+                    {
+                        output->start();
+                    }
+                    else
+                    {
+                        output->resetTime();
+                    }
+                }
+                decoder->start();
+                is_playing = true;
+                is_paused = false;
+                state_of_play_mutex->unlock();
+                return true;
+            }
+            else
+            {
                 delete output;
                 output = NULL;
                 delete input;
                 input = NULL;
+                state_of_play_mutex->unlock();
                 return false;
             }
-            decoder->setBlockSize(globalBlockSize);
-        }
-        else
-        {
-            decoder->setInput(input);
-            decoder->setOutput(output);
         }
         
-        play_data_mutex.lock();
-            elapsed_time = 0;
-        play_data_mutex.unlock();
-        
-        if(decoder->initialize())
-        {
-            if(output)
-            {
-                if(start_output)
-                {
-                    output->start();
-                }
-                else
-                {
-                    output->resetTime();
-                }
-            }
-            decoder->start();
-            is_playing = true;
-            is_paused = false;
-            return true;
-        }
-        else
-        {
-            delete output;
-            output = NULL;
-            delete input;
-            input = NULL;
-            return false;
-        }
-    }
-    
+    state_of_play_mutex->unlock();
     return false;
 }
 
 void AudioPlugin::stopAudio()
 {
-    if (decoder && decoder->running())
-    {
-        decoder->mutex()->lock();
-            decoder->stop();
-        decoder->mutex()->unlock();
-    }
+    state_of_play_mutex->lock();
+
+        if (decoder && decoder->running())
+        {
+            decoder->mutex()->lock();
+                decoder->stop();
+            decoder->mutex()->unlock();
+        }
     
-    if (output && output->running())
-    {
-        output->mutex()->lock();
-            output->stop();
-        output->mutex()->unlock();
-    }
-    
-    //
-    //  wake them up 
-    //
-    
-    if (decoder)
-    {
-        decoder->mutex()->lock();
-            decoder->cond()->wakeAll();
-        decoder->mutex()->unlock();
-    }
-
-    if (output)
-    {
-        output->recycler()->mutex()->lock();
-            output->recycler()->cond()->wakeAll();
-        output->recycler()->mutex()->unlock();
-    }
-
-    if (decoder)
-    {
-        decoder->wait();
-    }
-
-    if (output)
-    {
-        output->wait();
-    }
-
-    if (output)
-    {
-        delete output;
-        output = 0;
-    }
-    
-    delete input;
-    input = NULL;
-        
-    is_playing = false;
-    is_paused = false;
-}
-
-void AudioPlugin::pauseAudio(bool true_or_false)
-{
-    if(true_or_false == is_paused)
-    {
-        //
-        //  already in the right state of pause
-        //
-
-    }
-    else
-    {
-        is_paused = true_or_false;
-        if (output)
+        if (output && output->running())
         {
             output->mutex()->lock();
-                output->pause();
+                output->stop();
             output->mutex()->unlock();
         }
+    
+        //
+        //  wake them up 
+        //
+    
         if (decoder)
         {
             decoder->mutex()->lock();
                 decoder->cond()->wakeAll();
             decoder->mutex()->unlock();
         }
+
         if (output)
         {
             output->recycler()->mutex()->lock();
                 output->recycler()->cond()->wakeAll();
             output->recycler()->mutex()->unlock();
         }
-    }
-   
-    //
-    //   Tell every connected client the state of the pause
-    //
-    if(is_paused)
-    {
-        sendMessage("pause on");
-    }
-    else
-    {
-        sendMessage("pause off");
-    }
+
+        if (decoder)
+        {
+            decoder->wait();
+        }
+
+        if (output)
+        {
+            output->wait();
+        }
+
+        if (output)
+        {
+            delete output;
+            output = 0;
+        }
+    
+        if(input)
+        {
+            delete input;
+            input = NULL;
+        }
+        
+        is_playing = false;
+        is_paused = false;
+
+    state_of_play_mutex->unlock();
+}
+
+void AudioPlugin::pauseAudio(bool true_or_false)
+{
+    state_of_play_mutex->lock();
+        if(true_or_false == is_paused)
+        {
+            //
+            //  already in the right state of pause
+            //
+    
+        }
+        else
+        {
+            is_paused = true_or_false;
+            if (output)
+            {
+                output->mutex()->lock();
+                    output->pause();
+                output->mutex()->unlock();
+            }
+            if (decoder)
+            {
+                decoder->mutex()->lock();
+                    decoder->cond()->wakeAll();
+                decoder->mutex()->unlock();
+            }
+            if (output)
+            {
+                output->recycler()->mutex()->lock();
+                    output->recycler()->cond()->wakeAll();
+                output->recycler()->mutex()->unlock();
+            }
+        }
+       
+        //
+        //   Tell every connected client the state of the pause
+        //
+        if(is_paused)
+        {
+            sendMessage("pause on");
+        }
+        else
+        {
+            sendMessage("pause off");
+        }
+    state_of_play_mutex->unlock();
 }
 
 void AudioPlugin::seekAudio(int seek_amount)
 {
-    int position = elapsed_time + seek_amount;
-    if(position < 0)
-    {
-        position = 0;
-    }
+    state_of_play_mutex->lock();
 
-    if (output && output->running())
-    {
-        output->mutex()->lock();
-        output->seek(position);
-
-        if (decoder && decoder->running())
+        int position = elapsed_time + seek_amount;
+        if(position < 0)
         {
-            decoder->mutex()->lock();
-            decoder->seek(position);
-
-            /*
-            if (mainvisual)
-            {
-                mainvisual->mutex()->lock();
-                mainvisual->prepare();
-                mainvisual->mutex()->unlock();
-            }
-            */
-
-            decoder->mutex()->unlock();
+            position = 0;
         }
-        output->mutex()->unlock();
-    }
 
-
+        if (output && output->running())
+        {
+            output->mutex()->lock();
+            output->seek(position);
+    
+            if (decoder && decoder->running())
+            {
+                decoder->mutex()->lock();
+                decoder->seek(position);
+    
+                /*
+                if (mainvisual)
+                {
+                    mainvisual->mutex()->lock();
+                    mainvisual->prepare();
+                    mainvisual->mutex()->unlock();
+                }
+                */
+    
+                decoder->mutex()->unlock();
+            }
+            output->mutex()->unlock();
+        }
+    state_of_play_mutex->unlock();
 }
 
 AudioPlugin::~AudioPlugin()
 {
+    if(output)
+    {
+        delete output;
+        output = NULL;        
+    }
+    
+    if(input)
+    {
+        delete input;
+        input = NULL;
+    }
+    
+    if(state_of_play_mutex)
+    {
+        delete state_of_play_mutex;
+        state_of_play_mutex = NULL;
+    }
 }

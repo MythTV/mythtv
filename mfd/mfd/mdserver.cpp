@@ -90,6 +90,14 @@ void MetadataServer::doSomething(const QStringList &tokens, int socket_identifie
     }
 }
 
+void MetadataServer::startMetadataCheck()
+{
+    //
+    //  Take a thread from out pool and set it loose on checking for new
+    //  metadata
+    //
+}
+
 bool MetadataServer::checkMetadata()
 {
 //    new_overall_generation = parent

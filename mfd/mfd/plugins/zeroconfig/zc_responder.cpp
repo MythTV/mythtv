@@ -54,8 +54,10 @@ extern "C" void RegistrationCallback(mDNS *const m, ServiceRecordSet *const this
 
 
 ZeroConfigResponder::ZeroConfigResponder(MFD *owner, int identifier)
-                    :MFDServicePlugin(owner, identifier, -1)
+                    :MFDServicePlugin(owner, identifier, -1, false)
 {
+    setName("zeroconfig responder");
+
     //
     //  Hold a pointer to the mfd so we can
     //  post events to it. Identifier lets

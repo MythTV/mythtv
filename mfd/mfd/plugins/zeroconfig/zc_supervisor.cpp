@@ -33,6 +33,7 @@ void ZeroConfigSupervisor::runOnce()
 
 void ZeroConfigSupervisor::doSomething(const QStringList &tokens, int socket_identifier)
 {
+
     //
     //  We get mfdp "services" requests here, and just pass them
     //  to either the client (e.g. services list ...) or the

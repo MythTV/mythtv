@@ -32,6 +32,7 @@ class MetadataServer : public MFDServicePlugin
     ~MetadataServer();
     void    run();
     void    doSomething(const QStringList &tokens, int socket_identifier);
+    void    startMetadataCheck();
 
   private:
   

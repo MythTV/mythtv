@@ -290,12 +290,11 @@ extern "C" void BrowseCallback(mDNS *const m, DNSQuestion *question, const Resou
 
 
 ZeroConfigClient::ZeroConfigClient(MFD *owner, int identifier)
-                 :MFDServicePlugin(owner, identifier, -1)
+                 :MFDServicePlugin(owner, identifier, -1, false)
 {
-    //
-    //  Keep going (unless told otherwise)
-    //
-    
+    setName("zerconfig client");
+
+
     dns_questions.clear();
     dns_questions.setAutoDelete(true);
     
@@ -343,7 +342,7 @@ void ZeroConfigClient::handleServiceQueryCallback(mDNS *const m, ServiceInfoQuer
                 log(QString("resolved service \"%1\" to %2")
                     .arg(a_service->getName())
                     .arg(a_service->getLongDescription()),1);
-                sendMessage(a_service->getFormalServiceDescription());
+                sendCoreMFDMessage(a_service->getFormalServiceDescription());
                 break;
 
             default:
@@ -679,7 +678,7 @@ void ZeroConfigClient::removeService(const QString &name, const QString &type, c
            a_service->getType()   == type &&
            a_service->getDomain() == domain)
         {
-            sendMessage(a_service->getFormalServiceRemoval());
+            sendCoreMFDMessage(a_service->getFormalServiceRemoval());
             log(QString("zeroconfig client lost service called %1 (%2%3)")
                        .arg(name)
                        .arg(type)
@@ -726,7 +725,7 @@ void ZeroConfigClient::doSomething(const QStringList &tokens, int socket_identif
             ++iterator;
             if(a_service->isResolved())
             {
-                sendMessage(a_service->getFormalServiceDescription(), socket_identifier);            
+                sendCoreMFDMessage(a_service->getFormalServiceDescription(), socket_identifier);            
             }
         }
         return;

@@ -302,7 +302,7 @@ void MFD::customEvent(QCustomEvent *ce)
                             .arg(metadata_video_generation), 2);
                     }
                     
-                    //  metadata_server->addToDo("check", -1);
+                    metadata_server->startMetadataCheck();
                 }
                 break;
             }

@@ -105,7 +105,7 @@ class ZeroConfigClient: public MFDServicePlugin
   
     bool        checkServiceName(const QString &new_name);
     MFDService* findServiceByName(const QString &a_name);
-    void       removeService(const QString &name, const QString &type, const QString &domain);
+    void        removeService(const QString &name, const QString &type, const QString &domain);
   
     
     MFD         *parent;

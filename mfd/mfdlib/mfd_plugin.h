@@ -125,7 +125,7 @@ class MFDServicePlugin : public MFDBasePlugin
 {
   public:
   
-    MFDServicePlugin(MFD *owner, int identifier, int port);
+    MFDServicePlugin(MFD *owner, int identifier, int port, bool l_use_thread_pool = true, uint l_thread_pool_size = 5);
     ~MFDServicePlugin();
     
     bool            initServerSocket();
@@ -138,6 +138,8 @@ class MFDServicePlugin : public MFDBasePlugin
     void            waitForSomethingToHappen();
     void            setTimeout(int numb_seconds, int numb_useconds);
     int             bumpClient();
+    void            sendCoreMFDMessage(const QString &message, int socket_identifier);
+    void            sendCoreMFDMessage(const QString &message);
     void            sendMessage(const QString &message, int socket_identifier);
     void            sendMessage(const QString &message);
 
@@ -149,21 +151,48 @@ class MFDServicePlugin : public MFDBasePlugin
 
     int                     port_number;
     
+    //
+    //  One server socket, and a collection of client socket, plus a mutex
+    //  to protect changes to the list of client sockets.
+    //
+
     QSocketDevice                    *core_server_socket;
     QPtrList<MFDServiceClientSocket> client_sockets;
     int                              client_socket_identifier;
+    QMutex                           client_sockets_mutex;
+
+
+    //
+    //  A time structure for how long we sit in select() calls when nothing
+    //  else is going on. Note that this can be set to a really long time,
+    //  since one of the descriptors that select() pays attention to is a
+    //  pipe (see below).
+    //
 
     struct  timeval timeout;
     int     time_wait_seconds;
     int     time_wait_usecs;
     QMutex  timeout_mutex;
 
+    //
+    //  Insanely clever. A pipe from this object to this object. When
+    //  nothing else is going on, the execution loop sits in select(). But
+    //  one of the descriptors it pays attention to is the read side of this
+    //  u_shaped pipe. Any other thread can wake us up just by sitting a few
+    //  arbitrary bytes into the write end (ie. calling wakeUp()).
+    //
+
     QMutex  u_shaped_pipe_mutex;
     int     u_shaped_pipe[2];
 
+    //
+    //  A pool of threads to process incoming requests.
+    //
+
     vector<ServiceRequestThread *> thread_pool;
     QMutex                         thread_pool_mutex;
-
+    uint                           thread_pool_size;
+    bool                           use_thread_pool;
 };
 
 class MFDHttpPlugin : public MFDServicePlugin
