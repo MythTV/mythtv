@@ -373,13 +373,20 @@ void VideoBrowser::updateInfo(QPainter *p)
                type->SetText(coverfile);
   
            UIImageType *itype = (UIImageType *)container->GetType("coverart");
-           if (itype)
+           if (itype && (coverfile != QObject::tr("No Cover")) && (coverfile != QObject::tr("None")))
            {
-               //if (itype->GetImage() != coverfile)
-               //{
+               if (itype->GetImageFilename() != coverfile)
+               {
                    itype->SetImage(coverfile);
                    itype->LoadImage();
-               //}
+               }
+               if (itype->isHidden())
+                   itype->show();   
+           }
+           else
+           {
+               if (itype->isShown())
+                   itype->hide();   
            }
 
            type = (UITextType *)container->GetType("inetref");

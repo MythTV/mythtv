@@ -155,7 +155,7 @@ void Metadata::fillCountries(QSqlDatabase *db)
     {
         while(query.next())
         {
-            genres.append(query.value(0).toString());
+            countries.append(query.value(0).toString());
         }
     }
 
@@ -261,7 +261,7 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
     if (rating == "")
         rating = QObject::tr("Unknown Rating");
     if (coverfile == "")
-        coverfile = QObject::tr("None");
+        coverfile = QObject::tr("No Cover");
     if (inetref == "")
         inetref = "00000000";
     
@@ -296,13 +296,35 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
                      userrating, length, sqlfilename.utf8().data(), showlevel,
                      sqlcoverfile.utf8().data(), inetref.utf8().data(),browse);
 
-    db->exec(thequery);
+    QSqlQuery a_query(thequery, db);
+
+    if (!a_query.isActive() || a_query.numRowsAffected() < 1)
+    {
+        cerr << "metadata.o: The following metadata insert failed :" << thequery << endl;
+        return;
+    }
+
+    // Must make sure we have 'id' filled before we call updateGenres or updateCountries
+    thequery = "SELECT LAST_INSERT_ID();";
+    a_query.exec(thequery);
+
+    if (!a_query.isActive() || a_query.numRowsAffected() < 1)
+    {
+        cerr << "metadata.o: The following metadata id retreval failed :" << thequery << endl;
+        return;      
+    }      
+
+    a_query.next();
+    id = a_query.value(0).toUInt();
+
+    if (0 == id)
+    {
+        cerr << "metadata.o: The id of the last inserted row to videometadata seems to be 0. This is odd." << endl;
+        return;
+    }
 
     updateGenres(db);
     updateCountries(db);
-
-    // easiest way to ensure we've got 'id' filled.
-    fillData(db);
 }
 
 void Metadata::guessTitle()
@@ -342,7 +364,7 @@ void Metadata::updateDatabase(QSqlDatabase *db)
     if (rating == "")
         rating = QObject::tr("Unknown Rating");
     if (coverfile == "")
-        coverfile = QObject::tr("None");
+        coverfile = QObject::tr("No Cover");
     if (inetref == "")
         inetref = "00000000";
 
@@ -472,11 +494,10 @@ void Metadata::updateGenres(QSqlDatabase *db)
                 thequery.sprintf("INSERT INTO videogenre (genre) VALUES (\"%s\");",
                                  (*genre).utf8().data());
                 a_query.exec(thequery);
-                if (a_query.isActive())
+                if (a_query.isActive() && a_query.numRowsAffected() > 0)
                 {
                     //search the new idgenre
-                    thequery.sprintf("SELECT intid FROM videogenre WHERE genre "
-                                     "like \"%s\"",(*genre).utf8().data());
+                    thequery = "SELECT LAST_INSERT_ID();";
                     a_query.exec(thequery);
                     if (a_query.isActive())
                     {
@@ -488,7 +509,7 @@ void Metadata::updateGenres(QSqlDatabase *db)
                     }
                     else
                     {
-                        cerr << "metadata.o : The following search failed : " << thequery << endl;
+                        cerr << "metadata.o : The following id retreval failed : " << thequery << endl;
                     }
                 }
                 else
@@ -547,11 +568,10 @@ void Metadata::updateCountries(QSqlDatabase *db)
                 thequery.sprintf("INSERT INTO videocountry (country) "
                                  "VALUES (\"%s\");",(*country).utf8().data());
                 a_query.exec(thequery);
-                if (a_query.isActive())
+                if (a_query.isActive() && a_query.numRowsAffected() > 0)
                 {
                     //search the new idcountry
-                    thequery.sprintf("SELECT intid FROM videocountry "
-                                     "WHERE country like \"%s\"",(*country).utf8().data());
+                    thequery = "SELECT LAST_INSERT_ID();";
                     a_query.exec(thequery);
                     if (a_query.isActive())
                     {
@@ -563,7 +583,7 @@ void Metadata::updateCountries(QSqlDatabase *db)
                     }
                     else
                     {
-                        cerr << "metadata.o : The following search failed : " << thequery << endl;
+                        cerr << "metadata.o : The following id retreval failed : " << thequery << endl;
                     }
                 }
                 else
@@ -594,7 +614,7 @@ void Metadata::updateCountries(QSqlDatabase *db)
 
 QImage* Metadata::getCoverImage()
 {
-    if (!coverImage && (CoverFile() != "No Cover"))
+    if (!coverImage && (CoverFile() != QObject::tr("No Cover")) && (CoverFile() != QObject::tr("None")))
     {
         coverImage = new QImage();
         if (!coverImage->load(coverfile))

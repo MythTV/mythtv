@@ -1,10 +1,11 @@
 #CONFIG += debug
 CONFIG += release
 
-PREFIX = /usr/local
+PREFIX = /usr
 
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH *= /usr/local/include
+INCLUDEPATH *= $${PREFIX}/include/mythtv
 
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
