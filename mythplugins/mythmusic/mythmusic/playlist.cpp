@@ -705,6 +705,45 @@ void Playlist::saveNewPlaylist(QSqlDatabase *a_db, QString a_host)
 int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
 {
     Track *it;
+
+    // compute max/min playcount,lastplay for this playlist
+    int playcountMin = 0;
+    int playcountMax = 0;
+    double lastplayMin = 0.0;
+    double lastplayMax = 0.0;
+    for(it = songs.first(); it; it = songs.next())
+    {
+        if(!it->getCDFlag())
+        {
+            if(it->getValue() == 0)
+            {
+                cerr << "playlist.o: Oh crap ... how did we get something with an ID of 0 on a playlist?" << endl ;
+            }
+            if(it->getValue() > 0)
+            {
+                // Normal track
+                Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
+                if (tmpdata)
+                {
+                    if (songs.at() == 0) { // first song
+                        playcountMin = playcountMax = tmpdata->PlayCount();
+                        lastplayMin = lastplayMax = tmpdata->LastPlay();
+                    } else {
+                        if (tmpdata->PlayCount() < playcountMin) { playcountMin = tmpdata->PlayCount(); }
+                        else if (tmpdata->PlayCount() > playcountMax) { playcountMax = tmpdata->PlayCount(); }
+                 
+                        if (tmpdata->LastPlay() < lastplayMin) { lastplayMin = tmpdata->LastPlay(); }
+                        else if (tmpdata->LastPlay() > lastplayMax) { lastplayMax = tmpdata->LastPlay(); }
+                    }
+                }
+            }
+        }
+    }
+
+    int RatingWeight = gContext->GetNumSetting("IntelliRatingWeight", 2); 
+    int PlayCountWeight = gContext->GetNumSetting("IntelliPlayCountWeight", 2); 
+    int LastPlayWeight = gContext->GetNumSetting("IntelliLastPlayWeight", 2); 
+    int RandomWeight = gContext->GetNumSetting("IntelliRandomWeight", 2); 
     for(it = songs.first(); it; it = songs.next())
     {
         if(!it->getCDFlag())
@@ -729,20 +768,22 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                     //
                     //  Compute "intelligent" weighting
                     //
-                    
-                    QDateTime cTime = QDateTime::currentDateTime();
-                    double currentDateTime = cTime.toString("yyyyMMddhhmmss").toDouble();
+
                     int rating = tmpdata->Rating();
                     int playcount = tmpdata->PlayCount();
-                    double lastplay = tmpdata->LastPlay();
-                    double ratingValue = (double)rating / 10;
-                    double playcountValue = (double)playcount / 50;
-                    double lastplayValue = (currentDateTime - lastplay) / currentDateTime * 2000;
-                    double rating_value =  (35 * ratingValue - 25 * playcountValue + 25 * lastplayValue + 
-                                            15 * (double)rand() / (RAND_MAX + 1.0));
-                    int integer_rating = (int) rating_value * 100000;
+                    double lastplaydbl = tmpdata->LastPlay();
+                    double ratingValue = (double)(rating) / 10;
+                    double playcountValue, lastplayValue;
+                    if (playcountMax == playcountMin) { playcountValue = 0; }
+                    else { playcountValue = ((playcountMin - (double)playcount) / (playcountMax - playcountMin) + 1); }
+                    if (lastplayMax == lastplayMin) { lastplayValue = 0; }
+                    else { lastplayValue = ((lastplayMin - lastplaydbl) / (lastplayMax - lastplayMin) + 1); }
+                    double rating_value =  (RatingWeight * ratingValue + PlayCountWeight * playcountValue + 
+                                            LastPlayWeight * lastplayValue + RandomWeight * (double)rand() / 
+                                            (RAND_MAX + 1.0));
+                    int integer_rating = (int) (4000001 - rating_value * 10000);
                     added_node->setAttribute(3, integer_rating); //  "intelligent" order
-                }
+					 }
             }
             if(it->getValue() < 0)
             {

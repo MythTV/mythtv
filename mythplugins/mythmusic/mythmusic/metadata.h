@@ -90,7 +90,7 @@ class Metadata
     void incRating();
 
     double LastPlay();
-    QString Lastplay(){return lastplay;}
+    QString LastPlayStr() { return lastplay; }
     void setLastPlay();
 
     int PlayCount() { return playcount; }
@@ -149,7 +149,11 @@ class MusicNode
     void        putYourselfOnTheListView(TreeCheckItem *parent, bool show_node);
     void        writeTree(GenericTree *tree_to_write_to, int a_counter);
     void        sort();
-    
+    void        setPlayCountMin(int tmp_min) { playcountMin = tmp_min; }
+    void        setPlayCountMax(int tmp_max) { playcountMax = tmp_max; }
+    void        setLastPlayMin(double tmp_min) { lastplayMin = tmp_min; }
+    void        setLastPlayMax(double tmp_max) { lastplayMax = tmp_max; }
+ 
   private:
   
     QPtrList<Metadata>  my_tracks;
@@ -158,6 +162,11 @@ class MusicNode
     QString             my_level;
     QString             startdir;
     QString             paths;
+
+    int                 playcountMin;
+    int                 playcountMax;
+    double              lastplayMin;
+    double              lastplayMax;
 };
 
 class MetadataLoadingThread : public QThread
@@ -238,6 +247,10 @@ class AllMusic
     bool                     done_loading;
     int                      last_listed;
 
+    int                      playcountMin;
+    int                      playcountMax;
+    double                   lastplayMin;
+    double                   lastplayMax;
 
 };
 

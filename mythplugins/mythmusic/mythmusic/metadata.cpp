@@ -35,7 +35,7 @@ Metadata& Metadata::operator=(Metadata *rhs)
     tracknum = rhs->Track();
     length = rhs->Length();
     rating = rhs->Rating();
-    lastplay = rhs->Lastplay();
+    lastplay = rhs->LastPlayStr();
     playcount = rhs->Playcount();
     id = rhs->ID();
     filename = rhs->Filename();
@@ -323,7 +323,6 @@ double Metadata::LastPlay()
 {
     QString timestamp = lastplay;
 
-
     if(timestamp.contains('-') < 1)
     {
         timestamp.insert(4, '-');
@@ -347,11 +346,7 @@ void Metadata::setLastPlay()
 
 void Metadata::incPlayCount()
 {
-    if (playcount < 50)
-    {
-        playcount++;
-
-    }
+    playcount++;
     changed = true;
 }
 
@@ -447,10 +442,22 @@ void AllMusic::resync()
                                         query.value(7).toInt(),
                                         query.value(0).toInt(),
                                         query.value(9).toInt(),
-                                        query.value(10).toInt(),
-                                        query.value(11).toString()
+                                        query.value(11).toInt(),
+                                        query.value(10).toString()
                                     );
             all_music.append(temp); //  Don't delete temp, as PtrList now owns it
+
+            // compute max/min playcount,lastplay for all music
+            if (query.at() == 0) { // first song
+                playcountMin = playcountMax = temp->PlayCount();
+                lastplayMin = lastplayMax = temp->LastPlay();
+            } else {
+                if (temp->PlayCount() < playcountMin) { playcountMin = temp->PlayCount(); }
+                else if (temp->PlayCount() > playcountMax) { playcountMax = temp->PlayCount(); }
+
+                if (temp->LastPlay() < lastplayMin) { lastplayMin = temp->LastPlay(); }
+                else if (temp->LastPlay() > lastplayMax) { lastplayMax = temp->LastPlay(); }
+            }
         }
     }
     else
@@ -464,7 +471,7 @@ void AllMusic::resync()
             cerr << "metadata.o: Your don't seem to have any tracks. That's ok with me if it's ok with you." << endl; 
         }
     }    
-    
+ 
     //  To find this data quickly, build a map
     //  (a map to pointers!)
     
@@ -585,6 +592,10 @@ void AllMusic::writeTree(GenericTree *tree_to_write_to)
     int a_counter = 0;
     while ( (traverse = iter.current()) != 0 )
     {
+        traverse->setPlayCountMin(playcountMin);
+        traverse->setPlayCountMax(playcountMax);
+        traverse->setLastPlayMin(lastplayMin);
+        traverse->setLastPlayMax(lastplayMax);
         traverse->writeTree(sub_node, a_counter);
         ++a_counter;
         ++iter;
@@ -987,6 +998,10 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
     Metadata *a_track;
     int track_counter = 0;
     anit.toFirst();
+    int RatingWeight = gContext->GetNumSetting("IntelliRatingWeight", 2);
+    int PlayCountWeight = gContext->GetNumSetting("IntelliPlayCountWeight", 2);
+    int LastPlayWeight = gContext->GetNumSetting("IntelliLastPlayWeight", 2);
+    int RandomWeight = gContext->GetNumSetting("IntelliRandomWeight", 2);
     while( (a_track = anit.current() ) != 0)
     {
         QString title_temp = QString("%1 - %2").arg(a_track->Track()).arg(a_track->Title());
@@ -998,17 +1013,19 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
         //
         //  "Intelligent" ordering
         //
-        QDateTime cTime = QDateTime::currentDateTime();
-        double currentDateTime = cTime.toString("yyyyMMddhhmmss").toDouble();
         int rating = a_track->Rating();
         int playcount = a_track->PlayCount();
-        double lastplay = a_track->LastPlay();
-        double ratingValue = (double)rating / 10;
-        double playcountValue = (double)playcount / 50;
-        double lastplayValue = (currentDateTime - lastplay) / currentDateTime * 2000;
-        double rating_value =  (35 * ratingValue - 25 * playcountValue + 25 * lastplayValue + 
-                                15 * (double)rand() / (RAND_MAX + 1.0));
-        int integer_rating = (int) rating_value * 100000;
+        double lastplaydbl = a_track->LastPlay();
+        double ratingValue = (double)(rating) / 10;
+        double playcountValue, lastplayValue;
+        if (playcountMax == playcountMin) { playcountValue = 0; }
+        else { playcountValue = ((playcountMin - (double)playcount) / (playcountMax - playcountMin) + 1); }
+        if (lastplayMax == lastplayMin) { lastplayValue = 0; }
+        else { lastplayValue = ((lastplayMin - lastplaydbl) / (lastplayMax - lastplayMin) + 1); }
+        double rating_value =  (RatingWeight * ratingValue + PlayCountWeight * playcountValue +
+                                LastPlayWeight * lastplayValue + RandomWeight * (double)rand() /
+                                (RAND_MAX + 1.0));
+        int integer_rating = (int) (4000001 - rating_value * 10000);
         subsub_node->setAttribute(3, integer_rating);   //  "intelligent" order
         ++track_counter;
         ++anit;
@@ -1021,6 +1038,10 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
     iter.toFirst();
     while( (sub_traverse = iter.current() ) != 0)
     {
+        sub_traverse->setPlayCountMin(playcountMin);
+        sub_traverse->setPlayCountMax(playcountMax);
+        sub_traverse->setLastPlayMin(lastplayMin);
+        sub_traverse->setLastPlayMax(lastplayMax);
         sub_traverse->writeTree(sub_node, another_counter);
         ++another_counter;
         ++iter;

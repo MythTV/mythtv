@@ -271,11 +271,11 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 stop();
             handled = true;
             break;
-        case Key_U:
+        case Key_Z:
             increaseRating();
             handled = true;
             break;
-        case Key_D:
+        case Key_Q:
             decreaseRating();
             handled = true;
             break;

@@ -144,6 +144,62 @@ public:
     };
 };
 
+class SetRatingWeight: public SpinBoxSetting, public GlobalSetting {
+public:
+    SetRatingWeight():
+        SpinBoxSetting(0, 100, 1),
+        GlobalSetting("IntelliRatingWeight") {
+        setLabel("Rating Weight");
+        setValue(35);
+        setHelpText("Used in \"Smart\" Shuffle mode. "
+                    "This weighting affects how much strength is "
+                    "given to your rating of a given track when "
+                    "ordering a group of songs.");
+    };
+};
+
+class SetPlayCountWeight: public SpinBoxSetting, public GlobalSetting {
+public:
+    SetPlayCountWeight():
+        SpinBoxSetting(0, 100, 1),
+        GlobalSetting("IntelliPlayCountWeight") {
+        setLabel("Play Count Weight");
+        setValue(25);
+        setHelpText("Used in \"Smart\" Shuffle mode. "
+                    "This weighting affects how much strength is "
+                    "given to how many times a given track has been "
+                    "played when ordering a group of songs.");
+    };
+};
+
+class SetLastPlayWeight: public SpinBoxSetting, public GlobalSetting {
+public:
+    SetLastPlayWeight():
+        SpinBoxSetting(0, 100, 1),
+        GlobalSetting("IntelliLastPlayWeight") {
+        setLabel("Last Play Weight");
+        setValue(25);
+        setHelpText("Used in \"Smart\" Shuffle mode. "
+                    "This weighting affects how much strength is "
+                    "given to how long it has been since a given "
+                    "track was played when ordering a group of songs.");
+    };
+};
+
+class SetRandomWeight: public SpinBoxSetting, public GlobalSetting {
+public:
+    SetRandomWeight():
+        SpinBoxSetting(0, 100, 1),
+        GlobalSetting("IntelliRandomWeight") {
+        setLabel("Random Weight");
+        setValue(15);
+        setHelpText("Used in \"Smart\" Shuffle mode. "
+                    "This weighting affects how much strength is "
+                    "given to good old (peudo-)randomness "
+                    "when ordering a group of songs.");
+    };
+};
+
 class UseShowRatings: public CheckBoxSetting, public GlobalSetting {
 public:
     UseShowRatings():
@@ -366,6 +422,10 @@ PlayerSettings::PlayerSettings()
     VerticalConfigurationGroup* playersettings = new VerticalConfigurationGroup(false);
     playersettings->setLabel("Playback Settings");
     playersettings->addChild(new PlayMode());
+    playersettings->addChild(new SetRatingWeight());
+    playersettings->addChild(new SetPlayCountWeight());
+    playersettings->addChild(new SetLastPlayWeight());
+    playersettings->addChild(new SetRandomWeight());
     playersettings->addChild(new UseShowRatings());
     playersettings->addChild(new UseShowWholeTree());
     playersettings->addChild(new UseListShuffled());
