@@ -269,17 +269,28 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
 
     data->XJ_curwin = data->XJ_win = winid;
 
-    if (display_res && display_res->switchToVid(width, height))
+    if (display_res)
     {
-        // Switching to custom display resolution succeeded
-        // Make a note of the new size
-        dispw = display_res->Width();
-        disph = display_res->Height();
-        w_mm = display_res->Width_mm();
-        h_mm = display_res->Height_mm();
+        if (display_res->Width() == 0)
+        {
+            // The very first Resize needs to be the maximum possible
+            // desired res, because X will mask off anything outside
+            // the initial dimensions
+            XMoveResizeWindow(data->XJ_disp, winid, 0, 0, 1920, 1080);
+        }
 
-        // Resize X window to fill new resolution
-       XMoveResizeWindow(data->XJ_disp, winid, 0, 0, dispw, disph);
+        if (display_res->switchToVid(width, height))
+        {
+            // Switching to custom display resolution succeeded
+            // Make a note of the new size
+            dispw = display_res->Width();
+            disph = display_res->Height();
+            w_mm = display_res->Width_mm();
+            h_mm = display_res->Height_mm();
+            
+            // Resize X window to fill new resolution
+            XMoveResizeWindow(data->XJ_disp, winid, 0, 0, dispw, disph);
+        }
     }
     else
     {

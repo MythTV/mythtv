@@ -313,23 +313,43 @@ void TV::Init(bool createWindow)
     {
         MythMainWindow *mainWindow = gContext->GetMainWindow();
         bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
-        if (fullscreen) 
+        bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
+
+        if (switchMode)
+        {
+            // For "video playback window" to be as big as 1920x1080
+            // it's parent window "mainWindow", must be at least that big.
+            mainWindow->setGeometry(0, 0, 1920, 1080);
+            mainWindow->setFixedSize(QSize(1920, 1080));
+        }
+        else if (fullscreen) 
         {
             mainWindow->setGeometry(0, 0, QApplication::desktop()->width(),
                                     QApplication::desktop()->height());
             mainWindow->setFixedSize(QSize(QApplication::desktop()->width(),
                                            QApplication::desktop()->height()));
         }
+
         myWindow = new MythDialog(mainWindow, "video playback window");
         myWindow->installEventFilter(this);
         myWindow->setNoErase();
-        if (fullscreen) 
+
+        if (switchMode)
+        {
+            // If switching display resolutions, we may want a resolution
+            // up to 1920x1080.  We have to set that window size here and
+            // now, or some window mananger won't let us grow it later.
+            myWindow->setGeometry(0, 0, 1920, 1080);
+            myWindow->setFixedSize(QSize(1920, 1080));
+        }
+        else if (fullscreen) 
         {
             myWindow->setGeometry(0, 0, QApplication::desktop()->width(),
                                   QApplication::desktop()->height());
             myWindow->setFixedSize(QSize(QApplication::desktop()->width(),
                                          QApplication::desktop()->height()));
         }
+
         myWindow->show();
         myWindow->setBackgroundColor(Qt::black);
         qApp->processEvents();

@@ -660,7 +660,7 @@ void MythContext::InitializeScreenSettings()
     int height = GetNumSetting("GuiHeight", d->m_height);
     int width = GetNumSetting("GuiWidth", d->m_width);
 
-    if (display_res)
+    if (width == 0 && height == 0 && display_res)
     {
         // If using custom, full-screen resolution, note the size
         height = display_res->Height();
@@ -668,9 +668,6 @@ void MythContext::InitializeScreenSettings()
     }
     else
     {
-        height = GetNumSetting("GuiHeight", d->m_height);
-        width  = GetNumSetting("GuiWidth", d->m_width);
-
         if (w != 0 && h != 0 && height == 0 && width == 0)
         {
             width = w;
