@@ -1005,7 +1005,8 @@ void NuppelVideoRecorder::DoMJPEG(void)
 void NuppelVideoRecorder::TransitionToFile(const QString &lfilename)
 {
     ringBuffer->TransitionToFile(lfilename);
-    WriteHeader(true);
+    //WriteHeader(true);
+    WriteHeader(false);
 }
 
 // Must be called while paused.

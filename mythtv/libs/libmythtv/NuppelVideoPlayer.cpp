@@ -1130,7 +1130,8 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 
         while (frameheader.frametype != 'A' && frameheader.frametype != 'V' &&
                frameheader.frametype != 'S' && frameheader.frametype != 'T' &&
-               frameheader.frametype != 'R' && frameheader.frametype != 'X')
+               frameheader.frametype != 'R' && frameheader.frametype != 'X' &&
+               frameheader.frametype != 'M' && frameheader.frametype != 'D')
         {
             ringBuffer->Seek((long long)seeklen-FRAMEHEADERSIZE, SEEK_CUR);
 
@@ -1141,6 +1142,19 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
                 return;
             }
             seeklen = 1;
+        }
+
+        if (frameheader.frametype == 'M')
+        {
+            int sizetoskip = sizeof(rtfileheader) - sizeof(rtframeheader);
+            char *dummy = new char[sizetoskip + 1];
+
+            if (ringBuffer->Read(dummy, sizetoskip) != sizetoskip)
+            {
+                eof = 1;
+                return;
+            }
+            continue;
         }
 
         if (frameheader.frametype == 'R') 
@@ -2334,9 +2348,9 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
     if (livetv || (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
     {
         long long behind = nvr_enc->GetFramesWritten() - framesPlayed;
-	if (behind < maxtime) // if we're close, do nothing
-	    ret = 0;
-	else if (behind - fftime <= maxtime)
+        if (behind < maxtime) // if we're close, do nothing
+            ret = 0;
+        else if (behind - ff <= maxtime)
             ret = behind - maxtime;
     }
     else
@@ -2346,7 +2360,7 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
             long long behind = totalFrames - framesPlayed;
             if (behind < maxtime)
                 ret = 0;
-            else if (behind - fftime <= maxtime)
+            else if (behind - ff <= maxtime)
                 ret = behind - maxtime;
         }
     }
