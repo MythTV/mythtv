@@ -68,6 +68,8 @@ class VideoOutputIvtv: public VideoOutput
 
     char *osdbuffer;
     char *osdbuf_aligned;
+
+    bool firstframe;
 };
 
 #endif

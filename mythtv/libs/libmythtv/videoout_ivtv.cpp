@@ -255,6 +255,7 @@ void VideoOutputIvtv::Reopen(int skipframes, int newstartframe)
     }
 
     startframenum = newstartframe;
+    firstframe = true;
 }
 
 void VideoOutputIvtv::EmbedInWidget(unsigned long wid, int x, int y, int w, 
@@ -383,6 +384,14 @@ int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int count)
     // seems the decoder doesn't initialize this properly.
     if (frameinfo.frame >= 20000000)
         frameinfo.frame = 0;
+
+    if (firstframe)
+    {
+        if (frameinfo.frame > 5)
+            frameinfo.frame = 0;
+        else
+            firstframe = false;
+    }
 
     return frameinfo.frame + startframenum;
 }

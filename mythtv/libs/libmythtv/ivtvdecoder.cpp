@@ -189,7 +189,7 @@ void IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
             {
                 case GOP_START:
                 {
-                    int frameNum = framesRead - 1;
+                    int frameNum = framesRead;
 
                     if (!gopset && frameNum > 0)
                     {
@@ -262,6 +262,7 @@ bool IvtvDecoder::DoRewind(long long desiredFrame)
 {
     lastKey = (framesPlayed / keyframedist) * keyframedist;
     long long storelastKey = lastKey;
+
     while (lastKey > desiredFrame)
     {
         lastKey -= keyframedist;
@@ -377,13 +378,19 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
             }
             keyPos = positionMap[tmpIndex];
         }
-        if (keyPos == -1)
+
+        if (keyPos == -1 && (hasFullPositionMap || livetv || 
+                             (watchingrecording && nvr_enc)))
         {
             VERBOSE(VB_PLAYBACK, QString("No keyframe in position map for %1")
                     .arg((int)tmpKey));
 
             tmpKey -= keyframedist;
             tmpIndex--;
+        }
+        else if (keyPos == -1)
+        {
+            break;
         }
         else
         {
