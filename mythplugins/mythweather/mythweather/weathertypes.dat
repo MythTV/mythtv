@@ -29,6 +29,7 @@
 45,Flurries,flurries.png
 47,Rain/Wind,showers.png
 49,Sct Flurries/Wind,flurries.png
+50,Sct Strong Storms,thunshowers.png
 51,PM T-Storms,thunshowers.png
 53,Thunderstorms,thunshowers.png
 55,Sunny/Windy,sunny.png
@@ -41,6 +42,7 @@
 70,Sct Snow Showers,snowshow.png
 71,Snow to Ice/Wind,snowshow.png
 77,Snow to Rain,rainsnow.png
+80,AM Light Rain,lshowers.png
 81,PM Light Rain,lshowers.png
 82,PM Rain,showers.png
 84,Snow Showers,snowshow.png
@@ -71,12 +73,14 @@
 132,Snow to Wintry Mix,snowshow.png
 133,PM Snow Showers/Wind,snowshow.png
 135,Snow and Ice to Rain,rainsnow.png
+137,Heavy Rain,showers.png
 138,AM Rain/Ice,showers.png
 145,AM Snow Showers/Wind,snowshow.png
 146,AM Light Snow/Wind,flurries.png
 150,PM Light Rain/Wind,lshowers.png
 152,AM Light Wintry Mix,rainsnow.png
 153,PM Light Snow/Wind,flurries.png
+154,Heavy Rain/Wind,showers.png
 155,PM Snow Shower,snowshow.png
 158,Snow to Rain/Wind,rainsnow.png
 164,PM Light Rain/Ice,showers.png
