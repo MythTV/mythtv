@@ -120,9 +120,6 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
             type->SetText(curTime);
     }
 
-    usetheme = gContext->GetNumSetting("ThemeQt");
-
-    showtitle = gContext->GetNumSetting("EPGShowTitle");
     //showIcon = gContext->GetNumSetting("EPGShowChannelIcon");
 
     channelOrdering = gContext->GetSetting("ChannelSorting", "channum + 0");
@@ -132,18 +129,10 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     unknownTitle = gContext->GetSetting("UnknownTitle", "Unknown");
     unknownCategory = gContext->GetSetting("UnknownCategory", "Unknown");
 
-    //showCurrentTime = gContext->GetNumSetting("EPGShowCurrentTime", 0);
     currentTimeColor = gContext->GetSetting("EPGCurrentTimeColor", "red");
 
     displaychannum = gContext->GetNumSetting("DisplayChanNum");
 
-    // The 'Current Listings' and 'Future Programs' bar at the bottom of the screen.
-    showProgramBar = gContext->GetNumSetting("EPGProgramBar", 1);
-    //altTransparent = gContext->GetNumSetting("EPGTransparency");
-
-    //programGuideType = gContext->GetNumSetting("EPGType");
-    //if (programGuideType == 1)
-    //{
     UIBarType *type = NULL;
     container = theme->GetSet("chanbar");
 
@@ -173,9 +162,7 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     int secsoffset = -((m_originalStartTime.time().minute() % 30) * 60 +
                         m_originalStartTime.time().second());
     m_currentStartTime = m_originalStartTime.addSecs(secsoffset);
-    m_currentStartChannel = 2;
     m_startChanStr = channel;
-    setStartChannel(m_currentStartChannel - 2);
 
     container = theme->GetSet("current_info");
     if (container)
@@ -209,6 +196,7 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     //int filltime = clock.elapsed();
     //clock.restart();
     fillChannelInfos(maxchannel);
+    m_currentStartChannel = m_channelInfos.size() - (int)(desiredDisplayChans / 2);
     if (DISPLAY_CHANS > maxchannel)
         DISPLAY_CHANS = maxchannel;
 
@@ -262,7 +250,6 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
     timeCheck = NULL;
-    // One second timer for clock
     timeCheck = new QTimer(this);
     connect(timeCheck, SIGNAL(timeout()), SLOT(timeout()) );
     timeCheck->start(200);
