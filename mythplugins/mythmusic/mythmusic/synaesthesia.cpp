@@ -45,9 +45,9 @@ Synaesthesia::Synaesthesia(long int winid)
         cerr << "Unable to init SDL\n";
         return;
     }
-#endif
 
     SDL_ShowCursor(0);
+#endif
 
     setupPalette();
 }
