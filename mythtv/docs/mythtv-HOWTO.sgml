@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-05-25, v2.37
+<date>2003-06-09, v2.38
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -15,13 +15,18 @@ necessary.
 <toc>
 
 <sect>How to obtain this document. <label id="how_to_obtain">
-<p>This HOWTO document is maintained at
-the primary MythTV website: <url url="http://www.mythtv.org"
-name="http://www.mythtv.org">.  The latest version of this document can be
-found in CVS, accessible either through the <url
+
+<p>This HOWTO document is maintained at the primary MythTV website: <url
+url="http://www.mythtv.org" name="http://www.mythtv.org"> by Robert
+Kulagowski <url url="mailto:rkulagow@rocketmail.com">.  (Please note that I
+am <em>NOT</em> the author/programmer of the MythTV application!  See the
+<ref id="contributors" name="contributors"> section below for a list of the
+programmers.) The latest version of this document can be found in CVS,
+accessible either through the <url
 url="http://cvs.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web
 interface, or directly from the CVS repository.  You may download the latest
-copy of MythTV and the documentation from CVS this way: 
+copy of MythTV and the documentation from CVS this way:
+
 <tscreen><verb>
 $ mkdir mythtv
 $ cd mythtv
@@ -33,10 +38,12 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 
 This documentation will be in the <tt>docs/</tt> subdirectory.
 
+<!--
 A PDF version of this documentation can be obtained from <url
 url="http://www.smalltime.com/mythtv/MythTV_How-To.pdf"
 name="http://www.smalltime.com/mythtv/MythTV_How-To.pdf">
-
+Put back when we figure out what happened to N. Ziarek.
+-->
 <bf>NOTE</bf>: If you are going to use CVS to compile MythTV rather than
 using the distribution tarball, it is <bf>strongly</bf> recommended that you
 join the <url url="http://www.snowman.net/mailman/listinfo/mythtv-commits/"
@@ -56,12 +63,11 @@ American environment. If you have installation instructions for a different
 region or Linux distribution, please send them to the author so that it can
 be included in other versions of this document.
 
-Erik Arendse has setup a website that focuses on running MythTV in a
-non-North American environment.  See the website at <url
-url="http://www.home.zonnet.nl/erik_nospam.arendse/"
-name="http://www.home.zonnet.nl/erik_nospam.arendse/">.
+Hans Kruse has setup a website that focuses on running MythTV in a non-North
+American environment.  See the website at <url
+url="http://mythtv.nicenemo.net" name="http://mythtv.nicenemo.net">.
 
-The contributors to MythTV are:
+The contributors to MythTV are:<label id="contributors">
 <itemize>
 <item>Lead developer:  Isaac Richards, <url url="mailto:ijr@po.cwru.edu">
 <item>Developer:  Matthew Zimmerman, <url url="mailto:mdz@debian.org">
@@ -329,7 +335,7 @@ system to store the master database.  This does not necessarily mean that
 MySQL must run on one of the MythTV boxes.
 
 In order to compile MythTV, we need to make sure that the software it needs
-is installed.  As of 2003-03-15, this list includes <bf>mysql</bf>,
+is installed.  As of 2003-03-15, this list includes <bf>mysql,</bf>
 <bf>gcc</bf>, <bf>freetype2-devel</bf>, <bf>XFree86-devel</bf>,
 <bf>qt-devel</bf> and <bf>lame</bf>.  If you're going to use a remote
 control with MythTV, you're going to need the <bf>cdialog</bf> package in
@@ -1640,7 +1646,9 @@ if this directory doesn't exist, or it exists and you don't have write
 privileges to it then MythTV will fail when you attempt to make a recording. 
 The following example is specific for <tt>/var/video</tt>, but the same
 instructions would apply if you want to keep the default but don't have the
-directory structure setup yet.
+directory structure setup yet.  See the <ref id="advancedpartitionformatting"
+name="Advanced Partition Formatting"> section for hints on creating a
+partition for MythTV.
 
 If you create a <tt>/var/video</tt> subdirectory, change
 <tt>/mnt/store/</tt> to <tt>/var/video/</tt> in the setup screens.
@@ -3312,8 +3320,9 @@ closest to the AGP slot are bus-mastering.
 Check that the ivtv driver has created a new video device:
 <tscreen><verb>
 $ ls -l /dev/v4l/vi*
-crw-------    1 mythtv   sys       81,   0 Dec 31  1969 /dev/v4l/video0
-crw-------    1 mythtv   root      81,  32 Dec 31  1969 /dev/v4l/video32
+crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
+crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
+crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 </verb></tscreen>
 
 In this case, the ivtv device is <tt>video0</tt>.
@@ -3336,7 +3345,7 @@ input on the Input Connections screen.
 
 Some people report issues with the ivtv module not being loaded when
 required by MythTV.  To get around this, you can <bf>modprobe</bf> the ivtv driver
-before using it.  The simplest technique is to add the <bf/modprobe/>
+before using it.  The simplest technique is to add the <bf>modprobe</bf>
 command to <tt>/etc/rc.d/rc.local</tt>:
 <tscreen><verb>
 # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
@@ -3344,19 +3353,31 @@ command to <tt>/etc/rc.d/rc.local</tt>:
 
 By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.  This
 will create files at about 4GB/hour.  If you wish to adjust these
-parameters, add the following to your <tt/rc.local/>:
+parameters, add the following to your <tt>rc.local</tt>:
 <tscreen><verb>
 /path/to/ivtv/utils/test_ioctl -c bitrate=2500000,bitrate_peak=8000000
 </verb></tscreen>
 
-<label id="troubleshooting_pvraudio"><bf>NOTE</bf>:  some people complain that
-their PVR-250/350 card is not capturing audio.  The most like source for
-this is that your system is not loading the correct msp3400.o file; ivtv
+<label id="troubleshooting_pvraudio"><bf>NOTE</bf>:  some people complain
+that their PVR-250/350 card is not capturing audio.  The most like source
+for this is that your system is not loading the correct msp3400.o file; ivtv
 uses a custom msp3400.c, and if the resulting module isn't loaded you will
-not get sound.  Switch to your /lib/modules directory and rename the
-existing msp3400.o file, then copy the msp3400.o from the ivtv driver
-directory and re-run depmod.  If that still doesn't work, then check the
-ivtv mailing list for more information.
+not get sound.  Switch to your <tt>/lib/modules</tt> directory and rename
+the existing msp3400.o file, then copy the <tt>msp3400.o</tt> from the ivtv
+driver directory and re-run <bf>depmod</bf>.  If that still doesn't work,
+then check the ivtv mailing list for more information.
+
+<bf>NOTE</bf>:  Some people report "ghosting" issues with their PVR-250s,
+where there is a faint copy of whatever is on the screen appearing to the
+right of the image.  If you have this issue, it's fairly obvious.  This is a
+firmware issue, apparently.  There are two ways around this:
+<enum>
+<item>Run at 720x480 resolution
+<item>Turn off DNR
+</enum>
+
+To turn off DNR, add the following someplace in your <tt>rc.local</tt>:
+/path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
 
 <sect1>I'd like to use NFS.
 <p>You may want to use a central server to store your files.  
@@ -3419,7 +3440,7 @@ Use <bf>chkconfig</bf> to make sure the script is called when
 entering runlevels 3, 4 or 5:
 <tscreen><verb>
 $ su
-# chkconfig 345 mythbackend on
+# chkconfig --level 345 mythbackend on
 # exit
 $
 </verb></tscreen>
@@ -3549,6 +3570,36 @@ Using this round-robin scheme along with a shared storage directory like
 NFS and enabling the Master Backend Override setting will allow you to view
 content even if the slave backend that recorded a program is not available.
 
+<sect1>Advanced Partition Formatting <label
+id="advancedpartitionformatting">
+<p>MythTV creates large files.  The partitions that your distribution sets
+up for you may not be optimized for large files.
+<sect2>Ext3
+<p>With Ext3, your biggest gain is that in case of a crash and reboot you
+don't have to wait very long for your partition to be remounted.  With Ext2,
+the <bf>fsck</bf> may take a long time to run on multi-gigabyte partitions.
+
+When formatting the partition, the following command line should be better
+than the default.  This example assumes that <tt>/dev/hdb1</tt> has already
+been created using <bf>fdisk</bf>.
+<tscreen><verb>
+# mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+</verb></tscreen>
+
+The "-T largefile4" option creates one inode per 4 megabytes.  The "-m 0"
+(zero, not "oh") parameter sets the amount of spaced reserved for root to
+zero. By default, this is 5%, which on a multi-gigabyte drive is a lot of
+reserved space.
+
+You may also modify some aspects of a filesystem such as the reserved block
+percentage after it has been created using the <bf>tune2fs</bf> program:
+<tscreen><verb>
+# tune2fs -m 0 /dev/hdb1
+</verb></tscreen>
+
+You can check on your filesystem using the <bf>dumpe2fs</bf> program.  See
+the <bf>man</bf> page for details.
+
 </article>
 <!-- Revision History
 v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
@@ -3624,6 +3675,10 @@ Added Advanced Backend Configurations.  Fixed consistency of section
 headers.  PVR-250 audio troubleshooting.
 v2.37, 2003-05-25.  Fixed dangling close tag.  A little more on
 troubleshooting with gdb.
+v2.38, 2003-06-09.  Fix some more tags.  (WTF is it with the tags lately?)
+Update non-US mythtv website and POC.  Add the stuff about DNR for PVR-250. 
+Added Advanced Partition formatting section.  Fixed the chkconfig example to
+add -levels.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -442,8 +442,9 @@ closest to the AGP slot are bus-mastering.</P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ ls -l /dev/v4l/vi*
-crw-------    1 mythtv   sys       81,   0 Dec 31  1969 /dev/v4l/video0
-crw-------    1 mythtv   root      81,  32 Dec 31  1969 /dev/v4l/video32
+crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
+crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
+crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -462,7 +463,7 @@ if you have not already done so, and assign the video source to a video card
 input on the Input Connections screen.</P>
 <P>Some people report issues with the ivtv module not being loaded when
 required by MythTV.  To get around this, you can <B>modprobe</B> the ivtv driver
-before using it.  The simplest technique is to add the <B>modprobe</B>>
+before using it.  The simplest technique is to add the <B>modprobe</B>
 command to <CODE>/etc/rc.d/rc.local</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -472,7 +473,7 @@ command to <CODE>/etc/rc.d/rc.local</CODE>:
 </P>
 <P>By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.  This
 will create files at about 4GB/hour.  If you wish to adjust these
-parameters, add the following to your <CODE>rc.local</CODE>>:
+parameters, add the following to your <CODE>rc.local</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
 /path/to/ivtv/utils/test_ioctl -c bitrate=2500000,bitrate_peak=8000000
@@ -480,14 +481,25 @@ parameters, add the following to your <CODE>rc.local</CODE>>:
 </CODE></BLOCKQUOTE>
 </P>
 <P>
-<A NAME="troubleshooting_pvraudio"></A> <B>NOTE</B>:  some people complain that
-their PVR-250/350 card is not capturing audio.  The most like source for
-this is that your system is not loading the correct msp3400.o file; ivtv
+<A NAME="troubleshooting_pvraudio"></A> <B>NOTE</B>:  some people complain
+that their PVR-250/350 card is not capturing audio.  The most like source
+for this is that your system is not loading the correct msp3400.o file; ivtv
 uses a custom msp3400.c, and if the resulting module isn't loaded you will
-not get sound.  Switch to your /lib/modules directory and rename the
-existing msp3400.o file, then copy the msp3400.o from the ivtv driver
-directory and re-run depmod.  If that still doesn't work, then check the
-ivtv mailing list for more information.</P>
+not get sound.  Switch to your <CODE>/lib/modules</CODE> directory and rename
+the existing msp3400.o file, then copy the <CODE>msp3400.o</CODE> from the ivtv
+driver directory and re-run <B>depmod</B>.  If that still doesn't work,
+then check the ivtv mailing list for more information.</P>
+<P><B>NOTE</B>:  Some people report "ghosting" issues with their PVR-250s,
+where there is a faint copy of whatever is on the screen appearing to the
+right of the image.  If you have this issue, it's fairly obvious.  This is a
+firmware issue, apparently.  There are two ways around this:
+<OL>
+<LI>Run at 720x480 resolution</LI>
+<LI>Turn off DNR</LI>
+</OL>
+</P>
+<P>To turn off DNR, add the following someplace in your <CODE>rc.local</CODE>:
+/path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0</P>
 
 <H2><A NAME="ss19.11">19.11</A> <A HREF="mythtv-HOWTO.html#toc19.11">I'd like to use NFS.</A>
 </H2>
@@ -559,7 +571,7 @@ entering runlevels 3, 4 or 5:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
-# chkconfig 345 mythbackend on
+# chkconfig --level 345 mythbackend on
 # exit
 $
 </PRE>
@@ -705,6 +717,40 @@ be used.</P>
 <P>Using this round-robin scheme along with a shared storage directory like
 NFS and enabling the Master Backend Override setting will allow you to view
 content even if the slave backend that recorded a program is not available.</P>
+
+<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss19.14">19.14</A> <A HREF="mythtv-HOWTO.html#toc19.14">Advanced Partition Formatting </A>
+</H2>
+
+<P>MythTV creates large files.  The partitions that your distribution sets
+up for you may not be optimized for large files.</P>
+<H3>Ext3</H3>
+
+<P>With Ext3, your biggest gain is that in case of a crash and reboot you
+don't have to wait very long for your partition to be remounted.  With Ext2,
+the <B>fsck</B> may take a long time to run on multi-gigabyte partitions.</P>
+<P>When formatting the partition, the following command line should be better
+than the default.  This example assumes that <CODE>/dev/hdb1</CODE> has already
+been created using <B>fdisk</B>.
+<BLOCKQUOTE><CODE>
+<PRE>
+# mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The "-T largefile4" option creates one inode per 4 megabytes.  The "-m 0"
+(zero, not "oh") parameter sets the amount of spaced reserved for root to
+zero. By default, this is 5%, which on a multi-gigabyte drive is a lot of
+reserved space.</P>
+<P>You may also modify some aspects of a filesystem such as the reserved block
+percentage after it has been created using the <B>tune2fs</B> program:
+<BLOCKQUOTE><CODE>
+<PRE>
+# tune2fs -m 0 /dev/hdb1
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You can check on your filesystem using the <B>dumpe2fs</B> program.  See
+the <B>man</B> page for details.</P>
 
 <HR>
 Next

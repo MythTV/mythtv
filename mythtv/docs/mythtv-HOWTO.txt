@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-05-25, v2.37
+  2003-06-09, v2.38
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -163,6 +163,8 @@
            19.12.1.2 Mandrake 9.x
         19.12.2 Gentoo
      19.13 Advanced Backend Configurations
+     19.14 Advanced Partition Formatting
+        19.14.1 Ext3
 
 
   ______________________________________________________________________
@@ -170,11 +172,15 @@
   [1m1.  How to obtain this document.[0m
 
   This HOWTO document is maintained at the primary MythTV website:
-  http://www.mythtv.org <http://www.mythtv.org>.  The latest version of
+  http://www.mythtv.org <http://www.mythtv.org> by Robert Kulagowski
+  <mailto:rkulagow@rocketmail.com>.  (Please note that I am [4mNOT[24m the
+  author/programmer of the MythTV application!  See the ``contributors''
+  section below for a list of the programmers.) The latest version of
   this document can be found in CVS, accessible either through the
   ViewCVS <http://cvs.mythtv.org/cgi-bin/viewcvs.cgi/> web interface, or
   directly from the CVS repository.  You may download the latest copy of
   MythTV and the documentation from CVS this way:
+
 
 
        $ mkdir mythtv
@@ -187,10 +193,6 @@
 
 
   This documentation will be in the docs/ subdirectory.
-
-  A PDF version of this documentation can be obtained from
-  http://www.smalltime.com/mythtv/MythTV_How-To.pdf
-  <http://www.smalltime.com/mythtv/MythTV_How-To.pdf>
 
   [1mNOTE[22m: If you are going to use CVS to compile MythTV rather than using
   the distribution tarball, it is [1mstrongly [22mrecommended that you join the
@@ -206,6 +208,7 @@
   This HOWTO is for MythTV v0.8.
 
 
+
   [1m2.  Introduction.[0m
 
   This HOWTO document will focus on manually building MythTV in a North
@@ -213,10 +216,9 @@
   different region or Linux distribution, please send them to the author
   so that it can be included in other versions of this document.
 
-  Erik Arendse has setup a website that focuses on running MythTV in a
+  Hans Kruse has setup a website that focuses on running MythTV in a
   non-North American environment.  See the website at
-  http://www.home.zonnet.nl/erik_nospam.arendse/
-  <http://www.home.zonnet.nl/erik_nospam.arendse/>.
+  http://mythtv.nicenemo.net <http://mythtv.nicenemo.net>.
 
   The contributors to MythTV are:
 
@@ -274,7 +276,6 @@
   hardware selection, mainly because there are so many tradeoffs which
   can be made.  For example, if you have plenty of CPU, you can use
   higher bitrates or capture sizes, etc.
-
 
   MythTV has two modes of operation.  First, it can function as a
   software video encoder, which means that it uses a fairly generic
@@ -342,6 +343,7 @@
   frames per second, but typical values for MythTV range from 700
   megabytes/hour to 2 gigabyte/hour for MPEG-4 and larger for MPEG-2 and
   RTJPEG.
+
   [1mNOTE[22m:  You [4mmust[24m use DMA for hard drive access to prevent choppy or
   jittery video.  Red Hat Linux 8.0 apparently does not enable DMA at
   boot time.  See the Troubleshooting Section for ``instructions'' on
@@ -404,8 +406,8 @@
 
   +o  A Celeron 450 uses 2% CPU for encoding a 480x480 16Mbps MPEG-2
      stream.
-
   Here are some data points for decoding:
+
 
   +o  An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10%
      CPU
@@ -472,7 +474,6 @@
   controls for overscan, x,y position and several other useful controls
   to fine tune output.
 
-
   See the forums at
   http://sourceforge.net/forum/forum.php?forum_id=105850
   <http://sourceforge.net/forum/forum.php?forum_id=105850> for more
@@ -528,7 +529,7 @@
   MySQL must run on one of the MythTV boxes.
 
   In order to compile MythTV, we need to make sure that the software it
-  needs is installed.  As of 2003-03-15, this list includes [1mmysql[22m, [1mgcc[22m,
+  needs is installed.  As of 2003-03-15, this list includes [1mmysql, gcc[22m,
   [1mfreetype2-devel[22m, [1mXFree86-devel[22m, [1mqt-devel [22mand [1mlame[22m.  If you're going to
   use a remote control with MythTV, you're going to need the [1mcdialog[0m
   package in order to compile [1mlircd [22mif your distribution doesn't have a
@@ -2127,7 +2128,9 @@
   privileges to it then MythTV will fail when you attempt to make a
   recording.  The following example is specific for /var/video, but the
   same instructions would apply if you want to keep the default but
-  don't have the directory structure setup yet.
+  don't have the directory structure setup yet.  See the ``Advanced
+  Partition Formatting'' section for hints on creating a partition for
+  MythTV.
 
   If you create a /var/video subdirectory, change /mnt/store/ to
   /var/video/ in the setup screens.
@@ -2153,8 +2156,6 @@
   tuner on the master will always be the first choice. You will then
   want to add your ``other backends'' in the order of your preference
   for recording.
-
-
   See ``Advanced Backend Configurations'' for information on configuring
   multiple backend systems in various ways.
 
@@ -4094,8 +4095,9 @@
 
 
        $ ls -l /dev/v4l/vi*
-       crw-------    1 mythtv   sys       81,   0 Dec 31  1969 /dev/v4l/video0
-       crw-------    1 mythtv   root      81,  32 Dec 31  1969 /dev/v4l/video32
+       crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
+       crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
+       crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 
 
 
@@ -4119,16 +4121,15 @@
 
   Some people report issues with the ivtv module not being loaded when
   required by MythTV.  To get around this, you can [1mmodprobe [22mthe ivtv
-  driver before using it.  The simplest technique is to add the
-  [1mmodprobe[22m> command to /etc/rc.d/rc.local:
+  driver before using it.  The simplest technique is to add the [1mmodprobe[0m
+  command to /etc/rc.d/rc.local:
 
 
        # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
 
-
   By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.
   This will create files at about 4GB/hour.  If you wish to adjust these
-  parameters, add the following to your rc.local>:
+  parameters, add the following to your rc.local:
 
 
        /path/to/ivtv/utils/test_ioctl -c bitrate=2500000,bitrate_peak=8000000
@@ -4141,8 +4142,21 @@
   and if the resulting module isn't loaded you will not get sound.
   Switch to your /lib/modules directory and rename the existing
   msp3400.o file, then copy the msp3400.o from the ivtv driver directory
-  and re-run depmod.  If that still doesn't work, then check the ivtv
+  and re-run [1mdepmod[22m.  If that still doesn't work, then check the ivtv
   mailing list for more information.
+
+  [1mNOTE[22m:  Some people report "ghosting" issues with their PVR-250s, where
+  there is a faint copy of whatever is on the screen appearing to the
+  right of the image.  If you have this issue, it's fairly obvious.
+  This is a firmware issue, apparently.  There are two ways around this:
+
+  1. Run at 720x480 resolution
+
+  2. Turn off DNR
+
+  To turn off DNR, add the following someplace in your rc.local:
+  /path/to/ivtv/utils/test_ioctl --set-codec-
+  params=dnr_mode=0,dnr_temporal=0
 
 
   [1m19.11.  I'd like to use NFS.[0m
@@ -4189,6 +4203,7 @@
   Copy the files from the MythTV contrib directory or from Mike's web
   site (http://m-thomson.net/mythtv/ <http://m-thomson.net/mythtv/>) as
   follows:
+
   etc.rc.d.init.mythbackend should be made executable and copied to
   /etc/rc.d/init.d/:
 
@@ -4218,7 +4233,7 @@
 
 
        $ su
-       # chkconfig 345 mythbackend on
+       # chkconfig --level 345 mythbackend on
        # exit
        $
 
@@ -4235,6 +4250,7 @@
   add your usual MythTV users to that group. If you changed the user
   that starts mythbackend from the default of root you [4mmust[24m perform this
   step.
+
 
   Create the directory /var/log/mythtv and set its permissions as
   follows:
@@ -4296,6 +4312,7 @@
   get the results you expect, check that you're not asking msec to add
   missing permissions to the files or directories you created.
 
+
   [1m19.12.2.  Gentoo[0m
 
   The portage file for MythTV has scripts that will allow you to run
@@ -4312,6 +4329,8 @@
 
 
        # /etc/init.d/mythbackend stop
+
+
 
   To obtain a list of options:
 
@@ -4367,6 +4386,44 @@
   like NFS and enabling the Master Backend Override setting will allow
   you to view content even if the slave backend that recorded a program
   is not available.
+
+
+  [1m19.14.  Advanced Partition Formatting[0m
+
+  MythTV creates large files.  The partitions that your distribution
+  sets up for you may not be optimized for large files.
+
+  [1m19.14.1.  Ext3[0m
+
+  With Ext3, your biggest gain is that in case of a crash and reboot you
+  don't have to wait very long for your partition to be remounted.  With
+  Ext2, the [1mfsck [22mmay take a long time to run on multi-gigabyte
+  partitions.
+
+  When formatting the partition, the following command line should be
+  better than the default.  This example assumes that /dev/hdb1 has
+  already been created using [1mfdisk[22m.
+
+
+       # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+
+
+
+  The "-T largefile4" option creates one inode per 4 megabytes.  The "-m
+  0" (zero, not "oh") parameter sets the amount of spaced reserved for
+  root to zero. By default, this is 5%, which on a multi-gigabyte drive
+  is a lot of reserved space.
+
+  You may also modify some aspects of a filesystem such as the reserved
+  block percentage after it has been created using the [1mtune2fs [22mprogram:
+
+
+       # tune2fs -m 0 /dev/hdb1
+
+
+
+  You can check on your filesystem using the [1mdumpe2fs [22mprogram.  See the
+  [1mman [22mpage for details.
 
 
 
