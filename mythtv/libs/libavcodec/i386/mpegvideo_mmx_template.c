@@ -40,14 +40,15 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
     const UINT16 *qmat, *bias;
     INT16 *temp_block = s->dct_quantize_temp_block;
 
-    av_fdct (s, block);
-
+    //s->fdct (s, block);
+    fdct_mmx(s, block); //cant be anything else ...
+    
     if (s->mb_intra) {
         int dummy;
         if (n < 4)
-            q = s->y_dc_scale;
+            q = s->y_dc_scale<<3;
         else
-            q = s->c_dc_scale;
+            q = s->c_dc_scale<<3;
         /* note: block[0] is assumed to be positive */
         if (!s->h263_aic) {
 #if 1
@@ -69,7 +70,7 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
 #endif
         } else
             /* For AIC we skip quant/dequant of INTRADC */
-            level = block[0];
+            level = block[0]>>3;
             
         block[0]=0; //avoid fake overflow
 //        temp_block[0] = (block[0] + (q >> 1)) / q;

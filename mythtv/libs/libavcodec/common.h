@@ -911,7 +911,7 @@ static inline int ff_sqrt(int a)
     int s;
     int ret_sq=0;
 
-    if (a<128) return ff_sqrt_tab[a];
+    if(a<128) return ff_sqrt_tab[a];
 
     for(s=15; s>=0; s--){
         int b= ret_sq + (1<<(s*2)) + (ret<<s)*2;

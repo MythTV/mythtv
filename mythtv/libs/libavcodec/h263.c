@@ -2460,7 +2460,6 @@ static inline void decode_interlaced_info(MpegEncContext *s, int cbp, int mb_typ
 }
 #endif
 
-
 int h263_decode_mb(MpegEncContext *s,
                    DCTELEM block[6][64])
 {
@@ -2541,7 +2540,7 @@ int h263_decode_mb(MpegEncContext *s,
             h263_dc_scale(s);
         }
         if((!s->progressive_sequence) && (cbp || s->workaround_bugs==2))
-             s->interlaced_dct= get_bits1(&s->gb);
+            s->interlaced_dct= get_bits1(&s->gb);
 
         s->mv_dir = MV_DIR_FORWARD;
         if ((cbpc & 16) == 0) {
@@ -2555,7 +2554,7 @@ int h263_decode_mb(MpegEncContext *s,
                     mx = s->sprite_offset[0][0] / (1<<(a-s->quarter_sample));
                     my = s->sprite_offset[0][1] / (1<<(a-s->quarter_sample));
                 }else{
-                    mx = RSHIFT(s->sprite_offset[0][1], a-s->quarter_sample);
+                    mx = RSHIFT(s->sprite_offset[0][0], a-s->quarter_sample);
                     my = RSHIFT(s->sprite_offset[0][1], a-s->quarter_sample);
                 }
 //       int l = (1 << (s->f_code - 1)) * 32;

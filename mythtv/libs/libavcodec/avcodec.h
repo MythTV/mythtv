@@ -5,8 +5,8 @@
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4620
-#define LIBAVCODEC_BUILD_STR   "4620"
+#define LIBAVCODEC_BUILD       4621
+#define LIBAVCODEC_BUILD_STR   "4621"
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -27,6 +27,7 @@ enum CodecID {
     CODEC_ID_H263P,
     CODEC_ID_H263I,
     CODEC_ID_SVQ1,
+    CODEC_ID_VORBIS,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -48,58 +49,58 @@ enum CodecID {
 enum CodecType {
     CODEC_TYPE_UNKNOWN = -1,
     CODEC_TYPE_VIDEO,
-    CODEC_TYPE_AUDIO,
-};
+	    CODEC_TYPE_AUDIO,
+	};
 
-enum PixelFormat {
-    PIX_FMT_ANY = -1,
-    PIX_FMT_YUV420P,
-    PIX_FMT_YUV422,
-    PIX_FMT_RGB24,
-    PIX_FMT_BGR24,
-    PIX_FMT_YUV422P,
-    PIX_FMT_YUV444P,
-    PIX_FMT_RGBA32,
-    PIX_FMT_BGRA32,
-    PIX_FMT_YUV410P
-};
+	enum PixelFormat {
+	    PIX_FMT_ANY = -1,
+	    PIX_FMT_YUV420P,
+	    PIX_FMT_YUV422,
+	    PIX_FMT_RGB24,
+	    PIX_FMT_BGR24,
+	    PIX_FMT_YUV422P,
+	    PIX_FMT_YUV444P,
+	    PIX_FMT_RGBA32,
+	    PIX_FMT_BGRA32,
+	    PIX_FMT_YUV410P
+	};
 
-/* currently unused, may be used if 24/32 bits samples ever supported */
-enum SampleFormat {
-    SAMPLE_FMT_S16 = 0,         /* signed 16 bits */
-};
+	/* currently unused, may be used if 24/32 bits samples ever supported */
+	enum SampleFormat {
+	    SAMPLE_FMT_S16 = 0,         /* signed 16 bits */
+	};
 
-/* in bytes */
+	/* in bytes */
 #define AVCODEC_MAX_AUDIO_FRAME_SIZE 18432
 
-/* motion estimation type, EPZS by default */
-enum Motion_Est_ID {
-    ME_ZERO = 1,
-    ME_FULL,
-    ME_LOG,
-    ME_PHODS,
-    ME_EPZS,
-    ME_X1
-};
+	/* motion estimation type, EPZS by default */
+	enum Motion_Est_ID {
+	    ME_ZERO = 1,
+	    ME_FULL,
+	    ME_LOG,
+	    ME_PHODS,
+	    ME_EPZS,
+	    ME_X1
+	};
 
-typedef struct RcOverride{
-    int start_frame;
-    int end_frame;
-    int qscale; // if this is 0 then quality_factor will be used instead
-    float quality_factor;
-} RcOverride;
+	typedef struct RcOverride{
+	    int start_frame;
+	    int end_frame;
+	    int qscale; // if this is 0 then quality_factor will be used instead
+	    float quality_factor;
+	} RcOverride;
 
-/* only for ME compatiblity with old apps */
-extern int motion_estimation_method;
+	/* only for ME compatiblity with old apps */
+	extern int motion_estimation_method;
 
-/* ME algos sorted by quality */
-static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG, 
-                                       ME_X1, ME_EPZS, ME_FULL };
+	/* ME algos sorted by quality */
+	static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG, 
+					       ME_X1, ME_EPZS, ME_FULL };
 
 #define FF_MAX_B_FRAMES 4
 
-/* encoding support */
-/* note not everything is supported yet */
+	/* encoding support */
+	/* note not everything is supported yet */
 
 #define CODEC_FLAG_HQ     0x0001 /* high quality (non real time) encoding */
 #define CODEC_FLAG_QSCALE 0x0002 /* use fixed qscale */
@@ -108,8 +109,8 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_FLAG_GMC    0x0020 /* use GMC */
 #define CODEC_FLAG_TYPE   0x0040 /* fixed I/P frame type, from avctx->key_frame */
 #define CODEC_FLAG_PART   0x0080 /* use data partitioning */
-/* parent program gurantees that the input for b-frame containing streams is not written to 
-   for at least s->max_b_frames+1 frames, if this is not set than the input will be copied */
+	/* parent program gurantees that the input for b-frame containing streams is not written to 
+	   for at least s->max_b_frames+1 frames, if this is not set than the input will be copied */
 #define CODEC_FLAG_INPUT_PRESERVED 0x0100
 #define CODEC_FLAG_PASS1 0x0200  /* use internal 2pass ratecontrol in first  pass mode */
 #define CODEC_FLAG_PASS2 0x0400  /* use internal 2pass ratecontrol in second pass mode */
@@ -117,196 +118,203 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_FLAG_GRAY  0x2000  /* only decode/encode grayscale */
 #define CODEC_FLAG_EMU_EDGE 0x4000/* dont draw edges */
 #define CODEC_FLAG_DR1    0x8000 /* dr1 */
-/* codec capabilities */
+	/* codec capabilities */
 
-/* decoder can use draw_horiz_band callback */
+	/* decoder can use draw_horiz_band callback */
 #define CODEC_CAP_DRAW_HORIZ_BAND 0x0001
 #define CODEC_CAP_DR1             0x0002 /* direct rendering method 1 */
-/* if 'parse_only' field is true, then avcodec_parse_frame() can be
-   used */
+	/* if 'parse_only' field is true, then avcodec_parse_frame() can be
+	   used */
 #define CODEC_CAP_PARSE_ONLY      0x0004
 
 #define FRAME_RATE_BASE 10000
 
-typedef struct AVCodecContext {
-    int bit_rate;
-    int bit_rate_tolerance; /* amount of +- bits (>0)*/
-    int flags;
-    int sub_id;    /* some codecs needs additionnal format info. It is
-                      stored there */
-    
-    int me_method; /* ME algorithm used for video coding */
-    
-    /* extra data from parent application to codec, e.g. huffman table
-       for mjpeg */
-    /* the parent should allocate and free this buffer */
-    void *extradata;
-    int extradata_size;
-    
-    /* video only */
-    int frame_rate; /* frames per sec multiplied by FRAME_RATE_BASE */
-    int width, height;
-    int aspect_ratio_info;
+	typedef struct AVCodecContext {
+	    int bit_rate;
+	    int bit_rate_tolerance; /* amount of +- bits (>0)*/
+	    int flags;
+	    int sub_id;    /* some codecs needs additionnal format info. It is
+			      stored there */
+	    
+	    int me_method; /* ME algorithm used for video coding */
+	    
+	    /* extra data from parent application to codec, e.g. huffman table
+	       for mjpeg */
+	    /* the parent should allocate and free this buffer */
+	    void *extradata;
+	    int extradata_size;
+	    
+	    /* video only */
+	    int frame_rate; /* frames per sec multiplied by FRAME_RATE_BASE */
+	    int width, height;
+	    int aspect_ratio_info;
 #define FF_ASPECT_SQUARE 1
 #define FF_ASPECT_4_3_625 2
 #define FF_ASPECT_4_3_525 3
 #define FF_ASPECT_16_9_625 4
 #define FF_ASPECT_16_9_525 5
 #define FF_ASPECT_EXTENDED 15
-    int gop_size; /* 0 = intra only */
-    enum PixelFormat pix_fmt;  /* pixel format, see PIX_FMT_xxx */
-    int repeat_pict; /* when decoding, this signal how much the picture */
-                     /* must be delayed.                                */
-                     /* extra_delay = (repeat_pict / 2) * (1/fps)       */
-    /* if non NULL, 'draw_horiz_band' is called by the libavcodec
-       decoder to draw an horizontal band. It improve cache usage. Not
-       all codecs can do that. You must check the codec capabilities
-       before */
-    void (*draw_horiz_band)(struct AVCodecContext *s,
-                            UINT8 **src_ptr, int linesize,
-                            int y, int width, int height);
+	    int gop_size; /* 0 = intra only */
+	    enum PixelFormat pix_fmt;  /* pixel format, see PIX_FMT_xxx */
+	    int repeat_pict; /* when decoding, this signal how much the picture */
+			     /* must be delayed.                                */
+			     /* extra_delay = (repeat_pict / 2) * (1/fps)       */
+	    /* if non NULL, 'draw_horiz_band' is called by the libavcodec
+	       decoder to draw an horizontal band. It improve cache usage. Not
+	       all codecs can do that. You must check the codec capabilities
+	       before */
+	    void (*draw_horiz_band)(struct AVCodecContext *s,
+				    UINT8 **src_ptr, int linesize,
+				    int y, int width, int height);
 
-    /* audio only */
-    int sample_rate; /* samples per sec */
-    int channels;
-    int sample_fmt;  /* sample format, currenly unused */
+	    /* audio only */
+	    int sample_rate; /* samples per sec */
+	    int channels;
+	    int sample_fmt;  /* sample format, currenly unused */
 
-    /* the following data should not be initialized */
-    int frame_size;     /* in samples, initialized when calling 'init' */
-    int frame_number;   /* audio or video frame number */
-    int real_pict_num;  /* returns the real picture number of
-                           previous encoded frame */
-    int key_frame;      /* true if the previous compressed frame was 
-                           a key frame (intra, or seekable) */
-    int pict_type;      /* picture type of the previous 
-                           encoded frame */
-/* FIXME: these should have FF_ */
+	    /* the following data should not be initialized */
+	    int frame_size;     /* in samples, initialized when calling 'init' */
+	    int frame_number;   /* audio or video frame number */
+	    int real_pict_num;  /* returns the real picture number of
+				   previous encoded frame */
+	    int key_frame;      /* true if the previous compressed frame was 
+				   a key frame (intra, or seekable) */
+	    int pict_type;      /* picture type of the previous 
+				   encoded frame */
+	/* FIXME: these should have FF_ */
 #define I_TYPE 1 // Intra
 #define P_TYPE 2 // Predicted
 #define B_TYPE 3 // Bi-dir predicted
 #define S_TYPE 4 // S(GMC)-VOP MPEG4
 
-    int delay;          /* number of frames the decoded output 
-                           will be delayed relative to the encoded input */
-    uint8_t *mbskip_table; /* =1 if MB didnt change, is only valid for I/P frames 
-                              stride= mb_width = (width+15)>>4 */
-    
-    /* encoding parameters */
-    int quality;      /* quality of the previous encoded frame 
-                         (between 1 (good) and 31 (bad)) 
-                         this is allso used to set the quality in vbr mode
-                         and the per frame quality in CODEC_FLAG_TYPE (second pass mode) */
-    float qcompress;  /* amount of qscale change between easy & hard scenes (0.0-1.0)*/
-    float qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
-    int qmin;         /* min qscale */
-    int qmax;         /* max qscale */
-    int max_qdiff;    /* max qscale difference between frames */
-    int max_b_frames; /* maximum b frames, the output will be delayed by max_b_frames+1 relative to the input */
-    float b_quant_factor;/* qscale factor between ps and b frames */
-    int rc_strategy;  /* obsolete FIXME remove */
-    int b_frame_strategy;
+	    int delay;          /* number of frames the decoded output 
+				   will be delayed relative to the encoded input */
+	    uint8_t *mbskip_table; /* =1 if MB didnt change, is only valid for I/P frames 
+				      stride= mb_width = (width+15)>>4 */
+	    
+	    /* encoding parameters */
+	    int quality;      /* quality of the previous encoded frame 
+				 (between 1 (good) and 31 (bad)) 
+				 this is allso used to set the quality in vbr mode
+				 and the per frame quality in CODEC_FLAG_TYPE (second pass mode) */
+	    float qcompress;  /* amount of qscale change between easy & hard scenes (0.0-1.0)*/
+	    float qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
+	    int qmin;         /* min qscale */
+	    int qmax;         /* max qscale */
+	    int max_qdiff;    /* max qscale difference between frames */
+	    int max_b_frames; /* maximum b frames, the output will be delayed by max_b_frames+1 relative to the input */
+	    float b_quant_factor;/* qscale factor between ps and b frames */
+	    int rc_strategy;  /* obsolete FIXME remove */
+	    int b_frame_strategy;
 
-    int hurry_up;     /* when set to 1 during decoding, b frames will be skiped
-                         when set to 2 idct/dequant will be skipped too */
-    
-    struct AVCodec *codec;
-    void *priv_data;
+	    int hurry_up;     /* when set to 1 during decoding, b frames will be skiped
+				 when set to 2 idct/dequant will be skipped too */
+	    
+	    struct AVCodec *codec;
+	    void *priv_data;
 
-    /* The following data is for RTP friendly coding */
-    /* By now only H.263/H.263+/MPEG4 coder honours this   */
-    int rtp_mode;   /* 1 for activate RTP friendly-mode           */
-                    /* highers numbers represent more error-prone */
-                    /* enviroments, by now just "1" exist         */
-    
-    int rtp_payload_size;   /* The size of the RTP payload, the coder will  */
-                            /* do it's best to deliver a chunk with size    */
-                            /* below rtp_payload_size, the chunk will start */
-                            /* with a start code on some codecs like H.263  */
-                            /* This doesn't take account of any particular  */
-                            /* headers inside the transmited RTP payload    */
+	    /* The following data is for RTP friendly coding */
+	    /* By now only H.263/H.263+/MPEG4 coder honours this   */
+	    int rtp_mode;   /* 1 for activate RTP friendly-mode           */
+			    /* highers numbers represent more error-prone */
+			    /* enviroments, by now just "1" exist         */
+	    
+	    int rtp_payload_size;   /* The size of the RTP payload, the coder will  */
+				    /* do it's best to deliver a chunk with size    */
+				    /* below rtp_payload_size, the chunk will start */
+				    /* with a start code on some codecs like H.263  */
+				    /* This doesn't take account of any particular  */
+				    /* headers inside the transmited RTP payload    */
 
-    
-    /* The RTP callcack: This function is called  */
-    /* every time the encoder as a packet to send */
-    /* Depends on the encoder if the data starts  */
-    /* with a Start Code (it should) H.263 does   */
-    void (*rtp_callback)(void *data, int size, int packet_number); 
+	    
+	    /* The RTP callcack: This function is called  */
+	    /* every time the encoder as a packet to send */
+	    /* Depends on the encoder if the data starts  */
+	    /* with a Start Code (it should) H.263 does   */
+	    void (*rtp_callback)(void *data, int size, int packet_number); 
 
-    /* These are for PSNR calculation, if you set get_psnr to 1 */
-    /* after encoding you will have the PSNR on psnr_y/cb/cr    */
-    int get_psnr;
-    float psnr_y;
-    float psnr_cb;
-    float psnr_cr;
-    
-    /* statistics, used for 2-pass encoding */
-    int mv_bits;
-    int header_bits;
-    int i_tex_bits;
-    int p_tex_bits;
-    int i_count;
-    int p_count;
-    int skip_count;
-    int misc_bits; // cbp, mb_type
-    int frame_bits;
-                 
-    /* the following fields are ignored */
-    void *opaque;   /* can be used to carry app specific stuff */
-    char codec_name[32];
-    enum CodecType codec_type; /* see CODEC_TYPE_xxx */
-    enum CodecID codec_id; /* see CODEC_ID_xxx */
-    unsigned int codec_tag;  /* codec tag, only used if unknown codec */
-    
-    int workaround_bugs;       /* workaround bugs in encoders which cannot be detected automatically */
-    int luma_elim_threshold;
-    int chroma_elim_threshold;
-    int strict_std_compliance; /* strictly follow the std (MPEG4, ...) */
-    float b_quant_offset;/* qscale offset between ips and b frames, not implemented yet */
-    int error_resilience;
-    
+	    /* These are for PSNR calculation, if you set get_psnr to 1 */
+	    /* after encoding you will have the PSNR on psnr_y/cb/cr    */
+	    int get_psnr;
+	    float psnr_y;
+	    float psnr_cb;
+	    float psnr_cr;
+	    
+	    /* statistics, used for 2-pass encoding */
+	    int mv_bits;
+	    int header_bits;
+	    int i_tex_bits;
+	    int p_tex_bits;
+	    int i_count;
+	    int p_count;
+	    int skip_count;
+	    int misc_bits; // cbp, mb_type
+	    int frame_bits;
+			 
+	    /* the following fields are ignored */
+	    void *opaque;   /* can be used to carry app specific stuff */
+	    char codec_name[32];
+	    enum CodecType codec_type; /* see CODEC_TYPE_xxx */
+	    enum CodecID codec_id; /* see CODEC_ID_xxx */
+	    unsigned int codec_tag;  /* codec tag, only used if unknown codec */
+	    
+	    int workaround_bugs;       /* workaround bugs in encoders which cannot be detected automatically */
+	    int luma_elim_threshold;
+	    int chroma_elim_threshold;
+	    int strict_std_compliance; /* strictly follow the std (MPEG4, ...) */
+	    float b_quant_offset;/* qscale offset between ips and b frames, not implemented yet */
+	    int error_resilience;
+	    
 #ifndef MBC
 #define MBC 128
 #define MBR 96
 #endif
 #define QP_TYPE int //FIXME note xxx this might be changed to int8_t
 
-    QP_TYPE *quant_store; /* field for communicating with external postprocessing */
+	    QP_TYPE *quant_store; /* field for communicating with external postprocessing */
 
-    unsigned qstride;
-    uint8_t *dr_buffer[3];
-    int dr_stride;
-    void *dr_opaque_frame;
-    void (*get_buffer_callback)(struct AVCodecContext *c, int width, int height, int pict_type);
+	    unsigned qstride;
+	    uint8_t *dr_buffer[3];
+	    int dr_stride;
+	    void *dr_opaque_frame;
+	    void (*get_buffer_callback)(struct AVCodecContext *c, int width, int height, int pict_type);
 
-    int has_b_frames; // is 1 if the decoded stream contains b frames
-    int dr_uvstride;
-    int dr_ip_buffer_count;
-    int block_align; /* currently only for adpcm codec in wav/avi */
+	    int has_b_frames; // is 1 if the decoded stream contains b frames
+	    int dr_uvstride;
+	    int dr_ip_buffer_count;
+	    int block_align; /* currently only for adpcm codec in wav/avi */
 
-    int parse_only; /* decoding only: if true, only parsing is done
-                       (function avcodec_parse_frame()). The frame
-                       data is returned. Only MPEG codecs support this now. */
+	    int parse_only; /* decoding only: if true, only parsing is done
+			       (function avcodec_parse_frame()). The frame
+			       data is returned. Only MPEG codecs support this now. */
 
-    int mpeg_quant; /* 0-> h263 quant 1-> mpeg quant */
+	    int mpeg_quant; /* 0-> h263 quant 1-> mpeg quant */
 
-    char *stats_out; /* encoding statistics output buffer */
-    char *stats_in;  /* encoding statistics input buffer (concatenated stuff from stats_out of pass1 should be placed here)*/
-    float rc_qsquish;
-    float rc_qmod_amp;
-    int rc_qmod_freq;
-    RcOverride *rc_override;
-    int rc_override_count;
-    char *rc_eq;
-    int rc_max_rate;
-    int rc_min_rate;
-    int rc_buffer_size;
-    float rc_buffer_aggressivity;
-    float i_quant_factor;/* qscale factor between i and p frames */
-    float i_quant_offset;/* qscale offset between i and p frames */
-    float rc_initial_cplx;
+	    char *stats_out; /* encoding statistics output buffer */
+	    char *stats_in;  /* encoding statistics input buffer (concatenated stuff from stats_out of pass1 should be placed here)*/
+	    float rc_qsquish;
+	    float rc_qmod_amp;
+	    int rc_qmod_freq;
+	    RcOverride *rc_override;
+	    int rc_override_count;
+	    char *rc_eq;
+	    int rc_max_rate;
+	    int rc_min_rate;
+	    int rc_buffer_size;
+	    float rc_buffer_aggressivity;
+	    float i_quant_factor;/* qscale factor between i and p frames */
+	    float i_quant_offset;/* qscale offset between i and p frames */
+	    float rc_initial_cplx;
 
-    int aspected_width;
-    int aspected_height;
+	    int aspected_width;
+	    int aspected_height;
+
+	    int dct_algo;
+#define FF_DCT_AUTO    0
+#define FF_DCT_FASTINT 1
+#define FF_DCT_INT     2
+#define FF_DCT_MMX     3
+#define FF_DCT_MLIB    4
 
     //FIXME this should be reordered after kabis API is finished ...
     //TODO kill kabi
@@ -338,7 +346,7 @@ typedef struct AVCodecContext {
 	    uc_res6,uc_res7,uc_res8,uc_res9,uc_res10,uc_res11,uc_res12;
     unsigned int
            ui_res0,ui_res1,ui_res2,ui_res3,ui_res4,ui_res5,ui_res6,ui_res7,ui_res8,ui_res9,
-           ui_res10,ui_res11,ui_res12,ui_res13,ui_res14,ui_res15,ui_res16,ui_res17;
+           ui_res10,ui_res11,ui_res12,ui_res13,ui_res14,ui_res15,ui_res16;
 } AVCodecContext;
 
 typedef struct AVCodec {
@@ -381,6 +389,7 @@ typedef struct AVPicture {
 extern AVCodec ac3_encoder;
 extern AVCodec mp2_encoder;
 extern AVCodec mp3lame_encoder;
+extern AVCodec oggvorbis_encoder;
 extern AVCodec mpeg1video_encoder;
 extern AVCodec h263_encoder;
 extern AVCodec h263p_encoder;
@@ -455,6 +464,11 @@ typedef struct ImgReSampleContext ImgReSampleContext;
 
 ImgReSampleContext *img_resample_init(int output_width, int output_height,
                                       int input_width, int input_height);
+ImgReSampleContext *img_resample_full_init(int owidth, int oheight,
+                                      int iwidth, int iheight,
+                                      int topBand, int bottomBand,
+                                      int leftBand, int rightBand);
+
 void img_resample(ImgReSampleContext *s, 
                   AVPicture *output, AVPicture *input);
 

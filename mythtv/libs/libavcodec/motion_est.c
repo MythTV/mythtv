@@ -1556,7 +1556,7 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
 
     if(s->flags&CODEC_FLAG_HQ){
         type= MB_TYPE_FORWARD | MB_TYPE_BACKWARD | MB_TYPE_BIDIR | MB_TYPE_DIRECT; //FIXME something smarter
-     }
+    }
 
 /*
 {

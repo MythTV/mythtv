@@ -375,8 +375,6 @@ static int rv10_decode_init(AVCodecContext *avctx)
         s->rv10_version= avctx->sub_id;
     }
 
-    s->rv10_version = avctx->sub_id;
-    
     s->flags= avctx->flags;
 
     if (MPV_common_init(s) < 0)

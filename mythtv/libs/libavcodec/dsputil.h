@@ -163,7 +163,9 @@ void dsputil_init_alpha(void);
 #define emms_c()
 #define __align8 __attribute__ ((aligned (16)))
 
+#ifdef CONFIG_DARWIN
 void dsputil_init_altivec(void);
+#endif
 
 #else
 
@@ -202,6 +204,7 @@ void get_psnr(UINT8 *orig_image[3], UINT8 *coded_image[3],
 extern void (*av_fdct)(MpegEncContext *s, DCTELEM *block);
 
 void fdct_ifast(MpegEncContext *s, DCTELEM *data);
+void ff_jpeg_fdct_islow (MpegEncContext *s, DCTELEM *data);
 void fdct_mmx(MpegEncContext *s, DCTELEM *block);
 
 #endif

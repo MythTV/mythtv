@@ -35,7 +35,7 @@ case "$cpu" in
   alpha)
     cpu="alpha"
   ;;
-  "Power Macintosh")
+  "Power Macintosh"|ppc)
     cpu="powerpc"
   ;;
   *)
@@ -48,9 +48,11 @@ audio_oss="yes"
 network="yes"
 zlib="yes"
 mp3lame="no"
+vorbis="no"
 a52="yes"
 a52bin="no"
 win32="no"
+cygwin="no"
 lshared="no"
 extralibs="-lm"
 simpleidct="yes"
@@ -85,12 +87,23 @@ extralibs="-lpoll -lgnugetopt -lm"
 make="gmake"
 ;;
 Darwin)
+cc="cc"
 v4l="no"
 audio_oss="no"
 CFLAGS="-no-cpp-precomp -pipe -O3 -fomit-frame-pointer"
-SHFLAGS=-dynamic
+SHFLAGS="-dynamiclib"
 extralibs=""
-darwin=yes
+darwin="yes"
+;;
+CYGWIN*)
+v4l="no"
+audio_oss="yes"
+extralibs=""
+cygwin="yes"
+test -f /usr/include/inttypes.h || \
+test -f /usr/local/include/inttypes.h || \
+echo "Missing inttypes.h, please copy cygwin_inttypes.h to" \
+     "/usr/include/inttypes.h !!!"
 ;;
 *) ;;
 esac
@@ -163,6 +176,8 @@ for opt do
   --enable-a52bin) a52bin="yes" ; extralibs="-ldl $extralibs"
   ;;
   --enable-mp3lame) mp3lame="yes"
+  ;;
+  --enable-vorbis) vorbis="yes"
   ;;
   --disable-vhook) vhook="no"
   ;;
@@ -293,6 +308,7 @@ echo "Standard options:"
 echo "  --help                   print this message"
 echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
 echo "  --enable-mp3lame         enable mp3 encoding via libmp3lame [default=no]"
+echo "  --enable-vorbis          enable vorbis support via libvorbisenc [default=no]"
 echo "  --enable-win32           enable win32 cross compile"
 echo "  --disable-a52            disable GPL'ed A52 support [default=no]"
 echo "  --enable-a52bin          open liba52.so.0 at runtime [default=no]"
@@ -332,6 +348,7 @@ echo "MMX enabled      $mmx"
 echo "gprof enabled    $gprof"
 echo "zlib enabled     $zlib"
 echo "mp3lame enabled  $mp3lame"
+echo "vorbis enabled   $vorbis"
 echo "a52 support      $a52"
 echo "a52 dlopened     $a52bin"
 # echo "Video hooking    $vhook"
@@ -448,8 +465,18 @@ if test "$mp3lame" = "yes" ; then
   echo "CONFIG_MP3LAME=yes" >> config.mak
 fi
 
+if test "$vorbis" = "yes" ; then
+  echo "#define CONFIG_VORBIS 1" >> $TMPH
+  echo "CONFIG_VORBIS=yes" >> config.mak
+fi
+
 if test "$win32" = "yes" ; then
   echo "#define CONFIG_WIN32 1" >> $TMPH
+  echo "CONFIG_WIN32=yes" >> config.mak
+fi
+
+if test "$cygwin" = "yes" ; then
+  # setup correct exesuffix
   echo "CONFIG_WIN32=yes" >> config.mak
 fi
 

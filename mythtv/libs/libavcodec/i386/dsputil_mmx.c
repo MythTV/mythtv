@@ -393,19 +393,19 @@ static void just_return() { return; }
 void dsputil_init_mmx(void)
 {
     mm_flags = mm_support();
-#if 1
-    printf("libavcodec: CPU flags:");
+#if 0
+    fprintf(stderr, "libavcodec: CPU flags:");
     if (mm_flags & MM_MMX)
-        printf(" mmx");
+        fprintf(stderr, " mmx");
     if (mm_flags & MM_MMXEXT)
-        printf(" mmxext");
+        fprintf(stderr, " mmxext");
     if (mm_flags & MM_3DNOW)
-        printf(" 3dnow");
+        fprintf(stderr, " 3dnow");
     if (mm_flags & MM_SSE)
-        printf(" sse");
+        fprintf(stderr, " sse");
     if (mm_flags & MM_SSE2)
-        printf(" sse2");
-    printf("\n");
+        fprintf(stderr, " sse2");
+    fprintf(stderr, "\n");
 #endif
 
     if (mm_flags & MM_MMX) {
@@ -423,8 +423,6 @@ void dsputil_init_mmx(void)
         pix_abs8x8_x2 = pix_abs8x8_x2_mmx;
         pix_abs8x8_y2 = pix_abs8x8_y2_mmx;
         pix_abs8x8_xy2= pix_abs8x8_xy2_mmx;
-
-        av_fdct = fdct_mmx;
 
         put_pixels_tab[0] = put_pixels_mmx;
         put_pixels_tab[1] = put_pixels_x2_mmx;
@@ -526,6 +524,28 @@ void dsputil_init_mmx(void)
 #endif
 }
 
+void gen_idct_put(UINT8 *dest, int line_size, DCTELEM *block);
+
+/**
+ * this will send coeff matrixes which would have different results for the 16383 type MMX vs C IDCTs to the C IDCT
+ */ 
+void bit_exact_idct_put(UINT8 *dest, int line_size, INT16 *block){
+    if(   block[0]>1022 && block[1]==0 && block[4 ]==0 && block[5 ]==0
+       && block[8]==0   && block[9]==0 && block[12]==0 && block[13]==0){
+        int16_t tmp[64];
+        int i;
+
+        for(i=0; i<64; i++)
+            tmp[i]= block[i];
+        for(i=0; i<64; i++)
+            block[i]= tmp[block_permute_op(i)];
+        
+        simple_idct_put(dest, line_size, block);
+    }
+    else
+        gen_idct_put(dest, line_size, block);
+}
+
 /* remove any non bit exact operation (testing purpose). NOTE that
    this function should be kept as small as possible because it is
    always difficult to test automatically non bit exact cases. */
@@ -548,5 +568,9 @@ void dsputil_set_bit_exact_mmx(void)
             put_no_rnd_pixels_tab[2] = put_no_rnd_pixels_y2_mmx;
             avg_pixels_tab[3] = avg_pixels_xy2_mmx;
         }
+#ifdef SIMPLE_IDCT
+        if(ff_idct_put==gen_idct_put && ff_idct == simple_idct_mmx)
+            ff_idct_put= bit_exact_idct_put;
+#endif
     }
 }

@@ -30,8 +30,8 @@ enum OutputFormat {
 
 #define MPEG_BUF_SIZE (16 * 1024)
 
-#define QMAT_SHIFT_MMX 19
-#define QMAT_SHIFT 25
+#define QMAT_SHIFT_MMX 16
+#define QMAT_SHIFT 22
 
 #define MAX_FCODE 7
 #define MAX_MV 2048
@@ -465,6 +465,8 @@ typedef struct MpegEncContext {
                            DCTELEM *block, int n, int qscale);
     void (*dct_unquantize)(struct MpegEncContext *s, // unquantizer to use (mpeg4 can use both)
                            DCTELEM *block, int n, int qscale);
+    int (*dct_quantize)(struct MpegEncContext *s, DCTELEM *block, int n, int qscale, int *overflow);
+    void (*fdct)(struct MpegEncContext *s, DCTELEM *block);
     INT16 __align8 dct_quantize_temp_block[64];
     INT16 __align8 fdct_mmx_block_tmp[64];
 } MpegEncContext;
@@ -480,7 +482,9 @@ void MPV_common_init_mmx(MpegEncContext *s);
 #ifdef ARCH_ALPHA
 void MPV_common_init_axp(MpegEncContext *s);
 #endif
-extern int (*dct_quantize)(MpegEncContext *s, DCTELEM *block, int n, int qscale, int *overflow);
+#ifdef HAVE_MLIB
+void MPV_common_init_mlib(MpegEncContext *s);
+#endif
 extern void (*draw_edges)(UINT8 *buf, int wrap, int width, int height, int w);
 void ff_conceal_past_errors(MpegEncContext *s, int conceal_all);
 void ff_copy_bits(PutBitContext *pb, UINT8 *src, int length);

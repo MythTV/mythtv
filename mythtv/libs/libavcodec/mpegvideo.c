@@ -36,7 +36,6 @@ static void dct_unquantize_h263_c(MpegEncContext *s,
 static void draw_edges_c(UINT8 *buf, int wrap, int width, int height, int w);
 static int dct_quantize_c(MpegEncContext *s, DCTELEM *block, int n, int qscale, int *overflow);
 
-int (*dct_quantize)(MpegEncContext *s, DCTELEM *block, int n, int qscale, int *overflow)= dct_quantize_c;
 void (*draw_edges)(UINT8 *buf, int wrap, int width, int height, int w)= draw_edges_c;
 static void emulated_edge_mc(MpegEncContext *s, UINT8 *src, int linesize, int block_w, int block_h, 
                                     int src_x, int src_y, int w, int h);
@@ -76,14 +75,14 @@ extern UINT8 zigzag_end[64];
 /* default motion estimation */
 int motion_estimation_method = ME_EPZS;
 
-static void convert_matrix(int (*qmat)[64], uint16_t (*qmat16)[64], uint16_t (*qmat16_bias)[64],
+static void convert_matrix(MpegEncContext *s, int (*qmat)[64], uint16_t (*qmat16)[64], uint16_t (*qmat16_bias)[64],
                            const UINT16 *quant_matrix, int bias)
 {
     int qscale;
 
     for(qscale=1; qscale<32; qscale++){
         int i;
-        if (av_fdct == fdct_ifast) {
+        if (s->fdct == ff_jpeg_fdct_islow) {
             for(i=0;i<64;i++) {
                 const int j= block_permute_op(i);
                 /* 16 <= qscale * quant_matrix[i] <= 7905 */
@@ -91,8 +90,19 @@ static void convert_matrix(int (*qmat)[64], uint16_t (*qmat16)[64], uint16_t (*q
                 /* (1<<36)/19952 >= (1<<36)/(aanscales[i] * qscale * quant_matrix[i]) >= (1<<36)/249205026 */
                 /* 3444240       >= (1<<36)/(aanscales[i] * qscale * quant_matrix[i]) >= 275 */
                 
-                qmat[qscale][j] = (int)((UINT64_C(1) << (QMAT_SHIFT + 11)) / 
-                                (aanscales[i] * qscale * quant_matrix[j]));
+                qmat[qscale][j] = (int)((UINT64_C(1) << QMAT_SHIFT) / 
+                                (qscale * quant_matrix[j]));
+            }
+        } else if (s->fdct == fdct_ifast) {
+            for(i=0;i<64;i++) {
+                const int j= block_permute_op(i);
+                /* 16 <= qscale * quant_matrix[i] <= 7905 */
+                /* 19952         <= aanscales[i] * qscale * quant_matrix[i]           <= 249205026 */
+                /* (1<<36)/19952 >= (1<<36)/(aanscales[i] * qscale * quant_matrix[i]) >= (1<<36)/249205026 */
+                /* 3444240       >= (1<<36)/(aanscales[i] * qscale * quant_matrix[i]) >= 275 */
+                
+                qmat[qscale][j] = (int)((UINT64_C(1) << (QMAT_SHIFT + 14)) / 
+                                 (aanscales[i] * qscale * quant_matrix[j]));
             }
         } else {
             for(i=0;i<64;i++) {
@@ -105,7 +115,6 @@ static void convert_matrix(int (*qmat)[64], uint16_t (*qmat16)[64], uint16_t (*q
                 qmat16[qscale][i] = (1 << QMAT_SHIFT_MMX) / (qscale * quant_matrix[block_permute_op(i)]);
 
                 if(qmat16[qscale][i]==0 || qmat16[qscale][i]==128*256) qmat16[qscale][i]=128*256-1;
-
                 qmat16_bias[qscale][i]= ROUNDED_DIV(bias<<(16-QUANT_BIAS_SHIFT), qmat16[qscale][i]);
             }
         }
@@ -130,12 +139,21 @@ int MPV_common_init(MpegEncContext *s)
     s->dct_unquantize_h263 = dct_unquantize_h263_c;
     s->dct_unquantize_mpeg1 = dct_unquantize_mpeg1_c;
     s->dct_unquantize_mpeg2 = dct_unquantize_mpeg2_c;
-        
+    s->dct_quantize= dct_quantize_c;
+
+    if(s->avctx->dct_algo==FF_DCT_FASTINT)
+        s->fdct = fdct_ifast;
+    else
+        s->fdct = ff_jpeg_fdct_islow;
+    
 #ifdef HAVE_MMX
     MPV_common_init_mmx(s);
 #endif
 #ifdef ARCH_ALPHA
     MPV_common_init_axp(s);
+#endif
+#ifdef HAVE_MLIB
+    MPV_common_init_mlib(s);
 #endif
 
     s->mb_width = (s->width + 15) / 16;
@@ -563,9 +581,9 @@ int MPV_encode_init(AVCodecContext *avctx)
     /* precompute matrix */
     /* for mjpeg, we do include qscale in the matrix */
     if (s->out_format != FMT_MJPEG) {
-        convert_matrix(s->q_intra_matrix, s->q_intra_matrix16, s->q_intra_matrix16_bias, 
+        convert_matrix(s, s->q_intra_matrix, s->q_intra_matrix16, s->q_intra_matrix16_bias, 
                        s->intra_matrix, s->intra_quant_bias);
-        convert_matrix(s->q_inter_matrix, s->q_inter_matrix16, s->q_inter_matrix16_bias, 
+        convert_matrix(s, s->q_inter_matrix, s->q_inter_matrix16, s->q_inter_matrix16_bias, 
                        s->inter_matrix, s->inter_quant_bias);
     }
 
@@ -1812,14 +1830,14 @@ static void encode_mb(MpegEncContext *s, int motion_x, int motion_y)
     if(s->out_format==FMT_MJPEG){
         for(i=0;i<6;i++) {
             int overflow;
-            s->block_last_index[i] = dct_quantize(s, s->block[i], i, 8, &overflow);
+            s->block_last_index[i] = s->dct_quantize(s, s->block[i], i, 8, &overflow);
             if (overflow) clip_coeffs(s, s->block[i], s->block_last_index[i]);
         }
     }else{
         for(i=0;i<6;i++) {
             if(!skip_dct[i]){
                 int overflow;
-                s->block_last_index[i] = dct_quantize(s, s->block[i], i, s->qscale, &overflow);
+                s->block_last_index[i] = s->dct_quantize(s, s->block[i], i, s->qscale, &overflow);
             // FIXME we could decide to change to quantizer instead of clipping
             // JS: I don't think that would be a good idea it could lower quality instead
             //     of improve it. Just INTRADC clipping deserves changes in quantizer
@@ -2083,7 +2101,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
         s->intra_matrix[0] = ff_mpeg1_default_intra_matrix[0];
         for(i=1;i<64;i++)
             s->intra_matrix[i] = CLAMP_TO_8BIT((ff_mpeg1_default_intra_matrix[i] * s->qscale) >> 3);
-        convert_matrix(s->q_intra_matrix, s->q_intra_matrix16, 
+        convert_matrix(s, s->q_intra_matrix, s->q_intra_matrix16, 
                        s->q_intra_matrix16_bias, s->intra_matrix, s->intra_quant_bias);
     }
 
@@ -2447,7 +2465,7 @@ static int dct_quantize_c(MpegEncContext *s,
     int max=0;
     unsigned int threshold1, threshold2;
     
-    av_fdct (s, block);
+    s->fdct (s, block);
 
     /* we need this permutation so that we correct the IDCT
        permutation. will be moved into DCT code */
@@ -2469,15 +2487,15 @@ static int dct_quantize_c(MpegEncContext *s,
         i = 1;
         last_non_zero = 0;
         qmat = s->q_intra_matrix[qscale];
-        bias= s->intra_quant_bias<<(QMAT_SHIFT - 3 - QUANT_BIAS_SHIFT);
+        bias= s->intra_quant_bias<<(QMAT_SHIFT - QUANT_BIAS_SHIFT);
     } else {
         i = 0;
         last_non_zero = -1;
         qmat = s->q_inter_matrix[qscale];
-        bias= s->inter_quant_bias<<(QMAT_SHIFT - 3 - QUANT_BIAS_SHIFT);
+        bias= s->inter_quant_bias<<(QMAT_SHIFT - QUANT_BIAS_SHIFT);
     }
-    threshold1= (1<<(QMAT_SHIFT - 3)) - bias - 1;
-    threshold2= threshold1<<1;
+    threshold1= (1<<QMAT_SHIFT) - bias - 1;
+    threshold2= (threshold1<<1);
 
     for(;i<64;i++) {
         j = zigzag_direct[i];
@@ -2488,10 +2506,10 @@ static int dct_quantize_c(MpegEncContext *s,
 //           || bias-level >= (1<<(QMAT_SHIFT - 3))){
         if(((unsigned)(level+threshold1))>threshold2){
             if(level>0){
-                level= (bias + level)>>(QMAT_SHIFT - 3);
+                level= (bias + level)>>QMAT_SHIFT;
                 block[j]= level;
             }else{
-                level= (bias - level)>>(QMAT_SHIFT - 3);
+                level= (bias - level)>>QMAT_SHIFT;
                 block[j]= -level;
             }
             max |=level;
