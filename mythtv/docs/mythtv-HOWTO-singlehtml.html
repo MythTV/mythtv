@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-02-27, v0.17.01
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-03-17, v0.17.02
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -124,6 +124,7 @@ necessary.</EM>
 <LI><A NAME="toc12.1">12.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.1">Installation and prerequisites</A>
 <LI><A NAME="toc12.2">12.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.2">Completing the installation</A>
 <LI><A NAME="toc12.3">12.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.3">Resetting the key binding table.</A>
+<LI><A NAME="toc12.4">12.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.4">Resetting the theme.</A>
 </UL>
 <P>
 <H2><A NAME="toc13">13.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s13">MythGallery.</A></H2>
@@ -644,13 +645,13 @@ unencrypted Free-To-Air satellite channels.</P>
 
 <P>Currently there are two HDTV card with Linux drivers which are known to
 operate in the United States - the HD-2000 and HD-3000 cards available from
-<A HREF="http://www.pchdtv.com/">http://www.pchdtv.com/</A> and the
-Air2PC-ATSC-PCI available from 
+<A HREF="http://www.pchdtv.com/">http://www.pchdtv.com/</A> or 
+<A HREF="http://mythic.tv/">http://mythic.tv/</A> and the Air2PC-ATSC-PCI
+available from 
 <A HREF="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103</A>
 or 
-<A HREF="http://mythic.tv/">http://mythic.tv/</A>. The Air2PC card
-can be configured to capture unencrypted QAM and 8VSB.  8VSB is the standard
-used for over-the-air ATSC signals, QAM is used on cable TV systems.  The
+<A HREF="http://mythic.tv/">http://mythic.tv/</A>. </P>
+<P> The
 Air2PC is supported using the linux-dvb drivers.</P>
 <P>To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
@@ -3075,7 +3076,7 @@ $ mythbackend
 <P>mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <CODE>mythbackend -h</CODE> for help.</P>
-<P>As of 2003-10-03, the available options are:
+<P>As of MythTV v0.17, the available options are:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mythbackend -h
@@ -3085,10 +3086,15 @@ Valid options are:
 -d or --daemon                 Runs mythbackend as a daemon
 -v or --verbose debug-level    Prints more information
                                Accepts any combination (separated by comma)
-                               of all,none,quiet,record,playback,
-                               channel,osd,file,schedule,network
+                               of all,none,quiet,record,playback,channel,
+                               osd,file,schedule,network,commflag,audio,
+                               libav,jobqueue
 --printexpire                  List of auto-expire programs
 --printsched                   Upcoming scheduled programs
+--testsched                    Test run scheduler (ignore existing schedule)
+--resched                      Force the scheduler to update
+--nosched                      Do not perform any scheduling
+--version                      Version information
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -4640,6 +4646,12 @@ $ echo "delete from keybindings ;" | mysql -u mythtv -pmythtv mythconverg
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<H2><A NAME="ss12.4">12.4</A> <A HREF="#toc12.4">Resetting the theme.</A>
+</H2>
+
+<P>If you find yourself wedged into a theme that isn't working, open your
+web browser and go to site:
+<CODE>http://mythweb_name_or_ip_address/mythweb/settings.php?RESET_THEME=yes</CODE></P>
 <H2><A NAME="s13">13.</A> <A HREF="#toc13">MythGallery.</A></H2>
 
 <P>MythGallery is a photo and slideshow application.  MythGallery is a
@@ -6386,8 +6398,8 @@ mythbackend at startup.</P>
 # rc-update add mythbackend default
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>To stop mythbackend as a daemon:
+
+To stop mythbackend as a daemon:
 <BLOCKQUOTE><CODE>
 <PRE>
 # /etc/init.d/mythbackend stop
@@ -6432,7 +6444,7 @@ get cardid #4 in the database.  Exit setup.</LI>
 one of the following happens:
 <UL>
 <LI>There are four recordings scheduled for the same time</LI>
-<LI>Both slaves are not available</LI>
+<LI>Both slaves are unavailable</LI>
 </UL>
 </P>
 <P>The scheduler in MythTV checks whether an encoder is available; if a slave
@@ -7947,29 +7959,22 @@ leading to dropped frames.</P>
 </H2>
 
 <P>The Air2PC card has the capability to capture over-the-air HDTV signals
-(8VSB) and unencrypted HDTV (QAM) off of cable TV.  The Air2PC card is
+(8VSB).  The Air2PC card is
 installed as a DVB device and is supported within MythTV.  </P>
 <P>First, you must compile a version of the Linux kernel to support the new
-tuner device.  Version 2.6.11 supports the card in 8VSB mode.  If you wish
-to use QAM, you will need to patch the kernel, or wait until 2.6.12.</P>
-<P>Download the source to 2.6.11.  At the time of this writing (2005-02-15), the latest
-is 2.6.11-rc5.  Downloading the <CODE>nxt2002-qam.patch</CODE> file will allow you to use QAM mode
-to capture unencrypted HDTV.
+tuner device.  </P>
+<P>Download the source to 2.6.11.  
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
 # cd /usr/src
-# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc5.tar.bz2
-# tar -xjf linux-2.6.11-rc5.tar.bz2
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.bz2
+# tar -xjf linux-2.6.11.tar.bz2
 # pushd .
-# cd linux-2.6.11-rc5/drivers/media/dvb/frontends
-# wget http://www.digitalregime.com/patches/nxt2002-qam.patch
-# patch -p0 &lt; nxt2002-qam.patch
-# popd
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>If you already have a 2.6 kernel running, copy the <CODE>.config</CODE> file and
+
+If you already have a 2.6 kernel running, copy the <CODE>.config</CODE> file and
 use it as your starting point.  If not, then go straight to the <CODE>make
 menuconfig</CODE> portion below.</P>
 <P>On Debian with a 2.6.10 kernel:</P>
@@ -8089,44 +8094,8 @@ CTRL-C
 $
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>If you're using QAM, you can skip the <CODE>perl ./make_atsc_chanconf.pl</CODE> step shown
-above and do the following:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd ~/.azap
-$ wget http://www.digitalregime.com/patches/channels.conf-qam
-</PRE>
-</CODE></BLOCKQUOTE>
 
-Starting at "c80", increment by one until you get to a channel that returns FE_HAS_LOCK.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ azap -c channels.conf-qam -r c80
-using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
-tuning to 525000000 Hz
-video pid 0x0000, audio pid 0x0000
-status 00 | signal ef00 | snr ae50 | ber 00000000 | unc 00000000 |
-CTRL-C
-$ azap -c channels.conf-qam -r c81
-using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
-tuning to 531000000 Hz
-video pid 0x0000, audio pid 0x0000
-status 00 | signal a600 | snr 4f50 | ber 00000000 | unc 00000000 |
-CTRL-C
-(etc)
-$ azap -c channels.conf-qam -r c93
-using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
-tuning to 603000000 Hz
-video pid 0x0000, audio pid 0x0000
-status 00 | signal fff0 | snr 0000 | ber 00000000 | unc 00000000 |
-status 1f | signal fc30 | snr de3e | ber 00007ff8 | unc 0000000d | FE_HAS_LOCK
-status 1f | signal fc00 | snr df28 | ber 00007ff8 | unc 0000000f | FE_HAS_LOCK
-status 1f | signal fbf0 | snr df28 | ber 00007ff8 | unc 0000000e | FE_HAS_LOCK
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P><B>NOTE</B>: if you have anything in the unc column ("uncorrectable
+<B>NOTE</B>: if you have anything in the unc column ("uncorrectable
 errors") you will probably have problems with HDTV.  Check you antenna, cables, etc.</P>
 
 

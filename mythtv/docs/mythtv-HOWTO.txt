@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-02-27, v0.17.01
+  2005-03-17, v0.17.02
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -187,6 +187,7 @@
         12.1.1 Mandrake 9.0
      12.2 Completing the installation
      12.3 Resetting the key binding table.
+     12.4 Resetting the theme.
 
   13. MythGallery.
      13.1 Installation and prerequisites
@@ -211,7 +212,6 @@
      18.1 Manual Compilation of Prerequisites
      18.2 Pre-compiled binaries
      18.3 Running the Myth Transcoding Daemon
-
   19. MythNews.
   20. Troubleshooting.
      20.1 Compiling
@@ -782,13 +782,13 @@
 
   Currently there are two HDTV card with Linux drivers which are known
   to operate in the United States - the HD-2000 and HD-3000 cards
-  available from http://www.pchdtv.com/ <http://www.pchdtv.com/> and the
-  Air2PC-ATSC-PCI available from
+  available from http://www.pchdtv.com/ <http://www.pchdtv.com/> or
+  http://mythic.tv/ <http://mythic.tv/> and the Air2PC-ATSC-PCI
+  available from
   http://www.cyberestore.com/product_info.php?cPath=28&products_id=103
   <http://www.cyberestore.com/product_info.php?cPath=28&products_id=103>
-  or http://mythic.tv/ <http://mythic.tv/>. The Air2PC card can be
-  configured to capture unencrypted QAM and 8VSB.  8VSB is the standard
-  used for over-the-air ATSC signals, QAM is used on cable TV systems.
+  or http://mythic.tv/ <http://mythic.tv/>.
+
   The Air2PC is supported using the linux-dvb drivers.
 
   To playback HDTV content, plan on a powerful CPU.  "How powerful?"
@@ -3316,7 +3316,7 @@
   doing to the console.  If you'd like to see the options that are
   available for mythbackend, type mythbackend -h for help.
 
-  As of 2003-10-03, the available options are:
+  As of MythTV v0.17, the available options are:
 
 
        $ mythbackend -h
@@ -3326,10 +3326,15 @@
        -d or --daemon                 Runs mythbackend as a daemon
        -v or --verbose debug-level    Prints more information
                                       Accepts any combination (separated by comma)
-                                      of all,none,quiet,record,playback,
-                                      channel,osd,file,schedule,network
+                                      of all,none,quiet,record,playback,channel,
+                                      osd,file,schedule,network,commflag,audio,
+                                      libav,jobqueue
        --printexpire                  List of auto-expire programs
        --printsched                   Upcoming scheduled programs
+       --testsched                    Test run scheduler (ignore existing schedule)
+       --resched                      Force the scheduler to update
+       --nosched                      Do not perform any scheduling
+       --version                      Version information
 
 
 
@@ -3338,7 +3343,6 @@
   process.  For example, you may add this to your rc.local file, or you
   can follow the steps outlined in the section called ``Automatically
   starting mythbackend at system boot time''.
-
 
   [1m9.3.  Configuring a non-master backend[0m
 
@@ -3403,7 +3407,6 @@
   job will run at the same time as any other system cron jobs.
 
 
-
   [1m9.4.1.1.  Using the built-in method.[0m
 
   To use MythTV's built-in capability, you'll need to run the
@@ -3465,22 +3468,20 @@
   [1mmythfilldatabase [22mwill run, save and exit, and return to the shell
   prompt.
 
-
-
-  $ cp ~/mythtv/configfiles/mythfilldatabasecron ~/.mythtv
-  $ cp ~/mythtv/configfiles/mythcrontab ~/.mythtv
-  $ cd ~/.mythtv
-  $ crontab mythcrontab
-  $ crontab -l  NOTE: this is a lowercase L.
-  # The following will run the mythfilldatabase shell script at 0430
-  # every day.  Format is
-  # minutes hour day_of_month month day_of_week
-  # man 5 crontab for more information
-  # Need to use a shell script because the QTDIR environment variable isn't
-  # being honored by crontab?
-  # The next text should be all on the same line.
-  30 04 * * * /bin/bash $HOME/.mythtv/mythfilldatabasecron
-  $
+       $ cp ~/mythtv/configfiles/mythfilldatabasecron ~/.mythtv
+       $ cp ~/mythtv/configfiles/mythcrontab ~/.mythtv
+       $ cd ~/.mythtv
+       $ crontab mythcrontab
+       $ crontab -l  NOTE: this is a lowercase L.
+       # The following will run the mythfilldatabase shell script at 0430
+       # every day.  Format is
+       # minutes hour day_of_month month day_of_week
+       # man 5 crontab for more information
+       # Need to use a shell script because the QTDIR environment variable isn't
+       # being honored by crontab?
+       # The next text should be all on the same line.
+       30 04 * * * /bin/bash $HOME/.mythtv/mythfilldatabasecron
+       $
 
 
 
@@ -4963,6 +4964,12 @@
        $ echo "delete from keybindings ;" | mysql -u mythtv -pmythtv mythconverg
 
 
+
+  [1m12.4.  Resetting the theme.[0m
+
+  If you find yourself wedged into a theme that isn't working, open your
+  web browser and go to site:
+  http://mythweb_name_or_ip_address/mythweb/settings.php?RESET_THEME=yes
 
   [1m13.  MythGallery.[0m
 
@@ -6874,7 +6881,7 @@
   until one of the following happens:
   +o  There are four recordings scheduled for the same time
 
-  +o  Both slaves are not available
+  +o  Both slaves are unavailable
 
   The scheduler in MythTV checks whether an encoder is available; if a
   slave backend isn't running, its encoder isn't available, so the
@@ -8465,29 +8472,19 @@
   [1m22.5.  HDTV with the Air2PC-ATSC-PCI card[0m
 
   The Air2PC card has the capability to capture over-the-air HDTV
-  signals (8VSB) and unencrypted HDTV (QAM) off of cable TV.  The Air2PC
-  card is installed as a DVB device and is supported within MythTV.
+  signals (8VSB).  The Air2PC card is installed as a DVB device and is
+  supported within MythTV.
 
   First, you must compile a version of the Linux kernel to support the
-  new tuner device.  Version 2.6.11 supports the card in 8VSB mode.  If
-  you wish to use QAM, you will need to patch the kernel, or wait until
-  2.6.12.
+  new tuner device.
 
-  Download the source to 2.6.11.  At the time of this writing
-  (2005-02-15), the latest is 2.6.11-rc5.  Downloading the
-  nxt2002-qam.patch file will allow you to use QAM mode to capture
-  unencrypted HDTV.
+  Download the source to 2.6.11.
 
-
-       $ su
-       # cd /usr/src
-       # wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc5.tar.bz2
-       # tar -xjf linux-2.6.11-rc5.tar.bz2
-       # pushd .
-       # cd linux-2.6.11-rc5/drivers/media/dvb/frontends
-       # wget http://www.digitalregime.com/patches/nxt2002-qam.patch
-       # patch -p0 < nxt2002-qam.patch
-       # popd
+  $ su
+  # cd /usr/src
+  # wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.bz2
+  # tar -xjf linux-2.6.11.tar.bz2
+  # pushd .
 
 
 
@@ -8535,6 +8532,7 @@
        # make install modules_install
 
 
+
   Make any modifications necessary to your boot configuration files
   (lilo or grub) as required to boot your new kernel.
 
@@ -8542,10 +8540,11 @@
   card.  At the password prompt, press ENTER.
 
 
-       $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
-       $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
-       $ cd dvb-apps
-       $ make
+
+  $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
+  $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
+  $ cd dvb-apps
+  $ make
 
 
 
@@ -8596,9 +8595,9 @@
   HDTV channels.
 
 
-  $ cd /usr/src/dvb-apps/util/szap/channels-conf/atsc
-  $ test ~/.azap || mkdir ~/.azap
-  $ perl ./make_atsc_chanconf.pl ZIPCODE >~/.azap/channels.conf
+       $ cd /usr/src/dvb-apps/util/szap/channels-conf/atsc
+       $ test ~/.azap || mkdir ~/.azap
+       $ perl ./make_atsc_chanconf.pl ZIPCODE >~/.azap/channels.conf
 
 
 
@@ -8613,43 +8612,6 @@
        status 1f | signal f340 | snr c658 | ber 00000030 | unc 00000000 | FE_HAS_LOCK
        CTRL-C
        $
-
-
-
-  If you're using QAM, you can skip the perl ./make_atsc_chanconf.pl
-  step shown above and do the following:
-
-
-       $ cd ~/.azap
-       $ wget http://www.digitalregime.com/patches/channels.conf-qam
-
-
-
-  Starting at "c80", increment by one until you get to a channel that
-  returns FE_HAS_LOCK.
-
-
-       $ azap -c channels.conf-qam -r c80
-       using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
-       tuning to 525000000 Hz
-       video pid 0x0000, audio pid 0x0000
-       status 00 | signal ef00 | snr ae50 | ber 00000000 | unc 00000000 |
-       CTRL-C
-       $ azap -c channels.conf-qam -r c81
-       using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
-       tuning to 531000000 Hz
-       video pid 0x0000, audio pid 0x0000
-       status 00 | signal a600 | snr 4f50 | ber 00000000 | unc 00000000 |
-       CTRL-C
-       (etc)
-       $ azap -c channels.conf-qam -r c93
-       using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
-       tuning to 603000000 Hz
-       video pid 0x0000, audio pid 0x0000
-       status 00 | signal fff0 | snr 0000 | ber 00000000 | unc 00000000 |
-       status 1f | signal fc30 | snr de3e | ber 00007ff8 | unc 0000000d | FE_HAS_LOCK
-       status 1f | signal fc00 | snr df28 | ber 00007ff8 | unc 0000000f | FE_HAS_LOCK
-       status 1f | signal fbf0 | snr df28 | ber 00007ff8 | unc 0000000e | FE_HAS_LOCK
 
 
 

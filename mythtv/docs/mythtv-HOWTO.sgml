@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-02-27, v0.17.01
+<date>2005-03-17, v0.17.02
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -432,13 +432,16 @@ unencrypted Free-To-Air satellite channels.
 <sect3>HDTV.
 <p>Currently there are two HDTV card with Linux drivers which are known to
 operate in the United States - the HD-2000 and HD-3000 cards available from
-<url url="http://www.pchdtv.com/" name="http://www.pchdtv.com/"> and the
-Air2PC-ATSC-PCI available from <url
+<url url="http://www.pchdtv.com/" name="http://www.pchdtv.com/"> or <url
+url="http://mythic.tv/" name="http://mythic.tv/"> and the Air2PC-ATSC-PCI
+available from <url
 url="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103"
 name="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">
-or <url url="http://mythic.tv/" name="http://mythic.tv/">. The Air2PC card
+or <url url="http://mythic.tv/" name="http://mythic.tv/">. 
+
+<!-- The Air2PC card
 can be configured to capture unencrypted QAM and 8VSB.  8VSB is the standard
-used for over-the-air ATSC signals, QAM is used on cable TV systems.  The
+used for over-the-air ATSC signals, QAM is used on cable TV systems. --> The
 Air2PC is supported using the linux-dvb drivers.
 
 To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
@@ -2638,7 +2641,7 @@ mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <tt>mythbackend -h</tt> for help.
 
-As of 2003-10-03, the available options are:
+As of MythTV v0.17, the available options are:
 <tscreen><verb>
 $ mythbackend -h
 Valid options are:
@@ -2647,10 +2650,16 @@ Valid options are:
 -d or --daemon                 Runs mythbackend as a daemon
 -v or --verbose debug-level    Prints more information
                                Accepts any combination (separated by comma)
-                               of all,none,quiet,record,playback,
-                               channel,osd,file,schedule,network
+                               of all,none,quiet,record,playback,channel,
+                               osd,file,schedule,network,commflag,audio,
+                               libav,jobqueue
 --printexpire                  List of auto-expire programs
---printsched                   Upcoming scheduled programs</verb></tscreen>
+--printsched                   Upcoming scheduled programs
+--testsched                    Test run scheduler (ignore existing schedule)
+--resched                      Force the scheduler to update
+--nosched                      Do not perform any scheduling
+--version                      Version information
+</verb></tscreen>
 
 Running mythbackend as a daemon and using the logfile option will allow you
 to have mythbackend automatically start up during the boot process.  For
@@ -4202,6 +4211,10 @@ following command:
 <tscreen><verb>
 $ echo "delete from keybindings ;" | mysql -u mythtv -pmythtv mythconverg
 </verb></tscreen>
+<sect1>Resetting the theme.
+<p>If you find yourself wedged into a theme that isn't working, open your
+web browser and go to site:
+<tt>http://mythweb_name_or_ip_address/mythweb/settings.php?RESET_THEME=yes</tt>
 <sect>MythGallery.
 <p>MythGallery is a photo and slideshow application.  MythGallery is a
 separate application, but it's dependent on MythTV being installed and
@@ -5790,7 +5803,6 @@ To run mythbackend as a daemon which starts at boot time:
 <tscreen><verb>
 # rc-update add mythbackend default
 </verb></tscreen>
-
 To stop mythbackend as a daemon:
 <tscreen><verb>
 # /etc/init.d/mythbackend stop
@@ -5830,7 +5842,7 @@ Using this scheme, the master backend will not use both capture cards until
 one of the following happens:
 <itemize>
 <item>There are four recordings scheduled for the same time
-<item>Both slaves are not available
+<item>Both slaves are unavailable
 </itemize>
 
 The scheduler in MythTV checks whether an encoder is available; if a slave
@@ -7290,28 +7302,28 @@ leading to dropped frames.
 
 <sect1>HDTV with the Air2PC-ATSC-PCI card
 <p>The Air2PC card has the capability to capture over-the-air HDTV signals
-(8VSB) and unencrypted HDTV (QAM) off of cable TV.  The Air2PC card is
+(8VSB)<!-- and unencrypted HDTV (QAM) off of cable TV-->.  The Air2PC card is
 installed as a DVB device and is supported within MythTV.  
 
 First, you must compile a version of the Linux kernel to support the new
-tuner device.  Version 2.6.11 supports the card in 8VSB mode.  If you wish
-to use QAM, you will need to patch the kernel, or wait until 2.6.12.
+tuner device.  <!--Version 2.6.11 supports the card in 8VSB mode.  If you wish
+to use QAM, you will need to patch the kernel, or wait until 2.6.12. -->
 
-Download the source to 2.6.11.  At the time of this writing (2005-02-15), the latest
-is 2.6.11-rc5.  Downloading the <tt>nxt2002-qam.patch</tt> file will allow you to use QAM mode
-to capture unencrypted HDTV.
+Download the source to 2.6.11.  <!--Downloading the <tt>nxt2002-qam.patch</tt> file will allow you to use QAM mode
+to capture unencrypted HDTV. -->
 <tscreen><verb>
 $ su
 # cd /usr/src
-# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc5.tar.bz2
-# tar -xjf linux-2.6.11-rc5.tar.bz2
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.bz2
+# tar -xjf linux-2.6.11.tar.bz2
 # pushd .
-# cd linux-2.6.11-rc5/drivers/media/dvb/frontends
+</verb></tscreen>
+<!--
+# cd linux-2.6.11/drivers/media/dvb/frontends
 # wget http://www.digitalregime.com/patches/nxt2002-qam.patch
 # patch -p0 < nxt2002-qam.patch
 # popd
-</verb></tscreen>
-
+-->
 If you already have a 2.6 kernel running, copy the <tt>.config</tt> file and
 use it as your starting point.  If not, then go straight to the <tt>make
 menuconfig</tt> portion below.
@@ -7410,7 +7422,7 @@ status 1f | signal f340 | snr c658 | ber 00000030 | unc 00000000 | FE_HAS_LOCK
 CTRL-C
 $
 </verb></tscreen>
-
+<!--
 If you're using QAM, you can skip the <tt>perl ./make_atsc_chanconf.pl</tt> step shown
 above and do the following:
 <tscreen><verb>
@@ -7418,17 +7430,23 @@ $ cd ~/.azap
 $ wget http://www.digitalregime.com/patches/channels.conf-qam
 </verb></tscreen>
 Starting at "c80", increment by one until you get to a channel that returns FE_HAS_LOCK.
+<bf>NOTE</bf>:  it may take two or three seconds to get lock, so don't press CTRL-C until you
+have a few lines of output.
 <tscreen><verb>
 $ azap -c channels.conf-qam -r c80
 using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
 tuning to 525000000 Hz
 video pid 0x0000, audio pid 0x0000
 status 00 | signal ef00 | snr ae50 | ber 00000000 | unc 00000000 |
+status 00 | signal ef00 | snr ae50 | ber 00000000 | unc 00000000 |
+status 00 | signal ef00 | snr ae50 | ber 00000000 | unc 00000000 |
 CTRL-C
 $ azap -c channels.conf-qam -r c81
 using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
 tuning to 531000000 Hz
 video pid 0x0000, audio pid 0x0000
+status 00 | signal a600 | snr 4f50 | ber 00000000 | unc 00000000 |
+status 00 | signal a600 | snr 4f50 | ber 00000000 | unc 00000000 |
 status 00 | signal a600 | snr 4f50 | ber 00000000 | unc 00000000 |
 CTRL-C
 (etc)
@@ -7441,7 +7459,7 @@ status 1f | signal fc30 | snr de3e | ber 00007ff8 | unc 0000000d | FE_HAS_LOCK
 status 1f | signal fc00 | snr df28 | ber 00007ff8 | unc 0000000f | FE_HAS_LOCK
 status 1f | signal fbf0 | snr df28 | ber 00007ff8 | unc 0000000e | FE_HAS_LOCK
 </verb></tscreen>
-
+-->
 <bf>NOTE</bf>: if you have anything in the unc column ("uncorrectable
 errors") you will probably have problems with HDTV.  Check you antenna, cables, etc.
 
@@ -7463,7 +7481,9 @@ v0.17.01, 2005-02-27.  Add upgrade instructions at the top.  Add section on
 running commercial flagging on host other than it was recorded on.  Add
 stuff to HDTV QAM section.  Add note for march=k8 needing gcc 3.4.  Update
 link to snapstream's store.  Update description on Pentium-M.
-
+v0.17.02, 2005-03-17.  mythic.tv now sells the HD-3000 as well.  Don't press
+CTRL-C too quickly during azap channel scan.  Update mythbackend -h.  Add reset
+theme to MythWeb.
 -->
 
 <!--

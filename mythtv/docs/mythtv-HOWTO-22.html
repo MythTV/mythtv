@@ -861,29 +861,22 @@ leading to dropped frames.</P>
 </H2>
 
 <P>The Air2PC card has the capability to capture over-the-air HDTV signals
-(8VSB) and unencrypted HDTV (QAM) off of cable TV.  The Air2PC card is
+(8VSB).  The Air2PC card is
 installed as a DVB device and is supported within MythTV.  </P>
 <P>First, you must compile a version of the Linux kernel to support the new
-tuner device.  Version 2.6.11 supports the card in 8VSB mode.  If you wish
-to use QAM, you will need to patch the kernel, or wait until 2.6.12.</P>
-<P>Download the source to 2.6.11.  At the time of this writing (2005-02-15), the latest
-is 2.6.11-rc5.  Downloading the <CODE>nxt2002-qam.patch</CODE> file will allow you to use QAM mode
-to capture unencrypted HDTV.
+tuner device.  </P>
+<P>Download the source to 2.6.11.  
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
 # cd /usr/src
-# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc5.tar.bz2
-# tar -xjf linux-2.6.11-rc5.tar.bz2
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.bz2
+# tar -xjf linux-2.6.11.tar.bz2
 # pushd .
-# cd linux-2.6.11-rc5/drivers/media/dvb/frontends
-# wget http://www.digitalregime.com/patches/nxt2002-qam.patch
-# patch -p0 &lt; nxt2002-qam.patch
-# popd
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>If you already have a 2.6 kernel running, copy the <CODE>.config</CODE> file and
+
+If you already have a 2.6 kernel running, copy the <CODE>.config</CODE> file and
 use it as your starting point.  If not, then go straight to the <CODE>make
 menuconfig</CODE> portion below.</P>
 <P>On Debian with a 2.6.10 kernel:</P>
@@ -1003,44 +996,8 @@ CTRL-C
 $
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>If you're using QAM, you can skip the <CODE>perl ./make_atsc_chanconf.pl</CODE> step shown
-above and do the following:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd ~/.azap
-$ wget http://www.digitalregime.com/patches/channels.conf-qam
-</PRE>
-</CODE></BLOCKQUOTE>
 
-Starting at "c80", increment by one until you get to a channel that returns FE_HAS_LOCK.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ azap -c channels.conf-qam -r c80
-using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
-tuning to 525000000 Hz
-video pid 0x0000, audio pid 0x0000
-status 00 | signal ef00 | snr ae50 | ber 00000000 | unc 00000000 |
-CTRL-C
-$ azap -c channels.conf-qam -r c81
-using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
-tuning to 531000000 Hz
-video pid 0x0000, audio pid 0x0000
-status 00 | signal a600 | snr 4f50 | ber 00000000 | unc 00000000 |
-CTRL-C
-(etc)
-$ azap -c channels.conf-qam -r c93
-using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
-tuning to 603000000 Hz
-video pid 0x0000, audio pid 0x0000
-status 00 | signal fff0 | snr 0000 | ber 00000000 | unc 00000000 |
-status 1f | signal fc30 | snr de3e | ber 00007ff8 | unc 0000000d | FE_HAS_LOCK
-status 1f | signal fc00 | snr df28 | ber 00007ff8 | unc 0000000f | FE_HAS_LOCK
-status 1f | signal fbf0 | snr df28 | ber 00007ff8 | unc 0000000e | FE_HAS_LOCK
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P><B>NOTE</B>: if you have anything in the unc column ("uncorrectable
+<B>NOTE</B>: if you have anything in the unc column ("uncorrectable
 errors") you will probably have problems with HDTV.  Check you antenna, cables, etc.</P>
 
 
