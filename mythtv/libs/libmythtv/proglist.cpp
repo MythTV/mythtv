@@ -279,7 +279,9 @@ void ProgLister::fillItemList(void)
     {
         where = QString("LEFT JOIN oldprogram ON title=oldtitle "
                         "WHERE oldtitle IS NULL AND program.endtime > %1 "
-                        "AND  program.chanid = channel.chanid "
+                        "AND program.chanid = channel.chanid "
+                        "AND ( program.airdate = 0 OR "
+                        "program.airdate >= YEAR(NOW() - INTERVAL 1 YEAR)) "
                         "GROUP BY title ORDER BY starttime LIMIT 500;")
                         .arg(startTime.toString("yyyyMMddhhmm50"));
     }
