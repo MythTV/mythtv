@@ -697,6 +697,16 @@ QString MythContext::FindThemeDir(const QString &themename)
     if (dir.exists())
         return testdir;
 
+
+    // Don't complain about the "default" theme being missing
+    if(themename == QObject::tr("Default"))
+    {
+        testdir = d->m_installprefix + "/share/mythtv/";
+        dir.setPath(testdir);
+        if (dir.exists())
+            return testdir;
+    }
+    
     cerr << "Could not find theme: " << themename << endl;
     return "";
 }

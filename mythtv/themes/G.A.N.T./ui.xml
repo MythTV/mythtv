@@ -1261,6 +1261,20 @@
       </textarea>
     </container>
 
+    <container name="group_info">
+      <context>0</context>
+      <area>0,360,799,240</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,779,45</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>25,50,600,120</area>
+        <altarea>180,130,600,90</altarea>
+        <font>info</font>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
 
     <container name="program_info_play">
       <context>0</context>
