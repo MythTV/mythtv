@@ -167,6 +167,14 @@
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Command run to display movie files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This command is executed whenever a movie file is selected</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>

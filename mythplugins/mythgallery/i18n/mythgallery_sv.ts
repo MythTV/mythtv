@@ -167,6 +167,14 @@
         <source>Ok</source>
         <translation>OK</translation>
     </message>
+    <message>
+        <source>Command run to display movie files</source>
+        <translation>Kommando för att visa videofiler</translation>
+    </message>
+    <message>
+        <source>This command is executed whenever a movie file is selected</source>
+        <translation>Detta kommando används för att spela upp videofiler</translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>
