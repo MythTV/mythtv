@@ -21,29 +21,23 @@ This is what you need, software wise, to have installed:
 
    QT - You need at least QT 3.0.  Again, the best way to get this is from your
         distro.  You need it compiled threadsafe version, and the mysql bindings
-        as well.  I'm using version 3.0.5.  http://www.trolltech.com
+        as well.  I'm using version 3.1.1.  http://www.trolltech.com
 
    MySQL - You need this setup and working.  A recent version, I think, would
            be best.  I don't know, though, I'm utterly new to it.  Get it from
            your distro, or from http://www.mysql.com
 
-   XMLTV - You need at least version 0.5.  This will do the work of actually
-           grabbing the program information.  Get it from:
-           http://membled.com/work/apps/xmltv/
-           Installing this was rather a pain for me on Debian, but I don't have
-           any directions to do so.
-
+   XMLTV - You need at the latest version (0.5.8 at the time of this writing).
+           This will do the work of actually grabbing the program information.
+           Get it from: http://membled.com/work/apps/xmltv/
+          
 See the mythtv-HOWTO.html or mythtv-HOWTO.txt file in the docs/ subdirectory
-for in-depth instructions on installing and compiling mythtv and the
-pre-requisites.
+or on http://www.mythtv.org/docs/ for in-depth instructions on installing and 
+compiling mythtv and all of the pre-requisites.  It has instructions for various
+linux distributions.
 
-Debian users:  MythTV has been packaged by Matthew Zimmerman.  The package
-is available from http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/
-
-Gentoo users:  MythTV has a portage package created by Tony Clark.  The
-portage file is available at http://smalltime.com/mythtv/mythtv-gentoo-portage.tar.bz2
-
-You also need v4l setup and working properly.  If xawtv works, this should, too.
+You also need v4l setup and working properly.  If xawtv works (in grabdisplay
+mode and with xv), this should, too.
 
 Hardware wise, you need a computer.  Really.  Helps to have a fast one, too.
 You also need a video card with working Xv support (to scale and convert 
@@ -51,22 +45,12 @@ colorspaces), and a TV tuner card.  If you're using ALSA for sound support
 (which _is_ the recommended thing to do), you should be using version 0.9, not
 0.5.
 
-IMPORTANT: You _must_ edit the settings.txt file in /usr/local/share/mythtv/
-           before running the application.  
-
-If you change the Width/Height settings and you don't get any video, then
-the resolution you selected wasn't liked by the v4l subsystem.
-
 See the UPGRADING file for information on upgrading between releases.
 
-Now would be a good time to look over 'keys.txt' for a list of all the 
-keybindings.
+Compiling and setup instructions are all in the documentation in the docs/
+subdir (or at http://www.mythtv.org/docs/ ) these days.  Read those carefully.
 
-Change em if you want.  You can copy the various settings files to your 
-~/.mythtv/ directory if you want.
-
-The mysql.txt file located in there controls the database settings, mainly in 
-case you want to run the mysql server on another machine.
+keys.txt has a listing of all the various key bindings.
 
 If you want to check out the theme format, and perhaps make your own, just
 look at the .xml files in the /usr/local/share/mythtv/themes/[themename]
@@ -74,6 +58,9 @@ subdirs.
 
 Feel free to subscribe to the development mailing list at:
 http://www.snowman.net/mailman/listinfo/mythtv-dev
+
+A users list exists as well, subscrube at:
+http://www.snowman.net/mailman/listinfo/mythtv-users
 
 A list that's restricted to the CVS commit messages is available at:
 http://www.snowman.net/mailman/listinfo/mythtv-commits

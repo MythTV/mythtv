@@ -1,12 +1,28 @@
-UPGRADING FROM PREVIEW RELEASE 1
---------------------------------
-You need to add the record.sql script to the database, so, mysql < record.sql
-This is not needed on a new install.
+UPGRADING FROM RELEASE 0.7
+--------------------------
+Insert the 0-7-to-0-8.sql file from the database/ subdir into your database.
+Run the setup program included in the setup/ directory, and say yes to both
+questions it asks on the console, before it opens the UI.  Follow the rest of
+the setup instructions from the README, from here on out.
 
-UPGRADING FROM PREVIEW RELEASE 2
---------------------------------
-Follow the above instructions to add record.sql.  Do the same thing for
-conflict.sql.  Again, not needed for a new install.
+UPGRADING FROM RELEASE 0.6
+--------------------------
+No database changes have been made.
+
+UPGRADING FROM RELEASE 0.5
+--------------------------
+You'll need to insert the 0-5-to-0-6.sql file in the database/ subdir into
+your database.  Run the setup program included in the setup/ directory after
+compiling, and you should be all set.  Please note that upgrading will wipe
+out most scheduled recordings in your database.  Sorry about that, but there
+really wasn't any clean way to migrate the data over to the new database
+format.
+
+UPGRADING FROM RELEASE 0.4
+--------------------------
+You don't need to do anything other than re-edit the settings.txt file.
+Just remember to run the ./configure script to setup libavcodec before
+making MythTV.
 
 UPGRADING FROM PREVIEW RELEASE 3
 --------------------------------
@@ -16,21 +32,12 @@ They'll be updated the next time you run the filldata script.  You can remove
 all the .jpg and .gif files from the /usr/local/share/mythtv/ directory, if
 you want.
 
-UPGRADING FROM RELEASE 0.4
---------------------------
-You don't need to do anything other than re-edit the settings.txt file.
-Just remember to run the ./configure script to setup libavcodec before
-making MythTV.
+UPGRADING FROM PREVIEW RELEASE 2
+--------------------------------
+Follow the above instructions to add record.sql.  Do the same thing for
+conflict.sql.  Again, not needed for a new install.
 
-UPGRADING FROM RELEASE 0.5
---------------------------
-You'll need to insert the 0-5-to-0-6.sql file in the database/ subdir into
-your database.  Run the setup program included in the setup/ directory after
-compiling, and you should be all set.  Please note that upgrading will wipe 
-out most scheduled recordings in your database.  Sorry about that, but there
-really wasn't any clean way to migrate the data over to the new database
-format.
-
-UPGRADING FROM RELEASE 0.6
---------------------------
-No database changes have been made.
+UPGRADING FROM PREVIEW RELEASE 1
+--------------------------------
+You need to add the record.sql script to the database, so, mysql < record.sql
+This is not needed on a new install.
