@@ -7,7 +7,7 @@ use Log::TraceMessages qw<t d>; Log::TraceMessages::check_argv(); $| = 1;
 use Data::Dumper;
 use Getopt::Long;
 use DBI;
-
+use File::Basename;
 
 # Memoize some subroutines if possible
 eval { require Memoize };
@@ -41,7 +41,10 @@ elsif (@ARGV >= 2) {
 }
 else { die }
 
-my ($encoding, $credits, $channels, $progs) = @{XMLTV::read_data($filename)};
+my $sharepath = "/usr/local/share/mc/";
+chdir $sharepath;
+
+my ($encoding, $credits, $channels, $progs) = @{XMLTV::parsefile($filename)};
 my @progs = @$progs;
 my %channels = %$channels;
 
@@ -54,14 +57,32 @@ foreach my $id (keys %channels) {
 
     my $name = best_name(['en'], $channels->{$id}->{'display-name'})->[0];
 
+    my $src = "none";
+    for ($channels->{$id}->{icon}) {
+       if (defined) {
+           my $url = $channels->{$id}->{icon}->[0]->{src};
+           my $name = basename($url);
+           my $localpath = $sharepath . $name;
+           $src = $localpath;
+           if (-e $localpath) {
+               printf "$localpath exists\n";
+           }
+           else {
+               my $command = "wget $url";
+               printf "$localpath not found\n";
+               system $command;
+           }
+       }
+    }
+
     my $sth = $dbh->prepare("SELECT * FROM channel WHERE channum=$channum");
     $sth->execute() or die $sth->errstr;
 
     if ($sth->rows == 0)
     {
-        $dbh->do("INSERT INTO channel (channum,callsign) VALUES($channum, \"$callsign\")")
+        $dbh->do("INSERT INTO channel (channum,callsign,icon) VALUES($channum, \"$callsign\",\"$src\")")
           or die $dbh->errstr;
-        print "ADDED channel: $id , $callsign\n";
+        print "ADDED channel: $id , $callsign, $src\n";
     }
 }
 

@@ -5,7 +5,8 @@ CREATE TABLE channel
 (
     channum INT UNSIGNED NOT NULL PRIMARY KEY,
     callsign VARCHAR(20) NULL,
-    name VARCHAR(20) NULL
+    name VARCHAR(20) NULL,
+    icon VARCHAR(255) NULL
 );
 CREATE TABLE program
 (
