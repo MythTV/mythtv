@@ -699,7 +699,7 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
 {
     MythContext::KickDatabase(QSqlDatabase::database());
 
-    Scheduler *sched = new Scheduler(NULL, QSqlDatabase::database());
+    Scheduler *sched = new Scheduler(encoderList, QSqlDatabase::database());
 
     bool conflicts = sched->FillRecordLists(false);
     list<ProgramInfo *> *recordinglist = sched->getAllPending();
@@ -724,7 +724,7 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
 {
     MythContext::KickDatabase(QSqlDatabase::database());
 
-    Scheduler *sched = new Scheduler(NULL, QSqlDatabase::database());
+    Scheduler *sched = new Scheduler(encoderList, QSqlDatabase::database());
 
     bool removenonplaying = purge.toInt();
 
