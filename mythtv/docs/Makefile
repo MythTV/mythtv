@@ -2,7 +2,7 @@
 # means: linuxdoc-tools linuxdoc-tools-text
 #  - mdz
 
-TARGETS = mythtv-HOWTO.txt mythtv-HOWTO.html mythtv-HOWTO-singlehtml.html mythtv-HOWTO.pdf
+TARGETS = mythtv-HOWTO.txt mythtv-HOWTO.html mythtv-HOWTO-singlehtml.html mythtv-HOWTO.pdf index.html
 LINUXDOC_HTML_SPLIT := 1
 
 all: $(TARGETS)
@@ -24,4 +24,7 @@ validate: mythtv-HOWTO.sgml
 
 %-singlehtml.html: LINUXDOC_HTML_SPLIT=0
 %-singlehtml.sgml: %.sgml
+	cp $< $@
+
+index.html: mythtv-HOWTO.html
 	cp $< $@
