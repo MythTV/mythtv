@@ -1,0 +1,216 @@
+<?xml version="1.0"?>
+
+<sites>
+
+<category name="Arts">
+
+<item>
+<title>Bureau 42</title>
+<url>http://www.bureau42.com/rdf/</url>
+<ico>http://www.bureau42.com/favicon.ico</ico>
+</item>
+
+<item>
+<title>eFilmCritic</title>
+<url>http://efilmcritic.com/fo.rdf</url>
+<ico>http://efilmcritic.com/favicon.ico</ico>
+</item>
+
+</category>
+
+<category name="Business">
+
+<item>
+<title>Internet.com Business</title>
+<url>http://headlines.internet.com/internetnews/bus-news/news.rss</url>
+<ico></ico>
+</item>
+
+<item>
+<title>TradeSims</title>
+<url>http://www.tradesims.com/AEX.rdf</url>
+<ico></ico>
+</item>
+
+</category>
+
+<category name="Computers">
+
+<item>
+<title>KDE Deutschland</title>
+<url>http://www.kde.de/news/news.rdf</url>
+<ico>http://www.kde.de/favicon.ico</ico>
+</item>
+
+<item>
+<title>FreeBSD Project News</title>
+<url>http://www.freebsd.org/news/news.rdf</url>
+<ico>http://www.freebsd.org/favicon.ico</ico>
+</item>
+
+<item>
+<title>dot.kde.org</title>
+<url>http://www.kde.org/dotkdeorg.rdf</url>
+<ico>http://www.kde.org/favicon.ico</ico>
+</item>
+
+<item>
+<title>GNOME News</title>
+<url>http://www.gnomedesktop.org/backend.php</url>
+</item>
+
+<item>
+<title>Slashdot</title>
+<url>http://slashdot.org/slashdot.rss</url>
+<ico>http://slashdot.org/favicon.ico</ico>
+</item>
+
+<item>
+<title>Freshmeat</title>
+<url>http://freshmeat.net/backend/fm.rdf</url>
+<ico>http://freshmeat.net/favicon.ico</ico>
+</item>
+
+<item>
+<title>Linux Weekly News</title>
+<url>http://www.lwn.net/headlines/rss</url>
+<ico>http://www.lwn.net/favicon.ico"</ico>
+</item>
+
+<item> 
+<title>heise online news</title>
+<url>http://www.heise.de/newsticker/heise.rdf</url>
+<ico>http://www.heise.de/favicon.ico</ico>
+</item>
+
+<item> 
+<title>Kuro5hin</title>
+<url>http://kuro5hin.org/backend.rdf</url>
+<ico>http://kuro5hin.org/favicon.ico</ico>
+</item>
+
+<item> 
+<title>LinuxSecurity.com</title>
+<url>http://www.linuxsecurity.com/linuxsecurity_hybrid.rdf</url>
+<ico></ico>  
+</item>
+
+<item> 
+<title>Linux Game Tome</title>
+<url>http://happypenguin.org/html/news.rdf</url>
+<ico></ico>
+</item>
+
+<item> 
+<title>Mozilla</title>
+<url>http://www.mozilla.org/news.rdf</url>
+<ico>http://www.mozillazine.org/favicon.ico</ico>
+</item>
+
+<item> 
+<title>MozillaZine</title>
+<url>http://www.mozillazine.org/contents.rdf</url>
+<ico>http://www.mozillazine.org/favicon.ico</ico>
+</item>
+
+<item> 
+<title>BSD Today</title>
+<url>http://bsdtoday.com/backend/bt.rdf</url>
+<ico></ico>
+</item>
+
+<item> 
+<title>Daemon News</title>
+<url>http://daily.daemonnews.org/ddn.rdf.php3</url>
+<ico></ico>
+</item>
+
+<item> 
+<title>use Perl</title>
+<url>http://use.perl.org/useperl.rdf</url>
+<ico></ico>  
+</item>
+
+<item> 
+<title>desktopian.org</title>
+<url>http://www.desktopian.org/includes/headlines.xml</url>
+<ico>http://www.desktopian.org/favicon.ico</ico>
+</item>
+
+<item> 
+<title>Root prompt</title>
+<url>http://www.rootprompt.org/rss/</url>
+<ico>http://www.rootprompt.org/favicon.ico</ico>
+</item>
+
+<item> 
+<title>SecurityFocus</title>
+<url>http://www.securityfocus.com/topnews-rdf.html</url>
+<ico>http://www.securityfocus.com/favicon.ico</ico>
+</item>
+
+<item> 
+<title>LinuxNewbie</title>
+<url>http://www.linuxnewbie.org/news.cdf</url>
+<ico>http://www.linuxnewbie.org/favicon.ico</ico>
+</item>
+
+<item> 
+<title>Arstechnica</title>
+<url>http://arstechnica.com/etc/rdf/ars.rdf</url>
+<ico>http://arstechnica.com/favicon.ico</ico>
+</item>
+
+<item> 
+<title>FreshPorts - the place for ports</title>
+<url>http://www.freshports.org/news.php3</url>
+<ico>http://www.freshports.org/favicon.ico</ico>
+</item>
+
+</category>
+
+<category name="Miscellaneous">
+
+<item> 
+<title>HotWired</title>
+<url>http://www.hotwired.com/webmonkey/meta/headlines.rdf</url>
+<ico>http://www.hotwired.com/favicon.ico</ico>
+</item> 
+
+<item> 
+<title>The Register</title>
+<url>http://www.theregister.co.uk/tonys/slashdot.rdf</url>
+<ico>http://www.theregister.co.uk/favicon.ico</ico>
+</item> 
+
+</category>
+
+<category name="Magazines">
+
+</category>
+
+<category name="News">
+
+<item>
+<title>CNN</title>
+<url>http://www.cnn.com/cnn.rss</url>
+<ico>http://www.cnn.com/favicon.ico</ico>
+</item>
+
+<item>
+<title>CNN Europe</title>
+<url>http://europe.cnn.com/cnn.rss</url>
+<ico>http://europe.cnn.com/favicon.ico</ico>
+</item>
+
+</category>
+
+<category name="Recreation">
+
+</category>
+
+<category name="Society">
+
+</category>
+
+</sites>
