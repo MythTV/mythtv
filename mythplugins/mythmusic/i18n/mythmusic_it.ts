@@ -114,111 +114,222 @@
     <name>PlaybackBox</name>
     <message>
         <source>Edit Playlist</source>
-        <translation>Modifica la Playlist</translation>
+        <translation type="obsolete">Modifica la Playlist</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation>Visualizza</translation>
+        <translation type="obsolete">Visualizza</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation>Ripetizione: Traccia</translation>
+        <translation type="obsolete">Ripetizione: Traccia</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation>Ripetizione: Tutto</translation>
+        <translation type="obsolete">Ripetizione: Tutto</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation>Esecuzione brano.</translation>
+        <translation type="obsolete">Esecuzione brano.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation>Buffering del brano.</translation>
+        <translation type="obsolete">Buffering del brano.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation>Brano in pausa.</translation>
+        <translation type="obsolete">Brano in pausa.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation>Errore di Output.</translation>
+        <translation type="obsolete">Errore di Output.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation>Brano fermato.</translation>
+        <translation type="obsolete">Brano fermato.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation>Esecuzione terminata.</translation>
+        <translation type="obsolete">Esecuzione terminata.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation>Errore di decodifica.</translation>
+        <translation type="obsolete">Errore di decodifica.</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation>1 Ordine: No</translation>
+        <translation type="obsolete">1 Ordine: No</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation>Ordine: No</translation>
+        <translation type="obsolete">Ordine: No</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation>2 Ripeti: Tutti</translation>
+        <translation type="obsolete">2 Ripeti: Tutti</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation>2 Ripeti: Traccia</translation>
+        <translation type="obsolete">2 Ripeti: Traccia</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation>2 Ripeti: No</translation>
+        <translation type="obsolete">2 Ripeti: No</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation>Ripeti: No</translation>
+        <translation type="obsolete">Ripeti: No</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation>3 Modifica Playlist</translation>
+        <translation type="obsolete">3 Modifica Playlist</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation>4 Visualizza</translation>
+        <translation type="obsolete">4 Visualizza</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation>1 Ordine: Furbo</translation>
+        <translation type="obsolete">1 Ordine: Furbo</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation>Ordine: Furbo</translation>
+        <translation type="obsolete">Ordine: Furbo</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation>1 Ordine: Casuale</translation>
+        <translation type="obsolete">1 Ordine: Casuale</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation>Ordine: Casuale</translation>
+        <translation type="obsolete">Ordine: Casuale</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation>Radice della Playlist</translation>
+        <translation type="obsolete">Radice della Playlist</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation>kbps</translation>
+        <translation type="obsolete">kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation>kHz</translation>
+        <translation type="obsolete">kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation>ch</translation>
+        <translation type="obsolete">ch</translation>
+    </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="unfinished">Modifica la Playlist</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="unfinished">Visualizza</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="unfinished">3 Modifica Playlist</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="unfinished">4 Visualizza</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="unfinished">1 Ordine: Furbo</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="unfinished">Ordine: Furbo</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="unfinished">1 Ordine: Casuale</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="unfinished">Ordine: Casuale</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="unfinished">1 Ordine: No</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="unfinished">Ordine: No</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="unfinished">2 Ripeti: Tutti</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="unfinished">Ripetizione: Tutto</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="unfinished">2 Ripeti: Traccia</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="unfinished">Ripetizione: Traccia</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="unfinished">2 Ripeti: No</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="unfinished">Ripeti: No</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="unfinished">Radice della Playlist</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation type="unfinished">Esecuzione brano.</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation type="unfinished">Buffering del brano.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="unfinished">Brano in pausa.</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished">kbps</translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="unfinished">kHz</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="unfinished">ch</translation>
+    </message>
+    <message>
+        <source>Output error.</source>
+        <translation type="unfinished">Errore di Output.</translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation type="unfinished">Brano fermato.</translation>
+    </message>
+    <message>
+        <source>Finished playing stream.</source>
+        <translation type="unfinished">Esecuzione terminata.</translation>
+    </message>
+    <message>
+        <source>Decoder error.</source>
+        <translation type="unfinished">Errore di decodifica.</translation>
     </message>
 </context>
 <context>

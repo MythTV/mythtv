@@ -116,111 +116,222 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <name>PlaybackBox</name>
     <message>
         <source>Edit Playlist</source>
-        <translation>Editera spellista</translation>
+        <translation type="obsolete">Editera spellista</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation>Visualisera</translation>
+        <translation type="obsolete">Visualisera</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation>3 Redigera spellista</translation>
+        <translation type="obsolete">3 Redigera spellista</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation>4 Visualisera</translation>
+        <translation type="obsolete">4 Visualisera</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation>1 Ordning: Intelligent</translation>
+        <translation type="obsolete">1 Ordning: Intelligent</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation>Ordning: Intelligent</translation>
+        <translation type="obsolete">Ordning: Intelligent</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation>1 Ordning: Slump</translation>
+        <translation type="obsolete">1 Ordning: Slump</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation>Ordning: Slump</translation>
+        <translation type="obsolete">Ordning: Slump</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation>1 Ordning: Rak</translation>
+        <translation type="obsolete">1 Ordning: Rak</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation>Ordning: Rak</translation>
+        <translation type="obsolete">Ordning: Rak</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation>2 Repetera: Alla</translation>
+        <translation type="obsolete">2 Repetera: Alla</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation>Repetera: Alla</translation>
+        <translation type="obsolete">Repetera: Alla</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation>2 Repetera: Spår</translation>
+        <translation type="obsolete">2 Repetera: Spår</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation>Repetera: Spår</translation>
+        <translation type="obsolete">Repetera: Spår</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation>2 Repetera: Ej</translation>
+        <translation type="obsolete">2 Repetera: Ej</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation>Repetera: Inte</translation>
+        <translation type="obsolete">Repetera: Inte</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation>rot för spellistor</translation>
+        <translation type="obsolete">rot för spellistor</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation>Spelar ström.</translation>
+        <translation type="obsolete">Spelar ström.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation>Buffrar ström.</translation>
+        <translation type="obsolete">Buffrar ström.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation>Ström pausad.</translation>
+        <translation type="obsolete">Ström pausad.</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation>kbps</translation>
+        <translation type="obsolete">kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation>kHz</translation>
+        <translation type="obsolete">kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation>ch</translation>
+        <translation type="obsolete">ch</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation>Utmatningsfel.</translation>
+        <translation type="obsolete">Utmatningsfel.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation>Ström stoppad.</translation>
+        <translation type="obsolete">Ström stoppad.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation>Strömmen färdigspelad.</translation>
+        <translation type="obsolete">Strömmen färdigspelad.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation>Avkodningsfel.</translation>
+        <translation type="obsolete">Avkodningsfel.</translation>
+    </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="unfinished">Editera spellista</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="unfinished">Visualisera</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="unfinished">3 Redigera spellista</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="unfinished">4 Visualisera</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="unfinished">1 Ordning: Intelligent</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="unfinished">Ordning: Intelligent</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="unfinished">1 Ordning: Slump</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="unfinished">Ordning: Slump</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="unfinished">1 Ordning: Rak</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="unfinished">Ordning: Rak</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="unfinished">2 Repetera: Alla</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="unfinished">Repetera: Alla</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="unfinished">2 Repetera: Spår</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="unfinished">Repetera: Spår</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="unfinished">2 Repetera: Ej</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="unfinished">Repetera: Inte</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="unfinished">rot för spellistor</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation type="unfinished">Spelar ström.</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation type="unfinished">Buffrar ström.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="unfinished">Ström pausad.</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished">kbps</translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="unfinished">kHz</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="unfinished">ch</translation>
+    </message>
+    <message>
+        <source>Output error.</source>
+        <translation type="unfinished">Utmatningsfel.</translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation type="unfinished">Ström stoppad.</translation>
+    </message>
+    <message>
+        <source>Finished playing stream.</source>
+        <translation type="unfinished">Strömmen färdigspelad.</translation>
+    </message>
+    <message>
+        <source>Decoder error.</source>
+        <translation type="unfinished">Avkodningsfel.</translation>
     </message>
 </context>
 <context>

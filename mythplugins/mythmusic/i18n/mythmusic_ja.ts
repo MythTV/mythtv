@@ -161,11 +161,11 @@
     </message>
     <message>
         <source>Edit Playlist</source>
-        <translation>プレイリスト編集</translation>
+        <translation type="obsolete">プレイリスト編集</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation>ビジュアライズ</translation>
+        <translation type="obsolete">ビジュアライズ</translation>
     </message>
     <message>
         <source>Rating</source>
@@ -185,39 +185,39 @@
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation>リピート: トラック</translation>
+        <translation type="obsolete">リピート: トラック</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation>リピート: 全て</translation>
+        <translation type="obsolete">リピート: 全て</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation>再生ストリーム.</translation>
+        <translation type="obsolete">再生ストリーム.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation>バッファーストリーム.</translation>
+        <translation type="obsolete">バッファーストリーム.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation>ストリーム停止中.</translation>
+        <translation type="obsolete">ストリーム停止中.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation>出力エラー.</translation>
+        <translation type="obsolete">出力エラー.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation>ストリーム停止中.</translation>
+        <translation type="obsolete">ストリーム停止中.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation>再生ストリーム終了.</translation>
+        <translation type="obsolete">再生ストリーム終了.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation>出コードエラー.</translation>
+        <translation type="obsolete">出コードエラー.</translation>
     </message>
     <message>
         <source>Shuffle: Intelligent</source>
@@ -229,67 +229,166 @@
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation>1 シャッフル: 無し</translation>
+        <translation type="obsolete">1 シャッフル: 無し</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation>シャッフル: 無し</translation>
+        <translation type="obsolete">シャッフル: 無し</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation>2 リピート: 全て</translation>
+        <translation type="obsolete">2 リピート: 全て</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation>2 リピート: トラック</translation>
+        <translation type="obsolete">2 リピート: トラック</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation>2 リピート: 無し</translation>
+        <translation type="obsolete">2 リピート: 無し</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation>リピート: 無し</translation>
+        <translation type="obsolete">リピート: 無し</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation>3 プレイリスト編集</translation>
+        <translation type="obsolete">3 プレイリスト編集</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation>4 ビジュアライズ</translation>
+        <translation type="obsolete">4 ビジュアライズ</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation>1 シャッフル: スマート</translation>
+        <translation type="obsolete">1 シャッフル: スマート</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation>シャッフル: スマート</translation>
+        <translation type="obsolete">シャッフル: スマート</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation>1 シャッフル: ランダム</translation>
+        <translation type="obsolete">1 シャッフル: ランダム</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation>シャッフル: ランダム</translation>
+        <translation type="obsolete">シャッフル: ランダム</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation>プレイリストルート</translation>
+        <translation type="obsolete">プレイリストルート</translation>
+    </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="unfinished">プレイリスト編集</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="unfinished">ビジュアライズ</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="unfinished">3 プレイリスト編集</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="unfinished">4 ビジュアライズ</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="unfinished">1 シャッフル: スマート</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="unfinished">シャッフル: スマート</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="unfinished">1 シャッフル: ランダム</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="unfinished">シャッフル: ランダム</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="unfinished">1 シャッフル: 無し</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="unfinished">シャッフル: 無し</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="unfinished">2 リピート: 全て</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="unfinished">リピート: 全て</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="unfinished">2 リピート: トラック</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="unfinished">リピート: トラック</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="unfinished">2 リピート: 無し</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="unfinished">リピート: 無し</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="unfinished">プレイリストルート</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation type="unfinished">再生ストリーム.</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation type="unfinished">バッファーストリーム.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>ch</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output error.</source>
+        <translation type="unfinished">出力エラー.</translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finished playing stream.</source>
+        <translation type="unfinished">再生ストリーム終了.</translation>
+    </message>
+    <message>
+        <source>Decoder error.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

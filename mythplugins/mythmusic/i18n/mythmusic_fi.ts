@@ -114,111 +114,222 @@
     <name>PlaybackBox</name>
     <message>
         <source>Edit Playlist</source>
-        <translation>Muokkaa Soittolistaa</translation>
+        <translation type="obsolete">Muokkaa Soittolistaa</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation>Visualisoi</translation>
+        <translation type="obsolete">Visualisoi</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation>3 Muokkaa Soittolistaa</translation>
+        <translation type="obsolete">3 Muokkaa Soittolistaa</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation>4 Visualisoi</translation>
+        <translation type="obsolete">4 Visualisoi</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation>1 Satunnaist: Älykäs</translation>
+        <translation type="obsolete">1 Satunnaist: Älykäs</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation>Satunnaist: Älykäs</translation>
+        <translation type="obsolete">Satunnaist: Älykäs</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation>1 Satunnaist: Joku</translation>
+        <translation type="obsolete">1 Satunnaist: Joku</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation>Satunnaist: Joku</translation>
+        <translation type="obsolete">Satunnaist: Joku</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation>1 Satunnaist: Ei Mitään</translation>
+        <translation type="obsolete">1 Satunnaist: Ei Mitään</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation>Satunnaist: Ei Mitään</translation>
+        <translation type="obsolete">Satunnaist: Ei Mitään</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation>2 Toista: Kaikki</translation>
+        <translation type="obsolete">2 Toista: Kaikki</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation>Toista: Kaikki</translation>
+        <translation type="obsolete">Toista: Kaikki</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation>2 Toista: Kappale</translation>
+        <translation type="obsolete">2 Toista: Kappale</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation>Toista: Kappale</translation>
+        <translation type="obsolete">Toista: Kappale</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation>2 Toista: Ei Mitään</translation>
+        <translation type="obsolete">2 Toista: Ei Mitään</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation>Toista: Ei Mitään</translation>
+        <translation type="obsolete">Toista: Ei Mitään</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation>soittolistan juuri</translation>
+        <translation type="obsolete">soittolistan juuri</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation>Soittaa musiikkivirtaa.</translation>
+        <translation type="obsolete">Soittaa musiikkivirtaa.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation>Puskuroi musiikkivirtaa.</translation>
+        <translation type="obsolete">Puskuroi musiikkivirtaa.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation>Musiikkivirta tauotettu.</translation>
+        <translation type="obsolete">Musiikkivirta tauotettu.</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation>kbps</translation>
+        <translation type="obsolete">kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation>kHz</translation>
+        <translation type="obsolete">kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation>kan</translation>
+        <translation type="obsolete">kan</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation>Virhe ulostulossa.</translation>
+        <translation type="obsolete">Virhe ulostulossa.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation>Musiikkivirta lopetettu.</translation>
+        <translation type="obsolete">Musiikkivirta lopetettu.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation>Musiikkivirta soitettu loppuun.</translation>
+        <translation type="obsolete">Musiikkivirta soitettu loppuun.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation>Purkuvirhe.</translation>
+        <translation type="obsolete">Purkuvirhe.</translation>
+    </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="unfinished">Muokkaa Soittolistaa</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="unfinished">Visualisoi</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="unfinished">3 Muokkaa Soittolistaa</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="unfinished">4 Visualisoi</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="unfinished">1 Satunnaist: Älykäs</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="unfinished">Satunnaist: Älykäs</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="unfinished">1 Satunnaist: Joku</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="unfinished">Satunnaist: Joku</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="unfinished">1 Satunnaist: Ei Mitään</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="unfinished">Satunnaist: Ei Mitään</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="unfinished">2 Toista: Kaikki</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="unfinished">Toista: Kaikki</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="unfinished">2 Toista: Kappale</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="unfinished">Toista: Kappale</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="unfinished">2 Toista: Ei Mitään</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="unfinished">Toista: Ei Mitään</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="unfinished">soittolistan juuri</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation type="unfinished">Soittaa musiikkivirtaa.</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation type="unfinished">Puskuroi musiikkivirtaa.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="unfinished">Musiikkivirta tauotettu.</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished">kbps</translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="unfinished">kHz</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="unfinished">kan</translation>
+    </message>
+    <message>
+        <source>Output error.</source>
+        <translation type="unfinished">Virhe ulostulossa.</translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation type="unfinished">Musiikkivirta lopetettu.</translation>
+    </message>
+    <message>
+        <source>Finished playing stream.</source>
+        <translation type="unfinished">Musiikkivirta soitettu loppuun.</translation>
+    </message>
+    <message>
+        <source>Decoder error.</source>
+        <translation type="unfinished">Purkuvirhe.</translation>
     </message>
 </context>
 <context>
