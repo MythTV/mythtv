@@ -39,7 +39,7 @@ MfdInterface::MfdInterface()
     mfd_id_counter = 0;
 }
 
-void MfdInterface::playAudio(int which_mfd, int container, int type, int which_id)
+void MfdInterface::playAudio(int which_mfd, int container, int type, int which_id, int index)
 {
     //
     //  Find the instance, ask it to play something
@@ -53,7 +53,7 @@ void MfdInterface::playAudio(int which_mfd, int container, int type, int which_i
     {
         if(an_mfd->getId() == which_mfd)
         {
-            an_mfd->playAudio(container, type, which_id);
+            an_mfd->playAudio(container, type, which_id, index);
             break;
         }
     }

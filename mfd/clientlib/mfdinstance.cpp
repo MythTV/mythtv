@@ -276,9 +276,9 @@ void MfdInstance::wakeUp()
     
 }
 
-void MfdInstance::playAudio(int container, int type, int which_id)
+void MfdInstance::playAudio(int container, int type, int which_id, int index)
 {
-    if(type == 1)
+    if(type == 1) //item
     {
         //
         //  play metadata item  this is currently a _horrific_ hack
@@ -294,6 +294,26 @@ void MfdInstance::playAudio(int container, int type, int which_id)
             {
                 AudioClient *ac = (AudioClient *)an_sc;
                 ac->playTrack(container, which_id);
+                break;
+            }
+        }
+    }
+    if(type == 2)   // playlist
+    {
+        //
+        //  play list  this is currently a _horrific_ hack
+        //
+
+        for(
+            ServiceClient *an_sc = my_service_clients->first();
+            an_sc;
+            an_sc = my_service_clients->next()
+           )
+        {
+            if(an_sc->getType()    == MFD_SERVICE_AUDIO_CONTROL)
+            {
+                AudioClient *ac = (AudioClient *)an_sc;
+                ac->playList(container, which_id, index);
                 break;
             }
         }

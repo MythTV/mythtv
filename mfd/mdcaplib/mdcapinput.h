@@ -66,6 +66,7 @@ class MdcapInput
     uint32_t    popListItem();
     uint32_t    popDeletedList();
     uint32_t    popDeletedItem();
+    QString     popListItemName();
 
     void        printContents();    // Debugging
     

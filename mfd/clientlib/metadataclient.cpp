@@ -1534,8 +1534,9 @@ void MetadataClient::buildTree()
         //  Iterate over all playlists in this collection
         //
         
-        QIntDict<Playlist> *playlist = a_collection->getPlaylists();
-        QIntDictIterator<Playlist> p_it( *playlist ); 
+        
+        QIntDict<ClientPlaylist> *playlist = a_collection->getPlaylists();
+        QIntDictIterator<ClientPlaylist> p_it( *playlist ); 
         for ( ; p_it.current(); ++p_it )
         {
             GenericTree *playlist_node = playlist_branch->addNode(p_it.current()->getName(), 0, false);
@@ -1546,15 +1547,19 @@ void MetadataClient::buildTree()
             //  Iterate over the entries in this playlist
             //
             
-            QValueList<int> *the_list = p_it.current()->getListPtr();
-            QValueList<int>::iterator l_it;
+            int counter = 0;
+            QValueList<PlaylistEntry> *the_list = p_it.current()->getListPtr();
+            QValueList<PlaylistEntry>::iterator l_it;
             for(l_it = the_list->begin(); l_it != the_list->end(); ++l_it)
             {
-                GenericTree *track_node = playlist_node->addNode(metadata->find((*l_it))->getTitle(), (*l_it), true);
+                GenericTree *track_node = playlist_node->addNode((*l_it).getName(), counter, true);
                 track_node->setAttribute(0, a_collection->getId());
                 track_node->setAttribute(1, 2);
+                track_node->setAttribute(2, p_it.current()->getId());
+                ++counter;
             }
         }
+        
     }
 
 

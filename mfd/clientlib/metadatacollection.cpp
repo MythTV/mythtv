@@ -284,8 +284,7 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
 
     int new_list_id = -1;
     QString new_list_name;
-    QValueList<int> list_entries;    
-    uint32_t a_number;
+    QValueList<PlaylistEntry> list_entries;
     
     bool all_is_well = true;
 
@@ -304,9 +303,19 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
                 new_list_name = mdcap_input.popListName();
                 break;
                 
-            case MarkupCodes::list_item:
-                a_number = mdcap_input.popListItem();
-                list_entries.push_back(a_number);
+            case MarkupCodes::added_list_item_group:
+                {
+                    QValueVector<char> *list_entry = new QValueVector<char>;
+                    mdcap_input.popGroup(list_entry);
+                    MdcapInput rebuilt_internals(list_entry);
+                    PlaylistEntry new_entry = addListEntry(rebuilt_internals);
+                    if(new_entry.getId() > 0)
+                    {
+                        list_entries.push_back(new_entry);
+                    }
+                    delete list_entry;
+                }
+
                 break;
                 
             default:
@@ -338,14 +347,48 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
 
         }
 
-        Playlist *new_playlist = new Playlist(
-                                                id,
-                                                new_list_name,
-                                                &list_entries,
-                                                new_list_id
-                                             );
+        ClientPlaylist *new_playlist = new ClientPlaylist(
+                                                            id,
+                                                            new_list_name,
+                                                            &list_entries,
+                                                            new_list_id
+                                                         );
         playlists.insert(new_list_id, new_playlist);
     }
+}
+
+PlaylistEntry MetadataCollection::addListEntry(MdcapInput &mdcap_input)
+{
+    QString list_entry_name;
+    int     list_entry_id;
+    
+    bool all_is_well = true;
+    while(mdcap_input.size() > 0 && all_is_well) 
+    {
+        char content_code = mdcap_input.peekAtNextCode();
+        if(content_code == MarkupCodes::list_item_name)
+        {
+            list_entry_name = mdcap_input.popListItemName();
+        }
+        else if(content_code == MarkupCodes::list_item)
+        {
+            list_entry_id = mdcap_input.popListItem();
+        }
+        else
+        {
+            cerr << "metadatacollection.o: while doing addListEntry(), "
+                 << "seeing content codes that should not be there"
+                 << endl;
+            all_is_well = false;
+        }
+    }
+    
+    if(all_is_well)
+    {
+        return PlaylistEntry(list_entry_id, list_entry_name);
+    }
+    
+    return PlaylistEntry();
 }
 
 void MetadataCollection::deleteItem(uint which_item)
@@ -384,7 +427,7 @@ void MetadataCollection::printMetadata()
     cout << "\tPlaylists:" << endl;
 
 
-    QIntDictIterator<Playlist> it( playlists );
+    QIntDictIterator<ClientPlaylist> it( playlists );
     for ( ; it.current(); ++it )
     {
         cout << "\t\tPlaylist called \""

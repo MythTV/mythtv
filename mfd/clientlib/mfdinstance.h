@@ -47,7 +47,7 @@ class MfdInstance : public QThread
     void    announceMyDemise();
     int     getId(){return mfd_id;}
     
-    void    playAudio(int container, int type, int which_id);
+    void    playAudio(int container, int type, int which_id, int index);
     void    stopAudio();
     
     //

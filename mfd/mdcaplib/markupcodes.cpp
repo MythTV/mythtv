@@ -16,6 +16,7 @@ const char MarkupCodes::update_group;
 const char MarkupCodes::collection_group;
 const char MarkupCodes::item_group;
 const char MarkupCodes::added_items_group;
+const char MarkupCodes::added_list_item_group;
 const char MarkupCodes::deleted_items_group;
 const char MarkupCodes::added_item_group;
 const char MarkupCodes::list_group;
@@ -31,6 +32,7 @@ const char MarkupCodes::item_album;
 const char MarkupCodes::item_title;
 const char MarkupCodes::item_genre;
 const char MarkupCodes::list_name;
+const char MarkupCodes::list_item_name;
 
 const char MarkupCodes::status_code;
 const char MarkupCodes::protocol_version;

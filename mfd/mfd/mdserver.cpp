@@ -1214,6 +1214,7 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
     bool full_update = true;
     
     metadata_mutex.lock();
+
     MetadataContainer *container = getMetadataContainer(mdcap_request->getContainerId());
     if(!container)
     {
@@ -1437,7 +1438,35 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                             QValueList<int>::iterator item_it;
                             for(item_it = list_items->begin(); item_it != list_items->end(); ++item_it)
                             {
-                                response.addListItem((*item_it));
+                                //
+                                //  Find the Metadata this item_it refers to
+                                //
+
+                                Metadata *a_metadata = getMetadataByContainerAndId(container->getIdentifier(), (*item_it));
+                                if(a_metadata)
+                                {
+                                    AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
+                                    if(audio_metadata)
+                                    {
+                                        response.addListItemGroup();
+                                            response.addListItemName(
+                                                                        QString("%1 ~ %2")
+                                                                        .arg(audio_metadata->getArtist())
+                                                                        .arg(audio_metadata->getTitle())
+                                                                    );
+                                            response.addListItem((*item_it));
+                                        response.endGroup();
+                                    }
+                                    else
+                                    {
+                                        warning("me no do non audio yet");
+                                    }
+                                }
+                                else
+                                {
+                                    warning("playlist entry that does not point to metadata");
+                                }
+                                 
                             }
                         response.endGroup();
                     }
@@ -1486,7 +1515,34 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                                     QValueList<int>::iterator item_it;
                                     for(item_it = list_items->begin(); item_it != list_items->end(); ++item_it)
                                     {
-                                        response.addListItem((*item_it));
+                                        //
+                                        //  Find the Metadata this item_it refers to
+                                        //
+
+                                        Metadata *a_metadata = getMetadataByContainerAndId(container->getIdentifier(), (*item_it));
+                                        if(a_metadata)
+                                        {
+                                            AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
+                                            if(audio_metadata)
+                                            {
+                                                response.addListItemGroup();
+                                                    response.addListItemName(
+                                                                        QString("%1 ~ %2")
+                                                                        .arg(audio_metadata->getArtist())
+                                                                        .arg(audio_metadata->getTitle())
+                                                                            );
+                                                    response.addListItem((*item_it));
+                                                response.endGroup();
+                                            }
+                                            else
+                                            {
+                                                warning("me no do non audio yet");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            warning("playlist entry that does not point to metadata");
+                                        }
                                     }
                                 response.endGroup();
                             }

@@ -50,6 +50,7 @@ class MdcapOutput
     void addListGroup();
     void addAddedListsGroup();
     void addAddedListGroup();
+    void addListItemGroup();
     void addDeletedListsGroup();
     
 
@@ -61,6 +62,7 @@ class MdcapOutput
 
     void addServiceName(const QString &service_name);
     void addCollectionName(const QString &collection_name);
+    void addListItemName(const QString &list_item_name);
 
     //
     //  "element" functions

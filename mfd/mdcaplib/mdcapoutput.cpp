@@ -131,6 +131,13 @@ void MdcapOutput::addAddedListsGroup()
     append((uint32_t) 0);
 }
 
+void MdcapOutput::addListItemGroup()
+{
+    append(MarkupCodes::added_list_item_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
 void MdcapOutput::addAddedListGroup()
 {
     append(MarkupCodes::added_list_group);
@@ -226,6 +233,43 @@ void MdcapOutput::addCollectionName(const QString &collection_name)
     //
 
     append(MarkupCodes::name);
+    
+    //
+    //  This content is a string, it obviously requires a length specification
+    //
+    
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+    
+    //
+    //  Add the name in utf8 format
+    //
+    
+    append(utf8_string, utf8_string.length());
+
+    //
+    //  Now that the name has been inserted, close out this group
+    //  
+    
+    endGroup();
+
+    
+}
+
+void MdcapOutput::addListItemName(const QString &list_item_name)
+{
+
+    //
+    //  A name of an entry on a list
+    //
+
+    QCString utf8_string = list_item_name.utf8();
+    
+    //
+    //  Put in a content code
+    //
+
+    append(MarkupCodes::list_item_name);
     
     //
     //  This content is a string, it obviously requires a length specification

@@ -178,7 +178,11 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                         }
                     }
                 }
-                else if(tokens[1] == "container" || tokens[1] == "playlist")
+                else if(
+                        tokens[1] == "container" || 
+                        tokens[1] == "playlist"  || 
+                        tokens[1] == "list"
+                        )
                 {
                     if(tokens.count() < 4)
                     {

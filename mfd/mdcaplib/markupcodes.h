@@ -38,12 +38,13 @@ class MarkupCodes
     static const char item_group            = 5;
     static const char added_items_group     = 6;
     static const char added_item_group      = 7;
-    static const char deleted_items_group    = 8;
+    static const char added_list_item_group = 8;
+    static const char deleted_items_group   = 9;
 
-    static const char list_group            = 9;
-    static const char added_lists_group     = 10;
-    static const char deleted_lists_group   = 11;
-    static const char added_list_group      = 12;
+    static const char list_group            = 10;
+    static const char added_lists_group     = 11;
+    static const char deleted_lists_group   = 12;
+    static const char added_list_group      = 13;
     
     //
     //  Smaller items that implicitly imply groups (by virtue of being of
@@ -57,7 +58,7 @@ class MarkupCodes
     static const char item_title            = 20;
     static const char item_genre            = 21;
     static const char list_name             = 22;
-    
+    static const char list_item_name        = 23;    
     
     //
     //  Simple types of fixed lengths

@@ -1050,6 +1050,36 @@ uint32_t MdcapInput::popDeletedItem()
     return popU32();    
 }
 
+QString MdcapInput::popListItemName()
+{
+    QValueVector<char> list_item_string_vector;
+    char content_code = popGroup(&list_item_string_vector);
+    
+    if(content_code != MarkupCodes::list_item_name)
+    {
+        cerr << "mdcapinput.o: asked to do popListItemName(), but this "
+             << "doesn't look like an list_item_name ("
+             << (int) ((uint8_t )content_code)
+             << ")"
+             << endl;
+        return QString("");
+    }
+    
+    
+    char *utf8_list_item_name = new char [list_item_string_vector.size() + 1];
+    for(uint i = 0; i < list_item_string_vector.size(); i++)
+    {
+        utf8_list_item_name[i] = list_item_string_vector[i];
+    }
+    utf8_list_item_name[list_item_string_vector.size()] = '\0';
+    
+    QString the_list_item_name = QString::fromUtf8(utf8_list_item_name);
+    
+    delete [] utf8_list_item_name;
+    
+    return the_list_item_name;
+}
+
 
 
 void MdcapInput::printContents()
