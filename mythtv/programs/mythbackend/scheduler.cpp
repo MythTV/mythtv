@@ -288,7 +288,12 @@ bool Scheduler::FindInOldRecordings(ProgramInfo *pginfo)
 
     query = db->exec(thequery);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (!query.isActive()) {
+        MythContext::DBError("find in oldrecorded", query);
+        return false;
+    }
+
+    if (query.numRowsAffected() > 0)
         return true;
     return false;
 }
