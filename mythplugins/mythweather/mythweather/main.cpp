@@ -31,16 +31,9 @@ int mythplugin_config(void);
 
 int mythplugin_init(const char *libversion)
 {
-    QString lib = libversion;
-    if (lib != MYTH_BINARY_VERSION)
-    {
-        cerr << "This plugin was compiled against libmyth version: "
-             << MYTH_BINARY_VERSION
-             << "\nbut the library is version: " << libversion << endl;
-        cerr << "You probably want to recompile everything, and do a\n"
-             << "'make distclean' first.\n";
+    if (!gContext->TestPopupVersion("mythweather", libversion,
+                                    MYTH_BINARY_VERSION))
         return -1;
-    }
 
     return 0;
 }
