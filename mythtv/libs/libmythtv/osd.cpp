@@ -147,49 +147,6 @@ void OSD::SetDefaults(void)
                                           displaywidth, displayheight);
         container->AddType(ccpage);
     }
-
-/*
-    container = GetSet("menu");
-    if (!container)
-    {
-        QString name = "menu";
-        container = new OSDSet(name, true, vid_width, vid_height,
-                               wmult, hmult, frameint);
-        AddSet(container, name);
-
-        QRect area = QRect(20, 20, 200, 300);
-        OSDListBtnType *lb = new OSDListBtnType("menu", area, wmult,
-                                                hmult, true, true);
-        lb->SetItemRegColor(QColor("#505050"), QColor("#000000"), 100);
-        lb->SetItemSelColor(QColor("#52CA38"), QColor("#349838"), 255);
-
-        lb->SetSpacing((int)(2 * hmult));
-        lb->SetMargin((int)(2 * wmult));
-
-        TTFFont *actfont = GetFont("infofont");
-        TTFFont *inactfont = GetFont("infofontgray");
-
-        lb->SetFontActive(actfont);
-        lb->SetFontInactive(inactfont);
-
-        lb->SetActive(true);
-
-        container->AddType(lb);
-
-        OSDListBtnTypeItem *item;
-
-        item = new OSDListBtnTypeItem(lb, "test 1");
-        item = new OSDListBtnTypeItem(lb, "test 2");
-        item = new OSDListBtnTypeItem(lb, "test 3");
-        item = new OSDListBtnTypeItem(lb, "test 4");
-        item = new OSDListBtnTypeItem(lb, "test 5");
-        item = new OSDListBtnTypeItem(lb, "test 6");
-        item = new OSDListBtnTypeItem(lb, "test 7");
-        item = new OSDListBtnTypeItem(lb, "test 8");
-        item = new OSDListBtnTypeItem(lb, "test 9");
-        item = new OSDListBtnTypeItem(lb, "test 10");
-    }
-*/
 }
 
 void OSD::Reinit(int width, int height, int frint, int dispx, int dispy, 
@@ -427,7 +384,7 @@ void OSD::parseBox(OSDSet *container, QDomElement &element)
             if (info.tagName() == "area")
             {
                 area = parseRect(getFirstText(info));
-                normalizeRect(&area);
+                normalizeRect(area);
             }
             else
             {
@@ -519,7 +476,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
             if (info.tagName() == "area")
             {
                 area = parseRect(getFirstText(info));
-                normalizeRect(&area);
+                normalizeRect(area);
             }
             else if (info.tagName() == "font")
             {
@@ -648,7 +605,7 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
             if (info.tagName() == "area")
             {
                 area = parseRect(getFirstText(info));
-                normalizeRect(&area);            
+                normalizeRect(area);            
             }
             else if (info.tagName() == "filename")
             {
@@ -732,7 +689,7 @@ void OSD::parseEditArrow(OSDSet *container, QDomElement &element)
             if (info.tagName() == "area")
             {
                 area = parseRect(getFirstText(info));
-                normalizeRect(&area);
+                normalizeRect(area);
             }
             else if (info.tagName() == "filename")
             {
@@ -787,7 +744,7 @@ void OSD::parsePositionRects(OSDSet *container, QDomElement &element)
             if (info.tagName() == "area")
             {
                 QRect area = parseRect(getFirstText(info));
-                normalizeRect(&area);
+                normalizeRect(area);
 
                 rects->AddPosition(area);
             }
@@ -853,6 +810,139 @@ void OSD::parsePositionImage(OSDSet *container, QDomElement &element)
     image->LoadImage(filename, wmult, hmult, scale.x(), scale.y());
 
     container->AddType(image);
+}
+
+void OSD::parseListTree(OSDSet *container, QDomElement &element)
+{
+    QRect   area = QRect(0,0,0,0);
+    QString fontActive;
+    QString fontInactive;
+    bool    showArrow = true;
+    bool    showScrollArrows = false;
+    QColor  grUnselectedBeg(Qt::black);
+    QColor  grUnselectedEnd(80,80,80);
+    uint    grUnselectedAlpha(100);
+    QColor  grSelectedBeg(82,202,56);
+    QColor  grSelectedEnd(52,152,56);
+    uint    grSelectedAlpha(255);
+    int     spacing = 2;
+    int     margin = 3;
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "listtree needs a name\n";
+        return;
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling()) 
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else if (info.tagName() == "fcnfont")
+            {
+                QString fontName = info.attribute("name", "");
+                QString fontFcn  = info.attribute("function", "");
+
+                if (fontFcn.lower() == "active")
+                    fontActive = fontName;
+                else if (fontFcn.lower() == "inactive")
+                    fontInactive = fontFcn;
+                else 
+                {
+                    cerr << "Unknown font function for listtree area: "
+                         << fontFcn << endl;
+                    return;
+                }
+            }
+            else if (info.tagName() == "showarrow") 
+            {
+                if (getFirstText(info).lower() == "no")
+                    showArrow = false;
+            }
+            else if (info.tagName() == "showscrollarrows") 
+            {
+                if (getFirstText(info).lower() == "yes")
+                    showScrollArrows = true;
+            }
+            else if (info.tagName() == "gradient") 
+            {
+                if (info.attribute("type","").lower() == "selected") 
+                {
+                    grSelectedBeg = QColor(info.attribute("start"));
+                    grSelectedEnd = QColor(info.attribute("end"));
+                    grSelectedAlpha = info.attribute("alpha","255").toUInt();
+                }
+                else if (info.attribute("type","").lower() == "unselected") 
+                {
+                    grUnselectedBeg = QColor(info.attribute("start"));
+                    grUnselectedEnd = QColor(info.attribute("end"));
+                    grUnselectedAlpha = info.attribute("alpha","100").toUInt();
+                }
+                else 
+                {
+                    cerr << "Unknown type for gradient in listtree area\n";
+                    return;
+                }
+
+                if (!grSelectedBeg.isValid() || !grSelectedEnd.isValid() ||
+                    !grUnselectedBeg.isValid() || !grUnselectedEnd.isValid()) 
+                {
+                    cerr << "Unknown color for gradient in listtree area\n";
+                    return;
+                }
+
+                if (grSelectedAlpha > 255 || grUnselectedAlpha > 255) {
+                    cerr << "Incorrect alpha for gradient in listtree area\n";
+                    return;
+                }
+            }
+            else if (info.tagName() == "spacing") {
+                spacing = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "margin") {
+                margin = getFirstText(info).toInt();
+            }
+            else
+            {
+                cerr << "Unknown tag in listtree area: "
+                     << info.tagName() << endl;
+                return;
+            }
+        }
+    }
+
+    TTFFont *fpActive = GetFont(fontActive);
+    if (!fpActive)
+    {
+        cerr << "Unknown font: " << fontActive << " in listtree\n";
+        return;
+    }
+
+    TTFFont *fpInactive = GetFont(fontInactive);
+    if (!fpInactive)
+    {
+        cerr << "Unknown font: " << fontInactive << " in listtree\n";
+        return;
+    }
+
+    OSDListBtnType *lb = new OSDListBtnType(name, area, wmult, hmult, true, 
+                                            true);
+    lb->SetFontActive(fpActive);
+    lb->SetFontInactive(fpInactive);
+    lb->SetItemRegColor(grUnselectedBeg, grUnselectedEnd, grUnselectedAlpha);
+    lb->SetItemSelColor(grSelectedBeg, grSelectedEnd, grSelectedAlpha);
+    lb->SetSpacing((int)(spacing * hmult));
+    lb->SetMargin((int)(margin * wmult));
+
+    container->AddType(lb);
 }
 
 void OSD::parseContainer(QDomElement &element)
@@ -923,6 +1013,10 @@ void OSD::parseContainer(QDomElement &element)
             else if (info.tagName() == "positionimage")
             {
                 parsePositionImage(container, info);
+            }
+            else if (info.tagName() == "listtreemenu")
+            {
+                parseListTree(container, info);
             }
             else
             {
@@ -997,12 +1091,12 @@ bool OSD::LoadTheme(void)
     return true;
 }
 
-void OSD::normalizeRect(QRect *rect)
+void OSD::normalizeRect(QRect &rect)
 {   
-    rect->setWidth((int)(rect->width() * wmult));
-    rect->setHeight((int)(rect->height() * hmult));
-    rect->moveTopLeft(QPoint((int)(xoffset + rect->x() * wmult),
-                             (int)(yoffset + rect->y() * hmult)));
+    rect.setWidth((int)(rect.width() * wmult));
+    rect.setHeight((int)(rect.height() * hmult));
+    rect.moveTopLeft(QPoint((int)(xoffset + rect.x() * wmult),
+                            (int)(yoffset + rect.y() * hmult)));
 }       
 
 QPoint OSD::parsePoint(QString text)

@@ -63,6 +63,8 @@ OSDListBtnType::OSDListBtnType(const QString& name, const QRect& area,
 
     SetItemRegColor(Qt::black,QColor(80,80,80),100);
     SetItemSelColor(QColor(82,202,56),QColor(52,152,56),255);
+
+    m_visible = false;
 }
 
 OSDListBtnType::~OSDListBtnType()
@@ -293,6 +295,9 @@ void OSDListBtnType::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
 {
     (void)xoff;
     (void)yoff;
+
+    if (!m_visible)
+        return;
 
     if (!m_initialized)
         Init();

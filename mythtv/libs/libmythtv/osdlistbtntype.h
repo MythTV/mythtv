@@ -28,14 +28,42 @@
 #include <qptrlist.h>
 
 class OSDListBtnTypeItem;
+class OSDListBtnType;
 
+class OSDListTreeType : public OSDType
+{
+    Q_OBJECT
+  public:
+    OSDListTreeType(const QString &name, const QRect &area,
+                    float wmult, float hmult);
+
+    OSDListBtnType *GetLevelAt(unsigned int index);
+    
+  private:
+    int levels;
+    int curlevel;
+
+    TTFFont *active;
+    TTFFont *inactive;
+
+    QColor    m_itemRegBeg;
+    QColor    m_itemRegEnd;
+    QColor    m_itemSelBeg;
+    QColor    m_itemSelEnd;
+    uint      m_itemRegAlpha;
+    uint      m_itemSelAlpha;
+   
+    int spacing;
+    int margin;
+};
+ 
 class OSDListBtnType : public OSDType
 {
     Q_OBJECT
 
   public:
 
-    OSDListBtnType(const QString& name, const QRect& area, 
+    OSDListBtnType(const QString &name, const QRect& area,
                    float wmult, float hmult,
                    bool showArrow = true, bool showScrollArrows = false);
     ~OSDListBtnType();
@@ -63,6 +91,9 @@ class OSDListBtnType : public OSDType
 
     void  MoveDown();
     void  MoveUp();
+
+    bool  isVisible() { return m_visible; }
+    void  setVisible(bool vis) { m_visible = vis; }
 
   private:
 
@@ -119,6 +150,8 @@ class OSDListBtnType : public OSDType
     OSDListBtnTypeItem* m_topItem;
     OSDListBtnTypeItem* m_selItem;
     QPtrList<OSDListBtnTypeItem> m_itemList;
+
+    bool      m_visible;
 
     friend class OSDListBtnTypeItem;
     

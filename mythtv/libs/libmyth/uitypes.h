@@ -18,6 +18,7 @@
 #include "mythwidgets.h"
 #include "util.h"
 #include "mythdialogs.h"
+#include "generictree.h"
 
 using namespace std;
 
@@ -553,89 +554,6 @@ class UIStatusBarType : public UIType
     
     int m_orientation;
     
-};
-
-class GenericTree
-{
-    //
-    //  This is used by the UIType below
-    //  (UIManagedTreeListType) to fill it
-    //  with arbitrary simple data types and
-    //  allow that object to fire SIGNALS
-    //  when nodes, leafnodes, etc. are reached
-    //  by the user
-    //
-    typedef QValueVector<int> IntVector;
-
-  public:
-
-    GenericTree();
-    GenericTree(const QString a_string);
-    GenericTree(QString a_string, int an_int);
-    GenericTree(QString a_string, int an_int, bool selectable_flag);
-    ~GenericTree();
-
-    GenericTree*  addNode(QString a_string);
-    GenericTree*  addNode(QString a_string, int an_int);
-    GenericTree*  addNode(QString a_string, int an_int, bool selectable_flag);
-    GenericTree*  findLeaf();
-    GenericTree*  findLeaf(int ordering_index);
-    GenericTree*  findNode(QValueList<int> route_of_branches);
-    GenericTree*  recursiveNodeFinder(QValueList<int> route_of_branches);
-    bool          checkNode(QValueList<int> route_of_branches);
-    GenericTree*  nextSibling(int number_down);
-    GenericTree*  nextSibling(int number_down, int ordering_index);
-    GenericTree*  prevSibling(int number_up);
-    GenericTree*  prevSibling(int number_up, int ordering_index);
-    GenericTree*  getParent();
-    GenericTree*  getChildAt(uint reference);
-    GenericTree*  getSelectedChild(int ordering_index);
-    GenericTree*  getChildAt(uint reference, int ordering_index);
-    int           getChildPosition(GenericTree *which_child);
-    int           getChildPosition(GenericTree *which_child, int ordering_index);
-    int           getPosition();
-    int           getPosition(int ordering_index);
-    void          init();
-    void          setInt(int an_int){my_int = an_int;}
-    int           getInt(){return my_int;}
-    void          setParent(GenericTree* a_parent){my_parent = a_parent;}
-    const QString getString(){return my_string;}
-    void          printTree(int margin);    // debugging
-    void          printTree(){printTree(0);}// debugging
-    int           calculateDepth(int start);
-    int           childCount(){return my_subnodes.count();}
-    int           siblingCount();
-    void          setSelectable(bool flag){selectable = flag;}
-    bool          isSelectable(){return selectable;}
-    void          setAttribute(uint attribute_position, int value_of_attribute);
-    int           getAttribute(uint which_one);
-    IntVector*    getAttributes(){return my_attributes;}
-    void          reorderSubnodes(int ordering_index);
-    void          setOrderingIndex(int ordering_index){current_ordering_index = ordering_index;}
-    int           getOrderingIndex(){return current_ordering_index;}
-    void          becomeSelectedChild();
-    void          setSelectedChild(GenericTree* a_node){my_selected_subnode = a_node;}
-    void          addYourselfIfSelectable(QPtrList<GenericTree> *flat_list);
-    void          buildFlatListOfSubnodes(int ordering_index, bool scrambled_parents);
-    GenericTree*  nextPrevFromFlatList(bool forward_or_back, bool wrap_around, GenericTree *active);
-    GenericTree*  getChildByName(QString a_name);
-    void          sortByString();
-    void          sortBySelectable();
-    void          deleteAllChildren();
-
-  private:
-
-    QString               my_string;
-    QStringList           my_stringlist;
-    int                   my_int;
-    QPtrList<GenericTree> my_subnodes;
-    QPtrList<GenericTree> my_ordered_subnodes;
-    QPtrList<GenericTree> my_flatened_subnodes;
-    GenericTree*          my_selected_subnode;
-    IntVector             *my_attributes;
-    GenericTree*          my_parent;
-    bool                  selectable;
-    int                   current_ordering_index;
 };
 
 class UIManagedTreeListType : public UIType

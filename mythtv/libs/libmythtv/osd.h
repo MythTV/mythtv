@@ -114,7 +114,7 @@ class OSD : public QObject
     void HighlightDialogSelection(OSDSet *container, int num);  
  
     bool LoadTheme();
-    void normalizeRect(QRect *rect);
+    void normalizeRect(QRect &rect);
     QPoint parsePoint(QString text);
     QRect parseRect(QString text);
 
@@ -130,6 +130,7 @@ class OSD : public QObject
     void parseEditArrow(OSDSet *container, QDomElement &element);
     void parsePositionRects(OSDSet *container, QDomElement &element);
     void parsePositionImage(OSDSet *container, QDomElement &element);
+    void parseListTree(OSDSet *container, QDomElement &element);
 
     QString fontname;
     QString ccfontname;
