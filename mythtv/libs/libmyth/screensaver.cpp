@@ -10,13 +10,21 @@ using namespace std;
 #endif
 
 
+ScreenSaverControl* ScreenSaverSingleton = NULL;
+
 ScreenSaverControl* ScreenSaverControl::get(void)
 {
+    if (!ScreenSaverSingleton)
+    {
+  
 #if defined(Q_WS_X11)
-    return new ScreenSaverX11();
+        ScreenSaverSingleton = new ScreenSaverX11();
+#elif defined(CONFIG_DARWIN)
+        ScreenSaverSingleton = new ScreenSaverOSX();
+#else
+        ScreenSaverSingleton = new ScreenSaverNull();
 #endif
-#ifdef CONFIG_DARWIN
-    return new ScreenSaverOSX();
-#endif
-    return new ScreenSaverNull();
+    }
+    
+    return ScreenSaverSingleton;
 }
