@@ -2347,14 +2347,14 @@ void Weather::setWeatherIcon(QString txtType)
         if (txtType.replace(QRegExp("  "),  "" ) == 
             (wData[j].typeName).replace(QRegExp("  "),  "" ))
         {
-            curIcon = wData[j].typeIcon;
+            curIcon = "weather/" + wData[j].typeIcon;
             description = tr(wData[j].typeName);
             return;
         }
         
         if (txtType.toInt() == wData[j].typeNum)
         {
-            curIcon = wData[j].typeIcon;
+            curIcon = "weather/" + wData[j].typeIcon;
             description = tr(wData[j].typeName);
             return;
         }
