@@ -25,6 +25,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythmedia.h>
+#include <mythtv/mythdbcon.h>
 
 void CheckFreeDBServerFile(void)
 {
@@ -119,7 +120,7 @@ void SavePending(QSqlDatabase *db, int pending)
     //  Temporary Hack until mythmusic
     //  has a proper settings/setup
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("SELECT * FROM settings "
                   "WHERE value = :LASTPUSH "
                   "AND hostname = :HOST ;");
@@ -129,7 +130,7 @@ void SavePending(QSqlDatabase *db, int pending)
     if (query.exec() && query.size() == 0)
     {
         //  first run from this host / recent version
-        QSqlQuery subquery(QString::null, db);
+        MSqlQuery subquery(QString::null, db);
         subquery.prepare("INSERT INTO settings (value,data,hostname) VALUES "
                          "(:LASTPUSH, :DATA, :HOST );");
         subquery.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
@@ -141,7 +142,7 @@ void SavePending(QSqlDatabase *db, int pending)
     else if (query.size() == 1)
     {
         //  ah, just right
-        QSqlQuery subquery(QString::null, db);
+        MSqlQuery subquery(QString::null, db);
         subquery.prepare("UPDATE settings SET data = :DATA WHERE "
                          "WHERE value = :LASTPUSH "
                          "AND hostname = :HOST ;");
@@ -156,7 +157,7 @@ void SavePending(QSqlDatabase *db, int pending)
         //  correct thor's diabolical plot to 
         //  consume all table space
 
-        QSqlQuery subquery(QString::null, db);
+        MSqlQuery subquery(QString::null, db);
         subquery.prepare("DELETE FROM settings WHERE "
                          "WHERE value = :LASTPUSH "
                          "AND hostname = :HOST ;");
@@ -181,7 +182,7 @@ void SearchDir(QString &directory)
 
     BuildFileList(directory, music_files);
 
-    QSqlQuery query("SELECT filename FROM musicmetadata "
+    MSqlQuery query("SELECT filename FROM musicmetadata "
                     "WHERE filename NOT LIKE ('%://%');",
                      QSqlDatabase::database());
 
@@ -433,7 +434,7 @@ static void preMusic(MusicData *mdata)
 
     QSqlDatabase *db = QSqlDatabase::database();
 
-    QSqlQuery count_query("SELECT COUNT(*) FROM musicmetadata;", db);
+    MSqlQuery count_query("SELECT COUNT(*) FROM musicmetadata;", db);
 
     bool musicdata_exists = false;
     if (count_query.isActive())

@@ -7,6 +7,7 @@ using namespace std;
 #include "dbcheck.h"
 
 #include "mythcontext.h"
+#include "mythdbcon.h"
 
 const QString currentDatabaseVersion = "1071";
 
@@ -1136,7 +1137,7 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
         {
             QSqlDatabase *db = QSqlDatabase::database();
 
-            QSqlQuery query(QString::null, db);
+            MSqlQuery query(QString::null, db);
             query.prepare("UPDATE record SET autocommflag = 1;");
             query.exec();
         }

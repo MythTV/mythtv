@@ -76,7 +76,7 @@ void FileAssociation::saveYourself()
             //  save its changes.
             //
 
-            QSqlQuery query(QString::null, db);
+            MSqlQuery query(QString::null, db);
             query.prepare("UPDATE videotypes SET playcommand = :COMMAND, "
                           "f_ignore = :IGNORE, use_default = :DEFAULT "
                           "WHERE intid = :ID ;");
@@ -89,7 +89,7 @@ void FileAssociation::saveYourself()
         }
         else
         {
-            QSqlQuery query(QString::null, db);
+            MSqlQuery query(QString::null, db);
             query.prepare("INSERT INTO videotypes "
                           "(extension, playcommand, f_ignore, use_default) "
                           "VALUES (:EXT, :COMMAND, :IGNORE, :DEFAULT) ;");
@@ -108,7 +108,7 @@ void FileAssociation::deleteYourselfFromDB()
 {
     if(loaded_from_db)
     {
-        QSqlQuery query(QString::null, db);
+        MSqlQuery query(QString::null, db);
         query.prepare("DELETE FROM videotypes WHERE intid = :ID ;");
         query.bindValue(":ID", id);
         if(!query.exec())
@@ -236,7 +236,7 @@ void FileAssocDialog::loadFileAssociations()
                                "f_ignore, use_default "
                                "FROM videotypes ;");
     
-    QSqlQuery a_query(q_string, db);
+    MSqlQuery a_query(q_string, db);
     if(a_query.isActive() && a_query.size() > 0)
     {
         while(a_query.next())

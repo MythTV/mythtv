@@ -14,6 +14,7 @@
 #include "dialogbox.h"
 #include "remoteutil.h"
 #include "jobqueue.h"
+#include "mythdbcon.h"
 
 using namespace std;
 
@@ -431,7 +432,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 
     if (db)
     {
-        QSqlQuery query(QString::null, db);
+        MSqlQuery query(QString::null, db);
         query.prepare("SELECT icon FROM channel WHERE chanid = :CHANID ;");
         query.bindValue(":CHANID", chanid);
         
@@ -519,7 +520,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
                                    "WHERE chanid = \"%1\";")
                                    .arg(channel);
 
-        QSqlQuery query(QString::null, db);
+        MSqlQuery query(QString::null, db);
         query.prepare(querystr);
 
         if (!query.exec() || !query.isActive())
@@ -569,7 +570,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                                                  const QString &channel, 
                                                  const QString &starttime)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("SELECT recorded.chanid,starttime,endtime,title, "
                   "subtitle,description,channel.channum, "
                   "channel.callsign,channel.name,channel.commfree, "
@@ -723,7 +724,7 @@ int ProgramInfo::GetAutoRunJobs(QSqlDatabase *db)
 
 int ProgramInfo::GetChannelRecPriority(QSqlDatabase *db, const QString &chanid)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("SELECT recpriority FROM channel WHERE chanid = :CHANID ;");
     query.bindValue(":CHANID", chanid);
     
@@ -797,7 +798,7 @@ void ProgramInfo::ApplyRecordRecGroupChange(QSqlDatabase *db,
                                             const QString &newrecgroup)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE recorded"
                   " SET recgroup = :RECGROUP"
@@ -987,7 +988,7 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
     QString starts = recstartts.toString("yyyyMMddhhmm00");
     QString ends = recendts.toString("yyyyMMddhhmm00");
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("INSERT INTO recorded (chanid,starttime,endtime,title,"
                   " subtitle,description,hostname,category,recgroup,"
                   " autoexpire,recordid,seriesid,programid,stars,"
@@ -1038,7 +1039,7 @@ void ProgramInfo::SetFilesize(long long fsize, QSqlDatabase *db)
     MythContext::KickDatabase(db);
     filesize = fsize;
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("UPDATE recorded SET filesize = :FILESIZE"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
@@ -1054,7 +1055,7 @@ void ProgramInfo::SetFilesize(long long fsize, QSqlDatabase *db)
 long long ProgramInfo::GetFilesize(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     
     query.prepare("SELECT filesize FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1076,7 +1077,7 @@ long long ProgramInfo::GetFilesize(QSqlDatabase *db)
 void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE recorded"
                   " SET bookmark = :BOOKMARK"
@@ -1102,7 +1103,7 @@ void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
 long long ProgramInfo::GetBookmark(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     long long pos = 0;
 
     if (ignoreBookmark)
@@ -1128,7 +1129,7 @@ long long ProgramInfo::GetBookmark(QSqlDatabase *db)
 bool ProgramInfo::IsEditing(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT editing FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1148,7 +1149,7 @@ bool ProgramInfo::IsEditing(QSqlDatabase *db)
 void ProgramInfo::SetEditing(bool edit, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     
     query.prepare("UPDATE recorded"
                   " SET editing = :EDIT"
@@ -1166,7 +1167,7 @@ void ProgramInfo::SetEditing(bool edit, QSqlDatabase *db)
 void ProgramInfo::SetDeleteFlag(bool deleteFlag, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE recorded"
                   " SET deletepending = :DELETEFLAG"
@@ -1187,7 +1188,7 @@ void ProgramInfo::SetDeleteFlag(bool deleteFlag, QSqlDatabase *db)
 bool ProgramInfo::IsCommFlagged(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     
     query.prepare("SELECT commflagged FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1207,7 +1208,7 @@ bool ProgramInfo::IsCommFlagged(QSqlDatabase *db)
 void ProgramInfo::SetCommFlagged(int flag, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE recorded"
                   " SET commflagged = :FLAG"
@@ -1225,7 +1226,7 @@ void ProgramInfo::SetCommFlagged(int flag, QSqlDatabase *db)
 bool ProgramInfo::IsCommProcessing(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     
     query.prepare("SELECT commflagged FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1246,7 +1247,7 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE recorded"
                   " SET preserve = :PRESERVE"
@@ -1263,7 +1264,7 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode, QSqlDatabase *db)
 void ProgramInfo::SetAutoExpire(bool autoExpire, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE recorded"
                   " SET autoexpire = :AUTOEXPIRE"
@@ -1281,7 +1282,7 @@ void ProgramInfo::SetAutoExpire(bool autoExpire, QSqlDatabase *db)
 bool ProgramInfo::GetAutoExpireFromRecorded(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT autoexpire FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1301,7 +1302,7 @@ bool ProgramInfo::GetAutoExpireFromRecorded(QSqlDatabase *db)
 bool ProgramInfo::GetPreserveEpisodeFromRecorded(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT preserve FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1321,7 +1322,7 @@ bool ProgramInfo::GetPreserveEpisodeFromRecorded(QSqlDatabase *db)
 bool ProgramInfo::UsesMaxEpisodes(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT maxepisodes FROM record WHERE "
                   "recordid = :RECID ;");
@@ -1343,7 +1344,7 @@ void ProgramInfo::GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
 
     delMap.clear();
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT cutlist FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1408,7 +1409,7 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
     }
 
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE recorded"
                   " SET cutlist = :CUTLIST"
@@ -1455,7 +1456,7 @@ void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames,
 void ProgramInfo::ClearMarkupMap(QSqlDatabase *db, int type,
                                  long long min_frame, long long max_frame)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     QString comp = "";
 
     if (min_frame >= 0)
@@ -1503,7 +1504,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
                                long long max_frame)
 {
     QMap<long long, int>::Iterator i;
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     
     if (!isVideo)
     {
@@ -1573,7 +1574,7 @@ void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
         marks.clear();
 
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     
     if (isVideo)
     {
@@ -1630,7 +1631,7 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type,
 {
     posMap.clear();
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     if (isVideo)
     {
@@ -1660,7 +1661,7 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type,
 
 void ProgramInfo::ClearPositionMap(int type, QSqlDatabase *db)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
   
     if (isVideo)
     {
@@ -1690,47 +1691,46 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
                                  long long max_frame)
 {
     QMap<long long, long long>::Iterator i;
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString min_comp = " ";
-    QString max_comp = " ";
+    MSqlQuery query(QString::null, db);
+    QString comp = "";
 
     if (min_frame >= 0)
     {
         char tempc[128];
-        sprintf(tempc, "AND mark >= %lld", min_frame);
-        min_comp += tempc;
+        sprintf(tempc, " AND mark >= %lld ", min_frame);
+        comp += tempc;
     }
 
     if (max_frame >= 0)
     {
         char tempc[128];
-        sprintf(tempc, "AND mark <= %lld", max_frame);
-        max_comp += tempc;
+        sprintf(tempc, " AND mark <= %lld ", max_frame);
+        comp += tempc;
     }
-
-    QString querystr;
 
     if(isVideo)
     {
-        querystr = QString("DELETE FROM filemarkup "
-                           "WHERE filename = '%1' AND type = %2 %3 %4;")
-                           .arg(pathname).arg(type)
-                           .arg(min_comp).arg(max_comp);
+        query.prepare("DELETE FROM filemarkup"
+                      " WHERE filename = :PATH"
+                      " AND type = :TYPE"
+                      + comp + ";");
+        query.bindValue(":PATH", pathname);
     }
     else
     {
-        querystr = QString("DELETE FROM recordedmarkup "
-                           "WHERE chanid = '%1' AND starttime = '%2' "
-                           "AND type = %3 %4 %5;")
-                           .arg(chanid).arg(starts).arg(type)
-                           .arg(min_comp).arg(max_comp);
+        query.prepare("DELETE FROM recordedmarkup"
+                      " WHERE chanid = :CHANID"
+                      " AND starttime = :STARTTIME"
+                      " AND type = :TYPE"
+                      + comp + ";");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
     }
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
-        MythContext::DBError("position map clear", querystr);
+    query.bindValue(":TYPE", type);
+    
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("position map clear", 
+                             query);
 
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
@@ -1753,26 +1753,28 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
 
         if (isVideo)
         {
-            querystr = QString("INSERT INTO filemarkup (filename, "
-                               "mark, type, offset) values "
-                               "( '%1', %2, %3, \"%4\");")
-                               .arg(pathname)
-                               .arg(frame_str).arg(type)
-                               .arg(offset_str);
+            query.prepare("INSERT INTO filemarkup"
+                          " (filename, mark, type, offset)"
+                          " VALUES"
+                          " ( :PATH , :MARK , :TYPE , :OFFSET );");
+            query.bindValue(":PATH", pathname);
         }
         else
         {        
-            querystr = QString("INSERT INTO recordedmarkup (chanid, starttime, "
-                               "mark, type, offset) values "
-                               "( '%1', '%2', %3, %4, \"%5\");")
-                               .arg(chanid).arg(starts)
-                               .arg(frame_str).arg(type)
-                               .arg(offset_str);
+            query.prepare("INSERT INTO recordedmarkup"
+                          " (chanid, starttime, mark, type, offset)"
+                          " VALUES"
+                          " ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET );");
+            query.bindValue(":CHANID", chanid);
+            query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
         }
+        query.bindValue(":MARK", frame_str);
+        query.bindValue(":TYPE", type);
+        query.bindValue(":OFFSET", offset_str);
         
-        QSqlQuery subquery = db->exec(querystr);
-        if (!subquery.isActive())
-            MythContext::DBError("position map insert", querystr);
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("position map insert", 
+                                 query);
     }
 }
 
@@ -1780,9 +1782,7 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
                                       int type, QSqlDatabase *db)
 {
     QMap<long long, long long>::Iterator i;
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
+    MSqlQuery query(QString::null, db);
 
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
@@ -1797,29 +1797,30 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
        
         QString offset_str = tempc;
 
-        QString querystr;
-
         if (isVideo)
         {
-            querystr = QString("INSERT INTO filemarkup "
-                               "(filename, mark, type, offset) VALUES "
-                               "( '%1', %2, %3, \"%4\");")
-                               .arg(chanid)
-                               .arg(frame_str).arg(type)
-                               .arg(offset_str);
+            query.prepare("INSERT INTO filemarkup"
+                          " (filename, mark, type, offset)"
+                          " VALUES"
+                          " ( :PATH , :MARK , :TYPE , :OFFSET );");
+            query.bindValue(":PATH", pathname);
         }
         else
         {
-            querystr = QString("INSERT INTO recordedmarkup "
-                               "(chanid, starttime, mark, type, offset) VALUES "
-                               "( '%1', '%2', %3, %4, \"%5\");")
-                               .arg(chanid).arg(starts)
-                               .arg(frame_str).arg(type)
-                               .arg(offset_str);
+            query.prepare("INSERT INTO recordedmarkup"
+                          " (chanid, starttime, mark, type, offset)"
+                          " VALUES"
+                          " ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET );");
+            query.bindValue(":CHANID", chanid);
+            query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
         }
-        QSqlQuery subquery = db->exec(querystr);
-        if (!subquery.isActive())
-            MythContext::DBError("delta position map insert", querystr);
+        query.bindValue(":MARK", frame_str);
+        query.bindValue(":TYPE", type);
+        query.bindValue(":OFFSET", offset_str);
+        
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("delta position map insert", 
+                                 query);
     }
 }
 
@@ -2118,7 +2119,7 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
 
 void ProgramInfo::Save(QSqlDatabase *db)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     // This used to be REPLACE INTO...
     // primary key of table program is chanid,starttime
@@ -2254,7 +2255,7 @@ void ProgramInfo::EditScheduled(QSqlDatabase *db)
 void ProgramInfo::showDetails(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
 
     QString category_type, epinum, rating;
@@ -2465,7 +2466,7 @@ int ProgramInfo::getProgramFlags(QSqlDatabase *db)
 {
     int flags = 0;
     MythContext::KickDatabase(db);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     
     query.prepare("SELECT commflagged, cutlist, autoexpire, "
                   "editing, bookmark FROM recorded WHERE "
@@ -2794,7 +2795,7 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
     if (!sql.contains(" LIMIT "))
         querystr += "LIMIT 1000 ";
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare(querystr);
     
     if (!query.exec() || !query.isActive())
@@ -2870,7 +2871,7 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
 bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
 {
     clear();
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT oldrecorded.chanid, starttime, endtime, "
                   " title, subtitle, description, category, seriesid, "

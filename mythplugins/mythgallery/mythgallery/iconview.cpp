@@ -31,6 +31,7 @@ extern "C" {
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/dialogbox.h>
+#include <mythtv/mythdbcon.h>
 
 #include "galleryutil.h"
 #include "gallerysettings.h"
@@ -48,7 +49,7 @@ extern "C" {
 
 int ThumbItem::GetRotationAngle(QSqlDatabase *db)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("SELECT angle FROM gallerymetadata WHERE "
                   "image = :PATH ;");
     query.bindValue(":PATH", path.utf8());
@@ -64,7 +65,7 @@ int ThumbItem::GetRotationAngle(QSqlDatabase *db)
 
 void ThumbItem::SetRotationAngle(int angle, QSqlDatabase *db)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("REPLACE INTO gallerymetadata SET image = :IMAGE , "
                   "angle = :ANGLE ;");
     query.bindValue(":IMAGE", path.utf8());

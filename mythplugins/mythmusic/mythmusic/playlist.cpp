@@ -5,6 +5,7 @@ using namespace std;
 #include "qdatetime.h"
 #include <mythtv/mythcontext.h>
 #include "smartplaylist.h"
+#include <mythtv/mythdbcon.h>
 
 #include <qfileinfo.h>
 #include <qprocess.h>
@@ -334,7 +335,7 @@ void PlaylistsContainer::load()
 
     all_other_playlists->clear();
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("SELECT playlistid FROM musicplaylist "
                   "WHERE name != :DEFAULT  "
                   "AND name != :BACKUP  "
@@ -476,7 +477,7 @@ void Playlist::loadPlaylist(QString a_name, QSqlDatabase *a_db, QString a_host)
         return;
     }
    
-    QSqlQuery query(QString::null, a_db);
+    MSqlQuery query(QString::null, a_db);
     query.prepare("SELECT playlistid, name, songlist FROM "
                   "musicplaylist WHERE name = :NAME AND "
                   "hostname = :HOST ;");
@@ -506,7 +507,7 @@ void Playlist::loadPlaylist(QString a_name, QSqlDatabase *a_db, QString a_host)
 
 void Playlist::loadPlaylistByID(int id, QSqlDatabase *a_db, QString a_host)
 {
-    QSqlQuery query(QString::null, a_db);
+    MSqlQuery query(QString::null, a_db);
     query.prepare("SELECT playlistid, name, songlist FROM "
                   "musicplaylist WHERE playlistid = :ID AND "
                   "hostname = :HOST ;");
@@ -576,7 +577,7 @@ void Playlist::fillSonglistFromSongs()
 void Playlist::fillSonglistFromQuery(QString whereClause)
 {
     QSqlDatabase *db_conn = QSqlDatabase::database();
-    QSqlQuery query(QString::null, db_conn);
+    MSqlQuery query(QString::null, db_conn);
 
     QString theQuery;
 
@@ -603,7 +604,7 @@ void Playlist::fillSonglistFromQuery(QString whereClause)
 void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name)
 {
     QSqlDatabase *db_conn = QSqlDatabase::database();
-    QSqlQuery query(QString::null, db_conn);
+    MSqlQuery query(QString::null, db_conn);
 
     // find the correct categoryid
     int categoryID = SmartPlaylistEditor::lookupCategoryID(category);
@@ -697,7 +698,7 @@ void Playlist::savePlaylist(QString a_name, QSqlDatabase *a_db)
 
     fillSonglistFromSongs();
 
-    QSqlQuery query(QString::null, a_db);        
+    MSqlQuery query(QString::null, a_db);        
     query.prepare("SELECT NULL FROM musicplaylist WHERE playlistid = :ID ;");
     query.bindValue(":ID", playlistid);
 
@@ -742,7 +743,7 @@ void Playlist::saveNewPlaylist(QSqlDatabase *a_db, QString a_host)
 
     fillSonglistFromSongs();
     
-    QSqlQuery query(QString::null, a_db);
+    MSqlQuery query(QString::null, a_db);
     query.prepare("INSERT musicplaylist (name, hostname) "
                   "VALUES(:NAME, :HOST);");
     query.bindValue(":NAME", name.utf8());
@@ -1105,7 +1106,7 @@ void PlaylistsContainer::deletePlaylist(int kill_me)
         }
     }
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("DELETE FROM musicplaylist WHERE playlistid = :ID ;");
     query.bindValue(":ID", kill_me);
 

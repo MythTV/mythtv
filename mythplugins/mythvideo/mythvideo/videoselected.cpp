@@ -30,6 +30,7 @@ using namespace std;
 #include "videoselected.h"
 #include <mythtv/mythcontext.h>
 #include <mythtv/util.h>
+#include <mythtv/mythdbcon.h>
 
 
 VideoSelected::VideoSelected(QSqlDatabase *ldb,
@@ -403,7 +404,7 @@ void VideoSelected::selected(Metadata *someItem)
         
         QString extension = filename.section(".", -1, -1);
 
-        QSqlQuery query(QString::null, db);
+        MSqlQuery query(QString::null, db);
         query.prepare("SELECT playcommand, use_default FROM "
                       "videotypes WHERE extension = :EXT ;");
         query.bindValue(":EXT", extension);

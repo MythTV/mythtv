@@ -68,4 +68,20 @@ class MythSqlDatabase
     QSqlDatabase *m_db;
 };
 
+
+// QSqlQuery wrapper, QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
+
+class MSqlQuery : public QSqlQuery
+{ 
+  public:
+    MSqlQuery(QSqlResult * r) : QSqlQuery(r) {}
+    MSqlQuery(const QString& query = QString::null, QSqlDatabase* db = 0)
+                : QSqlQuery(query, db) {}
+    MSqlQuery(const QSqlQuery& other) : QSqlQuery(other) {}
+    
+    bool prepare(const QString& query);
+  
+};
+
+
 #endif    

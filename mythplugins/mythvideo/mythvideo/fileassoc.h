@@ -20,6 +20,7 @@ using namespace std;
 
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 
 class FileAssociation
 {

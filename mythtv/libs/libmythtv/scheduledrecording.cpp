@@ -7,6 +7,7 @@
 #include "sr_root.h"
 #include "sr_dialog.h"
 #include "jobqueue.h"
+#include "mythdbcon.h"
 
 #include <qlayout.h>
 #include <qlabel.h>
@@ -413,7 +414,7 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db,
 void ScheduledRecording::addHistory(QSqlDatabase* db, 
                                     const ProgramInfo& proginfo) 
 {
-    QSqlQuery result(QString::null, db);
+    MSqlQuery result(QString::null, db);
 
     result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
                    "endtime,title,subtitle,description,category,"
@@ -448,7 +449,7 @@ void ScheduledRecording::addHistory(QSqlDatabase* db,
 void ScheduledRecording::forgetHistory(QSqlDatabase* db,
                                        const ProgramInfo& proginfo)
 {
-    QSqlQuery result(QString::null, db);
+    MSqlQuery result(QString::null, db);
 
     result.prepare("DELETE FROM oldrecorded WHERE title = :TITLE AND "
                    "((subtitle = :SUBTITLE AND description = :DESC) OR "

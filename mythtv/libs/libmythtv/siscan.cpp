@@ -7,6 +7,8 @@
 #include "dvbtypes.h"
 #include "libmythtv/scheduledrecording.h"
 #include "frequencies.h"
+#include "mythdbcon.h"
+
 
 #define CHECKNIT_TIMER 5000
 //#define SISCAN_DEBUG
@@ -222,7 +224,7 @@ void SIScan::StartScanner()
                             if ((*i).mplexid == -1)
                             {
                                 pthread_mutex_lock(db_lock);
-                                QSqlQuery query(QString::null, db);
+                                MSqlQuery query(QString::null, db);
                                 query.prepare("INSERT into dtv_multiplex (frequency, "
                                                "modulation, sistandard, sourceid) "
                                                "VALUES (:FREQUENCY,:MODULATION,\"atsc\",:SOURCEID);");
@@ -434,7 +436,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                                    "WHERE mplexid = %1")
                                    .arg(DVBTID);
     pthread_mutex_lock(db_lock);
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     if(!query.exec(versionQuery))
         MythContext::DBError("Selecting channel/dtv_multiplex", query);
@@ -680,7 +682,7 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
     for (t = NIT.Transport.begin() ; t != NIT.Transport.end() ; ++t )
     {
         pthread_mutex_lock(db_lock);
-        QSqlQuery query(QString::null, db);
+        MSqlQuery query(QString::null, db);
         // See if transport already in database
         QString theQuery = QString("select * from dtv_multiplex where NetworkID = %1 and "
                    " TransportID = %2 and Frequency = %3 and sourceID = %4")
@@ -765,7 +767,7 @@ int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId
     // First see if current one is NULL, if so update those values and return current mplexid
     pthread_mutex_lock(db_lock);
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     QString theQuery;
 
     theQuery = QString("select networkid,transportid from dtv_multiplex where "
@@ -895,7 +897,7 @@ int SIScan::GenerateNewChanID()
 
     // This function must be called with db_lock enabled
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     QString theQuery = QString("select max(chanid) as maxchan from channel where sourceid=%1")
                        .arg(sourceID);
@@ -923,7 +925,7 @@ int SIScan::GenerateNewChanID()
 
 void SIScan::AddEvents()
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     QString theQuery;
     int counter = 0;
 

@@ -8,6 +8,7 @@ using namespace std;
 #include "dbcheck.h"
 
 #include "mythtv/mythcontext.h"
+#include "mythtv/mythdbcon.h"
 
 const QString currentDatabaseVersion = "1005";
 
@@ -93,9 +94,9 @@ void UpgradeMusicDatabaseSchema(void)
 
         QSqlDatabase *db_conn = QSqlDatabase::database();
         // urls as filenames are NOT officially supported yet
-        QSqlQuery query("SELECT filename, intid FROM musicmetadata WHERE "
+        MSqlQuery query("SELECT filename, intid FROM musicmetadata WHERE "
                         "filename NOT LIKE ('%://%');", db_conn);
-        QSqlQuery modify;
+        MSqlQuery modify;
 
         if (query.isActive() && query.numRowsAffected() > 0)
         {
@@ -162,7 +163,7 @@ void UpgradeMusicDatabaseSchema(void)
 
         QSqlDatabase *db_conn = QSqlDatabase::database();
 
-        QSqlQuery query(QString::null, db_conn);
+        MSqlQuery query(QString::null, db_conn);
         query.prepare("SELECT intid, artist, album, title, genre, "
                       "filename FROM musicmetadata ORDER BY intid;");
 
@@ -177,7 +178,7 @@ void UpgradeMusicDatabaseSchema(void)
                 QString genre = query.value(4).toString();
                 QString filename = query.value(5).toString();
 
-                QSqlQuery subquery(QString::null, db_conn);
+                MSqlQuery subquery(QString::null, db_conn);
                 subquery.prepare("UPDATE musicmetadata SET "
                                  "artist = :ARTIST, album = :ALBUM, "
                                  "title = :TITLE, genre = :GENRE, "
@@ -205,7 +206,7 @@ void UpgradeMusicDatabaseSchema(void)
                 int id = query.value(0).toInt();
                 QString name = query.value(1).toString();
 
-                QSqlQuery subquery(QString::null, db_conn);
+                MSqlQuery subquery(QString::null, db_conn);
                 subquery.prepare("UPDATE musicplaylist SET "
                                  "name = :NAME WHERE playlistid = :ID ;");
                 subquery.bindValue(":NAME", name.utf8());

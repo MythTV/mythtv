@@ -14,6 +14,7 @@ using namespace std;
 #include <mythtv/util.h>
 #include <mythtv/mythmedia.h>
 #include <mythtv/mythmediamonitor.h>
+#include <mythtv/mythdbcon.h>
 
 #include "videofilter.h"
 const long WATCHED_WATERMARK = 10000; // Less than this and the chain of videos will 
@@ -236,7 +237,7 @@ void VideoTree::setParentalLevel(int which_level)
 
 bool VideoTree::ignoreExtension(QString extension)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("SELECT f_ignore FROM videotypes WHERE extension = :EXT ;");
     query.bindValue(":EXT", extension);
     if(query.exec() && query.isActive() && query.size() > 0)
@@ -416,7 +417,7 @@ void VideoTree::buildVideoList()
                     .arg(currentVideoFilter->BuildClauseWhere())
                     .arg(currentVideoFilter->BuildClauseOrderBy());
         
-        QSqlQuery query(thequery,db);
+        MSqlQuery query(thequery,db);
         Metadata *myData;
         if (!video_tree_data)
             video_tree_data = video_tree_root->addNode("videos", -2, false);
@@ -585,7 +586,7 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
         //
         
 
-        QSqlQuery query(QString::null, db);
+        MSqlQuery query(QString::null, db);
         query.prepare("SELECT playcommand, use_default FROM "
                       "videotypes WHERE extension = :EXT ;");
         query.bindValue(":EXT", extension);
@@ -970,7 +971,7 @@ QString VideoTree::getHandler(Metadata *someItem)
         
         QString extension = filename.section(".", -1, -1);
 
-        QSqlQuery query(QString::null, db);
+        MSqlQuery query(QString::null, db);
         query.prepare("SELECT playcommand, use_default FROM "
                       "videotypes WHERE extension = :EXT ;");
         query.bindValue(":EXT", extension);

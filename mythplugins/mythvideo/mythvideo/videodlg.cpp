@@ -3,6 +3,7 @@
 #include <mythtv/xmlparse.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/util.h>
+#include <mythtv/mythdbcon.h>
 
 
 #include "videofilter.h"
@@ -273,7 +274,7 @@ QString VideoDialog::getHandler(Metadata *someItem)
         
         QString extension = filename.section(".", -1, -1);
 
-        QSqlQuery query(QString::null, db);
+        MSqlQuery query(QString::null, db);
         query.prepare("SELECT playcommand, use_default FROM "
                       "videotypes WHERE extension = :EXT ;");
         query.bindValue(":EXT", extension);
@@ -446,7 +447,7 @@ void VideoDialog::fetchVideos()
                         .arg(currentVideoFilter->BuildClauseWhere())
                         .arg(currentVideoFilter->BuildClauseOrderBy());
 
-    QSqlQuery query(thequery,db);
+    MSqlQuery query(thequery,db);
     
     Metadata *myData;
 

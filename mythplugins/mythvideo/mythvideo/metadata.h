@@ -7,6 +7,7 @@
 #include <mythtv/mythcontext.h>
 #include <qpixmap.h>
 #include <qimage.h>
+#include <mythtv/mythdbcon.h>
 
 class QSqlDatabase;
 

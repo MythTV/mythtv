@@ -28,6 +28,7 @@
 #include "libmyth/mythcontext.h"
 #include "libmythtv/scheduledrecording.h"
 #include "libmythtv/datadirect.h"
+#include "libmyth/mythdbcon.h"
 
 using namespace std;
 
@@ -213,7 +214,7 @@ unsigned int ELFHash(const char *s)
 
 void clearDataByChannel(int chanid, QDateTime from, QDateTime to) 
 {
-    QSqlQuery query;
+    MSqlQuery query;
     QString querystr;
 
     querystr.sprintf("DELETE FROM program "
@@ -251,7 +252,7 @@ void clearDataBySource(int sourceid, QDateTime from, QDateTime to)
     QString querystr= QString("SELECT chanid FROM channel WHERE "
                               "sourceid = \"%0\";").arg(sourceid);
 
-    QSqlQuery query;
+    MSqlQuery query;
 
     if (!query.exec(querystr))
         MythContext::DBError("Selecting channels per source", query);
@@ -321,7 +322,7 @@ void UpdateSourceIcons(int sourceid)
 
     QString fileprefix = SetupIconCacheDirectory();
 
-    QSqlQuery query;
+    MSqlQuery query;
     query.prepare("SELECT ch.chanid, nim.url "
             "FROM channel ch, callsignnetworkmap csm "
             "RIGHT JOIN networkiconmap nim ON csm.network = nim.network "
@@ -359,7 +360,7 @@ void UpdateSourceIcons(int sourceid)
                         .arg(chanid);
                     cout << m << endl;
                 }
-                QSqlQuery icon_update_query;
+                MSqlQuery icon_update_query;
                 icon_update_query.prepare("UPDATE channel SET icon = :ICON "
                         "WHERE chanid = :CHANID AND sourceid = :SOURCEID");
                 icon_update_query.bindValue(":ICON", localfile.name());
@@ -498,16 +499,16 @@ void ImportIconMap(const QString &filename)
         int de_column = 0;
         if (doc.setContent(&xml_file, false, &de_msg, &de_ln, &de_column))
         {
-            QSqlQuery nm_query;
+            MSqlQuery nm_query;
             nm_query.prepare("REPLACE INTO networkiconmap(network, url) "
                     "VALUES(:NETWORK, :URL)");
-            QSqlQuery cm_query;
+            MSqlQuery cm_query;
             cm_query.prepare("REPLACE INTO callsignnetworkmap(callsign, "
                     "network) VALUES(:CALLSIGN, :NETWORK)");
-            QSqlQuery su_query;
+            MSqlQuery su_query;
             su_query.prepare("UPDATE settings SET data = :URL "
                     "WHERE value = :STUBNAME");
-            QSqlQuery si_query;
+            MSqlQuery si_query;
             si_query.prepare("INSERT INTO settings(value, data) "
                     "VALUES(:STUBNAME, :URL)");
 
@@ -543,13 +544,13 @@ void ImportIconMap(const QString &filename)
                     }
                     else if (e.tagName() == IM_BASEURL_TAG)
                     {
-                        QSqlQuery *qr = &si_query;
+                        MSqlQuery *qr = &si_query;
 
                         QString st(BASEURLMAP_START);
                         st += getNamedElementText(e, IM_BASE_STUB_TAG);
                         QString u = getNamedElementText(e, IM_NET_URL_TAG);
 
-                        QSqlQuery qc;
+                        MSqlQuery qc;
                         qc.prepare("SELECT COUNT(*) FROM settings "
                                 "WHERE value = :STUBNAME");
                         qc.bindValue(":STUBNAME", st);
@@ -617,7 +618,7 @@ void ExportIconMap(const QString &filename)
         QDomDocument iconmap;
         QDomElement roote = iconmap.createElement(IM_DOC_TAG);
 
-        QSqlQuery query;
+        MSqlQuery query;
         query.exec("SELECT * FROM callsignnetworkmap ORDER BY callsign");
 
         if (query.isActive() && query.numRowsAffected() > 0)
@@ -710,14 +711,14 @@ void ExportIconMap(const QString &filename)
 
 void RunSimpleQuery(const QString &query)
 {
-    QSqlQuery q;
+    MSqlQuery q;
     if (!q.exec(query))
         MythContext::DBError("RunSimpleQuery ", q);
 }
 
 void ResetIconMap(bool reset_icons)
 {
-    QSqlQuery query;
+    MSqlQuery query;
     query.prepare("DELETE FROM settings WHERE value LIKE :URLMAPLIKE");
     query.bindValue(":URLMAPLIKE", QString(BASEURLMAP_START) + '%');
     if (!query.exec())
@@ -737,13 +738,13 @@ void ResetIconMap(bool reset_icons)
 // DataDirect stuff
 void DataDirectStationUpdate(Source source)
 {
-    QSqlQuery query;
+    MSqlQuery query;
     QString querystr;
     int chanid;
 
     ddprocessor.updateStationViewTable();
 
-    QSqlQuery query1;
+    MSqlQuery query1;
     query1.prepare("SELECT dd_v_station.stationid,dd_v_station.callsign,"
                "dd_v_station.stationname,dd_v_station.channel,"
                "dd_v_station.fccchannelnumber,dd_v_station.channelMinor "
@@ -820,12 +821,12 @@ void DataDirectStationUpdate(Source source)
         //  execute
         //
 
-        QSqlQuery dd_station_info("SELECT callsign, stationname, stationid,"
+        MSqlQuery dd_station_info("SELECT callsign, stationname, stationid,"
                 "channel, fccchannelnumber, channelMinor FROM dd_v_station;");
 
         if (dd_station_info.first())
         {
-            QSqlQuery dd_update;
+            MSqlQuery dd_update;
             dd_update.prepare("UPDATE channel SET callsign = :CALLSIGN,"
                     " name = :NAME, channum = :CHANNEL, freqid = :FREQID "
                     " WHERE xmltvid = :STATIONID AND sourceid = :SOURCEID;");
@@ -869,7 +870,7 @@ void DataDirectStationUpdate(Source source)
 
 void DataDirectProgramUpdate(Source source) 
 {
-    QSqlQuery query;
+    MSqlQuery query;
    
     //cerr << "Creating program view table...\n";
     ddprocessor.updateProgramViewTable(source.id);
@@ -953,7 +954,7 @@ bool grabDDData(Source source, int poffset, QDate pdate)
         needtoretrieve = false;
 
     QDateTime qdtNow = QDateTime::currentDateTime();
-    QSqlQuery query;
+    MSqlQuery query;
     QString status = "currently running.";
 
     query.exec(QString("UPDATE settings SET data ='%1' "
@@ -1902,7 +1903,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
             }
         }
 
-        QSqlQuery query;
+        MSqlQuery query;
 
         QString querystr;
 
@@ -1983,7 +1984,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                     icon     != localfile ||
                     tvformat != (*i).tvformat)
                 {
-                    QSqlQuery subquery;
+                    MSqlQuery subquery;
                     subquery.prepare("UPDATE channel SET chanid = :CHANID, "
                                      "name = :NAME, callsign = :CALLSIGN, "
                                      "channum = :CHANNUM, finetune = :FINE, "
@@ -2026,7 +2027,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
             {
                 if (!non_us_updating && localfile != "")
                 {
-                    QSqlQuery subquery;
+                    MSqlQuery subquery;
                     subquery.prepare("UPDATE channel SET icon = :ICON WHERE "
                                      "chanid = :CHANID;");
                     subquery.bindValue(":ICON", localfile);
@@ -2061,7 +2062,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
                 if (chanid > 0)
                 {
-                    QSqlQuery subquery;
+                    MSqlQuery subquery;
                     subquery.prepare("INSERT INTO channel (chanid,name"
                                      ",callsign,channum,finetune,icon"
                                      ",xmltvid,sourceid,freqid,tvformat) "
@@ -2122,7 +2123,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 if ((*i).callsign == "")
                     (*i).callsign = QString::number(chanid);
 
-                QSqlQuery subquery;
+                MSqlQuery subquery;
                 subquery.prepare("INSERT INTO channel (chanid,name"
                                  ",callsign,channum,finetune,icon"
                                  ",xmltvid,sourceid,freqid,tvformat) "
@@ -2186,7 +2187,7 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
 
     for (mapiter = proglist->begin(); mapiter != proglist->end(); ++mapiter)
     {
-        QSqlQuery query;
+        MSqlQuery query;
 
         if (mapiter.key() == "")
             continue;
@@ -2307,7 +2308,7 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                              << startstr << " - " << endstr << endl << endl;
                     }
 
-                    QSqlQuery subquery;
+                    MSqlQuery subquery;
                     subquery.prepare("DELETE FROM program WHERE "
                                      "chanid=:CHANID AND starttime>=:START "
                                      "AND starttime<:END;");
@@ -2618,7 +2619,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          cout << "----------------- Start of XMLTV output -----------------" << endl;
 
     QDateTime qdtNow = QDateTime::currentDateTime();
-    QSqlQuery query;
+    MSqlQuery query;
     QString status = "currently running.";
 
     query.exec(QString("UPDATE settings SET data ='%1' "
@@ -2686,7 +2687,7 @@ void grabDataFromDDFile(int id, int offset, const QString &filename,
 
 void clearOldDBEntries(void)
 {
-    QSqlQuery query;
+    MSqlQuery query;
     QString querystr;
     int offset = 1;
 
@@ -2729,7 +2730,7 @@ bool fillData(QValueList<Source> &sourcelist)
     QValueList<Source>::Iterator it;
 
     QString status;
-    QSqlQuery query;
+    MSqlQuery query;
     QDateTime GuideDataBefore, GuideDataAfter;
 
     query.exec(QString("SELECT MAX(endtime) FROM program;"));
@@ -2778,7 +2779,7 @@ bool fillData(QValueList<Source> &sourcelist)
                                  "    INTERVAL %d DAY)",
                                  (*it).id, i, i+1);
  
-                QSqlQuery query;
+                MSqlQuery query;
                 query.exec(querystr);
                 
                 if (query.isActive()) 
@@ -2870,7 +2871,7 @@ bool fillData(QValueList<Source> &sourcelist)
                     QString qstr = QString("SELECT COUNT(*) FROM channel "
                                            "WHERE sourceid = %1")
                                            .arg((*it).id);
-                    QSqlQuery qchan;
+                    MSqlQuery qchan;
                     qchan.exec(qstr);
                     if (qchan.isActive() && qchan.numRowsAffected() > 0) 
                     {
@@ -2891,7 +2892,7 @@ bool fillData(QValueList<Source> &sourcelist)
                                  "AND starttime < DATE_ADD(CURRENT_DATE(), "
                                  "    INTERVAL %d DAY)",
                                  (*it).id, i, i+1);
-                QSqlQuery query;
+                MSqlQuery query;
                 query.exec(querystr);
                
                 if (query.isActive()) 
@@ -2921,7 +2922,7 @@ bool fillData(QValueList<Source> &sourcelist)
                                  "    INTERVAL %d DAY) "
                                  "AND category = 'TBA'",
                                  (*it).id, i, i+1);
-                    QSqlQuery query;
+                    MSqlQuery query;
                     query.exec(querystr);
 
                     if (query.isActive()) 
@@ -3083,7 +3084,7 @@ int fix_end_times(void)
 {
     int count = 0;
     QString chanid, starttime, endtime, querystr;
-    QSqlQuery query1, query2;
+    MSqlQuery query1, query2;
 
     querystr = "SELECT chanid, starttime, endtime FROM program "
                "WHERE (DATE_FORMAT(endtime,\"%H%i\") = \"0000\") "
@@ -3472,7 +3473,7 @@ int main(int argc, char *argv[])
     gContext->LogEntry("mythfilldatabase", LP_INFO,
                        "Listings Download Started", "");
     
-    QSqlQuery query;
+    MSqlQuery query;
     
     if (!grab_data)
     {
@@ -3542,7 +3543,7 @@ int main(int argc, char *argv[])
     {
         QValueList<Source> sourcelist;
 
-        QSqlQuery sourcequery;
+        MSqlQuery sourcequery;
         QString querystr = QString("SELECT sourceid,name,xmltvgrabber,userid,"
                                    "password,lineupid "
                                    "FROM videosource ORDER BY sourceid;");

@@ -27,7 +27,7 @@ SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp uiphoneentry.cpp
 SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp
 SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
-SOURCES += langsettings.cpp
+SOURCES += langsettings.cpp mythdbcon.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../..
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch

@@ -30,6 +30,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/lcddevice.h>
+#include <mythtv/mythdbcon.h>
 
 enum VideoFileLocation
 {
@@ -339,7 +340,7 @@ void SearchDir(QSqlDatabase *db, QString &directory)
     QStringList imageExtensions = QImage::inputFormatList();
     BuildFileList(db, directory, video_files, imageExtensions);
 
-    QSqlQuery query("SELECT filename FROM videometadata;", db);
+    MSqlQuery query("SELECT filename FROM videometadata;", db);
 
     int counter = 0;
 
@@ -409,7 +410,7 @@ bool IgnoreExtension(QSqlDatabase *db, QString extension)
     
     QString q_string = QString("SELECT f_ignore FROM videotypes WHERE extension = \"%1\" ;")
                               .arg(extension);
-    QSqlQuery a_query(q_string, db);
+    MSqlQuery a_query(q_string, db);
     if(a_query.isActive() && a_query.size() > 0)
     {
         //

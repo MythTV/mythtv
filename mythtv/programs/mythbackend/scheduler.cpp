@@ -29,6 +29,7 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 #include "mainserver.h"
 #include "remoteutil.h"
+#include "libmyth/mythdbcon.h"
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList, 
                      QSqlDatabase *ldb)
@@ -76,7 +77,7 @@ void Scheduler::verifyCards(void)
 
     thequery = "SELECT NULL FROM capturecard;";
 
-    QSqlQuery query = db->exec(thequery);
+    MSqlQuery query = db->exec(thequery);
 
     int numcards = -1;
     if (query.isActive())
@@ -107,7 +108,7 @@ void Scheduler::verifyCards(void)
             thequery = QString("SELECT cardinputid FROM cardinput WHERE "
                                "sourceid = %1 ORDER BY cardinputid;")
                               .arg(source);
-            QSqlQuery subquery = db->exec(thequery);
+            MSqlQuery subquery = db->exec(thequery);
             
             if (!subquery.isActive() || subquery.numRowsAffected() <= 0)
                 cerr << query.value(1).toString() << " is defined, but isn't "
@@ -273,7 +274,7 @@ bool Scheduler::FillRecordList(void)
 
 void Scheduler::FillRecordListFromDB(void)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("CREATE TEMPORARY TABLE recordmatch "
                   "(recordid int unsigned, chanid int unsigned, "
                   " starttime datetime, INDEX (recordid));");
@@ -1273,7 +1274,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
                                        QStringList &where)
 {
     QString query;
-    QSqlQuery result;
+    MSqlQuery result;
     QString qphrase;
 
     query = QString("SELECT recordid,search,subtitle,description "
@@ -1357,7 +1358,7 @@ void Scheduler::UpdateMatches(int recordid) {
     struct timeval dbstart, dbend;
 
     MythContext::KickDatabase(db);
-    QSqlQuery query;
+    MSqlQuery query;
     query.prepare("DELETE FROM recordmatch WHERE "
                   "recordid = :RECORDID OR :RECORDID = -1;");
     query.bindValue(":RECORDID", recordid);
@@ -1432,7 +1433,7 @@ void Scheduler::UpdateMatches(int recordid) {
         VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query %1...").arg(clause));
 
         gettimeofday(&dbstart, NULL);
-        QSqlQuery result = db->exec(query);
+        MSqlQuery result = db->exec(query);
         gettimeofday(&dbend, NULL);
 
         if (!result.isActive())
@@ -1470,7 +1471,7 @@ void Scheduler::AddNewRecords(void) {
     QMap<int, bool> tooManyMap;
     bool checkTooMany = false;
 
-    QSqlQuery rlist(QString::null, db);
+    MSqlQuery rlist(QString::null, db);
     rlist.prepare("SELECT recordid,title,maxepisodes,maxnewest FROM record;");
 
     rlist.exec();
@@ -1492,7 +1493,7 @@ void Scheduler::AddNewRecords(void) {
 
         if (maxEpisodes && !maxNewest)
         {
-            QSqlQuery epicnt(QString::null, db);
+            MSqlQuery epicnt(QString::null, db);
 
             epicnt.prepare("SELECT count(*) FROM recorded "
                            "WHERE title = :TITLE;");
@@ -1610,7 +1611,7 @@ void Scheduler::AddNewRecords(void) {
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
 
     gettimeofday(&dbstart, NULL);
-    QSqlQuery result = db->exec(query);
+    MSqlQuery result = db->exec(query);
     gettimeofday(&dbend, NULL);
 
     if (!result.isActive())
@@ -1782,7 +1783,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "GROUP BY recordid "
 "ORDER BY title ASC;");
 
-    QSqlQuery result = db->exec(query);
+    MSqlQuery result = db->exec(query);
 
     if (result.isActive() && result.numRowsAffected() > 0)
         while (result.next()) 

@@ -8,6 +8,7 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
+#include <mythtv/mythdbcon.h>
 
 #include "metadata.h"
 
@@ -73,7 +74,7 @@ void Metadata::SetStartdir(const QString &dir)
 
 void Metadata::persist(QSqlDatabase *db)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("UPDATE musicmetadata set rating = :RATING , "
                   "playcount = :PLAYCOUNT , lastplay = :LASTPLAY "
                   "where intid = :ID ;");
@@ -93,7 +94,7 @@ bool Metadata::isInDatabase(QSqlDatabase *db, QString startdir)
     QString sqlfilename = filename;
     sqlfilename = filename.remove(0, startdir.length());
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("SELECT artist,compilation_artist,album,title,genre,year,tracknum,"
                   "length,intid,rating,playcount,lastplay,compilation FROM "
                   "musicmetadata WHERE filename = :FILENAME ;");
@@ -141,7 +142,7 @@ void Metadata::dumpToDatabase(QSqlDatabase *db, QString startdir)
 
     // Don't update the database if a song with the exact same
     // metadata is already there
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("SELECT filename FROM musicmetadata WHERE "
                   "( ( artist = :ARTIST ) AND "
                   "( compilation_artist = :COMPILATION_ARTIST ) "
@@ -325,7 +326,7 @@ void Metadata::updateDatabase(QSqlDatabase *db, QString startdir)
     if (genre == "")
         genre = QObject::tr("Unknown Genre");
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE musicmetadata SET artist = :ARTIST, album = :ALBUM, "
                   "title = :TITLE, genre = :GENRE, year = :YEAR, "
@@ -474,7 +475,7 @@ void Metadata::fillData(QSqlDatabase *db)
 
     thequery += ";";
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare(thequery);
     query.bindValue(":TITLE", title.utf8());
     query.bindValue(":ALBUM", album.utf8());
@@ -510,7 +511,7 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
     if (id == 0)
         return; 
         
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     query.prepare("SELECT title,artist,compilation_artist,album,title,genre,year,tracknum,"
                   "length,filename,rating,playcount,lastplay,compilation FROM "
                   "musicmetadata WHERE intid = :ID ;");
@@ -670,7 +671,7 @@ void AllMusic::resync()
     if (!startdir.endsWith("/"));
         startdir += "/";
 
-    QSqlQuery query = db->exec(aquery);
+    MSqlQuery query = db->exec(aquery);
 
     all_music.clear();
     

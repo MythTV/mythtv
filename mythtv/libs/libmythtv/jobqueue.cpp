@@ -155,8 +155,8 @@ void JobQueue::ProcessQueue(void)
 {
     VERBOSE(VB_JOBQUEUE, "JobQueue::ProcessQueue() started");
 
-    QSqlQuery delquery(QString::null, m_db);
-    QSqlQuery query(QString::null, m_db);
+    MSqlQuery delquery(QString::null, m_db);
+    MSqlQuery query(QString::null, m_db);
     QString chanid;
     QDateTime starttime;
     QString startts;
@@ -401,7 +401,7 @@ bool JobQueue::QueueJob(QSqlDatabase* db, int jobType,
     int tmpStatus = JOB_UNKNOWN;
     int tmpCmd = JOB_UNKNOWN;
     int jobID = -1;
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT status, id, cmds FROM jobqueue "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME "
@@ -492,7 +492,7 @@ int JobQueue::GetJobID(QSqlDatabase* db, int jobType, QString chanid,
                        QDateTime starttime)
 {
     QString startts = starttime.toString("yyyyMMddhhmm00");
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT id FROM jobqueue "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME "
@@ -520,7 +520,7 @@ int JobQueue::GetJobID(QSqlDatabase* db, int jobType, QString chanid,
 bool JobQueue::GetJobInfoFromID(QSqlDatabase* db, int jobID, int &jobType,
                                 QString &chanid, QDateTime &starttime)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT type, chanid, starttime FROM jobqueue "
                   "WHERE id = :ID;");
@@ -589,7 +589,7 @@ bool JobQueue::DeleteAllJobs(QSqlDatabase* db, QString chanid,
 {
     QString key = QString("%1_%2").arg(chanid)
                           .arg(starttime.toString("yyyyMMddhhmm00"));
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     QString message;
 
     query.prepare("UPDATE jobqueue SET status = :ABORTED "
@@ -699,7 +699,7 @@ bool JobQueue::DeleteJob(QSqlDatabase* db, int jobID)
     if (jobID < 0)
         return false;
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("DELETE FROM jobqueue WHERE id = :ID;");
 
@@ -721,7 +721,7 @@ bool JobQueue::ChangeJobCmds(QSqlDatabase* db, int jobID, int newCmds)
     if (jobID < 0)
         return false;
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE jobqueue SET cmds = :CMDS WHERE id = :ID;");
 
@@ -742,7 +742,7 @@ bool JobQueue::ChangeJobCmds(QSqlDatabase* db, int jobID, int newCmds)
 bool JobQueue::ChangeJobCmds(QSqlDatabase* db, int jobType, QString chanid,
                              QDateTime starttime,  int newCmds)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE jobqueue SET cmds = :CMDS WHERE type = :TYPE "
                   "AND chanid = :CHANID AND starttime = :STARTTIME;");
@@ -768,7 +768,7 @@ bool JobQueue::ChangeJobFlags(QSqlDatabase* db, int jobID, int newFlags)
     if (jobID < 0)
         return false;
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE jobqueue SET flags = :FLAGS WHERE id = :ID;");
 
@@ -792,7 +792,7 @@ bool JobQueue::ChangeJobStatus(QSqlDatabase* db, int jobID, int newStatus,
     if (jobID < 0)
         return false;
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE jobqueue SET status = :STATUS, comment = :COMMENT "
                   "WHERE id = :ID;");
@@ -817,7 +817,7 @@ bool JobQueue::ChangeJobComment(QSqlDatabase* db, int jobID, QString comment)
     if (jobID < 0)
         return false;
 
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE jobqueue SET comment = :COMMENT "
                   "WHERE id = :ID;");
@@ -839,7 +839,7 @@ bool JobQueue::ChangeJobComment(QSqlDatabase* db, int jobID, QString comment)
 bool JobQueue::IsJobRunning(QSqlDatabase* db, int jobType, QString chanid,
                              QDateTime starttime)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT status,cmds FROM jobqueue WHERE type = :TYPE "
                   "AND chanid = :CHANID AND starttime = :STARTTIME;");
@@ -905,7 +905,7 @@ int JobQueue::GetJobsInQueue(QSqlDatabase* db, QMap<int, JobQueueEntry> &jobs,
                              int findJobs)
 {
     JobQueueEntry thisJob;
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
     QDateTime recentDate = QDateTime::currentDateTime().addSecs(-4 * 3600);
     int jobCount = 0;
 
@@ -1011,7 +1011,7 @@ int JobQueue::GetJobsInQueue(QSqlDatabase* db, QMap<int, JobQueueEntry> &jobs,
 
 bool JobQueue::ClaimJob(QSqlDatabase* db, int jobID)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE jobqueue SET hostname = :HOSTNAME "
                   "WHERE hostname = :EMPTY AND id = :ID;");
@@ -1057,7 +1057,7 @@ bool JobQueue::AllowedToRun(JobQueueEntry job)
 
 int JobQueue::GetJobCmd(QSqlDatabase* db, int jobID)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT cmds FROM jobqueue WHERE id = :ID;");
 
@@ -1081,7 +1081,7 @@ int JobQueue::GetJobCmd(QSqlDatabase* db, int jobID)
 
 int JobQueue::GetJobFlags(QSqlDatabase* db, int jobID)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT flags FROM jobqueue WHERE id = :ID;");
 
@@ -1105,7 +1105,7 @@ int JobQueue::GetJobFlags(QSqlDatabase* db, int jobID)
 
 int JobQueue::GetJobStatus(QSqlDatabase* db, int jobID)
 {
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     query.prepare("SELECT status FROM jobqueue WHERE id = :ID;");
 
@@ -1188,7 +1188,7 @@ void JobQueue::RecoverQueue(QSqlDatabase *db, bool justOld)
 
 void JobQueue::CleanupOldJobsInQueue(QSqlDatabase* db)
 {
-    QSqlQuery delquery(QString::null, db);
+    MSqlQuery delquery(QString::null, db);
     QDateTime donePurgeDate = QDateTime::currentDateTime().addDays(-3);
     QDateTime errorsPurgeDate = QDateTime::currentDateTime().addDays(-7);
 
@@ -1322,7 +1322,7 @@ QString JobQueue::GetJobCommand(QSqlDatabase* db, int jobType,
                                     ProgramInfo *tmpInfo)
 {
     QString command = "";
-    QSqlQuery query(QString::null, db);
+    MSqlQuery query(QString::null, db);
 
     if (jobType == JOB_TRANSCODE)
         return "transcode";

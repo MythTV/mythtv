@@ -621,7 +621,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
             querytext = QString("SELECT audiodevice,cardtype FROM capturecard "
                                 "WHERE cardid=%1;").arg(recnum);
-            QSqlQuery query = m_db->exec(querytext);
+            MSqlQuery query = m_db->exec(querytext);
             if (query.isActive() && query.numRowsAffected())
             {
                 query.next();
@@ -745,7 +745,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         thequery += " DESC";
     thequery += ";";
 
-    QSqlQuery query = m_db->exec(thequery);
+    MSqlQuery query = m_db->exec(thequery);
 
     QStringList outputlist;
     QString fileprefix = gContext->GetFilePrefix();
@@ -1086,7 +1086,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     }
     unlink(filename.ascii());
 
-    QSqlQuery query(QString::null, delete_db->db());
+    MSqlQuery query(QString::null, delete_db->db());
     query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
                   "title = :TITLE AND starttime = :STARTTIME AND "
                   "endtime = :ENDTIME;");
@@ -1276,7 +1276,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     VERBOSE(VB_RECORD, QString("Host %1 updating endtime to %2")
                                .arg(gContext->GetHostName()).arg(newendts));
     
-    QSqlQuery query(QString::null, m_db);
+    MSqlQuery query(QString::null, m_db);
     query.prepare("UPDATE recorded SET starttime = :NEWSTARTTIME, "
                   "endtime = :NEWENDTIME WHERE chanid = :CHANID AND "
                   "title = :TITLE AND starttime = :STARTTIME AND "
@@ -1697,7 +1697,7 @@ void MainServer::getGuideDataThrough(QDateTime &GuideDataThrough)
     querytext = QString("SELECT max(endtime) FROM program;");
 
     dblock.lock();
-    QSqlQuery query = m_db->exec(querytext);
+    MSqlQuery query = m_db->exec(querytext);
 
     if (query.isActive() && query.numRowsAffected())
     {
@@ -1823,7 +1823,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs)
                                        "WHERE cardid = %1;")
                                        .arg(retval);
 
-            QSqlQuery query = m_db->exec(querystr);
+            MSqlQuery query = m_db->exec(querystr);
 
             if (query.isActive() && query.numRowsAffected())
             {
@@ -2954,7 +2954,7 @@ QString MainServer::LocalFilePath(QUrl &url)
 
         querytext = QString("SELECT icon FROM channel "
                             "WHERE icon LIKE '%%1';").arg(file);
-        QSqlQuery query = m_db->exec(querytext);
+        MSqlQuery query = m_db->exec(querytext);
         if (query.isActive() && query.numRowsAffected())
         {
             query.next();
@@ -3119,7 +3119,7 @@ void MainServer::PrintDVBStatus(QTextStream& os)
         "WHERE starttime >= DATE_SUB(NOW(), INTERVAL 48 HOUR) "
         "ORDER BY starttime;";
 
-    QSqlQuery oquery = m_db->exec(outerqry);
+    MSqlQuery oquery = m_db->exec(outerqry);
 
     if (oquery.isActive() && oquery.numRowsAffected())
     {
@@ -3133,7 +3133,7 @@ void MainServer::PrintDVBStatus(QTextStream& os)
                             "WHERE sampletime BETWEEN ? AND ? "
                             "GROUP BY cardid");
 
-        QSqlQuery query = m_db->exec(NULL);
+        MSqlQuery query = m_db->exec(NULL);
         query.prepare(querytext);
         
         while (oquery.next())
@@ -3647,7 +3647,7 @@ void MainServer::PrintStatus(QSocket *socket)
 
     querytext = QString("SELECT max(endtime) FROM program;");
 
-    QSqlQuery query = m_db->exec(querytext);
+    MSqlQuery query = m_db->exec(querytext);
 
     if (query.isActive() && query.numRowsAffected())
     {
