@@ -1,10 +1,31 @@
 <mythuitheme>
  
-   <window name="video">
+   <window name="manager">
 
     <font name="active_font" face="Arial">
       <color>#ffffff</color>
       <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="directorfnt" face="Arial">
+      <color>#ffffff</color>
+      <size>18</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="labels" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="moviedata" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
 
@@ -30,6 +51,14 @@
       <bold>yes</bold>
     </font>
 
+    <font name="leadfnt" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <shadow>1,1</shadow>
+      <size>40</size>
+      <bold>yes</bold>
+    </font>
+
     <font name="info" face="Arial">
       <color>#ffffff</color>
       <size>17</size>
@@ -44,60 +73,137 @@
       <bold>yes</bold>
     </font>
 
-    <font name="directoryfnt" face="Arial">
-      <color>#ffff33</color>
-      <size>16</size>
-      <bold>yes</bold>
-    </font>
-
     <container name="background">
-      <textarea name="sched" draworder="0">
-        <area>20,10,800,40</area>
-        <font>info</font>
-        <value>Select a video to watch...</value>
-        <value lang="IT">Seleziona il video da vedere...</value>
-        <value lang="ES">Seleccione el vídeo a ver...</value>
-        <value lang="CA">Esculli el video que vol veure...</value>
-      </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>cr-background.png</filename>
-        <position>0,39</position>
-        <staticsize>800,590</staticsize>
+        <position>0,310</position>
+        <staticsize>800,290</staticsize>
       </image>
+    </container>
+
+    <container name="info">
+      <area>0,0,800,290</area>
+      <textarea name="title" draworder="4">
+        <area>20,10,800,80</area>
+        <font>leadfnt</font>
+      </textarea>
+      <textarea name="dirlbl" draworder="4">
+        <area>20,80,150,35</area>
+        <font>directorfnt</font>
+        <value>Directed by</value>
+      </textarea>
+      <textarea name="director" draworder="4">
+        <area>166,80,350,35</area>
+        <font>directorfnt</font>
+      </textarea>
+      <textarea name="yrlbl" draworder="4" align="right">
+        <area>560,90,90,35</area>
+        <font>labels</font>
+        <value>Year:</value>
+      </textarea>
+      <textarea name="year" draworder="4">
+        <area>660,90,100,45</area>
+        <font>moviedata</font>
+      </textarea>
+      <textarea name="ratlbl" draworder="4">
+        <area>20,120,150,35</area>
+        <font>labels</font>
+        <value>Rated:</value>
+      </textarea>
+      <textarea name="rating" draworder="4">
+        <area>170,120,600,35</area>
+        <font>moviedata</font>
+      </textarea>
+      <textarea name="lvllbl" draworder="4" align="right">
+        <area>500,150,170,35</area>
+        <font>labels</font>
+        <value>Parental Level:</value>
+      </textarea>
+      <textarea name="level" draworder="4">
+        <area>680,150,350,35</area>
+        <font>moviedata</font>
+      </textarea>
+      <textarea name="lenlbl" draworder="4">
+        <area>20,150,150,35</area>
+        <font>labels</font>
+        <value>Runtime:</value>
+      </textarea>
+      <textarea name="length" draworder="4">
+        <area>170,150,350,35</area>
+        <font>moviedata</font>
+      </textarea>
+      <textarea name="pltlbl" draworder="4">
+        <area>20,180,150,35</area>
+        <font>labels</font>
+        <value>Plot:</value>
+      </textarea>
+      <textarea name="plot" draworder="4">
+        <area>170,180,600,35</area>
+        <font>moviedata</font>
+      </textarea>
+      <textarea name="fillbl" draworder="4">
+        <area>20,210,150,35</area>
+        <font>labels</font>
+        <value>Filename:</value>
+      </textarea>
+      <textarea name="filename" draworder="4">
+        <area>170,210,600,35</area>
+        <font>moviedata</font>
+      </textarea>
+      <textarea name="cvflbl" draworder="4">
+        <area>20,240,150,35</area>
+        <font>labels</font>
+        <value>Cover File:</value>
+      </textarea>
+      <textarea name="coverfile" draworder="4">
+        <area>170,240,600,35</area>
+        <font>moviedata</font>
+      </textarea>
+      <textarea name="imdblbl" draworder="4">
+        <area>20,270,155,35</area>
+        <font>labels</font>
+        <value>IMDB Num.:</value>
+      </textarea>
+      <textarea name="inetref" draworder="4">
+        <area>170,270,500,35</area>
+        <font>moviedata</font>
+      </textarea>
     </container>
  
     <container name="selector">
-      <area>0,39,800,590</area>
+      <area>0,310,800,290</area>
       <listarea name="listing" draworder="4">
-        <area>20,12,760,512</area>
+        <area>20,12,760,242</area>
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
-        <fcnfont name="directoryfnt" function="directory"></fcnfont>
         <columnpadding>10</columnpadding>
-        <column number="1" width="500" context="-1"></column>
-        <items>19</items>
-        <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
+        <column number="1" width="400" context="-1"></column>
+        <column number="2" width="200" context="-1"></column>
+        <column number="3" width="100" context="-1"></column>
+        <items>8</items>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-12,-5"></image>
         <image function="uparrow" filename="uparrow.png" location="750,22"></image>
-        <image function="downarrow" filename="downarrow.png" location="750,469"></image>
+        <image function="downarrow" filename="downarrow.png" location="750,195"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>cr-lines.png</filename>
         <position>0,0</position>
-        <staticsize>800,590</staticsize>
+        <staticsize>800,290</staticsize>
       </image>
     </container>
 
-    <container name="playwait">
-      <debug>yes</debug>
+    <container name="inetwait">
       <area>0,0,800,600</area>
       <textarea name="ld1" draworder="0">
         <area>68,140,350,90</area>
-        <font>bigtitle</font>
-        <value>loading...</value>
-        <value lang="IT">Lettura...</value>
-        <value lang="ES">Cargando...</value>
-        <value lang="CA">Llegint...</value>
+        <font>titlefnt</font>
+        <value>retriving data...</value>
+      </textarea>
+      <textarea name="finder" draworder="0" align="center">
+        <area>0,270,800,60</area>
+        <font>titlefnt</font>
+        <value>[ looking for ]</value>
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>
@@ -105,17 +211,241 @@
       </textarea>
     </container>
 
-   <container name="novideos_list">
+    <container name="moviesel">
+      <area>207,100,377,400</area>
+      <listarea name="listing" draworder="4">
+        <area>12,15,359,370</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>10</columnpadding>
+        <column number="1" width="355" context="-1"></column>
+        <items>11</items>
+        <image function="selectionbar" filename="mv-sel.png" location="-14,-5"></image>
+        <image function="uparrow" filename="uparrow.png" location="350,15"></image>
+        <image function="downarrow" filename="downarrow.png" location="350,330"></image>
+      </listarea>
+      <image name="showinglines" draworder="3" fleximage="no">
+        <filename>mv-mselect.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="enterimdb">
+      <area>220,200,360,200</area>
+      <image name="box" draworder="7">
+        <filename>mv-popup.png</filename>
+        <position>0,0</position>
+      </image>
+      <textarea name="msg" draworder="7" align="center">
+        <font>directorfnt</font>
+        <value>Enter IMDB #</value>
+        <area>0,15,360,25</area>
+      </textarea>
+      <textarea name="numhold" draworder="7" align="center">
+        <font>titlefnt</font>
+        <area>0,57,360,50</area>
+      </textarea>
+    </container>
+
+    <container name="playwait">
+      <area>0,0,800,600</area>
+      <textarea name="ld1" draworder="0">
+        <area>68,140,350,90</area>
+        <font>bigtitle</font>
+        <value>loading...</value>
+      </textarea>
+      <textarea name="title" draworder="0" align="center">
+        <area>0,320,800,60</area>
+        <font>titlefnt</font>
+      </textarea>
+    </container>
+
+    <container name="novideos_info">
       <textarea name="msg" align="center" draworder="8">
          <area>0,110,800,70</area>
          <font>info</font>
-         <value>No Videos Found In This Directory</value>
-         <value lang="IT">Nessun video in questa directory</value>
-         <value lang="ES">No encuentro videos en esta carpeta</value>
-         <value lang="CA">No trovo videos en aquesta carpeta</value>
+         <value>No Videos Found</value>
          <multiline>yes</multiline> 
       </textarea>
     </container>
 
   </window>
+
+  <window name="browser">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="directorfnt" face="Arial">
+      <color>#ffffff</color>
+      <size>18</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="labels" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="moviedata" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="bigtitle" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>50</size>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="titlefnt" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <shadow>1,1</shadow>
+      <size>27</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="leadfnt" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <shadow>1,1</shadow>
+      <size>40</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <image name="filler" draworder="0" fleximage="no">
+        <filename>mv-background.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+  
+    <container name="browsing">
+      <area>10,450,780,150</area>
+      <textarea name="videoin" draworder="3" align="center">
+        <area>10,28,500,35</area>
+        <font>info</font>
+        <value>Use the left and right arrows</value>
+      </textarea>
+      <textarea name="currentvideo" draworder="3" align="center">
+        <area>10,64,500,35</area>
+        <font>directorfnt</font>
+      </textarea>  
+    </container>
+
+    <container name="info">
+      <area>10,10,790,440</area>
+      <textarea name="title" draworder="4">
+        <area>20,10,800,80</area>
+        <font>leadfnt</font>
+      </textarea>
+      <textarea name="dirlbl" draworder="4">
+        <area>20,80,150,35</area>
+        <font>directorfnt</font>
+        <value>Directed by</value>
+      </textarea>
+      <textarea name="director" draworder="4">
+        <area>166,80,350,35</area>
+        <font>directorfnt</font>
+      </textarea>
+      <textarea name="yrlbl" draworder="4" align="right">
+        <area>580,90,90,35</area>
+        <font>labels</font>
+        <value>Year:</value>
+      </textarea>
+      <textarea name="year" draworder="4">
+        <area>680,90,100,45</area>
+        <font>moviedata</font>
+      </textarea>
+      <textarea name="pltlbl" draworder="4">
+        <area>240,120,150,35</area>
+        <font>labels</font>
+        <value>Plot:</value>
+      </textarea>
+      <textarea name="plot" draworder="4">
+        <area>240,150,500,105</area>
+        <font>moviedata</font>
+        <multiline>yes</multiline>
+      </textarea>
+      <textarea name="ratlbl" draworder="4">
+        <area>240,255,150,35</area>
+        <font>labels</font>
+        <value>Rated:</value>
+      </textarea>
+      <textarea name="rating" draworder="4">
+        <area>240,285,500,90</area>
+        <font>moviedata</font>
+        <multiline>yes</multiline>
+      </textarea>
+      <textarea name="lenlbl" draworder="4">
+        <area>240,375,150,35</area>
+        <font>labels</font>
+        <value>Runtime:</value>
+      </textarea>
+      <textarea name="length" draworder="4">
+        <area>240,405,350,35</area>
+        <font>moviedata</font>
+      </textarea>
+      <image name="coverart" draworder="5" fleximage="no">
+        <position>20,120</position>
+        <staticsize>200,308</staticsize>
+      </image>
+    </container>
+
+    <container name="playwait">
+      <area>0,0,800,600</area>
+      <textarea name="ld1" draworder="0">
+        <area>68,140,350,90</area>
+        <font>bigtitle</font>
+        <value>loading...</value>
+      </textarea>
+      <textarea name="title" draworder="0" align="center">
+        <area>0,320,800,60</area>
+        <font>titlefnt</font>
+      </textarea>
+    </container>
+
+    <container name="novideos_info">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>No Videos Found</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    </window>
+
 </mythuitheme>

@@ -1,6 +1,7 @@
 #ifndef METADATA_H_
 #define METADATA_H_
 
+#include <qregexp.h>
 #include <qstring.h>
 
 class QSqlDatabase;
@@ -8,80 +9,99 @@ class QSqlDatabase;
 class Metadata
 {
   public:
-    Metadata(QString lfilename = "", QString lartist = "", QString lalbum = "", 
-             QString ltitle = "", QString lgenre = "", int lyear = 0, 
-             int ltracknum = 0, int llength = 0, int lid = 0)
+    Metadata(QString lfilename = "", QString lcoverfile = "", QString ltitle = "", int lyear = 0, 
+             QString linetref = "", QString ldirector = "", QString lplot = "", float luserrating = 0.0, 
+             QString lrating = "", int llength = 0, int lid = 0, int lshowlevel = 1)
             {
                 filename = lfilename;
-                artist = lartist;
-                album = lalbum;
+                coverfile = lcoverfile;
                 title = ltitle;
-                genre = lgenre;
                 year = lyear;
-                tracknum = ltracknum;
+                inetref = linetref;
+                director = ldirector;
+                plot = lplot;
+                luserrating = luserrating;
+                rating = lrating;
                 length = llength;
+                showlevel = lshowlevel;
                 id = lid;
             }
 
     Metadata(const Metadata &other) 
             {
                 filename = other.filename;
-                artist = other.artist;
-                album = other.album;
+                coverfile = other.coverfile;
                 title = other.title;
-                genre = other.genre;
                 year = other.year;
-                tracknum = other.tracknum;
+                inetref = other.inetref;
+                director = other.director;
+                plot = other.plot;
+                userrating = other.userrating;
+                rating = other.rating;
                 length = other.length;
+                showlevel = other.showlevel;
                 id = other.id;
             }
 
    ~Metadata() {}
 
-    QString Artist() { return artist; }
-    void setArtist(const QString &lartist) { artist = lartist; }
-    
-    QString Album() { return album; }
-    void setAlbum(const QString &lalbum) { album = lalbum; }
-
     QString Title() { return title; }
     void setTitle(const QString &ltitle) { title = ltitle; }
-
-    QString Genre() { return genre; }
-    void setGenre(const QString &lgenre) { genre = lgenre; }
-
+    
     int Year() { return year; }
-    void setYear(int lyear) { year = lyear; }
+    void setYear(const int &lyear) { year = lyear; }
+
+    QString InetRef() { return inetref; }
+    void setInetRef(const QString &linetref) { inetref = linetref; }
+
+    QString Director() { return director; }
+    void setDirector(const QString &ldirector) { director = ldirector; }
+
+    QString Plot() { return plot; }
+    void setPlot(const QString &lplot) { plot = lplot; }
+
+    float UserRating() { return userrating; }
+    void setUserRating(float luserrating) { userrating = luserrating; }
  
-    int Track() { return tracknum; }
-    void setTrack(int ltrack) { tracknum = ltrack; }
+    QString Rating() { return rating; }
+    void setRating(QString lrating) { rating = lrating; }
 
     int Length() { return length; }
     void setLength(int llength) { length = llength; }
 
     unsigned int ID() { return id; }
     void setID(int lid) { id = lid; }
+   
+    int ShowLevel() { return showlevel; }
+    void setShowLevel(int lshowlevel) { showlevel = lshowlevel; }
 
     QString Filename() const { return filename; }
     void setFilename(QString &lfilename) { filename = lfilename; }
 
+    QString CoverFile() const { return coverfile; }
+    void setCoverFile(QString &lcoverfile) { coverfile = lcoverfile; }
 
     void setField(QString field, QString data);
+    void dumpToDatabase(QSqlDatabase *db);
+    void updateDatabase(QSqlDatabase *db);
     void fillData(QSqlDatabase *db);
     void fillDataFromID(QSqlDatabase *db);
 
   private:
-    QString artist;
-    QString album;
     QString title;
-    QString genre;
+    QString inetref;
+    QString director;
+    QString plot;
+    QString rating;
     int year;
-    int tracknum;
+    float userrating;
     int length;
+    int showlevel;
 
     unsigned int id;
     
     QString filename;
+    QString coverfile;
 };
 
 bool operator==(const Metadata& a, const Metadata& b);

@@ -1,0 +1,19 @@
+<mythmenu name="VIDEO_SETTINGS">
+
+   <button>
+      <type>VIDEO</type>
+      <text>General Settings</text>
+      <text lang="ES">Opciones Generales</text>
+      <text lang="CA">Opcions Generals</text>
+      <action>SETTINGS_GENERAL</action>
+   </button>
+
+   <button>
+      <type>VIDEO</type>
+      <text>Player Settings</text>
+      <text lang="ES">Opciones de reproducción</text>
+      <text lang="CA">Opcions de reproducció</text>
+      <action>SETTINGS_PLAYER</action>
+   </button>
+
+</mythmenu>

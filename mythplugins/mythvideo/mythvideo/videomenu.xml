@@ -1,19 +1,29 @@
 <mythmenu name="VIDEO">
 
    <button>
-     <type>TV</type>
-     <text>TV Shows</text>
-     <text lang="ES">Programas de TV</text>
-     <text lang="CA">Programes de TV</text>
-     <action>EXEC mythvideo /mnt/movies movies</action>
+     <type>BROWSER</type>
+     <text>Browse Videos</text>
+     <action>BROWSER</action>
    </button>
 
   <button>
-     <type>Videos</type>
-     <text>Movies</text>
-     <text lang="ES">Películas</text>
-     <text lang="CA">Pel-lícueas</text>
-     <action>EXEC mythvideo /mnt/tvshows movies</action>
+     <type>LISTING</type>
+     <text>Video List</text>
+     <action>LISTING</action>
+   </button>
+
+   <button>
+     <type>MANAGER</type>
+     <text>Video Manager</text>
+     <action>MANAGER</action>
+   </button>
+  
+   <button>
+     <type>SETUP</type>
+     <text>Setup</text>
+     <text lang="ES">Configurar</text>
+     <text lang="CA">Configurar</text>
+     <action>MENU video_settings.xml</action>
    </button>
 
 

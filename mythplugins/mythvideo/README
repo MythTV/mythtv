@@ -1,10 +1,11 @@
                                    MythVideo
+                                  Version 0.9
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-	MythTV 0.8 installed and working
+	MythTV 0.9 installed and working
 
 If you have met the requirements above, simply type 'make' in the main directory
 to begin compiling.
@@ -20,14 +21,75 @@ Compiling note:  If you get an error on building this, that says something
 Once the make is completed, you should switch to root and do a 'make install'.  
 
 - mythvideo will go into /usr/local/bin
-- the mythvideo-settings.txt will go into the /usr/local/share/mythtv 
-  directory
 
-Before running mythvideo, edit the installed mythvideo-settings.txt
-file and adjust your StartDir.  By default, it is set to /mnt/store
 
-The default media player is set to mplayer, and will default to full-screen
-mode.  If you do not want full-screen mode, remove the "-vm" parameter.
 
-If you wish to add helper applications, they must be defined as 
-str <format>_helper=<program>
+VIDEO METADATA TABLE
+--------------------
+
+You need to also create the videometadata table in your MySQL database, to do so:
+
+# exit
+$ cd videodb
+$ mysql -u root < metadata.sql
+
+
+
+RUNNING MYTHVIDEO
+-----------------
+
+MythVideo is run by executing 'mythvideo' - All the configuration is now done within the program.
+
+
+
+
+INTERNET INFORMATION
+--------------------
+ 
+MythVideo now supports contacting internet sites to grab information about the
+videos found. It does this by cutting out unnecessary information in the filename
+and doing a search. MythVideo will also grab a movie poster or coverart if it 
+is available. 
+
+In order to start this process, once your video have been found by MythVideo,
+in the 'Video Manager' screen, simply select the video you want to find 
+information/artwork for. MythVideo will contact imdb.com. If there is just
+one result returned, MythVideo will use the information from that page. Otherwise,
+MythVideo will present you with a list of movies and the year of the movie.
+
+IF MYTHVIDEO DOES NOT FIND YOUR MOVIE OR JUST SEEMS TO DO NOTHING - Do not dispare!
+MythVideo also allows you to enter the IMDB Movie number manually. To enter a movie
+number manually or reset an entry in the event of bad information, simply hit 'M' 
+and select either 'Reset Entry' or 'Manually Enter IMDB #' (depending on what you want 
+to do).
+
+
+PARENTAL LEVEL INFORMATION
+--------------------------
+
+MythVideo now supports the ability to limit what can be viewed without a password.
+There are 5 different levels that a video/file can be set at. From within the 
+configuration you can select a default level. Any videos/files at or below that 
+level will show up in the list. To change the current level, hit the 'M' key and
+select the desired level. MythVideo will then ask for the password to that level.
+
+MythVideo will only stay at that level until you exit the screen you upgraded 
+the level in (ie, it will not change the default level in this way). To change
+the default level go into setup. 
+
+Note: A video that is set to level 0 will not be seen in any lists other than
+the video manager (this is there in case some stray files are found in the 
+directories that are not videos). The Video Manager has complete control over 
+the parental levels of each video. For this reason, if the level 4 password
+is set, you will be prompted upon entering the Video Manager for the level
+4 password.
+
+
+
+Feel free to subscribe to the development mailing list at:
+http://www.snowman.net/mailman/listinfo/mythtv-dev
+
+A list that's restricted to the CVS commit messages is available at:
+http://www.snowman.net/mailman/listinfo/mythtv-commits
+
+or, just email me directly:  John Danner <johndanner (at) untzuntz (dot) com>

@@ -1,8 +1,9 @@
-#ifndef DATABASEBOX_H_
-#define DATABASEBOX_H_
+#ifndef VIDEOBROWSER_H_
+#define VIDEOBROWSER_H_
 
 #include <qwidget.h>
 #include <qdialog.h>
+#include <qapplication.h>
 #include <qstringlist.h>
 
 #include "metadata.h"
@@ -12,45 +13,52 @@
 #include <mythtv/xmlparse.h>
 
 class QSqlDatabase;
-class QListViewItem;
-class TreeCheckItem;
-class QLabel;
+typedef QValueList<Metadata>  ValueMetadata;
 
-class DatabaseBox : public MythDialog
+class VideoBrowser : public MythDialog
 {
     Q_OBJECT
   public:
-    DatabaseBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
-                QWidget *parent = 0, const char *name = 0);
-   ~DatabaseBox();
+    VideoBrowser(QSqlDatabase *ldb, 
+                 QWidget *parent = 0, const char *name = 0);
+    ~VideoBrowser();
+    void VideoBrowser::processEvents() { qApp->processEvents(); }
+    
 
   signals:
     void killTheApp();
 
   protected slots:
     void selected();
-    void cursorDown(bool page = false);
-    void cursorUp(bool page = false);
-    void pageDown() { cursorDown(true); }
-    void pageUp() { cursorUp(true); }
+    void cursorLeft();
+    void cursorRight();
+    void cursorDown();
+    void cursorUp();
     void exitWin();
 
   protected:
     void paintEvent(QPaintEvent *);
 
   private:
+    bool updateML;
+    bool noUpdate;
+
     QPixmap getPixmap(QString &level);
     QSqlDatabase *db;
-    QValueList<Metadata> *m_list;
+    ValueMetadata m_list;
 
     void LoadWindow(QDomElement &);
     void parseContainer(QDomElement &);
     XMLParse *theme;
     QDomElement xmldata;
 
+    int currentParentalLevel;
+    void RefreshMovieList();
+    void SetCurrentItem();
+
     void updateBackground(void);
-    void updateList(QPainter *);
     void updateInfo(QPainter *);
+    void updateBrowsing(QPainter *);
     void updatePlayWait(QPainter *);
 
     void grayOut(QPainter *);
@@ -60,30 +68,25 @@ class DatabaseBox : public MythDialog
 
     QPixmap *bgTransBackup;
     Metadata *curitem;
+    QString curitemMovie;
 
     QPainter backup;
     QPixmap myBackground;
-    bool pageDowner;
 
-    int inList;
     int inData;
-    int listCount;
-    int dataCount;
-
-    int m_status;
+ 
+    int m_state;
+    QString m_title;
+    QString m_cmd;
 
     int space_itemid;
     int enter_itemid;
     int return_itemid;
 
-    QRect listRect;
     QRect infoRect;
-    QRect fullRect;
+    QRect browsingRect;
+    QRect fullRect() const;
 
-    int listsize;
-
-    QString m_cmd;   
-    QString m_title;
 };
 
 #endif
