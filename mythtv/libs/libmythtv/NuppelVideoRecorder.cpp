@@ -332,10 +332,10 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     }
     else
     {
-        cerr << "Unknown video codec\n";
-        cerr << "Please go into the TV Settings, Recording Profiles and\n";
-        cerr << "setup the four 'Software Encoders' profiles.\n";
-        cerr << "Assuming RTjpeg for now.\n";
+        VERBOSE(VB_IMPORTANT, "Unknown video codec");
+        VERBOSE(VB_IMPORTANT, "Please go into the TV Settings, Recording Profiles and");
+        VERBOSE(VB_IMPORTANT, "setup the four 'Software Encoders' profiles.");
+        VERBOSE(VB_IMPORTANT, "Assuming RTjpeg for now.");
 
         SetOption("codec", "rtjpeg");
 
@@ -355,7 +355,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         SetOption("audiocompression", 0);
     else
     {
-        cerr << "Unknown audio codec\n";
+        VERBOSE(VB_IMPORTANT, "NVR: Error, unknown audio codec");
         SetOption("audiocompression", 0);
     }
 
@@ -445,7 +445,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
 
     if (!mpa_codec)
     {
-        cerr << "error finding codec: " << codec.ascii() << endl;
+        VERBOSE(VB_IMPORTANT, QString("NVR: Error finding codec: %1").arg(codec.ascii()));
         return false;
     }
 
@@ -461,7 +461,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
             mpa_picture.linesize[2] = w_out / 2;
             break;
         default:
-            cerr << "Unknown picture format: " << picture_format << endl;
+            VERBOSE(VB_IMPORTANT, QString("NVR: Unknown picture format: %1").arg(picture_format));
     }
  
     mpa_ctx->width = w_out;
@@ -512,7 +512,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     if (avcodec_open(mpa_ctx, mpa_codec) < 0)
     {
         pthread_mutex_unlock(&avcodeclock);
-        cerr << "Unable to open FFMPEG/" <<  codec << " codec\n" << endl;
+        VERBOSE(VB_IMPORTANT, QString("NVR: Unable to open FFMPEG/%1 codec").arg(codec));
         return false;
     }
 
@@ -539,7 +539,7 @@ void NuppelVideoRecorder::Initialize(void)
 {
     if (AudioInit() != 0)   
     {
-        cerr << "Could not detect audio blocksize\n";
+        VERBOSE(VB_IMPORTANT, "NVR: Could not detect audio blocksize");
     }
  
     if (codec == "hardware-mjpeg")
@@ -548,8 +548,8 @@ void NuppelVideoRecorder::Initialize(void)
         hardware_encode = true;
 
         if (MJPEGInit() != 0)
-            cerr << "Could not detect max width for hardware MJPEG card, "
-                    "falling back to default: " << hmjpg_maxw << endl;
+            VERBOSE(VB_IMPORTANT, QString("NVR: Could not detect max width for hardware MJPEG card, ").
+                    append(QString("falling back to default: %1").arg(hmjpg_maxw)));
  
         w = hmjpg_maxw / hmjpg_hdecimation;
 
@@ -575,7 +575,7 @@ void NuppelVideoRecorder::Initialize(void)
 
     if (!ringBuffer)
     {
-        cerr << "Warning: Old ringbuf creation\n";
+        VERBOSE(VB_IMPORTANT, "NVR: Warning, old ringbuf creation");
         ringBuffer = new RingBuffer("output.nuv", true);
         weMadeBuffer = true;
         livetv = false;
@@ -599,7 +599,8 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
     {
         if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY | O_NONBLOCK)))
         {
-            cerr << "Cannot open DSP '" << audiodevice << "', dying.\n";
+            VERBOSE(VB_IMPORTANT, QString("NVR: Error, cannot open DSP '%1'").
+                    arg(audiodevice));
             perror("open");
             return 1;
         }
@@ -616,7 +617,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
         if (afmt != AFMT_S16_LE) 
         {
             close(afd);
-            cerr << "Can't get 16 bit DSP, exiting\n";
+            VERBOSE(VB_IMPORTANT, "NVR: Error, can't get 16 bit DSP");
             return 1;
         }
 
@@ -625,18 +626,18 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
             ioctl(afd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
         {
             close(afd);
-            cerr << "recorder: " << audiodevice 
-                 << ": error setting audio input device to "
-                 << audio_samplerate << "kHz/" 
-                 << audio_bits << "bits/"
-                 << audio_channels << "channel\n";
+            QString msg = 
+                QString("NVR: AudioInit(): %1 : error setting audio input device"
+                        " to %2kHz/%3bits/%4channel").arg(audiodevice).
+                arg(audio_samplerate).arg(audio_bits).arg(audio_channels);
+            VERBOSE(VB_IMPORTANT, msg);
             return 1;
         }
 
         if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE, &blocksize)) 
         {
             close(afd);
-            cerr << "Can't get DSP blocksize, exiting\n";
+            VERBOSE(VB_IMPORTANT, "NVR: AudioInit(): Can't get DSP blocksize");
             return(1);
         }
 
@@ -659,13 +660,13 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
         lame_set_in_samplerate(gf, audio_samplerate);
         if ((tmp = lame_init_params(gf)) != 0)
         {
-            cerr << "lame_init_params error " << tmp << "\n";
+            VERBOSE(VB_IMPORTANT, QString("NVR: AudioInit(): lame_init_params error %1").arg(tmp));
             compressaudio = false; 
         }
 
         if (audio_bits != 16) 
         {
-            cerr << "lame support requires 16bit audio\n";
+            VERBOSE(VB_IMPORTANT, "NVR: AudioInit(): lame support requires 16bit audio");
             compressaudio = false;
         }
     }
@@ -680,7 +681,8 @@ int NuppelVideoRecorder::MJPEGInit(void)
     fd = open(videodevice.ascii(), O_RDWR);
     if (fd < 0)
     {
-        cerr << "Can't open video device: " << videodevice << endl;
+        VERBOSE(VB_IMPORTANT, QString("NVR: Can't open video device: %1").
+                arg(videodevice));
         perror("open video:");
         return 1;
     }
@@ -709,8 +711,9 @@ int NuppelVideoRecorder::MJPEGInit(void)
     }
     else
     {
-        cerr << "Video device " << videodevice << " does not appear to have "
-                "hardware MJPEG capture capabilities." << endl;
+        VERBOSE(VB_IMPORTANT, 
+                QString("Video device %1 does not appear to have hardware "
+                        "MJPEG capture capabilities.").arg(videodevice));
         return 1;
     }
 
@@ -842,7 +845,8 @@ bool NuppelVideoRecorder::Open(void)
         fd = open(videodevice.ascii(), O_RDWR);
         if (retries++ > 5)
         {
-            cerr << "Can't open video device: " << videodevice << endl;
+            VERBOSE(VB_IMPORTANT, QString("NVR: Can't open video device: %1").
+                    arg(videodevice));
             perror("open video:");
             KillChildren();
             errored = true;
@@ -862,13 +866,13 @@ bool NuppelVideoRecorder::Open(void)
 
     if (usingv4l2 && !(vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
     {
-        cerr << "Not a v4l2 capture device, falling back to v4l\n";
+        VERBOSE(VB_IMPORTANT, "NVR: Not a v4l2 capture device, falling back to v4l");
         usingv4l2 = false;
     }
 
     if (usingv4l2 && !(vcap.capabilities & V4L2_CAP_STREAMING))
     {
-        cerr << "Won't work with the streaming interface, falling back\n";
+        VERBOSE(VB_IMPORTANT, "NVR: Won't work with the streaming interface, falling back");
         usingv4l2 = false;
     }
 
@@ -883,7 +887,7 @@ bool NuppelVideoRecorder::Open(void)
             channelfd = open(videodevice.ascii(), O_RDWR);
             if (channelfd < 0)
             {
-                cerr << "Can't open video device: " << videodevice << endl;
+                VERBOSE(VB_IMPORTANT, QString("NVR: Can't open video device: %1").arg(videodevice));
                 perror("open video:");
                 KillChildren();
                 return false;
@@ -904,7 +908,7 @@ void NuppelVideoRecorder::StartRecording(void)
 {
     if (lzo_init() != LZO_E_OK)
     {
-        cerr << "lzo_init() failed, exiting\n";
+        VERBOSE(VB_IMPORTANT, "NVR: lzo_init() failed, exiting");
         errored = true;
         return;
     }
@@ -929,22 +933,22 @@ void NuppelVideoRecorder::StartRecording(void)
 
     if (CreateNuppelFile() != 0)
     {
-        cerr << "Cannot open '" << ringBuffer->GetFilename() << "' for "
-             << "writing, exiting\n";
+        VERBOSE(VB_IMPORTANT, QString("NVR: Error, cannot open '%1' for writing").
+                arg(ringBuffer->GetFilename()));
         errored = true;
         return;
     }
 
     if (childrenLive)
     {
-        cerr << "Error: children are already alive\n";
+        VERBOSE(VB_IMPORTANT, "NVR: Error, children are already alive");
         errored = true;
         return;
     }
 
     if (SpawnChildren() < 0)
     {
-        cerr << "Couldn't spawn children\n";
+        VERBOSE(VB_IMPORTANT, "NVR: Error, couldn't spawn children");
         errored = true;
         return;
     }
@@ -1109,7 +1113,8 @@ void NuppelVideoRecorder::StartRecording(void)
         {
             syncerrors++;
             if (syncerrors == 10)
-                cerr << "Multiple bttv errors, further messages supressed\n";
+                VERBOSE(VB_IMPORTANT, "NVR: Multiple bttv errors, "
+                        "further messages supressed");
             else if (syncerrors < 10)
                 perror("VIDIOCSYNC");
         }
@@ -1128,7 +1133,7 @@ void NuppelVideoRecorder::StartRecording(void)
         {
             syncerrors++;
             if (syncerrors == 10)
-                cerr << "Multiple bttv errors, further messages supressed\n";
+                VERBOSE(VB_IMPORTANT, "NVR: Multiple bttv errors, further messages supressed");
             else if (syncerrors < 10)
                 perror("VIDIOCSYNC");
         }
@@ -1182,7 +1187,8 @@ void NuppelVideoRecorder::DoV4L2(void)
         if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
         {
             VERBOSE(VB_IMPORTANT, "NVR: v4l2: Unable to set desired format");
-            exit(-2);
+            errored = true;
+            return;
         }
         else
         {
@@ -1191,16 +1197,14 @@ void NuppelVideoRecorder::DoV4L2(void)
             {
                 VERBOSE(VB_IMPORTANT, "NVR: v4l2: yuyv format supported, but yuv422 requested.");
                 VERBOSE(VB_IMPORTANT, "NVR: v4l2: unfortunately, this converter hasn't been written yet, exiting");
-                exit(-3);
+                errored = true;
+                return;
             }
-            cerr << "NVR: v4l2: format set, getting yuyv from v4l, converting" << endl;
+            VERBOSE(VB_RECORD, "NVR: v4l2: format set, getting yuyv from v4l, converting");
         }
     }
-    else
-    {
-        // cool, we can do our preferred format, most likely running on bttv.
-        cerr << "v4l2: format set, getting yuv420 from v4l";
-    }
+    else // cool, we can do our preferred format, most likely running on bttv.
+        VERBOSE(VB_RECORD, "NVR: v4l2: format set, getting yuv420 from v4l");
 
     int numbuffers = 5;
 
@@ -1211,13 +1215,15 @@ void NuppelVideoRecorder::DoV4L2(void)
     if (ioctl(fd, VIDIOC_REQBUFS, &vrbuf) < 0)
     {
         VERBOSE(VB_IMPORTANT, "NVR: Not able to get any capture buffers, exiting");
-        exit(-4);
+        errored = true;
+        return;
     }
 
     if (vrbuf.count < 5)
     {
         VERBOSE(VB_IMPORTANT, "NVR: Not enough buffer memory, exiting");
-        exit(-5);
+        errored = true;
+        return;
     }
 
     numbuffers = vrbuf.count;
@@ -1233,7 +1239,8 @@ void NuppelVideoRecorder::DoV4L2(void)
         if (ioctl(fd, VIDIOC_QUERYBUF, &vbuf) < 0)
         {
             VERBOSE(VB_IMPORTANT, QString("NVR: unable to query capture buffer %1").arg(i));
-            exit(-6);
+            errored = true;
+            return;
         }
 
         buffers[i] = (unsigned char *)mmap(NULL, vbuf.length,
@@ -1244,7 +1251,8 @@ void NuppelVideoRecorder::DoV4L2(void)
         {
             perror("mmap");
             VERBOSE(VB_IMPORTANT, QString("NVR: memory map error"));
-            exit(-7);
+            errored = true;
+            return;
         }
         bufferlen[i] = vbuf.length;
     }
@@ -1471,7 +1479,7 @@ void NuppelVideoRecorder::DoMJPEG(void)
 
     if (MJPG_buff == MAP_FAILED)
     {
-        cerr << "error mapping mjpeg buffers\n";
+        VERBOSE(VB_IMPORTANT, "NVR: error mapping mjpeg buffers");
         return;
     } 
   
@@ -1527,7 +1535,7 @@ int NuppelVideoRecorder::SpawnChildren(void)
 
     if (result)
     {
-        cerr << "Couldn't spawn writer thread, exiting\n";
+        VERBOSE(VB_IMPORTANT, "NVR: Couldn't spawn writer thread, exiting");
         return -1;
     }
 
@@ -1536,7 +1544,7 @@ int NuppelVideoRecorder::SpawnChildren(void)
 
     if (result)
     {
-        cerr << "Couldn't spawn audio thread, exiting\n";
+        VERBOSE(VB_IMPORTANT, "NVR: Couldn't spawn audio thread, exiting");
         return -1;
     }
 
@@ -1547,7 +1555,7 @@ int NuppelVideoRecorder::SpawnChildren(void)
 
         if (result)
         {
-            cerr << "Couldn't spawn vbi thread, exiting\n";
+            VERBOSE(VB_IMPORTANT, "NVR: Couldn't spawn vbi thread, exiting");
             return -1;
         }
     }
@@ -1917,13 +1925,13 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
     
     if (!ringBuffer)
     {
-        cerr << "Error: no ringbuffer, recorder wasn't initialized.\n";
+        VERBOSE(VB_IMPORTANT, "NVR: Error, no ringbuffer, recorder wasn't initialized.");
         return -1;
     }
 
     if (!ringBuffer->IsOpen())
     {
-        cerr << "Ringbuffer isn't open\n";
+        VERBOSE(VB_IMPORTANT, "NVR: Ringbuffer isn't open");
         return -1;
     }
 
@@ -2033,7 +2041,8 @@ void NuppelVideoRecorder::doAudioThread(void)
 
     if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY | O_NONBLOCK))) 
     {
-        cerr << "Cannot open DSP '" << audiodevice << "', exiting";
+        VERBOSE(VB_IMPORTANT, QString("NVR: Cannot open DSP '%1', exiting").
+                arg(audiodevice));
         perror("open");
         return;
     }
@@ -2048,7 +2057,7 @@ void NuppelVideoRecorder::doAudioThread(void)
     ioctl(afd, SNDCTL_DSP_SETFMT, &afmt);
     if (afmt != AFMT_S16_LE) 
     {
-        cerr << "Can't get 16 bit DSP, exiting";
+        VERBOSE(VB_IMPORTANT, "NVR: Can't get 16 bit DSP, exiting");
         close(afd);
         return;
     }
@@ -2057,11 +2066,10 @@ void NuppelVideoRecorder::doAudioThread(void)
         ioctl(afd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
         ioctl(afd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
     {
-        cerr << "recorder: " << audiodevice 
-             << ": error setting audio input device to "
-             << audio_samplerate << "kHz/" 
-             << audio_bits << "bits/"
-             << audio_channels << "channel\n";
+        VERBOSE(VB_IMPORTANT, QString("NVR: %1: error setting audio input device to "
+                                      "%2 kHz/%3 bits/%4 channel").
+                arg(audiodevice).arg(audio_samplerate).
+                arg(audio_bits).arg(audio_channels));
         close(afd);
         return;
     }
@@ -2070,7 +2078,7 @@ void NuppelVideoRecorder::doAudioThread(void)
 
     if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE,  &blocksize)) 
     {
-        cerr << "Can't get DSP blocksize, exiting";
+        VERBOSE(VB_IMPORTANT, "NVR: Can't get DSP blocksize, exiting");
         close(afd);
         return;
     }
@@ -2079,8 +2087,9 @@ void NuppelVideoRecorder::doAudioThread(void)
 
     if (blocksize != audio_buffer_size) 
     {
-        cerr << "warning: audio blocksize = '" << blocksize << "'"
-             << " audio_buffer_size='" << audio_buffer_size << "'\n";
+        VERBOSE(VB_IMPORTANT, 
+                QString("NVR: Warning, audio blocksize = '%1' while audio_buffer_size='%2'").
+                arg(blocksize).arg(audio_buffer_size));
     }
 
     buffer = new unsigned char[audio_buffer_size];
@@ -2106,8 +2115,9 @@ void NuppelVideoRecorder::doAudioThread(void)
         if (audio_buffer_size != (lastread = read(afd, buffer,
                                                   audio_buffer_size))) 
         {
-            cerr << "only read " << lastread << " from " << audio_buffer_size
-                 << " bytes from '" << audiodevice << "'\n";
+            VERBOSE(VB_IMPORTANT, 
+                    QString("NVR: Only read %1 bytes of %2 bytes from '%3").
+                    arg(lastread).arg(audio_buffer_size).arg(audiodevice));
             perror("read audio");
         }
 
@@ -2122,7 +2132,7 @@ void NuppelVideoRecorder::doAudioThread(void)
 
         if (!audiobuffer[act]->freeToBuffer) 
         {
-            cerr << "ran out of free AUDIO buffers :-(\n";
+            VERBOSE(VB_IMPORTANT, "NVR: Ran out of free AUDIO buffers :-(");
             act_audio_sample++;
             continue;
         }
@@ -2170,7 +2180,7 @@ void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
     int act = act_text_buffer;
     if (!textbuffer[act]->freeToBuffer)
     {
-        cerr << act << " ran out of free TEXT buffers :-(\n";
+        VERBOSE(VB_IMPORTANT, QString("NVR: Teletext #%1: ran out of free TEXT buffers :-(").arg(act));
         return;
     }
 
@@ -2860,7 +2870,7 @@ void NuppelVideoRecorder::BufferCC(struct cc *cc, int mode, int len, int clr)
     int act = act_text_buffer;
     if (!textbuffer[act]->freeToBuffer)
     {
-        cerr << act << " ran out of free TEXT buffers :-(\n";
+        VERBOSE(VB_IMPORTANT, QString("NVR: Teletext#%1 ran out of free TEXT buffers :-(").arg(act));
         return;
     }
 
@@ -3036,7 +3046,7 @@ void NuppelVideoRecorder::doVbiThread(void)
             vbi = vbi_open(vbidevice.ascii(), NULL, 99, -1);
             if (!vbi)
             {
-                cerr << "Can't open vbi device: " << vbidevice << endl;
+                VERBOSE(VB_IMPORTANT, QString("NVR: Can't open vbi device: %1").arg(vbidevice));
                 return;
             }
             vbifd = vbi->fd;
@@ -3045,7 +3055,7 @@ void NuppelVideoRecorder::doVbiThread(void)
             cc = cc_open(vbidevice.ascii());
             if (!cc)
             {
-                cerr << "Can't open vbi device: " << vbidevice << endl;
+                VERBOSE(VB_IMPORTANT, QString("NVR: Can't open vbi device: %1").arg(vbidevice));
                 return; 
             }
             vbifd = cc->fd;
@@ -3125,7 +3135,7 @@ void NuppelVideoRecorder::doVbiThread(void)
 void NuppelVideoRecorder::doWriteThread(void)
 {
     actuallypaused = false;
-    while (childrenLive)
+    while (childrenLive && !IsErrored())
     {
         if (pausewritethread)
         {
@@ -3193,6 +3203,11 @@ void NuppelVideoRecorder::doWriteThread(void)
                 WriteAudio(audiobuffer[act_audio_encode]->buffer,
                            audiobuffer[act_audio_encode]->sample,
                            audiobuffer[act_audio_encode]->timecode);
+                if (IsErrored()) {
+                    VERBOSE(VB_IMPORTANT, "NVR: ACTION_AUDIO can not be completed due to error.");
+                    StopRecording();
+                    break;
+                }
                 audiobuffer[act_audio_encode]->sample = 0;
                 audiobuffer[act_audio_encode]->freeToEncode = 0;
                 audiobuffer[act_audio_encode]->freeToBuffer = 1; 
@@ -3367,7 +3382,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
                                      (lzo_uint *)&out_len, wrkmem);
             if (r != LZO_E_OK) 
             {
-                cerr << "lzo compression failed\n";
+                VERBOSE(VB_IMPORTANT, "NVR: lzo compression failed");
                 return;
             }
         }
@@ -3505,9 +3520,8 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         if (fnum != (last_block+1)) 
         {
             audio_behind = fnum - (last_block+1);
-            QString msg = QString("audio behind %1 %2")
-                          .arg(last_block).arg(fnum);
-            VERBOSE(VB_RECORD, msg);
+            VERBOSE(VB_RECORD, QString("NVR: audio behind %1 %2").
+                    arg(last_block).arg(fnum));
         }
     }
 
@@ -3562,8 +3576,9 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 
         if (lameret < 0)
         {
-            cerr << "lame error '" << lameret << "', exiting\n";
-            exit(-8); 
+            VERBOSE(VB_IMPORTANT, QString("NVR: lame error '%1'").arg(lameret));
+            errored = true;
+            return;
         }
         compressedsize = lameret;
 
@@ -3571,8 +3586,9 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
                                           7200);
         if (lameret < 0)
         {
-            cerr << "lame error - " << lameret << " - exiting\n";
-            exit(-9);
+            VERBOSE(VB_IMPORTANT, QString("NVR: lame error '%1'").arg(lameret));
+            errored = true;
+            return;
         }
         gaplesssize = lameret;
 

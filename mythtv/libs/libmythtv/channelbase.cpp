@@ -107,7 +107,8 @@ void ChannelBase::SwitchToInput(const QString &inputname)
     if (input >= 0)
         SwitchToInput(input, true);
     else
-        cerr << "Couldn't find input: " << inputname << " on card\n";
+        VERBOSE(VB_IMPORTANT, QString("ChannelBase: Could not find input: "
+                                      "%1 on card\n").arg(inputname));
 }
 
 void ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
@@ -120,7 +121,9 @@ void ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
         SetChannelByString(chan);
     }
     else
-        cerr << "Couldn't find input: " << inputname << " on card\n";
+        VERBOSE(VB_IMPORTANT,
+                QString("ChannelBase: Could not find input: %1 on card when "
+                        "setting channel %2\n").arg(inputname).arg(chan));
 }
 
 bool ChannelBase::ChangeExternalChannel(const QString &channum)
@@ -134,28 +137,73 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     VERBOSE(VB_CHANNEL, QString("External channel change: %1").arg(command));
     pid_t child = fork();
     if (child < 0)
-    {
-        perror("fork");
+    {   // error encountered in creating fork
+        QString msg("ChannelBase: fork error -- ");
+        msg.append(strerror(errno));
+        VERBOSE(VB_IMPORTANT, msg);
+        return false;
     }
     else if (child == 0)
-    {
+    {   // we are the new fork
         for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
             close(i);
-        execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
-        perror("exec");
-        _exit(-11);
+        int ret=execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
+        QString msg("ChannelBase: ");
+        if (EACCES==ret) {
+            msg.append(QString("Access denied to /bin/sh"
+                               " when executing %1\n").arg(command.ascii()));
+        }
+        msg.append(strerror(errno));
+        VERBOSE(VB_IMPORTANT, msg);
+        _exit(1); // this exit is ok, we are just exiting from the channel changing fork with an error.
     }
     else
-    {
-        int status;
-        if (waitpid(child, &status, 0) < 0)
+    {   // child contains the pid of the new process
+        int status=0, pid=0;
+        VERBOSE(VB_CHANNEL, "Waiting for External Tuning program to exit");
+
+        bool timed_out = false;
+        uint timeout = 30; // how long to wait in seconds
+        time_t start_time = time(0);
+        while (-1!=pid && !timed_out)
         {
-            perror("waitpid");
+            sleep(1);
+            pid = waitpid(child, &status, WUNTRACED|WNOHANG);
+            VERBOSE(VB_IMPORTANT, QString("ret_pid(%1) child(%2) status(0x%3)")
+                    .arg(pid).arg(child).arg(status,0,16));
+            if (pid==child)
+                break;
+            else if (time(0)>start_time+timeout)
+                timed_out = true;
         }
-        else if (status != 0)
+        if (timed_out)
         {
-            cerr << "External channel change command exited with status "
-                 << status << endl;
+            VERBOSE(VB_IMPORTANT, "External Tuning program timed out, killing");
+            kill(child, SIGTERM);
+            usleep(500);
+            kill(child, SIGKILL);
+            return false;
+        }
+
+        VERBOSE(VB_CHANNEL, "External Tuning program no longer running");
+        if (WIFEXITED(status))
+        {   // program exited normally
+            int ret = WEXITSTATUS(status);
+            if (ret)
+            {   // external tuning program returned error value
+                VERBOSE(VB_IMPORTANT,
+                        QString("ChannelBase: external tuning program "
+                                "exited with error %1").arg(ret));
+                return false;
+            }
+            VERBOSE(VB_IMPORTANT, "External Tuning program exited with no error");
+        }
+        else
+        {   // program exited abnormally
+            QString msg = QString("ChannelBase: external tuning program "
+                                  "encountered error %1 -- ").arg(errno);
+            msg.append(strerror(errno));
+            VERBOSE(VB_IMPORTANT, msg);
             return false;
         }
     }

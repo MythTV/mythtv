@@ -913,7 +913,11 @@ bool grabDDData(Source source, int poffset, QDate pdate)
         {
             if (!quiet)
                 cout << "Grabbing ALL available data...\n";
-            ddprocessor.grabAllData();
+            if (!ddprocessor.grabAllData())
+            {
+                cerr << "Encountered error in grabbing data...\n";
+                return false;
+            }
         }
         else
         {

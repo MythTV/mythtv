@@ -254,9 +254,9 @@ class DataDirectProcessor
     void updateStationViewTable();
     void updateProgramViewTable(int sourceid);
 
-    void grabLineupsOnly();
-    void grabData(bool plineupsonly, QDateTime pstartdate, QDateTime penddate);
-    void grabAllData(void);
+    bool grabLineupsOnly();
+    bool grabData(bool plineupsonly, QDateTime pstartdate, QDateTime penddate);
+    bool grabAllData(void);
 
     void parseLineups();
     void parseStations();

@@ -623,6 +623,11 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 nvr->SetOption("audioframesize", audioframesize);
                 int starttime = audioOutput->GetAudiotime();
                 nvr->WriteAudio(arb->audiobuffer, audioFrame++, starttime);
+                if (nvr->IsErrored()) {
+                    VERBOSE(VB_IMPORTANT, "Transcode: Encountered "
+                            "irrecoverable error in NVR::WriteAudio");
+                    return REENCODE_ERROR;
+                }
                 arb->audiobuffer_len = 0;
             }
             nvp->TranscodeWriteText(&TranscodeWriteText, (void *)(nvr));

@@ -132,8 +132,11 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
 
     pdlg.setProgress(1);
 
-    ddp.grabLineupsOnly();
-
+    if (!ddp.grabLineupsOnly())
+    {
+        VERBOSE(VB_IMPORTANT, "DDLS: fillSelections did not successfully load selections");
+        return;
+    }
     QValueList<DataDirectLineup> lineups = ddp.getLineups();
 
     QValueList<DataDirectLineup>::iterator it;

@@ -433,7 +433,7 @@ void DataDirectProcessor::updateProgramViewTable(int sourceid)
         MythContext::DBError("Analyzing table dd_productioncrew", query);
 }
 
-void DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate, 
+bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate, 
                                    QDateTime pendDate) 
 {
     QString ddurl = "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService";
@@ -452,9 +452,9 @@ void DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
     char ctempfilename[] = "/tmp/mythpostXXXXXX";
     if (mkstemp(ctempfilename) == -1) 
     {
-         perror("mkstemp");
-         VERBOSE(VB_IMPORTANT, "DDP: error creating temp files");
-         exit(-12);
+        VERBOSE(VB_IMPORTANT, QString("DDP: error creating temp files -- %1").
+                arg(strerror(errno)));
+        return false;
     }
 
     QString tmpfilename = QString(ctempfilename);
@@ -494,9 +494,9 @@ void DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
     FILE* fp = popen(command.ascii(), "r");
     if (fp == NULL) 
     {
-        VERBOSE(VB_GENERAL, "Failed to get data");
-        perror(command.ascii());
-        return;
+        VERBOSE(VB_IMPORTANT, QString("DDP: Failed to get data (%1) -- %2").
+                arg(command.ascii()).arg(strerror(errno)));
+        return false;
     }
 
     QFile f;
@@ -504,7 +504,7 @@ void DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
     if (!f.open(IO_ReadOnly, fp)) 
     {
        VERBOSE(VB_GENERAL,"Error opening DataDirect file");
-       return;
+       return false;
     }
     
     DDStructureParser ddhandler(*this);
@@ -515,23 +515,26 @@ void DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
     xmlsimplereader.parse(xmlsource);
     f.close();
     postfile.remove();
+    return true;
 }
 
-void DataDirectProcessor::grabLineupsOnly() 
+bool DataDirectProcessor::grabLineupsOnly() 
 {
+    bool ok = true;
     if ((lastrunuserid != getUserID()) || (lastrunpassword != getPassword())) 
     {
         lastrunuserid = getUserID();
         lastrunpassword = getPassword();
-        grabData(true, QDateTime::currentDateTime(),
-                 QDateTime::currentDateTime());
-    }   
+        ok = grabData(true, QDateTime::currentDateTime(),
+                      QDateTime::currentDateTime());
+    }
+    return ok;
 }   
 
-void DataDirectProcessor::grabAllData() 
+bool DataDirectProcessor::grabAllData() 
 {
-    grabData(false, QDateTime(QDate::currentDate()).addDays(-2),
-             QDateTime(QDate::currentDate()).addDays(15));
+    return grabData(false, QDateTime(QDate::currentDate()).addDays(-2),
+                    QDateTime(QDate::currentDate()).addDays(15));
 }
 
 void DataDirectProcessor::createATempTable(const QString &ptablename, 
