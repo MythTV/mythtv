@@ -8,7 +8,8 @@
 #include <qsqldatabase.h>
 
 #include "mythcontext.h"
-#include "settings.h"
+//#include "settings.h"
+#include "oldsettings.h"
 #include "themedmenu.h"
 #include "guidegrid.h"
 

@@ -16,7 +16,7 @@ using namespace std;
 #include "ttfont.h"
 #include "osd.h"
 #include "osdtypes.h"
-#include "libmyth/settings.h"
+#include "libmyth/oldsettings.h"
 
 OSD::OSD(int width, int height, int framerate, const QString &filename, 
          const QString &prefix, const QString &osdtheme)

@@ -17,7 +17,7 @@ using namespace std;
 #include "infodialog.h"
 #include "infostructs.h"
 #include "programinfo.h"
-#include "settings.h"
+#include "oldsettings.h"
 
 using namespace libmyth;
 

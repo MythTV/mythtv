@@ -55,10 +55,16 @@ ViewScheduled::ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb,
     listview->addColumn("Chan");
     listview->addColumn("Date");
     listview->addColumn("Title");
+    //listview->addColumn("Quality");
  
+//     listview->setColumnWidth(0, (int)(100 * wmult));
+//     listview->setColumnWidth(1, (int)(210 * wmult)); 
+//     listview->setColumnWidth(2, (int)(350 * wmult));
+//     listview->setColumnWidth(3, (int)(90 * wmult));
     listview->setColumnWidth(0, (int)(80 * wmult));
     listview->setColumnWidth(1, (int)(210 * wmult)); 
     listview->setColumnWidth(2, (int)(460 * wmult));
+
     listview->setColumnWidthMode(0, QListView::Manual);
     listview->setColumnWidthMode(1, QListView::Manual);
 

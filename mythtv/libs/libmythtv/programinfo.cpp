@@ -18,6 +18,7 @@ ProgramInfo::ProgramInfo(void)
     sourceid = -1;
     inputid = -1;
     cardid = -1;
+    recordingprofileid = -1;
 }   
         
 ProgramInfo::ProgramInfo(const ProgramInfo &other)
@@ -43,6 +44,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     sourceid = other.sourceid;
     inputid = other.inputid;
     cardid = other.cardid;
+    recordingprofileid = other.recordingprofileid;
 }   
 
 int ProgramInfo::CalculateLength(void)
@@ -510,4 +512,3 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
     }
 
 }
-

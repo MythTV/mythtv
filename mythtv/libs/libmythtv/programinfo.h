@@ -57,6 +57,7 @@ class ProgramInfo
     int sourceid;
     int inputid;
     int cardid;
+    int recordingprofileid;
     bool conflictfixed;
 };
 

@@ -96,7 +96,7 @@ class TV
 
     void LoadMenu(void);
 
-    void SetupRecorder();
+    void SetupRecorder(int profile);
     void TeardownRecorder(bool killFile = false);
     void SetupPipRecorder();
     void TeardownPipRecorder();

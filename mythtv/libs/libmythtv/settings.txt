@@ -10,19 +10,19 @@ int BufferSize=5
 # forcing an unpause.
 int MaxBufferFill=50
 # The desired path + name of the live tv buffer
-str BufferName=/mnt/store/ringbuf.nuv
+str BufferName=/var/cache/mythtv/ringbuf.nuv
 # Path to store recordings in
-str RecordFilePrefix=/mnt/store
-
-# Record settings
+str RecordFilePrefix=/var/lib/mythtv
+ 
+# Record settings (these are now pretty much all in the database -mdz)
 #
 # Video settings
 #
 # Resolution to capture at
-int Width=480
-int Height=480
+#int Width=480
+#int Height=480
 # What codec to use?  Tested values are rtjpeg (the default) and mpeg4
-str Codec=rtjpeg
+#str Codec=rtjpeg
 #
 # I normally use 640x480 with the mpeg4 codec and the below settings.
 #
@@ -30,23 +30,23 @@ str Codec=rtjpeg
 # RTjpeg specific settings
 #
 # Quality level to capture at (higher better, 255 being best)
-int Quality=170
+#int Quality=170
 # Motion Levels (lower better, 0 being best)
-int LumaFilter=0
-int ChromaFilter=0
+#int LumaFilter=0
+#int ChromaFilter=0
 #
 # MPEG4 specific settings
 # 
 # Desired bitrate, in bits/second.  2200 means about a gigabyte an hour.
-int TargetBitrate=3300
+#int TargetBitrate=3300
 # Scale bitrate by frame size.  If this is set to 1, the target bitrate given
 # above will be used as a guideline for 640x480.  Other resolutions will scale
 # the target bitrate down according to the framesize.
-int ScaleBitrate=1
+#int ScaleBitrate=1
 # Maximum quality level.  1 is best, 31 is worst
-int MaxQuality=2
+#int MaxQuality=2
 # Minimum quality level.  1 is best, 31 is worst
-int MinQuality=15
+#int MinQuality=15
 # Maximum quality difference between frames.
 int QualDiff=3
 #
@@ -62,15 +62,10 @@ int HardwareMJPEGDecimation=2
 #
 # dsp device -- output only
 str AudioDevice=/dev/dsp
-# Audio Sample Rate: one of 32000, 44100, 48000
-int AudioSampleRate=32000
-# Turn off the audio compression? 1 for yes, 0 for no.  Compression saves 500 
-# megabytes an hour, but takes extra CPU time.
-int DontCompressAudio=0
-# Quality level for the MP3 compression (0 best - 9 worst)
-int MP3Quality=7
+
 # 
 # Length of time to record past the end of a show, in seconds
+#
 int RecordOverTime=0
 
 #
@@ -128,4 +123,4 @@ int yScanDisplacement=0
 # Picture-in-picture options
 int PIPBufferSize=1
 int PIPMaxBufferFill=50
-str PIPBufferName=/mnt/store/ringbuf2.nuv
+str PIPBufferName=/var/cache/mythtv/ringbuf2.nuv

@@ -76,6 +76,7 @@ ProgramListItem::ProgramListItem(MythContext *context, QListView *parent,
             setText(0, pginfo->chanstr);
         setText(1, pginfo->startts.toString(dateformat + " " + timeformat));
         setText(2, pginfo->title);
+        //setText(3, pginfo->recordingprofilename);
     }
 }
 

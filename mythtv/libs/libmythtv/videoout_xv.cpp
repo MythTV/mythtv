@@ -15,7 +15,7 @@
 using namespace std;
 
 #include "XJ.h"
-#include "../libmyth/settings.h"
+#include "../libmyth/oldsettings.h"
 
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
