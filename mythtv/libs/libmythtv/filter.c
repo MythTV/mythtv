@@ -58,7 +58,7 @@ int process_video_filters(Frame *frame,VideoFilter **filters,int numberFilters)
   int i;
   for(i=0; i<numberFilters; i++) 
     {
-      if(filters[i]->filter(frame)<0)
+      if(filters[i]->filter(filters[i], frame)<0)
        fprintf(stderr," (%s) filter plugin '%s' returned error - ignored\n", 
                __FILE__, filters[i]->name);
     }

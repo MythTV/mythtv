@@ -13,7 +13,7 @@
 
 typedef struct ThisFilter
 {
-  int (*filter)(Frame *);
+  int (*filter)(VideoFilter *, Frame *);
   void (*cleanup)(VideoFilter *);
 
   char *name;
@@ -24,7 +24,7 @@ typedef struct ThisFilter
 } ThisFilter;
 
 
-int invert(Frame *frame)
+int invert(VideoFilter *vf, Frame *frame)
 {  
   int size;
   unsigned char *buf=frame->buf;

@@ -11,7 +11,7 @@
 
 typedef struct  VideoFilter_
 {
-    int (*filter)(Frame *);
+    int (*filter)(void *, Frame *);
     void (*cleanup)(struct VideoFilter_ *);
 
     char *name;

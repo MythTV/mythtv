@@ -17,7 +17,7 @@
 
 typedef struct ThisFilter
 {
-  int (*filter)(Frame *);
+  int (*filter)(VideoFilter *, Frame *);
   void (*cleanup)(VideoFilter *);
 
   char *name;
@@ -92,7 +92,7 @@ static inline void linearBlend(unsigned char *src, int stride)
 #endif
 }
 
-int linearBlendFilter(Frame *frame)
+int linearBlendFilter(VideoFilter *vf, Frame *frame)
 {
   int width = frame->width;
   int height = frame->height;
