@@ -1684,8 +1684,6 @@ void PlaybackBox::stop(ProgramInfo *rec)
 void PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory)
 {
     RemoteDeleteRecording(rec, forgetHistory);
-    connected = FillList();
-    update(fullRect);
 }
 
 void PlaybackBox::remove(ProgramInfo *toDel)

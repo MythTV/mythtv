@@ -965,6 +965,10 @@ void *MainServer::SpawnDeleteThread(void *param)
 
 void MainServer::DoDeleteThread(DeleteStruct *ds)
 {
+    // sleep a little to let frontends reload the recordings list
+    // after deleteing a recording, then we can hammer the DB and filesystem
+    sleep(3);
+
     deletelock.lock();
 
     QString logInfo = QString("chanid %1 at %2")
@@ -1020,10 +1024,14 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                            QString("File %1 does not exist for %2 when trying "
                                    "to delete recording.")
                                    .arg(ds->filename).arg(logInfo));
-        deletelock.unlock();
 
         pginfo->SetDeleteFlag(false);
         delete pginfo;
+
+        MythEvent me("RECORDING_LIST_CHANGE");
+        gContext->dispatch(me);
+
+        deletelock.unlock();
         return;
     }
 
@@ -1054,6 +1062,9 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
         pginfo->SetDeleteFlag(false);
         delete pginfo;
+
+        MythEvent me("RECORDING_LIST_CHANGE");
+        gContext->dispatch(me);
 
         deletelock.unlock();
         return;
@@ -1091,6 +1102,9 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     // Notify the frontend so it can requery for Free Space
     MythEvent me("RECORDING_LIST_CHANGE");
     gContext->dispatch(me);
+
+    // sleep a little to let frontends reload the recordings list
+    sleep(3);
 
     query.prepare("DELETE FROM recordedmarkup "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
@@ -1457,6 +1471,12 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
                           "the database but wasn't on the disk.";
 
         SendResponse(pbssock, outputlist);
+    }
+
+    if ((fileExists) || (pginfo->filesize == 0))
+    {
+        MythEvent me("RECORDING_LIST_CHANGE");
+        gContext->dispatch(me);
     }
 
     delete pginfo;
