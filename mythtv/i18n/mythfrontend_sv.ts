@@ -3979,7 +3979,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Deinterlace algorithm.  &apos;Linear blend&apos; and &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation>Avflätningsalgoritm. &apos;Linjär blandning&apos; och &apos;Kärna&apos; kräver SSE. &apos;Bob&apos; kräver Xv eller XvMC video ut.</translation>
+        <translation type="obsolete">Avflätningsalgoritm. &apos;Linjär blandning&apos; och &apos;Kärna&apos; kräver SSE. &apos;Bob&apos; kräver Xv eller XvMC video ut.</translation>
     </message>
     <message>
         <source>Deinterlace settings</source>
@@ -5184,6 +5184,130 @@ som du startade detta programmet i.</translation>
     <message>
         <source>%1% Completed @ %2 fps.</source>
         <translation>%1% färdig vid %2 fps.</translation>
+    </message>
+    <message>
+        <source>Use custom identifier for frontend preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wake-On-LAN settings</source>
+        <translation>Wake-On-LAN-inställningar</translation>
+    </message>
+    <message>
+        <source>Database Configuration</source>
+        <translation>Databaskonfiguration</translation>
+    </message>
+    <message>
+        <source>All database settings take effect when you restart this program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth could not connect to the database. Please verify your database settings below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host name</source>
+        <translation>Värdnamn</translation>
+    </message>
+    <message>
+        <source>The host name or IP address of the machine hosting the database. This information is required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database</source>
+        <translation>Databas</translation>
+    </message>
+    <message>
+        <source>The name of the database. This information is required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation>Användare</translation>
+    </message>
+    <message>
+        <source>The user name to use while connecting to the database. This information is required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The password to use while connecting to the database. This information is required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database type</source>
+        <translation>Databastyp</translation>
+    </message>
+    <message>
+        <source>MySQL</source>
+        <translation>MySQL</translation>
+    </message>
+    <message>
+        <source>The database implementation used for your server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom identifier</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An identifier to use while saving the settings for this frontend.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Wake-On-LAN to wake database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, the frontend will use Wake-On-LAN parameters to reconnect to the database server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The time in seconds to wait for the server to wake up.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retry attempts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of retries to wake the server before the frontend gives up.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wake command</source>
+        <translation>Väckningskommando</translation>
+    </message>
+    <message>
+        <source>The command executed on this frontend to wake up the database server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable gamma correction for video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, QuickTime will correct the gamma of the video to match your monitor.  Turning this off can save some CPU cycles.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Altivec-enhanced color space conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

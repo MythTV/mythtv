@@ -3774,7 +3774,7 @@ Myth wird nun beendet.</translation>
     <message>
         <source>X</source>
         <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">X</translation>
     </message>
     <message>
         <source>P</source>
@@ -4006,7 +4006,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Deinterlace algorithm.  &apos;Linear blend&apos; and &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation>Deinterlace Algorithmus. &apos;Linear blend&apos; und &apos;Kernel&apos; benötigen SSE Funktionen. &apos;Bob&apos; benötigt Xv oder XvMC Unterstützung.</translation>
+        <translation type="obsolete">Deinterlace Algorithmus. &apos;Linear blend&apos; und &apos;Kernel&apos; benötigen SSE Funktionen. &apos;Bob&apos; benötigt Xv oder XvMC Unterstützung.</translation>
     </message>
     <message>
         <source>Deinterlace settings</source>
@@ -5208,6 +5208,130 @@ Myth wird nun beendet.</translation>
         <source>%1% Completed @ %2 fps.</source>
         <translation>%1% Fertig @ %2 fps.</translation>
     </message>
+    <message>
+        <source>Use custom identifier for frontend preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wake-On-LAN settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All database settings take effect when you restart this program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth could not connect to the database. Please verify your database settings below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The host name or IP address of the machine hosting the database. This information is required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The name of the database. This information is required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The user name to use while connecting to the database. This information is required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The password to use while connecting to the database. This information is required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MySQL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The database implementation used for your server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom identifier</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An identifier to use while saving the settings for this frontend.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Wake-On-LAN to wake database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, the frontend will use Wake-On-LAN parameters to reconnect to the database server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The time in seconds to wait for the server to wake up.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retry attempts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of retries to wake the server before the frontend gives up.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wake command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command executed on this frontend to wake up the database server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable gamma correction for video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, QuickTime will correct the gamma of the video to match your monitor.  Turning this off can save some CPU cycles.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Altivec-enhanced color space conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StatusBox</name>
@@ -5241,11 +5365,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>
-        <translation type="unfinished">Systemstatus - Bitte eine Kategorie wählen</translation>
+        <translation type="obsolete">Systemstatus - Bitte eine Kategorie wählen</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
-        <translation type="unfinished">Zeigt den Status verschiedener Systemkomponenten</translation>
+        <translation type="obsolete">Zeigt den Status verschiedener Systemkomponenten</translation>
     </message>
 </context>
 <context>
@@ -5735,11 +5859,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Select a recording to permanently delete:</source>
-        <translation type="obsolete">Welche Aufnahme soll gelöscht werden:</translation>
+        <translation type="unfinished">Welche Aufnahme soll gelöscht werden:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
-        <translation type="unfinished">Welche Aufnahme möchten Sie sehen:</translation>
+        <translation type="obsolete">Welche Aufnahme möchten Sie sehen:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -5759,7 +5883,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation type="unfinished">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts.</translation>
+        <translation type="obsolete">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts.</translation>
     </message>
     <message>
         <source>Select a program...</source>
@@ -5767,7 +5891,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation type="unfinished">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
+        <translation type="obsolete">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
     </message>
     <message>
         <source>No Programs</source>
@@ -5823,27 +5947,23 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Airdate:</source>
-        <translation type="unfinished">Sendezeit:</translation>
+        <translation type="obsolete">Sendezeit:</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">Lade...</translation>
+        <translation type="obsolete">Lade...</translation>
     </message>
     <message>
         <source>Select a recording to view:</source>
-        <translation type="obsolete">Welche Aufnahme möchten Sie sehen:</translation>
+        <translation type="unfinished">Welche Aufnahme möchten Sie sehen:</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation type="obsolete">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts</translation>
+        <translation type="unfinished">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation type="obsolete">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
-    </message>
-    <message>
-        <source>Select a recording to permanently erase:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
     </message>
 </context>
 <context>

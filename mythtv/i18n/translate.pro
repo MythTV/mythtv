@@ -1,3 +1,4 @@
+SOURCES += ../libs/libmyth/dbsettings.cpp
 SOURCES += ../libs/libmyth/managedlist.cpp
 SOURCES += ../libs/libmyth/mythcontext.cpp
 SOURCES += ../libs/libmyth/mythdialogs.cpp
