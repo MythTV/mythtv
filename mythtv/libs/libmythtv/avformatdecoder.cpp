@@ -58,7 +58,7 @@ bool AvFormatDecoderPrivate::InitMPEG2()
     {
         mpeg2dec = mpeg2_init();
         if (mpeg2dec)
-          VERBOSE(VB_PLAYBACK, "Using libmpeg2 for video decoding");
+            VERBOSE(VB_PLAYBACK, "Using libmpeg2 for video decoding");
     }
     return (mpeg2dec != NULL);
 }
@@ -1516,8 +1516,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                              frame_delay * 0.5);
                     }
 
-                    lastvpts += frame_delay;
-
 /* XXX: Broken.
                     if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
                         context->height == picframe->height)
@@ -1549,6 +1547,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     gotvideo = 1;
                     framesPlayed++;
 
+                    lastvpts = temppts;
                     break;
                 }
                 default:
