@@ -13,6 +13,14 @@
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
 
+enum
+{
+    SHOWING_MAINWINDOW = 0,
+    SHOWING_EDITWINDOW,
+    SHOWING_IMDBLIST,
+    SHOWING_IMDBMANUAL
+};
+
 class QSqlDatabase;
 typedef QValueList<Metadata>  ValueMetadata;
 
@@ -32,16 +40,17 @@ class VideoManager : public MythDialog
     void editMetadata();
     void cursorLeft();
     void cursorRight();
-    void cursorDown(bool page = false);
-    void cursorUp(bool page = false);
-    void pageDown() { cursorDown(true); }
-    void pageUp() { cursorUp(true); }
+    void cursorDown();
+    void cursorUp();
+    void pageDown();
+    void pageUp();
     void exitWin();
     void GetMovieListingTimeOut();
 
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
+    void validateUp();
 
   private slots:
     void num(QKeyEvent *e);
@@ -60,6 +69,7 @@ class VideoManager : public MythDialog
     QDomElement xmldata;
 
     QString parseData(QString, QString, QString);
+    QString parseDataAnchorEnd(QString, QString, QString);
     QMap<QString, QString> parseMovieList(QString);
     void ResetCurrentItem();
 
@@ -88,8 +98,8 @@ class VideoManager : public MythDialog
 
     QPainter backup;
     QPixmap myBackground;
-    bool pageDowner;
-    bool pageDownerMovie;
+    bool can_do_page_down;
+    bool can_do_page_down_movie;
 
     int inList;
     int inData;

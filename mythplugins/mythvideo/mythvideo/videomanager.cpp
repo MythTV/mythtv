@@ -36,8 +36,8 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     ratingCountry = "USA";
     curitem = NULL;
     curitemMovie = "";
-    pageDowner = false;
-    pageDownerMovie = false;
+    can_do_page_down = false;
+    can_do_page_down_movie = false;
 
     inList = 0;
     inData = 0;
@@ -52,7 +52,7 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     GetMovieListingTimeoutCounter = 0;
     stopProcessing = false;
 
-    m_state = 0;
+    m_state = SHOWING_MAINWINDOW;
     httpGrabber = NULL;
 
     urlTimer = new QTimer(this);
@@ -137,7 +137,7 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
             case Key_7:
             case Key_8:
             case Key_9:
-                if(m_state == 0)
+                if(m_state == SHOWING_MAINWINDOW)
                 {
                     editMetadata();
                 }
@@ -168,7 +168,7 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
         case Key_8: 
         case Key_9: 
         
-            if(m_state != 0)
+            if(m_state != SHOWING_MAINWINDOW)
             {
                 num(e); 
             }
@@ -180,7 +180,7 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
 
 void VideoManager::num(QKeyEvent *e)
 {
-    if (m_state == 3 && curIMDBNum.length() != 7)
+    if (m_state == SHOWING_IMDBMANUAL && curIMDBNum.length() != 7)
     {
         curIMDBNum = curIMDBNum + e->text();
         update(imdbEnterRect);
@@ -191,7 +191,7 @@ void VideoManager::num(QKeyEvent *e)
             backup.begin(this);
             backup.drawPixmap(0, 0, myBackground);
             backup.end();
-            m_state = 0;
+            m_state = SHOWING_MAINWINDOW;
             noUpdate = false;
             update(fullRect);
         }
@@ -272,6 +272,37 @@ QString VideoManager::parseData(QString data, QString beg, QString end)
     int endint = data.find(end, start + 1);
     if (start != ((int)beg.length() - 1) && endint != -1)
     {
+        ret = data.mid(start, endint - start);
+
+        replaceNumCharRefs(ret);
+
+        if (debug == true)
+            cout << "MythVideo: Parse HTML : Returning : " << ret << endl;
+        return ret;
+    }
+    else
+    {
+        if (debug == true)
+            cout << "MythVideo: Parse HTML : Parse Failed...returning <NULL>\n";
+        ret = "<NULL>";
+        return ret;
+    }
+}
+
+QString VideoManager::parseDataAnchorEnd(QString data, QString beg, QString end)
+{
+    bool debug = false;
+    QString ret;
+
+    if (debug == true)
+    {
+        cout << "MythVideo: Parse (Anchor End) HTML : Looking for: " << beg << ", ending with: " << end << endl;
+    }
+    int endint = data.find(end);
+    int start = data.findRev(beg, endint + 1);
+    if (start != - 1 && endint != -1)
+    {
+	start = start + beg.length();
         ret = data.mid(start, endint - start);
 
         replaceNumCharRefs(ret);
@@ -372,6 +403,7 @@ QString VideoManager::GetMoviePoster(QString movieNum)
         return(QString("<NULL>"));
 
     QString host = "www.imdb.com";
+    QString path = "";
 
     QUrl url("http://" + host + "/title/tt" + movieNum + "/posters");
 
@@ -394,12 +426,67 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     QString res;
     res = httpGrabber->getData();
 
-    QString beg = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-                  "background=\"http://posters.imdb.com/posters/";
-    QString end = "\"><td><td><a href=\"";
-    QString filename = "";
 
-    filename = parseData(res, beg, end);
+    QString beg, end, filename = "<NULL>";
+
+    // Check for posters on impawards.com first, since their posters
+    // are usually much better quality
+
+    beg = "Posters on other sites</h2></p>\n<ul>\n<li><a href=\"";
+    end = "\">http://www.impawards.com";
+    QString impsite = parseDataAnchorEnd(res, beg, end);
+    if (impsite != "<NULL>")
+    {
+
+	//cout << "Retreiving poster from " << impsite << endl; 
+	    
+        QUrl impurl(impsite);
+
+        //cout << "Grabbing Poster HTML From: " << url.toString() << endl;
+
+        if (httpGrabber)
+        {
+            httpGrabber->stop();
+            delete httpGrabber;
+        }
+
+        httpGrabber = new HttpComms(impurl);
+
+        while (!httpGrabber->isDone())
+        {
+            qApp->processEvents();
+            usleep(10000);
+        }
+
+	QString impres;
+	
+        impres = httpGrabber->getData();
+        beg = "<img SRC=\"posters/";
+	end = "\" ALT";
+
+	filename = parseData(impres, beg, end);
+	//cout << "Imp found: " << filename << endl;
+
+	host = parseData(impsite, "//", "/");
+	path = impsite.replace("http://" + host, "");
+	path = path.left(impsite.findRev("/") + 1) + "posters/";
+    }
+
+    // If the impawards site failed or wasn't available
+    // just grab the poster from imdb
+    if (filename == "<NULL>")
+    {
+        host = "posters.imdb.com";
+	path = "/posters/";
+
+	//cout << "Retreiving poster from imdb.com" << endl;
+        beg = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+                  "background=\"http://posters.imdb.com/posters/";
+        end = "\"><td><td><a href=\"";
+
+	filename = parseData(res, beg, end);
+    }
+    
     if (filename == "<NULL>")
     {
         cout << "MyhVideo: Error parsing poster filename.\n";
@@ -419,11 +506,9 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    host = "posters.imdb.com";
-
     //cout << "Copying (" << filename << ")...";
     QUrlOperator *op = new QUrlOperator();
-    op->copy(QString("http://" + host + "/posters/" + filename),
+    op->copy(QString("http://" + host + path + filename),
              "file:" + fileprefix);
     //cout << "Done.\n";
 
@@ -610,7 +695,7 @@ void VideoManager::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
 
-    if (m_state == 0 || m_state == 3)
+    if (m_state == SHOWING_MAINWINDOW || m_state == SHOWING_IMDBMANUAL)
     {
        if (r.intersects(listRect) && noUpdate == false)
        {
@@ -620,13 +705,13 @@ void VideoManager::paintEvent(QPaintEvent *e)
        {
            updateInfo(&p);
        }
-       if (r.intersects(imdbEnterRect) && m_state == 3)
+       if (r.intersects(imdbEnterRect) && m_state == SHOWING_IMDBMANUAL)
        {
            noUpdate = true;
            updateIMDBEnter(&p);
        }
     }
-    if (m_state == 2)
+    if (m_state == SHOWING_IMDBLIST)
     {
        if (r.intersects(movieListRect))
        {
@@ -643,7 +728,7 @@ void VideoManager::updateList(QPainter *p)
     QPainter tmp(&pix);
 
     int pastSkip = (int)inData;
-    pageDowner = false;
+    can_do_page_down = false;
     listCount = 0;
 
     QString filename = "";
@@ -704,11 +789,11 @@ void VideoManager::updateList(QPainter *p)
                   pastSkip--;
                }
                else
-                   pageDowner = true;
+                   can_do_page_down = true;
             }
         }
 
-        ltype->SetDownArrow(pageDowner);
+        ltype->SetDownArrow(can_do_page_down);
         if (inData > 0)
             ltype->SetUpArrow(true);
         else
@@ -742,7 +827,7 @@ void VideoManager::updateMovieList(QPainter *p)
     QPainter tmp(&pix);
 
     int pastSkip = (int)inDataMovie;
-    pageDownerMovie = false;
+    can_do_page_down_movie = false;
     listCountMovie = 0;
 
     QString title = "";
@@ -780,11 +865,11 @@ void VideoManager::updateMovieList(QPainter *p)
                   pastSkip--;
                }
                else
-                   pageDownerMovie = true;
+                   can_do_page_down_movie = true;
             }
         }
 
-        ltype->SetDownArrow(pageDownerMovie);
+        ltype->SetDownArrow(can_do_page_down_movie);
         if (inDataMovie > 0)
             ltype->SetUpArrow(true);
         else
@@ -1000,9 +1085,9 @@ void VideoManager::parseContainer(QDomElement &element)
  
 void VideoManager::exitWin()
 {
-    if (m_state != 0)
+    if (m_state != SHOWING_MAINWINDOW)
     {
-        m_state = 0;
+        m_state = SHOWING_MAINWINDOW;
         backup.begin(this);
         backup.drawPixmap(0, 0, myBackground);
         backup.end();
@@ -1042,47 +1127,73 @@ void VideoManager::cursorRight()
     }
 }
 
-void VideoManager::cursorDown(bool page)
+void VideoManager::cursorDown()
 {
-    if (page == false)
+  
+  switch (m_state)
+  {
+      
+    case SHOWING_MAINWINDOW:
     {
-      if (m_state == 0)
-      {
-        if (inList > (int)((int)(listsize / 2) - 1)
-            && ((int)(inData + listsize) <= (int)(dataCount - 1))
-            && pageDowner == true)
-        {
-            inData++;
-            inList = (int)(listsize / 2);
-        }
-        else
-        {
-            inList++;
 
-            if (inList >= listCount)
-                inList = listCount - 1;
-        }
-      }
-      else if (m_state == 2)
+      // if we're beyond halfway through the list, scroll the window
+      if (inList > (int)((int)(listsize / 2) - 1)
+          && ((int)(inData + listsize) <= (int)(dataCount - 1))
+          && can_do_page_down == true)
       {
-        if (inListMovie > (int)((int)(listsizeMovie / 2) - 1)
-            && ((int)(inDataMovie + listsizeMovie) <= (int)(dataCountMovie - 1))
-            && pageDownerMovie == true)
-        {
-            inDataMovie++;
-            inListMovie = (int)(listsizeMovie / 2);
-        }
-        else
-        {
-            inListMovie++;
-
-            if (inListMovie >= listCountMovie)
-                inListMovie = listCountMovie - 1;
-        }
+          inData++;
+          inList = (int)(listsize / 2);
       }
-    }
-    else if (page == true && pageDowner == true && m_state == 0)
+      
+      // otherwise just move the selection bar down one
+      else
+      {
+          inList++;
+
+          if (inList >= listCount)
+              inList = listCount - 1;
+      }
+
+    } break;
+
+
+    case SHOWING_IMDBLIST:
     {
+      if (inListMovie > (int)((int)(listsizeMovie / 2) - 1)
+          && ((int)(inDataMovie + listsizeMovie) <= (int)(dataCountMovie - 1))
+          && can_do_page_down_movie == true)
+      {
+          inDataMovie++;
+          inListMovie = (int)(listsizeMovie / 2);
+      }
+      else
+      {
+          inListMovie++;
+
+          if (inListMovie >= listCountMovie)
+              inListMovie = listCountMovie - 1;
+      }
+    } break;
+
+  } // switch
+
+      
+  validateUp();
+
+}
+
+void VideoManager::pageDown()
+{
+
+  switch (m_state)
+  {
+    
+    case SHOWING_MAINWINDOW:
+    {
+
+      // if there's more data to show, go a page down
+      if (can_do_page_down) {
+
         if (inList >= (int)(listsize / 2) || inData != 0)
         {
             inData = inData + listsize;
@@ -1092,9 +1203,23 @@ void VideoManager::cursorDown(bool page)
             inData = (int)(listsize / 2) + inList;
             inList = (int)(listsize / 2);
         }
-    }
-    else if (page == true && pageDownerMovie == true && m_state == 2)
+        
+      }
+
+      // otherwise just go to the end of the list
+      else
+        inList = listsize - 1;
+
+      
+    } break;
+    
+    case SHOWING_IMDBLIST:
     {
+
+      // if there's more data to show, go a page down
+      if (can_do_page_down_movie)
+      {
+
         if (inListMovie >= (int)(listsizeMovie / 2) || inDataMovie != 0)
         {
             inDataMovie = inDataMovie + listsizeMovie;
@@ -1104,150 +1229,208 @@ void VideoManager::cursorDown(bool page)
             inDataMovie = (int)(listsizeMovie / 2) + inListMovie;
             inListMovie = (int)(listsizeMovie / 2);
         }
-    }
-    else if (page == true && pageDowner == false && m_state == 0)
-    {
-        inList = listsize - 1;
-    }
-    else if (page == true && pageDownerMovie == false && m_state == 2)
-    {
+        
+      }
+      
+      // otherwise just go to the end of the list
+      else
         inListMovie = listsizeMovie - 1;
-    }
+      
+    } break;
+    
+   } // switch
 
-    if ((int)(inData + inList) >= (int)(dataCount) && m_state == 0)
-    {
-        inData = dataCount - listsize;
-        inList = listsize - 1;
-    }
-    else if ((int)(inData + listsize) >= (int)(dataCount) && m_state == 0)
-    {
-        inData = dataCount - listsize;
-    }
-    if (inList >= listCount && m_state == 0)
-        inList = listCount - 1;
 
-    if ((int)(inDataMovie + inListMovie) >= (int)(dataCountMovie) && m_state == 2)
-    {
-        inDataMovie = dataCountMovie - listsizeMovie;
-        inListMovie = listsizeMovie - 1;
-    }
-    else if ((int)(inDataMovie + listsizeMovie) >= (int)(dataCountMovie) && m_state == 2)
-    {
-        inDataMovie = dataCountMovie - listsizeMovie;
-    }
-    if (inListMovie >= listCountMovie && m_state == 2)
-        inListMovie = listCountMovie - 1;
+  validateUp();
 
-    update(fullRect);
 }
 
-void VideoManager::cursorUp(bool page)
+void VideoManager::validateUp() {
+
+  switch (m_state)
+  {
+    
+    case SHOWING_MAINWINDOW:
+    {
+
+      if ((int)(inData + inList) >= (int)(dataCount))
+      {
+        inData = dataCount - listsize;
+        inList = listsize - 1;
+      }
+      else if ((int)(inData + listsize) >= (int)(dataCount))
+      {
+        inData = dataCount - listsize;
+      }
+      if (inList >= listCount)
+        inList = listCount - 1;
+
+    } break;
+
+
+    case SHOWING_IMDBLIST:
+    {
+
+      if ((int)(inDataMovie + inListMovie) >= (int)(dataCountMovie))
+      {
+        inDataMovie = dataCountMovie - listsizeMovie;
+        inListMovie = listsizeMovie - 1;
+      }
+      else if ((int)(inDataMovie + listsizeMovie) >= (int)(dataCountMovie))
+      {
+        inDataMovie = dataCountMovie - listsizeMovie;
+      }
+      if (inListMovie >= listCountMovie)
+        inListMovie = listCountMovie - 1;
+
+
+    } break;
+
+  }
+
+  update(fullRect);
+
+}  
+
+
+void VideoManager::cursorUp()
+{
+  
+  //cout << "CursorUp\n";
+  
+  switch (m_state)
+  {
+
+    case SHOWING_MAINWINDOW:
+    {
+
+    //  cout << "CursorUp - SHOWING_MAINWINDOW\n";
+
+
+      // if we're beyond halfway through the list, scroll the window
+      if (inList < ((int)(listsize / 2) + 1) && inData > 0)
+      {
+        inList = (int)(listsize / 2);
+        inData--;
+        if (inData < 0)
+        {
+          inData = 0;
+          inList--;
+        }
+      }
+
+      // otherwise just move the selection bar up one
+      else
+        inList--;
+
+      if (inList > -1)
+        update(fullRect);
+      else
+        inList = 0;
+
+    } break;
+      
+    case SHOWING_IMDBLIST:
+    {
+      if (inListMovie < ((int)(listsizeMovie / 2) + 1) && inDataMovie > 0)
+      {
+        inListMovie = (int)(listsizeMovie / 2);
+        inDataMovie--;
+        if (inDataMovie < 0)
+        {
+          inDataMovie = 0;
+          inListMovie--;
+        }
+      }
+      else
+        inListMovie--;
+        
+      if (inListMovie > -1)
+        update(movieListRect);
+      else
+        inListMovie = 0;
+
+    } break;
+  
+  } // switch
+
+}
+
+void VideoManager::pageUp()
 {
 
-    if (page == false)
+  switch (m_state)
+  {
+    
+    case SHOWING_MAINWINDOW:
     {
-      if (m_state == 0)
+      
+      if (inData > 0)
       {
-         if (inList < ((int)(listsize / 2) + 1) && inData > 0)
-         {
-            inList = (int)(listsize / 2);
-            inData--;
-            if (inData < 0)
-            {
-                inData = 0;
-                inList--;
-            }
-         }
-         else
-         {
-             inList--;
-         }
-      }
-      if (m_state == 2)
-      {
-         if (inListMovie < ((int)(listsizeMovie / 2) + 1) && inDataMovie > 0)
-         {
-            inListMovie = (int)(listsizeMovie / 2);
-            inDataMovie--;
-            if (inDataMovie < 0)
-            {
-                inDataMovie = 0;
-                inListMovie--;
-            }
-         }
-         else
-         {
-             inListMovie--;
-         }
-      }
-    }
-    else if (page == true && inData > 0 && m_state == 0)
-    {
         inData = inData - listsize;
         if (inData < 0)
         {
-            inList = inList + inData;
-            inData = 0;
-            if (inList < 0)
-                inList = 0;
-         }
+          inList = inList + inData;
+          inData = 0;
+          if (inList < 0)
+            inList = 0;
+        }
 
-         if (inList > (int)(listsize / 2))
-         {
-              inList = (int)(listsize / 2);
-              inData = inData + (int)(listsize / 2) - 1;
-         }
-    }
-    else if (page == true && inDataMovie > 0 && m_state == 2)
+        if (inList > (int)(listsize / 2))
+        {
+          inList = (int)(listsize / 2);
+          inData = inData + (int)(listsize / 2) - 1;
+        }
+        
+        update(fullRect);
+      }
+
+      else {
+        inData = 0;
+        inList = 0;
+      }      
+
+    } break;
+    
+    case SHOWING_IMDBLIST:
     {
+
+      if (inDataMovie > 0)
+      {
         inDataMovie = inDataMovie - listsizeMovie;
         if (inDataMovie < 0)
         {
-            inListMovie = inListMovie + inDataMovie;
-            inDataMovie = 0;
-            if (inListMovie < 0)
-                inListMovie = 0;
-         }
-
-         if (inListMovie > (int)(listsizeMovie / 2))
-         {
-              inListMovie = (int)(listsizeMovie / 2);
-              inDataMovie = inDataMovie + (int)(listsizeMovie / 2) - 1;
-         }
-    }
-    else if (page == true)
-    {
-       if (m_state == 0)
-       {
-          inData = 0;
-          inList = 0;
-       } 
-       else if (m_state == 2)
-       {
+          inListMovie = inListMovie + inDataMovie;
           inDataMovie = 0;
-          inListMovie = 0;
-       }
-    }
+          if (inListMovie < 0)
+            inListMovie = 0;
+        }
 
-    if (inList > -1 && m_state == 0)
-    {
-        update(fullRect);
-    }
-    else if (m_state == 0)
-        inList = 0;
-
-    if (inListMovie > -1 && m_state == 2)
-    {
+        if (inListMovie > (int)(listsizeMovie / 2))
+        {
+          inListMovie = (int)(listsizeMovie / 2);
+          inDataMovie = inDataMovie + (int)(listsizeMovie / 2) - 1;
+        }
+        
         update(movieListRect);
-    }
-    else if (m_state == 2)
+
+      }
+      
+      else {
+        inDataMovie = 0;
         inListMovie = 0;
+      }
+
+    } break;    
+    
+  } // switch
 }
+
 
 void VideoManager::videoMenu()
 {
     QPainter p(this);
-    if (m_state == 0 || m_state == 1)
+    if (m_state == SHOWING_MAINWINDOW || m_state == SHOWING_EDITWINDOW)
     {
        backup.flush();
        backup.begin(this);
@@ -1262,7 +1445,7 @@ void VideoManager::videoMenu()
        inDataMovie = 0;
        listCountMovie = 0;
        dataCountMovie = 0;
-       m_state = 2;
+       m_state = SHOWING_IMDBLIST;
        update(movieListRect);
     }
 }
@@ -1288,12 +1471,12 @@ void VideoManager::selected()
 
 // Do IMDB Connections and Stuff
     QPainter p(this);
-    if (m_state == 0 || m_state == 1)
+    if (m_state == SHOWING_MAINWINDOW || m_state == SHOWING_EDITWINDOW)
     {
        QString movieTitle = curitem->Title();
        movieTitle.replace(QRegExp(" "), "+");
        movieTitle.replace(QRegExp("_"), "+");
-       m_state = 1;
+       m_state = SHOWING_EDITWINDOW;
  
        backup.flush();
        backup.begin(this);
@@ -1321,7 +1504,7 @@ void VideoManager::selected()
           inDataMovie = 0;
           listCountMovie = 0;
           dataCountMovie = 0;
-          m_state = 2;
+          m_state = SHOWING_IMDBLIST;
           update(movieListRect);
       }
       else if (ret == 1)
@@ -1332,7 +1515,7 @@ void VideoManager::selected()
               backup.begin(this);
               backup.drawPixmap(0, 0, myBackground);
               backup.end();
-              m_state = 0;
+              m_state = SHOWING_MAINWINDOW;
               update(fullRect);
               return;
           }
@@ -1341,7 +1524,7 @@ void VideoManager::selected()
           backup.begin(this);
           backup.drawPixmap(0, 0, myBackground);
           backup.end();
-          m_state = 0;
+          m_state = SHOWING_MAINWINDOW;
           update(infoRect);
           update(listRect);
       }
@@ -1351,12 +1534,12 @@ void VideoManager::selected()
           backup.begin(this);
           backup.drawPixmap(0, 0, myBackground);
           backup.end();
-          m_state = 0;
+          m_state = SHOWING_MAINWINDOW;
           update(infoRect);
           update(listRect);
       }
    }
-   else if (m_state == 2)
+   else if (m_state == SHOWING_IMDBLIST)
    {
        QMap<QString, QString>::Iterator it;
 
@@ -1382,7 +1565,7 @@ void VideoManager::selected()
            backup.begin(this);
            backup.drawPixmap(0, 0, myBackground);
            backup.end();
-           m_state = 0;
+           m_state = SHOWING_MAINWINDOW;
            update(fullRect);
            movieNumber = "";
            return;
@@ -1393,7 +1576,7 @@ void VideoManager::selected()
            backup.drawPixmap(0, 0, myBackground);
            backup.end();
            curIMDBNum = "";
-           m_state = 3;
+           m_state = SHOWING_IMDBMANUAL;
            update(fullRect);
            movieNumber = "";
            return;
@@ -1414,7 +1597,7 @@ void VideoManager::selected()
            backup.drawPixmap(0, 0, myBackground);
            backup.end();
  
-           m_state = 0;
+           m_state = SHOWING_MAINWINDOW;
            update(fullRect);
            movieNumber = "";
            return;
@@ -1435,7 +1618,7 @@ void VideoManager::selected()
            backup.begin(this);
            backup.drawPixmap(0, 0, myBackground);
            backup.end();
-           m_state = 0;
+           m_state = SHOWING_MAINWINDOW;
            update(infoRect);
            update(listRect);
            update(fullRect);

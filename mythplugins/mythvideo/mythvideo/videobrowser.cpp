@@ -336,39 +336,40 @@ void VideoBrowser::updatePlayWait(QPainter *p)
 void VideoBrowser::SetCurrentItem()
 {
     ValueMetadata::Iterator it;
-    ValueMetadata::Iterator start;
-    ValueMetadata::Iterator end;
-    start = m_list.begin();
-    end = m_list.end();
-    int cnt = 0;
 
     if(curitem)
     {
         delete curitem;
         curitem = NULL;
     }
+    
+    
+    //
+    //  The count may have changed because
+    //  the Parental Level might have been
+    //  altered
+    //
 
-    for (it = start; it != end; ++it)
+    int list_count = m_list.count();
+    
+    if(list_count == 0)
     {
-         if (cnt == inData)
-         {
-             curitem = new Metadata(*(it));
-         }
-         cnt++;
+        inData = 0;
+        allowselect = false;
     }
-    if(!curitem)
+    else
     {
-        if(cnt > 1)
+        if(inData < list_count)
         {
-            inData = 0;
-            curitem = new Metadata(*(start));
+            it = m_list.at(inData);
         }
         else
         {
             inData = 0;
-            allowselect = false;
+            it = m_list.begin();
         }
     }
+    curitem = new Metadata(*(it));
 }
 
 void VideoBrowser::updateBrowsing(QPainter *p)
