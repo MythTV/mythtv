@@ -135,7 +135,7 @@ class SRMaxNewest: public CheckBoxSetting, public SRSetting {
 public:
     SRMaxNewest(const ScheduledRecording& parent):
         SRSetting(parent, "maxnewest") {
-        setLabel(QObject::tr("Record new episodes and delete oldest once "
+        setLabel(QObject::tr("Record new and delete oldest once "
                              "maximum count is reached"));
         setValue(false);
     };
@@ -744,11 +744,12 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     gContext->GetScreenSettings(wmult, hmult);
 
     MythDialog* dialog = new ConfigurationDialogWidget(parent, name);
-    QVBoxLayout* vbox = new QVBoxLayout(dialog, (int)(10 * wmult));
+    QVBoxLayout* vbox = new QVBoxLayout(dialog, (int)(20 * wmult),
+                                                (int)(10 * wmult));
 
     if (m_pginfo)
     {
-        QGridLayout *grid = m_pginfo->DisplayWidget(this, dialog);
+        QGridLayout *grid = m_pginfo->DisplayWidget(dialog);
         vbox->addLayout(grid);
     }
 

@@ -1603,8 +1603,7 @@ void ProgramInfo::Save(QSqlDatabase *db)
     QSqlQuery query = db->exec(querystr.utf8().data());
 }
 
-QGridLayout* ProgramInfo::DisplayWidget(ScheduledRecording* rec,
-                                        QWidget *parent)
+QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent)
 {
     int row = 0;
     float wmult, hmult;
@@ -1627,36 +1626,6 @@ QGridLayout* ProgramInfo::DisplayWidget(ScheduledRecording* rec,
     airDateLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     QLabel* airDateField = new QLabel(airDateText,parent);
     airDateField->setBackgroundOrigin(QWidget::WindowOrigin);
-
-    QString recDateText = "";
-    QLabel *recDateLabel = NULL;
-    QLabel *recDateField = NULL;
-    if (rec)
-    {
-        switch (rec->getRecordingType()) {
-        case kSingleRecord:
-            recDateText += startts.toString(dateFormat + " " + timeFormat);
-            break;
-        case kWeekslotRecord:
-            recDateText += startts.toString("dddd")+"s ";
-        case kTimeslotRecord:
-            recDateText += QString("%1 - %2")
-                .arg(startts.toString(timeFormat))
-                .arg(endts.toString(timeFormat));
-            break;
-        case kChannelRecord:
-        case kAllRecord:
-        case kNotRecording:
-            recDateText += "(any)";
-            break;
-        }
-
-        recDateLabel = new QLabel(QObject::tr("Record Schedule:"), parent);
-        recDateLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-        recDateField = new QLabel(recDateText,parent);
-        recDateField->setBackgroundOrigin(QWidget::WindowOrigin);
-    }
-
     QLabel *subtitlelabel = new QLabel(QObject::tr("Episode:"), parent);
     subtitlelabel->setBackgroundOrigin(QWidget::WindowOrigin);
     QLabel *subtitlefield = new QLabel(subtitle, parent);
@@ -1671,7 +1640,7 @@ QGridLayout* ProgramInfo::DisplayWidget(ScheduledRecording* rec,
 
     descriptionlabel->polish();
 
-    int descwidth = (int)(700 * wmult) - descriptionlabel->width();
+    int descwidth = (int)(740 * wmult) - descriptionlabel->width();
     int titlewidth = (int)(760 * wmult);
 
     titlefield->setMinimumWidth(titlewidth);
@@ -1688,12 +1657,6 @@ QGridLayout* ProgramInfo::DisplayWidget(ScheduledRecording* rec,
     grid->addWidget(airDateLabel, row, 0, Qt::AlignLeft | Qt::AlignTop);
     grid->addWidget(airDateField, row, 1, Qt::AlignLeft);
     row++;
-    if (rec)
-    {
-        grid->addWidget(recDateLabel, row, 0, Qt::AlignLeft | Qt::AlignTop);
-        grid->addWidget(recDateField, row, 1, Qt::AlignLeft);
-        row++;
-    }
     grid->addWidget(subtitlelabel, row, 0, Qt::AlignLeft | Qt::AlignTop);
     grid->addWidget(subtitlefield, row, 1, Qt::AlignLeft | Qt::AlignTop);
     row++;
