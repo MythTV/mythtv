@@ -721,15 +721,15 @@ void Weather::firstLayout()
    if (tempimage->load(baseDir + "/share/mythtv/mythweather/images/logo.png"))
    {
    QImage tmp2;
-   tmp2 = tempimage->smoothScale((int)(117 * wmult),
+   tmp2 = tempimage->smoothScale((int)(157 * wmult),
                                  (int)(117 * hmult));
    picLogo.convertFromImage(tmp2);
    }
    delete tempimage;
 
    QLabel *logo = new QLabel(" ", this);
-   logo->setMaximumWidth((int)(117*wmult));
-   logo->setMinimumWidth((int)(117*wmult));
+   logo->setMaximumWidth((int)(157*wmult));
+   logo->setMinimumWidth((int)(157*wmult));
    logo->setMaximumHeight((int)(117*hmult));
    logo->setMinimumHeight((int)(117*hmult));
    logo->setBackgroundOrigin(WindowOrigin);
