@@ -86,7 +86,6 @@ struct QuartzData
     WindowRef          window;            // MythTV window
     CGDirectDisplayID  screen;            // screen containing main window
     float              refreshRate;       // for screen above
-    EventTime          lastWake;          // for disabling screen saver
 
     // Global preferences:
     bool               drawInWindow;      // Fullscreen or in GUI view?
@@ -1342,8 +1341,6 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     data->ZoomedUp = 0;
     data->ZoomedRight = 0;
 
-    data->lastWake = 0;
-
     // Initialize QuickTime
     if (EnterMovies())
     {
@@ -1718,19 +1715,6 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
     {
         frame = scratchFrame;
         CopyFrame(scratchFrame, &pauseFrame);
-    }
-    else
-    {
-        // Prevent sleep while we play video.
-        // Doing this here lets the computer sleep
-        // if video is paused, which seems like a
-        // good idea.
-        EventTime now = GetCurrentEventTime();
-        if (now > (data->lastWake + 30))
-        {
-            UpdateSystemActivity(OverallAct);
-            data->lastWake = now;
-        }
     }
 
     if (filterList)

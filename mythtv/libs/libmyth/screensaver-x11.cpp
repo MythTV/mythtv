@@ -1,8 +1,8 @@
-#include "screensaver.h"
+#include "screensaver-x11.h"
 
 #include <X11/Xlib.h>
 
-class ScreenSaverPrivate 
+class ScreenSaverX11Private 
 {
     struct 
     {
@@ -13,21 +13,20 @@ class ScreenSaverPrivate
         int allowexposure;
     } state;
 
-    friend class ScreenSaverControl;
+    friend class ScreenSaverX11;
 };
 
-ScreenSaverControl::ScreenSaverControl() 
+ScreenSaverX11::ScreenSaverX11() 
 {
-    d = new ScreenSaverPrivate();
+    d = new ScreenSaverX11Private();
 }
 
-ScreenSaverControl::~ScreenSaverControl() 
+ScreenSaverX11::~ScreenSaverX11() 
 {
-    if (d)
-        delete d;
+    delete d;
 }
 
-void ScreenSaverControl::Disable(void) 
+void ScreenSaverX11::Disable(void) 
 {
     if (!d->state.saved)
     {
@@ -42,7 +41,7 @@ void ScreenSaverControl::Disable(void)
     XSetScreenSaver(qt_xdisplay(), 0, 0, 0, 0);
 }
 
-void ScreenSaverControl::Restore(void) 
+void ScreenSaverX11::Restore(void) 
 {
     XResetScreenSaver(qt_xdisplay());
     XSetScreenSaver(qt_xdisplay(),
@@ -52,7 +51,7 @@ void ScreenSaverControl::Restore(void)
     d->state.saved = false;
 }
 
-void ScreenSaverControl::Reset(void) 
+void ScreenSaverX11::Reset(void) 
 {
     XResetScreenSaver(qt_xdisplay());
 }

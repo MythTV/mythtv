@@ -27,15 +27,15 @@ protected:
 class ScreenSaverControl 
 {
   public:
-    ScreenSaverControl();
-    ~ScreenSaverControl();
+    // creates one of the concrete subsclasses
+    static ScreenSaverControl* get(void);
+    
+    ScreenSaverControl() { };
+    virtual ~ScreenSaverControl() { };
 
-    void Disable(void);
-    void Restore(void);
-    void Reset(void);
-
-  protected:
-    class ScreenSaverPrivate *d;
+    virtual void Disable(void) = 0;
+    virtual void Restore(void) = 0;
+    virtual void Reset(void) = 0;
 };
 
 #endif // MYTH_SCREENSAVER_H

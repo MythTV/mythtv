@@ -15,7 +15,7 @@ HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h mythdbcon.h
 HEADERS += mythdialogs.h audiooutput.h inetcomms.h httpcomms.h mythmedia.h 
 HEADERS += uilistbtntype.h uiphoneentry.h generictree.h screensaver.h
 HEADERS += managedlist.h DisplayRes.h volumebase.h audiooutputbase.h
-HEADERS += dbsettings.h
+HEADERS += dbsettings.h screensaver-null.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
@@ -24,7 +24,7 @@ SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp inetcomms.cpp
 SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp uiphoneentry.cpp
 SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp DisplayResX.cpp
 SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
-SOURCES += dbsettings.cpp
+SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp
 
 LIBS += -L../libmythsamplerate
 LIBS += -lmythsamplerate-$${LIBVERSION}
@@ -63,9 +63,9 @@ macx {
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/AudioUnit.framework
     LIBS           += -framework AudioUnit
 
+    HEADERS        += screensaver-osx.h
+    SOURCES        += screensaver-osx.cpp
 
-#    SOURCES += mythcdrom-darwin.cpp
-    
     # We use HIToolbox from Carbon to hide the menu bar
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
     LIBS           += -framework Carbon
@@ -123,10 +123,7 @@ using_directx {
 }
 
 using_x11 {
+    HEADERS += screensaver-x11.h
     SOURCES += screensaver-x11.cpp
     LIBS += -L/usr/X11R6/lib -lXinerama
-}
-
-!using_x11 {
-    SOURCES += screensaver-null.cpp
 }

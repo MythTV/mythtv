@@ -1,23 +1,19 @@
-#include "screensaver.h"
+#include "screensaver-null.h"
 
-class ScreenSaverPrivate
-{
-};
-
-ScreenSaverControl::ScreenSaverControl() {
+ScreenSaverNull::ScreenSaverNull() {
 }
 
-ScreenSaverControl::~ScreenSaverControl() {
+ScreenSaverNull::~ScreenSaverNull() {
 }
 
-void ScreenSaverControl::Disable(void)
+void ScreenSaverNull::Disable(void)
 {
 }
 
-void ScreenSaverControl::Restore(void)
+void ScreenSaverNull::Restore(void)
 {
 }
 
-void ScreenSaverControl::Reset(void)
+void ScreenSaverNull::Reset(void)
 {
 }

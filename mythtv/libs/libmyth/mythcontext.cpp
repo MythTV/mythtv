@@ -161,7 +161,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     m_backgroundimage = NULL;
 
     m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
-    screensaver = new ScreenSaverControl();
+    screensaver = ScreenSaverControl::get();
 }
 
 void MythContextPrivate::Init(bool gui)
