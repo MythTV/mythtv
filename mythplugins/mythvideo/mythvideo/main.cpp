@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
     gContext->LoadSettingsFiles("mythvideo-settings.txt");
 
     translator.load(PREFIX + QString("/share/mythtv/i18n/mythvideo_") + 
-                    QString(gContext->GetSetting("Locale")) + QString(".qm"),
-                    ".");
+                    QString(gContext->GetSetting("Language").lower()) + 
+                    QString(".qm"), ".");
     a.installTranslator(&translator);
 
     if (a.argc() > 1)

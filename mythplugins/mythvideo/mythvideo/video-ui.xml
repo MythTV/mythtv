@@ -49,6 +49,7 @@
         <area>20,10,800,40</area>
         <font>info</font>
         <value>Select a video to watch...</value>
+        <value lang="IT">Seleziona il video da vedere...</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>cr-background.png</filename>
@@ -85,6 +86,7 @@
         <area>68,140,350,90</area>
         <font>bigtitle</font>
         <value>loading...</value>
+        <value lang="IT">Lettura...</value>
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>
@@ -96,7 +98,8 @@
       <textarea name="msg" align="center" draworder="8">
          <area>0,110,800,70</area>
          <font>info</font>
-         <value>YNo Videos Found In This Directory</value>
+         <value>No Videos Found In This Directory</value>
+         <value lang="IT">Nessun video in questa directory</value>
          <multiline>yes</multiline> 
       </textarea>
     </container>

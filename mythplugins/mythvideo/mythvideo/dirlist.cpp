@@ -61,7 +61,8 @@ Dirlist::Dirlist(QString &directory)
             else
             {
                 Metadata retdata(fi->absFilePath(), fi->absFilePath(), "album",
-                                 "(Up one level)", "dir",1900, 3, 40);
+                                 QObject::tr("(Up one level)"), "dir",
+                                 1900, 3, 40);
                 playlist.prepend(retdata);
                 ++it;
                 continue;
