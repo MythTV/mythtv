@@ -8,7 +8,7 @@
         </font>
 
         <font name="inactive" face="Arial">
-            <color>#9999cc</color>
+            <color>#b6b6b6</color>
             <size>16</size>
             <bold>yes</bold>
         </font>
@@ -116,9 +116,8 @@
             <area>0,0,760,400</area>
             <listsize>0,0,376,380</listsize>
             <leveloffset>8</leveloffset>
-            <gradient type="unselected" start="#505050" end="#ffffff" alpha="100">
+            <gradient type="unselected" start="#bbbbbb" end="#777777" alpha="255">
             </gradient>
-            <!-- <gradient type="selected" start="#52CA38" end="#349838" alpha="255"> -->
             <gradient type="selected" start="#0000ff" end="#505050" alpha="255">
             </gradient>
             <fcnfont name="active" function="active"></fcnfont>

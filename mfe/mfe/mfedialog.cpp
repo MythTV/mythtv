@@ -211,8 +211,8 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
                                     current_mfd->getId(),
                                     node->getAttribute(0),
                                     node->getAttribute(1),
-                                    node->getAttribute(2),
-                                    node->getInt()
+                                    node->getInt(),
+                                    node->getAttribute(2)
                                 );
     }
     else if(node->getAttribute(1) == 3)
