@@ -9,28 +9,28 @@
   </background>
 
   <titles>
-    <position>108,33</position>
-    <image mode="TV">title/title_tv.jpg</image>
-    <image mode="MAIN">title/title_main.jpg</image>
+    <position>20,10</position>
+    <image mode="TV">title/title_tv.png</image>
+    <image mode="MAIN">title/title_main.png</image>
     <image mode="MUSIC">title/title_music.jpg</image>
-    <image mode="GALLERY">title/title_gallery.jpg</image>
-    <image mode="VIDEO">title/title_video.jpg</image>
-    <image mode="SCHEDULE">title/title_schedule.jpg</image>
-    <image mode="SEARCH">title/title_search.jpg</image>
-    <image mode="SETUP">title/title_setup.jpg</image>
-    <image mode="MEDIA_SETUP">title/title_media_setup.jpg</image>
-    <image mode="INFO_SETUP">title/title_info_setup.jpg</image>
-    <image mode="TVSETUP">title/title_tv_setup.jpg</image>
-    <image mode="DVD">title/title_dvd.jpg</image>
-    <image mode="DVD_SETTINGS">title/title_dvd_setup.jpg</image>
-    <image mode="MUSIC_SETTINGS">title/title_music_setup.jpg</image>
-    <image mode="VIDEO_SETTINGS">title/title_video_setup.jpg</image>
-    <image mode="GAME_SETTINGS">title/title_game_setup.jpg</image>
-    <image mode="LIBRARY">title/title_library.jpg</image>
-    <image mode="MANAGE_RECORDINGS">title/title_manage_recordings.jpg</image>
-    <image mode="INFO">title/title_info_center.jpg</image>
-    <image mode="OPTICAL_DISK">title/title_optical_disks.jpg</image>
-    <image mode="UTIL">title/title_util.jpg</image>
+    <image mode="GALLERY">title/title_gallery.png</image>
+    <image mode="VIDEO">title/title_video.png</image>
+    <image mode="SCHEDULE">title/title_schedule.png</image>
+    <image mode="SEARCH">title/title_search.png</image>
+    <image mode="SETUP">title/title_setup.png</image>
+    <image mode="MEDIA_SETUP">title/title_media_setup.png</image>
+    <image mode="INFO_SETUP">title/title_info_setup.png</image>
+    <image mode="TVSETUP">title/title_tv_setup.png</image>
+    <image mode="DVD">title/title_dvd.png</image>
+    <image mode="DVD_SETTINGS">title/title_dvd_setup.png</image>
+    <image mode="MUSIC_SETTINGS">title/title_music_setup.png</image>
+    <image mode="VIDEO_SETTINGS">title/title_video_setup.png</image>
+    <image mode="GAME_SETTINGS">title/title_game_setup.png</image>
+    <image mode="LIBRARY">title/title_library.png</image>
+    <image mode="MANAGE_RECORDINGS">title/title_manage_recordings.png</image>
+    <image mode="INFO">title/title_info_center.png</image>
+    <image mode="OPTICAL_DISK">title/title_optical_disks.png</image>
+    <image mode="UTIL">title/title_util.png</image>
   </titles>
 
   <genericbutton>
