@@ -2573,6 +2573,11 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
                         filename.ascii());
+    else if (xmltv_grabber == "tv_grab_pt")
+        // Use fixed interval of 3 days for Portuguese grabber
+        command.sprintf("nice %s --days=4  --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), 
+                        configfile.ascii(), filename.ascii());
     else
     {
         isNorthAmerica = true;
@@ -2595,7 +2600,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          xmltv_grabber == "tv_grab_nl" ||
          xmltv_grabber == "tv_grab_fr" ||
          xmltv_grabber == "tv_grab_fi" ||
-         xmltv_grabber == "tv_grab_jp"))
+         xmltv_grabber == "tv_grab_jp" ||
+         xmltv_grabber == "tv_grab_pt"))
          command += " --quiet";
 
 
@@ -2737,7 +2743,7 @@ bool fillData(QValueList<Source> &sourcelist)
             xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
             xmltv_grabber == "tv_grab_nl" || xmltv_grabber == "tv_grab_au" ||
             xmltv_grabber == "tv_grab_fr" || xmltv_grabber == "tv_grab_jp" ||
-            xmltv_grabber == "tv_grab_uk_rt")
+            xmltv_grabber == "tv_grab_pt" || xmltv_grabber == "tv_grab_uk_rt")
         {
             // These don't support the --offset option, so just grab the max.
             if (!grabData(*it, -1))
