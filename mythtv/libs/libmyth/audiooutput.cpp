@@ -35,7 +35,8 @@ AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits,
         return new AudioOutputALSA(audiodevice.remove(0, 5), audio_bits,
                                    audio_channels, audio_samplerate, source, set_initial_vol);
 #else
-        printf("Audio output device is set to an ALSA device but ALSA support is not compiled in!\n");
+        VERBOSE(VB_IMPORTANT, "Audio output device is set to an ALSA device "
+                              "but ALSA support is not compiled in!");
         return NULL;
 #endif
     }
@@ -45,7 +46,8 @@ AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits,
         return new AudioOutputARTS(audiodevice.remove(0, 5), audio_bits,
                                    audio_channels, audio_samplerate, source, set_initial_vol);
 #else
-        printf("Audio output device is set to an ARTS device but ARTS support is not compiled in!\n");
+        VERBOSE(VB_IMPORTANT, "Audio output device is set to an ARTS device "
+                              "but ARTS support is not compiled in!");
         return NULL;
 #endif
     }
@@ -55,7 +57,8 @@ AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits,
         return new AudioOutputJACK(audiodevice.remove(0, 5), audio_bits,
                                    audio_channels, audio_samplerate, source, set_initial_vol);
 #else
-        printf("Audio output device is set to a JACK device but JACK support is not compiled in!\n");
+        VERBOSE(VB_IMPORTANT, "Audio output device is set to a JACK device "
+                              "but JACK support is not compiled in!");
         return NULL;
 #endif
     }
@@ -73,8 +76,9 @@ AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits,
                                  audio_channels, audio_samplerate, source, set_initial_vol);
 #endif
 
-    printf("No useable audio output driver found.\n");
-    printf("Don't disable OSS support unless you're not running on Linux.\n");
+    VERBOSE(VB_IMPORTANT, "No useable audio output driver found.");
+    VERBOSE(VB_IMPORTANT, "Don't disable OSS support unless you're "
+                          "not running on Linux.");
 
     return NULL;
 }
