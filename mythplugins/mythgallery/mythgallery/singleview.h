@@ -45,8 +45,11 @@ class SingleView : public MythDialog
 
     bool timerrunning;
     int rotateAngle, imageRotateAngle;
+    int origWidth, origHeight;
+    int newzoom, zoomfactor;
+    int sx, sy;
+    int zoomed_w, zoomed_h;
     bool redraw;
-
     QSqlDatabase *m_db;
 };
 
