@@ -1434,7 +1434,8 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
             {
                 parseCredits(info, pginfo);
             }
-            else if (info.tagName() == "episode-num" && info.attribute("system") == "xmltv_ns")
+            else if (info.tagName() == "episode-num" &&
+                     info.attribute("system") == "xmltv_ns")
             {
                 int tmp;
                 QString episodenum(getFirstText(info));
@@ -1470,6 +1471,12 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
                     pginfo->parttotal = parttotal;
                     pginfo->partnumber = partnumber;
                 }
+            }
+            else if (info.tagName() == "episode-num" &&
+                     info.attribute("system") == "onscreen" &&
+                     pginfo->subtitle.isEmpty())
+            {
+                 pginfo->subtitle = getFirstText(info);
             }
         }
     }
