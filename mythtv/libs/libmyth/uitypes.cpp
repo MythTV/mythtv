@@ -1290,10 +1290,21 @@ void UIImageType::LoadImage()
     int transparentFlag = gContext->GetNumSetting("PlayBoxTransparency", 1);
     if (m_flex == true)
     {
+        int pathStart = m_filename.findRev('/');
         if (transparentFlag == 1)
-            m_filename = "trans-" + m_filename;
+        {
+            if (pathStart < 0 )
+                m_filename = "trans-" + m_filename;
+            else
+                m_filename.replace(pathStart, 1, "/trans-");
+        }
         else
-            m_filename = "solid-" + m_filename;
+        {
+            if (pathStart < 0 )
+                m_filename = "solid-" + m_filename;
+            else
+                m_filename.replace(pathStart, 1, "/solid-");
+        }
     }
 
     QString themeDir = gContext->GetThemeDir();

@@ -1069,7 +1069,6 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
 {
     if (filename.left(5) == "myth:")
         return NULL;
-
     QString baseDir = d->m_installprefix + "/share/mythtv/themes/default/";
 
     QFile checkFile(filename);
@@ -1103,12 +1102,19 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
 
     if (!checkFile.exists())
     {
-        QFileInfo fi(filename);
-        filename = d->m_themepathname + fi.fileName();
-        checkFile.setName(filename);
+        QString fileTemp;
+        fileTemp = d->m_themepathname + filename;
+        checkFile.setName(fileTemp);
         if (!checkFile.exists())
-            filename = baseDir + fi.fileName();
+        {
+            QFileInfo fi(filename);
+            filename = d->m_themepathname + fi.fileName();
+            checkFile.setName(filename);
+            if (!checkFile.exists())
+                filename = baseDir + fi.fileName();
+        }
     }
+
 
     QImage *ret = NULL;
 
@@ -1148,9 +1154,7 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
 {
     if (filename.left(5) == "myth:")
         return NULL;
-
     QString baseDir = d->m_installprefix + "/share/mythtv/themes/default/";
-
     QFile checkFile(filename);
     QFileInfo fi(filename);
 
@@ -1182,11 +1186,17 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
 
     if (!checkFile.exists())
     {
-        QFileInfo fi(filename);
-        filename = d->m_themepathname + fi.fileName();
-        checkFile.setName(filename);
+        QString fileTemp;
+        fileTemp = d->m_themepathname + filename;
+        checkFile.setName(fileTemp);
         if (!checkFile.exists())
-            filename = baseDir + fi.fileName();
+        {
+            QFileInfo fi(filename);
+            filename = d->m_themepathname + fi.fileName();
+            checkFile.setName(filename);
+            if (!checkFile.exists())
+                filename = baseDir + fi.fileName();
+        }
     }
         
     QPixmap *ret = new QPixmap();

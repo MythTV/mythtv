@@ -1647,11 +1647,22 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                 {
                     if (flex.lower() == "yes")
                     {
+                        int pathStart = confile.findRev('/');
                         if (usetrans == 1)
-                            confile = "trans-" + confile;
+                        {
+                            if (pathStart < 0 )
+                                confile = "trans-" + confile;
+                            else
+                                confile.replace(pathStart, 1, "/trans-");
+                        }
                         else
-                            confile = "solid-" + confile;
-
+                        {
+                            if (pathStart < 0 )
+                                confile = "solid-" + confile;
+                            else
+                                confile.replace(pathStart, 1, "/solid-");
+                        }
+                        
                         imgContainer = gContext->LoadScalePixmap(confile);
                     }
                     else
