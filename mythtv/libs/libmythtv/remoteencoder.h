@@ -4,6 +4,8 @@
 #include <qsocket.h>
 #include <qstringlist.h>
 
+#include <pthread.h>
+
 class ProgramInfo;
 
 class RemoteEncoder
