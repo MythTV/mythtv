@@ -347,8 +347,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 m_parent->SetAudioParams(16, enc->channels, enc->sample_rate);
                 audio_sample_size = enc->channels * 2;
                 audio_sampling_rate = enc->sample_rate;
-                current_audio_channels = enc->channels;
-                current_audio_sample_rate = enc->sample_rate;
+                audio_channels = enc->channels;
                 break;
             }
             default:
@@ -435,7 +434,7 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
 
 bool AvFormatDecoder::CheckAudioParams(int freq, int channels)
 {
-    if (freq == current_audio_sample_rate && channels == current_audio_channels)
+    if (freq == audio_sampling_rate && channels == audio_channels)
         return false;
 
     QString chan = "stereo";
@@ -615,8 +614,6 @@ static const float avfmpeg2_aspect[16]={
     0,    1.0,    -3.0/4.0,    -9.0/16.0,    -1.0/2.21,
 };
 
-uint32_t avfmpa_freq_tab[3] = { 44100, 48000, 32000 };
-
 float AvFormatDecoder::GetMpegAspect(AVCodecContext *context,
                                      int aspect_ratio_info,
                                      int width, int height)
@@ -776,50 +773,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             }
         }
  
-        if (len > 0 && curstream->codec.codec_type == CODEC_TYPE_AUDIO)
-        {
-            AVCodecContext *context = &(curstream->codec);
-            if (context->codec_id == CODEC_ID_MP2 ||
-                context->codec_id == CODEC_ID_MP3LAME)
-            {
-                int header = (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) |
-                             ptr[3];
-
-                if (((header & 0xffe00000) == 0xffe00000) &&
-                    (((header >> 17) & 3) != 0) &&
-                    (((header >> 12) & 0xf) != 0xf) &&
-                    (((header >> 10) & 3) != 3))
-                {
-                    int freqindex = (header >> 10) & 3;
-                    int lsf = 1, mpeg25 = 1;
-                    if (header & (1 << 20))
-                    {
-                        lsf = (header & (1 << 19)) ? 0 : 1;
-                        mpeg25 = 0;
-                    }
-
-                    int freq = avfmpa_freq_tab[freqindex] >> (lsf + mpeg25);
-                    int mode = (header >> 6) & 3;
-                    int channels = 2;
-
-                    if (mode == 3)
-                        channels = 1;
-
-                    if (CheckAudioParams(freq, channels))
-                    {
-                        current_audio_sample_rate = freq;
-                        current_audio_channels = channels;
-
-                        audio_sample_size = channels * 2;
-                        audio_sampling_rate = freq;
-
-                        m_parent->SetAudioParams(16, channels, freq);
-                        m_parent->ReinitAudio();
-                    }
-                }
-            }
-        }
-
         while (len > 0)
         {
             switch (curstream->codec.codec_type)
@@ -840,6 +793,19 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         ptr += ret;
                         len -= ret;
                         continue;
+                    }
+
+                    if (CheckAudioParams(curstream->codec.sample_rate,
+                                         curstream->codec.channels))
+                    {
+                        audio_sampling_rate = curstream->codec.sample_rate;
+                        audio_channels = curstream->codec.channels;
+                        audio_sample_size = audio_channels * 2;
+
+                        m_parent->SetEffDsp(audio_sampling_rate * 100);
+                        m_parent->SetAudioParams(16, audio_channels,
+                                                 audio_sampling_rate);
+                        m_parent->ReinitAudio();
                     }
 
                     temppts = (long long)((double)pkt->pts * ptsmultiplier); 

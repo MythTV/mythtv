@@ -92,6 +92,7 @@ class AvFormatDecoder : public DecoderBase
 
     int audio_sample_size;
     int audio_sampling_rate;
+    int audio_channels;
 
     long long lastapts;
     long long lastvpts;
@@ -125,9 +126,6 @@ class AvFormatDecoder : public DecoderBase
     int current_width;
     int current_height;
     float current_aspect;
-
-    int current_audio_channels;
-    int current_audio_sample_rate;
 
     QPtrList<AVPacket> storedPackets;
 };

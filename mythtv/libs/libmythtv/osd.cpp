@@ -95,6 +95,14 @@ OSD::~OSD(void)
     delete setList;
 }
 
+void OSD::SetFPS(int newfps)
+{
+    float change = (newfps * 1.0 / fps);
+    
+    fps = newfps;
+    totalfadeframes = (int)(totalfadeframes * change);
+}
+
 void OSD::SetDefaults(void)
 {
     TTFFont *ccfont = GetFont("cc_font");

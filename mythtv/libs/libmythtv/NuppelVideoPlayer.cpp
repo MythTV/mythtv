@@ -1011,10 +1011,10 @@ void NuppelVideoPlayer::ExAVSync(void)
         {
             // If delay is sometwhat more than a frame or < 0ms,
             // we clip it to these amounts and reset nexttrigger
-            if ( delay > frame_interval / play_speed * 2)
+            if (delay > frame_interval / play_speed * 2)
             {
                 // cerr << "Delaying to next trigger: " << delay << endl;
-                usleep(frame_interval / play_speed);
+                usleep((int)(frame_interval / play_speed));
                 delay = 0;
                 avsync_avg = 0;
                 gettimeofday(&nexttrigger, NULL);
