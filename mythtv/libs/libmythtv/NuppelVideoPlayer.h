@@ -94,7 +94,8 @@ class NuppelVideoPlayer
     int GetLength(void) { return totalLength; }
 
     bool ReencodeFile(char *inputname, char *outputname,
-                      RecordingProfile &profile);
+                      RecordingProfile &profile, bool honorCutList = false,
+                      bool forceKeyFrames = false);
 
     int FlagCommercials(bool showPercentage = false, bool fullSpeed = false);
 

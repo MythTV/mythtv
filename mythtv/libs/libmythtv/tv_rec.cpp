@@ -1948,8 +1948,8 @@ void TVRec::RequestRingBufferBlock(int size)
     if (!readthreadlive)
         return;
 
-    if (size > 128000)
-        size = 128000;
+    if (size > 256000)
+        size = 256000;
 
     bool locked = false;
     QTime curtime = QTime::currentTime();
@@ -1993,7 +1993,7 @@ void TVRec::DoReadThread(void)
 {
     readthreadlive = true;
 
-    char *buffer = new char[128001];
+    char *buffer = new char[256001];
 
     while (readthreadlive && rbuffer)
     {

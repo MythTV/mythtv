@@ -21,9 +21,26 @@ QSqlDatabase *db;
 
 void StoreTranscodeState(ProgramInfo *pginfo, int createdelete);
 
+void usage(char *progname) 
+{
+    cerr << "Usage: " << progname << " <--chanid <channelid>>\n";
+    cerr << "\t<--starttime <starttime>> <--profile <profile>>\n";
+    cerr << "\t<honorcutlist> <--allkeys> <--help>\n\n";
+    cerr << "\t--chanid       or -c: Takes a channel id. REQUIRED\n";
+    cerr << "\t--starttime    or -s: Takes a starttime for the\n";
+    cerr << "\t\trecording. REQUIRED\n";
+    cerr << "\t--profile      or -p: Takes the named of an existing\n";
+    cerr << "\t\trecording profile. REQUIRED\n";
+    cerr << "\t--honorcutlist or -l: Specifies whether to use the cutlist.\n";
+    cerr << "\t--allkeys      or -k: Specifies that the output file\n";
+    cerr << "\t\tshould be made entirely of keyframes.\n";
+    cerr << "\t--help         or -h: Prints this help statement.\n";
+}
+
 int main(int argc, char *argv[])
 {
     QString chanid, starttime, profilename;
+    bool honorcutlist = false, keyframesonly = false;
     srand(time(NULL));
 
     QApplication a(argc, argv, false);
@@ -49,39 +66,58 @@ int main(int argc, char *argv[])
             else 
             {
                 cerr << "Missing argument to -s/--starttime option\n";
+                usage(a.argv()[0]);
                 return -1;
             }
-         } 
-         else if (!strcmp(a.argv()[argpos],"-c") ||
-                  !strcmp(a.argv()[argpos],"--chanid")) 
-         {
-             if (a.argc() > argpos) 
-             {
-                 chanid = a.argv()[argpos + 1];
-                 found_chanid = 1;
-                 ++argpos;
-             } 
-             else 
-             {
-                 cerr << "Missing argument to -c/--chanid option\n";
-                 return -1;
-             }
-         } 
-         else if (!strcmp(a.argv()[argpos],"-p") ||
-                  !strcmp(a.argv()[argpos],"--profile")) 
-         {
-             if (a.argc() > argpos) 
-             {
-                 profilename = a.argv()[argpos + 1];
-                 found_profile = 1;
-                 ++argpos;
-             } 
-             else 
-             {
-                 cerr << "Missing argument to -c/--chanid option\n";
-                 return -1;
-             }
-         }
+        } 
+        else if (!strcmp(a.argv()[argpos],"-c") ||
+                 !strcmp(a.argv()[argpos],"--chanid")) 
+        {
+            if (a.argc() > argpos) 
+            {
+                chanid = a.argv()[argpos + 1];
+                found_chanid = 1;
+                ++argpos;
+            } 
+            else 
+            {
+                cerr << "Missing argument to -c/--chanid option\n";
+                usage(a.argv()[0]);
+                return -1;
+            }
+        } 
+        else if (!strcmp(a.argv()[argpos],"-p") ||
+                 !strcmp(a.argv()[argpos],"--profile")) 
+        {
+            if (a.argc() > argpos) 
+            {
+                profilename = a.argv()[argpos + 1];
+                found_profile = 1;
+                ++argpos;
+            } 
+            else 
+            {
+                cerr << "Missing argument to -c/--chanid option\n";
+                usage(a.argv()[0]);
+                return -1;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-l") ||
+                 !strcmp(a.argv()[argpos],"--honorcutlist")) 
+        {
+            honorcutlist = true;
+        }
+        else if (!strcmp(a.argv()[argpos],"-k") ||
+                 !strcmp(a.argv()[argpos],"--allkeys")) 
+        {
+            keyframesonly = true;
+        }
+        else if (!strcmp(a.argv()[argpos],"-h") ||
+                 !strcmp(a.argv()[argpos],"--help")) 
+        {
+            usage(a.argv()[0]);
+            return(0);
+        }
     }
 
     if (!found_profile || !found_chanid || !found_starttime) 
@@ -90,9 +126,8 @@ int main(int argc, char *argv[])
          return -1;
     }
 
-    chanid = a.argv()[1];
-    starttime = a.argv()[2];
-    profilename = a.argv()[3];
+    //  Load the context
+    gContext = new MythContext(MYTH_BINARY_VERSION, false);
 
     db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -110,14 +145,14 @@ int main(int argc, char *argv[])
     RecordingProfile profile;
     MythContext::KickDatabase(db);
 
-    if (!profile.loadByName(db, profilename))
+    if (!profile.loadByName(db, profilename) && (profilename.lower() != "raw"))
     {
         cerr << "Illegal profile : " << profilename << endl;
         return -1;
     }
 
     QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
-    ProgramInfo *pginfo = ProgramInfo::GetProgramAtDateTime(chanid, startts);
+    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid, startts);
 
     if (!pginfo)
     {
@@ -127,16 +162,15 @@ int main(int argc, char *argv[])
 
     QString fileprefix = gContext->GetFilePrefix();
     QString infile = pginfo->GetRecordFilename(fileprefix);
-    QString tmpfile = infile;
-    tmpfile += ".tmp";
+    QString tmpfile = infile + ".tmp";
 
     StoreTranscodeState(pginfo, 1);
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer;
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(db, pginfo);
 
     cout << "Transcoding from " << infile << " to " << tmpfile << "\n";
 
     if (nvp->ReencodeFile((char *)infile.ascii(), (char *)tmpfile.ascii(), 
-                          profile)) 
+                          profile, honorcutlist, keyframesonly)) 
     {
         StoreTranscodeState(pginfo, 0);
         cout << "Transcoding " << infile << " done\n";

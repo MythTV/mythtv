@@ -2863,7 +2863,8 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
 }
 
 bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
-                                     RecordingProfile &profile)
+                                     RecordingProfile &profile,
+                                     bool honorCutList, bool forceKeyFrames)
 { 
     NuppelVideoRecorder *nvr;
 
@@ -2968,13 +2969,51 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     frame.height = video_height;
     frame.len = video_width * video_height * 3 / 2;
 
+    decoder->setExactSeeks(true);
     decoder->GetFrame(0);
     int tryraw = decoder->GetRawFrameState();
+
+    QMap<long long, int>::Iterator i;
+    QMap<long long, int>::Iterator last = deleteMap.end();
+    bool writekeyframe = true;
+    
+    if (honorCutList && !deleteMap.isEmpty())
+    {
+        i = deleteMap.begin();
+        if (i.key() == 1 && i.data() == 1)
+        {
+            while ((i.data() == 1) && (i != last))
+            {
+                decoder->DoFastForward(i.key());
+                ++i;
+            }
+        }
+    }
+
     while (!eof)
     {
         frame.buf = vbuffer[vpos];
         frame.timecode = timecodes[vpos];
         frame.frameNumber = framesPlayed;
+
+        if ((!deleteMap.isEmpty()) && honorCutList) 
+        {
+            if (frame.frameNumber >= i.key()) 
+            {
+                while((i.data() == 1) && (i != last))
+                {
+                    i++;
+                    decoder->DoFastForward(i.key());
+                }
+                while((i.data() == 0) && (i != last))
+                {
+                    i++;
+                }
+            }
+        }
+
+        if (eof)
+            break;
 
         if (tryraw)
         {
@@ -2990,7 +3029,12 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             }
 
             decoder->WriteStoredData(outRingBuffer);
-            nvr->WriteVideo(&frame, true, decoder->isLastFrameKey());
+            if (forceKeyFrames) 
+                writekeyframe = true;
+            else
+                writekeyframe = decoder->isLastFrameKey();
+ 
+            nvr->WriteVideo(&frame, true, writekeyframe);
             raud = waud;
             rtxt = wtxt;
         } 
@@ -3023,7 +3067,12 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 rtxt = (rtxt + 1) % MAXTBUFFER;
             }
 
-            nvr->WriteVideo(&frame);
+            if (forceKeyFrames)
+                writekeyframe = true;
+            else
+                writekeyframe = decoder->isLastFrameKey();
+
+            nvr->WriteVideo(&frame, true, writekeyframe);
         }
     
         decoder->GetFrame(0);

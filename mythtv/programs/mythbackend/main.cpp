@@ -22,7 +22,8 @@ using namespace std;
 
 QMap<int, EncoderLink *> tvList;
 MythContext *gContext;
-Scheduler* sched = NULL;
+Scheduler *sched = NULL;
+Transcoder *trans = NULL;
 QString pidfile;
 QString lockfile_location;
 
@@ -83,11 +84,15 @@ void setupTVs(bool ismaster)
     }
 }
 
-void cleanup(void) {
+void cleanup(void) 
+{
     delete gContext;
 
     if (sched)
         delete sched;
+
+    if (trans)
+        delete trans;
 
     if (pidfile != "")
         unlink(pidfile.ascii());
@@ -257,7 +262,7 @@ int main(int argc, char **argv)
     }
 
 //    QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
-//    Transcoder *trans = new Transcoder(&tvList, trandb);
+//    trans = new Transcoder(&tvList, trandb);
 
     VERBOSE("Verbose mode activated.");
 

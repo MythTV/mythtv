@@ -341,7 +341,8 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QString channel, const QString &l
     return NULL;
 }
 
-ProgramInfo *ProgramInfo::GetProgramAtDateTime(QString channel, QDateTime &dtime)
+ProgramInfo *ProgramInfo::GetProgramAtDateTime(QString channel, 
+                                               QDateTime &dtime)
 {
     QString sqltime = dtime.toString("yyyyMMddhhmm");
     sqltime += "50"; 
@@ -349,7 +350,17 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QString channel, QDateTime &dtime
     return GetProgramAtDateTime(channel, sqltime);
 }
 
-ProgramInfo *ProgramInfo::GetProgramFromRecorded(QString channel, QString starttime)
+ProgramInfo *ProgramInfo::GetProgramFromRecorded(QString channel, 
+                                                 QDateTime &dtime)
+{
+    QString sqltime = dtime.toString("yyyyMMddhhmm");
+    sqltime += "00"; 
+
+    return GetProgramFromRecorded(channel, sqltime);
+}
+
+ProgramInfo *ProgramInfo::GetProgramFromRecorded(QString channel, 
+                                                 QString starttime)
 {
     QSqlQuery query;
     QString thequery;

@@ -103,6 +103,8 @@ class ProgramInfo
     static ProgramInfo *GetProgramAtDateTime(QString channel, QDateTime &dtime);
     static ProgramInfo *GetProgramFromRecorded(QString channel, 
                                                QString starttime);
+    static ProgramInfo *GetProgramFromRecorded(QString channel, 
+                                               QDateTime &dtime);
 
     QString title;
     QString subtitle;

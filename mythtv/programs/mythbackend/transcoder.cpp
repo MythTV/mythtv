@@ -59,8 +59,8 @@ void Transcoder::customEvent(QCustomEvent *e)
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
             QDateTime startts = QDateTime::fromString(tokens[2], Qt::ISODate);
-            ProgramInfo *pinfo = ProgramInfo::GetProgramAtDateTime(tokens[1], 
-                                                                   startts);
+            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(tokens[1], 
+                                                                     startts);
             if (pinfo == NULL) 
             {
                 cerr << "Could not read program from database, skipping "
@@ -130,7 +130,7 @@ void Transcoder::ClearTranscodeTable(bool skipPartial)
                 {
                      // transcode didn't finish delete partial transcode
                      QDateTime dtstart = result.value(1).toDateTime();
-                     ProgramInfo *pinfo = ProgramInfo::GetProgramAtDateTime(
+                     ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
                                                    result.value(0).toString(), 
                                                    dtstart);
                      if (!pinfo) 
@@ -148,7 +148,7 @@ void Transcoder::ClearTranscodeTable(bool skipPartial)
             else
             {
                 QDateTime dtstart = result.value(1).toDateTime();
-                ProgramInfo *pinfo = ProgramInfo::GetProgramAtDateTime(
+                ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
                                                   result.value(0).toString(), 
                                                   dtstart);
 
@@ -274,7 +274,7 @@ void Transcoder::RestartTranscoding()
              QDateTime dtstart = result.value(1).toDateTime();
              // This is backwards (calling a query for something we just queried)
              // but it is a simple way to get all recordings
-             ProgramInfo *pinfo = ProgramInfo::GetProgramAtDateTime(
+             ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
                                                result.value(0).toString(), 
                                                dtstart);
 
