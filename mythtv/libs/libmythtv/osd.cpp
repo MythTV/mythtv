@@ -24,6 +24,7 @@ using namespace std;
 OSD::OSD(int width, int height, int frint, const QString &font, 
          const QString &ccfont, const QString &prefix, const QString &osdtheme,
          int dispx, int dispy, int dispw, int disph)
+   : QObject()
 {
     changed = false;
     vid_width = width;
@@ -1032,8 +1033,18 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
     osdlock.unlock();
 }
 
+void OSD::SetUpOSDClosedHandler(TV *tv)
+{
+    OSDSet *container = GetSet("status");
+
+    if (container)
+        connect((QObject *)container, SIGNAL(OSDClosed(int)), (QObject *)tv,
+                SLOT(HandleOSDClosed(int)));
+
+}
+
 void OSD::StartPause(int position, bool fill, QString msgtext,
-                     QString slidertext, int displaytime)
+                     QString slidertext, int displaytime, int osdFunctionalType)
 {
     fill = fill;
 
@@ -1053,7 +1064,7 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
             slider->SetPosition(position);
 
         if (displaytime > 0)
-            container->DisplayFor(displaytime * 1000000);
+            container->DisplayFor(displaytime * 1000000, osdFunctionalType);
         else
             container->Display();
         m_setsvisible = true;

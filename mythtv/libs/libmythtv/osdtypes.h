@@ -6,14 +6,18 @@
 #include <qmap.h>
 #include <qvaluelist.h>
 #include <vector>
+#include <qobject.h>
+
 using namespace std;
 
 class TTFFont;
 class OSDType;
 class OSDSurface;
+class TV;
 
-class OSDSet
+class OSDSet : public QObject
 {
+    Q_OBJECT
   public:
     OSDSet(const QString &name, bool cache, int screenwidth, int screenheight, 
            float wmult, float hmult, int frint);
@@ -43,8 +47,8 @@ class OSDSet
     bool HasDisplayed() { return m_hasdisplayed; }
     bool Fading() { return m_fadetime > 0; }
 
-    void Display(bool onoff = true);
-    void DisplayFor(int time);
+    void Display(bool onoff = true, int osdFunctionalType = 0);
+    void DisplayFor(int time, int osdFunctionalType = 0);
     void FadeFor(int time);
     void Hide(void);
 
@@ -62,6 +66,9 @@ class OSDSet
 
     void SetWantsUpdates(bool updates) { m_wantsupdates = updates; }
     bool NeedsUpdate(void) { return m_needsupdate; }
+
+  signals:
+    void OSDClosed(int);
 
   private:
     int m_screenwidth;
@@ -97,6 +104,8 @@ class OSDSet
     bool m_wantsupdates;
     bool m_needsupdate;
     int m_lastupdate;
+
+    int currentOSDFunctionalType;
 };
 
 class OSDType

@@ -113,6 +113,7 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
     bool hasarea = false;
 
     spreadbuttons = true;
+    visiblerowlimit = 6;	// the old default
 
     QString type = element.attribute("style", "");
     if (type == "tiled")
@@ -143,6 +144,10 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
                 QString val = getFirstText(info);
                 if (val == "no")
                     spreadbuttons = false;
+            }
+            else if (info.tagName() == "visiblerowlimit")
+            {
+                visiblerowlimit = atoi(getFirstText(info).ascii());
             }
             else
             {
@@ -180,9 +185,9 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
     }
 }
 
-void ThemedMenu::parseShadow(QDomElement &element)
+void ThemedMenu::parseShadow(TextAttributes &attributes, QDomElement &element)
 {
-    hasshadow = true;
+    attributes.hasshadow = true;
 
     bool hascolor = false;
     bool hasoffset = false;
@@ -196,19 +201,21 @@ void ThemedMenu::parseShadow(QDomElement &element)
         {
             if (info.tagName() == "color")
             {
-                shadowColor = QColor(getFirstText(info));
+                attributes.shadowColor = QColor(getFirstText(info));
                 hascolor = true;
             }
             else if (info.tagName() == "offset")
             {
-                shadowOffset = parsePoint(getFirstText(info));
-                shadowOffset.setX((int)(shadowOffset.x() * wmult));
-                shadowOffset.setY((int)(shadowOffset.y() * hmult));
+                attributes.shadowOffset = parsePoint(getFirstText(info));
+                attributes.shadowOffset.setX((int)(attributes.shadowOffset.x() *
+                                             wmult));
+                attributes.shadowOffset.setY((int)(attributes.shadowOffset.y() *
+                                             hmult));
                 hasoffset = true;
             }
             else if (info.tagName() == "alpha")
             {
-                shadowalpha = atoi(getFirstText(info).ascii());
+                attributes.shadowalpha = atoi(getFirstText(info).ascii());
                 hasalpha = true;
             }
             else
@@ -238,9 +245,9 @@ void ThemedMenu::parseShadow(QDomElement &element)
     }
 }
 
-void ThemedMenu::parseOutline(QDomElement &element)
+void ThemedMenu::parseOutline(TextAttributes &attributes, QDomElement &element)
 {
-    hasoutline = true;
+    attributes.hasoutline = true;
 
     bool hascolor = false;
     bool hassize = false;
@@ -253,13 +260,13 @@ void ThemedMenu::parseOutline(QDomElement &element)
         {
             if (info.tagName() == "color")
             {
-                outlineColor = QColor(getFirstText(info));
+                attributes.outlineColor = QColor(getFirstText(info));
                 hascolor = true;
             }
             else if (info.tagName() == "size")
             {
-                outlinesize = atoi(getFirstText(info).ascii());
-                outlinesize = (int)(outlinesize * hmult);
+                attributes.outlinesize = atoi(getFirstText(info).ascii());
+                attributes.outlinesize = (int)(attributes.outlinesize * hmult);
                 hassize = true;
             }
             else
@@ -283,7 +290,7 @@ void ThemedMenu::parseOutline(QDomElement &element)
     }
 }
 
-void ThemedMenu::parseText(QDomElement &element)
+void ThemedMenu::parseText(TextAttributes &attributes, QDomElement &element)
 {
     bool hasarea = false;
 
@@ -301,15 +308,22 @@ void ThemedMenu::parseText(QDomElement &element)
             if (info.tagName() == "area") 
             {
                 hasarea = true;
-                textRect = parseRect(getFirstText(info));
-                textRect.moveTopLeft(QPoint((int)(textRect.x() * wmult),
-                                            (int)(textRect.y() * hmult)));
-                textRect.setWidth((int)(textRect.width() * wmult));
-                textRect.setHeight((int)(textRect.height() * hmult));
-                textRect = QRect(textRect.x(), textRect.y(),
-                                 buttonnormal->width() - textRect.width() - 
-                                 textRect.x(), buttonnormal->height() - 
-                                 textRect.height() - textRect.y());
+                attributes.textRect = parseRect(getFirstText(info));
+                attributes.textRect.moveTopLeft(QPoint(
+                                       (int)(attributes.textRect.x() * wmult),
+                                       (int)(attributes.textRect.y() * hmult)));
+                attributes.textRect.setWidth((int)
+                                       (attributes.textRect.width() * wmult));
+                attributes.textRect.setHeight((int)
+                                       (attributes.textRect.height() * hmult));
+                attributes.textRect = QRect(attributes.textRect.x(), 
+                                            attributes.textRect.y(),
+                                            buttonnormal->width() - 
+                                            attributes.textRect.width() - 
+                                            attributes.textRect.x(), 
+                                            buttonnormal->height() - 
+                                            attributes.textRect.height() - 
+                                            attributes.textRect.y());
             }
             else if (info.tagName() == "fontsize")
             {
@@ -331,20 +345,21 @@ void ThemedMenu::parseText(QDomElement &element)
             }
             else if (info.tagName() == "color")
             {
-                textColor = QColor(getFirstText(info));
+                attributes.textColor = QColor(getFirstText(info));
             }
             else if (info.tagName() == "centered")
             {
                 if (getFirstText(info) == "yes")
-                    textflags = Qt::AlignTop | Qt::AlignHCenter | WordBreak;
+                    attributes.textflags = Qt::AlignTop | Qt::AlignHCenter | 
+                                           WordBreak;
             } 
             else if (info.tagName() == "outline")
             {
-                parseOutline(info);
+                parseOutline(attributes, info);
             }
             else if (info.tagName() == "shadow")
             {
-                parseShadow(info);
+                parseShadow(attributes, info);
             }
             else
             {
@@ -354,8 +369,7 @@ void ThemedMenu::parseText(QDomElement &element)
         }
     }
 
-    font = QFont(fontname, (int)(fontsize * hmult), weight, italic);
-    setFont(font);
+    attributes.font = QFont(fontname, (int)(fontsize * hmult), weight, italic);
 
     if (!hasarea)
     {
@@ -368,10 +382,9 @@ void ThemedMenu::parseButtonDefinition(QString dir, QDomElement &element)
 {
     bool hasnormal = false;
     bool hasactive = false;
+    bool hasactivetext = false;
 
     QString setting;
-
-    textflags = Qt::AlignTop | Qt::AlignLeft | WordBreak;
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -395,11 +408,22 @@ void ThemedMenu::parseButtonDefinition(QString dir, QDomElement &element)
             {
                 if (!hasnormal)
                 {
-                    cerr << "The 'normal' tag needs to come before the 'text' "
-                         << "tag\n";
+                    cerr << "The 'normal' tag needs to come before the "
+                         << "'normaltext' tag\n";
                     exit(0);
                 }
-                parseText(info);
+                parseText(normalAttributes, info);
+            }
+            else if (info.tagName() == "activetext")
+            {
+                if (!hasactive)
+                {
+                    cerr << "The 'active' tag needs to come before the "
+                         << "'activetext' tag\n";
+                    exit(0);
+                }
+                parseText(activeAttributes, info);
+                hasactivetext = true;
             }
             else if (info.tagName() == "watermarkposition")
             {
@@ -419,10 +443,16 @@ void ThemedMenu::parseButtonDefinition(QString dir, QDomElement &element)
         cerr << "No normal button image defined\n";
         exit(0);
     }
+
     if (!hasactive)
     {
         cerr << "No active button image defined\n";
         exit(0);
+    }
+
+    if (!hasactivetext)
+    {
+        activeAttributes = normalAttributes;
     }
 
     watermarkPos.setX((int)(watermarkPos.x() * wmult));
@@ -699,10 +729,17 @@ void ThemedMenu::setDefaults(void)
 {
     logo = NULL;
     buttonnormal = buttonactive = NULL;
-    textflags = Qt::AlignTop | Qt::AlignLeft | WordBreak;
-    textColor = QColor(white);
-    hasoutline = false;
-    hasshadow = false;
+
+    normalAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | WordBreak;
+    normalAttributes.textColor = QColor(white);
+    normalAttributes.hasoutline = false;
+    normalAttributes.hasshadow = false;
+
+    activeAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | WordBreak;
+    activeAttributes.textColor = QColor(white);
+    activeAttributes.hasoutline = false;
+    activeAttributes.hasshadow = false;
+
     titleIcons.clear();
     titleText = "";
     curTitle = NULL;
@@ -1091,9 +1128,9 @@ void ThemedMenu::layoutButtons(void)
     }    
 
     // limit it to 6 items displayed at one time
-    if (columns * maxrows > 6)
+    if (columns * maxrows > visiblerowlimit)
     {
-        maxrows = 6 / columns;
+        maxrows = visiblerowlimit / columns;
     }
                              
     vector<ThemedButton>::iterator iter = buttonList.begin();
@@ -1364,6 +1401,7 @@ void ThemedMenu::paintWatermark(QPainter *p)
 void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
                              bool drawinactive)
 {
+    TextAttributes attributes;
     ThemedButton *tbutton = &(buttonList[button]);
 
     if (!tbutton->visible)
@@ -1392,6 +1430,7 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
     {
         buttonback = buttonactive;
         tbutton->status = 1;
+        attributes = activeAttributes;
     }
     else
     {
@@ -1403,6 +1442,7 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
             return;
         }
         buttonback = buttonnormal;
+        attributes = normalAttributes;
     }
 
     QPixmap pix(cr.size());
@@ -1414,35 +1454,36 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
 
     tmp.drawImage(newRect.topLeft(), *buttonback);
 
-    QRect buttonTextRect = textRect;
+    QRect buttonTextRect = attributes.textRect;
     buttonTextRect.moveBy(newRect.x(), newRect.y());
 
     QString message = tbutton->text;
-    QRect testBound = tmp.boundingRect(buttonTextRect, textflags, message);
+    QRect testBound = tmp.boundingRect(buttonTextRect, attributes.textflags, 
+                                       message);
 
     if (testBound.height() > buttonTextRect.height() && tbutton->altText != "")
         message = buttonList[button].altText;
 
-    if (hasshadow && shadowalpha > 0)
+    if (attributes.hasshadow && attributes.shadowalpha > 0)
     {
         QPixmap textpix(buttonTextRect.size());
         textpix.fill(QColor(color0));
         textpix.setMask(textpix.createHeuristicMask());
 
         QRect myrect = buttonTextRect;
-        myrect.moveTopLeft(shadowOffset);
+        myrect.moveTopLeft(attributes.shadowOffset);
 
         QPainter texttmp;
         texttmp.begin(&textpix, this);
-        texttmp.setPen(QPen(shadowColor, 1));
-        texttmp.setFont(font);
-        texttmp.drawText(myrect, textflags, message);
+        texttmp.setPen(QPen(attributes.shadowColor, 1));
+        texttmp.setFont(attributes.font);
+        texttmp.drawText(myrect, attributes.textflags, message);
         texttmp.end();
 
         texttmp.begin(textpix.mask());
         texttmp.setPen(QPen(Qt::color1, 1));
-        texttmp.setFont(font);
-        texttmp.drawText(myrect, textflags, message);
+        texttmp.setFont(attributes.font);
+        texttmp.drawText(myrect, attributes.textflags, message);
         texttmp.end();
 
         QImage im = textpix.convertToImage();
@@ -1454,7 +1495,8 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
                uint *p = (uint *)im.scanLine(y) + x;
                QRgb col = *p;
                if (qAlpha(col) > 128)
-                   *p = qRgba(qRed(col), qGreen(col), qBlue(col), shadowalpha);
+                   *p = qRgba(qRed(col), qGreen(col), qBlue(col), 
+                              attributes.shadowalpha);
             }
         } 
 
@@ -1464,8 +1506,8 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
         bitBlt(&pix, buttonTextRect.topLeft(), &textpix, myrect, Qt::CopyROP);
     }
 
-    tmp.setFont(font);
-    drawText(&tmp, buttonTextRect, textflags, message);
+    tmp.setFont(attributes.font);
+    drawText(&tmp, buttonTextRect, attributes, message);
 
     if (buttonList[button].buttonicon)
     {
@@ -1488,47 +1530,53 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
     p->drawPixmap(cr.topLeft(), pix);
 }
 
-void ThemedMenu::drawText(QPainter *p, QRect &rect, int textflags, QString text)
+void ThemedMenu::drawText(QPainter *p, QRect &rect, TextAttributes attributes, 
+                          QString text)
 {
-    if (hasoutline)
+    if (attributes.hasoutline)
     {
         QRect outlinerect = rect;
 
-        p->setPen(QPen(outlineColor, 1));
-        outlinerect.moveBy(0 - outlinesize, 0 - outlinesize);
-        p->drawText(outlinerect, textflags, text);
+        p->setPen(QPen(attributes.outlineColor, 1));
+        outlinerect.moveBy(0 - attributes.outlinesize, 
+                           0 - attributes.outlinesize);
+        p->drawText(outlinerect, attributes.textflags, text);
 
-        for (int i = (0 - outlinesize + 1); i <= outlinesize; i++)
+        for (int i = (0 - attributes.outlinesize + 1); 
+             i <= attributes.outlinesize; i++)
         {
             outlinerect.moveBy(1, 0);
-            p->drawText(outlinerect, textflags, text);
+            p->drawText(outlinerect, attributes.textflags, text);
         }
 
-        for (int i = (0 - outlinesize + 1); i <= outlinesize; i++)
+        for (int i = (0 - attributes.outlinesize + 1); 
+             i <= attributes.outlinesize; i++)
         {
             outlinerect.moveBy(0, 1);
-            p->drawText(outlinerect, textflags, text);
+            p->drawText(outlinerect, attributes.textflags, text);
         }
   
-        for (int i = (0 - outlinesize + 1); i <= outlinesize; i++)
+        for (int i = (0 - attributes.outlinesize + 1); 
+             i <= attributes.outlinesize; i++)
         {
             outlinerect.moveBy(-1, 0);
-            p->drawText(outlinerect, textflags, text);
+            p->drawText(outlinerect, attributes.textflags, text);
         }
 
-        for (int i = (0 - outlinesize + 1); i <= outlinesize; i++)
+        for (int i = (0 - attributes.outlinesize + 1); 
+             i <= attributes.outlinesize; i++)
         {
             outlinerect.moveBy(0, -1);
-            p->drawText(outlinerect, textflags, text);
+            p->drawText(outlinerect, attributes.textflags, text);
         }
 
-        p->setPen(QPen(textColor, 1));
-        p->drawText(rect, textflags, text);
+        p->setPen(QPen(attributes.textColor, 1));
+        p->drawText(rect, attributes.textflags, text);
     }
     else
     {
-        p->setPen(QPen(textColor, 1));
-        p->drawText(rect, textflags, text);
+        p->setPen(QPen(attributes.textColor, 1));
+        p->drawText(rect, attributes.textflags, text);
     }
 }
 

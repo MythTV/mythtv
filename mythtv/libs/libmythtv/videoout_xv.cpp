@@ -361,6 +361,11 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
 
     MoveResize();
   
+    ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
+    ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
+    ChangePictureAttribute(kPictureAttribute_Colour, colour);
+    ChangePictureAttribute(kPictureAttribute_Hue, hue);
+
     XJ_started = true;
 
     return true;
@@ -761,3 +766,65 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
     pthread_mutex_unlock(&lock);
 }
 
+int VideoOutputXv::ChangePictureAttribute(int attributeType, int newValue)
+{
+    int value;
+    int i, howmany, port_min, port_max, range;
+    char *attrName = NULL;
+    Atom attribute;
+    XvAttribute *attributes;
+
+    switch (attributeType) {
+        case kPictureAttribute_Brightness:
+            attrName = "XV_BRIGHTNESS";
+            break;
+        case kPictureAttribute_Contrast:
+            attrName = "XV_CONTRAST";
+            break;
+        case kPictureAttribute_Colour:
+            attrName = "XV_SATURATION";
+            break;
+        case kPictureAttribute_Hue:
+            attrName = "XV_HUE";
+            break;
+    }
+
+    if (!attrName)
+        return -1;
+
+    if (newValue < 0) newValue = 0;
+    if (newValue >= 100) newValue = 99;
+
+    pthread_mutex_lock(&lock);
+
+    attribute = XInternAtom (data->XJ_disp, attrName, False);
+    if (!attribute) {
+        pthread_mutex_unlock(&lock);
+        return -1;
+    }
+    attributes = XvQueryPortAttributes(data->XJ_disp, xv_port, &howmany);
+    if (!attributes) {
+        pthread_mutex_unlock(&lock);
+        return -1;
+    }
+
+    for (i = 0; i < howmany; i++) {
+        if(!strcmp(attrName, attributes[i].name)) {
+            port_min = attributes[i].min_value;
+            port_max = attributes[i].max_value;
+            range = port_max - port_min;
+
+            value = (int) (port_min + (range/100.0) * newValue);
+
+            XvSetPortAttribute(data->XJ_disp, xv_port, attribute, value);
+
+            pthread_mutex_unlock(&lock);
+
+            return newValue;
+        }
+    }
+
+    pthread_mutex_unlock(&lock);
+    
+    return -1;
+}

@@ -15,6 +15,23 @@ class QPixmap;
 class QImage;
 class QWidget;
 
+struct TextAttributes
+{
+    QRect textRect;
+    QColor textColor;
+    QFont font;
+    int textflags;
+
+    bool hasshadow;
+    QColor shadowColor;
+    QPoint shadowOffset;
+    int shadowalpha;
+
+    bool hasoutline;
+    QColor outlineColor;
+    int outlinesize;
+};
+
 struct ButtonIcon
 {
     QString name;
@@ -96,9 +113,9 @@ class ThemedMenu : public MythDialog
     void parseButton(QString dir, QDomElement &element);
     void parseThemeButton(QDomElement &element);
     
-    void parseText(QDomElement &element);
-    void parseOutline(QDomElement &element);
-    void parseShadow(QDomElement &element);
+    void parseText(TextAttributes &attributes, QDomElement &element);
+    void parseOutline(TextAttributes &attributes, QDomElement &element);
+    void parseShadow(TextAttributes &attributes, QDomElement &element);
 
     void setDefaults(void);
 
@@ -124,7 +141,8 @@ class ThemedMenu : public MythDialog
     void paintButton(unsigned int button, QPainter *p, bool erased,
                      bool drawinactive = false);
 
-    void drawText(QPainter *p, QRect &rect, int textflags, QString text);
+    void drawText(QPainter *p, QRect &rect, TextAttributes attributes, 
+                  QString text);
 
     void clearToBackground(void);
     void drawInactiveButtons(void);
@@ -149,19 +167,8 @@ class ThemedMenu : public MythDialog
 
     vector<MenuRow> buttonRows;
    
-    QRect textRect;
-    QColor textColor;
-    QFont font;
-    int textflags;
-
-    bool hasshadow;
-    QColor shadowColor;
-    QPoint shadowOffset;
-    int shadowalpha;
-
-    bool hasoutline;
-    QColor outlineColor;
-    int outlinesize;
+    TextAttributes normalAttributes;
+    TextAttributes activeAttributes;
 
     QString selection;
     bool foundtheme;
@@ -188,6 +195,7 @@ class ThemedMenu : public MythDialog
 
     bool ignorekeys;
 
+    int visiblerowlimit;
     int maxrows;
     int visiblerows;
 

@@ -628,8 +628,11 @@ void NuppelVideoRecorder::InitFilters(void)
     QStringList filters = QStringList::split(",", videoFilterList);
     for (QStringList::Iterator i = filters.begin(); i != filters.end(); i++)
     {
-        VideoFilter *filter = load_videoFilter((char *)((*i).ascii()), 
-                                               NULL);
+        QString filtname = (*i).section('=', 0, 0);
+        QString filtopts = (*i).section('=', 1, 0xffffffff,
+                                        QString::SectionIncludeTrailingSep);
+        VideoFilter *filter = load_videoFilter((char *)(filtname.ascii()), 
+                                               (char *)(filtopts.ascii()));
         if (filter != NULL)
             videoFilters.push_back(filter);
     }

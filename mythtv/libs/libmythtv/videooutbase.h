@@ -25,6 +25,14 @@ enum VideoOutputType
     kVideoOutput_IVTV
 };
 
+enum PictureAttribute
+{
+    kPictureAttribute_Brightness = 0,
+    kPictureAttribute_Contrast,
+    kPictureAttribute_Colour,
+    kPictureAttribute_Hue
+};
+
 class VideoOutput
 {
   public:
@@ -89,6 +97,15 @@ class VideoOutput
 
     void ExposeEvent(void) { needrepaint = true; }
 
+    int ChangeBrightness(bool up);
+    int ChangeContrast(bool up);
+    int ChangeColour(bool up);
+    int ChangeHue(bool up);
+    int GetCurrentBrightness(void) { return brightness; }
+    int GetCurrentContrast(void) { return contrast; }
+    int GetCurrentColour(void) { return colour; }
+    int GetCurrentHue(void) { return hue; }
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer, int keepprebuffer);
@@ -103,6 +120,8 @@ class VideoOutput
     void BlendSurfaceToARGB(OSDSurface *surface, unsigned char *argbptr,
                             int stride = -1);
  
+    virtual int ChangePictureAttribute(int attributeType, int newValue);
+
     int XJ_width, XJ_height;
     float XJ_aspect;
 
@@ -115,6 +134,8 @@ class VideoOutput
     int dispx, dispy, dispw, disph;
     int olddispx, olddispy, olddispw, olddisph;
     bool embedding;
+
+    int brightness, contrast, colour, hue;
 
     int numbuffers;
 

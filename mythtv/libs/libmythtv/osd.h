@@ -10,9 +10,16 @@
 #include <qmap.h>
 #include <qdom.h>
 #include <qmutex.h>
+#include <qobject.h>
 
 #include <vector>
 using namespace std;
+
+enum OSDFunctionalType
+{
+    kOSDFunctionalType_Default = 0,
+    kOSDFunctionalType_PictureAdjust
+};
 
 class QImage;
 class TTFFont;
@@ -20,9 +27,11 @@ class OSDSet;
 class OSDTypeImage;
 class OSDTypePositionIndicator;
 class OSDSurface;
+class TV;
 
-class OSD
+class OSD : public QObject
 {
+    Q_OBJECT
  public:
     OSD(int width, int height, int framerate, const QString &font, 
         const QString &ccfont, const QString &prefix, const QString &osdtheme,
@@ -55,9 +64,12 @@ class OSD
     void DialogAbort(const QString &name);
     int GetDialogResponse(const QString &name);
 
+    void SetUpOSDClosedHandler(TV *tv);
+
     // position is 0 - 1000 
     void StartPause(int position, bool fill, QString msgtext,
-                    QString slidertext, int displaytime);
+                    QString slidertext, int displaytime,
+                    int osdFunctionalType = kOSDFunctionalType_Default);
     void UpdatePause(int position, QString slidertext);
     void EndPause(void);
 

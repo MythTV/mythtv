@@ -15,6 +15,7 @@ using namespace std;
 
 OSDSet::OSDSet(const QString &name, bool cache, int screenwidth, 
                int screenheight, float wmult, float hmult, int frint)
+      : QObject()
 {
     m_wantsupdates = false;
     m_lastupdate = 0;
@@ -46,11 +47,13 @@ OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
     m_yoff = 0;
 
     m_priority = 5;
+    currentOSDFunctionalType = 0;
 
     allTypes = new vector<OSDType *>;
 }
 
 OSDSet::OSDSet(const OSDSet &other)
+      : QObject()
 {
     m_screenwidth = other.m_screenwidth;
     m_screenheight = other.m_screenheight;
@@ -71,6 +74,7 @@ OSDSet::OSDSet(const OSDSet &other)
     m_xoff = other.m_xoff;
     m_yoff = other.m_yoff;
     m_allowfade = other.m_allowfade;
+    currentOSDFunctionalType = 0;
 
     allTypes = new vector<OSDType *>;
 
@@ -248,7 +252,7 @@ void OSDSet::SetTextByRegexp(QMap<QString, QString> &regexpMap)
     }
 }
 
-void OSDSet::Display(bool onoff)
+void OSDSet::Display(bool onoff, int osdFunctionalType)
 {
     if (onoff)
     {
@@ -263,9 +267,17 @@ void OSDSet::Display(bool onoff)
     {
         m_displaying = false;
     }
+
+    if (currentOSDFunctionalType != osdFunctionalType && 
+        currentOSDFunctionalType != 0)
+    {
+        emit OSDClosed(currentOSDFunctionalType);
+    }
+
+    currentOSDFunctionalType = osdFunctionalType;
 }
 
-void OSDSet::DisplayFor(int time)
+void OSDSet::DisplayFor(int time, int osdFunctionalType)
 {
     m_timeleft = time;
     m_displaying = true;
@@ -273,6 +285,14 @@ void OSDSet::DisplayFor(int time)
     m_notimeout = false;
     m_xoff = 0;
     m_yoff = 0;
+
+    if (currentOSDFunctionalType != osdFunctionalType && 
+        currentOSDFunctionalType != 0)
+    {
+        emit OSDClosed(currentOSDFunctionalType);
+    }
+
+    currentOSDFunctionalType = osdFunctionalType;
 }
  
 void OSDSet::FadeFor(int time)
@@ -331,8 +351,15 @@ void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
             m_fadetime -= (4 * m_frameint);
         }
 
-        if (m_fadetime < 0)
+        if (m_fadetime <= 0) 
+        {
             m_fadetime = 0;
+            if (currentOSDFunctionalType)
+            {
+                emit OSDClosed(currentOSDFunctionalType);
+                currentOSDFunctionalType = 0;
+            }
+        }
     }
 
     if (m_timeleft <= 0 && m_fadetime <= 0)

@@ -23,6 +23,7 @@ using namespace std;
 #include "volumecontrol.h"
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
+#include "avformat.h"
 
 enum SeekSpeeds {
   SSPEED_NORMAL_WITH_DISPLAY = 0,
@@ -88,6 +89,7 @@ TV::TV(QSqlDatabase *db)
     embedid = 0;
     times_pressed = 0;
     last_channel = "";
+    picAdjustment = 0;
 
     getRecorderPlaybackInfo = false;
     recorderPlaybackInfo = NULL;
@@ -523,6 +525,7 @@ void TV::StartPlayerAndRecorder(bool startPlayer, bool startRecorder)
 
         frameRate = nvp->GetFrameRate();
         osd = nvp->GetOSD();
+        osd->SetUpOSDClosedHandler(this);
     }
 }
 
@@ -968,9 +971,16 @@ void TV::ProcessKeypress(int keypressed)
             ChangeSpeed(-1);
             break;
         }
+        case Key_F:
+        {
+            DoTogglePictureAttribute();
+            break;
+        }
         case Key_Right: case Key_D: 
         {
-            if (paused)
+            if (picAdjustment)
+                DoChangePictureAttribute(true);
+            else if (paused)
                 DoSeek(1.001 / frameRate, tr("Forward"));
             else if (!stickykeys)
                 DoSeek(fftime, tr("Skip Ahead"));
@@ -988,7 +998,9 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_Left: case Key_A:
         {
-            if (paused)
+            if (picAdjustment)
+                DoChangePictureAttribute(false);
+            else if (paused)
                 DoSeek(-1.001 / frameRate, tr("Rewind"));
             else if (!stickykeys)
                 DoSeek(-rewtime, tr("Skip Back"));
@@ -1016,6 +1028,8 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_Escape:
         {
+            StopFFRew();
+
             if (StateIsPlaying(internalState) && 
                 gContext->GetNumSetting("PlaybackExitPrompt") == 1) 
             {
@@ -1118,14 +1132,14 @@ void TV::ProcessKeypress(int keypressed)
             case Key_B: ToggleActiveWindow(); break;
             case Key_N: SwapPIP(); break;
 
-            case Key_F1: ChangeContrast(false); break;
-            case Key_F2: ChangeContrast(true); break;
-            case Key_F3: ChangeBrightness(false); break;
-            case Key_F4: ChangeBrightness(true); break;
-            case Key_F5: ChangeColour(false); break;
-            case Key_F6: ChangeColour(true); break;
-            case Key_F7: ChangeHue(false); break;
-            case Key_F8: ChangeHue(true); break;
+            case Key_F1: ChangeContrast(false, true); break;
+            case Key_F2: ChangeContrast(true, true); break;
+            case Key_F3: ChangeBrightness(false, true); break;
+            case Key_F4: ChangeBrightness(true, true); break;
+            case Key_F5: ChangeColour(false, true); break;
+            case Key_F6: ChangeColour(true, true); break;
+            case Key_F7: ChangeHue(false, true); break;
+            case Key_F8: ChangeHue(true, true); break;
 
             case Key_O: BrowseStart(); break;
             case Key_H: PreviousChannel(); break;
@@ -1169,6 +1183,16 @@ void TV::ProcessKeypress(int keypressed)
                }
             editmode = nvp->EnableEdit();
             break;        
+            }
+            case Key_Up:
+            {
+                DoSeek(-jumptime * 60, tr("Jump Back"));
+                break;
+            }
+            case Key_Down:
+            {
+                DoSeek(jumptime * 60, tr("Jump Ahead"));
+                break;
             }
             default: break;
         }
@@ -2023,54 +2047,114 @@ void TV::LoadMenu(void)
     pthread_create(&tid, &attr, TV::MenuHandler, this);
 }
 
-void TV::ChangeBrightness(bool up)
+void TV::ChangeBrightness(bool up, bool recorder)
 {
-    int brightness = activerecorder->ChangeBrightness(up);
-
-    QString text = QString(tr("Brightness %1 %")).arg(brightness);
+    int brightness;
+    int osdPauseType;
+    QString text;
 
     if (osd)
     {
-        osd->StartPause(brightness * 10, true, tr("Adjust Picture"), text, 5);
+        if (recorder)
+        {
+            brightness = activerecorder->ChangeBrightness(up);
+            osdPauseType =  kOSDFunctionalType_Default;
+            text = QString(tr("Brightness (REC) %1 %")).arg(brightness);
+        }
+        else
+        {
+            brightness = nvp->getVideoOutput()->ChangeBrightness(up);
+            gContext->SaveSetting("PlaybackBrightness", brightness);
+            osdPauseType = kOSDFunctionalType_PictureAdjust;
+            text = QString(tr("Brightness %1 %")).arg(brightness);
+        }
+
+        osd->StartPause(brightness * 10, true, tr("Adjust Picture"), text, 5, 
+                        osdPauseType);
         update_osd_pos = false;
     }
 }
 
-void TV::ChangeContrast(bool up)
+void TV::ChangeContrast(bool up, bool recorder)
 {
-    int contrast = activerecorder->ChangeContrast(up);
-
-    QString text = QString(tr("Contrast %1 %")).arg(contrast);
+    int contrast;
+    int osdPauseType;
+    QString text;
 
     if (osd)
     {
-        osd->StartPause(contrast * 10, true, tr("Adjust Picture"), text, 5);
+        if (recorder)
+        {
+            contrast = activerecorder->ChangeContrast(up);
+            osdPauseType = kOSDFunctionalType_Default;
+            text = QString(tr("Contrast (REC) %1 %")).arg(contrast);
+        }
+        else
+        {
+            contrast = nvp->getVideoOutput()->ChangeContrast(up);
+            gContext->SaveSetting("PlaybackContrast", contrast);
+            osdPauseType = kOSDFunctionalType_PictureAdjust;
+            text = QString(tr("Contrast %1 %")).arg(contrast);
+        }
+
+        osd->StartPause(contrast * 10, true, tr("Adjust Picture"), text, 5, 
+                        osdPauseType);
         update_osd_pos = false;
     }
 }
 
-void TV::ChangeColour(bool up)
+void TV::ChangeColour(bool up, bool recorder)
 {
-    int colour = activerecorder->ChangeColour(up);
-
-    QString text = QString(tr("Colour %1 %")).arg(colour);
+    int colour;
+    int osdPauseType;
+    QString text;
 
     if (osd)
     {
-        osd->StartPause(colour * 10, true, tr("Adjust Picture"), text, 5);
+        if (recorder)
+        {
+            colour = activerecorder->ChangeColour(up);
+            osdPauseType = kOSDFunctionalType_Default;
+            text = QString(tr("Colour (REC) %1 %")).arg(colour);
+        }
+        else
+        {
+            colour = nvp->getVideoOutput()->ChangeColour(up);
+            gContext->SaveSetting("PlaybackColour", colour);
+            osdPauseType = kOSDFunctionalType_PictureAdjust;
+            text = QString(tr("Colour %1 %")).arg(colour);
+        }
+
+        osd->StartPause(colour * 10, true, tr("Adjust Picture"), text, 5, 
+                        osdPauseType);
         update_osd_pos = false;
     }
 }
 
-void TV::ChangeHue(bool up)
+void TV::ChangeHue(bool up, bool recorder)
 {
-    int colour = activerecorder->ChangeHue(up);
-
-    QString text = QString(tr("Hue %1 %")).arg(colour);
+    int hue;
+    int osdPauseType;
+    QString text;
 
     if (osd)
     {
-        osd->StartPause(colour * 10, true, tr("Adjust Picture"), text, 5);
+        if (recorder)
+        {
+            hue = activerecorder->ChangeHue(up);
+            osdPauseType = kOSDFunctionalType_Default;
+            text = QString(tr("Hue (REC) %1 %")).arg(hue);
+        }
+        else
+        {
+            hue = nvp->getVideoOutput()->ChangeHue(up);
+            gContext->SaveSetting("PlaybackHue", hue);
+            osdPauseType = kOSDFunctionalType_PictureAdjust;
+            text = QString(tr("Hue %1 %")).arg(hue);
+        }
+
+        osd->StartPause(hue * 10, true, tr("Adjust Picture"), text, 5, 
+                        osdPauseType);
         update_osd_pos = false;
     }
 }
@@ -2090,7 +2174,8 @@ void TV::ChangeVolume(bool up)
 
     if (osd && !browsemode)
     {
-        osd->StartPause(curvol * 10, true, tr("Adjust Volume"), text, 5);
+        osd->StartPause(curvol * 10, true, tr("Adjust Volume"), text, 5, 
+                        kOSDFunctionalType_PictureAdjust);
         update_osd_pos = false;
     }
 }
@@ -2323,3 +2408,80 @@ void TV::BrowseToggleRecord(void)
     delete program_info;
 }
 
+void TV::HandleOSDClosed(int osdType)
+{
+    switch (osdType)
+    {
+        case kOSDFunctionalType_PictureAdjust:
+            picAdjustment = 0;
+            break;
+        case kOSDFunctionalType_Default:
+            break;
+    }
+}
+
+void TV::DoTogglePictureAttribute(void)
+{
+    OSDSet *oset;
+    int value = 0;
+    oset = osd->GetSet("status");
+
+    picAdjustment = (picAdjustment % 5) + 1;
+
+    if (osd)
+    {
+        char *title = "Adjust Picture";
+        QString picName;
+
+        switch (picAdjustment)
+        {
+            case 1:
+                value = (volumeControl) ? (volumeControl->GetCurrentVolume()) 
+                        : 99; 
+                title = "Adjust Volume";
+                picName = QString(tr("Volume %1 %")).arg(value);
+                break;
+            case 2:
+                value = nvp->getVideoOutput()->GetCurrentBrightness();
+                picName = QString(tr("Brightness %1 %")).arg(value);
+                break;
+            case 3:
+                value = nvp->getVideoOutput()->GetCurrentContrast();
+                picName = QString(tr("Contrast %1 %")).arg(value);
+                break;
+            case 4:
+                value = nvp->getVideoOutput()->GetCurrentColour();
+                picName = QString(tr("Colour %1 %")).arg(value);
+                break;
+            case 5:
+                value = nvp->getVideoOutput()->GetCurrentHue();
+                picName = QString(tr("Hue %1 %")).arg(value);
+                break;
+        }
+        osd->StartPause(value*10, true, tr(title), picName, 5, 
+                        kOSDFunctionalType_PictureAdjust);
+        update_osd_pos = false;
+    }
+}
+
+void TV::DoChangePictureAttribute(bool up)
+{
+    switch (picAdjustment)
+    {
+        case 1:
+            ChangeVolume(up);
+            break;
+        case 2:
+            ChangeBrightness(up, false);
+            break;
+        case 3:
+            ChangeContrast(up, false);
+            break;
+        case 4:
+            ChangeColour(up, false);
+            break;
+        case 5:
+            ChangeHue(up, false);
+            break;
+    }
+}

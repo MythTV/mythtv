@@ -33,6 +33,8 @@ class VideoOutputXv : public VideoOutput
                       vector<VideoFilter *> &filterList,
                       NuppelVideoPlayer *pipPlayer);
 
+    int ChangePictureAttribute(int attributeType, int newValue);
+
   private:
     void Exit(void);
     bool CreateXvBuffers(void);

@@ -80,6 +80,9 @@ class TV : public QObject
     void AddPreviousChannel(void);
     void PreviousChannel(void);
 
+  public slots:
+    void HandleOSDClosed(int osdType);
+
   protected slots:
     void SetPreviousChannel(void);
     void UnMute(void);
@@ -108,10 +111,10 @@ class TV : public QObject
     void ChangeVolume(bool up);
     void ToggleMute(void);
     void ToggleLetterbox(void);
-    void ChangeContrast(bool up);
-    void ChangeBrightness(bool up);
-    void ChangeColour(bool up);
-    void ChangeHue(bool up);
+    void ChangeContrast(bool up, bool recorder);
+    void ChangeBrightness(bool up, bool recorder);
+    void ChangeColour(bool up, bool recorder);
+    void ChangeHue(bool up, bool recorder);
  
     void ChannelKey(int key);
     void ChannelCommit(void);
@@ -157,6 +160,9 @@ class TV : public QObject
     void BrowseEnd(bool change);
     void BrowseDispInfo(int direction);
     void BrowseToggleRecord(void);
+
+    void DoTogglePictureAttribute(void);
+    void DoChangePictureAttribute(bool up);
 
     int osd_display_time;
 
@@ -246,6 +252,8 @@ class TV : public QObject
 
     bool keyRepeat;
     QTimer *keyrepeatTimer;
+    
+    int picAdjustment;
 };
 
 #endif

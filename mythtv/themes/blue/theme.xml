@@ -3,6 +3,9 @@
   <background style="normal">
     <image>background.png</image>
     <buttonarea>25,150,750,450</buttonarea>
+<!--    <visiblerowlimit>6</visiblerowlimit> --> <!-- Don't override this 
+                                                      unless you've got good
+                                                      reason to do so -->
   </background>
 
   <genericbutton>
@@ -26,6 +29,25 @@
          <alpha>128</alpha>
       </shadow>
     </text>
+<!--   optional different text attributes for the active button 
+    <activetext>
+      <area>20,110,20,5</area>
+      <color>yellow</color>
+      <fontname>Arial</fontname>
+      <fontsize>14</fontsize>
+      <bold>yes</bold>
+      <italics>yes</italics>
+      <centered>yes</centered> -->
+<!--      <outline>
+         <color>black</color>
+         <size>2</size>
+      </outline> -->
+<!--      <shadow>
+         <color>black</color>
+         <offset>3,3</offset>
+         <alpha>128</alpha>
+      </shadow>
+    </activetext> -->
   </genericbutton>
   
   <logo>

@@ -111,7 +111,7 @@
       <position>0,392</position>
     </image>
     <textarea name="status">
-      <area>194,406,120,27</area>
+      <area>175,406,140,27</area>
       <font>infofont</font>
     </textarea>
     <slider name="statusslider" type="fill">

@@ -5,4 +5,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS += invert linearblend
+SUBDIRS += invert linearblend denoise3d

@@ -248,6 +248,15 @@ bool VideoOutput::Init(int width, int height, float aspect, unsigned int winid,
     imgx = winx; imgy = winy;
     imgw = XJ_width; imgh = XJ_height;
 
+    brightness = gContext->GetNumSettingOnHost("PlaybackBrightness", 
+                                               gContext->GetHostName(), 50);
+    contrast = gContext->GetNumSettingOnHost("PlaybackContrast", 
+                                             gContext->GetHostName(), 50);
+    colour = gContext->GetNumSettingOnHost("PlaybackColour", 
+                                           gContext->GetHostName(), 50);
+    hue = gContext->GetNumSettingOnHost("PlaybackHue", 
+                                        gContext->GetHostName(), 0);
+
     embedding = false;
 
     return true;
@@ -555,6 +564,59 @@ void VideoOutput::DoneDisplayingFrame(void)
     if (buf)
         availableVideoBuffers.enqueue(buf);
     video_buflock.unlock();
+}
+
+int VideoOutput::ChangePictureAttribute(int attribute, int newValue)
+{
+    (void)attribute;
+    (void)newValue;
+    return -1;
+}
+
+int VideoOutput::ChangeBrightness(bool up)
+{
+    int result;
+
+    result = this->ChangePictureAttribute(kPictureAttribute_Brightness, 
+                                          brightness + ((up) ? 1 : -1) );
+
+    brightness = (result == -1) ? brightness : result;
+
+    return brightness;
+}
+
+int VideoOutput::ChangeContrast(bool up)
+{
+    int result;
+
+    result = this->ChangePictureAttribute(kPictureAttribute_Contrast, 
+                                          contrast + ((up) ? 1 : -1) );
+
+    contrast = (result == -1) ? contrast : result;
+
+    return contrast;
+}
+
+int VideoOutput::ChangeColour(bool up)
+{
+    int result;
+
+    result = this->ChangePictureAttribute(kPictureAttribute_Colour, 
+                                          colour + ((up) ? 1 : -1) );
+    colour = (result == -1) ? colour : result;
+
+    return colour;
+}
+
+int VideoOutput::ChangeHue(bool up)
+{
+    int result;
+
+    result = this->ChangePictureAttribute(kPictureAttribute_Hue, 
+                                          hue + ((up) ? 1 : -1) );
+    hue = (result == -1) ? hue : result;
+
+    return hue;
 }
 
 void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause, 

@@ -5,9 +5,17 @@
    By Brandon Beattie
 
    Portions of this code taken from mpegrecorder
-   The current version does not support seeking.  If someone
-   can add that it would be very kind.  Other countless 
-   improvements still need to be made by others if possible.
+
+   Modified Oct. 2003 by Doug Larrick
+   * decodes MPEG-TS locally (does not use libavformat) for flexibility
+   * output format is MPEG-TS omitting unneeded PIDs, for smaller files
+     and no audio stutter on stations with >1 audio stream
+   * Emits proper keyframe data to recordedmarkup db, enabling seeking
+
+   References / example code: 
+     ATSC standards a.54, a.69 (www.atsc.org)
+     ts2pes from mpegutils from dvb (www.linuxtv.org)
+     bbinfo from Brent Beyeler, beyeler@home.com
 */
 
 #include <iostream>
@@ -50,20 +58,28 @@ HDTVRecorder::HDTVRecorder()
     framesWritten = 0;
 
     chanfd = -1; 
-    readfd = -1;
 
     keyframedist = 15;
     gopset = false;
 
     firstgoppos = 0;
+
+    pat_pid = 0;
+    psip_pid = 0x1ffb;
+    video_pid = 0; // video, audio, base PIDs will be filled in when we 
+    audio_pid = 0; // find them
+    base_pid = 0;
+    ts_packets = 0; // cumulative packet count
+
+    // temporary to find lowest PID in first 500 packets
+    lowest_video_pid = 0x1fff;
+    video_pid_packets = 0;
 }
 
 HDTVRecorder::~HDTVRecorder()
 {
     if (chanfd > 0)
         close(chanfd);
-    if (readfd > 0)
-        close(readfd);
 }
 
 void HDTVRecorder::SetOption(const QString &opt, int value)
@@ -77,32 +93,16 @@ void HDTVRecorder::StartRecording(void)
     uint8_t * buf;
     uint8_t * end;
     unsigned int errors=0;
-    int i,len;
+    int len;
     unsigned char data_byte[4];
-    unsigned int pids[10], counts[10];
     int insync = 0;
     int ret;
-
-    for(i=0;i<10;i++) 
-    {
-        pids[i] = 0;
-        counts[i] = 0;
-    }
 
     chanfd = open(videodevice.ascii(), O_RDWR);
     if (chanfd <= 0)
     {
         cerr << "HD1 Can't open video device: " << videodevice 
              << " chanfd = "<< chanfd << endl;
-        perror("open video:");
-        return;
-    }
-
-    readfd=chanfd;
-    if (readfd < 0)
-    {
-        cerr << "HD2 Can't open video device: " << videodevice 
-             << " readfd = "<< readfd << endl;
         perror("open video:");
         return;
     }
@@ -121,22 +121,22 @@ void HDTVRecorder::StartRecording(void)
     while (encoding) 
     {
         insync = 0;
-        len = read(readfd, &data_byte[0], 1); // read next byte
+        len = read(chanfd, &data_byte[0], 1); // read next byte
         if (len == 0) 
             return;  // end of file
 
         if (data_byte[0] == 0x47)
         {
-            read(readfd, buffer, 187); //read next 187 bytes-remainder of packet
+            read(chanfd, buffer, 187); //read next 187 bytes-remainder of packet
             // process next packet
             while (encoding) 
             {
-                len = read(readfd, &data_byte[0], 4); // read next 4 bytes
+                len = read(chanfd, &data_byte[0], 4); // read next 4 bytes
 
                 if (len != 4) 
                    return;
 
-                len = read(readfd, buffer+4, 184);
+                len = read(chanfd, buffer+4, 184);
                 
                 if (len != 184) 
                 {
@@ -167,13 +167,9 @@ void HDTVRecorder::StartRecording(void)
                         // TRANSFER DATA
                         while (encoding) 
                         {
+                            int remainder = 0;
                             if (paused)
                             {
-                                if (readfd > 0)
-                                {
-                                    //close(readfd);
-                                    readfd = -1;
-                                }
                                 mainpaused = true;
                                 pauseWait.wakeAll();
 
@@ -181,14 +177,8 @@ void HDTVRecorder::StartRecording(void)
                                 continue;
                             }
 
-                            if (readfd < 0)
-                            {
-                                //readfd = open(videodevice.ascii(), O_RDWR);
-                                readfd = chanfd;
-                            }
-
-                            ret = read(readfd, buffer, 188*PACKETS);
-                            //fwrite(fout,188,PACKETS,fout);
+                            ret = read(chanfd, &(buffer[remainder]), 
+                                       188*PACKETS - remainder);
 
                             if (ret < 0)
                             {
@@ -198,7 +188,13 @@ void HDTVRecorder::StartRecording(void)
                                 continue;
                             }
                             else if (ret > 0)
-                                ProcessData(buffer, ret);
+                            {
+                                remainder = ProcessData(buffer, ret);
+                                if (remainder > 0) // leftover bytes
+                                    memmove(&(buffer[0]), 
+                                            &(buffer[188*PACKETS-remainder]),
+                                            remainder);
+                            }
 
                         }
                     }
@@ -244,42 +240,6 @@ static int mpg_seek_packet(void *opaque, int64_t offset, int whence)
 
 bool HDTVRecorder::SetupRecording(void)
 {
-    AVInputFormat *fmt = &mpegps_demux;
-    fmt->flags |= AVFMT_NOFILE;
-
-    ic = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
-    if (!ic)
-    {
-        cerr << "HD Couldn't allocate context\n";
-        return false;
-    }
-
-    QString filename = "blah.mpg";
-    char *cfilename = (char *)filename.ascii();
-    AVFormatParameters params;
-
-    ic->pb.buffer_size = BUFFER_SIZE;
-    ic->pb.buffer = NULL;
-    ic->pb.buf_ptr = NULL;
-    ic->pb.write_flag = 0;
-    ic->pb.buf_end = NULL;
-    ic->pb.opaque = this;
-    ic->pb.read_packet = mpg_read_packet;
-    ic->pb.write_packet = mpg_write_packet;
-    ic->pb.seek = mpg_seek_packet;
-    ic->pb.pos = 0;
-    ic->pb.must_flush = 0;
-    ic->pb.eof_reached = 0;
-    ic->pb.is_streamed = 0;
-    ic->pb.max_packet_size = 0;
-
-    int err = av_open_input_file(&ic, cfilename, fmt, 0, &params);
-    if (err < 0)
-    {
-        cerr << "HD Couldn't initialize decocder\n";
-        return false;
-    }    
-
     prev_gop_save_pos = -1;
 
     return true;
@@ -306,105 +266,308 @@ void HDTVRecorder::Initialize(void)
     
 }
 
-#define GOP_START     0x000001B8
-#define PICTURE_START 0x00000100
-#define SLICE_MIN     0x00000101
-#define SLICE_MAX     0x000001af
-
-bool HDTVRecorder::PacketHasHeader(unsigned char *buf, int len,
-                                   unsigned int startcode)
+static unsigned int get1bit(unsigned char byte, int bit)
 {
-    unsigned char *bufptr;
-    unsigned int state = 0xFFFFFFFF, v;
-
-    bufptr = buf;
-
-    while (bufptr < buf + len)
-    {
-        v = *bufptr++;
-        if (state == 0x000001)
-        {
-            state = ((state << 8) | v) & 0xFFFFFF;
-            if (state >= SLICE_MIN && state <= SLICE_MAX)
-                return false;
-            if (state == startcode)
-                return true;
-        }
-        state = ((state << 8) | v) & 0xFFFFFF;
-    }
-
-    return false;
+    bit = 7-bit;
+    return (byte & (1 << bit)) >> bit;
 }
 
-void HDTVRecorder::ProcessData(unsigned char *buffer, int len)
+void HDTVRecorder::FindKeyframes(const unsigned char *buffer, 
+                                 int packet_start_pos,
+                                 int current_pos,
+                                 char adaptation_field_control,
+                                 bool payload_unit_start_indicator)
 {
-    AVPacket pkt;
+    int pos = current_pos;
+    int packet_end_pos = packet_start_pos + 188;
 
-    ic->pb.buffer = buffer;
-    ic->pb.buf_ptr = ic->pb.buffer;
-    ic->pb.buf_end = ic->pb.buffer + len;
-    ic->pb.eof_reached = 0;
-    ic->pb.pos = len;
-
-    while (ic->pb.eof_reached == 0)
+    int pkt_start = pos;
+    int pkt_pointer = 0;
+    if (adaptation_field_control == 3 && payload_unit_start_indicator) 
     {
-        if (av_read_packet(ic, &pkt) < 0)
-            break;
-        
-        if (pkt.stream_index > ic->nb_streams)
+        pkt_pointer = buffer[pos++];
+        if (pkt_pointer < 184)
+            pkt_start += pkt_pointer;
+    }
+    if (adaptation_field_control == 1 || adaptation_field_control == 3)
+    {
+        // we have payload
+        int payload_size = 0;
+        if (payload_unit_start_indicator)
         {
-            cerr << "HD bad stream\n";
-            av_free_packet(&pkt);
+            // packet contains start of PES packet
+
+            // Scan for PES header codes; specifically picture_start
+            // and group_start (of_pictures).  These should be within 
+            // this first TS packet of the PES packet.
+            //   00 00 01 00: picture_start_code
+            //   00 00 01 B8: group_start_code
+            //   (there are others that we don't care about)
+            int sync = 0;
+            payload_size = packet_end_pos - pkt_start;
+            for (int i=pos; i < payload_size+pos; i++)
+            {
+                char k = buffer[i];
+                switch (sync)
+                {
+                case 0:
+                    if (k == 0x00)
+                        sync = 1;
+                    break;
+                case 1:
+                    if (k == 0x00)
+                        sync = 2;
+                    else
+                        sync = 0;
+                    break;
+                case 2:
+                    if (k != 0x01)
+                    {
+                        if (k != 0x00)
+                            sync = 0;
+                    }
+                    else 
+                    {
+                        if (buffer[i+1] == 0x00) // picture_start
+                        {
+                            framesWritten++;
+                        }
+                        else if (buffer[i+1] == 0xB8) // group_of_pictures
+                        {
+                            int frameNum = framesWritten - 1;
+                            
+                            if (!gopset && frameNum > 0)
+                            {
+                                if (firstgoppos > 0)
+                                {
+                                    // don't set keyframedist...
+                                    // playback assumes it's 1 in 15
+                                    // frames, and in ATSC they come
+                                    // somewhat unevenly.
+                                    //keyframedist=frameNum-firstgoppos;
+                                    gopset = true;
+                                }
+                                else
+                                    firstgoppos = frameNum;
+                            }
+                            
+                            long long startpos = 
+                                ringBuffer->GetFileWritePosition();
+
+                            long long keyCount = frameNum/keyframedist;
+                            
+                            positionMap[keyCount] = startpos;
+                            
+                            if (curRecording && db_lock && db_conn &&
+                                ((positionMap.size() % 30) == 0))
+                            {
+                                pthread_mutex_lock(db_lock);
+                                MythContext::KickDatabase(db_conn);
+                                curRecording->SetPositionMap(
+                                    positionMap, MARK_GOP_START,
+                                    db_conn, prev_gop_save_pos, 
+                                    keyCount);
+                                pthread_mutex_unlock(db_lock);
+                                prev_gop_save_pos = keyCount + 1;
+                            }
+                            
+                        }
+                        sync = 0;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+}
+
+int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
+{
+    int pos = 0;
+    int packet_end_pos;
+    int packet_start_pos;
+    int pid;
+    bool payload_unit_start_indicator;
+    char adaptation_field_control;
+    int resync_count = 0;
+
+
+    while (pos + 187 < len) // while we have a whole packet left
+    {
+        // Find sync byte (0x47)
+        while (buffer[pos] != 0x47)
+        {
+            pos++;
+            resync_count++;
+            if (pos == len) 
+            {
+                cerr << "Transport stream sync byte not found" << endl;;
+                return 0;
+            }
+        }
+        if (resync_count)
+            cerr << "Skipped " << resync_count << " bytes to resync" << endl;
+        
+        resync_count = 0;
+        ts_packets++;
+        packet_start_pos = pos;
+        packet_end_pos = pos + 188;
+        pos++;
+        
+        // Decode the link header (next 3 bytes):
+        //   1 bit transport_packet_error (if set discard immediately: 
+        //      modem error)
+        //   1 bit payload_unit_start_indicator (if set this 
+        //      packet starts a PES packet)
+        //   1 bit transport_priority (ignore)
+        //   13 bit PID (packet ID, which transport stream)
+        //   2 bit transport_scrambling_control (00,01 OK; 10,11 scrambled)
+        //   2 bit adaptation_field_control 
+        //     (01-no adptation field,payload only
+        //      10-adaptation field only,no payload
+        //      11-adaptation field followed by payload
+        //      00-reserved)
+        //   4 bit continuity counter (should cycle 0->15 in sequence 
+        //     for each PID; if skip, we lost a packet; if dup, we can
+        //     ignore packet)
+
+        if (get1bit(buffer[pos], 0))
+        {
+            // transport_packet_error -- skip packet but don't skip
+            // ahead, let it resync in case modem dropped a byte
             continue;
         }
-
-        AVStream *curstream = ic->streams[pkt.stream_index];
-        if (pkt.size > 0 && curstream->codec.codec_type == CODEC_TYPE_VIDEO)
+        payload_unit_start_indicator = (get1bit(buffer[pos], 1));
+        pid = ((buffer[pos] << 8) + buffer[pos+1]) & 0x1fff;
+        //cerr << "found PID " << pid << endl;
+        pos += 2;
+        if (get1bit(buffer[pos], 1)) 
         {
-            if (PacketHasHeader(pkt.data, pkt.size, PICTURE_START))
+            // packet is from a scrambled stream
+            pos = packet_end_pos;
+            continue;
+        }
+        adaptation_field_control = (buffer[pos] & 0x30) >> 4;
+        pos++;
+        
+        if (adaptation_field_control == 2 || adaptation_field_control == 3)
+        {
+            // If we later care about any adaptation layer bits,
+            // we should parse them here:
+            /*
+              8 bit adaptation header length (after which is payload data)
+              1 bit discontinuity_indicator (time base may change)
+              1 bit random_access_indicator (?)
+              1 bit elementary_stream_priority_indicator (ignore)
+              Each of the following extends the adaptation header.  In order:
+              1 bit PCR flag (we have PCR data) (adds 6 bytes after adaptation 
+                  header)
+              1 bit OPCR flag (we have OPCR data) (adds 6 bytes)
+                   ((Original) Program Clock Reference; used to time output)
+              1 bit splicing_point_flag (we have splice point data) 
+                   (adds 1 byte)
+                   (splice data is packets until a good splice point for 
+                   e.g. commercial insertion -- if these are still set,
+                   might be a good way to recognize potential commercials 
+                   for flagging)
+              1 bit transport_private_data_flag 
+                   (adds 1 byte additional bytecount)
+              1 bit adaptation_field_extension_flag
+              8 bits extension length
+              1 bit ltw flag (adds 16 bits after extension flags)
+              1 bit piecewise_rate_flag (adds 24 bits)
+              1 bit seamless_splice_flag (adds 40 bits)
+              5 bits unused flags
+            */
+            unsigned char adaptation_length;
+            adaptation_length = buffer[pos];
+            pos += adaptation_length;
+        }
+
+        //
+        // Pass or reject frames based on PID, and parse info from them
+        //
+
+        if (pid == pat_pid) 
+        {
+
+            // PID 0: Program Association Table -- lists all other
+            // PIDs that make up the program(s) in the whole stream.
+            // Based on info in this table, and on which subprogram
+            // the user // desires, we should determine which PIDs'
+            // payloads to write // to the ring buffer.
+
+            // Example PAT scan code is in the pcHDTV's dtvscan.c,
+            // demux_ts_parse_pat
+
+            // NOTE: Broadcasters are encouraged to keep the
+            // subprogram:PID mapping constant.  If we store this data
+            // in the channel database, we can branch-predict which
+            // PIDs we are looking for, and can thus "tune" the
+            // subprogram more quickly.
+
+            // For now we're using the dirty hack below instead.
+            
+            // decoder needs PAT, write it to the stream
+            ringBuffer->Write(&buffer[packet_start_pos], 188);
+        }
+        else if (pid == psip_pid)
+        {
+            // Here we should decode the PSIP and fill guide data
+            // decoder does not need psip
+
+            // Some sample code is in pcHDTV's dtvscan.c,
+            // accum_sect/dequeue_buf/atsc_tables.  We should stuff
+            // this data back into the channel's guide data, though if
+            // it's unreliable we will need to be able to prefer the
+            // downloaded XMLTV data.
+
+        }
+        else if (pid == video_pid)
+        {
+            FindKeyframes(buffer, packet_start_pos, pos, 
+                    adaptation_field_control, payload_unit_start_indicator);
+            // decoder needs video, of course (just this PID)
+            ringBuffer->Write(&buffer[packet_start_pos], 188);
+        }
+        else if (pid == audio_pid)
+        {
+            // decoder needs audio, of course (just this PID)
+            ringBuffer->Write(&buffer[packet_start_pos], 188);
+        }
+        else if (pid == base_pid)
+        {
+            // decoder needs base PID
+            ringBuffer->Write(&buffer[packet_start_pos], 188);
+        }
+        else 
+        {
+            // Not a PID we're watching
+            
+            // As a hack until we start decoding PAT, find the lowest
+            // video PID in the first 50 packets and record only that
+            // stream
+            if ((pid & 0xff01) == 0x0001 && !video_pid) 
             {
-                framesWritten++;
-            }
-
-            if (PacketHasHeader(pkt.data, pkt.size, GOP_START))
-            {
-                int frameNum = framesWritten - 1;
-
-                if (!gopset && frameNum > 0)
+                if (pid < lowest_video_pid)
+                    lowest_video_pid = pid;
+                video_pid_packets++;
+                if (video_pid_packets >= 50) 
                 {
-                    if (firstgoppos > 0)
-                    {
-                        keyframedist = frameNum - firstgoppos;
-                        gopset = true;
-                    }
-                    else
-                        firstgoppos = frameNum;
-                }
-
-                long long startpos = ringBuffer->GetFileWritePosition();
-                startpos += pkt.startpos;
-
-                long long keyCount = frameNum / keyframedist;
-
-                positionMap[keyCount] = startpos;
-
-                if (curRecording && db_lock && db_conn &&
-                    ((positionMap.size() % 30) == 0))
-                {
-                    pthread_mutex_lock(db_lock);
-                    MythContext::KickDatabase(db_conn);
-                    curRecording->SetPositionMap(positionMap, MARK_GOP_START,
-                            db_conn, prev_gop_save_pos, keyCount);
-                    pthread_mutex_unlock(db_lock);
-                    prev_gop_save_pos = keyCount + 1;
+                    // n.b. these PID relationships are only a
+                    // recommendation from ATSC, but seem to be
+                    // universal
+                    video_pid = lowest_video_pid;
+                    audio_pid = video_pid + 3;
+                    base_pid = lowest_video_pid - 1;
                 }
             }
         }
-
-        av_free_packet(&pkt);
+        // Advance to next TS packet
+        pos = packet_end_pos;
     }
 
-    ringBuffer->Write(buffer, len);
+    return len - pos;
 }
 
 void HDTVRecorder::StopRecording(void)
@@ -414,19 +577,16 @@ void HDTVRecorder::StopRecording(void)
 
 void HDTVRecorder::Reset(void)
 {
-    AVPacketList *pktl = NULL;
-    while ((pktl = ic->packet_buffer))
-    {
-        ic->packet_buffer = pktl->next;
-        av_free(pktl);
-    }
-
-    ic->pb.pos = 0;
-    ic->pb.buf_ptr = ic->pb.buffer;
-    ic->pb.buf_end = ic->pb.buffer;
-
     framesWritten = 0;
-
+    gopset = false;
+    firstgoppos = 0;
+    video_pid = 0;
+    audio_pid = 0;
+    base_pid = 0;
+    ts_packets = 0;
+    lowest_video_pid = 0x1fff;
+    video_pid_packets = 0;
+    
     positionMap.clear();
 }
 

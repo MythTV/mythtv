@@ -39,8 +39,12 @@ class HDTVRecorder : public RecorderBase
     bool SetupRecording();
     void FinishRecording();
 
-    bool PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
-    void ProcessData(unsigned char *buffer, int len);
+    int ProcessData(unsigned char *buffer, int len);
+    void FindKeyframes(const unsigned char *buffer, 
+		       int packet_start_pos,
+		       int pkt_pos,
+		       char adaptation_field_control,
+		       bool payload_unit_start_indicator);
 
     bool recording;
     bool encoding;
@@ -54,9 +58,6 @@ class HDTVRecorder : public RecorderBase
     int width, height;
 
     int chanfd;
-    int readfd;
-
-    AVFormatContext *ic;
 
     int keyframedist;
     bool gopset;
@@ -65,6 +66,17 @@ class HDTVRecorder : public RecorderBase
 
     long long prev_gop_save_pos;
     int firstgoppos;
+
+    int pat_pid;
+    int psip_pid;
+    int video_pid;
+    int audio_pid;
+    int base_pid;
+
+    int ts_packets;
+
+    int lowest_video_pid;
+    int video_pid_packets;
 };
 
 #endif

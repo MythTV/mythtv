@@ -58,3 +58,5 @@ Localization support, italian Translation:
 Spanish and Catalan Translations, Photo-Theme, Manual schedule of recordings, 
 channel preset support & misc:
     Ramon Roca <ramon dot roca at xcombo dot com>
+Dynamic MMX/3DNow in linearblend filter, genericbutton UI extensions:
+    Simon Kenyon <simon@koala.ie>
