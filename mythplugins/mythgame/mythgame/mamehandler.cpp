@@ -428,7 +428,8 @@ void MameHandler::edit_settings(QWidget *parent,RomInfo * romdata)
         settingsdlg.SetFlyer(ImageFile);
     if(mamedata->FindImage("cabinet", &ImageFile))
         settingsdlg.SetCabinet(ImageFile);
-    if(settingsdlg.Show(&game_settings, mamedata->Vector()))
+    check_xmame_exe();
+    if(settingsdlg.Show(&general_prefs, &game_settings, mamedata->Vector()))
         SaveGameSettings(game_settings, mamedata);
 }
 
@@ -436,7 +437,8 @@ void MameHandler::edit_system_settings(QWidget *parent,RomInfo * romdata)
 {
     romdata = romdata;
     MameSettingsDlg settingsDlg(parent, "mamesettings", true, true);
-    if(settingsDlg.Show(&defaultSettings, true))
+    check_xmame_exe();
+    if(settingsDlg.Show(&general_prefs, &defaultSettings, true))
         SaveGameSettings(defaultSettings, NULL);    
 }
 
@@ -679,7 +681,8 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         joytype.sprintf("%d", game_settings.joytype);
 
         if (!strcmp(general_prefs.xmame_display_target, "x11")) {
-                fullscreen = " -x11-mode 1";
+                fullscreen = (game_settings.fullscreen == 1) ? " -x11-mode 1" :
+                             " -fullscreen";
                 windowed = " -x11-mode 0";
                 winkeys = " -winkeys";
                 nowinkeys = " -nowinkeys";
@@ -753,21 +756,34 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
                  << "default.";
             *exec+= "/roms";
         }
+
+
+        /* define the integer version of xmame_minor so we only have to evaluate it once */
+        tmp = general_prefs.xmame_minor;
+        int xmame_minor = atoi(tmp);
+
         if (!general_prefs.cheat_file.isEmpty())
         {
-           *exec+= " -cheatfile ";
+           /* The cheatfile argument name changed in 0.62 */
+           if (xmame_minor >= 62) 
+             *exec+= " -cheat_file ";
+           else
+             *exec+= " -cheatfile ";
            *exec+= general_prefs.cheat_file;
         }
         if (!general_prefs.game_history_file.isEmpty())
         {
-           *exec+= " -historyfile ";
+           /* The historyfile argument name changed in 0.62 */
+           if (xmame_minor >= 62)
+             *exec+= " -history_file ";
+           else
+             *exec+= " -historyfile ";
            *exec+= general_prefs.game_history_file;
         }
         if (!screenshotdir.isEmpty())
         {
-          tmp = general_prefs.xmame_minor;
           /* The screenshot dir argument name changed in 0.62. */
-          if (atoi(tmp) >= 62) {
+          if (xmame_minor >= 62) {
             *exec+= " -snapshot_directory ";
           } else {
             *exec+= " -screenshotdir ";
@@ -776,10 +792,13 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         }
         if (!general_prefs.highscore_dir.isEmpty())
         {
-          *exec+= " -spooldir ";
-          *exec+= general_prefs.highscore_dir;
+          if (xmame_minor < 62) {
+            *exec+= " -spooldir ";
+            *exec+= general_prefs.highscore_dir;
+          }
         }
-        *exec+= game_settings.fullscreen ? fullscreen : windowed;
+        *exec+= game_settings.fullscreen ? (" -nocursor" + fullscreen) : 
+                windowed;
         *exec+= game_settings.scanlines ? " -scanlines" : " -noscanlines";
         *exec+= game_settings.extra_artwork ? " -artwork" : " -noartwork";
         *exec+= game_settings.autoframeskip ? " -autoframeskip" : " -noautoframeskip";
@@ -841,7 +860,7 @@ void MameHandler::SetGameSettings(GameSettings &game_settings, MameRomInfo *romi
             if (!query.value(1).toBool())
             {
                 game_settings.default_options = false;
-                game_settings.fullscreen = query.value(2).toBool();
+                game_settings.fullscreen = query.value(2).toInt();
                 game_settings.scanlines = query.value(3).toBool();
                 game_settings.extra_artwork = query.value(4).toBool();
                 game_settings.autoframeskip = query.value(5).toBool();
@@ -940,7 +959,7 @@ void MameHandler::SetDefaultSettings()
     {
         query.next();
         defaultSettings.default_options = query.value(1).toBool();
-        defaultSettings.fullscreen = query.value(2).toBool();
+        defaultSettings.fullscreen = query.value(2).toInt();
         defaultSettings.scanlines = query.value(3).toBool();
         defaultSettings.extra_artwork = query.value(4).toBool();
         defaultSettings.autoframeskip = query.value(5).toBool();

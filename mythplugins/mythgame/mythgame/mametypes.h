@@ -40,7 +40,7 @@ class GameSettings
   public:
     bool default_options;
 
-    bool fullscreen;
+    int fullscreen;
     bool scanlines;
     bool extra_artwork;
     bool autoframeskip;

@@ -72,10 +72,10 @@ MameSettingsDlg::MameSettingsDlg(QWidget* parent, const char* name,
     //DisplayGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     DisplayGroup->setTitle( trUtf8( "Display" ) );
 
-    FullCheck = new QCheckBox( DisplayGroup, "FullCheck" );
-    FullCheck->setGeometry( QRect((int)(11 * wmult), (int)(31 * hmult), 
-                                  (int)(160 * wmult), (int)(31 * hmult))); 
-    FullCheck->setText( trUtf8( "Full screen" ) );
+    FullBox = new QComboBox( FALSE, DisplayGroup, "FullBox" );
+    FullBox->setGeometry( QRect((int)(11 * wmult), (int)(31 * hmult), 
+                                (int)(170 * wmult), (int)(31 * hmult))); 
+    FullBox->setFocusPolicy( QComboBox::TabFocus );
 
     SkipCheck = new QCheckBox( DisplayGroup, "SkipCheck" );
     SkipCheck->setGeometry( QRect( (int)(195 * wmult), (int)(31 * hmult), 
@@ -345,14 +345,14 @@ MameSettingsDlg::MameSettingsDlg(QWidget* parent, const char* name,
     // tab order
     if(bSystem)
     {
-        setTabOrder( MameTab, FullCheck );
+        setTabOrder( MameTab, FullBox );
     }
     else
     {
         setTabOrder( MameTab, DefaultCheck );
-        setTabOrder( DefaultCheck, FullCheck );
+        setTabOrder( DefaultCheck, FullBox );
     }
-    setTabOrder( FullCheck, SkipCheck );
+    setTabOrder( FullBox, SkipCheck );
     setTabOrder( SkipCheck, LeftCheck );
     setTabOrder( LeftCheck, RightCheck );
     setTabOrder( RightCheck, FlipXCheck );
@@ -416,15 +416,30 @@ MameSettingsDlg::~MameSettingsDlg()
     // no need to delete child widgets, Qt does it all for us
 }
 
-int MameSettingsDlg::Show(GameSettings *settings, bool vector)
+int MameSettingsDlg::Show(Prefs *prefs, GameSettings *settings, bool vector)
 {
+    system_prefs = prefs;
     game_settings = settings;
     if(!bSystem)
     {
         DefaultCheck->setChecked(game_settings->default_options);
     }
     VectorGroup->setEnabled(vector);
-    FullCheck->setChecked(game_settings->fullscreen);
+    if ((!strcmp(system_prefs->xmame_display_target, "x11")) &&
+        (atoi(system_prefs->xmame_minor) >= 61))
+    {
+        FullBox->setSizeLimit( 3 );
+        FullBox->insertItem( trUtf8( "Windowed" ) );
+        FullBox->insertItem( trUtf8( "Fullscreen/DGA" ) );
+        FullBox->insertItem( trUtf8( "Fullscreen/Xv" ) );
+    }
+    else
+    {
+        FullBox->setSizeLimit( 2 );
+        FullBox->insertItem( trUtf8( "Windowed" ) );
+        FullBox->insertItem( trUtf8( "Fullscreen" ) );
+    }
+    FullBox->setCurrentItem(game_settings->fullscreen);
     SkipCheck->setChecked(game_settings->autoframeskip);
     LeftCheck->setChecked(game_settings->rot_left);
     RightCheck->setChecked(game_settings->rot_right);
@@ -485,7 +500,7 @@ void MameSettingsDlg::SaveSettings()
 {
     if(!bSystem)
         game_settings->default_options = DefaultCheck->isChecked();
-    game_settings->fullscreen = FullCheck->isChecked();
+    game_settings->fullscreen = FullBox->currentItem();
     game_settings->autoframeskip = SkipCheck->isChecked();
     game_settings->rot_left = LeftCheck->isChecked();
     game_settings->rot_right = RightCheck->isChecked();

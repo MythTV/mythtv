@@ -6,6 +6,8 @@
 
 USE mythconverg;
 
+alter table mamesettings change fullscreen fullscreen tinyint(2) not null;
+
 --
 -- Table structure for table 'nestitle'
 --

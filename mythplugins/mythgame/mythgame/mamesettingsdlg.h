@@ -33,7 +33,7 @@ public:
     QWidget* SettingsTab;
     QFrame* SettingsFrame;
     QGroupBox* DisplayGroup;
-    QCheckBox* FullCheck;
+    QComboBox* FullBox;
     QCheckBox* SkipCheck;
     QCheckBox* LeftCheck;
     QCheckBox* RightCheck;
@@ -84,7 +84,7 @@ public:
     QWidget* cabinet;
     QLabel* CabinetPic;
 
-    int Show(GameSettings *settings, bool vector);
+    int Show(Prefs *prefs, GameSettings *settings, bool vector);
     void SetScreenshot(QString picfile);
     void SetCabinet(QString picfile);
     void SetFlyer(QString picfile);
@@ -101,6 +101,7 @@ public:
     void SaveSettings();
     void ScaleImageLabel(QPixmap &pixmap, QLabel *label);
 
+    Prefs *system_prefs;
     GameSettings *game_settings;
     QPixmap Screenshot;
     QPixmap Flyer;
