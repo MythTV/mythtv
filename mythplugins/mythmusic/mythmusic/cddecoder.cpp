@@ -136,7 +136,10 @@ bool CdDecoder::initialize()
     freq = 44100;
 
     if (output())
+    {
         output()->Reconfigure(16, chan, freq);
+        output()->SetSourceBitrate(44100 * 2 * 16);
+    }
 
     inited = TRUE;
     return TRUE;

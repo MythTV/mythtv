@@ -139,7 +139,10 @@ void FlacDecoder::setFlacMetadata(const FLAC__StreamMetadata *metadata)
     totalsamples = metadata->data.stream_info.total_samples;
    
     if (output())
+    {
         output()->Reconfigure(bitspersample, chan, freq);
+        output()->SetSourceBitrate(44100 * 2 * 16);
+    }
 }
 
 static void flacerror(const FLAC__SeekableStreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)

@@ -184,8 +184,11 @@ bool VorbisDecoder::initialize()
         chan = ogginfo->channels;
     }
 
-    if (output())
+    if (output()) 
+    {
         output()->Reconfigure(16, chan, freq);
+        output()->SetSourceBitrate(bitrate);
+    }
 
     inited = TRUE;
     return TRUE;
@@ -247,7 +250,10 @@ void VorbisDecoder::run()
             output_bytes += len;
 
             if (output())
+            {
+                output()->SetSourceBitrate(bitrate);
                 flush();
+            }
         } else if (len == 0) {
             flush(TRUE);
 

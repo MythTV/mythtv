@@ -110,7 +110,10 @@ bool MadDecoder::initialize()
     }
 
     if (output())
+    {
         output()->Reconfigure(16, channels, freq);
+        output()->SetSourceBitrate(bitrate);
+    }
 
     inited = TRUE;
     return TRUE;
@@ -468,6 +471,8 @@ enum mad_flow MadDecoder::madOutput()
 
 
     bitrate = frame.header.bitrate / 1000;
+    if (output())
+        output()->SetSourceBitrate(bitrate);
 
     while (samples--)
     {
