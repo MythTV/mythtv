@@ -315,14 +315,14 @@ class BooleanSetting: virtual public Setting {
     Q_OBJECT
 public:
     bool boolValue(void) const {
-        return getValue() == "true";
+        return getValue().toInt() != 0;
     };
 public slots:
     virtual void setValue(bool check) {
         if (check)
-            Setting::setValue("true");
+            Setting::setValue("1");
         else
-            Setting::setValue(QString::null);
+            Setting::setValue("0");
         emit valueChanged(check);
     };
 signals:
