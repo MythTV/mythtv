@@ -9,6 +9,8 @@
 #include "libmythtv/scheduledrecording.h"
 
 #define CHECKNIT_TIMER 5000
+//#define SISCAN_DEBUG
+
 
 SIScan::SIScan(DVBChannel* advbchannel,QSqlDatabase *thedb, pthread_mutex_t* _db_lock, int _sourceID)
 {
@@ -76,8 +78,6 @@ bool SIScan::ScanServicesSourceID(int SourceID)
                        "sourceid = %1")
                        .arg(SourceID);
 
-    //printf("%s\n",theQuery.ascii());
-
     pthread_mutex_lock(db_lock);
     QSqlQuery query = db->exec(theQuery);
 
@@ -98,7 +98,6 @@ bool SIScan::ScanServicesSourceID(int SourceID)
         query.next();
         int mplexid = query.value(0).toInt();
         scanTransports += TransportScanList(mplexid);
-        printf("I will scan %d\n",mplexid);
     }
     pthread_mutex_unlock(db_lock);
     sourceID = SourceID;
@@ -246,40 +245,16 @@ bool SIScan::FillEvents(int SourceID)
 
     // Check if you are tuned to a transport that is on SourceID x
 
+#ifdef SISCAN_DEBUG
     printf("current transport = %d\n",chan->GetCurrentTransportDBID());
+#endif
     fillingEvents = false;
 
-    // Request the NIT for sourceID
-
-
-/*
-    First pull NIT if possible to check for possible Linkage Transport
-    to use to pull guide..
-
-
-
-        If present see if you are tuned to that transport.. If so go ahead and
-        start pulling data..
-
-        If not assume you have to pull on a transport by transport basis
-
-    Now generate a list of serviceIDs from the database.. Then pull the SDT and
-    see what of those channels have EIT available.. Then call fill events..
-
-    If there are more transports you will need to check for tunability to those,
-    and then pull from those as well..
-
-    repeat until complete.
-
-*/
     return true;
 }
 
 void SIScan::EventsReady(QMap_Events* EventList)
 {
-// DEBUG FOR CHANNEL CHANGE LOCKING
-//    return;
-
     // Extra check since adding events to the DB is SLOW..
     if (threadExit)
         return;
@@ -313,7 +288,6 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     }
 
     QMap_SDTObject::Iterator s;
-    QSqlQuery query;
     int chanid=0;
 
 /*
@@ -345,7 +319,9 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
 
 //    int DVBTID = chan->GetCurrentTransportDBID();
 
+#ifdef  SISCAN_DEBUG
     printf("The mplexid is %d\n",DVBTID);
+#endif
     if (DVBTID == -1)
     {
         SISCAN("Error determing what transport this service table is associated with so failing");
@@ -361,6 +337,8 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     QString versionQuery = QString("SELECT serviceversion FROM dtv_multiplex "
                                    "WHERE mplexid = %1")
                                    .arg(DVBTID);
+    pthread_mutex_lock(db_lock);
+    QSqlQuery query(QString::null, db);
 
     if(!query.exec(versionQuery))
         MythContext::DBError("Selecting channel/dtv_multiplex", query);
@@ -376,6 +354,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
         {
             SISCAN("Service table up to date for this network.");
             emit ServiceScanUpdateText("Channels up to date");
+            pthread_mutex_unlock(db_lock);
             return;
         }
         else
@@ -415,7 +394,10 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
         FTAOnly = query.value(0).toInt();
     }
     else
+    {
+        pthread_mutex_unlock(db_lock);
         return;    
+    }
 
 // TODO: Process Steps 3 and 4.. Only a partial 4 is being done now..
     for (s = SDT.begin() ; s != SDT.end() ; ++s )
@@ -451,36 +433,35 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                     QString status = QString("Adding %1").arg((*s).ServiceName);
                     emit ServiceScanUpdateText(status);
                     // Get next chanid and determine what Transport its on
+
                     chanid = GenerateNewChanID();
+
                     int ChanNum;
-printf("Finding ChanNum\n");
                     if( (*s).ChanNum == -1 )
                         ChanNum = (*s).ServiceID;
                     else
                         ChanNum = (*s).ChanNum;
-printf("Done Finding ChanNum\n");
 
-                    // TODO: Handle UK Channel Numbers from NIT
-                    // Insert new channel into the database
-                    theQuery = QString("INSERT INTO channel (chanid, channum, "
-                               " sourceid, callsign, name,  mplexid, "
+                     query.prepare("INSERT INTO channel (chanid, channum, "
+                               "sourceid, callsign, name,  mplexid, "
                                "serviceid, atscsrcid, useonairguide ) "
-                               "VALUES (%1,%2,%3,\"%4\",\"%5\",%6,%7,%8,%9)")
-                               .arg(chanid)
-                               .arg(ChanNum)
-                               .arg(sourceID)
-                               .arg((*s).ServiceName.utf8())
-                               .arg((*s).ServiceName.utf8())
-                               .arg(chan->GetCurrentTransportDBID())
-                               .arg((*s).ServiceID)
-                               .arg((*s).ATSCSourceID)
-                               .arg((*s).EITPresent);
+                               "VALUES (:CHANID,:CHANNUM,:SOURCEID,:CALLSIGN,"
+                               ":NAME,:MPLEXID,:SERVICEID,:ATSCSRCID,:USEOAG);");
+                     query.bindValue(":CHANID",chanid);
+                     query.bindValue(":CHANNUM",ChanNum);
+                     query.bindValue(":SOURCEID",sourceID);
+                     query.bindValue(":CALLSIGN",(*s).ServiceName.utf8());
+                     query.bindValue(":NAME",(*s).ServiceName.utf8());
+                     query.bindValue(":MPLEXID",chan->GetCurrentTransportDBID());
+                     query.bindValue(":SERVICEID",(*s).ServiceID);
+                     query.bindValue(":ATSCSRCID",(*s).ATSCSourceID);
+                     query.bindValue(":USEOAG",(*s).EITPresent);
 
-                    if(!query.exec(theQuery))
+                     if(!query.exec())
                         MythContext::DBError("Adding new DVB Channel", query);
 
-                    if (!query.isActive())
-                        MythContext::DBError("Adding new DVB Channel", query);
+                     if (!query.isActive())
+                         MythContext::DBError("Adding new DVB Channel", query);
 
                 }
                 else
@@ -506,6 +487,8 @@ printf("Done Finding ChanNum\n");
                 emit ServiceScanUpdateText(status);
             }
     }
+    pthread_mutex_unlock(db_lock);
+
 }
 
 void SIScan::CheckNIT(NITObject& NIT)
@@ -597,7 +580,8 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
 
     for (t = NIT.Transport.begin() ; t != NIT.Transport.end() ; ++t )
     {
-        QSqlQuery query;
+        pthread_mutex_lock(db_lock);
+        QSqlQuery query(QString::null, db);
         // See if transport already in database
         QString theQuery = QString("select * from dtv_multiplex where NetworkID = %1 and "
                    " TransportID = %2 and Frequency = %3 and sourceID = %4")
@@ -605,13 +589,11 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
                    .arg((*t).TransportID)
                    .arg((*t).Frequency)
                    .arg(sourceID);
-        pthread_mutex_lock(db_lock);
         if(!query.exec(theQuery))
             MythContext::DBError("Selecting transports", query);
 
         if (!query.isActive())
             MythContext::DBError("Check Transport in dtv_multiplex.", query);
-        pthread_mutex_unlock(db_lock);
 
         // If transport not present add it, and move on to the next
         if (query.numRowsAffected() <= 0)
@@ -624,35 +606,34 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
                    .arg((*t).TransportID)
                    .arg((*t).NetworkID));
 
-            theQuery = QString("INSERT into dtv_multiplex (transportid, "
+            query.prepare("INSERT into dtv_multiplex (transportid, "
                                "networkid, frequency, symbolrate, fec, "
                                "polarity, modulation, constellation, "
                                "bandwidth, hierarchy, hp_code_rate, "
                                "lp_code_rate, guard_interval, "
                                "transmission_mode, inversion, sourceid) "
-                               "VALUES (%1 ,%2 ,%3 ,%4 ,\"%5\" ,\"%6\" ,"
-                                       "\"%7\" ,\"%8\" ,\"%9\" ,")
-                               .arg((*t).TransportID)
-                               .arg((*t).NetworkID)
-                               .arg((*t).Frequency)
-                               .arg((*t).SymbolRate)
-                               .arg((*t).FEC_Inner)
-                               .arg((*t).Polarity)
-                               .arg((*t).Modulation)
-                               .arg((*t).Constellation)
-                               .arg((*t).Bandwidth);
-
-            theQuery += QString("\"%1\" ,\"%2\" ,\"%3\" ,\"%4\" ,\"%5\" ,"
-                                "\"%6\", %7 )")
-                               .arg((*t).Hiearchy)
-                               .arg((*t).CodeRateHP)
-                               .arg((*t).CodeRateLP)
-                               .arg((*t).GuardInterval)
-                               .arg((*t).TransmissionMode)
-                               .arg((*t).Inversion)
-                               .arg(sourceID);
-            pthread_mutex_lock(db_lock);
-            if(!query.exec(theQuery))
+                               "VALUES (:TRANSPORTID,:NETWORKID,:FREQUENCY,"
+                               ":SYMBOLRATE,:FEC,:POLARITY,:MODULATION,"
+                               ":CONSTELLATION,:BANDWIDTH,:HIERARCHY,"
+                               ":HP_CODE_RATE,:LP_CODE_RATE,:GUARD_INTERVAL,"
+                               ":TRANSMISSION_MODE,:INVERSION,:SOURCEID);");
+                               query.bindValue(":TRANSPORTID",(*t).TransportID);
+                               query.bindValue(":NETWORKID",(*t).NetworkID);
+                               query.bindValue(":FREQUENCY",(*t).Frequency);
+                               query.bindValue(":SYMBOLRATE",(*t).SymbolRate);
+                               query.bindValue(":FEC",(*t).FEC_Inner);
+                               query.bindValue(":POLARITY",(*t).Polarity);
+                               query.bindValue(":MODULATION",(*t).Modulation);
+                               query.bindValue(":CONSTELLATION",(*t).Constellation);
+                               query.bindValue(":BANDWIDTH",(*t).Bandwidth);
+                               query.bindValue(":HIERARCHY",(*t).Hiearchy);
+                               query.bindValue(":HP_CODE_RATE",(*t).CodeRateHP);
+                               query.bindValue(":LP_CODE_RATE",(*t).CodeRateLP);
+                               query.bindValue(":GUARD_INTERVAL",(*t).GuardInterval);
+                               query.bindValue(":TRANSMISSION_MODE",(*t).TransmissionMode);
+                               query.bindValue(":INVERSION",(*t).Inversion);
+                               query.bindValue(":SOURCEID",sourceID);
+            if(!query.exec())
                 MythContext::DBError("Inserting new transport", query);
             if (!query.isActive())
                 MythContext::DBError("Adding transport to Database.", query);
@@ -660,13 +641,14 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
         }
         else
         {
-           emit TransportScanUpdateText(QString("Transport %1 - %2 Already in Database")
+            emit TransportScanUpdateText(QString("Transport %1 - %2 Already in Database")
                    .arg((*t).TransportID)
                    .arg((*t).NetworkID));
 
-           SISCAN(QString("Transport TID = %1 NID = %2 already in Database")
+            SISCAN(QString("Transport TID = %1 NID = %2 already in Database")
                    .arg((*t).TransportID)
                    .arg((*t).NetworkID));
+            pthread_mutex_unlock(db_lock);
         }
     }
 }
@@ -674,15 +656,18 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
 int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId)
 {
 
-printf("Request for Networkid/Transportid %d %d\n",NetworkID,TransportID);
+#ifdef SISCAN_DEBUG
+    printf("Request for Networkid/Transportid %d %d\n",NetworkID,TransportID);
+#endif
 
     // See if you can get an exact match baed on the current mplexid's sourceID
     // and the NetworkID/TransportID
-    QSqlQuery query;
-    QString theQuery;
 
     // First see if current one is NULL, if so update those values and return current mplexid
     pthread_mutex_lock(db_lock);
+
+    QSqlQuery query(QString::null, db);
+    QString theQuery;
 
     theQuery = QString("select networkid,transportid from dtv_multiplex where "
                        "mplexid = %1")
@@ -696,7 +681,9 @@ printf("Request for Networkid/Transportid %d %d\n",NetworkID,TransportID);
 
     query.next();
 
-printf("Query Results: %d %d\n",query.value(0).toInt(),query.value(1).toInt());
+#ifdef SISCAN_DEBUG
+    printf("Query Results: %d %d\n",query.value(0).toInt(),query.value(1).toInt());
+#endif
 
     if ((query.value(0).toInt() == NetworkID) && (query.value(1).toInt() == TransportID))
     {
@@ -744,16 +731,21 @@ printf("Query Results: %d %d\n",query.value(0).toInt(),query.value(1).toInt());
     // mplexid this NetworkId/TransportId is for.
     if (query.numRowsAffected() == 1)
     {
-printf("exact match\n");
+#ifdef SISCAN_DEBUG
+        printf("Exact Match!\n");
+#endif
+        int tmp = query.value(0).toInt();
         pthread_mutex_unlock(db_lock);
-        return query.value(0).toInt();
+        return tmp;
     }
 
     // If you got more than 1 hit then all you can do is hope that this NetworkID/TransportID
     // pair belongs to the CurrentMplexId;
     if (query.numRowsAffected() > 1)
     {
-printf("more than 1 hit\n");
+#ifdef SISCAN_DEBUG
+        printf("more than 1 hit\n");
+#endif
         pthread_mutex_unlock(db_lock);
         return CurrentMplexId;
     }
@@ -786,25 +778,28 @@ printf("more than 1 hit\n");
     {
         SISCAN(QString("Found more than 1 match for NetworkID %1 TransportID %2")
                .arg(NetworkID).arg(TransportID));
+        int tmp = query.value(0).toInt();
         pthread_mutex_unlock(db_lock);
-        return query.value(0).toInt();
+        return tmp;
     }
 
     // You found the entries, but it was on a different sourceID, so return that value
+    int retval = query.value(0).toInt();
     pthread_mutex_unlock(db_lock);
-    return query.value(0).toInt();
+
+    return retval;
 
 }
 
 int SIScan::GenerateNewChanID()
 {
 
-    QSqlQuery query;
+    // This function must be called with db_lock enabled
+
+    QSqlQuery query(QString::null, db);
 
     QString theQuery = QString("select max(chanid) as maxchan from channel where sourceid=%1")
                        .arg(sourceID);
-
-//    pthread_mutex_lock(db_lock);
 
     if(!query.exec(theQuery))
         MythContext::DBError("Calculating new ChanID", query);
@@ -816,13 +811,9 @@ int SIScan::GenerateNewChanID()
 
     // If transport not present add it, and move on to the next
     if (query.numRowsAffected() <= 0)
-    {
-//        pthread_mutex_unlock(db_lock);
         return sourceID * 1000;
-    }
 
     int MaxChanID = query.value(0).toInt();
-//    pthread_mutex_unlock(db_lock);
 
     if (MaxChanID == 0)
         return sourceID * 1000;
@@ -833,7 +824,7 @@ int SIScan::GenerateNewChanID()
 
 void SIScan::AddEvents()
 {
-    QSqlQuery query;
+    QSqlQuery query(QString::null, db);
     QString theQuery;
     int counter = 0;
 
@@ -855,8 +846,9 @@ void SIScan::AddEvents()
             theQuery = QString("select chanid,useonairguide from channel where atscsrcid=%1 and mplexid=%2")
                            .arg((*e).ServiceID)
                            .arg(chan->GetCurrentTransportDBID());
-
+#ifdef SISCAN_DEBUG
              printf("CHANID QUERY: %s\n",theQuery.ascii());
+#endif
         }
         else  /* DVB Link to chanid */
         {
@@ -865,7 +857,9 @@ void SIScan::AddEvents()
                            .arg((*e).ServiceID)
                            .arg((*e).NetworkID);
 
+#ifdef SISCAN_DEBUG
             printf("CHANID QUERY: %s\n",theQuery.ascii());
+#endif
         }
         pthread_mutex_lock(db_lock);
 
@@ -896,8 +890,9 @@ void SIScan::AddEvents()
             continue;
         }
 
+#ifdef SISCAN_DEBUG
         printf("QUERY: %d Events found for ChanId=%d\n",events->size(),ChanID);
-
+#endif
         for (e = events->begin() ; e != events->end() ; ++e)
         {
 

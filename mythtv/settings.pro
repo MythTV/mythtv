@@ -26,7 +26,7 @@ release {
 
 LOCAL_LIBDIR_X11 =
 !isEmpty( QMAKE_LIBDIR_X11 ) {
-    LOCAL_LIBDIR_X11 = $$join(QMAKE_LIBDIR_X11, " -L", -L)
+    LOCAL_LIBDIR_X11 = -L$${QMAKE_LIBDIR_X11}
 }
 QMAKE_LIBDIR_X11 = 
 
@@ -85,6 +85,12 @@ CONFIG += using_oss
 #INCLUDEPATH += /usr/src/linuxtv-dvb-1.0.1/include
 #define the following if you want On Air Guide information
 #DEFINES += USING_DVB_EIT
+
+# Firewire support
+#CONFIG += using_firewire
+#DEFINES += USING_FIREWIRE
+#EXTRA_LIBS += -lraw1394 -liec61883
+
 
 # Joystick menu support
 CONFIG += using_joystick_menu

@@ -26,6 +26,8 @@ AudioOutputBase::AudioOutputBase(QString audiodevice, int,
     audio_channels = -1;
     audio_samplerate = -1;    
     total_written = 0;
+    current_seconds = 0;
+    source_bitrate = -1;
     audio_stretchfactor = 1.0;
     pSoundStretch = NULL;
     blocking = false;
@@ -51,6 +53,11 @@ AudioOutputBase::~AudioOutputBase()
     pthread_cond_destroy(&audio_bufsig);
 }
 
+void AudioOutputBase::SetSourceBitrate(int rate)
+{
+    source_bitrate = rate;
+}
+
 void AudioOutputBase::SetStretchFactorLocked(float laudio_stretchfactor)
 {
     effdspstretched = (int)((float)effdsp / laudio_stretchfactor);
@@ -72,6 +79,8 @@ void AudioOutputBase::SetStretchFactorLocked(float laudio_stretchfactor)
             pSoundStretch->setChannels(audio_channels);
 
             pSoundStretch->setTempo(audio_stretchfactor);
+            pSoundStretch->setSetting(SETTING_SEQUENCE_MS, 35);
+
             // dont need these with only tempo change
             //pSoundStretch->setPitch(1.0);
             //pSoundStretch->setRate(1.0);
@@ -150,6 +159,8 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     effdsp = audio_samplerate * 100;
     gettimeofday(&audiotime_updated, NULL);
     total_written = 0;
+    current_seconds = 0;
+    source_bitrate = -1;
 
     // Check if we need the resampler
     if (audio_samplerate != laudio_samplerate)
@@ -250,6 +261,8 @@ void AudioOutputBase::Reset()
     audbuf_timecode = 0;
     audiotime = 0;
     total_written = 0;
+    current_seconds = 0;
+    source_bitrate = -1;
     was_paused = !pauseaudio;
 
     // Setup visualisations, zero the visualisations buffers
@@ -623,17 +636,21 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
 
 void AudioOutputBase::Status()
 {
-    static long current_seconds = 0;
     long ct = GetAudiotime();
 
     if (ct < 0)
         ct = 0;
 
-    if (ct != current_seconds) 
+    if (source_bitrate == -1)
+    {
+        source_bitrate = audio_samplerate * audio_channels * audio_bits;
+    }
+
+    if (ct / 1000 != current_seconds) 
     {
         current_seconds = ct;
-        OutputEvent e(current_seconds / 1000, current_seconds,
-                      audio_samplerate, audio_samplerate, audio_bits, 
+        OutputEvent e(current_seconds, ct,
+                      source_bitrate, audio_samplerate, audio_bits, 
                       audio_channels);
         dispatch(e);
     }

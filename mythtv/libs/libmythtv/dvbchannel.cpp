@@ -272,14 +272,16 @@ void DVBChannel::SwitchToInput(const QString &input, const QString &chan)
  */
 bool DVBChannel::GetChannelOptions(QString channum)
 {
-    QString         thequery;
-    QSqlQuery       query;
-    QString         inputName;
 
     if (db_conn == NULL)
        return false;
 
     pthread_mutex_lock(db_lock);
+
+    QString         thequery;
+    QSqlQuery       query(QString::null, db_conn);
+    QString         inputName;
+
     MythContext::KickDatabase(db_conn);
 
 // TODO: pParent doesn't exist when you create a DVBChannel from videosource
@@ -334,13 +336,15 @@ bool DVBChannel::GetChannelOptions(QString channum)
 
 bool DVBChannel::GetTransportOptions(int mplexid)
 {
-    QSqlQuery query;
-    QString thequery;
 
     if (db_conn == NULL)
        return false;
 
     pthread_mutex_lock(db_lock);
+
+    QSqlQuery query(QString::null, db_conn);
+    QString thequery;
+
     MythContext::KickDatabase(db_conn);
 
      // TODO: See previous comment about pParent
@@ -424,11 +428,13 @@ bool DVBChannel::GetTransportOptions(int mplexid)
     }
 
     query.next();
-    pthread_mutex_unlock(db_lock);
 
     if (!ParseTransportQuery(query))
+    {
+        pthread_mutex_unlock(db_lock);
         return false;
-
+    }
+    pthread_mutex_unlock(db_lock);
     return true;
 }
 
@@ -453,7 +459,7 @@ void DVBChannel::PrintChannelOptions()
             }
 
             // TODO: Make DiSEqC class print options here as well
-            //NOTE: Diseqc and LNB is handled by DVBDiSEqC.
+            // NOTE: Diseqc and LNB is handled by DVBDiSEqC.
             break;
 
         case FE_QAM:
@@ -719,11 +725,13 @@ bool DVBChannel::CheckModulation(fe_modulation_t& modulation)
 
 bool DVBChannel::ParseTransportQuery(QSqlQuery& query)
 {
+
+    // This function must be called with db_lock held
+
     pthread_mutex_lock(&chan_opts.lock);
 
     switch(info.type)
     {
-// TODO: Add in Diseqc_Pos when diseqc class supports position as well as switches
         case FE_QPSK:
             if (!ParseQPSK(query.value(0).toString(), query.value(1).toString(),
                            query.value(2).toString(), query.value(3).toString(),
@@ -774,6 +782,7 @@ bool DVBChannel::ParseTransportQuery(QSqlQuery& query)
     }
 
     pthread_mutex_unlock(&chan_opts.lock);
+
     return true;
 }
 

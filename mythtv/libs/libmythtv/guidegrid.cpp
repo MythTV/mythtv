@@ -84,6 +84,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
 
     fullRect = QRect(0, 0, size().width(), size().height());
     dateRect = QRect(0, 0, 0, 0);
+    jumpToChannelRect = QRect(0, 0, 0, 0);
     channelRect = QRect(0, 0, 0, 0);
     timeRect = QRect(0, 0, 0, 0);
     programRect = QRect(0, 0, 0, 0);
@@ -93,6 +94,12 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
 
     MythContext::KickDatabase(m_db);
 
+    jumpToChannelEnabled = gContext->GetNumSetting("EPGEnableJumpToChannel", 0);
+    jumpToChannelActive = false;
+    jumpToChannelHasRect = false; // by default, we assume there is no specific region for jumpToChannel in the theme
+    jumpToChannelTimer = new QTimer(this);
+    connect(jumpToChannelTimer, SIGNAL(timeout()), SLOT(jumpToChannelTimeout()));
+    
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
@@ -122,7 +129,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
 
     selectChangesChannel = gContext->GetNumSetting("SelectChangesChannel", 0);
     selectRecThreshold = gContext->GetNumSetting("SelChangeRecThreshold", 16);
-    
+
     LayerSet *container = NULL;
     container = theme->GetSet("guide");
     if (container)
@@ -344,6 +351,15 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
                 dayLeft();
             else if (action == "DAYRIGHT")
                 dayRight();
+            else if (jumpToChannelEnabled &&
+                     ((action[0] >= '0') && (action[0] <= '9')))
+                jumpToChannelDigitPress(action.toInt());
+            else if (jumpToChannelEnabled && jumpToChannelActive &&
+                     (action == "ESCAPE"))
+                jumpToChannelCancel();
+            else if (jumpToChannelEnabled && jumpToChannelActive &&
+                     (action == "DELETE"))
+                jumpToChannelDeleteLastDigit();
             else if (action == "NEXTFAV" || action == "4")
                 toggleGuideListing();
             else if (action == "6")
@@ -459,6 +475,10 @@ void GuideGrid::parseContainer(QDomElement &element)
         timeRect = area;
     if (name.lower() == "date_info")
         dateRect = area;
+    if (name.lower() == "jumptochannel") {
+        jumpToChannelRect = area;
+        jumpToChannelHasRect = true;
+    }
     if (name.lower() == "current_info")
         curInfoRect = area;
     if (name.lower() == "current_video")
@@ -903,7 +923,7 @@ void GuideGrid::paintEvent(QPaintEvent *e)
 
     if (r.intersects(infoRect))
         paintInfo(&p);
-    if (r.intersects(dateRect))
+    if (r.intersects(dateRect) && (jumpToChannelHasRect || (!jumpToChannelHasRect && !jumpToChannelActive)))
         paintDate(&p);
     if (r.intersects(channelRect))
         paintChannels(&p);
@@ -913,6 +933,11 @@ void GuideGrid::paintEvent(QPaintEvent *e)
         paintPrograms(&p);
     if (r.intersects(curInfoRect))
         paintCurrentInfo(&p);
+
+    // if jumpToChannel has its own rect, use that; otherwise use the date's rect
+    if ((jumpToChannelHasRect && r.intersects(jumpToChannelRect)) ||
+        (!jumpToChannelHasRect && r.intersects(dateRect)))
+        paintJumpToChannel(&p);
 
     qApp->unlock();
 }
@@ -946,6 +971,49 @@ void GuideGrid::paintDate(QPainter *p)
     }
     tmp.end();
     p->drawPixmap(dr.topLeft(), pix);
+}
+
+void GuideGrid::paintJumpToChannel(QPainter *p)
+{
+    if (!jumpToChannelEnabled || !jumpToChannelActive)
+        return;
+
+    QRect jtcr;
+    LayerSet *container = NULL;
+
+    if (jumpToChannelHasRect) {
+        jtcr = jumpToChannelRect;
+        container = theme->GetSet("jumptochannel");
+    } else {
+        jtcr = dateRect;
+        container = theme->GetSet("date_info");
+    }
+
+    QPixmap pix(jtcr.size());
+    pix.fill(this, jtcr.topLeft());
+    QPainter tmp(&pix);
+
+    if (container)
+    {
+        UITextType *type = (UITextType *)container->GetType((jumpToChannelHasRect) ? "channel" : "date");
+        if (type) {
+            type->SetText(QString::number(jumpToChannel));
+        }
+    }
+
+    if (container)
+    {
+        container->Draw(&tmp, 1, m_context);
+        container->Draw(&tmp, 2, m_context);
+        container->Draw(&tmp, 3, m_context);
+        container->Draw(&tmp, 4, m_context);
+        container->Draw(&tmp, 5, m_context);
+        container->Draw(&tmp, 6, m_context);
+        container->Draw(&tmp, 7, m_context);
+        container->Draw(&tmp, 8, m_context);
+    }
+    tmp.end();
+    p->drawPixmap(jtcr.topLeft(), pix);
 }
 
 void GuideGrid::paintCurrentInfo(QPainter *p)
@@ -1346,6 +1414,7 @@ void GuideGrid::scrollLeft()
     repaint(programRect, false);
     repaint(infoRect, false);
     repaint(dateRect, false);
+    repaint(jumpToChannelRect, false);
     repaint(timeRect, false);
 }
 
@@ -1367,6 +1436,7 @@ void GuideGrid::scrollRight()
     repaint(programRect, false);
     repaint(infoRect, false);
     repaint(dateRect, false);
+    repaint(jumpToChannelRect, false);
     repaint(timeRect, false);
 }
 
@@ -1586,6 +1656,7 @@ void GuideGrid::editScheduled()
 
     m_recList.FromScheduler();
     fillProgramInfos();
+
     repaint(fullRect, false);
 }
 
@@ -1631,5 +1702,112 @@ void GuideGrid::channelUpdate(void)
         chanNum = 0;
 
     m_player->EPGChannelUpdate(m_channelInfos[chanNum].chanstr);
+}
+
+//
+// jumpToChannel - Jason Parekh <jasonparekh@gmail.com> - 06/23/2004
+//
+// The way this works is if you enter a digit, it will set a timer for 2.5 seconds and enter
+// jump to channel mode where as you enter digits, it will find the closest matching channel
+// and show that on the program guide.  Within the 2.5 seconds, if you press the button bound
+// to END, it will cancel channel jump mode and revert to the highlighted channel before entering
+// this mode.  If you let the timer expire, it will stay on the selected channel.
+//
+// The positioning for the channel display can be in either one of two ways.  To ensure compatibility
+// with themes, I made it so if it can't find a specific jumptochannel container, it will use the date's
+// and just overwrite the date whenever it is in channel jump mode.  However, if there is a jumptochannel
+// container, it will use that.  An example container is as follows:
+//
+//     <container name="jumptochannel">
+//     <area>20,20,115,25</area>
+//     <textarea name="channel" draworder="4" align="right">
+//         <font>info</font>
+//         <area>0,0,115,25</area>
+//         <cutdown>no</cutdown>
+//     </textarea>
+//     </container>
+//
+
+void GuideGrid::jumpToChannelDigitPress(int digit)
+{
+    // if this is the first digit press (coming from inactive mode)
+    if (jumpToChannelActive == false) {
+        jumpToChannelActive = true;
+        jumpToChannel = 0;
+        jumpToChannelPreviousStartChannel = m_currentStartChannel;
+        jumpToChannelPreviousRow = m_currentRow;
+    }
+    
+    // setup the timeout timer for jump mode
+    jumpToChannelTimer->stop();
+    jumpToChannelTimer->start(3500, true);
+
+    jumpToChannel = (jumpToChannel * 10) + digit;
+
+    // So it will move to the closest channels while they enter the digits
+    jumpToChannelShowSelection();
+}
+
+void GuideGrid::jumpToChannelDeleteLastDigit()
+{
+    jumpToChannel /= 10;
+    
+    if (jumpToChannel == 0) {
+        jumpToChannelCancel();
+    }
+}
+
+void GuideGrid::jumpToChannelShowSelection()
+{
+    unsigned int i;
+    
+    // Not the best method, but the channel list is small and this isn't time critical
+    // Go through until the ith channel is equal to or greater than the one we're looking for
+    for (i=0; (i < m_channelInfos.size()-1) &&
+             (m_channelInfos[i].chanstr.toInt() < jumpToChannel); i++);
+    
+    if ((i > 0) &&
+        ((m_channelInfos[i].chanstr.toInt() - jumpToChannel) > (jumpToChannel - m_channelInfos[i-1].chanstr.toInt()))) {
+        i--;
+    }
+
+    // DISPLAY_CHANS to center
+    setStartChannel(i-DISPLAY_CHANS/2);
+    m_currentRow = DISPLAY_CHANS/2;
+    
+    fillProgramInfos();
+
+    repaint(fullRect, false);
+}
+
+void GuideGrid::jumpToChannelCommit()
+{
+    jumpToChannelResetAndHide();
+}
+
+void GuideGrid::jumpToChannelCancel()
+{
+    setStartChannel(jumpToChannelPreviousStartChannel);
+    m_currentRow = jumpToChannelPreviousRow;
+    
+    fillProgramInfos();
+    
+    repaint(fullRect, false);
+    
+    jumpToChannelResetAndHide();
+}
+
+void GuideGrid::jumpToChannelResetAndHide()
+{
+    jumpToChannelActive = false;
+
+    jumpToChannelTimer->stop();
+
+    repaint(fullRect, false);
+}
+
+void GuideGrid::jumpToChannelTimeout()
+{
+    jumpToChannelCommit();
 }
 

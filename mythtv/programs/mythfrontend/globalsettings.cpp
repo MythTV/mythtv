@@ -183,7 +183,7 @@ static HostCheckBox *DecodeExtraAudio()
 {
     HostCheckBox *gc = new HostCheckBox("DecodeExtraAudio");
     gc->setLabel(QObject::tr("Extra audio buffering"));
-    gc->setValue(false);
+    gc->setValue(true);
     gc->setHelpText(QObject::tr("Enable this setting if MythTV is playing "
                     "\"crackly\" audio and you are using hardware encoding. "
                     "This setting will have no effect "
@@ -1712,6 +1712,16 @@ static HostSpinBox *EPGTimeDisplay()
     return gs;
 }
 
+static GlobalCheckBox *EPGEnableJumpToChannel()
+{
+    GlobalCheckBox *gc = new GlobalCheckBox("EPGEnableJumpToChannel");
+    gc->setLabel(QObject::tr("Allow channel jumping in guide"));
+    gc->setHelpText(QObject::tr("If enabled, you will be able to press numbers "
+                    "and jump the selection to whatever channel you enter."));
+    gc->setValue(false);
+    return gc;
+}
+
 // General RecPriorities settings
 
 static GlobalCheckBox *GRSchedMoveHigher()
@@ -2829,6 +2839,7 @@ EPGSettings::EPGSettings()
     gen->addChild(DefaultTVChannel());
     gen->addChild(SelectChangesChannel());
     gen->addChild(EPGRecThreshold());
+    gen->addChild(EPGEnableJumpToChannel());
     addChild(gen);
 }
 

@@ -100,7 +100,6 @@ private:
     bool CheckCodeRate(fe_code_rate_t& rate);
 
     bool ParseTransportQuery(QSqlQuery& query);
-    bool ParseChannelQuery(QSqlQuery& query);
 
     bool TuneQPSK(dvb_tuning_t& tuning, bool reset, bool& havetuned);
     bool TuneQAM(dvb_tuning_t& tuning, bool reset, bool& havetuned);

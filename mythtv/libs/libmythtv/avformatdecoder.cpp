@@ -249,12 +249,21 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
             break;
         skipFrames--;
     }
+
 }
 
 void AvFormatDecoder::Reset(void)
 {
     SeekReset();
 
+    //
+    // Clear out the existing mpeg streams
+    // so we can get a clean set from the 
+    // new seek position.
+    for (int i = ic->nb_streams - 1; i >= 0; i--)
+    {
+        av_remove_stream(ic, ic->streams[i]->id);
+    }
     m_positionMap.clear();
     framesPlayed = 0;
     framesRead = 0;
@@ -1140,6 +1149,7 @@ void AvFormatDecoder::incCurrentAudioTrack()
         wantedAudioStream = audioStreams[currentAudioTrack];
 
         AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+        SetupAudioStream();
         CheckAudioParams(e->sample_rate, e->channels, true);
     }
 }
@@ -1157,6 +1167,7 @@ void AvFormatDecoder::decCurrentAudioTrack()
         wantedAudioStream = audioStreams[currentAudioTrack];
 
         AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+        SetupAudioStream();
         CheckAudioParams(e->sample_rate, e->channels, true);
     }
 }
@@ -1175,10 +1186,23 @@ bool AvFormatDecoder::setCurrentAudioTrack(int trackNo)
     wantedAudioStream = audioStreams[currentAudioTrack];
 
     AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+    SetupAudioStream();
     CheckAudioParams(e->sample_rate, e->channels, true);
     return true;
 }
 
+//
+// This function will select the best audio track
+// available usgin the following rules:
+//
+// 1. The fist AC3 track found will be select,
+// 2. If no AC3 is found then the audio track with
+// the most number of channels is selected. 
+//
+// This code has no awareness to language preferences
+// although I don't think it would be too hard to 
+// add.
+//
 bool AvFormatDecoder::autoSelectAudioTrack()
 {
     if (!audioStreams.size())
@@ -1191,7 +1215,10 @@ bool AvFormatDecoder::autoSelectAudioTrack()
     if (do_ac3_passthru)
         minChannels = 2;
 
-    while (!foundAudio)
+    int selectedTrack = -1;
+    int selectedChannels = -1;
+    
+    while ((!foundAudio) && (minChannels >= 0))
     {
         for (track = maxTracks; track >= 0; track--)
         {
@@ -1200,26 +1227,58 @@ bool AvFormatDecoder::autoSelectAudioTrack()
 
             if (e->channels > minChannels)
             {
-                currentAudioTrack = track;
-                wantedAudioStream = tempStream;
-                VERBOSE(VB_AUDIO, 
-                        QString("Auto-selecting audio track #%1 (stream #%2).")
-                               .arg(track + 1).arg(tempStream));
-                VERBOSE(VB_AUDIO, 
-                        QString("It has %1 channels and we needed at least %2")
-                               .arg(e->channels).arg(minChannels + 1));
+                //if we find an AC3 codec then we select it 
+                //as the preferred codec.
+                if (e->codec_id == CODEC_ID_AC3)
+                {
+                    selectedTrack = track;
+                    foundAudio = true;
+                    break;
+                }
 
-                AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
-                CheckAudioParams(e->sample_rate, e->channels, true);
-                return true;
+                if (e->channels > selectedChannels)
+                {
+                    //this is a candidate with more channels
+                    //than the previous, or there was no previous
+                    //so select it.
+                    selectedTrack = track;
+                }
             }
         }
+        if (!foundAudio)
+        {
         minChannels--;
-        if (minChannels < 0)
-            return false;
+        }
     }
 
+    if (selectedTrack == -1)
+    {
+        //no suitable track was found
     return false;
+    }
+
+    currentAudioTrack = selectedTrack;
+    wantedAudioStream = audioStreams[currentAudioTrack];
+     
+    AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+    if (e->codec_id == CODEC_ID_AC3)
+    {
+        VERBOSE(VB_AUDIO, 
+                QString("Auto-selecting AC3 audio track (stream #%2).")
+                .arg(wantedAudioStream)); 
+    }
+    else
+    {
+        VERBOSE(VB_AUDIO, 
+                QString("Auto-selecting audio track #%1 (stream #%2).")
+                .arg(selectedTrack + 1).arg(wantedAudioStream));
+        VERBOSE(VB_AUDIO, 
+                QString("It has %1 channels and we needed at least %2")
+                .arg(selectedChannels).arg(minChannels + 1));
+    }
+    SetupAudioStream();
+    CheckAudioParams(e->sample_rate, e->channels, true);
+    return true;
 }
 
 void AvFormatDecoder::SetupAudioStream(void)

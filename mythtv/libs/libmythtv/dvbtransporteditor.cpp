@@ -173,9 +173,7 @@ void DVBTransportsEditor::del() {
                                              tr("No, don't"), 2);
 
     if (val == 0) {
-        QSqlQuery query;
-
-        query = m_db->exec(QString("DELETE FROM dtv_multiplex "
+        QSqlQuery query = m_db->exec(QString("DELETE FROM dtv_multiplex "
                                  "WHERE mplexid ='%1'").arg(m_nID));
         if (!query.isActive())
             MythContext::DBError("TransportEditor Delete DVBTransport", query);

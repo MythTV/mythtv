@@ -81,6 +81,7 @@ class GuideGrid : public MythDialog
 
   private slots:
     void timeout();
+    void jumpToChannelTimeout();
 
   private:
     void keyPressEvent(QKeyEvent *e);
@@ -88,6 +89,7 @@ class GuideGrid : public MythDialog
 
     void updateBackground(void);
     void paintDate(QPainter *);
+    void paintJumpToChannel(QPainter *);
     void paintChannels(QPainter *);
     void paintTimes(QPainter *);
     void paintPrograms(QPainter *);
@@ -110,6 +112,7 @@ class GuideGrid : public MythDialog
 
     QRect fullRect;
     QRect dateRect;
+    QRect jumpToChannelRect;
     QRect channelRect;
     QRect timeRect;
     QRect programRect;
@@ -168,6 +171,20 @@ class GuideGrid : public MythDialog
     QSqlDatabase *m_db;
 
     bool keyDown;
+
+    void jumpToChannelResetAndHide();
+    void jumpToChannelCancel();
+    void jumpToChannelCommit();
+    void jumpToChannelShowSelection();
+    void jumpToChannelDeleteLastDigit();
+    void jumpToChannelDigitPress(int);
+    int jumpToChannel;
+    int jumpToChannelPreviousStartChannel;
+    int jumpToChannelPreviousRow;
+    bool jumpToChannelEnabled;
+    bool jumpToChannelActive;
+    bool jumpToChannelHasRect;
+    QTimer *jumpToChannelTimer;
 };
 
 #endif

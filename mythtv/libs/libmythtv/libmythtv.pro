@@ -32,10 +32,8 @@ TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB
 QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 QMAKE_CFLAGS_DEBUG = -g -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 
-FREETYPEFLAGS = $$system(freetype-config --cflags)
-
-QMAKE_CXXFLAGS_RELEASE += $$FREETYPEFLAGS
-QMAKE_CXXFLAGS_DEBUG += $$FREETYPEFLAGS
+QMAKE_CXXFLAGS_RELEASE += `freetype-config --cflags`
+QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 
 # old libvbitext
 
@@ -130,6 +128,11 @@ using_dvb {
     HEADERS += scanwizard.h dvbsignalmonitor.h sitypes.h
     HEADERS += dvbdev/dvbdev.h dvbdev/transform.h dvbdev/ringbuffy.h 
     HEADERS += dvbdev/dvbci.h
+}
+
+using_firewire {
+    SOURCES += firewirerecorder.cpp firewirechannel.cpp
+    HEADERS += firewirerecorder.h firewirechannel.h
 }
 
 using_directfb {

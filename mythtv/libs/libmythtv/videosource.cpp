@@ -786,6 +786,74 @@ public:
     };
 };
 
+class FirewireModel: public ComboBoxSetting, public CCSetting {
+    public:
+	FirewireModel(const CaptureCard& parent):
+ 	CCSetting(parent, "firewire_model") {
+            setLabel(QObject::tr("Firewire Model"));
+            addSelection(QObject::tr("Other"));
+            setHelpText(QObject::tr("Firewire Model is for future use incase there " 
+                                     "is a need to model specific work arounds.")); 
+
+        }
+};
+
+class FirewirePort: public LineEditSetting, public CCSetting {
+    public:
+	FirewirePort(const CaptureCard& parent):
+ 	CCSetting(parent, "firewire_port") {
+            setValue("0");
+            setLabel(QObject::tr("Firewire Port"));
+            setHelpText(QObject::tr("Firewire port on your firewire card."));
+        }
+};
+
+class FirewireNode: public LineEditSetting, public CCSetting {
+    public:
+        FirewireNode(const CaptureCard& parent):
+        CCSetting(parent, "firewire_node") {
+            setValue("2");
+            setLabel(QObject::tr("Firewire Node"));
+            setHelpText(QObject::tr("Firewire node is the remote device."));
+        }
+};
+
+class FirewireSpeed: public ComboBoxSetting, public CCSetting {
+    public:
+	FirewireSpeed(const CaptureCard& parent):
+ 	CCSetting(parent, "firewire_speed") {
+            setLabel(QObject::tr("Firewire Speed"));
+            addSelection(QObject::tr("100Mbps"),"0");
+            addSelection(QObject::tr("200Mbps"),"1");
+            addSelection(QObject::tr("400Mbps"),"2");
+        }
+};
+
+class FirewireInput: public ComboBoxSetting, public CCSetting {
+    public:
+	FirewireInput(const CaptureCard& parent):
+ 	CCSetting(parent, "defaultinput") {
+            setLabel(QObject::tr("Default Input"));
+            addSelection("MPEG2TS");
+            setHelpText(QObject::tr("Only MPEG2TS is supported at this time."));
+        }
+};
+
+class FirewireConfigurationGroup: public VerticalConfigurationGroup {
+public:
+    FirewireConfigurationGroup(CaptureCard& a_parent):
+        parent(a_parent) {
+        setUseLabel(false);
+        addChild(new FirewireModel(parent));
+        addChild(new FirewirePort(parent));
+        addChild(new FirewireNode(parent));
+        addChild(new FirewireSpeed(parent));
+   	addChild(new FirewireInput(parent));
+    };
+private:
+    CaptureCard& parent;
+};
+
 class V4LConfigurationGroup: public VerticalConfigurationGroup {
 public:
     V4LConfigurationGroup(CaptureCard& a_parent):
@@ -826,6 +894,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent)
 
     addTarget("V4L", new V4LConfigurationGroup(parent));
     addTarget("DVB", new DVBConfigurationGroup(parent));
+    addTarget("FIREWIRE", new FirewireConfigurationGroup(parent));
 }
 
 void CaptureCardGroup::triggerChanged(const QString& value) 
@@ -849,16 +918,24 @@ CaptureCard::CaptureCard()
 
 void CaptureCard::fillSelections(QSqlDatabase* db,
                                  SelectSetting* setting) {
-    QString query = QString("SELECT cardtype, videodevice, cardid "
+    QString query = QString("SELECT cardtype, videodevice, cardid, firewire_port, firewire_node "
                             "FROM capturecard WHERE hostname = \"%1\";")
                             .arg(gContext->GetHostName());
     QSqlQuery result = db->exec(query);
 
     if (result.isActive() && result.numRowsAffected() > 0)
         while (result.next())
-            setting->addSelection("[ " + result.value(0).toString() + " : " +
+            // dont like doing this..
+            if(result.value(0).toString() == "FIREWIRE") {
+                     setting->addSelection("[ " + result.value(0).toString() + " Port: " +
+                                  result.value(3).toString() + ", Node: " +
+                                  result.value(4).toString() + "]",
+                                  result.value(2).toString());
+            } else {
+                     setting->addSelection("[ " + result.value(0).toString() + " : " +
                                   result.value(1).toString() + " ]",
                                   result.value(2).toString());
+            }
 }
 
 void CaptureCard::loadByID(QSqlDatabase* db, int cardid) {
@@ -886,6 +963,8 @@ void CardType::fillSelections(SelectSetting* setting)
                           "HDTV");
     setting->addSelection(QObject::tr("Digital Video Broadcast card (DVB)"), 
                           "DVB");
+    setting->addSelection(QObject::tr("FireWire Input"),
+                          "FIREWIRE");
 }
 
 class CardID: public SelectLabelSetting, public CISetting {
@@ -1394,7 +1473,8 @@ void CardInputEditor::load(QSqlDatabase* db) {
     // SelectSetting provided a facility to edit the labels, we
     // could use CaptureCard::fillSelections
 
-    QString thequery = QString("SELECT cardid, videodevice, cardtype, dvb_diseqc_type "
+    QString thequery = QString("SELECT cardid, videodevice, cardtype, dvb_diseqc_type, "
+                               "firewire_port, firewire_node "
                                "FROM capturecard WHERE hostname = \"%1\";")
                               .arg(gContext->GetHostName());
 
@@ -1405,27 +1485,7 @@ void CardInputEditor::load(QSqlDatabase* db) {
             QString videodevice(capturecards.value(1).toString());
 
             QStringList inputs;
-            if (capturecards.value(2).toString() != "DVB")
-            {
-                inputs = VideoDevice::probeInputs(videodevice);
-                for (QStringList::iterator i = inputs.begin(); 
-                     i != inputs.end(); ++i)
-                {
-                    CardInput* cardinput = new CardInput();
-                    cardinput->loadByInput(db, cardid, *i);
-                    cardinputs.push_back(cardinput);
-                    QString index = QString::number(cardinputs.size()-1);
-
-                    QString label = QString("%1 (%2) -> %3")
-                        .arg("[ " + capturecards.value(2).toString() +
-                             " : " + capturecards.value(1).toString() +
-                             " ]")
-                        .arg(*i)
-                        .arg(cardinput->getSourceName());
-                    addSelection(label, index);
-                }
-            }
-            else
+            if (capturecards.value(2).toString() == "DVB")
             {
                 QValueList<DVBDiseqcInputList> dvbinput;
                 dvbinput = VideoDevice::fillDVBInputsDiseqc(capturecards.value(3).toInt());
@@ -1447,6 +1507,48 @@ void CardInputEditor::load(QSqlDatabase* db) {
                              " : " + capturecards.value(1).toString() +
                              " ]")
                         .arg((*it).input)
+                        .arg(cardinput->getSourceName());
+                    addSelection(label, index);
+                }
+            }
+            else if(capturecards.value(2).toString() == "FIREWIRE")
+            {
+                inputs = QStringList("MPEG2TS");
+                for (QStringList::iterator i = inputs.begin();
+                     i != inputs.end(); ++i)
+                { 
+                    CardInput* cardinput = new CardInput();
+                    cardinput->loadByInput(db, cardid, *i);   
+                    cardinputs.push_back(cardinput);
+                    QString index = QString::number(cardinputs.size()-1);
+
+                    QString label;
+                    label = QString("%1 (%2) -> %3")
+                        .arg("[ " + capturecards.value(2).toString() +
+                             " Port: " + capturecards.value(3).toString() +
+                             ", Node: " + capturecards.value(4).toString() +
+                             " ]")
+                        .arg(*i)
+                        .arg(cardinput->getSourceName());
+                    addSelection(label, index);
+                }
+            }
+            else
+            {
+                inputs = VideoDevice::probeInputs(videodevice);
+                for (QStringList::iterator i = inputs.begin(); 
+                     i != inputs.end(); ++i)
+                {
+                    CardInput* cardinput = new CardInput();
+                    cardinput->loadByInput(db, cardid, *i);
+                    cardinputs.push_back(cardinput);
+                    QString index = QString::number(cardinputs.size()-1);
+
+                    QString label = QString("%1 (%2) -> %3")
+                        .arg("[ " + capturecards.value(2).toString() +
+                             " : " + capturecards.value(1).toString() +
+                             " ]")
+                        .arg(*i)
                         .arg(cardinput->getSourceName());
                     addSelection(label, index);
                 }
@@ -1630,6 +1732,7 @@ void DVBDefaultInput::fillSelections(const QString& type) {
 
     for(QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i)
         addSelection(*i);
+
 }
 
 void TunerCardInput::fillSelections(const QString& device) {

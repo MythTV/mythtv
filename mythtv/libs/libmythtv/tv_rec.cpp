@@ -37,6 +37,11 @@ using namespace std;
 #include "siscan.h"
 #endif
 
+#ifdef USING_FIREWIRE
+#include "firewirerecorder.h"
+#include "firewirechannel.h"
+#endif
+
 void *SpawnEncode(void *param)
 {
     RecorderBase *nvr = (RecorderBase *)param;
@@ -86,7 +91,7 @@ TVRec::TVRec(int capturecardnum)
     QString inputname, startchannel;
 
     GetDevices(capturecardnum, videodev, vbidev, audiodev, audiosamplerate,
-               inputname, startchannel, cardtype, dvb_options, skip_btaudio);
+               inputname, startchannel, cardtype, dvb_options, firewire_options, skip_btaudio);
 
     if (cardtype == "DVB")
     {
@@ -109,6 +114,24 @@ TVRec::TVRec(int capturecardnum)
 #else
         VERBOSE(VB_IMPORTANT, "ERROR: DVB Card configured, "
                               "but no DVB support compiled in!");
+        VERBOSE(VB_IMPORTANT, "Remove the card from configuration, "
+                              "or recompile MythTV.");
+        exit(-20);
+#endif
+    }
+    if (cardtype == "FIREWIRE")
+    {
+#ifdef USING_FIREWIRE
+        channel = new FirewireChannel(this);
+        channel->Open();
+        if (inputname.isEmpty())
+            channel->SetChannelByString(startchannel);
+        else
+            channel->SwitchToInput(inputname, startchannel);
+        channel->SetChannelOrdering(chanorder);
+#else
+        VERBOSE(VB_IMPORTANT, "ERROR: FireWire Input configured, "
+                              "but no FireWire support compiled in!");
         VERBOSE(VB_IMPORTANT, "Remove the card from configuration, "
                               "or recompile MythTV.");
         exit(-20);
@@ -645,6 +668,20 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         nvr->Initialize();
         return;
     }
+    else if (cardtype == "FIREWIRE")
+    {
+#ifdef USING_FIREWIRE
+        nvr = new FirewireRecorder();
+        nvr->SetRingBuffer(rbuffer);
+        nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
+        nvr->SetOption("port", firewire_options.port);
+        nvr->SetOption("node", firewire_options.node);
+        nvr->SetOption("speed", firewire_options.speed);
+        nvr->SetOption("model", firewire_options.model);
+        nvr->Initialize();
+#endif
+        return;
+    }
     else if (cardtype == "DVB")
     {
 #ifdef USING_DVB
@@ -1096,7 +1133,8 @@ void TVRec::DisconnectDB(void)
 void TVRec::GetDevices(int cardnum, QString &video, QString &vbi, 
                        QString &audio, int &rate, QString &defaultinput,
                        QString &startchan, QString &type, 
-                       dvb_options_t &dvb_opts, bool &skip_bt)
+                       dvb_options_t &dvb_opts, firewire_options_t &firewire_opts, 
+                       bool &skip_bt)
 {
     video = "";
     vbi = "";
@@ -1113,7 +1151,9 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
                                "audioratelimit,defaultinput,cardtype,"
                                "dvb_swfilter, dvb_recordts,"
                                "dvb_wait_for_seqstart,dvb_dmx_buf_size,"
-                               "dvb_pkt_buf_size, skipbtaudio, dvb_on_demand "
+                               "dvb_pkt_buf_size, skipbtaudio, dvb_on_demand,"
+                               "firewire_port, firewire_node, firewire_speed,"
+                               "firewire_model "
                                "FROM capturecard WHERE cardid = %1;")
                               .arg(cardnum);
 
@@ -1158,6 +1198,12 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
 
         skip_bt = query.value(11).toInt();
         dvb_opts.dvb_on_demand = query.value(12).toInt();
+        firewire_opts.port = query.value(13).toInt();
+        firewire_opts.node = query.value(14).toInt(); 
+        firewire_opts.speed = query.value(15).toInt();
+        test = query.value(16).toString();
+        if (test != QString::null)
+	   firewire_opts.model = QString::fromUtf8(test);
     }
 
     thequery = QString("SELECT if(startchan!='', startchan, '3') "

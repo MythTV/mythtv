@@ -53,6 +53,8 @@ class AudioOutputBase : public AudioOutput
 
     QString GetError() { return lastError; };
 
+    virtual void SetSourceBitrate(int rate);
+
  protected:
 
     // You need to implement the following functions
@@ -147,7 +149,9 @@ class AudioOutputBase : public AudioOutput
     int numlowbuffer;
 
     QMutex killAudioLock;
-    
+
+    long current_seconds;
+    long source_bitrate;    
 };
 
 #endif
