@@ -362,15 +362,22 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
             update(SelectRect);
             update(ContentRect);
         }
-        else if ((action == "LEFT") &&
-                 (inContent))
+        else if (action == "LEFT")
         {
-            inContent = false;
-            contentPos = 0;
-            list_area->SetActive(false);
-            icon_list->SetActive(true);
-            update(SelectRect);
-            update(ContentRect);
+            if (inContent)
+            {
+                inContent = false;
+                contentPos = 0;
+                list_area->SetActive(false);
+                icon_list->SetActive(true);
+                update(SelectRect);
+                update(ContentRect);
+            }
+            else
+            {
+                if (gContext->GetNumSetting("UseArrowAccels", 1))
+                    accept();
+            }
         }
         else if ((currentItem == QObject::tr("Log Entries")) &&
                  (logNumberKeys.search(action) == 0))
