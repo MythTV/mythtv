@@ -493,7 +493,7 @@ void TitleDialog::wireUpTheme()
     if(editor_hack)
     {
         editor_hack->allowFocus(true);
-        QFont f( "arial", 14, QFont::Bold);
+        QFont f = gContext->GetMediumFont();
         name_editor = new MythRemoteLineEdit(&f, this);
         name_editor->setFocusPolicy(QWidget::NoFocus);
         name_editor->setGeometry(editor_hack->getScreenArea());

@@ -71,7 +71,7 @@ MainVisual::MainVisual(QWidget *parent, const char *name)
     setGeometry(0, 0, parent->width(), parent->height());
     //setFixedSize(QSize(parent->width(), parent->height()));
 
-    setFont(QFont("Arial", (int)(18 * hmult), QFont::Bold));
+    setFont(gContext->GetBigFont());
     setCursor(QCursor(Qt::BlankCursor));
 
     timer = new QTimer(this);
