@@ -2333,8 +2333,8 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                              
             if(!show_whole_tree)
             {
-                x_location = area.left() + 40; // that 40 is a HACK
-                y_location = area.top() + (area.height() / 2);
+                x_location = area.left();
+                y_location = area.top() + (area.height() / 2) + (QFontMetrics(tmpfont->face).height() / 2);
             }
 
             if(i == bins)
@@ -2457,15 +2457,33 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 
                 if(draw_up_arrow)
                 {
-                    p->drawPixmap(bin_corners[i].right() - up_arrow_image.width(), 
-                                  bin_corners[i].top(), 
-                                  up_arrow_image);
+                    if(show_whole_tree)
+                    {
+                        p->drawPixmap(bin_corners[i].right() - up_arrow_image.width(), 
+                                      bin_corners[i].top(), 
+                                      up_arrow_image);
+                    }
+                    else
+                    {
+                        p->drawPixmap(area.right() - up_arrow_image.width(), 
+                                      area.top(), 
+                                      up_arrow_image);
+                    }
                 }
                 if(draw_down_arrow)
                 {
-                    p->drawPixmap(bin_corners[i].right() - down_arrow_image.width(),
-                                  bin_corners[i].bottom() - down_arrow_image.height(),
-                                  down_arrow_image);
+                    if(show_whole_tree)
+                    {
+                        p->drawPixmap(bin_corners[i].right() - down_arrow_image.width(),
+                                      bin_corners[i].bottom() - down_arrow_image.height(),
+                                      down_arrow_image);
+                    }
+                    else
+                    {
+                        p->drawPixmap(area.right() - down_arrow_image.width(),
+                                      area.bottom() - down_arrow_image.height(),
+                                      down_arrow_image);
+                    }
                 }
             }
             
@@ -2514,7 +2532,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             a_limit = bin_corners[i].bottom();
             if(!show_whole_tree)
             {
-                a_limit = area.bottom() - 20;   //HACK!!
+                a_limit = area.bottom();
             }
             while (y_location < a_limit)
             {
@@ -2691,7 +2709,7 @@ void UIManagedTreeListType::makeHighlights()
     fontProp *tmpfont = NULL;
     QString a_string = QString("bin%1-active").arg(bins);
     tmpfont = &m_fontfcns[m_fonts[a_string]];
-    temp_pixmap->convertFromImage(temp_image.smoothScale(area.width() - 80 , QFontMetrics(tmpfont->face).height() )); // HACK
+    temp_pixmap->convertFromImage(temp_image.smoothScale(area.width(), QFontMetrics(tmpfont->face).height() ));
     resized_highlight_images.append(temp_pixmap);
     highlight_map[0] = temp_pixmap;
     
@@ -3052,7 +3070,8 @@ void UIManagedTreeListType::calculateScreenArea()
         ++i;
         screen_corners[i] = r;
     }
-    screen_area = area;
+    
+    screen_area = m_parent->GetAreaRect();
 }
 
 
