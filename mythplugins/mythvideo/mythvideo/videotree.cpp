@@ -182,8 +182,9 @@ void VideoTree::handleTreeListSelection(int node_int, IntVector *)
 
         QString filename = node_data->Filename();
         QString handler = gContext->GetSetting("VideoDefaultPlayer");
-        QString command = handler.replace(QRegExp("%s"), QString("\"%1\"")
-                          .arg(filename.replace(QRegExp("\""), "\\\"")));
+        QString arg;
+        arg.sprintf("\"%s\"", filename.replace(QRegExp("\""), "\\\"").ascii());
+        QString command = handler.replace(QRegExp("%s"), arg);
 
         // cout << "command:" << command << endl;
         

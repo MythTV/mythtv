@@ -224,15 +224,10 @@ void SearchDir(QSqlDatabase *db, QString &directory)
         {
             QString name(iter.key());
             name.replace(quote_regex, "\"\"");
-            QString title = name.right(name.length() - name.findRev("/") - 1);
-            title.replace(QRegExp("_"), " ");
-            title = title.left(title.findRev("."));
-            title.replace(QRegExp("\\."), " ");
-            title = title.left(title.find("["));
-            title = title.left(title.find("("));
 
-            myNewFile = new Metadata(name, "No Cover", title, 1895, "00000000", 
+            myNewFile = new Metadata(name, "No Cover", "", 1895, "00000000", 
                                      "Unknown", "None", 0.0, "NR", 0, 0, 1);
+            myNewFile->guessTitle();
             myNewFile->dumpToDatabase(db);
             if (myNewFile)
                 delete myNewFile;
@@ -242,8 +237,9 @@ void SearchDir(QSqlDatabase *db, QString &directory)
             QString name(iter.key());
             name.replace(quote_regex, "\"\"");
  
-            QString querystr = QString("DELETE FROM videometadata WHERE "
-                                       "filename=\"%1\"").arg(name);
+            QString querystr;
+            querystr.sprintf("DELETE FROM videometadata WHERE "
+                                       "filename=\"%s\"", name.ascii());
             query.exec(querystr);
         }
 

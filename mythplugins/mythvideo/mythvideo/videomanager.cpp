@@ -399,7 +399,7 @@ int VideoManager::GetMovieListing(QString movieName)
     InetGrabber = new INETComms(url);
 
     urlTimer->stop();
-    urlTimer->start(5000);
+    urlTimer->start(10000);
 
     stopProcessing = false;
     while (!InetGrabber->isDone())
@@ -458,7 +458,8 @@ void VideoManager::ParseMovieData(QString data)
         movieYear = mYear.toInt();
  
     movieDirector = parseData(data, ">Directed by</b><br>\n<a href=\"/Name?", "</a><br>");
-    movieDirector = movieDirector.right(movieDirector.length() - movieDirector.find("\">") - 2);
+    if (movieDirector != "<NULL>")
+        movieDirector = movieDirector.right(movieDirector.length() - movieDirector.find("\">") - 2);
     moviePlot = parseData(data, "<b class=\"ch\">Plot Outline:</b> ", "<a href=\"");
     if (moviePlot == "<NULL>")
         moviePlot = parseData(data, "<b class=\"ch\">Plot Summary:</b> ", "<a href=\"");
@@ -1389,15 +1390,9 @@ void VideoManager::selected()
 
 void VideoManager::ResetCurrentItem()
 {
-    QString name = curitem->Filename();
-    QString title = name.right(name.length() - name.findRev("/") - 1);
-    title = title.left(title.find("."));
-    title = title.left(title.find("["));
-    title = title.left(title.find("("));
-
     QString coverFile = "No Cover";
 
-    curitem->setTitle(title);
+    curitem->guessTitle();
     curitem->setCoverFile(coverFile);
     curitem->setYear(1895);
     curitem->setInetRef("00000000");

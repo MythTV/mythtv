@@ -132,13 +132,14 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
     QString sqlcoverfile = coverfile;
     sqlcoverfile.replace(QRegExp("\""), QString("\\\""));
 
-    QString thequery = QString("INSERT INTO videometadata (title,director,plot,"
-                               "rating,year,userrating,length,filename,showlevel,coverfile,inetref) VALUES "
-                               "(\"%1\",\"%2\",\"%3\",\"%4\",%5,%6,%7,\"%8\",%9,")
-                              .arg(title.latin1()).arg(director.latin1())
-                              .arg(plot.latin1()).arg(rating.latin1()).arg(year)
-                              .arg(userrating).arg(length).arg(sqlfilename).arg(showlevel);
-    thequery = thequery + QString("\"%1\",\"%2\");").arg(sqlcoverfile).arg(inetref);
+    QString thequery;
+    thequery.sprintf("INSERT INTO videometadata (title,director,plot,"
+                              "rating,year,userrating,length,filename,showlevel,coverfile,inetref) VALUES "
+                              "(\"%s\",\"%s\",\"%s\",\"%s\",%d,%f,%d,\"%s\",%d,\"%s\",\"%s\");",
+                              title.latin1(), director.latin1(),
+                              plot.latin1(), rating.latin1(), year,
+                              userrating, length, sqlfilename.ascii(), showlevel,
+                              sqlcoverfile.ascii(), inetref.ascii());
 
     db->exec(thequery);
 
@@ -146,10 +147,21 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
     fillData(db);
 }
 
+void Metadata::guessTitle()
+{
+    title = filename.right(filename.length() - filename.findRev("/") - 1);
+    title.replace(QRegExp("_"), " ");
+    title.replace(QRegExp("%20"), " ");
+    title = title.left(title.findRev("."));
+    title.replace(QRegExp("\\."), " ");
+    title = title.left(title.find("["));
+    title = title.left(title.find("("));
+}
+
 void Metadata::updateDatabase(QSqlDatabase *db)
 {
     if (title == "")
-        title = filename;
+        guessTitle();
     if (director == "")
         director = "Unknown";
     if (plot == "")
@@ -172,14 +184,14 @@ void Metadata::updateDatabase(QSqlDatabase *db)
     QString sqlcoverfile = coverfile;
     sqlcoverfile.replace(QRegExp("\""), QString("\\\""));
 
-    QString thequery = QString("UPDATE videometadata SET title=\"%1\",director=\"%2\",plot=\"%3\","
-                               "rating=\"%4\",year=%5,userrating=%6,length=%7,filename=\"%8\","
-                               "showlevel=%9,")
-                              .arg(title.latin1()).arg(director.latin1())
-                              .arg(plot.latin1()).arg(rating.latin1()).arg(year)
-                              .arg(userrating).arg(length).arg(sqlfilename).arg(showlevel);
-    thequery = thequery + QString("coverfile=\"%1\",inetref=\"%2\" WHERE intid=%3").arg(sqlcoverfile).arg(inetref)
-                              .arg(id);
+    QString thequery;
+    thequery.sprintf("UPDATE videometadata SET title=\"%s\",director=\"%s\",plot=\"%s\","
+                              "rating=\"%s\",year=%d,userrating=%f,length=%d,filename=\"%s\","
+                              "showlevel=%d,coverfile=\"%s\",inetref=\"%s\" WHERE intid=%d",
+                              title.latin1(), director.latin1(),
+                              plot.latin1(), rating.latin1(), year,
+                              userrating, length, sqlfilename.ascii(), showlevel,
+                              sqlcoverfile.ascii(), inetref.ascii(), id);
 
     db->exec(thequery);
 }

@@ -81,6 +81,7 @@ class Metadata
     QString CoverFile() const { return coverfile; }
     void setCoverFile(QString &lcoverfile) { coverfile = lcoverfile; }
 
+    void guessTitle();
     void setField(QString field, QString data);
     void dumpToDatabase(QSqlDatabase *db);
     void updateDatabase(QSqlDatabase *db);
