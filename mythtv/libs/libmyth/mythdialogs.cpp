@@ -707,6 +707,12 @@ QButton *MythPopupBox::addButton(QString caption, QObject *target,
 
 void MythPopupBox::ShowPopup(QObject *target, const char *slot)
 {
+    ShowPopupAtXY(-1, -1, target, slot);
+}
+
+void MythPopupBox::ShowPopupAtXY(int destx, int desty, 
+                                 QObject *target, const char *slot)
+{
     const QObjectList *objlist = children();
     QObjectListIt it(*objlist);
     QObject *objs;
@@ -752,8 +758,18 @@ void MythPopupBox::ShowPopup(QObject *target, const char *slot)
         height = parentWidget()->height();
     }
 
-    x = (int)(width / 2) - (int)(maxw / 2);
-    y = (int)(height / 2) - (int)(poph / 2);
+    if (destx == -1)
+        x = (int)(width / 2) - (int)(maxw / 2);
+    else
+        x = destx;
+
+    if (desty == -1)
+        y = (int)(height / 2) - (int)(poph / 2);
+    else
+        y = desty;
+
+    if (poph + y > height)
+        y = height - poph - (int)(8 * hmult);
 
     setFixedSize(maxw, poph);
     setGeometry(x, y, maxw, poph);

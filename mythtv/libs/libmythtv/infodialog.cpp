@@ -76,14 +76,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
     lview->setFixedHeight((int)(225 * hmult));
     lview->header()->hide();
 
-    connect(lview, SIGNAL(returnPressed(QListViewItem *)), this,
-            SLOT(selected(QListViewItem *)));
-    connect(lview, SIGNAL(spacePressed(QListViewItem *)), this,
-            SLOT(selected(QListViewItem *)));
-    connect(lview, SIGNAL(infoPressed(QListViewItem *)), this,
-            SLOT(advancedEdit(QListViewItem *)));
-    connect(lview, SIGNAL(numberPressed(QListViewItem *, int)), this,
-            SLOT(numberPress(QListViewItem *, int)));
+    lview->installEventFilter(this);
 
     RecListItem *item = new RecListItem(lview, tr("Record this program whenever"
                                         " it's shown anywhere"), kAllRecord);
@@ -172,6 +165,48 @@ QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
     QLabel *date = new QLabel(timedate, this);
 
     return date;
+}
+
+bool InfoDialog::eventFilter(QObject *o, QEvent *e)
+{
+    (void)o;
+
+    if (e->type() != QEvent::KeyPress)
+        return false;
+
+    QKeyEvent *ke = (QKeyEvent *)e;
+
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Qt", ke, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
+    {
+        QString action = actions[i];
+        if (action == "MENU" || action == "INFO")
+        {
+            handled = true;
+            advancedEdit(lview->currentItem());
+        }
+        else if (action == "SELECT")
+        {
+            handled = true;
+            selected(lview->currentItem());
+        }
+        else if (action == "0" || action == "1" || action == "2" ||
+                 action == "3" || action == "4" || action == "5" ||
+                 action == "6" || action == "7" || action == "8" ||
+                 action == "9")
+        {
+            handled = true;
+            numberPress(lview->currentItem(), action.toInt());
+        }
+    }
+
+    if (handled)
+        return true;
+
+    return false;
 }
 
 void InfoDialog::selected(QListViewItem *selitem)

@@ -158,6 +158,9 @@ class MythPopupBox : public MythDialog
                        const char *slot = NULL);
 
     void ShowPopup(QObject *target = NULL, const char *slot = NULL);
+    void ShowPopupAtXY(int destx, int desty, 
+                       QObject *target = NULL, const char *slot = NULL);
+
     int ExecPopup(QObject *target = NULL, const char *slot = NULL);
 
     static void showOkPopup(MythMainWindow *parent, QString title,

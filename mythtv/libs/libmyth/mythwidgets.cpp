@@ -969,9 +969,6 @@ void MythPushButton::keyReleaseEvent(QKeyEvent *e)
 MythListView::MythListView(QWidget *parent)
             : QListView(parent)
 {
-    allowkeypress = true;
-    fixspace = true;
-
     viewport()->setPalette(palette());
     horizontalScrollBar()->setPalette(palette());
     verticalScrollBar()->setPalette(palette());
@@ -1000,105 +997,39 @@ void MythListView::ensureItemVCentered ( const QListViewItem * i )
     }
 }
 
-/* XXX FIXME */
 void MythListView::keyPressEvent(QKeyEvent *e)
 {
-    if (!allowkeypress)
-        return;
-
     if (currentItem() && !currentItem()->isEnabled())
     {
+        QListView::keyPressEvent(e);
+        return;
+
     }
-    else
+
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Qt", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        switch(e->key())
+        QString action = actions[i];
+        if (action == "UP" && currentItem() == firstChild())
         {
-            case 'd': 
-            case 'D': 
-                emit deletePressed(currentItem()); 
-                return;
-                
-            case 'p': 
-            case 'P': 
-                emit playPressed(currentItem()); 
-                return;
-                
-            case 'i':
-            case 'I':
-                emit infoPressed(currentItem());
-                return;
-                
-            case '0':
-                emit numberPressed(currentItem(), 0);
-                return;
-                
-            case '1':
-                emit numberPressed(currentItem(), 1);
-                return;
-                
-            case '2':
-                emit numberPressed(currentItem(), 2);
-                return;
-                
-            case '3':
-                emit numberPressed(currentItem(), 3);
-                return;
-                
-            case '4':
-                emit numberPressed(currentItem(), 4);
-                return;
-                
-            case '5':
-                emit numberPressed(currentItem(), 5);
-                return;
-                
-            case '6':
-                emit numberPressed(currentItem(), 6);
-                return;
-                
-            case '7':
-                emit numberPressed(currentItem(), 7);
-                return;
-                
-            case '8':
-                emit numberPressed(currentItem(), 8);
-                return;
-                
-            case '9':
-                emit numberPressed(currentItem(), 9);
-                return;
-                
-        }
-        if(e->key() == Key_Up && currentItem() == firstChild())
-        {
-            //
-            //  Key_Up at top of list allows
-            //  focus to move to other widgets
-            //
+            // Key_Up at top of list allows focus to move to other widgets
             clearSelection();
-            if(!focusNextPrevChild(false))
+            if (!focusNextPrevChild(false))
             {
-                // BUT (if we get here) there
-                // was no other widget to take
-                // the focus 
+                // BUT (if we get here) there was no other widget to take focus 
                 setSelected(currentItem(), true);
             }
         }
-        if(e->key() == Key_Down && currentItem() == lastItem())
+        else if (action == "DOWN" && currentItem() == lastItem())
         {
-            //
-            //  Key_Down at bottom of list allows
-            //  focus to move to other widgets
-            //
+            // Key_Down at bottom of list allows focus to move to other widgets
             clearSelection();
-            if(!focusNextPrevChild(true))
-            {
+            if (!focusNextPrevChild(true))
                 setSelected(currentItem(), true);
-            }
         }
-        if (e->key() == Key_Space ||
-            e->key() == Key_Return ||
-            e->key() == Key_Enter)
+        else if (action == "SELECT")
         {
             emit spacePressed(currentItem());
             return;
@@ -1106,7 +1037,6 @@ void MythListView::keyPressEvent(QKeyEvent *e)
     }
 
     QListView::keyPressEvent(e);
-    emit unhandledKeyPress(e);
 }
 
 void MythListView::focusInEvent(QFocusEvent *e)

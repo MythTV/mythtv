@@ -24,6 +24,9 @@ class InfoDialog : public MythDialog
     void advancedEdit(QListViewItem *);
     void numberPress(QListViewItem *, int);
 
+  protected:
+    bool eventFilter(QObject *o, QEvent *e);
+
   private:
     QLabel *getDateLabel(ProgramInfo *pginfo);
 
