@@ -125,6 +125,17 @@
         <catcolor category="Game" color="orchid"></catcolor>
         <catcolor category="Children's" color="MediumSlateBlue"></catcolor>
         <catcolor category="Kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="CINE" color="Blue"></catcolor>
+        <catcolor category="SERIE" color="DarkOrchid"></catcolor>
+        <catcolor category="DOCUMENTAL" color="goldenrod"></catcolor>
+        <catcolor category="INFORMATIVO" color="DarkOrange3"></catcolor>
+        <catcolor category="DEPORTES" color="DarkCyan"></catcolor>
+        <catcolor category="FUTBOL" color="DarkCyan"></catcolor>
+        <catcolor category="MUSICAL" color="turquoise3"></catcolor>
+        <catcolor category="INFANTIL" color="MediumSlateBlue"></catcolor>
+        <catcolor category="MAGAZINE" color="MediumTurquoise"></catcolor>
+        <catcolor category="TIEMPO" color="#33ff99"></catcolor>
+        <catcolor category="SHOW" color="sienna"></catcolor>
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
         <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
         <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
@@ -303,6 +314,17 @@
         <catcolor category="Game" color="orchid"></catcolor>
         <catcolor category="Children's" color="MediumSlateBlue"></catcolor>
         <catcolor category="Kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="CINE" color="Blue"></catcolor>
+        <catcolor category="SERIE" color="DarkOrchid"></catcolor>
+        <catcolor category="DOCUMENTAL" color="goldenrod"></catcolor>
+        <catcolor category="INFORMATIVO" color="DarkOrange3"></catcolor>
+        <catcolor category="DEPORTES" color="DarkCyan"></catcolor>
+        <catcolor category="FUTBOL" color="DarkCyan"></catcolor>
+        <catcolor category="MUSICAL" color="turquoise3"></catcolor>
+        <catcolor category="INFANTIL" color="MediumSlateBlue"></catcolor>
+        <catcolor category="MAGAZINE" color="MediumTurquoise"></catcolor>
+        <catcolor category="TIEMPO" color="#33ff99"></catcolor>
+        <catcolor category="SHOW" color="sienna"></catcolor>
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
         <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
         <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
@@ -435,6 +457,8 @@
         <font>info</font>
         <value>Scheduled Recordings:</value>
         <value lang="IT">Registrazioni programmate:</value>
+        <value lang="ES">Grabaciones programadas</value>
+        <value lang="CA">Gravacions programades</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>cr-background.png</filename>
@@ -445,24 +469,32 @@
         <font>message</font>
         <value>Conflicting recordings are highlighted in</value>
         <value lang="IT">Le registrazioni in conflitto sono evidenziate in</value>
+        <value lang="ES">Las grabaciones en conflicto est√°n resaltadas en</value>
+        <value lang="CA">Les gravacions en conflicte s√≥Ûn les de color</value>
       </textarea>
       <textarea name="conyellow" draworder="0">
         <area>452,330,800,40</area>
         <font>messageyellow</font>
         <value>yellow</value>
         <value lang="IT">giallo</value>
+        <value lang="ES">amarillo</value>
+        <value lang="CA">groc</value>
       </textarea>
       <textarea name="disingray" draworder="0">
         <area>20,357,800,40</area>
         <font>message</font>
         <value>Deactivated recordings are highlighted in</value>
         <value lang="IT">Le registrazioni disattivate sono evidenziate in</value>
+        <value lang="ES">Las grabaciones desactivadas se resaltan en</value>
+        <value lang="CA">Les gravacions desactivades s√≥Ûn de color</value>
       </textarea>
       <textarea name="disgray" draworder="0">
         <area>458,357,800,40</area>
         <font>messagegray</font>
         <value>gray</value>
         <value lang="IT">grigio</value>
+        <value lang="ES">gris</value>
+        <value lang="CA">gris</value>
       </textarea>
     </container>
  
@@ -512,6 +544,8 @@
         <area>20,70,160,30</area>
         <font>info</font>
         <value>Airdate:</value>
+        <value lang="ES">Fecha de emisi√≥Ûn:</value>
+        <value lang="CA">Data d'emisi√≥Û:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -521,6 +555,8 @@
         <area>20,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
+        <value lang="ES">Canal:</value>
+        <value lang="CA">Canal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -530,6 +566,8 @@
         <area>20,130,160,30</area>
         <font>info</font>
         <value>Description:</value>
+        <value lang="ES">Descripci√≥Ûn:</value>
+        <value lang="CA">Descripci√≥Û:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,600,120</area>
@@ -545,6 +583,8 @@
          <font>info</font>
          <value>You Haven't Scheduled Any Programs To Be Recorded</value>
          <value lang="IT">Non hai programmato nessuna registrazione</value>
+         <value lang="ES">No tiene programada ninguna grabaci√≥Ûn</value>
+         <value lang="CA">No hi ha prevista cap gravaci√≥Û</value>
          <multiline>yes</multiline> 
       </textarea>
     </container>
@@ -555,12 +595,16 @@
          <font>info</font>
          <value>To schedule a recording, exit this screen and</value>
          <value lang="IT">Per programmare una registrazione,</value>
+         <value lang="ES">Para programar una grabaci√≥Ûn salga y</value>
+         <value lang="CA">Per programar una gravaci√≥Û surti i</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,70,760,30</area>
          <font>info</font>
          <value>Select 'Program Guide' or 'Program Finder'</value>
          <value lang="IT">esci e seleziona "Guida Programmi" o "Ricerca Programmi"</value>
+         <value lang="ES">"seleccione "Guia de Programas" o "Busqueda de programas"</value>
+         <value lang="CA">vagi a "Guia de programes" Û "Cercar Programes"</value>
       </textarea>
     </container>
 
@@ -624,6 +668,8 @@
         <font>message</font>
         <value>Select a recording to permanently delete:</value>
         <value lang="IT">Seleziona una registrazione da cancellare:</value>
+        <value lang="ES">Seleccione una grabaci√≥Ûn a borrar:</value>
+        <value lang="CA">Esculli una gravaci√≥Û a esborrar:</value>
         <context>1</context>
       </textarea>
       <textarea name="messageplay" draworder="0">
@@ -631,6 +677,8 @@
         <font>message</font>
         <value>Select a recording to view:</value>
         <value lang="IT">Seleziona una registrazione da vedere:</value>
+        <value lang="ES">Seleccione una grabaci√≥Ûn a ver:</value>
+        <value lang="CA">Esculli la gravaci√≥Û que vol veure:</value>
         <context>0</context>
       </textarea>
     </container>
@@ -696,6 +744,8 @@
         <area>20,70,160,30</area>
         <font>info</font>
         <value>Airdate:</value>
+        <value lang="ES">Fecha de emisi√≥Ûn:</value>
+        <value lang="CA">Data d'emisi√≥Û:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -705,6 +755,8 @@
         <area>20,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
+        <value lang="ES">Canal:</value>
+        <value lang="CA">Canal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -714,6 +766,8 @@
         <area>20,130,160,30</area>
         <font>info</font>
         <value>Description:</value>
+        <value lang="ES">Descripci√≥Ûn:</value>
+        <value lang="CA">Descripci√≥Û:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,400,120</area>
@@ -737,6 +791,8 @@
         <area>20,70,160,30</area>
         <font>info</font>
         <value>Airdate:</value>
+        <value lang="ES">Fecha de emisi√≥Ûn:</value>
+        <value lang="CA">Data d'emisi√≥Û:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -746,6 +802,8 @@
         <area>20,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
+        <value lang="ES">Canal:</value>
+        <value lang="CA">Canal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -755,6 +813,8 @@
         <area>20,130,160,30</area>
         <font>info</font>
         <value>Description:</value>
+        <value lang="ES">Descripci√≥Ûn:</value>
+        <value lang="CA">Descripci√≥Û:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,400,90</area>
@@ -792,6 +852,8 @@
          <font>info</font>
          <value>Sorry, No Recordings Available</value>
          <value lang="IT">Spiacente, nessuna registrazione disponibile</value>
+         <value lang="ES">Lo siento, no hay ninguna grabaci√≥Ûn disponible</value>
+         <value lang="CA">Ho sento, no hi ha cap gravaci√≥Û disponible</value>
       </textarea>
     </container>
 
@@ -801,12 +863,16 @@
          <font>info</font>
          <value>To schedule a recording, exit this screen and</value>
          <value lang="IT">Per programmare una registrazione,</value>
+         <value lang="ES">Para programar una grabaci√≥Ûn, salga y</value>
+         <value lang="CA">Per a programar una gravaci√≥Û, surti i</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,110,580,30</area>
          <font>info</font>
          <value>Select 'Schedule a Recording' from the Main Menu</value>
          <value lang="IT">esci e seleziona 'Programma una registrazione'</value>
+         <value lang="ES">seleccione 'Programar grabaciones'</value>
+         <value lang="CA">esculli 'Programar gravacions'</value>
       </textarea>
     </container>
 
@@ -874,6 +940,8 @@
         <font>info</font>
         <value>(4) Program Guide   **(6) Program Finder **</value>
         <value lang="IT">(4) Guida Programmi   **(6) Ricerca Programmi **</value>
+        <value lang="ES">(4) Guia de Programas **(6) Busqueda de programas **</value>
+        <value lang="CA">(4) Guia de programes **(6) Cerca Programes **</value>
         <context>1</context>
       </textarea>
     </container>
@@ -951,12 +1019,16 @@
         <area>10,5,500,30</area>
         <font>info</font>
         <value>Select a letter...</value>
+        <value lang="ES">Seleccione una letra...</value>
+        <value lang="CA">Esculli una lletra...</value>
       </textarea>
       <textarea name="pickinfo" draworder="6">
         <area>10,75,500,60</area>
         <font>info</font>
         <value>Pick the letter in which the show starts with, then hit ENTER or the right arrow</value>
         <value lang="IT">Seleziona la lettera iniziale del programma e premi OK oppure la freccia destra</value>
+        <value lang="ES">Seleccione la letra inicial del programa y pulse OK o cursor derecha</value>
+        <value lang="CA">Esculli la lletra inicial del programa i premi OK o fletxa dreta</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -968,12 +1040,16 @@
         <font>info</font>
         <value>Select a program...</value>
         <value lang="IT">Seleziona un programma...</value>
+        <value lang="ES">Seleccione un programa...</value>
+        <value lang="CA">Esculli un programa...</value>
       </textarea>
       <textarea name="pickprog" draworder="6">
         <area>10,75,500,120</area>
         <font>info</font>
         <value>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'info' will allow you to setup recording options.</value>
         <value lang="IT">Seleziona il titolo del programma che vuoi trovare. Quando hai finito torna indietro con la freccia a sinistra. Premendo 'info' potrai impostare la registrazione.</value>
+        <value lang="ES">Seleccione el nombre del programa que busca. Cuando lo encuentre vuelva con flecha izquierda. Pulsando 'info' podra determinar las opciones de grabacion.</value>
+        <value lang="CA">Cerqui el nom del programa. Quan el trovi retorni amb fletxa esquerra. Prement 'info' podra determinar les opcions de gravacio.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -985,12 +1061,16 @@
         <font>info</font>
         <value>No Programs</value>
         <value lang="IT">Nessun programma</value>
+        <value lang="ES">Ning√∫˙n progrma</value>
+        <value lang="CA">Cap programa</value>
       </textarea>
       <textarea name="research" draworder="6">
         <area>10,75,500,120</area>
         <font>info</font>
         <value>There are no available programs under this search. Please select another search.</value>
         <value lang="IT">Non ci sono programmi disponibili con questa ricerca. Seleziona un'altra ricerca.</value>
+        <value lang="ES">No encuentro programas con esta busqueda. Pruebe otra.</value>
+        <value lang="CA">No trovo cap programa amb aquest criteri. Continui cercant.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>

@@ -242,6 +242,90 @@
         <source>Delete this recording</source>
         <translation>Borrar esta grabación</translation>
     </message>
+    <message>
+        <source>Brightness %1 %</source>
+        <translation>Brillo %1 %</translation>
+    </message>
+    <message>
+        <source>Adjust Picture</source>
+        <translation>Ajustar Imagen</translation>
+    </message>
+    <message>
+        <source>Contrast %1 %</source>
+        <translation>Contraste %1 %</translation>
+    </message>
+    <message>
+        <source>Colour %1 %</source>
+        <translation>Color %1 %</translation>
+    </message>
+    <message>
+        <source>Volume %1 %</source>
+        <translation>Volumen %1 %</translation>
+    </message>
+    <message>
+        <source>Adjust Volume</source>
+        <translation>Ajustar Volumen</translation>
+    </message>
+    <message>
+        <source>Mute On</source>
+        <translation>Sin Sonido</translation>
+    </message>
+    <message>
+        <source>Mute Off</source>
+        <translation>Con Sonido</translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
+        <translation>%02d:%02d:%02d atrás -- %.2f%% lleno</translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d behind</source>
+        <translation>%02d:%02d:%02d atrás</translation>
+    </message>
+    <message>
+        <source>%02d:%02d behind  --  %.2f%% full</source>
+        <translation>%02d:%02d atrás -- %.2f%% lleno</translation>
+    </message>
+    <message>
+        <source>%02d:%02d behind</source>
+        <translation>%02d:%02d atrás</translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
+        <translation>%02d:%02d:%02d de %02d:%02d:%02d</translation>
+    </message>
+    <message>
+        <source>%02d:%02d of %02d:%02d</source>
+        <translation>%02d:%02d de %02d:%02d</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation>Pausado</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation>Posición</translation>
+    </message>
+    <message>
+        <source>Forward </source>
+        <translation>Adelante </translation>
+    </message>
+    <message>
+        <source>Rewind </source>
+        <translation>Atrás </translation>
+    </message>
+    <message>
+        <source>Jump Ahead</source>
+        <translation>Salto Adelante</translation>
+    </message>
+    <message>
+        <source>Jump Back</source>
+        <translation>Salto Atràs</translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation>SALTO</translation>
+    </message>
 </context>
 <context>
     <name>ViewScheduled</name>

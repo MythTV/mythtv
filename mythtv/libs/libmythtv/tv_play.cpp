@@ -46,6 +46,19 @@ using namespace std;
 #define wsNine          0xb9 + 256
 #define wsEnter         0x8d + 256
 #define wsReturn        0x0d + 256
+#define wsF1            0xbe + 256
+#define wsF2            0xbf + 256
+#define wsF3            0xc0 + 256
+#define wsF4            0xc1 + 256
+#define wsF5            0xc2 + 256
+#define wsF6            0xc3 + 256
+#define wsF7            0xc4 + 256
+#define wsF8            0xc5 + 256
+#define wsF9            0xc6 + 256
+#define wsF10           0xc7 + 256
+#define wsF11           0xc8 + 256
+#define wsF12           0xc9 + 256
+
 
 enum SeekSpeeds {
   SSPEED_NORMAL_WITH_DISPLAY = 0,
@@ -888,7 +901,7 @@ void TV::ProcessKeypress(int keypressed)
             DoPause();
             break;
         }
-        case wsRight: case 'd': case 'D': 
+        case wsRight: case 'd': case 'D': case wsF8: 
         {
             if (stickykeys)
             {
@@ -907,7 +920,7 @@ void TV::ProcessKeypress(int keypressed)
             DoFF(); 
             break;
         }
-        case wsLeft: case 'a': case 'A': 
+        case wsLeft: case 'a': case 'A': case wsF5:
         {
             if (stickykeys)
             {
@@ -961,9 +974,9 @@ void TV::ProcessKeypress(int keypressed)
             }
             break;
         }
-        case '[':  ChangeVolume(false); break;
-        case ']':  ChangeVolume(true); break;
-        case '|':  ToggleMute(); break;
+        case '[':  case wsF10: ChangeVolume(false); break;
+        case ']':  case wsF11: ChangeVolume(true); break;
+        case '|':  case wsF9: ToggleMute(); break;
 
         default: 
         {
@@ -1192,24 +1205,24 @@ int TV::calcSliderPos(int offset, QString &desc)
         {
             if (osd->getTimeType() == 0)
             {
-                sprintf(text, "%02d:%02d:%02d behind  --  %.2f%% full", hours, 
-                        mins, secs, (1000 - ret) / 10);
+                sprintf(text, tr("%02d:%02d:%02d behind  --  %.2f%% full"), 
+                        hours, mins, secs, (1000 - ret) / 10);
             }
             else
             {
-                sprintf(text, "%02d:%02d:%02d behind", hours, mins, secs);
+                sprintf(text, tr("%02d:%02d:%02d behind"), hours, mins, secs);
             }
         }
         else
         {
             if (osd->getTimeType() == 0)
             {
-                sprintf(text, "%02d:%02d behind  --  %.2f%% full", mins, secs,
-                        (1000 - ret) / 10);
+                sprintf(text, tr("%02d:%02d behind  --  %.2f%% full"), 
+                        mins, secs, (1000 - ret) / 10);
             }
             else
             {
-                sprintf(text, "%02d:%02d behind", mins, secs);
+                sprintf(text, tr("%02d:%02d behind"), mins, secs);
             }
         }
 
@@ -1240,10 +1253,10 @@ int TV::calcSliderPos(int offset, QString &desc)
     int ssecs = (playbackLen - shours * 3600 - smins * 60);
 
     if (shours > 0)
-        sprintf(text, "%02d:%02d:%02d of %02d:%02d:%02d", phours, pmins, psecs,
-                shours, smins, ssecs);
+        sprintf(text, tr("%02d:%02d:%02d of %02d:%02d:%02d"), 
+                phours, pmins, psecs, shours, smins, ssecs);
     else
-        sprintf(text, "%02d:%02d of %02d:%02d", pmins, psecs, smins, ssecs);
+        sprintf(text, tr("%02d:%02d of %02d:%02d"), pmins, psecs, smins, ssecs);
 
     desc = text;
 
@@ -1262,9 +1275,9 @@ void TV::DoPause(void)
         QString desc = "";
         int pos = calcSliderPos(0, desc);
         if (internalState == kState_WatchingLiveTV)
-            osd->StartPause(pos, true, "Paused", desc, -1);
+            osd->StartPause(pos, true, tr("Paused"), desc, -1);
 	else
-            osd->StartPause(pos, false, "Paused", desc, -1);
+            osd->StartPause(pos, false, tr("Paused"), desc, -1);
     }
     else
         osd->EndPause();
@@ -1297,7 +1310,7 @@ void TV::DoInfo(void)
 
         QString desc = "";
         int pos = calcSliderPos(0, desc);
-        osd->StartPause(pos, false, "Position", desc, osd_display_time);
+        osd->StartPause(pos, false, tr("Position"), desc, osd_display_time);
     }
 }
 
@@ -1308,7 +1321,7 @@ void TV::DoFF(void)
         slidertype = true;
 
     ff_rew_scaling = seek_speed_array[ff_rew_index].scaling;
-    QString scaleString = "Forward ";
+    QString scaleString = tr("Forward ");
     scaleString += seek_speed_array[ff_rew_index].dispString;
 
     if (activenvp == nvp)
@@ -1328,7 +1341,7 @@ void TV::DoRew(void)
         slidertype = true;
 
     ff_rew_scaling = seek_speed_array[ff_rew_index].scaling;
-    QString scaleString = "Rewind ";
+    QString scaleString = tr("Rewind ");
     scaleString += seek_speed_array[ff_rew_index].dispString;
 
     if (activenvp == nvp)
@@ -1351,7 +1364,7 @@ void TV::DoJumpAhead(void)
     {
         QString desc = "";
         int pos = calcSliderPos((int)(jumptime * 60), desc);
-        osd->StartPause(pos, slidertype, "Jump Ahead", desc, 2);
+        osd->StartPause(pos, slidertype, tr("Jump Ahead"), desc, 2);
     }
 
     activenvp->FastForward(jumptime * 60);
@@ -1367,7 +1380,7 @@ void TV::DoJumpBack(void)
     {
         QString desc = "";
         int pos = calcSliderPos(0 - (int)(jumptime * 60), desc);
-        osd->StartPause(pos, slidertype, "Jump Back", desc, 2);
+        osd->StartPause(pos, slidertype, tr("Jump Back"), desc, 2);
     }
 
     activenvp->Rewind(jumptime * 60);
@@ -1382,9 +1395,9 @@ void TV::DoSkipCommercials(int direction)
     if (activenvp == nvp)
     {
         QString dummy = "";
-        QString desc = "Searching...";
+        QString desc = tr("Searching...");
         int pos = calcSliderPos(0, dummy);
-        osd->StartPause(pos, slidertype, "SKIP", desc, 6);
+        osd->StartPause(pos, slidertype, tr("SKIP"), desc, 6);
     }
 
     activenvp->SkipCommercials(direction);
@@ -1870,30 +1883,30 @@ void TV::ChangeBrightness(bool up)
 {
     int brightness = activerecorder->ChangeBrightness(up);
 
-    QString text = QString("Brightness %1 %").arg(brightness);
+    QString text = QString(tr("Brightness %1 %")).arg(brightness);
 
     if (osd)
-        osd->StartPause(brightness * 10, true, "Adjust Picture", text, 5);
+        osd->StartPause(brightness * 10, true, tr("Adjust Picture"), text, 5);
 }
 
 void TV::ChangeContrast(bool up)
 {
     int contrast = activerecorder->ChangeContrast(up);
 
-    QString text = QString("Contrast %1 %").arg(contrast);
+    QString text = QString(tr("Contrast %1 %")).arg(contrast);
 
     if (osd)
-        osd->StartPause(contrast * 10, true, "Adjust Picture", text, 5);
+        osd->StartPause(contrast * 10, true, tr("Adjust Picture"), text, 5);
 }
 
 void TV::ChangeColour(bool up)
 {
     int colour = activerecorder->ChangeColour(up);
 
-    QString text = QString("Colour %1 %").arg(colour);
+    QString text = QString(tr("Colour %1 %")).arg(colour);
 
     if (osd)
-        osd->StartPause(colour * 10, true, "Adjust Picture", text, 5);
+        osd->StartPause(colour * 10, true, tr("Adjust Picture"), text, 5);
 }
 
 void TV::ChangeDeinterlacer()
@@ -1923,10 +1936,10 @@ void TV::ChangeVolume(bool up)
         volumeControl->AdjustCurrentVolume(-2);
 
     int curvol = volumeControl->GetCurrentVolume();
-    QString text = QString("Volume %1 %").arg(curvol);
+    QString text = QString(tr("Volume %1 %")).arg(curvol);
 
     if (osd && !browsemode)
-        osd->StartPause(curvol * 10, true, "Adjust Volume", text, 5);
+        osd->StartPause(curvol * 10, true, tr("Adjust Volume"), text, 5);
 }
 
 void TV::ToggleMute(void)
@@ -1940,9 +1953,9 @@ void TV::ToggleMute(void)
     QString text;
 
     if (muted)
-        text = "Mute On";
+        text = tr("Mute On");
     else
-        text = "Mute Off";
+        text = tr("Mute Off");
  
     if (osd && !browsemode)
         osd->SetSettingsText(text, 5);

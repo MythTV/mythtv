@@ -242,6 +242,90 @@
         <source>Delete this recording</source>
         <translation>Esborrar aquesta gravació</translation>
     </message>
+    <message>
+        <source>Brightness %1 %</source>
+        <translation>Brillantor %1 %</translation>
+    </message>
+    <message>
+        <source>Adjust Picture</source>
+        <translation>Ajustar Imatge</translation>
+    </message>
+    <message>
+        <source>Contrast %1 %</source>
+        <translation>Contrast %1 %</translation>
+    </message>
+    <message>
+        <source>Colour %1 %</source>
+        <translation>Color %1 %</translation>
+    </message>
+    <message>
+        <source>Volume %1 %</source>
+        <translation>Volum %1 %</translation>
+    </message>
+    <message>
+        <source>Adjust Volume</source>
+        <translation>Ajustar Volum</translation>
+    </message>
+    <message>
+        <source>Mute On</source>
+        <translation>So parat</translation>
+    </message>
+    <message>
+        <source>Mute Off</source>
+        <translation>So posat</translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
+        <translation>%02d:%02d:%02d enrera -- %.2f%% ple</translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d behind</source>
+        <translation>%02d:%02d:%02d enrera</translation>
+    </message>
+    <message>
+        <source>%02d:%02d behind  --  %.2f%% full</source>
+        <translation>%02d:%02d enrera -- %.2f%% ple</translation>
+    </message>
+    <message>
+        <source>%02d:%02d behind</source>
+        <translation>%02d:%02d enrera</translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
+        <translation>%02d:%02d:%02d de %02d:%02d:%02d</translation>
+    </message>
+    <message>
+        <source>%02d:%02d of %02d:%02d</source>
+        <translation>%02d:%02d de %02d:%02d</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation>Pausat</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation>Posició</translation>
+    </message>
+    <message>
+        <source>Forward </source>
+        <translation>Endavant </translation>
+    </message>
+    <message>
+        <source>Rewind </source>
+        <translation>Retrocedint </translation>
+    </message>
+    <message>
+        <source>Jump Ahead</source>
+        <translation>Salt endavant</translation>
+    </message>
+    <message>
+        <source>Jump Back</source>
+        <translation>Salt enrera</translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation>SALT</translation>
+    </message>
 </context>
 <context>
     <name>ViewScheduled</name>
