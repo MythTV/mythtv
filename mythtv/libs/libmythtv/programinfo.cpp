@@ -1674,11 +1674,11 @@ QString ProgramInfo::RecStatusDesc(void)
             break;
         case rsConflict:
             message += QObject::tr("another program with a higher priority "
-                                   "will be recorded instead.");
+                                   "will be recorded.");
             break;
         case rsLaterShowing:
             message += QObject::tr("this episode will be recorded at a "
-                                   "later time instead.");
+                                   "later time.");
             break;
         case rsLowDiskSpace:
             message += QObject::tr("there wasn't enough disk space available.");
@@ -1934,16 +1934,13 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
     if (recendts > now)
     {
         if (rectype != kSingleRecord &&
-            rectype != kFindOneRecord &&
             recstatus == rsWillRecord)
         {
             diag.AddButton(QObject::tr("Don't record"));
             addov = button++;
-            if ((dupmethod & kDupCheckNone) ||
-                ((dupmethod & kDupCheckSub) &&
-                 (subtitle != "")) ||
-                ((dupmethod & kDupCheckDesc) &&
-                 (description != "")))
+            if (rectype != kFindOneRecord &&
+                (((dupmethod & kDupCheckSub)  && (subtitle != "")) ||
+                 ((dupmethod & kDupCheckDesc) && (description != ""))))
             {
                 diag.AddButton(QObject::tr("Never record"));
                 forget = button++;
@@ -2002,6 +1999,8 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
 
 void ProgramInfo::handleNotRecording(QSqlDatabase *db)
 {
+    QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+
     QString message = title;
 
     if (subtitle != "")
@@ -2015,25 +2014,23 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
         vector<ProgramInfo *> *confList = RemoteGetConflictList(this);
 
         if (confList->size())
-        {
-            message += "\n\n";
-            message += QObject::tr("The following programs will be recorded "
+            message += QObject::tr(" The following programs will be recorded "
                                    "instead:\n");
-        }
 
-        while (confList->begin() != confList->end())
+        for (int maxi = 0; confList->begin() != confList->end() &&
+             maxi < 4; maxi++)
         {
             ProgramInfo *p = *confList->begin();
-            message += p->title;
+            message += QString("%1 - %2  %3")
+                .arg(p->recstartts.toString(timeFormat))
+                .arg(p->recendts.toString(timeFormat)).arg(p->title);
             if (p->subtitle != "")
                 message += QString(" - \"%1\"").arg(p->subtitle);
-            message += QString(", %1 %2, %3 - %4\n")
-                .arg(p->chanstr).arg(p->chansign)
-                .arg(p->recstartts.toString("hh:mm"))
-                .arg(p->recendts.toString("hh:mm"));
+            message += "\n";
             delete p;
             confList->erase(confList->begin());
         }
+        message += "\n";
         delete confList;
     }
 
