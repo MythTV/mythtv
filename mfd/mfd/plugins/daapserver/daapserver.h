@@ -36,6 +36,7 @@ class DaapServer: public MFDHttpPlugin
     void    handleIncoming(HttpInRequest *request, int client_id);
     void    parsePath(HttpInRequest *http_request, DaapRequest *daap_request);
     void    sendServerInfo(HttpInRequest *http_request);
+    void    sendContentCodes(HttpInRequest *http_request);
     void    sendTag(HttpInRequest *http_request, const Chunk& c);
     void    sendLogin(HttpInRequest *http_request, u32 session_id);
     void    parseVariables(HttpInRequest *http_request, DaapRequest *daap_request);
@@ -58,8 +59,6 @@ class DaapServer: public MFDHttpPlugin
     QString                     service_name;
     QValueList<int>             hanging_updates;
     QMutex                      hanging_updates_mutex;
-    bool                        first_update;
-    QMutex                      first_update_mutex;
 };
 
 #endif  // daapserver_h_

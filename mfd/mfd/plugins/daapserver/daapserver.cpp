@@ -29,7 +29,6 @@ const int   DAAP_OK = 200;
 DaapServer::DaapServer(MFD *owner, int identity)
       :MFDHttpPlugin(owner, identity, 3689, "daap server", 2)
 {
-    first_update = true;
     metadata_server = owner->getMetadataServer();
     metadata_containers = metadata_server->getMetadataContainers();    
     QString local_hostname = "unknown";
@@ -95,6 +94,14 @@ void DaapServer::handleIncoming(HttpInRequest *http_request, int client_id)
         daap_request = NULL;
         return;
     }   
+    
+    else if( daap_request->getRequestType() == DAAP_REQUEST_CONTCODES )
+    {
+        sendContentCodes(http_request);
+        delete daap_request;
+        daap_request = NULL;
+        return;
+    }
 
     else if( daap_request->getRequestType() == DAAP_REQUEST_LOGIN)
     {
@@ -177,28 +184,7 @@ void DaapServer::handleIncoming(HttpInRequest *http_request, int client_id)
     }
     else if (daap_request->getRequestType() == DAAP_REQUEST_UPDATE)
     {
-        //
-        //  Log some data about Client-DAAP-Validation
-        //
-        
-        if(
-            http_request->getHeader("Client-DAAP-Validation") &&
-            daap_request->getClientType() == DAAP_CLIENT_ITUNES4X
-          )
-        {
-            if(first_update)    // Do I need to mutex this test?    
-            {
-                first_update_mutex.lock();
-                    first_update = false;
-                first_update_mutex.unlock();
-                log(QString("map the md5 checksum relationship between \"%1\" "
-                            "and \"%2\", win a prize")
-                            .arg(http_request->getRequest())
-                            .arg(http_request->getHeader("Client-DAAP-Validation"))
-                            ,10);
-            }
-        }
-    
+
         //
         //  
         //  should only respond if the database version numbers are out of
@@ -267,7 +253,7 @@ void DaapServer::parsePath(HttpInRequest *http_request, DaapRequest *daap_reques
         daap_request->setRequestType(DAAP_REQUEST_SERVINFO);
         log(": a client asked for /server-info", 9);
     }
-    else if(the_path == "/content_codes")
+    else if(the_path == "/content-codes")
     {
         daap_request->setRequestType(DAAP_REQUEST_CONTCODES);
         log(": a client asked for /content-codes", 9);
@@ -334,9 +320,8 @@ void DaapServer::sendServerInfo(HttpInRequest *http_request)
                 << Tag('mslr') << (u8) 0 << end 
                 << Tag('msal') << (u8) 0 << end 
                 << Tag('mstm') << (u32) 1800 << end 
-                << Tag('msup') << (u8) 0 << end 
-                << Tag('msau') << (u32) 2 << end 
-
+                << Tag('msup') << (u8) 0 << end
+                << Tag('msau') << (u8) 2 << end 
                 << Tag('mspi') << (u8) 0 << end 
                 << Tag('msex') << (u8) 0 << end 
                 << Tag('msbr') << (u8) 0 << end 
@@ -349,6 +334,12 @@ void DaapServer::sendServerInfo(HttpInRequest *http_request)
 
     sendTag( http_request, response.data() );
     
+}
+
+
+void DaapServer::sendContentCodes(HttpInRequest *http_request)
+{
+    sendTag( http_request, TypeRegistry::getDictionary() );
 }
 
 
@@ -407,6 +398,7 @@ void DaapServer::parseVariables(HttpInRequest *http_request, DaapRequest *daap_r
     {
         daap_request->setClientType(DAAP_CLIENT_MFDDAAPCLIENT);
     }
+
 
     //
     //  This goes through the data that came in on the client request and
@@ -827,6 +819,10 @@ void DaapServer::addItemToResponse(
         if(which_item->getSampleRate() > 0)
         {
             response << Tag('assr') << (u32) which_item->getSampleRate() << end;
+        }
+        else
+        {
+            response << Tag('assr') << (u32) 0 << end;
         }
     }
     

@@ -140,11 +140,19 @@ TypeRegistry::Var    TypeRegistry::list[] = {
 
 void TypeRegistry::registerVar( const Var* var ) {
 	varMap[var->name] = var;
-	container << Tag( 'mdcl' ) <<
-		Tag( 'mcnm' ) << var->mnemonic  << end <<
-		Tag( 'mcna' ) << var->name      << end <<
-		Tag( 'mcty' ) << (u16)var->type << end <<
-	end;
+
+    //
+    //  Don't send the code that is mfd specific
+    //    
+
+    if(var->mnemonic != 'mypi')
+    {
+	    container << Tag( 'mdcl' ) <<
+		    Tag( 'mcnm' ) << var->mnemonic  << end <<
+		    Tag( 'mcna' ) << var->name      << end <<
+		    Tag( 'mcty' ) << (u16)var->type << end <<
+	    end;
+    }
 }
 
 
