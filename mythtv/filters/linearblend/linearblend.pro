@@ -16,5 +16,4 @@ QMAKE_CFLAGS_RELEASE += -Wno-missing-prototypes
 QMAKE_CFLAGS_DEBUG += -Wno-missing-prototypes
 
 # Input
-HEADERS += mmx.h
 SOURCES += filter_linearblend.c

@@ -4,9 +4,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "mmx.h"
-
-#define PAVGB(a,b)  "pavgb " #a ", " #b " \n\t"
+#define PAVGB(a,b)   "pavgb " #a ", " #b " \n\t"
+#define PAVGUSB(a,b) "pavgusb " #a ", " #b " \n\t"
 
 #include "filter.h"
 #include "frame.h"
@@ -22,6 +21,8 @@ typedef struct ThisFilter
     void *handle; // Library handle;
 
     /* functions and variables below here considered "private" */
+    int mm_flags;
+    void (*subfilter)(unsigned char *, int);
 } ThisFilter;
 
 #define cpuid(index,eax,ebx,ecx,edx)\
@@ -38,6 +39,8 @@ typedef struct ThisFilter
 #define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
 #define MM_SSE    0x0008 /* SSE functions */
 #define MM_SSE2   0x0010 /* PIV SSE2 functions */
+
+#define        emms()                  __asm__ __volatile__ ("emms")
 
 /* Function to test if multimedia instructions are supported...  */
 int mm_support(void)
@@ -144,7 +147,7 @@ int mm_support(void)
     }
 }
 
-static inline void portableLinearBlend(unsigned char *src, int stride)
+static void linearBlend(unsigned char *src, int stride)
 {
     int a, b, c, x;
 
@@ -188,7 +191,7 @@ static inline void portableLinearBlend(unsigned char *src, int stride)
     }
 }
 
-static inline void MMXLinearBlend(unsigned char *src, int stride)
+static void linearBlendMMX(unsigned char *src, int stride)
 {
 //  src += 4 * stride;
     asm volatile(
@@ -235,55 +238,54 @@ static inline void MMXLinearBlend(unsigned char *src, int stride)
     );
 }
 
-int MMXLinearBlendFilter(VideoFilter *vf, VideoFrame *frame)
+static void linearBlend3DNow(unsigned char *src, int stride)
 {
-    int width = frame->width;
-    int height = frame->height;
-    unsigned char *yuvptr = frame->buf;
-    int stride = width;
-    int ymax = height - 8;
-    int x,y;
-    unsigned char *src;
-    unsigned char *uoff;
-    unsigned char *voff;
-    vf = vf;
+//  src += 4 * stride;
+    asm volatile(
+       "leal (%0, %1), %%eax                           \n\t"
+       "leal (%%eax, %1, 4), %%ebx                     \n\t"
 
-    if (frame->codec != FMT_YV12)
-        return 1;
+       "movq (%0), %%mm0                               \n\t" // L0
+       "movq (%%eax, %1), %%mm1                        \n\t" // L2
+       PAVGUSB(%%mm1, %%mm0)                                 // L0+L2
+       "movq (%%eax), %%mm2                            \n\t" // L1
+       PAVGUSB(%%mm2, %%mm0)
+       "movq %%mm0, (%0)                               \n\t"
+       "movq (%%eax, %1, 2), %%mm0                     \n\t" // L3
+       PAVGUSB(%%mm0, %%mm2)                                 // L1+L3
+       PAVGUSB(%%mm1, %%mm2)                                 // 2L2 + L1 + L3
+       "movq %%mm2, (%%eax)                            \n\t"
+       "movq (%0, %1, 4), %%mm2                        \n\t" // L4
+       PAVGUSB(%%mm2, %%mm1)                                 // L2+L4
+       PAVGUSB(%%mm0, %%mm1)                                 // 2L3 + L2 + L4
+       "movq %%mm1, (%%eax, %1)                        \n\t"
+       "movq (%%ebx), %%mm1                            \n\t" // L5
+       PAVGUSB(%%mm1, %%mm0)                                 // L3+L5
+       PAVGUSB(%%mm2, %%mm0)                                 // 2L4 + L3 + L5
+       "movq %%mm0, (%%eax, %1, 2)                     \n\t"
+       "movq (%%ebx, %1), %%mm0                        \n\t" // L6
+       PAVGUSB(%%mm0, %%mm2)                                 // L4+L6
+       PAVGUSB(%%mm1, %%mm2)                                 // 2L5 + L4 + L6
+       "movq %%mm2, (%0, %1, 4)                        \n\t"
+       "movq (%%ebx, %1, 2), %%mm2                     \n\t" // L7
+       PAVGUSB(%%mm2, %%mm1)                                 // L5+L7
+       PAVGUSB(%%mm0, %%mm1)                                 // 2L6 + L5 + L7
+       "movq %%mm1, (%%ebx)                            \n\t"
+       "movq (%0, %1, 8), %%mm1                        \n\t" // L8
+       PAVGUSB(%%mm1, %%mm0)                                 // L6+L8
+       PAVGUSB(%%mm2, %%mm0)                                 // 2L7 + L6 + L8
+       "movq %%mm0, (%%ebx, %1)                        \n\t"
+       "movq (%%ebx, %1, 4), %%mm0                     \n\t" // L9
+       PAVGUSB(%%mm0, %%mm2)                                 // L7+L9
+       PAVGUSB(%%mm1, %%mm2)                                 // 2L8 + L7 + L9
+       "movq %%mm2, (%%ebx, %1, 2)                     \n\t"
 
-    for (y = 0; y < ymax; y+=8)
-    {  
-        for (x = 0; x < stride; x+=8)
-        {
-            src = yuvptr + x + y * stride;  
-            MMXLinearBlend(src, stride);  
-        }
-    }
-
-    stride = width / 2;
-    ymax = height / 2 - 8;
-
-    uoff = yuvptr + width * height;
-    voff = yuvptr + width * height * 5 / 4;
-
-    for (y = 0; y < ymax; y += 8)
-    {
-        for (x = 0; x < stride; x += 8)
-        {
-            src = uoff + x + y * stride;
-            MMXLinearBlend(src, stride);
-
-            src = voff + x + y * stride;
-            MMXLinearBlend(src, stride);
-        }
-    }
-
-    emms();
-
-    return 0;
+       : : "r" (src), "r" (stride)
+       : "%eax", "%ebx"
+    );
 }
 
-int portableLinearBlendFilter(VideoFilter *vf, VideoFrame *frame)
+int linearBlendFilter(VideoFilter *f, VideoFrame *frame)
 {
     int width = frame->width;
     int height = frame->height;
@@ -294,7 +296,7 @@ int portableLinearBlendFilter(VideoFilter *vf, VideoFrame *frame)
     unsigned char *src;
     unsigned char *uoff;
     unsigned char *voff;
-    vf = vf;
+    ThisFilter *vf = (ThisFilter *)f;
 
     if (frame->codec != FMT_YV12)
         return 1;
@@ -304,7 +306,7 @@ int portableLinearBlendFilter(VideoFilter *vf, VideoFrame *frame)
         for (x = 0; x < stride; x+=8)
         {
             src = yuvptr + x + y * stride;  
-            portableLinearBlend(src, stride);  
+            (vf->subfilter)(src, stride);  
         }
     }
  
@@ -319,19 +321,22 @@ int portableLinearBlendFilter(VideoFilter *vf, VideoFrame *frame)
         for (x = 0; x < stride; x += 8)
         {
             src = uoff + x + y * stride;
-            portableLinearBlend(src, stride);
+            (vf->subfilter)(src, stride);
        
             src = voff + x + y * stride;
-            portableLinearBlend(src, stride);
+            (vf->subfilter)(src, stride);
         }
     }
+
+    if ((vf->mm_flags & MM_MMXEXT) || (vf->mm_flags & MM_3DNOW))
+        emms();
 
     return 0;
 }
 
 void cleanup(VideoFilter *filter)
 {
-    free(filter);
+    free((ThisFilter *)filter);
 }
 
 VideoFilter *new_filter(char *options)
@@ -346,17 +351,16 @@ VideoFilter *new_filter(char *options)
         return NULL;
     }
 
-    if (mm_support() & MM_MMXEXT)
-    {
-        // CPU supports MMX instructions
-        filter->filter = &MMXLinearBlendFilter;
-    }
+    filter->filter = &linearBlendFilter;
+
+    filter->mm_flags = mm_support();
+
+    if (filter->mm_flags & MM_MMXEXT)
+        filter->subfilter = &linearBlendMMX;
+    else if (filter->mm_flags & MM_3DNOW)
+        filter->subfilter = &linearBlend3DNow;
     else
-    {
-        // CPU does not support MMX instructions
-        // fallback to portable implementation
-        filter->filter = &portableLinearBlendFilter;
-    }
+        filter->subfilter = &linearBlend;
 
     filter->cleanup = &cleanup;
     filter->name = (char *)FILTER_NAME;

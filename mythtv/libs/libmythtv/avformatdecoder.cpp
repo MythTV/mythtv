@@ -31,6 +31,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     framesPlayed = 0;
     framesRead = 0;
 
+    audio_check_1st = true;
     audio_sample_size = 4;
     audio_sampling_rate = 48000;
 
@@ -452,10 +453,28 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
 
 bool AvFormatDecoder::CheckAudioParams(int freq, int channels)
 {
-    return false;
+    if (audio_check_1st)
+    {
+        if (freq == audio_sampling_rate && channels == audio_channels)
+            return false;
 
-    if (freq == audio_sampling_rate && channels == audio_channels)
+        audio_check_1st = false;
+        audio_sampling_rate_2nd = freq;
+        audio_channels_2nd = channels;
         return false;
+    }
+    else
+    {
+        audio_check_1st = true;
+
+        if (freq != audio_sampling_rate_2nd && channels != audio_channels_2nd)
+        {
+            audio_sampling_rate_2nd = -1;
+            audio_channels_2nd = -1;
+            return false;
+        }
+    }
+
 
     QString chan = "stereo";
     if (channels == 1)

@@ -99,6 +99,10 @@ class AvFormatDecoder : public DecoderBase
     int audio_sampling_rate;
     int audio_channels;
 
+    bool audio_check_1st;
+    int audio_sampling_rate_2nd;
+    int audio_channels_2nd;
+
     long long lastapts;
     long long lastvpts;
 
