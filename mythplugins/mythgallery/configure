@@ -45,8 +45,8 @@ if test "$opengl" = "yes" ; then
   echo "        OpenGL support will be included"
   echo "#define OPENGL_SUPPORT 1" >> ./mythgallery/config.h
   echo "CONFIG += opengl" >> ./mythgallery/config.pro
-  echo "HEADERS += glslideshow.h" >> ./mythgallery/config.pro
-  echo "SOURCES += glslideshow.cpp" >> ./mythgallery/config.pro
+  echo "HEADERS += glsingleview.h" >> ./mythgallery/config.pro
+  echo "SOURCES += glsingleview.cpp" >> ./mythgallery/config.pro
 fi
 
 if test "$opengl" = "no" ; then
