@@ -854,6 +854,7 @@ void MythListView::keyPressEvent(QKeyEvent *e)
             //  Key_Up at top of list allows
             //  focus to move to other widgets
             //
+            clearSelection();
             focusNextPrevChild(false);
         }
         if(e->key() == Key_Down && currentItem() == lastItem())
@@ -862,6 +863,7 @@ void MythListView::keyPressEvent(QKeyEvent *e)
             //  Key_Down at bottom of list allows
             //  focus to move to other widgets
             //
+            clearSelection();
             focusNextPrevChild(true);
         }
         if (e->key() == Key_Space && fixspace)
@@ -872,6 +874,25 @@ void MythListView::keyPressEvent(QKeyEvent *e)
     }
 
     QListView::keyPressEvent(e);
+}
+
+void MythListView::focusInEvent(QFocusEvent *e)
+{
+    //
+    //  Let the base class do whatever it is
+    //  it does
+    //
+
+    QListView::focusInEvent(e);    
+    
+    //
+    //  Always highlight the current item
+    //  as "Selected" in the Qt sense
+    //  (not selected in the box ticked sense
+    //
+    
+    setSelected(currentItem(), true);
+    
 }
 
 void MythListBox::setCurrentItem(const QString& matchText) {

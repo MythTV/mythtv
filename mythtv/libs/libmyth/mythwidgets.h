@@ -303,6 +303,7 @@ class MythListView : public QListView
 
   protected:
     void keyPressEvent( QKeyEvent *e );
+    void focusInEvent(QFocusEvent *e);
 
   signals:
     void playPressed(QListViewItem *);
