@@ -235,7 +235,10 @@ class ProgramInfo
     RecStatusType savedrecstatus;
     int numconflicts;
     int conflictpriority;
-    bool reactivate;
+    int reactivate;             // 0 = not requested
+                                // 1 = requested, pending
+                                // 2 = requested, replaced
+                                // -1 = reactivated
     int recordid;
     RecordingType rectype;
     RecordingDupInType dupin;

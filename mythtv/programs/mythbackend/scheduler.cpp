@@ -154,8 +154,8 @@ static bool comp_common(ProgramInfo *a, ProgramInfo *b)
     if (a->recpriority != b->recpriority)
         return a->recpriority > b->recpriority;
 
-    int apast = (a->recstartts < schedTime.addSecs(-30));
-    int bpast = (b->recstartts < schedTime.addSecs(-30));
+    int apast = (a->recstartts < schedTime.addSecs(-30) && !a->reactivate);
+    int bpast = (b->recstartts < schedTime.addSecs(-30) && !b->reactivate);
 
     if (apast != bpast)
         return apast < bpast;
@@ -349,7 +349,7 @@ bool Scheduler::ReactivateRecording(ProgramInfo *pginfo)
                 p->recstatus != rsRecording &&
                 p->recstatus != rsWillRecord)
             {
-                p->reactivate = true;
+                p->reactivate = 1;
                 ScheduledRecording::signalChange(db);
             }
             return true;
@@ -1339,11 +1339,8 @@ void Scheduler::AddNewRecords(void) {
             if (p->recordid == r->recordid &&
                 p->IsSameProgramTimeslot(*r))
             {
-                if (r->reactivate)
-                {
-                    delete r;
-                    reclist.erase(rec);
-                }
+                if (r->reactivate > 0)
+                    r->reactivate = 2;
                 else
                 {
                     delete p;
@@ -1400,6 +1397,20 @@ void Scheduler::AddNewRecords(void) {
         }
 
         tmpList.push_back(p);
+    }
+
+    // Delete existing programs that were reactivated
+    RecIter rec = reclist.begin();
+    while (rec != reclist.end())
+    {
+        ProgramInfo *r = *rec;
+        if (r->reactivate < 2)
+            rec++;
+        else
+        {
+            delete r;
+            rec = reclist.erase(rec);
+        }
     }
 
     RecIter tmp = tmpList.begin();

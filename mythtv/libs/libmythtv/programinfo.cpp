@@ -2096,11 +2096,7 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
     QDateTime now = QDateTime::currentDateTime();
 
     if (recstartts < now && recendts > now &&
-        (recstatus == rsTooManyRecordings ||
-         recstatus == rsCancelled ||
-         recstatus == rsConflict || 
-         recstatus == rsLowDiskSpace ||
-         recstatus == rsTunerBusy))
+        recstatus != rsManualOverride)
     {
         diag.AddButton(QObject::tr("Reactivate it"));
         react = button++;
@@ -2132,7 +2128,7 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
     else if (ret == addov)
     {
         setOverride(db, 1);
-        if (recstartts > now)
+        if (recstartts < now)
             RemoteReactivateRecording(this);
     }
     else if (ret == clearov)
