@@ -453,6 +453,14 @@ void SIParser::ParseTable(uint8_t* buffer, int size, uint16_t pid)
     (void) pid;
 #endif
 
+    if (!(buffer[1] & 0x80))
+    {
+        SIPARSER(QString("SECTION_SYNTAX_INDICATOR = 0 - Discarding Table (%1)")
+                 .arg(buffer[0],2,16));
+        pthread_mutex_unlock(&pmap_lock);
+        return;
+    }
+
     tablehead_t head = ParseTableHead(buffer,size);
 
     /* Parse Common Tables (PAT/CAT/PMT) regardless of SI Standard */
