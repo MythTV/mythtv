@@ -58,11 +58,11 @@ void IvtvDecoder::SeekReset(int skipframes)
 
 void IvtvDecoder::Reset(void)
 {
-    SeekReset();
-
     positionMap.clear();
     framesPlayed = 0;
     framesRead = 0;
+
+    SeekReset();
 }
 
 bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
