@@ -284,7 +284,7 @@ public:
         GlobalSetting("GeneratePreviewPixmaps") {
         setLabel("Generate thumbnail preview images for recordings");
         setValue(false);
-	setHelpText("CURRENTLY DISABLED: If set, a static image of the saved file will be "
+	setHelpText("If set, a static image of the recording will be "
                     "displayed on the \"Watch a Recording\" menu.");
     };
 };
@@ -295,7 +295,7 @@ public:
         GlobalSetting("PlaybackPreview") {
         setLabel("Display live preview of recordings");
         setValue(true);
-        setHelpText("If set, a preview of the saved file will play in a "
+        setHelpText("If set, a preview of the recording will play in a "
                     "small window on the \"Watch a Recording\" menu.");
 
     };
