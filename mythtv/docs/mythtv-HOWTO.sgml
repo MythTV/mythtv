@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-01-12, v0.16.06
+<date>2005-02-, v0.17.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -136,7 +136,7 @@ seems to be ignoring you.
 </caption>
 </figure>
 
-<sect1>Bugzilla.
+<sect1>Bugzilla
 <p>If you feel you need to contribute to a bug database, use the MythTV
 Bugzilla at <url url="http://www.mythtv.org/bugs/"
 name="http://www.mythtv.org/bugs/">.
@@ -1249,8 +1249,8 @@ After downloading, be sure to install both:
 </code>
 
 Get lame from <url url="http://lame.sourceforge.net/"
-name="http://lame.sourceforge.net/">.  Download the source code to v3.93.1
-by following the links from "About".
+name="http://lame.sourceforge.net/">.  Download the source code to v3.96.1
+by following the links from "Using" through "Download...".
 
 <sect1>Notes on compiling for different processors
 <label id="cpuspecificoptimizations">
@@ -1265,8 +1265,8 @@ If you have a system with an AMD processor change the following in the
 <tt>settings.pro</tt> file. Replace <verb>-march=pentiumpro</verb> before
 you compile with one of:
 <itemize>
-<item><bf>-march=K6</bf>        for the AMD K6 with MMX (i586 compatible)
-<item><bf>-march=K6-2</bf>      for the AMD K6 CPU with MMX and 3dNOW! (i586 compatible)
+<item><bf>-march=k6</bf>        for the AMD K6 with MMX (i586 compatible)
+<item><bf>-march=k6-2</bf>      for the AMD K6 CPU with MMX and 3dNOW! (i586 compatible)
 <item>-march=athlon             for the AMD Athlon CPU with MMX, 3dNOW!, enhanced 3dNOW! and some of SSE. (pentium2 compatible)
 <item>-march=pentiumpro -mmmx   for the AMD Athlon XP CPU with MMX, 3dNOW!, enhanced 3dNOW! and SSE. (pentium3 compatible)
 <item>-march=k8                 for the AMD K8 core based CPUs with x86-64 instruction set support
@@ -1459,20 +1459,14 @@ $ make
 </verb></tscreen>
 
 If you want to build MythTV on a multi-CPU machine (or with
-<bf>distcc</bf>), you may run into issues with the standard build in MythTV.
-The easiest solution is to build the libraries first.  In the following
-example, we will have two concurrent jobs executing.  Do not set the number
-of jobs too high, or your compile will actually take longer to complete than
-it would if you did a "normal" build.
+<bf>distcc</bf>), specify "-j numjobs".  In the following example, we will
+have two concurrent jobs executing.  Do not set the number of jobs too high,
+or your compile will actually take longer to complete than it would if you
+did a "normal" build.
 <tscreen><verb>
 $ qmake mythtv.pro
 $ make qmake
-$ make -C libs/libavcodec -j2
-$ make -C libs/libavformat -j2
-$ make -C libs/libmyth -j2 
-$ make -C libs/libmythtv -j2
-$ make -C libs -j2
-$ make -j2
+$ make -j 2
 </verb></tscreen>
 
 If you are using <bf>distcc</bf>, and you had two other host machines (red, blue)
@@ -1481,17 +1475,8 @@ participating, you would do something like:
 $ export DISTCC_HOSTS='localhost red blue'
 $ qmake mythtv.pro
 $ make qmake
-$ make -C libs/libavcodec -j6 CC=distcc
-$ make -C libs/libavformat -j6 CC=distcc
-$ make -C libs/libmyth -j6 CXX=distcc
-$ make -C libs/libmythtv -j6 CXX=distcc
-$ make -C libs -j6 CXX=distcc
-$ make -j6 CXX=distcc
+$ make -j 6 CXX=distcc
 </verb></tscreen>
-
-Explicitly specifying the directories ensures that <bf>make</bf> has all
-dependencies satisfied before proceeding.  For example, <tt>libmyth</tt> may
-fail to compile if <tt>libavformat</tt> hasn't finished yet.
 
 The actual speed-up, if any, is dependant on a number of factors, such as
 number of CPUs / hosts, etc.  The <bf>distcc</bf> documentation recommends
@@ -1502,13 +1487,12 @@ Some timing information.  The following should only be used for
 illustration; your actual results may vary.  The test involves a complete
 <tt>make distclean</tt> to the final binary.
 <itemize>
-<item>Celeron 2.4Ghz and PIII/733 running distcc, -j4:  17m:57s
-<item>Celeron 2.4Ghz, -j4:  26m:57s
-<item>Celeron 2.4Ghz, "regular" make:  26m:55s
+<item>P4 3.2Ghz HT: "standard" make: 12m 49s
+<item>P4 3.2Ghz HT: make -j 2: 11m 24s 
 </itemize>
 
 In the above example, we see that with a single CPU, a multi-stage
-<bf>make</bf> does not decrease compile time.
+<bf>make</bf> does not significantly decrease compile time.
 
 Once the compile is done, switch to superuser:
 <tscreen><verb>
@@ -1766,133 +1750,12 @@ Video>Volume Control</verb> to open up a mixer. Make sure your global volume
 "mute" and "record" checked and that the gain is turned up. You may have to
 experiment with volume/gain levels to get the best sound.  
 
-<sect3>Using ALSA drivers.
-<p>For those of you who do want to install ALSA please follow the 
-directions below, compiled with much assistance from Gregorio Gervasio.
-
-First you must find out the name of your driver, which isn't necessarily the
-same as the name of your sound card. Go to <url
-url="http://www.alsa-project.org/alsa-doc/"
-name="http://www.alsa-project.org/alsa-doc/">, find your sound card on the
-list and click "details". Near the top it will say something like "The
-module options for snd-XXX", where XXX is the name of your driver. In the
-instructions below, replace "XXX" with the name of your driver.
-
-Download the development release (0.9.x) from the ALSA web site <url
-url="http://www.alsa-project.org" name="http://www.alsa-project.org">.  You
-need at least three files:
-<itemize>
-<item>alsa-driver-0.9.x.tar.bz2
-<item>alsa-lib-0.9.x.tar.bz2
-<item>alsa-utils-0.9.x.tar.bz2
-</itemize>
-
-Start with the alsa-driver package:
-<tscreen><verb>
-$ tar -xjf alsa-driver-0.9.x.tar.bz2
-$ cd alsa-driver-0.9.x
-$ ./configure --with-cards=XXX --with-sequencer=yes
-</verb></tscreen>
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>: Red Hat/Fedora users, you may need to perform the following step to
-allow the compile to continue:
-</caption>
-</figure>
-<tscreen><verb>
-mkdir -p include/linux
-touch include/linux/workqueue.h
-</verb></tscreen>
-Continuing on:
-<tscreen><verb>
-$ make
-$ su
-# make install
-# ./snddevices
-# exit
-$
-</verb></tscreen>
-
-This will compile and install the kernel modules and initialization
-scripts, as well as create device nodes in /dev.
-
-Install the rest of the packages:
-<tscreen><verb>
-$ cd ~
-$ tar -xjf alsa-lib-0.9.x.tar.bz2
-$ cd alsa-lib-0.9.x
-$ ./configure
-$ make
-$ su
-# make install
-# exit
-$ cd ..
-$ tar -xjf alsa-utils-0.9.x.tar.bz2
-$ cd alsa-utils-0.9.x
-$ ./configure
-$ make
-$ su
-# make install
-</verb></tscreen>
-
-Next, you must edit <tt>/etc/modules.conf</tt> so that the ALSA modules are
-loaded automatically. The first step is to remove your old OSS
-configuration to ensure that you don't end up with mysterious conflicts in
-the future.  You should end up with a <tt>/etc/modules.conf</tt> file that has
-this configuration:
-<tscreen><verb>
-alias char-major-116 snd
-alias snd-card-0 snd-XXX
-# module options should go here
-# OSS/Free portion
-alias char-major-14 soundcore
-alias sound-slot-0 snd-card-0
-# card #1
-alias sound-service-0-0 snd-mixer-oss
-alias sound-service-0-1 snd-seq-oss
-alias sound-service-0-3 snd-pcm-oss
-alias sound-service-0-8 snd-seq-oss
-alias sound-service-0-12 snd-pcm-oss
-</verb></tscreen>
-
-"XXX" should be the ALSA driver name for your sound card/chip. In some rare
-cases you need to supply extra options to the driver. These options are
-descried in the "INSTALL" file in the alsa-driver directory or at <url
-url="http://www.alsa-project.org/alsa-doc/"
-name="http://www.alsa-project.org/alsa-doc/">.
-
-For now we will assume that no extra options are required.  The next step is
-to ensure that the ALSA drivers are started during boot-up.
-<tscreen><verb>
-$ su
-# cd /etc/rc.d/init.d
-# /sbin/chkconfig --add alsasound
-</verb></tscreen>
-
-The next set of instructions will cause the ALSA volume/mixer/etc. state to
-be saved when the machine is shut down properly. Note that the mixer
-settings won't get restored the next time you boot unless you ran the
-shutdown script or you've explicitly saved the state which you can do
-as root with:
-<tscreen><verb>
-# alsactl -f /etc/asound.state store
-</verb></tscreen>
-
-Reboot your machine.  Login and adjust the sound levels using "alsamixer". 
-You should increase the main volume (the first slider) and the PCM volume,
-and unmute them by hitting "m".  For MythTV, if your tuner card audio output
-is patched to the Line-In input of your sound card, set the Line input for
-capture by pressing SPACE at the slider and mute it by pressing "M". If
-you've patched your tuner card to the Mic-In port of your sound card, follow
-the same instructions but make sure that you're on the Mic slider.
-
-Test the driver by playing a simple file:
-<tscreen><verb>
-$ aplay /usr/share/sounds/info.wav
-</verb></tscreen>
-
-If it works, you're done installing ALSA!
+<sect3>Using ALSA.
+<p>If you'd like to use ALSA, you'll need to correctly setup your
+<tt>asoundrc</tt> file. Configuring this file is beyond the scope of this
+HOWTO.  Once ALSA is working correctly, change the output sound device in
+mythfrontend->setup->Audio from <tt>/dev/dsp</tt> to <tt>ALSA:default</tt>.
+This field may be edited to suit your ALSA requirements.
 
 <sect1>Setting the mixer from the command line
 <p>If you have installed the alsa-utils package, then the <bf>amixer</bf>
@@ -2622,6 +2485,11 @@ keys to move around and to make your choices, and press RETURN when
 complete.  Pressing RETURN will take you back to the Capture Cards screen;
 if you have additional capture cards in this machine, press the space bar
 when the highlight is on the (New Capture Card) row to define another card. 
+
+If you have made a mistake, you can delete a card by highlighting it and 
+pressing the 'D' key, or you can highlight it and press the RETURN or 'E'
+key to edit it.
+
 Once you have no additional cards to setup, press ESC.
 
 <sect2>Video Sources <label id="VideoSources">
@@ -3229,12 +3097,12 @@ For stations with poor signal quality: "kerneldeint,denoise3d=12"
 The following types of hardware encoding cards are supported:
 <itemize>
 <item>MJPEG - Zoran-based cards; see <url url="http://mjpeg.sourceforge.net" name="http://mjpeg.sourceforge.net">
-<item>MPEG-2 - iTVC15 based cards (Hauppauge PVR-250/PVR-350); see <url
-url="http://ivtv.sourceforge.net" name="http://ivtv.sourceforge.net"> and
+<item>MPEG-2 - iTVC15/16 based cards (Hauppauge PVR-250/PVR-350); see <url
+url="http://ivtv.sourceforge.net" name="http://ivtv.sourceforge.net"> 
+<item>HDTV - pcHDTV cards; see <url url="http://pchdtv.com" name="http://pchdtv.com"> and
 the Air2PC-ATSC-PCI see <url
 url="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103"
-name="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">.
-<item>HDTV - pcHDTV cards; see <url url="http://pchdtv.com" name="http://pchdtv.com">
+name="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">
 <item>DVB - cards supporting DVB; see <url url="http://linuxtv.org" name="http://linuxtv.org">
 </itemize>
 For cards without hardware encoding capabilities (all cards supported by
@@ -3366,6 +3234,12 @@ ALT-F4	        | exit out of the application	                                @
 Space/Enter	| take action on the item under the highlight point	        @
 P       	| play in both "Watch a Recording" and "Delete a Recording"	@
 D       	| delete in both "Watch a Recording" and "Delete a Recording"	@
+U		| to view details for the currently selected show on the Watch&nbsp;
+		  or Delete screens, EPG, "Program Finder", "Fix Scheduling&nbsp;
+                  Conflicts" or search results screens                          @
+O		| to list the upcoming episodes for the currently selected show&nbsp;
+                  on the EPG, "Program Finder", "Program Recording Priorities",&nbsp;
+                  "Fix Scheduling Conflicts" or search results screens          @
 I       	| edit recording options from the EPG, "Program Finder",&nbsp;	
                  "Program Recording Priorities", or "Fix Scheduling Conflicts"&nbsp;
                  screens. From the Playback and Delete screens, 'I' presents&nbsp;
@@ -3380,7 +3254,9 @@ I       	| edit recording options from the EPG, "Program Finder",&nbsp;
 <tabular ca="rll">
 Up or down	| keys change the channel						     @  
 num pad	        | Type a number to enter a channel number or jump amount (HHMM format)	     @  
-P	        | pause / play								     @  
+P	        | pause / play.  You may also add an explicit keybinding for 'Play' through&nbsp;
+                  MythWeb, returning you to normal speed if you are in slow motion, rewind&nbsp;
+                  fast forward or pause mode.						     @  
 C	        | change inputs on TV Tuner card					     @  
 ESC	        | quits									     @  
 I	        | puts the On-screen Display up again. During playback, 'I' toggles&nbsp;          
@@ -3403,8 +3279,11 @@ F	        | rotate between the various Picture Adjustments (Colour, Hue, etc.)&n
 ?       	| mark/unmark the current channel as a "favorite"			     @  
 U       	| increase the play speed						     @  
 J       	| decrease the play speed						     @  
+A		| Adjust time stretch (speed up or slow down normal play of audio and video  @
 W       	| cycle through 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan),&nbsp;
                   16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal) @
+F8		| toggle the sleep timer 30m->1hr->1hr30m->2hr->Off @
+CTRL-B		| Jump to the beginning of the recording / ringbuffer @
 Left    	| (if a jump amount is entered) to jump back that amount		     @  
 Right   	| (if a jump amount is entered) to jump ahead that amount		     @  
                 | @
@@ -3448,36 +3327,9 @@ G	| rotate between the various Picture Adjustments (Colour, Hue, etc.)&nbsp;
 H	| Channel history. Each repeat steps back through the previous channels.  @     
 O	| Turns on 'Browse' mode, allowing user to browse channels and program&nbsp; 
           info while watching current show FullScreen.				  @     
-F8	| toggle the sleep timer 30m->1hr->1hr30m->2hr->Off			  @
 Y	| switch between multiple capture cards.&nbsp; <bf>NOTE</bf>:
 	  you will lose your LiveTV buffer on your current card. Useful&nbsp;
 	  for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.) @
-</tabular>
-</table>
-<sect2>Watching a recording only
-<p>
-<table loc=p>
-<tabular ca="rll">                                                                  
-Space/Enter     | set a bookmark at that point.  Next time you start the&nbsp;
-                  recording, you will automatically jump forward to this point&nbsp;
-                  and clear the bookmark.					    @     
-X	        | queues the current recording for transcoding			    @     
-O	        | brings up menu to allow toggling settings such as Commercial&nbsp;
-                  Auto-Skip, Auto-Expire, etc.					    @     
-E or M	        | enters/exits edit mode.					    @     
-                | @                                                                 
-                | @                                                                 
-                | <bf>In edit mode</bf>                                             @     
-Left/Right	| move forward and backward					    @     
-Up/Down	        | alter the amount of time you jump forward and backward.&nbsp;
-                  Increments are: nearest cutpoint, nearest video keyframe, 1&nbsp;
-                  frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes,&nbsp;
-                  and 10 minutes.						    @     
-PageUp/PageDown	| move forward and backward to the nearest cut point		    @     
-< or >	        | move forward or backward by 10 times the normal jump amount	    @     
-Space/Enter	| allows you to set or delete a cut point			    @     
-Z	        | loads the commercial skip list (if one exists) into the cutlist  @     
-C or Q	        | clear all cut points in the cutlist			    
 </tabular>
 </table>
 <sect2>LiveTV Browse Mode
@@ -3518,6 +3370,34 @@ B	| toggles the window focus (lets you change channels on the PiP window)  @
 N	| swaps the two channels by changing channels on both cards		       
 </tabular>
 </table>
+<sect2>Watching a recording only
+<p>
+<table loc=p>
+<tabular ca="rll">                                                                  
+Space/Enter     | set a bookmark at that point.  Next time you start the&nbsp;
+                  recording, you will automatically jump forward to this point&nbsp;
+                  and clear the bookmark.					    @     
+X	        | queues the current recording for transcoding			    @     
+O	        | brings up menu to allow toggling settings such as Commercial&nbsp;
+                  Auto-Skip, Auto-Expire, etc.					    @     
+D		| exits the current recording and displays the Delete menu @
+E or M	        | enters/exits edit mode.					    @     
+                | @                                                                 
+                | @                                                                 
+                | <bf>In edit mode</bf>                                             @     
+Left/Right	| move forward and backward					    @     
+Up/Down	        | alter the amount of time you jump forward and backward.&nbsp;
+                  Increments are: nearest cutpoint, nearest video keyframe, 1&nbsp;
+                  frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes,&nbsp;
+                  and 10 minutes.						    @     
+PageUp/PageDown	| move forward and backward to the nearest cut point		    @     
+< or >	        | move forward or backward by 10 times the normal jump amount	    @     
+Space/Enter	| allows you to set or delete a cut point			    @     
+Z	        | loads the commercial skip list (if one exists) into the cutlist  @     
+C or Q	        | clear all cut points in the cutlist			    @
+I		| Inverts the cutlist
+</tabular>
+</table>
 <sect2>EPG
 <p>
 <table loc=p>
@@ -3543,8 +3423,8 @@ R	           | change the current item from Recording/Not-Recording.&nbsp;
                      type list.								@       
 X	           | change the channel to the currently selected channel without&nbsp;
                      leaving the EPG (Most useful in the alternate EPG)			@       
-/	           | mark/unmark the current channel as a "favorite"			@       
-4	           | toggle the guide listing between all channels and filtered&nbsp;
+?	           | mark/unmark the current channel as a "favorite"			@       
+/ or 4	           | toggle the guide listing between all channels and filtered&nbsp;
                      "favorites"							       
 </tabular>
 </table>
@@ -3601,7 +3481,19 @@ M	| change the view or to set a group password		@
 I	| move a program from one Recording Group to another	       
 </tabular>
 </table>
-
+<sect2>Watch Recordings Screen
+<p>
+<table loc=p>
+<tabular ca="rll">
+1 or F1		| Meaning of the icons @
+/		| Tags a recording.  Tagged recordings can be played&nbsp;
+                  either in order or shuffled and deleted as a group.&nbsp;
+		  You can also change the recording group for several recordings&nbsp;
+		  at once by tagging them and using the popup INFO menu to change&nbsp;
+		  the recording group. @
+?		| Clear the tagged list.
+</tabular>
+</table>
 <sect2>Remote Controls
 <p>
 If you are using MythTV with just a remote control then it is suggested that you
@@ -5210,7 +5102,7 @@ grabbed by another process, like <bf>esd</bf> or <bf>artsd</bf>.  If
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE</bf>: The CVS version of MythTV now has support for using
+<caption><bf>NOTE</bf>: MythTV now has support for using
 <bf>artsd</bf>.  This is a compile-time option, so you will need to edit the
 <tt>settings.pro</tt> file in the mythtv directory then perform a <tt>make
 distclean; make</tt>, and re-run <tt>make install</tt> as root to add this
@@ -7315,22 +7207,10 @@ leading to dropped frames.
 </article>
 <!-- Revision History
 
-v0.16.00, 2004-09-08.  Version bump.  Cedric Teffts' AMD64 settings.pro
-update, update by bline.  David Greaves' suggestion about mythcommflag and
-the seektable. Add a section on differences between a PVR-250 and a 350. Add
-bugzilla pointer.  Add a section on changing channels on STBs.  Add section on
-making mythfrontend SUID root.
-v0.16.01, 2004-10-18.  Add stuff about ~/.mythtv directory (Gavin Hurlbut)
-Bruce Markey's scheduler description.
-v0.16.02, 2004-10-20.  Fix double mention of /usr/local/share/mythtv/mysql.txt
-v0.16.03, 2004-10-31.  Tyler Drake's "Y" key.
-v0.16.04, 2004-11-26.  Change NFS recommendation to hard,intr
-v0.16.05, 2005-01-04.  Update to HDTV card list.  Daniel Thor Kristjannson's
-alteration of "compiling for non-intel CPUs" section.  Add in a few
-sentences that people shouldn't email me to ask for tech support, not that
-anyone will read that part.
-v0.16.06, 2005-01-12.  Add a link from "Recording" to Misc letting user know
-about "Good" HxV values are.
+v0.17.00, 2005-01-  Version bump. Update LAME information.  Change case on
+march= line. Spelling error.  DTK's update to setup keys.  Update make -j
+stuff.  Add update to ALSA.  Remove all the stuff about compiling ALSA.
+
 
 -->
 
