@@ -1514,7 +1514,7 @@ void GuideGrid::pageUp()
  
 void GuideGrid::showProgFinder()
 {
-    RunProgramFind();
+    RunProgramFind(false, true);
 
     setActiveWindow();
     setFocus();

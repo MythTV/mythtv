@@ -25,7 +25,7 @@ class QSqlDatabase;
 class QWidget;
 class TV;
 
-void RunProgramFind(bool thread = false);
+void RunProgramFind(bool thread = false, bool ggActive = false);
 
 class ProgFinder : public MythDialog
 {
@@ -64,7 +64,7 @@ class ProgFinder : public MythDialog
 
     Q_OBJECT
   public:
-    ProgFinder(MythMainWindow *parent, const char *name = 0);
+    ProgFinder(MythMainWindow *parent, const char *name = 0, bool gg = false);
     virtual ~ProgFinder();
 
     void Initialize(void);
@@ -116,6 +116,7 @@ class ProgFinder : public MythDialog
     bool pastInitial;
     bool running;
     int *gotInitData;
+    bool ggActive;
 
     QTimer *update_Timer;
 
@@ -158,7 +159,7 @@ class ProgFinder : public MythDialog
 class JaProgFinder : public ProgFinder
 {
   public:
-    JaProgFinder(MythMainWindow *parent, const char *name = 0);
+    JaProgFinder(MythMainWindow *parent, const char *name = 0, bool gg=false);
 
   protected:
     virtual void fillSearchData();

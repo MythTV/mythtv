@@ -26,12 +26,13 @@
 #include "programinfo.h"
 #include "oldsettings.h"
 #include "tv.h"
+#include "guidegrid.h"
 
 using namespace std;
 
 #include "libmyth/mythcontext.h"
 
-void RunProgramFind(bool thread)
+void RunProgramFind(bool thread, bool ggActive)
 {
     if (thread)
         qApp->lock();
@@ -41,10 +42,10 @@ void RunProgramFind(bool thread)
     ProgFinder *programFind = NULL;
     if (gContext->GetLanguage() == "ja")
         programFind = new JaProgFinder(gContext->GetMainWindow(),
-                                       "program finder");
+                                       "program finder", ggActive);
     else
         programFind = new ProgFinder(gContext->GetMainWindow(),
-                                     "program finder");
+                                     "program finder", ggActive);
 
     programFind->Initialize();
     programFind->Show();
@@ -64,11 +65,12 @@ void RunProgramFind(bool thread)
     return;
 }
 
-ProgFinder::ProgFinder(MythMainWindow *parent, const char *name)
+ProgFinder::ProgFinder(MythMainWindow *parent, const char *name, bool gg)
           : MythDialog(parent, name)
 {
     curSearch = 10;
     searchCount = 37;
+    ggActive = gg;
 
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
 }
@@ -77,7 +79,8 @@ void ProgFinder::Initialize(void)
 {
     running = true;
     m_db = QSqlDatabase::database();
-
+    
+    
     allowkeypress = true;
 
     baseDir = gContext->GetInstallPrefix();
@@ -419,6 +422,16 @@ void ProgFinder::escape()
 
 void ProgFinder::showGuide()
 {
+    if(!ggActive)
+    {
+        QString startchannel = gContext->GetSetting("DefaultTVChannel");
+        if (startchannel == "")
+            startchannel = "3";
+
+        RunProgramGuide(startchannel);
+    }
+
+                
     running = false;
     hide();
 
@@ -1629,8 +1642,8 @@ const char* JaProgFinder::searchChars[] = {
     0,
 };
 
-JaProgFinder::JaProgFinder(MythMainWindow *parent, const char *name)
-            : ProgFinder(parent, name)
+JaProgFinder::JaProgFinder(MythMainWindow *parent, const char *name, bool gg)
+            : ProgFinder(parent, name, gg)
 {
     for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
          numberOfSearchChars++)
