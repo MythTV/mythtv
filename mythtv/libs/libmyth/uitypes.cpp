@@ -5,7 +5,7 @@ using namespace std;
 #include "uitypes.h"
 #include "mythdialogs.h"
 #include "mythcontext.h"
-
+#include "lcddevice.h"
 
 
 LayerSet::LayerSet(const QString &name)
@@ -2636,6 +2636,55 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
     {
         // no data (yet?)
         return;
+    }
+
+    //
+    //  Put something on the LCD device (if one exists)
+    //
+
+    class LCD *lcddev = LCD::Get();
+ 
+    if (lcddev)
+    {
+        QString msg = current_node->getString();
+        GenericTree *parent = current_node->getParent();
+        if (parent == NULL)
+        {
+            cerr << "UIManagedTreeListType: LCD sees no "
+                 << "parent to current_node" 
+                 << endl;
+        }
+        else 
+        {
+            QPtrListIterator<GenericTree> an_it =
+                parent->getFirstChildIterator(visual_order);
+            GenericTree *lnode;
+            QPtrList<LCDMenuItem> menuItems;
+            menuItems.setAutoDelete(true);
+            bool selected;
+
+            while ((lnode = an_it.current()) != 0)
+            {
+                if (lnode == current_node)
+                {
+                    selected = true;
+                }
+                else 
+                {
+                    selected = false;
+                }
+                menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
+                                                    lnode->getString()));
+                ++an_it;
+            }
+ 
+            QString title;
+            title = (parent->getParent()) ? "<< " : "   ";
+            if (!menuItems.isEmpty())
+            {
+                lcddev->switchToMenu(&menuItems, title);
+            }
+        }
     }
 
     bool draw_up_arrow = false;
