@@ -379,22 +379,29 @@ void ProgLister::setViewFromEdit(void)
     int newview = viewList.findIndex(text);
 
     QString querystr = NULL;
+    QString qphrase = NULL;
 
     if (newview < 0 || newview != oldview)
     {
         if (oldview >= 0)
         {
+            qphrase = viewList[oldview].utf8();
+            qphrase.replace("\'", "\\\'");
+
             querystr = QString("DELETE FROM keyword "
                                "WHERE phrase = '%1' AND searchtype = '%2';")
-                               .arg(viewList[oldview].utf8()).arg(searchtype);
+                               .arg(qphrase).arg(searchtype);
             QSqlQuery query;
             query.exec(querystr);
         }
         if (newview < 0)
         {
+            qphrase = text.utf8();
+            qphrase.replace("\'", "\\\'");
+
             querystr = QString("REPLACE INTO keyword (phrase, searchtype)"
                                "VALUES('%1','%2');")
-                               .arg(text.utf8()).arg(searchtype);
+                               .arg(qphrase).arg(searchtype);
             QSqlQuery query;
             query.exec(querystr);
         }
@@ -442,10 +449,12 @@ void ProgLister::deleteKeyword(void)
         return;
 
     QString text = viewList[view];
+    QString qphrase = text.utf8();
+    qphrase.replace("\'", "\\\'");
 
     QString querystr = QString("DELETE FROM keyword "
                                "WHERE phrase = '%1' AND searchtype = '%2';")
-                               .arg(text.utf8()).arg(searchtype);
+                               .arg(qphrase).arg(searchtype);
     QSqlQuery query;
     query.exec(querystr);
 
@@ -743,14 +752,16 @@ void ProgLister::fillItemList(void)
         return;
 
     QString where;
+    QString startstr = startTime.toString("yyyyMMddhhmm50");
+    QString qphrase = viewList[curView].utf8();
+    qphrase.replace("\'", "\\\'");
 
     if (type == plTitle) // per title listings
     {
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  AND program.title = \"%2\" ")
-                        .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(viewList[curView].utf8());
+                        "  AND program.title = '%2' ")
+                        .arg(startstr).arg(qphrase);
     }
     else if (type == plNewListings) // what's new list
     {
@@ -759,32 +770,28 @@ void ProgLister::fillItemList(void)
                         "WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
                         "  AND oldprogram.oldtitle IS NULL "
-                        "  AND ((program.category_type <> 'movie' "
-                        "    AND programid NOT LIKE \"MV\%\") "
+                        "  AND (program.category_type <> 'movie' "
                         "    OR program.airdate >= "
                         "      YEAR(NOW() - INTERVAL 2 YEAR)) "
                         "GROUP BY title ")
-                        .arg(startTime.toString("yyyyMMddhhmm50"));
+                        .arg(startstr);
     }
     else if (type == plTitleSearch) // keyword search
     {
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  AND program.title LIKE \"\%%2\%\" ")
-                        .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(viewList[curView].utf8());
+                        "  AND program.title LIKE '\%%2\%' ")
+                        .arg(startstr).arg(qphrase);
     }
     else if (type == plKeywordSearch) // keyword search
     {
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  AND (program.title LIKE \"\%%2\%\" "
-                        "    OR program.subtitle LIKE \"\%%3\%\" "
-                        "    OR program.description LIKE \"\%%4\%\") ")
-                        .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(viewList[curView].utf8())
-                        .arg(viewList[curView].utf8())
-                        .arg(viewList[curView].utf8());
+                        "  AND (program.title LIKE '\%%2\%' "
+                        "    OR program.subtitle LIKE '\%%3\%' "
+                        "    OR program.description LIKE '\%%4\%') ")
+                        .arg(startstr).arg(qphrase).arg(qphrase).arg(qphrase);
+
     }
     else if (type == plPeopleSearch) // people search
     {
@@ -793,33 +800,29 @@ void ProgLister::fillItemList(void)
                         "LEFT JOIN people ON people.person = credits.person "
                         "WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  AND people.name LIKE \"\%%2\%\" ")
-                        .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(viewList[curView].utf8());
+                        "  AND people.name LIKE '\%%2\%' ")
+                        .arg(startstr).arg(qphrase);
     }
     else if (type == plChannel) // list by channel
     {
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  AND channel.chanid = \"%2\" ")
-                        .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(viewList[curView]);
+                        "  AND channel.chanid = '%2' ")
+                        .arg(startstr).arg(qphrase);
     }
     else if (type == plCategory) // list by category
     {
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  AND program.category = \"\%2\" ")
-                        .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(viewList[curView].utf8());
+                        "  AND program.category = '\%2' ")
+                        .arg(startstr).arg(qphrase);
     }
     else if (type == plMovies) // list movies
     {
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  AND (program.category_type = 'movie' "
-                        "    OR programid LIKE \"MV\%\") ")
-                        .arg(startTime.toString("yyyyMMddhhmm50"));
+                        "  AND program.category_type = 'movie' ")
+                        .arg(startstr);
     }
 
     schedList.FromScheduler();

@@ -1214,6 +1214,7 @@ void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
 {
     QString query;
     QSqlQuery result;
+    QString qphrase;
 
     from << "";
     where << QString("record.search = %1 AND "
@@ -1231,6 +1232,9 @@ void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
 
     while (result.next())
     {
+    qphrase = result.value(3).toString();
+    qphrase.replace("\'", "\\\'");
+
         switch (result.value(1).toInt())
         {
         case kPowerSearch:
@@ -1238,14 +1242,14 @@ void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
             where << QString("record.recordid = %1 AND %2")
                 .arg(result.value(0).toString())
                 .arg(result.value(2).toString())
-                .arg(result.value(3).toString());
+                .arg(qphrase);
             break;
         case kTitleSearch:
             from << "";
             where << QString("record.recordid = %1 AND "
                              "program.title LIKE '\%%2\%'")
                 .arg(result.value(0).toString())
-                .arg(result.value(3).toString());
+                .arg(qphrase);
             break;
         case kKeywordSearch:
             from << "";
@@ -1254,9 +1258,7 @@ void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
                              " program.subtitle LIKE '\%%3\%' OR "
                              " program.description LIKE '\%%4\%')")
                 .arg(result.value(0).toString())
-                .arg(result.value(3).toString())
-                .arg(result.value(3).toString())
-                .arg(result.value(3).toString());
+                .arg(qphrase).arg(qphrase).arg(qphrase);
             break;
         case kPeopleSearch:
             from << ", people, credits";
@@ -1266,7 +1268,7 @@ void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
                              "program.chanid = credits.chanid AND "
                              "program.starttime = credits.starttime")
                 .arg(result.value(0).toString())
-                .arg(result.value(3).toString());
+                .arg(qphrase);
             break;
         default:
             cerr << "Unknown RecSearchType (" << result.value(1).toInt()
