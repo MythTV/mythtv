@@ -1272,11 +1272,7 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
                 ratings_image->setRepeat(curMeta->Rating());
         }
 
-        if(isplaying)
-        {
-            play();
-        }
-        else
+        if (output && output->isPaused())
         {
             stop();
             if(play_button)
@@ -1288,7 +1284,8 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
                 play();
             }
         }
-        
+        else
+            play();
     }
     else
     {
