@@ -52,6 +52,7 @@
 132,Snow to Wintry Mix,snowshow.png
 133,PM Snow Showers/Wind,snowshow.png
 135,Snow and Ice to Rain,rainsnow.png
+145,AM Snow Showers/Wind,snowshow.png
 146,AM Light Snow/Wind,snowshow.png
 150,PM Light Rain/Wind,showers.png
 155,PM Snow Shower,snowshow.png
@@ -60,6 +61,7 @@
 167,AM Snow,snowshow.png
 171,Snow to Ice,snowshow.png
 175,PM Light Snow,flurries.png
+204,AM Rain/Wind,showers.png
 271,Snow Showers/Windy,snowshow.png
 997,Clear,clear.png
 998,A Few Clouds,pcloudy.png
