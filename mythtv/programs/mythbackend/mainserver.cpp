@@ -2672,7 +2672,7 @@ void MainServer::PrintDVBStatus(QTextStream& os)
                 cout << query.lastError().databaseText() << "\r\n" 
                      << query.lastError().driverText() << "\r\n";
             
-            if (query.isActive())
+            if (query.isActive() && query.numRowsAffected())
             {
                 os << "<br>Recording period from " << t_start.toString() << 
                     " to " << t_end.toString() <<
