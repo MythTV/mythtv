@@ -321,12 +321,14 @@ void Scheduler::PruneList(void)
     list<ProgramInfo *>::reverse_iterator i;
     list<ProgramInfo *>::iterator deliter, q;
 
+    QDateTime now = QDateTime::currentDateTime();
+
     q = recordingList.begin();
     while (q != recordingList.end())
     {
         ProgramInfo *rec = (*q);
 
-        if (rec->startts > QDateTime::currentDateTime())
+        if (rec->startts > now)
         {
             break;
         }
@@ -368,24 +370,23 @@ void Scheduler::PruneList(void)
             }
             else
             {
-                for (; j != recordingList.rend(); j++)
+                while (j != recordingList.rend())
                 {
                     ProgramInfo *second = (*j);
                     if (first->IsSameTimeslot(*second)) 
                     {
                         delete second;
                         deliter = j.base();
-                        j++;
                         deliter--;
                         recordingList.erase(deliter);
                     }
                     else if (first->IsSameProgram(*second))
                     {
-                        if (second->conflicting && !first->conflicting)
+                        if ((second->conflicting && !first->conflicting) ||
+                            second->startts < now.addSecs(-15))
                         {
                             delete second;
                             deliter = j.base();
-                            j++;
                             deliter--;
                             recordingList.erase(deliter);
                         }
@@ -397,6 +398,10 @@ void Scheduler::PruneList(void)
                             recordingList.erase(deliter);
                             break;
                         }
+                    }
+                    else
+                    {
+                        j++;
                     }
                 }
             }
