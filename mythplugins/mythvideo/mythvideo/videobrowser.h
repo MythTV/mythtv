@@ -30,17 +30,24 @@ class VideoBrowser : public MythDialog
     void selected(Metadata *someItem);
     void cursorLeft();
     void cursorRight();
-    void cursorDown();
-    void cursorUp();
     void exitWin();
     void setParentalLevel(int which_level);
     bool checkParentPassword();
 
+    void slotWatchVideo();
+    void slotViewPlot();
+    void slotDoFilter();
+    void slotDoCancel();
+    void slotVideoTree();
+
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
-
+    void cancelPopup(void);
+    void doMenu(void);
   private:
+    MythPopupBox* popup;
+    bool expectingPopup;
     bool updateML;
     bool noUpdate;
     VideoFilterSettings	*currentVideoFilter;
@@ -54,9 +61,12 @@ class VideoBrowser : public MythDialog
     XMLParse *theme;
     QDomElement xmldata;
 
+    void doParental(int amount);
+    void jumpSelection(int amount);
     int currentParentalLevel;
     void RefreshMovieList();
     void SetCurrentItem();
+    
 
     void updateBackground(void);
     void updateInfo(QPainter *);
@@ -82,6 +92,7 @@ class VideoBrowser : public MythDialog
     QRect browsingRect;
     QRect fullRect;
 
+    
     bool allowselect;
 };
 

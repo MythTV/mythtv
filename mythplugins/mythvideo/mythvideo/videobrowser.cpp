@@ -30,6 +30,9 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
     currentVideoFilter = new VideoFilterSettings(db);
     RefreshMovieList();
 
+    popup = NULL;
+    expectingPopup = false;
+
     noUpdate = false;
     m_state = 0;
 
@@ -57,7 +60,7 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
 VideoBrowser::~VideoBrowser()
 {
     if (currentVideoFilter)
-	delete currentVideoFilter;
+        delete currentVideoFilter;
     delete theme;
     delete bgTransBackup;
     if (curitem)
@@ -175,57 +178,129 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
         QString action = actions[i];
         handled = true;
 
-        if (action == "SELECT" && allowselect)
-        {
+        if ((action == "SELECT" || action == "PLAY") && allowselect)
             selected(curitem);
-            return;
-        }
+        else if (action == "MENU")
+            doMenu();
         else if (action == "UP")
-            cursorUp();
+            jumpSelection(1);
         else if (action == "DOWN")
-            cursorDown();
+            jumpSelection(-1);
+        else if (action == "PAGEDOWN")
+            jumpSelection(0-(int)(m_list.count() / 5));
+        else if (action == "PAGEUP")
+            jumpSelection((int)(m_list.count() / 5));
+        else if (action == "INCPARENT")
+            doParental(1);
+        else if (action == "DECPARENT")
+            doParental(-1);            
         else if (action == "LEFT")
             cursorLeft();
         else if (action == "RIGHT")
             cursorRight();
-        else if (action == "1" || action == "2" || action == "3" ||
-                 action == "4")
-        {
+        else if (action == "1" || action == "2" || action == "3" || action == "4")
             setParentalLevel(action.toInt());
-        }
-	else if (action == "FILTER"){
-		VideoFilterDialog * vfd = new VideoFilterDialog(db,
-			currentVideoFilter,
-			gContext->GetMainWindow(),
-			"filter",
-			"video-",
-			"Video Filter Dialog");
-		vfd->exec();
-		delete vfd;
-		RefreshMovieList();
-		SetCurrentItem();
-		repaint();
-	}else if (action == "INFO"){
-		if (curitem){
-			MythPopupBox * plotbox
-			   = new MythPopupBox(gContext->GetMainWindow());
-			QLabel *plotLabel = plotbox->addLabel(curitem->Plot(),MythPopupBox::Small,true);
-			plotLabel->setAlignment(Qt::AlignJustify | Qt::WordBreak);
-			QButton * okButton = plotbox->addButton(tr("Ok"));
-			okButton->setFocus();
-			plotbox->ExecPopup();
-		//	plotbox->showOkPopup(gContext->GetMainWindow(),
-//				"test",
-//				curitem->Plot());
-			delete plotbox;
-		}
-	}
+        else if (action == "FILTER")
+            slotDoFilter();
+        else if (action == "INFO")
+            slotViewPlot();
         else
             handled = false;
     }
 
     if (!handled)
         MythDialog::keyPressEvent(e);
+}
+
+void VideoBrowser::doMenu()
+{
+    popup = new MythPopupBox(gContext->GetMainWindow(), "video popup");
+
+    expectingPopup = true;
+
+    popup->addLabel(tr("Select action"));
+    popup->addLabel("");
+
+    QButton *viewButton = popup->addButton(tr("Watch This Video"), this, SLOT(slotWatchVideo())); 
+
+    popup->addButton(tr("View Full Plot"), this, SLOT(slotViewPlot()));
+    popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
+    popup->addButton(tr("Switch to Video Listings"), this, SLOT(slotVideoTree()));    
+
+    popup->ShowPopup(this, SLOT(slotDoCancel()));
+
+    viewButton->setFocus();
+
+}
+
+void VideoBrowser::slotVideoTree()
+{
+    cancelPopup();
+    gContext->GetMainWindow()->JumpTo("Video Listings");
+}
+
+void VideoBrowser::slotWatchVideo()
+{
+    cancelPopup();
+    selected(curitem);
+}
+
+void VideoBrowser::slotViewPlot()
+{
+    cancelPopup();
+    
+    if (curitem)
+    {
+        MythPopupBox * plotbox = new MythPopupBox(gContext->GetMainWindow());
+        QLabel *plotLabel = plotbox->addLabel(curitem->Plot(),MythPopupBox::Small,true);
+        plotLabel->setAlignment(Qt::AlignJustify | Qt::WordBreak);
+        QButton * okButton = plotbox->addButton(tr("Ok"));
+        okButton->setFocus();
+        plotbox->ExecPopup();
+        delete plotbox;
+    }
+}
+
+void VideoBrowser::slotDoFilter()
+{
+    cancelPopup();
+    VideoFilterDialog * vfd = new VideoFilterDialog(db, currentVideoFilter,
+                                                    gContext->GetMainWindow(),
+                                                    "filter", "video-",
+                                                    "Video Filter Dialog");
+    vfd->exec();
+    delete vfd;
+
+    RefreshMovieList();
+    SetCurrentItem();
+    repaint();
+
+}
+
+
+void VideoBrowser::slotDoCancel(void)
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+}
+
+void VideoBrowser::cancelPopup(void)
+{
+    expectingPopup = false;
+
+    if(popup)
+    {
+        popup->hide();
+        delete popup;
+
+        popup = NULL;
+
+        update(fullRect);
+        qApp->processEvents();
+        setActiveWindow();
+    }
 }
 
 void VideoBrowser::updateBackground(void)
@@ -253,10 +328,10 @@ void VideoBrowser::RefreshMovieList()
     m_list.clear();
 
     QString thequery = QString("SELECT intid, browse FROM %1 %2 %3")
-		.arg(currentVideoFilter->BuildClauseFrom())
-		.arg(currentVideoFilter->BuildClauseWhere())
-		.arg(currentVideoFilter->BuildClauseOrderBy());
-//cout << thequery << endl;
+                        .arg(currentVideoFilter->BuildClauseFrom())
+                        .arg(currentVideoFilter->BuildClauseWhere())
+                        .arg(currentVideoFilter->BuildClauseOrderBy());
+
     QSqlQuery query(thequery,db);
     Metadata *myData;
 
@@ -498,7 +573,7 @@ void VideoBrowser::updateInfo(QPainter *p)
        {
            UITextType *type = (UITextType *)container->GetType("title");
            if (type)
-               type->SetText(title);
+               type->SetText(QString::fromUtf8(title));
 
            type = (UITextType *)container->GetType("filename");
            if (type)
@@ -506,7 +581,7 @@ void VideoBrowser::updateInfo(QPainter *p)
 
            type = (UITextType *)container->GetType("director");
            if (type)
-               type->SetText(director);
+               type->SetText(QString::fromUtf8(director));
  
            type = (UITextType *)container->GetType("year");
            if (type)
@@ -529,7 +604,7 @@ void VideoBrowser::updateInfo(QPainter *p)
 
            type = (UITextType *)container->GetType("plot");
            if (type)
-               type->SetText(plot);
+               type->SetText(QString::fromUtf8(plot));
  
            type = (UITextType *)container->GetType("userrating");
            if (type)
@@ -597,8 +672,12 @@ void VideoBrowser::LoadWindow(QDomElement &element)
             }
             else
             {
+                MythPopupBox::showOkPopup(gContext->GetMainWindow(), "",
+                                          tr(QString("There is a problem with your"
+                                          "music-ui.xml file... Unknown element: %1").
+                                          arg(e.tagName())));
+                
                 cerr << "Unknown element: " << e.tagName() << endl;
-                exit(0);
             }
         }
     }
@@ -616,7 +695,21 @@ void VideoBrowser::parseContainer(QDomElement &element)
     if (name.lower() == "browsing")
         browsingRect = area;
 }
- 
+
+void VideoBrowser::jumpSelection(int amount)
+{
+    inData += amount;
+     
+    if (inData < 0)
+        inData = m_list.count() - abs(1 - inData);
+    else if(inData >= (int)m_list.count())
+        inData = inData - m_list.count();
+     
+    SetCurrentItem();
+    update(infoRect);
+    update(browsingRect);
+}
+   
 void VideoBrowser::exitWin()
 {
     emit accept();
@@ -624,42 +717,23 @@ void VideoBrowser::exitWin()
 
 void VideoBrowser::cursorLeft()
 {
-     inData--;
-     if (inData < 0)
-         inData = m_list.count() - 1;
-     SetCurrentItem();
-     update(infoRect);
-     update(browsingRect);
+    exitWin();
 }
 
 void VideoBrowser::cursorRight()
 {
-     inData++;
-     if (inData >= (int)m_list.count())
-         inData = 0;
-     SetCurrentItem();
-     update(infoRect);
-     update(browsingRect);
+    doMenu();
 }
 
-void VideoBrowser::cursorUp()
+void VideoBrowser::doParental(int amount)
 {
-    setParentalLevel(currentParentalLevel + 1);
+    setParentalLevel(currentParentalLevel + amount);
     inData = 0;
     RefreshMovieList();
     SetCurrentItem();
     update(infoRect);
     update(browsingRect);
-}
 
-void VideoBrowser::cursorDown()
-{
-    setParentalLevel(currentParentalLevel - 1);
-    inData = 0;
-    RefreshMovieList();
-    SetCurrentItem();
-    update(infoRect);
-    update(browsingRect);
 }
 
 void VideoBrowser::selected(Metadata *someItem)
