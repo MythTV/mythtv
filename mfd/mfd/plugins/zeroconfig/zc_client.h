@@ -46,7 +46,8 @@ class MFDService
     void  takeOwnershipOfServiceInfo(ServiceInfo *si, ServiceInfoQuery *siq);
     void  setResolved(uint ip1, uint ip2, uint ip3, uint ip4, uint port_high, uint port_low);
     bool  isResolved(){return resolved;}
-    
+
+    void  warning(const QString &warn_text);
     
   private:
   

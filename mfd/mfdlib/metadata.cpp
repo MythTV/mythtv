@@ -337,18 +337,26 @@ void Playlist::addToList(int an_id)
 
 bool Playlist::removeFromList(int an_id)
 {
-    int how_many = song_references.remove(an_id);
-    if(how_many == 1)
+    bool deleted_something = false;
+
+    //
+    //  This is slightly broken at the moment. It will remove the first
+    //  reference to the track, even if the source of the deletion was a
+    //  different reference.
+    //
+
+    QValueList<int>::Iterator it;
+    for( it = song_references.begin(); it != song_references.end(); ++it )
     {
-        return true;
+        if( (*it) == an_id)
+        {
+            song_references.remove(it);
+            deleted_something = true;
+            break;
+        }
     }
-    if(how_many == 0)
-    {
-        return false;
-    }
-    cerr << "metadata.o: playlist had more than 1 reference to same track"
-         << endl;
-    return true;
+
+    return deleted_something;
 }
 
 void Playlist::checkAgainstMetadata(QIntDict<Metadata> *the_metadata)
@@ -374,6 +382,26 @@ void Playlist::checkAgainstMetadata(QIntDict<Metadata> *the_metadata)
 uint Playlist::getUniversalId()
 {
     return ((collection_id * METADATA_UNIVERSAL_ID_DIVIDER) + id );
+}
+
+void Playlist::addToIndirectMap(int key, int value)
+{
+    indirect_map[key] = value;
+}
+
+int Playlist::getFromIndirectMap(int key)
+{
+    int return_value = -1;
+    if(indirect_map.find(key) != indirect_map.end())
+    {
+        return_value = indirect_map[key];
+    }
+    return return_value;
+}
+
+void Playlist::removeFromIndirectMap(int key)
+{
+    indirect_map.remove(key);
 }
 
 Playlist::~Playlist()

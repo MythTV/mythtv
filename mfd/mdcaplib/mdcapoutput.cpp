@@ -110,6 +110,13 @@ void MdcapOutput::addAddedItemGroup()
     append((uint32_t) 0);
 }
 
+void MdcapOutput::addDeletedItemsGroup()
+{
+    append(MarkupCodes::deleted_items_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
 void MdcapOutput::addListGroup()
 {
     append(MarkupCodes::list_group);
@@ -127,6 +134,13 @@ void MdcapOutput::addAddedListsGroup()
 void MdcapOutput::addAddedListGroup()
 {
     append(MarkupCodes::added_list_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
+void MdcapOutput::addDeletedListsGroup()
+{
+    append(MarkupCodes::deleted_lists_group);
     open_groups.push(contents.size());
     append((uint32_t) 0);
 }
@@ -346,6 +360,17 @@ void MdcapOutput::addDeletedItems(uint count)
     append((uint32_t) count);
 }
 
+void MdcapOutput::addDeletedItem(uint item_id)
+{
+    //
+    //  Deleted items is 5 bytes
+    //  1 - markup code
+    //  4 = 32 bit id of deleted item
+    
+    append(MarkupCodes::deleted_item);
+    append((uint32_t) item_id);
+}
+
 void MdcapOutput::addItemType(int item_type)
 {
     //
@@ -501,6 +526,18 @@ void MdcapOutput::addListItem(int list_item)
     
     append(MarkupCodes::list_item);
     append((uint32_t) list_item);
+}
+
+void MdcapOutput::addDeletedList(int list_id)
+{
+    //
+    //  deleted list
+    //  1 - markup code
+    //  4 = 32 bit id of the list that has been deleted
+    //
+        
+    append(MarkupCodes::deleted_list);
+    append((uint32_t) list_id);
 }
 
 

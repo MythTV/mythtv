@@ -61,7 +61,7 @@ bool MetadataCollection::itemsUpToDate()
     {
         return true;
     }
-    
+
     return false;
 }
 
@@ -76,8 +76,47 @@ bool MetadataCollection::listsUpToDate()
     {
         return true;
     }
-    
+
     return false;
+}
+
+void MetadataCollection::beUpToDate()
+{
+    //
+    //  Our parent metadata client seems to think we are current with
+    //  everything. Set a few things, and complain if we aren't
+    //
+    
+    if(current_metadata_generation != current_playlist_generation)
+    {
+        cerr << "metadatacollection.o was told to beUpToDate(), but "
+             << "metadatata generation is "
+             << current_metadata_generation
+             << " while playlist generation is "
+             << current_playlist_generation
+             << endl; 
+    }
+    current_combined_generation = current_metadata_generation;
+    
+    if(current_combined_generation != pending_generation)
+    {
+        cerr << "metadatacollection.o was told to beUpToDate(), but "
+             << "combined generation is "
+             << current_combined_generation
+             << " while pending generation is "
+             << pending_generation
+             << endl;
+    }
+    
+    if(expected_count != (int) metadata.count())
+    {
+        cerr << "metadatacollection.o was told to beUpToDate(), but "
+             << "expected count is "
+             << expected_count
+             << " while the actual amount of metadata is "
+             << metadata.count()
+             << endl;
+    }
 }
 
 QString MetadataCollection::getItemsRequest(uint32_t session_id)
@@ -235,8 +274,7 @@ void MetadataCollection::addItem(MdcapInput &mdcap_input)
                                                     );
                                                     
         metadata.insert(new_item_id, new_audio);
-        cout << "Should be adding something to container " << id << " with metadata id of " << new_item_id << endl;
-        cout << "Title is " << new_audio->getTitle() << endl;
+
     }
     
 }
@@ -293,10 +331,57 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
                                                 new_list_id
                                              );
         playlists.insert(new_list_id, new_playlist);
-        cout << "Should be adding something to container " << id << " with playlist id of " << new_list_id << endl;
-        cout << "Title is " << new_playlist->getName() << endl;
     }
 }
+
+void MetadataCollection::deleteItem(uint which_item)
+{
+    if(!metadata.remove((int) which_item))
+    {
+        cerr << "metadatacollection.o: asked to remove metadata with id of "
+             << (int) which_item
+             << ", but can't find it"
+             << endl;
+    }
+}
+
+void MetadataCollection::deleteList(uint which_list)
+{
+    if(!playlists.remove((int) which_list))
+    {
+        cerr << "metadatacollection.o: asked to remove playlist with id of "
+             << (int) which_list
+             << ", but can't find it"
+             << endl;
+    }
+}
+
+void MetadataCollection::printMetadata()
+{
+    cout << "\n\tCollection number "
+         << id 
+         << " has name of \""
+         << name
+         << "\" and "
+         << metadata.count()
+         << " items"
+         << endl;
+         
+    cout << "\tPlaylists:" << endl;
+
+
+    QIntDictIterator<Playlist> it( playlists );
+    for ( ; it.current(); ++it )
+    {
+        cout << "\t\tPlaylist called \""
+             << it.current()->getName()
+             << "\" has "
+             << it.current()->getCount()
+             << " items"
+             << endl;
+    }
+}
+
 
 MetadataCollection::~MetadataCollection()
 {

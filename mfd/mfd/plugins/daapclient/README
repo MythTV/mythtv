@@ -7,17 +7,11 @@ metadata that is available on the local network.
 audio content available anywhere on the network (whether from other mfd's,
 or from anything else that happens to be serving it).
 
-    If you want to connect to iTunes and play it's content, you'll need
+    If you want to connect to iTunes and play its content, you'll need
 libopendaap:
 
         http://crazney.net/programs/itunes/libopendaap.html
 
-    There is a little problem with function names in version 0.1.1, so
-you'll need to apply the patch provided in this directory. If you cd to the
-libopendaap root directory, the patch should apply cleanly with:
-
-        patch -p1 < libopendaap_md5_name_patch.diff
-
-    Then build and install libopendaap. This will be fixed in a future
-release of libopendaap.
+    Version 0.1.2 (source release number) is required. Higher versions will
+probably work as well.
 

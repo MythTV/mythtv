@@ -48,7 +48,7 @@ class MetadataClient : public ServiceClient
     int  parseCollection(MdcapInput &mdcap_input);
 
     void parseNewItemData(
-                            int  collection_id,
+                            MetadataCollection *which_collection,
                             int  collection_generation,
                             bool update_type,
                             int  total_count,
@@ -57,8 +57,13 @@ class MetadataClient : public ServiceClient
                             MdcapInput &mdcap_input
                          );
     
+    void parseDeletedItemData(
+                                MetadataCollection *which_collection,
+                                MdcapInput &mdcap_input
+                            );
+    
     void parseNewListData(
-                            int  collection_id,
+                            MetadataCollection *which_collection,
                             int  collection_generation,
                             bool update_type,
                             int  total_count,
@@ -66,6 +71,14 @@ class MetadataClient : public ServiceClient
                             int  del_count,
                             MdcapInput &mdcap_input
                          );
+
+    void parseDeletedListData(
+                                MetadataCollection *which_collection,
+                                MdcapInput &mdcap_input
+                             );
+
+    MetadataCollection* findCollection(int collection_id);
+    void printMetadata();   // Debugging
     
   private:
   

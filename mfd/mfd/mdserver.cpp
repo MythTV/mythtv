@@ -117,12 +117,21 @@ void MetadataServer::handleIncoming(HttpInRequest *http_request, int client_id)
         mdcap_request = NULL;
         return;
     }
+
+
+    //
+    //  Log what's happening
+    //
+
+    log(QString("an mdcap client (%1) asked for \"%2\"")
+                .arg(client_id)
+                .arg(http_request->getUrl()), 8);
     
     //
     //  Send back server info if that's what they asked for
     //
     
-    else if(mdcap_request->getRequestType() == MDCAP_REQUEST_SERVINFO )
+    if(mdcap_request->getRequestType() == MDCAP_REQUEST_SERVINFO )
     {
         sendServerInfo(http_request);
         delete mdcap_request;
@@ -616,6 +625,8 @@ void MetadataServer::deleteContainer(int container_id)
                        .arg(container_id));
     }
     unlockMetadata();
+    
+    dealWithHangingUpdates();
 }
 
 int MetadataServer::bumpContainerId()
@@ -743,6 +754,8 @@ void MetadataServer::doAtomicDataSwap(
         }
         
     unlockMetadata();
+    
+    dealWithHangingUpdates();
 }
 
 void MetadataServer::doAtomicDataDelta(
@@ -862,7 +875,8 @@ void MetadataServer::doAtomicDataDelta(
         
     unlockMetadata();
 
-
+    dealWithHangingUpdates();
+    
 }
 
 MetadataContainer* MetadataServer::getMetadataContainer(int which_one)
@@ -1062,67 +1076,119 @@ void MetadataServer::sendLogin(HttpInRequest *http_request, uint32_t session_id)
     sendResponse(http_request, response);
 }
 
-void MetadataServer::possiblySendUpdate(HttpInRequest *http_request, int /* client_id */)
+void MetadataServer::possiblySendUpdate(HttpInRequest *http_request, int client_id)
 {
+    lockMetadata();
+
     //
     //  If the client is not up to date with version numbers, send an update
     //
     
-    QString version_string = http_request->getHeader("MDCAP-Container-Versions");
+    bool send_an_update = false;
+    
+    QString version_string = http_request->getHeader("MDCAP-Generations");
     if(version_string.length() > 0)
     {
         //
         //  Client sent container versions
         //
-    }
-    
-    //
-    //  We do need to send an update. Send a list of metadata collections with their current version numbers
-    //
-    
-    MdcapOutput response;
-    
-    lockMetadata();
-        response.addUpdateGroup();
 
-            //
-            //  How many collections in total
-            //
+        QMap<int, int> client_generations;
+        QStringList generation_pairs = QStringList::split(",", version_string);
+        for(
+            QStringList::Iterator sl_it = generation_pairs.begin(); 
+            sl_it != generation_pairs.end(); 
+            ++sl_it 
+           )
+        {
+            bool a_ok, b_ok;
+            int container_number  = (*sl_it).section("/", 0, 0).toInt(&a_ok);
+            int generation_number = (*sl_it).section("/", 1, 1).toInt(&b_ok); 
+            if(a_ok && b_ok)
+            {
+                client_generations.insert(container_number, generation_number);
+                
+                //
+                //  If the client has a reference to container that does not
+                //  (ie. no longer) exists, that's a problem ... they need an update
+                //
+                
+                bool bad_reference = true;
+                QPtrListIterator<MetadataContainer> it( *metadata_containers );
+                MetadataContainer *container;
+                while ( (container = it.current()) != 0 ) 
+                {
+                    ++it;
+                    if(container->getIdentifier() == container_number)
+                    {
+                        bad_reference = false;
+                    }                
+                }        
+                if(bad_reference)
+                {
+                    send_an_update = true;
+                }
+                
+            }
+            else
+            {
+                warning("error parsing mdcap client generations");
+            }
+        }
 
-            response.addCollectionCount(metadata_containers->count());
-
-            //
-            //  For each, add information about metadata containers
-            //
-
+        if(!send_an_update)
+        {
             QPtrListIterator<MetadataContainer> it( *metadata_containers );
             MetadataContainer *container;
             while ( (container = it.current()) != 0 ) 
             {
                 ++it;
-                response.addCollectionGroup();
-                    response.addCollectionId(container->getIdentifier());
-                    if(container->isAudio())
-                    {
-                        response.addCollectionType(MDT_audio);
-                    }
-                    else if(container->isVideo())
-                    {
-                        response.addCollectionType(MDT_video);
-                    }
-                    else
-                    {
-                        warning("collection that is neither audio not video");
-                    }
-                    response.addCollectionCount(container->getMetadataCount());
-                    response.addCollectionName(container->getName());
-                    response.addCollectionGeneration(container->getGeneration());
-                response.endGroup();
-            }
-        response.endGroup();
-    unlockMetadata();
+                int what_generation = container->getGeneration();
+                if(what_generation != client_generations[container->getIdentifier()])
+                {
+                    send_an_update = true;
+                }
+                    
+            }    
+        }        
+    }
+    else
+    {
+        send_an_update = true;
+    }
+    
+    
+    if(send_an_update)
+    {
 
+        //
+        //  We do need to send an update. Send a list of metadata collections with their current version numbers
+        //
+    
+        MdcapOutput response;
+        
+        buildUpdateResponse(&response);
+    
+    unlockMetadata();
     sendResponse(http_request, response);
+
+    }
+    else
+    {
+        
+        //
+        //  Put this client in our hanging updates list
+        //
+        
+        http_request->sendResponse(false);
+        unlockMetadata();
+
+        hanging_updates_mutex.lock();
+            hanging_updates.append(client_id);
+            log(QString("now has %1 client(s) sitting in a hanging mdcap update")
+                        .arg(hanging_updates.count()), 8);
+        hanging_updates_mutex.unlock();
+    }
 }
 
 void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *mdcap_request)
@@ -1227,6 +1293,78 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
             //  Send the deltas from the last change for items in this
             //  container
             //
+        
+            QIntDict<Metadata> *metadata = container->getMetadata();
+            QValueList<int> metadata_additions = container->getMetadataAdditions();
+            QValueList<int> metadata_deletions = container->getMetadataDeletions();
+            
+            MdcapOutput response;
+        
+            response.addItemGroup();
+
+                response.addCollectionId(container->getIdentifier());
+                response.addCollectionGeneration(container->getGeneration());
+                response.addUpdateType(full_update);    // false
+                response.addTotalItems(metadata->count());
+                response.addAddedItems(metadata_additions.count());
+                response.addDeletedItems(metadata_deletions.count());
+                
+                if(metadata_additions.count() > 0)
+                {
+                    response.addAddedItemsGroup();
+                        QValueList<int>::iterator it;
+                        for ( it = metadata_additions.begin(); it != metadata_additions.end(); ++it )
+                        {
+                            Metadata *a_metadata = metadata->find((*it));
+                            if(a_metadata)
+                            {
+                                if(a_metadata->getType() == MDT_audio)
+                                {
+                                    AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
+                                    response.addAddedItemGroup();
+                                        response.addItemType(audio_metadata->getType());
+                                        response.addItemId(audio_metadata->getId());
+                                        response.addItemUrl(audio_metadata->getUrl().toString());
+                                        response.addItemRating(audio_metadata->getRating());
+                                        response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
+                                        response.addItemPlayCount(audio_metadata->getPlayCount());
+                                        response.addItemArtist(audio_metadata->getArtist());
+                                        response.addItemAlbum(audio_metadata->getAlbum());
+                                        response.addItemTitle(audio_metadata->getTitle());
+                                        response.addItemGenre(audio_metadata->getGenre());
+                                        response.addItemYear(audio_metadata->getYear());
+                                        response.addItemTrack(audio_metadata->getTrack());
+                                        response.addItemLength(audio_metadata->getLength());
+                                    response.endGroup();
+                                }
+                                else
+                                {
+                                    warning("don't know how to handle non audio metadata yet");
+                                }
+                            }
+                            else
+                            {
+                                warning("metadata addition that doesn't point to a metadata!!");
+                            }
+                        }
+                    response.endGroup();
+                }
+                
+                if(metadata_deletions.count() > 0)
+                {
+                    response.addDeletedItemsGroup();
+                        QValueList<int>::iterator it;
+                        for ( it = metadata_deletions.begin(); it != metadata_deletions.end(); ++it )
+                        {
+                            response.addDeletedItem((*it));
+                        }
+                    response.endGroup();
+                }
+                
+
+            response.endGroup();
+    
+            sendResponse(http_request, response);
         }
         
     }
@@ -1281,6 +1419,63 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
             //  Send the deltas from the last change for items in this
             //  container
             //
+
+            QIntDict<Playlist> *playlists = container->getPlaylists();
+            QValueList<int> playlist_additions = container->getPlaylistAdditions();
+            QValueList<int> playlist_deletions = container->getPlaylistDeletions();
+            
+            MdcapOutput response;
+        
+            response.addListGroup();
+
+                response.addCollectionId(container->getIdentifier());
+                response.addCollectionGeneration(container->getGeneration());
+                response.addUpdateType(full_update);
+                response.addTotalItems(playlists->count());
+                response.addAddedItems(playlist_additions.count());
+                response.addDeletedItems(playlist_deletions.count());
+                
+                if(playlist_additions.count() > 0)
+                {
+                    response.addAddedListsGroup();
+                        QValueList<int>::iterator it;
+                        for ( it = playlist_additions.begin(); it != playlist_additions.end(); ++it )
+                        {
+                            Playlist *a_playlist = playlists->find((*it));
+                            if(a_playlist)
+                            {
+                                response.addAddedListGroup();
+                                    response.addListId(a_playlist->getId());
+                                    response.addListName(a_playlist->getName());
+                                    QValueList<int> *list_items = a_playlist->getListPtr();
+                                    QValueList<int>::iterator item_it;
+                                    for(item_it = list_items->begin(); item_it != list_items->end(); ++item_it)
+                                    {
+                                        response.addListItem((*item_it));
+                                    }
+                                response.endGroup();
+                            }
+                            else
+                            {
+                                warning("playlist addition entry that didn't point to anything");
+                            }
+                        }
+                    response.endGroup();
+                }
+                if(playlist_deletions.count() > 0)
+                {
+                    response.addDeletedListsGroup();
+                        QValueList<int>::iterator it;
+                        for ( it = playlist_deletions.begin(); it != playlist_deletions.end(); ++it )
+                        {
+                            response.addDeletedList((*it));
+                        }
+                    response.endGroup();
+                }
+
+            response.endGroup();
+    
+            sendResponse(http_request, response);
         }
         
     }
@@ -1294,6 +1489,96 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
     
 }
 
+void MetadataServer::buildUpdateResponse(MdcapOutput *response)
+{
+    //
+    //  The metadata should already be locked (!)
+    //
+
+    response->addUpdateGroup();
+
+    //
+    //  How many collections in total
+    //
+
+    response->addCollectionCount(metadata_containers->count());
+
+    //
+    //  For each, add information about metadata containers
+    //
+
+    QPtrListIterator<MetadataContainer> it( *metadata_containers );
+    MetadataContainer *container;
+    while ( (container = it.current()) != 0 ) 
+    {
+        ++it;
+        response->addCollectionGroup();
+            response->addCollectionId(container->getIdentifier());
+            if(container->isAudio())
+            {
+                response->addCollectionType(MDT_audio);
+            }
+            else if(container->isVideo())
+            {
+                response->addCollectionType(MDT_video);
+            }
+            else
+            {
+                warning("collection that is neither audio not video");
+            }
+            response->addCollectionCount(container->getMetadataCount());
+            response->addCollectionName(container->getName());
+            response->addCollectionGeneration(container->getGeneration());
+        response->endGroup();
+    }
+    response->endGroup();
+}
+
+void MetadataServer::dealWithHangingUpdates()
+{
+    //
+    //  Make an /update response that reflects current metadata
+    //
+
+    MdcapOutput response;
+    lockMetadata();
+        buildUpdateResponse(&response);
+    unlockMetadata();
+
+    //
+    //  Put the mdcap response into a properly constructed Http out response
+    //
+    
+    
+    HttpOutResponse *hu_response = new HttpOutResponse(this, NULL);
+    hu_response->addHeader(
+                            QString("MDCAP-Server: MythTV/%1.%1 (Probably Linux)")
+                                .arg(MDCAP_PROTOCOL_VERSION_MAJOR)
+                                .arg(MDCAP_PROTOCOL_VERSION_MINOR)
+                          );
+                        
+    hu_response->addHeader(
+                            "Content-Type: application/x-mdcap-tagged"
+                          );
+
+    hu_response->setPayload(response.getContents());
+
+    //
+    //  Send it out, removing each hanging update from the list as we go
+    //
+        
+    hanging_updates_mutex.lock();
+
+        QValueList<int>::iterator it;
+        for ( it = hanging_updates.begin(); it != hanging_updates.end(); ++it )
+        {
+            MFDHttpPlugin::sendResponse((*it), hu_response);
+        }
+        hanging_updates.clear();
+
+    hanging_updates_mutex.unlock();
+    
+}
 
 
 MetadataServer::~MetadataServer()

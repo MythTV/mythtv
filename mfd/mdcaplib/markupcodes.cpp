@@ -16,9 +16,11 @@ const char MarkupCodes::update_group;
 const char MarkupCodes::collection_group;
 const char MarkupCodes::item_group;
 const char MarkupCodes::added_items_group;
+const char MarkupCodes::deleted_items_group;
 const char MarkupCodes::added_item_group;
 const char MarkupCodes::list_group;
 const char MarkupCodes::added_lists_group;
+const char MarkupCodes::deleted_lists_group;
 const char MarkupCodes::added_list_group;
 
 
@@ -41,6 +43,7 @@ const char MarkupCodes::update_type;
 const char MarkupCodes::total_items;
 const char MarkupCodes::added_items;
 const char MarkupCodes::deleted_items;
+const char MarkupCodes::deleted_item;
 const char MarkupCodes::item_type;
 const char MarkupCodes::item_id;
 const char MarkupCodes::item_rating;
@@ -51,3 +54,4 @@ const char MarkupCodes::item_track;
 const char MarkupCodes::item_length;
 const char MarkupCodes::list_id;
 const char MarkupCodes::list_item;
+const char MarkupCodes::deleted_list;

@@ -266,6 +266,11 @@ const QString& MFDService::getFormalServiceRemoval()
     return formal_removal;
 }
 
+void MFDService::warning(const QString &warn_text)
+{
+    parent->warning(warn_text);
+}
+
 MFDService::~MFDService()
 {
     if(service_info)

@@ -17,6 +17,8 @@
 #include <qdatetime.h>
 #include <qvaluelist.h>
 #include <qintdict.h>
+#include <qmap.h>
+
 //
 //  The number of items you can have in a collection. Note this is _not_
 //  some limit in a dynamic variable or something. It just makes it easy for
@@ -284,6 +286,10 @@ class Playlist
     bool             waitingForList(){ return waiting_for_list; }
     void             waitingForList(bool uh_huh_or_nope_not_me){waiting_for_list = uh_huh_or_nope_not_me;}
     void             checkAgainstMetadata(QIntDict<Metadata> *the_metadata);
+    void             addToIndirectMap(int key, int value);
+    int              getFromIndirectMap(int key);
+    void             removeFromIndirectMap(int key);
+    QMap<int, int>*  getIndirectMap(){return &indirect_map;}
 
   private:
   
@@ -296,6 +302,13 @@ class Playlist
     bool             internal_change;
     bool             waiting_for_list;
     QString          raw_song_list;
+
+    //
+    //  Stupid thing to handle one too many levels of indirection in
+    //  playlists that come from iTunes
+    //
+
+    QMap<int, int>  indirect_map;
 };
 
 #endif

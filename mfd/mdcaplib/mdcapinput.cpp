@@ -1017,6 +1017,62 @@ uint32_t MdcapInput::popListItem()
     return popU32();    
 }
 
+uint32_t MdcapInput::popDeletedList()
+{
+    //
+    //  deleted list is always 5 bytes
+    //  1st byte - markup code
+    //  next 4 - 32 bit integer = id of the list being deleted
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popDeletedList(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::deleted_list)
+    {
+        cerr << "mdcapinput.o: asked to popDeletedList(), but "
+             << "content code is not deleted_list "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+uint32_t MdcapInput::popDeletedItem()
+{
+    //
+    //  deleted item is always 5 bytes
+    //  1st byte - markup code
+    //  next 4 - 32 bit integer = id of the item being deleted
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popDeletedItem(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::deleted_item)
+    {
+        cerr << "mdcapinput.o: asked to popDeletedItem(), but "
+             << "content code is not deleted_item "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
 
 
 void MdcapInput::printContents()

@@ -1796,17 +1796,17 @@ void HttpOutResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_cl
         //
         
         QFileInfo file_info(file_to_send->name());
-    
+        QUrl device_url = QUrl(file_to_send->name());
         QString filename = file_info.fileName();
-        QString devicename = file_info.dirPath(true);
+
         int tracknum = atoi(filename.section('.', 0, 0).ascii());
 
-        
-        cdrom_drive *device = cdda_identify(devicename.ascii(), 0, NULL);
+        cdrom_drive *device = cdda_identify(device_url.dirPath(), 0, NULL);
+
         if(!device)
         {
             warning(QString("could not get a device at \"%1\"")
-                            .arg(devicename.ascii()));
+                            .arg(device_url.dirPath()));
             streamEmptyWav(which_client);
             return;
         }
@@ -1815,7 +1815,7 @@ void HttpOutResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_cl
         {
             cdda_close(device);
             warning(QString("could not open device \"%1\"")
-                            .arg(devicename.ascii()));
+                            .arg(device_url.dirPath()));
             streamEmptyWav(which_client);
             return;
         }

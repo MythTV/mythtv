@@ -45,10 +45,12 @@ class MdcapOutput
     void addItemGroup();
     void addAddedItemsGroup();
     void addAddedItemGroup();
+    void addDeletedItemsGroup();
 
     void addListGroup();
     void addAddedListsGroup();
     void addAddedListGroup();
+    void addDeletedListsGroup();
     
 
     void endGroup();
@@ -75,6 +77,7 @@ class MdcapOutput
     void addTotalItems(uint count);
     void addAddedItems(uint count);
     void addDeletedItems(uint count);
+    void addDeletedItem(uint item_id);
 
     //
     //  "element" functions for items
@@ -101,6 +104,7 @@ class MdcapOutput
     void addListId(int list_id);
     void addListName(const QString &list_name);
     void addListItem(int list_item);
+    void addDeletedList(int list_id);
 
   private:
 

@@ -1330,6 +1330,7 @@ void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_
     u32 a_u32_variable;
     std::string a_string;
 
+
     Chunk listing;
     QString new_name;
 
@@ -1347,12 +1348,16 @@ void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_
             warning("got a non mlit tag "
                     "and I really really wanted one.");
         }
+
+        u32 items_real_id = 0;
+        u32 items_playlist_id = 0;
         
         TagInput internal_listing(listing);
         while(!internal_listing.isFinished())
         {
     
             internal_listing >> a_tag;
+
 
             switch(a_tag.type)
             {
@@ -1379,6 +1384,7 @@ void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_
                 
                     internal_listing >> a_u32_variable;
                     which_playlist->addToList(a_u32_variable);
+                    items_real_id = a_u32_variable;
                     break;
                 
                 case 'mcti':
@@ -1388,6 +1394,7 @@ void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_
                     //
                     
                     internal_listing >> a_u32_variable;
+                    items_playlist_id = a_u32_variable;
                     break;
                     
                 case 'minm':
@@ -1420,11 +1427,14 @@ void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_
 
             internal_listing >> end;
         }
+        
+        which_playlist->addToIndirectMap(items_playlist_id, items_real_id);
     }
 }
 
 void Database::parsePlaylistItemDeletions(TagInput &dmap_data, Playlist *which_playlist, int update_type)
 {
+
 
     if(update_type != 1)
     {
@@ -1433,32 +1443,50 @@ void Database::parsePlaylistItemDeletions(TagInput &dmap_data, Playlist *which_p
 
 
     //
-    //  If it's got no items, we need to refill it from copy in mdserver copy
+    //  Lock the metadata and get a reference to the existing playlist up in
+    //  the metadata server
     //
 
-    if(which_playlist->getCount() < 1)
+    metadata_server->lockMetadata();
+
+    Playlist *existing_playlist = metadata_server->getPlaylistByContainerAndId(container_id, which_playlist->getId());
+    if(!existing_playlist)
     {
-        metadata_server->lockMetadata();
-            Playlist *existing_playlist = metadata_server->getPlaylistByContainerAndId(container_id, which_playlist->getId());
-            if(existing_playlist)
-            {
-                QValueList<int> existing_tracks = existing_playlist->getList();
-                QValueList<int>::iterator it;
-                for(it = existing_tracks.begin(); it != existing_tracks.end(); ++it)
-                {
-                    which_playlist->addToList((*it));
-                }
-            }
-            else
-            {
-                warning("you want deletions from something that doesn't exist");
-                metadata_server->unlockMetadata();
-                return;
-            }
-    metadata_server->unlockMetadata();
-        
-        
+        warning("can't delete items from a playlist that doesn't yet exist");
+        metadata_server->unlockMetadata();
+        return;
     }
+
+
+
+/*
+    metadata_server->lockMetadata();
+        Playlist *existing_playlist = metadata_server->getPlaylistByContainerAndId(container_id, which_playlist->getId());
+        if(existing_playlist)
+        {
+            QValueList<int> existing_tracks = existing_playlist->getList();
+            QValueList<int>::iterator it;
+            for(it = existing_tracks.begin(); it != existing_tracks.end(); ++it)
+            {
+                which_playlist->addToList((*it));
+            }
+                
+            QMap <int, int> *stupid_itunes_indirection = existing_playlist->getIndirectMap();
+            QMap<int, int>::Iterator map_it;
+            for ( map_it = stupid_itunes_indirection->begin(); map_it != stupid_itunes_indirection->end(); ++map_it)
+            {
+                which_playlist->addToIndirectMap(map_it.key(), map_it.data());
+            } 
+        }
+        else
+        {
+            warning("you want deletions from something that doesn't exist");
+            metadata_server->unlockMetadata();
+            return;
+        }
+            
+    metadata_server->unlockMetadata();
+*/
 
 
     while(!dmap_data.isFinished())
@@ -1473,7 +1501,7 @@ void Database::parsePlaylistItemDeletions(TagInput &dmap_data, Playlist *which_p
         switch(a_tag.type)
         {
             //
-            //  Just store a list of deletions
+            //  Just parse a list of deletions
             //
 
             case 'miid':
@@ -1483,10 +1511,17 @@ void Database::parsePlaylistItemDeletions(TagInput &dmap_data, Playlist *which_p
                     //
 
                     dmap_data >> a_u32_variable;
-                    if(!which_playlist->removeFromList(a_u32_variable))
                     {
-                        warning("tried to delete an item from a "
-                                "playlist that did not contain the item");
+                        int real_item_id = existing_playlist->getFromIndirectMap(a_u32_variable);
+                        if(!which_playlist->removeFromList(real_item_id))
+                        {
+                            warning(QString("tried to delete an item from a "
+                                    "playlist that did not contain the item "
+                                    "(item #%1, indirect #%2, playlist #%3)")
+                                            .arg(real_item_id) 
+                                            .arg(a_u32_variable)
+                                            .arg(which_playlist->getId()));
+                        }
                     }
                     break;
 
@@ -1497,6 +1532,8 @@ void Database::parsePlaylistItemDeletions(TagInput &dmap_data, Playlist *which_p
         }
         dmap_data >> end;
     }
+
+    metadata_server->unlockMetadata();
 
 }
 

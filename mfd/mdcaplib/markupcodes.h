@@ -38,10 +38,12 @@ class MarkupCodes
     static const char item_group            = 5;
     static const char added_items_group     = 6;
     static const char added_item_group      = 7;
+    static const char deleted_items_group    = 8;
 
-    static const char list_group            = 8;
-    static const char added_lists_group     = 9;
-    static const char added_list_group      = 10;
+    static const char list_group            = 9;
+    static const char added_lists_group     = 10;
+    static const char deleted_lists_group   = 11;
+    static const char added_list_group      = 12;
     
     //
     //  Smaller items that implicitly imply groups (by virtue of being of
@@ -72,17 +74,18 @@ class MarkupCodes
     static const char total_items           = 40;
     static const char added_items           = 41;
     static const char deleted_items         = 42;
-    static const char item_type             = 43;
-    static const char item_id               = 44;
-    static const char item_rating           = 45;
-    static const char item_last_played      = 46;
-    static const char item_play_count       = 47;
-    static const char item_year             = 48;
-    static const char item_track            = 49;
-    static const char item_length           = 50;
-    static const char list_id               = 51;
-    static const char list_item             = 52;        
-    
+    static const char deleted_item          = 43;
+    static const char item_type             = 44;
+    static const char item_id               = 45;
+    static const char item_rating           = 46;
+    static const char item_last_played      = 47;
+    static const char item_play_count       = 48;
+    static const char item_year             = 49;
+    static const char item_track            = 50;
+    static const char item_length           = 51;
+    static const char list_id               = 52;
+    static const char list_item             = 53;
+    static const char deleted_list          = 54;    
 
   private:
 

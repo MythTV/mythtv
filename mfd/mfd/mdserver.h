@@ -94,7 +94,6 @@ class MetadataServer : public MFDHttpPlugin
     QValueList<int>             getLastDestroyedMetadataList(){return last_destroyed_metadata;}
     QValueList<int>             getLastDestroyedPlaylistList(){return last_destroyed_playlists;}
 
-
     //
     //  mdcap related serving functions
     //
@@ -105,6 +104,9 @@ class MetadataServer : public MFDHttpPlugin
     void sendContainers(HttpInRequest *http_request, MdcapRequest *mdcap_request);
 
     void sendResponse(HttpInRequest *http_request, MdcapOutput &response);
+
+    void buildUpdateResponse(MdcapOutput *response);
+    void dealWithHangingUpdates();
 
   private:
 
@@ -145,6 +147,10 @@ class MetadataServer : public MFDHttpPlugin
     QDict<Metadata>             *local_mythdigest_dictionary;
 
     MdcapSessions               mdcap_sessions;
+
+    QValueList<int>             hanging_updates;
+    QMutex                      hanging_updates_mutex;
+    
 };
 
 
