@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-06-09, v2.40
+  2003-06-09, v2.41
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -205,7 +205,7 @@
   http://www.snowman.net/mailman/listinfo/mythtv-users
   <http://www.snowman.net/mailman/listinfo/mythtv-users>.
 
-  This HOWTO is for MythTV v0.8.
+  This HOWTO is for MythTV v0.9.
 
 
 
@@ -1127,8 +1127,8 @@
   Unpack MythTV
 
 
-       $ tar -xjf mythtv-0.8.tar.bz2
-       $ cd mythtv-0.8
+       $ tar -xjf mythtv-0.9.tar.bz2
+       $ cd mythtv-0.9
        $ ./configure
        $ make
 
@@ -1889,7 +1889,7 @@
   used to control MythTV.
 
 
-       $ cd ~/mythtv-0.8/configfiles
+       $ cd ~/mythtv-0.9/configfiles
        $ cp lircrc.example ~/.lircrc
 
 
@@ -2481,7 +2481,7 @@
   # Need to use a shell script because the QTDIR environment variable isn't
   # being honored by crontab?
   # The next text should be all on the same line.
-  30 04 * * * /bin/bash $HOME/mythtv-0.8/configfiles/mythfilldatabasecron
+  30 04 * * * /bin/bash $HOME/mythtv-0.9/configfiles/mythfilldatabasecron
   $
 
 
@@ -2715,8 +2715,8 @@
 
 
 
-       $ tar -xjf mythweb-0.8.tar.bz2
-       $ cd mythweb-0.8
+       $ tar -xjf mythweb-0.9.tar.bz2
+       $ cd mythweb-0.9
        $ su
        # mkdir /var/www/html/mythweb
        # cp -r . /var/www/html/mythweb
@@ -2745,8 +2745,8 @@
   it.
 
 
-       $ tar -xjf mythgallery-0.8.tar.bz2
-       $ cd mythgallery-0.8
+       $ tar -xjf mythgallery-0.9.tar.bz2
+       $ cd mythgallery-0.9
        $ make
        # su
        # make install
@@ -3083,7 +3083,7 @@
   [1m16.  MythWeather.[0m
 
   The MythWeather module will obtain the weather information for the
-  location that you specify.  You must be running MythTV v0.8 in order
+  location that you specify.  You must be running MythTV v0.9 in order
   to use MythWeather.
 
 
@@ -3829,8 +3829,8 @@
 
   [1m19.5.2.  MythTV Dimensions[0m
 
-  In 0.8, from "mythfrontend" go to Setup->Appearance.  The default for
-  the height and width on 0.8 is "0" - this will cause MythTV to
+  In 0.9, from "mythfrontend" go to Setup->Appearance.  The default for
+  the height and width on 0.9 is "0" - this will cause MythTV to
   automatically size itself to full screen. To ensure that your new
   dimension settings take effect, exit and restart MythTV.
 

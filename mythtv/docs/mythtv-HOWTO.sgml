@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-06-09, v2.40
+<date>2003-06-09, v2.41
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -55,7 +55,7 @@ It's recommended that you join the user list at <url
 url="http://www.snowman.net/mailman/listinfo/mythtv-users"
 name="http://www.snowman.net/mailman/listinfo/mythtv-users">.
 
-This HOWTO is for MythTV v0.8.
+This HOWTO is for MythTV v0.9.
 
 <sect>Introduction.
 <p>This HOWTO document will focus on manually building MythTV in a North
@@ -813,8 +813,8 @@ $ su
 <sect1>Manually building MythTV.
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.8.tar.bz2
-$ cd mythtv-0.8
+$ tar -xjf mythtv-0.9.tar.bz2
+$ cd mythtv-0.9
 $ ./configure
 $ make
 </verb></tscreen>
@@ -1440,7 +1440,7 @@ receiver.
 The next step is to convert those signals into something that can be used
 to control MythTV.
 <tscreen><verb>
-$ cd ~/mythtv-0.8/configfiles
+$ cd ~/mythtv-0.9/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -1955,7 +1955,7 @@ $ crontab -l  NOTE: this is a lowercase L.
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.8/configfiles/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/mythtv-0.9/configfiles/mythfilldatabasecron
 $ 
 </verb></tscreen>
 
@@ -2148,8 +2148,8 @@ Mandrake Control Center.
 <sect1>Completing the installation.
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.8.tar.bz2
-$ cd mythweb-0.8
+$ tar -xjf mythweb-0.9.tar.bz2
+$ cd mythweb-0.9
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -2171,8 +2171,8 @@ operational.
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.
 <tscreen><verb>
-$ tar -xjf mythgallery-0.8.tar.bz2
-$ cd mythgallery-0.8
+$ tar -xjf mythgallery-0.9.tar.bz2
+$ cd mythgallery-0.9
 $ make
 # su
 # make install
@@ -2464,7 +2464,7 @@ select "Delete this Playlist" from the popup.
 
 <sect>MythWeather.
 <p>The MythWeather module will obtain the weather information for the
-location that you specify.  You must be running MythTV v0.8 in order to use
+location that you specify.  You must be running MythTV v0.9 in order to use
 MythWeather.
 
 <code>
@@ -3087,8 +3087,8 @@ this happens, edit your X configuration file to match the display size then
 restart X.
 
 <sect2>MythTV Dimensions
-<p>In 0.8, from "mythfrontend" go to Setup->Appearance.  The default for the
-height and width on 0.8 is "0" - this will cause MythTV to automatically
+<p>In 0.9, from "mythfrontend" go to Setup->Appearance.  The default for the
+height and width on 0.9 is "0" - this will cause MythTV to automatically
 size itself to full screen. To ensure that your new dimension settings take
 effect, exit and restart MythTV.
 
@@ -3708,6 +3708,7 @@ lirc example so that the user knows that only certain kinds of serial
 modules should have the link to ttySx.  Altered the PVR-250 bitrate example.
 v2.40, 2003-06-09.  Fixed lirc acronym expansion.  sdl vs. SDL in Mandrake
 MythMusic.  Updated MythVideo docs.
+v2.41, 2003-06-09.  Bumped version numbers to 0.9.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
