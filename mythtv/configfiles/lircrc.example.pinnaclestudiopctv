@@ -113,19 +113,19 @@ end
 begin
     prog = irxevent
     button = Mute
-    config = Key | CurrentWindow
+    config = Key Shift-bar CurrentWindow
 end
 
 begin
     prog = irxevent
     button = vol+
-    config = Key ] CurrentWindow
+    config = Key bracketright CurrentWindow
 end
 
 begin
     prog = irxevent
     button = vol-
-    config = Key [ CurrentWindow    
+    config = Key bracketleft CurrentWindow    
 end
 
 # begin
