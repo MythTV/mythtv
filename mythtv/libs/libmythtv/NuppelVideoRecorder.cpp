@@ -850,6 +850,8 @@ void NuppelVideoRecorder::StartRecording(void)
     encoding = true;
     recording = true;
 
+    int syncerrors = 0;
+
     while (encoding) {
         if (paused)
         {
@@ -859,10 +861,21 @@ void NuppelVideoRecorder::StartRecording(void)
                gettimeofday(&stm, &tzone);
            continue;
         }
+
         frame = 0;
         mm.frame = 0;
         if (ioctl(fd, VIDIOCSYNC, &frame)<0) 
-            perror("VIDIOCSYNC0");
+        {
+            syncerrors++;
+            if (syncerrors < 10)
+                perror("VIDIOCSYNC0");
+            else
+            {
+                cerr << "Multiple bttv errors, recording aborted\n";
+                encoding = false;
+                break;
+            }
+        }
         else 
         {
             BufferIt(buf+vm.offsets[0], video_buffer_size);
@@ -870,10 +883,21 @@ void NuppelVideoRecorder::StartRecording(void)
             if (ioctl(fd, VIDIOCMCAPTURE, &mm)<0) 
                 perror("VIDIOCMCAPTURE0");
         }
+
         frame = 1;
         mm.frame = 1;
         if (ioctl(fd, VIDIOCSYNC, &frame)<0) 
-            perror("VIDIOCSYNC1");
+        {
+            syncerrors++;
+            if (syncerrors < 10)
+                perror("VIDIOCSYNC1");
+            else
+            {
+                cerr << "Multiple bttv errors, recording aborted\n";
+                encoding = false;
+                break;
+            }
+        }
         else 
         {
             BufferIt(buf+vm.offsets[1], video_buffer_size);
