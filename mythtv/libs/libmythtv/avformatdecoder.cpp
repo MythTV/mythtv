@@ -57,6 +57,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
 
     positionMapType = MARK_UNSET;
 
+    do_ac3_passthru = false;
+
     memset(&params, 0, sizeof(AVFormatParameters));
     memset(prvpkt, 0, 3);
 

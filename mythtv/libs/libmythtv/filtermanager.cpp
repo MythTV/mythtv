@@ -77,7 +77,8 @@ FilterManager::FilterManager()
              i++)
         {
             Path = FiltDir.filePath(*i);
-            LoadFilterLib(Path);
+            if (Path.length() > 1)
+                LoadFilterLib(Path);
         }
     }
 }
