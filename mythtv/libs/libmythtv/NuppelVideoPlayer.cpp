@@ -3877,3 +3877,32 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
 }
 
 
+
+void NuppelVideoPlayer::incCurrentAudioTrack()
+{
+    if (decoder)
+        decoder->incCurrentAudioTrack();
+}
+
+void NuppelVideoPlayer::decCurrentAudioTrack()
+{
+    if (decoder)
+        decoder->decCurrentAudioTrack();
+}
+
+bool NuppelVideoPlayer::setCurrentAudioTrack(int trackNo)
+{
+    if (decoder)
+        return decoder->setCurrentAudioTrack(trackNo);
+    else
+        return false;
+}
+ 
+
+int NuppelVideoPlayer::getCurrentAudioTrack()
+{
+    if (decoder)
+        return decoder->getCurrentAudioTrack() + 1;
+    else
+        return 0;
+}

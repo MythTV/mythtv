@@ -60,6 +60,11 @@ class DecoderBase
     virtual void SeekReset(long long newKey = 0, int skipFrames = 0,
                            bool needFlush = false) { }
 
+    const int getCurrentAudioTrack() const { return currentAudioTrack;}
+    virtual void incCurrentAudioTrack(){}
+    virtual void decCurrentAudioTrack(){}
+    virtual bool setCurrentAudioTrack(int){ return false;}
+                                                          
   protected:
     typedef struct posmapentry
     {
@@ -108,6 +113,8 @@ class DecoderBase
 
     bool getrawframes;
     bool getrawvideo;
+
+    int currentAudioTrack;
 };
 
 #endif

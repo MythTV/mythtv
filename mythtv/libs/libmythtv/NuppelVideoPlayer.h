@@ -190,6 +190,11 @@ class NuppelVideoPlayer
 
     void ExposeEvent(void);
 
+    void incCurrentAudioTrack();
+    void decCurrentAudioTrack();
+    bool setCurrentAudioTrack(int trackNo);
+    int getCurrentAudioTrack();
+    
  protected:
     void OutputVideoLoop(void);
     void IvtvVideoLoop(void);

@@ -33,6 +33,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     framesPlayed = 0;
     framesRead = 0;
 
+    wantedAudioStream = -1;
+
     audio_check_1st = 2;
     audio_sample_size = 4;
     audio_sampling_rate = 48000;
@@ -583,27 +585,35 @@ bool AvFormatDecoder::CheckAudioParams(int freq, int channels)
     QString chan = "stereo";
     if (channels == 1)
         chan = "mono";
+    else if (channels > 2)
+        chan = "multi";
 
     cerr << "Audio has changed: " << freq << "hz "
          << chan << "(" << channels << ")" << endl;
 
-    for (int i = 0; i < ic->nb_streams; i++)
+    AVCodecContext *enc = &ic->streams[wantedAudioStream]->codec;
+    AVCodec *codec = enc->codec;
+    if (enc->channels == channels)
     {
-        AVCodecContext *enc = &ic->streams[i]->codec;
+        avcodec_close(enc);
+        avcodec_open(enc, codec);
+        return true;
+    }    
+/*    for (int i = 0; i < ic->nb_streams; i++)
+    {
+        
         switch (enc->codec_type)
         {
             case CODEC_TYPE_AUDIO:
             {
-                AVCodec *codec = enc->codec;
-                avcodec_close(enc);
-                avcodec_open(enc, codec);
+                
                 break;
             }
             default:
                 break;
         }
     }
-
+*/
     return true;
 }
 
@@ -992,6 +1002,94 @@ float AvFormatDecoder::GetMpegAspect(AVCodecContext *context,
     return retval;
 }
 
+bool AvFormatDecoder::scanAudioTracks()
+{
+    for (int i = 0; i < ic->nb_streams; i++)
+    {
+        AVCodecContext *enc = &ic->streams[i]->codec;
+        if (enc->codec_type == CODEC_TYPE_AUDIO)
+        {
+            audioStreams.push_back( i );
+        }
+    }
+
+    return (audioStreams.size() > 0);
+}
+
+void AvFormatDecoder::incCurrentAudioTrack()
+{
+    if (audioStreams.size())
+    {
+        int tempTrackNo = currentAudioTrack;
+        ++tempTrackNo;
+        if (tempTrackNo > (int)(audioStreams.size() - 1))
+            tempTrackNo = 0;
+
+        currentAudioTrack = tempTrackNo;
+        wantedAudioStream = audioStreams[currentAudioTrack];
+    }
+}
+
+void AvFormatDecoder::decCurrentAudioTrack()
+{
+    if (audioStreams.size())
+    {
+        int tempTrackNo = currentAudioTrack;
+        --tempTrackNo;
+        if (tempTrackNo < 0)
+            tempTrackNo = audioStreams.size() - 1;
+
+        currentAudioTrack = tempTrackNo;
+        wantedAudioStream = audioStreams[currentAudioTrack];
+    }
+}
+
+bool AvFormatDecoder::setCurrentAudioTrack(int trackNo)
+{
+    if (trackNo < 0)
+        trackNo = -1;
+    else if (trackNo >= (int)audioStreams.size())
+        return false;
+
+    currentAudioTrack = trackNo;
+    if (currentAudioTrack > -1)
+        wantedAudioStream = audioStreams[currentAudioTrack];
+
+    return true;
+}
+
+bool AvFormatDecoder::autoSelectAudioTrack()
+{
+    if (!audioStreams.size())
+        return false;
+
+    bool foundAudio = false;
+    int minChannels = 1;
+    int maxTracks = (audioStreams.size() - 1);
+    int track;
+    if (do_ac3_passthru)
+        minChannels = 2;
+
+    while (!foundAudio)
+    {
+        for (track = maxTracks; track >= 0; track--)
+        {
+            int tempStream = audioStreams[track];
+            AVCodecContext *e = &ic->streams[tempStream]->codec;
+            if (e->channels > minChannels)
+            {
+                currentAudioTrack = track;
+                wantedAudioStream = tempStream;
+                return true;
+            }
+        }
+        minChannels--;
+        if (minChannels < 0)
+            return false;
+    }
+    return false;
+}
+
 void AvFormatDecoder::GetFrame(int onlyvideo)
 {
     AVPacket *pkt = NULL;
@@ -1001,7 +1099,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     long long pts;
     bool firstloop = false, have_err = false;
     bool preProcessed = false;
-
+    
 
     gotvideo = false;
 
@@ -1009,6 +1107,16 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
     bool allowedquit = false;
     bool storevideoframes = false;
+
+    
+    if (currentAudioTrack == -1 )
+    {
+        // Scan for audio tracks and pick one to use.
+        if (scanAudioTracks())
+        {
+            autoSelectAudioTrack();
+        }
+    }
 
     while (!allowedquit)
     {
@@ -1111,7 +1219,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
                         lastapts = pkt->pts / (AV_TIME_BASE / 1000);
 
-                    if (onlyvideo != 0)
+                    if (onlyvideo != 0 || (pkt->stream_index != wantedAudioStream))
                     {
                         ptr += pkt->size;
                         len -= pkt->size;
@@ -1136,12 +1244,11 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
                     if (data_size <= 0)
                         continue;
-                    bool audioChanged = false;
+                    
                     if (!do_ac3_passthru)
                     {
-                        audioChanged = CheckAudioParams(curstream->codec.sample_rate,
-                                                        curstream->codec.channels);
-                        if (audioChanged)
+                        if (CheckAudioParams(curstream->codec.sample_rate,
+                                             curstream->codec.channels))
                         {
                              audio_sampling_rate = curstream->codec.sample_rate;
                              audio_channels = curstream->codec.channels;
@@ -1151,8 +1258,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                              m_parent->SetAudioParams(16, audio_channels,
                                                   audio_sampling_rate);
                              m_parent->ReinitAudio();
-                             audioChanged = false;
-
                         }
                     }
 

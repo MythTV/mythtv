@@ -11,7 +11,8 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     m_parent = parent; 
     m_db = db;
     m_playbackinfo = pginfo;
-
+    currentAudioTrack = -1;
+    
     exactseeks = false;
     livetv = false;
     watchingrecording = false;

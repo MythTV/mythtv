@@ -45,7 +45,14 @@ class AvFormatDecoder : public DecoderBase
 
     void SetPixelFormat(const int);
 
+    virtual void incCurrentAudioTrack();
+    virtual void decCurrentAudioTrack();
+    virtual bool setCurrentAudioTrack(int trackNo);
+
   protected:
+    bool scanAudioTracks();
+    bool autoSelectAudioTrack();
+    
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
   private:
@@ -128,6 +135,9 @@ class AvFormatDecoder : public DecoderBase
     bool do_ac3_passthru;
 
     short int audioSamples[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+
+    QValueVector<int> audioStreams;
+    int wantedAudioStream;
 };
 
 #endif

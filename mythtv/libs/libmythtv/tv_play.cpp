@@ -178,7 +178,9 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
     REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
     REG_KEY("TV Playback", "TOGGLESLEEP", "Toggle the Sleep Timer", "F8");
-    REG_KEY("TV Playback", "PLAY", "Play", "");
+    REG_KEY("TV Playback", "PLAY", "Play", "Ctrl+P");
+    REG_KEY("TV Playback", "NEXTAUDIO", "Switch to the next audio track", "+");
+    REG_KEY("TV Playback", "PREVAUDIO", "Switch to the previous audio track", "-");
     
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
     REG_KEY("TV Editing", "LOADCOMMSKIP", "Load cut list from commercial skips",
@@ -1512,6 +1514,37 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoQueueTranscode();
         else if (action == "PLAY")
             DoPlay();
+        else if (action == "NEXTAUDIO")
+        {
+            if(activenvp)
+            {
+                activenvp->incCurrentAudioTrack();
+                if ( activenvp->getCurrentAudioTrack() )
+                {
+                    QString msg = QString("%1 %2")
+                                  .arg(tr("Audio track"))
+                                  .arg(activenvp->getCurrentAudioTrack());
+
+                    osd->SetSettingsText(msg, 3);
+                }
+            }
+        }
+        else if (action == "PREVAUDIO")
+        {
+            if(activenvp)
+            {
+                activenvp->decCurrentAudioTrack();
+                if ( activenvp->getCurrentAudioTrack() )
+                {
+                    QString msg = QString("%1 %2")
+                                  .arg(tr("Audio track"))
+                                  .arg(activenvp->getCurrentAudioTrack());
+
+                    osd->SetSettingsText(msg, 3);
+                }
+
+            }
+        }
         else if (action == "PAUSE") 
             DoPause();
         else if (action == "SPEEDINC")
