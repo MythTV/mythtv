@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-24, v1.056
+<date>2002-12-24, v1.057
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1762,6 +1762,7 @@ v1.055, 2002-12-23.  James Wiggins (wigginjs@mailbox.sc.edu) Remove the
 "./configure" step from mythmusic - doesn't belong there.  Add
 libcdda0-devel.
 v1.056, 2002-12-24.  Updated Gentoo mysql instruction.
+v1.057, 2002-12-24.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
