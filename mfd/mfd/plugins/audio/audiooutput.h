@@ -44,6 +44,7 @@ public:
     void seek(long);
     void resetTime();
     bool isPaused() { return paus; }
+    void dispatch(OutputEvent&);
 
 private:
     // thread run function
@@ -56,7 +57,11 @@ private:
     void post();
     void sync();
 
-    QString audio_device;
+    
+
+ 
+    QString     audio_device;
+    AudioPlugin *parent;
 
     bool inited,paus,play,user_stop;
     long total_written, current_seconds,bps;

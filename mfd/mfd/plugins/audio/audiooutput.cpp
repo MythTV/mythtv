@@ -23,6 +23,8 @@
 #include <errno.h>
 #include <iostream>
 
+#include "audio.h"
+
 using namespace std;
 
 extern "C" {
@@ -83,7 +85,7 @@ void MMAudioOutput::seek(long pos)
 
 
 MMAudioOutput::MMAudioOutput(AudioPlugin *owner, unsigned int sz, const QString &d)
-    : Output(sz, owner), audio_device(d), inited(FALSE), paus(FALSE), play(FALSE),
+    : Output(sz), audio_device(d), inited(FALSE), paus(FALSE), play(FALSE),
       user_stop(FALSE),
       total_written(0), current_seconds(-1),
       bps(1), lf(-1), lc(-1), lp(-1),
@@ -91,6 +93,7 @@ MMAudioOutput::MMAudioOutput(AudioPlugin *owner, unsigned int sz, const QString 
       audio_fd(-1)
 {
     resampctx = NULL;
+    parent = owner;
 }
 
 MMAudioOutput::~MMAudioOutput()
@@ -427,3 +430,17 @@ void MMAudioOutput::run()
     delete [] resampbuf;
 }
 
+void MMAudioOutput::dispatch(OutputEvent &e)
+{
+    //
+    //  Send the event to anyone who is listening
+    //
+    
+    parent->swallowOutputUpdate(
+                                e.elapsedSeconds(),
+                                e.channels(),
+                                e.bitrate(),
+                                e.frequency()
+                               );
+    
+}

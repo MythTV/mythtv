@@ -81,17 +81,20 @@ void Decoder::error(const QString &e)
     }
 }
 
+/*
 void Decoder::addListener(QObject *object)
 {
     if (listeners.find(object) == -1)
         listeners.append(object);
 }
+*/
 
-
+/*
 void Decoder::removeListener(QObject *object)
 {
     listeners.remove(object);
 }
+*/
 
 
 // static methods

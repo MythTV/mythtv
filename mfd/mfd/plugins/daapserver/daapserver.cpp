@@ -625,6 +625,9 @@ void DaapServer::sendDatabase(httpd *server, DaapRequest *daap_request)
 
                         if(meta_codes & DAAP_META_SONGDATAKIND)
                         {
+                            //
+                            //  NB ... I think 1 is an internet radio stream
+                            //
                             response << Tag('asdk') << (u8) 0 << end;
                         }
                     
@@ -731,7 +734,7 @@ void DaapServer::sendDatabase(httpd *server, DaapRequest *daap_request)
                             }
                             else
                             {
-                                response << Tag('asfm') << "ogg" << end;
+                                response << Tag('asfm') << "wav" << end;
                             }
                         }
                         

@@ -18,12 +18,9 @@
 #include "output.h"
 #include "visual.h"
 
-#include "audio.h"
-
-Output::Output(unsigned int sz, AudioPlugin *owner)
+Output::Output(unsigned int sz)
     : r(sz), bufsize(sz)
 {
-    parent = owner;
 }
 
 
@@ -60,12 +57,14 @@ void Output::dispatch(OutputEvent &e)
     //  Send the event to anyone who is listening
     //
     
+/*
     parent->swallowOutputUpdate(
                                 e.elapsedSeconds(),
                                 e.channels(),
                                 e.bitrate(),
                                 e.frequency()
                                );
+*/
     
     QObject *object = listeners.first();
     while (object)

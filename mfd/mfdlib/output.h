@@ -28,7 +28,7 @@ class Output : public QThread
 
   public:
 
-    Output(unsigned int, AudioPlugin *owner);
+    Output(unsigned int);
     virtual ~Output();
 
     Recycler *recycler() { return &r; }
@@ -59,7 +59,7 @@ class Output : public QThread
 
 protected:
 
-    void dispatch(OutputEvent &e);
+    virtual void dispatch(OutputEvent &e);
     void error(const QString &e);
     void dispatchVisual(Buffer *, unsigned long, int, int);
     void prepareVisuals();
@@ -73,7 +73,6 @@ private:
     
     unsigned int bufsize;
 
-    AudioPlugin *parent;
 };
 
 

@@ -38,7 +38,9 @@ class DecoderFactory;
 
 class Decoder : public QThread 
 {
+
   public:
+
     virtual ~Decoder();
 
     virtual bool initialize() = 0;
@@ -47,8 +49,8 @@ class Decoder : public QThread
 
     DecoderFactory *factory() const { return fctry; }
 
-    void addListener(QObject *);
-    void removeListener(QObject *);
+    //void addListener(QObject *);
+    //void removeListener(QObject *);
 
     QIODevice *input() { return in; }
     Output *output() { return out; }
