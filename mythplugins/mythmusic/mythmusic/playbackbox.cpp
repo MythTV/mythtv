@@ -171,6 +171,47 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             mainvisual->setGeometry(visual_blackhole->getScreenArea());
             handled = true;
         }
+        else if(keyboard_accelerator_flag)
+        {
+            switch(e->key())
+            {
+                case Key_PageDown:
+                    next_button->push();
+                    handled = true;
+                    break;
+                case Key_PageUp:
+                    prev_button->push();
+                    handled = true;
+                    break;
+                case Key_F:
+                    ff_button->push();
+                    handled = true;
+                    break;
+                case Key_R:
+                    rew_button->push();
+                    handled = true;
+                    break;
+                case Key_P:
+                    if(isplaying)
+                    {
+                        pause_button->push();
+                    }
+                    else
+                    {
+                        play_button->push();
+                    }
+                    handled = true;
+                    break;
+                case Key_S:
+                    stop_button->push();
+                    handled = true;
+                    break;
+                case Key_6:
+                    CycleVisualizer();
+                    handled = true;
+                    break;
+            }
+        }
     }
     else
     {
