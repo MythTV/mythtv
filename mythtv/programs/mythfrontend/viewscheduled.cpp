@@ -102,6 +102,8 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
                 setShowAll(true);
             else if (action == "2")
                 setShowAll(false);
+            else if (action == "PREVVIEW" || action == "NEXTVIEW")
+                setShowAll(!showAll);
             else
                 handled = false;
         }

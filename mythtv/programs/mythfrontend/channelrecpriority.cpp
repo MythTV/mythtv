@@ -149,6 +149,15 @@ void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
                     update(fullRect);
                 }
             }
+            else if (action == "PREVVIEW" || action == "NEXTVIEW")
+            {
+                if (sortType == byChannel)
+                    sortType = byRecPriority;
+                else
+                    sortType = byChannel; 
+                SortList();     
+                update(fullRect);
+            }
             else
                 handled = false;
         }

@@ -1928,6 +1928,14 @@
       </image>
     </container>
 
+    <container name="view">
+      <area>300,10,480,30</area>
+      <textarea name="curview" draworder="4" align="right">
+        <area>0,0,480,30</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
     <container name="selector">
       <area>0,39,800,375</area>
       <listarea name="proglist" draworder="4">

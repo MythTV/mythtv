@@ -52,7 +52,7 @@
       <type>TV_PROGFIND</type>
       <text>Search Listings</text>
       <alttext>Search</alttext>
-      <action>TV_SEARCH</action>
+      <action>MENU tv_search.xml</action>
    </button>
 
 <!--

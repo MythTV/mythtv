@@ -890,9 +890,9 @@ void PlaybackBox::cursorRight()
     update(fullRect);
 }
 
-void PlaybackBox::cursorDown(bool page)
+void PlaybackBox::cursorDown(bool page, bool newview)
 {
-    if (inTitle == true)
+    if (inTitle == true || newview)
     {
         skipNum = 0;
         curShowing = 0;
@@ -915,6 +915,9 @@ void PlaybackBox::cursorDown(bool page)
             if (curTitle >= (signed int)showList.count())
                 curTitle = 0;
         }
+
+        if (newview)
+            inTitle = false;
 
         skipUpdate = false;
         update(fullRect);
@@ -974,9 +977,9 @@ void PlaybackBox::cursorDown(bool page)
     }
 }
 
-void PlaybackBox::cursorUp(bool page)
+void PlaybackBox::cursorUp(bool page, bool newview)
 {
-    if (inTitle == true)
+    if (inTitle == true || newview)
     {
         curShowing = 0;
         skipNum = 0;
@@ -997,6 +1000,10 @@ void PlaybackBox::cursorUp(bool page)
            if (curTitle < 0)
                curTitle = showList.count() - 1;
         }
+
+        if (newview)
+            inTitle = false;
+
         skipUpdate = false;
         update(fullRect);
     }
@@ -1839,6 +1846,10 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 pageUp();
             else if (action == "PAGEDOWN")
                 pageDown();
+            else if (action == "PREVVIEW")
+                cursorUp(false, true);
+            else if (action == "NEXTVIEW")
+                cursorDown(false, true);
             else
                 handled = false;
         }

@@ -1,0 +1,39 @@
+<mythmenu name="SEARCH">
+
+   <button>
+      <type>TV_PROGFIND</type>
+      <text>Titles</text>
+      <action>TV_SEARCH_TITLE</action>
+   </button>
+
+   <button>
+      <type>TV_PROGFIND</type>
+      <text>Descriptions</text>
+      <action>TV_SEARCH_DESC</action>
+   </button>
+
+   <button>
+      <type>TV_PROGFIND</type>
+      <text>Channels</text>
+      <action>TV_SEARCH_CHANNEL</action>
+   </button>
+
+   <button>
+      <type>TV_PROGFIND</type>
+      <text>Categories</text>
+      <action>TV_SEARCH_CATEGORY</action>
+   </button>
+
+   <button>
+      <type>TV_PROGFIND</type>
+      <text>Movies</text>
+      <action>TV_SEARCH_MOVIE</action>
+   </button>
+
+   <button>
+      <type>TV_PROGFIND</type>
+      <text>New Titles</text>
+      <action>TV_SEARCH_NEW</action>
+   </button>
+
+</mythmenu>

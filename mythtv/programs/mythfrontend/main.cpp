@@ -12,7 +12,7 @@
 using namespace std;
 
 #include "tv.h"
-#include "search.h"
+#include "proglist.h"
 #include "progfind.h"
 #include "manualbox.h"
 #include "manualschedule.h"
@@ -55,12 +55,69 @@ void startFinder(void)
     RunProgramFind();
 }
 
-void startSearch(void)
+void startSearchTitle(void)
 {
-    Search search(gContext->GetMainWindow(), "search");
+  ProgLister searchTitle(plTitleSearch, "",
+                         QSqlDatabase::database(),
+                         gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
-    search.exec();
+    searchTitle.exec();
+    qApp->lock();
+}
+
+void startSearchDesc(void)
+{
+  ProgLister searchDesc(plDescSearch, "",
+                        QSqlDatabase::database(),
+                        gContext->GetMainWindow(), "proglist");
+
+    qApp->unlock();
+    searchDesc.exec();
+    qApp->lock();
+}
+
+void startSearchChannel(void)
+{
+    ProgLister searchChannel(plChannel, "",
+                             QSqlDatabase::database(),
+                             gContext->GetMainWindow(), "proglist");
+
+    qApp->unlock();
+    searchChannel.exec();
+    qApp->lock();
+}
+
+void startSearchCategory(void)
+{
+  ProgLister searchCategory(plCategory, "",
+                            QSqlDatabase::database(),
+                            gContext->GetMainWindow(), "proglist");
+
+    qApp->unlock();
+    searchCategory.exec();
+    qApp->lock();
+}
+
+void startSearchMovie(void)
+{
+    ProgLister searchMovie(plMovies, "",
+                           QSqlDatabase::database(),
+                           gContext->GetMainWindow(), "proglist");
+
+    qApp->unlock();
+    searchMovie.exec();
+    qApp->lock();
+}
+
+void startSearchNew(void)
+{
+    ProgLister searchNew(plNewListings, "",
+                         QSqlDatabase::database(),
+                         gContext->GetMainWindow(), "proglist");
+
+    qApp->unlock();
+    searchNew.exec();
     qApp->lock();
 }
 
@@ -319,8 +376,18 @@ void TVMenuCallback(void *data, QString &selection)
         startProgramRecPriorities();
     else if (sel == "tv_progfind")
         startFinder();
-    else if (sel == "tv_search")
-        startSearch();
+    else if (sel == "tv_search_title")
+        startSearchTitle();
+    else if (sel == "tv_search_desc")
+        startSearchDesc();
+    else if (sel == "tv_search_channel")
+        startSearchChannel();
+    else if (sel == "tv_search_category")
+        startSearchCategory();
+    else if (sel == "tv_search_movie")
+        startSearchMovie();
+    else if (sel == "tv_search_new")
+        startSearchNew();
     else if (sel == "settings appearance") 
     {
         AppearanceSettings settings;
@@ -540,7 +607,7 @@ void InitJumpPoints(void)
 {
     REG_JUMP("Program Guide", "", "", startGuide);
     REG_JUMP("Program Finder", "", "", startFinder);
-    REG_JUMP("Search Listings", "", "", startSearch);
+    //REG_JUMP("Search Listings", "", "", startSearch);
     REG_JUMP("Manage Recordings / Fix Conflicts", "", "", startManaged);
     REG_JUMP("Program Recording Priorities", "", "", startProgramRecPriorities);
     REG_JUMP("Channel Recording Priorities", "", "", startChannelRecPriorities);

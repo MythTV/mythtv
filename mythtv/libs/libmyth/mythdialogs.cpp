@@ -165,6 +165,9 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
     RegisterKey("Global", "PAGEUP", "Page Up", "PgUp");
     RegisterKey("Global", "PAGEDOWN", "Page Down", "PgDown");
 
+    RegisterKey("Global", "PREVVIEW", "Previous View", "Home");
+    RegisterKey("Global", "NEXTVIEW", "Next View", "End");
+
     RegisterKey("Global", "0", "0", "0");
     RegisterKey("Global", "1", "1", "1");
     RegisterKey("Global", "2", "2", "2");

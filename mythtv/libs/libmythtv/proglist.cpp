@@ -22,13 +22,12 @@ using namespace std;
 #include "mythcontext.h"
 #include "remoteutil.h"
 
-ProgLister::ProgLister(ProgListType pltype, const QString &ltitle,
+ProgLister::ProgLister(ProgListType pltype, const QString &view,
                        QSqlDatabase *ldb, MythMainWindow *parent,
                        const char *name)
             : MythDialog(parent, name)
 {
     type = pltype;
-    title = ltitle;
     db = ldb;
     startTime = QDateTime::currentDateTime();
     timeFormat = gContext->GetSetting("ShortDateFormat") +
@@ -40,6 +39,7 @@ ProgLister::ProgLister(ProgListType pltype, const QString &ltitle,
     refillAll = false;
 
     fullRect = QRect(0, 0, size().width(), size().height());
+    viewRect = QRect(0, 0, 0, 0);
     listRect = QRect(0, 0, 0, 0);
     infoRect = QRect(0, 0, 0, 0);
     theme = new XMLParse();
@@ -74,12 +74,21 @@ ProgLister::ProgLister(ProgListType pltype, const QString &ltitle,
         exit(0);
     }
 
-    updateBackground();
+    chooseListBox = NULL;
+    chooseLineEdit = NULL;
+    chooseOkButton = NULL;
 
-    curItem = 0;
-    itemCount = 0;
+    curView = -1;
+    fillViewList(view);
+
     itemList.setAutoDelete(true);
+    curItem = -1;
     fillItemList();
+
+    if (curView < 0)
+        QApplication::postEvent(this, new MythEvent("CHOOSE_VIEW"));
+
+    updateBackground();
 
     setNoErase();
 
@@ -116,9 +125,15 @@ void ProgLister::keyPressEvent(QKeyEvent *e)
             cursorUp(true);
         else if (action == "PAGEDOWN")
             cursorDown(true);
+        else if (action == "PREVVIEW")
+            prevView();
+        else if (action == "NEXTVIEW")
+            nextView();
+        else if (action == "MENU")
+            chooseView();
         else if (action == "SELECT" || action == "RIGHT" || action == "LEFT")
             select();
-        else if (action == "MENU" || action == "INFO")
+        else if (action == "INFO")
             edit();
         else if (action == "TOGGLERECORD")
             quickRecord();
@@ -161,6 +176,8 @@ void ProgLister::LoadWindow(QDomElement &element)
             else if (e.tagName() == "container")
 	    {
 		theme->parseContainer(e, name, context, area);
+		if (name.lower() == "view")
+		    viewRect = area;
 		if (name.lower() == "selector")
 		    listRect = area;
 		if (name.lower() == "program_info")
@@ -184,7 +201,26 @@ void ProgLister::updateBackground(void)
 
     LayerSet *container = theme->GetSet("background");
     if (container)
+    {
+        UITextType *ltype = (UITextType *)container->GetType("sched");
+        if (ltype)
+        {
+            QString value;
+            switch (type)
+            {
+                case plTitle: value = tr("Program Listings"); break;
+                case plNewListings: value = tr("New Title Search"); break;
+                case plTitleSearch: value = tr("Title Search"); break;
+                case plDescSearch: value = tr("Description Search"); break;
+                case plChannel: value = tr("Channel Search"); break;
+                case plCategory: value = tr("Category Search"); break;
+                case plMovies: value = tr("Movie Search"); break;
+                default: value = tr("Unknown Search"); break;
+            }
+            ltype->SetText(value);
+        }
 	container->Draw(&tmp, 0, 0);
+    }
 
     tmp.end();
 
@@ -202,6 +238,8 @@ void ProgLister::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
  
+    if (updateAll || r.intersects(viewRect))
+        updateView(&p);
     if (updateAll || r.intersects(listRect))
         updateList(&p);
     if (updateAll || r.intersects(infoRect))
@@ -229,6 +267,146 @@ void ProgLister::cursorUp(bool page)
         if (curItem < 0)
             curItem = 0;
         update(fullRect);
+    }
+}
+
+void ProgLister::prevView(void)
+{
+    if (viewCount < 2)
+        return;
+
+    curView--;
+    if (curView < 0)
+        curView = viewCount - 1;
+
+    curItem = -1;
+    refillAll = true;
+}
+
+void ProgLister::nextView(void)
+{
+    if (viewCount < 2)
+        return;
+
+    curView++;
+    if (curView >= viewCount)
+        curView = 0;
+
+    curItem = -1;
+    refillAll = true;
+}
+
+void ProgLister::setViewFromList(void)
+{
+    if (!chooseListBox)
+        return;
+
+    int view = chooseListBox->currentItem();
+
+    if (view < 0 || view >= viewCount)
+        return;
+
+    if (view == curView)
+        return;
+
+    curView = view;
+
+    curItem = -1;
+    refillAll = true;
+}
+
+void ProgLister::chooseEditChanged(void)
+{
+    if (!chooseOkButton || !chooseLineEdit)
+        return;
+
+    chooseOkButton->setEnabled(chooseLineEdit->text() != "");
+}
+
+void ProgLister::setViewFromEdit(void)
+{
+    if (!chooseLineEdit)
+        return;
+
+    if (viewCount < 1)
+        return;
+
+    QString view = chooseLineEdit->text();
+
+    if (view == viewList[0])
+        return;
+
+    curView = 0;
+    viewList[0] = view;
+    viewTextList[0] = view;
+
+    curItem = -1;
+    refillAll = true;
+}
+
+void ProgLister::chooseView(void)
+{
+    cerr << "choose view: cur = " << curView << ", count = " << viewCount << endl;
+
+    if (type == plChannel || type == plCategory)
+    {
+        if (viewCount < 2)
+            return;
+
+        MythPopupBox choosePopup(gContext->GetMainWindow(), "");
+        if (type == plChannel)
+            choosePopup.addLabel(tr("Select Channel"));
+        else if (type == plCategory)
+            choosePopup.addLabel(tr("Select Category"));
+
+        chooseListBox = new MythListBox(&choosePopup);
+        chooseListBox->setScrollBar(false);
+        chooseListBox->setBottomScrollBar(false);
+        chooseListBox->insertStringList(viewTextList);
+        if (curView < 0)
+            chooseListBox->setCurrentItem(0);
+        else
+            chooseListBox->setCurrentItem(curView);
+        choosePopup.addWidget(chooseListBox);
+
+        connect(chooseListBox, SIGNAL(accepted(int)), this, SLOT(setViewFromList()));
+        connect(chooseListBox, SIGNAL(accepted(int)), &choosePopup, SLOT(accept()));
+
+        chooseListBox->setFocus();
+        choosePopup.ExecPopup();
+
+        delete chooseListBox;
+        chooseListBox = NULL;
+    }
+    else if (type == plTitleSearch || type == plDescSearch)
+    {
+        if (viewCount < 1)
+            return;
+
+        MythPopupBox choosePopup(gContext->GetMainWindow(), "");
+        choosePopup.addLabel(tr("Enter Phrase"));
+
+        chooseLineEdit = new MythRemoteLineEdit(&choosePopup);
+        chooseLineEdit->setText(viewList[0]);
+        chooseLineEdit->selectAll();
+        choosePopup.addWidget(chooseLineEdit);
+
+        chooseOkButton = new MythPushButton(&choosePopup);
+        chooseOkButton->setText(tr("OK"));
+        chooseOkButton->setEnabled(viewList[0] != "");
+        choosePopup.addWidget(chooseOkButton);
+
+        connect(chooseLineEdit, SIGNAL(textChanged()), this, SLOT(chooseEditChanged()));
+        connect(chooseOkButton, SIGNAL(clicked()), this, SLOT(setViewFromEdit()));
+        connect(chooseOkButton, SIGNAL(clicked()), &choosePopup, SLOT(accept()));
+
+        chooseLineEdit->setFocus();
+        choosePopup.ExecPopup();
+
+        delete chooseLineEdit;
+        chooseLineEdit = NULL;
+        delete chooseOkButton;
+        chooseOkButton = NULL;
     }
 }
 
@@ -262,8 +440,93 @@ void ProgLister::edit()
     pi->EditScheduled(db);
 }
 
+void ProgLister::fillViewList(const QString &view)
+{
+    viewList.clear();
+    viewTextList.clear();
+    viewCount = 0;
+
+    if (type == plChannel) // list by channel
+    {
+        QString channelOrdering = 
+            gContext->GetSetting("ChannelOrdering", "channum + 0");
+        QString querystr = "SELECT channel.chanid, channel.channum, "
+            "channel.callsign FROM channel ORDER BY " + channelOrdering + ";";
+        QSqlQuery query;
+        query.exec(querystr);
+        if (query.isActive() && query.numRowsAffected())
+        {
+            while (query.next())
+            {
+                QString chanid = query.value(0).toString();
+                QString chantext;
+                QString channum = query.value(1).toString();
+                if (channum != QString::null && channum != "")
+                    chantext = channum;
+                else
+                    chantext = "???";
+                QString chansign = query.value(2).toString();
+                if (chansign != QString::null && chansign != "")
+                    chantext = chantext + " " + chansign;
+                viewList << chanid;
+                viewTextList << chantext;
+                viewCount++;
+            }
+        }
+        if (view != "")
+            curView = viewList.findIndex(view);
+    }
+    else if (type == plCategory) // list by category
+    {
+        QString querystr = "SELECT category FROM program GROUP BY category;";
+        QSqlQuery query;
+        query.exec(querystr);
+        if (query.isActive() && query.numRowsAffected())
+        {
+            while (query.next())
+            {
+                QString category = query.value(0).toString();
+                if (category <= " ")
+                    continue;
+                viewList << category;
+                viewTextList << category;
+                viewCount++;
+            }
+        }
+        if (view != "")
+            curView = viewList.findIndex(view);
+    }
+    else if (type == plTitle || type == plTitleSearch ||
+             type == plDescSearch)
+    {
+        viewList << view;
+        viewTextList << view;
+        viewCount++;
+        if (view != "")
+            curView = 0;
+        else
+            curView = -1;
+    }
+    else if (type == plNewListings || type == plMovies)
+    {
+        viewList << "";
+        viewTextList << "";
+        viewCount++;
+        curView = 0;
+    }
+
+    if (curView >= viewCount)
+        curView = viewCount - 1;
+}
+
 void ProgLister::fillItemList(void)
 {
+    itemList.clear();
+    itemCount = 0;
+
+    if (curView < 0)
+        return;
+
     QString where;
 
     if (type == plTitle) // per title listings
@@ -272,7 +535,7 @@ void ProgLister::fillItemList(void)
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
                         "ORDER BY program.starttime,channel.channum;")
-                        .arg(title.utf8())
+                        .arg(viewList[curView].utf8())
                         .arg(startTime.toString("yyyyMMddhhmm50"));
     }
     else if (type == plNewListings) // what's new list
@@ -292,7 +555,7 @@ void ProgLister::fillItemList(void)
                         "AND program.chanid = channel.chanid "
                         "ORDER BY program.starttime,channel.channum "
                         "LIMIT 500;")
-                        .arg(title.utf8())
+                        .arg(viewList[curView].utf8())
                         .arg(startTime.toString("yyyyMMddhhmm50"));
     }
     else if (type == plDescSearch) // description search
@@ -304,16 +567,16 @@ void ProgLister::fillItemList(void)
                         "AND program.chanid = channel.chanid "
                         "ORDER BY program.starttime,channel.channum "
                         "LIMIT 500;")
-                        .arg(title.utf8()).arg(title.utf8()).arg(title.utf8())
+                        .arg(viewList[curView].utf8()).arg(viewList[curView].utf8()).arg(viewList[curView].utf8())
                         .arg(startTime.toString("yyyyMMddhhmm50"));
     }
     else if (type == plChannel) // list by channel
     {
-        where = QString("WHERE channel.name = \"%1\" "
+        where = QString("WHERE channel.chanid = \"%1\" "
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
                         "ORDER BY program.starttime;")
-                        .arg(title.utf8())
+                        .arg(viewList[curView])
                         .arg(startTime.toString("yyyyMMddhhmm50"));
     }
     else if (type == plCategory) // list by category
@@ -323,7 +586,7 @@ void ProgLister::fillItemList(void)
                         "AND program.chanid = channel.chanid "
                         "ORDER BY program.starttime,channel.channum "
                         "LIMIT 500;")
-                        .arg(title.utf8())
+                        .arg(viewList[curView].utf8())
                         .arg(startTime.toString("yyyyMMddhhmm50"));
     }
     else if (type == plMovies) // list movies
@@ -333,15 +596,16 @@ void ProgLister::fillItemList(void)
                         "AND program.chanid = channel.chanid "
                         "ORDER BY program.starttime,channel.channum "
                         "LIMIT 500;")
-                        .arg(title.utf8())
+                        .arg(tr("Movie").utf8())
                         .arg(startTime.toString("yyyyMMddhhmm50"));
     }
 
-    itemList.clear();
     ProgramInfo::GetProgramListByQuery(db, &itemList, where);
     itemCount = itemList.count();
 
-    if (curItem >= itemCount - 1)
+    if (curItem < 0 && itemCount > 0)
+        curItem = 0;
+    else if (curItem >= itemCount)
         curItem = itemCount - 1;
 
     vector<ProgramInfo *> recList;
@@ -358,6 +622,33 @@ void ProgLister::fillItemList(void)
         delete pi;
         recList.pop_back();
     }
+}
+
+void ProgLister::updateView(QPainter *p)
+{
+    QRect pr = viewRect;
+    QPixmap pix(pr.size());
+    pix.fill(this, pr.topLeft());
+    QPainter tmp(&pix);
+
+    LayerSet *container = NULL;
+
+    container = theme->GetSet("view");
+    if (container)
+    {  
+        UITextType *type = (UITextType *)container->GetType("curview");
+        if (type && curView >= 0)
+            type->SetText(viewTextList[curView]);
+
+        container->Draw(&tmp, 4, 0);
+        container->Draw(&tmp, 5, 0);
+        container->Draw(&tmp, 6, 0);
+        container->Draw(&tmp, 7, 0);
+        container->Draw(&tmp, 8, 0);
+    }
+
+    tmp.end();
+    p->drawPixmap(pr.topLeft(), pix);
 }
 
 void ProgLister::updateList(QPainter *p)
@@ -488,8 +779,18 @@ void ProgLister::customEvent(QCustomEvent *e)
 
     MythEvent *me = (MythEvent *)e;
     QString message = me->Message();
-    if (message != "SCHEDULE_CHANGE")
+    if (message != "SCHEDULE_CHANGE" && message != "CHOOSE_VIEW")
         return;
+
+    if (message == "CHOOSE_VIEW")
+    {
+        chooseView();
+        if (curView < 0)
+        {
+            reject();
+            return;
+        }
+    }
 
     refillAll = true;
 

@@ -26,15 +26,22 @@ class ProgLister : public MythDialog
     Q_OBJECT
 
   public:
-    ProgLister(ProgListType pltype, const QString &ltitle, QSqlDatabase *ldb, 
+    ProgLister(ProgListType pltype, const QString &view, QSqlDatabase *ldb, 
 	       MythMainWindow *parent, const char *name = 0);
     ~ProgLister();
 
   protected slots:
     void cursorDown(bool page = false);
     void cursorUp(bool page = false);
-    void select();
-    void edit();
+    void prevView(void);
+    void nextView(void);
+    void setViewFromList(void);
+    void chooseEditChanged(void);
+    void setViewFromEdit(void);
+    void select(void);
+    void edit(void);
+    void chooseView(void);
+
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -44,10 +51,14 @@ class ProgLister : public MythDialog
 
   private:
     ProgListType type;
-    QString title;
     QSqlDatabase *db;
     QDateTime startTime;
     QString timeFormat;
+
+    int curView;
+    int viewCount;
+    QStringList viewList;
+    QStringList viewTextList;
 
     int curItem;
     int itemCount;
@@ -56,6 +67,7 @@ class ProgLister : public MythDialog
     XMLParse *theme;
     QDomElement xmldata;
 
+    QRect viewRect;
     QRect listRect;
     QRect infoRect;
     QRect fullRect;
@@ -67,10 +79,19 @@ class ProgLister : public MythDialog
     bool refillAll;
 
     void updateBackground(void);
+    void updateView(QPainter *);
     void updateList(QPainter *);
     void updateInfo(QPainter *);
+    void fillViewList(const QString &view);
     void fillItemList(void);
     void LoadWindow(QDomElement &);
+
+    void createPopup(void);
+    void deletePopup(void);
+
+    MythListBox *chooseListBox;
+    MythRemoteLineEdit *chooseLineEdit;
+    MythPushButton *chooseOkButton;
 };
 
 #endif

@@ -203,6 +203,15 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
                     update(fullRect);
                 }
             }
+            else if (action == "PREVVIEW" || action == "NEXTVIEW")
+            {
+                if (sortType == byTitle)
+                    sortType = byRecPriority;
+                else
+                    sortType = byTitle;
+                SortList();
+                update(fullRect);
+            }
             else if (action == "SELECT" || action == "MENU" ||
                      action == "INFO")
             {

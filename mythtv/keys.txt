@@ -156,6 +156,7 @@ Set Program Recording Priorities and Set Channel Recording Priorities
 - Left decreases priority value.
 - 1 sorts by title.
 - 2 sorts by priority.
+- Home/End to toggle sort priority.
 - I to edit recording options.
 - ESC commits changes and exits.
 
@@ -164,9 +165,15 @@ Viewing Schedulded Recordings/Resolving Conflicts
 
 - 1 to show all recordings.
 - 2 to show only important recordings.
-- 3 to show only recording/conflicting recordings.
+- Home/End to toggle show showing all/important.
 - I to edit recording options.
 - Space or Enter to resolve conflict or override.
+
+Viewing Search Listings
+-----------------------
+- Home to change to the previous view if applicable.
+- End to change to the next view if applicable.
+- M to select another view if applicable.
 
 Recording Profiles Setup Screen
 -------------------------------
