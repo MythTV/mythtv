@@ -74,8 +74,8 @@ DEFINES += USING_OSS
 #INCLUDEPATH += /usr/src/linuxtv-dvb-1.0.1/include
 
 # Native lirc support
-CONFIG += using_lirc
-LIRC_LIBS = -llirc_client
+#CONFIG += using_lirc
+#LIRC_LIBS = -llirc_client
 
 # XvMC support, modify as necessary.
 #CONFIG += using_xvmc
