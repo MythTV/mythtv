@@ -40,6 +40,14 @@ Optionally:
             visualizations. Currently using 1.2.5
             http://www.libsdl.org
 
+   FAAD   - Free Advanced Audio Decoder. Needed for AAC/MP4 support.
+            Currently using 2.0.0. 
+	    http://www.audiocoding.com
+
+            __NB__: As of March 5, 2004, you can build and install FAAD2 v2.0
+            final, but you must manually copy mp4ff_int_types.h from faad2/common/mp4ff/
+            to your usr/local/include/ directory.
+
 Phew.  Lotta stuff required. If you're having problems, please check both
 the documentation and the mailing list archives at http://www.mythtv.org
 

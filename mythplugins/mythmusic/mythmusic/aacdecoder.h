@@ -64,7 +64,6 @@ class aacDecoder : public Decoder
     int aac_track_number;
     unsigned long timescale;
     unsigned int framesize;
-    void metadataSanityCheck(QString *artist, QString *album, QString *title, QString *genre);
 };
 
 #endif

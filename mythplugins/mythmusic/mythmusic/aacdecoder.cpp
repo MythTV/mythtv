@@ -20,6 +20,7 @@
 #include "constants.h"
 #include <mythtv/audiooutput.h>
 #include "metadata.h"
+#include "metaiomp4.h"
 
 #include <mythtv/mythcontext.h>
 
@@ -409,7 +410,6 @@ int aacDecoder::getAACTrack(mp4ff_t *infile)
     //
     //  No AAC tracks
     // 
-   
     return -1;
 }
 
@@ -614,233 +614,39 @@ void aacDecoder::run()
     deinit();
 }
 
-
-//
-//  Extern C callbacks for metadata reading 
-//
-
-
-uint32_t md_read_callback(void *user_data, void *buffer, uint32_t length)
-{
-    return fread(buffer, 1, length, (FILE*)user_data);
-}
-
-uint32_t md_seek_callback(void *user_data, uint64_t position)
-{
-    return fseek((FILE*)user_data, position, SEEK_SET);
-}
-
-
-void aacDecoder::metadataSanityCheck(QString *artist, QString *album, QString *title, QString *genre)
-{
-    if (artist->length() < 1)
-    {
-        artist->append("Unknown Artist");
-    }
-    
-    if (album->length() < 1)
-    {
-        album->append("Unknown Album");
-    }
-    
-    if (title->length() < 1)
-    {
-        title->append("Unknown Title");
-    }
-    
-    if (genre->length() < 1)
-    {
-        genre->append("Unknown Genre");
-    }
-    
-}
-
-
 Metadata* aacDecoder::getMetadata(QSqlDatabase *db)
 {
 
-    Metadata *retdata = new Metadata(filename);
-    if (retdata->isInDatabase(db, musiclocation))
+    Metadata *mdata = new Metadata(filename);
+    if (mdata->isInDatabase(db, musiclocation))
     {
-      return retdata;
-    }
-
-    delete retdata;
-
-    QString artist = "", album = "", title = "", genre = "";
-    QString writer = "", comment = "";
-    int year = 0, tracknum = 0, length = 0;
-
-    FILE *input = fopen(filename.ascii(), "r");
-    if (!input)
-    {
-      error(QString("could not open \"%1\" to read metadata").arg(filename.ascii()));
-        return NULL;
-    }
-
-    //
-    //  Create the callback structure
-    //
-
-    mp4ff_callback_t *mp4_cb = (mp4ff_callback_t*) malloc(sizeof(mp4ff_callback_t));
-    mp4_cb->read = md_read_callback;
-    mp4_cb->seek = md_seek_callback;
-    mp4_cb->user_data = input;
-
-
-    //
-    //  Open the mp4 input file  
-    //                   
-
-    mp4ff_t *mp4_ifile = mp4ff_open_read(mp4_cb);
-    if (!mp4_ifile)
-    {
-        error(QString("could not open \"%1\" as mp4 for metadata").arg(filename.ascii()));
-        free(mp4_cb);
-        fclose(input);
-        return NULL;
-    }
-
-    char *char_storage = NULL;
-
-    //
-    //  Look for metadata
-    //
-
-    if (mp4ff_meta_get_title(mp4_ifile, &char_storage))
-    {
-        title = QString::fromUtf8(char_storage);
-        free(char_storage);
-    }
-
-    if (mp4ff_meta_get_artist(mp4_ifile, &char_storage))
-    {
-        artist = QString::fromUtf8(char_storage);
-        free(char_storage);
-    }
-
-    if (mp4ff_meta_get_writer(mp4_ifile, &char_storage))
-    {
-        writer = QString::fromUtf8(char_storage);
-        free(char_storage);
-    }
-
-    if (mp4ff_meta_get_album(mp4_ifile, &char_storage))
-    {
-        album = QString::fromUtf8(char_storage);
-        free(char_storage);
-    }
-
-    if (mp4ff_meta_get_date(mp4_ifile, &char_storage))
-    {
-        year = QString(char_storage).toUInt();
-        free(char_storage);
-    }
-
-    if (mp4ff_meta_get_comment(mp4_ifile, &char_storage))
-    {
-        comment = QString::fromUtf8(char_storage);
-        free(char_storage);
+      return mdata;
     }
     
-    if (mp4ff_meta_get_genre(mp4_ifile, &char_storage))
-    {
-        genre = QString::fromUtf8(char_storage);
-        free(char_storage);
+    delete mdata;
+
+    MetaIOMP4* p_tagger = new MetaIOMP4;
+    if (ignore_id3) {
+        mdata = p_tagger->readFromFilename(filename);
+    } else {
+        mdata = p_tagger->read(filename);
     }
     
-    if (mp4ff_meta_get_track(mp4_ifile, &char_storage))
-    {
-        tracknum = QString(char_storage).toUInt();
-        free(char_storage);
-    }
+    delete p_tagger;
 
-    //
-    //  Find the AAC track inside this mp4 which we need to do to find the
-    //  length
-    //
+    if (mdata)
+        mdata->dumpToDatabase(db, musiclocation);
+    else
+      error(QString("aacdecoder.o: Could not read metadata from \"%1\"").arg(filename.local8Bit()));
 
-    int track_num;
-    if ( (track_num = getAACTrack(mp4_ifile)) < 0)
-    {
-        error("could not find aac track to calculate metadata length");
-        mp4ff_close(mp4_ifile);
-        free(mp4_callback);
-        fclose(input);
-        return NULL;
-    }
-
-    unsigned char *buffer = NULL;
-    uint buffer_size;
-
-    mp4ff_get_decoder_config(
-                                mp4_ifile, 
-                                track_num, 
-                                &buffer, 
-                                &buffer_size
-                            );    
-    
-    if (!buffer)
-    {
-        error("could not get decoder config to calculate metadata length");
-        mp4ff_close(mp4_input_file);
-        free(mp4_callback);
-        fclose(input);
-        return NULL;
-    }
-   
-
-    mp4AudioSpecificConfig mp4ASC;
-    if (AudioSpecificConfig(buffer, buffer_size, &mp4ASC) < 0)
-    {
-        error("could not get audio specifics to calculate metadata length");
-        mp4ff_close(mp4_input_file);
-        free(mp4_callback);
-        fclose(input);
-        return NULL;
-    }
-    
-    long samples = mp4ff_num_samples(mp4_ifile, track_num);
-    float f = 1024.0;
-
-    if (mp4ASC.sbr_present_flag == 1)
-    {
-        f = f * 2.0;
-    }
-    
-    float numb_seconds = (float)samples*(float)(f-1.0)/(float)mp4ASC.samplingFrequency;
-
-    length = (int) (numb_seconds * 1000);
-
-    mp4ff_close(mp4_ifile);
-    free(mp4_cb);
-    fclose(input);
-
-    metadataSanityCheck(&artist, &album, &title, &genre);
-
-    retdata = new Metadata(
-                                                filename, 
-                                                artist, 
-                                                album, 
-                                                title, 
-                                                genre,
-                                                year, 
-                                                tracknum, 
-                                                length
-                                              );
-
-    //retdata->setComposer(writer);
-    //retdata->setComment(comment);
-    //retdata->setBitrate(mp4ASC.samplingFrequency);
-
-    retdata->dumpToDatabase(db, musiclocation);
-
-    return retdata;
+    return mdata;
 }    
 
 void aacDecoder::commitMetadata(Metadata *mdata)
 {
-  error("ignoring request to commit AAC meta data");
+    MetaIOMP4* p_tagger = new MetaIOMP4;
+    p_tagger->write(mdata);
+    delete p_tagger;
 }
 
 uint32_t aacDecoder::aacRead(char *buffer, uint32_t length)

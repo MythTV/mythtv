@@ -90,8 +90,8 @@ if test "$aac" = "yes" ; then
   echo "        AAC    support will be included"
   echo "#define AAC_SUPPORT 1" >> ./mythmusic/config.h
   echo "LIBS += -lfaad -lmp4ff" >> ./mythmusic/config.pro
-  echo "HEADERS += aacdecoder.h" >> ./mythmusic/config.pro
-  echo "SOURCES += aacdecoder.cpp" >> ./mythmusic/config.pro
+  echo "HEADERS += metaiomp4.h aacdecoder.h" >> ./mythmusic/config.pro
+  echo "SOURCES += metaiomp4.cpp aacdecoder.cpp" >> ./mythmusic/config.pro
 fi
 if test "$aac" = "no" ; then
   echo "        AAC    support will not be included"
