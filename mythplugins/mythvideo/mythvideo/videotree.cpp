@@ -42,7 +42,7 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
     wireUpTheme();
     video_tree_root = new GenericTree("video root", -2, false);
     
-    currentVideoFilter = new VideoFilterSettings(db, true);
+    currentVideoFilter = new VideoFilterSettings(db, true, "VideoTree");
     
     buildVideoList();
     
@@ -507,27 +507,30 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
                 QString the_file = *(browser_mode_files.at(node_int));
                 QString base_name = the_file.section("/", -1);
 
-		/* See if we can find this filename in DB */
+                /* See if we can find this filename in DB */
                 curitem->setFilename(the_file);
-                if(curitem->fillDataFromFilename(db)) {
-		    video_title->SetText(curitem->Title());
+                
+                if(curitem->fillDataFromFilename(db)) 
+                {
+                    video_title->SetText(curitem->Title());
                     video_file->SetText(curitem->Filename().section("/", -1));
                     video_poster->SetImage(curitem->CoverFile());
                     video_poster->LoadImage();
                     if (video_plot)
                         video_plot->SetText(curitem->Plot());
-		}
-		else
-		{
+                }
+                else
+                {
                     /* Nope, let's make the best of the situation */
-		    video_title->SetText(base_name.section(".", 0, -2));
+                    video_title->SetText(base_name.section(".", 0, -2));
                     video_file->SetText(base_name);
-		    video_poster->ResetImage();
+                    video_poster->ResetImage();
                     curitem->setTitle(base_name.section(".", 0, -2));
                     curitem->setPlayer(player);
                     if (video_plot)
                         video_plot->SetText(" ");
-		}
+                }
+                
                 extension = the_file.section(".", -1);
                 player = gContext->GetSetting("VideoDefaultPlayer");
                 
@@ -901,7 +904,7 @@ void VideoTree::playVideo(Metadata *someItem)
         if (parentItem->ChildID() > 0)
         {
             //Load up data about this child
-            command = getCommand(someItem);
+            command = getCommand(childItem);
             playing_time.start();
             myth_system((QString("%1 ") .arg(command)).local8Bit());
         }

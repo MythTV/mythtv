@@ -37,7 +37,7 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     popup = NULL;
     
 
-    currentVideoFilter = new VideoFilterSettings(db, true, true);
+    currentVideoFilter = new VideoFilterSettings(db, true, "VideoManager");
     RefreshMovieList();
 
     fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));

@@ -206,7 +206,7 @@ bool Metadata::fillData(QSqlDatabase *db)
         childID = query.value(12).toUInt();
         browse = query.value(13).toBool();
         playcommand = query.value(14).toString();
-	return true;
+    return true;
     }
     else
     {
@@ -250,18 +250,18 @@ bool Metadata::fillDataFromID(QSqlDatabase *db)
         playcommand = query.value(13).toString();
         category = query.value(14).toString();
 
-	// Genres
+    // Genres
         fillGenres(db);
     
         //Countries
         fillCountries(db);
 
-	return true;
+    return true;
     }
     else
     {
         cerr << "metadata.o : SELECT by id failed : " << thequery << endl;
-	return false;
+    return false;
     }
 }
 
@@ -273,9 +273,9 @@ bool Metadata::fillDataFromFilename(QSqlDatabase *db)
     
     QString thequery;
     thequery = QString("SELECT videometadata.intid,title,director,plot"
-		       ",rating,year,userrating,length,showlevel,coverfile"
-		       ",inetref,childid,browse,playcommand"
-		       ", videocategory.category "
+               ",rating,year,userrating,length,showlevel,coverfile"
+               ",inetref,childid,browse,playcommand"
+               ", videocategory.category "
                        " FROM videometadata LEFT JOIN videocategory"
                        " ON videometadata.category = videocategory.intid"
                        "  WHERE videometadata.filename='%1';")
@@ -285,7 +285,7 @@ bool Metadata::fillDataFromFilename(QSqlDatabase *db)
     {
         query.next();
 
-	id = query.value(0).toInt();
+    id = query.value(0).toInt();
         title = QString::fromUtf8(query.value(1).toString());
         director = QString::fromUtf8(query.value(2).toString());
         plot = QString::fromUtf8(query.value(3).toString());
@@ -301,17 +301,17 @@ bool Metadata::fillDataFromFilename(QSqlDatabase *db)
         playcommand = query.value(13).toString();
         category = query.value(14).toString();
 
-	// Genres
+    // Genres
         fillGenres(db);
     
         //Countries
         fillCountries(db);
-	return true;
+    return true;
     }
     else
     {
         cerr << "metadata.o : SELECT by filename failed : " << thequery << endl;
-	return false;
+    return false;
     }
 }
 
@@ -360,7 +360,9 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
                      plot.utf8().data(), rating.utf8().data(), year,
                      userrating, length, sqlfilename.utf8().data(), showlevel,
                      sqlcoverfile.utf8().data(), inetref.utf8().data(),browse);
-
+    
+    
+    
     QSqlQuery a_query(thequery, db);
 
     if (!a_query.isActive() || a_query.numRowsAffected() < 1)

@@ -8,16 +8,12 @@
 
 #include "videofilter.h"
 
-VideoFilterSettings::VideoFilterSettings(QSqlDatabase * ldb, bool loaddefaultsettings, bool _mgr, 
-                                         bool _allowBrowse)
+VideoFilterSettings::VideoFilterSettings(QSqlDatabase * ldb, bool loaddefaultsettings, const QString& _prefix)
 {
-    QString prefix;
-    isManager = _mgr;
-    
-    if ( isManager )
-        prefix = "VideoManagerDefault";
-    else
+    if ( !_prefix )
         prefix = "VideoDefault";
+    else
+        prefix = _prefix + "Default";
     
     // do nothing yet
     db = ldb;
@@ -43,10 +39,6 @@ VideoFilterSettings::VideoFilterSettings(QSqlDatabase * ldb, bool loaddefaultset
         browse = -1;
         orderby = 0;
     }
-    
-    allowBrowse = _allowBrowse;
-    if (!allowBrowse)
-        browse = 1;
 
 }
 
@@ -60,9 +52,7 @@ VideoFilterSettings::VideoFilterSettings(VideoFilterSettings *other)
     runtime = other->runtime;
     userrating = other->userrating;
     browse = other->browse;
-    allowBrowse = other->allowBrowse;
     orderby = other->orderby;
-    isManager = other->isManager;
 }
 
 VideoFilterSettings::~VideoFilterSettings()
@@ -71,12 +61,6 @@ VideoFilterSettings::~VideoFilterSettings()
 }
 void VideoFilterSettings::saveAsDefault()
 {
-    QString prefix;
-        
-    if ( isManager )
-        prefix = "VideoManagerDefault";
-    else
-        prefix = "VideoDefault";
 
     gContext->SaveSetting(QString("%1Category").arg(prefix), category);
     gContext->SaveSetting(QString("%1Genre").arg(prefix), genre);
@@ -214,24 +198,14 @@ QString VideoFilterSettings::BuildClauseWhere()
         else 
             where = QString(" WHERE userrating >= %1").arg(userrating);
     }
-    
-    if (allowBrowse)
-    {
-        if (browse !=-1)
-        {
-            if (where)
-                where += QString(" AND browse = %1").arg(browse);
-            else 
-                where = QString(" WHERE browse = %1").arg(browse);
-        } 
-    }
-    else
+
+    if (browse !=-1)
     {
         if (where)
-            where += QString(" AND browse = 1");
+            where += QString(" AND browse = %1").arg(browse);
         else 
-            where = QString(" WHERE browse = 1");
-    }
+            where = QString(" WHERE browse = %1").arg(browse);
+    } 
     
 
     return where;
@@ -414,19 +388,12 @@ void VideoFilterDialog::fillWidgets()
     
     if (browse_select)
     {
-        if(originalSettings->getAllowBrowse())
-        {
-            browse_select->addItem(-1,"All");
-            browse_select->addItem(1,"Yes");
-            browse_select->addItem(0,"No");
-            browse_select->setToItem(currentSettings->getBrowse());
-        }
-        else
-        {
-            browse_select->addItem(1,"Yes");
-            browse_select->setToItem(currentSettings->getBrowse());
-        }
+        browse_select->addItem(-1,"All");
+        browse_select->addItem(1,"Yes");
+        browse_select->addItem(0,"No");
+        browse_select->setToItem(currentSettings->getBrowse());
     }
+    
     if (orderby_select)
     {
         orderby_select->addItem(0,"title");

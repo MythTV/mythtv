@@ -38,7 +38,7 @@ VideoDialog::VideoDialog(DialogType _myType, QSqlDatabase *_db,
     fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
     allowPaint = true;
     currentParentalLevel = gContext->GetNumSetting("VideoDefaultParentalLevel", 1);
-    currentVideoFilter = new VideoFilterSettings(db, true);
+    currentVideoFilter = new VideoFilterSettings(db, true, _winName);
 }
 
 VideoDialog::~VideoDialog()
@@ -194,8 +194,7 @@ void VideoDialog::playVideo(Metadata *someItem)
     QTime playing_time;
     playing_time.start();
     
-    // Play the movie
-    myth_system((QString("%1 ").arg(command)).local8Bit());
+    
 
     // Show a please wait message    
     LayerSet *container = theme->GetSet("playwait");
@@ -208,6 +207,9 @@ void VideoDialog::playVideo(Metadata *someItem)
     }
     update(fullRect);
     allowPaint = false;        
+    // Play the movie
+    myth_system((QString("%1 ").arg(command)).local8Bit());
+    
     Metadata *childItem = new Metadata;
     Metadata *parentItem = new Metadata(*someItem);
 
@@ -219,7 +221,7 @@ void VideoDialog::playVideo(Metadata *someItem)
         if (parentItem->ChildID() > 0)
         {
             //Load up data about this child
-            command = getCommand(someItem);
+            command = getCommand(childItem);
             playing_time.start();
             myth_system((QString("%1 ") .arg(command)).local8Bit());
         }
@@ -439,6 +441,7 @@ void VideoDialog::shiftParental(int amount)
 
 void VideoDialog::fetchVideos()
 {
+    
     QString thequery = QString("SELECT intid FROM %1 %2 %3")
                         .arg(currentVideoFilter->BuildClauseFrom())
                         .arg(currentVideoFilter->BuildClauseWhere())
