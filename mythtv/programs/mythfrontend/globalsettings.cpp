@@ -20,9 +20,9 @@ const char* AudioOutputDevice::paths[] = { "/dev/dsp",
                                            "/dev/dsp3",
                                            "/dev/dsp4",
                                            "/dev/sound/dsp",
-                                           "/dev/sound/dsp1"
-                                           "/dev/sound/dsp2"
-                                           "/dev/sound/dsp3"
+                                           "/dev/sound/dsp1",
+                                           "/dev/sound/dsp2",
+                                           "/dev/sound/dsp3",
                                            "/dev/sound/dsp4" };
 
 AudioOutputDevice::AudioOutputDevice():
