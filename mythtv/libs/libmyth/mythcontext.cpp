@@ -24,7 +24,9 @@
 #include "mythdialogs.h"
 #include "mythplugin.h"
 
+#ifndef QWS
 #include <X11/Xlib.h>
+#endif
 
 MythContext *gContext = NULL;
 
@@ -1441,6 +1443,9 @@ MythPluginManager *MythContext::getPluginManager(void)
 }
 
 
+#ifdef QWS
+void MythContext::DisableScreensaver(void) {}
+#else
 void MythContext::DisableScreensaver(void)
 {
     if (!d->m_screensaver.saved)
@@ -1453,7 +1458,11 @@ void MythContext::DisableScreensaver(void)
 
     XSetScreenSaver(qt_xdisplay(), 0, 0, 0, 0);
 }
+#endif
 
+#ifdef QWS
+void MythContext::RestoreScreensaver(void) {}
+#else
 void MythContext::RestoreScreensaver(void)
 {
     XResetScreenSaver(qt_xdisplay());
@@ -1462,3 +1471,4 @@ void MythContext::RestoreScreensaver(void)
                     d->m_screensaver.preferblank, d->m_screensaver.allowexposure);
     d->m_screensaver.saved = false;
 }
+#endif
