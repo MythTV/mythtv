@@ -95,6 +95,9 @@ TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
     if (rewtime <= 0)
         rewtime = 5;
 
+    inoverrecord = false;
+    overrecordseconds = settings->GetNumSetting("RecordOverTime");
+
     nvr = pipnvr = activenvr = NULL;
     nvp = pipnvp = activenvp = NULL;
     prbuffer = rbuffer = piprbuffer = activerbuffer = NULL;
@@ -235,6 +238,14 @@ int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
 void TV::StartRecording(ProgramInfo *rcinfo)
 {  
     QString recprefix = settings->GetSetting("RecordFilePrefix");
+
+    if (inoverrecord)
+    {
+        nextState = RemoveRecording(internalState);
+        changeState = true;
+        while (changeState)
+            usleep(50);
+    }
 
     if (internalState == kState_None || 
         internalState == kState_WatchingPreRecorded)
@@ -463,6 +474,7 @@ void TV::HandleStateChange(void)
 
         internalState = nextState;
         changed = true;
+        inoverrecord = false;
 
         watchingLiveTV = false;
     }
@@ -498,7 +510,9 @@ void TV::HandleStateChange(void)
              nextState == kState_WatchingLiveTV)
     {
         TeardownRecorder(true);
-        
+      
+        inoverrecord = false;
+ 
         long long filesize = settings->GetNumSetting("BufferSize");
         filesize = filesize * 1024 * 1024 * 1024;
         long long smudge = settings->GetNumSetting("MaxBufferFill");
@@ -568,7 +582,8 @@ void TV::HandleStateChange(void)
         nvp->Unpause();
  
         WriteRecordedRecord();
- 
+
+        inoverrecord = false; 
         internalState = nextState;
         changed = true;
     }
@@ -587,7 +602,6 @@ void TV::HandleStateChange(void)
     {
         printf("Changing from %s to %s\n", origname.ascii(), statename.ascii());
     }
-    changeState = false;
  
     if (startRecorder)
     {
@@ -636,6 +650,8 @@ void TV::HandleStateChange(void)
         if (pipnvp)
             TeardownPipPlayer();
     }
+
+    changeState = false;
 }
 
 void TV::SetupRecorder(void)
@@ -965,7 +981,14 @@ void TV::RunTV(void)
         {
             if (QDateTime::currentDateTime() > recordEndTime)
             {
-                if (watchingLiveTV)
+                if (!inoverrecord && overrecordseconds > 0)
+                {
+                    recordEndTime = recordEndTime.addSecs(overrecordseconds);
+                    inoverrecord = true;
+                    //cout << "switching to overrecord for " 
+                    //     << overrecordseconds << " more seconds\n";
+                }
+                else if (watchingLiveTV)
                 {
                     nextState = kState_WatchingLiveTV;
                     changeState = true;

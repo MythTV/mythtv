@@ -61,6 +61,9 @@ int AudioSampleRate=32000
 int DontCompressAudio=0
 # Quality level for the MP3 compression (0 best - 9 worst)
 int MP3Quality=7
+# 
+# Length of time to record past the end of a show, in seconds
+int RecordOverTime=0
 
 #
 # Playback options

@@ -9,7 +9,7 @@
 #include "filter.h"
 #include "frame.h"
 
-#define FILTER_NAME "Invert";
+static const char FILTER_NAME[] = "Invert";
 
 typedef struct ThisFilter
 {
@@ -28,6 +28,7 @@ int invert(VideoFilter *vf, Frame *frame)
 {  
   int size;
   unsigned char *buf=frame->buf;
+  vf = vf;
 
   if (frame->codec == CODEC_RGB)
     size = frame->width*3 * frame->height;
@@ -54,10 +55,10 @@ VideoFilter *new_filter(char *options)
     fprintf(stderr,"Couldn't allocate memory for filter\n");
     return NULL;
   }
-
+  options = options;
   filter->filter=&invert;
   filter->cleanup=&cleanup;
-  filter->name = FILTER_NAME;
+  filter->name = (char *)FILTER_NAME;
   return (VideoFilter *)filter;
 }
 

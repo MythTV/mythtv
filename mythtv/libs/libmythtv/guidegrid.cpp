@@ -47,8 +47,6 @@ GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
         bgcolor = QColor(globalsettings->GetSetting("BackgroundColor"));
         fgcolor = QColor(globalsettings->GetSetting("ForegroundColor"));
 
-        int bgtype = 0;
-
         QPixmap *bgpixmap = NULL;
 
         if (globalsettings->GetSetting("BackgroundPixmap") != "")

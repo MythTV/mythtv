@@ -13,7 +13,7 @@
 #include "filter.h"
 #include "frame.h"
 
-#define FILTER_NAME "linearblend";
+static const char FILTER_NAME[] = "linearblend";
 
 typedef struct ThisFilter
 {
@@ -103,6 +103,7 @@ int linearBlendFilter(VideoFilter *vf, Frame *frame)
   unsigned char *src;
   unsigned char *uoff;
   unsigned char *voff;
+  vf = vf;
 
   for (y = 0; y < ymax; y+=8)
   {  
@@ -145,6 +146,8 @@ VideoFilter *new_filter(char *options)
 {
   ThisFilter *filter = malloc(sizeof(ThisFilter));
 
+  options = options;
+
   if (filter == NULL)
   {
     fprintf(stderr,"Couldn't allocate memory for filter\n");
@@ -153,7 +156,7 @@ VideoFilter *new_filter(char *options)
 
   filter->filter=&linearBlendFilter;
   filter->cleanup=&cleanup;
-  filter->name = FILTER_NAME;
+  filter->name = (char *)FILTER_NAME;
   return (VideoFilter *)filter;
 }
 

@@ -60,6 +60,9 @@ LCD::LCD(QString hostname, unsigned int port)
 #ifdef LCD_DEVICE	
 	socket->connectToHost(hostname, port);
 	this->sendToServer("hello");
+#else
+	hostname = hostname;
+	port = port;
 #endif
 }
 
@@ -96,6 +99,8 @@ void LCD::sendToServer(QString someText)
 	//
 
 	os << someText << "\n";
+#else
+	someText = someText;
 #endif
 }
 

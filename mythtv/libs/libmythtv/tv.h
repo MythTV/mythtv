@@ -184,6 +184,9 @@ class TV
     int audiosamplerate;
     QString pipvideodev, pipaudiodev;
     int pipaudiosamplerate;
+
+    bool inoverrecord;
+    int overrecordseconds;
 };
 
 #endif
