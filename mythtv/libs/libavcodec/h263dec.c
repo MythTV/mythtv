@@ -209,6 +209,9 @@ static int decode_slice(MpegEncContext *s){
 //printf("%d %d %06X\n", ret, get_bits_count(&s->gb), show_bits(&s->gb, 24));
             ret= s->decode_mb(s, s->block);
 
+            if (s->pict_type!=B_TYPE)
+                ff_h263_update_motion_val(s);
+
             if(ret<0){
                 const int xy= s->mb_x + s->mb_y*s->mb_stride;
                 if(ret==SLICE_END){
@@ -401,9 +404,17 @@ uint64_t time= rdtsc();
     s->flags= avctx->flags;
 
     *data_size = 0;
-   
-   /* no supplementary picture */
+
+    /* no supplementary picture */
     if (buf_size == 0) {
+        /* special case for last picture */
+        if (s->low_delay==0 && s->next_picture_ptr) {
+            *pict= *(AVFrame*)s->next_picture_ptr;
+            s->next_picture_ptr= NULL;
+
+            *data_size = sizeof(AVFrame);
+        }
+
         return 0;
     }
 
@@ -459,6 +470,15 @@ retry:
     } else {
         ret = h263_decode_picture_header(s);
     }
+    
+    if(ret==FRAME_SKIPED) return get_consumed_bytes(s, buf_size);
+
+    /* skip if the header was thrashed */
+    if (ret < 0){
+        fprintf(stderr, "header damaged\n");
+        return -1;
+    }
+    
     avctx->has_b_frames= !s->low_delay;
 
     if(s->workaround_bugs&FF_BUG_AUTODETECT){
@@ -525,6 +545,9 @@ retry:
         if(s->divx_version && s->divx_version<500){
             s->workaround_bugs|= FF_BUG_EDGE;
         }
+        
+        if(s->avctx->codec_tag == ff_get_fourcc("DIVX") && s->divx_version==0 && s->lavc_build==0 && s->xvid_build==0 && s->vo_type==0 && s->vol_control_parameters==0 && s->low_delay)
+            s->workaround_bugs|= FF_BUG_EDGE;
 
 #if 0
         if(s->divx_version==500)
@@ -590,13 +613,6 @@ retry:
 
     if((s->codec_id==CODEC_ID_H263 || s->codec_id==CODEC_ID_H263P))
         s->gob_index = ff_h263_get_gob_height(s);
-
-    if(ret==FRAME_SKIPED) return get_consumed_bytes(s, buf_size);
-    /* skip if the header was thrashed */
-    if (ret < 0){
-        fprintf(stderr, "header damaged\n");
-        return -1;
-    }
     
     // for hurry_up==5
     s->current_picture.pict_type= s->pict_type;

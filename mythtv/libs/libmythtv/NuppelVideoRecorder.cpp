@@ -114,6 +114,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     minquality = 31;
     qualdiff = 3;
     mp4opts = 0;
+    mb_decision = FF_MB_DECISION_SIMPLE;
 
     oldtc = 0;
     startnum = 0;
@@ -227,9 +228,9 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
     else if (opt == "mpeg4optionvhq")
     {
         if (value)
-            mp4opts |= CODEC_FLAG_HQ;
+            mb_decision = FF_MB_DECISION_RD;
         else
-            mp4opts &= ~CODEC_FLAG_HQ;
+            mb_decision = FF_MB_DECISION_SIMPLE;
     }
     else if (opt == "mpeg4option4mv")
     {
@@ -357,6 +358,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx->mb_qmax = minquality;
     mpa_ctx->max_qdiff = qualdiff;
     mpa_ctx->flags = mp4opts;
+    mpa_ctx->mb_decision = mb_decision;
 
     mpa_ctx->qblur = 0.5;
     mpa_ctx->max_b_frames = 0;

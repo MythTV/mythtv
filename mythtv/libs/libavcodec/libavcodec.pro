@@ -26,7 +26,7 @@ SOURCES += h263dec.c svq1.c rv10.c mpegaudiodec.c pcm.c simple_idct.c
 SOURCES += ratecontrol.c adpcm.c eval.c jfdctint.c dv.c error_resilience.c
 SOURCES += wmadec.c fft.c mdct.c mace.c huffyuv.c opts.c cyuv.c
 SOURCES += golomb.c h264.c raw.c indeo3.c asv1.c vp3.c 4xm.c cabac.c
-SOURCES += ffv1.c ra144.c ra288.c
+SOURCES += ffv1.c ra144.c ra288.c vcr1.c cljr.c
 
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c
@@ -34,6 +34,10 @@ contains( CONFIG_AC3, yes ) {
         SOURCES += liba52/bit_allocate.c liba52/bitstream.c liba52/downmix.c
         SOURCES += liba52/imdct.c liba52/parse.c liba52/crc.c liba52/resample.c
     }
+}
+
+contains( HAVE_XVMC_ACCEL, yes ) {
+    SOURCES += xvmcvideo.c
 }
 
 contains( AMR_NV, yes) {

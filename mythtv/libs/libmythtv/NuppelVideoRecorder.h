@@ -219,6 +219,7 @@ class NuppelVideoRecorder : public RecorderBase
     int minquality;
     int qualdiff;
     int mp4opts;
+    int mb_decision;
 
     QString videoFilterList;
     vector<VideoFilter *> videoFilters;

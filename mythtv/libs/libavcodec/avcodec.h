@@ -15,14 +15,15 @@ extern "C" {
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4671
-#define LIBAVCODEC_BUILD_STR   "4671"
+#define LIBAVCODEC_BUILD       4673
+#define LIBAVCODEC_BUILD_STR   "4673"
 
 #define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" LIBAVCODEC_BUILD_STR
 
 enum CodecID {
     CODEC_ID_NONE, 
     CODEC_ID_MPEG1VIDEO,
+    CODEC_ID_MPEG2VIDEO_XVMC,
     CODEC_ID_H263,
     CODEC_ID_RV10,
     CODEC_ID_MP2,
@@ -60,6 +61,8 @@ enum CodecID {
     CODEC_ID_ASV1,
     CODEC_ID_FFV1,
     CODEC_ID_4XM,
+    CODEC_ID_VCR1,
+    CODEC_ID_CLJR,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -112,6 +115,8 @@ enum PixelFormat {
     PIX_FMT_YUVJ420P,  ///< Planar YUV 4:2:0 full scale (jpeg)
     PIX_FMT_YUVJ422P,  ///< Planar YUV 4:2:2 full scale (jpeg)
     PIX_FMT_YUVJ444P,  ///< Planar YUV 4:4:4 full scale (jpeg)
+    PIX_FMT_XVMC_MPEG2_MC,///< XVideo Motion Acceleration via common packet passing(xvmc_render.h)
+    PIX_FMT_XVMC_MPEG2_IDCT,
     PIX_FMT_NB,
 };
 
@@ -164,7 +169,6 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
    Note: note not everything is supported yet 
 */
 
-#define CODEC_FLAG_HQ     0x0001  ///< brute force MB-type decission mode (slow) 
 #define CODEC_FLAG_QSCALE 0x0002  ///< use fixed qscale 
 #define CODEC_FLAG_4MV    0x0004  ///< 4 MV per MB allowed 
 #define CODEC_FLAG_QPEL   0x0010  ///< use qpel MC 
@@ -1162,6 +1166,23 @@ typedef struct AVCodecContext {
 #define SLICE_FLAG_ALLOW_FIELD    0x0002 ///< allow draw_horiz_band() with field slices (MPEG2 field pics)
 #define SLICE_FLAG_ALLOW_PLANE    0x0004 ///< allow draw_horiz_band() with 1 component at a time (SVQ1)
 
+    /**
+     * XVideo Motion Acceleration
+     * - encoding: forbidden
+     * - decoding: set by decoder
+     */
+    int xvmc_acceleration;
+    
+    /**
+     * macroblock decision mode
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int mb_decision;
+#define FF_MB_DECISION_SIMPLE 0        ///< uses mb_cmp
+#define FF_MB_DECISION_BITS   1        ///< chooses the one which needs the fewest bits
+#define FF_MB_DECISION_RD     2        ///< rate distoration
+    
 } AVCodecContext;
 
 
@@ -1257,6 +1278,7 @@ extern AVCodec wmv2_encoder;
 extern AVCodec huffyuv_encoder;
 extern AVCodec h264_encoder;
 extern AVCodec asv1_encoder;
+extern AVCodec vcr1_encoder;
 extern AVCodec ffv1_encoder;
 
 extern AVCodec h263_decoder;
@@ -1267,6 +1289,7 @@ extern AVCodec msmpeg4v3_decoder;
 extern AVCodec wmv1_decoder;
 extern AVCodec wmv2_decoder;
 extern AVCodec mpeg_decoder;
+extern AVCodec mpeg_xvmc_decoder;
 extern AVCodec h263i_decoder;
 extern AVCodec flv_decoder;
 extern AVCodec rv10_decoder;
@@ -1293,6 +1316,8 @@ extern AVCodec amr_nb_encoder;
 extern AVCodec aac_decoder;
 extern AVCodec mpeg4aac_decoder;
 extern AVCodec asv1_decoder;
+extern AVCodec vcr1_decoder;
+extern AVCodec cljr_decoder;
 extern AVCodec ffv1_decoder;
 extern AVCodec fourxm_decoder;
 extern AVCodec ra_144_decoder;

@@ -51,8 +51,6 @@
 #ifdef CONFIG_ENCODERS
 static void h263_encode_block(MpegEncContext * s, DCTELEM * block,
                               int n);
-static void h263_flv_encode_block(MpegEncContext * s, DCTELEM * block,
-                                  int n);
 static void h263_encode_motion(MpegEncContext * s, int val, int fcode);
 static void h263p_encode_umotion(MpegEncContext * s, int val);
 static inline void mpeg4_encode_block(MpegEncContext * s, DCTELEM * block,
@@ -185,7 +183,7 @@ void ff_flv_encode_picture_header(MpegEncContext * s, int picture_number)
         put_bits(&s->pb, 16, s->height);
       }
       put_bits(&s->pb, 2, s->pict_type == P_TYPE); /* PictureType */
-      put_bits(&s->pb, 1, 0); /* DeblockingFlag: off */
+      put_bits(&s->pb, 1, 1); /* DeblockingFlag: on */
       put_bits(&s->pb, 5, s->qscale); /* Quantizer */
       put_bits(&s->pb, 1, 0); /* ExtraInformation */
 
@@ -509,6 +507,53 @@ int ff_mpeg4_set_direct_mv(MpegEncContext *s, int mx, int my){
         else
             s->mv_type= MV_TYPE_8X8;
         return MB_TYPE_DIRECT2 | MB_TYPE_16x16 | MB_TYPE_L0L1; //Note see prev line
+    }
+}
+
+void ff_h263_update_motion_val(MpegEncContext * s){
+    const int mb_xy = s->mb_y * s->mb_stride + s->mb_x;
+               //FIXME a lot of thet is only needed for !low_delay
+    const int wrap = s->block_wrap[0];
+    const int xy = s->block_index[0];
+    
+    s->current_picture.mbskip_table[mb_xy]= s->mb_skiped; 
+
+    if(s->mv_type != MV_TYPE_8X8){
+        int motion_x, motion_y;
+        if (s->mb_intra) {
+            motion_x = 0;
+            motion_y = 0;
+        } else if (s->mv_type == MV_TYPE_16X16) {
+            motion_x = s->mv[0][0][0];
+            motion_y = s->mv[0][0][1];
+        } else /*if (s->mv_type == MV_TYPE_FIELD)*/ {
+            int i;
+            motion_x = s->mv[0][0][0] + s->mv[0][1][0];
+            motion_y = s->mv[0][0][1] + s->mv[0][1][1];
+            motion_x = (motion_x>>1) | (motion_x&1);
+            for(i=0; i<2; i++){
+                s->field_mv_table[mb_xy][i][0]= s->mv[0][i][0];
+                s->field_mv_table[mb_xy][i][1]= s->mv[0][i][1];
+                s->field_select_table[mb_xy][i]= s->field_select[0][i];
+            }
+        }
+        
+        /* no update if 8X8 because it has been done during parsing */
+        s->motion_val[xy][0] = motion_x;
+        s->motion_val[xy][1] = motion_y;
+        s->motion_val[xy + 1][0] = motion_x;
+        s->motion_val[xy + 1][1] = motion_y;
+        s->motion_val[xy + wrap][0] = motion_x;
+        s->motion_val[xy + wrap][1] = motion_y;
+        s->motion_val[xy + 1 + wrap][0] = motion_x;
+        s->motion_val[xy + 1 + wrap][1] = motion_y;
+    }
+
+    if(s->encoding){ //FIXME encoding MUST be cleaned up
+        if (s->mv_type == MV_TYPE_8X8) 
+            s->current_picture.mb_type[mb_xy]= MB_TYPE_L0 | MB_TYPE_8x8;
+        else
+            s->current_picture.mb_type[mb_xy]= MB_TYPE_L0 | MB_TYPE_16x16;
     }
 }
 
@@ -2455,6 +2500,8 @@ static int h263_decode_gob_header(MpegEncContext *s)
         return -1;
     s->mb_x= 0;
     s->mb_y= s->gob_index* s->gob_number;
+    if(s->mb_y >= s->mb_height) 
+        return -1;
 #ifdef DEBUG
     fprintf(stderr, "\nGN: %u GFID: %u Quant: %u\n", s->gob_number, gfid, s->qscale);
 #endif
@@ -4024,7 +4071,7 @@ int h263_decode_picture_header(MpegEncContext *s)
 
     startcode= get_bits(&s->gb, 22-8);
 
-    for(i= s->gb.size_in_bits - get_bits_count(&s->gb); i>0; i--) {
+    for(i= s->gb.size_in_bits - get_bits_count(&s->gb); i>24; i-=8) {
         startcode = ((startcode << 8) | get_bits(&s->gb, 8)) & 0x003FFFFF;
         
         if(startcode == 0x20)
@@ -4071,8 +4118,6 @@ int h263_decode_picture_header(MpegEncContext *s)
         if (!width)
             return -1;
         
-        s->width = width;
-        s->height = height;
         s->pict_type = I_TYPE + get_bits1(&s->gb);
 
         s->unrestricted_mv = get_bits1(&s->gb); 
@@ -4092,6 +4137,9 @@ int h263_decode_picture_header(MpegEncContext *s)
         }
         s->qscale = get_bits(&s->gb, 5);
         skip_bits1(&s->gb);	/* Continuous Presence Multipoint mode: off */
+
+        s->width = width;
+        s->height = height;
     } else {
         int ufep;
         
@@ -5184,7 +5232,7 @@ int flv_h263_decode_picture_header(MpegEncContext *s)
         printf("%c esc_type:%d, qp:%d num:%d\n",
                av_get_pict_type_char(s->pict_type), s->h263_flv-1, s->qscale, s->picture_number);
     }
-
+    
     s->y_dc_scale_table=
     s->c_dc_scale_table= ff_mpeg1_dc_scale_table;
 
