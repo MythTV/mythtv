@@ -51,7 +51,7 @@ LCDPort=13666
 # VisualMode for the player
 # Can be one of: Synaesthesia MonoScope StereoScope Blank Random
 # with FFTW support: Spectrum 
-# with SDL support: BumpScope (and faster Synaesthesia)
+# with SDL support: BumpScope Goom (and faster Synaesthesia)
 # with OpenGL support: Gears (needs FFTW as well)
 # (Random chooses anything but Blank)
 VisualMode=Random
