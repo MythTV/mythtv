@@ -494,23 +494,52 @@ void ManualSchedule::saveScheduledRecording(void)
 
     query.exec(thequery);
     
-    if (query.isActive() && query.numRowsAffected() && query.next()) {
-      
-      progInfo.chanid = chanid;
-      progInfo.chanstr = query.value(0).toString();
-      progInfo.chansign = query.value(1).toString();
-      progInfo.channame = query.value(2).toString();
+    if (query.isActive() && query.numRowsAffected() && query.next()) 
+    {  
+        progInfo.chanid = chanid;
+        progInfo.chanstr = query.value(0).toString();
+        progInfo.chansign = query.value(1).toString();
+        progInfo.channame = query.value(2).toString();
 
-      cout << "Record scheduled on channel " 
-           << chanid << " - " << m_channel->currentText()
-           << " at "
-	   << progInfo.startts.toString("yyyy/MM/dd hh:mm") 
-           << " to "
-	   << progInfo.endts.toString("hh:mm") << endl;
+        cout << "Record scheduled on channel " 
+             << chanid << " - " << m_channel->currentText()
+             << " at "
+             << progInfo.startts.toString("yyyy/MM/dd hh:mm") 
+             << " to "
+	     << progInfo.endts.toString("hh:mm") << endl;
 
-      progInfo.Save(db);
-      
-      progInfo.ApplyRecordStateChange(db, kSingleRecord);
+        progInfo.Save(db);
+
+        ProgramList pglist;
+        QString query;
+        QString sqlcat = progInfo.category;
+
+        sqlcat.replace(QRegExp("([^\\])\"|^\""), QString("\\1\\\""));
+        query = QString("WHERE program.chanid = %1 AND program.starttime = %2 "
+                        "AND program.endtime = %3 AND program.category = \"%4\" ")
+                       .arg(chanid)
+                       .arg(progInfo.startts.toString("yyyyMMddhhmmss"))
+                       .arg(progInfo.endts.toString("yyyyMMddhhmmss"))
+                       .arg(sqlcat);
+
+        ProgramList reclist;
+        reclist.FromScheduler();
+
+        if (pglist.FromProgram(db, query, reclist))
+        {
+            if (pglist.count() > 0)
+            {
+                if (pglist.count() > 1)
+                {
+                    cerr << "Multiple manual recordings for the same chan/date\n";
+                }
+
+                ProgramInfo *pginfo = pglist.first();
+                pginfo->ApplyRecordStateChange(db, kSingleRecord);
+            }
+            else
+                cerr << "Couldn't find newly scheduled program\n";
+        }
     }
 }
 
