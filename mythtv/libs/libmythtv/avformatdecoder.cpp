@@ -525,6 +525,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     fps = 0;
 
     audioStreams.clear();
+    do_ac3_passthru = false;
+    audio_sample_size = -1;
+    audio_sampling_rate = -1;
+    audio_channels = -1;
+    audio_check_1st = 2;
+    audio_sampling_rate_2nd = -1;
+    audio_channels_2nd = -1;
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
@@ -687,7 +694,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             audioStreams.push_back( i );
             VERBOSE(VB_AUDIO, QString("Stream #%1 (audio track #%2) is an "
                     "audio stream with %3 channels.")
-                              .arg(i).arg(audioStreams.size()).arg(enc->channels));
+                    .arg(i).arg(audioStreams.size() - 1).arg(enc->channels));
         }
     }
 
@@ -779,7 +786,22 @@ void AvFormatDecoder::CheckAudioParams(int freq, int channels, bool safe)
     codec = avcodec_find_decoder(enc->codec_id);
     avcodec_open(enc, codec);
 
-    SetupAudioStream();
+    if (do_ac3_passthru)
+    {
+        // An AC3 stream looks like a 48KHz 2ch audio stream to
+        // the sound card
+        audio_sample_size = 4;
+        audio_sampling_rate = 48000;
+        audio_channels = 2;
+    }
+    else
+    {
+        audio_sample_size = channels * 2;
+        audio_sampling_rate = freq;
+        audio_channels = channels;
+    }
+
+    m_parent->SetAudioParams(16, audio_channels, audio_sampling_rate);
     m_parent->ReinitAudio();
     return;
 }
@@ -1300,31 +1322,13 @@ void AvFormatDecoder::SetupAudioStream(void)
     if (curstream == NULL)
         return;
 
-    VERBOSE(VB_AUDIO, QString("Initializing audio parms from stream #%1.")
+    VERBOSE(VB_AUDIO, QString("Initializing audio parms from audio track #%1.")
             .arg(currentAudioTrack));
 
     m_parent->SetEffDsp(curstream->codec.sample_rate * 100);
 
     do_ac3_passthru = curstream->codec.codec_id == CODEC_ID_AC3 &&
                       gContext->GetNumSetting("AC3PassThru", false);
-
-    if (do_ac3_passthru)
-    {
-        // An AC3 stream looks like a 48KHz 2ch audio stream to
-        // the sound card
-        audio_sample_size = 4;
-        audio_sampling_rate = 48000;
-        audio_channels = 2;
-    }
-    else
-    {
-        audio_sample_size = curstream->codec.channels * 2;
-        audio_sampling_rate = curstream->codec.sample_rate;
-        audio_channels = curstream->codec.channels;
-    }
-
-    assert(curstream->codec.sample_fmt == SAMPLE_FMT_S16);
-    m_parent->SetAudioParams(16, audio_channels, audio_sampling_rate);
 }
 
 bool AvFormatDecoder::GetFrame(int onlyvideo)
