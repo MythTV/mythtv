@@ -26,7 +26,6 @@ typedef struct {
 /* works on grid3d */
 grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center);
 void grid3d_free(grid3d **grid);
-
 void grid3d_update (grid3d *s, float angle, float *vals, float dist);
 
 /* low level */

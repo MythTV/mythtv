@@ -8,21 +8,21 @@
 
 typedef struct
 {
-	int     vitesse;							/* 128 = vitesse nule... * * 256 = en arriere 
-																 * hyper vite.. * * 0 = en avant hype vite. */
+	int     vitesse;					/* 128 = vitesse nule... * * 256 = en arriere * hyper vite.. * * 0 = en avant hype vite. */
 	unsigned char pertedec;
 	unsigned char sqrtperte;
 	int     middleX, middleY;			/* milieu de l'effet */
-	char    reverse;							/* inverse la vitesse */
-	char    mode;									/* type d'effet à appliquer (cf les #define)  */
-	int     hPlaneEffect;					/* deviation horitontale */
-	int     vPlaneEffect;					/* deviation verticale */
+	char    reverse;					/* inverse la vitesse */
+	char    mode;						/* type d'effet à appliquer (cf les #define)
+																 * * * * * ** @since June 2001 */
+	int     hPlaneEffect;				/* deviation horitontale */
+	int     vPlaneEffect;				/* deviation verticale */
 	/** @since April 2002 */
-	int     waveEffect;						/* applique une "surcouche" de wave effect */
+	int     waveEffect;					/* applique une "surcouche" de wave effect */
 	int     hypercosEffect;				/* applique une "surcouche de hypercos effect 
 																 */
 
-	char    noisify;							/* ajoute un bruit a la transformation */
+	char    noisify;					/* ajoute un bruit a la transformation */
 }
 ZoomFilterData;
 
@@ -38,8 +38,7 @@ ZoomFilterData;
 #define YONLY_MODE 8
 #define SPEEDWAY_MODE 9
 
-void    pointFilter (guint32 * pix1, Color c,
-										 float t1, float t2, float t3, float t4, guint32 cycle);
+void    pointFilter (guint32 * pix1, Color c, float t1, float t2, float t3, float t4, guint32 cycle);
 
 /* filtre de zoom :
  * le contenu de pix1 est copie dans pix2.
@@ -47,13 +46,7 @@ void    pointFilter (guint32 * pix1, Color c,
  * resx,resy : taille des buffers.
  */
 
-void    zoomFilterFastRGB (guint32 * pix1,
-													 guint32 * pix2,
-													 ZoomFilterData * zf,
-													 guint32 resx, guint32 resy,
-
-													 int switchIncr, float switchMult);
-
+void    zoomFilterFastRGB (guint32 * pix1, guint32 * pix2, ZoomFilterData * zf, guint32 resx, guint32 resy, int switchIncr, float switchMult);
 
 #define SIN_MUL 1
 #define SIN_ADD 2

@@ -1,3 +1,4 @@
+#ifdef HAVE_MMX
 /* a definir pour avoir exactement le meme resultat que la fonction C
  * (un chouillat plus lent)
  */
@@ -18,6 +19,10 @@
 //#define MMX_TRACE
 #include "mmx.h"
 
+int zoom_filter_xmmx_supported () {
+	return (mm_support()&0x8)>>3;
+}
+
 void zoom_filter_xmmx (int prevX, int prevY,
 											 unsigned int *expix1, unsigned int *expix2,
 											 int *lbruS, int *lbruD, int buffratio,
@@ -31,7 +36,8 @@ void zoom_filter_xmmx (int prevX, int prevY,
 
   volatile mmx_t prevXY;
 	volatile mmx_t ratiox;
-	
+	//volatile mmx_t interpix;
+
 	expix1[0]=expix1[prevX-1]=expix1[prevX*prevY-1]=expix1[prevX*prevY-prevX]=0;
 
 	prevXY.ud[0] = (prevX-1)<<PERTEDEC;
@@ -101,23 +107,25 @@ void zoom_filter_xmmx (int prevX, int prevY,
 			 * post : mm3 & mm4 : coefs for this position
 			 *              mm1 : X vector [0|X]
 			 *
-			 * modif : eax,ecx
+			 * modif : eax,ebx
 			 */
 			__asm__ __volatile__ (
-				"movd %%mm0,%%ecx\n"
+				"movd %%mm0,%%ebx\n"
 				"movq %%mm0,%%mm1\n"
 
-				"andl $15,%%ecx\n"
+				"andl $15,%%ebx\n"
 				"psrlq $32,%%mm1\n"
 
-				"shll $6,%%ecx\n"
+				"shll $6,%%ebx\n"
 				"movd %%mm1,%%eax\n"
 
-				"addl %0,%%ecx\n"
+				"addl %0,%%ebx\n"
 				"andl $15,%%eax\n"
 
-				"movd (%%ecx,%%eax,4),%%mm3\n"
-				::"m"(precalCoef):"eax","ecx");
+				"movd (%%ebx,%%eax,4),%%mm3\n"
+				/* ::"X"(precalCoef):"eax","ebx"); */
+				::"m"(precalCoef):"eax","ebx");
+				
 
 			/*
 			 * extraction des coefficients...
@@ -145,7 +153,7 @@ void zoom_filter_xmmx (int prevX, int prevY,
 			 * post : mm0 : expix1[position]
 			 *        mm2 : expix1[position+largeur]
 			 *
-			 * modif : eax,ecx
+			 * modif : eax,ebx
 			 */
 			psrld_i2r (PERTEDEC,mm0);
 			psrld_i2r (PERTEDEC,mm1);
@@ -154,23 +162,23 @@ void zoom_filter_xmmx (int prevX, int prevY,
 				/*^*/ "movq %%mm3,%%mm5\n"       /*^*/
 
 				"mull %1\n"
-				"movd %%mm0,%%ecx\n"
+				"movd %%mm0,%%ebx\n"
 				/*^*/ "punpcklbw %%mm5, %%mm3\n" /*^*/
 
-				"addl %%ecx,%%eax\n"
+				"addl %%ebx,%%eax\n"
 				/*^*/ "movq %%mm3,%%mm4\n"       /*^*/
 				/*^*/ "movq %%mm3,%%mm5\n"       /*^*/
 
-				"movl %0,%%ecx\n"
+				"movl %0,%%ebx\n"
 				/*^*/ "punpcklbw %%mm5,%%mm3\n"  /*^*/
 
-				"movq (%%ecx,%%eax,4),%%mm0\n"
+				"movq (%%ebx,%%eax,4),%%mm0\n"
 				/*^*/ "punpckhbw %%mm5,%%mm4\n"  /*^*/
 
 				"addl %1,%%eax\n"
-				"movq (%%ecx,%%eax,4),%%mm2\n"
+				"movq (%%ebx,%%eax,4),%%mm2\n"
 				
-				: : "X"(expix1), "X"(prevX):"eax","ecx"
+				: : "X"(expix1), "X"(prevX):"eax","ebx"
 				);
 
 			/*
@@ -234,3 +242,15 @@ void zoom_filter_xmmx (int prevX, int prevY,
 	emms();
 #endif
 }
+#else
+int zoom_filter_xmmx_supported () {
+	return 0;
+}
+void zoom_filter_xmmx (int prevX, int prevY,
+											 unsigned int *expix1, unsigned int *expix2,
+											 int *lbruS, int *lbruD, int buffratio,
+											 int precalCoef[16][16])
+{
+	return;
+}
+#endif

@@ -4,7 +4,6 @@
 #include "surf3d.h"
 #include "goom_tools.h"
 #include "goomconfig.h"
-#include "tentacle3d.h"
 
 #define D 256.0f
 
@@ -16,15 +15,15 @@ static float cycle = 0.0f;
 static grid3d *grille[nbgrid];
 static float *vals;
 
-void tentacle_free(void) {
-	int tmp;
+void tentacle_free (void) {
+        int tmp;
 	free (vals);
-	for (tmp=0;tmp<nbgrid;tmp++) {
-		grid3d_free(&(grille[tmp]));
-	}
+        for (tmp=0;tmp<nbgrid;tmp++) {
+                grid3d_free(&(grille[tmp]));
+        }
 }
 
-void tentacle_new(void) {
+void tentacle_new (void) {
 	int tmp;
 
 	v3d center = {0,-17.0,0};
@@ -78,8 +77,7 @@ lightencolor (int *col, float power)
 #define ShiftRight(_x,_s) ((_x<0) ? -(-_x>>_s) : (_x>>_s))
 
 static
-int evolutecolor (unsigned int src,unsigned int dest,
-									unsigned int mask, unsigned int incr) {
+int evolutecolor (unsigned int src,unsigned int dest, unsigned int mask, unsigned int incr) {
 	int color = src & (~mask);
 	src &= mask;
 	dest &= mask;
@@ -93,9 +91,7 @@ int evolutecolor (unsigned int src,unsigned int dest,
 	return (src&mask)|color;
 }
 
-static void pretty_move (float cycle,
-												 float *dist,float *dist2,
-												 float *rotangle) {
+static void pretty_move (float cycle, float *dist,float *dist2, float *rotangle) {
 	static float distt = 10.0f;
 	static float distt2 = 0.0f;
 	static float rot = 0.0f; // entre 0 et 2 * M_PI
@@ -150,9 +146,7 @@ static void pretty_move (float cycle,
 		*rotangle = rot = (tmp + 15.0f*rot) / 16.0f;
 }
 
-void tentacle_update(int *buf, int *back, int W, int H,
-										 short data[2][512], float rapport,
-										 int drawit) {
+void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], float rapport, int drawit) {
 	int tmp;
 	int tmp2;
 	

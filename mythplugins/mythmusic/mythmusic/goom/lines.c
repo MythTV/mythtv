@@ -45,8 +45,6 @@ lightencolor (int *col, float power)
 	*color = lighten (*color, power);
 }
 
-
-
 static void
 genline (int id, float param, GMUnitPointer * l, int rx, int ry)
 {

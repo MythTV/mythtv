@@ -1,3 +1,7 @@
+
+//#define VERSION "1.9.2"
+//#define _DEBUG
+
 #define COLOR_BGRA
 //#define COLOR_ARGB
 
@@ -14,8 +18,14 @@
     #define ALPHA 0
 #endif
 		
-// for pc users with mmx processors.
-#define HAVE_MMX
+
+// target
+#define XMMS_PLUGIN
+//#define STANDALONE
+
+//#define POWERPC
+
+//#define HAVE_ATHLON
 
 //#define VERBOSE
 

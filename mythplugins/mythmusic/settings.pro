@@ -11,7 +11,13 @@ INCLUDEPATH += $${PREFIX}/include
 
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
+DEFINES += HAVE_MMX
 release {
         QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
         QMAKE_CFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
 }
+
+macx {
+    DEFINES -= HAVE_MMX
+}
+

@@ -15,13 +15,6 @@ paddusb_m2r (_col, mm0); \
 movd_r2m (mm0, _out); \
 }
 
-/*
-paddusb (_out
-__asm__		("movd %%eax,%%mm0\n movd %%edx,%%mm1\n paddusb %%mm1,%%mm0\n movd %%mm0,%%eax"\
-:"=eax"(_out):"eax"(_backbuf),"edx"(_col));\
-}
-*/
-
 #else
 #define DRAWMETHOD_PLUS(_out,_backbuf,_col) \
 {\
@@ -49,67 +42,15 @@ __asm__		("movd %%eax,%%mm0\n movd %%edx,%%mm1\n paddusb %%mm1,%%mm0\n movd %%mm
 
 #ifndef DRAWMETHOD
 #define DRAWMETHOD DRAWMETHOD_PLUS(*p,*p,col)
-//#define DRAWMETHOD *p=col
 
-inline static void
-draw_line (int *data, int x1, int y1, int x2, int y2, int col, int screenx,
-					 int screeny)
-{
-    int     x, y, dx, dy, yy, xx;// am, tmp;
-		int    *p;
+static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int screenx, int screeny) {
+    int     x, y, dx, dy, yy, xx;	// am, tmp;
+	int    *p;
 
-//   DATA32 *p;
-//   DATA8 aaa, nr, ng, nb, rr, gg, bb, aa, na;
 
-        if ((y1 < 0) || (y2 < 0) || (x1 < 0) || (x2 < 0) || (y1 >= screeny) || (y2 >= screeny) || (x1 >= screenx) || (x2 >= screenx)) return;
+	if ((y1 < 0) || (y2 < 0) || (x1 < 0) || (x2 < 0) || (y1 >= screeny) || (y2 >= screeny) || (x1 >= screenx) || (x2 >= screenx)) 
+			return;
         
-	/* clip to top edge 
-	if ((y1 < 0) && (y2 < 0))
-		return;
-	
-         if (y1 < 0) {
-		x1 += (y1 * (x1 - x2)) / (y2 - y1);
-		y1 = 0;
-	}
-	if (y2 < 0) {
-		x2 += (y2 * (x1 - x2)) / (y2 - y1);
-		y2 = 0;
-	}
-         
-	//clip to bottom edge 
-	if ((y1 >= screeny) && (y2 >= screeny))
-		return;
-	if (y1 >= screeny) {
-		x1 -= ((screeny - y1) * (x1 - x2)) / (y2 - y1);
-		y1 = screeny - 1;
-	}
-	if (y2 >= screeny) {
-		x2 -= ((screeny - y2) * (x1 - x2)) / (y2 - y1);
-		y2 = screeny - 1;
-	}
-	// clip to left edge 
-	if ((x1 < 0) && (x2 < 0))
-		return;
-	if (x1 < 0) {
-		y1 += (x1 * (y1 - y2)) / (x2 - x1);
-		x1 = 0;
-	}
-	if (x2 < 0) {
-		y2 += (x2 * (y1 - y2)) / (x2 - x1);
-		x2 = 0;
-	}
-	// clip to right edge 
-	if ((x1 >= screenx) && (x2 >= screenx))
-		return;
-	if (x1 >= screenx) {
-		y1 -= ((screenx - x1) * (y1 - y2)) / (x2 - x1);
-		x1 = screenx - 1;
-	}
-	if (x2 >= screenx) {
-		y2 -= ((screenx - x2) * (y1 - y2)) / (x2 - x1);
-		x2 = screenx - 1;
-	}
-        */
 	dx = x2 - x1;
 	dy = y2 - y1;
 	if (x1 > x2) {
@@ -163,8 +104,7 @@ draw_line (int *data, int x1, int y1, int x2, int y2, int col, int screenx,
 		}
 	}
 	/* 1    */
-	/* \   */
-	/* \  */
+	
 	/* 2 */
 	if (y2 > y1) {
 		/* steep */
@@ -177,7 +117,6 @@ draw_line (int *data, int x1, int y1, int x2, int y2, int col, int screenx,
 				DRAWMETHOD;
 				if (xx < (screenx - 1)) {
 					p++;
-//                                 DRAWMETHOD;
 				}
 				x += dx;
 			}
@@ -193,15 +132,13 @@ draw_line (int *data, int x1, int y1, int x2, int y2, int col, int screenx,
 				DRAWMETHOD;
 				if (yy < (screeny - 1)) {
 					p += screeny;
-//                                       DRAWMETHOD;
 				}
 				y += dy;
 			}
 		}
 	}
 	/* 2 */
-	/* /  */
-	/* /   */
+	
 	/* 1    */
 	else {
 		/* steep */
@@ -214,7 +151,6 @@ draw_line (int *data, int x1, int y1, int x2, int y2, int col, int screenx,
 				DRAWMETHOD;
 				if (xx < (screenx - 1)) {
 					p--;
-//                                 DRAWMETHOD;
 				}
 				x += dx;
 			}
@@ -230,7 +166,6 @@ draw_line (int *data, int x1, int y1, int x2, int y2, int col, int screenx,
 				DRAWMETHOD;
 				if (yy < (screeny - 1)) {
 					p += screeny;
-//                                 DRAWMETHOD;
 				}
 				y += dy;
 			}

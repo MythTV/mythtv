@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #ifdef HAVE_MMX
 #define USE_ASM
@@ -35,157 +36,39 @@ extern volatile guint32 c_resoly;
 void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, signed int *brutS, signed int *brutD);
 
 #ifdef HAVE_MMX
-//#include "mmx.h"
 
-void    zoom_filter_xmmx (int prevX, int prevY,
-													unsigned int *expix1, unsigned int *expix2,
-													int *brutS, int *brutD, int buffratio,
-													int precalCoef[16][16]);
-
-void    zoom_filter_mmx (int prevX, int prevY,
-												 unsigned int *expix1, unsigned int *expix2,
-												 int *brutS, int *brutD, int buffratio,
-												 int precalCoef[16][16]);
+void    zoom_filter_xmmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
+int 	zoom_filter_xmmx_supported ();
+void    zoom_filter_mmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
+int 	zoom_filter_mmx_supported ();
 
 static int zf_use_xmmx = 0;
 static int zf_use_mmx = 0;
 
-#define MM_MMX    0x0001 /* standard MMX */
-#define MM_3DNOW  0x0004 /* AMD 3DNOW */
-#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
-#define MM_SSE    0x0008 /* SSE functions */
-#define MM_SSE2   0x0010 /* PIV SSE2 functions */
-
-#define cpuid(index,eax,ebx,ecx,edx)\
-    __asm __volatile\
-        ("movl %%ebx, %%esi\n\t"\
-         "cpuid\n\t"\
-         "xchgl %%ebx, %%esi"\
-         : "=a" (eax), "=S" (ebx),\
-           "=c" (ecx), "=d" (edx)\
-         : "0" (index));
-
-/* Function to test if multimedia instructions are supported...  */
-int mm_support(void)
-{
-    int rval;
-    int eax, ebx, ecx, edx;
-
-    __asm__ __volatile__ (
-                          /* See if CPUID instruction is supported ... */
-                          /* ... Get copies of EFLAGS into eax and ecx */
-                          "pushf\n\t"
-                          "popl %0\n\t"
-                          "movl %0, %1\n\t"
-
-                          /* ... Toggle the ID bit in one copy and store */
-                          /*     to the EFLAGS reg */
-                          "xorl $0x200000, %0\n\t"
-                          "push %0\n\t"
-                          "popf\n\t"
-
-                          /* ... Get the (hopefully modified) EFLAGS */
-                          "pushf\n\t"
-                          "popl %0\n\t"
-                          : "=a" (eax), "=c" (ecx)
-                          :
-                          : "cc"
-                          );
-
-    if (eax == ecx)
-        return 0; /* CPUID not supported */
-
-    cpuid(0, eax, ebx, ecx, edx);
-
-    if (ebx == 0x756e6547 &&
-        edx == 0x49656e69 &&
-        ecx == 0x6c65746e) {
-
-        /* intel */
-    inteltest:
-        cpuid(1, eax, ebx, ecx, edx);
-        if ((edx & 0x00800000) == 0)
-            return 0;
-        rval = MM_MMX;
-        if (edx & 0x02000000)
-            rval |= MM_MMXEXT | MM_SSE;
-        if (edx & 0x04000000)
-            rval |= MM_SSE2;
-        return rval;
-    } else if (ebx == 0x68747541 &&
-               edx == 0x69746e65 &&
-               ecx == 0x444d4163) {
-        /* AMD */
-        cpuid(0x80000000, eax, ebx, ecx, edx);
-        if ((unsigned)eax < 0x80000001)
-            goto inteltest;
-        cpuid(0x80000001, eax, ebx, ecx, edx);
-        if ((edx & 0x00800000) == 0)
-            return 0;
-        rval = MM_MMX;
-        if (edx & 0x80000000)
-            rval |= MM_3DNOW;
-        if (edx & 0x00400000)
-            rval |= MM_MMXEXT;
-        return rval;
-    } else if (ebx == 0x746e6543 &&
-               edx == 0x48727561 &&
-               ecx == 0x736c7561) {  /*  "CentaurHauls" */
-        /* VIA C3 */
-        cpuid(0x80000000, eax, ebx, ecx, edx);
-        if ((unsigned)eax < 0x80000001)
-            goto inteltest;
-        cpuid(0x80000001, eax, ebx, ecx, edx);
-        rval = 0;
-        if( edx & ( 1 << 31) )
-          rval |= MM_3DNOW;
-        if( edx & ( 1 << 23) )
-          rval |= MM_MMX;
-        if( edx & ( 1 << 24) )
-          rval |= MM_MMXEXT;
-        return rval;
-    } else if (ebx == 0x69727943 &&
-               edx == 0x736e4978 &&
-               ecx == 0x64616574) {
-        /* Cyrix Section */
-        /* See if extended CPUID level 80000001 is supported */
-        /* The value of CPUID/80000001 for the 6x86MX is undefined
-           according to the Cyrix CPU Detection Guide (Preliminary
-           Rev. 1.01 table 1), so we'll check the value of eax for
-           CPUID/0 to see if standard CPUID level 2 is supported.
-           According to the table, the only CPU which supports level
-           2 is also the only one which supports extended CPUID levels.
-        */
-        if (eax != 2)
-            goto inteltest;
-        cpuid(0x80000001, eax, ebx, ecx, edx);
-        if ((eax & 0x00800000) == 0)
-            return 0;
-        rval = MM_MMX;
-        if (eax & 0x01000000)
-            rval |= MM_MMXEXT;
-        return rval;
-    } else {
-        return 0;
-    }
-}
-
 static void select_zoom_filter () {
 	static int firsttime = 1;
 	if (firsttime){
-                int mm_flags = mm_support();
-
-                if (mm_flags & MM_MMXEXT) {
+		if (zoom_filter_xmmx_supported()) {
 			zf_use_xmmx = 1;
-			//printf ("Extented MMX detected. Using the fastest method !\n");
+			printf ("Extented MMX detected. Using the fastest method !\n");
 		}
-		else if (mm_flags & MM_MMX) {
+		else if (zoom_filter_mmx_supported()) {
 			zf_use_mmx = 1;
-			//printf ("MMX detected. Using fast method !\n");
+			printf ("MMX detected. Using fast method !\n");
 		}
 		else {
-			//printf ("Too bad ! No MMX detected.\n");
+			printf ("Too bad ! No MMX detected.\n");
 		}
+		firsttime = 0;
+	}
+}
+
+#else /* MMX */
+
+static void select_zoom_filter () {
+	static int firsttime = 1;
+	if (firsttime) {
+		printf ("No MMX support compiled in\n");
 		firsttime = 0;
 	}
 }
@@ -257,7 +140,7 @@ static int *firedec = 0;
 /** modif d'optim by Jeko : precalcul des 4 coefs résultant des 2 pos */
 int     precalCoef[16][16];
 
-static void
+void
 generatePrecalCoef ()
 {
 	static int firstime = 1;
@@ -310,7 +193,7 @@ generatePrecalCoef ()
  px et py indique la nouvelle position (en sqrtperte ieme de pixel)
  (valeur * 16)
  */
-inline static void
+inline void
 calculatePXandPY (int x, int y, int *px, int *py)
 {
 	if (theMode == WATER_MODE) {
@@ -449,7 +332,7 @@ setPixelRGB (Uint * buffer, Uint x, Uint y, Color c)
 }
 
 
-inline static void
+inline void
 setPixelRGB_ (Uint * buffer, Uint x, Color c)
 {
 #ifdef _DEBUG
@@ -485,7 +368,7 @@ getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c)
 }
 
 
-inline static void
+inline void
 getPixelRGB_ (Uint * buffer, Uint x, Color * c)
 {
 	register unsigned char *tmp8;
@@ -536,12 +419,9 @@ void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, uns
 
 		myPos2 = myPos + 1;
 
-		px =
-			brutSmypos + (((brutD[myPos] - brutSmypos) * buffratio) >> BUFFPOINTNB);
+		px = brutSmypos + (((brutD[myPos] - brutSmypos) * buffratio) >> BUFFPOINTNB);
 		brutSmypos = brutS[myPos2];
-		py =
-			brutSmypos +
-			(((brutD[myPos2] - brutSmypos) * buffratio) >> BUFFPOINTNB);
+		py = brutSmypos + (((brutD[myPos2] - brutSmypos) * buffratio) >> BUFFPOINTNB);
 
 		pos = ((px >> PERTEDEC) + prevX * (py >> PERTEDEC));
 		// coef en modulo 15
@@ -581,15 +461,26 @@ void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, uns
 	}
 }
 
+#ifdef USE_ASM
+static int use_asm = 1;
+void
+setAsmUse (int useIt)
+{
+	use_asm = useIt;
+}
+
+int
+getAsmUse ()
+{
+	return use_asm;
+}
+#endif
+
 /*===============================================================*/
 void
-zoomFilterFastRGB (Uint * pix1,
-									 Uint * pix2,
-									 ZoomFilterData * zf,
-									 Uint resx, Uint resy, int switchIncr, float switchMult)
+zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uint resy, int switchIncr, float switchMult)
 {
 	register Uint x, y;
-//	unsigned int *temp = brutD;
 
 	static char reverse = 0;			// vitesse inversé..(zoom out)
 	static unsigned char pertedec = 8;
@@ -600,10 +491,8 @@ zoomFilterFastRGB (Uint * pix1,
 #define INTERLACE_AND 0xf
 	static int interlace_start = -2;
 
-/* TODO virer */
 	expix1 = pix1;
 	expix2 = pix2;
-/* */
 
 	/** changement de taille **/
 	if ((prevX != resx) || (prevY != resy)) {
@@ -660,17 +549,14 @@ zoomFilterFastRGB (Uint * pix1,
 			generatePrecalCoef ();
 			select_zoom_filter ();
 
-			freebrutS =
-				(unsigned int *) calloc (resx * resy * 2 + 128, sizeof(unsigned int));
-			brutS = (guint32 *) ((1 + ((unsigned int) (freebrutS)) / 128) * 128);
+			freebrutS = (unsigned int *) calloc (resx * resy * 2 + 128, sizeof(unsigned int));
+			brutS = (guint32 *) ((1 + ((uintptr_t) (freebrutS)) / 128) * 128);
 
-			freebrutD =
-				(unsigned int *) calloc (resx * resy * 2 + 128, sizeof(unsigned int));
-			brutD = (guint32 *) ((1 + ((unsigned int) (freebrutD)) / 128) * 128);
+			freebrutD = (unsigned int *) calloc (resx * resy * 2 + 128, sizeof(unsigned int));
+			brutD = (guint32 *) ((1 + ((uintptr_t) (freebrutD)) / 128) * 128);
 
-			freebrutT =
-				(unsigned int *) calloc (resx * resy * 2 + 128, sizeof(unsigned int));
-			brutT = (guint32 *) ((1 + ((unsigned int) (freebrutT)) / 128) * 128);
+			freebrutT = (unsigned int *) calloc (resx * resy * 2 + 128, sizeof(unsigned int));
+			brutT = (guint32 *) ((1 + ((uintptr_t) (freebrutT)) / 128) * 128);
 
 			/** modif here by jeko : plus de multiplications **/
 			{
@@ -691,12 +577,7 @@ zoomFilterFastRGB (Uint * pix1,
 			}
 
 			for (us = 0; us < 0xffff; us++) {
-				sintable[us] =
-					(int) (1024 *
-								 sin ((double) us * 360 /
-											(sizeof (sintable) / sizeof (sintable[0]) -
-											 1) * 3.141592 / 180) + .5);
-				/* sintable [us] = (int)(1024.0f * sin (us*2*3.31415f/0xffff)) ; */
+				sintable[us] = (int) (1024 * sin ((double) us * 360 / (sizeof (sintable) / sizeof (sintable[0]) - 1) * 3.141592 / 180) + .5);
 			}
 
 			{
@@ -741,58 +622,13 @@ zoomFilterFastRGB (Uint * pix1,
 			}
 		}
 
-//        buffratio = 0;
         interlace_start = 0;
         }
 		// generation du buffer de trans
         if (interlace_start==-1) {
-			//int     yprevx = 0;
-			//unsigned int ax = (prevX - 1) << PERTEDEC, ay = (prevY - 1) << PERTEDEC;
 
 			/* sauvegarde de l'etat actuel dans la nouvelle source */
 
-#if 0
-			volatile mmx_t ratiox;
-
-			ratiox.d[0] = buffratio;
-			ratiox.d[1] = buffratio;
-			movq_m2r (ratiox, mm6);
-			pslld_i2r (16,mm6);
-
-			y = prevX * prevY;
-			for (x=0;x<y;++x) {
-				static volatile mmx_t *brutSm;
-				static volatile mmx_t *brutDm;
-				brutSm = (mmx_t*)brutS;
-				brutDm = (mmx_t*)brutD;
-				/*
-				 * pre : mm6 = [buffratio<<16|buffratio<<16]
-				 * post : mm0 = S + ((D-S)*buffratio)>>16 format [X|Y]
-				 * modified = mm0,mm1,mm2
-				 */
-				
-				__asm__ __volatile__ (
-					"movq %0,%%mm0\n"
-					"movq %1,%%mm1\n"
-					: :"X"(brutSm[x]),"X"(brutDm[x])
-					);               /* mm0 = S */
-				
-				psubd_r2r (mm0,mm1);           /* mm1 = D - S */
-				movq_r2r (mm1, mm2);           /* mm2 = D - S */
-				
-				pslld_i2r (16,mm1);
-				mmx_r2r (pmulhuw, mm6, mm1);   /* mm1 = ?? */
-				pmullw_r2r (mm6, mm2);
-				
-				paddd_r2r (mm2, mm1);     /* mm1 = (D - S) * buffratio >> 16 */
-				pslld_i2r (16,mm0);
-				
-				paddd_r2r (mm1, mm0);     /* mm0 = S + mm1 */
-				psrld_i2r (16, mm0);
-				movq_r2m (mm0,brutSm[x]);
-			}
-			emms();
-#else
 			y = prevX * prevY * 2;
 			for (x = 0; x < y; x += 2) {
 				int     brutSmypos = brutS[x];
@@ -805,14 +641,11 @@ zoomFilterFastRGB (Uint * pix1,
 					brutSmypos +
 					(((brutD[x2] - brutSmypos) * buffratio) >> BUFFPOINTNB);
 			}
-#endif
 			buffratio = 0;
         }
 	
         if (interlace_start==-1) {
             signed int * tmp;
-            //int i,prevXY = prevX*prevY*2;
-            //for (i=0;i<prevXY;i++)
             tmp = brutD;
             brutD=brutT;
             brutT=tmp;
@@ -820,60 +653,12 @@ zoomFilterFastRGB (Uint * pix1,
             freebrutD=freebrutT;
             freebrutT=tmp;
             interlace_start = -2;
-						/*            TODO: virer si ca marche
-													int i,prevXY = prevX*prevY*2;
-													for (i=0;i<prevXY;i++)
-													brutD[i]=brutT[i];
-													interlace_start = -2;*/
         }
-/*
-	if (interlace_start>=0) {
-		* creation de la nouvelle destination *
-		for (y = interlace_start; y < prevY; y+=INTERLACE_INCR) {
-			Uint premul_y_prevX = y * prevX * 2;
-			for (x = 0; x < prevX; x++) {
-				int     px, py;
-				
-				// unsigned char coefv,coefh;
-				
-				calculatePXandPY (x, y, &px, &py);
-				
-				*				if (py>ay<<16)
-									py = iRAND (32);
-									if (px>ax<<16)
-									px = iRAND (32);
-				*
-				
-				*
-					if ((px == x << 4) && (py == y << 4)) {
-					if (x > middleX)
-					py += 2;
-					else
-					py -= 2;
-					if (y > middleY)
-					px += 2;
-					else
-					px -= 2;
-					}
-				*
-				
-				brutT[premul_y_prevX] = px;
-				brutT[premul_y_prevX + 1] = py;
-				premul_y_prevX += 2;
-			}
-		}
-		interlace_start += INTERLACE_ADD;
-		interlace_start &= INTERLACE_AND;
-		if (interlace_start == 0)
-			interlace_start = -1;
-	}
-
-*/
 
 	if (interlace_start>=0) {
             int maxEnd = (interlace_start+INTERLACE_INCR);
 		/* creation de la nouvelle destination */
-		for (y = interlace_start; (y < (unsigned int)prevY) && (y < (unsigned int)maxEnd); y++) {
+		for (y = (Uint)interlace_start; (y < (Uint)prevY) && (y < (Uint)maxEnd); y++) {
 			Uint premul_y_prevX = y * prevX * 2;
 			for (x = 0; x < prevX; x++) {
 				int     px, py;
@@ -919,8 +704,6 @@ zoomFilterFastRGB (Uint * pix1,
 	if (useAltivec)
 {
             ppc_zoom (expix1, expix2, prevX, prevY, brutS, brutD, buffratio,precalCoef);
-            //c_zoom (expix1, expix2, prevX, prevY, brutS, brutD);
-            //ppc_zoom_altivec (expix1, expix2, prevX, prevY, brutS, brutD, buffratio,precalCoef);	// FIXME:rewrite alitvec
 }
 	else
             ppc_zoom (expix1, expix2, prevX, prevY, brutS, brutD, buffratio,precalCoef);
@@ -931,13 +714,10 @@ zoomFilterFastRGB (Uint * pix1,
 }
 
 void
-pointFilter (Uint * pix1, Color c,
-						 float t1, float t2, float t3, float t4, Uint cycle)
+pointFilter (Uint * pix1, Color c, float t1, float t2, float t3, float t4, Uint cycle)
 {
-	Uint    x = (Uint) ((int) (resolx/2)
-											+ (int) (t1 * cos ((float) cycle / t3)));
-	Uint    y = (Uint) ((int) (c_resoly/2)
-											+ (int) (t2 * sin ((float) cycle / t4)));
+	Uint    x = (Uint) ((int) (resolx/2) + (int) (t1 * cos ((float) cycle / t3)));
+	Uint    y = (Uint) ((int) (c_resoly/2) + (int) (t2 * sin ((float) cycle / t4)));
 
 	if ((x > 1) && (y > 1) && (x < resolx - 2) && (y < c_resoly - 2)) {
 		setPixelRGB (pix1, x + 1, y, c);

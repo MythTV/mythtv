@@ -25,6 +25,7 @@ Goom::Goom(long int winid)
     buffer = NULL;
 
     char SDL_windowhack[32];
+    //char SDL_windowhack[sizeof(long int)];
     sprintf(SDL_windowhack, "%ld", winid);
     setenv("SDL_WINDOWID", SDL_windowhack, 1);
 
@@ -67,7 +68,7 @@ void Goom::resize(const QSize &newsize)
     size.setHeight((size.height() / 2) * 2);
     size.setWidth((size.width() / 2) * 2);
 
-    surface = SDL_SetVideoMode(size.width(), size.height(), 32, 0);
+    surface = SDL_SetVideoMode(size.width(), size.height(), 32, 0 /* SDL_ANYFORMAT */);
     goom_set_resolution(size.width() / scalew, size.height() / scaleh, 0);
 }
 
@@ -99,6 +100,7 @@ bool Goom::process(VisualNode *node)
     }
 
     buffer = goom_update(data, 0);
+
     return false;
 }
 

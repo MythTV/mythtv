@@ -1,12 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include "goom_core.h"
 #include "goom_tools.h"
 #include "filters.h"
 #include "lines.h"
 #include "ifs.h"
 #include "tentacle3d.h"
+//#include "gfontlib.h"
 
 //#define VERBOSE
 
@@ -27,47 +29,41 @@ static guint32 *p1, *p2, *tmp;
 static guint32 cycle;
 
 typedef struct {
-       int drawIFS;
-       int drawPoints;
-       int drawTentacle;
+	int drawIFS;
+	int drawPoints;
+	int drawTentacle;
 
-       int drawScope;
-       int farScope;
+	int drawScope;
+	int farScope;
 
-       int rangemin;
-       int rangemax;
+	int rangemin;
+	int rangemax;
 } GoomState;
 
 #define STATES_NB 8
 #define STATES_RANGEMAX 510
 GoomState states[STATES_NB] = {
-       {1,0,0,1,4, 000, 100},
-       {1,0,0,1,1, 101, 140}, // turned on drawScope
-       {1,0,0,1,2, 141, 200},
-       {0,1,0,1,2, 201, 260},
-       {0,1,0,1,0, 261, 330},
-       {0,1,1,1,4, 331, 400},
-       {0,0,1,1,5, 401, 450}, // turned on drawScope
-       {0,0,1,1,1, 451, 510}
+	{1,0,0,1,4, 000, 100},
+	{1,0,0,1,1, 101, 140}, // turned on drawScope
+	{1,0,0,1,2, 141, 200},
+	{0,1,0,1,2, 201, 260},
+	{0,1,0,1,0, 261, 330},
+	{0,1,1,1,4, 331, 400},
+	{0,0,1,1,5, 401, 450}, // turned on drawScope
+        {0,0,1,1,1, 451, 510}
 };
 
 GoomState *curGState = states+4;
 
-guint32 resolx, resoly, buffsize, c_black_height = 0,	/* hauteur des bande *
-																											 * * noires en bas et *
-																											 * * en * haut */
-        c_offset = 0, c_resoly = 0;	/* avec prise en compte de ca */
+guint32 resolx, resoly, buffsize, c_black_height = 0, c_offset = 0, c_resoly = 0;	/* avec prise en compte de ca */
 
 // effet de ligne..
 static GMLine *gmline1 = NULL;
 static GMLine *gmline2 = NULL;
 
-void    choose_a_goom_line (float *param1, float *param2, int *couleur,
-                            int *mode, float *amplitude, int far);
+void    choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, float *amplitude, int far);
 
-void
-goom_init (guint32 resx, guint32 resy, int cinemascope)
-{
+void goom_init (guint32 resx, guint32 resy, int cinemascope) {
 #ifdef VERBOSE
 	printf ("GOOM: init (%d, %d);\n", resx, resy);
 #endif
@@ -85,31 +81,28 @@ goom_init (guint32 resx, guint32 resy, int cinemascope)
 
 	pixel = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
 	back = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
-        srand ((guint32) pixel);
+	//RAND_INIT ();
+        srand ((uintptr_t) pixel);
         if (!rand_tab) rand_tab = (int *) malloc (NB_RAND * sizeof(int)) ;
         rand_pos = 1 ;
         while (rand_pos != 0) rand_tab [rand_pos++] = rand () ;
-
+                
 	cycle = 0;
 
-	p1 = (guint32 *) ((1 + ((unsigned int) (pixel)) / 128) * 128);
-	p2 = (guint32 *) ((1 + ((unsigned int) (back)) / 128) * 128);
+	p1 = (guint32 *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
+	p2 = (guint32 *) ((1 + ((uintptr_t) (back)) / 128) * 128);
 
 	init_ifs (resx, c_resoly);
-	gmline1 = goom_lines_init (resx, c_resoly,
-														 GML_HLINE, c_resoly, GML_BLACK,
-														 GML_CIRCLE, 0.4f * (float) c_resoly, GML_VERT);
-	gmline2 = goom_lines_init (resx, c_resoly,
-														 GML_HLINE, 0, GML_BLACK,
-														 GML_CIRCLE, 0.2f * (float) c_resoly, GML_RED);
+	gmline1 = goom_lines_init (resx, c_resoly, GML_HLINE, c_resoly, GML_BLACK, GML_CIRCLE, 0.4f * (float) c_resoly, GML_VERT);
+	gmline2 = goom_lines_init (resx, c_resoly, GML_HLINE, 0, GML_BLACK, GML_CIRCLE, 0.2f * (float) c_resoly, GML_RED);
 
-	tentacle_new();
+//	gfont_load ();
+
+	tentacle_new ();
 }
 
 
-void
-goom_set_resolution (guint32 resx, guint32 resy, int cinemascope)
-{
+void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 	free (pixel);
 	free (back);
 
@@ -129,8 +122,8 @@ goom_set_resolution (guint32 resx, guint32 resy, int cinemascope)
 	bzero (pixel, buffsize * sizeof (guint32) + 128);
 	back = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
 	bzero (back, buffsize * sizeof (guint32) + 128);
-	p1 = (guint32 *) ((1 + ((unsigned int) (pixel)) / 128) * 128);
-	p2 = (guint32 *) ((1 + ((unsigned int) (back)) / 128) * 128);
+	p1 = (guint32 *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
+	p2 = (guint32 *) ((1 + ((uintptr_t) (back)) / 128) * 128);
 
 	init_ifs (resx, c_resoly);
 	goom_lines_set_res (gmline1, resx, c_resoly);
@@ -138,9 +131,7 @@ goom_set_resolution (guint32 resx, guint32 resy, int cinemascope)
 }
 
 
-guint32 *
-goom_update (gint16 data[2][512], int forceMode)
-{
+guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	static int lockvar = 0;				// pour empecher de nouveaux changements
 	static int goomvar = 0;				// boucle des gooms
 	static int totalgoom = 0;			// nombre de gooms par seconds
@@ -163,7 +154,6 @@ goom_update (gint16 data[2][512], int forceMode)
 	static int stop_lines = 0;
 
 	// des points
-
 	static int ifs_incr = 1;			// dessiner l'ifs (0 = non: > = increment)
 	static int decay_ifs = 0;			// disparition de l'ifs
 	static int recay_ifs = 0;			// dédisparition de l'ifs
@@ -172,8 +162,6 @@ goom_update (gint16 data[2][512], int forceMode)
 #define SWITCHINCR 0x7f
 	static float switchMult = 1.0f;
 	static int switchIncr = SWITCHINCR;
-
-//	static int lastgoom = 0;
 
 	static char goomlimit = 2;		// sensibilité du goom
 	static ZoomFilterData zfd = {
@@ -231,26 +219,12 @@ goom_update (gint16 data[2][512], int forceMode)
 	if (largfactor > 1.5f)
 		largfactor = 1.5f;
 
-/*
-	if ((ifs_incr == 1) && (iRAND (300) == 0) && (decay_ifs < -300) && (agoom)) {
-		decay_ifs = 200;
-	}
-*/
-
 	decay_ifs--;
 	if (decay_ifs > 0)
 		ifs_incr += 2;
 	if (decay_ifs == 0)
 		ifs_incr = 0;
 
-/*
-	if ((ifs_incr == 0) && (iRAND (300) == 0) && (agoom) && (decay_ifs < -100)) {
-		recay_ifs = 5;
-		ifs_incr = 11;
-		if (iRAND(2))
-			stop_lines = 0xf000 & 5;
-	}
-*/
 
 	if (recay_ifs) {
 		ifs_incr -= 2;
@@ -261,32 +235,16 @@ goom_update (gint16 data[2][512], int forceMode)
 
 	if (ifs_incr > 0)
 		ifs_update (p1 + c_offset, p2 + c_offset, resolx, c_resoly, ifs_incr);
+	
 	if (curGState->drawPoints) {
 		for (i = 1; i * 15 <= speedvar + 15; i++) {
 			loopvar += speedvar*2/3 + 1;
 
-			pointFilter (p1 + c_offset,
-									 YELLOW,
-									 ((pointWidth - 6.0f) * largfactor + 5.0f),
-									 ((pointHeight - 6.0f) * largfactor + 5.0f),
-									 i * 152.0f, 128.0f, loopvar + i * 2032);
-			pointFilter (p1 + c_offset, ORANGE,
-									 ((pointWidth / 2) * largfactor) / i + 10.0f * i,
-									 ((pointHeight / 2) * largfactor) / i + 10.0f * i,
-									 96.0f, i * 80.0f, loopvar / i);
-			pointFilter (p1 + c_offset, VIOLET,
-									 ((pointHeight / 3 + 5.0f) * largfactor) / i + 10.0f * i,
-									 ((pointHeight / 3 + 5.0f) * largfactor) / i + 10.0f * i,
-									 i + 122.0f, 134.0f, loopvar / i);
-			pointFilter (p1 + c_offset, BLACK,
-									 ((pointHeight / 3) * largfactor + 20.0f),
-									 ((pointHeight / 3) * largfactor + 20.0f),
-									 58.0f, i * 66.0f, loopvar / i);
-			pointFilter (p1 + c_offset, WHITE,
-									 (pointHeight * largfactor + 10.0f * i) / i,
-									 (pointHeight * largfactor + 10.0f * i) / i,
-									 66.0f, 74.0f, loopvar + i * 500);
-		}
+			pointFilter (p1 + c_offset, YELLOW, ((pointWidth - 6.0f) * largfactor + 5.0f), ((pointHeight - 6.0f) * largfactor + 5.0f), i * 152.0f, 128.0f, loopvar + i * 2032);
+			pointFilter (p1 + c_offset, ORANGE, ((pointWidth / 2) * largfactor) / i + 10.0f * i, ((pointHeight / 2) * largfactor) / i + 10.0f * i, 96.0f, i * 80.0f, loopvar / i);
+			pointFilter (p1 + c_offset, VIOLET, ((pointHeight / 3 + 5.0f) * largfactor) / i + 10.0f * i, ((pointHeight / 3 + 5.0f) * largfactor) / i + 10.0f * i, i + 122.0f, 134.0f, loopvar / i);
+			pointFilter (p1 + c_offset, BLACK, ((pointHeight / 3) * largfactor + 20.0f), ((pointHeight / 3) * largfactor + 20.0f), 58.0f, i * 66.0f, loopvar / i); 
+			pointFilter (p1 + c_offset, WHITE, (pointHeight * largfactor + 10.0f * i) / i, (pointHeight * largfactor + 10.0f * i) / i, 66.0f, 74.0f, loopvar + i * 500); }
 	}
 
 	// par défaut pas de changement de zoom
@@ -342,13 +300,6 @@ goom_update (gint16 data[2][512], int forceMode)
 		// UN GOOM !!! YAHOO !
 		totalgoom++;
 		agoom = 20;									// mais pdt 20 cycles, il n'y en aura plus.
-		// lineMode = (lineMode + 1)%40; // Tous les 10 gooms on change de mode
-		// lineaire
-
-		// if (iRAND(12) == 0)
-		// zfd.vitesse=STOP_SPEED-1;
-		// if (iRAND(13) == 0)
-		// zfd.vitesse=STOP_SPEED+1;
 
 		// changement eventuel de mode
 		if (iRAND(16) == 0)
@@ -389,7 +340,7 @@ goom_update (gint16 data[2][512], int forceMode)
 			zfd.hypercosEffect = 0;
 			break;
 		case 5:
-		case 15:
+  	case 15:
 		case 22:
 			zfd.mode = HYPERCOS1_MODE;
 			zfd.waveEffect = 0;
@@ -414,12 +365,12 @@ goom_update (gint16 data[2][512], int forceMode)
 			zfd.waveEffect = 1;
 			zfd.hypercosEffect = 1;
 			break;
-		case 29:
-		case 30:
+	  case 29:
+	 	case 30:
 			zfd.mode = YONLY_MODE;
 			break;
-		case 31:
-		case 32:
+	  case 31:
+	 	case 32:
 			zfd.mode = SPEEDWAY_MODE;
 			break;
 		default:
@@ -428,13 +379,13 @@ goom_update (gint16 data[2][512], int forceMode)
 			zfd.hypercosEffect = 0;
 		}
 	}
-
+	
 	// tout ceci ne sera fait qu'en cas de non-blocage
 	if (lockvar == 0) {
 		// reperage de goom (acceleration forte de l'acceleration du volume)
 		// -> coup de boost de la vitesse si besoin..
 		if ((accelvar > goomlimit) || (accelvar < -goomlimit)) {
-			static int rndn = 0, i;
+			static int rndn = 0 ,i;
 			static int blocker = 0;
 			goomvar++;
 
@@ -460,9 +411,9 @@ goom_update (gint16 data[2][512], int forceMode)
 
 			if (!curGState->drawScope)
 				stop_lines = 0xf000 & 5;
-
+			
 			if (!curGState->drawScope) {
-				stop_lines = 0;
+				stop_lines = 0;			
 				lineMode = DRAWLINES;
 			}
 
@@ -519,7 +470,7 @@ goom_update (gint16 data[2][512], int forceMode)
 
 				switch (vtmp = (iRAND (15))) {
 				case 0:
-
+                                    
 					zfd.vPlaneEffect = iRAND (3) - iRAND (3);
 					zfd.hPlaneEffect = iRAND (3) - iRAND (3);
 					break;
@@ -598,9 +549,6 @@ goom_update (gint16 data[2][512], int forceMode)
 		}
 		// mode mega-lent
 		if (iRAND (700) == 0) {
-			/* 
-			 * printf ("coup du sort...\n") ;
-			 */
 			pzfd = &zfd;
 			zfd.vitesse = STOP_SPEED - 1;
 			zfd.pertedec = 8;
@@ -641,8 +589,8 @@ goom_update (gint16 data[2][512], int forceMode)
 	}
 
 	/*
- 	 * Permet de forcer un effet.
- 	 */
+	 * Permet de forcer un effet.
+	 */
 	if ((forceMode > 0) && (forceMode <= NB_FX)) {
 		pzfd = &zfd;
 		pzfd->mode = forceMode - 1;
@@ -694,43 +642,88 @@ goom_update (gint16 data[2][512], int forceMode)
 #endif
 
 	// Zoom here !
-	zoomFilterFastRGB (p1 + c_offset, p2 + c_offset, pzfd, resolx, c_resoly,
-										 switchIncr, switchMult);
+	zoomFilterFastRGB (p1 + c_offset, p2 + c_offset, pzfd, resolx, c_resoly, switchIncr, switchMult);
 
 	/*
 	 * Affichage tentacule
 	 */
 
-	//      if (curGState->drawTentacle)
 	if (goomlimit!=0)
-		tentacle_update(p2 + c_offset, p1 + c_offset, resolx, c_resoly,
-										data, (float)accelvar/goomlimit, curGState->drawTentacle);
+		tentacle_update(p2 + c_offset, p1 + c_offset, resolx, c_resoly, data, (float)accelvar/goomlimit, curGState->drawTentacle);
 	else
-		tentacle_update(p2 + c_offset, p1 + c_offset, resolx, c_resoly,
-										data,0.0f, curGState->drawTentacle);
+		tentacle_update(p2 + c_offset, p1 + c_offset, resolx, c_resoly, data,0.0f, curGState->drawTentacle);
 
+/*
+	{
+		static char title[1024];
+		static int displayTitle = 0;
+		char    text[255];
 
-	/*
-	 * Gestion du Scope
-	 */
+		if (fps > 0) {
+			int i;
+			if (speedvar>0) {
+				for (i=0;i<speedvar;i++)
+					text[i]='*';
+				text[i]=0;
+				goom_draw_text (p1 + c_offset,resolx,c_resoly, 10, 50, text, 1.0f, 0);
+			}
+			if (accelvar>0) {
+				for (i=0;i<accelvar;i++) {
+					if (i==goomlimit)
+						text[i]='o';
+					else
+						text[i]='*';
+				}
+				text[i]=0;
+				goom_draw_text (p1 + c_offset,resolx,c_resoly, 10, 62, text, 1.0f, 0);
+			}
+			if (agoom==20)
+				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 80, "GOOM",1.0f, 0);
+			else if (agoom)
+				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 80, "goom",1.0f, 0);
+			if (abiggoom==200)
+				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 100, "BGOOM",1.0f, 0);
+			else if (abiggoom)
+				goom_draw_text (p1 + c_offset,resolx,c_resoly,10, 100, "bgoom",1.0f, 0);
+		}
+
+		update_message (message);
+
+		if (fps > 0) {
+			sprintf (text, "%2.f fps", fps);
+			goom_draw_text (p1 + c_offset,resolx,c_resoly, 10, 24, text, 1, 0);
+		}
+
+		if (songTitle != NULL) {
+			sprintf (title, songTitle);	// la flemme d'inclure string.h :)
+			displayTitle = 200;
+		}
+
+		if (displayTitle) {
+			goom_draw_text (p1 + c_offset,resolx,c_resoly, resolx / 2, c_resoly / 2 + 7, title, ((float) (190 - displayTitle) / 10.0f), 1);
+			displayTitle--;
+			if (displayTitle < 4)
+				goom_draw_text (p2 + c_offset,resolx,c_resoly, resolx / 2, c_resoly / 2 + 7, title, ((float) (190 - displayTitle) / 10.0f), 1);
+		}
+	}
+*/
 
 	/*
 	 * arret demande
 	 */
 	if ((stop_lines & 0xf000)||(!curGState->drawScope)) {
-		float	param1, param2, amplitude;
-		int	couleur;
-		int	mode;
-
+		float   param1, param2, amplitude;
+		int     couleur;
+		int     mode;
+		
 		choose_a_goom_line (&param1, &param2, &couleur, &mode, &amplitude,1);
 		couleur = GML_BLACK;
-
+		
 		goom_lines_switch_to (gmline1, mode, param1, amplitude, couleur);
 		goom_lines_switch_to (gmline2, mode, param2, amplitude, couleur);
 		stop_lines &= 0x0fff;
-		printf("turning lines off\n");
 	}
-
+	
 	/*
 	 * arret aleatore.. changement de mode de ligne..
 	 */
@@ -739,28 +732,27 @@ goom_update (gint16 data[2][512], int forceMode)
 		if (lineMode == -1)
 			lineMode = 0;
 	}
-	else 
+	else
 		if ((cycle%80==0)&&(iRAND(5)==0)&&lineMode)
 			lineMode--;
 
 	if ((cycle % 120 == 0)
-			&& (iRAND(4) == 0)
+			&& (iRAND (4) == 0)
 			&& (curGState->drawScope)) {
 		if (lineMode == 0)
 			lineMode = DRAWLINES;
 		else if (lineMode == DRAWLINES) {
 			float   param1, param2, amplitude;
-			int     couleur1, couleur2;
+			int     couleur1,couleur2;
 			int     mode;
 
 			lineMode--;
-			choose_a_goom_line (&param1, &param2, &couleur1, 
-													&mode, &amplitude,stop_lines);
+			choose_a_goom_line (&param1, &param2, &couleur1, &mode, &amplitude,stop_lines);
 
 			couleur2 = 5-couleur1;
 			if (stop_lines) {
 				stop_lines--;
-				if (iRAND(2)) 
+				if (iRAND(2))
 					couleur2=couleur1 = GML_BLACK;
 			}
 
@@ -772,7 +764,7 @@ goom_update (gint16 data[2][512], int forceMode)
 	/*
 	 * si on est dans un goom : afficher les lignes...
 	 */
-	if ((lineMode >= 0) || (agoom > 15)) {
+	if ((lineMode != 0) || (agoom > 15)) {
 		gmline2->power = gmline1->power;
 
 		goom_lines_draw (gmline1, data[0], p2 + c_offset);
@@ -784,10 +776,9 @@ goom_update (gint16 data[2][512], int forceMode)
 			int     couleur1,couleur2;
 			int     mode;
 
-			choose_a_goom_line (&param1, &param2, &couleur1, 
-													&mode, &amplitude, stop_lines);
+			choose_a_goom_line (&param1, &param2, &couleur1, &mode, &amplitude, stop_lines);
 			couleur2 = 5-couleur1;
-
+			
 			if (stop_lines) {
 				stop_lines--;
 				if (iRAND(2))
@@ -827,8 +818,7 @@ goom_update (gint16 data[2][512], int forceMode)
 	return return_val;
 }
 
-void goom_close(void)
-{
+void goom_close () {
 	if (pixel != NULL)
 		free (pixel);
 	if (back != NULL)
@@ -842,10 +832,7 @@ void goom_close(void)
 }
 
 
-void
-choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode,
-										float *amplitude, int far)
-{
+void choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, float *amplitude, int far) {
 	*mode = iRAND (3);
 	*amplitude = 1.0f;
 	switch (*mode) {
@@ -891,3 +878,68 @@ choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode,
 
 	*couleur = iRAND (6);
 }
+
+/*
+void goom_set_font (int ***chars, int *width, int *height) {
+    if (chars == NULL)
+        return ;
+}
+*/
+
+/*
+void update_message (char *message) {
+
+	static int nbl;
+	static char msg2 [0x800];
+	static int affiche = 0;
+	static int longueur;
+	int fin = 0;
+
+	if (message) {
+		int i=1,j=0;
+		sprintf (msg2,message);
+		for (j=0;msg2[j];j++)
+			if (msg2[j]=='\n')
+				i++;
+		nbl = i;
+		affiche = resoly + nbl * 25 + 105;
+		longueur = strlen (msg2);
+	}
+	if (affiche) {
+		int i = 0;
+		char *msg=malloc(longueur+1);
+		char *ptr = msg;
+		int pos;
+		float ecart;
+		message = msg;
+		sprintf (msg,msg2);
+		
+		while (!fin) {
+			while (1) {
+				if (*ptr == 0) {
+					fin = 1;
+					break;
+				}
+				if (*ptr == '\n') {
+					*ptr = 0;
+					break;
+				}
+				++ptr;
+			}
+			pos = affiche - (nbl-i)*25;
+			pos += 6.0*(cos((double)pos/20.0));
+			pos -= 80;
+			ecart = (1.0+2.0*sin((double)pos/20.0));
+			if ((fin) && (2 * pos < (int)resoly))
+				pos = (int)resoly / 2;
+			pos += 7;
+
+			goom_draw_text(p1 + c_offset,resolx,c_resoly, resolx/2, pos, message, ecart, 1);
+			message = ++ptr;
+			i++;
+		}
+		affiche --;
+		free (msg);
+	}
+}
+*/

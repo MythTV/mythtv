@@ -3,6 +3,8 @@
 // Use, modification and distribution is allowed without limitation,
 // warranty, or liability of any kind.
 //
+// modified 12-2004 by Kyle Schlansker to add 64 bit support
+//
 
 #include "mainvisual.h"
 #include "synaesthesia.h"
@@ -14,6 +16,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include <iostream>
 using namespace std;
@@ -135,15 +138,21 @@ void Synaesthesia::resize(const QSize &newsize)
     lastLastOutputBmp.size(size.width(), size.height());
     outWidth = size.width();
     outHeight = size.height();
-    
+ 
     if (outputImage)
         delete outputImage;
 
     size.setHeight(size.height() * 2);
     outputImage = new QImage(size, 8, 256);
 
+    if (!outputImage) 
+    {
+        cerr << "outputImage in Synaesthesia::resize() is NULL" << endl;
+        return;
+    }
+
     for (int i = 0; i < 256; i++)
-        outputImage->setColor(i, qRgb(palette[i * 3], palette[i * 3 + 1],
+        outputImage->setColor(i, qRgb(palette[i * 3], palette[i * 3 + 1], 
                                       palette[i * 3 + 2]));
 
 #ifdef SDL_SUPPORT
@@ -176,6 +185,7 @@ int Synaesthesia::bitReverser(int i)
         sum = (i & 1) + sum * 2;
         i >>= 1;
     }
+	
     return sum;
 }
 
@@ -272,6 +282,7 @@ unsigned char Synaesthesia::getPixel(int x, int y, int where)
 {
     if (x < 0 || y < 0 || x >= outWidth || y >= outHeight)
         return 0;
+	
     return lastOutput[where];
 }
 
@@ -282,8 +293,8 @@ void Synaesthesia::fadeFade(void)
     do {
         uint32_t x = *ptr;
         if (x)
-            *(ptr++) = x - ((x & 0xf0f0f0f0ul) >> 4) -
-                           ((x & 0xe0e0e0e0ul) >> 5);
+            *(ptr++) = x - ((x & (uintptr_t)0xf0f0f0f0) >> 4) -
+                           ((x & (uintptr_t)0xe0e0e0e0) >> 5);
         else
             ptr++;
     } while (--i > 0);
@@ -593,37 +604,37 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
 
     SDL_LockSurface(surface);
 
-    register unsigned long *ptr2 = (unsigned long*)output;
+    register uint32_t *ptrOutput = (uint32_t *)output;
 
-    for (int j = 0; j < outHeight * 2; j += 2)
-    {
-        unsigned long *ptr1 = (unsigned long *)(surface->pixels) + 
-                              outWidth / 4 * j;
-        unsigned long *ptr12 = (unsigned long *)(surface->pixels) + 
-                               outWidth / 4 * (j + 1);
+    for (int j = 0; j < outHeight * 2; j += 2) 
+    {		
+        uint32_t *ptrTop = (uint32_t *)(surface->pixels) + outWidth / 4 * j;
+	uint32_t *ptrBot = (uint32_t *)(surface->pixels) + 
+                                                         outWidth / 4 * (j + 1);
+		
         int i = outWidth / 4;
-        do
-        {
-            register unsigned int const r1 = *(ptr2++);
-            register unsigned int const r2 = *(ptr2++);
 
-            register unsigned int const v = ((r1 & 0x000000f0ul) >> 4) |
-                                            ((r1 & 0x0000f000ul) >> 8) |
+        do {
+            register unsigned int const r1 = *(ptrOutput++);
+            register unsigned int const r2 = *(ptrOutput++);
+            register unsigned int const v = ((r1 & 0x000000f0ul) >> 4)  |
+                                            ((r1 & 0x0000f000ul) >> 8)  |
                                             ((r1 & 0x00f00000ul) >> 12) |
                                             ((r1 & 0xf0000000ul) >> 16);
-            *(ptr1++) = v | (((r2 & 0x000000f0ul) << 12) |
-                             ((r2 & 0x0000f000ul) << 8) |
-                             ((r2 & 0x00f00000ul) << 4) |
-                             ((r2 & 0xf0000000ul)));
-            *(ptr12++) = v | (((r2 & 0x000000f0ul) << 12) |
-                             ((r2 & 0x0000f000ul) << 8) |
-                             ((r2 & 0x00f00000ul) << 4) |
-                             ((r2 & 0xf0000000ul)));
-        } while (--i);
+            *(ptrTop++) = v | ( ((r2 & 0x000000f0ul) << 12) |
+                                ((r2 & 0x0000f000ul) << 8 ) |
+                                ((r2 & 0x00f00000ul) << 4 ) |
+                                ((r2 & 0xf0000000ul)));
+
+            *(ptrBot++) = v | ( ((r2 & 0x000000f0ul) << 12) |
+                                ((r2 & 0x0000f000ul) << 8 ) |
+                                ((r2 & 0x00f00000ul) << 4 ) |
+                                ((r2 & 0xf0000000ul)));
+        }while(--i);
     }
 
     SDL_UnlockSurface(surface);
-    SDL_UpdateRect(surface, 0, 0, 0, 0);
+    SDL_Flip(surface);
 
     return false;
 #else
@@ -631,35 +642,39 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
     if (!outputImage)
         return false;
 
-    register unsigned long *ptr2 = (unsigned long*)output;
+    register uint32_t *ptrOutput = (uint32_t *)output;
 
-    for (int j = 0; j < outHeight * 2; j += 2)
+    for (int j = 0; j < outHeight * 2; j += 2) 
     {
-        unsigned long *ptr1 = (unsigned long *)(outputImage->scanLine(j));
-        unsigned long *ptr12 = (unsigned long *)(outputImage->scanLine(j+1));
+        uint32_t *ptrTop = (uint32_t *)(outputImage->scanLine(j));
+        uint32_t *ptrBot = (uint32_t *)(outputImage->scanLine(j+1));
+
         int i = outWidth / 4;
+
         do
         {
-            register unsigned int const r1 = *(ptr2++);
-            register unsigned int const r2 = *(ptr2++);
+            register unsigned int const r1 = *(ptrOutput++);
+            register unsigned int const r2 = *(ptrOutput++);
 
             register unsigned int const v = ((r1 & 0x000000f0ul) >> 4) |
                                             ((r1 & 0x0000f000ul) >> 8) |
                                             ((r1 & 0x00f00000ul) >> 12) |
                                             ((r1 & 0xf0000000ul) >> 16);
-            *(ptr1++) = v | (((r2 & 0x000000f0ul) << 12) |
-                             ((r2 & 0x0000f000ul) << 8) |
-                             ((r2 & 0x00f00000ul) << 4) |
-                             ((r2 & 0xf0000000ul)));
-            *(ptr12++) = v | (((r2 & 0x000000f0ul) << 12) |
-                             ((r2 & 0x0000f000ul) << 8) |
-                             ((r2 & 0x00f00000ul) << 4) |
-                             ((r2 & 0xf0000000ul)));
-	} while (--i);
+
+            *(ptrTop++) = v | (((r2 & 0x000000f0ul) << 12) |
+                               ((r2 & 0x0000f000ul) << 8) |
+                               ((r2 & 0x00f00000ul) << 4) |
+                               ((r2 & 0xf0000000ul)));
+
+            *(ptrBot++) = v | (((r2 & 0x000000f0ul) << 12) |
+                               ((r2 & 0x0000f000ul) << 8) |
+                               ((r2 & 0x00f00000ul) << 4) |
+                               ((r2 & 0xf0000000ul)));
+        } while (--i);
     }
 
     p->drawImage(QRect(0, 0, 800, 600), *outputImage);
-    
+   
     return true;
 #endif
 }
@@ -681,4 +696,3 @@ VisualBase *SynaesthesiaFactory::create(MainVisual *parent, long int winid)
     (void)parent;
     return new Synaesthesia(winid);
 }
-
