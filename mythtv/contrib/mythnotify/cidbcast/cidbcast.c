@@ -254,11 +254,9 @@ int waitfor_ring(int fd, char *wait_string, CID_Info *cid_info)
 	 while ((nbytes = read(fd, bufptr, buffer + sizeof(buffer) - bufptr - 1)) > 0)
 	   {
 	     bufptr += nbytes;
-	     if (bufptr[-1] == '\n' || bufptr[-1] == '\r')
-	       break;
 	   }
 	 
-	 /* nul terminate the string and see if we got an OK response */
+	 /* nul terminate the string and see if we got a complete response */
 	 *bufptr = '\0';
 	 
 	 if (checkfor_cid_info(buffer, 255,
