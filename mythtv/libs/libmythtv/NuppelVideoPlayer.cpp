@@ -94,6 +94,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     m_scan = kScan_Detect;
     m_double_framerate = false;
     video_frame_rate = 29.97;
+    prevtc = 0;
 
     forceVideoOutput = kVideoOutput_Default;
     decoder = NULL;
@@ -1378,7 +1379,8 @@ void NuppelVideoPlayer::AVSync(void)
             //cerr << delta << " ";
 
             // If the timecode is off by a frame (dropped frame) wait to sync
-            if (delta > (int) frame_interval / 1200)
+            if (delta > (int) frame_interval / 1200 &&
+                delta < (int) frame_interval / 1000 * 3)
             {
                 //cerr << "+ ";
                 videosync->AdvanceTrigger();
