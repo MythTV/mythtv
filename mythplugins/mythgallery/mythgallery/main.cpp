@@ -3,6 +3,7 @@
 using namespace std;
 
 #include <qapplication.h>
+#include <qsqldatabase.h>
 
 #include "iconview.h"
 
@@ -14,6 +15,19 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     MythContext *context = new MythContext();
+
+    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
+    if (!db)
+    {
+        printf("Couldn't connect to database\n");
+        return -1;
+    }
+
+    if (!context->OpenDatabase(db))
+    {
+        printf("couldn't open db\n");
+        return -1;
+    }
 
     context->LoadSettingsFiles("mythgallery-settings.txt");
 
