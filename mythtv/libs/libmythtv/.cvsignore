@@ -1,3 +1,4 @@
 .qmake.internal.cache
 moc_recordingprofile.cpp
+moc_videosource.cpp
 Makefile

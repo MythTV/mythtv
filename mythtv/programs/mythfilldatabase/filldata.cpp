@@ -11,6 +11,7 @@
 #include <qfile.h>
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
+#include <qurl.h>
 
 #include <iostream>
 #include <fstream>
@@ -140,7 +141,7 @@ QString getFirstText(QDomElement element)
     return "";
 }
 
-ChanInfo *parseChannel(QDomElement &element) 
+ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl) 
 {
     ChanInfo *chaninfo = new ChanInfo;
 
@@ -166,7 +167,8 @@ ChanInfo *parseChannel(QDomElement &element)
         {
             if (info.tagName() == "icon")
             {
-                chaninfo->iconpath = info.attribute("src", "");
+                QUrl iconUrl(baseUrl, info.attribute("src", ""), true);
+                chaninfo->iconpath = iconUrl.toString();
             }
             else if (info.tagName() == "display-name" && 
                      chaninfo->name.length() == 0)
@@ -322,6 +324,8 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
 
     QDomElement docElem = doc.documentElement();
 
+    QUrl baseUrl(docElem.attribute("source-data-url", ""));
+
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
     {
@@ -330,7 +334,7 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
         {
             if (e.tagName() == "channel")
             {
-                ChanInfo *chinfo = parseChannel(e);
+                ChanInfo *chinfo = parseChannel(e, baseUrl);
                 chanlist->push_back(*chinfo);
                 delete chinfo;
             }
