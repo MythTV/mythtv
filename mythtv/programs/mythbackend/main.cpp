@@ -153,13 +153,15 @@ int main(int argc, char **argv)
     int port = context->GetNumSetting("ServerPort", 6543);
     int statusport = context->GetNumSetting("StatusPort", 6544);
 
-    MainServer *ms = new MainServer(context, port, statusport, &tvList);
+    new MainServer(context, port, statusport, &tvList);
+
     a.exec();
 
     delete context;
     delete sched;
 
-    unlink(pidfile.ascii());
+    if (pidfile != "")
+        unlink(pidfile.ascii());
 
     return 0;
 }
