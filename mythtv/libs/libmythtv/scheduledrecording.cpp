@@ -195,8 +195,8 @@ void ScheduledRecording::fetchChannelInfo(QSqlDatabase *db)
 QString ScheduledRecording::ChannelText(QString format)
 {
     format.replace("<num>", chanstr)
-        .replace("<sign>", chansign)
-        .replace("<name>", channame);
+          .replace("<sign>", chansign)
+          .replace("<name>", channame);
 
     return format;
 }
@@ -404,32 +404,25 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db,
 void ScheduledRecording::addHistory(QSqlDatabase* db, 
                                     const ProgramInfo& proginfo) 
 {
-    QString sqltitle = proginfo.title;
-    QString sqlsubtitle = proginfo.subtitle;
-    QString sqldescription = proginfo.description;
-    QString sqlcategory = proginfo.category;
+    QSqlQuery result(QString::null, db);
 
-    sqltitle.replace(QRegExp("\""), QString("\\\""));
-    sqlsubtitle.replace(QRegExp("\""), QString("\\\""));
-    sqldescription.replace(QRegExp("\""), QString("\\\""));
-    sqlcategory.replace(QRegExp("\""), QString("\\\""));
+    result.prepare("INSERT INTO oldrecorded (chanid,starttime,"
+                   "endtime,title,subtitle,description,category,"
+                   "seriesid,programid) "
+                   "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,"
+                   ":CATEGORY,:SERIESID,:PROGRAMID);");
+    result.bindValue(":CHANID", proginfo.chanid);
+    result.bindValue(":START", proginfo.recstartts.toString(Qt::ISODate));
+    result.bindValue(":END", proginfo.recendts.toString(Qt::ISODate));
+    result.bindValue(":TITLE", proginfo.title.utf8());
+    result.bindValue(":SUBTITLE", proginfo.subtitle.utf8());
+    result.bindValue(":DESC", proginfo.description.utf8());
+    result.bindValue(":CATEGORY", proginfo.category.utf8());
+    result.bindValue(":SERIESID", proginfo.seriesid);
+    result.bindValue(":PROGRAMID", proginfo.programid);
 
-    QString query = QString("INSERT INTO oldrecorded (chanid,starttime,"
-                            "endtime,title,subtitle,description,category,"
-                            "seriesid,programid) "
-                            "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\","
-                            "\"%7\",\"%8\",\"%9\");")
-        .arg(proginfo.chanid)
-        .arg(proginfo.recstartts.toString(Qt::ISODate))
-        .arg(proginfo.recendts.toString(Qt::ISODate))
-        .arg(sqltitle.utf8()) 
-        .arg(sqlsubtitle.utf8())
-        .arg(sqldescription.utf8())
-        .arg(sqlcategory.utf8())
-        .arg(proginfo.seriesid)
-        .arg(proginfo.programid);
+    result.exec();
 
-    QSqlQuery result = db->exec(query);
     if (!result.isActive())
     {
         MythContext::DBError("addHistory", result);
@@ -443,24 +436,19 @@ void ScheduledRecording::addHistory(QSqlDatabase* db,
 }
 
 void ScheduledRecording::forgetHistory(QSqlDatabase* db,
-                                       const ProgramInfo& proginfo) {
-    QString sqltitle = proginfo.title;
-    QString sqlsubtitle = proginfo.subtitle;
-    QString sqldescription = proginfo.description;
+                                       const ProgramInfo& proginfo)
+{
+    QSqlQuery result(QString::null, db);
 
-    sqltitle.replace(QRegExp("'"), QString("\\'"));
-    sqlsubtitle.replace(QRegExp("'"), QString("\\'"));
-    sqldescription.replace(QRegExp("'"), QString("\\'"));
-
-    QString query = QString("DELETE FROM oldrecorded WHERE title = '%1' AND "
-                            "((subtitle = '%2' AND description = '%3') OR "
-                            "(programid <> '' AND programid = '%4'))")
-        .arg(sqltitle.utf8()) 
-        .arg(sqlsubtitle.utf8())
-        .arg(sqldescription.utf8())
-        .arg(proginfo.programid);
+    result.prepare("DELETE FROM oldrecorded WHERE title = :TITLE AND "
+                   "((subtitle = :SUBTITLE AND description = :DESC) OR "
+                   "(programid <> '' AND programid = :PROGRAMID))");
+    result.bindValue(":TITLE", proginfo.title.utf8());
+    result.bindValue(":SUBTITLE", proginfo.subtitle.utf8());
+    result.bindValue(":DESC", proginfo.description.utf8());
+    result.bindValue(":PROGRAMID", proginfo.programid);
     
-    QSqlQuery result = db->exec(query);
+    result.exec();
     if (!result.isActive())
     {
         MythContext::DBError("forgetHistory", result);
