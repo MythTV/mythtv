@@ -298,7 +298,7 @@ foreach my $show (@files) {
         print("Non-nuv file $show found.\n");
         print("Do you want to import? (y/n): ");
         chomp(my $do_import = <STDIN>);
-        if ($do_import = "y") {
+        if ($do_import eq "y") {
             print("Enter channel: ");
             chomp(my $tmp_channel = <STDIN>);
             if ($tmp_channel) {$channel = $tmp_channel;}
@@ -365,7 +365,7 @@ foreach my $show (@files) {
         print("Building a seek table should improve FF/RW and JUMP functions when watching this video\n");
         print("Do you want to build a seek table for this file? (y/n): ");
         chomp(my $do_commflag = <STDIN>);
-        if ($do_commflag = "y") {
+        if ($do_commflag eq "y") {
             if (!$test_mode) {
                 exec("mythcommflag --file $new_file --rebuild"); 
             } else { 
