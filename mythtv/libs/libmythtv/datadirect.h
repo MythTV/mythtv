@@ -261,6 +261,8 @@ class DataDirectProcessor
     void parseLineups();
     void parseStations();
 
+    void setInputFile(const QString &filename);
+
     QValueList<DataDirectStation> stations;
     QValueList<DataDirectLineup> lineups;
     QValueList<DataDirectLineupMap> lineupmaps;
@@ -274,6 +276,11 @@ class DataDirectProcessor
     QString lastrunpassword; 
     QDateTime actuallistingsfrom;
     QDateTime actuallistingsto;
+
+    QString inputfilename;
+
+    FILE *getInputFile(bool plineupsOnly, QDateTime pstartDate,
+            QDateTime pendDate, QString &err_txt, QString &tmpfilename);
 
     void createATempTable(const QString &ptablename, 
                           const QString &ptablestruct);

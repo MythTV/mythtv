@@ -2287,7 +2287,6 @@ void handlePrograms(int id, int offset, QMap<QString,
     }
 }
 
-
 void grabDataFromFile(int id, int offset, QString &filename, 
                       QDate *qCurrentDate = 0)
 {
@@ -2468,6 +2467,26 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     thefile.remove();
 
     return succeeded;
+}
+
+void grabDataFromDDFile(int id, int offset, const QString &filename,
+        const QString &lineupid, QDate *qCurrentDate = 0)
+{
+    QDate *currentd = qCurrentDate;
+    QDate qcd = QDate::currentDate();
+    if (!currentd)
+        currentd = &qcd;
+
+    ddprocessor.setInputFile(filename);
+    Source s;
+    s.id = id;
+    s.name = "";
+    s.xmltvgrabber = "datadirect";
+    s.userid = "fromfile";
+    s.password = "fromfile";
+    s.lineupid = lineupid;
+
+    grabData(s, offset, currentd);
 }
 
 void clearOldDBEntries(void)
@@ -2945,6 +2964,9 @@ int main(int argc, char *argv[])
 
     bool update_icon_map = false;
 
+    bool from_dd_file = false;
+    QString fromddfile_lineupid;
+
     while (argpos < a.argc())
     {
         // The manual and update flags should be mutually exclusive.
@@ -2996,6 +3018,27 @@ int main(int argc, char *argv[])
             if (!quiet)
                 cout << "### bypassing grabbers, reading directly from file\n";
             from_file = true;
+        }
+        else if (!strcmp(a.argv()[argpos], "--dd-file"))
+        {
+            if (((argpos + 4) >= a.argc()) ||
+                !strncmp(a.argv()[argpos + 1], "--", 2) ||
+                !strncmp(a.argv()[argpos + 2], "--", 2) ||
+                !strncmp(a.argv()[argpos + 3], "--", 2) ||
+                !strncmp(a.argv()[argpos + 4], "--", 2))
+            {
+                printf("missing or invalid parameters for --dd-file option\n");
+                return -1;
+            }
+
+            fromfile_id = atoi(a.argv()[++argpos]);
+            fromfile_offset = atoi(a.argv()[++argpos]);
+            fromddfile_lineupid = a.argv()[++argpos];
+            fromfile_name = a.argv()[++argpos];
+
+            if (!quiet)
+                cout << "### bypassing grabbers, reading directly from file\n";
+            from_dd_file = true;
         }
         else if (!strcmp(a.argv()[argpos], "--xawchannels"))
         {
@@ -3157,6 +3200,12 @@ int main(int argc, char *argv[])
             cout << "                (-1 means to replace all data, up to 10 days)\n";
             cout << "   <xmlfile>  = file to read\n";
             cout << "\n";
+            cout << "--dd-file <sourceid> <offset> <lineupid> <xmlfile>\n";
+            cout << "   <sourceid> = see --file\n";
+            cout << "   <offset>   = see --file\n";
+            cout << "   <lineupid> = the lineup id\n";
+            cout << "   <xmlfile>  = see --file\n";
+            cout << "\n";
             cout << "--xawchannels <sourceid> <xawtvrcfile>\n";
             cout << "   (--manual flag works in combination with this)\n";
             cout << "   Read channels as defined in xawtvrc file given\n";
@@ -3287,6 +3336,12 @@ int main(int argc, char *argv[])
         query.exec(QString("UPDATE settings SET data ='%1' "
                            "WHERE value='mythfilldatabaseLastRunStatus'")
                            .arg(status));
+    }
+    else if (from_dd_file)
+    {
+        grabDataFromDDFile(fromfile_id, fromfile_offset, fromfile_name,
+                fromddfile_lineupid);
+        clearOldDBEntries();
     }
     else
     {

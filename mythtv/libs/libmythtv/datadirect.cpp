@@ -434,69 +434,102 @@ void DataDirectProcessor::updateProgramViewTable(int sourceid)
         MythContext::DBError("Analyzing table dd_productioncrew", query);
 }
 
+void DataDirectProcessor::setInputFile(const QString &filename)
+{
+    inputfilename = filename;
+}
+
+FILE *DataDirectProcessor::getInputFile(bool plineupsOnly, QDateTime pstartDate,
+            QDateTime pendDate, QString &err_txt, QString &tmpfilename)
+{
+    FILE *ret = NULL;
+    if (inputfilename.isNull())
+    {
+        QString ddurl("http://datadirect.webservices.zap2it.com/tvlistings/xtvdService");
+
+        if (plineupsOnly) 
+        {
+            pstartDate = QDateTime(QDate::currentDate().addDays(2),
+                                   QTime::QTime(23, 59, 0));
+            pendDate = pstartDate;
+            pendDate = pendDate.addSecs(1);
+        }
+
+        QString startdatestr = pstartDate.toString(Qt::ISODate) + "Z";
+        QString enddatestr = pendDate.toString(Qt::ISODate) + "Z";
+
+        char ctempfilename[] = "/tmp/mythpostXXXXXX";
+        if (mkstemp(ctempfilename) == -1) 
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("DDP: error creating temp files -- %1").
+                    arg(strerror(errno)));
+            return NULL;
+        }
+
+        tmpfilename = QString(ctempfilename);
+        QFile postfile(tmpfilename);
+
+        if (postfile.open(IO_WriteOnly)) 
+        {
+            QTextStream poststream(&postfile);
+            poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
+            poststream << "<SOAP-ENV:Envelope\n";
+            poststream << "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
+            poststream << "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
+            poststream << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
+            poststream << "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
+            poststream << "<SOAP-ENV:Body>\n";
+            poststream << "<ns1:download  xmlns:ns1='urn:TMSWebServices'>\n";
+            poststream << "<startTime xsi:type='xsd:dateTime'>";
+            poststream << startdatestr << "</startTime>\n";
+            poststream << "<endTime xsi:type='xsd:dateTime'>";
+            poststream << enddatestr << "</endTime>\n";
+            poststream << "</ns1:download>\n";
+            poststream << "</SOAP-ENV:Body>\n";
+            poststream << "</SOAP-ENV:Envelope>\n";
+        }
+        else
+        {
+            err_txt = "Unable to open post data output file.";
+            return NULL;
+        }
+
+        postfile.close();
+
+        QString command = QString("wget --http-user='%1' --http-passwd='%2' "
+                                  "--post-file='%3' --header='Accept-Encoding:gzip'"
+                                  " %4 --output-document=- | gzip -df")
+                                 .arg(getUserID())
+                                 .arg(getPassword())
+                                 .arg(tmpfilename)
+                                 .arg(ddurl);
+
+        err_txt = command;
+
+        ret = popen(command.ascii(), "r");
+    }
+    else
+    {
+        err_txt = inputfilename;
+        ret = fopen(inputfilename.ascii(), "r");
+    }
+
+    return ret;
+}
+
 bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate, 
                                    QDateTime pendDate) 
 {
-    QString ddurl = "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService";
+    QString ferror;
+    QString tempfile;
+    FILE *fp = getInputFile(plineupsOnly, pstartDate, pendDate, ferror,
+                            tempfile);
 
-    if (plineupsOnly) 
-    {
-        pstartDate = QDateTime(QDate::currentDate().addDays(2),
-                               QTime::QTime(23, 59, 0));
-        pendDate = pstartDate;
-        pendDate = pendDate.addSecs(1);
-    }
-
-    QString startdatestr = pstartDate.toString(Qt::ISODate) + "Z";
-    QString enddatestr = pendDate.toString(Qt::ISODate) + "Z";
-
-    char ctempfilename[] = "/tmp/mythpostXXXXXX";
-    if (mkstemp(ctempfilename) == -1) 
-    {
-        VERBOSE(VB_IMPORTANT, QString("DDP: error creating temp files -- %1").
-                arg(strerror(errno)));
-        return false;
-    }
-
-    QString tmpfilename = QString(ctempfilename);
-    QFile postfile(tmpfilename);
-
-    if (postfile.open(IO_WriteOnly)) 
-    {
-        QTextStream poststream(&postfile);
-        poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
-        poststream << "<SOAP-ENV:Envelope\n";
-        poststream << "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
-        poststream << "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
-        poststream << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
-        poststream << "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
-        poststream << "<SOAP-ENV:Body>\n";
-        poststream << "<ns1:download  xmlns:ns1='urn:TMSWebServices'>\n";
-        poststream << "<startTime xsi:type='xsd:dateTime'>";
-        poststream << startdatestr << "</startTime>\n";
-        poststream << "<endTime xsi:type='xsd:dateTime'>";
-        poststream << enddatestr << "</endTime>\n";
-        poststream << "</ns1:download>\n";
-        poststream << "</SOAP-ENV:Body>\n";
-        poststream << "</SOAP-ENV:Envelope>\n";
-    }
-
-    postfile.close();
-
-    QString command = QString("wget --http-user='%1' --http-passwd='%2' "
-                              "--post-file='%3' --header='Accept-Encoding:gzip'"
-                              " %4 --output-document=- | gzip -df")
-                             .arg(getUserID())
-                             .arg(getPassword())
-                             .arg(tmpfilename)
-                             .arg(ddurl);
-
-
-    FILE* fp = popen(command.ascii(), "r");
     if (fp == NULL) 
     {
         VERBOSE(VB_IMPORTANT, QString("DDP: Failed to get data (%1) -- %2").
-                arg(command.ascii()).arg(strerror(errno)));
+                arg(ferror.ascii()).arg(strerror(errno)));
         return false;
     }
 
@@ -515,7 +548,12 @@ bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
     xmlsimplereader.setContentHandler(&ddhandler);
     xmlsimplereader.parse(xmlsource);
     f.close();
-    postfile.remove();
+
+    if (!tempfile.isNull())
+    {
+        QFile tmpfile(tempfile);
+        tmpfile.remove();
+    }
     return true;
 }
 
