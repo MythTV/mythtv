@@ -519,11 +519,50 @@ void VideoBrowser::selected(Metadata *someItem)
     QString ext = someItem->Filename().section('.',-1);
 
     QString handler = gContext->GetSetting("VideoDefaultPlayer");
+
+    //
+    //  Do we have a specialized player for this
+    //  type of file?
+    //
+        
+    QString extension = filename.section(".", -1, -1);
+
+    QString q_string = QString("SELECT playcommand, use_default FROM "
+                               "videotypes WHERE extension = \"%1\" ;")
+                               .arg(extension);
+
+    QSqlQuery a_query(q_string, db);
+    
+    if(a_query.isActive() && a_query.numRowsAffected() > 0)
+    {
+        a_query.next();
+        if(!a_query.value(1).toBool())
+        {
+            //
+            //  This file type is defined and
+            //  it is not set to use default player
+            //
+            handler = a_query.value(0).toString();                
+        }
+    }
+
+
+
     QString arg;
     arg.sprintf("\"%s\"", filename.replace(QRegExp("\""), "\\\"").ascii());
-    QString command = handler.replace(QRegExp("%s"), arg);
 
-    cout << "command:" << command << endl;
+    QString command = "";
+    
+    if(handler.contains("%s"))
+    {
+        command = handler.replace(QRegExp("%s"), arg);
+    }
+    else
+    {
+        command = handler + " " + arg;
+    }
+
+    //cout << "command:" << command << endl;
 
     m_title = someItem->Title();
     LayerSet *container = NULL;

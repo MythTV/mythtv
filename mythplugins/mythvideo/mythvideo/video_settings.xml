@@ -18,4 +18,10 @@
       <action>SETTINGS_PLAYER</action>
    </button>
 
+   <button>
+      <type>VIDEO</type>
+      <text>File Types</text>
+      <action>SETTINGS_ASSOCIATIONS</action>
+   </button>
+
 </mythmenu>

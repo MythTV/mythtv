@@ -21,6 +21,7 @@ using namespace std;
 #include "videobrowser.h"
 #include "videotree.h"
 #include "globalsettings.h"
+#include "fileassoc.h"
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
@@ -45,7 +46,7 @@ struct GenericData
 void runMenu(QString, const QString &, QSqlDatabase *, QString);
 void VideoCallback(void *, QString &);
 void SearchDir(QSqlDatabase *, QString &);
-void BuildFileList(QString &, VideoLoadedMap &, QStringList &);
+void BuildFileList(QSqlDatabase *, QString &, VideoLoadedMap &, QStringList &);
 
 extern "C" {
 int mythplugin_init(const char *libversion);
@@ -176,6 +177,16 @@ void VideoCallback(void *data, QString &selection)
         PlayerSettings settings;
         settings.exec(QSqlDatabase::database());
     }
+    else if (sel == "settings_associations")
+    {
+        FileAssocDialog fa(mdata->db,
+                           gContext->GetMainWindow(),
+                           "file_associations",
+                           "video-",
+                           "fa dialog");
+        
+        fa.exec();
+    }
 }
 
 void SearchDir(QSqlDatabase *db, QString &directory)
@@ -184,7 +195,7 @@ void SearchDir(QSqlDatabase *db, QString &directory)
     VideoLoadedMap::Iterator iter;
 
     QStringList imageExtensions = QImage::inputFormatList();
-    BuildFileList(directory, video_files, imageExtensions);
+    BuildFileList(db, directory, video_files, imageExtensions);
 
     QSqlQuery query("SELECT filename FROM videometadata;", db);
 
@@ -250,7 +261,36 @@ void SearchDir(QSqlDatabase *db, QString &directory)
     delete file_checking;
 }
 
-void BuildFileList(QString &directory, VideoLoadedMap &video_files,
+bool IgnoreExtension(QSqlDatabase *db, QString extension)
+{
+    
+    QString q_string = QString("SELECT f_ignore FROM videotypes WHERE extension = \"%1\" ;")
+                              .arg(extension);
+    QSqlQuery a_query(q_string, db);
+    if(a_query.isActive() && a_query.numRowsAffected() > 0)
+    {
+        //
+        //  This extension is a recognized
+        //  file type (in the videotypes
+        //  database). Return true only if
+        //  ignore explicitly set.
+        //
+        a_query.next();
+        return a_query.value(0).toBool();
+    }
+    
+    //
+    //  Otherwise, ignore this file only
+    //  if the user has a setting to
+    //  ignore unknown file types.
+    //
+    
+    return !gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
+}
+
+void BuildFileList(QSqlDatabase *db,
+                   QString &directory, 
+                   VideoLoadedMap &video_files,
                    QStringList &imageExtensions)
 {
     QDir d(directory);
@@ -269,12 +309,24 @@ void BuildFileList(QString &directory, VideoLoadedMap &video_files,
     while ((fi = it.current()) != 0)
     {
         ++it;
-        if (fi->fileName() == "." || fi->fileName() == ".." ||
+        if (fi->fileName() == "." || 
+            fi->fileName() == ".." ||
             fi->fileName() == "Thumbs.db")
+        {
             continue;
+        }
+        
+        if(!fi->isDir())
+        {
+            if(IgnoreExtension(db, fi->extension(false)))
+            {
+                continue;
+            }
+        }
+        
         QString filename = fi->absFilePath();
         if (fi->isDir())
-            BuildFileList(filename, video_files, imageExtensions);
+            BuildFileList(db, filename, video_files, imageExtensions);
         else
         {
             r.setPattern("^" + fi->extension() + "$");
@@ -286,3 +338,4 @@ void BuildFileList(QString &directory, VideoLoadedMap &video_files,
         }
     }
 }
+

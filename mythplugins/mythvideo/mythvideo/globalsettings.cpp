@@ -48,6 +48,31 @@ public:
     };
 };
 
+class VideoListUnknownFiletypes: public CheckBoxSetting, public GlobalSetting {
+public:
+    VideoListUnknownFiletypes():
+        GlobalSetting("VideoListUnknownFiletypes") {
+        setLabel("Show Unknown File Types");
+        setValue(true);
+        setHelpText("If set, all files below the Myth Video "
+                    "directory will be displayed unless their "
+                    "extension is explicitly set to be ignored. ");
+    };
+};
+
+class VideoTreeNoDB: public CheckBoxSetting, public GlobalSetting {
+public:
+    VideoTreeNoDB():
+        GlobalSetting("VideoTreeNoDB") {
+        setLabel("Video List browses files");
+        setValue(false);
+        setHelpText("If set, this will cause the Video List "
+                    "screen to show all relevant files below "
+                    "the MythVideo starting directory whether "
+                    "they have been scanned or not.");
+    };
+};
+
 //Player Settings
 
 class VideoDefaultPlayer: public LineEditSetting, public GlobalSetting {
@@ -68,6 +93,8 @@ GeneralSettings::GeneralSettings()
     general->addChild(new VideoStartupDirectory());
     general->addChild(new VideoDefaultParentalLevel());
     general->addChild(new VideoAdminPassword());
+    general->addChild(new VideoListUnknownFiletypes());
+    general->addChild(new VideoTreeNoDB());
     addChild(general);
 
 }

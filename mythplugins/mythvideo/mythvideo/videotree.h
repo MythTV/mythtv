@@ -26,7 +26,9 @@ class VideoTree : public MythThemedDialog
    ~VideoTree();
 
     void buildVideoList();
-
+    void buildFileList(QString directory);
+    bool ignoreExtension(QString extension);
+    
   public slots:
   
     void handleTreeListSelection(int, IntVector*);
@@ -40,7 +42,9 @@ class VideoTree : public MythThemedDialog
     void         wireUpTheme();
     int          currentParentalLevel;
     QSqlDatabase *db;
-    
+    bool         file_browser;
+    QStringList  browser_mode_files;
+       
     //
     //  Theme-related "widgets"
     //

@@ -633,4 +633,120 @@
 
     </window>
 
+    <window name="file_associations">
+
+        <font name="title" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>18</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
+        
+        <font name="display" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>16</size>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+        </font>
+        
+        <container name="associations">
+ 
+            <area>10,10,780,580</area>
+ 
+            <textarea name="title" draworder="0" align="center">
+                <area>10,10,760,50</area>
+                <font>title</font>
+                <value>MythVideo File Associations</value>
+            </textarea>
+ 
+ 
+            
+            <textarea name="extension_text" draworder="0" align="right">
+                <area>100,200,190,40</area>
+                <font>display</font>
+                <value>Extension:</value>
+            </textarea>
+
+            <textarea name="command_text" draworder="0" align="right">
+                <area>100,260,190,40</area>
+                <font>display</font>
+                <value>Command:</value>
+            </textarea>
+
+            <textarea name="default_text" draworder="0" align="right">
+                <area>100,320,190,40</area>
+                <font>display</font>
+                <value>Use default player:</value>
+            </textarea>
+
+            <textarea name="ignore_text" draworder="0" align="right">
+                <area>100,380,190,40</area>
+                <font>display</font>
+                <value>Ignore:</value>
+            </textarea>
+
+
+
+            <selector name="extension_select" draworder="0">
+                <area>300,195,200,40</area>
+                <font>display</font>
+                <image function="on" filename="mv_leftright_on.png"></image>
+                <image function="off" filename="mv_leftright_off.png"></image>
+                <image function="pushed" filename="mv_leftright_pushed.png"></image>
+            </selector>
+
+            <blackhole name="command_hack" draworder="0">
+                <area>300,255,300,40</area>
+            </blackhole>
+
+            <checkbox name="default_check" draworder="0">
+                <position>300,315</position>
+                <image function="checked" filename="mv_checked.png"></image>
+                <image function="unchecked" filename="mv_unchecked.png"></image>
+                <image function="checked_high" filename="mv_checked_high.png"></image>
+                <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+            </checkbox>      
+
+            <checkbox name="ignore_check" draworder="0">
+                <position>300,375</position>
+                <image function="checked" filename="mv_checked.png"></image>
+                <image function="unchecked" filename="mv_unchecked.png"></image>
+                <image function="checked_high" filename="mv_checked_high.png"></image>
+                <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+            </checkbox>      
+
+
+
+
+            <textbutton name="done_button" draworder="0">
+                <position>700,550</position>
+                <font>display</font>
+                <image function="on" filename="mv_pushbutton_on.png"></image>
+                <image function="off" filename="mv_pushbutton_off.png"></image>
+                <image function="pushed" filename="mv_pushbutton_pushed.png"></image>
+            </textbutton>
+
+            <textbutton name="new_button" draworder="0">
+                <position>600,550</position>
+                <font>display</font>
+                <image function="on" filename="mv_pushbutton_on.png"></image>
+                <image function="off" filename="mv_pushbutton_off.png"></image>
+                <image function="pushed" filename="mv_pushbutton_pushed.png"></image>
+            </textbutton>
+
+            <textbutton name="delete_button" draworder="0">
+                <position>0,550</position>
+                <font>display</font>
+                <image function="on" filename="mv_pushbutton_on.png"></image>
+                <image function="off" filename="mv_pushbutton_off.png"></image>
+                <image function="pushed" filename="mv_pushbutton_pushed.png"></image>
+            </textbutton>
+
+        </container>    
+ 
+    </window>
+
+
 </mythuitheme>

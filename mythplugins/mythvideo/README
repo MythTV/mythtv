@@ -24,10 +24,10 @@ Once the make is completed, you should switch to root and do a 'make install'.
 
 
 
-VIDEO METADATA TABLE
---------------------
+VIDEO METADATA
+--------------
 
-You need to also create the videometadata table in your MySQL database, to do so:
+You need to also create some video tables in your MySQL database, to do so:
 
 # exit
 $ cd videodb
@@ -38,7 +38,7 @@ $ mysql -u mythtv -p < metadata.sql
 RUNNING MYTHVIDEO
 -----------------
 
-MythVideo is run by executing 'mythvideo' - All the configuration is now done within the program.
+All the configuration is now done within the program.
 
 
 
