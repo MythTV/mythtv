@@ -992,9 +992,6 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
                 if (playList.grep(key).count())
                     ltype->EnableForcedFont(cnt, "tagged");
-
-                if (pendingDeletes.grep(key).count())
-                    ltype->EnableForcedFont(cnt, "inactive");
             }
         } 
     } 
@@ -1688,18 +1685,7 @@ void PlaybackBox::stop(ProgramInfo *rec)
 void PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory)
 {
     RemoteDeleteRecording(rec, forgetHistory);
-
-    ProgramInfo *tmpItem = findMatchingProg(curitem);
-
-    if (tmpItem)
-    {
-        QString key;
-        key = tmpItem->chanid + "_" +
-              tmpItem->startts.toString(Qt::ISODate);
-
-        pendingDeletes << key;
-    }
-
+    connected = FillList();
     update(fullRect);
 }
 
@@ -2356,21 +2342,12 @@ void PlaybackBox::doPlaylistDelete(void)
     {
         tmpItem = findMatchingProg(*it);
         if (tmpItem)
-        {
-            // Perform functions from doRemove here but update only once
-            // at the end to improve performance
             RemoteDeleteRecording(tmpItem, false);
-
-            QString key;
-            key = tmpItem->chanid + "_" +
-                  tmpItem->startts.toString(Qt::ISODate);
-
-            pendingDeletes << key;
-        }
     }
 
-    playList.clear();
+    connected = FillList();
     update(fullRect);
+    playList.clear();
 }
 
 void PlaybackBox::doDelete(void)

@@ -575,7 +575,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                   "channel.callsign,channel.name,channel.commfree, "
                   "channel.outputfilters,seriesid,programid,filesize, "
                   "lastmodified,stars,previouslyshown,originalairdate, "
-                  "hostname "
+                  "hostname,recordid "
                   "FROM recorded "
                   "LEFT JOIN channel "
                   "ON recorded.chanid = channel.chanid "
@@ -628,6 +628,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
             proginfo->hasAirDate = true;
         }
         proginfo->hostname = query.value(18).toString();
+        proginfo->recordid = query.value(19).toInt();
 
         proginfo->spread = -1;
 
@@ -1160,6 +1161,27 @@ void ProgramInfo::SetEditing(bool edit, QSqlDatabase *db)
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Edit status update", 
                              query);
+}
+
+void ProgramInfo::SetDeleteFlag(bool deleteFlag, QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
+
+    query.prepare("UPDATE recorded"
+                  " SET deletepending = :DELETEFLAG"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+
+    if (deleteFlag)
+        query.bindValue(":DELETEFLAG", 1);
+    else
+        query.bindValue(":DELETEFLAG", 0);
+    
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Set delete flag", query);
 }
 
 bool ProgramInfo::IsCommFlagged(QSqlDatabase *db)

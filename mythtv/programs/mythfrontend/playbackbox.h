@@ -144,7 +144,6 @@ class PlaybackBox : public MythDialog
     int progIndex;
     QStringList titleList;
     QStringList playList;
-    QStringList pendingDeletes;
     bool onPlaylist;
     QMap<QString, ProgramList> progLists;
 

@@ -738,6 +738,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                "FROM recorded "
                "LEFT JOIN record ON recorded.recordid = record.recordid "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
+               "WHERE recorded.deletepending = 0 "
                "ORDER BY recorded.starttime";
 
     if (type == "Delete")
@@ -1035,6 +1036,10 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         return;
     }
 
+    ProgramInfo *pginfo;
+    pginfo = ProgramInfo::GetProgramFromRecorded(delete_db->db(),
+                                                 ds->chanid,
+                                                 ds->recstartts);
     JobQueue::DeleteAllJobs(delete_db->db(), ds->chanid, ds->recstartts);
 
     QString filename;
@@ -1059,6 +1064,11 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
                            QString("File %1 for %2 could not be deleted.")
                                    .arg(ds->filename).arg(logInfo));
+        if (pginfo)
+        {
+            pginfo->SetDeleteFlag(false, delete_db->db());
+            delete pginfo;
+        }
 
         if (delete_db)
             delete delete_db;
@@ -1115,7 +1125,16 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                                    .arg(logInfo));
     }
 
-    ScheduledRecording::signalChange(0);
+    if (pginfo)
+    {
+        ScheduledRecording::signalChange(pginfo->recordid);
+
+        delete pginfo;
+    }
+    else
+    {
+        ScheduledRecording::signalChange(0);
+    }
 
     if (delete_db)
         delete delete_db;
@@ -1436,6 +1455,11 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         ds->chanid = pginfo->chanid;
         ds->recstartts = pginfo->recstartts;
         ds->recendts = pginfo->recendts;
+
+        dblock.lock();
+        MythContext::KickDatabase(m_db);
+        pginfo->SetDeleteFlag(true, m_db);
+        dblock.unlock();
 
         pthread_t deleteThread;
         pthread_attr_t attr;
