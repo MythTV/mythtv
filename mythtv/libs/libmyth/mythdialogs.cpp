@@ -395,7 +395,7 @@ bool MythPopupBox::focusNextPrevChild(bool next)
     QWidget *startingPoint = focusList->home();
     QWidget *candidate = NULL;
 
-    QWidget *w = (next) ? focusList->last() : focusList->first();
+    QWidget *w = (next) ? focusList->prev() : focusList->next();
 
     int countdown = focusList->count();
 
