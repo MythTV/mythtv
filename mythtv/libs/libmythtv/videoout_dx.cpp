@@ -264,6 +264,12 @@ void VideoOutputDX::StopEmbedding(void)
 
 void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
+    if (IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, "VideoOutputDX::PrepareFrame() called while IsErrored is true.");
+        return;
+    }
+
     unsigned char *picbuf;
     int stride;
     
@@ -316,7 +322,8 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
                 case MAKEFOURCC('R','V','3','2'): av_format = PIX_FMT_RGBA32; break;
                 default: 
                     VERBOSE(VB_IMPORTANT, "VODX: Non Xv mode only supports 16, 24, and 32 bpp displays");
-                    exit(-22);
+                    errored = true;
+                    return;
             }
             
             avpicture_fill(&image_out, picbuf, av_format, XJ_width, XJ_height);
@@ -338,6 +345,12 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 void VideoOutputDX::Show(FrameScanType )
 {
     HRESULT dxresult;
+
+    if (IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, "VideoOutputDX::Show() called while IsErrored istrue.");
+        return;
+    }
 
     if ((display == NULL))
     {
@@ -440,6 +453,12 @@ void VideoOutputDX::ProcessFrame(VideoFrame *frame, OSD *osd,
                                    FilterChain *filterList,
                                    NuppelVideoPlayer *pipPlayer)
 {
+    if (IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, "VideoOutputDX::ProcessFrame() called while IsErrored is true.");
+        return;
+    }
+
     if (!frame)
     {
         frame = scratchFrame;

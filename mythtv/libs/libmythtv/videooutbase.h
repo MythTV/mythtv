@@ -176,6 +176,8 @@ class VideoOutput
     void SetFramesPlayed(long long fp) { framesPlayed = fp; };
     long long GetFramesPlayed(void) { return framesPlayed; };
 
+    bool IsErrored() { return errored; }
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer_normal, int needprebuffer_small,
@@ -272,6 +274,8 @@ class VideoOutput
     bool m_deinterlaceBeforeOSD;;
 
     long long framesPlayed;
+
+    bool errored;
 };
 
 #endif

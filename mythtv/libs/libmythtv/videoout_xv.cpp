@@ -455,14 +455,15 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
             }
         } 
 
-        if (!foundimageformat)
-        {
-            VERBOSE(VB_IMPORTANT, "Couldn't find the proper Xv image format, exiting");
-            exit(-26);
-        }
-
         if (fo)
             XFree(fo);
+
+        if (!foundimageformat)
+        {
+            VERBOSE(VB_IMPORTANT, "Couldn't find the proper Xv image format");
+            errored = true;
+            return false;
+        }
     }
 
     data->XJ_gc = XCreateGC(data->XJ_disp, data->XJ_win, 0, 0);
@@ -834,6 +835,12 @@ void VideoOutputXv::StopEmbedding(void)
 
 void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
+    if (IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, "VideoOutputXv::PrepareFrame() called while IsErrored is true.");
+        return;
+    }
+
     if (!buffer)
         buffer = scratchFrame;
 
@@ -953,7 +960,8 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
             case 32: av_format = PIX_FMT_RGBA32; break;
             default: 
                 VERBOSE(VB_IMPORTANT, "Non Xv mode only supports 16, 24, and 32 bpp displays");
-                exit(-27);
+                errored = true;
+                return;
         }
 
         avpicture_fill(&image_in, (uint8_t *)image->data, 
@@ -979,6 +987,12 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
 void VideoOutputXv::Show(FrameScanType )
 {
+    if (IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, "VideoOutputXv::Show() called while IsErrored istrue.");
+        return;
+    }
+
     pthread_mutex_lock(&lock);
     XSync(data->XJ_disp, False);
     pthread_mutex_unlock(&lock);
@@ -1034,6 +1048,12 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
                                  FilterChain *filterList,
                                  NuppelVideoPlayer *pipPlayer)
 {
+    if (IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, "VideoOutputXv::ProcessFrame() called while IsErrored is true.");
+        return;
+    }
+
     pthread_mutex_lock(&lock);
 
     bool pauseframe = false;

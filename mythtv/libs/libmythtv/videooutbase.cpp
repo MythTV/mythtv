@@ -70,7 +70,7 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 #endif
 
     VERBOSE(VB_IMPORTANT, "Not compiled with any useable video output method.");
-    exit(-28);
+    return NULL;
 }
 
 VideoOutput::VideoOutput()
@@ -111,6 +111,7 @@ VideoOutput::VideoOutput()
     m_deintFiltMan = NULL;
     m_deintFilter = NULL;
     m_deinterlaceBeforeOSD = true;
+    errored = false;
 }
 
 VideoOutput::~VideoOutput()

@@ -202,6 +202,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     warpbuffsize = 0;
 
     videosync = NULL;
+
+    errored = false;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -352,14 +354,18 @@ void NuppelVideoPlayer::ForceVideoOutputType(VideoOutputType type)
     forceVideoOutput = type;
 }
 
-void NuppelVideoPlayer::InitVideo(void)
+bool NuppelVideoPlayer::InitVideo(void)
 {
     InitFilters();
     if (disablevideo)
     {
         videoOutput = new VideoOutputNull();
-        videoOutput->Init(video_width, video_height, video_aspect,
-                          0, 0, 0, 0, 0, 0);
+        if (!videoOutput->Init(video_width, video_height, video_aspect,
+                               0, 0, 0, 0, 0, 0))
+        {
+            errored = true;
+            return false;
+        }
     }
     else
     {
@@ -384,12 +390,22 @@ void NuppelVideoPlayer::InitVideo(void)
 
         videoOutput = VideoOutput::InitVideoOut(forceVideoOutput);
 
+        if (!videoOutput)
+        {
+            errored = true;
+            return false;
+        }
+
         if (gContext->GetNumSetting("DecodeExtraAudio", 0))
             decoder->setLowBuffers();
 
-        videoOutput->Init(video_width, video_height, video_aspect,
-                          widget->winId(), 0, 0, widget->width(),
-                          widget->height(), 0);
+        if (!videoOutput->Init(video_width, video_height, video_aspect,
+                               widget->winId(), 0, 0, widget->width(),
+                               widget->height(), 0))
+        {
+            errored = true;
+            return false;
+        }
 
 #ifdef USING_XVMC
         // We must tell the AvFormatDecoder whether we are using
@@ -408,6 +424,8 @@ void NuppelVideoPlayer::InitVideo(void)
     {
         videoOutput->EmbedInWidget(embedid, embx, emby, embw, embh);
     }
+
+    return true;
 }
 
 void NuppelVideoPlayer::ReinitOSD(void)
@@ -1282,6 +1300,14 @@ void NuppelVideoPlayer::AVSync(void)
     }
     else if (!disablevideo)
     {
+        if (videoOutput->IsErrored())
+        {   // this check prevents calling prepareframe
+            VERBOSE(VB_IMPORTANT, "NVP: Error condition detected "
+                    "in videoOutput before PrepareFrame(), aborting playback.");
+            errored = true;
+            return;
+        }
+
         // if we get here, we're actually going to do video output
         if (buffer)
         {
@@ -1293,6 +1319,14 @@ void NuppelVideoPlayer::AVSync(void)
 
         videosync->WaitForFrame(avsync_adjustment);
         videoOutput->Show(m_scan);
+
+        if (videoOutput->IsErrored())
+        {
+            VERBOSE(VB_IMPORTANT, "NVP: Error condition detected "
+                    "in videoOutput after Show(), aborting playback.");
+            errored = true;
+            return;
+        }
 
         if (m_double_framerate)
         {
@@ -1491,6 +1525,12 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
             video_actually_paused = true;
             videoThreadPaused.wakeAll();
+
+            if (videoOutput->IsErrored())
+            {
+                errored = true;
+                continue;
+            }
 
             videofiltersLock.lock();
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
@@ -1701,7 +1741,25 @@ void NuppelVideoPlayer::StartPlaying(void)
         }
     }
 
-    InitVideo();
+    if (!InitVideo())
+    {
+        qApp->lock();
+        DialogBox *dialog = new DialogBox(gContext->GetMainWindow(),
+                                   QObject::tr("Unable to initialize video."));
+        dialog->AddButton(QObject::tr("Return to menu."));
+        dialog->exec();
+        delete dialog;
+
+        qApp->unlock();
+
+        if (audioOutput)
+        {
+            delete audioOutput;
+            audioOutput = NULL;
+        }
+        disableaudio = true;
+        return;
+    }
 
     if (!disablevideo)
     {
@@ -1788,10 +1846,13 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     SetCommBreakIter();
 
-    while (!eof && !killplayer)
+    while (!eof && !killplayer && !errored)
     {
         if (nvr_enc && nvr_enc->GetErrorStatus())
-            killplayer = true;
+        {
+            errored = killplayer = true;
+            break;
+        }
 
         if (play_speed != next_play_speed)
         {
@@ -1955,6 +2016,19 @@ void NuppelVideoPlayer::StartPlaying(void)
 */
 
     playing = false;
+
+    if (IsErrored())
+    {
+        qApp->lock();
+        DialogBox *dialog =
+            new DialogBox(gContext->GetMainWindow(),
+                          QObject::tr("Error was encountered while displaying video."));
+        dialog->AddButton(QObject::tr("Return to Menu"));
+        dialog->exec();
+        delete dialog;
+
+        qApp->unlock();
+    }
 }
 
 void NuppelVideoPlayer::SetAudioParams(int bps, int channels, int samplerate)
@@ -3131,7 +3205,11 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     if (!hasFullPositionMap)
         return NULL;
 
-    InitVideo();
+    if (!InitVideo())
+    {
+        VERBOSE(VB_IMPORTANT, "NVP: Unable to initialize video for screen grab.");
+        return NULL;
+    }
 
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];
@@ -3226,7 +3304,13 @@ void NuppelVideoPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
     warpfactor = 1;
     warpfactor_avg = 1;
 
-    InitVideo();
+    if (!InitVideo())
+    {
+        VERBOSE(VB_IMPORTANT, "NVP: Unable to initialize video for transcode.");
+        playing = false;
+        return;
+    }
+
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];
 
@@ -3334,7 +3418,15 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
 
     playing = true;
 
-    InitVideo();
+    if (!InitVideo())
+    {
+        VERBOSE(VB_IMPORTANT, "NVP: Unable to initialize video for FlagCommercials.");
+        playing = false;
+        m_db->lock();
+        m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED, m_db->db());
+        m_db->unlock();
+        return 0;
+    }
 
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];
@@ -3554,7 +3646,12 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
 
     playing = true;
 
-    InitVideo();
+    if (!InitVideo())
+    {
+        VERBOSE(VB_IMPORTANT, "NVP: Unable to initialize video for RebuildSeekTable.");
+        playing = false;
+        return 0;
+    }
 
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];

@@ -246,7 +246,10 @@ bool Transcode::GetProfile(QString profileName, QString encodingType)
                                          "Transcoders");
         if (! result)
         {
-            cerr << "Couldn't find profile for : " << encodingType << endl;
+            VERBOSE(VB_IMPORTANT,
+                    QString("Transcode: Couldn't find profile for : %1").
+                    arg(encodingType));
+
             return false;
         }
     }
@@ -260,7 +263,8 @@ bool Transcode::GetProfile(QString profileName, QString encodingType)
             profile.loadByID(m_db, profileID);
         else
         {
-            cerr << "Couldn't find profile #: " << profileName << endl;
+            VERBOSE(VB_IMPORTANT, QString("Couldn't find profile #: %1").
+                    arg(profileName));
             return false;
         }
     }
@@ -383,7 +387,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
         else
         {
-            cerr << "Unknown video codec: " << vidsetting << "\n";
+            VERBOSE(VB_IMPORTANT, QString("Unknown video codec: %1").arg(vidsetting));
             return REENCODE_ERROR;
         }
 
@@ -401,7 +405,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
         else
         {
-            cerr << "Unknown audio codec: " << audsetting << endl;
+            VERBOSE(VB_IMPORTANT, QString("Unknown audio codec: %1").arg(audsetting));
         }
 
         nvr->AudioInit(true);
@@ -421,6 +425,12 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
     keyframedist = 30;
     nvp->InitForTranscode(copyaudio, copyvideo);
+    if (nvp->IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to initialize NuppelVideoPlayer for Transcode");
+        delete nvp;
+        return REENCODE_ERROR;
+    }
 
     VideoFrame frame;
     frame.codec = FMT_YV12;
@@ -441,9 +451,9 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         if (!fifow->FIFOInit(0, QString("video"), vidfifo, frame.size, 50) ||
             !fifow->FIFOInit(1, QString("audio"), audfifo, audio_size, 25))
         {
-           cerr << "Error initializing fifo writer.  Aborting" << endl;
-           unlink(outputname);
-           return REENCODE_ERROR;
+            VERBOSE(VB_IMPORTANT, "Error initializing fifo writer.  Aborting");
+            unlink(outputname);
+            return REENCODE_ERROR;
         }
         VERBOSE(VB_GENERAL, QString("Video %1x%2@%3fps Audio rate: %4")
                                    .arg(video_width).arg(video_height)
@@ -639,9 +649,9 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
         if (showprogress && QDateTime::currentDateTime() > statustime)
         {
-            cerr << "Processed: " << curFrameNum << " of " << total_frame_count
-                 << " frames (" << (long)(curFrameNum / video_frame_rate)
-                 << " seconds)\r";
+            VERBOSE(VB_IMPORTANT, QString("Processed: %1 of %2 frames(%3 seconds)").
+                    arg(curFrameNum).arg(total_frame_count).
+                    arg((long)(curFrameNum / video_frame_rate)));
             statustime = QDateTime::currentDateTime();
             statustime = statustime.addSecs(5);
         }
@@ -656,7 +666,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
             if (chkTranscodeDB)
             {
-		if (JobQueue::GetJobCmd(m_db, jobID) == JOB_STOP)
+                if (JobQueue::GetJobCmd(m_db, jobID) == JOB_STOP)
                 {
                     unlink(outputname);
                     return REENCODE_STOPPED;

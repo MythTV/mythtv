@@ -206,6 +206,8 @@ class NuppelVideoPlayer
 
     long long CalcMaxFFTime(long long ff);
 
+    bool IsErrored() { return errored; }
+
  protected:
     void OutputVideoLoop(void);
     void IvtvVideoLoop(void);
@@ -215,7 +217,7 @@ class NuppelVideoPlayer
     VideoOutputType forceVideoOutput;
 
  private:
-    void InitVideo(void);
+    bool InitVideo(void);
 
     void InitFilters(void);
 
@@ -463,6 +465,8 @@ class NuppelVideoPlayer
     QMutex vidExitLock;
 
     QMutex videofiltersLock;
+
+    bool errored;
 };
 
 #endif
