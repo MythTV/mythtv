@@ -13,6 +13,7 @@ CREATE TABLE videometadata
     showlevel INT UNSIGNED NOT NULL,
     filename TEXT NOT NULL,
     coverfile TEXT NOT NULL,
+    childid INT UNSIGNED NOT NULL DEFAULT 0,
     INDEX (director)
 );
  

@@ -9,39 +9,42 @@ class QSqlDatabase;
 class Metadata
 {
   public:
-    Metadata(QString lfilename = "", QString lcoverfile = "", QString ltitle = "", int lyear = 0, 
-             QString linetref = "", QString ldirector = "", QString lplot = "", float luserrating = 0.0, 
-             QString lrating = "", int llength = 0, int lid = 0, int lshowlevel = 1)
-            {
-                filename = lfilename;
-                coverfile = lcoverfile;
-                title = ltitle;
-                year = lyear;
-                inetref = linetref;
-                director = ldirector;
-                plot = lplot;
-                luserrating = luserrating;
-                rating = lrating;
-                length = llength;
-                showlevel = lshowlevel;
-                id = lid;
-            }
+    Metadata(QString lfilename = "", QString lcoverfile = "", 
+             QString ltitle = "", int lyear = 0, QString linetref = "", 
+             QString ldirector = "", QString lplot = "", 
+             float luserrating = 0.0, QString lrating = "", int llength = 0, 
+             int lid = 0, int lshowlevel = 1, unsigned int lchildID = 0)
+    {
+        filename = lfilename;
+        coverfile = lcoverfile;
+        title = ltitle;
+        year = lyear;
+        inetref = linetref;
+        director = ldirector;
+        plot = lplot;
+        luserrating = luserrating;
+        rating = lrating;
+        length = llength;
+        showlevel = lshowlevel;
+        id = lid;
+        childID = lchildID;
+    }
 
     Metadata(const Metadata &other) 
-            {
-                filename = other.filename;
-                coverfile = other.coverfile;
-                title = other.title;
-                year = other.year;
-                inetref = other.inetref;
-                director = other.director;
-                plot = other.plot;
-                userrating = other.userrating;
-                rating = other.rating;
-                length = other.length;
-                showlevel = other.showlevel;
-                id = other.id;
-            }
+    {
+        filename = other.filename;
+        coverfile = other.coverfile;
+        title = other.title;
+        year = other.year;
+        inetref = other.inetref;
+        director = other.director;
+        plot = other.plot;
+        userrating = other.userrating;
+        rating = other.rating;
+        length = other.length;
+        showlevel = other.showlevel;
+        id = other.id;
+    }
 
    ~Metadata() {}
 
@@ -71,6 +74,9 @@ class Metadata
 
     unsigned int ID() { return id; }
     void setID(int lid) { id = lid; }
+
+    unsigned int ChildID() { return childID; }
+    void setChildID(int lchildID) { childID = lchildID; }
    
     int ShowLevel() { return showlevel; }
     void setShowLevel(int lshowlevel) { showlevel = lshowlevel; }
@@ -94,6 +100,7 @@ class Metadata
     QString director;
     QString plot;
     QString rating;
+    unsigned int childID;
     int year;
     float userrating;
     int length;

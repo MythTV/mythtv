@@ -1,0 +1,3 @@
+UPGRADING FROM RELEASE 0.10
+---------------------------
+Update your database with the videodb/0.10-to-0.11.sql script.

@@ -37,6 +37,8 @@ void Metadata::setField(QString field, QString data)
         coverfile = data;
     else if (field == "inetref")
         inetref = data;
+    else if (field == "childid")
+        childID = data.toUInt();
 }
 
 void Metadata::fillData(QSqlDatabase *db)
@@ -44,9 +46,10 @@ void Metadata::fillData(QSqlDatabase *db)
     if (title == "")
         return;
 
-    QString thequery = "SELECT title,director,plot,rating,year,userrating,length,"
-                       "filename,showlevel,intid,coverfile,inetref FROM videometadata WHERE title=\"" + 
-                       title + "\"";
+    QString thequery = "SELECT title,director,plot,rating,year,userrating,"
+                       "length,filename,showlevel,intid,coverfile,inetref,"
+                       "childid FROM videometadata WHERE title=\"" + 
+                        title + "\"";
 
     if (director != "")
         thequery += " AND director=\"" + director + "\"";
@@ -73,6 +76,7 @@ void Metadata::fillData(QSqlDatabase *db)
         id = query.value(9).toUInt();
         coverfile = query.value(10).toString();
         inetref = query.value(11).toString();
+        childID = query.value(12).toUInt();
     }
 }
 
@@ -82,9 +86,9 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
         return; 
         
     QString thequery;
-    thequery = QString("SELECT title,director,plot,rating,year,userrating,length,"
-                       "filename,showlevel,coverfile,inetref FROM videometadata WHERE intid=%1;")
-                      .arg(id);
+    thequery = QString("SELECT title,director,plot,rating,year,userrating,"
+                       "length,filename,showlevel,coverfile,inetref,childid "
+                       " FROM videometadata WHERE intid=%1;").arg(id);
         
     QSqlQuery query = db->exec(thequery);
 
@@ -103,6 +107,7 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
         showlevel = query.value(8).toInt();
         coverfile = query.value(9).toString();
         inetref = query.value(10).toString();
+        childID = query.value(11).toUInt();
     }
 }
 

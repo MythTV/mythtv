@@ -26,7 +26,7 @@ class VideoBrowser : public MythDialog
     
 
   protected slots:
-    void selected();
+    void selected(Metadata *someItem);
     void cursorLeft();
     void cursorRight();
     void cursorDown();

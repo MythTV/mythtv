@@ -69,7 +69,8 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
     {
         switch (e->key())
         {
-            case Key_Space: case Key_Enter: case Key_Return: selected(); return;
+            case Key_Space: case Key_Enter: case Key_Return: 
+                selected(curitem); return;
             default: break;
         }
     }
@@ -217,7 +218,30 @@ void VideoBrowser::updatePlayWait(QPainter *p)
   }
   else if (m_state == 4)
   {
+    // Play the movie
     system((QString("%1 ") .arg(m_cmd)).ascii());
+
+    Metadata *childItem = new Metadata;
+    Metadata *parentItem = new Metadata(*curitem);
+
+    while(parentItem->ChildID())
+    {
+        childItem->setID(parentItem->ChildID());
+        childItem->fillDataFromID(db);
+
+        if(parentItem->ChildID())
+        {
+            //Load up data about this child
+            selected(childItem);
+            system((QString("%1 ") .arg(m_cmd)).ascii());
+        }
+
+        delete parentItem;
+        parentItem = new Metadata(*childItem);
+    }
+
+    delete childItem;
+    delete parentItem;
 
     backup.begin(this);
     backup.drawPixmap(0, 0, myBackground);
@@ -489,10 +513,10 @@ void VideoBrowser::cursorDown()
     update(browsingRect);
 }
 
-void VideoBrowser::selected()
+void VideoBrowser::selected(Metadata *someItem)
 {
-    QString filename = curitem->Filename();
-    QString ext = curitem->Filename().section('.',-1);
+    QString filename = someItem->Filename();
+    QString ext = someItem->Filename().section('.',-1);
 
     QString handler = gContext->GetSetting("VideoDefaultPlayer");
     QString arg;
@@ -501,7 +525,7 @@ void VideoBrowser::selected()
 
     cout << "command:" << command << endl;
 
-    m_title = curitem->Title();
+    m_title = someItem->Title();
     LayerSet *container = NULL;
     container = theme->GetSet("playwait");
     if (container)
