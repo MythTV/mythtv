@@ -1427,9 +1427,8 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "record.startdate, record.endtime, record.enddate, record.title, "
 "record.subtitle, record.description, record.recpriority, record.type, "
 "channel.name, record.recordid, record.recgroup, record.dupin, "
-"record.dupmethod, channel.commfree FROM record "
-"LEFT JOIN channel ON (channel.callsign = record.station) "
-"ORDER BY title ASC;");
+"record.dupmethod, channel.commfree FROM record,channel "
+"WHERE record.chanid = channel.chanid ORDER BY title ASC;");
 
     QSqlQuery result = db->exec(query);
 
