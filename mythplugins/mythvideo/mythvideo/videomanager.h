@@ -6,7 +6,7 @@
 #include <qapplication.h>
 #include <qstringlist.h>
 
-#include "inetcomms.h"
+#include <mythtv/inetcomms.h>
 #include "metadata.h"
 #include <mythtv/mythwidgets.h>
 #include <qdom.h>

@@ -27,7 +27,6 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
                            MythMainWindow *parent, const char *name)
             : MythDialog(parent, name)
 {
-    qInitNetworkProtocols();
     db = ldb;
     updateML = false;
 

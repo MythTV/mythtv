@@ -26,7 +26,6 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
                            MythMainWindow *parent, const char *name)
             : MythDialog(parent, name)
 {
-    qInitNetworkProtocols();
     db = ldb;
     updateML = false;
     currentParentalLevel = gContext->GetNumSetting("VideoDefaultParentalLevel", 4);
