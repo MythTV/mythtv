@@ -489,7 +489,7 @@ bool Channel::CheckSignal(int msecTotal, int reqSignal, int input)
         for (i = 0; i < (msecTotal / msecSleep) + 1; i++) 
         {
             if (i != 0) 
-                usleep(msecSleep);
+                usleep(msecSleep * 1000);
             if (usingv4l2)
                 maxSignal = max(maxSignal, signalStrengthATSC_v4l2(videofd, 
                                 input));
