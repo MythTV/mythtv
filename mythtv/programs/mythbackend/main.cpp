@@ -477,8 +477,8 @@ int main(int argc, char **argv)
        nfsfd = open(lockfile_location.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
        if (nfsfd < 0) 
        {
-           perror("open lockfile"); 
-           cerr << "Unable to create \'" << lockfile_location << "\'!\n"
+           perror("open"); 
+           cerr << "Unable to open lockfile \'" << lockfile_location << "\'!\n"
                 << "Be sure that \'" << gContext->GetSetting("RecordFilePrefix")
                 << "\' exists and that both \nthe directory and that "
                 << "file are writeble by this user.\n";
