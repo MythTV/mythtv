@@ -1379,7 +1379,7 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
 
     tmp.drawPixmap(QPoint(0, 0), backgroundPixmap, cr);
 
-    blendImageToPixmap(&pix, newRect.x(), newRect.y(), buttonback, &tmp, 0, 0);
+    tmp.drawImage(newRect.topLeft(), *buttonback);
 
     QRect buttonTextRect = textRect;
     buttonTextRect.moveBy(newRect.x(), newRect.y());
@@ -1445,8 +1445,7 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
         if (tbutton == activebutton && tbutton->buttonicon->activeicon)
             blendImage = tbutton->buttonicon->activeicon;
 
-        blendImageToPixmap(&pix, newRect.x(), newRect.y(), blendImage,
-                           &tmp, 0, 0);
+        tmp.drawImage(newRect.topLeft(), *blendImage);
     }
 
 
