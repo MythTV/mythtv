@@ -1928,6 +1928,8 @@ void *TVRec::ReadThread(void *param)
 
 void TVRec::DoFlagCommercialsThread(void)
 {
+    ProgramInfo *program_info = new ProgramInfo(*prevRecording);
+
     flagthreadstarted = true;
 
     QString name = QString("commercial%1%2").arg(getpid()).arg(rand());
@@ -1944,8 +1946,6 @@ void TVRec::DoFlagCommercialsThread(void)
         QSqlDatabase::removeDatabase(name);
         return;
     }
-
-    ProgramInfo *program_info = new ProgramInfo(*prevRecording);
 
     nice(19);
 
