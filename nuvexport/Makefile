@@ -6,7 +6,7 @@ BINS	          = mpeg2cut nuvexport nuvinfo
 MANS	          = man/nuvexport.1 \
                     man/nuvexport-svcd.1 \
                     man/nuvexport-vcd.1 \
-                    man/nuvexport-xvid.1 \
+                    man/nuvexport-xvid.1 
 MODULE_DIRS	  = export mythtv nuv_export
 EXPORT_MODULES	  = export/generic.pm   \
 		    export/ffmpeg.pm    \
