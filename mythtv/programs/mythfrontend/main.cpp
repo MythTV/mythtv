@@ -231,6 +231,8 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    context->LoadSettingsDatabase(db);
+
     QString themename = context->GetSetting("Theme");
     QString themedir = context->FindThemeDir(themename);
     if (themedir == "")
