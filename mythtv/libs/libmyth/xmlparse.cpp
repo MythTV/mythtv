@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include "xmlparse.h"
 
 
@@ -718,7 +721,7 @@ void XMLParse::resizeImage(QPixmap *dst, QString file)
 
 void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
 {
-    int imgFillSpace;
+    int imgFillSpace = 0;
     QPixmap imgFiller;
     QPixmap imgContainer;
     QString name = element.attribute("name", "");
