@@ -147,6 +147,7 @@ debug="yes"
 extralibs="-lm"
 simpleidct="yes"
 bigendian="no"
+emu_fast_int="no"
 vhook="no"
 dlfcn="no"
 dlopen="no"
@@ -177,7 +178,7 @@ prefix="/boot/home/config"
 # helps building libavcodec
 CFLAGS="-DPIC -fomit-frame-pointer"
 # 3 gcc releases known for BeOS, each with ugly bugs
-gcc_version="$($cc -v 2>&1 | grep version | cut -d ' ' -f3-)"
+gcc_version="`$cc -v 2>&1 | grep version | cut -d ' ' -f3-`"
 case "$gcc_version" in
 2.9-beos-991026*|2.9-beos-000224*) echo "R5/GG gcc"
 mmx="no"
@@ -257,6 +258,12 @@ echo "Missing inttypes.h, please copy cygwin_inttypes.h to" \
 ;;
 Linux)
 LDFLAGS="$LDFLAGS -rdynamic"
+;;
+IRIX*)
+ranlib="echo ignoring ranlib"
+v4l="no"
+audio_oss="no"
+make="gmake"
 ;;
 OS/2)
 TMPE=$TMPE".exe"
@@ -417,25 +424,29 @@ if test $mmx = "default"; then
 fi
 
 #Darwin CC versions
+needmdynamicnopic="no"
 if test $targetos = Darwin; then
-    if test -n "$($cc -v 2>&1 | grep xlc)"; then
-       CFLAGS="-qpdf2 -qlanglvl=extc99 -qmaxmem=-1 -qarch=auto -qtune=auto"
+    if test -n "`$cc -v 2>&1 | grep xlc`"; then
+	CFLAGS="-qpdf2 -qlanglvl=extc99 -qmaxmem=-1 -qarch=auto -qtune=auto"
     else
-       gcc_version="$($cc -v 2>&1 | grep version | cut -d ' ' -f3-)"
-       case "$gcc_version" in
-           *2.95*)
-               CFLAGS="-no-cpp-precomp -pipe -fomit-frame-pointer"
-               ;;
-           *3.1*)
-               CFLAGS="-no-cpp-precomp -pipe -fomit-frame-pointer -force_cpusubtype_ALL -Wno-sign-compare"
-               ;;
-           *3.3*)
-               CFLAGS="-no-cpp-precomp -pipe -fomit-frame-pointer -mdynamic-no-pic -force_cpusubtype_ALL -Wno-sign-compare"
-               ;;
-           *)
-               CFLAGS="-no-cpp-precomp -pipe -fomit-frame-pointer -mdynamic-no-pic"
-               ;;
-       esac
+	gcc_version="`$cc -v 2>&1 | grep version | cut -d ' ' -f3-`"
+	case "$gcc_version" in
+	    *2.95*) 
+		CFLAGS="-no-cpp-precomp -pipe -fomit-frame-pointer"
+		;;
+	    *3.*)
+		CFLAGS="-no-cpp-precomp -pipe -fomit-frame-pointer -force_cpusubtype_ALL -Wno-sign-compare"
+		if test "$lshared" = no; then
+		   needmdynamicnopic="yes"
+		fi
+		;;
+	    *)
+		CFLAGS="-no-cpp-precomp -pipe -fomit-frame-pointer"
+		if test "$lshared" = no; then
+		   needmdynamicnopic="yes"
+		fi
+		;;
+	esac
     fi
 fi
 
@@ -510,7 +521,7 @@ fi
 # AltiVec flags: The FSF version of GCC differs from the Apple version 
 if test $cpu = "powerpc"; then
     if test $altivec = "yes"; then
-        if test -n "$($cc -v 2>&1 | grep version | grep Apple)"; then
+        if test -n "`$cc -v 2>&1 | grep version | grep Apple`"; then
             CFLAGS="$CFLAGS -faltivec"
         else
             CFLAGS="$CFLAGS -maltivec -mabi=altivec"
@@ -618,6 +629,18 @@ if test "$cpu" = "powerpc" -o "$cpu" = "mips" ; then
 fi
 
 fi
+
+# ---
+# *int_fast* test
+cat > $TMPC << EOF
+#include <inttypes.h>
+int main(int argc, char ** argv){
+	volatile uint_fast64_t i=0x01234567;
+	return 0;
+}
+EOF
+
+$cc -o $TMPE $TMPC 2>/dev/null || emu_fast_int="yes"
 
 # ---
 # check availability of some header files
@@ -736,11 +759,11 @@ cat > $TMPC << EOF
 int main( void ) { return (int) dlopen("foo", 0); }
 EOF
 
-if $cc -o $TMPE $TMPC -ldl > /dev/null 2>&1 ; then
+if $cc -o $TMPE $TMPC -ldl > /dev/null 2>&1  ; then
 dlopen=yes
 fi
 
-if $cc -o $TMPE $TMPC > /dev/null 2>&1 ; then
+if $cc -o $TMPE $TMPC > /dev/null 2>&1  ; then
 dlopen=yes
 ldl=""
 fi
@@ -759,7 +782,7 @@ int main( void ) { return (int) imlib_load_font("foo"); }
 EOF
 
 imlib2=no
-if $cc -o $TMPE $TMPC -lImlib2 > /dev/null 2>&1 ; then
+if $cc -o $TMPE $TMPC -lImlib2 > /dev/null 2>&1  ; then
 imlib2=yes
 fi
 
@@ -800,12 +823,12 @@ fi
 #fi
 #fi
 
-case "$($cc -v 2>&1 | grep version)" in
+case "`$cc -v 2>&1 | grep version`" in
     *gcc*)
-       CFLAGS="-Wall $CFLAGS"
-       ;;
+	CFLAGS="-Wall $CFLAGS"
+	;;
     *)
-       ;;
+	;;
 esac
 
 if test "$sdl" = "no" ; then
@@ -813,7 +836,7 @@ if test "$sdl" = "no" ; then
 fi
 
 if test "$debug" = "yes"; then
-       CFLAGS="$CFLAGS -g"
+	CFLAGS="$CFLAGS -g"
 fi
 
 if test "$optimize" = "small"; then
@@ -822,11 +845,11 @@ if test "$optimize" = "small"; then
 fi
 
 if test "$optimize" = "yes"; then
-    if test -n "$($cc -v 2>&1 | grep xlc)"; then
-       CFLAGS="$CFLAGS -O5"
-       LDFLAGS="$LDFLAGS -O5"
+    if test -n "`$cc -v 2>&1 | grep xlc`"; then
+	CFLAGS="$CFLAGS -O5"
+	LDFLAGS="$LDFLAGS -O5"
     else
-       CFLAGS="$CFLAGS -O3"
+	CFLAGS="$CFLAGS -O3"
     fi
 fi
 
@@ -918,6 +941,9 @@ echo "#define TUNECPU $TUNECPU" >> $TMPH
 if test "$bigendian" = "yes" ; then
   echo "WORDS_BIGENDIAN=yes" >> config.mak
   echo "#define WORDS_BIGENDIAN 1" >> $TMPH
+fi
+if test "$emu_fast_int" = "yes" ; then
+  echo "#define EMULATE_FAST_INT 1" >> $TMPH
 fi
 if test "$mmx" = "yes" ; then
   echo "TARGET_MMX=yes" >> config.mak
