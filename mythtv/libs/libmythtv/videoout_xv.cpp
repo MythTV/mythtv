@@ -50,8 +50,10 @@ struct XvData
     Screen *XJ_screen;
     Display *XJ_disp;
     XShmSegmentInfo *XJ_SHMInfo;
+
     map<unsigned char *, XvImage *> buffers;
-    map<unsigned char *, XImage *> xbuffers;
+
+    XImage *fallbackImage;
 };
 
 #define GUID_I420_PLANAR 0x30323449
@@ -79,28 +81,27 @@ VideoOutputXv::~VideoOutputXv()
     delete data;
 }
 
-void VideoOutputXv::InputChanged(int width, int height, float aspect,
-                                 int num_buffers, VideoFrame *out_buffers)
+void VideoOutputXv::InputChanged(int width, int height, float aspect)
 {
     pthread_mutex_lock(&lock);
 
-    VideoOutput::InputChanged(width, height, aspect, num_buffers, out_buffers);
+    VideoOutput::InputChanged(width, height, aspect);
 
     if (xv_port != -1)
     {
         DeleteXvBuffers();
-        CreateXvBuffers(num_buffers, out_buffers);
+        CreateXvBuffers();
         XFlush(data->XJ_disp);
     }
     else if (use_shm)
     {
         DeleteShmBuffers();
-        CreateShmBuffers(num_buffers, out_buffers);
+        CreateShmBuffers();
     }
     else
     {
         DeleteXBuffers();
-        CreateShmBuffers(num_buffers, out_buffers);
+        CreateShmBuffers();
     }
 
     MoveResize();
@@ -299,17 +300,17 @@ bool VideoOutputXv::Init(int width, int height, float aspect, int num_buffers,
 
     if (xv_port != -1)
     {
-        if (!CreateXvBuffers(num_buffers, out_buffers))
+        if (!CreateXvBuffers())
             return false;
     }
     else if (use_shm)
     {
-        if (!CreateShmBuffers(num_buffers, out_buffers))
+        if (!CreateShmBuffers())
             return false;
     }
     else
     {
-        if (!CreateXBuffers(num_buffers, out_buffers))
+        if (!CreateXBuffers())
             return false;
     }
 
@@ -327,10 +328,10 @@ bool VideoOutputXv::Init(int width, int height, float aspect, int num_buffers,
     return true;
 }
 
-bool VideoOutputXv::CreateXvBuffers(int num_buffers, VideoFrame *out_buffers)
+bool VideoOutputXv::CreateXvBuffers(void)
 {
-    data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
-    for (int i = 0; i < num_buffers; i++)
+    data->XJ_SHMInfo = new XShmSegmentInfo[numbuffers];
+    for (int i = 0; i < numbuffers; i++)
     {
         XvImage *image = XvShmCreateImage(data->XJ_disp, xv_port,
                                           colorid, 0, XJ_width, XJ_height,
@@ -352,71 +353,72 @@ bool VideoOutputXv::CreateXvBuffers(int num_buffers, VideoFrame *out_buffers)
         shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
 
         data->buffers[(unsigned char *)image->data] = image;
-        out_buffers[i].buf = (unsigned char *)image->data;
 
         (data->XJ_SHMInfo)[i].readOnly = False;
 
         XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
 
-        out_buffers[i].height = XJ_height;
-        out_buffers[i].width = XJ_width;
-        out_buffers[i].bpp = 12;
-        out_buffers[i].size = XJ_height * XJ_width * 3 / 2;
-        out_buffers[i].codec = FMT_YV12;
+        videoframes[i].buf = (unsigned char *)image->data;
+        videoframes[i].height = XJ_height;
+        videoframes[i].width = XJ_width;
+        videoframes[i].bpp = 12;
+        videoframes[i].size = XJ_height * XJ_width * 3 / 2;
+        videoframes[i].codec = FMT_YV12;
     }
 
     XSync(data->XJ_disp, 0);
 
     if (colorid != GUID_I420_PLANAR)
         scratchspace = new unsigned char[XJ_width * XJ_height * 3 / 2];
+    else
+        scratchspace = NULL;
 
     return true;
 }
 
-bool VideoOutputXv::CreateShmBuffers(int num_buffers, VideoFrame *out_buffers)
+bool VideoOutputXv::CreateShmBuffers(void)
 {
-    data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
+    data->XJ_SHMInfo = new XShmSegmentInfo[1];
 
-    for (int i = 0; i < num_buffers; i++)
+    XImage *image = XShmCreateImage(data->XJ_disp,
+                                    DefaultVisual(data->XJ_disp, XJ_screen_num),
+                                    XJ_depth, ZPixmap, 0, 
+                                    &(data->XJ_SHMInfo)[0],
+                                    dispw, disph);
+
+    (data->XJ_SHMInfo)[0].shmid = shmget(IPC_PRIVATE, image->bytes_per_line
+                                         * image->height, IPC_CREAT|0777);
+
+    if ((data->XJ_SHMInfo)[0].shmid < 0)
     {
-        XImage *image = XShmCreateImage(data->XJ_disp,
-                                        DefaultVisual(data->XJ_disp, 
-                                                      XJ_screen_num),
-                                        XJ_depth, ZPixmap, 0, 
-                                        &(data->XJ_SHMInfo)[i],
-                                        dispw, disph);
+        perror("shmget failed:");
+        return false;
+    }
 
-        (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE, image->bytes_per_line
-                                             * image->height, IPC_CREAT|0777);
+    image->data = (data->XJ_SHMInfo)[0].shmaddr =
+                              (char *)shmat((data->XJ_SHMInfo)[0].shmid, 0, 0);
 
-        if ((data->XJ_SHMInfo)[i].shmid < 0)
-        {
-            perror("shmget failed:");
-            return false;
-        }
+    // mark for delete immediately - it won't be removed until detach
+    shmctl((data->XJ_SHMInfo)[0].shmid, IPC_RMID, 0);
 
-        image->data = (data->XJ_SHMInfo)[i].shmaddr =
-                           (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
+    data->fallbackImage = image;
 
-        // mark for delete immediately - it won't be removed until detach
-        shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
+    (data->XJ_SHMInfo)[0].readOnly = False;
 
-        data->xbuffers[(unsigned char *)image->data] = image;
-        out_buffers[i].buf = (unsigned char *)image->data;
+    if (!XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[0]))
+    {
+        perror("XShmAttach() failed:");
+        return false;
+    }
 
-        (data->XJ_SHMInfo)[i].readOnly = False;
-
-        if (!XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]))
-        {
-            perror("XShmAttach() failed:");
-            return false;
-        }
-
-        out_buffers[i].height = XJ_height;
-        out_buffers[i].width = XJ_width;
-        out_buffers[i].bpp = 12;
-        out_buffers[i].size = XJ_height * XJ_width * 3 / 2;
-        out_buffers[i].codec = FMT_YV12;
+    for (int i = 0; i < numbuffers; i++)
+    {
+        videoframes[i].height = XJ_height;
+        videoframes[i].width = XJ_width;
+        videoframes[i].bpp = 12;
+        videoframes[i].size = XJ_height * XJ_width * 3 / 2;
+        videoframes[i].codec = FMT_YV12;
+        videoframes[i].buf = new unsigned char[videoframes[i].size];
     }
 
     XSync(data->XJ_disp, 0);
@@ -424,26 +426,25 @@ bool VideoOutputXv::CreateShmBuffers(int num_buffers, VideoFrame *out_buffers)
     return true;
 }
 
-bool VideoOutputXv::CreateXBuffers(int num_buffers, VideoFrame *out_buffers)
+bool VideoOutputXv::CreateXBuffers(void)
 {
-    for (int i = 0; i < num_buffers; i++)
+    char *sbuf = new char[XJ_depth / 8 * XJ_screenwidth * XJ_screenheight];
+
+    XImage *image = XCreateImage(data->XJ_disp,
+                                 DefaultVisual(data->XJ_disp, 0),
+                                 XJ_depth, ZPixmap, 0, sbuf,
+                                 dispw, disph, XJ_depth, 0);
+
+    data->fallbackImage = image;
+
+    for (int i = 0; i < numbuffers; i++)
     {
-        char *sbuf = new char[XJ_depth / 8 * XJ_screenwidth * XJ_screenheight];
-
-        XImage *image = XCreateImage(data->XJ_disp,
-                                        DefaultVisual(data->XJ_disp, 0),
-                                        XJ_depth, ZPixmap, 0, sbuf,
-                                        dispw, disph,
-                                        XJ_depth, 0);
-
-        data->xbuffers[(unsigned char *)image->data] = image;
-        out_buffers[i].buf = (unsigned char *)image->data;
-
-        out_buffers[i].height = XJ_height;
-        out_buffers[i].width = XJ_width;
-        out_buffers[i].bpp = 12;
-        out_buffers[i].size = XJ_height * XJ_width * 3 / 2;
-        out_buffers[i].codec = FMT_YV12;
+        videoframes[i].height = XJ_height;
+        videoframes[i].width = XJ_width;
+        videoframes[i].bpp = 12;
+        videoframes[i].size = XJ_height * XJ_width * 3 / 2;
+        videoframes[i].codec = FMT_YV12;
+        videoframes[i].buf = new unsigned char[videoframes[i].size];
     }
 
     XSync(data->XJ_disp, 0);
@@ -489,39 +490,38 @@ void VideoOutputXv::DeleteXvBuffers()
 
     if (scratchspace)
         delete [] scratchspace;
+    scratchspace = NULL;
 
     data->buffers.clear();
 }
 
 void VideoOutputXv::DeleteShmBuffers()
 {
-    map<unsigned char *, XImage *>::iterator iter = data->xbuffers.begin();
-    for(int i=0; iter != data->xbuffers.end(); ++iter, ++i)
-    {
-        XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
-        if ((data->XJ_SHMInfo)[i].shmaddr)
-            shmdt((data->XJ_SHMInfo)[i].shmaddr);
-        if ((data->XJ_SHMInfo)[i].shmid > 0)
-            shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
-        XFree(iter->second);
-    }
+    XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[0]);
+    if ((data->XJ_SHMInfo)[0].shmaddr)
+        shmdt((data->XJ_SHMInfo)[0].shmaddr);
+    if ((data->XJ_SHMInfo)[0].shmid > 0)
+        shmctl((data->XJ_SHMInfo)[0].shmid, IPC_RMID, 0);
+    XFree(data->fallbackImage);
 
     delete [] (data->XJ_SHMInfo);
 
-    data->xbuffers.clear();
+    for (int i = 0; i < numbuffers; i++)
+    {
+        delete [] videoframes[i].buf;
+        videoframes[i].buf = NULL;
+    }
 }
 
 void VideoOutputXv::DeleteXBuffers()
 {
-    // XXX Check this later -- XDestroyImage instead?
-    map<unsigned char *, XImage *>::iterator iter = data->xbuffers.begin();
+    XFree(data->fallbackImage);
 
-    for(int i=0; iter != data->xbuffers.end(); ++iter, ++i)
+    for (int i = 0; i < numbuffers; i++)
     {
-        XFree(iter->second);
+        delete [] videoframes[i].buf;
+        videoframes[i].buf = NULL;
     }
-
-    data->xbuffers.clear();
 }
 
 void VideoOutputXv::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
@@ -617,9 +617,9 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
         if ((showFrame != 1) && (framesShown % showFrame))
             return;
 
-        unsigned char *sbuf = new unsigned char[dispw * disph * 4];
-        XImage *image = data->xbuffers[buffer->buf];
+        unsigned char *sbuf = new unsigned char[dispw * disph * 3 / 2];
         AVPicture image_in, image_out;
+        XImage *image = data->fallbackImage;
         ImgReSampleContext *scontext;
         int av_format;
         int width = buffer->width;
@@ -628,20 +628,19 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
         avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
                        dispw, disph);
 
-       
         if ((dispw == width) && (disph == height))
         {
-            memcpy(sbuf, image->data, width * height * 3 / 2);
+            memcpy(sbuf, buffer->buf, width * height * 3 / 2);
         }
         else
         {
-            avpicture_fill(&image_in, (uint8_t *)image->data, PIX_FMT_YUV420P,
+            avpicture_fill(&image_in, buffer->buf, PIX_FMT_YUV420P,
                            width, height);
             scontext = img_resample_init(dispw, disph, width, height);
             img_resample(scontext, &image_out, &image_in);
         }
 
-        switch (image->bits_per_pixel)
+        switch (data->fallbackImage->bits_per_pixel)
         {
             case 16: av_format = PIX_FMT_RGB565; break;
             case 24: av_format = PIX_FMT_RGB24;  break;
@@ -651,8 +650,8 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
                      exit(0);
         }
 
-        avpicture_fill(&image_in, (uint8_t *)image->data, av_format,
-                       dispw, disph);
+        avpicture_fill(&image_in, (uint8_t *)image->data, 
+                       av_format, dispw, disph);
 
         img_convert(&image_in, av_format, &image_out, PIX_FMT_YUV420P,
                     dispw, disph);

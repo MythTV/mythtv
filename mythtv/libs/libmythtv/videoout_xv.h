@@ -17,8 +17,7 @@ class VideoOutputXv : public VideoOutput
     void PrepareFrame(VideoFrame *buffer);
     void Show(void);
 
-    void InputChanged(int width, int height, float aspect,
-                      int num_buffers, VideoFrame *out_buffer);
+    void InputChanged(int width, int height, float aspect);
 
     void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
     void StopEmbedding(void);
@@ -27,12 +26,12 @@ class VideoOutputXv : public VideoOutput
 
   private:
     void Exit(void);
-    bool CreateXvBuffers(int num_buffers, VideoFrame *out_buffers);
-    bool CreateShmBuffers(int num_buffers, VideoFrame *out_buffers);
-    bool CreateXBuffers(int num_buffers, VideoFrame *out_buffers);
-    void DeleteXvBuffers();
-    void DeleteShmBuffers();
-    void DeleteXBuffers();
+    bool CreateXvBuffers(void);
+    bool CreateShmBuffers(void);
+    bool CreateXBuffers(void);
+    void DeleteXvBuffers(void);
+    void DeleteShmBuffers(void);
+    void DeleteXBuffers(void);
 
     XvData *data;
 

@@ -17,8 +17,7 @@ class VideoOutput
     virtual void PrepareFrame(VideoFrame *buffer) = 0;
     virtual void Show(void) = 0;
 
-    virtual void InputChanged(int width, int height, float aspect,
-                              int numbuffers, VideoFrame *out_buffer);
+    virtual void InputChanged(int width, int height, float aspect);
 
     virtual void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
     virtual void StopEmbedding(void);
@@ -42,6 +41,9 @@ class VideoOutput
     int dispx, dispy, dispw, disph;
     int olddispx, olddispy, olddispw, olddisph;
     bool embedding;
+
+    int numbuffers;
+    VideoFrame *videoframes;
 };
 
 #endif

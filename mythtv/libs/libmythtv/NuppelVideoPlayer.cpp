@@ -306,8 +306,7 @@ void NuppelVideoPlayer::Reinit(void)
 {
     pthread_mutex_lock(&video_buflock);
 
-    videoOutput->InputChanged(video_width, video_height, video_aspect,
-                              MAXVBUFFER+1, vbuffers);
+    videoOutput->InputChanged(video_width, video_height, video_aspect);
 
     availableVideoBuffers.clear();
     vbufferMap.clear();

@@ -17,14 +17,15 @@ bool VideoOutput::Init(int width, int height, float aspect, int num_buffers,
                        int winx, int winy, int winw, int winh,
                        unsigned int embedid)
 {
-    (void)num_buffers;
-    (void)out_buffers;
     (void)winid;
     (void)embedid;
 
     XJ_width = width;
     XJ_height = height;
     XJ_aspect = aspect;
+
+    numbuffers = num_buffers;
+    videoframes = out_buffers;
 
     QString HorizScanMode = gContext->GetSetting("HorizScanMode", "overscan");
     QString VertScanMode = gContext->GetSetting("VertScanMode", "overscan");
@@ -58,12 +59,8 @@ bool VideoOutput::Init(int width, int height, float aspect, int num_buffers,
     return true;
 }
 
-void VideoOutput::InputChanged(int width, int height, float aspect,
-                               int num_buffers, VideoFrame *out_buffers)
+void VideoOutput::InputChanged(int width, int height, float aspect)
 {
-    (void)num_buffers;
-    (void)out_buffers;
-
     XJ_width = width;
     XJ_height = height;
     XJ_aspect = aspect;
