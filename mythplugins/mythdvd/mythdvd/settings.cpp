@@ -199,8 +199,9 @@ public:
         setValue(0);
         setHelpText("If set to something other than 0, ripped "
                     "video titles will be broken up into files "
-                    "of this size (in MB). Only applies to Perfect "
-                    "quality recordings, not intermediate files.");
+                    "of this size (in MB). Applies to both perfect "
+                    "quality recordings and intermediate files "
+                    "used for transcoding.");
     };
 };
 

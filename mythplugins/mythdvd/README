@@ -130,13 +130,20 @@ FILESYSTEMS
 rips, you probably want to make sure that your MythVideo file location
 (where final files end up) is on a filesystem (ext3, etc.) that can handle
 files larger than 2 gigabytes. Alternatively, you can set the MB limit for
-perfect rip sizes in the setup screen.
+perfect rip sizes in the setup screen. This limit is also used for
+intermediate (perfect) files used during real transcoding jobs, so it should
+be possible to rip *and* transcode a source file which is larger than 2
+gigabytes on a filesystem which has a 2 gigabyte maximum file size.
 
-    For transcoding, the location of the intermediate files (DVD Rip
-Location) **really** needs to be on a large-file capable filesystem.
-This is because the first step in transcoding is to rip the content off the
-DVD in perfect format, which makes for very large (albeit temporary) files. 
 
+SUBTITLES
+---------
+
+    Subtitling with transcode is pretty much a hit or miss affair. Some DVDs
+work extremely well, and some generate awful results. If you find that
+MythDVD transcodes a title with subtitles badly, you are encouraged to try
+and use transcode from the command line. Hopefully, future versions of
+transcode will over more robust subtitling capabilites.
 
 CONFIGURATION
 -------------

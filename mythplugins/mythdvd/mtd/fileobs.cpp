@@ -33,7 +33,7 @@ bool RipFile::open(int mode, bool multiple_files)
 {
     use_multiple_files = multiple_files;
     access_mode = mode;
-    QString filename = base_name + "_1of"; 
+    QString filename = base_name + "_001of"; 
     QFile *new_file = new QFile(filename);
     files.append(new_file);
     active_file = new_file;
@@ -46,7 +46,10 @@ bool RipFile::open(int mode, bool multiple_files)
 
 void RipFile::close()
 {
-    active_file->close();
+    if(active_file)
+    {
+        active_file->close();
+    }
     if(files.count() == 1)
     {
         QString new_name = base_name + extension;
@@ -57,6 +60,10 @@ void RipFile::close()
             cerr << "   old name: \"" << active_file->name() << "\"" << endl;
             cerr << "   new name: \"" << new_name << "\"" << endl;
         }
+        else
+        {
+            active_file->setName(new_name);
+        }
     }
     else
     {
@@ -65,9 +72,13 @@ void RipFile::close()
         for(iter = files.first(); iter; iter = files.next())
         {
             QString new_name = iter->name() + QString("%1").arg(files.count()) + extension;
-            if(!stupid_qdir.rename(iter->name(), new_name));
+            if(!stupid_qdir.rename(iter->name(), new_name))
             {
-                cerr << "fileobs.o: Couldn't rename part of a set of ripped files. Uh oh ..." << endl;
+                cerr << "fileobs.o: Couldn't rename \"" << iter->name() << "\" to \"" << new_name << "\"" << endl;
+            }
+            else
+            {
+                iter->setName(new_name);
             }
         }
     }
@@ -81,6 +92,7 @@ void RipFile::remove()
     {
         iter->remove();
     }
+    files.clear();
 }
 
 QString RipFile::name()
@@ -101,7 +113,9 @@ bool RipFile::writeBlocks(unsigned char *the_data, int how_much)
         //  and start a new file
         //
     
-        QString filename = base_name + QString("_%1of").arg(files.count() + 1);
+        QString number_extension;
+        number_extension.sprintf("_%03dof", files.count() + 1);
+        QString filename = base_name + number_extension;
         QFile *new_file = new QFile(filename);
         active_file = new_file;
         files.append(new_file);
@@ -115,12 +129,20 @@ bool RipFile::writeBlocks(unsigned char *the_data, int how_much)
     int result = write(active_file->handle(), the_data, how_much);
     if(result < 0)
     {
+        cerr << "fileobs.o: Got a negative result while writing blocks. World may end shortly." << endl;
         return false;
     }
     if(result == 0)
     {
-        cerr << "fileobs.o: Ripfile writing 0 bytes of data. That's probably not a good sign." << endl;
-        return false;
+        if(how_much == 0)
+        {
+            cerr << "fileobs.o: Ripfile wrote 0 bytes, but that's all it was asked to. Unlikely coincidence?" << endl;
+        }
+        else
+        {
+            cerr << "fileobs.o: Ripfile writing 0 bytes of data. That's probably not a good sign." << endl;
+            return false;
+        }
     }
     if(result != how_much)
     {

@@ -239,6 +239,8 @@ bool DVDThread::ripTitle(int title_number,
     {
         problem(QString("DVDPerfectThread could not access this dvd device: %1").arg(dvd_device_location));
         ripfile->remove();
+        delete ripfile;
+        ripfile = NULL;
         dvd_device_access->unlock();
         return false;
     }
@@ -249,6 +251,8 @@ bool DVDThread::ripTitle(int title_number,
     {
         problem("DVDPerfectThread could not open VMG info.");
         ripfile->remove();
+        delete ripfile;
+        ripfile = NULL;
         DVDClose(the_dvd);
         dvd_device_access->unlock();
         return false;
@@ -263,6 +267,8 @@ bool DVDThread::ripTitle(int title_number,
     {
         problem(QString("DVDPerfectThread could not open title number %1").arg(title_number + 1));
         ripfile->remove();
+        delete ripfile;
+        ripfile = NULL;
         ifoClose(vmg_file);
         DVDClose(the_dvd);
         dvd_device_access->unlock();
@@ -274,6 +280,8 @@ bool DVDThread::ripTitle(int title_number,
     {
         problem("DVDPerfectThread could not open the title's info file");
         ripfile->remove();
+        delete ripfile;
+        ripfile = NULL;
         ifoClose(vmg_file);
         DVDClose(the_dvd);
         dvd_device_access->unlock();
@@ -316,6 +324,8 @@ bool DVDThread::ripTitle(int title_number,
     {
         problem("DVDPerfectThread could not open the title's actual VOB(s)");
         ripfile->remove();
+        delete ripfile;
+        ripfile = NULL;
         ifoClose(vts_file);
         ifoClose(vmg_file);
         DVDClose(the_dvd);
@@ -374,6 +384,8 @@ bool DVDThread::ripTitle(int title_number,
                 DVDClose(the_dvd);
                 dvd_device_access->unlock();
                 ripfile->remove();
+                delete ripfile;
+                ripfile = NULL;
                 return false;
             }
             
@@ -421,6 +433,8 @@ bool DVDThread::ripTitle(int title_number,
                         .arg(cur_pack)
                        );
                 ripfile->remove();
+                delete ripfile;
+                ripfile = NULL;
                 ifoClose(vts_file);
                 ifoClose(vmg_file);
                 DVDCloseFile( title );
@@ -436,6 +450,8 @@ bool DVDThread::ripTitle(int title_number,
             {
                 problem("Couldn't write blocks during a rip. Filesystem size exceeded? Disc full?");
                 ripfile->remove();
+                delete ripfile;
+                ripfile = NULL;
                 DVDCloseFile( title );
                 ifoClose(vts_file);
                 ifoClose(vmg_file);
@@ -457,6 +473,8 @@ bool DVDThread::ripTitle(int title_number,
             {
                 problem("abandoned job because master control said we need to shut down");
                 ripfile->remove();
+                delete ripfile;
+                ripfile = NULL;
                 DVDCloseFile( title );
                 ifoClose(vts_file);
                 ifoClose(vmg_file);
@@ -522,7 +540,7 @@ void DVDPerfectThread::run()
     job_name = QString("Perfect DVD Rip of %1").arg(rip_name);
     if(keepGoing())
     {
-        ripTitle(dvd_title, destination_file_string, ".mpg", true);
+        ripTitle(dvd_title, destination_file_string, ".vob", true);
     }
 }
 
@@ -625,10 +643,10 @@ void DVDTranscodeThread::run()
 
     if(keepGoing())
     {
-        QString rip_file_string = QString("%1/%2").arg(working_directory->path()).arg(rip_name);
+        QString rip_file_string = QString("%1/vob/%2").arg(working_directory->path()).arg(rip_name);
         if(!ripTitle(dvd_title, rip_file_string, ".vob", true))
         {
-            cleanUp();
+            cleanUp(); 
             return;
         }
     }
@@ -682,6 +700,11 @@ bool DVDTranscodeThread::makeWorkingDirectory()
     if(!working_directory->cd(rip_name))
     {
         problem(QString("could not cd into \"%1\"").arg(rip_name));
+        return false;
+    }
+    if(!working_directory->mkdir("vob"))
+    {
+        problem("could not create a vob subdirectory in the working directory");
         return false;
     }
     
@@ -821,7 +844,7 @@ bool DVDTranscodeThread::buildTranscodeCommandLine()
     
     
     tc_arguments.append("-i");
-    tc_arguments.append(QString("%1/%2.vob").arg(working_directory->path()).arg(rip_name));
+    tc_arguments.append(QString("%1/vob/").arg(working_directory->path()));
     tc_arguments.append("-g");
     tc_arguments.append(QString("%1x%2").arg(input_hsize).arg(input_vsize));
     tc_arguments.append("-f");
@@ -1030,7 +1053,7 @@ bool DVDTranscodeThread::runTranscode(int which_run)
             while(tc_process->canReadLineStdout())
             {
                 //
-                //  Would be nicd to just connect a SIGNAL here
+                //  Would be nice to just connect a SIGNAL here
                 //  rather than polling, but we're talking to a
                 //  a process from inside a thread, so Q_OBJECT
                 //  is not possible
@@ -1126,11 +1149,18 @@ void DVDTranscodeThread::cleanUp()
     //
     if(working_directory)
     {
-        working_directory->remove(QString("%1.vob").arg(rip_name));
+        if(ripfile)
+        {
+            ripfile->remove();
+            delete ripfile;
+            ripfile = NULL;
+        }
+            
         if(two_pass)
         {
             working_directory->remove("twopass.log");
         }
+        working_directory->rmdir("vob");
         working_directory->cd("..");
         working_directory->rmdir(rip_name);
         delete working_directory;
@@ -1159,6 +1189,10 @@ DVDTranscodeThread::~DVDTranscodeThread()
     if(tc_process)
     {
         delete tc_process;
+    }
+    if(ripfile)
+    {
+        delete ripfile;
     }
 }
 
