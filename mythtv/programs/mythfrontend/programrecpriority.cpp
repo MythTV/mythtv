@@ -1083,6 +1083,10 @@ void ProgramRecPriority::updateInfo(QPainter *p)
         else
             subtitle = "";
 
+        if (curitem->recstatus == rsInactive)
+            subtitle = QString("(%1) %2").arg(curitem->RecStatusText())
+                               .arg(subtitle);
+
         LayerSet *container = NULL;
         container = theme->GetSet("program_info");
         if (container)

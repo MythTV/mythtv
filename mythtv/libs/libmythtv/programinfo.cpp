@@ -1900,7 +1900,7 @@ QString ProgramInfo::RecStatusChar(void)
     case rsTunerBusy:
         return QObject::tr("B", "RecStatusChar");
     case rsInactive:
-        return QObject::tr("i", "RecStatusChar");
+        return QObject::tr("x", "RecStatusChar");
     default:
         return "-";
     }

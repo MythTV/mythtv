@@ -11,9 +11,6 @@ SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* 
                                        _parent, "schedOpts"),
                      schedRec(_rec)
 {
-    inactive = new SRInactive(_rec, this, _parentList);
-    addItem(inactive->getItem(), -1);
-
     recPriority = new SRRecPriority(_rec, this, _parentList);
     addItem(recPriority->getItem(), -1);
 
@@ -30,6 +27,9 @@ SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* 
     dupLocItem = new SRDupIn(_rec, _parentList, this);
     addItem(dupLocItem->getItem(), -1);
     connect(dupMethItem->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
+
+    inactive = new SRInactive(_rec, this, _parentList);
+    addItem(inactive->getItem(), -1);
 }
 
 
