@@ -1,0 +1,91 @@
+<mythmenu name="LIBRARY">
+   <button>
+      <type>TV_WATCH_RECORDINGS</type>
+      <text>Watch Recordings</text>
+      <text lang="IT">Guarda una registrazione</text>
+      <text lang="ES">Ver Grabaciones</text>
+      <text lang="CA">Veure Gravacions</text>
+      <text lang="NL">Opnames Bekijken</text>
+      <text lang="FR">Visionner</text>
+      <text lang="DE">Aufnahmen ansehen</text>
+      <text lang="DK">Afspil optagelser</text>
+      <text lang="PT">Ver Gravações</text>
+      <text lang="SV">Titta på inspelningar</text>
+      <text lang="JA">録画再生</text>
+      <action>TV_WATCH_RECORDING</action>
+   </button>
+
+   <button>
+     <type>VIDEO_BROWSER</type>
+     <text>Watch Videos</text>
+     <text lang="ES">Ver vídeos</text>
+     <text lang="CA">Veure vídeos</text>
+     <text lang="DE">Videos ansehen</text>
+     <text lang="DK">Gennemse film</text>
+     <text lang="PT">Ver Filmes</text>
+     <text lang="SV">Bläddra bland filmer</text>
+     <text lang="FR">Liste des vidéos</text>
+     <text lang="NL">Blader door videos</text>
+     <text lang="JA">ビデオブラウズ</text>
+     <action>JUMP MythVideo</action>
+     <depends>mythvideo</depends>
+   </button>
+   <button>
+      <type>MUSIC_PLAY</type>
+      <text>Listen to Music</text>
+      <text lang="IT">Esegui brani musicali</text>
+      <text lang="ES">Escuchar Música</text>
+      <text lang="CA">Escoltar Música</text>
+      <text lang="DE">Lieder spielen</text>
+      <text lang="DK">Afspil musik</text>
+      <text lang="NL">Muziek Afspelen</text>
+      <text lang="PT">Tocar Músicas</text>
+      <text lang="SV">Spela musik</text>
+      <text lang="FR">Jouer de la musique</text>
+      <text lang="JA">ミュージック再生</text>
+      <action>JUMP Play music</action>
+      <depends>mythmusic</depends>
+   </button>
+   
+   <button>
+     <type>FM</type>
+     <text>Listen to the radio</text>
+     <action>PLUGIN mythFM</action>
+     <depends>mythFM mythfm</depends>
+   </button>
+
+
+   <button>
+     <type>IMAGES</type>
+     <text>Image Gallery</text>
+     <text lang="IT">Immagini</text>
+     <text lang="ES">Fotos</text>
+     <text lang="CA">Imatges</text>
+     <text lang="NL">Beelden</text>
+     <text lang="FR">Images</text>
+     <text lang="DE">Photos</text>
+     <text lang="DK">Billeder</text>
+     <text lang="PT">Fotos</text>
+     <text lang="SV">Galleri</text>
+     <text lang="JA">イメージ</text>
+     <action>PLUGIN mythgallery</action>
+     <depends>mythgallery</depends>
+   </button>
+   
+   <button>
+     <type>GAME</type>
+     <text>Play Games</text>
+     <text lang="IT">Giochi</text>
+     <text lang="ES">Juegos</text>
+     <text lang="CA">Jocs</text>
+     <text lang="NL">Spelen</text>
+     <text lang="FR">Jeux</text>
+     <text lang="DE">Spiele</text>
+     <text lang="DK">Spil</text>
+     <text lang="PT">Jogos</text>
+     <text lang="SV">Spel</text>
+     <text lang="JA">ゲーム</text>
+     <action>PLUGIN mythgame</action>
+     <depends>mythgame</depends>
+   </button>
+</mythmenu>

@@ -1,0 +1,47 @@
+<mythmenu name="SETUP">
+   <button>
+     <type>SETTINGS_WEATHER</type>
+     <text>Weather Settings</text>
+     <text lang="ES">Configurar El Tiempo</text>
+     <text lang="CA">Configurar El Temps</text>
+     <text lang="DE">Wetter Einstellungen</text>
+     <text lang="DK">Vejr indstililnger</text>
+     <text lang="NL">"Het Weer" Instellingen</text>
+     <text lang="PT">Configurar Meteorologia</text>
+     <text lang="SV">Väderinställningar</text>
+     <text lang="JA">天気設定</text>
+     <action>CONFIGPLUGIN mythweather</action>
+     <depends>mythweather</depends>
+   </button>
+
+   <button>
+     <type>SETTINGS_NEWS</type>
+     <text>News Settings</text>
+     <text lang="DE">Nachrichten Einstellungen</text>
+     <text lang="CA">Configurar Notícies</text>
+     <text lang="ES">Configurar Noticias</text>
+     <text lang="NL">Nieuws Instellingen</text>
+     <text lang="SV">Nyhetsinställningar</text>
+     <text lang="JA">ニュース設定</text>
+     <action>CONFIGPLUGIN mythnews</action>
+     <depends>mythnews</depends>
+   </button>
+
+   <button>
+     <type>SETTINGS_WEBPAGE</type>
+     <text>Web Settings</text>
+     <text lang="DE">WWW Einstellungen</text>
+     <text lang="SV">Webb-inställningar</text>
+     <text lang="JA">Web設定</text>
+     <action>CONFIGPLUGIN mythbookmarkmanager</action>
+     <depends>mythbookmarkmanager</depends>
+   </button>
+
+   <button>
+     <type>SETTINGS_RECIPE</type>
+     <text>Recipe Settings</text>
+     <action>CONFIGPLUGIN mythrecipe</action>
+     <depends>mythrecipe</depends>
+   </button>
+
+</mythmenu>

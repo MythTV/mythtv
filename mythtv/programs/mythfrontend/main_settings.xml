@@ -1,6 +1,6 @@
 <mythmenu name="SETUP">
    <button>
-      <type>SETUP</type>
+      <type>SETTINGS_GENERAL</type>
       <text>General</text>
       <text lang="IT">Generale</text>
       <text lang="ES">General</text>
@@ -16,7 +16,7 @@
    </button>
 
    <button>
-      <type>SETUP</type>
+      <type>SETTINGS_APPEARANCE</type>
       <text>Appearance</text>
       <text lang="IT">Aspetto</text>
       <text lang="ES">Aspecto</text>
@@ -32,135 +32,31 @@
    </button>
 
    <button>
-     <type>TV</type>
+     <type>SETTINGS_TV</type>
      <text>TV Settings</text>
-     <text lang="CA">Configuració de TV</text>
-     <text lang="ES">Configuración de TV</text>
-     <text lang="FR">Options TV</text>
-     <text lang="DE">TV Einstellungen</text>
-     <text lang="DK">TV indstillinger</text>
-     <text lang="NL">TV Instellingen</text>
-     <text lang="PT">Configurar Televisão</text>
-     <text lang="SV">TV-inställningar</text>
-     <text lang="JA">TV設定</text>
+     <text lang="DE">Fernsehen</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
    <button>
-     <type>MUSIC</type>
-     <text>Music Settings</text>
-     <text lang="ES">Configurar Música</text>
-     <text lang="CA">Configurar Música</text>
-     <text lang="DE">Musik Einstellungen</text>
-     <text lang="DK">Musik indstillinger</text>
-     <text lang="NL">Muziek Instellingen</text>
-     <text lang="PT">Configurar Música</text>
-     <text lang="SV">Musikinställningar</text>
-     <text lang="JA">ミュージック設定</text>
-     <action>CONFIGPLUGIN mythmusic</action>
-     <depends>mythmusic</depends>
+     <type>SETTINGS_MEDIA</type>
+     <text>Media Settings</text>
+     <text lang="DE">Medien</text>
+     <action>MENU media_settings.xml</action>
+     <depends>mythvideo mythmusic mythgallery mythfm mythgame</depends>
    </button>
 
    <button>
-     <type>GAME</type>
-     <text>Game Settings</text>
-     <text lang="ES">Configurar Juegos</text>
-     <text lang="CA">Configurar Jocs</text>
-     <text lang="DE">Spiele Einstellungen</text>
-     <text lang="DK">Spil indstillinger</text>
-     <text lang="NL">Spelen Instellingen</text>
-     <text lang="PT">Configurar Jogos</text>
-     <text lang="SV">Spelinställningar</text>
-     <text lang="JA">ゲーム設定</text>
-     <action>CONFIGPLUGIN mythgame</action>
-     <depends>mythgame</depends>
+     <type>SETTINGS_INFO_CENTER</type>
+     <text>Info Center Settings</text>
+     <text lang="DE">Informationszentrale</text>
+     <action>MENU info_settings.xml</action>
+     <depends>mythnews mythweather mythbookmarkmanager mythrecipe<depends> 
    </button>
 
    <button>
-      <type>IMAGES</type>
-      <text>Images Settings</text>
-      <text lang="ES">Configurar Fotos</text>
-      <text lang="CA">Configurar Imatges</text>
-      <text lang="DE">Bilder Einstellungen</text>
-      <text lang="DK">Billed indstillinger</text>
-      <text lang="NL">Beelden Instellingen</text>
-      <text lang="PT">Configurar Fotos</text>
-      <text lang="SV">Galleriinställningar</text>
-      <text lang="JA">イメージ設定</text>
-      <action>CONFIGPLUGIN mythgallery</action>
-      <depends>mythgallery</depends>
-   </button>
-
-   <button>
-       <type>VIDEO</type>
-       <text>Videos Settings</text>
-       <text lang="ES">Configurar Videos</text>
-       <text lang="CA">Configurar Videos</text>
-       <text lang="DE">Videos Einstellungen</text>
-       <text lang="DK">Video indstillinger</text>
-       <text lang="NL">Films Instellingen</text>
-       <text lang="PT">Configurar Filmes</text>
-       <text lang="SV">Videoinställningar</text>
-       <text lang="JA">ビデオ設定</text>
-       <action>CONFIGPLUGIN mythvideo</action>
-       <depends>mythvideo</depends>
-   </button>
-
-   <button>
-     <type>WEATHER</type>
-     <text>Weather Settings</text>
-     <text lang="ES">Configurar El Tiempo</text>
-     <text lang="CA">Configurar El Temps</text>
-     <text lang="DE">Wetter Einstellungen</text>
-     <text lang="DK">Vejr indstililnger</text>
-     <text lang="NL">"Het Weer" Instellingen</text>
-     <text lang="PT">Configurar Meteorologia</text>
-     <text lang="SV">Väderinställningar</text>
-     <text lang="JA">天気設定</text>
-     <action>CONFIGPLUGIN mythweather</action>
-     <depends>mythweather</depends>
-   </button>
-
-   <button>
-     <type>DVD</type>
-     <text>DVD Settings</text>
-     <text lang="DE">DVD Einstellungen</text>
-     <text lang="PT">Configurar DVD</text>
-     <text lang="ES">Configurar DVD</text>
-     <text lang="CA">Configurar DVD</text>
-     <text lang="NL">DVD Instellingen</text>
-     <text lang="SV">DVD-inställningar</text>
-     <text lang="JA">DVD設定</text>
-     <action>CONFIGPLUGIN mythdvd</action>
-     <depends>mythdvd</depends>
-   </button>
-
-   <button>
-     <type>NEWS</type>
-     <text>News Settings</text>
-     <text lang="DE">Nachrichten Einstellungen</text>
-     <text lang="CA">Configurar Notícies</text>
-     <text lang="ES">Configurar Noticias</text>
-     <text lang="NL">Nieuws Instellingen</text>
-     <text lang="SV">Nyhetsinställningar</text>
-     <text lang="JA">ニュース設定</text>
-     <action>CONFIGPLUGIN mythnews</action>
-     <depends>mythnews</depends>
-   </button>
-
-   <button>
-     <type>WEBPAGE</type>
-     <text>Web Settings</text>
-     <text lang="DE">WWW Einstellungen</text>
-     <text lang="SV">Webb-inställningar</text>
-     <text lang="JA">Web設定</text>
-     <action>CONFIGPLUGIN mythbookmarkmanager</action>
-     <depends>mythbookmarkmanager</depends>
-   </button>
-
-   <button>
-     <type>SETUP</type>
-     <text>Xbox</text>
+     <type>SETTINGS_XBOX</type>
+     <text>Xbox Settings</text>
      <text lang="PT">Configurar XBox</text>
      <text lang="CA">Configurar XBox</text>
      <text lang="ES">Configurar XBox</text>
@@ -171,5 +67,7 @@
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
+
+
 
 </mythmenu>

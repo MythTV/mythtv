@@ -1,68 +1,56 @@
 <mythmenu name="SEARCH">
 
    <button>
-      <type>TV_PROGFIND</type>
+      <type>TV_SEARCH_TITLES</type>
       <text>Titles</text>
       <text lang="DE">Titel</text>
       <text lang="SV">Titel</text>
       <text lang="JA">タイトル</text>
-      <text lang="NL">Titels�</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
 
    <button>
-      <type>TV_PROGFIND</type>
-      <text>Keywords</text>
+      <type>TV_SEARCH_DESCRIPTIONS</type>
+      <text>Descriptions</text>
       <text lang="DE">Inhalt</text>
       <text lang="SV">Beskrivning</text>
-      <text lang="NL">Beschrijving</text>      
       <text lang="JA">内容</text>
-      <action>TV_SEARCH_KEYWORD</action>
+      <action>TV_SEARCH_DESC</action>
    </button>
 
    <button>
-      <type>TV_PROGFIND</type>
-      <text>People</text>
-      <action>TV_SEARCH_PEOPLE</action>
-   </button>
-
-   <button>
-      <type>TV_PROGFIND</type>
+      <type>TV_SEARCH_CHANNELS</type>
       <text>Channels</text>
       <text lang="DE">Sender</text>
       <text lang="SV">Kanal</text>
-      <text lang="NL">Zender</text>
       <text lang="JA">チャンネル</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
    <button>
-      <type>TV_PROGFIND</type>
+      <type>TV_SEARCH_CATEGORIES</type>
       <text>Categories</text>
       <text lang="DE">Kategorie</text>
       <text lang="SV">Kategori</text>
-      <text lang="NL">Categorie</text>
       <text lang="JA">カテゴリー</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
 
    <button>
-      <type>TV_PROGFIND</type>
+      <type>TV_SEARCH_MOVIES</type>
       <text>Movies</text>
       <text lang="DE">Spielfilme</text>
       <text lang="SV">Filmer</text>
-      <text lang="NL">Films</text>
       <text lang="JA">映画</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
    <button>
-      <type>TV_PROGFIND</type>
+      <type>TV_SEARCH_NEW_TITLES</type>
       <text>New Titles</text>
       <text lang="DE">Neue Titel</text>
       <text lang="SV">Nya titlar</text>
       <text lang="JA">新タイトル</text>
-      <text lang="NL">Nieuwe Titels</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 

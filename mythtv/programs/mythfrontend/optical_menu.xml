@@ -1,0 +1,51 @@
+<mythmenu name="OPTICAL_DISK">
+
+   <button>
+      <type>DVD_PLAY</type>
+      <text>Play DVD</text>
+      <text lang="DK">Afspil DVD</text>
+      <text lang="PT">Tocar DVD</text>
+      <text lang="DE">DVD spielen</text>
+      <text lang="SV">Spela DVD</text>
+      <text lang="ES">Ver DVD</text>
+      <text lang="CA">Veure DVD</text>
+      <text lang="FR">Lecture DVD</text>
+      <text lang="NL">DVD Afspelen</text>
+      <text lang="JA">DVD再生</text>
+      <action>JUMP Play DVD</action>
+      <depends>mythdvd</depends>
+   </button>
+
+   <button>
+      <type>VCD_PLAY</type>
+      <text>Play VCD</text>
+      <text lang="DK">Afspil DVD</text>
+      <text lang="PT">Tocar DVD</text>
+      <text lang="DE">VCD spielen</text>
+      <text lang="SV">Spela DVD</text>
+      <text lang="ES">Ver DVD</text>
+      <text lang="CA">Veure DVD</text>
+      <text lang="FR">Lecture DVD</text>
+      <text lang="NL">DVD Afspelen</text>
+      <text lang="JA">DVD再生</text>
+      <action>JUMP Play VCD</action>
+      <depends>mythdvd</depends>
+   </button>
+
+   <button>
+      <type>DVD_RIP</type>
+      <text>Archive DVD</text>
+      <text lang="DE">DVD archivieren</text>
+      <action>JUMP Rip DVD</action>
+      <depends>mythdvd</depends>
+   </button>
+
+   <button>
+      <type>MUSIC_RIP</type>
+      <text>Archive CD</text>
+      <text lang="DE">CD archivieren</text>
+      <action>JUMP Rip CD</action>
+      <depends>mythmusic</depends>
+   </button>
+
+</mythmenu>

@@ -1,0 +1,41 @@
+<mythmenu name="UTIL">
+   <button>
+      <type>MUSIC_PLAYLIST</type>
+      <text>Music Tools</text>
+      <text lang="DE">Musik-Manager</text>
+      <action>PLUGIN mythmusic</action>
+      <depends>mythmusic</depends>	
+   </button>
+   
+   <button>
+     <type>VIDEO_MANAGER</type>
+     <text>Video Manager</text>
+     <text lang="ES">Gestionar vÃ­deos</text>
+     <text lang="CA">Gestionar vÃ­deos</text>
+     <text lang="DK">Film opsÃ¦tning</text>
+     <text lang="DE">Video-Manager</text>
+     <text lang="PT">Gerir Filmes</text>
+     <text lang="SV">Filmhanterare</text>
+     <text lang="FR">Gestionnaire de vidÃ©os</text>
+     <text lang="NL">Video's Beheren</text>
+     <text lang="JA">ãããªããã¼ã¸ã£ã¼</text>
+     <action>JUMP Video Manager</action>
+     <depends>mythvideo</depends>
+   </button>
+   
+   <button>
+     <type>SETUP_MENU</type>
+     <text>Setup</text>
+     <text lang="IT">Impostazioni</text>
+     <text lang="ES">Configurar</text>
+     <text lang="CA">Configurar</text>
+     <text lang="FR">Configuration</text>
+     <text lang="DE">Konfiguration</text>
+     <text lang="DK">Konfiguration</text>
+     <text lang="NL">Instellingen</text>
+     <text lang="PT">Configurações</text>
+     <text lang="SV">Inställningar</text>
+     <text lang="JA">設定</text>
+     <action>MENU main_settings.xml</action>
+   </button>
+</mythmenu>

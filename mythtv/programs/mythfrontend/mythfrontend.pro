@@ -14,9 +14,10 @@ target.path = $${PREFIX}/bin
 INSTALLS = target
 
 setting.path = $${PREFIX}/share/mythtv/
-setting.files += theme.txt mysql.txt mainmenu.xml tvmenu.xml tv_settings.xml
-setting.files += tv_schedule.xml main_settings.xml recpriorities_settings.xml
-setting.files += tv_search.xml
+setting.files += theme.txt mysql.txt 
+setting.files += info_menu.xml mainmenu.xml media_settings.xml tv_schedule.xml util_menu.xml
+setting.files += info_settings.xml  main_settings.xml recpriorities_settings.xml tv_search.xml
+setting.files += library.xml manage_recordings.xml optical_menu.xml tvmenu.xml tv_settings.xml
 setting.extra = -ldconfig
 
 INSTALLS += setting
