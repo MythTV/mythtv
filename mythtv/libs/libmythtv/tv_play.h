@@ -121,7 +121,8 @@ class TV : public QObject
     void ChangeColour(bool up, bool recorder);
     void ChangeHue(bool up, bool recorder);
 
-    void ChannelClear(void); 
+    QString QueuedChannel(void);
+    void ChannelClear(bool hideosd = false); 
     void ChannelKey(int key);
     void ChannelCommit(void);
 
@@ -131,6 +132,7 @@ class TV : public QObject
     void DoPause(void);
     bool UpdatePosOSD(float time, const QString &mesg);
     void DoSeek(float time, const QString &mesg);
+    void DoArbSeek(int dir);
     void NormalSpeed(void);
     void ChangeSpeed(int direction);
     float StopFFRew(void);

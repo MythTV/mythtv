@@ -928,14 +928,16 @@ void TV::RunTV(void)
             updatecheck = 0;
         }
 
-        if (internalState == kState_WatchingLiveTV ||
-            internalState == kState_WatchingRecording)
+        if (channelqueued && nvp->GetOSD())
         {
-            if (channelqueued && nvp->GetOSD())
+            OSDSet *set = osd->GetSet("channel_number");
+            if (set && !set->Displaying())
             {
-                OSDSet *set = osd->GetSet("channel_number");
-                if (!set || !set->Displaying())
+                if (internalState == kState_WatchingLiveTV ||
+                    internalState == kState_WatchingRecording)
                     ChannelCommit();
+                else
+                    ChannelClear();
             }
         }
     }
@@ -1188,7 +1190,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "SEEKFFWD")
         {
-            if (paused)
+            if (channelqueued)
+                DoArbSeek(1);
+            else if (paused)
                 DoSeek(1.001 / frameRate, tr("Forward"));
             else if (!stickykeys)
             {
@@ -1209,7 +1213,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "SEEKRWND")
         {
-            if (paused)
+            if (channelqueued)
+                DoArbSeek(-1);
+            else if (paused)
                 DoSeek(-1.001 / frameRate, tr("Rewind"));
             else if (!stickykeys)
             {
@@ -1288,9 +1294,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         if (doing_ff_rew)
         {
-            for (unsigned int i = 0; i < actions.size(); i++)
+            for (unsigned int i = 0; i < actions.size() && !handled; i++)
             {
-                action = actions[0];
+                action = actions[i];
                 bool ok = false;
                 int val = action.toInt(&ok);
 
@@ -1317,6 +1323,22 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
     }
 
+    if (!handled)
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            action = actions[i];
+            bool ok = false;
+            int val = action.toInt(&ok);
+
+            if (ok)
+            {
+                ChannelKey(val);
+                handled = true;
+            }
+        }
+    }
+
     if (internalState == kState_WatchingLiveTV)
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
@@ -1325,7 +1347,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
             handled = true;
 
             if (action == "INFO")
-                ToggleOSD();
+            {
+                if (channelqueued)
+                    DoArbSeek(0);
+                else
+                    ToggleOSD();
+            }
             else if (action == "CHANNELUP")
             {
                 if (persistentbrowsemode)
@@ -1348,13 +1375,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ToggleChannelFavorite();
             else if (action == "TOGGLEINPUTS")
                 ToggleInputs();
-            else if (action == "0" || action == "1" || action == "2" ||
-                     action == "3" || action == "4" || action == "5" ||
-                     action == "6" || action == "7" || action == "8" ||
-                     action == "9")
-            {
-                ChannelKey(action.toInt());
-            }
             else if (action == "SELECT")
                 ChannelCommit();
             else if (action == "MENU")
@@ -1383,7 +1403,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
             handled = true;
 
             if (action == "INFO")
-                DoInfo();
+            {
+                if (channelqueued)
+                    DoArbSeek(0);
+                else
+                    DoInfo();
+            }
             else if (action == "SELECT")
             {
                 if (!was_doing_ff_rew)
@@ -1635,6 +1660,24 @@ void TV::DoSeek(float time, const QString &mesg)
     {
         keyRepeat = false;
         keyrepeatTimer->start(300, true);
+    }
+}
+
+void TV::DoArbSeek(int dir)
+{
+    int chan = QueuedChannel().toInt();
+    ChannelClear(true);
+
+    float time = ((chan / 100) * 3600) + ((chan % 100) * 60);
+
+    if (dir > 0)
+        DoSeek(time, tr("Jump Ahead"));
+    else if (dir < 0)
+        DoSeek(-time, tr("Jump Back"));
+    else
+    {
+        time -= (activenvp->GetFramesPlayed() / frameRate);
+        DoSeek(time, tr("Jump To"));
     }
 }
 
@@ -1904,8 +1947,27 @@ void TV::ChangeChannel(int direction)
         muteTimer->start(kMuteTimeout * 2, true);
 }
 
-void TV::ChannelClear(void)
+QString TV::QueuedChannel(void)
 {
+    if (!channelqueued)
+        return "";
+
+    for (int i = 0; i < channelkeysstored; i++)
+    {
+        if (channelKeys[i] == '0')
+            channelKeys[i] = ' ';
+        else
+            break;
+    }
+
+    return QString(channelKeys).stripWhiteSpace();
+}
+
+void TV::ChannelClear(bool hideosd)
+{
+    if (hideosd && osd) 
+        osd->HideSet("channel_number");
+
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
     channelKeys[4] = 0;
@@ -1984,15 +2046,7 @@ void TV::ChannelCommit(void)
     if (!channelqueued)
         return;
 
-    for (int i = 0; i < channelkeysstored; i++)
-    {
-        if (channelKeys[i] == '0')
-            channelKeys[i] = ' ';
-        else
-            break;
-    }
-
-    QString chan = QString(channelKeys).stripWhiteSpace();
+    QString chan = QueuedChannel();
 
     if (browsemode)
     {
