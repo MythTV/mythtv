@@ -1241,6 +1241,7 @@ void GuideGrid::cursorLeft()
         fillProgramRowInfos(m_currentRow);
         update(programRect());
         update(infoRect());
+        update(timeRect());
     }
 }
 
@@ -1260,6 +1261,7 @@ void GuideGrid::cursorRight()
     {
         fillProgramRowInfos(m_currentRow);
         update(programRect());
+        update(infoRect());
         update(timeRect());
     }
 }

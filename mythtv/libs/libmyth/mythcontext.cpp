@@ -16,7 +16,7 @@
 #include "remotefile.h"
 #include "lcddevice.h"
 
-    bool print_verbose_messages = false;    
+bool print_verbose_messages = false;    
 
 MythContext::MythContext(const QString &binversion, bool gui)
            : QObject()

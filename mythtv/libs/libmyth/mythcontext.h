@@ -17,7 +17,10 @@ class QSqlQuery;
 class QSocket;
 class LCD;
 
-#define VERBOSE(verbose,args...) if(verbose) cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " " << args << endl;
+#define VERBOSE(args...) \
+if (print_verbose_messages) \
+    cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") \
+         << " " << args << endl;
 
 class MythEvent : public QCustomEvent
 {
@@ -48,7 +51,7 @@ class MythEvent : public QCustomEvent
 
 #define MYTH_BINARY_VERSION "0.9.04292003-2"
 
-    extern bool print_verbose_messages;
+extern bool print_verbose_messages;
 
 class MythContext : public QObject
 {
