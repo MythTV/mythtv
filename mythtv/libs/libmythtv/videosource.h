@@ -72,6 +72,9 @@ public:
         addChild(grabber);
         setTrigger(grabber);
 
+        // only save settings for the selected grabber
+        setSaveAll(false);
+
         addTarget("tv_grab_na", new XMLTV_na_config(parent));
         grabber->addSelection("tv_grab_na");
 
@@ -182,6 +185,7 @@ public:
     };
 };
 
+// unused
 class CardType: public ComboBoxSetting, public CCSetting {
 public:
     CardType(const CaptureCard& parent):

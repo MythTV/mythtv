@@ -188,6 +188,13 @@ void StackedConfigurationGroup::raise(Configurable* child) {
     cout << "BUG: StackedConfigurationGroup::raise(): unrecognized child " << child << " on setting " << getName() << '/' << getLabel() << endl;
 }
 
+void StackedConfigurationGroup::save(QSqlDatabase* db) {
+    if (saveAll)
+        ConfigurationGroup::save(db);
+    else if (top > children.size())
+        children[top]->save(db);
+}
+
 void TriggeredConfigurationGroup::setTrigger(Configurable* _trigger) {
     trigger = _trigger;
     // Make sure the stack is after the trigger
@@ -477,7 +484,7 @@ MythDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
     MythDialog* dialog = new ConfigurationDialogWidget(m_context, parent, 
                                                        widgetName);
     QVBoxLayout* layout = new QVBoxLayout(dialog, 20);
-    layout->addWidget(configWidget(NULL, dialog)); // XXX
+    layout->addWidget(configWidget(NULL, dialog));
 
     return dialog;
 }

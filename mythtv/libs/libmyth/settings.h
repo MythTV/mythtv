@@ -131,18 +131,23 @@ class StackedConfigurationGroup: virtual public ConfigurationGroup {
     Q_OBJECT
 public:
     StackedConfigurationGroup(bool uselabel = true)
-                : ConfigurationGroup(uselabel) { top = 0; };
+                : ConfigurationGroup(uselabel) { top = 0; saveAll = true; };
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
 
     void raise(Configurable* child);
+    virtual void save(QSqlDatabase* db);
+
+    // save all children, or only the top?
+    void setSaveAll(bool b) { saveAll = b; };
 
 signals:
     void raiseWidget(int);
 
 protected:
     unsigned top;
+    bool saveAll;
 };
 
 class ConfigurationDialogWidget: public MythDialog {
@@ -388,6 +393,8 @@ public:
     void setTrigger(Configurable* _trigger);
 
     void addTarget(QString triggerValue, Configurable* target);
+
+    void setSaveAll(bool b) { configStack->setSaveAll(b); };
 
 protected slots:
     virtual void triggerChanged(const QString& value) {
