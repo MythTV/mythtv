@@ -68,7 +68,7 @@ class LocalStatusPort: public LineEditSetting, public BackendHostSetting {
 public:
     LocalStatusPort():
         BackendHostSetting("BackendStatusPort") {
-            setLabel("Port the server ");
+            setLabel("Port the server shows status on");
             setValue("6544");
             setHelpText("Port which the server will listen to for HTTP "
                         "requests.  Currently, it shows a little status "
@@ -92,7 +92,7 @@ public:
 class MasterServerPort: public LineEditSetting, public BackendSetting {
 public:
     MasterServerPort():
-        BackendSetting("BackendServerPort") {
+        BackendSetting("MasterServerPort") {
             setLabel("Port the master server runs on");
             setValue("6543");
             setHelpText("Unless you've got good reason to, don't change this.");
