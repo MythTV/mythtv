@@ -24,6 +24,7 @@
 #include <qpixmap.h>
 #include <qimage.h>
 #include <qcursor.h>
+#include <qstring.h>
 
 #include <math.h>
 #include <stdio.h>
@@ -90,8 +91,14 @@ void MainVisual::setVisual( const QString &visualname )
         newvis = randomVis(this, winId());
     }
     else 
-        newvis = createVis(allowed_modes[rand() % allowed_modes.size()], 
-                           this, winId());
+    {
+        int vis_mode_index = 0;
+        if (allowed_modes.size() > 1)
+            vis_mode_index = rand() % allowed_modes.size();
+
+        current_visual_name = allowed_modes[vis_mode_index].stripWhiteSpace();
+        newvis = createVis(current_visual_name, this, winId());
+    }
     	
     setVis( newvis );
 }
@@ -113,6 +120,22 @@ void MainVisual::setVis( VisualBase *newvis )
     // force an update
     timer->stop();
     timer->start( 1000 / fps );
+}
+
+int MainVisual::numVisualizers( void ) const
+{
+    QString visualname = gContext->GetSetting("VisualMode");
+    QStringList visualizers = QStringList::split(",", visualname);
+
+    if (visualizers.contains("Random"))
+        return visfactories->count() - 1;
+    else
+        return visualizers.size();
+}
+
+QString MainVisual::getCurrentVisual( void ) const
+{
+    return current_visual_name;
 }
 
 void MainVisual::prepare()
@@ -165,11 +188,8 @@ void MainVisual::timeout()
     VisualNode *node = 0;
 
     if (playing && output()) {
-	output()->mutex()->lock();
 	long olat = output()->latency();
 	long owrt = output()->written();
-	output()->mutex()->unlock();
-
 	long synctime = owrt < olat ? 0 : owrt - olat;
 
 	mutex()->lock();

@@ -84,7 +84,10 @@ bool Goom::process(VisualNode *node)
     for (i = 0; i < numSamps; i++)
     {
         data[0][i] = node->left[i];
-        data[1][i] = node->right[i];
+        if (node->right)
+            data[1][i] = node->right[i];
+        else
+            data[1][i] = data[0][i];
     }
 
     for (; i < 512; i++)

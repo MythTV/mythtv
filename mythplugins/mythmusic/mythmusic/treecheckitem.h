@@ -2,38 +2,85 @@
 #define TREECHECKITEM_H_
 
 #include <qlistview.h>
-#include "metadata.h"
 
 class QPixmap;
+class PlaylistsContainer;
+class Playlist;
+class Track;
 
 class TreeCheckItem : public QCheckListItem
 {
   public:
-    TreeCheckItem(QListView *parent, QString &ltext, const QString &llevel, 
-                  Metadata *mdata);
-    TreeCheckItem(TreeCheckItem *parent, QString &ltext, const QString &llevel,
-                  Metadata *mdata);
-
-   ~TreeCheckItem(void) { if (metadata) delete metadata; }
-
-    Metadata *getMetadata(void) { return metadata; }
+    TreeCheckItem(QListView *parent, QString &ltext, const QString &llevel, int l_id); 
+    TreeCheckItem(TreeCheckItem *parent, QString &ltext, const QString &llevel, int l_id);
+    TreeCheckItem(TreeCheckItem *parent, TreeCheckItem *after, QString &ltext, const QString &llevel, int l_id);
     QString getLevel(void) { return level; }
-
+    int getID(){return id;}
+    void    setCheckable(bool flag); //  Need different use than setEnabled();
+    bool    isCheckable(){return checkable;}
+    void    paintCell(QPainter * p, const QColorGroup & cg, int column, int width, int align);
+    void    setOn(bool flag);
+    
   private:
     void pickPixmap(void);
 
-    static void setupPixmaps(void);
-    static QPixmap *scalePixmap(const char **xpmdata, float wmult, float hmult);
-
-    Metadata *metadata;
+    int id;
     QString level;
 
-    static bool pixmapsSet;
-    static QPixmap *artist;
-    static QPixmap *album;
-    static QPixmap *track;
-    static QPixmap *catalog;
-    static QPixmap *cd;
+    bool    checkable;
+};
+
+class CDCheckItem : public TreeCheckItem
+{
+  public:
+    CDCheckItem(QListView *parent, QString &ltext, const QString &llevel, int l_track);
+    CDCheckItem(CDCheckItem *parent, QString &ltext, const QString &llevel, int l_track);
+
+};
+
+class PlaylistItem : public QListViewItem
+{
+  public:
+    PlaylistItem(QListView *parent, const QString &title);
+    PlaylistItem(QListViewItem *parent, const QString &title);
+    PlaylistItem(QListViewItem *parent, QListViewItem *after, const QString &title);
+    virtual void userSelectedMe(){} // pure virtual, should always be reimplemented
+};
+
+class PlaylistTitle : public PlaylistItem
+{
+  public:
+
+    PlaylistTitle(QListView *parent, const QString &title);
+    PlaylistTitle(QListViewItem *parent, const QString &title);
+    void setOwner(Playlist *owner);
+    void userSelectedMe();
+    void removeTrack(int x);
+    bool isActive(){return active;}
+    bool isDefault();
+
+  private:
+  
+    Playlist       *ptr_to_owner;
+    bool           active;
+};
+
+class PlaylistTrack : public PlaylistItem
+{
+  public:
+    PlaylistTrack(QListViewItem *parent, const QString &title);
+    PlaylistTrack(QListViewItem *parent, QListViewItem *after, 
+                  const QString &title);
+    void setOwner(Track *owner);
+    void userSelectedMe();
+    void beMoving(bool flag);
+    void moveUpDown(bool flag);
+    int  getID();
+
+  private:
+    Track           *ptr_to_owner;
+    bool            held;    
+    QPixmap         *pixmap;
 };
 
 #endif

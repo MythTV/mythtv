@@ -1,0 +1,29 @@
+
+A Note on Upgrading the Music Database Tables
+=============================================
+
+If you are installing mythmusic for the first time, you just need to execute
+the main metadata.sql script as described in ../README and in the online 
+documentation at:
+
+        http://www.mythtv.org/docs/mythtv-HOWTO-15.html
+
+The rest of this document is intended only for those who are upgrading an
+existing mythmusic install.
+
+On or around April 16th 2003, the powers that be decided to add an extra
+column to the playlists table. You need to do two things:
+
+    1. Edit the cvs.sql file and change MY_HOST_NAME to the machine 
+       that you will be running this instance of mythmusic from. 
+       Once you've done that, you need to remove the first line 
+       of the file (the one that says "quit").
+
+    2. Run the cvs.sql script like this:
+
+        mysql -p -u mythtv < cvs.sql
+
+Only do this once, not every time you update your cvs copy. Why the
+complications? This saves you from having to rebuild all of your playlists.
+You're welcome.
+

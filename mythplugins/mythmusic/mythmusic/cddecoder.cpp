@@ -294,22 +294,41 @@ int CdDecoder::getNumTracks(void)
         return 0;
     }
 
-    int retval = discinfo.disc_total_tracks;
+    int retval = 0;
+    for( ; retval < discinfo.disc_total_tracks; retval++)
+    {
+        if(discinfo.disc_track[retval].track_type != CDAUDIO_TRACK_AUDIO)
+        {
+            break;
+        }
+    }
 
     cd_finish(cd);
 
     return retval;
 }
 
-Metadata *CdDecoder::getMetadata(QSqlDatabase *db, int track)
+Metadata* CdDecoder::getMetadata(QSqlDatabase *x, int track)
 {
+    x = x;
     settracknum = track;
-    return getMetadata(db);
+    return getMetadata();
 }
 
-Metadata *CdDecoder::getMetadata(QSqlDatabase *db)
+Metadata* CdDecoder::getMetadata(QSqlDatabase *x)
 {
-    db = db;
+    x = x ;
+    return getMetadata();
+}
+
+Metadata *CdDecoder::getMetadata(int track)
+{
+    settracknum = track;
+    return getMetadata();
+}
+
+Metadata *CdDecoder::getMetadata()
+{
 
     QString artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
@@ -344,6 +363,13 @@ Metadata *CdDecoder::getMetadata(QSqlDatabase *db)
     if (tracknum > discinfo.disc_total_tracks)
     {
         error("No such track on CD");
+        cd_finish(cd);
+        return NULL;
+    }
+
+    if(discinfo.disc_track[tracknum - 1].track_type != CDAUDIO_TRACK_AUDIO )
+    {
+        error("Exclude non audio tracks");
         cd_finish(cd);
         return NULL;
     }

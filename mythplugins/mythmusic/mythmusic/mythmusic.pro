@@ -16,7 +16,7 @@ target.path = $${PREFIX}/bin
 INSTALLS += target
 
 installfiles.path = $${PREFIX}/share/mythtv
-installfiles.files = mythmusic-settings.txt musicmenu.xml
+installfiles.files = musicmenu.xml music_settings.xml
 
 INSTALLS += installfiles
 
@@ -29,7 +29,7 @@ HEADERS += decoder.h flacdecoder.h flacencoder.h maddecoder.h mainvisual.h
 HEADERS += metadata.h playbackbox.h playlist.h polygon.h output.h recycler.h 
 HEADERS += scrolllabel.h streaminput.h synaesthesia.h encoder.h visualize.h
 HEADERS += treecheckitem.h visual.h vorbisdecoder.h vorbisencoder.h polygon.h
-HEADERS += bumpscope.h
+HEADERS += bumpscope.h globalsettings.h
 HEADERS += goom/filters.h goom/goomconfig.h goom/goom_core.h goom/graphic.h
 HEADERS += goom/ifs.h goom/lines.h goom/mythgoom.h goom/drawmethods.h
 HEADERS += goom/mmx.h goom/mathtools.h goom/tentacle3d.h goom/v3d.h
@@ -39,7 +39,7 @@ SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp
 SOURCES += mainvisual.cpp metadata.cpp playbackbox.cpp playlist.cpp output.cpp 
 SOURCES += recycler.cpp scrolllabel.cpp streaminput.cpp encoder.cpp
 SOURCES += synaesthesia.cpp treecheckitem.cpp vorbisdecoder.cpp 
-SOURCES += vorbisencoder.cpp visualize.cpp bumpscope.cpp
+SOURCES += vorbisencoder.cpp visualize.cpp bumpscope.cpp globalsettings.cpp
 SOURCES += goom/filters.c goom/goom_core.c goom/graphic.c goom/tentacle3d.c
 SOURCES += goom/ifs.c goom/ifs_display.c goom/lines.c goom/surf3d.c 
 SOURCES += goom/zoom_filter_mmx.c goom/zoom_filter_xmmx.c goom/mythgoom.cpp

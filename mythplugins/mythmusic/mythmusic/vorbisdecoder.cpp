@@ -14,6 +14,8 @@ using namespace std;
 #include "recycler.h"
 #include "metadata.h"
 
+#include <mythtv/mythcontext.h>
+
 // static functions for OggVorbis
 
 static size_t oggread (void *buf, size_t size, size_t nmemb, void *src) {
@@ -85,6 +87,9 @@ VorbisDecoder::VorbisDecoder(const QString &file, DecoderFactory *d,
     totalTime = 0.0;
     chan = 0;
     output_size = 0;
+
+    filename_format = gContext->GetSetting("NonID3FileNameFormat").upper();
+    ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
 }
 
 VorbisDecoder::~VorbisDecoder(void)
@@ -344,12 +349,20 @@ Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
     comment = ov_comment(&vf, -1);
     length = (int)ov_time_total(&vf, -1) * 1000;
 
-    artist = getComment(comment, "artist");
-    album = getComment(comment, "album");
-    title = getComment(comment, "title");
-    genre = getComment(comment, "genre");
-    tracknum = atoi(getComment(comment, "tracknumber").ascii()); 
-    year = atoi(getComment(comment, "date").ascii());
+    if (ignore_id3)
+    {
+        getMetadataFromFilename(filename, QString(".ogg$"), artist, album, 
+                                title, genre, tracknum);
+    }
+    else
+    {
+        artist = getComment(comment, "artist");
+        album = getComment(comment, "album");
+        title = getComment(comment, "title");
+        genre = getComment(comment, "genre");
+        tracknum = atoi(getComment(comment, "tracknumber").ascii()); 
+        year = atoi(getComment(comment, "date").ascii());
+    }
 
     ov_clear(&vf);
 
@@ -363,7 +376,9 @@ Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
 
 void VorbisDecoder::commitMetadata(Metadata *mdata)
 {
+    mdata = mdata;  // -Wall annoyance
 }
+
 
 QString VorbisDecoder::getComment(vorbis_comment *vc, const char *label)
 {

@@ -1,0 +1,21 @@
+<mythmenu name="MUSIC_SETTINGS">
+
+   <button>
+      <type>SETUP</type>
+      <text>Scan Music</text>
+      <action>SETTINGS_SCAN</action>
+   </button>
+
+   <button>
+      <type>MUSIC</type>
+      <text>General Settings</text>
+      <action>MUSIC_SET_GENERAL</action>
+   </button>
+
+   <button>
+      <type>MUSIC</type>
+      <text>Player Settings</text>
+      <action>MUSIC_SET_PLAYER</action>
+   </button>
+
+</mythmenu>

@@ -491,18 +491,21 @@ enum mad_flow MadDecoder::madOutput()
 
     bitrate = frame.header.bitrate / 1000;
 
-    while (samples--) {
+    while (samples--)
+    {
         signed int sample;
 
         if (output_bytes + 4096 > globalBufferSize)
+        {
             flush();
-
+        }
         sample = fix_sample(16, *left++);
         *(output_buf + output_at++) = ((sample >> 0) & 0xff);
         *(output_buf + output_at++) = ((sample >> 8) & 0xff);
         output_bytes += 2;
 
-        if (channels == 2) {
+        if (channels == 2)
+        {
             sample = fix_sample(16, *right++);
             *(output_buf + output_at++) = ((sample >> 0) & 0xff);
             *(output_buf + output_at++) = ((sample >> 8) & 0xff);
@@ -612,40 +615,8 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
     }
     else
     {
-        // Ignore_ID3 header 
-        int part_num = 0;
-        QStringList fmt_list = QStringList::split( "/", filename_format );
-        QStringList::iterator fmt_it = fmt_list.begin();
-
-        // go through loop once to get minimum part number
-        for( ; fmt_it != fmt_list.end(); fmt_it++, part_num-- );
-
-        // reset to go through loop for real
-        fmt_it = fmt_list.begin();
-        for( ; fmt_it != fmt_list.end(); fmt_it++, part_num++ )
-        {
-            QString part_str = filename.section( "/", part_num, part_num );
-            part_str.replace( QRegExp(QString("_")), QString(" ") );
-            part_str.replace( QRegExp(QString(".mp3$"), FALSE), QString("") );
-
-            if ( *fmt_it == "GENRE" ) {
-                genre = part_str;
-            } else if ( *fmt_it == "ARTIST" ) {
-                artist = part_str;
-            } else if ( *fmt_it == "ALBUM" ) {
-                album = part_str;
-            } else if ( *fmt_it == "TITLE" ) {
-                title = part_str;
-            } else if ( *fmt_it == "TRACK_TITLE" ) {
-                part_str.replace( QRegExp(QString("-")), QString(" ") );
-                QString s_tmp = part_str;
-                s_tmp.replace( QRegExp(QString(" .*"), FALSE), QString("") );
-                tracknum = s_tmp.toInt();
-                title = part_str;
-                title.replace( QRegExp(QString("^[0-9][0-9] "), FALSE),
-                    QString("") );
-            }
-        }
+        getMetadataFromFilename(filename, QString(".mp3$"), artist, album, 
+                                title, genre, tracknum);
     }
 
     struct mad_stream stream;
@@ -717,7 +688,9 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
 
 void MadDecoder::commitMetadata(Metadata *mdata)
 {
+    mdata = mdata;
 }
+
 
 bool MadDecoderFactory::supports(const QString &source) const
 {

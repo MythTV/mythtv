@@ -14,6 +14,8 @@ using namespace std;
 #include "recycler.h"
 #include "metadata.h"
 
+#include <mythtv/mythcontext.h>
+
 static FLAC__SeekableStreamDecoderReadStatus flacread(const FLAC__SeekableStreamDecoder *decoder, FLAC__byte bufferp[], unsigned *bytes, void *client_data)
 {
     decoder = decoder;
@@ -174,6 +176,9 @@ FlacDecoder::FlacDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     output_size = 0;
 
     decoder = 0;
+
+    filename_format = gContext->GetSetting("NonID3FileNameFormat").upper();
+    ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
 }
 
 FlacDecoder::~FlacDecoder(void)
@@ -464,12 +469,20 @@ Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
     FLAC__ASSERT(0 != block);
     FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
-    artist = getComment(block, "artist");
-    album = getComment(block, "album");
-    title = getComment(block, "title");
-    genre = getComment(block, "genre");
-    tracknum = getComment(block, "tracknumber").toInt(); 
-    year = getComment(block, "date").toInt();
+    if (ignore_id3)
+    {
+        getMetadataFromFilename(filename, QString(".flac$"), artist, album, 
+                                title, genre, tracknum);
+    }
+    else
+    {
+        artist = getComment(block, "artist");
+        album = getComment(block, "album");
+        title = getComment(block, "title");
+        genre = getComment(block, "genre");
+        tracknum = getComment(block, "tracknumber").toInt(); 
+        year = getComment(block, "date").toInt();
+    }
 
     Metadata *retdata = new Metadata(filename, artist, album, title, genre,
                                      year, tracknum, length);

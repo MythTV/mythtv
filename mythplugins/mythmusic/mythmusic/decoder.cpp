@@ -13,13 +13,12 @@
 #include <qobject.h>
 #include <qptrlist.h>
 #include <qstringlist.h>
-
+#include <qregexp.h>
 
 Decoder::Decoder(DecoderFactory *d, QIODevice *i, Output *o)
        : fctry(d), in(i), out(o), blksize(0)
 {
 }
-
 
 Decoder::~Decoder()
 {
@@ -29,14 +28,12 @@ Decoder::~Decoder()
     blksize = 0;
 }
 
-
 void Decoder::setInput(QIODevice *i)
 {
     mutex()->lock();
     in = i;
     mutex()->unlock();
 }
-
 
 void Decoder::setOutput(Output *o)
 {
@@ -45,11 +42,11 @@ void Decoder::setOutput(Output *o)
     mutex()->unlock();
 }
 
-
 void Decoder::dispatch(const DecoderEvent &e)
 {
     QObject *object = listeners.first();
-    while (object) {
+    while (object) 
+    {
         QThread::postEvent(object, new DecoderEvent(e));
         object = listeners.next();
     }
@@ -58,21 +55,23 @@ void Decoder::dispatch(const DecoderEvent &e)
 void Decoder::dispatch(const OutputEvent &e)
 {
     QObject *object = listeners.first();
-    while (object) {
+    while (object) 
+    {
         QThread::postEvent(object, new OutputEvent(e));
         object = listeners.next();
     }
 }
 
-void Decoder::error(const QString &e) {
+void Decoder::error(const QString &e) 
+{
     QObject *object = listeners.first();
-    while (object) {
+    while (object) 
+    {
         QString *str = new QString(e.utf8());
         QThread::postEvent(object, new DecoderEvent(str));
         object = listeners.next();
     }
 }
-
 
 void Decoder::addListener(QObject *object)
 {
@@ -91,8 +90,10 @@ void Decoder::removeListener(QObject *object)
 
 static QPtrList<DecoderFactory> *factories = 0;
 
-static void checkFactories() {
-    if (! factories) {
+static void checkFactories() 
+{
+    if (!factories) 
+    {
         factories = new QPtrList<DecoderFactory>;
 
         Decoder::registerFactory(new VorbisDecoderFactory);
@@ -108,7 +109,8 @@ QStringList Decoder::all()
 
     QStringList l;
     DecoderFactory *fact = factories->first();
-    while (fact) {
+    while (fact) 
+    {
         l << fact->description();
         fact = factories->next();
     }
@@ -121,10 +123,10 @@ bool Decoder::supports(const QString &source)
     checkFactories();
 
     DecoderFactory *fact = factories->first();
-    while (fact) {
-        if (fact->supports(source)) {
+    while (fact) 
+    {
+        if (fact->supports(source))
             return TRUE;
-        }
 
         fact = factories->next();
     }
@@ -145,8 +147,10 @@ Decoder *Decoder::create(const QString &source, QIODevice *input,
     Decoder *decoder = 0;
 
     DecoderFactory *fact = factories->first();
-    while (fact) {
-        if (fact->supports(source)) {
+    while (fact) 
+    {
+        if (fact->supports(source)) 
+        {
             decoder = fact->create(source, input, output, deletable);
             break;
         }
@@ -155,5 +159,47 @@ Decoder *Decoder::create(const QString &source, QIODevice *input,
     }
 
     return decoder;
+}
+
+void Decoder::getMetadataFromFilename(const QString filename,
+                                      const QString regext, QString &artist, 
+                                      QString &album, QString &title, 
+                                      QString &genre, int &tracknum)
+{
+    // Ignore_ID3 header
+    int part_num = 0;
+    QStringList fmt_list = QStringList::split("/", filename_format);
+    QStringList::iterator fmt_it = fmt_list.begin();
+
+    // go through loop once to get minimum part number
+    for(; fmt_it != fmt_list.end(); fmt_it++, part_num--);
+
+    // reset to go through loop for real
+    fmt_it = fmt_list.begin();
+    for(; fmt_it != fmt_list.end(); fmt_it++, part_num++)
+    {
+        QString part_str = filename.section( "/", part_num, part_num);
+        part_str.replace(QRegExp(QString("_")), QString(" "));
+        part_str.replace(QRegExp(regext, FALSE), QString(""));
+
+        if ( *fmt_it == "GENRE" )
+            genre = part_str;
+        else if ( *fmt_it == "ARTIST" )
+            artist = part_str;
+        else if ( *fmt_it == "ALBUM" ) 
+            album = part_str;
+        else if ( *fmt_it == "TITLE" )
+            title = part_str;
+        else if ( *fmt_it == "TRACK_TITLE" ) 
+        {
+            part_str.replace(QRegExp(QString("-")), QString(" "));
+            QString s_tmp = part_str;
+            s_tmp.replace(QRegExp(QString(" .*"), FALSE), QString(""));
+            tracknum = s_tmp.toInt();
+            title = part_str;
+            title.replace(QRegExp(QString("^[0-9][0-9] "), FALSE),
+                          QString(""));
+        }
+    }
 }
 

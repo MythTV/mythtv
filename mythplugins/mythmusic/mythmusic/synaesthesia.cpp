@@ -432,7 +432,10 @@ bool Synaesthesia::process(VisualNode *node)
     for (i = 0; i < numSamps; i++) 
     {
         x[i] = node->left[i];
-        y[i] = node->right[i];
+        if (node->right)
+            y[i] = node->right[i];
+        else
+            y[i] = x[i];
     }
    
     fft(x, y);

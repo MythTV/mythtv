@@ -18,4 +18,10 @@
       <action>MUSIC_RIP</action>
    </button>
 
+   <button>
+      <type>SETUP</type>
+      <text>Setup</text>
+      <action>MENU music_settings.xml</action>
+   </button>
+
 </mythmenu>

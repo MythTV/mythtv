@@ -18,8 +18,11 @@ public:
     }
     ~Buffer()
     {
-	delete data;
-	data = 0;
+        if(data)
+        {
+    	    delete [] data;
+	    data = 0;
+	}
 	nbytes = 0;
 	rate = 0;
     }

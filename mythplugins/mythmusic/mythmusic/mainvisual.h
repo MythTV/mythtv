@@ -74,6 +74,9 @@ public:
     void setVis( VisualBase *newvis );
     void setVisual( const QString &visualname );
 
+    QString getCurrentVisual() const;
+    int numVisualizers() const;
+
     void add(Buffer *, unsigned long, int, int);
     void prepare();
 
@@ -112,6 +115,7 @@ private:
     bool playing;
     int fps;
 
+    QString current_visual_name;
     QStringList allowed_modes;
 };
 

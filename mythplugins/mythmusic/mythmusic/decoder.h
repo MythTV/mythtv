@@ -90,6 +90,13 @@ class Decoder : public QThread
 
     QString filename;
 
+    void getMetadataFromFilename(const QString filename, const QString regext,
+                                 QString &artist, QString &album,
+                                 QString &title, QString &genre, int &tracknum);
+
+    QString filename_format;
+    int ignore_id3;
+
   private:
     DecoderFactory *fctry;
 

@@ -1,0 +1,39 @@
+/* XPM */
+static const char * const uncategorized_pix[] = {
+/* width height num_colors chars_per_pixel */
+"    16    16       16            1",
+/* colors */
+". c #000000",
+"# c #808080",
+"a c #c0dcc0",
+"b c #553f55",
+"c c #555f55",
+"d c #aabfaa",
+"e c #d4bfaa",
+"f c #d4dfaa",
+"g c #ffbfaa",
+"h c #ffdfaa",
+"i c #2a0000",
+"j c #2a1f00",
+"k c #2a1f55",
+"l c #a0a0a4",
+"m c None",
+"n c #ffffff",
+/* pixels */
+"mmmmmmmmmmmmmmmm",
+"mmmmmmmmmmmmmmmm",
+"m....mmmmmmmmmmm",
+".nnna#.........m",
+".nnnn.fhffhfffe.",
+".....fhagflhffe.",
+".hffhfgfkjjfefe.",
+".ffgahah.jiafee.",
+".hehfgahjaahfhe.",
+".fhahabcjehaehe.",
+".aheh#j.jgahhae.",
+".hahf#jjcafhhge.",
+".fgahecbfhgaahe.",
+".eeeeeeeedeegde.",
+"#..............#",
+"mmmmmmmmmmmmmmmm"
+};

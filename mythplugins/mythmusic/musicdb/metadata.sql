@@ -22,6 +22,7 @@ CREATE TABLE musicplaylist
 (
     playlistid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
     name VARCHAR(128) NOT NULL,
+    hostname VARCHAR(255),
     songlist TEXT NOT NULL
 );
  

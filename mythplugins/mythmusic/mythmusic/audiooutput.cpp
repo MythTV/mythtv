@@ -6,6 +6,7 @@
 
 #include <qobject.h>
 #include <qapplication.h>
+#include <qdatetime.h>
 #include "audiooutput.h"
 #include "constants.h"
 #include "buffer.h"
@@ -135,8 +136,35 @@ void AudioOutput::reset()
 {
     if (audio_fd > 0) {
 	close(audio_fd);
-	audio_fd = -1;
     }
+
+    QTime curtime = QTime::currentTime();
+    curtime = curtime.addSecs(2);
+
+    while(-1 == (audio_fd = open(audio_device, O_WRONLY | O_NONBLOCK)))
+    {
+        if (errno == EBUSY)
+        {
+            error(QString("AudioOutput: something is currently using "
+                          "'%1'.  Fix this, then run mythmusic again.\n")
+                .arg(audio_device));
+            return;
+        }
+
+        if (errno != EAGAIN && errno != EINTR)
+            perror("open");
+
+        if (QTime::currentTime() > curtime)
+        {
+            error(QString("AudioOutput: timed-out opening '%1'.")
+                .arg(audio_device));
+            return;
+        }
+
+        usleep(50);
+    }
+
+    close(audio_fd);
 
     audio_fd = open(audio_device, O_WRONLY, 0);
 
