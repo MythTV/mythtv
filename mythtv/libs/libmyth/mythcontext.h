@@ -141,7 +141,7 @@ class MythPrivRequest
 };
 
 #define MYTH_BINARY_VERSION "0.17.20050223-1"
-#define MYTH_PROTO_VERSION "14"
+#define MYTH_PROTO_VERSION "15"
 
 extern int print_verbose_messages;
 
