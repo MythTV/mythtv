@@ -17,6 +17,8 @@ setting.extra = -ldconfig
 INSTALLS += setting
 
 INCLUDEPATH += ../../libs/libNuppelVideo ../../libs/libmythtv ../../libs
+DEPENDPATH += ../../libs/libNuppelVideo ../../libs/libmythtv ../../libs/libmyth
+DEPENDPATH += ../../libs/libavcodec
 
 LIBS += -L../../libs/libmythtv -L../../libs/libNuppelVideo 
 LIBS += -L../../libs/libavcodec -L../../libs/libmyth

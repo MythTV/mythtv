@@ -9,6 +9,7 @@ CONFIG += thread staticlib
 include ( ../../settings.pro )
 
 INCLUDEPATH += ../
+DEPENDPATH += ../libmyth
 
 QMAKE_CXXFLAGS_RELEASE += `freetype-config --cflags`
 QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`

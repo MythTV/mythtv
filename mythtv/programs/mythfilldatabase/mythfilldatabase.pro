@@ -14,5 +14,7 @@ INSTALLS = target
 INCLUDEPATH += ../../libs/
 LIBS += -lmyth-$$LIBVERSION -lXinerama -L../../libs/libmyth -L/usr/local/lib
 
+DEPENDPATH += ../../libs/libmyth
+
 # Input
 SOURCES += filldata.cpp

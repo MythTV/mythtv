@@ -49,8 +49,10 @@ extern pthread_mutex_t avcodeclock;
 #define wsReturn        0x0d + 256
 
 
-NuppelVideoPlayer::NuppelVideoPlayer(void)
+NuppelVideoPlayer::NuppelVideoPlayer(MythContext *context)
 {
+    m_context = context;
+
     playing = false;
     audiofd = -1;
     filename = "output.nuv";
@@ -250,7 +252,7 @@ void NuppelVideoPlayer::UnpauseAudio(void)
 void NuppelVideoPlayer::InitVideo(void)
 {
     char name[] = "MythTV"; 
-    videoOutput = new XvVideoOutput();
+    videoOutput = new XvVideoOutput(m_context);
     videoOutput->Init(video_width, video_height, name, name, MAXVBUFFER + 1, 
                       vbuffer, embedid);
     if (embedid > 0)

@@ -21,5 +21,8 @@ TARGETDEPS  = ../../libs/libNuppelVideo/libNuppelVideo.a
 TARGETDEPS += ../../libs/libmythtv/libmythtv.a
 TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 
+DEPENDPATH += ../../libs/libNuppelVideo ../../libs/libmythtv ../../libs/libmyth
+DEPENDPATH += ../../libs/libavcodec
+
 # Input
 SOURCES += main.cpp

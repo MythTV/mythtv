@@ -305,7 +305,7 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
 
     rbuffer = new RingBuffer(m_context, rec->pathname, false, true);
 
-    nvp = new NuppelVideoPlayer();
+    nvp = new NuppelVideoPlayer(m_context);
     nvp->SetRingBuffer(rbuffer);
     nvp->SetAsPIP();
     nvp->SetOSDFontName(m_context->GetSetting("OSDFont"), 

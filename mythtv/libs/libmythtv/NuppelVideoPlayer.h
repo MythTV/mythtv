@@ -38,7 +38,7 @@ class RemoteEncoder;
 class NuppelVideoPlayer
 {
  public:
-    NuppelVideoPlayer();
+    NuppelVideoPlayer(MythContext *context);
    ~NuppelVideoPlayer();
 
     void SetAsPIP(void) { disableaudio = disablevideo = true; }
@@ -77,8 +77,7 @@ class NuppelVideoPlayer
     long long GetFramesPlayed(void) { return framesPlayed; }
     void ResetFramesPlayed(void) { framesPlayed = 0; }
 
-    void SetRecorder(MythContext *context, RemoteEncoder *recorder) 
-                    { m_context = context; nvr_enc = recorder; }
+    void SetRecorder(RemoteEncoder *recorder) { nvr_enc = recorder; }
 
     OSD *GetOSD(void) { return osd; }
 

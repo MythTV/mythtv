@@ -448,7 +448,7 @@ char *TVRec::GetScreenGrab(ProgramInfo *rcinfo, int secondsin, int &bufferlen,
 
     RingBuffer *tmprbuf = new RingBuffer(context, filename, false);
 
-    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer();
+    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer(context);
     nupvidplay->SetRingBuffer(tmprbuf);
     nupvidplay->SetAudioSampleRate(context->GetNumSetting("AudioSampleRate"));
     char *retbuf = nupvidplay->GetScreenGrab(secondsin, bufferlen, video_width,

@@ -11,5 +11,7 @@ include ( ../settings.pro )
 INCLUDEPATH += ../libs/
 LIBS += -lmyth-$$LIBVERSION -lmythtv -lXinerama -L../libs/libmyth -L../libs/libmythtv -L/usr/local/lib
 
+DEPENDPATH += ../../libs/libmyth
+
 # Input
 SOURCES += main.cpp

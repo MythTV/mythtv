@@ -10,7 +10,7 @@ include ( ../../settings.pro )
 
 INCLUDEPATH += ../libNuppelVideo ../
 TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a
-DEPENDPATH += ../libmythtv ../libNuppelVideo
+DEPENDPATH += ../libmyth ../libNuppelVideo
 
 installfiles.path = $${PREFIX}/share/mythtv
 installfiles.files = FreeSans.ttf

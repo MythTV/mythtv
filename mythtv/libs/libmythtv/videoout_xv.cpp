@@ -15,7 +15,7 @@
 using namespace std;
 
 #include "XJ.h"
-#include "../libmyth/oldsettings.h"
+#include "../libmyth/mythcontext.h"
 #include "../libmyth/util.h"
 
 #include <X11/keysym.h>
@@ -56,8 +56,9 @@ int XJ_error_catcher(Display * d, XErrorEvent * xeev)
   return 0;
 }
 
-XvVideoOutput::XvVideoOutput(void)
+XvVideoOutput::XvVideoOutput(MythContext *context)
 {
+    m_context = context;
     XJ_started = 0; 
     xv_port = -1; 
     scratchspace = NULL; 
@@ -132,19 +133,14 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     data->XJ_screen = DefaultScreenOfDisplay(data->XJ_disp);
     XJ_screen_num = DefaultScreen(data->XJ_disp);
 
-    char *prefix = (char *)PREFIX;
+    QString HorizScanMode = m_context->GetSetting("HorizScanMode", "overscan");
+    QString VertScanMode = m_context->GetSetting("VertScanMode", "overscan");
 
-    Settings *settings = new Settings();
-    settings->LoadSettingsFiles(QString("settings.txt"), QString(prefix));
-
-    QString HorizScanMode = settings->GetSetting("HorizScanMode", "overscan");
-    QString VertScanMode = settings->GetSetting("VertScanMode", "overscan");
-
-    img_hscanf = settings->GetNumSetting("HorizScanPercentage", 5) / 100.0;
-    img_vscanf = settings->GetNumSetting("VertScanPercentage",5) / 100.0;
+    img_hscanf = m_context->GetNumSetting("HorizScanPercentage", 5) / 100.0;
+    img_vscanf = m_context->GetNumSetting("VertScanPercentage",5) / 100.0;
    
-    img_xoff = settings->GetNumSetting("xScanDisplacement", 0);
-    img_yoff = settings->GetNumSetting("yScanDisplacement",0);
+    img_xoff = m_context->GetNumSetting("xScanDisplacement", 0);
+    img_yoff = m_context->GetNumSetting("yScanDisplacement",0);
 
 
     if (VertScanMode == "underscan") 
@@ -159,10 +155,8 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     printf("Over/underscanning. V: %f, H: %f, XOff: %d, YOff: %d\n", 
            img_vscanf, img_hscanf, img_xoff, img_yoff);
 
-    delete settings;
-
-    XJ_white=XWhitePixel(data->XJ_disp, XJ_screen_num);
-    XJ_black=XBlackPixel(data->XJ_disp, XJ_screen_num);
+    XJ_white = XWhitePixel(data->XJ_disp, XJ_screen_num);
+    XJ_black = XBlackPixel(data->XJ_disp, XJ_screen_num);
   
     XJ_fullscreen = 0;
   

@@ -474,9 +474,9 @@ void TV::SetupPlayer(void)
     }
 
     QString filters = "";
-    nvp = new NuppelVideoPlayer();
+    nvp = new NuppelVideoPlayer(m_context);
     nvp->SetRingBuffer(prbuffer);
-    nvp->SetRecorder(m_context, recorder);
+    nvp->SetRecorder(recorder);
     nvp->SetOSDFontName(m_context->GetSetting("OSDFont"), 
                         m_context->GetInstallPrefix()); 
     nvp->SetOSDThemeName(m_context->GetSetting("OSDTheme"));
