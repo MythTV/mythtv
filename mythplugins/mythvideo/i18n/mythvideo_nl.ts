@@ -483,15 +483,15 @@
     </message>
     <message>
         <source>INFO - Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO - Actie Menu</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Omhoog/Omlaag, Pagina Op/Neer: Blader  MENU: Opties INFO: Actie Menu</translation>
     </message>
     <message>
         <source>Play File After This:</source>
-        <translation type="unfinished"></translation>
+        <translation>Speel vervolgens dit bestand:</translation>
     </message>
 </context>
 <context>

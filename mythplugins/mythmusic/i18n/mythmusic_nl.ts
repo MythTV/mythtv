@@ -11,27 +11,27 @@
     </message>
     <message>
         <source>Clear the Active Play Queue</source>
-        <translation>Maak Actieve Afspeellijst leeg</translation>
+        <translation>Maak Actieve Speellijst leeg</translation>
     </message>
     <message>
         <source>Save Back to Playlist Tree</source>
-        <translation>Sla op in Afspeellijst</translation>
+        <translation>Sla op in Speellijst</translation>
     </message>
     <message>
         <source>Move to Active Play Queue</source>
-        <translation>Verplaats naar Actieve Afspeellijst</translation>
+        <translation>Verplaats naar Actieve Speellijst</translation>
     </message>
     <message>
         <source>Delete This Playlist</source>
-        <translation>Verwijder deze Afspeellijst</translation>
+        <translation>Verwijder deze Speellijst</translation>
     </message>
     <message>
         <source>Rename This Playlist</source>
-        <translation>Hernoem deze Afspeellijst</translation>
+        <translation>Hernoem deze Speellijst</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation>Actieve Afspeellijst</translation>
+        <translation>Actieve Speellijst</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -75,11 +75,11 @@
     </message>
     <message>
         <source>Create Audio CD from Playlist</source>
-        <translation>Maak Audio-CD van Afspeellijst</translation>
+        <translation>Maak Audio-CD van Speellijst</translation>
     </message>
     <message>
         <source>Create MP3 CD from Playlist</source>
-        <translation>Maak MP3-CD van Afspeellijst</translation>
+        <translation>Maak MP3-CD van Speellijst</translation>
     </message>
     <message>
         <source>Clear CD-RW Disk</source>
@@ -91,19 +91,19 @@
     </message>
     <message>
         <source>Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Uitvoerder:</translation>
     </message>
     <message>
         <source>Album:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Album:</translation>
     </message>
     <message>
         <source>Title:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <source>Length:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Lengte:</translation>
     </message>
     <message>
         <source>Genre: </source>
@@ -174,7 +174,7 @@
     </message>
     <message>
         <source>Edit Playlist</source>
-        <translation type="obsolete">Wijzig Afspeellijst</translation>
+        <translation type="obsolete">Wijzig Speellijst</translation>
     </message>
     <message>
         <source>Visualize</source>
@@ -182,7 +182,7 @@
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Wijzig Afspeellijst</translation>
+        <translation type="obsolete">3 Wijzig Speellijst</translation>
     </message>
     <message>
         <source>4 Visualize</source>
@@ -225,111 +225,111 @@
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="unfinished">Wijzig Afspeellijst</translation>
+        <translation>Wijzig Speellijst</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="unfinished">Visuele Effecten</translation>
+        <translation>Visuele Effecten</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Wijzig Afspeellijst</translation>
+        <translation>3 Wijzig Speellijst</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation type="unfinished">4 Visuele Effecten</translation>
+        <translation>4 Weergave</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Mengen: Slim</translation>
+        <translation>1 Mengen: Slim</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation type="unfinished">Mengen: Slim</translation>
+        <translation>Mengen: Slim</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Mengen: Willekeurig</translation>
+        <translation>1 Mengen: Willek.</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation type="unfinished">Mengen: Willekeurig</translation>
+        <translation>Mengen: Willek.</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Mengen: Uit</translation>
+        <translation>1 Mengen: Uit</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="unfinished">Mengen: Uit</translation>
+        <translation>Mengen: Uit</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Herhalen: Alles</translation>
+        <translation>2 Herhalen: Alles</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="unfinished">Herhalen: Alles</translation>
+        <translation>Herhalen: Alles</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Herhalen: Nummer</translation>
+        <translation>2 Herhalen: Nummer</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="unfinished">Herhalen: Nummer</translation>
+        <translation>Herhalen: Nummer</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Herhalen: Geen</translation>
+        <translation>2 Herhalen: Geen</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="unfinished">Herhalen: Geen</translation>
+        <translation>Herhalen: Geen</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="unfinished">afspeellijst root</translation>
+        <translation>afspeellijst root</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="unfinished">Bezig afspelen stream.</translation>
+        <translation>Bezig met afspelen.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="unfinished">Bezig bufferen stream.</translation>
+        <translation>Bezig bufferen stream.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="unfinished">Stream gepauseerd.</translation>
+        <translation>Stream gepauseerd.</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation type="unfinished">kbps</translation>
+        <translation>kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="unfinished">kHz</translation>
+        <translation>kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished">kan</translation>
+        <translation>kan</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="unfinished">Uitvoerfout.</translation>
+        <translation>Afspeelfout.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="unfinished">Stream gestopt.</translation>
+        <translation>Stream gestopt.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="unfinished">Stream afgespeeld.</translation>
+        <translation>Stream afgespeeld.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="unfinished">Decodeerfout.</translation>
+        <translation>Decodeerfout.</translation>
     </message>
     <message>
         <source>Smart playlists</source>
@@ -769,11 +769,11 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation>Actieve Afspeellijst</translation>
+        <translation>Actieve Speellijst</translation>
     </message>
     <message>
         <source>Active Play Queue (%1)</source>
-        <translation>Actieve Afspeellijst (%1)</translation>
+        <translation>Actieve Speellijst (%1)</translation>
     </message>
     <message>
         <source>Something is Wrong</source>
@@ -1188,51 +1188,51 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>Track Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informatie Over Nummer</translation>
     </message>
     <message>
         <source>Artist:</source>
-        <translation type="unfinished"></translation>
+        <translation>Uitvoerder:</translation>
     </message>
     <message>
         <source>Album:</source>
-        <translation type="unfinished"></translation>
+        <translation>Album:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jaar:</translation>
     </message>
     <message>
         <source>Track No.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Track nr.:</translation>
     </message>
     <message>
         <source>Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Waardering:</translation>
     </message>
     <message>
         <source>Play Count:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aantal Maal Gespeeld:</translation>
     </message>
     <message>
         <source>Last Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>Laatst Gespeeld:</translation>
     </message>
     <message>
         <source>Compilation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Compilatie:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestandsnaam:</translation>
     </message>
 </context>
 </TS>
