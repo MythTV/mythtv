@@ -12,6 +12,9 @@
 #include <math.h>
 #include <qdom.h>
 
+#include <iostream>
+using namespace std;
+
 #include "themedmenu.h"
 #include "mythcontext.h"
 

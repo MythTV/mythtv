@@ -10,6 +10,9 @@
 #include "frequencies.h"
 #include "tv.h"
 
+#include <iostream>
+using namespace std;
+
 Channel::Channel(TV *parent, const QString &videodevice)
 {
     device = videodevice;

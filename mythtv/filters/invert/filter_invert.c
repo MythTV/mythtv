@@ -36,7 +36,10 @@ int invert(VideoFilter *vf, Frame *frame)
     size = frame->width*3/2 * frame->height;
 
   while(size--)
-    *buf = 255 - *(buf++);
+  {
+    *buf = 255 - (*buf);
+    buf++;
+  }
 
   return 0;
 }

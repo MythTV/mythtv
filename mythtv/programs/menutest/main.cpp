@@ -2,6 +2,9 @@
 #include <qsqldatabase.h>
 #include <unistd.h>
 
+#include <iostream>
+using namespace std;
+
 #include "mythcontext.h"
 #include "themedmenu.h"
 
