@@ -1466,7 +1466,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     initPopup(popup, program, message1, message2);
 
     QString tmpmessage;
-    const char *tmpslot;
+    const char *tmpslot = NULL;
 
     if ((types == EndOfRecording || types == DeleteRecording) &&
         (program->subtitle != "" && program->description != ""))

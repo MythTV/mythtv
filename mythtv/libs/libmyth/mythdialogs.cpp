@@ -80,6 +80,8 @@ struct MHData
 class MythMainWindowPrivate
 {
   public:
+    int TranslateKeyNum(QKeyEvent *e);
+
     float wmult, hmult;
     int screenwidth, screenheight;
     int xbase, ybase;
@@ -98,6 +100,30 @@ class MythMainWindowPrivate
 
     int escapekey;
 };
+
+// Make keynum in QKeyEvent be equivalent to what's in QKeySequence
+int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
+{
+    int keynum = e->key();
+
+    if (keynum != Qt::Key_Escape &&
+        (keynum <  Qt::Key_Shift || keynum > Qt::Key_ScrollLock))
+    {
+        Qt::ButtonState modifiers;
+        // if modifiers have been pressed, rebuild keynum
+        if ((modifiers = e->state()) != 0)
+        {
+            int modnum = ((modifiers & Qt::ShiftButton) ? Qt::SHIFT : 0) |
+                         ((modifiers & Qt::ControlButton) ? Qt::CTRL : 0) |
+                         ((modifiers & Qt::MetaButton) ? Qt::META : 0) |
+                         ((modifiers & Qt::AltButton) ? Qt::ALT : 0);
+            modnum &= ~Qt::UNICODE_ACCEL;
+            return (keynum |= modnum);
+        }
+    }
+
+    return keynum;
+}
 
 MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
               : QDialog(parent, name, modal)
@@ -254,7 +280,7 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
                                        QKeyEvent *e, QStringList &actions)
 {
     actions = QStringList();
-    int keynum = e->key();
+    int keynum = d->TranslateKeyNum(e);
 
     if (d->jumpMap.count(keynum) > 0 && d->exitmenucallback == NULL)
     {
