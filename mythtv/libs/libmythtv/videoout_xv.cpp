@@ -402,14 +402,14 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
         XJ_screenwidth = display_res->Width();
         XJ_screenheight = display_res->Height();
     }
-#ifndef QWS
     else
     {
-        GetMythTVGeometry(data->XJ_disp, XJ_screen_num,
-                          &XJ_screenx, &XJ_screeny, 
-                          &XJ_screenwidth, &XJ_screenheight);
+        // Get default (possibly user selected) screen resolution from context
+        float wmult, hmult;
+
+        gContext->GetScreenSettings(XJ_screenx, XJ_screenwidth, wmult,
+                                    XJ_screeny, XJ_screenheight, hmult);
     }
-#endif
 
     old_handler = XSetErrorHandler(XJ_error_catcher);
     XSync(data->XJ_disp, 0);
