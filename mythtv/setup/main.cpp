@@ -79,8 +79,11 @@ void SetupMenuCallback(void* data, QString& selection) {
 }
 
 void SetupMenu(MythContext* context) {
-    QString theme = context->FindThemeDir("blue");
-    ThemedMenu* menu = new ThemedMenu(context, theme, "setup.xml");
+    QString theme = context->GetSetting("Theme");
+
+    ThemedMenu* menu = new ThemedMenu(context,
+                                      context->FindThemeDir(theme),
+                                      "setup.xml");
     menu->setCallback(SetupMenuCallback, context);
     menu->setKillable();
 
@@ -105,6 +108,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    context->SetSetting("ThemeQt", "1");
+    context->SetSetting("Theme", "blue");
     context->LoadQtConfig();
 
     char *home = getenv("HOME");
