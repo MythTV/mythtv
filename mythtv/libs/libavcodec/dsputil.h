@@ -33,9 +33,6 @@ extern const UINT8 ff_alternate_horizontal_scan[64];
 extern const UINT8 ff_alternate_vertical_scan[64];
 extern const UINT8 ff_zigzag_direct[64];
 
-/* permutation table */
-extern UINT8 permutation[64];
-
 /* pixel operations */
 #define MAX_NEG_CROP 384
 
