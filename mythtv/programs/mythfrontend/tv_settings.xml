@@ -29,11 +29,5 @@
       <action>SETTINGS RECORDING</action>
    </button>
 
-   <button>
-      <type>SETUP</type>
-      <text>Weather</text>
-      <action>SETTINGS WEATHER</action>
-   </button>
-
 </mythmenu>
 

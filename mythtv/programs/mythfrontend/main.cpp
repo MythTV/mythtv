@@ -135,9 +135,6 @@ void TVMenuCallback(void *data, QString &selection)
     } else if (sel == "settings epg") {
         EPGSettings settings;
         settings.exec(QSqlDatabase::database());
-    } else if (sel == "settings weather") {
-        WeatherSettings settings;
-        settings.exec(QSqlDatabase::database());
     }
 
 }
