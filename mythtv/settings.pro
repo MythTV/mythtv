@@ -1,7 +1,7 @@
 #CONFIG += debug
 CONFIG += release
 
-PREFIX = /usr
+PREFIX = /usr/local
 
 LIBVERSION = 0.8
 
