@@ -2414,10 +2414,6 @@ void clearOldDBEntries(void)
                      "DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY);",
                      kSingleRecord, kOverrideRecord, kDontRecord);
     query.exec(querystr);
-
-    querystr.sprintf("DELETE FROM recordoverride WHERE endtime < "
-                     "DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY);");
-    query.exec(querystr);
 }
 
 bool fillData(QValueList<Source> &sourcelist)

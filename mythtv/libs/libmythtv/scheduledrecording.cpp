@@ -341,9 +341,6 @@ void ScheduledRecording::remove(QSqlDatabase* db) {
     QString query = QString("DELETE FROM record WHERE recordid = %1")
                             .arg(getRecordID());
     db->exec(query);
-    query = QString("DELETE FROM recordoverride WHERE recordid = %1")
-                    .arg(getRecordID());
-    db->exec(query);
     query = QString("UPDATE recordid FROM recorded SET recordid = NULL "
                     "WHERE recordid = %1")
                     .arg(getRecordID());

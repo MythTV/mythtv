@@ -86,31 +86,6 @@ bool setupTVs(bool ismaster)
                 }
             } while (records_without_station.next());
         }
-
-        QSqlQuery overrides_without_station("SELECT recordoverride.recordid,"
-                " channel.callsign FROM recordoverride LEFT JOIN channel"
-                " ON recordoverride.chanid = channel.chanid"
-                " WHERE recordoverride.station='';");
-        if (overrides_without_station.first())
-        {
-            QSqlQuery update_override;
-            update_override.prepare("UPDATE recordoverride"
-                    " SET station = :CALLSIGN,"
-                    " starttime=starttime, endtime=endtime"
-                    " WHERE recordid = :RECORDID;");
-            do
-            {
-                update_override.bindValue(":CALLSIGN",
-                        overrides_without_station.value(1));
-                update_override.bindValue(":RECORDID",
-                        overrides_without_station.value(0));
-                if (!update_override.exec())
-                {
-                    MythContext::DBError("Updating recordoverride station",
-                            update_override.lastQuery());
-                }
-            } while (overrides_without_station.next());
-        }
     }
 
     query.exec("SELECT cardid,hostname FROM capturecard ORDER BY cardid;");
