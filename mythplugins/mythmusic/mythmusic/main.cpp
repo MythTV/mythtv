@@ -5,6 +5,7 @@ using namespace std;
 
 #include <qapplication.h>
 #include <qsqldatabase.h>
+#include <qregexp.h>
 #include <unistd.h>
 
 #include <cdaudio.h>
@@ -73,7 +74,14 @@ void CheckFile(MythContext *context, const QString &filename)
     }
 }
 
-typedef map<QString, bool> MusicLoadedMap;
+enum MusicFileLocation
+{
+    kFileSystem,
+    kDatabase,
+    kBoth
+};
+
+typedef map<QString, MusicFileLocation> MusicLoadedMap;
 
 void BuildFileList(MythContext *context, QString &directory,
                    MusicLoadedMap &music_files)
@@ -99,14 +107,13 @@ void BuildFileList(MythContext *context, QString &directory,
         if (fi->isDir())
             BuildFileList(context, filename, music_files);
         else
-            music_files[filename] = false;
+            music_files[filename] = kFileSystem;
     }
 }
 
 void SearchDir(MythContext *context, QString &directory)
 {
     MusicLoadedMap music_files;
-    MusicLoadedMap db_files;
     MusicLoadedMap::iterator iter;
 
     BuildFileList(context, directory, music_files);
@@ -121,20 +128,29 @@ void SearchDir(MythContext *context, QString &directory)
             QString name = query.value(0).toString();
             if (name != QString::null)
             {
-                db_files[name] = false;
                 if ((iter = music_files.find(name)) != music_files.end())
-                {
-                    (*iter).second = true;
-                }
+                    (*iter).second = kBoth;
+                else
+                    music_files[name] = kDatabase;
             }
         }
     }
 
+    QRegExp quote_regex("\"");
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
-        if ((*iter).second == false)
+        if ((*iter).second == kFileSystem)
         {
             CheckFile(context, (*iter).first);
+        }
+        else if ((*iter).second == kDatabase)
+        {
+            QString name((*iter).first);
+            name.replace(quote_regex, "\"\"");
+
+            QString querystr = QString("DELETE FROM musicmetadata WHERE "
+                                       "filename=\"%1\"").arg(name);
+            query.exec(querystr);
         }
     }
 }
