@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-01-21, v0.13.13
+  2004-01-24, v0.13.14
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -191,6 +191,8 @@
      20.30 My screen goes black when I try to play something.
      20.31 Poor performance with NVidia cards and XVMC.
      20.32 My computer is loading a media player application when I insert a CD or DVD.
+     20.33 I'm trying to use an analog capture card with NTSC and MythTV keeps switching to PAL.
+     20.34 My analog capture card has bad colors, large portions of screen green, etc.
 
   21. Miscellaneous.
      21.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -273,7 +275,6 @@
 
   See http://mysettopbox.tv <http://mysettopbox.tv> if you'd like to
   install a custom version of Knoppix optimized for MythTV.
-
 
 
   [1m3.  Checking prerequisites.[0m
@@ -4652,6 +4653,23 @@
 
 
 
+  [1m20.33.  I'm trying to use an analog capture card with NTSC and MythTV[0m
+  [1mkeeps switching to PAL.[0m
+
+  [1m20.34.  My analog capture card has bad colors, large portions of[0m
+  [1mscreen green, etc.[0m
+
+  MythTV v0.13 has a bug in it.  There are three ways to fix this issue:
+
+  +o  Run CVS rather than the 0.13 release.
+
+  +o  Execute the following in MySQL: UPDATE channel SET
+     tvformat='Default' WHERE tvformat='';
+
+  +o  Apply the patch located at
+     http://www.mythtv.org/mc/tvformat.fix.0.13.diff
+     <http://www.mythtv.org/mc/tvformat.fix.0.13.diff>
+
   [1m21.  Miscellaneous.[0m
 
   [1m21.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -4681,6 +4699,7 @@
   independently, and there is no rate control between them which means
   that the two programs don't coordinate their efforts to maintain
   synchronization.
+
 
 
   [1m21.1.1.  mythtranscode example[0m
@@ -4873,6 +4892,7 @@
   image inside the screen. Underscan is useful for computer monitors so
   that toolbars and scrollbars at the edges can be seen.
 
+
   For best results, match the X display area as close as possible to the
   edges of the physical screen. This can only be adjusted by your tv-out
   device or by the settings for the television set. Many sets have these
@@ -4893,6 +4913,7 @@
 
 
        $ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
+
 
 
   To restore: (assuming that you've dropped the database)
@@ -4999,8 +5020,8 @@
   the channel that has been removed:
 
 
-       $ mysql -u root mythconverg
-       mysql> delete from program where chanid = '1015';
+  $ mysql -u root mythconverg
+  mysql> delete from program where chanid = '1015';
 
 
 
@@ -5020,6 +5041,8 @@
 
   On the "slave" machine, you'll want to edit the /etc/fstab file and
   add something like:
+
+
        masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
 
 
@@ -5053,11 +5076,12 @@
   The following also works with blackbox:
 
 
-       $ cat > .xinitrc
-       xset -dpms s off &
-       irxevent &
-       mythfrontend &
-       blackbox
+
+  $ cat > .xinitrc
+  xset -dpms s off &
+  irxevent &
+  mythfrontend &
+  blackbox
 
 
 
@@ -5113,10 +5137,11 @@
   runlevels 3, 4 or 5:
 
 
-       $ su
-       # chkconfig --level 345 mythbackend on
-       # exit
-       $
+
+  $ su
+  # chkconfig --level 345 mythbackend on
+  # exit
+  $
 
 
 
@@ -5145,6 +5170,8 @@
        drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
        $
 
+
+
   [1m21.11.1.2.  Mandrake 9.x[0m
 
   Mandrake adds one more twist in the form of the msec utility, which
@@ -5169,10 +5196,11 @@
   may add it by typing:
 
 
-       $ cd contrib
-       $ su
-       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-       # exit
+
+  $ cd contrib
+  $ su
+  # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+  # exit
 
 
 
@@ -5206,6 +5234,8 @@
 
 
        # /etc/init.d/mythbackend stop
+
+
 
   To obtain a list of options:
 
@@ -5292,6 +5322,7 @@
   program under the host-specific settings: set the Transcoder Auto-run
   checkbox
 
+
   For either manual or automatic transcoding: start mythbackend start
   mythfrontend select setup, and the Transcoding recording profile.  now
   select either RTJPEG or MPEG-4 (selecting any of the hardware encoders
@@ -5321,7 +5352,7 @@
   you'll need to perform a sequence of steps.  There are a number of
   pieces of information that MythTV keeps track of which are tied to the
   hostname of the box, so changing the hostname involves altering the
-  name both in the operating system and in the MySQL database.  In the
+  name in the operating system and in the MySQL database.  In the
   examples below, the old name of the system was "frontend1" and we're
   going to change it to "kidsroom".
 
@@ -5329,12 +5360,13 @@
   break things.  You [4mMUST[24m use this indirect method.
 
   1.  Stop all backends.  If you run [1mmythbackend [22mfrom a terminal
-  session, then press control-c. If your backends are started with an
-  init script, you would do something like the following.
+  session, press control-c. If your backends are started with an init
+  script, you would do something like the following:
 
 
        $ su
        # /etc/init.d/mythbackend stop
+
 
 
   2.  Change the hostname.  For most distributions, edit the
@@ -5370,6 +5402,11 @@
 
 
 
+  If you don't feel comfortable using [1msed[22m, you can open the
+  mythtv_backup.sql file in a text editor and perform a global search
+  and replace.  When saving the file, make sure you use the new name,
+  mythtv_restore.sql or the rest of the steps below will fail.
+
   5.  Drop and recreate the database.
 
 
@@ -5397,13 +5434,17 @@
 
        # /etc/init.d/mythbackend start
 
+
+
   8.  Quit and restart all frontends.  Delete the mythtv_backup.sql and
-  mythtv_restore.sql
+  mythtv_restore.sql files.
 
 
   [1m22.  Example Configurations.[0m
 
   This section contains configurations which you may find useful.
+
+
 
   [1m22.1.  Hauppauge PVR-250/350 hardware MPEG-2 encoder.[0m
 
@@ -5460,14 +5501,13 @@
   The [1mivtvfwextract [22mprogram extracts the firmware required for the card.
   You may want to go to the Hauppauge website and download the latest
   Windows driver if the [1mwget [22mcommand fails.
+
   ivtv also needs to know how your kernel was compiled.  The default
   Makefile is not configured for the way Mandrake "does things".  At the
   top of the Makefile in the driver directory is a line like this:
 
 
        KERNELDIR= /lib/modules/$(KERNVER)/build
-
-
 
   edit it so that it looks like:
 
@@ -5521,15 +5561,14 @@
   that came with the card.
 
 
-  alias char-major-81     videodev
-  alias char-major-81-0   ivtv
-  alias char-major-61 lirc_i2c
-  options ivtv debug=1
-  options tuner type=2
-  options msp3400 once=1 simple=1
-  add below ivtv msp3400 saa7115 tuner
-  add above ivtv lirc_dev lirc_i2c
-
+       alias char-major-81     videodev
+       alias char-major-81-0   ivtv
+       alias char-major-61 lirc_i2c
+       options ivtv debug=1
+       options tuner type=2
+       options msp3400 once=1 simple=1
+       add below ivtv msp3400 saa7115 tuner
+       add above ivtv lirc_dev lirc_i2c
 
 
   [1mNOTE[22m:  You must specify the tuner type manually.  See
@@ -5537,6 +5576,21 @@
   tuner type=2 is a Phillips NTSC.  Use an appropriate tuner type for
   your system and video standard.  The debug=1 parameter on the ivtv
   line actually means less debugging output will be printed.
+
+  At this point we need to ensure that there are no other versions of
+  msp3400.o that would be loaded instead of the version that is created
+  by ivtv.  Note that in the command below we are using the backtick,
+  usually located on the same key as the tilde " " and not the single
+  quote.
+
+
+       $ su
+       # cd /lib/modules/`uname -r`
+       # pwd
+       /lib/modules/2.4.21-0.16mdk
+       # find . -name "msp3400*" | xargs rm -f
+
+
 
   Next, copy the files that were compiled in the driver directory into
   the appropriate modules directory:
@@ -5578,10 +5632,13 @@
   Check that the ivtv driver has created a new video device:
 
 
-       $ ls -l /dev/v4l/vi*
-       crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
-       crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
-       crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
+
+  $ ls -l /dev/v4l/vi*
+  crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
+  crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
+  crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
+
+
 
   In this case, the ivtv device is video0.
 
@@ -5646,7 +5703,6 @@
   right of the image.  If you have this issue, it's fairly obvious.
   This is a firmware issue, apparently.  There are two ways around this:
 
-
   1. Run at 720x480 resolution
 
   2. Turn off DNR
@@ -5699,7 +5755,6 @@
 
   Check to ensure that you don't have other versions of lirc modules and
   programs on your system:
-
 
 
   $ su

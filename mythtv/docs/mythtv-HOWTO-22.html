@@ -142,6 +142,20 @@ add above ivtv lirc_dev lirc_i2c
 example, <CODE>tuner type=2</CODE> is a Phillips NTSC.  Use an appropriate tuner
 type for your system and video standard.  The <CODE>debug=1</CODE> parameter on
 the ivtv line actually means less debugging output will be printed.</P>
+<P>At this point we need to ensure that there are no other versions of
+<CODE>msp3400.o</CODE> that would be loaded instead of the version that is
+created by ivtv.  Note that in the command below we are using the backtick,
+usually located on the same key as the tilde "&nbsp;" and not the single quote.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cd /lib/modules/`uname -r`
+# pwd
+/lib/modules/2.4.21-0.16mdk
+# find . -name "msp3400*" | xargs rm -f
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>Next, copy the files that were compiled in the driver directory into the
 appropriate modules directory:
 <BLOCKQUOTE><CODE>

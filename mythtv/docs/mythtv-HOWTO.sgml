@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-21, v0.13.13
+<date>2004-01-24, v0.13.14
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -192,8 +192,7 @@ with Linux, please see
 <tt>/usr/src/linux/Documentation/video4linux/bttv</tt> for a partial
 listing; even if your specific card is not listed, it may be that the vendor
 is actually using a standard reference design and placing their own name on
-it.  See the video4linux mailing list (<url
-url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
+it.  See the video4linux mailing list (<url url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
 name="https://listman.redhat.com/mailman/listinfo/video4linux-list">) for
 more information and for specific hardware questions.  
 
@@ -3721,6 +3720,15 @@ In KDE, you may want to perform the following:
 <tscreen><verb>
 $ rm ~/.kde/Autostart/Autorun.desktop
 </verb></tscreen>
+<sect1>I'm trying to use an analog capture card with NTSC and MythTV keeps switching to PAL.
+<sect1>My analog capture card has bad colors, large portions of screen green, etc.
+<p>MythTV v0.13 has a bug in it.  There are three ways to fix this
+issue:
+<itemize>
+<item>Run CVS rather than the 0.13 release.
+<item>Execute the following in MySQL: UPDATE channel SET tvformat='Default' WHERE tvformat='';
+<item>Apply the patch located at <url url="http://www.mythtv.org/mc/tvformat.fix.0.13.diff" name="http://www.mythtv.org/mc/tvformat.fix.0.13.diff">
+</itemize>
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.  
 <p>MythTV comes with a utility called <bf>mythtranscode</bf> which can
@@ -4298,7 +4306,7 @@ with the new as soon as it is no longer in use.
 <p>If you need to change the name of the computers used with MythTV you'll
 need to perform a sequence of steps.  There are a number of pieces of
 information that MythTV keeps track of which are tied to the hostname of the
-box, so changing the hostname involves altering the name both in the
+box, so changing the hostname involves altering the name in the
 operating system and in the MySQL database.  In the examples below, the old
 name of the system was "frontend1" and we're going to change it to
 "kidsroom".
@@ -4307,8 +4315,8 @@ name of the system was "frontend1" and we're going to change it to
 break things.  You <em>MUST</em> use this indirect method.
  
 1.  Stop all backends.  If you run <bf>mythbackend</bf> from a terminal
-session, then press control-c. If your backends are started with an init
-script, you would do something like the following.
+session, press control-c. If your backends are started with an init
+script, you would do something like the following:
 <tscreen><verb>
 $ su
 # /etc/init.d/mythbackend stop
@@ -4338,6 +4346,10 @@ typed on the same line:
 <tscreen><verb>
 $ cat mythtv_backup.sql | sed s/\'frontend1\'/\'kidsroom\'/ >> mythtv_restore.sql
 </verb></tscreen>
+If you don't feel comfortable using <bf>sed</bf>, you can open the
+<tt>mythtv_backup.sql</tt> file in a text editor and perform a global search
+and replace.  When saving the file, make sure you use the new name,
+<tt>mythtv_restore.sql</tt> or the rest of the steps below will fail.
 	
 5.  Drop and recreate the database.
 <tscreen><verb>
@@ -4363,7 +4375,7 @@ start them from terminal consoles.
 </verb></tscreen>
 
 8.  Quit and restart all frontends.  Delete the <tt>mythtv_backup.sql</tt>
-and <tt>mythtv_restore.sql</tt>
+and <tt>mythtv_restore.sql</tt> files.
 
 <sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
@@ -4481,6 +4493,18 @@ add above ivtv lirc_dev lirc_i2c
 example, <tt>tuner type=2</tt> is a Phillips NTSC.  Use an appropriate tuner
 type for your system and video standard.  The <tt>debug=1</tt> parameter on
 the ivtv line actually means less debugging output will be printed.
+
+At this point we need to ensure that there are no other versions of
+<tt>msp3400.o</tt> that would be loaded instead of the version that is
+created by ivtv.  Note that in the command below we are using the backtick,
+usually located on the same key as the tilde "~" and not the single quote.
+<tscreen><verb>
+$ su
+# cd /lib/modules/`uname -r`
+# pwd
+/lib/modules/2.4.21-0.16mdk
+# find . -name "msp3400*" | xargs rm -f
+</verb></tscreen>
 
 Next, copy the files that were compiled in the driver directory into the
 appropriate modules directory:
@@ -5050,6 +5074,9 @@ v0.13.13, 2004-01-21.  Remove incorrect keybindings from MythGallery; point
 at README instead.  Add pointer to PVR-250 compile about new i2c.  Make some
 path changes since the ivtv tarball doesn't have a double-nested ivtv
 directory like CVS used to.
+v0.13.14, 2004-01-24.  Add pointer to main mythtv page for PAL problems with
+release 0.13.  Add a little verbiage to the changing hostname instructions. 
+Explicit instructions on removing msp3400 during the ivtv compile.
 -->
 
 <!--

@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-21, v0.13.13
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-24, v0.13.14
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -184,6 +184,8 @@ necessary.</EM>
 <LI><A NAME="toc20.30">20.30</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.30">My screen goes black when I try to play something.</A>
 <LI><A NAME="toc20.31">20.31</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.31">Poor performance with NVidia cards and XVMC.</A>
 <LI><A NAME="toc20.32">20.32</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.32">My computer is loading a media player application when I insert a CD or DVD.</A>
+<LI><A NAME="toc20.33">20.33</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.33">I'm trying to use an analog capture card with NTSC and MythTV keeps switching to PAL.</A>
+<LI><A NAME="toc20.34">20.34</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.34">My analog capture card has bad colors, large portions of screen green, etc.</A>
 </UL>
 <P>
 <H2><A NAME="toc21">21.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s21">Miscellaneous. </A></H2>
@@ -4276,6 +4278,21 @@ $ rm ~/.kde/Autostart/Autorun.desktop
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<H2><A NAME="ss20.33">20.33</A> <A HREF="#toc20.33">I'm trying to use an analog capture card with NTSC and MythTV keeps switching to PAL.</A>
+</H2>
+
+<H2><A NAME="ss20.34">20.34</A> <A HREF="#toc20.34">My analog capture card has bad colors, large portions of screen green, etc.</A>
+</H2>
+
+<P>MythTV v0.13 has a bug in it.  There are three ways to fix this
+issue:
+<UL>
+<LI>Run CVS rather than the 0.13 release.</LI>
+<LI>Execute the following in MySQL: UPDATE channel SET tvformat='Default' WHERE tvformat='';</LI>
+<LI>Apply the patch located at 
+<A HREF="http://www.mythtv.org/mc/tvformat.fix.0.13.diff">http://www.mythtv.org/mc/tvformat.fix.0.13.diff</A></LI>
+</UL>
+</P>
 <H2><A NAME="s21">21.</A> <A HREF="#toc21">Miscellaneous. </A></H2>
 
 <H2><A NAME="ss21.1">21.1</A> <A HREF="#toc21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>
@@ -4901,15 +4918,15 @@ with the new as soon as it is no longer in use.</P>
 <P>If you need to change the name of the computers used with MythTV you'll
 need to perform a sequence of steps.  There are a number of pieces of
 information that MythTV keeps track of which are tied to the hostname of the
-box, so changing the hostname involves altering the name both in the
+box, so changing the hostname involves altering the name in the
 operating system and in the MySQL database.  In the examples below, the old
 name of the system was "frontend1" and we're going to change it to
 "kidsroom".</P>
 <P><B>NOTE</B>:  Changing the hostname using direct SQL update commands will
 break things.  You <EM>MUST</EM> use this indirect method.</P>
 <P>1.  Stop all backends.  If you run <B>mythbackend</B> from a terminal
-session, then press control-c. If your backends are started with an init
-script, you would do something like the following.
+session, press control-c. If your backends are started with an init
+script, you would do something like the following:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -4950,7 +4967,11 @@ typed on the same line:
 $ cat mythtv_backup.sql | sed s/\'frontend1\'/\'kidsroom\'/ >> mythtv_restore.sql
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
+
+If you don't feel comfortable using <B>sed</B>, you can open the
+<CODE>mythtv_backup.sql</CODE> file in a text editor and perform a global search
+and replace.  When saving the file, make sure you use the new name,
+<CODE>mythtv_restore.sql</CODE> or the rest of the steps below will fail.</P>
 <P>5.  Drop and recreate the database.
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -4980,7 +5001,7 @@ start them from terminal consoles.
 </CODE></BLOCKQUOTE>
 </P>
 <P>8.  Quit and restart all frontends.  Delete the <CODE>mythtv_backup.sql</CODE>
-and <CODE>mythtv_restore.sql</CODE></P>
+and <CODE>mythtv_restore.sql</CODE> files.</P>
 
 <H2><A NAME="s22">22.</A> <A HREF="#toc22">Example Configurations.</A></H2>
 
@@ -5113,6 +5134,20 @@ add above ivtv lirc_dev lirc_i2c
 example, <CODE>tuner type=2</CODE> is a Phillips NTSC.  Use an appropriate tuner
 type for your system and video standard.  The <CODE>debug=1</CODE> parameter on
 the ivtv line actually means less debugging output will be printed.</P>
+<P>At this point we need to ensure that there are no other versions of
+<CODE>msp3400.o</CODE> that would be loaded instead of the version that is
+created by ivtv.  Note that in the command below we are using the backtick,
+usually located on the same key as the tilde "&nbsp;" and not the single quote.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cd /lib/modules/`uname -r`
+# pwd
+/lib/modules/2.4.21-0.16mdk
+# find . -name "msp3400*" | xargs rm -f
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>Next, copy the files that were compiled in the driver directory into the
 appropriate modules directory:
 <BLOCKQUOTE><CODE>

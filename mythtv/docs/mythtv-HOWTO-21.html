@@ -637,15 +637,15 @@ with the new as soon as it is no longer in use.</P>
 <P>If you need to change the name of the computers used with MythTV you'll
 need to perform a sequence of steps.  There are a number of pieces of
 information that MythTV keeps track of which are tied to the hostname of the
-box, so changing the hostname involves altering the name both in the
+box, so changing the hostname involves altering the name in the
 operating system and in the MySQL database.  In the examples below, the old
 name of the system was "frontend1" and we're going to change it to
 "kidsroom".</P>
 <P><B>NOTE</B>:  Changing the hostname using direct SQL update commands will
 break things.  You <EM>MUST</EM> use this indirect method.</P>
 <P>1.  Stop all backends.  If you run <B>mythbackend</B> from a terminal
-session, then press control-c. If your backends are started with an init
-script, you would do something like the following.
+session, press control-c. If your backends are started with an init
+script, you would do something like the following:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -686,7 +686,11 @@ typed on the same line:
 $ cat mythtv_backup.sql | sed s/\'frontend1\'/\'kidsroom\'/ >> mythtv_restore.sql
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
+
+If you don't feel comfortable using <B>sed</B>, you can open the
+<CODE>mythtv_backup.sql</CODE> file in a text editor and perform a global search
+and replace.  When saving the file, make sure you use the new name,
+<CODE>mythtv_restore.sql</CODE> or the rest of the steps below will fail.</P>
 <P>5.  Drop and recreate the database.
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -716,7 +720,7 @@ start them from terminal consoles.
 </CODE></BLOCKQUOTE>
 </P>
 <P>8.  Quit and restart all frontends.  Delete the <CODE>mythtv_backup.sql</CODE>
-and <CODE>mythtv_restore.sql</CODE></P>
+and <CODE>mythtv_restore.sql</CODE> files.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-22.html">Next</A>
