@@ -24,6 +24,7 @@ using namespace std;
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
+#include <mythtv/mythmedia.h>
 
 void CheckFreeDBServerFile(void)
 {
@@ -354,6 +355,11 @@ void runMusicPlayback(void);
 void runMusicSelection(void);
 void runRipCD(void);
 
+void handleMedia(void) 
+{
+    mythplugin_run();
+}
+
 void setupKeys(void)
 {
     REG_JUMP("Play music", "", "", runMusicPlayback);
@@ -375,6 +381,8 @@ void setupKeys(void)
     REG_KEY("Music", "THMBUP", "Increase rating", "9");
     REG_KEY("Music", "THMBDOWN", "Decrease rating", "7");
     REG_KEY("Music", "REFRESH", "Refresh music tree", "8");
+
+    REG_MEDIA_HANDLER("MythMusic Media Handler", "", "", handleMedia, MEDIATYPE_AUDIO | MEDIATYPE_MIXED);
 }
 
 int mythplugin_init(const char *libversion)
