@@ -62,7 +62,7 @@ SREpisodesGroup::SREpisodesGroup(ScheduledRecording& _rec, ManagedList* _list, M
                   : ManagedListGroup(QObject::tr("Duplicate detection"), _group, _list, _parent, "depGroup")
 {
 
-    maxEpisodes = new SRMaxEpisodes(_rec, _list);
+    maxEpisodes = new SRMaxEpisodes(_rec, this, _list);
     addItem(maxEpisodes->getItem(), -1);
 
     connect(maxEpisodes->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
@@ -96,13 +96,13 @@ SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* 
                                        _parent, "schedOpts"),
                      schedRec(_rec)
 {
-    recPriority = new SRRecPriority(_rec, _parentList);
+    recPriority = new SRRecPriority(_rec, this, _parentList);
     addItem(recPriority->getItem(), -1);
 
-    startOffset = new SRStartOffset(_rec, _parentList);
+    startOffset = new SRStartOffset(_rec, this, _parentList);
     addItem(startOffset->getItem());
 
-    endOffset = new SREndOffset(_rec, _parentList);
+    endOffset = new SREndOffset(_rec, this, _parentList);
     addItem(endOffset->getItem());
 
     dupMethItem = new SRDupMethod(_rec, _parentList, this);
@@ -164,7 +164,7 @@ SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedLi
     autoExpire = new SRAutoExpire(_rec, this, parentList);
     addItem(autoExpire->getItem(), -1);
 
-    maxEpisodes = new SRMaxEpisodes(_rec, _parentList);
+    maxEpisodes = new SRMaxEpisodes(_rec, this, _parentList);
     addItem(maxEpisodes->getItem(), -1);
 
     connect(maxEpisodes->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));

@@ -135,23 +135,36 @@ void IntegerManagedListItem::syncTextToValue()
 }
 
 
-
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // BoundedIntegerListItem
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(int minValIn, int maxValIn, int _bigStep, int stepIn, ManagedList* pList,
+BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(int _minVal, int _maxVal, int _bigStep,
+                                                             int _step, ManagedListGroup* _group,
+                                                             ManagedList* _list,
                                                              QObject* _parent, const char* _name)
-                             : IntegerManagedListItem(_bigStep, stepIn, pList, _parent, _name)
+                             : SelectManagedListItem("", _group,  _list, _parent, _name)
 {
-    minVal = minValIn;
-    maxVal = maxValIn;
-    setValue(0);
+    step = _step;
+    bigStep = _bigStep;
+    minVal = _minVal;
+    maxVal = _maxVal;
+//    setValue(0);
 }
 
+
+void BoundedIntegerManagedListItem::setTemplates(const QString& negStr, const QString& negOneStr,
+                                                 const QString& zeroStr,
+                                                 const QString& oneStr, const QString& posStr)
+{
+    negTemplate = negStr;
+    negOneTemplate = negOneStr;
+    posTemplate = posStr;
+    posOneTemplate = oneStr;
+    zeroTemplate = zeroStr;
+    generateList();
+}
 
 void BoundedIntegerManagedListItem::setValue(int val)
 {
@@ -160,9 +173,45 @@ void BoundedIntegerManagedListItem::setValue(int val)
     else if ( val < minVal)
         val = minVal;
 
-    IntegerManagedListItem::setValue(val);
+    SelectManagedListItem::setValue(QString::number(val));
 }
 
+void BoundedIntegerManagedListItem::generateList()
+{
+    for (int i = minVal; i <= maxVal; i++)
+    {
+        addSelection( numericToString(i), QString::number(i), false);
+    }
+
+}
+
+
+QString BoundedIntegerManagedListItem::numericToString(int v)
+{
+    QString str;
+    if (v == 0)
+    {
+        ASSIGN_TEMPLATE(zeroTemplate, str, v)
+    }
+    else if (v == 1)
+    {
+        ASSIGN_TEMPLATE(posOneTemplate, str, v);
+    }
+    else if (v == -1)
+    {
+        ASSIGN_TEMPLATE(negOneTemplate, str, v);
+    }
+    else if (v > 0)
+    {
+        ASSIGN_TEMPLATE(posTemplate, str, v);
+    }
+    else
+    {
+        ASSIGN_TEMPLATE(negTemplate, str, v);
+    }
+
+    return str;
+}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

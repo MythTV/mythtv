@@ -130,8 +130,10 @@ class SRBoundedIntegerSetting : public BoundedIntegerManagedListSetting
 {
     public:
         SRBoundedIntegerSetting(int _min, int _max, int _bigStep, int _step, ScheduledRecording& _parent,
-                                const QString& ItemName, QString _column, ManagedList* _parentList=NULL)
-            : BoundedIntegerManagedListSetting(_min, _max, _bigStep, _step, ItemName, "record", _column, _parentList),
+                                const QString& ItemName, QString _column, ManagedListGroup* _group,
+                                ManagedList* _parentList=NULL)
+            : BoundedIntegerManagedListSetting(_min, _max, _bigStep, _step, ItemName, "record",
+                                               _column, _group, _parentList),
               parent(_parent)
 
         {
@@ -202,12 +204,13 @@ class SRRecordingType : public SRSelectSetting
 class SRStartOffset : public SRBoundedIntegerSetting
 {
     public:
-        SRStartOffset(ScheduledRecording& _parent, ManagedList* _list)
-                     : SRBoundedIntegerSetting( -120, 120, 10, 1, _parent, "startoffsetList", "startoffset", _list)
+        SRStartOffset(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+                     : SRBoundedIntegerSetting( -120, 120, 10, 1, _parent, "startoffsetList", "startoffset",
+                                                _group, _list)
         {
-            setTemplates("Start recording %1 minutes late", "Start recording %1 minute late", "Start recording on time",
-                         "Start recording %1 minute early", "Start recording %1 minutes early");
-            setShortTemplates(" %1 minutes late", " %1 minute late", "on time", " %1 minute early", " %1 minutes early");
+            setTemplates("Start recording %1 minutes late", "Start recording %1 minute late",
+                         "Start recording on time", "Start recording %1 minute early",
+                         "Start recording %1 minutes early");
 
             _parent.setStartOffsetObj(this);
         }
@@ -218,12 +221,13 @@ class SRStartOffset : public SRBoundedIntegerSetting
 class SREndOffset : public SRBoundedIntegerSetting
 {
     public:
-        SREndOffset(ScheduledRecording& _parent, ManagedList* _list)
-                     : SRBoundedIntegerSetting( -120, 240, 10, 1, _parent, "endoffsetList", "endoffset", _list)
+        SREndOffset(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+                     : SRBoundedIntegerSetting( -120, 240, 10, 1, _parent, "endoffsetList", "endoffset",
+                                                _group, _list)
         {
-            setTemplates("End recording %1 minutes early", "End recording %1 minute early", "End recording on time",
-                         "End recording %1 minute late", "End recording %1 minutes late");
-            setShortTemplates("%1 minutes early", "%1 minute early", "on time", "%1 minute late", "%1 minutes late");
+            setTemplates("End recording %1 minutes early", "End recording %1 minute early",
+                         "End recording on time", "End recording %1 minute late",
+                         "End recording %1 minutes late");
 
             _parent.setEndOffsetObj(this);
         }
@@ -499,7 +503,8 @@ class SRMaxNewest: public SRBoolSetting
     public:
         SRMaxNewest(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
                    : SRBoolSetting(_parent, "Delete oldest if this recording exceedes the max episodes",
-                                   "Don't record if this would exceed the max episodes", "maxnewestItem", "maxnewest", _group, _list )
+                                   "Don't record if this would exceed the max episodes", "maxnewestItem",
+                                   "maxnewest", _group, _list )
         {
             setValue(false);
             _parent.setMaxNewestObj(this);
@@ -512,11 +517,11 @@ class SRMaxNewest: public SRBoolSetting
 class SRMaxEpisodes : public SRBoundedIntegerSetting
 {
     public:
-    SRMaxEpisodes(ScheduledRecording& _parent, ManagedList* _list)
-                 : SRBoundedIntegerSetting( 0, 100, 5, 1, _parent, "maxepisodesList", "maxepisodes", _list)
+    SRMaxEpisodes(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+                 : SRBoundedIntegerSetting( 0, 100, 5, 1, _parent, "maxepisodesList", "maxepisodes",
+                                            _group, _list)
     {
         setTemplates("", "", "No episode limit", "Keep only one episode.", "Keep at most %1 episodes");
-        setShortTemplates("", "", "No episode limit", "one episode", "%1 episodes");
         _parent.setMaxEpisodesObj(this);
     }
 };
@@ -554,8 +559,9 @@ class SREpisodesGroup : public ManagedListGroup
 class SRRecPriority: public SRBoundedIntegerSetting
 {
     public:
-        SRRecPriority(ScheduledRecording& _parent, ManagedList* _list)
-                    : SRBoundedIntegerSetting( -99, 99, 5, 1, _parent, "recpriorityList", "recpriority", _list)
+        SRRecPriority(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+                    : SRBoundedIntegerSetting( -99, 99, 5, 1, _parent, "recpriorityList", "recpriority",
+                                               _group, _list)
         {
             setTemplates( "Reduce priority by %1", "Reduce priority by %1", "Normal recording priority",
                           "Raise priority by %1", "Raise priority by %1" );

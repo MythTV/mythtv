@@ -115,12 +115,13 @@ class IntegerManagedListItem : public ManagedListItem
     Q_OBJECT
 
     public:
-        IntegerManagedListItem(int bigStepAmt = 10, int stepAmt=1,  ManagedList* parentList=NULL, QObject* _parent=NULL,
-                               const char* _name=0);
-        void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr, const QString& oneStr,
-                          const QString& posStr);
-        void setShortTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr, const QString& oneStr,
-                          const QString& posStr);
+        IntegerManagedListItem(int bigStepAmt = 10, int stepAmt=1,  ManagedList* parentList=NULL,
+                               QObject* _parent=NULL, const char* _name=0);
+        void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
+                          const QString& oneStr, const QString& posStr);
+        void setShortTemplates(const QString& negStr, const QString& negOneStr,
+                               const QString& zeroStr, const QString& oneStr,
+                               const QString& posStr);
 
         int intValue() const { return valueText.toInt();}
 
@@ -157,28 +158,6 @@ class IntegerManagedListItem : public ManagedListItem
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// An IntegerManagedListItem with a minimum and maximum value.
-//
-class BoundedIntegerManagedListItem : public IntegerManagedListItem
-{
-    Q_OBJECT
-
-    public:
-        BoundedIntegerManagedListItem(int minValIn, int maxValIn, int _bigStep, int _step = 1, ManagedList* parentList=NULL,
-                                      QObject* _parent=NULL, const char* _name=0);
-
-        virtual void setValue(int val);
-
-        virtual bool hasLeft(){ return intValue() > minVal; }
-
-        virtual bool hasRight(){ return intValue() < maxVal; }
-
-    protected:
-        int maxVal;
-        int minVal;
-};
 
 
 
@@ -349,6 +328,58 @@ class BoolManagedListItem : public SelectManagedListItem
         QString trueLabel;
         QString falseLabel;
         bool initialValue;
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// An IntegerManagedListItem with a minimum and maximum value.
+//
+class BoundedIntegerManagedListItem : public SelectManagedListItem
+{
+    Q_OBJECT
+
+    public:
+        BoundedIntegerManagedListItem(int minValIn, int maxValIn, int _bigStep, int _step = 1,
+                                      ManagedListGroup* _group=NULL, ManagedList* parentList=NULL,
+                                      QObject* _parent=NULL, const char* _name=0);
+
+
+        virtual bool hasLeft() { return intValue() > minVal; }
+
+        virtual bool hasRight(){ return intValue() < maxVal; }
+
+        void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
+                          const QString& oneStr, const QString& posStr);
+
+        int intValue() const { return valueText.toInt();}
+
+        virtual void setValue(int newVal);
+
+        virtual void changeValue(int amount) { setValue(intValue() + amount); }
+
+
+        QString numericToString(int v);
+
+
+    public slots:
+        virtual void cursorLeft(bool page = false) { if (enabled) changeValue(page ? (0 - bigStep) : (0 - step)); }
+        virtual void cursorRight(bool page = false) { if (enabled) changeValue(page ? bigStep : step); }
+
+    protected:
+        void generateList();
+        int step;
+        int bigStep;
+        QString negTemplate;
+        QString negOneTemplate;
+        QString posTemplate;
+        QString posOneTemplate;
+        QString zeroTemplate;
+
+    protected:
+        int maxVal;
+        int minVal;
 };
 
 
@@ -544,10 +575,12 @@ class BoundedIntegerManagedListSetting : public ManagedListSetting
 {
     public:
         BoundedIntegerManagedListSetting(int _min, int _max, int _bigStep, int _step, const QString& ItemName,
-                                  QString _table, QString _column, ManagedList* _parentList=NULL)
+                                  QString _table, QString _column, ManagedListGroup* _group,
+                                  ManagedList* _parentList=NULL)
                             : ManagedListSetting(_table, _column, _parentList)
         {
-            BoundedIntegerListItem = new BoundedIntegerManagedListItem(_min, _max, _bigStep, _step, _parentList, this, ItemName);
+            BoundedIntegerListItem = new BoundedIntegerManagedListItem(_min, _max, _bigStep, _step,
+                                                                       _group, _parentList, this, ItemName);
             listItem = BoundedIntegerListItem;
             connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
         }
@@ -559,14 +592,6 @@ class BoundedIntegerManagedListSetting : public ManagedListSetting
         {
             BoundedIntegerListItem->setTemplates(negStr, negOneStr, zeroStr, oneStr, posStr);
         }
-
-        void setShortTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr, const QString& oneStr,
-                          const QString& posStr)
-        {
-            BoundedIntegerListItem->setShortTemplates(negStr, negOneStr, zeroStr, oneStr, posStr);
-        }
-
-        const QString& getShortText() const { return BoundedIntegerListItem->getShortText(); }
 
     protected:
         BoundedIntegerManagedListItem* BoundedIntegerListItem;
