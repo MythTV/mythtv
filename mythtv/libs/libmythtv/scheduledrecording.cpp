@@ -93,18 +93,15 @@ void ScheduledRecording::loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo)
 {
     m_pginfo = proginfo;
     
-    //query.exec( "SELECT count(previouslyshown) FROM program WHERE previouslyshown = 1;");
-    //if (query.isActive() && query.numRowsAffected() > 0)
-    
     if (proginfo->recordid)
         loadByID(db, proginfo->recordid);
     else
         setDefault(db, true);
+        
+
     
     if (search->intValue() == kNoSearch)
         setProgram(proginfo);
-        
-    
 }
 
 void ScheduledRecording::loadBySearch(QSqlDatabase *db,
@@ -156,10 +153,12 @@ void ScheduledRecording::loadBySearch(QSqlDatabase *db,
 
 void ScheduledRecording::fetchChannelInfo(QSqlDatabase *db)
 {
+    
     if (channel->getValue().toInt() > 0)
     {
-        QString queryStr(QString("SELECT channum, callsign, name FROM channel WHERE chanid = '%1';").arg(channel->getValue()));
-        
+        QString queryStr(QString("SELECT channum, callsign, name FROM channel "
+                                 "WHERE chanid = '%1';").arg(channel->getValue()));
+    
         QSqlQuery result = db->exec(queryStr);
         
         if (result.isActive() && result.numRowsAffected() > 0)
@@ -692,10 +691,11 @@ void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
     recgroup->setValue("Default");
 }
 
-void ScheduledRecording::setProgram(ProgramInfo *proginfo)
+void ScheduledRecording::setProgram(ProgramInfo *proginfo, QSqlDatabase* db)
 {
     m_pginfo = proginfo;
-    
+    if (proginfo)
+    {
         title->setValue(proginfo->title);
         subtitle->setValue(proginfo->subtitle);
         description->setValue(proginfo->description);
@@ -708,7 +708,10 @@ void ScheduledRecording::setProgram(ProgramInfo *proginfo)
         seriesid->setValue(proginfo->seriesid);
         programid->setValue(proginfo->programid);
         category->setValue(proginfo->category);
-
+    
+        if (db)
+            fetchChannelInfo(db);
+    }
 }
 
 void ScheduledRecording::makeOverride(void)

@@ -154,7 +154,7 @@ protected slots:
 
 protected:
     virtual void setDefault(QSqlDatabase *db, bool haschannel);
-    virtual void setProgram(ProgramInfo *proginfo);
+    virtual void setProgram(ProgramInfo *proginfo, QSqlDatabase *db = NULL);
     void fetchChannelInfo(QSqlDatabase *db);
     
     class ID: virtual public IntegerSetting,
