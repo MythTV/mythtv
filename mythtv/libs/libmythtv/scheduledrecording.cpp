@@ -246,7 +246,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
 "recordid "
 "FROM record "
 "WHERE "
-"record.title = '%1' "
+"record.title = \"%1\" "
 "AND "
 "((record.type = %2) " // allrecord
 " OR "

@@ -937,7 +937,7 @@ void ProgFinder::selectSearchData()
     {
         while (query.next())
         {
-		data = query.value(0).toString();
+		data = QString::fromUtf8(query.value(0).toString());
 
 		progData[listCount] = data;
 
@@ -1081,10 +1081,18 @@ void ProgFinder::getRecordingInfo()
 
 		curRecordings[recordingCount].chanid = query.value(0).toString();
 		curRecordings[recordingCount].startdatetime = recDateTime;
-		curRecordings[recordingCount].title = query.value(3).toString();
-		curRecordings[recordingCount].subtitle = query.value(4).toString();
-		curRecordings[recordingCount].description = query.value(5).toString();
+		curRecordings[recordingCount].title = QString::fromUtf8(query.value(3).toString());
+		curRecordings[recordingCount].subtitle = QString::fromUtf8(query.value(4).toString());
+		curRecordings[recordingCount].description = QString::fromUtf8(query.value(5).toString());
 		curRecordings[recordingCount].type = query.value(6).toInt();
+
+                if (curRecordings[recordingCount].title == QString::null)
+                    curRecordings[recordingCount].title = "";
+                if (curRecordings[recordingCount].subtitle == QString::null)
+                    curRecordings[recordingCount].subtitle = "";
+                if (curRecordings[recordingCount].description == QString::null)
+                    curRecordings[recordingCount].description = "";
+
 		recordingCount++;
 	}
     }
@@ -1107,7 +1115,7 @@ void ProgFinder::selectShowData(QString progTitle)
                        "WHERE program.title = \"%1\" AND program.chanid = channel.chanid "
 		       "AND program.starttime > %2 "
                        "ORDER BY program.subtitle;")
-                        .arg(progTitle).arg(progStart.toString("yyyyMMddhhmm50"));
+                        .arg(progTitle.utf8()).arg(progStart.toString("yyyyMMddhhmm50"));
 
     QSqlQuery query = m_db->exec(thequery);
 
@@ -1146,13 +1154,18 @@ void ProgFinder::selectShowData(QString progTitle)
 		showData[showCount].channelNum = query.value(2).toString();
 		showData[showCount].channelCallsign = query.value(3).toString();
 		showData[showCount].title = progTitle;
-		showData[showCount].subtitle = query.value(0).toString();
-		showData[showCount].description = query.value(4).toString();
+		showData[showCount].subtitle = QString::fromUtf8(query.value(0).toString());
+		showData[showCount].description = QString::fromUtf8(query.value(4).toString());
 		showData[showCount].channelID = query.value(6).toString();
 		showData[showCount].starttime = progStart.toString("yyyyMMddhhmm");
 		showData[showCount].endtime = progEnd.toString("yyyyMMddhhmm");
 		rectype = checkRecordingStatus(showCount);
 		showData[showCount].recording = rectype;
+
+                if (showData[showCount].subtitle == QString::null)
+                    showData[showCount].subtitle = "";
+                if (showData[showCount].description == QString::null)
+                    showData[showCount].description = "";
 
 		switch (rectype)
 		{
@@ -1176,7 +1189,7 @@ void ProgFinder::selectShowData(QString progTitle)
 		}
 		
 		showData[showCount].recText = data;
-		showData[showCount].description = showData[showCount].description;
+
 		/*
                 data = progStart.toString("ddd M/dd     h:mm ap") + "~" + 
 			progEnd.toString("hh:mm ap") + "~" +
@@ -1254,7 +1267,7 @@ void ProgFinder::getSearchData(int charNum)
     {
         while (query.next())
         {
-		data = query.value(0).toString();
+		data = QString::fromUtf8(query.value(0).toString());
 		
 		cnts++;
 		initData[startPlace + dataNum] = data;
@@ -1283,7 +1296,7 @@ void ProgFinder::getSearchData(int charNum)
     {
         while (query.next())
         {
-                data = query.value(0).toString();
+                data = QString::fromUtf8(query.value(0).toString());
 
 		cnts++;
                 initData[startPlace + dataNum] = data;
