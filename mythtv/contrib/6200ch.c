@@ -31,6 +31,8 @@
 #define DCT6200_VENDOR_ID1 0x00000ce5
 #define DCT6200_VENDOR_ID2 0x00000e5c
 #define DCT6200_VENDOR_ID3 0x00001225
+#define DCT6200_VENDOR_ID4 0x00000f9f
+#define DCT6200_VENDOR_ID5 0x00001180
 #define DCT6200_SPEC_ID    0x00005068
 #define DCT6200_SW_VERSION 0x00010101
 #define DCT6200_MODEL_ID1  0x0000620a
@@ -109,7 +111,9 @@ int main (int argc, char *argv[])
 		
       if ( ((dir.vendor_id == DCT6200_VENDOR_ID1) || 
             (dir.vendor_id == DCT6200_VENDOR_ID2) ||
-            (dir.vendor_id == DCT6200_VENDOR_ID3)) &&
+            (dir.vendor_id == DCT6200_VENDOR_ID3) ||
+            (dir.vendor_id == DCT6200_VENDOR_ID4) ||
+            (dir.vendor_id == DCT6200_VENDOR_ID5)) &&
            ((dir.model_id == DCT6200_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID2)) ) {
             if (dir.unit_spec_id != DCT6200_SPEC_ID)
