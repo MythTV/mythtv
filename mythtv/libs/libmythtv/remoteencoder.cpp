@@ -175,6 +175,14 @@ void RemoteEncoder::TriggerRecordingTransition(void)
     SendReceiveStringList(strlist);
 }
 
+void RemoteEncoder::StopPlaying(void)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "STOP_PLAYING";
+
+    SendReceiveStringList(strlist);
+}
+
 void RemoteEncoder::SetupRingBuffer(QString &path, long long &filesize,
                                     long long &fillamount, bool pip)
 {

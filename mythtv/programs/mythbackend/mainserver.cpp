@@ -611,6 +611,11 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         enc->TriggerRecordingTransition();
         retlist << "ok";
     }
+    else if (command == "STOP_PLAYING")
+    {
+        enc->StopPlaying();
+        retlist << "ok";
+    }
     else if (command == "SPAWN_LIVETV")
     {
         enc->SpawnLiveTV();

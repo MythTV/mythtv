@@ -133,6 +133,7 @@ void TVRec::StartRecording(ProgramInfo *rcinfo)
     {
         nextState = RemoveRecording(internalState);
         changeState = true;
+
         while (changeState)
             usleep(50);
     }
@@ -358,6 +359,14 @@ void TVRec::HandleStateChange(void)
         inoverrecord = false;
         internalState = nextState;
         changed = true;
+    }
+    else if (internalState == kState_WatchingRecording &&
+             nextState == kState_RecordingOnly)
+    {
+        internalState = nextState;
+        changed = true;
+
+        watchingLiveTV = false;
     }
     else if (internalState == kState_None && 
              nextState == kState_None)
@@ -1042,6 +1051,11 @@ void TVRec::TriggerRecordingTransition(void)
 
     nextState = kState_WatchingRecording;
     changeState = true;
+}
+
+void TVRec::StopPlaying(void)
+{
+    exitPlayer = true;
 }
 
 void TVRec::SetupRingBuffer(QString &path, long long &filesize, 

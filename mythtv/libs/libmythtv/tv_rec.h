@@ -55,6 +55,7 @@ class TVRec
     long long GetFreeSpace(long long totalreadpos);
     long long GetKeyframePosition(long long desired);
     void TriggerRecordingTransition(void);
+    void StopPlaying(void);
     void SetupRingBuffer(QString &path, long long &filesize, 
                          long long &fillamount, bool pip = false);
     void SpawnLiveTV(void);

@@ -155,6 +155,12 @@ void EncoderLink::TriggerRecordingTransition(void)
         tv->TriggerRecordingTransition();
 }
 
+void EncoderLink::StopPlaying(void)
+{
+    if (local)
+        tv->StopPlaying();
+}
+
 void EncoderLink::SetupRingBuffer(QString &path, long long &filesize,
                                   long long &fillamount, bool pip)
 {

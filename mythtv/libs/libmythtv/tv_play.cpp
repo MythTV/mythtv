@@ -355,6 +355,9 @@ void TV::HandleStateChange(void)
              (internalState == kState_WatchingRecording &&
               nextState == kState_None))
     {
+        if (internalState == kState_WatchingRecording)
+            recorder->StopPlaying();
+
         closePlayer = true;
         
         internalState = nextState;
