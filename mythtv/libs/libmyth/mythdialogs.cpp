@@ -8,6 +8,7 @@
 #include <qdir.h>
 #include <qregexp.h>
 #include <qaccel.h>
+#include <qfocusdata.h>
 
 #include <iostream>
 using namespace std;
@@ -384,6 +385,38 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
     setPaletteForegroundColor(popupHighlight);
 
     popupForegroundColor = popupForeground;
+}
+
+bool MythPopupBox::focusNextPrevChild(bool next)
+{
+    QFocusData *focusList = focusData();
+    QObjectList *objList = queryList(NULL,NULL,false,true);
+
+    QWidget *startingPoint = focusList->home();
+    QWidget *candidate = NULL;
+
+    QWidget *w = (next) ? focusList->last() : focusList->first();
+
+    int countdown = focusList->count();
+
+    do
+    {
+        if (w && w != startingPoint && !w->focusProxy() && 
+            w->isVisibleTo(this) && w->isEnabled() &&
+            (objList->find((QObject *)w) != -1))
+        {
+            candidate = w;
+        }
+
+        w = (next) ? focusList->prev() : focusList->next();
+    }
+    while (w && !(candidate && w == startingPoint) && (countdown-- > 0));
+
+    if (!candidate)
+        return false;
+
+    candidate->setFocus();
+    return true;
 }
 
 void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
