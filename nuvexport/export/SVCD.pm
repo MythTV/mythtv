@@ -132,14 +132,20 @@ package export::SVCD;
         push @tmpfiles, $self->get_outfile($episode, ".$$.m2v"), $self->get_outfile($episode, ".$$.mpa");
     # Execute the parent method
         $self->SUPER::export($episode, ".$$");
+    # Need to do this here to get integer context -- otherwise, we get errors about non-numeric stuff.
+        my $size = (-s $self->get_outfile($episode, ".$$.m2v") or 0);
+            $size += (-s $self->get_outfile($episode, ".$$.mpa") or 0);
     # Create the split file?
         my $split_file;
-        if ((-s $self->get_outfile($episode, ".$$.m2v") + -s $self->get_outfile($episode, ".$$.mpa")) / 0.97 > $self->{'split_every'} * 1024 * 1024) {
+        if ($size > 0.97 * $self->{'split_every'} * 1024 * 1024) {
             $split_file = "/tmp/nuvexport-svcd.split.$$.$self->{'split_every'}";
             open(DATA, ">$split_file") or die "Can't write to $split_file:  $!\n\n";
             print DATA "maxFileSize = $self->{'split_every'}\n";
             close DATA;
             push @tmpfiles, $split_file;
+        }
+        else {
+            print "Not splitting because combined file size of chunks is < ".(0.97 * $self->{'split_every'} * 1024 * 1024).", which is the requested split size.\n";
         }
     # Multiplex the streams
         my $command = "nice -n $Args{'nice'} tcmplex -m s"
