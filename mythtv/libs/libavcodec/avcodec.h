@@ -101,6 +101,9 @@ enum CodecID {
     CODEC_ID_PGMYUV,
     CODEC_ID_PAM,
     CODEC_ID_FFVHUFF,
+    CODEC_ID_RV30,
+    CODEC_ID_RV40,
+    
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE= 0x10000,
@@ -477,7 +480,14 @@ typedef struct AVPanScan{
     uint8_t *mbskip_table;\
 \
     /**\
-     * Motion vector table\
+     * Motion vector table.\
+     * @code\
+     * example:\
+     * int mv_sample_log2= 4 - motion_subsample_log2;\
+     * int mb_width= (width+15)>>4;\
+     * int mv_stride= (mb_width << mv_sample_log2) + 1;\
+     * motion_val[direction][x + y*mv_stride][0->mv_x, 1->mv_y];\
+     * @endcode\
      * - encoding: set by user\
      * - decoding: set by lavc\
      */\
@@ -1887,6 +1897,8 @@ extern AVCodec h263i_decoder;
 extern AVCodec flv_decoder;
 extern AVCodec rv10_decoder;
 extern AVCodec rv20_decoder;
+extern AVCodec rv30_decoder;
+extern AVCodec rv40_decoder;
 extern AVCodec svq1_decoder;
 extern AVCodec svq3_decoder;
 extern AVCodec dvvideo_decoder;

@@ -1885,7 +1885,9 @@ int av_find_stream_info(AVFormatContext *ic)
             /* set real frame rate info */
             /* compute the real frame rate for telecine */
             if ((st->codec.codec_id == CODEC_ID_MPEG1VIDEO ||
-                 st->codec.codec_id == CODEC_ID_MPEG2VIDEO) &&
+                 st->codec.codec_id == CODEC_ID_MPEG2VIDEO ||
+                 st->codec.codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
+                 st->codec.codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD) &&
                 st->codec.sub_id == 2) {
                 if (st->codec_info_nb_frames >= 20) {
                     float coded_frame_rate, est_frame_rate;
@@ -1902,7 +1904,7 @@ int av_find_stream_info(AVFormatContext *ic)
                        higher level as it can change in a film */
                     if (coded_frame_rate >= 24.97 && 
                         (est_frame_rate >= 23.5 && est_frame_rate < 24.5)) {
-                        st->r_frame_rate = 24024;
+                        st->r_frame_rate = 24000;
                         st->r_frame_rate_base = 1001;
                     }
                 }

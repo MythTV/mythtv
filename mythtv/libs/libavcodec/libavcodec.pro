@@ -24,7 +24,7 @@ QMAKE_CFLAGS_RELEASE += $$OPTFLAGS -DPIC -fPIC -fomit-frame-pointer -DHAVE_AV_CO
 QMAKE_CFLAGS_DEBUG += -g -O -DHAVE_AV_CONFIG_H -I.. -DPIC -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 
 # Input
-SOURCES += common.c utils.c mem.c allcodecs.c mpegvideo.c h263.c jrevdct.c
+SOURCES += utils.c mem.c allcodecs.c mpegvideo.c h263.c jrevdct.c
 SOURCES += jfdctfst.c mpegaudio.c ac3enc.c mjpeg.c audresample.c dsputil.c
 SOURCES += motion_est.c imgconvert.c imgresample.c msmpeg4.c mpeg12.c
 SOURCES += h263dec.c svq1.c rv10.c mpegaudiodec.c pcm.c simple_idct.c
@@ -37,7 +37,7 @@ SOURCES += vqavideo.c idcinvideo.c adx.c rational.c faandct.c snow.c sonic.c
 SOURCES += 8bps.c parser.c smc.c flicvideo.c truemotion1.c vmdav.c lcl.c
 SOURCES += qtrle.c g726.c flac.c vp3dsp.c integer.c h261.c resample2.c
 SOURCES += h264idct.c png.c pnm.c qdrw.c qpeg.c rangecoder.c ulti.c xl.c
-SOURCES += libpostproc/postprocess.c #ffv1.c 
+SOURCES += bitstream.c libpostproc/postprocess.c #ffv1.c 
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
 inc.files = avcodec.h rational.h common.h
@@ -47,7 +47,7 @@ INSTALLS += inc
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c
     !contains( CONFIG_A52BIN, yes ) {
-        SOURCES += liba52/bit_allocate.c liba52/bitstream.c liba52/downmix.c
+        SOURCES += liba52/bit_allocate.c liba52/a52_bitstream.c liba52/downmix.c
         SOURCES += liba52/imdct.c liba52/parse.c liba52/crc.c liba52/resample.c
     }
 }

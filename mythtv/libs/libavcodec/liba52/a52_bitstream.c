@@ -22,7 +22,7 @@
  */
 #include "a52.h"
 #include "a52_internal.h"
-#include "bitstream.h"
+#include "a52_bitstream.h"
 
 #define BUFFER_SIZE 4096
 

@@ -17,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "avformat.h"
+#include "bitstream.h"
 
 #define MAX_PAYLOAD_SIZE 4096
 //#define DEBUG_SEEK
@@ -179,24 +180,24 @@ static int put_system_header(AVFormatContext *ctx, uint8_t *buf,int only_for_str
         put_bits(&pb, 5, 0);
     } else
         put_bits(&pb, 5, s->video_bound);
-
+    
     if (s->is_dvd) {
         put_bits(&pb, 1, 0);    /* packet_rate_restriction_flag */
         put_bits(&pb, 7, 0x7f); /* reserved byte */
     } else
         put_bits(&pb, 8, 0xff); /* reserved byte */
-
+    
     /* DVD-Video Stream_bound entries
-    id (0xB9) video, maximum P-STD for stream 0xE0. (P-STD_buffer_bound_scale = 1)
-    id (0xB8) audio, maximum P-STD for any MPEG audio (0xC0 to 0xC7) streams. If there are none set to 4096 (32x128). (P-STD_buffer_bound_scale = 0)
-    id (0xBD) private stream 1 (audio other than MPEG and subpictures). (P-STD_buffer_bound_scale = 1)
+    id (0xB9) video, maximum P-STD for stream 0xE0. (P-STD_buffer_bound_scale = 1) 
+    id (0xB8) audio, maximum P-STD for any MPEG audio (0xC0 to 0xC7) streams. If there are none set to 4096 (32x128). (P-STD_buffer_bound_scale = 0) 
+    id (0xBD) private stream 1 (audio other than MPEG and subpictures). (P-STD_buffer_bound_scale = 1) 
     id (0xBF) private stream 2, NAV packs, set to 2x1024. */
     if (s->is_dvd) {
         
         int P_STD_max_video = 0;
         int P_STD_max_mpeg_audio = 0;
         int P_STD_max_mpeg_PS1 = 0;
-
+        
         for(i=0;i<ctx->nb_streams;i++) {
             StreamInfo *stream = ctx->streams[i]->priv_data;
 
@@ -241,7 +242,7 @@ static int put_system_header(AVFormatContext *ctx, uint8_t *buf,int only_for_str
         private_stream_coded = 0;
         for(i=0;i<ctx->nb_streams;i++) {
             StreamInfo *stream = ctx->streams[i]->priv_data;
-
+            
 
             /* For VCDs, only include the stream info for the stream
             that the pack which contains this system belongs to.
@@ -1153,8 +1154,8 @@ static int mpeg_mux_write_packet(AVFormatContext *ctx, AVPacket *pkt)
     int64_t pts, dts;
     PacketDesc *pkt_desc;
     const int preload= av_rescale(ctx->preload, 90000, AV_TIME_BASE);
-    const int is_iframe = st->codec.codec_type == CODEC_TYPE_VIDEO && (pkt->flags & PKT_FLAG_KEY);   
-
+    const int is_iframe = st->codec.codec_type == CODEC_TYPE_VIDEO && (pkt->flags & PKT_FLAG_KEY);
+    
     pts= pkt->pts;
     dts= pkt->dts;
 
@@ -1250,7 +1251,7 @@ static int mpegps_probe(AVProbeData *p)
                 code == PROGRAM_STREAM_MAP ||
                 code == PRIVATE_STREAM_1 ||
                 code == PADDING_STREAM ||
-                code >= 0x100 && code <= 0x1b0) // An out of place packet?
+                code >= 0x100 && code <= 0x1b0) // An out of place packet
                 return AVPROBE_SCORE_MAX - 2;
             else
                 return 0;
@@ -1490,10 +1491,10 @@ static int mpegps_read_packet(AVFormatContext *s,
 {
     AVStream *st;
     int len, startcode, i, type, codec_id = 0;
-    int64_t pts, dts, ppos = 0;
+    int64_t pts, dts, dummy_pos = 0; //dummy_pos is needed for the index building to work
 
  redo:
-    len = mpegps_read_pes_header(s, &ppos, &startcode, &pts, &dts);
+    len = mpegps_read_pes_header(s, &dummy_pos, &startcode, &pts, &dts);
     if (len < 0)
         return len;
     
@@ -1554,7 +1555,7 @@ static int mpegps_read_packet(AVFormatContext *s,
     pkt->pts = pts;
     pkt->dts = dts;
     pkt->stream_index = st->index;
-    pkt->startpos = ppos;
+    pkt->startpos = dummy_pos;
 #if 0
     av_log(s, AV_LOG_DEBUG, "%d: pts=%0.3f dts=%0.3f\n",
            pkt->stream_index, pkt->pts / 90000.0, pkt->dts / 90000.0);

@@ -253,7 +253,7 @@ static inline void setup_context(MpegEncContext *s)
     if (s->encoding)
     {
         av_log(s->avctx, AV_LOG_ERROR, "XVMC doesn't support encoding!!!\n");
-        av_abort();
+        return -1;
     }
     // Do I need to export quant when I could not perform postprocessing?
     // Anyway, it doesn't hurt.

@@ -22,7 +22,7 @@
  */
 #include "a52.h"
 #include "a52_internal.h"
-#include "bitstream.h"
+#include "a52_bitstream.h"
 #include "tables.h"
 
 #if defined(HAVE_MEMALIGN) && !defined(__cplusplus)
