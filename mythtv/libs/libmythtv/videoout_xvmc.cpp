@@ -998,7 +998,6 @@ void VideoOutputXvMC::Show(FrameScanType scan)
     //if (field != 3)
         pthread_mutex_lock(&lock);
 
-/*  Doesn't seem necessary.
     if (data->p_render_surface_visible && 
         (data->p_render_surface_visible != showingsurface))
     {
@@ -1015,7 +1014,6 @@ void VideoOutputXvMC::Show(FrameScanType scan)
             XvMCGetSurfaceStatus(data->XJ_disp, surf, &status);
         }
     }
-*/
 
     data->p_render_surface_visible = data->p_render_surface_to_show;
 
