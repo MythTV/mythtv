@@ -20,10 +20,6 @@ using namespace std;
 
 #define MAXTBUFFER 21
 
-#define REENCODE_OK              1
-#define REENCODE_CUTLIST_CHANGE -1
-#define REENCODE_ERROR           0
-
 class VideoOutput;
 class OSDSet;
 class RemoteEncoder;
@@ -52,6 +48,7 @@ class NuppelVideoPlayer
 
     void SetAsPIP(void) { disableaudio = disablevideo = true; }
     void SetNoAudio(void) { disableaudio = true; }
+    void SetNoVideo(void) { disablevideo = true; }
 
     void SetAudioDevice(QString device) { audiodevice = device; }
     void SetFileName(QString lfilename) { filename = lfilename; }
@@ -61,6 +58,7 @@ class NuppelVideoPlayer
     void SetTryUnflaggedSkip(bool tryskip) { tryunflaggedskip = tryskip; };
     void SetCommercialSkipMethod(int method) { commercialskipmethod = method; }
 
+    int OpenFile(bool skipDsp = false);
     void StartPlaying(void);
     void StopPlaying(void) { killplayer = true; decoder_thread_alive = false; }
     
@@ -88,6 +86,8 @@ class NuppelVideoPlayer
 
     void ResetPlaying(void);
 
+    int GetVideoWidth(void) { return video_width; }
+    int GetVideoHeight(void) { return video_height; }
     float GetFrameRate(void) { return video_frame_rate; } 
     long long GetFramesPlayed(void) { return framesPlayed; }
 
@@ -106,10 +106,15 @@ class NuppelVideoPlayer
     void SetLength(int len) { totalLength = len; }
     int GetLength(void) { return totalLength; }
 
-    int ReencodeFile(char *inputname, char *outputname,
-                     QString profileName, bool honorCutList = false,
-                     bool framecontrol = false, bool chkTranscodeDB = false,
-                     QString fifodir = NULL);
+    QString GetEncodingType(void);
+    void SetAudioOutput (AudioOutput *ao) { audioOutput = ao; }
+    void FlushTxtBuffers(void) { rtxt = wtxt; }
+    bool WriteStoredData(RingBuffer *outRingBuffer, bool writevideo);
+    void UpdateFrameNumber(long curFrameNum);
+    void InitForTranscode(bool copyaudio, bool copyvideo);
+    bool TranscodeGetNextFrame(QMap<long long, int>::Iterator *dm_iter,
+                               int *did_ff, bool *is_key, bool honorCutList);
+    void TranscodeWriteText(void (*func)(void *, unsigned char *, int, int, int), void *ptr);
 
     int FlagCommercials(bool showPercentage = false, bool fullSpeed = false);
 
@@ -151,6 +156,7 @@ class NuppelVideoPlayer
 
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
+    bool GetRawAudioState(void);
     void AddAudioData(char *buffer, int len, long long timecode);
     void AddAudioData(short int *lbuffer, short int *rbuffer, int samples,
                       long long timecode);
@@ -194,8 +200,6 @@ class NuppelVideoPlayer
 
     void setPrebuffering(bool prebuffer);
  
-    int OpenFile(bool skipDsp = false);
-
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
     void GetFrame(int onlyvideo, bool unsafe = false);
@@ -249,9 +253,6 @@ class NuppelVideoPlayer
     void SetCommBreakIter(void);
 
     float WarpFactor(void);
-
-    void ReencoderAddKFA(QPtrList<struct kfatable_entry> *kfa_table,
-                         long curframe, long lastkey, long num_keyframes);
 
     QString filename;
     

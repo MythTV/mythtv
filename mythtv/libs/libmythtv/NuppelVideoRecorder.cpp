@@ -1558,6 +1558,7 @@ void NuppelVideoRecorder::WriteSeekTable(void)
         curRecording->SetPositionMap(positionMap, MARK_KEYFRAME, db_conn);
         pthread_mutex_unlock(db_lock);
     }
+    delete [] seekbuf;
 }
 
 void NuppelVideoRecorder::WriteKeyFrameAdjustTable(

@@ -17,4 +17,4 @@ LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
 # Input
-SOURCES += main.cpp
+SOURCES += main.cpp transcode.cpp

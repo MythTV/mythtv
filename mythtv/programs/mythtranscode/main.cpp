@@ -11,9 +11,9 @@
 #include <fstream>
 using namespace std;
 
-#include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 #include "mythcontext.h"
+#include "transcode.h"
 
 MythContext *gContext;
 QSqlDatabase *db;
@@ -167,9 +167,6 @@ int main(int argc, char *argv[])
          return -1;
     }
 
-    //  Load the context
-    gContext = new MythContext(MYTH_BINARY_VERSION, false);
-
     db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
     {
@@ -200,12 +197,13 @@ int main(int argc, char *argv[])
 
     if (use_db) 
         StoreTranscodeState(pginfo, TRANSCODE_STARTED, useCutlist);
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(db, pginfo);
+    Transcode *transcode = new Transcode(db, pginfo);
 
     VERBOSE(VB_GENERAL, QString("Transcoding from %1 to %2")
                         .arg(infile).arg(tmpfile));
 
-    int result = nvp->ReencodeFile((char *)infile.ascii(),
+    int result = 0;
+    result = transcode->TranscodeFile((char *)infile.ascii(),
                                    (char *)tmpfile.ascii(),
                                    profilename, useCutlist, 
                                    (fifosync || keyframesonly), use_db,
@@ -234,7 +232,9 @@ int main(int argc, char *argv[])
         retval = -1;
     }
 
-    delete nvp;
+    delete transcode;
+    delete pginfo;
+    delete gContext;
     return retval;
 }
 

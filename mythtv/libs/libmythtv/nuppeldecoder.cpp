@@ -95,7 +95,10 @@ NuppelDecoder::~NuppelDecoder()
         delete [] buf2;
     if (strm)
         delete [] strm;
-
+    while(! StoredData.isEmpty()) {
+        delete StoredData.first();
+        StoredData.removeFirst();
+    }
     CloseAVCodec();
 }
 
