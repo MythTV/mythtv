@@ -26,6 +26,8 @@ RingBuffer::RingBuffer(const string &lfilename, bool write)
     totalwritepos = writepos = 0;
     totalreadpos = readpos = 0;
     smudgeamount = 0;
+
+    stopreads = false;
 }
 
 RingBuffer::RingBuffer(const string &lfilename, long long size, 
@@ -45,6 +47,8 @@ RingBuffer::RingBuffer(const string &lfilename, long long size,
 
     wrapcount = 0;
     smudgeamount = smudge;
+
+    stopreads = false;
 }
 
 RingBuffer::~RingBuffer(void)
@@ -90,8 +94,10 @@ int RingBuffer::Read(void *buf, int count)
     else
     {
         while (totalreadpos + count >= totalwritepos)
-	{
+        {
             usleep(50);
+            if (stopreads)
+                return 0;
 	}
 
 	if (readpos + count > filesize)

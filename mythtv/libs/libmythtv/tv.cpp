@@ -418,6 +418,7 @@ void TV::TeardownPlayer(void)
 {
     if (nvp)
     {
+        prbuffer->StopReads();
         nvp->StopPlaying();
         pthread_join(decode, NULL);
         delete nvp;

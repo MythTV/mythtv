@@ -32,6 +32,8 @@ class RingBuffer
 
     void Reset(void);
 
+    void StopReads(void) { stopreads = true; }
+
  private:
     string filename;
     
@@ -50,6 +52,8 @@ class RingBuffer
     long long smudgeamount;
 
     long long wrapcount;
+
+    bool stopreads;
 };
 
 #endif
