@@ -1470,7 +1470,9 @@ void GuideGrid::displayInfo()
 
     if (pginfo)
     {
-        if (pginfo->GetProgramRecordingStatus(m_db) > ScheduledRecording::AllRecord)
+        if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
+            (pginfo->GetProgramRecordingStatus(m_db)
+                > ScheduledRecording::AllRecord))
         {
             ScheduledRecording record;
             record.loadByProgram(m_db, pginfo);

@@ -440,8 +440,20 @@ void ProgFinder::getInfo()
 
         if (curPick)
         {
-            InfoDialog diag(curPick, gContext->GetMainWindow(), "Program Info");
-            diag.exec();
+            if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
+                (curPick->GetProgramRecordingStatus(m_db)
+                    > ScheduledRecording::AllRecord))
+            {
+                ScheduledRecording record;
+                record.loadByProgram(m_db, curPick);
+                record.exec(m_db);
+            }
+            else
+            {
+                InfoDialog diag(curPick, gContext->GetMainWindow(),
+                                "Program Info");
+                diag.exec();
+            }
         }
         else
             return;

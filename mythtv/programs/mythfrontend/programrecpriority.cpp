@@ -416,7 +416,9 @@ void RankPrograms::edit(void)
 
     if (rec)
     {
-        if (rec->GetProgramRecordingStatus(db) > ScheduledRecording::AllRecord)
+        if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
+            (rec->GetProgramRecordingStatus(db)
+                > ScheduledRecording::AllRecord))
         {
             ScheduledRecording record;
             record.loadByProgram(db, rec);

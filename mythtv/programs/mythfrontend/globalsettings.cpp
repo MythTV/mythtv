@@ -569,6 +569,17 @@ public:
     };
 };
 
+class AdvancedRecord: public CheckBoxSetting, public GlobalSetting {
+public:
+    AdvancedRecord():
+        GlobalSetting("AdvancedRecord") {
+        setLabel("Always use Advanced Recording Options screen");
+        setValue(false);
+        setHelpText("Always use the Advanced Recording Options screen "
+                    "when editing a scheduled recording.");
+    };
+};
+
 class AllowQuitShutdown: public ComboBoxSetting, public GlobalSetting {
 public:
     AllowQuitShutdown():
@@ -1074,6 +1085,7 @@ GeneralSettings::GeneralSettings()
     general->addChild(new DisplayChanNum());
     general->addChild(new GeneratePreviewPixmaps());
     general->addChild(new PlaybackPreview());
+    general->addChild(new AdvancedRecord());
     addChild(general);
 
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
