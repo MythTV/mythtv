@@ -110,6 +110,10 @@ GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
     selectState = false;
     showInfo = false;
 
+    WFlags flags = getWFlags();
+    flags |= WRepaintNoErase;
+    setWFlags(flags);
+
     showFullScreen();
     setActiveWindow();
     raise();
@@ -150,9 +154,13 @@ void GuideGrid::fillChannelInfos()
 
     QString thequery;
     QSqlQuery query;
+
+    QString ordering = globalsettings->GetSetting("ChannelSorting");
+    if (ordering == "")
+        ordering = "channum + 0";
     
     thequery = "SELECT channum,callsign,icon,chanid FROM channel "
-               "ORDER BY channum + 0;";
+               "ORDER BY " + ordering;
     query.exec(thequery);
     
     bool set = false;

@@ -1,3 +1,14 @@
+# XMLTV grabber to use
+str XMLTVGrab=tv_grab_na
+
+# Program Guide options
+# 
+# Display order of channels.  Meaningful values are chanid, callsign, and 
+# "channum + 0".
+str ChannelSorting=channum + 0
+# Starting channel
+str DefaultTVChannel=3
+
 # Live TV options
 #
 # Size of the buffer for watching live tv, in GB

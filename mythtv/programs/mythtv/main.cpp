@@ -16,7 +16,9 @@ int main(int argc, char *argv[])
 		
     QApplication a(argc, argv);
 
-    QString startChannel = "3";
+    QString startChannel = globalsettings->GetSetting("DefaultTVChannel");
+    if (startChannel == "")
+        startChannel = "3";
 
     TV *tv = new TV(startChannel, 1, 2);
     tv->LiveTV();

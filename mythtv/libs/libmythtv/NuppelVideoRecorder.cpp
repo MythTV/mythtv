@@ -209,6 +209,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx.i_quant_offset = -0.8;
     mpa_ctx.b_quant_offset = 0;
     mpa_ctx.dct_algo = FF_DCT_AUTO;
+    mpa_ctx.idct_algo = FF_IDCT_AUTO;
     
     if (avcodec_open(&mpa_ctx, mpa_codec) < 0)
     {

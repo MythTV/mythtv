@@ -29,9 +29,9 @@ typedef short DCTELEM;
 void j_rev_dct (DCTELEM *data);
 
 /* encoding scans */
-extern UINT8 ff_alternate_horizontal_scan[64];
-extern UINT8 ff_alternate_vertical_scan[64];
-extern UINT8 zigzag_direct[64];
+extern const UINT8 ff_alternate_horizontal_scan[64];
+extern const UINT8 ff_alternate_vertical_scan[64];
+extern const UINT8 ff_zigzag_direct[64];
 
 /* permutation table */
 extern UINT8 permutation[64];
@@ -56,9 +56,6 @@ i (michael) didnt check them, these are just the alignents which i think could b
 */
 
 /* pixel ops : interface with DCT */
-extern void (*ff_idct)(DCTELEM *block/*align 16*/);
-extern void (*ff_idct_put)(UINT8 *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
-extern void (*ff_idct_add)(UINT8 *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
 extern void (*get_pixels)(DCTELEM *block/*align 16*/, const UINT8 *pixels/*align 8*/, int line_size);
 extern void (*diff_pixels)(DCTELEM *block/*align 16*/, const UINT8 *s1/*align 8*/, const UINT8 *s2/*align 8*/, int stride);
 extern void (*put_pixels_clamped)(const DCTELEM *block/*align 16*/, UINT8 *pixels/*align 8*/, int line_size);
@@ -114,12 +111,7 @@ int pix_abs16x16_x2_c(UINT8 *blk1, UINT8 *blk2, int lx);
 int pix_abs16x16_y2_c(UINT8 *blk1, UINT8 *blk2, int lx);
 int pix_abs16x16_xy2_c(UINT8 *blk1, UINT8 *blk2, int lx);
 
-static inline int block_permute_op(int j)
-{
-	return permutation[j];
-}
-
-void block_permute(INT16 *block);
+void block_permute(INT16 *block, UINT8 *permutation);
 
 #if defined(HAVE_MMX)
 
@@ -225,8 +217,6 @@ void get_psnr(UINT8 *orig_image[3], UINT8 *coded_image[3],
               AVCodecContext *avctx);
 
 #include "mpegvideo.h"
-
-extern void (*av_fdct)(MpegEncContext *s, DCTELEM *block);
 
 void fdct_ifast(MpegEncContext *s, DCTELEM *data);
 void ff_jpeg_fdct_islow (MpegEncContext *s, DCTELEM *data);

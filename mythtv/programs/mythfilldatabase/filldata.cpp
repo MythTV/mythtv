@@ -23,6 +23,8 @@ char installprefix[] = "/usr/local";
 
 using namespace std;
 
+bool interactive = false;
+
 class ChanInfo
 {
   public:
@@ -30,11 +32,17 @@ class ChanInfo
     ChanInfo(const ChanInfo &other) { callsign = other.callsign; 
                                       iconpath = other.iconpath;
                                       chanstr = other.chanstr;
+                                      xmltvid = other.xmltvid;
+                                      name = other.name;
+                                      finetune = other.finetune;
                                     }
 
     QString callsign;
     QString iconpath;
     QString chanstr;
+    QString xmltvid;
+    QString name;
+    QString finetune;
 };
 
 class ProgInfo
@@ -126,9 +134,10 @@ ChanInfo *parseChannel(QDomElement &element)
 {
     ChanInfo *chaninfo = new ChanInfo;
 
-    QString chanid = element.attribute("id", "");
-    QStringList split = QStringList::split(" ", chanid);
+    QString xmltvid = element.attribute("id", "");
+    QStringList split = QStringList::split(" ", xmltvid);
 
+    chaninfo->xmltvid = split[0];
     chaninfo->chanstr = split[0];
     if (split.size() > 1)
         chaninfo->callsign = split[1];
@@ -136,6 +145,8 @@ ChanInfo *parseChannel(QDomElement &element)
         chaninfo->callsign = "";
 
     chaninfo->iconpath = "";
+    chaninfo->name = "";
+    chaninfo->finetune = "";
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -146,6 +157,11 @@ ChanInfo *parseChannel(QDomElement &element)
             if (info.tagName() == "icon")
             {
                 chaninfo->iconpath = info.attribute("src", "");
+            }
+            else if (info.tagName() == "display-name" && 
+                     chaninfo->name.length() == 0)
+            {
+                chaninfo->name = info.text();
             }
         }
     }
@@ -285,6 +301,50 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
     }
 }
 
+QString getResponse(const QString &query, const QString &def)
+{
+    cout << query;
+
+    if (def != "")
+    {
+        cout << " [" << def << "]  ";
+    }
+    
+    char response[80];
+    cin.getline(response, 80);
+
+    QString qresponse = response;
+
+    if (qresponse == "")
+        qresponse = def;
+
+    return qresponse;
+}
+
+unsigned int promptForChannelUpdates(QValueList<ChanInfo>::iterator chaninfo, 
+                                     unsigned int chanid)
+{
+    if (chanid == 0)
+    {
+        chanid=atoi(getResponse("Choose a channel ID (positive integer) ","1"));
+    }
+
+    (*chaninfo).name = getResponse("Choose a channel name (any string, "
+                                   "long version) ",(*chaninfo).name);
+    (*chaninfo).callsign = getResponse("Choose a channel callsign (any string, "
+                                       "short version) ",(*chaninfo).callsign);
+
+    (*chaninfo).chanstr  = getResponse("Choose a channel number (just like "
+                                       "xawtv) ",(*chaninfo).chanstr);
+    (*chaninfo).finetune = getResponse("Choose a channel fine tune offset (just"
+                                       " like xawtv) ",(*chaninfo).finetune);
+
+    (*chaninfo).iconpath = getResponse("Choose a channel icon image (any path "
+                                       "name) ",(*chaninfo).iconpath);
+
+    return(chanid);
+}
+
 void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 {
     char *home = getenv("HOME");
@@ -326,27 +386,161 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
         QSqlQuery query;
 
         QString querystr;
-        querystr.sprintf("SELECT NULL FROM channel WHERE channum = \"%s\" AND "
-                         "sourceid = %d;", (*i).chanstr.ascii(), id); 
+        querystr.sprintf("SELECT chanid,name,callsign,channum,finetune,icon "
+                         "FROM channel WHERE xmltvid = \"%s\" AND "
+                         "sourceid = %d;", (*i).xmltvid.ascii(), id); 
 
         query.exec(querystr);
         if (query.isActive() && query.numRowsAffected() > 0)
         {
-            querystr.sprintf("UPDATE channel SET icon = \"%s\" WHERE channum = "
-                             "\"%s\" AND callsign = \"%s\" AND sourceid = %d;", 
-                             localfile.ascii(), (*i).chanstr.ascii(),
-                             (*i).callsign.ascii(), id);
+            query.next();
+
+            QString chanid = query.value(0).toString();
+            if (interactive)
+            {
+                QString name     = QString::fromUtf8(query.value(1).toString());
+                QString callsign = QString::fromUtf8(query.value(2).toString());
+                QString chanstr  = QString::fromUtf8(query.value(3).toString());
+                QString finetune = QString::fromUtf8(query.value(4).toString());
+                QString icon     = QString::fromUtf8(query.value(5).toString());
+
+                cout << "### " << endl;
+                cout << "### Existing channel found" << endl;
+                cout << "### " << endl;
+                cout << "### xmltvid  = " << (*i).xmltvid.ascii() << endl;
+                cout << "### chanid   = " << chanid.ascii()       << endl;
+                cout << "### name     = " << name.ascii()         << endl;
+                cout << "### callsign = " << callsign.ascii()     << endl;
+                cout << "### channum  = " << chanstr.ascii()      << endl;
+                cout << "### finetune = " << finetune.ascii()     << endl;
+                cout << "### icon     = " << icon.ascii()         << endl;
+                cout << "### " << endl;
+
+                (*i).name = name;
+                (*i).callsign = callsign;
+                (*i).chanstr  = chanstr;
+                (*i).finetune = finetune;
+
+                promptForChannelUpdates(i, atoi(chanid.ascii()));
+
+                if (name     != (*i).name ||
+                    callsign != (*i).callsign ||
+                    chanstr  != (*i).chanstr ||
+                    finetune != (*i).finetune ||
+                    icon     != localfile)
+                {
+                    querystr.sprintf("UPDATE channel SET chanid = %s, "
+                                     "name = \"%s\", callsign = \"%s\", "
+                                     "channum = \"%s\", finetune = %d, "
+                                     "icon = \"%s\" WHERE xmltvid = \"%s\" "
+                                     "AND sourceid = %d;",
+                                     chanid.ascii(),
+                                     (*i).name.ascii(),
+                                     (*i).callsign.ascii(),
+                                     (*i).chanstr.ascii(),
+                                     atoi((*i).finetune.ascii()),
+                                     localfile.ascii(),
+                                     (*i).xmltvid.ascii(),
+                                     id);
+
+                    query.exec(querystr);
+
+                    cout << "### " << endl;
+                    cout << "### Change performed" << endl;
+                    cout << "### " << endl;
+                }
+                else
+                {
+                    cout << "### " << endl;
+                    cout << "### Nothing changed" << endl;
+                    cout << "### " << endl;
+                }
+            }
+            else
+            {
+                querystr.sprintf("UPDATE channel SET icon = \"%s\" WHERE "
+                                 "chanid = \"%s\"",
+                                 localfile.ascii(), chanid.ascii());
+
+                query.exec(querystr);
+            }
         }
         else
         {
-            querystr.sprintf("INSERT INTO channel (channum,callsign,icon,"
-                             "sourceid) VALUES(\"%s\",\"%s\",\"%s\", %d);", 
-                             (*i).chanstr.ascii(), (*i).callsign.ascii(),
-                             localfile.ascii(), id);                  
-        }
+            if (interactive)
+            {
+                cout << "### " << endl;
+                cout << "### New channel found" << endl;
+                cout << "### " << endl;
+                cout << "### name     = " << (*i).name.ascii()         << endl;
+                cout << "### callsign = " << (*i).callsign.ascii()     << endl;
+                cout << "### channum  = " << (*i).chanstr.ascii()      << endl;
+                cout << "### finetune = " << (*i).finetune.ascii()     << endl;
+                cout << "### icon     = " << localfile.ascii()         << endl;
+                cout << "### " << endl;
 
-        query.exec(querystr);
-    } 
+                unsigned int chanid = promptForChannelUpdates(i,0);
+
+                if (chanid > 0)
+                {
+                    querystr.sprintf("INSERT INTO channel (chanid,name,"
+                                     "callsign,channum,finetune,icon,"
+                                     "xmltvid,sourceid) VALUES(%d,\"%s\","
+                                     "\"%s\",\"%s\",%d,\"%s\",\"%s\",%d);", 
+                                     chanid,
+                                     (*i).name.ascii(),
+                                     (*i).callsign.ascii(),
+                                     (*i).chanstr.ascii(),
+                                     atoi((*i).finetune.ascii()),
+                                     localfile.ascii(),
+                                     (*i).xmltvid.ascii(),
+                                     id);
+
+                    query.exec(querystr);
+
+                    cout << "### " << endl;
+                    cout << "### Channel inserted" << endl;
+                    cout << "### " << endl;
+                }
+            }
+            else
+            {
+                // Make up a chanid if automatically adding one.
+                // Must be unique, nothing else matters, nobody else knows.
+
+                int chanid = id * 1000 + atoi((*i).chanstr.ascii());
+
+                while(1)
+                {
+                    querystr.sprintf("SELECT channum FROM channel WHERE "
+                                     "chanid = %d", chanid);
+                    query.exec(querystr.ascii());
+
+                    if (query.isActive() && query.numRowsAffected() > 0)
+                    {
+                        chanid++;
+                    }
+                    else
+                        break;
+                }
+
+                querystr.sprintf("INSERT INTO channel (chanid,name,callsign,"
+                                 "channum,finetune,icon,xmltvid,sourceid) "
+                                 "VALUES(%d,\"%s\",\"%s\",\"%s\",%d,\"%s\","
+                                 "\"%s\",%d);", 
+                                 chanid,
+                                 (*i).name.ascii(),
+                                 (*i).callsign.ascii(),
+                                 (*i).chanstr.ascii(),
+                                 atoi((*i).finetune.ascii()),
+                                 localfile.ascii(),
+                                 (*i).xmltvid.ascii(),
+                                 id);
+
+                query.exec(querystr);
+            }
+        }
+    }
 }
 
 void clearDBAtOffset(int offset, int chanid)
@@ -375,20 +569,28 @@ void handlePrograms(int id, int offset, QMap<QString,
         if (mapiter.key() == "")
             continue;
 
-        int channum = atoi(mapiter.key().ascii());
+        int chanid = 0;
 
         querystr.sprintf("SELECT chanid FROM channel WHERE sourceid = %d AND "
-                         "channum = \"%s\";", id, mapiter.key().ascii());
+                         "xmltvid = \"%s\";", id, mapiter.key().ascii());
         query.exec(querystr.ascii());
 
         if (query.isActive() && query.numRowsAffected() > 0)
         {
             query.next();
             
-            channum = query.value(0).toInt();
+            chanid = query.value(0).toInt();
         }
 
-        clearDBAtOffset(offset, channum);
+        if (chanid == 0)
+        {
+            cerr << "Unknown xmltv channel identifier: " << mapiter.key() 
+                 << endl;
+            cerr << "Skipping channel.\n";
+            continue;
+        }
+
+        clearDBAtOffset(offset, chanid);
 
         QValueList<ProgInfo> *sortlist = &((*proglist)[mapiter.key()]);
 
@@ -400,7 +602,7 @@ void handlePrograms(int id, int offset, QMap<QString,
             querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
                              "title,subtitle,description,category) VALUES(%d,"
                              " %s, %s, \"%s\", \"%s\", \"%s\", \"%s\")", 
-                             channum, (*i).startts.ascii(), 
+                             chanid, (*i).startts.ascii(), 
                              (*i).endts.ascii(), (*i).title.utf8().data(), 
                              (*i).subtitle.utf8().data(), 
                              (*i).desc.utf8().data(), 
@@ -410,7 +612,7 @@ void handlePrograms(int id, int offset, QMap<QString,
     }
 }
 
-void grabData(Source source, int offset)
+void grabData(Source source, QString xmltv_grabber, int offset)
 {
     QValueList<ChanInfo> chanlist;
     QMap<QString, QValueList<ProgInfo> > proglist;
@@ -425,11 +627,21 @@ void grabData(Source source, int offset)
     QString configfile = QString("%1/.mythtv/%2.xmltv").arg(home)
                                                        .arg(source.name);
     QString command;
-    command.sprintf("nice -19 tv_grab_na --days 1 --offset %d "
-                    "--config-file %s --output %s", 
-                    offset, configfile.ascii(), filename.ascii());
 
-    system(command.ascii());
+    if (offset >= 0)
+        command.sprintf("nice -19 %s --days 1 --offset %d --config-file %s "
+                        "--output %s", xmltv_grabber.ascii(),
+                        offset, configfile.ascii(), filename.ascii());
+    else
+        command.sprintf("nice -19 %s --days 7 --config-file %s --output %s",
+                        xmltv_grabber.ascii(), configfile.ascii(), 
+                        filename.ascii());
+
+    cout << "----------------- Start of XMLTV output -----------------" << endl;
+ 
+     system(command.ascii());
+ 
+    cout << "------------------ End of XMLTV output ------------------" << endl;
 
     parseFile(filename, &chanlist, &proglist);
 
@@ -452,28 +664,39 @@ void clearOldDBEntries(void)
 void fillData(QValueList<Source> &sourcelist)
 {
     QValueList<Source>::Iterator it;
-    for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
-        grabData(*it, 1);
+    QString xmltv_grabber = globalsettings->GetSetting("XMLTVGrab");
 
-    for (int i = 0; i < 9; i++)
+    if (xmltv_grabber == "tv_grab_uk")
     {
-        int nextoffset = i + 1;
-        QString querystr;
-        querystr.sprintf("SELECT NULL FROM program WHERE starttime >= "
-                         "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) AND "
-                         "starttime < DATE_ADD(CURRENT_DATE, INTERVAL %d DAY);",
-                         i, nextoffset);
+        // tv_grab_uk doesn't support the --offset option, so just grab a week.
+        for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
+             grabData(*it, xmltv_grabber, -1);
+    }
+    else
+    {
+        for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
+            grabData(*it, xmltv_grabber, 1);
 
-        QSqlQuery query;
-        query.exec(querystr);
+        for (int i = 0; i < 9; i++)
+        {
+            int nextoffset = i + 1;
+            QString querystr;
+            querystr.sprintf("SELECT NULL FROM program WHERE starttime >= "
+                             "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) AND "
+                             "starttime < DATE_ADD(CURRENT_DATE, INTERVAL %d "
+                             "DAY);", i, nextoffset);
+
+            QSqlQuery query;
+            query.exec(querystr);
  
-        if (query.isActive() && query.numRowsAffected() > 20)
-        {
-        }
-        else
-        {
-            for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
-                grabData(*it, i);
+            if (query.isActive() && query.numRowsAffected() > 20)
+            {
+            }
+            else
+            {
+                for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
+                    grabData(*it, xmltv_grabber, i);
+            }
         }
     }
 
@@ -484,8 +707,20 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv, false);
 
+    if (a.argc() > 1)
+    {
+        if (a.argv()[1] == "--manual")
+        {
+            cout << "### Running in manual channel configuration mode.\n";
+            cout << "### This will ask you questions about every channel.\n";
+            cout << "###\n";
+            interactive = true;
+        }
+    }
+
     globalsettings = new Settings;
     globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
+    globalsettings->LoadSettingsFiles("settings.txt", installprefix);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     db->setDatabaseName(globalsettings->GetSetting("DBName"));

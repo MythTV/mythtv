@@ -25,8 +25,12 @@ QString prefix;
 vector<TV *> tvList;
 Settings *globalsettings;
 
-QString startGuide(const QString &startchannel)
+QString startGuide(void)
 {
+    QString startchannel = globalsettings->GetSetting("DefaultTVChannel");
+    if (startchannel == "")
+        startchannel = "3";
+
     GuideGrid gg(startchannel);
 
     gg.exec();
@@ -241,7 +245,7 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "tv_watch_recording")
         startPlayback();
     else if (sel == "tv_schedule")
-        startGuide("3");
+        startGuide();
     else if (sel == "tv_delete")
         startDelete();
     else if (sel == "tv_fix_conflicts")
@@ -286,9 +290,13 @@ void setupTVs(void)
         exit(0);
     }
 
+    QString startchannel = globalsettings->GetSetting("DefaultTVChannel");
+    if (startchannel == "")
+        startchannel = "3";
+
     for (int i = 0; i < numcards; i++)
     {
-        TV *tv = new TV("3", i+1, i+2);
+        TV *tv = new TV(startchannel, i+1, i+2);
         tvList.push_back(tv);
     }
 }
@@ -303,8 +311,6 @@ int main(int argc, char **argv)
     globalsettings->LoadSettingsFiles("theme.txt", installprefix);
     globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
 
-
-    
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
     {

@@ -17,6 +17,7 @@ int main(int argc, char **argv)
 
     globalsettings->LoadSettingsFiles("theme.txt", installprefix);
     globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
+    globalsettings->LoadSettingsFiles("settings.txt", installprefix);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     db->setDatabaseName(globalsettings->GetSetting("DBName"));
@@ -30,7 +31,9 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    QString startchannel = "3";
+    QString startchannel = globalsettings->GetSetting("DefaultTVChannel");
+    if (startchannel == "")
+        startchannel = "3";
 
     if (a.argc() > 1)
     {

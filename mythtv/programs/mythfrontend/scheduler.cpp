@@ -66,7 +66,7 @@ void Scheduler::setupCards(void)
         while (query.next())
         {
             thequery = QString("SELECT cardinputid FROM cardinput WHERE "
-                               "sourceid = %1 ORDER BY cardid")
+                               "sourceid = %1 ORDER BY cardid;")
                               .arg(query.value(0).toInt());
             subquery = db->exec(thequery);
           
@@ -93,7 +93,7 @@ void Scheduler::setupCards(void)
         exit(0);
     }
 
-    thequery = "SELECT cardid FROM cardinput ORDER BY cardinputid\n";
+    thequery = "SELECT cardid FROM cardinput ORDER BY cardinputid;";
 
     query = db->exec(thequery);
 

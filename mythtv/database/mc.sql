@@ -3,14 +3,15 @@ GRANT ALL ON mythconverg.* TO mythtv@localhost IDENTIFIED BY "mythtv";
 USE mythconverg;
 CREATE TABLE channel
 (
-    chanid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    chanid INT UNSIGNED NOT NULL PRIMARY KEY,
     channum VARCHAR(5) NOT NULL,
     sourceid INT UNSIGNED,
     callsign VARCHAR(20) NULL,
     name VARCHAR(20) NULL,
     icon VARCHAR(255) NULL,
     finetune INT,
-    videofilters VARCHAR(255) NULL
+    videofilters VARCHAR(255) NULL,
+    xmltvid VARCHAR(64) NULL
 );
 CREATE TABLE program
 (

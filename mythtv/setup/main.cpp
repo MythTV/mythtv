@@ -157,14 +157,22 @@ void getSources(void)
             file.remove();
         }
 
+        QString xmltv_grabber = globalsettings->GetSetting("XMLTVGrab");
+
         cout << "\n\nConfiguring channel source #" << i+1 << endl;
-        cout << "mythsetup will now run tv_grab_na --configure\n\n";
+        cout << "mythsetup will now run " << xmltv_grabber 
+             << " --configure\n\n";
         sleep(1);
 
-        QString command = QString("tv_grab_na --configure --config-file ") + 
+        QString command = xmltv_grabber + " --configure --config-file " + 
                           filename;
 
+        cout << "--------------- Start of XMLTV output ---------------" << endl;
+
+
         system(command);
+
+        cout << "---------------- End of XMLTV output ----------------" << endl;
 
         QSqlQuery sqlquery;
 
@@ -325,6 +333,7 @@ int main(int argc, char *argv[])
 
     globalsettings = new Settings;
     globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
+    globalsettings->LoadSettingsFiles("settings.txt", installprefix);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     db->setDatabaseName(globalsettings->GetSetting("DBName"));

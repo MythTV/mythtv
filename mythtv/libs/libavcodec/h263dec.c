@@ -164,6 +164,11 @@ uint64_t time= rdtsc();
         init_get_bits(&s->gb, buf, buf_size);
     s->bitstream_buffer_size=0;
 
+    if (!s->context_initialized) {
+        if (MPV_common_init(s) < 0) //we need the idct permutaton for reading a custom matrix
+            return -1;
+    }
+        
     /* let's go :-) */
     if (s->h263_msmpeg4) {
         ret = msmpeg4_decode_picture_header(s);
@@ -188,7 +193,10 @@ uint64_t time= rdtsc();
         /* and other parameters. So then we could init the picture   */
         /* FIXME: By the way H263 decoder is evolving it should have */
         /* an H263EncContext                                         */
-    if (s->width != avctx->width || s->height != avctx->height) {
+    if (   s->width != avctx->width || s->height != avctx->height 
+        || avctx->aspect_ratio_info != s->aspect_ratio_info
+        || avctx->aspected_width != s->aspected_width
+        || avctx->aspected_height != s->aspected_height) {
         /* H.263 could change picture size any time */
         MPV_common_end(s);
         s->context_initialized=0;
@@ -362,7 +370,12 @@ uint64_t time= rdtsc();
             h = s->height - y;
             if (h > 16)
                 h = 16;
-            offset = y * s->linesize;
+
+            if(s->pict_type==B_TYPE)
+                offset = 0;
+            else
+                offset = y * s->linesize;
+
             if(s->pict_type==B_TYPE || (!s->has_b_frames)){
                 src_ptr[0] = s->current_picture[0] + offset;
                 src_ptr[1] = s->current_picture[1] + (offset >> 2);

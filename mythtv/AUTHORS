@@ -15,9 +15,12 @@ Selectable GUI sizes:
     thor at lamedomainname.com
 Video Filters:
     Richard Jones <richard at earthmen.com>
-Misc small changes:
+Misc changes:
     Grant Taylor <gtaylor at picante.com>
 Colorize the EPG:
     skrpub <skrpub at earthlink.net>
-Random bugfixes, EPG updates:
+Random bugfixes, EPG updates, more UK friendly database filling:
     Andrew M. Bishop <amb at gedanken.demon.co.uk>
+Non-integer channel fixes:
+    Jens Lohmann-Hansen <JensLH at adslhome.dk>
+
