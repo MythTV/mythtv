@@ -94,6 +94,7 @@ package gui_cli;
 	# User-specified path?
 		if ($Args{outfile} && $Args{outfile} =~ /\w/) {
 			($savepath, $outfile) = $Args{outfile} =~ /^(?:(.*?)\/)?([^\/]+)$/;
+			$savepath ||= '.';
 		}
 	# Otherwise, use the default
 		else {

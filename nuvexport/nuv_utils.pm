@@ -220,8 +220,9 @@ package nuv_utils;
 	}
 
 	sub Quit {
-	# Print a nice goodbye message, and leave
-		print "\nThanks for using nuvexport!\n\n";
+	# If this is the main script, print a nice goodbye message
+		print "\nThanks for using nuvexport!\n\n" unless ($is_child);
+	# Time to leave
 		exit;
 	}
 
