@@ -274,8 +274,8 @@ void VideoOutput::MoveResize(void)
     if (img_vscanf > 0) 
     {
         // Veritcal overscan. Move the Y start point in original image.
-        imgy = (int)ceil(XJ_height * img_vscanf);
-        imgh = (int)ceil(XJ_height * (1 - 2 * img_vscanf));
+        imgy = (int)floor(0.5 + XJ_height * img_vscanf);
+        imgh = (int)floor(0.5 + XJ_height * (1 - 2 * img_vscanf));
 
         // If there is an offset, apply it now that we have a room.
         // To move the image down, move the start point up.
@@ -299,8 +299,8 @@ void VideoOutput::MoveResize(void)
     if (img_hscanf > 0) 
     {
         // Horizontal overscan. Move the X start point in original image.
-        imgx = (int)ceil(XJ_width * img_hscanf);
-        imgw = (int)ceil(XJ_width * (1 - 2 * img_hscanf));
+        imgx = (int)floor(0.5 + XJ_width * img_hscanf);
+        imgw = (int)floor(0.5 + XJ_width * (1 - 2 * img_hscanf));
         if (xoff > 0) 
         {
             if (xoff > imgx) 
@@ -318,11 +318,11 @@ void VideoOutput::MoveResize(void)
     float vscanf, hscanf;
     if (img_vscanf < 0) 
     {
-        // Veritcal underscan. Move the starting Y point in the display window.
+        // Vertical underscan. Move the starting Y point in the display window.
         // Use the abolute value of scan factor.
         vscanf = fabs(img_vscanf);
-        dispyoff = (int)ceil(disph * vscanf);
-        disphoff = (int)ceil(disph * (1 - 2 * vscanf));
+        dispyoff = (int)floor(0.5 + disph * vscanf);
+        disphoff = (int)floor(0.5 + disph * (1 - 2 * vscanf));
         // Now offset the image within the extra blank space created by
         // underscanning.
         // To move the image down, increase the Y offset inside the display
@@ -345,8 +345,8 @@ void VideoOutput::MoveResize(void)
     if (img_hscanf < 0) 
     {
         hscanf = fabs(img_hscanf);
-        dispxoff = (int)ceil(dispw * hscanf);
-        dispwoff = (int)ceil(dispw * (1 - 2 * hscanf));
+        dispxoff = (int)floor(0.5 + dispw * hscanf);
+        dispwoff = (int)floor(0.5 + dispw * (1 - 2 * hscanf));
         if (xoff > 0) 
         {
             if (xoff > dispxoff) 
@@ -425,6 +425,16 @@ void VideoOutput::MoveResize(void)
 
     //printf("After: %dx%d%+d%+d\n", dispwoff, disphoff, dispxoff, 
     //dispyoff);
+
+ 
+    VERBOSE(VB_PLAYBACK,
+            QString("Image size. dispxoff %1, dispxoff: %2, dispwoff: %3, "
+                    "disphoff: %4")
+            .arg(dispxoff).arg(dispyoff).arg(dispwoff).arg(disphoff));
+
+    VERBOSE(VB_PLAYBACK,
+            QString("Image size. imgx %1, imgy: %2, imgw: %3, imgh: %4")
+           .arg(imgx).arg(imgy).arg(imgw).arg(imgh));
 
     DrawUnusedRects();
 }
