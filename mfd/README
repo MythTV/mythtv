@@ -7,7 +7,7 @@ GENERAL INFO
 
 INSTALL:
 
-	./config
+	./configure
     qmake
     make
     make install
