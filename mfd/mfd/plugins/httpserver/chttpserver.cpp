@@ -15,7 +15,7 @@
 #include "chttpserver.h"
 #include "httpinrequest.h"
 #include "httpoutresponse.h"
-
+#include "../../servicelister.h"
 
 ClientHttpServer *http_server = NULL;
 
@@ -71,11 +71,11 @@ void ClientHttpServer::run()
     }
 
     
+    //
+    //  Become a client of the audio server (so we can control playback on
+    //  _this_ box via http)
+    //
 
-    //
-    //  Get a socket to the core mfd for service announcemnts
-    //
-    
     QHostAddress this_address;
     if(!this_address.setAddress("127.0.0.1"))
     {
@@ -83,38 +83,10 @@ void ClientHttpServer::run()
         return;
     }
 
-    client_socket_to_mfd = new QSocketDevice(QSocketDevice::Stream);
-    client_socket_to_mfd->setBlocking(false);
-    
-    int connect_tries = 0;
-    
-    while(! (client_socket_to_mfd->connect(this_address, 2342)))
-    {
-        //
-        //  We give this a few attempts. It can take a few on non-blocking sockets.
-        //
-
-        ++connect_tries;
-        if(connect_tries > 10)
-        {
-            fatal("could not connect to the core mfd as a regular client");
-            return;
-        }
-        usleep(100);
-    }
-    
-
-    QString first_and_only_command = "services list\n\r";
-    client_socket_to_mfd->writeBlock(first_and_only_command.ascii(), first_and_only_command.length());
-    
-    //
-    //  Become a client of the audio server
-    //
-
     client_socket_to_audio = new QSocketDevice(QSocketDevice::Stream);
     client_socket_to_audio->setBlocking(false);
     
-    connect_tries = 0;
+    int connect_tries = 0;
     
     while(! (client_socket_to_audio->connect(this_address, 2343)))
     {
@@ -135,6 +107,7 @@ void ClientHttpServer::run()
     {
         updateSockets();
         checkThreadPool();
+        checkServiceChanges();
 
         int nfds = 0;
         fd_set readfds;
@@ -143,27 +116,12 @@ void ClientHttpServer::run()
 
 
         //
-        //  Add the socket to the mfd (where we find out about new services,
-        //  services going away, etc.)
-        //
-
-        int a_socket = client_socket_to_mfd->socket();
-        if(a_socket > 0)
-        {
-            FD_SET(a_socket, &readfds);
-            if(nfds <= a_socket)
-            {
-                nfds = a_socket + 1;
-            }
-        }
-        
-        //
         //  Add the server socket to things we want to watch
         //
 
         if(core_server_socket)
         {
-            a_socket = core_server_socket->socket();
+            int a_socket = core_server_socket->socket();
             if(a_socket > 0)
             {
                 FD_SET(a_socket, &readfds);
@@ -255,75 +213,81 @@ void ClientHttpServer::run()
         char read_back[2049];
         client_socket_to_audio->readBlock(read_back, 2048);
     
-        //
-        //  Handle anything incoming on the socket
-        //
-
-        a_socket = client_socket_to_mfd->socket();
-        if(a_socket > 0)
-        {
-            if(FD_ISSET(a_socket, &readfds))
-            {
-                readFromMFD();
-            }
-        }
     }
 }    
 
-void ClientHttpServer::readFromMFD()
+void ClientHttpServer::handleServiceChange()
 {
-    char incoming[2049];
+    //
+    //  Something has changed in available services. I query the mfd,
+    //  looking for other http services (so I can build a page on _this_ box
+    //  that includes links to any other http service on the network that
+    //  includes the phrase UFPI in its description)
+    //
+    
+    ServiceLister *service_lister = parent->getServiceLister();
+    
+    service_lister->lockDiscoveredList();
 
-    int length = client_socket_to_mfd->readBlock(incoming, 2048);
-    if(length > 0)
-    {
-        if(length >= 2048)
-        {
-            // oh crap
-            warning("daap client socket to mfd is getting too much data");
-            length = 2048;
-        }
-        incoming[length] = '\0';
-        QString incoming_data = incoming;
-        
-        incoming_data.simplifyWhiteSpace();
+        //
+        //  Go through my list of http instances and make sure they still
+        //  exist in the mfd's service list
+        //
 
-        QStringList line_by_line = QStringList::split("\n", incoming_data);        
+        other_ufpi_mutex.lock();
 
-        for(uint i = 0; i < line_by_line.count(); i++)
-        {
-            QStringList tokens = QStringList::split(" ", line_by_line[i]);
-            if(tokens.count() >= 7)
+            QPtrListIterator<OtherUFPI> iter( other_ufpi );
+            OtherUFPI *a_ufpi;
+            while ( (a_ufpi = iter.current()) != 0 )
             {
-                if(tokens[0] == "services" &&
-                   tokens[2] == "lan" &&
-                   tokens[3] == "http")
+                ++iter;
+                if( !service_lister->findDiscoveredService( a_ufpi->getName()) )
                 {
-                    QString service_name = tokens[6];
-                    for(uint i = 7; i < tokens.count(); i++)
+                    log(QString("noticed that a UFPI service went away: "
+                                "\"%1\" (%2)")
+                                .arg(a_ufpi->getName())
+                                .arg(a_ufpi->getUrl()), 9);
+                    other_ufpi.remove(a_ufpi);    
+                }
+            }
+        other_ufpi_mutex.unlock();
+            
+
+        //
+        //  Go through services on the master list, add any that are HTTP
+        //  and have UFPI in the name (just add them all, as the add()
+        //  method with check for dupes.
+        //
+        
+        typedef     QValueList<Service> ServiceList;
+        ServiceList *discovered_list = service_lister->getDiscoveredList();
+        
+
+        ServiceList::iterator it;
+        for ( it  = discovered_list->begin(); 
+              it != discovered_list->end(); 
+              ++it )
+        {
+            //
+            //  We just try and add any that are not on this host, as the
+            //  addDaapServer() method checks for dupes
+            //
+                
+            if ( (*it).getType() == "http")
+            {
+                if( (*it).getLocation() == SLT_LAN ||
+                    (*it).getLocation() == SLT_NET )
+                {
+                    if( (*it).getName().contains("UFPI"))
                     {
-                        service_name += " ";
-                        service_name += tokens[i];
-                    }
-                    
-                    if(tokens[1] == "found")
-                    {
-                        addMHttpServer(tokens[4], tokens[5].toUInt(), service_name);
-                    }
-                    else if(tokens[1] == "lost")
-                    {
-                        removeMHttpServer(tokens[4], tokens[5].toUInt(), service_name);
-                    }
-                    else
-                    {
-                        warning("got a services update where 2nd token was neither \"found\" nor \"lost\"");
+                        addMHttpServer( (*it).getAddress(), (*it).getPort(), (*it).getName() );
                     }
                 }
-                   
             }
         }
-    }
-    
+
+
+    service_lister->unlockDiscoveredList();
 }
 
 void ClientHttpServer::addMHttpServer(QString server_address, uint server_port, QString service_name)
@@ -368,43 +332,6 @@ void ClientHttpServer::addMHttpServer(QString server_address, uint server_port, 
 
     other_ufpi_mutex.unlock();
 }
-
-void ClientHttpServer::removeMHttpServer(QString server_address, uint server_port, QString service_name)
-{
-    log(QString("httpservice has noticed that a service went away: \"%1\" (%2:%3)")
-        .arg(service_name)
-        .arg(server_address)
-        .arg(server_port), 10);
-        
-    //
-    //  Find it and delete it
-    //
-    
-    other_ufpi_mutex.lock();
-        QPtrListIterator<OtherUFPI> it( other_ufpi );
-        OtherUFPI *which_one = NULL;
-        OtherUFPI *a_ufpi;
-        while ( (a_ufpi = it.current()) != 0 )
-        {
-            ++it;
-            if(a_ufpi->getName() == service_name)
-            {
-                which_one = a_ufpi;
-                break;
-            }
-        }
-        if(which_one)
-        {
-            other_ufpi.remove(which_one);
-        }
-        else
-        {
-            warning("told to delete a UFPI I wasn't aware of:"); 
-        }
-    other_ufpi_mutex.unlock();
-}
-
-
 
 void ClientHttpServer::handleIncoming(HttpInRequest *http_request, int)
 {

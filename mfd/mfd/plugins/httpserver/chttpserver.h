@@ -50,10 +50,9 @@ class ClientHttpServer: public MFDHttpPlugin
     ~ClientHttpServer();
 
     void    run();
-    void    readFromMFD();
     void    addMHttpServer(QString server_address, uint server_port, QString service_name);
-    void    removeMHttpServer(QString server_address, uint server_port, QString service_name);
     void    handleIncoming(HttpInRequest *http_request, int client_id);
+    void    handleServiceChange();
     
     //
     //  Stuff that builds the HTML
@@ -82,7 +81,6 @@ class ClientHttpServer: public MFDHttpPlugin
   private:
   
     QString             my_hostname;
-    QSocketDevice       *client_socket_to_mfd;
     QSocketDevice       *client_socket_to_audio;
     int                 core_table_columns;
     MetadataServer      *metadata_server;
