@@ -967,7 +967,7 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         *exec+= volume;
         *exec+=  " ";
         *exec+= game_settings.cheat ? " -cheat " : " -nocheat ";
-        *exec+= game_settings.extra_options ? game_settings.extra_options : " ";
+        *exec+= game_settings.extra_options ? (const char *)game_settings.extra_options : " ";
         
         *exec+= " ";
         *exec+= game;
