@@ -241,7 +241,20 @@ int mythplugin_config(void);
 
 void handleMedia(void) 
 {
-    mythplugin_run();
+    switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
+    {
+       case 0 : // Do nothing
+           break;
+       case 1 : // Display menu (mythdvd)*/
+           mythplugin_run();
+           break;
+       case 2 : // play DVD
+           playDVD();    
+           break;
+       case 3 : //Rip DVD
+           startDVDRipper();
+           break;
+    }
 }
 
 void initKeys(void)

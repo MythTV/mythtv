@@ -50,6 +50,20 @@ public:
     };
 };
 
+class SetOnInsertDVD: public ComboBoxSetting, public GlobalSetting {
+public :
+    SetOnInsertDVD():
+       GlobalSetting("DVDOnInsertDVD") {
+       setLabel(QObject::tr("On DVD insertion"));
+       addSelection(QObject::tr("Display mythdvd menu menu"),"1");
+       addSelection(QObject::tr("Do nothing"),"0");
+       addSelection(QObject::tr("Play DVD"),"2");
+       addSelection(QObject::tr("Rip DVD"),"3");
+       setHelpText(QObject::tr("Media Monitoring should be turned on to "
+                   "allow this feature (Setup -> General -> CD/DVD Monitor"));
+       };
+};
+
 DVDGeneralSettings::DVDGeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
@@ -58,6 +72,7 @@ DVDGeneralSettings::DVDGeneralSettings()
 #ifdef VCD_SUPPORT
     general->addChild(new SetVCDDevice());
 #endif
+    general->addChild(new SetOnInsertDVD());
     addChild(general);
 }
 
