@@ -41,7 +41,7 @@ class MfdInfo
     void                    setCurrentPlayingData();
     bool                    setCurrentPlayingData(int which_container, int which_metadata, int numb_seconds);
     QStringList             getPlayingStrings(){return playing_strings;}
-    void                    clearCurrentPlayingData(){playing_strings.clear();}
+    void                    clearCurrentPlayingData(){playing_strings.clear(); previous_item = -2; previous_container = -2;}
     double                  getPercentPlayed(){return played_percentage;}
     
     void                    setPauseState(bool new_state){ pause_state = new_state; }
