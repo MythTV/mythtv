@@ -964,7 +964,7 @@ void DaapServer::sendDatabase(HttpInRequest *http_request, DaapRequest *daap_req
         TagOutput response;
         response    << Tag( 'adbs' )
                          << Tag('mstt') << (u32) DAAP_OK << end
-                         << Tag('muty') << (u8) 0 << end
+                         << Tag('muty') << (u8) 1 << end
                          << Tag('mtco') << (u32) audio_count << end
                          << Tag('mrco') << (u32) additions_count << end;
 
