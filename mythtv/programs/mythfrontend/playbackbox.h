@@ -92,8 +92,13 @@ class PlaybackBox : public MythDialog
     void changeSetRecGroup(void);
     void changeRecGroupPassword();
     void changeOldPasswordChanged(const QString &newText);
+    void doJobQueueJob(int jobType, int jobFlags = 0);
     void doBeginTranscoding();
     void doBeginFlagging();
+    void doBeginUserJob1();
+    void doBeginUserJob2();
+    void doBeginUserJob3();
+    void doBeginUserJob4();
     void doClearPlaylist();
     void doPlaylistDelete();
     void doPlaylistChangeRecGroup();
