@@ -17,7 +17,12 @@ extern "C" {
 }
 using namespace std;
 
+#ifndef USING_XVMC
 #define MAXVBUFFER 31
+#else
+#define MAXVBUFFER 7
+#endif
+
 #define MAXTBUFFER 21
 
 #define REENCODE_OK              1
@@ -137,6 +142,8 @@ class NuppelVideoPlayer
     VideoFrame *GetNextVideoFrame(void);
     void ReleaseNextVideoFrame(VideoFrame *buffer, long long timecode);
     void DiscardVideoFrame(VideoFrame *buffer);
+
+    void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
     void AddAudioData(char *buffer, int len, long long timecode);
     void AddAudioData(short int *lbuffer, short int *rbuffer, int samples,

@@ -28,6 +28,8 @@ class VideoOutput
 
     virtual int GetRefreshRate(void) = 0;
 
+    virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
+
   protected:
     int XJ_width, XJ_height;
     float XJ_aspect;

@@ -34,4 +34,11 @@ SOURCES += remoteutil.cpp RingBuffer.cpp RTjpegN.cpp scheduledrecording.cpp
 SOURCES += ttfont.cpp tv_play.cpp tv_rec.cpp videosource.cpp yuv2rgb.cpp
 SOURCES += progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp recorderbase.cpp
 SOURCES += mpegrecorder.cpp channelbase.cpp dvbrecorder.cpp dvbchannel.cpp
-SOURCES += vsync.c proglist.cpp hdtvrecorder.cpp videooutbase.cpp videoout_xv.cpp
+SOURCES += vsync.c proglist.cpp hdtvrecorder.cpp videooutbase.cpp 
+SOURCES += videoout_xv.cpp
+
+using_xvmc {
+    SOURCES += videoout_xvmc.cpp
+    HEADERS += videoout_xvmc.h
+    DEFINES += USING_XVMC
+}

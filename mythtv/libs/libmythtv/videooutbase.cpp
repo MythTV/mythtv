@@ -97,6 +97,15 @@ void VideoOutput::StopEmbedding(void)
     MoveResize();
 }
 
+void VideoOutput::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
+{
+    (void)frame;
+    (void)x;
+    (void)y;
+    (void)w;
+    (void)h;
+}
+
 void VideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
 {
     xoff = imgx;

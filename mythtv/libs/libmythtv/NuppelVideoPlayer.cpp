@@ -35,6 +35,16 @@ extern "C" {
 
 #include "remoteencoder.h"
 
+#ifndef USING_XVMC
+const int kPrebufferFrames = 12;
+const int kNeedFreeFrames = 1;
+#else
+#include "videoout_xvmc.h"
+const int kPrebufferFrames = 4;
+const int kNeedFreeFrames = 2;
+#endif
+
+
 NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
                                      ProgramInfo *info)
 {
@@ -68,7 +78,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     eof = 0;
 
     keyframedist = 30;
-    usepre = 12;
+    usepre = kPrebufferFrames;
 
     wtxt = rtxt = 0;
 
@@ -290,7 +300,11 @@ void NuppelVideoPlayer::InitVideo(void)
         exit(0);
     }
 
+#ifndef USING_XVMC
     videoOutput = new VideoOutputXv();
+#else
+    videoOutput = new VideoOutputXvMC();
+#endif
     videoOutput->Init(video_width, video_height, video_aspect,
                       MAXVBUFFER + 1, vbuffers, widget->winId(), 
                       0, 0, widget->width(), widget->height(),
@@ -540,6 +554,12 @@ void NuppelVideoPlayer::DiscardVideoFrame(VideoFrame *buffer)
     pthread_mutex_unlock(&video_buflock);
 }
 
+void NuppelVideoPlayer::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
+{
+    if (videoOutput)
+        videoOutput->DrawSlice(frame, x, y, w, h);
+}
+
 void NuppelVideoPlayer::AddTextData(char *buffer, int len, 
                                     long long timecode, char type)
 {
@@ -568,7 +588,7 @@ void NuppelVideoPlayer::AddTextData(char *buffer, int len,
 
 void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 {
-    while (vbuffer_numfree() == 0 && !unsafe)
+    while (vbuffer_numfree() < kNeedFreeFrames && !unsafe)
     {
         //cout << "waiting for video buffer to drain.\n";
         setPrebuffering(false);

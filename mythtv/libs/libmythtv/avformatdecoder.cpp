@@ -9,6 +9,10 @@ using namespace std;
 #include "remoteencoder.h"
 #include "programinfo.h"
 
+extern "C" {
+#include "../libavcodec/xvmc_render.h"
+}
+
 extern pthread_mutex_t avcodeclock;
 
 AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
@@ -288,12 +292,32 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 enc->debug = 0;
                 enc->rate_emu = 0;
 
+#ifdef USING_XVMC
+                if (enc->codec_id == CODEC_ID_MPEG1VIDEO)
+                {
+                    enc->codec_id = CODEC_ID_MPEG2VIDEO_XVMC;
+                    enc->slice_flags = SLICE_FLAG_CODED_ORDER | 
+                                       SLICE_FLAG_ALLOW_FIELD;
+                }
+#endif            
+        
                 AVCodec *codec = avcodec_find_decoder(enc->codec_id);
 
                 if (codec && codec->capabilities & CODEC_CAP_TRUNCATED)
                     enc->flags |= CODEC_FLAG_TRUNCATED;
 
-                if (codec && codec->capabilities & CODEC_CAP_DR1 && 
+                if (codec && codec->id == CODEC_ID_MPEG2VIDEO_XVMC)
+                {
+                    enc->flags |= CODEC_FLAG_EMU_EDGE;
+                    enc->get_buffer = get_avf_buffer_xvmc;
+                    enc->release_buffer = release_avf_buffer_xvmc;
+                    enc->draw_horiz_band = render_slice_xvmc;
+                    enc->opaque = (void *)this;
+                    directrendering = true;
+                    enc->slice_flags = SLICE_FLAG_CODED_ORDER |
+                                       SLICE_FLAG_ALLOW_FIELD;
+                }
+                else if (codec && codec->capabilities & CODEC_CAP_DR1 && 
                     !(enc->width % 16))
                 {
                     enc->flags |= CODEC_FLAG_EMU_EDGE;
@@ -441,6 +465,67 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
         pic->data[i] = NULL;
 }
 
+int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
+{
+    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+    VideoFrame *frame = nd->m_parent->GetNextVideoFrame();
+
+    pic->data[0] = frame->priv[0];
+    pic->data[1] = frame->priv[1];
+    pic->data[2] = frame->buf;
+
+    pic->linesize[0] = 0;
+    pic->linesize[1] = 0;
+    pic->linesize[2] = 0;
+
+    pic->opaque = frame;
+    pic->type = FF_BUFFER_TYPE_USER;
+
+    pic->age = 256 * 256 * 256 * 64;
+
+    nd->inUseBuffers.append(frame);
+
+    xvmc_render_state_t *render = (xvmc_render_state_t *)frame->buf;
+
+    render->state = MP_XVMC_STATE_PREDICTION;
+    render->picture_structure = 0;
+    render->flags = 0;
+    render->start_mv_blocks_num = 0;
+    render->filled_mv_blocks_num = 0;
+    render->next_free_data_block_num = 0;
+
+    return 1;
+}
+
+void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
+{
+    (void)c;
+
+    assert(pic->type == FF_BUFFER_TYPE_USER);
+
+    xvmc_render_state_t *render = (xvmc_render_state_t *)pic->data[2];
+    render->state &= ~MP_XVMC_STATE_PREDICTION;
+
+    int i;
+    for (i = 0; i < 4; i++)
+        pic->data[i] = NULL;
+
+}
+
+void render_slice_xvmc(struct AVCodecContext *s, AVFrame *src, int offset[4],
+                       int y, int type, int height)
+{
+    (void)offset;
+    (void)type;
+
+    AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
+
+    int width = s->width;
+
+    VideoFrame *frame = (VideoFrame *)src->opaque;
+    nd->m_parent->DrawSlice(frame, 0, y, width, height);
+}
+
 #define SEQ_START     0x000001b3
 #define GOP_START     0x000001b8
 #define PICTURE_START 0x00000100
@@ -554,7 +639,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
         if (len > 0 && curstream->codec.codec_type == CODEC_TYPE_VIDEO)
         {
             AVCodecContext *context = &(curstream->codec);
-            if (context->codec_id == CODEC_ID_MPEG1VIDEO)
+            if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
+                context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC)
             {
                 int startpos = 0;
                 if ((startpos = PacketHasHeader(pkt.data, pkt.size, SEQ_START)))

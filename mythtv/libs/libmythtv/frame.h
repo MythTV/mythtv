@@ -22,6 +22,8 @@ typedef struct VideoFrame_
 
     long long frameNumber;
     long long timecode;
+
+    unsigned char *priv[4]; // random empty storage
 } VideoFrame;
 
 #endif
