@@ -553,7 +553,7 @@
 
     <item>
         <title>The New York Times</title>
-        <url>http://partners.userland.com/nytRss/nytHomepage.xml</url>
+        <url>http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml</url>
     </item>
 
     <item>
@@ -889,7 +889,7 @@
 
     <item>
         <title>New York Times - Opinion</title>
-        <url>http://partners.userland.com/nytRss/opinion.xml</url>
+        <url>http://www.nytimes.com/services/xml/rss/nyt/Opinion.xml</url>
     </item>
 
 </category>
