@@ -29,12 +29,14 @@
 void showUsage()
 {
     cout << "Usage:" << endl;
-    cout << "   --file <filename>" << endl;
+    cout << "   --file <string>" << endl;
     cout << "       Import data from the given file." << endl << endl;
-    cout << "   --user <username>" << endl;
+    cout << "   --user <string>" << endl;
     cout << "       The user ID to authenticate on the web server with." << endl << endl;
-    cout << "   --pass <password>" << endl;
-    cout << "       The password to authenticate on the web server with." << endl << endl;
+    cout << "   --zip <string>" << endl;
+    cout << "       The zipcode that's the center of the radius." << endl << endl;
+    cout << "   --radius <number>" << endl;
+    cout << "       The how far out from <zipcode> to look for theaters. Defaults to 25 miles." << endl << endl;
     cout << "   --help" << endl;
     cout << "       This text." << endl << endl;
 }
@@ -42,7 +44,9 @@ void showUsage()
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv, false);
-    QString filename, user, passwd;
+    QString filename, user, passwd, zip;
+    double radius = 25;
+    
     int argpos = 1;
     
     while (argpos < a.argc())
@@ -54,6 +58,14 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos], "--user"))
         {
             user = a.argv()[++argpos];
+        }
+        else if (!strcmp(a.argv()[argpos], "--zip"))
+        {
+            zip = a.argv()[++argpos];
+        }
+        else if (!strcmp(a.argv()[argpos], "--radius"))
+        {
+            radius = QString(a.argv()[++argpos]).toDouble();
         }
         else if (!strcmp(a.argv()[argpos], "--pass"))
         {
@@ -92,9 +104,9 @@ int main(int argc, char *argv[])
     {
         dd.importFile(filename);
     }
-    else if (!user.isEmpty() && !passwd.isEmpty() )
+    else if (!user.isEmpty() && !passwd.isEmpty() && !zip.isEmpty())
     {
-        dd.importData( user, passwd, "43319", 25 );
+        dd.importData( user, passwd, zip, radius );
     }
     else
     {
