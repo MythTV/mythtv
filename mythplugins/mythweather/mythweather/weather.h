@@ -20,6 +20,8 @@
 #include <qlayout.h>
 #include <fstream>
 
+#include <mythtv/uitypes.h>
+#include <mythtv/xmlparse.h>
 #include <mythtv/oldsettings.h>
 #include <mythtv/mythwidgets.h>
 
@@ -38,18 +40,17 @@ class Weather : public MythDialog
 {
     Q_OBJECT
   public:
-    Weather(QSqlDatabase *db, QWidget *parent = 0, const char *name = 0);
+    Weather(QSqlDatabase *db, int, QWidget *parent = 0, const char *name = 0);
     ~Weather();
 
     bool UpdateData();
     void processEvents();
     QString getLocation();
 
-private slots:
+  private slots:
     void update_timeout();
     void showtime_timeout();
     void nextpage_timeout();
-    void status_timeout();
     void cursorLeft();
     void cursorRight();
     void upKey();
@@ -71,8 +72,20 @@ private slots:
     void newLocale8();
     void newLocale9();
 
+  protected:
+    void paintEvent(QPaintEvent *);
 
   private:
+    void LoadWindow(QDomElement &);
+    void parseContainer(QDomElement &);
+    XMLParse *theme;
+    QDomElement xmldata;
+
+    void SetText(LayerSet *, QString, QString);
+
+    void updateBackground();
+    void updatePage(QPainter *);
+
     QSqlDatabase *config;
     QAccel *accel;
 
@@ -89,6 +102,7 @@ private slots:
     int config_Units;
     int config_Aggressiveness;
     int curConfig;
+    int curPage;
     bool debug;
     bool deepSetup;
     bool gotLetter;
@@ -109,11 +123,11 @@ private slots:
     QString cityNames[9];
     QString newLocaleHold;
     QString baseDir;
+    QString cfgCity;
 
     int con_attempt;
     QTimer *nextpage_Timer;
     QTimer *update_Timer;
-    QTimer *status_Timer;
 
     void saveConfig();
     QString findAccidbyName(QString);
@@ -130,7 +144,6 @@ private slots:
     void updateAggr();
     void showCityName();
     void setSetting(QString, QString, bool);
-    //void loadCityLetter(int);
 
     QString GetString(QString);
     int GetInt(QString);
@@ -139,31 +152,7 @@ private slots:
     void loadWeatherTypes();
     weatherTypes *wData;
   
-    void firstLayout();
-    void lastLayout();
-    void setupLayout(int);
     void showLayout(int);
-    void setupColorScheme();
-
-    QFrame *page0Dia;
-    QFrame *page1Dia;
-    QFrame *page2Dia;
-    QFrame *page3Dia;
-    QFrame *page4Dia;
-    QFrame *page5Dia;
-
-    QFrame *unitType;
-    QFrame *location;
-    QFrame *aggressv;
- 
-    QVBoxLayout *mid;
-    QVBoxLayout *main;
-    QHBoxLayout *page0; 
-    QHBoxLayout *page1;
-    QHBoxLayout *page2;
-    QHBoxLayout *page3;
-    QHBoxLayout *page4;
-    QHBoxLayout *page5;
 
     int currentPage;
 
@@ -191,61 +180,14 @@ private slots:
     QString lowTemp[5];
     QString precip[5];
 
-    QLabel *letterList;
-    QLabel *cityList;
-    QLabel *aggrNum;
-    QLabel *ImpUnits;
-    QLabel *SIUnits;
-    QLabel *lbUnits;
-    QLabel *lbLocal;
-    QLabel *lbAggr;
-    QLabel *lbPic0;
-    QLabel *lbPic1;
-    QLabel *lbPic2;
-    QLabel *lbPic3;
-    QLabel *lbPic4;
-    QLabel *lbPic5;
-    QLabel *date1;
-    QLabel *date2;
-    QLabel *date3;
-    QLabel *desc1;
-    QLabel *desc2;
-    QLabel *desc3;
-    QLabel *high1;
-    QLabel *high2;
-    QLabel *high3;
-    QLabel *low1;
-    QLabel *low2;
-    QLabel *low3;
-    QLabel *prec1;
-    QLabel *prec2;
-    QLabel *prec3;
-    QLabel *lbTemp;
-    QLabel *tempType;
-    QLabel *lbCond;
-    QLabel *lbDesc;
-    QLabel *lbTDesc;
-    QLabel *lbHumid;
-    QLabel *lbPress;
-    QLabel *lbWind;
-    QLabel *lbVisi;
-    QLabel *lbWindC;
-    QLabel *lbUVIndex;
-    QLabel *lbLocale;
-    QLabel *lbStatus;
-    QLabel *lbUpdated;
-    QLabel *hdPart1;
-    QLabel *hdPart2;
-    QLabel *dtime;
-
     QString httpData;
     QString oldhttpData;
 
-    QColor topbot_bgColor;
-    QColor topbot_fgColor;
-    QColor main_bgColor;
-    QColor main_fgColor;
-    QColor lohi_fgColor;
+    QRect fullRect() const;
+    QRect newlocRect() const;
+
+    QPixmap realBackground;
+  
 };
 
 

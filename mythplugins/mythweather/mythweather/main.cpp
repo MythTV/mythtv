@@ -17,6 +17,7 @@ using namespace std;
 #include <unistd.h>
 
 #include "weather.h"
+#include "weathercomms.h"
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
@@ -27,7 +28,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    gContext = new MythContext();
+    gContext = new MythContext(MYTH_BINARY_VERSION);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -44,10 +45,21 @@ int main(int argc, char *argv[])
 
     gContext->LoadQtConfig();
 
-    Weather weatherDat(db);
+    int appCode = 0;
+
+    if (argc > 1)
+    {
+       QString cmdline = QString(argv[1]);
+       if (cmdline == "--debug")
+           appCode = 1;
+       if (cmdline == "--configure")
+           appCode = 2;
+    }
+
+    Weather weatherDat(db, appCode);
     weatherDat.Show();
     weatherDat.exec();
- 
+
     delete gContext;
 
     return 0;

@@ -10,12 +10,14 @@ TARGET = mythweather
 target.path = $${PREFIX}/bin
 INSTALLS += target
 
+uifiles.path = $${PREFIX}/share/mythtv/themes/default
+uifiles.files = weather-ui.xml
 installfiles.path = $${PREFIX}/share/mythtv/mythweather
 installfiles.files = weathertypes.dat accid.dat
-installimages.path = $${PREFIX}/share/mythtv/mythweather/images
+installimages.path = $${PREFIX}/share/mythtv/themes/default
 installimages.files = images/*.png
 
-INSTALLS += installfiles installimages
+INSTALLS += installfiles installimages uifiles
 
 LIBS += 
 LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION

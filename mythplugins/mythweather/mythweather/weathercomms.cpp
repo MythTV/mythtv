@@ -10,13 +10,17 @@ using namespace std;
 
 WeatherSock::WeatherSock(Weather *con, bool tDebug, int tAgg)
 {
-	debug = tDebug;
+        debug = tDebug;
 	parent = con;
 	httpData = "";
  	gotDataHook = false;
 	timeout_cnt = 0;
 	invalid_cnt = 0;
+        imgSize = -1;
+        writeImage = false;
+   	connectType = 0;
 	reset_cnt = 0;
+        httpSock = NULL;
 	if (tAgg < 1)
 		aggressiveness = 1;
 	else
@@ -33,7 +37,7 @@ WeatherSock::WeatherSock(Weather *con, bool tDebug, int tAgg)
 
 QString WeatherSock::getData()
 {
-	return httpData;
+	return weatherData;
 }
 
 bool WeatherSock::getStatus()
@@ -115,6 +119,9 @@ QString WeatherSock::strStatus()
 
 void WeatherSock::startConnect()
 {
+        int multiplyer = 1;
+        if (connectType == 3)
+	    multiplyer = 8;
 	breakout = false;
 	timeout_cnt = 0;
 	int curState;
@@ -143,38 +150,99 @@ void WeatherSock::startConnect()
 		tmpState = httpSock->state();
 		timeout_cnt++;
 
-
 		if (timeout_cnt > (int)(5*aggressiveness) && getIntStatus() == 1)
 			resetConnection();
 
 		if (timeout_cnt > (int)(10*aggressiveness) && getIntStatus() == 2)
 			resetConnection();
 
-		if (timeout_cnt > (int)(15*aggressiveness) && getIntStatus() == 3)
+		if (timeout_cnt > (int)(15*multiplyer*aggressiveness) && getIntStatus() == 3)
 			resetConnection();
 
 		if (gotDataHook == true)
 		{
-			errs = verifyData();
-			if (errs < 0)
-			{
+                        if (connectType == 0)
+ 			{
+			    errs = verifyData();
+			    if (errs < 0)
+			    {
 				if (debug == true)
 					cout << "MythWeather: COMMS : Received an error, resetting...\n";
 				resetConnection();
-			}
-			if (errs >= 0)
-			{
+			    }
+			    if (errs >= 0)
+			    {
 				if (error != 3)
 					error = errs;
 				breakout = true;
-			}
+			        weatherData = httpData;
+			    }
+                        }
+ 	 	  	else if (connectType == 1)
+                        {
+                            mapLoc = parseData("if (isMinNS4) var mapNURL = \"", "\";");
+			    breakout = true;
+                        }
+                        else if (connectType == 2)
+                        {
+                            imageLoc = parseData("<IMG NAME=\"mapImg\" SRC=\"http://image.weather.com", "\"");
+                            breakout = true;
+                        }
+                        else if (connectType == 3)
+                        {
+			    image_out.flush();
+			    image_out.close();
+			    breakout = true;
+                        }
 		}
 	}
 
 	currentError = (int)(error * 10);
-	myStatus = true;
+        if (currentError == 0)
+        {
+            if (debug == true)
+                cout << "MythWeather: No Error, Continuing to next stage...\n";
+            connectType++;
+            if (connectType < 4)
+                startConnect();
+            if (connectType == 4)
+ 	    {
+                myStatus = true;
+ 		return;
+	    }
+        }
+        else
+        {
+	    myStatus = true;
 
-        return;
+            return;
+	}
+}
+
+QString WeatherSock::parseData(QString beg, QString end)
+{
+    QString ret;
+     
+    if (debug == true)
+    {
+        cout << "MythWeather: Parse HTML : Looking for: " << beg << ", ending with: " << end << endl;
+    }
+    int start = httpData.find(beg) + beg.length();
+    int endint = httpData.find(end, start + 1);
+    if (start != -1 && endint != -1)
+    {
+        ret = httpData.mid(start, endint - start);
+        if (debug == true)
+            cout << "MythWeather: Parse HTML : Returning : " << ret << endl;
+        return ret;
+    } 
+    else
+    {
+        if (debug == true)
+            cout << "MythWeather: Parse HTML : Parse Failed...returning <NULL>\n";
+        ret = "<NULL>";
+        return ret;
+    } 
 }
 
 void WeatherSock::resetConnection()
@@ -203,12 +271,20 @@ void WeatherSock::resetConnection()
         	timeout_cnt = 0;
 		disconnect(httpSock, 0, 0, 0);
 		delete httpSock;
+                httpSock = NULL;
         	makeConnection();
 	}
 }
 
 void WeatherSock::makeConnection()
 {
+        image_out.flush();
+        image_out.close();
+        writeImage = false;
+        imgSize = -1;
+        if (httpSock)
+            delete httpSock;
+
 	httpSock = new QSocket();
         connect(httpSock, SIGNAL(connected()),
                 SLOT(socketConnected()));
@@ -225,7 +301,20 @@ void WeatherSock::makeConnection()
         connect(httpSock, SIGNAL(error(int)),
                 SLOT(socketError(int)));
 
-	httpSock->connectToHost("www.msnbc.com", 80);
+        gotDataHook = false;
+        httpData = "";
+
+  	if (connectType == 0)
+		httpSock->connectToHost("www.msnbc.com", 80);
+	else if (connectType == 1 || connectType == 2)
+		httpSock->connectToHost("www.weather.com", 80);
+	else if (connectType == 3)
+        {
+                image_out.setName("/tmp/weather.jpg");
+                image_out.open(IO_WriteOnly);
+		httpSock->connectToHost("image.weather.com", 80);
+        }
+
 	parent->processEvents();
 }
 
@@ -245,28 +334,140 @@ void WeatherSock::closeConnection()
 
 void WeatherSock::socketReadyRead()
 {
+     int data = 0;
 	if (debug == true)
 		cout << "MythWeather: COMMS : Reading Data From Host [";
 
-    	while (httpSock->canReadLine()) 
-	{
-		if (debug == true)
-        		cout << ".";
-        	httpData = httpData + httpSock->readLine();
-    	}
+        if (connectType != 3)
+        {
+    	    while (httpSock->canReadLine()) 
+	    {
+		  if (debug == true)
+        	      cout << ".";
+          	  httpData = httpData + httpSock->readLine();
+    	    }
+        }
+        else if (connectType == 3)
+        {
+            if (imgSize == -1)
+            {
+               while (httpSock->canReadLine())
+               { 
+                   if (debug == true)
+                       cout << ".";
+                   httpData = httpData + httpSock->readLine();
+                   if (httpData.find("HTTP/1.0 400 Bad Request") != -1)
+                   {
+                       invalid_cnt++;
+                       if (invalid_cnt >= 3)
+                       {
+                           if (debug == true)
+                               cout << "MythWeather: COMMS : 400 Bad Request Error\n";
+                           gotDataHook = true;
+                           closeConnection();
+                       }
+                   }
+                   if (httpData.find("Content-Length: ") != -1)
+                   {
+                       int start = httpData.find("Content-Length: ") + 16;
+                       int end = httpData.find("Content-Type:");
+                       imgSize = httpData.mid(start, end - start).toInt();  
+                       if (debug == true)
+		           cout << " [image size = " << imgSize << "] ";
+                   }
+                   usleep(20);
+                   if (imgSize > -1)
+                       break;
+               }
+            }
+            if (imgSize > -1)
+            {
+               int last4[4];
+               int cnt = 0;
+               char temp;
+               while (httpSock->bytesAvailable() && imgSize > 0)
+               {
+                     if (writeImage == true)
+                     {
+ 			 temp = httpSock->getch();
+                         image_out.putch(temp);
+                         cnt++;
+                         if (cnt == 1024)
+                         { 
+                             if (debug == true)
+			         cout << "!";
+  			     cnt = 0;
+                         }
+                         imgSize--;
+                     }
+ 		     else
+                     {
+                         data = httpSock->getch();
+                         last4[3] = last4[2];
+                         last4[2] = last4[1];
+                         last4[1] = last4[0];
+                         last4[0] = data;
+                         if (last4[3] == 13 && last4[2] == 10 && 
+                             last4[1] == 13 && last4[0] == 10)
+                         {
+                             writeImage = true;
+ 		         }
+                     }
+               }
+               if (imgSize <= 0)
+               {
+                   if (debug == true)
+                       cout << "]\n";
+ 		   gotDataHook = true;
+		   closeConnection();
+               }
+
+            }
+        }
 	if (debug == true)
     		cout << "]\n";
 }
 
 void WeatherSock::socketConnected()
 {
-	QString locale = parent->getLocation();
+   QString locale = parent->getLocation();
+   if (connectType == 0)
+   {
     	QTextStream os(httpSock);
     	os << "GET /m/chnk/d/weather_d_src.asp?acid="
        	   << locale << " HTTP/1.1\n"
            << "Connection: close\n"
            << "Host: www.msnbc.com\n\n\n";
     	httpData = "";
+   }
+   else if (connectType == 1)
+   {
+        QTextStream os(httpSock);
+        os << "GET /weather/map/"
+	   << locale << "?from=LAPmaps"
+           << " HTTP/1.1\n"
+           << "Connection: close\n"
+           << "Host: www.weather.com\n\n\n";
+        mapLoc = "";
+   } 
+   else if (connectType == 2)
+   {
+        QTextStream os(httpSock);
+        os << "GET " << mapLoc 
+           << " HTTP/1.1\n"
+           << "Connection: close\n"
+           << "Host: www.weather.com\n\n\n";
+        imageLoc = "";
+   }
+   else if (connectType == 3)
+   {
+	QTextStream os(httpSock);
+        os << "GET "
+           << imageLoc
+           << " HTTP/1.1\n"
+           << "Host: image.weather.com\n\n\n";
+        imageData = "";
+   }
 }
 
 void WeatherSock::delayedClosed()
@@ -304,3 +505,30 @@ void WeatherSock::socketError( int e )
     	closeConnection();
     	e = 0;
 }
+
+/*
+Get: http://www.weather.com/weather/map/16801?from=LAPmaps
+     Looking for:
+     if (isMinNS4) var mapNURL = "/maps/local/local/us_close_pit/1a/index_large.html";
+---------------------------------------------------------------------------------------
+Get: /maps/local/local/us_close_pit/1a/index_large.html
+     Looking for:
+     <IMG NAME="mapImg" SRC="http://image.weather.com/web/radar/us_pit_closeradar_large_usen.jpg" WIDTH=600 HEIGHT=405 BORDER=0 ALT="Doppler Radar 600 Mile"></TD>
+--------------------------------------------------------------------------------------
+GET /web/radar/us_pit_closeradar_large_usen.jpg HTTP/1.1
+Host:image.weather.com
+
+HTTP/1.1 200 OK
+Server: Apache
+Cache-Control: max-age=900
+Last-Modified: Thu, 10 Apr 2003 17:25:12 GMT
+ETag: "8bcf3-7ce2-21822e00"
+Accept-Ranges: bytes
+Content-Length: 31970
+Content-Type: image/jpeg
+Expires: Thu, 10 Apr 2003 17:41:01 GMT
+Date: Thu, 10 Apr 2003 17:26:09 GMT
+Connection: keep-alive
+*/
+
+

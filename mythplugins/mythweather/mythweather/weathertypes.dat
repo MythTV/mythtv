@@ -25,13 +25,16 @@
 38,AM Rain/Snow Showers,rainsnow.png
 40,Light Rain/Wind,lshowers.png
 41,Showers/Wind,showers.png
+44,Mostly Sunny/Wind,sunny.png
 45,Flurries,flurries.png
 47,Rain/Wind,showers.png
 49,Sct Flurries/Wind,flurries.png
 51,PM T-Storms,thunshowers.png
 53,Thunderstorms,thunshowers.png
 55,Sunny/Windy,sunny.png
+56,AM Thunderstorms,thunshowers.png
 62,AM Rain,showers.png
+64,Iso T-Storms/Wind,thunshowers.png
 65,Rain/Snow,rainsnow.png
 66,Sct T-Storms/Wind,showers.png
 67,AM Showers/Wind,showers.png
@@ -39,9 +42,11 @@
 71,Snow to Ice/Wind,snowshow.png
 77,Snow to Rain,rainsnow.png
 81,PM Light Rain,lshowers.png
+82,PM Rain,showers.png
 84,Snow Showers,snowshow.png
 85,Rain to Snow,rainsnow.png
 86,PM Rain/Snow,snowshow.png
+88,Few Showers/Wind,showers.png
 90,Snow/Wind,snowshow.png
 91,PM Rain/Snow Showers,rainsnow.png
 92,PM Rain/Snow/Wind,rainsnow.png
@@ -57,6 +62,7 @@
 108,AM Light Snow,flurries.png
 109,PM Rain/Snow/Wind,rainsnow.png
 114,Rain/Freezing Rain,showers.png
+118,T-Storms/Wind,thunshowers.png
 123,Sprinkles,lshowers.png
 125,AM Snow Showers,snowshow.png
 126,AM Clouds/PM Sun/Wind,pcloudy.png
@@ -65,6 +71,7 @@
 132,Snow to Wintry Mix,snowshow.png
 133,PM Snow Showers/Wind,snowshow.png
 135,Snow and Ice to Rain,rainsnow.png
+138,AM Rain/Ice,showers.png
 145,AM Snow Showers/Wind,snowshow.png
 146,AM Light Snow/Wind,flurries.png
 150,PM Light Rain/Wind,lshowers.png
@@ -75,9 +82,11 @@
 164,PM Light Rain/Ice,showers.png
 167,AM Snow,snowshow.png
 171,Snow to Ice,snowshow.png
+172,Wintry Mix/Wind,rainsnow.png
 175,PM Light Snow,flurries.png
 178,AM Drizzle,lshowers.png
 189,Strong Storms/Wind,thunshowers.png
+193,PM Drizzle,lshowers.png
 194,Drizzle,lshowers.png
 201,AM Light Rain/Wind,lshowers.png
 204,AM Rain/Wind,showers.png
@@ -85,6 +94,9 @@
 231,Rain,showers.png
 259,Hvy Rain/Freezing Rain,showers.png
 271,Snow Showers/Windy,snowshow.png
+989,Light Rain Shower,lshowers.png
+990,Light Rain with Thunder,thunshowers.png
+991,Light Drizzle,lshowers.png
 992,Mist,fog.png
 993,Smoke,fog.png
 994,Haze,fog.png

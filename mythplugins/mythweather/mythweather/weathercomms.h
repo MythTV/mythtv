@@ -1,4 +1,5 @@
 #include <qwidget.h>
+#include <qfile.h>
 #include <qsocket.h>
 
 #ifndef WEATHERSOCK_H_
@@ -16,6 +17,7 @@ class WeatherSock : public QObject
     int verifyData();
     int checkError();
     bool getStatus();
+    int connectType;
 
   private slots:
     void closeConnection();
@@ -31,6 +33,11 @@ class WeatherSock : public QObject
     QSocket *httpSock;
     QString strStatus();
     QString httpData;
+    QString weatherData;
+    QString imageData;
+    QString imageLoc;
+    QString mapLoc;
+    QString parseData(QString, QString);
     void makeConnection();
     void resetConnection();
     int getIntStatus();
@@ -40,11 +47,13 @@ class WeatherSock : public QObject
     int currentError;
     int aggressiveness;
     int error;
+    int imgSize;
+    bool writeImage;
     bool myStatus;
     bool debug;
     bool gotDataHook;
     bool breakout;
-
+    QFile image_out;
 };
 
 #endif
