@@ -728,8 +728,16 @@ void RingBuffer::ReadAheadThread(void)
 
 int RingBuffer::ReadFromBuf(void *buf, int count)
 {
-    while (!readsallowed && !stopreads)
-        usleep(100);
+    bool readone = false;
+
+    if (readaheadpaused && stopreads)
+    {
+        readone = true;
+        Unpause();
+    }
+    else 
+        while (!readsallowed && !stopreads)
+            usleep(100);
 
     int avail = ReadBufAvail();
 
@@ -740,6 +748,9 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         if (ateof && avail < count)
             count = avail;
     }
+
+    if (stopreads && avail < count)
+        count = avail;
 
     if (rbrpos + count > READ_AHEAD_SIZE)
     {
@@ -755,6 +766,13 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
     pthread_mutex_lock(&readAheadLock);
     rbrpos = (rbrpos + count) % READ_AHEAD_SIZE;
     pthread_mutex_unlock(&readAheadLock);
+
+    if (readone)
+    {
+        Pause();
+        while (!isPaused())
+            usleep(50);
+    }
 
     return count;
 }

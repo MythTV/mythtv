@@ -845,7 +845,7 @@ bool NuppelDecoder::DoRewind(long long desiredFrame)
 
     if (keyPos == 0)
     {
-        cout << "unknown position\n";
+        cout << "unknown position: " << lastKey endl;
         return false;
     }
 
