@@ -1,22 +1,6 @@
 <mythmenu name="MUSIC">
 
    <button>
-      <type>MUSIC_PLAYLIST</type>
-      <text>Select Music</text>
-      <text lang="IT">Seleziona brani musicali</text>
-      <text lang="ES">Seleccionar Música</text>
-      <text lang="CA">Escollir Música</text>
-      <text lang="DE">Lieder auswählen</text>
-      <text lang="DK">Vælg musik</text>
-      <text lang="NL">Muziek Kiezen</text>
-      <text lang="PT">Escolher Músicas</text>
-      <text lang="SV">Välj musik</text>
-      <text lang="FR">Sélectionner de la musicale</text>
-      <text lang="JA">ミュージック選択</text>
-      <action>MUSIC_CREATE_PLAYLIST</action>
-   </button>
-
-   <button>
       <type>MUSIC</type>
       <text>Play Music</text>
       <text lang="IT">Esegui brani musicali</text>
@@ -30,6 +14,22 @@
       <text lang="FR">Jouer de la musique</text>
       <text lang="JA">ミュージック再生</text>
       <action>MUSIC_PLAY</action>
+   </button>
+
+      <button>
+      <type>MUSIC_PLAYLIST</type>
+      <text>Select Music</text>
+      <text lang="IT">Seleziona brani musicali</text>
+      <text lang="ES">Seleccionar Música</text>
+      <text lang="CA">Escollir Música</text>
+      <text lang="DE">Lieder auswählen</text>
+      <text lang="DK">Vælg musik</text>
+      <text lang="NL">Muziek Kiezen</text>
+      <text lang="PT">Escolher Músicas</text>
+      <text lang="SV">Välj musik</text>
+      <text lang="FR">Sélectionner de la musicale</text>
+      <text lang="JA">ミュージック選択</text>
+      <action>MUSIC_CREATE_PLAYLIST</action>
    </button>
 
    <button>
