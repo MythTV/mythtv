@@ -426,7 +426,7 @@ void CdDecoder::commitMetadata(Metadata *mdata)
         return;
     }
 
-   
+  
     if (mdata->Artist() != discdata.data_artist)
         strncpy(discdata.data_artist, mdata->Artist().ascii(), 256);
     if (mdata->Album() != discdata.data_title)

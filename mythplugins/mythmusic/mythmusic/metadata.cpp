@@ -1,4 +1,6 @@
 #include <qsqldatabase.h>
+#include <qregexp.h>
+
 #include "metadata.h"
 
 bool operator==(const Metadata& a, const Metadata& b)
@@ -55,6 +57,11 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
         title = filename;
     if (genre == "")
         genre = "Unknown";
+
+    title.replace(QRegExp("\""), QString("\\\""));
+    artist.replace(QRegExp("\""), QString("\\\""));
+    album.replace(QRegExp("\""), QString("\\\""));
+    genre.replace(QRegExp("\""), QString("\\\""));
 
     char thequery[4096];
     sprintf(thequery, "INSERT INTO musicmetadata (artist,album,title,genre,"
