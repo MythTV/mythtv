@@ -48,6 +48,8 @@
 
 #define AVOPTION_CODEC_BOOL(name, help, field) \
     { name, help, offsetof(AVCodecContext, field), FF_OPT_TYPE_BOOL }
+#define AVOPTION_CODEC_DOUBLE(name, help, field, minv, maxv, defval) \
+    { name, help, offsetof(AVCodecContext, field), FF_OPT_TYPE_DOUBLE, minv, maxv, defval }
 #define AVOPTION_CODEC_FLAG(name, help, field, flag, defval) \
     { name, help, offsetof(AVCodecContext, field), FF_OPT_TYPE_FLAG, flag, 0, defval }
 #define AVOPTION_CODEC_INT(name, help, field, minv, maxv, defval) \
@@ -786,6 +788,50 @@ static always_inline int get_vlc2(GetBitContext *s, VLC_TYPE (*table)[2],
     return code;
 }
 
+//#define TRACE
+
+#ifdef TRACE
+
+static inline void print_bin(int bits, int n){
+    int i;
+    
+    for(i=n-1; i>=0; i--){
+        printf("%d", (bits>>i)&1);
+    }
+    for(i=n; i<24; i++)
+        printf(" ");
+}
+
+static inline int get_bits_trace(GetBitContext *s, int n, char *file, char *func, int line){
+    int r= get_bits(s, n);
+    
+    print_bin(r, n);
+    printf("%5d %2d %3d bit @%5d in %s %s:%d\n", r, n, r, get_bits_count(s)-n, file, func, line);
+    return r;
+}
+static inline int get_vlc_trace(GetBitContext *s, VLC_TYPE (*table)[2], int bits, int max_depth, char *file, char *func, int line){
+    int show= show_bits(s, 24);
+    int pos= get_bits_count(s);
+    int r= get_vlc2(s, table, bits, max_depth);
+    int len= get_bits_count(s) - pos;
+    int bits2= show>>(24-len);
+    
+    print_bin(bits2, len);
+    
+    printf("%5d %2d %3d vlc @%5d in %s %s:%d\n", bits2, len, r, pos, file, func, line);
+    return r;
+}
+
+#define get_bits(s, n)  get_bits_trace(s, n, __FILE__, __PRETTY_FUNCTION__, __LINE__)
+#define get_bits1(s)    get_bits_trace(s, 1, __FILE__, __PRETTY_FUNCTION__, __LINE__)
+#define get_vlc(s, vlc)            get_vlc_trace(s, (vlc)->table, (vlc)->bits, 3, __FILE__, __PRETTY_FUNCTION__, __LINE__)
+#define get_vlc2(s, tab, bits, max) get_vlc_trace(s, tab, bits, max, __FILE__, __PRETTY_FUNCTION__, __LINE__)
+
+#define tprintf printf
+
+#else //TRACE
+#define tprintf(_arg...) {}
+#endif
 
 /* define it to include statistics code (useful only for optimizing
    codec efficiency */
@@ -878,7 +924,7 @@ static inline int clip(int a, int amin, int amax)
 /* math */
 extern const uint8_t ff_sqrt_tab[128];
 
-int ff_gcd(int a, int b);
+int64_t ff_gcd(int64_t a, int64_t b);
 
 static inline int ff_sqrt(int a)
 {
@@ -906,6 +952,10 @@ static inline int ff_get_fourcc(const char *s){
     
     return (s[0]) + (s[1]<<8) + (s[2]<<16) + (s[3]<<24);
 }
+
+#define MKTAG(a,b,c,d) (a | (b << 8) | (c << 16) | (d << 24))
+#define MKBETAG(a,b,c,d) (d | (c << 8) | (b << 16) | (a << 24))
+
 
 void ff_float2fraction(int *nom_arg, int *denom_arg, double f, int max);
 

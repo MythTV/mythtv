@@ -4,23 +4,11 @@
 #include <vector>
 #include <qstring.h>
 
-#ifdef MMX
-#undef MMX
-#define MMXBLAH
-#endif
-#include <lame/lame.h>
-#ifdef MMXBLAH
-#define MMX
-#endif
-
-#include "RTjpegN.h"
-#include "format.h"
 #include "RingBuffer.h"
 #include "osd.h"
 #include "jitterometer.h"
 
 extern "C" {
-#include "../libavcodec/avcodec.h"
 #include "filter.h"
 }
 using namespace std;
@@ -32,12 +20,12 @@ using namespace std;
 #define COMMERCIAL_SKIP_OFF     0
 #define COMMERCIAL_SKIP_BLANKS  1
 
-class NuppelVideoPlayer;
 class XvVideoOutput;
 class OSDSet;
 class RemoteEncoder;
 class QSqlDatabase;
 class ProgramInfo;
+class DecoderBase;
 
 class NuppelVideoPlayer
 {
@@ -81,9 +69,8 @@ class NuppelVideoPlayer
 
     float GetFrameRate(void) { return video_frame_rate; } 
     long long GetFramesPlayed(void) { return framesPlayed; }
-    void ResetFramesPlayed(void) { framesPlayed = 0; }
 
-    void SetRecorder(RemoteEncoder *recorder) { nvr_enc = recorder; }
+    void SetRecorder(RemoteEncoder *recorder);
 
     OSD *GetOSD(void) { return osd; }
 
@@ -112,7 +99,7 @@ class NuppelVideoPlayer
 
     int CheckEvents(void); 
 
-    void SetWatchingRecording(bool mode) { watchingrecording = mode; }
+    void SetWatchingRecording(bool mode);
     void SetBookmark(void);
     long long GetBookmark(void);
 
@@ -129,6 +116,21 @@ class NuppelVideoPlayer
     void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
     void StopEmbedding(void);
 
+    // decoder stuff..
+    void SetVideoParams(int width, int height, double fps, 
+                        int keyframedistance);
+    void SetAudioParams(int bps, int channels, int samplerate);
+    void SetEffDsp(int dsprate);
+    void SetFileLength(int total, int frames);
+    unsigned char *GetNextVideoFrame(void);
+    void ReleaseNextVideoFrame(bool good, long long timecode);
+    void AddAudioData(char *buffer, int len, long long timecode);
+    void AddAudioData(short int *lbuffer, short int *rbuffer, int samples,
+                      long long timecode);
+    void AddTextData(char *buffer, int len, long long timecode, char type);
+    void SetEof(void) { eof = 1; }
+    void SetFramesPlayed(long long played) { framesPlayed = played; }
+
  protected:
     void OutputAudioLoop(void);
     void OutputVideoLoop(void);
@@ -142,7 +144,6 @@ class NuppelVideoPlayer
     void WriteAudio(unsigned char *aubuf, int size);
 
     void InitFilters(void);
-    int InitSubs(void);
    
     bool GetVideoPause(void);
     void PauseVideo(void);
@@ -213,8 +214,6 @@ class NuppelVideoPlayer
     void SetBlankIter(void);
     void SetCommBreakIter(void);
 
-    bool isValidFrametype(char type);
-
     int audiofd;
 
     QString filename;
@@ -226,10 +225,7 @@ class NuppelVideoPlayer
     int video_height;
     int video_size;
     double video_frame_rate;
-    unsigned char *buf;
-    unsigned char *buf2;
-    unsigned char *directbuf;
-    char lastct;
+
     int effdsp; // from the recorded stream
     int audio_channels;
     int audio_bits;
@@ -240,8 +236,6 @@ class NuppelVideoPlayer
     int startpos;
 
     int lastaudiolen;
-    unsigned char *strm;
-    struct rtframeheader frameheader;
 
     char vbimode;
     int vbipagenr;
@@ -293,14 +287,6 @@ class NuppelVideoPlayer
 
        and release in reverse order. This should avoid deadlock situations. */
 
-    int weseeked;
-
-    struct rtfileheader fileheader;
-    lame_global_flags *gf;
-
-    RTjpeg *rtjd;
-    uint8_t *planes[3];
-
     bool paused, pausevideo, pauseaudio;
     bool actuallypaused, audio_actually_paused, video_actually_paused;
     bool cc;
@@ -320,9 +306,6 @@ class NuppelVideoPlayer
     bool editmode;
     bool resetvideo;
 
-    QMap<long long, long long> *positionMap;
-    long long lastKey;
-    
     long long rewindtime, fftime;
     RemoteEncoder *nvr_enc;
 
@@ -338,19 +321,6 @@ class NuppelVideoPlayer
     QString osdtheme;
     OSD *osd;
 
-    bool InitAVCodec(int codec);
-    void CloseAVCodec(void);
-
-    AVCodec *mpa_codec;
-    AVCodecContext *mpa_ctx;
-    AVFrame *mpa_pic;
-    AVPicture tmppicture;
-    AVPicture mpa_pic_tmp;
-
-    bool directrendering;
-    friend int get_buffer(struct AVCodecContext *c, AVFrame *pic);
-    friend void release_buffer(struct AVCodecContext *c, AVFrame *pic);
-
     bool disablevideo;
     bool disableaudio;
 
@@ -361,10 +331,6 @@ class NuppelVideoPlayer
     QString videoFilterList;
     vector<VideoFilter *> videoFilters;
 
-    struct extendeddata extradata;
-    bool usingextradata;
-
-    bool haspositionmap;
     int keyframedist;
 
     bool exactseeks;
@@ -389,9 +355,7 @@ class NuppelVideoPlayer
     bool hasdeletetable;
     bool hasblanktable;
     bool hascommbreaktable;
-
-    int ffmpeg_extradatasize;
-    char *ffmpeg_extradata;
+    bool haspositionmap;
 
     bool own_vidbufs;
 
@@ -416,6 +380,8 @@ class NuppelVideoPlayer
     QString cclines[4];
     int ccindent[4];
     int lastccrow;
+
+    DecoderBase *decoder;
 };
 
 #endif

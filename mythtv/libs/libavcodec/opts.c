@@ -11,6 +11,7 @@
  */
 
 #include "avcodec.h"
+#include "os_support.h"
 
 const AVOption avoptions_common[] = {
     AVOPTION_CODEC_FLAG("bit_exact", "use only bit-exact stuff", flags, CODEC_FLAG_BITEXACT, 0),

@@ -164,7 +164,7 @@ int ff_rate_control_init(MpegEncContext *s)
                 bits= rce.i_tex_bits + rce.p_tex_bits;
 
                 q= get_qscale(s, &rce, rcc->pass1_wanted_bits/rcc->pass1_rc_eq_output_sum, i);
-                rcc->pass1_wanted_bits+= s->bit_rate/(s->frame_rate / (double)FRAME_RATE_BASE);
+                rcc->pass1_wanted_bits+= s->bit_rate/(s->avctx->frame_rate / (double)s->avctx->frame_rate_base);
             }
         }
 
@@ -197,7 +197,7 @@ static inline double bits2qp(RateControlEntry *rce, double bits){
     
 static void update_rc_buffer(MpegEncContext *s, int frame_size){
     RateControlContext *rcc= &s->rc_context;
-    const double fps= (double)s->frame_rate / FRAME_RATE_BASE;
+    const double fps= (double)s->avctx->frame_rate / (double)s->avctx->frame_rate_base;
     const double buffer_size= s->avctx->rc_buffer_size;
     const double min_rate= s->avctx->rc_min_rate/fps;
     const double max_rate= s->avctx->rc_max_rate/fps;
@@ -356,8 +356,8 @@ static double get_diff_limited_q(MpegEncContext *s, RateControlEntry *rce, doubl
  * gets the qmin & qmax for pict_type
  */
 static void get_qminmax(int *qmin_ret, int *qmax_ret, MpegEncContext *s, int pict_type){
-    int qmin= s->qmin;                                                       
-    int qmax= s->qmax;
+    int qmin= s->avctx->qmin;                                                       
+    int qmax= s->avctx->qmax;
 
     if(pict_type==B_TYPE){
         qmin= (int)(qmin*ABS(s->avctx->b_quant_factor)+s->avctx->b_quant_offset + 0.5);
@@ -368,7 +368,7 @@ static void get_qminmax(int *qmin_ret, int *qmax_ret, MpegEncContext *s, int pic
     }
 
     if(qmin<1) qmin=1;
-    if(qmin==1 && s->qmin>1) qmin=2; //avoid qmin=1 unless the user wants qmin=1
+    if(qmin==1 && s->avctx->qmin>1) qmin=2; //avoid qmin=1 unless the user wants qmin=1
 
     if(qmin<3 && s->max_qcoeff<=128 && pict_type==I_TYPE) qmin=3; //reduce cliping problems
 
@@ -571,7 +571,7 @@ float ff_rate_estimate_qscale(MpegEncContext *s)
 
     get_qminmax(&qmin, &qmax, s, pict_type);
 
-    fps= (double)s->frame_rate / FRAME_RATE_BASE;
+    fps= (double)s->avctx->frame_rate / (double)s->avctx->frame_rate_base;
 //printf("input_pic_num:%d pic_num:%d frame_rate:%d\n", s->input_picture_number, s->picture_number, s->frame_rate);
         /* update predictors */
     if(picture_number>2){
@@ -641,11 +641,6 @@ float ff_rate_estimate_qscale(MpegEncContext *s)
 //printf("%f ", q);
         q= get_diff_limited_q(s, rce, q);
 //printf("%f ", q);
-        if (q <= 0.0)
-        {
-            q = 2.0;
-            printf("badq: %f\n", q);
-        }
         assert(q>0.0);
 
         if(pict_type==P_TYPE || s->intra_only){ //FIXME type dependant blur like in 2-pass
@@ -703,7 +698,7 @@ static int init_pass2(MpegEncContext *s)
 {
     RateControlContext *rcc= &s->rc_context;
     int i;
-    double fps= (double)s->frame_rate / FRAME_RATE_BASE;
+    double fps= (double)s->avctx->frame_rate / (double)s->avctx->frame_rate_base;
     double complexity[5]={0,0,0,0,0};   // aproximate bits at quant=1
     double avg_quantizer[5];
     uint64_t const_bits[5]={0,0,0,0,0}; // quantizer idependant bits

@@ -15,8 +15,8 @@ extern "C" {
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4661
-#define LIBAVCODEC_BUILD_STR   "4661"
+#define LIBAVCODEC_BUILD       4663
+#define LIBAVCODEC_BUILD_STR   "4663"
 
 #define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" LIBAVCODEC_BUILD_STR
 
@@ -49,6 +49,7 @@ enum CodecID {
     CODEC_ID_MACE6,
     CODEC_ID_HUFFYUV,
     CODEC_ID_CYUV,
+    CODEC_ID_H264,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -186,9 +187,13 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_CAP_PARSE_ONLY      0x0004
 #define CODEC_CAP_TRUNCATED       0x0008
 
-#define FRAME_RATE_BASE 10010
-
 #define FF_COMMON_FRAME \
+    /**\
+     * pointer to the picture planes.\
+     * this might be different from the first allocated byte\
+     * - encoding: \
+     * - decoding: \
+     */\
     uint8_t *data[4];\
     int linesize[4];\
     /**\
@@ -206,7 +211,7 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
     int key_frame;\
 \
     /**\
-     * picture type of the frame, see ?_TYPE below\
+     * picture type of the frame, see ?_TYPE below.\
      * - encoding: set by lavc for coded_picture (and set by user for input)\
      * - decoding: set by lavc\
      */\
@@ -218,7 +223,7 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
      * - encoding: MUST be set by user\
      * - decoding: set by lavc\
      */\
-    long long int pts;\
+    int64_t pts;\
 \
     /**\
      * picture number in bitstream order.\
@@ -308,19 +313,25 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 
 
 #define FF_BUFFER_TYPE_INTERNAL 1
-#define FF_BUFFER_TYPE_USER     2 // Direct rendering buffers
-#define FF_BUFFER_TYPE_SHARED   4 // input frame for encoding(wont be dealloced)
+#define FF_BUFFER_TYPE_USER     2 ///< Direct rendering buffers
+#define FF_BUFFER_TYPE_SHARED   4 ///< buffer from somewher else, dont dealloc
 
 
 #define FF_I_TYPE 1 // Intra
 #define FF_P_TYPE 2 // Predicted
 #define FF_B_TYPE 3 // Bi-dir predicted
 #define FF_S_TYPE 4 // S(GMC)-VOP MPEG4
+#define FF_SI_TYPE 5
+#define FF_SP_TYPE 6
 
+/**
+ * Audio Video Frame.
+ */
 typedef struct AVFrame {
     FF_COMMON_FRAME
 } AVFrame;
 
+#define DEFAULT_FRAME_RATE_BASE 1001000
 
 /**
  * main external api structure.
@@ -375,14 +386,14 @@ typedef struct AVCodecContext {
     
     /* video only */
     /**
-     * frames per sec multiplied by FRAME_RATE_BASE.
+     * frames per sec multiplied by frame_rate_base.
      * for variable fps this is the precission, so if the timestamps 
-     * can be specified in msec precssion then this is 1000*FRAME_RATE_BASE
+     * can be specified in msec precssion then this is 1000*frame_rate_base
      * - encoding: MUST be set by user
      * - decoding: set by lavc. 0 or the frame_rate if available
      */
     int frame_rate;
-
+    
     /**
      * width / height.
      * - encoding: MUST be set by user. 
@@ -576,6 +587,7 @@ typedef struct AVCodecContext {
 #define FF_BUG_STD_QPEL         128
 #define FF_BUG_QPEL_CHROMA2     256
 #define FF_BUG_DIRECT_BLOCKSIZE 512
+#define FF_BUG_EDGE             1024
 //#define FF_BUG_FAKE_SCALABILITY 16 //autodetection should work 100%
         
     /**
@@ -791,6 +803,10 @@ typedef struct AVCodecContext {
      */
     float dark_masking;
     
+    
+    /* for binary compatibility */
+    int unused;
+    
     /**
      * idct algorithm, see FF_IDCT_* below.
      * - encoding: set by user
@@ -895,6 +911,8 @@ typedef struct AVCodecContext {
 #define FF_DEBUG_SKIP      0x00000080
 #define FF_DEBUG_STARTCODE 0x00000100
 #define FF_DEBUG_PTS       0x00000200
+#define FF_DEBUG_ER        0x00000400
+#define FF_DEBUG_MMCO      0x00000800
     
     /**
      * error.
@@ -1015,7 +1033,6 @@ typedef struct AVCodecContext {
 #define FF_DTG_AFD_16_9_SP_14_9 14
 #define FF_DTG_AFD_SP_4_3       15
 
-    int me_range;
     /**
      * Maximum motion estimation search range in subpel units.
      * if 0 then no limit
@@ -1023,7 +1040,32 @@ typedef struct AVCodecContext {
      * - encoding: set by user.
      * - decoding: unused.
      */
+    int me_range;
 
+    /**
+     * frame_rate_base.
+     * for variable fps this is 1
+     * - encoding: set by user.
+     * - decoding: set by lavc.
+     * @todo move this after frame_rate
+     */
+
+    int frame_rate_base;
+    /**
+     * intra quantizer bias.
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int intra_quant_bias;
+#define FF_DEFAULT_QUANT_BIAS 999999
+    
+    /**
+     * inter quantizer bias.
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int inter_quant_bias;
+    
 } AVCodecContext;
 
 
@@ -1114,6 +1156,7 @@ extern AVCodec msmpeg4v3_encoder;
 extern AVCodec wmv1_encoder;
 extern AVCodec wmv2_encoder;
 extern AVCodec huffyuv_encoder;
+extern AVCodec h264_encoder;
 
 extern AVCodec h263_decoder;
 extern AVCodec mpeg4_decoder;
@@ -1139,6 +1182,7 @@ extern AVCodec mace6_decoder;
 extern AVCodec huffyuv_decoder;
 extern AVCodec oggvorbis_decoder;
 extern AVCodec cyuv_decoder;
+extern AVCodec h264_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
@@ -1258,6 +1302,20 @@ void avcodec_register_all(void);
 
 void avcodec_flush_buffers(AVCodecContext *avctx);
 
+/* misc usefull functions */
+/**
+ * reduce a fraction.
+ * this is usefull for framerate calculations
+ * @param max the maximum allowed for dst_nom & dst_den
+ * @return 1 if exact, 0 otherwise
+ */
+int av_reduce(int *dst_nom, int *dst_den, int64_t nom, int64_t den, int64_t max);
+
+/**
+ * rescale a 64bit integer.
+ * a simple a*b/c isnt possible as it can overflow
+ */
+int64_t av_rescale(int64_t a, int b, int c);
 
 
 /**

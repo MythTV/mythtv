@@ -76,6 +76,7 @@ void clear_blocks_c(DCTELEM *blocks);
 // blocksizes for op_pixels_func are 8x4,8x8 16x8 16x16
 typedef void (*op_pixels_func)(uint8_t *block/*align width (8 or 16)*/, const uint8_t *pixels/*align 1*/, int line_size, int h);
 typedef void (*qpel_mc_func)(uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);
+typedef void (*h264_chroma_mc_func)(uint8_t *dst/*align 8*/, uint8_t *src/*align 1*/, int srcStride, int h, int x, int y);
 
 #define DEF_OLD_QPEL(name)\
 void ff_put_        ## name (uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);\
@@ -107,6 +108,7 @@ typedef int (*op_pixels_abs_func)(uint8_t *blk1/*align width (8 or 16)*/, uint8_
 
 typedef int (*me_cmp_func)(void /*MpegEncContext*/ *s, uint8_t *blk1/*align width (8 or 16)*/, uint8_t *blk2/*align 1*/, int line_size)/* __attribute__ ((const))*/;
 
+
 /**
  * DSPContext.
  */
@@ -116,7 +118,13 @@ typedef struct DSPContext {
     void (*diff_pixels)(DCTELEM *block/*align 16*/, const uint8_t *s1/*align 8*/, const uint8_t *s2/*align 8*/, int stride);
     void (*put_pixels_clamped)(const DCTELEM *block/*align 16*/, uint8_t *pixels/*align 8*/, int line_size);
     void (*add_pixels_clamped)(const DCTELEM *block/*align 16*/, uint8_t *pixels/*align 8*/, int line_size);
+    /**
+     * translational global motion compensation.
+     */
     void (*gmc1)(uint8_t *dst/*align 8*/, uint8_t *src/*align 1*/, int srcStride, int h, int x16, int y16, int rounder);
+    /**
+     * global motion compensation.
+     */
     void (*gmc )(uint8_t *dst/*align 8*/, uint8_t *src/*align 1*/, int stride, int h, int ox, int oy,
 		    int dxx, int dxy, int dyx, int dyy, int shift, int r, int width, int height);
     void (*clear_blocks)(DCTELEM *blocks/*align 16*/);
@@ -137,16 +145,60 @@ typedef struct DSPContext {
     me_cmp_func mb_cmp[11];
 
     /* maybe create an array for 16/8 functions */
+    /**
+     * Halfpel motion compensation with rounding (a+b+1)>>1.
+     * *pixels_tab[ 0->16x16 1->8x8 ][ xhalfpel + 2*yhalfpel ]
+     * @param block destination where the result is stored
+     * @param pixels source
+     * @param line_size number of bytes in a horizontal line of block
+     * @param h height
+     */
     op_pixels_func put_pixels_tab[2][4];
+
+    /**
+     * Halfpel motion compensation with rounding (a+b+1)>>1.
+     * *pixels_tab[ 0->16x16 1->8x8 ][ xhalfpel + 2*yhalfpel ]
+     * @param block destination into which the result is averaged (a+b+1)>>1
+     * @param pixels source
+     * @param line_size number of bytes in a horizontal line of block
+     * @param h height
+     */
     op_pixels_func avg_pixels_tab[2][4];
+
+    /**
+     * Halfpel motion compensation with no rounding (a+b)>>1.
+     * *pixels_tab[ 0->16x16 1->8x8 ][ xhalfpel + 2*yhalfpel ]
+     * @param block destination where the result is stored
+     * @param pixels source
+     * @param line_size number of bytes in a horizontal line of block
+     * @param h height
+     */
     op_pixels_func put_no_rnd_pixels_tab[2][4];
+
+    /**
+     * Halfpel motion compensation with no rounding (a+b)>>1.
+     * *pixels_tab[ 0->16x16 1->8x8 ][ xhalfpel + 2*yhalfpel ]
+     * @param block destination into which the result is averaged (a+b)>>1
+     * @param pixels source
+     * @param line_size number of bytes in a horizontal line of block
+     * @param h height
+     */
     op_pixels_func avg_no_rnd_pixels_tab[2][4];
     qpel_mc_func put_qpel_pixels_tab[2][16];
     qpel_mc_func avg_qpel_pixels_tab[2][16];
     qpel_mc_func put_no_rnd_qpel_pixels_tab[2][16];
     qpel_mc_func avg_no_rnd_qpel_pixels_tab[2][16];
     qpel_mc_func put_mspel_pixels_tab[8];
+    
+    /**
+     * h264 Chram MC
+     */
+    h264_chroma_mc_func put_h264_chroma_pixels_tab[3];
+    h264_chroma_mc_func avg_h264_chroma_pixels_tab[3];
 
+    qpel_mc_func put_h264_qpel_pixels_tab[3][16];
+    qpel_mc_func avg_h264_qpel_pixels_tab[3][16];
+    
     op_pixels_abs_func pix_abs16x16;
     op_pixels_abs_func pix_abs16x16_x2;
     op_pixels_abs_func pix_abs16x16_y2;

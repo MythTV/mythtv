@@ -267,8 +267,9 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     if (targetbitrate == -1)
         usebitrate = -1;
 
-    mpa_ctx->frame_rate = (int)ceil(video_frame_rate * FRAME_RATE_BASE *
+    mpa_ctx->frame_rate = (int)ceil(video_frame_rate * 100 *
                                     framerate_multiplier);
+    mpa_ctx->frame_rate_base = 100;
     mpa_ctx->bit_rate = usebitrate;
     mpa_ctx->bit_rate_tolerance = usebitrate * 100;
     mpa_ctx->qmin = maxquality;

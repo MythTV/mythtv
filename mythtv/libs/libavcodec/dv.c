@@ -537,16 +537,17 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
     /* init size */
     width = 720;
     if (dsf) {
-        avctx->frame_rate = 25 * FRAME_RATE_BASE;
+        avctx->frame_rate = 25;
         packet_size = PAL_FRAME_SIZE;
         height = 576;
         nb_dif_segs = 12;
     } else {
-        avctx->frame_rate = 30 * FRAME_RATE_BASE;
+        avctx->frame_rate = 30;
         packet_size = NTSC_FRAME_SIZE;
         height = 480;
         nb_dif_segs = 10;
     }
+    avctx->frame_rate_base= 1;
     /* NOTE: we only accept several full frames */
     if (buf_size < packet_size)
         return -1;
@@ -566,6 +567,17 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
 
     avctx->width = width;
     avctx->height = height;
+    
+    /* Once again, this is pretty complicated by the fact that the same
+     * field is used differently by IEC 68134[apt == 0] and 
+     * SMPTE 314M[apt == 1].
+     */
+    if (buf[VAUX_TC61_OFFSET] == 0x61 &&
+        ((apt == 0 && (buf[VAUX_TC61_OFFSET + 2] & 0x07) == 0x07) ||
+	 (apt == 1 && (buf[VAUX_TC61_OFFSET + 2] & 0x07) == 0x02)))
+        avctx->aspect_ratio = 16.0 / 9.0;
+    else
+        avctx->aspect_ratio = 4.0 / 3.0;
 
     s->picture.reference= 0;
     if(avctx->get_buffer(avctx, &s->picture) < 0) {
@@ -673,12 +685,11 @@ static uint16_t dv_audio_12to16(uint16_t sample)
    144000 bytes for PAL) 
 
    There's a couple of assumptions being made here:
-         1. We don't do any kind of audio error correction. It means,
-	    that erroneous samples 0x8000 are being passed upwards.
-            Do we need to silence erroneous samples ? Average them ?
+         1. By default we silence erroneous (0x8000/16bit 0x800/12bit) 
+	    audio samples. We can pass them upwards when ffmpeg will be ready
+	    to deal with them.
 	 2. We don't do software emphasis.
-	 3. We are not checking for 'speed' argument being valid.
-	 4. Audio is always returned as 16bit linear samples: 12bit
+	 3. Audio is always returned as 16bit linear samples: 12bit
 	    nonlinear samples are converted into 16bit linear ones.
 */
 static int dvaudio_decode_frame(AVCodecContext *avctx, 
@@ -692,7 +703,7 @@ static int dvaudio_decode_frame(AVCodecContext *avctx,
     uint8_t *buf_ptr;
     
     /* parse id */
-    init_get_bits(&s->gb, &buf[AAUX_OFFSET], 5*8);
+    init_get_bits(&s->gb, &buf[AAUX_AS_OFFSET], 5*8);
     i = get_bits(&s->gb, 8);
     if (i != 0x50) { /* No audio ? */
 	*data_size = 0;
@@ -718,6 +729,7 @@ static int dvaudio_decode_frame(AVCodecContext *avctx,
 	return -1; /* Unsupported quantization */
 
     avctx->sample_rate = dv_audio_frequency[freq];
+    avctx->channels = 2;
     // What about:
     // avctx->bit_rate = 
     // avctx->frame_size =
@@ -745,6 +757,8 @@ static int dvaudio_decode_frame(AVCodecContext *avctx,
 		   if (quant == 0) {  /* 16bit quantization */
 		       i = unshuffle[difseg][ad] + (dp - 8)/2 * stride;
 		       ((short *)data)[i] = (buf_ptr[dp] << 8) | buf_ptr[dp+1]; 
+		       if (((unsigned short *)data)[i] == 0x8000)
+		           ((short *)data)[i] = 0;
 		   } else {           /* 12bit quantization */
 		       if (difseg >= nb_dif_segs/2)
 			   goto out;  /* We're not doing 4ch at this time */
@@ -753,8 +767,8 @@ static int dvaudio_decode_frame(AVCodecContext *avctx,
 			    ((uint16_t)buf_ptr[dp+2] >> 4);
 		       rc = ((uint16_t)buf_ptr[dp+1] << 4) |
 			    ((uint16_t)buf_ptr[dp+2] & 0x0f);
-		       lc = dv_audio_12to16(lc);
-		       rc = dv_audio_12to16(rc);
+		       lc = (lc == 0x800 ? 0 : dv_audio_12to16(lc));
+		       rc = (rc == 0x800 ? 0 : dv_audio_12to16(rc));
 
 		       i = unshuffle[difseg][ad] + (dp - 8)/3 * stride;
 		       ((short *)data)[i] = lc;

@@ -66,7 +66,7 @@ static int encode_ext_header(Wmv2Context *w){
         
     init_put_bits(&pb, s->avctx->extradata, s->avctx->extradata_size, NULL, NULL);
 
-    put_bits(&pb, 5, s->frame_rate / FRAME_RATE_BASE); //yes 29.97 -> 29
+    put_bits(&pb, 5, s->avctx->frame_rate / s->avctx->frame_rate_base); //yes 29.97 -> 29
     put_bits(&pb, 11, FFMIN(s->bit_rate/1024, 2047));
     
     put_bits(&pb, 1, w->mspel_bit=1);
@@ -131,7 +131,10 @@ int ff_wmv2_encode_picture_header(MpegEncContext * s, int picture_number)
     w->abt_type=0;
     w->j_type=0;
 
+    assert(s->flipflop_rounding);
+
     if (s->pict_type == I_TYPE) {
+        assert(s->no_rounding==1);
         if(w->j_type_bit) put_bits(&s->pb, 1, w->j_type);
         
         if(w->per_mb_rl_bit) put_bits(&s->pb, 1, s->per_mb_rl_table);
@@ -144,7 +147,6 @@ int ff_wmv2_encode_picture_header(MpegEncContext * s, int picture_number)
         put_bits(&s->pb, 1, s->dc_table_index);
 
         s->inter_intra_pred= 0;
-        s->no_rounding = 1;
     }else{
         int cbp_index;
 
@@ -181,7 +183,6 @@ int ff_wmv2_encode_picture_header(MpegEncContext * s, int picture_number)
         put_bits(&s->pb, 1, s->mv_table_index);
     
         s->inter_intra_pred= (s->width*s->height < 320*240 && s->bit_rate<=II_BITRATE);
-        s->no_rounding ^= 1;
     }
     s->esc3_level_length= 0;
     s->esc3_run_length= 0;
@@ -709,8 +710,6 @@ static int wmv2_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
     uint8_t *coded_val;
 
     if(w->j_type) return 0;
-    
-    s->error_status_table[s->mb_x + s->mb_y*s->mb_width]= 0;
     
     if (s->pict_type == P_TYPE) {
         if(s->mb_type[s->mb_y * s->mb_width + s->mb_x]&MB_TYPE_SKIPED){
