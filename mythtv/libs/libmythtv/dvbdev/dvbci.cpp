@@ -59,7 +59,8 @@ static int SysLogLevel = 3;
 
 // Set these to 'true' for debug output:
 static bool DumpTPDUDataTransfer = false;
-static bool DebugProtocol = true;
+static bool DebugProtocol = false;
+static bool _connected = false;
 
 #define dbgprotocol(a...) if (DebugProtocol) fprintf(stderr, a)
 
@@ -496,14 +497,16 @@ int cCiTransportConnection::CreateConnection(void)
   if (state == stIDLE) {
      if (SendTPDU(T_CREATE_TC) == OK) {
         state = stCREATION;
-        if (RecvTPDU() == T_CTC_REPLY)
+        if (RecvTPDU() == T_CTC_REPLY) {
+           _connected=true;
            return OK;
         // the following is a workaround for CAMs that don't quite follow the specs...
-        else {
+	} else {
            for (int i = 0; i < MAX_CONNECT_RETRIES; i++) {
                dsyslog("CAM: retrying to establish connection");
                if (RecvTPDU() == T_CTC_REPLY) {
                   dsyslog("CAM: connection established");
+                  _connected=true;
                   return OK;
                   }
                }
@@ -777,6 +780,8 @@ int cCiSession::SendData(int Tag, int Length, const uint8_t *Data)
 
 bool cCiSession::Process(int Length, const uint8_t *Data)
 {
+  (void)Length;
+  (void)Data;
   return true;
 }
 
@@ -1320,15 +1325,6 @@ bool cCiEnquiry::Cancel(void)
 
 // --- cCiCaPmt --------------------------------------------------------------
 
-// Ca Pmt List Management:
-
-#define CPLM_MORE    0x00
-#define CPLM_FIRST   0x01
-#define CPLM_LAST    0x02
-#define CPLM_ONLY    0x03
-#define CPLM_ADD     0x04
-#define CPLM_UPDATE  0x05
-
 // Ca Pmt Cmd Ids:
 
 #define CPCI_OK_DESCRAMBLING  0x01
@@ -1336,10 +1332,10 @@ bool cCiEnquiry::Cancel(void)
 #define CPCI_QUERY            0x03
 #define CPCI_NOT_SELECTED     0x04
 
-cCiCaPmt::cCiCaPmt(int ProgramNumber)
+cCiCaPmt::cCiCaPmt(int ProgramNumber, uint8_t cplm)
 {
   length = 0;
-  capmt[length++] = CPLM_ONLY;
+  capmt[length++] = cplm;
   capmt[length++] = (ProgramNumber >> 8) & 0xFF;
   capmt[length++] =  ProgramNumber       & 0xFF;
   capmt[length++] = 0x01; // version_number, current_next_indicator - apparently vn doesn't matter, but cni must be 1
@@ -1389,13 +1385,17 @@ cCiHandler::cCiHandler(int Fd, int NumSlots)
       sessions[i] = NULL;
   tpl = new cCiTransportLayer(Fd, numSlots);
   tc = NULL;
+  fdCa = Fd;
 }
 
 cCiHandler::~cCiHandler()
 {
+  cMutexLock MutexLock(&mutex);
   for (int i = 0; i < MAX_CI_SESSION; i++)
+    if (sessions[i] != NULL)
       delete sessions[i];
   delete tpl;
+  close(fdCa);
 }
 
 cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
@@ -1406,7 +1406,8 @@ cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
      if (ioctl(fd_ca, CA_GET_CAP, &Caps) == 0) {
         int NumSlots = Caps.slot_num;
         if (NumSlots > 0) {
-           //XXX dsyslog("CAM: found %d CAM slots", NumSlots); // TODO let's do this only once we can be sure that there _really_ is a CAM adapter!
+           //XXX dsyslog("CAM: found %d CAM slots", NumSlots);
+// TODO let's do this only once we can be sure that there _really_ is a CAM adapter!
            if (Caps.slot_type & CA_CI_LINK)
               return new cCiHandler(fd_ca, NumSlots);
            else
@@ -1637,6 +1638,11 @@ bool cCiHandler::Reset(int Slot)
   cMutexLock MutexLock(&mutex);
   CloseAllSessions(Slot);
   return tpl->ResetSlot(Slot);
+}
+
+bool cCiHandler::connected() const
+{
+  return _connected;
 }
 
 int tcp_listen(struct sockaddr_in *name,int sckt, unsigned long address)

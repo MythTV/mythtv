@@ -205,10 +205,15 @@ extern "C" {
 		int which;
 		int done;
 		void *data;
+		void *data2;
 		void (*func)(uint8_t *buf,  int size, void *priv);
 		int count;
 		int start;
 		int fd;
+		int fd1;
+		int fd2;
+		int ffd;
+		int playing;
 	} ipack;
 
 	void instant_repack (uint8_t *buf, int count, ipack *p);

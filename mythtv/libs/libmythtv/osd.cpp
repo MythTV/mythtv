@@ -1438,18 +1438,45 @@ void OSD::HideAll(void)
     osdlock.unlock();
 }
 
-void OSD::HideSet(const QString &name)
+bool OSD::HideSet(const QString &name)
 {
+    bool ret = false;
     osdlock.lock();
 
     OSDSet *set = GetSet(name);
     if (set)
     {
+        if (set->Displaying())
+            ret = true;
         set->Hide();
     }
 
     changed = true;
     osdlock.unlock();
+    return ret;
+}
+
+bool OSD::HideSets(QStringList &name)
+{
+    bool ret = false;
+    osdlock.lock();
+
+    OSDSet *set;
+    QStringList::Iterator i = name.begin();
+    for (; i != name.end(); i++)
+    {
+        set = GetSet(*i);
+        if (set)
+        {
+            if (set->Displaying())
+                ret = true;
+            set->Hide();
+        }
+    }
+
+    changed = true;
+    osdlock.unlock();
+    return ret;
 }
 
 void OSD::UpdateEditText(const QString &seek_amount, const QString &deletemarker, 

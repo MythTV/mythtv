@@ -380,6 +380,20 @@ bool RemoteEncoder::CheckChannel(QString channel)
     return retval;
 }
 
+bool RemoteEncoder::CheckChannelPrefix(QString channel, bool &unique) 
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "CHECK_CHANNEL_PREFIX";
+    strlist << channel;
+
+    SendReceiveStringList(strlist);
+
+    bool retval = strlist[0].toInt();
+    unique = strlist[1].toInt();
+
+    return retval;
+}
+
 void RemoteEncoder::GetNextProgram(int direction,
                                    QString &title, QString &subtitle,
                                    QString &desc, QString &category,

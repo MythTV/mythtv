@@ -1191,6 +1191,70 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
     return ret;
 }
 
+/*
+ * Returns true if name is either a valid channel name or a valid channel
+ * prefix.  If name is a valid channel name and not a valid channel prefix
+ * unique is set to true.
+ * For example, if name == "36" and "36", "360", "361", "362", and "363" are
+ * valid channel names, this function would return true but set *unique to
+ * false.  However if name == "361" it would both return true and set *unique
+ * to true.
+ */
+bool TVRec::CheckChannelPrefix(QString name, bool &unique)
+{
+    if (!db_conn)
+        return true;
+
+    pthread_mutex_lock(&db_lock);
+    MythContext::KickDatabase(db_conn);
+
+    bool ret = false;
+    unique = false;
+
+    QString channelinput = channel->GetCurrentInput();
+
+    QString thequery = QString("SELECT channel.chanid FROM "
+                               "channel,capturecard,cardinput "
+                               "WHERE channel.channum LIKE \"%1%%\" AND "
+                               "channel.sourceid = cardinput.sourceid AND "
+                               "cardinput.inputname = \"%2\" AND "
+                               "cardinput.cardid = capturecard.cardid AND "
+                               "capturecard.cardid = \"%3\" AND "
+                               "capturecard.hostname = \"%4\";")
+                               .arg(name).arg(channelinput)
+                               .arg(m_capturecardnum)
+                               .arg(gContext->GetHostName());
+
+    QSqlQuery query = db_conn->exec(thequery);
+
+    if (!query.isActive())
+        MythContext::DBError("checkchannel", query);
+    else if (query.numRowsAffected() > 0)
+    {
+        pthread_mutex_unlock(&db_lock);
+
+        if (query.numRowsAffected() == 1)
+        {
+            unique = CheckChannel(name);
+        }
+
+        return true;
+    }
+
+    thequery = "SELECT NULL FROM channel;";
+    query = db_conn->exec(thequery);
+
+    if (query.numRowsAffected() == 0) 
+    {
+        unique = true;
+        ret = true;
+    }
+
+    pthread_mutex_unlock(&db_lock);
+
+    return ret;
+}
+
 bool TVRec::SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum)
 {
 
@@ -1814,8 +1878,8 @@ void TVRec::GetNextProgram(int direction,
         case BROWSE_SAME:
                 chanid = GetNextRelativeChanID(channelname,
                                                CHANNEL_DIRECTION_SAME);
-                compare = "=";
-                sortorder = "asc";
+                compare = "<=";
+                sortorder = "desc";
                 break;
         case BROWSE_UP:
                 chanid = GetNextRelativeChanID(channelname,
@@ -1836,6 +1900,12 @@ void TVRec::GetNextProgram(int direction,
         case BROWSE_RIGHT:
                 compare = ">";
                 sortorder = "asc";
+                break;
+        case BROWSE_FAVORITE:
+                chanid = GetNextRelativeChanID(channelname,
+                                               CHANNEL_DIRECTION_FAVORITE);
+                compare = "<=";
+                sortorder = "desc";
                 break;
     }
 

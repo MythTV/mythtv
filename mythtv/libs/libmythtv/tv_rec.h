@@ -26,7 +26,8 @@ typedef enum
     BROWSE_UP,
     BROWSE_DOWN,
     BROWSE_LEFT,
-    BROWSE_RIGHT
+    BROWSE_RIGHT,
+    BROWSE_FAVORITE
 } BrowseDirections;
 
 
@@ -102,6 +103,7 @@ class TVRec
     int ChangeBrightness(bool direction);
     int ChangeHue(bool direction);
     bool CheckChannel(QString name);
+    bool CheckChannelPrefix(QString name, bool &unique);
     void GetNextProgram(int direction,
                         QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime, 

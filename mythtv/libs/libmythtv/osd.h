@@ -77,7 +77,8 @@ class OSD : public QObject
     bool Visible(void);
 
     void HideAll(void);
-    void HideSet(const QString &name);
+    bool HideSet(const QString &name);
+    bool HideSets(QStringList &name);
 
     void AddSet(OSDSet *set, QString name, bool withlock = true);
 

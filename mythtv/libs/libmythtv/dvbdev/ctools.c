@@ -1320,14 +1320,14 @@ void trans_filt(uint8_t *buf, int count, trans *p)
 	}
 	if (p->found == 188){
 		p->found = 0;
-		filter(p);
+		tfilter(p);
 	}
 
 	if (c < count) trans_filt(buf+c,count-c,p);
 } 
 
 
-void filter(trans *p)
+void tfilter(trans *p)
 {
 	int l,c;
 	int tpid;
@@ -1336,7 +1336,7 @@ void filter(trans *p)
 	uint8_t cpid[2];
 
 
-	//	fprintf(stderr,"filter\n");
+	//	fprintf(stderr,"tfilter\n");
 
 	cpid[0] = p->packet[1];
 	cpid[1] = p->packet[2];

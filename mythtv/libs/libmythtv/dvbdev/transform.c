@@ -925,17 +925,19 @@ void pes_dfilt(p2p *p)
 	}
 } 
 
+
+#define PD_SIZE 1024*1024
 int64_t pes_dmx( int fdin, int fdouta, int fdoutv, int es)
 {
 	p2p p;
 	int count = 1;
-	uint8_t buf[SIZE];
+	uint8_t buf[PD_SIZE];
 	uint64_t length = 0;
 	uint64_t l = 0;
 	int verb = 0;
 	int percent, oldPercent = -1;
  	
-	init_p2p(&p, NULL, 2048);
+	init_p2p(&p, NULL, MAX_PLENGTH-1);
 	p.fd1 = fdouta;
 	p.fd2 = fdoutv;
 	p.es = es;
@@ -952,7 +954,7 @@ int64_t pes_dmx( int fdin, int fdouta, int fdoutv, int es)
 	}
 	
 	while (count > 0){
-		count = read(fdin,buf,SIZE);
+		count = read(fdin,buf,PD_SIZE);
 		l += count;
 		if (verb){
 			percent = 100 * l / length;
@@ -1024,7 +1026,7 @@ static void pes_in_ts(p2p *p)
 	}
 }
 
-
+static
 void write_out(uint8_t *buf, int count,void  *p)
 {
 	write(STDOUT_FILENO, buf, count);
@@ -2420,7 +2422,9 @@ int64_t ts_demux(int fdin, int fdv_out,int fda_out,uint16_t pida,
 	ipack *p;
 	uint8_t *sb;
 	int64_t apts=0;
+	int64_t apos=0;
 	int64_t vpts=0;
+	int64_t vpos=0;
 	int verb = 0;
 	uint64_t length =0;
 	uint64_t l=0;
@@ -2438,8 +2442,8 @@ int64_t ts_demux(int fdin, int fdv_out,int fda_out,uint16_t pida,
 		find_avpids(fdin, &pidv, &pida);
 
 	if (es){
-		init_ipack(&pa, IPACKS,write_out_es, 0);
-		init_ipack(&pv, IPACKS,write_out_es, 0);
+		init_ipack(&pa, MAX_PLENGTH-1,write_out_es, 0);
+		init_ipack(&pv, MAX_PLENGTH-1,write_out_es, 0);
 	} else {
 		init_ipack(&pa, IPACKS,write_out_pes, 0);
 		init_ipack(&pv, IPACKS,write_out_pes, 0);
@@ -2516,6 +2520,7 @@ int64_t ts_demux(int fdin, int fdv_out,int fda_out,uint16_t pida,
 					      get_vinfo( pay, l,&p->vi,1)+1) >0
 						){
 						vpts = trans_pts_dts(sb+9);
+						vpos = (uint64_t)(l-count+pay);
 						printf("vpts : %fs\n",
 						       vpts/90000.);
 					}
@@ -2532,6 +2537,7 @@ int64_t ts_demux(int fdin, int fdv_out,int fda_out,uint16_t pida,
 					      get_ac3info( pay, l,&p->ai,1)+1) >0
 						){
 						apts = trans_pts_dts(sb+9);
+						apos = (uint64_t)(l-count+pay);
 						printf("apts : %fs\n",
 						       apts/90000.);
 					}
@@ -2545,8 +2551,10 @@ int64_t ts_demux(int fdin, int fdv_out,int fda_out,uint16_t pida,
 
 	}
 
+	fprintf(stderr, "VPOS-APOS %d",(int)(vpos-apos));
 	return (vpts-apts);
 }
+
 
 void ts2es_opt(int fdin,  uint16_t pidv, ipack *p, int verb)
 {

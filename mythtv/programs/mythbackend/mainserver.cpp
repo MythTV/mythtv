@@ -1589,6 +1589,14 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         QString name = slist[2];
         retlist << QString::number((int)(enc->CheckChannel(name)));
     }
+    else if (command == "CHECK_CHANNEL_PREFIX")
+    {
+        bool unique;
+        QString name = slist[2];
+        retlist << QString::number((int)(enc->CheckChannelPrefix(name, 
+                                                                 unique)));
+        retlist << QString::number((int)unique);
+    }
     else if (command == "GET_NEXT_PROGRAM_INFO")
     {
         QString channelname = slist[2];

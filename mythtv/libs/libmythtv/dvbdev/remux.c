@@ -308,7 +308,7 @@ printpts((uint32_t)pts-rem->vpts_off);
  printpts(rem->vpts_list[rem->vptsn-1].PTS-rem->vpts_off);
  fprintf(stderr,"   DIFF:");
  printpts(pts-(uint64_t)rem->vpts_list[rem->vptsn-1].PTS);
- fprintf(stderr,"   DIST: %4d",-rem->vpts_list[rem->vptsn-1].pos+(rem->vwrite+c-4));
+// fprintf(stderr,"   DIST: %4d",-rem->vpts_list[rem->vptsn-1].pos+(rem->vwrite+c-4));
  //fprintf(stderr,"   ERR: %3f",(double)(-rem->vpts_list[rem->vptsn-1].PTS+pts)/(rem->vframe+1));
  fprintf(stderr,"\r");
 
@@ -357,7 +357,7 @@ printpts((uint32_t)pts-rem->apts_off);
  printpts(rem->apts_list[rem->aptsn-1].PTS-rem->apts_off);
  fprintf(stderr," DIFF:");
  printpts((uint32_t)((uint64_t)rem->apts_list[rem->aptsn-1].PTS-pts));
- fprintf(stderr," DIST: %4d",-rem->apts_list[rem->aptsn-1].pos+(rem->awrite+c-2));
+// fprintf(stderr," DIST: %4d",-rem->apts_list[rem->aptsn-1].pos+(rem->awrite+c-2));
  fprintf(stderr,"\r");
 
 			  rem->aptsn = add_pts(rem->apts_list,(uint32_t)pts

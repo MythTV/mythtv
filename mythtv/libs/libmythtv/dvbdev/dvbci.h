@@ -108,6 +108,15 @@ public:
   bool Cancel(void);
   };
 
+// Ca Pmt List Management:
+
+#define CPLM_MORE    0x00
+#define CPLM_FIRST   0x01
+#define CPLM_LAST    0x02
+#define CPLM_ONLY    0x03
+#define CPLM_ADD     0x04
+#define CPLM_UPDATE  0x05
+
 class cCiCaPmt {
   friend class cCiConditionalAccessSupport;
 private:
@@ -115,7 +124,7 @@ private:
   int esInfoLengthPos;
   uint8_t capmt[2048]; ///< XXX is there a specified maximum?
 public:
-  cCiCaPmt(int ProgramNumber);
+  cCiCaPmt(int ProgramNumber, uint8_t cplm = CPLM_ONLY);
   void AddPid(int Pid);
   void AddCaDescriptor(int Length, uint8_t *Data);
   };
@@ -129,6 +138,7 @@ class cCiTransportConnection;
 class cCiHandler {
 private:
   cMutex mutex;
+  int fdCa;
   int numSlots;
   bool newCaSupport;
   bool hasUserIO;
@@ -157,6 +167,7 @@ public:
   const unsigned short *GetCaSystemIds(int Slot);
   bool SetCaPmt(cCiCaPmt &CaPmt, int Slot);
   bool Reset(int Slot);
+  bool connected() const;
   };
 
 int tcp_listen(struct sockaddr_in *name,int sckt,unsigned long address=INADDR_ANY);

@@ -524,6 +524,16 @@ bool EncoderLink::CheckChannel(QString name)
     return false;
 }
 
+bool EncoderLink::CheckChannelPrefix(QString name, bool &unique)
+{
+    if (local)
+        return tv->CheckChannelPrefix(name, unique);
+
+    cerr << "Should be local only query: CheckChannelPrefix\n";
+    unique = false;
+    return false;
+}
+
 void EncoderLink::GetNextProgram(int direction,
                                  QString &title, QString &subtitle, 
                                  QString &desc, QString &category, 

@@ -313,7 +313,7 @@ extern "C" {
 	int filt_is_ready(trans *p,int filtn);
 
 	void trans_filt(uint8_t *buf, int count, trans *p);
-	void filter(trans *p);
+	void tfilter(trans *p);
 	void pes_filter(trans *p, int filtn, int off);
 	void sec_filter(trans *p, int filtn, int off);
 	int get_filt_buf(trans *p, int filtn,uint8_t **buf); 
@@ -388,6 +388,7 @@ extern "C" {
 			    uint32_t   buffer2_size);                    
 	
 
+	int seek_mpg_start(uint8_t *buf, int size);
 
 
 	void split_mpg(char *name, uint64_t size);

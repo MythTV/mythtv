@@ -77,7 +77,7 @@ class NuppelVideoPlayer
     bool GetPause(void);
 
     float GetPlaySpeed(void) { return play_speed; };
-    void SetPlaySpeed(float speed);
+    void SetPlaySpeed(float speed, bool normal);
 
     bool FastForward(float seconds);
     bool Rewind(float seconds);

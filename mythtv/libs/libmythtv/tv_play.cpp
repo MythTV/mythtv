@@ -24,20 +24,6 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 
-enum SeekSpeeds {
-  SSPEED_NORMAL_WITH_DISPLAY = 0,
-  SSPEED_SLOW_1,
-  SSPEED_SLOW_2,
-  SSPEED_NORMAL,
-  SSPEED_FAST_1,
-  SSPEED_FAST_2,
-  SSPEED_FAST_3,
-  SSPEED_FAST_4,
-  SSPEED_FAST_5,
-  SSPEED_FAST_6,
-  SSPEED_MAX
-};
-
 struct SeekSpeedInfo {
     QString   dispString;
     float  scaling;
@@ -58,6 +44,9 @@ SeekSpeedInfo seek_speed_array[] =
     {"10X", 11.18,  84.00, 54.00},
     {"16X", 16.72, 132.00, 84.00}
 };
+
+const int SSPEED_NORMAL = 3;
+const int SSPEED_MAX = sizeof seek_speed_array / sizeof seek_speed_array[0];
 
 const int kMuteTimeout = 800;
 
@@ -121,6 +110,7 @@ void TV::Init(bool createWindow)
     rewtime = gContext->GetNumSetting("RewindAmount", 5);
     jumptime = gContext->GetNumSetting("JumpAmount", 10);
     usePicControls = gContext->GetNumSetting("UseOutputPictureControls", 0);
+    smartChannelChange = gContext->GetNumSetting("SmartChannelChange", 0);
 
     recorder = piprecorder = activerecorder = NULL;
     nvp = pipnvp = activenvp = NULL;
@@ -788,7 +778,9 @@ void TV::RunTV(void)
 
         if (++updatecheck >= 20)
         {
-            if (osd && osd->Visible() && update_osd_pos &&
+            OSDSet *oset;
+            if (osd && (oset = osd->GetSet("status")) &&
+                oset->Displaying() && update_osd_pos &&
                 (internalState == kState_WatchingLiveTV || 
                  internalState == kState_WatchingRecording ||
                  internalState == kState_WatchingPreRecorded))
@@ -804,8 +796,12 @@ void TV::RunTV(void)
         if (internalState == kState_WatchingLiveTV ||
             internalState == kState_WatchingRecording)
         {
-            if (channelqueued && nvp->GetOSD() && !osd->Visible())
-                ChannelCommit();
+            if (channelqueued && nvp->GetOSD())
+            {
+                OSDSet *set = osd->GetSet("channel_number");
+                if (!set || !set->Displaying())
+                    ChannelCommit();
+            }
         }
     }
   
@@ -851,6 +847,8 @@ void TV::ProcessKeypress(int keypressed)
         if (keypressed == Key_Escape || 
             keypressed == Key_E || keypressed == Key_M)
             editmode = nvp->GetEditMode();
+        if (!editmode)
+            nvp->SetPlaySpeed(1.0, true);
         return;
     }
 
@@ -863,11 +861,17 @@ void TV::ProcessKeypress(int keypressed)
             case Key_Down: BrowseDispInfo(BROWSE_DOWN); break;
             case Key_Left: BrowseDispInfo(BROWSE_LEFT); break;
             case Key_Right: BrowseDispInfo(BROWSE_RIGHT); break;
+            case Key_Slash: BrowseDispInfo(BROWSE_FAVORITE); break;
 
-            case Key_Escape: BrowseEnd(false); break;
+            case Key_0: case Key_1: case Key_2: case Key_3: case Key_4:
+            case Key_5: case Key_6: case Key_7: case Key_8: case Key_9:
+                    ChannelKey(keypressed); break;
 
-            case Key_Space: case Key_Enter:
-            case Key_Return: BrowseEnd(true); break;
+            case Key_O: case Key_Escape: 
+                    ChannelCommit(); BrowseEnd(false); break;
+
+            case Key_Space: case Key_Enter: case Key_Return: 
+                    ChannelCommit(); BrowseEnd(true); break;
 
             case Key_R: BrowseToggleRecord(); break;
 
@@ -900,6 +904,8 @@ void TV::ProcessKeypress(int keypressed)
                     {
                        playbackinfo->SetEditing(false, m_db);
                        editmode = nvp->EnableEdit();
+                       if (editmode)
+                           nvp->SetPlaySpeed(1.0, false);
                     }
                 }
                 if (dialogname == "exitplayoptions") 
@@ -1042,13 +1048,18 @@ void TV::ProcessKeypress(int keypressed)
         {
             StopFFRew();
 
-            if (osd && osd->Visible())
+            if (osd)
             {
-                ChannelClear();
-                osd->HideAll();
-                return;
+                QStringList osetname;
+                osetname << "program_info" << "channel_number" << "status";
+                if (osd->HideSets(osetname))
+                {
+                    ChannelClear();
+                    return;
+                }
             }
-            else if (StateIsPlaying(internalState) &&
+
+            if (StateIsPlaying(internalState) &&
                 gContext->GetNumSetting("PlaybackExitPrompt") == 1) 
             {
                 nvp->Pause();
@@ -1083,24 +1094,13 @@ void TV::ProcessKeypress(int keypressed)
         {
             if (doing_ff_rew)
             {
-                switch (keypressed)
+                if (keypressed >= Key_0 && keypressed < Key_0 + SSPEED_MAX)
+                    ff_rew_index = keypressed - Key_0;
+                else
                 {
-                    case Key_0: ff_rew_index = SSPEED_NORMAL_WITH_DISPLAY; break;
-                    case Key_1: ff_rew_index = SSPEED_SLOW_1; break;
-                    case Key_2: ff_rew_index = SSPEED_SLOW_2; break;
-                    case Key_3: ff_rew_index = SSPEED_NORMAL; break;
-                    case Key_4: ff_rew_index = SSPEED_FAST_1; break;
-                    case Key_5: ff_rew_index = SSPEED_FAST_2; break;
-                    case Key_6: ff_rew_index = SSPEED_FAST_3; break;
-                    case Key_7: ff_rew_index = SSPEED_FAST_4; break;
-                    case Key_8: ff_rew_index = SSPEED_FAST_5; break;
-                    case Key_9: ff_rew_index = SSPEED_FAST_6; break;
-
-                    default:
-                       float time = StopFFRew();
-                       UpdatePosOSD(time, tr("Play"));
-                       was_doing_ff_rew = true;
-                       break;
+                    float time = StopFFRew();
+                    UpdatePosOSD(time, tr("Play"));
+                    was_doing_ff_rew = true;
                 }
             }
             if (speed_index)
@@ -1184,23 +1184,26 @@ void TV::ProcessKeypress(int keypressed)
             }
             case Key_E: case Key_M: 
             {
-               if (playbackinfo->IsEditing(m_db))
-               {
-                   nvp->Pause();
+                if (playbackinfo->IsEditing(m_db))
+                {
+                    nvp->Pause();
 
-                   dialogname = "alreadybeingedited";
+                    dialogname = "alreadybeingedited";
 
-                   QString message = tr("This program is currently being edited");
+                    QString message = tr("This program is currently being edited");
 
-                   QStringList options;
-                   options += tr("Continue Editing");
-                   options += tr("Do not edit");
+                    QStringList options;
+                    options += tr("Continue Editing");
+                    options += tr("Do not edit");
 
-                   osd->NewDialogBox(dialogname, message, options, 0); 
-                   break;
-               }
-            editmode = nvp->EnableEdit();
-            break;        
+                    osd->NewDialogBox(dialogname, message, options, 0); 
+                    break;
+                }
+
+                editmode = nvp->EnableEdit();
+                if (editmode)
+                    nvp->SetPlaySpeed(1.0, false);
+                break;        
             }
             case Key_Up:
             {
@@ -1427,7 +1430,7 @@ void TV::NormalSpeed(void)
         return;
 
     speed_index = 0;
-    activenvp->SetPlaySpeed(1.0);
+    activenvp->SetPlaySpeed(1.0, true);
 }
 
 void TV::ChangeSpeed(int direction)
@@ -1456,7 +1459,7 @@ void TV::ChangeSpeed(int direction)
         default: speed_index = old_speed; return; break;
     }
 
-    activenvp->SetPlaySpeed(speed);
+    activenvp->SetPlaySpeed(speed, (speed == 1.0));
     UpdatePosOSD(time, mesg);
 
     if (paused)
@@ -1481,6 +1484,8 @@ float TV::StopFFRew(void)
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
 
+    activenvp->SetPlaySpeed(1.0, true);
+
     return time;
 }
 
@@ -1497,6 +1502,8 @@ void TV::ChangeFFRew(int direction)
 
         if (paused)
             paused = activenvp->TogglePause();
+
+        activenvp->SetPlaySpeed(1.0, false);
     }
 }
 
@@ -1701,6 +1708,41 @@ void TV::ChannelKey(int key)
     }
     channelKeys[4] = 0;
 
+    channelqueued = true;
+
+    bool unique = false;
+
+    /* 
+     * Always use smartChannelChange when channel numbers are entered in
+     * browse mode because in browse mode space/enter exit browse mode and
+     * change to the currently browsed channel. This makes smartChannelChange
+     * the only way to enter a channel number to browse without waiting for the
+     * OSD to fadeout after entering numbers.
+     */
+    if (smartChannelChange || browsemode)
+    {
+        char *chan_no_leading_zero = NULL;
+        for (int i = 0; i < channelkeysstored; i++)
+        {
+            if (channelKeys[i] != '0') 
+            {
+                chan_no_leading_zero = &channelKeys[i];
+                break;
+            }
+        }
+
+        if (chan_no_leading_zero)
+        {
+            QString chan = QString(chan_no_leading_zero).stripWhiteSpace();
+            if (!activerecorder->CheckChannelPrefix(chan, unique))
+            {
+                channelKeys[0] = thekey;
+                channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
+                channelkeysstored = 1;
+            }
+        }
+    }
+
     if (activenvp == nvp && osd)
     {
         QMap<QString, QString> regexpMap;
@@ -1711,7 +1753,8 @@ void TV::ChannelKey(int key)
         osd->SetTextByRegexp("channel_number", regexpMap, 2);
     }
 
-    channelqueued = true;
+    if (unique)
+        ChannelCommit();
 }
 
 void TV::ChannelCommit(void)
@@ -1728,7 +1771,15 @@ void TV::ChannelCommit(void)
     }
 
     QString chan = QString(channelKeys).stripWhiteSpace();
-    ChangeChannelByString(chan);
+
+    if (browsemode)
+    {
+        BrowseChannel(chan);
+        if (activenvp == nvp && osd)
+            osd->HideSet("channel_number");
+    }
+    else
+        ChangeChannelByString(chan);
 
     ChannelClear();
 }
@@ -1862,7 +1913,8 @@ void TV::SetPreviousChannel()
 
 void TV::ToggleOSD(void)
 {
-    if (osd->Visible())
+    OSDSet *oset = osd->GetSet("program_info");
+    if (osd && (oset) && oset->Displaying())
     {
         osd->HideSet("program_info");
         osd->HideSet("channel_number");
@@ -2390,10 +2442,7 @@ void TV::BrowseDispInfo(int direction)
     regexpMap["dbstarttime"] = browsestarttime;
     regexpMap["chanid"] = browsechanid;
 
-    if (direction != BROWSE_SAME)
-        GetNextProgram(activerecorder, direction, regexpMap);
-    else
-        GetChannelInfo(activerecorder, regexpMap);
+    GetNextProgram(activerecorder, direction, regexpMap);
 
     browsechannum = regexpMap["channum"];
     browsechanid = regexpMap["chanid"];
@@ -2431,6 +2480,15 @@ void TV::BrowseToggleRecord(void)
     osd->SetTextByRegexp("browse_info", regexpMap, -1);
 
     delete program_info;
+}
+
+void TV::BrowseChannel(QString &chan)
+{
+    if (!activerecorder->CheckChannel(chan))
+        return;
+
+    browsechannum = chan;
+    BrowseDispInfo(BROWSE_SAME);
 }
 
 void TV::HandleOSDClosed(int osdType)

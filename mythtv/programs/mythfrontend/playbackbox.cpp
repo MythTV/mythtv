@@ -118,7 +118,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
 
-    timer->start(1000 / 30);
+    timer->start(500);
     gContext->addListener(this);
 }
 
@@ -441,7 +441,7 @@ void PlaybackBox::updateInfo(QPainter *p)
 
         ignoreevents = false;
 
-        timer->start(1000 / 30);
+        timer->start(500);
     }
     else
     {
@@ -461,7 +461,7 @@ void PlaybackBox::updateVideo(QPainter *p)
     if (noUpdate == true)
         return;
 
-    if (playbackPreview == 0 && curitem)
+    if (((playbackPreview == 0) || !playingVideo) && curitem)
     {
         QPixmap temp = getPixmap(curitem);
         if (temp.width() > 0)
@@ -1320,7 +1320,7 @@ void PlaybackBox::play(ProgramInfo *rec)
 
     ignoreevents = false;
 
-    timer->start(1000 / 30);
+    timer->start(500);
 }
 
 void PlaybackBox::stop(ProgramInfo *rec)
@@ -1650,7 +1650,7 @@ void PlaybackBox::noStop(void)
     delete delitem;
     delitem = NULL;
 
-    timer->start(1000 / 30);
+    timer->start(500);
 }
 
 void PlaybackBox::doStop(void)
@@ -1665,7 +1665,7 @@ void PlaybackBox::doStop(void)
     delete delitem;
     delitem = NULL;
 
-    timer->start(1000 / 30);
+    timer->start(500);
 }
 
 void PlaybackBox::askDelete(void)
@@ -1688,7 +1688,7 @@ void PlaybackBox::noDelete(void)
     delete delitem;
     delitem = NULL;
 
-    timer->start(1000 / 30);
+    timer->start(500);
 }
 
 void PlaybackBox::doDelete(void)
@@ -1703,7 +1703,7 @@ void PlaybackBox::doDelete(void)
     delete delitem;
     delitem = NULL;
 
-    timer->start(1000 / 30);
+    timer->start(500);
 }
 
 void PlaybackBox::noAutoExpire(void)
@@ -1804,6 +1804,8 @@ void PlaybackBox::timeout(void)
 
     if (playbackPreview == 0)
         timer->stop();
+    else
+        timer->start(1000 / 30);
 }
 
 void PlaybackBox::keyPressEvent(QKeyEvent *e)

@@ -919,6 +919,18 @@ public:
     };
 };
 
+class SmartChannelChange: public CheckBoxSetting, public GlobalSetting {
+public:
+    SmartChannelChange():
+        GlobalSetting("SmartChannelChange") {
+        setLabel(QObject::tr("Change channels immediately without select"));
+        setValue(false);
+        setHelpText(QObject::tr("When a complete channel number is entered "
+                    "MythTV will switch to that channel immediately without "
+                    "requiring you to hit the select button."));
+    };
+};
+
 class QtFontBig: public SpinBoxSetting, public GlobalSetting {
 public:
     QtFontBig():
@@ -1341,6 +1353,7 @@ GeneralSettings::GeneralSettings()
     general->addChild(new PlayBoxOrdering());
     general->addChild(new ChannelOrdering());
     general->addChild(new DisplayChanNum());
+    general->addChild(new SmartChannelChange());
     general->addChild(new GeneratePreviewPixmaps());
     general->addChild(new PlaybackPreview());
     general->addChild(new AdvancedRecord());

@@ -161,6 +161,7 @@ class TV : public QObject
     void BrowseEnd(bool change);
     void BrowseDispInfo(int direction);
     void BrowseToggleRecord(void);
+    void BrowseChannel(QString &chan);
 
     void DoTogglePictureAttribute(void);
     void DoChangePictureAttribute(bool up);
@@ -170,6 +171,7 @@ class TV : public QObject
     bool channelqueued;
     char channelKeys[5];
     int channelkeysstored;
+    bool smartChannelChange;
 
     bool menurunning;
 

@@ -262,10 +262,10 @@ void NuppelVideoPlayer::UnpauseVideo(void)
     pausevideo = false;
 }
 
-void NuppelVideoPlayer::SetPlaySpeed(float speed)
+void NuppelVideoPlayer::SetPlaySpeed(float speed, bool normal)
 {
     play_speed = speed;
-    normal_speed = (speed == 1.0);
+    normal_speed = normal;
     frame_interval = (int)(1000000.0 / video_frame_rate / speed);
     if (osd)
         osd->SetFrameInterval(frame_interval);
