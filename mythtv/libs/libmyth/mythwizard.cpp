@@ -563,7 +563,7 @@ void MythWizard::keyPressEvent(QKeyEvent* e)
             back();
         break;
     default:
-        e->ignore();
+        MythDialog::keyPressEvent(e);
     }
 }
 
