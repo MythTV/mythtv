@@ -80,7 +80,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     MythContext *context = new MythContext();
-    context->LoadQtConfig();
 
     context->LoadSettingsFiles("mythgame-settings.txt");
 
@@ -95,6 +94,8 @@ int main(int argc, char *argv[])
         printf("could not open db\n");
         return -1;
     }
+
+    context->LoadQtConfig();
 
     //this should only run the first time.
     QString thequery = "SELECT gamename FROM gamemetadata;";
