@@ -663,10 +663,13 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     X11videobuf = XJ_init(video_width, video_height, "Mythical Convergence",
                           "MythTV");
 
+    int pause_rpos = 0;
     while (!eof && !killplayer)
     {
         if (paused)
         {
+            if (!video_actually_paused)
+                pause_rpos = rpos;
             video_actually_paused = true;
             if (livetv && ringBuffer->GetFreeSpace() < -1000)
             {
@@ -678,6 +681,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 //printf("video waiting for unpause\n");
                 usleep(50);
 		ResetNexttrigger(&nexttrigger);
+                memcpy(X11videobuf, vbuffer[pause_rpos], videosize);
+                osd->Display(X11videobuf);
+                XJ_show(video_width, video_height);
                 continue;
             }
         }
@@ -1319,23 +1325,3 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
 
     return (char *)outputbuf;
 }
-    
-void NuppelVideoPlayer::SetInfoText(const string &text, const string &subtitle,
-                                    const string &desc, const string &category,
-                                    const string &start, const string &end,
-                                    int secs)
-{
-    osd->SetInfoText(text, subtitle, desc, category, start, end, 
-                     (int)(secs * ceil(video_frame_rate)));
-}
-
-void NuppelVideoPlayer::SetChannelText(const string &text, int secs)
-{
-    osd->SetChannumText(text, (int)(secs * ceil(video_frame_rate)));
-}
-
-void NuppelVideoPlayer::ShowLastOSD(int secs)
-{
-    osd->ShowLast((int)(secs * ceil(video_frame_rate)));
-}
-

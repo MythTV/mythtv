@@ -25,10 +25,18 @@ OSD::OSD(int width, int height, const string &filename, const string &prefix)
     
     channum_width = channum_x_end - channum_x_start;
     channum_height = channum_y_end - channum_y_start;
-    
+   
+    dialog_y_start = height / 8;
+    dialog_y_end = height * 7 / 8;
+    dialog_x_start = width / 8;
+    dialog_x_end = width * 7 / 8;
+ 
     displayframes = 0;
     show_info = false;
     show_channum = false;
+    show_dialog = false;
+
+    currentdialogoption = 1;
 
     infotext = channumtext = "";
     
@@ -83,7 +91,7 @@ void OSD::SetInfoText(const string &text, const string &subtitle,
                       const string &desc, const string &category,
                       const string &start, const string &end, int length)
 {
-    displayframes = length;
+    displayframes = time(NULL) + length;
     show_info = true;
 
     infotext = text;
@@ -93,15 +101,41 @@ void OSD::SetInfoText(const string &text, const string &subtitle,
 
 void OSD::SetChannumText(const string &text, int length)
 {
-    displayframes = length;
+    displayframes = time(NULL) + length;
     show_channum = true;
 
     channumtext = text;
 }
 
+void OSD::DialogUp(void)
+{
+    if (currentdialogoption > 1)
+        currentdialogoption--;
+}
+
+void OSD::DialogDown(void)
+{
+    if (currentdialogoption < 3)
+        currentdialogoption++;
+}
+
+void OSD::SetDialogBox(const string &message, const string &optionone,
+                       const string &optiontwo, const string &optionthree,
+                       int length)
+{
+    currentdialogoption = 1;
+    dialogmessagetext = message;
+    dialogoptionone = optionone;
+    dialogoptiontwo = optiontwo;
+    dialogoptionthree = optionthree;
+    
+    displayframes = time(NULL) + length;
+    show_dialog = true;
+}
+
 void OSD::ShowLast(int length)
 {
-    displayframes = length;
+    displayframes = time(NULL) + length;
     show_channum = true;
     show_info = true;
 }
@@ -116,28 +150,59 @@ void OSD::Display(unsigned char *yuvptr)
     if (!enableosd)
         return;
 
-    if (displayframes <= 0)
+    if (time(NULL) > displayframes)
     {
         show_info = false; 
 	show_channum = false;
+        show_dialog = false;
     	return;
     }
 
-    displayframes--;
+    if (show_dialog)
+    {
+        DarkenBox(dialog_x_start, dialog_y_start, dialog_x_end, dialog_y_end,
+                  yuvptr);
+        DrawStringIntoBox(dialog_x_start, dialog_y_start, dialog_x_end, 
+                          dialog_y_end - infofontsize * 2 * 3,
+                          dialogmessagetext, yuvptr);
+        DrawStringIntoBox(dialog_x_start, dialog_y_end - 
+                          infofontsize * 2 * 3, dialog_x_end, 
+                          dialog_y_end - infofontsize * (3 / 2) * 2,
+                          dialogoptionone, yuvptr);
+        DrawStringIntoBox(dialog_x_start, dialog_y_end
+                          - infofontsize * 2 * 2, 
+                          dialog_x_end, dialog_y_end - infofontsize / 2,
+                          dialogoptiontwo, yuvptr);
+        DrawStringIntoBox(dialog_x_start, dialog_y_end - infofontsize * 2,
+                          dialog_x_end, dialog_y_end + infofontsize,
+                          dialogoptionthree, yuvptr);
 
-    unsigned char *src;
+        if (currentdialogoption == 1)
+        {
+            DrawRectangle(dialog_x_start, dialog_y_end - 
+                          infofontsize * 2 * 3 - 2, dialog_x_end,    
+                          dialog_y_end - infofontsize * 2 * 2 - 2, yuvptr);
+        }
+        else if (currentdialogoption == 2)
+        {
+            DrawRectangle(dialog_x_start, dialog_y_end -  
+                          infofontsize * 2 * 2 - 2, dialog_x_end,     
+                          dialog_y_end - infofontsize * 2 - 2, yuvptr);
+        }
+        else if (currentdialogoption == 3)
+        {
+            DrawRectangle(dialog_x_start, dialog_y_end -  
+                          infofontsize * 2 - 2, dialog_x_end,     
+                          dialog_y_end - 2, yuvptr);
+        }
 
-    char c = -128;
+        return;
+    }
+
     if (show_info)
     {
-        for (int y = info_y_start ; y < info_y_end; y++)
-        {
-            for (int x = info_x_start; x < info_x_end; x++)
-            {
-                src = yuvptr + x + y * vid_width;
-	        *src = ((*src * c) >> 8) + *src;
-            }
-        }
+        DarkenBox(info_x_start, info_y_start, info_x_end, info_y_end,
+                  yuvptr);
 
 	EFont_draw_string(yuvptr, info_x_start + 5, info_y_start + 5, infotext,
                           info_font, info_x_end - 5, info_y_end - 5);
@@ -145,59 +210,9 @@ void OSD::Display(unsigned char *yuvptr)
                           infofontsize * 3 / 2, subtitletext, info_font, 
                           info_x_end - 5, 
                           info_y_end - 5 - infofontsize * 3 / 2);
-        int textlength = 0;
-        Efont_extents(info_font, desctext, NULL, NULL, &textlength, NULL, NULL,
-                      NULL, NULL);
-       
-        int maxlength = (info_x_end - 5) - (info_x_start + 5);
-        if (textlength > maxlength)
-        {
-            char *orig = strdup((char *)desctext.c_str());
-            int length = 0;
-            int lines = 0;
-            char line[512];
-            memset(line, '\0', 512);
-
-            char *word = strtok(orig, " ");
-            while (word)
-            {
-                Efont_extents(info_font, word, NULL, NULL, &textlength,
-                              NULL, NULL, NULL, NULL);
-                if (textlength + space_width + length > maxlength)
-                {
-                    EFont_draw_string(yuvptr, info_x_start + 5, info_y_start +
-                                      5 + infofontsize * (lines + 2) * 3 / 2,
-                                      line, info_font, info_x_end - 5, 
-                                      info_y_end - 5);
-                    length = 0;
-                    memset(line, '\0', 512);
-                    lines++;
-                }
-                if (length == 0)
-                {
-                    length = textlength;
-                    strcpy(line, word);
-                }
-                else
-                {
-                    length += textlength + space_width;
-                    strcat(line, " ");
-                    strcat(line, word);
-                }
-                word = strtok(NULL, " ");
-            }
-            EFont_draw_string(yuvptr, info_x_start + 5, info_y_start + 5 +
-                              infofontsize * (lines + 2) * 3 / 2, line, 
-                              info_font, info_x_end - 5, info_y_end - 5);
-            free(orig);
-        }
-        else
-        {
-            EFont_draw_string(yuvptr, info_x_start + 5, info_y_start + 5 +
-                              infofontsize * 3, desctext, info_font,
-                              info_x_end - 5, info_y_end - 5 - 
-                              infofontsize * 3);
-        }
+        DrawStringIntoBox(info_x_start, info_y_start + infofontsize * 3, 
+                          info_x_end, info_y_end, desctext, 
+                          yuvptr);
     }
 
     if (show_channum)
@@ -217,5 +232,123 @@ void OSD::Display(unsigned char *yuvptr)
         EFont_draw_string(yuvptr, channum_x_start, channum_y_start, channumtext,
                           channum_font, channum_x_end, channum_y_end, 
                           true, true);
+    }
+}
+
+void OSD::DrawStringIntoBox(int xstart, int ystart, int xend, int yend,
+                            const string &text, unsigned char *screen)
+{
+    int textlength = 0;
+    Efont_extents(info_font, text, NULL, NULL, &textlength, NULL, NULL, NULL,
+                  NULL);
+
+    int maxlength = (xend - 5) - (xstart + 5);
+    if (textlength > maxlength)
+    {
+        char *orig = strdup((char *)text.c_str());
+        int length = 0;
+        int lines = 0;
+        char line[512];
+        memset(line, '\0', 512);
+
+        char *word = strtok(orig, " ");
+        while (word)
+        {
+            if (word[0] == '%') 
+            {
+                if (word[1] == 'd')
+                {
+                    int timeleft = displayframes - time(NULL);
+                    if (timeleft > 99) 
+                        timeleft = 99;
+                    if (timeleft < 0)
+                        timeleft = 0;
+
+                    sprintf(word, "%d", timeleft);
+                }
+            }
+            Efont_extents(info_font, word, NULL, NULL, &textlength,
+                          NULL, NULL, NULL, NULL);
+            if (textlength + space_width + length > maxlength)
+            {
+                EFont_draw_string(screen, xstart + 5, ystart + 5 +
+                                  infofontsize * (lines) * 3 / 2, line,
+                                  info_font, xend - 5, yend - 5);
+                length = 0;
+                memset(line, '\0', 512);
+                lines++;
+            }
+            if (length == 0)
+            {
+                length = textlength;
+                strcpy(line, word);
+            }
+            else
+            {
+                length += textlength + space_width;
+                strcat(line, " ");
+                strcat(line, word);
+            }
+            word = strtok(NULL, " ");
+        }
+        EFont_draw_string(screen, xstart + 5, ystart + 5 + infofontsize *
+                          (lines) * 3 / 2, line, info_font, xend - 5,
+                          yend - 5);
+        free(orig);
+    }
+    else
+    {
+        EFont_draw_string(screen, xstart + 5, ystart + 5, text, info_font, 
+                          xend - 5, yend - 5);
+    }
+}
+
+void OSD::DarkenBox(int xstart, int ystart, int xend, int yend, 
+                    unsigned char *screen)
+{
+    unsigned char *src;
+    char c = -128;
+
+    for (int y = ystart ; y < yend; y++)
+    {
+        for (int x = xstart; x < xend; x++)
+        {
+            src = screen + x + y * vid_width;
+            *src = ((*src * c) >> 8) + *src;
+        }
+    }
+}
+
+void OSD::DrawRectangle(int xstart, int ystart, int xend, int yend,
+                       unsigned char *screen)
+{
+    unsigned char *src;
+
+    for (int y = ystart; y < yend; y++)
+    {
+        for (int x = xstart; x < xstart + 2; x++)
+        {
+            src = screen + x + y * vid_width;
+            *src = 255;
+        }
+        for (int x = xend - 2; x < xend; x++)
+        {
+            src = screen + x + y * vid_width;
+            *src = 255;
+        }
+    }
+
+    for (int x = xstart; x < xend; x++)
+    {
+        for (int y = ystart; y < ystart + 2; y++)
+        {
+            src = screen + x + y * vid_width;
+            *src = 255;
+        }
+        for (int y = yend - 2; y < yend; y++)
+        {
+            src = screen + x + y * vid_width;
+            *src = 255;
+        }
     }
 }

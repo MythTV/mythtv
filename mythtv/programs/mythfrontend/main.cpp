@@ -82,6 +82,25 @@ void startRecording(TV *tv, ProgramInfo *rec)
     tv->StartRecording(tvrec);
 }
 
+int askRecording(TV *tv, ProgramInfo *rec, int timeuntil)
+{
+    char startt[128];
+    char endt[128];
+    
+    QString starts = rec->startts.toString("yyyyMMddhhmm");
+    QString endts = rec->endts.toString("yyyyMMddhhmm");
+    
+    sprintf(startt, "%s00", starts.ascii());
+    sprintf(endt, "%s00", endts.ascii());
+    
+    RecordingInfo *tvrec = new RecordingInfo(rec->channum.ascii(),
+                                             startt, endt, rec->title.ascii(),
+                                             rec->subtitle.ascii(), 
+                                             rec->description.ascii());
+                                             
+    return tv->AllowRecording(tvrec, timeuntil);
+}
+
 void *runScheduler(void *dummy)
 {
     TV *tv = (TV *)dummy;
@@ -89,17 +108,20 @@ void *runScheduler(void *dummy)
 
     Scheduler *sched = new Scheduler(db);
 
-    if (sched->FillRecordLists())
-    {
-        // conflict exists
-    }
+    sched->FillRecordLists();
+
+    int secsleft = -1;
+    int asksecs = -1;
+    bool asked = false;
 
     ProgramInfo *nextRecording = sched->GetNextRecording();
     QDateTime nextrectime;
     if (nextRecording)
+    {
         nextrectime = nextRecording->startts;
+        asked = false;
+    }
     QDateTime curtime = QDateTime::currentDateTime();
-    int secsleft = -1;
 
     while (1)
     {
@@ -107,20 +129,42 @@ void *runScheduler(void *dummy)
 
         if (sched->CheckForChanges())
         {
-            if (sched->FillRecordLists())
-            {
-                // conflict
-            }
+            sched->FillRecordLists();
             nextRecording = sched->GetNextRecording();
             if (nextRecording)
+            {
                 nextrectime = nextRecording->startts;
+                asked = false;
+            }
         }
 
         if (nextRecording)
         {
             curtime = QDateTime::currentDateTime();
             secsleft = curtime.secsTo(nextrectime);
+            asksecs = secsleft - 30;
 
+            if (tv->GetState() == kState_WatchingLiveTV && asksecs <= 0)
+            {
+                if (!asked)
+                {
+                    asked = true;
+                    int result = askRecording(tv, nextRecording, secsleft);
+
+                    if (result == 3)
+                    {
+                        sched->RemoveFirstRecording();
+                        nextRecording = sched->GetNextRecording();
+                    }
+ 
+                    if (nextRecording)
+                    {
+                        nextrectime = nextRecording->startts;
+                        curtime = QDateTime::currentDateTime();
+                        secsleft = curtime.secsTo(nextrectime);
+                    }
+                }
+            }
             if (secsleft <= 0)
             {
                 // don't record stuff that's already started..

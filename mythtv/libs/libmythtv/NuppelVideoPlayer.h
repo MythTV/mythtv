@@ -71,10 +71,24 @@ class NuppelVideoPlayer
     
     void SetInfoText(const string &text, const string &subtitle,
                      const string &desc, const string &category,
-                     const string &start, const string &end, int secs);
-    void SetChannelText(const string &text, int secs);
+                     const string &start, const string &end, int secs)
+                      { osd->SetInfoText(text, subtitle, desc, category,
+                                         start, end, secs); }
+    void SetChannelText(const string &text, int secs)
+                      { osd->SetChannumText(text, secs); }
 
-    void ShowLastOSD(int secs);
+    void SetDialogBox(const string &message, const string &optionone,
+                      const string &optiontwo, const string &optionthree,
+                      int secs)
+                      { osd->SetDialogBox(message, optionone, optiontwo,
+                                          optionthree, secs); }
+
+    void DialogUp(void) { osd->DialogUp(); }
+    void DialogDown(void) { osd->DialogDown(); }
+    int GetDialogSelection(void) { return osd->GetDialogSelection(); }
+    bool DialogVisible(void) { return osd->DialogShowing(); }
+
+    void ShowLastOSD(int secs) { osd->ShowLast(secs); }
     void TurnOffOSD(void) { osd->TurnOff(); }
    
     bool OSDVisible(void) { if (osd) return osd->Visible(); else return false; }

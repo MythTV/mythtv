@@ -34,6 +34,7 @@ class TV
 
     void LiveTV(void);
 
+    int AllowRecording(RecordingInfo *rcinfo, int timeuntil);
     void StartRecording(RecordingInfo *rcinfo);
     void StopRecording(void);
 
@@ -126,6 +127,7 @@ class TV
     bool watchingLiveTV;
 
     RecordingInfo *curRecording;
+    int tvtorecording;
 };
 
 #endif

@@ -21,14 +21,29 @@ class OSD
 
     void ShowLast(int length);
     void TurnOff(void);
-    
-    bool Visible(void) { return displayframes > 0; }
+   
+    void SetDialogBox(const string &message, const string &optionone, 
+                      const string &optiontwo, const string &optionthree,
+                      int length);
+    void DialogUp(void);
+    void DialogDown(void);
+    bool DialogShowing(void) { return show_dialog; } 
+    int GetDialogSelection(void) { return currentdialogoption; }
+  
+    bool Visible(void) { return (time(NULL) <= displayframes); }
    
  private:
+    void DarkenBox(int xstart, int ystart, int xend, int yend,
+                   unsigned char *screen);
+    void DrawStringIntoBox(int xstart, int ystart, int xend, int yend, 
+                           const string &text, unsigned char *screen);
+    void DrawRectangle(int xstart, int ystart, int xend, int yend,
+                       unsigned char *screen);
     string fontname;
 
     int vid_width;
     int vid_height;
+
     int info_y_start;
     int info_y_end;
     int info_x_start;
@@ -58,6 +73,20 @@ class OSD
     int space_width;
 
     bool enableosd;
+
+    int dialog_y_start;
+    int dialog_x_start;
+    int dialog_y_end;
+    int dialog_x_end;
+    int dialog_width;
+    int dialog_height;
+    string dialogmessagetext;
+    string dialogoptionone;
+    string dialogoptiontwo;
+    string dialogoptionthree;
+
+    int currentdialogoption;
+    bool show_dialog;
 };
     
 #endif

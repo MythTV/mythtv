@@ -68,6 +68,8 @@ TV::TV(const string &startchannel)
         usleep(50);
 
     curRecording = NULL;
+
+    tvtorecording = 1;
 }
 
 TV::~TV(void)
@@ -122,6 +124,38 @@ void TV::LiveTV(void)
     }
 }
 
+int TV::AllowRecording(RecordingInfo *rcinfo, int timeuntil)
+{
+    if (internalState != kState_WatchingLiveTV)
+        return true;
+
+    string channame;
+    rcinfo->GetChannel(channame);
+
+    string title;
+
+    rcinfo->GetTitle(title);
+
+    string message = "MythTV wants to record \"";
+    message += title + "\" on Channel " + channame;
+    message += " in %d seconds.  Do you want to:";
+
+    string option1 = "Record and watch while it records";
+    string option2 = "Let it record and go back to the Main Menu";
+    string option3 = "Don't let it record, I want to watch TV";
+
+    nvp->SetDialogBox(message, option1, option2, option3, timeuntil);
+
+    while (nvp->DialogVisible())
+        usleep(50);
+
+    int result = nvp->GetDialogSelection();
+
+    tvtorecording = result;
+
+    return result;
+}
+
 void TV::StartRecording(RecordingInfo *rcinfo)
 {  
     string recprefix = settings->GetSetting("RecordFilePrefix");
@@ -141,48 +175,22 @@ void TV::StartRecording(RecordingInfo *rcinfo)
     }
     else if (internalState == kState_WatchingLiveTV)
     {
-        string channame;
-        rcinfo->GetChannel(channame);
-
-        if (channame != channel->GetCurrentName())
+        if (tvtorecording == 2)
         {
-            char cmdline[4096];
-            sprintf(cmdline, "mythdialog \"MythTV wants to record something.  Do you want to:\" \"Record and watch while it Records\" \"Let it record, and go back to the Main Menu\" \"Continue Watching TV\"");
- 
-            int result = system(cmdline);
+            nextState = kState_None;
+            changeState = true;
 
-            if (result > 0)
-                result -= 255;
+            while (GetState() != kState_None)
+                usleep(50);
 
-            if (result == 3)
-            {
-            }
-            else if (result == 2)
-            {
-                nextState = kState_None;
-                changeState = true;
+            rcinfo->GetRecordFilename(recprefix, outputFilename);
+            recordEndTime = rcinfo->GetEndTime();
+            curRecording = rcinfo;
 
-                while (GetState() != kState_None)
-                    usleep(50);
-
-                rcinfo->GetRecordFilename(recprefix, outputFilename);
-                recordEndTime = rcinfo->GetEndTime();
-                curRecording = rcinfo;
-
-                nextState = kState_RecordingOnly;
-                changeState = true;
-            }
-            else 
-            {
-                rcinfo->GetRecordFilename(recprefix, outputFilename);
-                recordEndTime = rcinfo->GetEndTime();
-                curRecording = rcinfo;
-
-                nextState = kState_WatchingRecording;
-                changeState = true;
-            }
+            nextState = kState_RecordingOnly;
+            changeState = true;
         }
-        else
+        else if (tvtorecording == 1)
         {
             rcinfo->GetRecordFilename(recprefix, outputFilename);
             recordEndTime = rcinfo->GetEndTime();
@@ -191,6 +199,7 @@ void TV::StartRecording(RecordingInfo *rcinfo)
             nextState = kState_WatchingRecording;
             changeState = true;
         }
+        tvtorecording = 1;
     }  
 }
 
@@ -752,6 +761,19 @@ void TV::RunTV(void)
 
 void TV::ProcessKeypress(int keypressed)
 {
+    if (nvp && nvp->DialogVisible())
+    {
+        switch (keypressed)
+        {
+            case wsUp: nvp->DialogUp(); break;
+            case wsDown: nvp->DialogDown(); break;
+            case ' ': case wsEnter: case wsReturn: nvp->TurnOffOSD(); break;
+            default: break;
+        }
+        
+        return;
+    }
+
     switch (keypressed) 
     {
         case 's': case 'S':

@@ -23,4 +23,4 @@ extern int XJ_CheckEvents(void);
 #define wsEight         0xb8 + 256
 #define wsNine          0xb9 + 256
 #define wsEnter         0x8d + 256
-
+#define wsReturn        0x0d + 256
