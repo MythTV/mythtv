@@ -558,92 +558,169 @@ UIType* MythThemedDialog::getUIObject(const QString &name)
 
 UIManagedTreeListType* MythThemedDialog::getUIManagedTreeListType(const QString &name)
 {
-    UIType *hunter = getUIObject(name);
-    if (hunter)
-    {
-        UIManagedTreeListType *hunted;
-        if ((hunted = dynamic_cast<UIManagedTreeListType*>(hunter)))
-            return hunted;
-    }
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
 
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIManagedTreeListType *hunted;
+            if( (hunted = dynamic_cast<UIManagedTreeListType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
     return NULL;
 }
 
 UITextType* MythThemedDialog::getUITextType(const QString &name)
 {
-    UIType *hunter = getUIObject(name);
-    if (hunter)
-    {
-        UITextType *hunted;
-        if ((hunted = dynamic_cast<UITextType*>(hunter)))
-            return hunted;
-    }
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
 
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UITextType *hunted;
+            if( (hunted = dynamic_cast<UITextType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
     return NULL;
 }
 
 UIPushButtonType* MythThemedDialog::getUIPushButtonType(const QString &name)
 {
-    UIType *hunter = getUIObject(name);
-    if (hunter)
-    {
-        UIPushButtonType *hunted;
-        if ((hunted = dynamic_cast<UIPushButtonType*>(hunter)))
-            return hunted;
-    }
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
 
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIPushButtonType *hunted;
+            if( (hunted = dynamic_cast<UIPushButtonType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
     return NULL;
 }
 
 UITextButtonType* MythThemedDialog::getUITextButtonType(const QString &name)
 {
-    UIType *hunter = getUIObject(name);
-    if (hunter)
-    {
-        UITextButtonType *hunted;
-        if ((hunted = dynamic_cast<UITextButtonType*>(hunter)))
-            return hunted;
-    }
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
 
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UITextButtonType *hunted;
+            if( (hunted = dynamic_cast<UITextButtonType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
     return NULL;
 }
 
 UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(const QString &name)
 {
-    UIType *hunter = getUIObject(name);
-    if (hunter)
-    {
-        UIRepeatedImageType *hunted;
-        if ((hunted = dynamic_cast<UIRepeatedImageType*>(hunter)))
-            return hunted;
-    }
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
 
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIRepeatedImageType *hunted;
+            if( (hunted = dynamic_cast<UIRepeatedImageType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
     return NULL;
 }
 
 UIBlackHoleType* MythThemedDialog::getUIBlackHoleType(const QString &name)
 {
-    UIType *hunter = getUIObject(name);
-    if (hunter)
-    {
-        UIBlackHoleType *hunted;
-        if ((hunted = dynamic_cast<UIBlackHoleType*>(hunter)))
-            return hunted;
-    }
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
 
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIBlackHoleType *hunted;
+            if( (hunted = dynamic_cast<UIBlackHoleType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
     return NULL;
 }
 
 UIImageType* MythThemedDialog::getUIImageType(const QString &name)
 {
-    UIType *hunter = getUIObject(name);
-    if (hunter)
-    {
-        UIImageType *hunted;
-        if ((hunted = dynamic_cast<UIImageType*>(hunter)))
-            return hunted;
-    }
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
 
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIImageType *hunted;
+            if( (hunted = dynamic_cast<UIImageType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+    return NULL;
+}
+
+UIStatusBarType* MythThemedDialog::getUIStatusBarType(const QString &name)
+{
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIStatusBarType *hunted;
+            if( (hunted = dynamic_cast<UIStatusBarType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
     return NULL;
 }
 

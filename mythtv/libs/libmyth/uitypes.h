@@ -78,7 +78,7 @@ class UIType : public QObject
     UIType(const QString &name);
     virtual ~UIType();
 
-    void SetOrder(int order) { m_order = order; }
+    void SetOrder(int order);
     void SetParent(LayerSet *);
     void SetScreen(double wmult, double hmult) { m_wmult = wmult; m_hmult = hmult; }
     void SetContext(int con) { m_context = con; }
@@ -430,11 +430,13 @@ class UIStatusBarType : public UIType
     void SetContainerImage(QPixmap img) { m_container = img; }
     void SetFillerImage(QPixmap img) { m_filler = img; }
     void SetFiller(int fill) { m_fillerSpace = fill; }
+    void calculateScreenArea();
+    void setOrientation(int x);
 
     void Draw(QPainter *, int drawlayer, int);
 
   private:
-    int m_order;
+
     int m_used;
     int m_total;
     int m_fillerSpace;
@@ -442,6 +444,14 @@ class UIStatusBarType : public UIType
     QPixmap m_container;
     QPixmap m_filler;
     QPoint m_location;
+    
+    // 0 = left to right
+    // 1 = left to right
+    // 2 = left to right
+    // 3 = left to right
+    
+    int m_orientation;
+    
 };
 
 class GenericTree
@@ -578,7 +588,6 @@ class UIManagedTreeListType : public UIType
 
   public slots:
 
-    void    sayHelloWorld(); // debugging;
     bool    popUp();
     bool    pushDown();
     bool    moveUp();

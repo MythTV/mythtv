@@ -276,6 +276,7 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     }
     image->SetParent(container);
     container->AddType(image);
+    container->bumpUpLayers(order.toInt());
 }
 
 void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
@@ -382,6 +383,7 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
     image->setOrientation(orientation);
     image->SetParent(container);
     container->AddType(image);
+    container->bumpUpLayers(order.toInt());
 }
 
 void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
@@ -1247,6 +1249,7 @@ LayerSet *XMLParse::GetSet(const QString &text)
 
 void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
 {
+    int orientation = 0;
     int imgFillSpace = 0;
     QPixmap *imgFiller = NULL;
     QPixmap *imgContainer = NULL;
@@ -1326,6 +1329,26 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                     imgFiller = gContext->LoadScalePixmap(fillfile);
                 }
             }
+            else if (info.tagName() == "orientation")
+            {
+                QString orient_string = getFirstText(info).lower();
+                if(orient_string == "lefttoright")
+                {
+                    orientation = 0;
+                }
+                if(orient_string == "righttoleft")
+                {
+                    orientation = 1;
+                }
+                if(orient_string == "bottomtotop")
+                {
+                    orientation = 2;
+                }
+                if(orient_string == "toptobottom")
+                {
+                    orientation = 3;
+                }
+            }
             else
             {
                 cerr << "Unknown: " << info.tagName() << " in image\n";
@@ -1346,7 +1369,11 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
         sb->SetFillerImage(*imgFiller);
         delete imgFiller;
     }
+    sb->SetParent(container);
+    sb->calculateScreenArea();
+    sb->setOrientation(orientation);
     container->AddType(sb);
+    container->bumpUpLayers(order.toInt());
 }
 
 void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)

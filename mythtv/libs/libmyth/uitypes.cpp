@@ -83,6 +83,15 @@ UIType::UIType(const QString &name)
     screen_area = QRect(0,0,0,0);
 }
 
+void UIType::SetOrder(int order)
+{
+    m_order = order;
+    if(m_parent)
+    {
+        m_parent->bumpUpLayers(order);
+    }
+}
+
 UIType::~UIType()
 {
 }
@@ -1677,6 +1686,7 @@ UIStatusBarType::UIStatusBarType(QString &name, QPoint loc, int dorder)
 {
     m_location = loc;
     m_order = dorder;
+    m_orientation = 0;
 }
 
 UIStatusBarType::~UIStatusBarType()
@@ -1685,22 +1695,77 @@ UIStatusBarType::~UIStatusBarType()
 
 void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
 {
-  if (m_context == context || m_context == -1)
-    if (drawlayer == m_order)
+    if (m_context == context || m_context == -1)
     {
- 	if (m_debug == true)
-            cerr << "   +UIStatusBarType::Draw() <- within Layer\n";
-     
-        int width = (int)((double)((double)m_container.width() - (double)(2*m_fillerSpace))
+        if (drawlayer == m_order)
+        {
+            if (m_debug == true)
+            {
+                cerr << "   +UIStatusBarType::Draw() <- within Layer\n";
+            }
+            int width = (int)((double)((double)m_container.width() - (double)(2*m_fillerSpace))
                     * (double)((double)m_used / (double)m_total));
 
-	if (m_debug == true)
-            cerr << "       -Width = " << width << "\n";
+            int height = (int)((double)((double)m_container.height() - (double)(2*m_fillerSpace))
+                    * (double)((double)m_used / (double)m_total));
 
-        dr->drawPixmap(m_location.x(), m_location.y(), m_container);
-        dr->drawPixmap(m_location.x(), m_location.y(), m_filler, 0, 0, width + m_fillerSpace);
+	        if (m_debug == true)
+	        {
+                cerr << "       -Width  = " << width << "\n";
+                cerr << "       -Height = " << height << endl;
+            }
+
+            if(m_orientation == 0)
+            {
+                dr->drawPixmap(m_location.x(), m_location.y(), m_container);
+                dr->drawPixmap(m_location.x(), m_location.y(), m_filler, 0, 0, width + m_fillerSpace);
+            }
+            else if(m_orientation == 1)
+            {
+                dr->drawPixmap(m_location.x(), m_location.y(), m_container);
+                dr->drawPixmap(m_location.x() + width, m_location.y(), m_filler, width - m_fillerSpace, 0);
+            }
+            else if(m_orientation == 2)
+            {
+                dr->drawPixmap(m_location.x(), m_location.y(), m_container);
+                dr->drawPixmap( m_location.x(), 
+                                (m_location.y() + m_container.height()) - height, 
+                                m_filler, 
+                                0, 
+                                (m_filler.height() - height) - m_fillerSpace);
+            }
+            else if(m_orientation == 3)
+            {
+                dr->drawPixmap(m_location.x(), m_location.y(), m_container);
+                dr->drawPixmap(m_location.x(), m_location.y(), m_filler, 0, 0, -1, height + m_fillerSpace);
+            }
+        }
     }
 }
+
+void UIStatusBarType::calculateScreenArea()
+{
+    QRect r = QRect(m_location.x(), 
+                    m_location.y(),
+                    m_container.width(),
+                    m_container.height());
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
+}
+
+void UIStatusBarType::setOrientation(int x)
+{
+    if(x < 0 || x > 3)
+    {
+        cerr << "uitypes.o: UIStatusBarType received an invalid request to set orientation to " << x << endl;
+        return;
+    }
+    m_orientation = x ;
+}
+
+
+
 
 // *********************************************************************
 
@@ -2753,20 +2818,23 @@ void UIManagedTreeListType::moveToNodesFirstChild(QValueList<int> route_of_branc
         if(finder->childCount() > 0)
         {
             current_node = finder->getChildAt(0, tree_order);
+            active_node = current_node;
+            active_parent = active_node->getParent();
+            emit nodeSelected(current_node->getInt(), current_node->getAttributes());
         }
         else
         {
             current_node = finder;
+            active_node = NULL;
+            active_parent = NULL;
+            emit nodeSelected(current_node->getInt(), current_node->getAttributes());
         }    
     }
     else
     {
         current_node = my_tree_data->findLeaf();
+        active_node = NULL;
     }
-
-    active_node = current_node;
-    active_parent = active_node->getParent();
-    emit nodeSelected(current_node->getInt(), current_node->getAttributes());
 }
 
 QValueList <int> * UIManagedTreeListType::getRouteToActive()
@@ -2792,7 +2860,7 @@ bool UIManagedTreeListType::tryToSetActive(QValueList <int> route)
     if(&route)
     {
         GenericTree *a_node = my_tree_data->findNode(route);
-        if(a_node)
+        if(a_node && a_node->isSelectable())
         {
             active_node = a_node;
             current_node = a_node;
@@ -2822,11 +2890,6 @@ void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
         cerr << "uitypes.o: somebody just assigned me to assign tree data, but they gave me no data" << endl;
     }
 
-}
-
-void UIManagedTreeListType::sayHelloWorld()
-{
-    cout << "From a UIManagedTreeListType Object: Hello World" << endl ;
 }
 
 void UIManagedTreeListType::makeHighlights()

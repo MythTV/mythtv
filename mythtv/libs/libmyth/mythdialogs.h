@@ -19,6 +19,7 @@ class UITextButtonType;
 class UIRepeatedImageType;
 class UIBlackHoleType;
 class UIImageType;
+class UIStatusBarType;
 class LayerSet;
 
 class MythMainWindow : public QDialog
@@ -80,6 +81,7 @@ class MythThemedDialog : public MythDialog
     UIRepeatedImageType *getUIRepeatedImageType(const QString &name);
     UIBlackHoleType *getUIBlackHoleType(const QString &name);
     UIImageType *getUIImageType(const QString &name);
+    UIStatusBarType*        getUIStatusBarType(const QString &name);
 
     void setContext(int a_context) { context = a_context; }
 
