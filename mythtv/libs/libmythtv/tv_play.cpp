@@ -2360,7 +2360,7 @@ void TV::DoQueueTranscode(void)
             QString jobHost = "";
 
             if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
-                jobHost = gContext->GetHostName();
+                jobHost = playbackinfo->hostname;
 
             if (JobQueue::QueueJob(m_db->db(), JOB_TRANSCODE,
                                playbackinfo->chanid, playbackinfo->startts,

@@ -1982,6 +1982,8 @@ void PlaybackBox::showJobPopup()
     QSqlDatabase *db = QSqlDatabase::database();
 
     QButton *jobButton;
+    QString jobTitle = "";
+    QString command = "";
 
     if (JobQueue::IsJobRunning(db, JOB_TRANSCODE, curitem->chanid,
                                                   curitem->startts))
@@ -1998,6 +2000,58 @@ void PlaybackBox::showJobPopup()
     else
         popup->addButton(tr("Begin Commercial Flagging"), this,
                          SLOT(doBeginFlagging()));
+
+    command = gContext->GetSetting("UserJob1", "");
+    if (command != "") {
+        jobTitle = gContext->GetSetting("UserJobDesc1", tr("User Job") + " #1");
+
+        if (JobQueue::IsJobRunning(db, JOB_USERJOB1, curitem->chanid,
+                                   curitem->startts))
+            popup->addButton(tr("Stop") + " " + jobTitle, this,
+                             SLOT(doBeginUserJob1()));
+        else
+            popup->addButton(tr("Begin") + " " + jobTitle, this,
+                             SLOT(doBeginUserJob1()));
+    }
+
+    command = gContext->GetSetting("UserJob2", "");
+    if (command != "") {
+        jobTitle = gContext->GetSetting("UserJobDesc2", tr("User Job") + " #2");
+
+        if (JobQueue::IsJobRunning(db, JOB_USERJOB2, curitem->chanid,
+                                   curitem->startts))
+            popup->addButton(tr("Stop") + " " + jobTitle, this,
+                             SLOT(doBeginUserJob2()));
+        else
+            popup->addButton(tr("Begin") + " " + jobTitle, this,
+                             SLOT(doBeginUserJob2()));
+    }
+
+    command = gContext->GetSetting("UserJob3", "");
+    if (command != "") {
+        jobTitle = gContext->GetSetting("UserJobDesc3", tr("User Job") + " #3");
+
+        if (JobQueue::IsJobRunning(db, JOB_USERJOB3, curitem->chanid,
+                                   curitem->startts))
+            popup->addButton(tr("Stop") + " " + jobTitle, this,
+                             SLOT(doBeginUserJob3()));
+        else
+            popup->addButton(tr("Begin") + " " + jobTitle, this,
+                             SLOT(doBeginUserJob3()));
+    }
+
+    command = gContext->GetSetting("UserJob4", "");
+    if (command != "") {
+        jobTitle = gContext->GetSetting("UserJobDesc4", tr("User Job") + " #4");
+
+        if (JobQueue::IsJobRunning(db, JOB_USERJOB4, curitem->chanid,
+                                   curitem->startts))
+            popup->addButton(tr("Stop") + " " + jobTitle, this,
+                             SLOT(doBeginUserJob4()));
+        else
+            popup->addButton(tr("Begin") + " "  + jobTitle, this,
+                             SLOT(doBeginUserJob4()));
+    }
 
     popup->ShowPopup(this, SLOT(doCancel()));
     jobButton->setFocus();
@@ -2245,7 +2299,7 @@ void PlaybackBox::doEditScheduled()
     update(fullRect);
 }    
 
-void PlaybackBox::doBeginTranscoding()
+void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
 {
     if (!expectingPopup)
         return;
@@ -2253,57 +2307,57 @@ void PlaybackBox::doBeginTranscoding()
     cancelPopup();
 
     QSqlDatabase *db = QSqlDatabase::database();
-    if (JobQueue::IsJobRunning(db, JOB_TRANSCODE,
-                               curitem->chanid, curitem->startts))
-    {
-        JobQueue::ChangeJobCmds(db, JOB_TRANSCODE,
-                                curitem->chanid, curitem->startts, JOB_STOP);
-    } else {
-        QString jobHost = "";
-        if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
-            jobHost = gContext->GetHostName();
-
-        JobQueue::QueueJob(db, JOB_TRANSCODE, curitem->chanid, curitem->startts,
-                           "", "", jobHost, JOB_USE_CUTLIST);
-    }
-}
-
-void PlaybackBox::doBeginFlagging()
-{
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    QString message;
-
-    QSqlDatabase *db = QSqlDatabase::database();
-
     ProgramInfo *tmpItem = findMatchingProg(curitem);
 
-    if (JobQueue::IsJobRunning(db, JOB_COMMFLAG, curitem->chanid,
-                                                  curitem->startts))
+    if (JobQueue::IsJobRunning(db, jobType, curitem->chanid,
+                               curitem->startts))
     {
-        JobQueue::ChangeJobCmds(db, JOB_COMMFLAG,
-                                curitem->chanid, curitem->startts, JOB_STOP);
-
-        if (tmpItem)
+        JobQueue::ChangeJobCmds(db, jobType, curitem->chanid,
+                                curitem->startts, JOB_STOP);
+        if ((jobType & JOB_COMMFLAG) && (tmpItem))
         {
             tmpItem->programflags &= ~FL_EDITING;
             tmpItem->programflags &= ~FL_COMMFLAG;
         }
-    }
-    else
-    {
+    } else {
         QString jobHost = "";
         if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
-            jobHost = tmpItem->hostname;
+            jobHost = curitem->hostname;
 
-        JobQueue::QueueJob(db, JOB_COMMFLAG, curitem->chanid, curitem->startts,
-                           "", "", jobHost);
+        JobQueue::QueueJob(db, jobType, curitem->chanid, curitem->startts,
+                           "", "", jobHost, jobFlags);
     }
+}
 
+void PlaybackBox::doBeginTranscoding()
+{
+    doJobQueueJob(JOB_TRANSCODE, JOB_USE_CUTLIST);
+}
+
+void PlaybackBox::doBeginFlagging()
+{
+    doJobQueueJob(JOB_COMMFLAG);
     update(listRect);
+}
+
+void PlaybackBox::doBeginUserJob1()
+{
+    doJobQueueJob(JOB_USERJOB1);
+}
+
+void PlaybackBox::doBeginUserJob2()
+{
+    doJobQueueJob(JOB_USERJOB2);
+}
+
+void PlaybackBox::doBeginUserJob3()
+{
+    doJobQueueJob(JOB_USERJOB3);
+}
+
+void PlaybackBox::doBeginUserJob4()
+{
+    doJobQueueJob(JOB_USERJOB4);
 }
 
 void PlaybackBox::askDelete(void)
