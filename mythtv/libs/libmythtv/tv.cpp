@@ -576,6 +576,7 @@ void TV::SetupRecorder(void)
     nvr->SetVideoDevice(settings->GetSetting("V4LDevice"));
     nvr->SetResolution(settings->GetNumSetting("Width"),
                        settings->GetNumSetting("Height"));
+    nvr->SetTVFormat(settings->GetSetting("TVFormat"));
     nvr->SetCodec(settings->GetSetting("Codec"));
     
     nvr->SetRTJpegMotionLevels(settings->GetNumSetting("LumaFilter"),

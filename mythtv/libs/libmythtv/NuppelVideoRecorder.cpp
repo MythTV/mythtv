@@ -115,6 +115,14 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         avcodec_close(&mpa_ctx);
 }
 
+void NuppelVideoRecorder::SetTVFormat(QString tvformat)
+{
+    if (tvformat.lower() == "ntsc" || tvformat.lower() == "ntsc-jp")
+        ntsc = 1;
+    else 
+        ntsc = 0;
+}
+
 bool NuppelVideoRecorder::SetupAVCodec(void)
 {
     if (mpa_codec)
@@ -316,12 +324,10 @@ void NuppelVideoRecorder::StartRecording(void)
 
     strm = new signed char[w * h + (w * h) / 2 + 10];
 
-    if (CreateNuppelFile() != 0)
-    {
-        cerr << "Cannot open '" << ringBuffer->GetFilename() << "' for "
-             << "writing, exiting\n";
-        return;
-    }
+    if (ntsc)
+        video_frame_rate = 29.97;
+    else
+        video_frame_rate = 25.0;
 
     if (codec.lower() == "rtjpeg")
         useavcodec = false;
@@ -343,7 +349,14 @@ void NuppelVideoRecorder::StartRecording(void)
         setval = 2;
         rtjc->SetIntra(&setval, &M1, &M2);
     }
-    
+
+    if (CreateNuppelFile() != 0)
+    {
+        cerr << "Cannot open '" << ringBuffer->GetFilename() << "' for "
+             << "writing, exiting\n";
+        return;
+    }
+
     if (childrenLive)
         return;
 
@@ -802,6 +815,25 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
         ringBuffer->WriteToDumpFile(&frameheader, FRAMEHEADERSIZE);
     else
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+
+    memset(tbls, 0, sizeof(tbls));
+
+    if (useavcodec)
+    {
+        tbls[0] = 1;
+        tbls[1] = (int)(mpa_codec->id);
+        tbls[2] = mpa_ctx.bit_rate;
+        tbls[3] = mpa_ctx.qmin;
+        tbls[4] = mpa_ctx.qmax;
+        tbls[5] = mpa_ctx.max_qdiff;
+    }
+    else
+    {
+        tbls[0] = 0;
+        tbls[1] = Q;
+        tbls[2] = M1;
+        tbls[3] = M2;
+    }
 
     // compression configuration data
     if (todumpfile)

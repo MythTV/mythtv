@@ -51,7 +51,8 @@ class NuppelVideoRecorder
     void SetFilename(QString filename) { sfilename = filename; }
     void SetAudioDevice(QString device) { audiodevice = device; }
     void SetVideoDevice(QString device) { videodevice = device; }
-   
+    void SetTVFormat(QString tvformat);
+    
     void Initialize(void);
     void StartRecording(void);
     void StopRecording(void) { encoding = false; } 
