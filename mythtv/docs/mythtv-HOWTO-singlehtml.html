@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-09-15, v2.74
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-09-17, v2.75
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -454,6 +454,12 @@ way will be mono only.  See the
 section for more information.</P>
 <P><B>NOTE</B>:  The PVR-250/350 does not require a sound card for audio
 capture.</P>
+<P><B>NOTE</B>:  Plugging a Line-level device into the Mic input is not
+recommended.  Line-level devices have higher volatages and can damage the
+soundcard.  In addition, even if it doesn't break your card, you will be
+getting Mono sound.  See the Linux MP3 HOWTO at 
+<A HREF="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8">http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8</A>
+for additional information.</P>
 
 <H3>Video Display Card</H3>
 
@@ -1676,16 +1682,13 @@ work for you, installing ALSA is not too difficult. For those of you who do
 not wish to install ALSA you must do this:</P>
 <P>To configure sound to work with MythTV, select 
 <PRE>
-RedHat Menu>Sound &amp; Video>Volume Control
+RedHat Menu>Sound &amp;
+Video>Volume Control
 </PRE>
-
-to open up a mixer. Make sure your global volume (on the far left)
-is up. Also make sure that the "line in" section has "mute" and "record"
-checked and that the gain is turned up. You may have to experiment with
-volume/gain levels to get the best sound.  If you experience difficulty with
-sound try moving your patch cord from "Line in" to "Mic in". You will need
-to go back to the mixer and select "mute" and "record" on the "Mic in" and
-turn up the gain for the Mic rather than Line.</P>
+ to open up a mixer. Make sure your global volume
+(on the far left) is up. Also make sure that the "line in" section has
+"mute" and "record" checked and that the gain is turned up. You may have to
+experiment with volume/gain levels to get the best sound.  </P>
 
 <H3>Using ALSA drivers.</H3>
 
