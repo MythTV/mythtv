@@ -41,17 +41,8 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
     menulevel = 0;
 
     callback = NULL;
-    int allowsd = gContext->GetNumSetting("AllowQuitShutdown");
-    killable = (allowsd == 4);
 
-    if (allowsd == 1)
-        exitModifier = Qt::ControlButton;
-    else if (allowsd == 2)
-        exitModifier = Qt::MetaButton;
-    else if (allowsd == 3)
-        exitModifier = Qt::AltButton;
-    else
-        exitModifier = -1;
+    ReloadExitKey();
     
     parseSettings(dir, "theme.xml");
 
@@ -75,6 +66,21 @@ ThemedMenu::~ThemedMenu(void)
         if (it.data().activeicon)
             delete it.data().activeicon;
     }
+}
+
+void ThemedMenu::ReloadExitKey(void)
+{
+    int allowsd = gContext->GetNumSetting("AllowQuitShutdown");
+    killable = (allowsd == 4);
+
+    if (allowsd == 1)
+        exitModifier = Qt::ControlButton;
+    else if (allowsd == 2)
+        exitModifier = Qt::MetaButton;
+    else if (allowsd == 3)
+        exitModifier = Qt::AltButton;
+    else
+        exitModifier = -1;
 }
 
 QString ThemedMenu::getFirstText(QDomElement &element)
@@ -1230,6 +1236,8 @@ void ThemedMenu::ReloadTheme(void)
 {
     buttonList.clear();
     buttonRows.clear();
+
+    ReloadExitKey();
   
     QMap<QString, ButtonIcon>::Iterator it;
     for (it = allButtonIcons.begin(); it != allButtonIcons.end(); ++it)

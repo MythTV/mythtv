@@ -64,6 +64,7 @@ class ThemedMenu : public MythDialog
     QString getSelection() { return selection; }
 
     void ReloadTheme(void);
+    void ReloadExitKey(void);
 
   protected:
     void paintEvent(QPaintEvent *e);
