@@ -612,10 +612,14 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
                     case 1: artist += (char *)latin1; break;
                     case 2: album += (char *)latin1; break;
                     case 3: if (year == 0) 
-                                year = atoi((char *)latin1); break;
+                                year = atoi((char *)latin1); 
+                            break;
                     case 4: if (tracknum == 0) 
-                                tracknum = atoi((char *)latin1); break;
-                    case 5: genre += (char *)latin1; break;
+                                tracknum = atoi((char *)latin1); 
+                            break;
+                    case 5: if (genre != (char *)latin1)
+                                genre += (char *)latin1; 
+                            break;
                     default: break;
                 }
 
