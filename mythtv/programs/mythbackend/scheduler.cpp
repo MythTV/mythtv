@@ -11,6 +11,7 @@ using namespace std;
 
 #include <sys/stat.h>
 #include <sys/vfs.h>
+#include <sys/time.h>
 
 #include "scheduler.h"
 
@@ -745,6 +746,8 @@ void Scheduler::RunScheduler(void)
     int idleWaitForRecordingTime = 0;
     bool firstRun = true;
 
+    struct timeval fillstart, fillend;
+
     // wait for slaves to connect
     sleep(2);
 
@@ -760,8 +763,15 @@ void Scheduler::RunScheduler(void)
         {
             VERBOSE(VB_GENERAL, "Found changes in the todo list.");
             FillEncoderFreeSpaceCache();
+            gettimeofday(&fillstart, NULL);
             FillRecordLists();
+            gettimeofday(&fillend, NULL);
             PrintList();
+            VERBOSE(VB_GENERAL, QString("Scheduled %1 items in %2 seconds.")
+                    .arg(reclist.size())
+                    .arg(((fillend.tv_sec  - fillstart.tv_sec ) * 1000000 +
+                         (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0));
+
             lastupdate = curtime;
             startIter = reclist.begin();
             statuschanged = true;
