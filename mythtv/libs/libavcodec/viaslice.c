@@ -70,11 +70,11 @@ int VIA_field_start(MpegEncContext*s, AVCodecContext *avctx)
         case B_TYPE:
             slicestate = (via_slice_state_t *)s->next_picture.data[0];
             assert(slicestate);
-            VIAMPGSurface.dwOldRefFrame = slicestate->image_number;
+            VIAMPGSurface.dwRefFrame = slicestate->image_number;
         case P_TYPE:
             slicestate = (via_slice_state_t *)s->last_picture.data[0];
             assert(slicestate);
-            VIAMPGSurface.dwRefFrame = slicestate->image_number;
+            VIAMPGSurface.dwOldRefFrame = slicestate->image_number;
             break;
         default:
             break;
