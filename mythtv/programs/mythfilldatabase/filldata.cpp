@@ -326,21 +326,21 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
         QSqlQuery query;
 
         QString querystr;
-        querystr.sprintf("SELECT NULL FROM channel WHERE channum = %s AND "
+        querystr.sprintf("SELECT NULL FROM channel WHERE channum = \"%s\" AND "
                          "sourceid = %d;", (*i).chanstr.ascii(), id); 
 
         query.exec(querystr);
         if (query.isActive() && query.numRowsAffected() > 0)
         {
             querystr.sprintf("UPDATE channel SET icon = \"%s\" WHERE channum = "
-                             "%s AND callsign = \"%s\" AND sourceid = %d;", 
+                             "\"%s\" AND callsign = \"%s\" AND sourceid = %d;", 
                              localfile.ascii(), (*i).chanstr.ascii(),
                              (*i).callsign.ascii(), id);
         }
         else
         {
             querystr.sprintf("INSERT INTO channel (channum,callsign,icon,"
-                             "sourceid) VALUES(%s,\"%s\",\"%s\", %d);", 
+                             "sourceid) VALUES(\"%s\",\"%s\",\"%s\", %d);", 
                              (*i).chanstr.ascii(), (*i).callsign.ascii(),
                              localfile.ascii(), id);                  
         }
@@ -378,7 +378,7 @@ void handlePrograms(int id, int offset, QMap<QString,
         int channum = atoi(mapiter.key().ascii());
 
         querystr.sprintf("SELECT chanid FROM channel WHERE sourceid = %d AND "
-                         "channum = %s;", id, mapiter.key().ascii());
+                         "channum = \"%s\";", id, mapiter.key().ascii());
         query.exec(querystr.ascii());
 
         if (query.isActive() && query.numRowsAffected() > 0)

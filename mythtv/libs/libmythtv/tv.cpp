@@ -1439,7 +1439,7 @@ void TV::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
     QString thequery = QString("SELECT starttime,endtime,title,subtitle,"
                                "description,category,callsign,icon "
                                "FROM program,channel,capturecard,cardinput "
-                               "WHERE channel.channum = %1 "
+                               "WHERE channel.channum = \"%1\" "
                                "AND starttime < %2 AND endtime > %3 AND "
                                "program.chanid = channel.chanid AND "
                                "channel.sourceid = cardinput.sourceid AND "
@@ -1553,7 +1553,7 @@ bool TV::CheckChannel(QString &channum)
     QString device = channel->GetDevice();
 
     QString thequery = QString("SELECT NULL FROM channel,capturecard,cardinput "
-                               "WHERE channel.channum = %1 AND "
+                               "WHERE channel.channum = \"%1\" AND "
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%2\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
