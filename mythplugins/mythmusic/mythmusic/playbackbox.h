@@ -3,6 +3,7 @@
 
 #include <qtimer.h>
 #include <qmutex.h>
+#include <qvaluevector.h>
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
