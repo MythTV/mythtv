@@ -26,12 +26,13 @@ using namespace std;
 #include <mythtv/dialogbox.h>
 #include <mythtv/util.h>
 #include <mythtv/mythmedia.h>
+#include <mythtv/lcddevice.h>
 
 #include "config.h"
 #include "settings.h"
 #include "dvdripbox.h"
 #include "dbcheck.h"
-#include "lcddevice.h"
+
 //
 //  Transcode stuff only if we were ./configure'd for it
 //
