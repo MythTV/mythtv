@@ -284,13 +284,20 @@ public:
         ComboBoxSetting(true),
         SRSetting(parent, "recgroup") {
         setLabel(QObject::tr("Recording Group"));
+    };
+
+    virtual void load(QSqlDatabase *db) {
+        fillSelections(db);
+        SRSetting::load(db);
+    };
+
+    virtual void fillSelections(QSqlDatabase *db) {
         addSelection(QString("Default"), QString("Default"));
 
-        QSqlDatabase *m_db = QSqlDatabase::database();
         QString thequery = QString("SELECT DISTINCT recgroup from recorded "
                                    "WHERE recgroup <> '%1'")
                                    .arg(QString("Default"));
-        QSqlQuery query = m_db->exec(thequery);
+        QSqlQuery query = db->exec(thequery);
 
         if (query.isActive() && query.numRowsAffected() > 0)
             while (query.next())
@@ -300,7 +307,7 @@ public:
         thequery = QString("SELECT DISTINCT recgroup from record "
                            "WHERE recgroup <> '%1'")
                            .arg(QString("Default"));
-        query = m_db->exec(thequery);
+        query = db->exec(thequery);
 
         if (query.isActive() && query.numRowsAffected() > 0)
             while (query.next())
