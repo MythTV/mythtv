@@ -1098,7 +1098,7 @@ void GuideGrid::paintInfo(QPainter *p)
     if (!pginfo)
         return;
 
-    QMap<QString, QString> regexpMap;
+    QMap<QString, QString> infoMap;
     QRect pr = infoRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
@@ -1112,13 +1112,13 @@ void GuideGrid::paintInfo(QPainter *p)
 
     ChannelInfo *chinfo = &(m_channelInfos[chanNum]);
 
-    pginfo->ToMap(m_db, regexpMap);
+    pginfo->ToMap(m_db, infoMap);
 
     LayerSet *container = theme->GetSet("program_info");
     if (container)
     {
         container->ClearAllText();
-        container->SetTextByRegexp(regexpMap);
+        container->SetText(infoMap);
 
         UITextType *type;
 

@@ -84,7 +84,7 @@ void LayerSet::ClearAllText(void)
     }
 }
 
-void LayerSet::SetTextByRegexp(QMap<QString, QString> &regexpMap)
+void LayerSet::SetText(QMap<QString, QString> &infoMap)
 {
     vector<UIType *>::iterator i = allTypes->begin();
     for (; i != allTypes->end(); i++)
@@ -92,17 +92,17 @@ void LayerSet::SetTextByRegexp(QMap<QString, QString> &regexpMap)
         UIType *type = (*i);
         if (UITextType *item = dynamic_cast<UITextType *>(type))
         {
-            QMap<QString, QString>::Iterator riter = regexpMap.begin();
+            QMap<QString, QString>::Iterator riter = infoMap.begin();
             QString new_text = item->GetDefaultText();
             QString full_regex;
 
             if ((new_text == "") &&
-                (regexpMap.contains(item->Name())))
+                (infoMap.contains(item->Name())))
             {
-                new_text = regexpMap[item->Name()];
+                new_text = infoMap[item->Name()];
             }
             else if (new_text.contains(QRegExp("%.*%")))
-                for (; riter != regexpMap.end(); riter++)
+                for (; riter != infoMap.end(); riter++)
                 {
                    full_regex = "%" + riter.key().upper() + 
                      "(\\|([^%|]*))?" + "(\\|([^%|]*))?" + "(\\|([^%]*))?%";

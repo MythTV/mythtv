@@ -12,6 +12,8 @@ mythfrontend
     "Program Recording Priorities", or "Fix Scheduling Conflicts" screens.
     From the Playback and Delete screens, 'I' presents options
     for recorded shows such as Auto Expire or Stop Recording.
+    Pressing 'I' while on the Recording Options screen will take you
+    to the Advanced Recording Options screen.
 
 
 Watching TV or a recording

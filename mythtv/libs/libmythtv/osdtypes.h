@@ -58,7 +58,7 @@ class OSDSet : public QObject
     int GetFrameInterval() { return m_frameint; }
 
     void ClearAllText(void);
-    void SetTextByRegexp(QMap<QString, QString> &regexpMap);
+    void SetText(QMap<QString, QString> &infoMap);
 
     void Reinit(int screenwidth, int screenheight, int xoff, int yoff, 
                 int displaywidth, int displayheight, float wmult, float hmult,

@@ -1032,9 +1032,8 @@ void clearDBAtOffset(int offset, int chanid, QDate *qCurrentDate)
     QDateTime from, to;
     from.setDate(*qCurrentDate);
     from = from.addDays(offset);
-    from.addSecs(listing_wrap_offset);
-    to = from;
-    to = to.addDays(nextoffset);
+    from = from.addSecs(listing_wrap_offset);
+    to = from.addDays(nextoffset);
 
     QSqlQuery query;
     QString querystr;

@@ -987,14 +987,14 @@ void OSD::ClearAllText(const QString &name)
     osdlock.unlock();
 }
 
-void OSD::SetTextByRegexp(const QString &name,
-                          QMap<QString, QString> &regexpMap, int length)
+void OSD::SetText(const QString &name,
+                          QMap<QString, QString> &infoMap, int length)
 {
     osdlock.lock();
     OSDSet *container = GetSet(name);
     if (container)
     {
-        container->SetTextByRegexp(regexpMap);
+        container->SetText(infoMap);
         if (length >= 0)
             container->DisplayFor(length * 1000000);
         else
@@ -1003,8 +1003,8 @@ void OSD::SetTextByRegexp(const QString &name,
         OSDTypeImage *cs = (OSDTypeImage *)container->GetType("channelicon");
         if (cs)
         {
-            if (regexpMap.contains("iconpath") && regexpMap["iconpath"] != "")
-                cs->LoadImage(regexpMap["iconpath"], wmult, hmult, 30, 30);
+            if ((infoMap.contains("iconpath")) && (infoMap["iconpath"] != ""))
+                cs->LoadImage(infoMap["iconpath"], wmult, hmult, 30, 30);
             else
                 cs->LoadImage(" ", wmult, hmult, 30, 30);
         }
@@ -1015,19 +1015,19 @@ void OSD::SetTextByRegexp(const QString &name,
     osdlock.unlock();
 }
 
-void OSD::SetInfoText(QMap<QString, QString> regexpMap, int length)
+void OSD::SetInfoText(QMap<QString, QString> infoMap, int length)
 {
     osdlock.lock();
     OSDSet *container = GetSet("program_info");
     if (container)
     {
-        container->SetTextByRegexp(regexpMap);
+        container->SetText(infoMap);
 
         OSDTypeImage *cs = (OSDTypeImage *)container->GetType("channelicon");
         if (cs)
         {
-            if (regexpMap.contains("iconpath") && regexpMap["iconpath"] != "")
-                cs->LoadImage(regexpMap["iconpath"], wmult, hmult, 30, 30);
+            if ((infoMap.contains("iconpath")) && (infoMap["iconpath"] != ""))
+                cs->LoadImage(infoMap["iconpath"], wmult, hmult, 30, 30);
             else
                 cs->LoadImage(" ", wmult, hmult, 30, 30);
         }

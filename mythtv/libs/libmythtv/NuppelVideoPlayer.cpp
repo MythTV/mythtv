@@ -2340,11 +2340,11 @@ bool NuppelVideoPlayer::EnableEdit(void)
 
     dialogname = "";
 
-    QMap<QString, QString> regexpMap;
+    QMap<QString, QString> infoMap;
     db_lock.lock();
-    m_playbackinfo->ToMap(m_db, regexpMap);
+    m_playbackinfo->ToMap(m_db, infoMap);
     db_lock.unlock();
-    osd->SetTextByRegexp("editmode", regexpMap, -1);
+    osd->SetText("editmode", infoMap, -1);
 
     UpdateEditSlider();
     UpdateTimeDisplay();
@@ -2609,9 +2609,9 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
         default: text = QObject::tr("error"); seekamount = fps; break;
     }
 
-    QMap<QString, QString> regexpMap;
-    regexpMap["seekamount"] = text;
-    osd->SetTextByRegexp("editmode", regexpMap, -1);
+    QMap<QString, QString> infoMap;
+    infoMap["seekamount"] = text;
+    osd->SetText("editmode", infoMap, -1);
 }
 
 void NuppelVideoPlayer::UpdateTimeDisplay(void)
@@ -2640,11 +2640,11 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
     if (IsInDelete(framesPlayed))
         cutmarker = QObject::tr("cut");
 
-    QMap<QString, QString> regexpMap;
-    regexpMap["timedisplay"] = timestr;
-    regexpMap["framedisplay"] = framestr;
-    regexpMap["cutindicator"] = cutmarker;
-    osd->SetTextByRegexp("editmode", regexpMap, -1);
+    QMap<QString, QString> infoMap;
+    infoMap["timedisplay"] = timestr;
+    infoMap["framedisplay"] = framestr;
+    infoMap["cutindicator"] = cutmarker;
+    osd->SetText("editmode", infoMap, -1);
 }
 
 void NuppelVideoPlayer::HandleSelect(void)

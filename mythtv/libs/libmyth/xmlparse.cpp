@@ -1,6 +1,8 @@
 #include <iostream>
 using namespace std;
 
+#include <cmath>
+
 #include "xmlparse.h"
 
 

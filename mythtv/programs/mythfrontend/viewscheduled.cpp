@@ -393,7 +393,7 @@ void ViewScheduled::updateInfo(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
-    QMap<QString, QString> regexpMap;
+    QMap<QString, QString> infoMap;
 
     LayerSet *container = theme->GetSet("program_info");
     if (container)
@@ -402,9 +402,9 @@ void ViewScheduled::updateInfo(QPainter *p)
         if (recList.getSelected(p))
         {
             QSqlDatabase *m_db = QSqlDatabase::database();
-            p.ToMap(m_db, regexpMap);
+            p.ToMap(m_db, infoMap);
             container->ClearAllText();
-            container->SetTextByRegexp(regexpMap);
+            container->SetText(infoMap);
         }
     }
 

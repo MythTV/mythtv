@@ -8,6 +8,8 @@
 
 using namespace std;
 
+#include <cmath>
+
 #include "mythlcd.h"
 #include "libmyth/mythcontext.h"
 

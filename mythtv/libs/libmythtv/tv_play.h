@@ -56,14 +56,14 @@ class TV : public QObject
     bool IsMenuRunning(void) { return menurunning; }
 
     void GetNextProgram(RemoteEncoder *enc, int direction,
-                        QMap<QString, QString> &regexpMap);
+                        QMap<QString, QString> &infoMap);
     void GetNextProgram(RemoteEncoder *enc, int direction,
                         QString &title, QString &subtitle,
                         QString &desc, QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid);
 
-    void GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &regexpMap);
+    void GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap);
     void GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle,
                         QString &desc, QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,

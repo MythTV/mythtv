@@ -827,10 +827,10 @@ void ProgLister::updateInfo(QPainter *p)
         container = theme->GetSet("program_info");
         if (container)
         {  
-            QMap<QString, QString> regexpMap;
-            pi->ToMap(db, regexpMap);
+            QMap<QString, QString> infoMap;
+            pi->ToMap(db, infoMap);
             container->ClearAllText();
-            container->SetTextByRegexp(regexpMap);
+            container->SetText(infoMap);
         }
     }
     else

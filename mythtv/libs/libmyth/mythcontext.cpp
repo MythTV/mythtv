@@ -12,6 +12,8 @@
 #include <qsocketdevice.h>
 #include <qhostaddress.h>
 
+#include <cmath>
+
 #include "mythcontext.h"
 #include "oldsettings.h"
 #include "themedmenu.h"

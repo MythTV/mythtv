@@ -11,6 +11,8 @@
 #include "mythcontext.h"
 #include "mythdialogs.h"
 
+#include <cmath>
+
 #include <qregexp.h>
 
 //#define LCD_DEVICE_DEBUG

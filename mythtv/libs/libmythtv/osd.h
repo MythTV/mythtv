@@ -44,9 +44,9 @@ class OSD : public QObject
     OSDSurface *Display(void);
 
     void ClearAllText(const QString &name);
-    void SetTextByRegexp(const QString &name, QMap<QString, QString> &regexpMap,
+    void SetText(const QString &name, QMap<QString, QString> &infoMap,
                          int length);
-    void SetInfoText(QMap<QString, QString> regexpMap, int length);
+    void SetInfoText(QMap<QString, QString> infoMap, int length);
     void SetInfoText(const QString &text, const QString &subtitle, 
                      const QString &desc, const QString &category,
                      const QString &start, const QString &end, 

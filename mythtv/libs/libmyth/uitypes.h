@@ -60,7 +60,7 @@ class LayerSet
     vector<UIType *> *getAllTypes(){return allTypes;}
 
     void    ClearAllText(void);
-    void    SetTextByRegexp(QMap<QString, QString> &regexpMap);
+    void    SetText(QMap<QString, QString> &infoMap);
 
     void    SetDrawFontShadow(bool state);
 

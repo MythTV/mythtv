@@ -338,7 +338,7 @@ void PlaybackBox::grayOut(QPainter *tmp)
 
 void PlaybackBox::updateInfo(QPainter *p)
 {
-    QMap<QString, QString> regexpMap;
+    QMap<QString, QString> infoMap;
     QRect pr = infoRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
@@ -351,7 +351,7 @@ void PlaybackBox::updateInfo(QPainter *p)
         if (playingVideo == true)
             state = kChanging;
 
-        curitem->ToMap(m_db, regexpMap);
+        curitem->ToMap(m_db, infoMap);
 
         LayerSet *container = NULL;
         if (type != Delete)
@@ -365,7 +365,7 @@ void PlaybackBox::updateInfo(QPainter *p)
                 container->UseAlternateArea(true);
 
             container->ClearAllText();
-            container->SetTextByRegexp(regexpMap);
+            container->SetText(infoMap);
 
             int flags = curitem->programflags;
 

@@ -234,7 +234,7 @@ void OSDSet::ClearAllText(void)
     }
 }
 
-void OSDSet::SetTextByRegexp(QMap<QString, QString> &regexpMap)
+void OSDSet::SetText(QMap<QString, QString> &infoMap)
 {
     vector<OSDType *>::iterator iter = allTypes->begin();
     for (; iter != allTypes->end(); iter++)
@@ -242,17 +242,17 @@ void OSDSet::SetTextByRegexp(QMap<QString, QString> &regexpMap)
         OSDType *type = (*iter);
         if (OSDTypeText *item = dynamic_cast<OSDTypeText *>(type))
         {
-            QMap<QString, QString>::Iterator riter = regexpMap.begin();
+            QMap<QString, QString>::Iterator riter = infoMap.begin();
             QString new_text = item->GetDefaultText();
             QString full_regex;
 
             if ((new_text == "") &&
-                (regexpMap.contains(item->Name())))
+                (infoMap.contains(item->Name())))
             {
-                new_text = regexpMap[item->Name()];
+                new_text = infoMap[item->Name()];
             }
             else if (new_text.contains(QRegExp("%.*%")))
-                for (; riter != regexpMap.end(); riter++)
+                for (; riter != infoMap.end(); riter++)
                 {
                    full_regex = "%" + riter.key().upper() + 
                      "(\\|([^%|]*))?" + "(\\|([^%|]*))?" + "(\\|([^%]*))?%";
