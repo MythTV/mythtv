@@ -354,6 +354,22 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     QTranslator translator(0);
+    
+    bool configure_general = false;
+    bool configure_player = false;
+    for(int argpos = 1; argpos < a.argc(); ++argpos)
+    {
+        if(!strcmp(a.argv()[argpos], "--configure-general"))
+        {
+            configure_general = true;
+        }
+        if(!strcmp(a.argv()[argpos], "--configure-player"))
+        {
+            configure_player = true;
+        }
+    }
+
+
 
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION);
@@ -369,43 +385,14 @@ int main(int argc, char *argv[])
         return -1;
     }
     gContext->LoadQtConfig();
+
+
     CheckFreeDBServerFile();
 
     translator.load(PREFIX + QString("/share/mythtv/i18n/mythmusic_") +
                     QString(gContext->GetSetting("Language").lower()) +
                     QString(".qm"), ".");
     a.installTranslator(&translator);
-
-    //  See if we should be talking to an LCDproc daemon
-
-    QString lcd_host = gContext->GetSetting("LCDHost");
-    QString lcd_port = gContext->GetSetting("LCDPort");
-    int lcd_port_number = lcd_port.toInt();
-    if (lcd_host.length() > 0 && lcd_port_number > 1024)
-    {
-        gContext->LCDconnectToHost(lcd_host, lcd_port_number);
-    }
-
-    QSqlQuery count_query("SELECT COUNT(*) FROM musicmetadata;", db);
-    bool musicdata_exists = false;
-
-    if (count_query.isActive() && count_query.next()
-        && 0 != count_query.value(0).toInt())
-    {
-        musicdata_exists = true;
-    }
-
-    //  Load all available info about songs (once!)
-    QString startdir = gContext->GetSetting("MusicLocation");
-
-    // Only search music files if a directory was specified & there
-    // is no data in the database yet (first run).  Otherwise, user
-    // can choose "Setup" option from the menu to force it.
-    if (startdir != "" && !musicdata_exists)
-        SearchDir(db, startdir);
-
-    QString paths = gContext->GetSetting("TreeLevels");
-    AllMusic *all_music = new AllMusic(db, paths, startdir);
 
     //  Handle the theme
     QString themename = gContext->GetSetting("Theme");
@@ -418,22 +405,67 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    //  Load all playlists into RAM (once!)
-    PlaylistsContainer *all_playlists = new PlaylistsContainer(db, all_music);
-    all_playlists->setHost(gContext->GetHostName());
-    //  And away we go ...
-    runMenu(themedir, db, paths, startdir, all_playlists, all_music);
-
-    //  Automagically save all playlists and metadata (ratings) that have changed
-    if( all_music->cleanOutThreads() &&
-        all_playlists->cleanOutThreads() )
+    if(configure_general)
     {
-        all_playlists->save();
-        int x = all_playlists->getPending();
-        SavePending(db, x);
-        all_music->save();
+        GeneralSettings settings;
+        settings.exec(QSqlDatabase::database());
     }
+    else if(configure_player)
+    {
+        PlayerSettings settings;
+        settings.exec(QSqlDatabase::database());
+    }
+    else
+    {
+    
+        //  See if we should be talking to an LCDproc daemon
 
+        QString lcd_host = gContext->GetSetting("LCDHost");
+        QString lcd_port = gContext->GetSetting("LCDPort");
+        int lcd_port_number = lcd_port.toInt();
+        if (lcd_host.length() > 0 && lcd_port_number > 1024)
+        {
+            gContext->LCDconnectToHost(lcd_host, lcd_port_number);
+        }
+
+        QSqlQuery count_query("SELECT COUNT(*) FROM musicmetadata;", db);
+        bool musicdata_exists = false;
+
+        if (count_query.isActive() && count_query.next()
+            && 0 != count_query.value(0).toInt())
+        {
+            musicdata_exists = true;
+        }
+
+        //  Load all available info about songs (once!)
+        QString startdir = gContext->GetSetting("MusicLocation");
+
+        // Only search music files if a directory was specified & there
+        // is no data in the database yet (first run).  Otherwise, user
+        // can choose "Setup" option from the menu to force it.
+        if (startdir != "" && !musicdata_exists)
+            SearchDir(db, startdir);
+
+        QString paths = gContext->GetSetting("TreeLevels");
+        AllMusic *all_music = new AllMusic(db, paths, startdir);
+
+        //  Load all playlists into RAM (once!)
+        PlaylistsContainer *all_playlists = new PlaylistsContainer(db, all_music);
+        all_playlists->setHost(gContext->GetHostName());
+        //  And away we go ...
+        runMenu(themedir, db, paths, startdir, all_playlists, all_music);
+
+        //  Automagically save all playlists and metadata (ratings) that have changed
+        if( all_music->cleanOutThreads() &&
+            all_playlists->cleanOutThreads() )
+        {
+            all_playlists->save();
+            int x = all_playlists->getPending();
+            SavePending(db, x);
+            all_music->save();
+        }
+    }
+    
     //  Clean up
     gContext->LCDdestroy();
     db->close();
