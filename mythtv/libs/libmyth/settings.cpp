@@ -29,10 +29,11 @@
 #include "mythwizard.h"
 
 QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                    const char* widgetName) {
+                                    float hmult, const char* widgetName) {
     (void)cg;
     (void)parent;
     (void)widgetName;
+    (void)hmult;
     cout << "BUG: Configurable is visible, but has no configWidget\n";
     return NULL;
 }
@@ -72,7 +73,7 @@ void ConfigurationGroup::save(QSqlDatabase* db) {
 }
 
 QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
-                                                  QWidget* parent,
+                                                  QWidget* parent, float hmult,
                                                   const char* widgetName) 
 {    
     QGroupBox* widget = new QGroupBox(parent, widgetName);
@@ -82,17 +83,17 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     if (uselabel)
     {
-        layout = new QVBoxLayout(widget, 30);
+        layout = new QVBoxLayout(widget, (int)(28 * hmult));
         // This makes weird and bad things happen in qt -mdz 2002/12/28
         //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
     }
     else
-        layout = new QVBoxLayout(widget, 10);
+        layout = new QVBoxLayout(widget, (int)(10 * hmult));
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
-            layout->add(children[i]->configWidget(cg, widget, NULL));
+            layout->add(children[i]->configWidget(cg, widget, hmult, NULL));
       
     if (cg)
     {
@@ -104,7 +105,8 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 }
 
 QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
-                                                    QWidget* parent,
+                                                    QWidget* parent, 
+                                                    float hmult,
                                                     const char* widgetName) 
 {
     QGroupBox* widget = new QGroupBox(parent, widgetName);
@@ -114,17 +116,17 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     if (uselabel)
     {
-        layout = new QHBoxLayout(widget, 30);
+        layout = new QHBoxLayout(widget, (int)(28 * hmult));
         // This makes weird and bad things happen in qt -mdz 2002/12/28
         //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
     }
     else
-        layout = new QHBoxLayout(widget, 10);
+        layout = new QHBoxLayout(widget, (int)(10 * hmult));
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
-            layout->add(children[i]->configWidget(cg, widget, NULL));
+            layout->add(children[i]->configWidget(cg, widget, hmult, NULL));
 
     if (cg)
     {
@@ -136,7 +138,7 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 }
 
 QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg, 
-                                                 QWidget* parent,
+                                                 QWidget* parent, float hmult,
                                                  const char* widgetName) 
 {
     QWidgetStack* widget = new QWidgetStack(parent, widgetName);
@@ -144,7 +146,8 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
-            widget->addWidget(children[i]->configWidget(cg, widget, NULL), i);
+            widget->addWidget(children[i]->configWidget(cg, widget, hmult,
+                                                        NULL), i);
 
     widget->raiseWidget(top);
 
@@ -161,7 +164,7 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
 }
 
 QWidget* TabbedConfigurationGroup::configWidget(ConfigurationGroup *cg, 
-                                                QWidget* parent,
+                                                QWidget* parent, float hmult,
                                                 const char* widgetName) 
 {
     QTabDialog* widget = new QTabDialog(parent, widgetName);
@@ -169,7 +172,7 @@ QWidget* TabbedConfigurationGroup::configWidget(ConfigurationGroup *cg,
     
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
-            widget->addTab(children[i]->configWidget(cg, widget), 
+            widget->addTab(children[i]->configWidget(cg, widget, hmult), 
                            children[i]->getLabel());
 
     if (cg)
@@ -248,8 +251,9 @@ void SelectSetting::setValue(const QString& newValue)  {
 }
 
 QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                    const char* widgetName) {
+                                    float hmult, const char* widgetName) {
     (void)cg;
+    (void)hmult;
 
     QWidget* widget = new QHBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -269,7 +273,9 @@ QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 }
 
 QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                       const char *widgetName) {
+                                       float hmult, const char *widgetName) {
+    (void)hmult;
+
     QWidget* widget = new QHBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -296,7 +302,9 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 }
 
 QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                     const char* widgetName) {
+                                     float hmult, const char* widgetName) {
+    (void)hmult;
+
     QWidget* widget = new QHBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -312,6 +320,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     slider->setOrientation(QSlider::Horizontal);
     slider->setLineStep(step);
     slider->setValue(intValue());
+    slider->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLCDNumber* lcd = new QLCDNumber(widget, QString(widgetName) + "-lcd");
     lcd->setMode(QLCDNumber::DEC);
@@ -330,7 +339,8 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 }
 
 QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                      const char* widgetName) {
+                                      float hmult, const char* widgetName) {
+    (void)hmult;
 
     QWidget* box = new QHBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -358,9 +368,10 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 }
 
 QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
-                                          QWidget* parent,
+                                          QWidget* parent, float hmult,
                                           const char* widgetName) {
     (void)cg;
+    (void)hmult;
 
     QWidget* widget = new QHBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -380,7 +391,9 @@ QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
 }
 
 QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                       const char* widgetName) {
+                                       float hmult, const char* widgetName) {
+    (void)hmult;
+
     QHBox* box = new QHBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -436,8 +449,7 @@ void TimeSetting::setValue(const QTime& newValue) {
 }
 
 QWidget* TimeSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
-                                   const char* widgetName) {
-    
+                                   float hmult, const char* widgetName) {
     //QString timeformat = m_context->GetSetting("TimeFormat", "h:mm AP");
     return NULL;
 }
@@ -451,13 +463,15 @@ void DateSetting::setValue(const QDate& newValue) {
 }
 
 QWidget* DateSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
-                                   const char* widgetName) {
+                                   float hmult, const char* widgetName) {
     //QString dateformat = m_context->GetSetting("DateFormat", "ddd MMMM d");
     return NULL;
 }
 
 QWidget* RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                    const char* widgetName) {
+                                    float hmult, const char* widgetName) {
+    (void)hmult;
+
     QButtonGroup* widget = new QButtonGroup(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
     widget->setTitle(getLabel());
@@ -476,8 +490,9 @@ QWidget* RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 }
 
 QWidget* CheckBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                       const char* widgetName) {
-    
+                                       float hmult, const char* widgetName) {
+    (void)hmult;    
+
     MythCheckBox* widget = new MythCheckBox(parent, widgetName);
     widget->setHelpText(getHelpText());
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -516,8 +531,14 @@ MythDialog* ConfigurationDialog::dialogWidget(MythContext* context,
                                               const char* widgetName) {
     MythDialog* dialog = new ConfigurationDialogWidget(context, parent, 
                                                        widgetName);
+
+    int width = 0, height = 0;
+    float wmult = 0, hmult = 0;
+
+    context->GetScreenSettings(width, wmult, height, hmult);
+
     QVBoxLayout* layout = new QVBoxLayout(dialog, 20);
-    layout->addWidget(configWidget(NULL, dialog));
+    layout->addWidget(configWidget(NULL, dialog, hmult));
 
     return dialog;
 }
@@ -547,10 +568,15 @@ MythDialog* ConfigurationWizard::dialogWidget(MythContext* context,
     connect(this, SIGNAL(changeHelpText(QString)), wizard,
             SLOT(setHelpText(QString)));
 
+    int width = 0, height = 0;
+    float wmult = 0, hmult = 0;
+
+    context->GetScreenSettings(width, wmult, height, hmult);
+
     unsigned i;
     for(i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible()) {
-            QWidget* child = children[i]->configWidget(this, parent);
+            QWidget* child = children[i]->configWidget(this, parent, hmult);
 
             wizard->addPage(child, children[i]->getLabel());
             if (i == children.size()-1)
@@ -623,7 +649,9 @@ void AutoIncrementStorage::save(QSqlDatabase* db) {
 }
 
 QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent, 
-                                      const char* widgetName) {
+                                      float hmult, const char* widgetName) {
+    (void)hmult;
+
     QWidget* box = new QVBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -680,9 +708,11 @@ ImageSelectSetting::~ImageSelectSetting() {
 }
 
 QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg, 
-                                          QWidget* parent, 
+                                          QWidget* parent, float hmult,
                                           const char* widgetName) 
 {
+    (void)hmult;
+
     QWidget* box = new QVBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 

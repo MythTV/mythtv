@@ -431,7 +431,7 @@ MythDialog* ScheduledRecording::dialogWidget(MythContext* context,
 
     qApp->processEvents();
 
-    int descwidth = (int)(800 * wmult) - descriptionlabel->width() - 100;
+    int descwidth = (int)(700 * wmult) - descriptionlabel->width();
     int titlewidth = (int)(760 * wmult);
 
     titlefield->setMinimumWidth(titlewidth);
@@ -460,8 +460,8 @@ MythDialog* ScheduledRecording::dialogWidget(MythContext* context,
     f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);    
 
-    vbox->addWidget(type->configWidget(this, dialog));
-    vbox->addWidget(profile->configWidget(this, dialog));
+    vbox->addWidget(type->configWidget(this, dialog, hmult));
+    vbox->addWidget(profile->configWidget(this, dialog, hmult));
 
     return dialog;
 }

@@ -46,8 +46,9 @@ protected:
         // Should never be called because this setting is not visible
         virtual QWidget* configWidget(ConfigurationGroup *cg,
                                       QWidget* parent = NULL,
+                                      float hmult = 1.0,
                                       const char* widgetName = NULL) {
-            (void)cg; (void)parent; (void)widgetName;
+            (void)cg; (void)parent; (void)widgetName; (void)hmult;
             return NULL;
         };
     };

@@ -188,9 +188,9 @@ private:
             setVisible(false);
         };
         virtual QWidget* configWidget(ConfigurationGroup *cg, 
-                                      QWidget* parent, 
+                                      QWidget* parent, float hmult = 1.0,
                                       const char* widgetName = 0) {
-            (void)cg; (void)parent; (void)widgetName;
+            (void)cg; (void)parent; (void)widgetName; (void)hmult;
             return NULL;
         };
     };
@@ -424,8 +424,9 @@ private:
             setName("CardInputID");
         };
         virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                      float hmult = 1.0,
                                       const char* widgetName = 0) {
-            (void)cg; (void)parent; (void)widgetName;
+            (void)cg; (void)parent; (void)widgetName; (void)hmult;
             return NULL;
         };
     };

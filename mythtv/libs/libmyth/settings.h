@@ -26,6 +26,7 @@ public:
 
     // Create and return a widget for configuring this entity
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                  float hmult = 1.0, 
                                   const char* widgetName = 0);
 
     virtual void load(QSqlDatabase* db) = 0;
@@ -126,6 +127,7 @@ class VerticalConfigurationGroup: virtual public ConfigurationGroup {
                 : ConfigurationGroup(uselabel) { }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                  float hmult = 1.0, 
                                   const char* widgetName = 0);
 };
 
@@ -135,6 +137,7 @@ class HorizontalConfigurationGroup: virtual public ConfigurationGroup {
                 : ConfigurationGroup(uselabel) { }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 };
 
@@ -145,6 +148,7 @@ public:
                 : ConfigurationGroup(uselabel) { top = 0; saveAll = true; };
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                  float hmult = 1.0, 
                                   const char* widgetName = 0);
 
     void raise(Configurable* child);
@@ -196,6 +200,7 @@ protected:
     LabelSetting() {};
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 };
 
@@ -204,6 +209,7 @@ protected:
     LineEditSetting() {};
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 };
 
@@ -243,6 +249,7 @@ protected:
         BoundedIntegerSetting(min, max, step) {};
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 };
 
@@ -252,6 +259,7 @@ protected:
         BoundedIntegerSetting(min, max, step) {};
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 };
 
@@ -302,6 +310,7 @@ protected:
 
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 };
 
@@ -323,6 +332,7 @@ public:
     };
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 private:
     bool rw;
@@ -332,6 +342,7 @@ class ListBoxSetting: public SelectSetting {
     Q_OBJECT
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  float hmult = 1.0, 
                                   const char* widgetName = 0);
 
 protected slots:
@@ -341,6 +352,7 @@ protected slots:
 class RadioSetting: public SelectSetting {
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 };
 
@@ -349,6 +361,7 @@ class ImageSelectSetting: public SelectSetting {
 public:
     virtual ~ImageSelectSetting();
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 
     virtual void addImageSelection(const QString& label,
@@ -383,6 +396,7 @@ signals:
 class CheckBoxSetting: public BooleanSetting {
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 };
 
@@ -416,6 +430,7 @@ class TabbedConfigurationGroup: virtual public ConfigurationGroup {
     Q_OBJECT
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 };
 
@@ -461,6 +476,7 @@ public:
     QDate dateValue(void) const;
 
     virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
+                                  float hmult = 1.0, 
                                   const char* widgetName = 0);
 
  public slots:
@@ -474,6 +490,7 @@ public:
     QTime timeValue(void) const;
 
     virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
+                                  float hmult = 1.0,
                                   const char* widgetName = 0);
 
  public slots:
