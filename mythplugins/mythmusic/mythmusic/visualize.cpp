@@ -424,6 +424,7 @@ Gears::Gears(QWidget *parent, const char *name)
 
     //gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
     setGeometry(0, 0, parent->width(), parent->height());
+    //setGeometry(0, 0, 400, 300);
     //setFixedSize(QSize(screenwidth, screenheight));
 
     angle = 0.0;
@@ -447,6 +448,7 @@ Gears::~Gears()
 
 void Gears::resize(const QSize &newsize)
 {
+    //cout << "Gears is resizing to width of " << newsize.width() << endl;
     size = newsize;
     scale.setMax(192, size.width() / analyzerBarWidth);
 
@@ -465,6 +467,8 @@ void Gears::resize(const QSize &newsize)
     }
 
     scaleFactor = double( size.height() / 2 ) / log( 512.0 );
+    //resizeGL(newsize.width(), newsize.height());
+    setGeometry(0, 0, newsize.width(), newsize.height());
 }
 
 
