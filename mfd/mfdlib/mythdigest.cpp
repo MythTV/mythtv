@@ -41,11 +41,13 @@ QString MythDigest::calculate()
     QFile the_file(file_name);
     if(!the_file.exists())
     {
+        cerr << "mythdigest.o: this file does not exist: \"" << file_name << "\"" << endl;
         return QString("");
     }    
     
     if(!the_file.open(IO_ReadOnly))
     {
+        cerr << "mythdigest.o: can't get read permissions for this file: \"" << file_name << "\"" << endl;
         return QString("");
     }
 
@@ -57,11 +59,13 @@ QString MythDigest::calculate()
         char *full_file = new char [file_size];
         if(!the_file.at(0))
         {
+            cerr << "mythdigest.o: can't seek in this full file: \"" << file_name << "\"" << endl;
             the_file.close();
             return QString("");
         }
         if(the_file.readBlock(full_file, file_size) != file_size)
         {
+            cerr << "mythdigest.o: can't read from this full file: \"" << file_name << "\"" << endl;
             the_file.close();
             return QString("");
         }
@@ -98,11 +102,13 @@ QString MythDigest::calculate()
 
         if(!the_file.at(0))
         {
+            cerr << "mythdigest.o: can't seek in this file: \"" << file_name << "\"" << endl;
             the_file.close();
             return QString("");
         }
         if(the_file.readBlock(first_four_kbytes, 4096) != 4096)
         {
+            cerr << "mythdigest.o: can't read from this file: \"" << file_name << "\"" << endl;
             the_file.close();
             return QString("");
         }
@@ -113,11 +119,13 @@ QString MythDigest::calculate()
 
         if(!the_file.at(file_size - 4096))
         {
+            cerr << "mythdigest.o: can't seek to the end of this file: \"" << file_name << "\"" << endl;
             the_file.close();
             return QString("");
         }
         if(the_file.readBlock(last_four_kbytes, 4096) != 4096)
         {
+            cerr << "mythdigest.o: can't read from the end of this file: \"" << file_name << "\"" << endl;
             the_file.close();
             return QString("");
         }
