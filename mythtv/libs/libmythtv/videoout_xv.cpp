@@ -167,7 +167,7 @@ unsigned char *XJ_init(int width, int height, char *window_name,
         (ai[i].type & XvImageMask))
     {
         xv_port = ai[i].base_id;
-      //  break;
+        break;
     }
   }
  
