@@ -1205,6 +1205,9 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     // Set the recorded end time to the current time
     // (we're stopping the recording so it'll never get to its originally 
     // intended end time)
+
+    VERBOSE(VB_RECORD, QString("Host %1 updating endtime to %2")
+                               .arg(gContext->GetHostName()).arg(newendts));
     
     QSqlQuery query(QString::null, m_db);
     query.prepare("UPDATE recorded SET starttime = :NEWSTARTTIME, "
@@ -1234,6 +1237,9 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     QString newfilename = pginfo->GetRecordFilename(fileprefix);
     QFile checkFile(oldfilename);
 
+    VERBOSE(VB_RECORD, QString("Host %1 renaming %2 to %3")
+                               .arg(gContext->GetHostName())
+                               .arg(oldfilename).arg(newfilename));
     if (checkFile.exists())
     {
         if (!QDir::root().rename(oldfilename, newfilename, TRUE))
