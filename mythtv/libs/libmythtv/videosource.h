@@ -185,8 +185,10 @@ public:
         addSelection("/dev/video");
         addSelection("/dev/video0");
         addSelection("/dev/video1");
+        addSelection("/dev/video2");
         addSelection("/dev/v4l/video0");
         addSelection("/dev/v4l/video1");
+        addSelection("/dev/v4l/video2");
     };
 };
 
@@ -198,7 +200,10 @@ public:
         setLabel("Audio device");
         addSelection("/dev/dsp");
         addSelection("/dev/dsp1");
+        addSelection("/dev/dsp2");
         addSelection("/dev/sound/dsp");
+        addSelection("/dev/sound/dsp1");
+        addSelection("/dev/sound/dsp2");
     };
 };
 
@@ -217,7 +222,7 @@ public:
     AudioRateLimit(const CaptureCard& parent):
         CCSetting(parent, "audioratelimit") {
         setLabel("Audio sampling rate limit");
-        addSelection("0");
+        addSelection("(None)", "0");
         addSelection("32000");
         addSelection("44100");
         addSelection("48000");
@@ -334,13 +339,16 @@ public:
         CISetting(parent,"externalcommand") {
         setLabel("External channel change command");
         setValue("");
+        setHelpText("If specified, this command will be run to change the "
+                    "channel for inputs which do not have a tuner.  The "
+                    "first argument will be the channel number");
     };
 };
 
 class CardInput: public VerticalConfigurationGroup, public ConfigurationDialog {
 public:
     CardInput(MythContext* context): ConfigurationDialog(context) {
-        setLabel("Associate input with source");
+        setLabel("Connect source to input");
         addChild(id = new ID());
         addChild(cardid = new CardID(*this));
         addChild(inputname = new InputName(*this));
