@@ -17,6 +17,8 @@
 #include <qlistbox.h>
 #include <qcheckbox.h>
 #include <qimage.h>
+#include <qlabel.h>
+#include <qtimer.h>
 
 #include <vector>
 
@@ -96,6 +98,7 @@ class MythSlider: public QSlider
     QString helptext;
 };
 
+
 class MythLineEdit : public QLineEdit 
 {
     Q_OBJECT
@@ -123,6 +126,136 @@ class MythLineEdit : public QLineEdit
   private:
     QString helptext;
 };
+
+
+
+//    Challenge: Use only keys 0-9 (that's it)
+    
+class LineEditHintBox : public QLabel
+{
+    Q_OBJECT
+
+    //
+    //  A little hint box that goes beside
+    //  the actual text editing box. There
+    //  are two of these. One shows the
+    //  state of shift'ing, and the other
+    //  the current characters that the 
+    //  current keypress will cycle through
+    //
+
+    public:
+        LineEditHintBox(QWidget * parent, const char * name = 0 );
+        ~LineEditHintBox();
+        
+    public slots:
+
+        void    showShift(bool);
+        void    showCycle(QString current_choice, QString set);
+
+};
+
+class KeypadLineEdit : public QLineEdit
+{
+    Q_OBJECT
+
+    //
+    //  The actual editor part of
+    //  the compound widget
+    //
+    
+    public:
+    
+        KeypadLineEdit( QWidget * parent, const char * name = 0 );
+        KeypadLineEdit( const QString & contents, QWidget * parent, const char * name = 0 );    
+        ~KeypadLineEdit();
+        void setCycleTime(float desired_interval); // in seconds
+
+    signals:
+    
+        void    shiftState(bool);
+        void    cycleState(QString current_choice, QString set);
+        void    askParentToChangeHelpText(void);
+
+    protected:
+    
+        virtual void focusInEvent(QFocusEvent *e);
+        virtual void keyPressEvent(QKeyEvent *e);
+
+    private slots:
+
+        void    endCycle();
+
+    private:
+    
+        void    Init(void);
+        void    cycleKeys(QString cycleList);
+        void    toggleShift(void);
+
+        bool    shift;
+        QTimer  *cycle_timer;
+        bool    active_cycle;
+        QString current_choice;
+        QString current_set;
+        int     cycle_time;
+};
+
+//  thor feb 17 2003
+//
+//  Alternative to MythLineEdit that lets you enter
+//  text using only (!) the keys 0-9 on a keypad/remote control
+//
+class MythRemoteLineEdit : public QWidget
+{
+    Q_OBJECT
+
+    //
+    //  A container that holds the
+    //  hint boxes and the editor and
+    //  co-ordinates their actions
+    //
+            
+    public:
+    
+        MythRemoteLineEdit( QWidget * parent, const char * name = 0 );
+        MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name = 0 );    
+        ~MythRemoteLineEdit();
+        void setCycleTime(float desired_interval); //seconds
+        void setHelpText(QString help) { helptext = help; }
+
+        //
+        //  These are three widgets inside
+        //  the container. They should really
+        //  be private, but are public for
+        //  the time being (so you can hack
+        //  settings on them like
+        //  MythRemoteLineEdit->editor->setPalette()
+        //  and so on)
+        //
+
+        KeypadLineEdit      *editor;
+        LineEditHintBox     *character_hint;
+        LineEditHintBox     *shift_hint;
+
+        
+    public slots:
+    
+        void setGeometry(int x, int y, int w, int h);
+        virtual void setText(const QString& text);
+        void textHasChanged(const QString &);
+        void honorRequestToChangeHelpText(void);
+
+    signals:
+        void changeHelpText(QString);
+        void textChanged(const QString &);
+
+    private:
+    
+        void    Init(void);
+        QString helptext;
+    
+};
+
 
 class MythTable : public QTable
 {
