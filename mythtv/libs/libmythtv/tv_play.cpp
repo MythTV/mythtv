@@ -26,6 +26,7 @@ using namespace std;
 #include "programinfo.h"
 #include "udpnotify.h"
 #include "commercial_skip.h"
+#include "vsync.h"
 
 struct SeekSpeedInfo {
     QString   dispString;
@@ -961,6 +962,11 @@ void TV::TeardownPlayer(void)
 {
     if (nvp)
     {
+        // Stop the player's video sync method.  Do so from this
+        // main thread to work around a potential OpenGL bug.
+        VideoSync *vs = nvp->getVideoSync();
+        if (vs != NULL)
+            vs->Stop();
         pthread_join(decode, NULL);
         delete nvp;
     }

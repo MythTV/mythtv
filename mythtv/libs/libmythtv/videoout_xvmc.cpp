@@ -735,7 +735,19 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer)
 
 void VideoOutputXvMC::Show(FrameScanType scan)
 {
-    int field = (kScan_Interlaced == scan) ? 1 : 3;
+    int field;
+    switch (scan) 
+    {
+    case kScan_Interlaced:
+	field = 1;
+	break;
+    case kScan_Intr2ndField:
+	field = 2;
+	break;
+    default:
+	field = 3;
+	break;
+    }
 
     xvmc_render_state_t *render = data->p_render_surface_to_show;
 

@@ -29,6 +29,7 @@ class DecoderBase;
 class AudioOutput;
 class FilterManager;
 class FilterChain;
+class VideoSync;
 
 struct TextContainer
 {
@@ -171,6 +172,10 @@ class NuppelVideoPlayer
 
     VideoOutput *getVideoOutput(void) { return videoOutput; }
 
+    VideoSync *getVideoSync() const { return videosync; }
+
+    void StopVideoSync(void);
+
     int calcSliderPos(QString &desc);
 
     bool GetLimitKeyRepeat(void) { return limitKeyRepeat; }
@@ -207,8 +212,6 @@ class NuppelVideoPlayer
                      unsigned char *strm, unsigned char *outbuf);
     void GetFrame(int onlyvideo, bool unsafe = false);
 
-    void ReduceJitter(struct timeval *nexttrigger);
-    
     long long CalcMaxFFTime(long long ff);
    
     bool DoFastForward();
@@ -230,10 +233,6 @@ class NuppelVideoPlayer
  
     int tbuffer_numvalid(void); // number of valid slots in the text buffer
     int tbuffer_numfree(void); // number of free slots in the text buffer
-
-    void ResetNexttrigger(struct timeval *tv);
-
-    int UpdateDelay(struct timeval *nexttrigger);
 
     void ShowText(void);
     void ResetCC(void);
@@ -274,6 +273,7 @@ class NuppelVideoPlayer
     double video_frame_rate;
     float video_aspect;
     FrameScanType m_scan;
+    bool m_deinterlace;
 
     int filesize;
     int startpos;
@@ -283,7 +283,7 @@ class NuppelVideoPlayer
     int text_size;
 
     /* Video circular buffer */
-    bool prebuffering;	/* don't play until done prebuffering */ 
+    bool prebuffering;  /* don't play until done prebuffering */ 
     QMutex prebuffering_lock;
     QWaitCondition prebuffering_wait;
 
@@ -401,6 +401,7 @@ class NuppelVideoPlayer
     int lastaudiotime;
     int delay;
     int avsync_delay;
+    int avsync_adjustment;
     int avsync_avg;
     int avsync_oldavg;
     int refreshrate;
@@ -410,7 +411,6 @@ class NuppelVideoPlayer
 
     float warpfactor;
     float warpfactor_avg;
-    int rtcfd;
     int vsynctol;
     short int *warplbuff;
     short int *warprbuff;
@@ -418,24 +418,16 @@ class NuppelVideoPlayer
  
     bool delay_clipping;
     struct timeval nexttrigger, now;
+    VideoSync *videosync;
 
     bool lastsync;
-    bool hasvsync;
-    bool hasvgasync;
 
     Jitterometer *output_jmeter;
 
-    void InitVTAVSync(void);
-    void VTAVSync(void);
-    void ShutdownVTAVSync(void);
+    void InitAVSync(void);
+    void AVSync(void);
+    void ShutdownAVSync(void);
 
-    void InitExAVSync(void);
-    void OldAVSync(void);
-    void ExAVSync(void);
-    void ShutdownExAVSync(void);
-
-    bool reducejitter;
-    bool experimentalsync;
     bool usevideotimebase;
 
     bool limitKeyRepeat;

@@ -79,7 +79,8 @@ enum FrameScanType {
     kScan_Ignore      = -1,
     kScan_Progressive =  0,
     kScan_Interlaced  =  1,
-    kScan_Detect      =  2
+    kScan_Intr2ndField=  2,
+    kScan_Detect      =  3
 };
 
 class VideoOutput

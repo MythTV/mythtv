@@ -346,7 +346,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                 m_parent->SetVideoParams(ALIGN(enc->width, 16), 
                                          ALIGN(enc->height, 16), fps, 
-                                         keyframedist, aspect_ratio);
+                                         keyframedist, aspect_ratio, kScan_Detect);
              
                 enc->error_resilience = FF_ER_COMPLIANT;
                 enc->workaround_bugs = FF_BUG_AUTODETECT;
@@ -951,7 +951,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                     {
                         m_parent->SetVideoParams(ALIGN(width, 16),
                                                  ALIGN(height, 16), fps,
-                                                 keyframedist, aspect);
+                                                 keyframedist, aspect, kScan_Detect);
                         m_parent->ReinitVideo();
                         current_width = width;
                         current_height = height;

@@ -806,17 +806,6 @@ public:
     };
 };
 
-class ReduceJitter: public CheckBoxSetting, public GlobalSetting {
-public:
-    ReduceJitter():
-       GlobalSetting("ReduceJitter") {
-       setLabel(QObject::tr("Jitter reduction"));
-       setValue(false);
-       setHelpText(QObject::tr("If enabled, frame timing will be adjusted "
-                   "for smoother motion."));
-    };
-};
-
 class UseVideoTimebase: public CheckBoxSetting, public GlobalSetting {
 public:
     UseVideoTimebase():
@@ -825,17 +814,6 @@ public:
         setValue(false);
         setHelpText(QObject::tr("Use the video as the timebase and warp "
                     "the audio to keep it in sync. (Experimental)"));
-    };
-};
-
-class ExperimentalSync: public CheckBoxSetting, public GlobalSetting {
-public:
-    ExperimentalSync():
-        GlobalSetting("ExperimentalAVSync") {
-        setLabel(QObject::tr("Video card A/V Sync"));
-        setValue(false);
-        setHelpText(QObject::tr("Use video card for frame timing (nVidia or "
-                    "OpenGL)."));
     };
 };
 
@@ -2436,8 +2414,6 @@ PlaybackSettings::PlaybackSettings()
     general->setLabel(QObject::tr("General playback"));
     general->addChild(new Deinterlace());
     general->addChild(new CustomFilters());
-    general->addChild(new ReduceJitter());
-    general->addChild(new ExperimentalSync());
     general->addChild(new UseVideoTimebase());
     general->addChild(new DecodeExtraAudio());
     general->addChild(new AspectOverride());
@@ -2495,12 +2471,16 @@ PlaybackSettings::PlaybackSettings()
     comms->addChild(new CommercialSkipCPU());
     comms->addChild(new CommercialSkipHost());
     comms->addChild(new AggressiveCommDetect());
-    comms->addChild(new CommSkipAllBlanks());
-    comms->addChild(new CommRewindAmount());
-    comms->addChild(new CommNotifyAmount());
-    comms->addChild(new AutoCommercialSkip());
-    comms->addChild(new TryUnflaggedSkip());
     addChild(comms);
+
+    VerticalConfigurationGroup* comms2 = new VerticalConfigurationGroup(false);
+    comms2->setLabel(QObject::tr("Commercial Detection (Playback)"));
+    comms2->addChild(new CommSkipAllBlanks());
+    comms2->addChild(new CommRewindAmount());
+    comms2->addChild(new CommNotifyAmount());
+    comms2->addChild(new AutoCommercialSkip());
+    comms2->addChild(new TryUnflaggedSkip());
+    addChild(comms2);
 
     VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);
     oscan->setLabel(QObject::tr("Overscan"));

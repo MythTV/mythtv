@@ -10,10 +10,6 @@
 #include <qstringlist.h>
 #include <qmap.h>
 
-#ifdef __linux__
-#include <linux/rtc.h>
-#endif
-
 #include <sys/ioctl.h>
 
 #include <iostream>
@@ -92,6 +88,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     text_size = 0;
     video_aspect = 1.33333;
     m_scan = kScan_Detect;
+    m_deinterlace = false;
 
     forceVideoOutput = kVideoOutput_Default;
     decoder = NULL;
@@ -189,6 +186,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     warplbuff = NULL;
     warprbuff = NULL;
     warpbuffsize = 0;
+
+    videosync = NULL;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -222,6 +221,9 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
 
     if (videoOutput)
         delete videoOutput;
+    
+    if (videosync)
+        delete videosync;
 }
 
 void NuppelVideoPlayer::SetWatchingRecording(bool mode)
@@ -437,10 +439,24 @@ void NuppelVideoPlayer::ReinitAudio(void)
         audioOutput->Reconfigure(audio_bits, audio_channels, audio_samplerate);
 }
 
+static inline QString toQString(FrameScanType scan) {
+    switch (scan) {
+        case kScan_Ignore: return QString("Ignore Scan");
+        case kScan_Detect: return QString("Detect Scan");
+        case kScan_Interlaced:  return QString("Interlaced Scan");
+        case kScan_Progressive: return QString("Progressive Scan");
+        default: return QString("Unknown Scan");
+    }
+}
+
 FrameScanType NuppelVideoPlayer::detectInterlace(FrameScanType newScan, 
                                                  FrameScanType scan,
                                                  float fps, int video_height) 
 {
+    QString dbg = QString("detectInterlace(") + toQString(newScan) +
+        QString(", ") + toQString(scan) + QString(", ") + QString("%1").arg(fps) +
+        QString(", ") + QString("%1").arg(video_height) + QString(") ->");
+
     if (kScan_Ignore != newScan || kScan_Detect == scan) 
     {
         // The scanning mode should be decoded from the stream, but if it
@@ -453,10 +469,14 @@ FrameScanType NuppelVideoPlayer::detectInterlace(FrameScanType newScan,
             scan = kScan_Progressive;
         else if (video_height <= 640) // HACK, 320x240 looks bad...
             scan = kScan_Progressive;
+        else if (video_height >= 1080) // ATSC 1080i
+            scan = kScan_Interlaced;
 
         if (kScan_Detect != newScan)
             scan = newScan;
-    }
+    };
+
+    VERBOSE(VB_PLAYBACK, dbg+toQString(scan));
 
     return scan;
 }
@@ -477,14 +497,26 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     }
 
     video_size = video_height * video_width * 3 / 2;
-    keyframedist = keyframedistance;
+    if (keyframedist > 0)
+        keyframedist = keyframedistance;
 
     if (aspect > 0.0f)
         video_aspect = aspect;
 
     m_scan = detectInterlace(scan, m_scan, video_frame_rate, video_height);
     VERBOSE(VB_PLAYBACK, QString("Interlaced: %1  video_height: %2  fps: %3")
-                                .arg(scan).arg(video_height).arg(fps));
+                                .arg(toQString(m_scan)).arg(video_height).arg(fps));
+    // For XvMC displaying interlaced video, use double frame rate
+    // showing fields alternately
+    m_deinterlace = false;
+#ifdef USING_XVMC
+    if (m_scan == kScan_Interlaced &&
+        forceVideoOutput == kVideoOutput_XvMC &&
+        gContext->GetNumSetting("Deinterlace"))
+        m_deinterlace = true;
+#endif
+    if (videosync != NULL)
+        videosync->SetFrameInterval(frame_interval, m_deinterlace);
 
 }
 
@@ -707,78 +739,6 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 
     if (videoOutput->EnoughDecodedFrames())
         setPrebuffering(false);
-}
-
-void NuppelVideoPlayer::ReduceJitter(struct timeval *nexttrigger)
-{
-    static int cheat = 5000;
-    static int fudge = 0;
-
-    int delay;
-    int cnt = 0;
-
-    cheat += 100;
-
-    delay = UpdateDelay(nexttrigger);
-
-    /* The usleep() is shortened by "cheat" so that this process
-       gets the CPU early for about half the frames. */
-
-    if (delay > (cheat - fudge))
-        usleep(delay - (cheat - fudge));
-
-    /* If late, draw the frame ASAP. If early, hold the CPU until
-       half as late as the previous frame (fudge) */
-
-    while (delay + fudge > 0)
-    {
-        delay = UpdateDelay(nexttrigger);
-        cnt++;
-    }
-
-    fudge = abs(delay / 2);
-
-    if (cnt > 1)
-        cheat -= 200;
-}
-
-static void NormalizeTimeval(struct timeval *tv)
-{
-    while (tv->tv_usec > 999999)
-    {
-        tv->tv_sec++;
-        tv->tv_usec -= 1000000;
-    }
-    while (tv->tv_usec < 0)
-    {
-        tv->tv_sec--;
-        tv->tv_usec += 1000000;
-    }
-}
-
-void NuppelVideoPlayer::ResetNexttrigger(struct timeval *nexttrigger)
-{
-    /* when we're paused or prebuffering, we need to update
-       'nexttrigger' before we start playing again. Otherwise,
-       the value of 'nexttrigger' will be far in the past, and
-       the video will play really fast for a while.*/
-    
-    gettimeofday(nexttrigger, NULL);
-    nexttrigger->tv_usec += frame_interval;
-    NormalizeTimeval(nexttrigger);
-}
-
-
-int NuppelVideoPlayer::UpdateDelay(struct timeval *nexttrigger)
-{
-    struct timeval now; 
-
-    gettimeofday(&now, NULL);
-
-    int ret = (nexttrigger->tv_sec - now.tv_sec) * 1000000 +
-              (nexttrigger->tv_usec - now.tv_usec); // uSecs
-
-    return ret;
 }
 
 VideoFrame *NuppelVideoPlayer::GetCurrentFrame(int &w, int &h)
@@ -1130,7 +1090,6 @@ void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
 #define WARPMULTIPLIER 1000000000 // How much do we multiply the warp by when 
                                   //storing it in an integer
 #define WARPAVLEN (video_frame_rate * 600) // How long to average the warp over
-#define RTCRATE 1024 // RTC frequency if we have no vsync
 #define WARPCLIP    0.1 // How much we allow the warp to deviate from 1 
                         // (normal speed)
 #define MAXDIVERGE  20  // Maximum number of frames of A/V divergence allowed
@@ -1171,88 +1130,66 @@ float NuppelVideoPlayer::WarpFactor(void)
     warpfactor_avg = (warpfactor + (warpfactor_avg * (WARPAVLEN - 1))) / 
                       WARPAVLEN;
 
-//    cerr << "Divergence: " << divergence << "  Rate: " << rate 
-//         << "  Warpfactor: " << warpfactor << "  warpfactor_avg: " 
-//         << warpfactor_avg << endl;
+    //cerr << "Divergence: " << divergence << "  Rate: " << rate 
+    //<< "  Warpfactor: " << warpfactor << "  warpfactor_avg: " 
+    //<< warpfactor_avg << endl;
     return divergence;
 }
 
-void NuppelVideoPlayer::InitVTAVSync(void) 
+void NuppelVideoPlayer::InitAVSync(void) 
 {
-    QString timing_type = "next trigger";
+    videosync->Start();
 
-    //warpfactor_avg = 1;
-    warpfactor_avg = gContext->GetNumSetting("WarpFactor", 0);
-    if (warpfactor_avg) 
-        warpfactor_avg /= WARPMULTIPLIER;
-    else 
-        warpfactor_avg = 1;
-    // Reset the warpfactor if it's obviously bogus
-    if (warpfactor_avg < (1 - WARPCLIP)) 
-        warpfactor_avg = 1;
-    if (warpfactor_avg > (1 + (WARPCLIP * 2)) )
-        warpfactor_avg = 1;
-
-    warpfactor = warpfactor_avg;
-    avsync_oldavg = 0;
-    rtcfd = -1;
-    if (!disablevideo) 
+    avsync_adjustment = 0;
+    
+    if (usevideotimebase) 
     {
-        int ret = vsync_init();
-
-        refreshrate = videoOutput->GetRefreshRate();
-        if (refreshrate <= 0) 
-            refreshrate = frame_interval;
-
-        if (ret > 0) 
-        {
-            hasvsync = true;
-
-            if ( ret == 1 ) timing_type = "nVidia polling";
-            vsynctol = refreshrate / 4; 
-            // How far out can the vsync be for us to use it?
-        } 
-#ifdef __linux__
+        warpfactor_avg = gContext->GetNumSetting("WarpFactor", 0);
+        if (warpfactor_avg) 
+            warpfactor_avg /= WARPMULTIPLIER;
         else 
-        {
-            rtcfd = open("/dev/rtc", O_RDONLY);
-            if (rtcfd >= 0) 
-            {
-                if ((ioctl(rtcfd, RTC_IRQP_SET, RTCRATE) < 0) || 
-                    (ioctl(rtcfd, RTC_PIE_ON, 0) < 0)) 
-                {
-                    close(rtcfd);
-                    rtcfd = -1;
-                } 
-                else 
-                {
-                    vsynctol = 1000000 / RTCRATE; 
-                    // How far out can the interrupt be for us to use it?
-                    timing_type = "/dev/rtc";
-                }
-            }
-        }
-#endif
+            warpfactor_avg = 1;
+        // Reset the warpfactor if it's obviously bogus
+        if (warpfactor_avg < (1 - WARPCLIP)) 
+            warpfactor_avg = 1;
+        if (warpfactor_avg > (1 + (WARPCLIP * 2)) )
+            warpfactor_avg = 1;
+        
+        warpfactor = warpfactor_avg;
+        avsync_oldavg = 0;
+    }
+        
+    refreshrate = videoOutput->GetRefreshRate();
+    if (refreshrate <= 0)
+        refreshrate = frame_interval;
+    vsynctol = refreshrate / 4; 
 
-        nice(-19);
-
+    if (!disablevideo)
+    {
+        if (usevideotimebase)
+            VERBOSE(VB_PLAYBACK, "Using video as timebase");
+        else
+            VERBOSE(VB_PLAYBACK, "Using audio as timebase");
+            
+        QString timing_type = videosync->getName();
+        
         QString msg = QString("Video timing method: %1").arg(timing_type);
         VERBOSE(VB_PLAYBACK, msg);
         msg = QString("Refresh rate: %1, frame interval: %2") 
-                     .arg(refreshrate).arg(frame_interval);
+                       .arg(refreshrate).arg(frame_interval);
         VERBOSE(VB_PLAYBACK, msg);
+        nice(-19);
     }
 }
 
-void NuppelVideoPlayer::VTAVSync(void)
+void NuppelVideoPlayer::AVSync(void)
 {
     float           diverge;
-    unsigned long   rtcdata;
     
     VideoFrame *buffer = videoOutput->GetLastShownFrame();
-    if (!buffer) 
+    if (!buffer)
     {
-        cerr << "No video buffer, error error\n";
+        VERBOSE(VB_IMPORTANT, "No video buffer");
         return;
     }
 
@@ -1261,88 +1198,89 @@ void NuppelVideoPlayer::VTAVSync(void)
     else
         diverge = 0;
 
-    delay = UpdateDelay(&nexttrigger);
-    // If video is way ahead of audio, drop some frames until we're close again.
-    // If we're close to a vsync then we'll display a frame to keep the 
-    // picture updated.
-    if ((diverge < -MAXDIVERGE) && (delay < vsynctol)) 
-        cerr << "A/V diverged by " << diverge 
-             << " frames, dropping frame to keep audio in sync" << endl;
-    else if (disablevideo) 
+    // If video is way ahead of audio, drop some frames until we're
+    // close again.  
+    if (diverge < -MAXDIVERGE) 
     {
-        delay = UpdateDelay(&nexttrigger);
-        if (delay > 0) 
-            usleep(delay);
-    } 
-    else 
+        VERBOSE(VB_PLAYBACK, QString("A/V diverged by %1 frames, dropping "
+            "frame to keep audio in sync").arg(diverge));
+        lastsync = true;
+    }
+    else if (!disablevideo) 
     {
         // if we get here, we're actually going to do video output
-        delay = UpdateDelay(&nexttrigger);
         if (buffer) 
             videoOutput->PrepareFrame(buffer);
-
-        if ((hasvsync) || (rtcfd >= 0)) 
-        {
-            delay = UpdateDelay(&nexttrigger);
-            if (delay < (0 - vsynctol)) 
-                cerr << "Late frame!  Delay: " << delay << endl;
-
-            if (hasvsync) 
-                vsync_wait_for_retrace();
-#ifdef __linux__
-            else 
-                read(rtcfd,&rtcdata,sizeof(rtcdata));
-#endif
-
-            delay = UpdateDelay(&nexttrigger);
-            while (delay > vsynctol) 
-            {
-                vsync_wait_for_retrace();
-                delay = UpdateDelay(&nexttrigger);
-            }
-        } 
-        else 
-        {    
-            // No vsync _or_ RTC, fall back to usleep() (yuck)
-            delay = UpdateDelay(&nexttrigger);
-            usleep(delay);
-        }
-        
-        // Reset the frame timer to current time since we're trusting the 
-        // video timing
-        gettimeofday(&nexttrigger, NULL);
-        
+ 
+        videosync->WaitForFrame(avsync_adjustment);
+        avsync_adjustment = 0;
+ 
         // Display the frame
         videoOutput->Show(m_scan);
+#ifdef USING_XVMC
+        if (m_deinterlace) 
+        {
+            // Display the second field
+            videosync->WaitForFrame(avsync_adjustment);
+            avsync_adjustment = 0;
+            
+            // Display the frame
+            videoOutput->Show(kScan_Intr2ndField);
+        }
+#endif  
     }
-    
-    if (output_jmeter && output_jmeter->RecordCycleTime()) 
-        cout << "avsync_avg: " << avsync_avg / 1000 
+    else
+    {
+        videosync->WaitForFrame(0);
+    }
+ 
+    if (output_jmeter && output_jmeter->RecordCycleTime())
+        cout << "avsync_delay: " << avsync_delay / 1000 
+             << ", avsync_avg: " << avsync_avg / 1000 
              << ", warpfactor: " << warpfactor 
              << ", warpfactor_avg: " << warpfactor_avg << endl;
 
-    // Schedule next frame
-    nexttrigger.tv_usec += frame_interval;
     if (diverge > MAXDIVERGE) 
     {
         // Audio is way ahead of the video - cut the frame rate
         // until it's almost in sync
-        cerr << "A/V diverged by " << diverge 
-             << " frames, extending frame to keep audio in sync" << endl;
-        nexttrigger.tv_usec += (frame_interval * ((int)diverge / MAXDIVERGE));
+        VERBOSE(VB_PLAYBACK, QString("A/V diverged by %1 frames, extending "
+            "frame to keep audio in sync").arg(diverge));
+        avsync_adjustment = (frame_interval * ((int)diverge / MAXDIVERGE));
+        lastsync = true;
     }
 
-    NormalizeTimeval(&nexttrigger);
-    
     if (audioOutput && normal_speed) 
     {
         // ms, same scale as timecodes
         lastaudiotime = audioOutput->GetAudiotime();
-        if (lastaudiotime != 0) { // lastaudiotime = 0 after a seek
+        if (lastaudiotime != 0 && buffer->timecode != 0)  
+        { // lastaudiotime = 0 after a seek
             // The time at the start of this frame (ie, now) is given by 
             // last->timecode
             avsync_delay = (buffer->timecode - lastaudiotime) * 1000; // uSecs
             avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
+            if (!usevideotimebase)
+            {
+                /* If the audio time codes and video diverge, shift
+                   the video by one interlaced field (1/2 frame) */
+                
+                if (!lastsync)
+                {
+                    if (avsync_avg > frame_interval * 3 / 2)
+                    {
+                        avsync_adjustment = refreshrate;
+                        lastsync = true;
+                    }
+                    else if (avsync_avg < 0 - frame_interval * 3 / 2)
+                    {
+                        avsync_adjustment = -refreshrate;
+                        lastsync = true;
+                    }
+                }
+                else
+                    lastsync = false;
+            }
         } 
         else 
         {
@@ -1352,341 +1290,26 @@ void NuppelVideoPlayer::VTAVSync(void)
     }
 }
 
-void NuppelVideoPlayer::ShutdownVTAVSync(void) 
+void NuppelVideoPlayer::ShutdownAVSync(void) 
 {
-    if (hasvsync) 
-        vsync_shutdown();
-    if (hasvgasync) 
-        vgasync_cleanup();
-    gContext->SaveSetting("WarpFactor", (int)(warpfactor_avg * WARPMULTIPLIER));
-
-    if (warplbuff) 
+    if (usevideotimebase) 
     {
-        free(warplbuff);
-        warplbuff = NULL;
-    }
-
-    if (warprbuff) 
-    {
-        free(warprbuff);
-        warprbuff = NULL;
-    }
-    warpbuffsize = 0;
-
-#ifdef __linux__
-    if (rtcfd >= 0)
-    {
-        close(rtcfd);
-        rtcfd = -1;
-    }
-#endif
-}
-
-void NuppelVideoPlayer::InitExAVSync(void)
-{
-    QString timing_type = "next trigger";
-
-    if (!disablevideo)
-    {
-        int ret = vsync_init();
-
-        if (ret > 0)
+        gContext->SaveSetting("WarpFactor", 
+            (int)(warpfactor_avg * WARPMULTIPLIER));
+        
+        if (warplbuff) 
         {
-            hasvsync = true;
-
-            if ( ret == 1 )
-                timing_type = "nVidia polling";
-            /*
-             // not yet tested
-            else if ( ret == 2 )
-                timing_type = "DRM vblank";
-            */
-            else if (ret == 3)
-                timing_type = "OpenGL vsync";
+            free(warplbuff);
+            warplbuff = NULL;
         }
-        /*
-        // not yet implemented
-        else if (vgasync_init(0) == 1)
+        
+        if (warprbuff) 
         {
-             hasvgasync = true;
-
-             timing_type = "VGA refresh";
+            free(warprbuff);
+            warprbuff = NULL;
         }
-        */
-        else
-        {
-            timing_type = "reduce jitter";
-        }
-
-        nice(-19);
-    }
-
-    if (!disablevideo)
-    {
-        QString msg = QString("Video timing method: %1").arg(timing_type);
-        VERBOSE(VB_PLAYBACK, msg);
-        refreshrate = videoOutput->GetRefreshRate();
-        if (refreshrate <= 0)
-            refreshrate = frame_interval;
-        msg = QString("Refresh rate: %1, frame interval: %2")
-              .arg(refreshrate).arg(frame_interval);
-        VERBOSE(VB_PLAYBACK, msg);
-    }
-}
-
-void NuppelVideoPlayer::ExAVSync(void)
-{
-    VideoFrame *buffer = videoOutput->GetLastShownFrame();
-    if (!buffer)
-    {
-        cerr << "No video buffer, error error\n";
-        return;
-    }
-
-    if (disablevideo)
-    {
-        delay = UpdateDelay(&nexttrigger);
-        if (delay > 0)
-            usleep(delay);
-    }
-    else
-    {
-        // if we get here, we're actually going to do video output
-        if (buffer)
-            videoOutput->PrepareFrame(buffer);
-
-        delay = UpdateDelay(&nexttrigger);
-
-        if (hasvsync)
-        {
-            while (delay > 0)
-            {
-                vsync_wait_for_retrace();
-                delay = UpdateDelay(&nexttrigger);
-            }
-
-            videoOutput->Show(m_scan);
-
-            // reset the clock if delay and refresh are too close
-            // at either end
-            if (delay > -1000 && !lastsync)
-            {
-                nexttrigger.tv_usec -= 2000;
-                NormalizeTimeval(&nexttrigger);
-            }
-            else if (delay < -(refreshrate/4)) 
-            {
-                nexttrigger.tv_usec += 2000;
-                NormalizeTimeval(&nexttrigger);
-            }
-        }
-        else
-        {
-            // If delay is sometwhat more than a frame or < 0ms,
-            // we clip it to these amounts and reset nexttrigger
-            if (delay > frame_interval * 2)
-            {
-                // cerr << "Delaying to next trigger: " << delay << endl;
-                usleep(frame_interval);
-                delay = 0;
-                avsync_avg = 0;
-                gettimeofday(&nexttrigger, NULL);
-            }
-            else if (delay < 0 - frame_interval)
-            {
-                // cerr << "clipped negative delay " << delay << endl;
-                delay = 0;
-                avsync_avg = 0;
-                gettimeofday(&nexttrigger, NULL);
-            }
-
-            if (reducejitter && normal_speed) 
-                ReduceJitter(&nexttrigger);
-            else
-            {
-                if (delay > 0)
-                    usleep(delay);
-            }
-
-            videoOutput->Show(m_scan);
-        }
-    }
-
-    if (output_jmeter && output_jmeter->RecordCycleTime())
-        cout << avsync_delay / 1000 << endl;
-
-    /* The value of nexttrigger is perfect -- we calculated it to
-       be exactly one frame time after the previous frame,
-       Show frames at the frame rate as long as audio is in sync */
-
-    nexttrigger.tv_usec += frame_interval;
-
-    if (audioOutput && normal_speed)
-    {
-        lastaudiotime = audioOutput->GetAudiotime(); // ms, same scale as timecodes
-
-        if (lastaudiotime != 0) // lastaudiotime = 0 after a seek
-        {
-            /* The time at the start of this frame (ie, now) is
-               given by last->timecode */
-
-            avsync_delay = (buffer->timecode - lastaudiotime) * 1000; // uSecs
-
-            avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
-
-            /* If the audio time codes and video diverge, shift
-               the video by one interlaced field (1/2 frame) */
-
-            if (!lastsync)
-            {
-                if (avsync_avg > frame_interval * 3 / 2)
-                {
-                    nexttrigger.tv_usec += refreshrate;
-                    lastsync = true;
-                }
-                else if (avsync_avg < 0 - frame_interval * 3 / 2)
-                {
-                    nexttrigger.tv_usec -= refreshrate;
-                    lastsync = true;
-                }
-            }
-            else
-                lastsync = false;
-        }
-        else
-            avsync_avg = 0;
-    }
-}
-
-void NuppelVideoPlayer::ShutdownExAVSync(void)
-{
-    if (hasvsync)
-        vsync_shutdown();
-
-    if (hasvgasync)
-        vgasync_cleanup();
-}
-
-void NuppelVideoPlayer::OldAVSync(void)
-{
-    VideoFrame *buffer = videoOutput->GetLastShownFrame();
-    if (!buffer)
-    {
-        cerr << "No video buffer, error error\n";
-        return;
-    }
-
-    // calculate 'delay', that we need to get from 'now' to 'nexttrigger'
-    gettimeofday(&now, NULL);
-
-    delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
-            (nexttrigger.tv_usec - now.tv_usec); // uSecs
-
-    if (reducejitter && normal_speed)
-    {
-        /* If delay is sometwhat more than a frame or < 0ms,
-           we clip it to these amounts and reset nexttrigger */
-        if (delay > frame_interval)
-        {
-            // cerr << "Delaying to next trigger: " << delay << endl;
-            delay = frame_interval;
-            usleep(delay);
-
-            gettimeofday(&nexttrigger, NULL);
-        }
-        else if (delay <= 0)
-        {
-            // cerr << "clipped negative delay " << delay << endl;
-            gettimeofday(&nexttrigger, NULL);
-
-        }
-        else
-        {
-            if (!disablevideo)
-                ReduceJitter(&nexttrigger);
-            else
-                usleep(delay);
-        }
-    }
-    else
-    {
-        if (delay > 200000)
-        {
-            QString msg = QString("Delaying to next trigger: %1")
-                          .arg(delay);
-            VERBOSE(VB_PLAYBACK, msg);
-            delay = 200000;
-            delay_clipping = true;
-        }
-
-        /* trigger */
-        if (delay > 0)
-            usleep(delay);
-        else
-        {
-            //cout << "clipped negative delay: " << delay << endl;
-            delay_clipping = true;
-        }
-        /* The time right now is a good approximation of nexttrigger. */
-        /* It's not perfect, because usleep() is only pseudo-
-           approximate about waking us up. So we jitter a few ms. */
-        /* The value of nexttrigger is perfect -- we calculated it to
-           be exactly one frame time after the previous frame,
-           plus just enough feedback to stay synchronized with audio. */
-        /* UNLESS... we had to clip.  In this case, resync nexttrigger
-           with the wall clock. */
-        if (delay_clipping)
-        {
-            gettimeofday(&nexttrigger, NULL);
-            delay_clipping = false;
-        }
-    }
-
-    if (!disablevideo)
-    {
-        videoOutput->PrepareFrame(buffer);
-        videoOutput->Show(m_scan);
-    }
-    /* a/v sync assumes that when 'Show' returns, that is the instant
-       the frame has become visible on screen */
-
-    if (output_jmeter && output_jmeter->RecordCycleTime())
-        cerr << avsync_delay / 1000 << endl;
-
-    /* The value of nexttrigger is perfect -- we calculated it to
-        be exactly one frame time after the previous frame,
-        plus just enough feedback to stay synchronized with audio. */
-
-    nexttrigger.tv_usec += frame_interval;
-
-    /* Apply just a little feedback. The ComputeAudiotime() function is
-       jittery, so if we try to correct our entire A/V drift on each frame,
-       video output is jerky. Instead, correct a fraction of the computed
-       drift on each frame.
-
-       In steady state, very little feedback is needed. However, if we are
-       far out of sync, we need more feedback. So, we case on this. */
-
-    if (audioOutput && normal_speed)
-    {
-        lastaudiotime = audioOutput->GetAudiotime(); // ms, same scale as timecodes
-        if (lastaudiotime != 0) // lastaudiotime = 0 after a seek
-        {
-            /* if we were perfect, (timecodes[rpos] - frame_time)
-               and lastaudiotime would match, and this adjustment
-               wouldn't do anything */
-
-            /* The time at the start of this frame (ie, now) is
-               given by timecodes[rpos] */
-
-            avsync_delay = (buffer->timecode - lastaudiotime) * 1000; // uSecs
-
-            if (avsync_delay < -100000 || avsync_delay > 100000)
-                nexttrigger.tv_usec += avsync_delay / 3; // re-syncing
-            else
-                nexttrigger.tv_usec += avsync_delay / 30; // steady state
-        }
-    }
+        warpbuffsize = 0;
+    }   
 }
 
 void NuppelVideoPlayer::OutputVideoLoop(void)
@@ -1700,11 +1323,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     refreshrate = 0;
     lastsync = false;
-    hasvsync = false;
-    hasvgasync = false;
 
-    reducejitter = gContext->GetNumSetting("ReduceJitter", 0);
-    experimentalsync = gContext->GetNumSetting("ExperimentalAVSync", 0);
     usevideotimebase = gContext->GetNumSetting("UseVideoTimebase", 0);
 
     if ((print_verbose_messages & VB_PLAYBACK) != 0)
@@ -1714,12 +1333,29 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     refreshrate = frame_interval;
 
-    gettimeofday(&nexttrigger, NULL);
+    int fr_int = (int)(1000000.0 / video_frame_rate / play_speed);
+    if (disablevideo) 
+    {
+        videosync = new USleepVideoSync(fr_int, 0, false);
+    }
+    else
+    {
+        // For XvMC displaying interlaced video, use double frame rate
+        // showing fields alternately
+        m_deinterlace = false;
+#ifdef USING_XVMC
+        if (m_scan == kScan_Interlaced &&
+            forceVideoOutput == kVideoOutput_XvMC &&
+            gContext->GetNumSetting("Deinterlace"))
+            m_deinterlace = true;
+#endif
+        videosync = VideoSync::BestMethod(
+            fr_int, videoOutput->GetRefreshRate(), m_deinterlace);
+    }
 
-    if (usevideotimebase)
-        InitVTAVSync();
-    else if (experimentalsync)
-        InitExAVSync();
+    InitAVSync();
+
+    videosync->Start();
 
     while (!eof && !killvideo)
     {
@@ -1749,7 +1385,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
             videoOutput->PrepareFrame(NULL); 
             videoOutput->Show(m_scan);
-            ResetNexttrigger(&nexttrigger);
+            videosync->Start();
 
             //printf("video waiting for unpause\n");
             usleep(frame_interval);
@@ -1766,7 +1402,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                                         frame_interval * 4 / 1000))
                 VERBOSE(VB_PLAYBACK, "prebuffer wait timed out..");
             prebuffering_lock.unlock();
-            ResetNexttrigger(&nexttrigger);
+            videosync->Start();
             continue;
         }
         prebuffering_lock.unlock();
@@ -1789,14 +1425,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
         videofiltersLock.unlock();
 
-        if (usevideotimebase)
-            VTAVSync();
-        else if (experimentalsync)
-            ExAVSync();
-        else 
-            OldAVSync();
-
-        NormalizeTimeval(&nexttrigger);
+        AVSync();
 
         videoOutput->DoneDisplayingFrame();
 
@@ -1808,10 +1437,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     videoOutput = NULL;
     vidExitLock.unlock();
 
-    if (usevideotimebase)
-        ShutdownVTAVSync();
-    else if (experimentalsync)
-        ShutdownExAVSync();
+    ShutdownAVSync();
 }
 
 #ifdef USING_IVTV
@@ -2131,6 +1757,8 @@ void NuppelVideoPlayer::StartPlaying(void)
 
             DoSkipCommercials(skipcommercials);
             UnpauseVideo();
+            while (GetVideoPause())
+                usleep(50);
 
             skipcommercials = 0;
             continue;
@@ -2148,7 +1776,13 @@ void NuppelVideoPlayer::StartPlaying(void)
             if (deleteIter.key() == totalFrames)
                 eof = 1;
             else
+            {
+                PauseVideo();
                 JumpToFrame(deleteIter.key());
+                UnpauseVideo();
+                while (GetVideoPause())
+                    usleep(50);
+            }
         }
     }
 
@@ -3735,7 +3369,13 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                 }
 
                 if (autocommercialskip == 1)
+                {
+                    PauseVideo();
                     JumpToFrame(commBreakIter.key());
+                    UnpauseVideo();
+                    while (GetVideoPause())
+                        usleep(50);
+                }
             }
 
             if (autocommercialskip == 1)
