@@ -2456,3 +2456,13 @@
   ALT modifiers mean that the Modifier + ESC key must be pressed to
   activate the exit from MythTV function.
 
+  [1mNOTE[22m:  Users that have been running the frontend and the backend on
+  different machines using Red Hat Linux 8.0 have stated that they have
+  been having issues with remote access of the MySQL database.  This is
+  not yet a supported configuration.  The following instructions may or
+  may not work.  Add the following to /etc/my.cnf on the backend
+  machine.
+
+       skip-innodb
+       set-variable=thread_stack=256k
+

@@ -217,6 +217,18 @@ until you get to the System Shutdown parameter.  By default, this is set to
 set it to "ESC", this will mean that the ESC key is used to exit
 MythTV.  Control, Meta and ALT modifiers mean that the Modifier + ESC key
 must be pressed to activate the exit from MythTV function.</P>
+<P><B>NOTE</B>:  Users that have been running the frontend and the backend on
+different machines using Red Hat Linux 8.0 have stated that they have been
+having issues with remote access of the MySQL database.  This is not yet a
+supported configuration.  The following instructions may or may not work. 
+Add the following to <CODE>/etc/my.cnf</CODE> on the backend machine.
+<BLOCKQUOTE><CODE>
+<PRE>
+skip-innodb
+set-variable=thread_stack=256k
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <HR>
 Next

@@ -2358,6 +2358,16 @@ set it to "ESC", this will mean that the ESC key is used to exit
 MythTV.  Control, Meta and ALT modifiers mean that the Modifier + ESC key
 must be pressed to activate the exit from MythTV function.
 
+<bf>NOTE</bf>:  Users that have been running the frontend and the backend on
+different machines using Red Hat Linux 8.0 have stated that they have been
+having issues with remote access of the MySQL database.  This is not yet a
+supported configuration.  The following instructions may or may not work. 
+Add the following to <tt>/etc/my.cnf</tt> on the backend machine.
+<tscreen><verb>
+skip-innodb
+set-variable=thread_stack=256k
+</verb></tscreen>
+
 </article>
 <!-- Revision History
 v1.00, 2002-11-05.  Initial.
@@ -2486,6 +2496,7 @@ RPM install.
 v1.086, 2003-01-29.  More on resolution hints.
 v1.087, 2003-01-30.  Pointer to VCDHelp's webpage on resolution.
 v1.088, 2003-02-01.  Added a section to check on the symlink in lirc.
+v1.089, 2003-02-03.  Added RH80 remote database instructions for v0.8
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
