@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.26 (xris)
+#Last Updated: 2005.01.21 (xris)
 #
 #  transcode.pm
 #
@@ -94,7 +94,7 @@ package export::transcode;
         load_finfo($episode);
     # Start the transcode command
         $transcode = "nice -n $Args{'nice'} transcode"
-                    .' -V'                     # use YV12/I420 instead of RGB, for faster processing
+                    # this is now the default:  .' -V'                     # use YV12/I420 instead of RGB, for faster processing
                     #.' -u 100,'.($num_cpus);   # Take advantage of multiple CPU's?  currently disabled because it actually seems to slow things down
                     ;
     # Not an mpeg
@@ -182,8 +182,9 @@ package export::transcode;
         $fps = 0.0;
         my $total_frames = $episode->{'lastgop'} ? ($episode->{'lastgop'} * (($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 12 : 15)) : 0;
     # Keep track of any warnings
-        my $warnings = '';
-        my $critical = 0;
+        my $warnings    = '';
+        my $death_timer = 0;
+        my $last_death  = '';
 	# Wait for child processes to finish
         while ((keys %children) > 0) {
             my $l;
@@ -208,8 +209,7 @@ package export::transcode;
                 }
                 elsif ($l =~ m/\[transcode\] critical/) {
                     $warnings .= $l;
-                    $critical  = 1;
-                    last;
+                    die "\n\nTranscode had critical errors:\n\n$warnings";
                 }
             }
         # Read from the mythtranscode handle?
@@ -221,13 +221,24 @@ package export::transcode;
                     }
                 }
             }
+        # Has the deathtimer been started?  Stick around for awhile, but not too long
+            if ($death_timer > 0 && time() - $death_timer > 30) {
+                $str = "\n\n$last_death died early.";
+                if ($warnings) {
+                    $str .= "See transcode warnings:\n\n$warnings";
+                }
+                else {
+                    $str .= "Please use the --debug option to figure out what went wrong.\n\n";
+                }
+                die $str;
+            }
         # The pid?
             $pid = waitpid(-1, &WNOHANG);
             if ($children{$pid}) {
                 print "\n$children{$pid} finished.\n" unless ($DEBUG);
+                $last_death  = $children{$pid};
+                $death_timer = time();
                 delete $children{$pid};
-                ##### do something here to track the time for the next process to die.
-                ##### If we wait too long, something obviously ended too early.
             }
         # Sleep for 1/10 second so we don't go too fast and annoy the cpu
             usleep(100000);
@@ -236,10 +247,6 @@ package export::transcode;
         if ($mythtranscode) {
             unlink "/tmp/fifodir_$$/audout", "/tmp/fifodir_$$/vidout";
             rmdir "/tmp/fifodir_$$";
-        }
-    # Critical errors?
-        if ($critical) {
-            die "Transcode had critical errors:\n\n$warnings\n";
         }
     }
 
