@@ -860,6 +860,14 @@ int main(int argc, char **argv)
 
     VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
+    lcd_host = gContext->GetSetting("LCDHost", "localhost");
+    lcd_port = gContext->GetNumSetting("LCDPort", 13666);
+    if (lcd_host.length() > 0 && lcd_port > 1024 && gContext->GetLCDDevice())
+    {
+        gContext->GetLCDDevice()->connectToHost(lcd_host, lcd_port);
+        gContext->GetLCDDevice()->setupLEDs(RemoteGetRecordingMask);
+    }
+
     translator->load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") + 
                      QString(gContext->GetSetting("Language").lower()) + 
                      QString(".qm"), ".");
@@ -895,15 +903,6 @@ int main(int argc, char **argv)
     gContext->SetPluginManager(pmanager);
 
     gContext->UpdateImageCache();
-
-    lcd_host = gContext->GetSetting("LCDHost", "localhost");
-    lcd_port = gContext->GetNumSetting("LCDPort", 13666);
-
-    if (lcd_host.length() > 0 && lcd_port > 1024 && gContext->GetLCDDevice())
-    {
-        gContext->GetLCDDevice()->connectToHost(lcd_host, lcd_port);
-        gContext->GetLCDDevice()->setupLEDs(RemoteGetRecordingMask);
-    }
 
     if (gContext->GetNumSetting("EnableXbox") == 1)
     {

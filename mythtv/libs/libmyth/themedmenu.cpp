@@ -141,6 +141,8 @@ class ThemedMenuPrivate
                       const QString &password_setting,
                       const QString &text);
 
+    void updateLCD(void);
+
     ThemedMenu *parent;
 
     float wmult;
@@ -1278,28 +1280,37 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
     {
         titleText = "MYTH-";
         titleText += menumode;
-        QPtrList<LCDMenuItem> menuItems;
-        menuItems.setAutoDelete(true);
-        bool selected;
-
-        for (int r = 0; r < (int)buttonRows.size(); r++)
-        {
-            if (r == currentrow)
-                selected = true;
-            else
-                selected = false;
-
-            if (currentcolumn < buttonRows[r].numitems)
-                menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
-                                 buttonRows[r].buttons[currentcolumn]->text));
-        }
-
-        if (!menuItems.isEmpty())
-            lcddev->switchToMenu(&menuItems, titleText);
+        updateLCD();
     }
 
     selection = "";
     parent->update(menuRect());
+}
+
+void ThemedMenuPrivate::updateLCD()
+{
+    if (!lcddev)
+        return;
+
+    // Build a list of the menu items
+    QPtrList<LCDMenuItem> menuItems;
+    menuItems.setAutoDelete(true);
+    bool selected;
+
+    for (int r = 0; r < (int)buttonRows.size(); r++)
+    {
+        if (r == currentrow)
+            selected = true;
+        else
+            selected = false;
+
+        if (currentcolumn < buttonRows[r].numitems)
+            menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
+                             buttonRows[r].buttons[currentcolumn]->text));
+    }
+
+    if (!menuItems.isEmpty())
+        lcddev->switchToMenu(&menuItems, titleText);
 }
 
 QPoint ThemedMenuPrivate::parsePoint(const QString &text)
@@ -1976,27 +1987,7 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
     }
 
     activebutton = buttonRows[currentrow].buttons[currentcolumn];
-    if (lcddev)
-    {
-        // Build a list of the menu items
-        QPtrList<LCDMenuItem> menuItems;
-        menuItems.setAutoDelete(true);
-        bool selected;
-        for (int r = 0; r < (int)buttonRows.size(); r++)
-        {
-            if (r == currentrow)
-                selected = true;
-            else
-                selected = false;
-
-            if (currentcolumn < buttonRows[r].numitems)
-                menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
-                                 buttonRows[r].buttons[currentcolumn]->text));
-        }
-
-        if (!menuItems.isEmpty())
-            lcddev->switchToMenu(&menuItems, titleText);
-    }
+    updateLCD();
 
     parent->update(watermarkRect);
     if (lastbutton)
@@ -2316,6 +2307,8 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
         if (r.intersects(d->buttonList[i].posRect))
             d->paintButton(i, &p, e->erased());
     }
+
+    d->updateLCD();
 }
 
 void ThemedMenu::ReloadTheme(void)
