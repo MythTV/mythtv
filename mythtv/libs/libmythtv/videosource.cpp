@@ -314,9 +314,7 @@ void CardInputEditor::load(QSqlDatabase* db) {
     if (capturecards.isActive() && capturecards.numRowsAffected() > 0)
         while (capturecards.next()) {
             int cardid = capturecards.value(0).toInt();
-            QString videodevice("[ " + capturecards.value(2).toString() + 
-                                " : " + capturecards.value(1).toString() + 
-                                " ]");
+            QString videodevice(capturecards.value(1).toString());
 
             QStringList inputs;
             if (capturecards.value(2).toString() != "DVB")
@@ -331,7 +329,9 @@ void CardInputEditor::load(QSqlDatabase* db) {
                 QString index = QString::number(cardinputs.size()-1);
 
                 QString label = QString("%1 (%2) -> %3")
-                    .arg(videodevice)
+                    .arg("[ " + capturecards.value(2).toString() + 
+                         " : " + capturecards.value(1).toString() + 
+                         " ]")
                     .arg(*i)
                     .arg(cardinput->getSourceName());
                 addSelection(label, index);
