@@ -1785,18 +1785,18 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                         "tvformat = \"%7\" "
                                         " WHERE xmltvid = \"%8\" "
                                         "AND sourceid = %9;")
-                                        .arg(chanid.utf8())
-                                        .arg((*i).name.utf8())
-                                        .arg((*i).callsign.utf8())
-                                        .arg((*i).chanstr.utf8())
-                                        .arg(atoi((*i).finetune.utf8()))
-                                        .arg(localfile.utf8())
-                                        .arg((*i).freqid.utf8())
-                                        .arg((*i).tvformat.utf8())
-                                        .arg((*i).xmltvid.utf8())
+                                        .arg(chanid)
+                                        .arg((*i).name)
+                                        .arg((*i).callsign)
+                                        .arg((*i).chanstr)
+                                        .arg(atoi((*i).finetune))
+                                        .arg(localfile)
+                                        .arg((*i).freqid)
+                                        .arg((*i).tvformat)
+                                        .arg((*i).xmltvid)
                                         .arg(id);
 
-                    if (!query.exec(querystr))
+                    if (!query.exec(querystr.utf8()))
                     {
                         cerr << "DB Error: Channel update failed, SQL query "
                              << "was:" << endl;
@@ -1859,17 +1859,17 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                        "VALUES(%0,\"%1\",\"%2\",\"%3\",%4,"
                                        "\"%5\",\"%6\",%7,\"%8\",\"%9\");")
                                        .arg(chanid)
-                                       .arg((*i).name.utf8())
-                                       .arg((*i).callsign.utf8())
-                                       .arg((*i).chanstr.utf8())
+                                       .arg((*i).name)
+                                       .arg((*i).callsign)
+                                       .arg((*i).chanstr)
                                        .arg(atoi((*i).finetune))
-                                       .arg(localfile.utf8())
-                                       .arg((*i).xmltvid.utf8())
+                                       .arg(localfile)
+                                       .arg((*i).xmltvid)
                                        .arg(id)
-                                       .arg((*i).freqid.utf8())
-                                       .arg((*i).tvformat.utf8());
+                                       .arg((*i).freqid)
+                                       .arg((*i).tvformat);
 
-                    if (!query.exec(querystr))
+                    if (!query.exec(querystr.utf8()))
                     {
                         MythContext::DBError("Channel insert", query);
                     }
@@ -1918,7 +1918,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                    "VALUES(%0,\"%1\",\"%2\",\"%3\",%4,\"%5\","
                                    "\"%6\",%7,\"%8\",\"%9\");")
                                    .arg(chanid)
-                                   .arg((*i).name.utf8())
+                                   .arg((*i).name)
                                    .arg((*i).callsign)
                                    .arg((*i).chanstr)
                                    .arg(atoi((*i).finetune))
@@ -1928,7 +1928,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                    .arg((*i).freqid)
                                    .arg((*i).tvformat);
 
-                if (!query.exec(querystr))
+                if (!query.exec(querystr.utf8()))
                     MythContext::DBError("channel insert", query);
 
             }
@@ -2020,30 +2020,30 @@ void handlePrograms(int id, int offset, QMap<QString,
 
             if (no_delete)
             {
-                querystr.sprintf("SELECT * FROM program WHERE chanid=%d AND "
-                                 "starttime=\"%s\" AND endtime=\"%s\" AND "
-                                 "title=\"%s\" AND subtitle=\"%s\" AND "
-                                 "description=\"%s\" AND category=\"%s\";",
-                                 chanid, 
-                                 (*i).start.toString("yyyyMMddhhmmss").ascii(), 
-                                 (*i).end.toString("yyyyMMddhhmmss").ascii(), 
-                                 (*i).title.utf8().data(), 
-                                 (*i).subtitle.utf8().data(), 
-                                 (*i).desc.utf8().data(), 
-                                 (*i).category.utf8().data());
+                querystr = QString("SELECT * FROM program WHERE chanid=%1 AND "
+                                   "starttime=\"%2\" AND endtime=\"%3\" AND "
+                                   "title=\"%4\" AND subtitle=\"%5\" AND "
+                                   "description=\"%6\" AND category=\"%7\";")
+                                   .arg(chanid)
+                                   .arg((*i).start.toString("yyyyMMddhhmmss")) 
+                                   .arg((*i).end.toString("yyyyMMddhhmmss")) 
+                                   .arg((*i).title) 
+                                   .arg((*i).subtitle) 
+                                   .arg((*i).desc) 
+                                   .arg((*i).category);
 
-                query.exec(querystr.utf8().data());
+                query.exec(querystr.utf8());
 
                 if (query.isActive() && query.numRowsAffected() > 0)
                     continue;
 
-                querystr.sprintf("SELECT title,subtitle,starttime,endtime "
-                                 "FROM program WHERE chanid=%d AND "
-                                 "starttime>=\"%s\" AND starttime<\"%s\";",
-                                 chanid, 
-                                 (*i).start.toString("yyyyMMddhhmmss").ascii(), 
-                                 (*i).end.toString("yyyyMMddhhmmss").ascii());
-                query.exec(querystr.utf8().data());
+                querystr = QString("SELECT title,subtitle,starttime,endtime "
+                                   "FROM program WHERE chanid=%1 AND "
+                                   "starttime>=\"%2\" AND starttime<\"%3\";")
+                                   .arg(chanid)
+                                   .arg((*i).start.toString("yyyyMMddhhmmss"))
+                                   .arg((*i).end.toString("yyyyMMddhhmmss"));
+                query.exec(querystr.utf8());
 
                 if (query.isActive() && query.numRowsAffected() > 0)
                 {
@@ -2062,48 +2062,50 @@ void handlePrograms(int id, int offset, QMap<QString,
                          << (*i).startts << "-" << (*i).endts << endl;
                     cerr << endl;
 
-                    querystr.sprintf("DELETE FROM program WHERE chanid=%d AND "
-                                     "starttime>=\"%s\" AND starttime<\"%s\";",
-                                     chanid, 
-                                     (*i).start.toString("yyyyMMddhhmmss").ascii(), 
-                                     (*i).end.toString("yyyyMMddhhmmss").ascii());
-                    query.exec(querystr.utf8().data());
+                    querystr = QString("DELETE FROM program WHERE chanid=%1 AND"
+                                     " starttime>=\"%2\" AND starttime<\"%3\";")
+                                     .arg(chanid)
+                                     .arg((*i).start.toString("yyyyMMddhhmmss"))
+                                     .arg((*i).end.toString("yyyyMMddhhmmss"));
+                    query.exec(querystr.utf8());
 
-                    querystr.sprintf("DELETE FROM programrating WHERE chanid=%d AND "
-                                     "starttime>=\"%s\" AND starttime<\"%s\";",
-                                     chanid, 
-                                     (*i).start.toString("yyyyMMddhhmmss").ascii(), 
-                                     (*i).end.toString("yyyyMMddhhmmss").ascii());
-                    query.exec(querystr.utf8().data());
+                    querystr = QString("DELETE FROM programrating WHERE chanid=%1 AND "
+                                       "starttime>=\"%2\" AND starttime<\"%3\";")
+                                      .arg(chanid)
+                                      .arg((*i).start.toString("yyyyMMddhhmmss"))
+                                      .arg((*i).end.toString("yyyyMMddhhmmss"));
+                    query.exec(querystr.utf8());
 
-                    querystr.sprintf("DELETE FROM credits WHERE chanid=%d AND "
-                                     "starttime>=\"%s\" AND starttime<\"%s\";",
-                                     chanid,
-                                     (*i).start.toString("yyyyMMddhhmmss").ascii(),
-                                     (*i).end.toString("yyyyMMddhhmmss").ascii());
-                    query.exec(querystr.utf8().data());
+                    querystr = QString("DELETE FROM credits WHERE chanid=%1 AND "
+                                      "starttime>=\"%2\" AND starttime<\"%3\";")
+                                      .arg(chanid)
+                                      .arg((*i).start.toString("yyyyMMddhhmmss"))
+                                      .arg((*i).end.toString("yyyyMMddhhmmss"));
+                    query.exec(querystr.utf8());
                 }
             }
 
-            querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
-                             "title,title_pronounce,subtitle,description,category,"
-                             "category_type,airdate,stars,previouslyshown) "
-                             "VALUES(%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\","
-                             "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%d\");", 
-                             chanid, 
-                             (*i).start.toString("yyyyMMddhhmmss").ascii(), 
-                             (*i).end.toString("yyyyMMddhhmmss").ascii(), 
-                             (*i).title.utf8().data(), 
-                             (*i).pronounce.utf8().data(), 
-                             (*i).subtitle.utf8().data(), 
-                             (*i).desc.utf8().data(), 
-                             (*i).category.utf8().data(),
-                             (*i).catType.utf8().data(),
-                             (*i).airdate.utf8().data(),
-                             (*i).stars.utf8().data(),
-                             (*i).repeat);
+            query.prepare("INSERT INTO program (chanid,starttime,endtime,"
+                          "title,title_pronounce,subtitle,description,category,"
+                          "category_type,airdate,stars,previouslyshown) "
+                          "VALUES(:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
+                          ":TITLE_PRONOUNCE,:SUBTITLE,"
+                          ":DESCRIPTION,:CATEGORY,:CATEGORY_TYPE,:AIRDATE,"
+                          ":STARS,:PREVIOUSLYSHOWN);");
+            query.bindValue(":CHANID", chanid);
+            query.bindValue(":STARTTIME", (*i).start.toString("yyyyMMddhhmmss"));
+            query.bindValue(":ENDTIME", (*i).end.toString("yyyyMMddhhmmss"));
+            query.bindValue(":TITLE", (*i).title.utf8());
+            query.bindValue(":TITLE_PRONOUNCE", (*i).pronounce.utf8());
+            query.bindValue(":SUBTITLE", (*i).subtitle.utf8());
+            query.bindValue(":DESCRIPTION", (*i).desc.utf8());
+            query.bindValue(":CATEGORY", (*i).category.utf8());
+            query.bindValue(":CATEGORY_TYPE", (*i).catType.utf8());
+            query.bindValue(":AIRDATE", (*i).airdate.utf8());
+            query.bindValue(":STARS", (*i).stars.utf8());
+            query.bindValue(":PREVIOUSLYSHOWN", (*i).repeat);
 
-            if (!query.exec(querystr.utf8().data()))
+            if (!query.exec(querystr))
             {
                 MythContext::DBError("program insert", query);
             }
@@ -2111,14 +2113,14 @@ void handlePrograms(int id, int offset, QMap<QString,
             QValueList<ProgRating>::iterator j = (*i).ratings.begin();
             for (; j != (*i).ratings.end(); j++)
             {
-                querystr.sprintf("INSERT INTO programrating (chanid,starttime,"
-                "system,rating) VALUES (%d, \"%s\", \"%s\", \"%s\");",
-                chanid,
-                (*i).start.toString("yyyyMMddhhmmss").ascii(),
-                (*j).system.utf8().data(),
-                (*j).rating.utf8().data());
+                querystr = QString("INSERT INTO programrating (chanid,starttime,"
+                                "system,rating) VALUES (%1, \"%2\", \"%3\", \"%4\");")
+                                .arg(chanid)
+                                .arg((*i).start.toString("yyyyMMddhhmmss"))
+                                .arg((*j).system)
+                                .arg((*j).rating);
 
-                if (!query.exec(querystr.utf8().data()))
+                if (!query.exec(querystr.utf8()))
                 {
                     MythContext::DBError("programrating insert", query);
                 }
@@ -2129,9 +2131,9 @@ void handlePrograms(int id, int offset, QMap<QString,
             {
                 (*k).name.replace(QRegExp("\""), QString("\\\""));
 
-                querystr.sprintf("SELECT person FROM people WHERE "
-                                 "name = \"%s\";", (*k).name.utf8().data());
-                if (!query.exec(querystr.utf8().data()))
+                querystr = QString("SELECT person FROM people WHERE "
+                                   "name = \"%1\";").arg((*k).name);
+                if (!query.exec(querystr.utf8()))
                     MythContext::DBError("person lookup", query);
 
                 int personid = -1;
@@ -2143,15 +2145,15 @@ void handlePrograms(int id, int offset, QMap<QString,
 
                 if (personid < 0)
                 {
-                    querystr.sprintf("INSERT INTO people (name) VALUES "
-                                     "(\"%s\");", (*k).name.utf8().data());
-                    if (!query.exec(querystr.utf8().data()))
+                    querystr = QString("INSERT INTO people (name) VALUES "
+                                     "(\"%1\");").arg((*k).name);
+                    if (!query.exec(querystr.utf8()))
                         MythContext::DBError("person insert", query);
 
-                    querystr.sprintf("SELECT person FROM people WHERE "
-                                     "name = \"%s\";", (*k).name.utf8().data());
-                    if (!query.exec(querystr.utf8().data()))
-                        MythContext::DBError("person lookup", query);
+                    querystr = QString("SELECT person FROM people WHERE "
+                                     "name = \"%1\";").arg((*k).name);
+                    if (!query.exec(querystr.utf8()))
+                       MythContext::DBError("person lookup", query);
 
                     if (query.isActive() && query.numRowsAffected() > 0)
                     {
@@ -2166,28 +2168,27 @@ void handlePrograms(int id, int offset, QMap<QString,
                     continue;
                 }
 
-                querystr.sprintf("INSERT INTO credits (chanid,starttime,"
-                                 "role,person) VALUES "
-                                 "(%d, \"%s\", \"%s\", %d);",
-                                 chanid,
-                                 (*i).start.toString("yyyyMMddhhmmss").ascii(),
-                                 (*k).role.ascii(),
-                                 personid);
-
-                if (!query.exec(querystr.utf8().data()))
+                querystr = QString("INSERT INTO credits (chanid,starttime,"
+                                   "role,person) VALUES "
+                                   "(%1, \"%2\", \"%3\", %4);")
+                                   .arg(chanid)
+                                   .arg((*i).start.toString("yyyyMMddhhmmss"))
+                                   .arg((*k).role)
+                                   .arg(personid);
+                if (!query.exec(querystr.utf8()))
                 {
                     // be careful of the startime/timestamp "feature"!
-                    querystr.sprintf("UPDATE credits SET "
-                                     "role = concat(role,',%s'), "
-                                     "starttime = %s "
-                                     "WHERE chanid = %d AND "
-                                        "starttime = %s and person = %d",
-                                     (*k).role.ascii(),
-                                     (*i).start.toString("yyyyMMddhhmmss").ascii(),
-                                     chanid,
-                                     (*i).start.toString("yyyyMMddhhmmss").ascii(),
-                                     personid);
-                    if (!query.exec(querystr.utf8().data()))
+                    querystr = QString("UPDATE credits SET "
+                                       "role = concat(role,',%1'), "
+                                       "starttime = %2 "
+                                       "WHERE chanid = %3 AND "
+                                       "starttime = %4 and person = %5")
+                                       .arg((*k).role)
+                                       .arg((*i).start.toString("yyyyMMddhhmmss"))
+                                       .arg(chanid)
+                                       .arg((*i).start.toString("yyyyMMddhhmmss"))
+                                       .arg(personid);
+                    if (!query.exec(querystr.utf8()))
                         MythContext::DBError("credits update", query);
                 }
             }
@@ -2226,7 +2227,7 @@ time_t toTime_t(QDateTime &dt)
 
 bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 {
-    QString xmltv_grabber = source.xmltvgrabber + graboptions;
+    QString xmltv_grabber = source.xmltvgrabber;
 
     if (xmltv_grabber == "datadirect")
         return grabDDData(source, offset, *qCurrentDate);
@@ -2323,6 +2324,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          xmltv_grabber == "tv_grab_jp"))
          command += " --quiet";
 
+
+    command += graboptions;
 
     if (!quiet)
          cout << "----------------- Start of XMLTV output -----------------" << endl;
@@ -2776,11 +2779,12 @@ int fix_end_times(void)
         chanid = query1.value(0).toString();
         endtime = query1.value(2).toString();
 
-        querystr.sprintf("SELECT chanid, starttime, endtime FROM program "
-                         "WHERE (DATE_FORMAT(starttime, \"%%Y-%%m-%%d\") = "
-                         "\"%s\") AND chanid = \"%s\" "
-                         "ORDER BY starttime LIMIT 1;", 
-                         endtime.left(10).ascii(), chanid.ascii());
+        querystr = QString("SELECT chanid, starttime, endtime FROM program "
+                           "WHERE (DATE_FORMAT(starttime, \"%%Y-%%m-%%d\") = "
+                           "\"%1\") AND chanid = \"%2\" "
+                           "ORDER BY starttime LIMIT 1;")
+                           .arg(endtime.left(10))
+                           .arg(chanid);
 
         if (!query2.exec(querystr))
         {
@@ -2792,11 +2796,12 @@ int fix_end_times(void)
         {
             count++;
             endtime = query2.value(1).toString();
-            querystr.sprintf("UPDATE program SET starttime = \"%s\", "
-                             "endtime = \"%s\" WHERE (chanid = \"%s\" AND "
-                             "starttime = \"%s\");", starttime.ascii(), 
-                             endtime.ascii(), chanid.ascii(), 
-                             starttime.ascii());
+            querystr = QString("UPDATE program SET starttime = \"%1\", "
+                               "endtime = \"%2\" WHERE (chanid = \"%3\" AND "
+                               "starttime = \"%4\");")
+                               .arg(starttime)
+                               .arg(endtime, chanid)
+                               .arg(starttime);
 
             if (!query2.exec(querystr)) 
             {
