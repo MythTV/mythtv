@@ -22,7 +22,7 @@ class MythContext
 
     void GetScreenSettings(int &width, float &wmult, int &height, float &hmult);
    
-    QString RunProgramGuide(QString startchannel);
+    QString RunProgramGuide(QString startchannel, bool thread = false);
  
     QString FindThemeDir(QString themename);
 

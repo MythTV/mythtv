@@ -4,6 +4,7 @@
 #include <qpixmap.h>
 #include <qdir.h>
 #include <qpainter.h>
+#include <unistd.h>
 
 #include "mythcontext.h"
 #include "settings.h"
@@ -114,12 +115,29 @@ QString MythContext::FindThemeDir(QString themename)
     return "";
 }
 
-QString MythContext::RunProgramGuide(QString startchannel)
+QString MythContext::RunProgramGuide(QString startchannel, bool thread = false)
 {
+    if (thread)
+        qApp->lock();
+ 
     GuideGrid gg(this, startchannel);
-    gg.exec();
 
-    return gg.getLastChannel();
+    if (thread)
+    {
+        gg.show();
+        qApp->unlock();
+
+        while (gg.isVisible())
+            usleep(50);
+    }
+    else 
+        gg.exec();
+
+    QString chanstr = gg.getLastChannel();
+    if (chanstr == QString::null)
+        chanstr = "";
+
+    return chanstr;
 }
 
 int MythContext::OpenDatabase(QSqlDatabase *db)

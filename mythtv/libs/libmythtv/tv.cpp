@@ -1882,18 +1882,13 @@ bool TV::ChangeExternalChannel(const QString &channum)
 
 void TV::doLoadMenu(void)
 {
-    QString epgname = "mythepg";
+    QString chanstr = context->RunProgramGuide(channel->GetCurrentName(), 
+                                               true);
 
-    char runname[512];
-
-    sprintf(runname, "%s %s", epgname.ascii(), 
-            channel->GetCurrentName().ascii());
-    int ret = system(runname);
-
-    if (ret > 0)
+    if (chanstr != "")
     {
-        ret = WEXITSTATUS(ret);
-        sprintf(channelKeys, "%d", ret);
+        chanstr = chanstr.left(3);
+        sprintf(channelKeys, "%s", chanstr.ascii());
         channelqueued = true; 
     }
 
