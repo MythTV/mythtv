@@ -61,7 +61,7 @@ contains( HAVE_MLIB, yes ) {
 contains( TARGET_ARCH_ALPHA, yes ) {
     OBJS += alpha/dsputil_alpha.c alpha/mpegvideo_alpha.c 
     OBJS += alpha/motion_est_alpha.c alpha/dsputil_alpha_asm.S
-    QMAKE_CFLAGS_RELEASE += -Wa,-mpca56 --finline-limit=8000 -fforce-addr -freduce-all-givs
+    QMAKE_CFLAGS_RELEASE += -fforce-addr -freduce-all-givs
 }
 
 contains( TARGET_ARCH_POWERPC, yes ) {
