@@ -42,7 +42,7 @@
     </message>
     <message>
         <source>Partly Cloudy</source>
-        <translation>Teilweise bewölkt</translation>
+        <translation>Teilw. bewölkt</translation>
     </message>
     <message>
         <source>Light Rain</source>
@@ -94,23 +94,23 @@
     </message>
     <message>
         <source>PM Showers</source>
-        <translation>Nachm. Regen</translation>
+        <translation>Nachm. Schauer</translation>
     </message>
     <message>
         <source>PM Showers/Wind</source>
-        <translation>Nachm. Regen/Wind</translation>
+        <translation>Nachm. Schauer/Wind</translation>
     </message>
     <message>
         <source>Rain/Snow Showers</source>
-        <translation>Regen/Schneeregen</translation>
+        <translation>Regen/Schneeschauer</translation>
     </message>
     <message>
         <source>Few Snow Showers</source>
-        <translation>Vereinzelter Schneeregen</translation>
+        <translation>Vereinzelte Schneeschauer</translation>
     </message>
     <message>
         <source>Cloudy/Wind</source>
-        <translation>Wolkig/Windig</translation>
+        <translation>Bewölkt/Windig</translation>
     </message>
     <message>
         <source>Flurries/Wind</source>
@@ -118,7 +118,7 @@
     </message>
     <message>
         <source>Mostly Cloudy/Windy</source>
-        <translation>Meist wolkig/Windig</translation>
+        <translation>Meist bewölkt/windig</translation>
     </message>
     <message>
         <source>Rain/Thunder</source>
@@ -126,7 +126,7 @@
     </message>
     <message>
         <source>Partly Cloudy/Windy</source>
-        <translation>Teilweise bewölkt/Windig</translation>
+        <translation>Teilw. bewölkt/windig</translation>
     </message>
     <message>
         <source>AM Rain/Snow Showers</source>
@@ -154,7 +154,7 @@
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
-        <translation>Verteilt böeige Winde</translation>
+        <translation>Verteilte böeige Winde</translation>
     </message>
     <message>
         <source>Sct Strong Storms</source>
@@ -194,7 +194,7 @@
     </message>
     <message>
         <source>AM Showers/Wind</source>
-        <translation>Vorm. Regen/Wind</translation>
+        <translation>Vorm. Schauer/Wind</translation>
     </message>
     <message>
         <source>Sct Snow Showers</source>
@@ -282,7 +282,7 @@
     </message>
     <message>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation>Sta. Regen/Gefr. Regen</translation>
+        <translation>sta. Regen/gefr. Regen</translation>
     </message>
     <message>
         <source>AM Light Snow</source>
@@ -290,7 +290,7 @@
     </message>
     <message>
         <source>Rain/Freezing Rain</source>
-        <translation>Regen/Gefr. Regen</translation>
+        <translation>Regen/gefr. Regen</translation>
     </message>
     <message>
         <source>T-Storms/Wind</source>
@@ -422,7 +422,7 @@
     </message>
     <message>
         <source>Light Rain Shower</source>
-        <translation>Leichter Regenschauer</translation>
+        <translation>Leichte Regenschauer</translation>
     </message>
     <message>
         <source>Light Rain with Thunder</source>
@@ -446,11 +446,11 @@
     </message>
     <message>
         <source>Light Snow Shower</source>
-        <translation>Leichter Schneeschauer</translation>
+        <translation>Leichte Schneeschauer</translation>
     </message>
     <message>
         <source>Light Snow Shower/ Windy</source>
-        <translation>Leichter Schneeschauer/Wind</translation>
+        <translation>Leichte Schneeschauer/Wind</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -540,7 +540,7 @@
     </message>
     <message>
         <source>[ retrieving weather data ... ]</source>
-        <translation>[ hole Wetterdaten ... ]</translation>
+        <translation>[ hole Wetterdaten... ]</translation>
     </message>
     <message>
         <source>current conditions</source>
@@ -556,7 +556,7 @@
     </message>
     <message>
         <source>Wind</source>
-        <translation>Windgeschwindigkeit</translation>
+        <translation>Windgeschw.</translation>
     </message>
     <message>
         <source>Visibility</source>
@@ -584,7 +584,7 @@
     </message>
     <message>
         <source>today&apos;s forecast</source>
-        <translation>Vorhersage für heute</translation>
+        <translation>Vorhersage für Heute</translation>
     </message>
     <message>
         <source>tomorrow&apos;s outlook</source>
@@ -636,15 +636,15 @@
     </message>
     <message>
         <source>COLD</source>
-        <translation type="unfinished"></translation>
+        <translation>kalt</translation>
     </message>
     <message>
         <source>COLDEST</source>
-        <translation type="unfinished"></translation>
+        <translation>am kältesten</translation>
     </message>
     <message>
         <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished"></translation>
+        <translation>Wolkentemperatur</translation>
     </message>
 </context>
 <context>
@@ -663,11 +663,11 @@
     </message>
     <message>
         <source>Use the right arrow key to select unit conversion...</source>
-        <translation>Pfeil-nach-rechts benutzen, um Einheitenkonvertierung zu wählen...</translation>
+        <translation>Mit Pfeil-Rechts das Maßsystem wählen...</translation>
     </message>
     <message>
         <source>Weather Units</source>
-        <translation>Wettereinheiten</translation>
+        <translation>Maßsystem</translation>
     </message>
     <message>
         <source>Location</source>
@@ -687,11 +687,11 @@
     </message>
     <message>
         <source>Use the right arrow key to select your location...</source>
-        <translation>Pfeil-nach-rechts benutzen, um Ort zu wählen...</translation>
+        <translation>Mit Pfeil-Rechts den Ort auswählen...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation>Pfeil-nach-rechts benutzen, um Agressivitäts-Level zu wählen...</translation>
+        <translation>Mit Pfeil-Rechts die Agressivitätsstufe wählen...</translation>
     </message>
     <message>
         <source> 1  High Speed Connection</source>
@@ -743,35 +743,35 @@
     </message>
     <message>
         <source>Today a high of </source>
-        <translation>Heute ein Hoch mit </translation>
+        <translation>Heute Höchstwerte um </translation>
     </message>
     <message>
         <source> and a low of </source>
-        <translation> und Tiefstwerte um </translation>
+        <translation>°C und Tiefstwerte um </translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
-        <translation>. Zzt. herrscht eine Luftfeuchtigkeit von </translation>
+        <translation>°C. Momentan herrscht eine Luftfeuchtigkeit von </translation>
     </message>
     <message>
         <source>% and the winds are</source>
-        <translation>% und der Wind ist </translation>
+        <translation>% und der Wind </translation>
     </message>
     <message>
         <source> calm.</source>
-        <translation>ruhig. </translation>
+        <translation>ist ruhig. </translation>
     </message>
     <message>
         <source> coming in at </source>
-        <translation> wehen mit </translation>
+        <translation>weht mit </translation>
     </message>
     <message>
         <source> mph from the </source>
-        <translation> MPH von </translation>
+        <translation> mph von </translation>
     </message>
     <message>
         <source> Km/h from the </source>
-        <translation> km/h von  </translation>
+        <translation> km/h von </translation>
     </message>
     <message>
         <source> Visibility will be unlimited for today.</source>
@@ -783,7 +783,7 @@
     </message>
     <message>
         <source> There will be a visibility of </source>
-        <translation> Es wir eine Sicht herrschen von </translation>
+        <translation> Die Sichtweite beträgt </translation>
     </message>
     <message>
         <source> miles.</source>
@@ -891,7 +891,7 @@
     </message>
     <message>
         <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation>Imperial (Fahrenheit, Inch, etc.)</translation>
+        <translation>Britisch (Fahrenheit, Inch, etc.)</translation>
     </message>
     <message>
         <source>Metric (Celsius, kPa, etc)</source>
@@ -915,15 +915,15 @@
     </message>
     <message>
         <source> - PAUSED -</source>
-        <translation> - PAUSIERT -</translation>
+        <translation> - PAUSE -</translation>
     </message>
     <message>
         <source>doppler radar</source>
-        <translation type="unfinished">Dopplerradar</translation>
+        <translation>Dopplerradar</translation>
     </message>
     <message>
         <source>satellite image</source>
-        <translation type="unfinished"></translation>
+        <translation>Satellitenbild</translation>
     </message>
 </context>
 </TS>
