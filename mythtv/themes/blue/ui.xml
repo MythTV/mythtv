@@ -1326,7 +1326,7 @@
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>200,40,440,30</area>
-        <altarea>160,40,620,30</altarea>
+        <altarea>200,40,580,30</altarea>
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
@@ -1386,7 +1386,7 @@
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>200,40,440,30</area>
-        <altarea>160,40,620,30</altarea>
+        <altarea>200,40,580,30</altarea>
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
