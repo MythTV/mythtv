@@ -1,10 +1,25 @@
+#!/usr/bin/perl -w
+#Last Updated: 2004.08.22 (xris)
+#
+#  nuv_utils
+#
+#   Utility routines for nuvexport and nuvinfo
+#
+
 package nuv_utils;
+
+    use Time::HiRes qw(usleep);
 
     use Exporter;
     our @ISA = qw/ Exporter /;
-    our @EXPORT = qw/ generate_showtime find_program nuv_info num_cpus fork_command shell_escape mysql_escape Quit system fifos_wait /;
+    our @EXPORT = qw/ generate_showtime find_program nuv_info num_cpus
+                      fork_command system fifos_wait has_data
+                      shell_escape mysql_escape Quit
+                    /;
 
     *DEBUG = *main::DEBUG;
+
+    $is_child = 0;
 
 # Returns a nicely-formatted timestamp from a specified time
     sub generate_showtime {
@@ -203,21 +218,64 @@ package nuv_utils;
     sub fork_command {
         my $command = shift;
         if ($DEBUG) {
+            $command =~ s#\ 2>/dev/null##sg;
             print "\nforking:\n$command\n";
             return undef;
         }
 
+    # Get read/write handles so we can communicate with the forked process
+        my ($read, $write);
+        pipe $read, $write;
+
     # Fork and return the child's pid
         my $pid = undef;
         if ($pid = fork) {
-            return $pid
+            close $write;
+        # Return both the read handle and the pid?
+            if (wantarray) {
+                return ($pid, $read)
+            }
+        # Just the pid -- close the read handle
+            else {
+                close $read;
+                return $pid;
+            }
         }
     # $pid defined means that this is now the forked child
         elsif (defined $pid) {
-            system($command);
+            $nuv_utils::is_child = 1;
+            close $read;
+        # Autoflush $write
+            select((select($write), $|=1)[0]);
+        # Run the requested command
+            my ($data, $buffer) = ('', '');
+            open(COM, "$command |") or die "couldn't run command:  $!\n$command\n";
+            while (read(COM, $data, 100)) {
+                next unless (length $data > 0);
+            # Convert CR's to linefeeds so the data will flush properly
+                $data =~ s/\r\n?/\n/sg;
+            # Some magic so that we only send whole lines (which helps us do nonblocking reads on the other end)
+                substr($data, 0, 0) = $buffer;
+                $buffer  = '';
+                if ($data !~ /\n$/) {
+                    ($data, $buffer) = $data =~ /(.+\n)?([^\n]+)$/;
+                }
+            # We have a line to print?
+                if ($data && length $data > 0) {
+                    print $write $data;
+                }
+            # Sleep for 1/20 second so we don't go too fast and annoy the cpu
+                usleep(50000);
+            }
+            close COM;
+        # Print the return status of the child
+            my $status = $? >> 8;
+            print $write "\n!!! process $$ complete:  $status !!!\n";
+        # Close the write handle
+            close $write;
         # Exit using something that won't set off the END block
             use POSIX;
-            POSIX::_exit(0);
+            POSIX::_exit($status);
         }
     # Couldn't fork, guess we have to quit
         die "Couldn't fork: $!\n\n$command\n\n";
@@ -238,7 +296,7 @@ package nuv_utils;
 
     sub Quit {
     # If this is the main script, print a nice goodbye message
-        print "\nThanks for using nuvexport!\n\n" unless ($is_child);
+        print "\nThanks for using nuvexport!\n\n" unless ($nuv_utils::is_child);
     # Time to leave
         exit;
     }
@@ -255,10 +313,22 @@ package nuv_utils;
     sub system {
         my $command = shift;
         if ($DEBUG) {
+            $command =~ s#\ 2>/dev/null##sg;
             print "\nsystem call:\n$command\n";
         } else {
-            system($command);
+            CORE::system($command);
         }
+    }
+
+    sub has_data {
+      my $fh = shift;
+      my $r  = '';
+      vec($r, fileno($fh), 1) = 1;
+      my $can = select($r, undef, undef, 0);
+      if ($can) {
+          return vec($r, fileno($fh), 1);
+      }
+      return 0;
     }
 
     sub fifos_wait {
