@@ -42,6 +42,7 @@ class MythComboBox: public QComboBox
 
   signals:
     void changeHelpText(QString);
+    void gotFocus();
 
   public slots:
     void insertItem(const QString& item) {
@@ -51,6 +52,7 @@ class MythComboBox: public QComboBox
   protected:
     virtual void keyPressEvent (QKeyEvent *e);
     virtual void focusInEvent(QFocusEvent *e) { emit changeHelpText(helptext);
+                                                emit gotFocus();
                                                 QComboBox::focusInEvent(e); }
 
   private:
