@@ -37,7 +37,9 @@ class ProgLister : public MythDialog
     void nextView(void);
     void setViewFromList(void);
     void chooseEditChanged(void);
+    void chooseComboBoxChanged(void);
     void setViewFromEdit(void);
+    void deleteKeyword(void);
     void select(void);
     void edit(void);
     void chooseView(void);
@@ -90,8 +92,10 @@ class ProgLister : public MythDialog
     void deletePopup(void);
 
     MythListBox *chooseListBox;
+    MythComboBox *chooseComboBox;
     MythRemoteLineEdit *chooseLineEdit;
     MythPushButton *chooseOkButton;
+    MythPushButton *chooseDeleteButton;
 };
 
 #endif

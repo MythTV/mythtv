@@ -69,8 +69,10 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
         listsize = ltype->GetItems();
 
     chooseListBox = NULL;
+    chooseComboBox = NULL;
     chooseLineEdit = NULL;
     chooseOkButton = NULL;
+    chooseDeleteButton = NULL;
 
     curView = -1;
     fillViewList(view);
@@ -315,6 +317,16 @@ void ProgLister::chooseEditChanged(void)
         return;
 
     chooseOkButton->setEnabled(chooseLineEdit->text() != "");
+    chooseDeleteButton->setEnabled(false);
+}
+
+void ProgLister::chooseComboBoxChanged(void)
+{
+    if (!chooseComboBox || !chooseLineEdit)
+        return;
+
+    chooseLineEdit->setText(chooseComboBox->currentText());
+    chooseDeleteButton->setEnabled(chooseComboBox->currentText() != "");
 }
 
 void ProgLister::setViewFromEdit(void)
@@ -322,20 +334,55 @@ void ProgLister::setViewFromEdit(void)
     if (!chooseLineEdit)
         return;
 
-    if (viewCount < 1)
-        return;
-
     QString view = chooseLineEdit->text();
 
-    if (view == viewList[0])
+    if (view <= " ")
         return;
 
-    curView = 0;
-    viewList[0] = view;
-    viewTextList[0] = view;
+    QString querystr = QString("REPLACE INTO keyword VALUES('%1');").arg(view);
+    QSqlQuery query;
+    query.exec(querystr);
+
+    fillViewList(chooseComboBox->currentText());
+
+    chooseComboBox->clear();
+    chooseComboBox->insertStringList(viewTextList);
+
+    curView = viewList.findIndex(view);
+
+    if (curView < 0)
+    {
+        viewList << view;
+        viewTextList << view;
+        curView = viewCount++;
+    }
 
     curItem = -1;
     refillAll = true;
+}
+
+void ProgLister::deleteKeyword(void)
+{
+    if (!chooseDeleteButton || !chooseComboBox || !chooseLineEdit)
+        return;
+
+    if (viewCount < 1)
+        return;
+
+    QString view = chooseComboBox->currentText();
+
+    QString querystr = QString("DELETE FROM keyword WHERE phrase = '%1';")
+                               .arg(view);
+    QSqlQuery query;
+    query.exec(querystr);
+
+    fillViewList(chooseComboBox->currentText());
+
+    chooseComboBox->clear();
+    chooseComboBox->insertStringList(viewTextList);
+
+    chooseLineEdit->setText("");
+    chooseDeleteButton->setEnabled(false);
 }
 
 void ProgLister::chooseView(void)
@@ -372,25 +419,38 @@ void ProgLister::chooseView(void)
     }
     else if (type == plTitleSearch || type == plDescSearch)
     {
-        if (viewCount < 1)
-            return;
-
         MythPopupBox choosePopup(gContext->GetMainWindow(), "");
-        choosePopup.addLabel(tr("Enter Phrase"));
+        choosePopup.addLabel(tr("Enter Search Phrase"));
 
         chooseLineEdit = new MythRemoteLineEdit(&choosePopup);
-        chooseLineEdit->setText(viewList[0]);
+        chooseLineEdit->setText("");
         chooseLineEdit->selectAll();
         choosePopup.addWidget(chooseLineEdit);
 
         chooseOkButton = new MythPushButton(&choosePopup);
         chooseOkButton->setText(tr("OK"));
-        chooseOkButton->setEnabled(viewList[0] != "");
+        chooseOkButton->setEnabled(false);
         choosePopup.addWidget(chooseOkButton);
+
+        chooseComboBox = new MythComboBox(false, &choosePopup);
+        chooseComboBox->insertStringList(viewTextList);
+        if (curView < 0)
+            chooseComboBox->setCurrentItem(0);
+        else
+            chooseComboBox->setCurrentItem(curView);
+        choosePopup.addWidget(chooseComboBox);
+
+        chooseDeleteButton = new MythPushButton(&choosePopup);
+        chooseDeleteButton->setText(tr("Delete"));
+        chooseDeleteButton->setEnabled(chooseComboBox->currentText() != "");
+        choosePopup.addWidget(chooseDeleteButton);
 
         connect(chooseLineEdit, SIGNAL(textChanged()), this, SLOT(chooseEditChanged()));
         connect(chooseOkButton, SIGNAL(clicked()), this, SLOT(setViewFromEdit()));
         connect(chooseOkButton, SIGNAL(clicked()), &choosePopup, SLOT(accept()));
+        connect(chooseComboBox, SIGNAL(activated(int)), this, SLOT(chooseComboBoxChanged()));
+        connect(chooseComboBox, SIGNAL(highlighted (int)), this, SLOT(chooseComboBoxChanged()));
+        connect(chooseDeleteButton, SIGNAL(clicked()), this, SLOT(deleteKeyword()));
 
         chooseLineEdit->setFocus();
         choosePopup.ExecPopup();
@@ -399,6 +459,10 @@ void ProgLister::chooseView(void)
         chooseLineEdit = NULL;
         delete chooseOkButton;
         chooseOkButton = NULL;
+        delete chooseComboBox;
+        chooseComboBox = NULL;
+        delete chooseDeleteButton;
+        chooseDeleteButton = NULL;
     }
 }
 
@@ -488,8 +552,29 @@ void ProgLister::fillViewList(const QString &view)
         if (view != "")
             curView = viewList.findIndex(view);
     }
-    else if (type == plTitle || type == plTitleSearch ||
-             type == plDescSearch)
+    else if (type == plTitleSearch || type == plDescSearch)
+    {
+        QString querystr = "SELECT phrase FROM keyword;";
+        QSqlQuery query;
+        query.exec(querystr);
+        if (query.isActive() && query.numRowsAffected())
+        {
+            while (query.next())
+            {
+                QString phrase = query.value(0).toString();
+                if (phrase <= " ")
+                    continue;
+                viewList << phrase;
+                viewTextList << phrase;
+                viewCount++;
+            }
+        }
+        if (view != "")
+            curView = viewList.findIndex(view);
+        else
+            curView = -1;
+    }
+    else if (type == plTitle)
     {
         viewList << view;
         viewTextList << view;
