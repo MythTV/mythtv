@@ -47,6 +47,16 @@ CREATE TABLE IF NOT EXISTS recordedmarkup
     primary key (chanid,starttime, mark, type )
 );  
 
+CREATE TABLE IF NOT EXISTS programrating
+(
+    chanid INT UNSIGNED NOT NULL,
+    starttime TIMESTAMP NOT NULL,
+    system CHAR(8) NOT NULL default '',
+    rating CHAR(8) NOT NULL default '',
+    UNIQUE KEY chanid (chanid,starttime,system,rating),
+    INDEX (starttime, system)
+);
+
 INSERT INTO record
 (type,chanid,starttime,startdate,endtime,enddate,title,subtitle,description)
 SELECT 1, chanid,
@@ -89,3 +99,6 @@ ALTER TABLE videosource ADD COLUMN xmltvgrabber VARCHAR(128);
 
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');
+
+ALTER TABLE program ADD airdate year NOT NULL;
+ALTER TABLE program ADD stars float unsigned NOT NULL;

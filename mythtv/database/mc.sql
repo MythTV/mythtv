@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS program
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
     category VARCHAR(64) NULL,
+    airdate YEAR NOT NULL,
+    stars FLOAT UNSIGNED NOT NULL,
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );
@@ -157,6 +159,15 @@ CREATE TABLE IF NOT EXISTS recordedmarkup
     mark BIGINT(20) NOT NULL,
     type INT NOT NULL,
     primary key (chanid,starttime, mark, type )
+);
+CREATE TABLE IF NOT EXISTS programrating
+(
+    chanid INT UNSIGNED NOT NULL,
+    starttime TIMESTAMP NOT NULL,
+    system CHAR(8) NOT NULL default '',
+    rating CHAR(8) NOT NULL default '',
+    UNIQUE KEY chanid (chanid,starttime,system,rating),
+    INDEX (starttime, system)
 );
 
 INSERT INTO recordingprofiles (name) VALUES ('Default');

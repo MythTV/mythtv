@@ -1,5 +1,18 @@
 USE mythconverg;
 
+CREATE TABLE IF NOT EXISTS programrating
+(
+    chanid INT UNSIGNED NOT NULL,
+    starttime TIMESTAMP NOT NULL,
+    system CHAR(8) NOT NULL default '',
+    rating CHAR(8) NOT NULL default '',
+    UNIQUE KEY chanid (chanid,starttime,system,rating),
+    INDEX (starttime, system)
+);
+
+ALTER TABLE program ADD airdate year NOT NULL;
+ALTER TABLE program ADD stars float unsigned NOT NULL;
+
 CREATE TABLE IF NOT EXISTS recordedmarkup
 (
     chanid INT UNSIGNED NOT NULL,
