@@ -525,6 +525,10 @@
         <source>New Password:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -726,6 +730,10 @@
         <source>At least 2 stars</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Power Recording Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -779,6 +787,10 @@
     </message>
     <message>
         <source>Any</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1644,34 +1656,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Category:  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Type:  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Episode Number:  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Original Airdate:  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Program ID:  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Filesize:  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording Group:  </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4949,11 +4933,174 @@ Myth will now exit.</source>
         <source>Job Queue (Global)</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ScheduledRecording</name>
     <message>
-        <source>Power Search</source>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Part %1 of %2, </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HDTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Close Captioned</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <comment>category_type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Episode Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Airdate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guest Star</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filesize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Machine Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Machine Status shows some operating system statistics of this machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and the MythTV server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uptime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RAM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disk space:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB error - RecordFilePrefix unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV buffer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB error - LiveBufferDir unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all capture card settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my card settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my card settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program and channel settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my program settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my program settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5384,6 +5531,50 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Zoom Mode OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Stretch %1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Time Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.5X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.9X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.0X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.5X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2.0X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep Off</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

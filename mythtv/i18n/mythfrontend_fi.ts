@@ -529,6 +529,10 @@
         <source>Yes, and allow re-record</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -730,6 +734,10 @@
         <source>At least 2 stars</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Power Recording Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -803,6 +811,10 @@
     </message>
     <message>
         <source>Not allowed to record this showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3836,31 +3848,31 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Category:  </source>
-        <translation>Kategoria:</translation>
+        <translation type="obsolete">Kategoria:</translation>
     </message>
     <message>
         <source>Type:  </source>
-        <translation>Tyyppi:</translation>
+        <translation type="obsolete">Tyyppi:</translation>
     </message>
     <message>
         <source>Episode Number:  </source>
-        <translation>Jakson Numero:</translation>
+        <translation type="obsolete">Jakson Numero:</translation>
     </message>
     <message>
         <source>Original Airdate:  </source>
-        <translation>Alkuperäinen Lähetysaika:</translation>
+        <translation type="obsolete">Alkuperäinen Lähetysaika:</translation>
     </message>
     <message>
         <source>Program ID:  </source>
-        <translation>Ohjelman ID:</translation>
+        <translation type="obsolete">Ohjelman ID:</translation>
     </message>
     <message>
         <source>Filesize:  </source>
-        <translation>Tiedostokoko:</translation>
+        <translation type="obsolete">Tiedostokoko:</translation>
     </message>
     <message>
         <source>Recording Group:  </source>
-        <translation>Nauhoitusryhmä:</translation>
+        <translation type="obsolete">Nauhoitusryhmä:</translation>
     </message>
     <message>
         <source> The following programs will be recorded instead:
@@ -5021,11 +5033,174 @@ Myth will now exit.</translation>
         <source>Job Queue (Global)</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ScheduledRecording</name>
     <message>
-        <source>Power Search</source>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Part %1 of %2, </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HDTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Close Captioned</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <comment>category_type</comment>
+        <translation type="unfinished">Tyyppi</translation>
+    </message>
+    <message>
+        <source>Episode Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Airdate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guest Star</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filesize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Machine Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Machine Status shows some operating system statistics of this machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and the MythTV server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uptime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RAM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disk space:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB error - RecordFilePrefix unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV buffer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB error - LiveBufferDir unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all capture card settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my card settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my card settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program and channel settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my program settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my program settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5196,7 +5371,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Speed 5X</source>
-        <translation>Nopeus 5X</translation>
+        <translation type="obsolete">Nopeus 5X</translation>
     </message>
     <message>
         <source>Speed 3X</source>
@@ -5464,6 +5639,50 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Try Again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Stretch %1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Time Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.5X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.9X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.0X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.5X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2.0X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep Off</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

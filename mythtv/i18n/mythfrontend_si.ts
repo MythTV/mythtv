@@ -525,6 +525,37 @@
         <source>New Password:</source>
         <translation>Novo geslo:</translation>
     </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PreviousBox</name>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Sort Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort by Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort by Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse Time</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -675,6 +706,34 @@
         <source>Specials</source>
         <translation>Ekstra</translation>
     </message>
+    <message>
+        <source>Select Rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least 3 1/2 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least 3 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least 2 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Power Recording Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -692,7 +751,7 @@
     </message>
     <message>
         <source>Recording this showing with override options</source>
-        <translation>Zajemi predvajanje - v načinu prepiši</translation>
+        <translation type="obsolete">Zajemi predvajanje - v načinu prepiši</translation>
     </message>
     <message>
         <source>Recording every week</source>
@@ -700,11 +759,11 @@
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation>Zajem v določenem času</translation>
+        <translation type="obsolete">Zajem v določenem času</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation>Zajem le na tem kanalu</translation>
+        <translation type="obsolete">Zajem le na tem kanalu</translation>
     </message>
     <message>
         <source>Recording all showings</source>
@@ -712,11 +771,11 @@
     </message>
     <message>
         <source>Recording one showing of this program</source>
-        <translation>Zajem samo enega predvajanja tega programa</translation>
+        <translation type="obsolete">Zajem samo enega predvajanja tega programa</translation>
     </message>
     <message>
         <source>Manually not recording this showing</source>
-        <translation>Ročno blokiranje predvajanja</translation>
+        <translation type="obsolete">Ročno blokiranje predvajanja</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
@@ -729,6 +788,30 @@
     <message>
         <source>Any</source>
         <translation>Katerikoli</translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording in this timeslot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on this channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording one showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not allowed to record this showing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1591,31 +1674,31 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     </message>
     <message>
         <source>Category:  </source>
-        <translation>Categorija:  </translation>
+        <translation type="obsolete">Categorija:  </translation>
     </message>
     <message>
         <source>Type:  </source>
-        <translation>Tip:  </translation>
+        <translation type="obsolete">Tip:  </translation>
     </message>
     <message>
         <source>Episode Number:  </source>
-        <translation>Številka oddaje:  </translation>
+        <translation type="obsolete">Številka oddaje:  </translation>
     </message>
     <message>
         <source>Original Airdate:  </source>
-        <translation>Izvirni datum predvajanja:  </translation>
+        <translation type="obsolete">Izvirni datum predvajanja:  </translation>
     </message>
     <message>
         <source>Program ID:  </source>
-        <translation>ID programa:  </translation>
+        <translation type="obsolete">ID programa:  </translation>
     </message>
     <message>
         <source>Filesize:  </source>
-        <translation>Velikost datoteke:  </translation>
+        <translation type="obsolete">Velikost datoteke:  </translation>
     </message>
     <message>
         <source>Recording Group:  </source>
-        <translation>Snemalna skupina:  </translation>
+        <translation type="obsolete">Snemalna skupina:  </translation>
     </message>
     <message>
         <source>OK</source>
@@ -3396,7 +3479,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>The horizontal offset the GUI will be displayed at. May only work if run in a window.</source>
-        <translation>Horizontalna zakasnitev, pri kateri bo GUI prikazan. Deluje lahko samo, če teče, v oknu.</translation>
+        <translation type="obsolete">Horizontalna zakasnitev, pri kateri bo GUI prikazan. Deluje lahko samo, če teče, v oknu.</translation>
     </message>
     <message>
         <source>GUI Y offset</source>
@@ -3904,7 +3987,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichome Chipset</source>
-        <translation>Omogoči uporabo viaXvMC HW Mpeg odkodiranja za Via Unichome čipovje</translation>
+        <translation type="obsolete">Omogoči uporabo viaXvMC HW Mpeg odkodiranja za Via Unichome čipovje</translation>
     </message>
     <message>
         <source>Hardware Decoding Settings</source>
@@ -4386,7 +4469,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Details of DVB error statistics for last 48 hours:</source>
-        <translation>Podrobna statistika o DVB napakah v zadnjih 48 urah:</translation>
+        <translation type="obsolete">Podrobna statistika o DVB napakah v zadnjih 48 urah:</translation>
     </message>
     <message>
         <source>Recording period from %1 to %2</source>
@@ -4780,6 +4863,313 @@ Myth se bo končal.</translation>
         <source>Job Queue (Global)</source>
         <translation>Čakalna vrsta opravila (globalno)</translation>
     </message>
+    <message>
+        <source>(New Channel)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>star</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Part %1 of %2, </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HDTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Close Captioned</comment>
+        <translation type="unfinished">CC</translation>
+    </message>
+    <message>
+        <source>Subtitled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <comment>category_type</comment>
+        <translation type="unfinished">Tip</translation>
+    </message>
+    <message>
+        <source>Episode Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Airdate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guest Star</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filesize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flag new recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not Commercial Flag new recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not run &apos;%1&apos; for new recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The horizontal offset the GUI will be displayed at.  May only work if run in a window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichrome Chipset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scale video as necessary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frames to skip in fullscreen mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in main window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frames to skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in floating window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the dock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video on the desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mac OS X video settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep this episode in the list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove this episode from the list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove all episodes for this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Machine Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Machine Status shows some operating system statistics of this machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and the MythTV server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details of DVB error statistics for last 48 hours:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uptime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RAM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disk space:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB error - RecordFilePrefix unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV buffer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB error - LiveBufferDir unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all capture card settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my card settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my card settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program and channel settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my program settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my program settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StatusBox</name>
@@ -4912,7 +5302,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Speed 5X</source>
-        <translation>5x hitrost</translation>
+        <translation type="obsolete">5x hitrost</translation>
     </message>
     <message>
         <source>Speed 3X</source>
@@ -5213,6 +5603,50 @@ Myth se bo končal.</translation>
     <message>
         <source>Zoom Mode OFF</source>
         <translation>Povečevalni način izklopljen</translation>
+    </message>
+    <message>
+        <source>Time Stretch %1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Time Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.5X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.9X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.0X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.5X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2.0X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep Off</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

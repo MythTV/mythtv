@@ -525,6 +525,10 @@
         <source>Yes, and allow re-record</source>
         <translation>Ja, och tillåt återinspelning</translation>
     </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation>^(The |A |An )</translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -726,6 +730,10 @@
         <source>At least 2 stars</source>
         <translation>Minst 2 stjärnor</translation>
     </message>
+    <message>
+        <source>Power Recording Rule</source>
+        <translation>Avancerad inspelningsregel</translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -780,6 +788,10 @@
     <message>
         <source>Not allowed to record this showing</source>
         <translation>Inte tillåten att spela in denna visning</translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation>^(The |A |An )</translation>
     </message>
 </context>
 <context>
@@ -3818,31 +3830,31 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Category:  </source>
-        <translation>Kategori:  </translation>
+        <translation type="obsolete">Kategori:  </translation>
     </message>
     <message>
         <source>Type:  </source>
-        <translation>Typ:  </translation>
+        <translation type="obsolete">Typ:  </translation>
     </message>
     <message>
         <source>Episode Number:  </source>
-        <translation>Avsnitt:  </translation>
+        <translation type="obsolete">Avsnitt:  </translation>
     </message>
     <message>
         <source>Original Airdate:  </source>
-        <translation>Ursprungligt sändningsdatum:  </translation>
+        <translation type="obsolete">Ursprungligt sändningsdatum:  </translation>
     </message>
     <message>
         <source>Program ID:  </source>
-        <translation>Program-ID:  </translation>
+        <translation type="obsolete">Program-ID:  </translation>
     </message>
     <message>
         <source>Filesize:  </source>
-        <translation>Filstorlek:  </translation>
+        <translation type="obsolete">Filstorlek:  </translation>
     </message>
     <message>
         <source>Recording Group:  </source>
-        <translation>Inspelningsgrupp:  </translation>
+        <translation type="obsolete">Inspelningsgrupp:  </translation>
     </message>
     <message>
         <source> The following programs will be recorded instead:
@@ -4980,12 +4992,182 @@ som du startade detta programmet i.</translation>
         <source>Do not run &apos;%1&apos; for new recordings</source>
         <translation>Kör inte &apos;%1&apos; för nya inspelningar</translation>
     </message>
+    <message>
+        <source>Title</source>
+        <translation>Titel</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation>Beskrivning</translation>
+    </message>
+    <message>
+        <source>Part %1 of %2, </source>
+        <translation>Del %1 av %2,</translation>
+    </message>
+    <message>
+        <source>HDTV</source>
+        <translation>HDTV</translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Close Captioned</comment>
+        <translation>Textning för hörselskadade</translation>
+    </message>
+    <message>
+        <source>Subtitled</source>
+        <translation>Textat</translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation>Stereo</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Kategori</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <comment>category_type</comment>
+        <translation>Typ</translation>
+    </message>
+    <message>
+        <source>Episode Number</source>
+        <translation>Avsnitt</translation>
+    </message>
+    <message>
+        <source>Original Airdate</source>
+        <translation>Ursprungligt visningsdatum</translation>
+    </message>
+    <message>
+        <source>Program ID</source>
+        <translation>Program-ID</translation>
+    </message>
+    <message>
+        <source>Actors</source>
+        <translation>Skådespelare</translation>
+    </message>
+    <message>
+        <source>Guest Star</source>
+        <translation>Gäst</translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation>Regissör</translation>
+    </message>
+    <message>
+        <source>Filesize</source>
+        <translation>Filstorlek</translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation>Inspelningsgrupp</translation>
+    </message>
+    <message>
+        <source>Machine Status</source>
+        <translation>Maskinstatus</translation>
+    </message>
+    <message>
+        <source>Machine Status shows some operating system statistics of this machine</source>
+        <translation>Maskinstatus visar statistik för denna datorn</translation>
+    </message>
+    <message>
+        <source>used</source>
+        <translation>använt</translation>
+    </message>
+    <message>
+        <source>free</source>
+        <translation>ledigt</translation>
+    </message>
+    <message>
+        <source>Uptime</source>
+        <translation>Drifttid</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation>System</translation>
+    </message>
+    <message>
+        <source>This machine</source>
+        <translation>Denna maskin</translation>
+    </message>
+    <message>
+        <source>Load</source>
+        <translation>Belastning</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>okänt</translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation>misslyckades</translation>
+    </message>
+    <message>
+        <source>RAM</source>
+        <translation>RAM</translation>
+    </message>
+    <message>
+        <source>Swap</source>
+        <translation>Swap</translation>
+    </message>
+    <message>
+        <source>MythTV server</source>
+        <translation>inspelningsserver</translation>
+    </message>
+    <message>
+        <source>Disk space:</source>
+        <translation>Diskutrymme:</translation>
+    </message>
+    <message>
+        <source>Recordings</source>
+        <translation>Inspelningar</translation>
+    </message>
+    <message>
+        <source>DB error - RecordFilePrefix unknown</source>
+        <translation>DB fel - RecordFilePrefix okänt</translation>
+    </message>
+    <message>
+        <source>TV buffer</source>
+        <translation>TV-buffert</translation>
+    </message>
+    <message>
+        <source>DB error - LiveBufferDir unknown</source>
+        <translation>DB fel - LiveBufferDir okänt</translation>
+    </message>
+    <message>
+        <source>and the MythTV server</source>
+        <translation>och inspelningsservern</translation>
+    </message>
+    <message>
+        <source>Would you like to clear all capture card settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my card settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my card settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program and channel settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my program settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my program settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
         <source>Power Search</source>
-        <translation>Avancerad sökning</translation>
+        <translation type="obsolete">Avancerad sökning</translation>
     </message>
 </context>
 <context>
@@ -5428,6 +5610,42 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Time Stretch %1X</source>
         <translation>Tempo %1X</translation>
+    </message>
+    <message>
+        <source>Adjust</source>
+        <translation>Justera</translation>
+    </message>
+    <message>
+        <source>0.5X</source>
+        <translation>0,5X</translation>
+    </message>
+    <message>
+        <source>0.9X</source>
+        <translation>0,9X</translation>
+    </message>
+    <message>
+        <source>1.0X</source>
+        <translation>1,0X</translation>
+    </message>
+    <message>
+        <source>1.1X</source>
+        <translation>1,1X</translation>
+    </message>
+    <message>
+        <source>1.5X</source>
+        <translation>1,5X</translation>
+    </message>
+    <message>
+        <source>2.0X</source>
+        <translation>2,0X</translation>
+    </message>
+    <message>
+        <source>Sleep Off</source>
+        <translation>Insomning Av</translation>
+    </message>
+    <message>
+        <source>Sleep</source>
+        <translation>Insomning</translation>
     </message>
 </context>
 <context>

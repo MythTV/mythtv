@@ -559,6 +559,37 @@
         <source>Yes, and allow re-record</source>
         <translation type="unfinished">はい, 再録画可能にする</translation>
     </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PreviousBox</name>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Sort Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort by Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort by Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse Time</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -649,6 +680,94 @@
         <source>Select Time</source>
         <translation>時間選択</translation>
     </message>
+    <message>
+        <source>Power Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;New Search&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Power Search Fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optional title phrase:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optional subtitle phrase:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optional description phrase:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Series</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">全て</translation>
+    </message>
+    <message>
+        <source>Specials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least 3 1/2 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least 3 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least 2 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Power Recording Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -662,11 +781,11 @@
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation>この時間帯で放送されるときは録画する</translation>
+        <translation type="obsolete">この時間帯で放送されるときは録画する</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation>このチャンネルで放送されるときは録画する</translation>
+        <translation type="obsolete">このチャンネルで放送されるときは録画する</translation>
     </message>
     <message>
         <source>Recording all showings</source>
@@ -690,7 +809,7 @@
     </message>
     <message>
         <source>Recording one showing of this program</source>
-        <translation>この放送を一回だけ録画する</translation>
+        <translation type="obsolete">この放送を一回だけ録画する</translation>
     </message>
     <message>
         <source>Any</source>
@@ -698,11 +817,35 @@
     </message>
     <message>
         <source>Recording this showing with override options</source>
-        <translation>個別設定オプションでこの番組を録画する</translation>
+        <translation type="obsolete">個別設定オプションでこの番組を録画する</translation>
     </message>
     <message>
         <source>Manually not recording this showing</source>
-        <translation>手動でこの番組を録画しない</translation>
+        <translation type="obsolete">手動でこの番組を録画しない</translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording in this timeslot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on this channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording one showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not allowed to record this showing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3720,19 +3863,19 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Live TV</source>
-        <translation>テレビ放送</translation>
+        <translation type="obsolete">テレビ放送</translation>
     </message>
     <message>
         <source>High Quality</source>
-        <translation>高品質</translation>
+        <translation type="obsolete">高品質</translation>
     </message>
     <message>
         <source>Low Quality</source>
-        <translation>低品質</translation>
+        <translation type="obsolete">低品質</translation>
     </message>
     <message>
         <source>Uncompressed</source>
-        <translation>無圧縮</translation>
+        <translation type="obsolete">無圧縮</translation>
     </message>
     <message>
         <source>(Unassigned)</source>
@@ -3766,31 +3909,31 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Category:  </source>
-        <translation>カテゴリー:</translation>
+        <translation type="obsolete">カテゴリー:</translation>
     </message>
     <message>
         <source>Type:  </source>
-        <translation>タイプ:</translation>
+        <translation type="obsolete">タイプ:</translation>
     </message>
     <message>
         <source>Episode Number:  </source>
-        <translation>番組番号:</translation>
+        <translation type="obsolete">番組番号:</translation>
     </message>
     <message>
         <source>Original Airdate:  </source>
-        <translation>オリジナル放送日:</translation>
+        <translation type="obsolete">オリジナル放送日:</translation>
     </message>
     <message>
         <source>Program ID:  </source>
-        <translation>プログラムID:</translation>
+        <translation type="obsolete">プログラムID:</translation>
     </message>
     <message>
         <source>Filesize:  </source>
-        <translation>ファイルサイズ:</translation>
+        <translation type="obsolete">ファイルサイズ:</translation>
     </message>
     <message>
         <source>Recording Group:  </source>
-        <translation>録画グループ:</translation>
+        <translation type="obsolete">録画グループ:</translation>
     </message>
     <message>
         <source> The following programs will be recorded instead:
@@ -4632,10 +4775,6 @@ MythTVは終了します。</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichome Chipset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Commercial Skip</source>
         <translation type="unfinished">CMスキップ</translation>
     </message>
@@ -4755,6 +4894,348 @@ MythTVは終了します。</translation>
         <source>Job Queue (Global)</source>
         <translation type="unfinished">ジョブキュー (全体)</translation>
     </message>
+    <message>
+        <source>(New Channel)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>star</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Part %1 of %2, </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HDTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Close Captioned</comment>
+        <translation type="unfinished">CC</translation>
+    </message>
+    <message>
+        <source>Subtitled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <comment>category_type</comment>
+        <translation type="unfinished">タイプ</translation>
+    </message>
+    <message>
+        <source>Episode Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Airdate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guest Star</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filesize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Power Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flag new recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not Commercial Flag new recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not run &apos;%1&apos; for new recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Re-record programs which have been automatically expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichrome Chipset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scale video as necessary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frames to skip in fullscreen mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in main window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frames to skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in floating window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the dock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video on the desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mac OS X video settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep this episode in the list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove this episode from the list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove all episodes for this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Machine Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Machine Status shows some operating system statistics of this machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and the MythTV server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Job?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">停止</translation>
+    </message>
+    <message>
+        <source>Job Queue Actions:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Requeue Job?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uptime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RAM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disk space:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB error - RecordFilePrefix unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV buffer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB error - LiveBufferDir unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow Symlinks when deleting files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all capture card settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my card settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my card settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program and channel settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my program settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my program settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StatusBox</name>
@@ -4781,6 +5262,10 @@ MythTVは終了します。</translation>
     <message>
         <source>Status: </source>
         <translation type="unfinished">ステータス:</translation>
+    </message>
+    <message>
+        <source>is not available</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4919,7 +5404,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Speed 5X</source>
-        <translation>5倍速</translation>
+        <translation type="obsolete">5倍速</translation>
     </message>
     <message>
         <source>Speed 3X</source>
@@ -5180,6 +5665,54 @@ MythTVは終了します。</translation>
     <message>
         <source>Jump to Beginning</source>
         <translation type="unfinished">始めにジャンプ</translation>
+    </message>
+    <message>
+        <source>Try Again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Stretch %1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Time Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.5X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.9X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.0X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.5X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2.0X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep Off</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

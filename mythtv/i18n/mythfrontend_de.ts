@@ -529,6 +529,37 @@
         <source>Yes, and allow re-record</source>
         <translation>Ja, erneutes Aufnehmen möglich</translation>
     </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PreviousBox</name>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Sort Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort by Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort by Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse Time</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -679,6 +710,34 @@
         <source>Specials</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Select Rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least 3 1/2 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least 3 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least 2 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Power Recording Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -692,11 +751,11 @@
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation>Nehme zu dieser Zeit auf</translation>
+        <translation type="obsolete">Nehme zu dieser Zeit auf</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation>Nehme auf diesem Sender auf</translation>
+        <translation type="obsolete">Nehme auf diesem Sender auf</translation>
     </message>
     <message>
         <source>Recording all showings</source>
@@ -720,7 +779,7 @@
     </message>
     <message>
         <source>Recording one showing of this program</source>
-        <translation>Nehme eine Ausstrahlung dieser Sendung auf</translation>
+        <translation type="obsolete">Nehme eine Ausstrahlung dieser Sendung auf</translation>
     </message>
     <message>
         <source>Any</source>
@@ -728,11 +787,35 @@
     </message>
     <message>
         <source>Recording this showing with override options</source>
-        <translation>Diese Ausstrahlung mit Übersteuerungsoptionen aufnehmen</translation>
+        <translation type="obsolete">Diese Ausstrahlung mit Übersteuerungsoptionen aufnehmen</translation>
     </message>
     <message>
         <source>Manually not recording this showing</source>
-        <translation>Aufnahme wurde manuell blockiert</translation>
+        <translation type="obsolete">Aufnahme wurde manuell blockiert</translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording in this timeslot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on this channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording one showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not allowed to record this showing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3675,7 +3758,7 @@ Myth wird nun beendet.</translation>
     <message>
         <source>X</source>
         <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">X</translation>
     </message>
     <message>
         <source>P</source>
@@ -3773,31 +3856,31 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Category:  </source>
-        <translation>Genre:  </translation>
+        <translation type="obsolete">Genre:  </translation>
     </message>
     <message>
         <source>Type:  </source>
-        <translation>Typ:  </translation>
+        <translation type="obsolete">Typ:  </translation>
     </message>
     <message>
         <source>Episode Number:  </source>
-        <translation>Folge Nr.:  </translation>
+        <translation type="obsolete">Folge Nr.:  </translation>
     </message>
     <message>
         <source>Original Airdate:  </source>
-        <translation>Erste Ausstrahlung:  </translation>
+        <translation type="obsolete">Erste Ausstrahlung:  </translation>
     </message>
     <message>
         <source>Program ID:  </source>
-        <translation>Programm ID:  </translation>
+        <translation type="obsolete">Programm ID:  </translation>
     </message>
     <message>
         <source>Filesize:  </source>
-        <translation>Dateigröße:  </translation>
+        <translation type="obsolete">Dateigröße:  </translation>
     </message>
     <message>
         <source>Recording Group:  </source>
-        <translation>Aufnahmegruppe:</translation>
+        <translation type="obsolete">Aufnahmegruppe:</translation>
     </message>
     <message>
         <source> The following programs will be recorded instead:
@@ -4641,7 +4724,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichome Chipset</source>
-        <translation>Dies schaltet die Unterstützung für den Via XvMC Hardware MPEG Dekoder ein. Nur beim Via Unichrome Chipsatz verfügbar.</translation>
+        <translation type="obsolete">Dies schaltet die Unterstützung für den Via XvMC Hardware MPEG Dekoder ein. Nur beim Via Unichrome Chipsatz verfügbar.</translation>
     </message>
     <message>
         <source>Commercial Skip</source>
@@ -4891,11 +4974,218 @@ Myth wird nun beendet.</translation>
         <source>Mac OS X video settings</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ScheduledRecording</name>
     <message>
-        <source>Power Search</source>
+        <source>(New Channel)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>star</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Part %1 of %2, </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HDTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Close Captioned</comment>
+        <translation type="unfinished">CC</translation>
+    </message>
+    <message>
+        <source>Subtitled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <comment>category_type</comment>
+        <translation type="unfinished">Typ</translation>
+    </message>
+    <message>
+        <source>Episode Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Airdate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guest Star</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filesize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flag new recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not Commercial Flag new recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not run &apos;%1&apos; for new recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichrome Chipset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep this episode in the list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove this episode from the list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove all episodes for this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Machine Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Machine Status shows some operating system statistics of this machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and the MythTV server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uptime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RAM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disk space:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB error - RecordFilePrefix unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV buffer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB error - LiveBufferDir unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all capture card settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my card settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my card settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program and channel settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my program settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my program settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4931,11 +5221,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>
-        <translation>Systemstatus - Bitte eine Kategorie wählen</translation>
+        <translation type="obsolete">Systemstatus - Bitte eine Kategorie wählen</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
-        <translation>Zeigt den Status verschiedener Systemkomponenten</translation>
+        <translation type="obsolete">Zeigt den Status verschiedener Systemkomponenten</translation>
     </message>
 </context>
 <context>
@@ -5074,7 +5364,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Speed 5X</source>
-        <translation>Zeitraffer 5x</translation>
+        <translation type="obsolete">Zeitraffer 5x</translation>
     </message>
     <message>
         <source>Speed 3X</source>
@@ -5340,6 +5630,50 @@ Myth wird nun beendet.</translation>
         <source>Try Again</source>
         <translation>Wiederholen</translation>
     </message>
+    <message>
+        <source>Time Stretch %1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Time Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.5X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.9X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.0X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.5X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2.0X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep Off</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -5385,7 +5719,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
-        <translation>Welche Aufnahme möchten Sie sehen:</translation>
+        <translation type="obsolete">Welche Aufnahme möchten Sie sehen:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -5405,7 +5739,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation>Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts.</translation>
+        <translation type="obsolete">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts.</translation>
     </message>
     <message>
         <source>Select a program...</source>
@@ -5413,7 +5747,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation>Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
+        <translation type="obsolete">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
     </message>
     <message>
         <source>No Programs</source>
@@ -5469,11 +5803,23 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Airdate:</source>
-        <translation>Sendezeit:</translation>
+        <translation type="obsolete">Sendezeit:</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation>Lade...</translation>
+        <translation type="obsolete">Lade...</translation>
+    </message>
+    <message>
+        <source>Select a recording to view:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
