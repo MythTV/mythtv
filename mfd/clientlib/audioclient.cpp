@@ -36,7 +36,7 @@ AudioClient::AudioClient(
 
 void AudioClient::playTrack(int container, int id)
 {
-    QString command = QString("play item %1 %2\n")
+    QString command = QString("play item %1 %2 \n")
                               .arg(container)
                               .arg(id);
 
@@ -45,7 +45,7 @@ void AudioClient::playTrack(int container, int id)
 
 void AudioClient::playList(int container, int id, int index)
 {
-    QString command = QString("play list %1 %2 %3\n")
+    QString command = QString("play list %1 %2 %3 \n")
                               .arg(container)
                               .arg(id)
                               .arg(index);
@@ -55,7 +55,7 @@ void AudioClient::playList(int container, int id, int index)
 
 void AudioClient::stopAudio()
 {
-    QString command = QString("stop\n");
+    QString command = QString("stop \n");
     client_socket_to_service->writeBlock(command.ascii(), command.length());
 }
 
@@ -64,11 +64,11 @@ void AudioClient::pauseAudio(bool y_or_n)
     QString command;
     if(y_or_n)
     {
-        command = QString("pause on\n");
+        command = QString("pause on \n");
     }
     else
     {
-        command = QString("pause off\n");
+        command = QString("pause off \n");
     }
 
     client_socket_to_service->writeBlock(command.ascii(), command.length());
@@ -76,19 +76,19 @@ void AudioClient::pauseAudio(bool y_or_n)
 
 void AudioClient::seekAudio(int how_much)
 {   
-    QString command = QString("seek %1\n").arg(how_much);
+    QString command = QString("seek %1 \n").arg(how_much);
     client_socket_to_service->writeBlock(command.ascii(), command.length());
 }
 
 void AudioClient::nextAudio()
 {   
-    QString command = QString("next\n");
+    QString command = QString("next \n");
     client_socket_to_service->writeBlock(command.ascii(), command.length());
 }
 
 void AudioClient::prevAudio()
 {   
-    QString command = QString("prev\n");
+    QString command = QString("prev \n");
     client_socket_to_service->writeBlock(command.ascii(), command.length());
 }
 
@@ -379,7 +379,7 @@ void AudioClient::executeCommand(QStringList new_command)
 
 void AudioClient::askForStatus()
 {
-    QString command = QString("status\n");
+    QString command = QString("status \n");
     client_socket_to_service->writeBlock(command.ascii(), command.length());
 }
 

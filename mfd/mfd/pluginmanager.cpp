@@ -248,7 +248,8 @@ MFDPluginManager::MFDPluginManager(MFD *owner)
     parent = owner;
     lib_open_daap = NULL;
     generateHashFunction = NULL;
-
+    daap_request_id = 0;
+    
     //
     //  Start a timer to check for dead 
     //  plugins.
@@ -619,12 +620,23 @@ void MFDPluginManager::doListCapabilities(int socket_identifier)
     }
 }
 
-void MFDPluginManager::fillValidationHeader(const QString &request, unsigned char *resulting_hash)
+void MFDPluginManager::fillValidationHeader(
+                                                int server_daap_version_major,
+                                                const QString &request, 
+                                                unsigned char *resulting_hash,
+                                                int request_id
+                                            )
 {
     hashing_mutex.lock();
         if(generateHashFunction)
         {
-            generateHashFunction((const unsigned char *)request.ascii(), 1, resulting_hash);
+            generateHashFunction(
+                                    server_daap_version_major,
+                                    (const unsigned char *)request.ascii(),
+                                    2,  // should this always be 2 ?
+                                    resulting_hash,
+                                    request_id
+                                );
         }
         else
         {
@@ -645,6 +657,16 @@ bool MFDPluginManager::haveLibOpenDaap()
     return false;
 }
 
+
+int MFDPluginManager::bumpDaapRequestId()
+{
+    int return_value;
+    daap_request_id_mutex.lock();
+        ++daap_request_id;
+        return_value = daap_request_id;
+    daap_request_id_mutex.unlock();
+    return return_value;
+}
 
 //
 //  This is only for debugging

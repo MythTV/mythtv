@@ -120,14 +120,20 @@ bool DaapInput::open(int)
     //  know we're going to close this connection whenever we feel like it.
     //
     
+    int daap_request_id =  parent->getMfd()->getPluginManager()->bumpDaapRequestId();
+    
     DaapRequest initial_request(
                                 NULL, 
-                                my_path_and_query, 
+                                QString("daap://%1:%2%3").arg(my_host).arg(my_port).arg(my_path_and_query),
                                 my_host,
-                                DAAP_SERVER_ITUNES4X,
-                                parent->getMfd()->getPluginManager()
+                                DAAP_SERVER_ITUNES45,
+                                parent->getMfd()->getPluginManager(),
+                                daap_request_id
                                );
+
     initial_request.addHeader("Connection: close");
+    initial_request.setHashingUrl(my_path_and_query);
+    initial_request.addHeader(QString("Client-DAAP-Request-ID: %1").arg(daap_request_id));
     initial_request.send(socket_to_daap_server, true);
 
 
@@ -325,17 +331,23 @@ bool DaapInput::at(unsigned long int an_offset)
     //  Send a request that positions us exactly where the at(int) seek call asked to be
     //
     
-    DaapRequest initial_request(
+    int daap_request_id =  parent->getMfd()->getPluginManager()->bumpDaapRequestId();
+
+    DaapRequest seek_request(
                                 NULL, 
-                                my_path_and_query, 
+                                QString("daap://%1:%2%3").arg(my_host).arg(my_port).arg(my_path_and_query),
                                 my_host,
-                                DAAP_SERVER_ITUNES4X,
-                                parent->getMfd()->getPluginManager()
+                                DAAP_SERVER_ITUNES45,
+                                parent->getMfd()->getPluginManager(),
+                                daap_request_id
                                );
-    initial_request.addHeader("Connection: close");
-    initial_request.addHeader(QString("Range: bytes=%1-").arg(an_offset));
-    initial_request.send(socket_to_daap_server, true);
-    // fake_seek_position = an_offset;
+
+    seek_request.addHeader("Connection: close");
+    seek_request.addHeader(QString("Range: bytes=%1-").arg(an_offset));    
+    seek_request.setHashingUrl(my_path_and_query);
+    seek_request.addHeader(QString("Client-DAAP-Request-ID: %1").arg(daap_request_id));
+    seek_request.send(socket_to_daap_server, true);
+
 
     //
     //  Get ourselves positioned on the first byte of the payload
@@ -463,7 +475,7 @@ void DaapInput::eatThroughHeadersAndGetToPayload()
                 //  
                 
                 warning("daap server sent us bad status code (not HTTP OK == 200|206)");
-                cout << "raw is: " << endl << "***************************" << endl << incoming << endl;
+                warning(QString("raw is: %1").arg(incoming));
                 all_is_well = false;
                 return;
             }

@@ -708,7 +708,7 @@ void Database::parseItems(TagInput& dmap_data, int how_many_now)
                 //  filename)
                 //  
             
-                QString new_url = QString("daap://%1:%2/databases/%3/items/%4.%5?revision-number=0&session-id=%6")
+                QString new_url = QString("daap://%1:%2/databases/%3/items/%4.%5?session-id=%6")
                                   .arg(host_address)
                                   .arg(host_port)
                                   .arg(daap_id)
@@ -959,6 +959,7 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
 
     Tag a_tag;
 
+    u8  a_u8_variable;
     u32 a_u32_variable;
     std::string a_string;
     Chunk listing;
@@ -1023,7 +1024,18 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
                     internal_listing >> a_u32_variable;
                     new_playlist_expected_count = a_u32_variable;
                     break;
-                
+
+                case 'abpl':
+                    
+                    //
+                    //  Base playlist (have no idea what this means, it's a
+                    //  single byte, so it may be a flag saying "this is a
+                    //  base playlist"?)
+                    //
+                    
+                    internal_listing >> a_u8_variable;
+                    break;
+                    
                 default:
                     
                     warning("unknown tag while parsing "

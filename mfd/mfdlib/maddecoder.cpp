@@ -369,12 +369,23 @@ void MadDecoder::run()
         if (seekTime >= 0.0)
         {
             long seek_pos = long(seekTime * input()->size() / totalTime);
-            input()->at(seek_pos);
-            output_size = long(seekTime) * long(freq * channels * 16 / 2);
-            input_bytes = 0;
-            output_at = 0;
-            output_bytes = 0;
-            eof = false;
+            if(input()->at(seek_pos))
+            {
+                output_size = long(seekTime) * long(freq * channels * 16 / 2);
+                input_bytes = 0;
+                output_at = 0;
+                output_bytes = 0;
+                eof = false;
+            }
+            else
+            {
+                //
+                //  We had a seeking error, give up
+                //
+
+                eof = true;
+                done = true;
+            }
         }
 
         finish = eof;

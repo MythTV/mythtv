@@ -563,9 +563,9 @@ bool DaapInstance::checkServerType(const QString &server_description)
             if(itunes_version == 4.5)
             {
                 daap_server_type = DAAP_SERVER_ITUNES45;
-                warning("cannot talk to iTunes 4.5 (please complain to Apple "
-                        "and/or wait for an update to libopendaap)");
-                return false;
+                //log("I'm a client of version 4.5 iTunes. You may nee"
+                //        "and/or wait for an update to libopendaap)");
+                //return false;
             }
             log(QString("discovered service "
                         "named \"%1\" is being served by "
@@ -1142,9 +1142,19 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
                 server_numb_databases = (int) a_u32_variable;
                 break;
 
+            case 'aeSV':
+
+                //
+                //  iTunes music-sharing version, which we ignore
+                //
+                
+                dmap_data >> a_u32_variable;
+                break;
+                
             default:
-                warning("got an unknown tag type "
-                        "while doing doServerInfoResponse()");
+                warning(QString("got an unknown tag type (%1) "
+                        "while doing doServerInfoResponse()")
+                        .arg(a_tag.type));
                 dmap_data >> emergency_throwaway_chunk;
         }
 

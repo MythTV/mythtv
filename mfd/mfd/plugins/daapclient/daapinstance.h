@@ -57,6 +57,8 @@ class DaapInstance: public QThread
     void processResponse(DaapResponse *daap_response);
     bool checkServerType(const QString &server_description);
     bool isThisYou(QString a_name, QString an_address, uint a_port);
+    int  getDaapVersionMajor(){return daap_version.hi;}
+    int  getSessionId(){return session_id;}
 
     //
     //  Methods to handle the various responses we can get from a DAAP

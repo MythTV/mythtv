@@ -63,6 +63,7 @@ TypeRegistry::Var    TypeRegistry::list[] = {
 	{ 'msrs', "dmap.supportsresolve", VT_INT8 },
 	{ 'mstm', "dmap.timeoutinterval", VT_INT32 },
 	{ 'msdc', "dmap.databasescount", VT_INT32 },
+	{ 'msas', "dmap.authenticationschemes",  VT_INT32 },
 	{ 'mlog', "dmap.loginresponse", VT_CONTAINER },
 	{ 'mlid', "dmap.sessionid", VT_INT32 },
 	
@@ -87,11 +88,14 @@ TypeRegistry::Var    TypeRegistry::list[] = {
 	{ 'abgn', "daap.browsegenrelisting", VT_CONTAINER },
 	
 	{ 'adbs', "daap.databasesongs", VT_CONTAINER },
+	{ 'agrp', "daap.songgrouping", VT_STRING },
 	{ 'asal', "daap.songalbum", VT_STRING },
 	{ 'asar', "daap.songartist", VT_STRING },
 	{ 'asbt', "daap.songbeatsperminute", VT_INT16 },
 	{ 'asbr', "daap.songbitrate", VT_INT16 },
 	{ 'ascm', "daap.songcomment", VT_STRING },
+	{ 'ascd', "daap.songcodectype", VT_INT32 },
+	{ 'ascs', "daap.songcodecsubtype", VT_INT32 },
 	{ 'asco', "daap.songcompilation", VT_INT8 },
 	{ 'ascp', "daap.songcomposer", VT_STRING },
 	{ 'asda', "daap.songdateadded", VT_TIME },
@@ -124,7 +128,12 @@ TypeRegistry::Var    TypeRegistry::list[] = {
 	
 	{ 'aeNV', "com.apple.itunes.norm-volume", VT_INT32 },
 	{ 'aeSP', "com.apple.itunes.smart-playlist", VT_INT8 },
-	
+	{ 'aeSV', "com.apple.itunes.music-sharing-version", VT_INT32},
+	{ 'aeGI', "com.apple.itunes.itms-genreid", VT_INT32},
+	{ 'aeCI', "com.apple.itunes.itms-composerid", VT_INT32},
+	{ 'aePI', "com.apple.itunes.itms-playlistid", VT_INT32},
+	{ 'aeAI', "com.apple.itunes.itms-artistid", VT_INT32},
+	{ 'aeSI', "com.apple.itunes.itms-songid", VT_INT32},
 	//
 	//  This type was added for myth <--> myth to enable exchange of myth
 	//  digests (oddly calculated md5 checksums). It is not part of

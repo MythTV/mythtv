@@ -34,20 +34,23 @@ class DaapRequest : public HttpOutRequest
                 const QString& l_base_url, 
                 const QString& l_host_address,
                 DaapServerType l_server_type = DAAP_SERVER_UNKNOWN,
-                MFDPluginManager *l_plugin_manager = NULL
+                MFDPluginManager *l_plugin_manager = NULL,
+                int l_request_id = 0
                );
                
     ~DaapRequest();
 
     bool send(QSocketDevice *where_to_send, bool add_validation = false);
     void warning(const QString &warn_text);
+    void setHashingUrl(const QString &a_string){hashing_url = a_string;}
     
   private:
 
     DaapInstance        *parent;
     DaapServerType      server_type;
-    MFDPluginManager    *plugin_manager;    
-    
+    MFDPluginManager    *plugin_manager;
+    int                 request_id;    
+    QString             hashing_url;    
 };
 
 #endif  // daaprequest_h_

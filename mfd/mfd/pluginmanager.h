@@ -112,8 +112,14 @@ class MFDPluginManager : public QObject
     //  is accesible by all the plugins
     //
 
-    void fillValidationHeader(const QString &request, unsigned char *resulting_hash );
+    void fillValidationHeader(
+                                int server_daap_version_major,
+                                const QString &request, 
+                                unsigned char *resulting_hash,
+                                int request_id
+                             );
     bool haveLibOpenDaap();
+    int  bumpDaapRequestId();
     
     //
     //  debugging
@@ -154,9 +160,23 @@ class MFDPluginManager : public QObject
 
     QLibrary                   *lib_open_daap;
     typedef void (*Generate_Hash_Function)
-            (const unsigned char*, unsigned char, unsigned char*);
+            (
+                short, 
+                const unsigned char*, 
+                unsigned char, 
+                unsigned char*,
+                int
+            );
     Generate_Hash_Function generateHashFunction;
     QMutex hashing_mutex;
+
+    //
+    //  And since plugin_manager is canonical place for DAAP validation, it
+    //  should also be the place to hand out unique DAAP request id's
+    //
+    
+    QMutex  daap_request_id_mutex;
+    int     daap_request_id;
 };
 
 
