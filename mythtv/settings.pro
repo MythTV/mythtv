@@ -108,6 +108,7 @@ CONFIG += using_joystick_menu
 #EXTRA_LIBS += -lXvMCNVIDIA -lXvMC
 
 # XvMC_VLD support, modify as necessary. Incompatible with normal XvMC support.
+# Used for hardware accelerated decoding on VIA EPIA-M (and other) boards.
 #CONFIG += using_xvmc using_xvmc_vld
 #DEFINES += USING_XVMC USING_XVMC_VLD
 #EXTRA_LIBS += -lviaXvMC -lXvMC
