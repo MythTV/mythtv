@@ -15,6 +15,8 @@
 #include <qevent.h>
 #include <qsocket.h>
 
+#include "service.h"
+
 class LoggingEvent : public QCustomEvent
 {
     //
@@ -100,21 +102,41 @@ class FatalEvent : public QCustomEvent
 class ServiceEvent : public QCustomEvent
 {
     //
-    //  This is used to pass a message up from a plugin and then back down
-    //  to services handling plugin. 'fer example, the audio plugin needs to
-    //  let the zeroconfig responder plugin know about where and how to
-    //  connect to the macp (Myth Audio Control Protocol). This is how it
-    //  does so
+    //  ServiceEvents are used for two purposes:
+    //
+    //  1. If a plugin wants a service it offers to be "broadcast" (eg. http
+    //  plugin wants to say it's ready to offer html) then it sends one of
+    //  these with the please_broadcast flag set to true and the
+    //  newly_created flag set to true. When it's done (no longer wants to
+    //  offer html), it changes the newly_created flag to false.
+    //
+    //  2. If a service *discovering* plugin (currently only zc_client, but
+    //  in the future, who knows ...) finds a service, it sends one with
+    //  please_broadcast set to false (the service is already being
+    //  broadcast), but with newly_created set to true. If the service then
+    //  goes away, it sends one with both please_broadcast and newly_created
+    //  set to false.
     //
   
   public:
     
-    ServiceEvent(const QString &service_string);
-    const QString & getString();
-    
+    ServiceEvent(
+                    bool    l_please_broadcast,
+                    bool    l_newly_created,
+                    Service &a_service
+                );
+
+    bool        pleaseBroadcast(){ return please_broadcast; }
+    bool        newlyCreated(){ return newly_created; }
+    Service*    getService(){ return service;}
+
+    ~ServiceEvent();
+                
   private:
 
-    QString text;
+    bool    please_broadcast;
+    bool    newly_created;
+    Service *service;
     
 };
 

@@ -23,6 +23,16 @@
 
 class ZeroConfigClient;
 
+enum ServiceLocation
+{
+    SLOCATION_UNKNOWN = 0,
+    SLOCATION_HOST, 
+    SLOCATION_LAN, 
+    SLOCATION_NET,  //  don't actually use that one yet.
+    MAX_SLOCATION
+};
+
+
 class MFDService
 {
     //
@@ -38,10 +48,18 @@ class MFDService
     
     const QString & getName(){return service_name;}
     const QString & getType(){return service_type;}
+    const QString   getShortType();
     const QString & getDomain(){return service_domain;}
+    int             getLocation(){return service_location;}
     const QString & getLongDescription();
     const QString & getFormalServiceDescription();
     const QString & getFormalServiceRemoval();
+
+    uint    getIpOne(){ return ip_address_one; }
+    uint    getIpTwo(){ return ip_address_two; }
+    uint    getIpThree(){ return ip_address_three; }
+    uint    getIpFour(){ return ip_address_four; }
+    uint    getPort(){ return port_number; }
     
     void  takeOwnershipOfServiceInfo(ServiceInfo *si, ServiceInfoQuery *siq);
     void  setResolved(uint ip1, uint ip2, uint ip3, uint ip4, uint port_high, uint port_low);
@@ -70,15 +88,6 @@ class MFDService
     QString  formal_description;
     QString  formal_removal;
 
-    enum ServiceLocation
-    {
-        SLOCATION_UNKNOWN = 0,
-        SLOCATION_HOST, 
-        SLOCATION_LAN, 
-        SLOCATION_NET,  //  don't actually use that one yet.
-        MAX_SLOCATION
-    };
-
     int     service_location;
     ZeroConfigClient *parent;
 };
@@ -100,17 +109,14 @@ class ZeroConfigClient: public MFDServicePlugin
     void handleBrowseCallback(mDNS *const m, DNSQuestion *question, const ResourceRecord *const answer, mDNSBool AddRecord);
     void handleServiceQueryCallback(mDNS *const m, ServiceInfoQuery *query);
     void browseForService(mDNS *const mdns_storage, const QString& service_name);
-    void addRequest(const QStringList &tokens, int socket_identifier);
-    void doSomething(const QStringList &tokens, int socket_identifier);
     
   private:
   
     bool        checkServiceName(const QString &new_name);
     MFDService* findServiceByName(const QString &a_name);
     void        removeService(const QString &name, const QString &type, const QString &domain);
-  
+    void        sendServiceEvent(MFDService *service, bool created_or_destroyed);
     
-    MFD         *parent;
     int         unique_identifier;
 
     QPtrList<DNSQuestion>   dns_questions;

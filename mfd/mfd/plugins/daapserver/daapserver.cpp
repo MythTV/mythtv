@@ -49,11 +49,17 @@ DaapServer::DaapServer(MFD *owner, int identity)
     //  Register this (daap) service
     //
 
-    ServiceEvent *se = new ServiceEvent(QString("services add daap %1 %2")
-                                       .arg(port_number)
-                                       .arg(service_name));
+    Service *daap_service = new Service(
+                                        QString("MythMusic on %1").arg(local_hostname),
+                                        QString("daap"),
+                                        local_hostname,
+                                        SLT_HOST,
+                                        (uint) port_number
+                                       );
+ 
+    ServiceEvent *se = new ServiceEvent( true, true, *daap_service);
     QApplication::postEvent(parent, se);
-
+    delete daap_service;
 
 }
 

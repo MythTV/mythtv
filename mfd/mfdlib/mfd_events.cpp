@@ -89,15 +89,48 @@ int FatalEvent::getPluginIdentifier()
 ---------------------------------------------------------------------
 */
 
-ServiceEvent::ServiceEvent(const QString &service_string)
+ServiceEvent::ServiceEvent(
+                            bool    l_please_broadcast,
+                            bool    l_newly_created,
+                            Service &a_service
+                          )
             :QCustomEvent(65428)
 {
-    text = service_string;
+    please_broadcast = l_please_broadcast;
+    newly_created = l_newly_created;
+
+    if(a_service.hostKnown())
+    {
+        service = new Service(
+                                a_service.getName(),
+                                a_service.getType(),
+                                a_service.getHostname(),
+                                a_service.getLocation(),
+                                a_service.getPort()
+                             );
+    }
+    else
+    {
+        service = new Service(
+                                a_service.getName(),
+                                a_service.getType(),
+                                a_service.getLocation(),
+                                a_service.getIpOne(),
+                                a_service.getIpTwo(),
+                                a_service.getIpThree(),
+                                a_service.getIpFour(),
+                                a_service.getPort()
+                             );
+    }                            
 }
 
-const QString& ServiceEvent::getString()
+ServiceEvent::~ServiceEvent()
 {
-    return text;
+    if(service)
+    {
+        delete service;
+        service = NULL;
+    }
 }
 
 /*

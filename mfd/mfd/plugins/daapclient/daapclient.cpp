@@ -12,79 +12,30 @@
 #include <qregexp.h>
 
 #include "daapclient.h"
+#include "../../servicelister.h"
 
 DaapClient::DaapClient(MFD *owner, int identity)
-      :MFDServicePlugin(owner, identity, 3689, "daap client", false)
+      :MFDServicePlugin(owner, identity, 0, "daap client", false)
 {
-    client_socket_to_mfd = NULL;
     daap_instances.setAutoDelete(true);
 }
 
 void DaapClient::run()
 {
-    //
-    //  Create a client socket and connect to the mfd just like a "normal"
-    //  client (although the only data we care about that the mfd will send
-    //  us are service announcements). Why do it this way? Well, someone
-    //  could write another plugin (not part of this tree) that finds daap
-    //  services in another way (say, further away than a zeroconfig hop).
-    //  All that plugin has to do is make a ServiceEvent announcement, and
-    //  this code here will still be able to find it and figure out what
-    //  data/metadata is on offer.
-    //
 
-    QHostAddress this_address;
-    if(!this_address.setAddress("127.0.0.1"))
-    {
-        fatal("daap client could not set address for 127.0.0.1");
-        return;
-    }
-    client_socket_to_mfd = new QSocketDevice(QSocketDevice::Stream);
-    client_socket_to_mfd->setBlocking(false);
-    
-    int connect_tries = 0;
-    
-    while(! (client_socket_to_mfd->connect(this_address, 2342)))
-    {
-        //
-        //  We give this a few attempts. It can take a few on non-blocking sockets.
-        //
-
-        ++connect_tries;
-        if(connect_tries > 10)
-        {
-            fatal("daap client could not connect to the core mfd as a regular client");
-            return;
-        }
-        usleep(100);
-    }
-    
-
-    QString first_and_only_command = "services list\n\r";
-    client_socket_to_mfd->writeBlock(first_and_only_command.ascii(), first_and_only_command.length());
-    
     while(keep_going)
     {
+
+        //
+        //  Check for service changes (i.e. any new daap servers out there?)
+        //
+
+        checkServiceChanges();
 
         int nfds = 0;
         fd_set readfds;
 
         FD_ZERO(&readfds);
-
-
-        //
-        //  Add the socket to the mfd (where we find out about new services,
-        //  services going away, etc.)
-        //
-
-        if(client_socket_to_mfd->socket() > 0)
-        {
-            FD_SET(client_socket_to_mfd->socket(), &readfds);
-            if(nfds <= client_socket_to_mfd->socket())
-            {
-                nfds = client_socket_to_mfd->socket() + 1;
-            }
-        }
 
         //
         //  Add the control pipe
@@ -124,18 +75,6 @@ void DaapClient::run()
         }
     
         //
-        //  Handle anything incoming on the socket
-        //
-
-        if(client_socket_to_mfd->socket() > 0)
-        {
-            if(FD_ISSET(client_socket_to_mfd->socket(), &readfds))
-            {
-                readSocket();
-            }
-        }
-        
-        //
         //  Clean out any instances that have exited (because, for example,
         //  the daap server they were talking to went away)
         //
@@ -170,60 +109,69 @@ void DaapClient::run()
     
 }
 
-void DaapClient::readSocket()
+void DaapClient::handleServiceChange()
 {
+    //
+    //  Something has changed in available services. I need to query the mfd
+    //  and make sure I know about all daap servers
+    //
+    
+    ServiceLister *service_lister = parent->getServiceLister();
+    
+    service_lister->lockDiscoveredList();
 
-    char incoming[2049];
+        //
+        //  Go through my list of daap instances and make sure they still
+        //  exist in the mfd's service list
+        //
 
-    int length = client_socket_to_mfd->readBlock(incoming, 2048);
-    if(length > 0)
-    {
-        if(length >= 2048)
+        DaapInstance *an_instance;
+        QPtrListIterator<DaapInstance> iter( daap_instances );
+
+        while ( (an_instance = iter.current()) != 0 )
         {
-            // oh crap
-            warning("daap client socket to mfd is getting too much data");
-            length = 2048;
-        }
-        incoming[length] = '\0';
-        QString incoming_data = incoming;
-        
-        incoming_data.simplifyWhiteSpace();
-
-        QStringList line_by_line = QStringList::split("\n", incoming_data);        
-
-        for(uint i = 0; i < line_by_line.count(); i++)
-        {
-            QStringList tokens = QStringList::split(" ", line_by_line[i]);
-            if(tokens.count() >= 7)
+            ++iter;
+            if( !service_lister->findDiscoveredService(an_instance->getName()) )
             {
-                if(tokens[0] == "services" &&
-                   tokens[2] == "lan" &&
-                   tokens[3] == "daap")
-                {
-                    QString service_name = tokens[6];
-                    for(uint i = 7; i < tokens.count(); i++)
-                    {
-                        service_name += " ";
-                        service_name += tokens[i];
-                    }
-                    
-                    if(tokens[1] == "found")
-                    {
-                        addDaapServer(tokens[4], tokens[5].toUInt(), service_name);
-                    }
-                    else if(tokens[1] == "lost")
-                    {
-                        removeDaapServer(tokens[4], tokens[5].toUInt(), service_name);
-                    }
-                    else
-                    {
-                        warning("daap client got a services update where 2nd token was neither \"found\" nor \"lost\"");
-                    }
-                }
+                an_instance->stop();
+                an_instance->wakeUp();
+                break;
             }
         }
-    }
+
+    
+        //
+        //  Go through services on the master list, add any that I don't
+        //  already know about
+        //
         
+        typedef     QValueList<Service> ServiceList;
+        ServiceList *discovered_list = service_lister->getDiscoveredList();
+        
+
+        ServiceList::iterator it;
+        for ( it  = discovered_list->begin(); 
+              it != discovered_list->end(); 
+              ++it )
+        {
+            //
+            //  We just try and add any that are not on this host, as the
+            //  addDaapServer() method checks for dupes
+            //
+                
+            if ( (*it).getType() == "daap")
+            {
+                if( (*it).getLocation() == SLT_LAN ||
+                    (*it).getLocation() == SLT_NET )
+                {
+                    addDaapServer( (*it).getAddress(), (*it).getPort(), (*it).getName() );
+                }
+            }
+                
+        }
+
+    service_lister->unlockDiscoveredList();
+    
 }
 
 void DaapClient::addDaapServer(QString server_address, uint server_port, QString service_name)
@@ -286,11 +234,6 @@ void DaapClient::removeDaapServer(QString server_address, uint server_port, QStr
 
 DaapClient::~DaapClient()
 {
-    if(client_socket_to_mfd)
-    {
-        delete client_socket_to_mfd;
-        client_socket_to_mfd = NULL;
-    }
     daap_instances.clear();
 }
 

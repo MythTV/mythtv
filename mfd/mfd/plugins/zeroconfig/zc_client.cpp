@@ -175,6 +175,38 @@ void MFDService::setResolved(uint ip1, uint ip2, uint ip3, uint ip4, uint port_h
 
 }
 
+const QString MFDService::getShortType()
+{
+    QString short_type = "unknown";
+
+    if(service_type == "_mfdp._tcp.")
+    {
+        short_type = "mfdp";
+    }
+    else if(service_type == "_macp._tcp.")
+    {
+        short_type = "macp";
+    }
+    else if(service_type == "_daap._tcp.")
+    {
+        short_type = "daap";
+    }
+    else if(service_type == "_mdcap._tcp.")
+    {
+        short_type = "mdcap";
+    }
+    else if(service_type == "_http._tcp.")
+    {
+        short_type = "http";
+    }
+    else if(service_type == "_raop._tcp.")
+    {
+        short_type = "raop";
+    }
+
+    return short_type;
+}
+
 const QString& MFDService::getLongDescription()
 {
     QString location_string = "Unknown";
@@ -222,27 +254,7 @@ const QString& MFDService::getFormalServiceDescription()
             break;
     }
 
-    QString formal_type = "unknown";
-    if(service_type == "_mfdp._tcp.")
-    {
-        formal_type = "mfdp";
-    }
-    else if(service_type == "_macp._tcp.")
-    {
-        formal_type = "macp";
-    }
-    else if(service_type == "_daap._tcp.")
-    {
-        formal_type = "daap";
-    }
-    else if(service_type == "_mdcap._tcp.")
-    {
-        formal_type = "mdcap";
-    }
-    else if(service_type == "_http._tcp.")
-    {
-        formal_type = "http";
-    }
+    QString formal_type = getShortType();
 
     formal_description = QString("services found %1 %2 %3.%4.%5.%6 %7 %8")
                .arg(location_string)
@@ -277,27 +289,7 @@ const QString& MFDService::getFormalServiceRemoval()
             break;
     }
 
-    QString formal_type = "unknown";
-    if(service_type == "_mfdp._tcp.")
-    {
-        formal_type = "mfdp";
-    }
-    else if(service_type == "_macp._tcp.")
-    {
-        formal_type = "macp";
-    }
-    else if(service_type == "_daap._tcp.")
-    {
-        formal_type = "daap";
-    }
-    else if(service_type == "_mdcap._tcp.")
-    {
-        formal_type = "mdcap";
-    }
-    else if(service_type == "_http._tcp.")
-    {
-        formal_type = "http";
-    }
+    QString formal_type = getShortType();
 
     formal_removal = QString("services lost %1 %2 %3.%4.%5.%6 %7 %8")
                .arg(location_string)
@@ -360,7 +352,7 @@ extern "C" void BrowseCallback(mDNS *const m, DNSQuestion *question, const Resou
 
 
 ZeroConfigClient::ZeroConfigClient(MFD *owner, int identifier)
-                 :MFDServicePlugin(owner, identifier, -1, "zeroconfig client", false)
+                 :MFDServicePlugin(owner, identifier, 0, "zeroconfig client", false)
 {
 
     dns_questions.clear();
@@ -411,7 +403,8 @@ void ZeroConfigClient::handleServiceQueryCallback(mDNS *const m, ServiceInfoQuer
                 log(QString("resolved service \"%1\" to %2")
                     .arg(a_service->getName())
                     .arg(a_service->getLongDescription()),1);
-                sendCoreMFDMessage(a_service->getFormalServiceDescription());
+                sendServiceEvent(a_service, true);
+                //sendCoreMFDMessage(a_service->getFormalServiceDescription());
                 break;
 
             default:
@@ -584,6 +577,7 @@ void ZeroConfigClient::run()
     browseForService(&mDNSStorage, "_daap._tcp.");
     browseForService(&mDNSStorage, "_mdcap._tcp.");
     browseForService(&mDNSStorage, "_http._tcp.");
+    browseForService(&mDNSStorage, "_raop._tcp.");
 
     //
     //  Set up some file descriptors and a pipe. This lets a separate thread
@@ -616,7 +610,7 @@ void ZeroConfigClient::run()
               
         if(pending_tokens.count() > 0)
         {
-            doSomething(pending_tokens, pending_socket);
+            warning("has pending tokens, and should not");
         }
         else
         {
@@ -748,11 +742,12 @@ void ZeroConfigClient::removeService(const QString &name, const QString &type, c
            a_service->getType()   == type &&
            a_service->getDomain() == domain)
         {
-            sendCoreMFDMessage(a_service->getFormalServiceRemoval());
+            //sendCoreMFDMessage(a_service->getFormalServiceRemoval());
             log(QString("lost service called %1 (%2%3)")
                        .arg(name)
                        .arg(type)
                        .arg(domain),1);
+            sendServiceEvent(a_service, false);
 
             available_services.remove(a_service);
             return;
@@ -764,45 +759,41 @@ void ZeroConfigClient::removeService(const QString &name, const QString &type, c
             .arg(domain));
 }
 
-void ZeroConfigClient::addRequest(const QStringList &tokens, int socket_identifier)
+void ZeroConfigClient::sendServiceEvent(MFDService *service, bool created_or_destroyed)
 {
-    SocketBuffer *sb = new SocketBuffer(tokens, socket_identifier);
-    things_to_do_mutex.lock();
-        things_to_do.append(sb);
-        if(things_to_do.count() > 99)
-        {
-            warning(QString("more than %1 pending commands")
-                    .arg(things_to_do.count()));
-        }
-    things_to_do_mutex.unlock();
-}
+    ServiceLocationDescription location = SLT_UNKNOWN;
+    
+    if(service->getLocation() == SLOCATION_HOST)
+    {
+        location = SLT_HOST;
+    }
+    else if(service->getLocation() == SLOCATION_LAN)
+    {
+        location = SLT_LAN;
+    }
+    else if(service->getLocation() == SLOCATION_NET)
+    {
+        location = SLT_NET;
+    }
 
-void ZeroConfigClient::doSomething(const QStringList &tokens, int socket_identifier)
-{
-    if(tokens.count() < 2)
-    {
-        warning(QString("got passed insufficient tokens: %1")
-                .arg(tokens.join(" ")));
-        huh(tokens, socket_identifier);
-        return;
-    }
-    if(tokens[1] == "list")
-    {
-        QPtrListIterator<MFDService> iterator(available_services);
-        MFDService *a_service;
-        while ( (a_service = iterator.current()) != 0 )
-        {
-            ++iterator;
-            if(a_service->isResolved())
-            {
-                sendCoreMFDMessage(a_service->getFormalServiceDescription(), socket_identifier);            
-            }
-        }
-        return;
-    }
-    warning(QString("got passed tokens is doesn't understand: %1")
-                .arg(tokens.join(" ")));
-    huh(tokens, socket_identifier);
+
+
+    Service *a_service = new Service(
+                                        service->getName(),
+                                        service->getShortType(),
+                                        location,
+                                        service->getIpOne(),
+                                        service->getIpTwo(),
+                                        service->getIpThree(),
+                                        service->getIpFour(),
+                                        service->getPort()
+                                    );
+
+    ServiceEvent *se = new ServiceEvent( false, created_or_destroyed, *a_service);
+   
+    delete a_service;
+
+    QApplication::postEvent(parent, se);
 }
 
 ZeroConfigClient::~ZeroConfigClient()

@@ -25,7 +25,7 @@
 DiscWatcher *disc_watcher = NULL;
 
 DiscWatcher::DiscWatcher(MFD *owner, int identity)
-            :MFDServicePlugin(owner, identity, -1, "discwatcher", false)
+            :MFDServicePlugin(owner, identity, 0, "discwatcher", false)
 {
     device_watchers.setAutoDelete(true);
 }

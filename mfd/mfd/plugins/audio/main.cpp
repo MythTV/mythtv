@@ -16,6 +16,7 @@ AudioPlugin *audio_plugin = NULL;
 extern "C" {
 bool         mfdplugin_init(MFD*, int);
 bool         mfdplugin_run();
+void         mfdplugin_parse_tokens(const QStringList &tokens, int socket_identifier);
 bool         mfdplugin_stop();
 bool         mfdplugin_can_unload();
 void         mfdplugin_metadata_change(int, bool);
@@ -35,6 +36,18 @@ bool mfdplugin_run()
         return true;
     }
     return false;
+}
+
+void mfdplugin_parse_tokens(const QStringList &tokens, int socket_identifier)
+{
+    cout << endl 
+         << "$$$$$$$$ audio plugin got (from "
+         << socket_identifier
+         << ") following service announcement: "
+         << tokens.join("|")
+         << endl
+         << endl;
+         
 }
 
 bool mfdplugin_stop()

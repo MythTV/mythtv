@@ -66,7 +66,13 @@ bool MFDPluginWrapper::init()
     if(!(metadata_change_function = (Plugin_Metadata_Change_Function) this->resolve("mfdplugin_metadata_change")))
     {
         log(QString("plugin wrapper did not find a metadata change interface in plugin %1")
-            .arg(shortName()),8);
+            .arg(shortName()),6);
+    }
+
+    if(!(services_change_function = (Plugin_Services_Change_Function) this->resolve("mfdplugin_services_change")))
+    {
+        log(QString("plugin wrapper did not find a services change interface in plugin %1")
+            .arg(shortName()),6);
     }
 
     //
@@ -228,6 +234,14 @@ void MFDPluginWrapper::metadataChanged(int which_collection, bool external)
     if(metadata_change_function)
     {
         metadata_change_function(which_collection, external);
+    }
+}
+
+void MFDPluginWrapper::servicesChanged()
+{
+    if(services_change_function)
+    {
+        services_change_function();
     }
 }
 
@@ -394,6 +408,7 @@ void MFDPluginManager::afterStopLoad()
             }
         }
     }
+
     emit allPluginsLoaded();
 }
 
@@ -427,7 +442,16 @@ void MFDPluginManager::tellPluginsMetadataChanged(int which_collection, bool ext
     }
 }
 
-
+void MFDPluginManager::tellPluginsServicesChanged()
+{
+    QPtrListIterator<MFDPluginWrapper> iterator( available_plugins );
+    MFDPluginWrapper *a_plugin;
+    while ( (a_plugin = iterator.current()) != 0 )
+    {
+        ++iterator;
+        a_plugin->servicesChanged();
+    }
+}
 
 void MFDPluginManager::stopPlugins()
 {

@@ -32,7 +32,6 @@ class ZeroConfigSupervisor: public MFDCapabilityPlugin
     ~ZeroConfigSupervisor();
 
     void    runOnce();
-    void    doSomething(const QStringList &tokens, int socket_identifier);
 
   private:
   

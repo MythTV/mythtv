@@ -28,6 +28,7 @@ MFDBasePlugin::MFDBasePlugin(MFD *owner, int identifier, const QString &a_name)
     metadata_changed_flag = false;
     metadata_change_external_flag = false;
     metadata_collection_last_changed = 0;
+    services_changed_flag = false;
 }
 
 
@@ -140,6 +141,14 @@ void MFDBasePlugin::metadataChanged(int which_collection, bool external)
     wakeUp();
 }
 
+void MFDBasePlugin::servicesChanged()
+{
+    services_changed_mutex.lock();
+        services_changed_flag = true;
+    services_changed_mutex.unlock();
+    wakeUp();
+}
+
 MFDBasePlugin::~MFDBasePlugin()
 {
 }
@@ -226,7 +235,6 @@ void MFDCapabilityPlugin::run()
             main_wait_condition.wait();
         }
     }
-    
 }
 
 MFDCapabilityPlugin::~MFDCapabilityPlugin()
@@ -240,7 +248,7 @@ MFDCapabilityPlugin::~MFDCapabilityPlugin()
 MFDServicePlugin::MFDServicePlugin(
                                     MFD *owner,
                                     int identifier, 
-                                    int port, 
+                                    uint port, 
                                     const QString &a_name,
                                     bool l_use_thread_pool, 
                                     uint l_minimum_thread_pool_size
@@ -328,6 +336,7 @@ void MFDServicePlugin::stop()
 
 bool MFDServicePlugin::initServerSocket()
 {
+
     core_server_socket = new QSocketDevice();
     core_server_socket->setAddressReusable(true);
     if(!core_server_socket->bind(QHostAddress(), port_number))
@@ -639,38 +648,39 @@ void MFDServicePlugin::checkInternalMessages()
 
 void MFDServicePlugin::checkMetadataChanges()
 {
-    if(metadata_changed_flag)
-    {
-        //
-        //  The mfd has "pushed" us the information that some collection
-        //  of metadata has changed. Deal with it (default
-        //  implementation is to do nothing)
-        //
+    metadata_changed_mutex.lock();
+        if(metadata_changed_flag)
+        {
+            //
+            //  The mfd has "pushed" us the information that some collection
+            //  of metadata has changed. Deal with it (default
+            //  implementation is to do nothing)
+            //
 
-        int which_collection;
-        bool external_flag;
-        metadata_changed_mutex.lock();
+            int which_collection;
+            bool external_flag;
             which_collection = metadata_collection_last_changed;
             external_flag = metadata_change_external_flag;
             metadata_changed_flag = false;
-        metadata_changed_mutex.unlock();
-        handleMetadataChange(which_collection, external_flag);
-    }
+            handleMetadataChange(which_collection, external_flag);
+        }
+    metadata_changed_mutex.unlock();
+}
+
+void MFDServicePlugin::checkServiceChanges()
+{
+    services_changed_mutex.lock();
+        if(services_changed_flag)
+        {
+            services_changed_flag= false;
+            handleServiceChange();
+        }
+    services_changed_mutex.unlock();    
 }
 
 void MFDServicePlugin::handleInternalMessage(QString)
 {
     warning("has not re-implemented handleInternalMessage()");
-}
-
-void MFDServicePlugin::sendCoreMFDMessage(const QString &message, int socket_identifier)
-{
-    MFDBasePlugin::sendMessage(message, socket_identifier);
-}
-
-void MFDServicePlugin::sendCoreMFDMessage(const QString &message)
-{
-    MFDBasePlugin::sendMessage(message);
 }
 
 void MFDServicePlugin::wakeUp()
@@ -757,7 +767,9 @@ void MFDServicePlugin::waitForSomethingToHappen()
         }
         else
         {
-            warning("lost out core server socket ... impending doom");
+            warning(QString("lost core server socket on port %1 "
+                            "... impending doom")
+                            .arg(port_number));
         }
     }
 
@@ -911,6 +923,16 @@ void MFDServicePlugin::handleMetadataChange(int, bool)
     //
 }
 
+void MFDServicePlugin::handleServiceChange()
+{
+    //
+    //  Default implementation is to just warn
+    //
+    
+    warning("services changed being handled by base class MFDServicePlugin::handleServiceChange()");
+
+}
+
 MFDServicePlugin::~MFDServicePlugin()
 {
     //
@@ -998,7 +1020,7 @@ MFDServicePlugin::~MFDServicePlugin()
 MFDHttpPlugin::MFDHttpPlugin(
                                 MFD *owner, 
                                 int identifier, 
-                                int port, 
+                                uint port, 
                                 const QString &a_name,
                                 int l_minimum_thread_pool_size
                             )

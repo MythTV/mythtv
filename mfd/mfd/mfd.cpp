@@ -1,7 +1,7 @@
 /*
 	mfd.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	Methods for the core mfd object
@@ -19,11 +19,12 @@
 #include "mfd.h"
 #include "../mfdlib/mfd_events.h"
 #include "mdserver.h"
+#include "servicelister.h"
 #include "signalthread.h"
 
 extern SignalThread *signal_thread;
 
-MFD::MFD(int port, bool log_stdout, int logging_verbosity)
+MFD::MFD(uint port, bool log_stdout, int logging_verbosity)
     :QObject()
 {
     //
@@ -73,15 +74,24 @@ MFD::MFD(int port, bool log_stdout, int logging_verbosity)
     metadata_server->start();
 
     //
+    //  Create the ServiceLister object (little thing that just keeps track
+    //  of what services (http, daap, etc.) are available.
+    //
+    
+    service_lister = new ServiceLister(this);
+
+    //
     //  Create the plugin manager, which will
     //  automatically load the plugins
     //
     
     plugin_manager = new MFDPluginManager(this);
-    connect(plugin_manager, SIGNAL(allPluginsLoaded(void)),
-            this, SLOT(registerMFDService(void)));
-    registerMFDService();
 
+    //
+    //  Announce the existence of this myth frontend daemon service
+    //
+
+    registerMFDService();
     
 }
 
@@ -182,17 +192,20 @@ void MFD::customEvent(QCustomEvent *ce)
     }
     else if(ce->type() == 65428)
     {
+    
         //
-        //  A plugin wants to register a service
+        //  Let the service_lister object deal with these
+        //
+
+        ServiceEvent *se = (ServiceEvent*)ce;
+        service_lister->handleServiceEvent(se);
+
+        //
+        //  Tell the plugins the event occured
         //  
         
-        ServiceEvent *se = (ServiceEvent*)ce;
-        QStringList service_tokens = QStringList::split(" ", se->getString());
-        if(!plugin_manager->parseTokens(service_tokens, -1))
-        {
-            warning(QString("mfd could not register this service at the "
-                            "request of a plugin: %1").arg(se->getString()));
-        }
+        plugin_manager->tellPluginsServicesChanged();
+        
     }
     else if(ce->type() == 65427)
     {
@@ -354,6 +367,10 @@ void MFD::parseTokens(const QStringList &tokens, MFDClientSocket *socket)
     {
         doListCapabilities(tokens, socket);
     }
+    else if(tokens[0] == "services")
+    {
+        doServiceResponse(tokens, socket);
+    }
     else if(plugin_manager->parseTokens(tokens, socket->getIdentifier()))
     {
         //
@@ -395,6 +412,44 @@ void MFD::doListCapabilities(const QStringList& tokens,
     plugin_manager->doListCapabilities(socket->getIdentifier());
         
 }
+
+void MFD::doServiceResponse(const QStringList& tokens,
+                             MFDClientSocket *socket)
+{
+    if(tokens.count() < 2)
+    {
+        warning(QString("failed to parse this incoming command: %1")
+                        .arg(tokens.join(" ")));
+        sendMessage(socket, QString("huh %1").arg(tokens.join(" ")));
+        return;
+    }
+    if(tokens[1] == "list")
+    {
+        doServiceList(socket);
+        return;
+    }
+
+    sendMessage(socket, QString("huh %1").arg(tokens.join(" ")));
+}
+
+void MFD::doServiceList(MFDClientSocket *socket)
+{
+    typedef     QValueList<Service> ServiceList;
+
+    service_lister->lockDiscoveredList();
+        ServiceList *discovered_list = service_lister->getDiscoveredList();
+        ServiceList::iterator it;
+        for ( it  = discovered_list->begin();
+              it != discovered_list->end();
+              ++it)
+        {
+            sendMessage(socket, (*it).getFormalDescription(true));
+        }
+        
+    service_lister->unlockDiscoveredList();
+}
+
+
 
 void MFD::shutDown()
 {
@@ -545,19 +600,21 @@ void MFD::registerMFDService()
 
     QString local_hostname = my_hostname;
 
-    QString self_registration_string =
-                    QString("services add mfdp %1 mfd on %2")
-                    .arg(port_number).arg(local_hostname);
+    Service *mfdp_service = new Service(
+                                            QString("mfd on %1").arg(local_hostname),
+                                            QString("mfdp"),
+                                            local_hostname,
+                                            SLT_HOST,
+                                            port_number
+                                        );
+ 
+    ServiceEvent *se = new ServiceEvent( true, true, *mfdp_service);
+   
+    delete mfdp_service;
 
-    QStringList self_registration_tokens = QStringList::split(" ", 
-                                            self_registration_string);
 
-    if(!plugin_manager->parseTokens(self_registration_tokens, -1))
-    {
-        warning("mfd could not register itself (perhaps no plugin "
-                "handling services tokens?)");
-    }
-    
+    QApplication::postEvent(this, se);
+
 }
 
 MFD::~MFD()
@@ -568,6 +625,12 @@ MFD::~MFD()
         delete metadata_server;
         metadata_server = NULL;
     }    
+
+    if(service_lister)
+    {
+        delete service_lister;
+        service_lister = NULL;
+    }
 
     if(plugin_manager)
     {

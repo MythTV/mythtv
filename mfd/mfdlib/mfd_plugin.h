@@ -25,6 +25,7 @@ using namespace std;
 #include "requestthread.h"
 #include "clientsocket.h"
 #include "httpinrequest.h"
+#include "mfd_events.h"
  
 class SocketBuffer
 {
@@ -77,6 +78,7 @@ class MFDBasePlugin : public QThread
     virtual void huh(const QStringList &tokens, int socket_identifier);
     bool         keepGoing();
     void         metadataChanged(int which_collection, bool external=false);
+    void         servicesChanged();
     MFD*         getMfd(){return parent;}
     
 
@@ -103,6 +105,9 @@ class MFDBasePlugin : public QThread
     int                     metadata_collection_last_changed;
     bool                    metadata_change_external_flag;
     QMutex                  metadata_changed_mutex;
+    
+    bool                    services_changed_flag;
+    QMutex                  services_changed_mutex;
     
 };
 
@@ -138,7 +143,7 @@ class MFDServicePlugin : public MFDBasePlugin
     MFDServicePlugin(
                         MFD *owner, 
                         int identifier, 
-                        int port, 
+                        uint port, 
                         const QString &a_name = "unkown",
                         bool l_use_thread_pool = true, 
                         uint l_minimum_thread_pool_size = 0
@@ -158,22 +163,22 @@ class MFDServicePlugin : public MFDBasePlugin
     void            waitForSomethingToHappen();
     void            setTimeout(int numb_seconds, int numb_useconds);
     int             bumpClient();
-    void            sendCoreMFDMessage(const QString &message, int socket_identifier);
-    void            sendCoreMFDMessage(const QString &message);
     void            sendMessage(const QString &message, int socket_identifier);
     void            sendMessage(const QString &message);
     void            sendInternalMessage(const QString &the_message);
     void            checkInternalMessages();
     void            checkMetadataChanges();
+    void            checkServiceChanges();
     virtual void    handleInternalMessage(QString the_message);
 
     virtual void    processRequest(MFDServiceClientSocket *a_client);
     void            markUnused(ServiceRequestThread *which_one);
     virtual void    handleMetadataChange(int which_collection, bool external=false);
+    virtual void    handleServiceChange();
 
   protected:
 
-    int                     port_number;
+    uint    port_number;
     
     //
     //  One server socket, and a collection of client socket, plus a mutex
@@ -248,7 +253,7 @@ class MFDHttpPlugin : public MFDServicePlugin
     MFDHttpPlugin(
                     MFD *owner, 
                     int identifier, 
-                    int port, 
+                    uint port, 
                     const QString &a_name = "unkown",
                     int l_minimum_thread_pool_size = 0
                  );

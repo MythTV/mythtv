@@ -26,13 +26,12 @@ class DaapClient: public MFDServicePlugin
     ~DaapClient();
 
     void    run();
-    void    readSocket();
+    void    handleServiceChange();
     void    addDaapServer(QString server_address, uint server_port, QString service_name);
     void    removeDaapServer(QString server_address, uint server_port, QString service_name);
 
   private:
   
-    QSocketDevice          *client_socket_to_mfd;
     QPtrList<DaapInstance> daap_instances;
 };
 

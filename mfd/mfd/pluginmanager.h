@@ -40,6 +40,7 @@ class MFDPluginWrapper : public QLibrary
     int  getIdentifier(){return unique_identifier;}
     bool tryToUnload();
     void metadataChanged(int which_collection, bool external);
+    void servicesChanged();
 
     QStringList* getListOfCapabilities(){return &acceptable_tokens;}
     
@@ -73,6 +74,9 @@ class MFDPluginWrapper : public QLibrary
     typedef void (*Plugin_Metadata_Change_Function)(int, bool);
     Plugin_Metadata_Change_Function metadata_change_function;
 
+    typedef void (*Plugin_Services_Change_Function)();
+    Plugin_Services_Change_Function services_change_function;
+
     typedef bool (*Plugin_Stop_Function)();
     Plugin_Stop_Function stop_function;
 
@@ -103,6 +107,7 @@ class MFDPluginManager : public QObject
     bool pluginsExist();
     
     void tellPluginsMetadataChanged(int which_collection, bool external);
+    void tellPluginsServicesChanged();
     
     void setShutdownFlag(bool true_or_false){shutdown_flag = true_or_false;}
     void setDeadPluginTimer(int an_int);

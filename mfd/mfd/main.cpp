@@ -169,6 +169,11 @@ int main(int argc, char **argv)
         assigned_port = special_port;
     }
 
+    if(assigned_port < 0)
+    {
+        cerr << "cannot start mfd with port number of " << assigned_port << endl;
+        return 0;
+    }
 
 
     //
@@ -192,7 +197,7 @@ int main(int argc, char **argv)
 
     UpgradeMusicDatabaseSchema();
 
-    the_mfd = new MFD(assigned_port, log_stdout, logging_verbosity);
+    the_mfd = new MFD((uint) assigned_port, log_stdout, logging_verbosity);
     a.exec();
                                 
     if(mfdContext)

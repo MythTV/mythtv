@@ -90,19 +90,28 @@ void AudioPlugin::run()
     if (gethostname(my_hostname, 2048) < 0)
     {
         warning("could not call gethostname()");
-       
     }
     else
     {
         local_hostname = my_hostname;
     }
 
-    ServiceEvent *se = new ServiceEvent(QString("services add macp %1 myth audio control on %2")
-                                       .arg(port_number)
-                                       .arg(local_hostname));
+    //
+    //  Have our macp service (Myth Audio Control Protocol) broadcast on
+    //  the local lan
+    //
+
+    Service *macp_service = new Service(
+                                        QString("Myth Audio Control on %1").arg(local_hostname),
+                                        QString("macp"),
+                                        local_hostname,
+                                        SLT_HOST,
+                                        (uint) port_number
+                                       );
+ 
+    ServiceEvent *se = new ServiceEvent( true, true, *macp_service);
     QApplication::postEvent(parent, se);
-
-
+    delete macp_service;
 
     //
     //  Init our sockets

@@ -39,7 +39,7 @@ extern "C" void signal_thread_catch_signal(int signal_number)
 */
 
 SignalThread::SignalThread(MFD *owner)
-             :MFDServicePlugin(owner, -2, -2, "signal thread", false)
+             :MFDServicePlugin(owner, -2, 0, "signal thread", false)
 {
     the_mfd = owner;
 }

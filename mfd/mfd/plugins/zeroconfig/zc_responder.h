@@ -55,6 +55,8 @@ class RegisteredService
 class ZeroConfigResponder: public MFDServicePlugin
 {
 
+    typedef     QValueList<Service> ServiceList;
+
   public:
 
     ZeroConfigResponder(MFD *owner, int identifier);
@@ -83,8 +85,7 @@ class ZeroConfigResponder: public MFDServicePlugin
                                    );
 
     RegisteredService*  getServiceByName(QString name);
-    void addRequest(const QStringList &tokens, int socket_identifier);
-    void doSomething(const QStringList &tokens, int socket_identifier);
+    void handleServiceChange();
     
   private:
   

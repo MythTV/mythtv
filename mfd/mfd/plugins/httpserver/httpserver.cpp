@@ -48,11 +48,17 @@ void ClientHttpServer::run()
     //  Register this (http) service
     //
 
-    ServiceEvent *se = new ServiceEvent(QString("services add http %1 %2")
-                                       .arg(port_number)
-                                       .arg(service_name));
+    Service *http_service = new Service(
+                                        QString("UFPI on %1").arg(my_hostname),
+                                        QString("http"),
+                                        my_hostname,
+                                        SLT_HOST,
+                                        (uint) port_number
+                                       );
+ 
+    ServiceEvent *se = new ServiceEvent( true, true, *http_service);
     QApplication::postEvent(parent, se);
-
+    delete http_service;
 
     //
     //  Initialize our server socket

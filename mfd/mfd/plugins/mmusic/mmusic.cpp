@@ -65,7 +65,7 @@ bool MusicFile::calculateMythDigest()
 
 
 MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
-      :MFDServicePlugin(owner, identity, -1, "mythmusic watcher", false)
+      :MFDServicePlugin(owner, identity, 0, "mythmusic watcher", false)
 {
     //
     //  Get a reference to the metadata server

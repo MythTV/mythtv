@@ -18,6 +18,7 @@ using namespace std;
 
 #include "mdserver.h"
 #include "mfd_events.h"
+#include "service.h"
 #include "httpoutresponse.h"
 #include "mdcaprequest.h"
 #include "../mdcaplib/mdcapinput.h"
@@ -56,9 +57,20 @@ void MetadataServer::run()
 
     QString local_hostname = mfdContext->getHostName();
 
-    ServiceEvent *se = new ServiceEvent(QString("services add mdcap %1 Myth Metadata Services on %2")
-                                       .arg(port_number)
-                                       .arg(local_hostname));
+    
+    Service *mdcap_service = new Service(
+                                            QString("Myth Metadata Services on %1").arg(local_hostname),
+                                            QString("mdcap"),
+                                            local_hostname,
+                                            SLT_HOST,
+                                            (uint) port_number
+                                        );
+ 
+    ServiceEvent *se = new ServiceEvent( true, true, *mdcap_service);
+   
+    delete mdcap_service;
+
+
     QApplication::postEvent(parent, se);
 
 

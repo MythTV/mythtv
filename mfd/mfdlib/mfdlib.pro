@@ -27,8 +27,8 @@ SOURCES += httpheader.cpp httpgetvar.cpp
 HEADERS += decoder.h   decoder_event.h   visual.h constants.h 
 SOURCES += decoder.cpp decoder_event.cpp 
 
-HEADERS += buffer.h
-SOURCES += buffer.cpp
+HEADERS += buffer.h   service.h
+SOURCES += buffer.cpp service.cpp
 
 HEADERS += vorbisdecoder.h   maddecoder.h
 SOURCES += vorbisdecoder.cpp maddecoder.cpp

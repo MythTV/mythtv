@@ -19,6 +19,7 @@
 #include "mdcontainer.h"
 
 class MetadataServer;
+class ServiceLister;
 
 class MFD : public QObject
 {
@@ -32,11 +33,15 @@ class MFD : public QObject
 
   public:
   
-    MFD(int port, bool log_stdout, int logging_verbosity);
+    MFD(uint port, bool log_stdout, int logging_verbosity);
     ~MFD();
     
     MetadataServer*     getMetadataServer(){return metadata_server;}
+    ServiceLister*      getServiceLister(){ return service_lister; }
     MFDPluginManager*   getPluginManager(){return plugin_manager;}
+    void                log(const QString &log_text, int verbosity);
+    void                warning(const QString &warning_text);
+    void                sendMessage(const QString &the_message);
     
   public slots:
   
@@ -59,23 +64,23 @@ class MFD : public QObject
 
   private:
 
-    void log(const QString &log_text, int verbosity);
-    void warning(const QString &warning_text);
     void error(const QString &error_text);
     void parseTokens(const QStringList &tokens, MFDClientSocket *socket);
     void shutDown();
     void sendMessage(MFDClientSocket *where, const QString &what);
-    void sendMessage(const QString &the_message);
     void doListCapabilities(const QStringList &tokens, MFDClientSocket *socket);
+    void doServiceResponse(const QStringList &tokens, MFDClientSocket *socket);
+    void doServiceList(MFDClientSocket *socket);
 
     MetadataServer              *metadata_server;
+    ServiceLister               *service_lister;
     MFDLogger                   *mfd_log;
     MFDPluginManager            *plugin_manager;
     MFDServerSocket             *server_socket;
     QPtrList <MFDClientSocket>  connected_clients;
     bool                        shutting_down;    
     bool                        watchdog_flag;
-    int                         port_number;
+    uint                        port_number;
 };
 
 #endif  // mfd_h_

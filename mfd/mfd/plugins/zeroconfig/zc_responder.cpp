@@ -18,6 +18,7 @@
 #include <qapplication.h>
 
 #include "zc_supervisor.h"
+#include "../../servicelister.h"
 
 static  mDNS mDNSStorage_responder;                       // mDNS core uses this to store its globals
 static  mDNS_PlatformSupport PlatformStorage_responder;   // Stores this platform's globals
@@ -54,7 +55,7 @@ extern "C" void RegistrationCallback(mDNS *const m, ServiceRecordSet *const this
 
 
 ZeroConfigResponder::ZeroConfigResponder(MFD *owner, int identifier)
-                    :MFDServicePlugin(owner, identifier, -1, "zeroconfig responder", false)
+                    :MFDServicePlugin(owner, identifier, 0, "zeroconfig responder", false)
 {
 
     //
@@ -361,9 +362,14 @@ void ZeroConfigResponder::run()
 
     while(keep_going)
     {
+        //
+        //  First, check for any pending service change announcements
+        //
+        
+        checkServiceChanges();
         
         //
-        //  First, see if we have any pending requests
+        //  Second, see if we have any pending requests
         //
         
         QStringList pending_tokens;
@@ -384,7 +390,7 @@ void ZeroConfigResponder::run()
             
         if(pending_tokens.count() > 0)
         {
-            doSomething(pending_tokens, pending_socket);
+            warning("has pending tokens, and should not");
         }
         else
         {        
@@ -474,19 +480,6 @@ void ZeroConfigResponder::run()
     }
 }
 
-void ZeroConfigResponder::addRequest(const QStringList &tokens, int socket_identifier)
-{
-    SocketBuffer *sb = new SocketBuffer(tokens, socket_identifier);
-    things_to_do_mutex.lock();
-        things_to_do.append(sb);
-        if(things_to_do.count() > 99)
-        {
-            warning(QString("object has more than %1 pending commands")
-                    .arg(things_to_do.count()));
-        }
-    things_to_do_mutex.unlock();
-}
-
 void ZeroConfigResponder::removeAllServices()
 {
     QPtrListIterator<RegisteredService> iterator(registered_services);
@@ -514,51 +507,63 @@ bool ZeroConfigResponder::removeService(const QString &service_name)
     return true;
 }
 
-void ZeroConfigResponder::doSomething(const QStringList &tokens, int socket_identifier)
+void ZeroConfigResponder::handleServiceChange()
 {
-    if(tokens.count() < 3)
-    {
-        warning(QString("got passed insufficient tokens: %1")
-                .arg(tokens.join(" ")));
-        huh(tokens, socket_identifier);
-        return;
-    }
-    if(tokens[1] == "remove")
-    {
-        QString service_to_remove = tokens[2];
-        for(uint i = 3; i < tokens.count(); i++)
+
+    //
+    //  Something has changed w.r.t. to services. I need to query the core
+    //  mfd and compare things I'm broadcasting versus it's list.
+    //
+    
+    ServiceLister *service_lister = parent->getServiceLister();
+    
+    service_lister->lockBroadcastList();
+    
+        //
+        //  Go through my services, and check that they still exist on the
+        //  master list
+        //
+        
+        QPtrListIterator<RegisteredService> iterator(registered_services);
+        RegisteredService *a_service;
+        while ( (a_service = iterator.current()) != 0 )
         {
-            service_to_remove += " ";
-            service_to_remove += tokens[i];
+            ++iterator;
+            if(! service_lister->findBroadcastService(a_service->getName()) )
+            {
+                //
+                //  Need to remove this one
+                //
+                
+                removeService(a_service->getName());
+            }
         }
-        if( !removeService(service_to_remove) )
+        
+        //
+        //  Go through services on the master list, add any that I don't
+        //  already know about
+        //
+        
+        ServiceList *broadcast_list = service_lister->getBroadcastList();
+        
+        ServiceList::iterator it;
+        for ( it  = broadcast_list->begin(); 
+              it != broadcast_list->end(); 
+              ++it )
         {
-            huh(tokens, socket_identifier);
+            RegisteredService *checker = getServiceByName((*it).getName());
+            if(!checker)
+            {
+                //
+                //  This one is new, I should begin broadcasting it
+                //
+                
+                registerService((*it).getName(), (*it).getType(), (*it).getPort());
+                
+            }
         }
-        return;
-    }
-    if(tokens.count() < 5)
-    {
-        warning(QString("got passed insufficient tokens: %1")
-                .arg(tokens.join(" ")));
-        huh(tokens, socket_identifier);
-        return;
-    }
-    if(tokens[1] == "add")
-    {
-        QString service_to_add = tokens[4];
-        for(uint i = 5; i < tokens.count(); i++)
-        {
-            service_to_add += " ";
-            service_to_add += tokens[i];
-        }
-        if( !registerService(service_to_add, tokens[2], tokens[3].toUInt()) )
-        {
-            huh(tokens, socket_identifier);
-        }
-        return;
-    }
-    huh(tokens, socket_identifier);
+
+    service_lister->unlockBroadcastList();
 }
 
 ZeroConfigResponder::~ZeroConfigResponder()

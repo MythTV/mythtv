@@ -121,7 +121,7 @@ void DaapInstance::run()
 
     int connect_tries = 0;
     while(!(client_socket_to_daap_server->connect(daap_server_address, 
-                                                  server_port)))
+                                                  server_port)) && keep_going)
     {
         //
         //  Try a few times (it's a non-blocking socket)
