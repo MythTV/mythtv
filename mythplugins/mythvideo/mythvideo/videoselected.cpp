@@ -46,8 +46,9 @@ VideoSelected::VideoSelected(QSqlDatabase *ldb,
     noUpdate = false;
     m_state = 0;
 
-    fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
-
+    
+    fullRect = QRect(0, 0, size().width(), size().height());
+    
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);

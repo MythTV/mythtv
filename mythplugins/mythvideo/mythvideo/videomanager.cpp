@@ -41,7 +41,7 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     RefreshMovieList();
     
     fullRect = QRect(0, 0, size().width(), size().height());
-    //fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
+    
 
     noUpdate = false;
     curIMDBNum = "";

@@ -35,7 +35,7 @@ VideoDialog::VideoDialog(DialogType _myType, QSqlDatabase *_db,
     }
 
     expectingPopup = false;
-    fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
+    fullRect = QRect(0, 0, size().width(), size().height());
     allowPaint = true;
     currentParentalLevel = gContext->GetNumSetting("VideoDefaultParentalLevel", 1);
     currentVideoFilter = new VideoFilterSettings(db, true, _winName);
