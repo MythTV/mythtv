@@ -44,8 +44,7 @@ public:
         setValue(true);
         setHelpText("MythTV can control the PCM and master "
                     "mixer volume.  If you prefer to use an external mixer "
-                    "program, uncheck this box.  If you uncheck the box, "
-                    "then ignore the next three settings.");
+                    "program, uncheck this box.");
     };
 };
 
@@ -772,6 +771,29 @@ public:
     };
 };
 
+class VolumeSettings: public VerticalConfigurationGroup,
+                      public TriggeredConfigurationGroup {
+public:
+     VolumeSettings():
+          VerticalConfigurationGroup(true),
+          TriggeredConfigurationGroup(true) {
+         setLabel("Volume control");
+
+         Setting* volumeControl = new MythControlsVolume();
+         addChild(volumeControl);
+         setTrigger(volumeControl);
+
+         ConfigurationGroup* settings = new VerticalConfigurationGroup();
+         settings->addChild(new MixerDevice());
+         settings->addChild(new MixerVolume());
+         settings->addChild(new PCMVolume());
+         addTarget("1", settings);
+         
+         // show nothing if volumeControl is off
+         addTarget("0", new VerticalConfigurationGroup());
+     };
+};
+
 PlaybackSettings::PlaybackSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
@@ -787,10 +809,8 @@ PlaybackSettings::PlaybackSettings()
     audio->setLabel("Audio");
     audio->addChild(new AudioOutputDevice());
     audio->addChild(new MythControlsVolume());
-    audio->addChild(new MixerDevice());
-    audio->addChild(new MixerVolume());
-    audio->addChild(new PCMVolume());
     audio->addChild(new AggressiveBuffer());
+    audio->addChild(new VolumeSettings());
     addChild(audio);
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
