@@ -2042,7 +2042,7 @@ static HostCheckBox *UseXVMC()
 {
     HostCheckBox *gc = new HostCheckBox("UseXVMC");
     gc->setLabel(QObject::tr("Use hardware XvMC MPEG Decoding"));
-    gc->setValue(true);
+    gc->setValue(false);
     return gc;
 };
 #endif
@@ -2052,7 +2052,7 @@ static HostCheckBox *UseXvMcVld()
 {
     HostCheckBox *gc = new HostCheckBox("UseXvMcVld");
     gc->setLabel(QObject::tr("Use HW XVMC VLD Decoding (Via only)"));
-    gc->setValue(true);
+    gc->setValue(false);
     gc->setHelpText(QObject::tr("Enables the use of viaXvMC HW Mpeg decoding "
                     "for the Via Unichrome Chipset"));
     return gc;
