@@ -757,6 +757,11 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
     else
         area.addCoords(breakin, breakin, -breakin, -breakin);
 
+    if (area.width() <= 0)
+        area.setWidth(1);
+    if (area.height() <= 0)
+        area.setHeight(1);
+
     if (filltype == Alpha)
     {
         QPixmap orig(area.width(), area.height());
@@ -767,7 +772,7 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
         alphaBlender.blendImage(tmpimg, fillColor);
         dr->drawImage(area.left(), area.top(), tmpimg);
 
-        if (overArea.width())
+        if (overArea.width() > 0)
         {
             orig = QPixmap(overArea.width(), overArea.height());
             orig.fill(window, screenloc.x() + overArea.left(),
@@ -781,19 +786,19 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
     else if (filltype == Dense)
     {
         dr->fillRect(area, QBrush(fillColor, Qt::Dense4Pattern));
-        if (overArea.width())
+        if (overArea.width() > 0)
             dr->fillRect(overArea, QBrush(overColor, Qt::Dense4Pattern));
     }
     else if (filltype == Eco)
     {
         dr->fillRect(area, QBrush(fillColor, Qt::Dense4Pattern));
-        if (overArea.width())
+        if (overArea.width() > 0)
             dr->fillRect(overArea, QBrush(overColor, Qt::Dense4Pattern));
     }
     else if (filltype == Solid)
     {
         dr->fillRect(area, QBrush(fillColor, Qt::SolidPattern));
-        if (overArea.width())
+        if (overArea.width() > 0)
             dr->fillRect(overArea, QBrush(overColor, Qt::SolidPattern));
     }
 }
