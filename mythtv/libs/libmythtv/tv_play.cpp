@@ -3344,6 +3344,7 @@ void TV::BrowseStart(void)
     QString callsign, iconpath, channum, chanid, seriesid, programid;
     QString chanFilters, repeat, airdate, stars;
 
+    
     GetChannelInfo(activerecorder, title, subtitle, desc, category, 
                    starttime, endtime, callsign, iconpath, channum, chanid,
                    seriesid, programid, chanFilters, repeat, airdate, stars);
@@ -3351,7 +3352,7 @@ void TV::BrowseStart(void)
     browsechannum = channum;
     browsechanid = chanid;
     browsestarttime = starttime;
-
+    
     BrowseDispInfo(BROWSE_SAME);
 
     browseTimer->start(30000, true);
@@ -3378,7 +3379,6 @@ void TV::BrowseDispInfo(int direction)
 {
     if (!browsemode)
         BrowseStart();
-
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime maxtime = curtime.addSecs(60 * 60 * 4);
     QDateTime lastprogtime =
@@ -3389,10 +3389,13 @@ void TV::BrowseDispInfo(int direction)
         return;
 
     browseTimer->changeInterval(30000);
-
+    
+    
     if (lastprogtime < curtime)
-        browsestarttime = curtime.toString("yyyyMMddhhmm") + "00";
-
+        browsestarttime = curtime.toString(Qt::ISODate);
+        //browsestarttime = curtime.toString("yyyyMMddhhmm") + "00";
+    
+    
     if ((lastprogtime > maxtime) &&
         (direction == BROWSE_RIGHT))
         return;
@@ -3400,9 +3403,9 @@ void TV::BrowseDispInfo(int direction)
     infoMap["channum"] = browsechannum;
     infoMap["dbstarttime"] = browsestarttime;
     infoMap["chanid"] = browsechanid;
-
+    
     GetNextProgram(activerecorder, direction, infoMap);
-
+    
     browsechannum = infoMap["channum"];
     browsechanid = infoMap["chanid"];
 
@@ -3411,11 +3414,11 @@ void TV::BrowseDispInfo(int direction)
         browsestarttime = infoMap["dbstarttime"];
 
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
-
     m_db->lock();
     ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db->db(),
                                                                   browsechanid,
                                                                   startts);
+    
     if (program_info)
         program_info->ToMap(m_db->db(), infoMap);
     m_db->unlock();
