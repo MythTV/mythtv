@@ -1107,7 +1107,7 @@ static GenericComboBox *AspectOverride()
 
 static GenericSpinBox *GuiWidth()
 {
-    GenericSpinBox *gs = new GenericSpinBox("GuiWidth", 0, 1920, 8);
+    GenericSpinBox *gs = new GenericSpinBox("GuiWidth", 0, 1920, 8, true);
     gs->setLabel(QObject::tr("GUI width (px)"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("The width of the GUI.  Do not make the GUI "
@@ -1118,7 +1118,7 @@ static GenericSpinBox *GuiWidth()
 
 static GenericSpinBox *GuiHeight()
 {
-    GenericSpinBox *gs = new GenericSpinBox("GuiHeight", 0, 1600, 8);
+    GenericSpinBox *gs = new GenericSpinBox("GuiHeight", 0, 1600, 8, true);
     gs->setLabel(QObject::tr("GUI height (px)"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("The height of the GUI.  Do not make the GUI "
@@ -1192,7 +1192,7 @@ static GenericCheckBox *UseVideoModes()
 
 static GenericSpinBox *GuiVidModeWidth()
 {
-    GenericSpinBox *gs = new GenericSpinBox("GuiVidModeWidth", 0, 1920, 8);
+    GenericSpinBox *gs = new GenericSpinBox("GuiVidModeWidth", 0, 1920, 8, true);
     gs->setLabelAboveWidget(true);
     gs->setLabel(QObject::tr("Width"));
     gs->setValue(0);
@@ -1204,7 +1204,7 @@ static GenericSpinBox *GuiVidModeWidth()
 
 static GenericSpinBox *GuiVidModeHeight()
 {
-    GenericSpinBox *gs = new GenericSpinBox("GuiVidModeHeight", 0, 1200, 4);
+    GenericSpinBox *gs = new GenericSpinBox("GuiVidModeHeight", 0, 1200, 4, true);
     gs->setLabelAboveWidget(true);
     gs->setLabel(QObject::tr("Height"));
     gs->setValue(0);
@@ -1217,7 +1217,7 @@ static GenericSpinBox *GuiVidModeHeight()
 static GenericSpinBox *VidModeWidth(int idx)
 {
     GenericSpinBox *gs = new GenericSpinBox(QString("VidModeWidth%1").arg(idx),
-                                            0, 1920, 8);
+                                            0, 1920, 8, true);
     gs->setLabel(QObject::tr("X"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Horizontal resolution of video mode "
@@ -1228,7 +1228,7 @@ static GenericSpinBox *VidModeWidth(int idx)
 static GenericSpinBox *VidModeHeight(int idx)
 {
     GenericSpinBox *gs = new GenericSpinBox(QString("VidModeHeight%1").arg(idx),
-                                            0, 1200, 4);
+                                            0, 1200, 4, true);
     gs->setLabel(QObject::tr("Y"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Vertical resolution of video mode "
@@ -1238,7 +1238,7 @@ static GenericSpinBox *VidModeHeight(int idx)
 
 static GenericSpinBox *TVVidModeWidth()
 {
-    GenericSpinBox *gs = new GenericSpinBox("TVVidModeWidth", 0, 1920, 8);
+    GenericSpinBox *gs = new GenericSpinBox("TVVidModeWidth", 0, 1920, 8, true);
     gs->setLabelAboveWidget(true);
     gs->setLabel(QObject::tr("Width"));
     gs->setValue(0);
@@ -1252,7 +1252,7 @@ static GenericSpinBox *TVVidModeWidth()
 static GenericSpinBox *TVVidModeWidth(int idx)
 {
     GenericSpinBox *gs = new GenericSpinBox(QString("TVVidModeWidth%1").arg(idx), 
-                                            0, 1920, 8);
+                                            0, 1920, 8, true);
     gs->setLabel(QObject::tr("X"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Horizontal resolution for playback video "
@@ -1265,7 +1265,7 @@ static GenericSpinBox *TVVidModeWidth(int idx)
 
 static GenericSpinBox *TVVidModeHeight()
 {
-    GenericSpinBox *gs = new GenericSpinBox("TVVidModeHeight", 0, 1200, 4);
+    GenericSpinBox *gs = new GenericSpinBox("TVVidModeHeight", 0, 1200, 4, true);
     gs->setLabelAboveWidget(true);
     gs->setLabel(QObject::tr("Height"));
     gs->setValue(0);
@@ -1278,7 +1278,7 @@ static GenericSpinBox *TVVidModeHeight()
 static GenericSpinBox *TVVidModeHeight(int idx)
 {
     GenericSpinBox *gs = new GenericSpinBox(QString("TVVidModeHeight%1").arg(idx),
-                                            0, 1200, 4);
+                                            0, 1200, 4, true);
     gs->setLabel(QObject::tr("Y"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Vertical resolution for playback video mode. "
