@@ -283,7 +283,7 @@ void startTV(void)
 void showStatus(void)
 {
     QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus, Status;
-    QString querytext;
+    QString querytext, DataDirectMessage;
     int DaysOfData;
     QDateTime qdtNow, GuideDataThrough;
     QSqlDatabase *db = QSqlDatabase::database();
@@ -303,6 +303,7 @@ void showStatus(void)
     mfdLastRunStart = gContext->GetSetting("mythfilldatabaseLastRunStart");
     mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
     mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
+    DataDirectMessage = gContext->GetSetting("DataDirectMessage");
 
     Status = QObject::tr("Myth version:") + " " + MYTH_BINARY_VERSION + "\n";
 
@@ -352,6 +353,13 @@ void showStatus(void)
     {
         Status += "\n";
         Status += QObject::tr("WARNING: is mythfilldatabase running?");
+    }
+
+    if (!DataDirectMessage.isNull())
+    {
+        Status += "\n";
+        Status += QObject::tr("DataDirect Status: ");
+        Status += DataDirectMessage;
     }
 
     DialogBox *status_dialog = new DialogBox(gContext->GetMainWindow(), Status);
