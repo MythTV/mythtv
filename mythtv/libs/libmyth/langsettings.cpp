@@ -104,7 +104,7 @@ void LanguageSettings::prompt(bool force)
     if (force || d.m_language.isEmpty())
     {
         LangEditor *ed = new LangEditor();
-        ed->exec(QSqlDatabase::database());
+        ed->exec(NULL);
         delete ed;
     }
     // Always update the database, even if there's
