@@ -14,6 +14,10 @@ RecordingInfo::RecordingInfo(const string &chan, const string &start,
     description = sdescription;
 }
 
+RecordingInfo::~RecordingInfo(void)
+{
+}
+
 void RecordingInfo::GetRecordFilename(string &filename)
 {
     char tempstr[1024];

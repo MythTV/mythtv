@@ -267,7 +267,7 @@ void TV::WriteRecordedRecord(void)
     if (curRecording)
         return;
 
-    curRecording->WriteToDB();
+    curRecording->WriteToDB(db_conn);
     delete curRecording;
     curRecording = NULL;
 }
