@@ -11,33 +11,27 @@
 #include "treecheckitem.h"
 #include "cddecoder.h"
 
-#include <mythtv/settings.h>
+#include <mythtv/mythcontext.h>
 
-extern Settings *globalsettings;
-
-DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths, 
-                         QValueList<Metadata> *playlist, 
+DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb, 
+                         QString &paths, QValueList<Metadata> *playlist, 
                          QWidget *parent, const char *name)
            : QDialog(parent, name)
 {
     db = ldb;
     plist = playlist;
+    m_context = context;
 
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    int screenheight = 0, screenwidth = 0;
+    float wmult = 0, hmult = 0;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
+    setFont(QFont("Arial", (int)(m_context->GetMediumFontSize() * hmult), 
+            QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
@@ -81,7 +75,7 @@ void DatabaseBox::fillCD(void)
         cditem->setText(0, "CD -- none");
     }
 
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder(m_context, "cda", NULL, NULL, NULL);
     int tracknum = decoder->getNumTracks();
 
     bool setTitle = false;
@@ -103,7 +97,8 @@ void DatabaseBox::fillCD(void)
 
         QString level = "title";
 
-        TreeCheckItem *item = new TreeCheckItem(cditem, title, level, track);
+        TreeCheckItem *item = new TreeCheckItem(m_context, cditem, title, 
+                                                level, track);
 
         if (plist->find(*track) != plist->end())
             item->setOn(true);
@@ -118,11 +113,11 @@ void DatabaseBox::fillList(QListView *listview, QString &paths)
 {
     QString title = "CD -- none";
     QString level = "cd";
-    cditem = new TreeCheckItem(listview, title, level, NULL);
+    cditem = new TreeCheckItem(m_context, listview, title, level, NULL);
 
     QString templevel = "genre";
     QString temptitle = "All My Music";
-    TreeCheckItem *allmusic = new TreeCheckItem(listview, temptitle,
+    TreeCheckItem *allmusic = new TreeCheckItem(m_context, listview, temptitle,
                                                 templevel, NULL);
     
     QStringList lines = QStringList::split(" ", paths);
@@ -153,8 +148,8 @@ void DatabaseBox::fillList(QListView *listview, QString &paths)
             Metadata *mdata = new Metadata();
             mdata->setField(first, current);
 
-            TreeCheckItem *item = new TreeCheckItem(allmusic, current,
-                                                    first, mdata);
+            TreeCheckItem *item = new TreeCheckItem(m_context, allmusic, 
+                                                    current, first, mdata);
 
             fillNextLevel(level, num, querystr, matchstr, line, lines,
                           item);
@@ -222,8 +217,8 @@ void DatabaseBox::fillNextLevel(QString level, int num, QString querystr,
             }
 
 
-            TreeCheckItem *item = new TreeCheckItem(parent, current, level, 
-                                                    mdata);
+            TreeCheckItem *item = new TreeCheckItem(m_context, parent, current,
+                                                    level, mdata);
 
             if (isleaf)
             {

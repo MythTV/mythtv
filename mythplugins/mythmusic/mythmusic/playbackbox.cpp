@@ -24,7 +24,7 @@
 #include "databasebox.h"
 #include "mainvisual.h"
 
-#include <mythtv/settings.h>
+#include <mythtv/mythcontext.h>
 
 #include "res/nextfile.xpm"
 #include "res/next.xpm"
@@ -33,8 +33,6 @@
 #include "res/prevfile.xpm"
 #include "res/prev.xpm"
 #include "res/stop.xpm"
-
-extern Settings *globalsettings;
 
 class MyButton : public QToolButton
 {   
@@ -79,32 +77,28 @@ void MyButton::drawButton( QPainter * p )
     drawButtonLabel(p);
 }
 
-PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
+PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb, 
+                         QValueList<Metadata> *playlist,
                          QWidget *parent, const char *name)
            : QDialog(parent, name)
 {
     db = ldb;
+    m_context = context;
 
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
-
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    wmult = screenwidth / 800.0;
-    hmult = screenheight / 600.0;
+    int screenwidth = 0, screenheight = 0;
+    
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", (int)(18 * hmult), QFont::Bold));
+    setFont(QFont("Arial", (int)((context->GetMediumFontSize() + 2) * hmult), 
+            QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
-    mainvisual = new MainVisual();
+    mainvisual = new MainVisual(context);
     
     QVBoxLayout *vbox2 = new QVBoxLayout(vbox, (int)(2 * wmult));
 
@@ -186,31 +180,34 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     QHBoxLayout *secondcontrol = new QHBoxLayout(vbox2, (int)(2 * wmult));
 
+    QFont buttonfont("Arial", (int)((context->GetSmallFontSize() + 2) * hmult),
+                     QFont::Bold);
+
     randomize = new MyButton(this);
     randomize->setAutoRaise(true);
     randomize->setText("Shuffle: Normal");
-    randomize->setFont(QFont("Arial", (int)(14 * hmult), QFont::Bold));
+    randomize->setFont(buttonfont); 
     secondcontrol->addWidget(randomize);
     connect(randomize, SIGNAL(clicked()), this, SLOT(toggleShuffle()));
 
     repeat = new MyButton(this);
     repeat->setAutoRaise(true);
     repeat->setText("Repeat: Playlist");
-    repeat->setFont(QFont("Arial", (int)(14 * hmult), QFont::Bold));
+    repeat->setFont(buttonfont);
     secondcontrol->addWidget(repeat);
     connect(repeat, SIGNAL(clicked()), this, SLOT(toggleRepeat()));
 
     MyButton *pledit = new MyButton(this);
     pledit->setAutoRaise(true);
     pledit->setText("Edit Playlist");
-    pledit->setFont(QFont("Arial", (int)(14 * hmult), QFont::Bold));
+    pledit->setFont(buttonfont);
     secondcontrol->addWidget(pledit);
     connect(pledit, SIGNAL(clicked()), this, SLOT(editPlaylist()));
 
     MyButton *vis = new MyButton(this);
     vis->setAutoRaise(true);
     vis->setText("Visualize");
-    vis->setFont(QFont("Arial", (int)(14 * hmult), QFont::Bold));
+    vis->setFont(buttonfont);
     secondcontrol->addWidget(vis);
     connect(vis, SIGNAL(clicked()), this, SLOT(visEnable()));
 
@@ -219,7 +216,7 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     playview->addColumn("Artist");  
     playview->addColumn("Title");
     playview->addColumn("Length");
-    playview->setFont(QFont("Arial", (int)(14 * hmult), QFont::Bold));
+    playview->setFont(buttonfont);
 
     playview->setFocusPolicy(NoFocus);
 
@@ -404,7 +401,7 @@ void PlaybackBox::play()
 
     if (!output)
     {
-        QString adevice = globalsettings->GetSetting("AudioDevice");
+        QString adevice = m_context->GetSetting("AudioDevice");
 
         output = new AudioOutput(outputBufferSize * 1024, adevice);
         output->setBufferSize(outputBufferSize * 1024);
@@ -429,7 +426,7 @@ void PlaybackBox::play()
         decoder = 0;
 
     if (!decoder) {
-        decoder = Decoder::create(sourcename, input, output);
+        decoder = Decoder::create(m_context, sourcename, input, output);
 
         if (! decoder) {
             printf("mythmusic: unsupported fileformat\n");
@@ -720,8 +717,8 @@ void PlaybackBox::editPlaylist()
     Metadata firstdata = curMeta;
     
     QValueList<Metadata> dblist = *plist; 
-    QString paths = globalsettings->GetSetting("TreeLevels");
-    DatabaseBox dbbox(db, paths, &dblist);
+    QString paths = m_context->GetSetting("TreeLevels");
+    DatabaseBox dbbox(m_context, db, paths, &dblist);
 
     dbbox.Show();
     dbbox.exec();

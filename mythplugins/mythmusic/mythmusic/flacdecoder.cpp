@@ -14,6 +14,8 @@ using namespace std;
 #include "recycler.h"
 #include "metadata.h"
 
+#include <mythtv/mythcontext.h>
+
 static FLAC__SeekableStreamDecoderReadStatus flacread(const FLAC__SeekableStreamDecoder *decoder, FLAC__byte bufferp[], unsigned *bytes, void *client_data)
 {
     decoder = decoder;
@@ -151,9 +153,9 @@ static void flacerror(const FLAC__SeekableStreamDecoder *decoder, FLAC__StreamDe
 }
 
 
-FlacDecoder::FlacDecoder(const QString &file, DecoderFactory *d, 
-                         QIODevice *i, Output *o) 
-             : Decoder(d, i, o)
+FlacDecoder::FlacDecoder(MythContext *context, const QString &file, 
+                         DecoderFactory *d, QIODevice *i, Output *o) 
+             : Decoder(context, d, i, o)
 {
     filename = file;
     inited = FALSE;
@@ -619,17 +621,16 @@ const QString &FlacDecoderFactory::description() const
     return desc;
 }
 
-Decoder *FlacDecoderFactory::create(const QString &file,
-                                    QIODevice *input,
-                                    Output *output,
+Decoder *FlacDecoderFactory::create(MythContext *context, const QString &file,
+                                    QIODevice *input, Output *output,
                                     bool deletable)
 {
     if (deletable)
-        return new FlacDecoder(file, this, input, output);
+        return new FlacDecoder(context, file, this, input, output);
 
     static FlacDecoder *decoder = 0;
     if (! decoder) {
-        decoder = new FlacDecoder(file, this, input, output);
+        decoder = new FlacDecoder(context, file, this, input, output);
     } else {
         decoder->setInput(input);
         decoder->setOutput(output);

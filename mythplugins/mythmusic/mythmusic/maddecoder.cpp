@@ -17,9 +17,9 @@ using namespace std;
 
 #define XING_MAGIC     (('X' << 24) | ('i' << 16) | ('n' << 8) | 'g')
 
-MadDecoder::MadDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
-                       Output *o)
-          : Decoder(d, i, o)
+MadDecoder::MadDecoder(MythContext *context, const QString &file, 
+                       DecoderFactory *d, QIODevice *i, Output *o)
+          : Decoder(context, d, i, o)
 {
     filename = file;
     inited = false;
@@ -688,16 +688,17 @@ const QString &MadDecoderFactory::description() const
     return desc;
 }
 
-Decoder *MadDecoderFactory::create(const QString &file, QIODevice *input, 
-                                   Output *output, bool deletable)
+Decoder *MadDecoderFactory::create(MythContext *context, const QString &file, 
+                                   QIODevice *input, Output *output, 
+                                   bool deletable)
 {
     if (deletable)
-        return new MadDecoder(file, this, input, output);
+        return new MadDecoder(context, file, this, input, output);
 
     static MadDecoder *decoder = 0;
 
     if (! decoder) {
-        decoder = new MadDecoder(file, this, input, output);
+        decoder = new MadDecoder(context, file, this, input, output);
     } else {
         decoder->setInput(input);
         decoder->setOutput(output);

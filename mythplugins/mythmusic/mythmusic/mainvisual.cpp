@@ -27,24 +27,15 @@
 // fast inlines
 #include "inlines.h"
 
+#include <mythtv/mythcontext.h>
 
-#include <mythtv/settings.h>
-
-extern Settings *globalsettings;
-
-MainVisual::MainVisual( QWidget *parent, const char *name )
+MainVisual::MainVisual(MythContext *context, QWidget *parent, const char *name)
     : QDialog( parent, name ), vis( 0 ), playing( FALSE ), fps( 30 )
 {
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
-    
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-        
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    int screenwidth = 0, screenheight = 0;
+    float wmult = 0, hmult = 0;
+   
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));

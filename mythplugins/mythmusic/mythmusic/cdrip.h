@@ -16,12 +16,14 @@ class QProgressBar;
 class MyButtonGroup;
 class MyLineEdit;
 class MyTable;
+class MythContext;
 
 class Ripper : public QDialog
 {
     Q_OBJECT
   public:
-    Ripper(QSqlDatabase *ldb, QWidget *parent = 0, const char *name = 0);
+    Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent = 0, 
+           const char *name = 0);
    ~Ripper(void);
   
     void Show(void);
@@ -56,6 +58,8 @@ class Ripper : public QDialog
     int totaltracks;
 
     QString albumname, artistname;
+
+    MythContext *m_context;
 };
 
 #endif

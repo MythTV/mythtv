@@ -15,8 +15,8 @@
 #include <qstringlist.h>
 
 
-Decoder::Decoder(DecoderFactory *d, QIODevice *i, Output *o)
-       : fctry(d), in(i), out(o), blksize(0)
+Decoder::Decoder(MythContext *c, DecoderFactory *d, QIODevice *i, Output *o)
+       : m_context(c), fctry(d), in(i), out(o), blksize(0)
 {
 }
 
@@ -137,7 +137,8 @@ void Decoder::registerFactory(DecoderFactory *fact)
     factories->append(fact);
 }
 
-Decoder *Decoder::create(const QString &source,
+Decoder *Decoder::create(MythContext *context,
+                         const QString &source,
                          QIODevice *input,
                          Output *output,
                          bool deletable)
@@ -149,7 +150,7 @@ Decoder *Decoder::create(const QString &source,
     DecoderFactory *fact = factories->first();
     while (fact) {
         if (fact->supports(source)) {
-            decoder = fact->create(source, input, output, deletable);
+            decoder = fact->create(context, source, input, output, deletable);
             break;
         }
 

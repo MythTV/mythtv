@@ -15,13 +15,11 @@ using namespace std;
 #include "recycler.h"
 #include "metadata.h"
 
-#include <mythtv/settings.h>
+#include <mythtv/mythcontext.h>
 
-extern Settings *globalsettings;
-
-CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, 
-                     QIODevice *i, Output *o) 
-         : Decoder(d, i, o)
+CdDecoder::CdDecoder(MythContext *context, const QString &file, 
+                     DecoderFactory *d, QIODevice *i, Output *o) 
+         : Decoder(context, d, i, o)
 {
     filename = file;
     inited = FALSE;
@@ -46,7 +44,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d,
 
     settracknum = -1;
 
-    devicename = globalsettings->GetSetting("CDDevice");
+    devicename = context->GetSetting("CDDevice");
 }
 
 CdDecoder::~CdDecoder(void)
@@ -462,17 +460,16 @@ const QString &CdDecoderFactory::description() const
     return desc;
 }
 
-Decoder *CdDecoderFactory::create(const QString &file,
-                                  QIODevice *input,
-                                  Output *output,
+Decoder *CdDecoderFactory::create(MythContext *context, const QString &file,
+                                  QIODevice *input, Output *output,
                                   bool deletable)
 {
     if (deletable)
-        return new CdDecoder(file, this, input, output);
+        return new CdDecoder(context, file, this, input, output);
 
     static CdDecoder *decoder = 0;
     if (! decoder) {
-        decoder = new CdDecoder(file, this, input, output);
+        decoder = new CdDecoder(context, file, this, input, output);
     } else {
         decoder->setInput(input);
         decoder->setOutput(output);

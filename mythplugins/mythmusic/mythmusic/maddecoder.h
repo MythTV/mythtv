@@ -12,7 +12,8 @@ class Metadata;
 class MadDecoder : public Decoder
 {
   public:
-    MadDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
+    MadDecoder(MythContext *context, const QString &file, DecoderFactory *, 
+               QIODevice *, Output *);
     virtual ~MadDecoder(void);
 
     bool initialize();

@@ -5,9 +5,7 @@
 
 #include "treecheckitem.h"
 
-#include <mythtv/settings.h>
-
-extern Settings *globalsettings;
+#include <mythtv/mythcontext.h>
 
 #include "res/album_pix.xpm"
 #include "res/artist_pix.xpm"
@@ -22,24 +20,28 @@ QPixmap *TreeCheckItem::catalog = NULL;
 QPixmap *TreeCheckItem::cd = NULL;
 bool TreeCheckItem::pixmapsSet = false;
 
-TreeCheckItem::TreeCheckItem(QListView *parent, QString &ltext, 
-                             const QString &llevel, Metadata *mdata)
+TreeCheckItem::TreeCheckItem(MythContext *context, QListView *parent, 
+                             QString &ltext, const QString &llevel, 
+                             Metadata *mdata)
              : QCheckListItem(parent, ltext.prepend(" "), 
                               QCheckListItem::CheckBox)
 {
     level = llevel;
     metadata = mdata;
+    m_context = context;
 
     pickPixmap();
 }
 
-TreeCheckItem::TreeCheckItem(TreeCheckItem *parent, QString &ltext,
-                             const QString &llevel, Metadata *mdata)
+TreeCheckItem::TreeCheckItem(MythContext *context, TreeCheckItem *parent, 
+                             QString &ltext, const QString &llevel, 
+                             Metadata *mdata)
              : QCheckListItem(parent, ltext.prepend(" "), 
                               QCheckListItem::CheckBox)
 {
     level = llevel;
     metadata = mdata;
+    m_context = context;
 
     pickPixmap();
 }
@@ -47,7 +49,7 @@ TreeCheckItem::TreeCheckItem(TreeCheckItem *parent, QString &ltext,
 void TreeCheckItem::pickPixmap(void)
 {
     if (!pixmapsSet)
-        setupPixmaps();
+        setupPixmaps(m_context);
 
     if (level == "artist")
         setPixmap(0, *artist);
@@ -61,18 +63,12 @@ void TreeCheckItem::pickPixmap(void)
         setPixmap(0, *cd);
 }
 
-void TreeCheckItem::setupPixmaps(void)
+void TreeCheckItem::setupPixmaps(MythContext *context)
 {
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    int screenheight = 0, screenwidth = 0;
+    float wmult = 0, hmult = 0;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     if (screenheight != 600 || screenwidth != 800) 
     {   

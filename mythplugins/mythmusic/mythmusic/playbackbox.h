@@ -24,12 +24,14 @@ class QSlider;
 class ScrollLabel;
 class MyButton;
 class MainVisual;
+class MythContext;
 
 class PlaybackBox : public QDialog
 {
     Q_OBJECT
   public:
-    PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
+    PlaybackBox(MythContext *context, QSqlDatabase *ldb, 
+                QValueList<Metadata> *playlist,
                 QWidget *parent = 0, const char *name = 0);
 
     ~PlaybackBox(void);
@@ -109,6 +111,7 @@ class PlaybackBox : public QDialog
     bool isplaying;
 
     MainVisual *mainvisual;
+    MythContext *m_context;
 };
 
 #endif

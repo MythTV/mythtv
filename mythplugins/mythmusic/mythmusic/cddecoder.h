@@ -14,7 +14,8 @@ class Metadata;
 class CdDecoder : public Decoder
 {
   public:
-    CdDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
+    CdDecoder(MythContext *context, const QString &file, DecoderFactory *, 
+              QIODevice *, Output *);
     virtual ~CdDecoder(void);
 
     bool initialize();

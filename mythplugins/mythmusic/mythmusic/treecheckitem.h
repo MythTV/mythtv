@@ -5,13 +5,14 @@
 #include "metadata.h"
 
 class QPixmap;
+class MythContext;
 
 class TreeCheckItem : public QCheckListItem
 {
   public:
-    TreeCheckItem(QListView *parent, QString &ltext, 
+    TreeCheckItem(MythContext *context, QListView *parent, QString &ltext, 
                   const QString &llevel, Metadata *mdata);
-    TreeCheckItem(TreeCheckItem *parent, QString &ltext, 
+    TreeCheckItem(MythContext *context, TreeCheckItem *parent, QString &ltext, 
                   const QString &llevel, Metadata *mdata);
 
    ~TreeCheckItem(void) { if (metadata) delete metadata; }
@@ -22,7 +23,7 @@ class TreeCheckItem : public QCheckListItem
   private:
     void pickPixmap();
 
-    static void setupPixmaps();
+    static void setupPixmaps(MythContext *context);
     static QPixmap *scalePixmap(const char **xpmdata, float wmult, float hmult);
 
     Metadata *metadata;
@@ -34,6 +35,8 @@ class TreeCheckItem : public QCheckListItem
     static QPixmap *track;
     static QPixmap *catalog;
     static QPixmap *cd;
+
+    MythContext *m_context;
 };
 
 #endif

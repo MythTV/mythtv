@@ -28,9 +28,7 @@ extern "C" {
 #include "vorbisencoder.h"
 #include "flacencoder.h"
 
-#include <mythtv/settings.h>
-
-extern Settings *globalsettings;
+#include <mythtv/mythcontext.h>
 
 class MyLineEdit : public QLineEdit
 {
@@ -140,29 +138,26 @@ void MyButtonGroup::moveFocus(int key)
     }
 }
 
-Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
+Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent, 
+               const char *name)
       : QDialog(parent, name)
 {
     db = ldb;
+    m_context = context;
     
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
-  
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
- 
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
- 
+    int screenheight = 0, screenwidth = 0;
+    float wmult = 0, hmult = 0;
+
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
+    setFont(QFont("Arial", (int)(context->GetMediumFontSize() * hmult), 
+            QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder(context, "cda", NULL, NULL, NULL);
     Metadata *track = decoder->getMetadata(db, 1);
 
     bigvb = new QVBoxLayout(this, 0);
@@ -172,7 +167,8 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
 
     QVBoxLayout *vbox = new QVBoxLayout(firstdiag, (int)(24 * wmult));
 
-    QLabel *inst = new QLabel("Please select a quality level and check the album information below:", firstdiag);
+    QLabel *inst = new QLabel("Please select a quality level and check the "
+                              "album information below:", firstdiag);
     vbox->addWidget(inst);
 
     QHBoxLayout *qualbox = new QHBoxLayout(vbox, 10);
@@ -301,7 +297,7 @@ void Ripper::Show(void)
 
 void Ripper::artistChanged(const QString &newartist)
 {
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder(m_context, "cda", NULL, NULL, NULL);
     Metadata *data = decoder->getMetadata(db, 1);
     
     data->setArtist(newartist);
@@ -315,7 +311,7 @@ void Ripper::artistChanged(const QString &newartist)
 
 void Ripper::albumChanged(const QString &newalbum)
 {
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder(m_context, "cda", NULL, NULL, NULL);
     Metadata *data = decoder->getMetadata(db, 1);
 
     data->setAlbum(newalbum);
@@ -329,7 +325,7 @@ void Ripper::albumChanged(const QString &newalbum)
 
 void Ripper::tableChanged(int row, int col)
 {
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder(m_context, "cda", NULL, NULL, NULL);
     Metadata *data = decoder->getMetadata(db, row + 1 );
 
     data->setTitle(table->text(row, col));
@@ -364,21 +360,17 @@ void Ripper::ripthedisc(void)
 
     QString tots = "Importing CD:\n" + artistname + "\n" + albumname;
 
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    int screenwidth = 0, screenheight = 0;
+    float wmult = 0, hmult = 0;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    float hmult = screenheight / 600.0;
+    m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     QDialog *newdiag = new QDialog(NULL, 0, TRUE);
     newdiag->setGeometry(0, 0, screenwidth, screenheight);
     newdiag->setFixedSize(QSize(screenwidth, screenheight));
     
-    newdiag->setFont(QFont("Arial", (int)(20 * hmult), QFont::Bold));
+    newdiag->setFont(QFont("Arial", (int)(m_context->GetBigFontSize() * hmult),
+                     QFont::Bold));
     newdiag->setCursor(QCursor(Qt::BlankCursor));
 
     QVBoxLayout *vb = new QVBoxLayout(newdiag, 20);
@@ -405,15 +397,15 @@ void Ripper::ripthedisc(void)
     qApp->processEvents();
 
     QString textstatus;
-    QString cddevice = globalsettings->GetSetting("CDDevice");
+    QString cddevice = m_context->GetSetting("CDDevice");
 
     char tempfile[512], outfile[4096];
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder(m_context, "cda", NULL, NULL, NULL);
 
     int encodequal = qualitygroup->id(qualitygroup->selected());
 
-    QString tempdir = globalsettings->GetSetting("TemporarySpace");
-    QString findir = globalsettings->GetSetting("MusicLocation");
+    QString tempdir = m_context->GetSetting("TemporarySpace");
+    QString findir = m_context->GetSetting("MusicLocation");
 
     for (int i = 0; i < totaltracks; i++)
     {
@@ -446,14 +438,14 @@ void Ripper::ripthedisc(void)
         if (encodequal < 3)
         {
             strcat(outfile, ".ogg");
-            VorbisEncode(tempfile, outfile, encodequal, track, totalbytes,
-                         current);
+            VorbisEncode(m_context, tempfile, outfile, encodequal, track, 
+                         totalbytes, current);
         }
         else
         {
             strcat(outfile, ".flac");
-            FlacEncode(tempfile, outfile, encodequal, track, totalbytes, 
-                       current);
+            FlacEncode(m_context, tempfile, outfile, encodequal, track, 
+                       totalbytes, current);
         }
 
         unlink(tempfile);
