@@ -2725,30 +2725,42 @@ static int pix_diff_vcmp16x8(uint8_t *s1, uint8_t*s2, int stride){ //FIXME move 
  * @param h is the normal height, this will be reduced automatically if needed for the last row
  */
 void ff_draw_horiz_band(MpegEncContext *s, int y, int h){
-    if (    s->avctx->draw_horiz_band 
-        && (s->last_picture_ptr || s->low_delay) ) {
+    if (s->avctx->draw_horiz_band) {
+        AVFrame *src;
         uint8_t *src_ptr[3];
-        int offset;
+        int offset[4];
+        
+        if(s->picture_structure != PICT_FRAME){
+            h <<= 1;
+            y <<= 1;
+            if(s->first_field  && !(s->avctx->slice_flags&SLICE_FLAG_ALLOW_FIELD)) return;
+        }
+
         h= FFMIN(h, s->height - y);
 
-        if(s->pict_type==B_TYPE && s->picture_structure == PICT_FRAME)
-            offset = 0;
+        if(s->pict_type==B_TYPE || s->low_delay || (s->avctx->slice_flags&SLICE_FLAG_CODED_ORDER)) 
+            src= (AVFrame*)s->current_picture_ptr;
+        else if(s->last_picture_ptr)
+            src= (AVFrame*)s->last_picture_ptr;
         else
-            offset = y * s->linesize;
-
-        if(s->pict_type==B_TYPE || s->low_delay){
-            src_ptr[0] = s->current_picture.data[0] + offset;
-            src_ptr[1] = s->current_picture.data[1] + (offset >> 2);
-            src_ptr[2] = s->current_picture.data[2] + (offset >> 2);
-        } else {
-            src_ptr[0] = s->last_picture.data[0] + offset;
-            src_ptr[1] = s->last_picture.data[1] + (offset >> 2);
-            src_ptr[2] = s->last_picture.data[2] + (offset >> 2);
+            return;
+            
+        if(s->pict_type==B_TYPE && s->picture_structure == PICT_FRAME && s->out_format != FMT_H264){
+            offset[0]=
+            offset[1]=
+            offset[2]=
+            offset[3]= 0;
+        }else{
+            offset[0]= y * s->linesize;;
+            offset[1]= 
+            offset[2]= (y>>1) * s->uvlinesize;;
+            offset[3]= 0;
         }
+
         emms_c();
 
-        s->avctx->draw_horiz_band(s->avctx, src_ptr, s->linesize,
-                               y, s->width, h);
+        s->avctx->draw_horiz_band(s->avctx, src, offset,
+                                  y, s->picture_structure, h);
     }
 }
 
@@ -3074,6 +3086,29 @@ int ff_combine_frame( MpegEncContext *s, int next, uint8_t **buf, int *buf_size)
 #endif
 
     return 0;
+}
+
+void ff_mpeg_flush(AVCodecContext *avctx){
+    MpegEncContext *s = avctx->priv_data;
+    
+    ff_mpegcontext_flush(s);
+}
+
+void ff_mpegcontext_flush(MpegEncContext *s){
+    int i;
+
+    for(i=0; i<MAX_PICTURE_COUNT; i++){
+       if(s->picture[i].data[0] && (   s->picture[i].type == FF_BUFFER_TYPE_INTERNAL
+                                    || s->picture[i].type == FF_BUFFER_TYPE_USER))
+        s->avctx->release_buffer(s->avctx, (AVFrame*)&s->picture[i]);
+    }
+    s->last_picture_ptr = s->next_picture_ptr = NULL;
+
+    s->parse_context.index = 0;
+    s->parse_context.last_index = 0;
+    s->parse_context.buffer_size = 0;
+    s->parse_context.state = 0;
+    s->parse_context.frame_start_found = 0;
 }
 
 #ifdef CONFIG_ENCODERS

@@ -1551,6 +1551,12 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
     return 0;
 }
 
+typedef struct Mpeg1Context {
+    MpegEncContext mpeg_enc_ctx;
+    int mpeg_enc_ctx_allocated; /* true if decoding context allocated */
+    int repeat_field; /* true if we must repeat the field */
+} Mpeg1Context;
+
 static int mpeg_decode_init(AVCodecContext *avctx)
 {
     Mpeg1Context *s = avctx->priv_data;
@@ -1937,13 +1943,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
         MPV_decode_mb(s, s->block);
 
         if (++s->mb_x >= s->mb_width) {
-            if(s->picture_structure==PICT_FRAME){
-                ff_draw_horiz_band(s, 16*s->mb_y, 16);
-            }else{
-                if(!s->first_field){
-                    ff_draw_horiz_band(s, 32*s->mb_y, 32);
-                }
-            }
+            ff_draw_horiz_band(s, 16*s->mb_y, 16);
 
             s->mb_x = 0;
             s->mb_y++;
@@ -2329,7 +2329,6 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
                     break;
                 }
     }
-    return -1;
 }
 
 static int mpeg_decode_end(AVCodecContext *avctx)
@@ -2339,6 +2338,13 @@ static int mpeg_decode_end(AVCodecContext *avctx)
     if (s->mpeg_enc_ctx_allocated)
         MPV_common_end(&s->mpeg_enc_ctx);
     return 0;
+}
+
+static void mpeg12_flush(AVCodecContext *avctx)
+{
+    Mpeg1Context *s = avctx->priv_data;
+
+    ff_mpegcontext_flush(&s->mpeg_enc_ctx);
 }
 
 AVCodec mpeg_decoder = {
@@ -2351,4 +2357,5 @@ AVCodec mpeg_decoder = {
     mpeg_decode_end,
     mpeg_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED,
+    .flush= mpeg12_flush,
 };

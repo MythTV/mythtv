@@ -715,6 +715,8 @@ void ff_emulated_edge_mc(uint8_t *buf, uint8_t *src, int linesize, int block_w, 
                                     int src_x, int src_y, int w, int h);
 #define END_NOT_FOUND -100
 int ff_combine_frame( MpegEncContext *s, int next, uint8_t **buf, int *buf_size);
+void ff_mpeg_flush(AVCodecContext *avctx);
+void ff_mpegcontext_flush(MpegEncContext *s);
 void ff_print_debug_info(MpegEncContext *s, Picture *pict);
 
 void ff_er_frame_start(MpegEncContext *s);
@@ -901,11 +903,5 @@ double ff_eval(char *s, double *const_value, const char **const_name,
                double (**func2)(void *, double, double), char **func2_name,
                void *opaque);
 
-
-typedef struct Mpeg1Context {
-    MpegEncContext mpeg_enc_ctx;
-    int mpeg_enc_ctx_allocated; /* true if decoding context allocated */
-    int repeat_field; /* true if we must repeat the field */
-} Mpeg1Context;
 
 #endif /* AVCODEC_MPEGVIDEO_H */
