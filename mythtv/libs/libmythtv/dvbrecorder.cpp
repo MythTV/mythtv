@@ -28,7 +28,6 @@ extern AVInputFormat mpegps_demux;
 }
 
 
-
 DVBRecorder::DVBRecorder(const DVBChannel* dvbchannel)
            : RecorderBase()
 {
@@ -47,6 +46,7 @@ DVBRecorder::DVBRecorder(const DVBChannel* dvbchannel)
     keyframedist = 15;
     gopset = false;
     prev_gop_save_pos = -1;
+    pktdrop = 0;
 }
 
 DVBRecorder::~DVBRecorder()
@@ -350,6 +350,8 @@ bool DVBRecorder::PacketHasHeader(unsigned char *buf, int len,
 
 void DVBRecorder::ProcessData(unsigned char *buffer, int len)
 {
+    bool dontwrite = false;
+    unsigned char *actualstart = buffer;
     AVPacket pkt;
 
     ic->pb.buffer = buffer;
@@ -362,7 +364,7 @@ void DVBRecorder::ProcessData(unsigned char *buffer, int len)
     {
         if (av_read_packet(ic, &pkt) < 0)
             break;
-        
+
         if (pkt.stream_index > ic->nb_streams)
         {
             cerr << "bad stream\n";
@@ -373,12 +375,41 @@ void DVBRecorder::ProcessData(unsigned char *buffer, int len)
         AVStream *curstream = ic->streams[pkt.stream_index];
         if (pkt.size > 0 && curstream->codec.codec_type == CODEC_TYPE_VIDEO)
         {
-            if (PacketHasHeader(pkt.data, pkt.size, PICTURE_START))
+            long long startpos = ringBuffer->GetFileWritePosition();
+
+            bool pic_start = PacketHasHeader(pkt.data, pkt.size, PICTURE_START);
+            bool gop_start = PacketHasHeader(pkt.data, pkt.size, GOP_START);
+
+            if (startpos == 0)
             {
-                framesWritten++;
+                // FIXME: Is this correct?? It seems to improve frame skipping..
+                // Toss away packets that will be tossed by a decoder anyway.
+                if (!gop_start)
+                {
+                    pktdrop++;
+                    dontwrite = true;
+                    av_free_packet(&pkt);
+                    continue;
+                }
+                else
+                {
+                    dontwrite = false;
+                    int off = ic->pb.buf_ptr - ic->pb.buffer - pkt.size - 48;
+                    cerr << "DVBRecorder - Correcting start of stream, dropped "
+                         << pktdrop <<" packets!" << endl;
+                    if (off > 0)
+                    {
+                        actualstart += off;
+                        len -= off;
+                    }
+                    pktdrop = 0;
+                }
             }
 
-            if (PacketHasHeader(pkt.data, pkt.size, GOP_START))
+            if (pic_start)
+                framesWritten++;
+
+            if (gop_start)
             {
                 int frameNum = framesWritten - 1;
 
@@ -388,7 +419,6 @@ void DVBRecorder::ProcessData(unsigned char *buffer, int len)
                     gopset = true;
                 }
 
-                long long startpos = ringBuffer->GetFileWritePosition();
                 startpos += pkt.startpos;
 
                 long long keyCount = frameNum / keyframedist;
@@ -411,7 +441,8 @@ void DVBRecorder::ProcessData(unsigned char *buffer, int len)
         av_free_packet(&pkt);
     }
 
-    ringBuffer->Write(buffer, len);
+    if (!dontwrite)
+        ringBuffer->Write(buffer, len);
 }
 
 void DVBRecorder::StopRecording(void)

@@ -29,7 +29,7 @@ DVBChannel::DVBChannel(TVRec *parent, int aCardnum,
       dvb_type = DVB_C;
     else
     {
-      cerr <<  "invalid DVB card type " << a_dvb_type << endl;
+      cerr <<  "DVBChannel ERROR: Invalid DVB card type (Check your configuration): " << a_dvb_type << endl;
       dvb_type = DVB_S;
     }
 }
@@ -69,18 +69,16 @@ bool DVBChannel::Open(unsigned int npids)
         demux_fd.push_back(open(devicenodename(dvbdev_demux, cardnum), O_RDWR));
         if (demux_fd.back() < 0)
         {
-            cerr <<  "open of demux device (" << i << ") failed" << endl;
+            cerr <<  "DVBChannel ERROR: open of demux device (" << i << ") failed" << endl;
             return false;
         }
     }
-    cout << "opened DVB demux devices" << endl;
 
     if (use_ts)
     {
         set_ts_filt(demux_fd[0], 8192, DMX_PES_OTHER);
           /* 8192 is the magic PID to tell the hardware/driver not to filter,
              but to give us the full TS. */
-        cout << "set demux device for TS" << endl;
     }
     // else wait for SetChannelByString() to use SetPIDs()
 
@@ -96,12 +94,12 @@ void DVBChannel::Close()
     for (vector_int::iterator i = pid.begin(); i != pid.end(); i++)
         if (*i > 0)
             close(*i);
-    cout << "closed DVB demux devices" << endl;
+    cout << "DVBChannel: Closed DVB demux devices!" << endl;
 }
 
 bool DVBChannel::SetPID()
 {
-    cout << "SetPID:";
+    cout << "SetPID: ";
     for (vector_int::iterator j = pid.begin(); j != pid.end(); j++)
         cout << " " << *j;
     cout << endl;
@@ -118,24 +116,24 @@ bool DVBChannel::SetPID()
             cerr << "aaarggg! sizes don't match" <<endl;
         for (unsigned int i = 0; i < pid.size(); i++)
         {
-            cout << "demux" << i << "=" << demux_fd[i] << " pid " << pid[i] << endl;
-            set_ts_filt(demux_fd[i], pid[i], DMX_PES_OTHER);
-            /* if we used DMX_PES_VIDEO/AUDIO, it would allow the full cards
-               to decode, but we don't need that anyways. */
+            // FIXME: This hurts no-one, but really,
+            //   there should be a video/audio pair in the database.
+            if (i==0)
+                 set_ts_filt(demux_fd[i], pid[i], DMX_PES_VIDEO);
+            else if (i==1)
+                 set_ts_filt(demux_fd[i], pid[i], DMX_PES_AUDIO);
+            else
+                 set_ts_filt(demux_fd[i], pid[i], DMX_PES_OTHER);
         }
 #endif
     }
     // else we did that in Open() already
 
-    cout << "set demux devices" << endl;
-
     // Notify DVBRecorder (which does the filtering) of the PID change
     DVBRecorder* rec = dynamic_cast<DVBRecorder*>(pParent->GetRecorder());
     if (rec)
     {
-        cout << "got recorder" << endl;
         rec->SetPID(pid);
-        cout << "notifed recorder" << endl;
     }
     // else ignore error, e.g. when there is no recorder yet
 
@@ -225,7 +223,7 @@ bool FetchDVBTuningOptions(QSqlDatabase* db_conn, pthread_mutex_t db_lock,
         MythContext::DBError("fetchtuningparamschanid", query);
     if (query.numRowsAffected() <= 0)
     {
-        cerr << "didn't find channel" << endl;
+        cerr << "DVBChannel ERROR: Could not find channel in database!" << endl;
         pthread_mutex_unlock(&db_lock);
         return false;
     }
@@ -244,7 +242,7 @@ bool FetchDVBTuningOptions(QSqlDatabase* db_conn, pthread_mutex_t db_lock,
         MythContext::DBError("fetchtuningparams", query);
     if (query.numRowsAffected() <= 0)
     {
-        cerr << "didn't find dvb tuning parameters for channel" << endl;
+        cerr << "DVBChannel ERROR: Could not find dvb tuning parameters for channel!" << endl;
         pthread_mutex_unlock(&db_lock);
         return false;
     }
@@ -260,9 +258,9 @@ bool FetchDVBTuningOptions(QSqlDatabase* db_conn, pthread_mutex_t db_lock,
     if (dvb_type == DVBChannel::DVB_S)
     {
         option = query.value(1).toString();
-        if (option == 'V' || option == 'v')
+        if (option[0] == 'V' || option[0] == 'v')
             s.pol_v = true;
-        else if (option == 'H' || option == 'h')
+        else if (option[0] == 'H' || option[0] == 'h')
             s.pol_v = false;
         else
             return false;
@@ -407,7 +405,7 @@ bool DVBTune(const DVBTunerSettings& s, int cardnum)
     int fd_frontend = open(devicenodename(dvbdev_frontend, cardnum), O_RDWR);
     if(fd_frontend < 0)
     {
-        cerr << "Opening of DVB frontend device failed";
+        cerr << "DVBChannel ERROR: Opening DVB frontend device failed!\n";
         return -1;
     }
     int fd_sec = 0;
@@ -415,11 +413,10 @@ bool DVBTune(const DVBTunerSettings& s, int cardnum)
     fd_sec = open(devicenodename(dvbdev_sec, cardnum), O_RDWR);
     if(fd_sec < 0)
     {
-        cerr << "Opening of DVB sec device failed";
+        cerr << "DVBChannel ERROR: Opening DVB sec device failed!\n";
         return -1;
     }
 #endif
-    cout << "trying to change to freq " << s.freq << endl;
 
     // tune; from tune.h/c
     int err = tune_it(fd_frontend, fd_sec,
@@ -439,10 +436,9 @@ bool DVBTune(const DVBTunerSettings& s, int cardnum)
     // return
     if (err < 0)
     {
-        cerr << "tuning failed" << endl;
+        cerr << "DVBChannel ERROR: Tuning failed!" << endl;
         return false;
     }
-    cout << "tuning succeeded" << endl;
 
     return true;
 }
@@ -453,47 +449,56 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 {
     if (curchannelname == chan)
         return true;
-    cout << "trying to change to channel " << chan << endl;
+    cout << "DVBChannel: Changing to channel " << chan << " on card " << cardnum << endl;
 
 #ifdef USING_DVB
     QSqlDatabase* db_conn;
     pthread_mutex_t db_lock;
     if (!pParent->CheckChannel(this, chan, db_conn, db_lock))
+    {
+        cerr << "DVBChannel ERROR: Checkchannel could not verify channel!" << endl;
         return false;
-    cout << "channel exists" << endl;
+    }
 
     DVBTunerSettings tunerSettings;
 
     if (!FetchDVBTuningOptions(db_conn, db_lock, dvb_type, chan,
                                /*out*/ tunerSettings))
+    {
+        cerr << "DVBCHannel ERROR: Could not get DVB tuning options!" << endl;
         return false;
-    cout << "got tuning parameters" << endl;
+    }
 
     if (!DVBTune(tunerSettings, cardnum))
     {
-        cerr << "invalid tuning parameters" << endl;
+        cerr << "DVBChannel ERROR: Failed to tune card!" << endl;
         return false;
     }
 
     pid = tunerSettings.pid;
     if (!SetPID())
+    {
+        cerr << "DVBChannel ERROR: Could not set video/audio pids on card!" << endl;
         return false;
-
-    cout << "successfully changed channel" << endl;
+    }
 
     curchannelname = chan;
     inputChannel[currentcapchannel] = curchannelname;
 
     return true;
 #else
-    cerr << "DVB support not compiled in" << endl;
+    cerr << "DVBChannel ERROR: DVB support not compiled in!" << endl;
     return false;
 #endif
 }
 
 void DVBChannel::SwitchToInput(const QString &input, const QString &chan)
 {
-    (void)input;
+    // FAKE DVB Input.
+    currentcapchannel = 0;
+    if (channelnames.empty())
+       channelnames[currentcapchannel] = input;
+
     SetChannelByString(chan);
 }
 

@@ -83,33 +83,31 @@ XvVideoOutput::~XvVideoOutput()
 void XvVideoOutput::InputChanged(int width, int height, float aspect,
                                  int num_buffers, unsigned char **out_buffers)
 {
-    if (XJ_started)
+    pthread_mutex_lock(&lock);
+
+    XJ_width = width;
+    XJ_height = height;
+    XJ_aspect = aspect;
+
+    if (xv_port != -1)
     {
-        XJ_started = false;
-        XJ_width = width;
-        XJ_height = height;
-        XJ_aspect = aspect;
-
-        if (xv_port != -1)
-        {
-            DeleteXvBuffers();
-            CreateXvBuffers(num_buffers, out_buffers);
-            XFlush(data->XJ_disp);
-        }
-        else if (use_shm)
-        {
-            DeleteShmBuffers();
-            CreateShmBuffers(num_buffers, out_buffers);
-        }
-        else
-        {
-            DeleteXBuffers();
-            CreateShmBuffers(num_buffers, out_buffers);
-        }
-
-        MoveResize();
-        XJ_started = true;
+        DeleteXvBuffers();
+        CreateXvBuffers(num_buffers, out_buffers);
+        XFlush(data->XJ_disp);
     }
+    else if (use_shm)
+    {
+        DeleteShmBuffers();
+        CreateShmBuffers(num_buffers, out_buffers);
+    }
+    else
+    {
+        DeleteXBuffers();
+        CreateShmBuffers(num_buffers, out_buffers);
+    }
+
+    MoveResize();
+    pthread_mutex_unlock(&lock);
 }
 
 int XvVideoOutput::GetRefreshRate(void)
@@ -637,19 +635,26 @@ void XvVideoOutput::PrepareFrame(unsigned char *buffer, int width, int height)
 {
     if (xv_port != -1)
     {
+        pthread_mutex_lock(&lock);
+
         XvImage *image = data->buffers[buffer];
+
+        if (!image)
+        {
+            pthread_mutex_unlock(&lock);
+            return;
+        }
+
         if (colorid == GUID_YV12_PLANAR)
         {
-            memcpy(scratchspace, (unsigned char *)image->data + (width * height),
-                   width * height / 4);
+            memcpy(scratchspace, (unsigned char *)image->data + 
+                   (width * height), width * height / 4);
             memcpy((unsigned char *)image->data + (width * height),
                    (unsigned char *)image->data + (width * height) * 5 / 4,
                    width * height / 4);
             memcpy((unsigned char *)image->data + (width * height) * 5 / 4,
                    scratchspace, width * height / 4);
         }
-
-        pthread_mutex_lock(&lock);
 
         XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc,
                       image, imgx, imgy, imgw, imgh, dispxoff, dispyoff,

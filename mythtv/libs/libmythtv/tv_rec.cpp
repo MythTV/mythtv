@@ -67,8 +67,11 @@ TVRec::TVRec(int capturecardnum)
     if (cardtype == "DVB")
     {
         channel = new DVBChannel(this, videodev.toInt(), use_ts == 1, dvb_type);
-        if (channel->SetChannelByString(startchannel))
-            channel->SetChannelOrdering(chanorder);
+        if (inputname.isEmpty())
+            channel->SetChannelByString(startchannel);
+        else
+            channel->SwitchToInput(inputname, startchannel);
+        channel->SetChannelOrdering(chanorder);
         // don't close this channel, otherwise we cannot read data
     }
     else // "V4L" or "MPEG", ie, analog TV

@@ -81,6 +81,7 @@ class DVBRecorder : public RecorderBase
     const DVBChannel* channel;
 
     long long prev_gop_save_pos;
+    unsigned int pktdrop;
 };
 
 #endif
