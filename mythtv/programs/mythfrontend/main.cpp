@@ -212,6 +212,73 @@ void startTV(void)
     delete tv;
 }
 
+void showStatus(void)
+{
+    QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus, Status;
+    QString querytext;
+    int DaysOfData;
+    QDateTime qdtNow, GuideDataThrough;
+    QSqlDatabase *db = QSqlDatabase::database();
+
+    qdtNow = QDateTime::currentDateTime();
+    querytext = QString("SELECT max(endtime) FROM program;");
+
+    QSqlQuery query = db->exec(querytext);
+
+    if (query.isActive() && query.numRowsAffected())
+    {
+        query.next();
+        GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
+                                                 Qt::ISODate);
+    }
+
+    mfdLastRunStart = gContext->GetSetting("mythfilldatabaseLastRunStart");
+    mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
+    mfdLastRunStatus = gContext->GetNumSetting("mythfilldatabaseLastRunStatus");
+
+    Status = "Last mythfilldatabase guide update:";
+    Status += "\n   Started:   ";
+    Status += mfdLastRunStart;
+    Status += "\n   Finished: ";
+    Status += mfdLastRunEnd;
+
+    Status += "\n   Result: ";
+
+    if(!mfdLastRunStatus)
+       Status += "FAILED";
+    else
+       Status += "Successful";
+
+    Status += "\n\nThere is guide data until ";
+    Status += QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
+
+    DaysOfData = qdtNow.daysTo(GuideDataThrough);
+
+    Status += "\nThere ";
+
+    if (DaysOfData == 1) 
+       Status += "is ";
+    else 
+       Status += "are ";
+
+    Status += QString::number(DaysOfData);
+    Status += " day";
+
+    if (DaysOfData != 1)
+       Status += "s";
+
+    Status += " of guide data remaining in the database.\n";
+
+    if (DaysOfData <= 3)
+       Status += "\nWARNING: is mythfilldatabase running?";
+
+    DialogBox *status_dialog = new DialogBox(gContext->GetMainWindow(), Status);
+    status_dialog->AddButton(QObject::tr("OK"));
+    status_dialog->exec();
+
+    delete status_dialog;
+}
+
 void TVMenuCallback(void *data, QString &selection)
 {
     (void)data;
@@ -287,6 +354,8 @@ void TVMenuCallback(void *data, QString &selection)
 
         xbox->GetSettings();
     }
+    else if (sel == "tv_status")
+        showStatus();
 }
 
 int handleExit(void)

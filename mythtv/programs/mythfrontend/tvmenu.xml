@@ -79,4 +79,11 @@
    </button>
 -->
 
+   <button>
+      <type>TV_STATUS</type>
+      <text>System Status</text>
+      <action>TV_STATUS</action>
+   </button>
+
+
 </mythmenu>
