@@ -68,7 +68,10 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
 
         return;
     }
- 
+
+    connect(tree, SIGNAL(itemEntered(UIListTreeType *, UIListGenericTree *)),
+            this, SLOT(entered(UIListTreeType *, UIListGenericTree *)));
+
     // Make the first few nodes in the tree that everything else hangs off
     // as children
 
@@ -89,12 +92,15 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
         // occasionally
 
         cd_reader_thread = new ReadCDThread(the_playlists, all_music);
+
+        // filling initialy before thread running
+        fillCD();
+
         cd_reader_thread->start();
     
         cd_watcher = new QTimer(this);
         connect(cd_watcher, SIGNAL(timeout()), this, SLOT(occasionallyCheckCD()));
         cd_watcher->start(1000); // Every second?
-        fillCD();
     }
     
     // Set a timer to keep redoing the fillList stuff until the metadata and 
@@ -186,6 +192,9 @@ void DatabaseBox::keepFilling()
 
 void DatabaseBox::occasionallyCheckCD()
 {
+    if (cd_reader_thread->getLock()->locked())
+        return;
+
     if (cd_reader_thread->statusChanged())
     {
         if (active_playlist)
@@ -302,9 +311,9 @@ void DatabaseBox::CreateCDAudio()
     error_popup = NULL;
 
     if (error)
-	ErrorPopup(tr("Couldn't create CD"));
+        ErrorPopup(tr("Couldn't create CD"));
     else
-	ErrorPopup(tr("CD Created"));
+        ErrorPopup(tr("CD Created"));
 }
 
 void DatabaseBox::CreateCDMP3()
@@ -322,9 +331,9 @@ void DatabaseBox::CreateCDMP3()
     error_popup=NULL;
 
     if (error)
-	ErrorPopup(tr("Couldn't create CD"));
+        ErrorPopup(tr("Couldn't create CD"));
     else
-	ErrorPopup(tr("CD Created"));
+        ErrorPopup(tr("CD Created"));
 }
 
 void DatabaseBox::ErrorPopup(const QString &msg)
@@ -377,7 +386,7 @@ void DatabaseBox::BlankCDRW()
     if (scsidev.length()==0) 
     {
         cerr << "playlist.o: We don't have SCSI devices" << endl ;
-	return;
+        return;
     }
     // Begin Blanking
     MythProgressDialog *record_progress;
@@ -462,17 +471,28 @@ void DatabaseBox::copyToActive()
 
 void DatabaseBox::fillCD(void)
 {
+    QMutexLocker locker(cd_reader_thread->getLock());
+
     if (cditem)
     {
+
+        // Close leaf before delete if opened
+
+        UIListGenericTree *curItem = tree->GetCurrentPosition();
+        if (dynamic_cast<CDCheckItem*>(curItem))
+        {
+            int depth = curItem->calculateDepth(0);
+            while(depth--)
+                tree->MoveLeft();
+        }   
+
         // Delete anything that might be there  
 
-        if (cditem->childCount() > 0)
-        { 
-            while (cditem->getChildAt(0))
-            {
-                cditem->RemoveFromParent();
-                //delete cditem->getChildAt(0); Deleted by GenericTree
-            }
+        while (cditem->childCount())
+        {
+            CDCheckItem *track_ptr = 
+                static_cast<CDCheckItem*>(cditem->getChildAt(0));
+            track_ptr->RemoveFromParent();
         }
     
         // Put on whatever all_music tells us is there
@@ -502,14 +522,16 @@ void DatabaseBox::fillCD(void)
         }
 
         qApp->unlock();
-    }
-    // Can't check what ain't there
+
+        // Can't check what ain't there
     
-    if (cditem->childCount() > 0)
-    {
-        cditem->setCheckable(true);
-        cditem->setCheck(0);
-        checkParent(cditem);
+        if (cditem->childCount() > 0)
+        {
+            cditem->setCheckable(true);
+            cditem->setCheck(0);
+            checkParent(cditem);
+        }
+
         tree->Redraw();
     }
 }
@@ -547,6 +569,35 @@ void DatabaseBox::alternateDoMenus(UIListGenericTree *item, int keypad_number)
         doActivePopup(item_ptr);
 }
 
+void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
+{
+    if (!item || !treetype)
+        return;
+
+    cout << endl;
+/*
+    if (item == allmusic || item == alllists || item == allcurrent ||
+        item == cditem)
+    {
+        cout << item->getString();
+        return;
+    }
+*/
+    if (CDCheckItem *item_ptr = dynamic_cast<CDCheckItem*>(item))
+    {
+        cout << "cd: " << cditem->getString() << endl;
+        cout << "track: " << item_ptr->getString() << endl;
+        return;
+    }
+
+    if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item))
+    {
+        cout << "level: " << item_ptr->getLevel() << endl;
+        cout << "text: " << item_ptr->getString() << endl;
+        return;
+    }
+}
+    
 void DatabaseBox::selected(UIListGenericTree *item)
 {
     if (!item)
@@ -667,9 +718,9 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
 
     if (gContext->GetNumSetting("CDWriterEnabled")) 
     {
-	QString scsidev = gContext->GetSetting("CDWriterDevice");
-	if (!scsidev.isEmpty() && !scsidev.isNull())
-		cdwriter = true;
+        QString scsidev = gContext->GetSetting("CDWriterDevice");
+        if (!scsidev.isEmpty() && !scsidev.isNull())
+            cdwriter = true;
     }
 
     QButton *cdaudiob = NULL;
@@ -1065,6 +1116,9 @@ ReadCDThread::ReadCDThread(PlaylistsContainer *all_the_playlists,
 
 void ReadCDThread::run()
 {
+    // lock all_music and cd_status_changed while running thread
+    QMutexLocker locker(getLock());
+
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     int tracknum = decoder->getNumCDAudioTracks();
 
@@ -1111,9 +1165,10 @@ void ReadCDThread::run()
         }
     } 
 
-    int actual_tracknum = decoder->getNumTracks();
+    int tracks = decoder->getNumTracks();
 
-    while (actual_tracknum > 0 && redo) 
+    for (int actual_tracknum = 1; 
+         redo && actual_tracknum <= tracks; actual_tracknum++)
     {
         Metadata *track = decoder->getMetadata(actual_tracknum);
         if (track)
@@ -1147,7 +1202,6 @@ void ReadCDThread::run()
             }
             delete track;
         }
-        actual_tracknum--;
     }
 
     delete decoder;

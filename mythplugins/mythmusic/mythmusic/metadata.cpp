@@ -900,7 +900,7 @@ bool AllMusic::checkCDTrack(Metadata *the_track)
     {
         return false;
     }
-    if(cd_data.first().Title() == the_track->Title())
+    if(cd_data.last().Title() == the_track->Title())
     {
         return true;
     }

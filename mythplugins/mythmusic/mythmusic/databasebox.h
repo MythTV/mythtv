@@ -24,12 +24,14 @@ class ReadCDThread : public QThread
     ReadCDThread(PlaylistsContainer *all_the_playlist, AllMusic *all_the_music);
     virtual void run();
     bool    statusChanged(){return cd_status_changed;}
+    QMutex  *getLock(){return &music_lock;}
 
   private:
 
     AllMusic*           all_music;
     PlaylistsContainer* the_playlists;
     bool                cd_status_changed;
+    QMutex              music_lock;
 };
 
 class DatabaseBox : public MythThemedDialog
@@ -48,6 +50,7 @@ class DatabaseBox : public MythThemedDialog
     
   protected slots:
     void selected(UIListGenericTree *);
+    void entered(UIListTreeType *, UIListGenericTree *);
     void doMenus(UIListGenericTree *);
     void alternateDoMenus(UIListGenericTree *, int);
     void keyPressEvent(QKeyEvent *e);
