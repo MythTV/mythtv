@@ -618,8 +618,8 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (fileheader.audioblocks != 0)
         InitSound();
   
-    X11videobuf = XJ_init(video_width, video_height, "NuppelVideo Player", 
-                          "NuppelVideo");
+    X11videobuf = XJ_init(video_width, video_height, "Mythical Convergence", 
+                          "MC-TV");
     videobuf3 = new unsigned char[videosize];
 
     osd = new OSD(video_width, video_height, osdfilename);

@@ -71,6 +71,11 @@ void Channel::SetFormat(const string &format)
     tuner.mode = mode;
 
     ioctl(videofd, VIDIOCSTUNER, &tuner);
+
+    struct video_channel vc;
+    ioctl(videofd, VIDIOCGCHAN, &vc);
+    vc.norm = mode;
+    ioctl(videofd, VIDIOCSCHAN, &vc);
 }
 
 void Channel::SetFreqTable(const string &name)
