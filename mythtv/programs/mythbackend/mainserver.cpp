@@ -1628,33 +1628,42 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
     EncoderLink *encoder = NULL;
     QString enchost;
 
+    bool lastcard = false;
+
+    if (gContext->GetSetting("LastFreeCard", "0") == "1")
+        lastcard = true;
+
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = iter.data();
 
-        if (elink->isLocal())
-            enchost = gContext->GetHostName();
-        else
-            enchost = elink->getHostname();
+        if (!lastcard)
+        {
+            if (elink->isLocal())
+                enchost = gContext->GetHostName();
+            else
+                enchost = elink->getHostname();
 
-        if ((enchost == pbshost) &&
-            (elink->isConnected()) &&
-            (!elink->IsBusy()) &&
-            (!elink->isTunerLocked()))
+            if (enchost == pbshost && elink->isConnected() &&
+                !elink->IsBusy() && !elink->isTunerLocked())
+            {
+                encoder = elink;
+                retval = iter.key();
+                VERBOSE(VB_RECORD, QString("Card %1 is local.")
+                        .arg(iter.key()));
+                break;
+            }
+        }
+
+        if ((retval == -1 || lastcard) && elink->isConnected() &&
+            !elink->IsBusy() && !elink->isTunerLocked())
         {
             encoder = elink;
             retval = iter.key();
-            break;
         }
-        if ((retval == -1) &&
-            (elink->isConnected()) &&
-            (!elink->IsBusy()) &&
-            (!elink->isTunerLocked()))
-        {
-            encoder = elink;
-            retval = iter.key();
-        }
+        VERBOSE(VB_RECORD, QString("Checking card %1. Best card so far %2")
+                .arg(iter.key()).arg(retval));
     }
 
     strlist << QString::number(retval);
@@ -1722,12 +1731,13 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
     EncoderLink *encoder = NULL;
     QString enchost;
 
-    VERBOSE(VB_ALL, QString("Getting next free recorder : %1").arg(currrec));
+    VERBOSE(VB_RECORD, QString("Getting next free recorder after : %1")
+            .arg(currrec));
 
     // find current recorder
     QMap<int, EncoderLink *>::Iterator iter, curr = encoderList->find(currrec);
 
-    if (curr != encoderList->end())
+    if (currrec > 0 && curr != encoderList->end())
     {
         // cycle through all recorders
         for (iter = curr;;)
@@ -1742,20 +1752,6 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
 
             elink = iter.data();
 
-            if (elink->isLocal())
-                enchost = gContext->GetHostName();
-            else
-                enchost = elink->getHostname();
-
-            if ((enchost == pbshost) &&
-                (elink->isConnected()) &&
-                (!elink->IsBusy()) &&
-                (!elink->isTunerLocked()))
-            {
-                encoder = elink;
-                retval = iter.key(); 
-                break;
-            }
             if ((retval == -1) &&
                 (elink->isConnected()) &&
                 (!elink->IsBusy()) &&

@@ -1525,6 +1525,19 @@ public:
     };
 };
 
+class LastFreeCard: public CheckBoxSetting, public BackendSetting {
+public:
+    LastFreeCard():
+        BackendSetting("LastFreeCard") {
+        setLabel(QObject::tr("Avoid conflicts between live TV and "
+                             "scheduled shows."));
+        setValue(false);
+        setHelpText(QObject::tr("If set, live TV will choose a tuner card "
+                    "that is less likely to have scheduled recordings "
+                    "rather than the best card available."));
+    };
+};
+
 class QtFontBig: public SpinBoxSetting, public GlobalSetting {
 public:
     QtFontBig():
@@ -2462,6 +2475,7 @@ GeneralSettings::GeneralSettings()
     general->addChild(new RecordOverTime());
     general->addChild(new ChannelOrdering());
     general->addChild(new SmartChannelChange());
+    general->addChild(new LastFreeCard());
     addChild(general);
 
     VerticalConfigurationGroup* gen2 = new VerticalConfigurationGroup(false);
