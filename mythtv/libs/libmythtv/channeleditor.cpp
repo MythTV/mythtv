@@ -106,9 +106,11 @@ void ChannelListSetting::fillSelections(void)
     clearSelections();
     addSelection("(New Channel)");
     QString querystr = "SELECT channel.name,channum,chanid ";
-    if (currentSourceID == "")
-        querystr += ",videosource.name FROM channel,videosource WHERE "
-                    "channel.sourceid = videosource.sourceid ";
+    if ((currentSourceID == "") ||
+        (currentSourceID == "Unassigned"))
+        querystr += ",videosource.name FROM channel "
+                    "LEFT JOIN videosource ON "
+                    "(channel.sourceid = videosource.sourceid) ";
     else
         querystr += QString("FROM channel WHERE sourceid='%1' ")
                            .arg(currentSourceID);
@@ -124,7 +126,14 @@ void ChannelListSetting::fillSelections(void)
             QString name = QString::fromUtf8(query.value(0).toString());
             QString channum = query.value(1).toString();
             QString chanid = query.value(2).toString();
-            QString sourceid = query.value(3).toString();
+            QString sourceid = "Unassigned";
+			
+            if (!query.value(3).toString().isNull())
+            {
+                sourceid = query.value(3).toString();
+                if (currentSourceID == "Unassigned")
+                    continue;
+            }
  
             if (channum == "" && currentHideMode) continue;
 
@@ -139,7 +148,8 @@ void ChannelListSetting::fillSelections(void)
                     name = "???. " + name;
             }
 
-            if (currentSourceID == "")
+            if ((currentSourceID == "") &&
+                (currentSourceID != "Unassigned"))
                 name += " (" + sourceid  + ")";
 
             addSelection(name, chanid, (chanid == currentValue) ? true : false);
@@ -162,6 +172,7 @@ public:
             while(query.next())
                 addSelection(query.value(0).toString(),
                              query.value(1).toString());
+        addSelection(QObject::tr("(Unassigned)"),"Unassigned");
     };
 };
 
