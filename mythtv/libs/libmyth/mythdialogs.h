@@ -271,7 +271,9 @@ class MythImageFileDialog: public MythThemedDialog
 
     QString               *selected_file;
     UIManagedTreeListType *file_browser;
+    GenericTree           *root_parent;
     GenericTree           *file_root;
+    GenericTree           *initial_node;
     UIImageType           *image_box;
     QStringList           image_files;
 };

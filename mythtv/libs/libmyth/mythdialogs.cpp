@@ -1209,6 +1209,8 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
                                      setsize)
 {
     selected_file = result;
+    initial_node = NULL;
+    
     //
     //  MythImageFileDialog's expect there to be certain
     //  elements in the theme, or they will fail.
@@ -1279,7 +1281,11 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     image_files.clear();
     buildTree(top_directory);
 
-    file_browser->assignTreeData(file_root);
+    file_browser->assignTreeData(root_parent);
+    if(initial_node)
+    {
+        file_browser->setCurrentNode(initial_node);
+    }
     file_browser->enter();
     file_browser->refresh();
     
@@ -1308,14 +1314,20 @@ void MythImageFileDialog::buildTree(QString starting_where)
 {
     buildFileList(starting_where);
     
-    file_root = new GenericTree("Image Files", -1, false);
+    root_parent = new GenericTree("Image Files root", -1, false);
+    file_root = root_parent->addNode("Image Files", -1, false);
 
     //
     //  Go through the files and build a tree
     //    
     for(uint i = 0; i < image_files.count(); ++i)
     {
+        bool make_active = false;
         QString file_string = *(image_files.at(i));
+        if(file_string == *selected_file)
+        {
+            make_active = true;
+        }
         QString prefix = gContext->GetSetting("VideoStartupDir");
         if(prefix.length() < 1)
         {
@@ -1332,7 +1344,11 @@ void MythImageFileDialog::buildTree(QString starting_where)
             if(a_counter + 1 >= (int) list.count())
             {
                 QString title = (*an_it);
-                where_to_add->addNode(title.section(".",0,0), i, true);
+                GenericTree *added_node = where_to_add->addNode(title.section(".",0,0), i, true);
+                if(make_active)
+                {
+                    initial_node = added_node;
+                }
             }
             else
             {
@@ -1437,10 +1453,11 @@ void MythImageFileDialog::handleTreeListSelection(int type, IntVector*)
 
 MythImageFileDialog::~MythImageFileDialog()
 {
-    if(file_root)
+    if(root_parent)
     {
-        file_root->deleteAllChildren();
-        delete file_root;
+        root_parent->deleteAllChildren();
+        delete root_parent;
+        root_parent = NULL;
     }
 }
 

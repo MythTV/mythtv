@@ -2944,6 +2944,19 @@ void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
 
 }
 
+void UIManagedTreeListType::setCurrentNode(GenericTree *a_node)
+{
+    //
+    //  We should really do a recursive check of the tree
+    //  to see if this node exists somewhere...
+    //
+    
+    if(a_node)
+    {
+        current_node = a_node;
+    }
+}
+
 void UIManagedTreeListType::makeHighlights()
 {
     resized_highlight_images.clear();
