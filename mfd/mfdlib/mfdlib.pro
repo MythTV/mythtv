@@ -10,8 +10,8 @@ INSTALLS += target
 HEADERS += mfd_events.h   mfd_plugin.h
 SOURCES += mfd_events.cpp mfd_plugin.cpp
 
-HEADERS += decoder.h   decoder_event.h   visual.h constants.h
-SOURCES += decoder.cpp decoder_event.cpp
+HEADERS += decoder.h   decoder_event.h   visual.h constants.h 
+SOURCES += decoder.cpp decoder_event.cpp 
 
 HEADERS += output.h   output_event.h   recycler.h   buffer.h
 SOURCES += output.cpp output_event.cpp recycler.cpp buffer.cpp
