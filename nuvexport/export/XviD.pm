@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.26 (xris)
+#Last Updated: 2004.11.02 (xris)
 #
 #  export::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -129,6 +129,7 @@ package export::XviD;
     # Height will default to whatever is the appropriate aspect ratio for the width
     # someday, we should check the aspect ratio here, too...
         $self->{'height'} = sprintf('%.0f', $self->{'width'} * 3/4);
+        $self->{'height'}++ if ($self->{'height'} % 2);
     # Ask about the height
         if ($Args{'height'}) {
             die "Height must be > 0\n" unless ($Args{'height'} > 0);
