@@ -42,6 +42,7 @@ class ChanInfo
                                       iconpath = other.iconpath;
                                       chanstr = other.chanstr;
                                       xmltvid = other.xmltvid;
+                                      old_xmltvid = other.old_xmltvid;
                                       name = other.name;
                                       freqid = other.freqid;
                                       finetune = other.finetune;
@@ -51,6 +52,7 @@ class ChanInfo
     QString iconpath;
     QString chanstr;
     QString xmltvid;
+    QString old_xmltvid;
     QString name;
     QString freqid;
     QString finetune;
@@ -188,8 +190,8 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
         if (xmltvid.contains("zap2it"))
         {
             xmltvisjunk = true;
-            chaninfo->xmltvid = "";
             chaninfo->chanstr = "";
+            chaninfo->xmltvid = xmltvid;
             chaninfo->callsign = "";
         }
         else
@@ -236,14 +238,14 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
           
                         if (split[0] == "Channel")
                         { 
-                            chaninfo->xmltvid = split[1];
+                            chaninfo->old_xmltvid = split[1];
                             chaninfo->chanstr = split[1];
                             if (split.size() > 2)
                                 chaninfo->callsign = split[2];
                         }
                         else
                         {
-                            chaninfo->xmltvid = split[0];
+                            chaninfo->old_xmltvid = split[0];
                             chaninfo->chanstr = split[0];
                             if (split.size() > 1)
                                 chaninfo->callsign = split[1];
@@ -369,14 +371,6 @@ ProgInfo *parseProgram(QDomElement &element)
     split = QStringList::split(" ", text);
     
     pginfo->channel = split[0];
-
-    if (pginfo->channel.contains("zap2it"))
-    {
-        QRegExp rx("C(\\d+)(\\w+)");
-        int pos = rx.search(pginfo->channel);
-        if (pos >= 0)
-            pginfo->channel = rx.cap(1);
-    }
 
     pginfo->start = fromXMLTVDate(pginfo->startts);
     pginfo->end = fromXMLTVDate(pginfo->endts);
@@ -720,6 +714,26 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
         QSqlQuery query;
 
         QString querystr;
+
+        if ((*i).old_xmltvid != QString::null) {
+            querystr.sprintf("SELECT xmltvid FROM channel WHERE xmltvid = \"%s\"",
+                             (*i).old_xmltvid.ascii());
+            query.exec(querystr);
+
+            if (query.isActive() && query.numRowsAffected() > 0) {
+                if (!quiet)
+                    cout << "Converting old xmltvid (" << (*i).old_xmltvid << ") to new ("
+                         << (*i).xmltvid << ")\n";
+
+                query.exec(QString("UPDATE channel SET xmltvid = '%1' WHERE xmltvid = '%2'")
+                            .arg((*i).xmltvid)
+                            .arg((*i).old_xmltvid));
+
+                if (!query.numRowsAffected())
+                    MythContext::DBError("xmltvid conversion",query);
+            }
+        }
+
         querystr.sprintf("SELECT chanid,name,callsign,channum,finetune,"
                          "icon,freqid FROM channel WHERE xmltvid = \"%s\" AND "
                          "sourceid = %d;", (*i).xmltvid.ascii(), id); 
