@@ -504,12 +504,15 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
 
     int ret;
+    db_lock.lock();
     if ((ret = decoder->OpenFile(ringBuffer, disablevideo, testbuf)) < 0)
     {
+        db_lock.unlock();
         cerr << "Couldn't open decoder for: " << ringBuffer->GetFilename()
              << endl;
         return -1;
     }
+    db_lock.unlock();
 
     if (ret > 0)
     {
@@ -1773,6 +1776,7 @@ void NuppelVideoPlayer::SetBookmark(void)
     if (!m_db || !m_playbackinfo)
         return;
 
+    QMutexLocker lockit(&db_lock);
     m_playbackinfo->SetBookmark(framesPlayed, m_db);
 
     osd->SetSettingsText("Position Saved", 1); 
@@ -1783,6 +1787,7 @@ long long NuppelVideoPlayer::GetBookmark(void)
     if (!m_db || !m_playbackinfo)
         return 0;
 
+    QMutexLocker lockit(&db_lock);
     return m_playbackinfo->GetBookmark(m_db);
 }
 
@@ -2008,7 +2013,12 @@ bool NuppelVideoPlayer::EnableEdit(void)
     if (!haspositionmap || !m_playbackinfo || !m_db)
         return false;
 
-    if (m_playbackinfo->IsEditing(m_db))
+    bool alreadyediting = false;
+    db_lock.lock();
+    alreadyediting = m_playbackinfo->IsEditing(m_db);
+    db_lock.unlock();
+
+    if (alreadyediting)
         return false;
 
     if (GetPause())
@@ -2025,7 +2035,9 @@ bool NuppelVideoPlayer::EnableEdit(void)
     dialogname = "";
 
     QMap<QString, QString> regexpMap;
+    db_lock.lock();
     m_playbackinfo->ToMap(m_db, regexpMap);
+    db_lock.unlock();
     osd->SetTextByRegexp("editmode", regexpMap, -1);
 
     UpdateEditSlider();
@@ -2044,7 +2056,9 @@ bool NuppelVideoPlayer::EnableEdit(void)
              AddMark(it.key(), it.data());
     }
 
+    db_lock.lock();
     m_playbackinfo->SetEditing(true, m_db);
+    db_lock.unlock();
 
     return editmode;   
 }
@@ -2052,6 +2066,9 @@ bool NuppelVideoPlayer::EnableEdit(void)
 void NuppelVideoPlayer::DisableEdit(void)
 {
     editmode = false;
+
+    if (!m_playbackinfo || !m_db)
+        return;
 
     QMap<long long, int>::Iterator i = deleteMap.begin();
     for (; i != deleteMap.end(); ++i)
@@ -2073,6 +2090,7 @@ void NuppelVideoPlayer::DisableEdit(void)
         hasdeletetable = false;
     }
    
+    QMutexLocker lockit(&db_lock);
     m_playbackinfo->SetEditing(false, m_db);
 
     Unpause();
@@ -2470,6 +2488,9 @@ bool NuppelVideoPlayer::IsInDelete(long long testframe)
 
 void NuppelVideoPlayer::SaveCutList(void)
 {
+    if (!m_playbackinfo || !m_db)
+        return;
+
     long long startpos = 0;
     long long endpos = 0;
     bool first = true;
@@ -2527,6 +2548,7 @@ void NuppelVideoPlayer::SaveCutList(void)
     if (indelete)
         deleteMap[totalFrames] = 0;
 
+    QMutexLocker lockit(&db_lock);
     m_playbackinfo->SetCutList(deleteMap, m_db);
 }
 
@@ -2535,6 +2557,7 @@ void NuppelVideoPlayer::LoadCutList(void)
     if (!m_playbackinfo || !m_db)
         return;
 
+    QMutexLocker lockit(&db_lock);
     m_playbackinfo->GetCutList(deleteMap, m_db);
 }
 
@@ -2543,6 +2566,7 @@ void NuppelVideoPlayer::LoadBlankList(void)
     if (!m_playbackinfo || !m_db)
         return;
 
+    QMutexLocker lockit(&db_lock);
     m_playbackinfo->GetBlankFrameList(blankMap, m_db);
 }
 
@@ -2551,6 +2575,7 @@ void NuppelVideoPlayer::LoadCommBreakList(void)
     if (!m_playbackinfo || !m_db)
         return;
 
+    QMutexLocker lockit(&db_lock);
     m_playbackinfo->GetCommBreakList(commBreakMap, m_db);
 }
 
@@ -2854,7 +2879,9 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
         printf( "\b\b\b\b      \b\b\b\b\b\b" );
 
     // done scanning through file, now process learned info
+    db_lock.lock();
     m_playbackinfo->SetBlankFrameList(blankMap, m_db);
+    db_lock.unlock();
 
     BuildCommListFromBlanks(blankMap, video_frame_rate, commBlankMap);
     MergeCommList(commBlankMap, video_frame_rate, commBlankBreakMap);
@@ -2862,7 +2889,9 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
     // Merge/resolve differences between the lists here
 
     // only list now is blank frame map so use that for final list
+    db_lock.lock();
     m_playbackinfo->SetCommBreakList(commBlankBreakMap, m_db);
+    db_lock.unlock();
     comms_found = commBlankBreakMap.size() / 2;
 
     playing = false;

@@ -368,7 +368,10 @@ void TVRec::HandleStateChange(void)
 
         if (prevRecording)
         {
+            pthread_mutex_lock(&db_lock);
+            MythContext::KickDatabase(db_conn);
             prevRecording->SetBlankFrameList(blank_frame_map, db_conn);
+            pthread_mutex_unlock(&db_lock);
 
             if ((!prematurelystopped) &&
                 (gContext->GetNumSetting("AutoCommercialFlag", 0)))
@@ -623,7 +626,10 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if ((prevRecording) && (!killFile))
     {
+        pthread_mutex_lock(&db_lock);
+        MythContext::KickDatabase(db_conn);
         prevRecording->SetBlankFrameList(blank_frame_map, db_conn);
+        pthread_mutex_unlock(&db_lock);
 
         if (!prematurelystopped)
         {
@@ -1922,9 +1928,24 @@ void *TVRec::ReadThread(void *param)
 
 void TVRec::DoFlagCommercialsThread(void)
 {
-    ProgramInfo *program_info = new ProgramInfo(*prevRecording);
-
     flagthreadstarted = true;
+
+    QString name = QString("commercial%1%2").arg(getpid()).arg(rand());
+
+    QSqlDatabase *commthread_db = QSqlDatabase::addDatabase("QMYSQL3", name);
+    if (!commthread_db)
+    {
+        cerr << "Couldn't initialize mysql connection for comm thread\n";
+        return;
+    }
+    if (!gContext->OpenDatabase(commthread_db))
+    {
+        cerr << "Couldn't open database connection for comm thread\n";
+        QSqlDatabase::removeDatabase(name);
+        return;
+    }
+
+    ProgramInfo *program_info = new ProgramInfo(*prevRecording);
 
     nice(19);
 
@@ -1937,7 +1958,7 @@ void TVRec::DoFlagCommercialsThread(void)
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(db_conn, program_info);
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(commthread_db, program_info);
     nvp->SetRingBuffer(tmprbuf);
 
     nvp->FlagCommercials();
@@ -1949,6 +1970,8 @@ void TVRec::DoFlagCommercialsThread(void)
     delete nvp;
     delete tmprbuf;
     delete program_info;
+
+    QSqlDatabase::removeDatabase(name);
 }
 
 void *TVRec::FlagCommercialsThread(void *param)

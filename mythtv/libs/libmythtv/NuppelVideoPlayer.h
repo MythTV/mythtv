@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <qstring.h>
+#include <qmutex.h>
 
 #include "RingBuffer.h"
 #include "osd.h"
@@ -371,6 +372,7 @@ class NuppelVideoPlayer
     int embx, emby, embw, embh;
 
     QSqlDatabase *m_db;
+    QMutex db_lock;
     ProgramInfo *m_playbackinfo;
 
     long long bookmarkseek;

@@ -52,6 +52,7 @@ void Jitterometer::RecordEndTime()
 
       double mean = 0, sum_of_squared_deviations=0;
       double standard_deviation;
+      double fps = 0, tottime = 0;
       int i;
 
       /* compute the mean */
@@ -59,8 +60,11 @@ void Jitterometer::RecordEndTime()
         {
           mean += times[i];
         }
+      tottime = mean;
       mean /= num_cycles;
 
+      fps = num_cycles / tottime * 1000000;
+          
       /* compute the sum of the squares of each deviation from the mean */
       for(i=0; i<num_cycles;i++)
         {
@@ -70,7 +74,7 @@ void Jitterometer::RecordEndTime()
       /* compute standard deviation */
       standard_deviation = sqrt(sum_of_squared_deviations / (num_cycles - 1));
 
-      printf("'%s' jitterometer: mean = '%f', std. dev. = '%f'\n", name, mean, standard_deviation);
+      printf("'%s' mean = '%f', std. dev. = '%f', fps = '%f'\n", name, mean, standard_deviation, fps);
 
       count = 0;
     }
