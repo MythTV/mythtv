@@ -206,9 +206,10 @@ bool DVBChannel::GetChannelOptions(QString channum)
     QSqlQuery       query;
     QSqlDatabase    *db_conn;
     pthread_mutex_t *db_lock;
+    QString         inputName;
 
     if (!pParent->CheckChannel((ChannelBase*)this, channum,
-                               db_conn, db_lock))
+                               db_conn, db_lock, inputName))
     {
         ERROR("Failed to verify channel integrity.");
         return false;
