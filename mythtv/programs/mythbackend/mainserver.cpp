@@ -3,6 +3,9 @@
 #include <qurl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <fcntl.h>
+#include <linux/soundcard.h>
+#include <sys/ioctl.h>
 
 #include <list>
 #include <iostream>
@@ -211,6 +214,55 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         EncoderLink *enc = iter.data();
 
         enc->SpawnReadThread(socket);
+
+        if (enc->isLocal())
+        {
+            int dsp_status, soundcardcaps;
+            QSqlQuery query;
+            QString audiodevice, audiooutputdevice, querytext;
+
+            querytext = QString("SELECT audiodevice FROM capturecard "
+                                "WHERE cardid=%1;").arg(recnum);
+            query.exec(querytext);
+            if (query.isActive() && query.numRowsAffected())
+            {
+                query.next();
+                audiodevice = query.value(0).toString();
+            }
+
+            query.exec("SELECT data FROM settings WHERE "
+                       "value ='AudioOutputDevice';");
+            if (query.isActive() && query.numRowsAffected())
+            {
+                query.next();
+                audiooutputdevice = query.value(0).toString();
+            }
+
+            if (audiodevice.right(4) == audiooutputdevice.right(4)) //they match
+            {
+                int dsp_fd = open(audiodevice, O_RDWR);
+                if (dsp_fd != -1)
+                {
+                    dsp_status = ioctl(dsp_fd, SNDCTL_DSP_GETCAPS,
+                                       &soundcardcaps);
+                    if (dsp_status != -1)
+                    {
+                        if (!(soundcardcaps & DSP_CAP_DUPLEX))
+                        cerr << "WARNING:  Capture device " << audiodevice 
+                             << "is not reporting full duplex "
+                             << " capability.\nSee docs/mythtv-HOWTO, "
+                             << "section 17 for more information.\n" << endl;
+                    }
+                    else 
+                        cerr << "Could not get capabilities for "
+                             << "audio device: " << audiodevice << endl;
+                    close(dsp_fd);
+                }
+                else 
+                    cerr << "Could not open audio device: " 
+                         << audiodevice << endl;
+            }
+        }
     }
     else if (commands[1] == "FileTransfer")
     {

@@ -901,17 +901,38 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
 
     QString id = QString::null;
 
-    if (!query.isActive())
-        MythContext::DBError("getnextchannel", query);
-    else if (query.numRowsAffected() > 0)
+    if (query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
 
         id = query.value(0).toString();
     }
+    else
+    {
+        cerr << "Channel: \'" << channum << "\' was not found in the database.";
+        cerr << "\nMost likely, your DefaultTVChannel setting is wrong\n";
+
+        thequery = QString("SELECT %1 FROM channel,capturecard,cardinput "
+                           "WHERE channel.sourceid = cardinput.sourceid AND "
+                           "cardinput.inputname = \"%2\" AND "
+                           "cardinput.cardid = capturecard.cardid AND "
+                           "capturecard.videodevice = \"%3\" ORDER BY %4 "
+                           "LIMIT 1;").arg(channelorder).arg(channelinput)
+                           .arg(device).arg(channelorder);
+       
+        query = db_conn->exec(thequery);
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            query.next();
+            id = query.value(0).toString();
+        }
+    }
 
     if (id == QString::null) {
         pthread_mutex_unlock(&db_lock);
+        cerr << "Couldn't find any channels in the database, please make sure "
+             << "\nyour inputs are associated properly with your cards.\n";
         return ret;
     }
 
