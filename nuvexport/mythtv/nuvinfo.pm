@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.22 (xris)
+#Last Updated: 2005.01.19 (xris)
 #
 #  mythtv::nuvinfo.pm
 #
 #   exports one routine:  nuv_info($path_to_nuv)
 #   This routine inspects a specified nuv file, and returns information about
 #   it, gathered either from its nuv file structure, or if it is actually an
-#   mpeg file, from mpgtx or tcprobe.
+#   mpeg file, from mplayer
 #
 
 package mythtv::nuvinfo;
@@ -117,33 +117,37 @@ package mythtv::nuvinfo;
         $file =~ s/'/\\'/sg;
         my %info;
     # First, we check for the existence of  an mpeg info program
-        my $program = find_program('tcprobe', 'mpgtx');
+        my $program = find_program('mplayer');
     # Nothing found?  Die
-        die "You need tcprobe (transcode) or mpgtx to use this script on mpeg-based nuv files.\n\n" unless ($program);
+        die "You need mplayer to use this script on mpeg-based nuv files.\n\n" unless ($program);
     # Set the is_mpeg flag
-        $info{'is_mpeg'}    = 1;
-        $info{'video_type'} = 'MPEG';
-    # Grab tcprobe info
-        if ($program =~ /tcprobe$/) {
-            my $data = `$program -i '$file' 2>/dev/null`;
-            ($info{'width'}, $info{'height'}) = $data =~ /frame\s+size:\s+-g\s+(\d+)x(\d+)\b/m;
-            ($info{'fps'})                  = $data =~ /frame\s+rate:\s+-f\s+(\d+(?:\.\d+)?)\b/m;
-            ($info{'audio_sample_rate'}, $info{'audio_bits_per_sample'},
-             $info{'audio_channels'}) = $data =~ /audio\s+track:.+?-e\s+(\d+),(\d+),(\d+)\b/m;
-            if ($data =~ m/MPEG\s+(system|program)/i) {
-                $info{'mpeg_stream_type'}  = "\L$1";
-            }
+        $info{'is_mpeg'} = 1;
+    # Grab the info we want from mplayer
+        my $data = `$program -vo null -ao null -frames 0 -identify '$file' 2>/dev/null`;
+        study $data;
+        ($info{'video_type'})            = $data =~ m/^VIDEO:\s*(MPEG[12])/m;
+        ($info{'width'})                 = $data =~ m/^ID_VIDEO_WIDTH=(\d+)/m;
+        ($info{'height'})                = $data =~ m/^ID_VIDEO_HEIGHT=(\d+)/m;
+        ($info{'fps'})                   = $data =~ m/^ID_VIDEO_FPS=(\d+(?:\.\d*)?)/m;
+        ($info{'audio_sample_rate'})     = $data =~ m/^ID_AUDIO_RATE=(\d+)/m;
+        ($info{'audio_bits_per_sample'}) = $data =~ m/^ID_AUDIO_BITRATE=(\d+)/m;
+        ($info{'audio_channels'})        = $data =~ m/^ID_AUDIO_NCH=(\d+)/m;
+        ($info{'mpeg_stream_type'})      = $data =~ m/^ID_VIDEO_FPS=(\d+(?:\.\d*)?)/m;
+        ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=(\d+(?:\.\d*)?)/m;
+        ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=(\d+(?:\.\d*)?)/m;
+        if ($data =~ m/^MPEG-PS file format detected/m) {
+            $info{'mpeg_stream_type'} = 'program';
         }
-    # Grab tcmplex info
-        elsif ($program =~ /mpgtx$/) {
-            my $data = `$program -i '$file' 2>/dev/null`;
-            ($info{'width'}, $info{'height'}, $info{'fps'}) = $data =~ /\bSize\s+\[(\d+)\s*x\s*(\d+)\]\s+(\d+(?:\.\d+)?)\s*fps/m;
-            ($info{'audio_sample_rate'})                = $data =~ /\b(\d+)\s*Hz/m;
-            if ($data =~ m/Mpeg\s+(\d)\s+(system|program)/i) {
-                $info{'video_type'}       .= $1;
-                $info{'mpeg_stream_type'}  = "\L$2";
-            }
+        elsif ($data =~ m/^TS file format detected/m) {
+            $info{'mpeg_stream_type'} = 'transport';
         }
+        else {
+            $info{'mpeg_stream_type'} = 'system';   # ?????
+            die "Unrecognized mpeg stream type.  Please email this to the nuvexport author:\n\n$data\n\n";
+        }
+# ID_VIDEO_BITRATE=6500000
+# ID_AUDIO_FORMAT=80
+# ID_LENGTH=3554
     # Return
         return %info;
     }
