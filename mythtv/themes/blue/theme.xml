@@ -1,0 +1,81 @@
+<myththeme>
+
+  <background style="normal">
+    <image>background.png</image>
+    <buttonarea>25,150,750,450</buttonarea>
+  </background>
+
+  <genericbutton>
+    <normal>button_off.png</normal>
+    <active>button_on.png</active>
+    <text>
+      <area>20,110,20,20</area>
+      <color>white</color>
+      <fontname>Arial</fontname>
+      <fontsize>14</fontsize>
+      <bold>yes</bold>
+      <italics>yes</italics>
+      <centered>yes</centered>
+      <outline>
+         <color>black</color>
+         <size>2</size>
+      </outline>
+      <shadow>
+         <color>black</color>
+         <offset>3,3</offset>
+         <alpha>128</alpha>
+      </shadow>
+    </text>
+  </genericbutton>
+  
+  <logo>
+    <image>myth_tv_logo.png</image>
+    <position>270,40</position>
+  </logo>
+
+  <buttondef name="TV">
+    <image>watch_tv.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="MUSIC">
+    <image>cd.png</image>
+    <offset>15,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SCHEDULE">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_PLAYBACK">
+    <image>play.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_CONFLICTS">
+    <image>conflict.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+  
+  <buttondef name="SETUP">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_DELETE">
+    <image>delete.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="MUSIC_PLAYLIST">
+    <image>playlist.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="MUSIC_RIP">
+    <image>rip_cd.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+</myththeme>

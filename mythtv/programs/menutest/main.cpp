@@ -23,7 +23,7 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    ThemedMenu *diag = new ThemedMenu(argv[1], argv[2]);
+    ThemedMenu *diag = new ThemedMenu(argv[1], installprefix, argv[2]);
 
     diag->Show();
     int result = diag->exec();

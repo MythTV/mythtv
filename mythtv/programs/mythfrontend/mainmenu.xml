@@ -1,0 +1,16 @@
+<mythmenu>
+
+   <button>
+     <type>TV</type>
+     <text>TV</text>
+     <action>MENU tvmenu.xml</action>
+   </button>
+
+   <button>
+     <type>MUSIC</type>
+     <text>Music</text>
+     <action>EXEC mythmusic</action>
+     <depends>musicmenu.xml</depends>
+   </button>
+
+</mythmenu>

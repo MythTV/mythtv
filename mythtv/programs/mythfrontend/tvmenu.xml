@@ -1,0 +1,39 @@
+<mythmenu>
+
+   <button>
+      <type>TV</type>
+      <text>Watch TV</text>
+      <action>TV_WATCH_LIVE</action>
+   </button>
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Schedule a Recording</text>
+      <action>TV_SCHEDULE</action>
+   </button>
+
+   <button>
+      <type>TV_PLAYBACK</type>
+      <text>Watch a Recording</text>
+      <action>TV_WATCH_RECORDING</action>
+   </button>
+
+   <button>
+      <type>TV_CONFLICTS</type>
+      <text>Fix Scheduling Conflicts</text>
+      <action>TV_FIX_CONFLICTS</action>
+   </button>
+
+   <button>
+      <type>TV_DELETE</type>
+      <text>Delete Recordings</text>
+      <action>TV_DELETE</action>
+   </button> 
+
+   <button>
+      <type>SETUP</type>
+      <text>Setup</text>
+      <action>TV_SETUP</action>
+   </button>
+
+</mythmenu>
