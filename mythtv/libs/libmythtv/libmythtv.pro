@@ -18,9 +18,9 @@ QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 HEADERS += channel.h commercial_skip.h filter.h format.h frame.h frequencies.h 
 HEADERS += guidegrid.h infodialog.h infostructs.h jitterometer.h lzoconf.h 
 HEADERS += minilzo.h mmx.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 
-HEADERS += osdtypes.h programinfo.h recordingprofile.h remoteencoder.h
-HEADERS += remoteutil.h RingBuffer.h RTjpegN.h scheduledrecording.h
-HEADERS += ttfont.h tv_play.h tv_rec.h videosource.h yuv2rgb.h
+HEADERS += osdtypes.h programinfo.h profilegroup.h recordingprofile.h 
+HEADERS += remoteencoder.h remoteutil.h RingBuffer.h scheduledrecording.h 
+HEADERS += RTjpegN.h ttfont.h tv_play.h tv_rec.h videosource.h yuv2rgb.h
 HEADERS += progfind.h decoderbase.h nuppeldecoder.h avformatdecoder.h
 HEADERS += recorderbase.h mpegrecorder.h channelbase.h dvbrecorder.h
 HEADERS += dvbchannel.h vsync.h proglist.h hdtvrecorder.h fifowriter.h
@@ -37,7 +37,7 @@ SOURCES += progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp recorderbase.cpp
 SOURCES += mpegrecorder.cpp channelbase.cpp dvbrecorder.cpp dvbchannel.cpp
 SOURCES += vsync.c proglist.cpp hdtvrecorder.cpp videooutbase.cpp 
 SOURCES += videoout_xv.cpp fifowriter.cpp videoout_null.cpp xbox.cpp
-SOURCES += ivtvdecoder.cpp videoout_ivtv.cpp dbcheck.cpp
+SOURCES += ivtvdecoder.cpp videoout_ivtv.cpp dbcheck.cpp profilegroup.cpp
 
 using_xvmc {
     SOURCES += videoout_xvmc.cpp

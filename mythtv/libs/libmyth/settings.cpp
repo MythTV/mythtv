@@ -555,7 +555,7 @@ MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
     return dialog;
 }
 
-int ConfigurationDialog::exec(QSqlDatabase* db) 
+int ConfigurationDialog::exec(QSqlDatabase* db, bool saveOnAccept) 
 {
     load(db);
 
@@ -565,7 +565,7 @@ int ConfigurationDialog::exec(QSqlDatabase* db)
 
     int ret;
 
-    if ((ret = dialog->exec()) == QDialog::Accepted)
+    if ((ret = dialog->exec()) == QDialog::Accepted && saveOnAccept)
         save(db);
 
     delete dialog;

@@ -103,7 +103,7 @@ class NuppelVideoPlayer
     int GetLength(void) { return totalLength; }
 
     int ReencodeFile(char *inputname, char *outputname,
-                     RecordingProfile &profile, bool honorCutList = false,
+                     QString profileName, bool honorCutList = false,
                      bool framecontrol = false, bool chkTranscodeDB = false,
                      QString fifodir = NULL);
 

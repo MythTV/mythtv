@@ -12,7 +12,6 @@
 using namespace std;
 
 #include "NuppelVideoPlayer.h"
-#include "recordingprofile.h"
 #include "programinfo.h"
 #include "mythcontext.h"
 
@@ -29,7 +28,7 @@ void usage(char *progname)
     cerr << "\t--chanid       or -c: Takes a channel id. REQUIRED\n";
     cerr << "\t--starttime    or -s: Takes a starttime for the\n";
     cerr << "\t\trecording. REQUIRED\n";
-    cerr << "\t--profile      or -p: Takes the named of an existing\n";
+    cerr << "\t--profile      or -p: Takes a profile number of 'autodetect'\n";
     cerr << "\t\trecording profile. REQUIRED\n";
     cerr << "\t--honorcutlist or -l: Specifies whether to use the cutlist.\n";
     cerr << "\t--allkeys      or -k: Specifies that the output file\n";
@@ -184,14 +183,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    RecordingProfile profile;
     MythContext::KickDatabase(db);
-
-    if (!profile.loadByName(db, profilename) && (profilename.lower() != "raw"))
-    {
-        cerr << "Illegal profile : " << profilename << endl;
-        return -1;
-    }
 
     QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
     ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(db, chanid, startts);
@@ -215,7 +207,7 @@ int main(int argc, char *argv[])
 
     int result = nvp->ReencodeFile((char *)infile.ascii(),
                                    (char *)tmpfile.ascii(),
-                                   profile, useCutlist, 
+                                   profilename, useCutlist, 
                                    (fifosync || keyframesonly), use_db,
                                    fifodir);
     int retval;

@@ -47,6 +47,7 @@ TVRec::TVRec(int capturecardnum)
     ispip = false;
     curRecording = NULL;
     pendingRecording = NULL;
+    profileName = "";
 
     pthread_mutex_init(&db_lock, NULL);
     pthread_mutex_init(&commLock, NULL);
@@ -440,21 +441,17 @@ void TVRec::HandleStateChange(void)
 
         prematurelystopped = false;
 
-        if (!profile.loadByName(db_conn, gContext->GetHostName()))
+        if (curRecording)
         {
-            if (curRecording) 
-            {
-                int profileID = curRecording->GetScheduledRecording(db_conn)
-                                            ->getProfileID();
-                if (profileID > 0)
-                    profile.loadByID(db_conn, profileID);
-                else
-                    profile.loadByName(db_conn, "Default");
-            } 
-            else 
-            {
-                profile.loadByName(db_conn, "Live TV");
-            }
+            profileName = curRecording->GetScheduledRecording(
+                                                db_conn)->getProfileName();
+            if (profileName != NULL)
+                profileName = QString("Default");
+            profile.loadByCard(db_conn, profileName, m_capturecardnum);
+        }
+        else
+        {
+            profile.loadByCard(db_conn, "Live TV", m_capturecardnum);
         }
 
         pthread_mutex_unlock(&db_lock);
@@ -533,7 +530,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         return;
     }
 
-    // V4L from here on
+    // V4L/MJPEG from here on
 
     nvr = new NuppelVideoRecorder(channel);
 
@@ -617,6 +614,7 @@ RecorderBase* TVRec::GetRecorder()
 void TVRec::TeardownRecorder(bool killFile)
 {
     QMap<long long, int> blank_frame_map;
+    QString oldProfileName = profileName;
 
     int filelen = -1;
 
@@ -637,6 +635,7 @@ void TVRec::TeardownRecorder(bool killFile)
         gContext->dispatch(me);
 
         nvr->StopRecording();
+        profileName = "";
 
         if (prevRecording && !killFile)
             nvr->GetBlankFrameMap(blank_frame_map);
@@ -689,9 +688,10 @@ void TVRec::TeardownRecorder(bool killFile)
 
             if (gContext->GetNumSetting("TranscoderAutoRun", 0))
             {
-                QString message = QString("LOCAL_TRANSCODE %1 %2")
+                QString message = QString("LOCAL_TRANSCODE %1 %2 %3")
                            .arg(prevRecording->chanid)
-                           .arg(prevRecording->startts.toString(Qt::ISODate));
+                           .arg(prevRecording->startts.toString(Qt::ISODate))
+                           .arg(oldProfileName);
                 MythEvent me(message);
                 gContext->dispatch(me);
             }

@@ -260,14 +260,19 @@ public:
 class VideoCompressionSettings: public VerticalConfigurationGroup,
                                 public TriggeredConfigurationGroup {
 public:
-    VideoCompressionSettings(const RecordingProfile& parent)
+    VideoCompressionSettings(const RecordingProfile& parent, QString profName)
              : VerticalConfigurationGroup(false),
                TriggeredConfigurationGroup(false)
     {
-        setName("Video Compression");
+        QString labelName;
+        if (profName.isNull())
+            labelName = "Video Compression";
+        else
+            labelName = profName + "->Video Compression";
+        setName(labelName);
         setUseLabel(false);
 
-        VideoCodecName* codecName = new VideoCodecName(parent);
+        codecName = new VideoCodecName(parent);
         addChild(codecName);
         setTrigger(codecName);
 
@@ -278,7 +283,6 @@ public:
         params->addChild(new RTjpegChromaFilter(parent));
 
         addTarget("RTjpeg", params);
-        codecName->addSelection("RTjpeg");
 
         params = new VerticalConfigurationGroup(false);
         params->setLabel("MPEG-4 Parameters");
@@ -291,7 +295,6 @@ public:
         params->addChild(new MPEG4Option4MV(parent));
 
         addTarget("MPEG-4", params);
-        codecName->addSelection("MPEG-4");
 
         params = new VerticalConfigurationGroup();
         params->setLabel("Hardware MJPEG Parameters");
@@ -300,8 +303,33 @@ public:
         params->addChild(new HardwareMJPEGVDecimation(parent));
  
         addTarget("Hardware MJPEG", params);
-        codecName->addSelection("Hardware MJPEG");
     }
+
+    void selectCodecs(QString groupType)
+    {
+        if(!groupType.isNull())
+        {
+//            if(groupType == "MPEG")
+//               codecName->addSelection("Hardware MPEG2");
+            if(groupType == "MJPEG")
+                codecName->addSelection("Hardware MJPEG");
+            else
+            {
+                // V4L, TRANSCODE (and any undefined types)
+                codecName->addSelection("RTjpeg");
+                codecName->addSelection("MPEG-4");
+            }
+        }
+        else
+        {
+            codecName->addSelection("RTjpeg");
+            codecName->addSelection("MPEG-4");
+            codecName->addSelection("Hardware MJPEG");
+        }
+    }
+
+private:
+    VideoCodecName* codecName;
 };
 
 class ImageSize: public HorizontalConfigurationGroup {
@@ -326,10 +354,17 @@ public:
         };
     };
 
-    ImageSize(const RecordingProfile& parent, QString tvFormat) 
+    ImageSize(const RecordingProfile& parent, QString tvFormat,
+              QString profName) 
          : HorizontalConfigurationGroup(false) 
     {
-        setLabel("Image size");
+        QString labelName;
+        if (profName.isNull())
+            labelName = "Image size";
+        else
+            labelName = profName + "->Image size";
+        setLabel(labelName);
+
         setUseLabel(false);
 
         QString fullsize, halfsize;
@@ -348,23 +383,32 @@ public:
     };
 };
 
-RecordingProfile::RecordingProfile()
+RecordingProfile::RecordingProfile(QString profName)
 {
     // This must be first because it is needed to load/save the other settings
     addChild(id = new ID());
 
     ConfigurationGroup* profile = new VerticalConfigurationGroup(false);
-    profile->setLabel("Profile");
+    QString labelName;
+    if (profName.isNull())
+        labelName = QString("Profile");
+    else
+        labelName = profName + "->Profile";
+    profile->setLabel(labelName);
     profile->addChild(name = new Name(*this));
     addChild(profile);
 
     QString tvFormat = gContext->GetSetting("TVFormat");
-    addChild(new ImageSize(*this, tvFormat));
-
-    addChild(new VideoCompressionSettings(*this));
+    addChild(new ImageSize(*this, tvFormat, profName));
+    vc = new VideoCompressionSettings(*this, profName);
+    addChild(vc);
 
     ConfigurationGroup* audioquality = new VerticalConfigurationGroup(false);
-    audioquality->setLabel("Audio Quality");
+    if (profName.isNull())
+        labelName = QString("Audio Quality");
+    else
+        labelName = profName + "->Audio Quality";
+    audioquality->setLabel(labelName);
     audioquality->addChild(new SampleRate(*this));
     audioquality->addChild(new AudioCompressionSettings(*this));
     addChild(audioquality);
@@ -375,9 +419,44 @@ void RecordingProfile::loadByID(QSqlDatabase* db, int profileId) {
     load(db);
 }
 
-bool RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
-    QString query = QString("SELECT id FROM recordingprofiles "
-                            "WHERE name = '%1';").arg(name);
+bool RecordingProfile::loadByCard(QSqlDatabase* db, QString name, int cardid) {
+    QString hostname = gContext->GetHostName();
+    int id = 0;
+    QString query = QString("SELECT recordingprofiles.id, "
+                   "profilegroups.hostname, profilegroups.is_default FROM "
+                   "recordingprofiles,profilegroups,capturecard WHERE "
+                   "profilegroups.id = recordingprofiles.profilegroup "
+                   "AND capturecard.cardid = %1 "
+                   "AND capturecard.cardtype = profilegroups.cardtype "
+                   "AND recordingprofiles.name = '%2';").arg(cardid).arg(name);
+    QSqlQuery result = db->exec(query);
+    if (result.isActive() && result.numRowsAffected() > 0) {
+        while (result.next())
+        {
+            if(result.value(1).toString() == hostname)
+            {
+                id = result.value(0).toInt();
+                break;
+            }
+            else if(result.value(2).toInt() == 1)
+                id = result.value(0).toInt();
+        }
+    }
+    if (id)
+    {
+        loadByID(db, id);
+        return true;
+    }
+    else
+        return false;
+}
+
+bool RecordingProfile::loadByGroup(QSqlDatabase* db, QString name, QString group) {
+    QString query = QString("SELECT recordingprofiles.id FROM "
+                 "recordingprofiles, profilegroups WHERE "
+                 "recordingprofiles.profilegroup = profilegroups.id AND "
+                 "profilegroups.name = '%1' AND recordingprofiles.name = '%2';")
+                 .arg(group).arg(name);
     QSqlQuery result = db->exec(query);
     if (result.isActive() && result.numRowsAffected() > 0) {
         result.next();
@@ -388,31 +467,41 @@ bool RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
     }
 }
 
+void RecordingProfile::setCodecTypes(QSqlDatabase *db)
+{
+    vc->selectCodecs(groupType(db));
+}
+
 void RecordingProfileEditor::open(int id) {
-    RecordingProfile* profile = new RecordingProfile();
-
-    if (id != 0)
-    {
-        profile->loadByID(db,id);
-
-        QString profName = profile->getName();
-        if ((profName != "Default") &&
-            (profName != "Live TV") &&
-            (profName != "Transcode"))
-            profile->setName(profName);
-    }
+    QString profName = RecordingProfile::getName(db, id);
+    if (profName.isNull())
+        profName = labelName;
     else
-        profile->setName("New Profile Name");
+        profName = labelName + "->" + profName;
+    RecordingProfile* profile = new RecordingProfile(profName);
+
+    profile->loadByID(db,id);
+    profile->setCodecTypes(db);
 
     if (profile->exec(db) == QDialog::Accepted)
         profile->save(db);
     delete profile;
 };
 
+RecordingProfileEditor::RecordingProfileEditor(QSqlDatabase* _db,
+                          int id, QString profName)
+{
+    labelName = profName;
+    db = _db;
+    group = id;
+    if(! labelName.isNull())
+        this->setLabel(labelName);
+}
+
 void RecordingProfileEditor::load(QSqlDatabase* db) {
     clearSelections();
-    addSelection("(Create new profile)", "0");
-    RecordingProfile::fillSelections(db, this);
+    //addSelection("(Create new profile)", "0");
+    RecordingProfile::fillSelections(db, this, group);
 }
 
 int RecordingProfileEditor::exec(QSqlDatabase* db) {
@@ -422,10 +511,57 @@ int RecordingProfileEditor::exec(QSqlDatabase* db) {
     return QDialog::Rejected;
 }
 
-void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
-    QSqlQuery result = db->exec("SELECT name, id FROM recordingprofiles;");
-    if (result.isActive() && result.numRowsAffected() > 0)
-        while (result.next())
-            setting->addSelection(result.value(0).toString(), 
-                                  result.value(1).toString());
+void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting,
+                                      int group) {
+    if (group == 0)
+    {
+       for(int i = 0; availProfiles[i][0] != 0; i++)
+           setting->addSelection(availProfiles[i],availProfiles[i]);
+    }
+    else
+    {
+        QString query = QString("SELECT name, id FROM recordingprofiles "
+                                "WHERE profilegroup = %1;").arg(group);
+       QSqlQuery result = db->exec(query);
+        if (result.isActive() && result.numRowsAffected() > 0)
+            while (result.next())
+                setting->addSelection(result.value(0).toString(),
+                                      result.value(1).toString());
+    }
 }
+
+QString RecordingProfile::groupType(QSqlDatabase *db)
+{
+    if (db != NULL)
+    {
+        QString query = QString("SELECT profilegroups.cardtype FROM "
+                            "profilegroups, recordingprofiles WHERE "
+                            "profilegroups.id = recordingprofiles.profilegroup "
+                            "AND recordingprofiles.id = %1;")
+                            .arg(getProfileNum());
+        QSqlQuery result = db->exec(query);
+        if (result.isActive() && result.numRowsAffected() > 0)
+        {
+            result.next();
+            return (result.value(0).toString());
+        }
+    }
+    return NULL;
+}
+
+QString RecordingProfile::getName(QSqlDatabase *db, int id)
+{
+    if (db != NULL)
+    {
+        QString query = QString("SELECT name FROM recordingprofiles WHERE "
+                                "id = %1;").arg(id);
+        QSqlQuery result = db->exec(query);
+        if (result.isActive() && result.numRowsAffected() > 0)
+        {
+            result.next();
+            return (result.value(0).toString());
+        }
+    }
+    return NULL;
+}
+

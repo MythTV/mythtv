@@ -216,6 +216,8 @@ class TVRec
 
     ProgramInfo *pendingRecording;
     QDateTime recordPendingStart;
+
+    QString profileName;
 };
 
 #endif

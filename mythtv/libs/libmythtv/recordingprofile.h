@@ -4,7 +4,11 @@
 #include "libmyth/settings.h"
 #include "libmyth/mythwidgets.h"
 
+const char availProfiles[][20] =
+      {"Default", "Live TV", "High Quality", "Low Quality", 0};
+
 class RecordingProfile;
+class VideoCompressionSettings;
 
 // Any setting associated with a recording profile
 class RecordingProfileSetting: virtual public Setting {
@@ -58,18 +62,22 @@ protected:
         };
     };
 public:
-    RecordingProfile();
+    RecordingProfile(QString profName = NULL);
 
     virtual void loadByID(QSqlDatabase* db, int id);
-    virtual bool loadByName(QSqlDatabase* db, QString name);
+    virtual bool loadByCard(QSqlDatabase* db, QString name, int cardid);
+    virtual bool loadByGroup(QSqlDatabase* db, QString name, QString group);
 
-    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
-
+    static void fillSelections(QSqlDatabase* db, SelectSetting* setting,
+                               int group);
+    QString groupType(QSqlDatabase *db);
+    void setCodecTypes(QSqlDatabase *db);
     int getProfileNum(void) const {
         return id->intValue();
     };
 
     QString getName(void) const { return name->getValue(); };
+    static QString getName(QSqlDatabase* db, int id);
     void setName(QString newName) { name->setValue(newName); name->setRW(); };
     const ImageSize& getImageSize(void) const { return *imageSize; };
     
@@ -77,13 +85,13 @@ private:
     ID* id;
     Name* name;
     ImageSize* imageSize;
+    VideoCompressionSettings *vc;
 };
 
 class RecordingProfileEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
-    RecordingProfileEditor(QSqlDatabase* _db):
-        db(_db) {};
+    RecordingProfileEditor(QSqlDatabase* _db, int id, QString profName);
 
     virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
@@ -94,6 +102,8 @@ protected slots:
 
 protected:
     QSqlDatabase* db;
+    int group;
+    QString labelName;
 };
 
 #endif

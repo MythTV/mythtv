@@ -2696,11 +2696,13 @@ void NuppelVideoPlayer::ReencoderAddKFA(
 }
 
 int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
-                                    RecordingProfile &profile,
+                                    QString profileName,
                                     bool honorCutList, bool framecontrol,
                                     bool chkTranscodeDB, QString fifodir)
 { 
     NuppelVideoRecorder *nvr;
+    RecordingProfile profile;
+    RingBuffer *outRingBuffer = NULL;
 
     inputname = inputname;
     outputname = outputname;
@@ -2743,66 +2745,102 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     if (arb->eff_audiorate > 0)
         audio_samplerate = arb->eff_audiorate;
 
-    // Recorder setup
-    nvr->SetFrameRate(video_frame_rate);
-
-    // this is ripped from tv_rec SetupRecording. It'd be nice to consolodate
-    nvr->SetOption("width", video_width);
-    nvr->SetOption("height", video_height);
-
-    nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
-    nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
-
-    QString vidsetting = profile.byName("videocodec")->getValue();
-    if (vidsetting == "MPEG-4") 
+    QString encodingType = decoder->GetEncodingType();
+    QString vidsetting = NULL, audsetting = NULL;
+    if (fifodir == NULL)
     {
-        nvr->SetOption("codec", "mpeg4");
+        if (profileName.lower() == "autodetect")
+        {
+            bool result = false;
+            if (encodingType == "MPEG-2")
+                result = profile.loadByGroup(m_db, "MPEG2", "Transcoders");
+            if (encodingType == "MPEG-4" || encodingType == "RTjpeg")
+                result = profile.loadByGroup(m_db, "RTjpeg/MPEG4",
+                                             "Transcoders");
+            if (! result)
+            {
+                cerr << "Couldn't find profile for : " << encodingType << endl;
+                delete nvr;
+                return REENCODE_ERROR;
+            }
+        }
+        else
+        {
+            bool isNum;
+            int profileID;
+            profileID = profileName.toInt(&isNum);
+            // If a bad profile is specified, there will be trouble
+            if (isNum && profileID > 0)
+                profile.loadByID(m_db, profileID);
+            else
+            {
+                cerr << "Couldn't find profile #: " << profileName << endl;
+                delete nvr;
+                return REENCODE_ERROR;
+            }
+        }
 
-        SetProfileOption(profile, "mpeg4bitrate");
-        SetProfileOption(profile, "mpeg4scalebitrate");
-        SetProfileOption(profile, "mpeg4maxquality");
-        SetProfileOption(profile, "mpeg4minquality");
-        SetProfileOption(profile, "mpeg4qualdiff");
-        SetProfileOption(profile, "mpeg4optionvhq");
-        SetProfileOption(profile, "mpeg4option4mv");
-        nvr->SetupAVCodec();
-    } 
-    else if (vidsetting == "RTjpeg")
-    {
-        nvr->SetOption("codec", "rtjpeg");
-        SetProfileOption(profile, "rtjpegquality");
-        SetProfileOption(profile, "rtjpegchromafilter");
-        SetProfileOption(profile, "rtjpeglumafilter");
-        nvr->SetupRTjpeg();
-    } 
-    else 
-    {
-        cerr << "Unknown video codec: " << vidsetting << endl;
+        // Recorder setup
+        nvr->SetFrameRate(video_frame_rate);
+
+        // this is ripped from tv_rec SetupRecording. It'd be nice to merge
+        nvr->SetOption("width", video_width);
+        nvr->SetOption("height", video_height);
+
+        nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
+        nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
+
+        vidsetting = profile.byName("videocodec")->getValue();
+        if (vidsetting == "MPEG-4")
+        {
+            nvr->SetOption("codec", "mpeg4");
+
+            SetProfileOption(profile, "mpeg4bitrate");
+            SetProfileOption(profile, "mpeg4scalebitrate");
+            SetProfileOption(profile, "mpeg4maxquality");
+            SetProfileOption(profile, "mpeg4minquality");
+            SetProfileOption(profile, "mpeg4qualdiff");
+            SetProfileOption(profile, "mpeg4optionvhq");
+            SetProfileOption(profile, "mpeg4option4mv");
+            nvr->SetupAVCodec();
+        }
+        else if (vidsetting == "RTjpeg")
+        {
+            nvr->SetOption("codec", "rtjpeg");
+            SetProfileOption(profile, "rtjpegquality");
+            SetProfileOption(profile, "rtjpegchromafilter");
+            SetProfileOption(profile, "rtjpeglumafilter");
+            nvr->SetupRTjpeg();
+        }
+        else
+        {
+            cerr << "Unknown video codec: " << vidsetting << endl;
+        }
+
+        audsetting = profile.byName("audiocodec")->getValue();
+        nvr->SetOption("samplerate", audio_samplerate);
+        if (audsetting == "MP3")
+        {
+            nvr->SetOption("audiocompression", 1);
+            SetProfileOption(profile, "mp3quality");
+            decoder->SetRawAudioState(true);
+        }
+        else if (audsetting == "Uncompressed")
+        {
+            nvr->SetOption("audiocompression", 0);
+        }
+        else
+        {
+            cerr << "Unknown audio codec: " << audsetting << endl;
+        }
+
+        nvr->AudioInit(true);
+
+        outRingBuffer = new RingBuffer(outputname, true, false);
+        nvr->SetRingBuffer(outRingBuffer);
+        nvr->WriteHeader();
+        nvr->StreamAllocate();
     }
-
-    QString audsetting = profile.byName("audiocodec")->getValue();
-    nvr->SetOption("samplerate", audio_samplerate);
-    if (audsetting == "MP3") 
-    {
-        nvr->SetOption("audiocompression", 1);
-        SetProfileOption(profile, "mp3quality");
-        decoder->SetRawAudioState(true);
-    } 
-    else if (audsetting == "Uncompressed")
-    {
-        nvr->SetOption("audiocompression", 0);
-    } 
-    else 
-    {
-        cerr << "Unknown audio codec: " << audsetting << endl;
-    }
-
-    nvr->AudioInit(true);
-
-    RingBuffer *outRingBuffer = new RingBuffer(outputname, true, false);
-    nvr->SetRingBuffer(outRingBuffer);
-    nvr->WriteHeader();
-    nvr->StreamAllocate();
 
     playing = true;
 
@@ -2838,7 +2876,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         {
            cerr << "Error initializing fifo writer.  Aborting" << endl;
            delete fifow;
-           delete outRingBuffer;
+           if (outRingBuffer)
+               delete outRingBuffer;
            delete nvr;
            unlink(outputname);
            return REENCODE_ERROR;
@@ -3011,7 +3050,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 // The Raw state changed during decode.  This is not good
                 if (fifow)
                     delete fifow;
-                delete outRingBuffer;
+                if (outRingBuffer)
+                    delete outRingBuffer;
                 delete nvr;
                 unlink(outputname);
                 return REENCODE_ERROR;
@@ -3099,7 +3139,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             {
                 if (fifow)
                     delete fifow;
-                delete outRingBuffer;
+                if (outRingBuffer)
+                    delete outRingBuffer;
                 delete nvr;
                 unlink(outputname);
                 return REENCODE_CUTLIST_CHANGE;
@@ -3123,7 +3164,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 {
                     if (fifow)
                         delete fifow;
-                    delete outRingBuffer;
+                    if (outRingBuffer)
+                        delete outRingBuffer;
                     delete nvr;
                     unlink(outputname);
                     return REENCODE_ERROR;
@@ -3141,7 +3183,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     nvr->WriteSeekTable();
     if (!kfa_table.isEmpty())
         nvr->WriteKeyFrameAdjustTable(&kfa_table);
-    delete outRingBuffer;
+    if (outRingBuffer)
+        delete outRingBuffer;
     delete nvr;
     if (fifow) 
     {

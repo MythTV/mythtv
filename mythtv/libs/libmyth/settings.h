@@ -177,7 +177,7 @@ public:
                                      const char* widgetName = 0);
 
     // Show a dialogWidget, and save if accepted
-    int exec(QSqlDatabase* db);
+    int exec(QSqlDatabase* db, bool saveOnExec = true);
 };
 
 // A wizard is a group with one child per page

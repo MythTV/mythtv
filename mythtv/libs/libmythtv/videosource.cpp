@@ -208,10 +208,16 @@ CardType::CardType(const CaptureCard& parent)
         : CCSetting(parent, "cardtype") 
 {
     setLabel("Card type");
-    addSelection("Standard V4L or MJPEG capture card", "V4L");
-    addSelection("Hardware MPEG Encoder card", "MPEG");
-    addSelection("pcHDTV ATSC capture card", "HDTV");
-};
+    fillSelections(this);
+}
+
+void CardType::fillSelections(SelectSetting* setting)
+{
+    setting->addSelection("Standard V4L capture card", "V4L");
+    setting->addSelection("MJPEG capture card (Matrox G200, DC10)", "MJPEG");
+    setting->addSelection("MPEG-2 Encoder card (PVR-250, PVR-350)", "MPEG");
+    setting->addSelection("pcHDTV ATSC capture card", "HDTV");
+}
 
 void CardInput::loadByID(QSqlDatabase* db, int inputid) {
     id->setValue(inputid);

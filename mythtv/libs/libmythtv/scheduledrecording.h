@@ -49,7 +49,7 @@ public:
 
     void remove(QSqlDatabase* db);
     int getRecordID(void) const { return id->intValue(); };
-    int getProfileID(void) const;
+    QString getProfileName(void) const;
 
     static void findAllProgramsToRecord(QSqlDatabase* db, 
                                         list<ProgramInfo*>& proglist);

@@ -20,7 +20,7 @@ using namespace std;
 #include "rankprograms.h"
 #include "rankchannels.h"
 #include "globalsettings.h"
-#include "recordingprofile.h"
+#include "profilegroup.h"
 
 #include "themedmenu.h"
 #include "programinfo.h"
@@ -243,7 +243,7 @@ void TVMenuCallback(void *data, QString &selection)
     } 
     else if (sel == "settings recording") 
     {
-        RecordingProfileEditor editor(QSqlDatabase::database());
+        ProfileGroupEditor editor(QSqlDatabase::database());
         editor.exec(QSqlDatabase::database());
     } 
     else if (sel == "settings general") 

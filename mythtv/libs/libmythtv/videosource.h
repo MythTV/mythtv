@@ -341,6 +341,7 @@ public slots:
 class CardType: public ComboBoxSetting, public CCSetting {
 public:
     CardType(const CaptureCard& parent);
+    static void fillSelections(SelectSetting* setting);
 };
 
 class CaptureCard: public ConfigurationWizard {

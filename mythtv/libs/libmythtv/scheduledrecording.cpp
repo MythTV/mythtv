@@ -69,7 +69,7 @@ public:
     virtual void fillSelections(QSqlDatabase* db) {
         clearSelections();
         addSelection(QObject::tr("(unspecified)"), "0");
-        RecordingProfile::fillSelections(db, this);
+        RecordingProfile::fillSelections(db, this, 0);
     };
 };
 
@@ -773,6 +773,6 @@ void ScheduledRecording::setRank(const QString& newrank) {
     rank->setValue(newrank.toInt());
 }
 
-int ScheduledRecording::getProfileID(void) const {
-    return profile->getValue().toInt();
+QString ScheduledRecording::getProfileName(void) const {
+    return profile->getValue();
 }

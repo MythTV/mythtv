@@ -62,6 +62,8 @@ void Transcoder::customEvent(QCustomEvent *e)
             ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(db_conn,
                                                                      tokens[1], 
                                                                      startts);
+            // tokens[3] may contain the profile name, which could be used
+            // to choose a transcode profile but ignore it for now.
             if (pinfo == NULL) 
             {
                 cerr << "Could not read program from database, skipping "
@@ -96,7 +98,7 @@ pid_t Transcoder::Transcode(ProgramInfo *pginfo, bool useCutlist)
     QString command = QString("%1 -c %2 -s %3 -p %4 -d %5").arg(path.ascii())
                       .arg(pginfo->chanid)
                       .arg(pginfo->startts.toString(Qt::ISODate))
-                      .arg("Transcode")
+                      .arg("autodetect")
                       .arg(useCutlist ? "-l" : "");
     // cout << "DEBUG: " << command.ascii() << endl;
     //Transcode may use the avencoder which is not thread-safe
