@@ -12,9 +12,12 @@ AudioDevice=/dev/dsp
 TemporarySpace=/tmp/
 
 # Order in which to sort the Music Selection Tree.
+# Possible values are space-separated list of genre, artist, album, and title
+#     OR the keyword "directory" to indicate that onscreen tree mirrors
+#        the actual directory tree.
 TreeLevels=artist album title
 
-# Ignore_ID3 TRUE says to skip checking ID3 tags in files and just try to
+# Ignore_ID3 = 1 says to skip checking ID3 tags in files and just try to
 # determine Genre, Artist, Album, and Track number and title from the
 # filename.  NonID3FileNameFormat specifies the format of the directory
 # structure for Genre, Artist, Album, etc..  Track number and Title can be

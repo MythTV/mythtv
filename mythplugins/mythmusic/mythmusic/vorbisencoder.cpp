@@ -53,16 +53,17 @@ long read_samples(float **buffer, FILE *in, int samples, long int totalsamples,
     return realsamples;
 }
 
-void VorbisEncode(const char *infile, const char *outfile, int qualitylevel, 
-                  Metadata *metadata, int totalbytes, QProgressBar *progressbar)
+void VorbisEncode(const QString &infile, const QString &outfile, 
+                  int qualitylevel, Metadata *metadata, int totalbytes, 
+                  QProgressBar *progressbar)
 {
     long int totalsamples = (totalbytes / 4);
     progressbar->setTotalSteps(totalsamples);
     progressbar->setProgress(0);
     qApp->processEvents();
 
-    FILE *in = fopen(infile, "r");
-    FILE *out = fopen(outfile, "w");
+    FILE *in = fopen(infile.ascii(), "r");
+    FILE *out = fopen(outfile.ascii(), "w");
 
     if (!out)
     {

@@ -6,11 +6,14 @@
 #include <qstringlist.h>
 #include <qheader.h>
 #include <qpixmap.h>
+#include <qregexp.h>
 
 #include "metadata.h"
 #include "databasebox.h"
 #include "treecheckitem.h"
 #include "cddecoder.h"
+
+#include <mythtv/mythcontext.h>
 
 DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths, 
                          QValueList<Metadata> *playlist, 
@@ -100,43 +103,128 @@ void DatabaseBox::fillList(QListView *listview, QString &paths)
     QString temptitle = "All My Music";
     TreeCheckItem *allmusic = new TreeCheckItem(listview, temptitle, templevel,
                                                 NULL);
-    
-    QStringList lines = QStringList::split(" ", paths);
-
-    QString first = lines.front();
-
-    char thequery[1024];
-    sprintf(thequery, "SELECT DISTINCT %s FROM musicmetadata ORDER BY %s DESC;",
-                      first.ascii(), first.ascii());
-
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+   
+    if ((paths == "directory") || (paths == "subdirectory"))
     {
-        while (query.next())
+        // tree levels match directory tree
+
+        QString base_dir = gContext->GetSetting("MusicLocation");
+
+        QString levels[10];
+        int current_level = 1;
+        int first = 1;
+        TreeCheckItem *node[10];
+
+        node[0] = allmusic;
+
+        QString thequery = "SELECT filename, title, artist, album, tracknum "
+                           "FROM musicmetadata ORDER BY filename DESC;"; 
+
+        QSqlQuery query = db->exec(thequery);
+
+        if (query.isActive() && query.numRowsAffected() > 0)
         {
-            QString current = query.value(0).toString();
+            while (query.next())
+            {
+                int sub_level = 1;
 
-            QString querystr = first;
-            QString matchstr = first + " = \"" + current + "\"";           
+                QString filename = query.value(0).toString();
+                QString current = query.value(0).toString();
+                QString title = query.value(1).toString();
+                QString artist = query.value(2).toString();
+                QString album = query.value(3).toString();
+                QString disp_title = query.value(4).toString();
+                QString current_dir;
+
+                current.replace(QRegExp(base_dir), QString(""));
+                current.replace(QRegExp("/[^/]*$"), QString(""));
+
+                QStringList subdirs = QStringList::split("/", current);
+                QStringList::iterator subdir_it = subdirs.begin();
+
+                for(; subdir_it != subdirs.end(); subdir_it++, sub_level++ )
+                {
+                    QString subdir = *subdir_it;
+                    QString subdir_txt = subdir;
+
+                    current_dir = current_dir + subdir + "/";
+
+                    subdir_txt.replace(QRegExp("_"), QString(" "));
+
+                    if ((first) || (levels[sub_level] != subdir))
+                    {
+                        Metadata *mdata = new Metadata();
+                        mdata->setField("filename", current_dir);
+                        levels[sub_level] = subdir;
+                        node[sub_level] = new TreeCheckItem(node[sub_level-1],
+                                                            subdir_txt, subdir,
+                                                            mdata);
+                        if (plist->find(*mdata) != plist->end())
+                             node[sub_level]->setOn(true);
+
+                        checkParent(node[sub_level]);
+                        first = 0;
+                    }
+                    current_level = sub_level;
+                }
+
+                // now fill in the file entry and it's metadata
+                Metadata *mdata = new Metadata();
+                mdata->setField("title", title);
+                mdata->setField("artist", artist);
+                mdata->setField("album", album);
+                mdata->setField("filename", filename);
+                mdata->fillData(db);
+
+                disp_title += " - " + title;
+
+                TreeCheckItem *item = new TreeCheckItem(node[current_level],
+                                                        disp_title, disp_title,
+                                                        mdata);
+
+                if (plist->find(*mdata) != plist->end())
+                    item->setOn(true);
+            }
+        }
+    } 
+    else 
+    {
+        QStringList lines = QStringList::split(" ", paths);
+
+        QString first = lines.front();
+
+        QString thequery = QString("SELECT DISTINCT %1 FROM musicmetadata "
+                                   "ORDER BY %2 DESC;").arg(first).arg(first);
+
+        QSqlQuery query = db->exec(thequery);
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            while (query.next())
+            {
+                QString current = query.value(0).toString();
+
+                QString querystr = first;
+                QString matchstr = first + " = \"" + current + "\"";           
  
-            QStringList::Iterator line = lines.begin();
-            ++line;
-            int num = 1;
+                QStringList::Iterator line = lines.begin();
+                ++line;
+                int num = 1;
 
-            QString level = *line;
+                QString level = *line;
 
-            Metadata *mdata = new Metadata();
-            mdata->setField(first, current);
+                Metadata *mdata = new Metadata();
+                mdata->setField(first, current);
 
-            TreeCheckItem *item = new TreeCheckItem(allmusic, current, first, 
-                                                    mdata);
+                TreeCheckItem *item = new TreeCheckItem(allmusic, current, 
+                                                        first, mdata);
 
-            fillNextLevel(level, num, querystr, matchstr, line, lines,
-                          item);
+                fillNextLevel(level, num, querystr, matchstr, line, lines,
+                              item);
 
-            if (plist->find(*mdata) != plist->end())
-                item->setOn(true);
+                if (plist->find(*mdata) != plist->end())
+                    item->setOn(true);
+            }
         }
     }
 
@@ -167,10 +255,9 @@ void DatabaseBox::fillNextLevel(QString level, int num, QString querystr,
         orderstr += "," + level;
     }
 
-    char thequery[1024];
-    sprintf(thequery, "SELECT DISTINCT %s FROM musicmetadata WHERE %s "
-                      "ORDER BY %s DESC;",
-                      querystr.ascii(), matchstr.ascii(), orderstr.ascii());
+    QString thequery = QString("SELECT DISTINCT %1 FROM musicmetadata WHERE %2 "
+                               "ORDER BY %3 DESC;").arg(querystr).arg(matchstr)
+                                                   .arg(orderstr);
                       
     QSqlQuery query = db->exec(thequery);
   

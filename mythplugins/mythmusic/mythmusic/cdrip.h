@@ -32,8 +32,8 @@ class Ripper : public MythDialog
     void tableChanged(int row, int col);
 
   private:
-    int ripTrack(char *cddevice, char *outputfilename, int tracknum);
-    void fixFilename(char *filename, const char *addition);
+    int ripTrack(QString &cddevice, QString &outputfilename, int tracknum);
+    void fixFilename(QString &filename, const QString &addition);
 
     QSqlDatabase *db;
     QVBoxLayout *bigvb;

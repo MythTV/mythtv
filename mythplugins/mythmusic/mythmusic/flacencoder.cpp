@@ -62,7 +62,7 @@ void format_input(FLAC__int32 *dest[], FLAC__int16 *ssbuffer,
             dest[channel][wide_sample] = (FLAC__int32)ssbuffer[sample];
 }
 
-void FlacEncode(const char *infile, const char *outfile, int qualitylevel, 
+void FlacEncode(const QString &infile, const QString &outfile, int qualitylevel,
                 Metadata *metadata, int totalbytes, QProgressBar *progressbar)
 {
     qualitylevel = qualitylevel;
@@ -83,7 +83,7 @@ void FlacEncode(const char *infile, const char *outfile, int qualitylevel,
     int rice_parameter_search_dist = 0;
     int max_lpc_order = 8;
 
-    FILE *in = fopen(infile, "r");
+    FILE *in = fopen(infile.ascii(), "r");
 
     FLAC__FileEncoder *encoder = FLAC__file_encoder_new();
 
@@ -98,10 +98,14 @@ void FlacEncode(const char *infile, const char *outfile, int qualitylevel,
     FLAC__file_encoder_set_qlp_coeff_precision(encoder, qlp_coeff_precision);
     FLAC__file_encoder_set_do_qlp_coeff_prec_search(encoder, false);
     FLAC__file_encoder_set_do_escape_coding(encoder, do_escape_coding);
-    FLAC__file_encoder_set_do_exhaustive_model_search(encoder, do_exhaustive_model_search);
-    FLAC__file_encoder_set_min_residual_partition_order(encoder, min_residual_partition_order);
-    FLAC__file_encoder_set_max_residual_partition_order(encoder, max_residual_partition_order);
-    FLAC__file_encoder_set_rice_parameter_search_dist(encoder, rice_parameter_search_dist);
+    FLAC__file_encoder_set_do_exhaustive_model_search(encoder, 
+                                                    do_exhaustive_model_search);
+    FLAC__file_encoder_set_min_residual_partition_order(encoder, 
+                                                  min_residual_partition_order);
+    FLAC__file_encoder_set_max_residual_partition_order(encoder, 
+                                                  max_residual_partition_order);
+    FLAC__file_encoder_set_rice_parameter_search_dist(encoder, 
+                                                    rice_parameter_search_dist);
     FLAC__file_encoder_set_total_samples_estimate(encoder, totalsamples);
 
     struct clientdata clidata;
@@ -111,7 +115,7 @@ void FlacEncode(const char *infile, const char *outfile, int qualitylevel,
 
     FLAC__file_encoder_set_client_data(encoder, &clidata);
     FLAC__file_encoder_set_progress_callback(encoder, progress_callback);
-    FLAC__file_encoder_set_filename(encoder, outfile);
+    FLAC__file_encoder_set_filename(encoder, outfile.ascii());
 
     if (FLAC__file_encoder_init(encoder) != FLAC__FILE_ENCODER_OK)
     {
@@ -120,7 +124,9 @@ void FlacEncode(const char *infile, const char *outfile, int qualitylevel,
     }
 
     int bytes_read;
-    unsigned char ucbuffer[2048 * FLAC__MAX_CHANNELS * ((FLAC__REFERENCE_CODEC_MAX_BITS_PER_SAMPLE + 7) / 8)];
+    unsigned char ucbuffer[2048 * FLAC__MAX_CHANNELS * 
+                           ((FLAC__REFERENCE_CODEC_MAX_BITS_PER_SAMPLE + 7) 
+                           / 8)];
     static FLAC__int32 inputin[FLAC__MAX_CHANNELS][2048];
     static FLAC__int32 *input[FLAC__MAX_CHANNELS];
 

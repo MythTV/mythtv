@@ -257,8 +257,8 @@ void PlaybackBox::setupListView(void)
         int min = secs / 60;
         secs -= min * 60;
         
-        char timestr[64];
-        sprintf(timestr, "%2d:%02d", min, secs);
+        QString timestr;
+        timestr.sprintf("%2d:%02d", min, secs);
         
         litem = new QListViewItem(playview, position, (*it).Artist(),
                                   (*it).Title(), timestr);

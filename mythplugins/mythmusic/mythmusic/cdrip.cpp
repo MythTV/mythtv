@@ -214,23 +214,18 @@ void Ripper::tableChanged(int row, int col)
     delete decoder;
 }
 
-void Ripper::fixFilename(char *filename, const char *addition)
+void Ripper::fixFilename(QString &filename, const QString &addition)
 {
-    char tempcopy[1025];
-    memset(tempcopy, '\0', 1025);
-    strncpy(tempcopy, addition, 1024);
+    QString tempcopy = addition;
 
-    for (unsigned int i = 0; i < strlen(tempcopy); i++)
-    {
-        if (tempcopy[i] == '/' || tempcopy[i] == '\\' || tempcopy[i] == ':' ||
-            tempcopy[i] == '?' || tempcopy[i] == '\'' || tempcopy[i] == '\"')
-        { 
-            tempcopy[i] = '_';
-        }
-    }
+    tempcopy.replace('/', '_');
+    tempcopy.replace('\\', '_');
+    tempcopy.replace(':', '_');
+    tempcopy.replace('?', '_');
+    tempcopy.replace('\'', '_');
+    tempcopy.replace('\"', '_');
 
-    strcat(filename, "/");
-    strcat(filename, tempcopy);
+    filename += "/" + tempcopy;
 }
 
 void Ripper::ripthedisc(void)
@@ -279,7 +274,7 @@ void Ripper::ripthedisc(void)
     QString textstatus;
     QString cddevice = gContext->GetSetting("CDDevice");
 
-    char tempfile[512], outfile[4096];
+    QString tempfile, outfile;
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
 
     int encodequal = qualitygroup->id(qualitygroup->selected());
@@ -297,8 +292,8 @@ void Ripper::ripthedisc(void)
         textstatus = "Copying from CD:\n" + track->Title();       
         statusline->setText(textstatus);
 
-        sprintf(tempfile, "/%s/%d.raw", tempdir.ascii(), i + 1);
-        long totalbytes = ripTrack((char *)cddevice.ascii(), tempfile, i + 1);
+        tempfile = QString("/%1/%2.raw").arg(tempdir).arg(i + 1);
+        long totalbytes = ripTrack(cddevice, tempfile, i + 1);
  
         overall->setProgress((i * 2) + 1);
 
@@ -308,27 +303,28 @@ void Ripper::ripthedisc(void)
         textstatus = "Compressing:\n" + track->Title();
         statusline->setText(textstatus);
 
-        sprintf(outfile, "%s", findir.ascii());
-        fixFilename(outfile, track->Artist().ascii());
+        outfile = findir;
+
+        fixFilename(outfile, track->Artist());
         mkdir(outfile, 0777);
-        fixFilename(outfile, track->Album().ascii());
+        fixFilename(outfile, track->Album());
         mkdir(outfile, 0777);
-        fixFilename(outfile, track->Title().ascii());
+        fixFilename(outfile, track->Title());
 
         if (encodequal < 3)
         {
-            strcat(outfile, ".ogg");
+            outfile += ".ogg";
             VorbisEncode(tempfile, outfile, encodequal, track, totalbytes, 
                          current);
         }
         else
         {
-            strcat(outfile, ".flac");
+            outfile += ".flac";
             FlacEncode(tempfile, outfile, encodequal, track, totalbytes, 
                        current);
         }
 
-        unlink(tempfile);
+        unlink(tempfile.ascii());
 
         overall->setProgress((i + 1) * 2);
         qApp->processEvents();
@@ -346,9 +342,9 @@ static void paranoia_cb(long inpos, int function)
     inpos = inpos; function = function;
 }
 
-int Ripper::ripTrack(char *cddevice, char *outputfilename, int tracknum)
+int Ripper::ripTrack(QString &cddevice, QString &outputfilename, int tracknum)
 {
-    cdrom_drive *device = cdda_identify(cddevice, 0, NULL);
+    cdrom_drive *device = cdda_identify(cddevice.ascii(), 0, NULL);
 
     if (!device)
         return -1;
@@ -359,7 +355,7 @@ int Ripper::ripTrack(char *cddevice, char *outputfilename, int tracknum)
         return -1;
     }
 
-    FILE *output = fopen(outputfilename, "w");
+    FILE *output = fopen(outputfilename.ascii(), "w");
     if (!output)
     {
         cdda_close(device);
