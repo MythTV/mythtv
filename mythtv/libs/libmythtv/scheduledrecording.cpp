@@ -511,7 +511,7 @@ void ScheduledRecording::runProgList(void)
         }
     }
     else
-        pl = new ProgLister(plTitle, m_pginfo->title,
+        pl = new ProgLister(plTitle, title->getValue(),
                             QSqlDatabase::database(),
                             gContext->GetMainWindow(), "proglist");
 
