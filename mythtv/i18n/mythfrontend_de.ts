@@ -304,7 +304,7 @@
     </message>
     <message>
         <source>Delete this recording?</source>
-        <translation>Diese Aufnahme löschen?</translation>
+        <translation type="obsolete">Diese Aufnahme löschen?</translation>
     </message>
     <message>
         <source>Allow this program to AutoExpire?</source>
@@ -936,7 +936,7 @@
     </message>
     <message>
         <source>Trigger AutoExpire when free space in Gigabytes goes below this value.  Turn OFF AutoExpire by setting to 0.</source>
-        <translation>Automatisches Löschen startet falls der freie Speicherplatz diesen Wert (in GB) unterschreitet. &apos;0&apos; schaltet autom. Löschen ab.</translation>
+        <translation>Automatisches Löschen startet falls der freie Speicherplatz diesen Wert (in GB) unterschreitet. &apos;0&apos; schaltet autom. Löschen aus.</translation>
     </message>
     <message>
         <source>Auto Expire Frequency (in minutes)</source>
@@ -988,7 +988,7 @@
     </message>
     <message>
         <source>If checked (default) the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen. If unchecked the oldest recording will be listed first.</source>
-        <translation>Falls gesetzt, so werden im &apos;Aufnahmen ansehen&apos; Menü neue vor älteren Aufnahmen einsortiert.</translation>
+        <translation>Falls gesetzt, so werden im &quot;Aufnahmen ansehen&quot; Menü neue vor älteren Aufnahmen einsortiert.</translation>
     </message>
     <message>
         <source>Sticky keys</source>
@@ -1236,7 +1236,7 @@
     </message>
     <message>
         <source>No exit key</source>
-        <translation>Keine &apos;Beenden&apos; Taste</translation>
+        <translation>Nicht definiert</translation>
     </message>
     <message>
         <source>Control-ESC</source>
@@ -1252,7 +1252,7 @@
     </message>
     <message>
         <source>MythTV is designed to run continuously. If you wish, you may use the ESC key or the ESC key + a modifier to exit MythTV. Do not choose a key combination that will be intercepted by your window manager.</source>
-        <translation>MythTV ist dafür ausgelegt ohne Unterbrechung zu laufen. Falls gewünscht kann MythTV über die ESC-Taste oder mittels ESC-Taste+Modifizierer beendet werden. Aber wählen Sie keine Tastenkombination die von Ihrem Windowmanager abgefangen wird.</translation>
+        <translation>MythTV ist dafür ausgelegt ohne Unterbrechung zu laufen. Alternativ kann MythTV über die ESC- oder ESC+Modifizierer Tastenkombination beendet werden. Wählen Sie keine Tastenkombination die von Ihrem Windowmanager abgefangen wird.</translation>
     </message>
     <message>
         <source>Halt command</source>
@@ -1260,7 +1260,7 @@
     </message>
     <message>
         <source>If you have configured an exit key on the System Shutdown menu, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is poweroff</source>
-        <translation>Falls Sie eine Beenden-Taste eingerichtet haben, können Sie damit entweder nur MythTV verlassen oder den Rechner herunterfahren. Eine weitere Möglichkeit ist, den Rechner auch auszuschalten</translation>
+        <translation>Falls Sie eine Beenden-Taste eingerichtet haben, können Sie damit entweder nur MythTV verlassen oder den Rechner herunterfahren. Eine weitere Möglichkeit ist, den Rechner auch auszuschalten.</translation>
     </message>
     <message>
         <source>Xinerama screen</source>
@@ -1332,7 +1332,7 @@
     </message>
     <message>
         <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation>Ihr bevorzugtes Zeitformat. Wählen Sie ein Format mit &quot;AP&quot; für eine 12 Stunden Anzeige, ansonsten wird die Zeit im 24 Stunden Format angezeigt.</translation>
+        <translation>Ihr bevorzugtes Zeitformat. Einträge mit &quot;am&quot; zeigen die Zeit mit 12 Stunden Teilung an.</translation>
     </message>
     <message>
         <source>Theme</source>
@@ -1762,7 +1762,7 @@ Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     </message>
     <message>
         <source>default: TV, small: monitor, big:</source>
-        <translation>Standard: TV klein; Monitor groß:</translation>
+        <translation>Standard: TV klein; Monitor groß.</translation>
     </message>
     <message>
         <source>Change channels immediately without select</source>
@@ -1811,22 +1811,6 @@ Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     <message>
         <source>Repeat</source>
         <translation>Wiederholung</translation>
-    </message>
-    <message>
-        <source>T</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>W</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source></source>
@@ -2006,7 +1990,7 @@ Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     </message>
     <message>
         <source>If this is set, captions will be on by default when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &apos;T&apos; during playback.</source>
-        <translation>Falls gesetzt, werden Untertitel (engl. closed caption, CC) beim Fernsehen sowie bei der Wiedergabe von Aufnahmen eingeblendet. Mit der Taste T können Untertitel während der Wiedergabe ein- und ausgeblendet werden.</translation>
+        <translation>Falls gesetzt, werden Untertitel (engl. closed caption, CC) beim Fernsehen sowie bei der Wiedergabe von Aufnahmen eingeblendet. Mit der Taste &quot;T&quot; können Untertitel während der Wiedergabe ein- und ausgeblendet werden.</translation>
     </message>
     <message>
         <source>No Prompt on Exit</source>
@@ -2014,7 +1998,7 @@ Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     </message>
     <message>
         <source>If set, you will not be prompted when pressing the exit key.  Instead, MythTV will immediately exit.</source>
-        <translation>Falls gesezt, beendet sich MythTV nach drücken der EXIT-Taste ohne nachzufragen.</translation>
+        <translation>Falls gesezt, beendet sich MythTV nach Drücken der Beenden-Taste ohne nachzufragen.</translation>
     </message>
     <message>
         <source>Alpha - Transparent (CPU Usage - High)</source>
@@ -2038,7 +2022,7 @@ Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     </message>
     <message>
         <source>Colorize program guide using  genre colors. (Not available for all grabbers.)</source>
-        <translation>Kategorien in der Programmübersicht farblich markieren. (Nicht bei allen XMLTV Quellen verfügbar.)</translation>
+        <translation>Kategorien in der Programmübersicht farblich markieren. (nicht bei allen XMLTV Quellen verfügbar)</translation>
     </message>
     <message>
         <source>Display Genre Text</source>
@@ -2046,7 +2030,7 @@ Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     </message>
     <message>
         <source>(Not available for all grabbers.)</source>
-        <translation>(Nicht bei allen XMLTV Quellen verfügbar.)</translation>
+        <translation>(nicht bei allen XMLTV Quellen verfügbar)</translation>
     </message>
     <message>
         <source>Monitor CD/DVD</source>
@@ -2312,12 +2296,13 @@ Die Frequenz des Senders in Hz.</translation>
     </message>
     <message>
         <source>Symbol Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbolrate</translation>
     </message>
     <message>
         <source>[DVB-S/C] Symbol Rate (Option has no default)
 ???</source>
-        <translation type="unfinished"></translation>
+        <translation>[DVB-S/C] Symbolrate (Option hat keine Voreinstellung)
+???</translation>
     </message>
     <message>
         <source>Satellite</source>
@@ -2325,7 +2310,7 @@ Die Frequenz des Senders in Hz.</translation>
     </message>
     <message>
         <source>[NONE CONFIGURED]</source>
-        <translation type="unfinished"></translation>
+        <translation>[NICHT KONFIGURIERT]</translation>
     </message>
     <message>
         <source>Polarity</source>
@@ -2334,7 +2319,8 @@ Die Frequenz des Senders in Hz.</translation>
     <message>
         <source>[DVB-S] Polarity (Option has no default)
 ???</source>
-        <translation type="unfinished"></translation>
+        <translation>[DVB-S] Polarität (Option hat keine Voreinstellung)
+???</translation>
     </message>
     <message>
         <source>Horizontal</source>
@@ -2367,16 +2353,17 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein</translation>
     </message>
     <message>
         <source>Bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>Bandbreite</translation>
     </message>
     <message>
         <source>[DVB-C/T] Bandwidth (Default: Auto)
 ???</source>
-        <translation type="unfinished"></translation>
+        <translation>[DVB-C/T] Bandbreite (Standard: Auto)
+???</translation>
     </message>
     <message>
         <source>6 Mhz</source>
@@ -2397,7 +2384,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-C] Modulation (Default: Auto)
 ???</source>
-        <translation type="unfinished"></translation>
+        <translation>[DVB-C] Modulation (Standard: Auto)
+???</translation>
     </message>
     <message>
         <source>Constellation</source>
@@ -2692,7 +2680,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Region</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Region</translation>
     </message>
     <message>
         <source>Provider</source>
@@ -2748,19 +2736,19 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>DVB Card Number</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB Kartennr.</translation>
     </message>
     <message>
         <source>When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie diese Einstellung verändern sollte im Feld darunter der Name und Typ Ihrer Karte angezeigt werden. Falls die Karte nicht angesprochen werden kann wird eine Fehlermeldung ausgegeben.</translation>
     </message>
     <message>
         <source>Card Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Kartentyp</translation>
     </message>
     <message>
         <source>Card Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Kartenname</translation>
     </message>
     <message>
         <source>Do NOT use DVB driver for filtering.</source>
@@ -2772,15 +2760,15 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Record the TS, not PS.</source>
-        <translation type="unfinished"></translation>
+        <translation>TS aufnehmen, nicht PS.</translation>
     </message>
     <message>
         <source>This will make the backend not perform Transport Stream to Program Stream conversion.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schaltet die Umwandlung von Transport Stream zu Program Stream im Backend ab.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bei DVB Aufnahmen werden normalerweise Datenpakete verworfen solange kein Sequence Startheader emfangen wurde. Diese Option schaltet dieses Merkmal ab.</translation>
     </message>
     <message>
         <source>Per PID driver buffer size</source>
@@ -2788,7 +2776,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Packet buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>Paketpuffer</translation>
     </message>
     <message>
         <source>Channels</source>
@@ -2808,7 +2796,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Satellites</source>
-        <translation type="unfinished"></translation>
+        <translation>Satelliten</translation>
     </message>
     <message>
         <source>Select the satellite you want to configure and press the &apos;menu&apos; key, and edit the satellite, when you are done configuring, press &apos;OK&apos; to leave this wizard.</source>
@@ -2816,11 +2804,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Satellite Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Satellitenkonfiguration</translation>
     </message>
     <message>
         <source>Satellite Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Satellitenname</translation>
     </message>
     <message>
         <source>A textual representation of this satellite or cluster of satellites.</source>
@@ -2828,7 +2816,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Satellite Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Satellitenposition</translation>
     </message>
     <message>
         <source>A textual representation of which position the satellite is located at (&apos;1W&apos;)</source>
@@ -2876,7 +2864,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Video source</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoquelle</translation>
     </message>
     <message>
         <source>Input</source>
@@ -2884,7 +2872,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>External channel change command</source>
-        <translation>Externes Programm zum Sender umschalten</translation>
+        <translation>Externes Programm um den Sender zu wechseln</translation>
     </message>
     <message>
         <source>Preset tuner to channel</source>
@@ -2904,7 +2892,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Connect source to input</source>
-        <translation type="unfinished"></translation>
+        <translation>Quelle mit Eingang verbinden</translation>
     </message>
     <message>
         <source>Input connections</source>
@@ -3139,10 +3127,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Falls gesetzt, wird MythTV Sie vor dem Senderwechsel auf den Verlust des Live TV Datenpuffers hinweisen.</translation>
     </message>
     <message>
-        <source>F</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Find One Recording</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3252,7 +3236,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Open DVB card on demand</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB Karte bei Bedarf ansprechen</translation>
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
@@ -3272,7 +3256,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Default Recording Group to display on the view recordings screen.</source>
-        <translation>Standard Aufnahmegruppe für das &apos;Aufnahmen ansehen&apos; Menü.</translation>
+        <translation>Standard Aufnahmegruppe für das &quot;Aufnahmen ansehen&quot; Menü.</translation>
     </message>
     <message>
         <source>Save current Recording Group view when changed</source>
@@ -3280,7 +3264,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
-        <translation>Falls gesetzt, so bleibt die zuletzt gewählte Aufnahmegruppe beim Betreten des &apos;Aufnahmen ansehen&apos; Menüs aktiv.</translation>
+        <translation>Falls gesetzt, so bleibt die zuletzt gewählte Aufnahmegruppe beim Betreten des &quot;Aufnahmen ansehen&quot; Menüs aktiv.</translation>
     </message>
     <message>
         <source>Use program categories as display groups</source>
@@ -3341,10 +3325,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Return to menu.</source>
         <translation>Zurück ins Menü.</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Earlier Showing</source>
@@ -3418,7 +3398,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>If set, the EPG will initally display only the channels marked as favorites. &quot;4&quot; will toggle between favorites and all channels.</source>
-        <translation>Falls gesetzt, werden im EPG nur die als Favoriten markierten Sender angezeigt. Die Taste &apos;4&apos; schaltet zwischen den Favoriten und allen Sendern um.</translation>
+        <translation>Falls gesetzt, werden im EPG nur die als Favoriten markierten Sender angezeigt. Die Taste &quot;4&quot; schaltet zwischen den Favoriten und allen Sendern um.</translation>
     </message>
     <message>
         <source>Reschedule Higher Priorities</source>
@@ -3786,7 +3766,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
-        <translation>Gibt das Seitenverhältnis für die Wiedergabe unabhängig von der Aufnahme vor. Es bewirkt das gleiche wie die Taste &apos;W&apos; während der Wiedergabe.</translation>
+        <translation>Gibt das Seitenverhältnis für die Wiedergabe unabhängig von der Aufnahme vor. Es bewirkt das gleiche wie die Taste &quot;W&quot; während der Wiedergabe.</translation>
     </message>
     <message>
         <source>GUI width (px)</source>
@@ -3854,7 +3834,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>If the option to use select to change the channel is on, pressing select on a show that is at least this many minutes into the future will schedule a recording.</source>
-        <translation>Nur bei aktiver &apos;Umschalten bei Select&apos; Option gültig. Liegt der Beginn einer Sendung mindestens so viele Minuten in der Zukunft, so wird beim drücken der &apos;Select&apos;-Taste eine neue Aufnahme geplant statt auf diesen Sender umzuschalten.</translation>
+        <translation>Nur bei aktiver &quot;Umschalten bei Select&quot; Option gültig. Liegt der Beginn einer Sendung mindestens so viele Minuten in der Zukunft, so wird beim drücken der &quot;Select&quot;-Taste eine neue Aufnahme geplant statt auf diesen Sender umzuschalten.</translation>
     </message>
     <message>
         <source>View Recordings (Recording Groups)</source>
@@ -3887,10 +3867,6 @@ Myth wird nun beendet.</translation>
         <translation>Eine Liste von Filtern die bei der Wiedergabe von Aufnahmen von diesem Sender verwendet werden. Ein &apos;+&apos; am Anfang fügt sie der Liste der globalen Wiedergabefilter hinzu.</translation>
     </message>
     <message>
-        <source>O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Override Recording</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3900,7 +3876,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Reactivate</source>
-        <translation type="unfinished"></translation>
+        <translation>Wieder aktivieren</translation>
     </message>
     <message>
         <source>Don&apos;t record</source>
@@ -3928,7 +3904,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Record this showing with normal options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Diese Ausstrahlung mit normalen Optionen aufnehmen</translation>
     </message>
     <message>
         <source>Record this showing with override options</source>
@@ -4052,6 +4028,117 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Free</source>
+        <translation>Ohne Werbung</translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>D</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>P</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>L</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>K</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting will change the qt widget style on startup, if this setting is set to anything other than &apos;Desktop Style&apos;. Setting this setting to &apos;Desktop Style&apos; will have no effect on the currently running MythTV session.</source>
+        <translation>Wählen Sie hier Ihren bevorzugten Qt Stil. Standardmäßig wird der Desktop Stil verwendet. Eine Änderung wird erst nach einem Neustart berücksichtigt.</translation>
+    </message>
+    <message>
+        <source>Startup command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This command is executed right after starting the BE. As a parameter &apos;$status&apos; is replaced by either &apos;auto&apos; if the machine was started automatically or &apos;user&apos; if a user switched it on.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4445,7 +4532,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation>wählen Sie &apos;Übersicht&apos; oder &apos;Suche&apos;</translation>
+        <translation>wählen Sie &quot;Übersicht&quot; oder &quot;Suche&quot;</translation>
     </message>
     <message>
         <source>(1) Sort by Channel    (2) Sort by Priority</source>
@@ -4477,7 +4564,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
-        <translation>&apos;Aufnahme planen&apos; im Hauptmenü</translation>
+        <translation>&quot;Aufnahme planen&quot; im Hauptmenü</translation>
     </message>
     <message>
         <source>(4) Program Guide   **(6) Program Finder **</source>
@@ -4497,7 +4584,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation>Wählen Sie den Titel der gesuchten Sendung. Weiter mit ENTER oder Cursor-Rechts. Mit &apos;info&apos; können Sie eine Aufnahme planen.</translation>
+        <translation>Wählen Sie den Titel der gesuchten Sendung. Weiter mit ENTER oder Cursor-Rechts. Mit &quot;info&quot; können Sie eine Aufnahme planen.</translation>
     </message>
     <message>
         <source>No Programs</source>
