@@ -1,11 +1,11 @@
                                    MythVideo
-                                  Version 0.10
+                                  Version 0.11
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-	MythTV 0.10 installed and working
+	MythTV 0.11 installed and working
 
 If you have met the requirements above, simply type 'make' in the main directory
 to begin compiling.
