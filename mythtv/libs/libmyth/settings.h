@@ -14,6 +14,7 @@ using namespace std;
 class QSqlDatabase;
 class QWidget;
 class ConfigurationGroup;
+class QDir;
 
 class Configurable: virtual public QObject {
     Q_OBJECT
@@ -261,6 +262,8 @@ public:
                               bool select=false);
 
     virtual void clearSelections(void);
+
+    virtual void fillSelectionsFromDir(const QDir& dir);
 
 signals:
     void selectionAdded(const QString& label, QString value);

@@ -4,6 +4,7 @@
 #include "libmyth/settings.h"
 #include <qregexp.h>
 #include <vector>
+#include <qdir.h>
 
 class VideoSource;
 class VSSetting: public SimpleDBStorage {
@@ -232,15 +233,10 @@ public:
         PathSetting(true),
         CCSetting(parent, "videodevice") {
         setLabel("Video device");
-        addSelection("/dev/video");
-        addSelection("/dev/video0");
-        addSelection("/dev/video1");
-        addSelection("/dev/video2");
-        addSelection("/dev/video3");
-        addSelection("/dev/v4l/video0");
-        addSelection("/dev/v4l/video1");
-        addSelection("/dev/v4l/video2");
-        addSelection("/dev/v4l/video3");
+        QDir dev("/dev", "video*", QDir::Name, QDir::System);
+        fillSelectionsFromDir(dev);
+        dev.setPath("/dev/v4l");
+        fillSelectionsFromDir(dev);
     };
 };
 
@@ -250,15 +246,10 @@ public:
         PathSetting(true),
         CCSetting(parent, "vbidevice") {
         setLabel("VBI device");
-        addSelection("/dev/vbi");
-        addSelection("/dev/vbi0");
-        addSelection("/dev/vbi1");
-        addSelection("/dev/vbi2");
-        addSelection("/dev/vbi3");
-        addSelection("/dev/v4l/vbi0");
-        addSelection("/dev/v4l/vbi1");
-        addSelection("/dev/v4l/vbi2");
-        addSelection("/dev/v4l/vbi3");
+        QDir dev("/dev", "vbi*", QDir::Name, QDir::System);
+        fillSelectionsFromDir(dev);
+        dev.setPath("/dev/v4l");
+        fillSelectionsFromDir(dev);
     };
 };
 
@@ -268,21 +259,13 @@ public:
         PathSetting(true),
         CCSetting(parent, "audiodevice") {
         setLabel("Audio device");
-        addSelection("/dev/dsp");
-        addSelection("/dev/dsp0");
-        addSelection("/dev/dsp1");
-        addSelection("/dev/dsp2");
-        addSelection("/dev/dsp3");
-        addSelection("/dev/dsp4");
-        addSelection("/dev/dsp5");
-        addSelection("/dev/sound/dsp");
-        addSelection("/dev/sound/dsp0");
-        addSelection("/dev/sound/dsp1");
-        addSelection("/dev/sound/dsp2");
-        addSelection("/dev/sound/dsp3");
-        addSelection("/dev/sound/dsp4");
-        addSelection("/dev/sound/dsp5");
+        QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
+        fillSelectionsFromDir(dev);
+        dev.setPath("/dev/sound");
+        fillSelectionsFromDir(dev);
     };
+private:
+     static const char* dspdirs[];
 };
 
 // unused

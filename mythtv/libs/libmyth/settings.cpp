@@ -24,6 +24,7 @@
 #include <qwidget.h>
 #include <unistd.h>
 #include <qdatetime.h>
+#include <qdir.h>
 
 #include "mythcontext.h"
 #include "mythwizard.h"
@@ -235,6 +236,18 @@ void SelectSetting::addSelection(const QString& label, QString value, bool selec
     
     if (select || !isSet)
         setValue(value);
+}
+
+void SelectSetting::fillSelectionsFromDir(const QDir& dir) {
+     const QFileInfoList *il = dir.entryInfoList();
+     if (!il)
+         return;
+
+     QFileInfoListIterator it( *il );
+     QFileInfo *fi;
+
+     for(; (fi = it.current()) != 0; ++it)
+         addSelection(fi->absFilePath());
 }
 
 void SelectSetting::clearSelections(void) {
