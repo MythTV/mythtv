@@ -1473,13 +1473,13 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, int types)
     switch (types)
     {
         case 1: case 2: tmpmessage = tr("Yes, get rid of it"); 
-                        tmpslot = SLOT(doDelete);
+                        tmpslot = SLOT(doDelete());
                         break;
         case 3: tmpmessage = tr("Yes, AutoExpire"); 
-                tmpslot = SLOT(doAutoExpire);
+                tmpslot = SLOT(doAutoExpire());
                 break;
         case 4: tmpmessage = tr("Yes, stop recording it"); 
-                tmpslot = SLOT(doStop);
+                tmpslot = SLOT(doStop());
                 break;
         default: tmpmessage = "ERROR ERROR ERROR"; tmpslot = NULL; break;
     }
@@ -1581,7 +1581,7 @@ void PlaybackBox::initPopup(MythPopupBox *popup, ProgramInfo *program,
         popup->addLabel("");
     }
 
-    QLabel *title = popup->addLabel(program->title, MythPopupBox::Large);
+    popup->addLabel(program->title, MythPopupBox::Large);
 
     if ((program->subtitle).stripWhiteSpace().length() > 0)
         popup->addLabel("\"" + program->subtitle + "\"");
