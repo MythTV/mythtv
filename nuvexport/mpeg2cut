@@ -175,7 +175,8 @@ then
 fi
 
 echo Remultiplexing video
-nice -n 19 lvemux -r -1 -v ${BASENAME}.m2v -a ${BASENAME}.mp2 -o "${OUTFILE}"
+nice -n 19 lvemux -r -1 -sh ${OFFSET} -v ${BASENAME}.m2v -a ${BASENAME}.mp2 \
+    -o "${OUTFILE}"
 
 echo Cleaning up
 rm ${FILENAME}.idx ${BASENAME}.m2v ${BASENAME}.mp2 ${BASENAME}.m2v.idx
