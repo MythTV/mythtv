@@ -32,12 +32,13 @@ class MainServer : public QVBox
 
     // playback
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
-    void HandleDeleteRecording(PlaybackSock *pbs);
+    void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs);
     void HandleGetPendingRecordings(PlaybackSock *pbs);
-    void HandleGetConflictingRecordings(QString purge, PlaybackSock *pbs);
+    void HandleGetConflictingRecordings(QStringList &slist, QString purge, 
+                                        PlaybackSock *pbs);
     void HandleGetFreeRecorder(PlaybackSock *pbs);
-    void HandleRecorderQuery(QStringList list, QStringList commands,
+    void HandleRecorderQuery(QStringList &slist, QStringList &commands,
                              PlaybackSock *pbs);
 
     PlaybackSock *getPlaybackByName(QString name);

@@ -422,6 +422,8 @@ void PlaybackBox::remove(QListViewItem *lvitem)
 
     if (result == 1)
     {
+        m_context->DeleteRecording(rec);
+
         if (lvitem->itemBelow())
         {
             listview->setCurrentItem(lvitem->itemBelow());

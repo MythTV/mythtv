@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#include <list>
 #include <iostream>
 using namespace std;
 
@@ -82,7 +83,7 @@ void MainServer::readSocket(void)
             }
             else if (command == "DELETE_RECORDING")
             {
-                HandleDeleteRecording(pbs);
+                HandleDeleteRecording(listline, pbs);
             }
             else if (command == "QUERY_GETALLPENDING")
             {
@@ -93,7 +94,7 @@ void MainServer::readSocket(void)
                 if (tokens.size() != 2)
                     cerr << "Bad QUERY_GETCONFLICTING\n";
                 else
-                    HandleGetConflictingRecordings(tokens[1], pbs);
+                    HandleGetConflictingRecordings(listline, tokens[1], pbs);
             }
             else if (command == "GET_FREE_RECORDER")
             {
@@ -173,6 +174,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
     QStringList outputlist;
 
+    QString fileprefix = m_context->GetFilePrefix();
+
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         outputlist << QString::number(query.numRowsAffected());
@@ -220,7 +223,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 proginfo->chansign = "#" + proginfo->chanid;
             }
 
-            proginfo->pathname = proginfo->GetRecordFilename("/mnt/store");
+            proginfo->pathname = proginfo->GetRecordFilename(fileprefix);
         
             struct stat64 st;
     
@@ -262,49 +265,48 @@ static void *SpawnDelete(void *param)
     return NULL;
 }
 
-void MainServer::HandleDeleteRecording(PlaybackSock *pbs)
+void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 {
-    QStringList strlist;
-    ReadStringList(pbs->getSocket(), strlist);
-
     ProgramInfo pginfo;
+    pginfo.FromStringList(slist, 1);
 
-    pginfo.FromStringList(strlist, 0);
+    QString fileprefix = m_context->GetFilePrefix();
 
-    cout << pginfo.title << endl;
-/*
-        QString filename = rec->GetRecordFilename(fileprefix);
+    QString filename = pginfo.GetRecordFilename(fileprefix);
 
-        QSqlQuery query;
-        QString thequery;
+    QSqlQuery query;
+    QString thequery;
 
-        QString startts = rec->startts.toString("yyyyMMddhhmm");
-        startts += "00";
-        QString endts = rec->endts.toString("yyyyMMddhhmm");
-        endts += "00";
+    QString startts = pginfo.startts.toString("yyyyMMddhhmm");
+    startts += "00";
+    QString endts = pginfo.endts.toString("yyyyMMddhhmm");
+    endts += "00";
 
-        thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
-                           "= \"%2\" AND starttime = %3 AND endtime = %4;")
-                           .arg(rec->chanid).arg(rec->title).arg(startts)
-                           .arg(endts);
+    thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
+                       "= \"%2\" AND starttime = %3 AND endtime = %4;")
+                       .arg(pginfo.chanid).arg(pginfo.title).arg(startts)
+                       .arg(endts);
 
-        query = db->exec(thequery);
-        if (!query.isActive())
-        {
-            cerr << "DB Error: recorded program deletion failed, SQL query "
-                 << "was:" << endl;
-            cerr << thequery << endl;
-        }
+    query.exec(thequery);
+    if (!query.isActive())
+    {
+        cerr << "DB Error: recorded program deletion failed, SQL query "
+             << "was:" << endl;
+        cerr << thequery << endl;
+    }
 
-        QString *fileptr = new QString(filename);
+    QString *fileptr = new QString(filename);
 
-        pthread_t deletethread;
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_t deletethread;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-        pthread_create(&deletethread, &attr, SpawnDelete, fileptr);
-*/
+    pthread_create(&deletethread, &attr, SpawnDelete, fileptr);
+
+    QStringList outputlist = "OK";
+
+    WriteStringList(pbs->getSocket(), outputlist);
 }
 
 void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
@@ -360,27 +362,23 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
     delete sched;
 }
 
-void MainServer::HandleGetConflictingRecordings(QString purge,
+void MainServer::HandleGetConflictingRecordings(QStringList &slist,
+                                                QString purge,
                                                 PlaybackSock *pbs)
 {
     Scheduler *sched = new Scheduler(QSqlDatabase::database());
 
     bool removenonplaying = purge.toInt();
 
-    QStringList strlist;
-    ReadStringList(pbs->getSocket(), strlist);
-
     ProgramInfo *pginfo = new ProgramInfo();
-    pginfo->FromStringList(strlist, 0);
+    pginfo->FromStringList(slist, 1);
 
     sched->FillRecordLists(false);
 
     list<ProgramInfo *> *conflictlist = sched->getConflicting(pginfo, 
                                                               removenonplaying);
 
-    strlist.clear();
-
-    strlist << QString::number(conflictlist->size());
+    QStringList strlist = QString::number(conflictlist->size());
 
     list<ProgramInfo *>::iterator iter = conflictlist->begin();
     for (; iter != conflictlist->end(); iter++)
@@ -401,7 +399,7 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
     WriteStringList(pbs->getSocket(), strlist);
 }
 
-void MainServer::HandleRecorderQuery(QStringList list, QStringList commands,
+void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
                                      PlaybackSock *pbs)
 {
     int recnum = commands[1].toInt();
@@ -415,7 +413,7 @@ void MainServer::HandleRecorderQuery(QStringList list, QStringList commands,
 
     EncoderLink *enc = iter.data();  
 
-    QString command = list[1];
+    QString command = slist[1];
 
     QStringList retlist;
 
@@ -439,21 +437,21 @@ void MainServer::HandleRecorderQuery(QStringList list, QStringList commands,
     }
     else if (command == "GET_FREE_SPACE")
     {
-        long long pos = decodeLongLong(list, 2);
+        long long pos = decodeLongLong(slist, 2);
 
         long long value = enc->GetFreeSpace(pos);
         encodeLongLong(retlist, value);
     }
     else if (command == "GET_KEYFRAME_POS")
     {
-        long long desired = decodeLongLong(list, 2);
+        long long desired = decodeLongLong(slist, 2);
 
         long long value = enc->GetKeyframePosition(desired);
         encodeLongLong(retlist, value);
     }
     else if (command == "SETUP_RING_BUFFER")
     {
-        bool pip = list[2].toInt();
+        bool pip = slist[2].toInt();
 
         QString path = "";
         long long filesize = 0;
@@ -492,19 +490,19 @@ void MainServer::HandleRecorderQuery(QStringList list, QStringList commands,
     }
     else if (command == "CHANGE_CHANNEL")
     {
-        bool up = list[2].toInt(); 
+        bool up = slist[2].toInt(); 
         enc->ChangeChannel(up);
         retlist << "ok";
     }
     else if (command == "SET_CHANNEL")
     {
-        QString name = list[2];
+        QString name = slist[2];
         enc->SetChannel(name);
         retlist << "ok";
     }
     else if (command == "CHECK_CHANNEL")
     {
-        QString name = list[2];
+        QString name = slist[2];
         retlist << QString::number((int)(enc->CheckChannel(name)));
     }
     else if (command == "GET_PROGRAM_INFO")
@@ -547,7 +545,7 @@ void MainServer::HandleRecorderQuery(QStringList list, QStringList commands,
     }
     else if (command == "GET_INPUT_NAME")
     {
-        QString name = list[2];
+        QString name = slist[2];
 
         QString input = "";
         enc->GetInputName(input);
@@ -574,16 +572,16 @@ void MainServer::HandleRecorderQuery(QStringList list, QStringList commands,
     }
     else if (command == "REQUEST_BLOCK")
     {
-        int size = list[2].toInt();
+        int size = slist[2].toInt();
 
         enc->RequestRingBufferBlock(size);
         retlist << "OK";
     }
     else if (command == "SEEK_RINGBUF")
     {
-        long long pos = decodeLongLong(list, 2);
-        int whence = list[4].toInt();
-        long long curpos = decodeLongLong(list, 5);
+        long long pos = decodeLongLong(slist, 2);
+        int whence = slist[4].toInt();
+        long long curpos = decodeLongLong(slist, 5);
 
         long long ret = enc->SeekRingBuffer(curpos, pos, whence);
         encodeLongLong(retlist, ret);

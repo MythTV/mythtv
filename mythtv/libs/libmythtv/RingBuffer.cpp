@@ -401,11 +401,11 @@ int RingBuffer::safe_read(QSocket *sock, void *data, unsigned sz)
     while (sock->bytesAvailable() < sz) 
     {
         int reqsize = 128000;
-        m_context->RequestRemoteRingBlock(recorder_num, sock, reqsize);
+        m_context->RequestRemoteRingBlock(recorder_num, reqsize);
         zerocnt++;
         if (zerocnt == 100)
         {
-            printf("EOF %d %u\n", sock->bytesAvailable(), sz);
+            printf("EOF %u\n", sz);
             break;
         }
         usleep(1000);

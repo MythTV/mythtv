@@ -434,6 +434,17 @@ void MythContext::GetFreeSpace(int &totalspace, int &usedspace)
     usedspace = strlist[1].toInt();
 }
 
+void MythContext::DeleteRecording(ProgramInfo *pginfo)
+{
+    QStringList strlist = QString("DELETE_RECORDING");
+    pginfo->ToStringList(strlist);
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+}
+
 bool MythContext::GetAllPendingRecordings(list<ProgramInfo *> &recordinglist)
 {
     QStringList strlist = QString("QUERY_GETALLPENDING");
@@ -465,13 +476,9 @@ list<ProgramInfo *> *MythContext::GetConflictList(ProgramInfo *pginfo,
 {
     QString cmd = QString("QUERY_GETCONFLICTING %1").arg(removenonplaying);
     QStringList strlist = cmd;
-
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-
-    strlist.clear();
     pginfo->ToStringList(strlist);
 
+    pthread_mutex_lock(&serverSockLock);
     WriteStringList(serverSock, strlist);
     ReadStringList(serverSock, strlist);
     pthread_mutex_unlock(&serverSockLock);
@@ -793,8 +800,7 @@ void MythContext::CloseRemoteRingBuffer(int recorder, QSocket *sock)
     sock->close();
 }
 
-void MythContext::RequestRemoteRingBlock(int recorder, QSocket *sock,
-                                         int size)
+void MythContext::RequestRemoteRingBlock(int recorder, int size) 
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "REQUEST_BLOCK";

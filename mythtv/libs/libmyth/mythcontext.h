@@ -6,6 +6,7 @@
 #include <qpalette.h>
 #include <qsocket.h>
 
+#include <list>
 #include <vector>
 using namespace std;
 
@@ -54,6 +55,7 @@ class MythContext
 
     vector<ProgramInfo *> *GetRecordedList(bool deltype);
     void GetFreeSpace(int &totalspace, int &usedspace);
+    void DeleteRecording(ProgramInfo *pginfo);
     bool GetAllPendingRecordings(list<ProgramInfo *> &recordinglist);
     list<ProgramInfo *> *GetConflictList(ProgramInfo *pginfo,
                                          bool removenonplaying);
@@ -84,7 +86,7 @@ class MythContext
 
     QSocket *SetupRemoteRingBuffer(int recorder, QString url);
     void CloseRemoteRingBuffer(int recorder, QSocket *sock);
-    void RequestRemoteRingBlock(int recorder, QSocket *sock, int size);
+    void RequestRemoteRingBlock(int recorder, int size);
     long long SeekRemoteRing(int recorder, QSocket *sock, long long curpos,
                              long long pos, int whence);
     
