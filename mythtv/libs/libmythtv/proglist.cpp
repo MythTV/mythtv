@@ -129,8 +129,10 @@ void ProgLister::keyPressEvent(QKeyEvent *e)
             nextView();
         else if (action == "MENU")
             chooseView();
-        else if (action == "SELECT" || action == "RIGHT" || action == "LEFT")
+        else if (action == "SELECT" || action == "RIGHT")
             select();
+        else if (action == "LEFT")
+            accept();
         else if (action == "INFO")
             edit();
         else if (action == "TOGGLERECORD")

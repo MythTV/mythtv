@@ -596,7 +596,7 @@ void ProgFinder::cursorLeft()
 {
     inSearch--;
     if (inSearch == -1)
-        inSearch = 0;
+        escape();
     else
     {
         if (inSearch == 0)
