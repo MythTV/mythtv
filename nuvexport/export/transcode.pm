@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.25 (xris)
+#Last Updated: 2004.09.30 (xris)
 #
 #  transcode.pm
 #
@@ -116,7 +116,7 @@ package export::transcode;
             $transcode .= " -i /tmp/fifodir_$$/vidout -p /tmp/fifodir_$$/audout"
                          .' -H 0 -x raw'
                          .' -g '.join('x', $episode->{'finfo'}{'width'}, $episode->{'finfo'}{'height'})
-                         .' -f '.$episode->{'finfo'}{'fps'}.',' 
+                         .' -f '.$episode->{'finfo'}{'fps'}.','
                          . (($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 3 : 4)
                          .' -n 0x1'
                          .' -e '.join(',', $episode->{'finfo'}{'audio_sample_rate'}, $episode->{'finfo'}{'audio_bits_per_sample'}, $episode->{'finfo'}{'audio_channels'})
@@ -126,6 +126,8 @@ package export::transcode;
         if ($self->{'crop'}) {
             my $w = sprintf('%.0f', .02 * $episode->{'finfo'}{'width'});
             my $h = sprintf('%.0f', .02 * $episode->{'finfo'}{'height'});
+            $w-- if ($w > 0 && $w % 2);
+            $h-- if ($h > 0 && $h % 2);
             $transcode .= " -j $h,$w,$h,$w" if ($h || $w);
         }
     # Use the cutlist?  (only for mpeg files -- nuv files are handled by mythtranscode)
