@@ -659,8 +659,6 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
         
         accepted = parent->SaveDatabaseParams(params);
     }
-    if (accepted)
-        LoadDatabaseSettings(true);
     return accepted;
 }
 
@@ -2276,6 +2274,7 @@ DatabaseParams MythContext::GetDatabaseParams(void)
 
 bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
 {
+    bool ret = true;
     DatabaseParams cur_params = GetDatabaseParams();
     
     // only rewrite file if it hasn't changed
@@ -2292,6 +2291,10 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
          (params.wolReconnect  != cur_params.wolReconnect ||
           params.wolRetry      != cur_params.wolRetry     ||
           params.wolCommand    != cur_params.wolCommand)))
-        return d->WriteSettingsFile(params, true);
-    return true;
+    {
+        ret = d->WriteSettingsFile(params, true);
+        if (ret)
+            d->LoadDatabaseSettings(true);
+    }
+    return ret;
 }
