@@ -414,6 +414,7 @@ void PhoneUIBox::PlaceorAnswerCall(QString url, QString name, QString Mode, bool
     switch (State)
     {
     case SIP_IDLE:
+cout << "Place Call\n";
         sipStack->PlaceNewCall(Mode, url, name, onLocalLan);
 
         // Add an entry into the Placed Calls dir
@@ -422,6 +423,7 @@ void PhoneUIBox::PlaceorAnswerCall(QString url, QString name, QString Mode, bool
         currentCallEntry = new CallRecord(name, url, false, (QDateTime::currentDateTime()).toString());
         phoneUIStatusBar->updateMidCallCaller(((name != 0) && (name.length() > 0)) ? name : url);
         EscapeHangsUp = true;
+cout << "Placed\n";
         break;
 
     case SIP_ICONNECTING:
@@ -1102,8 +1104,8 @@ void PhoneUIBox::closeUrlPopup()
 
 void PhoneUIBox::dialUrlVideo()
 {
-    PlaceorAnswerCall(urlField->text(), "", txVideoMode);
-    closeUrlPopup();
+    PlaceorAnswerCall(urlField==0 ? urlRemoteField->text() : urlField->text(), "", txVideoMode);
+    closeUrlPopup();                           
 
     // If we got here via the menu popup
     // then close that now - we're finiished with it
@@ -1114,7 +1116,7 @@ void PhoneUIBox::dialUrlVideo()
 
 void PhoneUIBox::dialUrlVoice()
 {
-    PlaceorAnswerCall(urlField->text(), "", "AUDIOONLY");
+    PlaceorAnswerCall(urlField==0 ? urlRemoteField->text() : urlField->text(), "", "AUDIOONLY");
     closeUrlPopup();
 
     // If we got here via the menu popup
