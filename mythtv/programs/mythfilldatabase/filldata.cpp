@@ -3164,10 +3164,11 @@ int main(int argc, char *argv[])
             cout << "   <xawtvrcfile> = file to read\n";
             cout << "\n";
             cout << "--do_channel_updates\n";
-            cout << "   Ask mythfilldatabase to overwrite channel names,\n";
-            cout << "   frequencies, etc. with the values available from\n";
-            cout << "   the data source. This will override custom channel\n";
-            cout << "   names, which is why it is off by default.\n";
+            cout << "   When using data direct, ask mythfilldatabase to\n";
+            cout << "   overwrite channel names, frequencies, etc. with the\n";
+            cout << "   values available from the data source. This will \n";
+            cout << "   override custom channel names, which is why it is\n";
+            cout << "   off by default.\n";
             cout << "\n";
             cout << "--graboptions <\"options\">\n";
             cout << "   Pass options to grabber\n";
