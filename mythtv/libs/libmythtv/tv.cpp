@@ -93,7 +93,7 @@ void TV::LiveTV(void)
     nvp->SetRecorder(nvr);
     nvp->SetDeinterlace((bool)settings->GetNumSetting("Deinterlace"));
     nvp->SetOSDFontName((char *)settings->GetSetting("OSDFont").c_str());
-    
+  
     pthread_create(&encode, NULL, SpawnEncode, nvr);
 
     while (!nvr->IsRecording())
@@ -106,7 +106,7 @@ void TV::LiveTV(void)
     pthread_create(&decode, NULL, SpawnDecode, nvp);
 
     while (!nvp->IsPlaying())
-        usleep(50);
+       usleep(50);
 
     int keypressed;
     bool paused = false;

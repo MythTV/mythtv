@@ -31,7 +31,7 @@ Display *XJ_disp;
 Window XJ_root,XJ_win;
 XvImage *XJ_image;
 
-#define GUID_YUV12_PLANAR 0x32315659
+#define GUID_YUV12_PLANAR 0x30323449
 
 XEvent XJ_ev;
 GC XJ_gc;
@@ -77,7 +77,8 @@ void sizehint(int x, int y, int width, int height, int max)
    XSetWMNormalHints(XJ_disp, XJ_win, &hints);
 }
 
-char *XJ_init(int width, int height, char *window_name, char *icon_name)
+unsigned char *XJ_init(int width, int height, char *window_name, 
+                       char *icon_name)
 {
   XWMHints wmhints;
   char *sbuf;
@@ -257,7 +258,7 @@ char *XJ_init(int width, int height, char *window_name, char *icon_name)
 
   XJ_toggleFullscreen();
 
-  return(sbuf);
+  return((unsigned char *)sbuf);
 }
 
 
@@ -311,10 +312,10 @@ void XJ_toggleFullscreen(void)
   } else {
     XJ_fullscreen = 1;
     oldx = curx; oldy = cury; oldw = curw; oldh = curh;
-    curx = 0 - (int)ceil(XJ_screenwidth * .03); 
-    cury = 0 - (int)ceil(XJ_screenheight * 0.03); 
-    curw = (int)ceil(XJ_screenwidth * 1.06); 
-    curh = (int)ceil(XJ_screenheight * 1.06);
+    curx = 0 - (int)ceil(XJ_screenwidth * .05); 
+    cury = 0 - (int)ceil(XJ_screenheight * 0.05); 
+    curw = (int)ceil(XJ_screenwidth * 1.10); 
+    curh = (int)ceil(XJ_screenheight * 1.10);
     hide_cursor();
     decorate(0);
   }

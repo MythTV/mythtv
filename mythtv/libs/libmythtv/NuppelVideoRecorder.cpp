@@ -7,6 +7,7 @@
 #include <sys/soundcard.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <errno.h>
 
 #include "NuppelVideoRecorder.h"
 
@@ -107,7 +108,7 @@ void NuppelVideoRecorder::Initialize(void)
 	lame_init_params(gf);
     }
 
-    video_buffer_size = w * h + ((w * h) >> 1);
+    video_buffer_size = w * h * 3 / 2;
     if (w >= 480 || h > 288) 
         videomegs = 14;
     else
@@ -228,14 +229,14 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    int i;
+    int setval;
     rtjc = new RTjpeg();
-    i = RTJ_YUV420;
-    rtjc->SetFormat(&i);
+    setval = RTJ_YUV420;
+    rtjc->SetFormat(&setval);
     rtjc->SetSize(&w, &h);
     rtjc->SetQuality(&Q);
-    i = 1;
-    rtjc->SetIntra(&i, &M1, &M2);
+    setval = 1;
+    rtjc->SetIntra(&setval, &M1, &M2);
 
     if (childrenLive)
         return;
@@ -249,13 +250,174 @@ void NuppelVideoRecorder::StartRecording(void)
     if (getuid() == 0)
         nice(-10);
 
-    fd = open(videodevice.c_str(), O_RDWR|O_CREAT);
+    fd = open(videodevice.c_str(), O_RDWR);
     if (fd <= 0)
     {
         perror("open video:");
         KillChildren();
         return;
     }
+
+#ifdef V4L2
+    struct v4l2_capability vcap;
+    struct v4l2_format     vfmt;
+    struct v4l2_buffer     vbuf;
+    struct v4l2_requestbuffers vrbuf;
+
+    memset(&vcap, 0, sizeof(vcap));
+    memset(&vfmt, 0, sizeof(vfmt));
+    memset(&vbuf, 0, sizeof(vbuf));
+    memset(&vrbuf, 0, sizeof(vrbuf));
+
+    if (ioctl(fd, VIDIOC_QUERYCAP, &vcap) < 0)
+    {
+        perror("videoc_querycap:");
+        return;
+    }
+
+    if (vcap.type != V4L2_TYPE_CAPTURE)
+    {
+        printf("Not a capture device\n");
+        exit(0);
+    }
+
+    if (!(vcap.flags & V4L2_FLAG_STREAMING) ||
+        !(vcap.flags & V4L2_FLAG_SELECT))
+    {
+        printf("Won't work with the streaming interface, failing\n");
+        exit(0);
+    }
+
+    vfmt.type = V4L2_BUF_TYPE_CAPTURE;
+    vfmt.fmt.pix.width = w;
+    vfmt.fmt.pix.height = h;
+    vfmt.fmt.pix.depth = 12;
+    vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
+    vfmt.fmt.pix.flags = V4L2_FMT_FLAG_INTERLACED;
+
+    if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
+    {
+        printf("Unable to set desired format\n");
+        exit(0);
+    }
+
+    int numbuffers = 2;
+    
+    vrbuf.type = V4L2_BUF_TYPE_CAPTURE;
+    vrbuf.count = numbuffers;
+
+    if (ioctl(fd, VIDIOC_REQBUFS, &vrbuf) < 0)
+    {
+        printf("Not able to get any capture buffers\n");
+        exit(0);
+    }
+
+    unsigned char *buffers[numbuffers];
+    int bufferlen[numbuffers];
+
+    for (int i = 0; i < numbuffers; i++)
+    {
+        vbuf.type = V4L2_BUF_TYPE_CAPTURE;
+        vbuf.index = i;
+
+        if (ioctl(fd, VIDIOC_QUERYBUF, &vbuf) < 0)
+        {
+            printf("unable to query capture buffer %d\n", i);
+            exit(0);
+        }
+
+        buffers[i] = (unsigned char *)mmap(NULL, vbuf.length,
+                                           PROT_READ|PROT_WRITE, MAP_SHARED,
+                                           fd, vbuf.offset);
+        bufferlen[i] = vbuf.length;
+    }
+
+    for (int i = 0; i < numbuffers; i++)
+    {
+	memset(buffers[i], 0, bufferlen[i]);
+        vbuf.type = V4L2_BUF_TYPE_CAPTURE;
+        vbuf.index = i;
+        ioctl(fd, VIDIOC_QBUF, &vbuf);
+    }
+
+    int turnon = V4L2_BUF_TYPE_CAPTURE;
+    ioctl(fd, VIDIOC_STREAMON, &turnon);
+
+    struct timeval tv;
+    fd_set rdset;
+    int frame = 0;
+
+    encoding = true;
+
+    struct timeval startt, nowt;
+    int framesdisplayed = 0;
+    
+    unsigned char framebuf[video_buffer_size];
+    
+    while (encoding) {
+        if (paused)
+        {
+            mainpaused = true;
+            usleep(50);
+            gettimeofday(&stm, &tzone);
+            continue;
+        }
+again:
+        tv.tv_sec = 5;
+        tv.tv_usec = 0;
+        FD_ZERO(&rdset);
+        FD_SET(fd, &rdset);
+
+        switch (select(fd+1, &rdset, NULL, NULL, &tv))
+        {
+            case -1:
+                  if (errno == EINTR)
+                      goto again;
+                  perror("select");
+                  continue;
+            case 0:
+                  printf("select timeout\n");
+                  continue;
+           default: break;
+        }
+
+        memset(&vbuf, 0, sizeof(vbuf));
+        vbuf.type = V4L2_BUF_TYPE_CAPTURE;
+        ioctl(fd, VIDIOC_DQBUF, &vbuf);
+
+        frame = vbuf.index;
+        memcpy(framebuf, buffers[frame], video_buffer_size);
+	
+	memset(buffers[frame], 0, bufferlen[frame]);
+
+        vbuf.type = V4L2_BUF_TYPE_CAPTURE;
+        ioctl(fd, VIDIOC_QBUF, &vbuf);
+
+	BufferIt(framebuf);
+
+	if (framesdisplayed == 60)
+        {
+            gettimeofday(&nowt, NULL);
+
+            double timediff = (nowt.tv_sec - startt.tv_sec) * 1000000 +
+                             (nowt.tv_usec - startt.tv_usec);
+
+            printf("FPS captured: %f\n", 60000000.0 / timediff);
+
+            startt.tv_sec = nowt.tv_sec;
+            startt.tv_usec = nowt.tv_usec;
+
+            framesdisplayed = 0;
+        }
+        framesdisplayed++;
+    }
+
+    ioctl(fd, VIDIOC_STREAMOFF, &turnon);
+
+    munmap(buffers[0], bufferlen[frame]);
+    munmap(buffers[1], bufferlen[frame]);
+
+#else
 
     struct video_mmap mm;
     struct video_mbuf vm;
@@ -283,11 +445,12 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    unsigned char *buf;
     int frame;
 
-    buf = (unsigned char *)mmap(0, vm.size, PROT_READ|PROT_WRITE, MAP_SHARED, 
-		                fd, 0);
+    unsigned char *buf = (unsigned char *)mmap(0, vm.size, 
+                                               PROT_READ|PROT_WRITE, 
+                                               MAP_SHARED, 
+                                               fd, 0);
     if (buf <= 0)
     {
         perror("mmap");
@@ -298,14 +461,9 @@ void NuppelVideoRecorder::StartRecording(void)
     int channel = 0;
     int volume = -1;
 
-    vchan.channel = channel;
     if (ioctl(fd, VIDIOCGCHAN, &vchan) < 0) 
         perror("VIDIOCGCHAN");
 
-    // choose the right input
-    if (ioctl(fd, VIDIOCSCHAN, &vchan) < 0) 
-        perror("VIDIOCSCHAN");
-  
     // if channel has a audio then activate it
     if ((vchan.flags & VIDEO_VC_AUDIO)==VIDEO_VC_AUDIO) {
         //if (!quiet) 
@@ -321,7 +479,7 @@ void NuppelVideoRecorder::StartRecording(void)
         va.flags &= ~VIDEO_AUDIO_MUTE; // now this really has to work
 
         if ((volume==-1 && va.volume<32768) || volume!=-1) 
-	{
+        {
             if (volume==-1) 
                 va.volume = 32768;            // no more silence 8-)
             else 
@@ -338,28 +496,6 @@ void NuppelVideoRecorder::StartRecording(void)
             fprintf(stderr, "channel '%d' has no tuner (composite)\n", channel);
     }
 
-    vt.tuner = 0;
-    if (ioctl(fd, VIDIOCGTUNER, &vt) < 0)
-        perror("VIDIOCGTUNER");
-    if (ntsc) 
-    { 
-        vt.flags |= VIDEO_TUNER_NTSC;  
-        vt.mode |= VIDEO_MODE_NTSC;
-    }  
-    else 
-    { 
-        vt.flags |= VIDEO_TUNER_PAL;   
-        vt.mode |= VIDEO_MODE_PAL;
-    }     
-
-    vt.tuner = 0;
-    if (ioctl(fd, VIDIOCSTUNER, &vt)<0) 
-        perror("VIDIOCSTUNER");
-        
-    // make sure we use the right input
-    if (ioctl(fd, VIDIOCSCHAN, &vchan)<0) 
-        perror("VIDIOCSCHAN");
-         
     mm.height = h;
     mm.width  = w;
     mm.format = VIDEO_PALETTE_YUV420P    ; /* YCrCb422 */
@@ -374,13 +510,13 @@ void NuppelVideoRecorder::StartRecording(void)
     encoding = true;
 
     while (encoding) {
-	if (paused)
+        if (paused)
         {
             mainpaused = true;
-	    usleep(50);
-	    gettimeofday(&stm, &tzone);
-	    continue;
-	}
+           usleep(50);
+           gettimeofday(&stm, &tzone);
+           continue;
+        }
         frame = 0;
         mm.frame = 0;
         if (ioctl(fd, VIDIOCSYNC, &frame)<0) 
@@ -405,9 +541,8 @@ void NuppelVideoRecorder::StartRecording(void)
 
     printf("closing encoder\n");
     munmap(buf, vm.size);
-    
+#endif
     KillChildren();
-
     close(fd);
 }
 
@@ -443,8 +578,11 @@ void NuppelVideoRecorder::KillChildren(void)
     childrenLive = false;
    
     printf("KillChildren\n"); 
-    if (ioctl(fd, VIDIOCSAUDIO, &origaudio)<0) 
+
+#ifndef V4L2
+    if (ioctl(fd, VIDIOCSAUDIO, &origaudio) < 0)
         perror("VIDIOCSAUDIO");
+#endif
 
     pthread_join(write_tid, NULL);
     pthread_join(audio_tid, NULL);
@@ -458,9 +596,8 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
     int fn;
 
     act = act_video_buffer;
-   
+ 
     if (!videobuffer[act]->freeToBuffer) {
-        // we have to skip the current frame :(
         return;
     }
 
@@ -468,6 +605,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
    
     tcres = (now.tv_sec-stm.tv_sec)*1000 + now.tv_usec/1000 - stm.tv_usec/1000;
 
+#ifndef V4L2
     if (usebttv) {
         if (ioctl(fd, BTTV_FIELDNR, &tf)) 
         {
@@ -485,6 +623,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
                              "\nfalling back to timecode routine to determine lost frames\n");
          }
     }
+#endif
 
     // here is the non preferable timecode - drop algorithm - fallback
     if (!usebttv) 
@@ -511,8 +650,10 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
     oldtc = tcres;
 
     if (!videobuffer[act]->freeToBuffer) 
+    {
         return; // we can't buffer the current frame
-
+    }
+	
     videobuffer[act]->sample = tf;
     videobuffer[act]->timecode = tcres;
 
@@ -552,6 +693,7 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
     if (!ringBuffer->IsOpen()) 
         return(-1);
 
+    memset(&fileheader, 0, sizeof(fileheader));
     memcpy(fileheader.finfo, finfo, sizeof(fileheader.finfo));
     memcpy(fileheader.version, vers, sizeof(fileheader.version));
     fileheader.width  = w;
@@ -569,7 +711,8 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
     fileheader.textsblocks = 0;
     fileheader.keyframedist = KEYFRAMEDISTEND;
     ringBuffer->Write(&fileheader, FILEHEADERSIZE);
-    
+   
+    memset(&frameheader, 0, sizeof(frameheader)); 
     frameheader.frametype = 'D'; // compressor data
     frameheader.comptype  = 'R'; // compressor data for RTjpeg
     frameheader.packetlength = sizeof(tbls);
@@ -640,9 +783,9 @@ void *NuppelVideoRecorder::AudioThread(void *param)
 
 void NuppelVideoRecorder::doAudioThread(void)
 {
-    int afmt,trigger;
-    int afd, act, lastread;
-    int frag, channels, rate, blocksize;
+    int afmt = 0, trigger = 0;
+    int afd = 0, act = 0, lastread = 0;
+    int frag = 0, channels = 0, rate = 0, blocksize = 0;
     unsigned char *buffer;
     long tcres;
 
@@ -825,6 +968,8 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     int raw = 0;
     int timeperframe = 40;
     uint8_t *planes[3];
+
+    memset(&frameheader, 0, sizeof(frameheader));
 
     planes[0] = buf;
     planes[1] = planes[0] + w*h;

@@ -51,6 +51,8 @@ void Channel::SetFormat(const string &format)
     int mode = VIDEO_MODE_AUTO;
     struct video_tuner tuner;
 
+    memset(&tuner, 0, sizeof(tuner));
+
     ioctl(videofd, VIDIOCGTUNER, &tuner);
     
     if (format == "NTSC")
@@ -73,6 +75,8 @@ void Channel::SetFormat(const string &format)
     ioctl(videofd, VIDIOCSTUNER, &tuner);
 
     struct video_channel vc;
+
+    memset(&vc, 0, sizeof(vc));
     ioctl(videofd, VIDIOCGCHAN, &vc);
     vc.norm = mode;
     ioctl(videofd, VIDIOCSCHAN, &vc);

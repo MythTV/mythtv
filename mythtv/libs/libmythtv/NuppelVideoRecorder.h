@@ -3,10 +3,11 @@
 
 #include <string>
 #include <vector>
-#include <linux/videodev.h>
 #include <sys/time.h>
 #include <time.h>
 #include <pthread.h>
+
+#include <linux/videodev.h>
 
 #ifdef MMX
 #undef MMX
@@ -117,7 +118,7 @@ class NuppelVideoRecorder
 
     string audiodevice;
     string videodevice;
-    
+ 
     vector<struct vidbuffertype *> videobuffer;
     vector<struct audbuffertype *> audiobuffer;
 

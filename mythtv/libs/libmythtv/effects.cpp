@@ -1,6 +1,7 @@
 // a linear blending deinterlacer yoinked from the mplayer sources.
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #ifdef MMX
 #include "mmx.h"
@@ -74,7 +75,6 @@ static inline void linearBlend(unsigned char *src, int stride)
 #endif
 }
 
-
 void linearBlendYUV420(unsigned char *yuvptr, int width, int height)
 {
   int stride = width;
@@ -83,14 +83,14 @@ void linearBlendYUV420(unsigned char *yuvptr, int width, int height)
   unsigned char *src;
 
   for (y = 0; y < ymax; y+=8)
-  {
+  {  
     for (x = 0; x < stride; x+=8)
     {
        src = yuvptr + x + y * stride;  
        linearBlend(src, stride);  
     }
   }
-
+ 
   stride = width / 2;
   ymax = height / 2 - 8;
   
@@ -103,7 +103,7 @@ void linearBlendYUV420(unsigned char *yuvptr, int width, int height)
     {
        src = uoff + x + y * stride;
        linearBlend(src, stride);
-
+       
        src = voff + x + y * stride;
        linearBlend(src, stride);
      }

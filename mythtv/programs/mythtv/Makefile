@@ -4,9 +4,9 @@ DO_MAKE = @ for i in $(SUBDIRS); do make -C $$i $@; done
 CXX=g++
 
 #DEBUG=-O0 -g3
-OPT=-O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
+OPT=-O6 -march=pentiumpro -DMMX -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
 
-CXXFLAGS  = -IlibNuppelVideo/ -Wall -DMMX -D_GNU_SOURCE -D_REENTRANT 
+CXXFLAGS  = -IlibNuppelVideo/ -Wall -D_GNU_SOURCE -D_REENTRANT 
 CXXFLAGS += -I/usr/include/mysql $(OPT) $(DEBUG)
 
 CXXCOMPILE = $(CXX) $(CXXFLAGS)

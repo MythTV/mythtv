@@ -1,9 +1,9 @@
 CXX=g++
 
 #DEBUG=-O0 -g3 
-OPT=-O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
+OPT=-O6 -march=pentiumpro -DMMX -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
 
-CXXFLAGS= -Wall -DMMX -D_GNU_SOURCE -D_REENTRANT $(OPT) $(DEBUG)
+CXXFLAGS= -I/usr/src/linux/include -Wall -D_GNU_SOURCE -D_REENTRANT $(OPT) $(DEBUG)
 
 CXXCOMPILE = $(CXX) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) -o $@

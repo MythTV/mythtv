@@ -216,7 +216,6 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     foundit = 0;
     effdsp = 44100;
 
-    
     while (!foundit) 
     {
         ftype = ' ';
@@ -586,7 +585,7 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
 #define MAXPREBUFFERS 60
 void NuppelVideoPlayer::StartPlaying(void)
 {
-    char *X11videobuf;
+    unsigned char *X11videobuf;
     unsigned char *videobuf, *videobuf3;
 
     struct timeval now, last;
@@ -621,7 +620,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     X11videobuf = XJ_init(video_width, video_height, "Mythical Convergence", 
                           "MC-TV");
     videobuf3 = new unsigned char[videosize];
-
+    
     osd = new OSD(video_width, video_height, osdfilename);
 
     playing = true;
@@ -640,6 +639,9 @@ void NuppelVideoPlayer::StartPlaying(void)
     
     //if (getuid() == 0)
     //    nice(-10);
+
+    struct timeval startt, nowt;
+    int framesdisplayed = 0;
 
     while (!eof && !killplayer)
     {
@@ -751,14 +753,9 @@ void NuppelVideoPlayer::StartPlaying(void)
         {
             if (deinterlace)
                 linearBlendYUV420(videobuf3, video_width, video_height);
-	    osd->Display(videobuf3);
-            memcpy(X11videobuf, videobuf3, video_width * video_height);
-            memcpy(X11videobuf + video_width * video_height, videobuf3 +
-                   video_width * video_height * 5 / 4, video_width * 
-                   video_height / 4);
-            memcpy(X11videobuf + video_width * video_height * 5 / 4, 
-                   videobuf3 + video_width * video_height, video_width * 
-                   video_height / 4);
+	   
+            memcpy(X11videobuf, videobuf3, videosize); 
+	    osd->Display(X11videobuf);
 
             XJ_show(video_width, video_height);
 	    framesPlayed++;
@@ -769,9 +766,25 @@ void NuppelVideoPlayer::StartPlaying(void)
 	    framesSkipped++;
 	}
 
+        if (framesdisplayed == 60)
+        {
+            gettimeofday(&nowt, NULL);
+
+            double timediff = (nowt.tv_sec - startt.tv_sec) * 1000000 +
+                             (nowt.tv_usec - startt.tv_usec);
+
+            printf("FPS played: %f\n", 60000000.0 / timediff);
+
+            startt.tv_sec = nowt.tv_sec;
+            startt.tv_usec = nowt.tv_usec;
+
+            framesdisplayed = 0;
+        }
+        framesdisplayed++;
+	
         if (usecs > 0)
         {
-    //        usleep(usecs);
+            //usleep(usecs);
         }
 
         tf++;

@@ -1581,12 +1581,12 @@ lzo_uint do_compress     ( const lzo_byte *in , lzo_uint  in_len,
 #if 0 && defined(__GNUC__) && defined(__i386__)
     register const lzo_byte *ip __asm__("%esi");
 #else
-    register const lzo_byte *ip;
+    register const lzo_byte *ip = NULL;
 #endif
-    lzo_byte *op;
+    lzo_byte *op = NULL;
     const lzo_byte * const in_end = in + in_len;
     const lzo_byte * const ip_end = in + in_len - M2_MAX_LEN - 5;
-    const lzo_byte *ii;
+    const lzo_byte *ii = NULL;
     lzo_dict_p const dict = (lzo_dict_p) wrkmem;
 
     op = out;
@@ -1599,11 +1599,11 @@ lzo_uint do_compress     ( const lzo_byte *in , lzo_uint  in_len,
 #if 0 && defined(__GNUC__) && defined(__i386__)
 	register const lzo_byte *m_pos __asm__("%edi");
 #else
-	register const lzo_byte *m_pos;
+	register const lzo_byte *m_pos = NULL;
 #endif
-	lzo_moff_t m_off;
-	lzo_uint m_len;
-	lzo_uint dindex;
+	lzo_moff_t m_off = 0;
+	lzo_uint m_len = 0;
+	lzo_uint dindex = 0;
 
 	DINDEX1(dindex,ip);
 	GINDEX(m_pos,m_off,dict,dindex,in);
