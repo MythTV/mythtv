@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-02-05, v0.17.00
+  2005-02-06, v0.17.00
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -720,7 +720,7 @@
   http://ivtv.sourceforge.net/ <http://ivtv.sourceforge.net/> such as
   the Hauppauge PVR-250, PVR-350, Avermedia M179, Hauppauge "Freestyle"
   or Yuan M600 cards will allow you to use dedicated hardware encoders
-  rather than your CPU. Release 0.16 of MythTV is able to use these
+  rather than your CPU. Release 0.17 of MythTV is able to use these
   MPEG-2 encoders as an input device for live TV and for scheduled
   recordings.  (The PVR-350 can simultaneously be used as an output
   device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
@@ -1683,7 +1683,7 @@
   [1mwget [22mversion 1.9.1 or higher.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download the latest version (0.5.34).
+  <http://xmltv.sourceforge.net>.  Download the latest version (0.5.38).
 
 
   ______________________________________________________________________
@@ -1887,7 +1887,7 @@
   Untar the xmltv file:
 
 
-       $ tar -xjf xmltv-0.5.34.tar.bz2
+       $ tar -xjf xmltv-0.5.38.tar.bz2
 
 
 
@@ -1911,7 +1911,7 @@
   Change to the XMLTV directory and compile it:
 
 
-       $ cd xmltv-0.5.34
+       $ cd xmltv-0.5.38
        $ perl Makefile.PL
 
 
@@ -1981,8 +1981,8 @@
   Unpack MythTV
 
 
-       $ tar -xjf mythtv-0.16.tar.bz2
-       $ cd mythtv-0.16
+       $ tar -xjf mythtv-0.17.tar.bz2
+       $ cd mythtv-0.17
        $ ./configure
 
 
@@ -2758,7 +2758,7 @@
 
 
 
-       $ cd ~/mythtv-0.16/configfiles
+       $ cd ~/mythtv-0.17/configfiles
        $ cp lircrc.example ~/.lircrc
 
 
@@ -3644,7 +3644,7 @@
   the video image, including hiding the effects of an interlaced image
   or reducing the effects of noise in a poor video signal. The following
   is a brief introduction to introduce you to the filters that are
-  available in MythTV version 0.16.
+  available in MythTV version 0.17.
 
   [1m10.4.2.  Applying filters[0m
 
@@ -4895,8 +4895,8 @@
 
 
 
-       $ tar -xjf mythweb-0.16.tar.bz2
-       $ cd mythweb-0.16
+       $ tar -xjf mythweb-0.17.tar.bz2
+       $ cd mythweb-0.17
        $ su
        # mkdir /var/www/html/mythweb
        # cp -r . /var/www/html/mythweb
@@ -4966,8 +4966,8 @@
   load and install the application:
 
 
-       $ tar -xjf mythgallery-0.16.tar.bz2
-       $ cd mythgallery-0.16
+       $ tar -xjf mythgallery-0.17.tar.bz2
+       $ cd mythgallery-0.17
        $ ./configure --enable-opengl
        $ qmake mythgallery.pro
        $ make

@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-02-05, v0.17.00
+<date>2005-02-06, v0.17.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -381,7 +381,7 @@ encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project <url url="http://ivtv.sourceforge.net/"
 name="http://ivtv.sourceforge.net/"> such as the Hauppauge PVR-250, PVR-350,
 Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. Release 0.16 of MythTV
+use dedicated hardware encoders rather than your CPU. Release 0.17 of MythTV
 is able to use these MPEG-2 encoders as an input device for live TV and for
 scheduled recordings.  (The PVR-350 can simultaneously be used as an output
 device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
@@ -1231,7 +1231,7 @@ grabber which is built-in to MythTV.  You <em>do not</em> need to install
 XMLTV, but you need <bf>wget</bf> version 1.9.1 or higher.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.34).
+name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.38).
 
 <code>
 NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
@@ -1369,7 +1369,7 @@ and skip straight to the XMLTV compilation step.
 <p>
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.34.tar.bz2
+$ tar -xjf xmltv-0.5.38.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites.  The following prerequisites are the
 minimum required; when you actually start running the xmltv setup program it
@@ -1388,7 +1388,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.34
+$ cd xmltv-0.5.38
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1447,8 +1447,8 @@ simplest thing is to immediately start using DataDirect.
 <sect1>Manually building MythTV
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.16.tar.bz2
-$ cd mythtv-0.16
+$ tar -xjf mythtv-0.17.tar.bz2
+$ cd mythtv-0.17
 $ ./configure
 </verb></tscreen>
 
@@ -2123,7 +2123,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.16/configfiles
+$ cd ~/mythtv-0.17/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2915,7 +2915,7 @@ during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
 effects of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
-version 0.16.
+version 0.17.
 <sect2>Applying filters
 <p>One or more filters can be included in a "filter chain". The filters to
 be used are identified in a "filter string". A filter string is a group of
@@ -4121,8 +4121,8 @@ Mandrake Control Center.
 <sect1>Completing the installation
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.16.tar.bz2
-$ cd mythweb-0.16
+$ tar -xjf mythweb-0.17.tar.bz2
+$ cd mythweb-0.17
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4180,8 +4180,8 @@ would perform the following command:
 Once you have satisfied the prerequisites for your distribution, download
 and install the application:
 <tscreen><verb>
-$ tar -xjf mythgallery-0.16.tar.bz2
-$ cd mythgallery-0.16
+$ tar -xjf mythgallery-0.17.tar.bz2
+$ cd mythgallery-0.17
 $ ./configure --enable-opengl
 $ qmake mythgallery.pro
 $ make
