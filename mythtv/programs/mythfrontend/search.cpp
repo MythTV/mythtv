@@ -77,7 +77,7 @@ Search::Search(MythMainWindow *parent, const char *name)
     // Channel
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
 
-    message = tr("Channel:");
+    message = tr("Channel: ");
     label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -153,8 +153,18 @@ Search::Search(MythMainWindow *parent, const char *name)
 
     hbox->addWidget(m_catButton);
 
-    //  What's New Button
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+
+    // Movie Button
+
+    m_movieButton = new MythPushButton( this, "movies" );
+    m_movieButton->setBackgroundOrigin(WindowOrigin);
+    m_movieButton->setText( tr( "Movies" ) );
+    m_movieButton->setEnabled(true);
+
+    hbox->addWidget(m_movieButton);
+
+    //  What's New Button
 
     m_newButton = new MythPushButton( this, "new" );
     m_newButton->setBackgroundOrigin(WindowOrigin);
@@ -187,6 +197,7 @@ Search::Search(MythMainWindow *parent, const char *name)
     connect(m_category, SIGNAL(highlighted(int)), this,
             SLOT(categoryChanged(void)));
     connect(m_catButton, SIGNAL(clicked()), this, SLOT(runCategoryList()));
+    connect(m_movieButton, SIGNAL(clicked()), this, SLOT(runMovieList()));
     connect(m_newButton, SIGNAL(clicked()), this, SLOT(runNewList()));
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
     
@@ -234,7 +245,7 @@ void Search::runDescSearch(void)
 
 void Search::runNewList(void)
 {
-    ProgLister *pl = new ProgLister(plNewListings, m_title->text(),
+    ProgLister *pl = new ProgLister(plNewListings, "",
                                     QSqlDatabase::database(),
                                     gContext->GetMainWindow(), "proglist");
     pl->exec();
@@ -253,6 +264,15 @@ void Search::runChannelList(void)
 void Search::runCategoryList(void)
 {
     ProgLister *pl = new ProgLister(plCategory, m_category->currentText(),
+                                    QSqlDatabase::database(),
+                                    gContext->GetMainWindow(), "proglist");
+    pl->exec();
+    delete pl;
+}
+
+void Search::runMovieList(void)
+{
+    ProgLister *pl = new ProgLister(plMovies, tr("Movie"),
                                     QSqlDatabase::database(),
                                     gContext->GetMainWindow(), "proglist");
     pl->exec();

@@ -32,6 +32,7 @@ class Search : public MythDialog
     void runNewList(void);
     void runChannelList(void);
     void runCategoryList(void);
+    void runMovieList(void);
     void cancelClicked(void);
 
   private:
@@ -42,6 +43,7 @@ class Search : public MythDialog
     MythPushButton *m_chanButton;
     MythComboBox *m_category;
     MythPushButton *m_catButton;
+    MythPushButton *m_movieButton;
     MythPushButton *m_newButton;
     MythPushButton *m_cancelButton;
 };

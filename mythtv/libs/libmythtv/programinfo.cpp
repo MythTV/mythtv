@@ -349,9 +349,10 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
 {
     QString thequery;
 
-    thequery = QString("SELECT channel.chanid,starttime,endtime,title,subtitle,"
-                       "description,category,channel.channum,channel.callsign, "
-                       "channel.name,previouslyshown FROM program,channel ")
+    thequery = QString("SELECT channel.chanid,starttime,endtime,title,"
+                       "subtitle,description,category,channel.channum,"
+                       "channel.callsign,channel.name,previouslyshown "
+                       "FROM program,channel ")
                        + where;
 
     QSqlQuery query = db->exec(thequery);
