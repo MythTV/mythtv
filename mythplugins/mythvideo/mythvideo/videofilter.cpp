@@ -53,6 +53,7 @@ VideoFilterSettings::VideoFilterSettings(VideoFilterSettings *other)
     userrating = other->userrating;
     browse = other->browse;
     orderby = other->orderby;
+    prefix = other->prefix;
 }
 
 VideoFilterSettings::~VideoFilterSettings()
