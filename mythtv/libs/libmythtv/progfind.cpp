@@ -92,10 +92,10 @@ ProgFinder::ProgFinder(MythContext *context,
     progData = new QString[1];
     listCount = 1;
     showsPerListing = m_context->GetNumSetting("showsPerListing");;
+    if (showsPerListing < 1)
+        showsPerListing = 7;
     if (showsPerListing % 2 == 0)
 	showsPerListing = showsPerListing + 1;
-    if (showsPerListing < 1)
-	showsPerListing = 7;
 
     inSearch = 0;
     pastInitial = false;
@@ -135,9 +135,9 @@ ProgFinder::ProgFinder(MythContext *context,
 
     update_Timer->start((int)(100));
 
-//    WFlags flags = getWFlags();
-//    flags |= WRepaintNoErase;
-//    setWFlags(flags);
+    WFlags flags = getWFlags();
+    flags |= WRepaintNoErase;
+    setWFlags(flags);
 
     showInfo = false;
 

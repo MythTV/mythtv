@@ -396,7 +396,7 @@ void GuideGrid::setupColorScheme()
 
 void GuideGrid::createProgramBar(QBoxLayout *holdingTank)
 {
-	QLabel *leftFiller;
+	QLabel *leftFiller = NULL;
         QLabel *currentButton = new QLabel("   (4) Current Programs   ", this);
         QLabel *futureButton = new QLabel("   (6) Program Finder   ", this);
         QLabel *rightFiller = new QLabel("   ", this);
@@ -449,7 +449,7 @@ void GuideGrid::createProgramBar(QBoxLayout *holdingTank)
         QHBoxLayout *bottomInfo = new QHBoxLayout(0, 0, 0);
 	if (programGuideType ==0 && showProgramBar == 1)
         	bottomInfo->addWidget(currentTime, 0, 0);
-	else
+	else if (leftFiller)
 		bottomInfo->addWidget(leftFiller, 0, 0);
         bottomInfo->addWidget(currentButton, 0, 0);
         bottomInfo->addWidget(futureButton, 0, 0);
