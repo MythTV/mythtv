@@ -828,31 +828,39 @@ void ScheduledRecording::setAvailableOptions(void)
 
 void ScheduledRecording::runProgList(void)
 {
-    ProgLister *pl;
+    ProgLister *pl = NULL;
 
-    switch (search->getValue().toInt())
+    if (!m_pginfo)
     {
-    case kTitleSearch:
-        pl = new ProgLister(plTitleSearch, description->getValue(),
-                            QSqlDatabase::database(),
-                            gContext->GetMainWindow(), "proglist");
-	break;
-    case kKeywordSearch:
-        pl = new ProgLister(plKeywordSearch, description->getValue(),
-                            QSqlDatabase::database(),
-                            gContext->GetMainWindow(), "proglist");
-	break;
-    case kPeopleSearch:
-        pl = new ProgLister(plPeopleSearch, description->getValue(),
-                            QSqlDatabase::database(),
-                            gContext->GetMainWindow(), "proglist");
-	break;
-    default:
-        pl = new ProgLister(plTitle, title->getValue(),
-                            QSqlDatabase::database(),
-                            gContext->GetMainWindow(), "proglist");
-	break;
+        switch (search->intValue())
+        {
+        case kTitleSearch:
+            pl = new ProgLister(plTitleSearch, description->getValue(),
+                                QSqlDatabase::database(),
+                                gContext->GetMainWindow(), "proglist");
+            break;
+        case kKeywordSearch:
+            pl = new ProgLister(plKeywordSearch, description->getValue(),
+                                QSqlDatabase::database(),
+                                gContext->GetMainWindow(), "proglist");
+            break;
+        case kPeopleSearch:
+            pl = new ProgLister(plPeopleSearch, description->getValue(),
+                                QSqlDatabase::database(),
+                                gContext->GetMainWindow(), "proglist");
+            break;
+        default:
+  	    pl = new ProgLister(plTitle, title->getValue(),
+  	                        QSqlDatabase::database(),
+  	                        gContext->GetMainWindow(), "proglist");
+            break;
         }
+    }
+    else
+        pl = new ProgLister(plTitle, m_pginfo->title,
+                            QSqlDatabase::database(),
+                            gContext->GetMainWindow(), "proglist");
+
     pl->exec();
     delete pl;
     proglistButton->setFocus();

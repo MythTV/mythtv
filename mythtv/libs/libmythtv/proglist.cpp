@@ -36,6 +36,14 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     channelOrdering = gContext->GetSetting("ChannelOrdering", "channum + 0");
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
 
+    switch (pltype)
+    {
+        case plTitleSearch:   searchtype = kTitleSearch;   break;
+        case plKeywordSearch: searchtype = kKeywordSearch; break;
+        case plPeopleSearch:  searchtype = kPeopleSearch;  break;
+        default:              searchtype = kNoSearch;      break;
+    }
+
     allowEvents = true;
     allowUpdates = true;
     updateAll = false;
@@ -367,20 +375,23 @@ void ProgLister::setViewFromEdit(void)
     int oldview = chooseListBox->currentItem() - 1;
     int newview = viewList.findIndex(text);
 
+    QString querystr = NULL;
+
     if (newview < 0 || newview != oldview)
     {
         if (oldview >= 0)
         {
-            QString querystr = QString("DELETE FROM keyword "
-                                       "WHERE phrase = '%1';")
-                                       .arg(viewList[oldview].utf8());
+            querystr = QString("DELETE FROM keyword "
+                               "WHERE phrase = '%1' AND searchtype = '%2';")
+                               .arg(viewList[oldview].utf8()).arg(searchtype);
             QSqlQuery query;
             query.exec(querystr);
         }
         if (newview < 0)
         {
-            QString querystr = QString("REPLACE INTO keyword "
-                                       "VALUES('%1');").arg(text.utf8());
+            querystr = QString("REPLACE INTO keyword (phrase, searchtype)"
+                               "VALUES('%1','%2');")
+                               .arg(text.utf8()).arg(searchtype);
             QSqlQuery query;
             query.exec(querystr);
         }
@@ -404,26 +415,14 @@ void ProgLister::addSearchRecord(void)
     if (text.stripWhiteSpace().length() == 0)
         return;
 
-    RecSearchType recsearch;
-
-    switch (type)
+    if (searchtype == kNoSearch)
     {
-    case plTitleSearch:
-        recsearch = kTitleSearch;
-        break;
-    case plKeywordSearch:
-        recsearch = kKeywordSearch;
-        break;
-    case plPeopleSearch:
-        recsearch = kPeopleSearch;
-        break;
-    default:
-        cerr << "Unknown search in ProgLister" << endl;
+        VERBOSE(VB_IMPORTANT, "Unknown search in ProgLister");
         return;
     }
 
     ScheduledRecording record;
-    record.loadBySearch(db, recsearch, text);
+    record.loadBySearch(db, searchtype, text);
     record.exec(db);
     ScheduledRecording::signalChange(db);
 
@@ -442,8 +441,9 @@ void ProgLister::deleteKeyword(void)
 
     QString text = viewList[view];
 
-    QString querystr = QString("DELETE FROM keyword WHERE phrase = '%1';")
-                               .arg(text.utf8());
+    QString querystr = QString("DELETE FROM keyword "
+                               "WHERE phrase = '%1' AND searchtype = '%2';")
+                               .arg(text.utf8()).arg(searchtype);
     QSqlQuery query;
     query.exec(querystr);
 
@@ -673,7 +673,9 @@ void ProgLister::fillViewList(const QString &view)
     else if (type == plTitleSearch || type == plKeywordSearch ||
              type == plPeopleSearch)
     {
-        QString querystr = "SELECT phrase FROM keyword;";
+        QString querystr = QString("SELECT phrase FROM keyword "
+                                   "WHERE searchtype = '%1';")
+                                   .arg(searchtype);
         QSqlQuery query;
         query.exec(querystr);
         if (query.isActive() && query.numRowsAffected())

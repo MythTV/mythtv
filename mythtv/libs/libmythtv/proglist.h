@@ -7,6 +7,7 @@
 #include "libmyth/mythwidgets.h"
 #include "libmyth/mythdialogs.h"
 #include "libmythtv/programinfo.h"
+#include "libmythtv/scheduledrecording.h"
 
 enum ProgListType {
     plUnknown = 0,
@@ -60,6 +61,8 @@ class ProgLister : public MythDialog
     QString timeFormat;
     QString channelOrdering;
     QString channelFormat;
+
+    RecSearchType searchtype;
 
     int curView;
     int viewCount;
