@@ -357,7 +357,7 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e) {
 QDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
                                            const char* widgetName) {
     QDialog* dialog = new ConfigurationDialogWidget(parent, widgetName);
-    QVBoxLayout* layout = new QVBoxLayout(dialog);
+    QVBoxLayout* layout = new QVBoxLayout(dialog, 20);
     layout->addWidget(configWidget(dialog));
 
     return dialog;

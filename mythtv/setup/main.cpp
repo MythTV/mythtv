@@ -115,6 +115,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    context->LoadQtConfig();
+
     char *home = getenv("HOME");
     QString fileprefix = QString(home) + "/.mythtv";
 

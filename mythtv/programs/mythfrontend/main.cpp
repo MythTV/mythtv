@@ -216,7 +216,7 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
 
     MythContext *context = new MythContext;
-    //context->ConnectServer("localhost", 6543);
+    context->ConnectServer("localhost", 6543);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
