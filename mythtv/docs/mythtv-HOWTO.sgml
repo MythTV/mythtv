@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-28, v2.24
+<date>2003-04-29, v2.25
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3120,7 +3120,7 @@ Works with btaudio:
 
 <itemize>
 <item>Hauppauge WinTV-radio with dbx-TV stereo, model 401
-<item>Hauppauge WinTV-Theater, model 495
+<item>Hauppauge WinTV-Theater, model 495, 498 (Europe)
 <item>ATI TV Wonder
 </itemize>
 
@@ -3350,6 +3350,7 @@ and the nfsvers is required for filesizes over 2GB.
 
 <label id="mythbackend_autostart">
 <sect1>I'd like to automatically start mythbackend at system boot time.
+<sect2>Red Hat And Mandrake
 <p>Here's a method for automatically starting mythbackend submitted by Mike
 Thomson (<url url="mailto:linux@m-thomson.net" name="mailto:linux@m-thomson.net">) and Stu Tomlinson (<url
 url="mailto:stu@nosnilmot.com" name="mailto:stu@nosnilmot.com">).
@@ -3388,7 +3389,7 @@ $ su
 $
 </verb></tscreen>
 
-<sect2>Log files 
+<sect3>Log files 
 <p>By default, the log file for mythbackend will be written to
 <tt>/var/tmp/mythbackend.log</tt>. This has been tested and is known to work
 on Mandrake and Red Hat, but many people prefer to place logs under
@@ -3412,7 +3413,7 @@ drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
 $
 </verb></tscreen>
 
-<sect2>Mandrake 9.x
+<sect3>Mandrake 9.x
 <p>Mandrake adds one more twist in the form of the <tt>msec</tt> utility,
 which runs regularly and (at the default or any higher security level) sets
 permissions on many files, including those under <tt>/var/log</tt>.
@@ -3451,7 +3452,24 @@ $
 you don't get the results you expect, check that you're not asking
 <tt>msec</tt> to add missing permissions to the files or directories you
 created.
+<sect2>Gentoo
+<p>The portage file for MythTV has scripts that will allow you to run
+mythbackend at startup.
 
+To run mythbackend as a daemon which starts at boot time:
+<tscreen><verb>
+# rc-update add mythbackend default
+</verb></tscreen>
+
+To stop mythbackend as a daemon:
+<tscreen><verb>
+# /etc/init.d/mythbackend stop
+</verb></tscreen>
+
+To obtain a list of options:
+<tscreen><verb>
+# /etc/init.d/mythbackend
+</verb></tscreen>
 
 </article>
 <!-- Revision History
@@ -3502,6 +3520,8 @@ More information on saving the mysql database.
 v2.23, 2003-04-28.  XMLTV version.  mythbackend startup as a daemon.
 Normalized spacing between tscreen tag and text.
 v2.24, 2003-04-28.  canada-cable.
+v2.25, 2003-04-29.  Additional btaudio card.  Added instructions for gentoo
+mythbackend auto-start.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -261,7 +261,7 @@ Works with btaudio:</P>
 <P>
 <UL>
 <LI>Hauppauge WinTV-radio with dbx-TV stereo, model 401</LI>
-<LI>Hauppauge WinTV-Theater, model 495</LI>
+<LI>Hauppauge WinTV-Theater, model 495, 498 (Europe)</LI>
 <LI>ATI TV Wonder</LI>
 </UL>
 </P>
@@ -511,6 +511,8 @@ and the nfsvers is required for filesizes over 2GB.</P>
 <H2><A NAME="ss19.12">19.12</A> <A HREF="mythtv-HOWTO.html#toc19.12">I'd like to automatically start mythbackend at system boot time.</A>
 </H2>
 
+<H3>Red Hat And Mandrake</H3>
+
 <P>Here's a method for automatically starting mythbackend submitted by Mike
 Thomson (
 <A HREF="mailto:linux@m-thomson.net">mailto:linux@m-thomson.net</A>) and Stu Tomlinson (
@@ -625,7 +627,31 @@ $
 you don't get the results you expect, check that you're not asking
 <CODE>msec</CODE> to add missing permissions to the files or directories you
 created.</P>
+<H3>Gentoo</H3>
 
+<P>The portage file for MythTV has scripts that will allow you to run
+mythbackend at startup.</P>
+<P>To run mythbackend as a daemon which starts at boot time:
+<BLOCKQUOTE><CODE>
+<PRE>
+# rc-update add mythbackend default
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>To stop mythbackend as a daemon:
+<BLOCKQUOTE><CODE>
+<PRE>
+# /etc/init.d/mythbackend stop
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>To obtain a list of options:
+<BLOCKQUOTE><CODE>
+<PRE>
+# /etc/init.d/mythbackend
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <HR>
 Next

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-28, v2.24
+  2003-04-29, v2.25
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -155,8 +155,10 @@
      19.10 I'd like to use a hardware MPEG-2 encoder.
      19.11 I'd like to use NFS.
      19.12 I'd like to automatically start mythbackend at system boot time.
-        19.12.1 Log files
-        19.12.2 Mandrake 9.x
+        19.12.1 Red Hat And Mandrake
+           19.12.1.1 Log files
+           19.12.1.2 Mandrake 9.x
+        19.12.2 Gentoo
 
   ______________________________________________________________________
 
@@ -201,7 +203,6 @@
   environment.  If you have installation instructions for a different
   region or Linux distribution, please send them to the author so that
   it can be included in other versions of this document.
-
   Erik Arendse has setup a website that focuses on running MythTV in a
   non-North American environment.  See the website at
   http://www.home.zonnet.nl/erik_nospam.arendse/
@@ -3333,7 +3334,7 @@
 
   +o  Hauppauge WinTV-radio with dbx-TV stereo, model 401
 
-  +o  Hauppauge WinTV-Theater, model 495
+  +o  Hauppauge WinTV-Theater, model 495, 498 (Europe)
 
   +o  ATI TV Wonder
 
@@ -3552,6 +3553,8 @@
   [1m19.12.  I'd like to automatically start mythbackend at system boot[0m
   [1mtime.[0m
 
+  [1m19.12.1.  Red Hat And Mandrake[0m
+
   Here's a method for automatically starting mythbackend submitted by
   Mike Thomson (mailto:linux@m-thomson.net <mailto:linux@m-thomson.net>)
   and Stu Tomlinson (mailto:stu@nosnilmot.com
@@ -3587,7 +3590,7 @@
        # exit
        $
 
-  [1m19.12.1.  Log files[0m
+  [1m19.12.1.1.  Log files[0m
 
   By default, the log file for mythbackend will be written to
   /var/tmp/mythbackend.log. This has been tested and is known to work on
@@ -3611,7 +3614,7 @@
        drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
        $
 
-  [1m19.12.2.  Mandrake 9.x[0m
+  [1m19.12.1.2.  Mandrake 9.x[0m
 
   Mandrake adds one more twist in the form of the msec utility, which
   runs regularly and (at the default or any higher security level) sets
@@ -3646,4 +3649,21 @@
   [1mNOTE[22m: msec can only [4mreduce[24m the permissions of files, so if you don't
   get the results you expect, check that you're not asking msec to add
   missing permissions to the files or directories you created.
+
+  [1m19.12.2.  Gentoo[0m
+
+  The portage file for MythTV has scripts that will allow you to run
+  mythbackend at startup.
+
+  To run mythbackend as a daemon which starts at boot time:
+
+       # rc-update add mythbackend default
+
+  To stop mythbackend as a daemon:
+
+       # /etc/init.d/mythbackend stop
+
+  To obtain a list of options:
+
+       # /etc/init.d/mythbackend
 
