@@ -225,9 +225,11 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
         use_shm = 0;
     }
 
+#ifndef QWS
     GetMythTVGeometry(data->XJ_disp, XJ_screen_num,
                       &XJ_screenx, &XJ_screeny, 
                       &XJ_screenwidth, &XJ_screenheight);
+#endif
 
     oldx = curx = XJ_screenx + 4; 
     oldy = cury = XJ_screeny + 20;

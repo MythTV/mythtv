@@ -9,7 +9,9 @@ CONFIG += thread
 include ( ../settings.pro )
 
 INCLUDEPATH += ../libs/
-LIBS += -lmyth-$$LIBVERSION -lmythtv -lXinerama -L../libs/libmyth -L../libs/libmythtv -L/usr/local/lib
+LIBS += -L../libs/libmyth -L../libs/libmythtv 
+LIBS += -lmyth-$$LIBVERSION -lmythtv
+LIBS += $$EXTRA_LIBS
 
 DEPENDPATH += ../../libs/libmyth
 

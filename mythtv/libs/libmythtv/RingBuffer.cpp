@@ -403,13 +403,10 @@ void RingBuffer::TransitionToFile(const QString &lfilename)
 // guaranteed to be paused, so don't need to lock this
 void RingBuffer::TransitionToRing(void)
 {
-    pthread_rwlock_wrlock(&rwlock);
-
+    dumpfw->Seek(0, SEEK_CUR);
     delete dumpfw;
     dumpfw = NULL;
     dumpwritepos = 0;
-
-    pthread_rwlock_unlock(&rwlock);
 }
 
 void RingBuffer::Reset(void)

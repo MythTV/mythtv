@@ -1286,8 +1286,10 @@ void ThemedMenu::ReloadTheme(void)
 
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    int x, y, w, h;
+    int x = 0, y = 0, w, h;
+#ifndef QWS
     GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
+#endif
 
     setGeometry(x, y, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));

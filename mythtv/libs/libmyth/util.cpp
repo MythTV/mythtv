@@ -8,10 +8,12 @@ using namespace std;
 #include "util.h"
 #include "mythcontext.h"
 
+#ifndef QWS
 extern "C" {
 #include <X11/Xlib.h>
 #include <X11/extensions/Xinerama.h>
 }
+#endif
 
 #include <qimage.h>
 #include <qpainter.h>
@@ -179,6 +181,7 @@ long long decodeLongLong(QStringList &list, int offset)
     return retval;
 } 
 
+#ifndef QWS
 void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y, 
                        int *w, int *h) 
 {
@@ -220,6 +223,7 @@ void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y,
         *x = 0; *y = 0;
     }
 }
+#endif
 
 QRgb blendColors(QRgb source, QRgb add, int alpha)
 {

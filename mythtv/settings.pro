@@ -17,3 +17,4 @@ release {
         QMAKE_CXXFLAGS_RELEASE = -O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations
 }
 
+EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext
