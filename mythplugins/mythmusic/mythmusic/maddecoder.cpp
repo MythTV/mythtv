@@ -547,12 +547,17 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
 
     QString artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
-    id3_file *id3file;
+    id3_file *id3file = NULL;
 
-    if (!ignore_id3 &&
-	(id3file = id3_file_open(filename.local8Bit(), 
-				 ID3_FILE_MODE_READONLY)))
-      {
+    if (!ignore_id3)
+    {
+        id3file = id3_file_open(filename.local8Bit(), ID3_FILE_MODE_READONLY);
+        if (!id3file)
+            id3file = id3_file_open(filename.ascii(), ID3_FILE_MODE_READONLY);
+    }
+
+    if (id3file)
+    {
         id3_tag *tag = id3_file_tag(id3file);
 
         if (!tag)
@@ -629,6 +634,7 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
 
         id3_file_close(id3file);
     }
+
     if(title.isEmpty())
     {
         getMetadataFromFilename(filename, QString(".mp3$"), artist, album, 
@@ -648,6 +654,12 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
     timer = mad_timer_zero;
 
     FILE *input = fopen(filename.local8Bit(), "r");
+    if (!input)
+        input = fopen(filename.ascii(), "r");
+
+    if (!input)
+        return NULL;
+
     struct stat s;
     fstat(fileno(input), &s);
     unsigned long old_bitrate = 0;
