@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-28, v2.23
+<date>2003-04-28, v2.24
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2871,6 +2871,18 @@ they run.  The following window managers are known to work correctly:
 "http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html"
 name="http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html">
 
+<sect1>Where's my "canada-cable" entry gone to? 
+<p>There is no such thing as "Canada Cable"; Canada uses the same
+frequencies as the United States.  "Canada Cable" was a hack that some
+people used when they would discover that their channels were off-by-one,
+ie, when tuning to channel 42, they might get channel 41 or 43.  This is
+actually due to the tuner on the video capture device being mis-detected. 
+You must manually specify the tuner type in your <tt>/etc/modules.conf</tt>. 
+See the video4linux mailing list (<url
+url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
+name="https://listman.redhat.com/mailman/listinfo/video4linux-list">) for
+more information.
+
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. 
 <p>Matthew Zimmerman has created a patch for MPlayer / Mencoder <url
@@ -3489,6 +3501,7 @@ v2.22, 2003-04-26.  PVR250 ptune.pl command.  Modify the ld.so.conf example.
 More information on saving the mysql database.
 v2.23, 2003-04-28.  XMLTV version.  mythbackend startup as a daemon.
 Normalized spacing between tscreen tag and text.
+v2.24, 2003-04-28.  canada-cable.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

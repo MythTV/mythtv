@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-28, v2.23
+  2003-04-28, v2.24
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -136,6 +136,7 @@
      18.13 The mythbackend program told me to look at this section.
      18.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
      18.15 My PVR-250 card doesn't show inputs in the setup screen.
+     18.16 Where's my "canada-cable" entry gone to?
 
   19. Miscellaneous.
      19.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -331,6 +332,7 @@
   the disk faster.  MPEG-4 requires more CPU, but the files are smaller.
   At the default resolution, MPEG-2 creates the largest files of all
   with almost no CPU impact.
+
   See the Troubleshooting ``section'' for more information.
 
   [1m3.1.4.  Video Capture Device[0m
@@ -387,7 +389,6 @@
   +o  An Athlon 1Ghz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
      CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and
      approximately 30% for Live TV at 416x480.
-
   +o  A P3-550 can decode a 480x480 16Mbps MPEG-2 file with 55% CPU.
 
   +o  A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
@@ -3070,6 +3071,19 @@
   <http://lists.snowman.net/pipermail/mythtv-
   users/2003-April/002527.html>
 
+  [1m18.16.  Where's my "canada-cable" entry gone to?[0m
+
+  There is no such thing as "Canada Cable"; Canada uses the same
+  frequencies as the United States.  "Canada Cable" was a hack that some
+  people used when they would discover that their channels were off-by-
+  one, ie, when tuning to channel 42, they might get channel 41 or 43.
+  This is actually due to the tuner on the video capture device being
+  mis-detected.  You must manually specify the tuner type in your
+  /etc/modules.conf.  See the video4linux mailing list
+  (https://listman.redhat.com/mailman/listinfo/video4linux-list
+  <https://listman.redhat.com/mailman/listinfo/video4linux-list>) for
+  more information.
+
   [1m19.  Miscellaneous.[0m
 
   [1m19.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -3137,7 +3151,6 @@
 
   In PAL, there are 625 "raw" lines of resolution, with a net of 576
   vertical lines.
-
   Horizontally, the maximum you can expect from a Bt8X8 chip is 720.
 
   With this in mind, there are certain commonly accepted values for
@@ -3202,7 +3215,6 @@
 
   The MythTV GUI uses its GUI dimensions regardless of the other two and
   is anchored to the upper left corner of the X Desktop.
-
   The MythTV full screen mode uses the X display size dimensions
   regardless of the other two and is anchored to the upper left corner
   of the X display.
@@ -3274,6 +3286,7 @@
   picture uses the recording resolution for its dimensions. If you check
   the box "Fixed Aspect Ratio" in Setup->Playback, the windowed picture
   will always be resized to normal 4:3 shape.
+
   [1m19.6.  I'd like to save or restore my database[0m
 
   See the [1mmysqldump [22mmanpage for more information.
@@ -3428,12 +3441,12 @@
 
   Add the following to /etc/modules.conf:
 
-  alias char-major-81     videodev
-  alias char-major-81-0   ivtv
-  options ivtv
-  options tuner type=2
-  options msp3400 once=1 simple=1
-  add below ivtv msp3400 saa7115 tuner
+       alias char-major-81     videodev
+       alias char-major-81-0   ivtv
+       options ivtv
+       options tuner type=2
+       options msp3400 once=1 simple=1
+       add below ivtv msp3400 saa7115 tuner
 
   [1mNOTE[22m:  You must specify the tuner type manually.  See
   ~/ivtv/ivtv/driver/tuner.h for a listing of tuners.  In the above
