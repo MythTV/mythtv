@@ -1098,7 +1098,15 @@ void TV::TogglePIPView(void)
         while (!nvp->PipPlayerSet())
             usleep(50);
 
+        piprbuffer->StopReads();
+        piprbuffer->Pause();
+        while (!piprbuffer->isPaused())
+            usleep(50);
+
+        pipnvp->StopPlaying();
+
         piprecorder->StopLiveTV();	
+
         TeardownPipPlayer();        
     }
 }
