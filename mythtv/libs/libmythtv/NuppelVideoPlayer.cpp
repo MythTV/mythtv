@@ -19,7 +19,6 @@ using namespace std;
 #include "NuppelVideoRecorder.h"
 #include "minilzo.h"
 #include "XJ.h"
-#include "effects.h"
 #include "yuv2rgb.h"
 #include "osdtypes.h"
 #include "remoteutil.h"
