@@ -340,6 +340,8 @@ void LCD::init()
     lcd_showvolume=(gContext->GetSetting("LCDShowVolume", "1")=="1");
     lcd_showmenu=(gContext->GetSetting("LCDShowMenu", "1")=="1");
     lcd_backlighton=(gContext->GetSetting("LCDBacklightOn", "1")=="1");
+    aString = gContext->GetSetting("LCDPopupTime", "5");
+    lcd_popuptime = aString.toInt() * 1000;
 
     connected = TRUE;
 
@@ -831,7 +833,7 @@ void LCD::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
     popMenuTimer->stop();
     // Start the unPop timer if this is a popup menu
     if (popMenu)
-        popMenuTimer->start(5000, true);
+        popMenuTimer->start(lcd_popuptime, true);
 
     // QPtrListIterator doesn't contain a deep copy constructor. . .
     // This will contain a copy of the menuItems for scrolling purposes

@@ -2330,6 +2330,16 @@ static HostCheckBox *LCDShowMenu()
     return gc;
 }
 
+static HostSpinBox *LCDPopupTime()
+{
+    HostSpinBox *gs = new HostSpinBox("LCDPopupTime", 1, 300, 1, true);
+    gs->setLabel(QObject::tr("Menu Pop-up Time"));
+    gs->setHelpText(QObject::tr("The time (in seconds) that the menu will "
+                    "remain visible after navigation."));
+    gs->setValue(5);
+    return gs;
+}
+
 static HostCheckBox *LCDShowMusic()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowMusic");
@@ -2908,6 +2918,7 @@ AppearanceSettings::AppearanceSettings()
     lcdscreen->setLabel(QObject::tr("LCD device display"));
     lcdscreen->addChild(LCDShowTime());
     lcdscreen->addChild(LCDShowMenu());
+    lcdscreen->addChild(LCDPopupTime());
     lcdscreen->addChild(LCDShowMusic());
     lcdscreen->addChild(LCDShowChannel());
     lcdscreen->addChild(LCDShowVolume());

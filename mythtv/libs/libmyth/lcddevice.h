@@ -281,6 +281,7 @@ class LCD : public QObject
     bool lcd_showchannel;
     bool lcd_showvolume;
     bool lcd_backlighton;
+    int  lcd_popuptime;
 
     int (*GetLEDMask)(void);
 };
