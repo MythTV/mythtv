@@ -18,7 +18,7 @@ extern "C" {
 using namespace std;
 
 #define MAXVBUFFER 31
-#define MAXTBUFFER 11
+#define MAXTBUFFER 21
 
 #define REENCODE_OK              1
 #define REENCODE_CUTLIST_CHANGE -1
