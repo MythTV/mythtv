@@ -353,6 +353,8 @@ static int JACK_callback (nframes_t nframes, void *arg)
   jack_driver_t* drv = (jack_driver_t*)arg;
   unsigned int i;
 
+  gettimeofday(&drv->previousTime, 0); /* record the current time */
+
 #if CALLBACK_TRACE
   TRACE("nframes %ld, sizeof(sample_t) == %d\n", (long)nframes, sizeof(sample_t));
 #endif
@@ -536,7 +538,6 @@ static int JACK_callback (nframes_t nframes, void *arg)
     } /* while(jackFramesAvailable && drv->pPlayPtr) */
 
 
-    gettimeofday(&drv->previousTime, 0); /* record the current time */
     drv->written_client_bytes+=read;
     drv->played_client_bytes+=drv->clientBytesInJack; /* move forward by the previous bytes we wrote since those must have finished by now */
     drv->clientBytesInJack = read; /* record the input bytes we wrote to jack */
@@ -590,7 +591,6 @@ static int JACK_callback (nframes_t nframes, void *arg)
 #if CALLBACK_TRACE
       TRACE("PAUSED or STOPPED or CLOSED, outputting silence\n");
 #endif
-      gettimeofday(&drv->previousTime, 0); /* record the current time */
 
       /* output silence if nothing is being outputted */
       for(i = 0; i < drv->num_output_channels; i++)
