@@ -818,6 +818,8 @@ void grabData(Source source, int offset)
                         offset, configfile.ascii(), filename.ascii());
 
 
+    cout << "Fetching data for " <<
+         QDate::currentDate().addDays(offset).toString() << "...\n";
     cout << "----------------- Start of XMLTV output -----------------" << endl;
  
      system(command.ascii());
