@@ -351,6 +351,8 @@ void MythContextPrivate::StoreGUIsettings()
 
     m_wmult = m_screenwidth  / (float)m_baseWidth;
     m_hmult = m_screenheight / (float)m_baseHeight;
+    
+    //VERBOSE(VB_ALL, QString("GUI multipliers are: width %1, height %2").arg(m_wmult).arg(m_hmult));
 }
 
 
@@ -915,8 +917,8 @@ void MythContext::LoadQtConfig(void)
         // Note the possibly changed screen settings
         d->GetScreenBounds();
     }
-    // Recalculate GUI dimensions
-    d->StoreGUIsettings();
+    
+    
 
     if (d->m_qtThemeSettings)
         delete d->m_qtThemeSettings;
@@ -940,7 +942,9 @@ void MythContext::LoadQtConfig(void)
         VERBOSE( VB_ALL, QString("Switching to square mode (%1)").arg(themename));
         d->SetSquareMode();
     }
-
+    
+    // Recalculate GUI dimensions
+    d->StoreGUIsettings();
         
     d->m_themepathname = themedir + "/";
     
