@@ -317,7 +317,7 @@ void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,
 
     int maxlength = m_displaysize.width();
 
-    if (m_multiline && textlength > maxlength)
+    if (m_multiline)
     {
         QString tmp_msg = m_message;
         tmp_msg.replace(QRegExp("%BR%"), "\n");
