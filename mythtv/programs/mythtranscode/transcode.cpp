@@ -63,7 +63,7 @@ class AudioReencodeBuffer : public AudioOutput
     }
 
     // timecode is in milliseconds.
-    virtual void AddSamples(char *buffer, int samples, long long timecode)
+    virtual bool AddSamples(char *buffer, int samples, long long timecode)
     {
         int freebuf = bufsize - audiobuffer_len;
 
@@ -81,9 +81,11 @@ class AudioReencodeBuffer : public AudioOutput
         audiobuffer_len += samples * bytes_per_sample;
         // last_audiotime is at the end of the sample
         last_audiotime = timecode + samples * 1000 / eff_audiorate;
+
+        return true;
     }
 
-    virtual void AddSamples(char *buffers[], int samples, long long timecode)
+    virtual bool AddSamples(char *buffers[], int samples, long long timecode)
     {
         int audio_bytes = bits / 8;
         int freebuf = bufsize - audiobuffer_len;
@@ -109,6 +111,8 @@ class AudioReencodeBuffer : public AudioOutput
 
         // last_audiotime is at the end of the sample
         last_audiotime = timecode + samples * 1000 / eff_audiorate;
+
+        return true;
     }
 
     virtual void SetTimecode(long long timecode)
@@ -122,6 +126,11 @@ class AudioReencodeBuffer : public AudioOutput
     virtual void Pause(bool paused)
     {
         (void)paused;
+    }
+    virtual void Drain(void)
+    {
+        // Do nothing
+        return;
     }
 
     virtual int GetAudiotime(void)

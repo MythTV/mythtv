@@ -2097,12 +2097,16 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
             }
 
             samples = outcount;
-            audioOutput->AddSamples((char *)newbuffer, samples, timecode);
+            if (!audioOutput->AddSamples((char *)newbuffer, samples, timecode))
+               VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
         }
         else
-            audioOutput->AddSamples(buffer, len /
-                                    (audio_channels * audio_bits / 8),
-                                    timecode);
+        {
+            if (!audioOutput->AddSamples(buffer, len /
+                                         (audio_channels * audio_bits / 8),
+                                         timecode))
+                VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
+        }
     }
 }
 
@@ -2165,7 +2169,8 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
             samples = outcount;
         }
 
-        audioOutput->AddSamples(buffers, samples, timecode);
+        if (!audioOutput->AddSamples(buffers, samples, timecode))
+            VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
     }
 }
 

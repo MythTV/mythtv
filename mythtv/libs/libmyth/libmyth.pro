@@ -15,7 +15,7 @@ HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h mythdbcon.h
 HEADERS += mythdialogs.h audiooutput.h inetcomms.h httpcomms.h mythmedia.h 
 HEADERS += uilistbtntype.h uiphoneentry.h generictree.h screensaver.h
 HEADERS += managedlist.h DisplayRes.h volumebase.h audiooutputbase.h
-HEADERS += dbsettings.h screensaver-null.h
+HEADERS += dbsettings.h screensaver-null.h output.h visual.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
@@ -24,7 +24,7 @@ SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp inetcomms.cpp
 SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp uiphoneentry.cpp
 SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp
 SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
-SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp
+SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
 
 LIBS += -L../libmythsamplerate
 LIBS += -lmythsamplerate-$${LIBVERSION}
@@ -44,6 +44,7 @@ inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h
 inc.files += uilistbtntype.h uiphoneentry.h generictree.h managedlist.h
+inc.files += visual.h volumebase.h output.h
 
 using_oss {
     SOURCES += audiooutputoss.cpp

@@ -650,13 +650,15 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
         return false;
     }
 
+    // called with the lock
     QString str = QString("ANN Playback %1 %2")
                          .arg(d->m_localhostname).arg(false);
     QStringList strlist = str;
     WriteStringList(d->serverSock, strlist);
     ReadStringList(d->serverSock, strlist, true);
-    
-    d->eventSock->connectToHost(hostname, port);
+
+    if (d->eventSock->state() == QSocket::Idle)    
+        d->eventSock->connectToHost(hostname, port);
     
     return true;
 }
@@ -671,7 +673,11 @@ QString MythContext::GetMasterHostPrefix(void)
     QString ret = "";
 
     if (!d->serverSock)
+    {
+        d->serverSockLock.lock();
         ConnectToMasterServer();
+        d->serverSockLock.unlock();
+    }
     
     if (d->serverSock)
         ret = QString("myth://%1:%2/")
@@ -1693,8 +1699,6 @@ void MythContext::SetSetting(const QString &key, const QString &newValue)
     d->m_settings->SetSetting(key, newValue);
 }
 
-
-
 bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
 {
     d->serverSockLock.lock();
@@ -1756,7 +1760,10 @@ void MythContext::EventSocketRead(void)
         QString prefix = strlist[0];
         QString message = strlist[1];
         
-        if (prefix != "BACKEND_MESSAGE")
+        if (prefix == "OK")
+        {
+        }
+        else if (prefix != "BACKEND_MESSAGE")
         {
             cerr << "Received a: " << prefix << " message from the backend\n";
             cerr << "But I don't know what to do with it.\n";
@@ -1821,14 +1828,17 @@ bool MythContext::CheckProtoVersion(QSocket* socket)
 
 void MythContext::EventSocketConnected(void)
 {
+/* Unnecessary, just checked on the serverSock connect */
+#if 0
     if (!CheckProtoVersion(d->eventSock))
         return;
+#endif
 
     QString str = QString("ANN Playback %1 %2")
                          .arg(d->m_localhostname).arg(true);
     QStringList strlist = str;
     WriteStringList(d->eventSock, strlist);
-    ReadStringList(d->eventSock, strlist);
+//    ReadStringList(d->eventSock, strlist);
 }
 
 void MythContext::EventSocketClosed(void)

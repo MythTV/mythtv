@@ -164,7 +164,7 @@ public:
     virtual void AddKey(uint16_t /*key0*/, uint16_t /*key1*/) {}
 
     /* Sets the SI Standard */
-    virtual void SetSIStandard(SISTANDARD /*_SIStandard*/) { }
+    virtual void SetSIStandard(SISTANDARD _SIStandard) { SIStandard = _SIStandard; }
 
     /* Adds required PIDs to table, change size to a type */
     virtual void AddPid(uint16_t pid,uint8_t filter, uint8_t mask, uint8_t key = 0)
@@ -188,6 +188,8 @@ public:
     /* Dependency setting funtions */
     virtual void DependencyMet(tabletypes t) = 0;
     virtual void DependencyChanged(tabletypes /*t*/) {}
+
+    SISTANDARD SIStandard;
 };
 
 /* Object best to be removed and not used anymore */
@@ -527,7 +529,6 @@ public:
     EventHandler() : TableHandler() { Reset(); }
     ~EventHandler() {}
     void Reset();
-    void SetSIStandard(SISTANDARD _SIStandard) { SIStandard = _SIStandard; }
     bool Complete();
     void SetupTrackers();
     bool RequirePIDs();
@@ -550,7 +551,6 @@ public:
     QMap_pidHandler        ETTpid;
     QMap2D_Events          Events;
     QMap_bool              TrackerSetup;
-    SISTANDARD             SIStandard;
 };
 
 class ServiceHandler : public TableHandler
@@ -558,7 +558,6 @@ class ServiceHandler : public TableHandler
 public:
     ServiceHandler() : TableHandler() { Reset(); }
     ~ServiceHandler() {}
-    void SetSIStandard(SISTANDARD _SIStandard) { SIStandard = _SIStandard; }
     void Reset();
     bool Complete();
     bool RequirePIDs();
@@ -570,7 +569,6 @@ public:
     void DependencyMet(tabletypes t);
     bool AddSection(tablehead_t *head, uint16_t key0, uint16_t key1);
 
-    SISTANDARD             SIStandard;
     QMap_SectionTracker    Tracker;
     QMap_pullStatus        status;        /* Status of each transport */
     bool                   mgtloaded;
@@ -584,7 +582,6 @@ class NetworkHandler : public TableHandler
 public:
     NetworkHandler() : TableHandler() { Reset(); }
     ~NetworkHandler() {}
-    void SetSIStandard(SISTANDARD _SIStandard) { SIStandard = _SIStandard; }
     void Reset();
     bool Complete();
     bool RequirePIDs();
@@ -596,7 +593,6 @@ public:
     bool AddSection(tablehead_t *head, uint16_t key0, uint16_t key1);
     void DependencyMet(tabletypes t) { (void) t;}
 
-    SISTANDARD           SIStandard;
     SectionTracker         Tracker;
     pullStatus             status;
     bool                 mgtloaded;

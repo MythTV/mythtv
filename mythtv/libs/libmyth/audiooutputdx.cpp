@@ -161,7 +161,7 @@ void AudioOutputDX::Reset(void)
 
 }
 
-void AudioOutputDX::AddSamples(char *buffer, int frames, long long timecode)
+bool AudioOutputDX::AddSamples(char *buffer, int frames, long long timecode)
 {
     FillBuffer(frames, buffer);
 
@@ -193,10 +193,12 @@ void AudioOutputDX::AddSamples(char *buffer, int frames, long long timecode)
     /* we want the time at the end -- but the file format stores
        time at the start of the chunk. */
     audbuf_timecode = timecode + (int)((frames*1000.0) / effdsp);
+
+    return true;
 }
 
 
-void AudioOutputDX::AddSamples(char *buffers[], int frames, long long timecode)
+bool AudioOutputDX::AddSamples(char *buffers[], int frames, long long timecode)
 {
 //    VERBOSE(VB_ALL, "add_samples(b) " << frames << " " << timecode);
 
@@ -245,6 +247,8 @@ void AudioOutputDX::AddSamples(char *buffers[], int frames, long long timecode)
     /* we want the time at the end -- but the file format stores
        time at the start of the chunk. */
     //audbuf_timecode = timecode + (int)((frames*100000.0) / effdsp);
+
+    return true;
 }
 
 void AudioOutputDX::SetTimecode(long long timecode)
@@ -718,6 +722,13 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
 //    VERBOSE(VB_ALL, "finished fillbuffer");
 
     return 0;
+}
+
+// Wait for all data to finish playing
+void AudioOutputDX::Drain()
+{
+    // TODO: Wait until all data has been played...
+
 }
 
 int AudioOutputDX::GetVolumeChannel(int channel)

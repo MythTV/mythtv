@@ -934,19 +934,16 @@ bool ServiceHandler::Complete()
 
 bool ServiceHandler::RequirePIDs()
 {
+    if (SIStandard == SI_STANDARD_AUTO)
+        return false;
+
     if ((SIStandard == SI_STANDARD_ATSC) && (!(mgtloaded)) )
         return false;
 
     if ((SIStandard == SI_STANDARD_DVB) && (!(nitloaded)) )
         return false;
 
-    if (status[0].pulling == false)
-    {
-        status[0].pulling = true;
-        return true;
-    }
-
-    return false;
+    return (!(status[0].pulling));
 }
 
 bool ServiceHandler::GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask)

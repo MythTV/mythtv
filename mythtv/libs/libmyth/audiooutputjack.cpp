@@ -89,11 +89,13 @@ bool AudioOutputJACK::OpenDevice()
         return false;
     }
     
-    // TODO: Should we get this from the driver?
-    fragment_size = 512;
+    fragment_size = JACK_GetJackBufferedBytes(audioid);
 
-//    VERBOSE(VB_GENERAL, QString("Audio fragment size: %1")
-//                                 .arg(fragment_size));
+    // Ensure blocking layer has a small amount of buffered data
+    JACK_SetMaxBufferedBytes(audioid, 4 * fragment_size);
+
+    VERBOSE(VB_AUDIO, QString("Audio fragment size: %1")
+                                 .arg(fragment_size));
 
     audio_buffer_unused = JACK_GetBytesFreeSpace(audioid);
     JACK_SetPosition(audioid, BYTES, 0);
@@ -140,7 +142,7 @@ void AudioOutputJACK::WriteAudio(unsigned char *aubuf, int size)
 
 inline int AudioOutputJACK::getBufferedOnSoundcard(void)
 {
-    return  JACK_GetBytesStored(audioid) + JACK_GetJackBufferedBytes(audioid)*2;
+    return  JACK_GetBytesStored(audioid) + fragment_size * 2;
 }
 
 inline int AudioOutputJACK::getSpaceOnSoundcard(void)

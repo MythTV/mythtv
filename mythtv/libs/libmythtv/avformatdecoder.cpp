@@ -119,6 +119,8 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
                     picture->data[2] = info->display_fbuf->buf[2];
                     picture->opaque  = info->display_fbuf->id;
                     *got_picture_ptr = 1;
+                    picture->top_field_first = !!(info->display_picture->flags & PIC_FLAG_TOP_FIELD_FIRST);
+                    picture->interlaced_frame = !(info->display_picture->flags & PIC_FLAG_PROGRESSIVE_FRAME);
                 }
                 return buf_size;
             case STATE_INVALID:

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 Chris Morgan <cmorgan@alum.wpi.edu>
+ * Copyright 2003-2004 Chris Morgan <cmorgan@alum.wpi.edu>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

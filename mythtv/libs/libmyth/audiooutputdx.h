@@ -24,13 +24,15 @@ public:
                          int audio_channels, int audio_samplerate);
     virtual void SetBlocking(bool blocking);
 
-    virtual void AddSamples(char *buffer, int samples, long long timecode);
-    virtual void AddSamples(char *buffers[], int samples, long long timecode);
+    virtual bool AddSamples(char *buffer, int samples, long long timecode);
+    virtual bool AddSamples(char *buffers[], int samples, long long timecode);
     virtual void SetEffDsp(int dsprate);
     virtual void SetTimecode(long long timecode);
 
     virtual bool GetPause(void);
     virtual void Pause(bool paused);
+
+    virtual void Drain(void);
 
     virtual int GetAudiotime(void);
 

@@ -1164,7 +1164,9 @@ bool PlaybackBox::FillList()
                     sTitle = p->title;
                     sTitle.remove(prefixes);
                     sortedList[sTitle] = p->title;
-                } else { 
+                } 
+                else 
+                { 
                     progLists[""].prepend(p);
                     progLists[p->recgroup].prepend(p);
                     sortedList[p->recgroup] = p->recgroup;
@@ -1182,6 +1184,17 @@ bool PlaybackBox::FillList()
                 delete p;
         }
         delete infoList;
+    }
+
+    if (sortedList.count() == 0)
+    {
+        progLists[""];
+        titleList << "";
+        progIndex = 0;
+        titleIndex = 0;
+        playList.clear();
+
+        return 0;
     }
 
     titleList = sortedList.values();

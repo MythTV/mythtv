@@ -36,14 +36,20 @@ class AudioOutputBase : public AudioOutput
     virtual void Reset(void);
 
     // timecode is in milliseconds.
-    virtual void AddSamples(char *buffer, int samples, long long timecode);
-    virtual void AddSamples(char *buffers[], int samples, long long timecode);
+    virtual bool AddSamples(char *buffer, int samples, long long timecode);
+    virtual bool AddSamples(char *buffers[], int samples, long long timecode);
 
     virtual void SetTimecode(long long timecode);
     virtual bool GetPause(void);
     virtual void Pause(bool paused);
+
+    // Wait for all data to finish playing
+    virtual void Drain(void);
  
     virtual int GetAudiotime(void);
+
+    // Send output events showing current progress
+    virtual void Status(void);
 
     QString GetError() { return lastError; };
 
@@ -91,13 +97,14 @@ class AudioOutputBase : public AudioOutput
     int fragment_size;
     long soundcard_buffer_size;
     QString audiodevice;
+    long total_written;
 
     float audio_stretchfactor;
     AudioOutputSource source;
 
     bool killaudio;
 
-    bool pauseaudio, audio_actually_paused;
+    bool pauseaudio, audio_actually_paused, was_paused;
     bool set_initial_vol;
     
  private:

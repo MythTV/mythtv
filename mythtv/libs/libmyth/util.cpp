@@ -117,10 +117,10 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
     payload.truncate(8);
     payload += utf8;
     
-
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = payload;
+        QString msg = QString("write->%1 %2:").arg(socket->socket())
+                                              .arg(payload);
 
         if (msg.length() > 58)
         {
