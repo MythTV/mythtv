@@ -75,7 +75,7 @@ public:
     TransmitFPS():
         GlobalSetting("TransmitFPS") {
         setLabel(QObject::tr("Transmit Frames/Second"));
-        setValue(QObject::tr("10"));
+        setValue(QObject::tr("5"));
         setHelpText(QObject::tr("Number of webcam frames/sec to transmit, from 1 to "
                                 "30. Higher numbers create better results but use more bandwidth."));
     }
