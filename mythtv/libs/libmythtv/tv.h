@@ -185,6 +185,8 @@ class TV
 
     bool inoverrecord;
     int overrecordseconds;
+
+    QString dialogname;
 };
 
 #endif

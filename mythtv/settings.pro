@@ -11,7 +11,7 @@ INCLUDEPATH *= /usr/local/include
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
 
-#DEFINES += EXTRA_LOCKING
+DEFINES += EXTRA_LOCKING
 
 release {
         DEFINES += MMX

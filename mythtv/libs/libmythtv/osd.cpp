@@ -10,79 +10,13 @@
 #include <qfile.h>
 #include <qcolor.h>
 
-#include "yuv2rgb.h"
+#include <algorithm>
+using namespace std;
+
 #include "ttfont.h"
 #include "osd.h"
+#include "osdtypes.h"
 #include "libmyth/settings.h"
-
-class OSDImage
-{
-  public:
-    OSDImage(QString pathname, float hmult, float wmult, bool scaletoscreen);
-   ~OSDImage();
-   
-    QString filename;
-
-    bool isvalid;
-
-    unsigned char *yuv;
-    unsigned char *ybuffer;
-    unsigned char *ubuffer;
-    unsigned char *vbuffer;
-
-    unsigned char *alpha;
-
-    int width;
-    int height;
-
-    QPoint position;
-
-  private:
-    void AddAlpha(QImage *image);
-};
-
-OSDImage::OSDImage(QString pathname, float hmult, float wmult, 
-                   bool scaletoscreen)
-{
-    filename = pathname;
-
-    QImage tmpimage(pathname);
-
-    yuv = alpha = NULL;
-    isvalid = false;
-
-    if (tmpimage.width() == 0 || tmpimage.height() == 0)
-        return;
-
-    float mult = wmult;
-    if (scaletoscreen)
-        mult *= 0.91;
-
-    width = ((int)(tmpimage.width() * mult) / 2) * 2;
-    height = ((int)(tmpimage.height() * hmult) / 2) * 2;
-
-    QImage tmp2 = tmpimage.smoothScale(width, height);  
-
-    isvalid = true;
-    yuv = new unsigned char[width * height * 3 / 2];
-
-    ybuffer = yuv;
-    ubuffer = yuv + (width * height);
-    vbuffer = yuv + (width * height * 5 / 4);
-
-    alpha = new unsigned char[width * height]; 
-            
-    rgb32_to_yuv420p(ybuffer, ubuffer, vbuffer, alpha, 
-                     tmp2.bits(), width, height, tmp2.width());
-}
-
-OSDImage::~OSDImage()
-{
-    if (yuv)
-        delete [] yuv;
-    if (alpha)
-        delete [] alpha;
-}
 
 OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
          const QString &osdtheme)
@@ -97,30 +31,9 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
 
     fontname = filename;
     fontprefix = prefix;
+    m_setsvisible = false;
 
-    displayframes = 0;
-    show_info = false;
-    show_channum = false;
-    show_dialog = false;
-    show_pause = hidingpause = false;
-    pauseyoffset = 0;
-
-    totalfadeframes = 0;
-
-    pausemovementperframe = (int)(6 * hmult);
-    
-    currentdialogoption = 1;
-
-    infotext = channumtext = "";
-    infoicon = infobackground = NULL;
-
-    pausesliderfont = NULL;
-    usepause = false;
-    pausesliderfill = pausesliderdelete = pausebackground = NULL;
-    pausesliderpos = NULL;   
-    pausesliderfontsize = 0;
- 
-    SetNoThemeDefaults();
+    setList = new vector<OSDSet *>;
 
     themepath = FindTheme(osdtheme);
 
@@ -140,82 +53,127 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
         }
     }
 
-    if (vid_height < 400)
-    {
-        infofontsize /= 2;
-        channumfontsize /= 2;
-        pausesliderfontsize /= 2;
-    }
-  
-    enableosd = false;
- 
-    info_font = LoadFont(fontname, infofontsize);
-    channum_font = LoadFont(fontname, channumfontsize);
-
-    if (!info_font || !channum_font)
-    {
-        printf("Coudln't open the OSD font, disabling the OSD.\n");
-        return;
-    }
-
-    if (pausesliderfontsize > 0)
-        pausesliderfont = LoadFont(fontname, pausesliderfontsize);
-
-    enableosd = true;
-
-    int mwidth, twidth;
-    info_font->CalcWidth("M M", &twidth); 
-    info_font->CalcWidth("M", &mwidth);
-
-    space_width = twidth - (mwidth * 2);
+    SetNoThemeDefaults();
 }
 
 OSD::~OSD(void)
 {
-    if (info_font)
-        delete info_font;
-    if (channum_font)
-        delete channum_font;
-    if (pausesliderfont)
-        delete pausesliderfont;
-    if (infobackground)
-        delete infobackground;
-    if (infoicon)
-        delete infoicon;
-    if (pausebackground)
-        delete pausebackground;
-    if (pausesliderfill)
-        delete pausesliderfill;
-    if (pausesliderdelete)
-        delete pausesliderdelete;
-    if (pausesliderpos)
-        delete pausesliderpos;
+    QMap<QString, TTFFont *>::iterator fonts = fontMap.begin();
+    for (; fonts != fontMap.end(); ++fonts)
+    {
+        TTFFont *font = (*fonts);
+        if (font)
+            delete font;
+    }
+
+    QMap<QString, OSDSet *>::iterator sets = setMap.begin();
+    for (; sets != setMap.end(); ++sets)
+    { 
+        OSDSet *set = (*sets);
+        if (set)
+            delete set;
+    }
+
+    delete setList;
 }
 
 void OSD::SetNoThemeDefaults(void)
 {
-    titleRect = QRect(0, 0, 0, 0);
+    QString name;
 
-    infoRect.setTop(vid_height * 5 / 8);
-    infoRect.setBottom(vid_height * 15 / 16);
-    infoRect.setLeft(vid_width / 8);
-    infoRect.setRight(vid_width * 7 / 8);
-    infobackground = NULL;
+    TTFFont *chanfont = GetFont("channel_font");
+    if (!chanfont)
+    {
+        name = "channel_font";
+        int fontsize = 40;
+        if (vid_width < 400)
+            fontsize /= 2;
 
-    channumRect.setTop(vid_height * 1 / 16);
-    channumRect.setBottom(vid_height * 2 / 8);
-    channumRect.setLeft(vid_width * 3 / 4);
-    channumRect.setRight(vid_width * 15 * 16);
+        chanfont = LoadFont(fontname, fontsize);
+       
+        if (chanfont) 
+            fontMap[name] = chanfont;
+    }
 
-    dialogRect.setTop(vid_height / 8);
-    dialogRect.setBottom(vid_height * 7 / 8);
-    dialogRect.setLeft(vid_width / 8);
-    dialogRect.setRight(vid_width * 7 / 8);
+    OSDSet *container = GetSet("channel_number");
+    if (!container)
+    {
+        QString name = "channel_number";
+        container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult);
+        AddSet(container, name);
 
-    infofontsize = 16;
-    channumfontsize = 40;
+        QRect channumRect;
 
-    usepause = false;
+        channumRect.setTop(vid_height * 1 / 16);
+        channumRect.setBottom(vid_height * 2 / 8);
+        channumRect.setLeft(vid_width * 3 / 4);
+        channumRect.setRight(vid_width * 15 * 16);
+
+        OSDTypeText *chantext = new OSDTypeText(name, chanfont, "", 
+                                                channumRect);
+        container->AddType(chantext);
+    }
+
+    TTFFont *infofont = GetFont("info_font");
+    if (!infofont)
+    {
+        name = "info_font";
+        int fontsize = 16;
+        if (vid_width < 400) 
+            fontsize /= 2;
+
+        infofont = LoadFont(fontname, fontsize);
+
+        if (infofont)
+            fontMap[name] = infofont;
+    }
+
+    container = GetSet("program_info");
+    if (!container)
+    {
+        QString name = "program_info";
+        container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult);
+        AddSet(container, name);
+
+        name = "background";
+        QRect rect;
+
+        rect.setTop(vid_height * 9 / 16);
+        rect.setBottom(vid_height * 7 / 8);
+        rect.setLeft(vid_width / 8);
+        rect.setRight(vid_width * 7 / 8);
+
+        OSDTypeBox *box = new OSDTypeBox(name, rect);
+        container->AddType(box);
+
+        QRect tmprect = rect;
+        tmprect.setTop(rect.top() + 5);
+        tmprect.setBottom(rect.top() + infofont->Size() * 3 / 2);
+        tmprect.setLeft(rect.left() + 5);
+
+        name = "title";
+        OSDTypeText *text = new OSDTypeText(name, infofont, "", tmprect);
+        container->AddType(text);
+
+        tmprect = rect;
+        tmprect.setTop(rect.top() + infofont->Size() * 3 / 2 + 5);
+        tmprect.setBottom(rect.bottom() - infofont->Size() * 3 / 2 + 5);
+        tmprect.setLeft(rect.left() + 5);
+
+        name = "subtitle";
+        text = new OSDTypeText(name, infofont, "", tmprect);
+        container->AddType(text);
+
+        tmprect = rect;
+        tmprect.setTop(rect.top() + infofont->Size() * 3 + 5);
+        tmprect.setBottom(rect.bottom() - infofont->Size() * 3 / 2 + 5);
+        tmprect.setLeft(rect.left() + 5);
+    
+        name = "description";
+        text = new OSDTypeText(name, infofont, "", tmprect);
+        text->SetMultiLine(true);
+        container->AddType(text);
+    }
 }
 
 QString OSD::FindTheme(QString name)
@@ -290,166 +248,290 @@ bool OSD::LoadTheme(void)
         return false;
 
     Settings *settings = new Settings(themefile);
+    QString name;
+    OSDSet *container;
 
     QString bgname = settings->GetSetting("InfoBackground");
     if (bgname != "")
     {
+        QString name = "program_info";
+        container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult);
+        AddSet(container, name);
+
+        name = "background";
+
         bgname = themepath + bgname;
-        infobackground = new OSDImage(bgname, hmult, wmult, true);
+
+        QPoint position = QPoint(0, 0);
+
+        OSDTypeImage *image = new OSDTypeImage(name, bgname, position, wmult, 
+                                               hmult);
+        container->AddType(image);
 
         QString coords = settings->GetSetting("InfoPosition");
-        infobackground->position = parsePoint(coords);
+        position = parsePoint(coords);
 
-        int x = infobackground->position.x();
-        int y = infobackground->position.y();
+        int imageheight = image->ImageSize().height();
+
+        int x = position.x();
+        int y = position.y();
 
         x += (int)(vid_width * 0.045);
         if (y == -1)
-            y = (int)(vid_height * 0.95 - infobackground->height);
+            y = (int)(vid_height * 0.95 - imageheight);
 
-        infobackground->position.setX(x);
-        infobackground->position.setY(y);
+        position.setX(x);
+        position.setY(y);
+
+        image->SetPosition(position);
+
+        int fontsize = settings->GetNumSetting("InfoTextFontSize");
+        if (fontsize == 0)
+            fontsize = 16;
+
+        if (vid_width < 400)
+            fontsize /= 2;
+
+        name = "info_font";
+        TTFFont *infofont = LoadFont(fontname, fontsize);
+
+        if (infofont)
+            fontMap[name] = infofont;
+
+        coords = settings->GetSetting("InfoIconPosition");
+        if (coords.length() > 1) 
+        {
+            QPoint pos = parsePoint(coords);
+            pos.setX((int)(x + pos.x() * wmult));
+            pos.setY((int)(y + pos.y() * hmult));
+
+            name = "callsign_image";
+            OSDTypeImage *image = new OSDTypeImage(name, "", pos, 
+                                                   wmult, hmult);
+            container->AddType(image);
+        }
+
+        coords = settings->GetSetting("InfoCallSignRect");
+        if (coords.length() > 1) 
+        {
+            QRect rect = parseRect(coords);
+            normalizeRect(&rect);
+            rect.moveBy(x, y);
+
+            name = "callsign_text";
+            OSDTypeText *text = new OSDTypeText(name, infofont, "", rect); 
+            container->AddType(text);
+        }
+
+        coords = settings->GetSetting("InfoTimeRect");
+        if (coords.length() > 1)
+        {
+            QRect rect = parseRect(coords);
+            normalizeRect(&rect);
+            rect.moveBy(x, y);
+
+            name = "time";
+            OSDTypeText *text = new OSDTypeText(name, infofont, "", rect);
+            container->AddType(text);
+        }
+
+        timeFormat = settings->GetSetting("InfoTimeFormat");
+        if (timeFormat == "")
+            timeFormat = "h:mm ap";
 
         coords = settings->GetSetting("InfoTextBox");
-        infoRect = parseRect(coords);
+        QRect infoRect = parseRect(coords);
         normalizeRect(&infoRect);
         infoRect.moveBy(x, y);
 
-        titleRect = QRect(0, 0, 0, 0);
+        QRect titleRect = QRect(0, 0, 0, 0);
         coords = settings->GetSetting("InfoTitleTextBox");
         if (coords != "")
         {
             titleRect = parseRect(coords);
             normalizeRect(&titleRect);
             titleRect.moveBy(x, y);
-        }	
-
-        int fontsize = settings->GetNumSetting("InfoTextFontSize");
-        if (fontsize > 0)
-            infofontsize = fontsize;
-
-        useinfoicon = false;
-        coords = settings->GetSetting("InfoIconPosition");
-        if (coords.length() > 1)
-        {
-            infoiconpos = parsePoint(coords);
-            infoiconpos.setX((int)(x + infoiconpos.x() * wmult));
-            infoiconpos.setY((int)(y + infoiconpos.y() * hmult));
-            useinfoicon = true;
         }
 
-        callsignRect = QRect(0, 0, 0, 0);
-        coords = settings->GetSetting("InfoCallSignRect");
-        if (coords.length() > 1) 
+        QRect tmprect = infoRect;
+
+        if (titleRect.width() > 0)
+            tmprect = titleRect;
+
+        name = "title";
+        OSDTypeText *text = new OSDTypeText(name, infofont, "", tmprect);
+        container->AddType(text);
+
+        if (titleRect.width() > 0)
+            tmprect = infoRect;
+        else
         {
-            callsignRect = parseRect(coords);
-            normalizeRect(&callsignRect);
-            callsignRect.moveBy(x, y);
+            tmprect.setTop(tmprect.top() + infofont->Size() * 3 / 2);
+            tmprect.setBottom(tmprect.bottom() - infofont->Size() * 3 / 2);
         }
 
-        timeRect = QRect(0, 0, 0, 0);
-        coords = settings->GetSetting("InfoTimeRect");
-        if (coords.length() > 1)
-        {
-            timeRect = parseRect(coords);
-            normalizeRect(&timeRect);
-            timeRect.moveBy(x, y);
-        }
+        name = "subtitle";
+        text = new OSDTypeText(name, infofont, "", tmprect);
+        container->AddType(text);
 
-        timeFormat = settings->GetSetting("InfoTimeFormat");
-        if (timeFormat == "")
-            timeFormat = "h:mm ap";
+        tmprect = infoRect;
+        if (titleRect.width() > 0)
+            tmprect.setTop(tmprect.top() + infofont->Size() * 3 / 2);
+        else
+            tmprect.setTop(tmprect.top() + infofont->Size() * 3);
+
+        name = "description";
+        text = new OSDTypeText(name, infofont, "", tmprect);
+        text->SetMultiLine(true);
+        container->AddType(text);
     }
 
     bgname = settings->GetSetting("SeekBackground");
     if (bgname != "")
     {  
-        usepause = true;
+        QString name = "status";
+        container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult);
+        container->SetPriority(10);
+        AddSet(container, name);
+        
+        container->SetFadeMovement(0, (int)(6 * hmult));
  
         bgname = themepath + bgname;
-        pausebackground = new OSDImage(bgname, hmult, wmult, true);
+
+        QPoint position = QPoint(0, 0);
+
+        OSDTypeImage *image = new OSDTypeImage(name, bgname, position, wmult,
+                                               hmult);
+        container->AddType(image);
 
         QString coords = settings->GetSetting("SeekPosition");
-        pausebackground->position = parsePoint(coords);
+        position = parsePoint(coords);
 
-        int x = pausebackground->position.x();
-        int y = pausebackground->position.y();
+        int x = position.x();
+        int y = position.y();
 
         x += (int)(vid_width * 0.045);
         if (y == -1)
-            y = (int)(vid_height * 0.95 - pausebackground->height);
+            y = (int)(vid_height * 0.95 - image->ImageSize().height());
 
-        pausebackground->position.setX(x);
-        pausebackground->position.setY(y);
+        position.setX(x);
+        position.setY(y);
 
-        pausestatusRect = QRect(0, 0, 0, 0);
+        image->SetPosition(position);
+
+        int fontsize = settings->GetNumSetting("SeekSliderFontSize");
+        if (fontsize == 0)
+            fontsize = 16;
+
+        if (vid_width < 400)
+            fontsize /= 2;
+
+        name = "pause_font";
+        TTFFont *pausefont = LoadFont(fontname, fontsize);
+
+        if (pausefont)
+            fontMap[name] = pausefont;
+
         coords = settings->GetSetting("SeekStatusRect");
         if (coords.length() > 1)
         {
-            pausestatusRect = parseRect(coords);
-            normalizeRect(&pausestatusRect);
-            pausestatusRect.moveBy(x, y);
+            QRect rect = parseRect(coords);
+            normalizeRect(&rect);
+            rect.moveBy(x, y);
+
+            TTFFont *infofont = GetFont("info_font");
+            if (!infofont)
+                infofont = pausefont;
+
+            name = "status";
+            OSDTypeText *text = new OSDTypeText(name, infofont, "", rect);
+            container->AddType(text);
         }
 
+        QRect pauseslider = parseRect(settings->GetSetting("SeekSliderRect"));
+        normalizeRect(&pauseslider);
+        pauseslider.moveBy(x, y);
+                                                
         bgname = settings->GetSetting("SeekSliderNormal");
         if (bgname != "")
         {
+            name = "status_slider";
             bgname = themepath + bgname;
-            pausesliderfill = new OSDImage(bgname, hmult, wmult, true);
- 
-            pausesliderRect = parseRect(settings->GetSetting("SeekSliderRect"));
-            normalizeRect(&pausesliderRect);
-            pausesliderRect.moveBy(x, y);
+
+            OSDTypeFillSlider *image = new OSDTypeFillSlider(name, bgname, 
+                                                             pauseslider,
+                                                             wmult, hmult);
+            container->AddType(image);
         }
 
-        bgname = settings->GetSetting("SeekSliderTextRect");
-        if (bgname != "")
+        coords = settings->GetSetting("SeekSliderTextRect");
+        if (coords.length() > 1)
         {
-            pausesliderTextRect = parseRect(bgname);
-            normalizeRect(&pausesliderTextRect);
-            pausesliderTextRect.moveBy(x, y);
+            QRect rect = parseRect(coords);
+            normalizeRect(&rect);
+            rect.moveBy(x, y);
+
+            name = "slidertext";
+            OSDTypeText *text = new OSDTypeText(name, pausefont, "", rect);
+            text->SetCentered(true);
+            container->AddType(text);
         }
 
+/*
         bgname = settings->GetSetting("SeekSliderPosition");
         if (bgname != "")
         {
             bgname = themepath + bgname;
             pausesliderpos = new OSDImage(bgname, hmult, wmult, true);
         }
-
-        pausesliderfontsize = settings->GetNumSetting("SeekSliderFontSize");
+*/
     }
- 
 
     totalfadeframes = settings->GetNumSetting("FadeAwayFrames");
-
-    if (pausesliderTextRect.width() == 0)
-        pausesliderTextRect = pausesliderRect;
 
     if (settings->GetSetting("ChannelNumberRect") != "")
     {
         QString chanrect = settings->GetSetting("ChannelNumberRect");
 
-        channumRect = parseRect(chanrect);
+        QRect channumRect = parseRect(chanrect);
         normalizeRect(&channumRect);
         channumRect.moveBy((int)(vid_width * 0.045), 
                            (int)(vid_height * 0.05));
 
-        channumfontsize = settings->GetNumSetting("ChannelNumberFontSize");
+        int channumfontsize = settings->GetNumSetting("ChannelNumberFontSize");
         if (!channumfontsize)
             channumfontsize = 40;
+
+        if (vid_height < 400)
+            channumfontsize /= 2;
+
+        name = "channel_font";
+        TTFFont *chanfont = LoadFont(fontname, channumfontsize);
+
+        fontMap[name] = chanfont;
+
+        name = "channel_number";
+        OSDSet *channelnumber = new OSDSet(name, true, vid_width, vid_height,
+                                           wmult, hmult);
+        AddSet(channelnumber, name);
+
+        OSDTypeText *chantext = new OSDTypeText(name, chanfont, "", 
+                                                channumRect);
+        channelnumber->AddType(chantext);
     }
+
+    delete settings;
 
     return true;
 }
 
 void OSD::normalizeRect(QRect *rect)
-{
+{   
     rect->setWidth((int)(rect->width() * 0.91 * wmult));
     rect->setHeight((int)(rect->height() * hmult));
-    rect->moveTopLeft(QPoint((int)(rect->left() * wmult), 
+    rect->moveTopLeft(QPoint((int)(rect->left() * wmult),
                              (int)(rect->top() * hmult)));
-}
+}       
 
 QPoint OSD::parsePoint(QString text)
 {
@@ -477,37 +559,28 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
                       int length)
 {
     pthread_mutex_lock(&osdlock);
-    
-    displayframes = time(NULL) + length;
-    show_info = true;
-
-    infotext = text;
-    subtitletext = subtitle;
-    desctext = desc;
-
-    QString dummy = category;
-    dummy = start;
-    dummy = end;
-
-    fadingframes = totalfadeframes;
-    infocallsign = callsign.left(5);
-
-    if (useinfoicon)
+    OSDSet *container = GetSet("program_info");
+    if (container)
     {
-        if (infoicon)
-        {
-            if (iconpath != infoicon->filename)
-            {
-                delete infoicon;
-                infoicon = new OSDImage(iconpath, hmult, wmult, false);
-            }
-        }
-        else
-        {
-            infoicon = new OSDImage(iconpath, hmult, wmult, false);
-        }
-    }
+        OSDTypeText *type = (OSDTypeText *)container->GetType("title");
+        if (type)
+            type->SetText(text);
+        type = (OSDTypeText *)container->GetType("subtitle");
+        if (type)
+            type->SetText(subtitle);
+        type = (OSDTypeText *)container->GetType("description");
+        if (type)
+            type->SetText(desc);
+        type = (OSDTypeText *)container->GetType("callsign_text");
+        if (type)
+            type->SetText(callsign.left(5));
+        OSDTypeImage *cs = (OSDTypeImage *)container->GetType("callsign_image");
+        if (cs)
+            cs->LoadImage(iconpath, wmult, hmult, 30, 30);
 
+        container->DisplayFor(length * 30);
+        m_setsvisible = true;
+    }
     pthread_mutex_unlock(&osdlock);
 }
 
@@ -515,678 +588,337 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
                      QString slidertext, int displaytime)
 {
     pthread_mutex_lock(&osdlock);
- 
-    pausestatus = msgtext;
-    pauseposition = position;
-    pauseslidertext = slidertext;
-    pausefilltype = fill; 
-    displaypausetime = -1;
-    pauseyoffset = 0;
-    hidingpause = false;
-    pausefadingframes = totalfadeframes;
-    
-    if (displaytime > 0)
-        displaypausetime = time(NULL) + displaytime;
-    
-    show_pause = true;
+    OSDSet *container = GetSet("status");
+    if (container)
+    {
+        OSDTypeText *type = (OSDTypeText *)container->GetType("status");
+        if (type)
+            type->SetText(msgtext);
+        type = (OSDTypeText *)container->GetType("slidertext");
+        if (type)
+            type->SetText(slidertext);
+        OSDTypeFillSlider *slider = 
+                      (OSDTypeFillSlider *)container->GetType("status_slider");
+        if (slider)
+            slider->SetPosition(position);
 
+        if (displaytime > 0)
+            container->DisplayFor(displaytime * 30);
+        else
+            container->Display();
+        m_setsvisible = true;
+    }
     pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::UpdatePause(int position, QString slidertext)
 {
     pthread_mutex_lock(&osdlock);
-    pauseposition = position;
-    pauseslidertext = slidertext;
-    hidingpause = false;
-    pauseyoffset = 0;
-    pausefadingframes = totalfadeframes;
+    OSDSet *container = GetSet("status");
+    if (container)
+    {
+        OSDTypeText *type = (OSDTypeText *)container->GetType("slidertext");
+        if (type)
+            type->SetText(slidertext);
+        OSDTypeFillSlider *slider =
+                      (OSDTypeFillSlider *)container->GetType("status_slider");
+        if (slider)
+            slider->SetPosition(position);
+
+        m_setsvisible = true;
+    }
     pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::EndPause(void)
 {
     pthread_mutex_lock(&osdlock);
-    hidingpause = true;
-    show_pause = false;
-    displaypausetime = 0;
-    pausefadingframes = totalfadeframes;
+    OSDSet *container = GetSet("status");
+    if (container)
+    {
+        container->Hide();
+        m_setsvisible = true;
+    }
     pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::SetChannumText(const QString &text, int length)
 {
     pthread_mutex_lock(&osdlock);
-    displayframes = time(NULL) + length;
-    show_channum = true;
-    fadingframes = totalfadeframes;
+    OSDSet *container = GetSet("channel_number");
+    if (container)
+    {
+        OSDTypeText *type = (OSDTypeText *)container->GetType("channel_number");
+        if (type)
+            type->SetText(text);
 
-    channumtext = text;
+        container->DisplayFor(length * 30);
+        m_setsvisible = true;
+    }
+
     pthread_mutex_unlock(&osdlock);
 }
 
-// doesn't really need locked
-void OSD::DialogUp(void)
-{
-    if (currentdialogoption > 1)
-        currentdialogoption--;
-}
-
-// doesn't really need locked
-void OSD::DialogDown(void)
-{
-    if (currentdialogoption < 3)
-        currentdialogoption++;
-}
-
-void OSD::SetDialogBox(const QString &message, const QString &optionone,
-                       const QString &optiontwo, const QString &optionthree,
-                       int length)
+void OSD::NewDialogBox(const QString &name, const QString &message, 
+                       const QString &optionone, const QString &optiontwo, 
+                       const QString &optionthree, int length)
 {
     pthread_mutex_lock(&osdlock);
-    currentdialogoption = 1;
-    dialogmessagetext = message;
-    dialogoptionone = optionone;
-    dialogoptiontwo = optiontwo;
-    dialogoptionthree = optionthree;
-    
-    displayframes = time(NULL) + length;
-    show_dialog = true;
-    pthread_mutex_unlock(&osdlock);
-}
-
-void OSD::ShowLast(int length)
-{
-    displayframes = time(NULL) + length;
-    fadingframes = totalfadeframes;
-    show_channum = true;
-    show_info = true;
-}
-
-void OSD::TurnOff(void)
-{
-    displayframes = 0;
-}
-
-void OSD::Display(unsigned char *yuvptr)
-{
-    if (!enableosd)
+    OSDSet *container = GetSet(name);
+    if (container)
+    {
+        cerr << "dialog: " << name << " already exists.\n";
         return;
+    }       
 
-    pthread_mutex_lock(&osdlock);
-    if (show_pause)
+    TTFFont *font = GetFont("info_font");
+    if (!font)
     {
-        if (displaypausetime > 0 && time(NULL) > displaypausetime)
-        {
-            show_pause = false;
-            hidingpause = true;
-        }
-	    
-        DisplayPause(yuvptr);
-    }
-
-    if (hidingpause)
-    {
-        if (pausemovementperframe == 0)
-            hidingpause = false;
-
-        if (pausefadingframes > 0)
-            pausefadingframes -= 2;
-
-        pauseyoffset = CalcNewOffset(pausebackground, pauseyoffset);
-        if (pauseyoffset < 0)
-            hidingpause = false;
-
-        if (hidingpause)
-            DisplayPause(yuvptr);
-    }   
- 
-    if (time(NULL) > displayframes)
-    {
-        if (fadingframes > 0)
-        {
-            fadingframes--;
-        }
-        else
-        {
-            show_info = false; 
-            show_channum = false;
-            show_dialog = false;
-            fadingframes = 0;
-            pthread_mutex_unlock(&osdlock);
-            return;
-        }
-    }
-
-    if (show_dialog)
-    {
-        DisplayDialogNoTheme(yuvptr);
+        cerr << "no info_font defined, dead dialog\n";
         pthread_mutex_unlock(&osdlock);
         return;
     }
 
-    if (show_info)
-    {
-        DisplayInfo(yuvptr);
-    }
+    container = new OSDSet(name, false, vid_width, vid_height, wmult, hmult);
+    container->SetPriority(0);
+    container->SetAllowFade(false);
+    AddSet(container, name, false);
 
-    if (show_channum)
-    {
-        DisplayChannumNoTheme(yuvptr);
-    }
+    QRect dialogRect;
+    dialogRect.setTop(vid_height / 8);
+    dialogRect.setBottom(vid_height * 7 / 8);
+    dialogRect.setLeft(vid_width / 8);
+    dialogRect.setRight(vid_width * 7 / 8);
+    OSDTypeBox *box = new OSDTypeBox("background", dialogRect); 
+    container->AddType(box);
+
+    QRect rect = dialogRect;
+    rect.setBottom(rect.bottom() - font->Size() * 2 * 3 - 5);
+    rect.setTop(rect.top() + 5);
+    rect.setLeft(rect.left() + 5);
+    rect.setRight(rect.right() - 5);
+    OSDTypeText *text = new OSDTypeText("message", font, message, rect);
+    text->SetMultiLine(true);
+    container->AddType(text);
+
+    rect = dialogRect;
+    rect.setTop(rect.bottom() - font->Size() * 2 * 3 + 5);
+    rect.setBottom(rect.bottom() - font->Size() * (3 / 2) * 2 - 5);
+    rect.setLeft(rect.left() + 5);
+    rect.setRight(rect.right() - 5);
+    text = new OSDTypeText("option1", font, optionone, rect);
+    container->AddType(text);
+
+    rect = dialogRect;
+    rect.setTop(rect.bottom() - font->Size() * 2 * 2 + 5);
+    rect.setBottom(rect.bottom() - font->Size() / 2 - 5);
+    rect.setLeft(rect.left() + 5);
+    rect.setRight(rect.right() - 5);
+    text = new OSDTypeText("option2", font, optiontwo, rect);
+    container->AddType(text);
+
+    rect = dialogRect;
+    rect.setTop(rect.bottom() - font->Size() * 2 + 5);
+    rect.setBottom(rect.bottom() + font->Size() - 5);
+    rect.setLeft(rect.left() + 5);
+    rect.setRight(rect.right() - 5);
+    text = new OSDTypeText("option3", font, optionthree, rect);
+    container->AddType(text);
+
+    OSDTypePositionRectangle *opr = new OSDTypePositionRectangle("selector");
+    container->AddType(opr);
+
+    rect = dialogRect;
+    rect.setTop(rect.bottom() - font->Size() * 2 * 3 - 2);
+    rect.setBottom(rect.bottom() - font->Size() * 2 * 2 - 2);
+    opr->AddPosition(rect);
+
+    rect = dialogRect;
+    rect.setTop(rect.bottom() - font->Size() * 2 * 2 - 2);
+    rect.setBottom(rect.bottom() - font->Size() * 2 - 2);
+    opr->AddPosition(rect);
+
+    rect = dialogRect;
+    rect.setTop(rect.bottom() - font->Size() * 2 - 2);
+    rect.setBottom(rect.bottom() - 2);
+    opr->AddPosition(rect);
+
+    opr->SetPosition(0);
+    dialogResponseList[name] = 0;
+
+    container->DisplayFor(length * 30);
+    m_setsvisible = true;
 
     pthread_mutex_unlock(&osdlock);
 }
 
-int OSD::CalcNewOffset(OSDImage *image, int curoffset)
+void OSD::TurnDialogOff(const QString &name)
 {
-    if (!image)
-        return -1;
-
-    curoffset += pausemovementperframe;
-    if (curoffset >= image->height)
-        return -1;
-    return curoffset;
+    pthread_mutex_lock(&osdlock);
+    OSDSet *container = GetSet(name);
+    if (container)
+    {
+        container->Hide();
+    }
+    pthread_mutex_unlock(&osdlock);
 }
 
-void OSD::DisplayDialogNoTheme(unsigned char *yuvptr)
+void OSD::DialogUp(const QString &name)
 {
-    DarkenBox(dialogRect, yuvptr);
-
-    QRect rect = dialogRect;
-    rect.setBottom(rect.bottom() - infofontsize * 2 * 3 - 5);
-    rect.setTop(rect.top() + 5);
-    rect.setLeft(rect.left() + 5);
-    rect.setRight(rect.right() - 5);
-    DrawStringIntoBox(rect, dialogmessagetext, yuvptr, totalfadeframes);
-
-    rect = dialogRect;
-    rect.setTop(rect.bottom() - infofontsize * 2 * 3 + 5);
-    rect.setBottom(rect.bottom() - infofontsize * (3 / 2) * 2 - 5);
-    rect.setLeft(rect.left() + 5);
-    rect.setRight(rect.right() - 5);
-    DrawStringIntoBox(rect, dialogoptionone, yuvptr, totalfadeframes);
-
-    rect = dialogRect;
-    rect.setTop(rect.bottom() - infofontsize * 2 * 2 + 5);
-    rect.setBottom(rect.bottom() - infofontsize / 2 - 5);
-    rect.setLeft(rect.left() + 5);
-    rect.setRight(rect.right() - 5);
-    DrawStringIntoBox(rect, dialogoptiontwo, yuvptr, totalfadeframes);
-
-    rect = dialogRect;
-    rect.setTop(rect.bottom() - infofontsize * 2 + 5);
-    rect.setBottom(rect.bottom() + infofontsize - 5);
-    rect.setLeft(rect.left() + 5);
-    rect.setRight(rect.right() - 5);
-    DrawStringIntoBox(rect, dialogoptionthree, yuvptr, totalfadeframes);
-
-    rect = dialogRect;
-    if (currentdialogoption == 1)
+    pthread_mutex_lock(&osdlock);
+    OSDSet *container = GetSet(name);
+    if (container)
     {
-        rect.setTop(rect.bottom() - infofontsize * 2 * 3 - 2);
-        rect.setBottom(rect.bottom() - infofontsize * 2 * 2 - 2);
-    }
-    else if (currentdialogoption == 2)
-    {
-        rect.setTop(rect.bottom() - infofontsize * 2 * 2 - 2);
-        rect.setBottom(rect.bottom() - infofontsize * 2 - 2);
-    }
-    else if (currentdialogoption == 3)
-    {
-        rect.setTop(rect.bottom() - infofontsize * 2 - 2);
-        rect.setBottom(rect.bottom() - 2);
-    }
-    DrawRectangle(rect, yuvptr);
-}
-
-void OSD::DisplayInfo(unsigned char *yuvptr)
-{
-    if (infobackground)
-    {
-        BlendImage(infobackground, infobackground->position.x(),
-                   infobackground->position.y(), yuvptr, fadingframes);
-        if (useinfoicon && infoicon)
-            BlendImage(infoicon, infoiconpos.x(), infoiconpos.y(), yuvptr,
-                       fadingframes);
-        if (callsignRect.width() > 0)
-            DrawStringWithOutline(yuvptr, callsignRect, infocallsign, 
-                                  info_font, fadingframes);
-        if (timeRect.width() > 0)
+        OSDTypePositionRectangle *type;
+        type = (OSDTypePositionRectangle *)container->GetType("selector");
+        if (type)
         {
-            QString thetime = QTime::currentTime().toString(timeFormat);
-            DrawStringWithOutline(yuvptr, timeRect, thetime, info_font,
-                                  fadingframes);
+            type->PositionUp();
+            dialogResponseList[name] = type->GetPosition();
         }
     }
-    else
-    {
-        DarkenBox(infoRect, yuvptr);
-    }
-
-    QRect rect = infoRect;
-
-    if (titleRect.width() > 0)
-    {
-        rect = titleRect;
-
-    }
-
-    DrawStringWithOutline(yuvptr, rect, infotext, info_font, fadingframes);
-
-    if (titleRect.width() > 0)
-    {
-        rect = infoRect;
-    }
-    else
-    {
-        rect.setTop(rect.top() + infofontsize * 3 / 2);
-        rect.setBottom(rect.bottom() - infofontsize * 3 / 2);
-    }
-
-    DrawStringWithOutline(yuvptr, rect, subtitletext, info_font, fadingframes);
-
-    rect = infoRect;
-
-    if (titleRect.width() > 0)
-        rect.setTop(rect.top() + infofontsize * 3 / 2);
-    else
-        rect.setTop(rect.top() + infofontsize * 3);
-    DrawStringIntoBox(rect, desctext, yuvptr, fadingframes);
+    pthread_mutex_unlock(&osdlock);
 }
 
-void OSD::DisplayChannumNoTheme(unsigned char *yuvptr)
+void OSD::DialogDown(const QString &name)
 {
-    DrawStringWithOutline(yuvptr, channumRect, channumtext, channum_font, 
-                          fadingframes, true);
-}
-
-void OSD::DisplayPause(unsigned char *yuvptr)
-{
-    if (pausebackground)
+    pthread_mutex_lock(&osdlock);
+    OSDSet *container = GetSet(name);
+    if (container)
     {
-        BlendImage(pausebackground, pausebackground->position.x(),
-                   pausebackground->position.y() + pauseyoffset, yuvptr,
-                   pausefadingframes);
-    }
- 
-    if (pausestatusRect.width() > 0)
-    {
-        QRect temp = pausestatusRect;
-        temp.moveTopLeft(QPoint(temp.left(), temp.top() + pauseyoffset));
-        DrawStringWithOutline(yuvptr, temp, pausestatus, info_font,
-                              pausefadingframes);
-    }
-
-    if (pausesliderRect.width() > 0)
-    {
-        if (pausefilltype || !pausesliderpos)
+        OSDTypePositionRectangle *type;
+        type = (OSDTypePositionRectangle *)container->GetType("selector");
+        if (type)
         {
-            int width = (int)((pausesliderRect.width() / 1000.0) * 
-                        pauseposition);
-            if (width > pausesliderRect.width())
-                width = pausesliderRect.width();
-	    BlendFillSlider(pausesliderfill, pausesliderRect.x(),
-                            pausesliderRect.y() + pauseyoffset, width, yuvptr,
-                            pausefadingframes);
-        }
-        else
-        {
-            int xpos = (int)((pausesliderRect.width() / 1000.0) *
-                       pauseposition);
-            xpos += pausesliderRect.left();
-            BlendImage(pausesliderpos, xpos, pausesliderRect.y() - 3 + 
-                       pauseyoffset, yuvptr, pausefadingframes);
+            type->PositionDown();
+            dialogResponseList[name] = type->GetPosition();
         }
     }
+    pthread_mutex_unlock(&osdlock);
+}
 
-    if (pausesliderfont)
+bool OSD::DialogShowing(const QString &name)
+{
+    if (name == "")
+        return false;
+
+    return (GetSet(name) != NULL);
+}
+
+int OSD::GetDialogResponse(const QString &name)
+{
+    if (dialogResponseList.contains(name))
     {
-        QRect temp = pausesliderTextRect;
-        temp.moveTopLeft(QPoint(temp.left(), temp.top() + pauseyoffset));
-        DrawStringCentered(yuvptr, temp, pauseslidertext, pausesliderfont,
-                           pausefadingframes);
+        int ret = dialogResponseList[name] + 1;
+        dialogResponseList.erase(name);
+
+        return ret;
     }
+    return -1;
 }
 
-void OSD::DrawStringCentered(unsigned char *yuvptr, QRect rect,
-                             const QString &text, TTFFont *font, int fadeframes)
+void OSD::Display(unsigned char *yuvptr)
 {
-    int textlength = 0;
-    font->CalcWidth(text, &textlength);
+    bool anytodisplay = false;
 
-    int xoffset = (rect.width() - textlength) / 2;
+    vector<OSDSet *> removeList;
 
-    if (xoffset > 0)
-        rect.moveBy(xoffset, 0);
-
-    DrawStringWithOutline(yuvptr, rect, text, font, fadeframes);
-}
-
-void OSD::DrawStringWithOutline(unsigned char *yuvptr, QRect rect, 
-                                const QString &text, TTFFont *font,
-                                int fadeframes, bool rightjustify)
-{
-    int x = rect.left();
-    int y = rect.top();
-    int maxx = rect.right();
-    int maxy = rect.bottom();
-
-    int alphamod = 255;
-
-    if (totalfadeframes > 0)
-        alphamod = (int)((((float)(fadeframes) / totalfadeframes) * 256.0) +
-                   0.5);
-
-    font->DrawString(yuvptr, x - 1, y - 1, text, maxx, maxy, alphamod, false,
-                     rightjustify);
-
-    font->DrawString(yuvptr, x + 1, y - 1, text, maxx, maxy, alphamod, false,
-                     rightjustify);
-
-    font->DrawString(yuvptr, x - 1, y + 1, text, maxx, maxy, alphamod, false,
-                      rightjustify);
-
-    font->DrawString(yuvptr, x + 1, y + 1, text, maxx, maxy, alphamod, false,
-                      rightjustify);
-
-    font->DrawString(yuvptr, x, y, text, maxx, maxy, alphamod, true, 
-                     rightjustify);
-}    
-
-void OSD::DrawStringIntoBox(QRect rect, const QString &text, 
-                            unsigned char *screen, int fadeframes)
-{
-    int textlength = 0;
-    info_font->CalcWidth(text, &textlength);
-
-    int maxlength = rect.width();
-    if (textlength > maxlength)
+    pthread_mutex_lock(&osdlock);
+    vector<OSDSet *>::iterator i = setList->begin();
+    for (; i != setList->end(); i++)
     {
-        char *orig = strdup((char *)text.ascii());
-        int length = 0;
-        int lines = 0;
-        char line[512];
-        memset(line, '\0', 512);
-
-        char *word = strtok(orig, " ");
-        while (word)
+        OSDSet *container = (*i);
+        if (container->Displaying())
         {
-            if (word[0] == '%') 
+            OSDTypeText *timedisp = (OSDTypeText *)container->GetType("time");
+            if (timedisp)
             {
-                if (word[1] == 'd')
-                {
-                    int timeleft = displayframes - time(NULL);
-                    if (timeleft > 99) 
-                        timeleft = 99;
-                    if (timeleft < 0)
-                        timeleft = 0;
-
-                    sprintf(word, "%d", timeleft);
-                }
+                QString thetime = QTime::currentTime().toString(timeFormat);
+                timedisp->SetText(thetime);
             }
-            info_font->CalcWidth(word, &textlength);
-            if (textlength + space_width + length > maxlength)
+
+            container->Draw(yuvptr);
+            anytodisplay = true;
+            if (container->GetFramesLeft() == 0 && totalfadeframes > 0)
             {
-                QRect drawrect = rect;
-                drawrect.setTop(rect.top() + infofontsize * (lines) * 3 / 2);
-                DrawStringWithOutline(screen, drawrect, line, info_font, 
-                                      fadeframes);
-                length = 0;
-                memset(line, '\0', 512);
-                lines++;
+                container->FadeFor(totalfadeframes);
             }
-            if (length == 0)
-            {
-                length = textlength;
-                strcpy(line, word);
-            }
-            else
-            {
-                length += textlength + space_width;
-                strcat(line, " ");
-                strcat(line, word);
-            }
-            word = strtok(NULL, " ");
         }
-        QRect drawrect = rect;
-        drawrect.setTop(rect.top() + infofontsize * (lines) * 3 / 2);
-        DrawStringWithOutline(screen, drawrect, line, info_font, fadeframes);
-        free(orig);
+        else if (container->HasDisplayed())
+        {
+            if (!container->GetCache())
+                removeList.push_back(container);
+        }
     }
-    else
+
+    while (removeList.size() > 0)
     {
-        DrawStringWithOutline(screen, rect, text, info_font, fadeframes);
+        OSDSet *container = removeList.back();
+        RemoveSet(container);
+        removeList.pop_back();
     }
+
+    pthread_mutex_unlock(&osdlock);
+
+    m_setsvisible = anytodisplay;
 }
 
-void OSD::DarkenBox(QRect &rect, unsigned char *screen)
+bool OSD::Visible(void)
 {
-    unsigned char *src;
-    char c = -128;
-
-    int ystart = rect.top();
-    int yend = rect.bottom();
-    int xstart = rect.left();
-    int xend = rect.right();
-
-    for (int y = ystart; y < yend; y++)
-    {
-        for (int x = xstart; x < xend; x++)
-        {
-            src = screen + x + y * vid_width;
-            *src = ((*src * c) >> 8) + *src;
-        }
-    }
+    return m_setsvisible;
 }
 
-void OSD::DrawRectangle(QRect &rect, unsigned char *screen)
+OSDSet *OSD::GetSet(const QString &text)
 {
-    unsigned char *src;
+    OSDSet *ret = NULL;
+    if (setMap.contains(text))
+        ret = setMap[text];
 
-    int ystart = rect.top();
-    int yend = rect.bottom();
-    int xstart = rect.left();
-    int xend = rect.right();
-
-    for (int y = ystart; y < yend; y++)
-    {
-        for (int x = xstart; x < xstart + 2; x++)
-        {
-            src = screen + x + y * vid_width;
-            *src = 255;
-        }
-        for (int x = xend - 2; x < xend; x++)
-        {
-            src = screen + x + y * vid_width;
-            *src = 255;
-        }
-    }
-
-    for (int x = xstart; x < xend; x++)
-    {
-        for (int y = ystart; y < ystart + 2; y++)
-        {
-            src = screen + x + y * vid_width;
-            *src = 255;
-        }
-        for (int y = yend - 2; y < yend; y++)
-        {
-            src = screen + x + y * vid_width;
-            *src = 255;
-        }
-    }
+    return ret;
 }
 
-void OSD::BlendImage(OSDImage *image, int xstart, int ystart, 
-                     unsigned char *screen, int fadeframes)
+TTFFont *OSD::GetFont(const QString &text)
 {
-    if (!image->isvalid)
-        return;
+    TTFFont *ret = NULL;
+    if (fontMap.contains(text))
+        ret = fontMap[text];
 
-    unsigned char *dest, *src;
-    int alpha, tmp1, tmp2;
-
-    int width = image->width;
-    int height = image->height;
-
-    if (height + ystart > vid_height)
-        height = vid_height - ystart - 1;
-	
-    int ysrcwidth;
-    int ydestwidth;
-
-    int alphamod = 255;
-
-    if (totalfadeframes > 0)
-        alphamod = (int)((((float)(fadeframes) / totalfadeframes) * 256.0) + 
-                   0.5);
-
-    for (int y = 0; y < height; y++)
-    {
-        ysrcwidth = y * width;
-        ydestwidth = (y + ystart) * vid_width;
-
-        for (int x = 0; x < width; x++)
-        {
-            alpha = *(image->alpha + x + ysrcwidth);
-  
-            if (alpha == 0)
-                continue;
-
-            alpha = ((alpha * alphamod) + 0x80) >> 8;
-
-	    dest = screen + x + xstart + ydestwidth;
-            src = image->ybuffer + x + ysrcwidth;
-
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
-        }
-    }
-
-    width /= 2;
-    height /= 2;
-  
-    ystart /= 2;
-    xstart /= 2;
-
-    unsigned char *destuptr = screen + (vid_width * vid_height);
-    unsigned char *destvptr = screen + (vid_width * vid_height * 5 / 4);
-
-    for (int y = 0; y < height; y++)
-    {
-        ysrcwidth = y * width;
-        ydestwidth = (y + ystart) * (vid_width / 2);
-
-        for (int x = 0; x < width; x++)
-        {
-            alpha = *(image->alpha + x * 2 + y * 2 * image->width);
-
-	    if (alpha == 0)
-		continue;
-
-            alpha = ((alpha * alphamod) + 0x80) >> 8;
-
-            dest = destuptr + x + xstart + ydestwidth;
-            src = image->ubuffer + x + ysrcwidth;
-
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
-
-            dest = destvptr + x + xstart + ydestwidth;
-            src = image->vbuffer + x + ysrcwidth;
-
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
-        }
-    }
+    return ret;
 }
 
-void OSD::BlendFillSlider(OSDImage *image, int xstart, int ystart,
-                          int drawwidth, unsigned char *screen, int fadeframes)
+class comp
 {
-    if (!image->isvalid)
-        return;
-
-    unsigned char *dest, *src;
-    int alpha, tmp1, tmp2;
-
-    int width = drawwidth;
-    int height = image->height;
-
-    if (height + ystart > vid_height)
-        height = vid_height - ystart - 1;
-
-    int ysrcwidth;
-    int ydestwidth;
-
-    int alphamod = 255;
-    if (totalfadeframes > 0)
-        alphamod = (int)((((float)(fadeframes) / totalfadeframes) * 256.0) + 
-                   0.5);
-
-    for (int y = 0; y < height; y++)
+  public:
+    bool operator()(const OSDSet *a, const OSDSet *b)
     {
-        ysrcwidth = y * image->width;
-        ydestwidth = (y + ystart) * vid_width;
-
-        for (int x = 0; x < width; x++)
-        {
-            alpha = *(image->alpha + ysrcwidth);
-            if (alpha == 0)
-                continue;
-
-            alpha = ((alpha * alphamod) + 0x80) >> 8;
-
-            dest = screen + x + xstart + ydestwidth;
-            src = image->ybuffer + ysrcwidth;
-
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
-        }
-    }  
-
-    width /= 2;
-    height /= 2;
-
-    ystart /= 2;
-    xstart /= 2;
-
-    unsigned char *destuptr = screen + (vid_width * vid_height);
-    unsigned char *destvptr = screen + (vid_width * vid_height * 5 / 4);
-
-    for (int y = 0; y < height; y++)
-    {
-        ysrcwidth = y * (image->width / 2);
-        ydestwidth = (y + ystart) * (vid_width / 2);
-
-        for (int x = 0; x < width; x++)
-        {
-            alpha = *(image->alpha + y * 2 * image->width);
-
-            if (alpha == 0)
-                continue;
-
-            alpha = ((alpha * alphamod) + 0x80) >> 8;
-
-            dest = destuptr + x + xstart + ydestwidth;
-            src = image->ubuffer + ysrcwidth;
-
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
-
-            dest = destvptr + x + xstart + ydestwidth;
-            src = image->vbuffer + ysrcwidth;
-
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
-        }
+        return (a->GetPriority() > b->GetPriority());
     }
+};
+
+void OSD::AddSet(OSDSet *set, QString name, bool withlock)
+{
+    if (withlock)
+        pthread_mutex_lock(&osdlock);
+
+    setMap[name] = set;
+    setList->push_back(set);
+
+    sort(setList->begin(), setList->end(), comp());     
+
+    if (withlock)
+        pthread_mutex_unlock(&osdlock);
 }
 
+void OSD::RemoveSet(OSDSet *set)
+{
+    setMap.erase(set->GetName());
+    vector<OSDSet *>::iterator i = setList->begin();
+    for (; i != setList->end(); i++)
+        if (*i == set)
+            break;
+
+    if (i != setList->end())
+        setList->erase(i);
+
+    delete set;
+}

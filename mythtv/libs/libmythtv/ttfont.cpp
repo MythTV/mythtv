@@ -130,7 +130,12 @@ Raster_Map *TTFFont::calc_size(int *width, int *height, char *text)
            pw += (bbox.xMax / 64);
        }
        else
-           pw += glyphs[j]->advance.x / 65535;
+       {
+           if (glyphs[j]->advance.x == 0)
+               pw += 4;
+           else
+               pw += glyphs[j]->advance.x / 65535;
+       }
    }
    *width = pw;
    *height = ph;
@@ -278,7 +283,10 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, char *text,
            _read -= rtmp->cols;
            _off -= rmap->cols;
        }
-       x_offset += (glyphs[j]->advance.x / 65535);
+       if (glyphs[j]->advance.x == 0)
+           x_offset += 4;
+       else
+           x_offset += (glyphs[j]->advance.x / 65535);
        previous = j;
     }
 }
@@ -319,7 +327,7 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
                       tmp1 = (255 - *src) * a;
                       tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
                       *src = tmp2 & 0xff;
-                      if (a == 255)
+                      if (a >= 230)
                       {
                           offset = ((y + ystart) / 2) * (video_width / 2) + 
                                    (x + xstart) / 2;
@@ -456,6 +464,8 @@ TTFFont::TTFFont(char *file, int size, int video_width, int video_height)
    unsigned short      i, n, code;
 
    valid = false;
+   m_size = size;
+   spacewidth = 0;
 
    if (!have_library)
    {
@@ -536,6 +546,12 @@ TTFFont::TTFFont(char *file, int size, int video_width, int video_height)
    use_kerning = 0; //FT_HAS_KERNING(face);
 
    valid = true;
+
+   int mwidth, twidth;
+   CalcWidth("M M", &twidth);
+   CalcWidth("M", &mwidth);
+
+   spacewidth = twidth - (mwidth * 2);
 }
 
 void TTFFont::CalcWidth(const QString &text, int *width_return)
@@ -552,7 +568,10 @@ void TTFFont::CalcWidth(const QString &text, int *width_return)
 
 	if (!FT_VALID(glyphs[j]))
 	   continue;
-	pw += glyphs[j]->advance.x / 65535;
+        if (glyphs[j]->advance.x == 0)
+            pw += 4;
+        else
+	    pw += glyphs[j]->advance.x / 65535;
    }
 
    if (width_return)

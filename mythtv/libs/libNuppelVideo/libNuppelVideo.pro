@@ -16,8 +16,8 @@ QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 # Input
 HEADERS += effects.h filter.h format.h frame.h jitterometer.h lzoconf.h 
 HEADERS += minilzo.h mmx.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 
-HEADERS += RingBuffer.h RTjpegN.h ttfont.h XJ.h yuv2rgb.h
+HEADERS += osdtypes.h RingBuffer.h RTjpegN.h ttfont.h XJ.h yuv2rgb.h
 
 SOURCES += effects.cpp filter.c jitterometer.cpp minilzo.cpp 
-SOURCES += NuppelVideoPlayer.cpp NuppelVideoRecorder.cpp osd.cpp RingBuffer.cpp
-SOURCES += RTjpegN.cpp ttfont.cpp XJ.cpp yuv2rgb.cpp
+SOURCES += NuppelVideoPlayer.cpp NuppelVideoRecorder.cpp osd.cpp osdtypes.cpp
+SOURCES += RingBuffer.cpp RTjpegN.cpp ttfont.cpp XJ.cpp yuv2rgb.cpp

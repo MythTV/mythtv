@@ -1,7 +1,7 @@
 # Location to draw the channel number into
-str ChannelNumberRect=460,20,120,90
+str ChannelNumberRect=420,20,160,90
 # Size of the channel number font
-int ChannelNumberFontSize=40
+int ChannelNumberFontSize=50
 
 # Background image for the box that shows up on channel change, should be
 # sized to fit 640x480

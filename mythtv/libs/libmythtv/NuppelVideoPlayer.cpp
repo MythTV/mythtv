@@ -356,7 +356,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (usingextradata && extradata.seektable_offset > 0 && !disablevideo)
     {
-        long long currentpos = ringBuffer->Seek(0, SEEK_CUR);
+        long long currentpos = ringBuffer->Seek(0, SEEK_CUR) - FRAMEHEADERSIZE;
 
         ringBuffer->Seek(extradata.seektable_offset, SEEK_SET);
 

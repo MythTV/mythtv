@@ -85,7 +85,7 @@ int OSDDisplayTime=3
 # ugly OSD will be used instead.
 str OSDTheme=defaultosd
 # Path to the TTF used in the OSD. 
-str OSDFont=helr.ttf
+str OSDFont=FreeSans.ttf
 #str OSDFont=/usr/share/fonts/truetype/Arial.ttf
 #
 # Channel ordering.  How to choose the next channel when using the up/down

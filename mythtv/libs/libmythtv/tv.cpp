@@ -47,6 +47,8 @@ TV::TV(MythContext *lcontext, const QString &startchannel, int capturecardnum,
 {
     context = lcontext;
     db_conn = NULL;
+    dialogname = "";
+
     ConnectDB(capturecardnum);
  
     QString chanorder = context->GetSetting("ChannelOrdering");
@@ -210,12 +212,15 @@ int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
     QString option2 = "Let it record and go back to the Main Menu";
     QString option3 = "Don't let it record, I want to watch TV";
 
-    osd->SetDialogBox(message, option1, option2, option3, timeuntil);
+    dialogname = "allowrecordingbox";
+    osd->NewDialogBox(dialogname, message, option1, option2, option3, 
+                      timeuntil);
 
-    while (osd->DialogShowing())
-        usleep(50);
+    while (osd->DialogShowing(dialogname))
+        usleep(500);
 
-    int result = osd->GetDialogSelection();
+    int result = osd->GetDialogResponse(dialogname);
+    dialogname = "";
 
     tvtorecording = result;
 
@@ -1040,13 +1045,14 @@ void TV::RunTV(void)
 
 void TV::ProcessKeypress(int keypressed)
 {
-    if (nvp->GetOSD() && osd->DialogShowing())
+    if (nvp->GetOSD() && osd->DialogShowing(dialogname))
     {
         switch (keypressed)
         {
-            case wsUp: osd->DialogUp(); break;
-            case wsDown: osd->DialogDown(); break;
-            case ' ': case wsEnter: case wsReturn: osd->TurnOff(); break;
+            case wsUp: osd->DialogUp(dialogname); break;
+            case wsDown: osd->DialogDown(dialogname); break;
+            case ' ': case wsEnter: case wsReturn: 
+                          osd->TurnDialogOff(dialogname); break;
             default: break;
         }
         

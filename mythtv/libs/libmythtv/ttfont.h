@@ -22,6 +22,9 @@ class TTFFont
                      bool rightjustify = false); 
      void CalcWidth(const QString &text, int *width_return);
 
+     int SpaceWidth() { return spacewidth; }
+     int Size() { return m_size; }
+
   private:
      Raster_Map *create_font_raster(int width, int height);
      Raster_Map *duplicate_raster(FT_BitmapGlyph bmap);
@@ -47,6 +50,9 @@ class TTFFont
      int          vid_width;
      int          vid_height;
      bool         use_kerning;
+
+     int spacewidth;
+     int m_size;
 };
 
 #endif
