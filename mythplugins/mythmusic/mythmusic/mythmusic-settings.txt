@@ -5,6 +5,9 @@ str MusicLocation=/mnt/store/music/
 # Where's your CD ROM?  Gotta be able to read from here.
 str CDDevice=/dev/cdrom
 
+# What dsp device to output to
+str AudioDevice=/dev/dsp
+
 # Place to store the temporary output from the CD.  Gotta be able to write.
 str TemporarySpace=/tmp/
 

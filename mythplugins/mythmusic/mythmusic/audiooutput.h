@@ -32,7 +32,7 @@ public:
     long written();
     long latency();
     void seek(long);
-
+    void resetTime();
 
 private:
     // thread run function

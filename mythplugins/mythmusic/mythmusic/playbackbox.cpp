@@ -364,7 +364,8 @@ void PlaybackBox::setupPlaylist(bool toggle)
 
 void PlaybackBox::play()
 {
-    stop();
+    if (isplaying)
+        stop();
 
     if (plist->size() == 0)
         return;
@@ -374,21 +375,25 @@ void PlaybackBox::play()
     QUrl sourceurl(playfile);
     QString sourcename(playfile);
 
-    if (output)
-        fprintf(stderr, "output not deleted!\n");
+    bool startoutput = false;
 
     QString cdext = ".cda";
     if (playfile.right(cdext.length()).lower() == cdext)
     {
         output = NULL;
     }
-    else
+    else if (!output)
     {
-        output = new AudioOutput(outputBufferSize * 1024, "/dev/dsp");
+        QString adevice;
+        adevice = (char *)(settings->GetSetting("AudioDevice").c_str());
+
+        output = new AudioOutput(outputBufferSize * 1024, adevice);
         output->setBufferSize(outputBufferSize * 1024);
         output->addListener(this);
 
-        if (! output->initialize())
+        startoutput = true;
+
+        if (!output->initialize())
             return;
     }
 
@@ -441,7 +446,13 @@ void PlaybackBox::play()
         }
  
         if (output)
-            output->start();
+        {
+            if (startoutput)
+                output->start();
+            else
+                output->resetTime();
+        }
+
         decoder->start();
 
         isplaying = true;
@@ -468,6 +479,24 @@ void PlaybackBox::pause(void)
         output->recycler()->cond()->wakeAll();
         output->recycler()->mutex()->unlock();
     }
+}
+
+void PlaybackBox::stopDecoder(void)
+{
+    if (decoder && decoder->running()) {
+        decoder->mutex()->lock();
+        decoder->stop();
+        decoder->mutex()->unlock();
+    }
+
+    if (decoder) {
+        decoder->mutex()->lock();
+        decoder->cond()->wakeAll();
+        decoder->mutex()->unlock();
+    }
+
+    if (decoder)
+        decoder->wait();
 }
 
 void PlaybackBox::stop(void)
@@ -550,7 +579,7 @@ void PlaybackBox::previous()
 
 void PlaybackBox::next()
 {
-    stop();
+//    stop();
 
     listlock.lock();
 
@@ -569,7 +598,9 @@ void PlaybackBox::next()
 
 void PlaybackBox::nextAuto()
 {
-    stop();
+    stopDecoder();
+
+    isplaying = false;
 
     if (repeatmode)
         play();

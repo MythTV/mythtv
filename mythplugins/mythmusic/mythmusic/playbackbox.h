@@ -43,6 +43,7 @@ class PlaybackBox : public QDialog
     void play();
     void pause();
     void stop();
+    void stopDecoder();
     void previous();
     void next();
     void seekforward();

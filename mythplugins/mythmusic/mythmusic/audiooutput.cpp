@@ -191,6 +191,14 @@ void AudioOutput::resetDSP()
 }
 
 
+void AudioOutput::resetTime()
+{
+    mutex()->lock();
+    current_seconds = -1;
+    total_written = 0;
+    mutex()->unlock();
+}
+
 bool AudioOutput::initialize()
 {
     inited = paus = play = user_stop = FALSE;

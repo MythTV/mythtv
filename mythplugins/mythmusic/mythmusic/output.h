@@ -93,6 +93,7 @@ public:
     virtual long written() = 0;
     virtual long latency() = 0;
     virtual void seek(long) = 0;
+    virtual void resetTime() = 0;
 
 
 protected:
