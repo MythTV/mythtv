@@ -274,8 +274,7 @@ void MythMainWindow::Init(void)
     Qt::WFlags flags = 0;
     if (d->does_fill_screen)
         flags = Qt::WStyle_Customize  |
-                Qt::WStyle_NoBorder   |
-                Qt::WStyle_StaysOnTop;
+                Qt::WStyle_NoBorder;
     else
         flags = Qt::WStyle_Customize | Qt::WStyle_NormalBorder;
 
