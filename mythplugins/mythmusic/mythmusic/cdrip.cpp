@@ -7,6 +7,7 @@
 #include <qcursor.h>
 #include <qcheckbox.h>
 #include <qpushbutton.h>
+#include <qregexp.h>
 #include <qvbox.h>
 #include <qprogressbar.h>
 #include <qradiobutton.h>
