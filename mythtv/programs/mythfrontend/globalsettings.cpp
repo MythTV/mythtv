@@ -319,6 +319,20 @@ public:
     };
 };
 
+class FFRewRepos: public CheckBoxSetting, public GlobalSetting {
+public:
+    FFRewRepos():
+        GlobalSetting("FFRewRepos") {
+        setLabel("Reposition after fast forward/rewind");
+        setValue(true);
+        setHelpText("When exiting sticky keys fast forward/rewind mode, "
+                   "reposition before resuming normal playback.  This is to "
+                   "compensate for the reaction time between seeing where to "
+                   "resume playback and actually exiting fast forward/rewind "
+                   "mode.");
+    };
+};
+
 class OSDDisplayTime: public SpinBoxSetting, public GlobalSetting {
 public:
     OSDDisplayTime():
@@ -1059,6 +1073,7 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(new FastForwardAmount());
     seek->addChild(new RewindAmount());
     seek->addChild(new StickyKeys());
+    seek->addChild(new FFRewRepos());
     seek->addChild(new ExactSeeking());
     seek->addChild(new JumpAmount());
     addChild(seek);

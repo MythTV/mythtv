@@ -1312,6 +1312,9 @@ void PlaybackBox::play(ProgramInfo *rec)
 
 void PlaybackBox::doRemove(ProgramInfo *rec)
 {
+    if (noUpdate)
+        return;
+
     noUpdate = true;
     RemoteDeleteRecording(rec);
     noUpdate = false;

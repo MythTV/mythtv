@@ -72,8 +72,8 @@ class NuppelVideoPlayer
     void Unpause(void); 
     bool GetPause(void);
    
-    void FastForward(float seconds);
-    void Rewind(float seconds);
+    bool FastForward(float seconds);
+    bool Rewind(float seconds);
 
     void SkipCommercials(int direction);
 

@@ -1328,16 +1328,20 @@ void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
     return NULL;
 }
 
-void NuppelVideoPlayer::FastForward(float seconds)
+bool NuppelVideoPlayer::FastForward(float seconds)
 {
     if (fftime == 0)
         fftime = (int)(seconds * video_frame_rate);
+
+    return fftime > CalcMaxFFTime(fftime);
 }
 
-void NuppelVideoPlayer::Rewind(float seconds)
+bool NuppelVideoPlayer::Rewind(float seconds)
 {
     if (rewindtime == 0)
         rewindtime = (int)(seconds * video_frame_rate);
+
+    return rewindtime >= framesPlayed;
 }
 
 void NuppelVideoPlayer::SkipCommercials(int direction)

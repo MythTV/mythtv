@@ -39,21 +39,25 @@ enum SeekSpeeds {
 };
 
 struct SeekSpeedInfo {
-  QString   dispString;
-  float  scaling;
+    QString   dispString;
+    float  scaling;
+    float ff_repos;
+    float rew_repos;
 };
 
 SeekSpeedInfo seek_speed_array[] =
-  {{"", 0.0},
-   {"1/4X", 0.25},
-   {"1/2X", 0.50},
-   {"1X", 1.00},
-   {"1.5X", 1.50},
-   {"2X", 2.24},
-   {"3X", 3.34},
-   {"8X", 7.48},
-   {"10X", 11.18},
-   {"16X", 16.72}};
+{
+    {"",     0.00,   0.00,  0.00},
+    {"1/4X", 0.25,   0.00,  0.00},
+    {"1/2X", 0.50,   4.00,  4.00},
+    {"1X",   1.00,  12.00,  9.00},
+    {"1.5X", 1.50,  16.00, 11.50},
+    {"2X",   2.24,  20.00, 14.00},
+    {"3X",   3.34,  28.00, 19.00},
+    {"8X",   7.48,  68.00, 44.00},
+    {"10X", 11.18,  84.00, 54.00},
+    {"16X", 16.72, 132.00, 84.00}
+};
 
 void *SpawnDecode(void *param)
 {
@@ -679,6 +683,8 @@ void TV::RunTV(void)
     int keypressed;
 
     stickykeys = gContext->GetNumSetting("StickyKeys");
+    ff_rew_repos = gContext->GetNumSetting("FFRewRepos", 1);
+
     doing_ff_rew = 0;
     ff_rew_scaling = 1.0;
     ff_rew_index = SSPEED_NORMAL;
@@ -904,7 +910,7 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_Z:
         {
-            StopFFRew();
+            StopFFRew(ff_rew_repos);
             DoSkipCommercials(1);
             break;
         }
@@ -915,13 +921,13 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_Q:
         {
-            StopFFRew();
+            StopFFRew(ff_rew_repos);
             DoSkipCommercials(-1);
             break;
         }
         case Key_S: case Key_P: 
         {
-            StopFFRew();
+            StopFFRew(ff_rew_repos);
             DoPause();
             break;
         }
@@ -929,7 +935,7 @@ void TV::ProcessKeypress(int keypressed)
         {
             if (!stickykeys)
             {
-                StopFFRew();
+                StopFFRew(ff_rew_repos);
                 DoFF(fftime); 
                 break;
             }
@@ -951,7 +957,7 @@ void TV::ProcessKeypress(int keypressed)
         {
             if (!stickykeys)
             {
-                StopFFRew();
+                StopFFRew(ff_rew_repos);
                 DoRew(rewtime);
                 break;
             }
@@ -1029,7 +1035,7 @@ void TV::ProcessKeypress(int keypressed)
                     case Key_9: ff_rew_index = SSPEED_FAST_6; break;
 
                     default:
-                       StopFFRew();
+                       StopFFRew(ff_rew_repos);
                        was_doing_ff_rew = true;
                        break;
                 }
@@ -1376,7 +1382,8 @@ void TV::DoFF(int time)
         osd->StartPause(pos, slidertype, scaleString, desc, 2);
     }
 
-    activenvp->FastForward(time * ff_rew_scaling);
+    if (activenvp->FastForward(time * ff_rew_scaling))
+        StopFFRew(false);
 
     if (muted) 
         muteTimer->start(600, true);
@@ -1416,7 +1423,8 @@ void TV::DoRew(int time)
         osd->StartPause(pos, slidertype, scaleString, desc, 2);
     }
 
-    activenvp->Rewind(time * ff_rew_scaling);
+    if (activenvp->Rewind(time * ff_rew_scaling))
+        StopFFRew(false);
 
     if (muted) 
         muteTimer->start(600, true);
@@ -1428,32 +1436,18 @@ void TV::DoRew(int time)
     }
 }
 
-void TV::StopFFRew(void)
+void TV::StopFFRew(bool repos)
 {
     if (!doing_ff_rew)
         return;
 
-    const double ff_offset = 7.00;
-    const double ff_scale = 6.00;
-    const double rew_offset = 0.00;
-    const double rew_scale = 6.00;
-
-    bool muted = false;
-
-    if (volumeControl && !volumeControl->GetMute())
+    if (repos)
     {
-        volumeControl->ToggleMute();
-        muted = true;
+        if (doing_ff_rew > 0)
+            activenvp->Rewind(seek_speed_array[ff_rew_index].ff_repos);
+        else
+            activenvp->FastForward(seek_speed_array[ff_rew_index].rew_repos);
     }
-
-    ff_rew_scaling = seek_speed_array[ff_rew_index].scaling;
-    if (doing_ff_rew > 0)
-        activenvp->Rewind(ff_offset + ff_scale * ff_rew_scaling);
-    else
-        activenvp->FastForward(rew_offset + rew_scale * ff_rew_scaling);
-
-    if (muted) 
-        muteTimer->start(600, true);
 
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
