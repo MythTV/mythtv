@@ -55,6 +55,8 @@ class DaapServer: public MFDHttpPlugin
     uint metadata_audio_generation;
 
     QValueList<int> hanging_updates;
+
+    bool first_update;
 };
 
 #endif  // daapserver_h_

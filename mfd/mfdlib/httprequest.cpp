@@ -22,6 +22,7 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
     parent = owner;
     raw_request = NULL;
     top_line = "";
+    raw_request_line = "";
     all_is_well = true;
     send_response = true;
     headers.setAutoDelete(true);
@@ -70,6 +71,7 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
             //  some checking that things are sane GET /server-info HTTP/1.1
             //
             
+            raw_request_line = QString(parsing_buffer);
             top_line = QString(parsing_buffer);
             QStringList line_tokens = QStringList::split( " ", top_line );
 
@@ -213,6 +215,11 @@ int HttpRequest::readLine(int *parse_point, char *parsing_buffer)
     return amount_read;
 }
 
+QString HttpRequest::getRequest()
+{
+    return raw_request_line;
+}
+
 QString HttpRequest::getHeader(const QString& field_label)
 {
     HttpHeader *which_one = headers.find(field_label);
@@ -233,6 +240,15 @@ QString HttpRequest::getVariable(const QString& variable_name)
     return NULL;
 }
 
+void HttpRequest::printRequest()
+{
+    cout << "==============================Debugging output==============================" << endl;
+    cout << "HTTP request line was:" << endl;
+    cout << raw_request_line << endl;
+    cout << "============================================================================" << endl;
+    
+}
+
 void HttpRequest::printHeaders()
 {
     //
@@ -246,6 +262,24 @@ void HttpRequest::printHeaders()
     for( ; iterator.current(); ++iterator )
     {
         cout << "\t" << iterator.currentKey() << ": " << iterator.current()->getValue() << endl;
+    }
+    cout << "============================================================================" << endl;
+    
+}
+
+void HttpRequest::printGetVariables()
+{
+    //
+    //  Debugging code to print all the headers that came in on this request
+    //
+    
+    cout << "==============================Debugging output==============================" << endl;
+    cout << "HTTP request contained the following get variables:" << endl;
+
+    QDictIterator<HttpGetVariable> iterator( get_variables );
+    for( ; iterator.current(); ++iterator )
+    {
+        cout << "\t" << iterator.currentKey() << "=" << iterator.current()->getValue() << endl;
     }
     cout << "============================================================================" << endl;
     

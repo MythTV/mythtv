@@ -38,11 +38,14 @@ class HttpRequest
     HttpResponse*   getResponse(){return my_response;}
     bool            allIsWell(){return all_is_well;}
     const QString&  getUrl(){return url;} 
+    QString         getRequest();
     QString         getHeader(const QString &field_label);
     QString         getVariable(const QString &variable_name);
     void            sendResponse(bool yes_or_no){send_response = yes_or_no;}
     bool            sendResponse(){return send_response;}
-    void            printHeaders();
+    void            printRequest();     //  Debugging
+    void            printHeaders();     //  Debugging
+    void            printGetVariables();//  Debugging
     MFDHttpPlugin*  getParent(){return parent;}
 
   private:
@@ -52,6 +55,7 @@ class HttpRequest
     char          *raw_request;
     int           raw_length;
     QString       top_line;
+    QString       raw_request_line;
     QString       url;
     bool          all_is_well;
     HttpResponse  *my_response;

@@ -18,6 +18,7 @@ class HttpGetVariable
   public:
   
     HttpGetVariable(const QString &text_segment);
+    HttpGetVariable(const QString &label, const QString &a_value);
     ~HttpGetVariable();
 
     const QString& getField();

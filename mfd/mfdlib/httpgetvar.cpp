@@ -25,6 +25,11 @@ HttpGetVariable::HttpGetVariable(const QString &text_segment)
     //
 }
 
+HttpGetVariable::HttpGetVariable(const QString &label, const QString &a_value)
+{
+    field = label;
+    value = a_value;
+}
 
 const QString& HttpGetVariable::getField()
 {

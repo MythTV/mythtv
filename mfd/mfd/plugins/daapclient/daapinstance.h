@@ -13,8 +13,20 @@
 #include <qthread.h>
 #include <qsocketdevice.h>
 
+#include "../daapserver/daaplib/taginput.h"
+#include "../daapserver/daaplib/tagoutput.h"
+
 class DaapClient;
 class DaapResponse;
+
+enum DaapServerType {
+    DAAP_SERVER_UNKNOWN = 0,
+    DAAP_SERVER_ITUNESLESSTHAN401,
+    DAAP_SERVER_ITUNES401ORGREATER,
+    DAAP_SERVER_MYTH
+};
+    
+
 
 class DaapInstance: public QThread
 {
@@ -30,14 +42,23 @@ class DaapInstance: public QThread
 
     ~DaapInstance();
 
-    void    run();
-    void    stop();
-    bool    keepGoing();
-    void    wakeUp();
-    void    log(const QString &log_message, int verbosity);
-    void    warning(const QString &warn_message);
-    void    handleIncoming();
-    void    processResponse(DaapResponse *daap_response);
+    void run();
+    void stop();
+    bool keepGoing();
+    void wakeUp();
+    void log(const QString &log_message, int verbosity);
+    void warning(const QString &warn_message);
+    void handleIncoming();
+    void processResponse(DaapResponse *daap_response);
+    bool checkServerType(const QString &server_description);
+
+    //
+    //  Methods to handle the various responses we can get from a DAAP
+    //  server
+    //
+    
+    void doServerInfoResponse(TagInput& dmap_data);
+    void doLoginResponse(TagInput &dmap_data);
 
   private:
 
@@ -51,8 +72,46 @@ class DaapInstance: public QThread
     QMutex      u_shaped_pipe_mutex;
     int         u_shaped_pipe[2];
 
-    QSocketDevice *client_socket_to_daap_server;
+    DaapServerType daap_server_type;
+    QSocketDevice  *client_socket_to_daap_server;
 
+    //
+    //  A WHOLE bunch of values that are filled in by talking to the server
+    //
+
+
+    //
+    //  from /server-info
+    //
+
+    bool    have_server_info;
+
+    QString supplied_service_name;
+    bool    server_requires_login;
+    int     server_timeout_interval;
+    bool    server_supports_autologout;
+    int     server_authentication_method;
+    bool    server_supports_update;
+    bool    server_supports_persistentid;
+    bool    server_supports_extensions;
+    bool    server_supports_browse;
+    bool    server_supports_query;
+    bool    server_supports_index;
+    bool    server_supports_resolve;
+    int     server_numb_databases;
+    
+    //
+    //  from /login
+    //
+
+    bool    logged_in;
+    int     session_id;
+    
+    //
+    //  from /update
+    //
+    
+    int metadata_generation;
 };
 
 #endif  // daapinstance_h_

@@ -8,6 +8,11 @@
 
 */
 
+#include <iostream>
+using namespace std;
+
+#include <qstringlist.h>
+
 #include "daapresponse.h"
 #include "daapinstance.h"
 
@@ -19,10 +24,10 @@ DaapResponse::DaapResponse(
 {
     parent = owner;
     raw_length = length;
+    all_is_well = true;
     headers.setAutoDelete(true);
-    get_variables.setAutoDelete(true);
 
-/*
+
     
     //
     //  Read the response
@@ -48,79 +53,33 @@ DaapResponse::DaapResponse(
 
             if(line_tokens.count() < 3)
             {
-                parent->warning(QString("httprequest got a malformed first line: \"%1\"")
+                parent->warning(QString("daapresponse got a malformed first line: \"%1\"")
                         .arg(top_line));
                 all_is_well = false;
                 return;
             }
-            else
+            if(line_tokens[0] != "HTTP/1.1")
             {
-                if(line_tokens[0] != "GET")
-                {
-                    parent->warning(QString("httprequest only knows how to do \"GET\" "
-                                    "requests, but got a \"%1\" request")
-                                    .arg(line_tokens[0])); 
-                    all_is_well = false;
-                    return;
-                }
-                
-                //
-                //  Set the URL 
-                //
-                
-                url = line_tokens[1].section('?', 0, 0);
-                
-                //
-                //  Pull out any http get variables
-                //
-                
-                QString get_variables_string = line_tokens[1].section('?', 1);
-                
-                QStringList get_variables_list = QStringList::split( "&", get_variables_string );
-                
-                for(uint i= 0; i < get_variables_list.count(); i++)
-                {
-                    HttpGetVariable *new_gv = new HttpGetVariable(get_variables_list[i]);
-                    get_variables.insert(new_gv->getField(), new_gv);
-                    
-                }
-                
-                
-                //
-                //  Check that we're speaking _http_ and that version is 1.1
-                //
-                
-                QStringList protocol_and_version = QStringList::split( "/", line_tokens[2]);
-                if(protocol_and_version.count() != 2)
-                {
-                    parent->warning(QString("httprequest got bad protocol and version in request ... "
-                                    "should be \"HTTP/1.1\" but got \"%1\"")
-                                    .arg(line_tokens[2]));
-                    all_is_well = false;
-                    return;
-                }
-                else
-                {
-                    if(protocol_and_version[0] != "HTTP")
-                    {
-                        parent->warning(QString("httprequest got bad protocol "
-                                                "should be \"HTTP\" but got \"%1\"")
-                                                .arg(protocol_and_version[0]));
-                        all_is_well = false;
-                        return;
-                    }
-                    if(protocol_and_version[1] != "1.1")
-                    {
-                        parent->warning(QString("httprequest got bad http version "
-                                                "should be \"1.1\" but got \"%1\"")
-                                                .arg(protocol_and_version[1]));
-                        all_is_well = false;
-                        return;
-                    }
-                }
-                
+                parent->warning(QString("daapresponse wanted \"HTTP/1.1\" but got \"%1\"")
+                                .arg(line_tokens[0])); 
+                all_is_well = false;
+                return;
             }
-           
+                
+            //
+            //  Set the http status code
+            //
+                
+            bool ok = true;
+            status_code = line_tokens[1].toInt(&ok);
+            if(!ok || status_code != 200)
+            {
+                parent->warning(QString("daapresponse got HTTP bad (not 200) http status: %1")
+                                .arg(status_code));
+                all_is_well = false;
+                return;
+            }
+                
             first_line = false;
         }
         else
@@ -136,11 +95,50 @@ DaapResponse::DaapResponse(
         }
     }
 
-*/
+    // printHeaders();
+    
+    //
+    //  Now we need to store the payload.
+    //
+    
+
+    payload.clear();
+    payload.insert( 
+                    payload.begin(), 
+                    (raw_incoming + parse_point), 
+                    (raw_incoming + parse_point + (length - parse_point))
+                  );
+    
+    //
+    //  Check that server is sending as many bytes as it said it would in
+    //  the HTTP header
+    //
+    
+    HttpHeader *content_length_header = headers.find("Content-Length");
+    if(content_length_header)
+    {
+        bool ok = true;
+        int content_length = content_length_header->getValue().toInt(&ok);
+        if(ok)
+        {
+            if(content_length != length - parse_point)
+            {
+                parent->log(QString("daap response payload size mismatch ("
+                                    "Content-Length=%1, actual=%2)")
+                                    .arg(content_length)
+                                    .arg(length - parse_point),3);
+            }
+        }
+        else
+        {
+            parent->warning("daap response got garbage in the returned "
+                            "Content-Length header");
+        }
+    }
     
 }
 
-int DaapResponse::readLine(int *parse_point, char *parsing_buffer, char *raw_request)
+int DaapResponse::readLine(int *parse_point, char *parsing_buffer, char *raw_response)
 {
     int  amount_read = 0;
     bool keep_reading = true;
@@ -158,7 +156,7 @@ int DaapResponse::readLine(int *parse_point, char *parsing_buffer, char *raw_req
             keep_reading = false;
         }
          
-        else if(raw_request[index] == '\r')
+        else if(raw_response[index] == '\r')
         {
             //
             // ignore
@@ -166,7 +164,7 @@ int DaapResponse::readLine(int *parse_point, char *parsing_buffer, char *raw_req
 
             index++;
         }
-        else if(raw_request[index] == '\n')
+        else if(raw_response[index] == '\n')
         {
             //
             //  done with this line
@@ -178,7 +176,7 @@ int DaapResponse::readLine(int *parse_point, char *parsing_buffer, char *raw_req
         }
         else
         {
-            parsing_buffer[amount_read] = raw_request[index];
+            parsing_buffer[amount_read] = raw_response[index];
             index++;
             amount_read++;
         }
@@ -187,10 +185,30 @@ int DaapResponse::readLine(int *parse_point, char *parsing_buffer, char *raw_req
     return amount_read;
 }
 
+QString DaapResponse::getHeader(const QString& field_label)
+{
+    HttpHeader *which_one = headers.find(field_label);
+    if(which_one)
+    {
+        return which_one->getValue();
+    }
+    return NULL;
+}
 
+void DaapResponse::printHeaders()
+{
+    cout << "============== Debugging Output - DAAP Response Headers ===============" << endl;
+
+    QDictIterator<HttpHeader> it( headers );
+    for( ; it.current(); ++it )
+    {
+        cout << it.currentKey() << ": " << it.current()->getValue() << endl;
+    }
+    
+    cout << "=======================================================================" << endl;
+}
 
 DaapResponse::~DaapResponse()
 {
     headers.clear();
-    get_variables.clear();
 }

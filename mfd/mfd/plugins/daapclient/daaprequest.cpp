@@ -24,6 +24,14 @@ DaapRequest::DaapRequest(
     parent = owner;
     base_url = l_base_url;
     host_address = l_host_address;
+    get_variables.setAutoDelete(true);
+}
+
+void DaapRequest::addGetVariable(const QString& label, int value)
+{
+    QString int_string = QString("%1").arg(value);
+    HttpGetVariable *new_get = new HttpGetVariable(label, int_string);
+    get_variables.insert( label, new_get);
 }
 
 void DaapRequest::addText(std::vector<char> *buffer, QString text_to_add)
@@ -31,25 +39,41 @@ void DaapRequest::addText(std::vector<char> *buffer, QString text_to_add)
     buffer->insert(buffer->end(), text_to_add.ascii(), text_to_add.ascii() + text_to_add.length());
 }
 
-bool DaapRequest::send(QSocketDevice *where_to_send)
+bool DaapRequest::send(QSocketDevice *where_to_send, bool ignore_shutdown)
 {
     std::vector<char>  the_request;
     
     //
-    //  Make the base url request (eg. /server-info)
+    //  Expand the base url with any Get Variables that exist
     //
+
+    QString extended_url = base_url;
+    bool first_get = true;
     
-    QString top_line = QString("GET %1 HTTP/1.1\r\n").arg(base_url);
+    QDictIterator<HttpGetVariable> it( get_variables );
+    for( ; it.current(); ++it )
+    {
+        if(first_get)
+        {
+            extended_url.append("?");
+            first_get = false;
+        }
+        else
+        {
+            extended_url.append("&");
+        }
+        extended_url.append(it.current()->getField());
+        extended_url.append("=");
+        extended_url.append(it.current()->getValue());
+    }
+    
+    //
+    //  Make the request line (eg. /server-info)
+    //
+
+    QString top_line = QString("GET %1 HTTP/1.1\r\n").arg(extended_url);
     addText(&the_request, top_line);
     
-    //
-    //  Add the server address (which the HTTP 1.1 spec is fairly adamant
-    //  *must* be in there)
-    // 
-   
-    QString host_line = QString("Host: %1\r\n").arg(host_address);
-    addText(&the_request, host_line);
-
     //
     //  Add a few more "standard" daap headers (ie. things that iTunes sends
     //  when it is a client)
@@ -65,8 +89,18 @@ bool DaapRequest::send(QSocketDevice *where_to_send)
         icy-metadata:1
     */
     
-    addText(&the_request, "User-Agent: iTunes/4.0 (Macintosh; N; PPC)\r\n");
-    addText(&the_request, "Client-DAAP-Version: 1.0\r\n");
+    addText(&the_request, "Client-DAAP-Version: 2.0\r\n");
+    addText(&the_request, "User-Agent: MythTV/1.0 (Probably Linux)\r\n");
+
+    //
+    //  Add the server address (which the HTTP 1.1 spec is fairly adamant
+    //  *must* be in there)
+    // 
+   
+    QString host_line = QString("Host: %1\r\n").arg(host_address);
+    addText(&the_request, host_line);
+
+    // addText(&the_request, "Client-DAAP-Access-Index: 1\r\n");
 
     //
     //  Add the final blank line
@@ -74,12 +108,12 @@ bool DaapRequest::send(QSocketDevice *where_to_send)
 
     addText(&the_request, "\r\n");
 
-    sendBlock(the_request, where_to_send);
+    sendBlock(the_request, where_to_send, ignore_shutdown);
 
     return true;
 }
 
-bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *where_to_send)
+bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *where_to_send, bool ignore_shutdown)
 {
     /*
     
@@ -124,7 +158,7 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
 
     while(keep_going)
     {
-        if(!parent->keepGoing())
+        if(!parent->keepGoing() && !ignore_shutdown)
         {
             //
             //  time to escape out of this
@@ -203,4 +237,5 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
 
 DaapRequest::~DaapRequest()
 {
+    get_variables.clear();
 }

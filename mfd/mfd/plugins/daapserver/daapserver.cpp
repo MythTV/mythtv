@@ -30,6 +30,7 @@ const int   DAAP_OK = 200;
 DaapServer::DaapServer(MFD *owner, int identity)
       :MFDHttpPlugin(owner, identity, 3689, "daap server", 2)
 {
+    first_update = true;
     metadata_containers = owner->getMetadataContainers();    
     QString local_hostname = "unknown";
     char my_hostname[2049];
@@ -154,6 +155,26 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
     }
     else if (daap_request->getRequestType() == DAAP_REQUEST_UPDATE)
     {
+        if(first_update)
+        {
+            //
+            //  Log some data about Client-DAAP-Validation
+            //
+        
+            first_update = false;
+            if(
+                http_request->getHeader("Client-DAAP-Validation") &&
+                daap_request->getClientType() == DAAP_CLIENT_ITUNES4X
+              )
+            {
+                log(QString("map the md5 checksum relationship between \"%1\" "
+                            "and \"%2\", win a prize")
+                            .arg(http_request->getRequest())
+                            .arg(http_request->getHeader("Client-DAAP-Validation"))
+                            ,10);
+            }
+        }
+    
         //
         //  
         //  should only respond if the database version numbers are out of
@@ -275,24 +296,25 @@ void DaapServer::sendServerInfo(HttpRequest *http_request)
     
     TagOutput response;
     
-    response << Tag('msrv') << Tag('mstt') << (u32) DAAP_OK << end 
-             << Tag('mpro') << dmapVersion << end 
-             << Tag('apro') << daapVersion << end 
-             << Tag('minm') << service_name.utf8() << end 
-             << Tag('mslr') << (u8) 0 << end 
-             << Tag('msal') << (u8) 0 << end 
-             << Tag('mstm') << (u32) 1800 << end 
-             << Tag('msup') << (u8) 0 << end 
-             << Tag('msau') << (u32) 2 << end 
+    response << Tag('msrv') 
+                << Tag('mstt') << (u32) DAAP_OK << end 
+                << Tag('mpro') << dmapVersion << end 
+                << Tag('apro') << daapVersion << end 
+                << Tag('minm') << service_name.utf8() << end 
+                << Tag('mslr') << (u8) 0 << end 
+                << Tag('msal') << (u8) 0 << end 
+                << Tag('mstm') << (u32) 1800 << end 
+                << Tag('msup') << (u8) 0 << end 
+                << Tag('msau') << (u32) 2 << end 
 
-             //<< Tag('mspi') << (u8) 1 << end 
-             //<< Tag('msex') << (u8) 1 << end 
-             //<< Tag('msbr') << (u8) 1 << end 
-             //<< Tag('msqy') << (u8) 1 << end 
-             //<< Tag('msix') << (u8) 1 << end 
-             //<< Tag('msrs') << (u8) 1 << end 
+                //<< Tag('mspi') << (u8) 0 << end 
+                //<< Tag('msex') << (u8) 0 << end 
+                //<< Tag('msbr') << (u8) 0 << end 
+                //<< Tag('msqy') << (u8) 0 << end 
+                //<< Tag('msix') << (u8) 0 << end 
+                //<< Tag('msrs') << (u8) 0 << end 
 
-             << Tag('msdc') << (u32) 1 << end   //  if only iTunes *did something* with more than 1 database
+                << Tag('msdc') << (u32) 1 << end   //  if only iTunes *did something* with more than 1 database
              
              << end;
 
@@ -309,6 +331,7 @@ void DaapServer::sendTag( HttpRequest *http_request, const Chunk& c )
     //  Set some header stuff 
     //
     
+    http_request->getResponse()->addHeader("DAAP-Server: MythTV/1.0 (Probably Linux)");
     http_request->getResponse()->addHeader("Content-Type: application/x-dmap-tagged");
     
     //

@@ -33,6 +33,7 @@ u32  DaapSessions::getNewId()
 
 bool DaapSessions::isValid( const u32 session_id)
 {
+    return true;
     if(session_ids.contains(session_id) > 0)
     {
         return true;

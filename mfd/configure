@@ -203,7 +203,7 @@ if test "$daapclient" = "yes" ; then
 
 fi
 
-if test "$daapserver" = "no" ; then
+if test "$daapclient" = "no" ; then
     echo "                daap client support: no"
 fi
 

@@ -25,7 +25,6 @@ enum DaapClientType {
     DAAP_CLIENT_MFDDAAPCLIENT
 };
     
-
 enum DaapRequestType {
 	DAAP_REQUEST_NOREQUEST = 0,  
 	DAAP_REQUEST_SERVINFO,
