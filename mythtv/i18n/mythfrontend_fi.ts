@@ -1080,11 +1080,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>listing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>listings</source>
+        <source>Recording %1 of %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

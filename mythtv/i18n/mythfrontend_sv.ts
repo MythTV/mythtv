@@ -1060,12 +1060,8 @@
         <translation>Spelar in en visning per vecka</translation>
     </message>
     <message>
-        <source>listing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>listings</source>
-        <translation type="unfinished"></translation>
+        <source>Recording %1 of %2</source>
+        <translation>Spelar in %1 av %2</translation>
     </message>
 </context>
 <context>
@@ -6356,7 +6352,7 @@ Kanalens frekvens i Hz.</translation>
     </message>
     <message>
         <source>Source:</source>
-        <translation type="unfinished"></translation>
+        <translation>Källa:</translation>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
@@ -6396,11 +6392,11 @@ Kanalens frekvens i Hz.</translation>
     </message>
     <message>
         <source>Airdate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sändningstid:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Beskrivning:</translation>
+        <translation>Beskrivning:</translation>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>
