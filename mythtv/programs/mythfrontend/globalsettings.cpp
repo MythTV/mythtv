@@ -416,7 +416,6 @@ public:
     PlaybackExitPrompt():
         GlobalSetting("PlaybackExitPrompt") {
         setLabel("Action on playback exit");
-        setValue("0");
         addSelection("Just exit", "0");
         addSelection("Save position and exit", "2");
         addSelection("Always prompt", "1");

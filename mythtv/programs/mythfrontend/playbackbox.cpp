@@ -1457,8 +1457,9 @@ void PlaybackBox::showDeletePopup(int types)
     int x, y, maxw, poph;
     poph = msg->height() + msg2->height() + filler1->height() + 
            filler2->height() + title->height() + times->height() + 
-           yesButton->height() + noButton->height() + (int)(170 * hmult);
-    popup->setMaximumHeight(poph);
+           subtitle->height() + yesButton->height() + noButton->height() +
+           (int)(110 * hmult);
+    popup->setMinimumHeight(poph);
     maxw = 0;
 
     if (title->width() > maxw)
