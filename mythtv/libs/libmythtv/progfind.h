@@ -68,11 +68,12 @@ class ProgFinder : public MythDialog
     void cursorRight();
     void cursorDown();
     void cursorUp();
-    void getInfo();
+    void getInfo(bool toggle = false);
     void showGuide();
     void pageUp();
     void pageDown();
     void select();
+    void quickRecord();
 
   protected:
     void paintEvent(QPaintEvent *e);

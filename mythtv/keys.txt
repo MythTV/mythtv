@@ -115,9 +115,8 @@ EPG
      "Instant Record" a program.
 - Pressing M when on a channel will change to that channel.
 - Pressing ESC or C exits without changing the channel.
-- Pressing R toggles between "Don't record this program" and "Record only this
-  showing of the program".  It will not do anything if other recording types
-  are selected for the highlighted entry.
+- Pressing R will change the current item from Recording/Not-Recording.
+  Successive keypresses cycle through the scheduled recording type list.
 - Pressing X will change the channel to the currently selected channel without
   leaving the EPG (Most useful in the alternate EPG)
 - Pressing '/' will mark/unmark the current channel as a "favorite"

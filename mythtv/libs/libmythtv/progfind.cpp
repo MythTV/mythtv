@@ -163,6 +163,8 @@ void ProgFinder::keyPressEvent(QKeyEvent *e)
         case Key_I: case Key_Space:
         case Key_Enter: case Key_Return: select(); break;
 
+        case Key_R: quickRecord(); break;
+
         case Key_PageUp: case Key_3: pageUp(); break;
         case Key_PageDown: case Key_9: pageDown(); break;
 
@@ -428,7 +430,7 @@ void ProgFinder::parseContainer(QDomElement &element)
         infoRect = area;
 }
 
-void ProgFinder::getInfo()
+void ProgFinder::getInfo(bool toggle)
 {
     int rectype = 0;
     QString data = "";
@@ -441,18 +443,25 @@ void ProgFinder::getInfo()
 
         if (curPick)
         {
-            if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-                (curPick->GetProgramRecordingStatus(m_db) > kAllRecord))
+            if (toggle)
             {
-                ScheduledRecording record;
-                record.loadByProgram(m_db, curPick);
-                record.exec(m_db);
+                curPick->ToggleRecord(m_db);
             }
             else
             {
-                InfoDialog diag(curPick, gContext->GetMainWindow(),
-                                "Program Info");
-                diag.exec();
+                if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
+                    (curPick->GetProgramRecordingStatus(m_db) > kAllRecord))
+                {
+                    ScheduledRecording record;
+                    record.loadByProgram(m_db, curPick);
+                    record.exec(m_db);
+                }
+                else
+                {
+                    InfoDialog diag(curPick, gContext->GetMainWindow(),
+                                    "Program Info");
+                    diag.exec();
+                }
             }
         }
         else
@@ -599,6 +608,14 @@ void ProgFinder::select()
 {
     if (inSearch == 2) 
         getInfo();
+    else
+        cursorRight();
+}
+
+void ProgFinder::quickRecord()
+{
+    if (inSearch == 2) 
+        getInfo(true);
     else
         cursorRight();
 }
