@@ -1694,7 +1694,9 @@ void NuppelVideoPlayer::StartPlaying(void)
     {
         // Request that the video output thread run with realtime priority.
         // If mythyv/mythfrontend was installed SUID root, this will work.
+#ifndef CONFIG_DARWIN
         gContext->addPrivRequest(MythPrivRequest::MythRealtime, &output_video);
+#endif
 
         // Use realtime prio for decoder thread as well
         //gContext->addPrivRequest(MythPrivRequest::MythRealtime, &decoder_thread);

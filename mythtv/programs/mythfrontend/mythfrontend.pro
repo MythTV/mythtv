@@ -35,3 +35,7 @@ HEADERS += statusbox.h previousbox.h
 SOURCES += main.cpp manualbox.cpp playbackbox.cpp viewscheduled.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp 
 SOURCES += channelrecpriority.cpp statusbox.cpp previousbox.cpp
+
+macx {
+    RC_FILE += mythfrontend.icns
+}

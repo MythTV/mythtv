@@ -57,6 +57,7 @@ LIBS += -L../libavcodec -lmythavcodec-$$LIBVERSION
 macx {
     LIBS               += -lz
     QMAKE_LFLAGS_SHLIB += -single_module
+    QMAKE_LFLAGS_SHLIB += -seg1addr 0xC4000000
     SOURCES            -= audio.c
 #    SOURCES            += audio-darwin.c
 }

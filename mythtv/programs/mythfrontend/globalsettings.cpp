@@ -2381,6 +2381,227 @@ static GenericCheckBox *LCDBacklightOn()
 }
 #endif
 
+#ifdef CONFIG_DARWIN
+static GenericCheckBox *MacScaleUp()
+{
+    GenericCheckBox *gc = new GenericCheckBox("MacScaleUp");
+    gc->setLabel(QObject::tr("Scale video as necessary"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If checked, video will be scaled to fit your "
+                    "window or screen. If unchecked, video will never be made "
+                    "larger than its actual pixel size."));
+    return gc;
+}
+
+static GenericSpinBox *MacFullSkip()
+{
+    GenericSpinBox *gs = new GenericSpinBox("MacFullSkip", 0, 30, 1, true);
+    gs->setLabel(QObject::tr("Frames to skip in fullscreen mode"));
+    gs->setValue(0);
+    gs->setHelpText(QObject::tr("Video displayed in fullscreen or non-windowed "
+                    "mode will skip this many frames for each frame drawn. "
+                    "Set to 0 to show every frame. Only valid when either "
+                    "\"Use GUI size for TV playback\" or \"Run the frontend "
+                    "in a window\" is not checked."));
+    return gs;
+}
+
+static GenericCheckBox *MacMainEnabled()
+{
+    GenericCheckBox *gc = new GenericCheckBox("MacMainEnabled");
+    gc->setLabel(QObject::tr("Video in main window"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If checked, video will be displayed in the "
+                    "main GUI window. Disable this when you only want video "
+                    "on the desktop or in a floating window. Only valid when "
+                    "\"Use GUI size for TV playback\" and \"Run the "
+                    "frontend in a window\" are checked."));
+    return gc;
+}
+
+static GenericSpinBox *MacMainSkip()
+{
+    GenericSpinBox *gs = new GenericSpinBox("MacMainSkip", 0, 30, 1, true);
+    gs->setLabel(QObject::tr("Frames to skip"));
+    gs->setValue(0);
+    gs->setHelpText(QObject::tr("Video in the main window will skip this many "
+                    "frames for each frame drawn. Set to 0 to show "
+                    "every frame."));
+    return gs;
+}
+
+static GenericSpinBox *MacMainOpacity()
+{
+    GenericSpinBox *gs = new GenericSpinBox("MacMainOpacity", 0, 100, 5, false);
+    gs->setLabel(QObject::tr("Opacity"));
+    gs->setValue(100);
+    gs->setHelpText(QObject::tr("The opacity of the main window. Set to "
+                    "100 for completely opaque, set to 0 for completely "
+                    "transparent."));
+    return gs;
+}
+
+class MacMainSettings: public HorizontalConfigurationGroup,
+                       public TriggeredConfigurationGroup {
+public:
+    MacMainSettings():
+        HorizontalConfigurationGroup(false, false),
+        TriggeredConfigurationGroup(false) {
+        setLabel(QObject::tr("Video in main window"));
+        setUseLabel(false);
+        Setting *gc = MacMainEnabled();
+        addChild(gc);
+        setTrigger(gc);
+
+        VerticalConfigurationGroup *opts = 
+            new VerticalConfigurationGroup(false, false);
+        opts->addChild(MacMainSkip());
+        opts->addChild(MacMainOpacity());
+        
+        addTarget("1", opts);
+        addTarget("0", new VerticalConfigurationGroup(false, false));
+    }
+};
+
+static GenericCheckBox *MacFloatEnabled()
+{
+    GenericCheckBox *gc = new GenericCheckBox("MacFloatEnabled");
+    gc->setLabel(QObject::tr("Video in floating window"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If checked, video will be displayed in a "
+                    "floating window. Only valid when \"Use GUI size for TV "
+                    "playback\" and \"Run the frontend in a window\" are "
+                    "checked."));
+    return gc;
+}
+
+static GenericSpinBox *MacFloatSkip()
+{
+    GenericSpinBox *gs = new GenericSpinBox("MacFloatSkip", 0, 30, 1, true);
+    gs->setLabel(QObject::tr("Frames to skip"));
+    gs->setValue(0);
+    gs->setHelpText(QObject::tr("Video in the floating window will skip "
+                    "this many frames for each frame drawn. Set to 0 to show "
+                    "every frame."));
+    return gs;
+}
+
+static GenericSpinBox *MacFloatOpacity()
+{
+    GenericSpinBox *gs = new GenericSpinBox("MacFloatOpacity", 0, 100, 5, false);
+    gs->setLabel(QObject::tr("Opacity"));
+    gs->setValue(100);
+    gs->setHelpText(QObject::tr("The opacity of the floating window. Set to "
+                    "100 for completely opaque, set to 0 for completely "
+                    "transparent."));
+    return gs;
+}
+
+class MacFloatSettings: public HorizontalConfigurationGroup,
+                        public TriggeredConfigurationGroup {
+public:
+    MacFloatSettings():
+        HorizontalConfigurationGroup(false, false),
+        TriggeredConfigurationGroup(false) {
+        setLabel(QObject::tr("Video in floating window"));
+        setUseLabel(false);
+        Setting *gc = MacFloatEnabled();
+        addChild(gc);
+        setTrigger(gc);
+
+        VerticalConfigurationGroup *opts = 
+            new VerticalConfigurationGroup(false, false);
+        opts->addChild(MacFloatSkip());
+        opts->addChild(MacFloatOpacity());
+        
+        addTarget("1", opts);
+        addTarget("0", new VerticalConfigurationGroup(false, false));
+    }
+};
+
+static GenericCheckBox *MacDockEnabled()
+{
+    GenericCheckBox *gc = new GenericCheckBox("MacDockEnabled");
+    gc->setLabel(QObject::tr("Video in the dock"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If checked, video will be displayed in the "
+                    "application's dock icon. Only valid when \"Use GUI size "
+                    "for TV playback\" and \"Run the frontend in a window\" "
+                    "are checked."));
+    return gc;
+}
+
+static GenericSpinBox *MacDockSkip()
+{
+    GenericSpinBox *gs = new GenericSpinBox("MacDockSkip", 0, 30, 1, true);
+    gs->setLabel(QObject::tr("Frames to skip"));
+    gs->setValue(3);
+    gs->setHelpText(QObject::tr("Video in the dock icon will skip this many "
+                    "frames for each frame drawn. Set to 0 to show "
+                    "every frame."));
+    return gs;
+}
+
+class MacDockSettings: public HorizontalConfigurationGroup,
+                       public TriggeredConfigurationGroup {
+public:
+    MacDockSettings():
+        HorizontalConfigurationGroup(false, false),
+        TriggeredConfigurationGroup(false) {
+        setLabel(QObject::tr("Video in the dock"));
+        setUseLabel(false);
+        Setting *gc = MacDockEnabled();
+        addChild(gc);
+        setTrigger(gc);
+
+        Setting *skip = MacDockSkip();
+        addTarget("1", skip);
+        addTarget("0", new HorizontalConfigurationGroup(false, false));
+    }
+};
+
+static GenericCheckBox *MacDesktopEnabled()
+{
+    GenericCheckBox *gc = new GenericCheckBox("MacDesktopEnabled");
+    gc->setLabel(QObject::tr("Video on the desktop"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If checked, video will be displayed on the "
+                    "desktop, behind the Finder icons. Only valid when \"Use "
+                    "GUI size for TV playback\" and \"Run the frontend in a "
+                    "window\" are checked."));
+    return gc;
+}
+
+static GenericSpinBox *MacDesktopSkip()
+{
+    GenericSpinBox *gs = new GenericSpinBox("MacDesktopSkip", 0, 30, 1, true);
+    gs->setLabel(QObject::tr("Frames to skip"));
+    gs->setValue(0);
+    gs->setHelpText(QObject::tr("Video on the desktop will skip this many "
+                    "frames for each frame drawn. Set to 0 to show "
+                    "every frame."));
+    return gs;
+}
+
+class MacDesktopSettings: public HorizontalConfigurationGroup,
+                          public TriggeredConfigurationGroup {
+public:
+    MacDesktopSettings():
+        HorizontalConfigurationGroup(false, false),
+        TriggeredConfigurationGroup(false) {
+        setLabel(QObject::tr("Video on the desktop"));
+        setUseLabel(false);
+        Setting *gc = MacDesktopEnabled();
+        addChild(gc);
+        setTrigger(gc);
+
+        Setting *skip = MacDesktopSkip();
+        addTarget("1", skip);
+        addTarget("0", new HorizontalConfigurationGroup(false, false));
+    }
+};
+#endif
+
 static GenericCheckBox *WatchTVGuide()
 {
     GenericCheckBox *gc = new GenericCheckBox("WatchTVGuide");
@@ -2503,6 +2724,22 @@ PlaybackSettings::PlaybackSettings()
     osd->addChild(DefaultCCMode());
     osd->addChild(PersistentBrowseMode());
     addChild(osd);
+
+#ifdef CONFIG_DARWIN
+    VerticalConfigurationGroup* mac1 = new VerticalConfigurationGroup(false);
+    mac1->setLabel(QObject::tr("Mac OS X video settings") + " 1/2");
+    mac1->addChild(MacScaleUp());
+    mac1->addChild(MacFullSkip());
+    addChild(mac1);
+
+    VerticalConfigurationGroup* mac2 = new VerticalConfigurationGroup(false);
+    mac2->setLabel(QObject::tr("Mac OS X video settings") + " 2/2");
+    mac2->addChild(new MacMainSettings());
+    mac2->addChild(new MacFloatSettings());
+    mac2->addChild(new MacDockSettings());
+    mac2->addChild(new MacDesktopSettings());
+    addChild(mac2);
+#endif
 }
 
 GeneralSettings::GeneralSettings()

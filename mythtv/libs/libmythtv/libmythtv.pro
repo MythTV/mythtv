@@ -75,8 +75,9 @@ macx {
     HEADERS += videoout_quartz.h
 
     # videoout_quartz.cpp uses CoreGraphics from ApplicationServices
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
-    LIBS           += -framework ApplicationServices
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks -F/System/Library/Frameworks/Carbon.framework/Frameworks
+    LIBS           += -framework ApplicationServices -framework QuickTime -framework Carbon
+    QMAKE_LFLAGS_SHLIB += -seg1addr 0xC9000000
 }
 
 using_x11 {

@@ -56,6 +56,8 @@ macx {
     # We use HIToolbox from Carbon to hide the menu bar
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
     LIBS           += -framework Carbon
+    
+    QMAKE_LFLAGS_SHLIB += -seg1addr 0xC6000000
 }
 
 linux {
