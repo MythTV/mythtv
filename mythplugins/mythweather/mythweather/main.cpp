@@ -17,7 +17,6 @@ using namespace std;
 #include <unistd.h>
 
 #include "weather.h"
-#include "weathercomms.h"
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>

@@ -18,6 +18,7 @@
 #include <qtimer.h>
 #include <qimage.h>
 #include <qregexp.h>
+#include <qnetwork.h>
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qcursor.h>
@@ -25,9 +26,11 @@
 #include <qheader.h>
 #include <qpixmap.h>
 #include <unistd.h>
+#include <qurl.h>
+#include <qdir.h>
 
 #include "weather.h"
-#include "weathercomms.h"
+#include "inetcomms.h"
 
 using namespace std;
 
@@ -37,6 +40,14 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
                  const char *name)
        : MythDialog(parent, name)
 {
+    qInitNetworkProtocols();
+
+    urlTimer = new QTimer(this);
+    connect(urlTimer, SIGNAL(timeout()), SLOT(weatherTimeout()));
+
+    timeoutCounter = 0;
+    stopProcessing = false;
+
     allowkeys = true;
 
     config = db;
@@ -1904,14 +1915,6 @@ void Weather::update_timeout()
         return;
     }
 
-    container = theme->GetSet("weatherpages");
-    if (container)
-    {
-        UIImageType *type = (UIImageType *)container->GetType("radarimg");
-            if (type)
-                type->LoadImage();
-    }
-
     if (result == true)
     {
 
@@ -2171,6 +2174,7 @@ void Weather::showLayout(int pageNum)
 bool Weather::UpdateData()
 {
 
+	timeoutCounter = 0;
         LayerSet *container = theme->GetSet("weatherpages");
         if (container)
         {
@@ -2426,59 +2430,211 @@ return ret;
 
 bool Weather::GetWeatherData()
 {
-	int tAgg = (gContext->GetSetting("WeatherAggressiveLvl")).toInt();
+     QUrl weatherDataURL("http://www.msnbc.com/m/chnk/d/weather_d_src.asp?acid=" + locale);
+     QUrl weatherMapLink1URL("http://w3.weather.com/weather/map/" + locale 
+		          + "?from=LAPmaps&setcookie=1 HTTP/1.1\nConnection: close\nHost: w3.weather.com\n\n\n");
 
-	if (debug == true)
-		cerr << "MythWeather: Setting status timer and data hook.\n";
 
-	WeatherSock *internetData = new WeatherSock(this, debug, tAgg);
-	internetData->startConnect();
-	
-	while (internetData->getStatus() == false)
-        {
-                qApp->processEvents();
-                usleep(100);
-        }
+     INETComms *weatherData = new INETComms(weatherDataURL);
+     INETComms *weatherMapLink1 = new INETComms(weatherMapLink1URL);
 
-        LayerSet *container = theme->GetSet("weatherpages");
-        if (container)
-            SetText(container, "updatetime", updated);
+     if (debug)
+     { 
+         cout << "MythWeather: Grabbing Weather From: " << weatherDataURL.toString() << endl;
+         cout << "MythWeather: Grabbing Weather Map Link (part 1) From: " << weatherMapLink1URL.toString() << endl;
+     }
 
-	if (internetData->checkError() == 10)
-	{
-		update_Timer->changeInterval((int)(1000 * 60 * 5));
-		cerr << "MythWeather: Invalid Area or Fatal Error.\n";
-                if (container)
-                    SetText(container, "updatetime", "!!! 3 Failed Attempts !!! Waiting 5 minutes.");
-		delete internetData;
-		return false;
-	}
-	else if (internetData->checkError() == 20)
-	{
-                update_Timer->stop();
-                cerr << "MythWeather: Invalid Area ID.\n";
-                if (container)
-                    SetText(container, "updatetime", tr("*** Invalid Area ID Entered *** Use a valid area id."));
-                delete internetData;
-                return false;
-	}
-	else if (internetData->checkError() == 30)
-	{
-                update_Timer->changeInterval((int)(1000 * 60 * 5));
-                cerr << "MythWeather: Timeout error, change aggressiveness variable.\n";
-                if (container)
-                {
-                    SetText(container, "location", tr("Weather Data Not Available"));
-                    SetText(container, "updatetime", tr("!!! Timeout Limit !!! Change aggressiveness level."));
-                }
-                
-                delete internetData;
-                return false;
-	}
-	else
-		httpData = internetData->getData();
+     urlTimer->stop();
+     urlTimer->start(10000);
 
-	delete internetData;
+     stopProcessing = false;
+     while (!weatherData->isDone())
+     {
+          qApp->processEvents();
+	  if (stopProcessing)
+	      return false;
 
-	return true;
+     }
+     while (!weatherMapLink1->isDone())
+     {
+	  qApp->processEvents();
+	  if (stopProcessing)
+	      return false;
+     }
+     
+     urlTimer->stop();
+
+     LayerSet *container = theme->GetSet("weatherpages");
+     if (container)
+         SetText(container, "updatetime", updated);
+
+
+     httpData = weatherData->getData();
+     if (httpData.find("this.swAcid = \"\";") != -1 ||
+         httpData.find("<html>") != -1 ||
+         httpData.find("Microsoft VBScript runtime") != -1 ||
+         httpData.find("Internal Server Error") != -1  ||
+         httpData.find("Bad Request", 0) != -1)
+     {
+           cerr << "MythWeather: Invalid Area ID or server error.\n";
+           if (debug)
+               cout << "MythWeather: HTTP Data Dump: " + httpData << endl;
+           if (container)
+               SetText(container, "updatetime", tr("*** Invalid Area ID or Server Error ***"));
+
+            return false;
+     }
+
+     QString tempData = "";
+     tempData = weatherMapLink1->getData();
+
+     QString mapLoc = parseData(tempData, "if (isMinNS4) var mapNURL = \"", "\";");
+     if (mapLoc == "<NULL>")
+	 return true;
+     
+     QUrl weatherMapLink2URL("http://w3.weather.com/" + mapLoc); 
+     
+     if (debug)
+	 cout << "MythWeather: Grabbing Weather Map Link (part 2) From: " << weatherMapLink2URL.toString() << endl;
+
+     urlTimer->stop();
+     urlTimer->start(10000);
+
+     INETComms *weatherMapLink2 = new INETComms(weatherMapLink2URL);
+     stopProcessing = false;
+     while (!weatherMapLink2->isDone())
+     {
+           qApp->processEvents();
+	   if (stopProcessing)
+	       return false;
+
+     }
+     urlTimer->stop();
+
+     QString tempData2 = weatherMapLink2->getData();
+
+     QString imageLoc = parseData(tempData2, "<IMG NAME=\"mapImg\" SRC=\"http://image.weather.com", "\"");
+     if (imageLoc == "<NULL>")
+     {
+         if (debug)
+             cout << "MythWeather: Warning: Failed to find link to map image.\n";
+
+	 return true;
+     }
+
+     char *home = getenv("HOME");
+     QString fileprefix = QString(home) + "/.mythtv";
+
+     QDir dir(fileprefix);
+     if (!dir.exists())
+         dir.mkdir(fileprefix);
+
+     fileprefix += "/MythWeather";
+
+     dir = QDir(fileprefix);
+     if (!dir.exists())
+         dir.mkdir(fileprefix);
+
+     if (debug)
+         cout << "MythWeather: Map File Prefix: " << fileprefix << endl;
+
+     if (debug)
+         cout << "MythWeather: Copying Map File from Server (" << imageLoc << ")...";
+
+     QUrlOperator *op = new QUrlOperator();
+     connect(op, SIGNAL(finished(QNetworkOperation *)), SLOT(radarImgDone(QNetworkOperation *)));
+     op->copy(QString("http://image.weather.com/" + imageLoc),
+                      "file:" + fileprefix);
+
+     if (debug)
+         cout << "Done.\n";
+
+     if (container)
+     {
+         QString filename = imageLoc.mid(imageLoc.findRev("/"), imageLoc.length() - imageLoc.findRev("/"));
+         UIImageType *type = (UIImageType *)container->GetType("radarimg");
+         if (type)
+	 {
+	     QString fullfile = fileprefix + filename;
+	     if (debug)
+	     cout << "MythWeather: Full path to radar image: " << fullfile << endl;
+             type->SetImage(fullfile);
+	 }
+     }
+     return true;
 }
+
+void Weather::radarImgDone(QNetworkOperation *op)
+{
+
+      if (op->operation() == QNetworkProtocol::OpListChildren) 
+      {
+          if (op->state() == QNetworkProtocol::StFailed)
+	  {
+              cout << "MythWeather: Error while grabbing the radar map." << endl;
+	      return;
+	  }
+      }
+      
+      LayerSet *container = theme->GetSet("weatherpages");
+
+      if (debug)
+	  cout << "MythWeather: Radar Image Done. (Loading...)\n";
+
+      if (container)
+      {
+          UIImageType *type = (UIImageType *)container->GetType("radarimg");
+          if (type)
+              type->LoadImage();
+      }
+}
+
+QString Weather::parseData(QString data, QString beg, QString end)
+{
+    QString ret;
+
+    if (debug == true)
+    {
+          cout << "MythWeather: Parse HTML : Looking for: " << beg << ", ending with: " << end << endl;
+          if (data.length() == 0)
+              cout << "MythWeather: Parse HTML : No Data!\n";
+    }
+    int start = data.find(beg) + beg.length();
+    int endint = data.find(end, start + 1);
+    if (start != -1 && endint != -1)
+    {
+        ret = data.mid(start, endint - start);
+        if (debug == true)
+            cout << "MythWeather: Parse HTML : Returning : " << ret << endl;
+        return ret;
+    }
+    else
+    {
+        if (debug == true)
+            cout << "MythWeather: Parse HTML : Parse Failed...returning <NULL>\n";
+        ret = "<NULL>";
+        return ret;
+    }
+}
+
+void Weather::weatherTimeout()
+{
+     //Increment the counter and check were not over the limit
+     if(++timeoutCounter != 3)
+     {
+          //Try again
+	  GetWeatherData();
+     }
+     else
+     {
+          timeoutCounter = 0;
+          cerr << "Failed to contact server" << endl;
+
+          //Set the stopProcessing var so the other thread knows what to do
+          stopProcessing = true;
+
+     }
+     return;
+}
+
+

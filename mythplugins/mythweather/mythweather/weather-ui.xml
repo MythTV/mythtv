@@ -572,7 +572,6 @@
       </image>
       <image name="radarimg" draworder="6">
         <context>5</context>
-        <filename>weather.jpg</filename>
         <position>18,132</position>
         <staticsize>765,500</staticsize>
         <skipin>0,58</skipin>

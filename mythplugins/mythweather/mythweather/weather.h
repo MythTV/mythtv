@@ -19,6 +19,8 @@
 #include <qstringlist.h>
 #include <qlayout.h>
 #include <fstream>
+#include <qnetwork.h>
+#include <qurl.h>
 
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
@@ -28,6 +30,7 @@
 
 class QLabel;
 class QListView;
+class QNetworkOperation;
 class Settings;
 class WeatherSock;
 
@@ -73,12 +76,18 @@ class Weather : public MythDialog
     void newLocale7();
     void newLocale8();
     void newLocale9();
+    void radarImgDone(QNetworkOperation *);
+    void weatherTimeout();
 
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
 
   private:
+    int timeoutCounter;
+    bool stopProcessing;
+    QString parseData(QString data, QString beg, QString end);
+    QTimer *urlTimer;
     void LoadWindow(QDomElement &);
     void parseContainer(QDomElement &);
     XMLParse *theme;
