@@ -577,24 +577,13 @@ QString FlacDecoder::getComment(FLAC__StreamMetadata *block, const char *label)
     FLAC__StreamMetadata_VorbisComment_Entry *entry;
     entry = block->data.vorbis_comment.comments;
 
-    QString qlabel = label;
-    QString retstr = "";
-    for (unsigned int i = 0; i < block->data.vorbis_comment.num_comments; i++)
-    {
-        char fieldname[512];
-        memset(fieldname, 0, 512);
-        strncpy(fieldname, (char *)((entry + i)->entry), (entry + i)->length);
-        QString entrytext = fieldname;
-        int loc;
-
-        if ((loc = entrytext.find("=")) && 
-            entrytext.lower().left(qlabel.length()) == qlabel.lower())
-        {
-            retstr = QString::fromUtf8(entrytext.right(entrytext.length() - loc - 1));
-        }
+    for (unsigned int i = 0; i < block->data.vorbis_comment.num_comments; i++, entry++) {
+        const char *e = (const char *)entry->entry;
+        if (!strncmp(e, label, strlen(label)) && 
+            e[strlen(label)] == '=')
+            return QString::fromUtf8( QCString(e + strlen(label) + 1, entry->length - strlen(label)) );
     }
-
-    return retstr;
+    return QString(NULL);
 }
 
 void FlacDecoder::setComment(FLAC__StreamMetadata *block, const char *label,
