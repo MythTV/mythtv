@@ -721,9 +721,9 @@ void TV::SetupPipRecorder(void)
 
     pipnvr->SetMP3Quality(9);
 
-    nvr->SetMP4TargetBitrate(context->GetNumSetting("TargetBitrate"));
-    nvr->SetMP4ScaleBitrate(1); //context->GetNumSetting("ScaleBitrate"));
-    nvr->SetMP4Quality(context->GetNumSetting("MaxQuality"),
+    pipnvr->SetMP4TargetBitrate(context->GetNumSetting("TargetBitrate"));
+    pipnvr->SetMP4ScaleBitrate(1); //context->GetNumSetting("ScaleBitrate"));
+    pipnvr->SetMP4Quality(context->GetNumSetting("MaxQuality"),
                        context->GetNumSetting("MinQuality"),
                        context->GetNumSetting("QualDiff"));
 

@@ -1374,7 +1374,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             continue;
         }
 
-        if (vbuffer_numvalid() == 0)
+        if (vbuffer_numvalid() < usepre)
         {
            prebuffering = true;
            continue;
