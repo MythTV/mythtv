@@ -16,7 +16,7 @@ UIPhoneEntry::UIPhoneEntry(MythMainWindow *parent, MythDialog *bg,
             : MythDialog(parent, name)
 {
     m_active = false;
-    m_lastKey = -1;
+    m_lastKey = "";
     m_lastIndex = 0;
     m_drawBlink = false;
     m_inDelay = false;
