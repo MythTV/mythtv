@@ -27,7 +27,7 @@ This is what you need, software wise, to have installed:
            be best.  I don't know, though, I'm utterly new to it.  Get it from
            your distro, or from http://www.mysql.com
 
-   XMLTV - You need at the latest version (0.5.8 at the time of this writing).
+   XMLTV - You need at the latest version (0.5.15 at the time of this writing).
            This will do the work of actually grabbing the program information.
            Get it from: http://membled.com/work/apps/xmltv/
           
