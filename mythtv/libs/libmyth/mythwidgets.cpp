@@ -41,7 +41,7 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
                 if (count() > 0)
                     setCurrentItem((currentItem() + 1) % count());
             }
-            else if (action == "SELECT")
+            else if (action == "SELECT" && AcceptOnSelect)
                 emit accepted(currentItem());
             else
                 handled = false;

@@ -2315,6 +2315,7 @@ void PlaybackBox::showRecGroupChooser(void)
 
     chooseComboBox = new MythComboBox(false, choosePopup);
     chooseComboBox->insertStringList(groups);
+    chooseComboBox->setAcceptOnSelect(true);
     grid->addWidget(chooseComboBox, 0, 1, Qt::AlignLeft);
 
     choosePopup->addLayout(grid);

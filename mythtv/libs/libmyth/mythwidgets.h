@@ -35,9 +35,10 @@ class MythComboBox: public QComboBox
     Q_OBJECT
   public:
     MythComboBox(bool rw, QWidget* parent=0, const char* name=0):
-        QComboBox(rw, parent, name) {};
+        QComboBox(rw, parent, name) { AcceptOnSelect = false; };
 
     void setHelpText(QString help) { helptext = help; }
+    void setAcceptOnSelect(bool Accept) { AcceptOnSelect = Accept; }
 
   signals:
     void changeHelpText(QString);
@@ -56,6 +57,7 @@ class MythComboBox: public QComboBox
 
   private:
     QString helptext;
+    bool AcceptOnSelect;
 };
 
 class MythSpinBox: public QSpinBox 
