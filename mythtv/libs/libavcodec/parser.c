@@ -330,7 +330,7 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
     int frame_rate_index, ext_type, bytes_left;
     int frame_rate_ext_n, frame_rate_ext_d;
     int picture_structure, top_field_first, repeat_first_field, progressive_frame;
-    int horiz_size_ext, vert_size_ext;
+    int horiz_size_ext, vert_size_ext, bit_rate_ext;
     float aspect;
 
     s->repeat_pict = 0;
@@ -345,7 +345,7 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
             }
             break;
         case SEQ_START_CODE:
-            if (bytes_left >= 4) {
+            if (bytes_left >= 7) {
                 pc->width  = (buf[0] << 4) | (buf[1] >> 4);
                 pc->height = ((buf[1] & 0x0f) << 8) | buf[2];
                 pc->aspect_ratio_info = (buf[3] >> 4);
@@ -355,6 +355,7 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
                 }
                 avcodec_set_dimensions(avctx, pc->width, pc->height);
                 frame_rate_index = buf[3] & 0xf;
+                avctx->bit_rate = ((buf[4] << 10) | (buf[5] << 2) | (buf[6] >> 6)) * 400;
                 pc->frame_rate = avctx->frame_rate = frame_rate_tab[frame_rate_index];
                 avctx->frame_rate_base = MPEG1_FRAME_RATE_BASE;
                 avctx->codec_id = CODEC_ID_MPEG1VIDEO;
@@ -373,7 +374,9 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
                         frame_rate_ext_d = (buf[5] & 0x1f);
                         pc->progressive_sequence = buf[1] & (1 << 3);
                         avctx->has_b_frames= buf[5] >> 7;
+                        bit_rate_ext = ((buf[2] & 0x1f) << 7) | ((buf[3] & 0xfe) >> 1);
 
+                        avctx->bit_rate += (bit_rate_ext << 12) * 400;
                         pc->width  |=(horiz_size_ext << 12);
                         pc->height |=( vert_size_ext << 12);
                         avcodec_set_dimensions(avctx, pc->width, pc->height);

@@ -548,6 +548,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
     }
 
+    if (bitrate > 0)
+        bitrate /= 1000;
+
     // Select a new track at the next opportunity.
     currentAudioTrack = -1;
     return scanerror;
