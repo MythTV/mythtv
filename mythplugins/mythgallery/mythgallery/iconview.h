@@ -19,7 +19,8 @@ class QFont;
 class Thumbnail
 {
   public:
-    Thumbnail() { pixmap = NULL; filename = ""; name = ""; isdir = false; }
+    Thumbnail() { pixmap = NULL; thumbfilename = (const char*)0;
+                  filename = ""; name = ""; isdir = false; }
     Thumbnail(const Thumbnail &other) { pixmap = other.pixmap; 
                                         filename = other.filename;
                                         isdir = other.isdir;
@@ -27,6 +28,7 @@ class Thumbnail
                                       }
 
     QPixmap *pixmap;
+    QString thumbfilename;
     QString filename;
     QString name;
     bool isdir;

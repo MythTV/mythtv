@@ -97,7 +97,7 @@ void IconView::paintEvent(QPaintEvent *e)
 
              int xpos = spacew * (x + 1) + thumbw * x;
 
-             if (thumb->isdir)
+             if (thumb->isdir && thumb->thumbfilename.isNull())
              {
                  if (foldericon)
                      tmp.drawPixmap(xpos + (thumbw - foldericon->width()) / 2,
@@ -150,6 +150,9 @@ void IconView::fillList(const QString &dir)
         return;
 
     curdir = d.absPath();
+
+    bool isGallery = d.entryInfoList("serial*.dat", QDir::Files);
+
     QFileInfo cdir(curdir + "/.thumbcache");
     if (!cdir.exists())
         d.mkdir(".thumbcache");
@@ -171,12 +174,50 @@ void IconView::fillList(const QString &dir)
         ++it;
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
+
+        // remove these already-resized pictures.  we'll look
+        // specifially for thumbnails a few lines down..
+        if (isGallery && (
+            (fi->fileName().find(".thumb.") > 0) ||
+            (fi->fileName().find(".sized.") > 0) ||
+            (fi->fileName().find(".highlight.") > 0)))
+            continue;
+
         QString filename = fi->absFilePath();
 
         Thumbnail thumb;
         thumb.filename = filename;
-        if (fi->isDir())
+        if (isGallery) 
+        {
+            // if the image name is xyz.jpg, then look
+            // for a file named xyz.thumb.jpg.
+            QString fn = fi->fileName();
+            int firstDot = fn.find('.');
+            if (firstDot > 0) 
+            {
+                fn.insert(firstDot, ".thumb");
+                QFileInfo galThumb(curdir + "/" + fn);
+                if (galThumb.exists()) 
+                {
+                    thumb.thumbfilename = galThumb.absFilePath();
+                }
+            }
+        }
+
+        if (fi->isDir()) 
+        {
             thumb.isdir = true;
+            if (isGallery) 
+            {
+                // try to find a highlight so we can replace the
+                // normal folder pixmap with the chosen one
+                QDir subdir(fi->absFilePath(), "*.highlight.*", QDir::Name, 
+                            QDir::Files);
+                if (subdir.count()>0) {
+                    thumb.thumbfilename = subdir.entryInfoList()->getFirst()->absFilePath();
+                }
+            }
+        }
 
         thumb.name = fi->baseName();
         thumbs.push_back(thumb);
@@ -187,12 +228,18 @@ void IconView::loadThumbPixmap(Thumbnail *thumb)
 {
     QImage tmpimage;
     QFileInfo thumbinfo(thumb->filename);
-    QString cachename(curdir + "/.thumbcache/" + thumbinfo.fileName());
+    QString cachename;
+
+    if (!thumb->thumbfilename.isNull())
+        cachename = thumb->thumbfilename;
+    else
+        cachename = curdir + "/.thumbcache/" + thumbinfo.fileName();
     QFileInfo cacheinfo(cachename);
 
     // scale thumb and cache it if outdated or not exist
     if (!cacheinfo.exists() ||
-         (cacheinfo.lastModified() < thumbinfo.lastModified() ) )
+        ((cacheinfo.lastModified() < thumbinfo.lastModified()) &&
+        thumb->thumbfilename.isNull()))
     {
         if (!cacheprogress)
             cacheprogress = new MythProgressDialog("Caching thumbnails...", 0);
