@@ -53,6 +53,19 @@ GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
                                globalsettings->GetSetting("BackgroundPixmap");
             setPaletteBackgroundPixmap(QPixmap(pmapname));
         }
+        else if (globalsettings->GetSetting("TiledBackgroundPixmap") != "")
+        {
+            QString pmapname = globalsettings->GetSetting("ThemePathName") +
+                          globalsettings->GetSetting("TiledBackgroundPixmap");
+
+            QPixmap background(screenwidth, screenheight);
+            QPainter tmp(&background);
+
+            tmp.drawTiledPixmap(0, 0, screenwidth, screenheight, 
+                                QPixmap(pmapname));
+            tmp.end();
+            setPaletteBackgroundPixmap(background);
+        }
         else
             setPalette(QPalette(bgcolor));
     }
@@ -630,12 +643,18 @@ void GuideGrid::paintPrograms(QPainter *p)
                     int endx = (int)((x + spread) * xdifference - 2 * wmult);
                     int starty = (int)(ydifference * y + 1 * hmult);
                     int endy = (int)(ydifference * (y + 1) - 2 * hmult);
+ 
+                    if (x == 0)
+                        startx--;
+                    if (y == 0)
+                        starty--;
+
                     unsigned int *data = NULL;
                    
-                    for (int tmpy = starty; tmpy < endy; tmpy++)
+                    for (int tmpy = starty; tmpy <= endy; tmpy++)
                     {
                         data = (unsigned int *)bgimage.scanLine(tmpy);
-                        for (int tmpx = startx; tmpx < endx; tmpx++)
+                        for (int tmpx = startx; tmpx <= endx; tmpx++)
                         {
                             QRgb pixelcolor = data[tmpx];
                             data[tmpx] = blendColors(pixelcolor, blendcolor, 
@@ -643,7 +662,8 @@ void GuideGrid::paintPrograms(QPainter *p)
                         }
                     }
                     tmp.drawImage(startx, starty, bgimage, startx, starty, 
-                                  endx - startx, ydifference - (int)(2 * hmult));
+                                  endx - startx + 1, 
+                                  endy - starty + 1);
                 }
 
                 int maxwidth = (int)(spread * xdifference - (10 * wmult));
