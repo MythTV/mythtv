@@ -580,13 +580,14 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
     int num, den, presentation_delayed;
 
     /* handle wrapping */
+/* XXX Doesn't work when there's a large (valid) jump in the pts
     if(st->cur_dts != AV_NOPTS_VALUE){
         if(pkt->pts != AV_NOPTS_VALUE)
             pkt->pts= lsb2full(pkt->pts, st->cur_dts, st->pts_wrap_bits);
         if(pkt->dts != AV_NOPTS_VALUE)
             pkt->dts= lsb2full(pkt->dts, st->cur_dts, st->pts_wrap_bits);
     }
-    
+*/    
     if (pkt->duration == 0) {
         compute_frame_duration(&num, &den, st, pc, pkt);
         if (den && num) {
@@ -611,7 +612,7 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
         if(pkt->dts != AV_NOPTS_VALUE && pkt->pts != AV_NOPTS_VALUE && pkt->pts > pkt->dts)
             presentation_delayed = 1;
     }
-    
+   
     if(st->cur_dts == AV_NOPTS_VALUE){
         if(presentation_delayed) st->cur_dts = -pkt->duration;
         else                     st->cur_dts = 0;
