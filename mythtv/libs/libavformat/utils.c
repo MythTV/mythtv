@@ -167,12 +167,14 @@ int av_dup_packet(AVPacket *pkt)
 {
     if (pkt->destruct != av_destruct_packet) {
         uint8_t *data;
-        /* we duplicate the packet */
-        data = av_malloc(pkt->size);
+        /* we duplicate the packet and don't forget to put the padding
+           again */
+        data = av_malloc(pkt->size + FF_INPUT_BUFFER_PADDING_SIZE);
         if (!data) {
             return AVERROR_NOMEM;
         }
         memcpy(data, pkt->data, pkt->size);
+        memset(data + pkt->size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
         pkt->data = data;
         pkt->destruct = av_destruct_packet;
     }
@@ -663,7 +665,7 @@ static void av_destruct_packet_nofree(AVPacket *pkt)
 static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 {
     AVStream *st;
-    int len, ret;
+    int len, ret, i;
     int64_t startpos;
 
     for(;;) {
@@ -678,29 +680,26 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 s->cur_st = NULL;
                 return 0;
             } else if (s->cur_len > 0) {
-                /* we use the MPEG semantics: the pts and dts in a
-                   packet are given from the first frame beginning in
-                   it */
                 if (!st->got_frame) {
-                    st->cur_frame_pts = s->cur_pkt.pts;
-                    st->cur_frame_dts = s->cur_pkt.dts;
                     st->cur_frame_startpos = s->cur_pkt.startpos;
-                    s->cur_pkt.pts = AV_NOPTS_VALUE;
-                    s->cur_pkt.dts = AV_NOPTS_VALUE;
                     st->got_frame = 1;
                 }
                 len = av_parser_parse(st->parser, &st->codec, &pkt->data, &pkt->size, 
-                                      s->cur_ptr, s->cur_len);
+                                      s->cur_ptr, s->cur_len,
+                                      s->cur_pkt.pts, s->cur_pkt.dts);
+                s->cur_pkt.pts = AV_NOPTS_VALUE;
+                s->cur_pkt.dts = AV_NOPTS_VALUE;
                 /* increment read pointer */
                 s->cur_ptr += len;
                 s->cur_len -= len;
                 
                 /* return packet if any */
                 if (pkt->size) {
+                got_packet:
                     pkt->duration = 0;
                     pkt->stream_index = st->index;
-                    pkt->pts = st->cur_frame_pts;
-                    pkt->dts = st->cur_frame_dts;
+                    pkt->pts = st->parser->pts;
+                    pkt->dts = st->parser->dts;
                     pkt->destruct = av_destruct_packet_nofree;
                     pkt->startpos = st->cur_frame_startpos;
                     compute_pkt_fields(s, st, st->parser, pkt);
@@ -708,22 +707,34 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                     return 0;
                 }
             } else {
-                if (s->cur_st && s->cur_st->parser)
-                    av_free_packet(&s->cur_pkt);
+                /* free packet */
+                av_free_packet(&s->cur_pkt); 
                 s->cur_st = NULL;
             }
         } else {
-            /* free previous packet */
-            if (s->cur_st && s->cur_st->parser)
-                av_free_packet(&s->cur_pkt); 
-
             startpos = url_ftell(&s->pb);
             s->cur_pkt.startpos = 0;
 
             /* read next packet */
             ret = av_read_packet(s, &s->cur_pkt);
-            if (ret < 0)
+            if (ret < 0) {
+                if (ret == -EAGAIN)
+                    return ret;
+                /* return the last frames, if any */
+                for(i = 0; i < s->nb_streams; i++) {
+                    st = s->streams[i];
+                    if (st->parser) {
+                        av_parser_parse(st->parser, &st->codec, 
+                                        &pkt->data, &pkt->size, 
+                                        NULL, 0, 
+                                        AV_NOPTS_VALUE, AV_NOPTS_VALUE);
+                        if (pkt->size)
+                            goto got_packet;
+                    }
+                }
+                /* no more packets: really terminates parsing */
                 return ret;
+            }
 
             if (s->cur_pkt.startpos == 0)
                 s->cur_pkt.startpos = startpos;
@@ -738,7 +749,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                                                &s->last_pkt_stream_dts,
                                                s->cur_pkt.dts);
 #if 0
-            if (s->cur_pkt.stream_index == 1) {
+            if (s->cur_pkt.stream_index == 0) {
                 if (s->cur_pkt.pts != AV_NOPTS_VALUE) 
                     printf("PACKET pts=%0.3f\n", 
                            (double)s->cur_pkt.pts / AV_TIME_BASE);
@@ -2070,8 +2081,12 @@ void av_pkt_dump(FILE *f, AVPacket *pkt, int dump_payload)
     fprintf(f, "stream #%d:\n", pkt->stream_index);
     fprintf(f, "  keyframe=%d\n", ((pkt->flags & PKT_FLAG_KEY) != 0));
     fprintf(f, "  duration=%0.3f\n", (double)pkt->duration / AV_TIME_BASE);
-    /* DTS is _always_ valid */
-    fprintf(f, "  dts=%0.3f\n", (double)pkt->dts / AV_TIME_BASE);
+    /* DTS is _always_ valid after av_read_frame() */
+    fprintf(f, "  dts=");
+    if (pkt->dts == AV_NOPTS_VALUE)
+        fprintf(f, "N/A");
+    else
+        fprintf(f, "%0.3f", (double)pkt->dts / AV_TIME_BASE);
     /* PTS may be not known if B frames are present */
     fprintf(f, "  pts=");
     if (pkt->pts == AV_NOPTS_VALUE)

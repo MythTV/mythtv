@@ -63,18 +63,61 @@ AVCodecParserContext *av_parser_init(int codec_id)
     return s;
 }
 
+/* NOTE: buf_size == 0 is used to signal EOF so that the last frame
+   can be returned if necessary */
 int av_parser_parse(AVCodecParserContext *s, 
                     AVCodecContext *avctx,
                     uint8_t **poutbuf, int *poutbuf_size, 
-                    const uint8_t *buf, int buf_size)
+                    const uint8_t *buf, int buf_size,
+                    int64_t pts, int64_t dts)
 {
-    int index;
+    int index, i, k;
+    uint8_t dummy_buf[FF_INPUT_BUFFER_PADDING_SIZE];
+    
+    if (buf_size == 0) {
+        /* padding is always necessary even if EOF, so we add it here */
+        memset(dummy_buf, 0, sizeof(dummy_buf));
+        buf = dummy_buf;
+    } else {
+        /* add a new packet descriptor */
+        k = (s->cur_frame_start_index + 1) & (AV_PARSER_PTS_NB - 1);
+        s->cur_frame_start_index = k;
+        s->cur_frame_offset[k] = s->cur_offset;
+        s->cur_frame_pts[k] = pts;
+        s->cur_frame_dts[k] = dts;
+
+        /* fill first PTS/DTS */
+        if (s->cur_offset == 0) {
+            s->last_pts = pts;
+            s->last_dts = dts;
+        }
+    }
+
     /* WARNING: the returned index can be negative */
     index = s->parser->parser_parse(s, avctx, poutbuf, poutbuf_size, buf, buf_size);
     /* update the file pointer */
     if (*poutbuf_size) {
+        /* fill the data for the current frame */
         s->frame_offset = s->last_frame_offset;
+        s->pts = s->last_pts;
+        s->dts = s->last_dts;
+        
+        /* offset of the next frame */
         s->last_frame_offset = s->cur_offset + index;
+        /* find the packet in which the new frame starts. It
+           is tricky because of MPEG video start codes
+           which can begin in one packet and finish in
+           another packet. In the worst case, an MPEG
+           video start code could be in 4 different
+           packets. */
+        k = s->cur_frame_start_index;
+        for(i = 0; i < AV_PARSER_PTS_NB; i++) {
+            if (s->last_frame_offset >= s->cur_frame_offset[k])
+                break;
+            k = (k - 1) & (AV_PARSER_PTS_NB - 1);
+        }
+        s->last_pts = s->cur_frame_pts[k];
+        s->last_dts = s->cur_frame_dts[k];
     }
     if (index < 0)
         index = 0;
@@ -202,6 +245,9 @@ static int mpeg1_find_frame_end(ParseContext1 *pc, const uint8_t *buf, int buf_s
     }
     
     if(pc->frame_start_found){
+        /* EOF considered as end of frame */
+        if (buf_size == 0)
+            return 0;
         for(; i<buf_size; i++){
             state= (state<<8) | buf[i];
             if((state&0xFFFFFF00) == 0x100){
@@ -243,7 +289,7 @@ static int find_start_code(const uint8_t **pbuf_ptr, const uint8_t *buf_end)
 #define MPEG1_FRAME_RATE_BASE 1001
 
 static const int frame_rate_tab[16] = {
-        0,        
+        0,
     24000,
     24024,
     25025,
@@ -340,6 +386,8 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
                 frame_rate_index = buf[3] & 0xf;
                 pc->frame_rate = avctx->frame_rate = frame_rate_tab[frame_rate_index];
                 avctx->frame_rate_base = MPEG1_FRAME_RATE_BASE;
+                avctx->codec_id = CODEC_ID_MPEG1VIDEO;
+                avctx->sub_id = 1;
             }
             break;
         case EXT_START_CODE:
@@ -358,14 +406,15 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
                         avctx->height = pc->height | (vert_size_ext << 12);
                         avctx->frame_rate = pc->frame_rate * (frame_rate_ext_n + 1);
                         avctx->frame_rate_base = MPEG1_FRAME_RATE_BASE * (frame_rate_ext_d + 1);
+                        avctx->codec_id = CODEC_ID_MPEG2VIDEO;
                         avctx->sub_id = 2; /* forces MPEG2 */
                         if (pc->aspect_ratio_info <= 1)
                             avctx->sample_aspect_ratio = mpeg2_aspect[pc->aspect_ratio_info];
                         else{
-                            avctx->sample_aspect_ratio = 
+                            avctx->sample_aspect_ratio =
                                  av_div_q(mpeg2_aspect[pc->aspect_ratio_info],
                                           (AVRational){avctx->width, avctx->height});
-                        }      
+                        }
                     }
                     break;
                 case 0x8: /* picture coding extension */
@@ -469,14 +518,17 @@ static int mpeg4_find_frame_end(ParseContext1 *pc,
     }
 
     if(vop_found){    
-      for(; i<buf_size; i++){
-        state= (state<<8) | buf[i];
-        if((state&0xFFFFFF00) == 0x100){
-            pc->frame_start_found=0;
-            pc->state=-1; 
-            return i-3;
+        /* EOF considered as end of frame */
+        if (buf_size == 0)
+            return 0;
+        for(; i<buf_size; i++){
+            state= (state<<8) | buf[i];
+            if((state&0xFFFFFF00) == 0x100){
+                pc->frame_start_found=0;
+                pc->state=-1; 
+                return i-3;
+            }
         }
-      }
     }
     pc->frame_start_found= vop_found;
     pc->state= state;

@@ -30,7 +30,7 @@
    synchronisation is lost */
 #define MAX_RESYNC_SIZE 4096
 
-static int add_pes_stream(MpegTSContext *ts, int pid);
+static int add_pes_stream(MpegTSContext *ts, int pid, int stream_type);
 
 enum MpegTSFilterType {
     MPEGTS_PES,
@@ -219,24 +219,45 @@ void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter)
     ts->pids[pid] = NULL;
 }
 
+static int analyze(const uint8_t *buf, int size, int packet_size, int *index){
+    int stat[packet_size];
+    int i;
+    int x=0;
+    int best_score=0;
+
+    memset(stat, 0, packet_size*sizeof(int));
+
+    for(x=i=0; i<size; i++){
+        if(buf[i] == 0x47){
+            stat[x]++;
+            if(stat[x] > best_score){
+                best_score= stat[x];
+                if(index) *index= x;
+            }
+        }
+
+        x++;
+        if(x == packet_size) x= 0;
+    }
+
+    return best_score;
+}
+
 /* autodetect fec presence. Must have at least 1024 bytes  */
 static int get_packet_size(const uint8_t *buf, int size)
 {
-    int i;
+    int score, fec_score;
 
     if (size < (TS_FEC_PACKET_SIZE * 5 + 1))
         return -1;
-    for(i=0;i<5;i++) {
-        if (buf[i * TS_PACKET_SIZE] != 0x47)
-            goto try_fec;
-    }
-    return TS_PACKET_SIZE;
- try_fec:
-    for(i=0;i<5;i++) {
-        if (buf[i * TS_FEC_PACKET_SIZE] != 0x47)
-            return -1;
-    }
-    return TS_FEC_PACKET_SIZE;
+        
+    score    = analyze(buf, size, TS_PACKET_SIZE, NULL);
+    fec_score= analyze(buf, size, TS_FEC_PACKET_SIZE, NULL);
+//    av_log(NULL, AV_LOG_DEBUG, "score: %d, fec_score: %d \n", score, fec_score);
+    
+    if     (score > fec_score) return TS_PACKET_SIZE;
+    else if(score < fec_score) return TS_FEC_PACKET_SIZE;
+    else                       return -1;
 }
 
 typedef struct SectionHeader {
@@ -404,8 +425,11 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
         case STREAM_TYPE_AUDIO_MPEG2:
         case STREAM_TYPE_VIDEO_MPEG1:
         case STREAM_TYPE_VIDEO_MPEG2:
+        case STREAM_TYPE_VIDEO_MPEG4:
+        case STREAM_TYPE_VIDEO_H264:
+        case STREAM_TYPE_AUDIO_AAC:
         case STREAM_TYPE_AUDIO_AC3:
-            add_pes_stream(ts, pid);
+            add_pes_stream(ts, pid, stream_type);
             break;
         default:
             /* we ignore the other streams */
@@ -633,6 +657,7 @@ enum MpegTSState {
 
 typedef struct PESContext {
     int pid;
+    int stream_type;
     MpegTSContext *ts;
     AVFormatContext *stream;
     AVStream *st;
@@ -702,15 +727,45 @@ static void mpegts_push_data(void *opaque,
                         goto skip;
                     if (!pes->st) {
                         /* allocate stream */
-                        if (code >= 0x1c0 && code <= 0x1df) {
+                        switch(pes->stream_type){
+                        case STREAM_TYPE_AUDIO_MPEG1:
+                        case STREAM_TYPE_AUDIO_MPEG2:
                             codec_type = CODEC_TYPE_AUDIO;
-                            codec_id = CODEC_ID_MP2;
-                        } else if (code == 0x1bd) {
+                            codec_id = CODEC_ID_MP3;
+                            break;
+                        case STREAM_TYPE_VIDEO_MPEG1:
+                        case STREAM_TYPE_VIDEO_MPEG2:
+                            codec_type = CODEC_TYPE_VIDEO;
+                            codec_id = CODEC_ID_MPEG2VIDEO;
+                            break;
+                        case STREAM_TYPE_VIDEO_MPEG4:
+                            codec_type = CODEC_TYPE_VIDEO;
+                            codec_id = CODEC_ID_MPEG4;
+                            break;
+                        case STREAM_TYPE_VIDEO_H264:
+                            codec_type = CODEC_TYPE_VIDEO;
+                            codec_id = CODEC_ID_H264;
+                            break;
+                        case STREAM_TYPE_AUDIO_AAC:
+                            codec_type = CODEC_TYPE_AUDIO;
+                            codec_id = CODEC_ID_AAC;
+                            break;
+                        case STREAM_TYPE_AUDIO_AC3:
                             codec_type = CODEC_TYPE_AUDIO;
                             codec_id = CODEC_ID_AC3;
-                        } else {
-                            codec_type = CODEC_TYPE_VIDEO;
-                            codec_id = CODEC_ID_MPEG1VIDEO;
+                            break;
+                        default:
+                            if (code >= 0x1c0 && code <= 0x1df) {
+                                codec_type = CODEC_TYPE_AUDIO;
+                                codec_id = CODEC_ID_MP2;
+                            } else if (code == 0x1bd) {
+                                codec_type = CODEC_TYPE_AUDIO;
+                                codec_id = CODEC_ID_AC3;
+                            } else {
+                                codec_type = CODEC_TYPE_VIDEO;
+                                codec_id = CODEC_ID_MPEG1VIDEO;
+                            }
+                            break;
                         }
                         st = av_new_stream(pes->stream, pes->pid);
                         if (st) {
@@ -799,7 +854,7 @@ static void mpegts_push_data(void *opaque,
     }
 }
 
-static int add_pes_stream(MpegTSContext *ts, int pid)
+static int add_pes_stream(MpegTSContext *ts, int pid, int stream_type)
 {
     MpegTSFilter *tss;
     PESContext *pes;
@@ -811,6 +866,7 @@ static int add_pes_stream(MpegTSContext *ts, int pid)
     pes->ts = ts;
     pes->stream = ts->stream;
     pes->pid = pid;
+    pes->stream_type = stream_type;
     tss = mpegts_open_pes_filter(ts, pid, mpegts_push_data, pes);
     if (!tss) {
         av_free(pes);
@@ -831,7 +887,7 @@ static void handle_packet(MpegTSContext *ts, const uint8_t *packet, int64_t posi
     is_start = packet[1] & 0x40;
     tss = ts->pids[pid];
     if (ts->auto_guess && tss == NULL && is_start) {
-        add_pes_stream(ts, pid);
+        add_pes_stream(ts, pid, 0);
         tss = ts->pids[pid];
     }
     if (!tss)
@@ -960,11 +1016,21 @@ static int handle_packets(MpegTSContext *ts, int nb_packets)
 static int mpegts_probe(AVProbeData *p)
 {
 #if 1
-    int size;
-    size = get_packet_size(p->buf, p->buf_size);
-    if (size < 0)
-        return 0;
-    return AVPROBE_SCORE_MAX - 1;
+    const int size= p->buf_size;
+    int score, fec_score;
+#define CHECK_COUNT 10
+    
+    if (size < (TS_FEC_PACKET_SIZE * CHECK_COUNT))
+        return -1;
+    
+    score    = analyze(p->buf, TS_PACKET_SIZE    *CHECK_COUNT, TS_PACKET_SIZE, NULL);
+    fec_score= analyze(p->buf, TS_FEC_PACKET_SIZE*CHECK_COUNT, TS_FEC_PACKET_SIZE, NULL);
+//    av_log(NULL, AV_LOG_DEBUG, "score: %d, fec_score: %d \n", score, fec_score);
+  
+// we need a clear definition for the returned score otherwise things will become messy sooner or later
+    if     (score > fec_score && score > 6) return AVPROBE_SCORE_MAX + score     - CHECK_COUNT;
+    else if(                 fec_score > 6) return AVPROBE_SCORE_MAX + fec_score - CHECK_COUNT;
+    else                                    return -1;
 #else
     /* only use the extension for safer guess */
     if (match_ext(p->filename, "ts"))

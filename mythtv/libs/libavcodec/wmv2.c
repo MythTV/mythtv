@@ -368,7 +368,7 @@ return -1;
         code = get_bits(&s->gb, 7);
         av_log(s->avctx, AV_LOG_ERROR, "I7:%X/\n", code);
     }
-    s->qscale = get_bits(&s->gb, 5);
+    s->chroma_qscale= s->qscale = get_bits(&s->gb, 5);
     if(s->qscale < 0)
        return -1;
        
@@ -507,11 +507,11 @@ static int16_t *wmv2_pred_motion(Wmv2Context *w, int *px, int *py){
     wrap = s->block_wrap[0];
     xy = s->block_index[0];
 
-    mot_val = s->motion_val[xy];
+    mot_val = s->current_picture.motion_val[0][xy];
 
-    A = s->motion_val[xy - 1];
-    B = s->motion_val[xy - wrap];
-    C = s->motion_val[xy + 2 - wrap];
+    A = s->current_picture.motion_val[0][xy - 1];
+    B = s->current_picture.motion_val[0][xy - wrap];
+    C = s->current_picture.motion_val[0][xy + 2 - wrap];
     
     diff= FFMAX(ABS(A[0] - B[0]), ABS(A[1] - B[1]));
     

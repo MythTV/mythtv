@@ -19,30 +19,37 @@
 #include "avformat.h"
 
 #define MAX_PAYLOAD_SIZE 4096
-#define NB_STREAMS 2
 //#define DEBUG_SEEK
 
 typedef struct {
     uint8_t buffer[MAX_PAYLOAD_SIZE];
     int buffer_ptr;
+    int nb_frames;    /* number of starting frame encountered (AC3) */
+    int frame_start_offset; /* starting offset of the frame + 1 (0 if none) */
     uint8_t id;
     int max_buffer_size; /* in bytes */
     int packet_number;
     int64_t start_pts;
+    int64_t start_dts;
+    uint8_t lpcm_header[3];
+    int lpcm_align;
 } StreamInfo;
 
 typedef struct {
     int packet_size; /* required packet size */
-    int packet_data_max_size; /* maximum data size inside a packet */
     int packet_number;
     int pack_header_freq;     /* frequency (in packets^-1) at which we send pack headers */
     int system_header_freq;
+    int system_header_size;
     int mux_rate; /* bitrate in units of 50 bytes/s */
     /* stream info */
     int audio_bound;
     int video_bound;
     int is_mpeg2;
     int is_vcd;
+    int scr_stream_index; /* stream from which the system clock is
+                             computed (VBR case) */
+    int64_t last_scr; /* current system clock */
 } MpegMuxContext;
 
 #define PACK_START_CODE             ((unsigned int)0x000001ba)
@@ -61,11 +68,15 @@ typedef struct {
 
 #define AUDIO_ID 0xc0
 #define VIDEO_ID 0xe0
+#define AC3_ID   0x80
+#define LPCM_ID  0xa0
 
 #ifdef CONFIG_ENCODERS
 extern AVOutputFormat mpeg1system_mux;
 extern AVOutputFormat mpeg1vcd_mux;
 extern AVOutputFormat mpeg2vob_mux;
+
+static const int lpcm_freq_tab[4] = { 48000, 96000, 44100, 32000 };
 
 static int put_pack_header(AVFormatContext *ctx, 
                            uint8_t *buf, int64_t timestamp)
@@ -163,10 +174,29 @@ static int put_system_header(AVFormatContext *ctx, uint8_t *buf)
     return size;
 }
 
+static int get_system_header_size(AVFormatContext *ctx)
+{
+    int buf_index, i, private_stream_coded;
+    StreamInfo *stream;
+
+    buf_index = 12;
+    private_stream_coded = 0;
+    for(i=0;i<ctx->nb_streams;i++) {
+        stream = ctx->streams[i]->priv_data;
+        if (stream->id < 0xc0) {
+            if (private_stream_coded)
+                continue;
+            private_stream_coded = 1;
+        }
+        buf_index += 3;
+    }
+    return buf_index;
+}
+
 static int mpeg_mux_init(AVFormatContext *ctx)
 {
     MpegMuxContext *s = ctx->priv_data;
-    int bitrate, i, mpa_id, mpv_id, ac3_id;
+    int bitrate, i, mpa_id, mpv_id, ac3_id, lpcm_id, j;
     AVStream *st;
     StreamInfo *stream;
 
@@ -179,13 +209,13 @@ static int mpeg_mux_init(AVFormatContext *ctx)
     else
         s->packet_size = 2048;
         
-    /* startcode(4) + length(2) + flags(1) */
-    s->packet_data_max_size = s->packet_size - 7;
     s->audio_bound = 0;
     s->video_bound = 0;
     mpa_id = AUDIO_ID;
-    ac3_id = 0x80;
+    ac3_id = AC3_ID;
     mpv_id = VIDEO_ID;
+    lpcm_id = LPCM_ID;
+    s->scr_stream_index = -1;
     for(i=0;i<ctx->nb_streams;i++) {
         st = ctx->streams[i];
         stream = av_mallocz(sizeof(StreamInfo));
@@ -195,14 +225,32 @@ static int mpeg_mux_init(AVFormatContext *ctx)
 
         switch(st->codec.codec_type) {
         case CODEC_TYPE_AUDIO:
-            if (st->codec.codec_id == CODEC_ID_AC3)
+            if (st->codec.codec_id == CODEC_ID_AC3) {
                 stream->id = ac3_id++;
-            else
+            } else if (st->codec.codec_id == CODEC_ID_PCM_S16BE) {
+                stream->id = lpcm_id++;
+                for(j = 0; j < 4; j++) {
+                    if (lpcm_freq_tab[j] == st->codec.sample_rate)
+                        break;
+                }
+                if (j == 4)
+                    goto fail;
+                if (st->codec.channels > 8)
+                    return -1;
+                stream->lpcm_header[0] = 0x0c;
+                stream->lpcm_header[1] = (st->codec.channels - 1) | (j << 4);
+                stream->lpcm_header[2] = 0x80;
+                stream->lpcm_align = st->codec.channels * 2;
+            } else {
                 stream->id = mpa_id++;
+            }
             stream->max_buffer_size = 4 * 1024; 
             s->audio_bound++;
             break;
         case CODEC_TYPE_VIDEO:
+            /* by default, video is used for the SCR computation */
+            if (s->scr_stream_index == -1)
+                s->scr_stream_index = i;
             stream->id = mpv_id++;
             stream->max_buffer_size = 46 * 1024; 
             s->video_bound++;
@@ -211,6 +259,9 @@ static int mpeg_mux_init(AVFormatContext *ctx)
             av_abort();
         }
     }
+    /* if no SCR, use first stream (audio) */
+    if (s->scr_stream_index == -1)
+        s->scr_stream_index = 0;
 
     /* we increase slightly the bitrate to take into account the
        headers. XXX: compute it exactly */
@@ -245,8 +296,11 @@ static int mpeg_mux_init(AVFormatContext *ctx)
         stream = ctx->streams[i]->priv_data;
         stream->buffer_ptr = 0;
         stream->packet_number = 0;
-        stream->start_pts = -1;
+        stream->start_pts = AV_NOPTS_VALUE;
+        stream->start_dts = AV_NOPTS_VALUE;
     }
+    s->system_header_size = get_system_header_size(ctx);
+    s->last_scr = 0;
     return 0;
  fail:
     for(i=0;i<ctx->nb_streams;i++) {
@@ -255,28 +309,91 @@ static int mpeg_mux_init(AVFormatContext *ctx)
     return -ENOMEM;
 }
 
+static inline void put_timestamp(ByteIOContext *pb, int id, int64_t timestamp)
+{
+    put_byte(pb, 
+             (id << 4) | 
+             (((timestamp >> 30) & 0x07) << 1) | 
+             1);
+    put_be16(pb, (uint16_t)((((timestamp >> 15) & 0x7fff) << 1) | 1));
+    put_be16(pb, (uint16_t)((((timestamp) & 0x7fff) << 1) | 1));
+}
+
+
+/* return the exact available payload size for the next packet for
+   stream 'stream_index'. 'pts' and 'dts' are only used to know if
+   timestamps are needed in the packet header. */
+static int get_packet_payload_size(AVFormatContext *ctx, int stream_index,
+                                   int64_t pts, int64_t dts)
+{
+    MpegMuxContext *s = ctx->priv_data;
+    int buf_index;
+    StreamInfo *stream;
+
+    buf_index = 0;
+    if (((s->packet_number % s->pack_header_freq) == 0)) {
+        /* pack header size */
+        if (s->is_mpeg2) 
+            buf_index += 14;
+        else
+            buf_index += 12;
+        if ((s->packet_number % s->system_header_freq) == 0)
+            buf_index += s->system_header_size;
+    }
+
+    /* packet header size */
+    buf_index += 6;
+    if (s->is_mpeg2)
+        buf_index += 3;
+    if (pts != AV_NOPTS_VALUE) {
+        if (dts != AV_NOPTS_VALUE)
+            buf_index += 5 + 5;
+        else
+            buf_index += 5;
+    } else {
+        if (!s->is_mpeg2)
+            buf_index++;
+    }
+    
+    stream = ctx->streams[stream_index]->priv_data;
+    if (stream->id < 0xc0) {
+        /* AC3/LPCM private data header */
+        buf_index += 4;
+        if (stream->id >= 0xa0) {
+            int n;
+            buf_index += 3;
+            /* NOTE: we round the payload size to an integer number of
+               LPCM samples */
+            n = (s->packet_size - buf_index) % stream->lpcm_align;
+            if (n)
+                buf_index += (stream->lpcm_align - n);
+        }
+    }
+    return s->packet_size - buf_index; 
+}
+
 /* flush the packet on stream stream_index */
-static void flush_packet(AVFormatContext *ctx, int stream_index)
+static void flush_packet(AVFormatContext *ctx, int stream_index, 
+                         int64_t pts, int64_t dts, int64_t scr)
 {
     MpegMuxContext *s = ctx->priv_data;
     StreamInfo *stream = ctx->streams[stream_index]->priv_data;
     uint8_t *buf_ptr;
-    int size, payload_size, startcode, id, len, stuffing_size, i, header_len;
-    int64_t timestamp;
+    int size, payload_size, startcode, id, stuffing_size, i, header_len;
+    int packet_size;
     uint8_t buffer[128];
     
     id = stream->id;
-    timestamp = stream->start_pts;
-
+    
 #if 0
     printf("packet ID=%2x PTS=%0.3f\n", 
-           id, timestamp / 90000.0);
+           id, pts / 90000.0);
 #endif
 
     buf_ptr = buffer;
     if (((s->packet_number % s->pack_header_freq) == 0)) {
         /* output pack and systems header if needed */
-        size = put_pack_header(ctx, buf_ptr, timestamp);
+        size = put_pack_header(ctx, buf_ptr, scr);
         buf_ptr += size;
         if ((s->packet_number % s->system_header_freq) == 0) {
             size = put_system_header(ctx, buf_ptr);
@@ -288,47 +405,85 @@ static void flush_packet(AVFormatContext *ctx, int stream_index)
 
     /* packet header */
     if (s->is_mpeg2) {
-        header_len = 8;
+        header_len = 3;
     } else {
-        header_len = 5;
+        header_len = 0;
     }
-    payload_size = s->packet_size - (size + 6 + header_len);
+    if (pts != AV_NOPTS_VALUE) {
+        if (dts != AV_NOPTS_VALUE)
+            header_len += 5 + 5;
+        else
+            header_len += 5;
+    } else {
+        if (!s->is_mpeg2)
+            header_len++;
+    }
+
+    packet_size = s->packet_size - (size + 6);
+    payload_size = packet_size - header_len;
     if (id < 0xc0) {
         startcode = PRIVATE_STREAM_1;
         payload_size -= 4;
+        if (id >= 0xa0)
+            payload_size -= 3;
     } else {
         startcode = 0x100 + id;
     }
+
     stuffing_size = payload_size - stream->buffer_ptr;
     if (stuffing_size < 0)
         stuffing_size = 0;
-
     put_be32(&ctx->pb, startcode);
 
-    put_be16(&ctx->pb, payload_size + header_len);
+    put_be16(&ctx->pb, packet_size);
     /* stuffing */
     for(i=0;i<stuffing_size;i++)
         put_byte(&ctx->pb, 0xff);
 
     if (s->is_mpeg2) {
         put_byte(&ctx->pb, 0x80); /* mpeg2 id */
-        put_byte(&ctx->pb, 0x80); /* flags */
-        put_byte(&ctx->pb, 0x05); /* header len (only pts is included) */
+
+        if (pts != AV_NOPTS_VALUE) {
+            if (dts != AV_NOPTS_VALUE) {
+                put_byte(&ctx->pb, 0xc0); /* flags */
+                put_byte(&ctx->pb, header_len - 3);
+                put_timestamp(&ctx->pb, 0x03, pts);
+                put_timestamp(&ctx->pb, 0x01, dts);
+            } else {
+                put_byte(&ctx->pb, 0x80); /* flags */
+                put_byte(&ctx->pb, header_len - 3);
+                put_timestamp(&ctx->pb, 0x02, pts);
+            }
+        } else {
+            put_byte(&ctx->pb, 0x00); /* flags */
+            put_byte(&ctx->pb, header_len - 3);
+        }
+    } else {
+        if (pts != AV_NOPTS_VALUE) {
+            if (dts != AV_NOPTS_VALUE) {
+                put_timestamp(&ctx->pb, 0x03, pts);
+                put_timestamp(&ctx->pb, 0x01, dts);
+            } else {
+                put_timestamp(&ctx->pb, 0x02, pts);
+            }
+        } else {
+            put_byte(&ctx->pb, 0x0f);
+        }
     }
-    put_byte(&ctx->pb, 
-             (0x02 << 4) | 
-             (((timestamp >> 30) & 0x07) << 1) | 
-             1);
-    put_be16(&ctx->pb, (uint16_t)((((timestamp >> 15) & 0x7fff) << 1) | 1));
-    put_be16(&ctx->pb, (uint16_t)((((timestamp) & 0x7fff) << 1) | 1));
 
     if (startcode == PRIVATE_STREAM_1) {
         put_byte(&ctx->pb, id);
-        if (id >= 0x80 && id <= 0xbf) {
-            /* XXX: need to check AC3 spec */
-            put_byte(&ctx->pb, 1);
-            put_byte(&ctx->pb, 0);
-            put_byte(&ctx->pb, 2);
+        if (id >= 0xa0) {
+            /* LPCM (XXX: check nb_frames) */
+            put_byte(&ctx->pb, 7);
+            put_be16(&ctx->pb, 4); /* skip 3 header bytes */
+            put_byte(&ctx->pb, stream->lpcm_header[0]);
+            put_byte(&ctx->pb, stream->lpcm_header[1]);
+            put_byte(&ctx->pb, stream->lpcm_header[2]);
+        } else {
+            /* AC3 */
+            put_byte(&ctx->pb, stream->nb_frames);
+            put_be16(&ctx->pb, stream->frame_start_offset);
         }
     }
 
@@ -336,16 +491,10 @@ static void flush_packet(AVFormatContext *ctx, int stream_index)
     put_buffer(&ctx->pb, stream->buffer, payload_size - stuffing_size);
     put_flush_packet(&ctx->pb);
     
-    /* preserve remaining data */
-    len = stream->buffer_ptr - payload_size;
-    if (len < 0) 
-        len = 0;
-    memmove(stream->buffer, stream->buffer + stream->buffer_ptr - len, len);
-    stream->buffer_ptr = len;
-
     s->packet_number++;
     stream->packet_number++;
-    stream->start_pts = -1;
+    stream->nb_frames = 0;
+    stream->frame_start_offset = 0;
 }
 
 static int mpeg_mux_write_packet(AVFormatContext *ctx, int stream_index,
@@ -354,32 +503,76 @@ static int mpeg_mux_write_packet(AVFormatContext *ctx, int stream_index,
     MpegMuxContext *s = ctx->priv_data;
     AVStream *st = ctx->streams[stream_index];
     StreamInfo *stream = st->priv_data;
-    int len;
+    int64_t dts, new_start_pts, new_start_dts;
+    int len, avail_size;
+
+    /* XXX: system clock should be computed precisely, especially for
+       CBR case. The current mode gives at least something coherent */
+    if (stream_index == s->scr_stream_index)
+        s->last_scr = pts;
     
+#if 0
+    printf("%d: pts=%0.3f scr=%0.3f\n", 
+           stream_index, pts / 90000.0, s->last_scr / 90000.0);
+#endif
+    
+    /* XXX: currently no way to pass dts, will change soon */
+    dts = AV_NOPTS_VALUE;
+
+    /* we assume here that pts != AV_NOPTS_VALUE */
+    new_start_pts = stream->start_pts;
+    new_start_dts = stream->start_dts;
+    
+    if (stream->start_pts == AV_NOPTS_VALUE) {
+        new_start_pts = pts;
+        new_start_dts = dts;
+    }
+    avail_size = get_packet_payload_size(ctx, stream_index,
+                                         new_start_pts, 
+                                         new_start_dts);
+    if (stream->buffer_ptr >= avail_size) {
+        /* unlikely case: outputing the pts or dts increase the packet
+           size so that we cannot write the start of the next
+           packet. In this case, we must flush the current packet with
+           padding */
+        flush_packet(ctx, stream_index,
+                     stream->start_pts, stream->start_dts, s->last_scr);
+        stream->buffer_ptr = 0;
+    }
+    stream->start_pts = new_start_pts;
+    stream->start_dts = new_start_dts;
+    stream->nb_frames++;
+    if (stream->frame_start_offset == 0)
+        stream->frame_start_offset = stream->buffer_ptr;
     while (size > 0) {
-        /* set pts */
-        if (stream->start_pts == -1) {
-            stream->start_pts = pts;
-        }
-        len = s->packet_data_max_size - stream->buffer_ptr;
+        avail_size = get_packet_payload_size(ctx, stream_index,
+                                             stream->start_pts, 
+                                             stream->start_dts);
+        len = avail_size - stream->buffer_ptr;
         if (len > size)
             len = size;
         memcpy(stream->buffer + stream->buffer_ptr, buf, len);
         stream->buffer_ptr += len;
         buf += len;
         size -= len;
-        while (stream->buffer_ptr >= s->packet_data_max_size) {
-            /* output the packet */
-            if (stream->start_pts == -1)
-                stream->start_pts = pts;
-            flush_packet(ctx, stream_index);
+        if (stream->buffer_ptr >= avail_size) {
+            /* if packet full, we send it now */
+            flush_packet(ctx, stream_index,
+                         stream->start_pts, stream->start_dts, s->last_scr);
+            stream->buffer_ptr = 0;
+            /* Make sure only the FIRST pes packet for this frame has
+               a timestamp */
+            stream->start_pts = AV_NOPTS_VALUE;
+            stream->start_dts = AV_NOPTS_VALUE;
         }
     }
+
     return 0;
 }
 
 static int mpeg_mux_end(AVFormatContext *ctx)
 {
+    MpegMuxContext *s = ctx->priv_data;
     StreamInfo *stream;
     int i;
 
@@ -387,7 +580,10 @@ static int mpeg_mux_end(AVFormatContext *ctx)
     for(i=0;i<ctx->nb_streams;i++) {
         stream = ctx->streams[i]->priv_data;
         if (stream->buffer_ptr > 0) {
-            flush_packet(ctx, i);
+            /* NOTE: we can always write the remaining data as it was
+               tested before in mpeg_mux_write_packet() */
+            flush_packet(ctx, i, stream->start_pts, stream->start_dts, 
+                         s->last_scr);
         }
     }
 
@@ -670,14 +866,13 @@ static int mpegps_read_packet(AVFormatContext *s,
 {
     AVStream *st;
     int len, startcode, i, type, codec_id;
-    int64_t pts, dts;
-    int64_t ppos = 0;
+    int64_t pts, dts, ppos = 0;
 
  redo:
     len = mpegps_read_pes_header(s, &ppos, &startcode, &pts, &dts, 1);
     if (len < 0)
         return len;
-
+    
     /* now find stream */
     for(i=0;i<s->nb_streams;i++) {
         st = s->streams[i];
@@ -686,7 +881,7 @@ static int mpegps_read_packet(AVFormatContext *s,
     }
     if (startcode >= 0x1e0 && startcode <= 0x1ef) {
         type = CODEC_TYPE_VIDEO;
-        codec_id = CODEC_ID_MPEG1VIDEO;
+        codec_id = CODEC_ID_MPEG2VIDEO;
     } else if (startcode >= 0x1c0 && startcode <= 0x1df) {
         type = CODEC_TYPE_AUDIO;
         codec_id = CODEC_ID_MP2;
@@ -713,7 +908,6 @@ static int mpegps_read_packet(AVFormatContext *s,
  found:
     if (startcode >= 0xa0 && startcode <= 0xbf) {
         int b1, freq;
-        static const int lpcm_freq_tab[4] = { 48000, 96000, 44100, 32000 };
 
         /* for LPCM, we just skip the header and consider it is raw
            audio data */
@@ -729,13 +923,15 @@ static int mpegps_read_packet(AVFormatContext *s,
         st->codec.bit_rate = st->codec.channels * st->codec.sample_rate * 2;
     }
     av_new_packet(pkt, len);
-    //printf("\nRead Packet ID: %x PTS: %f Size: %d", startcode,
-    //       (float)pts/90000, len);
     get_buffer(&s->pb, pkt->data, pkt->size);
     pkt->pts = pts;
     pkt->dts = dts;
     pkt->stream_index = st->index;
     pkt->startpos = ppos;
+#if 0
+    printf("%d: pts=%0.3f dts=%0.3f\n",
+           pkt->stream_index, pkt->pts / 90000.0, pkt->dts / 90000.0);
+#endif
     return 0;
 }
 
@@ -924,7 +1120,7 @@ static AVOutputFormat mpeg2vob_mux = {
     "vob",
     sizeof(MpegMuxContext),
     CODEC_ID_MP2,
-    CODEC_ID_MPEG1VIDEO,
+    CODEC_ID_MPEG2VIDEO,
     mpeg_mux_init,
     mpeg_mux_write_packet,
     mpeg_mux_end,

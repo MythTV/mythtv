@@ -5,14 +5,14 @@
 extern "C" {
 #endif
 
-#define LIBAVFORMAT_BUILD       4610
+#define LIBAVFORMAT_BUILD       4611
 
 #define LIBAVFORMAT_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVFORMAT_VERSION     FFMPEG_VERSION
 #define LIBAVFORMAT_IDENT	"FFmpeg" FFMPEG_VERSION "b" AV_STRINGIFY(LIBAVFORMAT_BUILD)
 
 #include <time.h>
-
+#include <stdio.h>  /* FILE */
 #include "avcodec.h"
 
 #include "avio.h"
@@ -227,9 +227,7 @@ typedef struct AVStream {
     /* av_read_frame() support */
     int need_parsing;
     struct AVCodecParserContext *parser;
-    int got_frame;
-    int64_t cur_frame_pts;
-    int64_t cur_frame_dts;
+
     int64_t cur_dts;
     int last_IP_duration;
     /* av_seek_frame() support */
@@ -238,6 +236,7 @@ typedef struct AVStream {
     int nb_index_entries;
     int index_entries_allocated_size;
 
+    int got_frame;
     int64_t cur_frame_startpos;
 } AVStream;
 
@@ -482,6 +481,9 @@ int film_init(void);
 
 /* idcin.c */
 int idcin_init(void);
+
+/* flic.c */
+int flic_init(void);
 
 //#include "rtp.h"
 

@@ -51,9 +51,10 @@ int ff_h263_decode_init(AVCodecContext *avctx)
     /* select sub codec */
     switch(avctx->codec->id) {
     case CODEC_ID_H263:
-        s->gob_number = 0;
+        s->unrestricted_mv= 0;
         break;
     case CODEC_ID_MPEG4:
+        s->decode_mb= ff_mpeg4_decode_mb;
         s->time_increment_bits = 4; /* default value for broken headers */
         s->h263_pred = 1;
         s->low_delay = 0; //default, might be overriden in the vol header during header parsing
@@ -84,7 +85,6 @@ int ff_h263_decode_init(AVCodecContext *avctx)
         s->msmpeg4_version=5;
         break;
     case CODEC_ID_H263I:
-        s->h263_intel = 1;
         break;
     case CODEC_ID_FLV1:
         s->h263_flv = 1;
@@ -144,8 +144,7 @@ static int decode_slice(MpegEncContext *s){
     s->resync_mb_x= s->mb_x;
     s->resync_mb_y= s->mb_y;
 
-    s->y_dc_scale= s->y_dc_scale_table[ s->qscale ];
-    s->c_dc_scale= s->c_dc_scale_table[ s->qscale ];
+    ff_set_qscale(s, s->qscale);
     
     if(s->partitioned_frame){
         const int qscale= s->qscale;
@@ -159,9 +158,7 @@ static int decode_slice(MpegEncContext *s){
         s->first_slice_line=1;
         s->mb_x= s->resync_mb_x;
         s->mb_y= s->resync_mb_y;
-        s->qscale= qscale;
-        s->y_dc_scale= s->y_dc_scale_table[ s->qscale ];
-        s->c_dc_scale= s->c_dc_scale_table[ s->qscale ];
+        ff_set_qscale(s, qscale);
     }
 
     for(; s->mb_y < s->mb_height; s->mb_y++) {
@@ -206,6 +203,8 @@ static int decode_slice(MpegEncContext *s){
                 const int xy= s->mb_x + s->mb_y*s->mb_stride;
                 if(ret==SLICE_END){
                     MPV_decode_mb(s, s->block);
+                    if(s->loop_filter)
+                        ff_h263_loop_filter(s);
 
 //printf("%d %d %d %06X\n", s->mb_x, s->mb_y, s->gb.size*8 - get_bits_count(&s->gb), show_bits(&s->gb, 24));
                     ff_er_add_slice(s, s->resync_mb_x, s->resync_mb_y, s->mb_x, s->mb_y, (AC_END|DC_END|MV_END)&part_mask);
@@ -230,6 +229,8 @@ static int decode_slice(MpegEncContext *s){
             }
 
             MPV_decode_mb(s, s->block);
+            if(s->loop_filter)
+                ff_h263_loop_filter(s);
         }
         
         ff_draw_horiz_band(s, s->mb_y*16, 16);
@@ -458,7 +459,7 @@ retry:
 
         if(s->flags& CODEC_FLAG_LOW_DELAY)
             s->low_delay=1;
-    } else if (s->h263_intel) {
+    } else if (s->codec_id == CODEC_ID_H263I) {
         ret = intel_h263_decode_picture_header(s);
     } else if (s->h263_flv) {
         ret = flv_h263_decode_picture_header(s);
