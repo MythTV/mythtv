@@ -182,12 +182,19 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
                                             &error_base) &&
                      XineramaIsActive(data->XJ_disp));
 
-    if (w_mm == 0 || h_mm == 0 || usingXinerama ||
-            gContext->GetNumSetting("GuiSizeForTV", 0))
+    if (w_mm == 0 || h_mm == 0 || usingXinerama)
     {
         w_mm = (int)(300 * XJ_aspect);
         h_mm = 300;
         data->display_aspect = XJ_aspect;
+    }
+    else if (gContext->GetNumSetting("GuiSizeForTV", 0))
+    {
+        int w = DisplayWidth(data->XJ_disp, XJ_screen_num);
+        int h = DisplayHeight(data->XJ_disp, XJ_screen_num);
+        w_mm = w_mm * gContext->GetNumSetting("GuiWidth", w) / w;
+        h_mm = h_mm * gContext->GetNumSetting("GuiHeight", h) / h;
+        data->display_aspect = (float)w_mm/h_mm;
     }
     else
         data->display_aspect = (float)w_mm / h_mm;

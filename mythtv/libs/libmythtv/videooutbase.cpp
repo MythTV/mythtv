@@ -373,28 +373,27 @@ void VideoOutput::MoveResize(void)
         // Video is 4:3
         if (letterbox == -1)
             letterbox = 0;
-
-        if (GetDisplayAspect() > (XJ_aspect * 0.97))
-        {
-            float pixNeeded = (h_mm * XJ_aspect) * ((float)dispw / w_mm);
-
-            dispxoff += (dispwoff - (int)pixNeeded) / 2;
-            dispwoff = (int)pixNeeded;
-        }
     }
-    else 
+    else
     {
         // Video is 16:9
         if (letterbox == -1)
             letterbox = 1;
+    }
 
-        if ((GetDisplayAspect() * 0.97) < XJ_aspect)
-        {
-            float pixNeeded = (w_mm / XJ_aspect) * ((float)disph / h_mm);
+    if (GetDisplayAspect() > XJ_aspect)
+    {
+        float pixNeeded = (h_mm * XJ_aspect) * ((float)dispw / w_mm);
 
-            dispyoff += (disphoff - (int)pixNeeded) / 2;
-            disphoff = (int)pixNeeded;
-        }
+        dispxoff += (dispwoff - (int)pixNeeded) / 2;
+        dispwoff = (int)pixNeeded;
+    }
+    else
+    {
+        float pixNeeded = (w_mm / XJ_aspect) * ((float)disph / h_mm);
+
+        dispyoff += (disphoff - (int)pixNeeded) / 2;
+        disphoff = (int)pixNeeded;
     }
 
     if (letterbox > 1) 
