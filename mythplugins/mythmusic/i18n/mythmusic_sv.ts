@@ -87,6 +87,30 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <source>Clear CD-RW Disk</source>
         <translation>Radera CD-RW skiva</translation>
     </message>
+    <message>
+        <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
+        <translation>Temat du använder innehåller inga informationsrader i music-elementet.&lt;br&gt;&lt;br&gt;Nästa skärm kommer att vara tom. Använd ESC för att återvända till menyn.</translation>
+    </message>
+    <message>
+        <source>Artist:<byte value="x9"/></source>
+        <translation>Artist:<byte value="x9"/></translation>
+    </message>
+    <message>
+        <source>Album:<byte value="x9"/></source>
+        <translation>Album:<byte value="x9"/></translation>
+    </message>
+    <message>
+        <source>Title:<byte value="x9"/></source>
+        <translation>Titel:<byte value="x9"/></translation>
+    </message>
+    <message>
+        <source>Length:<byte value="x9"/></source>
+        <translation>Längd:<byte value="x9"/></translation>
+    </message>
+    <message>
+        <source>Genre: </source>
+        <translation>Genre: </translation>
+    </message>
 </context>
 <context>
     <name>PlaybackBox</name>
@@ -251,7 +275,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation>Den ordning som trädet för musikval sorteras i. Möjliga värden är:
+        <translation type="obsolete">Den ordning som trädet för musikval sorteras i. Möjliga värden är:
 * Mellanslagsseparerad lista med &apos;genre&apos;, &apos;artist&apos;, &apos;album&apos; och &apos;title&apos;
 * &apos;directory&apos; (=katalog), vilket betyder att trädet speglar den faktiska katalogstrukturen.</translation>
     </message>
@@ -778,6 +802,12 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     <message>
         <source>?</source>
         <translation>?</translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation>Den ordning som trädet för musikval sorteras i. Möjliga värden är:
+* Mellanslagsseparerad lista med &apos;genre&apos;, &apos;splitartist&apos;, &apos;artist&apos;, &apos;album&apos; och &apos;title&apos;
+* &apos;directory&apos; (=katalog), vilket betyder att trädet speglar den faktiska katalogstrukturen.</translation>
     </message>
 </context>
 <context>
