@@ -62,8 +62,8 @@ package export::transcode;
             }
         }
     # Defaults?
-        $Args{'denoise'} = ''         if (defined $Args{'denoise'} && $Args{'denoise'} eq '');
-        $Args{'deinterlace'}     = 'smartyuv' if (defined $Args{'deinterlace'} && $Args{'deinterlace'} eq '');
+        $Args{'denoise'}     = ''         if (defined $Args{'denoise'} && $Args{'denoise'} eq '');
+        $Args{'deinterlace'} = 'smartyuv' if (defined $Args{'deinterlace'} && $Args{'deinterlace'} eq '');
     # Noise reduction?
         $self->{'denoise'} = query_text('Enable noise reduction (slower, but better results)?',
                                                 'yesno',
