@@ -1555,7 +1555,11 @@ void GuideGrid::editRecording()
 
     FocusPolicy storeFocus = focusPolicy();
     setFocusPolicy(QWidget::NoFocus);
-    pginfo->EditRecording(m_db);
+
+    ProgramInfo *temppginfo = new ProgramInfo(*pginfo);
+    temppginfo->EditRecording(m_db);
+    delete temppginfo;
+
     setFocusPolicy(storeFocus);
 
     setActiveWindow();
@@ -1578,7 +1582,11 @@ void GuideGrid::editScheduled()
 
     FocusPolicy storeFocus = focusPolicy();
     setFocusPolicy(QWidget::NoFocus);
-    pginfo->EditScheduled(m_db);
+
+    ProgramInfo *temppginfo = new ProgramInfo(*pginfo);
+    temppginfo->EditScheduled(m_db);
+    delete temppginfo;
+
     setFocusPolicy(storeFocus);
 
     setActiveWindow();
