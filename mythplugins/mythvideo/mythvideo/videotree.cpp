@@ -303,10 +303,37 @@ void VideoTree::buildVideoList()
         QStringList nodesname;
         QStringList nodespath;
 
-        nodespath.append(gContext->GetSetting("VideoStartupDir"));
-        nodesname.append("videos");
 
-
+        QStringList dirs = QStringList::split(":", 
+                                              gContext->GetSetting("VideoStartupDir",
+                                                                   "/share/Movies/dvd"));
+        if (dirs.size() > 1 )
+        {
+            QStringList::iterator iter;
+            
+            for (iter = dirs.begin(); iter != dirs.end(); iter++)
+            {
+                int slashLoc = 0;
+                QString pathname;
+                
+                nodespath.append( *iter );
+                pathname = *iter;
+                slashLoc = pathname.findRev("/", -2 ) + 1;
+                
+                if (pathname.right(1) == "/")
+                    nodesname.append(pathname.mid(slashLoc, pathname.length() - slashLoc - 2));
+                else
+                    nodesname.append(pathname.mid(slashLoc));
+            }
+        }
+        else
+        {
+            nodespath.append( dirs[0] );
+            nodesname.append(QObject::tr("videos"));
+        }
+        
+        
+        
         //
         // See if there are removable media available, so we can add them
         // to the tree.

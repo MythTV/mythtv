@@ -642,3 +642,62 @@ QPixmap* Metadata::getCoverPixmap()
     }
     return coverPixmap;
 }
+
+
+
+void Metadata::purgeByID( int ID )
+{
+    QString filename;
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    
+    query.prepare("SELECT filename FROM videometadata WHERE "
+                  "intid = :ID ;");
+    query.bindValue(":ID", ID);
+    query.exec();
+    
+    if (query.isActive() && query.size() > 0)
+    {
+        query.next();
+        filename = QString::fromUtf8(query.value(0).toString());
+        
+        query.prepare("DELETE FROM videometadata WHERE "
+                      "intid = :ID ;");
+        query.bindValue(":ID", ID);
+        query.exec();
+        
+        query.prepare("DELETE FROM videometadatacountry WHERE "
+                      "idvideo = :ID ;");
+        query.bindValue(":ID", ID);
+        query.exec();
+        
+        query.prepare("DELETE FROM videometadatagenre WHERE "
+                      "idvideo = :ID ;");
+        query.bindValue(":ID", ID);
+        query.exec();
+
+        query.prepare("DELETE FROM filemarkup WHERE "
+                      "filename = :FILE ;");
+        query.bindValue(":FILE", filename);
+        query.exec();
+    }
+
+}
+
+void Metadata::purgeByFilename( const QString& filename )
+{
+    unsigned int ID = 0;
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    query.prepare("SELECT intid FROM videometadata WHERE "
+                  "filename = :FILE ;");
+    query.bindValue(":FILE", filename);
+    query.exec();
+    
+    if (query.isActive() && query.size() > 0)
+    {
+        query.next();
+        ID = query.value(0).toInt();
+        Metadata::purgeByID(ID);
+    }
+}

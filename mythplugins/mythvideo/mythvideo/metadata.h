@@ -66,7 +66,10 @@ class Metadata
         genres = other.genres;
         countries = other.countries;
     }
-
+    
+    static void purgeByFilename( const QString& filename );
+    static void purgeByID( int ID );
+    
     void reset()
     {
         if (coverImage) delete coverImage;
