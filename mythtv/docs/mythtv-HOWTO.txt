@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-11, v2.10
+  2003-04-11, v2.11
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3019,16 +3019,17 @@
   prevent [1mmythfilldatabase [22mfrom grabbing future listings.
 
   Next, delete the unwanted item from the channel table so that it will
-  not appear in the EPG or when changing channels.  For example,
-  assuming that HBO is channel 15:
+  not appear in the EPG or when changing channels.  The channels will
+  always have "1000" added to them, so for example, assuming that HBO is
+  channel 15:
 
        $ mysql -u root mythconverg
-       mysql> delete from channel where chanid = '15';
+       mysql> delete from channel where chanid = '1015';
 
   Old program data will be removed over the course of a week. However,
   you may want to immediately delete any current program listings for
   the channel that has been removed:
 
        $ mysql -u root mythconverg
-       mysql> delete from program where chanid = '15';
+       mysql> delete from program where chanid = '1015';
 

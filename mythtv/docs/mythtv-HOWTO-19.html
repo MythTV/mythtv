@@ -286,13 +286,13 @@ Since you can never watch it, you want to get rid of it.</P>
 inserting a "#" in front of the unwanted entry. This will prevent
 <B>mythfilldatabase</B> from grabbing future listings.</P>
 <P>Next, delete the unwanted item from the channel table so that it will not
-appear in the EPG or when changing channels.  For example, assuming that HBO
-is channel 15:</P>
+appear in the EPG or when changing channels.  The channels will always have
+"1000" added to them, so for example, assuming that HBO is channel 15:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
-mysql> delete from channel where chanid = '15';
+mysql> delete from channel where chanid = '1015';
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -303,7 +303,7 @@ has been removed:</P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
-mysql> delete from program where chanid = '15';
+mysql> delete from program where chanid = '1015';
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

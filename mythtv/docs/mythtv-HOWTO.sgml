@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-11, v2.10
+<date>2003-04-11, v2.11
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2862,12 +2862,12 @@ inserting a "#" in front of the unwanted entry. This will prevent
 <bf>mythfilldatabase</bf> from grabbing future listings.
 
 Next, delete the unwanted item from the channel table so that it will not
-appear in the EPG or when changing channels.  For example, assuming that HBO
-is channel 15:
+appear in the EPG or when changing channels.  The channels will always have
+"1000" added to them, so for example, assuming that HBO is channel 15:
 
 <tscreen><verb>
 $ mysql -u root mythconverg
-mysql> delete from channel where chanid = '15';
+mysql> delete from channel where chanid = '1015';
 </verb></tscreen>
 
 Old program data will be removed over the course of a week. However, you may
@@ -2876,7 +2876,7 @@ has been removed:
 
 <tscreen><verb>
 $ mysql -u root mythconverg
-mysql> delete from program where chanid = '15';
+mysql> delete from program where chanid = '1015';
 </verb></tscreen>
 
 </article>
@@ -2902,6 +2902,7 @@ v2.08, 2003-04-07.  Updated XMLTV.
 v2.09, 2003-04-11.  Add spec for P4 2.4Ghz machine.  Added comment on repeat
 = commands for .lircrc file.
 v2.10, 2003-04-11.  Fixed typo.  AMD SSE info.  Channel removal information.
+v2.11, 2003-04-11.  Updated channel removal.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
