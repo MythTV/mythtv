@@ -2067,6 +2067,8 @@ void TV::DoPlay(void)
         return;
 
     UpdatePosOSD(time, PlayMesg());
+
+    gContext->DisableScreensaver();
 }
 
 QString TV::PlayMesg()
