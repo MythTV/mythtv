@@ -295,6 +295,15 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
         // remove overlapping programs
         if (conflict(*cur, *i))
         {
+            cerr << "removing conflicting program: "
+                 << (*cur).channel << " "
+                 << (*cur).title << " "
+                 << (*cur).startts << "-" << (*cur).endts << endl;
+            cerr << "conflicted with             : "
+                 <<   (*i).channel << " "
+                 <<   (*i).title << " "
+                 <<   (*i).startts << "-" <<   (*i).endts << endl;
+            cerr << endl;
             fixlist->erase(cur);
         }
     }
@@ -442,11 +451,18 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                      (*i).xmltvid.ascii(),
                                      id);
 
-                    query.exec(querystr);
-
-                    cout << "### " << endl;
-                    cout << "### Change performed" << endl;
-                    cout << "### " << endl;
+                    if (!query.exec(querystr))
+                    {
+                        cerr << "DB Error: Channel update failed, SQL query "
+                             << "was:" << endl;
+                        cerr << querystr << endl;
+                    }
+                    else
+                    {
+                        cout << "### " << endl;
+                        cout << "### Change performed" << endl;
+                        cout << "### " << endl;
+                    }
                 }
                 else
                 {
@@ -461,7 +477,12 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                  "chanid = \"%s\"",
                                  localfile.ascii(), chanid.ascii());
 
-                query.exec(querystr);
+                if (!query.exec(querystr))
+                {
+                    cerr << "DB Error: Channel icon change failed, SQL query "
+                         << "was:" << endl;
+                    cerr << querystr << endl;
+                }
             }
         }
         else
@@ -495,11 +516,18 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                      (*i).xmltvid.ascii(),
                                      id);
 
-                    query.exec(querystr);
-
-                    cout << "### " << endl;
-                    cout << "### Channel inserted" << endl;
-                    cout << "### " << endl;
+                    if (!query.exec(querystr))
+                    {
+                        cerr << "DB Error: Channel insert failed, SQL query "
+                             << "was:" << endl;
+                        cerr << querystr << endl;
+                    }
+                    else
+                    {
+                        cout << "### " << endl;
+                        cout << "### Channel inserted" << endl;
+                        cout << "### " << endl;
+                    }
                 }
             }
             else
@@ -513,14 +541,10 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 {
                     querystr.sprintf("SELECT channum FROM channel WHERE "
                                      "chanid = %d", chanid);
-                    query.exec(querystr.ascii());
-
-                    if (query.isActive() && query.numRowsAffected() > 0)
-                    {
-                        chanid++;
-                    }
-                    else
+                    if (!query.exec(querystr))
                         break;
+
+                    chanid++;
                 }
 
                 querystr.sprintf("INSERT INTO channel (chanid,name,callsign,"
@@ -536,7 +560,13 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                  (*i).xmltvid.ascii(),
                                  id);
 
-                query.exec(querystr);
+                if (!query.exec(querystr))
+                {
+                    cerr << "DB Error: Channel insert failed, SQL query "
+                         << "was:" << endl;
+                    cerr << querystr << endl;
+                }
+
             }
         }
     }
@@ -620,7 +650,8 @@ void handlePrograms(int id, int offset, QMap<QString,
 
             if (!query.exec(querystr.utf8().data()))
             {
-                cerr << "Program insertion failed:" << endl;
+                cerr << "DB ERror: Program insertion failed, SQL query "
+                     << "was: " << endl;
                 cerr << querystr.utf8().data() << endl;
             }
         }

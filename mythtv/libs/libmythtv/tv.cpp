@@ -836,6 +836,7 @@ void TV::TeardownPlayer(void)
     paused = false;
     doing_ff = false;
     doing_rew = false;
+    ff_rew_scaling = 1.0;
 
     nvp = NULL;
     osd = NULL;
@@ -946,6 +947,7 @@ void TV::RunTV(void)
     stickykeys = context->GetNumSetting("StickyKeys");
     doing_ff = false;
     doing_rew = false;
+    ff_rew_scaling = 1.0;
 
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
@@ -1104,8 +1106,27 @@ void TV::ProcessKeypress(int keypressed)
 //        case ' ': nvp->AdvanceOneFrame(); break;
         default: 
         {
-            doing_ff = false;
-            doing_rew = false;
+            if (doing_ff || doing_rew)
+            {
+                switch (keypressed)
+                {
+                    case wsZero:   case '0': ff_rew_scaling =  1.00; break;
+                    case wsOne:    case '1': ff_rew_scaling =  0.25; break;
+                    case wsTwo:    case '2': ff_rew_scaling =  0.50; break;
+                    case wsThree:  case '3': ff_rew_scaling =  1.00; break;
+                    case wsFour:   case '4': ff_rew_scaling =  1.50; break;
+                    case wsFive:   case '5': ff_rew_scaling =  2.24; break;
+                    case wsSix:    case '6': ff_rew_scaling =  3.34; break;
+                    case wsSeven:  case '7': ff_rew_scaling =  7.48; break;
+                    case wsEight:  case '8': ff_rew_scaling = 11.18; break;
+                    case wsNine:   case '9': ff_rew_scaling = 16.72; break;
+
+                    default:
+                       doing_ff = false;
+                       doing_rew = false;
+                       break;
+                }
+            }
             break;
         }
     }
@@ -1352,11 +1373,11 @@ void TV::DoFF(void)
     if (activenvp == nvp)
     {
         QString desc = "";
-        int pos = calcSliderPos(fftime, desc);
+        int pos = calcSliderPos((int)(fftime * ff_rew_scaling), desc);
         osd->StartPause(pos, slidertype, "Forward", desc, 2);
     }
 
-    activenvp->FastForward(fftime);
+    activenvp->FastForward((int)(fftime * ff_rew_scaling));
 }
 
 void TV::DoRew(void)
@@ -1371,11 +1392,11 @@ void TV::DoRew(void)
     if (activenvp == nvp)
     {
         QString desc = "";
-        int pos = calcSliderPos(0 - rewtime, desc);
+        int pos = calcSliderPos(0 - (int)(rewtime * ff_rew_scaling), desc);
         osd->StartPause(pos, slidertype, "Rewind", desc, 2);
     }
 
-    activenvp->Rewind(rewtime);
+    activenvp->Rewind((int)(rewtime * ff_rew_scaling));
 }
 
 void TV::ToggleInputs(void)

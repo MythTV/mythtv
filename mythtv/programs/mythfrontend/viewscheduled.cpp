@@ -246,7 +246,13 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
                        "starttime, endtime) VALUES (%1, %2, %3);")
                        .arg(rec->chanid).arg(pstart).arg(pend);
 
-    db->exec(thequery);
+    QSqlQuery qquery = db->exec(thequery);
+    if (!qquery.isActive())
+    {
+        cerr << "DB Error: conflict resolution insertion failed, SQL query "
+             << "was:" << endl;
+        cerr << thequery << endl;
+    }
 
     list<ProgramInfo *> *conflictlist = sched->getConflicting(rec, false);
 
@@ -264,7 +270,13 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
                            "endtime = %3;")
                            .arg((*i)->chanid).arg(dstart).arg(dend);
 
-        db->exec(thequery);
+        qquery = db->exec(thequery);
+        if (!qquery.isActive())
+        {
+            cerr << "DB Error: conflict resolution deletion failed, SQL query "
+                 << "was:" << endl;
+            cerr << thequery << endl;
+        }
     }
 
     delete conflictlist;
@@ -311,9 +323,9 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
         button = info->title + QString("\n");
         button += info->startts.toString(dateformat + " " + timeformat);
         if (m_context->GetNumSetting("DisplayChanNum") == 0)
-            button += " on " + rec->channame + " [" + rec->chansign + "]";
+            button += " on " + info->channame + " [" + info->chansign + "]";
         else
-            button += QString(" on channel ") + rec->chanstr;
+            button += QString(" on channel ") + info->chanstr;
 
         diag.AddButton(button);
     }
@@ -368,7 +380,13 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
                                "(prefertitle, disliketitle) VALUES "
                                "(\"%1\", \"%2\");").arg(prefer->title)
                                .arg((*i)->title);
-            db->exec(thequery);
+            QSqlQuery qquery = db->exec(thequery);
+            if (!qquery.isActive())
+            {
+                cerr << "DB Error: conflict resolution insertion failed, SQL "
+                     << "query was:" << endl;
+                cerr << thequery << endl;
+            }
         }
     } 
     else
@@ -395,7 +413,13 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
                                .arg(prefer->chanid).arg(pstart).arg(pend)
                                .arg((*i)->chanid).arg(dstart).arg(dend);
 
-            db->exec(thequery);
+            QSqlQuery qquery = db->exec(thequery);
+            if (!qquery.isActive())
+            {
+                cerr << "DB Error: conflict resolution insertion failed, SQL "
+                     << "query was:" << endl;
+                cerr << thequery << endl;
+            }
         }
     }  
 
@@ -412,7 +436,13 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
                            "endtime = %3;").arg((*i)->chanid).arg(dstart)
                            .arg(dend);
 
-        db->exec(thequery);
+        QSqlQuery qquery = db->exec(thequery);
+        if (!qquery.isActive())
+        {
+            cerr << "DB Error: conflict resolution deletion failed, SQL query "
+                 << "was:" << endl;
+            cerr << thequery << endl;
+        }
     }
 
     delete dislike;

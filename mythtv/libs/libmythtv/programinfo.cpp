@@ -242,7 +242,11 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
                            "chanid = %1 AND starttime = %2 AND "
                            "endtime = %3;").arg(chanid).arg(sqlstarttime)
                            .arg(sqlendtime);
-        query.exec(thequery);
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+        }
     }
     else if (recordtype == kTimeslotRecord)
     {
@@ -260,21 +264,33 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
                            "AND starttime = %2 AND endtime = %3;")
                            .arg(chanid).arg(tempstarttime).arg(tempendtime);
 
-        query.exec(thequery);
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+        }
     }
     else if (recordtype == kChannelRecord)
     {
         thequery = QString("DELETE FROM allrecord WHERE title = \"%1\" AND "
                            "chanid = %2;").arg(title).arg(chanid);
 
-        query.exec(thequery);
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+        }
     }
     else if (recordtype == kAllRecord)
     {
         thequery = QString("DELETE FROM allrecord WHERE title = \"%1\";")
                           .arg(title);
 
-        query.exec(thequery);
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+        }
     }
 
     if (newstate == kSingleRecord)
@@ -284,7 +300,11 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
                            "VALUES(%1, %2, %3, \"%4\", \"%5\", \"%6\");")
                            .arg(chanid).arg(sqlstarttime).arg(sqlendtime)
                            .arg(title).arg(subtitle).arg(description);
-        query.exec(thequery);
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+        }
     }
     else if (newstate == kTimeslotRecord)
     {
@@ -298,19 +318,31 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
                            "endtime,title) VALUES(%1,%2,%3,\"%4\");")
                            .arg(chanid).arg(sqlstarttime).arg(sqlendtime)
                            .arg(title);
-        query.exec(thequery);
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+        }
     }
     else if (newstate == kChannelRecord)
     {
         thequery = QString("INSERT INTO allrecord (title,chanid) VALUES("
                            "\"%1\",%2);").arg(title).arg(chanid);
-        query.exec(thequery);
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+        }
     }
     else if (newstate == kAllRecord)
     {
         thequery = QString("INSERT INTO allrecord (title) VALUES(\"%1\");")
                            .arg(title);
-        query.exec(thequery);
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+        }
     }
 
     if (newstate != recordtype)
@@ -367,6 +399,12 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
                     .arg(subtitle).arg(description);
 
     QSqlQuery qquery = db->exec(query);
+    if (!qquery.isActive())
+    {
+        cerr << "DB Error: recorded program insertion failed, SQL query "
+             << "was:" << endl;
+        cerr << query << endl;
+    }
 
     query = QString("INSERT INTO oldrecorded (chanid,starttime,endtime,title,"
                     "subtitle,description) "
@@ -375,6 +413,12 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
                     .arg(subtitle).arg(description);
 
     qquery = db->exec(query);
+    if (!qquery.isActive())
+    {
+        cerr << "DB Error: recorded program insertion failed, SQL query "
+             << "was:" << endl;
+        cerr << query << endl;
+    }
 
     if (recordtype == kSingleRecord)
     {
@@ -383,6 +427,12 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
                         .arg(starts).arg(ends);
 
         qquery = db->exec(query);
+        if (!qquery.isActive())
+        {
+            cerr << "DB Error: recorded program deletion from singlerecord "
+                 << "failed, SQL query was:" << endl;
+            cerr << query << endl;
+        }
     }
 
 }

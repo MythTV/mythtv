@@ -422,6 +422,12 @@ void DeleteBox::selected(QListViewItem *lvitem)
                            .arg(endts);
 
         query = db->exec(thequery);
+        if (!query.isActive())
+        {
+            cerr << "DB Error: recorded program deletion failed, SQL query "
+                 << "was:" << endl;
+            cerr << thequery << endl;
+        }
 
         QString *fileptr = new QString(filename);
 

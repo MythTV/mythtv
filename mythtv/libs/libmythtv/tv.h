@@ -165,6 +165,7 @@ class TV
     int stickykeys;
     bool doing_ff;
     bool doing_rew;
+    float ff_rew_scaling;
 
     OSD *osd;
 
