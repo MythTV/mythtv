@@ -2650,14 +2650,11 @@ if (pageNum == 4)
         int h;
         int cnt = 0;
 
+	letterList[4].setPaletteBackgroundColor(QColor(0, 0, 0));
+	cityList[4].setPaletteBackgroundColor(QColor(0, 0, 0));
+
 	for (int j = curLetter - 4; j < curLetter + 5; j++)
         {
-		if (j == 0)
-		{
-			letterList[cnt].setPaletteBackgroundColor(QColor(0, 0, 0));
-			cityList[cnt].setPaletteBackgroundColor(QColor(0, 0, 0));
-		}
-
 		h = j;
 		if (h < 0)
 			h = h + 91;
