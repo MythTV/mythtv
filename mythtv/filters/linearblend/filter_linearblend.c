@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include "config.h"
 
 #define PAVGB(a,b)   "pavgb " #a ", " #b " \n\t"
 #define PAVGUSB(a,b) "pavgusb " #a ", " #b " \n\t"
@@ -265,7 +266,7 @@ int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame) {(void)f; (void)
 void linearBlendMMX(unsigned char *src, int stride) {(void)src; (void)stride;};
 void linearBlend3DNow(unsigned char *src, int stride) {(void)src;(void)stride;};
 
-#ifdef USING_ALTIVEC
+#ifdef HAVE_ALTIVEC
 
 #include <Accelerate/Accelerate.h>
 
@@ -293,6 +294,7 @@ inline void linearBlendAltivec(unsigned char *src, int stride)
 
 int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame)
 {
+    (void)f;
     int width = frame->width;
     int height = frame->height;
     unsigned char *yuvptr = frame->buf;
