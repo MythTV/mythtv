@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.25 (xris)
+#Last Updated: 2005.03.09 (xris)
 #
 #  cli.pm
 #
@@ -42,7 +42,7 @@ package nuv_export::cli;
 
 # Load the nuvexportrc file
     my %rc_args;
-    foreach my $file ($config_file, 'nuvexportrc', "$ENV{'HOME'}/.nuvexportrc", "/etc/.nuvexportrc") {
+    foreach my $file ($config_file, 'nuvexportrc', "$ENV{'HOME'}/.nuvexportrc", "/etc/nuvexportrc") {
     # No file
         next unless ($file && -e $file);
     # Slurp
@@ -182,17 +182,26 @@ package nuv_export::cli;
     # Scan the package from parent to child, looking for matches
         my $path = $package;
         while ($path) {
-            return $rc_args{$path}{$arg} if (defined $rc_args{$path}{$arg});
+            if (defined $rc_args{$path}{$arg}) {
+                #print "$arg used from $path:  $rc_args{$path}{$arg}\n";
+                return $rc_args{$path}{$arg};
+            }
             last unless ($path =~ s/^.+?:://);
         }
     # Scan the package from child to parent, looking for matches
         $path = $package;
         while ($path) {
-            return $rc_args{$path}{$arg} if (defined $rc_args{$path}{$arg});
+            if (defined $rc_args{$path}{$arg}) {
+                #print "$arg used from $path:  $rc_args{$path}{$arg}\n";
+                return $rc_args{$path}{$arg};
+            }
             last unless ($path =~ s/::.+?$//);
         }
     # Finally, try "generic"
-        return $rc_args{'generic'}{$arg} if (defined $rc_args{'generic'}{$arg});
+        if (defined $rc_args{'generic'}{$arg}) {
+            #print "$arg used from generic:  $rc_args{'generic'}{$arg}\n";
+            return $rc_args{'generic'}{$arg};
+        }
     # Lastly, try "nuvexport" (or just return undef)
         return $rc_args{'nuvexport'}{$arg};
     }
