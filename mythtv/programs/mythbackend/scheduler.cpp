@@ -1377,7 +1377,7 @@ void Scheduler::AddNewRecords(void) {
 "channel.commfree, capturecard.cardid, "
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
 "program.seriesid, program.programid, "
-"program.stars, program.originalairdate "
+"program.airdate, program.stars, program.originalairdate "
 
 "FROM record, program ") + fromclauses[clause] + QString(
 
@@ -1517,11 +1517,12 @@ void Scheduler::AddNewRecords(void) {
         p->shareable = result.value(26).toInt();
         p->seriesid = result.value(27).toString();
         p->programid = result.value(28).toString();
-        p->stars =  result.value(29).toDouble();
+        p->year = result.value(29).toString();
+        p->stars =  result.value(30).toDouble();
         
         p->repeat = result.value(20).toInt();
         
-        if(result.value(30).isNull())
+        if(result.value(31).isNull())
             p->originalAirDate = p->startts.date();
         else
             p->originalAirDate = QDate::fromString(result.value(30).toString(), Qt::ISODate);

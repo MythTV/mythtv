@@ -239,7 +239,9 @@ class ProgramInfo
     bool isVideo;
     int lenMins;
     
+    QString year;
     float stars;
+
     QDate originalAirDate;
     QDateTime lastmodified;
     

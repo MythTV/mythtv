@@ -221,7 +221,7 @@
         <catcolor category="趣味・暮らし" color="goldenrod"></catcolor>
 
 
-	<!-- Categories introduced by italian program guide www.latele.it -->
+        <!-- Categories introduced by italian program guide www.latele.it -->
         <catcolor category="Altri" color="SlateGray"></catcolor>
         <catcolor category="Corto" color="SlateGray"></catcolor>
         <catcolor category="Speciale" color="SlateGray"></catcolor>
@@ -293,6 +293,7 @@
         <area>4,96,690,60</area>
         <font>descinfo</font>
         <multiline>yes</multiline>
+        <value>%STARS%%DESCRIPTION%</value>
       </textarea>
       <textarea name="recordingstatus" draworder="6" align="center">
         <area>380,62,380,30</area>
@@ -570,6 +571,7 @@
         <area>4,140,489,79</area>
         <font>descinfo</font>
         <multiline>yes</multiline>
+        <value>%STARS%%DESCRIPTION%</value>
       </textarea>
       <textarea name="recordingstatus" draworder="6">
         <area>4,230,489,30</area>
@@ -735,19 +737,19 @@
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>20,40,120,30</area>
+        <area>20,40,160,30</area>
         <font>info</font>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>160,40,420,30</area>
+        <area>200,40,420,30</area>
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>20,70,720,140</area>
         <font>info</font>
         <multiline>yes</multiline>
-	<value>%SUBTITLE|"|"
-%%DESCRIPTION%</value>
+        <value>%SUBTITLE|"|"
+%%STARS%%DESCRIPTION%</value>
       </textarea>
     </container>
 
@@ -1319,11 +1321,11 @@
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>20,40,120,30</area>
+        <area>20,40,160,30</area>
         <font>info</font>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>160,40,440,30</area>
+        <area>200,40,440,30</area>
         <altarea>160,40,620,30</altarea>
         <font>info</font>
       </textarea>
@@ -1332,8 +1334,8 @@
         <altarea>20,70,760,125</altarea>
         <font>info</font>
         <multiline>yes</multiline>
-	<value>%SUBTITLE|"|"
-%%DESCRIPTION%</value>
+        <value>%SUBTITLE|"|"
+%%STARS%%DESCRIPTION%</value>
       </textarea>
 <!--
       <textarea name="recgroupinfo" draworder="6">
@@ -1379,11 +1381,11 @@
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>20,40,120,30</area>
+        <area>20,40,160,30</area>
         <font>info</font>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>160,40,440,30</area>
+        <area>200,40,440,30</area>
         <altarea>160,40,620,30</altarea>
         <font>info</font>
       </textarea>
@@ -1392,8 +1394,8 @@
         <altarea>20,70,760,125</altarea>
         <font>info</font>
         <multiline>yes</multiline>
-	<value>%SUBTITLE|"|"
-%%DESCRIPTION%</value>
+        <value>%SUBTITLE|"|"
+%%STARS%%DESCRIPTION%</value>
       </textarea>
     </container>
 
@@ -1411,7 +1413,7 @@
       <area>0,555,800,40</area>
       <statusbar name="usedbar" draworder="5">
         <container fleximage="yes">container.png</container>
-	<fill>filler.png</fill>
+        <fill>filler.png</fill>
         <position>20,0</position>
       </statusbar>
       <textarea name="freereport" draworder="6">
@@ -1739,19 +1741,19 @@
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>0,40,120,30</area>
+        <area>0,40,160,30</area>
         <font>info</font>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>140,40,420,30</area>
+        <area>180,40,420,30</area>
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>0,70,720,90</area>
         <font>info</font>
-	<multiline>yes</multiline>
-	<value>%SUBTITLE|"|"
-%%DESCRIPTION%</value>
+        <multiline>yes</multiline>
+        <value>%SUBTITLE|"|"
+%%STARS%%DESCRIPTION%</value>
       </textarea>
       <textarea name="type" draworder="6">
         <area>0,160,560,30</area>
@@ -1831,7 +1833,7 @@
       <color>#ffffff</color>
       <size>18</size>
       <size:small>10</size:small>
-	<shadow>2,2</shadow>
+        <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
 
@@ -1856,9 +1858,9 @@
         <area>20,10,760,274</area>
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
-	<fcnfont name="inactive" function="disabled"></fcnfont>
+        <fcnfont name="inactive" function="disabled"></fcnfont>
         <fcnfont name="active" function="selected"></fcnfont>
-	<fcnfont name="enabled_state_0_font" function="enabled_state_0"></fcnfont>
+        <fcnfont name="enabled_state_0_font" function="enabled_state_0"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="745" context="-1"></column>
         <items>8</items>

@@ -27,6 +27,7 @@ ProgramInfo::ProgramInfo(void)
     channame = "";
     chancommfree = 0;
     chanOutputFilters = "";
+    year = "";
     stars = 0;
     
 
@@ -141,6 +142,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
 
     originalAirDate = other.originalAirDate;
     stars = other.stars;
+    year = other.year;
     
     record = NULL;
 
@@ -443,9 +445,21 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
    
     progMap["seriesid"] = seriesid;
     progMap["programid"] = programid;
+
+    progMap["year"] = year;
     
     if (stars)
-        progMap["stars"] = QString("(%1 %2) ").arg(4.0 * stars).arg(QObject::tr("stars"));
+    {
+        QString str = QObject::tr("stars");
+        if (stars > 0 && stars <= 0.25)
+            str = QObject::tr("star");
+
+        if (year != "")
+            progMap["stars"] = QString("(%1, %2 %3) ")
+                                       .arg(year).arg(4.0 * stars).arg(str);
+        else
+            progMap["stars"] = QString("(%1 %2) ").arg(4.0 * stars).arg(str);
+    }
     else
         progMap["stars"] = "";
         
@@ -2124,13 +2138,13 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
     QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
 
     QString querytext;
-    QString category_type, airdate, epinum, rating;
+    QString category_type, epinum, rating;
     int partnumber = 0, parttotal = 0;
     int stereo = 0, subtitled = 0, hdtv = 0, closecaptioned = 0;
 
     if (endts != startts)
     {
-        querytext = QString("SELECT category_type, airdate, partnumber, "
+        querytext = QString("SELECT category_type, partnumber, "
                             "parttotal, stereo, subtitled, hdtv, "
                             "closecaptioned, syndicatedepisodenumber "
                             "FROM program WHERE chanid = %1 "
@@ -2143,14 +2157,13 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
         {
             query.next();
             category_type = query.value(0).toString();
-            airdate = query.value(1).toString();
-            partnumber = query.value(2).toInt();
-            parttotal = query.value(3).toInt();
-            stereo = query.value(4).toInt();
-            subtitled = query.value(5).toInt();
-            hdtv = query.value(6).toInt();
-            closecaptioned = query.value(7).toInt();
-            epinum = query.value(8).toString();
+            partnumber = query.value(1).toInt();
+            parttotal = query.value(2).toInt();
+            stereo = query.value(3).toInt();
+            subtitled = query.value(4).toInt();
+            hdtv = query.value(5).toInt();
+            closecaptioned = query.value(6).toInt();
+            epinum = query.value(7).toString();
         }
 
         querytext = QString("SELECT rating FROM programrating "
@@ -2197,11 +2210,17 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
 
     if (category_type == "movie")
     {
-        if (airdate != "")
-            attr += airdate + ", ";
-        if (stars > 0)
-            attr +=  QString("%1 %2, ").arg(4.0 * stars)
-                                           .arg(QObject::tr("stars"));
+        if (year != "")
+            attr += year + ", ";
+
+        if (stars > 0.0)
+        {
+            QString str = QObject::tr("stars");
+            if (stars > 0 && stars <= 0.25)
+                str = QObject::tr("star");
+
+            attr += QString("%1 %2, ").arg(4.0 * stars).arg(str);
+        }
     }
 
     if (hdtv)
@@ -2610,7 +2629,7 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
         "    program.category, channel.channum, channel.callsign, "
         "    channel.name, program.previouslyshown, channel.commfree, "
         "    channel.outputfilters, program.seriesid, program.programid, "
-        "    program.stars, program.originalairdate "
+        "    program.airdate, program.stars, program.originalairdate "
         "FROM program "
         "LEFT JOIN channel ON program.chanid = channel.chanid "
         "%1 ").arg(sql);
@@ -2657,19 +2676,19 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
         p->chanOutputFilters = query.value(12).toString();
         p->seriesid = query.value(13).toString();
         p->programid = query.value(14).toString();
-
-        p->stars = query.value(15).toString().toFloat();
+        p->year = query.value(15).toString();
+        p->stars = query.value(16).toString().toFloat();
         
         
         
-        if (query.value(16).isNull() || query.value(16).toString().isEmpty())
+        if (query.value(17).isNull() || query.value(17).toString().isEmpty())
         {
             p->originalAirDate = p->startts.date();
             p->hasAirDate = false;
         }
         else
         {
-            p->originalAirDate = QDate::fromString(query.value(16).toString(),
+            p->originalAirDate = QDate::fromString(query.value(17).toString(),
                                                    Qt::ISODate);
             p->hasAirDate = true;
         }

@@ -639,18 +639,24 @@ void ProgLister::setViewFromTime(void)
 
 void ProgLister::chooseView(void)
 {
-    if (type == plChannel || type == plCategory || type == plNewListings)
+    if (type == plChannel || type == plCategory || 
+        type == plMovies || type == plNewListings)
     {
         if (viewList.count() < 2)
             return;
 
         choosePopup = new MythPopupBox(gContext->GetMainWindow(), "");
-        if (type == plChannel)
-            choosePopup->addLabel(tr("Select Channel"));
-        else if (type == plCategory)
-            choosePopup->addLabel(tr("Select Category"));
-        else if (type == plNewListings)
-            choosePopup->addLabel(tr("Select List"));
+
+        QString msg;
+        switch (type)
+        {
+            case plMovies: msg = tr("Select Rating"); break;
+            case plChannel: msg = tr("Select Channel"); break;
+            case plCategory: msg = tr("Select Category"); break;
+            case plNewListings: msg = tr("Select List"); break;
+            default: msg = tr("Select"); break;
+        }
+        choosePopup->addLabel(msg);
 
         chooseListBox = new MythListBox(choosePopup);
         chooseListBox->setScrollBar(false);
@@ -1230,8 +1236,16 @@ void ProgLister::fillViewList(const QString &view)
     }
     else if (type == plMovies)
     {
-        viewList << "";
-        viewTextList << "";
+        viewList << "0.0";
+        viewTextList << tr("All");
+        viewList << "1.0";
+        viewTextList << tr("4 stars");
+        viewList << "0.875";
+        viewTextList << tr("At least 3 1/2 stars");
+        viewList << "0.75";
+        viewTextList << tr("At least 3 stars");
+        viewList << "0.5";
+        viewTextList << tr("At least 2 stars");
         curView = 0;
     }
     else if (type == plTime)
@@ -1342,8 +1356,9 @@ void ProgLister::fillItemList(void)
     {
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  AND program.category_type = 'movie' ")
-                        .arg(startstr);
+                        "  AND program.category_type = 'movie' "
+                        "  AND program.stars >= '\%2' ")
+                        .arg(startstr).arg(qphrase);
     }
     else if (type == plTime) // list by time
     {
@@ -1396,7 +1411,7 @@ void ProgLister::updateList(QPainter *p)
     QPainter tmp(&pix);
 
     QString tmptitle;
-    
+
     LayerSet *container = theme->GetSet("selector");
     if (container)
     {
@@ -1405,6 +1420,15 @@ void ProgLister::updateList(QPainter *p)
         {
             ltype->ResetList();
             ltype->SetActive(true);
+
+            QStringList starMap;
+            QString starstr = "";
+            for (int i = 0; i <= 4; i++)
+            {
+                starMap << starstr;
+                starMap << starstr + "/";
+                starstr += "*";
+            }
 
             int skip;
             if ((int)itemList.count() <= listsize || curItem <= listsize/2)
@@ -1427,7 +1451,11 @@ void ProgLister::updateList(QPainter *p)
                 ltype->SetItemText(i, 1, pi->startts.toString(timeFormat));
                 ltype->SetItemText(i, 2, pi->ChannelText(channelFormat));
 
-                if (pi->subtitle == "")
+                if (pi->stars > 0.0)
+                    tmptitle = QString("%1 (%2, %3 )")
+                                       .arg(pi->title).arg(pi->year)
+                                       .arg(starMap[(int) (pi->stars * 8)]);
+                else if (pi->subtitle == "")
                     tmptitle = pi->title;
                 else
                 {
