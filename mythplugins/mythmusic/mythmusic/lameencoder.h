@@ -6,7 +6,16 @@
 class Metadata;
 class Encoder;
 
+#ifdef MMX
+#define LAME_WORKAROUND 1
+#undef MMX
+#endif
+
 #include <lame/lame.h>
+
+#ifdef LAME_WORKAROUND
+#define MMX 1
+#endif
 
 class LameEncoder : public Encoder 
 {
