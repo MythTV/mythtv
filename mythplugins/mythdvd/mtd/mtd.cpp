@@ -830,14 +830,14 @@ void MTD::customEvent(QCustomEvent *ce)
 {
     if(ce->type() == 65432)
     {
-        ErrorEvent *ee = (ErrorEvent*)ce;
-        QString error_string = "Error: " + ee->getString();
-        emit writeToLog(error_string);
+        LoggingEvent *le = (LoggingEvent*)ce;
+        emit writeToLog(le->getString());
     }
     else if(ce->type() == 65431)
     {
-        LoggingEvent *le = (LoggingEvent*)ce;
-        emit writeToLog(le->getString());
+        ErrorEvent *ee = (ErrorEvent*)ce;
+        QString error_string = "Error: " + ee->getString();
+        emit writeToLog(error_string);
     }
     else
     {
