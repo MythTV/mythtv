@@ -1,5 +1,8 @@
 USE mythconverg;
 
+DELETE FROM settings WHERE value='DBSchemaVer';
+INSERT INTO settings VALUES ('DBSchemaVer', 900, NULL);
+
 ALTER TABLE capturecard ADD COLUMN use_ts INT NULL;
 ALTER TABLE capturecard ADD COLUMN dvb_type CHAR NULL;
 

@@ -1,5 +1,8 @@
 USE mythconverg;
 
+DELETE FROM settings WHERE value='DBSchemaVer';
+INSERT INTO settings VALUES ('DBSchemaVer', 900, NULL);
+
 CREATE TABLE IF NOT EXISTS people
 (
     person MEDIUMINT(8) UNSIGNED NOT NULL AUTO_INCREMENT,

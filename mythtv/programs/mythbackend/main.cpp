@@ -219,6 +219,12 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    if (!gContext->CheckDBVersion())
+    {
+        printf("db schema update required\n");
+        return -1;
+    }
+
     if (printsched) {
         sched = new Scheduler(false, &tvList, db);
         sched->FillRecordLists(false);

@@ -287,6 +287,28 @@ QString MythContext::DBErrorMessage(const QSqlError& err)
         .arg(err.databaseText());
 }
 
+bool MythContext::CheckDBVersion(void)
+{
+    QString DBSchemaVer = GetSetting("DBSchemaVer", "0");
+
+    int dbversion = DBSchemaVer.toInt();
+
+    int appschema = atoi(MYTH_SCHEMA_VERSION);
+
+    if (dbversion < appschema)
+    {
+        cerr << "Your current database schema version is: " << dbversion
+             << "\nbut this application requires version "
+             << MYTH_SCHEMA_VERSION << " or higher.\n";
+        cerr << "You should update your database with the latest\n"
+             << "changes in the 'database' directory. See section 6\n"
+             << "of the MythTV documentation for more information.\n\n";
+
+        return false;
+    }
+    return true;
+}
+
 void MythContext::SaveSetting(QString key, int newValue)
 {
     QString strValue = QString("%1").arg(newValue);

@@ -226,6 +226,8 @@ CREATE TABLE IF NOT EXISTS transcoding (
     isdone INT UNSIGNED NOT NULL DEFAULT 0
 );
 
+INSERT INTO settings VALUES ('DBSchemaVer', 900, NULL);
+
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');
 INSERT INTO recordingprofiles (name) VALUES ('Transcode');

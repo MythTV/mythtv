@@ -52,6 +52,7 @@ class MythEvent : public QCustomEvent
 };
 
 #define MYTH_BINARY_VERSION "0.9.06062003-2"
+#define MYTH_SCHEMA_VERSION "900"
 
 extern bool print_verbose_messages;
 
@@ -85,6 +86,8 @@ class MythContext : public QObject
     static void KickDatabase(QSqlDatabase *db);
     static void DBError(QString where, const QSqlQuery& query);
     static QString DBErrorMessage(const QSqlError& err);
+
+    bool CheckDBVersion(void);
 
     Settings *settings() { return m_settings; }
     Settings *qtconfig() { return m_qtThemeSettings; }
