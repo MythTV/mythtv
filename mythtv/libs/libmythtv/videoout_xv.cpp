@@ -10,6 +10,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <math.h>
+#include <time.h>
 
 #include <map>
 #include <iostream>
@@ -128,7 +129,6 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     XJ_width = width;
     XJ_height = height;
 
-    use_shm = 1;
 
     XInitThreads();
 
@@ -138,7 +138,7 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
         printf("open display failed\n"); 
         return false;
     }
-  
+ 
     data->XJ_screen = DefaultScreenOfDisplay(data->XJ_disp);
     XJ_screen_num = DefaultScreen(data->XJ_disp);
 
@@ -207,11 +207,17 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
                 XvFreeAdaptorInfo(ai);
         }
 
+    use_shm = 0;
+    char *dispname = DisplayString(data->XJ_disp);
+
+    if ((dispname) &&
+        (*dispname == ':'))
+        use_shm = XShmQueryExtension(data->XJ_disp);
+
     // can be used to force non-Xv mode as well as non-Xv/non-Shm mode
     if (getenv("NO_XV"))
     {
         xv_port = -1;
-        use_shm = 1;
     }
     if (getenv("NO_SHM"))
     {
@@ -299,11 +305,19 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
 
     if (xv_port == -1)
     {
-        printf("Couldn't find Xv support, falling back to non-Xv mode.\n");
+        printf("***\n");
+        printf("* Couldn't find Xv support, falling back to non-Xv mode.\n");
         printf("* MythTV performance will be much slower since color\n");
         printf("* conversion and scaling will be done in software.\n");
         printf("* Consider upgrading your video card or X server if\n");
         printf("* you would like better performance.\n");
+
+        if (!use_shm)
+        {
+            printf("***\n" );
+            printf("* No XShm support found, MythTV may be very slow and "
+                    "consume lots of cpu.\n");
+        }
     }
 
     int formats;
@@ -651,6 +665,39 @@ void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
     }
     else
     {
+        static long long framesShown = 0;
+        static int showFrame = 1;
+        static int fps = 0;
+        static time_t stop_time;
+
+        // bad way to throttle frame display for non-Xv mode.
+        // calculate fps we can do and skip enough frames so we don't exceed.
+        if (framesShown == 0)
+            stop_time = time(NULL) + 4;
+
+        if ((!fps) &&
+            (time(NULL) > stop_time))
+        {
+            fps = (int)(framesShown / 4);
+
+            if (fps < 25)
+            {
+                showFrame = 120 / framesShown + 1;
+                printf("***\n" );
+                printf( "* Your system is not capable of displaying the\n" );
+                printf( "* full framerate at %dx%d resolution.  Frames\n",
+                    curw, curh );
+                printf( "* will be skipped in order to keep the audio and\n" );
+                printf( "* video in sync.\n" );
+            }
+        }
+
+        framesShown++;
+
+        if ((showFrame != 1) &&
+            (framesShown % showFrame))
+            return;
+
         unsigned char *sbuf = new unsigned char[curw * curh * 4];
         XImage *image = data->xbuffers[buffer];
         AVPicture image_in, image_out;
