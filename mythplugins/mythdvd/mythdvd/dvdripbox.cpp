@@ -282,9 +282,10 @@ void DVDRipBox::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("DVD", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
     
         if (getContext() == 1)
         {
@@ -294,41 +295,39 @@ void DVDRipBox::keyPressEvent(QKeyEvent *e)
                 action == "9")
             {
                 connectToMtd(true);
-                handled = true;
             }
+            else
+                handled = false;
         }    
-        else if(getContext() == 2 && have_disc)
+        else if (getContext() == 2 && have_disc)
         {
             if (action == "0")
             {
                 if (ripscreen_button && ripscreen_button->GetContext() == -1)
                     ripscreen_button->push();
-                handled=true;
             }
+            else
+                handled = false;
         }
-        else if(getContext() == 3)
+        else if (getContext() == 3)
         {
             if (action == "RIGHT")
             {
-                handled = true;
                 if (nextjob_button)
                     nextjob_button->push();
             }
             else if (action == "LEFT")
             {
-                handled = true;
                 if (prevjob_button)
                     prevjob_button->push();
             }
             else if (action == "0")
             {
-                handled = true;
                 if (ripscreen_button && ripscreen_button->GetContext() != -2)
                     ripscreen_button->push();
             }
             else if (action == "9")
             {
-                handled = true;
                 if (cancel_button)
                     cancel_button->push();
             }
@@ -336,10 +335,13 @@ void DVDRipBox::keyPressEvent(QKeyEvent *e)
                      action == "4" || action == "5" || action == "6" ||
                      action == "7" || action == "8")
             {
-                handled = true;
                 goToJob(action.toInt());
             }
+            else
+                handled = false;
         }
+        else
+            handled = false;
     }
 
     if (!handled)

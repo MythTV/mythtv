@@ -168,65 +168,44 @@ void TitleDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("DVD", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
+
         if (action == "PAGEDOWN")
         { 
-            handled = true;
             if (next_title_button)
-            {
                 next_title_button->push();
-            }
         }
         else if (action == "PAGEUP")
         {
-            handled = true;
             if (prev_title_button)
-            {
                 prev_title_button->push();
-            }
         }
         else if (action == "UP")
-        {
             nextPrevWidgetFocus(false);
-            handled = true;
-        }
         else if (action == "DOWN")
-        {
             nextPrevWidgetFocus(true);
-            handled = true;
-        }
         else if (action == "SELECT")   
-        {
             activateCurrent();
-            handled = true;
-        }
         else if (action == "1" || action == "2" || action == "3" ||
                  action == "4" || action == "5" || action == "6" ||
                  action == "7" || action == "8" || action == "9")
         {
             gotoTitle(action.toInt());
-            handled = true;
         }
         else if (action == "LEFT")
-        {
             prev_title_button->push();
-            handled = true;
-        }
         else if (action == "RIGHT")
-        {
             next_title_button->push();
-            handled = true;
-        }
         else if (action == "0") 
         {
             if (ripaway_button->GetContext() == -1)
-            {
                 ripaway_button->push();
-            }
-            handled = true;
         }
+        else
+            handled = false;
     }
 
     if (!handled)
