@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-11, v1.069
+<date>2003-01-11, v1.070
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -98,8 +98,8 @@ choppy or jittery video.  Red Hat Linux 8.0 apparently does not enable DMA
 at boot time.  See the Troubleshooting Section for <ref id="Setting_DMA"
 name="instructions"> on how to do this.
 
-Mark Cooper <url url="mailto:mythtv-dev@mcooper.demon.co.uk"> has setup a
-hardware database at <url url="http://www.goldfish.org/~mcooper/pvrhw/"
+Mark Cooper has setup a hardware database at <url
+url="http://www.goldfish.org/~mcooper/pvrhw/"
 name="http://www.goldfish.org/~mcooper/pvrhw/">.  The website will let you
 browse what other users have reported as their hardware configuration, and
 how happy they are with the results.
@@ -2237,6 +2237,7 @@ v1.068, 2003-01-10.  Added link to Mark Cooper's hardware database website.
 Added info to audio troubleshooting on disabling sound managers, like esd
 and artsd.  Added mythweather international example.
 v1.069, 2003-01-11.  Fixed keyboard commands for mythweather.
+v1.070, 2003-01-11.  Remove Mark Cooper's email address, per request.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

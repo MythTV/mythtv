@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-11, v1.069
+  2003-01-11, v1.070
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -217,8 +217,8 @@
   boot time.  See the Troubleshooting Section for ``instructions'' on
   how to do this.
 
-  Mark Cooper  <mailto:mythtv-dev@mcooper.demon.co.uk> has setup a
-  hardware database at http://www.goldfish.org/~mcooper/pvrhw/
+  Mark Cooper has setup a hardware database at
+  http://www.goldfish.org/~mcooper/pvrhw/
   <http://www.goldfish.org/~mcooper/pvrhw/>.  The website will let you
   browse what other users have reported as their hardware configuration,
   and how happy they are with the results.
