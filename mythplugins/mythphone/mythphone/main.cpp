@@ -15,6 +15,10 @@ using namespace std;
 #include <qdir.h>
 #include <qmutex.h>
 #include <qregexp.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <net/if.h>
 #include <linux/videodev.h>
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
@@ -141,6 +145,85 @@ void initKeys(void)
     REG_KEY("Phone", "MUTE", "Mute", "|,\\,F9");
 }
 
+QString GetMySipIp()
+{
+    QSocketDevice *tempSocket = new QSocketDevice (QSocketDevice::Datagram);
+    QString ifName = gContext->GetSetting("SipBindInterface");
+    struct ifreq ifreq;
+    strcpy(ifreq.ifr_name, ifName);
+    if (ioctl(tempSocket->socket(), SIOCGIFADDR, &ifreq) != 0)
+    {
+        cerr << "Failed to find network interface " << ifName << endl;
+        delete tempSocket;
+        tempSocket = 0;
+        return "";
+    }
+    delete tempSocket;
+    tempSocket = 0;
+    struct sockaddr_in * sptr = (struct sockaddr_in *)&ifreq.ifr_addr;
+    QHostAddress myIP;
+    myIP.setAddress(htonl(sptr->sin_addr.s_addr));
+    return myIP.toString();
+}
+
+void addMyselfToDirectory()
+{
+QString thequery;
+char myHostname[64];
+
+    // Create an automatic new entry in the MythPhone Directory for this Frontend to assist in
+    // calling between Frontends.
+
+    if (gethostname(myHostname, sizeof(myHostname)) == -1)
+        myHostname[0] = 0;
+    QString Surname   = myHostname;
+    QString FirstName = QString("Local Myth Host");
+    QString NickName  = gContext->GetSetting("MySipName") + "(" + myHostname + ")";
+    QString Uri       = "MythPhone@" + GetMySipIp();
+    QString Dir       = "My MythTVs";
+
+
+    // First check if an entry already exists; and if it is up-to-date (IP address etc)
+    QSqlDatabase *db_conn = QSqlDatabase::database();
+    thequery = QString("SELECT intid,nickname,url "
+                       "FROM phonedirectory "
+                       "WHERE directory = \"%1\" and "
+                       "firstname = \"%2\" and "
+                       "surname = \"%3\";")
+                       .arg(Dir.latin1()).arg(FirstName.latin1()).arg(myHostname);
+    QSqlQuery query = db_conn->exec(thequery);
+    if(query.isActive() && query.numRowsAffected() > 0)
+    {
+        while(query.next())
+        {
+            // See if the user has changed their display name or the IP address has changed
+            if ((query.value(1).toString() != NickName) || 
+                (query.value(2).toString() != Uri))
+            {
+                cout << "SIP: Updating out-of-date autogen directory entry; " << query.value(1).toString() << ", " << query.value(2).toString() << endl;
+                thequery = QString("UPDATE phonedirectory "
+                                   "SET nickname=\"%1\", "
+                                   "url=\"%2\" "
+                                   "WHERE intid=%3 ;")
+                           .arg(NickName.latin1()).arg(Uri.latin1()).arg(query.value(0).toInt());
+                db_conn->exec(thequery);
+            }
+        }
+    }
+    else
+    {
+        cout << "SIP: Creating autogen directory entry for this host\n";
+        thequery = QString("INSERT INTO phonedirectory (nickname,firstname,surname,"
+                               "url,directory,photofile,speeddial,onhomelan) VALUES "
+                               "(\"%1\",\"%2\",\"%3\",\"%4\",\"%5\",\"\",1,1);")
+                              .arg(NickName.latin1()).arg(FirstName.latin1())
+                              .arg(Surname.latin1()).arg(Uri.latin1())
+                              .arg(Dir.latin1())
+                              ;
+        db_conn->exec(thequery);
+    }
+}
+
 int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythphone", libversion,
@@ -177,6 +260,8 @@ int mythplugin_init(const char *libversion)
 
     initKeys();
 
+    addMyselfToDirectory();
+ 
     sipStack = new SipContainer();
 
     return 0;
