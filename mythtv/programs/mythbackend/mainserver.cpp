@@ -271,10 +271,7 @@ void MainServer::ProcessRequest(QSocket *sock)
     }
     else if (command == "QUERY_GETCONFLICTING")
     {
-        if (tokens.size() != 2)
-            VERBOSE(VB_ALL, "Bad QUERY_GETCONFLICTING");
-        else
-            HandleGetConflictingRecordings(listline, tokens[1], pbs);
+        HandleGetConflictingRecordings(listline, pbs);
     }
     else if (command == "GET_FREE_RECORDER")
     {
@@ -665,8 +662,6 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();
-
-            proginfo->conflicting = false;
 
             if (proginfo->title == QString::null)
                 proginfo->title = "";
@@ -1351,12 +1346,9 @@ void MainServer::HandleGetScheduledRecordings(PlaybackSock *pbs)
 }
 
 void MainServer::HandleGetConflictingRecordings(QStringList &slist,
-                                                QString purge,
                                                 PlaybackSock *pbs)
 {
     QSocket *pbssock = pbs->getSocket();
-
-    bool removenonplaying = purge.toInt();
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
@@ -1364,7 +1356,7 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
     QStringList strlist;
 
     if (m_sched)
-        m_sched->getConflicting(pginfo, removenonplaying, strlist);
+        m_sched->getConflicting(pginfo, strlist);
     else
         strlist << QString::number(0);
 
@@ -2880,7 +2872,7 @@ void MainServer::PrintStatus(QSocket *socket)
        for (unsigned int i = 0; (iter != recordingList.end()) && i < iNum; 
             iter++, i++)
        {
-           if (!(*iter)->recording ||     // bad entry, don't show as upcoming
+           if ((*iter)->recstatus > rsWillRecord ||     // bad entry, don't show as upcoming
                ((*iter)->recstartts) < QDateTime::currentDateTime()) // rec
            {                       
                i--;

@@ -217,7 +217,8 @@ void ViewScheduled::FillList(void)
     for (i = schedList.begin(); i != schedList.end(); i++)
     {
         ProgramInfo *p = *i;
-        if ((p->recording || showAll || p->recstatus > rsOtherShowing) &&
+        if ((p->recstatus <= rsWillRecord || 
+             showAll || p->recstatus > rsEarlierShowing) &&
             p->recendts >= now)
             schedListFilter.push_back(p);
         else
@@ -298,9 +299,10 @@ void ViewScheduled::updateList(QPainter *p)
 
                 if (p->recstatus == rsRecording)
                     ltype->EnableForcedFont(i, "recording");
-                else if (p->conflicting)
+                else if (p->recstatus == rsConflict)
                     ltype->EnableForcedFont(i, "conflictingrecording");
-                else if (!p->recording || p->recstatus < rsRecording)
+                else if (p->recstatus > rsWillRecord || 
+                         p->recstatus < rsRecording)
                     ltype->EnableForcedFont(i, "disabledrecording");
             }
         }

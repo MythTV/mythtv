@@ -328,6 +328,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
 
     // prevent the SQL from breaking if chanid is null
     QString chanid = proginfo->chanid;
+    QString chansign = proginfo->chansign;
     if (!chanid || chanid == "")
          chanid = "0";
 
@@ -337,25 +338,28 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
 "SELECT "
 "recordid "
 "FROM record "
+"LEFT JOIN channel ON (record.chanid = channel.chanid) "
 "WHERE "
 "record.title = \"%1\" "
 "AND "
 "((record.type = %2 " // allrecord
 "OR record.type = %3) " // findonerecord
 " OR "
-" ((record.chanid = %4) " // channel matches
+" ((record.chanid = %4 " // channel matches
+" OR (callsign IS NOT NULL AND callsign <> '' AND callsign = '%5')) "
 "  AND "
-"  ((record.type = %5) " // channelrecord
+"  ((record.type = %6) " // channelrecord
 "   OR"
-"   (((TIME_TO_SEC(record.starttime) = TIME_TO_SEC('%6')) " // timeslot matches
+"   (((TIME_TO_SEC(record.starttime) = TIME_TO_SEC('%7')) " // timeslot matches
 "      AND "
-"     (TIME_TO_SEC(record.endtime) = TIME_TO_SEC('%7')) "
+"     (TIME_TO_SEC(record.endtime) = TIME_TO_SEC('%8')) "
 "    )"
 "    AND ")
         .arg(sqltitle.utf8())
         .arg(kAllRecord)
         .arg(kFindOneRecord)
         .arg(chanid)
+        .arg(chansign)
         .arg(kChannelRecord)
         .arg(proginfo->startts.time().toString(Qt::ISODate))
         .arg(proginfo->endts.time().toString(Qt::ISODate));

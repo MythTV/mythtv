@@ -1298,25 +1298,18 @@ public:
 
 // General RecPriorities settings
 
-class GRUseRecPriorities: public CheckBoxSetting, public BackendSetting {
+class GRSchedMoveHigher: public CheckBoxSetting, public BackendSetting {
 public:
-    GRUseRecPriorities():
-        BackendSetting("RecPriorityActive") {
-        setLabel(QObject::tr("Use Recording Priorities"));
-        setHelpText(QObject::tr("Use program recording priorities to resolve "
-                    "conflicts."));
+    GRSchedMoveHigher():
+        BackendSetting("SchedMoveHigher") {
+        setLabel(QObject::tr("Reschedule Higher Priorities"));
+        setHelpText(QObject::tr("Move higher priority programs to other cards "
+                                "and showings when resolving conflicts.  This "
+                                "can be used to record lower priority "
+                                "programs that would not otherwise be "
+                                "recorded, but risks missing a higher "
+                                "priority program if the schedule changes."));
         setValue(false);
-    };
-};
-
-class GRRecPrioritiesFirst: public CheckBoxSetting, public BackendSetting {
-public:
-    GRRecPrioritiesFirst():
-        BackendSetting("RecPriorityOrder") {
-        setLabel(QObject::tr("Recording Priorities First."));
-        setHelpText(QObject::tr("Use recording priorities to resolve conflicts "
-                    "before using traditional conflict resolution."));
-        setValue(true);
     };
 };
 
@@ -1822,8 +1815,7 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     VerticalConfigurationGroup* gr = new VerticalConfigurationGroup(false);
     gr->setLabel(QObject::tr("General Recording Priorities Settings"));
 
-    gr->addChild(new GRUseRecPriorities());
-    gr->addChild(new GRRecPrioritiesFirst());
+    gr->addChild(new GRSchedMoveHigher());
     gr->addChild(new GRSingleRecordRecPriority());
     gr->addChild(new GRFindOneRecordRecPriority());
     gr->addChild(new GRWeekslotRecordRecPriority());

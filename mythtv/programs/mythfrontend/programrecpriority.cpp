@@ -61,8 +61,6 @@ ProgramRecPriorityInfo& ProgramRecPriorityInfo::operator=(const ProgramInfo &oth
     spread = other.spread;
     startCol = other.startCol;
 
-    conflicting = other.conflicting;
-    recording = other.recording;
     override = other.override;
     recstatus = other.recstatus;
     recordid = other.recordid;

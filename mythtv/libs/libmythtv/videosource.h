@@ -1065,6 +1065,19 @@ public:
     };
 };
 
+class InputPreference: public SpinBoxSetting, public CISetting {
+public:
+    InputPreference(const CardInput& parent):
+        SpinBoxSetting(-99,99,1),
+        CISetting(parent, "preference") {
+        setLabel(QObject::tr("Input preference"));
+        setHelpText(QObject::tr("If the input preference is not equal for "
+                    "all inputs, the scheduler may choose to record a show "
+                    "at a later time so that it can record on an input with "
+                    "a higher value."));
+    };
+};
+
 class CardInput: public ConfigurationWizard {
 public:
     CardInput() {
@@ -1075,6 +1088,7 @@ public:
         group->addChild(cardid = new CardID(*this));
         group->addChild(inputname = new InputName(*this));
         group->addChild(sourceid = new SourceID(*this));
+        group->addChild(new InputPreference(*this));
         group->addChild(new ExternalChannelCommand(*this));
         group->addChild(new PresetTuner(*this));
         group->addChild(new StartingChannel(*this));

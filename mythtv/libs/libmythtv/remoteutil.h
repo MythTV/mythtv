@@ -15,8 +15,7 @@ void RemoteStopRecording(ProgramInfo *pginfo);
 void RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory);
 bool RemoteGetAllPendingRecordings(vector<ProgramInfo *> &recordinglist);
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist);
-vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,
-                                             bool removenonplaying);
+vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo);
 void RemoteSendMessage(const QString &message);
 RemoteEncoder *RemoteRequestRecorder(void);
 RemoteEncoder *RemoteRequestNextFreeRecorder(int curr);

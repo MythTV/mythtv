@@ -55,12 +55,12 @@ enum RecStatusType {
     rsManualOverride = 1,
     rsPreviousRecording = 2,
     rsCurrentRecording = 3,
-    rsOtherShowing = 4,
+    rsEarlierShowing = 4,
     rsTooManyRecordings = 5,
     rsCancelled = 6,
-    rsLowerRecPriority = 7,
-    rsManualConflict = 8,
-    rsAutoConflict = 9,
+    rsConflict = 7,
+    rsLaterShowing = 8,
+    //rsUnused = 9,
     rsOverlap = 10,
     rsLowDiskSpace = 11,
     rsTunerBusy = 12
@@ -230,10 +230,11 @@ class ProgramInfo
     int spread;
     int startCol;
 
-    bool conflicting;
-    bool recording;
     int override;
     RecStatusType recstatus;
+    RecStatusType savedrecstatus;
+    int numconflicts;
+    int conflictpriority;
     int recordid;
     RecordingType rectype;
     RecordingDupInType dupin;
@@ -242,6 +243,7 @@ class ProgramInfo
     int sourceid;
     int inputid;
     int cardid;
+    bool shareable;
     bool conflictfixed;
 
     QString schedulerid;
@@ -251,7 +253,6 @@ class ProgramInfo
 private:
     void handleRecording(QSqlDatabase *db);
     void handleNotRecording(QSqlDatabase *db);
-    void handleConflicting(QSqlDatabase *db);
     void setOverride(QSqlDatabase *db, int override);
 
     class ScheduledRecording* record;

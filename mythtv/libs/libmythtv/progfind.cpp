@@ -1133,7 +1133,10 @@ int ProgFinder::checkRecordingStatus(int showNum)
             {
                 if ((showData[showNum].startdatetime).time() ==
                      (curRecordings[j].startdatetime).time()
-                    && showData[showNum].channelID == curRecordings[j].chanid)
+                    && (showData[showNum].channelID == curRecordings[j].chanid
+                      || (showData[showNum].channelCallsign != ""
+                         && showData[showNum].channelCallsign ==
+                            curRecordings[j].chansign)))
                 {
                     return curRecordings[j].type;
                 }
@@ -1144,14 +1147,20 @@ int ProgFinder::checkRecordingStatus(int showNum)
                      (curRecordings[j].startdatetime).time()
                     && (showData[showNum].startdatetime).toString("dddd") ==
                      (curRecordings[j].startdatetime).toString("dddd")
-                    && showData[showNum].channelID == curRecordings[j].chanid)
+                    && (showData[showNum].channelID == curRecordings[j].chanid
+                      || (showData[showNum].channelCallsign != ""
+                         && showData[showNum].channelCallsign ==
+                            curRecordings[j].chansign)))
                 {
                     return curRecordings[j].type;
                 }
             }
             if (curRecordings[j].type == kChannelRecord)
             {
-                if (showData[showNum].channelID == curRecordings[j].chanid)
+                if (showData[showNum].channelID == curRecordings[j].chanid
+                      || (showData[showNum].channelCallsign != ""
+                         && showData[showNum].channelCallsign ==
+                            curRecordings[j].chansign))
                 {
                     return curRecordings[j].type;
                 }
@@ -1176,8 +1185,11 @@ void ProgFinder::getRecordingInfo()
     QDateTime recDateTime;
     QString thequery;
     QString data;
-    thequery = QString("SELECT chanid,starttime,startdate,title,subtitle,"
-                       "description,type FROM record;");
+
+    thequery = QString("SELECT record.chanid,starttime,startdate,"
+                       "title,subtitle,description,type,callsign "
+                       "FROM record,channel "
+                       "WHERE record.chanid = channel.chanid;");
 
     QSqlQuery query = m_db->exec(thequery);
 
@@ -1210,6 +1222,7 @@ void ProgFinder::getRecordingInfo()
                 curRecordings[recordingCount].subtitle = QString::fromUtf8(query.value(4).toString());
                 curRecordings[recordingCount].description = QString::fromUtf8(query.value(5).toString());
                 curRecordings[recordingCount].type = query.value(6).toInt();
+                curRecordings[recordingCount].chansign = QString::fromUtf8(query.value(7).toString());
 
                 if (curRecordings[recordingCount].title == QString::null)
                     curRecordings[recordingCount].title = "";
@@ -1217,6 +1230,8 @@ void ProgFinder::getRecordingInfo()
                     curRecordings[recordingCount].subtitle = "";
                 if (curRecordings[recordingCount].description == QString::null)
                     curRecordings[recordingCount].description = "";
+                if (curRecordings[recordingCount].chansign == QString::null)
+                    curRecordings[recordingCount].chansign = "";
 
                 recordingCount++;
             }
@@ -1238,12 +1253,17 @@ void ProgFinder::selectShowData(QString progTitle)
 
     QSqlQuery query(QString::null, m_db);
     query.prepare("SELECT subtitle,starttime,channel.channum,"
-                  "channel.callsign,description,endtime,channel.chanid "
+                  "channel.callsign,description,endtime,channel.chanid,"
+                  "channel.sourceid,"
+                  "IF(channel.callsign IS NOT NULL AND channel.callsign <> '',"
+                  "  channel.callsign,channel.chanid) AS uniquesign "
                   "FROM program,channel "
                   "WHERE program.title = :TITLE AND "
                   "program.chanid = channel.chanid "
                   "AND program.starttime > :STARTTIME "
-                  "ORDER BY program.starttime;");
+                  "GROUP BY starttime,endtime,channum,uniquesign "
+                  "ORDER BY starttime," +
+                  gContext->GetSetting("ChannelOrdering", "channum + 0") +";");
     query.bindValue(":TITLE", progTitle.utf8());
     query.bindValue(":STARTTIME", progStart.toString("yyyyMMddhhmm50"));
 

@@ -54,6 +54,7 @@ class ProgFinder : public MythDialog
         QString subtitle;
         QString description;
         int type;
+        QString chansign;
     };
 
     Q_OBJECT

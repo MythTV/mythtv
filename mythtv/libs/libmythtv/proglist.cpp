@@ -32,7 +32,8 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     db = ldb;
     startTime = QDateTime::currentDateTime();
     timeFormat = gContext->GetSetting("ShortDateFormat") +
-	" " + gContext->GetSetting("TimeFormat");
+        " " + gContext->GetSetting("TimeFormat");
+    channelOrdering = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
     allowEvents = true;
     allowUpdates = true;
@@ -172,15 +173,15 @@ void ProgLister::LoadWindow(QDomElement &element)
             if (e.tagName() == "font")
                 theme->parseFont(e);
             else if (e.tagName() == "container")
-	    {
-		theme->parseContainer(e, name, context, area);
-		if (name.lower() == "view")
-		    viewRect = area;
-		if (name.lower() == "selector")
-		    listRect = area;
-		if (name.lower() == "program_info")
-		    infoRect = area;
-	    }
+            {
+                theme->parseContainer(e, name, context, area);
+                if (name.lower() == "view")
+                    viewRect = area;
+                if (name.lower() == "selector")
+                    listRect = area;
+                if (name.lower() == "program_info")
+                    infoRect = area;
+            }
             else
             {
                 cerr << "Unknown element: " << e.tagName() << endl;
@@ -217,7 +218,7 @@ void ProgLister::updateBackground(void)
             }
             ltype->SetText(value);
         }
-	container->Draw(&tmp, 0, 0);
+        container->Draw(&tmp, 0, 0);
     }
 
     tmp.end();
@@ -567,10 +568,11 @@ void ProgLister::fillViewList(const QString &view)
 
     if (type == plChannel) // list by channel
     {
-        QString channelOrdering = 
-            gContext->GetSetting("ChannelOrdering", "channum + 0");
         QString querystr = "SELECT channel.chanid, channel.channum, "
-            "channel.callsign FROM channel ORDER BY " + channelOrdering + ";";
+            "channel.callsign, IF(channel.callsign IS NOT NULL AND "
+            "channel.callsign <> '',channel.callsign,channel.chanid) "
+            "AS uniquesign FROM channel GROUP BY channum,uniquesign "
+            "ORDER BY " + channelOrdering + ";";
         QSqlQuery query;
         query.exec(querystr);
         if (query.isActive() && query.numRowsAffected())
@@ -580,7 +582,7 @@ void ProgLister::fillViewList(const QString &view)
                 QString chanid = query.value(0).toString();
                 QString chantext;
                 QString channum = query.value(1).toString();
-                if(displaychannum)
+                if (!displaychannum)
                     chantext="";
                 else if (channum != QString::null && channum != "")
                     chantext = channum;
@@ -678,9 +680,11 @@ void ProgLister::fillItemList(void)
         where = QString("WHERE program.title = \"%1\" "
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
-                        "ORDER BY program.starttime,channel.channum;")
+                        "GROUP BY starttime,endtime,channum,uniquesign "
+                        "ORDER BY program.starttime,%3;")
                         .arg(viewList[curView].utf8())
-                        .arg(startTime.toString("yyyyMMddhhmm50"));
+                        .arg(startTime.toString("yyyyMMddhhmm50"))
+                        .arg(channelOrdering);
     }
     else if (type == plNewListings) // what's new list
     {
@@ -697,10 +701,12 @@ void ProgLister::fillItemList(void)
         where = QString("WHERE program.title LIKE \"\%%1\%\" "
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
-                        "ORDER BY program.starttime,channel.channum "
+                        "GROUP BY starttime,endtime,channum,uniquesign "
+                        "ORDER BY program.starttime,%3 "
                         "LIMIT 500;")
                         .arg(viewList[curView].utf8())
-                        .arg(startTime.toString("yyyyMMddhhmm50"));
+                        .arg(startTime.toString("yyyyMMddhhmm50"))
+                        .arg(channelOrdering);
     }
     else if (type == plDescSearch) // description search
     {
@@ -709,10 +715,12 @@ void ProgLister::fillItemList(void)
                         "OR program.description LIKE \"\%%3\%\") "
                         "AND program.endtime > %4 "
                         "AND program.chanid = channel.chanid "
-                        "ORDER BY program.starttime,channel.channum "
+                        "GROUP BY starttime,endtime,channum,uniquesign "
+                        "ORDER BY program.starttime,%5 "
                         "LIMIT 500;")
                         .arg(viewList[curView].utf8()).arg(viewList[curView].utf8()).arg(viewList[curView].utf8())
-                        .arg(startTime.toString("yyyyMMddhhmm50"));
+                        .arg(startTime.toString("yyyyMMddhhmm50"))
+                        .arg(channelOrdering);
     }
     else if (type == plChannel) // list by channel
     {
@@ -728,20 +736,24 @@ void ProgLister::fillItemList(void)
         where = QString("WHERE program.category = \"\%1\" "
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
-                        "ORDER BY program.starttime,channel.channum "
+                        "GROUP BY starttime,endtime,channum,uniquesign "
+                        "ORDER BY program.starttime,%3 "
                         "LIMIT 500;")
                         .arg(viewList[curView].utf8())
-                        .arg(startTime.toString("yyyyMMddhhmm50"));
+                        .arg(startTime.toString("yyyyMMddhhmm50"))
+                        .arg(channelOrdering);
     }
     else if (type == plMovies) // list movies
     {
         where = QString("WHERE program.category_type LIKE \"\%%1\%\" "
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
-                        "ORDER BY program.starttime,channel.channum "
+                        "GROUP BY starttime,endtime,channum,uniquesign "
+                        "ORDER BY program.starttime,%3 "
                         "LIMIT 500;")
                         .arg(tr("Movie").utf8())
-                        .arg(startTime.toString("yyyyMMddhhmm50"));
+                        .arg(startTime.toString("yyyyMMddhhmm50"))
+                        .arg(channelOrdering);
     }
 
     ProgramInfo::GetProgramListByQuery(db, &itemList, where);
@@ -851,9 +863,9 @@ void ProgLister::updateList(QPainter *p)
 
                 ltype->SetItemText(i, 3, tmptitle);
 
-                if (pi->conflicting)
+                if (pi->recstatus == rsConflict)
                     ltype->EnableForcedFont(i, "conflicting");
-                else if (pi->recording)
+                else if (pi->recstatus <= rsWillRecord)
                     ltype->EnableForcedFont(i, "recording");
 
                 if (i + skip == curItem)

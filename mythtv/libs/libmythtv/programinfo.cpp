@@ -35,10 +35,11 @@ ProgramInfo::ProgramInfo(void)
     recstartts = startts;
     recendts = startts;
 
-    conflicting = false;
-    recording = false;
     override = 0;
     recstatus = rsUnknown;
+    savedrecstatus = rsUnknown;
+    numconflicts = 0;
+    conflictpriority = -1000;
     recordid = 0;
     rectype = kNotRecording;
     dupin = kDupsInAll;
@@ -47,6 +48,7 @@ ProgramInfo::ProgramInfo(void)
     sourceid = 0;
     inputid = 0;
     cardid = 0;
+    shareable = false;
     schedulerid = "";
     recpriority = 0;
     recgroup = QString("Default");
@@ -78,10 +80,11 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     spread = other.spread;
     startCol = other.startCol;
  
-    conflicting = other.conflicting;
-    recording = other.recording;
     override = other.override;
     recstatus = other.recstatus;
+    savedrecstatus = other.savedrecstatus;
+    numconflicts = other.numconflicts;
+    conflictpriority = other.conflictpriority;
     recordid = other.recordid;
     rectype = other.rectype;
     dupin = other.dupin;
@@ -90,6 +93,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     sourceid = other.sourceid;
     inputid = other.inputid;
     cardid = other.cardid;
+    shareable = other.shareable;
     schedulerid = other.schedulerid;
     recpriority = other.recpriority;
     recgroup = other.recgroup;
@@ -125,10 +129,11 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
     spread = other.spread;
     startCol = other.startCol;
 
-    conflicting = other.conflicting;
-    recording = other.recording;
     override = other.override;
     recstatus = other.recstatus;
+    savedrecstatus = other.savedrecstatus;
+    numconflicts = other.numconflicts;
+    conflictpriority = other.conflictpriority;
     recordid = other.recordid;
     rectype = other.rectype;
     dupin = other.dupin;
@@ -137,6 +142,7 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
     sourceid = other.sourceid;
     inputid = other.inputid;
     cardid = other.cardid;
+    shareable = other.shareable;
     schedulerid = other.schedulerid;
     recpriority = other.recpriority;
     recgroup = other.recgroup;
@@ -174,8 +180,8 @@ void ProgramInfo::ToStringList(QStringList &list)
     encodeLongLong(list, filesize);
     list << startts.toString(Qt::ISODate);
     list << endts.toString(Qt::ISODate);
-    list << QString::number(conflicting);
-    list << QString::number(recording);
+    list << QString(" "); // dummy place holder
+    list << QString::number(shareable);
     list << QString::number(override);
     list << ((hostname != "") ? hostname : QString(" "));
     list << QString::number(sourceid);
@@ -223,8 +229,8 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     filesize = decodeLongLong(list, it);
     startts = QDateTime::fromString(*(it++), Qt::ISODate);
     endts = QDateTime::fromString(*(it++), Qt::ISODate);
-    conflicting = (*(it++)).toInt();
-    recording = (*(it++)).toInt();
+    it++; // dummy place holder
+    shareable = (*(it++)).toInt();
     override = (*(it++)).toInt();
     hostname = *(it++);
     sourceid = (*(it++)).toInt();
@@ -374,7 +380,10 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
     thequery = QString("SELECT channel.chanid,starttime,endtime,title,"
                        "subtitle,description,category,channel.channum,"
                        "channel.callsign,channel.name,previouslyshown,"
-                       "channel.commfree "
+                       "channel.commfree,"
+                       "IF(channel.callsign IS NOT NULL AND "
+                       "  channel.callsign <> '', channel.callsign, "
+                       "  channel.chanid) AS uniquesign "
                        "FROM program,channel ")
                        + where;
 
@@ -797,11 +806,13 @@ void ProgramInfo::ToggleRecord(QSqlDatabase *db)
 
 bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 {
-    if (title == other.title && rectype == kFindOneRecord)
+    if (title != other.title)
+        return false;
+
+    if (rectype == kFindOneRecord)
         return true;
 
-    if ((title != other.title) ||
-        (dupmethod & kDupCheckNone))
+    if (dupmethod & kDupCheckNone)
         return false;
 
     if ((dupmethod & kDupCheckSub) &&
@@ -819,25 +830,22 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
  
 bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
 {
-    if (chanid == other.chanid &&
-        startts == other.startts &&
-        endts == other.endts &&
-        sourceid == other.sourceid &&
-        cardid == other.cardid &&
-        inputid == other.inputid)
+    if (startts == other.startts && endts == other.endts &&
+        (chanid == other.chanid || 
+         (chansign != "" && chansign == other.chansign)))
         return true;
-    else
-        return false;
+
+    return false;
 }
 
 bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
 {
-    if (chanid == other.chanid &&
+    if ((chanid == other.chanid ||
+         (chansign != "" && chansign == other.chansign)) &&
         startts < other.endts &&
-        endts > other.startts &&
-        (sourceid <= 0 || other.sourceid <= 0 ||
-         sourceid == other.sourceid))
+        endts > other.startts)
         return true;
+
     return false;
 }
 
@@ -1616,19 +1624,17 @@ QString ProgramInfo::RecStatusChar(void)
     case rsPreviousRecording:
         return "P";
     case rsCurrentRecording:
-        return "C";
-    case rsOtherShowing:
-        return "O";
+        return "R";
+    case rsEarlierShowing:
+        return "E";
     case rsTooManyRecordings:
         return "T";
     case rsCancelled:
         return "N";
-    case rsLowerRecPriority:
-        return "R";
-    case rsManualConflict:
-        return "M";
-    case rsAutoConflict:
-        return "A";
+    case rsConflict:
+        return "C";
+    case rsLaterShowing:
+        return "L";
     case rsOverlap:
         return "V";
     case rsLowDiskSpace:
@@ -1644,8 +1650,6 @@ QString ProgramInfo::RecStatusText(void)
 {
     if (rectype == kNotRecording)
         return QObject::tr("Not Recording");
-    else if (conflicting)
-        return QObject::tr("Conflicting");
     else
     {
         switch (recstatus)
@@ -1666,18 +1670,16 @@ QString ProgramInfo::RecStatusText(void)
             return QObject::tr("Previous Recording");
         case rsCurrentRecording:
             return QObject::tr("Current Recording");
-        case rsOtherShowing:
-            return QObject::tr("Other Showing");
+        case rsEarlierShowing:
+            return QObject::tr("Earlier Showing");
         case rsTooManyRecordings:
             return QObject::tr("Max Recordings");
         case rsCancelled:
             return QObject::tr("Manual Cancel");
-        case rsLowerRecPriority:
-            return QObject::tr("Low Priority");
-        case rsManualConflict:
-            return QObject::tr("Manual Conflict");
-        case rsAutoConflict:
-            return QObject::tr("Auto Conflict");
+        case rsConflict:
+            return QObject::tr("Conflicting");
+        case rsLaterShowing:
+            return QObject::tr("Later Showing");
         case rsOverlap:
             return QObject::tr("Overlap");
         case rsLowDiskSpace:
@@ -1697,10 +1699,7 @@ QString ProgramInfo::RecStatusDesc(void)
     QString message;
     QDateTime now = QDateTime::currentDateTime();
 
-    if (conflicting)
-        message += QObject::tr("This showing conflicts with one or more other "
-                               "scheduled programs.");
-    else if (recording)
+    if (recstatus <= rsWillRecord)
     {
         switch (recstatus)
         {
@@ -1748,9 +1747,9 @@ QString ProgramInfo::RecStatusDesc(void)
                                    "is still available in the list of "
                                    "recordings.");
             break;
-        case rsOtherShowing:
-            message += QObject::tr("this episode will be recorded at another "
-                                   "time instead.");
+        case rsEarlierShowing:
+            message += QObject::tr("this episode will be recorded at an "
+                                   "earlier time instead.");
             break;
         case rsTooManyRecordings:
             message += QObject::tr("too many recordings of this program have "
@@ -1759,17 +1758,13 @@ QString ProgramInfo::RecStatusDesc(void)
         case rsCancelled:
             message += QObject::tr("it was manually cancelled.");
             break;
-        case rsLowerRecPriority:
-            message += QObject::tr("another program with a higher recording "
-                                   "priority will be recorded.");
+        case rsConflict:
+            message += QObject::tr("another program with a higher priority "
+                                   "will be recorded instead.");
             break;
-        case rsManualConflict:
-            message += QObject::tr("another program was manually chosen to be "
-                                    "recorded instead.");
-            break;
-        case rsAutoConflict:
-            message += QObject::tr("another program was automatically chosen "
-                                   "to be recorded instead.");
+        case rsLaterShowing:
+            message += QObject::tr("this episode will be recorded at a "
+                                   "later time instead.");
             break;
         case rsOverlap:
             message += QObject::tr("it is covered by another scheduled "
@@ -1798,13 +1793,8 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
 
     for (i = reclist.begin(); i != reclist.end(); i++)
     {
-        ProgramInfo *p = (*i);
-        if (chanid == p->chanid && 
-            startts == p->startts &&
-            endts == p->endts && 
-            title == p->title &&
-            subtitle == p->subtitle && 
-            description == p->description)
+        ProgramInfo *p = *i;
+        if (IsSameTimeslot(*p))
         {
             int pp = RecTypePriority(p->rectype);
             if (!found || pp < pfound || 
@@ -1818,8 +1808,6 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
                 
     if (found)
     {
-        conflicting = found->conflicting;
-        recording = found->recording;
         override = found->override;
         recstatus = found->recstatus;
         recordid = found->recordid;
@@ -1828,6 +1816,8 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
         dupmethod = found->dupmethod;
         recstartts = found->recstartts;
         recendts = found->recendts;
+        cardid = found->cardid;
+        inputid = found->inputid;
     }
 }
 
@@ -1925,9 +1915,7 @@ void ProgramInfo::EditRecording(QSqlDatabase *db)
 
     if (recordid == 0)
         EditScheduled(db);
-    else if (conflicting)
-        handleConflicting(db);
-    else if (recording)
+    else if (recstatus <= rsWillRecord)
         handleRecording(db);
     else
         handleNotRecording(db);
@@ -1995,35 +1983,50 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
     message += RecStatusDesc();
 
     DialogBox diag(gContext->GetMainWindow(), message);
+    int button = 1, ok = -1, addov = -1, forget = -1, clearov = -1;
+
     diag.AddButton(QObject::tr("OK"));
+    ok = button++;
 
     if (recstatus == rsWillRecord)
     {
         diag.AddButton(QObject::tr("Don't record it"));
+        addov = button++;
         if ((dupmethod & kDupCheckNone) ||
             ((dupmethod & kDupCheckSub) &&
              (subtitle != "")) ||
             ((dupmethod & kDupCheckDesc) &&
              (description != "")))
+        {
             diag.AddButton(QObject::tr("Never record this episode"));
+            forget = button++;
+        }
+    }
+
+    if (override != 0)
+    {
+        diag.AddButton(QObject::tr("Clear Override"));
+        clearov = button++;
     }
 
     int ret = diag.exec();
 
-    if (ret <= 1)
-      return;
-
-    setOverride(db, 2);
-
-    if (ret <= 2)
-      return;
-
-    if (record == NULL) 
+    if (ret == addov)
+        setOverride(db, 2);
+    else if (ret == forget)
     {
-        record = new ScheduledRecording();
-        record->loadByProgram(db, this);
+        setOverride(db, 2);
+        if (record == NULL) 
+        {
+            record = new ScheduledRecording();
+            record->loadByProgram(db, this);
+        }
+        record->doneRecording(db, *this);
     }
-    record->doneRecording(db, *this);
+    if (ret == clearov)
+        setOverride(db, 0);
+
+    return;
 }
 
 void ProgramInfo::handleNotRecording(QSqlDatabase *db)
@@ -2036,253 +2039,67 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
     message += "\n\n";
     message += RecStatusDesc();
 
+    if (recstatus == rsConflict || recstatus == rsLaterShowing)
+    {
+        vector<ProgramInfo *> *confList = RemoteGetConflictList(this);
+
+        if (confList->size())
+        {
+            message += "\n\n";
+            message += QObject::tr("The following programs will be recorded "
+                                   "instead:\n");
+        }
+
+        while (confList->begin() != confList->end())
+        {
+            ProgramInfo *p = *confList->begin();
+            message += p->title;
+            if (p->subtitle != "")
+                message += QString(" - \"%1\"").arg(p->subtitle);
+            message += QString(", %1 %2, %3 - %4\n")
+                .arg(p->chanstr).arg(p->chansign)
+                .arg(p->recstartts.toString("hh:mm"))
+                .arg(p->recendts.toString("hh:mm"));
+            delete p;
+            confList->erase(confList->begin());
+        }
+        delete confList;
+    }
+
     DialogBox diag(gContext->GetMainWindow(), message);
+    int button = 1, ok = -1, addov = -1, clearov = -1;
+
     diag.AddButton(QObject::tr("OK"));
+    ok = button++;
 
     QDateTime now = QDateTime::currentDateTime();
 
     if (recstartts > now &&
+        override != 1 &&
         recstatus != rsTooManyRecordings &&
         recstatus != rsCancelled &&
-        recstatus != rsLowerRecPriority &&
         recstatus != rsOverlap &&
         recstatus != rsLowDiskSpace &&
         recstatus != rsTunerBusy)
+    {
         diag.AddButton(QObject::tr("Record it anyway"));
+        addov = button++;
+    }
+
+    if (override != 0)
+    {
+        diag.AddButton(QObject::tr("Clear Override"));
+        clearov = button++;
+    }
 
     int ret = diag.exec();
 
-    if (ret <= 1)
-        return;
-
-    if (recstatus != rsManualConflict &&
-        recstatus != rsAutoConflict)
-    {
+    if (ret == addov)
         setOverride(db, 1);
-        return;
-    }
+    else if (ret == clearov)
+        setOverride(db, 0);
 
-    QString pstart = startts.toString("yyyyMMddhhmm00");
-    QString pend = endts.toString("yyyyMMddhhmm00");
-
-    QString thequery;
-    thequery = QString("INSERT INTO conflictresolutionoverride (chanid,"
-                       "starttime, endtime) VALUES (%1, %2, %3);")
-                       .arg(chanid).arg(pstart).arg(pend);
-
-    QSqlQuery qquery = db->exec(thequery);
-    if (!qquery.isActive())
-    {
-        cerr << "DB Error: conflict resolution insertion failed, SQL query "
-             << "was:" << endl;
-        cerr << thequery << endl;
-    }
-
-    vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(this, false);
-
-    if (!conflictlist)
-        return;
-
-    QString dstart, dend;
-    vector<ProgramInfo *>::iterator i;
-    for (i = conflictlist->begin(); i != conflictlist->end(); i++)
-    {
-        dstart = (*i)->startts.toString("yyyyMMddhhmm00");
-        dend = (*i)->endts.toString("yyyyMMddhhmm00");
-
-        thequery = QString("DELETE FROM conflictresolutionoverride WHERE "
-                           "chanid = %1 AND starttime = %2 AND "
-                           "endtime = %3;")
-                           .arg((*i)->chanid).arg(dstart).arg(dend);
-
-        qquery = db->exec(thequery);
-        if (!qquery.isActive())
-        {
-            cerr << "DB Error: conflict resolution deletion failed, SQL query "
-                 << "was:" << endl;
-            cerr << thequery << endl;
-        }
-    }
-
-    vector<ProgramInfo *>::iterator iter = conflictlist->begin();
-    for (; iter != conflictlist->end(); iter++)
-        delete (*iter);
-    delete conflictlist;
-}
-
-void ProgramInfo::handleConflicting(QSqlDatabase *db)
-{
-    vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(this, true);
-
-    if (!conflictlist)
-        return;
-
-    QString message = QObject::tr("The following scheduled recordings conflict "
-                         "with each other.  Which would you like to record?");
-
-    DialogBox diag(gContext->GetMainWindow(), message, 
-                   QObject::tr("Remember this choice and use it automatically "
-                      "in the future"));
- 
-    QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-
-    QString button; 
-    button = title + QString("\n");
-    button += recstartts.toString(dateformat + " " + timeformat);
-    if (gContext->GetNumSetting("DisplayChanNum") != 0)
-        button += " on " + channame + " [" + chansign + "]";
-    else
-        button += QString(" on channel ") + chanstr;
-
-    diag.AddButton(button);
-
-    vector<ProgramInfo *>::iterator i = conflictlist->begin();
-    for (; i != conflictlist->end(); i++)
-    {
-        ProgramInfo *info = (*i);
-
-        button = info->title + QString("\n");
-        button += info->recstartts.toString(dateformat + " " + timeformat);
-        if (gContext->GetNumSetting("DisplayChanNum") != 0)
-            button += " on " + info->channame + " [" + info->chansign + "]";
-        else
-            button += QString(" on channel ") + info->chanstr;
-
-        diag.AddButton(button);
-    }
-
-    int ret = diag.exec();
-    int boxstatus = diag.getCheckBoxState();
-
-    if (ret == 0)
-    {
-        vector<ProgramInfo *>::iterator iter = conflictlist->begin();
-        for (; iter != conflictlist->end(); iter++)
-        {
-            delete (*iter);
-        }
-
-        delete conflictlist;
-        return;
-    }
-
-    ProgramInfo *prefer = NULL;
-    vector<ProgramInfo *> *dislike = new vector<ProgramInfo *>;
-    if (ret == 2)
-    {
-        prefer = this;
-        for (i = conflictlist->begin(); i != conflictlist->end(); i++)
-            dislike->push_back(*i);
-    }
-    else
-    {
-        dislike->push_back(this);
-        int counter = 3;
-        for (i = conflictlist->begin(); i != conflictlist->end(); i++) 
-        {
-            if (counter == ret)
-                prefer = (*i);
-            else
-                dislike->push_back(*i);
-            counter++;
-        }
-    }
-
-    if (!prefer)
-    {
-        printf("Ack, no preferred recording\n");
-        delete dislike;
-        vector<ProgramInfo *>::iterator iter = conflictlist->begin();
-        for (; iter != conflictlist->end(); iter++)
-        {
-            delete (*iter);
-        }
-
-        delete conflictlist;
-        return;
-    }
-
-    QString thequery;
-
-    if (boxstatus == 1)
-    {
-        for (i = dislike->begin(); i != dislike->end(); i++)
-        {
-            QString sqltitle1 = prefer->title;
-            QString sqltitle2 = (*i)->title;
-
-            sqltitle1.replace(QRegExp("\""), QString("\\\""));
-            sqltitle2.replace(QRegExp("\""), QString("\\\""));
-
-            thequery = QString("INSERT INTO conflictresolutionany "
-                               "(prefertitle, disliketitle) VALUES "
-                               "(\"%1\", \"%2\");").arg(sqltitle1.utf8())
-                               .arg(sqltitle2.utf8());
-            QSqlQuery qquery = db->exec(thequery);
-            if (!qquery.isActive())
-            {
-                cerr << "DB Error: conflict resolution insertion failed, SQL "
-                     << "query was:" << endl;
-                cerr << thequery << endl;
-            }
-        }
-    } 
-    else
-    {
-        QString pstart = prefer->startts.toString("yyyyMMddhhmm00");
-        QString pend = prefer->endts.toString("yyyyMMddhhmm00");
-
-        QString dstart, dend;
-
-        for (i = dislike->begin(); i != dislike->end(); i++)
-        {
-            dstart = (*i)->startts.toString("yyyyMMddhhmm00");
-            dend = (*i)->endts.toString("yyyyMMddhhmm00");
-
-            thequery = QString("INSERT INTO conflictresolutionsingle "
-                               "(preferchanid, preferstarttime, "
-                               "preferendtime, dislikechanid, "
-                               "dislikestarttime, dislikeendtime) VALUES "
-                               "(%1, %2, %3, %4, %5, %6);") 
-                               .arg(prefer->chanid).arg(pstart).arg(pend)
-                               .arg((*i)->chanid).arg(dstart).arg(dend);
-
-            QSqlQuery qquery = db->exec(thequery);
-            if (!qquery.isActive())
-            {
-                cerr << "DB Error: conflict resolution insertion failed, SQL "
-                     << "query was:" << endl;
-                cerr << thequery << endl;
-            }
-        }
-    }  
-
-    QString dstart, dend;
-    for (i = dislike->begin(); i != dislike->end(); i++)
-    {
-        dstart = (*i)->startts.toString("yyyyMMddhhmm00");
-        dend = (*i)->endts.toString("yyyyMMddhhmm00");
-
-        thequery = QString("DELETE FROM conflictresolutionoverride WHERE "
-                           "chanid = %1 AND starttime = %2 AND "
-                           "endtime = %3;").arg((*i)->chanid).arg(dstart)
-                           .arg(dend);
-
-        QSqlQuery qquery = db->exec(thequery);
-        if (!qquery.isActive())
-        {
-            cerr << "DB Error: conflict resolution deletion failed, SQL query "
-                 << "was:" << endl;
-            cerr << thequery << endl;
-        }
-    }
-
-    delete dislike;
-    vector<ProgramInfo *>::iterator iter = conflictlist->begin();
-    for (; iter != conflictlist->end(); iter++)
-        delete (*iter);
-    delete conflictlist;
+    return;
 }
 
 PGInfoCon::PGInfoCon()

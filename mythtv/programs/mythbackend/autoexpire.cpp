@@ -266,8 +266,6 @@ void AutoExpire::FillOldestFirst(void)
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();
 
-            proginfo->conflicting = false;
-
             if (proginfo->title == QString::null)
                 proginfo->title = "";
             if (proginfo->subtitle == QString::null)

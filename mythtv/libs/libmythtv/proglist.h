@@ -56,6 +56,7 @@ class ProgLister : public MythDialog
     QSqlDatabase *db;
     QDateTime startTime;
     QString timeFormat;
+    QString channelOrdering;
 
     int curView;
     int viewCount;

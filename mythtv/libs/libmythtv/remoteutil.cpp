@@ -164,10 +164,9 @@ void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist)
     }
 }
 
-vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,
-                                             bool removenonplaying)
+vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo)
 {
-    QString cmd = QString("QUERY_GETCONFLICTING %1").arg(removenonplaying);
+    QString cmd = QString("QUERY_GETCONFLICTING");
     QStringList strlist = cmd;
     pginfo->ToStringList(strlist);
 

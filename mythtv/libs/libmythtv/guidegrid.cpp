@@ -494,9 +494,12 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
     QSqlQuery query;
 
     QString queryall = "SELECT channel.channum, channel.callsign, "
-                       "channel.icon, channel.chanid, favorites.favid "
+                       "channel.icon, channel.chanid, favorites.favid, "
+                       "IF(callsign IS NOT NULL AND callsign <> '',"
+                       "  callsign,channel.chanid) AS uniquesign "
                        "FROM channel LEFT JOIN favorites ON "
                        "favorites.chanid = channel.chanid WHERE visible = 1 "
+                       "GROUP BY channum,uniquesign "
                        "ORDER BY " + channelOrdering + ";";
 
     if (showFavorites)
@@ -850,12 +853,12 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                 }
 
                 int recStat;
-                if (!proginfo->recording)
-                    recStat = 0;
-                else if (!proginfo->conflicting)
+                if (proginfo->recstatus == rsConflict)
+                    recStat = 2;
+                if (proginfo->recstatus <= rsWillRecord)
                     recStat = 1;
                 else
-                    recStat = 2;
+                    recStat = 0;
 
                 type->SetProgramInfo(row, cnt, tempRect, proginfo->title,
                                      proginfo->category, arrow, recFlag, 

@@ -250,6 +250,7 @@ int main(int argc, char **argv)
         else if (!strcmp(a.argv()[argpos],"--printsched"))
         {
             printsched = true;
+            print_verbose_messages |= VB_SCHEDULE;
         } 
         else if (!strcmp(a.argv()[argpos],"--nosched"))
         {
@@ -400,7 +401,7 @@ int main(int argc, char **argv)
             cout << "Calculating Schedule from database.\n" <<
                     "Inputs, Card IDs, and Conflict info may be invalid "
                     "if you have multiple tuners.\n";
-            sched->FillRecordLists(false);
+            sched->FillRecordLists();
         }
 
         sched->PrintList(true);
