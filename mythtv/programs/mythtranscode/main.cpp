@@ -12,6 +12,7 @@
 using namespace std;
 
 #include "programinfo.h"
+#include "jobqueue.h"
 #include "mythcontext.h"
 #include "transcode.h"
 #include "mpeg2trans.h"
@@ -261,8 +262,14 @@ int main(int argc, char *argv[])
     }
     QString tmpfile = infile + ".tmp";
 
-    if (use_db) 
-        StoreTranscodeState(pginfo, TRANSCODE_STARTED, useCutlist);
+    int jobID = -1;
+    if (use_db)
+    {
+        jobID = JobQueue::GetJobID(db, JOB_TRANSCODE, pginfo->chanid,
+                                   pginfo->startts);
+        JobQueue::ChangeJobStatus(db, jobID, JOB_RUNNING);
+    }
+
     if (found_infile)
     {
         MPEG2trans *mpeg2trans = new MPEG2trans(&deleteMap);
@@ -308,22 +315,30 @@ int main(int argc, char *argv[])
     if (result == REENCODE_OK)
     {
         if (use_db)
-            StoreTranscodeState(pginfo, TRANSCODE_FINISHED, useCutlist);
+            JobQueue::ChangeJobStatus(db, jobID, JOB_STOPPING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 done").arg(infile));
         retval = 0;
     } 
     else if (result == REENCODE_CUTLIST_CHANGE)
     {
         if (use_db)
-            StoreTranscodeState(pginfo, TRANSCODE_RETRY, useCutlist);
+            JobQueue::ChangeJobStatus(db, jobID, JOB_RETRY);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 aborted because of "
                                     "cutlist update").arg(infile));
+        retval = 1;
+    }
+    else if (result == REENCODE_STOPPED)
+    {
+        if (use_db)
+            JobQueue::ChangeJobStatus(db, jobID, JOB_ABORTING);
+        VERBOSE(VB_GENERAL, QString("Transcoding %1 stopped because of "
+                                    "stop command").arg(infile));
         retval = 1;
     }
     else
     {
         if (use_db)
-            StoreTranscodeState(pginfo, TRANSCODE_FAILED, useCutlist);
+            JobQueue::ChangeJobStatus(db, jobID, JOB_ERRORING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 failed").arg(infile));
         retval = -1;
     }
@@ -333,51 +348,6 @@ int main(int argc, char *argv[])
     delete gContext;
     return retval;
 }
-
-void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist)
-{
-    // status can have values:
-    // -2 : Transcode failed because cutlist changed
-    // -1 : Transcode failed for some othr reason
-    //  0 : Transcoder was launched
-    //  1 : Transcode started
-    //  2 : Transcode completed successfully
-    bool exists = false;
-    QString query = QString("SELECT * FROM transcoding WHERE "
-                            "chanid = '%1' AND starttime = '%2' "
-                            "AND hostname = '%3';")
-                           .arg(pginfo->chanid)
-                           .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
-                           .arg(gContext->GetHostName());
-    QSqlQuery result = db->exec(query);
-    if (result.isActive() && result.numRowsAffected() > 0)
-        exists = true;
-
-    if (! exists)
-    {
-        query = QString("INSERT INTO transcoding "
-                        "(chanid,starttime,status,hostname) "
-                        "VALUES ('%1','%2','%3','%4');")
-                        .arg(pginfo->chanid)
-                        .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
-                        .arg(status | (useCutlist) ? TRANSCODE_USE_CUTLIST : 0)
-                        .arg(gContext->GetHostName());
-    } 
-    else 
-    {
-        query = QString("UPDATE transcoding SET status = ((status & %1) | %2), "
-                        "starttime = starttime "
-                        "WHERE chanid = '%3' AND starttime = '%4' "
-                        "AND hostname = '%5';")
-                        .arg(TRANSCODE_FLAGS).arg(status).arg(pginfo->chanid)
-                        .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
-                        .arg(gContext->GetHostName());
-    }
-
-    MythContext::KickDatabase(db);
-    db->exec(query);
-}
-
 void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
                        ProgramInfo *pginfo)
 {

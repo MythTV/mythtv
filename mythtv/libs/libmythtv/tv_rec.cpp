@@ -725,8 +725,8 @@ void TVRec::TeardownRecorder(bool killFile)
             if (prevRecording->chancommfree)
                 jobTypes = jobTypes & (~JOB_COMMFLAG);
 
-//            if (autoTranscode)
-//                jobTypes |= JOB_TRANSCODE;
+            if (autoTranscode)
+                jobTypes |= JOB_TRANSCODE;
 
             if (jobTypes)
             {
@@ -740,16 +740,6 @@ void TVRec::TeardownRecorder(bool killFile)
                                     prevRecording->chanid,
                                     prevRecording->recstartts, jobHost);
                 pthread_mutex_unlock(&db_lock);
-            }
-
-            if (autoTranscode)
-            {
-                QString message = QString("LOCAL_TRANSCODE %1 %2 %3")
-                           .arg(prevRecording->chanid)
-                           .arg(prevRecording->recstartts.toString(Qt::ISODate))
-                           .arg(oldProfileName);
-                MythEvent me(message);
-                gContext->dispatch(me);
             }
         }
     }

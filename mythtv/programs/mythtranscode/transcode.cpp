@@ -19,6 +19,7 @@ using namespace std;
 #include "osdtypes.h"
 #include "remoteutil.h"
 #include "mythcontext.h"
+#include "jobqueue.h"
 
 // This class is to act as a fake audio output device to store the data
 // for reencoding.
@@ -237,6 +238,19 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     int audioframesize;
     int audioFrame = 0;
 
+    int jobID = -1;
+    if (chkTranscodeDB)
+    {
+        jobID = JobQueue::GetJobID(m_db, JOB_TRANSCODE, m_proginfo->chanid,
+                                   m_proginfo->startts);
+
+        if (jobID < 0)
+            return REENCODE_ERROR;
+
+        JobQueue::ChangeJobComment(m_db, jobID,
+                                   "0% " + QObject::tr("Completed"));
+    }
+
     nvp = new NuppelVideoPlayer(nvpdb, m_proginfo);
     nvp->SetNoVideo();
 
@@ -321,7 +335,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
         else
         {
-            cerr << "Unknown video codec: " << vidsetting << endl;
+            cerr << "Unknown video codec: " << vidsetting << "\n";
+            return REENCODE_ERROR;
         }
 
         audsetting = profile.byName("audiocodec")->getValue();
@@ -588,21 +603,15 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
             if (chkTranscodeDB)
             {
-                QString query = QString("SELECT * FROM transcoding WHERE "
-                        "chanid = '%1' AND starttime = '%2' AND "
-                        "((status & %3) = %4) AND hostname = '%5';")
-                        .arg(m_proginfo->chanid)
-                        .arg(m_proginfo->startts.toString("yyyyMMddhhmmss"))
-                        .arg(TRANSCODE_STOP)
-                        .arg(TRANSCODE_STOP)
-                        .arg(gContext->GetHostName());
-                MythContext::KickDatabase(m_db);
-                QSqlQuery result = m_db->exec(query);
-                if (result.isActive() && result.numRowsAffected() > 0)
+		if (JobQueue::GetJobCmd(m_db, jobID) == JOB_STOP)
                 {
                     unlink(outputname);
-                    return REENCODE_ERROR;
+                    return REENCODE_STOPPED;
                 }
+                int percentage = curFrameNum * 100 / total_frame_count;
+                JobQueue::ChangeJobComment(m_db, jobID,
+                                           QString("%1% ").arg(percentage) + 
+                                           QObject::tr("Completed"));
             }
             curtime = QDateTime::currentDateTime();
             curtime = curtime.addSecs(60);

@@ -1619,15 +1619,8 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     popup->addButton(tr("Edit Recording Schedule"), this,
                      SLOT(doEditScheduled()));
 
-    QString query = QString("SELECT * FROM transcoding WHERE "
-                            "chanid = '%1' AND starttime = '%2';")
-                           .arg(curitem->chanid)
-                           .arg(curitem->startts.toString("yyyyMMddhhmmss"));
-
-    MythContext::KickDatabase(db);
-    QSqlQuery result = db->exec(query);
-
-    if (result.isActive() && result.numRowsAffected() > 0)
+    if (JobQueue::IsJobRunning(db, JOB_TRANSCODE, curitem->chanid,
+                                                  curitem->startts))
         popup->addButton(tr("Stop Transcoding"), this,
                          SLOT(doBeginTranscoding()));
     else
@@ -1771,22 +1764,19 @@ void PlaybackBox::doBeginTranscoding()
     cancelPopup();
 
     QSqlDatabase *db = QSqlDatabase::database();
+    if (JobQueue::IsJobRunning(db, JOB_TRANSCODE,
+                               curitem->chanid, curitem->startts))
+    {
+        JobQueue::ChangeJobCmds(db, JOB_TRANSCODE,
+                                curitem->chanid, curitem->startts, JOB_STOP);
+    } else {
+        QString jobHost = "";
+        if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+            jobHost = gContext->GetHostName();
 
-    QString query = QString("SELECT * FROM transcoding WHERE "
-                            "chanid = '%1' AND starttime = '%2';")
-                           .arg(curitem->chanid)
-                           .arg(curitem->startts.toString("yyyyMMddhhmmss"));
-
-    MythContext::KickDatabase(db);
-
-    QSqlQuery result = db->exec(query);
-
-    if (result.isActive() && result.numRowsAffected() > 0)
-        RemoteQueueTranscode(curitem, TRANSCODE_STOP);
-    else
-        RemoteQueueTranscode(curitem, TRANSCODE_QUEUED |
-                                      TRANSCODE_USE_CUTLIST);
-
+        JobQueue::QueueJob(db, JOB_TRANSCODE, curitem->chanid, curitem->startts,
+                           jobHost, "", "", JOB_USE_CUTLIST);
+    }
 }
 
 void PlaybackBox::doBeginFlagging()

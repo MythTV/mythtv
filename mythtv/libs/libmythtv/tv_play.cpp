@@ -27,6 +27,7 @@ using namespace std;
 #include "udpnotify.h"
 #include "commercial_skip.h"
 #include "vsync.h"
+#include "jobqueue.h"
 
 struct SeekSpeedInfo {
     QString   dispString;
@@ -2258,40 +2259,43 @@ void TV::DoQueueTranscode(void)
 {
     if (internalState == kState_WatchingPreRecorded)
     {
-        bool stop = false, abort = false;
+        bool stop = false;
+        m_db->lock();
         if (queuedTranscode)
             stop = true;
-        else
-        {
-            QString query = QString("SELECT * FROM transcoding WHERE "
-                                    "chanid = '%1' AND starttime = '%2';")
-                                   .arg(playbackinfo->chanid)
-                         .arg(playbackinfo->startts.toString("yyyyMMddhhmmss"));
-            m_db->lock();
-            MythContext::KickDatabase(m_db->db());
-            QSqlQuery result = m_db->db()->exec(query);
-            if (result.isActive() && result.numRowsAffected() > 0)
-            {
-                stop = true;
-                abort = true;
-            }
-            m_db->unlock();
-        }
+        else if (JobQueue::IsJobRunning(m_db->db(), JOB_TRANSCODE,
+                                        playbackinfo->chanid,
+                                        playbackinfo->startts))
+            stop = true;
         if (stop)
         {
-            RemoteQueueTranscode(playbackinfo, TRANSCODE_STOP);
+            JobQueue::ChangeJobCmds(m_db->db(), JOB_TRANSCODE,
+                                    playbackinfo->chanid,
+                                    playbackinfo->startts, JOB_STOP);
             queuedTranscode = false;
             if (activenvp == nvp)
                 osd->SetSettingsText(tr("Stopping Transcode"), 3);
         }
         else
         {
-            RemoteQueueTranscode(playbackinfo, TRANSCODE_QUEUED |
-                                               TRANSCODE_USE_CUTLIST);
-            queuedTranscode = true;
-            if (activenvp == nvp)
-                osd->SetSettingsText(tr("Transcoding"), 3);
+            QString jobHost = "";
+
+            if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+                jobHost = gContext->GetHostName();
+
+            if (JobQueue::QueueJob(m_db->db(), JOB_TRANSCODE,
+                               playbackinfo->chanid, playbackinfo->startts,
+                               jobHost, "", "", JOB_USE_CUTLIST))
+            {
+                queuedTranscode = true;
+                if (activenvp == nvp)
+                    osd->SetSettingsText(tr("Transcoding"), 3);
+            } else {
+                if (activenvp == nvp)
+                    osd->SetSettingsText(tr("Try Again"), 3);
+            }
         }
+        m_db->unlock();
     }
 }
 
@@ -3835,14 +3839,10 @@ void TV::BuildOSDTreeMenu(void)
     {
         item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
 
-        QString query = QString("SELECT * FROM transcoding WHERE "
-                                "chanid = '%1' AND starttime = '%2';")
-                               .arg(playbackinfo->chanid)
-                               .arg(playbackinfo->startts.toString("yyyyMMddhhmmss"));
         m_db->lock();
         MythContext::KickDatabase(m_db->db());
-        QSqlQuery result = m_db->db()->exec(query);
-        if (result.isActive() && result.numRowsAffected() > 0)
+        if (JobQueue::IsJobRunning(m_db->db(), JOB_TRANSCODE,
+                                   playbackinfo->chanid, playbackinfo->startts))
             item = new OSDGenericTree(treeMenu, tr("Stop Transcoding"), "QUEUETRANSCODE");
         else
             item = new OSDGenericTree(treeMenu, tr("Begin Transcoding"), "QUEUETRANSCODE");

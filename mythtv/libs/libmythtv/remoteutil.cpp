@@ -69,19 +69,6 @@ bool RemoteCheckFile(ProgramInfo *pginfo)
     return strlist[0].toInt();
 }
 
-void RemoteQueueTranscode(ProgramInfo *pginfo, int state)
-{
-    QStringList strlist;
-    if (state & TRANSCODE_STOP)
-        strlist = QString("QUEUE_TRANSCODE_STOP");
-    else
-        strlist = QString("QUEUE_TRANSCODE_CUTLIST");
-
-    pginfo->ToStringList(strlist);
-
-    gContext->SendReceiveStringList(strlist);
-}
-
 void RemoteStopRecording(ProgramInfo *pginfo)
 {
     QStringList strlist = QString("STOP_RECORDING");

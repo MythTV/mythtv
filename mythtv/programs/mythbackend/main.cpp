@@ -16,7 +16,6 @@ using namespace std;
 #include "tv.h"
 #include "autoexpire.h"
 #include "scheduler.h"
-#include "transcoder.h"
 #include "mainserver.h"
 #include "encoderlink.h"
 #include "remoteutil.h"
@@ -30,7 +29,6 @@ using namespace std;
 QMap<int, EncoderLink *> tvList;
 AutoExpire *expirer = NULL;
 Scheduler *sched = NULL;
-Transcoder *trans = NULL;
 JobQueue *jobqueue = NULL;
 QString pidfile;
 QString lockfile_location;
@@ -155,9 +153,6 @@ void cleanup(void)
 
     if (sched)
         delete sched;
-
-    if (trans)
-        delete trans;
 
     if (pidfile != "")
         unlink(pidfile.ascii());
@@ -451,13 +446,6 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    QSqlDatabase *transthread = QSqlDatabase::addDatabase("QMYSQL3", "TRANSDB");
-    if (!transthread)
-    {
-        cerr << "Couldn't connect to database\n";
-        return -1;
-    }
-
     QSqlDatabase *jobthread = QSqlDatabase::addDatabase("QMYSQL3", "JOBDB");
     if (!jobthread)
     {
@@ -475,7 +463,6 @@ int main(int argc, char **argv)
     if (!gContext->OpenDatabase(db) || !gContext->OpenDatabase(subthread) ||
         !gContext->OpenDatabase(expthread) ||
         !gContext->OpenDatabase(hkthread) ||
-        !gContext->OpenDatabase(transthread) ||
         !gContext->OpenDatabase(jobthread) ||
         !gContext->OpenDatabase(msdb))
     {
@@ -564,9 +551,6 @@ int main(int argc, char **argv)
     QSqlDatabase *hkdb = QSqlDatabase::database("HKDB");
     housekeeping = new HouseKeeper(true, ismaster, hkdb);
 
-    QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
-    trans = new Transcoder(&tvList, trandb);
-
     QSqlDatabase *jobdb = QSqlDatabase::database("JOBDB");
     jobqueue = new JobQueue(ismaster, jobdb);
 
@@ -610,8 +594,6 @@ int main(int argc, char **argv)
     }
 
     a.exec();
-
-    // delete trans;
 
     gContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");
     cleanup();

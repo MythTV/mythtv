@@ -22,6 +22,8 @@ enum JobStatus {
     JOB_STOPPING      = 0x0005,
     JOB_PAUSED        = 0x0006,
     JOB_RETRY         = 0x0007,
+    JOB_ERRORING      = 0x0008,
+    JOB_ABORTING      = 0x0009,
 
     // JOB_DONE is a mask to indicate the job is done no matter what the status
     JOB_DONE          = 0x0100,
@@ -92,7 +94,8 @@ class JobQueue : public QObject
 
     static bool QueueJob(QSqlDatabase* db, int jobType, QString chanid,
                          QDateTime starttime, QString args = "",
-                         QString comment = "", QString host = "");
+                         QString comment = "", QString host = "",
+                         int flags = 0);
     static bool QueueJobs(QSqlDatabase* db, int jobTypes, QString chanid,
                          QDateTime starttime, QString args = "",
                          QString comment = "", QString host = "");
@@ -103,18 +106,23 @@ class JobQueue : public QObject
                                  QString &chanid, QDateTime &starttime);
 
     static bool ChangeJobCmds(QSqlDatabase* db, int jobID, int newCmds);
+    static bool ChangeJobCmds(QSqlDatabase* db, int jobType, QString chanid,
+                              QDateTime starttime, int newCmds);
     static bool ChangeJobFlags(QSqlDatabase* db, int jobID, int newFlags);
     static bool ChangeJobStatus(QSqlDatabase* db, int jobID, int newStatus,
                                 QString comment = "");
     static bool ChangeJobComment(QSqlDatabase* db, int jobID,
                                  QString comment = "");
-
+    static bool IsJobRunning(QSqlDatabase* db, int jobType, QString chanid,
+                             QDateTime starttime);
     static bool PauseJob(QSqlDatabase* db, int jobID);
     static bool ResumeJob(QSqlDatabase* db, int jobID);
     static bool RestartJob(QSqlDatabase* db, int jobID);
     static bool StopJob(QSqlDatabase* db, int jobID);
     static bool DeleteJob(QSqlDatabase* db, int jobID);
 
+    static int GetJobCmd(QSqlDatabase* db, int jobID);
+    static int GetJobFlags(QSqlDatabase* db, int jobID);
     static int GetJobStatus(QSqlDatabase* db, int jobID);
 
     static bool DeleteAllJobs(QSqlDatabase* db, QString chanid,

@@ -291,7 +291,7 @@ void JobQueue::ProcessQueue(void)
                         *(jobControlFlags[key]) = JOB_STOP;
                     controlFlagsLock.unlock();
 
-                    ChangeJobCmds(m_db, id, JOB_RUN);
+                    // ChangeJobCmds(m_db, id, JOB_RUN);
                     continue;
                 }
 
@@ -394,17 +394,18 @@ void JobQueue::ProcessQueue(void)
 
 bool JobQueue::QueueJob(QSqlDatabase* db, int jobType,
                         QString chanid, QDateTime starttime, QString args,
-                        QString comment, QString host)
+                        QString comment, QString host, int flags)
 {
     QString startts = starttime.toString("yyyyMMddhhmm00");
 
     int tmpStatus = JOB_UNKNOWN;
+    int tmpCmd = JOB_UNKNOWN;
     int jobID = -1;
     QSqlQuery query(QString::null, db);
 
-    query.prepare("SELECT status, id FROM jobqueue "
+    query.prepare("SELECT status, id, cmds FROM jobqueue "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME "
-                  "AND type = :JOPTYPE;");
+                  "AND type = :JOBTYPE;");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", startts);
     query.bindValue(":JOBTYPE", jobType);
@@ -422,9 +423,9 @@ bool JobQueue::QueueJob(QSqlDatabase* db, int jobType,
         {
             tmpStatus = query.value(0).toInt();
             jobID = query.value(1).toInt();
+            tmpCmd = query.value(2).toInt();
         }
     }
-
     switch (tmpStatus)
     {
         case JOB_UNKNOWN:
@@ -433,16 +434,19 @@ bool JobQueue::QueueJob(QSqlDatabase* db, int jobType,
         case JOB_RUNNING:
         case JOB_PAUSED:
         case JOB_STOPPING:
+        case JOB_ERRORING:
+        case JOB_ABORTING:
                  return false;
         default:
                  DeleteJob(db, jobID);
                  break;
     }
-
+    if (! (tmpStatus & JOB_DONE) && (tmpCmd & JOB_STOP))
+        return false;
     query.prepare("INSERT jobqueue (chanid, starttime, inserttime, type, "
-                         "status, hostname, args, comment) "
+                         "status, hostname, args, comment, flags) "
                      "VALUES (:CHANID, :STARTTIME, now(), :JOBTYPE, :STATUS, "
-                         ":HOST, :ARGS, :COMMENT);");
+                         ":HOST, :ARGS, :COMMENT, :FLAGS);");
 
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", startts);
@@ -451,6 +455,7 @@ bool JobQueue::QueueJob(QSqlDatabase* db, int jobType,
     query.bindValue(":HOST", host);
     query.bindValue(":ARGS", args);
     query.bindValue(":COMMENT", comment);
+    query.bindValue(":FLAGS", flags);
 
     query.exec();
 
@@ -734,6 +739,30 @@ bool JobQueue::ChangeJobCmds(QSqlDatabase* db, int jobID, int newCmds)
     return true;
 }
 
+bool JobQueue::ChangeJobCmds(QSqlDatabase* db, int jobType, QString chanid,
+                             QDateTime starttime,  int newCmds)
+{
+    QSqlQuery query(QString::null, db);
+
+    query.prepare("UPDATE jobqueue SET cmds = :CMDS WHERE type = :TYPE "
+                  "AND chanid = :CHANID AND starttime = :STARTTIME;");
+
+    query.bindValue(":CMDS", newCmds);
+    query.bindValue(":TYPE", jobType);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", starttime);
+
+    query.exec();
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("Error in JobQueue::ChangeJobCmds()", query);
+        return false;
+    }
+
+    return true;
+}
+
 bool JobQueue::ChangeJobFlags(QSqlDatabase* db, int jobID, int newFlags)
 {
     if (jobID < 0)
@@ -805,6 +834,36 @@ bool JobQueue::ChangeJobComment(QSqlDatabase* db, int jobID, QString comment)
     }
 
     return true;
+}
+
+bool JobQueue::IsJobRunning(QSqlDatabase* db, int jobType, QString chanid,
+                             QDateTime starttime)
+{
+    QSqlQuery query(QString::null, db);
+
+    query.prepare("SELECT status,cmds FROM jobqueue WHERE type = :TYPE "
+                  "AND chanid = :CHANID AND starttime = :STARTTIME;");
+
+    query.bindValue(":TYPE", jobType);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", starttime);
+
+    query.exec();
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("Error in JobQueue::ChangeJobComment()", query);
+        return false;
+    }
+    if (query.numRowsAffected() > 0 && query.next())
+    {
+        int tmpStatus, tmpCmd;
+        tmpStatus = query.value(0).toInt();
+        tmpCmd = query.value(1).toInt();
+        if (!(tmpStatus & JOB_DONE))
+            return true;
+    }
+    return false;
 }
 
 QString JobQueue::JobText(int jobType)
@@ -994,6 +1053,54 @@ bool JobQueue::AllowedToRun(JobQueueEntry job)
         return true;
 
     return false;
+}
+
+int JobQueue::GetJobCmd(QSqlDatabase* db, int jobID)
+{
+    QSqlQuery query(QString::null, db);
+
+    query.prepare("SELECT cmds FROM jobqueue WHERE id = :ID;");
+
+    query.bindValue(":ID", jobID);
+
+    query.exec();
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("Error in JobQueue::GetJobCmd()", query);
+        return false;
+    }
+    else
+    {
+        if ((query.numRowsAffected() > 0) && query.next())
+            return query.value(0).toInt();
+    }
+
+    return JOB_UNKNOWN;
+}
+
+int JobQueue::GetJobFlags(QSqlDatabase* db, int jobID)
+{
+    QSqlQuery query(QString::null, db);
+
+    query.prepare("SELECT flags FROM jobqueue WHERE id = :ID;");
+
+    query.bindValue(":ID", jobID);
+
+    query.exec();
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("Error in JobQueue::GetJobFlags()", query);
+        return false;
+    }
+    else
+    {
+        if ((query.numRowsAffected() > 0) && query.next())
+            return query.value(0).toInt();
+    }
+
+    return JOB_UNKNOWN;
 }
 
 int JobQueue::GetJobStatus(QSqlDatabase* db, int jobID)
@@ -1274,6 +1381,7 @@ void JobQueue::DoTranscodeThread(void)
 
     dblock.lock();
     ChangeJobStatus(m_db, jobID, JOB_RUNNING);
+    bool useCutlist = !!(GetJobFlags(m_db, jobID) & JOB_USE_CUTLIST);
     dblock.unlock();
 
     controlFlagsLock.lock();
@@ -1283,11 +1391,68 @@ void JobQueue::DoTranscodeThread(void)
     /////////////////////////////
     // DO TRANSCODE STUFF HERE //
     /////////////////////////////
+    QString path = "mythtranscode";
+    QString command = QString("%1 -c %2 -s %3 -p %4 -d %5").arg(path.ascii())
+                      .arg(program_info->chanid)
+                      .arg(program_info->recstartts.toString(Qt::ISODate))
+                      .arg("autodetect")
+                      .arg(useCutlist ? "-l" : "");
 
-    dblock.lock();
-    ChangeJobStatus(m_db, jobID, JOB_FINISHED, "?Successfully? Completed.");
-    dblock.unlock();
+    if (jobQueueCPU < 2)
+        nice(19);
 
+    bool retry = true;
+    while (retry)
+    {
+        retry = false;
+        dblock.lock();
+        ChangeJobStatus(m_db, jobID, JOB_STARTING);
+        dblock.unlock();
+
+        myth_system(command.ascii());
+
+        dblock.lock();
+        int status = GetJobStatus(m_db, jobID);
+        dblock.unlock();
+
+        QString fileprefix = gContext->GetFilePrefix();
+        QString filename = program_info->GetRecordFilename(fileprefix);
+        if (status == JOB_STOPPING)
+        {
+            QString tmpfile = filename;
+            tmpfile += ".tmp";
+            // Get new filesize
+            struct stat st;
+            long long filesize = 0;
+            if (stat(tmpfile.ascii(), &st) == 0)
+            filesize = st.st_size;
+            // To save the original file...
+            QString oldfile = filename;
+            oldfile += ".old";
+            rename (filename, oldfile);
+            rename (tmpfile, filename);
+            if (!gContext->GetNumSetting("SaveTranscoding", 0))
+                unlink(oldfile);
+            dblock.lock();
+            ChangeJobStatus(m_db, jobID, JOB_FINISHED);
+            dblock.unlock();
+        } else {
+            // transcode didn't finish delete partial transcode
+            filename += ".tmp";
+            VERBOSE(VB_GENERAL, QString("Deleting %1").arg(filename));
+            unlink(filename);
+            filename += ".map";
+            unlink(filename);
+            dblock.lock();
+            if (status == JOB_ABORTING) // Stop command was sent
+                ChangeJobStatus(m_db, jobID, JOB_ABORTED);
+            else if (status == JOB_ERRORED) // Unrecoverabble error
+                ChangeJobStatus(m_db, jobID, JOB_ERRORED);
+            else // This is likely a recoverable problem
+                retry = true;
+            dblock.unlock();
+        }
+    }
     controlFlagsLock.lock();
     runningJobIDs.erase(key);
     runningJobTypes.erase(key);

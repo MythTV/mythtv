@@ -1043,6 +1043,14 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
             query.exec();
         }
     }
+    if (dbver == "1057")
+    {
+        const QString updates[] = {
+"DROP TABLE IF EXISTS transcoding;",
+""
+};
+        performActualUpdate(updates, "1058", dbver);
+    }
 }
 
 void InitializeDatabase(void)
