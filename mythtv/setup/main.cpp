@@ -74,7 +74,7 @@ void configXMLTV()
         QString command;
 
         if (xmltv_grabber == "tv_grab_de")
-            command = xmltv_grabber + "--configure";
+            command = xmltv_grabber + " --configure";
         else
             command = xmltv_grabber + " --configure --config-file " + filename;
 
