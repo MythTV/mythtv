@@ -1,5 +1,5 @@
                                    MythTV
-			         Release 0.5
+			         Release 0.6
 
 
 There'll be more information here later, but for now:
@@ -88,15 +88,21 @@ debian, might not work elsewhere.  Better instructions welcome.
 
 See the UPGRADING file for information on upgrading between releases.
 
+If you're in the US/Canada, you can proceed with the next step.  Otherwise, you
+need to edit /usr/local/share/mythtv/settings.txt and edit the very first
+setting -- XMLTVGrab.  Change this to the appropriate xmltv grabber 
+(tv_grab_uk in the UK, etc).
+
 Next, you need to run the setup program that should be located in the setup/ 
 subdir.  It will ask you some questions about your hardware, and then run 
-xmltv's 'tv_grab_na' to configure your channels.  If you live in an area where
-'tv_grab_na' doesn't work, you're outta luck until someone bothers to write 
-support for other xmltv grabbers.
+xmltv's grabber to configure your channels.
 
 Once you've run the setup program, just run 'mythfilldata' to download and
 insert a week's worth of program data into the database.  'mythfilldata' should
-be run once a day, if you want to keep your database current.  
+be run once a day, if you want to keep your database current.  If you want
+more control over what channels get inserted into the databaes, or need to setup
+finetuning amounts for specific channels (like in xawtv), run 
+'mythfilldatabase --manual' instead.
 
 Once 'mythfilldata' has finished, try running the 'mythepg' binary.  It should 
 be populated with program info.  Use the arrow keys to move around in the grid.
@@ -111,6 +117,10 @@ currently was on, exiting with 'Escape' will just exit without changing the
 channel.  Pressing 'I' will let you get more information about a program, and 
 if you're running mythfrontend, will allow you to schedule recordings.
 
+If you have two tuner cards setup properly, you can hit 'V' to turn on/off the
+Picture-in-Picture support, 'B' to toggle the active window (for channel 
+changes and the like), and 'N' to swap the two active channels.
+
 Ok, so try running 'mythfrontend'.  You should see a nice menu show up.
 This should be pretty simple to figure out.  mythfrontend is designed to be the
 main interface of the application.  It also provides all the support for
@@ -123,7 +133,7 @@ remote working with this stuff.  Just use irxevent and it should all work.
 Whew.  If you thought this compile process sucked, I'll accept pretty much
 any patch sent my way that improves it.
 
-Ok, some more configuration.  There are a couple .txt files in 
+Time for some more configuration.  There are a couple .txt files in 
 /usr/local/share/mythtv/.  The theme.txt will let you switch between themes
 for the menus.  There's also settings for the size the GUI is displayed at. 
 Change em if you want.  You can copy the various settings files to your 
