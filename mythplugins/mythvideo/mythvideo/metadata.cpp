@@ -1,4 +1,8 @@
 #include <qsqldatabase.h>
+#include <iostream>
+
+using namespace std;
+
 #include "metadata.h"
 
 bool operator==(const Metadata& a, const Metadata& b)

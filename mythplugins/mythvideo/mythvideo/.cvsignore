@@ -4,4 +4,6 @@ moc_inetcomms.cpp
 moc_videobrowser.cpp
 moc_videomanager.cpp
 moc_videotree.cpp
+moc_editmetadata.cpp
+moc_fileassoc.cpp
 mythvideo
