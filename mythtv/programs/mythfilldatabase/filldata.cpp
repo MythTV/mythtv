@@ -2034,7 +2034,8 @@ void handlePrograms(int id, int offset, QMap<QString,
                 query.prepare("SELECT * FROM program WHERE chanid=:CHANID AND "
                               "starttime=:START AND endtime=:END AND "
                               "title=:TITLE AND subtitle=:SUBTITLE AND "
-                              "description=:DESC AND category=:CATEGORY;");
+                              "description=:DESC AND category=:CATEGORY AND "
+                              "stars=:STARS;");
                 query.bindValue(":CHANID", chanid);
                 query.bindValue(":START", startstr);
                 query.bindValue(":END", endstr);
@@ -2042,6 +2043,7 @@ void handlePrograms(int id, int offset, QMap<QString,
                 query.bindValue(":SUBTITLE", (*i).subtitle.utf8()); 
                 query.bindValue(":DESC", (*i).desc.utf8()); 
                 query.bindValue(":CATEGORY", (*i).category.utf8());
+                query.bindValue(":STARS", (*i).stars);
 
                 query.exec();
 
