@@ -516,19 +516,7 @@ void GLSingleView::loadImage()
         t.item     = item;
         t.angle    = 0;
 
-        QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
-                           "image=\"" + item->path + "\";";
-        QSqlQuery query = m_db->exec(queryStr);
-        
-        if (query.isActive()  && query.numRowsAffected() > 0) 
-        {
-            query.next();
-            t.angle = query.value(0).toInt(); 
-        }
-        else
-        {
-            t.angle = GalleryUtil::getNaturalRotation(item->path);
-        }
+        t.angle = item->GetRotationAngle(m_db);
 
         t.width  = image.width();
         t.height = image.height();
@@ -579,10 +567,7 @@ void GLSingleView::rotate(int angle)
 
     ThumbItem *item = m_itemList.at(m_pos);
     if (item) {
-        QString queryStr = "REPLACE INTO gallerymetadata SET image=\"" +
-                           item->path + "\", angle=" + 
-                           QString::number(ang) + ";";
-        m_db->exec(queryStr);
+        item->SetRotationAngle(ang, m_db);
 
         // Delete thumbnail for this
         if (item->pixmap)

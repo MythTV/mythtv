@@ -50,6 +50,9 @@ public:
             delete pixmap;
     }
 
+    int GetRotationAngle(QSqlDatabase *db);
+    void SetRotationAngle(int angle, QSqlDatabase *db);
+
     QPixmap *pixmap;
     QString  name;
     QString  path;

@@ -440,18 +440,8 @@ void SingleView::loadImage()
         m_image.load(item->path);
         
         if (!m_image.isNull()) {
-          
-          QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
-            "image=\"" + item->path + "\";";
-          QSqlQuery query = m_db->exec(queryStr);
-          
-          if (query.isActive()  && query.numRowsAffected() > 0) {
-            query.next();
-            m_rotateAngle = query.value(0).toInt();
-          }
-          else {
-            m_rotateAngle = GalleryUtil::getNaturalRotation(item->path);
-          }
+
+          m_rotateAngle = item->GetRotationAngle(m_db);
           
           if (m_rotateAngle != 0) {
             QWMatrix matrix;
@@ -481,10 +471,7 @@ void SingleView::rotate(int angle)
 
     ThumbItem *item = m_itemList.at(m_pos);
     if (item) {
-        QString queryStr = "REPLACE INTO gallerymetadata SET image=\"" +
-                           item->path + "\", angle=" + 
-                           QString::number(m_rotateAngle) + ";";
-        m_db->exec(queryStr);
+        item->SetRotationAngle(m_rotateAngle, m_db);
 
         // Delete thumbnail for this
         if (item->pixmap)

@@ -402,20 +402,7 @@ void IconView::customEvent(QCustomEvent *e)
             delete item->pixmap;
         item->pixmap = 0;
 
-        QString queryStr = "SELECT angle FROM gallerymetadata WHERE image =\"" +
-                           item->path + "\";";
-        QSqlQuery query = m_db->exec(queryStr);
-        int rotateAngle = 0;
-
-        if (query.isActive() && query.numRowsAffected() > 0) 
-        {
-            query.next();
-            rotateAngle = query.value(0).toInt();
-        }
-        else
-        {
-            rotateAngle = GalleryUtil::getNaturalRotation(item->path);
-        }
+        int rotateAngle = item->GetRotationAngle(m_db);
 
         if (rotateAngle)
         {
@@ -424,7 +411,6 @@ void IconView::customEvent(QCustomEvent *e)
             td->thumb = td->thumb.xForm(matrix);
         }
 
-        item->pixmap = new QPixmap(td->thumb);
 
         int pos = m_itemList.find(item);
         
@@ -683,18 +669,8 @@ void IconView::loadThumbnail(ThumbItem *item)
                                   (int)(m_thumbW-10*wmult),
                                   QImage::ScaleMax);
         int rotateAngle = 0;
-        
-        QString queryStr = "SELECT angle FROM gallerymetadata WHERE image =\"" +
-                           item->path + "\";";
-        QSqlQuery query = m_db->exec(queryStr);
-        if (query.isActive() && query.numRowsAffected() > 0) {
-            query.next();
-            rotateAngle = query.value(0).toInt();
-        }
-        else
-        {
-            rotateAngle = GalleryUtil::getNaturalRotation(item->path);
-        }
+
+        rotateAngle = item->GetRotationAngle(m_db);
 
         if (rotateAngle != 0)
         {
@@ -783,32 +759,15 @@ void IconView::actionRotateCW()
     if (!item || item->isDir)
         return;
 
-    int rotAngle = 0;
+    int rotAngle = item->GetRotationAngle(m_db);
     
-    QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
-                       "image=\"" + item->path + "\";";
-    QSqlQuery query = m_db->exec(queryStr);
-            
-    if (query.isActive()  && query.numRowsAffected() > 0) 
-    {
-        query.next();
-        rotAngle = query.value(0).toInt();
-    }
-    else
-    {
-        rotAngle = GalleryUtil::getNaturalRotation(item->path);
-    }
-
     rotAngle += 90;
     if (rotAngle >= 360)
         rotAngle -= 360;
     if (rotAngle < 0)
         rotAngle += 360;
 
-    queryStr = "REPLACE INTO gallerymetadata SET image=\"" +
-               item->path + "\", angle=" + 
-               QString::number(rotAngle) + ";";
-    query = m_db->exec(queryStr);
+    item->SetRotationAngle(rotAngle, m_db);
 
     if (item->pixmap) {
         delete item->pixmap;
@@ -823,32 +782,15 @@ void IconView::actionRotateCCW()
     if (!item || item->isDir)
         return;
 
-    int rotAngle = 0;
+    int rotAngle = item->GetRotationAngle(m_db);;
     
-    QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
-                       "image=\"" + item->path + "\";";
-    QSqlQuery query = m_db->exec(queryStr);
-            
-    if (query.isActive()  && query.numRowsAffected() > 0) 
-    {
-        query.next();
-        rotAngle = query.value(0).toInt();
-    }
-    else
-    {
-        rotAngle = GalleryUtil::getNaturalRotation(item->path);
-    }
-
     rotAngle -= 90;
     if (rotAngle >= 360)
         rotAngle -= 360;
     if (rotAngle < 0)
         rotAngle += 360;
 
-    queryStr = "REPLACE INTO gallerymetadata SET image=\"" +
-               item->path + "\", angle=" + 
-               QString::number(rotAngle) + ";";
-    query = m_db->exec(queryStr);
+    item->SetRotationAngle(rotAngle, m_db);
 
     if (item->pixmap) {
         delete item->pixmap;
