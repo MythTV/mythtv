@@ -3375,7 +3375,7 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
 
         if (hours > 0)
         {
-            text1.sprintf("%02d:%02d:%02d", hours, mins, secs);
+            text1.sprintf("%d:%02d:%02d", hours, mins, secs);
             if (osd->getTimeType() == 0)
             {
                 text2.sprintf("%.2f%%", (1000 - ret) / 10);
@@ -3389,7 +3389,7 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
         }
         else
         {
-            text1.sprintf("%02d:%02d", mins, secs);
+            text1.sprintf("%d:%02d", mins, secs);
             if (osd->getTimeType() == 0)
             {
                 text2.sprintf("%.2f%%", (1000 - ret) / 10);
@@ -3431,13 +3431,13 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
 
     if (shours > 0)
     {
-        text1.sprintf("%02d:%02d:%02d", phours, pmins, psecs);
-        text2.sprintf("%02d:%02d:%02d", shours, smins, ssecs);
+        text1.sprintf("%d:%02d:%02d", phours, pmins, psecs);
+        text2.sprintf("%d:%02d:%02d", shours, smins, ssecs);
     }
     else
     {
-        text1.sprintf("%02d:%02d", pmins, psecs);
-        text2.sprintf("%02d:%02d", smins, ssecs);
+        text1.sprintf("%d:%02d", pmins, psecs);
+        text2.sprintf("%d:%02d", smins, ssecs);
     }
 
     desc = QObject::tr("%1 of %2").arg(text1).arg(text2);

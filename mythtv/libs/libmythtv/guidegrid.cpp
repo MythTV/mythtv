@@ -163,7 +163,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     }
 
     channelOrdering = gContext->GetSetting("ChannelOrdering", "channum + 0");
-    dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    dateformat = gContext->GetSetting("ShortDateFormat", "ddd d");
     unknownTitle = gContext->GetSetting("UnknownTitle", "Unknown");
     unknownCategory = gContext->GetSetting("UnknownCategory", "Unknown");
     currentTimeColor = gContext->GetSetting("EPGCurrentTimeColor", "red");
@@ -924,7 +924,7 @@ void GuideGrid::paintDate(QPainter *p)
     {
         UITextType *type = (UITextType *)container->GetType("date");
         if (type)
-            type->SetText(m_currentStartTime.toString("ddd"));
+            type->SetText(m_currentStartTime.toString(dateformat));
     }
 
     if (container)

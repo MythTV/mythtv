@@ -1095,6 +1095,8 @@ public:
         addSelection(sampdate.toString("d.M."), "d.M.");
         addSelection(sampdate.toString("dd.MM."), "dd.MM.");
         addSelection(sampdate.toString("MM-dd"), "MM-dd");
+        addSelection(sampdate.toString("ddd d"), "ddd d");
+        addSelection(sampdate.toString("d ddd"), "d ddd");
         setHelpText(QObject::tr("Your preferred short date format."));
     };
 };
