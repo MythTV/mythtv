@@ -2936,6 +2936,16 @@ bool UIManagedTreeListType::popUp()
     //  current active node's parent  
     //
     
+    if(!current_node)
+    {
+        return false;
+    }
+    
+    if(!current_node->getParent())
+    {
+        return false;
+    }
+    
     if(!current_node->getParent()->getParent())
     {
         //
@@ -2976,6 +2986,11 @@ bool UIManagedTreeListType::pushDown()
     //  current active node's first child
     //
 
+    if(!current_node)
+    {
+        return false;
+    }
+
     if(current_node->childCount() < 1)
     {
         //
@@ -3008,6 +3023,10 @@ bool UIManagedTreeListType::pushDown()
 
 bool UIManagedTreeListType::moveUp()
 {
+    if(!current_node)
+    {
+        return false;
+    }
     //
     //  Move the active node to the
     //  current active node's previous
@@ -3038,6 +3057,10 @@ bool UIManagedTreeListType::moveUp()
 
 bool UIManagedTreeListType::moveDown()
 {
+    if(!current_node)
+    {
+        return false;
+    }
     //
     //  Move the active node to the
     //  current active node's next
@@ -3118,6 +3141,10 @@ void UIManagedTreeListType::enter()
 
 bool UIManagedTreeListType::nextActive(bool wrap_around, bool traverse_up_down)
 {
+    if(!active_node)
+    {
+        return false;
+    }
     if(traverse_up_down && active_parent != active_node->getParent())
     {
         return complexInternalNextPrevActive(true, wrap_around);
@@ -3185,6 +3212,10 @@ bool UIManagedTreeListType::nextActive(bool wrap_around, bool traverse_up_down)
 
 bool UIManagedTreeListType::prevActive(bool wrap_around, bool traverse_up_down)
 {
+    if(!active_node)
+    {
+        return false;
+    }
     if(traverse_up_down && active_parent != active_node->getParent())
     {
         return complexInternalNextPrevActive(false, wrap_around);
