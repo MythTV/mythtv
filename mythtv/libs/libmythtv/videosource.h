@@ -434,6 +434,7 @@ public:
 
     void fillSelections(QSqlDatabase* db) {
         clearSelections();
+        addSelection("(None)", "0");
         VideoSource::fillSelections(db, this);
     };
 };
