@@ -1,0 +1,98 @@
+<mythuitheme>
+
+  <window name="status">
+
+    <font name="active" face="Arial">
+      <color>#ffffff</color>
+      <size>18</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <size>18</size>
+      <bold>yes</bold>
+      <shadow>2,2</shadow>
+    </font>
+
+    <font name="selected" face="Arial">
+      <color>#ffff33</color>
+      <size>18</size>
+      <bold>yes</bold>
+      <shadow>2,1</shadow>
+    </font>
+
+    <font name="status" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <container name="topbar">
+      <area>0,0,800,200</area>
+      <textarea name="heading" draworder="0">
+        <area>30,10,760,40</area>
+        <font>title</font>
+        <value>System Status - Select a category to view the status</value>
+      </textarea>
+      <textarea name="helptext" draworder="0">
+        <area>30,60,760,80</area>
+        <font>title</font>
+        <value>This screen show the status of various system components</value>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>0,201,255,600</area>
+      <listarea name="icon_list" draworder="2">
+       <area>40,30,235,350</area>
+       <fcnfont name="active" function="active"></fcnfont>
+       <fcnfont name="active" function="inactive"></fcnfont>
+       <fcnfont name="selected" function="selected"></fcnfont>
+       <column number="1" width="200" context="-1"></column>
+       <items>8</items>
+      </listarea>
+      <image name="iconlines" draworder="0" fleximage="no">
+        <filename>cr-lines.png</filename>
+        <position>20,0</position>
+        <staticsize>235,410</staticsize>
+      </image>
+      <image name="iconbg" draworder="1" fleximage="no">
+        <filename>trans-cr-background.png</filename>
+        <position>20,0</position>
+        <staticsize>235,410</staticsize>
+      </image>
+    </container>
+
+    <container name="content">
+      <area>265,201,535,600</area>
+      <listarea name="list_area" draworder="2">
+       <area>15,20,490,395</area>
+       <fcnfont name="status" function="active"></fcnfont>
+       <fcnfont name="status" function="inactive"></fcnfont>
+       <fcnfont name="status" function="selected"></fcnfont>
+       <column number="1" width="490" context="-1"></column>
+       <items>12</items>
+      </listarea>
+      <textarea name="text_area" draworder="2">
+        <area>15,20,490,395</area>
+        <font>status</font>
+        <multiline>yes</multiline>
+      </textarea>
+      <image name="datalines" draworder="0" fleximage="no">
+        <filename>cr-lines.png</filename>
+        <position>0,0</position>
+        <staticsize>510,410</staticsize>
+      </image>
+      <image name="databg" draworder="1" fleximage="no">
+        <filename>trans-cr-background.png</filename>
+        <position>0,0</position>
+        <staticsize>510,410</staticsize>
+      </image>
+    </container>
+
+  </window>
+
+</mythuitheme>
+

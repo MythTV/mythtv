@@ -1,16 +1,4 @@
 .qmake.internal.cache
 Makefile
-moc_deletebox.cpp
-moc_menubox.cpp
-moc_manualbox.cpp
-moc_playbackbox.cpp
-moc_programlistitem.cpp
-moc_viewscheduled.cpp
-moc_videosource.cpp
-moc_themesetup.cpp
-moc_setrectime.cpp
-moc_manualschedule.cpp
-moc_channelrecpriority.cpp
-moc_programrecpriority.cpp
-moc_search.cpp
+moc_*
 mythfrontend

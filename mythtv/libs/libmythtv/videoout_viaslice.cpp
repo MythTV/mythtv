@@ -419,11 +419,12 @@ void VideoOutputVIA::Show(FrameScanType )
 
     via_slice_state_t *cur = (via_slice_state_t *)data->display_buffer->buf;
 
-    if (cur->progressive_sequence)
+    if (1) //cur->progressive_sequence)
     {
         data->VIAMPGSurface.dwDisplayPictStruct = VIA_PICT_STRUCT_FRAME;
         VIADisplayControl(DEV_MPEG, &data->VIAMPGSurface);
     }
+#if 0  // Needs fixed to work with new bob deint.
     else
     {
         if (cur->top_field_first)
@@ -441,6 +442,7 @@ void VideoOutputVIA::Show(FrameScanType )
             VIADisplayControl(DEV_MPEG, &data->VIAMPGSurface);
         }
     }
+#endif
 }
 
 void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)

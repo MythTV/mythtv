@@ -372,6 +372,7 @@ class UIListType : public UIType
                           m_fonts = fonts; m_fontfcns = fontfcn; }
     void EnableForcedFont(int num, QString func) { forceFonts[num] = m_fonts[func]; }
 
+    int GetCurrentItem() { return m_current; }
     int GetItems() { return m_count; }
     QString GetItemText(int, int col = 1);
     void ResetList() { listData.clear(); forceFonts.clear(); 

@@ -44,6 +44,10 @@ unix {
 macx {
 #    SOURCES += audiooutputdarwin.cpp
 #    SOURCES += mythcdrom-darwin.cpp
+    
+    # We use HIToolbox from Carbon to hide the menu bar
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
+    LIBS           += -framework Carbon
 }
 
 linux {

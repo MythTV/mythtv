@@ -34,6 +34,7 @@ using namespace std;
 #include "xbox.h"
 #include "dbcheck.h"
 #include "mythmediamonitor.h"
+#include "statusbox.h"
 
 #define QUIT     1
 #define HALT     2
@@ -304,91 +305,10 @@ void startTV(void)
 
 void showStatus(void)
 {
-    QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus, Status;
-    QString querytext, DataDirectMessage;
-    int DaysOfData;
-    QDateTime qdtNow, GuideDataThrough;
-    QSqlDatabase *db = QSqlDatabase::database();
-
-    qdtNow = QDateTime::currentDateTime();
-    querytext = QString("SELECT max(endtime) FROM program;");
-
-    QSqlQuery query = db->exec(querytext);
-
-    if (query.isActive() && query.numRowsAffected())
-    {
-        query.next();
-        GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
-                                                 Qt::ISODate);
-    }
-
-    mfdLastRunStart = gContext->GetSetting("mythfilldatabaseLastRunStart");
-    mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
-    mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
-    DataDirectMessage = gContext->GetSetting("DataDirectMessage");
-
-    Status = QObject::tr("Myth version:") + " " + MYTH_BINARY_VERSION + "\n";
-
-    Status += QObject::tr("Last mythfilldatabase guide update:");
-    Status += "\n   ";
-    Status += QObject::tr("Started:   ");
-    Status += mfdLastRunStart;
-    if (mfdLastRunEnd > mfdLastRunStart)  //if end < start, it's still running.
-    {
-        Status += "\n   ";
-        Status += QObject::tr("Finished: ");
-        Status += mfdLastRunEnd;
-    }
-
-    Status += "\n   ";
-    Status += QObject::tr("Result: ");
-    Status += mfdLastRunStatus;
-
-    DaysOfData = qdtNow.daysTo(GuideDataThrough);
-
-    if (GuideDataThrough.isNull())
-    {
-        Status += QObject::tr("There's no guide data available! ");
-        Status += QObject::tr("Have you run mythfilldatabase?");
-        Status += "\n";
-    }
-    else
-    {
-        Status += "\n\n";
-        Status += QObject::tr("There is guide data until ");
-        Status += QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
-
-        if (DaysOfData > 0)
-        {
-            Status += QString("\n(%1 ").arg(DaysOfData);
-            if (DaysOfData >1)
-                Status += QObject::tr("days");
-            else
-                Status += QObject::tr("day");
-            Status += ").";
-        }
-        else
-            Status += ".";
-    }
-
-    if (DaysOfData <= 3)
-    {
-        Status += "\n";
-        Status += QObject::tr("WARNING: is mythfilldatabase running?");
-    }
-
-    if (!DataDirectMessage.isNull())
-    {
-        Status += "\n";
-        Status += QObject::tr("DataDirect Status: ");
-        Status += DataDirectMessage;
-    }
-
-    DialogBox *status_dialog = new DialogBox(gContext->GetMainWindow(), Status);
-    status_dialog->AddButton(QObject::tr("OK"));
-    status_dialog->exec();
-
-    delete status_dialog;
+    StatusBox statusbox(gContext->GetMainWindow(), "status box");
+    qApp->unlock();
+    statusbox.exec();
+    qApp->lock();
 }
 
 void TVMenuCallback(void *data, QString &selection)

@@ -114,3 +114,8 @@ using_directx {
     SOURCES += videoout_dx.cpp
     HEADERS += videoout_dx.h
 }
+
+using_opengl {
+    CONFIG += opengl
+}
+

@@ -11,8 +11,12 @@
 #include <qfocusdata.h>
 #include <qdict.h>
 #include <qsqldatabase.h>
+
 #ifdef QWS
 #include <qwindowsystem_qws.h>
+#endif
+#ifdef Q_WS_MACX
+#import <HIToolbox/Menus.h>   // For HideMenuBar()
 #endif
 
 #include <iostream>
@@ -235,7 +239,13 @@ void MythMainWindow::Show(void)
     if (gContext->GetNumSetting("RunFrontendInWindow", 0))
         show();
     else
+    {
         showFullScreen();
+#ifdef Q_WS_MACX
+        HideMenuBar();
+#endif
+    }
+
     setActiveWindow();
 }
 
