@@ -218,6 +218,14 @@ void RemoteEncoder::Pause(void)
     SendReceiveStringList(strlist);
 }
 
+void RemoteEncoder::FinishRecording(void)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "FINISH_RECORDING";
+
+    SendReceiveStringList(strlist);
+}
+
 void RemoteEncoder::ToggleInputs(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -313,7 +321,7 @@ void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
                                    QString &desc, QString &category,
                                    QString &starttime, QString &endtime,
                                    QString &callsign, QString &iconpath,
-                                   QString &channelname)
+                                   QString &channelname, QString &chanid)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "GET_PROGRAM_INFO";
@@ -329,6 +337,7 @@ void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
     callsign = strlist[6];
     iconpath = strlist[7];
     channelname = strlist[8];
+    chanid = strlist[9];
 }
 
 void RemoteEncoder::GetInputName(QString &inputname)

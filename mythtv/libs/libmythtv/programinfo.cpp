@@ -798,3 +798,41 @@ void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames,
             frames[query.value(0).toInt()] = query.value(1).toInt();
     }
 }
+
+void ProgramInfo::Save(void)
+{
+    QSqlQuery query;
+    QString querystr;
+    QString escaped_title;
+    QString escaped_subtitle;
+    QString escaped_description;
+    QString escaped_category;
+
+    escaped_title = title;
+    escaped_title.replace(QRegExp("\""), QString("\\\""));
+
+    escaped_subtitle = subtitle;
+    escaped_subtitle.replace(QRegExp("\""), QString("\\\""));
+
+    escaped_description = description;
+    escaped_description.replace(QRegExp("\""), QString("\\\""));
+
+    escaped_category = category;
+    escaped_category.replace(QRegExp("\""), QString("\\\""));
+
+    querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
+                    "title,subtitle,description,category,airdate,"
+                    "stars) VALUES(%d,\"%s\",\"%s\",\"%s\",\"%s\", "
+                    "\"%s\",\"%s\",\"%s\",\"%s\");",
+                    chanid.toInt(),
+                    startts.toString("yyyyMMddhhmmss").ascii(),
+                    endts.toString("yyyyMMddhhmmss").ascii(),
+                    escaped_title.utf8().data(),
+                    escaped_subtitle.utf8().data(),
+                    escaped_description.utf8().data(),
+                    escaped_category.utf8().data(),
+                    "0",
+                    "0");
+
+    query.exec(querystr.utf8().data());
+}

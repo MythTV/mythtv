@@ -54,6 +54,7 @@ class XvVideoOutput
     int dispx, dispy, dispw, disph;
     int olddispx, olddispy, olddispw, olddisph;
     bool embedding;
+    bool created_win;
 
     int xv_port;
     int colorid;

@@ -25,6 +25,7 @@ class TV : public QObject
 
     TVState LiveTV(void);
     void StopLiveTV(void) { exitPlayer = true; }
+    void FinishRecording(void);
 
     int AllowRecording(const QString &message, int timeuntil);
 
@@ -39,6 +40,11 @@ class TV : public QObject
     bool IsPlaying(void) { return StateIsPlaying(internalState); }
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
+    void GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle,
+                        QString &desc, QString &category, QString &starttime,
+                        QString &endtime, QString &callsign, QString &iconpath,
+                        QString &channelname, QString &chanid);
+
     // for the guidegrid to use
     void EmbedOutput(unsigned long wid, int x, int y, int w, int h);
     void StopEmbeddingOutput(void);
@@ -47,6 +53,7 @@ class TV : public QObject
     bool getRequestDelete(void) { return requestDelete; }
     bool getEndOfRecording(void) { return endOfRecording; }
 
+    void ProcessKeypress(int keypressed);
     void customEvent(QCustomEvent *e);
 
  protected:
@@ -86,10 +93,6 @@ class TV : public QObject
     
     void UpdateOSD(void);
     void UpdateOSDInput(void);
-    void GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle, 
-                        QString &desc, QString &category, QString &starttime, 
-                        QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname);
 
     void LoadMenu(void);
 
@@ -98,8 +101,6 @@ class TV : public QObject
     void SetupPipPlayer();
     void TeardownPipPlayer();
     
-    void ProcessKeypress(int keypressed);
-
     void StateToString(TVState state, QString &statestr);
     void HandleStateChange();
     bool StateIsRecording(TVState state);
@@ -171,6 +172,9 @@ class TV : public QObject
     VolumeControl *volumeControl;
 
     int deinterlace_mode;
+
+    unsigned int embedid;
+    int embx, emby, embw, embh;
 };
 
 #endif

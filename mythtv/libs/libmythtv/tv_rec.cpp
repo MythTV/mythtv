@@ -651,6 +651,7 @@ void TVRec::RunTV(void)
 
     runMainLoop = true;
     exitPlayer = false;
+    finishRecording = false;
 
     while (runMainLoop)
     {
@@ -661,7 +662,7 @@ void TVRec::RunTV(void)
 
         if (StateIsRecording(internalState))
         {
-            if (QDateTime::currentDateTime() > recordEndTime)
+            if (QDateTime::currentDateTime() > recordEndTime || finishRecording)
             {
                 if (!inoverrecord && overrecordseconds > 0)
                 {
@@ -680,6 +681,7 @@ void TVRec::RunTV(void)
                     nextState = RemoveRecording(internalState);
                     changeState = true;
                 }
+                finishRecording = false;
             }
         }
 
@@ -707,7 +709,7 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
                            QString &desc, QString &category, 
                            QString &starttime, QString &endtime, 
                            QString &callsign, QString &iconpath, 
-                           QString &channelname)
+                           QString &channelname, QString &chanid)
 {
     title = " ";
     subtitle = " ";
@@ -718,6 +720,7 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
     callsign = " ";
     iconpath = " ";
     channelname = " ";
+    chanid = " ";
 
     if (!db_conn)
         return;
@@ -739,7 +742,8 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
     QString device = chan->GetDevice();
  
     QString thequery = QString("SELECT starttime,endtime,title,subtitle,"
-                               "description,category,callsign,icon "
+                               "description,category,callsign,icon,"
+                               "channel.chanid "
                                "FROM program,channel,capturecard,cardinput "
                                "WHERE channel.channum = \"%1\" "
                                "AND starttime < %2 AND endtime > %3 AND "
@@ -780,7 +784,44 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
         test = query.value(7).toString();
         if (test != QString::null)
             iconpath = test;
+        test = query.value(8).toString();
+        if (test != QString::null)
+            chanid = test;
     }
+    else
+    {
+        // couldn't find a matching program for the current channel.
+        // get the information about the channel anyway
+        QString thequery = QString("SELECT callsign,icon,channel.chanid "
+                                   "FROM channel,capturecard,cardinput "
+                                   "WHERE channel.channum = \"%1\" AND "
+                                   "channel.sourceid = cardinput.sourceid AND "
+                                   "cardinput.inputname = \"%2\" AND "
+                                   "cardinput.cardid = capturecard.cardid AND "
+                                   "capturecard.videodevice = \"%3\" AND "
+                                   "capturecard.hostname = \"%4\";")
+                                   .arg(channelname)
+                                   .arg(channelinput).arg(device)
+                                   .arg(gContext->GetHostName());
+
+        QSqlQuery query = db_conn->exec(thequery);
+
+        QString test;
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            query.next();
+
+            test = query.value(0).toString();
+            if (test != QString::null)
+                callsign = test;
+            test = query.value(1).toString();
+            if (test != QString::null)
+                iconpath = test;
+            test = query.value(2).toString();
+            if (test != QString::null)
+                chanid = test;
+        }
+     }
 
     pthread_mutex_unlock(&db_lock);
 }
@@ -1505,10 +1546,10 @@ bool TVRec::CheckChannel(QString name)
 void TVRec::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname)
+                        QString &channelname, QString &chanid)
 {
     GetChannelInfo(channel, title, subtitle, desc, category, starttime,
-                   endtime, callsign, iconpath, channelname);
+                   endtime, callsign, iconpath, channelname, chanid);
 }
 
 void TVRec::GetInputName(QString &inputname)

@@ -118,6 +118,7 @@ TV::TV(QSqlDatabase *db)
     requestDelete = false;
     endOfRecording = false;
     volumeControl = NULL;
+    embedid = 0;
 
     deinterlace_mode = DEINTERLACE_NONE;
     gContext->addListener(this);
@@ -209,6 +210,14 @@ TVState TV::LiveTV(void)
     }
 
     return retval;
+}
+
+void TV::FinishRecording(void)
+{
+    if (!IsRecording())
+        return;
+
+    activerecorder->FinishRecording();
 }
 
 int TV::AllowRecording(const QString &message, int timeuntil)
@@ -576,6 +585,9 @@ void TV::SetupPlayer(void)
     }
 
     nvp->SetVideoFilters(filters);
+
+    if (embedid > 0)
+        nvp->EmbedInWidget(embedid, embx, emby, embw, embh);
 
     if (internalState == kState_WatchingRecording)
         nvp->SetWatchingRecording(true);
@@ -1086,9 +1098,9 @@ void TV::SwapPIP(void)
     QString bigchanname;
 
     piprecorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
-                                dummy, dummy, pipchanname);
+                                dummy, dummy, pipchanname, dummy);
     recorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
-                             dummy, dummy, bigchanname);
+                             dummy, dummy, bigchanname, dummy);
 
     if (activenvp != nvp)
         ToggleActiveWindow();
@@ -1473,10 +1485,10 @@ void TV::ChangeChannelByString(QString &name)
 void TV::UpdateOSD(void)
 {
     QString title, subtitle, desc, category, starttime, endtime;
-    QString callsign, iconpath, channelname;
+    QString callsign, iconpath, channelname, chanid;
 
     GetChannelInfo(activerecorder, title, subtitle, desc, category, 
-                   starttime, endtime, callsign, iconpath, channelname);
+                   starttime, endtime, callsign, iconpath, channelname, chanid);
 
     osd->SetInfoText(title, subtitle, desc, category, starttime, endtime,
                      callsign, iconpath, osd_display_time);
@@ -1497,14 +1509,23 @@ void TV::UpdateOSDInput(void)
 void TV::GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname)
+                        QString &channelname, QString &chanid)
 {
+    if (!enc)
+        enc = activerecorder;
+
     enc->GetChannelInfo(title, subtitle, desc, category, starttime, endtime, 
-                        callsign, iconpath, channelname);
+                        callsign, iconpath, channelname, chanid);
 }
 
 void TV::EmbedOutput(unsigned long wid, int x, int y, int w, int h)
 {
+    embedid = wid;
+    embx = x;
+    emby = y;
+    embw = w;
+    embh = h;
+
     if (nvp)
         nvp->EmbedInWidget(wid, x, y, w, h);
 }
@@ -1513,6 +1534,7 @@ void TV::StopEmbeddingOutput(void)
 {
     if (nvp)
         nvp->StopEmbedding();
+    embedid = 0;
 }
 
 void TV::doLoadMenu(void)
@@ -1522,7 +1544,7 @@ void TV::doLoadMenu(void)
 
     if (recorder)
         recorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy, 
-                                 dummy, dummy, channame);
+                                 dummy, dummy, channame, dummy);
 
     QString chanstr = RunProgramGuide(channame, true, this);
 

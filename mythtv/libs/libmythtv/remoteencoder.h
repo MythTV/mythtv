@@ -30,6 +30,7 @@ class RemoteEncoder
     void SpawnLiveTV(void);
     void StopLiveTV(void);
     void Pause(void);
+    void FinishRecording(void);
 
     void ToggleInputs(void);
     int ChangeContrast(bool direction);
@@ -43,7 +44,7 @@ class RemoteEncoder
     void GetChannelInfo(QString &title, QString &subtitle, QString &desc, 
                         QString &category, QString &starttime, QString &endtime,
                         QString &callsign, QString &iconpath,
-                        QString &channelname);
+                        QString &channelname, QString &chanid);
     void GetInputName(QString &inputname);
   
   private:

@@ -27,6 +27,7 @@ class TVRec
 
     void StartRecording(ProgramInfo *rcinfo);
     void StopRecording(void);
+    void FinishRecording(void) { finishRecording = true; }
 
     ProgramInfo *GetRecording(void) { return curRecording; }
 
@@ -79,7 +80,7 @@ class TVRec
     void GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname);
+                        QString &channelname, QString &chanid);
     void GetInputName(QString &inputname);
 
     void SpawnReadThread(QSocket *sock);
@@ -106,7 +107,7 @@ class TVRec
     void GetChannelInfo(Channel *chan, QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname);
+                        QString &channelname, QString &chanid);
 
     void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
                     int &rate, QString &defaultinput, QString &startchannel);
@@ -141,6 +142,7 @@ class TVRec
 
     bool runMainLoop;
     bool exitPlayer;
+    bool finishRecording;
     bool paused;
     bool prematurelystopped;
     QDateTime recordEndTime;

@@ -24,6 +24,8 @@ class ProgramInfo
     bool IsSameProgram(const ProgramInfo& other) const;
     bool IsSameTimeslot(const ProgramInfo& other) const;
 
+    void Save(void);
+
     ScheduledRecording::RecordingType GetProgramRecordingStatus(QSqlDatabase *db);
     void ApplyRecordStateChange(QSqlDatabase *db,
                                 ScheduledRecording::RecordingType newstate);

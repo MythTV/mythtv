@@ -64,6 +64,7 @@ XvVideoOutput::XvVideoOutput(void)
     XJ_started = 0; 
     xv_port = -1; 
     scratchspace = NULL; 
+    created_win = false;
 
     data = new XvData();
 }
@@ -257,6 +258,7 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
                                            cury, curw, curh, 0, 
                                            XJ_white, XJ_black);
         data->XJ_curwin = data->XJ_win;
+        created_win = true;
 
         if (!data->XJ_win) 
         {  
@@ -497,7 +499,8 @@ void XvVideoOutput::Exit(void)
             }
         }
 
-        XDestroyWindow(data->XJ_disp, data->XJ_win);
+        if (created_win)
+            XDestroyWindow(data->XJ_disp, data->XJ_win);
         XCloseDisplay(data->XJ_disp);
     }
 }
@@ -587,6 +590,8 @@ void XvVideoOutput::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
     disphoff = disph = h;
 
     embedding = true;
+
+    MoveResize();
 
     pthread_mutex_unlock(&lock);
 }
