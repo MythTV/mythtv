@@ -49,3 +49,7 @@
 - Simply copy the files you want to save to ~/.mythtv/ and they won't get
   overwritten anymore.  Changes to the settings files happen regularly, so you
   need to watch for these changes.
+
+) Colors are all messed up, people's faces are blue!
+- Using the binary nvidia drivers?  Make sure you're using version 1.0-2960 of
+  their drivers.
