@@ -344,7 +344,7 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
     QString button; 
     button = rec->title + QString("\n");
     button += rec->startts.toString(dateformat + " " + timeformat);
-    if (m_context->GetNumSetting("DisplayChanNum") == 0)
+    if (m_context->GetNumSetting("DisplayChanNum") != 0)
         button += " on " + rec->channame + " [" + rec->chansign + "]";
     else
         button += QString(" on channel ") + rec->chanstr;
@@ -358,7 +358,7 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
 
         button = info->title + QString("\n");
         button += info->startts.toString(dateformat + " " + timeformat);
-        if (m_context->GetNumSetting("DisplayChanNum") == 0)
+        if (m_context->GetNumSetting("DisplayChanNum") != 0)
             button += " on " + info->channame + " [" + info->chansign + "]";
         else
             button += QString(" on channel ") + info->chanstr;

@@ -109,7 +109,7 @@ int TVRec::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
     }
 
     QString message = QString("MythTV wants to record \"") + rcinfo->title;
-    if (context->GetNumSetting("DisplayChanNum") == 0)
+    if (context->GetNumSetting("DisplayChanNum") != 0)
         message += QString("\" on ") + rcinfo->channame + " [" +
                    rcinfo->chansign + "]";
     else
