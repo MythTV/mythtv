@@ -16,6 +16,7 @@ using namespace std;
 #include "remoteencoder.h"
 #include "remoteutil.h"
 #include "guidegrid.h"
+#include "volumecontrol.h"
 
 // cheat and put the keycodes here
 #define wsUp            0x52 + 256
@@ -60,6 +61,7 @@ TV::TV(QSqlDatabase *db)
     osd = NULL;
     requestDelete = false;
     endOfRecording = false;
+    volumeControl = NULL;
 
     gContext->addListener(this);
 }
@@ -83,6 +85,8 @@ void TV::Init(void)
 
     watchingLiveTV = false;
 
+    volumeControl = new VolumeControl(true);
+
     pthread_create(&event, NULL, EventThread, this);
 
     while (!runMainLoop)
@@ -100,6 +104,8 @@ TV::~TV(void)
         delete prbuffer;
     if (nvp)
         delete nvp;
+    if (volumeControl)
+        delete volumeControl;
 }
 
 TVState TV::LiveTV(void)
@@ -790,6 +796,10 @@ void TV::ProcessKeypress(int keypressed)
             }
             break;
         }
+        case '[':  ChangeVolume(false); break;
+        case ']':  ChangeVolume(true); break;
+        case '|':  ToggleMute(); break;
+
         default: 
         {
             if (doing_ff || doing_rew)
@@ -1427,6 +1437,42 @@ void TV::ChangeColour(bool up)
 
     if (activenvp == nvp)
         osd->SetSettingsText(text, text.length() );
+}
+
+void TV::ChangeVolume(bool up)
+{
+    if (!volumeControl)
+        return;
+
+    if (up)
+        volumeControl->AdjustCurrentVolume(2);
+    else 
+        volumeControl->AdjustCurrentVolume(-2);
+
+    int curvol = volumeControl->GetCurrentVolume();
+    QString text = QString("Volume %1 %").arg(curvol);
+
+    if (osd)
+        osd->StartPause(curvol * 10, true, "", text, 5);
+}
+
+void TV::ToggleMute(void)
+{
+    if (!volumeControl)
+        return;
+
+    volumeControl->ToggleMute();
+    bool muted = volumeControl->GetMute();
+
+    QString text;
+
+    if (muted)
+        text = "Mute On";
+    else
+        text = "Mute Off";
+ 
+    if (osd)
+        osd->SetSettingsText(text, 5);
 }
 
 void TV::EPGChannelUpdate(QString chanstr)

@@ -37,7 +37,13 @@ protected:
 const char* AudioOutputDevice::paths[] = { "/dev/dsp",
                                            "/dev/dsp1",
                                            "/dev/dsp2",
-                                           "/dev/sound/dsp" };
+                                           "/dev/dsp3",
+                                           "/dev/dsp4",
+                                           "/dev/sound/dsp",
+                                           "/dev/sound/dsp1"
+                                           "/dev/sound/dsp2"
+                                           "/dev/sound/dsp3"
+                                           "/dev/sound/dsp4" };
 
 AudioOutputDevice::AudioOutputDevice():
     ComboBoxSetting(true),
@@ -49,6 +55,60 @@ AudioOutputDevice::AudioOutputDevice():
             addSelection(paths[i]);
     }
 }
+
+class MixerDevice: public ComboBoxSetting, public GlobalSetting {
+public:
+    MixerDevice();
+protected:
+    static const char* paths[];
+};
+
+const char* MixerDevice::paths[] = { "/dev/mixer",
+                                     "/dev/mixer1",
+                                     "/dev/mixer2",
+                                     "/dev/mixer3",
+                                     "/dev/mixer4",
+                                     "/dev/sound/mixer",
+                                     "/dev/sound/mixer1",
+                                     "/dev/sound/mixer2",
+                                     "/dev/sound/mixer3",
+                                     "/dev/sound/mixer4" };
+
+MixerDevice::MixerDevice():
+    ComboBoxSetting(true),
+    GlobalSetting("MixerDevice") {
+
+    setLabel("Mixer Device");
+    for(unsigned int i = 0; i < sizeof(paths) / sizeof(char*); ++i) {
+        if (QFile(paths[i]).exists())
+            addSelection(paths[i]);
+    }
+}
+
+class MixerVolume: public SliderSetting, public GlobalSetting {
+public:
+    MixerVolume():
+	SliderSetting(0, 100, 10),
+        GlobalSetting("MasterMixerVolume") {
+        setLabel("Master Mixer Volume");
+        setValue(70);
+        setHelpText("Initial volume for the Master Mixer.  This affects "
+                    "all sound created by the soundcard.  Note: Do not "
+                    "set this too low." );
+        };
+};
+
+class PCMVolume: public SliderSetting, public GlobalSetting {
+public:
+    PCMVolume():
+        SliderSetting(0, 100, 10),
+        GlobalSetting("PCMMixerVolume") {
+        setLabel("PCM Mixer Volume");
+        setValue(70);
+        setHelpText("Initial volume for PCM output.  Use of the volume "
+                    "keys in MythTV will adjust this parameter.");
+        };
+};
 
 class Deinterlace: public CheckBoxSetting, public GlobalSetting {
 public:
@@ -657,6 +717,9 @@ PlaybackSettings::PlaybackSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel("General playback");
     general->addChild(new AudioOutputDevice());
+    general->addChild(new MixerDevice());
+    general->addChild(new MixerVolume());
+    general->addChild(new PCMVolume());
     general->addChild(new Deinterlace());
     general->addChild(new PlaybackExitPrompt());
     general->addChild(new EndOfRecordingExitPrompt());

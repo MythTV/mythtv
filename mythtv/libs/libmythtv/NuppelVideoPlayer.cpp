@@ -171,6 +171,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     cc = false;
 
     numbadioctls = 0;
+    numlowbuffer = 0;
 
     pthread_mutex_init(&eventLock, NULL);
 }
@@ -1799,9 +1800,18 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
         if (bytesperframe > space_on_soundcard)
         {
             //printf("waiting for space to write %d bytes on soundcard whish has %d bytes free\n", bytesperframe, space_on_soundcard);
+            numlowbuffer++;
+            if (numlowbuffer > 2 && audio_buffer_unused)
+            {
+                cerr << "dropping back audio_buffer_unused\n";
+                audio_buffer_unused /= 2;
+            }
+
             usleep(200);
             continue;
         }
+        else
+            numlowbuffer = 0;
 
         pthread_mutex_lock(&audio_buflock); // begin critical section
 

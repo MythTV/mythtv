@@ -24,6 +24,9 @@ Watching TV or a recording
 - Page Up to jump ahead the configured number of minutes.  (default is 10)
 - Page Down to jump back the configured number of minutes.  (default is 10)
 - T to toggle close caption support
+- [ to decrease volume
+- ] to increase volume
+- | to toggle mute
 
 Without the stickykeys option selected:
 

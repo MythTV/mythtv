@@ -17,6 +17,7 @@ class QSqlDatabase;
 class QDateTime;
 class OSD;
 class RemoteEncoder;
+class VolumeControl;
 
 class TV : public QObject
 {
@@ -65,6 +66,8 @@ class TV : public QObject
     void ChangeChannel(bool up);
     void ChangeChannelByString(QString &name);
 
+    void ChangeVolume(bool up);
+    void ToggleMute(void);
     void ChangeContrast(bool up);
     void ChangeBrightness(bool up);
     void ChangeColour(bool up);
@@ -164,6 +167,8 @@ class TV : public QObject
     ProgramInfo *playbackinfo;
 
     QSqlDatabase *m_db;
+
+    VolumeControl *volumeControl;
 };
 
 #endif

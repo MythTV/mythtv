@@ -377,6 +377,7 @@ class NuppelVideoPlayer
     long long bookmarkseek;
 
     int numbadioctls;
+    int numlowbuffer;
 };
 
 #endif
