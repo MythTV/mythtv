@@ -31,10 +31,10 @@ contains( CONFIG_AC3, yes ) {
     }
 }
 
-contains( CONFIG_MP3LAME, yes ) {
-    SOURCES += mp3lameaudio.c
-    LIBS += -lmp3lame
-}
+#contains( CONFIG_MP3LAME, yes ) {
+#    SOURCES += mp3lameaudio.c
+#    LIBS += -lmp3lame
+#}
 
 contains( TARGET_GPROF, yes ) {
     QMAKE_CFLAGS_RELEASE += -p
