@@ -381,6 +381,9 @@ QString VideoManager::parseData(QString data, QString beg, QString end)
     {
         ret = data.mid(start, endint - start);
 
+        ret.replace(QRegExp("&#38;"), "&");
+        ret.replace(QRegExp("&#34;"), "\"");
+
         if (debug == true)
             cout << "MythVideo: Parse HTML : Returning : " << ret << endl;
         return ret;
@@ -627,7 +630,6 @@ void VideoManager::ParseMovieData(QString data)
     moviePlot = parseData(data, "<b class=\"ch\">Plot Outline:</b> ", "<a href=\"");
     if (moviePlot == "<NULL>")
         moviePlot = parseData(data, "<b class=\"ch\">Plot Summary:</b> ", "<a href=\"");
-    moviePlot.replace(QRegExp("&#34;"), "\"");
 
     QString rating = parseData(data, "<b class=\"ch\">User Rating:</b>", " (");
     rating = parseData(rating, "<b>", "/");
