@@ -1863,7 +1863,6 @@ void ProgramInfo::EditScheduled(QSqlDatabase *db)
     if (gContext->GetNumSetting("AdvancedRecord", 0))
     {
         GetProgramRecordingStatus(db);
-        record->loadByProgram(db, this);
         record->exec(db);
     }
     else
