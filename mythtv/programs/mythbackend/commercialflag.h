@@ -29,13 +29,12 @@ class CommercialFlagger : public QObject
     void DoRestartUnfinishedJobs(void);
 
   private:
-    void ProcessUnflaggedRecordings(void);
+    void ProcessUnflaggedRecordings(QString flagHost = "");
     void FlagCommercials(ProgramInfo *tmpInfo);
     static void *FlagCommercialsThread(void *param);
     void DoFlagCommercialsThread(void);
 
     QMutex dblock;
-    QMutex flaglistlock;
     QMutex eventlock;
     QSqlDatabase *db;
 

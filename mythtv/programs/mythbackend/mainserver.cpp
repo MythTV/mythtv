@@ -531,6 +531,11 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         ScheduledRecording::signalChange(m_db);
         dblock.unlock();
 
+        QString message = QString("LOCAL_SLAVE_BACKEND_ONLINE %2")
+                                  .arg(commands[2]);
+        MythEvent me(message);
+        gContext->dispatch(me);
+
         playbackList.push_back(pbs);
     }
     else if (commands[1] == "RingBuffer")
@@ -2515,6 +2520,11 @@ void MainServer::endConnection(QSocket *socket)
                 dblock.lock();
                 ScheduledRecording::signalChange(m_db);
                 dblock.unlock();
+
+                QString message = QString("LOCAL_SLAVE_BACKEND_OFFLINE %2")
+                                          .arg((*it)->getHostname());
+                MythEvent me(message);
+                gContext->dispatch(me);
             }
             delete (*it);
             playbackList.erase(it);

@@ -29,8 +29,12 @@ CommercialFlagger::CommercialFlagger(bool master, QSqlDatabase *ldb)
 
     gContext->addListener(this);
 
-    pthread_t restartThread;
-    pthread_create(&restartThread, NULL, RestartUnfinishedJobs, this);
+    if ((gContext->GetNumSetting("AutoCommercialFlag", 1)) &&
+        (isMaster))
+    {
+        pthread_t restartThread;
+        pthread_create(&restartThread, NULL, RestartUnfinishedJobs, this);
+    }
 }
 
 CommercialFlagger::~CommercialFlagger(void)
@@ -55,10 +59,13 @@ void CommercialFlagger::customEvent(QCustomEvent *e)
             QString detectionHost = tokens[4];
             QString key = QString("%1_%2").arg(tokens[2]).arg(tokens[3]);
 
+            dblock.lock();
             ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(db,
                                       chanid, startts);
+            dblock.unlock();
 
             if ((action == "START") &&
+                (!flaggingList.contains(key)) &&
                 ((detectionHost == gContext->GetHostName()) ||
                 ((detectionHost == "master") && (isMaster))))
             {
@@ -74,6 +81,30 @@ void CommercialFlagger::customEvent(QCustomEvent *e)
                     *(flaggingSems[key]) = true;
                 eventlock.unlock();
             }
+        }
+        else if ((isMaster) &&
+                 (message.left(26) == "LOCAL_SLAVE_BACKEND_ONLINE"))
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            QString slaveHost = tokens[1];
+            QString detectionHost = gContext->GetSetting("CommercialSkipHost");
+
+            if ((gContext->GetNumSetting("AutoCommercialFlag", 1)) &&
+                (detectionHost == slaveHost))
+                ProcessUnflaggedRecordings();
+        }
+        else if ((isMaster) &&
+                 (message.left(27) == "LOCAL_SLAVE_BACKEND_OFFLINE"))
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            QString slaveHost = tokens[1];
+            QString detectionHost = gContext->GetSetting("CommercialSkipHost");
+
+            if ((gContext->GetNumSetting("AutoCommercialFlag", 1)) &&
+                (detectionHost == "Default"))
+                ProcessUnflaggedRecordings(slaveHost);
         }
     }
 }
@@ -174,8 +205,7 @@ void CommercialFlagger::DoRestartUnfinishedJobs()
 {
     sleep(10);
 
-    if ( isMaster )
-        ProcessUnflaggedRecordings();
+    ProcessUnflaggedRecordings();
 }
 
 void *CommercialFlagger::RestartUnfinishedJobs(void *param)
@@ -186,11 +216,15 @@ void *CommercialFlagger::RestartUnfinishedJobs(void *param)
     return NULL;
 }
 
-void CommercialFlagger::ProcessUnflaggedRecordings(void)
+void CommercialFlagger::ProcessUnflaggedRecordings(QString flagHost)
 {
-    QString querystr = QString("SELECT DISTINCT chanid, starttime "
+    QString querystr = QString("SELECT DISTINCT chanid, starttime, hostname "
                        "FROM recorded "
-                       "WHERE commflagged = %1;").arg(COMM_FLAG_PROCESSING);
+                       "WHERE ( commflagged = %1 ) "
+                       "OR ( commflagged = %2 AND endtime < now());")
+                       .arg(COMM_FLAG_PROCESSING)
+                       .arg(COMM_FLAG_NOT_FLAGGED);
+    dblock.lock();
     QSqlQuery query = db->exec(querystr);
     QString detectionHost = gContext->GetSetting("CommercialSkipHost");
 
@@ -201,12 +235,16 @@ void CommercialFlagger::ProcessUnflaggedRecordings(void)
     {
         while (query.next())
         {
-            QString message = QString("GLOBAL_COMMFLAG START %1 %2 %3")
-                                        .arg(query.value(0).toString())
-                                        .arg(query.value(1).toString())
-                                        .arg(detectionHost);
-            MythEvent me(message);
-            gContext->dispatch(me);
+            if ((flagHost == "") || (flagHost == query.value(2).toString()))
+            {
+                QString message = QString("GLOBAL_COMMFLAG START %1 %2 %3")
+                                            .arg(query.value(0).toString())
+                                            .arg(query.value(1).toString())
+                                            .arg(detectionHost);
+                MythEvent me(message);
+                gContext->dispatch(me);
+            }
         }
     }
+    dblock.unlock();
 }
