@@ -67,6 +67,9 @@ class PlaybackBox : public MythDialog
     bool ignoreevents;
     bool playbackPreview;
     bool generatePreviewPixmap;
+    bool displayChanNum;
+    QString dateformat;
+    QString timeformat;
 };
 
 #endif

@@ -136,8 +136,11 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     grid->setColStretch(1, 1);
     grid->setRowStretch(4, 1);
 
-    playbackPreview = (context->GetNumSetting("PlaybackPreview") == 1);
-    generatePreviewPixmap = (context->GetNumSetting("GeneratePreviewPixmaps") == 1);
+    playbackPreview = (context->GetNumSetting("PlaybackPreview") != 0);
+    generatePreviewPixmap = (context->GetNumSetting("GeneratePreviewPixmaps") != 0);
+    displayChanNum = (context->GetNumSetting("DisplayChanNum") != 0);
+    dateformat = context->GetSetting("DateFormat", "ddd MMMM d");
+    timeformat = context->GetSetting("TimeFormat");
 
     if (playbackPreview || generatePreviewPixmap)
     {
@@ -371,13 +374,6 @@ void PlaybackBox::changed(QListViewItem *lvitem)
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
        
-    QString dateformat = m_context->GetSetting("DateFormat");
-    if (dateformat == "")
-        dateformat = "ddd MMMM d";
-    QString timeformat = m_context->GetSetting("TimeFormat");
-    if (timeformat == "")
-        timeformat = "h:mm AP";
-
     QString timedate = endts.date().toString(dateformat) + QString(", ") +
                        startts.time().toString(timeformat) + QString(" - ") +
                        endts.time().toString(timeformat);
@@ -385,7 +381,7 @@ void PlaybackBox::changed(QListViewItem *lvitem)
     date->setText(timedate);
 
     QString chantext;
-    if (m_context->GetNumSetting("DisplayChanNum") == 0)
+    if (displayChanNum)
         chantext = rec->channame + " [" + rec->chansign + "]";
     else
         chantext = rec->chanstr;
@@ -497,13 +493,6 @@ void PlaybackBox::remove(QListViewItem *lvitem)
     
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
-
-    QString dateformat = m_context->GetSetting("DateFormat");
-    if (dateformat == "")
-        dateformat = "ddd MMMM d";
-    QString timeformat = m_context->GetSetting("TimeFormat");
-    if (timeformat == "")
-        timeformat = "h:mm AP";
 
     QString timedate = endts.date().toString(dateformat) + QString(", ") +
                        startts.time().toString(timeformat) + QString(" - ") +
