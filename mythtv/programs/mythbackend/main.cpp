@@ -115,6 +115,7 @@ int main(int argc, char **argv)
     QApplication a(argc, argv, false);
 
     QString logfile = "";
+    QString binname = basename(a.argv()[0]);
     QString verboseString = QString(" important general");
 
     bool daemonize = false;
@@ -455,6 +456,9 @@ int main(int argc, char **argv)
 
     QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
     trans = new Transcoder(&tvList, trandb);
+
+    VERBOSE(VB_ALL, QString("%1 version: %2 GPL www.mythtv.org")
+                            .arg(binname).arg(MYTH_BINARY_VERSION));
 
     VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
