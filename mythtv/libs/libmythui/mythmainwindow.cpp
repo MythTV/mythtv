@@ -318,12 +318,13 @@ void MythMainWindow::closeEvent(QCloseEvent *e)
 
 void MythMainWindow::Init(void)
 {
-/*
+
     gContext->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
                                 d->ybase, d->screenheight, d->hmult);
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
+/*
     setFont(gContext->GetMediumFont());
     setCursor(QCursor(Qt::BlankCursor));
 */

@@ -45,4 +45,10 @@ using_x11 {
     LIBS += -L/usr/X11R6/lib -lXinerama
 }
 
+macx {
+    LIBS += -framework OpenGL
+    # Duplication of source with libmyth (e.g. oldsettings.cpp)
+    # means that the linker complains, so we have to ignore duplicates 
+    QMAKE_LFLAGS_SHLIB += -multiply_defined suppress
+}
 
