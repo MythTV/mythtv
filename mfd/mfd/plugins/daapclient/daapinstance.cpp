@@ -543,6 +543,13 @@ bool DaapInstance::checkServerType(const QString &server_description)
                     copasetic = false;
                 }
             }
+            else if(itunes_sub_version == 6)
+            {
+                if(daap_server_type != DAAP_SERVER_ITUNES46)
+                {
+                    copasetic = false;
+                }
+            }
             else
             {
                 if(daap_server_type != DAAP_SERVER_ITUNES4X)
@@ -605,6 +612,10 @@ bool DaapInstance::checkServerType(const QString &server_description)
                 else if(itunes_sub_version == 5)
                 {
                     daap_server_type = DAAP_SERVER_ITUNES45;
+                }
+                else if(itunes_sub_version == 6)
+                {
+                    daap_server_type = DAAP_SERVER_ITUNES46;
                 }
                 else
                 {

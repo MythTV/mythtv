@@ -354,6 +354,10 @@ void DaapServer::parsePath(HttpInRequest *http_request, DaapRequest *daap_reques
             {
                 daap_request->setClientType(DAAP_CLIENT_ITUNES45);
             }
+            else if(itunes_sub_version == 6)
+            {
+                daap_request->setClientType(DAAP_CLIENT_ITUNES46);
+            }
             else
             {
                 warning(QString("daapserver does not yet have "
@@ -396,7 +400,8 @@ void DaapServer::sendServerInfo(HttpInRequest *http_request, DaapRequest *daap_r
                 //  get
                 //
                 
-                if(daap_request->getClientType() == DAAP_CLIENT_ITUNES45)
+                if(daap_request->getClientType() == DAAP_CLIENT_ITUNES45 ||
+                   daap_request->getClientType() == DAAP_CLIENT_ITUNES46)
                 {
                     response << Tag('apro') << daapVersion3 << end ;
                 }
