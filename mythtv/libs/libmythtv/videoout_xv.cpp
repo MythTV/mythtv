@@ -53,8 +53,9 @@ void XvVideoOutput::sizehint(int x, int y, int width, int height, int max)
    XSetWMNormalHints(XJ_disp, XJ_win, &hints);
 }
 
-unsigned char *XvVideoOutput::Init(int width, int height, char *window_name, 
-                                   char *icon_name)
+bool XvVideoOutput::Init(int width, int height, char *window_name, 
+                         char *icon_name, int num_buffers, 
+                         unsigned char **out_buffers)
 {
   XWMHints wmhints;
   XTextProperty windowName, iconName;
@@ -73,7 +74,7 @@ unsigned char *XvVideoOutput::Init(int width, int height, char *window_name,
   XInitThreads();
 
   XJ_disp=XOpenDisplay(NULL);
-  if(!XJ_disp) {printf("open display failed\n"); return NULL;}
+  if(!XJ_disp) {printf("open display failed\n"); return false;}
   
   XJ_screen=DefaultScreenOfDisplay(XJ_disp);
   XJ_screen_num=DefaultScreen(XJ_disp);
@@ -91,7 +92,7 @@ unsigned char *XvVideoOutput::Init(int width, int height, char *window_name,
   XJ_win=XCreateSimpleWindow(XJ_disp,XJ_root,0,0,XJ_width,XJ_height,0,XJ_white,XJ_black);
   if(!XJ_win) {  
     printf("create window failed\n");
-    return(NULL); 
+    return false; 
   }
  
   curx = 0; cury = 0;
@@ -190,26 +191,34 @@ unsigned char *XvVideoOutput::Init(int width, int height, char *window_name,
 
   XJ_gc = XCreateGC(XJ_disp, XJ_win, 0, 0);
   XJ_depth = DefaultDepthOfScreen(XJ_screen);
-  XJ_image = XvShmCreateImage(XJ_disp, xv_port, colorid, 0, 
-                              XJ_width, XJ_height, &XJ_SHMInfo);
-  XJ_SHMInfo.shmid=shmget(IPC_PRIVATE, XJ_image->data_size,
-		          IPC_CREAT|0777);
+  XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
+  for (int i = 0; i < num_buffers; i++)
+  {
+      XvImage *image = XvShmCreateImage(XJ_disp, xv_port, colorid, 0,
+                                        XJ_width, XJ_height, &XJ_SHMInfo[i]);
+      XJ_SHMInfo[i].shmid = shmget(IPC_PRIVATE, image->data_size,
+                                   IPC_CREAT|0777);
+      if (XJ_SHMInfo[i].shmid < 0)
+      {
+          perror("shmget failed:");
+          return false;
+      }
+ 
+      image->data = XJ_SHMInfo[i].shmaddr = (char *)shmat(XJ_SHMInfo[i].shmid,
+                                                          0, 0);
+      buffers[(unsigned char *)image->data] = image;
+      out_buffers[i] = (unsigned char *)image->data;
 
-  if(XJ_SHMInfo.shmid < 0) {
-    perror("shmget failed:");
-    return (NULL);
+      XJ_SHMInfo[i].readOnly = False;
+
+      XShmAttach(XJ_disp, &XJ_SHMInfo[i]);
+      XSync(XJ_disp, 0);
   }
 
-  XJ_image->data = XJ_SHMInfo.shmaddr = (char *)shmat(XJ_SHMInfo.shmid, 0, 0);
-  XJ_SHMInfo.readOnly = False;
- 
-  XShmAttach(XJ_disp, &XJ_SHMInfo);
-
-  XSync(XJ_disp, 0);
   XSetErrorHandler(old_handler);
 
   if (XJ_caught_error) {
-      return 0;
+      return false;
   }
   
   XJ_started=1;
@@ -221,7 +230,7 @@ unsigned char *XvVideoOutput::Init(int width, int height, char *window_name,
       scratchspace = new unsigned char[width * height * 3 / 2];
   }
 
-  return((unsigned char *)XJ_image->data);
+  return true;
 }
 
 void XvVideoOutput::Exit(void)
@@ -231,19 +240,23 @@ void XvVideoOutput::Exit(void)
 
     //if (XJ_image)
     //  XvDestroyImage(XJ_image);
-    XShmDetach(XJ_disp, &XJ_SHMInfo);
+    int i = 0;
+    for(map<unsigned char *, XvImage *>::iterator iter = buffers.begin() ;
+        iter != buffers.end() ; 
+        ++iter, ++i) 
+    {
+       XShmDetach(XJ_disp, &XJ_SHMInfo[i]);
+       if(XJ_SHMInfo[i].shmaddr)
+         shmdt(XJ_SHMInfo[i].shmaddr);
+       if(XJ_SHMInfo[i].shmid > 0)
+         shmctl(XJ_SHMInfo[i].shmid, IPC_RMID, 0);
+       XFree(iter->second);
+    }
 
-    if(XJ_SHMInfo.shmaddr)
-      shmdt(XJ_SHMInfo.shmaddr);
-
-    if(XJ_SHMInfo.shmid > 0)
-      shmctl(XJ_SHMInfo.shmid, IPC_RMID, 0);
+    delete [] XJ_SHMInfo;
 
     if (scratchspace)
         delete [] scratchspace;
-
-    if (XJ_image)
-        XFree(XJ_image);
 
     XvUngrabPort(XJ_disp, xv_port, CurrentTime);
     XDestroyWindow(XJ_disp, XJ_win);
@@ -305,20 +318,22 @@ void XvVideoOutput::ToggleFullScreen(void)
   XFlush(XJ_disp);
 }
    
-void XvVideoOutput::Show(int width, int height)
+void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
 {
+  XvImage *image = buffers[buffer];
+
   if (colorid == GUID_YV12_PLANAR)
   {
-      memcpy(scratchspace, (unsigned char *)XJ_image->data + (width * height),
+      memcpy(scratchspace, (unsigned char *)image->data + (width * height),
              width * height / 4);
-      memcpy((unsigned char *)XJ_image->data + (width * height),
-             (unsigned char *)XJ_image->data + (width * height) * 5 / 4,
+      memcpy((unsigned char *)image->data + (width * height),
+             (unsigned char *)image->data + (width * height) * 5 / 4,
              width * height / 4);
-      memcpy((unsigned char *)XJ_image->data + (width * height) * 5 / 4,
+      memcpy((unsigned char *)image->data + (width * height) * 5 / 4,
              scratchspace, width * height / 4);
   }
-     
-  XvShmPutImage(XJ_disp, xv_port, XJ_win, XJ_gc, XJ_image, 0, 0, width, 
+    
+  XvShmPutImage(XJ_disp, xv_port, XJ_win, XJ_gc, image, 0, 0, width, 
                 height, 0, 0, curw, curh, False);
   XSync(XJ_disp, False);
 }

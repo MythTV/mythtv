@@ -7,15 +7,19 @@
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
 
+#include <map>
+using namespace std;
+
 class XvVideoOutput
 {
   public:
     XvVideoOutput() { XJ_started = 0; xv_port = -1; scratchspace = NULL; }
    ~XvVideoOutput() { Exit(); }
 
-    unsigned char *Init(int width, int height, char *window_name, 
-                        char *icon_name);
-    void Show(int width, int height);
+    bool Init(int width, int height, char *window_name, 
+              char *icon_name, int num_buffers, 
+              unsigned char **out_buffers);
+    void Show(unsigned char *buffer, int width, int height);
     int CheckEvents(void);
 
     void ToggleFullScreen();
@@ -28,11 +32,11 @@ class XvVideoOutput
     void hide_cursor(void);
     void show_cursor(void);
 
-    XShmSegmentInfo XJ_SHMInfo;
+    map<unsigned char *,XvImage *> buffers;
+    XShmSegmentInfo *XJ_SHMInfo;
     Screen *XJ_screen;
     Display *XJ_disp;
     Window XJ_root,XJ_win;
-    XvImage *XJ_image;
 
     XEvent XJ_ev;
     GC XJ_gc;

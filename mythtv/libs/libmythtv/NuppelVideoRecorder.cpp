@@ -1701,16 +1701,6 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
     }
 
     frameheader.frametype = 'A'; // audio frame
-
-    if (compressaudio) 
-    {
-        frameheader.comptype  = '3'; // audio is compressed
-    }
-    else 
-    {
-        frameheader.comptype  = '0'; // audio is uncompressed
-        frameheader.packetlength = audio_buffer_size;
-    }
     frameheader.timecode = timecode;
 
     if (firsttc == -1) 
@@ -1765,6 +1755,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         }
         gaplesssize = lameret;
 
+        frameheader.comptype = '3'; // audio is compressed
         frameheader.packetlength = compressedsize + gaplesssize;
 
         if (frameheader.packetlength > 0)
@@ -1777,6 +1768,9 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
     } 
     else 
     {
+        frameheader.comptype = '0'; // uncompressed audio
+        frameheader.packetlength = audio_buffer_size;
+
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
         ringBuffer->Write(buf, audio_buffer_size);
         audiobytes += audio_buffer_size; // only audio no header!!

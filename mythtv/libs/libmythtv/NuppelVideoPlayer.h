@@ -59,18 +59,14 @@ class NuppelVideoPlayer
     bool TogglePause(void) { if (paused) Unpause(); else Pause(); 
                              return paused; 
                            }
-    void Pause(void) { paused = true; actuallypaused = false; 
-                       audio_actually_paused = false; 
-                       video_actually_paused = false; }
-    void Unpause(void) { paused = false; }
+    void Pause(void);
+    void Unpause(void); 
     bool GetPause(void);
    
     void AdvanceOneFrame(void) { advancedecoder = true; } 
  
-    void FastForward(float seconds) 
-                                { fftime = (int)(seconds * video_frame_rate); }
-    void Rewind(float seconds) 
-                            { rewindtime = (int)(seconds * video_frame_rate); }
+    void FastForward(float seconds);
+    void Rewind(float seconds);
 
     void ResetPlaying(void) { resetplaying = true; actuallyreset = false; }
     bool ResetYet(void) { return actuallyreset; }
@@ -125,18 +121,27 @@ class NuppelVideoPlayer
     
  private:
     void InitSound(void);
+    void InitVideo(void);
     void WriteAudio(unsigned char *aubuf, int size);
 
     void InitFilters(void);
     int InitSubs(void);
-    
+   
+    bool GetVideoPause(void);
+    void PauseVideo(void);
+    void UnpauseVideo(void);
+
+    bool GetAudioPause(void);
+    void PauseAudio(void);
+    void UnpauseAudio(void);
+ 
     int OpenFile(bool skipDsp = false);
     int CloseFile(void);
 
     int GetAudiotime(void);
     void SetAudiotime(void);
-    unsigned char *DecodeFrame(struct rtframeheader *frameheader,
-                               unsigned char *strm);
+    bool DecodeFrame(struct rtframeheader *frameheader,
+                     unsigned char *strm, unsigned char *outbuf);
     void GetFrame(int onlyvideo);
     
     long long CalcMaxFFTime(long long ff);
@@ -178,9 +183,11 @@ class NuppelVideoPlayer
     int eof;
     int video_width;
     int video_height;
+    int video_size;
     double video_frame_rate;
     unsigned char *buf;
     unsigned char *buf2;
+    unsigned char *directbuf;
     char lastct;
     int effdsp; // from the recorded stream
     int audio_samplerate; // rate to tell the output device
@@ -197,7 +204,7 @@ class NuppelVideoPlayer
     int usepre;		/* number of slots to keep full */
     bool prebuffering;	/* don't play until done prebuffering */ 
     int timecodes[MAXVBUFFER];	/* timecode for each slot */
-    unsigned char *vbuffer[MAXVBUFFER];	/* decompressed video data */
+    unsigned char *vbuffer[MAXVBUFFER+1];	/* decompressed video data */
 
     /* Audio circular buffer */
     unsigned char audiobuffer[AUDBUFSIZE];	/* buffer */
@@ -237,7 +244,7 @@ class NuppelVideoPlayer
     RTjpeg *rtjd;
     uint8_t *planes[3];
 
-    int paused;
+    bool paused, pausevideo, pauseaudio;
     bool actuallypaused, audio_actually_paused, video_actually_paused;
 
     bool playing;
@@ -245,6 +252,8 @@ class NuppelVideoPlayer
     RingBuffer *ringBuffer;
     bool weMadeBuffer; 
     bool killplayer;
+    bool killaudio;
+    bool killvideo;
 
     long long framesPlayed;
     
@@ -279,6 +288,9 @@ class NuppelVideoPlayer
     AVCodecContext *mpa_ctx;
     AVPicture mpa_picture;
     AVPicture tmppicture;
+    bool directrendering;
+    friend int get_buffer(struct AVCodecContext *c, int width, int height,
+                          int pict_type);
 
     bool disablevideo;
     bool disableaudio;
@@ -315,6 +327,8 @@ class NuppelVideoPlayer
 
     int ffmpeg_extradatasize;
     char *ffmpeg_extradata;
+
+    bool own_vidbufs;
 };
 
 #endif

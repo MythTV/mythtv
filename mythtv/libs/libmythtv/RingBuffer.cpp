@@ -78,7 +78,6 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
     in_dtor = 0;
 
     fd = open(filename, flags, mode);
-    child_live = 0;
 
     if(fd<=0)
     {
@@ -89,7 +88,6 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
     {
 	buf = (char *)malloc(TFW_BUF_SIZE);
 
-	child_live = 1;
 	pthread_create(&writer, NULL, boot_writer, this);
     }
 }
@@ -98,10 +96,7 @@ ThreadedFileWriter::~ThreadedFileWriter()
 {
     in_dtor = 1; /* tells child thread to exit */
 
-    while(child_live)
-    {
-	usleep(10000);
-    }
+    pthread_join(writer, NULL);
 
     close(fd);
     fd = -1;
@@ -190,7 +185,6 @@ void ThreadedFileWriter::DiskLoop()
 	rpos = (rpos + size) % TFW_BUF_SIZE;
 	pthread_mutex_unlock(&buflock);
     }
-    child_live=0;
 }
 
 unsigned ThreadedFileWriter::BufUsed()

@@ -26,7 +26,6 @@ private:
     unsigned rpos,wpos;
     pthread_mutex_t buflock;
     int in_dtor;
-    int child_live;
     pthread_t writer;
 };
 
