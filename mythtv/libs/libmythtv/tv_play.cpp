@@ -972,7 +972,7 @@ void TV::ProcessKeypress(int keypressed)
     {
         switch (keypressed)
         {
-            case 'i': case 'I': UpdateOSD(); break;
+            case 'i': case 'I': ToggleOSD(); break;
 
             case wsUp: ChangeChannel(CHANNEL_DIRECTION_UP); break;
             case wsDown: ChangeChannel(CHANNEL_DIRECTION_DOWN); break;
@@ -1585,15 +1585,19 @@ void TV::SetPreviousChannel()
         osd->HideSet("channel_number");
 }
 
-void TV::UpdateOSD(void)
+void TV::ToggleOSD(void)
 {
     if (osd->Visible())
     {
         osd->HideSet("program_info");
         osd->HideSet("channel_number");
-        return;
     }
+    else
+        UpdateOSD();
+}
 
+void TV::UpdateOSD(void)
+{
     QString title, subtitle, desc, category, starttime, endtime;
     QString callsign, iconpath, channelname, chanid;
 

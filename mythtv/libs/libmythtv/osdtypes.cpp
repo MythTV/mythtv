@@ -547,6 +547,21 @@ void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
     if (width + xstart > vid_width)
         width = vid_width - xstart - 1;
 
+    int startline = 0;
+    int startcol = 0;
+
+    if (ystart < 0)
+    {
+        startline = 0 - ystart;
+        ystart = 0;
+    }
+
+    if (xstart < 0)
+    {
+        startcol = 0 - xstart;
+        xstart = 0;
+    }
+   
     int ysrcwidth;
     int ydestwidth;
 
@@ -555,12 +570,12 @@ void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
 
-    for (int y = 0; y < height; y++)
+    for (int y = startline; y < height; y++)
     {
         ysrcwidth = y * width;
         ydestwidth = (y + ystart) * vid_width;
 
-        for (int x = 0; x < width; x++)
+        for (int x = startcol; x < width; x++)
         {
             alpha = *(m_alpha + x + ysrcwidth);
 
@@ -584,15 +599,18 @@ void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
     ystart /= 2;
     xstart /= 2;
 
+    startline /= 2;
+    startcol /= 2;
+
     unsigned char *destuptr = screenptr + (vid_width * vid_height);
     unsigned char *destvptr = screenptr + (vid_width * vid_height * 5 / 4);
 
-    for (int y = 0; y < height; y++)
+    for (int y = startline; y < height; y++)
     {
         ysrcwidth = y * width;
         ydestwidth = (y + ystart) * (vid_width / 2);
 
-        for (int x = 0; x < width; x++)
+        for (int x = startcol; x < width; x++)
         {
             alpha = *(m_alpha + x * 2 + y * 2 * iwidth);
 
@@ -711,6 +729,21 @@ void OSDTypeFillSlider::Draw(unsigned char *screenptr, int vid_width,
     if (width + xstart > vid_width)
         width = vid_width - xstart - 1;
 
+    int startline = 0;
+    int startcol = 0;
+
+    if (ystart < 0)
+    {
+        startline = 0 - ystart;
+        ystart = 0;
+    }
+
+    if (xstart < 0)
+    {
+        startcol = 0 - xstart;
+        xstart = 0;
+    }
+
     int ysrcwidth;
     int ydestwidth;
 
@@ -719,12 +752,12 @@ void OSDTypeFillSlider::Draw(unsigned char *screenptr, int vid_width,
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
 
-    for (int y = 0; y < height; y++)
+    for (int y = startline; y < height; y++)
     {
         ysrcwidth = y * iwidth;
         ydestwidth = (y + ystart) * vid_width;
 
-        for (int x = 0; x < width; x++)
+        for (int x = startcol; x < width; x++)
         {
             alpha = *(m_alpha + ysrcwidth);
 
@@ -749,15 +782,18 @@ void OSDTypeFillSlider::Draw(unsigned char *screenptr, int vid_width,
     ystart /= 2;
     xstart /= 2;
 
+    startline /= 2;
+    startcol /= 2;
+
     unsigned char *destuptr = screenptr + (vid_width * vid_height);
     unsigned char *destvptr = screenptr + (vid_width * vid_height * 5 / 4);
 
-    for (int y = 0; y < height; y++)
+    for (int y = startline; y < height; y++)
     {
         ysrcwidth = y * iwidth;
         ydestwidth = (y + ystart) * (vid_width / 2);
 
-        for (int x = 0; x < width; x++)
+        for (int x = startcol; x < width; x++)
         {
             alpha = *(m_alpha + y * 2 * iwidth);
 
@@ -897,7 +933,22 @@ void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
         height = vid_height - ystart - 1;
     if (width + xstart > vid_width)  
         width = vid_width - xstart - 1;
-                 
+                
+    int startline = 0;
+    int startcol = 0;
+
+    if (ystart < 0)
+    {
+        startline = 0 - ystart;
+        ystart = 0;
+    }
+
+    if (xstart < 0)
+    {
+        startcol = 0 - xstart;
+        xstart = 0;
+    }
+ 
     int ysrcwidth;              
     int ydestwidth;
     
@@ -911,11 +962,11 @@ void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
     unsigned char *ubuf;
     unsigned char *vbuf;
 
-    for (int y = 0; y < height; y++)
+    for (int y = startline; y < height; y++)
     {
         ydestwidth = (y + ystart) * vid_width;
 
-        for (int x = 0; x < width; x++)
+        for (int x = startcol; x < width; x++)
         {
             if (m_drawMap[x] == 0)
             {
@@ -954,14 +1005,17 @@ void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
     ystart /= 2;
     xstart /= 2;
 
+    startline /= 2;
+    startcol /= 2;
+
     unsigned char *destuptr = screenptr + (vid_width * vid_height);
     unsigned char *destvptr = screenptr + (vid_width * vid_height * 5 / 4);
 
-    for (int y = 0; y < height; y++)
+    for (int y = startline; y < height; y++)
     {
         ydestwidth = (y + ystart) * (vid_width / 2);
 
-        for (int x = 0; x < width; x++)
+        for (int x = startcol; x < width; x++)
         {
             if (m_drawMap[x * 2] == 0)
             {
@@ -1155,13 +1209,20 @@ void OSDTypePositionRectangle::Draw(unsigned char *screenptr, int vid_width,
 
     for (int y = ystart; y < yend; y++)
     {
+        if (y < 0 || y >= vid_height)
+            continue;
+
         for (int x = xstart; x < xstart + 2; x++)
         {
+            if (x < 0 || x >= vid_width)
+                continue;
             src = screenptr + x + y * vid_width;
             *src = 255;
         }
         for (int x = xend - 2; x < xend; x++)
         {
+            if (x < 0 || x >= vid_width)
+                continue;
             src = screenptr + x + y * vid_width;
             *src = 255;
         }
@@ -1169,13 +1230,20 @@ void OSDTypePositionRectangle::Draw(unsigned char *screenptr, int vid_width,
 
     for (int x = xstart; x < xend; x++)
     {
+        if (x < 0 || x >= vid_width)
+            continue;
+
         for (int y = ystart; y < ystart + 2; y++)
         {
+            if (y < 0 || y >= vid_height)
+                continue;
             src = screenptr + x + y * vid_width;
             *src = 255;
         }
         for (int y = yend - 2; y < yend; y++)
         {
+            if (y < 0 || y >= vid_height)
+                continue;
             src = screenptr + x + y * vid_width;
             *src = 255;
         }
