@@ -154,10 +154,11 @@
         -->
 
         <container name="background">
-            <image name="filler" draworder="0" fleximage="yes">
+            <!--<image name="filler" draworder="0" fleximage="yes">
                 <filename>music/mm-background.png</filename>
                 <position>0,10</position>
             </image>
+            -->
             <!-- <image name="titlelines" draworder="0" fleximage="no">
                 <filename>trans-titles.png</filename>
                 <position>0,10</position>
@@ -169,7 +170,7 @@
             </image>
             <image name="music/mm_blackhole_border" draworder="0" fleximage="no">
                 <filename>music/mm_blackhole_border.png</filename>
-                <position>130,330</position>
+                <position>120,330</position>
             </image>
             
         </container>
@@ -195,7 +196,7 @@
                 <!--
                     An image to show the current navigation node
                 -->
-                <image function="selectionbar" filename="music/mm_selectionbar.png"></image>
+                <image function="selectionbar" filename="shared/long_bar.png" padding="15" location="-17,-6"></image>
                 <!--
                     Some arrow images
                 -->
@@ -228,14 +229,14 @@
 
             <!--
                 An image that go "on top" of the list bins
-            -->
+            
 
             <image name="showinglines" draworder="2" fleximage="yes">
                 <context>1</context>
                 <filename>music/mm-showings.png</filename>
                 <position>0,0</position>
             </image>
-
+            -->
             <!--
                 An image for when we're waiting for data
             -->
@@ -320,7 +321,7 @@
             </textarea>
 
             <blackhole name="visual_blackhole">
-                <area>137,22,118,122</area>
+                <area>125,22,118,122</area>
             </blackhole>
 
         </container>
