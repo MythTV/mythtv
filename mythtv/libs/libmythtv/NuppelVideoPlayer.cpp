@@ -2799,7 +2799,7 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             UpdateTimeDisplay();
             break; 
         }
-        case wsEscape: case 'e': case 'E':
+        case wsEscape: case 'e': case 'E': case 'm': case 'M':
         {
             DisableEdit();
             break;
