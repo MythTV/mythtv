@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-07-29, v2.55
+<date>2003-08-03, v2.56
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -176,6 +176,11 @@ CPU impact.
 See the Troubleshooting <ref id="Setting_DMA" name="section"> for more
 information.
 
+<sect2>Filesystems
+<p>MythTV creates large files, many in excess of 2GB.  You <em>must</em> use a
+filesystem that will allow you to create large files.  Filesystems known to
+have issues are FAT and FAT32.
+
 <label id="video_capture_device">
 <sect2>Video Capture Device 
 <p>In order to watch live TV, MythTV will need one or more video capture
@@ -236,6 +241,10 @@ for Live TV at 416x480.
 
 See the <ref id="pvr250" name="I'd like to use a hardware MPEG-2 encoder">
 section for information on installing a PVR-250 on Mandrake 9.1.
+
+<bf>NOTE</bf>:  The ATI All-in-Wonder cards <em>will not</em> work as a
+MythTV capture device.  The cards do not use the V4L drivers, and the gatos
+drivers that are available provide a limited subset of the V4L API.
 
 <sect2>Sound card
 <p>The system needs a sound card or an onboard equivalent on the motherboard
@@ -4270,6 +4279,9 @@ sources to inputs unless there's something actually on them.  Add link to
 troubleshooting audio in Alsa section.  Modify lirc section so people don't
 get confused about the example vs. _their_ setup.  Add IR keyboard/learning
 remote option to lirc section.
+v2.56, 2003-08-03.  version 2^8.  ATI All-in-Wonder doesn't work as a capture
+device, so quit asking.  Don't use a FAT filesystem and expect things to
+magically work when creating a 2GB file.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

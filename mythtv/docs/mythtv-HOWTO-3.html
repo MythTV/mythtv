@@ -101,6 +101,12 @@ CPU impact.</P>
 <P>See the Troubleshooting 
 <A HREF="mythtv-HOWTO-18.html#Setting_DMA">section</A> for more
 information.</P>
+
+<H3>Filesystems</H3>
+
+<P>MythTV creates large files, many in excess of 2GB.  You <EM>must</EM> use a
+filesystem that will allow you to create large files.  Filesystems known to
+have issues are FAT and FAT32.</P>
 <P>
 <A NAME="video_capture_device"></A> </P>
 <H3>Video Capture Device </H3>
@@ -160,6 +166,9 @@ for Live TV at 416x480.</LI>
 <P>See the 
 <A HREF="mythtv-HOWTO-19.html#pvr250">I'd like to use a hardware MPEG-2 encoder</A>
 section for information on installing a PVR-250 on Mandrake 9.1.</P>
+<P><B>NOTE</B>:  The ATI All-in-Wonder cards <EM>will not</EM> work as a
+MythTV capture device.  The cards do not use the V4L drivers, and the gatos
+drivers that are available provide a limited subset of the V4L API.</P>
 
 <H3>Sound card</H3>
 
