@@ -190,6 +190,8 @@ class Weather : public MythDialog
 
     QPixmap realBackground;
     bool allowkeys;  
+    
+    int weatherTimeoutInt;
 };
 
 

@@ -34,7 +34,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/inetcomms.h>
 
-static const int weatherTimeoutInt = 10000;
+
 
 using namespace std;
 
@@ -46,7 +46,10 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     stopProcessing = false;
 
     allowkeys = true;
-
+   
+    weatherTimeoutInt = gContext->GetNumSetting("WeatherTimeout", 10);
+    weatherTimeoutInt *= 1000;
+    
     config = db;
     debug = false;
     if (appCode == 1)
@@ -1971,25 +1974,40 @@ bool Weather::UpdateData()
     }
     
     bool haveData = false;
+    bool wantRetry = true;
+    
     allowkeys = false;
     if (debug == true)
         cerr << "MythWeather: COMMS : GetWeatherData() ...\n";
     
-    int cnt = 3;
-    while (cnt > 0)
+    while((haveData == false)&& (wantRetry == true))
     {
         stopProcessing = false;
         urlTimer->start(weatherTimeoutInt);
         haveData = GetWeatherData();
         urlTimer->stop();
-        if (haveData == true)
-            cnt = 0;
-        else
-            cnt--;
+        
+        if(haveData == false)
+        {
+            QString msg = QString("Myth was unable to retrieve your weather data within the "
+                                  "time allowed (%1 seconds).\nPress OK to try again with a larger "
+                                  "timeout value. Press Cancel to abort.")
+                                  .arg(weatherTimeoutInt / 1000);
+
+            wantRetry = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), 
+                                                        "Timeout Reached", msg, true);
+            if(wantRetry)
+                weatherTimeoutInt += (weatherTimeoutInt / 2);
+                                                        
+        }
     }
     
     if (haveData == false)
-        cout << "MythWeather: Failed to get weather data.\n"; 
+    {
+        VERBOSE(VB_IMPORTANT, "MythWeather: Failed to get weather data."); 
+        accept();
+        return false;
+    }
     
     update(fullRect);
     allowkeys = true;
@@ -2424,7 +2442,7 @@ QString Weather::parseData(QString data, QString beg, QString end)
         cout << "MythWeather: Parse HTML : Looking for: " << beg << ", ending with: " << end << endl;
         if (data.length() == 0)
         {
-            cout << "MythWeather: Parse HTML : No Data!\n";
+            VERBOSE(VB_IMPORTANT, "MythWeather: Parse HTML: No data!");
             ret = "<NULL>";
             return ret;
         }
@@ -2442,7 +2460,7 @@ QString Weather::parseData(QString data, QString beg, QString end)
     else
     {
         if (debug == true)
-            cout << "MythWeather: Parse HTML : Parse Failed...returning <NULL>\n";
+            VERBOSE(VB_IMPORTANT, "MythWeather: Parse HTML: Parse Failed...returning <NULL>");
         ret = "<NULL>";
         return ret;
     }
@@ -2450,7 +2468,6 @@ QString Weather::parseData(QString data, QString beg, QString end)
 
 void Weather::weatherTimeout()
 {
-     cout << "weatherTimeout() ::: Welcome!\n";
      stopProcessing = true;
      return;
 }
