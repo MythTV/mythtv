@@ -2163,6 +2163,7 @@ int main(int argc, char *argv[])
     else if (from_file)
     {
         grabDataFromFile(fromfile_id, fromfile_offset, fromfile_name);
+        clearOldDBEntries();
     }
     else
     {
