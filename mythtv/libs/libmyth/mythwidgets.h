@@ -61,14 +61,15 @@ class MythSpinBox: public QSpinBox
 {
     Q_OBJECT
   public:
-    MythSpinBox(QWidget* parent = NULL, const char* widgetName = 0, bool allow_single_step = false):
+    MythSpinBox(QWidget* parent = NULL, const char* widgetName = 0, 
+                bool allow_single_step = false) :
         QSpinBox(parent, widgetName),
-        sstep(allow_single_step) { if (sstep) setLineStep(10); }
+        singlestep(allow_single_step) { if (singlestep) setLineStep(10); }
 
     void setHelpText(QString help) { helptext = help; }
     
-    bool singleStep () { return sstep; }
-    void setSingleStep (bool arg = true) { sstep = arg; }
+    bool singleStep(void) { return singlestep; }
+    void setSingleStep(bool arg = true) { singlestep = arg; }
 
   signals:
     void changeHelpText(QString);
@@ -80,7 +81,7 @@ class MythSpinBox: public QSpinBox
 
   private:
     QString helptext;
-    bool sstep;
+    bool singlestep;
 };
 
 class MythSlider: public QSlider 
