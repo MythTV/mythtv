@@ -26,10 +26,12 @@
     </font>
     
     <font name="info" base="basefont">
+      <size>18</size>
       <shadow>2,2</shadow>
     </font>
     
     <font name="metadata" base="info">
+      <size>18</size>
       <color>#ffffdd</color>
     </font>
     
