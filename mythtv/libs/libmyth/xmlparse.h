@@ -14,7 +14,7 @@ class XMLParse
     XMLParse();
    ~XMLParse();
 
-    fontProp *GetFont(const QString &);
+    fontProp *GetFont(const QString &, bool checkGlobal = true);
     LayerSet *GetSet(const QString &text);
 
     void SetWMult(double wm) { wmult = wm; }

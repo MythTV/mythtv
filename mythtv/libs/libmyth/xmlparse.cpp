@@ -8,6 +8,7 @@ using namespace std;
 #include "uilistbtntype.h"
 #include "xmlparse.h"
 
+QMap<QString, fontProp> globalFontMap;
 
 XMLParse::XMLParse(void)
 {
@@ -180,8 +181,8 @@ void XMLParse::parseFont(QDomElement &element)
             }
         }
     }
-
-    fontProp *testFont = GetFont(name);
+    
+    fontProp *testFont = GetFont(name, false);
     if (testFont)
     {
         cerr << "Error: already have a font called: " << name << endl;
@@ -218,7 +219,7 @@ void XMLParse::parseFont(QDomElement &element)
     newFont.color = foreColor;
     newFont.dropColor = dropColor;
     newFont.shadowOffset = shadowOffset;
-
+    
     fontMap[name] = newFont;
 }
 
@@ -843,14 +844,15 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
 
 
 
-fontProp *XMLParse::GetFont(const QString &text)
+fontProp *XMLParse::GetFont(const QString &text, bool checkGlobal)
 {
     fontProp *ret;
     if (fontMap.contains(text))
         ret = &fontMap[text];
+    else if (checkGlobal && globalFontMap.contains(text))
+        ret = &globalFontMap[text];
     else
         ret = NULL;
-
     return ret;
 }
 

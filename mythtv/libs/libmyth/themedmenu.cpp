@@ -22,6 +22,10 @@ using namespace std;
 #include "dialogbox.h"
 #include "lcddevice.h"
 
+
+
+extern QMap<QString, fontProp> globalFontMap;
+
 struct TextAttributes
 {
     QRect textRect;
@@ -107,6 +111,8 @@ class ThemedMenuPrivate
     void parseText(TextAttributes &attributes, QDomElement &element);
     void parseOutline(TextAttributes &attributes, QDomElement &element);
     void parseShadow(TextAttributes &attributes, QDomElement &element);
+    
+    void parseFont(QDomElement &element);
 
     void setDefaults(void);
 
@@ -123,7 +129,7 @@ class ThemedMenuPrivate
     QString getFirstText(QDomElement &element);
     QPoint parsePoint(const QString &text);
     QRect parseRect(const QString &text);
-
+    
     QRect menuRect() const;
 
     void paintLogo(QPainter *p);
@@ -214,7 +220,11 @@ class ThemedMenuPrivate
 
     bool allowreorder;
     int maxColumns;
+    QString fontSizeType;
+    static bool parseFonts;
 };
+
+bool ThemedMenuPrivate::parseFonts = true;
 
 ThemedMenuPrivate::ThemedMenuPrivate(ThemedMenu *lparent, float lwmult, 
                                      float lhmult, int lscreenwidth, 
@@ -225,7 +235,8 @@ ThemedMenuPrivate::ThemedMenuPrivate(ThemedMenu *lparent, float lwmult,
     hmult = lhmult;
     screenwidth = lscreenwidth;
     screenheight = lscreenheight;
-
+    if (parseFonts)
+        fontSizeType = gContext->GetSetting("ThemeFontSizeType", "default");
     allowreorder = true;
 
     logo = NULL;
@@ -425,6 +436,118 @@ void ThemedMenuPrivate::parseShadow(TextAttributes &attributes,
         return;
     }
 }
+
+void ThemedMenuPrivate::parseFont(QDomElement &element)
+{
+    QString name;
+    QString face;
+    QString bold;
+    int size = -1;
+    int sizeSmall = -1;
+    int sizeBig = -1;
+    QPoint shadowOffset = QPoint(0, 0);
+    QString color = "#ffffff";
+    QString dropcolor = "#000000";
+
+    name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Font needs a name\n";
+        return;
+    }
+
+    face = element.attribute("face", "");
+    if (face.isNull() || face.isEmpty())
+    {
+        cerr << "Font needs a face\n";
+        return;
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "size")
+            {
+                size = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "size:small")
+            {
+                sizeSmall = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "size:big")
+            {
+                sizeBig = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "color")
+            {
+                color = getFirstText(info);
+            }
+            else if (info.tagName() == "dropcolor")
+            {
+                dropcolor = getFirstText(info);
+            }
+            else if (info.tagName() == "shadow")
+            {
+                shadowOffset = parsePoint(getFirstText(info));
+                shadowOffset.setX((int)(shadowOffset.x() * wmult));
+                shadowOffset.setY((int)(shadowOffset.y() * hmult));
+            }
+            else if (info.tagName() == "bold")
+            {
+                bold = getFirstText(info);
+            }
+            else
+            {
+                cerr << "Unknown tag " << info.tagName() << " in font\n";
+                return;
+            }
+        }
+    }
+
+    if (globalFontMap.contains(name))
+    {
+        cerr << "Error: already have a global font called: " << name << endl;
+        return;
+    }
+
+    if (fontSizeType == "small")
+    {
+        if (sizeSmall > 0)
+            size = sizeSmall;
+    }
+    else if (fontSizeType == "big")
+    {
+        if (sizeBig > 0)
+            size = sizeBig;
+    }
+
+    if (size < 0)
+    {
+        cerr << "Error: font size must be > 0\n";
+        return;
+    }
+
+    size = (int)ceil(size * hmult);
+    QFont temp(face, size);
+    if (bold.lower() == "yes")
+        temp.setBold(true);
+
+    QColor foreColor(color);
+    QColor dropColor(dropcolor);
+
+    fontProp newFont;
+    newFont.face = temp;
+    newFont.color = foreColor;
+    newFont.dropColor = dropColor;
+    newFont.shadowOffset = shadowOffset;
+
+
+    globalFontMap[name] = newFont;
+}
+
 
 void ThemedMenuPrivate::parseOutline(TextAttributes &attributes, 
                                      QDomElement &element)
@@ -1034,6 +1157,11 @@ void ThemedMenuPrivate::parseSettings(const QString &dir,
             {
                 parseArrow(dir, e, false);
             }
+            else if (e.tagName() == "font")
+            {
+                if (parseFonts)
+                    parseFont(e);
+            }
             else
             {
                 cerr << "Unknown element " << e.tagName() << endl;
@@ -1055,6 +1183,7 @@ void ThemedMenuPrivate::parseSettings(const QString &dir,
         return;
     }
 
+    parseFonts = false;
     return;
 }
 
