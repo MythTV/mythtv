@@ -77,7 +77,19 @@ void RegionSelector::fillSelections() {
 }
 
 void ProviderSelector::fillSelections(const QString& location) {
+    QString waitMsg = QString("Fetching providers for %1... Please be patient.")
+                             .arg(location);
+    VERBOSE(VB_GENERAL, waitMsg);
+    
+    MythProgressDialog pdlg(waitMsg, 2);
+
     clearSelections();
+
+    // First let the final character show up...
+    qApp->processEvents();    
+    
+    // Now show our progress dialog.
+    pdlg.show();
 
     QString command = QString("%1 --configure --postalcode %2 --list-providers")
         .arg(grabber)
@@ -86,9 +98,20 @@ void ProviderSelector::fillSelections(const QString& location) {
     FILE* fp = popen(command.ascii(), "r");
 
     if (fp == NULL) {
+        pdlg.Close();
+        VERBOSE(VB_GENERAL, "Failed to get providers");
+
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                            QObject::tr("Failed to get provider information"), 
+                            QObject::tr("You probably need to update XMLTV."));
+        qApp->processEvents();
+
         perror(command.ascii());
         return;
     }
+
+    // Update our progress
+    pdlg.setProgress(1);
 
     QFile f;
     f.open(IO_ReadOnly, fp);
@@ -96,6 +119,9 @@ void ProviderSelector::fillSelections(const QString& location) {
         QStringList fields = QStringList::split(":", line.stripWhiteSpace());
         addSelection(fields.last(), fields.first());
     }
+
+    pdlg.setProgress( 2 );
+    pdlg.Close();
 
     f.close();
     fclose(fp);
