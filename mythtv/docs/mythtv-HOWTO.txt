@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-03-27, v2.04
+  2003-03-27, v2.05
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -2185,10 +2185,13 @@
   <http://plf.zarb.org/~nanardon/urpmiweb.php> will allow you to choose
   a mirror site and then present the command-line configuration text for
   that mirror.  You will most likely need to add a "Contrib" mirror to
-  your setup.  Once you have done that, you can proceed.
+  your setup.  Once you have done that, you can proceed.  If [1murpmi[0m
+  prompts you about other modules that need to be installed to satisfy
+  dependencies, say "Yes".
 
        # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia
        # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
+       # urpmi libcdaudio1-devel
 
   [1m15.2.1.  Additional options with CVS MythMusic[0m
 
@@ -2203,16 +2206,22 @@
   +o  SDL
 
   fftw may be obtained from http://www.fftw.org/ <http://www.fftw.org/>.
-  It may also be installed in Mandrake 9.1 with # urpmi libfftw2
-  libfftw2-devel
+  In Mandrake 9.1 it may be installed by typing:
+
+       # urpmi libfftw2 libfftw2-devel
 
   OpenGL should be installed on practically all distributions.  However,
-  you will need the devel module.  On Mandrake 9.1, you would need to
-  install # urpmi libMesaGLU1-devel.
+  you will need the devel module.  In Mandrake 9.1 it may be installed
+  by typing:
+
+       # urpmi libMesaGLU1-devel
 
   SDL may be obtained from http://www.libsdl.org
-  <http://www.libsdl.org>.  On Mandrake 9.1, you may install it by
-  executing: # urpmi libsdl1.2 libsdl1.2-devel
+  <http://www.libsdl.org>.  In Mandrake 9.1 it may be installed by
+  typing:
+
+       # urpmi libsdl1.2 libsdl1.2-devel
+
   [1m15.3.  Red Hat Linux 8.0[0m
 
   Red Hat provides packages for several of the pre-requisites, making
@@ -2239,14 +2248,18 @@
   you wish to use the new visualizations, make sure you install the
   prerequisites.  Run ./configure --help for help.
 
-  [1mNOTE for Red Hat users[22m: Before compiling, make the following
-  modification to settings.pro, otherwise the compile will fail:
+  ______________________________________________________________________
+  NOTE for Red Hat users: Before compiling, make the following modification
+  to settings.pro, otherwise the compile will fail:
 
-  Find the following text: INCLUDEPATH *= /usr/local/include
+  Find the following text:
+  INCLUDEPATH *= /usr/local/include
 
-  immediately below that add INCLUDEPATH *= /usr/include/cdda
+  immediately below that add
+  INCLUDEPATH *= /usr/include/cdda
 
   save and close settings.pro and proceed with compiling MythMusic.
+  ______________________________________________________________________
 
        $ make
        $ su
@@ -2327,17 +2340,17 @@
 
   These are the keyboard commands for MythWeather:
 
-  Left Key             Goes back one page, and extends the time spent
-                       on the page you are on.
-  Right Key            Goes forward one page, see above.
-  Space                Pause, wait on the current page until space is hit
-                       again.
-  Numeric Keys         You can check other weather by keying in other ZIP codes.
-  Enter Key            Switch between Celsius and Fahrenheit. Can also
-                       be used a way to force a data update.
-  "m" Key              Resets the location to the database default, then updates the data.
-  "i"                  Enter / Save settings
-  ESC                  Exit the settings screen without saving / Exit the program
+       Left Key             Goes back one page, and extends the time spent
+                            on the page you are on.
+       Right Key            Goes forward one page, see above.
+       Space                Pause, wait on the current page until space is hit
+                            again.
+       Numeric Keys         You can check other weather by keying in other ZIP codes.
+       Enter Key            Switch between Celsius and Fahrenheit. Can also
+                            be used a way to force a data update.
+       "m" Key              Resets the location to the database default, then updates the data.
+       "i"                  Enter / Save settings
+       ESC                  Exit the settings screen without saving / Exit the program
 
   MythWeather also has an "Aggressiveness" setting.  This affects how
   long MythWeather waits for data from the msnbc.com website before
@@ -2384,6 +2397,7 @@
   +o  You have an AMD K6-2 or VIA C3 processor.  If you have either of
      these, make sure that you you followed the instructions in this
      ``section''.
+
   +o  You have an early production Intel Celeron, Pentium Pro or Pentium
      II.  If you have any of these processors, make sure that your
      ``deinterlace'' variable is set correctly.  Your CPU needs to
@@ -2443,10 +2457,10 @@
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
 
-  cc1plus: warning: changing search order for system directory
-  "/usr/local/include"
-  cc1plus: warning:   as it has already been specified as a non-system
-  directory
+       cc1plus: warning: changing search order for system directory
+       "/usr/local/include"
+       cc1plus: warning:   as it has already been specified as a non-system
+       directory
 
   then it shouldn't be a problem.
 
@@ -2494,23 +2508,23 @@
 
   Finally, check:
 
-  Section "Monitor"
-      Identifier "monitor1"
-      VendorName "Plug'n Play"
-      HorizSync 30-85
-      VertRefresh 50-160
+       Section "Monitor"
+           Identifier "monitor1"
+           VendorName "Plug'n Play"
+           HorizSync 30-85
+           VertRefresh 50-160
 
-      # Sony Vaio C1(X,XS,VE,VN)?
-      # 1024x480 @ 85.6 Hz, 48 kHz hsync
-      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+           # Sony Vaio C1(X,XS,VE,VN)?
+           # 1024x480 @ 85.6 Hz, 48 kHz hsync
+           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-      # TV fullscreen mode or DVD fullscreen output.
-      # 768x576 @ 79 Hz, 50 kHz hsync
-      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+           # TV fullscreen mode or DVD fullscreen output.
+           # 768x576 @ 79 Hz, 50 kHz hsync
+           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-      # 768x576 @ 100 Hz, 61.6 kHz hsync
-      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-  EndSection
+           # 768x576 @ 100 Hz, 61.6 kHz hsync
+           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+       EndSection
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
@@ -2623,7 +2637,6 @@
   audio data is written to /dev/dsp and converted back to an analog
   signal. This analog signal should then be sent to your speakers. Here
   is what is needed in alsamixer:
-
   CAPTUR source - the analog source to be sent to the DSP. This should
   be set to the input source from the tuner card to the sound card. In
   most cases this is Line but this could also be Aux, CD, Mic, etc.,
@@ -2651,7 +2664,7 @@
   instructions on disabling the sound manager.  If you wish to see what
   application is grabbing a resource, you can use the fuser command:
 
-  # fuser -v /dev/dsp
+       # fuser -v /dev/dsp
 
   To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System
   and uncheck the "Start aRts soundserver on KDE startup" box.  Run #
@@ -2705,11 +2718,11 @@
 
   Download the source to MPlayer and patch:
 
-  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-  $ tar -xjf MPlayer-0.90rc1.tar.bz2
-  $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-  $ cd MPlayer-0.90rc1
-  $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+       $ tar -xjf MPlayer-0.90rc1.tar.bz2
+       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+       $ cd MPlayer-0.90rc1
+       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
 
   At this point, you can read the MPlayer documentation and start the
   compile process.

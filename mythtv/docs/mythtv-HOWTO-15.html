@@ -118,12 +118,15 @@ following website
 <A HREF="http://plf.zarb.org/~nanardon/urpmiweb.php">http://plf.zarb.org/~nanardon/urpmiweb.php</A> will allow you to choose
 a mirror site and then present the command-line configuration text for that
 mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
-Once you have done that, you can proceed.</P>
+Once you have done that, you can proceed.  If <B>urpmi</B> prompts you
+about other modules that need to be installed to satisfy dependencies, say
+"Yes".</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
 # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia
 # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
+# urpmi libcdaudio1-devel
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -140,14 +143,35 @@ use these, there are some prerequisites you must install prior to compiling.</P>
 </UL>
 </P>
 <P><CODE>fftw</CODE> may be obtained from 
-<A HREF="http://www.fftw.org/">http://www.fftw.org/</A>.  It may also be installed in Mandrake 9.1 with
-<CODE># urpmi libfftw2 libfftw2-devel</CODE></P>
+<A HREF="http://www.fftw.org/">http://www.fftw.org/</A>.  In Mandrake 9.1 it may be installed by
+typing:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libfftw2 libfftw2-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P><CODE>OpenGL</CODE> should be installed on practically all distributions. 
-However, you will need the devel module.  On Mandrake 9.1, you would need to
-install <CODE># urpmi libMesaGLU1-devel</CODE>.</P>
+However, you will need the devel module.  In Mandrake 9.1 it may be
+installed by typing:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libMesaGLU1-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P><CODE>SDL</CODE> may be obtained from 
-<A HREF="http://www.libsdl.org">http://www.libsdl.org</A>.  On Mandrake 9.1,
-you may install it by executing: <CODE># urpmi libsdl1.2 libsdl1.2-devel</CODE></P>
+<A HREF="http://www.libsdl.org">http://www.libsdl.org</A>.  In Mandrake 9.1 it may be installed by
+typing:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libsdl1.2 libsdl1.2-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <H2><A NAME="ss15.3">15.3</A> <A HREF="mythtv-HOWTO.html#toc15.3">Red Hat Linux 8.0</A>
 </H2>
@@ -179,13 +203,24 @@ will cause an error, so use the source package instead.</P>
 getting MythMusic going. Make sure that you run <CODE>./configure</CODE> first. 
 If you wish to use the new visualizations, make sure you install the
 prerequisites.  Run <CODE>./configure --help</CODE> for help.</P>
-<P><B>NOTE for Red Hat users</B>: Before compiling, make the following modification 
-to settings.pro, otherwise the compile will fail:</P>
-<P>Find the following text:
-<CODE>INCLUDEPATH *= /usr/local/include</CODE></P>
-<P>immediately below that add
-<CODE>INCLUDEPATH *= /usr/include/cdda</CODE></P>
-<P>save and close settings.pro and proceed with compiling MythMusic.</P>
+
+<P>
+<HR>
+<PRE>
+NOTE for Red Hat users: Before compiling, make the following modification 
+to settings.pro, otherwise the compile will fail:
+
+Find the following text:
+INCLUDEPATH *= /usr/local/include
+
+immediately below that add
+INCLUDEPATH *= /usr/include/cdda
+
+save and close settings.pro and proceed with compiling MythMusic.
+</PRE>
+<HR>
+</P>
+
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>

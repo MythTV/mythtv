@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-27, v2.04
+<date>2003-03-27, v2.05
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2044,11 +2044,14 @@ following website <url url="http://plf.zarb.org/~nanardon/urpmiweb.php"
 name="http://plf.zarb.org/~nanardon/urpmiweb.php"> will allow you to choose
 a mirror site and then present the command-line configuration text for that
 mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
-Once you have done that, you can proceed.
+Once you have done that, you can proceed.  If <bf>urpmi</bf> prompts you
+about other modules that need to be installed to satisfy dependencies, say
+"Yes".
 
 <tscreen><verb>
 # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia
 # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
+# urpmi libcdaudio1-devel
 </verb></tscreen>
 
 <sect2>Additional options with CVS MythMusic
@@ -2062,16 +2065,28 @@ use these, there are some prerequisites you must install prior to compiling.
 </itemize>
 
 <tt>fftw</tt> may be obtained from <url url="http://www.fftw.org/"
-name="http://www.fftw.org/">.  It may also be installed in Mandrake 9.1 with
-<tt># urpmi libfftw2 libfftw2-devel</tt>
+name="http://www.fftw.org/">.  In Mandrake 9.1 it may be installed by
+typing:
+
+<tscreen><verb>
+# urpmi libfftw2 libfftw2-devel
+</verb></tscreen>
 
 <tt>OpenGL</tt> should be installed on practically all distributions. 
-However, you will need the devel module.  On Mandrake 9.1, you would need to
-install <tt># urpmi libMesaGLU1-devel</tt>.
+However, you will need the devel module.  In Mandrake 9.1 it may be
+installed by typing:
 
-<tt>SDL</tt> may be obtained from <url
-url="http://www.libsdl.org" name="http://www.libsdl.org">.  On Mandrake 9.1,
-you may install it by executing: <tt># urpmi libsdl1.2 libsdl1.2-devel</tt>
+<tscreen><verb>
+# urpmi libMesaGLU1-devel
+</verb></tscreen>
+
+<tt>SDL</tt> may be obtained from <url url="http://www.libsdl.org"
+name="http://www.libsdl.org">.  In Mandrake 9.1 it may be installed by
+typing:
+
+<tscreen><verb>
+# urpmi libsdl1.2 libsdl1.2-devel
+</verb></tscreen>
 
 <sect1>Red Hat Linux 8.0
 <p>Red Hat provides packages for several of the pre-requisites, making 
@@ -2099,16 +2114,20 @@ getting MythMusic going. Make sure that you run <tt>./configure</tt> first.
 If you wish to use the new visualizations, make sure you install the
 prerequisites.  Run <tt>./configure --help</tt> for help.
 
-<bf>NOTE for Red Hat users</bf>: Before compiling, make the following modification 
+
+<code>
+NOTE for Red Hat users: Before compiling, make the following modification 
 to settings.pro, otherwise the compile will fail:
 
 Find the following text:
-<tt>INCLUDEPATH *= /usr/local/include</tt>
+INCLUDEPATH *= /usr/local/include
 
 immediately below that add
-<tt>INCLUDEPATH *= /usr/include/cdda</tt>
+INCLUDEPATH *= /usr/include/cdda
 
 save and close settings.pro and proceed with compiling MythMusic.
+</code>
+
 
 <tscreen><verb>
 $ make
@@ -2801,6 +2820,8 @@ create a /mnt/store directory if you don't already have one.
 v2.04, 2003-03-27.  Added information on btaudio.  Added information on full
 duplex issues as reported by mythbackend.  Added information on -f flag to
 mysql.  Added info on mythbackend command-line options.
+v2.05, 2003-03-27.  Reformatted the examples in mythmusic a little.  Added
+Mandrake 9.1 mythmusic prereq.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
