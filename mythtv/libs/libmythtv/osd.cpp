@@ -1273,6 +1273,11 @@ bool OSD::DialogShowing(const QString &name)
     return (GetSet(name) != NULL);
 }
 
+void OSD::DialogAbort(const QString &name)
+{
+    dialogResponseList[name] = -1;
+}
+
 int OSD::GetDialogResponse(const QString &name)
 {
     if (dialogResponseList.contains(name))

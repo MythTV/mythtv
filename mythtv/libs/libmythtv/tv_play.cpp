@@ -255,6 +255,8 @@ int TV::AllowRecording(const QString &message, int timeuntil)
 
     if (result == 2)
         StopLiveTV();
+    else
+        result = 1;
 
     return result;
 }
@@ -834,6 +836,8 @@ void TV::ProcessKeypress(int keypressed)
         {
             case Key_Up: osd->DialogUp(dialogname); break;
             case Key_Down: osd->DialogDown(dialogname); break;
+            case Key_Escape: osd->DialogAbort(dialogname);
+                // fall through
             case Key_Space: case Key_Enter: case Key_Return: 
             {
                 osd->TurnDialogOff(dialogname);
@@ -842,23 +846,22 @@ void TV::ProcessKeypress(int keypressed)
                     int result = osd->GetDialogResponse(dialogname);
                     dialogname = "";
 
-                    if (result == 3)
+                    switch (result)
                     {
-                        nvp->Unpause();
-                    }
-                    else if (result == 1)
-                    {
-                        nvp->SetBookmark();
-                        exitPlayer = true;
-                    }
-                    else if (result == 4)
-                    {
-                        exitPlayer = true;
-                        requestDelete = true;
-                    }
-                    else
-                    {
-                        exitPlayer = true;
+                        case 1:
+                            nvp->SetBookmark();
+                            exitPlayer = true;
+                            break;
+                        case 3: case 0:
+                            nvp->Unpause();
+                            break;
+                        case 4:
+                            exitPlayer = true;
+                            requestDelete = true;
+                            break;
+                        default:
+                            exitPlayer = true;
+                            break;
                     }
                 }
                 break;

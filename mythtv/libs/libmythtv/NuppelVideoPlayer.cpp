@@ -1891,6 +1891,8 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
         {
             case Qt::Key_Up: osd->DialogUp(dialogname); break;
             case Qt::Key_Down: osd->DialogDown(dialogname); break;
+            case Qt::Key_Escape: osd->DialogAbort(dialogname);
+                // fall through
             case Qt::Key_Space: case Qt::Key_Enter: case Qt::Key_Return: 
             {
                 osd->TurnDialogOff(dialogname); 
@@ -2124,25 +2126,36 @@ void NuppelVideoPlayer::HandleResponse(void)
     if (dialogtype == 0)
     {
         int type = deleteMap[deleteframe];
-        if (result == 1)
-            DeleteMark(deleteframe);
-        if (result == 2)
+        switch (result)
         {
-            DeleteMark(deleteframe);
-            AddMark(framesPlayed, type);
-        }
-        else if (result == 3)
-        {
-            DeleteMark(deleteframe);
-            AddMark(deleteframe, 1 - type);
+            case 1:
+                DeleteMark(deleteframe);
+                break;
+            case 2:
+                DeleteMark(deleteframe);
+                AddMark(framesPlayed, type);
+                break;
+            case 3:
+                DeleteMark(deleteframe);
+                AddMark(deleteframe, 1 - type);
+                break;
+            default:
+                break;
         }
     }
     else if (dialogtype == 1)
     {
-        if (result == 1)
-            AddMark(framesPlayed, 0);
-        else if (result == 2)
-            AddMark(framesPlayed, 1);
+        switch (result)
+        {
+            case 1:
+                AddMark(framesPlayed, 0);
+                break;
+            case 2:
+                AddMark(framesPlayed, 1);
+                break;
+            case 3: case 0: default:
+                break;
+        }
     }
 }
 

@@ -50,6 +50,7 @@ class OSD
     void DialogDown(const QString &name);
     bool DialogShowing(const QString &name);
     void TurnDialogOff(const QString &name);
+    void DialogAbort(const QString &name);
     int GetDialogResponse(const QString &name);
 
     // position is 0 - 1000 

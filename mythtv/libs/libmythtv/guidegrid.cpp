@@ -260,7 +260,8 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
       
         case Key_Slash: toggleChannelFavorite(); break;
  
-        case Key_C: case Key_M: case Key_Escape: escape(); break;
+        case Key_C: case Key_Escape: escape(); break;
+        case Key_M: enter(); break;
 
         case Key_I: case Key_Space: 
         case Key_Enter: case Key_Return:  displayInfo(); break;
