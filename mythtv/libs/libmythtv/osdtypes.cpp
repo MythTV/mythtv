@@ -936,9 +936,6 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
     int uvdestwidth;
 
     int alphamod = 255;
-    bool transdest = false;
-
-    int newalpha = 0;
 
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
@@ -996,87 +993,36 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
     if (m_onlyusefirst)
         startingx = 0;
 
-    // overlap with something we've already drawn..
-    for (int y = startline; y < height; y++)
-    {
-        ysrcwidth = y * iwidth;
-        ydestwidth = (y + ystart - startline) * surface->width;
+    ysrcwidth = startline * iwidth;
+    ydestwidth = (ystart - startline) * surface->width;
 
-        dest = surface->y + xstart + ydestwidth;
-        destalpha = surface->alpha + xstart + ydestwidth;
-        src = m_ybuffer + ysrcwidth + startingx;
+    dest = surface->y + xstart + ydestwidth;
+    destalpha = surface->alpha + xstart + ydestwidth;
+    src = m_ybuffer + ysrcwidth + startingx;
 
-        srcalpha = m_alpha + ysrcwidth + startingx;
+    srcalpha = m_alpha + ysrcwidth + startingx;
 
-        uvsrcwidth = ysrcwidth / 4;
-        uvdestwidth = ydestwidth / 4;
+    uvsrcwidth = ysrcwidth / 4;
+    uvdestwidth = ydestwidth / 4;
 
-        udest = surface->u + xstart / 2 + uvdestwidth;
-        usrc = m_ubuffer + uvsrcwidth + startingx / 2;
+    udest = surface->u + xstart / 2 + uvdestwidth;
+    usrc = m_ubuffer + uvsrcwidth + startingx / 2;
 
-        vdest = surface->v + xstart / 2 + uvdestwidth;
-        vsrc = m_vbuffer + uvsrcwidth + startingx / 2;
+    vdest = surface->v + xstart / 2 + uvdestwidth;
+    vsrc = m_vbuffer + uvsrcwidth + startingx / 2;
 
-        for (int x = startcol; x < width; x++)
-        {
-            alpha = *srcalpha;
-
-            if (alpha == 0)
-                goto imagedrawend;
-
-            alpha = ((alpha * alphamod) + 0x80) >> 8;
-
-            newalpha = alpha;
-
-            if (*destalpha != 0)
-            {
-                transdest = false;
-                newalpha = surface->pow_lut[alpha][*destalpha];
-                *dest = blendColorsAlpha(*src, *dest, newalpha);
-                *destalpha = *destalpha + ((alpha * (255 - *destalpha)) / 255);
-            }
-            else
-            {
-                transdest = true;
-                *dest = *src;
-                *destalpha = alpha;
-            }
-
-            if ((y % 2 == 0) && (x % 2 == 0))
-            {
-                if (!transdest)
-                {
-                    *udest = blendColorsAlpha(*usrc, *udest, newalpha);
-                    *vdest = blendColorsAlpha(*vsrc, *vdest, newalpha);
-                }
-                else
-                {
-                    *udest = *usrc;
-                    *vdest = *vsrc;
-                }
-            }
-
-imagedrawend:
-            if ((y % 2 == 0) && (x % 2 == 0))
-            {
-                udest++;
-                vdest++;
-                if (!m_onlyusefirst)
-                {
-                    usrc++;
-                    vsrc++;
-                }
-            }
-
-            dest++;
-            destalpha++;
-            if (!m_onlyusefirst)
-            {
-                src++;
-                srcalpha++;
-            }
-        }
-    }
+    if (m_onlyusefirst)
+        (surface->blendcolumnfunc) (src, usrc, vsrc, srcalpha, iwidth, dest,
+                                    udest, vdest, destalpha, surface->width,
+                                    width - startcol, height - startline,
+                                    alphamod, 1, surface->rec_lut,
+                                    surface->pow_lut);
+    else
+        (surface->blendregionfunc) (src, usrc, vsrc, srcalpha, iwidth, dest,
+                                    udest, vdest, destalpha, surface->width,
+                                    width - startcol, height - startline,
+                                    alphamod, 1, surface->rec_lut,
+                                    surface->pow_lut);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -1193,7 +1139,7 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
     m_displayrect = displayrect;
     m_drawwidth = displayrect.width();
 
-    m_drawMap = new int[m_drawwidth + 1];
+    m_drawMap = new unsigned char[m_drawwidth + 1];
     for (int i = 0; i < m_drawwidth; i++)
          m_drawMap[i] = 0;
 
@@ -1252,7 +1198,7 @@ void OSDTypeEditSlider::Reinit(float wchange, float hchange, float wmult,
 
     delete [] m_drawMap;
     
-    m_drawMap = new int[m_drawwidth + 1];
+    m_drawMap = new unsigned char[m_drawwidth + 1];
     for (int i = 0; i < m_drawwidth; i++)
          m_drawMap[i] = 0;
 
@@ -1323,7 +1269,6 @@ void OSDTypeEditSlider::Draw(OSDSurface *surface, int fade, int maxfade,
             
     unsigned char *dest, *destalpha, *src, *rsrc, *srcalpha, *rsrcalpha;
     unsigned char *udest, *vdest, *usrc, *rusrc, *vsrc, *rvsrc;
-    int a; 
             
     int iwidth, riwidth, width;
     iwidth = m_imagesize.width();
@@ -1375,107 +1320,39 @@ void OSDTypeEditSlider::Draw(OSDSurface *surface, int fade, int maxfade,
     int uvdestwidth;
  
     int alphamod = 255;
-    bool transdest = false;
-    int newalpha = 0;
     
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
 
-    unsigned char *alpha;
-    unsigned char *ybuf;
-    unsigned char *ubuf;
-    unsigned char *vbuf;
+    ysrcwidth = startline * iwidth; 
+    rysrcwidth = startline * riwidth;
+    ydestwidth = (startline + ystart - startline) * surface->width;
 
-    for (int y = startline; y < height; y++)
-    {
-        ysrcwidth = y * iwidth; 
-        rysrcwidth = y * riwidth;
-        ydestwidth = (y + ystart - startline) * surface->width;
+    dest = surface->y + xstart + ydestwidth;
+    destalpha = surface->alpha + xstart + ydestwidth;
+    src = m_ybuffer + ysrcwidth;
+    rsrc = m_rybuffer + rysrcwidth;
 
-        dest = surface->y + xstart + ydestwidth;
-        destalpha = surface->alpha + xstart + ydestwidth;
-        src = m_ybuffer + ysrcwidth;
-        rsrc = m_rybuffer + rysrcwidth;
+    srcalpha = m_alpha + ysrcwidth;
+    rsrcalpha = m_ralpha + rysrcwidth;
 
-        srcalpha = m_alpha + ysrcwidth;
-        rsrcalpha = m_ralpha + rysrcwidth;
+    uvdestwidth = ydestwidth / 4;
+    uvsrcwidth = ysrcwidth / 4;
+    ruvsrcwidth = rysrcwidth / 4;
 
-        uvdestwidth = ydestwidth / 4;
-        uvsrcwidth = ysrcwidth / 4;
-        ruvsrcwidth = rysrcwidth / 4;
+    udest = surface->u + xstart / 2 + uvdestwidth;
+    usrc = m_ubuffer + uvsrcwidth;
+    rusrc = m_rubuffer + ruvsrcwidth;
 
-        udest = surface->u + xstart / 2 + uvdestwidth;
-        usrc = m_ubuffer + uvsrcwidth;
-        rusrc = m_rubuffer + ruvsrcwidth;
-
-        vdest = surface->v + xstart / 2 + uvdestwidth;
-        vsrc = m_vbuffer + uvsrcwidth;
-        rvsrc = m_rvbuffer + ruvsrcwidth;
-
-        for (int x = startcol; x < width; x++)
-        {
-            if (m_drawMap[x] == 0)
-            {
-                alpha = srcalpha;
-                ybuf = src;
-                ubuf = usrc;
-                vbuf = vsrc; 
-            }
-            else
-            {
-                alpha = rsrcalpha;
-                ybuf = rsrc;
-                ubuf = rusrc;
-                vbuf = rvsrc;
-            }
-
-            if (*alpha == 0)
-                goto editsliderdrawend;
-
-            a = *alpha;
-
-            a = ((a * alphamod) + 0x80) >> 8;
-            newalpha = a;
-
-            if (*destalpha != 0)
-            {
-                transdest = false;
-                newalpha = surface->pow_lut[a][*destalpha];
-                *dest = blendColorsAlpha(*ybuf, *dest, newalpha);
-                *destalpha = *destalpha + ((a * (255 - *destalpha)) / 255);
-            }
-            else
-            {
-                transdest = true;
-                *dest = *ybuf;
-                *destalpha = a;
-            }
-
-            if ((y % 2 == 0) && (x % 2 == 0))
-            {
-                if (!transdest)
-                {
-                    *udest = blendColorsAlpha(*ubuf, *udest, newalpha);
-                    *vdest = blendColorsAlpha(*vbuf, *vdest, newalpha);
-                }
-                else
-                {
-                    *udest = *ubuf;
-                    *vdest = *vbuf;
-                }
-            }
-
-editsliderdrawend:
-            if ((y % 2 == 0) && (x % 2 == 0))
-            {
-                udest++;
-                vdest++;
-            }
-
-            dest++;
-            destalpha++;
-        }
-    }
+    vdest = surface->v + xstart / 2 + uvdestwidth;
+    vsrc = m_vbuffer + uvsrcwidth;
+    rvsrc = m_rvbuffer + ruvsrcwidth;
+    (surface->blendcolumn2func) (rsrc, rusrc, rvsrc, rsrcalpha, riwidth, src,
+                                 usrc, vsrc, srcalpha, iwidth,
+                                 m_drawMap + startcol, dest, udest, vdest,
+                                 destalpha, surface->width, width - startcol,
+                                 height - startline, alphamod, 1,
+                                 surface->rec_lut, surface->pow_lut);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1542,9 +1419,9 @@ void OSDTypeBox::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
 
-    alpha = ((alpha * alphamod) + 0x809) >> 8;
-    int newalpha, ydestwidth;
+    int ydestwidth;
 
+    alpha = ((alpha * alphamod) + 0x80) >> 8;
     if (!needblend)
     {
         for (int y = ystart; y < yend; y++)
@@ -1558,29 +1435,11 @@ void OSDTypeBox::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         return;
     }
 
-    for (int y = ystart; y < yend; y++)
-    {
-        dest = surface->y + y * surface->width + xstart;
-        destalpha = surface->alpha + y * surface->width + xstart;
-
-        for (int x = xstart; x < xend; x++)
-        {
-            if (*destalpha != 0)
-            {
-                newalpha = surface->pow_lut[alpha][*destalpha];
-                *dest = blendColorsAlpha(0, *dest, newalpha);
-                *destalpha = *destalpha + ((alpha * (255 - *destalpha)) / 255);
-            }
-            else
-            {
-                *dest = 0;
-                *destalpha = alpha;
-            }
-
-            dest++;
-            destalpha++;
-        }
-    }
+    dest = surface->y + ystart * surface->width + xstart;
+    destalpha = surface->alpha + ystart * surface->width + xstart;
+    (surface->blendconstfunc) (0, 0, 0, alpha, dest, NULL, NULL, destalpha,
+                               surface->width, width, height, 0,
+                               surface->rec_lut, surface->pow_lut);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -170,8 +170,24 @@ OSDSurface::OSDSurface(int w, int h)
 
     usemmx = false;
 
+    blendregionfunc = &blendregion;
+    blendcolumn2func = &blendcolumn2;
+    blendcolumnfunc = &blendcolumn;
+    blendcolorfunc = &blendcolor;
+    blendconstfunc = &blendconst;
 #if defined(i386) && defined(MMX)
     usemmx = (mm_support() & MM_MMX);
+    if (usemmx)
+    {
+        rec_lut[0] = 0;
+        for (int i = 1; i < 256; i++)
+            rec_lut[i] = ((255 << 7) + (i >> 1)) / i;
+        blendregionfunc = &blendregion_mmx;
+        blendcolumn2func = &blendcolumn2_mmx;
+        blendcolumnfunc = &blendcolumn_mmx;
+        blendcolorfunc = &blendcolor_mmx;
+        blendconstfunc = &blendconst_mmx;
+    }
 #endif
 }
 

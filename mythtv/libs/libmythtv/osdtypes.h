@@ -328,7 +328,7 @@ class OSDTypeEditSlider : public OSDTypeImage
     int m_curval;
     int m_drawwidth;
 
-    int *m_drawMap;
+    unsigned char *m_drawMap;
 
     bool m_risvalid;
     unsigned char *m_ryuv;

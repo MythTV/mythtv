@@ -230,14 +230,14 @@ void UIListBtnType::MoveUp(MovementUnit unit)
     if (pos == -1)
         return;
 
-    UIListBtnTypeItem *item;
+    UIListBtnTypeItem *item = NULL;
     switch (unit)
     {
     case MoveItem:
         item = m_itemList.prev();
         break;
     case MovePage:
-        if (pos > m_itemsVisible)
+        if (pos > (int)m_itemsVisible)
         {
             item = m_itemList.at(pos - m_itemsVisible);
             break;
@@ -274,7 +274,7 @@ void UIListBtnType::MoveDown(MovementUnit unit)
     if (pos == -1)
         return;
 
-    UIListBtnTypeItem *item;
+    UIListBtnTypeItem *item = NULL;
     switch (unit)
     {
     case MoveItem:

@@ -1142,8 +1142,8 @@ void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface,
             dest = argbptr + destyoffset + startcol * 4;
             alpha = surface->alpha + yoffset + startcol;
 
-            usrcbase = surface->u + yoffset / 4;
-            vsrcbase = surface->v + yoffset / 4;
+            usrcbase = surface->u + (y / 2) * (surface->width / 2);
+            vsrcbase = surface->v + (y / 2) * (surface->width / 2);
 
             for (int x = startcol; x <= endcol; x++)
             {
@@ -1161,7 +1161,6 @@ void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface,
                     src++;
                     alpha++;
                     dest += 4;
-                    alpha++;
                 }
                 else
                 {
@@ -1170,7 +1169,7 @@ void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface,
                     dest += 32;
                     alpha += 8;
                     x += 7;
-                }
+                } 
             }
         }
     }

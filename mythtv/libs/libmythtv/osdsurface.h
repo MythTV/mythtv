@@ -2,6 +2,10 @@
 #define OSDSURFACE_H_
 
 #include <qregion.h>
+extern "C"
+{
+#include "blend.h"
+}
 
 static inline unsigned char blendColorsAlpha(int src, int dest, int alpha)
 {
@@ -42,7 +46,18 @@ class OSDSurface
 
     QRegion usedRegions;
 
+#ifdef i386
+    short int rec_lut[256];
+#else
+    short int * rec_lut;
+#endif
     unsigned char pow_lut[256][256];
+
+    blendregion_ptr blendregionfunc;
+    blendcolumn2_ptr blendcolumn2func;
+    blendcolumn_ptr blendcolumnfunc;
+    blendcolor_ptr blendcolorfunc;
+    blendconst_ptr blendconstfunc;
 
     bool changed;
 
