@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythtv/mythcontext.h"
 
-const QString currentDatabaseVersion = "1002";
+const QString currentDatabaseVersion = "1003";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -1087,4 +1087,14 @@ void UpgradeGameDatabaseSchema(void)
 };
         performActualUpdate(updates, "1002", dbver);
     }
+
+    if (dbver == "1002")
+    {
+        const QString updates[] = {
+"ALTER TABLE mamemetadata ADD rom_path varchar(255) NOT NULL DEFAULT \"\";",
+""
+};
+        performActualUpdate(updates, "1003", dbver);
+    }
+
 }

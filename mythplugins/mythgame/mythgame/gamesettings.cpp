@@ -16,7 +16,8 @@ public:
         setLabel(QObject::tr("Game display order"));
         setValue("system year genre gamename");
         setHelpText(QObject::tr("Order in which to sort the games "
-                    "- this is for all systems."));
+                    "- this is for all systems. Available choices: "
+                    "system, year, genre and gamename"));
     };
 };
 
@@ -204,6 +205,17 @@ public:
     };
 };
 
+class SnesEmulator: public ComboBoxSetting, public GlobalSetting {
+public:
+    SnesEmulator():
+        GlobalSetting("SnesEmulator") {
+        setLabel(QObject::tr("SNES Emulator"));
+        addSelection(QObject::tr("SNES9x"), "0");
+        addSelection(QObject::tr("zSNES"), "1");
+        setHelpText(QObject::tr("Which emulator to use"));
+    };
+};
+
 class SnesBinary: public LineEditSetting, public GlobalSetting {
 public:
     SnesBinary():
@@ -298,6 +310,7 @@ MythGameSettings::MythGameSettings()
 
     VerticalConfigurationGroup *snes = new VerticalConfigurationGroup(false);
     snes->setLabel(QObject::tr("MythGame Settings -- SNES Emulation"));
+    snes->addChild(new SnesEmulator());
     snes->addChild(new SnesBinary());
     snes->addChild(new SnesRomPath());
     snes->addChild(new SnesScreensLocation());

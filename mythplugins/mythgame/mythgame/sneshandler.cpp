@@ -320,108 +320,129 @@ void SnesHandler::start_game(RomInfo * romdata)
     SnesRomInfo *snesdata = dynamic_cast<SnesRomInfo*>(romdata);
     SetGameSettings(game_settings, snesdata);
     QString exec = gContext->GetSetting("SnesBinary") + " ";
+    QString emulator = gContext->GetSetting("SnesEmulator", "SNES9x");
+
+    //Set these bools to make seting up the options easier
+    bool zsnes = (emulator = "zSNES")? true : false;
+    bool snes9x = !zsnes;
+
     //bool bNoSound = false;
-    if(game_settings.transparency)
-        exec+= "-tr ";
-    if(game_settings.sixteen)
-        exec+= "-16 ";
-    if(game_settings.hi_res)
-        exec+= "-hi ";
-    if(game_settings.no_mode_switch)
-        exec+= "-nms ";
+    if(snes9x)
+    {
+        if(game_settings.transparency)
+            exec+= "-tr ";
+        if(game_settings.sixteen)
+            exec+= "-16 ";
+        if(game_settings.hi_res)
+            exec+= "-hi ";
+        if(game_settings.no_mode_switch)
+            exec+= "-nms ";
+        if(game_settings.stretch)
+            exec+= "-sc ";
+    }
     if(game_settings.full_screen)
-        exec+= "-fs ";
-    if(game_settings.stretch)
-        exec+= "-sc ";
+        exec+= (snes9x)? "-fs " : "-cs ";
     if(game_settings.no_sound)
-        exec+= "-ns ";
+        exec+= (snes9x)? "-ns " : "-dd ";
     else
     {
         if(game_settings.stereo)
-            exec+= "-st ";
+            exec+= (snes9x)? "-st " : "-z ";
         else
-            exec+= " -mono ";
-        if(game_settings.envx)
-            exec+= "-ex ";
-        if(game_settings.thread_sound)
-            exec+= "-ts ";
-        if(game_settings.sound_sync)
-            exec+= "-sy ";
-        if(game_settings.interpolated_sound)
-            exec+= "-is ";
-        if(game_settings.no_sample_caching)
-            exec+= "-nc ";
-        if(game_settings.alt_sample_decode)
-            exec+= "-alt ";
-        if(game_settings.no_echo)
-            exec+= "-ne ";
-        if(game_settings.no_master_volume)
-            exec+= "-nmv ";
+            if(snes9x)
+                exec+= " -mono ";
+        if(snes9x)
+        {
+            if(game_settings.envx)
+                exec+= "-ex ";
+            if(game_settings.thread_sound)
+                exec+= "-ts ";
+            if(game_settings.sound_sync)
+                exec+= "-sy ";
+            if(game_settings.interpolated_sound)
+                exec+= "-is ";
+            if(game_settings.no_sample_caching)
+                exec+= "-nc ";
+            if(game_settings.alt_sample_decode)
+                exec+= "-alt ";
+            if(game_settings.no_echo)
+                exec+= "-ne ";
+            if(game_settings.no_master_volume)
+                exec+= "-nmv ";
+        }
     }
-    if(game_settings.no_joy)
-        exec+= "-j ";
-    if(game_settings.interleaved)
-        exec+= "-i ";
-    if(game_settings.alt_interleaved)
-        exec+= "-i2 ";
+    if(snes9x)
+    {
+        if(game_settings.no_joy)
+            exec+= "-j ";
+        if(game_settings.interleaved)
+            exec+= "-i ";
+        if(game_settings.alt_interleaved)
+            exec+= "-i2 ";
+        if(game_settings.header)
+            exec+= "-hd ";
+        if(game_settings.no_header)
+            exec+= "-nhd ";
+        if(game_settings.layering)
+            exec+= "-l ";
+        if(game_settings.no_hdma)
+            exec+= "-nh ";
+        if(game_settings.no_windows)
+            exec+= "-nw ";
+        switch(game_settings.interpolate)
+        {
+            case 1:
+                exec+= "-y ";
+                break;
+            case 2:
+                exec+= "-y2 ";
+                break;
+            case 3:
+                exec+= "-y3 ";
+                break;
+            case 4:
+                exec+= "-y4 ";
+                break;
+            case 5:
+                exec+= "-y5";
+                break;
+            default:
+                break;
+        }
+        if(game_settings.buffer_size != 0)
+        {
+            exec+= "-bs ";
+            exec+= QString::number(game_settings.buffer_size);
+            exec+= " ";
+        }
+        if(game_settings.sound_skip != 0)
+        {
+            exec+= "-sk ";
+            exec+= QString::number(game_settings.sound_skip);
+            exec+= " ";
+        }
+    }
     if(game_settings.hi_rom)
-        exec+= "-hr ";
+        exec+= (snes9x)? "-hr " : "-h ";
     if(game_settings.low_rom)
-        exec+= "-lr ";
-    if(game_settings.header)
-        exec+= "-hd ";
-    if(game_settings.no_header)
-        exec+= "-nhd ";
+        exec+= (snes9x)? "-lr " : "-l ";
     if(game_settings.pal)
-        exec+= "-p ";
+        exec+= (snes9x)? "-p " : "-u ";
     if(game_settings.ntsc)
-        exec+= "-ntsc ";
-    if(game_settings.layering)
-        exec+= "-l ";
-    if(game_settings.no_hdma)
-        exec+= "-nh ";
+        exec+= (snes9x)? "-ntsc " : "-t ";
     if(game_settings.no_speed_hacks)
-        exec+= "-nospeedhacks ";
-    if(game_settings.no_windows)
-        exec+= "-nw ";
-    switch(game_settings.interpolate)
-    {
-        case 1:
-            exec+= "-y ";
-            break;
-        case 2:
-            exec+= "-y2 ";
-            break;
-        case 3:
-            exec+= "-y3 ";
-            break;
-        case 4:
-            exec+= "-y4 ";
-            break;
-        case 5:
-            exec+= "-y5";
-            break;
-        default:
-            break;
-    }
-    if(game_settings.sound_skip != 0)
-    {
-        exec+= "-sk ";
-        exec+= QString::number(game_settings.sound_skip);
-        exec+= " ";
-    }
+        exec+= (snes9x)? "-nospeedhacks " : "-7 ";
     if(game_settings.sound_quality != 0)
     {
-        exec+= "-soundquality ";
+        exec+= (snes9x)? "-soundquality " : "-r ";
         exec+= QString::number(game_settings.sound_quality);
         exec+= " ";
     }
-    if(game_settings.buffer_size != 0)
-    {
-        exec+= "-bs ";
-        exec+= QString::number(game_settings.buffer_size);
-        exec+= " ";
-    }
+
+    //Disable the menu and mouse if its zsnes
+    if(zsnes)
+        exec+= "-m -j ";
+
     exec+= game_settings.extra_options;
     exec+= " \"" + gContext->GetSetting("SnesRomLocation") + "/" + romdata->Romname() + "\"";
     cout << exec << endl;

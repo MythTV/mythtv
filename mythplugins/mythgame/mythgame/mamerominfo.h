@@ -51,6 +51,7 @@ class MameRomInfo : public RomInfo
                 favourite = lhs.favourite;
                 timesplayed = lhs.timesplayed;
                 image_searched = lhs.image_searched;
+                rom_path = lhs.rom_path;
             }
     MameRomInfo(const RomInfo &lhs) :
                 RomInfo(lhs) {}
@@ -129,6 +130,9 @@ class MameRomInfo : public RomInfo
 
     virtual bool FindImage(QString type,QString *result);
 
+    QString RomPath() const { return rom_path; }
+    void setRomPath(QString lrom_path) { rom_path = lrom_path; }
+
   protected:
     QString manu;
     QString cloneof;
@@ -145,6 +149,7 @@ class MameRomInfo : public RomInfo
     QString control;
     QString category;
     QString mame_ver_added;
+    QString rom_path;
     int num_players;
     int num_buttons;
     RomStatus status;

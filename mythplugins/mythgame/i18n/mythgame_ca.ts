@@ -35,10 +35,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Order in which to sort the games - this is for all systems.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>MAME binary location</source>
         <translation type="unfinished"></translation>
     </message>
@@ -208,10 +204,6 @@
     </message>
     <message>
         <source>MythGame Settings -- PC games</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Looking for Mame games...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -659,21 +651,140 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to get supported games.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MythTV was unable to retrieve the number of supported games.
-Is your path to xmame correct?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to read catver.ini</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>MythTV was unable to read catver.ini.
 Please enter the correct path and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAME image downloader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The path to the MAME image downloader helper.  (See the contrib/ dir in the mythgame source.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically download images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attempt to automatically download ROM images if they don&apos;t exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SNES Emulator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SNES9x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>zSNES</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Which emulator to use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable autoframeskip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate screen anti-clockwise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate screen clockwise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip screen left-right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip screen upside-down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use additional game artwork</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable displaying simulated scanlines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set X-Y Scale to the same aspect ratio. For vector games scale may have value&apos;s like 1.5 and even 0.5. For scaling of regular games this will be rounded to an int</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable antialiasing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable tranlucency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always scale vectorgames to X x Y, keeping their aspect ratio. This overrides the scale options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Beam</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the beam size for vector games (float)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flicker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the flicker for vector games (float)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable sound (if available)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable samples (if available)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate sound even when sound is disabled, this is needed for some games which won&apos;t run without sound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set volume to x db, (-32 (soft) - 0(loud) )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cheat subsystem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable mouse (if supported)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select type of joystick support to use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Joystick as analog for analog controls</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

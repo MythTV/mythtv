@@ -62,7 +62,7 @@ public:
         MameSetting("autoframeskip", rom) {
         setLabel(QObject::tr("Auto frame skip"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Enable autoframeskip"));
     };
 };
 
@@ -72,7 +72,7 @@ public:
         MameSetting("rotleft", rom) {
         setLabel(QObject::tr("Rotate left"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Rotate screen anti-clockwise"));
     };
 };
 
@@ -82,7 +82,7 @@ public:
         MameSetting("rotright", rom) {
         setLabel(QObject::tr("Rotate right"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Rotate screen clockwise"));
     };
 };
 
@@ -92,7 +92,7 @@ public:
         MameSetting("flipx", rom) {
         setLabel(QObject::tr("Flip X Axis"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Flip screen left-right"));
     };
 };
 
@@ -102,7 +102,7 @@ public:
         MameSetting("flipy", rom) {
         setLabel(QObject::tr("Flip Y Axis"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Flip screen upside-down"));
     };
 };
 
@@ -112,7 +112,7 @@ public:
         MameSetting("extra_artwork", rom) {
         setLabel(QObject::tr("Extra Artwork"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Use additional game artwork"));
     };
 };
 
@@ -122,7 +122,7 @@ public:
         MameSetting("scanlines", rom) {
         setLabel(QObject::tr("Scanlines"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Enable displaying simulated scanlines"));
     };
 };
 
@@ -143,7 +143,10 @@ public:
         MameSetting("scale", rom) {
         setLabel(QObject::tr("Scaling"));
         setValue(1);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Set X-Y Scale to the same aspect ratio. For "
+                                "vector games scale may have value's like 1.5 and even "
+                                "0.5. For scaling of regular games this will be "
+                                "rounded to an int"));
     };
 };
 
@@ -154,7 +157,7 @@ public:
         MameSetting("antialias", rom) {
         setLabel(QObject::tr("Antialiasing"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Enable antialiasing"));
     };
 };
 
@@ -164,7 +167,7 @@ public:
         MameSetting("translucency", rom) {
         setLabel(QObject::tr("Translucency"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Enable tranlucency"));
     };
 };
 
@@ -179,29 +182,29 @@ public:
         addSelection(QObject::tr("1024 x 768"), "3");
         addSelection(QObject::tr("1280 x 1024"), "4");
         addSelection(QObject::tr("1600 x 1200"), "5");
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Always scale vectorgames to X x Y, keeping "
+                                "their aspect ratio. This overrides the scale "
+                                "options"));
     };
 };
 
-class MameBeam: public SpinBoxSetting, public MameSetting {
+class MameBeam: public LineEditSetting, public MameSetting {
 public:
     MameBeam(QString rom):
-        SpinBoxSetting(1, 15, 1),
         MameSetting("beam", rom) {
-        setLabel(QObject::tr("Scaling"));
-        setValue(1);
-        setHelpText(QObject::tr("No Help text"));
+        setLabel(QObject::tr("Beam"));
+        setValue("1.0");
+        setHelpText(QObject::tr("Set the beam size for vector games (float)"));
     };
 };
 
-class MameFlicker: public SpinBoxSetting, public MameSetting {
+class MameFlicker: public LineEditSetting, public MameSetting {
 public:
     MameFlicker(QString rom):
-        SpinBoxSetting(0, 10, 1),
-        MameSetting("beam", rom) {
-        setLabel(QObject::tr("Scaling"));
-        setValue(0);
-        setHelpText(QObject::tr("No Help text"));
+        MameSetting("flicker", rom) {
+        setLabel(QObject::tr("Flicker"));
+        setValue("0.0");
+        setHelpText(QObject::tr("Set the flicker for vector games (float)"));
     };
 };
 
@@ -212,7 +215,7 @@ public:
         MameSetting("sound", rom) {
         setLabel(QObject::tr("Use sound"));
         setValue(true);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Enable sound (if available)"));
     };
 };
 
@@ -222,7 +225,7 @@ public:
         MameSetting("samples", rom) {
         setLabel(QObject::tr("Use samples"));
         setValue(true);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Enable samples (if available)"));
     };
 };
 
@@ -232,7 +235,9 @@ public:
         MameSetting("fakesound", rom) {
         setLabel(QObject::tr("Fake sound"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Generate sound even when sound is disabled, "
+                                "this is needed for some games which won't run "
+                                "without sound"));
     };
 };
 
@@ -242,8 +247,8 @@ public:
         SpinBoxSetting(-32, 0, 1),
         MameSetting("volume", rom) {
         setLabel(QObject::tr("Volume"));
-        setValue(-16);
-        setHelpText(QObject::tr("No Help text"));
+        setValue(-3);
+        setHelpText(QObject::tr("Set volume to x db, (-32 (soft) - 0(loud) )"));
     };
 };
 
@@ -254,7 +259,7 @@ public:
         MameSetting("cheat", rom) {
         setLabel(QObject::tr("Enable cheats"));
         setValue(true);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Enable cheat subsystem"));
     };
 };
 
@@ -285,7 +290,7 @@ public:
         MameSetting("mouse", rom) {
         setLabel(QObject::tr("Use Mouse"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Enable mouse (if supported)"));
     };
 };
 
@@ -312,7 +317,7 @@ public:
         addSelection(QObject::tr("NetBSD USB Joystick"), "5");
         addSelection(QObject::tr("PS2-Linux native pad"), "6");
         addSelection(QObject::tr("SDL Joystick"), "7");
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Select type of joystick support to use"));
     };
 };
 
@@ -322,7 +327,7 @@ public:
         MameSetting("analogjoy", rom) {
         setLabel(QObject::tr("Use joystick as analog"));
         setValue(false);
-        setHelpText(QObject::tr("No Help text"));
+        setHelpText(QObject::tr("Use Joystick as analog for analog controls"));
     };
 };
 

@@ -34,6 +34,7 @@ class MameHandler : public GameHandler
   protected:
     bool check_xmame_exe();
     void makecmd_line(const char * game, QString* exec, MameRomInfo * romentry);
+    void makecmd_line(const char * game, QString* exec, QString &rom_path);
     void SetGeneralPrefs();
     void SetGameSettings(GameSettings &game_settings, MameRomInfo *rominfo);
     void SetDefaultSettings();
