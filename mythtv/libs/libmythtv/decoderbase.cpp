@@ -403,13 +403,30 @@ bool DecoderBase::DoFastForward(long long desiredFrame)
     if (!m_positionMap.empty())
         last_frame = m_positionMap[m_positionMap.size()-1].index * keyframedist;
 
-    if (desiredFrame > last_frame) 
+    if (desiredFrame > last_frame)
+    {
+        VERBOSE(VB_PLAYBACK, QString("DoFastForward: Not enough info in "
+                                     "positionMap, we need frame %1 but "
+                                     "highest we have is %2")
+                                     .arg((long int)desiredFrame)
+                                     .arg((long int)last_frame));
         SyncPositionMap();
+    }
 
     bool needflush = false;
 
     if (!m_positionMap.empty())
         last_frame = m_positionMap[m_positionMap.size()-1].index * keyframedist;
+
+    if (desiredFrame > last_frame)
+    {
+        VERBOSE(VB_PLAYBACK, QString("DoFastForward: Still Not enough info in "
+                                     "positionMap, we need frame %1 but "
+                                     "highest we have is %2.  Will seek "
+                                     "frame-by-frame")
+                                     .arg((long int)desiredFrame)
+                                     .arg((long int)last_frame));
+    }
 
     while (desiredFrame > last_frame)
     {

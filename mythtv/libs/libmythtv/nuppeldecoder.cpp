@@ -889,12 +889,21 @@ void NuppelDecoder::GetFrame(int avignore)
 
                 if (!hasFullPositionMap)
                 {
-                    // Grow positionMap vector several entries at a time
-                    if (m_positionMap.capacity() == m_positionMap.size())
-                        m_positionMap.reserve(m_positionMap.size() + 60);
-                    PosMapEntry entry = {lastKey / keyframedist,
-                                         lastKey, currentposition};
-                    m_positionMap.push_back(entry);
+                    long long last_index = 0;
+                    long long this_index = lastKey / keyframedist;
+                    if (!m_positionMap.empty())
+                        last_index =
+                            m_positionMap[m_positionMap.size() - 1].index;
+
+                    if (this_index > last_index)
+                    {
+                        // Grow positionMap vector several entries at a time
+                        if (m_positionMap.capacity() == m_positionMap.size())
+                            m_positionMap.reserve(m_positionMap.size() + 60);
+                        PosMapEntry entry = {this_index, lastKey,
+                                             currentposition};
+                        m_positionMap.push_back(entry);
+                    }
                 }
             }
             if (getrawframes)

@@ -245,6 +245,9 @@ void IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
                             keyframedist = frameNum - firstgoppos;
                             gopset = true;
                             m_parent->SetVideoParams(-1, -1, -1, keyframedist);
+                            VERBOSE(VB_PLAYBACK,
+                                    QString("keyframedist changed to %1")
+                                    .arg(keyframedist));
                         }
                         else
                             firstgoppos = frameNum;

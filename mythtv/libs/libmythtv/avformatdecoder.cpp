@@ -775,7 +775,8 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
 
         if (!gopset) // gopset: we've seen 2 keyframes
         {
-            //cerr << "!gopset, syncing posmap" << endl;
+            VERBOSE(VB_PLAYBACK, QString("HandleGopStart: gopset not set, "
+                                         "syncing positionMap"));
             SyncPositionMap();
             if (tempKeyFrameDist > 0)
             {
