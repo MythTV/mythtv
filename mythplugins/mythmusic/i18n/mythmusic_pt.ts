@@ -660,23 +660,23 @@
     </message>
     <message>
         <source>music database</source>
-        <translation>Base de Dados de Música</translation>
+        <translation type="obsolete">Base de Dados de Música</translation>
     </message>
     <message>
         <source>cd ripper</source>
-        <translation>cópia de CD</translation>
+        <translation type="obsolete">cópia de CD</translation>
     </message>
     <message>
         <source>
 
 You have no MythMusic tables in your database.</source>
-        <translation>
+        <translation type="obsolete">
 
 Não existem dados do MythMusic na base de dados.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll read the documentation</source>
-        <translation>Ok, eu leio a documentação</translation>
+        <translation type="obsolete">Ok, eu leio a documentação</translation>
     </message>
     <message>
         <source>Unknown</source>

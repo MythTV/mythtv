@@ -600,23 +600,23 @@
     </message>
     <message>
         <source>music database</source>
-        <translation>Base de dades de música</translation>
+        <translation type="obsolete">Base de dades de música</translation>
     </message>
     <message>
         <source>cd ripper</source>
-        <translation>volcador de CD</translation>
+        <translation type="obsolete">volcador de CD</translation>
     </message>
     <message>
         <source>
 
 You have no MythMusic tables in your database.</source>
-        <translation>
+        <translation type="obsolete">
 
 No disposa de les taules de MythMusic en la seva Base de Dades.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll read the documentation</source>
-        <translation>OK, llegiré la documentació</translation>
+        <translation type="obsolete">OK, llegiré la documentació</translation>
     </message>
     <message>
         <source>Unknown Artist</source>

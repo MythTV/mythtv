@@ -600,21 +600,21 @@
     </message>
     <message>
         <source>music database</source>
-        <translation>Base de Datos de música</translation>
+        <translation type="obsolete">Base de Datos de música</translation>
     </message>
     <message>
         <source>cd ripper</source>
-        <translation>ripeador</translation>
+        <translation type="obsolete">ripeador</translation>
     </message>
     <message>
         <source>
 
 You have no MythMusic tables in your database.</source>
-        <translation>No tiene las tablas de MythMusic en su Base de Datos.</translation>
+        <translation type="obsolete">No tiene las tablas de MythMusic en su Base de Datos.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll read the documentation</source>
-        <translation>Bien, leeré la documentación</translation>
+        <translation type="obsolete">Bien, leeré la documentación</translation>
     </message>
     <message>
         <source>Unknown Artist</source>

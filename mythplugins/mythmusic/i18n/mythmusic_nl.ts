@@ -520,24 +520,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>music database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>cd ripper</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>
-
-You have no MythMusic tables in your database.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OK, I&apos;ll read the documentation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unknown Artist</source>
         <translation type="unfinished"></translation>
     </message>

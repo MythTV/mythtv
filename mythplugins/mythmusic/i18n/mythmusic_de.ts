@@ -521,23 +521,23 @@
     </message>
     <message>
         <source>music database</source>
-        <translation>Musikdatenbank</translation>
+        <translation type="obsolete">Musikdatenbank</translation>
     </message>
     <message>
         <source>cd ripper</source>
-        <translation>CD Ripper</translation>
+        <translation type="obsolete">CD Ripper</translation>
     </message>
     <message>
         <source>
 
 You have no MythMusic tables in your database.</source>
-        <translation>&lt;br&gt;
+        <translation type="obsolete">&lt;br&gt;
 &lt;br&gt;
 MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll read the documentation</source>
-        <translation>Gut, ich werde die Dokumentation lesen</translation>
+        <translation type="obsolete">Gut, ich werde die Dokumentation lesen</translation>
     </message>
     <message>
         <source>Unknown Artist</source>

@@ -523,23 +523,23 @@
     </message>
     <message>
         <source>music database</source>
-        <translation>musikdatabas</translation>
+        <translation type="obsolete">musikdatabas</translation>
     </message>
     <message>
         <source>cd ripper</source>
-        <translation>cd-kopierare</translation>
+        <translation type="obsolete">cd-kopierare</translation>
     </message>
     <message>
         <source>
 
 You have no MythMusic tables in your database.</source>
-        <translation>
+        <translation type="obsolete">
 
 Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll read the documentation</source>
-        <translation>OK, jag skall läsa dokumentationen</translation>
+        <translation type="obsolete">OK, jag skall läsa dokumentationen</translation>
     </message>
     <message>
         <source>Unknown Artist</source>
