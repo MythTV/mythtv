@@ -521,8 +521,10 @@ static GlobalSpinBox *RecordPreRoll()
     GlobalSpinBox *bs = new GlobalSpinBox("RecordPreRoll", 0, 600, 60, true);
     bs->setLabel(QObject::tr("Time to record before start of show "
                  "(in seconds)"));
-    bs->setHelpText(QObject::tr("This global setting is ignored in case of "
-                    "conflicts with other scheduled programs."));
+    bs->setHelpText(QObject::tr("This global setting allows the recorder "
+                    "to start before the scheduled start time. It does "
+                    "not affect the scheduler. It is ignored when two shows "
+                    "have been scheduled without enough time in between."));
     bs->setValue(0);
     return bs;
 }
@@ -532,8 +534,10 @@ static GlobalSpinBox *RecordOverTime()
     GlobalSpinBox *bs = new GlobalSpinBox("RecordOverTime", 0, 1800, 60, true);
     bs->setLabel(QObject::tr("Time to record past end of show (in seconds)"));
     bs->setValue(0);
-    bs->setHelpText(QObject::tr("This global setting is ignored in case of "
-                    "conflicts with other scheduled programs."));
+    bs->setHelpText(QObject::tr("This global setting allows the recorder "
+                    "to record beyond the scheduled end time. It does "
+                    "not affect the scheduler. It is ignored when two shows "
+                    "have been scheduled without enough time in between."));
     return bs;
 }
 
