@@ -21,7 +21,7 @@
 #    preference of program for exports.  This is equivalent to --ffmpeg,
 #    --transcode or --mencoder
 #
-    export_prog=transcode
+    export_prog=ffmpeg
 
 #
 #  Any other parameters set in this file are equivalent to using the equivalent
@@ -51,7 +51,7 @@
 
 <generic>
 
-    path = /home/xris/Video
+    path = .
 
     use_cutlist     = yes
     multipass       = yes
