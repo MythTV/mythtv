@@ -212,6 +212,8 @@ bool MpegRecorder::SetupRecording(void)
         return false;
     }    
 
+    prev_gop_save_pos = -1;
+
     return true;
 }
 
@@ -314,7 +316,6 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                 startpos += pkt.startpos;
 
                 long long keyCount = frameNum / keyframedist;
-                static long long prev_gop_save_pos = -1;
 
                 positionMap[keyCount] = startpos;
 

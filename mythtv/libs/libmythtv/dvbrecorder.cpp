@@ -44,6 +44,7 @@ DVBRecorder::DVBRecorder(const DVBChannel* dvbchannel)
     framesWritten = 0;
     keyframedist = 15;
     gopset = false;
+    prev_gop_save_pos = -1;
 }
 
 DVBRecorder::~DVBRecorder()
@@ -393,7 +394,6 @@ void DVBRecorder::ProcessData(unsigned char *buffer, int len)
                 startpos += pkt.startpos;
 
                 long long keyCount = frameNum / keyframedist;
-                static long long prev_gop_save_pos = -1;
 
                 positionMap[keyCount] = startpos;
 

@@ -65,6 +65,8 @@ class MpegRecorder : public RecorderBase
     bool gopset;
 
     QMap<long long, long long> positionMap;
+
+    long long prev_gop_save_pos;
 };
 
 #endif

@@ -83,6 +83,8 @@ class DVBRecorder : public RecorderBase
     vector<int> pid;
     bool pid_changed;
     const DVBChannel* channel;
+
+    long long prev_gop_save_pos;
 };
 
 #endif

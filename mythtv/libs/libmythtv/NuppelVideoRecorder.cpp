@@ -138,6 +138,9 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     memset(&subtitle, 0, sizeof(subtitle));
 
     usingv4l2 = false;
+
+    prev_bframe_save_pos = -1;
+    prev_keyframe_save_pos = -1;
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -2714,8 +2717,6 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
     int fnum = frame->frameNumber;
     int timecode = frame->timecode;
     unsigned char *buf = frame->buf;
-    static long long prev_bframe_save_pos = -1;
-    static long long prev_keyframe_save_pos = -1;
 
     memset(&frameheader, 0, sizeof(frameheader));
 

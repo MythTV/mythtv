@@ -265,6 +265,9 @@ class NuppelVideoRecorder : public RecorderBase
 
     bool usingv4l2;
     int channelfd;
+
+    long long prev_bframe_save_pos;
+    long long prev_keyframe_save_pos;
 };
 
 #endif
