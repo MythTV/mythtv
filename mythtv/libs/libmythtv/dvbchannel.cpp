@@ -376,7 +376,7 @@ void DVBChannel::CheckOptions()
                 WARNING("Unsupported code_rate_hp option.");
 
             if (!CheckCodeRate(t.params.u.ofdm.code_rate_LP))
-                WARNING("Unsupported cope_rate_lp parameter.");
+                WARNING("Unsupported code_rate_lp parameter.");
 
             if ((t.params.u.ofdm.bandwidth == BANDWIDTH_AUTO)
                 && !(info.caps & FE_CAN_BANDWIDTH_AUTO))
@@ -533,7 +533,7 @@ bool DVBChannel::ParseQuery(QSqlQuery& query)
 bool DVBChannel::ParseQPSK(const QString& frequency, const QString& inversion,
                            const QString& symbol_rate, const QString& fec_inner,
                            const QString& pol, 
-                           const QString& deseqc_type, const QString& diseqc_port,
+                           const QString& diseqc_type, const QString& diseqc_port,
                            const QString& lnb_lof_switch, const QString& lnb_lof_hi,
                            const QString& lnb_lof_lo, dvb_tuning_t& t)
 {
