@@ -49,7 +49,7 @@ class Metadata
                 bool l_ephemeral = false
             );
 
-    ~Metadata();
+    virtual ~Metadata();
 
     //
     //  Get 'em
@@ -155,39 +155,6 @@ class AudioMetadata : public Metadata
     int tracknum;
     int length;
 };
-
-/*
-
-class AudioDBMetadata : public AudioMetadata
-{
-  public:
-
-    AudioDBMetadata( 
-                      int l_collection_id, 
-                      int l_id,
-                      int l_db_id,
-                      QUrl l_url = QUrl(""),
-                      int l_rating = 0,
-                      QDateTime l_last_played = QDateTime(),
-                      int l_play_count = 0,
-                      bool l_ephemeral = false,
-                      QString l_artist = "", 
-                      QString l_album = "", 
-                      QString l_title = "", 
-                      QString l_genre = "", 
-                      int l_year = 0, 
-                      int l_tracknum = 0, 
-                      int l_length = 0
-                 );
-    ~AudioDBMetadata();
-
-  protected:
-
-    bool changed;
-};
-
-*/
-
 
 
 class Playlist

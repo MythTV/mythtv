@@ -132,39 +132,57 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
         //  for playing.
         //
 
+        //
+        //  We don't want the metadata to change from this point on (once
+        //  we've got the audio generation value). So we lock it, do all our
+        //  processing, and then unlock it. This is not as bad as it sounds,
+        //  because all we're doing is building an in memory structured
+        //  response to the request. Actually sending the bits over the wire
+        //  is handled by our base class outside of the lock.
         
-        uint audio_generation = metadata_server->getMetadataAudioGeneration();
-        if(daap_request->getDatabaseVersion() != audio_generation &&
-           daap_request->getDatabaseVersion() != 0)
-        {
-            log(QString(": a client asked for a database request, "
-                        "but has stale db reference "
-                        "(mfd db# = %1, client db# = %2)")
-                        .arg(audio_generation)
-                        .arg(daap_request->getDatabaseVersion()), 9);
 
-            sendUpdate(http_request, audio_generation);
-        }
-        else
-        {
-            sendMetadata(http_request, http_request->getUrl(), daap_request);
-        }        
-        return;        
+        metadata_server->lockMetadata();
+
+            uint audio_generation = metadata_server->getMetadataAudioGeneration();
+
+            if(daap_request->getDatabaseVersion() != audio_generation &&
+               daap_request->getDatabaseVersion() != 0)
+            {
+                log(QString(": a client asked for a database request, "
+                            "but has stale db reference "
+                            "(mfd db# = %1, client db# = %2)")
+                            .arg(audio_generation)
+                            .arg(daap_request->getDatabaseVersion()), 9);
+
+                sendUpdate(http_request, audio_generation);
+            }
+            else
+            {
+                //
+                //  Ah, so we really need to send metadata. 
+                //
+
+                sendMetadata(http_request, http_request->getUrl(), daap_request);
+
+            }
+        metadata_server->unlockMetadata();
     }
     else if (daap_request->getRequestType() == DAAP_REQUEST_UPDATE)
     {
-        if(first_update)
-        {
-            //
-            //  Log some data about Client-DAAP-Validation
-            //
+        //
+        //  Log some data about Client-DAAP-Validation
+        //
         
-            first_update = false;
-            if(
-                http_request->getHeader("Client-DAAP-Validation") &&
-                daap_request->getClientType() == DAAP_CLIENT_ITUNES4X
-              )
+        if(
+            http_request->getHeader("Client-DAAP-Validation") &&
+            daap_request->getClientType() == DAAP_CLIENT_ITUNES4X
+          )
+        {
+            if(first_update)    // Do I need to mutex this test?    
             {
+                first_update_mutex.lock();
+                    first_update = false;
+                first_update_mutex.unlock();
                 log(QString("map the md5 checksum relationship between \"%1\" "
                             "and \"%2\", win a prize")
                             .arg(http_request->getRequest())
@@ -216,7 +234,6 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
         //
         
         http_request->getResponse()->setError(204);
-        
     }
 
     
@@ -314,25 +331,9 @@ void DaapServer::sendServerInfo(HttpRequest *http_request)
                 << Tag('msbr') << (u8) 0 << end 
                 << Tag('msqy') << (u8) 0 << end 
                 << Tag('msix') << (u8) 0 << end 
-                << Tag('msrs') << (u8) 0 << end;
+                << Tag('msrs') << (u8) 0 << end
+                << Tag('msdc') << (u32) 1 << end;
 
-                //
-                //  Handle iTunes/etc. (only understands one database)
-                //  versus a _real_ daap client (e.g. another Myth box).
-                //
-                
-                QString user_agent = http_request->getHeader("User-Agent");
-
-                if(user_agent.left(6) == "MythTV")
-                {
-                    response << Tag('msdc') << (u32) metadata_server->getMetadataContainerCount() << end;
-                }
-                else
-                {
-                    response << Tag('msdc') << (u32) 1 << end;
-                }
-
-             
              response << end;
 
     sendTag( http_request, response.data() );
@@ -345,6 +346,12 @@ void DaapServer::sendServerInfo(HttpRequest *http_request)
 void DaapServer::sendTag( HttpRequest *http_request, const Chunk& c ) 
 {
     //
+    //  Note the function name is a bit of a mismomer as we are not actually
+    //  sending anything here. This just loads the payload of the http/daap
+    //  response with whatever data we've built up.
+    //
+
+    //
     //  Set some header stuff 
     //
     
@@ -356,10 +363,6 @@ void DaapServer::sendTag( HttpRequest *http_request, const Chunk& c )
     //
     
     http_request->getResponse()->setPayload((char*) c.begin(), c.size());
-    
-    //
-    //  We are done ... this will exit out and the base class will send it off
-    //
 }
 
 
@@ -384,7 +387,7 @@ void DaapServer::parseVariables(HttpRequest *http_request, DaapRequest *daap_req
     //
 
     QString user_agent = http_request->getHeader("User-Agent");
-    // QString user_agent = server->request.userAgent;
+
     if(user_agent.contains("iTunes/4"))
     {
         daap_request->setClientType(DAAP_CLIENT_ITUNES4X);
@@ -492,7 +495,7 @@ void DaapServer::sendMetadata(HttpRequest *http_request, QString request_path, D
         //  It must (*must*) have asked for /databases
         //
         
-        sendDatabaseList(http_request, daap_request);
+        sendDatabaseList(http_request);
     } 
     else 
     {
@@ -501,19 +504,6 @@ void DaapServer::sendMetadata(HttpRequest *http_request, QString request_path, D
         //
 
         
-        /*
-        if( components[1].toULong() != (ulong) parent->getMetadataAudioGeneration() ||
-            components.count() < 3)
-        {
-            //
-            //  I don't know what it's asking for ... doesn't make sense ... or db is out of date
-            //
-            
-            http_request->getResponse()->setError(403);
-            return;
-        }
-        */
- 
         if( components[2] == "items" )
         {
             if( components.count() == 3 )
@@ -545,7 +535,7 @@ void DaapServer::sendMetadata(HttpRequest *http_request, QString request_path, D
             else if ( components.count() == 5 && components[4] == "items" )
             {
                 u32 container_id = components[3].toULong();
-                sendContainer(http_request, daap_request, container_id, components[1].toInt());
+                sendContainer(http_request, container_id, components[1].toInt());
 
             } 
             else 
@@ -562,87 +552,37 @@ void DaapServer::sendMetadata(HttpRequest *http_request, QString request_path, D
     }    
 }
 
-void DaapServer::sendDatabaseList(HttpRequest *http_request, DaapRequest *daap_request)
+void DaapServer::sendDatabaseList(HttpRequest *http_request)
 {
 
     //
-    //  If we're talking to another mfd, each MetadataContainer is a
-    //  "database" in DAAP terms. If, however we're talking to iTunes (or
-    //  any other DAAP client we don't specifically recognize), we "fold"
-    //  all the MetadataContainers into a single DAAP "database", and use
-    //  Universal ID's (which hold the MetaContainer id) instead or real
-    //  id's.
+    //  Describe our only "virtual" database and how many items (songs) and
+    //  containers (playlists) it has
     //
-    //  So, as far as iTunes is concerned, there is only 1 database which
-    //  contains *all* audio items and containers/playlists.
-    //
-
 
     TagOutput response;
     
-    if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
-    {
-        
-
-        metadata_server->lockMetadata();
-
-        QPtrList<MetadataContainer>* the_containers = metadata_server->getLocalAudioMetadataContainers();
-        uint numb_metadata_containers = the_containers->count();
-        
-                response << Tag('avdb') 
-                    << Tag('mstt') << (u32) DAAP_OK << end 
-                    << Tag('muty') << (u8) 0 << end 
-                    << Tag('mtco') << (u32) numb_metadata_containers << end 
-                    << Tag('mrco') << (u32) numb_metadata_containers << end 
-                    << Tag('mlcl');
-                        
-                        //
-                        //  Iterate over the containers and send data about
-                        //  each one (that's why we've got a metadata lock
-                        //  on)
-                        //
-
-                        MetadataContainer *a_container;
-                        for ( a_container = the_containers->first(); a_container; a_container = the_containers->next() )
-                        {
-                            response << Tag('mlit')
-                        
-                                << Tag('miid') << (u32) a_container->getIdentifier() << end 
-                                //<< Tag('mper') << (u64) 543675286654 blah some persistent id << end 
-                                << Tag('minm') << a_container->getName().utf8() << end 
-                                << Tag('mimc') << (u32) a_container->getMetadataCount() << end 
-                                << Tag('mctc') << (u32) a_container->getPlaylistCount() << end 
-                            << end;
-                        }
-                    response << end 
-                << end;
-        metadata_server->unlockMetadata();
-    }
-    else
-    {
-        response << Tag('avdb') 
-                    << Tag('mstt') << (u32) DAAP_OK << end 
-                    << Tag('muty') << (u8) 0 << end 
-                    << Tag('mtco') << (u32) 1 << end 
-                    << Tag('mrco') << (u32) 1 << end 
-                    << Tag('mlcl')
-                        << Tag('mlit')
-                            << Tag('miid') << (u32) 1 << end 
-                            //<< Tag('mper') << (u64) 543675286654 << end 
-                            << Tag('minm') << service_name.utf8() << end 
-                            << Tag('mimc') << (u32) metadata_server->getAllLocalAudioMetadataCount() << end 
-                            << Tag('mctc') << (u32) metadata_server->getAllLocalAudioPlaylistCount() << end 
-                        << end
-                    << end 
-                << end;
-    }
-    
+    response << Tag('avdb') 
+                << Tag('mstt') << (u32) DAAP_OK << end 
+                << Tag('muty') << (u8) 0 << end 
+                << Tag('mtco') << (u32) 1 << end 
+                << Tag('mrco') << (u32) 1 << end 
+                << Tag('mlcl')
+                    << Tag('mlit')
+                        << Tag('miid') << (u32) 1 << end 
+                        //<< Tag('mper') << (u64) 543675286654 << end 
+                        << Tag('minm') << service_name.utf8() << end 
+                        << Tag('mimc') << (u32) metadata_server->getAllLocalAudioMetadataCount() << end 
+                        << Tag('mctc') << (u32) metadata_server->getAllLocalAudioPlaylistCount() << end 
+                    << end
+                << end 
+            << end;
 
     sendTag( http_request, response.data() );
 
 }
 
-void DaapServer::addItemToResponse(TagOutput &response, AudioMetadata *which_item, u64 meta_codes, bool universal_conversion)
+void DaapServer::addItemToResponse(TagOutput &response, AudioMetadata *which_item, u64 meta_codes)
 {
     response << Tag('mlit');
                     
@@ -652,15 +592,9 @@ void DaapServer::addItemToResponse(TagOutput &response, AudioMetadata *which_ite
     //  item id, and item name must _always_ be sent
     //
     
-    uint item_id = which_item->getId();
-    if(universal_conversion)
-    {
-        item_id = which_item->getUniversalId();
-    }
-    
     response << Tag('mikd') << (u8) 2 << end;
     response << Tag('asdk') << (u8) 0 << end;
-    response << Tag('miid') << (u32) item_id << end;
+    response << Tag('miid') << (u32) which_item->getUniversalId() << end;
     response << Tag('minm') << which_item->getTitle().utf8() << end;
 
     //
@@ -845,13 +779,13 @@ void DaapServer::addItemToResponse(TagOutput &response, AudioMetadata *which_ite
 
 void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_request, int which_database)
 { 
+    if(which_database != 1)
+    {
+        warning("some client is asking about a database other than 1");
+    }
 
     //
-    //  OK, this is a bit complicated. If the client is another Myth box, we
-    //  need to send only the database in question. If it's iTunes (or
-    //  equivalent), we need to send unified data (single DAAP "database").
-    //  At the same time, if the client's generation is only off by one, we
-    //  don't need to send the whole database, just deltas.
+    //  send deltas (+/-) additions if it makes sense, otherwise send everything
     //
 
     uint audio_generation = metadata_server->getMetadataAudioGeneration();
@@ -867,288 +801,132 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
     u64 meta_codes = daap_request->getParsedMetaContentCodes();
     uint audio_count = metadata_server->getAllLocalAudioMetadataCount();
 
-    if(last_changed_collection != NULL &&
-       client_db_delta  != 0 &&
-       client_db_generation == audio_generation &&
-       client_db_generation == client_db_delta + 1)
+    if(last_changed_collection != NULL              &&
+       last_changed_collection->isAudio()           &&
+       last_changed_collection->isLocal()           &&
+       client_db_delta  != 0                        &&
+       client_db_generation == audio_generation     &&
+       client_db_generation == client_db_delta + 1
+      )
     {
+
+        //
+        //  The client is only off by one, so we can be slightly efficient here and only send the deltas
+        //
         
-        if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
+        QValueList<int> *additions = last_changed_collection->getMetadataAdditions();
+        QValueList<int> *deletions = last_changed_collection->getMetadataDeletions();
+
+        TagOutput response;
+        response    << Tag( 'adbs' )
+                         << Tag('mstt') << (u32) DAAP_OK << end
+                         << Tag('muty') << (u8) 0 << end
+                         << Tag('mtco') << (u32) audio_count << end
+                         << Tag('mrco') << (u32) additions->count() << end;
+
+        //
+        //  Send new items (delta +)
+        //
+        
+        if(additions->count() > 0)
         {
-            //
-            //  If this container is the one that changed, send the deltas, otherwise say "I haven't changed".
-            //
-            
-            metadata_server->lockMetadata();
-        
-            QValueList<int> *additions;
-            QValueList<int> *deletions;
-            if(which_collection_id == which_database)
-            {
-                additions = last_changed_collection->getMetadataAdditions();
-                deletions = last_changed_collection->getMetadataDeletions();
-            }
-            else
-            {
-                additions = new QValueList<int>;
-                deletions = new QValueList<int>;
-            }
-        
-
-            TagOutput response;
-            response    << Tag( 'adbs' )
-                            << Tag('mstt') << (u32) DAAP_OK << end
-                            << Tag('muty') << (u8) 0 << end
-                            << Tag('mtco') << (u32) audio_count << end
-                            << Tag('mrco') << (u32) additions->count() << end;
-
-            //
-            //  Send new items (delta +)
-            //
-        
-            if(additions->count() > 0)
-            {
-                response << Tag('mlcl') ;
-                for(uint i = 0; i < additions->count(); i++)
+             response << Tag('mlcl') ;
+             for(uint i = 0; i < additions->count(); i++)
+             {
+                Metadata *added_metadata = last_changed_collection->getMetadata((*additions->at(i)));
+                if(added_metadata->getType() == MDT_audio)
                 {
-                    Metadata *added_metadata = last_changed_collection->getMetadata((*additions->at(i)));
-                    if(added_metadata->getType() == MDT_audio)
-                    {
-                        AudioMetadata *added_audio_metadata = (AudioMetadata*)added_metadata;
-                        addItemToResponse(response, added_audio_metadata, meta_codes);
-                    }
-                    else
-                    {
-                        //  Crap!
-                    }
-                }
-                response << end;
-            }
-        
-            //
-            //  Send deleted items (delta -)
-            //
-        
-            if(deletions->count() > 0)
-            {
-                response << Tag('mudl') ;
-                    for(uint i = 0; i < deletions->count(); i++)
-                    {
-                        response << Tag('miid') << (u32) ((*deletions->at(i)) + (which_collection_id * METADATA_UNIVERSAL_ID_DIVIDER )) << end;
-                    }
-                response << end;
-            }
-
-            //
-            //  Close out the adbs tag
-            //
-        
-            response << end;
-
-            metadata_server->unlockMetadata();
-
-            if(which_collection_id != which_database)
-            {
-                //
-                //  If we had to create empty ones, get rid of them
-                //
-                delete additions;
-                delete deletions;
-            }
-            
-            
-            sendTag( http_request, response.data() );
-            
-        }
-        else
-        {
-            //
-            //  The client is only off by one, so we can be slightly efficient here and only send the deltas
-            //
-        
-            metadata_server->lockMetadata();
-        
-            QValueList<int> *additions = last_changed_collection->getMetadataAdditions();
-            QValueList<int> *deletions = last_changed_collection->getMetadataDeletions();
-
-            TagOutput response;
-            response    << Tag( 'adbs' )
-                            << Tag('mstt') << (u32) DAAP_OK << end
-                            << Tag('muty') << (u8) 0 << end
-                            << Tag('mtco') << (u32) audio_count << end
-                            << Tag('mrco') << (u32) additions->count() << end;
-
-            //
-            //  Send new items (delta +)
-            //
-        
-            if(additions->count() > 0)
-            {
-                response << Tag('mlcl') ;
-                for(uint i = 0; i < additions->count(); i++)
-                {
-                    Metadata *added_metadata = last_changed_collection->getMetadata((*additions->at(i)));
-                    if(added_metadata->getType() == MDT_audio)
-                    {
-                        AudioMetadata *added_audio_metadata = (AudioMetadata*)added_metadata;
-                        addItemToResponse(response, added_audio_metadata, meta_codes);
-                    }
-                    else
-                    {
-                        //  Crap!
-                    }
-                }
-                response << end;
-            }
-        
-            //
-            //  Send deleted items (delta -)
-            //
-        
-            if(deletions->count() > 0)
-            {
-                response << Tag('mudl') ;
-                    for(uint i = 0; i < deletions->count(); i++)
-                    {
-                        response << Tag('miid') << (u32) ((*deletions->at(i)) + (which_collection_id * METADATA_UNIVERSAL_ID_DIVIDER )) << end;
-                    }
-                response << end;
-            }
-
-            //
-            //  Close out the adbs tag
-            //
-        
-            response << end;
-
-            metadata_server->unlockMetadata();
-            sendTag( http_request, response.data() );
-        }
-        
-    }
-    else
-    {    
-
-        if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
-        {
-            //
-            // Lock all the metadata before we do this
-            //
-             
-            metadata_server->lockMetadata();
-            
-            MetadataContainer *one_to_send = metadata_server->getMetadataContainer(which_database);
-            if(!one_to_send)
-            {
-                warning("cannot send a database that does not exist");
-                metadata_server->unlockMetadata();
-                return;
-            }
-
-            QIntDict<Metadata> *metadata_to_send = one_to_send->getMetadata();
-            
-             
-            TagOutput response;
-            response    << Tag( 'adbs' )
-                            << Tag('mstt') << (u32) DAAP_OK << end 
-                            << Tag('muty') << (u8) 0 << end 
-                            << Tag('mtco') << (u32) metadata_to_send->count() << end 
-                            << Tag('mrco') << (u32) metadata_to_send->count() << end 
-                            << Tag('mlcl') ;
-             
-            QIntDictIterator<Metadata> iterator(*metadata_to_send);
-            for( ; iterator.current(); ++iterator)
-            {
-                if(iterator.current()->getType() == MDT_audio)
-                {
-                    AudioMetadata *which_item = (AudioMetadata*)iterator.current();
-                    addItemToResponse(response, which_item, meta_codes, false);
+                    AudioMetadata *added_audio_metadata = (AudioMetadata*)added_metadata;
+                    addItemToResponse(response, added_audio_metadata, meta_codes);
                 }
                 else
                 {
-                    warning("got a metadata item off an audio collection that is not of type AudioMetadata");
+                    warning("getting non audio metadata off a last changed collection ... disaster");
                 }
             }
-            response << end 
-            << end;
-            metadata_server->unlockMetadata();
-            sendTag( http_request, response.data() );
+            response << end;
         }
-        else
+        
+        
+        //
+        //  Send deleted items (delta -)
+        //
+        
+        if(deletions->count() > 0)
         {
-            TagOutput response;
-            response    << Tag( 'adbs' )
-                            << Tag('mstt') << (u32) DAAP_OK << end 
-                            << Tag('muty') << (u8) 0 << end 
-                            << Tag('mtco') << (u32) audio_count << end 
-                            << Tag('mrco') << (u32) audio_count << end 
-                            << Tag('mlcl') ;
-             
-            //
-            // Lock all the metadata before we do this
-            //
-             
-            metadata_server->lockMetadata();
-             
-            //
-            // Iterate over all the containers, and then over every item in
-            // each container
-            //
-             
-            MetadataContainer *a_container = NULL;
-             
-            for(   
-                a_container = metadata_containers->first(); 
-                a_container; 
-                a_container = metadata_containers->next() 
-               )
+            response << Tag('mudl') ;
+            for(uint i = 0; i < deletions->count(); i++)
             {
-                if(a_container->isAudio())
-                {
-                    QIntDict<Metadata>     *which_metadata;
-                    which_metadata = a_container->getMetadata();
+                response << Tag('miid') << (u32) ((*deletions->at(i)) + (which_collection_id * METADATA_UNIVERSAL_ID_DIVIDER )) << end;
+            }
+            response << end;
+        }
+
+        //
+        //  Close out the adbs tag
+        //
+        
+        response << end;
+
+        sendTag( http_request, response.data() );
+    }
+    else
+    {    
+        TagOutput response;
+        response << Tag( 'adbs' )
+                    << Tag('mstt') << (u32) DAAP_OK << end 
+                    << Tag('muty') << (u8) 0 << end 
+                    << Tag('mtco') << (u32) audio_count << end 
+                    << Tag('mrco') << (u32) audio_count << end 
+                    << Tag('mlcl') ;
+             
+        //
+        // Iterate over all the containers, and then over every item in
+        // each container
+        //
+             
+        MetadataContainer *a_container = NULL;
+             
+        for(   
+            a_container = metadata_containers->first(); 
+            a_container; 
+            a_container = metadata_containers->next() 
+           )
+        {
+            if(a_container->isAudio())
+            {
+                QIntDict<Metadata>     *which_metadata;
+                which_metadata = a_container->getMetadata();
                     
-                    if(which_metadata)
+                if(which_metadata)
+                {
+                    QIntDictIterator<Metadata> iterator(*which_metadata);
+                    for( ; iterator.current(); ++iterator)
                     {
-                        QIntDictIterator<Metadata> iterator(*which_metadata);
-                        for( ; iterator.current(); ++iterator)
+                        if(iterator.current()->getType() == MDT_audio)
                         {
-                            if(iterator.current()->getType() == MDT_audio)
-                            {
-                                AudioMetadata *which_item = (AudioMetadata*)iterator.current();
-                                addItemToResponse(response, which_item, meta_codes);
-                            }
-                            else
-                            {
-                                warning("got a metadata item off an audio collection that is not of type AudioMetadata");
-                            }
+                            AudioMetadata *which_item = (AudioMetadata*)iterator.current();
+                            addItemToResponse(response, which_item, meta_codes);
+                        }
+                        else
+                        {
+                            warning("got a metadata item off an audio collection that is not of type AudioMetadata");
                         }
                     }
                 }
             }
-            response << end 
-            << end;
-            metadata_server->unlockMetadata();
-            sendTag( http_request, response.data() );
         }
-
+        
+        response << end 
+        << end;
+        sendTag( http_request, response.data() );
     }
-
 }
 
 void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRequest *daap_request)
 {
-    Metadata *which_one = NULL;
-    if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
-    {
-        //
-        //  Need to find it.
-        //
-    }
-    else
-    {
-        which_one = metadata_server->getMetadataByUniversalId(song_id);
-    }
+    Metadata *which_one = metadata_server->getMetadataByUniversalId(song_id);
+
     if(which_one)
     {
         if(which_one->getType() == MDT_audio)
@@ -1240,100 +1018,59 @@ void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRe
 
 void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_request, int which_database)
 {
-    if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
+    if(which_database != 1)
     {
-        //
-        //  For another Myth Box
-        //
+        warning("some client asked for containers in a database other than 1");
+    }
+    
 
-        metadata_server->lockMetadata();
-            
-        MetadataContainer *one_to_send = metadata_server->getMetadataContainer(which_database);
-        if(!one_to_send)
-        {
-            warning("cannot send playlists from a database that does not exist");
-            metadata_server->unlockMetadata();
-            return;
-        }
-        QIntDict<Playlist> *playlists_to_send = one_to_send->getPlaylists();
+    uint all_metadata_count = metadata_server->getAllLocalAudioMetadataCount();
+    uint all_playlist_count = metadata_server->getAllLocalAudioPlaylistCount();
+    
+    //
+    //  if the client is not another mfd, we have to add a fake playlist with all the items
+    //
 
-
-        TagOutput response;
-        response << Tag( 'aply' ) << Tag('mstt') << (u32) DAAP_OK << end 
+    if(daap_request->getClientType() != DAAP_CLIENT_MFDDAAPCLIENT)
+    {
+        ++all_playlist_count;
+    }
+    
+    TagOutput response;
+    response << Tag( 'aply' ) 
+                << Tag('mstt') << (u32) DAAP_OK << end 
                 << Tag('muty') << (u8) 0 << end 
-                << Tag('mtco') << (u32) playlists_to_send->count() << end
-                << Tag('mrco') << (u32) playlists_to_send->count() << end 
+                << Tag('mtco') << (u32) all_playlist_count << end
+                << Tag('mrco') << (u32) all_playlist_count << end 
                 << Tag('mlcl');
              
-                QIntDictIterator<Playlist> it( *playlists_to_send );
-                Playlist *a_playlist;
-                while ( (a_playlist = it.current()) != 0 )
-                {
-                    ++it;
+                
+                //
+                //  If non-mfd, send playlist "1" as all the metadata
+                //
              
+                if(daap_request->getClientType() != DAAP_CLIENT_MFDDAAPCLIENT)
+                {
                     response << Tag('mlit');
-                        response << Tag('miid') << (u32) a_playlist->getId() << end ;
-                        response << Tag('minm') << a_playlist->getName().utf8() << end ;
-                        response << Tag('mimc') << (u32) a_playlist->getCount() << end ;
+                        response << Tag('miid') << (u32) 1 << end ;
+                        response << Tag('minm') << service_name.utf8() << end ;
+                        response << Tag('mimc') << (u32) all_metadata_count << end ;
                     response << end;
                 }
-             
-            response << end
-        << end;
-        metadata_server->unlockMetadata();
-        sendTag( http_request, response.data() );
-    }
-    else
-    {
-        //
-        //  For iTunes (or equivalent)
-        //
-
-        uint all_metadata_count = metadata_server->getAllLocalAudioMetadataCount();
-        uint all_playlist_count = metadata_server->getAllLocalAudioPlaylistCount();
-        metadata_server->lockMetadata();
-        TagOutput response;
-        response << Tag( 'aply' ) << Tag('mstt') << (u32) DAAP_OK << end 
-                << Tag('muty') << (u8) 0 << end 
-                << Tag('mtco') << (u32) 1 + all_playlist_count << end
-                << Tag('mrco') << (u32) 1 + all_playlist_count << end 
-                << Tag('mlcl');
-             
-                //
-                // We always have 1 "fake" playlist, which always has id #1 and
-                // is just all the metadata
-                //
-             
-                response << Tag('mlit');
-                
-                    if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMID)
-                    {
-                        response << Tag('miid') << (u32) 1 << end ;
-                    }
-             
-                    if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMNAME)
-                    {
-                        response << Tag('minm') << service_name.utf8() << end ;
-                    }
-             
-                    response << Tag('mimc') << (u32) all_metadata_count << end ;
-                response << end;
              
                 //
                 // For each container, explain it
                 //
              
                 MetadataContainer *a_container = NULL;
-                for (   
-                         a_container = metadata_containers->first(); 
-                         a_container; 
-                        a_container = metadata_containers->next() 
-                    )
+                for(   
+                    a_container = metadata_containers->first(); 
+                    a_container; 
+                    a_container = metadata_containers->next() 
+                   )
                 {
                     if(a_container->isAudio())
                     {
-            
-            
                         QIntDict<Playlist> *which_playlists = a_container->getPlaylists();
                         if(which_playlists)
                         {
@@ -1345,18 +1082,9 @@ void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_req
                                 ++it;
              
                                 response << Tag('mlit');
-                
-                                if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMID)
-                                {
                                     response << Tag('miid') << (u32) a_playlist->getUniversalId() << end ;
-                                }
-             
-                                if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMNAME)
-                                {
                                     response << Tag('minm') << a_playlist->getName().utf8() << end ;
-                                }
-             
-                                response << Tag('mimc') << (u32) a_playlist->getCount() << end ;
+                                    response << Tag('mimc') << (u32) a_playlist->getCount() << end ;
                                 response << end;
                             }
                         }
@@ -1365,184 +1093,119 @@ void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_req
              
             response << end
         << end;
-        metadata_server->unlockMetadata();
-        sendTag( http_request, response.data() );
-    }
+    sendTag( http_request, response.data() );
 }
 
-void DaapServer::sendContainer(HttpRequest *http_request, DaapRequest *daap_request, u32 container_id, int which_database)
+void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int which_database)
 {
-    if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
+    if(which_database != 1)
     {
-        //
-        //  Another Myth Box
-        //
-
-        metadata_server->lockMetadata();
-            
-        MetadataContainer *one_to_send = metadata_server->getMetadataContainer(which_database);
-        if(!one_to_send)
-        {
-            warning("cannot send playlists from a database that does not exist");
-            metadata_server->unlockMetadata();
-            return;
-        }
-        
-        Playlist *which_playlist = one_to_send->getPlaylist(container_id);
-        if(!which_playlist)
-        {
-            warning("something asked me for playlist that doesn't exit");
-            metadata_server->unlockMetadata();
-            return;
-        }
-
-        TagOutput response;
-
-        response << Tag( 'apso' ) 
-                    << Tag('mstt') << (u32) DAAP_OK << end 
-                    << Tag('muty') << (u8) 0 << end 
-                    << Tag('mtco') << (u32) which_playlist->getCount() << end 
-                    << Tag('mrco') << (u32) which_playlist->getCount() << end 
-
-                    << Tag('mlcl');
-             
-                        //
-                        //  For every item in this playlist
-                        //
-
-                
-                        QValueList<uint> songs_in_list = which_playlist->getList();
-                        typedef QValueList<uint> UINTList;
-                        UINTList::iterator iter;
-                        for ( iter = songs_in_list.begin(); iter != songs_in_list.end(); ++iter )
-                        {
-                            response << Tag('mlit') 
-                                     << Tag('mikd') << (u8) 2  << end
-                                     << Tag('miid') << (u32) (*iter) << end 
-                                     << Tag('mcti') << (u32) (*iter) << end 
-                                     << end;
-                        }
-                    response << end;
-                response << end;
-        metadata_server->unlockMetadata();        
-
-        sendTag( http_request, response.data() );
+        warning("some client wanted details about a container which is not in database 1");
     }
-    else
-    {
-        //
-        //  iTunes
-        //
-
-        //
-        //  Get the playlist in question, unless it's out special "all metadata" playlist (id = 1)
-        //
-
-
-        uint how_many;
-
-        Playlist *the_playlist = NULL;
     
-        if(container_id != 1)
+    //
+    //  Get the playlist in question, unless it's out special "all metadata" playlist (id = 1)
+    //
+
+    uint how_many;
+
+    Playlist *the_playlist = NULL;
+    
+    if(container_id != 1)
+    {
+        the_playlist = metadata_server->getPlaylistByUniversalId(container_id);
+        if(!the_playlist)
         {
-            the_playlist = metadata_server->getPlaylistByUniversalId(container_id);
-            if(!the_playlist)
-            {
-                warning("asked for a playlist it can't find");
-                return;
-            }
-            else
-            {
-                how_many = the_playlist->getCount();
-            }
+            warning("asked for a playlist it can't find");
+            http_request->getResponse()->setError(404);
+            return;
         }
         else
         {
-            how_many = metadata_server->getAllLocalAudioMetadataCount();
+            how_many = the_playlist->getCount();
         }
+    }
+    else
+    {
+        how_many = metadata_server->getAllLocalAudioMetadataCount();
+    }
     
-        TagOutput response;
+    TagOutput response;
 
-        response << Tag( 'apso' ) << Tag('mstt') << (u32) DAAP_OK << end 
+    response << Tag( 'apso' ) 
+                << Tag('mstt') << (u32) DAAP_OK << end 
                 << Tag('muty') << (u8) 0 << end 
                 << Tag('mtco') << (u32) how_many << end 
                 << Tag('mrco') << (u32) how_many << end 
 
                 << Tag('mlcl');
              
-                //
-                //  For everthing inside this container
-                //
+                    //
+                    //  For everthing inside this container
+                    //
 
-                
-                metadata_server->lockMetadata();
-                metadata_server->lockPlaylists();
-
-                if(container_id != 1)
-                {
-                    QValueList<uint> songs_in_list = the_playlist->getList();
-                    typedef QValueList<uint> UINTList;
-                    UINTList::iterator iter;
-                    for ( iter = songs_in_list.begin(); iter != songs_in_list.end(); ++iter )
+                    if(container_id != 1)
                     {
-                            
+                        QValueList<uint> songs_in_list = the_playlist->getList();
+                        QValueList<uint>::iterator iter;
+                        for ( iter = songs_in_list.begin(); iter != songs_in_list.end(); ++iter )
+                        {
                             int actual_id = (*iter) + (METADATA_UNIVERSAL_ID_DIVIDER * the_playlist->getCollectionId());
                             response << Tag('mlit') 
-                                     << Tag('mikd') << (u8) 2  << end
-                                     << Tag('miid') << (u32) actual_id << end 
-                                     << Tag('mcti') << (u32) actual_id << end 
+                                        << Tag('mikd') << (u8) 2  << end
+                                        << Tag('miid') << (u32) actual_id << end 
+                                        << Tag('mcti') << (u32) actual_id << end 
                                      << end;
+                        }
                     }
-                }
-                else
-                {
-                    //
-                    //  If it's playlist #1, that's *all* the metadata
-                    //
+                    else
+                    {
+                    
+                        //
+                        //  If it's playlist #1, that's *all* the metadata
+                        //
 
-                    MetadataContainer *a_container = NULL;
-                    for (   
+                        MetadataContainer *a_container = NULL;
+                        for(   
                             a_container = metadata_containers->first(); 
                             a_container; 
                             a_container = metadata_containers->next() 
-                        )
-                    {
-
-                        if(a_container->isAudio())
+                           )
                         {
-                            QIntDict<Metadata>     *which_metadata;
-                            which_metadata = a_container->getMetadata();
-                            
-                            if(which_metadata)
+                            if(a_container->isAudio())
                             {
-                                QIntDictIterator<Metadata> iterator(*which_metadata);
-            
-                                for( ; iterator.current(); ++iterator)
+                                QIntDict<Metadata>     *which_metadata;
+                                which_metadata = a_container->getMetadata();
+                            
+                                if(which_metadata)
                                 {
-                                    if(iterator.current()->getType() == MDT_audio)
+                                    QIntDictIterator<Metadata> iterator(*which_metadata);
+            
+                                    for( ; iterator.current(); ++iterator)
                                     {
-                                        AudioMetadata *which_item = (AudioMetadata*)iterator.current();
-                                        response << Tag('mlit') 
-                                                 << Tag('mikd') << (u8) 2  << end
-                                                 << Tag('miid') << (u32) which_item->getUniversalId() << end 
-                                                 << Tag('mcti') << (u32) which_item->getUniversalId() << end 
-                                                 << end;
+                                        if(iterator.current()->getType() == MDT_audio)
+                                        {
+                                            AudioMetadata *which_item = (AudioMetadata*)iterator.current();
+                                            response << Tag('mlit') 
+                                                        << Tag('mikd') << (u8) 2  << end
+                                                        << Tag('miid') << (u32) which_item->getUniversalId() << end 
+                                                        << Tag('mcti') << (u32) which_item->getUniversalId() << end 
+                                                     << end;
+                                        }
+                                        else
+                                        {
+                                            warning("got non AudioMetadata of an audio metadata list");
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                metadata_server->unlockPlaylists();
-                metadata_server->unlockMetadata();
+                response << end 
+    << end;
 
-             response << end 
-             << end;
-
-        sendTag( http_request, response.data() );
-    }
-
+    sendTag( http_request, response.data() );
 }
 
 void DaapServer::handleMetadataChange(int which_collection)

@@ -38,9 +38,6 @@ class MetadataServer : public MFDServicePlugin
     void                         lockMetadata();
     void                         unlockMetadata();
 
-    void                         lockPlaylists();
-    void                         unlockPlaylists();
-
     QPtrList<MetadataContainer>* getMetadataContainers(){return metadata_containers;}
     QPtrList<MetadataContainer>* getLocalAudioMetadataContainers(){return local_audio_metadata_containers;}
     MetadataContainer*           getMetadataContainer(int which_one);
@@ -69,18 +66,6 @@ class MetadataServer : public MFDServicePlugin
                                                     QValueList<int> playlist_deletions
                                                  );
 
-    //uint                         getMetadataVideoGeneration(){return metadata_video_generation;}
-    //int                          bumpMetadataId();
-    //int                          bumpPlaylistId();
-    //void                         lockPlaylists();
-    //void                         unlockPlaylists();
-    //Playlist*                    getPlaylist(int id);
-
-    // void makeMetadataContainers();
-    //int  bumpMetadataAudioGeneration();
-    //int  bumpMetadataVideoGeneration();
-    
-
 
   private:
 
@@ -90,7 +75,9 @@ class MetadataServer : public MFDServicePlugin
     QPtrList<MetadataContainer> *metadata_containers;
     QPtrList<MetadataContainer> *local_audio_metadata_containers;
     QMutex                      metadata_mutex;
-    QMutex                      playlists_mutex;
+
+    int                         metadata_container_count;
+    QMutex                      metadata_container_count_mutex;
 
     QMutex                      metadata_audio_generation_mutex;
     uint                        metadata_audio_generation;
@@ -98,15 +85,12 @@ class MetadataServer : public MFDServicePlugin
     int                         container_identifier;
     QMutex                      container_identifier_mutex;
 
-    //uint                        metadata_video_generation;
+
+    int                         local_audio_metadata_count;
+    QMutex                      local_audio_metadata_count_mutex;
     
-    //int                         metadata_id;
-    //int                         playlist_id;
-
-    //QMutex                      bump_metadata_id_mutex;
-    //QMutex                      bump_playlist_id_mutex;
-
-  
+    int                         local_audio_playlist_count;
+    QMutex                      local_audio_playlist_count_mutex;
 };
 
 

@@ -41,12 +41,12 @@ class DaapServer: public MFDHttpPlugin
     void    parseVariables(HttpRequest *http_request, DaapRequest *daap_request);
     void    sendUpdate(HttpRequest *http_request, u32 database_version);
     void    sendMetadata(HttpRequest *http_request, QString request_path, DaapRequest *daap_request);
-    void    sendDatabaseList(HttpRequest *http_request, DaapRequest *daap_request);
-    void    addItemToResponse(TagOutput &response, AudioMetadata *which_item, u64 meta_codes, bool universal_conversion=true);
+    void    sendDatabaseList(HttpRequest *http_request);
+    void    addItemToResponse(TagOutput &response, AudioMetadata *which_item, u64 meta_codes);
     void    sendDatabase(HttpRequest *http_request, DaapRequest *daap_request, int which_database);
     void    sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRequest *daap_request);
     void    sendContainers(HttpRequest *http_request, DaapRequest *daap_request, int which_database);
-    void    sendContainer(HttpRequest *http_request, DaapRequest *daap_request, u32 container_id, int which_database);
+    void    sendContainer(HttpRequest *http_request, u32 container_id, int which_database);
     void    handleMetadataChange(int which_collection);
 
     DaapSessions daap_sessions;
@@ -59,6 +59,7 @@ class DaapServer: public MFDHttpPlugin
     QValueList<int>             hanging_updates;
     QMutex                      hanging_updates_mutex;
     bool                        first_update;
+    QMutex                      first_update_mutex;
 };
 
 #endif  // daapserver_h_

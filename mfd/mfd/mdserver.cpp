@@ -28,6 +28,10 @@ MetadataServer::MetadataServer(MFD* owner, int port)
     local_audio_metadata_containers->setAutoDelete(false);
     metadata_audio_generation = 4;  //  don't ask
     container_identifier = 0;
+    
+    local_audio_metadata_count = 0;
+    local_audio_playlist_count = 0;
+    metadata_container_count = 0;
 }
 
 void MetadataServer::run()
@@ -98,16 +102,6 @@ void MetadataServer::unlockMetadata()
     metadata_mutex.unlock();
 }
 
-void MetadataServer::lockPlaylists()
-{
-    playlists_mutex.lock();
-}
-
-void MetadataServer::unlockPlaylists()
-{
-    playlists_mutex.unlock();
-}
-
 uint MetadataServer::getMetadataAudioGeneration()
 {
     uint return_value;
@@ -120,65 +114,49 @@ uint MetadataServer::getMetadataAudioGeneration()
 uint MetadataServer::getMetadataContainerCount()
 {
     uint return_value = 0;
-    lockMetadata();
-        return_value = metadata_containers->count();
-    unlockMetadata();
+    metadata_container_count_mutex.lock();
+        return_value = metadata_container_count;
+    metadata_container_count_mutex.unlock();
     return return_value;
 }
 
 uint MetadataServer::getAllLocalAudioMetadataCount()
 {
-    //
-    //  Iterate over all Audio collections and count the items
-    //
-
-    uint return_value;
-
-    lockMetadata();
-
-        return_value = 0;
-        MetadataContainer * a_container;
-        for (
-                a_container = local_audio_metadata_containers->first(); 
-                a_container; 
-                a_container = local_audio_metadata_containers->next()
-            )
+    uint return_value = 0;
+    local_audio_metadata_count_mutex.lock();
+        if(local_audio_metadata_count > -1)
         {
-            return_value += a_container->getMetadataCount();
+            return_value = (uint) local_audio_metadata_count;
         }
-    
-    unlockMetadata();
+    local_audio_metadata_count_mutex.unlock();
     return return_value;
 }
 
 uint MetadataServer::getAllLocalAudioPlaylistCount()
 {
-    //
-    //  Iterate over all Audio collections and count the playlists
-    //
-
-    uint return_value;
-
-    lockPlaylists();
-
-        return_value = 0;
-        MetadataContainer * a_container;
-        for (
-                a_container = local_audio_metadata_containers->first(); 
-                a_container; 
-                a_container = local_audio_metadata_containers->next()
-            )
+    uint return_value = 0;
+    local_audio_playlist_count_mutex.lock();
+        if(local_audio_playlist_count > -1)
         {
-            return_value += a_container->getPlaylistCount();
+            return_value = (uint) local_audio_playlist_count;
         }
-    
-    unlockPlaylists();
+    local_audio_playlist_count_mutex.unlock();
     return return_value;
-
 }
 
 Metadata* MetadataServer::getMetadataByUniversalId(uint universal_id)
 {
+    //
+    //  Metadata should be locked _before_ calling this method
+    //
+    
+    if(metadata_mutex.tryLock())
+    {
+        metadata_mutex.unlock();
+        warning("getMetadataByUniversalId() called without "
+                "metadata_mutex being locked");
+    }
+
     if(universal_id <= METADATA_UNIVERSAL_ID_DIVIDER)
     {
         warning("something asked for metadata with "
@@ -195,29 +173,39 @@ Metadata* MetadataServer::getMetadataByUniversalId(uint universal_id)
     
     Metadata *return_value = NULL;
     
-    lockMetadata();
-
-        MetadataContainer * a_container;
-        for (
-                a_container = metadata_containers->first(); 
-                a_container; 
-                a_container = metadata_containers->next()
-            )
+    MetadataContainer * a_container;
+    for (
+            a_container = metadata_containers->first(); 
+            a_container; 
+            a_container = metadata_containers->next()
+        )
+    {
+        if(a_container->getIdentifier() == collection_id)
         {
-            if(a_container->getIdentifier() == collection_id)
-            {
-                return_value = a_container->getMetadata(item_id);
-                break; 
-            }
+            return_value = a_container->getMetadata(item_id);
+            break; 
         }
+    }
 
-    unlockMetadata();        
     
     return return_value;
 }
 
 Playlist* MetadataServer::getPlaylistByUniversalId(uint universal_id)
 {
+
+    //
+    //  Metadata should be locked _before_ calling this method
+    //
+    
+    if(metadata_mutex.tryLock())
+    {
+        metadata_mutex.unlock();
+        warning("getPlaylistByUniversalId() called without "
+                "metadata_mutex being locked");
+    }
+
+
     if(universal_id <= METADATA_UNIVERSAL_ID_DIVIDER)
     {
         warning("something asked for playlist with "
@@ -225,6 +213,7 @@ Playlist* MetadataServer::getPlaylistByUniversalId(uint universal_id)
         return NULL;
     }
     
+
     int collection_id = universal_id / METADATA_UNIVERSAL_ID_DIVIDER;
     int playlist_id = universal_id % METADATA_UNIVERSAL_ID_DIVIDER;
     
@@ -234,23 +223,19 @@ Playlist* MetadataServer::getPlaylistByUniversalId(uint universal_id)
     
     Playlist *return_value = NULL;
     
-    lockMetadata();
-
-        MetadataContainer * a_container;
-        for (
-                a_container = metadata_containers->first(); 
-                a_container; 
-                a_container = metadata_containers->next()
-            )
+    MetadataContainer * a_container;
+    for (
+            a_container = metadata_containers->first(); 
+            a_container; 
+            a_container = metadata_containers->next()
+        )
+    {
+        if(a_container->getIdentifier() == collection_id)
         {
-            if(a_container->getIdentifier() == collection_id)
-            {
-                return_value = a_container->getPlaylist(playlist_id);
-                break; 
-            }
+            return_value = a_container->getPlaylist(playlist_id);
+            break; 
         }
-    unlockMetadata();        
-    
+    }
     return return_value;
 }
 
@@ -281,6 +266,9 @@ MetadataContainer* MetadataServer::createContainer(
         {
             local_audio_metadata_containers->append(return_value);
         }
+    metadata_container_count_mutex.lock();
+        ++metadata_container_count;
+    metadata_container_count_mutex.unlock();
         
     unlockMetadata();
     
@@ -335,21 +323,43 @@ void MetadataServer::doAtomicDataSwap(
         
         if(target)
         {
-
-            target->dataSwap(
-                                new_metadata, 
-                                metadata_additions,
-                                metadata_deletions,
-                                new_playlists,
-                                playlist_additions,
-                                playlist_deletions
-                            );
-            if(target->isAudio())
-            {
-                metadata_audio_generation_mutex.lock();
-                    ++metadata_audio_generation;
-                metadata_audio_generation_mutex.unlock();
-            }
+            local_audio_metadata_count_mutex.lock();
+                local_audio_playlist_count_mutex.lock();
+            
+                    if(target->isLocal() && target->isAudio())
+                    {
+                        local_audio_metadata_count = 
+                                local_audio_metadata_count 
+                                - target->getMetadataCount();
+                        local_audio_playlist_count = 
+                                local_audio_playlist_count 
+                                - target->getPlaylistCount();
+                    }
+                    target->dataSwap(
+                                    new_metadata, 
+                                    metadata_additions,
+                                    metadata_deletions,
+                                    new_playlists,
+                                    playlist_additions,
+                                    playlist_deletions
+                                    );
+                    if(target->isAudio())
+                    {
+                        metadata_audio_generation_mutex.lock();
+                            ++metadata_audio_generation;
+                        metadata_audio_generation_mutex.unlock();
+                    }
+                    if(target->isLocal() && target->isAudio())
+                    {
+                        local_audio_metadata_count = 
+                                local_audio_metadata_count 
+                                - target->getMetadataCount();
+                        local_audio_playlist_count = 
+                                local_audio_playlist_count 
+                                - target->getPlaylistCount();
+                    }
+                local_audio_playlist_count_mutex.unlock();
+            local_audio_metadata_count_mutex.unlock();
         }
         else
         {
