@@ -54,9 +54,10 @@ void RecorderBase::SetBaseOption(const QString &name, const QString &value)
     }
     else if (name == "vbiformat")
     {
-        if (value.lower() == "pal teletext")
-            vbimode = 1;
-        else if (value.lower().left(4) == "ntsc")
+        //if (value.lower() == "pal teletext")
+        //    vbimode = 1;
+        //else 
+        if (value.lower().left(4) == "ntsc")
             vbimode = 2;
         else
             vbimode = 0;
