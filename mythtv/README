@@ -19,9 +19,10 @@ This is what you need, software wise, to have installed:
                 recording.  You'll probably have to compile this one yourself,
                 so get it from http://www.mp3dev.org/mp3/
 
-   QT - You need at least QT 3.0.  Again, the best way to get this is from your
-        distro.  You need it compiled threadsafe version, and the mysql bindings
-        as well.  I'm using version 3.1.1.  http://www.trolltech.com
+   QT - Version 3.1 or greater is strongly recommended.  MythTV will probably
+        compile with version 3.0, but there are known to be bugs in that version        which can crash MythTV.  Again, the best way to get this is from your
+        distro.  You need it compiled threadsafe version, and the mysql
+        bindings as well.  I'm using version 3.1.1.  http://www.trolltech.com
 
    MySQL - You need this setup and working.  A recent version, I think, would
            be best.  I don't know, though, I'm utterly new to it.  Get it from
