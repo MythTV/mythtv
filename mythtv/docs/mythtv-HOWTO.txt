@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-05-xx, v0.15.00
+  2004-05-25, v0.15.00
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -79,6 +79,8 @@
         5.3.2 Mandrake
         5.3.3 Other distributions and manual installation.
      5.4 Configuring the Zap2It.com DataDirect service.
+        5.4.1 Introduction.
+        5.4.2 Grabbing channel icons for DataDirect users.
      5.5 Manually building MythTV.
         5.5.1 Frontend-only configuration
      5.6 Gentoo.
@@ -277,6 +279,7 @@
   http://www.mythtv.org <http://www.mythtv.org> by Robert Kulagowski
   <mailto:rkulagow@rocketmail.com>.  (Please note that I am [4mNOT[24m the
   author/programmer of the MythTV application!)
+
   This document is available as a single-page HTML document at
   http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html
   <http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html> or as a PDF
@@ -340,7 +343,6 @@
 
   Pre-compiled binaries are available for a number of distributions.
   See section ``Software::Pre-compiled packages'' for more information.
-
   Custom mini-distributions are also available to make it easier to
   install MythTV.  A mini-distribution removes many of the "general
   purpose" workstation / server software packages that may be installed
@@ -405,6 +407,7 @@
   fairly low CPU requirements compared to encoding video, which is why a
   device like a Series 1 TiVo can run with only 16MB of RAM and a 54MHz
   CPU.
+
 
   There are many variables that go into the question: "How fast a CPU do
   I need to run MythTV"?  Obviously, the faster your CPU, the better
@@ -1681,6 +1684,8 @@
 
   [1m5.4.  Configuring the Zap2It.com DataDirect service.[0m
 
+  [1m5.4.1.  Introduction.[0m
+
   Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
   Tribune Media Services.  TMS is one of the primary providers for
   program listing data in the United States and Canada.  There are a
@@ -1694,8 +1699,8 @@
   +o  It's much faster, because the grabber isn't downloading hundreds of
      HTML pages and trying to parse the program data out of the HTML.
 
-  +o  It contains more program information.
 
+  +o  It contains more program information.
 
   +o  It's easier on the Zap2It servers, since they're not generating
      hundreds of custom HTML pages when you scrape their listings.
@@ -1720,6 +1725,42 @@
   instructions on moving to to DataDirect if you are currently using
   XMLTV.  If you are starting from a fresh installation, the simplest
   thing is to immediately start using DataDirect.
+
+
+  [1m5.4.2.  Grabbing channel icons for DataDirect users.[0m
+
+  While the DataDirect TV listings service has several advantages, it
+  does not support grabbing logo icons for the stations you receive.
+  However, there are utilities provided that you can use to grab your
+  initial set of icons and to update them if your lineups change.
+
+  First, you need to generate or obtain an XML file with the information
+  for your stations.
+
+  If you have XMLTV software installed, there is a perl script in
+  MythTV's contrib/ directory which will generate this file for you. Run
+  the command:
+
+
+       $ perl mkiconmap.pl
+
+
+
+  You will be asked for your zipcode and the service that you use. If
+  there are no errors, the iconmap.xml file that you need for the next
+  step will be created.
+
+  If you do not have XMLTV software installed and do not want to install
+  it for the sake of this minor task, there is a generic
+  contrib/master_iconmap.xml which you can copy and use but this may not
+  be as complete as using the specific information for your service.
+
+  Once you have an iconmap.xml file, add the icon information to your
+  database and grab any new icons with the command:
+
+
+       $ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
+
 
 
   [1m5.5.  Manually building MythTV.[0m
@@ -1820,6 +1861,7 @@
 
   To get a better picture of what is needed to run a frontend, note the
   following:
+
   You do NOT need the MySQL server installed on your remote frontend
 
   You do NOT need XMLTV installed on your remote frontend
@@ -1879,11 +1921,10 @@
   If this is happening to you, try running the following commands.
 
 
-
-  $ su
-  # chkconfig --level 35 mysql on
-  # /etc/rc.d/init.d/mysql start
-  # exit
+       $ su
+       # chkconfig --level 35 mysql on
+       # /etc/rc.d/init.d/mysql start
+       # exit
 
 
 
@@ -1993,6 +2034,7 @@
        mysql> flush privileges;
 
 
+
   [1m7.  Configuring Sound.[0m
 
   If your video doesn't appear to be in-sync with your audio, it could
@@ -2016,7 +2058,6 @@
 
   There are two ways to do this.  Graphically, and from the command
   line.
-
 
   [1m7.1.  Graphically setting up the mixer.[0m
 
@@ -2058,7 +2099,6 @@
 
   To configure sound to work with MythTV, select
 
-
   RedHat Menu>Sound &
   Video>Volume Control
 
@@ -2085,7 +2125,6 @@
   Download the development release (0.9.x) from the ALSA web site
   http://www.alsa-project.org <http://www.alsa-project.org>.  You need
   at least three files:
-
   +o  alsa-driver-0.9.x.tar.bz2
 
   +o  alsa-lib-0.9.x.tar.bz2
@@ -2113,13 +2152,12 @@
   Continuing on:
 
 
-
-  $ make
-  $ su
-  # make install
-  # ./snddevices
-  # exit
-  $
+       $ make
+       $ su
+       # make install
+       # ./snddevices
+       # exit
+       $
 
 
 
@@ -2144,8 +2182,6 @@
        $ make
        $ su
        # make install
-
-
 
   Next, you must edit /etc/modules.conf so that the ALSA modules are
   loaded automatically. The first step is to remove your old OSS
@@ -2177,6 +2213,8 @@
 
   For now we will assume that no extra options are required.  The next
   step is to ensure that the ALSA drivers are started during boot-up.
+
+
        $ su
        # cd /etc/rc.d/init.d
        # /sbin/chkconfig --add alsasound
@@ -2208,8 +2246,6 @@
 
        $ aplay /usr/share/sounds/info.wav
 
-
-
   If it works, you're done installing ALSA!
 
 
@@ -2238,6 +2274,8 @@
        # alsactl store
        # exit
        $
+
+
 
   If you have multiple sound cards, then use the -c parameter to specify
   which card to adjust.  Note that the first card will be "0", the
@@ -2270,7 +2308,6 @@
   [1mlirc [22mhandles the IR hardware and passes keystrokes to MythTV, which
   then acts as if the user had pressed the keys on the keyboard.  The
   file keys.txt describes the keys used to control MythTV.
-
 
 
           [1mNOTE[22m:If you are running Mandrake 9.1, you may install
@@ -2332,8 +2369,6 @@
        # ln -s linux-2.4 /usr/src/linux
        # exit
 
-
-
   [1m8.4.  Obtaining and compiling lirc.[0m
 
   You're going to need to download and compile [1mlircd[22m.  Go to
@@ -2358,7 +2393,6 @@
   Each remote is different; some remote receivers connect directly to
   your capture card and not to a serial port, so make sure that you've
   got the correct one.
-
 
   You then click "Save Configuration and run configure" to continue.
 
@@ -2397,8 +2431,6 @@
 
 
        crw-------    1 root     root      61,   0 Dec 31  1969 lirc
-
-
 
   Some IR receivers (including some homebrew units) use a character
   device as their data interface as opposed to a link to a serial port.
@@ -2543,9 +2575,10 @@
   replace XXX with the name which you determined earlier, which in this
   example was "lirc_serial"
 
-  $ su
-  # modprobe lirc_serial
-  # /sbin/ldconfig
+
+       $ su
+       # modprobe lirc_serial
+       # /sbin/ldconfig
 
 
 
@@ -2577,9 +2610,8 @@
   If your remote ends up working well, you should consider submitting
   your lircd.conf file back to the lirc developers. Once finished:
 
-
-       $ su
-       # cp myremote /etc/lircd.conf
+  $ su
+  # cp myremote /etc/lircd.conf
 
 
 
@@ -2603,13 +2635,13 @@
   All other distributions:
 
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
 
 
@@ -2789,9 +2821,8 @@
   install:
 
 
-
-  $ su
-  # make install
+       $ su
+       # make install
 
 
 
@@ -2827,10 +2858,11 @@
   something similar to the following:
 
 
-       $ irw
-       0000000000007ff0 00 1 gi-motorola-dct2000
-       000000000000bff8 00 2 gi-motorola-dct2000
-       000000000000f7f0 00 ENTER gi-motorola-dct2000
+
+  $ irw
+  0000000000007ff0 00 1 gi-motorola-dct2000
+  000000000000bff8 00 2 gi-motorola-dct2000
+  000000000000f7f0 00 ENTER gi-motorola-dct2000
 
 
 
@@ -2849,17 +2881,16 @@
   parent file descriptors before they start.
 
 
-
-  $ cd /usr/local/bin
-  # su
-  # cat > change_channel.csh
-  #!/bin/csh
-  echo "changing to $1"
-  /usr/local/bin/channel.pl $1 &
-  ^D
-  # chmod a+x change_channel.csh
-  # exit
-  $ exit
+       $ cd /usr/local/bin
+       # su
+       # cat > change_channel.csh
+       #!/bin/csh
+       echo "changing to $1"
+       /usr/local/bin/channel.pl $1 &
+       ^D
+       # chmod a+x change_channel.csh
+       # exit
+       $ exit
 
 
 
@@ -2889,8 +2920,6 @@
        # apt-get install libqt3c102-mt-mysql
        # exit
 
-
-
   [1m9.1.  Configuring the Master backend system.[0m
 
   Open a shell and decide where you will store your video files.  By
@@ -2907,11 +2936,10 @@
   /var/video/ in the setup screens.
 
 
-
-  $ su
-  # mkdir /var/video
-  # chmod a+rwx /var/video
-  # exit
+       $ su
+       # mkdir /var/video
+       # chmod a+rwx /var/video
+       # exit
 
 
 
@@ -2966,6 +2994,8 @@
        $ cd setup
        $ ./setup
 
+
+
   The backend setup program will start and offer you a number of
   choices.  It is [4mstrongly[24m recommended that you go through them in
   order.
@@ -3012,6 +3042,7 @@
   Once you're satisfied with the values, move the focus down to Next and
   hit the space bar.
 
+
   The next screen details the Host-specific Backend setup.  This is
   where you will set the specific directory paths for this particular
   backend.  Make sure that you've followed the steps at the beginning of
@@ -3030,7 +3061,6 @@
 
   You should have no capture cards defined, so the highlight will be on
   (New Capture Card).  Press space to begin.
-
 
   Choose the appropriate settings for your particular tuner.  Use the
   arrow keys to move around and to make your choices, and press RETURN
@@ -3079,8 +3109,6 @@
   ahead and define them all, even if they're not all going to be
   physically connected to the master backend server.  Once you're done,
   press ESC to return to the main screen.
-
-
   [1m9.1.4.  Input Connections[0m
 
   The final configuration item is Input Connections.  On this screen,
@@ -3143,7 +3171,6 @@
   mythbackend will print information about connections and what it's
   doing to the console.  If you'd like to see the options that are
   available for mythbackend, type mythbackend -h for help.
-
   As of 2003-10-03, the available options are:
 
 
@@ -3158,6 +3185,7 @@
                                       channel,osd,file,schedule,network
        --printexpire                  List of auto-expire programs
        --printsched                   Upcoming scheduled programs
+
 
 
   Running mythbackend as a daemon and using the logfile option will
@@ -3260,19 +3288,20 @@
   following:
 
 
-       # cat /etc/crontab
-       SHELL=/bin/bash
-       PATH=/sbin:/bin:/usr/sbin:/usr/bin
-       MAILTO=root
-       HOME=/
 
-       # run-parts
-       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-       # exit
-       $
+  # cat /etc/crontab
+  SHELL=/bin/bash
+  PATH=/sbin:/bin:/usr/sbin:/usr/bin
+  MAILTO=root
+  HOME=/
+
+  # run-parts
+  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+  # exit
+  $
 
 
 
@@ -3377,6 +3406,7 @@
 
   The final General page sets up some final configuration items.  See
   the help text for more information.
+
 
 
   [1m10.2.  Appearance[0m
@@ -3507,7 +3537,6 @@
   value, it will cause the filter to skip chroma, and filter only the
   luminance.  It may be useful on some capture cards which do not
   capture the chroma fields of interlaced video correctly.
-
   o The "onefield" filter
 
   This is a simple one-field deinterlacing filter that uses only one
@@ -3761,6 +3790,8 @@
   selecting RedHatMenu>Extras>System Settings>Desktop Switching Tool and
   choose "KDE".
 
+
+
   [1m11.1.  Keyboard commands.[0m
 
   The keys.txt file describes what the various keyboard commands are.
@@ -3784,7 +3815,46 @@
   [1m11.1.3.  Watching TV only[0m
 
 
+  G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
+  H           Channel history. Each repeat steps back through the previous channels.
+  O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
+  F8          toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
+
+
   [1m11.1.4.  Watching a recording only[0m
+
+
+      Space/Enter     set a bookmark at that point. Next time you start the recording, you will automatically jump forward to this point and clear the bookmark.
+                X     queues the current recording for transcoding
+                O     brings up menu to allow toggling settings such as Commercial Auto-Skip, Auto-Expire, etc.
+           E or M     enters/exits edit mode.
+
+
+                      [1mIn edit mode[0m
+  Left/Right          move forward and backward
+          Up/Down     alter the amount of time you jump forward and backward. Increments are: nearest cutpoint, nearest video keyframe, 1 frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes, and 10 minutes.
+  PageUp/PageDown     move forward and backward to the nearest cut point
+           < or >     move forward or backward by 10 times the normal jump amount
+  Space/Enter         allows you to set or delete a cut point
+                Z     loads the commercial skip list (if one exists) into the cutlist
+           C or Q     clear all cut points in the cutlist
+
+
+  [1m11.1.5.  LiveTV Browse Mode[0m
+
+
+             Left     browse program prior to current listed program
+            Right     browse program following current listed program
+               Up     browse program on channel above current listed channel/program
+             Down     browse program on channel below current listed channel/program
+                /     browse program on next favorite channel
+              0-9     enter a channel number to browse
+  Space/Enter         change channel to channel of current listed program
+              R/r     Toggle recording of current program (cycles through types)
+            ESC/O     Exit Browse mode
+
+
+  [1m11.1.6.  Playback Recording Zoom Mode[0m
 
 
 
@@ -3841,45 +3911,6 @@
                 >     advance 1 second
 
 
-  G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
-  H           Channel history. Each repeat steps back through the previous channels.
-  O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
-  F8          toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
-
-  [1m11.1.5.  LiveTV Browse Mode[0m
-
-
-  [1m11.1.6.  Playback Recording Zoom Mode[0m
-
-
-
-      Space/Enter     set a bookmark at that point. Next time you start the recording, you will automatically jump forward to this point and clear the bookmark.
-                X     queues the current recording for transcoding
-                O     brings up menu to allow toggling settings such as Commercial Auto-Skip, Auto-Expire, etc.
-           E or M     enters/exits edit mode.
-
-
-                      [1mIn edit mode[0m
-  Left/Right          move forward and backward
-          Up/Down     alter the amount of time you jump forward and backward. Increments are: nearest cutpoint, nearest video keyframe, 1 frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes, and 10 minutes.
-  PageUp/PageDown     move forward and backward to the nearest cut point
-           < or >     move forward or backward by 10 times the normal jump amount
-  Space/Enter         allows you to set or delete a cut point
-                Z     loads the commercial skip list (if one exists) into the cutlist
-           C or Q     clear all cut points in the cutlist
-
-
-             Left     browse program prior to current listed program
-            Right     browse program following current listed program
-               Up     browse program on channel above current listed channel/program
-             Down     browse program on channel below current listed channel/program
-                /     browse program on next favorite channel
-              0-9     enter a channel number to browse
-  Space/Enter         change channel to channel of current listed program
-              R/r     Toggle recording of current program (cycles through types)
-            ESC/O     Exit Browse mode
-
-
              Left     Move video to Left
             Right     Move video to Right
                Up     Move video Up
@@ -3915,7 +3946,6 @@
                 X     change the channel to the currently selected channel without leaving the EPG (Most useful in the alternate EPG)
                 /     mark/unmark the current channel as a "favorite"
                 4     toggle the guide listing between all channels and filtered "favorites"
-
 
 
   [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
@@ -3982,8 +4012,6 @@
   more keys then you can access all of the features.  With only 16 keys
   most features are usable.
 
-
-
       REMOTE CONTROL     LIRC KEYSTROKE     FUNCTION
                0 - 9     0 - 9              channel selection, EPG navigation, ff/rew speed setting (with stickykeys)
           Left Arrow     Left               scroll left, rewind
@@ -3996,6 +4024,8 @@
                Pause     p                  Pause
          Other key 1     i                  Information
          Other key 2     c                  Change tuner card input
+
+
 
   [1m11.2.  Using themes with MythTV.[0m
 
@@ -4045,6 +4075,7 @@
   http://tarek.2y.net/myth/ <http://tarek.2y.net/myth/>.  This is
   currently an external user-supplied program, so if you have issues
   with the script, please contact the author.
+
   Feel free to browse some of what sort of hardware is available at
   http://shop.store.yahoo.com/snapstreammedia/cablepacks.html
   <http://shop.store.yahoo.com/snapstreammedia/cablepacks.html>, or if
@@ -4082,6 +4113,7 @@
      <http://sourceforge.net/projects/nvram-wakeup> and
      http://www.malloc.de/tools/wakeup_clock.html
      <http://www.malloc.de/tools/wakeup_clock.html>
+
 
 
   [1m11.5.1.  A deeper look into the operation[0m
@@ -4149,6 +4181,7 @@
   +o  "Set wakeuptime command" is the command executed to set the new
      wakeuptime.
 
+
   +o  "Server Halt Command" is the command executed to shutdown the
      Master backend and the Slave backends.
 
@@ -4213,6 +4246,7 @@
   which cares about setting the at-job. The following additions are nec-
   essary on the $SERVER:
 
+
   If you use [1minetd[22m:
 
   In /etc/inetd.conf add:
@@ -4240,7 +4274,8 @@
 
   and add the following to /etc/services:
 
-  mythwake        $PORT/tcp
+
+       mythwake        $PORT/tcp
 
 
 
@@ -4273,6 +4308,7 @@
   "Set wakeuptime command" with the "Wakeup time format" suitable for
   that tool.
 
+
   [1m11.5.3.  Wakeup the MySQL server using WOL.[0m
 
   If your MySQL server and your Master backend are not on the same
@@ -4300,7 +4336,6 @@
   The MythWeb allows you to use a web page to control various aspects of
   your MythTV system.  MythWeb is a separate application, but it's
   dependent on MythTV being installed and operational.
-
 
 
   [1m12.1.  Installation and prerequisites.[0m
@@ -4335,13 +4370,13 @@
 
 
 
-       $ tar -xjf mythweb-0.15.tar.bz2
-       $ cd mythweb-0.15
-       $ su
-       # mkdir /var/www/html/mythweb
-       # cp -r . /var/www/html/mythweb
-       # exit
-       $
+  $ tar -xjf mythweb-0.15.tar.bz2
+  $ cd mythweb-0.15
+  $ su
+  # mkdir /var/www/html/mythweb
+  # cp -r . /var/www/html/mythweb
+  # exit
+  $
 
 
 
@@ -4395,15 +4430,15 @@
   load and install the application:
 
 
-       $ tar -xjf mythgallery-0.15.tar.bz2
-       $ cd mythgallery-0.15
-       $ ./configure --enable-opengl
-       $ qmake mythgallery.pro
-       $ make
-       # su
-       # make install
-       # exit
-       $
+  $ tar -xjf mythgallery-0.15.tar.bz2
+  $ cd mythgallery-0.15
+  $ ./configure --enable-opengl
+  $ qmake mythgallery.pro
+  $ make
+  # su
+  # make install
+  # exit
+  $
 
 
 
@@ -4468,33 +4503,32 @@
   Here is an example script that a user may want to run on import:
 
 
+       #!/bin/csh
 
-  #!/bin/csh
+       if ($#argv == 0) then
+               echo "Usage: $0 dest_dir"
+               exit
+       endif
 
-  if ($#argv == 0) then
-          echo "Usage: $0 dest_dir"
-          exit
-  endif
+       cd $argv[1]
 
-  cd $argv[1]
+       # get stuff over the network
+       wget http://www.somesite.dom/dir/file1.jpg
+       wget http://www.somesite.dom/dir/file2.jpg
+       wget http://www.somesite.dom/dir/file3.jpg
 
-  # get stuff over the network
-  wget http://www.somesite.dom/dir/file1.jpg
-  wget http://www.somesite.dom/dir/file2.jpg
-  wget http://www.somesite.dom/dir/file3.jpg
+       # stuff that requires manual module loading and/or fs mounting
+       modprobe camera_module
+       mount /dev/camera /mnt/camera
+       cp /mnt/camera/* $argv[1]
+       umount /mnt/camera
+       rmmod camera_module
 
-  # stuff that requires manual module loading and/or fs mounting
-  modprobe camera_module
-  mount /dev/camera /mnt/camera
-  cp /mnt/camera/* $argv[1]
-  umount /mnt/camera
-  rmmod camera_module
-
-  # perform some processing
-  foreach pname (`ls *.jpg`)
-          jpegtran -flip vertical $pname > $pname.new
-          mv $pname.new $pname
-  end
+       # perform some processing
+       foreach pname (`ls *.jpg`)
+               jpegtran -flip vertical $pname > $pname.new
+               mv $pname.new $pname
+       end
 
 
 
@@ -4524,6 +4558,7 @@
   +o  CDParanoia
 
 
+
   [1m15.1.  Manual installation of prerequisites.[0m
 
   These instructions are for distributions which don't have pre-compiled
@@ -4533,14 +4568,15 @@
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
   can find later.
 
-  $ tar -xzf mad-0.14.2b.tar.gz
-  $ cd mad-0.14.2b
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+
+       $ tar -xzf mad-0.14.2b.tar.gz
+       $ cd mad-0.14.2b
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -4581,20 +4617,23 @@
   install:
 
 
-       $ tar -xzf libcdaudio-0.99.9.tar.gz
-       $ cd libcdaudio-0.99.9
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+
+  $ tar -xzf libcdaudio-0.99.9.tar.gz
+  $ cd libcdaudio-0.99.9
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
 
 
   Download cdparanoia from http://www.xiph.org/paranoia/down.html
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
+
+
        $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
        $ cd cdparanoia-III-alpha9.8
        $ ./configure
@@ -4657,6 +4696,8 @@
 
        # urpmi libfftw2 libfftw2-devel
 
+
+
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
   by typing:
@@ -4697,8 +4738,6 @@
   When installing fftw do not use the rpm package offered on the website
   because it will cause an error, so use the source package instead.
 
-
-
   [1mNOTE[22m: you can use the instructions given at the ``automated
         installation section'' to install all of MythMusic in one
   step.
@@ -4709,7 +4748,6 @@
   getting MythMusic going. Make sure that you run ./configure first.  If
   you wish to use the new visualizations, make sure you install the
   prerequisites.  Run ./configure --help for help.
-
 
 
   ______________________________________________________________________
@@ -4772,7 +4810,6 @@
 
   The Ignore_ID3 option does not disable the code that determines the
   track length, just the portion that tries to read ID3 info.
-
 
 
   [1m15.6.  Using MythMusic.[0m
@@ -4897,18 +4934,17 @@
   These are the keyboard commands for MythWeather:
 
 
-
-  Left Key             Goes back one page, and extends the time spent
-                       on the page you are on.
-  Right Key            Goes forward one page, see above.
-  Space                Pause, wait on the current page until space is hit
-                       again.
-  Numeric Keys         You can check other weather by keying in other ZIP codes.
-  Enter Key            Switch between Celsius and Fahrenheit. Can also
-                       be used a way to force a data update.
-  "m" Key              Resets the location to the database default, then updates the data.
-  "i"                  Enter / Save settings
-  ESC                  Exit the settings screen without saving / Exit the program
+       Left Key             Goes back one page, and extends the time spent
+                            on the page you are on.
+       Right Key            Goes forward one page, see above.
+       Space                Pause, wait on the current page until space is hit
+                            again.
+       Numeric Keys         You can check other weather by keying in other ZIP codes.
+       Enter Key            Switch between Celsius and Fahrenheit. Can also
+                            be used a way to force a data update.
+       "m" Key              Resets the location to the database default, then updates the data.
+       "i"                  Enter / Save settings
+       ESC                  Exit the settings screen without saving / Exit the program
 
 
 
@@ -4958,10 +4994,13 @@
   MPEG-2 to other formats which should greatly reduce the amount of
   space the DVD material takes up on your hard drive.
 
+
   MythDVD has a number of prerequisites to enable transcoding
   functionality.  If you only wish to play DVDs rather than convert them
   to something like MPEG-4 or xvid you may skip the prerequisite
   installation step.
+
+
   [1m18.1.  Manual Compilation of Prerequisites.[0m
 
 
@@ -5016,6 +5055,8 @@
      support SSE instructions for deinterlace support.  You may check
      this by doing a $ cat /proc/cpuinfo and looking for "sse" in the
      processor flags section.
+
+
 
   [1m20.2.  mythfilldatabase failing.[0m
 
@@ -5075,6 +5116,8 @@
 
 
   [1m20.4.  I have a MPEG-2 encoder card and my video appears "jittery".[0m
+
+
 
   [1m20.5.  I have a MPEG-2 encoder card and my video is jumping up and[0m
   [1mdown.[0m
@@ -5153,6 +5196,8 @@
            Option "DPMS"
        EndSection
 
+
+
   In this case, you would need to either delete the Option "DPMS" line,
   or change it to # Option "DPMS" to comment it out.  The next time you
   start XFree this change will take effect.
@@ -5212,8 +5257,6 @@
 
   [1m20.9.  I get segfaults / MythTV isn't doing anything.[0m
 
-
-
   [1m20.10.  Debugging with GDB.[0m
 
   Without details, the developers will not be able to determine if you
@@ -5263,8 +5306,6 @@
        (gdb) handle SIGPIPE nostop
        Signal        Stop      Print   Pass to program Description
        SIGPIPE       No        Yes     Yes             Broken pipe
-
-
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
@@ -5455,6 +5496,7 @@
   more information.
 
 
+
   [1m20.18.  Mythweb is showing a db_open error when I connect to it.[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
@@ -5462,7 +5504,6 @@
   extension=mysql.so
 
   Restart apache for it to take effect.
-
 
 
   [1m20.19.  error: can't find a register in class 'BREG' while reloading[0m
@@ -5520,6 +5561,7 @@
   of the libmp3lame library.
 
 
+
   [1m20.24.  I can't change the channel when watching Live TV.[0m
 
   Something's wrong with your program database.  Did mythfilldatabase
@@ -5528,7 +5570,6 @@
 
   [1m20.25.  When trying to run setup, I get an error like this: "./setup:[0m
   [1merror while loading shared libraries:"[0m
-
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
   modifying ``/etc/ld.so.conf''.
@@ -5773,7 +5814,6 @@
   In 0.10 and later, from "mythfrontend" go to Setup->Appearance.  The
   default for the height and width is "0" - this will cause MythTV to
   automatically size itself to full screen.
-
   If the MythTV GUI width and height are not 0, mythfrontend uses these
   GUI dimensions and is anchored to the upper left corner of the X
   Desktop. If the GUI X and/or Y are not 0, the upper left corner is
@@ -5832,17 +5872,17 @@
   To restore: (assuming that you've dropped the database)
 
 
-       $ mysql -u root
-       mysql>create database mythconverg;
-       mysql>exit
-       $ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
+
+  $ mysql -u root
+  mysql>create database mythconverg;
+  mysql>exit
+  $ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
 
 
 
   You may need to alter the MySQL permissions if this database is being
   shared with multiple systems.  See the ``Modifying access to the MySQL
   database for multiple systems'' section for more information.
-
 
 
   [1m21.6.  I'd like to delete the MySQL database.[0m
@@ -5902,7 +5942,6 @@
 
   Once btaudio loads, it should register additional /dev/dsp and
   /dev/mixer devices.  Typing $ dmesg will let you know what's going on.
-
 
 
   [1m21.8.  Removing unwanted channels.[0m
@@ -6019,7 +6058,6 @@
        session.screen0.focusModel:     SloppyFocus
 
 
-
   in it.
 
 
@@ -6082,20 +6120,18 @@
   add your usual MythTV users to that group. If you changed the user
   that starts mythbackend from the default of root you [4mmust[24m perform this
   step.
-
   Create the directory /var/log/mythtv and set its permissions as
   follows:
 
 
-
-  $ su
-  # mkdir /var/log/mythtv
-  # chown root:mythtv /var/log/mythtv
-  # chmod 0775 /var/log/mythtv
-  # exit
-  $ ls -ld /var/log/mythtv
-  drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
-  $
+       $ su
+       # mkdir /var/log/mythtv
+       # chown root:mythtv /var/log/mythtv
+       # chmod 0775 /var/log/mythtv
+       # exit
+       $ ls -ld /var/log/mythtv
+       drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+       $
 
 
 
@@ -6144,6 +6180,7 @@
   you don't get the results you expect, check that you're not asking
   msec to add missing permissions to the files or directories you
   created.
+
   [1m21.11.2.  Gentoo[0m
 
   The portage file for MythTV has scripts that will allow you to run
@@ -6201,7 +6238,6 @@
 
   Using this scheme, the master backend will not use both capture cards
   until one of the following happens:
-
   +o  There are four recordings scheduled for the same time
 
   +o  Both slaves are not available
@@ -6267,9 +6303,9 @@
   commercials).  If you change your mind, hitting 'X' again will stop
   the transcoding.
 
+
   Once the transcode is complete, mythbackend will replace the old file
   with the new as soon as it is no longer in use.
-
 
 
   [1m21.14.  Changing your hostname.[0m
@@ -6326,7 +6362,8 @@
   hostname you'll be using isn't already in the database.
 
 
-       $ grep kidsroom mythtv_backup.sql
+
+  $ grep kidsroom mythtv_backup.sql
 
 
 
@@ -6390,8 +6427,6 @@
   The ReplayTV runs VxWorks, a Real Time Operating System from Wind
   River Systems.
 
-
-
   [1m21.17.  Can I use wireless between the frontend and the backend?[0m
 
   Yes, you may, assuming that your wireless connection has sufficient
@@ -6450,10 +6485,11 @@
   example:
 
 
-       #!/bin/sh
-       TSIZE=`mkisofs -dvd-video -udf -q -print-size .`
-       mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
-       driveropts=burnfree -dao -v tsize="$TSIZE"s -
+
+  #!/bin/sh
+  TSIZE=`mkisofs -dvd-video -udf -q -print-size .`
+  mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
+  driveropts=burnfree -dao -v tsize="$TSIZE"s -
 
 
 
@@ -6504,20 +6540,21 @@
   a semicolon.
 
 
-       $ mysql -u root mythconverg
-       mysql>create table channel_temp
-       select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
-       c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
-       c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
-       c.commfree, c.visible, c.outputfilters
-       from channel c
-       left join channel_copy cb on (c.callsign = cb.callsign);
-       mysql>truncate channel;
-       mysql>insert channel select * from channel_temp;
-       mysql>drop table channel_temp;
-       mysql>drop table channel_copy;
-       mysql>exit
-       $
+
+  $ mysql -u root mythconverg
+  mysql>create table channel_temp
+  select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
+  c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
+  c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
+  c.commfree, c.visible, c.outputfilters
+  from channel c
+  left join channel_copy cb on (c.callsign = cb.callsign);
+  mysql>truncate channel;
+  mysql>insert channel select * from channel_temp;
+  mysql>drop table channel_temp;
+  mysql>drop table channel_copy;
+  mysql>exit
+  $
 
 
 
@@ -6563,7 +6600,6 @@
 
        $ su
        # urpmi kernel-source
-
 
 
              [1mNOTE[22m:  You do not need to recompile your kernel.
@@ -6633,11 +6669,11 @@
   Compile the [1mtest_ioctl [22mprogram:
 
 
-  $ cd ../utils
-  $ make
-  $ su
-  # cp test_ioctl /usr/local/bin
-  # exit
+       $ cd ../utils
+       $ make
+       $ su
+       # cp test_ioctl /usr/local/bin
+       # exit
 
 
 
@@ -6680,12 +6716,11 @@
   located on the same key as the tilde " " and not the single quote.
 
 
-
-  $ su
-  # cd /lib/modules/`uname -r`
-  # pwd
-  /lib/modules/2.4.21-0.16mdk
-  # find . -name "msp3400*" | xargs rm -f
+       $ su
+       # cd /lib/modules/`uname -r`
+       # pwd
+       /lib/modules/2.4.21-0.16mdk
+       # find . -name "msp3400*" | xargs rm -f
 
 
 
@@ -6735,13 +6770,15 @@
        crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 
 
-
   In this case, the ivtv device is video0.
 
   You can now add this card available to MythTV.  Go into your mythtv
   setup directory on the machine hosting the hardware MPEG-2 card.  When
   you add a new capture card, ensure that you are using the video0
   device.
+
+
+
      [1mNOTE[22m:  As of 2003-04-25 the ivtv driver does not support VBI, so
   closed-captioning is not available.  Leave the VBI device, audio
   device and audio sampling rate limit at the default values.  Change
@@ -6841,10 +6878,11 @@
   going to be version 0.6.6, and that won't work.  Uninstall it:
 
 
-       $ su
-       # urpme lirc lirc-remotes liblirc-devel
-       # rm -rf /dev/lirc*
-       # exit
+
+  $ su
+  # urpme lirc lirc-remotes liblirc-devel
+  # rm -rf /dev/lirc*
+  # exit
 
 
 
@@ -6852,40 +6890,39 @@
   programs on your system:
 
 
+       $ su
+       # updatedb
+       # locate lirc_i2c|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-  $ su
-  # updatedb
-  # locate lirc_i2c|grep `uname -r`
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
-  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
+       # locate lirc_dev|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
 
-  # locate lirc_dev|grep `uname -r`
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
-  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
-  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
-  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
+       # locate irw|grep "/usr"
+       /usr/bin/irw
+       /usr/local/bin/irw
+       /usr/local/man/man1/irw.1
 
-  # locate irw|grep "/usr"
-  /usr/bin/irw
-  /usr/local/bin/irw
-  /usr/local/man/man1/irw.1
+       # locate lircd|grep "/usr"
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
+       /usr/share/man/man8/lircd.8.bz2
+       /usr/share/doc/lirc-0.6.6/html/lircd.html
+       /usr/sbin/lircd
+       /usr/local/sbin/lircd
+       /usr/local/man/man8/lircd.8
 
-  # locate lircd|grep "/usr"
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
-  /usr/share/man/man8/lircd.8.bz2
-  /usr/share/doc/lirc-0.6.6/html/lircd.html
-  /usr/sbin/lircd
-  /usr/local/sbin/lircd
-  /usr/local/man/man8/lircd.8
-
-  # locate irxevent|grep "/usr"
-  /usr/share/man/man1/irxevent.1.bz2
-  /usr/share/doc/lirc-0.6.6/html/irxevent.html
-  /usr/share/doc/lirc-0.6.6/irxevent.keys
-  /usr/bin/irxevent
-  /usr/local/bin/irxevent
-  /usr/local/man/man1/irxevent.1
+       # locate irxevent|grep "/usr"
+       /usr/share/man/man1/irxevent.1.bz2
+       /usr/share/doc/lirc-0.6.6/html/irxevent.html
+       /usr/share/doc/lirc-0.6.6/irxevent.keys
+       /usr/bin/irxevent
+       /usr/local/bin/irxevent
+       /usr/local/man/man1/irxevent.1
 
 
 
@@ -6905,9 +6942,8 @@
 
   Download the lirc-0.7.0pre2 tarball:
 
-
-       $ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
-       $ tar -xjf lirc-0.7.0pre2.tar.bz2
+  $ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
+  $ tar -xjf lirc-0.7.0pre2.tar.bz2
 
 
 
@@ -6916,9 +6952,9 @@
   work correctly.  Download the patch and install:
 
 
-  $ cd lirc-0.7.0pre2
-  $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
-  $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+       $ cd lirc-0.7.0pre2
+       $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
+       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
 
@@ -6966,22 +7002,21 @@
   your /var/log/messages and /var/log/lircd files.
 
 
-
-  $ su
-  # modprobe lirc_i2c
-  # lsmod
-  Module                  Size  Used by    Not tainted
-  lirc_i2c                5124   0
-  lirc_dev               10096   1  [lirc_i2c]
-  ...
-  # lircd
-  # tail /var/log/messages
-  Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
-  Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
-  10
-  ...
-  # tail /var/log/lircd
-  Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+       $ su
+       # modprobe lirc_i2c
+       # lsmod
+       Module                  Size  Used by    Not tainted
+       lirc_i2c                5124   0
+       lirc_dev               10096   1  [lirc_i2c]
+       ...
+       # lircd
+       # tail /var/log/messages
+       Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+       Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+       10
+       ...
+       # tail /var/log/lircd
+       Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
 
 
 
@@ -7028,12 +7063,9 @@
   native LIRC support within MythTV, you will need to modify your
   settings.pro file and recompile.  Your settings.pro should look like
   this:
-
-
-
-  # Native lirc support
-  CONFIG += using_lirc
-  LIRC_LIBS = -llirc_client
+       # Native lirc support
+       CONFIG += using_lirc
+       LIRC_LIBS = -llirc_client
 
 
 

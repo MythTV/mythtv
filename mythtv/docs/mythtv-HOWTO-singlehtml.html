@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-05-xx, v0.15.00
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-05-25, v0.15.00
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1548,6 +1548,8 @@ $ su
 <H2><A NAME="ConfigureDD"></A> <A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Configuring the Zap2It.com DataDirect service. </A>
 </H2>
 
+<H3>Introduction.</H3>
+
 <P>Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
 Tribune Media Services.  TMS is one of the primary providers for program
 listing data in the United States and Canada.  There are a number of
@@ -1581,7 +1583,39 @@ configuration will be imported into MythTV when you first run the
 <A HREF="#MigratingtoDD">Migrating from XMLTV to DataDirect</A> for instructions on moving to to DataDirect if you are
 currently using XMLTV.  If you are starting from a fresh installation, the
 simplest thing is to immediately start using DataDirect.</P>
-<P>
+
+<H3>Grabbing channel icons for DataDirect users.</H3>
+
+<P>While the DataDirect TV listings service has several advantages, it does
+not support grabbing logo icons for the stations you receive. However, there
+are utilities provided that you can use to grab your initial set of icons
+and to update them if your lineups change.</P>
+<P>First, you need to generate or obtain an XML file with the information for
+your stations.</P>
+<P>If you have XMLTV software installed, there is a perl script in MythTV's
+<CODE>contrib/</CODE> directory which will generate this file for you. Run the
+command:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ perl mkiconmap.pl
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You will be asked for your zipcode and the service that you use. If there
+are no errors, the <CODE>iconmap.xml</CODE> file that you need for the next step
+will be created.</P>
+<P>If you do not have XMLTV software installed and do not want to install it
+for the sake of this minor task, there is a generic
+<CODE>contrib/master_iconmap.xml</CODE> which you can copy and use but this may
+not be as complete as using the specific information for your service.</P>
+<P>Once you have an <CODE>iconmap.xml</CODE> file, add the icon information to your
+database and grab any new icons with the command:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
+</PRE>
+</CODE></BLOCKQUOTE>
+
 <A NAME="manually_building_mythtv"></A> </P>
 <H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Manually building MythTV.</A>
 </H2>

@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-05-xx, v0.15.00
+<date>2004-05-25, v0.15.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1281,6 +1281,7 @@ $ su
 </verb></tscreen>
 
 <sect1>Configuring the Zap2It.com DataDirect service. <label id="ConfigureDD">
+<sect2>Introduction.
 <p>Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
 Tribune Media Services.  TMS is one of the primary providers for program
 listing data in the United States and Canada.  There are a number of
@@ -1317,6 +1318,36 @@ to DataDirect"> for instructions on moving to to DataDirect if you are
 currently using XMLTV.  If you are starting from a fresh installation, the
 simplest thing is to immediately start using DataDirect.
 
+<sect2>Grabbing channel icons for DataDirect users.
+<p>While the DataDirect TV listings service has several advantages, it does
+not support grabbing logo icons for the stations you receive. However, there
+are utilities provided that you can use to grab your initial set of icons
+and to update them if your lineups change.
+
+First, you need to generate or obtain an XML file with the information for
+your stations.
+
+If you have XMLTV software installed, there is a perl script in MythTV's
+<tt>contrib/</tt> directory which will generate this file for you. Run the
+command:
+<tscreen><verb>
+$ perl mkiconmap.pl
+</verb></tscreen>
+
+You will be asked for your zipcode and the service that you use. If there
+are no errors, the <tt>iconmap.xml</tt> file that you need for the next step
+will be created.
+
+If you do not have XMLTV software installed and do not want to install it
+for the sake of this minor task, there is a generic
+<tt>contrib/master_iconmap.xml</tt> which you can copy and use but this may
+not be as complete as using the specific information for your service.
+
+Once you have an <tt>iconmap.xml</tt> file, add the icon information to your
+database and grab any new icons with the command:
+<tscreen><verb>
+$ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
+</verb></tscreen>
 <label id="manually_building_mythtv">
 <sect1>Manually building MythTV.
 <p>Unpack MythTV
@@ -6341,14 +6372,14 @@ leading to dropped frames.
 </article>
 <!-- Revision History
 
-v0.15.00, 2004-05-xx  Bump XMLTV version.  Update link to gossamer threads
+v0.15.00, 2004-05-25  Bump XMLTV version.  Update link to gossamer threads
 archive.  Add statement that XFS or JFS are really the way to go.  Add Bruce
 Markey's update to the filter docs.  Modify non-master backend config based
 on Scott Rowe's suggestion. Initial version for v00.15.00.  Bruce's mod to
 removing unwanted DD channels.  Chris Pinkham's save icon thing for MySQL
 v3.  Update rest of gossamer-threads links. Axel Thimms' Fedora update.
 Adjust the MySQL v3 instructions since I wasn't paying attention the first
-time.
+time.  Instructions for grabbing icons for DataDirect.
 
 -->
 
