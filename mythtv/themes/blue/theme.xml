@@ -9,20 +9,20 @@
     <image mode="VIDEO">videobutton.png</image>
     <image mode="SCHEDULE">record.png</image>
     <image mode="SEARCH">finder.png</image>
-    <image mode="SETUP">settings.png</image>
-    <image mode="MEDIA_SETUP">title/title_media_setup.jpg</image>
-    <image mode="INFO_SETUP">title/title_info_setup.jpg</image>
-    <image mode="TVSETUP">title/title_tv_setup.jpg</image>
+    <image mode="SETUP">SETTINGS.png</image>
+    <image mode="MEDIA_SETUP">MEDIA_LIBRARY.png</image>
+    <image mode="INFO_SETUP">news.png</image>
+    <image mode="TVSETUP">tv.png</image>
     <image mode="DVD">watch_dvd.png</image>
-    <image mode="DVD_SETTINGS">title/title_dvd_setup.jpg</image>
-    <image mode="MUSIC_SETTINGS">title/title_music_setup.jpg</image>
-    <image mode="VIDEO_SETTINGS">title/title_video_setup.jpg</image>
-    <image mode="GAME_SETTINGS">title/title_game_setup.jpg</image>
+    <image mode="DVD_SETTINGS">watch_dvd.png</image>
+    <image mode="MUSIC_SETTINGS">playlist.png</image>
+    <image mode="VIDEO_SETTINGS">videobutton.png</image>
+    <image mode="GAME_SETTINGS">game.png</image>
     <image mode="LIBRARY">MEDIA_LIBRARY.png</image>
     <image mode="MANAGE_RECORDINGS">record.png</image>
     <image mode="INFO">news.png</image>
     <image mode="OPTICAL_DISK">cd.png</image>
-    <image mode="UTIL">title/title_util.jpg</image>
+    <image mode="UTIL">SETTINGS.png</image>
     <image mode="WORDS">SEARCH_WORDS.png</image>
     <image mode="LISTS">SEARCH_LISTS.png</image>
   </titles>
@@ -586,7 +586,7 @@
   </buttondef>
 
   <buttondef name="SETTINGS_MEDIA">
-    <image>cd.png</image>
+    <image>MEDIA_LIBRARY.png</image>
     <offset>15,10</offset>
   </buttondef>
 

@@ -3,7 +3,7 @@
   <window name="programguide">
 
     <font name="title" face="Arial">
-      <color>#ffffff</color>
+      <color>#ffffdd</color>
       <dropcolor>#000000</dropcolor>
       <size>25</size>
       <size:small>14</size:small>
@@ -306,7 +306,7 @@
    <window name="programguide-video">
 
     <font name="title" face="Arial">
-      <color>#ffffff</color>
+      <color>#ffffdd</color>
       <dropcolor>#000000</dropcolor>
       <size>25</size>
       <size:small>12</size:small>
@@ -626,7 +626,7 @@
     </font>
 
     <font name="title" face="Arial">
-      <color>#ffffff</color>
+      <color>#ffffdd</color>
       <dropcolor>#000000</dropcolor>
       <size>27</size>
       <size:small>13</size:small>
@@ -667,17 +667,18 @@
     </font>
 
     <container name="background">
+      <area> 0, 0, 800, 600</area>
       <textarea name="sched" draworder="0">
         <area>20,10,800,40</area>
         <font>info</font>
         <value>Scheduled Recordings:</value>
       </textarea>
-      <image name="filler" draworder="0" fleximage="yes">
+      <image name="filler" draworder="0" fleximage="no">
         <filename>cr-background.png</filename>
-        <position>0,39</position>
+        <position>0,0</position>
       </image>
       <textarea name="showinstr" align="center" draworder="0">
-        <area>0,570,800,30</area>
+        <area>0,550,800,30</area>
         <font>message</font>
         <value>Show  (1) All  (2) Important</value>
       </textarea>
@@ -692,9 +693,9 @@
     </container>
 
     <container name="showlevel_info">
-      <area>10,330,280,30</area>
+      <area>25,345,280,20</area>
       <textarea name="showing" draworder="4">
-        <area>0,0,105,30</area>
+        <area>0,0,105,20</area>
         <font>message</font>
         <value>Showing:</value>
       </textarea>
@@ -715,14 +716,14 @@
         <fcnfont name="record_font" function="recording"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
-        <column number="1" width="160" context="-1"></column>
-        <column number="2" width="120" context="-1"></column>
-        <column number="3" width="400" context="-1"></column>
+        <column number="1" width="150" context="-1"></column>
+        <column number="2" width="110" context="-1"></column>
+        <column number="3" width="420" context="-1"></column>
         <column number="4" width="20" context="-1"></column>
         <items>9</items>
-        <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
-        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
-        <image function="downarrow" filename="downarrow.png" location="755,230"></image>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-10,-10"></image>
+        <image function="uparrow" filename="uparrow.png" location="745,12"></image>
+        <image function="downarrow" filename="downarrow.png" location="745,238"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>cr-lines.png</filename>
@@ -731,30 +732,30 @@
     </container>
 
     <container name="program_info">
-      <area>0,360,800,210</area>
+      <area>25,370,800,210</area>
       <textarea name="title" draworder="6">
-        <area>20,0,800,40</area>
+        <area>0,0,800,40</area>
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>20,40,160,30</area>
+        <area>0,40,160,30</area>
         <font>info</font>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>200,40,420,30</area>
+        <area>175,40,420,30</area>
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
-        <area>20,70,720,140</area>
+        <area>0,70,720,140</area>
         <font>info</font>
         <multiline>yes</multiline>
         <value>%SUBTITLE|"|"
-%%STARS%%DESCRIPTION%</value>
+%%REPEAT%%STARS%%DESCRIPTION%</value>
       </textarea>
     </container>
 
     <container name="status_info">
-      <area>300,330,480,30</area>
+      <area>300,345,480,30</area>
       <textarea name="recordingstatus" align="right" draworder="6">
         <area>0,0,480,30</area>
         <font>message</font>
@@ -810,7 +811,7 @@
     </font>
 
     <font name="title" face="Arial">
-      <color>#ffffff</color>
+      <color>#ffffdd</color>
       <dropcolor>#000000</dropcolor>
       <size>29</size>
       <size:small>13</size:small>
@@ -947,7 +948,7 @@
     </font>
 
     <font name="title" face="Arial">
-      <color>#ffffff</color>
+      <color>#ffffdd</color>
       <dropcolor>#000000</dropcolor>
       <size>27</size>
       <size:small>13</size:small>
@@ -1207,7 +1208,7 @@
     </font>
 
     <font name="title" face="Arial">
-      <color>#ffffff</color>
+      <color>#ffffdd</color>
       <dropcolor>#000000</dropcolor>
       <size>24</size>
       <size:big>26</size:big>
@@ -1677,7 +1678,7 @@
     </font>
 
     <font name="title" face="Arial">
-      <color>#ffffff</color>
+      <color>#ffffdd</color>
       <dropcolor>#000000</dropcolor>
       <size>27</size>
       <size:small>12</size:small>
@@ -1823,7 +1824,7 @@
 
 
     <font name="title" face="Arial">
-      <color>#ffffff</color>
+      <color>#ffffdd</color>
       <dropcolor>#000000</dropcolor>
       <size>27</size>
       <size:small>14</size:small>
