@@ -89,11 +89,15 @@
         <font>header</font>
         <area>30,170,400,50</area>
         <value>loading...</value>
+        <value lang="ES">Cargando información...</value>
+        <value lang="CA">Obtenint informació...</value>
       </textarea>
       <textarea name="retrieve" draworder="3" align="center">
         <font>timedate</font>
         <area>0,480,800,42</area>
         <value>[ retrieving weather data ... ]</value>
+        <value lang="ES">[ obteniendo datos meteorológicos ... ]</value>
+        <value lang="CA">[ recuperant dades meteorològiques ... ]</value>
       </textarea>
     </container>
 
@@ -150,12 +154,16 @@
         <area>0,18,800,45</area>
         <font>header</font>
         <value>current conditions</value>
+        <value lang="ES">el tiempo ahora</value>
+        <value lang="CA">dades actuals</value>
       </textarea>
       <textarea name="humiditylbl" draworder="5">
         <context>1</context>
         <area>40,240,245,32</area>
         <font>weatherdata</font>
         <value>Humidity</value>
+        <value lang="ES">Humedad</value>
+        <value lang="CA">Humitat</value>
       </textarea>
       <textarea name="humidity" draworder="5" align="right">
         <context>1</context>
@@ -167,6 +175,8 @@
         <area>40,288,245,32</area>
         <font>weatherdata</font>
         <value>Pressure</value>
+        <value lang="ES">Presión</value>
+        <value lang="CA">Pressió</value>
       </textarea>
       <textarea name="barometer" draworder="5" align="right">
         <context>1</context>
@@ -178,6 +188,8 @@
         <area>40,336,245,32</area>
         <font>weatherdata</font>
         <value>Wind</value>
+        <value lang="ES">Viento</value>
+        <value lang="CA">Vent</value>
       </textarea>
       <textarea name="winddata" draworder="5" align="right">
         <context>1</context>
@@ -189,6 +201,8 @@
         <area>40,384,245,32</area>
         <font>weatherdata</font>
         <value>Visibility</value>
+        <value lang="ES">Visibilidat</value>
+        <value lang="CA">Visibilitat</value>
       </textarea>
       <textarea name="visibility" draworder="5" align="right">
         <context>1</context>
@@ -200,6 +214,8 @@
         <area>40,432,245,32</area>
         <font>weatherdata</font>
         <value>Wind Chill</value>
+        <value lang="ES">Sensación</value>
+        <value lang="CA">Sensació</value>
       </textarea>
       <textarea name="windchill" draworder="5" align="right">
         <context>1</context>
@@ -211,6 +227,8 @@
         <area>40,480,245,32</area>
         <font>weatherdata</font>
         <value>UV Index</value>
+        <value lang="ES">Radiación solar (UV)</value>
+        <value lang="CA">Radiació solar (UV)</value>
       </textarea>
       <textarea name="uvlevel" draworder="5" align="right">
         <context>1</context>
@@ -258,6 +276,8 @@
         <area>0,18,800,45</area>
         <font>header</font>
         <value>extended forecast</value>
+        <value lang="ES">próximos días</value>
+        <value lang="CA">propers dies</value>
       </textarea>
       <textarea name="date1" draworder="5" align="center">
         <context>2</context>
@@ -280,12 +300,16 @@
         <area>31,458,122,32</area>
         <font>lohifont</font>
         <value>LO</value>
+        <value lang="ES">MIN</value>
+        <value lang="CA">MIN</value>
       </textarea>
       <textarea name="hilbl1" draworder="5" align="center">
         <context>2</context>
         <area>152,458,122,32</area>
         <font>lohifont</font>
         <value>HI</value>
+        <value lang="CA">MAX</value>
+        <value lang="ES">MAX</value>
       </textarea>
       <textarea name="low1" draworder="5" align="center">
         <context>2</context>
@@ -320,12 +344,16 @@
         <area>276,458,122,32</area>
         <font>lohifont</font>
         <value>LO</value>
+        <value lang="ES">MIN</value>
+        <value lang="CA">MIN</value>
       </textarea>
       <textarea name="hilbl2" draworder="5" align="center">
         <context>2</context>
         <area>379,458,122,32</area>
         <font>lohifont</font>
         <value>HI</value>
+        <value lang="ES">MAX</value>
+        <value lang="CA">MAX</value>
       </textarea>
       <textarea name="low2" draworder="5" align="center">
         <context>2</context>
@@ -360,12 +388,16 @@
         <area>524,458,122,32</area>
         <font>lohifont</font>
         <value>LO</value>
+        <value lang="ES">MIN</value>
+        <value lang="CA">MIN</value>
       </textarea>
       <textarea name="hilbl3" draworder="5" align="center">
         <context>2</context>
         <area>624,458,122,32</area>
         <font>lohifont</font>
         <value>HI</value>
+        <value lang="ES">MAX</value>
+        <value lang="CA">MAX</value>
       </textarea>
       <textarea name="low3" draworder="5" align="center">
         <context>2</context>
@@ -397,6 +429,8 @@
         <area>0,18,800,45</area>
         <font>header</font>
         <value>today's forecast</value>
+        <value lang="ES">previsión para hoy</value>
+        <value lang="CA">previsió per a avui</value>
       </textarea>
       <textarea name="updatetime-3" draworder="5">
         <context>3</context>
@@ -428,12 +462,16 @@
         <area>0,18,800,45</area>
         <font>header</font>
         <value>tomorrow's outlook</value>
+        <value lang="ES">previsión para mañana</value>
+        <value lang="CA">previsió per demà</value>
       </textarea>
       <textarea name="forecastlbl" draworder="5">
         <context>4</context>
         <area>260,235,500,45</area>
         <font>todayfont</font>
         <value>Forecast for</value>
+        <value lang="ES">Previsión para el</value>
+        <value lang="ES">Previsió per al</value>
       </textarea>
       <textarea name="forecastdate" draworder="5">
         <context>4</context>
@@ -474,12 +512,16 @@
         <area>0,18,800,45</area>
         <font>header</font> 
         <value>doppler radar</value>
-      </textarea>
+        <value lang="ES">Imagen del radar</value>
+        <value lang="CA">Imatge del radar</value>
+	  </textarea>
       <textarea name="err1" draworder="5" align="center">
         <context>5</context>
         <area>0,250,800,45</area>
         <font>header</font>
         <value>Map Unavailable</value>
+        <value lang="ES">Mapa no disponible</value>
+        <value lang="CA">Mapa no disponible</value>
       </textarea>
       <image name="radarbk" draworder="4">
         <context>5</context>
@@ -522,6 +564,8 @@
         <area>0,18,800,45</area>
         <font>header</font>
         <value>weather setup</value>
+        <value lang="ES">Configuración de "El Tiempo"</value>
+        <value lang="CA">Configuració de "El Temps"</value>
       </textarea>
       <textarea name="help" draworder="7" align="center">
         <font>weatherdata</font>
@@ -542,6 +586,8 @@
       <textarea name="savemsg" draworder="5" align="allcenter">
         <font>footer</font>
         <value>To save, press 'i' - to cancel, hit escape</value>
+        <value lang="ES">Para guardar, pulse 'i' - para cancelar, para cancelar salga</value>
+        <value lang="CA">Per a guardar, premi 'i' - per cancel-lar, surti</value>
         <area>47,350,200,150</area>
         <multiline>yes</multiline>
       </textarea>
