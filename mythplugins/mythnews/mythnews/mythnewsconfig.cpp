@@ -150,9 +150,18 @@ void MythNewsConfig::populateSites()
         return;
     }
 
+    QString errorMsg;
+    int errorLine = 0;
+    int errorColumn = 0;
+
     QDomDocument domDoc;
-    if (!domDoc.setContent(&xmlFile)) {
+
+    if (!domDoc.setContent(&xmlFile, false, &errorMsg, &errorLine, &errorColumn)) 
+    {
         cerr << "MythNews: Error in reading content of news-sites.xml" << endl;
+        VERBOSE(VB_IMPORTANT, QString("MythNews: Error, parsing %1\n"
+                                      "at line: %2  column: %3 msg: %4").
+                arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
         return;
     }
 

@@ -1062,7 +1062,7 @@
     
     <item>
         <title>EFF Monthly Events Calendar</title>
-        <url>http://www.eff.org/calendar/rss/rss.php?cal=events&rssview=month</url>
+        <url>http://www.eff.org/calendar/rss/rss.php?cal=events&amp;rssview=month</url>
         <ico>http://www.eff.org/favicon.ico</ico>
     </item>
     
