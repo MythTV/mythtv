@@ -8,7 +8,7 @@ MythDVD is a MythTV module (see http://www.mythtv.org) that allows you to
 play DVDs and (optionally) VCDs. It can also be configured to let you rip
 DVDs and transcode their video and audio content to other (generally
 smaller) formats. The playing features are simply myth-style wrappers for
-your favourite DVD/XVCD playing software (mplayer, ogle, xine, etc). The
+your favorite DVD/XVCD playing software (mplayer, ogle, xine, etc). The
 transcoding is based on and derived from the excellent transcode package
 (see below).
 
@@ -23,8 +23,8 @@ done, don't even bother with this, as it won't work.
 Also, you need MythVideo installed (because mythDVD needs to know where you
 like to store your videos, and that's defined in the MythVideo setup).
 
-In addition to MythTV's prerequisites, you'll should have these software
-packages installed for *transcoding* to work:
+In addition to MythTV's prerequisites, you'll have to have the following
+software packages installed for *transcoding* to work:
 
    libdvdread - Needed by transcode and most direct DVD players.
                 Crucial for ripping functionality of mythDVD.
@@ -40,7 +40,7 @@ packages installed for *transcoding* to work:
                 almost certainly already have this. Transcode wants
                 it in any case. Currently using 1.6.1.
                 http://mjpeg.sourceforge.net/
-                Note that mjpegtools has dependencies of it's own,
+                Note that mjpegtools has dependencies of its own,
                 (libmovtar etc.) but that those packages are all 
                 available at the mjpegtools site. This includes 
                 avifile (0.7.38).
@@ -50,8 +50,8 @@ packages installed for *transcoding* to work:
                 Currently using 0.9.1
                 http://www.xvid.org/
 
-       liba52 - Library for dealing with ATSC A/52 (AC-3) for dealing
-                with DVD audio.
+       liba52 - Library for dealing with ATSC A/52 (AC-3) to handle
+                DVD audio.
                 http://liba52.sourceforge.net/
 
       libfame - Transcode will use this if it's installed.
@@ -59,11 +59,11 @@ packages installed for *transcoding* to work:
                 http://fame.sourceforge.net/
 
     transcode - The core of the re-encoding process (most
-                of the stuff above are actually things that
+                of the items above are actually things that
                 transcode wants for full functionality). The
                 more codecs you have installed, the better. You
-		        almost certainly want to install the divx codec,
-		        even if you plan to use xvid (see below).
+	        almost certainly want to install the divx codec,
+	        even if you plan to use xvid (see below).
                 Developers currently using 0.6.8.
                 http://www.theorie.physik.uni-goettingen.de/
                 ~ostreich/transcode/
@@ -143,7 +143,7 @@ source.
 
 	
 Keybindings with xine are also another area of great joy. In order to
-emulate exisiting usability characteristics, we want the Escape key to take
+emulate existing usability characteristics, we want the Escape key to take
 us back to the MythTV menu. This means that we need to change the key
 bindings slightly for xine.
 
@@ -151,7 +151,7 @@ The keybindings file can be found at:
 
 	~/.xine/keymap
 
-	1. Locate the vvalue for "Menu" and change it to the following:
+	1. Locate the value for "Menu" and change it to the following:
 
 		# Jump to Menu.
 		Menu {
@@ -167,7 +167,7 @@ The keybindings file can be found at:
 			modifier = none
 		}
 
-The following versions of xine are reccomended for XVCD playback:
+The following versions of xine are recommended for XVCD playback:
 
 	xine-lib-1-rc0a
 	xine-ui-0.9.22
@@ -200,13 +200,13 @@ SUBTITLES
 work extremely well, and some generate awful results. If you find that
 MythDVD transcodes a title with subtitles badly, you are encouraged to try
 and use transcode from the command line. Hopefully, future versions of
-transcode will offer more robust subtitling capabilites.
+transcode will offer more robust subtitling capabilities.
 
 CONFIGURATION
 -------------
 
     You have to go into Setup (Top Level Myth Menu --> Setup --> DVD
-Settings) and make some choice. A few (more or less random) thoughts on
+Settings) and make some choices. A few (more or less random) thoughts on
 these:
 
         * DVD device should probably be /dev/dvd
