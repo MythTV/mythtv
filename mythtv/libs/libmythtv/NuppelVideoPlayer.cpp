@@ -1735,6 +1735,11 @@ void NuppelVideoPlayer::StartPlaying(void)
             killplayer = true;
         }
 
+        if (rewindtime < 0)
+            rewindtime = 0;
+        if (fftime < 0)
+            fftime = 0;
+
         if (paused)
         {
             if (!previously_paused)
