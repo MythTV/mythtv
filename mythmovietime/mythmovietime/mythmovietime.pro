@@ -11,7 +11,7 @@ CONFIG += plugin thread warn_on debug
 TARGET = mythmovietime
 
 HEADERS += mainwnd.h mtdbitem.h
-SOURCES += main.cpp mainwnd.cpp mtdbitem.cpp
+SOURCES += main.cpp mainwnd.cpp mtdbitem.cpp dbcheck.cpp
 
 
 target.path = $${PREFIX}/lib/mythtv/plugins

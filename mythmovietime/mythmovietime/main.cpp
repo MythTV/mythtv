@@ -32,7 +32,7 @@
 
 using namespace std;
 
-
+extern void UpgradeMovieTimeDatabaseSchema(void);
 
 extern "C" {
 int mythplugin_init(const char *libversion);
@@ -51,12 +51,13 @@ void setupKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    cerr << "MythMovieTime init " << endl;
     if (!gContext->TestPopupVersion("mythmovietime",
                                     libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
-
+    
+    UpgradeMovieTimeDatabaseSchema();
+    
     setupKeys();
 
     return 0;
