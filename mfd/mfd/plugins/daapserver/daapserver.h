@@ -42,7 +42,7 @@ class DaapServer: public MFDHttpPlugin
     void    sendUpdate(HttpRequest *http_request, u32 database_version);
     void    sendMetadata(HttpRequest *http_request, QString request_path, DaapRequest *daap_request);
     void    sendDatabaseList(HttpRequest *http_request);
-    void    addItemToResponse(DaapRequest *daap_request, TagOutput &response, AudioMetadata *which_item, u64 meta_codes);
+    void    addItemToResponse(HttpRequest *http_request, DaapRequest *daap_request, TagOutput &response, AudioMetadata *which_item, u64 meta_codes);
     void    sendDatabase(HttpRequest *http_request, DaapRequest *daap_request, int which_database);
     void    sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRequest *daap_request);
     void    sendContainers(HttpRequest *http_request, DaapRequest *daap_request, int which_database);

@@ -20,7 +20,9 @@ using namespace std;
 #include "httpgetvar.h"
 #include "httpheader.h"
 
-class DaapInstance;
+//  class DaapInstance;
+
+#include "daapinstance.h"
 
 class DaapRequest
 {
@@ -30,7 +32,8 @@ class DaapRequest
     DaapRequest(
                 DaapInstance *owner,
                 const QString &l_base_url, 
-                const QString &l_host_address
+                const QString &l_host_address,
+                DaapServerType l_server_type = DAAP_SERVER_UNKNOWN
                );
                
     ~DaapRequest();
@@ -44,7 +47,11 @@ class DaapRequest
   private:
 
     DaapInstance *parent;
-    bool sendBlock(std::vector<char> what, QSocketDevice *where, bool ignore_shutdown = false);
+    bool sendBlock(
+                    std::vector<char> what, 
+                    QSocketDevice *where, 
+                    bool ignore_shutdown = false
+                  );
     void addText(std::vector<char> *buffer, QString text_to_add);
     
     QString base_url;
@@ -53,6 +60,7 @@ class DaapRequest
 
     QDict<HttpGetVariable>   get_variables;
     QDict<HttpHeader>        headers;
+    DaapServerType           server_type;
     
 };
 

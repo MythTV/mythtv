@@ -8,17 +8,19 @@
 
 */
 
+#include "../../../config.h"
+
 #include <vector>
 #include <iostream>
 using namespace std;
 
 #include "daaprequest.h"
-#include "daapinstance.h"
 
 DaapRequest::DaapRequest(
                             DaapInstance *owner,
                             const QString& l_base_url, 
-                            const QString& l_host_address
+                            const QString& l_host_address,
+                            DaapServerType l_server_type
                         )
 {
     parent = owner;
@@ -26,6 +28,7 @@ DaapRequest::DaapRequest(
     host_address = l_host_address;
     get_variables.setAutoDelete(true);
     stored_request = "";
+    server_type = l_server_type;
 }
 
 void DaapRequest::addGetVariable(const QString& label, int value)
@@ -89,12 +92,30 @@ bool DaapRequest::send(QSocketDevice *where_to_send, bool ignore_shutdown)
     stored_request = base_url;
     
     //
-    //  Add a few more "standard" daap headers (ie. things that iTunes sends
+    //  Add another "standard" daap header (ie. things that iTunes sends
     //  when it is a client)
     //
 
     addText(&the_request, "Cache-Control: no-cache\r\n");
-    addText(&the_request, "Accept: */*\r\n");
+    
+    //
+    //  If the server is an actual mfd, tell it precisely what formats we
+    //  understand (it will try and convert other to wav if we ask for them)
+    //
+
+    if(server_type == DAAP_SERVER_MYTH)
+    {
+        QString accept_string = "Accept: audio/wav,audio/mpg,audio/ogg,audio/flac";
+#ifdef AAC_AUDIO_SUPPORT
+        accept_string.append(",audio/m4a");
+#endif
+        accept_string.append("\r\n");
+        addText(&the_request, accept_string);
+    }
+    else
+    {
+        addText(&the_request, "Accept: */*\r\n");
+    }
 
     /*
         Might want to add these at some point
@@ -102,6 +123,10 @@ bool DaapRequest::send(QSocketDevice *where_to_send, bool ignore_shutdown)
         x-audiocast-udpport:49154
         icy-metadata:1
     */
+    
+    //
+    //  More standard headers
+    //
     
     addText(&the_request, "Client-DAAP-Version: 2.0\r\n");
     addText(&the_request, "User-Agent: MythTV/1.0 (Probably Linux)\r\n");

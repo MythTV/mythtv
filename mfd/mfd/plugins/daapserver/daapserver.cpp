@@ -586,7 +586,13 @@ void DaapServer::sendDatabaseList(HttpRequest *http_request)
 
 }
 
-void DaapServer::addItemToResponse(DaapRequest *daap_request, TagOutput &response, AudioMetadata *which_item, u64 meta_codes)
+void DaapServer::addItemToResponse(
+                                    HttpRequest *http_request,
+                                    DaapRequest *daap_request, 
+                                    TagOutput &response, 
+                                    AudioMetadata *which_item, 
+                                    u64 meta_codes
+                                  )
 {
     response << Tag('mlit');
                     
@@ -734,7 +740,8 @@ void DaapServer::addItemToResponse(DaapRequest *daap_request, TagOutput &respons
             //
             //  If the file is a wma, stream it as a wav (because the audio
             //  plugin does not know how to handle non-file based wma
-            //  content).
+            //  content). Similarily, we always stream local cd audio tracks
+            //  as wav files.
             //
             
             if(
@@ -743,6 +750,20 @@ void DaapServer::addItemToResponse(DaapRequest *daap_request, TagOutput &respons
               )
             {
                 response << Tag('asfm') << "wav" << end;
+            }
+            else if(which_item->getUrl().fileName().section('.', -1,-1) == "m4a")
+            {
+                //
+                //  Send aac (.m4a) as aac if the client supports it, otherwise wav
+                //
+                if(http_request->getHeader("Accept").contains("audio/m4a"))
+                {
+                    response << Tag('asfm') << "m4a" << end;
+                }
+                else
+                {
+                    response << Tag('asfm') << "wav" << end;
+                }
             }
             else
             {
@@ -957,7 +978,13 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
                 if(added_metadata->getType() == MDT_audio)
                 {
                     AudioMetadata *added_audio_metadata = (AudioMetadata*)added_metadata;
-                    addItemToResponse(daap_request, response, added_audio_metadata, meta_codes);
+                    addItemToResponse(
+                                        http_request,
+                                        daap_request, 
+                                        response, 
+                                        added_audio_metadata, 
+                                        meta_codes
+                                     );
                 }
                 else
                 {
@@ -1026,7 +1053,13 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
                         if(iterator.current()->getType() == MDT_audio)
                         {
                             AudioMetadata *which_item = (AudioMetadata*)iterator.current();
-                            addItemToResponse(daap_request, response, which_item, meta_codes);
+                            addItemToResponse(
+                                                http_request,
+                                                daap_request, 
+                                                response, 
+                                                which_item, 
+                                                meta_codes
+                                             );
                         }
                         else
                         {
@@ -1098,10 +1131,21 @@ void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRe
             if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
             {
                 //
-                //  Only translate wma's and cda's
+                //  Always translate wma's and cda's
                 //
                 
-                if(
+                if(file_path.section('.', -1,-1) == "m4a")
+                {
+                    if(http_request->getHeader("Accept").contains("audio/m4a"))
+                    {
+                        http_request->getResponse()->sendFile(file_path, skip);
+                    }
+                    else
+                    {
+                        http_request->getResponse()->sendFile(file_path, skip, FILE_TRANSFORM_TOWAV);
+                    }
+                }
+                else if(
                     file_path.section('.', -1,-1) == "wma" ||
                     file_path.section('.', -1,-1) == "cda"
                   )
