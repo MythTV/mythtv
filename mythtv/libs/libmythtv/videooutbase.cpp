@@ -18,6 +18,10 @@
 #include "videoout_viaslice.h"
 #endif
 
+#ifdef USING_DIRECTFB
+#include "videoout_directfb.h"
+#endif
+
 #define MAX_NEG_CROP 384
 unsigned char cropTbl[256 + 2 * MAX_NEG_CROP];
 unsigned char *cm = NULL;
@@ -176,6 +180,10 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 #ifdef USING_VIASLICE
     if (type == kVideoOutput_VIA)
         return new VideoOutputVIA();
+#endif
+
+#ifdef USING_DIRECTFB
+    return new VideoOutputDirectfb();
 #endif
 
     return new VideoOutputXv();

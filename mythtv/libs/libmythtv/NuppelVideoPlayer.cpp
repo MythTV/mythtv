@@ -11,6 +11,9 @@
 #include <qsqldatabase.h>
 #include <qmap.h>
 
+#include <linux/rtc.h>
+#include <sys/ioctl.h>
+
 #include <iostream>
 using namespace std;
 
@@ -876,6 +879,233 @@ void NuppelVideoPlayer::ShowText(void)
     }
 }
 
+#define MAXWARPDIFF 0.0005 // Max amount the warpfactor can change in 1 frame
+#define WARPMULTIPLIER 1000000000 // How much do we multiply the warp by when 
+                                  //storing it in an integer
+#define WARPAVLEN (video_frame_rate * 600) // How long to average the warp over
+#define RTCRATE 1024 // RTC frequency if we have no vsync
+
+float NuppelVideoPlayer::WarpFactor(void) 
+{
+    // Calculate a new warp factor
+    float   divergence;
+    float   rate;
+    float   newwarp = 1;
+    float   warpdiff;
+
+    // Number of frames the audio is out by
+    divergence = (float)avsync_avg / (float)frame_interval;
+    // Number of frames divergence is changing by per frame
+    rate = (float)(avsync_avg - avsync_oldavg) / (float)frame_interval;
+    avsync_oldavg = avsync_avg;
+    newwarp = warpfactor_avg * (1 + ((divergence + rate) / 125));
+
+    // Clip the amount changed so we don't get big frequency variations
+    warpdiff = newwarp / warpfactor;
+    if (warpdiff > (1 + MAXWARPDIFF)) 
+    {
+//        cerr << "Clipped.  Warpdiff: " << warpdiff << "  warp: " << newwarp;
+        newwarp = warpfactor * (1 + MAXWARPDIFF);
+//        cerr << "  clipped to: " << newwarp << endl;
+    } 
+    else if (warpdiff < (1 - MAXWARPDIFF)) 
+    {
+//        cerr << "Clipped.  Warpdiff: " << warpdiff << "  warp: " << newwarp;
+        newwarp = warpfactor * (1 - MAXWARPDIFF);
+//        cerr << "  clipped to: " << newwarp << endl;
+    }
+    
+    warpfactor = newwarp;
+
+    // Clip final warp factor
+    if (warpfactor < 0.5) 
+        warpfactor = 0.5;
+    else if (warpfactor > 2) 
+        warpfactor = 2;
+
+    // Keep a 10 minute average
+    warpfactor_avg = (warpfactor + (warpfactor_avg * (WARPAVLEN - 1))) / 
+                      WARPAVLEN;
+
+//    cerr << "Divergence: " << divergence << "  Rate: " << rate 
+//         << "  Warpfactor: " << warpfactor << "  warpfactor_avg: " 
+//         << warpfactor_avg << endl;
+    return divergence;
+}
+
+void NuppelVideoPlayer::InitVTAVSync(void) 
+{
+    QString timing_type = "next trigger";
+
+    //warpfactor_avg = 1;
+    warpfactor_avg = gContext->GetNumSetting("WarpFactor", 0);
+    if (warpfactor_avg) 
+        warpfactor_avg /= WARPMULTIPLIER;
+    else 
+        warpfactor_avg = 1;
+    // Reset the warpfactor if it's obviously bogus
+    if (warpfactor_avg < 0.5) 
+        warpfactor_avg = 1;
+    if (warpfactor_avg > 2) 
+        warpfactor_avg = 1;
+
+    warpfactor = warpfactor_avg;
+    avsync_oldavg = 0;
+    rtcfd = -1;
+    if (!disablevideo) 
+    {
+        int ret = vsync_init();
+
+        refreshrate = videoOutput->GetRefreshRate();
+        if (refreshrate <= 0) 
+            refreshrate = frame_interval;
+
+        if (ret > 0) 
+        {
+            hasvsync = true;
+
+            if ( ret == 1 ) timing_type = "nVidia polling";
+            vsynctol = refreshrate / 2; 
+            // How far out can the vsync be for us to use it?
+        } 
+        else 
+        {
+            rtcfd = open("/dev/rtc", O_RDONLY);
+            if (rtcfd >= 0) 
+            {
+                if ((ioctl(rtcfd, RTC_IRQP_SET, RTCRATE) < 0) || 
+                    (ioctl(rtcfd, RTC_PIE_ON, 0) < 0)) 
+                {
+                    close(rtcfd);
+                    rtcfd = -1;
+                } 
+                else 
+                {
+                    vsynctol = 1000000 / RTCRATE; 
+                    // How far out can the interrupt be for us to use it?
+                    timing_type = "/dev/rtc";
+                }
+            }
+        }
+
+        nice(-19);
+
+        QString msg = QString("Video timing method: %1").arg(timing_type);
+        VERBOSE(VB_PLAYBACK, msg);
+        msg = QString("Refresh rate: %1, frame interval: %2") 
+                     .arg(refreshrate).arg(frame_interval);
+        VERBOSE(VB_PLAYBACK, msg);
+    }
+}
+
+void NuppelVideoPlayer::VTAVSync(void)
+{
+    float           diverge;
+    unsigned long   rtcdata;
+    
+    VideoFrame *buffer = videoOutput->GetLastShownFrame();
+    if (!buffer) 
+    {
+        cerr << "No video buffer, error error\n";
+        return;
+    }
+
+    diverge = WarpFactor();
+    /*if (diverge < -5) cerr << "Dropping frame to keep audio in sync :(" << endl;
+    else*/ 
+    if (disablevideo) 
+    {
+        delay = UpdateDelay(&nexttrigger);
+        if (delay > 0) 
+            usleep(delay);
+    } 
+    else 
+    {
+        // if we get here, we're actually going to do video output
+        delay = UpdateDelay(&nexttrigger);
+        if (buffer) 
+            videoOutput->PrepareFrame(buffer);
+
+        if ((hasvsync) || (rtcfd >= 0)) 
+        {
+            delay = UpdateDelay(&nexttrigger);
+            if (delay < (0 - vsynctol)) 
+                cerr << "Late frame!  Delay: " << delay << endl;
+
+            if (hasvsync) 
+                vsync_wait_for_retrace();
+            else 
+                read(rtcfd,&rtcdata,sizeof(rtcdata));
+
+            delay = UpdateDelay(&nexttrigger);
+            while (delay > vsynctol) 
+            {
+                vsync_wait_for_retrace();
+                delay = UpdateDelay(&nexttrigger);
+            }
+        } 
+        else if (rtcfd >= 0) 
+        {
+            // No vsync - use the RTC instead
+        } 
+        else 
+        {    
+            // No vsync _or_ RTC, fall back to usleep() (yuck)
+            delay = UpdateDelay(&nexttrigger);
+            usleep(delay);
+        }
+        
+        // Reset the frame timer to current time since we're trusting the 
+        // video timing
+        gettimeofday(&nexttrigger, NULL);
+        
+        // Display the frame
+        videoOutput->Show();
+    }
+    
+    if (output_jmeter && output_jmeter->RecordCycleTime()) 
+        cout << "avsync_avg: " << avsync_avg / 1000 
+             << ", avsync_oldavg: " << avsync_oldavg / 1000 
+             << ", warpfactor: " << warpfactor 
+             << ", warpfactor_avg: " << warpfactor_avg << endl;
+
+    // Schedule next frame
+    nexttrigger.tv_usec += frame_interval;
+    NormalizeTimeval(&nexttrigger);
+    
+    if (audioOutput && normal_speed) 
+    {
+        // ms, same scale as timecodes
+        lastaudiotime = audioOutput->GetAudiotime();
+        if (lastaudiotime != 0) { // lastaudiotime = 0 after a seek
+            // The time at the start of this frame (ie, now) is given by 
+            // last->timecode
+            avsync_delay = (buffer->timecode - lastaudiotime) * 1000; // uSecs
+            avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
+        } 
+        else 
+        {
+            avsync_avg = 0;
+            avsync_oldavg = 0;
+        }
+    }
+}
+
+void NuppelVideoPlayer::ShutdownVTAVSync(void) 
+{
+    if (hasvsync) 
+        vsync_shutdown();
+    if (hasvgasync) 
+        vgasync_cleanup();
+    gContext->SaveSetting("WarpFactor", (int)(warpfactor_avg * WARPMULTIPLIER));
+
+    if (rtcfd >= 0)
+    {
+        close(rtcfd);
+        rtcfd = -1;
+    }
+}
+
 void NuppelVideoPlayer::InitExAVSync(void)
 {
     QString timing_type = "next trigger";
@@ -1191,6 +1421,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     reducejitter = gContext->GetNumSetting("ReduceJitter", 0);
     experimentalsync = gContext->GetNumSetting("ExperimentalAVSync", 0);
+    usevideotimebase = gContext->GetNumSetting("UseVideoTimebase", 0);
 
     if ((print_verbose_messages & VB_PLAYBACK) != 0)
         output_jmeter = new Jitterometer("video_output", 100);
@@ -1201,7 +1432,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     gettimeofday(&nexttrigger, NULL);
 
-    if (experimentalsync)
+    if (usevideotimebase)
+        InitVTAVSync();
+    else if (experimentalsync)
         InitExAVSync();
 
     while (!eof && !killvideo)
@@ -1262,7 +1495,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
 
-        if (experimentalsync)
+        if (usevideotimebase)
+            VTAVSync();
+        else if (experimentalsync)
             ExAVSync();
         else 
             OldAVSync();
@@ -1277,7 +1512,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     delete videoOutput;
     videoOutput = NULL;
 
-    if (experimentalsync)
+    if (usevideotimebase)
+        VTAVSync();
+    else if (experimentalsync)
         ShutdownExAVSync();
 }
 
@@ -1608,8 +1845,35 @@ void NuppelVideoPlayer::SetEffDsp(int dsprate)
 void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 {
     if (audioOutput)
-        audioOutput->AddSamples(buffer, len / (audio_channels * audio_bits / 8),
-                                timecode);
+    {
+        if (usevideotimebase)
+        {
+            int samples;
+            char * newbuffer;
+            float incount = 0;
+            int outcount;
+            int samplesize;
+
+            samplesize = audio_channels * audio_bits / 8;
+            samples = len / samplesize;
+            newbuffer = (char *)malloc(len * 2);
+            for (incount = 0, outcount = 0; 
+                 (incount < samples) && (outcount < (samples * 2)); 
+                 outcount++, incount += warpfactor) 
+            {
+                memcpy(newbuffer + (outcount * samplesize), 
+                       buffer + ((int)incount * samplesize), samplesize);
+            }
+
+            samples = outcount;
+            audioOutput->AddSamples(buffer, samples, timecode);
+            free(newbuffer);
+        }
+        else
+            audioOutput->AddSamples(buffer, len / 
+                                    (audio_channels * audio_bits / 8),
+                                    timecode);
+    }
 }
 
 void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
@@ -1618,7 +1882,33 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
     if (audioOutput)
     {
         char *buffers[] = {(char *)lbuffer, (char *)rbuffer};
-        audioOutput->AddSamples(buffers, samples, timecode);
+        if (usevideotimebase)
+        {
+            short int *newlbuffer;
+            short int *newrbuffer;
+            float incount = 0;
+            int outcount;
+
+            newlbuffer = (short int *)malloc(sizeof(short int) * samples * 2);
+            newrbuffer = (short int *)malloc(sizeof(short int) * samples * 2);
+            buffers[0] = (char *)newlbuffer;
+            buffers[1] = (char *)newlbuffer;
+
+            for (incount = 0, outcount = 0; 
+                 (incount < samples) && (outcount < (samples * 2)); 
+                 outcount++, incount += warpfactor) 
+            {
+                newlbuffer[outcount] = lbuffer[(int)incount];
+                newrbuffer[outcount] = rbuffer[(int)incount];
+            }
+
+            samples = outcount;
+            audioOutput->AddSamples(buffers, samples, timecode);
+            free(newlbuffer);
+            free(newrbuffer);
+        }
+        else
+            audioOutput->AddSamples(buffers, samples, timecode);
     }
 }
 

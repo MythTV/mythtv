@@ -1008,7 +1008,9 @@ void ThemedMenu::parseMenu(QString menuname, int row, int col)
         activebutton = buttonRows[currentrow].buttons[currentcolumn];
     }
 
+#ifndef QWS
     setNoErase();
+#endif
 
     menulevel++;
 

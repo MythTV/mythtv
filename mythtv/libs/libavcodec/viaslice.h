@@ -9,6 +9,7 @@ typedef struct {
 
     int code;
     int maxcode;
+    int slicecount;
 } via_slice_state_t;
 
 #endif

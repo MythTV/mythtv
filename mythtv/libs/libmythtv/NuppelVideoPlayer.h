@@ -248,6 +248,8 @@ class NuppelVideoPlayer
     void SetBlankIter(void);
     void SetCommBreakIter(void);
 
+    float WarpFactor(void);
+
     void ReencoderAddKFA(QPtrList<struct kfatable_entry> *kfa_table,
                          long curframe, long lastkey, long num_keyframes);
 
@@ -386,10 +388,16 @@ class NuppelVideoPlayer
     int delay;
     int avsync_delay;
     int avsync_avg;
+    int avsync_oldavg;
     int refreshrate;
     int frame_interval; // always adjusted for play_speed
     float play_speed;  
     bool normal_speed;
+
+    float warpfactor;
+    float warpfactor_avg;
+    int rtcfd;
+    int vsynctol;
  
     bool delay_clipping;
     struct timeval nexttrigger, now;
@@ -400,6 +408,10 @@ class NuppelVideoPlayer
 
     Jitterometer *output_jmeter;
 
+    void InitVTAVSync(void);
+    void VTAVSync(void);
+    void ShutdownVTAVSync(void);
+
     void InitExAVSync(void);
     void OldAVSync(void);
     void ExAVSync(void);
@@ -407,6 +419,7 @@ class NuppelVideoPlayer
 
     bool reducejitter;
     bool experimentalsync;
+    bool usevideotimebase;
 
     bool limitKeyRepeat;
 

@@ -367,7 +367,7 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 
     via_slice_state_t *curdata = (via_slice_state_t *)frame->buf;
 
-    if (curdata->code == 1)
+    if (curdata->slicecount == 1)
         data->current = data->buffer;
 
     memset(data->tempbuffer + curdata->slice_datalen, 0, 32);
@@ -412,7 +412,7 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
      */
     if (curdata->code == curdata->maxcode)
     {
-        VIASliceReceiveData(curdata->maxcode, data->buffer);
+        VIASliceReceiveData(curdata->slicecount, data->buffer);
     } 
 }
 

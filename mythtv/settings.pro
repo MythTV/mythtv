@@ -43,3 +43,9 @@ EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm -lfreetype
 # VIA cle266 support
 #CONFIG += using_viahwslice
 #EXTRA_LIBS += -lddmpeg
+
+# DirectFB support
+#CONFIG += using_directfb
+#EXTRA_LIBS = `directfb-config --libs` -lfreetype
+#QMAKE_CXXFLAGS += `directfb-config --cflags`
+

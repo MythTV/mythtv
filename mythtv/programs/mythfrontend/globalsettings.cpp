@@ -599,6 +599,17 @@ public:
     };
 };
 
+class UseVideoTimebase: public CheckBoxSetting, public GlobalSetting {
+public:
+    UseVideoTimebase():
+        GlobalSetting("UseVideoTimebase") {
+        setLabel(QObject::tr("Use video as timebase"));
+        setValue(false);
+        setHelpText(QObject::tr("Use the video as the timebase and warp "
+                    "the audio to keep it in sync. (Experimental)"));
+    };
+};
+
 class ExperimentalSync: public CheckBoxSetting, public GlobalSetting {
 public:
     ExperimentalSync():
@@ -1425,6 +1436,7 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new CustomFilters());
     general->addChild(new ReduceJitter());
     general->addChild(new ExperimentalSync());
+    general->addChild(new UseVideoTimebase());
     general->addChild(new DecodeExtraAudio());
     general->addChild(new PIPLocation());
     addChild(general);
