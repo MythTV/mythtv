@@ -6,6 +6,7 @@
 #include <qstring.h>
 #include <qpixmap.h>
 #include <qdatetime.h>
+#include <qvaluevector.h>
 
 class QFont;
 class ProgramInfo;
@@ -53,7 +54,6 @@ class GuideGrid : public QDialog
     QRect timeRect() const;
     QRect programRect() const;
 
-    ChannelInfo *getChannelInfo(int channum);
     void fillChannelInfos();
 
     void fillTimeInfos();
@@ -64,14 +64,13 @@ class GuideGrid : public QDialog
     QFont *m_font;
     QFont *m_largerFont;
 
-    ChannelInfo *m_channelInfos[10];
+    QValueVector<ChannelInfo> m_channelInfos;
     TimeInfo *m_timeInfos[10];
     ProgramInfo *m_programInfos[10][10];
 
     QDateTime m_originalStartTime;
     QDateTime m_currentStartTime;
     unsigned int m_currentStartChannel;
-    unsigned int m_currentEndChannel;
 
     int m_currentRow;
     int m_currentCol;

@@ -51,7 +51,6 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
 
     for (int y = 0; y < 10; y++)
     {
-        m_channelInfos[y] = NULL;
         m_timeInfos[y] = NULL;
         for (int x = 0; x < 10; x++)
             m_programInfos[x][y] = NULL;
@@ -104,8 +103,6 @@ GuideGrid::~GuideGrid()
 {
     for (int y = 0; y < 10; y++)
     {
-        if (m_channelInfos[y])
-            delete m_channelInfos[y];
         if (m_timeInfos[y])
             delete m_timeInfos[y];
 
@@ -115,81 +112,56 @@ GuideGrid::~GuideGrid()
                 delete m_programInfos[x][y];
         }
     }
+
+    m_channelInfos.clear();
 }
 
 int GuideGrid::getLastChannel(void)
 {
+    unsigned int chanNum = m_currentRow + m_currentStartChannel;
+    if (chanNum >= m_channelInfos.size())
+        chanNum -= m_channelInfos.size();
+
     if (selectState)
-        return m_channelInfos[m_currentRow]->channum;
+        return m_channelInfos[chanNum].channum;
     return 0;
-}
-
-ChannelInfo *GuideGrid::getChannelInfo(int channum)
-{
-    char thequery[512];
-    QSqlQuery query;
-
-    sprintf(thequery, "SELECT channum,callsign,icon FROM channel WHERE "
-                      "channum = %d;", channum);
-    query.exec(thequery);
-
-    ChannelInfo *retval = NULL;
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        query.next();
-
-        retval = new ChannelInfo;
-        retval->callsign = query.value(1).toString();
-        if (retval->callsign == QString::null)
-            retval->callsign = "";
-        retval->iconpath = query.value(2).toString();
-        retval->chanstr = query.value(0).toString();
-        retval->channum = channum;
-        retval->icon = NULL;
-    }
-
-    return retval;   
 }
 
 void GuideGrid::fillChannelInfos()
 {
-    for (int x = 0; x < 10; x++)
-    {
-        if (m_channelInfos[x])
-            delete m_channelInfos[x];
-        m_channelInfos[x] = NULL;
-    }
+    m_channelInfos.clear();
 
-    int channum = m_currentStartChannel;
-    for (int y = 0; y < 6; y++)
+    char thequery[512];
+    QSqlQuery query;
+    
+    sprintf(thequery, "SELECT channum,callsign,icon FROM channel ORDER BY "
+                      "channum;");
+    query.exec(thequery);
+    
+    bool set = false;
+    
+    if (query.isActive() && query.numRowsAffected() > 0)
     {
-        bool done = false;
-        ChannelInfo *chinfo;
- 
-        while (!done)
+        while (query.next())
         {
-            if ((chinfo = getChannelInfo(channum)) != NULL)
-            { 
-                done = true;
-                break;
+            ChannelInfo val;
+            val.callsign = query.value(1).toString();
+            if (val.callsign == QString::null)
+                val.callsign = "";
+            val.iconpath = query.value(2).toString();
+            val.chanstr = query.value(0).toString();
+            val.channum = atoi(val.chanstr);
+            val.icon = NULL;
+        
+            if ((unsigned int)val.channum == m_currentStartChannel && !set)
+            {
+                m_currentStartChannel = m_channelInfos.size();
+                set = true;
             }
-            channum++;
-            if (channum > CHANNUM_MAX)
-                channum = 0;
+		
+            m_channelInfos.push_back(val);
         }
-
-        if (!done)
-            break;
-
-        m_currentEndChannel = chinfo->channum;
-        m_channelInfos[y] = chinfo;
-        channum++;
-        if (channum > CHANNUM_MAX)
-            channum = 0;
     }
-
-    m_currentStartChannel = m_channelInfos[0]->channum;
 }
 
 void GuideGrid::fillTimeInfos()
@@ -260,11 +232,15 @@ void GuideGrid::fillTimeInfos()
 
 ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
 {
-    if (!m_channelInfos[row] || !m_timeInfos[col])
+    unsigned int chanNum = row + m_currentStartChannel;
+    if (chanNum >= m_channelInfos.size())
+        chanNum -= m_channelInfos.size();
+
+    if (m_channelInfos[chanNum].chanstr == "" || !m_timeInfos[col])
         return NULL;
 
-    ProgramInfo *pginfo = GetProgramAtDateTime(m_channelInfos[row]->channum,
-                                        m_timeInfos[col]->sqltime.ascii());
+    ProgramInfo *pginfo = GetProgramAtDateTime(m_channelInfos[chanNum].channum,
+                                             m_timeInfos[col]->sqltime.ascii());
     if (pginfo)
     {
         pginfo->startCol = col;
@@ -371,10 +347,14 @@ void GuideGrid::paintChannels(QPainter *p)
 
     for (unsigned int i = 0; i < 6; i++)
     {
-        if (!m_channelInfos[i])
+        unsigned int chanNumber = i + m_currentStartChannel;
+        if (chanNumber >= m_channelInfos.size())
+            chanNumber -= m_channelInfos.size();
+  
+        if (m_channelInfos[chanNumber].chanstr == "")
             break;
 
-        ChannelInfo *chinfo = m_channelInfos[i];
+        ChannelInfo *chinfo = &(m_channelInfos[chanNumber]);
         if (chinfo->iconpath != "none")
         {
             if (!chinfo->icon)
@@ -466,7 +446,11 @@ void GuideGrid::paintPrograms(QPainter *p)
 
     for (unsigned int y = 0; y < 6; y++)
     {
-        if (!m_channelInfos[y])
+        unsigned int chanNum = y + m_currentStartChannel;
+        if (chanNum >= m_channelInfos.size())
+            chanNum -= m_channelInfos.size();
+
+        if (m_channelInfos[chanNum].chanstr == "")
             break;
 
         QDateTime lastprog;
@@ -737,32 +721,9 @@ void GuideGrid::scrollRight()
 
 void GuideGrid::scrollDown()
 {
-    ChannelInfo *chinfo = m_channelInfos[0];
-    if (chinfo)
-        delete chinfo;
-
-    for (int x = 0; x < 5; x++)
-        m_channelInfos[x] = m_channelInfos[x + 1];
-
-    m_channelInfos[5] = NULL;
-
-    m_currentStartChannel = m_channelInfos[0]->channum;
-
-    bool done = false;
-    while (!done)
-    {
-        m_currentEndChannel++;
-
-        if (m_currentEndChannel > CHANNUM_MAX)
-            m_currentEndChannel = 0;
-
-        chinfo = getChannelInfo(m_currentEndChannel);
-        if (chinfo)
-        {
-            done = true;
-            m_channelInfos[5] = chinfo;
-        }
-    }
+    m_currentStartChannel++;
+    if (m_currentStartChannel >= m_channelInfos.size())
+        m_currentStartChannel -= m_channelInfos.size();
 
     for (int y = 0; y < 5; y++)
     {
@@ -791,32 +752,10 @@ void GuideGrid::scrollDown()
 
 void GuideGrid::scrollUp()
 {
-    ChannelInfo *chinfo = m_channelInfos[5];
-    if (chinfo)
-        delete chinfo;
-
-    for (int x = 5; x > 0; x--)
-        m_channelInfos[x] = m_channelInfos[x - 1];
-
-    m_channelInfos[0] = NULL;
-
-    bool done = false; 
-    while (!done)
-    {
+    if (m_currentStartChannel == 0)
+        m_currentStartChannel = m_channelInfos.size() - 1;
+    else
         m_currentStartChannel--;
- 
-        if (m_currentStartChannel < 2)
-            m_currentStartChannel = CHANNUM_MAX;
-
-        chinfo = getChannelInfo(m_currentStartChannel);
-        if (chinfo)
-        {
-            done = true;
-            m_channelInfos[0] = chinfo;
-        }
-    }
-
-    m_currentEndChannel = m_channelInfos[5]->channum;
 
     for (int y = 0; y < 5; y++)
     {
