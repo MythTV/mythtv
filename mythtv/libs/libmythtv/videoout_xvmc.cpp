@@ -1019,17 +1019,8 @@ void VideoOutputXvMC::Show(FrameScanType scan)
 
     data->p_render_surface_visible = data->p_render_surface_to_show;
 
-    if (data->curosd && data->curosd != osdframe)
-    {
-        DiscardFrame(data->curosd);
-        data->curosd = NULL;
-    }
-
     if (osdframe)
-    {
         data->p_render_surface_visible = osdren;
-        data->curosd = osdframe;
-    } 
  
     if (!m_deinterlacing || (m_deinterlacing && scan != kScan_Interlaced))
     {
@@ -1179,6 +1170,12 @@ void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
     xvmc_render_state_t *render = (xvmc_render_state_t *)frame->buf;
     render->p_osd_target_surface_render = NULL;
 
+    if (data->curosd)
+    {
+        DiscardFrame(data->curosd);
+        data->curosd = NULL;
+    }
+
     if (osd)
     {
         if (data->subpicture_mode == BLEND_SUBPICTURE ||
@@ -1220,6 +1217,7 @@ void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
                                      0, 0, XJ_width, XJ_height);
 
                 render->p_osd_target_surface_render = newframe;
+                data->curosd = newframe;
             }
             else if (data->subpicture_mode == BACKEND_SUBPICTURE)
             {
