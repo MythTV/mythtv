@@ -93,6 +93,11 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
     {
         curr_program.clearValues();
         curr_program.programid = pxmlatts.value("id");
+
+        if (curr_program.programid.left(2) == QString("MV"))
+        {
+           curr_program.showtype = "Movie";
+        }
     }
     else if (currtagname == "crew") 
     {
