@@ -7,18 +7,19 @@
 #include "tv.h"
 
 class MainServer;
+class PlaybackSock;
 
 class EncoderLink
 {
   public:
-    EncoderLink(int capturecardnum, QSocket *lsock, QString lhostname);
+    EncoderLink(int capturecardnum, PlaybackSock *lsock, QString lhostname);
     EncoderLink(int capturecardnum, TVRec *ltv);
 
    ~EncoderLink();
 
-    void setSocket(QSocket *lsock) { sock = lsock; }
+    void setSocket(PlaybackSock *lsock) { sock = lsock; }
 
-    QSocket *getSocket() { return sock; }
+    PlaybackSock *getSocket() { return sock; }
     QString getHostname() { return hostname; }
 
     TVRec *getTV() { return tv; }
@@ -76,7 +77,7 @@ class EncoderLink
   private:
     int m_capturecardnum;
 
-    QSocket *sock;
+    PlaybackSock *sock;
     QString hostname;
 
     TVRec *tv;

@@ -3,6 +3,9 @@
 
 #include <qsocket.h>
 #include <qstring.h>
+#include <pthread.h>
+
+class ProgramInfo;
 
 class PlaybackSock
 {
@@ -10,22 +13,40 @@ class PlaybackSock
     PlaybackSock(QSocket *lsock, QString lhostname, bool wantevents);
    ~PlaybackSock();
 
-    QSocket *getSocket() { return sock; }
-    QString getHostname() { return hostname; }
+    QSocket *getSocket(void) { return sock; }
+    QString getHostname(void) { return hostname; }
 
-    bool isLocal() { return local; }
-    bool wantsEvents() { return events; }
+    bool isLocal(void) { return local; }
+    bool wantsEvents(void) { return events; }
 
-    bool isSlaveBackend() { return backend; }
-    void setAsSlaveBackend() { backend = true; }
+    // all backend<->backend stuff below here
+    bool isSlaveBackend(void) { return backend; }
+    void setAsSlaveBackend(void) { backend = true; }
+
+    bool isExpectingReply(void) { return expectingreply; }
+
+    void setIP(QString &lip) { ip = lip; }
+    QString getIP(void) { return ip; }
+
+    void GetFreeSpace(int &totalspace, int &usedspace);
+    void DeleteRecording(ProgramInfo *pginfo);
+    void FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost);
 
   private:
+    void SendReceiveStringList(QStringList &strlist);
+
     QSocket *sock;
     QString hostname;
+    QString ip;
+
     bool local;
     bool events;
 
     bool backend;
+
+    pthread_mutex_t sockLock;
+
+    bool expectingreply;
 };
 
 #endif

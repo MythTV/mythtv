@@ -8,7 +8,7 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 15
+#define NUMPROGRAMLINES 16
 
 class ProgramInfo
 {
@@ -67,6 +67,7 @@ class ProgramInfo
 
     QString pathname;
     long long filesize;
+    QString hostname;
 
     QDateTime startts;
     QDateTime endts;

@@ -58,6 +58,11 @@ void MainServer::newConnection(QSocket *socket)
 void MainServer::readSocket(void)
 {
     QSocket *socket = (QSocket *)sender();
+
+    PlaybackSock *testsock = getPlaybackBySock(socket);
+    if (testsock && testsock->isExpectingReply())
+        return;
+
     if (socket->bytesAvailable() > 0)
     {
         QStringList listline;
@@ -146,6 +151,10 @@ void MainServer::readSocket(void)
             else if (command == "MESSAGE")
             {
                 HandleMessage(listline, pbs);
+            } 
+            else if (command == "FILL_PROGRAM_INFO")
+            {
+                HandleFillProgramInfo(listline, pbs);
             }
             else if (command == "BACKEND_MESSAGE")
             {
@@ -220,8 +229,18 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         cout << "adding: " << commands[2] << " as a slave backend server\n";
         PlaybackSock *pbs = new PlaybackSock(socket, commands[2], false);
         pbs->setAsSlaveBackend();
+        pbs->setIP(commands[3]);
 
-        // XXX mark all encoders with this sock.
+        QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+        for (; iter != encoderList->end(); ++iter)
+        {
+            EncoderLink *elink = iter.data();
+            if (elink->getHostname() == commands[2])
+                elink->setSocket(pbs);
+        }
+
+        ScheduledRecording::signalChange(QSqlDatabase::database());
+
         playbackList.push_back(pbs);
     }
     else if (commands[1] == "RingBuffer")
@@ -392,14 +411,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 if (pbs->isLocal())
                     proginfo->pathname = lpath;
                 else
-                {
-                    QString lpath = proginfo->GetRecordFilename(fileprefix);
-                    QString ip = gContext->GetSetting("BackendServerIP");
-                    QString port = gContext->GetSetting("BackendServerPort");
-
                     proginfo->pathname = QString("myth://") + ip + ":" + port + 
                                          lpath;
-                }
 
                 struct stat64 st;
 
@@ -408,19 +421,68 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     size = st.st_size;
 
                 proginfo->filesize = size;
-
-                proginfo->ToStringList(outputlist);
             }
             else
             {
-                // XXX: fill in for remote encoder
+                PlaybackSock *slave = getSlaveByHostname(hostname);
+ 
+                if (!slave)
+                {
+                    cerr << "Couldn't find backend for: " << proginfo->title
+                         << " : " << proginfo->subtitle << endl;
+                    proginfo->filesize = 0;
+                    proginfo->pathname = "file not found";
+                }
+                else
+                {
+                    QString playbackhost = pbs->getHostname();
+                    slave->FillProgramInfo(proginfo, playbackhost);
+                }
             }
+
+            proginfo->ToStringList(outputlist);
+
+            delete proginfo;
         }
     }
     else
         outputlist << "0";
 
     WriteStringList(pbs->getSocket(), outputlist);
+}
+
+void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
+{
+    QString playbackhost = slist[1];
+
+    ProgramInfo *pginfo = new ProgramInfo();
+    pginfo->FromStringList(slist, 2);
+
+    QString fileprefix = gContext->GetFilePrefix();
+    QString lpath = pginfo->GetRecordFilename(fileprefix);
+    QString ip = gContext->GetSetting("BackendServerIP");
+    QString port = gContext->GetSetting("BackendServerPort");
+
+    if (playbackhost == gContext->GetHostName())
+        pginfo->pathname = lpath;
+    else
+        pginfo->pathname = QString("myth://") + ip + ":" + port + lpath;
+
+    struct stat64 st;
+
+    long long size = 0;
+    if (stat64(lpath.ascii(), &st) == 0)
+        size = st.st_size;
+
+    pginfo->filesize = size;
+
+    QStringList strlist;
+
+    pginfo->ToStringList(strlist);
+
+    delete pginfo;
+
+    WriteStringList(pbs->getSocket(), strlist);
 }
 
 struct DeleteStruct
@@ -466,8 +528,7 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     {
         EncoderLink *elink = iter.data();
 
-        if (elink->isConnected() && elink->isBusy() && 
-            elink->MatchesRecording(pginfo))
+        if (elink->isBusy() && elink->MatchesRecording(pginfo))
         {
             elink->StopRecording();
 
@@ -477,7 +538,6 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     }
 
     QString fileprefix = gContext->GetFilePrefix();
-
     QString filename = pginfo->GetRecordFilename(fileprefix);
 
     QSqlQuery query;
@@ -516,6 +576,8 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     QStringList outputlist = "OK";
 
     WriteStringList(pbs->getSocket(), outputlist);
+
+    delete pginfo;
 }
 
 void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
@@ -528,10 +590,21 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
                     (1024*1024/statbuf.f_bsize);
     }
 
+    vector<PlaybackSock *>::iterator iter = playbackList.begin();
+    for (; iter != playbackList.end(); iter++)
+    {
+        PlaybackSock *pbs = (*iter);
+        if (pbs->isSlaveBackend())
+        {
+            int remtotal = -1, remused = -1;
+            pbs->GetFreeSpace(remtotal, remused);
+            totalspace += remtotal;
+            usedspace += remused;
+        }
+    }
+
     QStringList strlist;
-
     strlist << QString::number(totalspace) << QString::number(usedspace);
-
     WriteStringList(pbs->getSocket(), strlist);
 }
 
@@ -945,6 +1018,8 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
     retlist << gContext->GetSetting("BackendServerPort");
 
     WriteStringList(pbs->getSocket(), retlist);    
+
+    delete pginfo;
 }
 
 void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
@@ -1009,7 +1084,15 @@ void MainServer::endConnection(QSocket *socket)
             {
                 cout << "Slave backend: " << (*it)->getHostname() 
                      << " has left the building\n";
-                // XXX mark all encoders using this hostname as not connected
+
+                QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+                for (; iter != encoderList->end(); ++iter)
+                {
+                    EncoderLink *elink = iter.data();
+                    if (elink->getSocket() == (*it))
+                        elink->setSocket(NULL);
+                }
+                ScheduledRecording::signalChange(QSqlDatabase::database());
             }
             delete (*it);
             playbackList.erase(it);
@@ -1060,6 +1143,22 @@ void MainServer::endConnection(QSocket *socket)
     }
 
     cout << "unknown socket\n";
+}
+
+PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
+{
+    vector<PlaybackSock *>::iterator iter = playbackList.begin();
+    for (; iter != playbackList.end(); iter++)
+    {
+        PlaybackSock *pbs = (*iter);
+        if (pbs->isSlaveBackend() && 
+            ((pbs->getHostname() == hostname) || (pbs->getIP() == hostname)))
+        {
+            return pbs;
+        }
+    }
+
+    return NULL;
 }
 
 PlaybackSock *MainServer::getPlaybackBySock(QSocket *sock)

@@ -4,12 +4,14 @@
 using namespace std;
 
 #include "encoderlink.h"
+#include "playbacksock.h"
 #include "tv.h"
 #include "programinfo.h"
 
 #include "libmyth/mythcontext.h"
 
-EncoderLink::EncoderLink(int capturecardnum, QSocket *lsock, QString lhostname)
+EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock, 
+                         QString lhostname)
 {
     sock = lsock;
     hostname = lhostname;

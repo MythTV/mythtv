@@ -52,7 +52,6 @@ public:
 
     static void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting);
 
-protected:
     static void signalChange(QSqlDatabase* db);
 
 private:

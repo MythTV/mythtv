@@ -19,6 +19,7 @@ ProgramInfo::ProgramInfo(void)
 
     pathname = "";
     filesize = 0;
+    hostname = "";
 
     conflicting = false;
     recording = true;
@@ -43,6 +44,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     channame = other.channame;
     pathname = other.pathname;
     filesize = other.filesize;
+    hostname = other.hostname;
 
     startts = other.startts;
     endts = other.endts;
@@ -77,6 +79,8 @@ void ProgramInfo::ToStringList(QStringList &list)
         category = " ";
     if (pathname == "")
         pathname = " ";
+    if (hostname == "")
+        hostname = " ";
     if (chanid == "")
         chanid = " ";
     if (chanstr == "")
@@ -98,6 +102,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << endts.toString();
     list << QString::number(conflicting);
     list << QString::number(recording);
+    list << hostname;
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -123,6 +128,7 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     endts = QDateTime::fromString(list[offset + 12]);
     conflicting = list[offset + 13].toInt();
     recording = list[offset + 14].toInt();
+    hostname = list[offset += 15];
 
     if (title == " ")
         title = "";
@@ -134,6 +140,8 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
         category = "";
     if (pathname == " ")
         pathname = "";
+    if (hostname == " ")
+        hostname = "";
     if (chanid == " ")
         chanid = "";
     if (chanstr == " ")

@@ -51,7 +51,9 @@ class MainServer : public QObject
     void HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs);
     void HandleMessage(QStringList &slist, PlaybackSock *pbs);
     void HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs);
+    void HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs);
 
+    PlaybackSock *getSlaveByHostname(QString &hostname);
     PlaybackSock *getPlaybackBySock(QSocket *socket);
     FileTransfer *getFileTransferByID(int id);
     FileTransfer *getFileTransferBySock(QSocket *socket);
