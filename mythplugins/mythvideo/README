@@ -4,7 +4,7 @@ BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-	MythTV installed and working
+	MythTV 0.8 installed and working
 
 If you have met the requirements above, simply type 'make' in the main directory
 to begin compiling.
@@ -20,9 +20,10 @@ Compiling note:  If you get an error on building this, that says something
 Once the make is completed, you should switch to root and do a 'make install'.  
 
 - mythvideo will go into /usr/local/bin
-- the mythexplorer-settings.txt will go into the /usr/local/share/mythtv directory
+- the mythvideo-settings.txt will go into the /usr/local/share/mythtv 
+  directory
 
-Before running mythvideo, edit the /usr/local/share/mythtv/mythexplorer-settings.txt
+Before running mythvideo, edit the installed mythvideo-settings.txt
 file and adjust your StartDir.  By default, it is set to /mnt/store
 
 The default media player is set to mplayer, and will default to full-screen
