@@ -1,5 +1,6 @@
 #include <qsqldatabase.h>
 #include <qfile.h>
+#include <qurl.h>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -458,7 +459,9 @@ void MainServer::HandleQueryCheckFile(QString filename, PlaybackSock *pbs)
 {
     int exists = 0;
 
-    QFile checkFile(filename);
+    QUrl qurl(filename);
+    
+    QFile checkFile(qurl.path());
 
     if (checkFile.exists() == true)
         exists = 1;
