@@ -1447,13 +1447,12 @@ void JobQueue::DoTranscodeThread(void)
             dblock.lock();
             if (status == JOB_ABORTING) // Stop command was sent
                 ChangeJobStatus(m_db, jobID, JOB_ABORTED);
-            else if (status == JOB_ERRORING) // Unrecoverabble error
-                ChangeJobStatus(m_db, jobID, JOB_ERRORED);
-            else if (retrylimit) // This is likely a recoverable problem
+            else if (status != JOB_ERRORING && retrylimit) // Recoverable error
             {
                 retry = true;
                 retrylimit--;
-            }
+            } else // Unrecoerable error
+                ChangeJobStatus(m_db, jobID, JOB_ERRORED);
             dblock.unlock();
         }
     }
