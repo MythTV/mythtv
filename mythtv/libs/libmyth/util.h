@@ -3,6 +3,7 @@
 
 #include <qsocket.h>
 #include <qstringlist.h>
+#include <qdatetime.h>
 #include <qcolor.h>
 
 #include <time.h>
@@ -41,6 +42,9 @@ QRgb blendColors(QRgb source, QRgb add, int alpha);
 int myth_system(const QString &command, int flags = 0);
 
 QString cutDownString(QString text, QFont *testFont, int maxwidth);
+
+QDateTime MythUTCToLocal(const QDateTime &utc);
+int MythSecsTo(const QDateTime &from, const QDateTime &to);
 
 long long stringToLongLong(const QString &str);
 QString longLongToString(long long ll);

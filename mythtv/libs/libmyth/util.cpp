@@ -686,6 +686,23 @@ QString cutDownString(QString text, QFont *testFont, int maxwidth)
     return text;
 }
 
+int MythSecsTo(const QDateTime &from, const QDateTime &to)
+{
+   return (from.time().secsTo(to.time()) +
+           from.date().daysTo(to.date()) * 60 * 60 * 24);
+}
+
+QDateTime MythUTCToLocal(const QDateTime &utc)
+{
+    QDateTime local = QDateTime(QDate(1970, 1, 1));
+
+    int timesecs = MythSecsTo(local, utc);
+    QDateTime localdt;
+    localdt.setTime_t(timesecs);
+
+    return localdt;
+}
+    
 long long stringToLongLong(const QString &str)
 {
     long long retval = 0;

@@ -1,5 +1,7 @@
-#include "../libmyth/mythcontext.h"
-#include "../libmyth/mythdbcon.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "util.h"
+
 #include "siparser.h"
 #include <qdatetime.h>
 #include <qtextcodec.h>
@@ -945,18 +947,7 @@ QDateTime SIParser::ConvertDVBDate(uint8_t* dvb_buf)
     QDateTime UTCTime = QDateTime(QDate(year,month,day),QTime(hour,min,sec));
 
     // Convert to localtime
-    QDateTime EPOCTime = QDateTime(QDate(1970, 1, 1));
-    int timesecs = EPOCTime.secsTo(UTCTime);
-
-    QDateTime LocalTime;
-
-    LocalTime.setTime_t(timesecs);
-
-    QString UTCText = UTCTime.toString();
-    QString LocalText = LocalTime.toString();
-
-    return LocalTime;
-
+    return MythUTCToLocal(UTCTime);
 }
 
 /*------------------------------------------------------------------------
@@ -2007,14 +1998,9 @@ QDateTime SIParser::ConvertATSCDate(uint32_t offset)
     // Get event time and add on GPS Second Difference
 //    QDateTime UTCTime = ATSCEPOC.addSecs(offset - (((STTHandler*) Table[STT])->GPSOffset) );
     QDateTime UTCTime = ATSCEPOC.addSecs(offset - 13 );
-    // Get UTC
-    QDateTime UTCEPOC = QDateTime(QDate(1970,1,1));
-    // Now sloppily convert it to localtime
 
-    int timesecs = UTCEPOC.secsTo(UTCTime);
-    QDateTime LocalTime;
-    LocalTime.setTime_t(timesecs);
-    return LocalTime;
+    // Convert to localtime
+    return MythUTCToLocal(UTCTime);
 }
 
 /*

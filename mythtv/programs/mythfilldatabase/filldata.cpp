@@ -1015,13 +1015,8 @@ bool grabDDData(Source source, int poffset, QDate pdate)
 
     if (!quiet)
         cout << "Clearing data for source...\n";
-    QDateTime basedt = QDateTime(QDate(1970, 1, 1));
-    QDateTime fromlocaldt;
-    int timesecs = basedt.secsTo(ddprocessor.getActualListingsFrom());
-    fromlocaldt.setTime_t(timesecs);
-    QDateTime tolocaldt;
-    timesecs = basedt.secsTo(ddprocessor.getActualListingsTo());
-    tolocaldt.setTime_t(timesecs);
+    QDateTime fromlocaldt = MythUTCToLocal(ddprocessor.getActualListingsFrom());
+    QDateTime tolocaldt = MythUTCToLocal(ddprocessor.getActualListingsTo());
 
     if (!quiet)
         cout << "Clearing from " << fromlocaldt.toString() 

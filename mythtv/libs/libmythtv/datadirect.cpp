@@ -1,7 +1,8 @@
 #include "datadirect.h"
-#include "../libmyth/mythwidgets.h"
-#include "../libmyth/mythcontext.h"
-#include "../libmyth/mythdbcon.h"
+#include "mythwidgets.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "util.h"
 
 #include <qfile.h>
 #include <qstring.h>
@@ -69,16 +70,9 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
         curr_schedule.stationid = pxmlatts.value("station");
 
         QString timestr = pxmlatts.value("time");
-        QDateTime basedt = QDateTime(QDate(1970, 1, 1));
+        QDateTime UTCdt = QDateTime::fromString(timestr, Qt::ISODate);
 
-        QDateTime UTCdt;
-        QDateTime localdt;
-        UTCdt = QDateTime::fromString(pxmlatts.value("time"), Qt::ISODate);
-
-        int timesecs = basedt.secsTo(UTCdt);
-        localdt.setTime_t(timesecs);
-
-        curr_schedule.time = localdt;
+        curr_schedule.time = MythUTCToLocal(UTCdt);
         QString durstr;
 
         durstr = pxmlatts.value("duration");
