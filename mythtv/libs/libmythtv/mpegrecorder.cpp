@@ -21,15 +21,6 @@ extern "C" {
 #endif
 }
 
-// Fix up some BSD ioctls.  Do it here instead of in ivtv_myth.h
-// so it can be an exact copy from the ivtv source.
-#ifdef __FreeBSD__
-#undef IVTV_IOC_G_CODEC
-#undef IVTV_IOC_S_CODEC
-#define IVTV_IOC_G_CODEC        _IOR  ('V', 73, struct ivtv_ioctl_codec)
-#define IVTV_IOC_S_CODEC        _IOWR ('V', 74, struct ivtv_ioctl_codec)
-#endif
-
 using namespace std;
 
 #include "mpegrecorder.h"
