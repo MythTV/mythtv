@@ -263,21 +263,53 @@ void JobQueue::ProcessQueue(void)
                     continue;
                 }
 
-                if ((cmds & JOB_STOP) && (status != JOB_QUEUED))
+                if (cmds & JOB_STOP)
                 {
-                    message = QString("JobQueue: Stopping '%1' job for chanid "
-                                      "%2 @ %3")
-                                      .arg(JobText(type))
-                                      .arg(chanid).arg(startts);
-                    VERBOSE(VB_JOBQUEUE, message);
+                    // if we're trying to stop a job and it's not queued
+                    //  then lets send a STOP command
+                    if (status != JOB_QUEUED) {
+                        message = QString("JobQueue: Stopping '%1' job for "
+                                              "chanid %2 @ %3")
+                                          .arg(JobText(type))
+                                          .arg(chanid).arg(startts);
+                        VERBOSE(VB_JOBQUEUE, message);
+    
+                        controlFlagsLock.lock();
+                        if (jobControlFlags.contains(key))
+                            *(jobControlFlags[key]) = JOB_STOP;
+                        controlFlagsLock.unlock();
+    
+                        // ChangeJobCmds(m_db, id, JOB_RUN);
+                        continue;
+                    
+                    // if we're trying to stop a job and it's still queued
+                    //  then let's just change the status to cancelled so
+                    //  we don't try to run it from the queue
+                    } else {
+                        message = QString("JobQueue: Cancelling '%1' job for "
+                                          "chanid %2 @ %3")
+                                          .arg(JobText(type))
+                                          .arg(chanid).arg(startts);
+                        VERBOSE(VB_JOBQUEUE, message);
 
-                    controlFlagsLock.lock();
-                    if (jobControlFlags.contains(key))
-                        *(jobControlFlags[key]) = JOB_STOP;
-                    controlFlagsLock.unlock();
+                        // at the bottom of this loop we requeue any jobs that
+                        //  are not currently queued and also not associated 
+                        //  with a hostname so we must claim this job before we
+                        //  can cancel it
+                        if (!ClaimJob(id))
+                        {
+                            message = QString("JobQueue: ERROR claiming '%1' job "
+                                              "for chanid %2 @ %3.")
+                                              .arg(JobText(type))
+                                              .arg(chanid).arg(startts);
+                            VERBOSE(VB_JOBQUEUE, message);
+                            continue;
+                        }
 
-                    // ChangeJobCmds(id, JOB_RUN);
-                    continue;
+                        ChangeJobStatus(id, JOB_CANCELLED, "");
+                        ChangeJobCmds(id, JOB_RUN);
+                        continue;
+                    }
                 }
 
                 if ((cmds & JOB_PAUSE) && (status != JOB_QUEUED))
@@ -573,11 +605,11 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
     MSqlQuery query(MSqlQuery::InitCon());
     QString message;
 
-    query.prepare("UPDATE jobqueue SET status = :ABORTED "
+    query.prepare("UPDATE jobqueue SET status = :CANCELLED "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME "
                   "AND status = :QUEUED;");
 
-    query.bindValue(":ABORTED", JOB_ABORTED);
+    query.bindValue(":CANCELLED", JOB_CANCELLED);
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", starttime);
     query.bindValue(":QUEUED", JOB_QUEUED);
@@ -612,12 +644,14 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
         usleep(1000);
         query.prepare("SELECT id FROM jobqueue "
                       "WHERE chanid = :CHANID and starttime = :STARTTIME "
-                      "AND status NOT IN (:FINISHED,:ABORTED,:ERRORED);");
+                      "AND status NOT IN "
+                      "(:FINISHED,:ABORTED,:ERRORED,:CANCELLED);");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", starttime);
         query.bindValue(":FINISHED", JOB_FINISHED);
         query.bindValue(":ABORTED", JOB_ABORTED);
         query.bindValue(":ERRORED", JOB_ERRORED);
+        query.bindValue(":CANCELLED", JOB_CANCELLED);
 
         query.exec();
 
@@ -800,30 +834,34 @@ bool JobQueue::ChangeJobComment(int jobID, QString comment)
 
 bool JobQueue::IsJobRunning(int jobType, QString chanid, QDateTime starttime)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
+    int tmpStatus = GetJobStatus(jobType, chanid, starttime);
 
-    query.prepare("SELECT status,cmds FROM jobqueue WHERE type = :TYPE "
-                  "AND chanid = :CHANID AND starttime = :STARTTIME;");
+    if ((tmpStatus != JOB_UNKNOWN) && (tmpStatus != JOB_QUEUED) &&
+        (!(tmpStatus & JOB_DONE)))
+        return true;
 
-    query.bindValue(":TYPE", jobType);
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", starttime);
+    return false;
+}
 
-    query.exec();
+bool JobQueue::IsJobQueuedOrRunning(int jobType, QString chanid,
+                                    QDateTime starttime)
+{
+    int tmpStatus = GetJobStatus(jobType, chanid, starttime);
 
-    if (!query.isActive())
-    {
-        MythContext::DBError("Error in JobQueue::ChangeJobComment()", query);
-        return false;
-    }
-    if (query.numRowsAffected() > 0 && query.next())
-    {
-        int tmpStatus, tmpCmd;
-        tmpStatus = query.value(0).toInt();
-        tmpCmd = query.value(1).toInt();
-        if (!(tmpStatus & JOB_DONE))
-            return true;
-    }
+    if ((tmpStatus != JOB_UNKNOWN) && (!(tmpStatus & JOB_DONE)))
+        return true;
+
+    return false;
+}
+
+bool JobQueue::IsJobQueued(int jobType, QString chanid,
+                            QDateTime starttime)
+{
+    int tmpStatus = GetJobStatus(jobType, chanid, starttime);
+
+    if (tmpStatus & JOB_QUEUED)
+        return true;
+
     return false;
 }
 
@@ -848,16 +886,17 @@ QString JobQueue::StatusText(int status)
 {
     switch (status)
     {
-        case JOB_QUEUED:   return tr("Queued");
-        case JOB_PENDING:  return tr("Pending");
-        case JOB_STARTING: return tr("Starting");
-        case JOB_RUNNING:  return tr("Running");
-        case JOB_PAUSED:   return tr("Paused");
-        case JOB_STOPPING: return tr("Stopping");
-        case JOB_DONE:     return tr("Done (Invalid status!)");
-        case JOB_FINISHED: return tr("Finished");
-        case JOB_ABORTED:  return tr("Aborted");
-        case JOB_ERRORED:  return tr("Errored");
+        case JOB_QUEUED:    return tr("Queued");
+        case JOB_PENDING:   return tr("Pending");
+        case JOB_STARTING:  return tr("Starting");
+        case JOB_RUNNING:   return tr("Running");
+        case JOB_PAUSED:    return tr("Paused");
+        case JOB_STOPPING:  return tr("Stopping");
+        case JOB_DONE:      return tr("Done (Invalid status!)");
+        case JOB_FINISHED:  return tr("Finished");
+        case JOB_ABORTED:   return tr("Aborted");
+        case JOB_ERRORED:   return tr("Errored");
+        case JOB_CANCELLED: return tr("Cancelled");
     }
     return tr("Undefined");
 }
@@ -1087,6 +1126,34 @@ int JobQueue::GetJobStatus(int jobID)
     return JOB_UNKNOWN;
 }
 
+int JobQueue::GetJobStatus(int jobType, QString chanid, QDateTime startts)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    query.prepare("SELECT status,cmds FROM jobqueue WHERE type = :TYPE "
+                  "AND chanid = :CHANID AND starttime = :STARTTIME;");
+
+    query.bindValue(":TYPE", jobType);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", startts);
+
+    query.exec();
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("Error in JobQueue::GetJobStatus()", query);
+        return false;
+    }
+    if (query.numRowsAffected() > 0 && query.next())
+    {
+        int tmpStatus;
+        tmpStatus = query.value(0).toInt();
+        return tmpStatus;
+    }
+    return JOB_UNKNOWN;
+
+}
+
 void JobQueue::RecoverQueue(bool justOld)
 {
     QMap<int, JobQueueEntry> jobs;
@@ -1153,12 +1220,13 @@ void JobQueue::CleanupOldJobsInQueue()
     QDateTime errorsPurgeDate = QDateTime::currentDateTime().addDays(-7);
 
     delquery.prepare("DELETE FROM jobqueue "
-                     "WHERE (status in (:FINISHED, :ABORTED) "
+                     "WHERE (status in (:FINISHED, :ABORTED, :CANCELLED) "
                      "AND statustime < :DONEPURGEDATE) "
                      "OR (status in (:ERRORED) "
                      "AND statustime < :ERRORSPURGEDATE) ");
     delquery.bindValue(":FINISHED", JOB_FINISHED);
     delquery.bindValue(":ABORTED", JOB_ABORTED);
+    delquery.bindValue(":CANCELLED", JOB_CANCELLED);
     delquery.bindValue(":ERRORED", JOB_ERRORED);
     delquery.bindValue(":DONEPURGEDATE", donePurgeDate);
     delquery.bindValue(":ERRORSPURGEDATE", errorsPurgeDate);

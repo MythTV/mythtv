@@ -2345,7 +2345,7 @@ void TV::DoQueueTranscode(void)
         bool stop = false;
         if (queuedTranscode)
             stop = true;
-        else if (JobQueue::IsJobRunning(JOB_TRANSCODE,
+        else if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
                                         playbackinfo->chanid,
                                         playbackinfo->startts))
             stop = true;
@@ -3963,7 +3963,7 @@ void TV::BuildOSDTreeMenu(void)
     {
         item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
 
-        if (JobQueue::IsJobRunning(JOB_TRANSCODE,
+        if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
                                    playbackinfo->chanid, playbackinfo->startts))
             item = new OSDGenericTree(treeMenu, tr("Stop Transcoding"), "QUEUETRANSCODE");
         else

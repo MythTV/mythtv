@@ -1759,7 +1759,10 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     if ((types == EndOfRecording || types == DeleteRecording) &&
         (program->IsSameProgram(*program)))
     {
-        tmpmessage = tr("Yes, and allow re-record"); 
+        if (types == EndOfRecording)
+            tmpmessage = tr("Delete it, but allow it to re-record"); 
+        else
+            tmpmessage = tr("Yes, and allow re-record"); 
         tmpslot = SLOT(doDeleteForgetHistory());
         popup->addButton(tmpmessage, this, tmpslot);
     }
@@ -1767,6 +1770,9 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     switch (types)
     {
         case EndOfRecording:
+             tmpmessage = tr("Delete it"); 
+             tmpslot = SLOT(doDelete());
+             break;
         case DeleteRecording:
              tmpmessage = tr("Yes, delete it"); 
              tmpslot = SLOT(doDelete());
@@ -1780,12 +1786,13 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              tmpslot = SLOT(doStop());
              break;
     }
+    
     QButton *yesButton = popup->addButton(tmpmessage, this, tmpslot);
 
     switch (types)
     {
         case EndOfRecording:
-             tmpmessage = tr("No, I might want to watch it again."); 
+             tmpmessage = tr("Save it so I can watch it again"); 
              tmpslot = SLOT(noDelete());
              break;
         case DeleteRecording:
@@ -1868,12 +1875,144 @@ void PlaybackBox::showPlaylistPopup()
 
     popup->addButton(tr("Change Recording Group"), this,
                      SLOT(doPlaylistChangeRecGroup()));
+    popup->addButton(tr("Job Options"), this,
+                     SLOT(showPlaylistJobPopup()));
     popup->addButton(tr("Delete"), this, SLOT(doPlaylistDelete()));
 
     playButton->setFocus();
 
     popup->ShowPopup(this, SLOT(doCancel()));
   
+    expectingPopup = true;
+}
+
+void PlaybackBox::showPlaylistJobPopup()
+{
+    if (expectingPopup)
+       cancelPopup();
+
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
+    
+    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
+                             popupForeground, popupBackground,
+                             popupHighlight, "playlist popup");
+
+    QLabel *tlabel = NULL;
+    if (playList.count() > 1)
+    {
+        tlabel = popup->addLabel(tr("There are %1 items in the playlist.")
+                                       .arg(playList.count()));
+    } else {
+        tlabel = popup->addLabel(tr("There is %1 item in the playlist.")
+                                       .arg(playList.count()));
+    }
+    tlabel->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+
+    QButton *jobButton;
+    QString jobTitle = "";
+    QString command = "";
+    QStringList::Iterator it;
+    ProgramInfo *tmpItem;
+    bool isTranscoding = true;
+    bool isFlagging = true;
+    bool isRunningUserJob1 = true;
+    bool isRunningUserJob2 = true;
+    bool isRunningUserJob3 = true;
+    bool isRunningUserJob4 = true;
+
+    for(it = playList.begin(); it != playList.end(); ++it)
+    {
+        tmpItem = findMatchingProg(*it);
+        if (tmpItem) {
+            if (!JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
+                                       tmpItem->chanid, tmpItem->startts))
+                isTranscoding = false;
+            if (!JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG,
+                                       tmpItem->chanid, tmpItem->startts))
+                isFlagging = false;
+            if (!JobQueue::IsJobQueuedOrRunning(JOB_USERJOB1,
+                                       tmpItem->chanid, tmpItem->startts))
+                isRunningUserJob1 = false;
+            if (!JobQueue::IsJobQueuedOrRunning(JOB_USERJOB2,
+                                       tmpItem->chanid, tmpItem->startts))
+                isRunningUserJob2 = false;
+            if (!JobQueue::IsJobQueuedOrRunning(JOB_USERJOB3,
+                                       tmpItem->chanid, tmpItem->startts))
+                isRunningUserJob3 = false;
+            if (!JobQueue::IsJobQueuedOrRunning(JOB_USERJOB4,
+                                       tmpItem->chanid, tmpItem->startts))
+                isRunningUserJob4 = false;
+            if (!isTranscoding && !isFlagging && !isRunningUserJob1 &&
+                !isRunningUserJob2 && !isRunningUserJob3 && !isRunningUserJob4)
+                break;
+        }
+    }
+    if (!isTranscoding)
+        jobButton = popup->addButton(tr("Begin Transcoding"), this,
+                         SLOT(doPlaylistBeginTranscoding()));
+    else
+        jobButton = popup->addButton(tr("Stop Transcoding"), this,
+                         SLOT(stopPlaylistTranscoding()));
+    if (!isFlagging)
+        popup->addButton(tr("Begin Commercial Flagging"), this,
+                         SLOT(doPlaylistBeginFlagging()));
+    else
+        popup->addButton(tr("Stop Commercial Flagging"), this,
+                         SLOT(stopPlaylistFlagging()));
+
+    command = gContext->GetSetting("UserJob1", "");
+    if (command != "") {
+        jobTitle = gContext->GetSetting("UserJobDesc1");
+
+        if (!isRunningUserJob1)
+            popup->addButton(tr("Begin") + " " + jobTitle, this,
+                             SLOT(doPlaylistBeginUserJob1()));
+        else
+            popup->addButton(tr("Stop") + " " + jobTitle, this,
+                             SLOT(stopPlaylistUserJob1()));
+    }
+    
+    command = gContext->GetSetting("UserJob2", "");
+    if (command != "") {
+        jobTitle = gContext->GetSetting("UserJobDesc2");
+
+        if (!isRunningUserJob2)
+            popup->addButton(tr("Begin") + " " + jobTitle, this,
+                             SLOT(doPlaylistBeginUserJob2()));
+        else
+            popup->addButton(tr("Stop") + " " + jobTitle, this,
+                             SLOT(stopPlaylistUserJob2()));
+    }
+    
+    command = gContext->GetSetting("UserJob3", "");
+    if (command != "") {
+        jobTitle = gContext->GetSetting("UserJobDesc3");
+
+        if (!isRunningUserJob3)
+            popup->addButton(tr("Begin") + " " + jobTitle, this,
+                             SLOT(doPlaylistBeginUserJob3()));
+        else
+            popup->addButton(tr("Stop") + " " + jobTitle, this,
+                             SLOT(stopPlaylistUserJob3()));
+    }
+    
+    command = gContext->GetSetting("UserJob4", "");
+    if (command != "") {
+        jobTitle = gContext->GetSetting("UserJobDesc4");
+
+        if (!isRunningUserJob4)
+            popup->addButton(tr("Begin") + " " + jobTitle, this,
+                             SLOT(doPlaylistBeginUserJob4()));
+        else
+            popup->addButton(tr("Stop") + " " + jobTitle, this,
+                             SLOT(stopPlaylistUserJob4()));
+    }
+    
+    popup->ShowPopup(this, SLOT(doCancel()));
+    jobButton->setFocus();
+
     expectingPopup = true;
 }
 
@@ -1984,7 +2123,7 @@ void PlaybackBox::showJobPopup()
     QString jobTitle = "";
     QString command = "";
 
-    if (JobQueue::IsJobRunning(JOB_TRANSCODE, curitem->chanid,
+    if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE, curitem->chanid,
                                                   curitem->startts))
         jobButton = popup->addButton(tr("Stop Transcoding"), this,
                          SLOT(doBeginTranscoding()));
@@ -1992,7 +2131,7 @@ void PlaybackBox::showJobPopup()
         jobButton = popup->addButton(tr("Begin Transcoding"), this,
                          SLOT(doBeginTranscoding()));
 
-    if (JobQueue::IsJobRunning(JOB_COMMFLAG, curitem->chanid,
+    if (JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG, curitem->chanid,
                                                   curitem->startts))
         popup->addButton(tr("Stop Commercial Flagging"), this,
                          SLOT(doBeginFlagging()));
@@ -2004,7 +2143,7 @@ void PlaybackBox::showJobPopup()
     if (command != "") {
         jobTitle = gContext->GetSetting("UserJobDesc1", tr("User Job") + " #1");
 
-        if (JobQueue::IsJobRunning(JOB_USERJOB1, curitem->chanid,
+        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB1, curitem->chanid,
                                    curitem->startts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob1()));
@@ -2017,7 +2156,7 @@ void PlaybackBox::showJobPopup()
     if (command != "") {
         jobTitle = gContext->GetSetting("UserJobDesc2", tr("User Job") + " #2");
 
-        if (JobQueue::IsJobRunning(JOB_USERJOB2, curitem->chanid,
+        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB2, curitem->chanid,
                                    curitem->startts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob2()));
@@ -2030,7 +2169,7 @@ void PlaybackBox::showJobPopup()
     if (command != "") {
         jobTitle = gContext->GetSetting("UserJobDesc3", tr("User Job") + " #3");
 
-        if (JobQueue::IsJobRunning(JOB_USERJOB3, curitem->chanid,
+        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB3, curitem->chanid,
                                    curitem->startts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob3()));
@@ -2043,7 +2182,7 @@ void PlaybackBox::showJobPopup()
     if (command != "") {
         jobTitle = gContext->GetSetting("UserJobDesc4", tr("User Job") + " #4");
 
-        if (JobQueue::IsJobRunning(JOB_USERJOB4, curitem->chanid,
+        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB4, curitem->chanid,
                                    curitem->startts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob4()));
@@ -2302,7 +2441,7 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
 
     ProgramInfo *tmpItem = findMatchingProg(curitem);
 
-    if (JobQueue::IsJobRunning(jobType, curitem->chanid,
+    if (JobQueue::IsJobQueuedOrRunning(jobType, curitem->chanid,
                                curitem->startts))
     {
         JobQueue::ChangeJobCmds(jobType, curitem->chanid,
@@ -2320,7 +2459,6 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
         JobQueue::QueueJob(jobType, curitem->chanid, curitem->startts,
                            "", "", jobHost, jobFlags);
     }
-
 }
 
 void PlaybackBox::doBeginTranscoding()
@@ -2352,6 +2490,122 @@ void PlaybackBox::doBeginUserJob3()
 void PlaybackBox::doBeginUserJob4()
 {
     doJobQueueJob(JOB_USERJOB4);
+}
+
+void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
+{
+    ProgramInfo *tmpItem;
+    QStringList::Iterator it;
+    int jobID;
+
+    if (expectingPopup)
+        cancelPopup();
+
+    for (it = playList.begin(); it != playList.end(); ++it)
+    {
+        jobID = 0;
+        tmpItem = findMatchingProg(*it);
+        if (tmpItem && 
+            (!JobQueue::IsJobQueuedOrRunning(jobType, tmpItem->chanid,
+                                    tmpItem->startts))) {
+            QString jobHost = "";
+            if (gContext->GetNumSetting("JobsRunOnRecordingHost", 0))
+                jobHost = gContext->GetHostName();
+
+            JobQueue::QueueJob(jobType, tmpItem->chanid,
+                               tmpItem->startts, "", "", jobHost, jobFlags);
+        }
+    }
+}
+
+void PlaybackBox::stopPlaylistJobQueueJob(int jobType)
+{
+    ProgramInfo *tmpItem;
+    QStringList::Iterator it;
+    int jobID;
+
+    if (expectingPopup)
+        cancelPopup();
+
+    for (it = playList.begin(); it != playList.end(); ++it)
+    {
+        jobID = 0;
+        tmpItem = findMatchingProg(*it);
+        if (tmpItem &&
+            (JobQueue::IsJobQueuedOrRunning(jobType, tmpItem->chanid,
+                                tmpItem->startts)))
+        {
+cout << "stop job " << jobType << ": job is queued or running\n";
+            JobQueue::ChangeJobCmds(jobType, tmpItem->chanid,
+                                     tmpItem->startts, JOB_STOP);
+            if ((jobType & JOB_COMMFLAG) && (tmpItem))
+            {
+                tmpItem->programflags &= ~FL_EDITING;
+                tmpItem->programflags &= ~FL_COMMFLAG;
+            }
+        } else 
+cout << "stop job tmpItem == NULL\n";
+    }
+}
+
+void PlaybackBox::doPlaylistBeginTranscoding()
+{
+    doPlaylistJobQueueJob(JOB_TRANSCODE, JOB_USE_CUTLIST);
+}
+
+void PlaybackBox::stopPlaylistTranscoding()
+{
+    stopPlaylistJobQueueJob(JOB_TRANSCODE);
+}
+
+void PlaybackBox::doPlaylistBeginFlagging()
+{
+    doPlaylistJobQueueJob(JOB_COMMFLAG);
+}
+
+void PlaybackBox::stopPlaylistFlagging()
+{
+    stopPlaylistJobQueueJob(JOB_COMMFLAG);
+}
+
+void PlaybackBox::doPlaylistBeginUserJob1()
+{
+    doPlaylistJobQueueJob(JOB_USERJOB1);
+}
+
+void PlaybackBox::stopPlaylistUserJob1()
+{
+    stopPlaylistJobQueueJob(JOB_USERJOB1);
+}
+
+void PlaybackBox::doPlaylistBeginUserJob2()
+{
+    doPlaylistJobQueueJob(JOB_USERJOB1);
+}
+
+void PlaybackBox::stopPlaylistUserJob2()
+{
+    stopPlaylistJobQueueJob(JOB_USERJOB2);
+}
+
+void PlaybackBox::doPlaylistBeginUserJob3()
+{
+    doPlaylistJobQueueJob(JOB_USERJOB1);
+}
+
+void PlaybackBox::stopPlaylistUserJob3()
+{
+    stopPlaylistJobQueueJob(JOB_USERJOB3);
+}
+
+void PlaybackBox::doPlaylistBeginUserJob4()
+{
+    doPlaylistJobQueueJob(JOB_USERJOB1);
+}
+
+void PlaybackBox::stopPlaylistUserJob4()
+{
+    stopPlaylistJobQueueJob(JOB_USERJOB4);
 }
 
 void PlaybackBox::askDelete(void)

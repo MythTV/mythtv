@@ -58,6 +58,7 @@ class PlaybackBox : public MythDialog
     void showJobPopup();
     void showStoragePopup();
     void showPlaylistPopup();
+    void showPlaylistJobPopup();
 
     void doPlay();
     void doPlayFromBeg();
@@ -99,6 +100,20 @@ class PlaybackBox : public MythDialog
     void doBeginUserJob2();
     void doBeginUserJob3();
     void doBeginUserJob4();
+    void doPlaylistJobQueueJob(int jobType, int jobFlags = 0);
+    void stopPlaylistJobQueueJob(int jobType);
+    void doPlaylistBeginTranscoding();
+    void stopPlaylistTranscoding();
+    void doPlaylistBeginFlagging();
+    void stopPlaylistFlagging();
+    void doPlaylistBeginUserJob1();
+    void stopPlaylistUserJob1();
+    void doPlaylistBeginUserJob2();
+    void stopPlaylistUserJob2();
+    void doPlaylistBeginUserJob3();
+    void stopPlaylistUserJob3();
+    void doPlaylistBeginUserJob4();
+    void stopPlaylistUserJob4();
     void doClearPlaylist();
     void doPlaylistDelete();
     void doPlaylistChangeRecGroup();

@@ -30,6 +30,7 @@ enum JobStatus {
     JOB_FINISHED      = 0x0110,
     JOB_ABORTED       = 0x0120,
     JOB_ERRORED       = 0x0130,
+    JOB_CANCELLED     = 0x0140,
 
     JOB_UNKNOWN       = 0x0000
 };
@@ -113,8 +114,11 @@ class JobQueue : public QObject
                                 QString comment = "");
     static bool ChangeJobComment(int jobID,
                                  QString comment = "");
+    static bool IsJobQueuedOrRunning(int jobType, QString chanid,
+                                     QDateTime starttime);
     static bool IsJobRunning(int jobType, QString chanid,
                              QDateTime starttime);
+    static bool IsJobQueued(int jobType, QString chanid, QDateTime starttime);
     static bool PauseJob(int jobID);
     static bool ResumeJob(int jobID);
     static bool RestartJob(int jobID);
@@ -124,6 +128,7 @@ class JobQueue : public QObject
     static int GetJobCmd(int jobID);
     static int GetJobFlags(int jobID);
     static int GetJobStatus(int jobID);
+    static int GetJobStatus(int jobType, QString chanid, QDateTime starttime);
 
     static bool DeleteAllJobs(QString chanid, QDateTime starttime);
 
