@@ -442,12 +442,12 @@ class startupCommand: public LineEditSetting, public BackendSetting {
 public:
     startupCommand():
         BackendSetting("startupCommand") {
-        setLabel("startup command");
+        setLabel(QObject::tr("Startup command"));
         setValue("");
-        setHelpText("This command is executed right after starting the BE. As a "
-                    "parameter \'$status\' is replaced by either \'auto\' if the "
-                    "machine was started automatically or \'user\' if a user "
-                    "switched it on.");
+        setHelpText(QObject::tr("This command is executed right after starting "
+                    "the BE. As a parameter \'$status\' is replaced by either "
+                    "\'auto\' if the machine was started automatically or "
+                    "\'user\' if a user switched it on."));
     };
 };
 

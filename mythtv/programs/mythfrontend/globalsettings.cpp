@@ -1374,10 +1374,11 @@ public:
         GlobalSetting("Style") {
         setLabel(QObject::tr("Qt Style"));
         fillSelections();
-        setHelpText("This setting will change the qt widget style on startup, "
-                    "if this setting is set to anything other than 'Desktop "
-                    "Style'. Setting this setting to 'Desktop Style' will have "
-                    "no effect on the currently running MythTV session.");
+        setHelpText(QObject::tr("This setting will change the qt widget style "
+                    "on startup, if this setting is set to anything other "
+                    "than 'Desktop Style'. Setting this setting to 'Desktop "
+                    "Style' will have no effect on the currently running "
+                    "MythTV session."));
     };
 
     void fillSelections(void) {

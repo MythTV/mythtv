@@ -176,7 +176,7 @@ class CommFree: public CheckBoxSetting, public CSetting {
 public:
     CommFree(const ChannelID& id):
         CheckBoxSetting(), CSetting(id, "commfree") {
-        setLabel("Commercial Free");
+        setLabel(QObject::tr("Commercial Free"));
         setHelpText(QObject::tr("If set automatic commercial flagging will "
                 "be skipped for this channel.  Useful for "
                 "premium channels like HBO."));
