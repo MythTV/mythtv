@@ -11,8 +11,11 @@
 */
 
 #include <qsocketdevice.h>
+#include <qptrlist.h>
 
 #include "mfd_plugin.h"
+
+#include "daapinstance.h"
 
 class DaapClient: public MFDServicePlugin
 {
@@ -29,8 +32,8 @@ class DaapClient: public MFDServicePlugin
 
   private:
   
-    QSocketDevice *client_socket_to_mfd;
-
+    QSocketDevice          *client_socket_to_mfd;
+    QPtrList<DaapInstance> daap_instances;
 };
 
 #endif  // daapclient_h_

@@ -472,7 +472,8 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
         {
             if(parent)
             {
-                parent->warning("httpresponse got an error from select()");
+                parent->warning("httpresponse got an error from "
+                                "select() ... not sure what to do");
             }
         }
         else

@@ -22,7 +22,7 @@ ServiceRequestThread::ServiceRequestThread(MFDServicePlugin *owner)
 
     parent = owner;
     keep_going = true;
-    // do_stuff = false;
+    //do_stuff = false;
     client_socket = NULL;
 }
 
@@ -74,6 +74,7 @@ void ServiceRequestThread::run()
         wait_condition.wait(&prt_mutex);
         if(!keep_going)
         {
+            parent->wakeUp();
             break;
         }
 

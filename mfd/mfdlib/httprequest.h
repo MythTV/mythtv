@@ -16,47 +16,16 @@
 class HttpResponse;
 class MFDHttpPlugin;
 
+#include "httpheader.h"
+#include "httpgetvar.h"
+
 //
 //  Some defines ... probably want to get rid of these at some point
 //
 
-#define MAX_CLIENT_INCOMING 10240
+#define MAX_CLIENT_INCOMING 10240       // FIX
 #define MAX_CLIENT_OUTGOING 12000000    // FIX
 
-
-class HttpGetVariable
-{
-
-  public:
-  
-    HttpGetVariable(const QString &text_segment);
-    ~HttpGetVariable();
-
-    const QString& getField();
-    const QString& getValue();
-
-  private:
-  
-    QString field;
-    QString value;
-};
-
-class HttpHeader
-{
-
-  public:
-  
-    HttpHeader(const QString &input_line);
-    ~HttpHeader();
-
-    const QString& getField();
-    const QString& getValue();
-
-  private:
-  
-    QString field;
-    QString value;
-};
 
 class HttpRequest
 {

@@ -14,8 +14,8 @@ INSTALLS += target
 HEADERS += mfd_events.h   mfd_plugin.h   requestthread.h   clientsocket.h  
 SOURCES += mfd_events.cpp mfd_plugin.cpp requestthread.cpp clientsocket.cpp
 
-HEADERS += httprequest.h   httpresponse.h
-SOURCES += httprequest.cpp httpresponse.cpp
+HEADERS += httprequest.h   httpresponse.h   httpheader.h   httpgetvar.h
+SOURCES += httprequest.cpp httpresponse.cpp httpheader.cpp httpgetvar.cpp
 
 HEADERS += decoder.h   decoder_event.h   visual.h constants.h 
 SOURCES += decoder.cpp decoder_event.cpp 

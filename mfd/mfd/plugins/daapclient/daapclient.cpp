@@ -14,9 +14,10 @@
 #include "daapclient.h"
 
 DaapClient::DaapClient(MFD *owner, int identity)
-      :MFDServicePlugin(owner, identity, 3689, "daap client")
+      :MFDServicePlugin(owner, identity, 3689, "daap client", false)
 {
     client_socket_to_mfd = NULL;
+    daap_instances.setAutoDelete(true);
 }
 
 void DaapClient::run()
@@ -45,12 +46,17 @@ void DaapClient::run()
     
     while(! (client_socket_to_mfd->connect(this_address, 2342)))
     {
+        //
+        //  We give this a few attempts. It can take a few on non-blocking sockets.
+        //
+
         ++connect_tries;
         if(connect_tries > 10)
         {
             fatal("daap client could not connect to the core mfd as a regular client");
             return;
         }
+        usleep(100);
     }
     
 
@@ -68,6 +74,18 @@ void DaapClient::run()
 
         sleep(3);
     }
+    
+    //
+    //  Shut down all my connections to any and all daap servers
+    //
+    
+    DaapInstance *an_instance;
+    for ( an_instance = daap_instances.first(); an_instance; an_instance = daap_instances.next() )
+    {
+        an_instance->stop();
+        an_instance->wait();
+    }
+    
 }
 
 void DaapClient::readSocket()
@@ -129,15 +147,19 @@ void DaapClient::readSocket()
 
 void DaapClient::addDaapServer(QString server_address, uint server_port, QString service_name)
 {
-    log(QString("daapclient will add service \"%1\" (%2:%3)")
+    log(QString("daapclient will attempt to add service \"%1\" (%2:%3)")
         .arg(service_name)
         .arg(server_address)
         .arg(server_port), 10);
+        
+    DaapInstance *new_daap_instance = new DaapInstance(this, server_address, server_port, service_name);
+    new_daap_instance->start();
+    daap_instances.append(new_daap_instance);
 }
 
 void DaapClient::removeDaapServer(QString server_address, uint server_port, QString service_name)
 {
-    log(QString("daapclient will remove service \"%1\" (%2:%3)")
+    log(QString("daapclient will attempt to remove service \"%1\" (%2:%3)")
         .arg(service_name)
         .arg(server_address)
         .arg(server_port), 10);
@@ -150,5 +172,6 @@ DaapClient::~DaapClient()
         delete client_socket_to_mfd;
         client_socket_to_mfd = NULL;
     }
+    daap_instances.clear();
 }
 

@@ -1,74 +1,47 @@
 /*
-	httprequest.h
+    daapresponse.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Methods for an object to hold and parse incoming http requests
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+    
+    A little object for handling daap responses
 
 */
 
-#include <iostream>
-using namespace std;
+#include "daapresponse.h"
+#include "daapinstance.h"
 
-#include <qstringlist.h>
-
-#include "httprequest.h"
-#include "httpresponse.h"
-#include "mfd_plugin.h"
-
-HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_length)
+DaapResponse::DaapResponse(
+                            DaapInstance *owner,
+                            char *raw_incoming, 
+                            int length
+                          )
 {
     parent = owner;
-    raw_request = NULL;
-    top_line = "";
-    all_is_well = true;
-    send_response = true;
+    raw_length = length;
     headers.setAutoDelete(true);
-    get_variables.setAutoDelete(true); 
-       
-    //
-    //  Every request gets a response
-    //
+    get_variables.setAutoDelete(true);
+
+/*
     
-    my_response = new HttpResponse(parent, this);
-    
-    if(incoming_length > MAX_CLIENT_INCOMING)
-    {
-        parent->warning("http request too big .. this should not happen");
-        all_is_well = false;
-        return;
-    }
-
-
     //
-    //  Make and fill storage for the raw incoming data
-    //
-
-    raw_request = new char [incoming_length + 1];
-    for(int i = 0; i < incoming_length; i ++)
-    {
-        raw_request[i] = raw_incoming[i];
-    }
-    raw_request[incoming_length] = '\0';
-    raw_length = incoming_length;
-
-
-    //
-    //  Read the request
+    //  Read the response
     //
     
     int parse_point = 0;
     bool first_line = true;
-    char parsing_buffer[MAX_CLIENT_INCOMING];
-    while(readLine(&parse_point, parsing_buffer))
+    char parsing_buffer[10000]; //  FIX
+    QString top_line = "";
+
+    while(readLine(&parse_point, parsing_buffer, raw_incoming))
     {
         if(first_line)
         {
             //  
-            //  First line of an http request is pretty important ... do
-            //  some checking that things are sane GET /server-info HTTP/1.1
+            //  First line of a daap response is pretty important ... do
+            //  some checking that things are sane
             //
+            
             
             top_line = QString(parsing_buffer);
             QStringList line_tokens = QStringList::split( " ", top_line );
@@ -147,6 +120,7 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
                 }
                 
             }
+           
             first_line = false;
         }
         else
@@ -162,10 +136,11 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
         }
     }
 
-
+*/
+    
 }
 
-int HttpRequest::readLine(int *parse_point, char *parsing_buffer)
+int DaapResponse::readLine(int *parse_point, char *parsing_buffer, char *raw_request)
 {
     int  amount_read = 0;
     bool keep_reading = true;
@@ -199,7 +174,6 @@ int HttpRequest::readLine(int *parse_point, char *parsing_buffer)
 
             index++;
             parsing_buffer[amount_read] = '\0';
-            //amount_read++;
             keep_reading = false;
         }
         else
@@ -213,58 +187,10 @@ int HttpRequest::readLine(int *parse_point, char *parsing_buffer)
     return amount_read;
 }
 
-QString HttpRequest::getHeader(const QString& field_label)
+
+
+DaapResponse::~DaapResponse()
 {
-    HttpHeader *which_one = headers.find(field_label);
-    if(which_one)
-    {
-        return which_one->getValue();
-    }
-    return NULL;
-}
-
-QString HttpRequest::getVariable(const QString& variable_name)
-{
-    HttpGetVariable *which_one = get_variables.find(variable_name);
-    if(which_one)
-    {
-        return which_one->getValue();
-    }
-    return NULL;
-}
-
-void HttpRequest::printHeaders()
-{
-    //
-    //  Debugging code to print all the headers that came in on this request
-    //
-    
-    cout << "==============================Debugging output==============================" << endl;
-    cout << "HTTP request contained the following headers:" << endl;
-
-    QDictIterator<HttpHeader> iterator( headers );
-    for( ; iterator.current(); ++iterator )
-    {
-        cout << "\t" << iterator.currentKey() << ": " << iterator.current()->getValue() << endl;
-    }
-    cout << "============================================================================" << endl;
-    
-}
-
-HttpRequest::~HttpRequest()
-{
-    if(raw_request)
-    {
-        delete [] raw_request;
-        raw_request = NULL;
-    }
-
     headers.clear();
     get_variables.clear();
-    
-    if(my_response)
-    {
-        delete my_response;
-    }
 }
-
