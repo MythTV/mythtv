@@ -495,7 +495,7 @@
     </message>
     <message>
         <source>Program Listings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">情報</translation>
     </message>
     <message>
         <source>New Title Search</source>
@@ -3763,6 +3763,157 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Scheduled Recordings:</source>
+        <translation>録画予約:</translation>
+    </message>
+    <message>
+        <source>Highlighting:</source>
+        <translation>強調:</translation>
+    </message>
+    <message>
+        <source>Conflicting</source>
+        <translation>衝突</translation>
+    </message>
+    <message>
+        <source>Deactivated</source>
+        <translation>無効</translation>
+    </message>
+    <message>
+        <source>Show  (1) All  (2) Important</source>
+        <translation>表示  (1) 全て  (2) 重要な物のみ</translation>
+    </message>
+    <message>
+        <source>Showing:</source>
+        <translation>表示:</translation>
+    </message>
+    <message>
+        <source>Airdate:</source>
+        <translation>日付:</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>チャンネル:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation>内容:</translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
+        <translation>予約で録画された番組がありません</translation>
+    </message>
+    <message>
+        <source>To schedule a recording, exit this screen and</source>
+        <translation>録画予約は、この画面を終了して</translation>
+    </message>
+    <message>
+        <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation>&apos;番組ガイド&apos;か&apos;番組検索&apos;を選択してください</translation>
+    </message>
+    <message>
+        <source>Channel Recording Priorities</source>
+        <translation>チャンネル録画優先順位</translation>
+    </message>
+    <message>
+        <source>(1) Sort by Channel    (2) Sort by Priority</source>
+        <translation>(1) チャンネルで並び替え  (2) 優先順位で並び替え</translation>
+    </message>
+    <message>
+        <source>Priority:</source>
+        <translation>優先順位:</translation>
+    </message>
+    <message>
+        <source>Program Recording Priorities</source>
+        <translation>番組録画優先順位</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>優先順位</translation>
+    </message>
+    <message>
+        <source>Final Priority</source>
+        <translation>最終優先順位</translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title    (2) Sort by Priority</source>
+        <translation>(1) タイトルで並び替え  (2) 優先順位で並び替え</translation>
+    </message>
+    <message>
+        <source>Record Type:</source>
+        <translation>録画タイプ:</translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently delete:</source>
+        <translation>完全に削除する録画を選択してください:</translation>
+    </message>
+    <message>
+        <source>Select a recording to view:</source>
+        <translation>再生する録画を選択してください:</translation>
+    </message>
+    <message>
+        <source>Sorry, No Recordings Available</source>
+        <translation>利用可能な録画がありません</translation>
+    </message>
+    <message>
+        <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
+        <translation>&apos;録画予約&apos;をメインメニューから選択してください</translation>
+    </message>
+    <message>
+        <source>(4) Program Guide   **(6) Program Finder **</source>
+        <translation>(4) 番組ガイド        **(6) 番組検索    **</translation>
+    </message>
+    <message>
+        <source>Select a letter...</source>
+        <translation>文字選択してください...</translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
+        <translation>文字を選んでENTERキーか右矢印キーを押してください｡</translation>
+    </message>
+    <message>
+        <source>Select a program...</source>
+        <translation>番組を選択してください...</translation>
+    </message>
+    <message>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
+        <translation>見つけたいタイトルを選択したら左矢印キーで戻ってください｡&apos;情報&apos;をクリックすると録画オプションを設定することが出来ます｡.</translation>
+    </message>
+    <message>
+        <source>No Programs</source>
+        <translation>番組がありません</translation>
+    </message>
+    <message>
+        <source>There are no available programs under this search. Please select another search.</source>
+        <translation>検索に利用できる番組がありません｡他の検索を選んでください｡.</translation>
+    </message>
+    <message>
+        <source>Program Listings</source>
+        <translation>情報</translation>
+    </message>
+    <message>
+        <source>No listings found for this program. </source>
+        <translation>番組を見つけられませんでした.</translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]  = </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

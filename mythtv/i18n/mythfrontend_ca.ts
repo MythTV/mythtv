@@ -554,7 +554,7 @@
     </message>
     <message>
         <source>Program Listings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Llista de programes</translation>
     </message>
     <message>
         <source>New Title Search</source>
@@ -2081,7 +2081,7 @@
     </message>
     <message>
         <source>Conflicting</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Conflicte</translation>
     </message>
     <message>
         <source>Will Record</source>
@@ -3805,6 +3805,157 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Jump To</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Scheduled Recordings:</source>
+        <translation>Gravacions programades</translation>
+    </message>
+    <message>
+        <source>Conflicting</source>
+        <translation>Conflicte</translation>
+    </message>
+    <message>
+        <source>Deactivated</source>
+        <translation>Desactivades</translation>
+    </message>
+    <message>
+        <source>Airdate:</source>
+        <translation>Data d&apos;emisió:</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>Canal:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation>Descripció:</translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
+        <translation>No hi ha prevista cap gravació</translation>
+    </message>
+    <message>
+        <source>To schedule a recording, exit this screen and</source>
+        <translation>Per a programar una gravació, surti i</translation>
+    </message>
+    <message>
+        <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation>vagi a &quot;Guia de programes&quot; o &quot;Cercar Programes&quot;</translation>
+    </message>
+    <message>
+        <source>(1) Sort by Channel    (2) Sort by Priority</source>
+        <translation>(1) Ordenar per Canal  (2) Ordenar per Preferència</translation>
+    </message>
+    <message>
+        <source>Priority:</source>
+        <translation>Rànquing:</translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title    (2) Sort by Priority</source>
+        <translation>(1) Ordenar per Títol  (2) Ordenar per Preferència</translation>
+    </message>
+    <message>
+        <source>Record Type:</source>
+        <translation>Tipus de gravació:</translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently delete:</source>
+        <translation>Esculli una gravació a esborrar:</translation>
+    </message>
+    <message>
+        <source>Select a recording to view:</source>
+        <translation>Esculli la gravació que vol veure:</translation>
+    </message>
+    <message>
+        <source>Sorry, No Recordings Available</source>
+        <translation>Ho sento, no hi ha cap gravació disponible</translation>
+    </message>
+    <message>
+        <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
+        <translation>esculli &apos;Programar gravacions&apos;</translation>
+    </message>
+    <message>
+        <source>(4) Program Guide   **(6) Program Finder **</source>
+        <translation>(4) Guia de programes **(6) Cerca Programes **</translation>
+    </message>
+    <message>
+        <source>Select a letter...</source>
+        <translation>Esculli una lletra...</translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
+        <translation>Esculli la lletra inicial del programa i premi OK o fletxa dreta</translation>
+    </message>
+    <message>
+        <source>Select a program...</source>
+        <translation>Esculli un programa...</translation>
+    </message>
+    <message>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
+        <translation>Cerqui el nom del programa. Quan el trovi retorni amb fletxa esquerra. Prement &apos;info&apos; podra determinar les opcions de gravacio.</translation>
+    </message>
+    <message>
+        <source>No Programs</source>
+        <translation>Cap programa</translation>
+    </message>
+    <message>
+        <source>There are no available programs under this search. Please select another search.</source>
+        <translation>No trovo cap programa amb aquest criteri. Continui cercant.</translation>
+    </message>
+    <message>
+        <source>Program Listings</source>
+        <translation>Llista de programes</translation>
+    </message>
+    <message>
+        <source>No listings found for this program. </source>
+        <translation>Aquest programa no el trovo llistat.</translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlighting:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show  (1) All  (2) Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Final Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]  = </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

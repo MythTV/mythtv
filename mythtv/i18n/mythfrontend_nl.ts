@@ -1965,7 +1965,7 @@
     </message>
     <message>
         <source>Conflicting</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Conflicterende</translation>
     </message>
     <message>
         <source>Will Record</source>
@@ -3690,6 +3690,157 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Jump To</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Scheduled Recordings:</source>
+        <translation>Geplande Opnames</translation>
+    </message>
+    <message>
+        <source>Conflicting</source>
+        <translation>Conflicterende</translation>
+    </message>
+    <message>
+        <source>Deactivated</source>
+        <translation>Gedesactiveerde</translation>
+    </message>
+    <message>
+        <source>Airdate:</source>
+        <translation>Uitzenddatum:</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>Kanaal:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation>Beschrijving:</translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
+        <translation>Er zijn geen geplande opnames</translation>
+    </message>
+    <message>
+        <source>To schedule a recording, exit this screen and</source>
+        <translation>Om een opname te plannen, verlaat dit scherm en</translation>
+    </message>
+    <message>
+        <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation>kies &quot;Programmagids&quot; of &quot;Programma Zoeker&quot;</translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently delete:</source>
+        <translation>Kies een opname om te verwijderen:</translation>
+    </message>
+    <message>
+        <source>Select a recording to view:</source>
+        <translation>Kies een opname om te bekijken:</translation>
+    </message>
+    <message>
+        <source>Sorry, No Recordings Available</source>
+        <translation>Sorry, geen opnames aanwezig</translation>
+    </message>
+    <message>
+        <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
+        <translation>kies &apos;Opname plannen&apos;</translation>
+    </message>
+    <message>
+        <source>(4) Program Guide   **(6) Program Finder **</source>
+        <translation>(4) Programmagids     **(6) Programma Zoeker **</translation>
+    </message>
+    <message>
+        <source>Select a letter...</source>
+        <translation>Kies een letter...</translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
+        <translation>Kies de eerste letter van het programma, en druk OK of pijl naar rechts</translation>
+    </message>
+    <message>
+        <source>Select a program...</source>
+        <translation>Kies een programma...</translation>
+    </message>
+    <message>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
+        <translation>Kies de titel van het programma dat U zoekt. Druk op pijl naar links wanneer U klaar bent. Druk &apos;info&apos; als U de opname-opties wilt wijzigen.</translation>
+    </message>
+    <message>
+        <source>No Programs</source>
+        <translation>Geen programma&apos;s</translation>
+    </message>
+    <message>
+        <source>There are no available programs under this search. Please select another search.</source>
+        <translation>Er zijn geen programma&apos;s gevonden. Probeer een andere zoekopdracht.</translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlighting:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show  (1) All  (2) Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Channel    (2) Sort by Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Final Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title    (2) Sort by Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]  = </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No listings found for this program. </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

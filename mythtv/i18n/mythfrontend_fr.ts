@@ -3687,6 +3687,157 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>%SUBTITLE|%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlighting:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflicting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deactivated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show  (1) All  (2) Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Airdate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation type="unfinished">Station:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">Description:</translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To schedule a recording, exit this screen and</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Channel    (2) Sort by Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Final Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title    (2) Sort by Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]  = </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently delete:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to view:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, No Recordings Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(4) Program Guide   **(6) Program Finder **</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a letter...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a program...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Programs</source>
+        <translation type="unfinished">Aucun programme</translation>
+    </message>
+    <message>
+        <source>There are no available programs under this search. Please select another search.</source>
+        <translation type="unfinished">Aucun résultat pour cette recherche. Veuillez essayer une autre recherche.</translation>
+    </message>
+    <message>
+        <source>Program Listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No listings found for this program. </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VideoSourceEditor</name>
     <message>
         <source>Video sources</source>

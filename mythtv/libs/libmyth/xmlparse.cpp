@@ -943,7 +943,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
                 if ((value.isNull() || value.isEmpty()) && 
                     info.attribute("lang","") == "")
                 {
-                    value = getFirstText(info);
+                    value = qApp->translate("ThemeUI", getFirstText(info));
                 }
                 else if (info.attribute("lang","").lower() == 
                          gContext->GetLanguage())

@@ -3865,6 +3865,157 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Scheduled Recordings:</source>
+        <translation>Geplante Aufnahmen:</translation>
+    </message>
+    <message>
+        <source>Conflicting</source>
+        <translation>Überschneidungen</translation>
+    </message>
+    <message>
+        <source>Deactivated</source>
+        <translation>Blockierte</translation>
+    </message>
+    <message>
+        <source>Airdate:</source>
+        <translation>Sendezeit:</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>Sender:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation>Inhalt:</translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
+        <translation>Sie haben noch keine Aufnahmen geplant</translation>
+    </message>
+    <message>
+        <source>To schedule a recording, exit this screen and</source>
+        <translation>Um eine Aufnahme zu planen wählen Sie</translation>
+    </message>
+    <message>
+        <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation>wählen Sie &apos;Übersicht&apos; oder &apos;Sendung suchen&apos;</translation>
+    </message>
+    <message>
+        <source>(1) Sort by Channel    (2) Sort by Priority</source>
+        <translation>(1) Sortiert nach Sender (2) Sortiert nach Rang</translation>
+    </message>
+    <message>
+        <source>Priority:</source>
+        <translation>Rang:</translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title    (2) Sort by Priority</source>
+        <translation>(1) Sortiert nach Sender (2) Sortiert nach Rang</translation>
+    </message>
+    <message>
+        <source>Record Type:</source>
+        <translation>Modus:</translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently delete:</source>
+        <translation>Welche Aufnahme soll gelöscht werden:</translation>
+    </message>
+    <message>
+        <source>Select a recording to view:</source>
+        <translation>Welche Aufnahme möchten Sie sehen:</translation>
+    </message>
+    <message>
+        <source>Sorry, No Recordings Available</source>
+        <translation>Keine Aufnahmen verfügbar</translation>
+    </message>
+    <message>
+        <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
+        <translation>&apos;Aufnahme planen&apos; im Hauptmenü</translation>
+    </message>
+    <message>
+        <source>(4) Program Guide   **(6) Program Finder **</source>
+        <translation>(4) Übersicht         **(6) Sendung suchen **</translation>
+    </message>
+    <message>
+        <source>Select a letter...</source>
+        <translation>Wählen Sie einen Buchstaben...</translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
+        <translation>Wählen Sie den Anfangsbuchstaben der Sendung, danach ENTER oder Cursor-Rechts</translation>
+    </message>
+    <message>
+        <source>Select a program...</source>
+        <translation>Wählen Sie eine Sendung...</translation>
+    </message>
+    <message>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
+        <translation>Wählen Sie den Titel der gesuchten Sendung. Weiter mit ENTER oder Cursor-Rechts. Mit &apos;info&apos; können Sie eine Aufnahme planen.</translation>
+    </message>
+    <message>
+        <source>No Programs</source>
+        <translation>Keine Sendungen</translation>
+    </message>
+    <message>
+        <source>There are no available programs under this search. Please select another search.</source>
+        <translation>Keine Sendungen gefunden. Bitte wählen Sie eine andere Suche.</translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlighting:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show  (1) All  (2) Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished">Priorität</translation>
+    </message>
+    <message>
+        <source>Final Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]  = </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Listings</source>
+        <translation type="unfinished">Fernsehprogramm</translation>
+    </message>
+    <message>
+        <source>No listings found for this program. </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VideoSourceEditor</name>
     <message>
         <source>Video sources</source>

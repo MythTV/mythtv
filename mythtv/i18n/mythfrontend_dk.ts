@@ -2006,7 +2006,7 @@
     </message>
     <message>
         <source>Conflicting</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konflikter</translation>
     </message>
     <message>
         <source>Will Record</source>
@@ -3707,6 +3707,157 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Jump To</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Scheduled Recordings:</source>
+        <translation>Planlagte optagelser:</translation>
+    </message>
+    <message>
+        <source>Conflicting</source>
+        <translation>Konflikter</translation>
+    </message>
+    <message>
+        <source>Deactivated</source>
+        <translation>Deaktiverede</translation>
+    </message>
+    <message>
+        <source>Airdate:</source>
+        <translation>Sendt:</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>Kanal:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation>Beskrivelse:</translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
+        <translation>Du har ikke optaget nogen udsendelser</translation>
+    </message>
+    <message>
+        <source>To schedule a recording, exit this screen and</source>
+        <translation>For at optage en udsendelse, forlad denne skærm og</translation>
+    </message>
+    <message>
+        <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation>vælg &apos;Program Guide&apos; eller &apos;Program Finder&apos;</translation>
+    </message>
+    <message>
+        <source>(1) Sort by Channel    (2) Sort by Priority</source>
+        <translation>(1) Sortér efter Titel  (2) Sortér efter Rang</translation>
+    </message>
+    <message>
+        <source>Priority:</source>
+        <translation>Rang:</translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title    (2) Sort by Priority</source>
+        <translation>(1) Sortér efter Titel  (2) Sortér efter Rang</translation>
+    </message>
+    <message>
+        <source>Record Type:</source>
+        <translation>Optagelsestype:</translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently delete:</source>
+        <translation>Vælg en optagelse du vil slette permanent:</translation>
+    </message>
+    <message>
+        <source>Select a recording to view:</source>
+        <translation>Vælg den optagelse du ønsker at se:</translation>
+    </message>
+    <message>
+        <source>Sorry, No Recordings Available</source>
+        <translation>Beklager, ingen optagelser fundet</translation>
+    </message>
+    <message>
+        <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
+        <translation>vælg &apos;Optag en udsendelse&apos;</translation>
+    </message>
+    <message>
+        <source>(4) Program Guide   **(6) Program Finder **</source>
+        <translation>(4) Program Guide     **(6) Program Finder **</translation>
+    </message>
+    <message>
+        <source>Select a letter...</source>
+        <translation>Vælg et bogstav...</translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
+        <translation>Vælg det bogstav udsendelsen starter med og tryk ENTER eller pil til højre</translation>
+    </message>
+    <message>
+        <source>Select a program...</source>
+        <translation>Vælg en udsendelse...</translation>
+    </message>
+    <message>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
+        <translation>Vælg titlen på det den udsendelse du ønsker at finde og tryk ENTER eller Pil til venstre. Med &apos;Info&apos; kan du vælge optagelsetype.</translation>
+    </message>
+    <message>
+        <source>No Programs</source>
+        <translation>Ingen udsendelser</translation>
+    </message>
+    <message>
+        <source>There are no available programs under this search. Please select another search.</source>
+        <translation>Ingen udsendelser under denne søgning. Prøv venligst en anden.</translation>
+    </message>
+    <message>
+        <source>No listings found for this program. </source>
+        <translation>Ingen visninger af dette program fundet. </translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlighting:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show  (1) All  (2) Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Final Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]  = </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Listings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

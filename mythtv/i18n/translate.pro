@@ -31,6 +31,7 @@ SOURCES += ../programs/mythfrontend/programrecpriority.cpp
 SOURCES += ../programs/mythfrontend/viewscheduled.cpp
 SOURCES += ../programs/mythfrontend/channelrecpriority.cpp
 SOURCES += ../setup/backendsettings.cpp
+SOURCES += ../themes/themestrings.h
 
 TRANSLATIONS  = mythfrontend_it.ts mythfrontend_es.ts mythfrontend_ca.ts
 TRANSLATIONS += mythfrontend_nl.ts mythfrontend_fr.ts mythfrontend_de.ts

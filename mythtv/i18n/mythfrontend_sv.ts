@@ -479,7 +479,7 @@
     </message>
     <message>
         <source>Program Listings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Programlistning</translation>
     </message>
     <message>
         <source>New Title Search</source>
@@ -2154,7 +2154,7 @@
     </message>
     <message>
         <source>Conflicting</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konflikter</translation>
     </message>
     <message>
         <source>Will Record</source>
@@ -3819,6 +3819,157 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Jump To</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Scheduled Recordings:</source>
+        <translation>Schemalagda inspelningar:</translation>
+    </message>
+    <message>
+        <source>Conflicting</source>
+        <translation>Konflikter</translation>
+    </message>
+    <message>
+        <source>Deactivated</source>
+        <translation>Deaktiverade</translation>
+    </message>
+    <message>
+        <source>Airdate:</source>
+        <translation>Sänt:</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>Kanal:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation>Beskrivning:</translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
+        <translation>Du har inte schemalagt några inspelningar</translation>
+    </message>
+    <message>
+        <source>To schedule a recording, exit this screen and</source>
+        <translation>För att schemalägga en inspelning, gå tillbaka och</translation>
+    </message>
+    <message>
+        <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation>välj &apos;Programguide&apos; eller &apos;Sök program&apos;</translation>
+    </message>
+    <message>
+        <source>(1) Sort by Channel    (2) Sort by Priority</source>
+        <translation>(1) Sortera efter titel  (2) Sortera efter rank</translation>
+    </message>
+    <message>
+        <source>Priority:</source>
+        <translation>Rank:</translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title    (2) Sort by Priority</source>
+        <translation>(1) Sortera efter titel  (2) Sortera efter rank</translation>
+    </message>
+    <message>
+        <source>Record Type:</source>
+        <translation>Inspelningstyp:</translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently delete:</source>
+        <translation>Välj en inspelning du vill radera permanent:</translation>
+    </message>
+    <message>
+        <source>Select a recording to view:</source>
+        <translation>Välj den inspelning du önskar se:</translation>
+    </message>
+    <message>
+        <source>Sorry, No Recordings Available</source>
+        <translation>Inga inspelningar hittades</translation>
+    </message>
+    <message>
+        <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
+        <translation>välj &apos;Schemalägg inspelningar&apos; från huvudmenyn</translation>
+    </message>
+    <message>
+        <source>(4) Program Guide   **(6) Program Finder **</source>
+        <translation>(4) Programguide      **(6) Sök program **</translation>
+    </message>
+    <message>
+        <source>Select a letter...</source>
+        <translation>Välj en bokstav...</translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
+        <translation>Välj den bokstav som programnamnet börjar med. Tryck sedan ENTER eller högerpil</translation>
+    </message>
+    <message>
+        <source>Select a program...</source>
+        <translation>Välj ett program...</translation>
+    </message>
+    <message>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
+        <translation>Välj titeln på det program du vill hitta. När du är klar, återgå med vänsterpil. Genom att trycka på infoknappen kan du göra inspelningsinställningar.</translation>
+    </message>
+    <message>
+        <source>No Programs</source>
+        <translation>Inga program</translation>
+    </message>
+    <message>
+        <source>There are no available programs under this search. Please select another search.</source>
+        <translation>Inga program funna. Välj något annat att söka på.</translation>
+    </message>
+    <message>
+        <source>Program Listings</source>
+        <translation>Programlistning</translation>
+    </message>
+    <message>
+        <source>No listings found for this program. </source>
+        <translation>Inga visningar funna av detta program. </translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlighting:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show  (1) All  (2) Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Final Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]  = </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
