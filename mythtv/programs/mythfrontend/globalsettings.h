@@ -580,18 +580,23 @@ class GeneralSettings: virtual public ConfigurationDialog,
 public:
     GeneralSettings(MythContext *context) : ConfigurationDialog(context) {
         addChild(new RecordFilePrefix());
-        addChild(new ChannelOrdering());
-        addChild(new TunerCardInput());
+
         addChild(new TVFormat());
         addChild(new FreqTable());
+
         addChild(new RecordOverTime());
+
+        addChild(new ChannelOrdering());
         addChild(new ExternalChannelCommand());
         addChild(new ChannelSorting());
         addChild(new DefaultTVChannel());
-        addChild(new UnknownTitle());
-        addChild(new UnknownCategory());
+        addChild(new TunerCardInput());
+
         addChild(new GeneratePreviewPixmaps());
         addChild(new PlaybackPreview());
+
+        addChild(new UnknownTitle());
+        addChild(new UnknownCategory());
     };
 };
 
