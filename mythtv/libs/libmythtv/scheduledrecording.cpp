@@ -149,8 +149,6 @@ public:
                  QString::number(kDupCheckSub));
         addSelection(QObject::tr("Description"),
                  QString::number(kDupCheckDesc));
-        addSelection(QObject::tr("ID Only"),
-                 QString::number(kDupCheckIdOnly));
         addSelection(QObject::tr("None"),
                  QString::number(kDupCheckNone));
     };

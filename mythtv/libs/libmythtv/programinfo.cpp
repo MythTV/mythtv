@@ -889,13 +889,16 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     if (dupmethod & kDupCheckNone)
         return false;
 
-    if (programid != "" && 
-        (seriesid == "" || !programid.contains(QRegExp("0000$"))) &&
-        programid == other.programid)
-        return true;
-
-    if (dupmethod & kDupCheckIdOnly)
+    if (programid.contains(QRegExp("^SH.*0000$")))
         return false;
+
+    if (programid != "" && other.programid != "")
+    {
+        if (programid == other.programid)
+            return true;
+        else
+            return false;
+    }
 
     if ((dupmethod & kDupCheckSub) &&
         ((subtitle == "") ||

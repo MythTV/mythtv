@@ -35,8 +35,7 @@ enum RecordingDupMethodType
     kDupCheckNone     = 0x01,
     kDupCheckSub      = 0x02,
     kDupCheckDesc     = 0x04,
-    kDupCheckSubDesc  = 0x06,
-    kDupCheckIdOnly   = 0x08
+    kDupCheckSubDesc  = 0x06
 };
 
 class ProgramInfo;
