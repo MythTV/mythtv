@@ -75,7 +75,7 @@ void runGames(void);
 
 void setupKeys(void)
 {
-    REG_JUMP("MythGame", "Game frontend", "-", runGames);
+    REG_JUMP("MythGame", "Game frontend", "", runGames);
 
     REG_KEY("Game", "TOGGLEFAV", "Toggle the current game as a favorite", 
             "?,/");
