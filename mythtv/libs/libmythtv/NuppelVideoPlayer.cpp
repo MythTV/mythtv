@@ -1069,7 +1069,8 @@ int NuppelVideoPlayer::CheckEvents(void)
     if (videoOutput && eventvalid)
     {
         pthread_mutex_lock(&eventLock);
-        ret = videoOutput->CheckEvents();
+        if (videoOutput && eventvalid)
+            ret = videoOutput->CheckEvents();
         pthread_mutex_unlock(&eventLock);
     } 
     return ret;
