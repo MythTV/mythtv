@@ -12,6 +12,7 @@
       <text lang="FR">Configuration générale</text>
       <text lang="NL">Algemene Instellingen</text>
       <text lang="JA">全般設定</text>
+      <text lang="IT">Generale</text>
       <action>SETTINGS_GENERAL</action>
    </button>
 
@@ -27,6 +28,7 @@
       <text lang="FR">Configuration du lecteur</text>
       <text lang="NL">Weergave Instellingen</text>
       <text lang="JA">プレイヤー設定</text>
+      <text lang="IT">Player</text>
       <action>SETTINGS_PLAYER</action>
    </button>
 
@@ -41,6 +43,7 @@
       <text lang="FR">Types de fichiers</text>
       <text lang="NL">Bestandstypes</text>
       <text lang="JA">ファイルタイプ</text>
+      <text lang="IT">Tipi di file</text>
       <action>SETTINGS_ASSOCIATIONS</action>
    </button>
 

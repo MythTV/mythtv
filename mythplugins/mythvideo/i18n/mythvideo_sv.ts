@@ -121,11 +121,11 @@
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation>Söker efter videofiler</translation>
+        <translation type="obsolete">Söker efter videofiler</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation>Uppdaterar filmdatabasen</translation>
+        <translation type="obsolete">Uppdaterar filmdatabasen</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -141,7 +141,7 @@
     </message>
     <message>
         <source>NR</source>
-        <translation>Oklassificerad</translation>
+        <translation type="obsolete">Oklassificerad</translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -255,6 +255,10 @@
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
         <translation>Standardvy för MythVideo. Andra vyer kan nås genom popup-menyn tillgänglig via MENY-knappen.</translation>
+    </message>
+    <message>
+        <source>videos</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -10,46 +10,46 @@
     <name>EditMetadataDialog</name>
     <message>
         <source>Level %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Livello %1</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>None</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessuna copertina</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Fatto</translation>
     </message>
 </context>
 <context>
     <name>FileAssocDialog</name>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Fatto</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuovo</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina</translation>
     </message>
     <message>
         <source>Please enter the new extension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Prego inserisci la nuova estensione:</translation>
     </message>
     <message>
         <source>Create new extension</source>
-        <translation type="unfinished"></translation>
+        <translation>Crea una nuova estensione</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulla</translation>
     </message>
 </context>
 <context>
@@ -76,11 +76,11 @@
     </message>
     <message>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">2</translation>
     </message>
     <message>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">3</translation>
     </message>
     <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
@@ -120,30 +120,18 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Searching for video files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pin parentale:</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nessuna copertina</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sconosciuto</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>NR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -263,477 +251,481 @@
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>videos</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Director:</source>
-        <translation type="unfinished"></translation>
+        <translation>Regia:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Anno:</translation>
     </message>
     <message>
         <source>Rated:</source>
-        <translation type="unfinished"></translation>
+        <translation>Quotato:</translation>
     </message>
     <message>
         <source>Parental Level:</source>
-        <translation type="unfinished"></translation>
+        <translation>Livello parentale:</translation>
     </message>
     <message>
         <source>Browsable:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sfogliabile:</translation>
     </message>
     <message>
         <source>Runtime:</source>
-        <translation type="unfinished"></translation>
+        <translation>Durata:</translation>
     </message>
     <message>
         <source>Plot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Trama:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome file:</translation>
     </message>
     <message>
         <source>Cover File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Copertina:</translation>
     </message>
     <message>
         <source>IMDB Num.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Num. IMDB:</translation>
     </message>
     <message>
         <source>retrieving data...</source>
-        <translation type="unfinished"></translation>
+        <translation>Recupero dati...</translation>
     </message>
     <message>
         <source>[ looking for ]</source>
-        <translation type="unfinished"></translation>
+        <translation>[ ricerca di ]</translation>
     </message>
     <message>
         <source>Enter IMDB #</source>
-        <translation type="unfinished"></translation>
+        <translation>Inserisci IMDB #</translation>
     </message>
     <message>
         <source>loading...</source>
-        <translation type="unfinished"></translation>
+        <translation>caricamento...</translation>
     </message>
     <message>
         <source>No Videos Found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessun video trovato</translation>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <source>Directed by</source>
-        <translation type="unfinished"></translation>
+        <translation>Diretto da</translation>
     </message>
     <message>
         <source>File:</source>
-        <translation type="unfinished"></translation>
+        <translation>File:</translation>
     </message>
     <message>
         <source>Player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Player:</translation>
     </message>
     <message>
         <source>PL </source>
-        <translation type="unfinished"></translation>
+        <translation>PL</translation>
     </message>
     <message>
         <source>MythVideo File Associations</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythvideo Associazione File</translation>
     </message>
     <message>
         <source>Extension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Estensione:</translation>
     </message>
     <message>
         <source>Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando:</translation>
     </message>
     <message>
         <source>Use default player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Usa il player di default:</translation>
     </message>
     <message>
         <source>Ignore:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignora:</translation>
     </message>
     <message>
         <source>Edit Video Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifica informazioni video</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome:</translation>
     </message>
     <message>
         <source>Parental Control:</source>
-        <translation type="unfinished"></translation>
+        <translation>Controllo parentale:</translation>
     </message>
     <message>
         <source>File to Always Play Next:</source>
-        <translation type="unfinished"></translation>
+        <translation>File da eseguire in seguito:</translation>
     </message>
     <message>
         <source>Include while Browsing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Includi mentre sfogli:</translation>
     </message>
     <message>
         <source>Cover Art:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cover Art:</translation>
     </message>
     <message>
         <source>Unique Player Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando personalizzato:</translation>
     </message>
     <message>
         <source>/path/to/the/thing.jpg</source>
-        <translation type="unfinished"></translation>
+        <translation>/percorso/a/oggetto.jpg</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Categoria:</translation>
     </message>
     <message>
         <source>Filters video list</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtri sulla lista dei film</translation>
     </message>
     <message>
         <source>Category :</source>
-        <translation type="unfinished"></translation>
+        <translation>Categoria:</translation>
     </message>
     <message>
         <source>Genre :</source>
-        <translation type="unfinished"></translation>
+        <translation>Genere:</translation>
     </message>
     <message>
         <source>Country :</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazione:</translation>
     </message>
     <message>
         <source>Year :</source>
-        <translation type="unfinished"></translation>
+        <translation>Anno:</translation>
     </message>
     <message>
         <source>Runtime :</source>
-        <translation type="unfinished"></translation>
+        <translation>Durata:</translation>
     </message>
     <message>
         <source>User Rating :</source>
-        <translation type="unfinished"></translation>
+        <translation>Giudizio:</translation>
     </message>
     <message>
         <source>Browse :</source>
-        <translation type="unfinished"></translation>
+        <translation>Scorri:</translation>
     </message>
     <message>
         <source>Sort by :</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordina per:</translation>
     </message>
     <message>
         <source>Aucune video</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>SELECT: Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>SELECT: Modifica</translation>
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Parental</source>
-        <translation type="unfinished"></translation>
+        <translation>Parentale</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Livello</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Anno</translation>
     </message>
     <message>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Durata</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Giudizio</translation>
     </message>
     <message>
         <source>INFO - Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO - Menu azione</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Sù/Giù, Pagina sù/giù: Scorri   MENU: Opzioni   INFO: Menu azione</translation>
     </message>
     <message>
         <source>Play File After This:</source>
-        <translation type="unfinished"></translation>
+        <translation>Esegui successivamente:</translation>
     </message>
 </context>
 <context>
     <name>VideoBrowser</name>
     <message>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 di %2</translation>
     </message>
     <message>
         <source>No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessun video</translation>
     </message>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessun rating disponibile.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minuti</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Guarda questo film</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Vedi la trama completa</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualizzazione filtrata</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulla</translation>
     </message>
 </context>
 <context>
     <name>VideoDialog</name>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia vista a scorrimento</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia vista a galleria</translation>
     </message>
     <message>
         <source>Switch to List View</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia vista a lista</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona azione</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pin parentale:</translation>
     </message>
 </context>
 <context>
     <name>VideoFilterDialog</name>
     <message>
         <source>Result of this filter : %1 video(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Risultati di questo filtro: %1 film</translation>
     </message>
     <message>
         <source>Result of this filter : No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Risultato di questo filtro: Nessun film</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Sconosciuto</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minuti</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Tutti</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Salva come default</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Fatto</translation>
     </message>
 </context>
 <context>
     <name>VideoGallery</name>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualizzazione filtrata</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Guarda questo film</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Vedi la trama completa</translation>
     </message>
     <message>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Vedi dettagli</translation>
     </message>
     <message>
         <source>Plain View</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualizzazione semplice</translation>
     </message>
     <message>
         <source>Folder View</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualizzazione cartelle</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulla</translation>
     </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minuti</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Sì</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>No</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessuna copertina</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Sconosciuto</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessuno</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished"></translation>
+        <translation>NR</translation>
     </message>
     <message>
         <source>delete failed</source>
-        <translation type="unfinished"></translation>
+        <translation>cancellazione fallita</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona azione:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifica metadati</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerca IMDB</translation>
     </message>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation type="unfinished"></translation>
+        <translation>Inserisci il # di IMDB</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Resetta metadata</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Scambia scorrimento</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Rimuovi il film</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualizzazione filtrata</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulla</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimino questo file?</translation>
     </message>
 </context>
 <context>
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessun rating disponibile.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minuti</translation>
     </message>
 </context>
 <context>
     <name>VideoTree</name>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pin parentale:</translation>
     </message>
     <message>
         <source>No files found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessun file trovato</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona azione</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Guarda questo film</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Vedi la trama completa</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualizzazione filtrata</translation>
     </message>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia vista a scorrimento</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia vista a galleria</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulla</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 </TS>

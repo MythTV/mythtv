@@ -116,14 +116,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Searching for video files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No Cover</source>
         <translation type="unfinished"></translation>
     </message>
@@ -133,10 +125,6 @@
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>NR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -254,6 +242,10 @@
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>videos</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

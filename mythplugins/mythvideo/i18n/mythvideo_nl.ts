@@ -117,11 +117,11 @@
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation>Zoek naar videobestanden</translation>
+        <translation type="obsolete">Zoek naar videobestanden</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation>Bezig met bijwerken film-databank</translation>
+        <translation type="obsolete">Bezig met bijwerken film-databank</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -137,7 +137,7 @@
     </message>
     <message>
         <source>NR</source>
-        <translation>Niet Beoordeeld</translation>
+        <translation type="obsolete">Niet Beoordeeld</translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -260,6 +260,10 @@
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>videos</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -132,11 +132,11 @@
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation>ビデオファイルの検索</translation>
+        <translation type="obsolete">ビデオファイルの検索</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation>ビデオデータベースを更新中</translation>
+        <translation type="obsolete">ビデオデータベースを更新中</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -149,10 +149,6 @@
     <message>
         <source>None</source>
         <translation>無し</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation></translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -271,6 +267,10 @@
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
         <translation>MythVideoのデフォルトビュー。他のビューはMENUキーを押して出るポップアップから選択できます。</translation>
+    </message>
+    <message>
+        <source>videos</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -129,11 +129,11 @@
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation>Cercant arxius de vídeo</translation>
+        <translation type="obsolete">Cercant arxius de vídeo</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation>Actualitzant base de dades de vídeos</translation>
+        <translation type="obsolete">Actualitzant base de dades de vídeos</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -146,10 +146,6 @@
     <message>
         <source>None</source>
         <translation>Cap</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation></translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -266,6 +262,10 @@
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>videos</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

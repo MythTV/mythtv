@@ -221,11 +221,11 @@
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation>Iskanje video datotek</translation>
+        <translation type="obsolete">Iskanje video datotek</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation>Nadgrajevanje video baze</translation>
+        <translation type="obsolete">Nadgrajevanje video baze</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -241,7 +241,7 @@
     </message>
     <message>
         <source>NR</source>
-        <translation>NR</translation>
+        <translation type="obsolete">NR</translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -259,6 +259,10 @@
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>videos</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
