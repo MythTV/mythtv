@@ -6,20 +6,21 @@
 #include <fcntl.h>
 #include "RingBuffer.h"
 
-RingBuffer::RingBuffer(const char *lfilename, bool actasnormalfile, bool write)
+RingBuffer::RingBuffer(const string &lfilename, bool actasnormalfile, 
+                       bool write)
 {
     normalfile = true;
-    filename = lfilename;
+    filename = (string)lfilename;
     fd = -1;
 
     if (write)
     {
-        fd = open(lfilename, O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
+        fd = open(filename.c_str(), O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
         writemode = true;
     }
     else
     {
-        fd = open(lfilename, O_RDONLY|O_LARGEFILE);
+        fd = open(filename.c_str(), O_RDONLY|O_LARGEFILE);
         writemode = false;
     }
 
@@ -28,10 +29,12 @@ RingBuffer::RingBuffer(const char *lfilename, bool actasnormalfile, bool write)
     smudgeamount = 0;
 }
 
-RingBuffer::RingBuffer(const char *lfilename, long long size, long long smudge)
+RingBuffer::RingBuffer(const string &lfilename, long long size, 
+                       long long smudge)
 {
+	printf("%s\n", lfilename.c_str());
     normalfile = false;
-    filename = lfilename;
+    filename = (string)lfilename;
     filesize = size;
    
     fd = -1; fd2 = -1;

@@ -26,7 +26,7 @@ NUVPLAYLDF =-Llib/ -lNuppelVideo $(NUVLIBS)
 NUVRECOBJ = nuvrec.o
 NUVRECLDF = -Llib/ -lNuppelVideo $(NUVLIBS)
 
-TVOBJ = tv.o
+TVOBJ = tv.o settings.o
 TVLDF = -Llib/ -lNuppelVideo $(NUVLIBS)
 
 libNuppelVideo:

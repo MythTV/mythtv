@@ -8,6 +8,7 @@
 #include "NuppelVideoPlayer.h"
 #include "RingBuffer.h"
 #include "XJ.h"
+#include "settings.h"
 
 void *SpawnEncode(void *param)
 {
@@ -29,19 +30,25 @@ void *SpawnDecode(void *param)
 
 int main(int argc, char *argv[])
 {
-  pthread_t encode, decode;
- 
-  long long filesize = (long long)(5) * 1024 * 1024 * 1024;
-  long long smudge = (long long)(50) * 1024 * 1024; 
+  Settings settings("settings.txt");
+  
+  pthread_t encode, decode; 
+  
+  long long filesize = settings.GetNumSetting("BufferSize");
+  filesize = filesize * 1024 * 1024 * 1024;
+  long long smudge = settings.GetNumSetting("MaxBufferFill");
+  smudge = smudge * 1024 * 1024; 
 
-  RingBuffer *rbuffer = new RingBuffer("/mnt/store/ringbuf.nuv", 
+  RingBuffer *rbuffer = new RingBuffer(settings.GetSetting("BufferName"), 
 		                       filesize, smudge);
   
   NuppelVideoRecorder *nvr = new NuppelVideoRecorder();
   nvr->SetRingBuffer(rbuffer);
-  nvr->SetMotionLevels(0, 0);
-  nvr->SetQuality(120);
-  nvr->SetResolution(640, 480);
+  nvr->SetMotionLevels(settings.GetNumSetting("LumaFilter"), 
+                       settings.GetNumSetting("ChromaFilter"));
+  nvr->SetQuality(settings.GetNumSetting("Quality"));
+  nvr->SetResolution(settings.GetNumSetting("Width"),
+                     settings.GetNumSetting("Height"));
   nvr->Initialize();
   
   NuppelVideoPlayer *nvp = new NuppelVideoPlayer();

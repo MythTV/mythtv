@@ -1,0 +1,19 @@
+# Size of the buffer for watching live tv, in GB
+int BufferSize=5
+
+# The amount of space to fill the buffer up before forcing an unpause, in MB
+int MaxBufferFill=50
+
+# The desired path + name of the live tv buffer
+str BufferName=/mnt/store/ringbuf.nuv
+
+# Resolution to capture at
+int Width=640
+int Height=480
+
+# Quality level to capture at (higher better, 255 being best)
+int Quality=120
+
+# Motion Levels (lower better, 0 being best)
+int LumaFilter=0
+int ChromaFilter=0

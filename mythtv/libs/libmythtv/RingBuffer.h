@@ -8,8 +8,8 @@ using namespace std;
 class RingBuffer
 {
  public:
-    RingBuffer(const char *lfilename, bool actasnormalfile, bool write);
-    RingBuffer(const char *lfilename, long long size, long long smudge);
+    RingBuffer(const string &lfilename, bool actasnormalfile, bool write);
+    RingBuffer(const string &lfilename, long long size, long long smudge);
     
    ~RingBuffer();
 
