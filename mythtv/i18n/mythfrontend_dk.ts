@@ -159,19 +159,19 @@
     <name>MythWizard</name>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Afbryd</translation>
     </message>
     <message>
         <source>&lt; &amp;Back</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;&amp;Tilbage</translation>
     </message>
     <message>
         <source>&amp;Next &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Næste&gt;</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>A&amp;fslut</translation>
     </message>
 </context>
 <context>
@@ -226,47 +226,47 @@
     </message>
     <message>
         <source>Are you sure you want to stop:</source>
-        <translation type="unfinished"></translation>
+        <translation>Er du sikker på du ønsker at stoppe:</translation>
     </message>
     <message>
         <source>Yes, stop recording it</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, stop med at optage</translation>
     </message>
     <message>
         <source>No, do not AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej, unlad at auto-udløbe</translation>
     </message>
     <message>
         <source>No, continue recording it</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej, fortsæt med at optage det</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg handling:</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished">Afspil</translation>
+        <translation>Afspil</translation>
     </message>
     <message>
         <source>Stop Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Hold op med at optage</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Unlad auto-udløb</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-udløb</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Afbryd</translation>
+        <translation>Afbryd</translation>
     </message>
 </context>
 <context>
@@ -603,251 +603,251 @@
     </message>
     <message>
         <source>Pre-scaling theme images</source>
-        <translation type="unfinished"></translation>
+        <translation>Forskalerer tema billeder</translation>
     </message>
     <message>
         <source>Audio output device</source>
-        <translation type="unfinished"></translation>
+        <translation>Lyd ud enhend</translation>
     </message>
     <message>
         <source>Use internal volume controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Brug intern lydstyrke styring</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, uncheck this box.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kan kontrollere PCM og Master mixer lydstyrke. Hvis du foretrækker at bruge et eksternt mixer program så fravælgt denne boks.</translation>
     </message>
     <message>
         <source>Mixer Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Mixer enhed</translation>
     </message>
     <message>
         <source>Changing the volume adjusts the selected mixer.</source>
-        <translation type="unfinished"></translation>
+        <translation>�dring af lydstyrken tilpasser den valgte mixer.</translation>
     </message>
     <message>
         <source>Master Mixer Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Master mixer lydstyrke</translation>
     </message>
     <message>
         <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation type="unfinished"></translation>
+        <translation>Start lydstyrke for Master Mixer.  Dette påvirker al lyd lavet af lydkortet.  Note: Pas på ikke at angive for lave værdier.</translation>
     </message>
     <message>
         <source>PCM Mixer Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>PCM Mixer lydstyrke</translation>
     </message>
     <message>
         <source>Initial volume for PCM output.  Use of the volume keys in MythTV will adjust this parameter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Start lydstyrke for PCM uddata.  Brug af lydstyrke tasterne i MythTV vil tilpasse denne parameter.</translation>
     </message>
     <message>
         <source>Deinterlace playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Deinterlace afspilning</translation>
     </message>
     <message>
         <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Få videon til at se normal ud på en progressivt skærm, såsom en monitor. Deinterlace kræver at din CPU understøtter SSE instruktioner. At slå dette til uden denne understøttelse vil få programmet til at gå ned med en lagersegmentfejl. Se HOWTO dokumentet for mere information.</translation>
     </message>
     <message>
         <source>Extra audio buffering</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekstra lyd buffering</translation>
     </message>
     <message>
         <source>This attempts to keep extra audio data in the internal buffers.  Try setting this if you&apos;re getting crackly audio. (Not used for software encoded video.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette forsøger at holde ekstra lyddata i de interne buffere.  Prøv at slå dette til hvis du får krakeleret lyd.  (Bruges ikke af software indkodet video.)</translation>
     </message>
     <message>
         <source>Jump amount (in minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hop hvor langt (i minutter)</translation>
     </message>
     <message>
         <source>How many minutes to jump forward or backward when the jump keys are pressed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvor mange minutter der skal hoppes fremad eller tilbage når &apos;hop&apos; tasterne trykkes.</translation>
     </message>
     <message>
         <source>Fast forward amount (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Spol fremad (sekunder)</translation>
     </message>
     <message>
         <source>How many seconds to skip forward on a fast forward.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvor mange sekunder der skal hoppes frem ved fremadspoling.</translation>
     </message>
     <message>
         <source>Rewind amount (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Spol tilbage (sekunder)</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvor mange sekunder der skal hoppes tilbage ved tilbagespoling.</translation>
     </message>
     <message>
         <source>Seek to exact frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Søg til bestemt ramme</translation>
     </message>
     <message>
         <source>If enabled, seeking is frame exact, but slower.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er slået til vil søgnning være præcis til ramme-niveau, men langsommere end ellers.</translation>
     </message>
     <message>
         <source>Commercial Skip Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklame skipnings metode</translation>
     </message>
     <message>
         <source>Blank Frame Detection (default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Blank ramme detektion (standard)</translation>
     </message>
     <message>
         <source>Blank Frame + Scene Change Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Blank ramme + scene skift detektion</translation>
     </message>
     <message>
         <source>Scene Change Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Scene skift detektion</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette angiver hvilken metode MythTV skal bruge til at finde reklame start og stop punkter i udsendelser. Du skal have automastic reklame markering slået til for at bruge andet end &apos;Blank ramme&apos;.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisk skipning af reklamer</translation>
     </message>
     <message>
         <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopper automatisk over reklameblokke der er blevet markeret af automatick reklame markering eller via mythcommflag programmet.</translation>
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
-        <translation type="unfinished"></translation>
+        <translation>Markér reklamer automatisk</translation>
     </message>
     <message>
         <source>Automatically flag commercials after a recording completes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Markér reklamer automatisk efter udsendelsen er blevet optaget.</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Strikt reklame detektion</translation>
     </message>
     <message>
         <source>Turn on stricter Commercial Detection code.  If some commercials are not being detected, try turning this setting OFF.</source>
-        <translation type="unfinished"></translation>
+        <translation>Slår mere striks reklame detektion kode til.  Hvis nogle reklamer ikke  bliver detekteret, så prøv at slå dette FRA.</translation>
     </message>
     <message>
         <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto udløb fri disk plads grænse (i gigabyte)</translation>
     </message>
     <message>
         <source>Trigger AutoExpire when free space in Gigabytes goes below this value.  Turn OFF AutoExpire by setting to 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Igangsætter auto udløb når den fri diskplads (i gigabyte) kommer under denne værdi.  Slå Auto udløb FRA ved at sætte værdien til 0.</translation>
     </message>
     <message>
         <source>Auto Expire Frequency (in minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto udløb hyppighed (i minutter)</translation>
     </message>
     <message>
         <source>Number of minutes the AutoExpire process will wait between each time that it checks for free disk space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal minutter auto udløb processen vil vente før den tjekker hvor meget fri disk plads er ledig igen.</translation>
     </message>
     <message>
         <source>Auto Expire Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto udløbs metode</translation>
     </message>
     <message>
         <source>Oldest Show First</source>
-        <translation type="unfinished"></translation>
+        <translation>�dste show først</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to AutoExpire first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Metoden auto udløb skal bruge til at bestemme hvilke optagelser skal slettes først.</translation>
     </message>
     <message>
         <source>Auto-Expire Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto udløb standard</translation>
     </message>
     <message>
         <source>Turn Auto-Expire ON by default when creating new scheduled recordings.  Existing scheduled recordings will keep their current value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå Auto udløb TIL som standard for nye optagelser. Existerende optagelser vil beholde deres nuværende værdi.</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fri disk plads grænse for nye optagelser (i megabyte)</translation>
     </message>
     <message>
         <source>MythTV will stop scheduling new recordings on a backend when its free disk space falls below this value.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV til ikke optage mere før der er mindst denne mænge diskplads tilgængelig på optagemaskinen.</translation>
     </message>
     <message>
         <source>Time to record before start of show (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Begynd optagelse før start af udsendelse (i sekunder)</translation>
     </message>
     <message>
         <source>Time to record past end of show (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortsæt optagelse efter udsendelsen (i sekunder)</translation>
     </message>
     <message>
         <source>List Newest Recording First</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis nyeste optagelser først</translation>
     </message>
     <message>
         <source>If checked (default) the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen. If unchecked the oldest recording will be listed first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Når dette er valgt (standard) vil den nyere optagelse være listet øverst i &apos;Afspil optageler&apos; billedet.  Hvis den er fravalgt vil den ældste optagelse blive vist øverst.</translation>
     </message>
     <message>
         <source>Sticky keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Klæbende taster</translation>
     </message>
     <message>
         <source>If this is set, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er sat vil spoling frem og tilbage fortsætte efter tasten er sluppet.  Trykker man tasten igen forøges frem- eller tilbage-spolingens hastighed.  Vekslen mellem frem og tilbage spolings taster opfører sig altid på denne måde[?].</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprog</translation>
     </message>
     <message>
         <source>English</source>
-        <translation type="unfinished"></translation>
+        <translation>Engelsk</translation>
     </message>
     <message>
         <source>Italian</source>
-        <translation type="unfinished"></translation>
+        <translation>Italiensk</translation>
     </message>
     <message>
         <source>Catalan</source>
-        <translation type="unfinished"></translation>
+        <translation>Katalansk(?)</translation>
     </message>
     <message>
         <source>Spanish</source>
-        <translation type="unfinished"></translation>
+        <translation>Spansk</translation>
     </message>
     <message>
         <source>Dutch</source>
-        <translation type="unfinished"></translation>
+        <translation>Hollandsk</translation>
     </message>
     <message>
         <source>French</source>
-        <translation type="unfinished"></translation>
+        <translation>Fransk</translation>
     </message>
     <message>
         <source>German</source>
-        <translation type="unfinished"></translation>
+        <translation>Tysk</translation>
     </message>
     <message>
         <source>Danish</source>
-        <translation type="unfinished"></translation>
+        <translation>Dansk</translation>
     </message>
     <message>
         <source>Swedish</source>
-        <translation type="unfinished"></translation>
+        <translation>Svensk</translation>
     </message>
     <message>
         <source>Portuguese</source>
-        <translation type="unfinished"></translation>
+        <translation>Portugisisk</translation>
     </message>
     <message>
         <source>Your preferred language.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit foretrukne sprog.</translation>
     </message>
 </context>
 <context>
@@ -896,7 +896,7 @@
     <name>Scheduler</name>
     <message>
         <source>the maximum number of episodes have already been recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det maksimale antal episoder er allerede blevet optaget.</translation>
     </message>
 </context>
 <context>
@@ -1103,15 +1103,15 @@
     </message>
     <message>
         <source>This program is currently being edited</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette program er i øjeblikket ved at blive redigeret</translation>
     </message>
     <message>
         <source>Continue Editing</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortsæt redigering</translation>
     </message>
     <message>
         <source>Do not edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Unlad at redigere</translation>
     </message>
 </context>
 <context>

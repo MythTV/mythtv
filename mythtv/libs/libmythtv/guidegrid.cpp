@@ -215,7 +215,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     gContext->addListener(this);
     
     keyDown = false;
-    setFocusPolicy(QWidget::StrongFocus); //get keyRelease events after refocus
+    setFocusPolicy(QWidget::ClickFocus); //get keyRelease events after refocus
 }
 
 GuideGrid::~GuideGrid()
@@ -244,7 +244,7 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
     //after key is released. Note: Qt's keycompress should handle
     //this but will fail with fast key strokes and keyboard repeat
     //enabled. Keys will not be marked as autorepeat and flood buffer.
-    //setFocusPolicy(QWidget::StrongFocus) in constructor is important 
+    //setFocusPolicy(QWidget::ClickFocus) in constructor is important 
     //or keyRelease events will not be received after a refocus.
     
     if(keyDown && e->key() != Key_Escape && e->key() != Key_C)
@@ -1519,6 +1519,8 @@ void GuideGrid::displayInfo()
 
     if (pginfo)
     {
+        FocusPolicy storeFocus = focusPolicy();
+        setFocusPolicy(QWidget::NoFocus);
         if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
             (pginfo->GetProgramRecordingStatus(m_db) > kAllRecord))
         {
@@ -1531,6 +1533,7 @@ void GuideGrid::displayInfo()
             InfoDialog diag(pginfo, gContext->GetMainWindow(), "Program Info");
             diag.exec();
         }
+        setFocusPolicy(storeFocus);
     }
     else
         return;

@@ -88,9 +88,9 @@
       <area>143,206,645,386</area>
       <guidegrid name="guidegrid" draworder="4">
         <area>0,0,645,386</area>
-        <solidcolor>#000066</solidcolor>
+        <solidcolor>#003256</solidcolor>
         <selector type="box" color="#ffff33"></selector>
-        <recordingcolor>#ff6600</recordingcolor>
+        <recordingcolor>#ff6600</recordingcolor> <!--use #ae5500 for non shaded-->
         <cutdown>no</cutdown>
         <multiline>yes</multiline>
         <textoffset>9,6</textoffset>
@@ -302,9 +302,9 @@
       <area>143,326,645,266</area>
       <guidegrid name="guidegrid" draworder="4">
         <area>0,0,645,266</area>
-        <solidcolor>#999999</solidcolor>
+        <solidcolor>#003256</solidcolor>
         <selector type="box" color="#ffff33"></selector>
-        <recordingcolor>#ff6600</recordingcolor>
+        <recordingcolor>#ff6600</recordingcolor> <!--use #ae5500 for non shaded-->
         <textoffset>9,6</textoffset>
         <catcolor category="Educational" color="CornflowerBlue"></catcolor>
         <catcolor category="Adult" color="thistle3"></catcolor>

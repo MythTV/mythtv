@@ -197,6 +197,9 @@ void InfoDialog::advancedEdit(QListViewItem *)
     QSqlDatabase *m_db = QSqlDatabase::database();;
     ScheduledRecording record;
     record.loadByProgram(m_db, myinfo);
+
+    setFocusPolicy(QWidget::NoFocus);
+    lview->setFocusPolicy(QWidget::NoFocus);
     record.exec(m_db);
 
     reject();

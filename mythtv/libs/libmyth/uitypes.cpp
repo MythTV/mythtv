@@ -732,18 +732,18 @@ void UIGuideType::drawBackground(QPainter *dr, int num)
         dr->setPen(QPen(QColor(m_solidcolor), (int)(2 * m_wmult)));
         dr->fillRect(area, QBrush( QColor(m_solidcolor), Qt::Dense4Pattern));
 
-        dr->setBrush( QBrush(QColor("#0000ee")) );
-        dr->setPen(QPen(QColor("#0000ee"), (int)(2 * m_wmult)));
+        dr->setBrush( QBrush(QColor("#003367")) );
+        dr->setPen(QPen(QColor("#003367"), (int)(2 * m_wmult)));
         dr->drawLine(area.left() - 1, area.top() - 1, area.right() + 1, area.top() - 1);
         dr->drawLine(area.left(), area.top(), area.right(), area.top());
 
-        dr->setBrush( QBrush(QColor("#0000aa")) );
-        dr->setPen(QPen(QColor("#0000aa"), (int)(2 * m_wmult)));
+        dr->setBrush( QBrush(QColor("#003367")) );
+        dr->setPen(QPen(QColor("#003367"), (int)(2 * m_wmult)));
         dr->drawLine(area.left() - 1, area.top(), area.left() - 1, area.bottom());
         dr->drawLine(area.left(), area.top() + 1, area.left(), area.bottom() - 1);
 
-        dr->setBrush( QBrush(QColor("#000033")) );
-        dr->setPen(QPen(QColor("#000033"), (int)(2 * m_wmult)));
+        dr->setBrush( QBrush(QColor("#002536")) );
+        dr->setPen(QPen(QColor("#002536"), (int)(2 * m_wmult)));
         dr->drawLine(area.left() - 1, area.bottom() + 1, area.right() + 1, area.bottom() + 1);
         dr->drawLine(area.left(), area.bottom(), area.right(), area.bottom());
         dr->drawLine(area.right() + 1, area.top() + 1, area.right() + 1, area.bottom());
@@ -755,17 +755,17 @@ void UIGuideType::drawBackground(QPainter *dr, int num)
         dr->setPen(QPen(QColor(m_solidcolor), (int)(2 * m_wmult)));
         dr->fillRect(area, QBrush(QColor(m_solidcolor)));
 
-        dr->setBrush( QBrush(QColor("#0000bb")) );
-        dr->setPen(QPen(QColor("#0000bb"), (int)(2 * m_wmult)));
+        dr->setBrush( QBrush(QColor("#003367")) );
+        dr->setPen(QPen(QColor("#003367"), (int)(2 * m_wmult)));
 
         dr->drawLine(area.left() - 1, area.top() - 1, area.right() + 1, area.top() - 1);
 
-        dr->setBrush( QBrush(QColor("#000099")) );
-        dr->setPen(QPen(QColor("#000099"), (int)(2 * m_wmult)));
+        dr->setBrush( QBrush(QColor("#003367")) );
+        dr->setPen(QPen(QColor("#003367"), (int)(2 * m_wmult)));
         dr->drawLine(area.left() - 1, area.top(), area.left() - 1, area.bottom());
 
-        dr->setBrush( QBrush(QColor("#000033")) );
-        dr->setPen(QPen(QColor("#000033"), (int)(2 * m_wmult)));
+        dr->setBrush( QBrush(QColor("#002536")) );
+        dr->setPen(QPen(QColor("#002536"), (int)(2 * m_wmult)));
         dr->drawLine(area.left() - 1, area.bottom() + 1, area.right() + 1, area.bottom() + 1);
         dr->drawLine(area.right() + 1, area.top() + 1, area.right() + 1, area.bottom());
 
