@@ -14,8 +14,8 @@ Next
 <H2><A NAME="s22">22.</A> <A HREF="mythtv-HOWTO.html#toc22">Example Configurations</A></H2>
 
 <P>This section contains configurations which you may find useful.</P>
-<H2><A NAME="pvr250"></A> <A NAME="ss22.1">22.1</A> <A HREF="mythtv-HOWTO.html#toc22.1">Hauppauge PVR-250/350 hardware MPEG-2 encoder.</A>
-I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350). </H2>
+<H2><A NAME="pvr250"></A> <A NAME="ss22.1">22.1</A> <A HREF="mythtv-HOWTO.html#toc22.1">Hauppauge PVR-250/350 hardware MPEG-2 encoder. </A>
+</H2>
 
 <P><B>NOTE</B>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
 NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER ASSISTANCE,
@@ -69,6 +69,17 @@ Windows driver if the <B>wget</B> command fails.</P>
 <PRE>
 $ cd ~/ivtv/ivtv/driver
 $ make
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Compile the <B>test_ioctl</B> program:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd ../utils
+$ make
+$ su
+# cp test_ioctl /usr/local/bin
+# exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -167,7 +178,7 @@ will create files at about 4GB/hour.  If you wish to adjust these
 parameters, add something like the following to your <CODE>rc.local</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
-/path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
+/usr/local/bin/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -175,6 +186,8 @@ parameters, add something like the following to your <CODE>rc.local</CODE>:
 depend on the capture resolution.  The above example is more than adequate
 for 480x480.  Once the IVTV API has settled down MythTV will incorporate the
 ability to modify the bitrate internally.</P>
+<P>If you have multiple cards, use the <CODE>-d</CODE> parameter to specify which
+<CODE>/dev/video</CODE> device to configure.</P>
 <P>
 <A NAME="troubleshooting_pvraudio"></A> <B>NOTE</B>:  some people complain
 that their PVR-250/350 card is not capturing audio.  The most likely source
@@ -297,7 +310,8 @@ $ su
 </CODE></BLOCKQUOTE>
 
 As you can see, there were a number of different versions of lirc already
-installed on this system.  They must be removed.
+installed on this system.  They must be removed.  We don't care about the
+source code or the man pages, only the executables and the kernel modules.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -404,7 +418,7 @@ by all groups?</LI>
 <LI>If you think you may have had old LIRC device drivers you may need to
 reboot to ensure that they're totally out of the system.  Try running
 modprobe -r lirc_i2c as root first, then modprobe lirc_i2c and try again.</LI>
-<LI>What path does modprobe lirc_i2c and modprobe lirc_dev show?  It
+<LI>What path does modinfo lirc_i2c and modinfo lirc_dev show?  It
 should be in /lib/modules/{your kernel version}/misc/</LI>
 </UL>
 </P>
@@ -455,7 +469,7 @@ your <CODE>rc.local</CODE>:
 <PRE>
 $ su
 # echo "modprobe lirc_i2c" >> /etc/rc.d/rc.local
-# echo "lircd" >> /etc/rc.d/rc.local
+# echo "/usr/local/sbin/lircd" >> /etc/rc.d/rc.local
 # exit
 </PRE>
 </CODE></BLOCKQUOTE>

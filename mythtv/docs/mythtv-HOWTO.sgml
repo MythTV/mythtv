@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-09-21, v2.80
+<date>2003-09-24, v2.81
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3548,6 +3548,13 @@ with no major errors?
 <p>You didn't add <tt>/usr/local/lib</tt> to <tt>/etc/ld.so.conf</tt>.  See the
 section on modifying <ref id="modifying_ld.so.conf" name="/etc/ld.so.conf">.
 
+<sect1>Troubleshooting the Hauppauge PVR-250 IR remote
+<p>The most likely issue is that you have incompatible versions of the
+<bf>lirc_i2c</bf> and <bf>lirc_dev</bf> modules and the various
+<bf>lircd</bf> programs.  See the section called <ref id="hauppauge_remote"
+name="Hauppauge PVR-250 remote and MythTV's native LIRC support."> for
+examples on finding and removing old versions of lirc.
+
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. 
 <p>Matthew Zimmerman has created a patch for MPlayer / Mencoder <url
@@ -4098,17 +4105,10 @@ transcoding.
 Once the transcode is complete, mythbackend will replace the old file
 with the new as soon as it is no longer in use.
 
-<sect1>Troubleshooting the Hauppauge PVR-250 IR remote
-<p>The most likely issue is that you have incompatible versions of the
-<bf>lirc_i2c</bf> and <bf>lirc_dev</bf> modules and the various
-<bf>lircd</bf> programs.  See the section called <ref id="hauppauge_remote"
-name="Hauppauge PVR-250 remote and MythTV's native LIRC support."> for
-examples on finding and removing old versions of lirc.
 
 <sect>Example Configurations
 <p>This section contains configurations which you may find useful.
-<sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder.
-I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350). <label id="pvr250">
+<sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder. <label id="pvr250">
 <p><bf>NOTE</bf>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
 NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER ASSISTANCE,
 SEE THE IVTV MAILING LIST.  <url
@@ -4160,6 +4160,15 @@ Next, compile the driver:
 <tscreen><verb>
 $ cd ~/ivtv/ivtv/driver
 $ make
+</verb></tscreen>
+
+Compile the <bf>test_ioctl</bf> program:
+<tscreen><verb>
+$ cd ../utils
+$ make
+$ su
+# cp test_ioctl /usr/local/bin
+# exit
 </verb></tscreen>
 
 <bf>NOTE</bf>: You may get warnings about i2c during the compile.  Ignore
@@ -4252,13 +4261,16 @@ By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.  This
 will create files at about 4GB/hour.  If you wish to adjust these
 parameters, add something like the following to your <tt>rc.local</tt>:
 <tscreen><verb>
-/path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
+/usr/local/bin/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
 </verb></tscreen>
 
 The actual values to use should be adjusted to your liking and in part
 depend on the capture resolution.  The above example is more than adequate
 for 480x480.  Once the IVTV API has settled down MythTV will incorporate the
 ability to modify the bitrate internally.
+
+If you have multiple cards, use the <tt>-d</tt> parameter to specify which
+<tt>/dev/video</tt> device to configure.
 
 <label id="troubleshooting_pvraudio"><bf>NOTE</bf>:  some people complain
 that their PVR-250/350 card is not capturing audio.  The most likely source
@@ -4372,7 +4384,8 @@ $ su
 /usr/local/man/man1/irxevent.1
 </verb></tscreen>
 As you can see, there were a number of different versions of lirc already
-installed on this system.  They must be removed.
+installed on this system.  They must be removed.  We don't care about the
+source code or the man pages, only the executables and the kernel modules.
 <tscreen><verb>
 $ su
 # rm -rf /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc
@@ -4465,7 +4478,7 @@ by all groups?
 <item>If you think you may have had old LIRC device drivers you may need to
 reboot to ensure that they're totally out of the system.  Try running
 modprobe -r lirc_i2c as root first, then modprobe lirc_i2c and try again.
-<item>What path does modprobe lirc_i2c and modprobe lirc_dev show?  It
+<item>What path does modinfo lirc_i2c and modinfo lirc_dev show?  It
 should be in /lib/modules/{your kernel version}/misc/
 </itemize>
 
@@ -4511,7 +4524,7 @@ your <tt>rc.local</tt>:
 <tscreen><verb>
 $ su
 # echo "modprobe lirc_i2c" >> /etc/rc.d/rc.local
-# echo "lircd" >> /etc/rc.d/rc.local
+# echo "/usr/local/sbin/lircd" >> /etc/rc.d/rc.local
 # exit
 </verb></tscreen>
 
@@ -4843,6 +4856,10 @@ for MythNews.
 v2.80, 2003-09-21.  Fix LVM acronym.  Explicit filenames for lirc to look
 for if it's not working.  modinfo examples of pathname to check that the
 correct modules are being loaded.  "Troubleshooting PVR-250" section.
+v2.81, 2003-09-24.  Put PVR-250 troubleshooting in the troubleshooting
+section.  Correct troubleshooting step.  Fix section header for PVR-250. 
+Full path for lircd.  Incorporate suggestion from -users on test_ioctl and
+-d parameter.
 -->
 
 <!--

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-21, v2.80
+  2003-09-24, v2.81
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -178,6 +178,7 @@
      20.23 What does "strange error flushing buffer" mean on my console?
      20.24 I can't change the channel when watching Live TV.
      20.25 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
+     20.26 Troubleshooting the Hauppauge PVR-250 IR remote
 
   21. Miscellaneous.
      21.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -201,10 +202,9 @@
         21.11.2 Gentoo
      21.12 Advanced Backend Configurations.
      21.13 What is this transcoder thing, and how do I use it?
-     21.14 Troubleshooting the Hauppauge PVR-250 IR remote
 
   22. Example Configurations
-     22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder. I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).
+     22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder.
      22.2 Hauppauge PVR-250 remote and MythTV's native LIRC support.
      22.3 Logical Volume Manager (LVM).
         22.3.1 ReiserFS
@@ -4449,6 +4449,14 @@
   modifying ``/etc/ld.so.conf''.
 
 
+  [1m20.26.  Troubleshooting the Hauppauge PVR-250 IR remote[0m
+
+  The most likely issue is that you have incompatible versions of the
+  [1mlirc_i2c [22mand [1mlirc_dev [22mmodules and the various [1mlircd [22mprograms.  See the
+  section called ``Hauppauge PVR-250 remote and MythTV's native LIRC
+  support.'' for examples on finding and removing old versions of lirc.
+
+
   [1m21.  Miscellaneous.[0m
 
   [1m21.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -4469,8 +4477,7 @@
   <http://dijkstra.csh.rit.edu/~mdz/mythtv/>.
 
 
-
-  $ wget http://dijkstra.csh.rit.edu/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
+       $ wget http://dijkstra.csh.rit.edu/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
 
 
 
@@ -4533,7 +4540,6 @@
 
   +o  544x240
 
-
   +o  480x240
 
   +o  352x240
@@ -4593,6 +4599,7 @@
   at one of the lower resolutions. Everything in MythTV is scalable and
   should 'fit' regardless of the resolution you choose.
 
+
   Edit your X configuration file, usually "XF86Config-4", so that the
   the resolution you want to use is listed first in the lists under
   "Screen". If this resolution is higher than the resolutions supported
@@ -4600,6 +4607,8 @@
   the mouse to the edge will scroll around a desktop area which is
   larger than the display size. If this happens, edit your X
   configuration file to match the display size then restart X.
+
+
   [1m21.4.2.  MythTV Dimensions[0m
 
   In 0.10 and later, from "mythfrontend" go to Setup->Appearance.  The
@@ -4653,6 +4662,7 @@
   picture uses the recording resolution for its dimensions. If you check
   the box "Fixed Aspect Ratio" in Setup->Playback, the windowed picture
   will always be resized to normal 4:3 shape.
+
 
 
   [1m21.5.  I'd like to save or restore my database.[0m
@@ -4715,6 +4725,7 @@
   +o  Hauppauge WinTV-Theater, model 495, 498 (Europe)
 
   +o  ATI TV Wonder
+
 
   The following cards do not work:
 
@@ -4779,8 +4790,6 @@
 
   On the host machine, (in this case, the hostname is "masterbackend")
   you'll want to edit your /etc/exports file and use something like:
-
-
        /var/video (rw)
 
 
@@ -4789,6 +4798,8 @@
 
   On the "slave" machine, you'll want to edit the /etc/fstab file and
   add something like:
+
+
        masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
 
 
@@ -4903,8 +4914,6 @@
 
   Create the directory /var/log/mythtv and set its permissions as
   follows:
-
-
        $ su
        # mkdir /var/log/mythtv
        # chown root:mythtv /var/log/mythtv
@@ -4913,6 +4922,8 @@
        $ ls -ld /var/log/mythtv
        drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
        $
+
+
 
   [1m21.11.1.2.  Mandrake 9.x[0m
 
@@ -4975,6 +4986,8 @@
 
 
        # /etc/init.d/mythbackend stop
+
+
 
   To obtain a list of options:
 
@@ -5040,6 +5053,7 @@
   encoders (PVR-250) or systems that can only record in RTJpeg due to
   performance reasons (multiple capture cards, slow system, etc) to
   create MPEG4 streams to save space.
+
   The transcoder can be used in two ways:
 
   +o  Automatically re-encode every file once it has completed recording
@@ -5084,20 +5098,12 @@
   with the new as soon as it is no longer in use.
 
 
-  [1m21.14.  Troubleshooting the Hauppauge PVR-250 IR remote[0m
-
-  The most likely issue is that you have incompatible versions of the
-  [1mlirc_i2c [22mand [1mlirc_dev [22mmodules and the various [1mlircd [22mprograms.  See the
-  section called ``Hauppauge PVR-250 remote and MythTV's native LIRC
-  support.'' for examples on finding and removing old versions of lirc.
-
 
   [1m22.  Example Configurations[0m
 
   This section contains configurations which you may find useful.
 
-  [1m22.1.  Hauppauge PVR-250/350 hardware MPEG-2 encoder. I'd like to use[0m
-  [1ma hardware MPEG-2 encoder (ie, a PVR-250/350).[0m
+  [1m22.1.  Hauppauge PVR-250/350 hardware MPEG-2 encoder.[0m
 
   [1mNOTE[22m:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS NOT
   GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER
@@ -5160,20 +5166,30 @@
 
 
 
+  Compile the [1mtest_ioctl [22mprogram:
+
+
+       $ cd ../utils
+       $ make
+       $ su
+       # cp test_ioctl /usr/local/bin
+       # exit
+
+
+
   [1mNOTE[22m: You may get warnings about i2c during the compile.  Ignore them.
 
   Add the following to /etc/modules.conf:
 
 
-
-  alias char-major-81     videodev
-  alias char-major-81-0   ivtv
-  alias char-major-61 lirc_i2c
-  options ivtv debug=1
-  options tuner type=2
-  options msp3400 once=1 simple=1
-  add below ivtv msp3400 saa7115 tuner
-  add above ivtv lirc_dev lirc_i2c
+       alias char-major-81     videodev
+       alias char-major-81-0   ivtv
+       alias char-major-61 lirc_i2c
+       options ivtv debug=1
+       options tuner type=2
+       options msp3400 once=1 simple=1
+       add below ivtv msp3400 saa7115 tuner
+       add above ivtv lirc_dev lirc_i2c
 
 
 
@@ -5204,15 +5220,16 @@
   Check that the card is being recognized on the PCI bus:
 
 
-       $ lspci -v
-       <snip>
 
-       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-       Encoder (rev 01)
-               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-               Flags: bus master, medium devsel, latency 32, IRQ 11
-               Memory at d0000000 (32-bit, prefetchable) [size=64M]
-               Capabilities: <available only to root>
+  $ lspci -v
+  <snip>
+
+  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+  Encoder (rev 01)
+          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+          Flags: bus master, medium devsel, latency 32, IRQ 11
+          Memory at d0000000 (32-bit, prefetchable) [size=64M]
+          Capabilities: <available only to root>
 
 
 
@@ -5227,6 +5244,8 @@
        crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
        crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
        crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
+
+
 
   In this case, the ivtv device is video0.
 
@@ -5261,7 +5280,7 @@
   parameters, add something like the following to your rc.local:
 
 
-       /path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
+       /usr/local/bin/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
 
 
 
@@ -5269,6 +5288,9 @@
   depend on the capture resolution.  The above example is more than
   adequate for 480x480.  Once the IVTV API has settled down MythTV will
   incorporate the ability to modify the bitrate internally.
+
+  If you have multiple cards, use the -d parameter to specify which
+  /dev/video device to configure.
 
   [1mNOTE[22m:  some people complain that their PVR-250/350 card is not
   capturing audio.  The most likely source for this is that your system
@@ -5291,8 +5313,8 @@
 
 
 
-  # modinfo msp3400
-  filename:    /lib/modules/2.4.22-9mdk/kernel/drivers/media/video/msp3400.o
+       # modinfo msp3400
+       filename:    /lib/modules/2.4.22-9mdk/kernel/drivers/media/video/msp3400.o
 
 
 
@@ -5353,48 +5375,52 @@
        # exit
 
 
+
   Check to ensure that you don't have other versions of lirc modules and
   programs on your system:
 
 
-       $ su
-       # updatedb
-       # locate lirc_i2c|grep `uname -r`
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
-       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-       # locate lirc_dev|grep `uname -r`
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
-       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
-       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
-       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
+  $ su
+  # updatedb
+  # locate lirc_i2c|grep `uname -r`
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
+  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-       # locate irw|grep "/usr"
-       /usr/bin/irw
-       /usr/local/bin/irw
-       /usr/local/man/man1/irw.1
+  # locate lirc_dev|grep `uname -r`
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
+  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
+  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
+  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
 
-       # locate lircd|grep "/usr"
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
-       /usr/share/man/man8/lircd.8.bz2
-       /usr/share/doc/lirc-0.6.6/html/lircd.html
-       /usr/sbin/lircd
-       /usr/local/sbin/lircd
-       /usr/local/man/man8/lircd.8
+  # locate irw|grep "/usr"
+  /usr/bin/irw
+  /usr/local/bin/irw
+  /usr/local/man/man1/irw.1
 
-       # locate irxevent|grep "/usr"
-       /usr/share/man/man1/irxevent.1.bz2
-       /usr/share/doc/lirc-0.6.6/html/irxevent.html
-       /usr/share/doc/lirc-0.6.6/irxevent.keys
-       /usr/bin/irxevent
-       /usr/local/bin/irxevent
-       /usr/local/man/man1/irxevent.1
+  # locate lircd|grep "/usr"
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
+  /usr/share/man/man8/lircd.8.bz2
+  /usr/share/doc/lirc-0.6.6/html/lircd.html
+  /usr/sbin/lircd
+  /usr/local/sbin/lircd
+  /usr/local/man/man8/lircd.8
+
+  # locate irxevent|grep "/usr"
+  /usr/share/man/man1/irxevent.1.bz2
+  /usr/share/doc/lirc-0.6.6/html/irxevent.html
+  /usr/share/doc/lirc-0.6.6/irxevent.keys
+  /usr/bin/irxevent
+  /usr/local/bin/irxevent
+  /usr/local/man/man1/irxevent.1
 
 
 
   As you can see, there were a number of different versions of lirc
-  already installed on this system.  They must be removed.
+  already installed on this system.  They must be removed.  We don't
+  care about the source code or the man pages, only the executables and
+  the kernel modules.
 
 
        $ su
@@ -5416,9 +5442,11 @@
   Mandrake now includes i2c version 2.8.0 which changes the semantics of
   some low-level calls.  You will need to patch LIRC in order for it to
   work correctly.  Download the patch and install:
-       $ cd lirc-0.7.0pre2
-       $ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
-       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+
+
+  $ cd lirc-0.7.0pre2
+  $ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
+  $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
 
@@ -5511,7 +5539,7 @@
      running modprobe -r lirc_i2c as root first, then modprobe lirc_i2c
      and try again.
 
-  +o  What path does modprobe lirc_i2c and modprobe lirc_dev show?  It
+  +o  What path does modinfo lirc_i2c and modinfo lirc_dev show?  It
      should be in /lib/modules/{your kernel version}/misc/
 
   If none of the above works, and [1mirw [22mstill isn't showing keypresses,
@@ -5562,7 +5590,7 @@
 
        $ su
        # echo "modprobe lirc_i2c" >> /etc/rc.d/rc.local
-       # echo "lircd" >> /etc/rc.d/rc.local
+       # echo "/usr/local/sbin/lircd" >> /etc/rc.d/rc.local
        # exit
 
 
