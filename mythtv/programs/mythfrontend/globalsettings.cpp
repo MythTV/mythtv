@@ -460,7 +460,7 @@ public:
 class XScanDisplacement: public SpinBoxSetting, public GlobalSetting {
 public:
     XScanDisplacement():
-        SpinBoxSetting(0, 800, 1),
+        SpinBoxSetting(-50, 50, 1),
         GlobalSetting("XScanDisplacement") {
         setLabel("Scan displacement (X)");
         setValue(0);
@@ -471,7 +471,7 @@ public:
 class YScanDisplacement: public SpinBoxSetting, public GlobalSetting {
 public:
     YScanDisplacement():
-        SpinBoxSetting(0, 800, 1),
+        SpinBoxSetting(-50, 50, 1),
         GlobalSetting("YScanDisplacement") {
         setLabel("Scan displacement (Y)");
         setValue(0);

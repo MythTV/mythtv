@@ -143,7 +143,7 @@ class MPEG2audVolume: public CodecParam, public SliderSetting {
 public:
     MPEG2audVolume(const RecordingProfile& parent):
         CodecParam(parent, "mpeg2audvolume"),
-        SliderSetting(0,100,2) {
+        SliderSetting(0,100,1) {
 
         setLabel("Volume (%)");
         setValue(90);
