@@ -70,11 +70,13 @@
   what it does.  If your machine is hanging or rebooting, you most likely
   have a problem with your hardware or kernel device drivers.
 
-) I'm using ALSA, and bad things happen when I change channels
+) Bad things (hang, reboot, etc.) happen when I change channels
 - There was a bug in some versions of ALSA which affected MythTV users
   this way.  See
   http://www.geocrawler.com/lists/3/SourceForge/12349/75/10112099/
   for a patch, or upgrade to ALSA 0.9.0rc6 or later.
+- Your sound card may have problems operating in full duplex mode
+  (recording and playing back at the same time)
 
 ) When trying to run setup, I get an "Illegal instruction", "Bus error" or
   "Segmentation fault" message
