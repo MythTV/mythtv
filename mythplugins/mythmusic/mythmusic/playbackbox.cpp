@@ -581,7 +581,8 @@ void PlaybackBox::CycleVisualizer()
             {
                 new_visualizer =  allowed_modes[rand() % allowed_modes.size()];
             } 
-            while (new_visualizer == mainvisual->getCurrentVisual());
+            while (new_visualizer == mainvisual->getCurrentVisual() &&
+                   allowed_modes.count() > 1);
         }
         else
         {
@@ -748,7 +749,7 @@ void PlaybackBox::next()
     if(repeatmode == REPEAT_ALL)
     {
         //
-        //  Grap the next track after this
+        //  Grab the next track after this
         //  one. First flag is to wrap around
         //  to the beginning of the list. Second
         //  decides if we will traverse up and down
@@ -1103,6 +1104,11 @@ void PlaybackBox::customEvent(QCustomEvent *event)
             {
                 time_text->SetText(time_string);
                 info_text->SetText(info_string);
+                
+                //
+                //  This would also work
+                //
+                // info_text->SetText(mainvisual->getCurrentVisual());
             }
 
             break;

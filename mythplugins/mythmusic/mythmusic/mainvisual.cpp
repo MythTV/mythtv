@@ -36,6 +36,30 @@ using namespace std;
 
 static QPtrList<VisFactory> *visfactories = 0;
 
+static void checkVisFactories(void)
+{
+    if (!visfactories)
+    {
+        visfactories = new QPtrList<VisFactory>;
+
+        MainVisual::registerVisFactory(new BlankFactory);
+
+        MainVisual::registerVisFactory(new MonoScopeFactory);
+        MainVisual::registerVisFactory(new StereoScopeFactory);
+        MainVisual::registerVisFactory(new SynaesthesiaFactory);
+        MainVisual::registerVisFactory(new SpectrumFactory);
+#ifdef OPENGL_SUPPORT
+        MainVisual::registerVisFactory(new GearsFactory);
+#endif
+#ifdef SDL_SUPPORT
+        MainVisual::registerVisFactory(new BumpScopeFactory);
+        MainVisual::registerVisFactory(new GoomFactory);
+#endif
+    }
+}
+
+
+
 MainVisual::MainVisual(QWidget *parent, const char *name)
     : QWidget( parent, name ), vis( 0 ), playing( FALSE ), fps( 20 )
 {
@@ -89,18 +113,29 @@ void MainVisual::setVisual( const QString &visualname )
 
     if (allowed_modes.contains("Random"))
     {
-        newvis = randomVis(this, winId());
+        //
+        //  Pick anything from compile time options
+        //
+
+        checkVisFactories();
+        int numvis = visfactories->count() - 1;
+        int i = 1 + (int)((double)rand() / (RAND_MAX + 1.0) * numvis);
+        VisFactory *fact = visfactories->at(i);
+        current_visual_name = fact->name();
+        
     }
     else 
     {
+        //
+        //  Pick anything from run time options
+        //
         int vis_mode_index = 0;
         if (allowed_modes.size() > 1)
             vis_mode_index = rand() % allowed_modes.size();
 
         current_visual_name = allowed_modes[vis_mode_index].stripWhiteSpace();
-        newvis = createVis(current_visual_name, this, winId());
     }
-    	
+    newvis = createVis(current_visual_name, this, winId());
     setVis( newvis );
 }
 
@@ -277,28 +312,6 @@ void MainVisual::registerVisFactory(VisFactory *vis)
     visfactories->append(vis);
 }
 
-static void checkVisFactories(void)
-{
-    if (!visfactories)
-    {
-        visfactories = new QPtrList<VisFactory>;
-
-        MainVisual::registerVisFactory(new BlankFactory);
-
-        MainVisual::registerVisFactory(new MonoScopeFactory);
-        MainVisual::registerVisFactory(new StereoScopeFactory);
-        MainVisual::registerVisFactory(new SynaesthesiaFactory);
-        MainVisual::registerVisFactory(new SpectrumFactory);
-#ifdef OPENGL_SUPPORT
-        MainVisual::registerVisFactory(new GearsFactory);
-#endif
-#ifdef SDL_SUPPORT
-        MainVisual::registerVisFactory(new BumpScopeFactory);
-        MainVisual::registerVisFactory(new GoomFactory);
-#endif
-    }
-}
-
 VisualBase *MainVisual::createVis(const QString &name, MainVisual *parent,
                                   long int winid)
 {
@@ -320,6 +333,8 @@ VisualBase *MainVisual::createVis(const QString &name, MainVisual *parent,
     return vis;
 }
 
+/*
+
 VisualBase *MainVisual::randomVis(MainVisual *parent, long int winid)
 {
     checkVisFactories();
@@ -338,6 +353,7 @@ VisualBase *MainVisual::randomVis(MainVisual *parent, long int winid)
 
     return vis;
 }
+*/
 
 StereoScope::StereoScope()
 {

@@ -445,10 +445,10 @@ void DatabaseBox::selected(QListViewItem *item)
     //  else (Effectice C++ 2nd Ed on my lap, pg. 181,
     //  which I am partially disregarding due to laziness)
     
-    
     if(CDCheckItem *item_ptr = dynamic_cast<CDCheckItem*>(item))
     {
         //  Something to do with a CD
+        item_ptr->setOn(!item_ptr->isOn());
         doSelected(item_ptr, true);
         if (CDCheckItem *item_ptr = dynamic_cast<CDCheckItem*>(item->parent()))
         {
@@ -458,6 +458,7 @@ void DatabaseBox::selected(QListViewItem *item)
     }
     else if(TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item))
     {
+        item_ptr->setOn(!item_ptr->isOn());
         doSelected(item_ptr, false);
         if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item->parent()))
         {
@@ -709,7 +710,7 @@ void DatabaseBox::doSelected(QListViewItem *item, bool cd_flag)
     bool keep_going = false;
 
     TreeCheckItem *tcitem = (TreeCheckItem *)item;
-    
+
     if(tcitem->childCount() > 0)
     {
         keep_going = true;
@@ -722,7 +723,6 @@ void DatabaseBox::doSelected(QListViewItem *item, bool cd_flag)
     
     if(keep_going)
     {
-    
         TreeCheckItem *child = (TreeCheckItem *)tcitem->firstChild();
         while (child) 
         {
@@ -867,14 +867,15 @@ void DatabaseBox::moveHeldUpDown(bool flag)
 
 void DatabaseBox::keyPressEvent(QKeyEvent *e)
 {
-    //  NB: BAD
-    //  this is the wrong way to be doing this
-    //  fix soon
+    //
+    //  This is a bit wonky, but it works
+    // 
 
     if(holding_track)
     {
-        if( e->key() == Key_Space || 
-            e->key() == Key_Enter ||
+        if( e->key() == Key_Space  || 
+            e->key() == Key_Enter  ||
+            e->key() == Key_Return ||
             e->key() == Key_Escape)
         {
             //  Done holding this track

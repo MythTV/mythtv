@@ -94,7 +94,6 @@ public:
     static void registerVisFactory(VisFactory *);
     static VisualBase *createVis(const QString &name,
                                  MainVisual *parent, long int winid);
-    static VisualBase *randomVis(MainVisual *parent, long int winid);
 
 public slots:
     void timeout();
