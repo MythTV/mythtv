@@ -5,8 +5,8 @@
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4639
-#define LIBAVCODEC_BUILD_STR   "4639"
+#define LIBAVCODEC_BUILD       4640
+#define LIBAVCODEC_BUILD_STR   "4640"
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -15,8 +15,10 @@ enum CodecID {
     CODEC_ID_RV10,
     CODEC_ID_MP2,
     CODEC_ID_MP3LAME,
+    CODEC_ID_VORBIS,
     CODEC_ID_AC3,
     CODEC_ID_MJPEG,
+    CODEC_ID_MJPEGB,
     CODEC_ID_MPEG4,
     CODEC_ID_RAWVIDEO,
     CODEC_ID_MSMPEG4V1,
@@ -27,7 +29,6 @@ enum CodecID {
     CODEC_ID_H263P,
     CODEC_ID_H263I,
     CODEC_ID_SVQ1,
-    CODEC_ID_VORBIS,
     CODEC_ID_DVVIDEO,
     CODEC_ID_DVAUDIO,
     CODEC_ID_WMAV1,
@@ -145,6 +146,7 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_FLAG_NORMALIZE_AQP  0x00020000 /* normalize adaptive quantization */
 #define CODEC_FLAG_INTERLACED_DCT 0x00040000 /* use interlaced dct */
 #define CODEC_FLAG_LOW_DELAY      0x00080000 /* force low delay / will fail on b frames */
+#define CODEC_FLAG_ALT_SCAN       0x00100000 /* use alternate scan */
 
 /* codec capabilities */
 
@@ -222,8 +224,7 @@ typedef struct AVCodecContext {
     int width, height;
     
     /**
-     * encoding: set by user. 0 if not known
-     * decoding: set by lavc. 0 if not known
+     * Obsolete, will be removed
      */
     int aspect_ratio_info;
 #define FF_ASPECT_SQUARE 1
@@ -646,9 +647,7 @@ typedef struct AVCodecContext {
     float rc_initial_cplx;
 
     /**
-     * custom aspect ratio, used if aspect_info==FF_ASPECT_EXTENDED
-     * encoding: set by user.
-     * decoding: set by lavc.
+     * Obsolete, will be removed
      */
     int aspected_width;
     int aspected_height;
@@ -795,6 +794,13 @@ typedef struct AVCodecContext {
 #define FF_PRED_LEFT   0
 #define FF_PRED_PLANE  1
 #define FF_PRED_MEDIAN 2
+    
+    /**
+     * aspect ratio. (0 if unknown)
+     * encoding: set by user.
+     * decoding: set by lavc.
+     */
+    float aspect_ratio;
 } AVCodecContext;
 
 typedef struct AVCodec {
@@ -853,11 +859,13 @@ extern AVCodec dvaudio_decoder;
 extern AVCodec wmav1_decoder;
 extern AVCodec wmav2_decoder;
 extern AVCodec mjpeg_decoder;
+extern AVCodec mjpegb_decoder;
 extern AVCodec mp2_decoder;
 extern AVCodec mp3_decoder;
 extern AVCodec mace3_decoder;
 extern AVCodec mace6_decoder;
 extern AVCodec huffyuv_decoder;
+extern AVCodec oggvorbis_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \

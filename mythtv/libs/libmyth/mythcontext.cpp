@@ -77,7 +77,7 @@ void MythContext::LoadSettingsFiles(const QString &filename)
 
 void MythContext::LoadSettingsDatabase(QSqlDatabase *db)
 {
-    QString thequery = "SELECT * FROM mythsettings";
+    QString thequery = "SELECT * FROM settings";
     QSqlQuery query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)

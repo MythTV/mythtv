@@ -41,6 +41,7 @@ void avcodec_register_all(void)
 #endif
 #ifdef CONFIG_VORBIS
     register_avcodec(&oggvorbis_encoder);
+    register_avcodec(&oggvorbis_decoder);
 #endif
     register_avcodec(&mpeg1video_encoder);
     register_avcodec(&h263_encoder);
@@ -73,6 +74,7 @@ void avcodec_register_all(void)
     register_avcodec(&dvvideo_decoder);
     //    register_avcodec(&dvaudio_decoder);
     register_avcodec(&mjpeg_decoder);
+    register_avcodec(&mjpegb_decoder);
     register_avcodec(&mp2_decoder);
     register_avcodec(&mp3_decoder);
     register_avcodec(&wmav1_decoder);

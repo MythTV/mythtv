@@ -228,7 +228,7 @@ int DCT_common_init(MpegEncContext *s)
     MPV_common_init_mmi(s);
 #endif
 #ifdef ARCH_ARMV4L
-    MPV_common_init_armv4l();
+    MPV_common_init_armv4l(s);
 #endif
 #ifdef ARCH_POWERPC
     MPV_common_init_ppc(s);
@@ -557,12 +557,6 @@ int MPV_encode_init(AVCodecContext *avctx)
     s->qcompress= avctx->qcompress;
     s->qblur= avctx->qblur;
     s->avctx = avctx;
-    s->aspect_ratio_info= avctx->aspect_ratio_info;
-    if (avctx->aspect_ratio_info == FF_ASPECT_EXTENDED)
-    {
-	s->aspected_width = avctx->aspected_width;
-	s->aspected_height = avctx->aspected_height;
-    }
     s->flags= avctx->flags;
     s->max_b_frames= avctx->max_b_frames;
     s->b_frame_strategy= avctx->b_frame_strategy;
@@ -3081,7 +3075,8 @@ static int dct_quantize_c(MpegEncContext *s,
     *overflow= s->max_qcoeff < max; //overflow might have happend
     
     /* we need this permutation so that we correct the IDCT, we only permute the !=0 elements */
-    ff_block_permute(block, s->idct_permutation, scantable, last_non_zero);
+    if (s->idct_permutation_type != FF_NO_IDCT_PERM)
+	ff_block_permute(block, s->idct_permutation, scantable, last_non_zero);
 
     return last_non_zero;
 }
