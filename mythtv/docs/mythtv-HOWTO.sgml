@@ -12,7 +12,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <article>
 
-<title>Installing mythtv
+<title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
 <date>2002-11-11, v1.02
 <abstract>
@@ -27,12 +27,16 @@ necessary.
 
 <sect>Introduction. 
 <p>This HOWTO document will focus on mythtv in a North
-America environment using KDE on Mandrake 9.0.  Installation instructions
+America environment using KDE.  Installation instructions
 for other distributions and regions can be sent to the author for inclusion
 in other versions of this document.
 
-Installation of mythtv on Mandrake 9.0 is made fairly simple since a lot
-of the prerequisites are already packaged.
+The document authors are:
+<itemize>
+<item>Overall structure and Mandrake 9.0: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
+<item>Red Hat Linux 8.0: Cedar MacKay, <url url="mailto:xxx@mac.com">
+<item>Gentoo:
+</itemize>
 
 For users with a Debian system, the mythtv program has been packaged by Matt
 Zimmerman <url url="mailto:mdz@debian.org"> and is available at <url 
@@ -43,7 +47,36 @@ url="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html"
 name="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">.
 
 <sect>Checking prerequisites.
+<sect1>Hardware.
+<p>mythtv is a software video encoder, which means that it uses a fairly
+generic "dumb" video capture card, encodes the frames of video using the CPU
+on your motherboard and writes them to disk.  High-end video capture cards
+and devices like the Tivo and RePlay have dedicated encoder chips on them
+which use specialized hardware to convert the video stream to the MPEG-2
+format without using the motherboard CPU, which means that the main CPU only
+has to worry about running the Operating System and reading and writing to
+the disk.  These have fairly low CPU requirements compared to encoding
+video.
 
+There are many variables that go into the question: "How fast a CPU do I
+need to run mythtv"?  Obviously, the faster your CPU, the better your
+experience will be with mythtv.  Performing the "Watch TV" function, where
+the CPU is both encoding and decoding video simultaneously to allow Pause,
+Fast Forward and Rewind functions for live TV requires twice as much CPU as
+just encoding or decoding.  mythtv also supports multiple encoder cards in a
+single PC, increasing the CPU requirements if you are going to
+simultaneously encode multiple programs.
+
+Here are a few data points: 
+<itemize> 
+<item>A PIII/733Mhz system can encode one video stream using the RTJPEG
+codec using 512x480 capture resolution.  This does not allow for live TV
+watching, but does allow for encoding video and then watching it later.
+<item>The developer states that his AMD1800+ system can <bf>almost</bf>
+encode two MPEG4 video streams and watch one program simultaneously. 
+</itemize>
+
+<sect1>Software.
 <p>There are a few ways of installing programs on Linux systems; you can either
 use the graphical tools, or command-line utilities.  Either system will get
 the job done, and it all depends on your comfort level with Linux.
@@ -54,7 +87,7 @@ gcc, freetype2-devel and qt-devel.  If you're going to use a remote control
 with mythtv, you're going to need the cdialog package in order to compile
 lircd.
 
-<sect1>Graphical installation tools.
+<sect2>Graphical installation tools.
 
 <p>On systems running KDE, a tool which will allow you to see what packages
 are available and if they're installed on your system can be accessed by
@@ -90,11 +123,11 @@ alsa-utils is needed for setting the volume.
 If you marked anything to install, click on Install Marked.  Click "Yes" or
 OK if you get a message about satisfying dependencies.
 
-<sect1>Command-line installation.
+<sect2>Command-line installation.
 <p> This section details the various methods for installing pre-requisites
 from the command line.
 
-<sect2>Mandrake 8.2 and 9.0
+<sect3>Mandrake 8.2 and 9.0
 <p>The simplest tool for installing packages from the command line is
 <bf>urpmi</bf>.
 
@@ -115,11 +148,11 @@ everything already installed
 </verb></tscreen>
 
 In that case, you're ready to move onto the next step.
-<sect2>Red Hat Linux 8.0
+<sect3>Red Hat Linux 8.0
 
 <p>[Please submit instructions]
 
-<sect2>Gentoo.
+<sect3>Gentoo.
 
 <p>[Please submit instructions]
 
@@ -542,10 +575,11 @@ functionality with mythtv.
 
 <sect>Configuring mythtv.
 <p>By this point, all of the prerequisites have been installed,
-<bf>mysql</bf> is running and has had it's initial database setup.  It's now
+<bf>mysql</bf> is running and has had its initial database setup.  It's now
 time to configure mythtv.
 
-Open a shell and switch to the <tt>/usr/local/share/mythtv</tt> directory. 
+<sect1>Editing the settings.txt file.
+<p>Open a shell and switch to the <tt>/usr/local/share/mythtv</tt> directory. 
 You <bf>MUST</bf> edit the <tt>settings.txt</tt> file so that it's
 appropriate for your system.  At a minimum, ensure that the BufferName, RecordFilePrefix
 and PIPBuffername variables are set to directories that exist on your system. 
@@ -571,6 +605,28 @@ of the world need to modify the first line and modify the XMLTVGrabber
 variable to the correct grabber for their region.  <bf>tv_grab_uk</bf> for the
 UK, etc.  Use the name from the xmltv directory.
 
+<sect2>Adding support for an external tuner.
+<!-- Make this better -->
+<p>mythtv supports changing the channel on an external tuner.  If you have
+an external tuner, like a DirecTV or digital cable set top box, the
+following command should be added to your settings.txt file:
+<tscreen><verb>
+str ExternalChannelCommand=/usr/local/bin/changechannel
+</verb></tscreen>
+
+The <bf>changechannel</bf> program is not supplied with mythtv, so this is
+going to be dependant on what sort of external tuner you have.
+
+Feel free to browse some of what sort of hardware is available at <url
+url="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html"
+name="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html">, or if
+you wish to assemble your own, rather than purchase, the following may be
+helpful: <url url="http://www.snapstream.com/products/irblaster/sonydss.htm"
+name="http://www.snapstream.com/products/irblaster/sonydss.htm"> for cable
+pinouts for RCA DSS receivers.
+
+<sect1>Running setup.
+<p>
 Now that you've edited your <tt>settings.txt</tt> file, it's time to run the
 setup program and perform the initial configuration.
 
@@ -585,7 +641,8 @@ Open a shell, and switch to the setup directory:
 The setup program will ask you a few questions and then proceed to run the
 XMLTV grabber program.
 
-Now that the setup program has completed, run <bf>mythfilldatabase</bf> to
+<sect1>Running mythfilldatabase.
+<p>Now that the setup program has completed, run <bf>mythfilldatabase</bf> to
 get one week of data inserted into the database.
 
 <bf>NOTE</bf>:  <bf>mythfilldatabase</bf> might take a while to complete,
@@ -598,14 +655,15 @@ the database.
 
 <!-- get more information on the manual setting -->
 
-In order to keep your database filled, <bf>mythfilldatabase</bf> should be
+<sect2>Setting <bf>mythfilldatabase</bf> to run from <bf>cron</bf>
+<p>In order to keep your database filled, <bf>mythfilldatabase</bf> should be
 run once a day.
 
-The default in the <bf>mythcrontab</bf> file is to run the
-<bf>mythfilldatabase</bf> program every day at 1800 (6 PM).  If you want to
-change this, then open the <tt>configfiles/mythcrontab</tt> file in your
-favorite editor and modify it as you like.  Once you're satisfied with the
-time that <bf>mythfilldatabase</bf> will run, save and exit, and return to the shell
+The default <bf>mythcrontab</bf> file will run the <bf>mythfilldatabase</bf>
+program every day at 1800 (6 PM).  If you want to change this, then open the
+<tt>configfiles/mythcrontab</tt> file in your favorite editor and modify it
+as you like.  Once you're satisfied with the time that
+<bf>mythfilldatabase</bf> will run, save and exit, and return to the shell
 prompt.
 
 <tscreen><verb>
@@ -613,19 +671,69 @@ prompt.
 % crontab mythcrontab
 % crontab -l  NOTE: this is a lowercase L.
 # DO NOT EDIT THIS FILE - edit the master and reinstall.
-# (mythcrontab installed on Mon Nov 11 17:20:18 2002)
+# (mythcrontab installed on Mon Nov 11 20:36:28 2002)
 # (Cron version -- $Id$)
-0 18 * * * /usr/local/bin/mythfilldatabase
-%
+# The following will run the mythfilldatabase shell script at 18:00 every
+day.  Format is
+# minutes hour day_of_month month day_of_week
+# In the case of mythfilldatabase, we want it to run at 1800 daily.
+# man 5 crontab for more information
+# Need to use a shell script because the QTDIR environment variable isn't
+# being honored by crontab?
+# The next part is all on one line.
+0 18 * * * /bin/bash $HOME/mythtv/MC/configfiles/mythfilldatabasecron
+% 
 </verb></tscreen>
 
 As you can see, <bf>mythfilldatabase</bf> will now be run at 1800 (6 PM)
 every day.
 
-Once <
+If you decide to alter the time that the <bf>mythfilldatabase</bf> runs,
+you can use the crontab command to open your existing job and edit it in
+place.
+
+<tscreen><verb>
+% crontab -e
+</verb></tscreen>
+
+The <bf>crontab -e</bf> command will allow you to edit the existing crontab. 
+<bf>NOTE</bf>:  By default, the crontab will use <bf>vi</bf> as your
+editor.  If you don't like to use <bf>vi</bf>, make sure that you've set
+<tt>VISUAL</tt> to something other than <bf>vi</bf>.
+
+<tscreen><verb>
+% export VISUAL=/usr/bin/joe
+% crontab -e
+</verb></tscreen>
+
+This will cause <bf>crontab</bf> to use <bf>joe</bf>, a visual editor that
+uses the Wordstar command sequence.  You may use <bf>emacs</bf>, or any
+other editor that you're comfortable with.  You may also add the
+<tt>EXPORT</tt> command to your <tt>.bashrc</tt> or to the
+<tt>/etc/profile.d/mythtv.sh</tt> file.
+
+Once you've completed this step, run the <bf>mythepg</bf> program to check
+that the database has been filled.  The cursor keys will move you around the
+grid, the "I" key will give you more information on a program and ESC will
+exit out back to the shell.
 
 <sect>Using mythtv.
+<p><bf>mythfrontend</bf> is the main interface to the mythtv program.  This
+program allows you to choose which of the other modules you'd like to run
+and ensures that programs that you've scheduled for recording actually get
+recorded, so it's important that this program is always running.
 
+<!-- insert stuff on getting around, key sequences, etc -->
+
+<sect1>Using themes with mythtv.
+<p>mythtv is "themeable", meaning that the visual appearance of the program
+can be modified by the user without re-compiling or altering the program
+functionality.
+<tt>usr/local/share/mythtv/theme.txt</tt> allows you to alter the theme
+for mythtv.  The default theme is called "blue".  Other themes that ship
+with mythtv can be found in the <tt>/usr/local/share/mythtv/themes</tt>
+directory.  Change the first variable in the <tt>theme.txt</tt> file and
+exit and restart <bf>mythfrontend</bf> for it to take effect.
 
 <sect>Using mythweb.
 <sect>Using mythgallery.

@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing mythtv: Using mythtv.</TITLE>
+ <TITLE>Installing and using mythtv: Using mythtv.</TITLE>
  <LINK HREF="mythtv-HOWTO-10.html" REL=next>
  <LINK HREF="mythtv-HOWTO-8.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc9" REL=contents>
@@ -13,6 +13,24 @@
 <A HREF="mythtv-HOWTO.html#toc9">Contents</A>
 <HR>
 <H2><A NAME="s9">9.</A> <A HREF="mythtv-HOWTO.html#toc9">Using mythtv.</A></H2>
+
+<P><B>mythfrontend</B> is the main interface to the mythtv program.  This
+program allows you to choose which of the other modules you'd like to run
+and ensures that programs that you've scheduled for recording actually get
+recorded, so it's important that this program is always running.</P>
+
+
+<H2><A NAME="ss9.1">9.1</A> <A HREF="mythtv-HOWTO.html#toc9.1">Using themes with mythtv.</A>
+</H2>
+
+<P>mythtv is "themeable", meaning that the visual appearance of the program
+can be modified by the user without re-compiling or altering the program
+functionality.
+<CODE>usr/local/share/mythtv/theme.txt</CODE> allows you to alter the theme
+for mythtv.  The default theme is called "blue".  Other themes that ship
+with mythtv can be found in the <CODE>/usr/local/share/mythtv/themes</CODE>
+directory.  Change the first variable in the <CODE>theme.txt</CODE> file and
+exit and restart <B>mythfrontend</B> for it to take effect.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-10.html">Next</A>

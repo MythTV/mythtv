@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing mythtv: Checking prerequisites.</TITLE>
+ <TITLE>Installing and using mythtv: Checking prerequisites.</TITLE>
  <LINK HREF="mythtv-HOWTO-3.html" REL=next>
  <LINK HREF="mythtv-HOWTO-1.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc2" REL=contents>
@@ -14,6 +14,39 @@
 <HR>
 <H2><A NAME="s2">2.</A> <A HREF="mythtv-HOWTO.html#toc2">Checking prerequisites.</A></H2>
 
+<H2><A NAME="ss2.1">2.1</A> <A HREF="mythtv-HOWTO.html#toc2.1">Hardware.</A>
+</H2>
+
+<P>mythtv is a software video encoder, which means that it uses a fairly
+generic "dumb" video capture card, encodes the frames of video using the CPU
+on your motherboard and writes them to disk.  High-end video capture cards
+and devices like the Tivo and RePlay have dedicated encoder chips on them
+which use specialized hardware to convert the video stream to the MPEG-2
+format without using the motherboard CPU, which means that the main CPU only
+has to worry about running the Operating System and reading and writing to
+the disk.  These have fairly low CPU requirements compared to encoding
+video.</P>
+<P>There are many variables that go into the question: "How fast a CPU do I
+need to run mythtv"?  Obviously, the faster your CPU, the better your
+experience will be with mythtv.  Performing the "Watch TV" function, where
+the CPU is both encoding and decoding video simultaneously to allow Pause,
+Fast Forward and Rewind functions for live TV requires twice as much CPU as
+just encoding or decoding.  mythtv also supports multiple encoder cards in a
+single PC, increasing the CPU requirements if you are going to
+simultaneously encode multiple programs.</P>
+<P>Here are a few data points: 
+<UL>
+<LI>A PIII/733Mhz system can encode one video stream using the RTJPEG
+codec using 512x480 capture resolution.  This does not allow for live TV
+watching, but does allow for encoding video and then watching it later.</LI>
+<LI>The developer states that his AMD1800+ system can <B>almost</B>
+encode two MPEG4 video streams and watch one program simultaneously. </LI>
+</UL>
+</P>
+
+<H2><A NAME="ss2.2">2.2</A> <A HREF="mythtv-HOWTO.html#toc2.2">Software.</A>
+</H2>
+
 <P>There are a few ways of installing programs on Linux systems; you can either
 use the graphical tools, or command-line utilities.  Either system will get
 the job done, and it all depends on your comfort level with Linux.</P>
@@ -23,8 +56,7 @@ gcc, freetype2-devel and qt-devel.  If you're going to use a remote control
 with mythtv, you're going to need the cdialog package in order to compile
 lircd.</P>
 
-<H2><A NAME="ss2.1">2.1</A> <A HREF="mythtv-HOWTO.html#toc2.1">Graphical installation tools.</A>
-</H2>
+<H3>Graphical installation tools.</H3>
 
 <P>On systems running KDE, a tool which will allow you to see what packages
 are available and if they're installed on your system can be accessed by
@@ -51,8 +83,7 @@ control.</P>
 <P>If you marked anything to install, click on Install Marked.  Click "Yes" or
 OK if you get a message about satisfying dependencies.</P>
 
-<H2><A NAME="ss2.2">2.2</A> <A HREF="mythtv-HOWTO.html#toc2.2">Command-line installation.</A>
-</H2>
+<H3>Command-line installation.</H3>
 
 <P> This section details the various methods for installing pre-requisites
 from the command line.</P>

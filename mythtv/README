@@ -56,21 +56,8 @@ the resolution you selected wasn't liked by the v4l subsystem.
 
 See the UPGRADING file for information on upgrading between releases.
 
-Once 'mythfilldata' has finished, try running the 'mythepg' binary.  It should 
-be populated with program info.  Just hit escape to exit out of it.
-
-Anyway.  Now that you have the program database populated and configured, try
-running the 'mythtv' binary.  Use the arrow keys to change channels up and 
-down, and Escape exits out of the program as with mythepg. 
-
 Now would be a good time to look over 'keys.txt' for a list of all the 
 keybindings.
-
-Ok, so try running 'mythfrontend'.  You should see a nice graphical menu show 
-up. This should be pretty simple to figure out.  mythfrontend is designed to 
-be the main interface of the application.  It also provides all the support for
-scheduled recordings, so keep in mind that it needs to be running for 
-shows to get recorded.
 
 Time for some more configuration.  There are a couple .txt files in 
 /usr/local/share/mythtv/.  The theme.txt will let you switch between themes
