@@ -128,5 +128,33 @@ void UpgradeMusicDatabaseSchema(void)
         performActualUpdate(updates, "1001", dbver);
     }
 
+    if (dbver == "1001")
+    {
+        const QString updates[] = {
+"ALTER TABLE musicmetadata ADD mythdigest      VARCHAR(255);",
+"ALTER TABLE musicmetadata ADD size            BIGINT UNSIGNED;",
+"ALTER TABLE musicmetadata ADD date_added      DATETIME;",
+"ALTER TABLE musicmetadata ADD date_modified   DATETIME;",
+"ALTER TABLE musicmetadata ADD format          VARCHAR(4);",
+"ALTER TABLE musicmetadata ADD description     VARCHAR(255);",
+"ALTER TABLE musicmetadata ADD comment         VARCHAR(255);",
+"ALTER TABLE musicmetadata ADD compilation     TINYINT DEFAULT 0;",
+"ALTER TABLE musicmetadata ADD composer        VARCHAR(255);",
+"ALTER TABLE musicmetadata ADD disc_count      SMALLINT UNSIGNED DEFAULT 0;",
+"ALTER TABLE musicmetadata ADD disc_number     SMALLINT UNSIGNED DEFAULT 0;",
+"ALTER TABLE musicmetadata ADD track_count     SMALLINT UNSIGNED DEFAULT 0;",
+"ALTER TABLE musicmetadata ADD start_time      INT UNSIGNED DEFAULT 0;",
+"ALTER TABLE musicmetadata ADD stop_time       INT UNSIGNED;",
+"ALTER TABLE musicmetadata ADD eq_preset       VARCHAR(255);",
+"ALTER TABLE musicmetadata ADD relative_volume TINYINT DEFAULT 0;",
+"ALTER TABLE musicmetadata ADD sample_rate     INT UNSIGNED;",
+"ALTER TABLE musicmetadata ADD bpm             SMALLINT UNSIGNED;",
+"ALTER TABLE musicmetadata ADD INDEX (mythdigest);",
+""
+};
+
+        performActualUpdate(updates, "1002", dbver);
+    }
+
 }
 
