@@ -692,9 +692,9 @@ void ProgLister::fillItemList(void)
                         "WHERE channel.visible = 1 "
                         "AND oldtitle IS NULL AND program.endtime > %1 "
                         "AND program.chanid = channel.chanid "
-                        "AND (( program.airdate = 0 OR "
-                        "programid NOT LIKE \"MV\%\" ) OR "
-                        "program.airdate >= YEAR(NOW() - INTERVAL 1 YEAR)) "
+                        "AND (program.category_type <> 'movie' OR "
+                        "(program.category_type = 'movie' AND "
+                        "program.airdate >= YEAR(NOW() - INTERVAL 2 YEAR))) "
                         "GROUP BY title ORDER BY starttime LIMIT 500;")
                         .arg(startTime.toString("yyyyMMddhhmm50"));
     }
