@@ -6,7 +6,7 @@ BINS	          = mpeg2cut nuvexport nuvinfo
 MANS	          = man/nuvexport.1 \
                     man/nuvexport-svcd.1 \
                     man/nuvexport-vcd.1 \
-                    man/nuvexport-xvid.1 
+                    man/nuvexport-xvid.1
 MODULE_DIRS	  = export mythtv nuv_export
 EXPORT_MODULES	  = export/generic.pm   \
 		    export/ffmpeg.pm    \
@@ -18,7 +18,7 @@ EXPORT_MODULES	  = export/generic.pm   \
 		    export/NUV_SQL.pm   \
 		    export/SVCD.pm      \
 		    export/VCD.pm       \
-		    export/WMV.pm       \
+		    export/ASF.pm       \
 		    export/XviD.pm
 MYTHTV_MODULES	  = mythtv/nuvinfo.pm \
 		    mythtv/db.pm      \
@@ -26,7 +26,7 @@ MYTHTV_MODULES	  = mythtv/nuvinfo.pm \
 NUVEXPORT_MODULES = nuv_export/shared_utils.pm \
 		    nuv_export/task.pm         \
 		    nuv_export/ui.pm
-NUVEXPORT_LINKS   = dvcd dvd mp3 mpeg2cut nuvsql svcd vcd wmv xvid
+NUVEXPORT_LINKS   = dvcd dvd mp3 mpeg2cut nuvsql svcd vcd asf xvid
 
 OWNER	= -o root -g root
 
