@@ -83,8 +83,11 @@ void GameTree::buildGameList(void)
             regSystems.append(GameHandler::getHandler(i)->Systemname());
     }
 
+    bool isleaf = (first == "gamename");
+    QString selcols = isleaf ? "gamename, system" : first;
+
     QString thequery = QString("SELECT DISTINCT %1 FROM gamemetadata "
-                               "ORDER BY %2;").arg(first).arg(first);
+                               "ORDER BY %2;").arg(selcols).arg(first);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec(thequery);
@@ -102,8 +105,25 @@ void GameTree::buildGameList(void)
                 (regSystems.find(current) == regSystems.end()))
                 continue;
 
-            RomInfo *rinfo = new RomInfo();
-            rinfo->setField(first, current);
+            RomInfo* rinfo;
+            if (isleaf)
+            {
+                //  no guarantee System has been set so create a temp RomInfo so
+                //  that CreateRomInfo can create the correct subtype
+                RomInfo* temp = new RomInfo();
+                temp->setSystem(query.value(1).toString());
+                rinfo = GameHandler::CreateRomInfo(temp);
+                delete temp;
+
+                rinfo->setGamename(query.value(0).toString());
+                rinfo->setSystem(query.value(1).toString());
+                rinfo->fillData(db);
+            }
+            else
+            {
+                rinfo = new RomInfo();
+                rinfo->setField(first, current);
+            }
 
             GameTreeItem *titem = new GameTreeItem(first, rinfo);
 
@@ -245,9 +265,6 @@ void GameTree::FillListFrom(GameTreeItem *item)
     if (showfavs == "1")
       whereClause += " AND favorite=1";
 
-    QString thequery = QString("SELECT DISTINCT %1 FROM gamemetadata "
-                               "WHERE %2 ORDER BY %3;")
-                               .arg(column).arg(whereClause).arg(column);
 
     QStringList regSystems;
     if (column == "system")
@@ -257,6 +274,11 @@ void GameTree::FillListFrom(GameTreeItem *item)
     }
 
     bool isleaf = (column == "gamename");
+    QString selcols = isleaf ? "gamename, system" : column;
+
+    QString thequery = QString("SELECT DISTINCT %1 FROM gamemetadata "
+                               "WHERE %2 ORDER BY %3;")
+                               .arg(selcols).arg(whereClause).arg(column);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec(thequery);
@@ -274,8 +296,15 @@ void GameTree::FillListFrom(GameTreeItem *item)
             RomInfo* rinfo;
             if (isleaf)
             {
-                rinfo = GameHandler::CreateRomInfo(item->rominfo);
-                rinfo->setField(column, current);
+                //  no guarantee System has been set so create a temp RomInfo so
+                //  that CreateRomInfo can create the correct subtype
+                RomInfo* temp = new RomInfo();
+                temp->setSystem(query.value(1).toString());
+                rinfo = GameHandler::CreateRomInfo(temp);
+                delete temp;
+
+                rinfo->setGamename(query.value(0).toString());
+                rinfo->setSystem(query.value(1).toString());
                 rinfo->fillData();
             }
             else
