@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "libmyth/mythcontext.h"
+#include "libmyth/dialogbox.h"
 #include "libmythtv/videosource.h"
 #include "libmythtv/channeleditor.h"
 #include "libmyth/themedmenu.h"
@@ -27,26 +28,6 @@ using namespace std;
 
 QTranslator *translator;
 QSqlDatabase* db;
-
-QString getResponse(const QString &query, const QString &def)
-{
-    cout << query;
-
-    if (def != "")
-    {
-        cout << " [" << def << "]  ";
-    }
-    
-    char response[80];
-    cin.getline(response, 80);
-
-    QString qresponse = response;
-
-    if (qresponse == "")
-        qresponse = def;
-
-    return qresponse;
-}
 
 void clearCardDB(void)
 {
@@ -117,6 +98,11 @@ void SetupMenu(void)
 
 int main(int argc, char *argv[])
 {
+#ifdef Q_WS_MACX
+    // Without this, we can't set focus to any of the CheckBoxSetting, and most
+    // of the MythPushButton widgets, and they don't use the themed background.
+    QApplication::setDesktopSettingsAware(FALSE);
+#endif
     QApplication a(argc, argv);
 
     gContext = new MythContext(MYTH_BINARY_VERSION, true);
@@ -150,23 +136,28 @@ int main(int argc, char *argv[])
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    QString response = getResponse("Would you like to clear all capture card\n"
-                                   "settings before starting configuration?", 
-                                   "no");
-
-    if (response.left(1).lower() == "y")
-        clearCardDB();
-
-    response = getResponse("Would you like to clear all program/channel\n"
-                           "settings before starting configuration?",
-                           "no");
-
-    if (response.left(1).lower() == "y")
-        clearAllDB();
-
     MythMainWindow *mainWindow = new MythMainWindow();
     mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
+
+    DialogBox dboxCard(mainWindow, "Would you like to clear all capture card "
+                                   "settings before starting configuration?");
+    dboxCard.AddButton("No, leave my card settings alone");
+    dboxCard.AddButton("Yes, delete my card settings");
+    if (dboxCard.exec() == 2)
+        clearCardDB();
+    
+    // Give the user time to realize the first dialog is gone
+    // before we bring up a similar-looking one
+    usleep(750000);
+    
+    DialogBox dboxProg(mainWindow, "Would you like to clear all program and "
+                                   "channel settings before starting "
+                                   "configuration?");
+    dboxProg.AddButton("No, leave my program settings alone");
+    dboxProg.AddButton("Yes, delete my program settings");
+    if (dboxProg.exec() == 2)
+        clearAllDB();
 
     SetupMenu();
 
