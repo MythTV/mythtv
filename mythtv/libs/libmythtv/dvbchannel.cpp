@@ -58,9 +58,8 @@ using namespace std;
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
            : ChannelBase(parent), cardnum(aCardNum)
 {
-    fd_frontend = 0;
+    fd_frontend = -1;
     force_channel_change = false;
-    first_tune = true;
     isOpen = false;
     diseqc = NULL;
     monitorRunning = false;
@@ -74,10 +73,8 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
 
 DVBChannel::~DVBChannel()
 {
-    if (dvbsct)
-        delete dvbsct;
-    if (dvbcam)
-        delete dvbcam;
+    if (diseqc)
+        delete diseqc;
 
     CloseDVB();
 }
@@ -86,17 +83,21 @@ void DVBChannel::CloseDVB()
 {
     VERBOSE(VB_ALL, "Closing DVB channel");
 
-    if (fd_frontend > 0)
+    if (fd_frontend >= 0)
     {
         close(fd_frontend);
-        fd_frontend = 0;
+        fd_frontend = -1;
+        if (dvbcam)
+            delete dvbcam;
+        if (dvbsct)
+            delete dvbsct;
         isOpen = false;
     }
 }
 
 bool DVBChannel::Open()
 {
-    if (fd_frontend > 0)
+    if (fd_frontend >= 0)
         return true;
 
     fd_frontend = open(dvbdevice(DVB_DEV_FRONTEND, cardnum),
@@ -145,6 +146,7 @@ bool DVBChannel::Open()
     }
 
     force_channel_change = true;
+    first_tune = true;
 
     return isOpen = true;
 }
@@ -632,7 +634,7 @@ bool DVBChannel::CheckModulation(fe_modulation_t& modulation)
 
 bool DVBChannel::FillFrontendStats(dvb_stats_t& stats)
 {
-    if (fd_frontend <= 0)
+    if (fd_frontend < 0)
         return false;
 
     ioctl(fd_frontend, FE_READ_SNR, &stats.snr);
