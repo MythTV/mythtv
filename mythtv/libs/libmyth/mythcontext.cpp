@@ -162,6 +162,19 @@ void MythContext::GetScreenSettings(int &width, float &wmult,
     if (width == 0)
         width = m_width;
 
+    if (height < 160 || width < 160)
+    {
+        cerr << "Somehow, your screen size settings are bad.\n";
+        cerr << "GuiHeight: " << GetNumSetting("GuiHeight") << endl;
+        cerr << "GuiWidth: " << GetNumSetting("GuiWidth") << endl;
+        cerr << "m_height: " << m_height << endl;
+        cerr << "m_width: " << m_width << endl;
+        cerr << "Falling back to 640x480\n";
+
+        height = 640;
+        width = 480;
+    }
+
     wmult = width / 800.0;
     hmult = height / 600.0;
 }
