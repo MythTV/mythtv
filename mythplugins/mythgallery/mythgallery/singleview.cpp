@@ -170,33 +170,33 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     int oldpos = imagepos;
     timer->stop();
 
-    switch (e->key())
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        case ']': case Key_3:
+        QString action = actions[i];
+        if (action == "ROTRIGHT")
         {
             rotateAngle += 90;
             handled = true;
             redraw = true;
             newzoom = 1;
-            break;
         }
-        case '[': case Key_1:
+        else if (action == "ROTLEFT")
         {
             rotateAngle -= 90;
             handled = true;
             redraw = true;
             newzoom = 1;
-            break;
         }
-        case Key_Left:
-        case Key_Up:
+        else if (action == "LEFT" || action == "UP")
         {
             retreatFrame(false);
             handled = true;
             rotateAngle = 0;
-            break;
         }
-        case Key_I:
+        else if (action == "INFO")
         {
             handled=true;
             QString filename = (*images)[imagepos].filename;
@@ -219,94 +219,76 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             DialogBox fiDlg(gContext->GetMainWindow(), info);
             fiDlg.AddButton(tr("OK"));
             fiDlg.exec();
-            break;
         }
-        case Key_7: // zoom out
+        else if (action == "ZOOMOUT")
         {
             handled = zoomfactor;
             newzoom = (zoomfactor < 1) ? zoomfactor : (zoomfactor / 2);
-            break;
         }
-        case Key_9: // zoom in
+        else if (action == "ZOOMIN")
         {
             handled = true;
             newzoom = zoomfactor ? (zoomfactor * 2) : 2;
             timerrunning = false;
-            break;
         }
-        case Key_2: // scroll up
+        else if (action == "SCROLLUP")
         {
             handled = zoomfactor;
             sy -= screenheight/2;
             sy = (sy < 0) ? 0 : sy;
-            break;
         }
-        case Key_4: // scroll left
+        else if (action == "SCROLLLEFT")
         {
             handled = zoomfactor;
             sx -= screenwidth/2;
             sx = (sx < 0) ? 0 : sx;
-            break;
         }
-        case Key_6: // scroll right
+        else if (action == "SCROLLRIGHT")
         {
             handled=zoomfactor;
             sx += screenwidth/2;
             sx = (sx > (zoomed_w-screenwidth)) ? (zoomed_w - screenwidth) : sx;
-            break;
         }
-        case Key_8: // scroll down
+        else if (action == "SCROLLDOWN")
         {
             handled = zoomfactor;
             sy += screenheight/2;
             sy = (sy>(zoomed_h-screenheight)) ? (zoomed_h - screenheight):sy;
-            break;
         }
-        case Key_5: // recenter
+        else if (action == "RECENTER")
         {
             handled = zoomfactor;
             sx = (zoomed_w - screenwidth)/2;
             sy = (zoomed_h - screenheight)/2;
-            break;
         }
-        case Key_0: // fullsize 
+        else if (action == "FULLSIZE")
         {
             handled = zoomfactor;
             newzoom = 1;
-            break;
         }
-        case Key_PageUp: // upper left corner
+        else if (action == "UPLEFT")
         {
             handled = zoomfactor;
             sx = sy = 0;
-            break;
         }
-        case Key_PageDown: // lower right corner 
+        else if (action == "LOWRIGHT")
         {
             handled = zoomfactor;
             sx = zoomed_w - screenwidth;
             sy = zoomed_h - screenheight;
-            break;
         }
-        case Key_Right:
-        case Key_Down:
-        case Key_Space:
-        case Key_Enter:
-        case Key_Return:
+        else if (action == "RIGHT" || action == "DOWN" || action == "SELECT")
         {
             advanceFrame(false);
             handled = true;
             rotateAngle = 0;
-            break;
         }
-        case 'P':
+        else if (action == "PLAY")
         {
             timerrunning = !timerrunning;
             handled = true;
             rotateAngle = 0;
-            break;
         }
-        default: break;
     }
 
     if (handled)

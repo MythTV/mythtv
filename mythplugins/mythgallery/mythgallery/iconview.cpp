@@ -374,32 +374,21 @@ void IconView::keyPressEvent(QKeyEvent *e)
     int oldcol = curcol;
     int oldpos = screenposition;
 
-    switch (e->key())
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+    
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        case Key_Up:
-        {
+        QString action = actions[i];
+        if (action == "UP")
             handled = moveUp();
-            break;
-        }
-        case Key_Left:
-        {
+        else if (action == "LEFT")
             handled = moveLeft();
-            break;
-        }
-        case Key_Down:
-        {
+        else if (action == "DOWN")
             handled = moveDown();
-            break;
-        }
-        case Key_Right:
-        {
+        else if (action == "RIGHT")
             handled = moveRight();
-            break;
-        }
-        case Key_Space:
-        case Key_Enter:
-        case Key_Return:
-        case Key_P:
+        else if (action == "SELECT" || action == "PLAY")
         {
             int pos = screenposition + currow * THUMBS_W + curcol;
 
@@ -418,29 +407,25 @@ void IconView::keyPressEvent(QKeyEvent *e)
             }
 
             handled = true;
-            break;
         }
-        case Key_PageUp:
+        else if (action == "PAGEUP")
         {
             for (int i = 0; i < THUMBS_H; ++i) 
                  moveUp();
             handled = true;
-            break;
         }
-        case Key_PageDown:
+        else if (action == "PAGEDOWN")
         {
             for (int i = 0; i < THUMBS_H; ++i) 
                  moveDown();
             handled = true;
-            break;
         }
-        case Key_Home:
+        else if (action == "HOME")
         {
             screenposition = curcol = currow = 0;
             handled = true;
-            break;
         }
-        case Key_End:
+        else if (action == "END")
         {
             screenposition = ((thumbs.size() - 1) / (THUMBS_W * THUMBS_H)) * 
                              (THUMBS_W * THUMBS_H);
@@ -449,22 +434,19 @@ void IconView::keyPressEvent(QKeyEvent *e)
                 curcol = thumbs.size() - (screenposition + currow * THUMBS_W) -
                          1;
             handled = true;
-            break;
         }
-        case Key_M:
+        else if (action == "MENU")
         {
             GallerySettings settings;
             settings.exec(QSqlDatabase::database());
             break;
         }
-        case Key_I:
+        else if (action == "IMPORT")
         {
             handled = true;
             importPics();
             screenposition = 0;
-            break;
         }
-        default: break;
     }
 
     if (handled)
