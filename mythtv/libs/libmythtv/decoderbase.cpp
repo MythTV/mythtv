@@ -144,6 +144,9 @@ bool DecoderBase::PosMapFromEnc(void)
     if (size > 0 && keyframedist > 0) 
         end /= keyframedist;
 
+    VERBOSE(VB_PLAYBACK, QString("Filling position map from %1 to %2")
+                                 .arg(start).arg(end));
+
     nvr_enc->FillPositionMap(start, end, posMap);
     if (keyframedist == -1 && posMap.size() > 1)
     {
@@ -174,6 +177,9 @@ bool DecoderBase::PosMapFromEnc(void)
         PosMapEntry e = {it.key(), it.key() * keyframedist, it.data()};
         m_positionMap.push_back(e);
     }
+    VERBOSE(VB_PLAYBACK, QString("Position map filled to: %1")
+            .arg(m_positionMap[m_positionMap.size()-1].index));
+
     return true;
 }
 
