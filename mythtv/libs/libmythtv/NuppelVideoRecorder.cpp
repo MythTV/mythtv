@@ -223,6 +223,8 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx->bit_rate_tolerance = usebitrate * 100;
     mpa_ctx->qmin = maxquality;
     mpa_ctx->qmax = minquality;
+    mpa_ctx->mb_qmin = maxquality;
+    mpa_ctx->mb_qmax = minquality;
     mpa_ctx->max_qdiff = qualdiff;
 
     mpa_ctx->qblur = 0.5;
@@ -231,7 +233,6 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx->rc_strategy = 2;
     mpa_ctx->b_frame_strategy = 0;
     mpa_ctx->gop_size = 30;
-    mpa_ctx->key_frame = -1;
     mpa_ctx->rc_max_rate = 0;
     mpa_ctx->rc_min_rate = 0;
     mpa_ctx->rc_buffer_size = 0;
@@ -1587,11 +1588,16 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
         mpa_picture.data[0] = planes[0];
         mpa_picture.data[1] = planes[1];
         mpa_picture.data[2] = planes[2];
+        mpa_picture.linesize[0] = w;
+        mpa_picture.linesize[1] = w / 2;
+        mpa_picture.linesize[2] = w / 2;
+        mpa_picture.pts = timecode;
+        mpa_picture.type = FF_BUFFER_TYPE_SHARED;
 
         if (wantkeyframe)
-            mpa_ctx->force_type = I_TYPE;
+            mpa_picture.pict_type = FF_I_TYPE;
         else
-            mpa_ctx->force_type = 0;
+            mpa_picture.pict_type = 0;
 
 	if (!hardware_encode)
 	{

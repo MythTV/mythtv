@@ -297,11 +297,13 @@ class NuppelVideoPlayer
 
     AVCodec *mpa_codec;
     AVCodecContext *mpa_ctx;
-    AVPicture mpa_picture;
+    AVFrame *mpa_pic;
     AVPicture tmppicture;
+    AVPicture mpa_pic_tmp;
+
     bool directrendering;
-    friend int get_buffer(struct AVCodecContext *c, int width, int height,
-                          int pict_type);
+    friend int get_buffer(struct AVCodecContext *c, AVFrame *pic);
+    friend void release_buffer(struct AVCodecContext *c, AVFrame *pic);
 
     bool disablevideo;
     bool disableaudio;

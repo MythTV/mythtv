@@ -40,7 +40,7 @@ static inline long long rdtsc()
 }
 #endif
 
-static int h263_decode_init(AVCodecContext *avctx)
+int ff_h263_decode_init(AVCodecContext *avctx)
 {
     MpegEncContext *s = avctx->priv_data;
 
@@ -55,6 +55,7 @@ static int h263_decode_init(AVCodecContext *avctx)
     s->quant_precision=5;
     s->progressive_sequence=1;
     s->decode_mb= ff_h263_decode_mb;
+    s->low_delay= 1;
 
     /* select sub codec */
     switch(avctx->codec->id) {
@@ -64,7 +65,7 @@ static int h263_decode_init(AVCodecContext *avctx)
     case CODEC_ID_MPEG4:
         s->time_increment_bits = 4; /* default value for broken headers */
         s->h263_pred = 1;
-        s->has_b_frames = 1; //default, might be overriden in the vol header during header parsing
+        s->low_delay = 0; //default, might be overriden in the vol header during header parsing
         break;
     case CODEC_ID_MSMPEG4V1:
         s->h263_msmpeg4 = 1;
@@ -112,7 +113,7 @@ static int h263_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static int h263_decode_end(AVCodecContext *avctx)
+int ff_h263_decode_end(AVCodecContext *avctx)
 {
     MpegEncContext *s = avctx->priv_data;
 
@@ -199,6 +200,7 @@ static int decode_slice(MpegEncContext *s){
             
             s->mv_dir = MV_DIR_FORWARD;
             s->mv_type = MV_TYPE_16X16;
+//            s->mb_skiped = 0;
 //printf("%d %d %06X\n", ret, get_bits_count(&s->gb), show_bits(&s->gb, 24));
             ret= s->decode_mb(s, s->block);
             
@@ -248,7 +250,7 @@ static int decode_slice(MpegEncContext *s){
        &&   (s->workaround_bugs&FF_BUG_AUTODETECT) 
        &&    s->gb.size*8 - get_bits_count(&s->gb) >=0
        &&    s->gb.size*8 - get_bits_count(&s->gb) < 48
-       &&   !s->resync_marker
+//       &&   !s->resync_marker
        &&   !s->data_partitioning){
         
         const int bits_count= get_bits_count(&s->gb);
@@ -341,13 +343,13 @@ static int mpeg4_find_frame_end(MpegEncContext *s, UINT8 *buf, int buf_size){
     return -1;
 }
 
-static int h263_decode_frame(AVCodecContext *avctx, 
+int ff_h263_decode_frame(AVCodecContext *avctx, 
                              void *data, int *data_size,
                              UINT8 *buf, int buf_size)
 {
     MpegEncContext *s = avctx->priv_data;
     int ret,i;
-    AVPicture *pict = data; 
+    AVFrame *pict = data; 
     float new_aspect;
     
 #ifdef PRINT_FRAME_TIME
@@ -357,7 +359,6 @@ uint64_t time= rdtsc();
     printf("*****frame %d size=%d\n", avctx->frame_number, buf_size);
     printf("bytes=%x %x %x %x\n", buf[0], buf[1], buf[2], buf[3]);
 #endif
-
     s->flags= avctx->flags;
 
     *data_size = 0;
@@ -415,9 +416,11 @@ retry:
         if (MPV_common_init(s) < 0) //we need the idct permutaton for reading a custom matrix
             return -1;
     }
-        
+      
     /* let's go :-) */
-    if (s->h263_msmpeg4) {
+    if (s->msmpeg4_version==5) {
+        ret= ff_wmv2_decode_picture_header(s);
+    } else if (s->msmpeg4_version) {
         ret = msmpeg4_decode_picture_header(s);
     } else if (s->h263_pred) {
         if(s->avctx->extradata_size && s->picture_number==0){
@@ -430,25 +433,23 @@ retry:
 
         if(s->flags& CODEC_FLAG_LOW_DELAY)
             s->low_delay=1;
-
-        s->has_b_frames= !s->low_delay;
     } else if (s->h263_intel) {
         ret = intel_h263_decode_picture_header(s);
     } else {
         ret = h263_decode_picture_header(s);
     }
-    avctx->has_b_frames= s->has_b_frames;
+    avctx->has_b_frames= !s->low_delay;
 
     if(s->workaround_bugs&FF_BUG_AUTODETECT){
         if(s->avctx->fourcc == ff_get_fourcc("XVIX")) 
             s->workaround_bugs|= FF_BUG_XVID_ILACE;
-
+#if 0
         if(s->avctx->fourcc == ff_get_fourcc("MP4S")) 
             s->workaround_bugs|= FF_BUG_AC_VLC;
         
         if(s->avctx->fourcc == ff_get_fourcc("M4S2")) 
             s->workaround_bugs|= FF_BUG_AC_VLC;
-                
+#endif
         if(s->avctx->fourcc == ff_get_fourcc("UMP4")){
             s->workaround_bugs|= FF_BUG_UMP4;
             s->workaround_bugs|= FF_BUG_AC_VLC;
@@ -460,6 +461,9 @@ retry:
 
         if(s->avctx->fourcc == ff_get_fourcc("XVID") && s->xvid_build==0)
             s->workaround_bugs|= FF_BUG_QPEL_CHROMA;
+        
+        if(s->avctx->fourcc == ff_get_fourcc("XVID") && s->xvid_build==0)
+            s->padding_bug_score= 256*256*256*64;
         
         if(s->xvid_build && s->xvid_build<=1)
             s->workaround_bugs|= FF_BUG_QPEL_CHROMA;
@@ -523,11 +527,12 @@ retry:
         return -1;
     }
     
-    s->avctx->key_frame   = (s->pict_type == I_TYPE);
-    s->avctx->pict_type   = s->pict_type;
+    // for hurry_up==5
+    s->current_picture.pict_type= s->pict_type;
+    s->current_picture.key_frame= s->pict_type == I_TYPE;
 
     /* skip b frames if we dont have reference frames */
-    if(s->num_available_buffers<2 && s->pict_type==B_TYPE) return get_consumed_bytes(s, buf_size);
+    if(s->last_picture.data[0]==NULL && s->pict_type==B_TYPE) return get_consumed_bytes(s, buf_size);
     /* skip b frames if we are in a hurry */
     if(avctx->hurry_up && s->pict_type==B_TYPE) return get_consumed_bytes(s, buf_size);
     /* skip everything if we are in a hurry>=5 */
@@ -580,7 +585,9 @@ retry:
     }
 
     if (s->h263_msmpeg4 && s->msmpeg4_version<4 && s->pict_type==I_TYPE)
-        if(msmpeg4_decode_ext_header(s, buf_size) < 0) return -1;
+        if(msmpeg4_decode_ext_header(s, buf_size) < 0){
+            s->error_status_table[s->mb_num-1]= AC_ERROR|DC_ERROR|MV_ERROR;
+        }
     
     /* divx 5.01+ bistream reorder stuff */
     if(s->codec_id==CODEC_ID_MPEG4 && s->bitstream_buffer_size==0 && s->divx_version>=500){
@@ -629,7 +636,6 @@ retry:
         }
         if(num_end_markers || error){
             fprintf(stderr, "concealing errors\n");
-//printf("type:%d\n", s->pict_type);
             ff_error_resilience(s);
         }
     }
@@ -644,7 +650,7 @@ retry:
     int y= mb_y*16 + 8;
     for(mb_x=0; mb_x<s->mb_width; mb_x++){
       int x= mb_x*16 + 8;
-      uint8_t *ptr= s->last_picture[0];
+      uint8_t *ptr= s->last_picture.data[0];
       int xy= 1 + mb_x*2 + (mb_y*2 + 1)*(s->mb_width*2 + 2);
       int mx= (s->motion_val[xy][0]>>1) + x;
       int my= (s->motion_val[xy][1]>>1) + y;
@@ -669,30 +675,34 @@ retry:
   }
 
 }
-#endif    
-    if(s->pict_type==B_TYPE || (!s->has_b_frames)){
-        pict->data[0] = s->current_picture[0];
-        pict->data[1] = s->current_picture[1];
-        pict->data[2] = s->current_picture[2];
-    } else {
-        pict->data[0] = s->last_picture[0];
-        pict->data[1] = s->last_picture[1];
-        pict->data[2] = s->last_picture[2];
-    }
-    pict->linesize[0] = s->linesize;
-    pict->linesize[1] = s->uvlinesize;
-    pict->linesize[2] = s->uvlinesize;
+#endif
 
-    avctx->quality = s->qscale;
+    if(s->pict_type==B_TYPE || s->low_delay){
+        *pict= *(AVFrame*)&s->current_picture;
+    } else {
+        *pict= *(AVFrame*)&s->last_picture;
+    }
+
+    if(avctx->debug&FF_DEBUG_QP){
+        int8_t *qtab= pict->qscale_table;
+        int x,y;
+        
+        for(y=0; y<s->mb_height; y++){
+            for(x=0; x<s->mb_width; x++){
+                printf("%2d ", qtab[x + y*s->mb_width]);
+            }
+            printf("\n");
+        }
+        printf("\n");
+    }
 
     /* Return the Picture timestamp as the frame number */
     /* we substract 1 because it is added on utils.c    */
     avctx->frame_number = s->picture_number - 1;
 
-    /* dont output the last pic after seeking 
-       note we allready added +1 for the current pix in MPV_frame_end(s) */
-    if(s->num_available_buffers>=2 || (!s->has_b_frames))
-        *data_size = sizeof(AVPicture);
+    /* dont output the last pic after seeking */
+    if(s->last_picture.data[0] || s->low_delay)
+        *data_size = sizeof(AVFrame);
 #ifdef PRINT_FRAME_TIME
 printf("%Ld\n", rdtsc()-time);
 #endif
@@ -704,10 +714,10 @@ AVCodec mpeg4_decoder = {
     CODEC_TYPE_VIDEO,
     CODEC_ID_MPEG4,
     sizeof(MpegEncContext),
-    h263_decode_init,
+    ff_h263_decode_init,
     NULL,
-    h263_decode_end,
-    h263_decode_frame,
+    ff_h263_decode_end,
+    ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED,
 };
 
@@ -716,10 +726,10 @@ AVCodec h263_decoder = {
     CODEC_TYPE_VIDEO,
     CODEC_ID_H263,
     sizeof(MpegEncContext),
-    h263_decode_init,
+    ff_h263_decode_init,
     NULL,
-    h263_decode_end,
-    h263_decode_frame,
+    ff_h263_decode_end,
+    ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
 };
 
@@ -728,10 +738,10 @@ AVCodec msmpeg4v1_decoder = {
     CODEC_TYPE_VIDEO,
     CODEC_ID_MSMPEG4V1,
     sizeof(MpegEncContext),
-    h263_decode_init,
+    ff_h263_decode_init,
     NULL,
-    h263_decode_end,
-    h263_decode_frame,
+    ff_h263_decode_end,
+    ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
 };
 
@@ -740,10 +750,10 @@ AVCodec msmpeg4v2_decoder = {
     CODEC_TYPE_VIDEO,
     CODEC_ID_MSMPEG4V2,
     sizeof(MpegEncContext),
-    h263_decode_init,
+    ff_h263_decode_init,
     NULL,
-    h263_decode_end,
-    h263_decode_frame,
+    ff_h263_decode_end,
+    ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
 };
 
@@ -752,10 +762,10 @@ AVCodec msmpeg4v3_decoder = {
     CODEC_TYPE_VIDEO,
     CODEC_ID_MSMPEG4V3,
     sizeof(MpegEncContext),
-    h263_decode_init,
+    ff_h263_decode_init,
     NULL,
-    h263_decode_end,
-    h263_decode_frame,
+    ff_h263_decode_end,
+    ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
 };
 
@@ -764,22 +774,10 @@ AVCodec wmv1_decoder = {
     CODEC_TYPE_VIDEO,
     CODEC_ID_WMV1,
     sizeof(MpegEncContext),
-    h263_decode_init,
+    ff_h263_decode_init,
     NULL,
-    h263_decode_end,
-    h263_decode_frame,
-    CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
-};
-
-AVCodec wmv2_decoder = {
-    "wmv2",
-    CODEC_TYPE_VIDEO,
-    CODEC_ID_WMV2,
-    sizeof(MpegEncContext),
-    h263_decode_init,
-    NULL,
-    h263_decode_end,
-    h263_decode_frame,
+    ff_h263_decode_end,
+    ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
 };
 
@@ -788,10 +786,10 @@ AVCodec h263i_decoder = {
     CODEC_TYPE_VIDEO,
     CODEC_ID_H263I,
     sizeof(MpegEncContext),
-    h263_decode_init,
+    ff_h263_decode_init,
     NULL,
-    h263_decode_end,
-    h263_decode_frame,
+    ff_h263_decode_end,
+    ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
 };
 

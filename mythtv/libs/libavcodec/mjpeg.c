@@ -720,6 +720,8 @@ static int mjpeg_decode_init(AVCodecContext *avctx)
     s->buffer_size = 102400; /* smaller buffer should be enough,
 				but photojpg files could ahive bigger sizes */
     s->buffer = av_malloc(s->buffer_size);
+    if (!s->buffer)
+	return -1;
     s->start_code = -1;
     s->first_picture = 1;
     s->org_width = avctx->width;
@@ -1180,15 +1182,27 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
 	    get_bits(&s->gb, 8), get_bits(&s->gb, 8));
 	if (get_bits(&s->gb, 8) == 0)
 	{
-	    s->avctx->aspect_ratio_info = FF_ASPECT_EXTENDED;
-	    s->avctx->aspected_width = get_bits(&s->gb, 16);
-	    s->avctx->aspected_height = get_bits(&s->gb, 16);
+	    int x_density = get_bits(&s->gb, 16);
+	    int y_density = get_bits(&s->gb, 16);
+
+	    dprintf("x/y density: %d (%f), %d (%f)\n", x_density,
+		(float)x_density, y_density, (float)y_density);
+#if 0
+            //MN: needs to be checked
+            if(x_density)
+//                s->avctx->aspect_ratio= s->width*y_density/((float)s->height*x_density);
+		s->avctx->aspect_ratio = (float)x_density/y_density;
+		/* it's better, but every JFIF I have seen stores 1:1 */
+            else
+                s->avctx->aspect_ratio= 0.0;
+#endif
 	}
 	else
 	{
 	    skip_bits(&s->gb, 16);
 	    skip_bits(&s->gb, 16);
 	}
+
 	t_w = get_bits(&s->gb, 8);
 	t_h = get_bits(&s->gb, 8);
 	if (t_w && t_h)
@@ -1429,7 +1443,6 @@ static int mjpeg_decode_frame(AVCodecContext *avctx,
 		case EOI:
 eoi_parser:
 		    {
-                        int l;
                         if (s->interlaced) {
                             s->bottom_field ^= 1;
                             /* if not bottom field, do not output image yet */
@@ -1438,15 +1451,8 @@ eoi_parser:
                         }
                         for(i=0;i<3;i++) {
                             picture->data[i] = s->current_picture[i];
-#if 1
-                            l = s->linesize[i];
-                            if (s->interlaced)
-                                l >>= 1;
-                            picture->linesize[i] = l;
-#else
 			    picture->linesize[i] = (s->interlaced) ?
 				s->linesize[i] >> 1 : s->linesize[i];
-#endif
                         }
                         *data_size = sizeof(AVPicture);
                         avctx->height = s->height;
@@ -1468,7 +1474,7 @@ eoi_parser:
                         }
                         /* dummy quality */
                         /* XXX: infer it with matrix */
-                    	avctx->quality = 3; 
+//                    	avctx->quality = 3; 
                         goto the_end;
                     }
 		    break;
@@ -1635,7 +1641,7 @@ read_header:
     }
     /* dummy quality */
     /* XXX: infer it with matrix */
-    avctx->quality = 3; 
+//    avctx->quality = 3; 
 
     return buf_ptr - buf;
 }

@@ -24,12 +24,20 @@ typedef struct OggVorbisContext {
 
 
 int oggvorbis_init_encoder(vorbis_info *vi, AVCodecContext *avccontext) {
-    if(avccontext->quality) /* VBR requested */
-	return vorbis_encode_init_vbr(vi, avccontext->channels,
-		  avccontext->sample_rate, (float)avccontext->quality / 1000) ;
+
+#ifdef OGGVORBIS_VBR_BY_ESTIMATE
+    /* variable bitrate by estimate */
+
+    return (vorbis_encode_setup_managed(vi, avccontext->channels,
+              avccontext->sample_rate, -1, avccontext->bit_rate, -1) ||
+	    vorbis_encode_ctl(vi, OV_ECTL_RATEMANAGE_AVG, NULL) ||
+	    vorbis_encode_setup_init(vi)) ;
+#else
+    /* constant bitrate */
 
     return vorbis_encode_init(vi, avccontext->channels,
 	          avccontext->sample_rate, -1, avccontext->bit_rate, -1) ;
+#endif
 }
 
 
@@ -45,6 +53,9 @@ static int oggvorbis_encode_init(AVCodecContext *avccontext) {
     vorbis_block_init(&context->vd, &context->vb) ;
 
     avccontext->frame_size = OGGVORBIS_FRAME_SIZE ;
+ 
+    avccontext->coded_frame= avcodec_alloc_frame();
+    avccontext->coded_frame->key_frame= 1;
     
     return 0 ;
 }
@@ -113,6 +124,8 @@ static int oggvorbis_encode_close(AVCodecContext *avccontext) {
     vorbis_block_clear(&context->vb);
     vorbis_dsp_clear(&context->vd);
     vorbis_info_clear(&context->vi);
+
+    av_freep(&avccontext->coded_frame);
   
     return 0 ;
 }

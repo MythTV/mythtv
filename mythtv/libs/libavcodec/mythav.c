@@ -17,9 +17,10 @@ void mythav_set_last_picture(AVCodecContext *avctx, UINT8 *buf,
         case CODEC_ID_H263I:
         {
             MpegEncContext *s = avctx->priv_data;
-            s->next_picture[0] = buf;
-            s->next_picture[1] = buf + width * height;
-            s->next_picture[2] = s->next_picture[1] + width * height / 4;
+            s->next_picture.data[0] = buf;
+            s->next_picture.data[1] = buf + width * height;
+            s->next_picture.data[2] = s->next_picture.data[1] + 
+                                       width * height / 4;
             break;
         }
         default: break;

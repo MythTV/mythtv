@@ -215,7 +215,7 @@ class NuppelVideoRecorder
 
     AVCodec *mpa_codec;
     AVCodecContext *mpa_ctx;
-    AVPicture mpa_picture;
+    AVFrame mpa_picture;
 
     int targetbitrate;
     int scalebitrate;

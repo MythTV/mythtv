@@ -109,6 +109,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythContext *context)
 
     mpa_codec = 0;
     mpa_ctx = NULL;
+    mpa_pic = NULL;
     osdtheme = "none";
     directrendering = false;
 
@@ -668,16 +669,37 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     return 0;
 }
 
-int get_buffer(struct AVCodecContext *c, int width, int height, 
-               int pict_type)
+int get_buffer(struct AVCodecContext *c, AVFrame *pic)
 {
-    pict_type = pict_type;
-    NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)(c->dr_opaque_frame);
-    c->dr_buffer[0] = nvp->directbuf;
-    c->dr_buffer[1] = c->dr_buffer[0] + width * height;
-    c->dr_buffer[2] = c->dr_buffer[1] + width * height / 4;
+    NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)(c->opaque);
+
+    int width = c->width;
+    int height = c->height;
+
+    pic->data[0] = nvp->directbuf;
+    pic->data[1] = pic->data[0] + width * height;
+    pic->data[2] = pic->data[1] + width * height / 4;
+
+    pic->linesize[0] = width;
+    pic->linesize[1] = width / 2;
+    pic->linesize[2] = width / 2;
+
+    pic->opaque = nvp;
+    pic->type = FF_BUFFER_TYPE_USER;
+
+    pic->age = 256 * 256 * 256 * 64;
 
     return 1;
+}
+
+void release_buffer(struct AVCodecContext *c, AVFrame *pic)
+{
+    (void)c;
+    assert(pic->type == FF_BUFFER_TYPE_USER);
+
+    int i;
+    for (i = 0; i < 4; i++)
+        pic->data[i] = NULL;
 }
 
 bool NuppelVideoPlayer::InitAVCodec(int codec)
@@ -719,6 +741,11 @@ bool NuppelVideoPlayer::InitAVCodec(int codec)
     if (mpa_ctx)
         free(mpa_ctx);
 
+    if (mpa_pic)
+        free(mpa_pic);
+
+    mpa_pic = avcodec_alloc_frame();
+
     mpa_ctx = avcodec_alloc_context();
 
     mpa_ctx->codec_id = (enum CodecID)codec;
@@ -729,17 +756,16 @@ bool NuppelVideoPlayer::InitAVCodec(int codec)
 
     if (directrendering) 
     {
-        mpa_ctx->flags |= CODEC_FLAG_EMU_EDGE | CODEC_FLAG_DR1; 
+        mpa_ctx->flags |= CODEC_FLAG_EMU_EDGE; 
         mpa_ctx->draw_horiz_band = NULL;
-        mpa_ctx->get_buffer_callback = get_buffer;
-        mpa_ctx->dr_opaque_frame = (void *)this;
-        mpa_ctx->dr_ip_buffer_count = 100;
-        mpa_ctx->dr_stride = video_width;
-        mpa_ctx->dr_uvstride = video_width / 2;
+        mpa_ctx->get_buffer = get_buffer;
+        mpa_ctx->release_buffer = release_buffer;
+        mpa_ctx->opaque = (void *)this;
     }
 
     if (ffmpeg_extradatasize > 0)
     {
+        mpa_ctx->flags |= CODEC_FLAG_EXTERN_HUFF;
         mpa_ctx->extradata = ffmpeg_extradata;
         mpa_ctx->extradata_size = ffmpeg_extradatasize;
     }
@@ -762,7 +788,10 @@ void NuppelVideoPlayer::CloseAVCodec(void)
 
     if (mpa_ctx)
         free(mpa_ctx);
+    if (mpa_pic)
+        free(mpa_pic);
     mpa_ctx = NULL;
+    mpa_pic = NULL;
 }
 
 void NuppelVideoPlayer::InitFilters(void)
@@ -861,7 +890,7 @@ bool NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
 #endif
         // if directrendering, writes into buf
         directbuf = outbuf;
-        int ret = avcodec_decode_video(mpa_ctx, &mpa_picture, &gotpicture,
+        int ret = avcodec_decode_video(mpa_ctx, mpa_pic, &gotpicture,
                                        lstrm, frameheader->packetlength);
 #ifdef EXTRA_LOCKING
         pthread_mutex_unlock(&avcodeclock);
@@ -882,7 +911,13 @@ bool NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
 
         avpicture_fill(&tmppicture, outbuf, PIX_FMT_YUV420P, video_width,
                        video_height);
-        img_convert(&tmppicture, PIX_FMT_YUV420P, &mpa_picture,
+        for (int i = 0; i < 4; i++)
+        {
+            mpa_pic_tmp.data[i] = mpa_pic->data[i];
+            mpa_pic_tmp.linesize[i] = mpa_pic->linesize[i];
+        }
+
+        img_convert(&tmppicture, PIX_FMT_YUV420P, &mpa_pic_tmp,
                     mpa_ctx->pix_fmt, video_width, video_height);
     }
 
@@ -1943,6 +1978,9 @@ bool NuppelVideoPlayer::DoRewind(void)
     if (!exactseeks)
         normalframes = 0;
 
+    if (mpa_codec)
+        avcodec_flush_buffers(mpa_ctx);
+ 
     while (normalframes > 0)
     {
         fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
@@ -2109,6 +2147,9 @@ bool NuppelVideoPlayer::DoFastForward(void)
 
     if (!exactseeks)
         normalframes = 0;
+
+    if (mpa_codec)
+        avcodec_flush_buffers(mpa_ctx);
 
     while (normalframes > 0 && !fileend)
     {
@@ -3100,7 +3141,7 @@ correct place with respect to when commericals usually happen.
     mpa_ctx->gop_size = 30; 
     mpa_ctx->flags = CODEC_FLAG_HQ; // | CODEC_FLAG_TYPE; 
     mpa_ctx->me_method = 5;
-    mpa_ctx->key_frame = -1; 
+    //mpa_ctx->key_frame = -1; 
 
     if (avcodec_open(mpa_ctx, mpa_codec) < 0)
     {

@@ -67,7 +67,6 @@ class MythContext : public QObject
 
     QString GetSetting(const QString &key, const QString &defaultval = "");
     int GetNumSetting(const QString &key, int defaultval = 0);
-    int GetBooleanSetting(const QString &key, int defaultval = 0);
 
     void SetSetting(const QString &key, const QString &newValue);
 
