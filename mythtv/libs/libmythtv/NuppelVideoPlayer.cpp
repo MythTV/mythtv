@@ -1692,8 +1692,8 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
             long long behind = totalFrames - framesPlayed;
             if (behind < maxtime)
                 ret = 0;
-            else if (behind - ff <= maxtime)
-                ret = behind - maxtime;
+            else if (behind - ff <= maxtime * 2)
+                ret = behind - maxtime * 2;
         }
     }
 

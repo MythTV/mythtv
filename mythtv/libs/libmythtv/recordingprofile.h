@@ -9,6 +9,7 @@ const char availProfiles[][20] =
 
 class RecordingProfile;
 class VideoCompressionSettings;
+class AudioCompressionSettings;
 
 // Any setting associated with a recording profile
 class RecordingProfileSetting: virtual public Setting {
@@ -86,6 +87,7 @@ private:
     Name* name;
     ImageSize* imageSize;
     VideoCompressionSettings *vc;
+    AudioCompressionSettings *ac;
 };
 
 class RecordingProfileEditor: public ListBoxSetting, public ConfigurationDialog {

@@ -71,28 +71,162 @@ public:
     };
 };
 
+class MPEG2audType: public CodecParam, public ComboBoxSetting {
+public:
+   MPEG2audType(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg2audtype") {
+        setLabel("Type");
+	setHelpText("Sets the audio type");
+    };
+};
+
+class MPEG2audBitrateL1: public CodecParam, public ComboBoxSetting {
+public:
+   MPEG2audBitrateL1(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg2audbitratel1") {
+        setLabel("Bitrate");
+        
+        addSelection("32 kbps", "32");
+        addSelection("64 kbps", "64");
+        addSelection("96 kbps", "96");
+        addSelection("128 kbps", "128");
+        addSelection("160 kbps", "160");
+        addSelection("192 kbps", "192");
+        addSelection("224 kbps", "224");
+        addSelection("256 kbps", "256");
+        addSelection("288 kbps", "288");
+        addSelection("320 kbps", "320");
+        addSelection("352 kbps", "352");
+        addSelection("384 kbps", "384");
+        addSelection("416 kbps", "416");
+        addSelection("448 kbps", "448");
+        setValue(13);
+        setHelpText("Sets the audio bitrate");
+    };
+};
+
+class MPEG2audBitrateL2: public CodecParam, public ComboBoxSetting {
+public:
+   MPEG2audBitrateL2(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg2audbitratel2") {
+        setLabel("Bitrate");
+        
+        addSelection("32 kbps", "32");
+        addSelection("48 kbps", "48");
+        addSelection("56 kbps", "56");
+        addSelection("64 kbps", "64");
+        addSelection("80 kbps", "80");
+        addSelection("96 kbps", "96");
+        addSelection("112 kbps", "112");
+        addSelection("128 kbps", "128");
+        addSelection("160 kbps", "160");
+        addSelection("192 kbps", "192");
+        addSelection("224 kbps", "224");
+        addSelection("256 kbps", "256");
+        addSelection("320 kbps", "320");
+        addSelection("384 kbps", "384");
+        setValue(13);
+        setHelpText("Sets the audio bitrate");
+    };
+};
+
+class MPEG2audVolume: public CodecParam, public SliderSetting {
+public:
+    MPEG2audVolume(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg2audvolume"),
+        SliderSetting(0,100,5) {
+
+        setLabel("Volume (%)");
+        setValue(80);
+        setHelpText("Volume of the recording ");
+    };
+};
+
+class MPEG2AudioBitrateSettings: public VerticalConfigurationGroup,
+                                 public TriggeredConfigurationGroup {
+public:
+    MPEG2AudioBitrateSettings(const RecordingProfile& parent)
+           : VerticalConfigurationGroup(false)
+    {
+        setLabel("Bitrate Settings");
+        setUseLabel(false);
+        MPEG2audType* audType = new MPEG2audType(parent);
+        addChild(audType);
+        setTrigger(audType);
+
+        ConfigurationGroup* audbr = new VerticalConfigurationGroup(false);
+        audbr->addChild(new MPEG2audBitrateL1(parent));
+        audbr->setLabel("Layer I");
+        addTarget("Layer I", audbr);
+        audType->addSelection("Layer I");
+
+        audbr = new VerticalConfigurationGroup(false);
+        audbr->addChild(new MPEG2audBitrateL2(parent));
+        audbr->setLabel("Layer II");
+        addTarget("Layer II", audbr);
+        audType->addSelection("Layer II");
+        audType->setValue(1);
+    };
+};
+
 class AudioCompressionSettings: public VerticalConfigurationGroup,
                                 public TriggeredConfigurationGroup {
 public:
-    AudioCompressionSettings(const RecordingProfile& parent)
+    AudioCompressionSettings(const RecordingProfile& parent, QString profName)
            : VerticalConfigurationGroup(false)
     {
-        setLabel("Audio Compression");
+        QString labelName;
+        if (profName.isNull())
+            labelName = QString("Audio Quality");
+        else
+            labelName = profName + "->Audio Quality";
+        setName(labelName);
         setUseLabel(false);
 
-        AudioCodecName* codecName = new AudioCodecName(parent);
+        addChild(new SampleRate(parent));
+
+        codecName = new AudioCodecName(parent);
         addChild(codecName);
         setTrigger(codecName);
 
-        ConfigurationGroup* params = new VerticalConfigurationGroup();
+        ConfigurationGroup* params = new VerticalConfigurationGroup(false);
         params->setLabel("MP3");
         params->addChild(new MP3Quality(parent));
         addTarget("MP3", params);
-        codecName->addSelection("MP3");
 
-        addTarget("Uncompressed", new VerticalConfigurationGroup());
-        codecName->addSelection("Uncompressed");
+        params = new VerticalConfigurationGroup(false);
+        params->setLabel("MPEG-2 Hardware Encoder");
+        params->addChild(new MPEG2AudioBitrateSettings(parent));
+        params->addChild(new MPEG2audVolume(parent));
+        addTarget("MPEG-2 Hardware Encoder", params);
+
+        params = new VerticalConfigurationGroup(false);
+        params->setLabel("Uncompressed");
+        addTarget("Uncompressed", params);
     };
+
+    void selectCodecs(QString groupType)
+    {
+        if(!groupType.isNull())
+        {
+            if(groupType == "MPEG")
+               codecName->addSelection("MPEG-2 Hardware Encoder");
+            else
+            {
+                // V4L, TRANSCODE (and any undefined types)
+                codecName->addSelection("MP3");
+                codecName->addSelection("Uncompressed");
+            }
+        }
+        else
+        {
+            codecName->addSelection("MP3");
+            codecName->addSelection("Uncompressed");
+            codecName->addSelection("MPEG-2 Hardware Encoder");
+        }
+    }
+private:
+    AudioCodecName* codecName;
 };
 
 class VideoCodecName: public ComboBoxSetting, public RecordingProfileParam {
@@ -223,6 +357,65 @@ public:
     };
 };
 
+class MPEG2bitrate: public CodecParam, public SliderSetting {
+public:
+    MPEG2bitrate(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg2bitrate"),
+        SliderSetting(1000,16000,500) {
+
+        setLabel("Bitrate");
+        setValue(8000);
+        setHelpText("Bitrate in kilobits/second.  2200Kbps is "
+                    "approximately 1 Gigabyte per hour.");
+    };
+};
+
+class MPEG2maxBitrate: public CodecParam, public SliderSetting {
+public:
+    MPEG2maxBitrate(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg2maxbitrate"),
+        SliderSetting(1000,16000,500) {
+
+        setLabel("Max. Bitrate");
+        setValue(16000);
+        setHelpText("Maximum Bitrate in kilobits/second.  2200Kbps is "
+                    "approximately 1 Gigabyte per hour.");
+    };
+};
+
+class MPEG2streamType: public CodecParam, public ComboBoxSetting {
+public:
+    MPEG2streamType(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg2streamtype") {
+        setLabel("Stream Type");
+        
+        addSelection("MPEG-2 PS");
+        addSelection("MPEG-2 TS");
+        addSelection("MPEG-1 VCD");
+        addSelection("PES AV");
+        addSelection("PES V");
+        addSelection("PES A");
+        addSelection("DVD");
+        setValue(0);
+        setHelpText("Sets the type of stream generated by your PVR. ");
+    };
+};
+
+class MPEG2aspectRatio: public CodecParam, public ComboBoxSetting {
+public:
+    MPEG2aspectRatio(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg2aspectratio") {
+        setLabel("Aspect Ratio");
+        
+        addSelection("Square");
+        addSelection("4:3");
+        addSelection("16:9");
+        addSelection("2.21:1");
+        setValue(1);
+        setHelpText("Sets the aspect ratio of stream generated by your PVR. ");
+    };
+};
+
 class HardwareMJPEGQuality: public CodecParam, public SliderSetting {
 public:
     HardwareMJPEGQuality(const RecordingProfile& parent):
@@ -303,15 +496,24 @@ public:
         params->addChild(new HardwareMJPEGVDecimation(parent));
  
         addTarget("Hardware MJPEG", params);
+
+        params = new VerticalConfigurationGroup(false);
+        params->setLabel("MPEG-2 Hardware Encoder");
+        params->addChild(new MPEG2streamType(parent));
+        params->addChild(new MPEG2aspectRatio(parent));
+        params->addChild(new MPEG2bitrate(parent));
+        params->addChild(new MPEG2maxBitrate(parent));
+
+        addTarget("MPEG-2 Hardware Encoder", params);
     }
 
     void selectCodecs(QString groupType)
     {
         if(!groupType.isNull())
         {
-//            if(groupType == "MPEG")
-//               codecName->addSelection("Hardware MPEG2");
-            if(groupType == "MJPEG")
+            if(groupType == "MPEG")
+               codecName->addSelection("MPEG-2 Hardware Encoder");
+            else if(groupType == "MJPEG")
                 codecName->addSelection("Hardware MJPEG");
             else
             {
@@ -325,6 +527,7 @@ public:
             codecName->addSelection("RTjpeg");
             codecName->addSelection("MPEG-4");
             codecName->addSelection("Hardware MJPEG");
+            codecName->addSelection("MPEG-2 Hardware Encoder");
         }
     }
 
@@ -413,15 +616,8 @@ RecordingProfile::RecordingProfile(QString profName)
     vc = new VideoCompressionSettings(*this, profName);
     addChild(vc);
 
-    ConfigurationGroup* audioquality = new VerticalConfigurationGroup(false);
-    if (profName.isNull())
-        labelName = QString("Audio Quality");
-    else
-        labelName = profName + "->Audio Quality";
-    audioquality->setLabel(labelName);
-    audioquality->addChild(new SampleRate(*this));
-    audioquality->addChild(new AudioCompressionSettings(*this));
-    addChild(audioquality);
+    ac = new AudioCompressionSettings(*this, profName);
+    addChild(ac);
 };
 
 void RecordingProfile::loadByID(QSqlDatabase* db, int profileId) {
@@ -480,6 +676,7 @@ bool RecordingProfile::loadByGroup(QSqlDatabase* db, QString name, QString group
 void RecordingProfile::setCodecTypes(QSqlDatabase *db)
 {
     vc->selectCodecs(groupType(db));
+    ac->selectCodecs(groupType(db));
 }
 
 void RecordingProfileEditor::open(int id) {

@@ -512,6 +512,20 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
         nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
+        SetOption(profile, "mpeg2bitrate");
+        SetOption(profile, "mpeg2maxbitrate");
+        nvr->SetOption("mpeg2streamtype", 
+                       profile.byName("mpeg2streamtype")->getValue());
+        nvr->SetOption("mpeg2aspectratio", 
+                       profile.byName("mpeg2aspectratio")->getValue());
+
+        SetOption(profile, "samplerate");
+        nvr->SetOption("mpeg2audtype", 
+                       profile.byName("mpeg2audtype")->getValue());
+        SetOption(profile, "mpeg2audbitratel1");
+        SetOption(profile, "mpeg2audbitratel2");
+        SetOption(profile, "mpeg2audvolume");
+
         SetOption(profile, "width");
         SetOption(profile, "height");
 
@@ -584,7 +598,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         SetOption(profile, "hardwaremjpegquality");
         SetOption(profile, "hardwaremjpeghdecimation");
         SetOption(profile, "hardwaremjpegvdecimation");
-    } 
+    }
     else 
         cerr << "Unknown video codec: " << setting << endl;
 

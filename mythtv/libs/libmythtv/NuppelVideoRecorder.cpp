@@ -496,6 +496,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 {
     int afmt, afd;
     int frag, blocksize = 4096;
+    int tmp;
 
     if (!skipdevice)
     {
@@ -521,9 +522,10 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
             return 1;
         }
 
+        tmp = audio_samplerate;
         if (ioctl(afd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
             ioctl(afd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
-            ioctl(afd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
+            ioctl(afd, SNDCTL_DSP_SPEED, &tmp) < 0)
         {
             cerr << "recorder: " << audiodevice 
                  << ": error setting audio input device to "
@@ -557,7 +559,11 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
         lame_set_num_channels(gf, audio_channels);
         lame_set_out_samplerate(gf, audio_samplerate);
         lame_set_in_samplerate(gf, audio_samplerate);
-        lame_init_params(gf);
+        if((tmp = lame_init_params(gf)) != 0)
+        {
+            cerr << "lame_init_params error " << tmp << ", exiting\n";
+            return 1;
+        }
 
         if (audio_bits != 16) 
         {

@@ -46,13 +46,13 @@
 
    <button>
       <type>TV_SCHEDULE</type>
-      <text>Recording</text>
+      <text>Recording Profiles</text>
       <text lang="IT">Registrazione</text>
       <text lang="ES">Grabación</text>
       <text lang="CA">Gravació</text>
       <text lang="NL">Opnemen</text>
       <text lang="FR">Enregistrement</text>
-      <text lang="DE">Aufnahmen</text>
+      <text lang="DE">Aufnahme- profile</text>
       <text lang="DK">Optagelse</text>
       <text lang="PT">Configurações de Gravação</text>
       <text lang="SV">Inspelning</text>

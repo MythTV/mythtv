@@ -13,8 +13,7 @@ class MpegRecorder : public RecorderBase
    ~MpegRecorder();
 
     void SetOption(const QString &opt, int value);
-    void SetOption(const QString &name, const QString &value)
-                       { RecorderBase::SetOption(name, value); }
+    void SetOption(const QString &name, const QString &value);
     void SetVideoFilters(QString &filters);
 
     void Initialize(void);
@@ -52,6 +51,9 @@ class MpegRecorder : public RecorderBase
     long long framesWritten;
 
     int width, height;
+    int bitrate, maxbitrate, streamtype, aspectratio;
+    int audtype, audsamplerate, audbitratel1, audbitratel2;
+    int audvolume;
 
     int chanfd;
     int readfd;
@@ -64,6 +66,9 @@ class MpegRecorder : public RecorderBase
     QMap<long long, long long> positionMap;
 
     long long prev_gop_save_pos;
+    static const int audRateL1[];
+    static const int audRateL2[];
+    static const char* streamType[];
+    static const char* aspectRatio[];
 };
-
 #endif

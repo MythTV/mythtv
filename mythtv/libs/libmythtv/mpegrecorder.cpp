@@ -10,6 +10,10 @@
 #include <sys/time.h>
 #include <time.h>
 #include "videodev_myth.h"
+extern "C" {
+#include <inttypes.h>
+#include "ivtv-ext-api.h"
+}
 
 using namespace std;
 
@@ -22,6 +26,16 @@ extern "C" {
 #include "../libavcodec/avcodec.h"
 #include "../libavformat/avformat.h"
 }
+
+const int MpegRecorder::audRateL1[] = { 32, 64, 96, 128, 160, 192, 224, 
+                                        256, 288, 320, 352, 384, 416, 448, 0 };
+const int MpegRecorder::audRateL2[] = { 32, 48, 56, 64, 80, 96, 112, 128, 
+                                        160, 192, 224, 256, 320, 384, 0 };
+const char* MpegRecorder::streamType[] = { "MPEG-2 PS", "MPEG-2 TS", 
+                                           "MPEG-1 VCD", "PES AV", "", "PES V", 
+                                           "", "PES A", "", "", "DVD"};
+const char* MpegRecorder::aspectRatio[] = { "Square", "4:3", "16:9", 
+                                            "2.21:1", 0 };
 
 MpegRecorder::MpegRecorder()
             : RecorderBase()
@@ -40,6 +54,16 @@ MpegRecorder::MpegRecorder()
 
     keyframedist = 15;
     gopset = false;
+
+    bitrate = 8000;
+    maxbitrate = 16000;
+    streamtype = 0;
+    aspectratio = 2;
+    audtype = 2;
+    audsamplerate = 48000;
+    audbitratel1 = 14;
+    audbitratel2 = 14;
+    audvolume = 80;
 }
 
 MpegRecorder::~MpegRecorder()
@@ -52,12 +76,88 @@ MpegRecorder::~MpegRecorder()
 
 void MpegRecorder::SetOption(const QString &opt, int value)
 {
+    bool found = false;
     if (opt == "width")
         width = value;
     else if (opt == "height")
         height = value;
+    else if (opt == "mpeg2bitrate")
+        bitrate = value;
+    else if (opt == "mpeg2maxbitrate")
+        maxbitrate = value;
+    else if (opt == "samplerate")
+        audsamplerate = value;
+    else if (opt == "mpeg2audbitratel1")
+    {
+        for (int i = 0; audRateL1[i] != 0; i++)
+            if (audRateL1[i] == value)
+            {
+                audbitratel1 = i + 1;
+                found = true;
+                break;
+            }
+        if (! found)
+            cerr << "Audiorate(L1): " << value << " is invalid\n";
+
+    }
+    else if (opt == "mpeg2audbitratel2")
+    {
+        for (int i = 0; audRateL2[i] != 0; i++)
+            if (audRateL2[i] == value)
+            {
+                audbitratel2 = i + 1;
+                found = true;
+                break;
+            }
+        if (! found)
+            cerr << "Audiorate(L2): " << value << " is invalid\n";
+    }
+    else if (opt == "mpeg2audvolume")
+        audvolume = value;
     else
         RecorderBase::SetOption(opt, value);
+}
+
+void MpegRecorder::SetOption(const QString &opt, const QString &value)
+{
+    if (opt == "mpeg2streamtype")
+    {
+        bool found;
+        for (unsigned int i = 0; i < sizeof(streamType) / sizeof(char*); i++)
+            if (QString(streamType[i]) == value)
+            {
+                streamtype = i;
+                found = true;
+                break;
+            }
+        if (! found)
+            cerr << "MPEG2 stream type: " << value << " is invalid\n";
+    }
+    else if (opt == "mpeg2aspectratio")
+    {
+        bool found = false;
+        for (int i = 0; aspectRatio[i] != 0; i++)
+            if (QString(aspectRatio[i]) == value)
+            {
+                aspectratio = i + 1;
+                found = true;
+                break;
+            }
+        if (! found)
+            cerr << "MPEG2 Aspect-ratio: " << value << " is invalid\n";
+    }
+    else if (opt == "mpeg2audtype")
+    {
+        if (value == "Layer I")
+            audtype = 1;
+        else if (value == "Layer II")
+            audtype = 2;
+        else
+            cerr << "MPEG2 layer: " << value << " is invalid\n";
+    }
+    else
+        RecorderBase::SetOption(opt, value);
+
 }
 
 void MpegRecorder::StartRecording(void)
@@ -87,6 +187,60 @@ void MpegRecorder::StartRecording(void)
     {
         cerr << "Error setting format\n";
         perror("VIDIOC_S_FMT:");
+        return;
+    }
+
+    struct ivtv_ioctl_codec ivtvcodec;
+    memset(&ivtvcodec, 0, sizeof(ivtvcodec));
+
+    if (ioctl(chanfd, IVTV_IOC_G_CODEC, &ivtvcodec) < 0)
+    {
+        cerr << "Error getting codec params\n";
+        perror("IVTV_IOC_G_CODEC:");
+        return;
+    }
+
+    int audio_rate;
+    if (audsamplerate == 44100)
+        audio_rate = 0;
+    else if (audsamplerate == 48000)
+        audio_rate = 1;
+    else if (audsamplerate == 32000)
+        audio_rate = 2;
+    else
+    {
+        cerr << "Error setting audio sample rate\n";
+        cerr << audsamplerate << " is not a valid sampling rate\n";
+        return;
+    }
+    ivtvcodec.aspect = aspectratio;
+    if (audtype == 2)
+        ivtvcodec.audio_bitmask = audio_rate + (audtype << 2) + 
+                                  (audbitratel2 << 4);
+    else
+        ivtvcodec.audio_bitmask = audio_rate + (audtype << 2) + 
+                                  (audbitratel1 << 4);
+    ivtvcodec.bitrate = bitrate * 1000;
+    ivtvcodec.bitrate_peak = maxbitrate * 1000;
+    // framerate (1 = 25fps, 0 = 30fps)
+    ivtvcodec.framerate = (! ntsc);
+    ivtvcodec.stream_type = streamtype;
+
+    if (ioctl(chanfd, IVTV_IOC_S_CODEC, &ivtvcodec) < 0)
+    {
+        cerr << "Error setting codec params\n";
+        perror("IVTV_IOC_S_CODEC:");
+        return;
+    }
+
+    struct v4l2_control ctrl;
+    ctrl.id = V4L2_CID_AUDIO_VOLUME;
+    ctrl.value = 65536 / 100 *audvolume;
+
+    if (ioctl(chanfd, VIDIOC_S_CTRL, &ctrl) < 0)
+    {
+        cerr << "Error setting codec params\n";
+        perror("VIDIOC_S_CTRL:");
         return;
     }
 

@@ -264,7 +264,7 @@ int main(int argc, char **argv)
 
     if (logfile != "")
     {
-        logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
+        logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
          
         if (logfd < 0)
         {

@@ -1114,11 +1114,11 @@
     </message>
     <message>
         <source>Rewind</source>
-        <translation>Rückwärts</translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <source>Skip Back</source>
-        <translation>Zurück springen</translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <source>Play</source>
@@ -1150,7 +1150,7 @@
     </message>
     <message>
         <source>Skip</source>
-        <translation>Überspringen</translation>
+        <translation>Springen</translation>
     </message>
     <message>
         <source>16:9</source>
