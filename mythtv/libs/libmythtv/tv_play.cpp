@@ -2777,14 +2777,19 @@ void TV::ToggleRecord(void)
         ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db,
                                                                       chanid,
                                                                       startts);
-        program_info->ToggleRecord(m_db);
 
-        QString msg = QString("%1 \"%2\"").arg(tr("Record")).arg(title);
+        if (program_info)
+        {
+            program_info->ToggleRecord(m_db);
 
-        if (activenvp == nvp)
-            osd->SetSettingsText(msg, 3);
+            QString msg = QString("%1 \"%2\"").arg(tr("Record")).arg(title);
 
-        delete program_info;
+            if (activenvp == nvp)
+                osd->SetSettingsText(msg, 3);
+
+            delete program_info;
+        }
+
         return;
     }
 
