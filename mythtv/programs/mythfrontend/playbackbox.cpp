@@ -399,13 +399,21 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
         container->ClearAllText();
         QPainter tmp(&pix);
         QMap<QString, QString> infoMap;
+        int countInGroup; // = progLists[""].count();
+        
+       
         if(titleList[titleIndex] == "")
-            infoMap["title"] = groupDisplayName;
+        {
+           countInGroup = progLists[""].count(); 
+           infoMap["title"] = groupDisplayName;
+        }
         else
+        {                  
+            countInGroup = progLists[titleList[titleIndex]].count();
             infoMap["title"] = QString("%1 - %2").arg(groupDisplayName)
                                                  .arg(titleList[titleIndex]);
-
-        int countInGroup = progLists[""].count();
+        }
+        
         if (countInGroup > 1)
             infoMap["description"] = QString(tr("There are %1 recordings in "
                                                 "this display group"))
@@ -953,6 +961,7 @@ void PlaybackBox::cursorLeft()
     {
         if(haveGroupInfoSet)
             killPlayerSafe();
+        
         inTitle = true;
         skipUpdate = false;
         
