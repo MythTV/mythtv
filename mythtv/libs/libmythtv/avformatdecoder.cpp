@@ -795,6 +795,13 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             {
                 gopset = true;
                 keyframedist = tempKeyFrameDist;
+
+                if ((keyframedist == 15) ||
+                    (keyframedist == 12))
+                    positionMapType = MARK_GOP_START;
+                else
+                    positionMapType = MARK_GOP_BYFRAME;
+
                 VERBOSE(VB_PLAYBACK, QString("Stream initial keyframedist: %1.").arg(keyframedist));
                 m_parent->SetVideoParams(-1, -1, -1, keyframedist,
                                          current_aspect);
@@ -808,6 +815,13 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                                              .arg(tempKeyFrameDist).arg(keyframedist));
 
                 keyframedist = tempKeyFrameDist;
+
+                if ((keyframedist == 15) ||
+                    (keyframedist == 12))
+                    positionMapType = MARK_GOP_START;
+                else
+                    positionMapType = MARK_GOP_BYFRAME;
+
                 m_parent->SetVideoParams(-1, -1, -1, keyframedist,
                                          current_aspect);
                 // also reset length

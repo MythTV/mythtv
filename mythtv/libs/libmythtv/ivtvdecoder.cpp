@@ -27,8 +27,6 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
 {
     lastStartFrame = 0;
 
-    keyframedist = 15;
-
     gopset = false;
     firstgoppos = 0;
     prevgoppos = 0;
@@ -42,8 +40,6 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     prvpkt[0] = prvpkt[1] = prvpkt[2] = 0;
 
     vidread = vidwrite = vidfull = 0;
-
-    positionMapType = MARK_GOP_START;
 }
 
 IvtvDecoder::~IvtvDecoder()
@@ -152,13 +148,15 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     m_parent->ForceVideoOutputType(kVideoOutput_IVTV);
 
+    keyframedist = -1;
+    positionMapType = MARK_UNSET;
+
     int video_width = 720;
     int video_height = 480;
     if (!ntsc)
     {
         video_height = 576;
         fps = 25.00;
-        keyframedist = 12;
     }
     m_parent->SetVideoParams(video_width, video_height, 
                              fps, keyframedist, 1.33);
@@ -240,9 +238,16 @@ void IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
 
                     if (!gopset && frameNum > 0)
                     {
-                        if (firstgoppos > 0)
+                        if ((firstgoppos > 0) && (keyframedist != 1))
                         {
                             keyframedist = frameNum - firstgoppos;
+
+                            if ((keyframedist == 15) ||
+                                (keyframedist == 12))
+                                positionMapType = MARK_GOP_START;
+                            else
+                                positionMapType = MARK_GOP_BYFRAME;
+
                             gopset = true;
                             m_parent->SetVideoParams(-1, -1, -1, keyframedist);
                             VERBOSE(VB_PLAYBACK,

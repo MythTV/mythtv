@@ -32,6 +32,7 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     posmapStarted = false;
 
     keyframedist = -1;
+    positionMapType = MARK_UNSET;
 
     current_aspect = 1.33333;
     current_width = 640;
@@ -167,6 +168,7 @@ bool DecoderBase::PosMapFromEnc(void)
         if (i1.key() + 1 == i2.key()) 
         {
             //cerr << "keyframedist to 15/12 due to encoder" << endl;
+            positionMapType = MARK_GOP_START;
             keyframedist = 15;
             if (fps < 26 && fps > 24)
                 keyframedist = 12;
@@ -174,6 +176,7 @@ bool DecoderBase::PosMapFromEnc(void)
         else
         {
             //cerr << "keyframedist to 1 due to encoder" << endl;
+            positionMapType = MARK_GOP_BYFRAME;
             keyframedist = 1;
         }
     }
@@ -331,7 +334,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
 
 void DecoderBase::SetPositionMap(void)
 {
-    if (m_playbackinfo && m_db) 
+    if (m_playbackinfo && m_db && (positionMapType != MARK_UNSET)) 
     {
         QMap<long long, long long> posMap;
         for (unsigned int i=0; i < m_positionMap.size(); i++) 
