@@ -30,7 +30,7 @@
 static void *SpawnLirc(void *param)
 {
     MythMainWindow *main_window = (MythMainWindow *)param;
-    QString config_file = QDir::homeDirPath() + "/.mythtv/lircrc";
+    QString config_file = MythContext::GetConfDir() + "/lircrc";
     QString program("mythtv");
     LircClient *cl = new LircClient(main_window);
     if (!cl->Init(config_file, program))

@@ -246,7 +246,7 @@ void OSD::Reinit(int width, int height, int frint, int dispx, int dispy,
 
 QString OSD::FindTheme(QString name)
 {
-    QString testdir = QDir::homeDirPath() + "/.mythtv/osd/" + name;
+    QString testdir = MythContext::GetConfDir() + "/osd/" + name;
     
     QDir dir(testdir);
     if (dir.exists())
@@ -267,7 +267,7 @@ QString OSD::FindTheme(QString name)
 
 TTFFont *OSD::LoadFont(QString name, int size)
 {
-    QString fullname = QDir::homeDirPath() + "/.mythtv/" + name;
+    QString fullname = MythContext::GetConfDir() + "/" + name;
     TTFFont *font = new TTFFont((char *)fullname.ascii(), size, vid_width,
                                 vid_height, hmult);
 

@@ -10,6 +10,7 @@
 
 
 #include "oldsettings.h"
+#include "mythcontext.h"
 #include <qstring.h>
 #include <fstream>
 #include <cstdlib>
@@ -120,7 +121,7 @@ bool Settings::LoadSettingsFiles(QString filename, QString prefix)
     if (ReadSettings(setname))
          result = true;
 
-    setname = QDir::homeDirPath() + "/.mythtv/" + filename;
+    setname = MythContext::GetConfDir() + "/" + filename;
 
     if (ReadSettings(setname))
          result = true;

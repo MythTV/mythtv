@@ -159,8 +159,6 @@ class ThemedMenuPrivate
     int screenwidth;
     int screenheight;
     
-    QString prefix;
-
     QRect buttonArea;
 
     QRect logoRect;
@@ -2334,7 +2332,7 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 
 QString ThemedMenuPrivate::findMenuFile(const QString &menuname)
 {
-    QString testdir = QDir::homeDirPath() + "/.mythtv/" + menuname;
+    QString testdir = MythContext::GetConfDir() + "/" + menuname;
     QFile file(testdir);
     if (file.exists())
         return testdir;
@@ -2350,7 +2348,7 @@ QString ThemedMenuPrivate::findMenuFile(const QString &menuname)
     if (file.exists())
         return testdir;
         
-    testdir = prefix + "/share/mythtv/" + menuname;
+    testdir = gContext->GetShareDir() + menuname;
     file.setName(testdir);
     if (file.exists())
         return testdir;
@@ -2576,7 +2574,6 @@ void ThemedMenu::Init(const char *cdir, const char *menufile)
         return;
     }
 
-    d->prefix = gContext->GetInstallPrefix();
     d->menulevel = 0;
 
     d->callback = NULL;

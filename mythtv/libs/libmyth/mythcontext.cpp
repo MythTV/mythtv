@@ -288,7 +288,7 @@ bool MythContextPrivate::FixSettingsFile(void)
 bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
                                            bool overwrite)
 {
-    QString path = QDir::homeDirPath() + "/.mythtv/mysql.txt";
+    QString path = MythContext::GetConfDir() + "/mysql.txt";
     QFile   * f  = new QFile(path);
     
     if (!overwrite && f->exists())
@@ -296,14 +296,14 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
         return false;
     }
 
-    QString dirpath = QDir::homeDirPath() + "/.mythtv";
+    QString dirpath = MythContext::GetConfDir();
     QDir createDir(dirpath);
 
     if (!createDir.exists())
     {
         if (!createDir.mkdir(dirpath, true))
         {
-            VERBOSE(VB_IMPORTANT, "Could not create ~/.mythtv");
+            VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(dirpath));
             return false;
         }
     }
@@ -729,6 +729,19 @@ QString MythContext::GetInstallPrefix(void)
     return d->m_installprefix; 
 }
 
+QString MythContext::GetConfDir(void)
+{
+    char *tmp_confdir = getenv("MYTHCONFDIR");
+    QString dir;
+    if (tmp_confdir)
+        dir = QString(tmp_confdir);
+    else
+        dir = QDir::homeDirPath() + "/.mythtv";
+
+    //VERBOSE(VB_ALL, QString("Using conf dir = %1").arg(dir));
+    return dir;
+}
+
 QString MythContext::GetShareDir(void) 
 { 
     return d->m_installprefix + "/share/mythtv/"; 
@@ -882,7 +895,7 @@ void MythContext::UpdateImageCache(void)
 
 void MythContext::ClearOldImageCache(void)
 {
-    QString cachedirname = QDir::homeDirPath() + "/.mythtv/themecache/";
+    QString cachedirname = MythContext::GetConfDir() + "/themecache/";
 
     d->themecachedir = cachedirname + GetSetting("Theme") + "." + 
                        QString::number(d->m_screenwidth) + "." + 
@@ -926,7 +939,7 @@ void MythContext::ClearOldImageCache(void)
 
 void MythContext::RemoveCacheDir(const QString &dirname)
 {
-    QString cachedirname = QDir::homeDirPath() + "/.mythtv/themecache/";
+    QString cachedirname = MythContext::GetConfDir() + "/themecache/";
 
     if (!dirname.startsWith(cachedirname))
         return;
@@ -1152,7 +1165,7 @@ void MythContext::InitializeScreenSettings()
 
 QString MythContext::FindThemeDir(const QString &themename)
 {
-    QString testdir = QDir::homeDirPath() + "/.mythtv/themes/" + themename;
+    QString testdir = MythContext::GetConfDir() + "/themes/" + themename;
 
     QDir dir(testdir);
     if (dir.exists())

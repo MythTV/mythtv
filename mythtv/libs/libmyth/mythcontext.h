@@ -128,7 +128,7 @@ class MythPrivRequest
     void *m_data;
 };
 
-#define MYTH_BINARY_VERSION "0.17.20050130-1"
+#define MYTH_BINARY_VERSION "0.17.20050220-1"
 #define MYTH_PROTO_VERSION "14"
 
 extern int print_verbose_messages;
@@ -155,6 +155,7 @@ class MythContext : public QObject
     QString GetInstallPrefix(void);
     QString GetShareDir(void);
     QString GetLibraryDir(void);
+    static QString GetConfDir(void);
 
     QString GetFilePrefix(void);
 

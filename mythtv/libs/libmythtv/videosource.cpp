@@ -393,8 +393,8 @@ void XMLTV_uk_config::save(QSqlDatabase* db) {
                                 "list of available channels"));
     pdlg.show();
 
-    QString filename = QString("%1/.mythtv/%2.xmltv")
-        .arg(QDir::homeDirPath()).arg(parent.getSourceName());
+    QString filename = QString("%1/%2.xmltv")
+        .arg(MythContext::GetConfDir()).arg(parent.getSourceName());
     QString command = QString("tv_grab_uk --config-file '%1' --configure --retry-limit %2 --retry-delay %3 --postalcode %4 --provider %5 --auto-new-channels add")
         .arg(filename)
         .arg(2)
@@ -448,8 +448,8 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
     if (grabber == "tv_grab_de") {
         command = "tv_grab_de --configure";
     } else {
-        QString filename = QString("%1/.mythtv/%2.xmltv")
-            .arg(QDir::homeDirPath()).arg(parent.getSourceName());
+        QString filename = QString("%1/%2.xmltv")
+            .arg(MythContext::GetConfDir()).arg(parent.getSourceName());
 
         command = QString("%1 --config-file '%2' --configure")
             .arg(grabber).arg(filename);

@@ -1861,7 +1861,7 @@ unsigned int promptForChannelUpdates(QValueList<ChanInfo>::iterator chaninfo,
 
 static QString SetupIconCacheDirectory()
 {
-    QString fileprefix = QDir::homeDirPath() + "/.mythtv";
+    QString fileprefix = MythContext::GetConfDir();
 
     QDir dir(fileprefix);
     if (!dir.exists())
@@ -2518,7 +2518,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     QString filename = QString(tempfilename);
 
     QString home = QDir::homeDirPath();
-    QString configfile = QString("%1/.mythtv/%2.xmltv").arg(home)
+    QString configfile = QString("%1/%2.xmltv").arg(MythContext::GetConfDir())
                                                        .arg(source.name);
     QString command;
 

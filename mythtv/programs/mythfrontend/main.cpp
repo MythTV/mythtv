@@ -869,7 +869,11 @@ int main(int argc, char **argv)
                     "                               of all,none,quiet,record,playback,channel," << endl <<
                     "                               osd,file,schedule,network,commflag,audio,libav" << endl <<
                     "--version                      Version information" << endl <<
-                    "<plugin>                       Initialize and run this plugin" << endl;
+                    "<plugin>                       Initialize and run this plugin" << endl <<
+                    endl <<
+                    "Environment Variables:" << endl <<
+                    "$MYTHTVDIR                     Set the installation prefix" << endl <<
+                    "$MYTHCONFDIR                   Set the config dir (instead of ~/.mythtv)" << endl;
             return -1;
         }
     }
@@ -901,7 +905,7 @@ int main(int argc, char **argv)
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";
 
-    QString fileprefix = QDir::homeDirPath() + "/.mythtv";
+    QString fileprefix = MythContext::GetConfDir();
 
     QDir dir(fileprefix);
     if (!dir.exists())

@@ -45,7 +45,7 @@ using namespace std;
 static void *SpawnLirc(void *param)
 {
     MythMainWindow *main_window = (MythMainWindow *)param;
-    QString config_file = QDir::homeDirPath() + "/.mythtv/lircrc";
+    QString config_file = MythContext::GetConfDir() + "/lircrc";
     QString program("mythtv");
     LircClient *cl = new LircClient(main_window);
     if (!cl->Init(config_file, program))
@@ -59,7 +59,7 @@ static void *SpawnLirc(void *param)
 static void *SpawnJoystickMenu(void *param)
 {
     MythMainWindow *main_window = (MythMainWindow *)param;
-    QString config_file = QDir::homeDirPath() + "/.mythtv/joystickmenurc";
+    QString config_file = MythContext::GetConfDir() + "/joystickmenurc";
     JoystickMenuClient *js = new JoystickMenuClient(main_window);
     if (!js->Init(config_file))
         js->Process();

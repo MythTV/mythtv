@@ -148,8 +148,6 @@ class ThemedMenuState
 
     QMap<QString, ButtonIcon> allButtonIcons;
 
-    QString prefix;
-
     TextAttributes normalAttributes;
     TextAttributes activeAttributes;
 
@@ -228,8 +226,6 @@ class ThemedMenuPrivate
 
     ThemedMenuState *m_state;
     bool allocedstate;
-
-    QString prefix;
 
     vector<ThemedButton> buttonList;
     ThemedButton *activebutton;
@@ -1962,7 +1958,7 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 
 QString ThemedMenuPrivate::findMenuFile(const QString &menuname)
 {
-    QString testdir = QDir::homeDirPath() + "/.mythtv/" + menuname;
+    QString testdir = MythContext::GetConfDir() + "/" + menuname;
     QFile file(testdir);
     if (file.exists())
         return testdir;
@@ -1978,7 +1974,7 @@ QString ThemedMenuPrivate::findMenuFile(const QString &menuname)
     if (file.exists())
         return testdir;
         
-    testdir = prefix + "/share/mythtv/" + menuname;
+    testdir = gContext->GetShareDir() + menuname;
     file.setName(testdir);
     if (file.exists())
         return testdir;
@@ -2223,8 +2219,6 @@ void ThemedMenu::Init(const char *cdir, const char *menufile)
         d->foundtheme = false;
         return;
     }
-
-    d->prefix = d->m_state->prefix = gContext->GetInstallPrefix();
 
     d->m_state->callback = NULL;
 
