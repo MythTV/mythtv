@@ -60,6 +60,11 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     mpa_codec = 0;
     osdtheme = "none";
 
+    for (int i = 0; i < MAXVBUFFER; i++)
+    {
+        vbuffer[i] = NULL;
+    }
+
     disablevideo = disableaudio = false;
 
     setpipplayer = pipplayer = NULL;
@@ -94,7 +99,8 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
 
     for (int i = 0; i < MAXVBUFFER; i++)
     {
-        delete [] vbuffer[i];
+        if (vbuffer[i])
+            delete [] vbuffer[i];
     }
 
     CloseAVCodec();
@@ -238,7 +244,26 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             return -1;
         }
     }
+    startpos = ringBuffer->Seek(0, SEEK_CUR);
+    
     ringBuffer->Read(&fileheader, FILEHEADERSIZE);
+
+    while (QString(fileheader.finfo) != "NuppelVideo")
+    {
+        ringBuffer->Seek(startpos, SEEK_SET);
+        char dummychar;
+        ringBuffer->Read(&dummychar, 1);
+
+        startpos = ringBuffer->Seek(0, SEEK_CUR);
+ 
+        ringBuffer->Read(&fileheader, FILEHEADERSIZE);
+
+        if (startpos > 20000)
+        {
+            cerr << "Bad file: " << ringBuffer->GetFilename().ascii() << endl;
+            return -1;
+        }
+    }
 
     if (!skipDsp)
     {
@@ -348,8 +373,28 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             }
         }
 
+        long long startpos2 = ringBuffer->Seek(0, SEEK_CUR);
+
         foundit = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, 
                                                        FRAMEHEADERSIZE));
+
+        while (frameheader.frametype != 'A' && frameheader.frametype != 'V' &&
+               frameheader.frametype != 'S' && frameheader.frametype != 'T' &&
+               frameheader.frametype != 'R' && frameheader.frametype != 'X')
+        {      
+            ringBuffer->Seek(startpos2, SEEK_SET);
+        
+            char dummychar;
+            ringBuffer->Read(&dummychar, 1);
+        
+            startpos2 = ringBuffer->Seek(0, SEEK_CUR);
+        
+            foundid = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, 
+                                                           FRAMEHEADERSIZE));
+
+            if (foundit)
+                break;
+        }
     }
 
     delete [] space;
@@ -681,10 +726,29 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
     while (!gotvideo)
     {
 	long long currentposition = ringBuffer->GetReadPosition();
+        long long startpos = ringBuffer->Seek(0, SEEK_CUR);
         if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
         {
             eof = 1;
             return;
+        }
+
+        while (frameheader.frametype != 'A' && frameheader.frametype != 'V' &&
+               frameheader.frametype != 'S' && frameheader.frametype != 'T' &&
+               frameheader.frametype != 'R' && frameheader.frametype != 'X')
+        {
+            ringBuffer->Seek(startpos, SEEK_SET);
+            char dummychar;
+            ringBuffer->Read(&dummychar, 1);
+
+            startpos = ringBuffer->Seek(0, SEEK_CUR);
+
+            if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) 
+                != FRAMEHEADERSIZE)
+            {
+                eof = 1;
+                return;
+            }
         }
 
         if (frameheader.frametype == 'R') 
@@ -705,7 +769,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 		lastKey = framesPlayed;
 	    }
         }
-	    
+	  
         if (frameheader.packetlength!=0) {
             if (ringBuffer->Read(strm, frameheader.packetlength) != 
                 frameheader.packetlength) 
@@ -1183,7 +1247,8 @@ void NuppelVideoPlayer::StartPlaying(void)
     usepre = 2;
 
     InitSubs();
-    OpenFile();
+    if (OpenFile() < 0)
+        return;
 
     if (fileheader.audioblocks != 0)
         InitSound();

@@ -10,7 +10,7 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write)
 {
     normalfile = true;
     filename = (QString)lfilename;
-    fd = -1;
+    fd = fd2 = -1;
 
     if (write)
     {
