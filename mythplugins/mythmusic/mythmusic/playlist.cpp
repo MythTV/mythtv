@@ -4,6 +4,8 @@ using namespace std;
 #include "qdatetime.h"
 #include <mythtv/mythcontext.h>
 
+#include <qfileinfo.h>
+#include <qprocess.h>
 
 Track::Track(int x, AllMusic *all_music_ptr)
 {
@@ -1269,5 +1271,306 @@ void PlaylistsContainer::clearActive()
     active_playlist->Changed();
     pending_writeback_index = 0;
     active_widget->setText(0, QObject::tr("Active Play Queue"));
+}
+
+// Here begins CD Writing things. ComputeSize, CreateCDMP3 & CreateCDAudio
+
+void Playlist::computeSize(double &size_in_MB, double &size_in_sec)
+{
+    Track *it;
+    double child_MB;
+    double child_sec;
+
+    // Clear return values
+    size_in_MB = 0.0;
+    size_in_sec = 0.0;
+
+    for (it = songs.first(); it; it = songs.next())
+    {
+        if (it->getCDFlag())
+            continue;
+
+        if (it->getValue() == 0)
+        {
+            cerr << "playlist.o: Oh crap ... how did we get something with an ID of 0 on a playlist?" << endl ;
+        }
+        else if (it->getValue() > 0)
+        {
+            // Normal track
+            Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
+            if (tmpdata)
+            {
+                if (tmpdata->Length() > 0)
+                    size_in_sec += tmpdata->Length();
+                else
+                    cerr << "playlist.o: Computing track lengths. One track <=0" <<endl ;
+
+                // Check tmpdata->Filename
+                QFileInfo finfo(tmpdata->Filename());
+
+                size_in_MB += finfo.size() / 1000000;
+            }
+        }
+        if (it->getValue() < 0)
+        {
+            // it's a playlist, recurse (mildly)
+
+            // Comment: I can't make this thing work. Nothing is computed with playlists
+            Playlist *level_down = parent->getPlaylist((it->getValue()) * -1);
+            if (level_down)
+            {
+                level_down->computeSize(child_MB, child_sec);
+                size_in_MB += child_MB;
+                size_in_sec += child_sec;
+	    }
+        }
+    }
+}
+
+int Playlist::CreateCDMP3(void)
+{
+    // Check & get global settings
+    if (!gContext->GetNumSetting("CDWriterEnabled")) 
+    {
+        cerr << "CD Writer is not enabled.\n";
+        return 1;
+    }
+
+    QString scsidev = gContext->GetSetting("CDWriterDevice");
+    if (scsidev.isEmpty() || scsidev.isNull()) 
+    {
+        cerr << "No CD Writer device defined.\n";
+        return 1;
+    }
+
+    int disksize = gContext->GetNumSetting("CDDiskSize", 2);
+    QString writespeed = gContext->GetSetting("CDWriteSpeed", "2");
+    bool MP3_dir_flag = gContext->GetNumSetting("CDCreateDir", 1);
+
+    double size_in_MB = 0.0;
+
+    QStringList reclist;
+
+    Track *it;
+    for (it = songs.first(); it; it = songs.next())
+    {
+        if (it->getCDFlag())
+            continue;
+
+        if (it->getValue() == 0)
+        {
+            cerr << "playlist.o: Oh crap ... how did we get something with an ID of 0 on a playlist?" << endl ;
+        }
+        else if (it->getValue() > 0)
+        {
+            // Normal track
+            Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
+            if (tmpdata)
+            {
+                // check filename..
+                QFileInfo testit(tmpdata->Filename());
+                if (!testit.exists())
+                    continue;
+                size_in_MB += testit.size() / 1000000.0;
+                QString outline;
+                if (MP3_dir_flag)
+                {
+                    if (tmpdata->Artist().length() > 0)
+                        outline += tmpdata->Artist() + "/";
+                    if (tmpdata->Album().length() > 0)
+                        outline += tmpdata->Album() + "/";
+                }
+
+                outline += "=";
+                outline += tmpdata->Filename();
+
+                reclist += outline;
+            }
+        }
+        else if (it->getValue() < 0)
+        {
+            // FIXME: handle playlists
+        }
+    }
+
+    int max_size;
+    if (disksize == 0)
+        max_size = 650;
+    else
+        max_size = 700;
+
+    if (size_in_MB >= max_size)
+    {
+        cerr << "MP3 CD creation aborted -- cd size too big.\n";
+        return 1;
+    }
+
+    // probably should tie stdout of mkisofs to stdin of cdrecord sometime
+    char tmprecordlist[L_tmpnam];
+    char tmprecordisofs[L_tmpnam];
+
+    tmpnam(tmprecordlist);
+    tmpnam(tmprecordisofs);
+
+    QFile reclistfile(tmprecordlist);
+
+    if (!reclistfile.open(IO_WriteOnly))
+    {
+        cerr << "Unable to open temporary file\n";
+        return 1;
+    }
+
+    QTextStream recstream(&reclistfile);
+
+    QStringList::Iterator iter;
+
+    for (iter = reclist.begin(); iter != reclist.end(); ++iter)
+    {
+        recstream << *iter << "\n";
+    }
+
+    reclistfile.close();
+
+    MythProgressDialog *progress;
+    progress = new MythProgressDialog(QObject::tr("Creating CD File System"),
+                                      100);
+    progress->setProgress(1);
+
+    QStringList args;
+    args = "mkisofs";
+    args += "-graft-points";
+    args += "-path-list";
+    args += tmprecordlist;
+    args += "-o";
+    args += tmprecordisofs;
+    args += "-J";
+
+    cout << "Running: " << args.join(" ") << endl;
+
+    bool retval = 0;
+
+    QProcess isofs(args);
+    
+    if (isofs.start())
+    {
+        while (1)
+        {
+            while (isofs.canReadLineStderr())
+            {
+                QString buf = isofs.readLineStderr();
+                if (buf[6] == '%')
+                    progress->setProgress(buf.toInt());
+            }
+            if (isofs.isRunning())
+            {
+                qApp->processEvents();
+                usleep(100000);
+            }
+            else
+            {
+                if (!isofs.normalExit())
+                {
+                    cerr << "Unable to run 'mkisofs'\n";
+                    retval = 1;
+                }
+                break;
+            }
+        }
+    }
+    else
+    {
+        cerr << "Unable to run 'mkisofs'\n";
+        retval = 1;
+    }
+
+    progress->Close();
+    delete progress;
+
+    progress = new MythProgressDialog(QObject::tr("Burning CD"), 100);
+    progress->setProgress(2);
+
+    args = "cdrecord";
+    args += "-v";
+    args += "dev=";
+    args += scsidev;
+
+    if (writespeed.toInt() > 0)
+    {
+        args += "-speed=";
+        args += writespeed;
+    }
+
+    args += "-data";
+    args += tmprecordisofs;
+
+    cout << "Running: " << args.join(" ") << endl;
+
+    QProcess burn(args);
+
+    if (burn.start())
+    {
+        while (1)
+        {
+            if (burn.canReadLineStderr())
+            {
+                QString err = burn.readLineStderr();
+                if (err == "cdrecord: Drive needs to reload the media" ||
+                    err == "cdrecord: Input/output error." ||
+                    err == "cdrecord: No disk / Wrong disk!")
+                {
+                    cerr << err << endl;
+                    burn.kill();
+                    retval = 1;
+                }
+            }
+            if (burn.canReadLineStdout())
+            {
+                QString line = burn.readLineStdout();
+                if (line.mid(15, 2) == "of")
+                {
+                    int mbdone = line.mid(10, 5).toInt();
+                    int mbtotal = line.mid(17, 5).toInt();
+
+                    if (mbtotal > 0)
+                    {
+                        progress->setProgress((mbdone * 100) / mbtotal);
+                    }
+                }
+            }
+
+            if (burn.isRunning())
+            {
+                qApp->processEvents();
+                usleep(100000);
+            }
+            else
+            {
+                if (!burn.normalExit())
+                {
+                    cerr << "Unable to run 'cdrecord'\n";
+                    retval = 1;
+                }
+                break;
+            }
+        }
+    }
+    else
+    {
+        cerr << "Unable to run 'cdrecord'\n";
+        retval = 1;
+    }
+
+    progress->Close();
+    delete progress;
+
+    QFile::remove(tmprecordlist);
+    QFile::remove(tmprecordisofs);
+
+    return retval;
+}
+
+int Playlist::CreateCDAudio(void)
+{
+    return -1;
 }
 

@@ -84,6 +84,10 @@ class Playlist
     bool    containsReference(int to_check, int depth);
     void    ripOutAllCDTracksNow();
 
+    void computeSize(double &size_in_MB, double &size_in_sec);
+    int CreateCDMP3(void);
+    int CreateCDAudio(void);
+
   private:
 
     int                 playlistid;

@@ -335,6 +335,124 @@ void DatabaseBox::clearActive()
     checkTree();
 }
 
+void DatabaseBox::CreateCDAudio()
+{
+    int error;
+
+    if (!active_popup)
+        return;
+
+    closeActivePopup();
+
+    // Begin CD Audio Creation
+
+    error = active_playlist->CreateCDAudio();
+
+    error_popup = NULL;
+
+    if (error)
+	ErrorPopup(tr("Couldn't create CD"));
+    else
+	ErrorPopup(tr("CD Created"));
+}
+
+void DatabaseBox::CreateCDMP3()
+{
+    int error;
+    if (!active_popup)
+        return;
+
+    closeActivePopup();
+
+    // Begin MP3 Creation
+
+    error = active_playlist->CreateCDMP3();
+
+    error_popup=NULL;
+
+    if (error)
+	ErrorPopup(tr("Couldn't create CD"));
+    else
+	ErrorPopup(tr("CD Created"));
+}
+
+void DatabaseBox::ErrorPopup(const QString &msg)
+{
+    if (error_popup)
+        return;
+
+    error_popup = new MythPopupBox(gContext->GetMainWindow(),
+                                   "playlist_popup");
+
+    error_popup->addLabel(msg);
+
+    QButton *mac_b =error_popup->addButton(tr("OK"), this,
+                                           SLOT(closeErrorPopup()));
+
+    int x = (int)(100 * wmult);
+    int y = (int)(100 * hmult);
+
+    error_popup->ShowPopupAtXY(x, y, this, SLOT(closeErrorPopup()));
+    mac_b->setFocus();
+    listview->setFocusPolicy(NoFocus);
+}
+
+void DatabaseBox::closeErrorPopup(void)
+{
+    if (!error_popup)
+        return;
+
+    error_popup->hide();
+    delete error_popup;
+    error_popup = NULL;
+
+    listview->setFocusPolicy(TabFocus);
+    listview->setFocus();
+}
+
+
+void DatabaseBox::BlankCDRW()
+{
+    char command[1024];
+
+    if (!active_popup)
+        return;
+
+    closeActivePopup();
+
+    // Check & get global settings
+    if (!gContext->GetNumSetting("CDWriterEnabled")) 
+    {
+        cerr << "playlist.o: Writer is not enabled. We cannot be here!" << endl ;
+        return;
+    }
+
+    QString scsidev = gContext->GetSetting("CDWriterDevice");
+    if (scsidev.length()==0) 
+    {
+        cerr << "playlist.o: We don't have SCSI devices" << endl ;
+	return;
+    }
+    // Begin Blanking
+    MythProgressDialog *record_progress;
+    record_progress = new MythProgressDialog(tr("CD-RW Blanking Progress"), 10);
+
+    // Run CD Record
+    QString blanktype=gContext->GetSetting("CDBlankType");
+
+    record_progress->setProgress(1);
+    strcpy(command,"cdrecord -v ");
+    strcat(command," dev= ");
+    strcat(command,scsidev.ascii());
+    strcat(command," -blank=");
+    strcat(command,blanktype.ascii());
+    cout << command << endl;
+    system(command);
+
+    record_progress->Close();
+    delete record_progress;
+}
+
 void DatabaseBox::deletePlaylist()
 {
     if (!playlist_popup)
@@ -601,6 +719,70 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
     QButton *pb = active_popup->addButton(tr("Save Back to Playlist Tree"), 
                                           this, SLOT(popBackPlaylist()));
 
+    // CD writing
+    
+    bool cdwriter = false;
+
+    if (gContext->GetNumSetting("CDWriterEnabled")) 
+    {
+	QString scsidev = gContext->GetSetting("CDWriterDevice");
+	if (!scsidev.isEmpty() && !scsidev.isNull())
+		cdwriter = true;
+    }
+
+    QButton *cdaudiob = NULL;
+    QButton *cdmp3b = NULL;
+
+    if (cdwriter)
+    {
+        cdaudiob = active_popup->addButton(tr("Create Audio CD from "
+                                               "Playlist"), this,
+                                               SLOT(CreateCDAudio()));
+
+        cdmp3b = active_popup->addButton(tr("Create MP3 CD from Playlist"),
+                                         this, SLOT(CreateCDMP3()));
+
+        active_popup->addButton(tr("Clear CD-RW Disk"), this,
+                                SLOT(BlankCDRW()));
+
+        double size_in_MB = 0.0;
+        double size_in_sec = 0.0;
+        active_playlist->computeSize(size_in_MB, size_in_sec);
+
+        int disksize = gContext->GetNumSetting("CDDiskSize", 2);
+
+        double max_size_in_MB;
+        double max_size_in_min;
+
+        if (disksize == 1) 
+        {
+            max_size_in_MB = 650;
+            max_size_in_min = 75;
+        } 
+        else 
+        {
+            max_size_in_MB = 700;
+            max_size_in_min = 80;
+        }
+
+        double ratio_MB = 100.0 * size_in_MB / max_size_in_MB;
+        double ratio_sec = 100.0 * size_in_sec / 60.0 / 1000.0 / max_size_in_min;
+
+        QString label1;
+        QString label2;
+
+        label1.sprintf("Size: %dMB (%02d%%)", (int)(size_in_MB),
+                       (int)(ratio_MB));
+        label2.sprintf("Duration: %3dmin (%02d%%)", 
+                       (int)(size_in_sec / 60.0 / 1000.0), (int)(ratio_sec));
+
+        active_popup->addLabel(label1);
+        active_popup->addLabel(label2);
+
+        cdmp3b->setEnabled((ratio_MB <= 100.0));
+        cdaudiob->setEnabled((ratio_sec <= 100.0));
+    }
+ 
     int x, y;
     QRect r;
 

@@ -67,6 +67,13 @@ class DatabaseBox : public MythDialog
     void showWaiting();
     void updateLCDMenu(QKeyEvent *e);
 
+    void ErrorPopup(const QString &msg);
+    void closeErrorPopup();
+
+    void CreateCDAudio();
+    void CreateCDMP3();
+    void BlankCDRW();
+
   protected:
     bool eventFilter(QObject *o, QEvent *e);
  
@@ -104,6 +111,8 @@ class DatabaseBox : public MythDialog
 
     MythPopupBox        *playlist_popup;
     MythRemoteLineEdit  *playlist_rename;
+
+    MythPopupBox        *error_popup;
 
     ReadCDThread        *cd_reader_thread;
     QTimer              *cd_watcher;

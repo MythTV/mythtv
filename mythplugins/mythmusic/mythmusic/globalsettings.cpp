@@ -6,6 +6,8 @@
 #include <qcursor.h>
 #include <qdir.h>
 #include <qimage.h>
+#include <qstringlist.h>
+#include <qprocess.h>
 
 class GlobalSetting: public SimpleDBStorage, virtual public Configurable {
 public:
@@ -429,6 +431,125 @@ public:
     };
 };
 
+// CD Writer Settings
+
+class CDWriterEnabled: public CheckBoxSetting, public GlobalSetting {
+public:
+    CDWriterEnabled():
+        GlobalSetting("CDWriterEnabled") {
+        setLabel(QObject::tr("Enable CD Writing."));
+        setValue(true);
+        setHelpText(QObject::tr("Requires a SCSI or an IDE-SCSI CD Writer."));
+    };
+};
+
+class CDWriterDevice: public ComboBoxSetting, public GlobalSetting {
+public:
+    CDWriterDevice():
+        GlobalSetting("CDWriterDevice") {
+
+        QStringList args;
+        QStringList result;
+
+        args = "cdrecord";
+        args += "--scanbus";
+
+        QProcess proc(args);
+
+        if (proc.start())
+        {
+            while (1)
+            {
+                while (proc.canReadLineStdout())
+                    result += proc.readLineStdout();
+                if (proc.isRunning())
+                {
+                    qApp->processEvents();
+                    usleep(10000);
+                }
+                else
+                {
+                    if (!proc.normalExit())
+                        cerr << "Failed to run 'cdrecord --scanbus'\n";
+                    break;
+                }
+            }
+        }
+        else
+            cerr << "Failed to run 'cdrecord --scanbus'\n";
+
+        while (proc.canReadLineStdout())
+            result += proc.readLineStdout();
+
+        for (QStringList::Iterator it = result.begin(); it != result.end();
+             ++it)
+        {
+            QString line = *it;
+            if (line.length() > 12)
+            {
+                if (line[10] == ')' && line[12] != '*')
+                {
+                    addSelection(line.mid(24, 16), line.mid(1, 5));
+                }
+            }
+        }
+
+        setLabel(QObject::tr("CD-Writer Device"));
+        setHelpText(QObject::tr("Select the SCSI Device for CD Writing.  If "
+                    "your IDE device is not present, try adding "
+                    "hdd(or hdc/hdb)=ide-scsi to your boot options"));
+    };
+};
+
+class CDDiskSize: public ComboBoxSetting, public GlobalSetting {
+public:
+    CDDiskSize():
+        GlobalSetting("CDDiskSize") {
+        setLabel(QObject::tr("Disk Size"));
+        addSelection(QObject::tr("650MB/75min"), "1");
+        addSelection(QObject::tr("700MB/80min"), "2");
+        setHelpText(QObject::tr("Default CD Capacity."));
+    };
+};
+
+class CDCreateDir: public CheckBoxSetting, public GlobalSetting {
+public:
+    CDCreateDir():
+        GlobalSetting("CDCreateDir") {
+        setLabel(QObject::tr("Enable directories on MP3 Creation"));
+        setValue(true);
+        setHelpText("");
+    };
+};
+
+class CDWriteSpeed: public ComboBoxSetting, public GlobalSetting {
+public:
+    CDWriteSpeed():
+        GlobalSetting("CDWriteSpeed") {
+        setLabel(QObject::tr("CD Write Speed"));
+        addSelection(QObject::tr("Auto"), "0");
+        addSelection(QObject::tr("1x"), "1");
+        addSelection(QObject::tr("2x"), "2");
+        addSelection(QObject::tr("4x"), "4");
+        addSelection(QObject::tr("8x"), "8");
+        addSelection(QObject::tr("16x"), "16");
+        setHelpText(QObject::tr("CD Writer speed. Auto will use the recomended "
+                    "speed."));
+    };
+};
+
+class CDBlankType: public ComboBoxSetting, public GlobalSetting {
+public:
+    CDBlankType():
+        GlobalSetting("CDBlankType") {
+        setLabel(QObject::tr("CD Blanking Type"));
+        addSelection(QObject::tr("Fast"), "fast");
+        addSelection(QObject::tr("Complete"), "all");
+        setHelpText(QObject::tr("Blanking Method. Fast takes 1 minute. "
+                    "Complete can take up to 20 minutes."));
+    };
+};
+
 MusicGeneralSettings::MusicGeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
@@ -442,6 +563,16 @@ MusicGeneralSettings::MusicGeneralSettings()
     general->addChild(new AutoLookupCD());
     general->addChild(new KeyboardAccelerators());
     addChild(general);
+
+    VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
+    general2->setLabel(QObject::tr("CD Recording Settings"));
+    general2->addChild(new CDWriterEnabled());
+    general2->addChild(new CDWriterDevice());
+    general2->addChild(new CDDiskSize());
+    general2->addChild(new CDCreateDir());
+    general2->addChild(new CDWriteSpeed());
+    general2->addChild(new CDBlankType());
+    addChild(general2);
 }
 
 MusicPlayerSettings::MusicPlayerSettings()
