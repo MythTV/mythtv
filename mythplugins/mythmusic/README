@@ -1,5 +1,5 @@
                                    MythMusic
-			          Release 0.5
+			          Release 0.6
 
 
 There'll be more information here later, but for now:
@@ -62,16 +62,17 @@ database setup from MythTV.
 
 So, now you can run mythmusic.  The first time you run it, it'll seem to just 
 sit there at first, while it searches the directory you told it music was 
-stored in.  This may take a while, depends on how much music you've already got
-there.  It'll read all the metadata (vorbis comments, id3 tags, etc) and stash 
-the information in the database.  If it's looking over a network, the process 
-might take a _long_ time.  Actually, running over a network isn't recommended 
-for now, as there's little input buffering, so you'll probably have jerky 
-playback.
+stored in.  It'll print out status messages to the console, so you can hopefully
+gauge progress that way..  This may take a while, depends on how much music 
+you've already got there.  It's reading all the metadata (vorbis comments, 
+id3 tags, etc) and stash the information in the database.  If it's looking 
+over a network, the process might take a _long_ time.  Actually, running over 
+a network isn't recommended for now, as there's little input buffering, so 
+you'll probably have jerky playback.
 
 Once it's done searching for your music, the interface will show up.  It should
-be fairly easy to figure out..  The playlists you select won't be saved across
-runs of the program, for now.
+be fairly easy to figure out..  Any playlists you create will be saved on exit
+and auto-loaded the next time you start mythmusic.
 
 Feel free to subscribe to the development mailing list at:
 http://www.snowman.net/mailman/listinfo/mythtv-dev

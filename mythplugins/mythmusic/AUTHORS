@@ -5,3 +5,6 @@ The decoding engine (mp3 + vorbis) is taken from MQ3 version 14, from
     http://www.mq3.org/   
 MQ3 is released under a 'do as you want' license, but borrows heavily from
 GPL'd code (zinf.sourceforge.net), so I'm re-GPL-ing it here.
+
+Synaesthesia:
+    Paul Harrison -- http://yoyo.cc.monash.edu.au/~pfh/synaesthesia.html
