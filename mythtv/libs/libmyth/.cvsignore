@@ -13,3 +13,4 @@ moc_mythcontext.cpp
 moc_mythwizard.cpp
 moc_uitypes.cpp
 moc_mythdialogs.cpp
+moc_inetcomms.cpp

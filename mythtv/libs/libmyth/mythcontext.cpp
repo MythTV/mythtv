@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <qsqldatabase.h>
 #include <qurl.h>
+#include <qnetwork.h>
 
 #include "mythcontext.h"
 #include "oldsettings.h"
@@ -22,6 +23,8 @@ bool print_verbose_messages = false;
 MythContext::MythContext(const QString &binversion, bool gui)
            : QObject()
 {
+    qInitNetworkProtocols();
+
     if (binversion != MYTH_BINARY_VERSION)
     {
         cerr << "This app was compiled against libmyth version: " << binversion
