@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <qdir.h>
 #include <qtextcodec.h>
+#include <fcntl.h>
 #include <signal.h>
 
 #include <iostream>
@@ -415,6 +416,150 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
     QTranslator translator( 0 );
 
+    QString logfile = "";
+    QString verboseString = QString(" important general");
+
+    QString pluginname = "";
+
+    for(int argpos = 1; argpos < a.argc(); ++argpos)
+    {
+        if (!strcmp(a.argv()[argpos],"-l") ||
+            !strcmp(a.argv()[argpos],"--logfile"))
+        {
+            if (a.argc() > argpos)
+            {
+                logfile = a.argv()[argpos+1];
+                if (logfile.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -l/--logfile option\n";
+                    return -1;
+                }
+                else
+                {
+                    ++argpos;
+                }
+            }
+        } else if (!strcmp(a.argv()[argpos],"-v") ||
+            !strcmp(a.argv()[argpos],"--verbose"))
+        {
+            if (a.argc() > argpos)
+            {
+                QString temp = a.argv()[argpos+1];
+                if (temp.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -v/--verbose option\n";
+                    return -1;
+                } else
+                {
+                    QStringList verboseOpts;
+                    verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
+                    ++argpos;
+                    for (QStringList::Iterator it = verboseOpts.begin(); 
+                         it != verboseOpts.end(); ++it )
+                    {
+                        if(!strcmp(*it,"none"))
+                        {
+                            print_verbose_messages = VB_NONE;
+                            verboseString = "";
+                        }
+                        else if(!strcmp(*it,"all"))
+                        {
+                            print_verbose_messages = VB_ALL;
+                            verboseString = "all";
+                        }
+                        else if(!strcmp(*it,"quiet"))
+                        {
+                            print_verbose_messages = VB_IMPORTANT;
+                            verboseString = "important";
+                        }
+                        else if(!strcmp(*it,"record"))
+                        {
+                            print_verbose_messages |= VB_RECORD;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"playback"))
+                        {
+                            print_verbose_messages |= VB_PLAYBACK;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"channel"))
+                        {
+                            print_verbose_messages |= VB_CHANNEL;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"osd"))
+                        {
+                            print_verbose_messages |= VB_OSD;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"file"))
+                        {
+                            print_verbose_messages |= VB_FILE;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"schedule"))
+                        {
+                            print_verbose_messages |= VB_SCHEDULE;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"network"))
+                        {
+                            print_verbose_messages |= VB_NETWORK;
+                            verboseString += " " + *it;
+                        }
+                        else
+                        {
+                            cerr << "Unknown argument for -v/--verbose: "
+                                 << *it << endl;;
+                        }
+                    }
+                }
+            } else
+            {
+                cerr << "Missing argument to -v/--verbose option\n";
+                return -1;
+            }
+        } else if ((argpos + 1 == a.argc()) &&
+                    !QString(a.argv()[argpos]).startsWith("-"))
+        {
+            pluginname = a.argv()[argpos];
+        } 
+        else
+        {
+            if (!(!strcmp(a.argv()[argpos],"-h") ||
+                !strcmp(a.argv()[argpos],"--help")))
+                cerr << "Invalid argument: " << a.argv()[argpos] << endl;
+            cerr << "Valid options are: " << endl <<
+                    "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
+                    "-v or --verbose debug-level    Prints more information" << endl <<
+                    "                               Accepts any combination (separated by comma)" << endl << 
+                    "                               of all,none,quiet,record,playback," << endl <<
+                    "                               channel,osd,file,schedule,network" << endl <<
+                    "<plugin>                       Initialize and run this plugin" << endl;
+            return -1;
+        }
+    }
+
+    int logfd = -1;
+
+    if (logfile != "")
+    {
+        logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
+         
+        if (logfd < 0)
+        {
+            perror("open(logfile)");
+            return -1;
+        }
+    }
+    
+    if (logfd != -1)
+    {
+        // Send stdout and stderr to the logfile
+        dup2(logfd, 1);
+        dup2(logfd, 2);
+    }
+
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";
 
@@ -432,6 +577,8 @@ int main(int argc, char **argv)
         printf("couldn't open db\n");
         return -1;
     }
+
+    VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
     MythPluginManager::init();
 
@@ -481,10 +628,8 @@ int main(int argc, char **argv)
     else
         xbox = NULL;
 
-    if (a.argc() == 2)
+    if (pluginname != "")
     {
-        QString pluginname = a.argv()[1];
-
         if (MythPluginManager::init_plugin(pluginname))
         {
             MythPluginManager::run_plugin(pluginname);
