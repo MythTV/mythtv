@@ -6,6 +6,7 @@
       <text lang="IT">Impostazioni generali</text>
       <text lang="ES">Opciones Generales</text>
       <text lang="CA">Opcions Generals</text>
+      <text lang="DE">Allgemeines</text>
       <action>MUSIC_SET_GENERAL</action>
    </button>
 
@@ -15,6 +16,7 @@
       <text lang="IT">Opzioni di lettura</text>
       <text lang="ES">Opciones de reproducción</text>
       <text lang="CA">Opcions de reproducció</text>
+      <text lang="DE">Wiedergabe Einstellungen�</text>
       <action>MUSIC_SET_PLAYER</action>
    </button>
 
