@@ -968,7 +968,7 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
     if (dbver == "1052")
     {
         const QString updates[] = {
-"ALTER TABLE recorded ADD COLUMN stars FLOAT UNSIGNED NOT NULL DEFAULT 0;",
+"ALTER TABLE recorded ADD COLUMN stars FLOAT NOT NULL DEFAULT 0;",
 "ALTER TABLE recorded ADD COLUMN previouslyshown TINYINT(1) DEFAULT 0;",
 "ALTER TABLE recorded ADD COLUMN originalairdate DATE;",
 "INSERT INTO settings VALUES ('HaveRepeats', '0', NULL);",
@@ -1472,7 +1472,7 @@ void InitializeDatabase(void)
 "  category varchar(64) NOT NULL default '',"
 "  category_type varchar(64) NOT NULL default '',"
 "  airdate year(4) NOT NULL default '0000',"
-"  stars float unsigned NOT NULL default '0',"
+"  stars float NOT NULL default '0',"
 "  previouslyshown tinyint(4) NOT NULL default '0',"
 "  title_pronounce varchar(128) NOT NULL default '',"
 "  stereo tinyint(1) default NULL,"
@@ -1574,7 +1574,7 @@ void InitializeDatabase(void)
 "  programid varchar(12) NOT NULL default '',"
 "  lastmodified timestamp(14) NOT NULL,"
 "  filesize bigint(20) NOT NULL default '0',"
-"  stars float unsigned NOT NULL default '0',"
+"  stars float NOT NULL default '0',"
 "  previouslyshown tinyint(1) default '0',"
 "  originalairdate date default NULL,"
 "  preserve tinyint(1) NOT NULL default '0',"
