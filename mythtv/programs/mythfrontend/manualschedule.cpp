@@ -75,12 +75,9 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, channum, callsign, name "
-                  "FROM channel GROUP BY channum, callsign "
-                  "ORDER BY :CHANORDER ;");
-    query.bindValue(":CHANORDER", chanorder);
-
-    
+    query.prepare(QString("SELECT chanid, channum, callsign, name "
+                          "FROM channel GROUP BY channum, callsign "
+                          "ORDER BY %1;").arg(chanorder));
 
     QString longChannelFormat = 
         gContext->GetSetting("LongChannelFormat", "<num> <name>");
