@@ -139,6 +139,7 @@ private:
     QWidget *maxnewestWidget;
     QWidget *dupinWidget;
     QWidget *dupmethodWidget;
+    MythPushButton *proglistButton;
 
     ProgramInfo* m_pginfo;
 };

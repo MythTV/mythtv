@@ -488,7 +488,7 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         box->setStretchFactor(label, 0);
     }
 
-    MythComboBox* widget = new MythComboBox(rw, box);
+    widget = new MythComboBox(rw, box);
     widget->setHelpText(getHelpText());
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
     box->setStretchFactor(widget, 1);

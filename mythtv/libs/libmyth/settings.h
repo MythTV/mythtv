@@ -341,9 +341,12 @@ public:
 };
 
 class ComboBoxSetting: public SelectSetting {
+    Q_OBJECT;
+
 protected:
     ComboBoxSetting(bool _rw = false) {
         rw = _rw;
+        widget = NULL;
     };
 public:
     virtual void setValue(QString newValue) {
@@ -359,8 +362,23 @@ public:
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
+
+    void setFocus() { if (widget) widget->setFocus(); }
+
+public slots:
+    void addSelection(const QString& label,
+                      QString value=QString::null,
+                      bool select=false) {
+        if (widget != NULL)
+            widget->insertItem(label);
+        SelectSetting::addSelection(label, value, select);
+    };
+protected slots:
+    void widgetDestroyed() { widget=NULL; };
+
 private:
     bool rw;
+    MythComboBox *widget;
 };
 
 class ListBoxSetting: public SelectSetting {

@@ -621,9 +621,9 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     vbox2->addWidget(dupinWidget);
 
     hbox = new QHBoxLayout(vbox, (int)(20 * wmult));
-    MythPushButton *button = new MythPushButton(tr("List upcoming episodes"),
+    proglistButton = new MythPushButton(tr("List upcoming episodes"),
                                                 dialog);
-    hbox->addWidget(button);
+    hbox->addWidget(proglistButton);
     hbox->addStretch( 42 );
     MythPushButton *cancel = new MythPushButton(tr("&Cancel"), dialog);
     hbox->addWidget(cancel);
@@ -635,12 +635,12 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
             SLOT(setAvailableOptions(const QString&)));
     connect(maxepisodes, SIGNAL(valueChanged(int)), this,
             SLOT(setAvailableOptions(int)));
-    connect(button, SIGNAL(clicked()), this, SLOT(runProgList()));
+    connect(proglistButton, SIGNAL(clicked()), this, SLOT(runProgList()));
     connect(cancel, SIGNAL(clicked()), dialog, SLOT(reject()));
     connect(finish, SIGNAL(clicked()), dialog, SLOT(accept()));
 
-    button->setFocus();
     setAvailableOptions();
+    type->setFocus();
 
     return dialog;
 }
@@ -686,6 +686,7 @@ void ScheduledRecording::runProgList(void)
                                     gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
+    proglistButton->setFocus();
 }
 
 void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
