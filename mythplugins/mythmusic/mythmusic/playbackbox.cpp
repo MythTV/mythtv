@@ -281,14 +281,17 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             handled = true;
             break;
         case '[':
+        case Key_F10:
             changeVolume(false);
             handled = true;
             break;
         case ']':
+        case Key_F11:
             changeVolume(true);
             handled = true;
             break;
         case '|':
+        case Key_F9:
             toggleMute();
             handled = true;
             break;
