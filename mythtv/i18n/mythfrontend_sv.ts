@@ -556,6 +556,22 @@
         <source>Reverse Time</source>
         <translation>Omvänd tid</translation>
     </message>
+    <message>
+        <source>NOTE: removing items from this list will not delete any recordings.</source>
+        <translation>OBS: borttagning av poster från denna lista raderar inte några inspelningar.</translation>
+    </message>
+    <message>
+        <source>Keep this episode in the list</source>
+        <translation>Behåll detta avsnitt i listan</translation>
+    </message>
+    <message>
+        <source>Remove this episode from the list</source>
+        <translation>Ta bort detta avsnitt från listan</translation>
+    </message>
+    <message>
+        <source>Remove all episodes for this title</source>
+        <translation>Ta bort alla avsnitt för denna titel</translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -2000,7 +2016,7 @@
     </message>
     <message>
         <source>The status of this showing is unknown.</source>
-        <translation>Statusen för denna visningen är okänd.</translation>
+        <translation>Statusen för denna visning är okänd.</translation>
     </message>
     <message>
         <source>This showing will not be recorded because </source>
@@ -2028,7 +2044,7 @@
     </message>
     <message>
         <source>it was manually cancelled.</source>
-        <translation>den upphävdes manuellt.</translation>
+        <translation>den avbröts manuellt.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -3769,9 +3785,12 @@ MythTV kommer nu att avslutas.</translation>
 .  You might want to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation>Vänligen vänta medans MythTV hämtar lista med tillfängliga kanaler.
-Du kan kontrollera förloppet genom att byta över till terminalfönstret
-som du startade detta programmet i.</translation>
+        <translation>Vänligen vänta medans MythTV hämtar listan 
+med tillgängliga kanaler.
+
+För att välja vilka kanaler som ska hämtas i fortsättningen,
+byt över till terminalfönstret som du startade detta
+programmet i. Detta gör du vanligtvis med Alt+Tab.</translation>
     </message>
     <message>
         <source>Please wait while MythTV retrieves the list of available channels.
@@ -4958,15 +4977,15 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation>Behåll detta avsnitt i listan</translation>
+        <translation type="obsolete">Behåll detta avsnitt i listan</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation>Ta bort detta avsnitt från listan</translation>
+        <translation type="obsolete">Ta bort detta avsnitt från listan</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
-        <translation>Ta bort alla avsnitt för denna titel</translation>
+        <translation type="obsolete">Ta bort alla avsnitt för denna titel</translation>
     </message>
     <message>
         <source>(New Channel)</source>
@@ -5140,27 +5159,31 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vill du rensa alla TV-kortsinställningar innan konfigurationen fortsätter?</translation>
     </message>
     <message>
         <source>No, leave my card settings alone</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej, lämna mina TV-kortsinställningar som de är</translation>
     </message>
     <message>
         <source>Yes, delete my card settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, ta bort mina TV-kortsinställningar</translation>
     </message>
     <message>
         <source>Would you like to clear all program and channel settings before starting configuration?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vill du rensa alla program och kanalinställningar innan konfigurationen fortsätter?</translation>
     </message>
     <message>
         <source>No, leave my program settings alone</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej, lämna mina programinställningar som de är</translation>
     </message>
     <message>
         <source>Yes, delete my program settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, ta bort mina programinställningar</translation>
+    </message>
+    <message>
+        <source>%1% Completed @ %2 fps.</source>
+        <translation>%1% färdig vid %2 fps.</translation>
     </message>
 </context>
 <context>

@@ -630,23 +630,23 @@ void PreviousBox::removalDialog()
     if (pi->description != "")
         message += "\n\n" + pi->description;
 
-    message += "\n\n\nNOTE: removing items from this list will not ";
-    message += "delete any recordings.";
+    message += "\n\n\n" + tr("NOTE: removing items from this list will not "
+                             "delete any recordings.");
     
     DialogBox diag(gContext->GetMainWindow(), message);
     int button = 1, ok = -1, rm_episode = -1, rm_title = -1;
     // int rm_generics = -1;
 
-    diag.AddButton(QObject::tr("Keep this episode in the list"));
+    diag.AddButton(tr("Keep this episode in the list"));
     ok = button++;
 
-    diag.AddButton(QObject::tr("Remove this episode from the list"));
+    diag.AddButton(tr("Remove this episode from the list"));
     rm_episode = button++;
 
-    diag.AddButton(QObject::tr("Remove all episodes for this title"));
+    diag.AddButton(tr("Remove all episodes for this title"));
     rm_title = button++;
 
-    // diag.AddButton(QObject::tr("Remove all that cannot be used for duplicate matching"));
+    // diag.AddButton(tr("Remove all that cannot be used for duplicate matching"));
     // rm_generics = button++;
 
     int ret = diag.exec();
