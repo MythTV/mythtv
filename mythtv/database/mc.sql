@@ -3,6 +3,11 @@ GRANT ALL ON mythconverg.* TO mythtv@localhost IDENTIFIED BY "mythtv";
 
 USE mythconverg;
 
+#
+#   The version number of the database schema is set by the
+#   first INSERT command after all tables have been created.
+#
+
 CREATE TABLE IF NOT EXISTS recordingprofiles
 (
     id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
