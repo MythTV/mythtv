@@ -2329,9 +2329,9 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                         xmltv_grabber.ascii(), configfile.ascii(), 
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_uk_rt")
-        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
-                     xmltv_grabber.ascii(), offset, 
-             configfile.ascii(), filename.ascii());
+        command.sprintf("nice %s --days 14 --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(),
+                        configfile.ascii(), filename.ascii());
     else if (xmltv_grabber == "tv_grab_au")
         command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
@@ -2523,10 +2523,10 @@ bool fillData(QValueList<Source> &sourcelist)
         if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de" ||
             xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
             xmltv_grabber == "tv_grab_nl" || xmltv_grabber == "tv_grab_au" ||
-            xmltv_grabber == "tv_grab_fr" || xmltv_grabber == "tv_grab_jp")
+            xmltv_grabber == "tv_grab_fr" || xmltv_grabber == "tv_grab_jp" ||
+            xmltv_grabber == "tv_grab_uk_rt")
         {
-            // tv_grab_uk|de doesn't support the --offset option, so just grab a 
-            // week.
+            // These don't support the --offset option, so just grab the max.
             if (!grabData(*it, -1))
                 ++failures;
         }
@@ -2576,8 +2576,6 @@ bool fillData(QValueList<Source> &sourcelist)
             grabData(*it, 0, &qCurrentDate);
         }
         else if (xmltv_grabber == "datadirect" ||
-                 //xmltv_grabber == "tv_grab_na" || 
-                 xmltv_grabber == "tv_grab_uk_rt" ||
                  xmltv_grabber == "tv_grab_se" ||
                  xmltv_grabber == "tv_grab_no")
         {
@@ -2613,8 +2611,7 @@ bool fillData(QValueList<Source> &sourcelist)
 
             int maxday = 9;
 
-            if (xmltv_grabber == "tv_grab_uk_rt" ||
-                xmltv_grabber == "tv_grab_se" ||
+            if (xmltv_grabber == "tv_grab_se" ||
                 xmltv_grabber == "tv_grab_no")
                 maxday = 14;
 
@@ -3155,7 +3152,7 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "--refresh-today\n";
             cout << "--refresh-second\n";
-            cout << "   (Only valid for grabbers: na/uk_rt/sn)\n";
+            cout << "   (Only valid for grabbers: na, se, no)\n";
             cout << "   Force a refresh today or two days from now, to catch the latest changes\n";
             cout << "--dont-refresh-tomorrow\n";
             cout << "   Tomorrow will be refreshed always unless this argument is used\n";
