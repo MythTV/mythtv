@@ -94,7 +94,6 @@ lircd.
 
 <sect2>Graphical installation tools. <label id="graphicinstalltools_">
 <sect3>Mandrake 9.0
-
 <p>On systems running KDE, a tool which will allow you to see what packages
 are available and if they're installed on your system can be accessed by
 clicking K->Configuration->Packaging->KPackage
@@ -898,7 +897,7 @@ theme while <bf>mythfrontend</bf> is still running.
 mythtv system.  mythweb is a separate application, but it's dependant on
 mythtv being installed and operational.
 
-<sect1>Installation.
+<sect1>Installation and pre-requisites.
 <p>Download mythweb from <url url="http://www.mythtv.org/"
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.  The next step depends on whether your distribution has a web server and
@@ -911,7 +910,10 @@ either with the graphical installer (see instructions in <ref
 id="graphicinstalltools_" name="Graphic Install Tools">) or through the
 command line (section <ref id="CLIinstalltools_" name="Command Line">), and
 you've ensured that the <bf>apache</bf> server will start at boot using the
-Mandrake Control Center, do the following:
+Mandrake Control Center.
+
+<sect1>Completing the installation.
+<p>
 <tscreen><verb>
 % tar -xjf mythweb-0.7.tar.bz2
 % cd mythweb-0.7
@@ -927,7 +929,40 @@ address]/mythweb/</bf>
 <bf>NOTE</bf>: Make sure that you have a trailing slash on the URL,
 otherwise you will get a <tt>404 Page not Found</tt> error.
 
-<sect>Using mythgallery.
-<sect>Using mythgame.
+<sect>mythgallery.
+<p>mythgallery is a photo and slideshow application.  mythgallery is a
+separate application, but it's dependant on mythtv being installed and
+operational.
+<sect1>Installation and pre-requisites.
+<p>Download mythgallery from <url url="http://www.mythtv.org/"
+name="http://www.mythtv.org/"> and save it to a location where you can find
+it.
+<tscreen><verb>
+% tar -xjf mythgallery-0.7.tar.bz2
+% cd mythgallery-0.7
+% make
+# su
+# make install
+# exit
+%
+</verb></tscreen>
+The configuration file for mythgallery is located in
+<tt>/usr/local/share/mythtv</tt>.  This file needs to be edited:  ensure
+that your GalleryDir variable is set to the directory where your pictures are
+stored.
 
+<itemize>
+<item>Use the arrow keys to move around the thumbnails.
+<item>Use SPACE or ENTER to maximize a photo.
+<itemize><item>Use p or P to start the slideshow of all the files in the
+directory.  "Play" or "Pause" on your remote may also work.
+<item>Use SPACE or ENTER to advance to the next photo.
+</itemize>
+<item>Use ESC to go up one level, or to exit out of the module if
+you're at the first level.
+</itemize>
+
+<sect>mythgame.
+
+<sect>mythmusic.
 </article>

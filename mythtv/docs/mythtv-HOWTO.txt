@@ -70,13 +70,15 @@
      9.1 Using themes with mythtv.
 
   10. mythweb.
-     10.1 Installation.
+     10.1 Installation and pre-requisites.
         10.1.1 Mandrake 9.0
+     10.2 Completing the installation.
 
-  11. Using mythgallery.
-  12. Using mythgame.
+  11. mythgallery.
+     11.1 Installation and pre-requisites.
 
-
+  12. mythgame.
+  13. mythmusic.
   ______________________________________________________________________
 
   [1m1.  Introduction.[0m
@@ -143,8 +145,6 @@
   +o  A PIII/800Mhz system with 512MB RAM can encode one video stream
      using the RTJPEG codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
-
-
   [1m2.2.  Software.[0m
 
   There are a few ways of installing programs on Linux systems; you can
@@ -1150,7 +1150,7 @@
   dependant on mythtv being installed and operational.
 
 
-  [1m10.1.  Installation.[0m
+  [1m10.1.  Installation and pre-requisites.[0m
 
   Download mythweb from http://www.mythtv.org/ <http://www.mythtv.org/>
   and save it to a location where you can find it.  The next step
@@ -1165,7 +1165,11 @@
   graphical installer (see instructions in ``Graphic Install Tools'') or
   through the command line (section ``Command Line''), and you've
   ensured that the [1mapache [22mserver will start at boot using the Mandrake
-  Control Center, do the following:
+  Control Center.
+
+
+  [1m10.2.  Completing the installation.[0m
+
 
 
        % tar -xjf mythweb-0.7.tar.bz2
@@ -1185,9 +1189,52 @@
   you will get a 404 Page not Found error.
 
 
-  [1m11.  Using mythgallery.[0m
 
-  [1m12.  Using mythgame.[0m
+  [1m11.  mythgallery.[0m
+
+  mythgallery is a photo and slideshow application.  mythgallery is a
+  separate application, but it's dependant on mythtv being installed and
+  operational.
+
+  [1m11.1.  Installation and pre-requisites.[0m
+
+  Download mythgallery from http://www.mythtv.org/
+  <http://www.mythtv.org/> and save it to a location where you can find
+  it.
+
+
+       % tar -xjf mythgallery-0.7.tar.bz2
+       % cd mythgallery-0.7
+       % make
+       # su
+       # make install
+       # exit
+       %
+
+
+
+  The configuration file for mythgallery is located in
+  /usr/local/share/mythtv.  This file needs to be edited:  ensure that
+  your GalleryDir variable is set to the directory where your pictures
+  are stored.
+
+
+  +o  Use the arrow keys to move around the thumbnails.
+
+  +o  Use SPACE or ENTER to maximize a photo.
+
+     +o  Use p or P to start the slideshow of all the files in the
+        directory.  "Play" or "Pause" on your remote may also work.
+
+     +o  Use SPACE or ENTER to advance to the next photo.
+
+  +o  Use ESC to go up one level, or to exit out of the module if you're
+     at the first level.
+
+
+  [1m12.  mythgame.[0m
+
+  [1m13.  mythmusic.[0m
 
 
 
