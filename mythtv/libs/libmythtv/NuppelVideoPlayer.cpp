@@ -2853,8 +2853,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
     nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
-    QString setting = profile.byName("videocodec")->getValue();
-    if (setting == "MPEG-4") 
+    QString vidsetting = profile.byName("videocodec")->getValue();
+    if (vidsetting == "MPEG-4") 
     {
         nvr->SetOption("codec", "mpeg4");
 
@@ -2867,7 +2867,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         SetProfileOption(profile, "mpeg4option4mv");
         nvr->SetupAVCodec();
     } 
-    else if (setting == "RTjpeg") 
+    else if (vidsetting == "RTjpeg")
     {
         nvr->SetOption("codec", "rtjpeg");
         SetProfileOption(profile, "rtjpegquality");
@@ -2877,24 +2877,24 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     } 
     else 
     {
-        cerr << "Unknown video codec: " << setting << endl;
+        cerr << "Unknown video codec: " << vidsetting << endl;
     }
 
-    setting = profile.byName("audiocodec")->getValue();
-    if (setting == "MP3") 
+    QString audsetting = profile.byName("audiocodec")->getValue();
+    if (audsetting == "MP3") 
     {
         nvr->SetOption("audiocompression", 1);
         SetProfileOption(profile, "mp3quality");
         SetProfileOption(profile, "samplerate");
         decoder->SetRawAudioState(true);
     } 
-    else if (setting == "Uncompressed") 
+    else if (audsetting == "Uncompressed")
     {
         nvr->SetOption("audiocompression", 0);
     } 
     else 
     {
-        cerr << "Unknown audio codec: " << setting << endl;
+        cerr << "Unknown audio codec: " << audsetting << endl;
     }
 
     nvr->AudioInit(true);
@@ -2966,7 +2966,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
 
     bool forceKeyFrames = (fifow == NULL) ? framecontrol : false;
 
-    if (setting == decoder->GetEncodingType() && !forceKeyFrames &&
+    if (vidsetting == decoder->GetEncodingType() && !forceKeyFrames &&
         fifow == NULL && !deleteMap.isEmpty() && honorCutList)
     {
         decoder->SetRawVideoState(true);
@@ -3077,7 +3077,11 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                     wait_recover--;
             }
             else
+            {
                 dropvideo = 0;
+                wait_recover = 0;
+            }
+
             // cout << frame.frameNumber << ": video time: " << frame.timecode
             //      << " audio time: " << arb->last_audiotime << " buf: "
             //      << audbufTime << " exp: "
