@@ -556,6 +556,26 @@ public:
     };
 };
 
+class GuiOffsetX: public SpinBoxSetting, public GlobalSetting {
+public:
+    GuiOffsetX():
+        SpinBoxSetting(-1600, 1600, 1), GlobalSetting("GuiOffsetX") {
+        setLabel("GUI X offset");
+        setValue(0);
+        setHelpText("The horizontal offset the GUI will be displayed at.");
+    };
+};
+
+class GuiOffsetY: public SpinBoxSetting, public GlobalSetting {
+public:
+    GuiOffsetY():
+        SpinBoxSetting(-1600, 1600, 1), GlobalSetting("GuiOffsetY") {
+        setLabel("GUI Y offset");
+        setValue(0);
+        setHelpText("The vertical offset the GUI will be displayed at.");
+    };
+};
+
 class RunInWindow: public CheckBoxSetting, public GlobalSetting {
 public:
     RunInWindow():
@@ -920,11 +940,17 @@ AppearanceSettings::AppearanceSettings()
 
     theme->addChild(new ThemeSelector());
     theme->addChild(new RandomTheme());
-    theme->addChild(new XineramaScreen());
-    theme->addChild(new GuiWidth());
-    theme->addChild(new GuiHeight());
-    theme->addChild(new RunInWindow());
     addChild(theme);
+
+    VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
+    screen->setLabel("Screen settings");
+    screen->addChild(new XineramaScreen());
+    screen->addChild(new GuiWidth());
+    screen->addChild(new GuiHeight());
+    screen->addChild(new GuiOffsetX());
+    screen->addChild(new GuiOffsetY());
+    screen->addChild(new RunInWindow());
+    addChild(screen);
 
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
     dates->setLabel("Localization");    

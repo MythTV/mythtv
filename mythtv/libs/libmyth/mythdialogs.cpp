@@ -27,6 +27,12 @@ void MythMainWindow::Init(void)
     GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
 #endif
 
+    int xoff = gContext->GetNumSetting("GuiOffsetX", 0);
+    int yoff = gContext->GetNumSetting("GuiOffsetY", 0);
+
+    x += xoff;
+    y += yoff;
+
     setGeometry(x, y, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
