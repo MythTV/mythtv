@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1012";
+const QString currentDatabaseVersion = "1013";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -334,6 +334,17 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
         performActualUpdate(updates, "1012", dbver);
+    }
+
+    if (dbver == "1012")
+    {
+        const QString updates[] = {
+"INSERT INTO settings SET value=\"mythfilldatabaseLastRunStart\";",
+"INSERT INTO settings SET value=\"mythfilldatabaseLastRunEnd\";",
+"INSERT INTO settings SET value=\"mythfilldatabaseLastRunStatus\";",
+""
+};
+        performActualUpdate(updates, "1013", dbver);
     }
 }
 

@@ -57,6 +57,7 @@ struct XvData
     GC XJ_gc;
     Screen *XJ_screen;
     Display *XJ_disp;
+    float display_aspect;
     XShmSegmentInfo *XJ_SHMInfo;
 
     map<unsigned char *, XvImage *> buffers;
@@ -186,6 +187,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     unsigned int p_version, p_release, p_request_base, p_event_base, 
                  p_error_base;
     int p_num_adaptors;
+    int w_mm, h_mm;
 
     XvAdaptorInfo *ai;
 
@@ -203,6 +205,13 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
  
     data->XJ_screen = DefaultScreenOfDisplay(data->XJ_disp);
     XJ_screen_num = DefaultScreen(data->XJ_disp);
+
+    w_mm = DisplayWidthMM(data->XJ_disp, XJ_screen_num);
+    h_mm = DisplayHeightMM(data->XJ_disp, XJ_screen_num);
+    if (w_mm == 0 || h_mm == 0)
+        data->display_aspect = XJ_aspect;
+    else
+        data->display_aspect = (float)w_mm/h_mm;
 
     XJ_white = XWhitePixel(data->XJ_disp, XJ_screen_num);
     XJ_black = XBlackPixel(data->XJ_disp, XJ_screen_num);
@@ -769,12 +778,29 @@ void VideoOutputXv::Show()
 
 void VideoOutputXv::DrawUnusedRects(void)
 {
+    // Draw black in masked areas
     XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
-  
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, dispy, 
-                   dispw, dispyoff);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, 
-                   dispyoff + disphoff, dispw, dispyoff);
+
+    if (dispxoff > dispx) // left
+        XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
+                       dispx, dispy, dispxoff-dispx, disph);
+    if (dispxoff+dispwoff < dispx+dispw) // right
+        XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
+                       dispxoff+dispwoff, dispy, 
+                       (dispx+dispw)-(dispxoff+dispwoff), disph);
+    if (dispyoff > dispy) // bottom
+        XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
+                       dispx, dispy, dispw, dispyoff-dispy);
+    if (dispyoff+disphoff < dispy+disph) // top
+        XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
+                       dispx, dispyoff+disphoff, 
+                       dispw, (dispy+disph)-(dispyoff+disphoff));
+    XSync(data->XJ_disp, false);
+}
+
+float VideoOutputXv::GetDisplayAspect(void)
+{
+    return data->display_aspect;
 }
 
 void VideoOutputXv::UpdatePauseFrame(void)

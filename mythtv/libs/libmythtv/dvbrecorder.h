@@ -16,6 +16,8 @@ using namespace std;
 
 #include "dvbtypes.h"
 #include "dvbchannel.h"
+#include "dvbsections.h"
+#include "dvbcam.h"
 
 class DVBRecorder: public QObject, public RecorderBase
 {
@@ -108,6 +110,8 @@ private:
     dvb_channel_t   chan_opts;
 
     DVBChannel*     dvbchannel;
+    DVBSections*    dvbsections;
+    DVBCam*         dvbcam;
 };
 
 #endif

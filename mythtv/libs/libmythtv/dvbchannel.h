@@ -18,6 +18,7 @@ using namespace std;
 #include "channelbase.h"
 
 #include "dvbtypes.h"
+#include "dvbdiseqc.h"
 
 class TVRec;
 
@@ -104,6 +105,8 @@ private:
 
     pthread_t statusMonitorThread;
     bool pauseStatusMonitor;
+
+    DVBDiSEqC* diseqc;
 };
 
 #endif

@@ -609,10 +609,6 @@
         <translation>Sauter %1 secondes</translation>
     </message>
     <message>
-        <source>Not Currently Suppressed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>Pas enregistré</translation>
     </message>
@@ -1845,6 +1841,18 @@
         <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -1890,13 +1898,6 @@
     <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
         <translation>Lister tous les prochains épisodes.</translation>
-    </message>
-</context>
-<context>
-    <name>Scheduler</name>
-    <message>
-        <source>the maximum number of episodes have already been recorded.</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2134,7 +2135,7 @@
     </message>
     <message>
         <source>4:3 Zoom</source>
-        <translation>Zoom 4:3</translation>
+        <translation type="obsolete">Zoom 4:3</translation>
     </message>
     <message>
         <source>Brightness (REC) %1 %</source>
@@ -2192,6 +2193,10 @@
         <source>Auto-Skip Notify</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ViewScheduled</name>
@@ -2205,19 +2210,19 @@
     </message>
     <message>
         <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation>Cet programme a été désactivé car il était en conflict avec un autre programme. Réactiver ce programme?</translation>
+        <translation type="obsolete">Cet programme a été désactivé car il était en conflict avec un autre programme. Réactiver ce programme?</translation>
     </message>
     <message>
         <source>Yes, I want to record it.</source>
-        <translation>Oui, l&apos;enregistrer</translation>
+        <translation type="obsolete">Oui, l&apos;enregistrer</translation>
     </message>
     <message>
         <source>No, leave it disabled.</source>
-        <translation>Non, le garder désactivé.</translation>
+        <translation type="obsolete">Non, le garder désactivé.</translation>
     </message>
     <message>
         <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation>Ce programme a été désactivé car il a déjà été enregistré auparavant.</translation>
+        <translation type="obsolete">Ce programme a été désactivé car il a déjà été enregistré auparavant.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -2225,7 +2230,7 @@
     </message>
     <message>
         <source>Unsuppress recording</source>
-        <translation>Réactiver l&apos;enregistrement</translation>
+        <translation type="obsolete">Réactiver l&apos;enregistrement</translation>
     </message>
     <message>
         <source>The follow scheduled recordings conflict with each other.  Which would you like to record?</source>
@@ -2237,7 +2242,15 @@
     </message>
     <message>
         <source>Recording this program has been suppressed because: </source>
-        <translation>L&apos;enregistrement de se programme a été désactivé parce que:</translation>
+        <translation type="obsolete">L&apos;enregistrement de se programme a été désactivé parce que:</translation>
+    </message>
+    <message>
+        <source>Record it anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t record it</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

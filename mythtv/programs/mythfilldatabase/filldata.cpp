@@ -1378,7 +1378,22 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     if (!quiet)
          cout << "----------------- Start of XMLTV output -----------------" << endl;
 
+    QDateTime qdtNow = QDateTime::currentDateTime();
+    QSqlQuery query;
+    query.exec(QString("UPDATE settings SET data ='%1' "
+                       "WHERE value='mythfilldatabaseLastRunStart'")
+                       .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
+
     int status = system(command.ascii());
+
+    query.exec(QString("UPDATE settings SET data ='%1' "
+                       "WHERE value='mythfilldatabaseLastRunStatus'")
+                       .arg(status));
+
+    qdtNow = QDateTime::currentDateTime();
+    query.exec(QString("UPDATE settings SET data ='%1' "
+                       "WHERE value='mythfilldatabaseLastRunEnd'")
+                       .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
  
     if (!quiet)
          cout << "------------------ End of XMLTV output ------------------" << endl;
@@ -1845,11 +1860,12 @@ int main(int argc, char *argv[])
             cout << "   Read channels as defined in xawtvrc file given\n";
             cout << "   <sourceid>    = cardinput\n";
             cout << "   <xawtvrcfile> = file to read\n";
+            cout << "\n";
             cout << "--help\n";
             cout << "   This text\n";
             cout << "\n";
             cout << "\n";
-            cout << "  --manual and --update can not be used together\n";
+            cout << "  --manual and --update can not be used together.\n";
             cout << "\n";
             return -1;
         }
@@ -1919,6 +1935,7 @@ int main(int argc, char *argv[])
         }
     
         bool ret = fillData(sourcelist);
+
         if (!ret)
         {
              cerr << "Failed to fetch some program info\n";

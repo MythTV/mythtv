@@ -51,6 +51,8 @@ using namespace std;
 #include "transform.h"
 #include "dvbtypes.h"
 #include "dvbdev.h"
+#include "dvbsections.h"
+#include "dvbcam.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 
@@ -68,8 +70,11 @@ DVBRecorder::DVBRecorder(DVBChannel* advbchannel): RecorderBase()
     mainpaused = false;
     recording = false;
 
-    wait_for_seqstart = false;
-    wait_for_seqstart_enabled = false;
+    wait_for_seqstart = true;
+    wait_for_seqstart_enabled = true;
+
+    dvbsections = NULL;
+    dvbcam = NULL;
 }
 
 DVBRecorder::~DVBRecorder()
@@ -126,6 +131,17 @@ bool DVBRecorder::Open()
     connect(dvbchannel, SIGNAL(ChannelChanged(dvb_channel_t&)),
             this, SLOT(ChannelChanged(dvb_channel_t&)));
 
+    if (dvbchannel->GetCardType() == FE_QPSK)
+    {
+        dvbsections = new DVBSections(cardnum);
+        connect(dvbchannel, SIGNAL(ChannelChanged(dvb_channel_t&)),
+                dvbsections, SLOT(ChannelChanged(dvb_channel_t&)));
+
+        dvbcam = new DVBCam(cardnum);
+        connect(dvbsections, SIGNAL(ChannelChanged(dvb_channel_t&, uint8_t*, int)),
+                dvbcam, SLOT(ChannelChanged(dvb_channel_t&, uint8_t*, int)));
+    }
+
     dvbchannel->RecorderStarted();
 
     isopen = true;
@@ -136,6 +152,9 @@ void DVBRecorder::Close()
 {
     if (!isopen)
         return;
+
+    delete dvbsections;
+    delete dvbcam;
 
     CloseFilters();
 
@@ -528,7 +547,6 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
                     case PICTURE_START:
                         framesWritten++;
                     break;
-
                 }
                 continue;
             }

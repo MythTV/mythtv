@@ -2533,7 +2533,31 @@ void MainServer::PrintStatus(QSocket *socket)
     }
     dblock.unlock();
 
-    os << "Guide data until "
+    QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus;
+
+    mfdLastRunStart = gContext->GetSetting("mythfilldatabaseLastRunStart");
+    mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
+    mfdLastRunStatus = gContext->GetNumSetting("mythfilldatabaseLastRunStatus");
+
+    os << "Last mythfilldatabase run started on: "
+       << mfdLastRunStart
+       << "\r\n";
+    os << "and ended on: "
+       << mfdLastRunEnd
+       << ".\r\n";
+
+    if(!mfdLastRunStatus)
+    {
+       os << "<P><strong>WARNING</strong>: There was an error during the last run."
+          << "\r\n";
+    }
+    else
+    {
+       os << "Last run: successful."
+          << "\r\n";
+    }
+
+    os << "<P>Guide data until "
        << QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm")
        << "\r\n";
 

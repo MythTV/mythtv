@@ -57,8 +57,8 @@ using_viahwslice {
 }
 
 using_dvb {
-    SOURCES += dvbrecorder.cpp dvbchannel.cpp
-    HEADERS += dvbrecorder.h dvbchannel.h
+    SOURCES += dvbrecorder.cpp dvbchannel.cpp dvbdiseqc.cpp
+    HEADERS += dvbtypes.h dvbrecorder.h dvbchannel.h dvbdiseqc.h
     TARGETDEPS += ../libdvbdev/libdvbdev.a
 }
 

@@ -622,7 +622,7 @@
     </message>
     <message>
         <source>Not Currently Suppressed</source>
-        <translation>Momentan nicht blockiert</translation>
+        <translation type="obsolete">Momentan nicht blockiert</translation>
     </message>
     <message>
         <source>Not Recording</source>
@@ -1901,6 +1901,18 @@
         <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -1956,7 +1968,7 @@
     <name>Scheduler</name>
     <message>
         <source>the maximum number of episodes have already been recorded.</source>
-        <translation>Es können keine weiteren Folgen mehr aufgenommen werden.</translation>
+        <translation type="obsolete">Es können keine weiteren Folgen mehr aufgenommen werden.</translation>
     </message>
 </context>
 <context>
@@ -2198,7 +2210,7 @@
     </message>
     <message>
         <source>4:3 Zoom</source>
-        <translation>4:3 Zoom</translation>
+        <translation type="obsolete">4:3 Zoom</translation>
     </message>
     <message>
         <source>Brightness (REC) %1 %</source>
@@ -2256,6 +2268,10 @@
         <source>Auto-Skip Notify</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ViewScheduled</name>
@@ -2269,19 +2285,19 @@
     </message>
     <message>
         <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation>Diese Aufnahme wurde blockiert, da sie mit einer anderen Aufnahme kollidiert. Möchten Sie sie wieder aktivieren?</translation>
+        <translation type="obsolete">Diese Aufnahme wurde blockiert, da sie mit einer anderen Aufnahme kollidiert. Möchten Sie sie wieder aktivieren?</translation>
     </message>
     <message>
         <source>Yes, I want to record it.</source>
-        <translation>Ja, Ich möchte es aufnehmen</translation>
+        <translation type="obsolete">Ja, Ich möchte es aufnehmen</translation>
     </message>
     <message>
         <source>No, leave it disabled.</source>
-        <translation>Nein, alles bleibt beim alten.</translation>
+        <translation type="obsolete">Nein, alles bleibt beim alten.</translation>
     </message>
     <message>
         <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation>Diese Aufnahme wurde blockiert, da diese Sendung schon aufgezeichnet wurde.</translation>
+        <translation type="obsolete">Diese Aufnahme wurde blockiert, da diese Sendung schon aufgezeichnet wurde.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -2289,7 +2305,7 @@
     </message>
     <message>
         <source>Unsuppress recording</source>
-        <translation>Aufnahme wieder aktivieren</translation>
+        <translation type="obsolete">Aufnahme wieder aktivieren</translation>
     </message>
     <message>
         <source>The follow scheduled recordings conflict with each other.  Which would you like to record?</source>
@@ -2301,7 +2317,15 @@
     </message>
     <message>
         <source>Recording this program has been suppressed because: </source>
-        <translation>Diese Aufnahme wurde blockiert weil: </translation>
+        <translation type="obsolete">Diese Aufnahme wurde blockiert weil: </translation>
+    </message>
+    <message>
+        <source>Record it anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t record it</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

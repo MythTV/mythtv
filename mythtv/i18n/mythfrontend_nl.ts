@@ -616,10 +616,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not Currently Suppressed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation type="unfinished">Niet Opnemen</translation>
     </message>
@@ -1848,6 +1844,18 @@
         <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -1896,13 +1904,6 @@
     </message>
     <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Scheduler</name>
-    <message>
-        <source>the maximum number of episodes have already been recorded.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2144,10 +2145,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>4:3 Zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Brightness (REC) %1 %</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2203,6 +2200,10 @@
         <source>Auto-Skip Notify</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ViewScheduled</name>
@@ -2216,19 +2217,19 @@
     </message>
     <message>
         <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation>Opname van dit programma is gedesactiveerd omdat het in conflict is met een andere opname. Wilt U deze opname heractiveren?</translation>
+        <translation type="obsolete">Opname van dit programma is gedesactiveerd omdat het in conflict is met een andere opname. Wilt U deze opname heractiveren?</translation>
     </message>
     <message>
         <source>Yes, I want to record it.</source>
-        <translation>Ja, ik wil het opnemen.</translation>
+        <translation type="obsolete">Ja, ik wil het opnemen.</translation>
     </message>
     <message>
         <source>No, leave it disabled.</source>
-        <translation>Nee, laat het gedesactiveerd.</translation>
+        <translation type="obsolete">Nee, laat het gedesactiveerd.</translation>
     </message>
     <message>
         <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation>Opname van dit programma is uitgeschakeld, omdat het vroeger al is opgenomen.</translation>
+        <translation type="obsolete">Opname van dit programma is uitgeschakeld, omdat het vroeger al is opgenomen.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -2244,10 +2245,14 @@
     </message>
     <message>
         <source>Unsuppress recording</source>
-        <translation>Heractiveer opname</translation>
+        <translation type="obsolete">Heractiveer opname</translation>
     </message>
     <message>
-        <source>Recording this program has been suppressed because: </source>
+        <source>Record it anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t record it</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

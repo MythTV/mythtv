@@ -163,7 +163,10 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
         fbfd = open(fbdev.ascii(), O_RDWR);
         if (fbfd < 0)
         {
-            cerr << "Unable to open the ivtv framebuffer\n";
+            perror("ivtv framebuffer open");
+            cerr << "Unable to open the ivtv framebuffer device '"
+                 << fbdev.ascii() << "'\n";
+            cerr << "OSD will be unavailable\n";
             return false;
         }
 

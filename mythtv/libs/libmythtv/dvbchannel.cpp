@@ -50,6 +50,7 @@ using namespace std;
 #include "dvbdev.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
+#include "dvbdiseqc.h"
 
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
            : ChannelBase(parent), cardnum(aCardNum)
@@ -57,6 +58,7 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     fd_frontend = 0;
     first_tune = true;
     isOpen = false;
+    diseqc = NULL;
     pauseStatusMonitor = false;
 
     pthread_mutex_init(&chan_opts.lock, NULL);
@@ -94,6 +96,12 @@ bool DVBChannel::Open()
 
         if (ioctl(fd_frontend, FE_SET_VOLTAGE, SEC_VOLTAGE_13) < 0)
             WARNING("Initial Voltage setting failed.");
+
+        if (diseqc == NULL)
+        {
+            diseqc = new DVBDiSEqC(cardnum, fd_frontend);
+            diseqc->DiseqcReset();
+        }
     }
 
     GENERAL(QString("Using DVB card %1, with frontend %2.")
@@ -300,10 +308,11 @@ void DVBChannel::PrintChannelOptions()
                     .arg(t.params.u.qpsk.symbol_rate)
                     .arg(t.voltage==SEC_VOLTAGE_13?'V':'H');
 
+            msg += " Inv:";
             switch(t.params.inversion) {
-                case INVERSION_AUTO: msg += " Inv: Auto"; break;
-                case INVERSION_OFF: msg += " Inv: Off"; break;
-                case INVERSION_ON: msg += " Inv: On"; break;
+                case INVERSION_AUTO: msg += "Auto"; break;
+                case INVERSION_OFF: msg += "Off"; break;
+                case INVERSION_ON: msg += "On"; break;
             }
 
             //NOTE: Diseqc and LNB is handled by DVBDiSEqC.
@@ -313,10 +322,114 @@ void DVBChannel::PrintChannelOptions()
             msg = QString("Frequency: %1 Symbol Rate: %2.")
                     .arg(t.params.frequency)
                     .arg(t.params.u.qam.symbol_rate);
+
+            msg += " Inv:";
+            switch(t.params.inversion) {
+                case INVERSION_AUTO: msg += "Auto"; break;
+                case INVERSION_OFF: msg += "Off"; break;
+                case INVERSION_ON: msg += "On"; break;
+            }
+
+            msg += " Fec:";
+            switch(t.params.u.qam.fec_inner) {
+                case FEC_NONE: msg += "None"; break;
+                case FEC_AUTO: msg += "Auto"; break;
+                case FEC_8_9: msg += "8/9"; break;
+                case FEC_7_8: msg += "7/8"; break;
+                case FEC_6_7: msg += "6/7"; break;
+                case FEC_5_6: msg += "5/6"; break;
+                case FEC_4_5: msg += "4/5"; break;
+                case FEC_3_4: msg += "3/4"; break;
+                case FEC_2_3: msg += "2/3"; break;
+                case FEC_1_2: msg += "1/2"; break;
+            }
+
+            msg += " Mod:";
+            switch(t.params.u.qam.modulation) {
+                case QPSK: msg += "QPSK"; break;
+                case QAM_AUTO: msg += "Auto"; break;
+                case QAM_256: msg += "256"; break;
+                case QAM_128: msg += "128"; break;
+                case QAM_64: msg += "64"; break;
+                case QAM_32: msg += "32"; break;
+                case QAM_16: msg += "16"; break;
+            }
             break;
 
         case FE_OFDM:
             msg = QString("Frequency: %1.").arg(t.params.frequency);
+
+            msg += " BW:";
+            switch(t.params.u.ofdm.bandwidth) {
+                case BANDWIDTH_AUTO: msg += "Auto"; break;
+                case BANDWIDTH_8_MHZ: msg += "8Mhz"; break;
+                case BANDWIDTH_7_MHZ: msg += "7Mhz"; break;
+                case BANDWIDTH_6_MHZ: msg += "6Mhz"; break;
+            }
+
+            msg += " HP:";
+            switch(t.params.u.ofdm.code_rate_HP) {
+                case FEC_NONE: msg += "None"; break;
+                case FEC_AUTO: msg += "Auto"; break;
+                case FEC_8_9: msg += "8/9"; break;
+                case FEC_7_8: msg += "7/8"; break;
+                case FEC_6_7: msg += "6/7"; break;
+                case FEC_5_6: msg += "5/6"; break;
+                case FEC_4_5: msg += "4/5"; break;
+                case FEC_3_4: msg += "3/4"; break;
+                case FEC_2_3: msg += "2/3"; break;
+                case FEC_1_2: msg += "1/2"; break;
+            }
+
+            msg += " LP:";
+            switch(t.params.u.ofdm.code_rate_LP) {
+                case FEC_NONE: msg += "None"; break;
+                case FEC_AUTO: msg += "Auto"; break;
+                case FEC_8_9: msg += "8/9"; break;
+                case FEC_7_8: msg += "7/8"; break;
+                case FEC_6_7: msg += "6/7"; break;
+                case FEC_5_6: msg += "5/6"; break;
+                case FEC_4_5: msg += "4/5"; break;
+                case FEC_3_4: msg += "3/4"; break;
+                case FEC_2_3: msg += "2/3"; break;
+                case FEC_1_2: msg += "1/2"; break;
+            }
+
+            msg += " C:";
+            switch(t.params.u.ofdm.constellation) {
+                case QPSK: msg += "QPSK"; break;
+                case QAM_AUTO: msg += "Auto"; break;
+                case QAM_256: msg += "256"; break;
+                case QAM_128: msg += "128"; break;
+                case QAM_64: msg += "64"; break;
+                case QAM_32: msg += "32"; break;
+                case QAM_16: msg += "16"; break;
+            }
+
+            msg += " TM:";
+            switch(t.params.u.ofdm.transmission_mode) {
+                case TRANSMISSION_MODE_AUTO: msg += "Auto"; break;
+                case TRANSMISSION_MODE_2K: msg += "2K"; break;
+                case TRANSMISSION_MODE_8K: msg += "8K"; break;
+            }
+
+            msg += " H:";
+            switch(t.params.u.ofdm.hierarchy_information) {
+                case HIERARCHY_AUTO: msg += "Auto"; break;
+                case HIERARCHY_NONE: msg += "None"; break;
+                case HIERARCHY_1: msg += "1"; break;
+                case HIERARCHY_2: msg += "2"; break;
+                case HIERARCHY_4: msg += "4"; break;
+            }
+
+            msg += " GI:";
+            switch(t.params.u.ofdm.guard_interval) {
+                case GUARD_INTERVAL_AUTO: msg += "Auto"; break;
+                case GUARD_INTERVAL_1_4: msg += "1/4"; break;
+                case GUARD_INTERVAL_1_8: msg += "1/8"; break;
+                case GUARD_INTERVAL_1_16: msg += "1/16"; break;
+                case GUARD_INTERVAL_1_32: msg += "1/32"; break;
+            }
             break;
     }
 
@@ -907,6 +1020,10 @@ bool DVBChannel::TuneQPSK(dvb_tuning_t& tuning, bool reset, bool& havetuned)
         tuning.params.frequency = tuning.params.frequency - tuning.lnb_lof_lo;
         tuning.tone = SEC_TONE_OFF;
     }
+
+    if (diseqc)
+        if (!diseqc->Set(tuning, reset, havetuned))
+            return false;
 
     if (reset ||
         prev_tuning.params.frequency != tuning.params.frequency ||

@@ -669,7 +669,7 @@
     </message>
     <message>
         <source>Not Currently Suppressed</source>
-        <translation>Sense suprimir</translation>
+        <translation type="obsolete">Sense suprimir</translation>
     </message>
     <message>
         <source>Not Recording</source>
@@ -1944,6 +1944,18 @@
         <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -1995,7 +2007,7 @@
     <name>Scheduler</name>
     <message>
         <source>the maximum number of episodes have already been recorded.</source>
-        <translation>s&apos;ha assolit el màxim nombre d&apos;episodis a gravar.</translation>
+        <translation type="obsolete">s&apos;ha assolit el màxim nombre d&apos;episodis a gravar.</translation>
     </message>
 </context>
 <context>
@@ -2233,7 +2245,7 @@
     </message>
     <message>
         <source>4:3 Zoom</source>
-        <translation>Zoom 4:3</translation>
+        <translation type="obsolete">Zoom 4:3</translation>
     </message>
     <message>
         <source>Brightness (REC) %1 %</source>
@@ -2291,24 +2303,28 @@
         <source>Auto-Skip Notify</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ViewScheduled</name>
     <message>
         <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation>La gravació d&apos;aquest programa ha estat desactivada perquè estava en conflicte amb una altra gravació programada. Vol tornar-la a reactivar?</translation>
+        <translation type="obsolete">La gravació d&apos;aquest programa ha estat desactivada perquè estava en conflicte amb una altra gravació programada. Vol tornar-la a reactivar?</translation>
     </message>
     <message>
         <source>Yes, I want to record it.</source>
-        <translation>Si, vull gravar-ho.</translation>
+        <translation type="obsolete">Si, vull gravar-ho.</translation>
     </message>
     <message>
         <source>No, leave it disabled.</source>
-        <translation>No, mantenir desactivat.</translation>
+        <translation type="obsolete">No, mantenir desactivat.</translation>
     </message>
     <message>
         <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation>Aquesta gravació ha estat suprimida perquè ja ha estat gravada anteriorment.</translation>
+        <translation type="obsolete">Aquesta gravació ha estat suprimida perquè ja ha estat gravada anteriorment.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -2332,11 +2348,19 @@
     </message>
     <message>
         <source>Unsuppress recording</source>
-        <translation>Dessuprimir gravació</translation>
+        <translation type="obsolete">Dessuprimir gravació</translation>
     </message>
     <message>
         <source>Recording this program has been suppressed because: </source>
-        <translation>Aquesta gravació ha estat suspesa per la següent raó: </translation>
+        <translation type="obsolete">Aquesta gravació ha estat suspesa per la següent raó: </translation>
+    </message>
+    <message>
+        <source>Record it anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t record it</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

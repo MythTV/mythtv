@@ -5,7 +5,7 @@
 include ( ../../settings.pro )
 
 TEMPLATE = lib
-CONFIG -= moc
+CONFIG -= moc qt
 CONFIG += plugin thread
 target.path = $${PREFIX}/lib/mythtv/filters
 INSTALLS = target

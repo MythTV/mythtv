@@ -456,23 +456,59 @@ void VideoOutput::MoveResize(void)
         }
     }
 
-    if (XJ_aspect >= 1.34)
+    // Manage aspect ratio and letterbox settings.  XJ_aspect is the
+    // (desired) video aspect ratio.  GetDisplayAspect provides the
+    // actual display aspect ratio, in mm not pixels.  In addition,
+    // letterbox == 2 indicates a zoom mode (large overscan).  Do no
+    // conversion between x and y sizes in pixels, as pixels are not
+    // necessarily square.
+    // n.b. assumes aspect < 1.4 is 4:3 and > 1.4 is 16:9; other
+    // aspect ratios wil cause incorrect results
+
+    if (letterbox == 2) 
     {
-        int oldheight = disphoff;
-        disphoff = (int)(dispwoff / XJ_aspect);
-        dispyoff = (oldheight - disphoff) / 2;
+        // Zoom mode 
+        // expressly for 4:3 program inside 16:9 frames displayed on 4:3 set 
+        // or 16:9 program inside 4:3 frames displayed on 16:9 set
+        // Math works out that zoom is the same for both
+        // Expand by 4/3 and overscan
+        dispxoff -= (dispwoff/6); // 1/6 of original is 1/8 of new
+        dispwoff = dispwoff*4/3;
+        dispyoff -= (disphoff/6);
+        disphoff = disphoff*4/3;
     }
-
-    // Provide zoom for 4:3 stuff broadcast in 16:9. Vertical zoom is 
-    // natively done already.  Takes the 4:3 chunk out of the middle of a 
-    // 16:9.  Like pan and scan
- 
-    if (letterbox == 2)
+    else 
     {
-        int oldwidth = dispwoff;
-
-        dispwoff = (int)(disphoff * 16.0 / 9);
-        dispxoff = (oldwidth - dispwoff) / 2;
+        if (XJ_aspect <= 1.4) 
+        {
+            // Video is 4:3
+            if (GetDisplayAspect() <= 1.4)
+            {
+                // Display is 4:3 - do nothing
+            }
+            else 
+            {
+                // Display is 16:9 - pillarbox it
+                // image in center, 3/4 of the overall width
+                dispxoff += (dispwoff/8);
+                dispwoff = dispwoff*3/4;
+            }
+        }
+        else
+        {
+            // Video is 16:9
+            if (GetDisplayAspect() <= 1.4)
+            {
+                // Display is 4:3 -- letterbox it
+                // image in center, 3/4 of the overall height
+                dispyoff += (disphoff/8);
+                disphoff = disphoff*3/4;
+            }
+            else 
+            {
+                // Display is 16:9 - do nothing
+            }
+        }
     }
 
     DrawUnusedRects();
@@ -483,10 +519,18 @@ void VideoOutput::ToggleLetterbox(void)
     if (++letterbox > 2)
         letterbox = 0;
 
-    if (letterbox == 1)
-        AspectChanged(16.0 / 9);
-    else
+    switch (letterbox) 
+    {
+    case 0:
         AspectChanged(4.0 / 3);
+        break;
+    case 1:
+        AspectChanged(16.0 / 9);
+        break;
+    case 2:
+        AspectChanged(GetDisplayAspect());
+        break;
+    }
 }
 
 int VideoOutput::ValidVideoFrames(void)

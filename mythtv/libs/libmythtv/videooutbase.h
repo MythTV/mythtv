@@ -65,6 +65,8 @@ class VideoOutput
 
     virtual void DrawUnusedRects(void) = 0;
 
+    virtual float GetDisplayAspect(void) { return 4.0/3; }
+
     int GetLetterbox(void) { return letterbox; }
     void ToggleLetterbox(void);
 
@@ -107,7 +109,7 @@ class VideoOutput
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer, int keepprebuffer);
-	
+
     void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
     int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1);
 

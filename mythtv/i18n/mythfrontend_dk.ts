@@ -598,7 +598,7 @@
     </message>
     <message>
         <source>Not Currently Suppressed</source>
-        <translation>Ikke udeladt i øjeblikket</translation>
+        <translation type="obsolete">Ikke udeladt i øjeblikket</translation>
     </message>
     <message>
         <source>Not Recording</source>
@@ -1873,6 +1873,18 @@
         <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -1920,7 +1932,7 @@
     <name>Scheduler</name>
     <message>
         <source>the maximum number of episodes have already been recorded.</source>
-        <translation>Det maksimale antal episoder er allerede blevet optaget.</translation>
+        <translation type="obsolete">Det maksimale antal episoder er allerede blevet optaget.</translation>
     </message>
 </context>
 <context>
@@ -2138,10 +2150,6 @@
         <translation>Unlad at redigere</translation>
     </message>
     <message>
-        <source>4:3 Zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Brightness (REC) %1 %</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2197,6 +2205,10 @@
         <source>Auto-Skip Notify</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ViewScheduled</name>
@@ -2210,19 +2222,19 @@
     </message>
     <message>
         <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation>Optagelse af dette program er slået fra, da det vil foresage en konflikt med et andet programmeret program. Vil du genaktivere optagelse af dette program?</translation>
+        <translation type="obsolete">Optagelse af dette program er slået fra, da det vil foresage en konflikt med et andet programmeret program. Vil du genaktivere optagelse af dette program?</translation>
     </message>
     <message>
         <source>Yes, I want to record it.</source>
-        <translation>Ja, jeg vil optage det.</translation>
+        <translation type="obsolete">Ja, jeg vil optage det.</translation>
     </message>
     <message>
         <source>No, leave it disabled.</source>
-        <translation>Nej, lad det være slået fra.</translation>
+        <translation type="obsolete">Nej, lad det være slået fra.</translation>
     </message>
     <message>
         <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation>Optagelse af dette program er undertrykt, da det allerede er blevet optaget tidligere.</translation>
+        <translation type="obsolete">Optagelse af dette program er undertrykt, da det allerede er blevet optaget tidligere.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -2230,7 +2242,7 @@
     </message>
     <message>
         <source>Unsuppress recording</source>
-        <translation>Lad være med at undertrykke denne optagelse</translation>
+        <translation type="obsolete">Lad være med at undertrykke denne optagelse</translation>
     </message>
     <message>
         <source>The follow scheduled recordings conflict with each other.  Which would you like to record?</source>
@@ -2242,7 +2254,15 @@
     </message>
     <message>
         <source>Recording this program has been suppressed because: </source>
-        <translation>Optagelse af dette progam er blevet undertrykt fordi:</translation>
+        <translation type="obsolete">Optagelse af dette progam er blevet undertrykt fordi:</translation>
+    </message>
+    <message>
+        <source>Record it anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t record it</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -28,6 +28,8 @@ class VideoOutputXvMC : public VideoOutput
 
     void DrawUnusedRects(void);
 
+    float GetDisplayAspect(void);
+
     void UpdatePauseFrame(void);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,

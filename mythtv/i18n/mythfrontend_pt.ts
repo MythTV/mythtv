@@ -335,7 +335,7 @@
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Permitir que a gravação seja apagada automaticamente</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -908,10 +908,6 @@
     </message>
     <message>
         <source>Pre-scaling theme images</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not Currently Suppressed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1939,6 +1935,18 @@
         <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -1984,13 +1992,6 @@
     <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
         <translation>Ver a lista de todos os próximos episódios e horários.</translation>
-    </message>
-</context>
-<context>
-    <name>Scheduler</name>
-    <message>
-        <source>the maximum number of episodes have already been recorded.</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2227,10 +2228,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>4:3 Zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Brightness (REC) %1 %</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2268,7 +2265,7 @@
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Permitir que a gravação seja apagada automaticamente</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -2286,24 +2283,28 @@
         <source>Auto-Skip Notify</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ViewScheduled</name>
     <message>
         <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation>A gravação deste programa foi desactivada pois está em conflito com outra gravação. Deseja reabilitar esta gravação?</translation>
+        <translation type="obsolete">A gravação deste programa foi desactivada pois está em conflito com outra gravação. Deseja reabilitar esta gravação?</translation>
     </message>
     <message>
         <source>Yes, I want to record it.</source>
-        <translation>Sim, quero gravar.</translation>
+        <translation type="obsolete">Sim, quero gravar.</translation>
     </message>
     <message>
         <source>No, leave it disabled.</source>
-        <translation>Não, deixar desabilitada.</translation>
+        <translation type="obsolete">Não, deixar desabilitada.</translation>
     </message>
     <message>
         <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation type="unfinished">Esta grabación fué cancelada porque ya se grabó anteriormente.</translation>
+        <translation type="obsolete">Esta grabación fué cancelada porque ya se grabó anteriormente.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -2327,10 +2328,14 @@
     </message>
     <message>
         <source>Unsuppress recording</source>
-        <translation type="unfinished">Desuprimir grabación</translation>
+        <translation type="obsolete">Desuprimir grabación</translation>
     </message>
     <message>
-        <source>Recording this program has been suppressed because: </source>
+        <source>Record it anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t record it</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

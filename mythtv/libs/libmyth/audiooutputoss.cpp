@@ -227,15 +227,16 @@ void AudioOutputOSS::WriteAudio(unsigned char *aubuf, int size)
     while ((written < size) && 
            ((lw = write(audiofd, tmpbuf, size - written)) > 0))
     {
-        if (lw == -1)
-        {
-            cerr << "Error writing to audio device, exiting\n";
-            close(audiofd);
-            audiofd = -1;
-            return;
-        }
         written += lw;
         tmpbuf += lw;
+    }
+
+    if (lw < 0)
+    {
+        perror("Writing to audio device");
+        close(audiofd);
+        audiofd = -1;
+        return;
     }
 }
 
