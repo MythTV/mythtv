@@ -166,6 +166,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     if (recTypeRankMap.size() > 0)
         recTypeRankMap.clear();
 
+    QMutexLocker lockit(&recordingList_lock);
+
     while (recordingList.size() > 0)
     {
         ProgramInfo *pginfo = recordingList.back();
@@ -226,6 +228,8 @@ void Scheduler::FillRecordListFromMaster(void)
     RemoteGetAllPendingRecordings(reclist);
 
     vector<ProgramInfo *>::iterator pgiter = reclist.begin();
+
+    QMutexLocker lockit(&recordingList_lock);
 
     for (; pgiter != reclist.end(); pgiter++)
     {
@@ -300,6 +304,8 @@ void Scheduler::PruneDontRecords(void)
 void Scheduler::RemoveRecording(ProgramInfo *pginfo)
 {
     recPendingList.remove(pginfo->schedulerid);
+
+    QMutexLocker lockit(&recordingList_lock);
 
     list<ProgramInfo *>::iterator i = recordingList.begin();
     for (; i != recordingList.end(); i++)
@@ -515,6 +521,25 @@ void Scheduler::PruneList(void)
     }    
 }
 
+void Scheduler::getAllPending(list<ProgramInfo *> *retList)
+{
+    QMutexLocker lockit(&recordingList_lock);
+
+    while (retList->size() > 0)
+    {
+        ProgramInfo *pginfo = retList->back();
+        delete pginfo;
+        retList->pop_back();
+    }
+
+    list<ProgramInfo *>::iterator i = recordingList.begin();
+    for (; i != recordingList.end(); i++)
+    {
+        ProgramInfo *newInfo = new ProgramInfo(*(*i));
+        retList->push_back(newInfo);
+    }
+}
+
 list<ProgramInfo *> *Scheduler::getAllScheduled(void)
 {
     while (scheduledList.size() > 0)
@@ -527,6 +552,27 @@ list<ProgramInfo *> *Scheduler::getAllScheduled(void)
     ScheduledRecording::findAllScheduledPrograms(db, scheduledList);
 
     return &scheduledList;
+}
+
+void Scheduler::getAllScheduled(list<ProgramInfo *> *retList)
+{
+    QMutexLocker lockit(&scheduledList_lock);
+
+    while (retList->size() > 0)
+    {
+        ProgramInfo *pginfo = retList->back();
+        delete pginfo;
+        retList->pop_back();
+    }
+
+    getAllScheduled();
+
+    list<ProgramInfo *>::iterator i = scheduledList.begin();
+    for (; i != scheduledList.end(); i++)
+    {
+        ProgramInfo *newInfo = new ProgramInfo(*(*i));
+        retList->push_back(newInfo);
+    }
 }
 
 list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,

@@ -90,6 +90,9 @@ TVState EncoderLink::GetState(void)
 {
     TVState retval = kState_Error;
 
+    if (!isConnected())
+        return retval;
+
     if (local)
         retval = tv->GetState();
     else if (sock)

@@ -461,7 +461,7 @@ int main(int argc, char **argv)
        close(nfsfd);
     }
 
-    new MainServer(ismaster, port, statusport, &tvList, msdb);
+    new MainServer(ismaster, port, statusport, &tvList, msdb, sched);
 
     a.exec();
 

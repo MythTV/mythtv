@@ -14,6 +14,7 @@ using namespace std;
 #include "playbacksock.h"
 #include "encoderlink.h"
 #include "filetransfer.h"
+#include "scheduler.h"
 
 class QSqlDatabase;
 class HttpStatus;
@@ -24,7 +25,8 @@ class MainServer : public QObject
     Q_OBJECT
   public:
     MainServer(bool master, int port, int statusport, 
-               QMap<int, EncoderLink *> *tvList, QSqlDatabase *db);
+               QMap<int, EncoderLink *> *tvList, QSqlDatabase *db,
+               Scheduler *sched);
 
    ~MainServer();
 
@@ -116,6 +118,7 @@ class MainServer : public QObject
     bool masterBackendOverride;
 
     QSqlDatabase *m_db;
+    Scheduler *m_sched;
 
     QMutex readReadyLock;
 };

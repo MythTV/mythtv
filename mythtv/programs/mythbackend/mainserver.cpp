@@ -76,9 +76,10 @@ class ProcessRequestThread : public QThread
 
 MainServer::MainServer(bool master, int port, int statusport, 
                        QMap<int, EncoderLink *> *tvList,
-                       QSqlDatabase *db)
+                       QSqlDatabase *db, Scheduler *sched)
 {
     m_db = db;
+    m_sched = sched;
 
     ismaster = master;
     masterServer = NULL;
@@ -1200,52 +1201,54 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
 {
     QSocket *pbssock = pbs->getSocket();
 
-    dblock.lock();
+    list<ProgramInfo *> recordingList;
 
-    MythContext::KickDatabase(m_db);
-
-    Scheduler *sched = new Scheduler(false, encoderList, m_db);
-
-    bool conflicts = sched->FillRecordLists(false);
-    list<ProgramInfo *> *recordinglist = sched->getAllPending();
-
-    dblock.unlock();
+    m_sched->getAllPending(&recordingList);
 
     QStringList strlist;
 
-    strlist << QString::number(conflicts);
-    strlist << QString::number(recordinglist->size());
+    bool conflicts = m_sched->HasConflicts();
 
-    list<ProgramInfo *>::iterator iter = recordinglist->begin();
-    for (; iter != recordinglist->end(); iter++)
+    strlist << QString::number(conflicts);
+    strlist << QString::number(recordingList.size());
+
+    list<ProgramInfo *>::iterator iter = recordingList.begin();
+    for (; iter != recordingList.end(); iter++)
         (*iter)->ToStringList(strlist);
 
     SendResponse(pbssock, strlist);
 
-    delete sched;
+    while (recordingList.size() > 0)
+    {
+        ProgramInfo *pginfo = recordingList.back();
+        delete pginfo;
+        recordingList.pop_back();
+    }
 }
 
 void MainServer::HandleGetScheduledRecordings(PlaybackSock *pbs)
 {
     QSocket *pbssock = pbs->getSocket();
 
-    dblock.lock();
-    MythContext::KickDatabase(m_db);
-    Scheduler *sched = new Scheduler(false, encoderList, m_db);
-    list<ProgramInfo *> *recordinglist = sched->getAllScheduled();
-    dblock.unlock();
+    list<ProgramInfo *> recordingList;
+    m_sched->getAllScheduled(&recordingList);
 
     QStringList strlist;
 
-    strlist << QString::number(recordinglist->size());
+    strlist << QString::number(recordingList.size());
 
-    list<ProgramInfo *>::iterator iter = recordinglist->begin();
-    for (; iter != recordinglist->end(); iter++)
+    list<ProgramInfo *>::iterator iter = recordingList.begin();
+    for (; iter != recordingList.end(); iter++)
         (*iter)->ToStringList(strlist);
 
     SendResponse(pbssock, strlist);
 
-    delete sched;
+    while (recordingList.size() > 0)
+    {
+        ProgramInfo *pginfo = recordingList.back();
+        delete pginfo;
+        recordingList.pop_back();
+    }
 }
 
 void MainServer::HandleGetConflictingRecordings(QStringList &slist,
@@ -1254,31 +1257,29 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
 {
     QSocket *pbssock = pbs->getSocket();
 
-    dblock.lock();
-    MythContext::KickDatabase(m_db);
-    Scheduler *sched = new Scheduler(false, encoderList, m_db);
-
     bool removenonplaying = purge.toInt();
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
 
-    sched->FillRecordLists(false);
-
-    list<ProgramInfo *> *conflictlist = sched->getConflicting(pginfo, 
+    list<ProgramInfo *> *conflictList = m_sched->getConflicting(pginfo, 
                                                               removenonplaying);
 
-    dblock.unlock();
+    QStringList strlist = QString::number(conflictList->size());
 
-    QStringList strlist = QString::number(conflictlist->size());
-
-    list<ProgramInfo *>::iterator iter = conflictlist->begin();
-    for (; iter != conflictlist->end(); iter++)
+    list<ProgramInfo *>::iterator iter = conflictList->begin();
+    for (; iter != conflictList->end(); iter++)
         (*iter)->ToStringList(strlist); 
 
     SendResponse(pbssock, strlist);
 
-    delete sched;
+    while (conflictList->size() > 0)
+    {
+        ProgramInfo *pginfo = conflictList->back();
+        delete pginfo;
+        conflictList->pop_back();
+    }
+
     delete pginfo;
 }
 
@@ -2430,17 +2431,13 @@ void MainServer::PrintStatus(QSocket *socket)
     }
 
     // upcoming shows ---------------------
-    dblock.lock();
-    MythContext::KickDatabase(m_db);
-    Scheduler *sched = new Scheduler(false, encoderList, m_db);
-    sched->FillRecordLists(false);
-    list<ProgramInfo *> *recordinglist = sched->getAllPending();
-    dblock.unlock();
+    list<ProgramInfo *> recordingList;
+    m_sched->getAllPending(&recordingList);
 
     unsigned int iNum = 5;
-    if (recordinglist->size() < iNum) 
+    if (recordingList.size() < iNum) 
     {
-        iNum = recordinglist->size();
+        iNum = recordingList.size();
     }
 
     if (iNum == 0)
@@ -2455,8 +2452,8 @@ void MainServer::PrintStatus(QSocket *socket)
 
        os << "<TABLE BORDER WIDTH=80%>\r\n"; 
        os << "<TR><TH>Start Time</TH><TH>Show</TH><TH>Encoder</TH></TR>\r\n";
-       list<ProgramInfo *>::iterator iter = recordinglist->begin();
-       for (unsigned int i = 0; (iter != recordinglist->end()) && i < iNum; 
+       list<ProgramInfo *>::iterator iter = recordingList.begin();
+       for (unsigned int i = 0; (iter != recordingList.end()) && i < iNum; 
             iter++, i++)
        {
            if (!(*iter)->recording ||     // bad entry, don't show as upcoming
@@ -2475,8 +2472,6 @@ void MainServer::PrintStatus(QSocket *socket)
        }
        os << "</TABLE>";
     }
-
-    delete sched;
 
     os << "<P>Machine Information:\r\n";
     os << "<TABLE WIDTH =100% BGCOLOR=EEEEEE>";
@@ -2577,5 +2572,12 @@ void MainServer::PrintStatus(QSocket *socket)
 
     os << "</BODY>\r\n"
        << "</HTTP>\r\n";
+
+    while (recordingList.size() > 0)
+    {
+        ProgramInfo *pginfo = recordingList.back();
+        delete pginfo;
+        recordingList.pop_back();
+    }
 }
 

@@ -5,6 +5,7 @@ class ProgramInfo;
 class QSqlDatabase;
 class EncoderLink;
 
+#include <qmutex.h>
 #include <qmap.h> 
 #include <list>
 #include <vector>
@@ -30,13 +31,18 @@ class Scheduler : public QObject
     void RemoveRecording(ProgramInfo *pginfo);
 
     list<ProgramInfo *> *getAllPending(void) { return &recordingList; }
+    void getAllPending(list<ProgramInfo *> *retList);
+
     list<ProgramInfo *> *getAllScheduled(void);
+    void getAllScheduled(list<ProgramInfo *> *retList);
 
     list<ProgramInfo *> *getConflicting(ProgramInfo *pginfo,
                                         bool removenonplaying = true,
                                         list<ProgramInfo *> *uselist = NULL);
 
     void PrintList(void);
+
+    bool HasConflicts(void) { return hasconflicts; }
 
   protected:
     void RunScheduler(void);
@@ -75,6 +81,9 @@ class Scheduler : public QObject
 
     list<ProgramInfo *> recordingList;
     list<ProgramInfo *> scheduledList;
+
+    QMutex recordingList_lock;
+    QMutex scheduledList_lock;
 
     bool doRank;
     bool doRankFirst;
