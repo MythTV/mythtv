@@ -1934,8 +1934,6 @@ void ProgramInfo::EditRecording(QSqlDatabase *db)
         handleRecording(db);
     else
         handleNotRecording(db);
-
-    ScheduledRecording::signalChange(db);
 }
 
 void ProgramInfo::EditScheduled(QSqlDatabase *db)
@@ -1953,8 +1951,6 @@ void ProgramInfo::EditScheduled(QSqlDatabase *db)
         InfoDialog diag(this, gContext->GetMainWindow(), "Program Info");
         diag.exec();
     }
-
-    ScheduledRecording::signalChange(db);
 }
 
 int ProgramInfo::getProgramFlags(QSqlDatabase *db)

@@ -436,8 +436,6 @@ void ProgramRecPriority::edit(void)
             diag.exec();
         }
 
-        ScheduledRecording::signalChange(db);
-
         // We need to refetch the recording priority values since the Advanced
         // Recording Options page could've been used to change them 
         QString thequery;
@@ -561,7 +559,6 @@ void ProgramRecPriority::saveRecPriority(void)
         if (progInfo->recpriority != origRecPriorityData[key])
             progInfo->ApplyRecordRecPriorityChange(db, progInfo->recpriority);
     }
-    ScheduledRecording::signalChange(db);
 }
 
 void ProgramRecPriority::FillList(void)

@@ -1556,6 +1556,7 @@ void PlaybackBox::stop(ProgramInfo *rec)
 void PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory)
 {
     RemoteDeleteRecording(rec, forgetHistory);
+    ScheduledRecording::signalChange(QSqlDatabase::database());
 
     if (titleitems == 1)
     {
@@ -1918,8 +1919,6 @@ void PlaybackBox::doEditScheduled()
         diag.exec();
     }
     
-    ScheduledRecording::signalChange(db);
-
     connected = FillList();
     update(fullRect);
 }    

@@ -424,7 +424,6 @@ void ProgLister::addSearchRecord(void)
     ScheduledRecording record;
     record.loadBySearch(db, searchtype, text);
     record.exec(db);
-    ScheduledRecording::signalChange(db);
 
     setViewFromEdit();
 }
