@@ -81,7 +81,7 @@ class NuppelVideoPlayer
               bool unpauseaudio = true);
     bool GetPause(void);
     int GetFFRewSkip(void) { return ffrew_skip; }
-    int GetNewFFRewSkip(void) { return new_ffrew_skip; }
+    bool AtNormalSpeed(void) { return normal_speed; }
 
     bool FastForward(float seconds);
     bool Rewind(float seconds);
@@ -319,7 +319,7 @@ class NuppelVideoPlayer
 
     AudioOutput *audioOutput;
 
-    bool paused, previously_paused, pausevideo;
+    bool paused, pausevideo;
     bool actuallypaused, video_actually_paused;
     QWaitCondition decoderThreadPaused, videoThreadPaused;
 
@@ -420,11 +420,14 @@ class NuppelVideoPlayer
     int avsync_avg;
     int avsync_oldavg;
     int refreshrate;
+
+    QMutex decoder_lock;
     int frame_interval; // always adjusted for play_speed
     float play_speed;
+    bool speed_changed;
     bool normal_speed;
     int ffrew_skip;
-    int new_ffrew_skip;
+    bool skip_changed;
 
     float warpfactor;
     float warpfactor_avg;

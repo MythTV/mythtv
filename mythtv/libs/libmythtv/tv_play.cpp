@@ -1166,8 +1166,10 @@ void TV::RunTV(void)
             exitPlayer = false;
         }
 
-        if (doing_ff_rew && activenvp->GetNewFFRewSkip() == 1)
+        if ((doing_ff_rew || speed_index) && 
+            activenvp->AtNormalSpeed())
         {
+            speed_index = 0;
             doing_ff_rew = 0;
             ff_rew_index = SSPEED_NORMAL;
             UpdatePosOSD(0.0, tr("Play"));
