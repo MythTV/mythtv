@@ -804,7 +804,6 @@ PlaybackSettings::PlaybackSettings()
     general->setLabel("General playback");
     general->addChild(new Deinterlace());
     general->addChild(new ReduceJitter());
-    general->addChild(new AggressiveBuffer());
     general->addChild(new PlaybackExitPrompt());
     general->addChild(new EndOfRecordingExitPrompt());
     general->addChild(new FixedAspectRatio());
@@ -817,6 +816,7 @@ PlaybackSettings::PlaybackSettings()
     audio->addChild(new MixerDevice());
     audio->addChild(new MixerVolume());
     audio->addChild(new PCMVolume());
+    audio->addChild(new AggressiveBuffer());
     addChild(audio);
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
