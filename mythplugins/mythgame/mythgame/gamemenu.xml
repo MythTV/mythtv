@@ -3,6 +3,7 @@
   <button>
      <type>GAME</type>
      <text>Games</text>
+     <text lang="DK">Spil</text>
      <action>GAME_PLAY</action>
   </button>
 
