@@ -14,9 +14,6 @@ DEPENDPATH += ../libmyth ../libvbitext ../libavcodec
 QMAKE_CXXFLAGS_RELEASE += `freetype-config --cflags`
 QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 
-installfiles.path = $${PREFIX}/share/mythtv
-installfiles.files = FreeSans.ttf
-
 INSTALLS = installfiles
  
 # Input
