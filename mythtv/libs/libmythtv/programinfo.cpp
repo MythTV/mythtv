@@ -26,6 +26,11 @@ ProgramInfo::ProgramInfo(void)
     filesize = 0;
     hostname = "";
 
+    startts = QDateTime::currentDateTime();
+    endts = startts;
+    recstartts = startts;
+    recendts = startts;
+
     conflicting = false;
     recording = false;
     override = 0;
