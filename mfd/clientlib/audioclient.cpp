@@ -317,7 +317,49 @@ void AudioClient::executeCommand(QStringList new_command)
                  << "neither \"on\" nor \"off\"."
                  << endl;
         }
+    }
+    else if(new_command[0] == "seek")
+    {
+        //
+        //  Seek some number of seconds
+        //
+        
+        if(new_command.count() < 2)
+        {
+            cerr << "audioclient.o: seek is a useless command "
+                 << "without amount."
+                 << endl;
+            return;
+        }
+
+        bool ok = true;
+        int amount = new_command[1].toInt(&ok);
+        if(!ok)
+        {
+            cerr << "audioclient.o: could not parse seek amount"
+                 << endl;
+            return;
+        }
+
+        seekAudio(amount);
     }    
+    else if(new_command[0] == "next")
+    {
+        //
+        //  Next track
+        //
+        
+        nextAudio();
+    }    
+    else if(new_command[0] == "prev")
+    {
+        //
+        //  Next track
+        //
+        
+        prevAudio();
+    }    
+        
     else
     {
         cerr << "audioclient.o: I don't understand this "

@@ -163,7 +163,7 @@ void MfdInterface::seekAudio(int which_mfd, int how_much)
         if(an_mfd->getId() == which_mfd)
         {
             an_mfd->addPendingCommand(
-                                        QStringList::split(" ", QString("audio seek $1")
+                                        QStringList::split(" ", QString("audio seek %1")
                                                                         .arg(how_much))
                                      );
 
