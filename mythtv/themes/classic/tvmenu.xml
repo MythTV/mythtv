@@ -39,6 +39,7 @@
       <alttext lang="SV">Schemalägg</alttext>
       <alttext lang="JA">予約</alttext>
       <alttext lang="IT">Programmazione</alttext>
+      <alttext lang="DE">Planung</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -55,6 +56,7 @@
       <text lang="PT">Ver Gravações</text>
       <text lang="SV">Titta på inspelningar</text>
       <text lang="JA">録画再生</text>
+      <alttext lang="DE">Wiedergabe</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -71,6 +73,7 @@
       <text lang="PT">Apagar Gravações</text>
       <text lang="SV">Radera inspelningar</text>
       <text lang="JA">録画削除</text>
+      <alttext lang="DE">Löschen</alttext>
       <action>TV_DELETE</action>
    </button> 
 
@@ -91,6 +94,7 @@
    <button>
       <type>TV_PREVIOUS</type>
       <text>Previously Recorded</text>
+      <text lang="DE">Alte Aufnahmen</text>
       <action>TV_PREVIOUS</action>
    </button>
 

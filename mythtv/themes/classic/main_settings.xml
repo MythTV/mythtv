@@ -93,6 +93,7 @@
    <button>
       <type>SETTINGS_FM</type>
       <text>Radio Settings</text>
+      <text lang="DE">Radio Einstellungen</text>
       <action>CONFIGPLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -102,7 +103,7 @@
       <text>Images Settings</text>
       <text lang="ES">Configurar Fotos</text>
       <text lang="CA">Configurar Imatges</text>
-      <text lang="DE">Bilder Einstellungen</text>
+      <text lang="DE">Photos Einstellungen</text>
       <text lang="DK">Billed indstillinger</text>
       <text lang="NL">Beelden Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
@@ -168,6 +169,7 @@
    <button>
       <type>SETTINGS_RECIPE</type>
       <text>Recipe Settings</text>
+      <text lang="DE">Rezepte Einstellungen</text>
       <action>CONFIGPLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -175,6 +177,7 @@
    <button>
       <type>PHONE</type>
       <text>Phone Settings</text>
+      <text lang="DE">Telephon Einstellungen</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>

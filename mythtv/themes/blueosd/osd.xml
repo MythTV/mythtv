@@ -2,7 +2,7 @@
 
   <!-- if timeformat is set to 'FROMSETTINGS', it will use the time format
        specified in the general mythtv settings -->
-  <timeformat>h:mm ap</timeformat>
+  <timeformat>FROMSETTINGS</timeformat>
   <fadeaway>30</fadeaway>
 
   <font name="notifyfont">

@@ -23,11 +23,12 @@
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programma Gids</text>
       <text lang="FR">Grille horaire</text>
-      <text lang="DE">Programm- übersicht</text>
+      <text lang="DE">Programmübersicht</text>
       <text lang="DK">Program Guide</text>
       <text lang="PT">Configurações do Guia</text>
       <text lang="SV">Programguide</text>
       <text lang="JA">番組ガイド</text>
+      <alttext lang="DE">EPG</alttext>
       <action>SETTINGS EPG</action>
    </button>
 
@@ -55,21 +56,23 @@
       <text lang="CA">Gravació</text>
       <text lang="NL">Opnemen</text>
       <text lang="FR">Enregistrement</text>
-      <text lang="DE">Aufnahme- profile</text>
+      <text lang="DE">Aufnahmeprofile</text>
       <text lang="DK">Optagelse</text>
       <text lang="PT">Configurações de Gravação</text>
       <text lang="SV">Inspelningsprofiler</text>
       <text lang="JA">録画プロフィール</text>
       <alttext lang="SV">Inspelning</alttext>
+      <alttext lang="DE">Profile</alttext>
       <action>SETTINGS RECORDING</action>
    </button>
 
    <button>
       <type>TV_SETTINGS_RECPRIORITIES</type>
       <text>Recording Priorities</text>
-      <text lang="DE">Aufnahme- prioritäten</text>
+      <text lang="DE">Aufnahmeprioritäten</text>
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
+      <alttext lang="DE">Prioritäten</alttext>
       <action>MENU recpriorities_settings.xml</action>
    </button>
 

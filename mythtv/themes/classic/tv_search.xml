@@ -33,7 +33,7 @@
    <button>
       <type>TV_SEARCH_CATEGORIES</type>
       <text>Categories</text>
-      <text lang="DE">Kategorie</text>
+      <text lang="DE">Genres</text>
       <text lang="SV">Kategori</text>
       <text lang="NL">Catergorie</text>
       <text lang="JA">カテゴリー</text>
@@ -43,7 +43,7 @@
    <button>
       <type>TV_SEARCH_MOVIES</type>
       <text>Movies</text>
-      <text lang="DE">Spielfilme</text>
+      <text lang="DE">Filme</text>
       <text lang="SV">Filmer</text>
       <text lang="NL">Films</text>
       <text lang="JA">映画</text>

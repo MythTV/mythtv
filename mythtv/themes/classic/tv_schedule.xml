@@ -8,7 +8,7 @@
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programma Gids</text>
       <text lang="FR">Grille Horaire</text>
-      <text lang="DE">Programm- übersicht</text>
+      <text lang="DE">TV Programm</text>
       <text lang="DK">Program Guide</text>
       <text lang="PT">Guia de Programação</text>
       <text lang="SV">Programguide</text>
@@ -17,7 +17,7 @@
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Parilla</alttext>
       <alttext lang="CA">Guia</alttext>
-      <alttext lang="DE">Programm</alttext>
+      <alttext lang="DE">EPG</alttext>
       <alttext lang="DK">Guide</alttext>
       <alttext lang="NL">Gids</alttext>
       <alttext lang="NL">Guia</alttext>
@@ -118,13 +118,14 @@
    <button>
       <type>TV_RECPRIORITIES</type>
       <text>Recording Priorities</text>
-      <text lang="DE">Aufnahme- prioritäten</text>
+      <text lang="DE">Aufnahmeprioritäten</text>
       <text lang="NL">Opname Prioriteiten</text>      
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
       <alttext>Priorities</alttext>
       <alttext lang="SV">Prioriteter</alttext>
       <alttext lang="NL">Prioriteiten</alttext>
+      <alttext lang="DE">Prioritäten</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 

@@ -5,6 +5,7 @@
      <text>TV</text>
      <text lang="PT">Televisão</text>
      <text lang="SV">TV</text>
+     <text lang="DE">TV</text>
      <action>MENU tvmenu.xml</action>
    </button>
 
@@ -55,6 +56,7 @@
    <button>
       <type>FM</type>
       <text>Radio</text>
+      <text lang="DE">Radio</text>
       <action>PLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -136,6 +138,7 @@
    <button>
       <type>PHONE</type>
       <text>Phone</text>
+      <text lang="DE">Telephon</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -143,6 +146,7 @@
    <button>
       <type>RECIPE</type>
       <text>Recipes</text>
+      <text lang="DE">Rezepte</text>
       <action>PLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -167,6 +171,7 @@
      <type>SHUTDOWN</type>
      <text>Shutdown</text>
      <text lang="SV">Avstängning</text>
+     <text lang="DE">Beenden</text>
      <action>SHUTDOWN</action>
    </button> -->
 </mythmenu>
