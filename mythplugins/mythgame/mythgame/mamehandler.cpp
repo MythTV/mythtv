@@ -30,7 +30,12 @@ void MameHandler::processGames()
         FILE* xmame_info;
         FILE* xmame_vrfy;
         FILE* xmame_drv;
-        char line[500];
+        char line[20000];
+
+        char *keywords[10];
+        char *values[10];
+        int valuecount;
+
         QString infocmd;
         QString vrfycmd;
         QString drvcmd;
@@ -43,7 +48,11 @@ void MameHandler::processGames()
         QString romof;
         QString input;
         QString video;
-        QString chip[16];
+        QString players;
+        QString control;
+        QString buttons;
+        QString audio_chip[4];
+        QString cpu_chip[4];
         QString driver_status;
 
         QString driver = NULL;
@@ -76,18 +85,9 @@ void MameHandler::processGames()
         thequery = "DELETE FROM gamemetadata WHERE system = \"Mame\";";
         db->exec(thequery);
 
-        for (tmp_counter = 0; tmp_counter < 16; tmp_counter++) {
-                chip[tmp_counter] = "";
-        }
-
         VERBOSE(VB_ALL, "Checking xmame version");
         check_xmame_exe();
         if (!xmame_version_ok) {
-                tmp_counter = 0;
-                while ((chip[tmp_counter] != "")) {
-                        chip[tmp_counter] = "";
-                        tmp_counter++;
-                }
                 supported_games = 0;
                 VERBOSE(VB_GENERAL, "This version of xmame is not supported");
                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
@@ -170,7 +170,7 @@ void MameHandler::processGames()
                 /* Generate the list */
                 VERBOSE(VB_ALL, QString("This version of xmame supports %1 games... "
                                         "Getting the list.").arg(supported_games));
-                makecmd_line("-listinfo 2>/dev/null", &infocmd, romPath);
+                makecmd_line("-listxml 2>/dev/null", &infocmd, romPath);
                 xmame_info = popen(infocmd, "r");
 
                 VERBOSE(VB_ALL, "Verifying the installed games.");
@@ -199,69 +199,135 @@ void MameHandler::processGames()
                                            QString(fi->fileName().latin1()) + "..."), 
                                          supported_games);
 
-                while (fgets(line, 500, xmame_info)) {
-                        if (!strncmp(line, "game (", 6)) {
-                                romname = QObject::tr("Unknown");
-                                gamename = QObject::tr("Unknown");
-                                year = "-";
-                                manu = QObject::tr("Unknown");
-                                cloneof = "-";
-                                romof = "-";
-                                while (fgets(line, 500, xmame_info)) {
-                                        if (line[0] == ')')
-                                                break;
-                                        p = line + 1;
-                                        keyword = p;
-                                        i = 0;
+                while (fgets(line, 20000, xmame_info)) {
+                        valuecount=0;
+                        p = line;
+                        while (*p && ((*p == ' ') || (*p == '\t')) ) p++;
+                        if (*p != '<') continue;
+                        p++;                     // xml style <keyword>value</keyword>
+                        keyword = p;             // or        <keyword keyword[0]=value[0] >Value</keyword>
+                        value=NULL;              // or        <keyword keyword[0]=value[0] />
 
-                                        while (*p && (*p++ != ' '))
-                                                i++;
-                                        keyword[i] = 0;
+                        while (*p && (*p != ' ') && (*p != '\t') && (*p != '>')) p++;
+
+                        if (*p && (*p != '>')){
+                            *p='\0';
+                            p++;
+                            while (*p && ((*p == ' ') || (*p == '\t')) ) p++;
+                            while (*p && (*p != '/') && (*p != '>')){
+                                keywords[valuecount]=p;
+                                while (*p && (*p != ' ') && (*p != '\t') && (*p != '=')) p++;
+                                if (!*p) break;
+                                *p = '\0';
+                                do {p++;} while (*p && (*p != '\"'));
+                                if (!*p) break;
+                                *p = '\0';
+                                p++;
+                                values[valuecount]=p;
+                                while (*p && (*p != '\"')) p++;
+                                *p = '\0';
+                                do {p++;} while (*p && ((*p == ' ') || (*p == '\t')) );
+                                if (valuecount++ >= 10) break;
+                            }
+                        }
+
+                        if (*p == '>'){
+                            *p='\0';
+                            p++;
+                            value = p;
+                            while (*p && (*p != '<')) p++;
+                            *p='\0';
+                        }
+
+                        if (!strcmp(keyword, "game")) {
+                            romname = QObject::tr("Unknown");
+                            gamename = QObject::tr("Unknown");
+                            year = "-";
+                            manu = QObject::tr("Unknown");
+                            cloneof = "-";
+                            romof = "-";
+                            gamename = "";
+                            driver_status = "";
+                            players = "0";
+                            control = "-";
+                            buttons = "0";
+                            video = "-";
+
+                            for (tmp_counter = 0; tmp_counter < 4; tmp_counter++) {
+                                    audio_chip[tmp_counter] = "-";
+                                    cpu_chip[tmp_counter] = "-";
+                            }
+
+                            while (valuecount--){
+                                if (!strcmp(keywords[valuecount], "name"))
+                                    romname=values[valuecount];
+                                if (!strcmp(keywords[valuecount], "cloneof"))
+                                    cloneof=values[valuecount];
+                                if (!strcmp(keywords[valuecount], "romof"))
+                                    romof=values[valuecount];
+                            }
+                        }
+
+                        if (!strcmp(keyword, "description")) {
+                            if (value) gamename=value;
+                        }
+
+                        if (!strcmp(keyword, "year")) {
+                            if (value) year=value;
+                        }
 
 
-                                        if (p[0] == '\"')
-                                                *p++;
-                                        value = p;
+                        if (!strcmp(keyword, "manufacturer")) {
+                            if (value) manu=value;
+                        }
 
-                                        i = 0;
+                        if (!strcmp(keyword, "driver")) {
+                            while (valuecount--){
+                                if (!strcmp(keywords[valuecount], "status"))
+                                    driver_status=values[valuecount];
+                            }
+                        }
 
-                                        while (*p && (*p++ != '\n'))
-                                                i++;
+                        if (!strcmp(keyword, "video")) {
+                            while (valuecount--){
+                                if (!strcmp(keywords[valuecount], "screen"))
+                                    video=values[valuecount];
+                            }
+                        }
 
-                                        if (value[i - 1] == '\"')
-                                                i--;
-                                        value[i] = '\0';
+                        if (!strcmp(keyword, "chip")) {
+                            char* chip_type = NULL;
+                            char* chip_name = NULL;
+                            while (valuecount--){
+                                if (!strcmp(keywords[valuecount], "type"))
+                                    chip_type=values[valuecount];
+                                if (!strcmp(keywords[valuecount], "name"))
+                                    chip_name=values[valuecount];
+                            }
+                            if (chip_type && chip_name && !strcmp(chip_type, "cpu")){
+                                tmp_counter = 0;
+                                while ((tmp_counter < 4) && (cpu_chip[tmp_counter] != "-")) tmp_counter++;
+                                if (tmp_counter < 4) cpu_chip[tmp_counter]= chip_name;
+                            }
+                            if (chip_type && chip_name && !strcmp(chip_type, "audio")){
+                                tmp_counter = 0;
+                                while ((tmp_counter < 4) && (audio_chip[tmp_counter] != "-")) tmp_counter++;
+                                if (tmp_counter < 4) audio_chip[tmp_counter]= chip_name;
+                            }
+                        }
 
-                                        if (!strcmp(keyword, "name"))
-                                                romname = value;
-                                        if (!strcmp(keyword, "description"))
-                                                gamename = value;
-                                        if (!strcmp(keyword, "year"))
-                                                year = value;
-                                        if (!strcmp(keyword, "manufacturer"))
-                                                manu = value;
-                                        if (!strcmp(keyword, "cloneof"))
-                                                cloneof = value;
-                                        if (!strcmp(keyword, "romof"))
-                                                romof = value;
-                                        if (!strcmp(keyword, "chip")) {
-                                                tmp_counter = 0;
-                                                /* Put it in the next free chip[] slot */
-                                                while ((chip[tmp_counter] != "")
-                                                       && tmp_counter < 16)
-                                                        tmp_counter++;
-                                                if ((chip[tmp_counter] == ""))
-                                                        chip[tmp_counter] =
-                                                            strdup(value);
-                                        }
-                                        if (!strcmp(keyword, "video"))
-                                                video = value;
-                                        if (!strcmp(keyword, "input"))
-                                                input = value;
-                                        if (!strcmp(keyword, "driver"))
-                                                driver_status = value;
+                        if (!strcmp(keyword, "input")) {
+                            while (valuecount--){
+                                if (!strcmp(keywords[valuecount], "players"))
+                                    players=values[valuecount];
+                                if (!strcmp(keywords[valuecount], "control"))
+                                    control=values[valuecount];
+                                if (!strcmp(keywords[valuecount], "buttons"))
+                                    buttons=values[valuecount];
+                            }
+                        }
 
-                                }
+                        if (!strcmp(keyword, "/game")) {
                                 /* Get romstatus */
                                 while (TRUE) {
                                         if (!fgets(line, 500, xmame_vrfy))
@@ -333,18 +399,18 @@ void MameHandler::processGames()
                                                     "gamelist");
                                 }
 
-                                /* Setting som default values */
-                                rom->setCpu1("-");
-                                rom->setCpu2("-");
-                                rom->setCpu3("-");
-                                rom->setCpu4("-");
-                                rom->setSound1("-");
-                                rom->setSound2("-");
-                                rom->setSound3("-");
-                                rom->setSound4("-");
-                                rom->setControl("-");
-                                rom->setNum_buttons(0);
-                                rom->setNum_players(0);
+                                /* Setting some default values */
+                                rom->setCpu1(cpu_chip[0]);
+                                rom->setCpu2(cpu_chip[1]);
+                                rom->setCpu3(cpu_chip[2]);
+                                rom->setCpu4(cpu_chip[3]);
+                                rom->setSound1(audio_chip[0]);
+                                rom->setSound2(audio_chip[1]);
+                                rom->setSound3(audio_chip[2]);
+                                rom->setSound4(audio_chip[3]);
+                                rom->setControl(control);
+                                rom->setNum_buttons(buttons.toInt());
+                                rom->setNum_players(players.toInt());
                                 rom->setRomname(romname);
                                 rom->setGamename(gamename);
                                 rom->setYear(year.toInt());
@@ -354,75 +420,19 @@ void MameHandler::processGames()
                                 rom->setDriver(driver);
                                 rom->setRomPath(romPath);
 
-                                tmp_counter = 0;
-                                while ((chip[tmp_counter] != "")
-                                       && (tmp_counter < 16)) {
-                                        tmp_array =
-                                            QStringList::split(" ", chip[tmp_counter]);
-                                        if (tmp_array[3] && !strcmp(tmp_array[3], "name")) {
-                                                if (!strcmp(tmp_array[2], "cpu")) {
-                                                        if (!strcmp(rom->Cpu1(), "-"))
-                                                                rom->setCpu1(tmp_array[4]);
-                                                        else if (!strcmp(rom->Cpu2(), "-"))
-                                                                rom->setCpu2(tmp_array[4]);
-                                                        else if (!strcmp(rom->Cpu3(), "-"))
-                                                                rom->setCpu3(tmp_array[4]);
-                                                        else if (!strcmp(rom->Cpu4(), "-"))
-                                                                rom->setCpu4(tmp_array[4]);
-                                                }
-                                                if (!strcmp(tmp_array[2], "audio")) {
-                                                        if (!strcmp(rom->Sound1(), "-"))
-                                                                rom->setSound1(tmp_array[4]);
-                                                        else if (!strcmp(rom->Sound2(),"-"))
-                                                                rom->setSound2(tmp_array[4]);
-                                                        else if (!strcmp(rom->Sound3(),"-"))
-                                                                rom->setSound3(tmp_array[4]);
-                                                        else if (!strcmp(rom->Sound4(),"-"))
-                                                                rom->setSound4(tmp_array[4]);
-                                                }
-                                        }
-                                        tmp_array.clear();
-                                        tmp_counter++;
-                                }
-                                tmp_counter = 0;
-                                while ((chip[tmp_counter] != "")) {
-                                        chip[tmp_counter] = "";
-                                        tmp_counter++;
-                                }
-
-                                tmp_array = QStringList::split(" ", video);
-                                if (tmp_array[2] && !strcmp(tmp_array[2], "vector")) {
-                                        rom->setVector(TRUE);
+                                if (!strcmp(video, "vector")) {
+                                         rom->setVector(TRUE);
                                 } else {
-                                        rom->setVector(FALSE);
+                                         rom->setVector(FALSE);
                                 }
 
-                                tmp_array.clear();
-                                tmp_array = QStringList::split(" ", input);
-                                tmp_counter = 0;
-                                while ((tmp_array[tmp_counter + 1] != NULL)) {
-                                        if (!strcmp
-                                            (tmp_array[tmp_counter], "players"))
-                                                rom->setNum_players(atoi(tmp_array[tmp_counter + 1]));
-                                        if (!strcmp
-                                            (tmp_array[tmp_counter], "control"))
-                                                rom->setControl(tmp_array[tmp_counter + 1]);
-                                        if (!strcmp
-                                            (tmp_array[tmp_counter], "buttons"))
-                                                rom->setNum_buttons(atoi(tmp_array[tmp_counter + 1]));
-                                        tmp_counter++;
-                                }
-                                tmp_array.clear();
-
-                                tmp_array = QStringList::split(" ", driver_status);
-                                if ((tmp_array[2])
-                                    && !strcmp(tmp_array[2], "good")) {
+                                if (strcmp(driver_status, "good")) {
                                         rom->setWorking(TRUE);
                                 } else {
                                         rom->setWorking(FALSE);
                                 }
-                                tmp_array.clear();
-                                if (!strcmp(status, "correct\n"))
+
+                                if (!strcmp(status, "correct\n") || !strcmp(status, "best available\n"))
                                 {
                                     rom->setStatus(CORRECT);
 
@@ -461,11 +471,13 @@ void MameHandler::processGames()
                                                       rom->Num_players(), rom->Num_buttons(),
                                                       rom->RomPath().latin1());
                                     db->exec(thequery);
+
+                                    done_roms++;
                                 }
+                                if (!strcmp(status, "incorrect\n")) done_roms++;
 
                                 delete rom;
 
-                                done_roms++;
                                 done = (float) ((float) (done_roms) /
                                                  (float) (supported_games));
 
@@ -485,10 +497,6 @@ void MameHandler::processGames()
                 pclose(xmame_vrfy);
                 pclose(xmame_drv);
                 tmp_counter = 0;
-                while ((chip[tmp_counter] != "")) {
-                        chip[tmp_counter] = "";
-                        tmp_counter++;
-                }
                 ++it;
             }
         }
@@ -673,15 +681,8 @@ bool MameHandler::check_xmame_exe()
                                            minor);
                                 versionchk = atoi(versionchk_string);
                                 /*0.37 and up is ok */
-                                if (versionchk >= 37)
+                                if (versionchk >= 83)
                                         xmame_version_ok = TRUE;
-                                else {
-                                        /* The following four versions are ok */
-                                        if (!strcmp(minor, "36b16") ||
-                                            !strcmp(minor, "36rc1") ||
-                                            !strcmp(minor, "36"))
-                                                xmame_version_ok = TRUE;
-                                }
                                 free(versionchk_string);
 
                         }
@@ -735,8 +736,6 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
 
         GameSettings game_settings;
         SetGameSettings(game_settings, rominfo);
-
-        QString tmp;
 
         /* Need to do these ugly hacks to keep it from returning 0.0 as the scale value
            * or 0.000 for the beam value when no games are in the list (i.e
@@ -807,16 +806,7 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
                 /* Check for version. 0.37b4->uses -nocabview */
                 /* FIXME: This is a very ugly hack. It will be replaced by a
                  * more generic aproach shortly */
-                tmp = general_prefs.xmame_minor;
-
-                if (tmp == "37 BETA 4")
-                    fullscreen = " -nocabview";
-                else if (tmp == "37 BETA 5")
-                    fullscreen = " -fullview";
-                else if (tmp.toInt() >= 76)
-                    fullscreen = " -fullscreen";
-                else
-                    fullscreen = " -fullview";
+                fullscreen = " -fullscreen";
 
                 windowed = " -cabview";
                 winkeys = " -winkeys";
@@ -872,70 +862,38 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         }
 
 
-        /* define the integer version of xmame_minor so we only have to evaluate it once */
-        tmp = general_prefs.xmame_minor;
-        int xmame_minor = atoi(tmp);
-
         if (!general_prefs.cheat_file.isEmpty())
         {
-           /* The cheatfile argument name changed in 0.62 */
-           if (xmame_minor >= 62) 
-             *exec+= " -cheat_file ";
-           else
-             *exec+= " -cheatfile ";
+           *exec+= " -cheat_file ";
            *exec+= general_prefs.cheat_file;
         }
         if (!general_prefs.game_history_file.isEmpty())
         {
-           /* The historyfile argument name changed in 0.62 */
-           if (xmame_minor >= 62)
-             *exec+= " -history_file ";
-           else
-             *exec+= " -historyfile ";
+           *exec+= " -history_file ";
            *exec+= general_prefs.game_history_file;
         }
         if (!screenshotdir.isEmpty())
         {
-          /* The screenshot dir argument name changed in 0.62. */
-          if (xmame_minor >= 62) {
-            *exec+= " -snapshot_directory ";
-          } else {
-            *exec+= " -screenshotdir ";
-          }
+          *exec+= " -snapshot_directory ";
           *exec+= screenshotdir;
         }
         if (!general_prefs.highscore_dir.isEmpty())
         {
-          if (xmame_minor < 62) {
-            *exec+= " -spooldir ";
-         } else {
-            *exec+= " -hiscore_directory ";
-         }
-         *exec+= general_prefs.highscore_dir;
+          *exec+= " -hiscore_directory ";
+          *exec+= general_prefs.highscore_dir;
         }
         if (!general_prefs.highscore_file.isEmpty())
         {
-          if (xmame_minor < 62) {
-            *exec+= " -hiscorefile ";
-          } else {
-            *exec+= " -hiscore_file ";
-          }
+          *exec+= " -hiscore_file ";
           *exec+= general_prefs.highscore_file;
         }
 
-        // The .65 builds of mame finally allow you to turn off the disclaimer
-        //  and the game info screen.  See if the user wants them off
-        if (xmame_minor >= 65 ) {
-            *exec+= general_prefs.show_disclaimer ? " -noskip_disclaimer" : " -skip_disclaimer";
-            *exec+= general_prefs.show_gameinfo ?" -noskip_gameinfo" : " -skip_gameinfo";
-        }
+        *exec+= general_prefs.show_disclaimer ? " -noskip_disclaimer" : " -skip_disclaimer";
+        *exec+= general_prefs.show_gameinfo ?" -noskip_gameinfo" : " -skip_gameinfo";
+
         /* the nocursor option doesn't apply to SDL builds of xmame */
         if (strcmp(general_prefs.xmame_display_target, "SDL")) {
-            if (general_prefs.xmame_minor.toInt() >= 76)
-                *exec += game_settings.fullscreen ? (fullscreen) : windowed;
-            else
-                *exec+= game_settings.fullscreen ? 
-                                     (" -nocursor" + fullscreen) : windowed;
+            *exec += game_settings.fullscreen ? (fullscreen) : windowed;
         }
         else
           *exec+= game_settings.fullscreen ? fullscreen : windowed;
