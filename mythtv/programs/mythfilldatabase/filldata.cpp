@@ -22,6 +22,7 @@
 using namespace std;
 
 bool interactive = false;
+bool non_us_updating = false;
 MythContext *context;
 
 class ChanInfo
@@ -334,7 +335,15 @@ unsigned int promptForChannelUpdates(QValueList<ChanInfo>::iterator chaninfo,
 {
     if (chanid == 0)
     {
-        chanid=atoi(getResponse("Choose a channel ID (positive integer) ","1"));
+        // Default is 0 to allow rapid skipping of many channels,
+        // in some xmltv outputs there may be over 100 channel, but
+        // only 10 or so that are available in each area.
+        chanid = atoi(getResponse("Choose a channel ID (positive integer) ",
+                                  "0"));
+
+        // If we wish to skip this channel, use the default 0 and return.
+        if (chanid == 0)
+            return(0);
     }
 
     (*chaninfo).name = getResponse("Choose a channel name (any string, "
@@ -529,11 +538,19 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                         cout << "### " << endl;
                     }
                 }
+                else
+                {
+                    cout << "### " << endl;
+                    cout << "### Channel skipped" << endl;
+                    cout << "### " << endl;
+                }
             }
-            else
+            else if (!non_us_updating)
             {
                 // Make up a chanid if automatically adding one.
                 // Must be unique, nothing else matters, nobody else knows.
+                // We only do this if we are not asked to skip it with the
+                // --updating flag.
 
                 int chanid = id * 1000 + atoi((*i).chanstr.ascii());
 
@@ -770,6 +787,7 @@ int main(int argc, char *argv[])
 
     if (a.argc() > 1)
     {
+        // The manual and update flags should be mutually exclusive.
         if (!strcmp(a.argv()[1], "--manual"))
         {
             cout << "###\n";
@@ -777,6 +795,12 @@ int main(int argc, char *argv[])
             cout << "### This will ask you questions about every channel.\n";
             cout << "###\n";
             interactive = true;
+        }
+        else if (!strcmp(a.argv()[1], "--update"))
+        {
+            // For running non-destructive updates on the database for
+            // users in xmltv zones that do not provide channel data.
+            non_us_updating = true;
         }
     }
 
