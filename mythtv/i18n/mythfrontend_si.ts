@@ -225,6 +225,10 @@
         <source>The database error was</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>
@@ -250,10 +254,6 @@
     <message>
         <source>Record this program in this timeslot every day</source>
         <translation>Dnevno zajemanje v določenem času</translation>
-    </message>
-    <message>
-        <source>Record one showing of this program</source>
-        <translation type="obsolete">Zajem predvajanja</translation>
     </message>
     <message>
         <source>Record only this showing of the program</source>
@@ -346,6 +346,10 @@
         <source>Undefined</source>
         <translation>Nedefinirano</translation>
     </message>
+    <message>
+        <source>Cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -389,52 +393,16 @@
         <translation>Kanal:</translation>
     </message>
     <message>
-        <source>Date:</source>
-        <translation type="obsolete">Datum:</translation>
-    </message>
-    <message>
         <source>Time:</source>
         <translation>Čas:</translation>
-    </message>
-    <message>
-        <source>hr</source>
-        <translation type="obsolete">ura</translation>
-    </message>
-    <message>
-        <source>min</source>
-        <translation type="obsolete">min</translation>
     </message>
     <message>
         <source>Duration:</source>
         <translation>Čas trajanja:</translation>
     </message>
     <message>
-        <source>Title:</source>
-        <translation type="obsolete">Naslov:</translation>
-    </message>
-    <message>
-        <source>Subtitle:</source>
-        <translation type="obsolete">Podnapisi:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Opis:</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and exit</source>
-        <translation type="obsolete">Zapri in shrani poljubno nastavitev zajema</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and set another</source>
-        <translation type="obsolete">Shrani poljubno nastavitev zajema in dodaj nov zajem</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Prekliči</translation>
-    </message>
-    <message>
-        <source>Manual recording</source>
-        <translation type="obsolete">Ročna nastavitev zajema</translation>
     </message>
     <message>
         <source>Date or day of the week</source>
@@ -586,10 +554,6 @@
     <message>
         <source>Yes, stop recording it</source>
         <translation>Da, prenehaj s snemanjem</translation>
-    </message>
-    <message>
-        <source>No, I might want to watch it again.</source>
-        <translation>Ne, mogoče še bom kdaj gledal</translation>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
@@ -817,6 +781,18 @@
     </message>
     <message>
         <source>Begin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete it, but allow it to re-record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save it so I can watch it again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1068,32 +1044,12 @@
         <translation>Zajemi le to predvajanje</translation>
     </message>
     <message>
-        <source>Recording this showing with override options</source>
-        <translation type="obsolete">Zajemi predvajanje - v načinu prepiši</translation>
-    </message>
-    <message>
         <source>Recording every week</source>
         <translation>Tedenski zajem</translation>
     </message>
     <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Zajem v določenem času</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Zajem le na tem kanalu</translation>
-    </message>
-    <message>
         <source>Recording all showings</source>
         <translation>Zajem vseh predvajanj</translation>
-    </message>
-    <message>
-        <source>Recording one showing of this program</source>
-        <translation type="obsolete">Zajem samo enega predvajanja tega programa</translation>
-    </message>
-    <message>
-        <source>Manually not recording this showing</source>
-        <translation type="obsolete">Ročno blokiranje predvajanja</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
@@ -1283,36 +1239,12 @@
         <translation>Frekvenca</translation>
     </message>
     <message>
-        <source>[Common] Frequency (Option has no default)
-The frequency for this channel in hz.</source>
-        <translation type="obsolete">[Pogosta] Frekvenca (Ni privzete možnosti)
-Frekvenca kanala v hz.</translation>
-    </message>
-    <message>
         <source>Symbol Rate</source>
         <translation>Simbolno razmerje</translation>
     </message>
     <message>
-        <source>[DVB-S/C] Symbol Rate (Option has no default)
-???</source>
-        <translation type="obsolete">[DVB-S/C] Simbolno razmerje (Ni privzete možnosti)</translation>
-    </message>
-    <message>
-        <source>Satellite</source>
-        <translation type="obsolete">Satelitska</translation>
-    </message>
-    <message>
-        <source>[NONE CONFIGURED]</source>
-        <translation type="obsolete">[NI NASTAVLJENO]</translation>
-    </message>
-    <message>
         <source>Polarity</source>
         <translation>Polariteta</translation>
-    </message>
-    <message>
-        <source>[DVB-S] Polarity (Option has no default)
-???</source>
-        <translation type="obsolete">[DVB-S] Polariteta (Ni privzete možnosti)</translation>
     </message>
     <message>
         <source>Horizontal</source>
@@ -1335,12 +1267,6 @@ Frekvenca kanala v hz.</translation>
         <translation>Inverzija</translation>
     </message>
     <message>
-        <source>[Common] Inversion (Default: Auto):
-Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="obsolete">[Splošna] Inverzija (Privzeta: Avtomatska):
-Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela</translation>
-    </message>
-    <message>
         <source>Auto</source>
         <translation>Avtomatsko</translation>
     </message>
@@ -1357,39 +1283,12 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
         <translation>Pasovna širina</translation>
     </message>
     <message>
-        <source>[DVB-C/T] Bandwidth (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-C/T] Pasovna širina (Privzeto: Avtomatsko)</translation>
-    </message>
-    <message>
-        <source>6 Mhz</source>
-        <translation type="obsolete">6 Mhz</translation>
-    </message>
-    <message>
-        <source>7 Mhz</source>
-        <translation type="obsolete">7 Mhz</translation>
-    </message>
-    <message>
-        <source>8 Mhz</source>
-        <translation type="obsolete">8 Mhz</translation>
-    </message>
-    <message>
         <source>Modulation</source>
         <translation>Modulacija</translation>
     </message>
     <message>
-        <source>[DVB-C] Modulation (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-C] modulacija (Privzeto: Avtomatsko)</translation>
-    </message>
-    <message>
         <source>Constellation</source>
         <translation>Sestava</translation>
-    </message>
-    <message>
-        <source>[DVB-T] Constellation (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Sestava</translation>
     </message>
     <message>
         <source>None</source>
@@ -1400,94 +1299,32 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
         <translation>FEC</translation>
     </message>
     <message>
-        <source>[DVB-S/C] Forward Error Correction (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-S/C] Popravilo napak (Privzeto: Avtomatsko)</translation>
-    </message>
-    <message>
         <source>LP Coderate</source>
         <translation>LP kodeks</translation>
-    </message>
-    <message>
-        <source>[DVB-T] Low Priority Code Rate (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Kodno razmerje z nizko prioriteto (Privzeto: Avtomatsko)</translation>
     </message>
     <message>
         <source>HP Coderate</source>
         <translation>HP kodno razmerje</translation>
     </message>
     <message>
-        <source>[DVB-T] High Priority Code Rate (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Kodno razmerje z visoko prioriteto (Privzeto: Avtomatsko)</translation>
-    </message>
-    <message>
         <source>Guard Interval</source>
         <translation>Interval</translation>
-    </message>
-    <message>
-        <source>[DVB-T] Guard Interval (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Interval (Privzeto: Avtomatsko)</translation>
     </message>
     <message>
         <source>Trans. Mode</source>
         <translation>Način prenosa</translation>
     </message>
     <message>
-        <source>[DVB-T] Transmission Mode (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Način prenosa</translation>
-    </message>
-    <message>
         <source>Hierarchy</source>
         <translation>Hierarhija</translation>
-    </message>
-    <message>
-        <source>[DVB-T] Hierarchy (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Hierarhija</translation>
-    </message>
-    <message>
-        <source>Video</source>
-        <translation type="obsolete">Slika</translation>
     </message>
     <message>
         <source>Audio</source>
         <translation>Zvok</translation>
     </message>
     <message>
-        <source>Teletext</source>
-        <translation type="obsolete">Teletekst</translation>
-    </message>
-    <message>
-        <source>Subtitle</source>
-        <translation type="obsolete">Podnapisi</translation>
-    </message>
-    <message>
-        <source>Pcr</source>
-        <translation type="obsolete">Pcr</translation>
-    </message>
-    <message>
         <source>Other</source>
         <translation>Drugo</translation>
-    </message>
-    <message>
-        <source>Service ID</source>
-        <translation type="obsolete">ID Storitve</translation>
-    </message>
-    <message>
-        <source>Provider ID</source>
-        <translation type="obsolete">ID Ponudnika</translation>
-    </message>
-    <message>
-        <source>Transport ID</source>
-        <translation type="obsolete">ID Prenosa</translation>
-    </message>
-    <message>
-        <source>Network ID</source>
-        <translation type="obsolete">ID Omrežja</translation>
     </message>
     <message>
         <source>Channel Options - Common</source>
@@ -1496,18 +1333,6 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>Channel Options - Video 4 Linux</source>
         <translation>Kanalne nastavitve - V4L</translation>
-    </message>
-    <message>
-        <source>Channel Options - DVB</source>
-        <translation type="obsolete">Kanalne nastavitve - DVB</translation>
-    </message>
-    <message>
-        <source>Channel Options - DVB Pids &amp; IDs</source>
-        <translation type="obsolete">Kanalne nastavitve - DVB pid &amp; oznake</translation>
-    </message>
-    <message>
-        <source>A comma separated list of pids for each type. Note that currently MythTV only supports recording and not playback of multiple audio or video pids. It does not support showing teletext or subtitles either, but these do not crash the player as audio and video might.</source>
-        <translation type="obsolete">Z vejico ločene oznake pid-ov. MythTV trenutno podpira le zajem, ne pa tudi predvajanja večih glasbenih in slikovnih pid-ov. Prav tako pa ne podpira prikaz teleteksta in podnapisov, ampak ti ne zrušijo predvajalnika, kot ga lahko zvok in slika.</translation>
     </message>
     <message>
         <source>TXT off</source>
@@ -1715,136 +1540,12 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
         <translation>zvezde</translation>
     </message>
     <message>
-        <source>S</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">S</translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">T</translation>
-    </message>
-    <message>
-        <source>W</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">W</translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">C</translation>
-    </message>
-    <message>
-        <source>A</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">A</translation>
-    </message>
-    <message>
-        <source>F</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">F</translation>
-    </message>
-    <message>
-        <source>O</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">O</translation>
-    </message>
-    <message>
-        <source>Single Recording</source>
-        <translation type="obsolete">Posamezni zajem</translation>
-    </message>
-    <message>
-        <source>Daily Recording</source>
-        <translation type="obsolete">Dnevni zajem</translation>
-    </message>
-    <message>
-        <source>Weekly Recording</source>
-        <translation type="obsolete">Tedenski zajem</translation>
-    </message>
-    <message>
-        <source>Channel Recording</source>
-        <translation type="obsolete">Zajem kanala</translation>
-    </message>
-    <message>
-        <source>All Recording</source>
-        <translation type="obsolete">Vsi zajemi</translation>
-    </message>
-    <message>
-        <source>Find One Recording</source>
-        <translation type="obsolete">Najdi zajem</translation>
-    </message>
-    <message>
         <source>Override Recording</source>
         <translation>Prepiši zajem</translation>
     </message>
     <message>
         <source>Not Recording</source>
         <translation>Ne zajemam</translation>
-    </message>
-    <message>
-        <source>D</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">D</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">S</translation>
-    </message>
-    <message>
-        <source>R</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">R</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">X</translation>
-    </message>
-    <message>
-        <source>P</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">P</translation>
-    </message>
-    <message>
-        <source>r</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">r</translation>
-    </message>
-    <message>
-        <source>E</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">E</translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">T</translation>
-    </message>
-    <message>
-        <source>N</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">N</translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">C</translation>
-    </message>
-    <message>
-        <source>L</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">L</translation>
-    </message>
-    <message>
-        <source>K</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">K</translation>
-    </message>
-    <message>
-        <source>B</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">B</translation>
     </message>
     <message>
         <source>Deleted</source>
@@ -1869,14 +1570,6 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>Don&apos;t Record</source>
         <translation>Ne &apos; zajami</translation>
-    </message>
-    <message>
-        <source>Previous Recording</source>
-        <translation type="obsolete">Prejšnji zajem</translation>
-    </message>
-    <message>
-        <source>Current Recording</source>
-        <translation type="obsolete">Trenutni zajem</translation>
     </message>
     <message>
         <source>Earlier Showing</source>
@@ -2001,34 +1694,6 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>Description:</source>
         <translation>Opis:</translation>
-    </message>
-    <message>
-        <source>Category:  </source>
-        <translation type="obsolete">Categorija:  </translation>
-    </message>
-    <message>
-        <source>Type:  </source>
-        <translation type="obsolete">Tip:  </translation>
-    </message>
-    <message>
-        <source>Episode Number:  </source>
-        <translation type="obsolete">Številka oddaje:  </translation>
-    </message>
-    <message>
-        <source>Original Airdate:  </source>
-        <translation type="obsolete">Izvirni datum predvajanja:  </translation>
-    </message>
-    <message>
-        <source>Program ID:  </source>
-        <translation type="obsolete">ID programa:  </translation>
-    </message>
-    <message>
-        <source>Filesize:  </source>
-        <translation type="obsolete">Velikost datoteke:  </translation>
-    </message>
-    <message>
-        <source>Recording Group:  </source>
-        <translation type="obsolete">Snemalna skupina:  </translation>
     </message>
     <message>
         <source>OK</source>
@@ -2421,10 +2086,6 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
         <translation>Snemaj samo to oddajo</translation>
     </message>
     <message>
-        <source>Record one showing of this program</source>
-        <translation type="obsolete">Snemaj eno oddajo tega programa</translation>
-    </message>
-    <message>
         <source>Record in this timeslot every week</source>
         <translation>Snemaj v tem času vsak teden</translation>
     </message>
@@ -2539,10 +2200,6 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>Don&apos;t allow auto expire</source>
         <translation>Ne dovoli avtomatskega preteka</translation>
-    </message>
-    <message>
-        <source>Delete oldest if this would exceede the max episodes</source>
-        <translation type="obsolete">Izbriši najstarejšega, če je dosežena največje število epizod</translation>
     </message>
     <message>
         <source>Don&apos;t record if this would exceed the max episodes</source>
@@ -2718,14 +2375,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>(PREKINJENO) Ta možnost se uporablja za obhod filtriranja na nekaterih DVB karticah.</translation>
     </message>
     <message>
-        <source>Record the TS, not PS.</source>
-        <translation type="obsolete">Zajemi TS, ne PS.</translation>
-    </message>
-    <message>
-        <source>This will make the backend not perform Transport Stream to Program Stream conversion.</source>
-        <translation type="obsolete">Backend ne bo opravil pretvorbe prenosa pretoka v programski pretok.</translation>
-    </message>
-    <message>
         <source>Wait for SEQ start header.</source>
         <translation>Počakaj na začetek SEQ.</translation>
     </message>
@@ -2750,18 +2399,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Paketni predpomnilnik</translation>
     </message>
     <message>
-        <source>Select the type of satellite equipment you have. Selecting &apos;Finish&apos; on this screen will only save the type, and not the individual satellite, move down to the list to do this.</source>
-        <translation type="obsolete">Izberite tip satelitske opreme, ki jo uporabljate. Če izberete &apos;Konec&apos; bo shranjen samo tip in ne individualni satelit, za to premaknite se nižje na seznam.</translation>
-    </message>
-    <message>
-        <source>Satellites</source>
-        <translation type="obsolete">Sateliti</translation>
-    </message>
-    <message>
-        <source>Select the satellite you want to configure and press the &apos;menu&apos; key, and edit the satellite, when you are done configuring, press &apos;OK&apos; to leave this wizard.</source>
-        <translation type="obsolete">Izberite satelit za konfiguracijo in pritisnite gumb &apos;menu&apos; in uredite satelit. Ko ste končali z nastavitvami, pritisnite &apos;OK&apos; za zapustitev tega čarovnika.</translation>
-    </message>
-    <message>
         <source>Capture Card Setup</source>
         <translation>Nastavitve kartice za zajem</translation>
     </message>
@@ -2784,10 +2421,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>MPEG-2 Encoder card (PVR-250, PVR-350)</source>
         <translation>MPEG-2 kodirna kartica (PVR-250, PVR-350)</translation>
-    </message>
-    <message>
-        <source>pcHDTV ATSC capture card</source>
-        <translation type="obsolete">pcHDTV ATSC kartica za zajem</translation>
     </message>
     <message>
         <source>Digital Video Broadcast card (DVB)</source>
@@ -2858,46 +2491,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>NAPAKA, na tem OS podpora V4L ni na voljo</translation>
     </message>
     <message>
-        <source>[All VideoSources]</source>
-        <translation type="obsolete">[Vsi video viri]</translation>
-    </message>
-    <message>
-        <source>[No VideoSources Defined]</source>
-        <translation type="obsolete">[Ni definiranih vide virov]</translation>
-    </message>
-    <message>
-        <source>[No Channels Defined]</source>
-        <translation type="obsolete">[Ni definiranih kanalov]</translation>
-    </message>
-    <message>
-        <source>Load &amp; Tune</source>
-        <translation type="obsolete">Naloži &amp; uglaševanje</translation>
-    </message>
-    <message>
-        <source>Will load the selected channel above into the previous screen, and try to tune it. If it fails to tune the channel, press back and check the settings.</source>
-        <translation type="obsolete">Zgoraj izbrani kanal bo naložen v predhodnji zaslon, sledi poizkus uglaševanja le tega. Če po uglaševanje spodletelo, kliknite nazaj in preverite nastavitve.</translation>
-    </message>
-    <message>
-        <source>Tune Only</source>
-        <translation type="obsolete">Samo uglasi</translation>
-    </message>
-    <message>
-        <source>Will ONLY try to tune the previous screen, not alter it. If it fails to tune, press back and check the settings.</source>
-        <translation type="obsolete">Poizkus uglasitve predhodnega zaslona, ne pa njegova prikrojitev. Če po uglaševanje spodletelo, kliknite nazaj in preverite nastavitve. </translation>
-    </message>
-    <message>
-        <source>Card Verification Wizard (DVB#</source>
-        <translation type="obsolete">Čarovnik za verifikacijo kartice za zajem (DVB#</translation>
-    </message>
-    <message>
-        <source>Bit Error Rate</source>
-        <translation type="obsolete">Napaka bitnega razmerja</translation>
-    </message>
-    <message>
-        <source>Uncorrected Blocks</source>
-        <translation type="obsolete">Nepopravljeni bloki</translation>
-    </message>
-    <message>
         <source>Signal/Noise</source>
         <translation>Signal/Šum</translation>
     </message>
@@ -2906,68 +2499,24 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Moč signala</translation>
     </message>
     <message>
-        <source>FAILED TO OPEN CARD, CHECK CONSOLE!!</source>
-        <translation type="obsolete">NAPAKA PRI ZAGONU KARTICE ZA ZAJEM, PREVERI TERMINALSKO OKNO!!</translation>
-    </message>
-    <message>
         <source>Advanced Configuration</source>
         <translation>Napredne nastavitve</translation>
-    </message>
-    <message>
-        <source>Satellite Configuration</source>
-        <translation type="obsolete">Satelitske nastavitve</translation>
-    </message>
-    <message>
-        <source>Satellite Name</source>
-        <translation type="obsolete">Ime satelitske</translation>
-    </message>
-    <message>
-        <source>A textual representation of this satellite or cluster of satellites.</source>
-        <translation type="obsolete">Predstavitev satelita ali skupino satelitov.</translation>
-    </message>
-    <message>
-        <source>Satellite Position</source>
-        <translation type="obsolete">Položaj satelita</translation>
-    </message>
-    <message>
-        <source>A textual representation of which position the satellite is located at (&apos;1W&apos;)</source>
-        <translation type="obsolete">Predstavitev lokacije, na kateri je lociran satelit (&apos;1W&apos;)</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
         <translation>LNB LOF stikalo</translation>
     </message>
     <message>
-        <source>This defines at what frequency (in hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation type="obsolete">Definira na kateri frekvenci (v hz) bo LNB preklopil iz višjih na nižje nastavitve.</translation>
-    </message>
-    <message>
         <source>LNB LOF High</source>
         <translation>LNB LOF Višji</translation>
-    </message>
-    <message>
-        <source>This defines the offset (in hz) the frequency coming from the lnb will be in high setting.</source>
-        <translation type="obsolete">Definira zakasnitev (v hz), frekvenca ki prihaja iz LNB bo v višjih nastavitvah.</translation>
     </message>
     <message>
         <source>LNB LOF Low</source>
         <translation>LNB LOF Nižji</translation>
     </message>
     <message>
-        <source>This defines the offset (in hz) the frequency coming from the lnb will be in low setting.</source>
-        <translation type="obsolete">Definira zakasnitev (v hz), frekvenca ki prihaja iz LNB bo v nižjih nastavitvah.</translation>
-    </message>
-    <message>
         <source>Recorder Options</source>
         <translation>Snemalne možnosti</translation>
-    </message>
-    <message>
-        <source>Configuration Options</source>
-        <translation type="obsolete">Nastavitvene možnosti</translation>
-    </message>
-    <message>
-        <source>Card Verification Wizard</source>
-        <translation type="obsolete">Čarovnik za verifikacijo kartice za zajem</translation>
     </message>
     <message>
         <source>Region</source>
@@ -2992,14 +2541,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Default input</source>
         <translation>Privzeti vhod</translation>
-    </message>
-    <message>
-        <source>Channels</source>
-        <translation type="obsolete">Kanali</translation>
-    </message>
-    <message>
-        <source>This box contains all channels from the selected video source. Select a channel here and press the &apos;Load and Tune&apos; button to load the channel settings into the previous screen and try to tune it.</source>
-        <translation type="obsolete">Ta okvir vsebuje vse kanale izbranega video vira. Izberite kanal in kliknite &apos;Naloži in uglasi&apos; gumb, za naložitev nastavitev kanala v predhodnji zaslon in poizkus uglaševanja le tega.</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3092,10 +2633,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>One field</source>
         <translation>Eno polje</translation>
-    </message>
-    <message>
-        <source>Deinterlace algorithm.  &apos;Linear blend&apos; and &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="obsolete">Neprepleteni algoritem. &apos;Linearno prelivanje&apos; in &apos;Jedro&apos; potrebujeta SSE. &apos;Bob&apos; potebuje Xv ali XvMC video izhod.</translation>
     </message>
     <message>
         <source>Deinterlace settings</source>
@@ -3296,10 +2833,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Avtomatsko označi reklame</translation>
     </message>
     <message>
-        <source>Automatically flag commercials after a recording completes.</source>
-        <translation type="obsolete">Po končanem zajemanju avtomatsko označi reklame.</translation>
-    </message>
-    <message>
         <source>Strict Commercial Detection</source>
         <translation>Natančno iskanje reklam</translation>
     </message>
@@ -3386,10 +2919,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Time to record before start of show (in seconds)</source>
         <translation>Čas za zajem pred začetkom oddaje (v sekundah)</translation>
-    </message>
-    <message>
-        <source>This global setting is ignored in case of conflicts with other scheduled programs.</source>
-        <translation type="obsolete">Ta, globalna nastavitev bo spregledana v primeru konflikta z ostalimi ročno nastavljenimi programi.</translation>
     </message>
     <message>
         <source>Time to record past end of show (in seconds)</source>
@@ -3760,20 +3289,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Xinerama zaslon (združitev več zaslonov v enega</translation>
     </message>
     <message>
-        <source>If using Xinerama, run only on the specified screen.</source>
-        <translation>Če uporabljate Xinerama, uporabljajte samo na enenm zaslonu.</translation>
-    </message>
-    <message>
         <source>Aspect Override</source>
         <translation>Prednostni videz</translation>
-    </message>
-    <message>
-        <source>16/9 Anamorphic</source>
-        <translation type="obsolete">16/9 Anamorfičen</translation>
-    </message>
-    <message>
-        <source>4/3 Normal</source>
-        <translation type="obsolete">4/3 Normalni</translation>
     </message>
     <message>
         <source>16/9 Zoom</source>
@@ -3782,10 +3299,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>4/3 Zoom</source>
         <translation>4/3 Povečava</translation>
-    </message>
-    <message>
-        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
-        <translation type="obsolete">To bo spremenilo razmerje slike, isto kot pritisk tipke W med predvajanjem.</translation>
     </message>
     <message>
         <source>GUI width (px)</source>
@@ -3806,10 +3319,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>GUI X offset</source>
         <translation>GUI X zakasnitev</translation>
-    </message>
-    <message>
-        <source>The horizontal offset the GUI will be displayed at. May only work if run in a window.</source>
-        <translation type="obsolete">Horizontalna zakasnitev, pri kateri bo GUI prikazan. Deluje lahko samo, če teče, v oknu.</translation>
     </message>
     <message>
         <source>GUI Y offset</source>
@@ -4176,10 +3685,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Prioriteta najdi eno zajemov</translation>
     </message>
     <message>
-        <source>Find One Recording types will receive this additional recording priority value.</source>
-        <translation type="obsolete">Najdi eno tipi zajemov bodo sprejeli to dodatno prioritetno vrednost.</translation>
-    </message>
-    <message>
         <source>Override Recordings Priority</source>
         <translation>Prioriteta prepiši zajemov</translation>
     </message>
@@ -4314,10 +3819,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Use HW XVMC VLD Decoding (Via only)</source>
         <translation>Uporabi HW XVMC VLD odkodiranje (samo Via)</translation>
-    </message>
-    <message>
-        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichome Chipset</source>
-        <translation type="obsolete">Omogoči uporabo viaXvMC HW Mpeg odkodiranja za Via Unichome čipovje</translation>
     </message>
     <message>
         <source>Hardware Decoding Settings</source>
@@ -4798,10 +4299,6 @@ Myth se bo končal.</translation>
         <translation>Stanje DataDirect-a: </translation>
     </message>
     <message>
-        <source>Details of DVB error statistics for last 48 hours:</source>
-        <translation type="obsolete">Podrobna statistika o DVB napakah v zadnjih 48 urah:</translation>
-    </message>
-    <message>
         <source>Recording period from %1 to %2</source>
         <translation>Snemalna perioda od %1 do %2</translation>
     </message>
@@ -4920,10 +4417,6 @@ Myth se bo končal.</translation>
     <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
         <translation>Kadar je nastavljeno in je transkoder aktiven, bodo, po končanem transkodiranju, originalne nuv datoteke preimenovane v nuv.old.</translation>
-    </message>
-    <message>
-        <source>Follow Symlinks when deleting files</source>
-        <translation type="obsolete">Kadar brišeš datoteke, sledi simbolični povezavi</translation>
     </message>
     <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
@@ -5132,10 +4625,6 @@ Myth se bo končal.</translation>
     <message>
         <source>User Job #4 Command</source>
         <translation>Ukaz porabniškega opravila #4</translation>
-    </message>
-    <message>
-        <source>Allow Transcoding jobs</source>
-        <translation type="obsolete">Dovoli transkodirana opravila</translation>
     </message>
     <message>
         <source>Allow jobs of this type to run on this backend.</source>
@@ -6167,6 +5656,42 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <source>Resize Video while transcoding</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Absolutely don&apos;t record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Connection Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Point to Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Air date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV audio through PVR-350 only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
@@ -6363,10 +5888,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Jump To</source>
         <translation>Skoči na</translation>
-    </message>
-    <message>
-        <source>Speed 5X</source>
-        <translation type="obsolete">5x hitrost</translation>
     </message>
     <message>
         <source>Speed 3X</source>
@@ -6780,36 +6301,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Končna prioriteta</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority</source>
-        <translation type="obsolete">(1) Uredi po naslovu    (2) Uredi po prioriteti</translation>
-    </message>
-    <message>
         <source>Record Type:</source>
         <translation>Način snemanja:</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation type="obsolete">[</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation type="obsolete">]</translation>
-    </message>
-    <message>
         <source>Channel:</source>
         <translation>Kanal:</translation>
-    </message>
-    <message>
-        <source>]  = </source>
-        <translation type="obsolete"> = </translation>
-    </message>
-    <message>
-        <source>Select a recording to permanently delete:</source>
-        <translation type="obsolete">Izberi snemanje za izbris:</translation>
-    </message>
-    <message>
-        <source>Select a recording to view:</source>
-        <translation type="obsolete">Izberi snemanje za gledanje:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -6828,16 +6325,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Izberite črko...</translation>
     </message>
     <message>
-        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation type="obsolete">Izberite črko s katero se začne snemanje, potem pritisnite ENTER ali desno smerno tipko</translation>
-    </message>
-    <message>
         <source>Select a program...</source>
         <translation>Izberite program...</translation>
-    </message>
-    <message>
-        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation type="obsolete">Izberite naslov programa, ki ga iščete. Ko končate, se vrnete z levo smerno tipko. Z pritiskom na &apos;info&apos; boste lahko nastavili snemalne nastavitve.</translation>
     </message>
     <message>
         <source>No Programs</source>

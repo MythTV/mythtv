@@ -225,6 +225,10 @@
         <source>The database error was</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>
@@ -340,6 +344,10 @@
     </message>
     <message>
         <source>Undefined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -545,10 +553,6 @@
     </message>
     <message>
         <source>Yes, stop recording it</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No, I might want to watch it again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -777,6 +781,18 @@
     </message>
     <message>
         <source>Begin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete it, but allow it to re-record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save it so I can watch it again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3299,10 +3315,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If using Xinerama, run only on the specified screen.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Aspect Override</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5637,6 +5649,42 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Resize Video while transcoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Absolutely don&apos;t record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Connection Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Point to Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Air date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV audio through PVR-350 only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

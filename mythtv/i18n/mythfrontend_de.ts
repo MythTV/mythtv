@@ -225,6 +225,10 @@
         <source>The database error was</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>
@@ -342,6 +346,10 @@
         <source>Undefined</source>
         <translation>Nicht definiert</translation>
     </message>
+    <message>
+        <source>Cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -385,52 +393,16 @@
         <translation>Sender:</translation>
     </message>
     <message>
-        <source>Date:</source>
-        <translation type="obsolete">Datum:</translation>
-    </message>
-    <message>
         <source>Time:</source>
         <translation>Zeit:</translation>
-    </message>
-    <message>
-        <source>hr</source>
-        <translation type="obsolete">Uhr</translation>
-    </message>
-    <message>
-        <source>min</source>
-        <translation type="obsolete">min</translation>
     </message>
     <message>
         <source>Duration:</source>
         <translation>Dauer:</translation>
     </message>
     <message>
-        <source>Title:</source>
-        <translation type="obsolete">Titel:</translation>
-    </message>
-    <message>
-        <source>Subtitle:</source>
-        <translation type="obsolete">Untertitel:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Inhalt:</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and exit</source>
-        <translation type="obsolete">Speichern und zurück ins Menü</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and set another</source>
-        <translation type="obsolete">Speichern und eine weitere Aufnahme eingeben</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
-    </message>
-    <message>
-        <source>Manual recording</source>
-        <translation type="obsolete">Manuelle Aufnahme</translation>
     </message>
     <message>
         <source>Date or day of the week</source>
@@ -526,10 +498,6 @@
     <message>
         <source>Are you sure you want to delete:</source>
         <translation>Aufnahme löschen:</translation>
-    </message>
-    <message>
-        <source>No, I might want to watch it again.</source>
-        <translation>Nein, Ich will es vielleicht noch einmal sehen.</translation>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
@@ -813,6 +781,18 @@
     </message>
     <message>
         <source>Begin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete it, but allow it to re-record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save it so I can watch it again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1603,10 +1583,6 @@
         <translation>Xinerama Bildschirm</translation>
     </message>
     <message>
-        <source>If using Xinerama, run only on the specified screen.</source>
-        <translation>Geben Sie hier den gewünschten Bildschirm an, falls Sie Xinerama nutzen.</translation>
-    </message>
-    <message>
         <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
         <translation>Die Breite des MythTV Fensters. Stellen Sie die Breite nicht größer als die wirkliche Auflösung ein. Bei &apos;0&apos; wird automatisch auf Vollbild skaliert.</translation>
     </message>
@@ -2372,10 +2348,6 @@
         <translation>Versucht Werbepausen zu überspringen, auch wenn sie nicht markiert sind. Dies funktioniert nicht immer zuverlässig und kann die Wiedergabe stören.</translation>
     </message>
     <message>
-        <source>This global setting is ignored in case of conflicts with other scheduled programs.</source>
-        <translation type="obsolete">Diese globale Einstellung wird bei Konflikten mit anderen geplanten Aufnahmen ignoriert.</translation>
-    </message>
-    <message>
         <source>Program Guide Alpha</source>
         <translation>EPG alpha</translation>
     </message>
@@ -2476,12 +2448,6 @@
         <translation>Symbolrate</translation>
     </message>
     <message>
-        <source>[DVB-S/C] Symbol Rate (Option has no default)
-???</source>
-        <translation type="obsolete">[DVB-S/C] Symbolrate (Option hat keine Voreinstellung)
-???</translation>
-    </message>
-    <message>
         <source>Polarity</source>
         <translation>Polarität</translation>
     </message>
@@ -2518,20 +2484,8 @@
         <translation>Bandbreite</translation>
     </message>
     <message>
-        <source>[DVB-C/T] Bandwidth (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-C/T] Bandbreite (Standard: Auto)
-???</translation>
-    </message>
-    <message>
         <source>Modulation</source>
         <translation>Modulation</translation>
-    </message>
-    <message>
-        <source>[DVB-C] Modulation (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-C] Modulation (Standard: Auto)
-???</translation>
     </message>
     <message>
         <source>Constellation</source>
@@ -5363,10 +5317,6 @@ Myth wird nun beendet.</translation>
         <translation>Bestimmt, wie die einzelnen Folgen einer Serie sortiert werden.</translation>
     </message>
     <message>
-        <source>Sort shows</source>
-        <translation type="obsolete">Sendungen sortieren</translation>
-    </message>
-    <message>
         <source>S</source>
         <comment>RecTypeChar kSingleRecord</comment>
         <translation type="unfinished"></translation>
@@ -5715,6 +5665,42 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Resize Video while transcoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Absolutely don&apos;t record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Connection Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Point to Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Air date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV audio through PVR-350 only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6245,10 +6231,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>1.5X</source>
         <translation>1,5x</translation>
-    </message>
-    <message>
-        <source>2.0X</source>
-        <translation type="obsolete">2,0x</translation>
     </message>
     <message>
         <source>Sleep</source>

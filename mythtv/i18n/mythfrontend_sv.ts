@@ -225,6 +225,10 @@
         <source>The database error was</source>
         <translation>Databasfelet var</translation>
     </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation>Endast visningar markerade som HDTV</translation>
+    </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>
@@ -342,6 +346,10 @@
         <source>Undefined</source>
         <translation>Odefinierad</translation>
     </message>
+    <message>
+        <source>Cancelled</source>
+        <translation>Avbruten</translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -385,44 +393,12 @@
         <translation>Kanal:</translation>
     </message>
     <message>
-        <source>Date:</source>
-        <translation type="obsolete">Datum:</translation>
-    </message>
-    <message>
-        <source>hr</source>
-        <translation type="obsolete">tim</translation>
-    </message>
-    <message>
-        <source>min</source>
-        <translation type="obsolete">min</translation>
-    </message>
-    <message>
         <source>Duration:</source>
         <translation>Längd:</translation>
     </message>
     <message>
-        <source>Title:</source>
-        <translation type="obsolete">Titel:</translation>
-    </message>
-    <message>
-        <source>Subtitle:</source>
-        <translation type="obsolete">Undertitel:</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
-    </message>
-    <message>
-        <source>Manual recording</source>
-        <translation type="obsolete">Manuell inspelning</translation>
-    </message>
-    <message>
-        <source>Save and exit</source>
-        <translation type="obsolete">Spara och stäng</translation>
-    </message>
-    <message>
-        <source>Save and set another</source>
-        <translation type="obsolete">Spara och fortsätt</translation>
     </message>
     <message>
         <source>Date or day of the week</source>
@@ -530,10 +506,6 @@
     <message>
         <source>Yes, AutoExpire</source>
         <translation>Ja, autoradera</translation>
-    </message>
-    <message>
-        <source>No, I might want to watch it again.</source>
-        <translation>Nej, jag kanske vill se den igen.</translation>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
@@ -810,6 +782,18 @@
     <message>
         <source>Begin</source>
         <translation>Börja</translation>
+    </message>
+    <message>
+        <source>Delete it, but allow it to re-record</source>
+        <translation>Radera, men tillåt återinspelning</translation>
+    </message>
+    <message>
+        <source>Delete it</source>
+        <translation>Radera</translation>
+    </message>
+    <message>
+        <source>Save it so I can watch it again</source>
+        <translation>Spara så att jag kan se den igen</translation>
     </message>
 </context>
 <context>
@@ -1597,10 +1581,6 @@
     <message>
         <source>Xinerama screen</source>
         <translation>Xinerama-skärm</translation>
-    </message>
-    <message>
-        <source>If using Xinerama, run only on the specified screen.</source>
-        <translation>Om Xinerama används, kör endast på den specificerade skärmen.</translation>
     </message>
     <message>
         <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
@@ -5693,6 +5673,42 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>Resize Video while transcoding</source>
         <translation>Ändra storlek på video under omkodning</translation>
+    </message>
+    <message>
+        <source>Absolutely don&apos;t record</source>
+        <translation>Spela absolut inte in</translation>
+    </message>
+    <message>
+        <source>Firewire Connection Type</source>
+        <translation>Firewire-anslutningstyp</translation>
+    </message>
+    <message>
+        <source>Point to Point</source>
+        <translation>Point to Point</translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
+        <translation>Broadcast</translation>
+    </message>
+    <message>
+        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
+        <translation>USB MPEG4-kodare (Plextor ConvertX, etc)</translation>
+    </message>
+    <message>
+        <source>Original Air date</source>
+        <translation>Ursprungligt visningsdatum</translation>
+    </message>
+    <message>
+        <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
+        <translation>Om Xinerama används, använd endast specifierad skärm. Värdet -1 betyder använd alla skärmar.</translation>
+    </message>
+    <message>
+        <source>TV audio through PVR-350 only</source>
+        <translation>TV-ljud endast genom PVR-350</translation>
+    </message>
+    <message>
+        <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
+        <translation>Normalt loopas ljudet från PVR-350 genom ljudkortet, ändra här om så inte är fallet. MythTV kan inte kontrollera TV-volymen med detta alternativ aktiverat.</translation>
     </message>
 </context>
 <context>

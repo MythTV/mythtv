@@ -225,6 +225,10 @@
         <source>The database error was</source>
         <translation>Tietokannassa tapahtunut virhe</translation>
     </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>
@@ -266,10 +270,6 @@
     <message>
         <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
         <translation>Paina &apos;5&apos; nähdäksesi jokaisen tulevan jakson kyseisestä ohjelmasta</translation>
-    </message>
-    <message>
-        <source>Record one showing of this program</source>
-        <translation type="obsolete">Nauhoita vain yksi jakso kyseisestä ohjelmasta</translation>
     </message>
     <message>
         <source>Don&apos;t record this showing</source>
@@ -346,6 +346,10 @@
         <source>Undefined</source>
         <translation>Tuntematon</translation>
     </message>
+    <message>
+        <source>Cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -389,52 +393,16 @@
         <translation>Kanava: </translation>
     </message>
     <message>
-        <source>Date:</source>
-        <translation>Päivämäärä: </translation>
-    </message>
-    <message>
         <source>Time:</source>
         <translation>Aika: </translation>
-    </message>
-    <message>
-        <source>hr</source>
-        <translation> tuntia</translation>
-    </message>
-    <message>
-        <source>min</source>
-        <translation> min</translation>
     </message>
     <message>
         <source>Duration:</source>
         <translation>Kesto:</translation>
     </message>
     <message>
-        <source>Title:</source>
-        <translation>Ohjelman nimi:</translation>
-    </message>
-    <message>
-        <source>Subtitle:</source>
-        <translation>Lisätietoja:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>Tiivistelmä:</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and exit</source>
-        <translation>Tallenna kyseinen ohjelmoitu nauhoitus ja lopeta</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and set another</source>
-        <translation>Tallenna kyseinen ohjelmoitu nauhoitus ja määritä toinen</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Peruuta</translation>
-    </message>
-    <message>
-        <source>Manual recording</source>
-        <translation type="obsolete">Manuaalinen nauhoitus</translation>
     </message>
     <message>
         <source>Date or day of the week</source>
@@ -526,10 +494,6 @@
     <message>
         <source>Are you sure you want to delete:</source>
         <translation>Poistetaanko:</translation>
-    </message>
-    <message>
-        <source>No, I might want to watch it again.</source>
-        <translation>Ei . Säilytetään tulevaa katselukertaa varten.</translation>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
@@ -666,10 +630,6 @@
     <message>
         <source>, %1 GB free</source>
         <translation>, %1 GB vapaana</translation>
-    </message>
-    <message>
-        <source>Yes, but allow future recordings of this episode</source>
-        <translation type="obsolete">Kyllä, mutta salli tulevat nauhoitukset tälle jaksolle</translation>
     </message>
     <message>
         <source>There are %1 recordings in this display group</source>
@@ -822,6 +782,18 @@
     <message>
         <source>Begin</source>
         <translation>Aloita</translation>
+    </message>
+    <message>
+        <source>Delete it, but allow it to re-record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save it so I can watch it again</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1068,14 +1040,6 @@
         <translation>Nauhoitus joka viikko</translation>
     </message>
     <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Nauhoitus esityksille jotka asettuvat tälle ajankohdalle</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Nauhoitus tämän kanavan esityksille</translation>
-    </message>
-    <message>
         <source>Recording all showings</source>
         <translation>Nauhoitus kaikille esityksille</translation>
     </message>
@@ -1096,20 +1060,8 @@
         <translation>OK</translation>
     </message>
     <message>
-        <source>Recording one showing of this program</source>
-        <translation type="obsolete">Nauhoitus yhdelle tämän ohjelman esityskerralle</translation>
-    </message>
-    <message>
         <source>Any</source>
         <translation>Mikä vain</translation>
-    </message>
-    <message>
-        <source>Recording this showing with override options</source>
-        <translation type="obsolete">Nauhoitus tälle esitykselle, syrjäytys-valinnoin</translation>
-    </message>
-    <message>
-        <source>Manually not recording this showing</source>
-        <translation type="obsolete">Jätä tämä ohjelma manuaalisesti nauhoittamatta</translation>
     </message>
     <message>
         <source>Recording with override options</source>
@@ -1275,14 +1227,6 @@
         <translation>Ei Nauhoitusta</translation>
     </message>
     <message>
-        <source>Channel Recording</source>
-        <translation type="obsolete">Nauhoitus Kanavalla</translation>
-    </message>
-    <message>
-        <source>All Recording</source>
-        <translation type="obsolete">Kaikki Nauhoitukset</translation>
-    </message>
-    <message>
         <source>Air Date:</source>
         <translation>Lähetysaika:</translation>
     </message>
@@ -1389,10 +1333,6 @@
     <message>
         <source>Automatically Flag Commercials</source>
         <translation>Merkkaa Mainokset Automaattisesti</translation>
-    </message>
-    <message>
-        <source>Automatically flag commercials after a recording completes.</source>
-        <translation type="obsolete">Merkkaa mainokset automaattisesti nauhoituksen jälkeen.</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -1643,10 +1583,6 @@
         <translation>Xinerama ikkuna</translation>
     </message>
     <message>
-        <source>If using Xinerama, run only on the specified screen.</source>
-        <translation>Jos Xinerama on käytössä, aja ainoastaan määritellyssä näytössä.</translation>
-    </message>
-    <message>
         <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
         <translation>Graafisen näytön leveys. Älä määritä leveämmäksi kuin näytön resoluutio. 0 skaalaa automaattisesti koko näytön leveydeksi.</translation>
     </message>
@@ -1657,10 +1593,6 @@
     <message>
         <source>GUI X offset</source>
         <translation>Graafiikan X- siirto</translation>
-    </message>
-    <message>
-        <source>The horizontal offset the GUI will be displayed at.</source>
-        <translation type="obsolete">Horisontaalinen siirtymä.</translation>
     </message>
     <message>
         <source>GUI Y offset</source>
@@ -1813,10 +1745,6 @@
     <message>
         <source>Seeking</source>
         <translation>Haku</translation>
-    </message>
-    <message>
-        <source>Commercial Detection</source>
-        <translation type="obsolete">Mainosten Tunnistaminen</translation>
     </message>
     <message>
         <source>Overscan</source>
@@ -2148,18 +2076,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Single Recording</source>
-        <translation type="obsolete">Yksi Nauhoitus</translation>
-    </message>
-    <message>
-        <source>Daily Recording</source>
-        <translation type="obsolete">Päivittäinen Nauhoitus</translation>
-    </message>
-    <message>
-        <source>Weekly Recording</source>
-        <translation type="obsolete">Viikkoinen Nauhoitus</translation>
-    </message>
-    <message>
         <source>Conflicting</source>
         <translation>Ristiriitainen</translation>
     </message>
@@ -2320,14 +2236,6 @@
         <translation>Nauhoitetaan</translation>
     </message>
     <message>
-        <source>Previous Recording</source>
-        <translation type="obsolete">Edellinen Nauhoitus</translation>
-    </message>
-    <message>
-        <source>Current Recording</source>
-        <translation type="obsolete">Nykyinen Nauhoitus</translation>
-    </message>
-    <message>
         <source>Max Recordings</source>
         <translation>Max Nauhoitukset</translation>
     </message>
@@ -2440,10 +2348,6 @@
         <translation>Yrittää ohittaa mainoskatkot, vaikka niitä ei ole merkitty. Ei aina toimi ja saattaa aiheuttaa katkoksia toistoon.</translation>
     </message>
     <message>
-        <source>This global setting is ignored in case of conflicts with other scheduled programs.</source>
-        <translation type="obsolete">Tämä yleinen asetus ohitetaan, jos löytyy ristiriitoja toisten ajastettujen nauhoitusten kanssa.</translation>
-    </message>
-    <message>
         <source>Program Guide Alpha</source>
         <translation>Ohjelmaoppaan Alpha</translation>
     </message>
@@ -2540,35 +2444,12 @@
         <translation>Taajuus</translation>
     </message>
     <message>
-        <source>[Common] Frequency (Option has no default)
-The frequency for this channel in hz.</source>
-        <translation type="obsolete">[Yleinen] Taajuus (Asetukselle ei oletusta).</translation>
-    </message>
-    <message>
         <source>Symbol Rate</source>
         <translation>Symboolin Rate</translation>
     </message>
     <message>
-        <source>[DVB-S/C] Symbol Rate (Option has no default)
-???</source>
-        <translation type="obsolete">[DVB-S/C] Symboolin Rate (Asetukselle ei oletusta)?</translation>
-    </message>
-    <message>
-        <source>Satellite</source>
-        <translation type="obsolete">Satelliitti</translation>
-    </message>
-    <message>
-        <source>[NONE CONFIGURED]</source>
-        <translation type="obsolete">[EI MÄÄRITETTY]</translation>
-    </message>
-    <message>
         <source>Polarity</source>
         <translation>Polariteetti</translation>
-    </message>
-    <message>
-        <source>[DVB-S] Polarity (Option has no default)
-???</source>
-        <translation type="obsolete">[DVB-S] Polariteetti (Asetukselle ei oletusta)?</translation>
     </message>
     <message>
         <source>Horizontal</source>
@@ -2591,11 +2472,6 @@ The frequency for this channel in hz.</source>
         <translation>Inversio</translation>
     </message>
     <message>
-        <source>[Common] Inversion (Default: Auto):
-Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="obsolete">[Yleinen] Inversio (Oletus: automaattinen).</translation>
-    </message>
-    <message>
         <source>Auto</source>
         <translation>Automaattinen</translation>
     </message>
@@ -2608,121 +2484,36 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Kaistaleveys</translation>
     </message>
     <message>
-        <source>[DVB-C/T] Bandwidth (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-C/T] Kaistaleveys (Oletus: automaattinen)?</translation>
-    </message>
-    <message>
-        <source>6 Mhz</source>
-        <translation type="obsolete">6 Mhz</translation>
-    </message>
-    <message>
-        <source>7 Mhz</source>
-        <translation type="obsolete">7 Mhz</translation>
-    </message>
-    <message>
-        <source>8 Mhz</source>
-        <translation type="obsolete">8 Mhz</translation>
-    </message>
-    <message>
         <source>Modulation</source>
         <translation>Modulaatio</translation>
-    </message>
-    <message>
-        <source>[DVB-C] Modulation (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-C] Modulaatio (Oletus: automaattinen)?</translation>
     </message>
     <message>
         <source>Constellation</source>
         <translation>Constellation</translation>
     </message>
     <message>
-        <source>[DVB-T] Constellation (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Constellation (Oletus: automaattinen)?</translation>
-    </message>
-    <message>
         <source>FEC</source>
         <translation>FEC</translation>
-    </message>
-    <message>
-        <source>[DVB-S/C] Forward Error Correction (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-S/C] Forward Virheenkorjaus (Oletus: automaattinen)?</translation>
     </message>
     <message>
         <source>LP Coderate</source>
         <translation>LP Koodinopeus</translation>
     </message>
     <message>
-        <source>[DVB-T] Low Priority Code Rate (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Alhainen Prioriteetti Koodinopeus (Oletus: automaattinen)?</translation>
-    </message>
-    <message>
         <source>HP Coderate</source>
         <translation>HP Koodinopeus</translation>
-    </message>
-    <message>
-        <source>[DVB-T] High Priority Code Rate (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Korkea Prioriteetti Koodinopeus (Oletus: automaattinen)?</translation>
     </message>
     <message>
         <source>Guard Interval</source>
         <translation>Guard Interval</translation>
     </message>
     <message>
-        <source>[DVB-T] Guard Interval (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Guard Interval (Oletus: automaattinen)?</translation>
-    </message>
-    <message>
         <source>Trans. Mode</source>
         <translation>Lähetys Moodi</translation>
     </message>
     <message>
-        <source>[DVB-T] Transmission Mode (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Lähetys Moodi (Oletus: automaattinen)?</translation>
-    </message>
-    <message>
         <source>Hierarchy</source>
         <translation>Hierarkia</translation>
-    </message>
-    <message>
-        <source>[DVB-T] Hierarchy (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Hierarkia (Oletus: automaattinen)?</translation>
-    </message>
-    <message>
-        <source>Video</source>
-        <translation type="obsolete">Video</translation>
-    </message>
-    <message>
-        <source>Teletext</source>
-        <translation type="obsolete">Tekstitys</translation>
-    </message>
-    <message>
-        <source>Subtitle</source>
-        <translation type="obsolete">Tekstitys</translation>
-    </message>
-    <message>
-        <source>Service ID</source>
-        <translation type="obsolete">Service ID</translation>
-    </message>
-    <message>
-        <source>Provider ID</source>
-        <translation type="obsolete">Provider ID</translation>
-    </message>
-    <message>
-        <source>Transport ID</source>
-        <translation type="obsolete">Transport ID</translation>
-    </message>
-    <message>
-        <source>Network ID</source>
-        <translation type="obsolete">Network ID</translation>
     </message>
     <message>
         <source>Channel Options - Common</source>
@@ -2731,18 +2522,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Channel Options - Video 4 Linux</source>
         <translation>Kanava-asetukset - Video 4 Linux</translation>
-    </message>
-    <message>
-        <source>Channel Options - DVB</source>
-        <translation type="obsolete">Kanava-asetukset - DVB</translation>
-    </message>
-    <message>
-        <source>Channel Options - DVB Pids &amp; IDs</source>
-        <translation type="obsolete">Kanava-asetukset - DVB Pids &amp; IDs</translation>
-    </message>
-    <message>
-        <source>A comma separated list of pids for each type. Note that currently MythTV only supports recording and not playback of multiple audio or video pids. It does not support showing teletext or subtitles either, but these do not crash the player as audio and video might.</source>
-        <translation type="obsolete">Pilkulla erotettu listaus pid:eistä jokaiselle tyypille. Tällä hetkellä MythTV tukee vain nauhoittamista usealla ääni- tai video pid:llä. Ei tukea teletekstin tai tekstityksen näytölle, mutta näiden määritys ei kaada ohjelmaa.</translation>
     </message>
     <message>
         <source>Profile Group Name</source>
@@ -2822,10 +2601,6 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
         <translation>MPEG-2 purkukortti (PVR-250, PVR-350)</translation>
     </message>
     <message>
-        <source>pcHDTV ATSC capture card</source>
-        <translation type="obsolete">pcHDTV ATSC tv-kortti</translation>
-    </message>
-    <message>
         <source>Digital Video Broadcast card (DVB)</source>
         <translation>Digitaalinen tv-kortti (DVB)</translation>
     </message>
@@ -2842,56 +2617,12 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
         <translation>VIRHE, Ei tuloja löydetty</translation>
     </message>
     <message>
-        <source>[All VideoSources]</source>
-        <translation type="obsolete">[Kaikki Videolähteet]</translation>
-    </message>
-    <message>
-        <source>[No VideoSources Defined]</source>
-        <translation type="obsolete">[Ei Videolähteitä Määritetty]</translation>
-    </message>
-    <message>
-        <source>[No Channels Defined]</source>
-        <translation type="obsolete">[Ei Kanavia Määritetty]</translation>
-    </message>
-    <message>
-        <source>Load &amp; Tune</source>
-        <translation type="obsolete">Lataa &amp; Viritä</translation>
-    </message>
-    <message>
-        <source>Will load the selected channel above into the previous screen, and try to tune it. If it fails to tune the channel, press back and check the settings.</source>
-        <translation type="obsolete">Lataa valitun kanavan edelliselle näytölle, ja yrittää virittää sen.</translation>
-    </message>
-    <message>
-        <source>Tune Only</source>
-        <translation type="obsolete">Ainoastaan Viritä</translation>
-    </message>
-    <message>
-        <source>Will ONLY try to tune the previous screen, not alter it. If it fails to tune, press back and check the settings.</source>
-        <translation type="obsolete">Ainoastaan virittää edellisen näytön, ei muuta sitä.</translation>
-    </message>
-    <message>
-        <source>Card Verification Wizard (DVB#</source>
-        <translation type="obsolete">DVB-Kortin varmennus-velho</translation>
-    </message>
-    <message>
-        <source>Bit Error Rate</source>
-        <translation type="obsolete">Bittien Virhetaajuus</translation>
-    </message>
-    <message>
-        <source>Uncorrected Blocks</source>
-        <translation type="obsolete">Korjaamattomat Lohkot</translation>
-    </message>
-    <message>
         <source>Signal/Noise</source>
         <translation>Signaali/Kohina</translation>
     </message>
     <message>
         <source>Signal Strength</source>
         <translation>Signaalin Voimakkuus</translation>
-    </message>
-    <message>
-        <source>FAILED TO OPEN CARD, CHECK CONSOLE!!</source>
-        <translation type="obsolete">KORTIN LUKU EPÄONNISTUI, KATSO TERMINAALI!!</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
@@ -2982,14 +2713,6 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
         <translation>(RIKKINÄINEN) Tämä asetus ohittaa joidenkin DVB-korttien suodatusongelmat.</translation>
     </message>
     <message>
-        <source>Record the TS, not PS.</source>
-        <translation type="obsolete">Nauhoita TS, ei PS.</translation>
-    </message>
-    <message>
-        <source>This will make the backend not perform Transport Stream to Program Stream conversion.</source>
-        <translation type="obsolete">Valinnalla backend ei suorita konversiota siirtovirrasta ohjelmavirraksi.</translation>
-    </message>
-    <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
         <translation>Tavallisesti dvb-nauhoitus pudottaa paketteja kunnes aloitussekvenssi huomataan. Valinta poistaa tämän asetuksen.</translation>
     </message>
@@ -3002,84 +2725,24 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
         <translation>Pakettipuskuri</translation>
     </message>
     <message>
-        <source>Channels</source>
-        <translation type="obsolete">Kanavat</translation>
-    </message>
-    <message>
-        <source>This box contains all channels from the selected video source. Select a channel here and press the &apos;Load and Tune&apos; button to load the channel settings into the previous screen and try to tune it.</source>
-        <translation type="obsolete">Sisältää kaikki kanavat valitusta videolähteestä. Valitse kanava tästä ja paina &apos;Lataa ja Viritä&apos; lataaksesi kanavan säädöt edelliselle näytölle virittääksesi sen.</translation>
-    </message>
-    <message>
         <source>Status</source>
         <translation>Tila</translation>
-    </message>
-    <message>
-        <source>Select the type of satellite equipment you have. Selecting &apos;Finish&apos; on this screen will only save the type, and not the individual satellite, move down to the list to do this.</source>
-        <translation type="obsolete">Valitaan satelliitin tyyppi. Jos painetaan &apos;Valmis&apos;, tyyppi ainoastaan talletetaan, ei yksittäinen satelliitti. Liiku alas listauksessa tehdäksesi tämän.</translation>
-    </message>
-    <message>
-        <source>Satellites</source>
-        <translation type="obsolete">Satelliitit</translation>
-    </message>
-    <message>
-        <source>Select the satellite you want to configure and press the &apos;menu&apos; key, and edit the satellite, when you are done configuring, press &apos;OK&apos; to leave this wizard.</source>
-        <translation type="obsolete">Valitse satelliitti jonka haluat asettaa ja paina &apos;valikko&apos;-näppäintä asettaaksesi sen. Kun olet valmis, paina &apos;OK&apos; lopettaaksesi velhon.</translation>
-    </message>
-    <message>
-        <source>Satellite Configuration</source>
-        <translation type="obsolete">Satelliitin Asetukset</translation>
-    </message>
-    <message>
-        <source>Satellite Name</source>
-        <translation type="obsolete">Satelliitin Nimi</translation>
-    </message>
-    <message>
-        <source>A textual representation of this satellite or cluster of satellites.</source>
-        <translation type="obsolete">Tekstimuotoinen esitys satelliitista tai satelliiteista.</translation>
-    </message>
-    <message>
-        <source>Satellite Position</source>
-        <translation type="obsolete">Satelliitin Sijainti</translation>
-    </message>
-    <message>
-        <source>A textual representation of which position the satellite is located at (&apos;1W&apos;)</source>
-        <translation type="obsolete">Tekstimuotoinen esitys satelliitin sijainnista (&apos;1W&apos;)</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
         <translation>LNB LOF Kytkin</translation>
     </message>
     <message>
-        <source>This defines at what frequency (in hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation type="obsolete">Määrittää millä taajuudella (hz) LNB suorittaa kytkennän korkeasta alhaiseen asetukseen ja päinvastoin.</translation>
-    </message>
-    <message>
         <source>LNB LOF High</source>
         <translation>LNB LOF Korkea</translation>
-    </message>
-    <message>
-        <source>This defines the offset (in hz) the frequency coming from the lnb will be in high setting.</source>
-        <translation type="obsolete">Määrittää milloin (hz) LNB:ltä tuleva taajuus on korkealla asetuksella.</translation>
     </message>
     <message>
         <source>LNB LOF Low</source>
         <translation>LNB LOF Matala</translation>
     </message>
     <message>
-        <source>This defines the offset (in hz) the frequency coming from the lnb will be in low setting.</source>
-        <translation type="obsolete">Määrittää milloin (hz) LNB:ltä tuleva taajuus on matalalla asetuksella.</translation>
-    </message>
-    <message>
         <source>Recorder Options</source>
         <translation>Nauhoittajan Asetukset</translation>
-    </message>
-    <message>
-        <source>Configuration Options</source>
-        <translation type="obsolete">Asetukset</translation>
-    </message>
-    <message>
-        <source>Card Verification Wizard</source>
-        <translation type="obsolete">Kortin varmennus-velho</translation>
     </message>
     <message>
         <source>Capture device</source>
@@ -3334,10 +2997,6 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
         <translation>Laita päälle kanavanvaihdon puskurivaroitukset</translation>
     </message>
     <message>
-        <source>Find One Recording</source>
-        <translation type="obsolete">Etsi Yksi Nauhoitus</translation>
-    </message>
-    <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
         <translation>Tämä valinta on halvoille BT878-perustaisille DVB-T-korteille kuten AverTV DVB-T, jotka vaativat, että äänenvoimakkuuteen jätetään koskematta.</translation>
     </message>
@@ -3348,10 +3007,6 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     <message>
         <source>Find One Recordings Priority</source>
         <translation>Etsi Yksi Nauhoitus Prioriteetti</translation>
-    </message>
-    <message>
-        <source>Find One Recording types will receive this additional recording priority value.</source>
-        <translation type="obsolete">Yhden haun nauhoitustyypit saavat lisänä tämän prioriteettiarvon.</translation>
     </message>
     <message>
         <source>Length of time to retain DVB signal data (in days)</source>
@@ -3814,24 +3469,12 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
         <translation>Kuvasuhteen Syrjäytys</translation>
     </message>
     <message>
-        <source>16/9 Anamorphic</source>
-        <translation type="obsolete">16/9 Anamorfinen</translation>
-    </message>
-    <message>
-        <source>4/3 Normal</source>
-        <translation type="obsolete">4/3 Normaali</translation>
-    </message>
-    <message>
         <source>16/9 Zoom</source>
         <translation>16/9 Tarkennus</translation>
     </message>
     <message>
         <source>4/3 Zoom</source>
         <translation>4/3 Tarkennus</translation>
-    </message>
-    <message>
-        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
-        <translation type="obsolete">Syrjäyttää minkä tahansa kuvasuhteen nauhoituksessa.</translation>
     </message>
     <message>
         <source>GUI width (px)</source>
@@ -4024,101 +3667,6 @@ Myth will now exit.</translation>
         <translation>Mainosvapaa</translation>
     </message>
     <message>
-        <source>S</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">S</translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">T</translation>
-    </message>
-    <message>
-        <source>W</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">W</translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">C</translation>
-    </message>
-    <message>
-        <source>A</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">A</translation>
-    </message>
-    <message>
-        <source>F</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">F</translation>
-    </message>
-    <message>
-        <source>O</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">O</translation>
-    </message>
-    <message>
-        <source>D</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">D</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">S</translation>
-    </message>
-    <message>
-        <source>R</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">R</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">X</translation>
-    </message>
-    <message>
-        <source>P</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">P</translation>
-    </message>
-    <message>
-        <source>E</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">E</translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">T</translation>
-    </message>
-    <message>
-        <source>N</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">N</translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">C</translation>
-    </message>
-    <message>
-        <source>L</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">L</translation>
-    </message>
-    <message>
-        <source>K</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">K</translation>
-    </message>
-    <message>
-        <source>B</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">B</translation>
-    </message>
-    <message>
         <source>Startup command</source>
         <translation>Käynnistyskomento</translation>
     </message>
@@ -4156,11 +3704,6 @@ Myth will now exit.</translation>
         <translation>tähdet</translation>
     </message>
     <message>
-        <source>r</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">r</translation>
-    </message>
-    <message>
         <source>this episode is a repeat.</source>
         <translation>Jakso on uusinta.</translation>
     </message>
@@ -4171,34 +3714,6 @@ Myth will now exit.</translation>
     <message>
         <source>this episode will be recorded at a later time.</source>
         <translation>tämä jakso nauhoitetaan myöhemmin.</translation>
-    </message>
-    <message>
-        <source>Category:  </source>
-        <translation type="obsolete">Kategoria:</translation>
-    </message>
-    <message>
-        <source>Type:  </source>
-        <translation type="obsolete">Tyyppi:</translation>
-    </message>
-    <message>
-        <source>Episode Number:  </source>
-        <translation type="obsolete">Jakson Numero:</translation>
-    </message>
-    <message>
-        <source>Original Airdate:  </source>
-        <translation type="obsolete">Alkuperäinen Lähetysaika:</translation>
-    </message>
-    <message>
-        <source>Program ID:  </source>
-        <translation type="obsolete">Ohjelman ID:</translation>
-    </message>
-    <message>
-        <source>Filesize:  </source>
-        <translation type="obsolete">Tiedostokoko:</translation>
-    </message>
-    <message>
-        <source>Recording Group:  </source>
-        <translation type="obsolete">Nauhoitusryhmä:</translation>
     </message>
     <message>
         <source> The following programs will be recorded instead:
@@ -4217,10 +3732,6 @@ Myth will now exit.</translation>
     <message>
         <source>Record using the &quot;%1&quot; profile</source>
         <translation>Nauhoita käyttäen &quot;%1&quot; profiilia</translation>
-    </message>
-    <message>
-        <source>Duplicate detection</source>
-        <translation type="obsolete">Kaksinkertaisten havaitseminen</translation>
     </message>
     <message>
         <source>Scheduling Options</source>
@@ -4311,10 +3822,6 @@ Myth will now exit.</translation>
         <translation>Yksi kenttä</translation>
     </message>
     <message>
-        <source>Deinterlace algorithm.  &apos;Linear blend&apos; and &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="obsolete">Lomituksen algoritmi. Lineaarinen sekoitus ja Ydin tarvitsevat SSE -tuen. Bob tarvitsee Xv tai XvMC videoulostulon.</translation>
-    </message>
-    <message>
         <source>Deinterlace settings</source>
         <translation>Lomitussäädöt</translation>
     </message>
@@ -4365,18 +3872,6 @@ Myth will now exit.</translation>
     <message>
         <source>High</source>
         <translation>Korkea</translation>
-    </message>
-    <message>
-        <source>This setting determines approximately how much CPU Commercial Detection threads will consume. On &apos;High&apos;, all available CPU time will be used which may cause problems on slow systems.</source>
-        <translation type="obsolete">Asettaa kuinka paljon prosessoriaikaa mainosten tunnistaminen voi käyttää. Korkea käyttää kaiken vapaan prosessoriajan, mutta voi aiheuttaa ongelmia hitaissa koneissa.</translation>
-    </message>
-    <message>
-        <source>Commercial Detection Processing Host</source>
-        <translation type="obsolete">Mainosten Havaitsemisen Palvelin</translation>
-    </message>
-    <message>
-        <source>Select &apos;Default&apos; to run Commercial Detection on the same backend which created a recording, or select a hostname to run all detection jobs on a specific host.</source>
-        <translation type="obsolete">Asetus &apos;Oletus&apos; ajaa Mainosten Havaitsemisen samalla backendillä kuin mikä vastaa nauhoituksesta.</translation>
     </message>
     <message>
         <source>Enable stricter Commercial Detection code.  Disable if some commercials are not being detected.</source>
@@ -4663,10 +4158,6 @@ Myth will now exit.</translation>
         <translation>Käytä laitteiston XVMC MPEG purkua</translation>
     </message>
     <message>
-        <source>Use VIA hardware MPEG Decoding</source>
-        <translation type="obsolete">Käytä VIA laitteiston MPEG purkua</translation>
-    </message>
-    <message>
         <source>Sample interval for DVB signal statistics (in seconds)</source>
         <translation>DVB-signaalin tulosteen intervalli (sekunteina)</translation>
     </message>
@@ -4703,10 +4194,6 @@ Myth will now exit.</translation>
         <translation>Määrittävät kellonajan ja päivät jolloin mythfilldatabase hakee ohjelmatiedot. Esimerkiksi Min. 11 ja Max. 13 tarkoittaa, että suoritus tapahtuu kello 11 ja 13 välillä.</translation>
     </message>
     <message>
-        <source>Shows Program Guide when starting Live TV</source>
-        <translation type="obsolete">Näytä Ohjelmaopas kun siirrytään LiveTV:oon</translation>
-    </message>
-    <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
         <translation>Aloittaa Ohjelmaoppaan heti kun siirrytään katsomaan LiveTV:tä.</translation>
     </message>
@@ -4717,10 +4204,6 @@ Myth will now exit.</translation>
     <message>
         <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
         <translation>Taustavalo on aina päällä.</translation>
-    </message>
-    <message>
-        <source>Commercial Detection (Playback)</source>
-        <translation type="obsolete">Mainosten Havaitseminen (Toisto)</translation>
     </message>
     <message>
         <source>Directed By</source>
@@ -4781,10 +4264,6 @@ Myth will now exit.</translation>
     <message>
         <source>Record only this showing</source>
         <translation>Nauhoita vain tämä esitys</translation>
-    </message>
-    <message>
-        <source>Record one showing of this program</source>
-        <translation type="obsolete">Nauhoita vain yksi jakso kyseisestä ohjelmasta</translation>
     </message>
     <message>
         <source>Record in this timeslot every week</source>
@@ -6188,6 +5667,42 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <source>Resize Video while transcoding</source>
         <translation>Videon koonmuutos jälkikäsittelyssä</translation>
     </message>
+    <message>
+        <source>Absolutely don&apos;t record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Connection Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Point to Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Air date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV audio through PVR-350 only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
@@ -6422,10 +5937,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Näytä</translation>
     </message>
     <message>
-        <source>Speed 5X</source>
-        <translation type="obsolete">Nopeus 5X</translation>
-    </message>
-    <message>
         <source>Speed 3X</source>
         <translation>Nopeus 3X</translation>
     </message>
@@ -6646,10 +6157,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Ääniraita</translation>
     </message>
     <message>
-        <source>Jump to Begining</source>
-        <translation type="obsolete">Hyppää Alkuun</translation>
-    </message>
-    <message>
         <source>You are exiting this video</source>
         <translation>Poistutaan esityksestä</translation>
     </message>
@@ -6809,32 +6316,8 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Lop. Prioriteetti</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority</source>
-        <translation type="obsolete">(1) Järjestä Nimen Mukaan    (2) Järjestä Prioriteetin Mukaan</translation>
-    </message>
-    <message>
         <source>Record Type:</source>
         <translation>Tyyppi:</translation>
-    </message>
-    <message>
-        <source>[</source>
-        <translation type="obsolete">[</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation type="obsolete">]</translation>
-    </message>
-    <message>
-        <source>]  = </source>
-        <translation type="obsolete">]   =</translation>
-    </message>
-    <message>
-        <source>Select a recording to permanently delete:</source>
-        <translation type="obsolete">Valitse poistettava nauhoitus:</translation>
-    </message>
-    <message>
-        <source>Select a recording to view:</source>
-        <translation type="obsolete">Valitse katsottava nauhoitus:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -6853,16 +6336,8 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Valitse kirjain</translation>
     </message>
     <message>
-        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation type="obsolete">Valitse kirjain jolla ohjelma alkaa ja paina rivinvaihtoa</translation>
-    </message>
-    <message>
         <source>Select a program...</source>
         <translation>Valitse ohjelma</translation>
-    </message>
-    <message>
-        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation type="obsolete">Valitse ohjelman nimike. Käytä nuolinäppäimiä valintaan. Ohjelmalle voidaan antaa nauhoitukseen liittyviä asetuksia.</translation>
     </message>
     <message>
         <source>No Programs</source>

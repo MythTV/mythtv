@@ -211,19 +211,23 @@
     </message>
     <message>
         <source>Match an exact title</source>
-        <translation type="unfinished"></translation>
+        <translation>Trouver un titre exact</translation>
     </message>
     <message>
         <source>Match an exact episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Trouver un épisode exact</translation>
     </message>
     <message>
         <source>An error was found when checking</source>
-        <translation type="unfinished"></translation>
+        <translation>Une erreur est survenu lors du test</translation>
     </message>
     <message>
         <source>The database error was</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;erreur de la BDD est</translation>
+    </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation>Seules les diffusions HDTV</translation>
     </message>
 </context>
 <context>
@@ -342,6 +346,10 @@
         <source>Undefined</source>
         <translation>Indéfini</translation>
     </message>
+    <message>
+        <source>Cancelled</source>
+        <translation>Annulé</translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -385,76 +393,40 @@
         <translation>Chaîne:</translation>
     </message>
     <message>
-        <source>Date:</source>
-        <translation type="obsolete">Date:</translation>
-    </message>
-    <message>
         <source>Time:</source>
         <translation>Heure:</translation>
-    </message>
-    <message>
-        <source>hr</source>
-        <translation type="obsolete">h</translation>
-    </message>
-    <message>
-        <source>min</source>
-        <translation type="obsolete">min</translation>
     </message>
     <message>
         <source>Duration:</source>
         <translation>Durée:</translation>
     </message>
     <message>
-        <source>Title:</source>
-        <translation type="obsolete">Titre:</translation>
-    </message>
-    <message>
-        <source>Subtitle:</source>
-        <translation type="obsolete">Sous-titre:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Description:</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and exit</source>
-        <translation type="obsolete">Enregistrer cette programmation et quitter</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and set another</source>
-        <translation type="obsolete">Enregistrer cette programmation et en entrer une autre</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <source>Manual recording</source>
-        <translation type="obsolete">Enregistrement manuel</translation>
-    </message>
-    <message>
         <source>Date or day of the week</source>
-        <translation type="unfinished"></translation>
+        <translation>Date ou jour de la semaine</translation>
     </message>
     <message>
         <source>minute</source>
-        <translation type="unfinished"></translation>
+        <translation>minute</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minutes</translation>
+        <translation>minutes</translation>
     </message>
     <message>
         <source>Title (optional):</source>
-        <translation type="unfinished"></translation>
+        <translation>Titre (optionnel):</translation>
     </message>
     <message>
         <source>Set Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Fixer les options d&apos;enregistrement</translation>
     </message>
     <message>
         <source>Manual Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement manuel</translation>
     </message>
 </context>
 <context>
@@ -522,10 +494,6 @@
     <message>
         <source>Are you sure you want to delete:</source>
         <translation>Êtes-vous certain de vouloir supprimer:</translation>
-    </message>
-    <message>
-        <source>No, I might want to watch it again.</source>
-        <translation>Non, je voudrais le regarder encore</translation>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
@@ -805,15 +773,27 @@
     </message>
     <message>
         <source>User Job</source>
-        <translation type="unfinished"></translation>
+        <translation>Tâche utilisateur</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished">Interrompre</translation>
+        <translation>Interrompre</translation>
     </message>
     <message>
         <source>Begin</source>
-        <translation type="unfinished"></translation>
+        <translation>Début</translation>
+    </message>
+    <message>
+        <source>Delete it, but allow it to re-record</source>
+        <translation>Effacer le, mais autoriser un ré-enregistrement</translation>
+    </message>
+    <message>
+        <source>Delete it</source>
+        <translation>Effacer le</translation>
+    </message>
+    <message>
+        <source>Save it so I can watch it again</source>
+        <translation>Le Sauver afin de le regarder à nouveau</translation>
     </message>
 </context>
 <context>
@@ -1038,15 +1018,15 @@
     </message>
     <message>
         <source>(Any Program Type)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Tout type de programme)</translation>
     </message>
     <message>
         <source>(Any Category)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Toute catégorie)</translation>
     </message>
     <message>
         <source>(Any Station)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Toute Chaîne)</translation>
     </message>
 </context>
 <context>
@@ -1373,10 +1353,6 @@
     <message>
         <source>Xinerama screen</source>
         <translation>écran Xinerama</translation>
-    </message>
-    <message>
-        <source>If using Xinerama, run only on the specified screen.</source>
-        <translation>Si Xinerama est utilisé, seul l&apos;écran spécifié est utilisé.</translation>
     </message>
     <message>
         <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
@@ -2103,12 +2079,6 @@
     <message>
         <source>Symbol Rate</source>
         <translation>Débit de symboles</translation>
-    </message>
-    <message>
-        <source>[DVB-S/C] Symbol Rate (Option has no default)
-???</source>
-        <translation type="obsolete">[DVB-S/C] débit de symboles (cette option n&apos;a pas de valeur par défaut) 
-???</translation>
     </message>
     <message>
         <source>Polarity</source>
@@ -3354,10 +3324,6 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
         <translation>Si coché, les programmes qui sont automatiquement supprimé après expiration pourront être réenregistré si ils sont rediffusés.</translation>
     </message>
     <message>
-        <source>This global setting is ignored in case of conflicts with other scheduled programs.</source>
-        <translation type="obsolete">Ce réglage global est ignoré dans le cas de conflits avec d&apos;autre émissions programmées.</translation>
-    </message>
-    <message>
         <source>List Newest Recording First</source>
         <translation>Lister les enregistrements récents d&apos;abord</translation>
     </message>
@@ -4509,68 +4475,8 @@ Myth will now exit.</source>
         <translation>Filtres à utiliser pour la lecture des enregistrements de cette chaîne.  Mettre un + devant pour ajouter aux filtres de lecture globaux.</translation>
     </message>
     <message>
-        <source>[Common] Inversion (Default: Auto):
-Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="obsolete">[Commun] Inversion (Defaut: Auto):
-La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si ça ne fonctionne pas.</translation>
-    </message>
-    <message>
         <source>Auto</source>
         <translation>Auto</translation>
-    </message>
-    <message>
-        <source>[DVB-C/T] Bandwidth (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-C/T] Bande Passante (Défaut: Auto)
-???</translation>
-    </message>
-    <message>
-        <source>[DVB-C] Modulation (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-C] Modulation (Défaut: Auto)
-???</translation>
-    </message>
-    <message>
-        <source>[DVB-T] Constellation (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Constellation (Défaut: Auto)
-???</translation>
-    </message>
-    <message>
-        <source>[DVB-S/C] Forward Error Correction (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-S/C] Correction d&apos;erreur prédictive (Défaut: Auto)
-???</translation>
-    </message>
-    <message>
-        <source>[DVB-T] Low Priority Code Rate (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Code de débit faible priorité (Défaut: Auto)
-???</translation>
-    </message>
-    <message>
-        <source>[DVB-T] High Priority Code Rate (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Code de débit haute priorité (Défaut: Auto)
-???</translation>
-    </message>
-    <message>
-        <source>[DVB-T] Guard Interval (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Intervalle de garde (Défaut: Auto)
-???</translation>
-    </message>
-    <message>
-        <source>[DVB-T] Transmission Mode (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Mode de transmissio, (Défaut: Auto)
-???</translation>
-    </message>
-    <message>
-        <source>[DVB-T] Hierarchy (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Hiérarchie (Défaut: Auto)
-???</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -5421,17 +5327,6 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
         <translation>Trouver ID</translation>
     </message>
     <message>
-        <source>[Common] Frequency (Option has no default)
-The frequency for this channel in Hz.</source>
-        <translation type="obsolete">[Commun] Fréquence (Cette option n&apos;a pas de valeur par défaut) 
-La fréquence de cette chaîne en Hz.</translation>
-    </message>
-    <message>
-        <source>[DVB-S] Polarity (Option has no default)
-</source>
-        <translation type="obsolete">[DVB-S] Polarité (pas de valeur par défaut)</translation>
-    </message>
-    <message>
         <source>6 MHz</source>
         <translation>6 MHz</translation>
     </message>
@@ -5564,10 +5459,6 @@ La fréquence de cette chaîne en Hz.</translation>
         <translation>Sélectionne comme trier les épisodes.</translation>
     </message>
     <message>
-        <source>Sort shows</source>
-        <translation type="obsolete">Trier les diffusions</translation>
-    </message>
-    <message>
         <source>Use libmpeg2 for decoding</source>
         <translation>Utiliser libmpeg2 pour le décodage</translation>
     </message>
@@ -5690,85 +5581,123 @@ La fréquence de cette chaîne en Hz.</translation>
     <message>
         <source>Frequency (Option has no default)
 The frequency for this channel in Hz.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence (Option sans défaut) 
+La fréquence de cette chaîne en Hz</translation>
     </message>
     <message>
         <source>Symbol Rate (Option has no default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Débit symbole (Pas d&apos;option par défaut)</translation>
     </message>
     <message>
         <source>Polarity (Option has no default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Polarité (Pas d&apos;option par défaut)</translation>
     </message>
     <message>
         <source>Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inversion (Défaut: Auto) 
+La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf si ça ne marche pas.</translation>
     </message>
     <message>
         <source>Bandwidth (Default: Auto)
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Bande Passante (Défaut: Auto)</translation>
     </message>
     <message>
         <source>Modulation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Modulation (Défaut: Auto)</translation>
     </message>
     <message>
         <source>Constellation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Constellation (Défaut: Auto)</translation>
     </message>
     <message>
         <source>Forward Error Correction (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Correction d&apos;erreur d&apos;avance: FEC (Défaut Auto)</translation>
     </message>
     <message>
         <source>Low Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Code Débit basse priorité (Défaut: Auto)</translation>
     </message>
     <message>
         <source>High Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Code Débit haute priorité (Défaut: Auto)</translation>
     </message>
     <message>
         <source>Guard Interval (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalle de garde (Défaut: Auto)</translation>
     </message>
     <message>
         <source>Transmission Mode (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode de Transmission (Défaut: Auto)</translation>
     </message>
     <message>
         <source>Hierarchy (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiérarchie (Défaut: Auto)</translation>
     </message>
     <message>
         <source>Enable realtime priority threads</source>
-        <translation type="unfinished"></translation>
+        <translation>Active les Threads temps-réels</translation>
     </message>
     <message>
         <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lorsque vous exécutez mythfrontend en mode Root, Certaines tâches peuvent avoir une priorité spéciale. A désactiver, si mythfrontend se fige pendant la lecture.</translation>
     </message>
     <message>
         <source>Enable LCD device</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer les périfs LCD</translation>
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser un afficheur à cristaux liquides pour afficher le statut d&apos;info. Nécessite de redémarrer Mythfrontend après activation</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce paramètre global permet à l&apos;enregistreur de démarrer avant l&apos;heure de début programmée. Il n&apos;affecte pas le programmateur. Il est ignoré lorsque deux émissions sont programmées avec trop peu de temps entre elles.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce paramètre global permet à l&apos;enregistreur de s&apos;arrêter après l&apos;heure de fin programmée. Il n&apos;affecte pas le programmateur. Il est ignoré lorsque deux émissions sont programmées avec trop peu de temps entre elles.</translation>
     </message>
     <message>
         <source>Resize Video while transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>retailler la vidéo lors du transcodage.</translation>
+    </message>
+    <message>
+        <source>Absolutely don&apos;t record</source>
+        <translation>Ne pas enregistrer du tout</translation>
+    </message>
+    <message>
+        <source>Firewire Connection Type</source>
+        <translation>Type de connexion firewire</translation>
+    </message>
+    <message>
+        <source>Point to Point</source>
+        <translation>point à point</translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
+        <translation>Diffusion</translation>
+    </message>
+    <message>
+        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
+        <translation>Encoder MPEG-4 USB (Plextor ConvertX, etc)</translation>
+    </message>
+    <message>
+        <source>Original Air date</source>
+        <translation>Date de diffusion d&apos;origine</translation>
+    </message>
+    <message>
+        <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
+        <translation>Si Xinerama est utilisé, afficher sur l&apos;écran spécifié. -1 signifie sur tous les écrans</translation>
+    </message>
+    <message>
+        <source>TV audio through PVR-350 only</source>
+        <translation>Audio TV à travers le PVR 350 seulement</translation>
+    </message>
+    <message>
+        <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
+        <translation>Normalement l&apos;audio du PVR 350 est rebouclé dans une carte son. Ici, vous pouvez indiquer lorsque ce n&apos;est pas le cas. Mythtv ne peut pas contrôler le volume lorsque cette case est cochée.</translation>
     </message>
 </context>
 <context>
@@ -5824,11 +5753,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Failed to open the card</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir la carte </translation>
     </message>
     <message>
         <source>Failed to probe the card</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;analyser la carte</translation>
     </message>
 </context>
 <context>
@@ -6142,10 +6071,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>1.5X</source>
         <translation>1.5X</translation>
-    </message>
-    <message>
-        <source>2.0X</source>
-        <translation type="obsolete">2.0X</translation>
     </message>
     <message>
         <source>Sleep</source>

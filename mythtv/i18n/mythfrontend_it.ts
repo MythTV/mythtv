@@ -225,6 +225,10 @@
         <source>The database error was</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>
@@ -342,6 +346,10 @@
         <source>Undefined</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -385,52 +393,16 @@
         <translation>Canale:</translation>
     </message>
     <message>
-        <source>Date:</source>
-        <translation type="obsolete">Data:</translation>
-    </message>
-    <message>
         <source>Time:</source>
         <translation>Ora:</translation>
-    </message>
-    <message>
-        <source>hr</source>
-        <translation type="obsolete">hr</translation>
-    </message>
-    <message>
-        <source>min</source>
-        <translation type="obsolete">min</translation>
     </message>
     <message>
         <source>Duration:</source>
         <translation>Durata:</translation>
     </message>
     <message>
-        <source>Title:</source>
-        <translation type="obsolete">Titolo:</translation>
-    </message>
-    <message>
-        <source>Subtitle:</source>
-        <translation type="obsolete">Sottotitolo:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Descrizione:</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and exit</source>
-        <translation type="obsolete">Imposta questa registrazione ed esci</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and set another</source>
-        <translation type="obsolete">Imposta questa registrazione e continua</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annulla</translation>
-    </message>
-    <message>
-        <source>Manual recording</source>
-        <translation type="obsolete">Registrazione manuale</translation>
     </message>
     <message>
         <source>Date or day of the week</source>
@@ -546,10 +518,6 @@
     <message>
         <source>Yes, stop recording it</source>
         <translation>Sì, ferma la registrazione</translation>
-    </message>
-    <message>
-        <source>No, I might want to watch it again.</source>
-        <translation>No, penso di vederlo ancora.</translation>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
@@ -815,6 +783,18 @@
         <source>Begin</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Delete it, but allow it to re-record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save it so I can watch it again</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -1060,14 +1040,6 @@
         <translation>Registra ogni settimana</translation>
     </message>
     <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Registra quando presente in questo orario</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Registra quando presente su questo canale</translation>
-    </message>
-    <message>
         <source>Recording all showings</source>
         <translation>Registra ogni passaggio</translation>
     </message>
@@ -1247,26 +1219,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Single Recording</source>
-        <translation type="obsolete">Registrazione singola</translation>
-    </message>
-    <message>
-        <source>Daily Recording</source>
-        <translation type="obsolete">Registrazione giornaliera</translation>
-    </message>
-    <message>
-        <source>Weekly Recording</source>
-        <translation type="obsolete">Registrazione settimanale</translation>
-    </message>
-    <message>
-        <source>Channel Recording</source>
-        <translation type="obsolete">Registrazione del canale</translation>
-    </message>
-    <message>
-        <source>All Recording</source>
-        <translation type="obsolete">Tutte le registrazioni</translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>Nessuna registrazione</translation>
     </message>
@@ -1293,14 +1245,6 @@
     <message>
         <source>Will Record</source>
         <translation>Registrazione futura</translation>
-    </message>
-    <message>
-        <source>Previous Recording</source>
-        <translation type="obsolete">Registrazione precedente</translation>
-    </message>
-    <message>
-        <source>Current Recording</source>
-        <translation type="obsolete">Registrazione corrente</translation>
     </message>
     <message>
         <source>Max Recordings</source>
@@ -2425,10 +2369,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Channels</source>
-        <translation type="obsolete">Canali</translation>
-    </message>
-    <message>
         <source>Status</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2514,10 +2454,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Xinerama screen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If using Xinerama, run only on the specified screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3722,36 +3658,6 @@ Myth will now exit.</source>
     <message>
         <source>Commercial Free</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">T</translation>
-    </message>
-    <message>
-        <source>W</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">W</translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">C</translation>
-    </message>
-    <message>
-        <source>A</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">A</translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">T</translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">C</translation>
     </message>
     <message>
         <source>Startup command</source>
@@ -5749,6 +5655,42 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <source>Resize Video while transcoding</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Absolutely don&apos;t record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Connection Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Point to Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Air date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV audio through PVR-350 only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
@@ -5941,10 +5883,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Jump To</source>
         <translation>Salta a</translation>
-    </message>
-    <message>
-        <source>Speed 5X</source>
-        <translation type="obsolete">Velocità 5X</translation>
     </message>
     <message>
         <source>Speed 3X</source>
@@ -6366,32 +6304,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Priorità finale</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority</source>
-        <translation type="obsolete">(1) Ordina per titolo (2) Ordina per priorità</translation>
-    </message>
-    <message>
         <source>Record Type:</source>
         <translation>Tipo di registrazione:</translation>
-    </message>
-    <message>
-        <source>[</source>
-        <translation type="obsolete">[</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation type="obsolete">]</translation>
-    </message>
-    <message>
-        <source>]  = </source>
-        <translation type="obsolete">] =</translation>
-    </message>
-    <message>
-        <source>Select a recording to permanently delete:</source>
-        <translation type="obsolete">Seleziona una registrazione da eliminare:</translation>
-    </message>
-    <message>
-        <source>Select a recording to view:</source>
-        <translation type="obsolete">Seleziona una registrazione da vedere:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -6410,16 +6324,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Seleziona una lettera...</translation>
     </message>
     <message>
-        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation type="obsolete">Seleziona la lettera iniziale del programma, poi premi OK o la freccia destra</translation>
-    </message>
-    <message>
         <source>Select a program...</source>
         <translation>Seleziona un programma...</translation>
-    </message>
-    <message>
-        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation type="obsolete">Seleziona il titolo del programma che vuoi trovare. Quando finito torna indietro con la freccia a sinistra. Premendo su &apos;info&apos; potrai impostare le opzioni di registrazione.</translation>
     </message>
     <message>
         <source>No Programs</source>
