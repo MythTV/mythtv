@@ -3,6 +3,10 @@
 # ffmpeg configure script (c) 2000, 2001, 2002 Fabrice Bellard
 #
 
+x86_mmx_cpus="pentium-mmx,i686,pentium2,pentium3,pentium3m"
+x86_mmx_cpus="$x86_mmx_cpus,pentium-m,pentium4,pentium4m,prescott,athlon,athlon-xp"
+x86_cpus="i386,i486,i586,pentium,pentiumpro,${x86_mmx_cpus}"
+
 # default parameters
 compile_type="release"
 prefix="/usr/local"
@@ -55,6 +59,14 @@ if test x"$KERNEL_RELEASE" != x"" ; then
     dvb_path="/usr/src/linux-$KERNEL_RELEASE/include"
 fi
 
+if test x"$CC" != x"" ; then
+    cc="$CC"
+fi
+
+if test x"$CXX" != x"" ; then
+    cxx="$CXX"
+fi
+
 if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
 cat << EOF
 
@@ -89,7 +101,8 @@ echo "Advanced compile options (experts only):"
 #echo "  --cross-prefix=PREFIX    use PREFIX for compile tools [$cross_prefix]"
 #echo "  --cc=CC                  use C compiler CC [$cc]"
 #echo "  --make=MAKE              use specified make [$make]"
-echo "  --extra-cflags=ECFLAGS   add ECFLAGS to list of flags for C/C++ compile"
+echo "  --extra-cflags=ECFLAGS    add ECFLAGS to list of flags for C compile"
+echo "  --extra-cxxflags=ECXFLAGS add ECXXFLAGS to list of flags for C++ compile"
 #echo "  --extra-ldflags=ELDFLAGS add ELDFLAGS to LDFLAGS [$LDFLAGS]"
 #echo "  --extra-libs=ELIBS       add ELIBS [$ELIBS]"
 echo "  --cpu=CPU                only use instructions available on CPU [$cpu]"
@@ -185,6 +198,7 @@ for opt do
   ;;
   --arch=*)
           arch=`echo $opt | cut -d '=' -f 2`
+          cpu_overide="yes"
           cpu="$arch"
           cpu_raw="$arch"
           tune="$arch"
@@ -195,11 +209,16 @@ for opt do
   esac
 done
 
+is_x86_cpu() {
+    expr ",${x86_cpus}," : ".*,$1," > /dev/null
+}
 
+if is_x86_cpu "$cpu" ; then
+    cpu="x86"
+fi
 
 case "$cpu" in
-  i386|i486|i586|i686|i86pc|BePC)
-    cpu="x86"
+  x86)
   ;;
   x86_64)
     if [ "`$cc -dumpmachine | grep x86_64 | cut -d- -f1`" = "x86_64" -a \
@@ -235,6 +254,7 @@ case "$cpu" in
     cpu="unknown"
   ;;
 esac
+
 gprof="no"
 v4l="yes"
 audio_beos="no"
@@ -480,7 +500,9 @@ for opt do
   ;;
   --make=*) make=`echo $opt | cut -d '=' -f 2`
   ;;
-  --extra-cflags=*) ECFLAGS="$${opt#--extra-cflags=}"
+  --extra-cflags=*) ECFLAGS=${opt#--extra-cflags=}
+  ;;
+  --extra-cxxflags=*) ECXXFLAGS=${opt#--extra-cxxflags=}
   ;;
   --extra-ldflags=*) LDFLAGS=$LDFLAGS ${opt#--extra-ldflags=}
   ;;
@@ -700,16 +722,24 @@ EOF
     fi
 fi
 
+is_x86_mmx() {
+    expr ",${x86_mmx_cpus}," : ".*,$1," > /dev/null
+}
+
 # compute mmx state
 if test x"$mmx" = x"default"; then
-    # defaults to mmx="yes" with i686 (despite pentiumpro),
     mmx="no"
-    if test x"$cpu_raw" = x"i686" -o x"$cpu" = x"x86_64"; then
+    if test x"$cpu" = x"x86_64"; then
+        mmx="yes"
+    fi
+    # defaults to mmx="yes" with i686 (despite pentiumpro),
+    if is_x86_mmx "$cpu_raw"; then
         mmx="yes"
     fi
 
-    # unless processor_flags is set, then do right thing.
-    if test x"$processor_flags" != x"" ; then
+    # if !cpu && !tune && !arch & processor_flags, then...
+    if test x"$cpu_overide" != x"yes" -a x"$tune_raw" = x"" -a \
+            x"$processor_flags" != x"" ; then
         mmx="no"
         if expr "$processor_flags" : ".*mmx" > /dev/null ; then
             mmx="yes"
@@ -875,33 +905,74 @@ if test x"$tune" = x"c3" -o x"$tune" = x"c3-2"; then
 fi
 
 # if no tune setting and we know cpu class look at $processor 
-if test x"$tune" = x"generic" -a x"$cpu_overide" = x"no"; then
+if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
+# first try to tune based on processor info
    if expr "$processor" : ".*Intel(R) Pentium(R) 4" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Intel(R) Pentium(R) M" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
-   elif expr "$processor" : ".*AMD Athlon(tm)" > /dev/null ; then
+   elif expr "$processor" : ".*AMD Sempron(tm)" > /dev/null ; then
        ARCHFLAGS="-march=pentiumpro -mmmx"
+   elif expr "$processor" : ".*AMD Athlon(tm) 64" > /dev/null ; then
+       ARCHFLAGS="-march=k8"
+   elif expr "$processor" : ".*AMD Athlon(tm) XP" > /dev/null ; then
+       ARCHFLAGS="-march=pentiumpro -mmmx"
+   elif expr "$processor" : ".*AMD Athlon(tm)" > /dev/null ; then
+       ARCHFLAGS="-march=athlon"
+   elif expr "$processor" : "athlon" > /dev/null ; then
+       ARCHFLAGS="-march=athlon"
    elif expr "$processor" : ".*VIA C3 Ezra" > /dev/null ; then
-       ARCHFLAGS="-march=c3 -Os"
+       ARCHFLAGS="-march=c3"
+       optimize="small"
+       cpu_raw="c3"
    elif expr "$processor" : ".*VIA Samuel 2" > /dev/null ; then
-       ARCHFLAGS="-march=c3 -Os"
-
+       ARCHFLAGS="-march=c3"
+       optimize="small"
+       cpu_raw="c3"
+   elif expr "$processor" : ".*VIA Nehemiah" > /dev/null ; then
+       ARCHFLAGS="-march=c3-2"
+       optimize="small"
+       cpu_raw="c3-2"
+# if no known processor info, tune base on cpu_raw info
    elif test x"$cpu_raw" = x"i686" -a x"$mmx" = x"yes" ; then
        ARCHFLAGS="-march=pentium2"
+       proc_error_msg="yes"
    elif test x"$cpu_raw" = x"i686" -a x"$mmx" = x"no" ; then
        ARCHFLAGS="-march=pentiumpro"
+       proc_error_msg="yes"
    elif test x"$cpu_raw" = x"i586" -a x"$mmx" = x"yes" ; then
        ARCHFLAGS="-march=pentium-mmx"
+       proc_error_msg="yes"
    elif test x"$cpu_raw" = x"i586" -a x"$mmx" = x"no" ; then
        ARCHFLAGS="-march=i586"
+       proc_error_msg="yes"
    elif test x"$cpu_raw" = x"i486"; then
        ARCHFLAGS="-march=i486"
+       proc_error_msg="yes"
    elif test x"$cpu_raw" = x"i386"; then
        ARCHFLAGS="-march=i386"
+       proc_error_msg="yes"
    fi
-elif test x"$tune" = x"generic" -a x"$cpu" = x"x86_64"; then
+fi
+if test x"$tune" = x"generic" -a x"$cpu" = x"x86_64" -a x"$cpu_overide" != x"yes"; then
    ARCHFLAGS="-march=k8"
+fi
+
+if test x"$proc_error_msg" = x"yes"; then
+    UNAME_M_INFO=` uname -m 2> /dev/null`
+    UNAME_P_INFO=` uname -p 2> /dev/null`
+    PROC_INFO=`cat /proc/cpuinfo | grep "model name" | head -n 1 | sed s/"\t"//g 2>/dev/null`
+    echo ""
+    echo " *** WARNING *** "
+    echo " Your CPU was not detected properly:"
+    echo "   uname -m: $UNAME_M_INFO"
+    echo "   uname -p: $UNAME_P_INFO"
+    echo " $PROC_INFO"
+    echo ""
+    echo " If you are using a recent CVS checkout, "
+    echo " please e-mail the above to mythtv-dev@mythtv.org"
+    echo " With a subject \"configure did not detect my cpu\""
+    echo ""
 fi
 
 # if arch flag is present ignore tune and cpu and just use arch
@@ -1533,14 +1604,16 @@ fi
 if test x"$xvmc_vld" = x"yes" ; then
     xvmc_vld="no"
     if test x`ls /usr/X11R6/lib/libviaXvMC.* 2> /dev/null | head -n 1` != x"" ; then
-        VENDOR_XVMC_LIBS="-lviaXvMC"
+        if test x"$cpu_raw" = x"c3" -o x"$cpu_raw" = x"c3-2" ; then
+            xvmc_vld="yes"
+        fi
     fi
-    if test x"$VENDOR_XVMC_LIBS" = x"-lviaXvMC" ; then
+    if test x"$xvmc_vld" = x"yes" ; then
         if test x`ls /usr/X11R6/lib/libXvMCW.* 2> /dev/null | head -n 1` != x"" ; then
             VENDOR_XVMC_LIBS="-lXvMCW"
+        else
+            VENDOR_XVMC_LIBS="-lviaXvMC"
         fi
-
-        xvmc_vld="yes"
         xvmc="yes"
     fi
 fi
@@ -1566,7 +1639,13 @@ echo "Install prefix   $prefix"
 #echo "Source path      $source_path"
 #echo "C compiler       $cc"
 #echo "make             $make"
-echo "CPU              $cpu ($processor)"
+if test x"$processor" != x"" ; then
+    echo "CPU              $cpu ($processor)"
+elif test x"$cpu_raw" != x"" ; then
+    echo "CPU              $cpu ($cpu_raw)"
+else
+    echo "CPU              $cpu"
+fi
 echo "Big Endian       $bigendian"
 #echo "inttypes.h       $inttypes"
 #echo "broken inttypes.h $emu_fast_int"
@@ -1680,6 +1759,7 @@ echo "ARCHFLAGS=$ARCHFLAGS" >> config.mak
 echo "PROFILEFLAGS=$PROFILEFLAGS" >> config.mak
 echo "OPTFLAGS=$CFLAGS" >> config.mak
 echo "ECFLAGS=$ECFLAGS" >> config.mak
+echo "ECXXFLAGS=$ECXXFLAGS" >> config.mak
 #echo "SHCFLAGS=$SHCFLAGS">>config.mak
 #echo "LDFLAGS=$LDFLAGS" >> config.mak
 #echo "FFSLDFLAGS=$FFSLDFLAGS" >> config.mak
