@@ -65,7 +65,12 @@ package nuv_utils;
 		my $file = shift;
 		my(%info, $buffer);
 	# open the file
-		open(DATA, "$main::video_dir/$file") or die "Can't open $file:  $!\n\n";
+        if (-e $main::video_dir and -e "$main::video_dir/$file") {
+            open(DATA, "$main::video_dir/$file") or die "Can't open $file:  $!\n\n";
+        }
+        else {
+            open(DATA, $file) or die "Can't open $file:  $!\n\n";
+        }
 	# Read the file info header
 		read(DATA, $buffer, 72);
 	# Unpack the data structure
@@ -163,7 +168,7 @@ package nuv_utils;
 		if ($program =~ /tcprobe$/) {
 			my $data = `$program -i '$file'`;
 			($info{width}, $info{height}) = $data =~ /frame\s+size:\s+-g\s+(\d+)x(\d+)\b/m;
-			($info{fps})                  = $data =~ /frame\s+rate:\s+-f\s+(\d+(?:\.\s+)?)\b/m;
+			($info{fps})                  = $data =~ /frame\s+rate:\s+-f\s+(\d+(?:\.\d+)?)\b/m;
 			($info{audio_sample_rate})    = $data =~ /audio\s+track:.+?-e\s+(\d+)\b/m;
 		}
 	# Grab tcmplex info
