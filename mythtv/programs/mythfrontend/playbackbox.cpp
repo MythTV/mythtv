@@ -564,9 +564,8 @@ void PlaybackBox::updateUsage(QPainter *p)
         usestr = usestr + tr("% used");
 
         QString rep;
-        rep.sprintf(tr(", %d,%03d MB free"), 
-                    (freeSpaceTotal - freeSpaceUsed) / 1000, 
-                    (freeSpaceTotal - freeSpaceUsed) % 1000);
+        rep.sprintf(tr(", %0.2f GB free"),
+                    (freeSpaceTotal - freeSpaceUsed) / 1024.0);
         usestr = usestr + rep;
 
         QRect pr = usageRect;
@@ -736,8 +735,8 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                          tempTime = (tempInfo->startts).toString(showTimeFormat);
 
                          long long size = tempInfo->filesize;
-                         long int mbytes = size / 1024 / 1024;
-                         tempSize = QString("%1 MB").arg(mbytes);
+                         tempSize.sprintf("%0.2f GB",
+                                          size / 1024.0 / 1024.0 / 1024.0);
 
                          if (cnt == curShowing)
                          {
@@ -1431,7 +1430,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, int types)
     const char *tmpslot;
 
     if ((types == 1 || types == 2) &&
-        (program->subtitle != "" || program->description != ""))
+        (program->subtitle != "" && program->description != ""))
     {
 
         tmpmessage = tr("Yes; allow re-recording"); 
