@@ -48,6 +48,9 @@ private:
     void setupView();
 
     MythSpinBox        *zoom;
+    MythSpinBox        *scrollspeed;
+    MythCheckBox       *scrollmode;
+    MythCheckBox       *hidescrollbars;
     MythLineEdit       *browser;
     QSqlDatabase       *myDb;
     MythListView       *myBookmarksView;

@@ -193,6 +193,11 @@ BookmarksConfig::~BookmarksConfig()
 //    delete myTree;
     gContext->SaveSetting("WebBrowserZoomLevel", zoom->value());
     gContext->SaveSetting("WebBrowserCommand", browser->text());
+    gContext->SaveSetting("WebBrowserScrollMode", 
+                                               scrollmode->isChecked()?1:0);
+    gContext->SaveSetting("WebBrowserScrollSpeed", scrollspeed->value());
+    gContext->SaveSetting("WebBrowserHideScrollbars", 
+                                               hidescrollbars->isChecked()?1:0);
 }
 
 
@@ -278,11 +283,11 @@ void BookmarksConfig::setupView()
     hbox2->addWidget(zoomLabel);
 
     zoom = new MythSpinBox(this);
-    zoom->setMinValue(30);
+    zoom->setMinValue(20);
     zoom->setMaxValue(300);
     zoom->setLineStep(5);
     hbox2->addWidget(zoom);
-    zoom->setValue(gContext->GetNumSetting("WebBrowserZoomLevel", 200));
+    zoom->setValue(gContext->GetNumSetting("WebBrowserZoomLevel", 20));
 
     QLabel *browserLabel = new QLabel(this);
     browserLabel->setText("Browser:");
@@ -295,6 +300,35 @@ void BookmarksConfig::setupView()
     hbox2->addWidget(browser);
     //    browser->setText(gContext->GetSetting("WebBrowserCommand", "/usr/local/bin/mythbrowser"));
     browser->setText(gContext->GetSetting("WebBrowserCommand", PREFIX "/bin/mythbrowser"));
+
+    // Scroll Settings 
+    QHBoxLayout *hbox3 = new QHBoxLayout(vbox);
+
+    hidescrollbars = new MythCheckBox(this);
+    hidescrollbars->setText("Hide Scrollbars");
+    hidescrollbars->setChecked(gContext->GetNumSetting(
+                                                "WebBrowserHideScrollbars", 0) 
+             == 1);
+    hbox3->addWidget(hidescrollbars);
+
+    scrollmode = new MythCheckBox(this);
+    scrollmode->setText("Scroll Page");
+    scrollmode->setChecked(gContext->GetNumSetting("WebBrowserScrollMode", 1) 
+             == 1);
+    hbox3->addWidget(scrollmode);
+
+    QLabel *label = new QLabel(this);
+    label->setText("Scroll Speed:");
+    label->setBackgroundOrigin(QWidget::WindowOrigin);
+    label->setBackgroundOrigin(QWidget::WindowOrigin);
+    hbox3->addWidget(label);
+
+    scrollspeed = new MythSpinBox(this);
+    scrollspeed->setMinValue(1);
+    scrollspeed->setMaxValue(8);
+    scrollspeed->setLineStep(1);
+    hbox3->addWidget(scrollspeed);
+    scrollspeed->setValue(gContext->GetNumSetting("WebBrowserScrollSpeed", 4));
 
     // Add new bookmark ------------------------------------
     QHBoxLayout *hbox = new QHBoxLayout(vbox);

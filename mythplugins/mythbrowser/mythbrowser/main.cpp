@@ -38,6 +38,8 @@ QSqlDatabase* db;
 
 int main(int argc, char **argv)
 {
+    int x = 0, y = 0;
+    float xm = 0, ym = 0;
     int zoom,width=-1,height=-1;    // defaults
     char usage[] = "Usage: mythbrowser [-z n] [-w n] [-h n] -u URL [URL]";
     QStringList urls;
@@ -79,10 +81,15 @@ int main(int argc, char **argv)
 //    gContext->SetMainWindow(mainWindow);
 //    a.setMainWidget(mainWindow);
 
+    // Obtain width/height and x/y offset from context
+    gContext->GetScreenSettings(x, width, xm, y, height, ym);
+
     TabView *mainWindow = 
         new TabView(db, urls, zoom, width, height, Qt::WStyle_Customize | Qt::WStyle_NoBorder);
     gContext->SetMainWindow(mainWindow);
     a.setMainWidget(mainWindow);
+    mainWindow->setGeometry(x, y, width, height);
+    mainWindow->setFixedSize(QSize(width, height));
     mainWindow->Show();
 
     return a.exec();

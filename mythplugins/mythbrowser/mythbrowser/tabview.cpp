@@ -32,6 +32,7 @@
 #include <kaction.h>
 #include <kstdaction.h>
 #include <khtml_part.h>
+#include <khtmlview.h>
 
 #include "mythtv/mythcontext.h"
 
@@ -52,12 +53,34 @@ TabView::TabView(QSqlDatabase *db, QStringList urls,
     h=height-rect.height();
     f=flags;
 
+    // Qt doesn't give you mousebutton states from QWheelEvent->state()
+    // so we have to remember the last mousebutton press/release state
+    lastButtonState = (ButtonState)0;
+
+    lastPosX = -1;
+    lastPosY = -1;
+    scrollSpeed = gContext->GetNumSetting("WebBrowserScrollSpeed", 4);
+    scrollPage = gContext->GetNumSetting("WebBrowserScrollMode", 1);
+    hideScrollbars = gContext->GetNumSetting("WebBrowserHideScrollbars", 0);
+    if (scrollPage == 1) {
+       scrollSpeed *= -1;  // scroll page vs background
+    }
+
     for(QStringList::Iterator it = urls.begin(); it != urls.end(); ++it) {
         // is rect.height() really the height of the tab in pixels???
         WebPage *page = new WebPage(*it,z,w,h,f);
 	connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs&)),
            this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
         mytab->addTab(page,*it);
+
+/* moved this into show event processing
+        // Hide Scrollbars - Why doesn't this work??? TSH 1/20/04
+        if (hideScrollbars) {
+            KHTMLView* view = page->browser->view();
+            view->setVScrollBarMode(QScrollView::AlwaysOff);
+            view->setHScrollBarMode(QScrollView::AlwaysOff);
+        }
+*/
 
 	QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
 	widgetHistory.append(currWidgetHistory);
@@ -256,6 +279,7 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
     if (event->type() == QEvent::MouseButtonPress) {
         QMouseEvent* me = (QMouseEvent*)event;
 
+        lastButtonState = me->stateAfter(); 
         if(me->button() == Qt::RightButton) {
             if(menuIsOpen)
                 emit closeMenu();
@@ -263,6 +287,61 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                 emit menuPressed();
             return true;
         }
+    }
+
+    if (event->type() == QEvent::MouseButtonRelease) {
+        QMouseEvent* me = (QMouseEvent*)event;
+        lastButtonState = me->stateAfter(); 
+    }
+
+    QScrollView *view=((WebPage*)mytab->currentPage())->browser->view();
+    if (event->type() == QEvent::Show) {
+        // hide scrollbars - kind of a hack to do it on a show event but 
+        // for some reason I can't get it to work upon creation of the page 
+        //   - TSH
+        if (hideScrollbars) {
+            QScrollView *view=((WebPage*)mytab->currentPage())->browser->view();
+            view->setVScrollBarMode(QScrollView::AlwaysOff);
+            view->setHScrollBarMode(QScrollView::AlwaysOff);
+        }
+    }
+
+    // MouseMove while middlebutton pressed pans page
+    int deltax = 0, deltay = 0;
+    if (event->type() == QEvent::MouseMove) {
+        QMouseEvent* me = (QMouseEvent*)event;
+        lastButtonState = me->stateAfter(); 
+        deltax = me->globalX() - lastPosX;
+        deltay = me->globalY() - lastPosY;
+        deltax *= scrollSpeed;
+        deltay *= scrollSpeed;
+        if (lastPosX != -1 
+//            && (lastButtonState & (LeftButton|AltButton)) 
+            && (lastButtonState & (MidButton|AltButton)) 
+            && !view->isHorizontalSliderPressed()
+            && !view->isVerticalSliderPressed() ) 
+        {
+            view->scrollBy(deltax, deltay);
+        }
+        lastPosX = me->globalX();
+        lastPosY = me->globalY();
+    }
+
+    // MouseWheel scrolling while middlebutton/ctrlkey pressed to zoom in/out
+    if (event->type() == QEvent::Wheel) {
+        QWheelEvent* we = (QWheelEvent*)event;
+        if (lastButtonState & MidButton || we->state() & AltButton) {
+            if (we->delta() > 0) {
+                we->accept();
+                ((WebPage*)mytab->currentPage())->zoomIn();
+                return true;
+            } else if (we->delta() < 0)  {
+                we->accept();
+                ((WebPage*)mytab->currentPage())->zoomOut();
+                return true;
+            }
+        }
+
     }
 
     if(menuIsOpen)

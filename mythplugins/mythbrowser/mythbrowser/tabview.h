@@ -78,6 +78,13 @@ private:
 
     QPtrList<WIDGET_HISTORY> widgetHistory;
     QPtrList<URL_HISTORY> urlHistory;
+
+    ButtonState lastButtonState;
+    int lastPosX; 
+    int lastPosY; 
+    int scrollSpeed;
+    int scrollPage;
+    int hideScrollbars;
 };
 
 class PopupBox : public QDialog

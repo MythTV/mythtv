@@ -56,7 +56,13 @@ make install
   First you have to enter the MythBrowser Settings to define your favorite
 webpages and groups. This is also where you can adjust the zoom level of the
 fonts on the webpages as well as define the command to execute mythbrowser
-(default: PREFIX+/bin/mythbrowser). Then exit setup.
+(default: PREFIX+/bin/mythbrowser). The Zoom Level is a percentage between 
+20 (smaller text) and 300 (larger text).  Check 'Scroll Page' to drag the 
+page within the background when moving the mouse while holding 'Alt' or 
+pressing the middle button.  If 'Scroll Page' is unchecked then the 
+background will be dragged instead of the page.  Set the 'Scroll Speed' 
+to a value according to how fast you want this mouse-scrolling to 
+scroll.  Then exit setup.
 
   In the MythBrowser screen you can then select a webpage to display. If
 you select (SPACE/Enter) on a group the browser will be startet with all
@@ -76,6 +82,11 @@ Page Navigation:
   PrintScreen		Popup Menu
 
   Right mouse button    Popup Menu
+  
+  MouseScroll + MidBut  Scroll Page/Background (depending on settings) 
+  MouseScroll + AltBut  Scroll Page/Background (depending on settings)
+  WheelScroll + MidBut  Zoom Page 
+  WheelScroll + AltBut  Zoom Page 
 
 The popup menu (PrintScreen Button) allows to switch between tabs as well.
 Furthermore it features a Back menu item, as well as a zoomin and zoomout
