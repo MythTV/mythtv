@@ -380,8 +380,7 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
             }
             else
             {
-                // set the end time to tomorrow, midnight.
-                (*cur).end.setTime(0, 0);
+                (*cur).end.setTime(QTime(0, 0));
                 (*cur).end.setDate((*cur).end.date().addDays(1));
 
                 (*cur).endts = (*cur).end.toString("yyyyMMddhhmmss").ascii();
