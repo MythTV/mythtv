@@ -52,7 +52,6 @@ class DaapServer: public MFDServicePlugin
     QIntDict<AudioMetadata>  *current_metadata;
     QString service_name;
 
-    bool    first_update;
 };
 
 #endif  // daapserver_h_

@@ -18,7 +18,7 @@ RUN:
     to stop it:  mfdctl stop
 
     You can just CTRL-C the daemon, but other zeroconfig-aware applications
-will not know that's gone away.
+will not know that it has gone away.
 
 
 
@@ -36,7 +36,7 @@ the latter a "capability".
 
 Every plugin (can! must?) run as a separate thread. They can and do create
 their own sub-threads. Any information they want to pass up to the mfd is
-send by QCustomEvents (see events.h/.cpp).
+send by QCustomEvents (see mfd_events.h/.cpp in mfdlib).
 
 The mfd itself speaks a protocol called mfdp (mfd protocol). This is a
 classic example of YAMUP (yet another made up protocol). The audio plugin

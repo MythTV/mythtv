@@ -107,7 +107,7 @@ class MetadataContainer
     QIntDict<AudioMetadata>* getCurrentMetadata();
     void                     lockMetadata();
     void                     unlockMetadata();
-    int                      getCurrentGeneration(){return 3;}  // HACK
+    uint                     getCurrentGeneration(){return 3;}  // HACK
     uint                     getMetadataCount();
     uint                     getMP3Count();
     

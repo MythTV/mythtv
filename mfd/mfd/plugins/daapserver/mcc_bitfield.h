@@ -17,10 +17,10 @@
 
 
 //
-//  In DAAP, a client can pass an argument called "meta" which is (possibly
-//  very long) list of content codes. It's basically the way the request
-//  describes what kind of data it wants back from the server. These codes
-//  are used in the DaapRequest object (and, in building the response)
+//  In DAAP, a client can pass an argument called "meta" which is a
+//  (possibly very long) list of content codes. It's basically the way the
+//  request describes what kind of data it wants back from the server. These
+//  codes are used in the DaapRequest object (and, in building the response)
 //
 
 

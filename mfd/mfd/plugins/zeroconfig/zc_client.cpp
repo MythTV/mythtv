@@ -582,7 +582,7 @@ void ZeroConfigClient::run()
         }
         timeout.tv_sec = seconds_to_wait;
         timeout.tv_usec = usecs_to_wait;
-
+        
 		nfds = 0;
 		FD_ZERO(&readfds);
 		mDNSPosixGetFDSet(&mDNSStorage, &nfds, &readfds, &timeout);
@@ -590,8 +590,15 @@ void ZeroConfigClient::run()
 		//
 		//  The mDNS code (immediately above) generally will have set the
 		//  timeout to something it wants. We have to tell our watching
-		//  thread to sit in it's select() call for that long.
+		//  thread to sit in it's select() call for that long. But we put an
+		//  upper bound on it so that we can get out if we're shutting down
+		//  or reloading.
 		//
+
+        if(timeout.tv_sec > 10)
+        {
+            timeout.tv_sec = 10;
+        }
 
 		fd_watcher->setTimeout(timeout.tv_sec, timeout.tv_usec);
 

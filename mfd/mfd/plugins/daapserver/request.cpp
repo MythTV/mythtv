@@ -21,6 +21,7 @@ using namespace std;
 DaapRequest::DaapRequest()
 {
     request_type = DAAP_REQUEST_NOREQUEST;
+    client_type = DAAP_CLIENT_UNKNOWN;
     session_id = 0;
     database_version = 0;
     database_delta = 0;

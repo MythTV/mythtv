@@ -49,7 +49,6 @@ extern "C" void parseRequest( httpd *server, void *)
 DaapServer::DaapServer(MFD *owner, int identity)
       :MFDServicePlugin(owner, identity, 3689)
 {
-    first_update = true;
     all_the_metadata = owner->getMetadataContainer();
     
     QString local_hostname = "unknown";
@@ -82,30 +81,6 @@ void DaapServer::run()
     //
 
     httpd *server;
-    //InitParams initParams;
-
-
-    //initParams.serverName = (char *) service_name.ascii();
-    //initParams.dbName = (char *) service_name.ascii();
-
-    //int argc = 0;
-    //char *argv[1];
-    //argv[0] = "";
-
-    //initParams = *getConfigFile( argc, argv, initParams );
-    //initParams = *readConfig( initParams );
-    //initParams = *parseArgs( argc, argv, initParams );
-
-    //if( initParams.dirs->size() == 0 ) {
-    //    std::string dir( "." );
-    //    initParams.dirs->push_back( dir );
-    //}
-
-    //cout << "scanning " << initParams.dirs << " for mp3s... " << flush;
-    //Database db( initParams );
-    //cout << "done. " << endl;
-
-
 
     server = httpdCreate(NULL, 3689);
     if(!server)
@@ -113,11 +88,17 @@ void DaapServer::run()
         fatal("daapserver could not create a persistent http server ... will be unloaded");
     }
 
+    //
+    //  You can uncomment these to get libhttp to log to the console
+    //
+
     //httpdSetAccessLog( server, stdout );
     //httpdSetErrorLog( server, stderr );
 
-    // we do all URL parsing ourselves
-    // httpdAddCSiteContent( server, parseRequest, (void*)&db );
+    //
+    // Tell libhttp we want to parse all requests ourself
+    //
+    
     httpdAddCSiteContent( server, parseRequest, (void*)0);
     httpdSetContentType( server, "application/x-dmap-tagged" );
 
@@ -154,6 +135,8 @@ void DaapServer::run()
 
 void DaapServer::parseIncomingRequest(httpd *server)
 {
+
+
     //
     //  Create a DaapRequest object that will be built up to understand the
     //  request that has just come in from a client
@@ -183,53 +166,80 @@ void DaapServer::parseIncomingRequest(httpd *server)
     else if( daap_request->getRequestType() == DAAP_REQUEST_SERVINFO )
     {
         sendServerInfo(server);
+        return;
     }   
     else if( daap_request->getRequestType() == DAAP_REQUEST_LOGIN)
     {
         u32 session_id = daap_sessions.getNewId();
-        sendLogin( server, session_id);    
+        sendLogin( server, session_id);
+        return;
     }
-    else if( daap_request->getRequestType() == DAAP_REQUEST_DATABASES)
-    {
-        parseVariables( server, daap_request);
 
+    //
+    //  IF we've made it this far, then we have a logged in client, so we
+    //  should be able to parse the request to get session ID, etc.
+    //
+
+    parseVariables( server, daap_request);
+
+    if(!daap_sessions.isValid(daap_request->getSessionId()))
+    {
         //
-        //  If the session id (which we just parsed immediately above) is
-        //  valid (ie. this client is already logged in), then proceed
+        //  Hmmm ... this isn't right. The DAAP client did not ask for
+        //  server info or a login, but it does not have a valid session id
+        //  (which it can get by requesting a login).
         //
         
-        if(daap_sessions.isValid(daap_request->getSessionId()))
+        httpdSend403( server );
+        return;
+    }
+    
+
+    if( daap_request->getRequestType() == DAAP_REQUEST_DATABASES)
+    {
+        //
+        //  The client wants some kind of metatdata about items or
+        //  containers available (or it wants a specific item to play). Go
+        //  ahead and give it to the client, as long as their version of the
+        //  database is the same as our version. UNLESS, the client passes
+        //  db version of 0, which for some inexplicable reason, is what
+        //  iTunes does when it's actually trying to get a hold of a stream
+        //  for playing.
+        //
+
+        if(daap_request->getDatabaseVersion() != all_the_metadata->getCurrentGeneration() &&
+           daap_request->getDatabaseVersion() != 0)
         {
-            //
-            //  If this is not the first DB request, and the version of the
-            //  database is not the same as our metadata says it is, then we
-            //  need to tell the client it's store of data about *this* daap
-            //  server is out of date.
-            //
+            log(QString("daap client asked for a database request, "
+                        "but has stale db reference "
+                        "(mfd db# = %1, client db# = %2)")
+                        .arg(all_the_metadata->getCurrentGeneration())
+                        .arg(daap_request->getDatabaseVersion()), 9);
 
-            // cout << "daap client requested  db #" << daap_request->getDatabaseVersion() << endl;
-            // cout << "all_the_metadata is at db #" << all_the_metadata->getCurrentGeneration() << endl;
-             
-            
-            if( daap_request->getDatabaseVersion() != 0 && 
-                daap_request->getDatabaseVersion() != 
-                (uint) all_the_metadata->getCurrentGeneration())
-            {
-                sendUpdate(server, all_the_metadata->getCurrentGeneration());
-            }
-            else 
-            {
-                //
-                //  At some point, deal with deltas!!
-                //
-                sendMetadata( server, httpdRequestPath(server), daap_request);
-            }
-
+            sendUpdate(server, all_the_metadata->getCurrentGeneration());
         }
+        else
+        {
+            sendMetadata( server, httpdRequestPath(server), daap_request);
+        }        
+        return;        
     }
     else if (daap_request->getRequestType() == DAAP_REQUEST_UPDATE)
     {
-        sendUpdate(server, all_the_metadata->getCurrentGeneration());
+        //
+        //  iTunes has an annoying habit of just sending these requests. We
+        //  should only respond if the database version numbers are out of
+        //  whack.
+        //
+
+        if(daap_request->getDatabaseVersion() != all_the_metadata->getCurrentGeneration())
+        {
+            log(QString("daap client asked for and will get an update "
+                        "(mfd db# = %1, client db# = %2)")
+                        .arg(all_the_metadata->getCurrentGeneration())
+                        .arg(daap_request->getDatabaseVersion()), 9);
+            sendUpdate(server, all_the_metadata->getCurrentGeneration());
+        }
     }
     
     delete daap_request;
@@ -312,7 +322,7 @@ void DaapServer::sendServerInfo(httpd *server)
     
     TagOutput response;
     
-    response << Tag( 'msrv' ) << Tag('mstt') << (u32) DAAP_OK << end 
+    response << Tag('msrv') << Tag('mstt') << (u32) DAAP_OK << end 
              << Tag('mpro') << dmapVersion << end 
              << Tag('apro') << daapVersion << end 
              << Tag('minm') << service_name.utf8() << end 
@@ -323,27 +333,17 @@ void DaapServer::sendServerInfo(httpd *server)
              << Tag('msau') << (u32) 2 << end 
              <<
 // Disable some features for now
-/*        Tag('mspi') <<
-            (u8) 0 <<
-        end <<
-        Tag('msex') <<
-            (u8) 0 <<
-        end <<
-        Tag('msbr') <<
-            (u8) 0 <<
-        end <<
-        Tag('msqy') <<
-            (u8) 0 <<
-        end <<
-        Tag('msix') <<
-            (u8) 0 <<
-        end <<
-        Tag('msrs') <<
-            (u8) 0 <<
-        end <<
+/*              Tag('mspi') << (u8) 0 << end 
+             << Tag('msex') << (u8) 0 << end 
+             << Tag('msbr') << (u8) 0 << end 
+             << Tag('msqy') << (u8) 0 << end 
+             << Tag('msix') << (u8) 0 << end 
+             << Tag('msrs') << (u8) 0 << end 
+             <<
 */        
-            Tag('msdc') << (u32) 1 << end 
-            << end;
+                Tag('msdc') << (u32) 1 << end 
+             
+             << end;
 
     sendTag( server, response.data() );
     
@@ -370,10 +370,26 @@ void DaapServer::parseVariables(httpd *server, DaapRequest *daap_request)
     httpVar *varPtr;
 
     //
+    //  Check the user agent header that httpd returns to take note of which
+    //  kind of client this is (for iTunes we (will) need to re-encode some
+    //  content on the fly.
+    //
+
+    cout << "The user agent is " << server->request.userAgent << endl;
+
+    QString user_agent = server->request.userAgent;
+    if(user_agent.contains("iTunes/4"))
+    {
+        daap_request->setClientType(DAAP_CLIENT_ITUNES4X);
+    }
+    
+
+    //
     //  This goes through the data that came in on the client request,
     //  breaks it up into useful pieces, and assigns them to our DaapRequest
     //  object
     //
+
 
     if ( ( varPtr = httpdGetVariableByName ( server, "session-id" ) ) != NULL)
     {
@@ -426,6 +442,7 @@ void DaapServer::parseVariables(httpd *server, DaapRequest *daap_request)
 void DaapServer::sendUpdate(httpd *server, u32 database_version)
 {
 
+/*
     //
     //  Terrible HACK (temporary)
     //
@@ -445,6 +462,7 @@ void DaapServer::sendUpdate(httpd *server, u32 database_version)
     }
 
     first_update = false;
+*/
 
     TagOutput response;
 

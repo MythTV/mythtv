@@ -19,6 +19,13 @@
 
 #include "./daaplib/basic.h"
 
+enum DaapClientType {
+    DAAP_CLIENT_UNKNOWN = 0,
+    DAAP_CLIENT_ITUNES4X,
+    DAAP_CLIENT_MFDDAAPCLIENT
+};
+    
+
 enum DaapRequestType {
 	DAAP_REQUEST_NOREQUEST = 0,  
 	DAAP_REQUEST_SERVINFO,
@@ -39,38 +46,41 @@ class DaapRequest
     DaapRequest();
     ~DaapRequest();
 
-    void            setRequestType(DaapRequestType a_type){request_type = a_type;}
-    DaapRequestType getRequestType(){return request_type;}
     void            parseRawMetaContentCodes();
 
     //
     //  Sets
     //
     
-    void        setSessionId(u32 x){session_id = x;}
-    void        setDatabaseVersion(u32 x){database_version = x;}
-    void        setDatabaseDelta(u32 x){database_delta = x;}
-    void        setContentType(const QString &x){content_type = x;}
-    void        setRawMetaContentCodes(const QStringList &x){raw_meta_content_codes = x;}
+    void            setRequestType(DaapRequestType x){request_type = x;}
+    void            setClientType(DaapClientType x){client_type = x;}
+    void            setSessionId(u32 x){session_id = x;}
+    void            setDatabaseVersion(u32 x){database_version = x;}
+    void            setDatabaseDelta(u32 x){database_delta = x;}
+    void            setContentType(const QString &x){content_type = x;}
+    void            setRawMetaContentCodes(const QStringList &x){raw_meta_content_codes = x;}
 
-    void        setFilter(const QString &x);
-    void        setQuery(const QString &x);
-    void        setIndex(const QString &x);
+    void            setFilter(const QString &x);
+    void            setQuery(const QString &x);
+    void            setIndex(const QString &x);
         
     //
     //  Gets
     //
     
-    u32         getSessionId(){return session_id;}
-    u32         getDatabaseVersion(){return database_version;}
-    u32         getDatabaseDelta(){return database_delta;}
-    QString     getContentType(){return content_type;}
-    QStringList getRawMetaContentCodes(){return raw_meta_content_codes;}
-    u64         getParsedMetaContentCodes(){return parsed_meta_content_codes;}
+    DaapRequestType getRequestType(){return request_type;}
+    DaapClientType  getClientType(){return client_type;}
+    u32             getSessionId(){return session_id;}
+    u32             getDatabaseVersion(){return database_version;}
+    u32             getDatabaseDelta(){return database_delta;}
+    QString         getContentType(){return content_type;}
+    QStringList     getRawMetaContentCodes(){return raw_meta_content_codes;}
+    u64             getParsedMetaContentCodes(){return parsed_meta_content_codes;}
 
   private:
   
     DaapRequestType   request_type;
+    DaapClientType    client_type;
     u32               session_id;
     u32               database_version;
     u32               database_delta;
