@@ -21,4 +21,6 @@ validate: mythtv-HOWTO.sgml
 	linuxdoc -B html --split=1 --toc=2 $<
 
 %-singlehtml.html: %.sgml
-	linuxdoc -B html --split=0 --toc=2 $<
+	cp $< $*-singlehtml.sgml
+	linuxdoc -B html --split=0 --toc=2 $*-singlehtml.sgml
+	rm $*-singlehtml.sgml
