@@ -31,7 +31,7 @@
     </message>
     <message>
         <source>SlideShow</source>
-        <translation type="unfinished"></translation>
+        <translation>Diaschau</translation>
     </message>
     <message>
         <source>Rotate CW</source>
@@ -43,11 +43,11 @@
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importieren</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen</translation>
     </message>
 </context>
 <context>
