@@ -17,7 +17,15 @@ url="http://www.mythtv.org" name="http://www.mythtv.org"> by Robert
 Kulagowski <url url="mailto:rkulagow@rocketmail.com">.  (Please note that I
 am <em>NOT</em> the author/programmer of the MythTV application!  See the
 <ref id="contributors" name="contributors"> section below for a list of the
-programmers.) The latest version of this document can be found in CVS,
+programmers.) 
+
+This document is available as a single-page HTML document at <url
+url="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"
+name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
+at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
+name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
+
+The latest version of this document can be found in CVS,
 accessible either through the <url
 url="http://cvs.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web
 interface, or directly from the CVS repository.  You may download the latest
@@ -4209,7 +4217,8 @@ v2.53, 2003-07-13.  Add link to searchable archive right near the top.  Added
 ivtv make.  Moved/added keys.txt to more prominent positions in the HOWTO. 
 Added note that you don't need to transcode .nuv files if they're made by a
 PVR-250/350.  Added example for LVM/ext2 and ext3.  Added note to not run
-XMLTV 0.5.15 if you're not running CVS.
+XMLTV 0.5.15 if you're not running CVS.  Add link in first section to single
+page and PDF version of docs.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
