@@ -264,8 +264,6 @@ public:
         dev.setPath("/dev/sound");
         fillSelectionsFromDir(dev);
     };
-private:
-     static const char* dspdirs[];
 };
 
 // unused
