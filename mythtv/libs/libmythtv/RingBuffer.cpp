@@ -452,16 +452,19 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
 
         if (ret == 0) // EOF returns 0
         {
+            if (tot > 0)
+                break;
+
             zerocnt++;
-            if (zerocnt >= 10)
+            if (zerocnt >= 50) // 3 second timeout with usleep(60000)
             {
                 break;
             }
         }
         if (stopreads)
             break;
-        if(tot < sz)
-           usleep(1000);
+        if (tot < sz)
+            usleep(60000);
     }
     return tot;
 }

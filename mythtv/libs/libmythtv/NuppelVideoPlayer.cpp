@@ -2048,11 +2048,14 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
                 for (it = commBreakMap.begin(); it != commBreakMap.end(); ++it)
                 {
                     if (!deleteMap.contains(it.key()))
+                    {
                         if (it.data() == MARK_COMM_START)
                             AddMark(it.key(), 1);
                         else
                             AddMark(it.key(), 0);
+                    }
                 }
+                UpdateEditSlider();
             }
             break;
         }
