@@ -522,14 +522,16 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
             int dsp_status, soundcardcaps;
             QString audiodevice, audiooutputdevice, querytext;
+            QString cardtype;
 
-            querytext = QString("SELECT audiodevice FROM capturecard "
+            querytext = QString("SELECT audiodevice,cardtype FROM capturecard "
                                 "WHERE cardid=%1;").arg(recnum);
             QSqlQuery query = m_db->exec(querytext);
             if (query.isActive() && query.numRowsAffected())
             {
                 query.next();
                 audiodevice = query.value(0).toString();
+                cardtype = query.value(1).toString();
             }
 
             query = m_db->exec("SELECT data FROM settings WHERE "
@@ -542,7 +544,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
             dblock.unlock();
 
-            if (audiodevice.right(4) == audiooutputdevice.right(4)) //they match
+            if (audiodevice.right(4) == audiooutputdevice.right(4) &&
+                (cardtype == "V4L" || cardtype == "MJPEG")) //they match
             {
                 int dsp_fd = open(audiodevice, O_RDWR | O_NONBLOCK);
                 if (dsp_fd != -1)

@@ -82,3 +82,7 @@ DEFINES += USING_IVTV
 #CONFIG += using_directx
 #DEFINES += USING_DIRECTX
 
+# OpenGL support for vertical retrace sync
+#DEFINES += USING_OPENGL_VSYNC
+#EXTRA_LIBS += -lGL -lGLU
+

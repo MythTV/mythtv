@@ -65,6 +65,7 @@ using_directx {
 
 using_x11 {
     SOURCES += screensaver-x11.cpp
+    LIBS += -L/usr/X11R6/lib -lXinerama
 }
 
 !using_x11 {

@@ -30,7 +30,7 @@
 #include <string.h>
 #include "vsync.h"
 
-#ifndef QWS
+#ifdef USING_OPENGL_VSYNC
 /* OpenGL video sync */
 #define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
@@ -156,7 +156,7 @@ const char *dri_dev = "/dev/dri/card0";
 
 static int nvidia_fd = -1;
 const char *nvidia_dev = "/dev/nvidia0";
-#ifndef QWS
+#ifdef USING_OPENGL_VSYNC
 /* OpenGL video sync */
 static Display *s_sync_display;
 static GLXDrawable s_sync_drawable;
@@ -240,7 +240,7 @@ static int init_try_gl(void)
      * http://www.inb.mu-luebeck.de/~boehme/xvideo_sync.html
      */
     s_glsync_good = 0;
-#ifndef QWS
+#ifdef USING_OPENGL_VSYNC
     s_sync_drawable = 0;
     s_sync_context = 0;
     s_sync_display = NULL;
@@ -272,8 +272,8 @@ static int init_try_gl(void)
             glXMakeCurrent(s_sync_display, s_sync_drawable, s_sync_context);
         }
     }
-    return s_glsync_good;
 #endif
+    return s_glsync_good;
 }
 
 /* Returns:
@@ -331,6 +331,7 @@ void vsync_wait_for_retrace( void )
     } else if (s_glsync_good) {
         unsigned int count;
         int r;
+#ifdef USING_OPENGL_VSYNC
         r = glXMakeCurrent(s_sync_display, s_sync_drawable, s_sync_context);
         //printf("glxmc: %d ", r);
         //glXSwapBuffers(s_sync_display, s_sync_drawable);
@@ -339,6 +340,7 @@ void vsync_wait_for_retrace( void )
         r = glXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
         //printf("glxwvs: %d ", r);
         //printf("Count now %d\n", count);
+#endif
     } else {
         usleep( 2000 );
     }
