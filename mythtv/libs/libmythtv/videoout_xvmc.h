@@ -17,7 +17,7 @@ class VideoOutputXvMC : public VideoOutput
     void Show(void);
 
     void InputChanged(int width, int height, float aspect);
-	void Zoom(int direction);
+    void Zoom(int direction);
     void AspectChanged(float aspect);
 
     void EmbedInWidget(WId wid, int x, int y, int w, int h);

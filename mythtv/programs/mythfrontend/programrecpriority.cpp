@@ -415,12 +415,15 @@ void ProgramRecPriority::edit(void)
 
     if (rec)
     {
+        int recid = 0;
+
         if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
             (rec->GetProgramRecordingStatus(db) > kAllRecord))
         {
             ScheduledRecording record;
             record.loadByProgram(db, rec);
             record.exec(db);
+            recid = record.getRecordID();
         }
         else
         {
@@ -433,7 +436,10 @@ void ProgramRecPriority::edit(void)
         // We need to refetch the recording priority values since the Advanced
         // Recording Options page could've been used to change them 
         QString thequery;
-        int recid = rec->GetScheduledRecording(db)->getRecordID();
+
+        if (!recid)
+            recid = rec->getRecordID(db);
+
         thequery = QString(
                    "SELECT recpriority, type FROM record WHERE recordid = %1;")
                            .arg(recid);

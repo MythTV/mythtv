@@ -110,6 +110,13 @@ class ProgramInfo
         return record;
     };
 
+    int getRecordID(QSqlDatabase *db)
+    {
+        GetProgramRecordingStatus(db);
+        recordid = record->getRecordID();
+        return recordid;
+    }
+
     void StartedRecording(QSqlDatabase *db);
     void FinishedRecording(QSqlDatabase* db);
 
@@ -227,7 +234,7 @@ class ProgramInfo
     bool recording;
     int override;
     RecStatusType recstatus;
-    unsigned recordid;
+    int recordid;
     RecordingType rectype;
     RecordingDupInType dupin;
     RecordingDupMethodType dupmethod;
