@@ -90,6 +90,8 @@ void Metadata::setField(QString field, QString data)
         title = data;
     else if (field == "genre")
         genre = data;
+    else if (field == "filename")
+        filename = data;
     else if (field == "year")
         year = data.toInt();
     else if (field == "tracknum")
