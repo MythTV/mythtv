@@ -1781,7 +1781,7 @@ void GenericTree::init()
 
 GenericTree* GenericTree::addNode(QString a_string)
 {
-    GenericTree *new_node = new GenericTree(a_string);
+    GenericTree *new_node = new GenericTree(a_string.stripWhiteSpace());
     new_node->setParent(this);
     my_subnodes.append(new_node);
     my_ordered_subnodes.append(new_node);
@@ -1791,7 +1791,7 @@ GenericTree* GenericTree::addNode(QString a_string)
 
 GenericTree* GenericTree::addNode(QString a_string, int an_int)
 {
-    GenericTree *new_node = new GenericTree(a_string);
+    GenericTree *new_node = new GenericTree(a_string.stripWhiteSpace());
     new_node->setInt(an_int);
     new_node->setParent(this);
     my_subnodes.append(new_node);
@@ -1801,7 +1801,7 @@ GenericTree* GenericTree::addNode(QString a_string, int an_int)
 
 GenericTree* GenericTree::addNode(QString a_string, int an_int, bool selectable_flag)
 {
-    GenericTree *new_node = new GenericTree(a_string);
+    GenericTree *new_node = new GenericTree(a_string.stripWhiteSpace());
     new_node->setInt(an_int);
     new_node->setParent(this);
     new_node->setSelectable(selectable_flag);
