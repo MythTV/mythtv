@@ -23,7 +23,7 @@ extern "C" {
 #include "../libvbitext/vbi.h"
 }
 
-#include <linux/videodev.h>
+#include "videodev_myth.h"
 
 #ifndef MJPIOC_S_PARAMS
 #include "videodev_mjpeg.h"
@@ -33,14 +33,6 @@ extern "C" {
 
 #include "RingBuffer.h"
 #include "RTjpegN.h"
-
-#ifdef HAVE_V4L2
-#ifdef V4L2_CAP_VIDEO_CAPTURE
-#define USING_V4L2 1
-#else
-#warning old broken version of v4l2 detected.
-#endif
-#endif
 
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -673,7 +665,6 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-#ifdef USING_V4L2
     usingv4l2 = true;
 
     struct v4l2_capability vcap;
@@ -696,6 +687,8 @@ void NuppelVideoRecorder::StartRecording(void)
         usingv4l2 = false;
     }
 
+    usingv4l2 = false;
+
     if (usingv4l2)
     {
         channelfd = open(videodevice.ascii(), O_RDWR);
@@ -710,7 +703,6 @@ void NuppelVideoRecorder::StartRecording(void)
         DoV4L2();
         return;
     }
-#endif
 
     channelfd = fd;
 
@@ -876,7 +868,6 @@ void NuppelVideoRecorder::StartRecording(void)
 
 void NuppelVideoRecorder::DoV4L2(void)
 {
-#ifdef USING_V4L2
     struct v4l2_format     vfmt;
     struct v4l2_buffer     vbuf;
     struct v4l2_requestbuffers vrbuf;
@@ -1022,7 +1013,6 @@ again:
     {
         munmap(buffers[i], bufferlen[i]);
     }
-#endif
 
     KillChildren();
 

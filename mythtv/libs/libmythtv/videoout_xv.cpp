@@ -229,8 +229,10 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
                       &XJ_screenx, &XJ_screeny, 
                       &XJ_screenwidth, &XJ_screenheight);
 
-    curx = XJ_screenx + 4; cury = XJ_screeny + 20;
-    curw = XJ_width; curh = XJ_height;
+    oldx = curx = XJ_screenx + 4; 
+    oldy = cury = XJ_screeny + 20;
+    oldw = curw = XJ_width;
+    oldh = curh = XJ_height;
 
     // if non-XV mode then run @ GUI size
     if ( xv_port == -1 )

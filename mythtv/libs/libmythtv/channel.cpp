@@ -6,21 +6,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
-#include <linux/videodev.h>
+#include "videodev_myth.h"
 #include "channel.h"
 #include "frequencies.h"
 #include "tv.h"
 
 #include <iostream>
 using namespace std;
-
-#ifdef HAVE_V4L2
-#ifdef V4L2_CAP_VIDEO_CAPTURE
-#define USING_V4L2 1
-#else
-#warning old broken version of v4l2 detected.
-#endif
-#endif
 
 Channel::Channel(TVRec *parent, const QString &videodevice)
 {
@@ -57,7 +49,6 @@ bool Channel::Open(void)
          return false;
     }
 
-#ifdef USING_V4L2
     struct v4l2_capability vcap;
     memset(&vcap, 0, sizeof(vcap));
     if (ioctl(videofd, VIDIOC_QUERYCAP, &vcap) < 0)
@@ -67,7 +58,7 @@ bool Channel::Open(void)
         if (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE)
             usingv4l2 = true;
     }
-#endif
+
     return isopen;
 }
 
@@ -86,7 +77,6 @@ void Channel::SetFormat(const QString &format)
     if (!isopen)
         return;
    
-#ifdef USING_V4L2
     if (usingv4l2)
     {
         struct v4l2_input vin;
@@ -124,7 +114,6 @@ void Channel::SetFormat(const QString &format)
                                        externalChanger);
         return;
     }
-#endif
  
     int mode = VIDEO_MODE_AUTO;
     struct video_tuner tuner;
@@ -248,7 +237,6 @@ bool Channel::TuneTo(const QString &chan, int finetune)
     int i = GetCurrentChannelNum(chan);
     int frequency = curList[i].freq * 16 / 1000 + finetune;
 
-#ifdef USING_V4L2
     if (usingv4l2)
     {
         struct v4l2_frequency vf;
@@ -263,7 +251,6 @@ bool Channel::TuneTo(const QString &chan, int finetune)
         }
         return true;
     }
-#endif
 
     if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
     {
@@ -427,7 +414,6 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
     if (newcapchannel == currentcapchannel)
         return;
 
-#ifdef USING_V4L2
     if (usingv4l2)
     {
         if (ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel) < 0)
@@ -437,7 +423,6 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
             perror("VIDIOC_S_STD");
     }
     else
-#endif
     {
         struct video_channel set;
         memset(&set, 0, sizeof(set));

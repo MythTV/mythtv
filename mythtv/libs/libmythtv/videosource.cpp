@@ -15,15 +15,7 @@
 #include <stdlib.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
-#include <linux/videodev.h>
-
-#ifdef HAVE_V4L2
-#ifdef V4L2_CAP_VIDEO_CAPTURE
-#define USING_V4L2 1
-#else
-#warning old broken version of v4l2 detected.
-#endif
-#endif
+#include "videodev_myth.h"
 
 QString VSSetting::whereClause(void) {
     return QString("sourceid = %1").arg(parent.getSourceID());
@@ -207,11 +199,7 @@ CardType::CardType(const CaptureCard& parent)
 {
     setLabel("Card type");
     addSelection("Standard V4L or MJPEG capture card", "V4L");
-#ifdef USING_V4L2
     addSelection("Hardware MPEG Encoder card", "MPEG");
-#else
-    addSelection("No V4L2 support, Hardware MPEG disabled", "");
-#endif
 };
 
 void CardInput::loadByID(QSqlDatabase* db, int inputid) {
@@ -335,7 +323,6 @@ QStringList VideoDevice::probeInputs(QString device) {
         return ret;
     }
 
-#ifdef USING_V4L2
     bool usingv4l2 = false;
 
     struct v4l2_capability vcap;
@@ -361,7 +348,6 @@ QStringList VideoDevice::probeInputs(QString device) {
         }
     }
     else
-#endif
     {
         struct video_capability vidcap;
         memset(&vidcap, 0, sizeof(vidcap));
