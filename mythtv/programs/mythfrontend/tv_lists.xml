@@ -7,6 +7,7 @@
       <text lang="SV">Nya titlar</text>
       <text lang="JA">新タイトル</text>
       <text lang="NL">Nieuwe Titels</text>
+      <text lang="FI">Uudet Ohjelmat</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -17,6 +18,7 @@
       <text lang="SV">Filmer</text>
       <text lang="JA">映画</text>
       <text lang="NL">Films</text>
+      <text lang="FI">Elokuvat</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -27,6 +29,7 @@
       <text lang="SV">Kategori</text>
       <text lang="JA">カテゴリー</text>
       <text lang="NL">Categorie</text>
+      <text lang="FI">Kategoriat</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -37,6 +40,7 @@
       <text lang="SV">Kanal</text>
       <text lang="NL">Zender</text>
       <text lang="JA">チャンネル</text>
+      <text lang="FI">Kanavat</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -47,6 +51,7 @@
       <text lang="SV">Tid</text>
       <text lang="JA">時間</text>
       <text lang="DE">Sendezeit</text>
+      <text lang="FI">Aika</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 

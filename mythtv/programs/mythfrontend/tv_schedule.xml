@@ -13,6 +13,7 @@
       <text lang="PT">Guia de Programação</text>
       <text lang="SV">Programguide</text>
       <text lang="JA">番組ガイド</text>
+      <text lang="FI">Ohjelmaopas</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Parilla</alttext>
@@ -39,6 +40,7 @@
       <text lang="PT">Procurar Programa</text>
       <text lang="SV">Programletaren</text>
       <text lang="JA">番組検索</text>
+      <text lang="FI">Ohjelman Etsintä</text>
       <alttext>Finder</alttext>
       <alttext lang="FR">Recherche</alttext>
       <alttext lang="ES">Buscar</alttext>
@@ -59,6 +61,7 @@
       <text lang="SV">Sök ord</text>
       <text lang="NL">Zoek Woorden</text>
       <text lang="JA">単語検索</text>
+      <text lang="FI">Etsi Sanoista</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök</alttext>
       <alttext lang="DE">Wörter</alttext>
@@ -72,6 +75,7 @@
       <text lang="NL">Overzichtslijsten</text>
       <text lang="JA">リスト検索</text>
       <text lang="DE">Listensuche</text>
+      <text lang="FI">Etsi Oppaasta</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>
       <alttext lang="SV">Listor</alttext>
@@ -116,6 +120,7 @@
       <text lang="PT">Gravação Manual</text>
       <text lang="SV">Manuell schemaläggning</text>
       <text lang="JA">手動予約</text>
+      <text lang="FI">Manuaalinen Ajastus</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>

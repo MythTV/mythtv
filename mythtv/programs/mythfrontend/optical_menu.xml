@@ -12,6 +12,7 @@
       <text lang="FR">Lecture DVD</text>
       <text lang="NL">DVD Afspelen</text>
       <text lang="JA">DVD再生</text>
+      <text lang="FI">Toista DVD</text>
       <action>JUMP Play DVD</action>
       <depends>mythdvd</depends>
    </button>
@@ -28,6 +29,7 @@
       <text lang="FR">Lecture VCD</text>
       <text lang="NL">VCD Afspelen</text>
       <text lang="JA">VCD再生</text>
+      <text lang="FI">Toista VCD</text>
       <action>JUMP Play VCD</action>
       <depends>mythdvd</depends>
    </button>
@@ -45,6 +47,7 @@
       <text lang="SV">Importera DVD</text>
       <text lang="FR">Importer un DVD</text>
       <text lang="JA">DVD取込</text>
+      <text lang="FI">Tuo DVD</text>
       <action>JUMP Rip DVD</action>
       <depends>mythdvd</depends>
    </button>
@@ -62,6 +65,7 @@
       <text lang="SV">Importera CD</text>
       <text lang="FR">Importer un CD</text>
       <text lang="JA">CD取込</text>
+      <text lang="FI">Tuo CD</text>
       <action>JUMP Rip CD</action>
       <depends>mythmusic</depends>
    </button>

@@ -13,6 +13,7 @@
       <text lang="PT">Ver Gravações</text>
       <text lang="SV">Visa inspelningar</text>
       <text lang="JA">録画再生</text>
+      <text lang="FI">Katso Nauhoitukset</text>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -28,6 +29,7 @@
      <text lang="FR">Liste des vidéos</text>
      <text lang="NL">Blader door videos</text>
      <text lang="JA">ビデオブラウズ</text>
+     <text lang="FI">Katso Videoita</text>
      <action>JUMP MythVideo</action>
      <depends>mythvideo</depends>
    </button>
@@ -45,6 +47,7 @@
       <text lang="SV">Spela musik</text>
       <text lang="FR">Jouer de la musique</text>
       <text lang="JA">ミュージック再生</text>
+      <text lang="FI">Kuuntele Musiikkia</text>
       <action>JUMP Play music</action>
       <depends>mythmusic</depends>
    </button>
@@ -56,6 +59,7 @@
      <text lang="NL">Radio Luisteren</text>
      <text lang="JA">ラジオ放送</text>
      <text lang="DE">Radio hören</text>
+     <text lang="FI">Kuuntele Radiota</text>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>
    </button>
@@ -73,6 +77,7 @@
      <text lang="PT">Fotos</text>
      <text lang="SV">Bildgalleri</text>
      <text lang="JA">イメージ</text>
+     <text lang="FI">Kuvagalleria</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
    </button>
@@ -90,6 +95,7 @@
      <text lang="PT">Jogos</text>
      <text lang="SV">Spela spel</text>
      <text lang="JA">ゲーム</text>
+     <text lang="FI">Pelit</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>

@@ -13,6 +13,7 @@
       <text lang="PT">Gravação Programada</text>
       <text lang="SV">Schemalägg inspelningar</text>
       <text lang="JA">録画予約</text>
+      <text lang="FI">Ajasta Nauhoituksia</text>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -23,6 +24,7 @@
       <text lang="NL">Prioriteiten</text>
       <text lang="SV">Prioriteter</text>
       <text lang="JA">録画優先順位</text>
+      <text lang="FI">Aseta Prioriteetteja</text>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -39,6 +41,7 @@
       <text lang="PT">Resolver Conflitos</text>
       <text lang="SV">Kommande inspelningar</text>
       <text lang="JA">予約衝突修正</text>
+      <text lang="FI">Tulevat Nauhoitukset</text>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 
@@ -55,6 +58,7 @@
       <text lang="PT">Apagar Gravações</text>
       <text lang="SV">Radera inspelningar</text>
       <text lang="JA">録画削除</text>
+      <text lang="FI">Poista Nauhoituksia</text>
       <action>TV_DELETE</action>
    </button>
 
@@ -63,6 +67,7 @@
       <text>Previously Recorded</text>
       <text lang="JA">以前の録画</text>
       <text lang="DE">Alte Aufnahmen</text>
+      <text lang="FI">Aiemmin Nauhoitetut</text>
       <action>TV_PREVIOUS</action>
    </button>
 

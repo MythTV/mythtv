@@ -13,6 +13,7 @@
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
       <text lang="JA">一般</text>
+      <text lang="FI">Yleiset</text>
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -29,6 +30,7 @@
       <text lang="PT">Configurações do Guia</text>
       <text lang="SV">Programguide</text>
       <text lang="JA">番組ガイド</text>
+      <text lang="FI">Ohjelmaopas</text>
       <alttext lang="DE">EPG</alttext>
       <action>SETTINGS EPG</action>
    </button>
@@ -46,6 +48,7 @@
       <text lang="PT">Configurações de Leitura</text>
       <text lang="SV">Uppspelning</text>
       <text lang="JA">再生</text>
+      <text lang="FI">Toisto</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -62,6 +65,7 @@
       <text lang="PT">Configurações de Gravação</text>
       <text lang="SV">Inspelningsprofiler</text>
       <text lang="JA">録画プロフィール</text>
+      <text lang="FI">Nauhoitusprofiilit</text>
       <alttext lang="SV">Inspelning</alttext>
       <alttext lang="DE">Profile</alttext>
       <action>SETTINGS RECORDING</action>
@@ -73,6 +77,7 @@
       <text lang="DE">Aufnahmeprioritäten</text>
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
+      <text lang="FI">Nauhoitusprioriteetit</text>
       <alttext lang="DE">Prioritäten</alttext>
       <action>MENU recpriorities_settings.xml</action>
    </button>

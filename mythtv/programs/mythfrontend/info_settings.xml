@@ -11,6 +11,7 @@
      <text lang="PT">Configurar Meteorologia</text>
      <text lang="SV">Väderinställningar</text>
      <text lang="JA">天気設定</text>
+     <text lang="FI">Sään Asetukset</text>
      <alttext lang="DE">Wetter</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
@@ -25,6 +26,7 @@
      <text lang="NL">Nieuws Instellingen</text>
      <text lang="SV">Nyhetsinställningar</text>
      <text lang="JA">ニュース設定</text>
+     <text lang="FI">Uutisten Asetukset</text>
      <alttext lang="DE">Nachrichten</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
@@ -36,6 +38,7 @@
      <text lang="DE">WWW Einstellungen</text>
      <text lang="SV">Webb-inställningar</text>
      <text lang="JA">Web設定</text>
+     <text lang="FI">Nettiasetukset</text>
      <alttext lang="DE">WWW</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
@@ -47,6 +50,7 @@
      <text lang="SV">ReceptinstÃ¤llningar</text>
      <text lang="JA">レシピ設定</text>
      <text lang="DE">Rezepte Einstellungen</text>
+     <text lang="FI">Reseptiasetukset</text>
      <alttext lang="DE">Rezepte</text>
      <action>CONFIGPLUGIN mythrecipe</action>
      <depends>mythrecipe</depends>

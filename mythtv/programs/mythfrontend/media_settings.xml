@@ -11,6 +11,7 @@
      <text lang="SV">Musikinställningar</text>
      <text lang="JA">ミュージック設定</text>
      <alttext lang="DE">Musik</alttext>
+     <text lang="FI">Musiikkiasetukset</text>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -26,6 +27,7 @@
        <text lang="PT">Configurar Filmes</text>
        <text lang="SV">Videoinställningar</text>
        <text lang="JA">ビデオ設定</text>
+       <text lang="FI">Videoasetukset</text>
        <alttext lang="DE">Videos</alttext>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
@@ -41,6 +43,7 @@
      <text lang="NL">DVD Instellingen</text>
      <text lang="SV">DVD-inställningar</text>
      <text lang="JA">DVD設定</text>
+     <text lang="FI">DVD Asetukset</text>
      <alttext lang="DE">DVD</alttext>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
@@ -57,6 +60,7 @@
       <text lang="PT">Configurar Fotos</text>
       <text lang="SV">Galleriinställningar</text>
       <text lang="JA">イメージ設定</text>
+      <text lang="FI">Kuva-asetukset</text>
       <alttext lang="DE">Photos</alttext>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
@@ -73,6 +77,7 @@
      <text lang="PT">Configurar Jogos</text>
      <text lang="SV">Spelinställningar</text>
      <text lang="JA">ゲーム設定</text>
+     <text lang="FI">Peliasetukset</text>
      <alttext lang="DE">Spiele</alttext>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
@@ -84,6 +89,7 @@
      <text lang="SV">Radioinställningar</text>
      <text lang="JA">ラジオ設定</text>
      <text lang="DE">Radio Einstellungen</text>
+     <text lang="FI">Radioasetukset</text>
      <alttext lang="DE">Radio</alttext>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>

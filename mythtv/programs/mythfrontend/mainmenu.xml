@@ -13,6 +13,7 @@
       <text lang="PT">Ver TelevisÃ£o</text>
       <text lang="SV">Se på TV</text>
       <text lang="JA">TV放送</text>
+      <text lang="FI">Katso TV:tä</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -23,6 +24,7 @@
      <text lang="NL">Media-Center</text>     
      <text lang="SV">Mediabibliotek</text>
      <text lang="JA">メディアライブラリ</text>
+     <text lang="FI">Mediakirjasto</text>
      <action>MENU library.xml</action>
    </button>
    
@@ -39,6 +41,7 @@
       <text lang="PT">Gravação Programada</text>
       <text lang="SV">Hantera inspelningar</text>
       <text lang="JA">録画予約</text>
+      <text lang="FI">Hallitse Nauhoituksia</text>
       <action>MENU manage_recordings.xml</action>
    </button>
 
@@ -49,6 +52,7 @@
      <text lang="NL">Informatiecentrale</text>
      <text lang="SV">Informationscenter</text>
      <text lang="JA">インフォメーションセンター</text>
+     <text lang="FI">Tiedotepalvelu</text>
      <action>MENU info_menu.xml</action>
    </button>
 
@@ -59,6 +63,7 @@
      <text lang="NL">DVD-CD media</text>
      <text lang="SV">Optiska diskar</text>
      <text lang="JA">オプティカルディスク</text>
+     <text lang="FI">DVD ja CD</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
@@ -68,6 +73,7 @@
       <text>Phone</text>
       <text lang="JA">電話</text>
       <text lang="DE">Telephon</text>
+      <text lang="FI">Puhelin</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -85,6 +91,7 @@
      <text lang="PT">Configurações</text>
      <text lang="SV">Verktyg/Inställningar</text>
      <text lang="JA">設定</text>
+     <text lang="FI">Oheis/Asetukset</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <action>MENU util_menu.xml</action>
    </button>
