@@ -140,6 +140,7 @@ While watching a recording:
   - Space/Enter allows you to set or delete a cut point.
   - 'Z' loads the commercial skip list (if one exists) into the cutlist.
   - 'C' and 'Q' clear all cut points in the cutlist.
+  - 'I' inverts the cutlist.
 - X queues the current recording for transcoding.
 - O brings up menu to allow toggling settings such as Commercial Auto-Skip,
     Auto-Expire, etc.
@@ -157,7 +158,7 @@ EPG
   right by one page.
 - The keys 9, 3, 7 and 1 (like a numeric keypad) perform the same as PageUp,
   PageDown, Home and End.
-- I will bring up more information about a show, and allow  you to schedule 
+- I will bring up more information about a show, and allow you to schedule 
   a recording.
   -  If you select "Record this showing" while watching Live TV you can
      "Instant Record" a program.
