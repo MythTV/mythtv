@@ -477,10 +477,16 @@ void NuppelVideoRecorder::StartRecording(void)
     }
 
     if (childrenLive)
+    {
+        cerr << "Error: children are already alive\n";
         return;
+    }
 
     if (SpawnChildren() < 0)
+    {
+        cerr << "Couldn't spawn children\n";
         return;
+    }
 
     // save the start time
     gettimeofday(&stm, &tzone);
@@ -1195,8 +1201,11 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
         return -1;
     }
 
-    if (!ringBuffer->IsOpen()) 
+    if (!ringBuffer->IsOpen())
+    {
+        cerr << "Ringbuffer isn't open\n";
         return -1;
+    }
 
     WriteHeader();
 
@@ -1838,7 +1847,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
     // 'uncountable' video frame drop -> material==worthless
     if (audio_behind > 0) 
     {
-        cerr << "audio behind!!!!!\n";
+        cerr << "audio behind\n";
         frameheader.frametype = 'A'; // audio frame
         frameheader.comptype  = 'N'; // output a nullframe with
         frameheader.packetlength = 0;
