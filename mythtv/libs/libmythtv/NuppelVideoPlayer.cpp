@@ -44,7 +44,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     weMadeBuffer = false;
 
     osd = NULL;
-
     audio_samplerate = 44100;
 }
 
