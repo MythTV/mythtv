@@ -4,13 +4,11 @@
 // warranty, or liability of any kind.
 //
 
+#include <cstdio>
 #include <qobject.h>
 
 #include "output.h"
 #include "visual.h"
-
-#include <stdio.h>
-
 
 OutputListeners::OutputListeners()
 {
@@ -54,14 +52,14 @@ void OutputListeners::error(const QString &e) {
     }
 }
 
-void OutputListeners::addVisual(Visual *v)
+void OutputListeners::addVisual(MythTV::Visual *v)
 {
     if (visuals.find(v) == -1) {
        visuals.append(v);
     }
 }
 
-void OutputListeners::removeVisual(Visual *v)
+void OutputListeners::removeVisual(MythTV::Visual *v)
 {
     visuals.remove(v);
 }
@@ -72,7 +70,7 @@ void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
     if (! buffer)
        return;
 
-    Visual *visual = visuals.first();
+    MythTV::Visual *visual = visuals.first();
     while (visual) {
        visual->mutex()->lock();
        visual->add(buffer, b_len, written, chan, prec);
@@ -84,7 +82,7 @@ void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
 
 void OutputListeners::prepareVisuals()
 {
-    Visual *visual = visuals.first();
+    MythTV::Visual *visual = visuals.first();
     while (visual) {
        visual->mutex()->lock();
        visual->prepare();

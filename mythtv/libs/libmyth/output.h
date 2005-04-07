@@ -13,9 +13,9 @@ class OutputEvent;
 #include <qthread.h>
 #include <qevent.h>
 #include <qptrlist.h>
+#include <visual.h>
 
 class QObject;
-class Visual;
 class Buffer;
 
 class OutputEvent : public QCustomEvent
@@ -76,8 +76,8 @@ public:
     void addListener(QObject *);
     void removeListener(QObject *);
 
-    void addVisual(Visual *);
-    void removeVisual(Visual *);
+    void addVisual(MythTV::Visual *);
+    void removeVisual(MythTV::Visual *);
     
     QMutex *mutex() { return &mtx; }
 
@@ -94,7 +94,7 @@ protected:
 private:
     QMutex mtx;
     QPtrList<QObject> listeners;
-    QPtrList<Visual> visuals;
+    QPtrList<MythTV::Visual> visuals;
     
     unsigned int bufsize;
 };

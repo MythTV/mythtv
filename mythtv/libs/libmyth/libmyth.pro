@@ -18,7 +18,7 @@ HEADERS += uilistbtntype.h uiphoneentry.h generictree.h screensaver.h
 HEADERS += managedlist.h DisplayRes.h volumebase.h audiooutputbase.h
 HEADERS += dbsettings.h screensaver-null.h output.h visual.h
 HEADERS += langsettings.h audiooutputnull.h
-HEADERS += DisplayResScreen.h util-x11.h
+HEADERS += DisplayResScreen.h util-x11.h mythdeque.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp

@@ -11,7 +11,8 @@
 
 class Decoder;
 class AudioOutput;
-
+namespace MythTV
+{
 class Visual
 {
 public:
@@ -35,6 +36,6 @@ private:
     AudioOutput *out;
     QMutex mtx;
 };
-
+};
 
 #endif // __visual_h
