@@ -3167,15 +3167,21 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
 
         if (elink != NULL)
         {
+            isLocal = elink->isLocal();
+
             QDomElement encoder = pDoc->createElement("Encoder");
             encoders.appendChild(encoder);
 
             encoder.setAttribute("id"            , elink->getCardId()       );
             encoder.setAttribute("local"         , isLocal                  );
-            encoder.setAttribute("hostname"      , gContext->GetHostName()  );
             encoder.setAttribute("connected"     , elink->isConnected()     );
             encoder.setAttribute("state"         , elink->GetState()        );
             encoder.setAttribute("lowOnFreeSpace", elink->isLowOnFreeSpace());
+
+            if (isLocal)
+                encoder.setAttribute("hostname", gContext->GetHostName());
+            else
+                encoder.setAttribute("hostname", elink->getHostname());
 
             if (elink->isConnected())
                 numencoders++;

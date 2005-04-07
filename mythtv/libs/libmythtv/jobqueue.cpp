@@ -267,6 +267,20 @@ void JobQueue::ProcessQueue(void)
 
                 QString key = QString("%1_%2").arg(chanid).arg(startts);
 
+                // Should we even be looking at this job?
+                if ((inTimeWindow) &&
+                    (hostname != "") &&
+                    (hostname != m_hostname))
+                {
+                    message = QString("JobQueue: Skipping '%1' job for chanid "
+                                      "%2 @ %3, should run on '%4' instead")
+                                      .arg(JobText(type))
+                                      .arg(chanid).arg(startts)
+                                      .arg(hostname);
+                    VERBOSE(VB_JOBQUEUE, message);
+                    continue;
+                }
+
                 // Check to see if there was a previous job that is not done
                 if ((inTimeWindow) &&
                     (jobStatus.contains(key)) &&
@@ -283,20 +297,8 @@ void JobQueue::ProcessQueue(void)
                 }
 
                 jobStatus[key] = status;
-               
-                if ((inTimeWindow) &&
-                    (hostname != "") &&
-                    (hostname != m_hostname))
-                {
-                    message = QString("JobQueue: Skipping '%1' job for chanid "
-                                      "%2 @ %3, should run on '%4' instead")
-                                      .arg(JobText(type))
-                                      .arg(chanid).arg(startts)
-                                      .arg(hostname);
-                    VERBOSE(VB_JOBQUEUE, message);
-                    continue;
-                }
 
+                // Are we allowed to run this job?
                 if ((inTimeWindow) && (!AllowedToRun(jobs[x])))
                 {
                     message = QString("JobQueue: Skipping '%1' job for chanid "

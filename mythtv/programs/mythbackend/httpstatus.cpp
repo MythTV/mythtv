@@ -283,6 +283,8 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
                 if ((sIsLocal == "remote") && !bConnected)
                 {
                     os << " (currently not connected).<br />";
+
+                    node = node.nextSibling();
                     continue;
                 }
 

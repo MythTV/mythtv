@@ -3642,6 +3642,9 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
 
     usecPerFrame = (long)(1.0 / video_frame_rate * 1000000);
 
+    if (watchingrecording)
+        totalFrames = 0;
+
     while (!eof)
     {
         if (watchingrecording)
