@@ -756,6 +756,20 @@ class HostComboBox: public ComboBoxSetting, public HostSetting {
     HostComboBox(const QString &name, bool rw = false) :
         ComboBoxSetting(rw),
         HostSetting(name) { }
+    virtual ~HostComboBox() { ; }
+};
+
+class HostRefreshRateComboBox: virtual public HostComboBox
+{
+    Q_OBJECT
+  public:
+    HostRefreshRateComboBox(const QString &name, bool rw = false) :
+        HostComboBox(name, rw) { ; }
+    virtual ~HostRefreshRateComboBox() { ; }
+  public slots:
+    virtual void ChangeResolution(const QString& resolution);
+  private:
+    static const vector<short> GetRefreshRates(const QString &resolution);
 };
 
 class HostTimeBox: public ComboBoxSetting, public HostSetting {

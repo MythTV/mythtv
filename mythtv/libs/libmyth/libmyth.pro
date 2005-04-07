@@ -18,6 +18,7 @@ HEADERS += uilistbtntype.h uiphoneentry.h generictree.h screensaver.h
 HEADERS += managedlist.h DisplayRes.h volumebase.h audiooutputbase.h
 HEADERS += dbsettings.h screensaver-null.h output.h visual.h
 HEADERS += langsettings.h audiooutputnull.h
+HEADERS += DisplayResScreen.h util-x11.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
@@ -28,6 +29,7 @@ SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp
 SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
 SOURCES += langsettings.cpp mythdbcon.cpp audiooutputnull.cpp
+SOURCES += DisplayResScreen.cpp util-x11.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../..
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
@@ -66,23 +68,21 @@ unix {
 }
 
 macx {
-    # OS X specific audio layer
-    SOURCES        += audiooutputca.cpp
-    HEADERS        += audiooutputca.h
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/CoreAudio.framework/Frameworks
-    LIBS           += -framework CoreAudio
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/AudioUnit.framework/Frameworks
-    LIBS           += -framework AudioUnit
+    HEADERS += audiooutputca.h   screensaver-osx.h   DisplayResOSX.h
+    SOURCES += audiooutputca.cpp screensaver-osx.cpp DisplayResOSX.cpp
 
-    HEADERS        += screensaver-osx.h   DisplayResOSX.h
-    SOURCES        += screensaver-osx.cpp DisplayResOSX.cpp
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
-    LIBS           += -framework ApplicationServices
-
-    # We use HIToolbox from Carbon to hide the menu bar
+    # Mac OS X Frameworks
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/IOKit.framework/Frameworks
+    LIBS += -framework IOKit
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
-    LIBS           += -framework Carbon
-    
+    LIBS += -framework Carbon
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
+    LIBS += -framework ApplicationServices
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/CoreAudio.framework/Frameworks
+    LIBS += -framework CoreAudio
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/AudioUnit.framework/Frameworks
+    LIBS += -framework AudioUnit
+
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC6000000
 }
 

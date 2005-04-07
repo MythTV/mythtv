@@ -28,6 +28,7 @@
 #include "mythcontext.h"
 #include "mythwizard.h"
 #include "mythdbcon.h"
+#include "DisplayRes.h"
 
 QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) 
@@ -579,6 +580,49 @@ void ComboBoxSetting::setVisible(bool b)
         else
             widget->hide();
     }
+}
+
+void HostRefreshRateComboBox::ChangeResolution(const QString& resolution)
+{
+    clearSelections();
+    
+    const vector<short> list = GetRefreshRates(resolution);
+    addSelection(QObject::tr("Any"), "0");
+    int hz50 = -1, hz60 = -1;
+    for (uint i=0; i<list.size(); ++i)
+    {        
+        QString sel = QString::number(list[i]);
+        addSelection(sel+" Hz", sel);
+        hz50 = (50 == list[i]) ? i : hz50;
+        hz60 = (60 == list[i]) ? i : hz60;
+    }
+    
+    setValue(0);
+    if ("640x480" == resolution || "720x480" == resolution)
+        setValue(hz60+1);
+    if ("640x576" == resolution || "720x576" == resolution)
+        setValue(hz50+1);
+    
+    setEnabled(list.size());
+}
+
+const vector<short> HostRefreshRateComboBox::GetRefreshRates(const QString &res)
+{
+    QStringList slist = QStringList::split("x", res);
+    int w = 0, h = 0;
+    bool ok0 = false, ok1 = false;
+    if (2 == slist.size())
+    {
+        w = slist[0].toInt(&ok0);
+        h = slist[1].toInt(&ok1);
+    }
+
+    DisplayRes *display_res = DisplayRes::GetDisplayRes();
+    if (display_res && ok0 && ok1)
+        return display_res->GetRefreshRates(w, h);    
+
+    vector<short> list;
+    return list;
 }
 
 void PathSetting::addSelection(const QString& label,

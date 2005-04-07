@@ -4,13 +4,19 @@
 #include "DisplayRes.h"
 
 class DisplayResX : public DisplayRes {
-  protected:
-    bool get_display_size(int & width_mm, int & height_mm);
-    bool switch_res(int width, int height);
-  
   public:
     DisplayResX(void);
     ~DisplayResX(void);
+
+    const vector<DisplayResScreen>& GetVideoModes(void) const;
+
+  protected:
+    bool GetDisplaySize(int &width_mm, int &height_mm) const;
+    bool SwitchToVideoMode(int width, int height, short framerate);
+
+  private:
+    mutable vector<DisplayResScreen> m_video_modes;
+    mutable vector<DisplayResScreen> m_video_modes_unsorted;
 };
 
 #endif // _DISPLAYRESX_H_

@@ -779,9 +779,11 @@ class VoqvFullscreen : public VideoOutputQuartzView
         }
         
         // switch screen resolution if desired
-        DisplayRes *disp = DisplayRes::getDisplayRes();
-        if (disp)
-            disp->switchToVid(parentData->srcWidth, parentData->srcHeight);
+        if (gContext->GetNumSetting("UseVideoModes", 0))
+        {
+            DisplayRes *disp = DisplayRes::GetDisplayRes();
+            disp->SwitchToVideo(parentData->srcWidth, parentData->srcHeight);
+        }
 
         CGDisplayHideCursor(d);
 
@@ -807,9 +809,8 @@ class VoqvFullscreen : public VideoOutputQuartzView
         }
         
         // return screen resolution to normal
-        DisplayRes *disp = DisplayRes::getDisplayRes();
-        if (disp)
-            disp->switchToGUI();
+        if (gContext->GetNumSetting("UseVideoModes", 0))
+            DisplayRes::GetDisplayRes()->SwitchToGUI();
 
         if (d)
         {

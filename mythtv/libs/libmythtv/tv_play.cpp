@@ -1,16 +1,17 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
 #include <unistd.h>
 #include <pthread.h>
+
+#include <iostream>
+using namespace std;
+
 #include <qapplication.h>
 #include <qregexp.h>
 #include <qfile.h>
 #include <qtimer.h>
-#include <math.h>
-
-#include <iostream>
-using namespace std;
 
 #include "mythdbcon.h"
 #include "tv.h"
@@ -30,6 +31,7 @@ using namespace std;
 #include "lcddevice.h"
 #include "jobqueue.h"
 #include "audiooutput.h"
+#include "DisplayRes.h"
 
 struct SeekSpeedInfo {
     QString   dispString;
@@ -315,41 +317,45 @@ bool TV::Init(bool createWindow)
         bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
         bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
 
-        int   xbase, width, ybase, height;
-
+        saved_gui_bounds = mainWindow->geometry();
+        QRect player_bounds = saved_gui_bounds;
         if (fullscreen)
+        {
+            int xbase, width, ybase, height;
             gContext->GetScreenBounds(xbase, ybase, width, height);
-
-        if (switchMode)
-        {
-            // For "video playback window" to be as big as 1920x1080
-            // it's parent window "mainWindow", must be at least that big.
-            mainWindow->setGeometry(0, 0, 1920, 1080);
-            mainWindow->setFixedSize(QSize(1920, 1080));
-        }
-        else if (fullscreen) 
-        {
-            mainWindow->setGeometry(0, 0, width, height);
-            mainWindow->setFixedSize(QSize(width, height));
+            player_bounds = QRect(xbase, ybase, width, height);
         }
 
+        // main window sizing
+        DisplayRes *display_res = DisplayRes::GetDisplayRes();
+        int maxWidth = 1920, maxHeight = 1440;
+        if (switchMode && display_res)
+        {
+            // The very first Resize needs to be the maximum possible
+            // desired res, because X will mask off anything outside
+            // the initial dimensions
+            maxWidth = display_res->GetMaxWidth();
+            maxHeight = display_res->GetMaxHeight();
+            QRect max_bounds(saved_gui_bounds.left(), saved_gui_bounds.top(),
+                             maxWidth, maxHeight);
+            mainWindow->setGeometry(max_bounds);
+            mainWindow->setFixedSize(QSize(maxWidth, maxHeight));
+        }
+        mainWindow->setGeometry(player_bounds);
+        mainWindow->setFixedSize(player_bounds.size());
+
+        // myWindow sizing
         myWindow = new MythDialog(mainWindow, "video playback window");
         myWindow->installEventFilter(this);
         myWindow->setNoErase();
-
-        if (switchMode)
+        if (switchMode && display_res)
         {
-            // If switching display resolutions, we may want a resolution
-            // up to 1920x1080.  We have to set that window size here and
-            // now, or some window mananger won't let us grow it later.
-            myWindow->setGeometry(0, 0, 1920, 1080);
-            myWindow->setFixedSize(QSize(1920, 1080));
+            myWindow->setGeometry(0, 0, maxWidth, maxHeight);
+            myWindow->setFixedSize(QSize(maxWidth, maxHeight));
         }
-        else if (fullscreen) 
-        {
-            myWindow->setGeometry(0, 0, width, height);
-            myWindow->setFixedSize(QSize(width, height));
-        }
+        QRect win_bounds(0, 0, player_bounds.width(), player_bounds.height());
+        myWindow->setGeometry(win_bounds);
+        myWindow->setFixedSize(win_bounds.size());
 
         myWindow->show();
         myWindow->setBackgroundColor(Qt::black);
@@ -378,17 +384,10 @@ TV::~TV(void)
     if (myWindow)
     {
         delete myWindow;
-        bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
-        if (fullscreen) 
+        if (!gContext->GetNumSetting("GuiSizeForTV", 0))
         {
-            int xbase, width, ybase, height;
-            float wmult, hmult;
-            gContext->GetScreenSettings(xbase, width, wmult,
-                                        ybase, height, hmult);
-            MythMainWindow *mainWindow = gContext->GetMainWindow();
-            mainWindow->setGeometry(xbase, ybase, width, height);
-            mainWindow->setFixedSize(QSize(width, height));
-            mainWindow->move(QPoint(xbase, ybase));
+            gContext->GetMainWindow()->setGeometry(saved_gui_bounds);
+            gContext->GetMainWindow()->setFixedSize(saved_gui_bounds.size());
         }
     }
     if (recorderPlaybackInfo)

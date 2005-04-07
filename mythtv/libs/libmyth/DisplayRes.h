@@ -1,80 +1,99 @@
 #ifndef _Display_Res_H_
 #define _Display_Res_H_
 
-//using namespace std;
+using namespace std;
 
 #include <fstream>
 #include <vector>
+#include <map>
+#include "DisplayResScreen.h"
 
 /**********************************************************
- *  The DisplayRes module allows for the display resolution to be
- *  changed "on the fly", based on the video resolution.  It also
- *  allows for the GUI to have a specific resolution.
+ *  The DisplayRes module allows for the display resolution
+ *  and refresh rateto be changed "on the fly", using an
+ *  explicit call or based on the video resolution.
  *
- *  The switch_res routine takes care of the actual work involved in
- *  changing the display resolution.  It is currently implemented by
- *  calling Xrandr(3x) and is therefore limited to Xv and XvMC.
+ *  The SwitchToVideoMode routine takes care of the actual
+ *  work involved in changing the display mode. There are
+ *  currently XRandR and OSX Carbon implementation so this
+ *  works for X11 and OSX.
  **********************************************************/
 
+typedef enum { GUI = 0, VIDEO = 1, CUSTOM_GUI = 2, CUSTOM_VIDEO = 3 } tmode;
+
 class DisplayRes {
-  private:
-    class dim_t {
-      public:
-        int             vid_width;
-        int             vid_height;
-        int             width;
-        int             height;
-        int             width_mm;
-        int             height_mm;
+  public:
+    // Factory method that returns DisplayRes singleton
+    static DisplayRes *GetDisplayRes(void);
 
-      public:
-        dim_t(void);
-        ~dim_t(void) {;}
-    };
+    // Initialize is called automatically on creation, but 
+    // should be called again if the configuration is changed.
+    bool Initialize(void);
 
-    dim_t      gui;
-    dim_t      last;
-    dim_t      default_res;
+    // These return true if mode is changed
+    bool SwitchToVideo(int iwidth, int iheight, short irate = 0);
+    bool SwitchToGUI(tmode which_gui=GUI);
+    bool SwitchToCustomGUI(int width, int height, short rate = 0);
 
-    std::vector<dim_t>   disp;
+    // These return the current display attributes
+    int GetWidth(void)       const { return last.Width(); }
+    int GetHeight(void)      const { return last.Height(); }
+    int GetPhysicalWidth(void)    const { return last.Width_mm(); }
+    int GetPhysicalHeight(void)   const { return last.Height_mm(); }
+    int GetRefreshRate(void) const { return last.RefreshRate(); }
+    double GetAspectRatio(void) const { return last.AspectRatio(); }
 
-    bool       mode_video;
+    // These are global for all video modes
+    int GetMaxWidth(void)    const { return max_width; }
+    int GetMaxHeight(void)   const { return max_height; }
+    virtual const vector<DisplayResScreen>& GetVideoModes() const = 0;
+    const vector<short> GetRefreshRates(int width, int height) const;
 
-    int        x_width_mm;
-    int        x_height_mm;
-    int        alt_height_mm;
-    int        vid_width;
-    int        vid_height;
-
-    static DisplayRes * instance;
-
-    DisplayRes(const DisplayRes & rhs)
-        { abort(); }
+    // These are for backward compatability
+    static DisplayRes *getDisplayRes(void);
+    bool switchToGUI(void) { return SwitchToGUI(); }
+    int vwidth, vheight;
+    bool switchToVid(int width, int height)
+    {
+        vwidth=width;
+        vheight=height;
+        return SwitchToVideo(width, height, 0);
+    }
+    bool switchToCustom(int width, int height)
+    {
+        return SwitchToCustomGUI(width, height, 0);
+    }
+    int Width(void)       const { return GetWidth(); }
+    int Height(void)      const { return GetHeight(); }
+    int Width_mm(void)    const { return GetPhysicalWidth(); }
+    int Height_mm(void)   const { return GetPhysicalHeight(); }
+    int vidWidth(void)    const { return vwidth; }
+    int vidHeight(void)    const { return vheight; }
 
   protected:
-    DisplayRes(void) {;}
+    DisplayRes(void) : max_width(0), max_height(0) {;}
     virtual ~DisplayRes(void) {;}
     
     // These methods are implemented by the subclasses
-    virtual bool get_display_size(int & width_mm, int & height_mm) = 0;
-    virtual bool switch_res(int width, int height) = 0;
+    virtual bool GetDisplaySize(int &width_mm, int &height_mm) const = 0;
+    virtual bool SwitchToVideoMode(int width, int height, short framerate) = 0;
 
-  public:
-    static DisplayRes * getDisplayRes(void);
+  private:
+    DisplayRes(const DisplayRes & rhs); // disable copy constructor;
 
-    bool Initialize(void);
-    bool getScreenSize(int vid_width, int vid_height,
-                       int & width_mm, int & height_mm);
-    bool switchToVid(int vid_width, int vid_height);
-    bool switchToGUI(void);
-    bool switchToCustom(int width, int height);
+    tmode cur_mode;           // current mode
+    DisplayResScreen mode[4]; // GUI, default video, custom GUI, custom video
+    DisplayResScreen last;    // mirror of mode[current_mode]
 
-    int Width(void)     { return last.width; }
-    int Height(void)    { return last.height; }
-    int Width_mm(void)  { return last.width_mm; }
-    int Height_mm(void) { return last.height_mm; }
-    int vidWidth(void)  { return vid_width; }
-    int vidHeight(void) { return vid_height; }
+    // maps input video parameters to output video modes
+    DisplayResMap in_size_to_output_mode;
+
+    int max_width, max_height;
+
+    static DisplayRes *instance;
 };
+
+// Helper function
+const vector<DisplayResScreen> GetVideoModes();
 
 #endif

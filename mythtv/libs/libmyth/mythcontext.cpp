@@ -350,8 +350,8 @@ void MythContextPrivate::StoreGUIsettings()
     {
         m_screenxbase  = parent->GetNumSetting("GuiOffsetX");
         m_screenybase  = parent->GetNumSetting("GuiOffsetY");
-        m_screenwidth  = parent->GetNumSetting("GuiWidth");
-        m_screenheight = parent->GetNumSetting("GuiHeight");
+        m_screenwidth = m_screenheight = 0;
+        parent->GetResolutionSetting("Gui", m_screenwidth, m_screenheight);
     }
 
     // If any of these was _not_ set by the user,
@@ -369,9 +369,11 @@ void MythContextPrivate::StoreGUIsettings()
     if (m_screenheight < 160 || m_screenwidth < 160)
     {
         VERBOSE(VB_ALL, "Somehow, your screen size settings are bad.");
-        VERBOSE(VB_ALL, QString("GuiWidth: %1")
+        VERBOSE(VB_ALL, QString("GuiResolution: %1")
+                        .arg(parent->GetSetting("GuiResolution")));
+        VERBOSE(VB_ALL, QString("  old GuiWidth: %1")
                         .arg(parent->GetNumSetting("GuiWidth")));
-        VERBOSE(VB_ALL, QString("GuiHeight: %1")
+        VERBOSE(VB_ALL, QString("  old GuiHeight: %1")
                         .arg(parent->GetNumSetting("GuiHeight")));
         VERBOSE(VB_ALL, QString("m_width: %1").arg(m_width));
         VERBOSE(VB_ALL, QString("m_height: %1").arg(m_height));
@@ -940,13 +942,15 @@ void MythContext::LoadQtConfig(void)
     d->language = "";
     d->themecachedir = "";
 
-    if ((d->display_res = DisplayRes::getDisplayRes()))
+    DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
+    if (dispRes && GetNumSetting("UseVideoModes", 0))
     {
+        d->display_res = dispRes;
         // Make sure DisplayRes has current context info
         d->display_res->Initialize();
 
         // Switch to desired GUI resolution
-        d->display_res->switchToGUI();
+        d->display_res->SwitchToGUI();
 
         // Note the possibly changed screen settings
         d->GetScreenBounds();
@@ -1238,6 +1242,72 @@ void MythContext::GetScreenSettings(int &xbase, int &width, float &wmult,
     hmult = d->m_hmult;
 }
 
+void MythContext::GetResolutionSetting(const QString &type,
+                                       int &width, int &height,
+                                       double &forced_aspect,
+                                       short &refresh_rate, 
+                                       int index)
+{
+    bool ok = false, ok0 = false, ok1 = false;
+    QString sRes =    QString("%1Resolution").arg(type);
+    QString sRR =     QString("%1RefreshRate").arg(type);
+    QString sAspect = QString("%1ForceAspect").arg(type);
+    QString sWidth =  QString("%1Width").arg(type);
+    QString sHeight = QString("%1Height").arg(type);
+    if (index >= 0)
+    {
+        sRes =    QString("%1Resolution%2").arg(type).arg(index);
+        sRR =     QString("%1RefreshRate%2").arg(type).arg(index);
+        sAspect = QString("%1ForceAspect%2").arg(type).arg(index);
+        sWidth =  QString("%1Width%2").arg(type).arg(index);
+        sHeight = QString("%1Height%2").arg(type).arg(index);
+    }
+
+    QString res = GetSetting(sRes);
+
+    if ("" != res)
+    {
+        QStringList slist = QStringList::split("x", res);
+        int w, h;
+        if (2 == slist.size())
+        {
+            w = slist[0].toInt(&ok0);
+            h = slist[1].toInt(&ok1);
+        }
+        bool ok = ok0 && ok1;
+        if (ok)
+        {
+            width = w;
+            height = h;
+            refresh_rate = GetNumSetting(sRR);
+            forced_aspect = GetFloatSetting(sAspect);
+        }
+    }
+    else
+
+    if (!ok)
+    {
+        int tmpWidth = GetNumSetting(sWidth, width);
+        if (tmpWidth)
+            width = tmpWidth;
+
+        int tmpHeight = GetNumSetting(sHeight, height);
+        if (tmpHeight)
+            height = tmpHeight;
+
+        refresh_rate = 0;
+        forced_aspect = 0.0;
+        //SetSetting(sRes, QString("%1x%2").arg(width).arg(height));
+    }
+}
+
+void MythContext::GetResolutionSetting(const QString &t, int &w, int &h, int i)
+{
+    double forced_aspect = 0;
+    short refresh_rate = 0;
+    GetResolutionSetting(t, w, h, forced_aspect, refresh_rate, i);
+}
+
 // Parse an X11 style command line geometry string, like
 //  -geometry 800x600
 // or
@@ -1487,6 +1557,14 @@ int MythContext::GetNumSetting(const QString &key, int defaultval)
     QString retval = GetSetting(key, val);
 
     return retval.toInt();
+}
+
+double MythContext::GetFloatSetting(const QString &key, double defaultval)
+{
+    QString val = QString::number(defaultval);
+    QString retval = GetSetting(key, val);
+
+    return retval.toDouble();
 }
 
 QString MythContext::GetSettingOnHost(const QString &key, const QString &host,

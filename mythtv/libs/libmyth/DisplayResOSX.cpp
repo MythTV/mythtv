@@ -3,8 +3,13 @@ using namespace std;
 #import <CoreGraphics/CGBase.h>
 #import <CoreGraphics/CGDisplayConfiguration.h>
 #import <Carbon/Carbon.h>
+#import <IOKit/graphics/IOGraphicsLib.h> // for IODisplayCreateInfoDictionary()
 
 #include "DisplayResOSX.h"
+
+CGDirectDisplayID mythtv_display();
+static int get_int_val(CFDictionaryRef, CFStringRef);
+
 
 DisplayResOSX::DisplayResOSX(void)
 {
@@ -15,15 +20,26 @@ DisplayResOSX::~DisplayResOSX(void)
 {
 }
 
-bool DisplayResOSX::get_display_size(int & width_mm, int & height_mm)
+bool DisplayResOSX::GetDisplaySize(int &width_mm, int &height_mm) const
 {
-    // The mm settings are not applicable on Mac OS X.
-    width_mm = 0;
-    height_mm = 0;
+    CGDirectDisplayID d = mythtv_display();
+
+    io_connect_t port = CGDisplayIOServicePort(d);
+    if (port == MACH_PORT_NULL )
+        return false;
+
+    CFDictionaryRef dict = IODisplayCreateInfoDictionary(port, 0);
+    if (!dict)
+        return false;
+
+    width_mm = get_int_val(dict, CFSTR(kDisplayHorizontalImageSize));
+    height_mm = get_int_val(dict, CFSTR(kDisplayVerticalImageSize));
+    CFRelease(dict);
+    
     return true;
 }
 
-bool DisplayResOSX::switch_res(int width, int height)
+CGDirectDisplayID mythtv_display()
 {
     CGDirectDisplayID d = NULL;
     
@@ -47,16 +63,29 @@ bool DisplayResOSX::switch_res(int width, int height)
     {
         d = CGMainDisplayID();
     }
+    return d;
+}
+
+bool DisplayResOSX::SwitchToVideoMode(int width, int height, short refreshrate)
+{
+    CGDirectDisplayID d = mythtv_display();
+    CFDictionaryRef dispMode = NULL;
+    int match = 0;
 
     // find mode that matches the desired size
-    CFDictionaryRef dispMode;
-    int exactMatch = 0;
-    dispMode = CGDisplayBestModeForParameters(d, 32, width, height,
-                                              &exactMatch);
-    if (!exactMatch)
-        dispMode = CGDisplayBestModeForParameters(d, 16, width, height,
-                                                  &exactMatch);
-    if (!exactMatch)
+    if (refreshrate)
+        dispMode = CGDisplayBestModeForParametersAndRefreshRate(
+            d, 32, width, height, (CGRefreshRate)(refreshrate), &match);
+
+    if (!match)
+        dispMode = 
+            CGDisplayBestModeForParameters(d, 32, width, height, &match);
+
+    if (!match)
+        dispMode = 
+            CGDisplayBestModeForParameters(d, 16, width, height, &match);
+
+    if (!match)
         return false;
     
     // switch mode and return success
@@ -68,4 +97,52 @@ bool DisplayResOSX::switch_res(int width, int height)
     CGError err = CGCompleteDisplayConfiguration(cfg, kCGConfigureForAppOnly);
     CGDisplayRelease(d);
     return (err == kCGErrorSuccess);
+}
+
+const DisplayResVector& DisplayResOSX::GetVideoModes() const
+{
+    if (m_video_modes.size())
+        return m_video_modes;
+
+    CGDirectDisplayID d = mythtv_display();
+    CFArrayRef displayModes = CGDisplayAvailableModes(d);
+    if (NULL == displayModes)
+        return m_video_modes;
+
+    DisplayResMap screen_map;
+    for (int i=0; i<CFArrayGetCount(displayModes); ++i)
+    {
+        CFDictionaryRef displayMode = (CFDictionaryRef) 
+            CFArrayGetValueAtIndex(displayModes, i);
+        int width = get_int_val(displayMode, kCGDisplayWidth);
+        int height = get_int_val(displayMode, kCGDisplayHeight);
+        int refresh = get_int_val(displayMode, kCGDisplayRefreshRate);
+        CFRelease(displayMode);
+
+        uint key = DisplayResScreen::CalcKey(width, height, 0);
+
+	if (screen_map.find(key)==screen_map.end())
+            screen_map[key] = DisplayResScreen(width, height,
+                                               0, 0, -1.0, refresh);
+        else
+            screen_map[key].AddRefreshRate(refresh);
+    }
+    CFRelease(displayModes);
+
+    DisplayResMapCIt it = screen_map.begin();
+    for (; screen_map.end() != it; ++it)
+        m_video_modes.push_back(it->second);
+
+    return m_video_modes;
+}
+
+static int get_int_val(CFDictionaryRef dict, CFStringRef key)
+{
+    int val = 0;
+    CFNumberRef idx = (CFNumberRef) CFDictionaryGetValue(dict, key);
+    if (idx)
+    {
+        CFNumberGetValue(idx, kCFNumberLongType, &val);
+    }
+    return val;
 }

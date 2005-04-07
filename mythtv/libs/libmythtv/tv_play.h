@@ -330,6 +330,7 @@ class TV : public QObject
     MythDialog *myWindow;// Our MythDialow window, if it exists
     WId embedid;         // Window ID when embedded in another widget
     int embx, emby, embw, embh; // bounds when embedded in another widget
+    QRect saved_gui_bounds; // prior GUI window bounds, for after player is done
 
     // Various threads
     pthread_t event;     // TV::RunTV(), the event thread

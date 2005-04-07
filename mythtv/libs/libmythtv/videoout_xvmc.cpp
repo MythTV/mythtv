@@ -193,18 +193,20 @@ void VideoOutputXvMC::InputChanged(int width, int height, float aspect)
     {
         // Switching to custom display resolution succeeded
         // Make a note of the new size
-        dispx = dispy = 0;
-        dispw = display_res->Width();
-        disph = display_res->Height();
         w_mm =  display_res->Width_mm();
         h_mm =  display_res->Height_mm();
 
-        data->display_aspect = (float)(w_mm/h_mm);
+        data->display_aspect = display_res->GetAspectRatio();
 
-        // Resize X window to fill new resolution
-        XMoveResizeWindow(data->XJ_disp, data->XJ_win, 0, 0,
-                          display_res->Width(),
-                          display_res->Height());
+        if (!gContext->GetNumSetting("GuiSizeForTV", 0))
+        {
+            dispx = dispy = 0;
+            dispw = display_res->Width();
+            disph = display_res->Height();
+            // Resize X window to fill new resolution
+            XMoveResizeWindow(data->XJ_disp, data->XJ_win,
+                              dispx, dispy, dispw, disph);
+        }
     }
 
     CreateXvMCBuffers();
@@ -281,25 +283,29 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
 
     if (display_res)
     {
-        if (display_res->Width() == 0)
-        {
-            // The very first Resize needs to be the maximum possible
-            // desired res, because X will mask off anything outside
-            // the initial dimensions
-            XMoveResizeWindow(data->XJ_disp, winid, 0, 0, 1920, 1080);
-        }
+        // The very first Resize needs to be the maximum possible
+        // desired res, because X will mask off anything outside
+        // the initial dimensions
+        XMoveResizeWindow(data->XJ_disp, data->XJ_win, 0, 0,
+                          display_res->GetMaxWidth(),
+                          display_res->GetMaxHeight());
 
         if (display_res->switchToVid(width, height))
         {
             // Switching to custom display resolution succeeded
             // Make a note of the new size
-            dispw = display_res->Width();
-            disph = display_res->Height();
             w_mm = display_res->Width_mm();
             h_mm = display_res->Height_mm();
             
-            // Resize X window to fill new resolution
-            XMoveResizeWindow(data->XJ_disp, winid, 0, 0, dispw, disph);
+            if (!gContext->GetNumSetting("GuiSizeForTV", 0))
+            {
+                dispx = dispy = 0;
+                dispw = display_res->Width();
+                disph = display_res->Height();
+                // Resize X window to fill new resolution
+                XMoveResizeWindow(data->XJ_disp, data->XJ_win,
+                                  dispx, dispy, dispw, disph);
+            }
         }
     }
     else
@@ -328,8 +334,8 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
     {
         int w = DisplayWidth(data->XJ_disp, XJ_screen_num);
         int h = DisplayHeight(data->XJ_disp, XJ_screen_num);
-        int gui_w = gContext->GetNumSetting("GuiWidth", w);
-        int gui_h = gContext->GetNumSetting("GuiHeight", h);
+        int gui_w = w, gui_h = h;
+        gContext->GetResolutionSetting("Gui", gui_w,  gui_h);
 
         if (gui_w)
             w_mm = w_mm * gui_w / w;
@@ -340,6 +346,9 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
     }
     else
         data->display_aspect = (float)w_mm/h_mm;
+
+    if (display_res)
+        data->display_aspect = display_res->GetAspectRatio();
 
     XJ_white = XWhitePixel(data->XJ_disp, XJ_screen_num);
     XJ_black = XBlackPixel(data->XJ_disp, XJ_screen_num);

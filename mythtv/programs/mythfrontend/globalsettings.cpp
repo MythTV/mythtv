@@ -3,9 +3,10 @@
 #include "mythdbcon.h"
 #include "dbsettings.h"
 #include "langsettings.h"
-
 #include "globalsettings.h"
 #include "scheduledrecording.h"
+#include "util-x11.h"
+#include "DisplayRes.h"
 #include <qstylefactory.h>
 #include <qsqldatabase.h>
 #include <qfile.h>
@@ -1094,14 +1095,18 @@ static HostCheckBox *SetupPinCodeRequired()
     return gc;
 }
 
-static HostSpinBox *XineramaScreen()
+static HostComboBox *XineramaScreen()
 {
-    HostSpinBox *gs = new HostSpinBox("XineramaScreen", -1, 8, 1);
-    gs->setLabel(QObject::tr("Xinerama screen"));
-    gs->setValue(0);
-    gs->setHelpText(QObject::tr("If using Xinerama, run only on the specified "
-                    "screen. A value of -1 means use all screens."));
-    return gs;
+    HostComboBox *gc = new HostComboBox("XineramaScreen", false);
+    int num = GetNumberOfXineramaScreens();
+    for (int i=0; i<num; ++i)
+        gc->addSelection(QString::number(i), QString::number(i));
+    gc->addSelection(QObject::tr("All"), QString::number(-1));
+    gc->setLabel(QObject::tr("Xinerama screen"));
+    gc->setValue(0);
+    gc->setHelpText(QObject::tr("Run on the specified screen or "
+                                "spanning all screens."));
+    return gc;
 }
 
 static HostComboBox *AspectOverride()
@@ -1168,6 +1173,7 @@ static HostSpinBox *GuiOffsetY()
     return gs;
 }
 
+#if 0
 static HostSpinBox *DisplaySizeWidth()
 {
     HostSpinBox *gs = new HostSpinBox("DisplaySizeWidth", 0, 10000, 1);
@@ -1189,6 +1195,7 @@ static HostSpinBox *DisplaySizeHeight()
                     "will override the DisplaySize from the system."));
     return gs;
 }
+#endif
 
 static HostCheckBox *GuiSizeForTV()
 {
@@ -1211,37 +1218,13 @@ static HostCheckBox *UseVideoModes()
     return gc;
 }
 
-static HostSpinBox *GuiVidModeWidth()
-{
-    HostSpinBox *gs = new HostSpinBox("GuiVidModeWidth", 0, 1920, 8, true);
-    gs->setLabelAboveWidget(true);
-    gs->setLabel(QObject::tr("Width"));
-    gs->setValue(0);
-    gs->setHelpText(QObject::tr("Horizontal resolution for GUI video mode. "
-                                "This mode must be defined in your X "
-                                "configuration file."));
-    return gs;
-}
-
-static HostSpinBox *GuiVidModeHeight()
-{
-    HostSpinBox *gs = new HostSpinBox("GuiVidModeHeight", 0, 1440, 4, true);
-    gs->setLabelAboveWidget(true);
-    gs->setLabel(QObject::tr("Height"));
-    gs->setValue(0);
-    gs->setHelpText(QObject::tr("Vertical resolution for GUI video mode. "
-                                "This mode must be defined in your X "
-                                "configuration file."));
-    return gs;
-}
-
 static HostSpinBox *VidModeWidth(int idx)
 {
     HostSpinBox *gs = new HostSpinBox(QString("VidModeWidth%1").arg(idx),
                                             0, 1920, 8, true);
-    gs->setLabel(QObject::tr("X"));
+    gs->setLabel(QObject::tr("Input Video X"));
     gs->setValue(0);
-    gs->setHelpText(QObject::tr("Horizontal resolution of video mode "
+    gs->setHelpText(QObject::tr("Horizontal resolution of video "
                                 "which needs a special output resolution."));
     return gs;
 }
@@ -1249,86 +1232,96 @@ static HostSpinBox *VidModeWidth(int idx)
 static HostSpinBox *VidModeHeight(int idx)
 {
     HostSpinBox *gs = new HostSpinBox(QString("VidModeHeight%1").arg(idx),
-                                            0, 1440, 4, true);
-    gs->setLabel(QObject::tr("Y"));
+                                            0, 1080, 4, true);
+    gs->setLabel(QObject::tr("Input Video Y"));
     gs->setValue(0);
-    gs->setHelpText(QObject::tr("Vertical resolution of video mode "
+    gs->setHelpText(QObject::tr("Vertical resolution of video "
                                 "which needs a special output resolution."));
     return gs;
 }
 
-static HostSpinBox *TVVidModeWidth()
+static HostComboBox *GuiVidModeResolution()
 {
-    HostSpinBox *gs = new HostSpinBox("TVVidModeWidth", 0, 1920, 8, true);
-    gs->setLabelAboveWidget(true);
-    gs->setLabel(QObject::tr("Width"));
-    gs->setValue(0);
-    gs->setHelpText(QObject::tr("Horizontal resolution for playback video "
-                                "mode. "
-                                "This mode must be defined in your X "
-                                "configuration file."));
-    return gs;
-}
-
-static HostSpinBox *TVVidModeWidth(int idx)
-{
-    HostSpinBox *gs = new HostSpinBox(QString("TVVidModeWidth%1").arg(idx), 
-                                            0, 1920, 8, true);
-    gs->setLabel(QObject::tr("X"));
-    gs->setValue(0);
-    gs->setHelpText(QObject::tr("Horizontal resolution for playback video "
-                                "mode. "
-                                "This mode must be defined in your X "
-                                "configuration file."));
-    return gs;
-}
-
-
-static HostSpinBox *TVVidModeHeight()
-{
-    HostSpinBox *gs = new HostSpinBox("TVVidModeHeight", 0, 1440, 4, true);
-    gs->setLabelAboveWidget(true);
-    gs->setLabel(QObject::tr("Height"));
-    gs->setValue(0);
-    gs->setHelpText(QObject::tr("Vertical resolution for playback video mode. "
-                                "This mode must be defined in your X "
-                                "configuration file."));
-    return gs;
-}
-
-static HostSpinBox *TVVidModeHeight(int idx)
-{
-    HostSpinBox *gs = new HostSpinBox(QString("TVVidModeHeight%1").arg(idx),
-                                            0, 1440, 4, true);
-    gs->setLabel(QObject::tr("Y"));
-    gs->setValue(0);
-    gs->setHelpText(QObject::tr("Vertical resolution for playback video mode. "
-                                "This mode must be defined in your X "
-                                "configuration file."));
-    return gs;
-}
-
-static HostCheckBox *TVVidModeAltAspect()
-{
-    HostCheckBox *gc = new HostCheckBox("TVVidModeAltAspect");
+    HostComboBox *gc = new HostComboBox("GuiVidModeResolution");
+    gc->setLabel(QObject::tr("GUI"));
     gc->setLabelAboveWidget(true);
-    gc->setLabel(QObject::tr("Alt Aspect"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If X's DisplaySize indicates 16:9, "
-                                "fudge vertical size into 4:3, "
-                                "and visa-versa"));
+    gc->setHelpText(QObject::tr("Resolution of screen "
+                                "when not watching a video."));
+    
+    const vector<DisplayResScreen> scr = GetVideoModes();
+    for (uint i=0; i<scr.size(); ++i)
+    {
+        int w = scr[i].Width(), h = scr[i].Height();
+        QString sel = QString("%1x%2").arg(w).arg(h);
+        gc->addSelection(sel, sel);
+    }
+    
+    // if no resolution setting, set it with a reasonable initial value
+    if (scr.size() && ("" == gContext->GetSetting("GuiVidModeResolution")))
+    {
+        int w = 0, h = 0;
+        gContext->GetResolutionSetting("GuiVidMode", w, h);
+        if ((w <= 0) || (h <= 0))
+            (w = 640), (h = 480);
+
+        DisplayResScreen dscr(w, h, -1, -1, -1.0, 0);
+        short rate = -1;
+        int i = DisplayResScreen::FindBestMatch(scr, dscr, rate);
+        gc->setValue((i >= 0) ? i : scr.size()-1);
+    }
+
     return gc;
 }
 
-static HostCheckBox *TVVidModeAltAspect(int idx)
+static HostComboBox *TVVidModeResolution(int idx=-1)
 {
-    HostCheckBox *gc = new HostCheckBox(QString("TVVidModeAltAspect%1").arg(idx));
+    QString qstr = (idx<0) ? "TVVidModeResolution" :
+        QString("TVVidModeResolution%1").arg(idx);
+    HostComboBox *gc = new HostComboBox(qstr);
     gc->setLabelAboveWidget(true);
-    gc->setLabel(QObject::tr("Alt Aspect"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If X's DisplaySize indicates 16:9, "
-                                "fudge vertical size into 4:3, "
-                                "and visa-versa"));
+    QString lstr = (idx<0) ? QObject::tr("Default Video") :
+        QObject::tr("Output Resolution");
+    gc->setLabel(lstr);
+    gc->setHelpText(QObject::tr("Default screen resolution "
+                                "when watching a video."));
+    
+    const vector<DisplayResScreen> scr = GetVideoModes();
+    for (uint i=0; i<scr.size(); ++i)
+    {        
+        QString sel = QString("%1x%2").arg(scr[i].Width()).arg(scr[i].Height());
+        gc->addSelection(sel, sel);
+    }
+    return gc;
+}
+
+static HostRefreshRateComboBox *TVVidModeRefreshRate(int idx=-1)
+{
+    QString qstr = (idx<0) ? "TVVidModeRefreshRate" :
+        QString("TVVidModeRefreshRate%1").arg(idx);
+    HostRefreshRateComboBox *gc = new HostRefreshRateComboBox(qstr);
+    QString lstr = (idx<0) ? "Default Rate" : "OutputRate";
+    gc->setLabel(QObject::tr("Default Rate"));
+    gc->setLabelAboveWidget(idx<0);
+    gc->setHelpText(QObject::tr("Default screen refresh rate "
+                                "when watching a video."));
+    gc->setEnabled(false);
+    return gc;
+}
+
+static HostComboBox *TVVidModeForceAspect(int idx=-1)
+{
+    QString qstr = (idx<0) ? "TVVidModeForceAspect" :
+        QString("TVVidModeForceAspect%1").arg(idx);
+    HostComboBox *gc = new HostComboBox(qstr);
+    gc->setLabel(QObject::tr("Aspect"));
+    gc->setLabelAboveWidget(idx<0);
+
+    gc->setHelpText(QObject::tr("Leave at \"Default\" to use ratio reported by "
+                                "the monitor. Or, set to 16:9 or 4:3 to "
+                                "force a specific aspect ratio."));
+    gc->addSelection(QObject::tr("Default"), "0.0");
+    gc->addSelection("16:9", "1.77777777777");
+    gc->addSelection("4:3",  "1.33333333333");
     return gc;
 }
 
@@ -1345,52 +1338,50 @@ class VideoModeSettings: public VerticalConfigurationGroup,
         addChild(videomode);
         setTrigger(videomode);
 
-        ConfigurationGroup* settings =
-            new VerticalConfigurationGroup(false);
         ConfigurationGroup* defaultsettings =
-            new HorizontalConfigurationGroup(false, false);
-        ConfigurationGroup *xres =
-            new HorizontalConfigurationGroup(true, false);
-        ConfigurationGroup *yres =
-            new HorizontalConfigurationGroup(true, false);
-        ConfigurationGroup *zres =
             new HorizontalConfigurationGroup(true, false);
 
-        xres->setLabel(QObject::tr("GUI Size (px)"));
-        xres->addChild(GuiVidModeWidth());
-        xres->addChild(GuiVidModeHeight());
+        HostComboBox *res = TVVidModeResolution();
+        HostRefreshRateComboBox *rate = TVVidModeRefreshRate();
+        defaultsettings->setLabel("Default Resolutions");
+        defaultsettings->addChild(GuiVidModeResolution());
+        defaultsettings->addChild(res);
+        defaultsettings->addChild(rate);
+        defaultsettings->addChild(TVVidModeForceAspect());
+        connect(res, SIGNAL(valueChanged(const QString&)),
+                rate, SLOT(ChangeResolution(const QString&)));
 
-        yres->setLabel(QObject::tr("Default Display (px)"));
-        yres->addChild(TVVidModeWidth());
-        yres->addChild(TVVidModeHeight());
+        ConfigurationGroup* overrides =
+            new VerticalConfigurationGroup(true, true);
+        overrides->setLabel("Overrides for specific video sizes");
+        for (int idx = 0; idx < 2; ++idx)
+        {
+            ConfigurationGroup 
+                *resmap = new HorizontalConfigurationGroup(false, false),
+                *outres0 = new VerticalConfigurationGroup(false, false),
+                *outres1 = new VerticalConfigurationGroup(false, false),
+                *inres = new VerticalConfigurationGroup(false, false);
 
-        zres->setLabel(QObject::tr("Physical Size"));
-        zres->addChild(TVVidModeAltAspect());
+            //input side
+            inres->addChild(VidModeWidth(idx));
+            inres->addChild(VidModeHeight(idx));
+            resmap->addChild(inres);
 
-        defaultsettings->addChild(xres);
-        defaultsettings->addChild(yres);
-        defaultsettings->addChild(zres);
+            // output side
+            outres0->addChild(res = TVVidModeResolution(idx));
+            outres1->addChild(rate = TVVidModeRefreshRate(idx));
+            outres1->addChild(TVVidModeForceAspect(idx));
+            resmap->addChild(outres0);
+            resmap->addChild(outres1);
+            connect(res, SIGNAL(valueChanged(const QString&)),
+                    rate, SLOT(ChangeResolution(const QString&)));
 
-        settings->addChild(defaultsettings);
-
-        for (int idx = 0; idx < 2; ++idx) {
-
-            ConfigurationGroup *xres =
-                new HorizontalConfigurationGroup(true, false);
-
-            xres->addChild(VidModeWidth(idx));
-            xres->addChild(VidModeHeight(idx));
-
-            xres->addChild(TVVidModeWidth(idx));
-            xres->addChild(TVVidModeHeight(idx));
-
-            xres->addChild(TVVidModeAltAspect(idx));
-
-            xres->setLabel(QString("Video Size ---> Display Size  "
-                                   "(Override %1)").arg(idx + 1));
-
-            settings->addChild(xres);
+            overrides->addChild(resmap);
         }
+
+        ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
+        settings->addChild(defaultsettings);
+        settings->addChild(overrides);
 
         addTarget("1", settings);
         addTarget("0", new VerticalConfigurationGroup(true));
@@ -2468,14 +2459,21 @@ public:
          setTrigger(lcd_enable);
 
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         settings->addChild(LCDShowTime());
-         settings->addChild(LCDShowMenu());
+         ConfigurationGroup* setHoriz = new HorizontalConfigurationGroup(false);
+         ConfigurationGroup* setLeft  = new VerticalConfigurationGroup(false);
+         ConfigurationGroup* setRight = new VerticalConfigurationGroup(false);
+         setLeft->addChild(LCDShowTime());
+         setLeft->addChild(LCDShowMenu());
+         setLeft->addChild(LCDShowMusic());
+         setLeft->addChild(LCDShowChannel());
+         setRight->addChild(LCDShowVolume());
+         setRight->addChild(LCDShowGeneric());
+         setRight->addChild(LCDBacklightOn());
+         setHoriz->addChild(setLeft);
+         setHoriz->addChild(setRight);
+         settings->addChild(setHoriz);
          settings->addChild(LCDPopupTime());
-         settings->addChild(LCDShowMusic());
-         settings->addChild(LCDShowChannel());
-         settings->addChild(LCDShowVolume());
-         settings->addChild(LCDShowGeneric());
-         settings->addChild(LCDBacklightOn());
+         
          addTarget("1", settings);
 
          addTarget("0", new VerticalConfigurationGroup(true));
@@ -2977,7 +2975,8 @@ AppearanceSettings::AppearanceSettings()
 
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
     screen->setLabel(QObject::tr("Screen settings"));
-    screen->addChild(XineramaScreen());
+    if (GetNumberOfXineramaScreens())
+        screen->addChild(XineramaScreen());
     screen->addChild(GuiWidth());
     screen->addChild(GuiHeight());
 //    screen->addChild(DisplaySizeHeight());
@@ -2989,9 +2988,9 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(RunInWindow());
     addChild(screen);
 
-#if defined(USING_XRANDR) || defined(CONFIG_DARWIN)
-    addChild(new VideoModeSettings());
-#endif
+    const vector<DisplayResScreen> scr = GetVideoModes();
+    if (scr.size())
+        addChild(new VideoModeSettings());
 
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
     dates->setLabel(QObject::tr("Localization"));

@@ -230,7 +230,15 @@ class MythContext : public QObject
     void SaveSetting(const QString &key, int newValue);
     void SaveSetting(const QString &key, const QString &newValue);
     QString GetSetting(const QString &key, const QString &defaultval = "");
+
+    // Convenience setting query methods
     int GetNumSetting(const QString &key, int defaultval = 0);
+    double GetFloatSetting(const QString &key, double defaultval = 0.0);
+    void GetResolutionSetting(const QString &type, int &width, int &height,
+                              double& forced_aspect, short &refreshrate,
+                              int index=-1);
+    void GetResolutionSetting(const QString &type, int &width, int &height,
+                              int index=-1);
 
     QString GetSettingOnHost(const QString &key, const QString &host,
                              const QString &defaultval = "");
