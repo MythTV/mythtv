@@ -29,6 +29,31 @@
 
 #include "mtdbitem.h"
 
+
+static bool pixmapsSet = false;
+static QPixmap *pixBargain = NULL;
+
+static void setupPixmaps(void)
+{
+    pixmapsSet = true;
+    
+    pixBargain = gContext->LoadScalePixmap("bargain_ticket.png");
+}
+
+static QPixmap *getPixmap(const QString &level)
+{
+    if (!pixmapsSet)
+        setupPixmaps();
+
+    if (level == "bargain")
+        return pixBargain;
+    else
+        return NULL;
+
+}
+
+
+
  
 MMTDBItem::MMTDBItem(UIListGenericTree *parent, const QString &text, 
                      TreeKeys key, int filmID, const QString& theaterID, 
@@ -154,10 +179,11 @@ void MMTDBItem::toMap(QMap<QString, QString> &map)
  
 
 MMTMovieMasterItem::MMTMovieMasterItem(UIListGenericTree* parent, const QString &text)
-                  : MMTDBItem(parent, text, KEY_MOVIE_MASTER, 0 )
+                  : MMTDBItem(parent, text, KEY_MOVIE_MASTER )
 {
     populateTree(parent);    
 }
+
 
 void MMTMovieMasterItem::populateTree(UIListGenericTree*)
 {
@@ -196,45 +222,80 @@ MMTShowingItem::MMTShowingItem(UIListGenericTree* parent, const QString& text,
                
 void MMTShowingItem::populateTree(UIListGenericTree*)
 {
-    MMTDBItem* tempItem;
+    
     
     MSqlQuery query(MSqlQuery::InitCon());
     
     if (TheaterID == "ALL" )
     {
+        MMTDBItem* tempItem;
         
         query.prepare( "SELECT DISTINCT rowid, Date "
                        "FROM movietime_movies "
                        "WHERE filmid = :FILMID" );
                    
         query.bindValue(":FILMID", FilmID);
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            while (query.next()) 
+            {
+                tempItem = new MMTDBItem(this, query.value(1).toString(), 
+                                     KEY_TIME, FilmID, TheaterID, ShowingID, query.value(0).toInt());
+         
+            }
+        }
     }        
     else
     {
-       query.prepare( "SELECT rowid, Time "
+       query.prepare( "SELECT rowid, Time, Bargin "
                       "FROM movietime_showtimes "
                       "WHERE TimesRowID = :ROWID" );
                    
         query.bindValue(":ROWID", ShowingID);
-
+        
+        MMTShowTimeItem* tempItem;
+        
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            while (query.next()) 
+            {
+                tempItem = new MMTShowTimeItem(this, query.value(1).toString(), 
+                                               query.value(2).toBool(), FilmID, 
+                                               TheaterID, ShowingID, query.value(0).toInt());         
+            }
+        }
     }
     
-    if (query.exec() && query.isActive() && query.size() > 0)
+}
+
+
+MMTShowTimeItem::MMTShowTimeItem(UIListGenericTree* parent, const QString& text, bool bargain,
+                                 int filmID, const QString& theaterID, int showingID, int timeID)
+               : MMTDBItem(parent, text, KEY_TIME, filmID, theaterID, showingID, timeID)
+{
+    Bargain = bargain;
+    if ( Bargain )
     {
-        while (query.next()) 
-        {
-            tempItem = new MMTDBItem(this, query.value(1).toString(), 
-                                     KEY_TIME, FilmID, TheaterID, ShowingID, query.value(0).toInt());
-         
-        }
+        setPixmap(getPixmap("bargain"));
+    }
+    
+    TicketTime = text;
+}
+
+void MMTShowTimeItem::toMap(QMap<QString, QString> &map)
+{
+    MMTDBItem::toMap(map);
+    
+    if (Bargain)
+    {
+        map["ticket_type"] = QObject::tr("Bargain");
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "MMTMovieItem::populateTreeWithDates failed to fetch dates" );
-        VERBOSE(VB_IMPORTANT, query.executedQuery());
-        VERBOSE(VB_IMPORTANT, query.lastError().text());
+        map["ticket_type"] = QObject::tr("Normal");
     }
     
+    map["ticket_time"] = TicketTime;
 }
 
 

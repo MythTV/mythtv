@@ -74,6 +74,19 @@ class MMTShowingItem : public MMTDBItem
 };
 
 
+class MMTShowTimeItem : public MMTDBItem
+{
+    public:
+        MMTShowTimeItem(UIListGenericTree* parent, const QString& text, bool bargain,
+                       int FilmID = 0, const QString& theaterID = "", int ShowingID = 0, 
+                       int TimeID = 0);
+    
+        virtual void toMap(QMap<QString, QString> &map);
+    protected:
+        bool Bargain;                      
+        QString TicketTime;
+};
+
 // MMTMovieMasterItem encapsulates the top level list of movies
 // It's used to handle the "I want to watch movie XXX, when is it on?" question
 class MMTMovieMasterItem : public MMTDBItem

@@ -17,7 +17,7 @@ SOURCES += main.cpp mainwnd.cpp mtdbitem.cpp dbcheck.cpp
 target.path = $${PREFIX}/lib/mythtv/plugins
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
-uifiles.files = movietime-ui.xml
+uifiles.files = movietime-ui.xml images/*.png
 
 INSTALLS += target uifiles
 
