@@ -910,7 +910,9 @@ fi
 # if no tune setting and we know cpu class look at $processor 
 if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 # first try to tune based on processor info
-   if expr "$processor" : ".*Intel(R) Pentium(R) 4" > /dev/null ; then
+   if expr "$processor" : "pentium4" > /dev/null ; then
+       ARCHFLAGS="-march=pentium4"
+   elif expr "$processor" : ".*Intel(R) Pentium(R) 4" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Intel(R) Pentium(R) M" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
@@ -922,8 +924,17 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
        ARCHFLAGS="-march=pentium3"
    elif expr "$processor" : ".*Intel(R) Pentium(R) III" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
+   elif expr "$processor" : "pentium3" > /dev/null ; then
+       ARCHFLAGS="-march=pentium3"
    elif expr "$processor" : ".*Celeron (Coppermine)" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
+       optimize="small"
+   elif expr "$processor" : ".*Intel(R) Celeron(TM) CPU" > /dev/null ; then
+       ARCHFLAGS="-march=pentium3"
+       optimize="small"
+   elif expr "$processor" : ".*Celeron (Mendocino)" > /dev/null ; then
+       ARCHFLAGS="-march=pentium2"
+       optimize="small"
    elif expr "$processor" : ".*Intel(R) Celeron(R) CPU" > /dev/null ; then
        if expr "$processor_flags" : ".*sse2" > /dev/null ; then
            ARCHFLAGS="-march=pentium4"
@@ -946,6 +957,9 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
        ARCHFLAGS="-march=athlon"
    elif expr "$processor" : ".*AMD Athlon(TM)" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
+   elif expr "$processor" : ".*AMD Duron(TM)" > /dev/null ; then
+       ARCHFLAGS="-march=athlon"
+       optimize="small"
    elif expr "$processor" : "athlon" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
    elif expr "$processor" : ".*Crusoe(m) Processor TM5600" > /dev/null ; then
