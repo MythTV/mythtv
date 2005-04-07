@@ -35,6 +35,13 @@
    </button>
 
    <button>
+     <type>SETTINGS_MOVIETIME</type>
+     <text>Movie Time Settings</text>
+     <action>CONFIGPLUGIN mythmovietime</action>
+     <depends>mythmovietime</depends>
+   </button>
+   
+   <button>
      <type>SETTINGS_WEBPAGE</type>
      <text>Web Settings</text>
      <text lang="DE">WWW</text>
