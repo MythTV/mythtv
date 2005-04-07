@@ -145,6 +145,24 @@ void PreviousBox::keyPressEvent(QKeyEvent *e)
             upcoming();
         else if (action == "DETAILS")
             details();
+        else if (action == "1")
+        {
+            if (viewList[curView] == "sort by time")
+                curView = viewList.findIndex("reverse time");
+            else
+                curView = viewList.findIndex("sort by time");
+
+            refillAll = true;
+        }
+        else if (action == "2")
+        {
+            if (viewList[curView] == "sort by title")
+                curView = viewList.findIndex("reverse title");
+            else
+                curView = viewList.findIndex("sort by title");
+
+            refillAll = true;
+        }
         else
             handled = false;
     }
@@ -347,7 +365,12 @@ void PreviousBox::select()
 
 void PreviousBox::edit()
 {
-    removalDialog();
+    ProgramInfo *pi = itemList.at(curItem);
+
+    if (!pi)
+        return;
+
+    pi->EditScheduled();
 }
 
 void PreviousBox::upcoming()
@@ -391,10 +414,10 @@ void PreviousBox::fillViewList(const QString &view)
         curView = 0;
 }
 
-class titleIDSort
+class pbTitleSort
 {
     public:
-        titleIDSort(bool reverseSort = false) {m_reverse = reverseSort;}
+        pbTitleSort(bool reverseSort = false) {m_reverse = reverseSort;}
 
         bool operator()(const ProgramInfo *a, const ProgramInfo *b) 
         {
@@ -415,10 +438,10 @@ class titleIDSort
         bool m_reverse;
 };
 
-class timeSort
+class pbTimeSort
 {
     public:
-        timeSort(bool reverseSort = false) {m_reverse = reverseSort;}
+        pbTimeSort(bool reverseSort = false) {m_reverse = reverseSort;}
 
         bool operator()(const ProgramInfo *a, const ProgramInfo *b) 
         {
@@ -450,13 +473,13 @@ void PreviousBox::fillItemList(void)
     }
 
     if (viewList[curView] == "reverse time")
-        sort(sortedList.begin(), sortedList.end(), timeSort(true));
+        sort(sortedList.begin(), sortedList.end(), pbTimeSort(true));
     else if (viewList[curView] == "sort by time")
-        sort(sortedList.begin(), sortedList.end(), timeSort(false));
+        sort(sortedList.begin(), sortedList.end(), pbTimeSort(false));
     else if (viewList[curView] == "reverse title")
-        sort(sortedList.begin(), sortedList.end(), titleIDSort(true));
+        sort(sortedList.begin(), sortedList.end(), pbTitleSort(true));
     else
-        sort(sortedList.begin(), sortedList.end(), titleIDSort(false));
+        sort(sortedList.begin(), sortedList.end(), pbTitleSort(false));
 
     vector<ProgramInfo *>::iterator i = sortedList.begin();
     for (; i != sortedList.end(); i++)
