@@ -55,10 +55,6 @@ static const int chromaBits[4] = { 6, 6, 4+1<<CHROMA_422, 4+1<<CHROMA_444 };
 static const int mv_ffmpeg_to_xvmc[8];
 static const char* mv_ffmpeg_to_string[8];
 
-//#include "xvmc_debug.h"
-
-#undef fprintf
-
 static inline xvmc_render_state_t *render_state(const MpegEncContext *s);
 static inline int calc_cbp(MpegEncContext *s);
 static void set_block_pattern(const MpegEncContext *, XvMCMacroBlock *);
@@ -96,7 +92,6 @@ const int mb_block_count = 4+(1<<s->chroma_format);
            s->pblocks[i] = NULL;
         }
         cbp+=cbp;
-//        printf("s->pblocks[%d]=%p ,s->block=%p cbp=%d\n",i,s->pblocks[i],s->block,cbp);
     }
 }
 
@@ -136,15 +131,18 @@ xvmc_render_state_t * render,* last, * next;
             render->p_past_surface = findPastSurface(s, render);
             render->p_future_surface = findFutureSurface(s);
             if (!render->p_past_surface)
-                fprintf(stderr, "error: decoding B frame and past frame is null!");
+                av_log(s->avctx, AV_LOG_ERROR, "XvMC: Error, decoding "
+                       "B frame and past frame is null!\n");
             else if (!render->p_future_surface)
-                fprintf(stderr, "error: decoding B frame and future frame is null!");
+                av_log(s->avctx, AV_LOG_ERROR, "XvMC: Error, decoding "
+                       "B frame and future frame is null!\n");
             else return 0;
             return 0; // pretend things are ok even if they aren't
         case  P_TYPE:
             render->p_past_surface = findPastSurface(s, render);
             if (!render->p_past_surface)
-                fprintf(stderr, "error: decoding P frame and past frame is null!");
+                av_log(s->avctx, AV_LOG_ERROR, "XvMC: error, decoding "
+                       "P frame and past frame is null!\n");
             else return 0;
             return 0; // pretend things are ok even if they aren't
      }
@@ -285,7 +283,8 @@ static inline void DBG_printPictureStructureChanges(int picture_structure)
     int frame = (PICT_FRAME==picture_structure)? 1 : 0;
     if (oldframe != frame)
     {
-        fprintf(stderr, "picture structure %s\n", frame ? "FRAME" : "FIELD");
+        av_log(NULL, AV_LOG_ERROR, "XvMC: picture structure %s\n",
+               frame ? "FRAME" : "FIELD");
         oldframe = frame;
     }
 #endif
@@ -491,10 +490,8 @@ static void setup_pmv_frame(MpegEncContext *s,
             mv_block->PMV[1][1][1] = s->mv[1][1][1]<<1;
             mv_block->motion_vertical_field_select = mvfs0 | mvfs1;
         }
-        else
+        else if (MV_TYPE_DMV==s->mv_type)
         {
-            assert(MV_TYPE_DMV==s->mv_type);
-            //fprintf(stdout, "XVMC: DMV ");
             mv_block->PMV[0][0][0] = s->mv[0][0][0]; // top    from top
             mv_block->PMV[0][0][1] = s->mv[0][0][1]<<1;
             mv_block->PMV[0][1][0] = s->mv[0][0][0]; // bottom from bottom
@@ -504,6 +501,8 @@ static void setup_pmv_frame(MpegEncContext *s,
             mv_block->PMV[1][1][0] = s->mv[0][3][0]; // bottom from top
             mv_block->PMV[1][1][1] = s->mv[0][3][1]<<1;
         }
+        else
+            av_log(s->avctx, AV_LOG_ERROR, "XvMC: Unexpected movement type\n");
     }
     else
     {
@@ -515,7 +514,8 @@ static void setup_pmv_frame(MpegEncContext *s,
     // Error conditions
     if (MV_TYPE_16X8 == s->mv_type)
     {
-        fprintf(stderr, "XVMC: Field motion vector type with frame picture!\n");
+        av_log(s->avctx, AV_LOG_ERROR,
+               "XvMC: Field motion vector type with frame picture!\n");
         if (s->mv_type == MV_TYPE_16X8)
         {
             int mvfs0 = (s->field_select[0][0]) ? XVMC_SELECT_FIRST_FORWARD   : 0;
@@ -528,10 +528,11 @@ static void setup_pmv_frame(MpegEncContext *s,
     if (-1 == mv_block->motion_type)
     {
         if (MV_TYPE_8X8==s->mv_type)
-            fprintf(stderr, "XVMC: H263/MPEG4 motion"
-                    " vectortype in MPEG2 decoder!\n");
+            av_log(s->avctx, AV_LOG_ERROR,
+                   "XvMC: H263/MPEG4 motion vectortype in MPEG2 decoder!\n");
         else
-            fprintf(stderr, "XVMC: Unknown motion vector type!\n");
+            av_log(s->avctx, AV_LOG_ERROR,
+                   "XvMC: Unknown motion vector type!\n");
         mv_block->motion_type=XVMC_PREDICTION_FRAME;
     }
 }
@@ -571,9 +572,11 @@ static void setup_pmv_field(MpegEncContext *s,
     if (-1==mv_block->motion_type)
     {
         if (MV_TYPE_8X8==s->mv_type) 
-            fprintf(stderr, "XVMC: H263/MPEG4 motion vector type in MPEG2 decoder!\n");
+            av_log(s->avctx, AV_LOG_ERROR,
+                   "XvMC: H263/MPEG4 motion vector type in MPEG2 decoder!\n");
         else
-            fprintf(stderr, "XVMC: Unknown motion vector type!\n");
+            av_log(s->avctx, AV_LOG_ERROR,
+                   "XvMC: Unknown motion vector type!\n");
         mv_block->motion_type = XVMC_PREDICTION_FRAME;
     }
 }
