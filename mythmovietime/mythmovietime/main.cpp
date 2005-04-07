@@ -28,6 +28,7 @@
 #include <mythtv/mythplugin.h>
 
 #include "mainwnd.h"
+#include "settings.h"
 
 
 using namespace std;
@@ -80,6 +81,8 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
+    MMTGeneralSettings settings;
+    settings.exec();
     return 0;
 }
 
