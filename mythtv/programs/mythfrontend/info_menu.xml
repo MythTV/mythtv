@@ -15,7 +15,13 @@
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
-
+    <button>
+     <type>MOVIETIMES</type>
+     <text>Movie Times</text>
+     <action>PLUGIN mythmovietime</action>
+     <depends>mythmovietime</depends>
+   </button>
+   
    <button>
      <type>WEATHER</type>
      <text>Weather</text>
