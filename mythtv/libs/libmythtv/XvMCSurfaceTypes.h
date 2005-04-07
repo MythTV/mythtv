@@ -2,6 +2,8 @@
 #ifndef XVMC_SURFACE_TYPES_H_
 #define XVMC_SURFACE_TYPES_H_
 
+#ifdef USING_XVMC
+
 #include "../libmyth/mythcontext.h"
 #include <X11/extensions/XvMC.h>
 
@@ -160,4 +162,6 @@ class XvMCSurfaceTypes
     XvMCSurfaceInfo *surfaces;
 };
 
-#endif
+#endif // USING_XVMC
+
+#endif // XVMC_SURFACE_TYPES_H_

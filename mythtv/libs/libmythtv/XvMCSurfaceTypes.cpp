@@ -1,3 +1,4 @@
+#ifdef USING_XVMC
 #include "XvMCSurfaceTypes.h"
 
 static inline Display* createXvMCDisplay() 
@@ -88,11 +89,13 @@ void XvMCSurfaceTypes::find(int minWidth, int minHeight,
                             int& surfNum) 
 {
     VERBOSE(VB_PLAYBACK, 
-            QString("XvMCSurfaceTypes::find(w %1, h %2, c %3, i %4, m %5,"
-                    "sw %6, sh %7, disp, p<= %9, %10 <=p, port, surfNum)")
-            .arg(minWidth).arg(minHeight).arg(chroma).arg(idct).arg(mpeg)
+            QString("XvMCSurfaceTypes::find(w %1, h %2, chroma %3, vld %4, idct %5,"
+                    " mpeg%6, sub-width %7, sub-height %8, disp, %9")
+            .arg(minWidth).arg(minHeight).arg(chroma)
+            .arg(vld).arg(idct).arg(mpeg)
             .arg(minSubpictureWidth).arg(minSubpictureHeight)
-            .arg(portMin).arg(portMax));
+            .arg(QString("p<= %9, %10 <=p, port, surfNum)")
+                 .arg(portMin).arg(portMax)));
 
     port = 0;
     surfNum = -1;
@@ -242,3 +245,5 @@ void printAll()
     }
 }
 #endif
+
+#endif // USING_XVMC
