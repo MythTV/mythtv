@@ -142,9 +142,9 @@ int main(int argc, char *argv[])
             cerr << "Valid options are: \n" << 
 #ifdef Q_WS_X11 
                     "-display X-server     Create GUI on X-server, not localhost\n" <<
-                    "-geometry WxH+X+Y     Override window size settings\n" <<
 #endif          
-                    "--geometry WxH+X+Y    Override window size settings\n";
+                    "--geometry WxH        Override window size settings\n" <<
+                    "-geometry WxH+X+Y     Override window size and position\n";
             return -1;
         }
     }

@@ -898,9 +898,9 @@ int main(int argc, char **argv)
             cerr << "Valid options are: " << endl <<
 #ifdef Q_WS_X11
                     "-display X-server              Create GUI on X-server, not localhost\n" <<
-                    "-geometry WxH+X+Y              Override window size settings\n" <<
 #endif
-                    "--geometry WxH+X+Y             Override window size settings\n" <<
+                    "-geometry or --geometry WxH    Override window size settings\n" <<
+                    "--geometry WxH+X+Y             Override window size and position\n" <<
                     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
                     "-v or --verbose debug-level    Prints more information" << endl <<
                     "                               Accepts any combination (separated by comma)" << endl << 

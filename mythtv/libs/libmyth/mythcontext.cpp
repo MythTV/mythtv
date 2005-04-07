@@ -218,6 +218,10 @@ void MythContextPrivate::GetScreenBounds()
 
     QDesktopWidget * desktop = QApplication::desktop();
 
+cout << "Nigel, total desktop width=" << desktop->width() <<
+        ", height="     << desktop->height() <<
+        ", numscreens=" << desktop->numScreens() << endl;
+
     int screen = parent->GetNumSetting("XineramaScreen", 0);
 
     if (screen == -1)       // Special case - span all screens
@@ -1235,23 +1239,36 @@ void MythContext::GetScreenSettings(int &xbase, int &width, float &wmult,
 }
 
 // Parse an X11 style command line geometry string, like
+//  -geometry 800x600
+// or
 //  -geometry 800x600+112+22
 // and override the fullscreen and user default screen dimensions
 
 bool MythContext::ParseGeometryOverride(const QString geometry)
 {
-    QRegExp re("^(\\d+)x(\\d+)([+-]\\d+)([+-]\\d+)$");
+    QRegExp     sre("^(\\d+)x(\\d+)$");
+    QRegExp     lre("^(\\d+)x(\\d+)([+-]\\d+)([+-]\\d+)$");
+    QStringList geo;
+    bool        longForm = false;
 
-    if (!re.exactMatch(geometry))
+    if (sre.exactMatch(geometry))
     {
-        VERBOSE(VB_IMPORTANT,
-                "Geometry does not match form WIDTHxHEIGHT+XOFF+YOFF");
+        sre.search(geometry);
+        geo = sre.capturedTexts();
+    }
+    else if (lre.exactMatch(geometry))
+    {
+        lre.search(geometry);
+        geo = lre.capturedTexts();
+        longForm = true;
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, "Geometry does not match either form -");
+        VERBOSE(VB_IMPORTANT, "WIDTHxHEIGHT or WIDTHxHEIGHT+XOFF+YOFF");
         return false;
     }
 
-    re.search(geometry);
-
-    QStringList geo = re.capturedTexts();
     bool parsed;
 
     d->m_geometry_w = geo[1].toInt(&parsed);
@@ -1269,7 +1286,7 @@ bool MythContext::ParseGeometryOverride(const QString geometry)
     }
 
     d->m_geometry_x = geo[3].toInt(&parsed);
-    if (!parsed)
+    if (longForm && !parsed)
     {
         VERBOSE(VB_IMPORTANT,
                 "Could not parse horizontal offset of geometry override");
@@ -1277,7 +1294,7 @@ bool MythContext::ParseGeometryOverride(const QString geometry)
     }
 
     d->m_geometry_y = geo[4].toInt(&parsed);
-    if (!parsed)
+    if (longForm && !parsed)
     {
         VERBOSE(VB_IMPORTANT,
                 "Could not parse vertical offset of geometry override");
