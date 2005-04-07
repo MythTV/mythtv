@@ -1268,7 +1268,7 @@ void MythContext::GetResolutionSetting(const QString &type,
     if ("" != res)
     {
         QStringList slist = QStringList::split("x", res);
-        int w, h;
+        int w = width, h = height;
         if (2 == slist.size())
         {
             w = slist[0].toInt(&ok0);
