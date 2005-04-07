@@ -77,6 +77,11 @@
 <category name="Computers">
 
     <item>
+        <title>2CPU.com</title>
+        <url>http://www.2cpu.com/news.rdf</url>
+    </item>
+
+    <item>
         <title>BBC - Technology</title>
         <url>http://news.bbc.co.uk/rss/newsonline_world_edition/business/rss091.xml</url>
     </item>
