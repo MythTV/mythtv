@@ -42,10 +42,10 @@ static HostComboBox *TxResolution()
 {
     HostComboBox *gc = new HostComboBox("TxResolution");
     gc->setLabel(QObject::tr("Transmit Resolution"));
-    gc->addSelection(QObject::tr("176x144"), "176x144");
-    gc->addSelection(QObject::tr("128x96"), "128x96");
-    gc->addSelection(QObject::tr("704x576"), "704x576");
-    gc->addSelection(QObject::tr("352x288"), "352x288");
+    gc->addSelection("176x144");
+    gc->addSelection("128x96");
+    gc->addSelection("704x576");
+    gc->addSelection("352x288");
     gc->setHelpText(QObject::tr("Size of video window to transmit; higher "
                     "resolutions require more bandwidth."));
     return gc;
@@ -55,13 +55,13 @@ static HostComboBox *CaptureResolution()
 {
     HostComboBox *gc = new HostComboBox("CaptureResolution");
     gc->setLabel(QObject::tr("Capture Resolution"));
-    gc->addSelection(QObject::tr("352x288"), "352x288");
-    gc->addSelection(QObject::tr("320x240"), "320x240");
-    gc->addSelection(QObject::tr("176x144"), "176x144");
-    gc->addSelection(QObject::tr("160x120"), "160x120");
-    gc->addSelection(QObject::tr("128x96"), "128x96");
-    gc->addSelection(QObject::tr("704x576"), "704x576");
-    gc->addSelection(QObject::tr("640x480"), "640x480");
+    gc->addSelection("352x288");
+    gc->addSelection("320x240");
+    gc->addSelection("176x144");
+    gc->addSelection("160x120");
+    gc->addSelection("128x96");
+    gc->addSelection("704x576");
+    gc->addSelection("640x480");
     gc->setHelpText(QObject::tr("Size of video source from your webcam. Choose "
                     "a value compatible with your webcam hardware. Choose "
                     "higher values to digitally pan/zoom before "
@@ -97,7 +97,7 @@ static HostLineEdit *TimeToAnswer()
 {
     HostLineEdit *gc = new HostLineEdit("TimeToAnswer");
     gc->setLabel(QObject::tr("Time to Answer"));
-    gc->setValue(QObject::tr("10"));
+    gc->setValue("10");
     gc->setHelpText(QObject::tr("The time in seconds a call rings before being "
                     "automatically answered and diverted to a VXML script."));
     return gc;
@@ -107,7 +107,7 @@ static HostLineEdit *DefaultVxmlUrl()
 {
     HostLineEdit *gc = new HostLineEdit("DefaultVxmlUrl");
     gc->setLabel(QObject::tr("Default VXML URL"));
-    gc->setValue(QObject::tr("http://127.0.0.1/vxml/index.vxml"));
+    gc->setValue("http://127.0.0.1/vxml/index.vxml");
     gc->setHelpText(QObject::tr("The URL to retrieve a VXML script which can "
                     "be used to prompt for leaving a voicemail etc. Leave "
                     "blank if you have no HTTP server and a default Voicemail "
@@ -190,7 +190,7 @@ static HostLineEdit *SipLocalPort()
 {
     HostLineEdit *gc = new HostLineEdit("SipLocalPort");
     gc->setLabel(QObject::tr("SIP Local Port"));
-    gc->setValue(QObject::tr("5060"));
+    gc->setValue("5060");
     gc->setHelpText(QObject::tr("The port on this machine to use. You may need "
                     "to make these different for each Mythfrontend and setup "
                     "your firewall to let this port through."));
@@ -214,7 +214,7 @@ static HostLineEdit *MySipName()
 {
     HostLineEdit *gc = new HostLineEdit("MySipName");
     gc->setLabel(QObject::tr("My Display Name"));
-    gc->setValue("Me");
+    gc->setValue(QObject::tr("Me"));
     gc->setHelpText(QObject::tr("My common name to display when I call other "
                     "people. "));
     return gc;
@@ -245,7 +245,7 @@ static HostLineEdit *SipBindInterface()
 {
     HostLineEdit *gc = new HostLineEdit("SipBindInterface");
     gc->setLabel(QObject::tr("SIP Network Interface"));
-    gc->setValue(QObject::tr("eth0"));
+    gc->setValue("eth0");
     gc->setHelpText(QObject::tr("Enter the name of the network to bind to e.g. "
                     "eth0"));
     return gc;
