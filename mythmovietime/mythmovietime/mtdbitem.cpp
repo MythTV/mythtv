@@ -29,6 +29,17 @@
 
 #include "mtdbitem.h"
 
+QString DateFormat;
+
+const QString& getDateFormat()
+{
+    if( DateFormat.isEmpty() )
+    {
+        DateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    }
+    
+    return DateFormat;
+}
 
 static bool pixmapsSet = false;
 static QPixmap *pixBargain = NULL;
@@ -56,11 +67,10 @@ static QPixmap *getPixmap(const QString &level)
 
  
 MMTDBItem::MMTDBItem(UIListGenericTree *parent, const QString &text, 
-                     TreeKeys key, int filmID, const QString& theaterID, 
+                     int filmID, const QString& theaterID, 
                      int showingID, int timeID)
          : UIListGenericTree(parent, text, "MMTDBItem")
 {
-    Key = key;
     FilmID = filmID;
     TheaterID = theaterID;
     ShowingID = showingID;
@@ -146,6 +156,12 @@ void MMTDBItem::toMap(QMap<QString, QString> &map)
             map["film_soundmix"]        = query.value(6).toString();
             map["film_genre"]           = query.value(7).toString();
             map["film_mpaarating"]      = query.value(8).toString();
+            if (!query.value(8).toString().isEmpty() )
+            {
+                map["film_disp_mpaarating"] = QString("%1 %2" )
+                                                      .arg(QObject::tr("Rated"))
+                                                      .arg(query.value(8).toString());
+            }                                     
             map["film_starrating"]      = query.value(9).toString();
             map["film_certification"]   = query.value(10).toString();
             map["film_audience"]        = query.value(11).toString();
@@ -167,6 +183,7 @@ void MMTDBItem::toMap(QMap<QString, QString> &map)
         map["film_soundmix"]        = "";
         map["film_genre"]           = "";
         map["film_mpaarating"]      = "";
+        map["film_disp_mpaarating"] = "";
         map["film_starrating"]      = "";
         map["film_certification"]   = "";
         map["film_audience"]        = "";
@@ -174,12 +191,16 @@ void MMTDBItem::toMap(QMap<QString, QString> &map)
         map["film_officialurl"]     = "";
         map["film_language"]        = "";
     }    
-    
+
+    // Clear out fields implemented by derrived classes
+    map["ticket_time"] = "";
+    map["ticket_date"] = "";
+    map["ticket_date_time"] = "";
 }
  
 
 MMTMovieMasterItem::MMTMovieMasterItem(UIListGenericTree* parent, const QString &text)
-                  : MMTDBItem(parent, text, KEY_MOVIE_MASTER )
+                  : MMTDBItem(parent, text)
 {
     populateTree(parent);    
 }
@@ -213,10 +234,12 @@ void MMTMovieMasterItem::populateTree(UIListGenericTree*)
 }
 
 
-MMTShowingItem::MMTShowingItem(UIListGenericTree* parent, const QString& text, 
-                               int filmID, const QString& theaterID, int showingID)
-              : MMTDBItem(parent, text, KEY_DATE, filmID, theaterID, showingID )
+MMTShowingItem::MMTShowingItem(UIListGenericTree* parent, const QDate& dt, 
+                               int filmID, const QString& theaterID, int showingID, int timeID)
+              : MMTDBItem(parent, dt.toString(getDateFormat()),
+                          filmID, theaterID, showingID, timeID )
 {
+    ShowDate = dt;
 }
 
                
@@ -240,7 +263,7 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
             while (query.next()) 
             {
                 tempItem = new MMTDBItem(this, query.value(1).toString(), 
-                                     KEY_TIME, FilmID, TheaterID, ShowingID, query.value(0).toInt());
+                                         FilmID, TheaterID, ShowingID, query.value(0).toInt());
          
             }
         }
@@ -249,7 +272,8 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
     {
        query.prepare( "SELECT rowid, Time, Bargin "
                       "FROM movietime_showtimes "
-                      "WHERE TimesRowID = :ROWID" );
+                      "WHERE TimesRowID = :ROWID " 
+                      "ORDER BY Time");
                    
         query.bindValue(":ROWID", ShowingID);
         
@@ -259,7 +283,7 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
         {
             while (query.next()) 
             {
-                tempItem = new MMTShowTimeItem(this, query.value(1).toString(), 
+                tempItem = new MMTShowTimeItem(this, ShowDate, query.value(1).toString(), 
                                                query.value(2).toBool(), FilmID, 
                                                TheaterID, ShowingID, query.value(0).toInt());         
             }
@@ -269,10 +293,13 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
 }
 
 
-MMTShowTimeItem::MMTShowTimeItem(UIListGenericTree* parent, const QString& text, bool bargain,
-                                 int filmID, const QString& theaterID, int showingID, int timeID)
-               : MMTDBItem(parent, text, KEY_TIME, filmID, theaterID, showingID, timeID)
+MMTShowTimeItem::MMTShowTimeItem(UIListGenericTree* parent, const QDate& dt, const QString& text, 
+                                 bool bargain, int filmID, const QString& theaterID, int showingID, 
+                                 int timeID)
+               : MMTDBItem(parent, text, 
+                           filmID, theaterID, showingID, timeID)
 {
+    ShowDate = dt;
     Bargain = bargain;
     if ( Bargain )
     {
@@ -280,6 +307,14 @@ MMTShowTimeItem::MMTShowTimeItem(UIListGenericTree* parent, const QString& text,
     }
     
     TicketTime = text;
+}
+
+void MMTShowingItem::toMap(QMap<QString, QString> &map)
+{
+    MMTDBItem::toMap(map);
+    map["ticket_time"] = "";
+    map["ticket_date"] = ShowDate.toString(getDateFormat());
+    map["ticket_date_time"] = map["ticket_date"];
 }
 
 void MMTShowTimeItem::toMap(QMap<QString, QString> &map)
@@ -296,12 +331,14 @@ void MMTShowTimeItem::toMap(QMap<QString, QString> &map)
     }
     
     map["ticket_time"] = TicketTime;
+    map["ticket_date"] = ShowDate.toString(getDateFormat());
+    map["ticket_date_time"] = QString("%1, %2").arg(ShowDate.toString(getDateFormat())).arg(TicketTime);
 }
 
 
 MMTMovieItem::MMTMovieItem(UIListGenericTree* parent, const QString &text, 
                            int filmID, const QString& theaterID, int showingID)
-            : MMTDBItem(parent, text, KEY_MOVIE, filmID, theaterID, showingID )
+            : MMTDBItem(parent, text, filmID, theaterID, showingID )
 {
 }
 
@@ -345,7 +382,7 @@ void MMTMovieItem::populateTreeWithDates(UIListGenericTree* tree)
     {
         while (query.next()) 
         {
-            tempItem = new MMTShowingItem(this, query.value(1).toString(), 
+            tempItem = new MMTShowingItem(this, query.value(1).toDate(), 
                                           FilmID, TheaterID, query.value(0).toInt());
          
         }
@@ -396,7 +433,7 @@ void MMTMovieItem::populateTreeWithTheaters(UIListGenericTree* tree)
 
 
 MMTTheaterMasterItem::MMTTheaterMasterItem(UIListGenericTree* parent, const QString &text)
-                  : MMTDBItem(parent, text, KEY_THEATER_MASTER)
+                  : MMTDBItem(parent, text)
 {
     populateTree(parent);    
 }
@@ -424,7 +461,7 @@ void MMTTheaterMasterItem::populateTree(UIListGenericTree*)
 
 MMTTheaterItem::MMTTheaterItem(UIListGenericTree* parent, const QString &text, 
                                int filmID, const QString& theaterID, int showingID, int timeID)
-              : MMTDBItem(parent, text, KEY_THEATER, filmID, theaterID, showingID, timeID)
+              : MMTDBItem(parent, text, filmID, theaterID, showingID, timeID)
 {
 }
 
@@ -492,7 +529,7 @@ void MMTTheaterItem::populateTreeWithDates(UIListGenericTree*)
     {
         while (query.next()) 
         {
-            tempItem = new MMTShowingItem(this, query.value(1).toString(), 
+            tempItem = new MMTShowingItem(this, query.value(1).toDate(), 
                                           FilmID, TheaterID, query.value(0).toInt());
          
         }

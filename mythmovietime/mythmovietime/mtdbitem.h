@@ -25,24 +25,12 @@
 
 #include <mythtv/uilistbtntype.h>
 
-enum TreeKeys {
-    KEY_THEATER = 1,    
-    KEY_THEATER_MASTER, 
-    KEY_MOVIE,          
-    KEY_MOVIE_MASTER,   
-    KEY_TIME,
-    KEY_DATE
-};    
-
-
-
-
 
 class MMTDBItem  : public UIListGenericTree
 {
     public:
         MMTDBItem(UIListGenericTree *parent, const QString &text, 
-                  TreeKeys key, int FilmID = 0, const QString& theaterID = "ALL",
+                  int FilmID = 0, const QString& theaterID = "ALL",
                   int ShowingID = 0, int TimeID = 0 );
                   
         virtual ~MMTDBItem() { }
@@ -68,23 +56,28 @@ class MMTDBItem  : public UIListGenericTree
 class MMTShowingItem : public MMTDBItem
 {
     public:
-        MMTShowingItem(UIListGenericTree* parent, const QString& text, int FilmID = 0, 
-                       const QString& theaterID = "", int ShowingID = 0);
+        MMTShowingItem(UIListGenericTree* parent, const QDate& dt, int FilmID = 0, 
+                       const QString& theaterID = "", int ShowingID = 0, int timeID = 0);
         virtual void populateTree(UIListGenericTree* Tree);
+        virtual void toMap(QMap<QString, QString> &map);
+        
+    protected:        
+        QDate ShowDate;
 };
 
 
 class MMTShowTimeItem : public MMTDBItem
 {
     public:
-        MMTShowTimeItem(UIListGenericTree* parent, const QString& text, bool bargain,
-                       int FilmID = 0, const QString& theaterID = "", int ShowingID = 0, 
-                       int TimeID = 0);
+        MMTShowTimeItem(UIListGenericTree* parent, const QDate& dt, const QString& text, 
+                        bool bargain, int FilmID = 0, const QString& theaterID = "", 
+                        int ShowingID = 0, int TimeID = 0);
     
         virtual void toMap(QMap<QString, QString> &map);
     protected:
         bool Bargain;                      
         QString TicketTime;
+        QDate ShowDate;
 };
 
 // MMTMovieMasterItem encapsulates the top level list of movies

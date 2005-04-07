@@ -11,21 +11,44 @@
     <window name="movietime_main">
     
         <font name="info" face="Arial">
+            <color>#ffff99</color>
+            <size>16</size>
+            <bold>yes</bold>
+            <shadow>1,1</shadow>
+        </font>
+        <font name="infow" face="Arial">
             <color>#ffffff</color>
             <size>16</size>
             <bold>yes</bold>
+            <shadow>1,1</shadow>
+        </font>
+        
+        <font name="theater" face="Arial">
+            <color>#ffff99</color>
+            <size>18</size>
+            <bold>yes</bold>
+            <shadow>1,1</shadow>
         </font>
         
         <font name="title" face="Arial">
-            <color>#ffffff</color>
+            <color>#ffffBB</color>
             <size>20</size>
             <bold>yes</bold>
+            <shadow>2,2</shadow>
+        </font>
+        
+        <font name="description" face="Arial">
+            <color>#ffffff</color>
+            <size>17</size>
+            <bold>yes</bold>
+            <shadow>1,1</shadow>
         </font>
         
         <font name="active" face="Arial">
             <color>#ffffff</color>
             <size>18</size>
             <bold>yes</bold>
+            <shadow>1,1</shadow>
         </font>
 
         
@@ -34,6 +57,7 @@
             <color>#9999cc</color>
             <size>18</size>
             <bold>yes</bold>
+            <shadow>1,1</shadow>
         </font>
 
         <container name="movietree">
@@ -57,27 +81,46 @@
                 <position>0,0</position>
             </image>
 
-            <textarea name="theater_name" draworder="1" align="left">
-                <font>active</font>
-                <area>10,0,780,30</area>
-                <cutdown>yes</cutdown>
-            </textarea>
-
-            <textarea name="theater_street" draworder="1" align="left">
-                <font>info</font>
-                <area>10,30,780,20</area>
-                <cutdown>yes</cutdown>
-            </textarea>
             
             <textarea name="film_title" draworder="1" align="left">
                 <font>title</font>
-                <area>10,65,780,30</area>
+                <area>10,0,580,35</area>
                 <cutdown>yes</cutdown>
             </textarea>
+            
             <textarea name="film_description" draworder="1" align="left">
-                <font>info</font>
-                <area>10,105,780,80</area>
+                <font>description</font>
+                <area>10,30,780,95</area>
                 <multiline>yes</multiline>
+                <cutdown>yes</cutdown>
+            </textarea>
+            
+            <textarea name="film_disp_mpaarating" draworder="1" align="right">
+                <font>info</font> 
+                <area>590,0,200,65</area>
+                <cutdown>yes</cutdown>
+            </textarea>
+            
+            <textarea name="ticket_date_time" draworder="1" align="left">
+                <font>theater</font>
+                <area>10,170,300,30</area>
+                <cutdown>yes</cutdown>
+            </textarea>
+            
+            <textarea name="theater_name" draworder="1" align="right">
+                <font>theater</font>
+                <area>390,140,400,30</area>
+                <cutdown>yes</cutdown>
+            </textarea>
+            
+            <!--<textarea name="theater_street" draworder="1" align="left">
+                <font>infow</font>
+                <area>390,140,400,30</area>
+                <cutdown>yes</cutdown>
+            </textarea>--> 
+            <textarea name="theater_phone" draworder="1" align="right">
+                <font>theater</font>
+                <area>390,170,400,30</area>
                 <cutdown>yes</cutdown>
             </textarea>
             
