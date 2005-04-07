@@ -134,7 +134,7 @@ package mythtv::nuvinfo;
         ($info{'audio_bits_per_sample'}) = $data =~ m/^ID_AUDIO_BITRATE=(\d+)/m;
         ($info{'audio_channels'})        = $data =~ m/^ID_AUDIO_NCH=(\d+)/m;
         ($info{'mpeg_stream_type'})      = $data =~ m/^ID_VIDEO_FPS=(\d+(?:\.\d*)?)/m;
-        ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=(\d+(?:\.\d*)?)/m;
+        ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=(\d+(?:[\.\,]\d*)?)/m;
         ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=(\d+(?:\.\d*)?)/m;
         if ($data =~ m/\bMPEG-(PE?S) file format detected/m) {
             $info{'mpeg_stream_type'} = lc($1);
@@ -148,6 +148,8 @@ package mythtv::nuvinfo;
                ."in your mplayer config).  If not, email the output to the nuvexport author.\n\n"
                ."    $program -v -v -v -v -nolirc -nojoystick -vo null -ao null -frames 0 -identify '$file'\n\n";
         }
+
+        $info{'aspect'} =~ s/\,/\./;
 # ID_VIDEO_BITRATE=6500000
 # ID_AUDIO_FORMAT=80
 # ID_LENGTH=3554
