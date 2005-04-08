@@ -29,6 +29,7 @@
 
 #include "mainwnd.h"
 #include "settings.h"
+#include "ddmovie.h"
 
 
 using namespace std;
@@ -73,9 +74,74 @@ void runMovietime(void)
     qApp->lock();    
 }
 
+bool fetchData()
+{
+    // Don't fetch data unless it's been at least a day since our last fetch.
+    // Note: The last fetch date gets reset every time the user enters the 
+    //       config dialogs so that changes in the config can cause us to
+    //       fetch data again.    
+    QString lastFetch;
+    lastFetch = gContext->GetSetting("MMT-Last-Fetch");
+    if (!lastFetch.isEmpty() && 
+        (QDate::currentDate().daysTo(QDate::fromString(lastFetch, Qt::ISODate)) != 0 ))
+    {
+        return true;
+    }
+
+    
+    QString user = gContext->GetSetting("MMTUser");
+    QString passwd = gContext->GetSetting("MMTPass");
+    QString zip = gContext->GetSetting("PostalCode");
+    double radius = gContext->GetSetting("Radius", "25").toDouble();
+    
+    if ( user.isEmpty() || passwd.isEmpty() || zip.isEmpty() )
+    {
+        MythPopupBox::showOkPopup( gContext->GetMainWindow(),  "",
+                                   QObject::tr("Movie data cannot be retrieved without "
+                                               "supplying some basic configuration.<br><br>"
+                                               "After selecting OK below you will be taken "
+                                               "to the configuration screen.<br><br>After you "
+                                               "have finished configuration you may run this "
+                                               "plugin again."));
+                                               
+        mythplugin_config();
+        return false;
+    }
+
+    MythProgressDialog dlg(QObject::tr("Retrieving movie showtime data"), 3);
+    
+    TMSMovieDirect dd;
+    dlg.setProgress(1);
+    
+    if (!dd.importData( user, passwd, zip, radius ))
+    {
+        dlg.Close();
+        MythPopupBox::showOkPopup( gContext->GetMainWindow(),  "",
+                                   QObject::tr("Movie data cannot be retrieved "
+                                               "please try again later.") );
+        return false;                                               
+    }
+    dlg.setProgress(2);
+
+    if ( !dd.store() )
+    {
+        dlg.Close();
+        MythPopupBox::showOkPopup( gContext->GetMainWindow(),  "",
+                                   QObject::tr("Movie data could not be saved "
+                                               "please check the output in the "
+                                               "console and try again later.") );
+        return false;                                               
+    }
+    
+    dlg.setProgress(3);
+    dlg.Close();
+    return true;    
+}
+
 int mythplugin_run(void)
 {
-    runMovietime();
+    if (fetchData() )
+        runMovietime();
     return 0;
 }
 

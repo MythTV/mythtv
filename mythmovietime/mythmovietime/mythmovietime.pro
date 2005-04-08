@@ -5,13 +5,16 @@
 include ( ../settings.pro )
 
 TEMPLATE = lib
-
+INCLUDES +=
 CONFIG += plugin thread warn_on debug
+
+INCLUDEPATH += ../mythfetchmovies
 
 TARGET = mythmovietime
 
 HEADERS += mainwnd.h mtdbitem.h settings.h 
-SOURCES += main.cpp mainwnd.cpp mtdbitem.cpp dbcheck.cpp settings.cpp
+SOURCES += main.cpp mainwnd.cpp mtdbitem.cpp dbcheck.cpp 
+SOURCES += settings.cpp  ../mythfetchmovies/ddmovie.cpp
 
 
 target.path = $${PREFIX}/lib/mythtv/plugins
