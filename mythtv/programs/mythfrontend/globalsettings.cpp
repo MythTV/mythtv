@@ -2988,10 +2988,11 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(RunInWindow());
     addChild(screen);
 
+#if defined(USING_XRANDR) || defined(CONFIG_DARWIN)
     const vector<DisplayResScreen> scr = GetVideoModes();
     if (scr.size())
         addChild(new VideoModeSettings());
-
+#endif
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
     dates->setLabel(QObject::tr("Localization"));
     dates->addChild(MythLanguage());
