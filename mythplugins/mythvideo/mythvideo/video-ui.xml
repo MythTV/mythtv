@@ -441,7 +441,7 @@
         <value>Directed by</value>
       </textarea>
       <textarea name="director" draworder="4">
-        <area>370,90,350,35</area>
+        <area>380,90,350,35</area>
         <font>labels</font>
       </textarea>
       <textarea name="yrlbl" draworder="4">
@@ -707,7 +707,7 @@
         <value>Directed by</value>
       </textarea>
       <textarea name="director" draworder="4">
-        <area>370,90,350,35</area>
+        <area>380,90,350,35</area>
         <font>labels</font>
       </textarea>
       <textarea name="yrlbl" draworder="4">
