@@ -30,6 +30,17 @@
 #include "mtdbitem.h"
 
 QString DateFormat;
+QString TimeFormat;
+
+const QString& getTimeFormat()
+{
+    if( TimeFormat.isEmpty() )
+    {
+        TimeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    }
+    
+    return TimeFormat;
+}
 
 const QString& getDateFormat()
 {
@@ -283,7 +294,7 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
         {
             while (query.next()) 
             {
-                tempItem = new MMTShowTimeItem(this, ShowDate, query.value(1).toString(), 
+                tempItem = new MMTShowTimeItem(this, ShowDate, query.value(1).toTime(), 
                                                query.value(2).toBool(), FilmID, 
                                                TheaterID, ShowingID, query.value(0).toInt());         
             }
@@ -293,20 +304,21 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
 }
 
 
-MMTShowTimeItem::MMTShowTimeItem(UIListGenericTree* parent, const QDate& dt, const QString& text, 
+MMTShowTimeItem::MMTShowTimeItem(UIListGenericTree* parent, const QDate& dt, const QTime& tm, 
                                  bool bargain, int filmID, const QString& theaterID, int showingID, 
                                  int timeID)
-               : MMTDBItem(parent, text, 
+               : MMTDBItem(parent, tm.toString(getTimeFormat()), 
                            filmID, theaterID, showingID, timeID)
 {
     ShowDate = dt;
+    TicketTime = tm;
     Bargain = bargain;
     if ( Bargain )
     {
         setPixmap(getPixmap("bargain"));
     }
     
-    TicketTime = text;
+    
 }
 
 void MMTShowingItem::toMap(QMap<QString, QString> &map)
@@ -330,9 +342,10 @@ void MMTShowTimeItem::toMap(QMap<QString, QString> &map)
         map["ticket_type"] = QObject::tr("Normal");
     }
     
-    map["ticket_time"] = TicketTime;
+    map["ticket_time"] = TicketTime.toString(getTimeFormat());
     map["ticket_date"] = ShowDate.toString(getDateFormat());
-    map["ticket_date_time"] = QString("%1, %2").arg(ShowDate.toString(getDateFormat())).arg(TicketTime);
+    map["ticket_date_time"] = QString("%1, %2").arg(map["ticket_date"])
+                                               .arg(map["ticket_time"]);
 }
 
 

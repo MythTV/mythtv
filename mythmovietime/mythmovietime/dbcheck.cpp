@@ -26,7 +26,7 @@ using namespace std;
 #include "mythtv/mythdbcon.h"
 
  
-const QString currentDatabaseVersion = "1000";
+const QString currentDatabaseVersion = "1001";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -162,5 +162,15 @@ void UpgradeMovieTimeDatabaseSchema(void)
         
         performActualUpdate(updates, "1000", dbver);
     }
-
+    
+    if (dbver == "1000")
+    {
+        //VERBOSE(VB_ALL, "Inserting MythMovieTime database schema to 1001.");        
+        const QString updates[] = {
+            "ALTER TABLE movietime_showtimes CHANGE Time Time TIME NOT NULL;",
+            ""
+        };
+        
+        performActualUpdate(updates, "1001", dbver);
+    }
 }

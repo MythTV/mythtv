@@ -69,14 +69,15 @@ class MMTShowingItem : public MMTDBItem
 class MMTShowTimeItem : public MMTDBItem
 {
     public:
-        MMTShowTimeItem(UIListGenericTree* parent, const QDate& dt, const QString& text, 
+        MMTShowTimeItem(UIListGenericTree* parent, const QDate& dt, const QTime& time, 
                         bool bargain, int FilmID = 0, const QString& theaterID = "", 
                         int ShowingID = 0, int TimeID = 0);
     
         virtual void toMap(QMap<QString, QString> &map);
     protected:
-        bool Bargain;                      
-        QString TicketTime;
+        bool Bargain;
+
+        QTime TicketTime;
         QDate ShowDate;
 };
 
