@@ -591,7 +591,7 @@ bool TMSTimes::parse(const QDomElement& elem)
 {
     QDomNode n = elem.firstChild();
     bool bargin = false;
-    
+    QTime tempTime;
     
     while (!n.isNull())
     {    
@@ -611,7 +611,13 @@ bool TMSTimes::parse(const QDomElement& elem)
         else if (e.tagName() == "time" )
         {
             bargin = (e.attribute( "bargainPrice", "false" ) == "true");
-            Times.append( TMSTime(e.text(), bargin) );
+            tempTime = QTime::fromString(e.text());
+            if (tempTime.hour() < 13 )
+            {
+                tempTime = tempTime.addSecs( 43200 ); // Add twelve hours to the time.
+            }
+            
+            Times.append( TMSTime(tempTime.toString(), bargin) );
 
 
         }
