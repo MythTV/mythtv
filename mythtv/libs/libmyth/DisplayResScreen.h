@@ -6,6 +6,7 @@ using namespace std;
 #include <qstringlist.h>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 class DisplayResScreen
 {
