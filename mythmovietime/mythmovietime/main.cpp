@@ -81,12 +81,17 @@ bool fetchData()
     //       config dialogs so that changes in the config can cause us to
     //       fetch data again.    
     QString lastFetch;
+    int daysSince = 0;
     lastFetch = gContext->GetSetting("MMT-Last-Fetch");
-    if (!lastFetch.isEmpty() && 
-        (QDate::currentDate().daysTo(QDate::fromString(lastFetch, Qt::ISODate)) != 0 ))
+    
+    daysSince = QDate::currentDate().daysTo(QDate::fromString(lastFetch, Qt::ISODate));
+    
+    if (daysSince == 0)
     {
         return true;
     }
+
+    
 
     
     QString user = gContext->GetSetting("MMTUser");
@@ -132,8 +137,8 @@ bool fetchData()
                                                "console and try again later.") );
         return false;                                               
     }
-    
     dlg.setProgress(3);
+    gContext->SaveSetting("MMT-Last-Fetch", QDate::currentDate().toString(Qt::ISODate));
     dlg.Close();
     return true;    
 }
