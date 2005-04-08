@@ -44,8 +44,20 @@ void showUsage()
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv, false);
-    QString filename, user, passwd, zip;
-    double radius = 25;
+    
+    
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    if(!gContext->Init(false))
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        return -1;
+    }
+    
+    QString filename;
+    QString user = gContext->GetSetting("MMTUser");
+    QString passwd = gContext->GetSetting("MMTPass");
+    QString zip = gContext->GetSetting("PostalCode");
+    double radius = gContext->GetSetting("Radius", "25").toDouble();
     
     int argpos = 1;
     
@@ -91,13 +103,7 @@ int main(int argc, char *argv[])
     
     
     
-    gContext = NULL;
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if(!gContext->Init(false))
-    {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return -1;
-    }
+    
     
     TMSMovieDirect dd;
     if (!filename.isEmpty() )
@@ -111,9 +117,13 @@ int main(int argc, char *argv[])
     else
     {
         showUsage();
+        return 0;
     }
     
-    dd.store();
+    if( dd.store() )
+    {   
+        gContext->SaveSetting("MMT-Last-Fetch", QDate::currentDate().toString(Qt::ISODate));
+    }
     return 0;
 }
 
