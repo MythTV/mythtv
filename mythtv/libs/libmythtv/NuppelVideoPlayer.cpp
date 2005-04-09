@@ -3630,10 +3630,9 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     if (!watchingrecording)
         myTotalFrames = totalFrames;
     else
-        myTotalFrames = (m_playbackinfo->recendts.toTime_t()
-                            - m_playbackinfo->recstartts.toTime_t())
-                         * video_frame_rate;
-
+        myTotalFrames = (long long)(video_frame_rate *
+                                    (m_playbackinfo->recendts.toTime_t()
+                                     - m_playbackinfo->recstartts.toTime_t()));
     if (showPercentage)
     {
         if (myTotalFrames)
@@ -3710,8 +3709,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             else
                 percentage = 0;
 
-            if (percentage > 100.0)
-                percentage = 100.0;
+            if (percentage > 100)
+                percentage = 100;
 
             if (showPercentage)
             {
@@ -4391,8 +4390,8 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             if (osd)
                 osd->StartPause(spos, false, comm_msg, desc, 2);
 
-            if (lastCommSkipStart > (2 * video_frame_rate))
-                lastCommSkipStart -= 2 * video_frame_rate;
+            if (lastCommSkipStart > (2.0 * video_frame_rate))
+                lastCommSkipStart -= (long long) (2.0 * video_frame_rate);
 
             JumpToFrame(lastCommSkipStart);
             lastCommSkipDirection = 0;
