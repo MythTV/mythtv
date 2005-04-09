@@ -62,7 +62,7 @@ class VisualBase
 };
 
 // base class to handle things like frame rate...
-class MainVisual : public QWidget, public Visual
+class MainVisual : public QWidget, public MythTV::Visual
 {
     Q_OBJECT
 
