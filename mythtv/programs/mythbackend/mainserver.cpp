@@ -2825,8 +2825,8 @@ void MainServer::endConnection(RefSocket *socket)
         {
             if (ismaster && (*it)->isSlaveBackend())
             {
-                VERBOSE(VB_ALL, QString("Slave backend: %1 has left the "
-                                        "building").arg((*it)->getHostname()));
+                VERBOSE(VB_ALL,QString("Slave backend: %1 no longer connected")
+                                       .arg((*it)->getHostname()));
 
                 QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
                 for (; iter != encoderList->end(); ++iter)

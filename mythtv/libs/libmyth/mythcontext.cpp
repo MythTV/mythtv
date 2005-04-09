@@ -1956,7 +1956,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
         if (!ok)
         {
             qApp->lock();
-            cout << "Connection to backend server lost\n";
+            VERBOSE(VB_ALL, QString("Connection to backend server lost"));
             MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
                              tr("The connection to the master backend "
                                 "server has gone away for some reason.. "
@@ -2068,7 +2068,8 @@ void MythContext::EventSocketConnected(void)
 
 void MythContext::EventSocketClosed(void)
 {
-    cerr << "Errm, event socket just closed.\n";
+            VERBOSE(VB_IMPORTANT, QString("Event socket closed. "
+                    "No connection to the backend."));
 }
 
 void MythContext::addListener(QObject *obj)
