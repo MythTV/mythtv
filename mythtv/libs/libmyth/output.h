@@ -13,7 +13,7 @@ class OutputEvent;
 #include <qthread.h>
 #include <qevent.h>
 #include <qptrlist.h>
-#include <visual.h>
+#include "visual.h"
 
 class QObject;
 class Buffer;
