@@ -1487,7 +1487,9 @@ void ProgLister::fillItemList(void)
                              .arg(searchTime.toString("yyyyMMddhh0000"));
     }
 
-    if (type == plNewListings || titleSort)
+    if (titleSort && type == plTitle)
+        where += " GROUP BY subtitle ";
+    else if (type == plNewListings || titleSort)
         where += " GROUP BY title ";
 
     schedList.FromScheduler();
@@ -1501,7 +1503,11 @@ void ProgLister::fillItemList(void)
         while (itemList.count())
         {
             s = itemList.take();
-            s->sortTitle = s->title;
+            if (type == plTitle)
+                s->sortTitle = s->subtitle;
+            else
+                s->sortTitle = s->title;
+
             s->sortTitle.remove(QRegExp("^(The |A |An )"));
             sortedList.push_back(s);
         }
