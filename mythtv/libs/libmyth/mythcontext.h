@@ -15,6 +15,7 @@
 #include <qmutex.h>
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 using namespace std;
@@ -87,6 +88,8 @@ struct DatabaseParams {
 // But waiting for another thread to do something is not safe within a 
 // VERBOSE macro, since those threads may wish to use the VERBOSE macro
 // and this will cause a deadlock.
+#ifdef DEBUG
+
 #define VERBOSE(mask,args...) \
 do { \
     if ((print_verbose_messages & mask) != 0) \
@@ -98,6 +101,25 @@ do { \
         MythContext::verbose_mutex.unlock(); \
     } \
 } while (0)
+
+#else // if !DEBUG
+
+// use a slower non-deadlockable version in release builds
+#define VERBOSE(mask,args...) \
+do { \
+    if ((print_verbose_messages & mask) != 0) \
+    { \
+        QDateTime dtmp = QDateTime::currentDateTime(); \
+        QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
+        ostringstream verbose_macro_tmp; \
+        verbose_macro_tmp << dtime << " " << args; \
+        MythContext::verbose_mutex.lock(); \
+        cout << verbose_macro_tmp.str() << endl; \
+        MythContext::verbose_mutex.unlock(); \
+    } \
+} while (0)
+
+#endif // DEBUG
 
 class MythEvent : public QCustomEvent
 {
