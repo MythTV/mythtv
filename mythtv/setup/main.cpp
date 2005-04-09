@@ -34,8 +34,6 @@ void clearCardDB(void)
 
     query.exec("TRUNCATE TABLE capturecard;");
     query.exec("TRUNCATE TABLE cardinput;");
-    query.exec("TRUNCATE TABLE dvb_sat;");
-    query.exec("TRUNCATE TABLE dvb_signal_quality;");
 }
 
 void clearAllDB(void)
@@ -48,8 +46,7 @@ void clearAllDB(void)
     query.exec("TRUNCATE TABLE credits;");
     query.exec("TRUNCATE TABLE programrating;");
     query.exec("TRUNCATE TABLE programgenres;");
-    query.exec("TRUNCATE TABLE dvb_channel;");
-    query.exec("TRUNCATE TABLE dvb_pids;");
+    query.exec("TRUNCATE TABLE dtv_multiplex;");
     query.exec("TRUNCATE TABLE cardinput;");
 }
 
