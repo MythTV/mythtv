@@ -1327,6 +1327,8 @@ void UIImageType::LoadImage()
 
             delete tmppix;
             refresh();
+
+            return;
         }
     }
 

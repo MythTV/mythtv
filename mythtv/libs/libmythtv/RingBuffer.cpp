@@ -1290,13 +1290,13 @@ long long RingBuffer::Seek(long long pos, int whence)
             readpos += pos;
             totalreadpos += pos;
         }
+
+        while (readpos > filesize && filesize > 0)
+            readpos -= filesize;
+
+        while (readpos < 0 && filesize > 0)
+            readpos += filesize;
     }
-
-    while (readpos > filesize)
-        readpos -= filesize;
-
-    while (readpos < 0)
-        readpos += filesize;
 
     if (readaheadrunning)
         ResetReadAhead(readpos);
