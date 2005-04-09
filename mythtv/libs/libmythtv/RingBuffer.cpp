@@ -1258,7 +1258,17 @@ long long RingBuffer::Seek(long long pos, int whence)
         {
             if (whence == SEEK_SET)
             {
-                ret = lseek(fd2, pos, whence);
+                long long tmpPos = pos;
+                long long tmpRet;
+
+                if (tmpPos > filesize)
+                    tmpPos = tmpPos % filesize;
+
+                tmpRet = lseek(fd2, tmpPos, whence);
+                if (tmpRet == tmpPos)
+                    ret = pos;
+                else
+                    ret = tmpRet;
             }
             else if (whence == SEEK_CUR)
             {
@@ -1279,12 +1289,14 @@ long long RingBuffer::Seek(long long pos, int whence)
         {
             readpos += pos;
             totalreadpos += pos;
-            while (readpos > filesize)
-                readpos -= filesize;
-            while (readpos < 0)
-                readpos += filesize;
         }
     }
+
+    while (readpos > filesize)
+        readpos -= filesize;
+
+    while (readpos < 0)
+        readpos += filesize;
 
     if (readaheadrunning)
         ResetReadAhead(readpos);
