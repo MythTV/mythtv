@@ -13,10 +13,13 @@ class OutputEvent;
 #include <qthread.h>
 #include <qevent.h>
 #include <qptrlist.h>
-#include "visual.h"
 
 class QObject;
 class Buffer;
+
+namespace MythTV {
+class Visual;
+}
 
 class OutputEvent : public QCustomEvent
 {
