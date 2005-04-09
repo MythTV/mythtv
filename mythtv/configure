@@ -4,8 +4,9 @@
 #
 
 x86_mmx_cpus="pentium-mmx,i686,pentium2,pentium3,pentium3m"
-x86_mmx_cpus="$x86_mmx_cpus,pentium-m,pentium4,pentium4m,prescott,athlon,athlon-xp"
+x86_mmx_cpus="$x86_mmx_cpus,i686,pentium-m,pentium4,pentium4m,prescott,athlon,athlon-xp"
 x86_cpus="i386,i486,i586,pentium,pentiumpro,${x86_mmx_cpus}"
+x86_cmov_cpus="pentium-m,pentium4,pentium4m,prescott,athlon,athlon-xp,pentiumpro,i686,c3-2"
 
 # default parameters
 compile_type="release"
@@ -53,6 +54,7 @@ direct_x="no"
 CONFIG_INCLUDEPATH=""
 CONFIG_DEFINES=""
 PROFILEFLAGS=""
+proc_opt="no"
 
 KERNEL_RELEASE=`uname -r 2>/dev/null`
 if test x"$KERNEL_RELEASE" != x"" ; then
@@ -109,6 +111,7 @@ echo "  --cpu=CPU                only use instructions available on CPU [$cpu]"
 echo "  --tune=CPU               tune instruction usage for a particular CPU [$tune]"
 echo "  --arch=CPU               equivalent to \"--cpu=CPU --tune=CPU\""
 #echo "  --powerpc-perf-enable    enable performance report on PPC (requires enabling PMC)"
+echo "  --enable-proc-opt        enable processor specific compilation"
 echo "  --disable-mmx            disable mmx usage"
 echo "  --disable-altivec        disable AltiVec usage"
 echo "Advanced features (experts only):"
@@ -515,6 +518,10 @@ for opt do
   ;;
   --powerpc-perf-enable) powerpc_perf="yes"
   ;;
+  --enable-proc-opt) proc_opt="yes"
+  ;;
+  --disable-proc-opt) proc_opt="no"
+  ;;
   --enable-mmx) mmx="yes"
   ;;
   --disable-mmx) mmx="no"
@@ -910,49 +917,47 @@ fi
 # if no tune setting and we know cpu class look at $processor 
 if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 # first try to tune based on processor info
+
+# P4
    if expr "$processor" : "pentium4" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
-   elif expr "$processor" : ".*Intel(R) Pentium(R) 4" > /dev/null ; then
+   elif expr "$processor" : ".*Pentium(R) [4M]" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
-   elif expr "$processor" : ".*Intel(R) Pentium(R) M" > /dev/null ; then
+   elif expr "$processor" : ".*Xeon(TM) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
-   elif expr "$processor" : ".*Intel(R) Xeon(TM) CPU" > /dev/null ; then
+   elif expr "$processor" : ".*Celeron(R) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
-   elif expr "$processor" : ".*Pentium(R) III Xeon processor" > /dev/null ; then
-       ARCHFLAGS="-march=pentium3"
-   elif expr "$processor" : ".*Pentium III" > /dev/null ; then
-       ARCHFLAGS="-march=pentium3"
-   elif expr "$processor" : ".*Intel(R) Pentium(R) III" > /dev/null ; then
-       ARCHFLAGS="-march=pentium3"
+       optimize="small"
+# P3
    elif expr "$processor" : "pentium3" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
-   elif expr "$processor" : ".*Celeron (Coppermine)" > /dev/null ; then
+   elif expr "$processor" : ".*Pentium.* III" > /dev/null ; then
+       ARCHFLAGS="-march=pentium3"
+   elif expr "$processor" : ".*Coppermine" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
        optimize="small"
-   elif expr "$processor" : ".*Intel(R) Celeron(TM) CPU" > /dev/null ; then
+   elif expr "$processor" : ".*Celeron(TM) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
        optimize="small"
-   elif expr "$processor" : ".*Celeron (Mendocino)" > /dev/null ; then
+# P2
+   elif expr "$processor" : "pentium2" > /dev/null ; then
+       ARCHFLAGS="-march=pentium2"
+   elif expr "$processor" : ".*Mendocino" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
        optimize="small"
-   elif expr "$processor" : ".*Intel(R) Celeron(R) CPU" > /dev/null ; then
-       if expr "$processor_flags" : ".*sse2" > /dev/null ; then
-           ARCHFLAGS="-march=pentium4"
-       elif expr "$processor_flags" : ".*sse" > /dev/null ; then
-           ARCHFLAGS="-march=pentium3"
-       elif expr "$processor_flags" : ".*mmx" > /dev/null ; then
-           ARCHFLAGS="-march=pentium2"
-       else
-           ARCHFLAGS="-march=pentium2"
-           proc_error_msg="yes"
-       fi
-       optimize="small"
-   elif expr "$processor" : ".*AMD Sempron(tm)" > /dev/null ; then
-       ARCHFLAGS="-march=pentiumpro -mmmx"
+# Athlon 64
    elif expr "$processor" : ".*AMD Athlon(tm) 64" > /dev/null ; then
        ARCHFLAGS="-march=k8"
+# Athlon XP
+   elif expr "$processor" : "athlon-xp" > /dev/null ; then
+       ARCHFLAGS="-march=pentiumpro -mmmx"
    elif expr "$processor" : ".*AMD Athlon(tm) XP" > /dev/null ; then
        ARCHFLAGS="-march=pentiumpro -mmmx"
+   elif expr "$processor" : ".*AMD Sempron(tm)" > /dev/null ; then
+       ARCHFLAGS="-march=pentiumpro -mmmx"
+# Athlon
+   elif expr "$processor" : "athlon" > /dev/null ; then
+       ARCHFLAGS="-march=athlon"
    elif expr "$processor" : ".*AMD Athlon(tm)" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
    elif expr "$processor" : ".*AMD Athlon(TM)" > /dev/null ; then
@@ -960,10 +965,15 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : ".*AMD Duron(TM)" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
        optimize="small"
-   elif expr "$processor" : "athlon" > /dev/null ; then
-       ARCHFLAGS="-march=athlon"
+# Transmeta Crusoe
    elif expr "$processor" : ".*Crusoe(m) Processor TM5600" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
+# c3-2
+   elif expr "$processor" : ".*VIA Nehemiah" > /dev/null ; then
+       ARCHFLAGS="-march=c3-2"
+       optimize="small"
+       cpu_raw="c3-2"
+# c3
    elif expr "$processor" : ".*VIA C3 Ezra" > /dev/null ; then
        ARCHFLAGS="-march=c3"
        optimize="small"
@@ -972,10 +982,7 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
        ARCHFLAGS="-march=c3"
        optimize="small"
        cpu_raw="c3"
-   elif expr "$processor" : ".*VIA Nehemiah" > /dev/null ; then
-       ARCHFLAGS="-march=c3-2"
-       optimize="small"
-       cpu_raw="c3-2"
+
 # if no known processor info, tune base on cpu_raw info
    elif test x"$cpu_raw" = x"i686" -a x"$mmx" = x"yes" ; then
        ARCHFLAGS="-march=pentium2"
@@ -1018,6 +1025,20 @@ if test x"$proc_error_msg" = x"yes"; then
     echo " please e-mail the above to mythtv-users@mythtv.org"
     echo " With the subject \"configure did not detect my cpu\""
     echo ""
+fi
+
+is_x86_cmov() {
+    expr ",${x86_cmov_cpus}," : ".*,$1," > /dev/null
+}
+
+if test x"$proc_opt" = x"no"; then
+    optimize="yes"
+    if is_x86_cmov "$cpu_raw" -a x"$ARCHFLAGS" != x"-march=k8"; then
+        ARCHFLAGS="-march=pentiumpro";
+    fi
+else
+    echo "WARNING: include the output of ./configure along with"
+    echo "any bug report, when using a processor optimized build."
 fi
 
 # if arch flag is present ignore tune and cpu and just use arch
