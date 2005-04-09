@@ -218,7 +218,7 @@ void MythContextPrivate::GetScreenBounds()
 
     QDesktopWidget * desktop = QApplication::desktop();
 
-cout << "Nigel, total desktop width=" << desktop->width() <<
+cout << "Total desktop width=" << desktop->width() <<
         ", height="     << desktop->height() <<
         ", numscreens=" << desktop->numScreens() << endl;
 
