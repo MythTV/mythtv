@@ -1,5 +1,5 @@
                                    MythTV
-			        Release 0.17
+			        Release 0.18
 
 BUILD/CONFIGURATION INSTRUCTIONS 
 --------------------------------
@@ -31,7 +31,7 @@ The following is a list of some of the prerequisites you will need installed:
            your distro, or from http://www.mysql.com
 
    XMLTV - If you are outside of North America, you will need to install the
-           latest version (0.5.38 as of 2005-02-06).  This will do the work
+           latest version (0.5.39 as of 2005-03-13).  This will do the work
            of actually grabbing the program information. Get it from
            http://xmltv.sf.net
 
@@ -43,10 +43,10 @@ The following is a list of some of the prerequisites you will need installed:
            a built-in grabber which uses Zap2It as a data source.  See the
            HOWTO for complete instructions on configuring an account.
           
-See the mythtv-HOWTO.html, .pdf or .txt file in the docs/ subdirectory
-or on http://www.mythtv.org/docs/ for in-depth instructions on installing and 
-compiling MythTV and all of the pre-requisites.  It has instructions for various
-Linux distributions.
+See the mythtv-HOWTO.html, .pdf or .txt file in the docs/ subdirectory or on
+http://www.mythtv.org/docs/ for in-depth instructions on installing and
+compiling MythTV and all of the pre-requisites.  It has instructions for
+various Linux distributions.
 
 If you are using a framegrabber card (as opposed to a hardware MPEG-2
 capture card) you also need v4l setup and working properly.  If xawtv works
@@ -63,12 +63,12 @@ See the UPGRADING file for information on upgrading between releases.
 Compiling and setup instructions are all in the documentation in the docs/
 subdir (or at http://www.mythtv.org/docs/ ) these days.  Read those carefully.
 
-keys.txt has a listing of all the various default key bindings.  All keybindings
-can be changed via MythWeb.
+keys.txt has a listing of all the various default key bindings.  All
+keybindings can be changed via MythWeb.
 
 If you want to check out the theme format, and perhaps make your own, just
 look at the .xml files in the /usr/local/share/mythtv/themes/[themename]
-subdirs. 
+subdirs.
 
 Feel free to subscribe to the development mailing list at:
 http://www.mythtv.org/mailman/listinfo/mythtv-dev
