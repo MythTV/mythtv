@@ -214,7 +214,10 @@ void VideoTree::setParentalLevel(int which_level)
     {
         current_parental_level = which_level;
         pl_value->SetText(QString("%1").arg(current_parental_level));
-        video_tree_data->deleteAllChildren();
+        video_tree_data = NULL;
+        video_tree_root->deleteAllChildren();
+        browser_mode_files.clear();
+
         buildVideoList();
     
         //  
