@@ -3506,6 +3506,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     struct timeval startTime;
     struct timeval endTime;
     VideoFrame *currentFrame;
+    long long myTotalFrames = 0;
 
     killplayer = false;
     framesPlayed = 0;
@@ -3575,15 +3576,6 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     if (OpenFile() < 0)
         return(254);
 
-    // if we know the total length, how can be be flagging an in-progress
-    // recording??  This also handles cases where the recording finished
-    // before we got a goot start like when called from the JobQueue.
-    if (totalLength)
-    {
-        watchingrecording = false;
-        SetWatchingRecording(false);
-    }
-
     if (watchingrecording)
         commDetect->SetWatchingRecording(true, nvr_enc, this);
 
@@ -3632,18 +3624,23 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     // the meat of the offline commercial detection code, scan through whole
     // file looking for indications of commercial breaks
     GetFrame(1,true);
+
+    usecPerFrame = (long)(1.0 / video_frame_rate * 1000000);
+
+    if (!watchingrecording)
+        myTotalFrames = totalFrames;
+    else
+        myTotalFrames = (m_playbackinfo->recendts.toTime_t()
+                            - m_playbackinfo->recstartts.toTime_t())
+                         * video_frame_rate;
+
     if (showPercentage)
     {
-        if (totalFrames)
+        if (myTotalFrames)
             printf( "%3d%%/      ", 0 );
         else
             printf( "%6lld/      ", 0LL );
     }
-
-    usecPerFrame = (long)(1.0 / video_frame_rate * 1000000);
-
-    if (watchingrecording)
-        totalFrames = 0;
 
     while (!eof)
     {
@@ -3708,14 +3705,17 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             else
                 flagFPS = 0.0;
 
-            if (totalFrames)
-                percentage = currentFrame->frameNumber * 100 / totalFrames;
+            if (myTotalFrames)
+                percentage = currentFrame->frameNumber * 100 / myTotalFrames;
             else
                 percentage = 0;
 
+            if (percentage > 100.0)
+                percentage = 100.0;
+
             if (showPercentage)
             {
-                if (totalFrames)
+                if (myTotalFrames)
                 {
                     printf( "\b\b\b\b\b\b\b\b\b\b\b" );
                     printf( "%3d%%/%3dfps", percentage, (int)flagFPS );
@@ -3734,7 +3734,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                  (((currentFrame->frameNumber % 100) == 0) &&
                   (watchingrecording)))
             {
-                if (totalFrames && !watchingrecording)
+                if (myTotalFrames)
                 {
                     JobQueue::ChangeJobComment(jobID, QObject::tr(
                                                "%1% Completed @ %2 fps.")
@@ -3792,7 +3792,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         else
             flagFPS = 0.0;
 
-        if (totalFrames)
+        if (myTotalFrames)
             printf( "\b\b\b\b\b\b      \b\b\b\b\b\b" );
         else
             printf( "\b\b\b\b\b\b\b\b\b\b\b\b\b             "
@@ -3830,15 +3830,22 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     {
         elapsed = flagTime.elapsed() / 1000.0;
 
-        if (elapsed)
-            flagFPS = totalFrames / elapsed;
+        if (myTotalFrames && (elapsed > 0.0))
+        {
+            flagFPS = myTotalFrames / elapsed;
+            JobQueue::ChangeJobStatus(jobID, JOB_STOPPING,
+                                      QObject::tr("Completed, %1 FPS")
+                                                  .arg(flagFPS) + ", "
+                                      + QString("%1").arg(comms_found) + " "
+                                      + QObject::tr("Commercial Breaks Found"));
+        }
         else
-            flagFPS = 0.0;
-
-        JobQueue::ChangeJobStatus(jobID, JOB_STOPPING,
-                                  QObject::tr("Completed, %1 FPS").arg(flagFPS)
-                                  + ", " + QString("%1").arg(comms_found) + " "
-                                  + QObject::tr("Commercial Breaks Found"));
+        {
+            JobQueue::ChangeJobStatus(jobID, JOB_STOPPING,
+                                      QObject::tr("Completed") + ", "
+                                      + QString("%1").arg(comms_found) + " "
+                                      + QObject::tr("Commercial Breaks Found"));
+        }
     }
 
     return(comms_found);

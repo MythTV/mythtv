@@ -224,7 +224,11 @@ void CommDetect::SetWatchingRecording(bool watching, RemoteEncoder *rec,
     m_parent = nvp;
 
     if (watching)
+    {
         gContext->addListener(this);
+        VERBOSE(VB_COMMFLAG,
+                "Setting up CommDetect Listener, flagging Live recording.");
+    }
     else
         gContext->removeListener(this);
 }
