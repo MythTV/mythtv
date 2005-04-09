@@ -706,17 +706,17 @@ RecordingProfile::RecordingProfile(QString profName)
     profile->setLabel(labelName);
     profile->addChild(name = new Name(*this));
 
-    if (profName == NULL)
-    {
-        profile->addChild(new TranscodeResize(*this));
-        profile->addChild(new AutoTranscode(*this));
-    }
-    else if (profName.right(7) != "Live TV")
+    if (profName != NULL)
     {
         if (profName.left(11) == "Transcoders")
             profile->addChild(new TranscodeResize(*this));
         else
             profile->addChild(new AutoTranscode(*this));
+    }
+    else
+    {
+        profile->addChild(new TranscodeResize(*this));
+        profile->addChild(new AutoTranscode(*this));
     }
 
     addChild(profile);
