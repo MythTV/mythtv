@@ -1,6 +1,6 @@
 #CONFIG += debug
 CONFIG += release
-LIBVERSION = 0.17
+LIBVERSION = 0.18
 
 isEmpty( PREFIX ) {
     PREFIX = /usr/local
