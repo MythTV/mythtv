@@ -128,10 +128,7 @@ void runGames(void)
         }
     }
 
-    QString paths = gContext->GetSetting("GameTreeLevels");
-
-    GameTree gametree(gContext->GetMainWindow(), "gametree", "game-",
-                      paths);
+    GameTree gametree(gContext->GetMainWindow(), "gametree", "game-");
     gametree.exec();
 }
 

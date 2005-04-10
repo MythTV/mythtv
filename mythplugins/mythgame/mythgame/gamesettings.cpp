@@ -9,9 +9,9 @@
 
 // General Settings
 
-static HostLineEdit *GameTreeLevels()
+static HostLineEdit *GameAllTreeLevels()
 {
-    HostLineEdit *gc = new HostLineEdit("GameTreeLevels");
+    HostLineEdit *gc = new HostLineEdit("GameAllTreeLevels");
     gc->setLabel(QObject::tr("Game display order"));
     gc->setValue("system year genre gamename");
     gc->setHelpText(QObject::tr("Order in which to sort the games "
@@ -20,13 +20,15 @@ static HostLineEdit *GameTreeLevels()
     return gc;
 };
 
-static HostCheckBox *GameShowFavorites()
+static HostLineEdit *GameFavTreeLevels()
 {
-    HostCheckBox *gc = new HostCheckBox("GameShowFavorites");
-    gc->setLabel(QObject::tr("Show Only Favorites"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Limit games listed to only those tagged "
-                    "as \"favorite\""));
+    HostLineEdit *gc = new HostLineEdit("GameFavTreeLevels");
+    gc->setLabel(QObject::tr("Favourite display order"));
+    gc->setValue("gamename");
+    gc->setHelpText(QObject::tr("Order in which to sort the games "
+                    "marked as favourites "
+                    "- this is for all systems. Available choices: "
+                    "system, year, genre and gamename"));
     return gc;
 };
 
@@ -295,8 +297,8 @@ MythGameSettings::MythGameSettings()
 {
     VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("MythGame Settings -- General"));
-    general->addChild(GameTreeLevels());
-    general->addChild(GameShowFavorites());
+    general->addChild(GameAllTreeLevels());
+    general->addChild(GameFavTreeLevels());
     addChild(general);
 
     VerticalConfigurationGroup *mame = new VerticalConfigurationGroup(false);

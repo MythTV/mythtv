@@ -11,28 +11,295 @@ using namespace std;
 #include <mythtv/mythwidgets.h>
 #include <mythtv/uitypes.h>
 
-GameTree::GameTree(MythMainWindow *parent, QString window_name, 
-                   QString theme_filename, QString &paths, const char *name)
-        : MythThemedDialog(parent, window_name, theme_filename, name)
+/**************************************************************************
+    GameTreeRoot - helper class holding tree root details
+ **************************************************************************/
+
+class GameTreeRoot
 {
-    m_paths = paths;
-    m_pathlist = QStringList::split(" ", m_paths);
-    showfavs = gContext->GetSetting("GameShowFavorites");
+  public:
+    GameTreeRoot(const QString& levels, const QString& filter)
+      : m_levels(QStringList::split(" ", levels))
+      , m_filter(filter)
+    {
+    }
+
+    ~GameTreeRoot()
+    {
+    }
+
+    unsigned getDepth() const                   { return m_levels.size(); }
+    const QString& getLevel(unsigned i) const   { return m_levels[i]; }
+    const QString& getFilter() const            { return m_filter; }
+
+  private:
+    QStringList m_levels;
+    QString m_filter;
+};
+
+/**************************************************************************
+    GameTreeItem - helper class supplying data and methods to each node
+ **************************************************************************/
+
+class GameTreeItem
+{
+  public:
+    GameTreeItem(GameTreeRoot* root)
+      : m_root(root)
+      , m_romInfo(0)
+      , m_depth(0)
+      , m_isFilled(false)
+    {
+    }
+
+    ~GameTreeItem()
+    {
+        if (m_romInfo)
+            delete m_romInfo;
+    }
+
+    bool isFilled() const             { return m_isFilled; }
+    bool isLeaf() const               { return m_depth == m_root->getDepth(); }
+
+    const QString& getLevel() const   { return m_root->getLevel(m_depth - 1); }
+    RomInfo* getRomInfo() const       { return m_romInfo; }
+    QString getFillSql() const;
+
+    void setFilled(bool isFilled)     { m_isFilled = isFilled; }
+
+    GameTreeItem* createChild(const QSqlQuery& query) const;
+    void editSettings() const;
+
+  private:
+    GameTreeRoot* m_root;
+    RomInfo* m_romInfo;
+    unsigned m_depth;
+    bool m_isFilled;
+};
+
+QString GameTreeItem::getFillSql() const
+{
+    unsigned childDepth = m_depth + 1;
+    bool childIsLeaf = childDepth == m_root->getDepth();
+    QString childLevel = m_root->getLevel(childDepth - 1);
+
+    QString columns = childIsLeaf
+                    ? childLevel + ",system,year,genre,gamename"
+                    : childLevel;
+
+    QString filter = m_root->getFilter();
+    QString conj = "where ";
+
+    if (!filter.isEmpty())
+    {
+        filter = conj + filter;
+        conj = " and ";
+    }
+
+    //  this whole section ought to be in rominfo.cpp really, but I've put it
+    //  in here for now to minimise the number of files changed by this mod
+    if (m_romInfo)
+    {
+        if (!m_romInfo->System().isEmpty())
+        {
+            filter += conj + "trim(system)='" + m_romInfo->System() + "'";
+            conj = " and ";
+        }
+        if (m_romInfo->Year() != 0)
+        {
+            filter += conj + "year=" + QString::number(m_romInfo->Year());
+            conj = " and ";
+        }
+        if (!m_romInfo->Genre().isEmpty())
+        {
+            filter += conj + "trim(genre)='" + m_romInfo->Genre() + "'";
+            conj = " and ";
+        }
+        if (!m_romInfo->Gamename().isEmpty())
+        {
+            filter += conj + "trim(gamename)='" + m_romInfo->Gamename() + "'";
+        }
+    }
+
+    QString sql = "select distinct "
+                + columns
+                + " from gamemetadata "
+                + filter
+                + " order by "
+                + childLevel
+                + ";";
+
+    return sql;
+}
+
+GameTreeItem* GameTreeItem::createChild(const QSqlQuery& query) const
+{
+    GameTreeItem *childItem = new GameTreeItem(m_root);
+    childItem->m_depth = m_depth + 1;
+
+    QString current = query.value(0).toString().stripWhiteSpace();
+    if (childItem->isLeaf())
+    {
+        RomInfo temp;
+        temp.setSystem(query.value(1).toString().stripWhiteSpace());
+        childItem->m_romInfo = GameHandler::CreateRomInfo(&temp);
+
+        childItem->m_romInfo->setSystem(temp.System());
+        childItem->m_romInfo->setYear(query.value(2).toInt());
+        childItem->m_romInfo->setGenre(query.value(3).toString().stripWhiteSpace());
+        childItem->m_romInfo->setGamename(query.value(4).toString().stripWhiteSpace());
+    }
+    else
+    {
+        childItem->m_romInfo = m_romInfo
+                             ? new RomInfo(*m_romInfo)
+                             : new RomInfo();
+        childItem->m_romInfo->setField(childItem->getLevel(), current);
+    }
+
+    return childItem;
+}
+
+void GameTreeItem::editSettings() const
+{
+    QString level = getLevel();
+
+    if (level == "system")
+        GameHandler::EditSystemSettings(m_romInfo);
+    else if (level == "gamename")
+        GameHandler::EditSettings(m_romInfo);
+}
+
+/**************************************************************************
+    GameTree - main game tree class
+ **************************************************************************/
+
+GameTree::GameTree(MythMainWindow *parent, QString windowName,
+                   QString themeFilename, const char *name)
+        : MythThemedDialog(parent, windowName, themeFilename, name)
+{
+    QString levels;
+    GameTreeRoot *root;
+    GenericTree *node;
+
+    m_gameTree = new GenericTree("game root", 0, false);
 
     wireUpTheme();
 
-    game_tree_root = new GenericTree("game root", 0, false);
-    game_tree_data = game_tree_root->addNode(tr("All Games"), 0, false);
+    //  create system filter to only select games where handlers are present
+    QString systemFilter;
+    for (unsigned i = 0; i < GameHandler::count(); ++i)
+    {
+        QString system = GameHandler::getHandler(i)->Systemname();
+        if (i == 0)
+            systemFilter = "system in ('" + system + "'";
+        else
+            systemFilter += ",'" + system + "'";
+    }
+    if (systemFilter.isEmpty())
+    {
+        systemFilter = "1=0";
+        cerr << "gametree.o: Couldn't find any game handlers" << endl;
+    }
+    else
+        systemFilter += ")";
 
-    buildGameList();
+    //  create two top level nodes - this could be moved to a config based
+    //  approach with multiple roots if/when someone has the time to create
+    //  the relevant dialog screens
+    levels = gContext->GetSetting("GameAllTreeLevels");
+    root = new GameTreeRoot(levels, systemFilter);
+    m_gameTreeRoots.push_back(root);
+    m_gameTreeItems.push_back(new GameTreeItem(root));
+    node = m_gameTree->addNode(tr("All Games"), m_gameTreeItems.size(), false);
 
-    game_tree_list->enter();
+    levels = gContext->GetSetting("GameFavTreeLevels");
+    root = new GameTreeRoot(levels, systemFilter + " and favorite=1");
+    m_gameTreeRoots.push_back(root);
+    m_gameTreeItems.push_back(new GameTreeItem(root));
+    node = m_gameTree->addNode(tr("Favourites"), m_gameTreeItems.size(), false);
+
+    m_gameTreeUI->assignTreeData(m_gameTree);
+    m_gameTreeUI->enter();
+    m_gameTreeUI->pushDown();
+
     updateForeground();
 }
 
 GameTree::~GameTree()
 {
-    delete game_tree_root;
+    delete m_gameTree;
+}
+
+void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
+{
+    m_gameImage->SetImage("");
+    m_gameTitle->SetText("");
+    m_gameSystem->SetText("");
+    m_gameYear->SetText("");
+    m_gameGenre->SetText("");
+    m_gameFavourite->SetText("");
+
+    GameTreeItem *item = nodeInt ? m_gameTreeItems[nodeInt - 1] : 0;
+    RomInfo *romInfo = item ? item->getRomInfo() : 0;
+
+    if (item && !item->isLeaf() && !item->isFilled())
+    {
+        GenericTree *node = m_gameTreeUI->getCurrentNode();
+        if (!node)
+        {
+            cerr << "gametree.o: Couldn't get current node\n";
+            return;
+        }
+        fillNode(node);
+    }
+
+    if (romInfo)
+    {
+        if (item->isLeaf() && romInfo->Romname().isEmpty())
+            romInfo->fillData();
+
+        if (!romInfo->Gamename().isEmpty())
+            m_gameTitle->SetText(romInfo->Gamename());
+
+        if (!romInfo->System().isEmpty())
+            m_gameSystem->SetText(romInfo->System());
+
+        if (romInfo->Year() > 0)
+            m_gameYear->SetText(QString::number(romInfo->Year()));
+
+        if (!romInfo->Genre().isEmpty())
+            m_gameGenre->SetText(romInfo->Genre());
+
+        if (item->isLeaf())
+        {
+            if (romInfo->Favorite())
+                m_gameFavourite->SetText("Yes");
+            else
+                m_gameFavourite->SetText("No");
+
+            QString imagename;
+            if (romInfo->FindImage("screenshot", &imagename))
+                m_gameImage->SetImage(imagename);
+        }
+    }
+
+    m_gameImage->LoadImage();
+}
+
+void GameTree::handleTreeListSelection(int nodeInt, IntVector *)
+{
+    if (nodeInt > 0)
+    {
+        GameTreeItem *item = m_gameTreeItems[nodeInt - 1];
+
+        if (item->isLeaf())
+        {
+            GameHandler::Launchgame(item->getRomInfo());
+            raise();
+            setActiveWindow();
+        }
+    }
 }
 
 void GameTree::keyPressEvent(QKeyEvent *e)
@@ -47,21 +314,21 @@ void GameTree::keyPressEvent(QKeyEvent *e)
         handled = true;
 
         if (action == "SELECT")
-            game_tree_list->select();
-        else if (action == "MENU" || action == "INFO") 
+            m_gameTreeUI->select();
+        else if (action == "MENU" || action == "INFO")
             edit();
         else if (action == "UP")
-            game_tree_list->moveUp();
+            m_gameTreeUI->moveUp();
         else if (action == "DOWN")
-            game_tree_list->moveDown();
+            m_gameTreeUI->moveDown();
         else if (action == "LEFT")
-            game_tree_list->popUp();
+            m_gameTreeUI->popUp();
         else if (action == "RIGHT")
-            goRight();
+            m_gameTreeUI->pushDown();
         else if (action == "PAGEUP")
-            game_tree_list->pageUp();
+            m_gameTreeUI->pageUp();
         else if (action == "PAGEDOWN")
-            game_tree_list->pageDown();
+            m_gameTreeUI->pageDown();
         else if (action == "TOGGLEFAV")
             toggleFavorite();
         else
@@ -72,336 +339,90 @@ void GameTree::keyPressEvent(QKeyEvent *e)
         MythThemedDialog::keyPressEvent(e);
 }
 
-void GameTree::buildGameList(void)
-{
-    QString first = m_pathlist.front();
-
-    QStringList regSystems;
-    if (first == "system")
-    {
-        for (uint i = 0; i < GameHandler::count(); ++i)
-            regSystems.append(GameHandler::getHandler(i)->Systemname());
-    }
-
-    bool isleaf = (first == "gamename");
-    QString selcols = isleaf ? "gamename, system" : first;
-
-    QString thequery = QString("SELECT DISTINCT %1 FROM gamemetadata "
-                               "ORDER BY %2;").arg(selcols).arg(first);
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(thequery);
-
-    if (query.isActive() && query.size() > 0)
-    {
-        while (query.next())
-        {
-            QString current = query.value(0).toString();
-
-            // Don't display non-registered systems, even if they are in the
-            // database.
-
-            if (first == "system" &&
-                (regSystems.find(current) == regSystems.end()))
-                continue;
-
-            RomInfo* rinfo;
-            if (isleaf)
-            {
-                //  no guarantee System has been set so create a temp RomInfo so
-                //  that CreateRomInfo can create the correct subtype
-                RomInfo* temp = new RomInfo();
-                temp->setSystem(query.value(1).toString());
-                rinfo = GameHandler::CreateRomInfo(temp);
-                delete temp;
-
-                rinfo->setGamename(query.value(0).toString());
-                rinfo->setSystem(query.value(1).toString());
-                rinfo->fillData();
-            }
-            else
-            {
-                rinfo = new RomInfo();
-                rinfo->setField(first, current);
-            }
-
-            GameTreeItem *titem = new GameTreeItem(first, rinfo);
-
-            treeList.push_back(titem);
-
-            game_tree_data->addNode(current, treeList.size(), false);
-        }
-    }
-
-    game_tree_list->assignTreeData(game_tree_root);
-}
-
-void GameTree::handleTreeListEntry(int node_int, IntVector *)
-{
-    game_shot->SetImage("");
-    game_title->SetText("");
-    game_system->SetText("");
-    game_year->SetText("");
-    game_genre->SetText("");
-    game_favorite->SetText("");
-
-    if (node_int > 0)
-    {
-        curitem = treeList[node_int - 1];
-
-        if (curitem->isleaf)
-        {
-            QString imagename;
-
-            if (curitem->rominfo->FindImage("screenshot", &imagename))
-            {
-                game_shot->SetImage(imagename);
-            }
-        }
-
-        for (QStringList::Iterator field = m_pathlist.begin();
-             field != m_pathlist.end(); ++field)
-        {
-            if (*field == "system")
-                game_system->SetText(curitem->rominfo->System());
-            else if (*field == "year")
-            {
-                int year = curitem->rominfo->Year();
-                if (year == 0)
-                    game_year->SetText("");
-                else
-                    game_year->SetText(QString::number(year));
-            }
-            else if (*field == "genre")
-                game_genre->SetText(curitem->rominfo->Genre());
-            else if (*field == "gamename")
-            {
-                game_title->SetText(curitem->rominfo->Gamename());
-                if (curitem->rominfo->Favorite())
-                    game_favorite->SetText("Yes");
-                else
-                    game_favorite->SetText("No");
-            }
-        }
-    }
-    else
-        curitem = NULL;
-
-    game_shot->LoadImage();
-}
-
-void GameTree::handleTreeListSelection(int node_int, IntVector *)
-{
-    if (node_int > 0)
-    {
-        curitem = treeList[node_int - 1];
-    
-        if (curitem->isleaf)
-        {
-            GameHandler::Launchgame(curitem->rominfo);
-            raise();
-            setActiveWindow();
-        }
-    }    
-}
-
-void GameTree::goRight(void)
-{
-    if (curitem)
-    {
-        if (!curitem->filled)
-            FillListFrom(curitem);
-    }
-
-    game_tree_list->pushDown();
-}
-
-void GameTree::edit(void)
-{
-    if (!curitem)
-        return;
-
-    if (curitem->level == "system")
-        GameHandler::EditSystemSettings(curitem->rominfo);
-    else if (curitem->level == "gamename" && curitem->isleaf)
-        GameHandler::EditSettings(curitem->rominfo);
-}
-
-void GameTree::toggleFavorite(void)
-{
-    if (!curitem)
-        return;
-
-    if (curitem->level == "gamename" && curitem->isleaf)
-    {
-        curitem->rominfo->setFavorite();
-        if (curitem->rominfo->Favorite())
-            game_favorite->SetText("Yes");
-        else
-            game_favorite->SetText("No");
-    }
-}
-
-void GameTree::FillListFrom(GameTreeItem *item)
-{
-    QString whereClause;
-    QString conjunction;
-    QString column;
-
-    for (QStringList::Iterator field = m_pathlist.begin();
-         field != m_pathlist.end(); ++field)
-    {
-        whereClause += conjunction + getClause(*field, item);
-        conjunction = " AND ";
-
-        if (*field == item->level)
-        {
-            ++field;
-            column = *field;
-            break;
-        }
-    }
-    
-    if (showfavs == "1")
-      whereClause += " AND favorite=1";
-
-
-    QStringList regSystems;
-    if (column == "system")
-    {
-        for (uint i = 0; i < GameHandler::count(); ++i)
-            regSystems.append(GameHandler::getHandler(i)->Systemname());
-    }
-
-    bool isleaf = (column == "gamename");
-    QString selcols = isleaf ? "gamename, system" : column;
-
-    QString thequery = QString("SELECT DISTINCT %1 FROM gamemetadata "
-                               "WHERE %2 ORDER BY %3;")
-                               .arg(selcols).arg(whereClause).arg(column);
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(thequery);
-
-    if (query.isActive() && query.size() > 0)
-    {
-        while (query.next())
-        {
-            QString current = query.value(0).toString();
-
-            if (column == "system" && 
-                (regSystems.find(current) == regSystems.end()))
-                continue;
-
-            RomInfo* rinfo;
-            if (isleaf)
-            {
-                //  no guarantee System has been set so create a temp RomInfo so
-                //  that CreateRomInfo can create the correct subtype
-                RomInfo* temp = new RomInfo();
-                temp->setSystem(query.value(1).toString());
-                rinfo = GameHandler::CreateRomInfo(temp);
-                delete temp;
-
-                rinfo->setGamename(query.value(0).toString());
-                rinfo->setSystem(query.value(1).toString());
-                rinfo->fillData();
-            }
-            else
-            {
-                rinfo = new RomInfo(*(item->rominfo));
-                rinfo->setField(column, current);
-            }
-
-            GameTreeItem *titem = new GameTreeItem(column, rinfo);
-
-            treeList.push_back(titem);
-
-            GenericTree *node = game_tree_list->getCurrentNode();
-
-            current = current.stripWhiteSpace();
-
-            if (node)
-                node->addNode(current, treeList.size(), isleaf);
-            else
-            {
-                cerr << "Couldn't get active node\n";
-            }
-        }
-    }
-
-    item->filled = true;
-}
-
-QString GameTree::getClause(QString field, GameTreeItem *item)
-{
-    if (!item)
-        return "";
-
-    QString clause = field + " = \"";
-    if (field == "system")
-        clause += item->rominfo->System();
-    else if (field == "year")
-        clause += QString::number(item->rominfo->Year());
-    else if (field == "genre")
-        clause += item->rominfo->Genre();
-    else if (field == "gamename")
-        clause += item->rominfo->Gamename();
-    clause += "\"";
-
-    return clause;
-}
-
 void GameTree::wireUpTheme(void)
 {
-    game_tree_list = getUIManagedTreeListType("gametreelist");
-    if (!game_tree_list)
+    m_gameTreeUI = getUIManagedTreeListType("gametreelist");
+    if (!m_gameTreeUI)
     {
         cerr << "gametree.o: Couldn't find a gametreelist in your theme" << endl;
         exit(0);
     }
-    game_tree_list->showWholeTree(true);
-    game_tree_list->colorSelectables(true);
+    m_gameTreeUI->showWholeTree(true);
+    m_gameTreeUI->colorSelectables(true);
 
-    connect(game_tree_list, SIGNAL(nodeSelected(int, IntVector*)), 
+    connect(m_gameTreeUI, SIGNAL(nodeSelected(int, IntVector*)),
             this, SLOT(handleTreeListSelection(int, IntVector*)));
-    connect(game_tree_list, SIGNAL(nodeEntered(int, IntVector*)), 
+    connect(m_gameTreeUI, SIGNAL(nodeEntered(int, IntVector*)),
             this, SLOT(handleTreeListEntry(int, IntVector*)));
 
-    game_title = getUITextType("gametitle");
-    if (!game_title)
-    {
+    m_gameTitle = getUITextType("gametitle");
+    if (!m_gameTitle)
         cerr << "gametree.o: Couldn't find a text area gametitle\n";
-    }
 
-    game_system = getUITextType("systemname");
-    if (!game_system)
-    {
+    m_gameSystem = getUITextType("systemname");
+    if (!m_gameSystem)
         cerr << "gametree.o: Couldn't find a text area systemname\n";
-    }
 
-    game_year = getUITextType("yearname");
-    if (!game_year)
-    {
+    m_gameYear = getUITextType("yearname");
+    if (!m_gameYear)
         cerr << "gametree.o: Couldn't find a text area yearname\n";
-    }
 
-    game_genre = getUITextType("genrename");
-    if (!game_genre)
-    {
+    m_gameGenre = getUITextType("genrename");
+    if (!m_gameGenre)
         cerr << "gametree.o: Couldn't find a text area genrename\n";
-    }
 
-    game_favorite = getUITextType("showfavorite");
-    if (!game_favorite)
-    {
+    m_gameFavourite = getUITextType("showfavorite");
+    if (!m_gameFavourite)
         cerr << "gametree.o: Couldn't find a text area showfavorite\n";
-    }
 
-    game_shot = getUIImageType("gameimage");
-    if (!game_shot)
-    {
-        cerr << "gametree.o: Couldn't find an image gameimage\n"; 
-    }
+    m_gameImage = getUIImageType("gameimage");
+    if (!m_gameImage)
+        cerr << "gametree.o: Couldn't find an image gameimage\n";
 }
 
+void GameTree::fillNode(GenericTree *node)
+{
+    int i = node->getInt();
+    GameTreeItem* curItem = m_gameTreeItems[i - 1];
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(curItem->getFillSql());
+
+    if (query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            GameTreeItem *childItem = curItem->createChild(query);
+            m_gameTreeItems.push_back(childItem);
+            node->addNode(query.value(0).toString().stripWhiteSpace(),
+                              m_gameTreeItems.size(), childItem->isLeaf());
+        }
+    }
+    curItem->setFilled(true);
+}
+
+void GameTree::edit(void)
+{
+    GenericTree *curNode = m_gameTreeUI->getCurrentNode();
+    int i = curNode->getInt();
+    GameTreeItem *curItem = i ? m_gameTreeItems[i - 1] : 0;
+
+    if (curItem)
+        curItem->editSettings();
+}
+
+void GameTree::toggleFavorite(void)
+{
+    GenericTree *node = m_gameTreeUI->getCurrentNode();
+    int i = node->getInt();
+    GameTreeItem *item = i ? m_gameTreeItems[i - 1] : 0;
+
+    if (item && item->isLeaf())
+    {
+        item->getRomInfo()->setFavorite();
+        if (item->getRomInfo()->Favorite())
+            m_gameFavourite->SetText("Yes");
+        else
+            m_gameFavourite->SetText("No");
+    }
+}
