@@ -846,7 +846,6 @@ void VideoOutputXvMC::EmbedInWidget(WId wid, int x, int y, int w, int h)
         return;
     }
 
-    pthread_mutex_lock(&lock);
     data->XJ_curwin = wid;
     VideoOutput::EmbedInWidget(wid, x, y, w, h);
 
