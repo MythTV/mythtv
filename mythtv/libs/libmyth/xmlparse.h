@@ -51,6 +51,7 @@ class XMLParse
     void parseKey(LayerSet *, QDomElement &);
  
   private:
+    bool doLoadTheme(QDomElement &, QString, QString);
     QMap<QString, fontProp> fontMap;
     QMap<QString, LayerSet*> layerMap;
     vector<LayerSet *> *allTypes;

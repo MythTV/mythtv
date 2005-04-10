@@ -33,31 +33,45 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 
     fontSizeType = gContext->GetSetting("ThemeFontSizeType", "default");
 
+    
+    // first try to load the theme from the current theme directory
     QString themepath = gContext->GetThemeDir();
     QString themefile = themepath + specialfile + "ui.xml";
+     
+    if (doLoadTheme(ele, winName, themefile))
+        return true;
+        
+    // not found so now try the default theme directory
+    themepath = gContext->GetShareDir() + "themes/default/";
+    themefile = themepath + specialfile + "ui.xml";
 
+    if (doLoadTheme(ele, winName, themefile))
+    {    
+        cout << "XMLParse::LoadTheme(): Using default theme file" << endl;
+        return true;
+    }
+    
+    return false;
+}
+
+bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
+{
     QDomDocument doc;
-    QFile f(themefile);
+    QFile f(themeFile);
 
     if (!f.open(IO_ReadOnly))
-    {
-        themepath = gContext->GetShareDir() + "themes/default/";
-        themefile = themepath + "/" + specialfile + "ui.xml";
-        f.setName(themefile);
-        if (!f.open(IO_ReadOnly))
-        {
-            cerr << "XMLParse::LoadTheme(): Can't open: " << themefile << endl;
-            return false;
-        }
+    {    
+        cerr << "XMLParse::LoadTheme(): Can't open: " << themeFile << endl;
+        return false;
     }
-
+     
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cerr << "Error parsing: " << themefile << endl;
+        cerr << "Error parsing: " << themeFile << endl;
         cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
         cerr << errorMsg << endl;
         f.close();
