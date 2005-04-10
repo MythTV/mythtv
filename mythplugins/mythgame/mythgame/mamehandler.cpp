@@ -631,7 +631,7 @@ bool MameHandler::check_xmame_exe()
                                 /* skip " version " */
                                 tmp = tmp + 9;
                                 xmame_version_string = tmp;
-                                while (*tmp && (*tmp++ != '\n'))
+                                while (*tmp && (*temp != ' ') && (*tmp++ != '\n'))
                                         i++;
                                 xmame_version_string[i] = 0;
 
@@ -791,7 +791,7 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         volume.sprintf("%d", game_settings.volume);
         joytype.sprintf("%d", game_settings.joytype);
         if (!strcmp(general_prefs.xmame_display_target, "x11")) {
-                if(general_prefs.xmame_major <= 0 && general_prefs.xmame_minor < 88){
+                if(general_prefs.xmame_major <= 0 && general_prefs.xmame_minor.toInt() < 88){
                     fullscreen = (game_settings.fullscreen == 1) ? " -x11-mode 1" :
                                  " -fullscreen";
                     windowed = " -x11-mode 3";
