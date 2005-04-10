@@ -432,7 +432,7 @@ void ScheduledRecording::doneRecording(const ProgramInfo& proginfo)
 
     VERBOSE(VB_GENERAL, msg.local8Bit());
     gContext->LogEntry("scheduler", LP_NOTICE, "Finished recording", 
-                       msg.utf8());
+                       msg);
 
     addHistory(proginfo);
 }
