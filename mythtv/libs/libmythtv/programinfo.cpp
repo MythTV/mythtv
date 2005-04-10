@@ -1104,13 +1104,32 @@ void ProgramInfo::SetBookmark(long long pos)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("UPDATE recorded"
-                  " SET bookmark = :BOOKMARK"
-                  " WHERE chanid = :CHANID"
-                  " AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
-    
+    // When using mythtv to play files not recorded by myth the title is empty
+    // so bookmark is saved to videobookmarks rather than recorded
+    if (isVideo) 
+    {
+        //delete any existing bookmark for this file
+        query.prepare("DELETE from videobookmarks"                      
+                      " WHERE filename = :FILENAME ;");                   
+        query.bindValue(":FILENAME", pathname);        
+        if (!query.exec() || !query.isActive())
+        MythContext::DBError("Save position update",
+                             query);
+        //insert new bookmark
+        query.prepare("INSERT into videobookmarks (filename, bookmark)"
+                      "VALUES (:FILENAME , :BOOKMARK);");
+        query.bindValue(":FILENAME", pathname);                                    
+    }
+    else
+    {
+        query.prepare("UPDATE recorded"
+                    " SET bookmark = :BOOKMARK"
+                    " WHERE chanid = :CHANID"
+                    " AND starttime = :STARTTIME ;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    }
+        
     if (pos > 0)
     {
         char posstr[128];
@@ -1132,13 +1151,23 @@ long long ProgramInfo::GetBookmark()
 
     if (ignoreBookmark)
         return pos;
- 
-    query.prepare("SELECT bookmark FROM recorded"
-                  " WHERE chanid = :CHANID"
-                  " AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
-
+    
+    // When using mythtv to play files not recorded by myth the title is empty
+    // so bookmark comes from videobookmarks rather than recorded
+    if (isVideo) 
+    {
+        query.prepare("SELECT bookmark FROM videobookmarks"
+                      " WHERE filename = :FILENAME;");                  
+        query.bindValue(":FILENAME", pathname);        
+    } 
+    else 
+    {
+        query.prepare("SELECT bookmark FROM recorded"
+                    " WHERE chanid = :CHANID"
+                    " AND starttime = :STARTTIME ;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    }
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();

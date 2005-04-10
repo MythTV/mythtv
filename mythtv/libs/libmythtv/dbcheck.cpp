@@ -9,7 +9,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 
-const QString currentDatabaseVersion = "1082";
+const QString currentDatabaseVersion = "1083";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -1626,6 +1626,20 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ""
 };
         if (!performActualUpdate(updates, "1082", dbver))
+            return false;
+    }
+
+    if (dbver == "1082")
+    {
+        const QString updates[] = {
+"CREATE TABLE IF NOT EXISTS videobookmarks ("
+"  filename varchar(255) NOT NULL,"
+"  bookmark varchar(128) default NULL,"
+"  PRIMARY KEY (filename)"
+");",
+""
+};
+        if (!performActualUpdate(updates, "1083", dbver))
             return false;
     }
 
