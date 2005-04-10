@@ -9,6 +9,7 @@
 #include <mythtv/mythwidgets.h>
 #include <mythtv/mythdialogs.h>
 
+
 struct SmartPLOperator;
 struct SmartPLField;
 
@@ -53,7 +54,9 @@ class SmartPLCriteriaRow : public QObject
     MythSpinBox        *value2SpinEdit;
     MythPushButton     *value1Button;
     MythPushButton     *value2Button;
-      
+    MythComboBox       *value1Combo;
+    MythComboBox       *value2Combo;
+          
     bool saveToDatabase(int smartPlaylistID);
     void initValues(QString Field, QString Operator, QString Value1, QString Value2);
     
@@ -73,8 +76,10 @@ class SmartPLCriteriaRow : public QObject
     bool showList(QString caption, QString &value);
     void searchGenre(MythRemoteLineEdit *editor);
     void searchArtist(MythRemoteLineEdit *editor);
+    void searchCompilationArtist(MythRemoteLineEdit *editor);
     void searchAlbum(MythRemoteLineEdit *editor);
     void searchTitle(MythRemoteLineEdit *editor);
+    void editDate(MythComboBox *combo);
     void getOperatorList(SmartPLFieldType fieldType);   
     
     QStringList searchList;
@@ -147,6 +152,7 @@ class SmartPlaylistEditor : public MythDialog
     QPtrList<SmartPLCriteriaRow> criteriaRows;
     int matchesCount;
     bool bNewPlaylist;
+    bool bPlaylistIsValid;
     QString originalCategory, originalName;
 };
 
@@ -245,6 +251,53 @@ class SmartPLOrderByDialog: public MythPopupBox
     QButton             *moveDownButton;
     QButton             *ascendingButton;
     QButton             *descendingButton;
+    QButton             *okButton;
+};
+
+class SmartPLDateDialog: public MythPopupBox
+{
+  Q_OBJECT
+
+  public:
+
+    SmartPLDateDialog(MythMainWindow *parent, const char *name = 0); 
+    ~SmartPLDateDialog();
+
+    QString getDate(void);
+    void setDate(QString date);
+        
+ protected slots:
+    void fixedCheckToggled(bool on);
+    void nowCheckToggled(bool on);
+    void addDaysCheckToggled(bool on);
+    void valueChanged(void);
+    
+    void okPressed(void);
+    void cancelPressed(void);
+        
+ protected:
+    void keyPressEvent(QKeyEvent *e);
+
+ private:
+    QString             dateValue;
+    
+    QVBoxLayout         *vbox;
+    QLabel              *caption;
+    QLabel              *dayLabel;
+    QLabel              *monthLabel; 
+    QLabel              *yearLabel;
+    MythRadioButton     *fixedRadio; 
+    MythSpinBox         *daySpinEdit;
+    MythSpinBox         *monthSpinEdit;
+    MythSpinBox         *yearSpinEdit;  
+    
+    MythRadioButton     *nowRadio; 
+    
+    MythCheckBox        *addDaysCheck; 
+    MythSpinBox         *addDaysSpinEdit;
+    QLabel              *statusLabel;
+    
+    QButton             *cancelButton;
     QButton             *okButton;
 };
 

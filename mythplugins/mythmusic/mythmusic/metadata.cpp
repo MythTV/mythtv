@@ -164,9 +164,9 @@ void Metadata::dumpToDatabase(QString startdir)
         return;
 
     query.prepare("INSERT INTO musicmetadata (artist,compilation_artist,album,title,"
-                  "genre,year,tracknum,length,filename,compilation) VALUES "
+                  "genre,year,tracknum,length,filename,compilation,date_added) VALUES "
                   "(:ARTIST, :COMPILATION_ARTIST, :ALBUM, :TITLE, :GENRE, :YEAR, :TRACKNUM, "
-                  ":LENGTH, :FILENAME, :COMPILATION );");
+                  ":LENGTH, :FILENAME, :COMPILATION, :DATE_ADDED );");
     query.bindValue(":ARTIST", artist.utf8());
     query.bindValue(":COMPILATION_ARTIST", compilation_artist.utf8());
     query.bindValue(":ALBUM", album.utf8());
@@ -177,7 +177,8 @@ void Metadata::dumpToDatabase(QString startdir)
     query.bindValue(":LENGTH", length);
     query.bindValue(":FILENAME", sqlfilename.utf8());
     query.bindValue(":COMPILATION", compilation);
-
+    query.bindValue(":DATE_ADDED", QDate::currentDate());
+    
     query.exec();
 
     // easiest way to ensure we've got 'id' filled.

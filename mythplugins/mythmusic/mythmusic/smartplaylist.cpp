@@ -32,18 +32,19 @@ struct SmartPLField
 
 static SmartPLField SmartPLFields[] = 
 {
-    "",              "",              ftString,   0,    0,    0,
-    "Artist",        "artist",        ftString,   0,    0,    0,
-    "Album",         "album",         ftString,   0,    0,    0,
-    "Title",         "title",         ftString,   0,    0,    0,
-    "Genre",         "genre",         ftString,   0,    0,    0,
-    "Year",          "year",          ftNumeric,  1900, 2099, 2000,
-    "Track No.",     "tracknum",      ftNumeric,  0,    99,   0,
-    "Rating",        "rating",        ftNumeric,  0,    10,   0,
-    "Play Count",    "playcount",     ftNumeric,  0,    9999, 0 //,
-//    "Compilation"    "compilation",   ftBoolean, 0,    0,    0,
-//    "Last Play" ,    "lastplay",      ftDate, 0,    0,    0,
-//    "Date Imported", "date_added",    ftDate, 0,    0,    0   
+    "",              "",                               ftString,   0,    0,    0,
+    "Artist",        "artist",                         ftString,   0,    0,    0,
+    "Album",         "album",                          ftString,   0,    0,    0,
+    "Title",         "title",                          ftString,   0,    0,    0,
+    "Genre",         "genre",                          ftString,   0,    0,    0,
+    "Year",          "year",                           ftNumeric,  1900, 2099, 2000,
+    "Track No.",     "tracknum",                       ftNumeric,  0,    99,   0,
+    "Rating",        "rating",                         ftNumeric,  0,    10,   0,
+    "Play Count",    "playcount",                      ftNumeric,  0,    9999, 0,
+    "Compilation",   "compilation",                    ftBoolean,  0,    0,    0,
+    "Comp. Artist",  "compilation_artist",             ftString,   0,    0,    0, 
+    "Last Play",     "FROM_DAYS(TO_DAYS(lastplay))",   ftDate,     0,    0,    0,
+    "Date Imported", "FROM_DAYS(TO_DAYS(date_added))", ftDate,     0,    0,    0   
 };        
 
 struct SmartPLOperator
@@ -51,18 +52,19 @@ struct SmartPLOperator
     QString name;
     int     noOfArguments;
     bool    stringOnly;
+    bool    validForBoolean;
 };
 
 static SmartPLOperator SmartPLOperators[] = 
 {
-    "is equal to",     1,  false,
-    "is not equal",    1,  false,
-    "is greater than", 1,  false,
-    "is less than",    1,  false,     
-    "starts with",     1,  true,
-    "ends with",       1,  true, 
-    "contains",        1,  true,
-    "is between",      2,  false,
+    "is equal to",     1,  false, true,
+    "is not equal to", 1,  false, true,
+    "is greater than", 1,  false, false,
+    "is less than",    1,  false, false,     
+    "starts with",     1,  true,  false,
+    "ends with",       1,  true,  false,
+    "contains",        1,  true,  false,
+    "is between",      2,  false, false,
 };
 
 static int SmartPLOperatorsCount = sizeof(SmartPLOperators) / sizeof(SmartPLOperators[0]);
@@ -101,6 +103,34 @@ QString formattedFieldValue(const QVariant &value)
     return result;
 }
 
+QString evaluateDateValue(QString sDate)
+{
+    if (sDate.startsWith("$DATE"))
+    {
+        QDate date = QDate::currentDate();
+        
+        if (sDate.length() > 9)
+        {
+            bool bNegative = false;
+            if (sDate[6] == '-')
+                bNegative = true;
+       
+            if (sDate.endsWith(" days"))
+                sDate = sDate.left(sDate.length() - 5);
+ 
+            int nDays = sDate.mid(8).toInt();
+            if (bNegative)
+                nDays = -nDays;
+            
+            date = date.addDays(nDays);     
+        }
+        
+        return date.toString(Qt::ISODate);
+    }
+
+    return sDate;      
+}
+
 QString getCriteriaSQL(QString fieldName, QString operatorName, 
                        QString value1, QString value2)
 {
@@ -125,6 +155,19 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
         return "";
     }
     
+    // convert boolean and date values
+    if (Field->type == ftBoolean)
+    {
+        // compilation field uses 0 = false;  1 = true
+        value1 = (value1 == "Yes") ? "1":"0";
+        value2 = (value2 == "Yes") ? "1":"0";
+    }
+    else if (Field->type == ftDate)
+    {
+        value1 = evaluateDateValue(value1);
+        value2 = evaluateDateValue(value2);
+    }
+    
     value1 = value1.utf8();
     value2 = value2.utf8();
     
@@ -132,7 +175,7 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
     {
         result = result + " = " + formattedFieldValue(value1);
     }
-    else if (Operator->name == "is not equal")
+    else if (Operator->name == "is not equal to")
     {
         result = result + " != " + formattedFieldValue(value1);
     }
@@ -231,12 +274,11 @@ SmartPLCriteriaRow::SmartPLCriteriaRow(QWidget *parent, QHBoxLayout *hbox)
     fieldCombo->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(fieldCombo);
 
-    // criteria combo
+    // operator combo
     operatorCombo = new MythComboBox(false, parent, "criteria" );
     for (int x = 0; x < SmartPLOperatorsCount; x++)
         operatorCombo->insertItem(SmartPLOperators[x].name);
     
-    // operator combo
     operatorCombo->setBackgroundOrigin(parent->WindowOrigin);
     operatorCombo->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(operatorCombo);
@@ -254,6 +296,13 @@ SmartPLCriteriaRow::SmartPLCriteriaRow(QWidget *parent, QHBoxLayout *hbox)
     value1SpinEdit->setMaxValue(9999);
     value1SpinEdit->hide();
     hbox->addWidget(value1SpinEdit);
+
+    // value1 combo
+    value1Combo = new MythComboBox(false, parent, "value1Combo" );
+    value1Combo->setBackgroundOrigin(parent->WindowOrigin);
+    value1Combo->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
+    value1Combo->hide();
+    hbox->addWidget(value1Combo);
     
     // value1 button
     value1Button = new MythPushButton( parent, "value1Button" );
@@ -281,6 +330,13 @@ SmartPLCriteriaRow::SmartPLCriteriaRow(QWidget *parent, QHBoxLayout *hbox)
     value2SpinEdit->hide();
     hbox->addWidget(value2SpinEdit);
 
+    // value2 combo
+    value2Combo = new MythComboBox(false, parent, "value2Combo" );
+    value2Combo->setBackgroundOrigin(parent->WindowOrigin);
+    value1Combo->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
+    value2Combo->hide();
+    hbox->addWidget(value2Combo);
+
     // value2 button
     value2Button = new MythPushButton( parent, "value1Button" );
     value2Button->setBackgroundOrigin(parent->WindowOrigin);
@@ -304,7 +360,12 @@ SmartPLCriteriaRow::SmartPLCriteriaRow(QWidget *parent, QHBoxLayout *hbox)
     connect(value2Edit, SIGNAL(textChanged(void)), this, SLOT(valueChanged(void)));
     connect(value1SpinEdit, SIGNAL(valueChanged(const QString &)), this, SLOT(valueChanged(void)));
     connect(value2SpinEdit, SIGNAL(valueChanged(const QString &)), this, SLOT(valueChanged(void)));
-    
+    connect(value1Combo, SIGNAL(activated(int)), this, SLOT(valueChanged(void)));
+    connect(value1Combo, SIGNAL(highlighted(int)), this, SLOT(valueChanged(void)));    
+    connect(value2Combo, SIGNAL(activated(int)), this, SLOT(valueChanged(void)));
+    connect(value2Combo, SIGNAL(highlighted(int)), this, SLOT(valueChanged(void)));    
+
+        
     bUpdating = false;
     fieldChanged();
 }
@@ -326,6 +387,8 @@ void SmartPLCriteriaRow::fieldChanged(void)
         value2SpinEdit->setEnabled(false);
         value1Button->setEnabled(false);
         value2Button->setEnabled(false);
+        value1Combo->setEnabled(false);
+        value2Combo->setEnabled(false);
     }
     else
     {
@@ -336,6 +399,8 @@ void SmartPLCriteriaRow::fieldChanged(void)
         value2SpinEdit->setEnabled(true);
         value1Button->setEnabled(true);
         value2Button->setEnabled(true);
+        value1Combo->setEnabled(true);
+        value2Combo->setEnabled(true);
     }
     
     SmartPLField *Field;
@@ -344,6 +409,30 @@ void SmartPLCriteriaRow::fieldChanged(void)
     {
         emit criteriaChanged();
         return;
+    }
+    
+    if (Field->type == ftBoolean) 
+    {
+        // add yes / no items to combo
+        value1Combo->clear();
+        value1Combo->insertItem("No");
+        value1Combo->insertItem("Yes");
+        value2Combo->clear();
+        value2Combo->insertItem("No");
+        value2Combo->insertItem("Yes");
+    }
+    else if (Field->type == ftDate)
+    {
+        // add a couple of date values to the combo
+        value1Combo->clear();
+        value1Combo->insertItem("$DATE");
+        value1Combo->insertItem("$DATE - 30 days");
+        value1Combo->insertItem("$DATE - 60 days"); 
+
+        value2Combo->clear();
+        value2Combo->insertItem("$DATE");
+        value2Combo->insertItem("$DATE - 30 days");
+        value2Combo->insertItem("$DATE - 60 days"); 
     }
     
     // get list of operators valid for this field type
@@ -374,7 +463,7 @@ void SmartPLCriteriaRow::operatorChanged(void)
         return;
     }
         
-    // show hide spin edits
+    // show/hide spin edits
     if (Field->type == ftNumeric)
     {
         // show hide second values
@@ -400,6 +489,8 @@ void SmartPLCriteriaRow::operatorChanged(void)
         value2Edit->hide();
         value1Button->hide();
         value2Button->hide();
+        value1Combo->hide();
+        value2Combo->hide();
 
         value1SpinEdit->show();
         
@@ -410,9 +501,44 @@ void SmartPLCriteriaRow::operatorChanged(void)
         if (currentValue < Field->minValue || currentValue > Field->maxValue)
             value1SpinEdit->setValue(Field->defaultValue);
     }
-    else // FIXME: add support for date and boolean types
+    else if (Field->type == ftBoolean) 
     {
-        // show hide second values
+        // only show value1combo
+        value1Edit->hide();
+        value2Edit->hide();
+        value1Button->hide();
+        value2Button->hide();
+        value1SpinEdit->hide();
+        value2SpinEdit->hide();
+        value2Combo->hide();
+        
+        value1Combo->show();
+    }
+    else if (Field->type == ftDate)
+    {
+        // show/hide second values
+        if (Operator->noOfArguments == 2)
+        {
+            value2Combo->show();
+            value2Button->show();
+        }
+        else
+        {
+            value2Combo->hide();
+            value2Button->hide();    
+        }    
+
+        value1Edit->hide();
+        value2Edit->hide();
+        value1SpinEdit->hide();
+        value2SpinEdit->hide();
+
+        value1Combo->show();
+        value1Button->show();
+    }
+    else // ftString
+    {
+        // show/hide second values
         if (Operator->noOfArguments == 2)
         {
             value2Edit->show();
@@ -426,6 +552,8 @@ void SmartPLCriteriaRow::operatorChanged(void)
 
         value1SpinEdit->hide();
         value2SpinEdit->hide();
+        value1Combo->hide();
+        value2Combo->hide();
 
         value1Edit->show();
         value1Button->show();
@@ -446,12 +574,18 @@ void SmartPLCriteriaRow::value1ButtonClicked(void)
 {
     if (fieldCombo->currentText() == "Artist")
         searchArtist(value1Edit);
+    else if (fieldCombo->currentText() == "Comp. Artist")
+        searchCompilationArtist(value1Edit);
     else if (fieldCombo->currentText() == "Album")
         searchAlbum(value1Edit);
     else if (fieldCombo->currentText() == "Genre")
         searchGenre(value1Edit);
     else if (fieldCombo->currentText() == "Title")
         searchTitle(value1Edit);
+    else if (fieldCombo->currentText() == "Last Play")
+        editDate(value1Combo);
+    else if (fieldCombo->currentText() == "Date Imported")
+        editDate(value1Combo);
         
     value1Button->setFocus();    
 }
@@ -460,14 +594,36 @@ void SmartPLCriteriaRow::value2ButtonClicked(void)
 {
     if (fieldCombo->currentText() == "Artist")
         searchArtist(value2Edit);
+    else if (fieldCombo->currentText() == "Comp. Artist")
+        searchCompilationArtist(value2Edit);
     else if (fieldCombo->currentText() == "Album")
         searchAlbum(value2Edit);
     else if (fieldCombo->currentText() == "Genre")
         searchGenre(value2Edit);
     else if (fieldCombo->currentText() == "Title")
         searchTitle(value2Edit);
+    else if (fieldCombo->currentText() == "Last Play")
+        editDate(value2Combo);
+    else if (fieldCombo->currentText() == "Date Imported")
+        editDate(value2Combo);
     
     value2Button->setFocus();        
+}
+
+void SmartPLCriteriaRow::editDate(MythComboBox *combo)
+{
+    bool res = false;
+    
+    SmartPLDateDialog *dateDialog = new SmartPLDateDialog(gContext->GetMainWindow(), "");
+    dateDialog->setDate(combo->currentText());
+    if (dateDialog->ExecPopup() == 0)
+    {
+        combo->insertItem(dateDialog->getDate());
+        combo->setCurrentText(dateDialog->getDate());
+        res = true;
+    }
+    
+    delete dateDialog;
 }
           
 bool SmartPLCriteriaRow::showList(QString caption, QString &value)
@@ -515,6 +671,19 @@ void SmartPLCriteriaRow::searchArtist(MythRemoteLineEdit *editor)
     
     s = editor->text();
     if (showList(tr("Select an Artist"), s))
+    {
+        editor->setText(s);
+    }
+}
+
+void SmartPLCriteriaRow::searchCompilationArtist(MythRemoteLineEdit *editor)
+{
+    QString s;
+    
+    fillSearchList("compilation_artist");
+    
+    s = editor->text();
+    if (showList(tr("Select a Compilation Artist"), s))
     {
         editor->setText(s);
     }
@@ -580,7 +749,12 @@ QString SmartPLCriteriaRow::getSQL(void)
         value1 = value1SpinEdit->text();
         value2 = value2SpinEdit->text();
     }
-    else // FIXME: add support for date and boolean types
+    else if (Field->type == ftBoolean || Field->type == ftDate)
+    {
+        value1 = value1Combo->currentText();
+        value2 = value2Combo->currentText();
+    }
+    else // ftString
     {
         value1 = value1Edit->text();
         value2 = value2Edit->text();
@@ -617,7 +791,19 @@ bool SmartPLCriteriaRow::saveToDatabase(int smartPlaylistID)
         Value1 = value1SpinEdit->text();
         Value2 = value2SpinEdit->text();
     }
-    else // FIXME: add support for date and boolean types
+    else if (PLField->type == ftBoolean)
+    {
+        // compilation field uses 0 = false;  >0 = true
+        Value1 = (value1Combo->currentText() == "Yes") ? "1":"0";
+        Value2 = (value2Combo->currentText() == "Yes") ? "1":"0";
+    }
+    else if (PLField->type == ftDate)
+    {
+        // TODO: date conversion
+        Value1 = value1Combo->currentText();
+        Value2 = value2Combo->currentText();
+    }
+    else // ftString
     {
         Value1 = value1Edit->text();
         Value2 = value2Edit->text();
@@ -655,9 +841,18 @@ void SmartPLCriteriaRow::initValues(QString Field, QString Operator, QString Val
         {
             value1SpinEdit->setValue(Value1.toInt());
             value2SpinEdit->setValue(Value2.toInt());
-            
         }
-        else //FIXME: add support for date and boolean types
+        else if (PLField->type == ftBoolean)
+        {
+            value1Combo->setCurrentText( (Value1 == "1") ? "Yes":"No" );
+            value2Combo->setCurrentText( (Value2 == "1") ? "Yes":"No" );
+        }
+        else if (PLField->type == ftDate)
+        {
+            value1Combo->setCurrentText(Value1);
+            value2Combo->setCurrentText(Value2);
+        }
+        else //ftString
         {
             value1Edit->setText(Value1);
             value2Edit->setText(Value2);
@@ -684,6 +879,10 @@ void SmartPLCriteriaRow::getOperatorList(SmartPLFieldType fieldType)
         if (fieldType != ftString && SmartPLOperators[x].stringOnly)
             continue;
             
+        // don't add operators that only work with boolean fields 
+        if (fieldType == ftBoolean && !SmartPLOperators[x].validForBoolean)
+            continue;
+       
         operatorCombo->insertItem(SmartPLOperators[x].name);
     }
     
@@ -907,6 +1106,7 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     
     titleEdit->setFocus();
     category_popup = NULL;
+    bPlaylistIsValid = false;
     
     gContext->addListener(this);
 }
@@ -918,24 +1118,32 @@ SmartPlaylistEditor::~SmartPlaylistEditor(void)
 
 void SmartPlaylistEditor::titleChanged(void)
 {
-    saveButton->setEnabled((matchesCount > 0 && !titleEdit->text().isEmpty()));
+    saveButton->setEnabled((bPlaylistIsValid && !titleEdit->text().isEmpty()));
 }
 
 void SmartPlaylistEditor::updateMatches(void)
 {
+    bPlaylistIsValid = true;
+    
     QString sql = "select count(*) from musicmetadata ";
     sql += getWhereClause();
     
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(sql);
-    
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec(sql))
     {
-        query.first();
-        matchesCount = query.value(0).toInt();
-    }
+        if (query.numRowsAffected() > 0)
+        {
+            query.first();
+            matchesCount = query.value(0).toInt();
+        }
+        else
+            matchesCount = 0;
+    }    
     else
+    {    
+        bPlaylistIsValid = false;
         matchesCount = 0;
+    }
         
     matchesLabel->setText(QString().setNum(matchesCount));    
     
@@ -2206,5 +2414,383 @@ void SmartPLOrderByDialog::getOrderByFields(void)
     orderByCombo->clear();
     for (int x = 1; x < SmartPLFieldsCount; x++)
         orderByCombo->insertItem(SmartPLFields[x].name);
+}
+
+/*
+---------------------------------------------------------------------
+*/
+
+SmartPLDateDialog::SmartPLDateDialog(MythMainWindow *parent, const char *name) 
+                 :MythPopupBox(parent, name)
+{
+    // we have to create a parent less layout because otherwise MythPopupbox
+    // complains about already having a layout
+    vbox = new QVBoxLayout(NULL, 0, (int)(15 * hmult));
+    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(15 * wmult));
+    
+    // create the widgets
+    
+    caption = new QLabel(tr("Edit Date"), this);
+    QFont font = caption->font();
+    font.setPointSize(int (font.pointSize() * 1.2));
+    font.setBold(true);
+    caption->setFont(font);
+    caption->setPaletteForegroundColor(QColor("yellow"));
+    caption->setBackgroundOrigin(ParentOrigin);
+    caption->setAlignment(Qt::AlignCenter);
+    caption->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+    caption->setMinimumWidth((int)(400 * hmult));
+    caption->setMaximumWidth((int)(400 * hmult));  
+    hbox->addWidget(caption);
+    
+    // fixed date widgets
+    QDate date = QDate::currentDate();
+    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    fixedRadio = new MythRadioButton(this, "nopopsize");
+    fixedRadio->setText(tr("Fixed Date"));
+    fixedRadio->setBackgroundOrigin(ParentOrigin);
+    fixedRadio->setChecked(true);
+    fixedRadio->setFocus();
+    hbox->addWidget(fixedRadio);
+    
+    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    dayLabel = new QLabel(tr("Day"), this, "nopopsize");
+    dayLabel->setBackgroundOrigin(ParentOrigin);
+    dayLabel->setAlignment(Qt::AlignLeft);
+    dayLabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    hbox->addWidget(dayLabel);
+
+    daySpinEdit = new MythSpinBox(this);
+    daySpinEdit->setBackgroundOrigin(ParentOrigin);
+    daySpinEdit->setMinValue(1);
+    daySpinEdit->setMaxValue(31);
+    daySpinEdit->setValue(date.day());
+    hbox->addWidget(daySpinEdit);
+
+    monthLabel = new QLabel(QString(tr("Month")), this, "nopopsize");
+    monthLabel->setBackgroundOrigin(ParentOrigin);
+    monthLabel->setAlignment(Qt::AlignLeft);
+    monthLabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    hbox->addWidget(monthLabel);
+
+    monthSpinEdit = new MythSpinBox(this);
+    monthSpinEdit->setBackgroundOrigin(ParentOrigin);
+    monthSpinEdit->setMinValue(1);
+    monthSpinEdit->setMaxValue(12);
+    monthSpinEdit->setValue(date.month());
+    hbox->addWidget(monthSpinEdit);
+
+    yearLabel = new QLabel(QString(tr("Year")), this, "nopopsize");
+    yearLabel->setBackgroundOrigin(ParentOrigin);
+    yearLabel->setAlignment(Qt::AlignLeft);
+    yearLabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    hbox->addWidget(yearLabel);
+
+    yearSpinEdit = new MythSpinBox(this);
+    yearSpinEdit->setBackgroundOrigin(ParentOrigin);
+    yearSpinEdit->setMinValue(1900);
+    yearSpinEdit->setMaxValue(2099);
+    yearSpinEdit->setValue(date.year());
+    hbox->addWidget(yearSpinEdit);
+    
+    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    QLabel *splitter = new QLabel("", this);
+    splitter->setLineWidth(2);
+    splitter->setFrameShape(QFrame::HLine);
+    splitter->setFrameShadow(QFrame::Sunken);
+    splitter->setMaximumHeight((int) (5 * hmult));
+    splitter->setMaximumHeight((int) (5 * hmult));
+    hbox->addWidget(splitter);
+
+    // date now widgets
+    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    nowRadio = new MythRadioButton(this);
+    nowRadio->setText(tr("Use Current Date"));
+    nowRadio->setBackgroundOrigin(ParentOrigin);
+    nowRadio->setChecked(false);
+    hbox->addWidget(nowRadio);
+
+    
+    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    splitter = new QLabel("          ", this, "nopopsize");
+    splitter->setBackgroundOrigin(ParentOrigin);
+    splitter->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    hbox->addWidget(splitter);
+
+    // add/take days widgets
+    addDaysCheck = new MythCheckBox(this);
+    addDaysCheck->setText(tr("+/- Days"));
+    addDaysCheck->setBackgroundOrigin(ParentOrigin);
+    hbox->addWidget(addDaysCheck);
+  
+    addDaysSpinEdit = new MythSpinBox(this, "nopopsize");
+    addDaysSpinEdit->setBackgroundOrigin(WindowOrigin);
+    addDaysSpinEdit->setMinValue(-9999);
+    addDaysSpinEdit->setMaxValue(9999);
+    hbox->addWidget(addDaysSpinEdit);
+    
+    // status label
+    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    statusLabel = new QLabel(QString(""), this);
+    statusLabel->setLineWidth(2);
+    statusLabel->setFrameShape(QFrame::Panel);
+    statusLabel->setFrameShadow(QFrame::Sunken);
+    statusLabel->setBackgroundOrigin(ParentOrigin);
+    statusLabel->setAlignment(Qt::AlignLeft);
+    statusLabel->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
+    statusLabel->setAlignment(Qt::AlignCenter);
+    hbox->addWidget(statusLabel);
+
+    // buttons
+    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    okButton = new MythPushButton(this);
+    okButton->setText(tr("OK"));
+    hbox->addWidget(okButton);
+    
+    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    cancelButton = new MythPushButton(this);
+    cancelButton->setText(tr("Cancel"));
+    hbox->addWidget(cancelButton);
+
+    addLayout(vbox, 0);
+    
+    connect(okButton, SIGNAL(clicked()), this, SLOT(okPressed()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelPressed()));
+
+    connect(fixedRadio, SIGNAL(toggled(bool)), this, SLOT(fixedCheckToggled(bool)));
+    connect(nowRadio, SIGNAL(toggled(bool)), this, SLOT(nowCheckToggled(bool)));
+    connect(addDaysCheck, SIGNAL(toggled(bool)), this, SLOT(addDaysCheckToggled(bool)));
+    connect(addDaysSpinEdit, SIGNAL(valueChanged(const QString &)), 
+            this, SLOT(valueChanged(void)));
+    connect(daySpinEdit, SIGNAL(valueChanged(const QString &)), 
+            this, SLOT(valueChanged(void)));
+    connect(monthSpinEdit, SIGNAL(valueChanged(const QString &)), 
+            this, SLOT(valueChanged(void)));
+    connect(yearSpinEdit, SIGNAL(valueChanged(const QString &)), 
+            this, SLOT(valueChanged(void)));
+    
+    valueChanged();        
+}
+
+
+SmartPLDateDialog::~SmartPLDateDialog(void)
+{
+    if (vbox)
+    {
+        delete vbox;
+        vbox = NULL;
+    }
+}
+
+QString SmartPLDateDialog::getDate(void)
+{
+    QString sResult;
+    
+    if (fixedRadio->isChecked())
+    {
+        QString day = daySpinEdit->text();
+        if (daySpinEdit->value() < 10)
+            day = "0" + day;
+            
+        QString month = monthSpinEdit->text();
+        if (monthSpinEdit->value() < 10)      
+            month = "0" + month;
+        
+        sResult = yearSpinEdit->text() + "-" + month + "-" + day;
+    
+    }
+    else
+       sResult = statusLabel->text(); 
+    
+    return sResult;    
+}
+    
+void SmartPLDateDialog::setDate(QString date)
+{
+    if (date.startsWith("$DATE"))
+    {
+        nowRadio->setChecked(true);
+        
+        if (date.length() > 9)
+        {
+            bool bNegative = false;
+            if (date[6] == '-')
+                bNegative = true;
+       
+            if (date.endsWith(" days"))
+                date = date.left(date.length() - 5);
+ 
+            int nDays = date.mid(8).toInt();
+            if (bNegative)
+                nDays = -nDays;
+                
+            addDaysCheck->setEnabled(true);
+            addDaysCheck->setChecked(true);
+            addDaysSpinEdit->setEnabled(true);
+            addDaysSpinEdit->setValue(nDays);
+        }
+        else
+        {
+            addDaysCheck->setEnabled(false);
+            addDaysSpinEdit->setEnabled(false);
+            addDaysSpinEdit->setValue(0);
+        }
+        
+        nowCheckToggled(true);
+    }
+    else
+    {
+        int nYear = date.mid(0, 4).toInt();
+        int nMonth = date.mid(5, 2).toInt();
+        int nDay = date.mid(8, 2).toInt();
+        
+        daySpinEdit->setValue(nDay);
+        monthSpinEdit->setValue(nMonth);
+        yearSpinEdit->setValue(nYear);
+        
+        fixedCheckToggled(true);
+    }
+}
+        
+void SmartPLDateDialog::keyPressEvent(QKeyEvent *e)
+{
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            if (action == "ESCAPE")
+            {
+                handled = true;
+                done(-1);        
+            }
+            else if (action == "LEFT")
+            {
+                handled = true;
+                focusNextPrevChild(false);
+            }
+            else if (action == "RIGHT")
+            {
+                handled = true;
+                focusNextPrevChild(true);
+            }
+            else if (action == "UP")
+            {
+                handled = true;
+                focusNextPrevChild(false);
+            }
+            else if (action == "DOWN")
+            {
+                handled = true;
+                focusNextPrevChild(true);
+            }
+        }
+    }
+    if (!handled)
+        MythPopupBox::keyPressEvent(e);
+}
+
+void SmartPLDateDialog::okPressed(void)
+{
+    done(0);
+}
+
+void SmartPLDateDialog::cancelPressed(void)
+{
+    done(-1);
+}
+
+void SmartPLDateDialog::fixedCheckToggled(bool on)
+{
+    daySpinEdit->setEnabled(on);
+    monthSpinEdit->setEnabled(on);
+    yearSpinEdit->setEnabled(on);
+    dayLabel->setEnabled(on);
+    monthLabel->setEnabled(on);
+    yearLabel->setEnabled(on);
+    
+    nowRadio->setChecked(!on);
+    addDaysCheck->setEnabled(!on);
+    addDaysSpinEdit->setEnabled(!on && addDaysCheck->isChecked());    
+    
+    valueChanged();
+}
+
+void SmartPLDateDialog::nowCheckToggled(bool on)
+{
+    fixedRadio->setChecked(!on);
+    daySpinEdit->setEnabled(!on);
+    monthSpinEdit->setEnabled(!on);
+    yearSpinEdit->setEnabled(!on);
+    dayLabel->setEnabled(!on);
+    monthLabel->setEnabled(!on);
+    yearLabel->setEnabled(!on);
+    
+    nowRadio->setChecked(on);
+    addDaysCheck->setEnabled(on);
+    
+    addDaysSpinEdit->setEnabled(on && addDaysCheck->isChecked());    
+    
+    valueChanged();
+}
+
+void SmartPLDateDialog::addDaysCheckToggled(bool on)
+{
+    addDaysSpinEdit->setEnabled(on);
+    
+    valueChanged();
+}    
+
+void SmartPLDateDialog::valueChanged(void)
+{
+    bool bValidDate = true;
+    
+    if (fixedRadio->isChecked())
+    {
+        QString day = daySpinEdit->text();
+        if (daySpinEdit->value() < 10)
+            day = "0" + day;
+            
+        QString month = monthSpinEdit->text();
+        if (monthSpinEdit->value() < 10)      
+            month = "0" + month;
+        
+        QString sDate = yearSpinEdit->text() + "-" + month + "-" + day;
+        QDate date = QDate::fromString(sDate, Qt::ISODate);
+        if (date.isValid())
+            statusLabel->setText(date.toString("dddd, d MMMM yyyy"));
+        else
+        {    
+            bValidDate = false;
+            statusLabel->setText(tr("Invalid Date"));
+        } 
+    }
+    else if (nowRadio->isChecked())
+    {
+        if (addDaysCheck->isChecked())
+        {
+            QString days;
+            if (addDaysSpinEdit->value() > 0)
+                days = QString("$DATE + %1 days").arg(addDaysSpinEdit->value());
+            else if (addDaysSpinEdit->value() == 0)
+                days = QString("$DATE");
+            else
+                days = QString("$DATE - %1 days").arg(
+                    addDaysSpinEdit->text().right(addDaysSpinEdit->text().length() - 1));
+                
+            statusLabel->setText(days);
+        }
+        else
+            statusLabel->setText("$DATE");
+    }
+    
+    if (bValidDate)
+        statusLabel->setPaletteForegroundColor(QColor("green"));
+    else    
+        statusLabel->setPaletteForegroundColor(QColor("red"));
+
+    okButton->setEnabled(bValidDate);
 }
 

@@ -129,22 +129,22 @@ bool Goom::draw(QPainter *p, const QColor &back)
         int sw2 = surface->pitch;
         int swd = sw2 - sw * scalew;
 
-        int fin = (int)s;
-        int fd = (int)d + (sw2 * size.height());
+        long fin = (long)s;
+        long fd = (long)d + (sw2 * size.height());
 
-        while ((int)d < fd) {
+        while ((long)d < fd) {
             fin += sw;
             if (scalew == 2)
             {
-                while ((int)s < fin) {
-                    register int col = *(s++);
+                while ((long)s < fin) {
+                    register long col = *(s++);
                     *(d++) = col; *(d++) = col;
                 } 
             }
             else
             {
-                while ((int)s < fin) {
-                    register int col = *(s++);
+                while ((long)s < fin) {
+                    register long col = *(s++);
                     *(d++) = col;
                 }
             }
