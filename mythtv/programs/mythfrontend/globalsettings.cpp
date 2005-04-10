@@ -1221,8 +1221,9 @@ static HostCheckBox *UseVideoModes()
 static HostSpinBox *VidModeWidth(int idx)
 {
     HostSpinBox *gs = new HostSpinBox(QString("VidModeWidth%1").arg(idx),
-                                            0, 1920, 8, true);
-    gs->setLabel(QObject::tr("Input Video X"));
+                                            0, 1920, 16, true);
+    gs->setLabel((idx<1) ? QObject::tr("In X"): "");
+    gs->setLabelAboveWidget(idx<1);
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Horizontal resolution of video "
                                 "which needs a special output resolution."));
@@ -1232,8 +1233,9 @@ static HostSpinBox *VidModeWidth(int idx)
 static HostSpinBox *VidModeHeight(int idx)
 {
     HostSpinBox *gs = new HostSpinBox(QString("VidModeHeight%1").arg(idx),
-                                            0, 1080, 4, true);
-    gs->setLabel(QObject::tr("Input Video Y"));
+                                            0, 1080, 16, true);
+    gs->setLabel((idx<1) ? QObject::tr("In Y"): "");
+    gs->setLabelAboveWidget(idx<1);
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Vertical resolution of video "
                                 "which needs a special output resolution."));
@@ -1275,15 +1277,21 @@ static HostComboBox *GuiVidModeResolution()
 
 static HostComboBox *TVVidModeResolution(int idx=-1)
 {
+    QString dhelp = QObject::tr("Default screen resolution "
+                                "when watching a video.");
+    QString ohelp = QObject::tr("Screen resolution when watching a "
+                                "video at a specific resolution.");
+
     QString qstr = (idx<0) ? "TVVidModeResolution" :
         QString("TVVidModeResolution%1").arg(idx);
     HostComboBox *gc = new HostComboBox(qstr);
-    gc->setLabelAboveWidget(true);
-    QString lstr = (idx<0) ? QObject::tr("Default Video") :
-        QObject::tr("Output Resolution");
+    QString lstr = (idx<0) ? QObject::tr("Video Output") :
+        ((idx<1) ? QObject::tr("Output") : "");
+    QString hstr = (idx<0) ? dhelp : ohelp;
+
     gc->setLabel(lstr);
-    gc->setHelpText(QObject::tr("Default screen resolution "
-                                "when watching a video."));
+    gc->setLabelAboveWidget(idx<1);
+    gc->setHelpText(hstr);
     
     const vector<DisplayResScreen> scr = GetVideoModes();
     for (uint i=0; i<scr.size(); ++i)
@@ -1296,29 +1304,40 @@ static HostComboBox *TVVidModeResolution(int idx=-1)
 
 static HostRefreshRateComboBox *TVVidModeRefreshRate(int idx=-1)
 {
+    QString dhelp = QObject::tr("Default refresh rate "
+                                "when watching a video.");
+    QString ohelp = QObject::tr("Refresh rate when watching a "
+                                "video at a specific resolution.");
     QString qstr = (idx<0) ? "TVVidModeRefreshRate" :
         QString("TVVidModeRefreshRate%1").arg(idx);
     HostRefreshRateComboBox *gc = new HostRefreshRateComboBox(qstr);
-    QString lstr = (idx<0) ? "Default Rate" : "OutputRate";
-    gc->setLabel(QObject::tr("Default Rate"));
-    gc->setLabelAboveWidget(idx<0);
-    gc->setHelpText(QObject::tr("Default screen refresh rate "
-                                "when watching a video."));
+    QString lstr = (idx<1) ? QObject::tr("Rate") : "";
+    QString hstr = (idx<0) ? dhelp : ohelp;
+
+    gc->setLabel(lstr);
+    gc->setLabelAboveWidget(idx<1);
+    gc->setHelpText(hstr);
     gc->setEnabled(false);
     return gc;
 }
 
 static HostComboBox *TVVidModeForceAspect(int idx=-1)
 {
+    QString dhelp = QObject::tr("Aspect ratio when watching a video.");
+    QString ohelp = QObject::tr("Aspect ration when watching a "
+                                "video at a specific resolution.");
+
     QString qstr = (idx<0) ? "TVVidModeForceAspect" :
         QString("TVVidModeForceAspect%1").arg(idx);
     HostComboBox *gc = new HostComboBox(qstr);
-    gc->setLabel(QObject::tr("Aspect"));
-    gc->setLabelAboveWidget(idx<0);
+    gc->setLabel( (idx<1) ? QObject::tr("Aspect") : "" );
+    gc->setLabelAboveWidget(idx<1);
 
-    gc->setHelpText(QObject::tr("Leave at \"Default\" to use ratio reported by "
-                                "the monitor. Or, set to 16:9 or 4:3 to "
-                                "force a specific aspect ratio."));
+    QString hstr = (idx<0) ? dhelp : ohelp;
+    gc->setHelpText(hstr+"  "+
+        QObject::tr("Leave at \"Default\" to use ratio reported by "
+                    "the monitor.  Set to 16:9 or 4:3 to "
+                    "force a specific aspect ratio."));
     gc->addSelection(QObject::tr("Default"), "0.0");
     gc->addSelection("16:9", "1.77777777777");
     gc->addSelection("4:3",  "1.33333333333");
@@ -1339,11 +1358,10 @@ class VideoModeSettings: public VerticalConfigurationGroup,
         setTrigger(videomode);
 
         ConfigurationGroup* defaultsettings =
-            new HorizontalConfigurationGroup(true, false);
+            new HorizontalConfigurationGroup(false, false);
 
         HostComboBox *res = TVVidModeResolution();
         HostRefreshRateComboBox *rate = TVVidModeRefreshRate();
-        defaultsettings->setLabel("Default Resolutions");
         defaultsettings->addChild(GuiVidModeResolution());
         defaultsettings->addChild(res);
         defaultsettings->addChild(rate);
@@ -1351,37 +1369,32 @@ class VideoModeSettings: public VerticalConfigurationGroup,
         connect(res, SIGNAL(valueChanged(const QString&)),
                 rate, SLOT(ChangeResolution(const QString&)));
 
-        ConfigurationGroup* overrides =
-            new VerticalConfigurationGroup(true, true);
-        overrides->setLabel("Overrides for specific video sizes");
-        for (int idx = 0; idx < 2; ++idx)
+        ConfigurationGroup* overridesbox =
+            new HorizontalConfigurationGroup(true, true);
+        overridesbox->setLabel("Overrides for specific video sizes");
+            
+        ConfigurationGroup* overrides[5];
+        for (int i=0; i<5; i++)
+            overrides[i] = new VerticalConfigurationGroup(false, false);
+        for (int idx = 0; idx < 3; ++idx)
         {
-            ConfigurationGroup 
-                *resmap = new HorizontalConfigurationGroup(false, false),
-                *outres0 = new VerticalConfigurationGroup(false, false),
-                *outres1 = new VerticalConfigurationGroup(false, false),
-                *inres = new VerticalConfigurationGroup(false, false);
-
             //input side
-            inres->addChild(VidModeWidth(idx));
-            inres->addChild(VidModeHeight(idx));
-            resmap->addChild(inres);
-
+            overrides[0]->addChild(VidModeWidth(idx));
+            overrides[1]->addChild(VidModeHeight(idx));
             // output side
-            outres0->addChild(res = TVVidModeResolution(idx));
-            outres1->addChild(rate = TVVidModeRefreshRate(idx));
-            outres1->addChild(TVVidModeForceAspect(idx));
-            resmap->addChild(outres0);
-            resmap->addChild(outres1);
+            overrides[2]->addChild(res = TVVidModeResolution(idx));
+            overrides[3]->addChild(rate = TVVidModeRefreshRate(idx));
+            overrides[4]->addChild(TVVidModeForceAspect(idx));
             connect(res, SIGNAL(valueChanged(const QString&)),
                     rate, SLOT(ChangeResolution(const QString&)));
 
-            overrides->addChild(resmap);
         }
+        for (int i=0; i<5; i++)
+            overridesbox->addChild(overrides[i]);
 
         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
         settings->addChild(defaultsettings);
-        settings->addChild(overrides);
+        settings->addChild(overridesbox);
 
         addTarget("1", settings);
         addTarget("0", new VerticalConfigurationGroup(true));
