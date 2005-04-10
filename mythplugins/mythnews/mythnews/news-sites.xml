@@ -35,7 +35,7 @@
 
     <item>
         <title>BBC - Entertainment</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/entertainment/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/entertainment/rss.xml</url>
     </item>
 
 </category>
@@ -45,7 +45,7 @@
 
     <item>
         <title>BBC - Business</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/business/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/business/rss.xml</url>
     </item>
 
     <item>
@@ -83,7 +83,7 @@
 
     <item>
         <title>BBC - Technology</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/business/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/business/rss.xml</url>
     </item>
 
 
@@ -238,7 +238,12 @@
         <url>http://www.groklaw.net/backend/GrokLaw.rdf</url>
         <ico>http://www.groklaw.net/favicon.ico</ico>
     </item>
-
+    
+    <item>
+        <title>PC Magazine - New Product Reviews</title>
+        <url>http://rssnewsapps.ziffdavis.com/pcmag.xml</url>
+    </item>
+    
 </category>
 
 
@@ -246,7 +251,7 @@
 
     <item>
         <title>HotWired</title>
-        <url>http://hotwired.lycos.com/webmonkey/meta/headlines.rdf</url>
+        <url>http://webmonkey.wired.com/webmonkey/meta/headlines.rdf</url>
         <ico>http://www.hotwired.com/favicon.ico</ico>
     </item>
 
@@ -254,6 +259,88 @@
         <title>The Register</title>
         <url>http://www.theregister.co.uk/tonys/slashdot.rdf</url>
         <ico>http://www.theregister.co.uk/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>CNN - Law</title>
+        <url>http://rss.cnn.com/rss/cnn_law.rss</url>
+    </item>
+
+    <item>
+        <title>CNN - Education</title>
+        <url>http://rss.cnn.com/rss/cnn_education.rss</url>
+    </item>
+    
+    <item>
+        <title>CNN - Travel</title>
+        <url>http://rss.cnn.com/rss/cnn_travel.rss</url>
+    </item>
+    
+    <item>
+        <title>CNN - Most Popular</title>
+        <url>http://rss.cnn.com/rss/cnn_mostpopular.rss</url>
+    </item>
+
+        <item>
+        <title>CNN - Most Recent</title>
+        <url>http://rss.cnn.com/rss/cnn_latest.rss</url>
+    </item>
+
+</category>
+
+<category name="Media News">
+    <item>
+        <title>Digital Spy - Headlines</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsukstd.xml</url>
+    </item>
+    <item>
+        <title>Digital Spy - Showbiz</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsshowbiz.xml</url>
+    </item>
+    <item>
+        <title>Digital Spy - Television</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dstv.xml</url>
+    </item>
+    <item>
+        <title>Digital Spy - Film and DVD</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsfilm.xml</url>
+    </item>
+    <item>
+        <title>Digital Spy - Reality TV</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsreality.xml</url>
+    </item>
+    <item>
+        <title>Digital Spy - Broadcasting</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsbroadcast.xml</url>
+    </item>
+    <item>
+        <title>Digital Spy - Satellite</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dssatellite.xml</url>
+    </item>
+    <item>
+        <title>Digital Spy - Terrestrial</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsterrestrial.xml</url>
+    </item>
+    <item>
+        <title>Digital Spy - Cable</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dscable.xml</url>
+    </item>
+        <item>
+        <title>Digital Spy - Gaydar</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsgaydar.xml</url>
+    </item>
+    <item>
+        <title>Digital Spy - Jackson On Trial</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsjackson.xml</url>
+    </item>
+    <item>
+        <title>Digital Spy - US Television</title>
+        <url>http://syndication.digitalspy.co.uk/xmlcache/dsusa.xml</url>
+    </item>
+    
+    <item>
+        <title>CNN - Entertainment</title>
+        <url>http://rss.cnn.com/rss/cnn_showbiz.rss</url>
     </item>
 
 </category>
@@ -272,13 +359,17 @@
 
     <item>
         <title>BBC (World Edition)</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/front_page/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml</url>
     </item>
 
     <item>
         <title>CNN (World Edition)</title>
-        <url>http://csociety.purdue.org/~jacoby/XML/CNN_WORLD.xml</url>
-        <ico>http://www.cnn.com/favicon.ico</ico>
+        <url>http://rss.cnn.com/rss/cnn_world.rss</url>
+    </item>
+     
+    <item>
+        <title>CNN (Top Stories)</title>
+        <url>http://rss.cnn.com/rss/cnn_topstories.rss</url>
     </item>
 
     <item>
@@ -505,38 +596,38 @@
 
     <item>
         <title>BBC News - Africa</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/africa/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/africa/rss.xml</url>
     </item>
 
     <item>
         <title>BBC News - Americas</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/americas/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/americas/rss.xml</url>
     </item>
 
     <item>
         <title>BBC News - Asia-Pacific</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/asia-pacific/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/asia-pacific/rss.xml</url>
     </item>
 
     <item>
         <title>BBC News - Europe</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/europe/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/europe/rss.xml</url>
     </item>
 
     <item>
         <title>BBC News - Middle East</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/middle_east/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/middle_east/rss.xml</url>
     </item>
 
     <item>
         <title>BBC News - South Asia</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/south_asia/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/south_asia/rss.xml</url>
     </item>
 
 
     <item>
         <title>BBC News - UK</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/uk_news/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/uk_news/rss.xml</url>
     </item>
 
 </category>
@@ -551,9 +642,8 @@
     </item>
 
     <item>
-        <title>CNN (US Edition)</title>
-        <url>http://csociety.purdue.org/~jacoby/XML/CNN_US.xml</url>
-        <ico>http://www.cnn.com/favicon.ico</ico>
+        <title>CNN - US Edition</title>
+        <url>http://rss.cnn.com/rss/cnn_us.rss</url>
     </item>
 
     <item>
@@ -889,7 +979,7 @@
 
     <item>
         <title>BBC - Talking Point</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/talking_point/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/talking_point/rss.xml</url>
     </item>
 
     <item>
@@ -912,6 +1002,11 @@
         <title>Reuters Politics</title>
         <url>http://www.microsite.reuters.com/rss/ElectionCoverage</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
+    
+    <item>
+        <title>CNN - Politics</title>
+        <url>http://rss.cnn.com/rss/cnn_allpolitics.rss</url>
     </item>
 
 </category>
@@ -992,6 +1087,11 @@
         <url>http://www.microsite.reuters.com/rss/oddlyEnoughNews</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
+    
+    <item>
+        <title>CNN - Offbeat</title>
+        <url>http://rss.cnn.com/rss/cnn_offbeat.rss</url>
+    </item>
 
 </category>
 
@@ -1036,7 +1136,12 @@
 
     <item>
         <title>BBC News - Health</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/health/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/health/rss.xml</url>
+    </item>
+    
+    <item>
+        <title>CNN - Health</title>
+        <url>http://rss.cnn.com/rss/cnn_health.rss</url>
     </item>
 
 </category>
@@ -1052,7 +1157,17 @@
 
     <item>
         <title>BBC News - Science</title>
-        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/science/nature/rss091.xml</url>
+        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/science/nature/rss.xml</url>
+    </item>
+    
+    <item>
+        <title>CNN - Technology</title>
+        <url>http://rss.cnn.com/rss/cnn_tech.rss</url>
+    </item>
+    
+    <item>
+        <title>CNN - Science &amp; Space</title>
+        <url>http://rss.cnn.com/rss/cnn_space.rss</url>
     </item>
 
 </category>
