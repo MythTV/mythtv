@@ -44,11 +44,12 @@ TabView::TabView(QStringList urls, int zoom, int width, int height,
 {
     menuIsOpen = false;
     enterURL = NULL;
+    menu = NULL;
     
     mytab = new QTabWidget(this);
     mytab->setGeometry(0,0,width,height);
     QRect rect = mytab->childrenRect();
-
+    
     z=zoom;
     w=width;
     h=height-rect.height();
@@ -68,11 +69,20 @@ TabView::TabView(QStringList urls, int zoom, int width, int height,
        scrollSpeed *= -1;  // scroll page vs background
     }
 
+    widgetHistory.setAutoDelete(true);
+    
     for (QStringList::Iterator it = urls.begin(); it != urls.end(); ++it) {
-        // is rect.height() really the height of the tab in pixels???
-        WebPage *page = new WebPage(*it,z,w,h,f);
+        WebPage *page = new WebPage(*it,z,f);
+        
         connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs &)),
            this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
+        
+        connect(page, SIGNAL( newWindowRequested( const KURL &, const KParts::URLArgs &, 
+                              const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ), 
+                this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &, 
+                                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
+
+        
         mytab->addTab(page,*it);
 
 /* moved this into show event processing
@@ -85,7 +95,9 @@ TabView::TabView(QStringList urls, int zoom, int width, int height,
 */
 
         QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
+        currWidgetHistory->setAutoDelete(true);
         widgetHistory.append(currWidgetHistory);
+        
         QValueStack<QString> *currUrlHistory = new QValueStack<QString>;
         urlHistory.append(currUrlHistory);
     }
@@ -117,13 +129,12 @@ void TabView::openMenu()
     } else {
         temp = menu->addButton(tr("       Next Tab       "), this, SLOT(actionNextTab()));
         menu->addButton(tr("       Prev Tab       "), this, SLOT(actionPrevTab()));
+        menu->addButton(tr("      Remove Tab      "), this, SLOT(actionRemoveTab()));
         menu->addButton(tr("         Back         "), this, SLOT(actionBack()));
     }
     menu->addButton(tr("Save Link in Bookmarks"), this, SLOT(actionAddBookmark()));
-//    menu->addButton(tr("       New Tab        "), this, SLOT(actionNewTab()));
-//    menu->addButton(tr("         STOP         "), this, SLOT(actionSTOP()));
-    menu->addButton(tr("       zoom Out       "), this, SLOT(actionZoomOut()));
-    menu->addButton(tr("       zoom In        "), this, SLOT(actionZoomIn()));
+    menu->addButton(tr("       Zoom Out       "), this, SLOT(actionZoomOut()));
+    menu->addButton(tr("       Zoom In        "), this, SLOT(actionZoomIn()));
     temp->setFocus();
 
     menu->ShowPopup(this, SLOT(cancelMenu()));
@@ -132,10 +143,10 @@ void TabView::openMenu()
 
 void TabView::cancelMenu()
 {
-    if(menuIsOpen) {
+    if (menuIsOpen) {
         menu->hide();
-//        delete menu;
-//        menu=NULL;
+        delete menu;
+        menu=NULL;
         menuIsOpen=false;
         hadFocus->setFocus();
     }
@@ -193,19 +204,6 @@ void TabView::handleMouseAction(QString action)
     }
 }
 
-void TabView::actionMouseEmulation()
-{
-    cancelMenu();
-
-    mouseEmulation=~mouseEmulation;
-    if(mouseEmulation) {
-        mouse = new QCursor(Qt::ArrowCursor);
-        mouse->setPos(w/2,h/2);
-    } else {
-        mouse->cleanup();
-    }
-}
-
 void TabView::actionNextTab()
 {
     cancelMenu();
@@ -215,7 +213,6 @@ void TabView::actionNextTab()
         nextpage = 0;
     mytab->setCurrentPage(nextpage);
 }
-
 
 void TabView::actionPrevTab()
 {
@@ -227,9 +224,29 @@ void TabView::actionPrevTab()
     mytab->setCurrentPage(nextpage);
 }
 
-void TabView::actionSTOP()
+void TabView::actionRemoveTab()
 {
     cancelMenu();
+    
+    // don't remove the last tab
+    if (mytab->count() <= 1)
+        return;
+        
+    int index = mytab->currentPageIndex();
+    
+    // delete web pages stored in history 
+    widgetHistory.remove(index);
+    urlHistory.remove(index);
+    
+    // delete current web page
+    QWidget *curr = mytab->currentPage();
+    mytab->removePage(curr);
+    delete curr;
+    
+    // move to next/last tab
+    if (index >= mytab->count())
+        index = mytab->count() - 1;
+    mytab->setCurrentPage(index);
 }
 
 void TabView::actionZoomOut()
@@ -264,7 +281,7 @@ void TabView::finishAddBookmark(const char* group, const char* desc, const char*
     QString descStr = QString(desc);
     QString urlStr = QString(url);
     urlStr.stripWhiteSpace();
-    if( urlStr.find("http://") == -1 )
+    if( urlStr.find("http://") == -1 && urlStr.find("file:/") == -1)
         urlStr.prepend("http://");
 
     if(groupStr.isEmpty() || urlStr.isEmpty())
@@ -321,7 +338,7 @@ void TabView::showEnterURLDialog()
 void TabView::enterURLOkPressed()
 {
     QString sURL = URLeditor->text();
-    if (!sURL.startsWith("http://"))
+    if (!sURL.startsWith("http://") && !sURL.startsWith("file:/"))
       sURL = "http://" + sURL;
     
     newPage(sURL);
@@ -344,37 +361,71 @@ void TabView::newPage(QString sURL)
 {
     int index = mytab->currentPageIndex();
     
-    WebPage *page = new WebPage(sURL,z,w,h,f);
+    WebPage *page = new WebPage(sURL,z,f);
+    
     connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs&)),
         this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
+
+    connect(page, SIGNAL( newWindowRequested( const KURL &, const KParts::URLArgs &, 
+                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ), 
+            this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &, 
+                                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
 
     mytab->insertTab(page, sURL, index);
     mytab->setCurrentPage(index);
 
     QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
+    currWidgetHistory->setAutoDelete(true);
     widgetHistory.append(currWidgetHistory);
+    
     QValueStack<QString> *currUrlHistory = new QValueStack<QString>;
     urlHistory.append(currUrlHistory);
+    
     hadFocus = page;
 }
 
 void TabView::newUrlRequested(const KURL &url, const KParts::URLArgs &args)
 {
     int index = mytab->currentPageIndex();
-    QPtrStack<QWidget> *curWidgetHistory = widgetHistory.at(index);
-    QValueStack<QString> *curUrlHistory = urlHistory.at(index);
+    
+    if (mytab->tabLabel(mytab->currentPage()) == "")
+    {
+        // if the tab title is blank then a new blank web page has already been 
+        // created for a popup window just need to open the URL 
+        ((WebPage*)mytab->currentPage())->openURL(url.url());
+        mytab->setTabLabel(mytab->currentPage(), url.url());
+    }
+    else
+    {    
+        QPtrStack<QWidget> *curWidgetHistory = widgetHistory.at(index);
+        QValueStack<QString> *curUrlHistory = urlHistory.at(index);
+    
+        QWidget *curr = mytab->currentPage();
+        curWidgetHistory->push(curr);
+        curUrlHistory->push(mytab->label(index));
+    
+        WebPage *page = new WebPage(url.url(),args,((WebPage*)curr)->zoomFactor,f);
 
-    QWidget *curr = mytab->currentPage();
-    curWidgetHistory->push(curr);
-    curUrlHistory->push(mytab->label(index));
+        mytab->insertTab(page,url.url(),index);
+        mytab->removePage(curr);
+        mytab->setCurrentPage(index);
+        
+        connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs &)),
+                this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
+        
+        connect(page, SIGNAL( newWindowRequested( const KURL &, const KParts::URLArgs &, 
+                              const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ), 
+                this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &, 
+                                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
+    }
+}
 
-    WebPage *page = new WebPage(url.url(),args,((WebPage*)curr)->zoomFactor,w,h,f);
-    mytab->insertTab(page,url.url(),index);
-    mytab->removePage(curr);
-    mytab->setCurrentPage(index);
-
-    connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs&)),
-            this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
+void TabView::newWindowRequested(const KURL &, const KParts::URLArgs &, 
+                                 const KParts::WindowArgs &, 
+                                 KParts::ReadOnlyPart *&part)
+{
+    newPage("");
+    part = ((WebPage*)mytab->currentPage())->browser->currentFrame();
 }
 
 bool TabView::eventFilter(QObject* object, QEvent* event)
@@ -500,22 +551,14 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                 actionNextTab();
                 return true;
             }    
+            else if (action == "DELETETAB") {
+                actionRemoveTab();
+                return true;
+            }
+
             else if (action == "BACK") {
-    
-                int index = mytab->currentPageIndex();
-                QPtrStack<QWidget> *curWidgetHistory = widgetHistory.at(index);
-                if (!curWidgetHistory->isEmpty()) {
-                    QValueStack<QString> *curUrlHistory = urlHistory.at(index);
-
-                    QWidget *curr = mytab->currentPage();
-                    mytab->insertTab(curWidgetHistory->pop(),curUrlHistory->pop(),index);
-                    mytab->removePage(curr);
-                    mytab->setCurrentPage(index);
-
-                    // disconnect(curr,...);
-                    delete curr;
-                    return true;
-                }
+                actionBack();
+                return true;
             }
             else if (action == "FOLLOWLINK") {
                 *ke = returnKey;
@@ -544,10 +587,10 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                 showEnterURLDialog();
                 return true;
             }    
-            else if(action == "MENU") {
+            else if (action == "MENU") {
                 emit menuPressed();
                 return true;
-            }    
+            }
         }
     }
     return false; // continue processing the event with QObject::event()

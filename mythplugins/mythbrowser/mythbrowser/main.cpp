@@ -36,6 +36,8 @@ static KCmdLineOptions options[] = {
 void setupKeys(void)
 {
     REG_KEY("Browser", "NEXTTAB", "Move to next browser tab", "P");
+    REG_KEY("Browser", "DELETETAB", "Delete the current browser tab", "D");
+    
     REG_KEY("Browser", "ZOOMIN", "Zoom in on browser window", ".,>");
     REG_KEY("Browser", "ZOOMOUT", "Zoom out on browser window", ",,<");
     REG_KEY("Browser", "TOGGLEINPUT", "Toggle where keyboard input goes to", "F1");

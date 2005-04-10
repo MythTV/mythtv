@@ -42,17 +42,18 @@ signals:
     void closeMenu();
 
 public slots:
-//  void openURLRequested(KURL url,KParts::URLArgs args);
     void newUrlRequested(const KURL &url, const KParts::URLArgs &args);
     void newPage(QString URL);
-    
+    void newWindowRequested(const KURL &url, const KParts::URLArgs &args, 
+                                  const KParts::WindowArgs &windowArgs, 
+                                  KParts::ReadOnlyPart *&part);
+
 private slots:
     void openMenu();
     void actionBack();
     void actionNextTab();
     void actionPrevTab();
-    void actionMouseEmulation();
-    void actionSTOP();
+    void actionRemoveTab();
     void actionZoomOut();
     void actionZoomIn();
     void cancelMenu();
@@ -110,7 +111,6 @@ public:
 
 signals:
     void finished(const char* group, const char* desc,const char* url);
-//    void cancelMenu();
 
 private slots:
     void slotOkClicked();

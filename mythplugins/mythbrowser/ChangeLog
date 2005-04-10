@@ -39,3 +39,12 @@ V0.32   - Zoom In and Zoom Out added to the Popup Menu
         - Add mouse emulation using remote keys
         - Add URL input dialog
         - Change edit controls to MythRemoteLineEdits
+
+2005.03.27
+        - Fix problem where the HTML viewer widget was resized to the wrong size
+        - Add support for popup windows (opens them in new tab page)
+        - Work around bug in HTML widget with URLs with anchors/references not 
+          scrolling to the proper location after opening.
+        - Add "Remove Tab" menu option and key binding 
+        - Add support for local file system URL's (use file:/)
+        - Change mouse pointer to busy cursor when downloading

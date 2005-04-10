@@ -82,6 +82,7 @@ Default key bindings (use MythWeb to change them):
   Cursor Left/Right     Scrolling
   Page Up/Down          Scrolling
   P                     Switch to next tab
+  D                     Delete current tab
   I                     Show enter URL dialog
   M                     Show popup menu
   <                     Zoom out
@@ -130,8 +131,3 @@ the remote keys used for mouse emulation in your lircrc config file.
 - Add OSD message 'Loading... 45%'
 
 - Make it themeable
-
-- Make it handle popup windows properly
-
-- Make it handle links to an anchor within a web page
-
