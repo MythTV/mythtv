@@ -6,9 +6,11 @@
       <text lang="DE">Aufnahmen</text>
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="FI">Nauhoitusprioriteetit</text>
+      <text lang="JA">録画優先順位設定</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
       <alttext lang="SV">Inspelning</alttext>
+      <alttext lang="JA">録画優先順位</alttext>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 

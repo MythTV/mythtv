@@ -2263,7 +2263,7 @@ void MythContext::LogEntry(const QString &module, int priority,
         query.bindValue(":PRIORITY", priority);
         query.bindValue(":HOSTNAME", d->m_localhostname);
         query.bindValue(":MESSAGE", message);
-        query.bindValue(":DETAILS", details);
+        query.bindValue(":DETAILS", details.utf8());
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("LogEntry", query);

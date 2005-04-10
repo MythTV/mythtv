@@ -1770,10 +1770,10 @@ void JobQueue::DoUserJobThread(void)
     QString msg = QString("Started \"%1\" for \"%2\" recorded "
                           "from channel %3 at %4")
                           .arg(jobDesc)
-                          .arg(program_info->title.local8Bit())
+                          .arg(program_info->title)
                           .arg(program_info->chanid)
                           .arg(program_info->startts.toString());
-    VERBOSE(VB_JOBQUEUE, msg);
+    VERBOSE(VB_JOBQUEUE, msg.local8Bit());
     gContext->LogEntry("jobqueue", LP_NOTICE,
                        QString("Job \"%1\" Started").arg(jobDesc), msg);
 
@@ -1792,10 +1792,10 @@ void JobQueue::DoUserJobThread(void)
     msg = QString("Finished \"%1\" for \"%2\" recorded from "
                   "channel %3 at %4.")
                   .arg(jobDesc)
-                  .arg(program_info->title.local8Bit())
+                  .arg(program_info->title)
                   .arg(program_info->chanid)
                   .arg(program_info->startts.toString());
-    VERBOSE(VB_JOBQUEUE, msg);
+    VERBOSE(VB_JOBQUEUE, msg.local8Bit());
 
     gContext->LogEntry("jobqueue", LP_NOTICE,
                        QString("Job \"%1\" Finished").arg(jobDesc), msg);

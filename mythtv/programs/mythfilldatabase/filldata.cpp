@@ -2294,7 +2294,7 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                         {
                             cerr << "removing existing program: "
                                  << (*i).channel.local8Bit() << " "
-                                 << query.value(0).toString().local8Bit() << " "
+                                 << QString::fromUtf8(query.value(0).toString()).local8Bit() << " "
                                  << query.value(1).toDateTime().toString(Qt::ISODate) << " - "
                                  << query.value(2).toDateTime().toString(Qt::ISODate) << endl;
                         }

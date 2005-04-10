@@ -173,8 +173,6 @@ int main(int argc, char *argv[])
 
     UpgradeTVDatabaseSchema();
 
-    LanguageSettings::load("mythfrontend");
-
     gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();
 
@@ -187,7 +185,9 @@ int main(int argc, char *argv[])
     MythMainWindow *mainWindow = new MythMainWindow();
     mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
+
     LanguageSettings::prompt();
+    LanguageSettings::load("mythfrontend");
 
     DialogBox dboxCard(mainWindow, QObject::tr("Would you like to clear all "
                                    "capture card settings before starting "

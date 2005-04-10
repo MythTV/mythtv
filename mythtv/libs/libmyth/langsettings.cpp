@@ -145,7 +145,6 @@ QStringList LanguageSettings::getLanguages(void)
           << QString::fromUtf8("Dansk")       << "DK"   // Danish
           << QString::fromUtf8("Svenska")     << "SV"   // Swedish
           << QString::fromUtf8("Português")   << "PT"   // Portuguese
-       // << QString::fromUtf8("日本語")   << "JA"   // Japanese
           << QString::fromUtf8("Nihongo")     << "JA"   // Japanese
           << QString::fromUtf8("Slovenski")   << "SI"   // Slovenian
           << QString::fromUtf8("Suomi")       << "FI"   // Finnish
@@ -160,7 +159,9 @@ void LanguageSettings::fillSelections(SelectSetting *widget)
     widget->clearSelections();
     for (QStringList::Iterator it = langs.begin(); it != langs.end(); ++it)
     {
-        widget->addSelection(*it, *(++it));
+        QString label = *it;
+        QString value = *(++it);
+        widget->addSelection(label, value);
     }
 }
 

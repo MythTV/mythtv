@@ -1101,7 +1101,7 @@ void Scheduler::RunScheduler(void)
                 .arg(nextRecording->sourceid);
             VERBOSE(VB_GENERAL, msg.local8Bit());
             gContext->LogEntry("scheduler", LP_NOTICE, "Schedule Change", 
-                               msg.utf8());
+                               msg);
         }
 
         if (statuschanged)

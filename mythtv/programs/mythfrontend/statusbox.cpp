@@ -775,7 +775,7 @@ void StatusBox::doLogEntries(void)
             contentLines[count] = line;
 
             if (query.value(6).toString() != "")
-                line = QString("On %1 %2 from %3.%4\n%5\n%6")
+                line = tr("On %1 %2 from %3.%4\n%5\n%6")
                                .arg(query.value(3).toDateTime()
                                          .toString(dateFormat))
                                .arg(query.value(3).toDateTime()
@@ -783,9 +783,9 @@ void StatusBox::doLogEntries(void)
                                .arg(query.value(4).toString())
                                .arg(query.value(1).toString())
                                .arg(query.value(5).toString())
-                               .arg(query.value(6).toString());
+                               .arg(QString::fromUtf8(query.value(6).toString()));
             else
-                line = QString("On %1 %2 from %3.%4\n%5\nNo other details")
+                line = tr("On %1 %2 from %3.%4\n%5\nNo other details")
                                .arg(query.value(3).toDateTime()
                                          .toString(dateFormat))
                                .arg(query.value(3).toDateTime()
