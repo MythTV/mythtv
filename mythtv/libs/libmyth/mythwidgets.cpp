@@ -155,6 +155,48 @@ void MythCheckBox::focusOutEvent(QFocusEvent *e)
     QCheckBox::focusOutEvent(e);
 }
 
+void MythRadioButton::keyPressEvent(QKeyEvent* e)
+{
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+
+            if (action == "UP")
+                focusNextPrevChild(false);
+            else if (action == "DOWN")
+                focusNextPrevChild(true);
+            else if (action == "LEFT" || action == "RIGHT")
+                toggle();
+            else
+                handled = false;
+        }
+    }
+
+    if (!handled)
+        e->ignore();
+}
+
+void MythRadioButton::focusInEvent(QFocusEvent *e)
+{
+    emit changeHelpText(helptext);
+
+    QColor highlight = colorGroup().highlight();
+
+    this->setPaletteBackgroundColor(highlight);
+    QRadioButton::focusInEvent(e);
+}
+
+void MythRadioButton::focusOutEvent(QFocusEvent *e)
+{
+    this->unsetPalette();
+    QRadioButton::focusOutEvent(e);
+}
+
 bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
 {
     (void)o;
@@ -1060,6 +1102,23 @@ void MythListView::focusInEvent(QFocusEvent *e)
     setSelected(currentItem(), true);
 }
 
+MythListBox::MythListBox(QWidget* parent): QListBox(parent) 
+{
+}
+
+void MythListBox::polish(void)
+{
+    QListBox::polish();
+    
+    QPalette pal = palette();
+    QColorGroup::ColorRole role = QColorGroup::Highlight;
+    pal.setColor(QPalette::Active, role, pal.active().button()); 
+    pal.setColor(QPalette::Inactive, role, pal.active().button()); 
+    pal.setColor(QPalette::Disabled, role, pal.active().button()); 
+   
+    setPalette(pal);
+}
+
 void MythListBox::setCurrentItem(const QString& matchText, bool caseSensitive, 
                                  bool partialMatch) 
 {
@@ -1116,13 +1175,45 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
         {
             QString action = actions[i];
             if (action == "UP" || action == "DOWN" || action == "PAGEUP" ||
-                action == "PAGEDOWN")
+                action == "PAGEDOWN" || action == "LEFT" || action == "RIGHT")
             {
                 int key;
                 if (action == "UP")
+                {
+                    // Key_Up at top of list allows focus to move to other widgets
+                    if (currentItem() == 0)
+                    {
+                        focusNextPrevChild(false);
+                        handled = true;
+                        continue;
+                    }
+                    
                     key = Key_Up;
+                }
                 else if (action == "DOWN")
+                {
+                    // Key_down at bottom of list allows focus to move to other widgets
+                    if (currentItem() == (int) count() - 1)
+                    {
+                        focusNextPrevChild(true);
+                        handled = true;
+                        continue;
+                    }
+                    
                     key = Key_Down;
+                }
+                else if (action == "LEFT")
+                {
+                    focusNextPrevChild(false);
+                    handled = true;
+                    continue;
+                }
+                else if (action == "RIGHT")
+                {
+                    focusNextPrevChild(true);
+                    handled = true;
+                    continue;
+                }
                 else if (action == "PAGEUP")
                     key = Key_Prior;
                 else if (action == "PAGEDOWN")
@@ -1145,8 +1236,22 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
         e->ignore();
 }
 
+void MythListBox::focusOutEvent(QFocusEvent *e)
+{
+    QPalette pal = palette();
+    QColorGroup::ColorRole role = QColorGroup::Highlight;
+    pal.setColor(QPalette::Active, role, pal.active().button()); 
+    pal.setColor(QPalette::Inactive, role, pal.active().button()); 
+    pal.setColor(QPalette::Disabled, role, pal.active().button()); 
+   
+    setPalette(pal);
+    QListBox::focusOutEvent(e);
+}
+
 void MythListBox::focusInEvent(QFocusEvent *e)
 {
+    this->unsetPalette();
+    
     emit changeHelpText(helptext);
     QListBox::focusInEvent(e);
 }

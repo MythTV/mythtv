@@ -16,6 +16,7 @@
 #include <qbuttongroup.h>
 #include <qlistbox.h>
 #include <qcheckbox.h>
+#include <qradiobutton.h>
 #include <qimage.h>
 #include <qlabel.h>
 #include <qtimer.h>
@@ -281,6 +282,26 @@ class MythCheckBox: public QCheckBox
     QString helptext;
 };
 
+class MythRadioButton: public QRadioButton
+{
+    Q_OBJECT
+  public:
+    MythRadioButton(QWidget* parent = 0, const char* name = 0):
+        QRadioButton(parent, name) {};
+    void setHelpText(QString help) { helptext = help; }
+
+  signals:
+    void changeHelpText(QString);
+
+  protected:
+    virtual void keyPressEvent(QKeyEvent* e);
+    virtual void focusInEvent(QFocusEvent *e);
+    virtual void focusOutEvent(QFocusEvent *e);
+
+  private:
+    QString helptext;
+};
+
 class MythListView : public QListView
 {
     Q_OBJECT
@@ -297,7 +318,7 @@ class MythListView : public QListView
 class MythListBox: public QListBox {
     Q_OBJECT
   public:
-    MythListBox(QWidget* parent): QListBox(parent) {};
+    MythListBox(QWidget* parent);
 
     virtual void keyPressEvent(QKeyEvent* e);
 
@@ -305,7 +326,9 @@ class MythListBox: public QListBox {
 
   protected:
     void focusInEvent(QFocusEvent *e);
-
+    void focusOutEvent(QFocusEvent *e);
+    virtual void polish(void);
+ 
   public slots:
     void setCurrentItem(const QString& matchText, bool caseSensitive = true, 
                         bool partialMatch = false);
