@@ -842,6 +842,9 @@ void SIParser::ParsePMT(tablehead_t* head, uint8_t* buffer, int size)
                 break;
         }
 
+        if (!e.Language.isEmpty())
+            e.Description += QString(" (%1").arg(e.Language);
+
         p.Components += e;
     }
 
