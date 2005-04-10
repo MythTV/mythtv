@@ -828,13 +828,15 @@ void VideoOutputXv::DeleteXBuffers()
 
 void VideoOutputXv::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
+    pthread_mutex_lock(&lock);
+
     if (embedding)
     {
         MoveResize();
+        pthread_mutex_unlock(&lock);
         return;
     }
 
-    pthread_mutex_lock(&lock);
     data->XJ_curwin = wid;
 
     VideoOutput::EmbedInWidget(wid, x, y, w, h);

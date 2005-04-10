@@ -837,9 +837,12 @@ void VideoOutputXvMC::DeleteXvMCBuffers()
 
 void VideoOutputXvMC::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
+    pthread_mutex_lock(&lock);
+
     if (embedding)
     {
         MoveResize();
+        pthread_mutex_unlock(&lock);
         return;
     }
 
