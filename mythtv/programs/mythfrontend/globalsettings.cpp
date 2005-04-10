@@ -1370,7 +1370,7 @@ class VideoModeSettings: public VerticalConfigurationGroup,
                 rate, SLOT(ChangeResolution(const QString&)));
 
         ConfigurationGroup* overrides =
-            new GridConfigurationGroup(5, true, true);
+            new GridConfigurationGroup(5, true, true, false, true);
         overrides->setLabel("Overrides for specific video sizes");
             
         for (int idx = 0; idx < 3; ++idx)

@@ -92,13 +92,28 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     if (uselabel)
     {
-        layout = new QVBoxLayout(widget, (int)(28 * hmult));
+        int space = -1;
+        int margin = (int)(28 * hmult);
+        if (zeroSpace)
+            space = 1;
+        if (zeroMargin)
+            margin = 1;
+
+        layout = new QVBoxLayout(widget, margin, space);
         // This makes weird and bad things happen in qt -mdz 2002/12/28
         //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
     }
     else
-        layout = new QVBoxLayout(widget, (int)(10 * hmult));
+    {
+        int space = -1;
+        int margin = (int)(10 * hmult);
+        if (zeroSpace)
+            space = 1;
+        if (zeroMargin)
+            margin = 1;
+        layout = new QVBoxLayout(widget, margin, space);
+    }
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
@@ -135,13 +150,29 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     if (uselabel)
     {
-        layout = new QHBoxLayout(widget, (int)(28 * hmult));
+        int space = -1;
+        int margin = (int)(28 * hmult);
+        if (zeroSpace)
+            space = 1;
+        if (zeroMargin)
+            margin = 1;
+
+        layout = new QHBoxLayout(widget, margin, space);
         // This makes weird and bad things happen in qt -mdz 2002/12/28
         //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
     }
     else
-        layout = new QHBoxLayout(widget, (int)(10 * hmult));
+    {
+        int space = -1;
+        int margin = (int)(10 * hmult);
+        if (zeroSpace)
+            space = 1;
+        if (zeroMargin)
+            margin = 1;
+
+        layout = new QHBoxLayout(widget, margin, space);
+    }
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
@@ -179,13 +210,29 @@ QWidget* GridConfigurationGroup::configWidget(ConfigurationGroup *cg,
     int rows = (children.size()+columns-1) / columns;
     if (uselabel)
     {
-        layout = new QGridLayout(widget, rows, columns, (int)(28 * hmult));
+        int space = -1;
+        int margin = (int)(28 * hmult);
+        if (zeroSpace)
+            space = 1;
+        if (zeroMargin)
+            margin = 1;
+
+        layout = new QGridLayout(widget, rows, columns, margin, space);
         // This makes weird and bad things happen in qt -mdz 2002/12/28
         //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
     }
     else
-        layout = new QGridLayout(widget, rows, columns, (int)(10 * hmult));
+    {
+        int space = -1;
+        int margin = (int)(10 * hmult);
+        if (zeroSpace)
+            space = 1;
+        if (zeroMargin)
+            margin = 1;
+
+        layout = new QGridLayout(widget, rows, columns, margin, space);
+    }
 
     for (unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())

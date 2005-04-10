@@ -103,8 +103,10 @@ class ConfigurationGroup: virtual public Configurable
 {
     Q_OBJECT
   public:
-    ConfigurationGroup(bool luselabel = true, bool luseframe = true) 
-             { uselabel = luselabel; useframe = luseframe; }
+    ConfigurationGroup(bool luselabel = true, bool luseframe = true,
+                       bool lzeroMargin = false, bool lzeroSpace = false) 
+              { uselabel = luselabel; useframe = luseframe; 
+               zeroMargin = lzeroMargin; zeroSpace = lzeroSpace; }
     virtual ~ConfigurationGroup();
 
 
@@ -129,12 +131,15 @@ class ConfigurationGroup: virtual public Configurable
     childList children;
     bool uselabel;
     bool useframe;
+    bool zeroMargin;
+    bool zeroSpace;
 };
 
 class VerticalConfigurationGroup: virtual public ConfigurationGroup {
  public:
-    VerticalConfigurationGroup(bool uselabel = true, bool useframe = true) 
-                : ConfigurationGroup(uselabel, useframe) { }
+    VerticalConfigurationGroup(bool uselabel = true, bool useframe = true,
+                                 bool zeroMargin = false, bool zeroSpace = false) 
+                : ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace) { }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
@@ -142,8 +147,9 @@ class VerticalConfigurationGroup: virtual public ConfigurationGroup {
 
 class HorizontalConfigurationGroup: virtual public ConfigurationGroup {
  public:
-    HorizontalConfigurationGroup(bool uselabel = true, bool useframe = true) 
-                : ConfigurationGroup(uselabel, useframe) { }
+    HorizontalConfigurationGroup(bool uselabel = true, bool useframe = true,
+                                 bool zeroMargin = false, bool zeroSpace = false) 
+                : ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace) { }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
@@ -151,8 +157,10 @@ class HorizontalConfigurationGroup: virtual public ConfigurationGroup {
 
 class GridConfigurationGroup: virtual public ConfigurationGroup {
  public:
-    GridConfigurationGroup(uint col, bool uselabel = true, bool useframe = true)
-                : ConfigurationGroup(uselabel, useframe), columns(col) { }
+    GridConfigurationGroup(uint col, bool uselabel = true, bool useframe = true,
+                           bool zeroMargin = false, bool zeroSpace = false) 
+                : ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace), 
+                  columns(col) { }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
