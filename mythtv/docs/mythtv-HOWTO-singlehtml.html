@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-03-27, v0.17.04
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-04-10, v0.18.00
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -52,12 +52,11 @@ necessary.</EM>
 <H2><A NAME="toc5">5.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s5">Downloading and compiling.</A></H2>
 
 <UL>
-<LI><A NAME="toc5.1">5.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.1">Notes on compiling for different processors</A>
-<LI><A NAME="toc5.2">5.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.2">Building LAME</A>
-<LI><A NAME="toc5.3">5.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.3">XMLTV</A>
-<LI><A NAME="toc5.4">5.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.4">Configuring the Zap2It.com DataDirect service </A>
-<LI><A NAME="toc5.5">5.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.5">Manually building MythTV</A>
-<LI><A NAME="toc5.6">5.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.6">Gentoo </A>
+<LI><A NAME="toc5.1">5.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.1">Building LAME</A>
+<LI><A NAME="toc5.2">5.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.2">XMLTV</A>
+<LI><A NAME="toc5.3">5.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.3">Configuring the Zap2It.com DataDirect service </A>
+<LI><A NAME="toc5.4">5.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.4">Manually building MythTV</A>
+<LI><A NAME="toc5.5">5.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.5">Gentoo </A>
 </UL>
 <P>
 <H2><A NAME="toc6">6.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s6">MySQL.</A></H2>
@@ -113,9 +112,10 @@ necessary.</EM>
 <LI><A NAME="toc11.1">11.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.1">Keyboard commands</A>
 <LI><A NAME="toc11.2">11.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.2">Using themes with MythTV</A>
 <LI><A NAME="toc11.3">11.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.3">Adding DirecTV information to the database</A>
-<LI><A NAME="toc11.4">11.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.4">Adding support for an external tuner</A>
-<LI><A NAME="toc11.5">11.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.5">Using Shutdown/Wakeup</A>
-<LI><A NAME="toc11.6">11.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.6">Scheduling Recordings</A>
+<LI><A NAME="toc11.4">11.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.4">Adding DishTV information to the database</A>
+<LI><A NAME="toc11.5">11.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.5">Adding support for an external tuner</A>
+<LI><A NAME="toc11.6">11.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.6">Using Shutdown/Wakeup</A>
+<LI><A NAME="toc11.7">11.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.7">Scheduling Recordings</A>
 </UL>
 <P>
 <H2><A NAME="toc12">12.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s12">MythWeb.</A></H2>
@@ -186,25 +186,26 @@ necessary.</EM>
 <LI><A NAME="toc21.4">21.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.4">MythTV GUI and X Display Sizes</A>
 <LI><A NAME="toc21.5">21.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.5">Saving or restoring the database </A>
 <LI><A NAME="toc21.6">21.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.6">Deleting the MySQL database</A>
-<LI><A NAME="toc21.7">21.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.7">btaudio </A>
-<LI><A NAME="toc21.8">21.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.8">Removing unwanted channels</A>
-<LI><A NAME="toc21.9">21.9</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.9">NFS</A>
-<LI><A NAME="toc21.10">21.10</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.10">Automatically starting mythfrontend at system boot time</A>
-<LI><A NAME="toc21.11">21.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.11">Automatically starting mythbackend at system boot time</A>
-<LI><A NAME="toc21.12">21.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.12">Advanced Backend Configurations </A>
-<LI><A NAME="toc21.13">21.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.13">What is this transcoder thing, and how do I use it?</A>
-<LI><A NAME="toc21.14">21.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.14">Changing your hostname</A>
-<LI><A NAME="toc21.15">21.15</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.15">Can I run MythTV on my TiVo?</A>
-<LI><A NAME="toc21.16">21.16</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.16">Can I run MythTV on my ReplayTV?</A>
-<LI><A NAME="toc21.17">21.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.17">Can a wireless connection be used between the frontend and the backend?</A>
-<LI><A NAME="toc21.18">21.18</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.18">How can I burn shows that I have recorded to a DVD?</A>
-<LI><A NAME="toc21.19">21.19</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.19">Burning a MythTV recording to a DVD (alternate version)</A>
-<LI><A NAME="toc21.20">21.20</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.20">Creating a DVD with Menus</A>
-<LI><A NAME="toc21.21">21.21</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.21">Migrating from XMLTV to DataDirect </A>
-<LI><A NAME="toc21.22">21.22</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.22">What do the icons on the Watch Recordings screen mean?</A>
-<LI><A NAME="toc21.23">21.23</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.23">What is the difference between a PVR-250 and a PVR-350</A>
-<LI><A NAME="toc21.24">21.24</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.24">Changing channels on an external Set Top Box</A>
-<LI><A NAME="toc21.25">21.25</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.25">Configuring one machine to flag all commercials.</A>
+<LI><A NAME="toc21.7">21.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.7">Moving your data to new hardware.</A>
+<LI><A NAME="toc21.8">21.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.8">btaudio </A>
+<LI><A NAME="toc21.9">21.9</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.9">Removing unwanted channels</A>
+<LI><A NAME="toc21.10">21.10</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.10">NFS</A>
+<LI><A NAME="toc21.11">21.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.11">Automatically starting mythfrontend at system boot time</A>
+<LI><A NAME="toc21.12">21.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.12">Automatically starting mythbackend at system boot time</A>
+<LI><A NAME="toc21.13">21.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.13">Advanced Backend Configurations </A>
+<LI><A NAME="toc21.14">21.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.14">What is this transcoder thing, and how do I use it?</A>
+<LI><A NAME="toc21.15">21.15</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.15">Changing your hostname</A>
+<LI><A NAME="toc21.16">21.16</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.16">Can I run MythTV on my TiVo?</A>
+<LI><A NAME="toc21.17">21.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.17">Can I run MythTV on my ReplayTV?</A>
+<LI><A NAME="toc21.18">21.18</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.18">Can a wireless connection be used between the frontend and the backend?</A>
+<LI><A NAME="toc21.19">21.19</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.19">How can I burn shows that I have recorded to a DVD?</A>
+<LI><A NAME="toc21.20">21.20</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.20">Burning a MythTV recording to a DVD (alternate version)</A>
+<LI><A NAME="toc21.21">21.21</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.21">Creating a DVD with Menus</A>
+<LI><A NAME="toc21.22">21.22</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.22">Migrating from XMLTV to DataDirect </A>
+<LI><A NAME="toc21.23">21.23</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.23">What do the icons on the Watch Recordings screen mean?</A>
+<LI><A NAME="toc21.24">21.24</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.24">What is the difference between a PVR-250 and a PVR-350</A>
+<LI><A NAME="toc21.25">21.25</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.25">Changing channels on an external Set Top Box</A>
+<LI><A NAME="toc21.26">21.26</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.26">Configuring one machine to flag all commercials.</A>
 </UL>
 <P>
 <H2><A NAME="toc22">22.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s22">Example Configurations.</A></H2>
@@ -319,7 +320,7 @@ archives, or post your question to the MythTV-users mailing list. </CAPTION>
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html">http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html</A> or as a PDF
 at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">http://www.mythtv.org/docs/mythtv-HOWTO.pdf</A>.</P>
-<P>This HOWTO is for MythTV v0.17.</P>
+<P>This HOWTO is for MythTV v0.18.</P>
 
 <H2><A NAME="ss1.5">1.5</A> <A HREF="#toc1.5">Document conventions</A>
 </H2>
@@ -609,11 +610,9 @@ encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project 
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge PVR-250, PVR-350,
 Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. Release 0.17 of MythTV
-is able to use these MPEG-2 encoders as an input device for live TV and for
-scheduled recordings.  (The PVR-350 can simultaneously be used as an output
-device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
-requirements for encoding.</P>
+use dedicated hardware encoders rather than your CPU. (The PVR-350 can
+simultaneously be used as an output device.) Using the on-board MPEG-2
+encoder drastically reduces the CPU requirements for encoding.</P>
 <P><B>NOTE</B>:  Motherboards with the Via chipset are notoriously bad with
 DMA and have caused numerous issues with ivtv, including hard locks.  See
 the ivtv website (url url="http://ivtv.sf.net" name="http://ivtv.sf.net")
@@ -1121,8 +1120,9 @@ Qt") and libqt3 ("Libraries").</P>
 <FIGURE>
 <EPS FILE="warning.eps">
 <IMG SRC="warning.png">
-<CAPTION>NOTE for Mandrake 9.1 users:  Mandrake 9.1 has removed the MySQL modules
-from the default installation.  Ensure that you install libqt3-mysql.</CAPTION>
+<CAPTION>NOTE for Mandrake users:  In versions after Mandrake 9.1, Mandrake
+removed the MySQL modules from the default installation.  Ensure that you
+install libqt3-mysql.</CAPTION>
 </FIGURE>
 </P>
 <P>Make sure that cdialog is installed if you want to use MythTV with a remote
@@ -1169,7 +1169,7 @@ $ su
 <P>
 <HR>
 <PRE>
-NOTE for Mandrake 9.1 users: execute the following command.
+NOTE for Mandrake 9.1+ users: execute the following command.
 
 # urpmi libqt3-mysql
 </PRE>
@@ -1536,7 +1536,7 @@ join the
 grabber which is built-in to MythTV.  You <EM>do not</EM> need to install
 XMLTV, but you need <B>wget</B> version 1.9.1 or higher.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.38).</P>
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.39).</P>
 <P>
 <HR>
 <PRE>
@@ -1558,98 +1558,7 @@ After downloading, be sure to install both:
 <A HREF="http://lame.sourceforge.net/">http://lame.sourceforge.net/</A>.  Download the source code to v3.96.1
 by following the links from "Using" through "Download...".</P>
 
-<H2><A NAME="cpuspecificoptimizations"></A> <A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Notes on compiling for different processors</A>
-</H2>
-
-<P><B>NOTE</B>: the following section applies to MythTV 0.17.  If you are
-running CVS, MythTV has a more intelligent <B>configure</B> script that
-will auto-detect your system and compile processor-specific optimizations. 
-You will not edit the <CODE>settings.pro</CODE> file as described below at all;
-run <CODE>./configure --help</CODE> to obtain the full list of options.  You may
-skip this entire section.</P>
-<P>By default, MythTV is compiled for a Pentium Pro or i686 processor. This
-generates good code for most CPUs, but does not take advantage of MMX or
-SSE, and does not work with recent processors that are compatible with older
-Intel processors, such as the Via or IDT low power processors. So you may
-wish to, or need to, change this before compiling. The flags in bold are
-required if you have that CPU.</P>
-<P>If you have a system with an AMD processor change the following in the
-<CODE>settings.pro</CODE> file. Replace 
-<PRE>
--march=pentiumpro
-</PRE>
- before
-you compile with one of:
-<UL>
-<LI><B>-march=k6</B>        for the AMD K6 with MMX (i586 compatible)</LI>
-<LI><B>-march=k6-2</B>      for the AMD K6 CPU with MMX and 3dNOW! (i586 compatible)</LI>
-<LI>-march=athlon             for the AMD Athlon CPU with MMX, 3dNOW!, enhanced 3dNOW! and some of SSE. (pentium2 compatible)</LI>
-<LI>-march=pentiumpro -mmmx   for the AMD Athlon XP CPU with MMX, 3dNOW!, enhanced 3dNOW! and SSE. (pentium3 compatible)</LI>
-<LI>-march=k8                 for the AMD K8 core based CPUs with x86-64 instruction set support
-with MMX, 3dNOW!, enhanced 3dNOW!, SSE and SSE2. (pentium4 compatible)</LI>
-</UL>
-</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  If you wish to compile with the <CODE>-march=k8</CODE> flag you
-must use gcc v3.4 or higher.</CAPTION>
-</FIGURE>
-</P>
-<P>If you have a Via processor change the following in the
-<CODE>settings.pro</CODE> file. Replace 
-<PRE>
--march=pentiumpro
-</PRE>
- before
-you compile with one of:
-<UL>
-<LI><B>-march=c3</B>        for the Via C3 CPU with MMX and 3dNOW! instruction set support. (pentium-mmx compatible)</LI>
-<LI><B>-march=c3-2</B>      for the Via C3-2 CPU with MMX and SSE instruction set support. (pentium2 compatible)</LI>
-</UL>
-</P>
-<P>If you have an IDT Winchip processor change the following in the
-<CODE>settings.pro</CODE> file. Replace 
-<PRE>
--march=pentiumpro
-</PRE>
- before
-you compile with one of:
-<UL>
-<LI><B>-march=winchip-c6</B>  for the IDT Winchip C6 CPU with MMX (i486 compatible)</LI>
-<LI><B>-march=winchip2</B>    for the IDT Winchip2 CPU, with MMX and 3dNOW! (i486 compatible)</LI>
-</UL>
-</P>
-<P>Finally, if you have an Intel processor other than the Pentium Pro you may
-wish to specify your particular model. Replace
-<PRE>
--march=pentiumpro
-</PRE>
- before you compile with one of:
-<UL>
-<LI><B>-march=i586</B>        for the Intel Pentium CPU without MMX</LI>
-<LI><B>-march=pentium-mmx</B> for the Intel PentiumMMX CPU based on Pentium core with MMX</LI>
-<LI>-march=pentium2    for the Intel Pentium2 CPU based on Pentium Pro core with MMX</LI>
-<LI>-march=pentium3    for the Intel Pentium3 CPU based on Pentium Pro core with MMX and SSE</LI>
-<LI>-march=pentium-m   for the Intel Pentium-M CPU with MMX, SSE and SSE2.  Used in Centrino notebooks.</LI>
-<LI>-march=pentium4    for the Intel Pentium4 CPU with MMX, SSE and SSE2</LI>
-<LI>-march=prescott    for the Intel Pentium4 CPU with MMX, SSE, SSE2 and SSE3</LI>
-<LI>-march=nocona      for the Intel Pentium4 CPU with 64-bit extensions, MMX, SSE, SSE2 and SSE3</LI>
-</UL>
-</P>
-<P><B>NOTE</B>: If your version of gcc does not support your processor,
-choose the most recent processor supported by your compiler and add any
-extra features, for instance the <CODE>-march=winchip-c6</CODE> would become
-<CODE>-march=i486 -mmmx</CODE> for the IDT Winchip C6 CPU. It's also recommended
-that when compiling for the for the Athlon XP you leave the default of
-<PRE>
--march=pentiumpro
-</PRE>
- because gcc doesn't properly optimize for the
-Athlon XP.</P>
-
-<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Building LAME</A>
+<H2><A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Building LAME</A>
 </H2>
 
 <P>Open a shell and switch to the directory where you saved lame.
@@ -1684,7 +1593,7 @@ $
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">XMLTV</A>
+<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">XMLTV</A>
 </H2>
 
 <H3>Red Hat Linux and Fedora Core:</H3>
@@ -1727,7 +1636,7 @@ does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf xmltv-0.5.38.tar.bz2
+$ tar -xjf xmltv-0.5.39.tar.bz2
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -1751,7 +1660,7 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd xmltv-0.5.38
+$ cd xmltv-0.5.39
 $ perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -1772,7 +1681,7 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ConfigureDD"></A> <A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Configuring the Zap2It.com DataDirect service </A>
+<H2><A NAME="ConfigureDD"></A> <A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">Configuring the Zap2It.com DataDirect service </A>
 </H2>
 
 <H3>Introduction</H3>
@@ -1812,18 +1721,25 @@ currently using XMLTV.  If you are starting from a fresh installation, the
 simplest thing is to immediately start using DataDirect.</P>
 <P>
 <A NAME="manually_building_mythtv"></A> </P>
-<H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Manually building MythTV</A>
+<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Manually building MythTV</A>
 </H2>
 
 <P>Unpack MythTV
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.17.tar.bz2
-$ cd mythtv-0.17
+$ tar -xjf mythtv-0.18.tar.bz2
+$ cd mythtv-0.18
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>As of MythTV version 0.18, there is no need to edit the
+<CODE>settings.pro</CODE> file to set compile-time options.  The
+<B>configure</B> script will configure MythTV appropriately for your
+system.  If you wish to change options, run <B>./configure --help</B> to
+see what is available and to override and automatically detected options. 
+See the <CODE>config.log</CODE> file after running <B>configure</B> to see
+previous runs.</P>
 <P>On a single cpu machine, you would type the following to compile MythTV:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -1944,7 +1860,7 @@ and a "Database Configuration" screen should appear.
 Set the "Host name" field to point to your Master backend's IP address.</LI>
 </P>
 
-<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.6">5.6</A> <A HREF="#toc5.6">Gentoo </A>
+<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Gentoo </A>
 </H2>
 
 <P>Installation of MythTV on Gentoo consists of simply emerging the desired
@@ -2598,7 +2514,7 @@ interact directly with </P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythtv-0.17/configfiles
+$ cd ~/mythtv-0.18/configfiles
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2624,8 +2540,7 @@ to troubleshoot further by going back to the lirc home page and investigating
 from there.</P>
 <P>If it is working, then press <B>CTRL-C</B> to abort the program.  Once you
 know that your remote is working, you can either recompile MythTV with
-native lirc support (edit the <CODE>settings.pro</CODE> file and remove the "#"
-from the lirc option, then make <CODE>distclean</CODE> and <CODE>make</CODE>) or you
+native lirc support by enabling it in <B>configure</B> or you
 need to run the <B>irxevent</B> program, which takes the key presses and
 sends them to MythTV.  If you use native lirc support, you don't need to run
 <B>irxevent</B>.  If you are going to use irxevent, then you need to run
@@ -2924,11 +2839,10 @@ set-variable=thread_stack=256k
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Switch to the setup directory and run the setup program:
+<P>Run the setup program:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd setup
-$ ./setup
+$ mythtv-setup
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -3114,7 +3028,7 @@ $ mythbackend
 <P>mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <CODE>mythbackend -h</CODE> for help.</P>
-<P>As of MythTV v0.17, the available options are:
+<P>As of MythTV v0.18, the available options are:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mythbackend -h
@@ -3329,7 +3243,7 @@ during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
 effects of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
-version 0.17.</P>
+version 0.18.</P>
 <H3>Applying filters</H3>
 
 <P>One or more filters can be included in a "filter chain". The filters to
@@ -3950,7 +3864,14 @@ available at
 user-supplied program, so if you have issues with the script, please contact
 the author.</P>
 
-<H2><A NAME="ss11.4">11.4</A> <A HREF="#toc11.4">Adding support for an external tuner</A>
+<H2><A NAME="ss11.4">11.4</A> <A HREF="#toc11.4">Adding DishTV information to the database</A>
+</H2>
+
+<P>A script for adding Pay Per View information into the MythTV database for
+DishTV subscribers is available at 
+<A HREF="http://www.mythppv.com/">http://www.mythppv.com/</A>.</P>
+
+<H2><A NAME="ss11.5">11.5</A> <A HREF="#toc11.5">Adding support for an external tuner</A>
 </H2>
 
 <P>MythTV supports changing the channel on an external tuner.  If you have
@@ -3970,7 +3891,7 @@ helpful:
 <A HREF="http://www.snapstream.com/products/irblaster/sonydss.htm">http://www.snapstream.com/products/irblaster/sonydss.htm</A> for cable
 pinouts for RCA DSS receivers.</P>
 
-<H2><A NAME="ss11.5">11.5</A> <A HREF="#toc11.5">Using Shutdown/Wakeup</A>
+<H2><A NAME="ss11.6">11.6</A> <A HREF="#toc11.6">Using Shutdown/Wakeup</A>
 </H2>
 
 <P>What does the MythTV Shutdown/Wakeup function do? The scheduler on the
@@ -4179,7 +4100,7 @@ permission to shutdown. If you cancel the shutdown, simply call
 set-wakeuptime-script should stop the program that uses <CODE>/dev/rtc</CODE> before
 setting the wakeuptime.</P>
 
-<H2><A NAME="ss11.6">11.6</A> <A HREF="#toc11.6">Scheduling Recordings</A>
+<H2><A NAME="ss11.7">11.7</A> <A HREF="#toc11.7">Scheduling Recordings</A>
 </H2>
 
 <P>The MythTV master backend is responsible for managing the schedule
@@ -4531,8 +4452,8 @@ Mandrake Control Center.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythweb-0.17.tar.bz2
-$ cd mythweb-0.17
+$ tar -xjf mythweb-0.18.tar.bz2
+$ cd mythweb-0.18
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4608,8 +4529,8 @@ Once you have satisfied the prerequisites for your distribution, download
 and install the application:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythgallery-0.17.tar.bz2
-$ cd mythgallery-0.17
+$ tar -xjf mythgallery-0.18.tar.bz2
+$ cd mythgallery-0.18
 $ ./configure --enable-opengl
 $ qmake mythgallery.pro
 $ make
@@ -5282,21 +5203,15 @@ an actual programming fault within gcc.</P>
 discovered a genuine code-bug,  or if the problem is with your system.  In
 order to determine what's going on, you must recompile MythTV with debugging
 support and run MythTV within <B>gdb</B>, the GNU debugger.</P>
-<P>Edit the settings.pro file.  Make sure that the top of the file looks like this:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cat settings.pro
-CONFIG += debug
-#CONFIG += release
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>Re-run the <B>configure</B> script and add <CODE>--compile-type=debug</CODE>
+to any previous configuration options you may have used.  Check the
+<CODE>config.log</CODE> file if you have forgotten.</P>
 <P>Now, you need to clear out the old versions of the software to ensure that
 you're running with the debugging code, then compile and install.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ make clean distclean
-$ ./configure
+$ make distclean
+$ ./configure --compile-type=debug
 $ make
 $ su
 # make install
@@ -5309,7 +5224,7 @@ the problem you're having is in the <CODE>setup</CODE> program.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd setup
-$ gdb ./setup
+$ gdb ./mythtv-setup
 
 GNU gdb 5.3-1mdk (Mandrake Linux)
 Copyright 2002 Free Software Foundation, Inc.
@@ -5352,20 +5267,9 @@ instructions.</P>
 
 <H3>Illegal Instruction</H3>
 
-<P>This error can happen for the following reasons:
-<UL>
-<LI>You have an AMD K6-2 or VIA C3 processor.  If you have either of
-these, make sure that you you followed the instructions in this 
-<A HREF="#cpuspecificoptimizations">section</A>.</LI>
-<LI>You have an early production Intel Celeron, Pentium Pro or Pentium II.  If you have any
-of these processors, make sure that your 
-<A HREF="#deinterlace_">deinterlace</A>
-variable is set correctly.  Your CPU needs to support SSE instructions for
-deinterlace support.  You may check this by doing a <CODE>$ cat
-/proc/cpuinfo</CODE> and looking for "sse" in the processor flags section.</LI>
-</UL>
-</P>
-
+<P>This error used to occur when users compiled MythTV with incorrect CPU
+options.  This should no longer occur with the new <B>configure</B>
+script.</P>
 <H3>MythTV is crashing your system</H3>
 
 <P>When run as a non-privileged user, MythTV <EM>can not</EM> crash your
@@ -5426,7 +5330,9 @@ Profiles and adjust the <B>Default</B> and <B>Live TV</B> options to
 <P>This is due to DPMS, the Display Power Management System, which is used
 to save power by turning off your monitor when the system decides that it's
 not being used or due to a screensaver that has defaulted to a blank screen. 
-Since it's likely that watching TV will not generate keyboard or mouse
+MythTV now has DPMS support built-in, and should intelligently handle the
+screen.  Continue reading if you wish to override DPMS and force it off.</P>
+<P>Since it's likely that watching TV will not generate keyboard or mouse
 events for a time, you need to turn off DPMS and the screensaver.  There are
 a few ways to do this.  You may also need to check your BIOS for power
 saving modes and disable screen blanking there as well.</P>
@@ -5438,12 +5344,16 @@ Section "ServerFlags"
     #DontZap # disable &lt;Crtl>&lt;Alt>&lt;BS> (server abort)
     #DontZoom # disable &lt;Crtl>&lt;Alt>&lt;KP_+>/&lt;KP_-> (resolution switching)
     AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+
+    Option "blank time" "0"
+    Option "standby time" "0"
+    Option "suspend time" "0"
+    Option "off time" "0"
+    Option "NoPM" "1"
 EndSection
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Add <CODE>Option "NoPM" "true"</CODE> and <CODE>Option "BlankTime" "0"</CODE> to the
-ServerFlags section.</P>
 <P>Also, look for:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -5505,18 +5415,6 @@ You may also combine the command to turn off DPMS and the screensaver:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ xset -dpms s off
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>There's also:
-<BLOCKQUOTE><CODE>
-<PRE>
-Section "ServerFlags"
-       Option "blank time" "0"
-       Option "standby time" "0"
-       Option "suspend time" "0"
-       Option "off time" "0"
-EndSection 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -5640,23 +5538,12 @@ volume of 100% is recommended for testing, distortion may occur. Lowering
 this level to 75% to 85% may result in better audio quality.</P>
 <P>Master mixer - sets the level for the analog signal sent to line-out or the
 speakers.</P>
-<P>You may also want to ensure that <CODE>/dev/dsp</CODE> , or whatever device
-file is being used, hasn't already been grabbed by another process, like
+<P>You may also want to ensure that <CODE>/dev/dsp</CODE> , or whatever device file
+is being used, hasn't already been grabbed by another process, like
 <B>esd</B> or <B>artsd</B>.  If the device file isn't available, then
-MythTV won't work.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: MythTV now has support for using
-<B>artsd</B>.  This is a compile-time option, so you will need to edit the
-<CODE>settings.pro</CODE> file in the mythtv directory then perform a <CODE>make
-distclean; make</CODE>, and re-run <CODE>make install</CODE> as root to add this
-support.  Otherwise, check your window manager documentation for
-instructions on disabling the sound manager.</CAPTION>
-</FIGURE>
-
-If you wish to see what application is grabbing a resource, you can use the
+MythTV won't work.  You may wish to run <B>configure</B> and enable
+support for these.</P>
+<P>If you wish to see what application is grabbing a resource, you can use the
 <CODE>fuser</CODE> command:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -6056,7 +5943,41 @@ mysql> quit
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="btaudio"></A> <A NAME="ss21.7">21.7</A> <A HREF="#toc21.7">btaudio </A>
+<H2><A NAME="ss21.7">21.7</A> <A HREF="#toc21.7">Moving your data to new hardware.</A>
+</H2>
+
+<P>This assumes that you will be moving your data to newer / bigger hardware
+and don't want to lose your programs.</P>
+<P>The first step is to create a database backup as demonstrated in an earlier
+section.</P>
+<P>Next, you will extract only the data that is relevant to the programs:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ grep "INSERT INTO record "         mythtv_backup.sql > restore.sql
+$ grep "INSERT INTO recorded "       mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO oldrecorded "    mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Note the space after the table name and the ">>" to append to the file for
+all but the first grep. "recordedmarkup" is huge and may be hundreds of
+thousands of lines if you had lots of hours of recordings.</P>
+<P>After you have moved the data files to the new hardware, configure MythTV
+using the <B>mythtv-setup</B> program as you normally would with a
+standard MythTV installation.</P>
+<P>At this point we will restore the information about your programs back into
+the database:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u mythtv -pmythtv mythconverg &lt; restore.sql 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>After successful insertion of the data you may delete the
+<CODE>restore.sql</CODE> file.</P>
+
+<H2><A NAME="btaudio"></A> <A NAME="ss21.8">21.8</A> <A HREF="#toc21.8">btaudio </A>
 </H2>
 
 <P>btaudio allows you to obtain the audio data from your tuner card directly
@@ -6096,7 +6017,7 @@ analog)</LI>
 <CODE>/dev/mixer</CODE> devices.  Typing <CODE>$ dmesg</CODE> will let you know
 what's going on.</P>
 
-<H2><A NAME="ss21.8">21.8</A> <A HREF="#toc21.8">Removing unwanted channels</A>
+<H2><A NAME="ss21.9">21.9</A> <A HREF="#toc21.9">Removing unwanted channels</A>
 </H2>
 
 <P>If <B>mythfilldatabase</B> grabbed a channel which you do not want to
@@ -6142,7 +6063,7 @@ mysql> delete from program where chanid = 1015;
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss21.9">21.9</A> <A HREF="#toc21.9">NFS</A>
+<H2><A NAME="ss21.10">21.10</A> <A HREF="#toc21.10">NFS</A>
 </H2>
 
 <P>You may want to use a central server to store your files.  </P>
@@ -6170,7 +6091,7 @@ exporting the directory "/var/video", which we're mounting locally at
 performance of NFS; "hard,intr" is there because that's the recommendation
 of the NFS-HOWTO, and the nfsvers is required for filesizes over 2GB.</P>
 
-<H2><A NAME="ss21.10">21.10</A> <A HREF="#toc21.10">Automatically starting mythfrontend at system boot time</A>
+<H2><A NAME="ss21.11">21.11</A> <A HREF="#toc21.11">Automatically starting mythfrontend at system boot time</A>
 </H2>
 
 <P>Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -6209,7 +6130,7 @@ session.screen0.focusModel:     SloppyFocus
  in it.</P>
 <P>
 <A NAME="mythbackend_autostart"></A> </P>
-<H2><A NAME="ss21.11">21.11</A> <A HREF="#toc21.11">Automatically starting mythbackend at system boot time</A>
+<H2><A NAME="ss21.12">21.12</A> <A HREF="#toc21.12">Automatically starting mythbackend at system boot time</A>
 </H2>
 
 <H3>Red Hat And Mandrake</H3>
@@ -6360,7 +6281,7 @@ To stop mythbackend as a daemon:
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="advanced_backend_config"></A> <A NAME="ss21.12">21.12</A> <A HREF="#toc21.12">Advanced Backend Configurations </A>
+<H2><A NAME="advanced_backend_config"></A> <A NAME="ss21.13">21.13</A> <A HREF="#toc21.13">Advanced Backend Configurations </A>
 </H2>
 
 <P>MythTV is flexible in the way that you define multiple backend tuner
@@ -6403,7 +6324,7 @@ be used.</P>
 NFS and enabling the Master Backend Override setting will allow you to view
 content even if the slave backend that recorded a program is not available.</P>
 
-<H2><A NAME="ss21.13">21.13</A> <A HREF="#toc21.13">What is this transcoder thing, and how do I use it?</A>
+<H2><A NAME="ss21.14">21.14</A> <A HREF="#toc21.14">What is this transcoder thing, and how do I use it?</A>
 </H2>
 
 <P>The transcoder re-encodes files from one MythTV format to another.  The
@@ -6451,7 +6372,7 @@ transcoding.</P>
 <P>Once the transcode is complete, mythbackend will replace the old file
 with the new as soon as it is no longer in use.</P>
 
-<H2><A NAME="ss21.14">21.14</A> <A HREF="#toc21.14">Changing your hostname</A>
+<H2><A NAME="ss21.15">21.15</A> <A HREF="#toc21.15">Changing your hostname</A>
 </H2>
 
 <P>If you need to change the name of the computers used with MythTV you'll
@@ -6556,10 +6477,10 @@ start them from terminal consoles.
 <P>8.  Quit and restart all frontends.  Delete the <CODE>mythtv_backup.sql</CODE>
 and <CODE>mythtv_restore.sql</CODE> files.</P>
 
-<H2><A NAME="ss21.15">21.15</A> <A HREF="#toc21.15">Can I run MythTV on my TiVo?</A>
+<H2><A NAME="ss21.16">21.16</A> <A HREF="#toc21.16">Can I run MythTV on my TiVo?</A>
 </H2>
 
-<H2><A NAME="ss21.16">21.16</A> <A HREF="#toc21.16">Can I run MythTV on my ReplayTV?</A>
+<H2><A NAME="ss21.17">21.17</A> <A HREF="#toc21.17">Can I run MythTV on my ReplayTV?</A>
 </H2>
 
 <P>No.</P>
@@ -6570,7 +6491,7 @@ for the custom hardware contained within a TiVo.  TiVo is under no
 obligation to release the source code to their <EM>application</EM>.</P>
 <P>The ReplayTV runs VxWorks, a Real Time Operating System from Wind River
 Systems.</P>
-<H2><A NAME="ss21.17">21.17</A> <A HREF="#toc21.17">Can a wireless connection be used between the frontend and the backend?</A>
+<H2><A NAME="ss21.18">21.18</A> <A HREF="#toc21.18">Can a wireless connection be used between the frontend and the backend?</A>
 </H2>
 
 <P>Yes, assuming that your wireless connection has sufficient bandwidth to
@@ -6583,7 +6504,7 @@ modes, or proprietary 802.11b "Turbo" schemes should be adequate.  Multiple
 wireless frontends, poor signal strength or other factors can severely
 impact the viewing experience on the frontend.</P>
 
-<H2><A NAME="ss21.18">21.18</A> <A HREF="#toc21.18">How can I burn shows that I have recorded to a DVD?</A>
+<H2><A NAME="ss21.19">21.19</A> <A HREF="#toc21.19">How can I burn shows that I have recorded to a DVD?</A>
 </H2>
 
 <P>There are two answers to this question.  The easiest thing to do is to
@@ -6636,7 +6557,7 @@ driveropts=burnfree -dao -v tsize="$TSIZE"s -
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss21.19">21.19</A> <A HREF="#toc21.19">Burning a MythTV recording to a DVD (alternate version)</A>
+<H2><A NAME="ss21.20">21.20</A> <A HREF="#toc21.20">Burning a MythTV recording to a DVD (alternate version)</A>
 </H2>
 
 
@@ -6679,7 +6600,7 @@ created in this process.</P>
 you want to burn a DVD with menus and multiple video titles, see the next
 section.</P>
 
-<H2><A NAME="ss21.20">21.20</A> <A HREF="#toc21.20">Creating a DVD with Menus</A>
+<H2><A NAME="ss21.21">21.21</A> <A HREF="#toc21.21">Creating a DVD with Menus</A>
 </H2>
 
 <P>This assumes that you have already formatted the videos in a 
@@ -6901,7 +6822,7 @@ separate chapters of one consistent video title.</P>
 <P><CODE>growisofs -Z /dev/scd0 -dvd-video DVD</CODE></P>
 
 
-<H2><A NAME="MigratingtoDD"></A> <A NAME="ss21.21">21.21</A> <A HREF="#toc21.21">Migrating from XMLTV to DataDirect </A>
+<H2><A NAME="MigratingtoDD"></A> <A NAME="ss21.22">21.22</A> <A HREF="#toc21.22">Migrating from XMLTV to DataDirect </A>
 </H2>
 
 <P>DataDirect will use different information for your video sources and
@@ -6982,11 +6903,11 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H2><A NAME="ss21.22">21.22</A> <A HREF="#toc21.22">What do the icons on the Watch Recordings screen mean?</A>
+<H2><A NAME="ss21.23">21.23</A> <A HREF="#toc21.23">What do the icons on the Watch Recordings screen mean?</A>
 </H2>
 
 <P>Press "1" or F1 to get a popup.</P>
-<H2><A NAME="ss21.23">21.23</A> <A HREF="#toc21.23">What is the difference between a PVR-250 and a PVR-350</A>
+<H2><A NAME="ss21.24">21.24</A> <A HREF="#toc21.24">What is the difference between a PVR-250 and a PVR-350</A>
 </H2>
 
 <P>This is covered in the hardware section, and extensively covered on the
@@ -7013,7 +6934,7 @@ features, placing a large load on the host CPU.</P>
 <A HREF="#PVR-350">considerations</A>
 regarding the way audio is handled.</P>
 
-<H2><A NAME="ss21.24">21.24</A> <A HREF="#toc21.24">Changing channels on an external Set Top Box</A>
+<H2><A NAME="ss21.25">21.25</A> <A HREF="#toc21.25">Changing channels on an external Set Top Box</A>
 </H2>
 
 <P>If you need to use an external Set Top Box (STB), such as for satellite
@@ -7034,7 +6955,7 @@ the Tivo has a direct-connect capability.</LI>
 contrib directory which may work for you.</LI>
 </OL>
 </P>
-<H2><A NAME="ss21.25">21.25</A> <A HREF="#toc21.25">Configuring one machine to flag all commercials.</A>
+<H2><A NAME="ss21.26">21.26</A> <A HREF="#toc21.26">Configuring one machine to flag all commercials.</A>
 </H2>
 
 <P>Commercial flagging can be CPU intensive.  By default, the backend that
@@ -7582,22 +7503,13 @@ should be in /lib/modules/{your kernel version}/misc/</LI>
 </P>
 <P>If none of the above works, and <B>irw</B> still isn't showing keypresses,
 then you will need to ask your question on the LIRC list.</P>
-<P>Assuming that <B>irw</B> is showing keypresses, you can continue:
-To enable native LIRC support within MythTV, you will need to modify your
-<CODE>settings.pro</CODE> file and recompile.  Your <CODE>settings.pro</CODE> should
-look like this:
-<BLOCKQUOTE><CODE>
-<PRE>
-# Native lirc support
-CONFIG += using_lirc
-LIRC_LIBS = -llirc_client
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>Assuming that <B>irw</B> is showing keypresses, you can continue:</P>
 <P>Recompile and install:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ make distclean; make
+$ make distclean
+$ ./configure --enable-lirc
+$ make
 $ su
 # make install
 </PRE>

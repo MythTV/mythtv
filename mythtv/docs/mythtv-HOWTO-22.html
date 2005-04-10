@@ -535,22 +535,13 @@ should be in /lib/modules/{your kernel version}/misc/</LI>
 </P>
 <P>If none of the above works, and <B>irw</B> still isn't showing keypresses,
 then you will need to ask your question on the LIRC list.</P>
-<P>Assuming that <B>irw</B> is showing keypresses, you can continue:
-To enable native LIRC support within MythTV, you will need to modify your
-<CODE>settings.pro</CODE> file and recompile.  Your <CODE>settings.pro</CODE> should
-look like this:
-<BLOCKQUOTE><CODE>
-<PRE>
-# Native lirc support
-CONFIG += using_lirc
-LIRC_LIBS = -llirc_client
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>Assuming that <B>irw</B> is showing keypresses, you can continue:</P>
 <P>Recompile and install:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ make distclean; make
+$ make distclean
+$ ./configure --enable-lirc
+$ make
 $ su
 # make install
 </PRE>

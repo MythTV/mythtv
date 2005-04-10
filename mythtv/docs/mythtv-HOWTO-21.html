@@ -274,7 +274,41 @@ mysql> quit
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="btaudio"></A> <A NAME="ss21.7">21.7</A> <A HREF="mythtv-HOWTO.html#toc21.7">btaudio </A>
+<H2><A NAME="ss21.7">21.7</A> <A HREF="mythtv-HOWTO.html#toc21.7">Moving your data to new hardware.</A>
+</H2>
+
+<P>This assumes that you will be moving your data to newer / bigger hardware
+and don't want to lose your programs.</P>
+<P>The first step is to create a database backup as demonstrated in an earlier
+section.</P>
+<P>Next, you will extract only the data that is relevant to the programs:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ grep "INSERT INTO record "         mythtv_backup.sql > restore.sql
+$ grep "INSERT INTO recorded "       mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO oldrecorded "    mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Note the space after the table name and the ">>" to append to the file for
+all but the first grep. "recordedmarkup" is huge and may be hundreds of
+thousands of lines if you had lots of hours of recordings.</P>
+<P>After you have moved the data files to the new hardware, configure MythTV
+using the <B>mythtv-setup</B> program as you normally would with a
+standard MythTV installation.</P>
+<P>At this point we will restore the information about your programs back into
+the database:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u mythtv -pmythtv mythconverg &lt; restore.sql 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>After successful insertion of the data you may delete the
+<CODE>restore.sql</CODE> file.</P>
+
+<H2><A NAME="btaudio"></A> <A NAME="ss21.8">21.8</A> <A HREF="mythtv-HOWTO.html#toc21.8">btaudio </A>
 </H2>
 
 <P>btaudio allows you to obtain the audio data from your tuner card directly
@@ -314,7 +348,7 @@ analog)</LI>
 <CODE>/dev/mixer</CODE> devices.  Typing <CODE>$ dmesg</CODE> will let you know
 what's going on.</P>
 
-<H2><A NAME="ss21.8">21.8</A> <A HREF="mythtv-HOWTO.html#toc21.8">Removing unwanted channels</A>
+<H2><A NAME="ss21.9">21.9</A> <A HREF="mythtv-HOWTO.html#toc21.9">Removing unwanted channels</A>
 </H2>
 
 <P>If <B>mythfilldatabase</B> grabbed a channel which you do not want to
@@ -360,7 +394,7 @@ mysql> delete from program where chanid = 1015;
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss21.9">21.9</A> <A HREF="mythtv-HOWTO.html#toc21.9">NFS</A>
+<H2><A NAME="ss21.10">21.10</A> <A HREF="mythtv-HOWTO.html#toc21.10">NFS</A>
 </H2>
 
 <P>You may want to use a central server to store your files.  </P>
@@ -388,7 +422,7 @@ exporting the directory "/var/video", which we're mounting locally at
 performance of NFS; "hard,intr" is there because that's the recommendation
 of the NFS-HOWTO, and the nfsvers is required for filesizes over 2GB.</P>
 
-<H2><A NAME="ss21.10">21.10</A> <A HREF="mythtv-HOWTO.html#toc21.10">Automatically starting mythfrontend at system boot time</A>
+<H2><A NAME="ss21.11">21.11</A> <A HREF="mythtv-HOWTO.html#toc21.11">Automatically starting mythfrontend at system boot time</A>
 </H2>
 
 <P>Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -427,7 +461,7 @@ session.screen0.focusModel:     SloppyFocus
  in it.</P>
 <P>
 <A NAME="mythbackend_autostart"></A> </P>
-<H2><A NAME="ss21.11">21.11</A> <A HREF="mythtv-HOWTO.html#toc21.11">Automatically starting mythbackend at system boot time</A>
+<H2><A NAME="ss21.12">21.12</A> <A HREF="mythtv-HOWTO.html#toc21.12">Automatically starting mythbackend at system boot time</A>
 </H2>
 
 <H3>Red Hat And Mandrake</H3>
@@ -578,7 +612,7 @@ To stop mythbackend as a daemon:
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="advanced_backend_config"></A> <A NAME="ss21.12">21.12</A> <A HREF="mythtv-HOWTO.html#toc21.12">Advanced Backend Configurations </A>
+<H2><A NAME="advanced_backend_config"></A> <A NAME="ss21.13">21.13</A> <A HREF="mythtv-HOWTO.html#toc21.13">Advanced Backend Configurations </A>
 </H2>
 
 <P>MythTV is flexible in the way that you define multiple backend tuner
@@ -621,7 +655,7 @@ be used.</P>
 NFS and enabling the Master Backend Override setting will allow you to view
 content even if the slave backend that recorded a program is not available.</P>
 
-<H2><A NAME="ss21.13">21.13</A> <A HREF="mythtv-HOWTO.html#toc21.13">What is this transcoder thing, and how do I use it?</A>
+<H2><A NAME="ss21.14">21.14</A> <A HREF="mythtv-HOWTO.html#toc21.14">What is this transcoder thing, and how do I use it?</A>
 </H2>
 
 <P>The transcoder re-encodes files from one MythTV format to another.  The
@@ -669,7 +703,7 @@ transcoding.</P>
 <P>Once the transcode is complete, mythbackend will replace the old file
 with the new as soon as it is no longer in use.</P>
 
-<H2><A NAME="ss21.14">21.14</A> <A HREF="mythtv-HOWTO.html#toc21.14">Changing your hostname</A>
+<H2><A NAME="ss21.15">21.15</A> <A HREF="mythtv-HOWTO.html#toc21.15">Changing your hostname</A>
 </H2>
 
 <P>If you need to change the name of the computers used with MythTV you'll
@@ -774,10 +808,10 @@ start them from terminal consoles.
 <P>8.  Quit and restart all frontends.  Delete the <CODE>mythtv_backup.sql</CODE>
 and <CODE>mythtv_restore.sql</CODE> files.</P>
 
-<H2><A NAME="ss21.15">21.15</A> <A HREF="mythtv-HOWTO.html#toc21.15">Can I run MythTV on my TiVo?</A>
+<H2><A NAME="ss21.16">21.16</A> <A HREF="mythtv-HOWTO.html#toc21.16">Can I run MythTV on my TiVo?</A>
 </H2>
 
-<H2><A NAME="ss21.16">21.16</A> <A HREF="mythtv-HOWTO.html#toc21.16">Can I run MythTV on my ReplayTV?</A>
+<H2><A NAME="ss21.17">21.17</A> <A HREF="mythtv-HOWTO.html#toc21.17">Can I run MythTV on my ReplayTV?</A>
 </H2>
 
 <P>No.</P>
@@ -788,7 +822,7 @@ for the custom hardware contained within a TiVo.  TiVo is under no
 obligation to release the source code to their <EM>application</EM>.</P>
 <P>The ReplayTV runs VxWorks, a Real Time Operating System from Wind River
 Systems.</P>
-<H2><A NAME="ss21.17">21.17</A> <A HREF="mythtv-HOWTO.html#toc21.17">Can a wireless connection be used between the frontend and the backend?</A>
+<H2><A NAME="ss21.18">21.18</A> <A HREF="mythtv-HOWTO.html#toc21.18">Can a wireless connection be used between the frontend and the backend?</A>
 </H2>
 
 <P>Yes, assuming that your wireless connection has sufficient bandwidth to
@@ -801,7 +835,7 @@ modes, or proprietary 802.11b "Turbo" schemes should be adequate.  Multiple
 wireless frontends, poor signal strength or other factors can severely
 impact the viewing experience on the frontend.</P>
 
-<H2><A NAME="ss21.18">21.18</A> <A HREF="mythtv-HOWTO.html#toc21.18">How can I burn shows that I have recorded to a DVD?</A>
+<H2><A NAME="ss21.19">21.19</A> <A HREF="mythtv-HOWTO.html#toc21.19">How can I burn shows that I have recorded to a DVD?</A>
 </H2>
 
 <P>There are two answers to this question.  The easiest thing to do is to
@@ -854,7 +888,7 @@ driveropts=burnfree -dao -v tsize="$TSIZE"s -
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss21.19">21.19</A> <A HREF="mythtv-HOWTO.html#toc21.19">Burning a MythTV recording to a DVD (alternate version)</A>
+<H2><A NAME="ss21.20">21.20</A> <A HREF="mythtv-HOWTO.html#toc21.20">Burning a MythTV recording to a DVD (alternate version)</A>
 </H2>
 
 
@@ -897,7 +931,7 @@ created in this process.</P>
 you want to burn a DVD with menus and multiple video titles, see the next
 section.</P>
 
-<H2><A NAME="ss21.20">21.20</A> <A HREF="mythtv-HOWTO.html#toc21.20">Creating a DVD with Menus</A>
+<H2><A NAME="ss21.21">21.21</A> <A HREF="mythtv-HOWTO.html#toc21.21">Creating a DVD with Menus</A>
 </H2>
 
 <P>This assumes that you have already formatted the videos in a 
@@ -1119,7 +1153,7 @@ separate chapters of one consistent video title.</P>
 <P><CODE>growisofs -Z /dev/scd0 -dvd-video DVD</CODE></P>
 
 
-<H2><A NAME="MigratingtoDD"></A> <A NAME="ss21.21">21.21</A> <A HREF="mythtv-HOWTO.html#toc21.21">Migrating from XMLTV to DataDirect </A>
+<H2><A NAME="MigratingtoDD"></A> <A NAME="ss21.22">21.22</A> <A HREF="mythtv-HOWTO.html#toc21.22">Migrating from XMLTV to DataDirect </A>
 </H2>
 
 <P>DataDirect will use different information for your video sources and
@@ -1200,11 +1234,11 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H2><A NAME="ss21.22">21.22</A> <A HREF="mythtv-HOWTO.html#toc21.22">What do the icons on the Watch Recordings screen mean?</A>
+<H2><A NAME="ss21.23">21.23</A> <A HREF="mythtv-HOWTO.html#toc21.23">What do the icons on the Watch Recordings screen mean?</A>
 </H2>
 
 <P>Press "1" or F1 to get a popup.</P>
-<H2><A NAME="ss21.23">21.23</A> <A HREF="mythtv-HOWTO.html#toc21.23">What is the difference between a PVR-250 and a PVR-350</A>
+<H2><A NAME="ss21.24">21.24</A> <A HREF="mythtv-HOWTO.html#toc21.24">What is the difference between a PVR-250 and a PVR-350</A>
 </H2>
 
 <P>This is covered in the hardware section, and extensively covered on the
@@ -1231,7 +1265,7 @@ features, placing a large load on the host CPU.</P>
 <A HREF="mythtv-HOWTO-3.html#PVR-350">considerations</A>
 regarding the way audio is handled.</P>
 
-<H2><A NAME="ss21.24">21.24</A> <A HREF="mythtv-HOWTO.html#toc21.24">Changing channels on an external Set Top Box</A>
+<H2><A NAME="ss21.25">21.25</A> <A HREF="mythtv-HOWTO.html#toc21.25">Changing channels on an external Set Top Box</A>
 </H2>
 
 <P>If you need to use an external Set Top Box (STB), such as for satellite
@@ -1252,7 +1286,7 @@ the Tivo has a direct-connect capability.</LI>
 contrib directory which may work for you.</LI>
 </OL>
 </P>
-<H2><A NAME="ss21.25">21.25</A> <A HREF="mythtv-HOWTO.html#toc21.25">Configuring one machine to flag all commercials.</A>
+<H2><A NAME="ss21.26">21.26</A> <A HREF="mythtv-HOWTO.html#toc21.26">Configuring one machine to flag all commercials.</A>
 </H2>
 
 <P>Commercial flagging can be CPU intensive.  By default, the backend that

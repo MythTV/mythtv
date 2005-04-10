@@ -60,7 +60,7 @@ join the
 grabber which is built-in to MythTV.  You <EM>do not</EM> need to install
 XMLTV, but you need <B>wget</B> version 1.9.1 or higher.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.38).</P>
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.39).</P>
 <P>
 <HR>
 <PRE>
@@ -82,98 +82,7 @@ After downloading, be sure to install both:
 <A HREF="http://lame.sourceforge.net/">http://lame.sourceforge.net/</A>.  Download the source code to v3.96.1
 by following the links from "Using" through "Download...".</P>
 
-<H2><A NAME="cpuspecificoptimizations"></A> <A NAME="ss5.1">5.1</A> <A HREF="mythtv-HOWTO.html#toc5.1">Notes on compiling for different processors</A>
-</H2>
-
-<P><B>NOTE</B>: the following section applies to MythTV 0.17.  If you are
-running CVS, MythTV has a more intelligent <B>configure</B> script that
-will auto-detect your system and compile processor-specific optimizations. 
-You will not edit the <CODE>settings.pro</CODE> file as described below at all;
-run <CODE>./configure --help</CODE> to obtain the full list of options.  You may
-skip this entire section.</P>
-<P>By default, MythTV is compiled for a Pentium Pro or i686 processor. This
-generates good code for most CPUs, but does not take advantage of MMX or
-SSE, and does not work with recent processors that are compatible with older
-Intel processors, such as the Via or IDT low power processors. So you may
-wish to, or need to, change this before compiling. The flags in bold are
-required if you have that CPU.</P>
-<P>If you have a system with an AMD processor change the following in the
-<CODE>settings.pro</CODE> file. Replace 
-<PRE>
--march=pentiumpro
-</PRE>
- before
-you compile with one of:
-<UL>
-<LI><B>-march=k6</B>        for the AMD K6 with MMX (i586 compatible)</LI>
-<LI><B>-march=k6-2</B>      for the AMD K6 CPU with MMX and 3dNOW! (i586 compatible)</LI>
-<LI>-march=athlon             for the AMD Athlon CPU with MMX, 3dNOW!, enhanced 3dNOW! and some of SSE. (pentium2 compatible)</LI>
-<LI>-march=pentiumpro -mmmx   for the AMD Athlon XP CPU with MMX, 3dNOW!, enhanced 3dNOW! and SSE. (pentium3 compatible)</LI>
-<LI>-march=k8                 for the AMD K8 core based CPUs with x86-64 instruction set support
-with MMX, 3dNOW!, enhanced 3dNOW!, SSE and SSE2. (pentium4 compatible)</LI>
-</UL>
-</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  If you wish to compile with the <CODE>-march=k8</CODE> flag you
-must use gcc v3.4 or higher.</CAPTION>
-</FIGURE>
-</P>
-<P>If you have a Via processor change the following in the
-<CODE>settings.pro</CODE> file. Replace 
-<PRE>
--march=pentiumpro
-</PRE>
- before
-you compile with one of:
-<UL>
-<LI><B>-march=c3</B>        for the Via C3 CPU with MMX and 3dNOW! instruction set support. (pentium-mmx compatible)</LI>
-<LI><B>-march=c3-2</B>      for the Via C3-2 CPU with MMX and SSE instruction set support. (pentium2 compatible)</LI>
-</UL>
-</P>
-<P>If you have an IDT Winchip processor change the following in the
-<CODE>settings.pro</CODE> file. Replace 
-<PRE>
--march=pentiumpro
-</PRE>
- before
-you compile with one of:
-<UL>
-<LI><B>-march=winchip-c6</B>  for the IDT Winchip C6 CPU with MMX (i486 compatible)</LI>
-<LI><B>-march=winchip2</B>    for the IDT Winchip2 CPU, with MMX and 3dNOW! (i486 compatible)</LI>
-</UL>
-</P>
-<P>Finally, if you have an Intel processor other than the Pentium Pro you may
-wish to specify your particular model. Replace
-<PRE>
--march=pentiumpro
-</PRE>
- before you compile with one of:
-<UL>
-<LI><B>-march=i586</B>        for the Intel Pentium CPU without MMX</LI>
-<LI><B>-march=pentium-mmx</B> for the Intel PentiumMMX CPU based on Pentium core with MMX</LI>
-<LI>-march=pentium2    for the Intel Pentium2 CPU based on Pentium Pro core with MMX</LI>
-<LI>-march=pentium3    for the Intel Pentium3 CPU based on Pentium Pro core with MMX and SSE</LI>
-<LI>-march=pentium-m   for the Intel Pentium-M CPU with MMX, SSE and SSE2.  Used in Centrino notebooks.</LI>
-<LI>-march=pentium4    for the Intel Pentium4 CPU with MMX, SSE and SSE2</LI>
-<LI>-march=prescott    for the Intel Pentium4 CPU with MMX, SSE, SSE2 and SSE3</LI>
-<LI>-march=nocona      for the Intel Pentium4 CPU with 64-bit extensions, MMX, SSE, SSE2 and SSE3</LI>
-</UL>
-</P>
-<P><B>NOTE</B>: If your version of gcc does not support your processor,
-choose the most recent processor supported by your compiler and add any
-extra features, for instance the <CODE>-march=winchip-c6</CODE> would become
-<CODE>-march=i486 -mmmx</CODE> for the IDT Winchip C6 CPU. It's also recommended
-that when compiling for the for the Athlon XP you leave the default of
-<PRE>
--march=pentiumpro
-</PRE>
- because gcc doesn't properly optimize for the
-Athlon XP.</P>
-
-<H2><A NAME="ss5.2">5.2</A> <A HREF="mythtv-HOWTO.html#toc5.2">Building LAME</A>
+<H2><A NAME="ss5.1">5.1</A> <A HREF="mythtv-HOWTO.html#toc5.1">Building LAME</A>
 </H2>
 
 <P>Open a shell and switch to the directory where you saved lame.
@@ -208,7 +117,7 @@ $
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">XMLTV</A>
+<H2><A NAME="ss5.2">5.2</A> <A HREF="mythtv-HOWTO.html#toc5.2">XMLTV</A>
 </H2>
 
 <H3>Red Hat Linux and Fedora Core:</H3>
@@ -251,7 +160,7 @@ does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf xmltv-0.5.38.tar.bz2
+$ tar -xjf xmltv-0.5.39.tar.bz2
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -275,7 +184,7 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd xmltv-0.5.38
+$ cd xmltv-0.5.39
 $ perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -296,7 +205,7 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ConfigureDD"></A> <A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Configuring the Zap2It.com DataDirect service </A>
+<H2><A NAME="ConfigureDD"></A> <A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">Configuring the Zap2It.com DataDirect service </A>
 </H2>
 
 <H3>Introduction</H3>
@@ -336,18 +245,25 @@ currently using XMLTV.  If you are starting from a fresh installation, the
 simplest thing is to immediately start using DataDirect.</P>
 <P>
 <A NAME="manually_building_mythtv"></A> </P>
-<H2><A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Manually building MythTV</A>
+<H2><A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Manually building MythTV</A>
 </H2>
 
 <P>Unpack MythTV
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.17.tar.bz2
-$ cd mythtv-0.17
+$ tar -xjf mythtv-0.18.tar.bz2
+$ cd mythtv-0.18
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>As of MythTV version 0.18, there is no need to edit the
+<CODE>settings.pro</CODE> file to set compile-time options.  The
+<B>configure</B> script will configure MythTV appropriately for your
+system.  If you wish to change options, run <B>./configure --help</B> to
+see what is available and to override and automatically detected options. 
+See the <CODE>config.log</CODE> file after running <B>configure</B> to see
+previous runs.</P>
 <P>On a single cpu machine, you would type the following to compile MythTV:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -468,7 +384,7 @@ and a "Database Configuration" screen should appear.
 Set the "Host name" field to point to your Master backend's IP address.</LI>
 </P>
 
-<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.6">5.6</A> <A HREF="mythtv-HOWTO.html#toc5.6">Gentoo </A>
+<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Gentoo </A>
 </H2>
 
 <P>Installation of MythTV on Gentoo consists of simply emerging the desired

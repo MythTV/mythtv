@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-04-, v0.18.00
+<date>2005-04-10, v0.18.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -5526,6 +5526,38 @@ mysql> drop database mythconverg;
 mysql> quit
 </verb></tscreen>
 
+<sect1>Moving your data to new hardware.
+<p>This assumes that you will be moving your data to newer / bigger hardware
+and don't want to lose your programs.
+
+The first step is to create a database backup as demonstrated in an earlier
+section.
+
+Next, you will extract only the data that is relevant to the programs:
+<tscreen><verb>
+$ grep "INSERT INTO record "         mythtv_backup.sql > restore.sql
+$ grep "INSERT INTO recorded "       mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO oldrecorded "    mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
+</verb></tscreen>
+
+Note the space after the table name and the ">>" to append to the file for
+all but the first grep. "recordedmarkup" is huge and may be hundreds of
+thousands of lines if you had lots of hours of recordings.
+
+After you have moved the data files to the new hardware, configure MythTV
+using the <bf>mythtv-setup</bf> program as you normally would with a
+standard MythTV installation.
+
+At this point we will restore the information about your programs back into
+the database:
+<tscreen><verb>
+$ mysql -u mythtv -pmythtv mythconverg < restore.sql 
+</verb></tscreen>
+
+After successful insertion of the data you may delete the
+<tt>restore.sql</tt> file.
+
 <sect1>btaudio <label id="btaudio">
 <p>btaudio allows you to obtain the audio data from your tuner card directly
 over the PCI bus without using a sound card.  This is useful if you would
@@ -7446,39 +7478,13 @@ For HDTV you do not need to use the Advanced configuration.
 
 </article>
 <!-- Revision History
-
-v0.17.00, 2005-02-09.  Version bump. Update LAME information.  Change case
-on march= line. Spelling error.  DTK's update to setup keys.  Update make -j
-stuff.  Add update to ALSA sound output.  Remove all the stuff about
-compiling ALSA.  Add another source for the Air2PC-ATSC card.  Add a section
-for Firewire "tuner".  Expand on HDTV - Air2PC can now talk QAM.  Rework
-section 6 slightly (Suggestions from Max Waterman).  Add a little extra hint
-in LVM section about boot-time messages.  (Wendy Seltzer).  Add caveat about
-IP addresses on general setup page. (James Casbon).  Update "mythtv is
-crashing my system".  Add + key for audio streams.
-v0.17.01, 2005-02-27.  Add upgrade instructions at the top.  Add section on
-running commercial flagging on host other than it was recorded on.  Add
-stuff to HDTV QAM section.  Add note for march=k8 needing gcc 3.4.  Update
-link to snapstream's store.  Update description on Pentium-M.
-v0.17.02, 2005-03-17.  mythic.tv now sells the HD-3000 as well.  Don't press
-CTRL-C too quickly during azap channel scan.  Update mythbackend -h.  Add reset
-theme to MythWeb.
-v0.17.03, 2005-03-27.  Add Plextor ConvertX to supported hardware.  Add in some
-wording on hardware - don't try to turn a crappy system into something
-wonderful; just won't happen.  "run fstab -a to remount" - what the hell was
-I thinking?  Add a comment to the processor flags section that CVS uses
-something different / better.
-v0.17.04, 2005-03-27.  Add xorg.conf.  Add more stuff for screen blanking - who
-knew that it was so hard to turn off DPMS?!?  Comment out all the stuff that
-talks about setting up cron for mythfilldatabase; using the internal method
-is better. Updated urpmi website for Mandrake.  Add note that DirecTV PPV
-script no longer works, and section will be removed in 0.19.
-
-v0.18.00, 2005-04-  Add note that Mandrake > 9.1 needs libqt3-mysql.  Add
-note that you don't need to explicitly disable DPMS.  ./setup is now
-mythtv-setup.  Add DishTV PPV link.  Get rid of references to settings.pro
-since everything is now done in the configure script.  Update debugging to
-reflect new configure script.  Update XMLTV version.
+v0.18.00, 2005-04-10.  Version bump. Add note that Mandrake > 9.1 needs
+libqt3-mysql.  Add note that you don't need to explicitly disable DPMS. 
+./setup is now mythtv-setup.  Add DishTV PPV link.  Get rid of references to
+settings.pro since everything is now done in the configure script.  Update
+debugging to reflect new configure script.  Update XMLTV version.  bjm's
+selective restore of program information/migration section added.
+(2004-09-01!)
 
 -->
 

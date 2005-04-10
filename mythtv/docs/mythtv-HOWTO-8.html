@@ -379,7 +379,7 @@ interact directly with </P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythtv-0.17/configfiles
+$ cd ~/mythtv-0.18/configfiles
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -405,8 +405,7 @@ to troubleshoot further by going back to the lirc home page and investigating
 from there.</P>
 <P>If it is working, then press <B>CTRL-C</B> to abort the program.  Once you
 know that your remote is working, you can either recompile MythTV with
-native lirc support (edit the <CODE>settings.pro</CODE> file and remove the "#"
-from the lirc option, then make <CODE>distclean</CODE> and <CODE>make</CODE>) or you
+native lirc support by enabling it in <B>configure</B> or you
 need to run the <B>irxevent</B> program, which takes the key presses and
 sends them to MythTV.  If you use native lirc support, you don't need to run
 <B>irxevent</B>.  If you are going to use irxevent, then you need to run

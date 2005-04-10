@@ -87,21 +87,15 @@ an actual programming fault within gcc.</P>
 discovered a genuine code-bug,  or if the problem is with your system.  In
 order to determine what's going on, you must recompile MythTV with debugging
 support and run MythTV within <B>gdb</B>, the GNU debugger.</P>
-<P>Edit the settings.pro file.  Make sure that the top of the file looks like this:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cat settings.pro
-CONFIG += debug
-#CONFIG += release
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>Re-run the <B>configure</B> script and add <CODE>--compile-type=debug</CODE>
+to any previous configuration options you may have used.  Check the
+<CODE>config.log</CODE> file if you have forgotten.</P>
 <P>Now, you need to clear out the old versions of the software to ensure that
 you're running with the debugging code, then compile and install.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ make clean distclean
-$ ./configure
+$ make distclean
+$ ./configure --compile-type=debug
 $ make
 $ su
 # make install
@@ -114,7 +108,7 @@ the problem you're having is in the <CODE>setup</CODE> program.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd setup
-$ gdb ./setup
+$ gdb ./mythtv-setup
 
 GNU gdb 5.3-1mdk (Mandrake Linux)
 Copyright 2002 Free Software Foundation, Inc.
@@ -157,20 +151,9 @@ instructions.</P>
 
 <H3>Illegal Instruction</H3>
 
-<P>This error can happen for the following reasons:
-<UL>
-<LI>You have an AMD K6-2 or VIA C3 processor.  If you have either of
-these, make sure that you you followed the instructions in this 
-<A HREF="mythtv-HOWTO-5.html#cpuspecificoptimizations">section</A>.</LI>
-<LI>You have an early production Intel Celeron, Pentium Pro or Pentium II.  If you have any
-of these processors, make sure that your 
-<A HREF="mythtv-HOWTO-10.html#deinterlace_">deinterlace</A>
-variable is set correctly.  Your CPU needs to support SSE instructions for
-deinterlace support.  You may check this by doing a <CODE>$ cat
-/proc/cpuinfo</CODE> and looking for "sse" in the processor flags section.</LI>
-</UL>
-</P>
-
+<P>This error used to occur when users compiled MythTV with incorrect CPU
+options.  This should no longer occur with the new <B>configure</B>
+script.</P>
 <H3>MythTV is crashing your system</H3>
 
 <P>When run as a non-privileged user, MythTV <EM>can not</EM> crash your
@@ -231,7 +214,9 @@ Profiles and adjust the <B>Default</B> and <B>Live TV</B> options to
 <P>This is due to DPMS, the Display Power Management System, which is used
 to save power by turning off your monitor when the system decides that it's
 not being used or due to a screensaver that has defaulted to a blank screen. 
-Since it's likely that watching TV will not generate keyboard or mouse
+MythTV now has DPMS support built-in, and should intelligently handle the
+screen.  Continue reading if you wish to override DPMS and force it off.</P>
+<P>Since it's likely that watching TV will not generate keyboard or mouse
 events for a time, you need to turn off DPMS and the screensaver.  There are
 a few ways to do this.  You may also need to check your BIOS for power
 saving modes and disable screen blanking there as well.</P>
@@ -243,12 +228,16 @@ Section "ServerFlags"
     #DontZap # disable &lt;Crtl>&lt;Alt>&lt;BS> (server abort)
     #DontZoom # disable &lt;Crtl>&lt;Alt>&lt;KP_+>/&lt;KP_-> (resolution switching)
     AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+
+    Option "blank time" "0"
+    Option "standby time" "0"
+    Option "suspend time" "0"
+    Option "off time" "0"
+    Option "NoPM" "1"
 EndSection
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Add <CODE>Option "NoPM" "true"</CODE> and <CODE>Option "BlankTime" "0"</CODE> to the
-ServerFlags section.</P>
 <P>Also, look for:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -310,18 +299,6 @@ You may also combine the command to turn off DPMS and the screensaver:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ xset -dpms s off
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>There's also:
-<BLOCKQUOTE><CODE>
-<PRE>
-Section "ServerFlags"
-       Option "blank time" "0"
-       Option "standby time" "0"
-       Option "suspend time" "0"
-       Option "off time" "0"
-EndSection 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -445,23 +422,12 @@ volume of 100% is recommended for testing, distortion may occur. Lowering
 this level to 75% to 85% may result in better audio quality.</P>
 <P>Master mixer - sets the level for the analog signal sent to line-out or the
 speakers.</P>
-<P>You may also want to ensure that <CODE>/dev/dsp</CODE> , or whatever device
-file is being used, hasn't already been grabbed by another process, like
+<P>You may also want to ensure that <CODE>/dev/dsp</CODE> , or whatever device file
+is being used, hasn't already been grabbed by another process, like
 <B>esd</B> or <B>artsd</B>.  If the device file isn't available, then
-MythTV won't work.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: MythTV now has support for using
-<B>artsd</B>.  This is a compile-time option, so you will need to edit the
-<CODE>settings.pro</CODE> file in the mythtv directory then perform a <CODE>make
-distclean; make</CODE>, and re-run <CODE>make install</CODE> as root to add this
-support.  Otherwise, check your window manager documentation for
-instructions on disabling the sound manager.</CAPTION>
-</FIGURE>
-
-If you wish to see what application is grabbing a resource, you can use the
+MythTV won't work.  You may wish to run <B>configure</B> and enable
+support for these.</P>
+<P>If you wish to see what application is grabbing a resource, you can use the
 <CODE>fuser</CODE> command:
 <BLOCKQUOTE><CODE>
 <PRE>

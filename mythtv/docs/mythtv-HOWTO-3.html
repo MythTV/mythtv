@@ -210,11 +210,9 @@ encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project 
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge PVR-250, PVR-350,
 Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. Release 0.17 of MythTV
-is able to use these MPEG-2 encoders as an input device for live TV and for
-scheduled recordings.  (The PVR-350 can simultaneously be used as an output
-device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
-requirements for encoding.</P>
+use dedicated hardware encoders rather than your CPU. (The PVR-350 can
+simultaneously be used as an output device.) Using the on-board MPEG-2
+encoder drastically reduces the CPU requirements for encoding.</P>
 <P><B>NOTE</B>:  Motherboards with the Via chipset are notoriously bad with
 DMA and have caused numerous issues with ivtv, including hard locks.  See
 the ivtv website (url url="http://ivtv.sf.net" name="http://ivtv.sf.net")
@@ -722,8 +720,9 @@ Qt") and libqt3 ("Libraries").</P>
 <FIGURE>
 <EPS FILE="warning.eps">
 <IMG SRC="warning.png">
-<CAPTION>NOTE for Mandrake 9.1 users:  Mandrake 9.1 has removed the MySQL modules
-from the default installation.  Ensure that you install libqt3-mysql.</CAPTION>
+<CAPTION>NOTE for Mandrake users:  In versions after Mandrake 9.1, Mandrake
+removed the MySQL modules from the default installation.  Ensure that you
+install libqt3-mysql.</CAPTION>
 </FIGURE>
 </P>
 <P>Make sure that cdialog is installed if you want to use MythTV with a remote
@@ -770,7 +769,7 @@ $ su
 <P>
 <HR>
 <PRE>
-NOTE for Mandrake 9.1 users: execute the following command.
+NOTE for Mandrake 9.1+ users: execute the following command.
 
 # urpmi libqt3-mysql
 </PRE>
