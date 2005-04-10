@@ -160,6 +160,50 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
     return widget;
 }
 
+QWidget* GridConfigurationGroup::configWidget(ConfigurationGroup *cg, 
+                                              QWidget* parent, 
+                                              const char* widgetName)
+{
+    QGroupBox* widget = new QGroupBox(parent, widgetName);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+
+    if (!useframe)
+        widget->setFrameShape(QFrame::NoFrame);
+
+    QGridLayout *layout = NULL;
+
+    float wmult = 0, hmult = 0;
+
+    gContext->GetScreenSettings(wmult, hmult);
+
+    int rows = (children.size()+columns-1) / columns;
+    if (uselabel)
+    {
+        layout = new QGridLayout(widget, rows, columns, (int)(28 * hmult));
+        // This makes weird and bad things happen in qt -mdz 2002/12/28
+        //widget->setInsideMargin(20);
+        widget->setTitle(getLabel());
+    }
+    else
+        layout = new QGridLayout(widget, rows, columns, (int)(10 * hmult));
+
+    for (unsigned i = 0 ; i < children.size() ; ++i)
+        if (children[i]->isVisible())
+        {
+            QWidget *child = children[i]->configWidget(cg, widget, NULL);
+            layout->addWidget(child, i / columns, i % columns);
+            children[i]->setEnabled(children[i]->isEnabled());
+        }
+
+    if (cg)
+    {
+        connect(this, SIGNAL(changeHelpText(QString)), cg,
+                SIGNAL(changeHelpText(QString)));
+    }
+
+    return widget;
+}
+
 QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg, 
                                                  QWidget* parent,
                                                  const char* widgetName) 

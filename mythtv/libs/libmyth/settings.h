@@ -149,6 +149,17 @@ class HorizontalConfigurationGroup: virtual public ConfigurationGroup {
                                   const char* widgetName = 0);
 };
 
+class GridConfigurationGroup: virtual public ConfigurationGroup {
+ public:
+    GridConfigurationGroup(uint col, bool uselabel = true, bool useframe = true)
+                : ConfigurationGroup(uselabel, useframe), columns(col) { }
+
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                  const char* widgetName = 0);
+ private:
+    uint columns;
+};
+
 class StackedConfigurationGroup: virtual public ConfigurationGroup {
     Q_OBJECT
 public:

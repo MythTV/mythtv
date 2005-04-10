@@ -1369,32 +1369,26 @@ class VideoModeSettings: public VerticalConfigurationGroup,
         connect(res, SIGNAL(valueChanged(const QString&)),
                 rate, SLOT(ChangeResolution(const QString&)));
 
-        ConfigurationGroup* overridesbox =
-            new HorizontalConfigurationGroup(true, true);
-        overridesbox->setLabel("Overrides for specific video sizes");
+        ConfigurationGroup* overrides =
+            new GridConfigurationGroup(5, true, true);
+        overrides->setLabel("Overrides for specific video sizes");
             
-        ConfigurationGroup* overrides[5];
-        for (int i=0; i<5; i++)
-            overrides[i] = new VerticalConfigurationGroup(false, false);
         for (int idx = 0; idx < 3; ++idx)
         {
             //input side
-            overrides[0]->addChild(VidModeWidth(idx));
-            overrides[1]->addChild(VidModeHeight(idx));
+            overrides->addChild(VidModeWidth(idx));
+            overrides->addChild(VidModeHeight(idx));
             // output side
-            overrides[2]->addChild(res = TVVidModeResolution(idx));
-            overrides[3]->addChild(rate = TVVidModeRefreshRate(idx));
-            overrides[4]->addChild(TVVidModeForceAspect(idx));
+            overrides->addChild(res = TVVidModeResolution(idx));
+            overrides->addChild(rate = TVVidModeRefreshRate(idx));
+            overrides->addChild(TVVidModeForceAspect(idx));
             connect(res, SIGNAL(valueChanged(const QString&)),
                     rate, SLOT(ChangeResolution(const QString&)));
-
         }
-        for (int i=0; i<5; i++)
-            overridesbox->addChild(overrides[i]);
 
         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
         settings->addChild(defaultsettings);
-        settings->addChild(overridesbox);
+        settings->addChild(overrides);
 
         addTarget("1", settings);
         addTarget("0", new VerticalConfigurationGroup(true));
