@@ -95,9 +95,9 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
         int space = -1;
         int margin = (int)(28 * hmult);
         if (zeroSpace)
-            space = 1;
+            space = 4;
         if (zeroMargin)
-            margin = 1;
+            margin = 4;
 
         layout = new QVBoxLayout(widget, margin, space);
         // This makes weird and bad things happen in qt -mdz 2002/12/28
@@ -109,9 +109,9 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
         int space = -1;
         int margin = (int)(10 * hmult);
         if (zeroSpace)
-            space = 1;
+            space = 4;
         if (zeroMargin)
-            margin = 1;
+            margin = 4;
         layout = new QVBoxLayout(widget, margin, space);
     }
 
@@ -153,9 +153,9 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
         int space = -1;
         int margin = (int)(28 * hmult);
         if (zeroSpace)
-            space = 1;
+            space = 4;
         if (zeroMargin)
-            margin = 1;
+            margin = 4;
 
         layout = new QHBoxLayout(widget, margin, space);
         // This makes weird and bad things happen in qt -mdz 2002/12/28
@@ -167,9 +167,9 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
         int space = -1;
         int margin = (int)(10 * hmult);
         if (zeroSpace)
-            space = 1;
+            space = 4;
         if (zeroMargin)
-            margin = 1;
+            margin = 4;
 
         layout = new QHBoxLayout(widget, margin, space);
     }
@@ -213,9 +213,9 @@ QWidget* GridConfigurationGroup::configWidget(ConfigurationGroup *cg,
         int space = -1;
         int margin = (int)(28 * hmult);
         if (zeroSpace)
-            space = 1;
+            space = 4;
         if (zeroMargin)
-            margin = 1;
+            margin = 4;
 
         layout = new QGridLayout(widget, rows, columns, margin, space);
         // This makes weird and bad things happen in qt -mdz 2002/12/28
@@ -227,9 +227,9 @@ QWidget* GridConfigurationGroup::configWidget(ConfigurationGroup *cg,
         int space = -1;
         int margin = (int)(10 * hmult);
         if (zeroSpace)
-            space = 1;
+            space = 4;
         if (zeroMargin)
-            margin = 1;
+            margin = 4;
 
         layout = new QGridLayout(widget, rows, columns, margin, space);
     }
