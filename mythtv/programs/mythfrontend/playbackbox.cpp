@@ -3387,7 +3387,7 @@ void PlaybackBox::showRecGroupChooser(void)
 
     QGridLayout *grid = new QGridLayout(1, 2, (int)(10 * wmult));
 
-    label = new QLabel("Group", choosePopup);
+    label = new QLabel(tr("Group"), choosePopup);
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
     label->setBackgroundOrigin(ParentOrigin);
     label->setPaletteForegroundColor(popupForeground);
@@ -3448,7 +3448,7 @@ void PlaybackBox::chooseSetViewGroup(void)
     {
 
         bool ok = false;
-        QString text = "Password:";
+        QString text = tr("Password:");
 
         MythPasswordDialog *pwd = new MythPasswordDialog(text, &ok,
                                                      recGroupPassword,

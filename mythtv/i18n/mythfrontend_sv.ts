@@ -834,6 +834,14 @@
         <source>Save it so I can watch it again</source>
         <translation>Spara så att jag kan se den igen</translation>
     </message>
+    <message>
+        <source>Group</source>
+        <translation>Grupp</translation>
+    </message>
+    <message>
+        <source>Password:</source>
+        <translation>Lösenord:</translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -5839,7 +5847,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>In X</source>
-        <translation>In X</translation>
+        <translation>X in</translation>
     </message>
     <message>
         <source>Horizontal resolution of video which needs a special output resolution.</source>
@@ -5847,7 +5855,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>In Y</source>
-        <translation>In Y</translation>
+        <translation>Y in</translation>
     </message>
     <message>
         <source>Vertical resolution of video which needs a special output resolution.</source>
