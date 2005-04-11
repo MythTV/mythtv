@@ -295,7 +295,11 @@ int cropMMX(VideoFilter *f, VideoFrame *frame)
   return 0;
 }
 #else // i386
-int cropMMX(VideoFilter *f, VideoFrame *frame) { (void)f; (void)frame; }
+int cropMMX(VideoFilter *f, VideoFrame *frame)
+{ 
+  fprintf(stderr,"cropMMX: attempt to use MMX version of crop on non-mmx system\n");
+  return crop(f, frame);
+}
 #endif
 
 VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
