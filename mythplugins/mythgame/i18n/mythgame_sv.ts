@@ -5,6 +5,10 @@
         <source>All Games</source>
         <translation>Alla spel</translation>
     </message>
+    <message>
+        <source>Favourites</source>
+        <translation>Favoriter</translation>
+    </message>
 </context>
 <context>
     <name>NesSettingsDlg</name>
@@ -623,14 +627,6 @@
         <translation>ljud sida 2</translation>
     </message>
     <message>
-        <source>Show Only Favorites</source>
-        <translation>Visa endast favoriter</translation>
-    </message>
-    <message>
-        <source>Limit games listed to only those tagged as &quot;favorite&quot;</source>
-        <translation>Begränsa listade spel till de märkta som &quot;favoriter&quot;</translation>
-    </message>
-    <message>
         <source>The path to the MAME history.dat file.</source>
         <translation>Sökvägen till MAME-filen history.dat.</translation>
     </message>
@@ -835,6 +831,14 @@ Ange korrekt sökväg och försök igen.</translation>
     <message>
         <source>Set volume to x db, (-32 (soft) - 0 (loud) )</source>
         <translation>Sätt volym till x dB, (-32 (låg) - 0 (hög) )</translation>
+    </message>
+    <message>
+        <source>Favourite display order</source>
+        <translation>Sorteringsordning för favoriter</translation>
+    </message>
+    <message>
+        <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
+        <translation>Sorteringsordning för spel markerade som favoriter - detta gäller alla system. Tillgängliga val: system, år, genre och spelnamn</translation>
     </message>
 </context>
 <context>

@@ -97,14 +97,6 @@ Ett tryck på Mellanslag/Enter på en markerad post tar bort den från listvisar
         <translation>Spara länk i bokmärken</translation>
     </message>
     <message>
-        <source>       zoom Out       </source>
-        <translation>       Zooma ut       </translation>
-    </message>
-    <message>
-        <source>       zoom In        </source>
-        <translation>       Zooma in       </translation>
-    </message>
-    <message>
         <source>Enter URL</source>
         <translation>Skriv in adress</translation>
     </message>
@@ -115,6 +107,18 @@ Ett tryck på Mellanslag/Enter på en markerad post tar bort den från listvisar
     <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>      Remove Tab      </source>
+        <translation>     Ta bort tabb     </translation>
+    </message>
+    <message>
+        <source>       Zoom Out       </source>
+        <translation>       Zooma ut       </translation>
+    </message>
+    <message>
+        <source>       Zoom In        </source>
+        <translation>       Zooma in       </translation>
     </message>
 </context>
 </TS>
