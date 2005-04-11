@@ -37,6 +37,7 @@
    <button>
      <type>SETTINGS_MOVIETIME</type>
      <text>Movie Time Settings</text>
+     <text lang="FI">Elokuvien Aika-asetukset</text>
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>

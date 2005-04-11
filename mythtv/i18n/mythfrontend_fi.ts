@@ -227,7 +227,46 @@
     </message>
     <message>
         <source>Only shows marked as HDTV</source>
+        <translation>Vain HDTV- ohjelmat</translation>
+    </message>
+    <message>
+        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movie of the Week (complete example - use FindWeekly)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVBTransportsEditor</name>
+    <message>
+        <source>DVB Transport Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to delete this transport?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete the transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="unfinished">Muokkaa..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="unfinished">Poista..</translation>
     </message>
 </context>
 <context>
@@ -348,7 +387,7 @@
     </message>
     <message>
         <source>Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>Peruutettu</translation>
     </message>
 </context>
 <context>
@@ -785,15 +824,15 @@
     </message>
     <message>
         <source>Delete it, but allow it to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista, mutta salli uudelleennauhoitukset</translation>
     </message>
     <message>
         <source>Delete it</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista</translation>
     </message>
     <message>
         <source>Save it so I can watch it again</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallenna uutta katselukertaa varten</translation>
     </message>
 </context>
 <context>
@@ -1332,7 +1371,7 @@
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
-        <translation>Merkkaa Mainokset Automaattisesti</translation>
+        <translation type="obsolete">Merkkaa Mainokset Automaattisesti</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -4023,55 +4062,55 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Horizontal resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Horisontaalinen resoluutio GUI:lle. Oltava määriteltynä XF86Config:ssa.</translation>
+        <translation type="obsolete">Horisontaalinen resoluutio GUI:lle. Oltava määriteltynä XF86Config:ssa.</translation>
     </message>
     <message>
         <source>Vertical resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Vertikaalinen resoluutio GUI:lle. Oltava määriteltynä XF86Config:ssa.</translation>
+        <translation type="obsolete">Vertikaalinen resoluutio GUI:lle. Oltava määriteltynä XF86Config:ssa.</translation>
     </message>
     <message>
         <source>X</source>
-        <translation>X</translation>
+        <translation type="obsolete">X</translation>
     </message>
     <message>
         <source>Horizontal resolution of video mode which needs a special output resolution.</source>
-        <translation>Horisontaalinen resoluutio asetuksille jotka vaativat erikoisen ulostuloresoluution.</translation>
+        <translation type="obsolete">Horisontaalinen resoluutio asetuksille jotka vaativat erikoisen ulostuloresoluution.</translation>
     </message>
     <message>
         <source>Y</source>
-        <translation>Y</translation>
+        <translation type="obsolete">Y</translation>
     </message>
     <message>
         <source>Vertical resolution of video mode which needs a special output resolution.</source>
-        <translation>Vertikaalinen resoluutio asetuksille jotka vaativat erikoisen ulostuloresoluution.</translation>
+        <translation type="obsolete">Vertikaalinen resoluutio asetuksille jotka vaativat erikoisen ulostuloresoluution.</translation>
     </message>
     <message>
         <source>Horizontal resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Horisontaalinen resoluutio nauhoitusten katsomiselle. Oltava määriteltynä XF86Config:ssa.</translation>
+        <translation type="obsolete">Horisontaalinen resoluutio nauhoitusten katsomiselle. Oltava määriteltynä XF86Config:ssa.</translation>
     </message>
     <message>
         <source>Vertical resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Vertikaalinen resoluutio nauhoitusten katsomiselle. Oltava määriteltynä XF86Config:ssa.</translation>
+        <translation type="obsolete">Vertikaalinen resoluutio nauhoitusten katsomiselle. Oltava määriteltynä XF86Config:ssa.</translation>
     </message>
     <message>
         <source>Alt Aspect</source>
-        <translation>Toinen Suhdeluku</translation>
+        <translation type="obsolete">Toinen Suhdeluku</translation>
     </message>
     <message>
         <source>If X&apos;s DisplaySize indicates 16:9, fudge vertical size into 4:3, and visa-versa</source>
-        <translation>Jos X:n ruudunkoko ilmoittaa 16:9, muuta se 4:3 ja päinvastoin</translation>
+        <translation type="obsolete">Jos X:n ruudunkoko ilmoittaa 16:9, muuta se 4:3 ja päinvastoin</translation>
     </message>
     <message>
         <source>GUI Size (px)</source>
-        <translation>GUI koko (pikseliä)</translation>
+        <translation type="obsolete">GUI koko (pikseliä)</translation>
     </message>
     <message>
         <source>Default Display (px)</source>
-        <translation>Oletus Näyttö (pikseliä)</translation>
+        <translation type="obsolete">Oletus Näyttö (pikseliä)</translation>
     </message>
     <message>
         <source>Physical Size</source>
-        <translation>Fyysinen Koko</translation>
+        <translation type="obsolete">Fyysinen Koko</translation>
     </message>
     <message>
         <source>Toggles between windowed and borderless operation.</source>
@@ -4887,11 +4926,11 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Machine Status shows some operating system statistics of this machine</source>
-        <translation type="unfinished"></translation>
+        <translation>Näyttää joitakin käyttöjärjestelmän tilastoja tälle koneelle</translation>
     </message>
     <message>
         <source>and the MythTV server</source>
-        <translation type="unfinished"></translation>
+        <translation>ja Mythtv- palvelimelle</translation>
     </message>
     <message>
         <source>used</source>
@@ -5119,7 +5158,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>This button will scan for digital channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsii ja virittää digitaalisia kanavia.</translation>
     </message>
     <message>
         <source>Advanced</source>
@@ -5127,7 +5166,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Advanced editing options for digital channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Edistyneet digitaalisten kanavien valinnat</translation>
     </message>
     <message>
         <source>Use on air guide</source>
@@ -5135,7 +5174,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>If set the guide information will be taken from the On Air Channel guide.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valittuna ohjelmatiedot haetaan ohjelmavirrasta.</translation>
     </message>
     <message>
         <source>Unable to initialize video.</source>
@@ -5322,10 +5361,6 @@ Myth will now exit.</translation>
         <translation>Kaikki</translation>
     </message>
     <message>
-        <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Use libmpeg2 for decoding</source>
         <translation>Käytä libmpeg2 lähetyksen purkuun</translation>
     </message>
@@ -5375,7 +5410,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Selects how to sort a shows episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuinka ohjelmien jaksot järjestetään</translation>
     </message>
     <message>
         <source>S</source>
@@ -5539,7 +5574,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Only MPEG2TS is supported at this time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vain MPEG2TS on tällä hetkellä tuettu.</translation>
     </message>
     <message>
         <source>FireWire Input</source>
@@ -5665,35 +5700,35 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei nauhoitusta, missään nimessä</translation>
     </message>
     <message>
         <source>Firewire Connection Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire:n liitäntätyyppi</translation>
     </message>
     <message>
         <source>Point to Point</source>
-        <translation type="unfinished"></translation>
+        <translation>P2P</translation>
     </message>
     <message>
         <source>Broadcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Lähetys</translation>
     </message>
     <message>
         <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation>USB Mpeg-4 Pakkaus (Plextor ConvertX, jne)</translation>
     </message>
     <message>
         <source>Original Air date</source>
-        <translation type="unfinished"></translation>
+        <translation>Alkuperäinen lähetysaika</translation>
     </message>
     <message>
         <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Aja vain tietyllä näytöllä käytettäessä Xineramaa. Arvo -1 merkitsee kaikkia näyttöjä.</translation>
     </message>
     <message>
         <source>TV audio through PVR-350 only</source>
-        <translation type="unfinished"></translation>
+        <translation>TV:n äänen ulostulo PVR-350:n kautta</translation>
     </message>
     <message>
         <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
@@ -5701,47 +5736,47 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Building Detection Buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>Rakennetaan Puskuria Havainnoimiseen</translation>
     </message>
     <message>
         <source>%1 Frames Completed @ %2 fps.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Ruutua Valmiina @ %2 fps.</translation>
     </message>
     <message>
         <source>Terrestrial</source>
-        <translation type="unfinished"></translation>
+        <translation>Maanpäällinen</translation>
     </message>
     <message>
         <source>Cable</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaapeli</translation>
     </message>
     <message>
         <source>ATSC Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC Lähetys</translation>
     </message>
     <message>
         <source>ATSC transport, cable or terrestrial</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC joko kaapelina tai maanpäällisenä lähetyksenä</translation>
     </message>
     <message>
         <source>Use hardware MPEG decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä laitteiston MPEG purkua</translation>
     </message>
     <message>
         <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos DVB-kortti tukee MPEG-purkua, tämä voidaan asettaa päälle. (Käytetään vain ns. full-feature korttien &amp; joidenkin USB-väyläisten korttien kanssa).</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiiren Kursori Piiloon</translation>
     </message>
     <message>
         <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valinta piilottaa hiiren kursorin Mythtv:n käyttöliittymässä.</translation>
     </message>
     <message>
         <source>Job Queue Start Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Työjonon Aloitusaika</translation>
     </message>
     <message>
         <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
@@ -5749,7 +5784,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Job Queue End Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Työjonon Lopetusaika</translation>
     </message>
     <message>
         <source>This setting controls the end of the Job Queue time window which determines when new jobs will be started.</source>
@@ -5757,7 +5792,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajetaan Jälkikäsittelytyöt ennen Automaattista Mainosten Merkkausta</translation>
     </message>
     <message>
         <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
@@ -5765,7 +5800,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
-        <translation type="unfinished"></translation>
+        <translation>Aloitetaan Automaattiset Mainosten Merkkaukset nauhoituksen aikana</translation>
     </message>
     <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
@@ -5773,6 +5808,191 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Job Queue (Job Commands)</source>
+        <translation>Työjono (Töiden Komennot)</translation>
+    </message>
+    <message>
+        <source>Bad Menu File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Menu File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed out waiting for signal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital TV standard.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation Used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8VSB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM64</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM256</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skipping Back.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Auto Commercial Flagging setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #1&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #1&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #2&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #2&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #3&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #3&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #4&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run on the specified screen or spanning all screens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution of video which needs a special output resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution of video which needs a special output resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resolution of screen when not watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default screen resolution when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen resolution when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default refresh rate when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh rate when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ration when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5872,6 +6092,18 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     <message>
         <source>Status: </source>
         <translation>Tila: </translation>
+    </message>
+    <message>
+        <source>On %1 %2 from %3.%4
+%5
+%6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2 from %3.%4
+%5
+No other details</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

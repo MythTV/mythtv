@@ -18,6 +18,7 @@
     <button>
      <type>MOVIETIMES</type>
      <text>Movie Times</text>
+     <text lang="FI">Elokuvien Ajat</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>

@@ -239,6 +239,37 @@
     </message>
 </context>
 <context>
+    <name>DVBTransportsEditor</name>
+    <message>
+        <source>DVB Transport Editor</source>
+        <translation>Ändra DVB-transport</translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to delete this transport?</source>
+        <translation>Är du säker på att du vill ta bort denna transport?</translation>
+    </message>
+    <message>
+        <source>Yes, delete the transport</source>
+        <translation>Ja, ta bort transporten</translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation>Nej, låt bli</translation>
+    </message>
+    <message>
+        <source>Transport Menu</source>
+        <translation>Transportmeny</translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation>Ändra..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation>Ta bort..</translation>
+    </message>
+</context>
+<context>
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
@@ -4002,58 +4033,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Växla X Window videolägen för TV. Kräver &quot;xrandr&quot;-stöd.</translation>
     </message>
     <message>
-        <source>Horizontal resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Horisontell upplösning för GUI-videoläge. Detta läge måste vara definierat i din X-konfigurationsfil.</translation>
-    </message>
-    <message>
-        <source>Vertical resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Vertikal upplösning för GUI-videoläge. Detta läge måste vara definierat i din X-konfigurationsfil.</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution of video mode which needs a special output resolution.</source>
-        <translation>Horisontell upplösning för videoläge som kräver en speciell utgångsupplösning.</translation>
-    </message>
-    <message>
-        <source>Y</source>
-        <translation>Y</translation>
-    </message>
-    <message>
-        <source>Vertical resolution of video mode which needs a special output resolution.</source>
-        <translation>Vertikal upplösning för videoläge som kräver en speciell utgångsupplösning.</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Horisontell upplösning för uppspelningsvideoläge. Detta läge måste vara definierat i din X-konfigurationsfil.</translation>
-    </message>
-    <message>
-        <source>Vertical resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Vertikal upplösning för uppspelningsvideoläge. Detta läge måste vara definierat i din X-konfigurationsfil.</translation>
-    </message>
-    <message>
-        <source>Alt Aspect</source>
-        <translation>Alt aspekt</translation>
-    </message>
-    <message>
-        <source>If X&apos;s DisplaySize indicates 16:9, fudge vertical size into 4:3, and visa-versa</source>
-        <translation>Om X&apos;s Skärmstorlek anger 16:9, fuska till vertikal storlek till 4:3, och vice versa</translation>
-    </message>
-    <message>
-        <source>GUI Size (px)</source>
-        <translation>GUI-storlek (px)</translation>
-    </message>
-    <message>
-        <source>Default Display (px)</source>
-        <translation>Förvald skärm (px)</translation>
-    </message>
-    <message>
-        <source>Physical Size</source>
-        <translation>Fysisk storlek</translation>
-    </message>
-    <message>
         <source>Toggles between windowed and borderless operation.</source>
         <translation>Växlar mellan fönsterläge och kantlöst läge.</translation>
     </message>
@@ -4151,7 +4130,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>This enables the periodic cleanup of the events stored in the Myth database (see &quot;Log MythTV events to database&quot; on the previous page).</source>
-        <translation>Detta aktiverar periodisk rensning av händelser sparade i databasen (se &quot;Logga MythTV-händelser till databas&quot; på föregående sida).</translation>
+        <translation>Detta aktiverar periodisk rensning av händelser sparade i databasen (se &quot;Logga MythTV-händelser till databas&quot; ovan).</translation>
     </message>
     <message>
         <source>The number of days between log cleanup runs.</source>
@@ -5657,10 +5636,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Ursprungligt visningsdatum</translation>
     </message>
     <message>
-        <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
-        <translation>Om Xinerama används, använd endast specifierad skärm. Värdet -1 betyder använd alla skärmar.</translation>
-    </message>
-    <message>
         <source>TV audio through PVR-350 only</source>
         <translation>TV-ljud endast genom PVR-350</translation>
     </message>
@@ -5788,6 +5763,152 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
         <translation>Detta är det förvalda värdet för inställningen &apos;Kör användarjobb #4&apos; när en ny schemalagd inspelning skapas.</translation>
     </message>
+    <message>
+        <source>Bad Menu File</source>
+        <translation>Ogiltig menyfil</translation>
+    </message>
+    <message>
+        <source>No Menu File</source>
+        <translation>Ingen menyfil</translation>
+    </message>
+    <message>
+        <source>Timed out waiting for signal.</source>
+        <translation>Väntat för länge på signal.</translation>
+    </message>
+    <message>
+        <source>Signal Locked</source>
+        <translation>Signal låst</translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation>Inget lås</translation>
+    </message>
+    <message>
+        <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
+        <translation>Här listas de transporter MythTV känner till. De visade fälten är Frekvens, Symboltakt, Nät-id och Transport-id </translation>
+    </message>
+    <message>
+        <source>Standard</source>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <source>Digital TV standard.
+</source>
+        <translation>Digital-TV-standard.
+</translation>
+    </message>
+    <message>
+        <source>DVB</source>
+        <translation>DVB</translation>
+    </message>
+    <message>
+        <source>ATSC</source>
+        <translation>ATSC</translation>
+    </message>
+    <message>
+        <source>Modulation Used</source>
+        <translation>Modulation</translation>
+    </message>
+    <message>
+        <source>8VSB</source>
+        <translation>8VSB</translation>
+    </message>
+    <message>
+        <source>QAM64</source>
+        <translation>QAM64</translation>
+    </message>
+    <message>
+        <source>QAM256</source>
+        <translation>QAM256</translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)</source>
+        <translation>Bandbredd (Standard: Auto)</translation>
+    </message>
+    <message>
+        <source>DVB Transport</source>
+        <translation>DVB-transport</translation>
+    </message>
+    <message>
+        <source>Transport Options</source>
+        <translation>Transportinställningar</translation>
+    </message>
+    <message>
+        <source>Run on the specified screen or spanning all screens.</source>
+        <translation>Kör på angiven skärm eller täck alla skärmar.</translation>
+    </message>
+    <message>
+        <source>In X</source>
+        <translation>In X</translation>
+    </message>
+    <message>
+        <source>Horizontal resolution of video which needs a special output resolution.</source>
+        <translation>Horisontell upplösning för video som kräver en speciell utgångsupplösning.</translation>
+    </message>
+    <message>
+        <source>In Y</source>
+        <translation>In Y</translation>
+    </message>
+    <message>
+        <source>Vertical resolution of video which needs a special output resolution.</source>
+        <translation>Vertikal upplösning för video som kräver en speciell utgångsupplösning.</translation>
+    </message>
+    <message>
+        <source>GUI</source>
+        <translation>GUI</translation>
+    </message>
+    <message>
+        <source>Resolution of screen when not watching a video.</source>
+        <translation>Skärmupplösning när video inte visas.</translation>
+    </message>
+    <message>
+        <source>Default screen resolution when watching a video.</source>
+        <translation>Förvald skärmupplösning när video visas.</translation>
+    </message>
+    <message>
+        <source>Screen resolution when watching a video at a specific resolution.</source>
+        <translation>Skärmupplösning när video visas med en specifik upplösning.</translation>
+    </message>
+    <message>
+        <source>Video Output</source>
+        <translation>Videoutmatning</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Utmatning</translation>
+    </message>
+    <message>
+        <source>Default refresh rate when watching a video.</source>
+        <translation>Förvald uppdateringsfrekvens när video visas.</translation>
+    </message>
+    <message>
+        <source>Refresh rate when watching a video at a specific resolution.</source>
+        <translation>Uppdateringsfrekvens när video visas med en specifik upplösning.</translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation>Frekvens</translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video.</source>
+        <translation>Bildaspekt när video visas.</translation>
+    </message>
+    <message>
+        <source>Aspect ration when watching a video at a specific resolution.</source>
+        <translation>Bildaspekt när video visas med en specifik upplösning.</translation>
+    </message>
+    <message>
+        <source>Aspect</source>
+        <translation>Aspekt</translation>
+    </message>
+    <message>
+        <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
+        <translation>Använd &quot;Standard&quot; för att använda den kvot som skärmen rapporterar. 16:9 eller 4:3 tvingar fram en specifik kvot.</translation>
+    </message>
+    <message>
+        <source>X</source>
+        <translation type="obsolete">X</translation>
+    </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
@@ -5885,6 +6006,22 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>is not available</source>
         <translation>är inte tillgänglig</translation>
+    </message>
+    <message>
+        <source>On %1 %2 from %3.%4
+%5
+%6</source>
+        <translation>På %1 %2 från %3.%4
+%5
+%6</translation>
+    </message>
+    <message>
+        <source>On %1 %2 from %3.%4
+%5
+No other details</source>
+        <translation>På %1 %2 från %3.%4
+%5
+Inga andra detaljer</translation>
     </message>
 </context>
 <context>
