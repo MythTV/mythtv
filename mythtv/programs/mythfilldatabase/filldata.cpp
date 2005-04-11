@@ -1379,10 +1379,9 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
             }
             else if (info.tagName() == "date" && pginfo->airdate == "")
             {
-                pginfo->airdate = getFirstText(info);
-
-                if (4 != pginfo->airdate.length())
-                    pginfo->airdate = "";
+                // Movie production year
+                QString date = getFirstText(info);
+                pginfo->airdate = date.left(4);
             }
             else if (info.tagName() == "star-rating")
             {
