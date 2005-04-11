@@ -1558,7 +1558,7 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
     return pginfo;
 }
                   
-void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
+bool parseFile(QString filename, QValueList<ChanInfo> *chanlist,
                QMap<QString, QValueList<ProgInfo> > *proglist)
 {
     QDomDocument doc;
@@ -1566,7 +1566,10 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
 
     if (!dash_open(f, filename, IO_ReadOnly))
     {
-        return;
+        cerr << QString("Error unable to open '%1' for reading.")
+                .arg(filename)
+             << endl;
+        return false;
     }
 
     QString errorMsg = "unknown";
@@ -1579,7 +1582,7 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
              << errorMsg << endl;
 
         f.close();
-        return;
+        return true;
     }
 
     f.close();
@@ -1701,7 +1704,7 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
         n = n.nextSibling();
     }
 
-    return;
+    return true;
 }
 
 bool conflict(ProgInfo &a, ProgInfo &b)
@@ -2472,15 +2475,17 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
     }
 }
 
-void grabDataFromFile(int id, QString &filename)
+bool grabDataFromFile(int id, QString &filename)
 {
     QValueList<ChanInfo> chanlist;
     QMap<QString, QValueList<ProgInfo> > proglist;
 
-    parseFile(filename, &chanlist, &proglist);
+    if (!parseFile(filename, &chanlist, &proglist))
+        return false;
 
     handleChannels(id, &chanlist);
     handlePrograms(id, &proglist);
+    return true;
 }
 
 time_t toTime_t(QDateTime &dt)
@@ -3502,7 +3507,9 @@ int main(int argc, char *argv[])
                                                     Qt::ISODate);
         }
 
-        grabDataFromFile(fromfile_id, fromfile_name);
+        if (!grabDataFromFile(fromfile_id, fromfile_name))
+            return -1;
+
         clearOldDBEntries();
 
         query.exec(QString("UPDATE settings SET data ='%1' "
