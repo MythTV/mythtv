@@ -964,6 +964,53 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <source>Select a Title</source>
         <translation>Välj en titel</translation>
     </message>
+    <message>
+        <source>Select a Compilation Artist</source>
+        <translation>Välj en kompileringsartist</translation>
+    </message>
+</context>
+<context>
+    <name>SmartPLDateDialog</name>
+    <message>
+        <source>Edit Date</source>
+        <translation>Ändra datum</translation>
+    </message>
+    <message>
+        <source>Fixed Date</source>
+        <translation>Fixt datum</translation>
+    </message>
+    <message>
+        <source>Day</source>
+        <translation>Dag</translation>
+    </message>
+    <message>
+        <source>Month</source>
+        <translation>Månad</translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation>År</translation>
+    </message>
+    <message>
+        <source>Use Current Date</source>
+        <translation>Använd dagens datum</translation>
+    </message>
+    <message>
+        <source>+/- Days</source>
+        <translation>+/- dagar</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Invalid Date</source>
+        <translation>Ogiltigt datum</translation>
+    </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>

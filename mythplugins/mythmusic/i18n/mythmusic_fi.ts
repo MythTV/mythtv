@@ -111,66 +111,66 @@
     </message>
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Kokoelman Esittäjä:</translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Valmis</translation>
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>TK Tilastoja</translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished">Monia Esittäjiä</translation>
+        <translation>Useita Esittäjiä</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Esittäjä</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Kokoelman Esittäjä</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Albumi</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Laji</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallennetaanko?</translation>
     </message>
     <message>
         <source>Save to Database Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallennus Ainoastaan TK:aan</translation>
     </message>
     <message>
         <source>Save to File Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallennus Ainoastaan Tiedostoon</translation>
     </message>
     <message>
         <source>Save to File and Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallennus sekä TK:aan että Tiedostoon</translation>
     </message>
     <message>
         <source>Exit/Do Not Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei Tallennusta, Poistu</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallennetaanko muutettu informaatio tiedostoon?</translation>
     </message>
 </context>
 <context>
@@ -288,135 +288,135 @@
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="unfinished">Muokkaa Soittolistaa</translation>
+        <translation>Muokkaa Soittolistaa</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="unfinished">Visualisoi</translation>
+        <translation>Visualisoi</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Muokkaa Soittolistaa</translation>
+        <translation>3 Soittolista</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation type="unfinished">4 Visualisoi</translation>
+        <translation>4 Visualisoi</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Satunnaist: Älykäs</translation>
+        <translation>1 Satunnaist: Älykäs</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation type="unfinished">Satunnaist: Älykäs</translation>
+        <translation>Satunnaist: Älykäs</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Satunnaist: Joku</translation>
+        <translation>1 Satunnaist: Joku</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation type="unfinished">Satunnaist: Joku</translation>
+        <translation>Satunnaist: Joku</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Satunnaist: Ei Mitään</translation>
+        <translation>1 Satunnaist: Ei Mitään</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="unfinished">Satunnaist: Ei Mitään</translation>
+        <translation>Satunnaist: Ei Mitään</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Toista: Kaikki</translation>
+        <translation>2 Toista: Kaikki</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="unfinished">Toista: Kaikki</translation>
+        <translation>Toista: Kaikki</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Toista: Kappale</translation>
+        <translation>2 Toista: Kappale</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="unfinished">Toista: Kappale</translation>
+        <translation>Toista: Kappale</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Toista: Ei Mitään</translation>
+        <translation>2 Toista: Ei Mitään</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="unfinished">Toista: Ei Mitään</translation>
+        <translation>Toista: Ei Mitään</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="unfinished">soittolistan juuri</translation>
+        <translation>soittolistan juuri</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="unfinished">Soittaa musiikkivirtaa.</translation>
+        <translation>Soittaa musiikkivirtaa.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="unfinished">Puskuroi musiikkivirtaa.</translation>
+        <translation>Puskuroi musiikkivirtaa.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="unfinished">Musiikkivirta tauotettu.</translation>
+        <translation>Musiikkivirta tauotettu.</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation type="unfinished">kbps</translation>
+        <translation>kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="unfinished">kHz</translation>
+        <translation>kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished">kan</translation>
+        <translation>kan</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="unfinished">Virhe ulostulossa.</translation>
+        <translation>Virhe ulostulossa.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="unfinished">Musiikkivirta lopetettu.</translation>
+        <translation>Musiikkivirta lopetettu.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="unfinished">Musiikkivirta soitettu loppuun.</translation>
+        <translation>Musiikkivirta soitettu loppuun.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="unfinished">Purkuvirhe.</translation>
+        <translation>Purkuvirhe.</translation>
     </message>
     <message>
         <source>Smart playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Älykäs soittolista</translation>
     </message>
     <message>
         <source>All Tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaikki Kappaleet</translation>
     </message>
     <message>
         <source>Tracks by current Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Nykyisen Esittäjän Kappaleet</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Nykyisen Albumin Kappaleet</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Nykyisen Lajin Kappaleet</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämän Vuoden Kappaleet</translation>
     </message>
 </context>
 <context>
@@ -1005,7 +1005,7 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
-        <translation type="unfinished"></translation>
+        <translation>CD: %1 ~ %2 - %3</translation>
     </message>
 </context>
 <context>
@@ -1064,41 +1064,88 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Useita Esittäjiä?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaihda Kappaleita &amp;&amp; Esittäjiä</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Kappale</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Esittäjä</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Pituus</translation>
     </message>
 </context>
 <context>
     <name>SmartPLCriteriaRow</name>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Esittäjä</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Albumi</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Laji</translation>
     </message>
     <message>
         <source>Select a Title</source>
+        <translation>Valitse Kappaleen Nimellä</translation>
+    </message>
+    <message>
+        <source>Select a Compilation Artist</source>
+        <translation type="unfinished">Valitse Kokoelman Esittäjä</translation>
+    </message>
+</context>
+<context>
+    <name>SmartPLDateDialog</name>
+    <message>
+        <source>Edit Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fixed Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished">Vuosi</translation>
+    </message>
+    <message>
+        <source>Use Current Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>+/- Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>Invalid Date</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1106,228 +1153,228 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     <name>SmartPLOrderByDialog</name>
     <message>
         <source>Order By Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestys Sarakkeen Mukaan</translation>
     </message>
     <message>
         <source>1 Add</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Lisää</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää</translation>
     </message>
     <message>
         <source>2 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Poista</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista</translation>
     </message>
     <message>
         <source>3 Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Ylös</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Ylös</translation>
     </message>
     <message>
         <source>4 Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Alas</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Alas</translation>
     </message>
     <message>
         <source>5 Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Nouseva</translation>
     </message>
     <message>
         <source>Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouseva</translation>
     </message>
     <message>
         <source>6 Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>6 Laskeva</translation>
     </message>
     <message>
         <source>Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Laskeva</translation>
     </message>
     <message>
         <source>7 OK</source>
-        <translation type="unfinished"></translation>
+        <translation>7 OK</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Älykkään Soittolistan Tulokset</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistu</translation>
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Esittäjä</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Albumi</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Kappale</translation>
     </message>
     <message>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Laji</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Vuosi</translation>
     </message>
     <message>
         <source>Track No.</source>
-        <translation type="unfinished"></translation>
+        <translation>Raidan n:o.</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Älykäs Soittolista</translation>
     </message>
     <message>
         <source>1 Select</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Valitse</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse</translation>
     </message>
     <message>
         <source>2 New</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Uusi</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Uusi</translation>
     </message>
     <message>
         <source>3 Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Muokkaa</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa</translation>
     </message>
     <message>
         <source>4 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Poista</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaanko tämä Älykäs Soittolista?</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Älykkään Soittolistan Muokkaus</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategoria:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nimike:</translation>
     </message>
     <message>
         <source>Match</source>
-        <translation type="unfinished"></translation>
+        <translation>Sovita</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaikki</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>Mikä Vain</translation>
     </message>
     <message>
         <source>Of The Following Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>Näistä Ehdoista</translation>
     </message>
     <message>
         <source>Order By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestys:</translation>
     </message>
     <message>
         <source>Matches:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tulokset:</translation>
     </message>
     <message>
         <source>Limit:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rajoitus:</translation>
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallenna</translation>
     </message>
     <message>
         <source>Show Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Tulokset</translation>
     </message>
     <message>
         <source>Smart Playlist Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Älykkään Soittolistan Kategoriat</translation>
     </message>
     <message>
         <source>New Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Uusi Kategoria</translation>
     </message>
     <message>
         <source>Delete Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista Kategoria</translation>
     </message>
     <message>
         <source>Rename Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Uudelleennimeä Kategoria</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this Category?</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaanko tämä Kategoria?</translation>
     </message>
     <message>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistaa myös kaikki älykkäät soittolistat, jotka kuuluvat tähän kategoriaan.</translation>
     </message>
 </context>
 <context>
@@ -1338,51 +1385,51 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     </message>
     <message>
         <source>Track Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Kappaleen Tiedot</translation>
     </message>
     <message>
         <source>Artist:</source>
-        <translation type="unfinished"></translation>
+        <translation>Esittäjä:</translation>
     </message>
     <message>
         <source>Album:</source>
-        <translation type="unfinished"></translation>
+        <translation>Albumi:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nimike:</translation>
     </message>
     <message>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Laji:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vuosi:</translation>
     </message>
     <message>
         <source>Track No.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Raidan n:o:</translation>
     </message>
     <message>
         <source>Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Painoarvo:</translation>
     </message>
     <message>
         <source>Play Count:</source>
-        <translation type="unfinished"></translation>
+        <translation>Soiton Laskuarvo:</translation>
     </message>
     <message>
         <source>Last Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>Viimeisin Soittokerta:</translation>
     </message>
     <message>
         <source>Compilation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kokoelma:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiedostonimi:</translation>
     </message>
 </context>
 </TS>
