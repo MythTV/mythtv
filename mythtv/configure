@@ -508,7 +508,7 @@ for opt do
   ;;
   --extra-cxxflags=*) ECXXFLAGS=${opt#--extra-cxxflags=}
   ;;
-  --extra-ldflags=*) LDFLAGS=$LDFLAGS ${opt#--extra-ldflags=}
+  --extra-ldflags=*) LDFLAGS="$LDFLAGS ${opt#--extra-ldflags=}"
   ;;
   --extra-libs=*) extralibs=${opt#--extra-libs=}
   ;;
