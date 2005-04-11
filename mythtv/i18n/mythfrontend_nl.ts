@@ -23,7 +23,7 @@
     </message>
     <message>
         <source>Diseqc</source>
-        <translation type="unfinished"></translation>
+        <translation>Diseqc</translation>
     </message>
 </context>
 <context>
@@ -212,23 +212,62 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Match an exact title</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoek naar exacte titel</translation>
     </message>
     <message>
         <source>Match an exact episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoek naar exacte aflevering</translation>
     </message>
     <message>
         <source>An error was found when checking</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout gevonden bij het controleren van</translation>
     </message>
     <message>
         <source>The database error was</source>
-        <translation type="unfinished"></translation>
+        <translation>De databasefout was</translation>
     </message>
     <message>
         <source>Only shows marked as HDTV</source>
+        <translation>Enkel uitzendingen in HDTV</translation>
+    </message>
+    <message>
+        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
+        <translation>SportsCenter Overnight (volledig voorbeeld - gebruik VindDagelijks)</translation>
+    </message>
+    <message>
+        <source>Movie of the Week (complete example - use FindWeekly)</source>
+        <translation>Film van de Week (volledig voorbeeld - gebruik VindWekelijks)</translation>
+    </message>
+</context>
+<context>
+    <name>DVBTransportsEditor</name>
+    <message>
+        <source>DVB Transport Editor</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to delete this transport?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete the transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished">Nee, niet doen</translation>
+    </message>
+    <message>
+        <source>Transport Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="unfinished">Bewerk..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="unfinished">Verwijder..</translation>
     </message>
 </context>
 <context>
@@ -349,7 +388,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>Geannuleerd</translation>
     </message>
 </context>
 <context>
@@ -407,27 +446,27 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Date or day of the week</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum of dag van de week</translation>
     </message>
     <message>
         <source>minute</source>
-        <translation type="unfinished"></translation>
+        <translation>minuut</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
+        <translation>minuten</translation>
     </message>
     <message>
         <source>Title (optional):</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel (optioneel):</translation>
     </message>
     <message>
         <source>Set Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnameopties instellen</translation>
     </message>
     <message>
         <source>Manual Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Handmatig opnemen</translation>
     </message>
 </context>
 <context>
@@ -502,7 +541,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
-        <translation>Nee, bewaar de opname, ik heb me bedacht.</translation>
+        <translation>Nee, bewaar de opname, ik heb me bedacht</translation>
     </message>
     <message>
         <source>Allow this program to AutoExpire?</source>
@@ -774,27 +813,27 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>User Job</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruikerstaak</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished">Einde</translation>
+        <translation>Einde</translation>
     </message>
     <message>
         <source>Begin</source>
-        <translation type="unfinished"></translation>
+        <translation>Begin</translation>
     </message>
     <message>
         <source>Delete it, but allow it to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder, maar sta toe opnieuw op te nemen</translation>
     </message>
     <message>
         <source>Delete it</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder</translation>
     </message>
     <message>
         <source>Save it so I can watch it again</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewaar, zodat ik opnieuw kan kijken</translation>
     </message>
 </context>
 <context>
@@ -1019,15 +1058,15 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>(Any Program Type)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Elk Programmatype)</translation>
     </message>
     <message>
         <source>(Any Category)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Elke Categorie)</translation>
     </message>
     <message>
         <source>(Any Station)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Elke Zender)</translation>
     </message>
 </context>
 <context>
@@ -1262,7 +1301,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Master Mixer Volume</source>
-        <translation></translation>
+        <translation>Mater Mixer Volume</translation>
     </message>
     <message>
         <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
@@ -1272,7 +1311,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>PCM Mixer Volume</source>
-        <translation></translation>
+        <translation>PCM Mixer Volume</translation>
     </message>
     <message>
         <source>Deinterlace playback</source>
@@ -1333,10 +1372,6 @@ Opmerking: Niet te laag zetten.</translation>
     <message>
         <source>Automatically Skip Commercials</source>
         <translation>Automatisch Overslaan</translation>
-    </message>
-    <message>
-        <source>Automatically Flag Commercials</source>
-        <translation>Reclame Automatisch Markeren</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -1556,7 +1591,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>ESC</source>
-        <translation></translation>
+        <translation>ESC</translation>
     </message>
     <message>
         <source>No exit key</source>
@@ -1564,15 +1599,15 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Control-ESC</source>
-        <translation></translation>
+        <translation>Control-ESC</translation>
     </message>
     <message>
         <source>Meta-ESC</source>
-        <translation></translation>
+        <translation>Meta-ESC</translation>
     </message>
     <message>
         <source>Alt-ESC</source>
-        <translation></translation>
+        <translation>Alt-ESC</translation>
     </message>
     <message>
         <source>MythTV is designed to run continuously. If you wish, you may use the ESC key or the ESC key + a modifier to exit MythTV. Do not choose a key combination that will be intercepted by your window manager.</source>
@@ -1752,7 +1787,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Overscan</source>
-        <translation></translation>
+        <translation>Overscan</translation>
     </message>
     <message>
         <source>On-screen display</source>
@@ -1824,7 +1859,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Volume (%)</source>
-        <translation></translation>
+        <translation>Volume (%)</translation>
     </message>
     <message>
         <source>Volume of the recording </source>
@@ -1936,11 +1971,11 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Horizontal Decimation</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Vertical Decimation</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Video Compression</source>
@@ -1948,19 +1983,19 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>RTjpeg Parameters</source>
-        <translation></translation>
+        <translation>RTjpeg Parameters</translation>
     </message>
     <message>
         <source>MPEG-4 Parameters</source>
-        <translation></translation>
+        <translation>MPEG-4 Parameters</translation>
     </message>
     <message>
         <source>Hardware MJPEG Parameters</source>
-        <translation></translation>
+        <translation>Hardware MJPEG Parameters</translation>
     </message>
     <message>
         <source>MPEG-2 Hardware Encoder</source>
-        <translation></translation>
+        <translation>MPEG 2 Hardware Encoder</translation>
     </message>
     <message>
         <source>Automatically transcode after recording</source>
@@ -2074,7 +2109,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Repeat</source>
-        <translation>Herhaal</translation>
+        <translation>Herhaling</translation>
     </message>
     <message>
         <source></source>
@@ -2214,7 +2249,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Monitor CD/DVD</source>
-        <translation></translation>
+        <translation>Monitor CD/DVD</translation>
     </message>
     <message>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them.</source>
@@ -2326,7 +2361,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Transcoders</source>
-        <translation></translation>
+        <translation>Transcoders</translation>
     </message>
     <message>
         <source>New Profile Group Name</source>
@@ -2362,11 +2397,11 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>QT</source>
-        <translation></translation>
+        <translation>QT</translation>
     </message>
     <message>
         <source>Xbox</source>
-        <translation></translation>
+        <translation>Xbox</translation>
     </message>
     <message>
         <source>Channel Options</source>
@@ -2398,7 +2433,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Callsign</source>
-        <translation></translation>
+        <translation>Zender</translation>
     </message>
     <message>
         <source>TV Format</source>
@@ -2450,7 +2485,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Symbol Rate</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Polarity</source>
@@ -2478,7 +2513,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation></translation>
+        <translation>Auto</translation>
     </message>
     <message>
         <source>On</source>
@@ -2646,7 +2681,7 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>Provider</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Channel frequency table</source>
@@ -2713,24 +2748,16 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
         <translation>Naam kaart</translation>
     </message>
     <message>
-        <source>Do NOT use DVB driver for filtering.</source>
-        <translation type="obsolete">Gebruik NIET de DVB-driver voor filtering.</translation>
-    </message>
-    <message>
-        <source>(BROKEN) This option is used to get around filtering limitations on some DVB cards.</source>
-        <translation type="obsolete">(WERKT NIET) Deze optie wordt gebruikt om problemen met filtering van sommige DVB-kaarten te omzeilen.</translation>
-    </message>
-    <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
-        <translation></translation>
+        <translation>Normaal gezien zal dvb-opname pakketten van de kaart laten vallen totdat een \&quot;sequence start header\&quot; gevonden wordt. Deze optie schakelt deze functie uit.</translation>
     </message>
     <message>
         <source>Per PID driver buffer size</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Packet buffer</source>
-        <translation></translation>
+        <translation>Pakket buffer</translation>
     </message>
     <message>
         <source>Status</source>
@@ -2738,7 +2765,7 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>LNB LOF Switch</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>LNB LOF High</source>
@@ -2928,7 +2955,7 @@ Als u een antenne heeft, gebruik dan een &quot;-bcast&quot; frequentie.</transla
     </message>
     <message>
         <source>Idle timeout (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijd ongebruikt (sec)</translation>
     </message>
     <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
@@ -3018,14 +3045,6 @@ Als er een opname start binnen deze tijdsperiode, zal de backend niet uitschakel
     <message>
         <source>Find One Recordings Priority</source>
         <translation>Prioriteit van Vind 1 Opname</translation>
-    </message>
-    <message>
-        <source>Length of time to retain DVB signal data (in days)</source>
-        <translation type="obsolete">Tijd dat DVB-signaal data gereserveerd blijft (dagen)</translation>
-    </message>
-    <message>
-        <source>DVB Global Settings</source>
-        <translation type="obsolete">Algemene Instellingen DVB</translation>
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
@@ -3162,7 +3181,7 @@ Enkel programma &apos;s in groepen zonder wachtwoordbeveiliging worden getoond.<
     </message>
     <message>
         <source>30m</source>
-        <translation></translation>
+        <translation>30m</translation>
     </message>
     <message>
         <source>1h</source>
@@ -3327,11 +3346,11 @@ Voer 0 in om uit te schakelen.</translation>
     </message>
     <message>
         <source>Myth Database Logging</source>
-        <translation></translation>
+        <translation>Myth Database Logging</translation>
     </message>
     <message>
         <source>Mythfilldatabase</source>
-        <translation></translation>
+        <translation>Mythfilldatabase</translation>
     </message>
     <message>
         <source>TXT off</source>
@@ -3465,7 +3484,7 @@ Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
         <source>Data Direct Lineup</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Retrieve Lineups</source>
@@ -3485,11 +3504,11 @@ Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
         <source>16/9 Zoom</source>
-        <translation></translation>
+        <translation>16/9 Zoom</translation>
     </message>
     <message>
         <source>4/3 Zoom</source>
-        <translation></translation>
+        <translation>4/3 Zoom</translation>
     </message>
     <message>
         <source>GUI width (px)</source>
@@ -3711,7 +3730,7 @@ Laat leeg om niet te loggen.</translation>
     <message>
         <source>GB</source>
         <comment>GigaBytes</comment>
-        <translation></translation>
+        <translation>GB</translation>
     </message>
     <message>
         <source>stars</source>
@@ -3820,7 +3839,7 @@ Vereist dat audio-uitvoer apparaat juist ingesteld is.</translation>
     </message>
     <message>
         <source>Linear blend</source>
-        <translation></translation>
+        <translation>Lineair mengen</translation>
     </message>
     <message>
         <source>Kernel (less motion blur)</source>
@@ -3828,7 +3847,7 @@ Vereist dat audio-uitvoer apparaat juist ingesteld is.</translation>
     </message>
     <message>
         <source>Bob (2x framerate)</source>
-        <translation></translation>
+        <translation>Bob (2x framerate)</translation>
     </message>
     <message>
         <source>One field</source>
@@ -4029,58 +4048,6 @@ Zie README in contrib/mythnotify voor aanvullende informatie.</translation>
         <translation>Verwissel &quot;X Window&quot; video modes voor TV. Vereist &quot;xrandr&quot; ondersteuning.</translation>
     </message>
     <message>
-        <source>Horizontal resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Horizontale resolutie voor GUI video mode. Deze mode moet gedefinieerd zijn in uw X-configuratiebestand.</translation>
-    </message>
-    <message>
-        <source>Vertical resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Vertikale resolutie voor GUI video mode. Deze mode moet gedefinieerd zijn in uw X-configuratiebestand.</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution of video mode which needs a special output resolution.</source>
-        <translation>Horizontale resolutie van video mode die een speciale output-resolutie nodig heeft.</translation>
-    </message>
-    <message>
-        <source>Y</source>
-        <translation>Y</translation>
-    </message>
-    <message>
-        <source>Vertical resolution of video mode which needs a special output resolution.</source>
-        <translation>Vertikale resolutie van video mode die een speciale output-resolutie nodig heeft.</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Horizontale resolutie voor afspeel video mode. Deze mode moet gedefinieerd zijn in uw X-configuratiebestand.</translation>
-    </message>
-    <message>
-        <source>Vertical resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Vertikale resolutie voor afspeel video mode. Deze mode moet gedefinieerd zijn in uw X-configuratiebestand.</translation>
-    </message>
-    <message>
-        <source>Alt Aspect</source>
-        <translation>Alt Aspect</translation>
-    </message>
-    <message>
-        <source>If X&apos;s DisplaySize indicates 16:9, fudge vertical size into 4:3, and visa-versa</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>GUI Size (px)</source>
-        <translation>Afmeting GUI (px)</translation>
-    </message>
-    <message>
-        <source>Default Display (px)</source>
-        <translation>Standaard Schermafmeting (px)</translation>
-    </message>
-    <message>
-        <source>Physical Size</source>
-        <translation>Werkelijke Afmeting</translation>
-    </message>
-    <message>
         <source>Toggles between windowed and borderless operation.</source>
         <translation>Wisselt tussen uitvoeren in een venster en fullscreen uitvoeren.</translation>
     </message>
@@ -4164,15 +4131,6 @@ Wanneer &quot;Bureaublad Stijl&quot; wordt geselecteerd zal MythTV de huidige in
     <message>
         <source>Use hardware XvMC MPEG Decoding</source>
         <translation>Gebruik &quot;Hardware XvMC MPEG Decoding&quot;</translation>
-    </message>
-    <message>
-        <source>Sample interval for DVB signal statistics (in seconds)</source>
-        <translation type="obsolete">Sample interval voor DVB-signaal statistieken (seconden)</translation>
-    </message>
-    <message>
-        <source>MythTV will monitor the DVB signal statistics using the specified interval.  Set to &quot;0&quot; to disable.</source>
-        <translation type="obsolete">MythTV zal de DVB-signaal statistieken controleren met dit interval.
-Zet op &quot;0&quot; om uit te schakelen.</translation>
     </message>
     <message>
         <source>Log MythTV events to database</source>
@@ -4499,20 +4457,6 @@ Zet op &quot;0&quot; om uit te schakelen.</translation>
         <translation>Status DataDirect:</translation>
     </message>
     <message>
-        <source>Details of DVB error statistics for last 48 hours:
-</source>
-        <translation type="obsolete">Details van DVB foutmeldingen (afgelopen 48h):
-</translation>
-    </message>
-    <message>
-        <source>Recording period from %1 to %2</source>
-        <translation type="obsolete">Opnametijd van %1 tot %2</translation>
-    </message>
-    <message>
-        <source>There is no DVB signal quality data available to display.</source>
-        <translation type="obsolete">Er zijn geen data over DVB-signaalkwaliteit beschikbaar.</translation>
-    </message>
-    <message>
         <source>No items found at priority level %1 or lower.</source>
         <translation>Geen items met prioriteit %1 of lager.</translation>
     </message>
@@ -4703,7 +4647,7 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>HDTV</source>
-        <translation></translation>
+        <translation>HDTV</translation>
     </message>
     <message>
         <source>CC</source>
@@ -4716,7 +4660,7 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Stereo</source>
-        <translation></translation>
+        <translation>Stereo</translation>
     </message>
     <message>
         <source>Category</source>
@@ -5125,59 +5069,59 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Recording Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname Toestel</translation>
     </message>
     <message>
         <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wil u alle programmadata en zenderinstellingen wissen voordat u de configuratie start? Dit heeft geen invloed op reeds opgenomen programma s.</translation>
     </message>
     <message>
         <source>No, leave my channel settings alone</source>
-        <translation type="unfinished"></translation>
+        <translation>Nee, laat mijn zenderinstellingen met rust</translation>
     </message>
     <message>
         <source>Yes, delete my channel settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, verwijder mijn zenderinstellingen</translation>
     </message>
     <message>
         <source>Scan for channels(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan naar zender(s)</translation>
     </message>
     <message>
         <source>This button will scan for digital channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze knop start het scannen naar digitale zenders.</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Geavanceerd</translation>
     </message>
     <message>
         <source>Advanced editing options for digital channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Geavanceerde opties voor digitale zenders</translation>
     </message>
     <message>
         <source>Use on air guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik EPG</translation>
     </message>
     <message>
         <source>If set the guide information will be taken from the On Air Channel guide.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd zal programmagids van de EPG van digitale TV gebruikt worden.</translation>
     </message>
     <message>
         <source>Unable to initialize video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan video niet initialiseren.</translation>
     </message>
     <message>
         <source>Error was encountered while displaying video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Er was een fout tijdens het vertonen van video.</translation>
     </message>
     <message>
         <source>Return to Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Terug naar Menu</translation>
     </message>
     <message>
         <source>Searching for Logo</source>
-        <translation type="unfinished"></translation>
+        <translation>Aan het zoeken naar Logo</translation>
     </message>
     <message>
         <source>Single Record</source>
@@ -5233,31 +5177,31 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>6 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation>6 MHz</translation>
     </message>
     <message>
         <source>7 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation>7 MHz</translation>
     </message>
     <message>
         <source>8 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation>8 MHz</translation>
     </message>
     <message>
         <source>Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Transport</translation>
     </message>
     <message>
         <source>Capture Card</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-kaart</translation>
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished"></translation>
+        <translation>Aan het scannen</translation>
     </message>
     <message>
         <source>Scan Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Activiteit</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
@@ -5285,11 +5229,11 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Record in TS format instead of PS.</source>
-        <translation type="unfinished"></translation>
+        <translation>Neem op in TS formaat i.p.v. PS.</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schakelt omzetting van \&quot;Transport Stream\&quot; naar \&quot;Program Stream\&quot; uit. TS opnames zorgen voor enigszins grotere bestanden, maar het risico op fouten tijdens omzetten wordt kleiner.</translation>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
@@ -5301,7 +5245,7 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>pcHDTV capture card (HD-2000, HD-3000)</source>
-        <translation type="unfinished"></translation>
+        <translation>pcHDTV TV-kaart (HD-2000, HD-3000)</translation>
     </message>
     <message>
         <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
@@ -5325,11 +5269,11 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Free to air channels only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkel vrij toegankelijke zenders</translation>
     </message>
     <message>
         <source>If set, only free to air channels will be used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkel vrij toegankelijke (ongescrambelde) zenders worden gebruikt.</translation>
     </message>
     <message>
         <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
@@ -5345,27 +5289,23 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <source>Use libmpeg2 for decoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik libmpeg2 voor het decoderen</translation>
     </message>
     <message>
         <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Libmpeg2 zal gebruikt worden in plaats van ffmpeg voor het decoderen van MPEG-1 en MPEG-2 bestanden. Dit kan sneller zijn. Niet beschikbaar wanneer XvMC gebruikt wordt.</translation>
     </message>
     <message>
         <source>4/3</source>
-        <translation type="unfinished"></translation>
+        <translation>4/3</translation>
     </message>
     <message>
         <source>16/9</source>
-        <translation type="unfinished"></translation>
+        <translation>16/9</translation>
     </message>
     <message>
         <source>16/9 Stretch</source>
@@ -5373,11 +5313,11 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit gaat boven de beeldverhouding in het opgenomen programma, hetzelfde als de W-toets tijdens het afspelen. Vullen zal het scherm vullen door het beeld bij te knippen wanneer nodig. Vullen is bruikbaar bij het gebruik van een 4/3 TV.</translation>
     </message>
     <message>
         <source>HD Ringbuffer size (KB)</source>
-        <translation type="unfinished"></translation>
+        <translation>HD Ringbuffer grootte (kB)</translation>
     </message>
     <message>
         <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
@@ -5385,203 +5325,203 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation>VindEen, VindWekelijks en VindDagelijks opnametypes zullen additioneel deze waarde bij hun prioriteit opgeteld krijgen.</translation>
     </message>
     <message>
         <source>Follow symbolic links when deleting files</source>
-        <translation type="unfinished"></translation>
+        <translation>Volg symbolische links bij het verwijderen van bestanden</translation>
     </message>
     <message>
         <source>Sort Episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteer Afleveringen</translation>
     </message>
     <message>
         <source>Record date</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnamedatum</translation>
     </message>
     <message>
         <source>Selects how to sort a shows episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteert hoe afleveringen gesorteerd worden</translation>
     </message>
     <message>
         <source>S</source>
         <comment>RecTypeChar kSingleRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>S</translation>
     </message>
     <message>
         <source>T</source>
         <comment>RecTypeChar kTimeslotRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>T</translation>
     </message>
     <message>
         <source>W</source>
         <comment>RecTypeChar kWeekslotRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>W</translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecTypeChar kChannelRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>C</translation>
     </message>
     <message>
         <source>A</source>
         <comment>RecTypeChar kAllRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>A</translation>
     </message>
     <message>
         <source>F</source>
         <comment>RecTypeChar kFindOneRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>F</translation>
     </message>
     <message>
         <source>d</source>
         <comment>RecTypeChar kFindDailyRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>d</translation>
     </message>
     <message>
         <source>w</source>
         <comment>RecTypeChar kFindWeeklyRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>w</translation>
     </message>
     <message>
         <source>O</source>
         <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>O</translation>
     </message>
     <message>
         <source>D</source>
         <comment>RecStatusChar rsDeleted</comment>
-        <translation type="unfinished"></translation>
+        <translation>D</translation>
     </message>
     <message>
         <source>S</source>
         <comment>RecStatusChar rsStopped</comment>
-        <translation type="unfinished"></translation>
+        <translation>S</translation>
     </message>
     <message>
         <source>R</source>
         <comment>RecStatusChar rsRecorded</comment>
-        <translation type="unfinished"></translation>
+        <translation>R</translation>
     </message>
     <message>
         <source>X</source>
         <comment>RecStatusChar rsDontRecord</comment>
-        <translation type="unfinished">X</translation>
+        <translation>X</translation>
     </message>
     <message>
         <source>P</source>
         <comment>RecStatusChar rsPreviousRecording</comment>
-        <translation type="unfinished"></translation>
+        <translation>P</translation>
     </message>
     <message>
         <source>R</source>
         <comment>RecStatusChar rsCurrentRecording</comment>
-        <translation type="unfinished"></translation>
+        <translation>R</translation>
     </message>
     <message>
         <source>r</source>
         <comment>RecStatusChar rsRepeat</comment>
-        <translation type="unfinished"></translation>
+        <translation>r</translation>
     </message>
     <message>
         <source>E</source>
         <comment>RecStatusChar rsEarlierShowing</comment>
-        <translation type="unfinished"></translation>
+        <translation>E</translation>
     </message>
     <message>
         <source>T</source>
         <comment>RecStatusChar rsTooManyRecordings</comment>
-        <translation type="unfinished"></translation>
+        <translation>T</translation>
     </message>
     <message>
         <source>N</source>
         <comment>RecStatusChar rsCancelled</comment>
-        <translation type="unfinished"></translation>
+        <translation>N</translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecStatusChar rsConflict</comment>
-        <translation type="unfinished"></translation>
+        <translation>C</translation>
     </message>
     <message>
         <source>L</source>
         <comment>RecStatusChar rsLaterShowing</comment>
-        <translation type="unfinished"></translation>
+        <translation>L</translation>
     </message>
     <message>
         <source>K</source>
         <comment>RecStatusChar rsLowDiskSpace</comment>
-        <translation type="unfinished"></translation>
+        <translation>K</translation>
     </message>
     <message>
         <source>B</source>
         <comment>RecStatusChar rsTunerBusy</comment>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
     <message>
         <source>x</source>
         <comment>RecStatusChar rsInactive</comment>
-        <translation type="unfinished"></translation>
+        <translation>x</translation>
     </message>
     <message>
         <source>Firewire Model</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Model</translation>
     </message>
     <message>
         <source>Firewire Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Poort</translation>
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire poort op uw firewire kaart</translation>
     </message>
     <message>
         <source>Firewire Node</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Knooppunt</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire knooppunt is het externe apparaat</translation>
     </message>
     <message>
         <source>Firewire Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Snelheid</translation>
     </message>
     <message>
         <source>100Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>100Mbps</translation>
     </message>
     <message>
         <source>200Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>200Mbps</translation>
     </message>
     <message>
         <source>400Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>400Mbps</translation>
     </message>
     <message>
         <source>Default Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard Input</translation>
     </message>
     <message>
         <source>Only MPEG2TS is supported at this time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkel MPEG2TS wordt op dit moment ondersteund.</translation>
     </message>
     <message>
         <source>FireWire Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Input</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Sta verspringen van zenders toe in gids</translation>
     </message>
     <message>
         <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingeschakeld zal het mogelijk zijn een nummer in te toetsen zodat de selectie verspringt naar hetgeen u intoetst.</translation>
     </message>
     <message>
         <source>Select your preferred language</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer de taal van uw voorkeur</translation>
     </message>
     <message>
         <source>Frequency (Option has no default)
@@ -5644,55 +5584,55 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>CPU friendly preview of recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>CPU-vriendelijke preview van opnames</translation>
     </message>
     <message>
         <source>When enabled, recording previews will play with reduced FPS to save CPU.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingeschakeld zal de preview van opnames met gereduceerde FPS opgespeeld worden om CPU gebruik te besparen.</translation>
     </message>
     <message>
         <source>Menu Pop-up Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu Pop-up Tijd</translation>
     </message>
     <message>
         <source>The time (in seconds) that the menu will remain visible after navigation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het aantal seconden dat het menu zichtbaar blijft na navigeren.</translation>
     </message>
     <message>
         <source>Enable realtime priority threads</source>
-        <translation type="unfinished"></translation>
+        <translation>Schakel \&quot;realtime priority threads\&quot; in</translation>
     </message>
     <message>
         <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wanneer mythfrontend uitgevoerd wordt met root-privileges, kunnen aan sommige threads voorrang gegeven worden. Schakel uit wanneer mythfrontend bevriest tijdens het afspelen van video.</translation>
     </message>
     <message>
         <source>Enable LCD device</source>
-        <translation type="unfinished"></translation>
+        <translation>Schakel LCD-apparaat in</translation>
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik een LCD-display om status informatie van MythTV te tonen. Mythfrontend dient opnieuw gestart te worden.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze globale instelling staat toe met opnemen te beginnen voor de tijd in de programmagids. Het beïnvloedt de \&quot;scheduler\&quot;niet. Wordt uitgeschakeld wanneer er niet voldoende tijd is tussen twee opnames.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze globale instelling staat toe het opnemen te eindigen na de tijd in de programmagids. Het beïnvloedt de \&quot;scheduler\&quot;niet. Wordt uitgeschakeld wanneer er niet voldoende tijd is tussen twee opnames.</translation>
     </message>
     <message>
         <source>Resize Video while transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Verander grootte van video tijdens transcode</translation>
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeker niet opnemen</translation>
     </message>
     <message>
         <source>Firewire Connection Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Type aansluiting Firewire</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -5704,31 +5644,27 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation>USB MPEG-4 Encoder (Plextor ConvertX enz.)</translation>
     </message>
     <message>
         <source>Original Air date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
-        <translation type="unfinished"></translation>
+        <translation>Oorspronkelijke Uitzenddatum</translation>
     </message>
     <message>
         <source>TV audio through PVR-350 only</source>
-        <translation type="unfinished"></translation>
+        <translation>Tv-audio enkel door PVR-350</translation>
     </message>
     <message>
         <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Normaal gezien wordt het geluid van de PVR-350 omgeleid naar de geluidskaart. Hier kan u instellen of dat niet het geval is. MythTV kan het volume niet aanpassen wanneer deze optie aangevinkt is.</translation>
     </message>
     <message>
         <source>Building Detection Buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>Detectiebuffer aan het opbouwen</translation>
     </message>
     <message>
         <source>%1 Frames Completed @ %2 fps.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Frames Voltooid @ %2 fps.</translation>
     </message>
     <message>
         <source>Terrestrial</source>
@@ -5736,7 +5672,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Cable</source>
-        <translation type="unfinished"></translation>
+        <translation>Kabel</translation>
     </message>
     <message>
         <source>ATSC Transport</source>
@@ -5748,54 +5684,267 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Use hardware MPEG decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik hardware MPEG decoder</translation>
     </message>
     <message>
         <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
-        <translation type="unfinished"></translation>
+        <translation>Als uw DVB-kaart een ingebouwde MPEG decoder heeft kan u deze hier activeren. (Enkel voor high-end kaarten en sommige USB-apparaten)</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
-        <translation type="unfinished"></translation>
+        <translation>Verberg muisaanwijzer in MythTV</translation>
     </message>
     <message>
         <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schakelt de zichtbaarheid van de muisaanwijzer in/uit. De meeste onderdelen in MythTV reageren niet op muisklikken. Dit is enkel om het \&quot;verliezen\&quot;van de muisaanwijzer tegen te gaan.</translation>
     </message>
     <message>
         <source>Job Queue Start Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Taakrij Starttijd</translation>
     </message>
     <message>
         <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Controleert de start van het Taakrij venster dat bepaalt wanneer nieuwe taken gestart worden.</translation>
     </message>
     <message>
         <source>Job Queue End Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Taakrij Eindtijd</translation>
     </message>
     <message>
         <source>This setting controls the end of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Controleert het einde van het Taakrij venster dat bepaalt wanneer nieuwe taken gestart worden.</translation>
     </message>
     <message>
         <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
-        <translation type="unfinished"></translation>
+        <translation>Voer Transcode-taken uit voor Reclamedetectie</translation>
     </message>
     <message>
         <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien zowel automatisch transcoden en automatisch reclame detecteren ingeschakeld zijn voor een opname, zal transcode eerst uitgevoerd worden, anders het detecteren van reclameblokken eerst.</translation>
     </message>
     <message>
         <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
-        <translation type="unfinished"></translation>
+        <translation>Start \&quot;Reclame Detecteren\&quot; wanneer de opname start</translation>
     </message>
     <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien Reclame detecteren ingeschakeld is voor een opname, zal het detecteren onmiddelijk na de start van de opname gestart worden. NIET aanbevolen voor systemen met weinig kracht.</translation>
     </message>
     <message>
         <source>Job Queue (Job Commands)</source>
+        <translation>Taakrij (Taak Opdrachten)</translation>
+    </message>
+    <message>
+        <source>Skipping Back.</source>
+        <translation>Spring Terug</translation>
+    </message>
+    <message>
+        <source>Default Auto Commercial Flagging setting</source>
+        <translation>Standaard instelling Automatische Reclamedetectie</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
+        <translation>Dit is de standaard instelling voor Automatische Reclamedetectie wanneer een nieuwe opname geprogrammeerd wordt.</translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #1&apos; setting</source>
+        <translation>Standaard &apos;Gebruikerstaak #1&apos; uitvoeren instelling</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #1&apos; setting when a new scheduled recording is created.</source>
+        <translation>Dit is de standaard instelling voor &apos;Gebruikerstaak #1 uitvoeren&apos; wanneer een nieuwe opname geprogrammeerd wordt.</translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #2&apos; setting</source>
+        <translation>Standaard &apos;Gebruikerstaak #2&apos; uitvoeren instelling</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #2&apos; setting when a new scheduled recording is created.</source>
+        <translation>Dit is de standaard instelling voor &apos;Gebruikerstaak #2 uitvoeren&apos; wanneer een nieuwe opname geprogrammeerd wordt.</translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #3&apos; setting</source>
+        <translation>Standaard &apos;Gebruikerstaak #3&apos; uitvoeren instelling</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #3&apos; setting when a new scheduled recording is created.</source>
+        <translation>Dit is de standaard instelling voor &apos;Gebruikerstaak #3 uitvoeren&apos; wanneer een nieuwe opname geprogrammeerd wordt.</translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #4&apos; setting</source>
+        <translation>Standaard &apos;Gebruikerstaak #4&apos; uitvoeren instelling</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
+        <translation>Dit is de standaard instelling voor &apos;Gebruikerstaak #4 uitvoeren&apos; wanneer een nieuwe opname geprogrammeerd wordt.</translation>
+    </message>
+    <message>
+        <source>Run on the specified screen or spanning all screens.</source>
+        <translation>UItvoeren op het geselecteerd scherm of over alle schermen uitgestrekt.</translation>
+    </message>
+    <message>
+        <source>Input Video X</source>
+        <translation type="obsolete">Input Video X</translation>
+    </message>
+    <message>
+        <source>Horizontal resolution of video which needs a special output resolution.</source>
+        <translation>Horizontale resolutie van video die een speciale output resolutie nodig heeft.</translation>
+    </message>
+    <message>
+        <source>Input Video Y</source>
+        <translation type="obsolete">Input Video Y</translation>
+    </message>
+    <message>
+        <source>Vertical resolution of video which needs a special output resolution.</source>
+        <translation>Vertikale resolutie van video die een speciale output resolutie nodig heeft.</translation>
+    </message>
+    <message>
+        <source>GUI</source>
+        <translation>GUI</translation>
+    </message>
+    <message>
+        <source>Resolution of screen when not watching a video.</source>
+        <translation>Schermresolutie wanneer u geen video bekijkt</translation>
+    </message>
+    <message>
+        <source>Default Video</source>
+        <translation type="obsolete">Standaard Video</translation>
+    </message>
+    <message>
+        <source>Output Resolution</source>
+        <translation type="obsolete">Output Resolutie</translation>
+    </message>
+    <message>
+        <source>Default screen resolution when watching a video.</source>
+        <translation>Standaard schermresolutie bij het bekijken van video.</translation>
+    </message>
+    <message>
+        <source>Default Rate</source>
+        <translation type="obsolete">Standaard frequentie</translation>
+    </message>
+    <message>
+        <source>Default screen refresh rate when watching a video.</source>
+        <translation type="obsolete">Standaard verversingsfrequentie bij het bekijken van video</translation>
+    </message>
+    <message>
+        <source>Aspect</source>
+        <translation>Verhouding</translation>
+    </message>
+    <message>
+        <source>Leave at &quot;Default&quot; to use ratio reported by the monitor. Or, set to 16:9 or 4:3 to force a specific aspect ratio.</source>
+        <translation type="obsolete">Laat staan op \&quot;Standaard\&quot; om de verhouding te gebruiken die door de monitor aangegeven wordt. Of stel in op 16:9 of 4:3 om een specifieke beeldverhouding te forceren.</translation>
+    </message>
+    <message>
+        <source>Bad Menu File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Menu File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed out waiting for signal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital TV standard.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation Used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8VSB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM64</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM256</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen resolution when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default refresh rate when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh rate when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ration when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5803,11 +5952,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Voortgang</translation>
     </message>
     <message>
         <source>Tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Aan het tunen</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -5818,45 +5967,45 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Type</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished"></translation>
+        <translation>Aan het scannen</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>ScanWizard</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout bij tunen naar transport</translation>
     </message>
     <message>
         <source>Error detecting card type</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout bij detecteren van kaarttype</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout bij verwerken parameters</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardTuningPage</name>
     <message>
         <source>Tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Aan het tunen</translation>
     </message>
     <message>
         <source>Failed to open the card</source>
-        <translation type="unfinished"></translation>
+        <translation>Openen kaart mislukt</translation>
     </message>
     <message>
         <source>Failed to probe the card</source>
-        <translation type="unfinished"></translation>
+        <translation>\&quot;Proben\&quot; naar kaart mislukt</translation>
     </message>
 </context>
 <context>
@@ -5870,7 +6019,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <name>StatusBox</name>
     <message>
         <source>Tuner %1 </source>
-        <translation></translation>
+        <translation>Tuner %1 </translation>
     </message>
     <message>
         <source>is watching live TV</source>
@@ -5895,6 +6044,18 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>is not available</source>
         <translation>is niet beschikbaar</translation>
+    </message>
+    <message>
+        <source>On %1 %2 from %3.%4
+%5
+%6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2 from %3.%4
+%5
+No other details</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6057,11 +6218,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>16:9</source>
-        <translation></translation>
+        <translation>16:9</translation>
     </message>
     <message>
         <source>4:3</source>
-        <translation></translation>
+        <translation>4:3</translation>
     </message>
     <message>
         <source>This program is currently being edited</source>
@@ -6105,11 +6266,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>16:9 Zoom</source>
-        <translation></translation>
+        <translation>16:9 Zoom</translation>
     </message>
     <message>
         <source>4:3 Zoom</source>
-        <translation></translation>
+        <translation>4:3 Zoom</translation>
     </message>
     <message>
         <source>Adjust Recording</source>
@@ -6269,7 +6430,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>(REC)</source>
-        <translation></translation>
+        <translation>(REC)</translation>
     </message>
     <message>
         <source>Auto-Skip Pre-Notify</source>
@@ -6309,23 +6470,23 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>0.5X</source>
-        <translation></translation>
+        <translation>0.5X</translation>
     </message>
     <message>
         <source>0.9X</source>
-        <translation></translation>
+        <translation>0.9X</translation>
     </message>
     <message>
         <source>1.0X</source>
-        <translation></translation>
+        <translation>1.0X</translation>
     </message>
     <message>
         <source>1.1X</source>
-        <translation></translation>
+        <translation>1.1X</translation>
     </message>
     <message>
         <source>1.5X</source>
-        <translation></translation>
+        <translation>1.5X</translation>
     </message>
     <message>
         <source>Sleep</source>
@@ -6345,15 +6506,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>1.2X</source>
-        <translation></translation>
+        <translation>1.2X</translation>
     </message>
     <message>
         <source>1.3X</source>
-        <translation></translation>
+        <translation>1.3X</translation>
     </message>
     <message>
         <source>1.4X</source>
-        <translation></translation>
+        <translation>1.4X</translation>
     </message>
 </context>
 <context>
@@ -6452,7 +6613,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Source:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bron:</translation>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
