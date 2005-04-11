@@ -57,7 +57,12 @@ QSocketDevice *RemoteFile::openSocket(bool control)
     
     if (!connectSocket(lsock, host, port))
     {
-        cerr << "Could not connect to server\n";
+        QString dtype = (type == 0) ? "file" : "ringbuffer";
+        QString stype = (control) ? "control socket" : dtype + " data socket";
+        VERBOSE(VB_IMPORTANT,
+                QString("RemoteFile::openSocket(%1): \n"
+                        "\t\t\tCould not connect to server \"%2\" @ port %3")
+                .arg(stype).arg(host).arg(port));
         delete lsock;
         return NULL;
     }
@@ -124,7 +129,7 @@ void RemoteFile::Close(void)
     WriteStringList(controlSock, strlist);
     if (!ReadStringList(controlSock, strlist, true))
     {
-        cerr << "Remote file timeout.\n";
+        VERBOSE(VB_IMPORTANT, "Remote file timeout.");
     }
     
     if (sock)
@@ -143,6 +148,12 @@ void RemoteFile::Close(void)
 
 void RemoteFile::Reset(void)
 {
+    if (!sock)
+    {
+        VERBOSE(VB_NETWORK, "RemoteFile::Reset(): Called with no socket");
+        return;
+    }
+
     while (sock->bytesAvailable() > 0)
     {
         int avail;
@@ -163,6 +174,12 @@ void RemoteFile::Reset(void)
 
 long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 {
+    if (!sock)
+    {
+        VERBOSE(VB_NETWORK, "RemoteFile::Seek(): Called with no socket");
+        return 0;
+    }
+
     if (!sock->isOpen() || sock->error())
         return 0;
 
@@ -199,6 +216,12 @@ int RemoteFile::Read(void *data, int size)
     bool error = false;
     bool response = false;
    
+    if (!sock)
+    {
+        VERBOSE(VB_NETWORK, "RemoteFile::Read(): Called with no socket");
+        return -1;
+    }
+
     if (!sock->isOpen() || sock->error())
         return -1;
    

@@ -432,7 +432,17 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
             }
         }
         else
+        {
             remotefile = new RemoteFile(filename);
+            if (!remotefile->isOpen())
+            {
+                VERBOSE(VB_IMPORTANT,
+                    QString("RingBuffer::RingBuffer(): Failed to open remote "
+                            "file (%1)").arg(filename));
+                delete remotefile;
+                remotefile = NULL;
+            }
+        }
 
         writemode = false;
     }
@@ -465,6 +475,14 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
     else
     {
         remotefile = new RemoteFile(filename, recorder_num);
+        if (!remotefile->isOpen())
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("RingBuffer::RingBuffer(): Failed to open remote "
+                            "file (%1)").arg(filename));
+            delete remotefile;
+            remotefile = NULL;
+        }
     }
 
     wrapcount = 0;
