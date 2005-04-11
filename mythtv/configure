@@ -1615,10 +1615,12 @@ if test x"$firewire_cable_box" = x"yes" ; then
     firewire_cable_box="no"
     libiec1=`ls /usr/local/lib/libiec61883* 2> /dev/null | head -n 1`
     libiec2=`ls /usr/lib/libiec61883* 2> /dev/null | head -n 1`
-    if test x"$libiec1" != x"" -o x"$libiec2" != x"" ; then
+    libiec3=`ls /usr/lib64/libiec61883* 2> /dev/null | head -n 1`
+    if test x"$libiec1" != x"" -o x"$libiec2" != x"" -o x"$libiec3" != x"" ; then
         libraw1=`ls /usr/local/lib/libraw1394* 2> /dev/null | head -n 1`
         libraw2=`ls /usr/lib/libraw1394* 2> /dev/null | head -n 1`
-        if test x"$libraw1" != x"" -o x"$libraw2" != x"" ; then
+        libraw3=`ls /usr/lib64/libraw1394* 2> /dev/null | head -n 1`
+        if test x"$libraw1" != x"" -o x"$libraw2" != x"" -o x"$libraw3" != x"" ; then
             firewire_cable_box="yes"
         fi
     fi
