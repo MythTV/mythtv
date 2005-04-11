@@ -159,6 +159,16 @@ void MainServer::readSocket(void)
 
     readReadyLock.lock();
 
+    if (socket->IsInProcess())
+    {
+        VERBOSE(VB_IMPORTANT, "Overlapping calls to readSocket.");
+        readReadyLock.unlock();
+        return;
+    }
+
+    // will be set to false after processed by worker thread.
+    socket->SetInProcess(true);
+
     ProcessRequestThread *prt = NULL;
     while (!prt)
     {
@@ -188,6 +198,8 @@ void MainServer::ProcessRequest(RefSocket *sock)
     {
         ProcessRequestWork(sock);
     }
+
+    sock->SetInProcess(false);
 }
 
 void MainServer::ProcessRequestWork(RefSocket *sock)

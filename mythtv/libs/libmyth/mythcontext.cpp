@@ -1717,35 +1717,53 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
         return NULL;
     QString baseDir = d->m_installprefix + "/share/mythtv/themes/default/";
 
-    QFile checkFile(filename);
-    QFileInfo fi(filename);
-
     if (d->themecachedir != "" && fromcache)
     {
-        QString cachefilepath = d->themecachedir + fi.fileName();
-        QFile cachecheck(cachefilepath);
-        if (cachecheck.exists())
+        QString cachefilepath;
+        bool bFound = false;
+
+        // Is absolute path in theme directory.
+        if (!bFound)
+        {
+            if (!strcmp(filename.left(d->m_themepathname.length()),d->m_themepathname))
+            {
+                QString tmpfilename = filename;
+                tmpfilename.remove(0, d->m_themepathname.length());
+                cachefilepath = d->themecachedir + tmpfilename;
+                QFile cachecheck(cachefilepath);
+                if (cachecheck.exists())
+                    bFound = true;
+            }
+        }
+
+        // Is relative path in theme directory.
+        if (!bFound)
+        {
+            cachefilepath = d->themecachedir + filename;
+            QFile cachecheck(cachefilepath);
+            if (cachecheck.exists())
+                bFound = true;
+        }
+
+        // Is in top level cache directory.
+        if (!bFound)
+        {
+            QFileInfo fi(filename);
+            cachefilepath = d->themecachedir + fi.fileName();
+            QFile cachecheck(cachefilepath);
+            if (cachecheck.exists())
+                bFound = true;
+        }
+
+        if (bFound)
         {
             QImage *ret = new QImage(cachefilepath);
             if (ret)
                 return ret;
         }
-
-        if (filename.length() > d->m_themepathname.length())
-        {
-            QString tmpfilename = filename;
-            tmpfilename.remove(0, d->m_themepathname.length());
-            cachefilepath = d->themecachedir + tmpfilename;
-            cachecheck.setName(cachefilepath);
-            if (cachecheck.exists())
-            {
-                QImage *ret = new QImage(cachefilepath);
-                if (ret)
-                    return ret;
-            }
-        }
     }
 
+    QFile checkFile(filename);
     if (!checkFile.exists())
     {
         QString fileTemp;
@@ -1764,7 +1782,6 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
             filename = fileTemp;
         }
     }
-
 
     QImage *ret = NULL;
 
@@ -1805,35 +1822,54 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
     if (filename.left(5) == "myth:")
         return NULL;
     QString baseDir = d->m_installprefix + "/share/mythtv/themes/default/";
-    QFile checkFile(filename);
-    QFileInfo fi(filename);
 
     if (d->themecachedir != "" && fromcache)
     {
-        QString cachefilepath = d->themecachedir + fi.fileName();
-        QFile cachecheck(cachefilepath);
-        if (cachecheck.exists())
+        QString cachefilepath;
+        bool bFound = false;
+
+        // Is absolute path in theme directory.
+        if (!bFound)
+        {
+            if (!strcmp(filename.left(d->m_themepathname.length()),d->m_themepathname))
+            {
+                QString tmpfilename = filename;
+                tmpfilename.remove(0, d->m_themepathname.length());
+                cachefilepath = d->themecachedir + tmpfilename;
+                QFile cachecheck(cachefilepath);
+                if (cachecheck.exists())
+                    bFound = true;
+            }
+        }
+
+        // Is relative path in theme directory.
+        if (!bFound)
+        {
+            cachefilepath = d->themecachedir + filename;
+            QFile cachecheck(cachefilepath);
+            if (cachecheck.exists())
+                bFound = true;
+        }
+
+        // Is in top level cache directory.
+        if (!bFound)
+        {
+            QFileInfo fi(filename);
+            cachefilepath = d->themecachedir + fi.fileName();
+            QFile cachecheck(cachefilepath);
+            if (cachecheck.exists())
+                bFound = true;
+        }
+
+        if (bFound)
         {
             QPixmap *ret = new QPixmap(cachefilepath);
             if (ret)
                 return ret;
         }
-
-        if (filename.length() > d->m_themepathname.length())
-        {
-            QString tmpfilename = filename;
-            tmpfilename.remove(0, d->m_themepathname.length());
-            cachefilepath = d->themecachedir + tmpfilename;
-            cachecheck.setName(cachefilepath);
-            if (cachecheck.exists())
-            {
-                QPixmap *ret = new QPixmap(cachefilepath);
-                if (ret)
-                    return ret;
-            }
-        }
     }
 
+    QFile checkFile(filename);
     if (!checkFile.exists())
     {
         QString fileTemp;
@@ -1862,7 +1898,7 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
     GetScreenSettings(width, wmult, height, hmult);
 
     if (width != d->m_baseWidth || height != d->m_baseHeight)
-    {           
+    {
         QImage tmpimage;
 
         if (!tmpimage.load(filename))
