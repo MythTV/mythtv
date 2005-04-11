@@ -127,8 +127,9 @@ void MMTMainWindow::initializeTree()
     // Make the first few nodes in the tree,
     RootNode = new UIListGenericTree(NULL, "Root Node");            
     
-    MoviesRoot = new MMTMovieMasterItem(RootNode, tr("Movies"));
+    MoviesRoot   = new MMTMovieMasterItem(RootNode, tr("Movies"));
     TheatersRoot = new MMTTheaterMasterItem(RootNode, tr("Theaters"));
+    GenreRoot    = new MMTGenreMasterItem(RootNode, tr("Genre"));
     
     Tree->SetTree(RootNode);
 }

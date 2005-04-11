@@ -81,6 +81,28 @@ class MMTShowTimeItem : public MMTDBItem
         QDate ShowDate;
 };
 
+class MMTGenreMasterItem : public MMTDBItem
+{
+    public:
+        MMTGenreMasterItem(UIListGenericTree* parent, const QString &text, int FilmID = 0, 
+                           const QString& theaterID = "", int ShowingID = 0);
+        virtual void populateTree(UIListGenericTree* Tree);
+};
+
+class MMTGenreItem : public MMTDBItem
+{
+    public:
+        MMTGenreItem(UIListGenericTree* parent, const QString &text, int FilmID = 0, 
+                     const QString& theaterID = "", int ShowingID = 0);
+        
+        virtual void populateTree(UIListGenericTree* tree);
+    
+    protected:
+        QString Genre;
+};
+
+
+
 // MMTMovieMasterItem encapsulates the top level list of movies
 // It's used to handle the "I want to watch movie XXX, when is it on?" question
 class MMTMovieMasterItem : public MMTDBItem

@@ -208,13 +208,91 @@ void MMTDBItem::toMap(QMap<QString, QString> &map)
     map["ticket_date"] = "";
     map["ticket_date_time"] = "";
 }
+
+
+MMTGenreItem::MMTGenreItem(UIListGenericTree* parent, const QString &text,
+                           int filmID, const QString& theaterID, int showingID)
+            : MMTDBItem(parent, text, filmID, theaterID, showingID)
+{
+    Genre = text;
+}
+
+
+void MMTGenreItem::populateTree(UIListGenericTree*)
+{
+    // We're going to create a bunch of children.  One for each movie.
+    MMTMovieItem* tempItem;
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    // Logic would dictate that we just grab all the movies listed in the
+    // movietime_films table however that table can contain films that are
+    // not actually being shown. So we're forced to do an inner join.
+    query.prepare( "SELECT DISTINCT movie.FilmID, film.title "
+                   "FROM movietime_movies movie "
+                   "INNER JOIN movietime_films film ON film.filmID = movie.filmID "
+                   "WHERE film.Genre = :GENRE "
+                   "ORDER BY title" );
+    
+    query.bindValue(":GENRE", Genre);    
+    
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next()) 
+        {
+            tempItem = new MMTMovieItem(this, query.value(1).toString(), 
+                                        query.value(0).toInt());
+         
+        }
+    }
+    
+}
+
+
+
+MMTGenreMasterItem::MMTGenreMasterItem(UIListGenericTree* parent, const QString &text,
+                                       int filmID, const QString& theaterID, int showingID)
+                  : MMTDBItem(parent, text, filmID, theaterID, showingID)
+{
+    populateTree(parent);    
+}
+
  
+void MMTGenreMasterItem::populateTree(UIListGenericTree*)
+{
+    // We're going to create a bunch of children.  One for each movie.
+    MMTGenreItem* tempItem;
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    // Logic would dictate that we just grab all the movies listed in the
+    // movietime_films table however that table can contain films that are
+    // not actually being shown. So we're forced to do an inner join.
+    query.prepare( "SELECT DISTINCT film.genre "
+                   "FROM movietime_movies movie "
+                   "INNER JOIN movietime_films film ON film.filmID = movie.filmID "
+                   "ORDER BY genre" );
+    
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next()) 
+        {
+            tempItem = new MMTGenreItem(this, query.value(0).toString(), FilmID,
+                                        TheaterID, ShowingID);
+        }
+    }
+    
+}
+
+
 
 MMTMovieMasterItem::MMTMovieMasterItem(UIListGenericTree* parent, const QString &text)
                   : MMTDBItem(parent, text)
 {
     populateTree(parent);    
 }
+
+
 
 
 void MMTMovieMasterItem::populateTree(UIListGenericTree*)
@@ -365,7 +443,7 @@ void MMTMovieItem::populateTree(UIListGenericTree* tree)
 }
 
 
-void MMTMovieItem::populateTreeWithDates(UIListGenericTree* tree)
+void MMTMovieItem::populateTreeWithDates(UIListGenericTree*)
 {
 
     MMTShowingItem* tempItem;
@@ -409,7 +487,7 @@ void MMTMovieItem::populateTreeWithDates(UIListGenericTree* tree)
     
 }
 
-void MMTMovieItem::populateTreeWithTheaters(UIListGenericTree* tree)
+void MMTMovieItem::populateTreeWithTheaters(UIListGenericTree*)
 {
     // We're going to create a bunch of children.  
     // One for each theater that's showing this movie.

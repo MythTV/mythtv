@@ -65,6 +65,7 @@ class MMTMainWindow : public MythThemedDialog
         
         MMTDBItem* MoviesRoot;
         MMTDBItem* TheatersRoot;
+        MMTDBItem* GenreRoot;
         
 };
 

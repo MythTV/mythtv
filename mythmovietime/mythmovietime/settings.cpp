@@ -87,7 +87,7 @@ MMTGeneralSettings::MMTGeneralSettings()
     gen->addChild(DefaultDays());
     addChild(gen);
     
-    gContext->SetSetting("MMT-Last-Fetch", "");
+    gContext->SaveSetting("MMT-Last-Fetch", "");
 }
 
 
