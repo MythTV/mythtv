@@ -383,6 +383,10 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 music_tree_list->forceLastBin();
                 music_tree_list->refresh();
             }
+            else if (action == "PAGEUP")
+                music_tree_list->pageUp();
+            else if (action == "PAGEDOWN")
+                music_tree_list->pageDown();
             else
                 handled = false;
         }
