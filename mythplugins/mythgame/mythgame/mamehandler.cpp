@@ -631,7 +631,7 @@ bool MameHandler::check_xmame_exe()
                                 /* skip " version " */
                                 tmp = tmp + 9;
                                 xmame_version_string = tmp;
-                                while (*tmp && (*temp != ' ') && (*tmp++ != '\n'))
+                                while (*tmp && (*tmp != ' ') && (*tmp++ != '\n'))
                                         i++;
                                 xmame_version_string[i] = 0;
 
