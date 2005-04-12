@@ -317,7 +317,7 @@ bool TV::Init(bool createWindow)
         bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
         bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
 
-        saved_gui_bounds = mainWindow->geometry();
+        saved_gui_bounds = QRect(mainWindow->pos(), mainWindow->size());
         QRect player_bounds = saved_gui_bounds;
         if (fullscreen)
         {
@@ -336,27 +336,25 @@ bool TV::Init(bool createWindow)
             // the initial dimensions
             maxWidth = display_res->GetMaxWidth();
             maxHeight = display_res->GetMaxHeight();
-            QRect max_bounds(saved_gui_bounds.left(), saved_gui_bounds.top(),
-                             maxWidth, maxHeight);
-            mainWindow->setGeometry(max_bounds);
+            mainWindow->resize(QSize(maxWidth, maxHeight));
             mainWindow->setFixedSize(QSize(maxWidth, maxHeight));
         }
-        mainWindow->setGeometry(player_bounds);
-        mainWindow->setFixedSize(player_bounds.size());
 
-        // myWindow sizing
+        // player window sizing
         myWindow = new MythDialog(mainWindow, "video playback window");
         myWindow->installEventFilter(this);
         myWindow->setNoErase();
         if (switchMode && display_res)
-        {
-            myWindow->setGeometry(0, 0, maxWidth, maxHeight);
-            myWindow->setFixedSize(QSize(maxWidth, maxHeight));
-        }
+            myWindow->resize(QSize(maxWidth, maxHeight));
         QRect win_bounds(0, 0, player_bounds.width(), player_bounds.height());
         myWindow->setGeometry(win_bounds);
         myWindow->setFixedSize(win_bounds.size());
 
+        // resize main window
+        mainWindow->setGeometry(player_bounds);
+        mainWindow->setFixedSize(player_bounds.size());
+
+        // finally we put the player window on screen...
         myWindow->show();
         myWindow->setBackgroundColor(Qt::black);
         qApp->processEvents();
@@ -386,8 +384,9 @@ TV::~TV(void)
         delete myWindow;
         if (!gContext->GetNumSetting("GuiSizeForTV", 0))
         {
-            gContext->GetMainWindow()->setGeometry(saved_gui_bounds);
+            gContext->GetMainWindow()->resize(saved_gui_bounds.size());
             gContext->GetMainWindow()->setFixedSize(saved_gui_bounds.size());
+            gContext->GetMainWindow()->move(saved_gui_bounds.topLeft());
         }
     }
     if (recorderPlaybackInfo)
