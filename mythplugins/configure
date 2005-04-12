@@ -1,0 +1,472 @@
+#!/bin/sh
+#
+# Configure script for mythplugins
+#
+
+# 
+#    default parameters for all plugins
+#
+
+music="yes"
+video="yes"
+dvd="yes"
+weather="yes"
+gallery="yes"
+game="yes"
+movietime="yes"
+news="yes"
+phone="yes"
+
+opengl="no"
+fftw_lib="no"
+sdl="no"
+aac="no"
+transcode="no"
+vcdsupport="no"
+exif="no"
+festival="no"
+
+for opt do
+  case "$opt" in
+  --enable-mythmusic) music="yes"
+  ;;
+  --disable-mythmusic) music="no"
+  ;;
+  --enable-mythvideo) video="yes"
+  ;;
+  --disable-mythvideo) video="no"
+  ;;
+  --enable-mythdvd) dvd="yes"
+  ;;
+  --disable-mythdvd) dvd="no"
+  ;;
+  --enable-mythweather) weather="yes"
+  ;;
+  --disable-mythweather) weather="no"
+  ;;
+  --enable-mythgallery) gallery="yes"
+  ;;
+  --disable-mythgallery) gallery="no"
+  ;;
+  --enable-mythgame) game="yes"
+  ;;
+  --disable-mythgame) game="no"
+  ;;
+  --enable-mythmovietime) movietime="yes"
+  ;;
+  --disable-mythmovietime) movietime="no"
+  ;;
+  --enable-mythnews) news="yes"
+  ;;
+  --disable-mythnews) news="no"
+  ;;
+  --enable-mythphone) phone="yes"
+  ;;
+  --disable-mythphone) phone="no"
+  ;;
+  --enable-opengl) opengl="yes"
+  ;;
+  --disable-opengl) opengl="no"
+  ;;
+  --enable-fftw) fftw_lib="yes"
+  ;;
+  --disable-fftw) fftw_lib="no"
+  ;;
+  --enable-sdl) sdl="yes"
+  ;;
+  --disable-sdl) sdl="no"
+  ;;
+  --enable-aac) aac="yes"
+  ;;
+  --disable-aac) aac="no"
+  ;;
+  --enable-transcode) transcode="yes"
+  ;;
+  --disable-transcode) transcode="no"
+  ;;
+  --enable-vcd) vcdsupport="yes"
+  ;;
+  --disable-vcd) vcdsupport="no"
+  ;;
+  --enable-exif) exif="yes"
+  ;;
+  --disable-exif) exif="no"
+  ;;
+  --enable-festival) festival="yes"
+  ;;
+  --disable-festival) festival="no"
+  ;;
+  --enable-all)  music="yes"; 
+                 video="yes";
+                 dvd="yes";
+                 weather="yes";
+                 gallery="yes";
+                 game="yes";
+                 movietime="yes";
+                 news="yes";
+                 phone="yes";
+                 sdl="yes";
+                 opengl="yes";
+                 fftw_lib="yes";
+                 aac="yes";
+                 vcdsupport="yes";
+                 transcode="yes";
+                 exif="yes";
+				 festival="yes";
+  ;;
+  --disable-all) music="no";  
+                 video="no";  
+                 dvd="no";  
+                 weather="no";  
+                 gallery="no";  
+                 game="no";  
+                 movietime="no";  
+                 news="no";
+                 phone="no";
+                 sdl="no";  
+                 opengl="no"; 
+                 fftw_lib="no"; 
+                 aac="no"; 
+                 vcdsupport="no"; 
+                 transcode="no";
+                 exif="no";
+                 festival="no"
+  esac
+done
+
+if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
+cat << EOF
+
+Usage:   configure [options]
+Options: [defaults in brackets after descriptions]
+NB:      all --enable-* options can be reversed with --disable-*
+
+Generic options:
+  --help                   print this message
+  --enable-all             Enable all options
+  --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
+
+MythMusic related options:
+  --enable-mythmusic       build the mythmusic plugin [default=yes]
+  --enable-fftw            enable fftw visualizers [default=no]
+  --enable-sdl             use SDL for the synaesthesia output [default=no]
+  --enable-aac             enable AAC/MP4 audio file decompression [default=no]
+
+MythVideo related options:
+  --enable-mythvideo       build the mythvideo plugin [default=yes]
+
+MythDVD related options:
+  --enable-mythdvd         build the mythdvd plugin [default=yes]
+  --enable-transcode       enable DVD ripping and transcoding [default=no]
+  --enable-vcd             enable VCD playing [default=no]
+
+MythWeather related options:
+  --enable-mythweather     build the mythweather plugin [default=yes]
+
+MythGallery related options:
+  --enable-mythgallery     build the mythgallery plugin [default=yes]
+  --enable-exif            enable reading of EXIF headers [default=no]
+
+MythGame related options:
+  --enable-mythgame        build the mythgame plugin [default=yes]
+
+MythMovieTime related options:
+  --enable-mythmovietime   build the mythmovietime plugin [default=yes]
+
+MythNews related options:
+  --enable-mythnews        build the mythnews plugin [default=yes]
+
+MythPhone related options:
+  --enable-mythphone       build the mythphone plugin [default=yes]
+  --enable-festival        enable festival TTS Engine [default=no]
+EOF
+exit 1
+fi
+
+###########################################################
+#                                                         #
+#  Top level mythplugin.pro file creation                 #
+#  (ie. which plugins to build)                           #
+#                                                         #
+###########################################################
+
+echo ""
+echo "Configuration settings: "
+echo " "
+
+
+echo "#" > ./config.pro
+echo "#    Automatically generated by mythplugin configure" >> ./config.prog
+echo "#    (modify only under penalty of death)" >> ./config.pro
+echo "#" >> ./config.pro
+
+if test "$music" = "yes" ; then
+  echo "        MythMusic     plugin will be built"
+  echo "SUBDIRS += mythmusic" >> ./config.pro
+else
+  echo "        MythMusic     plugin will not be built"
+fi
+
+if test "$video" = "yes" ; then
+  echo "        MythVideo     plugin will be built"
+  echo "SUBDIRS += mythvideo" >> ./config.pro
+else
+  echo "        MythVideo     plugin will not be built"
+fi
+
+if test "$dvd" = "yes" ; then
+  echo "        MythDVD       plugin will be built"
+  echo "SUBDIRS += mythdvd" >> ./config.pro
+else
+  echo "        MythDVD       plugin will not be built"
+fi
+
+if test "$weather" = "yes" ; then
+  echo "        MythWeather   plugin will be built"
+  echo "SUBDIRS += mythweather" >> ./config.pro
+else
+  echo "        MythWeather   plugin will not be built"
+fi
+
+if test "$gallery" = "yes" ; then
+  echo "        MythGallery   plugin will be built"
+  echo "SUBDIRS += mythgallery" >> ./config.pro
+else
+  echo "        MythGallery   plugin will not be built"
+fi
+
+if test "$game" = "yes" ; then
+  echo "        MythGame      plugin will be built"
+  echo "SUBDIRS += mythgame" >> ./config.pro
+else
+  echo "        MythGame      plugin will not be built"
+fi
+
+if test "$movietime" = "yes" ; then
+  echo "        MythMovieTime plugin will be built"
+  echo "SUBDIRS += mythmovietime" >> ./config.pro
+else
+  echo "        MythMovieTime plugin will not be built"
+fi
+
+if test "$news" = "yes" ; then
+  echo "        MythNews      plugin will be built"
+  echo "SUBDIRS += mythnews" >> ./config.pro
+else
+  echo "        MythNews      plugin will not be built"
+fi
+
+if test "$phone" = "yes" ; then
+  echo "        MythPhone     plugin will be built"
+  echo "SUBDIRS += mythphone" >> ./config.pro
+else
+  echo "        MythPhone     plugin will not be built"
+fi
+
+###########################################################
+#                                                         #
+#  MythMusic related configuration options                #
+#                                                         #
+###########################################################
+
+echo "/*" >  ./mythmusic/mythmusic/config.h
+echo "    Automatically generated by configure - do not modify" >> ./mythmusic/mythmusic/config.h
+echo "*/" >> ./mythmusic/mythmusic/config.h
+
+echo "#" > ./mythmusic/mythmusic/config.pro
+echo "#    Automatically generated by configure - modify only under penalty of death" >> ./mythmusic/mythmusic/config.pro
+echo "#" >> ./mythmusic/mythmusic/config.pro
+
+if test "$opengl" = "yes" ; then
+  echo "        OpenGL        support will be included in MythMusic"
+  echo "#define OPENGL_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
+  echo "CONFIG += opengl" >> ./mythmusic/mythmusic/config.pro
+fi
+
+if test "$opengl" = "no" ; then
+  echo "        OpenGL        support will not be included in MythMusic"
+fi
+
+if test "$fftw_lib" = "yes" ; then
+  echo "        FFTW          support will be included in MythMusic"
+  echo "#define FFTW_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
+  echo "LIBS += -lrfftw -lfftw" >> ./mythmusic/mythmusic/config.pro
+fi
+
+if test "$fftw_lib" = "no" ; then
+  echo "        FFTW          support will not be included in MythMusic"
+fi
+
+if test "$sdl" = "yes" ; then
+  echo "        SDL           support will be included in MythMusic"
+  echo "#define SDL_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
+  echo "LIBS += `sdl-config --libs`" >> ./mythmusic/mythmusic/config.pro
+  echo "QMAKE_CXXFLAGS_RELEASE += `sdl-config --cflags`" >> ./mythmusic/mythmusic/config.pro
+  echo "QMAKE_CXXFLAGS_DEBUG += `sdl-config --cflags`" >> ./mythmusic/mythmusic/config.pro
+fi
+if test "$sdl" = "no" ; then
+  echo "        SDL           support will not be included in MythMusic"
+fi
+
+if test "$aac" = "yes" ; then
+  echo "        AAC           support will be included in MythMusic"
+  echo "#define AAC_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
+  echo "LIBS += -lfaad -lmp4ff" >> ./mythmusic/mythmusic/config.pro
+  echo "HEADERS += metaiomp4.h aacdecoder.h" >> ./mythmusic/mythmusic/config.pro
+  echo "SOURCES += metaiomp4.cpp aacdecoder.cpp" >> ./mythmusic/mythmusic/config.pro
+fi
+if test "$aac" = "no" ; then
+  echo "        AAC           support will not be included in MythMusic"
+fi
+
+
+###########################################################
+#                                                         #
+#   MythDVD related configuration options                 #
+#                                                         #
+###########################################################
+
+echo "/*" >  ./mythdvd/mythdvd/config.h
+echo "    Automatically generated by configure - do not modify" >> ./mythdvd/mythdvd/config.h
+echo "*/" >> ./mythdvd/mythdvd/config.h
+
+echo "#" > ./mythdvd/mythdvd/config.pro
+echo "#    Automatically generated by configure - modify only under penalty of death" >> ./mythdvd/mythdvd/config.pro
+echo "#" >> ./mythdvd/mythdvd/config.pro
+
+echo "#" > ./mythdvd/mtd/config.pro
+echo "#    Automatically generated by configure - modify only under penalty of death" >> ./mythdvd/mtd/config.pro
+echo "#" >> ./mythdvd/mtd/config.pro
+
+#
+#   Copy over common start of xml menu files
+#
+cp ./mythdvd/mythdvd/dvdmenu.xml.pre ./mythdvd/mythdvd/dvdmenu.xml
+cp ./mythdvd/mythdvd/dvd_settings.xml.pre ./mythdvd/mythdvd/dvd_settings.xml
+
+if test "$vcdsupport" = "yes" ; then
+    echo "        VCD           support will be included in MythDVD"
+    echo "#define VCD_SUPPORT 1" >> ./mythdvd/mythdvd/config.h
+    #
+    #   Make the user menu include a button for VCD playing
+    #
+    cat ./mythdvd/mythdvd/dvdmenu.xml.vcd >> ./mythdvd/mythdvd/dvdmenu.xml
+fi
+
+if test "$transcode" = "yes" ; then
+    echo "        Transcode     support will be included in MythDVD"
+    echo "#define TRANSCODE_SUPPORT 1" >> ./mythdvd/mythdvd/config.h
+
+    #
+    #   Conditional build and link stuff for mythdvd
+    #
+    echo "HEADERS += dvdripbox.h   dvdinfo.h   titledialog.h"   >> ./mythdvd/mythdvd/config.pro
+    echo "SOURCES += dvdripbox.cpp dvdinfo.cpp titledialog.cpp" >> ./mythdvd/mythdvd/config.pro
+    echo "LIBS    += -ldvdread"                                  >> ./mythdvd/mythdvd/config.pro
+
+    #
+    #   Conditional build and link stuff for mtd
+    #
+    echo "HEADERS += logging.h   mtd.h   serversocket.h   jobthread.h   dvdprobe.h   fileobs.h   threadevents.h "   >> ./mythdvd/mtd/config.pro
+    echo "SOURCES += logging.cpp mtd.cpp serversocket.cpp jobthread.cpp dvdprobe.cpp fileobs.cpp threadevents.cpp " >> ./mythdvd/mtd/config.pro
+    echo "LIBS    += -ldvdread"                                          >> ./mythdvd/mtd/config.pro
+
+    #
+    #   Need to make the xml menus reflect this choice
+    #
+    cat ./mythdvd/mythdvd/dvdmenu.xml.mid >> ./mythdvd/mythdvd/dvdmenu.xml
+    cat ./mythdvd/mythdvd/dvd_settings.xml.mid >> ./mythdvd/mythdvd/dvd_settings.xml
+
+#  echo "LIBS += -lrfftw -lfftw" >> ./mythdvd/mythdvd/config.pro
+#  echo "QMAKE_CXXFLAGS_RELEASE += `sdl-config --cflags`" >> ./mythdvd/mythdvd/config.pro
+#  echo "QMAKE_CXXFLAGS_DEBUG += `sdl-config --cflags`" >> ./mythdvd/mythdvd/config.pro
+fi
+
+if test "$transcode" = "no" ; then
+  echo "        Transcode     support will not be included in MythDVD"
+fi
+
+if test "$vcdsupport" = "no" ; then
+  echo "        VCD           support will not be included in MythDVD"
+fi
+
+#
+#   Finish off the xml menu files
+#
+cat ./mythdvd/mythdvd/dvdmenu.xml.post >> ./mythdvd/mythdvd/dvdmenu.xml
+cat ./mythdvd/mythdvd/dvd_settings.xml.post >> ./mythdvd/mythdvd/dvd_settings.xml
+
+###########################################################
+#                                                         #
+#   MythGallery related configuration options             #
+#                                                         #
+###########################################################
+
+
+echo "/*" >  ./mythgallery/mythgallery/config.h
+echo "    Automatically generated by configure - do not modify" >> ./mythgallery/mythgallery/config.h
+echo "*/" >> ./mythgallery/mythgallery/config.h
+
+echo "#" > ./mythgallery/mythgallery/config.pro
+echo "#    Automatically generated by configure - modify only under penalty of death" >> ./mythgallery/mythgallery/config.pro
+echo "#" >> ./mythgallery/mythgallery/config.pro
+
+if test "$opengl" = "yes" ; then
+  echo "        OpenGL        support will be included in MythGallery"
+  echo "#define OPENGL_SUPPORT 1" >> ./mythgallery/mythgallery/config.h
+  echo "CONFIG += opengl" >> ./mythgallery/mythgallery/config.pro
+  echo "HEADERS += glsingleview.h" >> ./mythgallery/mythgallery/config.pro
+  echo "SOURCES += glsingleview.cpp" >> ./mythgallery/mythgallery/config.pro
+fi
+
+if test "$opengl" = "no" ; then
+  echo "        OpenGL        support will not be included in MythGallery"
+fi
+
+if test "$exif" = "yes" ; then
+  echo "        EXIF          support will be included in MythGallery"
+  echo "#define EXIF_SUPPORT 1" >> ./mythgallery/mythgallery/config.h
+  echo "LIBS += -lexif" >> ./mythgallery/mythgallery/config.pro
+
+  if `pkg-config --atleast-version 0.6.9 libexif` ; then
+     echo "#define NEW_LIB_EXIF 1" >> ./mythgallery/mythgallery/config.h
+  fi
+fi
+
+if test "$exif" = "no" ; then
+  echo "        EXIF          support will not be included in MythGallery"
+fi
+
+###########################################################
+#                                                         #
+#   MythPhone related configuration options               #
+#                                                         #
+###########################################################
+
+
+echo "/*" >  ./mythphone/mythphone/config.h
+echo "    Automatically generated by configure - do not modify" >> ./mythphone/mythphone/config.h
+echo "*/" >> ./mythphone/mythphone/config.h
+
+echo "#" > ./mythphone/mythphone/config.pro
+echo "#    Automatically generated by configure - modify only under penalty of death" >> ./mythphone/mythphone/config.pro
+echo "#" >> ./mythphone/mythphone/config.pro
+
+if test "$festival" = "yes" ; then
+  echo "        FESTIVAL      support will be included in MythPhone"
+  echo "#define FESTIVAL_SUPPORT 1" >> ./mythphone/mythphone/config.h
+  echo "FESTIVALDIR = /home/paul/Build/festival/festival/" >> ./mythphone/mythphone/config.pro
+  echo "SPEECHTOOLSDIR = /home/paul/Build/festival/speech_tools/" >> ./mythphone/mythphone/config.pro
+  echo "INCLUDEPATH += \$\${FESTIVALDIR}/src/include" >> ./mythphone/mythphone/config.pro
+  echo "INCLUDEPATH += \$\${SPEECHTOOLSDIR}/include" >> ./mythphone/mythphone/config.pro
+  echo "DEFINES += FESTIVAL_HOME=\\\"\$\${FESTIVALDIR}\\\"" >> ./mythphone/mythphone/config.pro
+  echo "LIBS += -L\$\${FESTIVALDIR}/src/lib" >> ./mythphone/mythphone/config.pro
+  echo "LIBS += -L\$\${SPEECHTOOLSDIR}/lib" >> ./mythphone/mythphone/config.pro
+  echo "LIBS += -lFestival -lestools -lestbase -leststring -ltermcap" >> ./mythphone/mythphone/config.pro
+fi
+
+if test "$festival" = "no" ; then
+  echo "        FESTIVAL      support will not be included in MythPhone"
+fi
+
+echo ""
