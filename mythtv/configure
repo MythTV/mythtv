@@ -974,7 +974,7 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
        optimize="small"
        cpu_raw="c3-2"
 # c3
-   elif expr "$processor" : ".*VIA C3 Ezra" > /dev/null ; then
+   elif expr "$processor" : ".*VIA.*Ezra" > /dev/null ; then
        ARCHFLAGS="-march=c3"
        optimize="small"
        cpu_raw="c3"
