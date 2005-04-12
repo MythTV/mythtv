@@ -222,7 +222,7 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
         socket->readBlock(dump.data(), pending);
         VERBOSE(VB_IMPORTANT, QString("Protocol error: '%1' is not a valid "
                                       "size prefix. %2 bytes pending.")
-                                      .arg(sizestr, pending));
+                                      .arg(sizestr).arg(pending));
         return false;
     }
 
@@ -464,7 +464,7 @@ bool ReadStringList(QSocket *socket, QStringList &list)
         socket->readBlock(dump.data(), pending);
         VERBOSE(VB_IMPORTANT, QString("Protocol error: '%1' is not a valid "
                                       "size prefix. %2 bytes pending.")
-                                      .arg(sizestr, pending));
+                                      .arg(sizestr).arg(pending));
         return false;
     }
 

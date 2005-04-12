@@ -433,7 +433,11 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
     }
     else if (command == "OK")
     {
-        VERBOSE(VB_ALL, "Got 'OK' out of sync..");
+        VERBOSE(VB_ALL, "Got 'OK' out of sequence.");
+    }
+    else if (command == "UNKNOWN_COMMAND")
+    {
+        VERBOSE(VB_ALL, "Got 'UNKNOWN_COMMAND' out of sequence.");
     }
     else
     {
