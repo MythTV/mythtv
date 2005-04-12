@@ -485,9 +485,20 @@ bool OpenGLVideoSync::TryInit()
         return false;
     }
     m_drawable = w;
-    glXMakeCurrent(m_display, m_drawable, m_context);
-    
-    return true;
+    if (glXMakeCurrent(m_display, m_drawable, m_context) != False)
+    {
+        unsigned int count;
+        int ok = glXGetVideoSyncSGI(&count);
+        if (GLX_BAD_CONTEXT == ok)
+            VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Bad Context for VSync");
+        return GLX_BAD_CONTEXT != ok;
+    }
+    else
+    {
+        VERBOSE(VB_PLAYBACK,
+                "OpenGLVideoSync: Failed to make GLX context current context");
+        return false;
+    }
 }
 
 void OpenGLVideoSync::Start()
