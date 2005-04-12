@@ -211,7 +211,7 @@
     </message>
     <message>
         <source>Match an exact title</source>
-        <translation>&gt;Nach einem best. Titel suchen</translation>
+        <translation>Nach einem best. Titel suchen</translation>
     </message>
     <message>
         <source>Match an exact episode</source>
@@ -228,6 +228,45 @@
     <message>
         <source>Only shows marked as HDTV</source>
         <translation>Nur Sendungen in HDTV</translation>
+    </message>
+    <message>
+        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
+        <translation>SportsCenter Overnight (vollst. Beispiel mit &apos;Suche Täglich&apos;)</translation>
+    </message>
+    <message>
+        <source>Movie of the Week (complete example - use FindWeekly)</source>
+        <translation>Filme der Woche (vollst. Beispiel mit &apos;Suche Wöchentlich&apos;)</translation>
+    </message>
+</context>
+<context>
+    <name>DVBTransportsEditor</name>
+    <message>
+        <source>DVB Transport Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to delete this transport?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete the transport</source>
+        <translation>Ja, bitte löschen</translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation>Nein, nicht löschen</translation>
+    </message>
+    <message>
+        <source>Transport Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation>Bearbeiten..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation>Löschen..</translation>
     </message>
 </context>
 <context>
@@ -793,7 +832,15 @@
     </message>
     <message>
         <source>Save it so I can watch it again</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte speichern, ich möchte es noch einmal sehen</translation>
+    </message>
+    <message>
+        <source>Group</source>
+        <translation>Gruppe</translation>
+    </message>
+    <message>
+        <source>Password:</source>
+        <translation>Passwort:</translation>
     </message>
 </context>
 <context>
@@ -3221,7 +3268,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Log Print Threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>Log-Level Schwellwert</translation>
     </message>
     <message>
         <source>All Messages</source>
@@ -3261,11 +3308,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Disable Printed Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Meldungen</translation>
     </message>
     <message>
         <source>This controls what messages will be printed out as well as being logged to the database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestimmt, welche Meldungen im Terminalfenster ausgegeben werden. Zusätzlich werden diese Meldungen in der Datenbank gespeichert.</translation>
     </message>
     <message>
         <source>Automatically run mythfilldatabase</source>
@@ -4018,55 +4065,55 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Horizontal resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Horizontale Auflösung für die GUI. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
+        <translation type="obsolete">Horizontale Auflösung für die GUI. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
     </message>
     <message>
         <source>Vertical resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Vertikale Auflösung für die GUI. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
+        <translation type="obsolete">Vertikale Auflösung für die GUI. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
     </message>
     <message>
         <source>X</source>
-        <translation>X</translation>
+        <translation type="obsolete">X</translation>
     </message>
     <message>
         <source>Horizontal resolution of video mode which needs a special output resolution.</source>
-        <translation>Horizontale Auflösung des Videomodus der eine spezielle Auflösung für die Ausgabe benötigt.</translation>
+        <translation type="obsolete">Horizontale Auflösung des Videomodus der eine spezielle Auflösung für die Ausgabe benötigt.</translation>
     </message>
     <message>
         <source>Y</source>
-        <translation>Y</translation>
+        <translation type="obsolete">Y</translation>
     </message>
     <message>
         <source>Vertical resolution of video mode which needs a special output resolution.</source>
-        <translation>Vertikale Auflösung des Videomodus der eine spezielle Auflösung für die Ausgabe benötigt.</translation>
+        <translation type="obsolete">Vertikale Auflösung des Videomodus der eine spezielle Auflösung für die Ausgabe benötigt.</translation>
     </message>
     <message>
         <source>Horizontal resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Horizontale Auflösung für die Video Wiedergabe. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
+        <translation type="obsolete">Horizontale Auflösung für die Video Wiedergabe. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
     </message>
     <message>
         <source>Vertical resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Vertikale Auflösung für die Video Wiedergabe. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
+        <translation type="obsolete">Vertikale Auflösung für die Video Wiedergabe. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
     </message>
     <message>
         <source>Alt Aspect</source>
-        <translation>Alt Aspekt</translation>
+        <translation type="obsolete">Alt Aspekt</translation>
     </message>
     <message>
         <source>If X&apos;s DisplaySize indicates 16:9, fudge vertical size into 4:3, and visa-versa</source>
-        <translation>Falls X&apos; DisplaySize 16:9 meldet, zwänge die vertikale Größe in 4:3 und umgekehrt.</translation>
+        <translation type="obsolete">Falls X&apos; DisplaySize 16:9 meldet, zwänge die vertikale Größe in 4:3 und umgekehrt.</translation>
     </message>
     <message>
         <source>GUI Size (px)</source>
-        <translation>GUI Größe (pixel)</translation>
+        <translation type="obsolete">GUI Größe (pixel)</translation>
     </message>
     <message>
         <source>Default Display (px)</source>
-        <translation>Standarddisplay (pixel)</translation>
+        <translation type="obsolete">Standarddisplay (pixel)</translation>
     </message>
     <message>
         <source>Physical Size</source>
-        <translation>Physische Größe</translation>
+        <translation type="obsolete">Physische Größe</translation>
     </message>
     <message>
         <source>Toggles between windowed and borderless operation.</source>
@@ -4966,7 +5013,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze einen selbstgewählten Namen für dieses Frontend</translation>
     </message>
     <message>
         <source>Wake-On-LAN settings</source>
@@ -5677,7 +5724,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
-        <translation>Für Xinerama Nutzer; benutze nur den angegebenen Bildschirm. Bei -1 werden alle Bildschirme genutzt.</translation>
+        <translation type="obsolete">Für Xinerama Nutzer; benutze nur den angegebenen Bildschirm. Bei -1 werden alle Bildschirme genutzt.</translation>
     </message>
     <message>
         <source>TV audio through PVR-350 only</source>
@@ -5807,6 +5854,147 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
         <translation>Falls gesetzt, wird für neue Aufnahmen der Auftragstyp 4 standardmäßig aktiviert sein.</translation>
     </message>
+    <message>
+        <source>Run on the specified screen or spanning all screens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution of video which needs a special output resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution of video which needs a special output resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI</source>
+        <translation>GUI</translation>
+    </message>
+    <message>
+        <source>Resolution of screen when not watching a video.</source>
+        <translation>Bildschirmauflösung für die GUI.</translation>
+    </message>
+    <message>
+        <source>Default screen resolution when watching a video.</source>
+        <translation>Bildschirmauflösung für die Videowiedergabe.</translation>
+    </message>
+    <message>
+        <source>Aspect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In X</source>
+        <translation>In X</translation>
+    </message>
+    <message>
+        <source>In Y</source>
+        <translation>In Y</translation>
+    </message>
+    <message>
+        <source>Screen resolution when watching a video at a specific resolution.</source>
+        <translation>Bildschirmauflösung für die Videowiedergabe in einer best. Auflösung.</translation>
+    </message>
+    <message>
+        <source>Video Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default refresh rate when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh rate when watching a video at a specific resolution.</source>
+        <translation>Wiederholrate für die Videowiedergabe in einer best. Auflösung.</translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation>Rate</translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video.</source>
+        <translation>Seitenverhältnis für die Videowiedergabe.</translation>
+    </message>
+    <message>
+        <source>Aspect ration when watching a video at a specific resolution.</source>
+        <translation>Seitenverhältnis für die Videowiedergabe in einer best. Auflösung.</translation>
+    </message>
+    <message>
+        <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bad Menu File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Menu File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed out waiting for signal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital TV standard.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation Used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8VSB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM64</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM256</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport Options</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
@@ -5904,6 +6092,22 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>is not available</source>
         <translation>ist nicht verfügbar</translation>
+    </message>
+    <message>
+        <source>On %1 %2 from %3.%4
+%5
+%6</source>
+        <translation>Bei %1 %2 von %3.%4
+%5
+%6</translation>
+    </message>
+    <message>
+        <source>On %1 %2 from %3.%4
+%5
+No other details</source>
+        <translation>Bei %1 %2 von %3.%4
+%5
+Keine weiteren Informationen</translation>
     </message>
 </context>
 <context>
