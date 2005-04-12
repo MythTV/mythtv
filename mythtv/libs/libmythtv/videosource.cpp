@@ -480,7 +480,8 @@ void XMLTV_generic_config::save() {
     if (grabber == "tv_grab_de" || grabber == "tv_grab_se_swedb" || 
         grabber == "tv_grab_fi" || grabber == "tv_grab_es" ||
         grabber == "tv_grab_nl" || grabber == "tv_grab_jp" ||
-        grabber == "tv_grab_no" || grabber == "tv_grab_pt")
+        grabber == "tv_grab_no" || grabber == "tv_grab_pt" ||
+        grabber == "tv_grab_ee")
     {
         cerr << "You _MUST_ run 'mythfilldatabase --manual the first time, "
              << "instead\n";
@@ -554,6 +555,9 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent)
 
     addTarget("tv_grab_pt", new XMLTV_generic_config(parent, "tv_grab_pt"));
     grabber->addSelection("Portugal", "tv_grab_pt");
+
+    addTarget("tv_grab_ee", new XMLTV_generic_config(parent, "tv_grab_ee"));
+    grabber->addSelection("Estonia", "tv_grab_ee");
 }
 
 VideoSource::VideoSource() 

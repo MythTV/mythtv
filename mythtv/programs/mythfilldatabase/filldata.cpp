@@ -2806,7 +2806,8 @@ bool fillData(QValueList<Source> &sourcelist)
         }
         else if (xmltv_grabber == "datadirect" ||
                  xmltv_grabber == "tv_grab_se_swedb" ||
-                 xmltv_grabber == "tv_grab_no")
+                 xmltv_grabber == "tv_grab_no" ||
+                 xmltv_grabber == "tv_grab_ee")
         {
             if (xmltv_grabber == "tv_grab_no")
                 listing_wrap_offset = 6 * 3600;
@@ -2845,6 +2846,8 @@ bool fillData(QValueList<Source> &sourcelist)
                 maxday = 7;
             else if (xmltv_grabber == "tv_grab_se_swedb")
                 maxday = 10;
+            else if (xmltv_grabber == "tv_grab_ee")
+                maxday = 14;
 
             for (int i = 0; i < maxday; i++)
             {
