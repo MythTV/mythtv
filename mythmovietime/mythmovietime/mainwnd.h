@@ -52,21 +52,31 @@ class MMTMainWindow : public MythThemedDialog
         void selected(UIListGenericTree *);
         void entered(UIListTreeType *, UIListGenericTree *);
         void keyPressEvent(QKeyEvent *e);
+        void doBuyTicket();
+        void doVisitSite();
+        void doFullFilmInfo();
+        void closeActivePopup();
         
     protected:    
+        void launchBrowser(const QString& url) const;
         void initializeTree();
-        void doMenu(UIListGenericTree*);
+        void doMenu(UIListGenericTree*, bool);
+        
+        
+        QString Zoom;
+        QString Browser;
         
         //  Theme widgets
         UIListGenericTree   *RootNode;
         UIListTreeType      *Tree;
         LayerSet            *Info;
         
+                
+        MMTDBItem *MoviesRoot;
+        MMTDBItem *TheatersRoot;
+        MMTDBItem *GenreRoot;
         
-        MMTDBItem* MoviesRoot;
-        MMTDBItem* TheatersRoot;
-        MMTDBItem* GenreRoot;
-        
+        MythPopupBox *ActivePopup;
 };
 
 

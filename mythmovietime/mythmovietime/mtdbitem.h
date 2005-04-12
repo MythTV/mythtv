@@ -31,25 +31,28 @@ class MMTDBItem  : public UIListGenericTree
     public:
         MMTDBItem(UIListGenericTree *parent, const QString &text, 
                   int FilmID = 0, const QString& theaterID = "ALL",
-                  int ShowingID = 0, int TimeID = 0 );
+                  int ShowingID = 0, int TimeID = 0, const QString& officialURL = "");
                   
         virtual ~MMTDBItem() { }
 
         int getKey(void) const { return Key; }
         int getFilmID(void) const { return FilmID; }
         int getShowingID(void) const { return ShowingID; }
+        
         const QString& getTheaterID(void) const { return TheaterID; }
+        const QString& getOfficialURL() const { return OfficialURL; }        
         
         virtual void populateTree(UIListGenericTree*) {return;}
         virtual void toMap(QMap<QString, QString> &map);
         
     protected:
         int Key;
-        
         int FilmID;
-        QString TheaterID;
         int ShowingID;
         int TimeID;
+
+        QString TheaterID;
+        QString OfficialURL;        
 };
 
 
@@ -57,7 +60,8 @@ class MMTShowingItem : public MMTDBItem
 {
     public:
         MMTShowingItem(UIListGenericTree* parent, const QDate& dt, int FilmID = 0, 
-                       const QString& theaterID = "", int ShowingID = 0, int timeID = 0);
+                       const QString& theaterID = "", int ShowingID = 0, int timeID = 0,
+                       const QString& officialURL = "");
         virtual void populateTree(UIListGenericTree* Tree);
         virtual void toMap(QMap<QString, QString> &map);
         
@@ -71,14 +75,19 @@ class MMTShowTimeItem : public MMTDBItem
     public:
         MMTShowTimeItem(UIListGenericTree* parent, const QDate& dt, const QTime& time, 
                         bool bargain, int FilmID = 0, const QString& theaterID = "", 
-                        int ShowingID = 0, int TimeID = 0);
+                        int ShowingID = 0, int TimeID = 0, const QString& ticketURL = "",
+                        const QString& officialURL = "");
     
         virtual void toMap(QMap<QString, QString> &map);
+        const QString& getTicketURL() const { return TicketURL; }
+        
     protected:
         bool Bargain;
 
         QTime TicketTime;
         QDate ShowDate;
+        QString TicketURL;
+        
 };
 
 class MMTGenreMasterItem : public MMTDBItem
@@ -93,7 +102,7 @@ class MMTGenreItem : public MMTDBItem
 {
     public:
         MMTGenreItem(UIListGenericTree* parent, const QString &text, int FilmID = 0, 
-                     const QString& theaterID = "", int ShowingID = 0);
+                     const QString& theaterID = "", int ShowingID = 0, const QString& officialURL = "");
         
         virtual void populateTree(UIListGenericTree* tree);
     
@@ -116,7 +125,7 @@ class MMTMovieItem : public MMTDBItem
 {
     public:
         MMTMovieItem(UIListGenericTree* parent, const QString &text, int FilmID = 0, 
-                     const QString& theaterID = "", int ShowingID = 0);
+                     const QString& theaterID = "", int ShowingID = 0, const QString& officialURL = "");
         
         virtual void populateTree(UIListGenericTree* tree);
                         
@@ -138,12 +147,14 @@ class MMTTheaterItem : public MMTDBItem
 {
     public:
         MMTTheaterItem(UIListGenericTree* parent, const QString &text, int FilmID = 0, 
-                       const QString& theaterID = "", int ShowingID = 0, int timeID = 0);
+                       const QString& theaterID = "", int ShowingID = 0, int timeID = 0,
+                       const QString& officialURL = "");
         virtual void populateTree(UIListGenericTree* Tree);
     
     protected:
         void populateTreeWithMovies(UIListGenericTree* Tree);
         void populateTreeWithDates(UIListGenericTree* Tree);
+        void populateTreeWithTimes(UIListGenericTree* Tree);
 };
 
 

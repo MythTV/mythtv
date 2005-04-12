@@ -79,13 +79,15 @@ static QPixmap *getPixmap(const QString &level)
  
 MMTDBItem::MMTDBItem(UIListGenericTree *parent, const QString &text, 
                      int filmID, const QString& theaterID, 
-                     int showingID, int timeID)
+                     int showingID, int timeID, const QString& officialURL)
          : UIListGenericTree(parent, text, "MMTDBItem")
 {
     FilmID = filmID;
     TheaterID = theaterID;
     ShowingID = showingID;
     TimeID = timeID;
+    OfficialURL = officialURL;
+    
 }
 
 
@@ -174,6 +176,15 @@ void MMTDBItem::toMap(QMap<QString, QString> &map)
                                                       .arg(query.value(8).toString());
             }                                     
             map["film_starrating"]      = query.value(9).toString();
+            if(!map["film_starrating"].isEmpty())
+            {
+                map["film_longtitle"] = map["film_title"] + " (" + map["film_starrating"] + ")";
+            }
+            else
+            {
+                map["film_longtitle"] = map["film_title"];
+            }
+            
             map["film_certification"]   = query.value(10).toString();
             map["film_audience"]        = query.value(11).toString();
             map["film_imageurl"]        = query.value(12).toString();
@@ -211,8 +222,8 @@ void MMTDBItem::toMap(QMap<QString, QString> &map)
 
 
 MMTGenreItem::MMTGenreItem(UIListGenericTree* parent, const QString &text,
-                           int filmID, const QString& theaterID, int showingID)
-            : MMTDBItem(parent, text, filmID, theaterID, showingID)
+                           int filmID, const QString& theaterID, int showingID, const QString& officialURL)
+            : MMTDBItem(parent, text, filmID, theaterID, showingID, 0, officialURL)
 {
     Genre = text;
 }
@@ -228,7 +239,7 @@ void MMTGenreItem::populateTree(UIListGenericTree*)
     // Logic would dictate that we just grab all the movies listed in the
     // movietime_films table however that table can contain films that are
     // not actually being shown. So we're forced to do an inner join.
-    query.prepare( "SELECT DISTINCT movie.FilmID, film.title "
+    query.prepare( "SELECT DISTINCT movie.FilmID, film.title, film.officialurl "
                    "FROM movietime_movies movie "
                    "INNER JOIN movietime_films film ON film.filmID = movie.filmID "
                    "WHERE film.Genre = :GENRE "
@@ -241,7 +252,8 @@ void MMTGenreItem::populateTree(UIListGenericTree*)
         while (query.next()) 
         {
             tempItem = new MMTMovieItem(this, query.value(1).toString(), 
-                                        query.value(0).toInt());
+                                        query.value(0).toInt(), TheaterID, ShowingID,
+                                        query.value(2).toString());
          
         }
     }
@@ -305,7 +317,7 @@ void MMTMovieMasterItem::populateTree(UIListGenericTree*)
     // Logic would dictate that we just grab all the movies listed in the
     // movietime_films table however that table can contain films that are
     // not actually being shown. So we're forced to do an inner join.
-    query.prepare( "SELECT DISTINCT movie.FilmID, film.title "
+    query.prepare( "SELECT DISTINCT movie.FilmID, film.title, film.officialurl "
                    "FROM movietime_movies movie "
                    "INNER JOIN movietime_films film ON film.filmID = movie.filmID "
                    "ORDER BY title" );
@@ -315,7 +327,8 @@ void MMTMovieMasterItem::populateTree(UIListGenericTree*)
         while (query.next()) 
         {
             tempItem = new MMTMovieItem(this, query.value(1).toString(), 
-                                        query.value(0).toInt());
+                                        query.value(0).toInt(), TheaterID, ShowingID,
+                                        query.value(2).toString());
          
         }
     }
@@ -324,9 +337,10 @@ void MMTMovieMasterItem::populateTree(UIListGenericTree*)
 
 
 MMTShowingItem::MMTShowingItem(UIListGenericTree* parent, const QDate& dt, 
-                               int filmID, const QString& theaterID, int showingID, int timeID)
+                               int filmID, const QString& theaterID, int showingID, 
+                               int timeID, const QString& officialURL)
               : MMTDBItem(parent, dt.toString(getDateFormat()),
-                          filmID, theaterID, showingID, timeID )
+                          filmID, theaterID, showingID, timeID, officialURL)
 {
     ShowDate = dt;
 }
@@ -334,35 +348,47 @@ MMTShowingItem::MMTShowingItem(UIListGenericTree* parent, const QDate& dt,
                
 void MMTShowingItem::populateTree(UIListGenericTree*)
 {
-    
-    
     MSqlQuery query(MSqlQuery::InitCon());
+    QString tempURL;
     
     if (TheaterID == "ALL" )
     {
-        MMTDBItem* tempItem;
+        MMTTheaterItem* tempItem;
         
-        query.prepare( "SELECT DISTINCT rowid, Date "
-                       "FROM movietime_movies "
-                       "WHERE filmid = :FILMID" );
+        
+        query.prepare( "SELECT m.rowid, m.theaterid, t.name "
+                       "FROM movietime_movies m "
+                       "INNER JOIN movietime_theaters t on t.theaterid = m.theaterid "
+                       "WHERE m.filmid = :FILMID " 
+                       "AND m.date = :DATE");
                    
         query.bindValue(":FILMID", FilmID);
+        query.bindValue(":DATE", ShowDate);
+        
         if (query.exec() && query.isActive() && query.size() > 0)
         {
             while (query.next()) 
             {
-                tempItem = new MMTDBItem(this, query.value(1).toString(), 
-                                         FilmID, TheaterID, ShowingID, query.value(0).toInt());
+               
+                tempItem = new MMTTheaterItem(this, query.value(2).toString(), 
+                                              FilmID, query.value(1).toString(), 
+                                              query.value(0).toInt(), 0, OfficialURL);
          
             }
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, query.executedQuery());
         }
     }        
     else
     {
-       query.prepare( "SELECT rowid, Time, Bargin "
-                      "FROM movietime_showtimes "
-                      "WHERE TimesRowID = :ROWID " 
-                      "ORDER BY Time");
+       query.prepare( "SELECT st.rowid, st.Time, st.Bargin, "
+                      "       mt.TicketURL, mt.TimesTicketURL "
+                      "FROM movietime_showtimes st "
+                      "INNER JOIN movietime_movies mt ON mt.rowid = st.TimesRowId "
+                      "WHERE st.TimesRowID = :ROWID " 
+                      "ORDER BY st.Time");
                    
         query.bindValue(":ROWID", ShowingID);
         
@@ -372,10 +398,29 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
         {
             while (query.next()) 
             {
+//                cerr << query.value(3).toString() << endl;
+
+                if ( query.value(3).toString().isEmpty() )
+                {
+                    tempURL = query.value(2).toString();
+                }
+                else
+                {
+                    tempURL = query.value(3).toString();
+                }
+                
                 tempItem = new MMTShowTimeItem(this, ShowDate, query.value(1).toTime(), 
                                                query.value(2).toBool(), FilmID, 
-                                               TheaterID, ShowingID, query.value(0).toInt());         
+                                               TheaterID, ShowingID, query.value(0).toInt(),
+                                               tempURL, OfficialURL );
             }
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "MMTShowingItem::populateTree failed to fetch times" );
+            VERBOSE(VB_IMPORTANT, query.executedQuery());
+            VERBOSE(VB_IMPORTANT, query.lastError().text());
+
         }
     }
     
@@ -384,13 +429,15 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
 
 MMTShowTimeItem::MMTShowTimeItem(UIListGenericTree* parent, const QDate& dt, const QTime& tm, 
                                  bool bargain, int filmID, const QString& theaterID, int showingID, 
-                                 int timeID)
+                                 int timeID, const QString& ticketURL, const QString& officialURL)
                : MMTDBItem(parent, tm.toString(getTimeFormat()), 
                            filmID, theaterID, showingID, timeID)
 {
     ShowDate = dt;
     TicketTime = tm;
     Bargain = bargain;
+    TicketURL = ticketURL;
+    OfficialURL = officialURL;
     if ( Bargain )
     {
         setPixmap(getPixmap("bargain"));
@@ -428,8 +475,8 @@ void MMTShowTimeItem::toMap(QMap<QString, QString> &map)
 
 
 MMTMovieItem::MMTMovieItem(UIListGenericTree* parent, const QString &text, 
-                           int filmID, const QString& theaterID, int showingID)
-            : MMTDBItem(parent, text, filmID, theaterID, showingID )
+                           int filmID, const QString& theaterID, int showingID, const QString& officialURL)
+            : MMTDBItem(parent, text, filmID, theaterID, showingID, 0, officialURL)
 {
 }
 
@@ -474,7 +521,8 @@ void MMTMovieItem::populateTreeWithDates(UIListGenericTree*)
         while (query.next()) 
         {
             tempItem = new MMTShowingItem(this, query.value(1).toDate(), 
-                                          FilmID, TheaterID, query.value(0).toInt());
+                                          FilmID, TheaterID, query.value(0).toInt(),
+                                          0, OfficialURL);
          
         }
     }
@@ -551,8 +599,9 @@ void MMTTheaterMasterItem::populateTree(UIListGenericTree*)
 }
 
 MMTTheaterItem::MMTTheaterItem(UIListGenericTree* parent, const QString &text, 
-                               int filmID, const QString& theaterID, int showingID, int timeID)
-              : MMTDBItem(parent, text, filmID, theaterID, showingID, timeID)
+                               int filmID, const QString& theaterID, int showingID, 
+                               int timeID, const QString& officialURL)
+              : MMTDBItem(parent, text, filmID, theaterID, showingID, timeID, officialURL)
 {
 }
 
@@ -560,16 +609,59 @@ void MMTTheaterItem::populateTree(UIListGenericTree* tree)
 {
     if ( ShowingID > 0)
     {
-       
+       populateTreeWithTimes( tree );
     }
     else if (FilmID > 0)
     {
-        
         populateTreeWithDates( tree );
     }
     else
     {
         populateTreeWithMovies( tree );
+    }
+}
+
+void MMTTheaterItem::populateTreeWithTimes(UIListGenericTree*)
+{
+    MMTShowTimeItem* tempItem;
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString tempURL;
+    
+    query.prepare( "SELECT st.rowid, st.Time, st.Bargin, mt.date, "
+                  "       mt.TicketURL, mt.TimesTicketURL "
+                  "FROM movietime_showtimes st "
+                  "INNER JOIN movietime_movies mt ON mt.rowid = st.TimesRowId "
+                  "WHERE st.TimesRowID = :ROWID " 
+                  "ORDER BY st.Time");
+               
+    query.bindValue(":ROWID", ShowingID);
+    
+    
+    
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next()) 
+        {
+            if ( query.value(5).toString().isEmpty() )
+            {
+                tempURL = query.value(4).toString();
+            }
+            else
+            {
+                tempURL = query.value(5).toString();
+            }
+            
+            tempItem = new MMTShowTimeItem(this, query.value(3).toDate(), query.value(1).toTime(), 
+                                           query.value(2).toBool(), FilmID, 
+                                           TheaterID, ShowingID, query.value(0).toInt(),
+                                           tempURL, OfficialURL );
+        }
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, "MMTTheaterItem::populateTreeWithTimes failed to fetch times" );
+        VERBOSE(VB_IMPORTANT, query.executedQuery());
+        VERBOSE(VB_IMPORTANT, query.lastError().text());
     }
 }
 
@@ -580,7 +672,7 @@ void MMTTheaterItem::populateTreeWithMovies(UIListGenericTree*)
     
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT DISTINCT movie.FilmID, film.Title "
+    query.prepare("SELECT DISTINCT movie.FilmID, film.Title, film.officialurl "
                   "FROM movietime_movies movie "
                   "INNER JOIN movietime_films film ON film.FilmID = movie.FilmID "
                   "WHERE movie.TheaterID = :THEATERID");
@@ -592,7 +684,8 @@ void MMTTheaterItem::populateTreeWithMovies(UIListGenericTree*)
         while (query.next()) 
         {
             tempItem = new MMTMovieItem(this, query.value(1).toString(), 
-                                        query.value(0).toInt(), TheaterID, ShowingID);
+                                        query.value(0).toInt(), TheaterID, ShowingID, 
+                                        query.value(2).toString());
          
         }
     }
@@ -603,23 +696,20 @@ void MMTTheaterItem::populateTreeWithDates(UIListGenericTree*)
     MMTShowingItem* tempItem;
     
     MSqlQuery query(MSqlQuery::InitCon());
-    
-    if (FilmID > 0 )
-    {
-    
-        query.prepare( "SELECT rowid,  Date "
-                       "FROM movietime_movies "
-                       "WHERE filmid = :FILMID AND "
-                       "TheaterID = :THEATERID" );
+    query.prepare( "SELECT rowid, Date"
+                   "FROM movietime_movies "
+                   "WHERE filmid = :FILMID AND "
+                   "TheaterID = :THEATERID" );
 
-        query.bindValue(":FILMID", FilmID);
-        query.bindValue(":THEATERID", TheaterID);
-    }
+    query.bindValue(":FILMID", FilmID);
+    query.bindValue(":THEATERID", TheaterID);
+
     
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         while (query.next()) 
         {
+        
             tempItem = new MMTShowingItem(this, query.value(1).toDate(), 
                                           FilmID, TheaterID, query.value(0).toInt());
          

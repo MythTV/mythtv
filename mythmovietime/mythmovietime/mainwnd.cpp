@@ -48,9 +48,15 @@ MMTMainWindow::MMTMainWindow(MythMainWindow *parent, const QString &window_name,
                              const QString &theme_filename, const char *name)
              : MythThemedDialog(parent, window_name, theme_filename, name)
 {
+    ActivePopup = NULL;
+
+    Zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
+    Browser = gContext->GetSetting("WebBrowserCommand",
+                                   gContext->GetInstallPrefix() + "/bin/mythbrowser");
+
     Info = getContainer("info");
     Tree = getUIListTreeType("movietree");
-    
+        
     if (!Tree)
     {
         DialogBox diag(gContext->GetMainWindow(), 
@@ -150,7 +156,7 @@ void MMTMainWindow::keyPressEvent(QKeyEvent *e)
         handled = true;
 
         if (action == "INFO")
-            doMenu(curItem);
+            doMenu(curItem, true);
         else if (action == "SELECT")
             selected(curItem);
         else if (action == "UP")
@@ -175,11 +181,102 @@ void MMTMainWindow::keyPressEvent(QKeyEvent *e)
     MythDialog::keyPressEvent(e);
 }
 
-void MMTMainWindow::doMenu(UIListGenericTree*)
+void MMTMainWindow::doMenu(UIListGenericTree* item, bool infoMenu)
 {
+    MMTDBItem *curItem = dynamic_cast<MMTDBItem*>(item);
+    
+    if (ActivePopup || !curItem)
+    {
+        return;
+    }
+    
+    ActivePopup = new MythPopupBox(gContext->GetMainWindow(), "popup");
+    if (infoMenu)
+    {
+        if (curItem->getFilmID() > 0 )
+        {
+            ActivePopup->addButton(tr("Full Film Details"), this, SLOT(doFullFilmInfo()));
+        }
+        
+        if (!curItem->getOfficialURL().isEmpty() )
+        {
+            ActivePopup->addButton(tr("Visit Movie Website"), this, SLOT(doVisitSite()));
+        }
+
+        MMTShowTimeItem *showItem = dynamic_cast<MMTShowTimeItem*>(item);
+        if (showItem)
+        {
+            
+            if (!showItem->getTicketURL().isEmpty() )
+            {
+                ActivePopup->addButton(tr("Buy Ticket"), this, SLOT(doBuyTicket()));
+            }
+       }
+        
+        ActivePopup->ShowPopup(this, SLOT(closeActivePopup()));
+    }
+}
+
+void MMTMainWindow::closeActivePopup(void)
+{
+    if (!ActivePopup)
+        return;
+
+    ActivePopup->hide();
+    delete ActivePopup;
+    ActivePopup = NULL;
+}
+
+void MMTMainWindow::launchBrowser(const QString& url) const
+{
+    QString cmdUrl = url;
+    
+    // Sanity check
+    if (cmdUrl.isEmpty() )
+    {
+        VERBOSE( VB_IMPORTANT, "MMTMainWindow::launchBrowser no URL given");
+        return;
+    }
+    
+    cmdUrl.replace('\'', "%27");
+    
+    QString cmd = QString("%1 %2 '%3'")
+                         .arg(Browser)
+                         .arg(Zoom)
+                         .arg(cmdUrl);
+    
+    myth_system(cmd);
+}
+
+void MMTMainWindow::doVisitSite()
+{
+    UIListGenericTree *curItem = Tree->GetCurrentPosition();
+    MMTDBItem *pItem = dynamic_cast<MMTDBItem*>(curItem);
+    
+    closeActivePopup();
+    
+    if (pItem)
+    {
+        launchBrowser(pItem->getOfficialURL());
+    }
 
 }
 
+void MMTMainWindow::doBuyTicket()
+{
+    UIListGenericTree *curItem = Tree->GetCurrentPosition();
+    MMTShowTimeItem *pItem = dynamic_cast<MMTShowTimeItem*>(curItem);
+    closeActivePopup();
+    if (pItem)
+    {
+        launchBrowser(pItem->getTicketURL());
+    }
+}
+
+void MMTMainWindow::doFullFilmInfo()
+{
+    closeActivePopup();
+}
 
 // EOF
 
