@@ -2255,8 +2255,8 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
             query.bindValue(":DESC", (*i).desc.utf8());
             query.bindValue(":CATEGORY", (*i).category.utf8());
             query.bindValue(":CATEGORY_TYPE", (*i).catType.utf8());
-            query.bindValue(":AIRDATE", (*i).airdate);
-            query.bindValue(":STARS", (*i).stars);
+            query.bindValue(":AIRDATE", (*i).airdate.utf8());
+            query.bindValue(":STARS", (*i).stars.utf8());
             query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
             query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
             query.bindValue(":STEREO", (*i).stereo);
@@ -2278,63 +2278,60 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                 continue;
             }
 
-            if (!no_delete)
+            query.prepare("SELECT title,starttime,endtime FROM program WHERE "
+                          "chanid=:CHANID AND starttime>=:START AND "
+                          "starttime<:END;");
+            query.bindValue(":CHANID", chanid);
+            query.bindValue(":START", startstr);
+            query.bindValue(":END", endstr);
+            query.exec();
+
+            if (query.isActive() && query.numRowsAffected() > 0)
             {
-                query.prepare("SELECT title,starttime,endtime FROM program WHERE "
-                              "chanid=:CHANID AND starttime>=:START AND "
-                              "starttime<:END;");
-                query.bindValue(":CHANID", chanid);
-                query.bindValue(":START", startstr);
-                query.bindValue(":END", endstr);
-                query.exec();
-
-                if (query.isActive() && query.numRowsAffected() > 0)
+                if (!quiet)
                 {
-                    if (!quiet)
+                    while(query.next())
                     {
-                        while(query.next())
-                        {
-                            cerr << "removing existing program: "
-                                 << (*i).channel.local8Bit() << " "
-                                 << QString::fromUtf8(query.value(0).toString()).local8Bit() << " "
-                                 << query.value(1).toDateTime().toString(Qt::ISODate) << " - "
-                                 << query.value(2).toDateTime().toString(Qt::ISODate) << endl;
-                        }
-
-                        cerr << "inserting new program    : "
+                        cerr << "removing existing program: "
                              << (*i).channel.local8Bit() << " "
-                             << (*i).title.local8Bit() << " "
-                             << startstr << " - " << endstr << endl << endl;
+                             << QString::fromUtf8(query.value(0).toString()).local8Bit() << " "
+                             << query.value(1).toDateTime().toString(Qt::ISODate) << " - "
+                             << query.value(2).toDateTime().toString(Qt::ISODate) << endl;
                     }
 
-                    MSqlQuery subquery(MSqlQuery::InitCon());
-                    subquery.prepare("DELETE FROM program WHERE "
-                                     "chanid=:CHANID AND starttime>=:START "
-                                     "AND starttime<:END;");
-                    subquery.bindValue(":CHANID", chanid);
-                    subquery.bindValue(":START", startstr);
-                    subquery.bindValue(":END", endstr);
-
-                    subquery.exec();
-
-                    subquery.prepare("DELETE FROM programrating WHERE "
-                                     "chanid=:CHANID AND starttime>=:START "
-                                     "AND starttime<:END;");
-                    subquery.bindValue(":CHANID", chanid);
-                    subquery.bindValue(":START", startstr);
-                    subquery.bindValue(":END", endstr);
-
-                    subquery.exec();
-
-                    subquery.prepare("DELETE FROM credits WHERE "
-                                     "chanid=:CHANID AND starttime>=:START "
-                                     "AND starttime<:END;");
-                    subquery.bindValue(":CHANID", chanid);
-                    subquery.bindValue(":START", startstr);
-                    subquery.bindValue(":END", endstr);
-
-                    subquery.exec();
+                    cerr << "inserting new program    : "
+                         << (*i).channel.local8Bit() << " "
+                         << (*i).title.local8Bit() << " "
+                         << startstr << " - " << endstr << endl << endl;
                 }
+
+                MSqlQuery subquery(MSqlQuery::InitCon());
+                subquery.prepare("DELETE FROM program WHERE "
+                                 "chanid=:CHANID AND starttime>=:START "
+                                 "AND starttime<:END;");
+                subquery.bindValue(":CHANID", chanid);
+                subquery.bindValue(":START", startstr);
+                subquery.bindValue(":END", endstr);
+
+                subquery.exec();
+
+                subquery.prepare("DELETE FROM programrating WHERE "
+                                 "chanid=:CHANID AND starttime>=:START "
+                                 "AND starttime<:END;");
+                subquery.bindValue(":CHANID", chanid);
+                subquery.bindValue(":START", startstr);
+                subquery.bindValue(":END", endstr);
+
+                subquery.exec();
+
+                subquery.prepare("DELETE FROM credits WHERE "
+                                 "chanid=:CHANID AND starttime>=:START "
+                                 "AND starttime<:END;");
+                subquery.bindValue(":CHANID", chanid);
+                subquery.bindValue(":START", startstr);
+                subquery.bindValue(":END", endstr);
+
+                subquery.exec();
             }
 
             query.prepare("INSERT INTO program (chanid,starttime,endtime,"
@@ -2693,7 +2690,11 @@ void clearOldDBEntries(void)
     int offset = 1;
 
     if (no_delete)
-        offset=7;
+    {
+        offset = 7;
+        if (!quiet)
+            cout << "Keeping 7 days of data." << endl;
+    }
 
     querystr.sprintf("DELETE FROM oldprogram WHERE airdate < "
                      "DATE_SUB(CURRENT_DATE, INTERVAL 320 DAY);");
@@ -3198,7 +3199,6 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos], "--no-delete"))
         {
             // Do not delete old programs from the database until 7 days old.
-            // Do not delete existing programs from the database when updating.
             no_delete = true;
         }
         else if (!strcmp(a.argv()[argpos], "--file"))
@@ -3392,7 +3392,6 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "--no-delete\n";
             cout << "   Do not delete old programs from the database until 7 days old.\n";
-            cout << "   Do not delete existing programs from the database when updating.\n";
             cout << "\n";
             cout << "--file <sourceid> <offset> <xmlfile>\n";
             cout << "   Bypass the grabbers and read data directly from a file\n";
