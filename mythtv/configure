@@ -1601,7 +1601,7 @@ if test x"$dvb_eit" = x"yes" ; then
     fi
 fi
 
-
+#test for lirc client libraries
 if test x"$lirc" = x"yes" ; then
    lirc="no"
    lirc_c1=`ls /usr/lib/liblirc_client.so* 2> /dev/null | head -n 1`
@@ -1610,6 +1610,20 @@ if test x"$lirc" = x"yes" ; then
        lirc="yes"
    fi
 fi
+
+#test for lirc client header
+if test x"$lirc" = x"yes" ; then
+   lirc="no"
+cat > $TMPC << EOF
+#include <lirc/lirc_client.h>
+int main( void ) { return 0; }
+EOF
+
+    if $cc $CFLAGS $ARCHFLAGS -o $TMPE $TMPC 2> /dev/null ; then
+        lirc="yes"
+    fi
+fi
+
 
 if test x"$firewire_cable_box" = x"yes" ; then
     firewire_cable_box="no"
