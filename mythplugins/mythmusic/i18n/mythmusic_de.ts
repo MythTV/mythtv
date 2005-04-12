@@ -929,7 +929,7 @@
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel &amp; Interpreten vertauschen</translation>
     </message>
     <message>
         <source>Title</source>
@@ -961,6 +961,53 @@
     <message>
         <source>Select a Title</source>
         <translation>Einen Titel wählen</translation>
+    </message>
+    <message>
+        <source>Select a Compilation Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SmartPLDateDialog</name>
+    <message>
+        <source>Edit Date</source>
+        <translation>Datum bearbeiten</translation>
+    </message>
+    <message>
+        <source>Fixed Date</source>
+        <translation>Fixes Datum</translation>
+    </message>
+    <message>
+        <source>Day</source>
+        <translation>Tag</translation>
+    </message>
+    <message>
+        <source>Month</source>
+        <translation>Monat</translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation>Jahr</translation>
+    </message>
+    <message>
+        <source>Use Current Date</source>
+        <translation>Aktuelles Datum verwenden</translation>
+    </message>
+    <message>
+        <source>+/- Days</source>
+        <translation>+/- Tage</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <source>Invalid Date</source>
+        <translation>Ungültiges Datum</translation>
     </message>
 </context>
 <context>
