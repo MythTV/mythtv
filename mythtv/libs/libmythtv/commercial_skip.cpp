@@ -332,8 +332,8 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
     frameInfo[curFrameNumber].flagMask = flagMask;
 
 #ifdef SHOW_DEBUG_WIN
-    VERBOSE(VB_COMMFLAG,QString().sprintf("Frame: %6lld, Mask %04x",
-                                          curFrameNumber, flagMask ));
+    VERBOSE(VB_COMMFLAG,QString().sprintf("Frame: %6ld, Mask %04x",
+                                          (long)curFrameNumber, flagMask ));
     getchar();
     comm_debug_show(frame->buf);
 #endif
@@ -373,7 +373,8 @@ bool CommDetect::CheckFrameIsBlank(void)
         for(int x = border; x < (width - border) && !abort;
                             x += horizSpacing)
         {
-            if ((logoInfoAvailable) &&
+            if ((!aggressiveDetection) &&
+                (logoInfoAvailable) &&
                 (y >= logoMinY) && (y <= logoMaxY) &&
                 (x >= logoMinX) && (x <= logoMaxX))
                 continue;
@@ -448,16 +449,21 @@ bool CommDetect::CheckFrameIsBlank(void)
     frameInfo[curFrameNumber].avgBrightness = avg;
 
     if (verboseDebugging)
-        VERBOSE(VB_COMMFLAG,QString().sprintf("Fr: %6lld - Br: min %03d, max "
+        VERBOSE(VB_COMMFLAG,QString().sprintf("Fr: %6ld - Br: min %03d, max "
                                              "%03d, avg %03d, fmt %d, asp %d",
-                                             curFrameNumber, min, max, avg,
+                                             (long)curFrameNumber, min, max, avg,
                                              frameInfo[curFrameNumber].format,
                                              frameInfo[curFrameNumber].aspect));
 
     totalMinBrightness += min;
     DimAVG = min + 10;
 
-    if ((max - min) <= blankFrameMaxDiff)
+    if (((max - min) <= blankFrameMaxDiff) &&
+        (max < DimBrightness))
+        return(true);
+
+    if ((!aggressiveDetection) && 
+        ((max - min) <= blankFrameMaxDiff))
         return(true);
 
     if ((!aggressiveDetection) &&
@@ -1491,20 +1497,37 @@ void CommDetect::BuildAllMethodsCommList(void)
         if ((breakStart >= 0) &&
             ((fbp->end - breakStart) > (MAX_COMM_BREAK_LENGTH * fps)))
         {
-            if (verboseDebugging)
-                VERBOSE(VB_COMMFLAG,
-                        QString("Closing commercial block at start of frame "
-                                "block %1 with length %2, frame block length "
-                                "of %3 frames would put comm block "
-                                "length over max of %4 seconds.")
-                                .arg(curBlock).arg(fbp->start - breakStart)
-                                .arg(fbp->frames).arg(MAX_COMM_BREAK_LENGTH));
+            if (((fbp->start - breakStart) > (MIN_COMM_BREAK_LENGTH * fps)) || 
+                (lastEnd == 0))
+            {
+                if (verboseDebugging)
+                    VERBOSE(VB_COMMFLAG,
+                            QString("Closing commercial block at start of frame "
+                                    "block %1 with length %2, frame block length "
+                                    "of %3 frames would put comm block "
+                                    "length over max of %4 seconds.")
+                                    .arg(curBlock).arg(fbp->start - breakStart)
+                                    .arg(fbp->frames).arg(MAX_COMM_BREAK_LENGTH));
 
-            commBreakMap[breakStart] = MARK_COMM_START;
-            commBreakMap[fbp->start] = MARK_COMM_END;
-            lastStart = breakStart;
-            lastEnd = fbp->start;
-            breakStart = -1;
+                commBreakMap[breakStart] = MARK_COMM_START;
+                commBreakMap[fbp->start] = MARK_COMM_END;
+                lastStart = breakStart;
+                lastEnd = fbp->start;
+                breakStart = -1;
+            }
+            else
+            {
+                if (verboseDebugging)
+                    VERBOSE(VB_COMMFLAG,
+                            QString("Ignoring what appears to be commercial "
+                                    "block %1 with length %2, which would put "
+                                    "comm block length under minimum of "
+                                    "%3 seconds.")
+                                    .arg(curBlock)
+                                    .arg(fbp->start - breakStart)
+                                    .arg(MIN_COMM_BREAK_LENGTH));
+                breakStart = -1;
+            }
         }
         if (thisScore == 0)
         {
@@ -2031,15 +2054,16 @@ void CommDetect::DumpMap(QMap<long long, int> &map)
     for (it = map.begin(); it != map.end(); ++it)
     {
         long long frame = it.key();
+        int flag = it.data();
         int my_fps = (int)ceil(fps);
         int hour = (frame / my_fps) / 60 / 60;
         int min = (frame / my_fps) / 60 - (hour * 60);
         int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
         int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
                     (hour * 60 * 60 * my_fps));
-        msg.sprintf("%7lld : %d (%02d:%02d:%02d.%02d) (%d)",
-                    it.key(), it.data(), hour, min, sec, frm,
-                    (int)(frame / my_fps));
+        int my_sec = (int)(frame / my_fps);
+        msg.sprintf("%7ld : %d (%02d:%02d:%02d.%02d) (%d)",
+                    (long)frame, flag, hour, min, sec, frm, my_sec);
         VERBOSE(VB_COMMFLAG, msg);
     }
     VERBOSE(VB_COMMFLAG, "---------------------------------------------------");

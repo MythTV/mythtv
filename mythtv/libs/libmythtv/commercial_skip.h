@@ -45,7 +45,7 @@ enum frameFormats {
 
 // Set max comm break length to 00:08:05 minutes & max comm length to 00:02:05
 #define MIN_COMM_BREAK_LENGTH   60
-#define MAX_COMM_BREAK_LENGTH  485
+#define MAX_COMM_BREAK_LENGTH  395
 #define MAX_COMM_LENGTH        125
 #define MIN_SHOW_LENGTH         65
 #define LOGO_SAMPLES_NEEDED    240
