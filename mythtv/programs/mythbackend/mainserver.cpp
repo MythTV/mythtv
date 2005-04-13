@@ -539,7 +539,10 @@ void MainServer::customEvent(QCustomEvent *e)
 
             RefSocket *sock = pbs->getSocket();
             sock->UpRef();
+
+            qApp->unlock();
             sock->Lock();
+            qApp->lock();
 
             if (sendGlobal)
             {
