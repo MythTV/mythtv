@@ -1,4 +1,4 @@
-#Last Updated: 2005.04.12 (xris)
+#Last Updated: 2005.04.13 (xris)
 #
 #  export::ffmpeg::DivX
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -132,8 +132,9 @@ package export::ffmpeg::DivX;
             $self->{'ffmpeg_xtra'} = ' -vcodec mpeg4'
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
-                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.5'
                                    . ' -bufsize 65535'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.5'
+                                   . ' -4mv -part'
                                    . ' -vtag divx'
                                    . " -pass 1 -passlogfile '/tmp/divx.$$.log'"
                                    . ' -f avi';
@@ -145,8 +146,9 @@ package export::ffmpeg::DivX;
             $self->{'ffmpeg_xtra'} = ' -vcodec mpeg4'
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
-                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.5'
                                    . ' -bufsize 65535'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.5'
+                                   . ' -4mv -part'
                                    . ' -vtag divx'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
@@ -165,6 +167,7 @@ package export::ffmpeg::DivX;
                                        . ' -bufsize 65535'
                                        : '')
                                    . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.5'
+                                   . ' -4mv -part'
                                    . ' -vtag divx'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
