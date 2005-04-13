@@ -3427,7 +3427,7 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "--refresh-today\n";
             cout << "--refresh-second\n";
-            cout << "   (Only valid for grabbers: na, se_swedb, no)\n";
+            cout << "   (Only valid for grabbers: na, se_swedb, no, ee, de_tvtoday)\n";
             cout << "   Force a refresh today or two days from now, to catch the latest changes\n";
             cout << "--dont-refresh-tomorrow\n";
             cout << "   Tomorrow will be refreshed always unless this argument is used\n";
