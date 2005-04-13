@@ -2532,10 +2532,6 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
                         filename.ascii());
-    else if (xmltv_grabber == "tv_grab_nz")
-        command.sprintf("nice %s -n 1 -f %d -o '%s'",
-                        xmltv_grabber.ascii(), offset,
-                        filename.ascii());
     else if (xmltv_grabber == "tv_grab_de_tvtoday")
         command.sprintf("nice %s --slow --days 1 --config-file '%s' --offset %d --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
@@ -2597,7 +2593,6 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          xmltv_grabber == "tv_grab_de_tvtoday" ||
          xmltv_grabber == "tv_grab_fi" ||
          xmltv_grabber == "tv_grab_es" ||
-         xmltv_grabber == "tv_grab_nz" ||
          xmltv_grabber == "tv_grab_se_swedb" ||
          xmltv_grabber == "tv_grab_no" ||
          xmltv_grabber == "tv_grab_dk" ||
@@ -2764,40 +2759,6 @@ bool fillData(QValueList<Source> &sourcelist)
         {
             if (!grabData(*it, 0))
                 ++failures;
-        }
-        else if (xmltv_grabber == "tv_grab_nz")
-        {
-            // tv_grab_nz only supports a 7-day "grab".
-            grabData(*it, 1);
-
-            for (int i = 0; i < 7; i++)
-            {
-                QString querystr;
-                querystr.sprintf("SELECT COUNT(*) FROM program "
-                                 "LEFT JOIN channel USING (chanid) "
-                                 "WHERE sourceid = %d "
-                                 "AND starttime >= DATE_ADD(CURRENT_DATE(), "
-                                 "    INTERVAL %d DAY) "
-                                 "AND starttime < DATE_ADD(CURRENT_DATE(), "
-                                 "    INTERVAL %d DAY)",
-                                 (*it).id, i, i+1);
- 
-                MSqlQuery query(MSqlQuery::InitCon());
-                query.exec(querystr);
-                
-                if (query.isActive()) 
-                {
-                    if (!query.numRowsAffected() ||
-                        (query.next() && query.value(0).toInt() <= 1))
-                    {
-                        if (!grabData(*it, i))
-                            ++failures;
-                    }
-                } 
-                else
-                    MythContext::DBError("checking existing program data", 
-                                         query);
-            }
         }
         else if (xmltv_grabber == "datadirect" && dd_grab_all)
         {
