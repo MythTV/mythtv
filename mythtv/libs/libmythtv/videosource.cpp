@@ -449,15 +449,11 @@ void XMLTV_generic_config::save() {
     pdlg.show();
 
     QString command;
-    if (grabber == "tv_grab_de") {
-        command = "tv_grab_de --configure";
-    } else {
-        QString filename = QString("%1/%2.xmltv")
-            .arg(MythContext::GetConfDir()).arg(parent.getSourceName());
+    QString filename = QString("%1/%2.xmltv")
+        .arg(MythContext::GetConfDir()).arg(parent.getSourceName());
 
-        command = QString("%1 --config-file '%2' --configure")
-            .arg(grabber).arg(filename);
-    }
+    command = QString("%1 --config-file '%2' --configure")
+        .arg(grabber).arg(filename);
 
     pdlg.setProgress(1);
 
@@ -477,7 +473,7 @@ void XMLTV_generic_config::save() {
                                               "information"));
     }
 
-    if (grabber == "tv_grab_de" || grabber == "tv_grab_se_swedb" || 
+    if (grabber == "tv_grab_de_tvtoday" || grabber == "tv_grab_se_swedb" || 
         grabber == "tv_grab_fi" || grabber == "tv_grab_es" ||
         grabber == "tv_grab_nl" || grabber == "tv_grab_jp" ||
         grabber == "tv_grab_no" || grabber == "tv_grab_pt" ||
@@ -517,8 +513,8 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent)
     addTarget("datadirect", new DataDirect_config(parent));
     grabber->addSelection("North America (DataDirect)", "datadirect");
 
-    addTarget("tv_grab_de", new XMLTV_generic_config(parent, "tv_grab_de"));
-    grabber->addSelection("Germany/Austria", "tv_grab_de");
+    addTarget("tv_grab_de_tvtoday", new XMLTV_generic_config(parent, "tv_grab_de_tvtoday"));
+    grabber->addSelection("Germany (tvtoday)", "tv_grab_de_tvtoday");
 
     addTarget("tv_grab_se_swedb", new XMLTV_generic_config(parent, "tv_grab_se_swedb"));
     grabber->addSelection("Sweden (tv.swedb.se)","tv_grab_se_swedb");

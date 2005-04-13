@@ -2536,10 +2536,10 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         command.sprintf("nice %s -n 1 -f %d -o '%s'",
                         xmltv_grabber.ascii(), offset,
                         filename.ascii());
-    else if (xmltv_grabber == "tv_grab_de")
-        command.sprintf("nice %s --days 7 --output %s",
-                        xmltv_grabber.ascii(),
-                        filename.ascii());
+    else if (xmltv_grabber == "tv_grab_de_tvtoday")
+        command.sprintf("nice %s --slow --days 1 --config-file '%s' --offset %d --output %s",
+                        xmltv_grabber.ascii(), configfile.ascii(),
+                        offset, filename.ascii());
     else if (xmltv_grabber == "tv_grab_fr")
         command.sprintf("nice %s --days 7 '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
@@ -2594,7 +2594,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 
     if (quiet &&
         (xmltv_grabber == "tv_grab_na" ||
-         xmltv_grabber == "tv_grab_de" ||
+         xmltv_grabber == "tv_grab_de_tvtoday" ||
          xmltv_grabber == "tv_grab_fi" ||
          xmltv_grabber == "tv_grab_es" ||
          xmltv_grabber == "tv_grab_nz" ||
@@ -2750,11 +2750,11 @@ bool fillData(QValueList<Source> &sourcelist)
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it) {
         int chancnt = 0;
         QString xmltv_grabber = (*it).xmltvgrabber;
-        if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de" ||
+        if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_uk_rt" ||
             xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
             xmltv_grabber == "tv_grab_nl" || xmltv_grabber == "tv_grab_au" ||
             xmltv_grabber == "tv_grab_fr" || xmltv_grabber == "tv_grab_jp" ||
-            xmltv_grabber == "tv_grab_pt" || xmltv_grabber == "tv_grab_uk_rt")
+            xmltv_grabber == "tv_grab_pt")
         {
             // These don't support the --offset option, so just grab the max.
             if (!grabData(*it, -1))
@@ -2808,7 +2808,8 @@ bool fillData(QValueList<Source> &sourcelist)
         else if (xmltv_grabber == "datadirect" ||
                  xmltv_grabber == "tv_grab_se_swedb" ||
                  xmltv_grabber == "tv_grab_no" ||
-                 xmltv_grabber == "tv_grab_ee")
+                 xmltv_grabber == "tv_grab_ee" ||
+                 xmltv_grabber == "tv_grab_de_tvtoday")
         {
             if (xmltv_grabber == "tv_grab_no")
                 listing_wrap_offset = 6 * 3600;
@@ -2849,6 +2850,8 @@ bool fillData(QValueList<Source> &sourcelist)
                 maxday = 10;
             else if (xmltv_grabber == "tv_grab_ee")
                 maxday = 14;
+            else if (xmltv_grabber == "tv_grab_de_tvtoday")
+                maxday = 7;
 
             for (int i = 0; i < maxday; i++)
             {
