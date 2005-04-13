@@ -5,7 +5,7 @@
 
 #include "audiooutputbase.h"
 
-#define NULLAUDIO_OUTPUT_BUFFER_SIZE 8192
+#define NULLAUDIO_OUTPUT_BUFFER_SIZE 32768
 
 /*
 
