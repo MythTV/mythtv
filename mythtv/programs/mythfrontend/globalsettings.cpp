@@ -2241,7 +2241,7 @@ static GlobalCheckBox *MythFillEnabled()
 
 static GlobalSpinBox *MythFillPeriod()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("MythFillPeriod", 0, 30, 1);
+    GlobalSpinBox *bs = new GlobalSpinBox("MythFillPeriod", 1, 30, 1);
     bs->setLabel(QObject::tr("mythfilldatabase Run Frequency (Days)"));
     bs->setValue(1);
     bs->setHelpText(QObject::tr("The number of days between mythfilldatabase "
