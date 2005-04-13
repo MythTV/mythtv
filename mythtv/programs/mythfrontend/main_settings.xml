@@ -99,6 +99,7 @@
       <text>Phone Settings</text>
       <text lang="FR">Configuration téléphone</text>
       <text lang="DE">Telefon</text>
+      <text lang="SV">Telefon</text>
       <text lang="NL">Telefoon Instellingen</text>      
       <text lang="FI">Puhelimen Asetukset</text>
       <action>CONFIGPLUGIN mythphone</action>
