@@ -1,4 +1,4 @@
-#Last Updated: 2005.04.03 (xris)
+#Last Updated: 2005.04.12 (xris)
 #
 #  export::ffmpeg::DivX
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -132,7 +132,7 @@ package export::ffmpeg::DivX;
             $self->{'ffmpeg_xtra'} = ' -vcodec mpeg4'
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
-                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.2'
                                    . ' -bufsize 65535'
                                    . ' -vtag divx'
                                    . " -pass 1 -passlogfile '/tmp/divx.$$.log'"
@@ -145,7 +145,7 @@ package export::ffmpeg::DivX;
             $self->{'ffmpeg_xtra'} = ' -vcodec mpeg4'
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
-                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.2'
                                    . ' -bufsize 65535'
                                    . ' -vtag divx'
                                    . ' -acodec mp3'
@@ -164,7 +164,7 @@ package export::ffmpeg::DivX;
                                        . ' -bt 32'
                                        . ' -bufsize 65535'
                                        : '')
-                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.2'
                                    . ' -vtag divx'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
