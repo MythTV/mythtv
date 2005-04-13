@@ -13,105 +13,113 @@
 #include "../../../config.h"
 #ifdef MFD_RTSP_SUPPORT
 
-#include "rtspout.h"
+#include <mythtv/audiooutput.h>
 
-RtspOut::RtspOut(MFD *owner, int identity)
-      :MFDRtspPlugin(owner, identity, 2346, "audio rtsp server")
+#include <liveMedia.hh>
+#include <GroupsockHelper.hh>
+#include <BasicUsageEnvironment.hh>
+
+#include "rtspout.h"
+#include "livemedia.h"
+
+
+RtspOut::RtspOut(MFD *owner, int identity, AudioOutput *ao)
+      :MFDRtspPlugin(owner, identity, 2347, "audio rtsp server")
 {
-    log("sub-plugin came into existence", 2);
+    log("rtsp sub-plugin came into existence", 9);
+    watch_variable = 0;
+    live_subsession = NULL;
+    audio_output = ao;
+}
+
+void RtspOut::stop()
+{
+    keep_going_mutex.lock();
+        keep_going = false;
+        watch_variable = 1;
+        
+        //
+        //  There is a bug in some versions of live media where timing on
+        //  the select is mucked up. If we poke the server socket now
+        //  (having set watch_variable to non-zero), it will exit
+        //
+
+        bool output_warning = false;
+
+        QHostAddress this_host;
+        if(this_host.setAddress("127.0.0.1"))
+        {
+            QSocketDevice poker;
+            poker.setBlocking(false);
+            if(!poker.connect(this_host, 2346))
+            {
+                output_warning = true;
+            }
+        }
+        else
+        {
+            output_warning = true;
+        }
+
+        if(output_warning)
+        {
+            cerr << "rtspout.o: Failed to workaround a shutdown bug in "
+                 << "liveMedia. You'll probably have to kill -KILL this "
+                 << "mfd by hand."
+                 << endl;
+        }
+
+    keep_going_mutex.unlock();
 }
 
 
 /*
+bool RtspOut::pullFromThisAudioOutput(AudioOutput *ao)
+{
+    if(live_subsession)
+    {
+        UniversalPCMSource* ups = live_subsession->getUniversalPCMSource();
+        if(ups)
+        {
+            ups->setAudioOutput(ao);
+            return true;
+        }
+    }
+    return false;
+}
+*/
+
 
 void RtspOut::run()
 {
-    char my_hostname[2049];
-    QString local_hostname = "unknown";
 
-    if (gethostname(my_hostname, 2048) < 0)
+    BasicTaskScheduler* scheduler = BasicTaskScheduler::createNew();
+    UsageEnvironment *env = BasicUsageEnvironment::createNew(*scheduler);
+
+    RTSPServer* rtspServer = RTSPServer::createNew(*env, 2346, NULL);
+    if (rtspServer == NULL)
     {
-        warning("could not call gethostname()");
-    }
-    else
-    {
-        //
-        //  TEMP HACK FIX
-        //
-
-        local_hostname = my_hostname;
-        struct hostent* host;
-        host = gethostbyname(local_hostname.ascii());
-        u_int8_t const** const hAddrPtr = (u_int8_t const**)host->h_addr_list;
-        if (hAddrPtr != NULL) 
-        {
-            // First, count the number of addresses:
-            u_int8_t const** hAddrPtr1 = hAddrPtr;
-
-            uint number_of_addresses = 0;
-            while (*hAddrPtr1 != NULL) 
-            {
-                ++number_of_addresses;
-                ++hAddrPtr1;
-            }
-
-            // Next, set up the list:
-            //fAddressArray = new NetAddress*[fNumAddresses];
-            //if (fAddressArray == NULL) return;
-
-            for (unsigned i = 0; i < 1; ++i) 
-            {
-                //fAddressArray[i] = new NetAddress(hAddrPtr[i], host->h_length);
-                struct in_addr addr;
-                memcpy(&addr, hAddrPtr[i], sizeof(struct in_addr));
-                my_ip_address = QString(inet_ntoa(addr));
-            }
-
-        }
-    }
-
-    //
-    //  Have our rtsp service broadcast on the local lan
-    //
-
-    Service *rtsp_service = new Service(
-                                        QString("Myth Audio RTSP on %1").arg(local_hostname),
-                                        QString("rtsp"),
-                                        local_hostname,
-                                        SLT_HOST,
-                                        (uint) port_number
-                                       );
- 
-    ServiceEvent *se = new ServiceEvent( true, true, *rtsp_service);
-    QApplication::postEvent(parent, se);
-    delete rtsp_service;
-
-    //
-    //  Init our sockets
-    //
-    
-    if ( !initServerSocket())
-    {
-        fatal("rtsp sub-plugin could not initialize its core server socket");
+        warning(QString("failed to create an RTSP server: %1")
+                .arg(env->getResultMsg()));
         return;
     }
-    
-    while(keep_going)
-    {
-        //
-        //  Update the status of our sockets and wait for something to happen
-        //
-        
-        updateSockets();
-        waitForSomethingToHappen();
-    }
+
+    ServerMediaSession *sms = ServerMediaSession::createNew(*env);
+    live_subsession = LiveSubsession::createNew(*env, *audio_output);
+    sms->addSubsession(live_subsession);
+    rtspServer->addServerMediaSession(sms);
+
+    //
+    //  See stop() (above) for how we get out of this
+    //
+
+    env->taskScheduler().doEventLoop(&watch_variable);
 }
 
-*/
 
 RtspOut::~RtspOut()
 {
-    log("sub-plugin is being snuffed out", 2);
+    log("rtsp sub-plugin is being snuffed out", 9);
 }
 
 #endif

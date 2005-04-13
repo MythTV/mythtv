@@ -33,11 +33,27 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     state_of_play_mutex = new QMutex(true);    
     metadata_server = parent->getMetadataServer();
     stopPlaylistMode();
+    audio_listener = new AudioListener(this);
 #ifdef MFD_RTSP_SUPPORT
-    rtsp_out = new RtspOut(owner, -1);
+    //
+    //  Create a NULL audio_output device that we will use forever. Since
+    //  it's NULL, it's not holding up a soundcard. It's just an object that
+    //  thr RTSP streamer can use to get PCM bits to send out.
+    //
+
+    output = AudioOutput::OpenAudio("NULL", 16, 2, 44100, AUDIOOUTPUT_MUSIC, true );
+    output->bufferOutputData(true);
+    output->setBufferSize(output_buffer_size * 1024);
+    output->SetBlocking(false);
+    output->addListener(audio_listener);
+    
+    //
+    //  Create and start the RtspOut thread
+    //
+
+    rtsp_out = new RtspOut(owner, -1, output);
     rtsp_out->start();
 #endif
-    audio_listener = new AudioListener(this);
 }
 
 void AudioPlugin::swallowOutputUpdate(int type, int numb_seconds, int channels, int bitrate, int frequency)
@@ -429,17 +445,19 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
 
         if (!output)
         {
-
+#ifdef MFD_RTSP_SUPPORT
+            //
+            //  Output always exists
+            //
+#else
             QString adevice = gContext->GetSetting("AudioDevice");
-
             // TODO: Error checking that device is opened correctly!
-            output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, 
-	                                     AUDIOOUTPUT_MUSIC, true );	
+            output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, AUDIOOUTPUT_MUSIC, true );
             output->setBufferSize(output_buffer_size * 1024);
             output->SetBlocking(false);
             output->addListener(audio_listener);
             start_output = true;
-
+#endif
         }
     
         //
@@ -510,8 +528,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
         {
             warning(QString("have no idea how to play this protocol: %1")
                     .arg(url.toString()));
-            delete output;
-            output = NULL;
+            deleteOutput();
             input = NULL;
             state_of_play_mutex->unlock();
             return false;
@@ -537,8 +554,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
             {
                 warning(QString("passed unsupported url in unsupported format: %1")
                         .arg(filename));
-                delete output;
-                output = NULL;
+                deleteOutput();
                 delete input;
                 input = NULL;
                 state_of_play_mutex->unlock();
@@ -577,8 +593,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
             warning(QString("decoder barfed on "
                     "initialization of %1")
                     .arg(url.toString()));
-            delete output;
-            output = NULL;
+            deleteOutput();
             delete input;
             input = NULL;
             state_of_play_mutex->unlock();
@@ -676,8 +691,7 @@ void AudioPlugin::stopAudio()
 
         if (output)
         {
-            delete output;
-            output = NULL;
+            deleteOutput();
         }
 
         if (decoder)
@@ -1105,6 +1119,16 @@ void AudioPlugin::handleMetadataChange(int which_collection, bool /*external*/)
     }
 }
 
+void AudioPlugin::deleteOutput()
+{
+#ifdef MFD_RTSP_SUPPORT
+    output->Reset();
+#else
+    delete output;
+    output = NULL;
+#endif
+}
+                
 
 AudioPlugin::~AudioPlugin()
 {
@@ -1135,6 +1159,11 @@ AudioPlugin::~AudioPlugin()
         
         delete rtsp_out;
         rtsp_out = NULL;
+    }
+    if(output)
+    {
+        delete output;
+        output = NULL;
     }
 #endif 
    

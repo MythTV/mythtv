@@ -19,6 +19,7 @@ aacsupport="no"
 discwatchersupport="yes"
 mfdclient="yes"
 rtsp="yes"
+livemediaprefix="/usr/include"
 
 for opt do
   case "$opt" in
@@ -92,8 +93,11 @@ for opt do
       mfdclient="no"
       rtsp="no"
   ;;
+  --with-livemedia-prefix=*) livemediaprefix=`echo $opt | cut -d '=' -f 2` 
+  ;;
   esac
 done
+
 
 #
 #   Sanity checking
@@ -112,6 +116,7 @@ Options: [defaults in brackets after descriptions]
 
 Standard options:
   --help               print this message
+
   --enable-zeroconfig  enable auto discovery of services       [default=yes]
   --enable-audio       enable audio playing                    [default=yes]
   --enable-wmasupport  include ability to play wma audio files [default=yes]
@@ -124,7 +129,9 @@ Standard options:
   --enable-mfdclient   build libmfdclient                      [default=yes]
   --enable-rtsp        rtsp support (HIGHLY recommended)       [default=no]
 
-All options can be turned off with --disable-foo
+  --with-livemedia-prefix=[DIR] path to liveMedia/groupsock/etc include files
+
+All --enable-foo options can be turned off with --disable-foo
 Some options will be automatically turned off if they make no sense 
 
 EOF
@@ -361,6 +368,7 @@ fi
 
 if test "$rtsp" = "yes" ; then
     echo "                       rtsp support: yes"        
+	echo "      prefix for livemedia includes: $livemediaprefix"
 #    echo "#    Build rtsp " >> ./config.pro
 #    echo " " >> ./config.pro
 #    echo "SUBDIRS += ./plugins/rtspserver " >> ./config.pro
@@ -370,6 +378,7 @@ if test "$rtsp" = "yes" ; then
     echo "#define MFD_RTSP_SUPPORT 1" >> ./config.h
     echo " " >> ./config.h
     echo "MFD_RTSP_SUPPORT = 1 " >> ./options.pro
+	echo "LIVEMEDIAPREFIX = $livemediaprefix " >> ./options.pro
 fi
 
 if test "$rtsp" = "no" ; then

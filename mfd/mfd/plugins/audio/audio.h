@@ -23,7 +23,10 @@
 #include "decoder.h"
 
 class AudioListener;
+
+#ifdef MFD_RTSP_SUPPORT
 class RtspOut;
+#endif
 
 class AudioPlugin: public MFDServicePlugin
 {
@@ -47,7 +50,7 @@ class AudioPlugin: public MFDServicePlugin
     void    playFromPlaylist(int augment_index = 0);
     void    nextPrevAudio(bool forward);
     void    handleMetadataChange(int which_collection, bool external=false);
-        
+    void    deleteOutput();        
         
   private:
   
@@ -82,7 +85,9 @@ class AudioPlugin: public MFDServicePlugin
     int     current_playlist_item_index;
 
     AudioListener *audio_listener;
+#ifdef MFD_RTSP_SUPPORT
     RtspOut       *rtsp_out;
+#endif
 };
 
 #endif  // audio_h_

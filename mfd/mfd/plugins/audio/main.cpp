@@ -40,6 +40,7 @@ bool mfdplugin_run()
 
 void mfdplugin_parse_tokens(const QStringList &tokens, int socket_identifier)
 {
+/*
     cout << endl 
          << "$$$$$$$$ audio plugin got (from "
          << socket_identifier
@@ -47,7 +48,7 @@ void mfdplugin_parse_tokens(const QStringList &tokens, int socket_identifier)
          << tokens.join("|")
          << endl
          << endl;
-         
+*/
 }
 
 bool mfdplugin_stop()
