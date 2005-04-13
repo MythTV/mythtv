@@ -861,7 +861,6 @@ void AudioOutputBase::Drain()
 {
     while (audiolen(true) > fragment_size)
     {
-        cout << "I'm in mythlib draining" << endl; 
         usleep(1000);
     }
 }
