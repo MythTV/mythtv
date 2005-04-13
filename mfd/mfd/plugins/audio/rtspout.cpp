@@ -73,25 +73,35 @@ void RtspOut::stop()
 }
 
 
-/*
-bool RtspOut::pullFromThisAudioOutput(AudioOutput *ao)
-{
-    if(live_subsession)
-    {
-        UniversalPCMSource* ups = live_subsession->getUniversalPCMSource();
-        if(ups)
-        {
-            ups->setAudioOutput(ao);
-            return true;
-        }
-    }
-    return false;
-}
-*/
-
-
 void RtspOut::run()
 {
+
+    //
+    //  Register this (rtsp) service
+    //
+
+    QString local_hostname = "unknown";
+    char my_hostname[2049];
+    if(gethostname(my_hostname, 2048) < 0)
+    {
+        warning("could not call gethostname()");
+    }
+    else
+    {
+        local_hostname = my_hostname;
+    }
+
+    Service *rtsp_service = new Service(
+                                        QString("Myth Audio Streaming on %1").arg(local_hostname),
+                                        QString("rtsp"),
+                                        local_hostname,
+                                        SLT_HOST,
+                                        (uint) 2346
+                                       );
+ 
+    ServiceEvent *se = new ServiceEvent( true, true, *rtsp_service);
+    QApplication::postEvent(parent, se);
+    delete rtsp_service;
 
     BasicTaskScheduler* scheduler = BasicTaskScheduler::createNew();
     UsageEnvironment *env = BasicUsageEnvironment::createNew(*scheduler);
