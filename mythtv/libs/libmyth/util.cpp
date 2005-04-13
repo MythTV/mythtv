@@ -377,9 +377,9 @@ bool WriteStringList(QSocket *socket, QStringList &list)
     {
         QString msg = payload;
 
-        if (msg.length() > 58)
+        if (msg.length() > 53)
         {
-            msg.truncate(55);
+            msg.truncate(50);
             msg += "...";
         }
         VERBOSE(VB_NETWORK, msg);
