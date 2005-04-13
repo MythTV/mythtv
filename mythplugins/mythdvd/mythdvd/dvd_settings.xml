@@ -5,7 +5,7 @@
       <text>General Settings</text>
       <text lang="DK">Generelle indstillinger</text>
       <text lang="PT">Configurações Gerais</text>
-      <text lang="DE">Allgemeines</text>
+      <text lang="DE">Grundeinstellungen</text>
       <text lang="SV">Generella inställningar</text>
       <text lang="CA">Opcions generals</text>
       <text lang="ES">Opciones generales</text>
@@ -20,7 +20,7 @@
       <text>Play Settings</text>
       <text lang="DK">Afspilnings indstillinger</text>
       <text lang="PT">Configurações de Leitura</text>
-      <text lang="DE">Wiedergabe Einstellungen</text>
+      <text lang="DE">Wiedergabe</text>
       <text lang="SV">Inställningar för avspelning</text>
       <text lang="ES">Opciones de reproducción</text>
       <text lang="CA">Opcions de reproducció</text>
@@ -28,22 +28,6 @@
       <text lang="NL">DVD Afspeelinstelingen</text>
       <text lang="JA">再生設定</text>
       <action>DVD_SETTINGS_PLAY</action>
-   </button>
-
-
-   <button>
-      <type>DVD_RIP</type>
-      <text>Rip Settings</text>
-      <text lang="DK">Genkodnings indstillinger</text>
-      <text lang="PT">Configurações de Cópia</text>
-      <text lang="DE">Rippen Einstellungen</text>
-      <text lang="SV">Inställningar för kopiering</text>
-      <text lang="ES">Opciones de "ripear"</text>
-      <text lang="CA">Opcions de volcat</text>
-      <text lang="FR">Configuration de copie/encodage</text>
-      <text lang="NL">DVD RIP instellingen</text>
-      <text lang="JA">再生設定</text>
-      <action>DVD_SETTINGS_RIP</action>
    </button>
 
 </mythmenu>

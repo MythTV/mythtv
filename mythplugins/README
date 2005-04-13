@@ -1,0 +1,13 @@
+This is a consolidation of all the official MythTV plugins that used to be
+distributed as separate downloads from mythtv.org.  
+
+For installation help for everything but mythweb, run:
+  ./configure --help
+
+After running configure with whatever options you, just:
+
+  qmake mythplugins.pro
+  make
+  make install
+
+There is a README in each plugin subdirectory as well.

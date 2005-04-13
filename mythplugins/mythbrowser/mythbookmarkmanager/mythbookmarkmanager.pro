@@ -1,4 +1,4 @@
-include ( ../settings.pro )
+include ( ../../settings.pro )
 
 INCLUDEPATH += /usr/include/kde
 INCLUDEPATH += /opt/kde3/include

@@ -1,4 +1,4 @@
-include ( ../settings.pro )
+include ( ../../settings.pro )
 
 TEMPLATE = lib
 CONFIG += plugin thread warn_on debug

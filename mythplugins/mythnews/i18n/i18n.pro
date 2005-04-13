@@ -1,4 +1,4 @@
-include ( ../settings.pro )
+include ( ../../settings.pro )
 
 TEMPLATE = app
 CONFIG -= moc qt

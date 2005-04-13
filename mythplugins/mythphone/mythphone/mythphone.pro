@@ -1,9 +1,16 @@
-include ( ../settings.pro )
+include ( ../../settings.pro )
 include ( config.pro )
 
 !exists( config.pro ) {
     error(Missing config.pro: please run the configure script)
 }
+
+DEFINES += _RENTRANT
+DEFINES += USE_PTHREADS
+DEFINES += WAV49
+
+QMAKE_CXXFLAGS_RELEASE += -Wno-unused
+QMAKE_CFLAGS_RELEASE += -Wno-unused
 
 TEMPLATE = lib
 CONFIG += plugin thread

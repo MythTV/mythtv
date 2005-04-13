@@ -13,7 +13,6 @@ dvd="yes"
 weather="yes"
 gallery="yes"
 game="yes"
-movietime="yes"
 news="yes"
 phone="yes"
 
@@ -51,10 +50,6 @@ for opt do
   --enable-mythgame) game="yes"
   ;;
   --disable-mythgame) game="no"
-  ;;
-  --enable-mythmovietime) movietime="yes"
-  ;;
-  --disable-mythmovietime) movietime="no"
   ;;
   --enable-mythnews) news="yes"
   ;;
@@ -102,7 +97,6 @@ for opt do
                  weather="yes";
                  gallery="yes";
                  game="yes";
-                 movietime="yes";
                  news="yes";
                  phone="yes";
                  sdl="yes";
@@ -120,7 +114,6 @@ for opt do
                  weather="no";  
                  gallery="no";  
                  game="no";  
-                 movietime="no";  
                  news="no";
                  phone="no";
                  sdl="no";  
@@ -169,9 +162,6 @@ MythGallery related options:
 
 MythGame related options:
   --enable-mythgame        build the mythgame plugin [default=yes]
-
-MythMovieTime related options:
-  --enable-mythmovietime   build the mythmovietime plugin [default=yes]
 
 MythNews related options:
   --enable-mythnews        build the mythnews plugin [default=yes]
@@ -240,13 +230,6 @@ if test "$game" = "yes" ; then
   echo "SUBDIRS += mythgame" >> ./config.pro
 else
   echo "        MythGame      plugin will not be built"
-fi
-
-if test "$movietime" = "yes" ; then
-  echo "        MythMovieTime plugin will be built"
-  echo "SUBDIRS += mythmovietime" >> ./config.pro
-else
-  echo "        MythMovieTime plugin will not be built"
 fi
 
 if test "$news" = "yes" ; then

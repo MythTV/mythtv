@@ -1,4 +1,4 @@
-include ( ../settings.pro )
+include ( ../../settings.pro )
 include ( config.pro )
 
 !exists( config.pro ) {
