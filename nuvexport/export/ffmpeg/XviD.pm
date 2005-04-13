@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.04.03 (xris)
+#Last Updated: 2005.04.12 (xris)
 #
 #  export::ffmpeg::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -142,7 +142,7 @@ package export::ffmpeg::XviD;
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
                                    . ' -bufsize 65535'
-                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.2'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.5'
                                    . " -pass 1 -passlogfile '/tmp/xvid.$$.log'"
                                    . ' -f avi';
             $self->SUPER::export($episode, '');
@@ -154,7 +154,7 @@ package export::ffmpeg::XviD;
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
                                    . ' -bufsize 65535'
-                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.2'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.5'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
                                    . " -pass 2 -passlogfile '/tmp/xvid.$$.log'"
@@ -171,7 +171,7 @@ package export::ffmpeg::XviD;
                                       . ' -bt 32'
                                       . ' -bufsize 65535'
                                       : '')
-                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.2'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.5'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
                                    . ' -f avi';
