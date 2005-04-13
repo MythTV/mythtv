@@ -35,6 +35,7 @@ PlaybackSock::~PlaybackSock()
 
 bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
 {
+    sock->Lock();
     sock->UpRef();
 
     sockLock.lock();
@@ -57,6 +58,8 @@ bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
 
     expectingreply = false;
     sockLock.unlock();
+
+    sock->Unlock();
 
     sock->DownRef();
 

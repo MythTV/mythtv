@@ -478,6 +478,13 @@ bool ReadStringList(QSocket *socket, QStringList &list)
         qApp->lock();
         int temp = socket->readBlock(utf8.data() + read, size);
         qApp->unlock();
+
+        if (temp < 0)
+        {
+            VERBOSE(VB_IMPORTANT, "ReadStringList failed.  Bailing..\n");
+            return false;
+        }
+
         // cerr << "  read: " << temp << endl; //DEBUG
         read += temp;
         size -= temp;

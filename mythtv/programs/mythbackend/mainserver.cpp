@@ -194,11 +194,14 @@ void MainServer::readSocket(void)
 
 void MainServer::ProcessRequest(RefSocket *sock)
 {
+    sock->Lock();
+
     while (sock->bytesAvailable() > 0)
     {
         ProcessRequestWork(sock);
     }
 
+    sock->Unlock();
     sock->SetInProcess(false);
 }
 
@@ -536,6 +539,7 @@ void MainServer::customEvent(QCustomEvent *e)
 
             RefSocket *sock = pbs->getSocket();
             sock->UpRef();
+            sock->Lock();
 
             if (sendGlobal)
             {
@@ -546,6 +550,8 @@ void MainServer::customEvent(QCustomEvent *e)
             {
                 WriteStringList(sock, broadcast);
             }
+
+            sock->Unlock();
 
             if (sock->DownRef())
             {
@@ -3095,6 +3101,8 @@ void MainServer::reconnectTimeout(void)
                           .arg(gContext->GetHostName())
                           .arg(gContext->GetSetting("BackendServerIP"));
 
+    masterServerSock->Lock();
+
     QStringList strlist = str;
     WriteStringList(masterServerSock, strlist);
     ReadStringList(masterServerSock, strlist);
@@ -3105,6 +3113,8 @@ void MainServer::reconnectTimeout(void)
 
     masterServer = new PlaybackSock(masterServerSock, server, true);
     playbackList.push_back(masterServer);
+
+    masterServerSock->Unlock();
 
     // Handle any messages sent before the readyRead signal was connected.
     ProcessRequest(masterServerSock);

@@ -3,6 +3,7 @@
 
 #include <qsocket.h>
 #include <qserversocket.h>
+#include <qmutex.h>
 
 class RefSocket : public QSocket
 {
@@ -18,9 +19,13 @@ class RefSocket : public QSocket
     void SetInProcess(bool use) { inUse = use; }
     bool IsInProcess(void) { return inUse; }
 
+    void Lock() { lock.lock(); }
+    void Unlock() { lock.unlock(); }
+
   private:
     int refCount;
     bool inUse;
+    QMutex lock;
 };
 
 class MythServer : public QServerSocket
