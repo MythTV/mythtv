@@ -83,7 +83,6 @@ void DTVRecorder::Reset()
 
     _first_keyframe = 0;
     _position_within_gop_header = 0;
-    _scanning_pes_header_for_gop = false;
     _keyframe_seen = false;
     _last_gop_seen = 0;
     _last_seq_seen = 0;
@@ -97,12 +96,11 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
     bool noPayload = !tspacket->HasPayload();
     bool payloadStart = tspacket->PayloadStart();
 
-    if (noPayload | (!payloadStart & !_scanning_pes_header_for_gop))
-        return; // not scanning or no payload to scan
+    if (noPayload)
+        return; // no payload to scan
 
     if (payloadStart)
     { // packet contains start of PES packet
-        _scanning_pes_header_for_gop = true; // start scanning for PES headers
         _position_within_gop_header = 0; // start looking for first byte of pattern
     }
 
@@ -113,10 +111,9 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
     //   00 00 01 B8: group_start_code
     //   00 00 01 B3: seq_start_code
     //   (there are others that we don't care about)
-    unsigned int i = tspacket->AFCOffset(); // borked if AFCOffset > 188
     long long frameSeenNum = _frames_seen_count;
     const unsigned char *buffer = tspacket->data();
-    for (;(i+1<TSPacket::SIZE) && _scanning_pes_header_for_gop; i++)
+    for (unsigned int i = tspacket->AFCOffset(); i+1<TSPacket::SIZE; i++)
     {
         const unsigned char k = buffer[i];
         if (0 == _position_within_gop_header)
@@ -127,7 +124,7 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
         {
             if (0x01 != k)
             {
-                _position_within_gop_header = (k) ? 0 : 2;
+                _position_within_gop_header = (k == 0x00) ? 2 : 0;
                 continue;
             }
             const unsigned char k1 = buffer[i+1];
@@ -156,19 +153,20 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
 #endif
                 HandleKeyframe();
                 _last_keyframe_seen = _last_gop_seen = frameSeenNum;
-            } else if (0xB3 == k1 && ((_last_gop_seen+MAX_KEYFRAME_DIFF)<frameSeenNum))
+            } else if (0xB3 == k1)
             {   //   00 00 01 B3: seq_start_code
+                if ((_last_gop_seen+MAX_KEYFRAME_DIFF)<frameSeenNum)
+                {
 #if DEBUG_FIND_KEY_FRAMES
-                VERBOSE(VB_RECORD, QString("seq sc(%1) wc(%2) lgop(%3) lseq(%4)").
+                    VERBOSE(VB_RECORD, QString("seq sc(%1) wc(%2) lgop(%3) lseq(%4)").
                         arg(_frames_seen_count).arg(_frames_written_count).
                         arg(_last_gop_seen).arg(_last_seq_seen));
 #endif
-                HandleKeyframe();
-                _last_keyframe_seen = _last_seq_seen = frameSeenNum;
+                    HandleKeyframe();
+                    _last_keyframe_seen = frameSeenNum;
+                }
+                _last_seq_seen = frameSeenNum;
             }
-            // video slice ... end of "interesting" headers
-            if (0x01 <= k1 && k1 <= 0xAF)
-                _scanning_pes_header_for_gop = false;
             _position_within_gop_header = 0;
         }
     }

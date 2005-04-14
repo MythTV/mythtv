@@ -18,9 +18,8 @@ class DTVRecorder: public RecorderBase
   public:
     DTVRecorder::DTVRecorder() : 
         _first_keyframe(0), _position_within_gop_header(0),
-        _scanning_pes_header_for_gop(0), _keyframe_seen(false),
-        _last_keyframe_seen(0), _last_gop_seen(0), _last_seq_seen(0),
-        _stream_fd(-1), _error(false),
+        _keyframe_seen(false), _last_keyframe_seen(0), _last_gop_seen(0),
+        _last_seq_seen(0), _stream_fd(-1), _error(false),
         _request_recording(false), _request_pause(false), _wait_for_keyframe_option(true),
         _recording(false), _paused(false), _wait_for_keyframe(true),
         _buffer(0), _buffer_size(0),
@@ -62,7 +61,6 @@ class DTVRecorder: public RecorderBase
     // used for scanning pes header for group of pictures header
     int _first_keyframe;
     int _position_within_gop_header;
-    bool _scanning_pes_header_for_gop;
     bool _keyframe_seen;
     long long _last_keyframe_seen, _last_gop_seen, _last_seq_seen;
 
