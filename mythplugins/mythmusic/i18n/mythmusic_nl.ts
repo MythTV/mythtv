@@ -1078,6 +1078,53 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
         <source>Select a Title</source>
         <translation>Kies een Titel</translation>
     </message>
+    <message>
+        <source>Select a Compilation Artist</source>
+        <translation type="unfinished">Kies een Compilatie Artiest</translation>
+    </message>
+</context>
+<context>
+    <name>SmartPLDateDialog</name>
+    <message>
+        <source>Edit Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fixed Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished">Jaar</translation>
+    </message>
+    <message>
+        <source>Use Current Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>+/- Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Date</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>

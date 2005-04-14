@@ -5,6 +5,10 @@
         <source>All Games</source>
         <translation>Alle Spiele</translation>
     </message>
+    <message>
+        <source>Favourites</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NesSettingsDlg</name>
@@ -624,11 +628,11 @@
     </message>
     <message>
         <source>Show Only Favorites</source>
-        <translation>Nur Favoriten anzeigen</translation>
+        <translation type="obsolete">Nur Favoriten anzeigen</translation>
     </message>
     <message>
         <source>Limit games listed to only those tagged as &quot;favorite&quot;</source>
-        <translation>Es werden nur Spiele, die als &quot;Favorit&quot; gekennzeichnet wurden angezeigt.</translation>
+        <translation type="obsolete">Es werden nur Spiele, die als &quot;Favorit&quot; gekennzeichnet wurden angezeigt.</translation>
     </message>
     <message>
         <source>The path to the MAME history.dat file.</source>
@@ -835,6 +839,14 @@ Bitte den Pfad überprüfen und erneut versuchen.</translation>
     <message>
         <source>Set volume to x db, (-32 (soft) - 0 (loud) )</source>
         <translation>Lautstärke in db (von -32 (leise) bis 0 (laut))</translation>
+    </message>
+    <message>
+        <source>Favourite display order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

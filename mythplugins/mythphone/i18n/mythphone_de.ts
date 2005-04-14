@@ -71,11 +71,11 @@
     </message>
     <message>
         <source>Registered to</source>
-        <translation>Registriert auf</translation>
+        <translation type="obsolete">Registriert auf</translation>
     </message>
     <message>
         <source>as</source>
-        <translation>als</translation>
+        <translation type="obsolete">als</translation>
     </message>
     <message>
         <source>Not Registered</source>
@@ -127,15 +127,15 @@
     </message>
     <message>
         <source>First Name</source>
-        <translation>Vorname</translation>
+        <translation type="obsolete">Vorname</translation>
     </message>
     <message>
         <source>(Optional)</source>
-        <translation>(Optional)</translation>
+        <translation type="obsolete">(Optional)</translation>
     </message>
     <message>
         <source>Surname</source>
-        <translation>Nachname</translation>
+        <translation type="obsolete">Nachname</translation>
     </message>
     <message>
         <source>URL</source>
@@ -159,11 +159,11 @@
     </message>
     <message>
         <source>Videocall</source>
-        <translation>Videoanruf</translation>
+        <translation type="obsolete">Videoanruf</translation>
     </message>
     <message>
         <source>Voice-Only</source>
-        <translation>nur Sprache</translation>
+        <translation type="obsolete">nur Sprache</translation>
     </message>
     <message>
         <source>Send an Instant Message</source>
@@ -183,11 +183,11 @@
     </message>
     <message>
         <source>Today</source>
-        <translation>Heute</translation>
+        <translation type="obsolete">Heute</translation>
     </message>
     <message>
         <source>Yesterday</source>
-        <translation>Gestern</translation>
+        <translation type="obsolete">Gestern</translation>
     </message>
     <message>
         <source>at</source>
@@ -202,39 +202,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Packets In/Out/Lost/Late:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Average Kbps In/Out: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Resolution In/Out:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Average Kbps In/Out:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Video Frames In/Out/Discarded:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Average FPS In/Out:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Webcam FPS Actual/Used:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Webcam FPS Hw/Driver/Used:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -275,11 +247,95 @@
     </message>
     <message>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
     <message>
         <source>A directory entry already exists with this URL.</source>
-        <translation>Es existiert bereits ein Eintrag mit dieser URL.</translation>
+        <translation type="obsolete">Es existiert bereits ein Eintrag mit dieser URL.</translation>
+    </message>
+    <message>
+        <source>Registered to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> as </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connecting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First Name (Optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Surname (Optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Dial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client is on My Home LAN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> Videocall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> Voice-Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Today </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yesterday </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packets In/Out/Lost/Late:             </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resolution In/Out: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packets In/Lost/Disc/Late: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packets Out/Dropped: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Frames In/Out/Disc: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average FPS In/Out: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Webcam Frames Delivered/Dropped: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packets In/Out/Lost/Late: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Codec</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -298,19 +354,19 @@
     </message>
     <message>
         <source>176x144</source>
-        <translation>176x144</translation>
+        <translation type="obsolete">176x144</translation>
     </message>
     <message>
         <source>128x96</source>
-        <translation>128x96</translation>
+        <translation type="obsolete">128x96</translation>
     </message>
     <message>
         <source>704x576</source>
-        <translation>704x576</translation>
+        <translation type="obsolete">704x576</translation>
     </message>
     <message>
         <source>352x288</source>
-        <translation>352x288</translation>
+        <translation type="obsolete">352x288</translation>
     </message>
     <message>
         <source>Size of video window to transmit; higher resolutions require more bandwidth.</source>
@@ -322,15 +378,15 @@
     </message>
     <message>
         <source>320x240</source>
-        <translation>320x240</translation>
+        <translation type="obsolete">320x240</translation>
     </message>
     <message>
         <source>160x120</source>
-        <translation>160x120</translation>
+        <translation type="obsolete">160x120</translation>
     </message>
     <message>
         <source>640x480</source>
-        <translation>640x480</translation>
+        <translation type="obsolete">640x480</translation>
     </message>
     <message>
         <source>Size of video source from your webcam. Choose a value compatible with your webcam hardware. Choose higher values to digitally pan/zoom before transmission.</source>
@@ -350,7 +406,7 @@
     </message>
     <message>
         <source>10</source>
-        <translation>10</translation>
+        <translation type="obsolete">10</translation>
     </message>
     <message>
         <source>The time in seconds a call rings before being automatically answered and diverted to a VXML script.</source>
@@ -362,7 +418,7 @@
     </message>
     <message>
         <source>http://127.0.0.1/vxml/index.vxml</source>
-        <translation>http://127.0.0.1/vxml/index.vxml</translation>
+        <translation type="obsolete">http://127.0.0.1/vxml/index.vxml</translation>
     </message>
     <message>
         <source>The URL to retrieve a VXML script which can be used to prompt for leaving a voicemail etc. Leave blank if you have no HTTP server and a default Voicemail script will be used.</source>
@@ -402,7 +458,7 @@
     </message>
     <message>
         <source>5060</source>
-        <translation>5060</translation>
+        <translation type="obsolete">5060</translation>
     </message>
     <message>
         <source>The port on this machine to use. You may need to make these different for each Mythfrontend and setup your firewall to let this port through.</source>
@@ -438,7 +494,7 @@
     </message>
     <message>
         <source>eth0</source>
-        <translation>eth0</translation>
+        <translation type="obsolete">eth0</translation>
     </message>
     <message>
         <source>Enter the name of the network to bind to e.g. eth0</source>
@@ -543,6 +599,26 @@
     <message>
         <source>Received Calls</source>
         <translation>empf. Anrufe</translation>
+    </message>
+    <message>
+        <source>A directory entry already exists with this URL.</source>
+        <translation type="unfinished">Es existiert bereits ein Eintrag mit dieser URL.</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Max Transmit Bandwidth Kbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the upspeed bandwidth of your local WAN in Kbps. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Me</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -94,11 +94,11 @@ Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la
     </message>
     <message>
         <source>       zoom Out       </source>
-        <translation>       Dézoomer       </translation>
+        <translation type="obsolete">       Dézoomer       </translation>
     </message>
     <message>
         <source>       zoom In        </source>
-        <translation>        Zoomer         </translation>
+        <translation type="obsolete">        Zoomer         </translation>
     </message>
     <message>
         <source>MythBrowser Menu</source>
@@ -115,6 +115,18 @@ Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>      Remove Tab      </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>       Zoom Out       </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>       Zoom In        </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

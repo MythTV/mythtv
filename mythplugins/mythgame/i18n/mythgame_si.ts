@@ -5,6 +5,10 @@
         <source>All Games</source>
         <translation>Vse igre</translation>
     </message>
+    <message>
+        <source>Favourites</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NesSettingsDlg</name>
@@ -40,11 +44,11 @@
     </message>
     <message>
         <source>Show Only Favorites</source>
-        <translation>Prikaži samo priljubljene</translation>
+        <translation type="obsolete">Prikaži samo priljubljene</translation>
     </message>
     <message>
         <source>Limit games listed to only those tagged as &quot;favorite&quot;</source>
-        <translation>Prikaži samo tiste igre z oznako &quot;priljubljene&quot;</translation>
+        <translation type="obsolete">Prikaži samo tiste igre z oznako &quot;priljubljene&quot;</translation>
     </message>
     <message>
         <source>MAME binary location</source>
@@ -835,6 +839,14 @@ Prosim vnesite pravilno pot in poizkusite ponovno.</translation>
     <message>
         <source>sound page 2</source>
         <translation>zvočna stran 2</translation>
+    </message>
+    <message>
+        <source>Favourite display order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

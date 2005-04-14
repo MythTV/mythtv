@@ -1398,6 +1398,53 @@ Não existem dados do MythMusic na base de dados.</translation>
         <source>Select a Title</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Select a Compilation Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SmartPLDateDialog</name>
+    <message>
+        <source>Edit Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fixed Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished">Ano</translation>
+    </message>
+    <message>
+        <source>Use Current Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>+/- Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Date</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>

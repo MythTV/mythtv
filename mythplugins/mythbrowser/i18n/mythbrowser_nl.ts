@@ -98,11 +98,11 @@ De OK toets verwijders het item uit de lijst.</translation>
     </message>
     <message>
         <source>       zoom Out       </source>
-        <translation>      zoom Uit        </translation>
+        <translation type="obsolete">      zoom Uit        </translation>
     </message>
     <message>
         <source>       zoom In        </source>
-        <translation>      zoom In         </translation>
+        <translation type="obsolete">      zoom In         </translation>
     </message>
     <message>
         <source>Enter URL</source>
@@ -114,6 +114,18 @@ De OK toets verwijders het item uit de lijst.</translation>
     </message>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>      Remove Tab      </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>       Zoom Out       </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>       Zoom In        </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

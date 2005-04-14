@@ -94,11 +94,11 @@ SPACE/Enter löscht den selektierten Eintrag.</translation>
     </message>
     <message>
         <source>       zoom Out       </source>
-        <translation>Schrift kleiner</translation>
+        <translation type="obsolete">Schrift kleiner</translation>
     </message>
     <message>
         <source>       zoom In        </source>
-        <translation>Schrift grösser</translation>
+        <translation type="obsolete">Schrift grösser</translation>
     </message>
     <message>
         <source>MythBrowser Menu</source>
@@ -114,6 +114,18 @@ SPACE/Enter löscht den selektierten Eintrag.</translation>
     </message>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>      Remove Tab      </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>       Zoom Out       </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>       Zoom In        </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

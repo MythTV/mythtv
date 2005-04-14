@@ -5,6 +5,10 @@
         <source>All Games</source>
         <translation>Tous les jeux</translation>
     </message>
+    <message>
+        <source>Favourites</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NesSettingsDlg</name>
@@ -40,11 +44,11 @@
     </message>
     <message>
         <source>Show Only Favorites</source>
-        <translation>Afficher seulement les favoris</translation>
+        <translation type="obsolete">Afficher seulement les favoris</translation>
     </message>
     <message>
         <source>Limit games listed to only those tagged as &quot;favorite&quot;</source>
-        <translation>Limiter les jeux listés à ceux marqués comme \&quot;favoris\&quot;</translation>
+        <translation type="obsolete">Limiter les jeux listés à ceux marqués comme \&quot;favoris\&quot;</translation>
     </message>
     <message>
         <source>MAME binary location</source>
@@ -834,6 +838,14 @@ Please enter the correct path and try again.</source>
     <message>
         <source>sound page 2</source>
         <translation>son page 2</translation>
+    </message>
+    <message>
+        <source>Favourite display order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

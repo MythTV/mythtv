@@ -69,15 +69,233 @@
         <source>ADD DIRECTORY</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Registered to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> as </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Registered</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio and Video Looped to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Active Calls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caller is Leaving Voicemail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trying to Contact Remote Party</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connecting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incoming Call</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hanging Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Dials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Call History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voicemail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nickname</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First Name (Optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Surname (Optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Dial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client is on My Home LAN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Photo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Business Card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Latest Calls:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> Videocall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> Voice-Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send an Instant Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You Called </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>They Called </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You missed their call </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Today </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yesterday </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>at</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> for %d min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packets In/Out/Lost/Late:             </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average Kbps In/Out: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resolution In/Out: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packets In/Lost/Disc/Late: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packets Out/Dropped: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Frames In/Out/Disc: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average FPS In/Out: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Webcam Frames Delivered/Dropped: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packets In/Out/Lost/Late: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average Kbps In/Out:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mic Volume (not impl.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Codec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contrast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmit Video Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmit Video FPS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up/Down - Change       Left/Right - Adjust</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dial</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>
-
-A directory entry already exists with this URL.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>OK</source>
         <translation type="unfinished"></translation>
@@ -95,39 +313,11 @@ A directory entry already exists with this URL.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>176x144</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>128x96</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>704x576</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>352x288</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Size of video window to transmit; higher resolutions require more bandwidth.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Capture Resolution</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>320x240</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>160x120</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>640x480</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -143,19 +333,11 @@ A directory entry already exists with this URL.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The time in seconds a call rings before being automatically answered and diverted to a VXML script.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Default VXML URL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>http://127.0.0.1/vxml/index.vxml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -195,10 +377,6 @@ A directory entry already exists with this URL.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>5060</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The port on this machine to use. You may need to make these different for each Mythfrontend and setup your firewall to let this port through.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -228,10 +406,6 @@ A directory entry already exists with this URL.</source>
     </message>
     <message>
         <source>SIP Network Interface</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>eth0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -324,6 +498,38 @@ A directory entry already exists with this URL.</source>
     </message>
     <message>
         <source>Method to use for NAT traversal; needs a Frontend restart after changing. Choose NONE if you have a public IP address, choose MANUAL if your ISP always gives you the same public address and manually enter this address below. Choose Web Server if you have a dynamic NAT address and enter a web address like http://checkip.dyndns.org below. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Dials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voicemail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Placed Calls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Received Calls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A directory entry already exists with this URL.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max Transmit Bandwidth Kbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the upspeed bandwidth of your local WAN in Kbps. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Me</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

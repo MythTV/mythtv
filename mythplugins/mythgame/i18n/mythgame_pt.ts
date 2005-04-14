@@ -5,6 +5,10 @@
         <source>All Games</source>
         <translation>Todos os Jogos</translation>
     </message>
+    <message>
+        <source>Favourites</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NesSettingsDlg</name>
@@ -623,14 +627,6 @@
         <translation>  (erro no ficheiro)</translation>
     </message>
     <message>
-        <source>Show Only Favorites</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Limit games listed to only those tagged as &quot;favorite&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The path to the MAME history.dat file.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -833,6 +829,14 @@ Please enter the correct path and try again.</source>
     </message>
     <message>
         <source>Set volume to x db, (-32 (soft) - 0 (loud) )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favourite display order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

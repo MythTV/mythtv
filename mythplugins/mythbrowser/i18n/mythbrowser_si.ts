@@ -98,11 +98,11 @@ Z pritiskom na PRESLEDNICO/ENTER nad izbranim vnosom, se le ta izbriše. </trans
     </message>
     <message>
         <source>       zoom Out       </source>
-        <translation>       Pomanjšaj       </translation>
+        <translation type="obsolete">       Pomanjšaj       </translation>
     </message>
     <message>
         <source>       zoom In        </source>
-        <translation>       Povečaj       </translation>
+        <translation type="obsolete">       Povečaj       </translation>
     </message>
     <message>
         <source>Enter URL</source>
@@ -114,6 +114,18 @@ Z pritiskom na PRESLEDNICO/ENTER nad izbranim vnosom, se le ta izbriše. </trans
     </message>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>      Remove Tab      </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>       Zoom Out       </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>       Zoom In        </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

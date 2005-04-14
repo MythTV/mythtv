@@ -14,17 +14,30 @@
     <name>MythNewsConfig</name>
     <message>
         <source>Select News Feeds</source>
-        <translation>Selecter News Feeds</translation>
+        <translation type="obsolete">Selecter News Feeds</translation>
     </message>
     <message>
         <source>Set Update Frequency</source>
-        <translation>Stel De Verversfrekwentie In</translation>
+        <translation type="obsolete">Stel De Verversfrekwentie In</translation>
     </message>
     <message>
         <source>Set Update Frequency in Minutes
 Minimum allowed value is 30 Minutes</source>
-        <translation>Verversfrekwentie in Minuten
+        <translation type="obsolete">Verversfrekwentie in Minuten
 Minimum is 30 Minuten</translation>
+    </message>
+    <message>
+        <source>Press MENU to set the update frequency.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set update frequency by using the up/down arrows.
+The minimum allowed value is 30 Minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press MENU to return to feed selection.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

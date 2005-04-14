@@ -13,16 +13,16 @@
 <context>
     <name>MythNewsConfig</name>
     <message>
-        <source>Select News Feeds</source>
+        <source>Press MENU to set the update frequency.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set Update Frequency</source>
+        <source>Set update frequency by using the up/down arrows.
+The minimum allowed value is 30 Minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set Update Frequency in Minutes
-Minimum allowed value is 30 Minutes</source>
+        <source>Press MENU to return to feed selection.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
