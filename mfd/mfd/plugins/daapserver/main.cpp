@@ -55,6 +55,7 @@ bool mfdplugin_can_unload()
         {
             delete daap_server;
             daap_server = NULL;
+            return true;
         }
         return false;
     }

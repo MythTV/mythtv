@@ -13,6 +13,7 @@
 #include <qfileinfo.h>
 
 #include "mfd_events.h"
+#include "../../servicelister.h"
 
 #include "audio.h"
 #include "daapinput.h"
@@ -54,6 +55,10 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     rtsp_out = new RtspOut(owner, -1, output);
     rtsp_out->start();
 #endif
+    maop_instances.setAutoDelete(true);
+    speaker_release_timer.start();
+    waiting_for_speaker_release = false;
+    
 }
 
 void AudioPlugin::swallowOutputUpdate(int type, int numb_seconds, int channels, int bitrate, int frequency)
@@ -155,6 +160,8 @@ void AudioPlugin::run()
         waitForSomethingToHappen();
         checkInternalMessages();
         checkMetadataChanges();
+        checkServiceChanges();
+        checkSpeakers();
     }
 
     stopAudio();
@@ -585,6 +592,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
             decoder->start();
             is_playing = true;
             is_paused = false;
+            turnOnSpeakers();
             state_of_play_mutex->unlock();
             return true;
         }
@@ -709,7 +717,10 @@ void AudioPlugin::stopAudio()
         is_paused = false;
 
     state_of_play_mutex->unlock();
-
+    maop_mutex.lock();
+        waiting_for_speaker_release = true;
+    maop_mutex.unlock();
+    speaker_release_timer.restart();
     sendMessage("stop");
 }
 
@@ -1130,8 +1141,219 @@ void AudioPlugin::deleteOutput()
 }
                 
 
+void AudioPlugin::handleServiceChange()
+{
+    //
+    //  Something has changed in available services. I need to query the mfd
+    //  and make sure I know about all maop services (i.e. all available
+    //  speakers)
+    //
+    
+    ServiceLister *service_lister = parent->getServiceLister();
+    
+    service_lister->lockDiscoveredList();
+
+        //
+        //  Go through my list of maop instances and make sure they still
+        //  exist in the mfd's service list
+        //
+
+        maop_mutex.lock();
+            MaopInstance *an_instance;
+            QPtrListIterator<MaopInstance> iter( maop_instances );
+
+            while ( (an_instance = iter.current()) != 0 )
+            {
+                if( !service_lister->findDiscoveredService(an_instance->getName()) )
+                {
+                    log(QString("removed speakers resource called \"%1\" (total now %2)")
+                        .arg(an_instance->getName()).arg(maop_instances.count() - 1), 5);
+                    int fd = an_instance->getFileDescriptor();
+                    if(fd > 0)
+                    {
+                        removeFileDescriptorToWatch(fd);
+                    }
+                    maop_instances.remove( an_instance );
+                }
+                ++iter;
+            }
+        maop_mutex.unlock();
+    
+        //
+        //  Go through services on the master list, add any that I don't
+        //  already know about
+        //
+        
+        typedef     QValueList<Service> ServiceList;
+        ServiceList *discovered_list = service_lister->getDiscoveredList();
+        
+
+        ServiceList::iterator it;
+        for ( it  = discovered_list->begin(); 
+              it != discovered_list->end(); 
+              ++it )
+        {
+            //
+            //  We just try and add any that are not on this host, as the
+            //  addDaapServer() method checks for dupes
+            //
+                
+            if ( (*it).getType() == "maop")
+            {
+                addMaopSpeakers((*it).getAddress(), (*it).getPort(), (*it).getName() );
+            }
+                
+        }
+
+    service_lister->unlockDiscoveredList();
+    
+}
+
+void AudioPlugin::addMaopSpeakers(QString l_address, uint l_port, QString l_name)
+{
+    //
+    //  If it's new, add it ... otherwise ignore it
+    //
+
+
+    bool already_have_it = false;
+
+    maop_mutex.lock();
+    MaopInstance *an_instance;
+    for ( an_instance = maop_instances.first(); an_instance; an_instance = maop_instances.next() )
+    {
+        if(an_instance->isThisYou(l_name, l_address, l_port))
+        {
+            already_have_it = true;
+            break;
+        }
+    }
+    
+    if(!already_have_it)
+    {
+        MaopInstance *new_maop_instance = new MaopInstance(this, l_name, l_address, l_port);
+        if(new_maop_instance->allIsWell())
+        {
+            int fd = new_maop_instance->getFileDescriptor();
+            if(fd > 0)
+            {
+                log(QString("adding speakers resource called \"%1\" via maop://%2:%3 (total now %4)")
+                    .arg(l_name)
+                    .arg(l_address)
+                    .arg(l_port)
+                    .arg(maop_instances.count() + 1), 5);
+                maop_instances.append(new_maop_instance);
+                addFileDescriptorToWatch(fd);
+            }
+            else
+            {
+                warning("maop instance said it was created ok, but returned a bad file descriptor ???");
+                delete new_maop_instance;
+            }
+        }
+        else
+        {
+            warning(QString("failed to add a speakers resource called \"%1\" "
+                            "via maop://%2:%3")
+                            .arg(l_name)
+                            .arg(l_address)
+                            .arg(l_port));
+            delete new_maop_instance;
+        }
+    }
+    maop_mutex.unlock();
+}
+
+void AudioPlugin::checkSpeakers()
+{
+    //
+    //  Give a little processing time in this main thread of the audio
+    //  plugin to checking whether there's any coming in from the
+    //  speakers/maop services (change of status, etc)
+    //
+    
+    maop_mutex.lock();
+        QPtrListIterator<MaopInstance> it( maop_instances );
+        MaopInstance *an_instance;
+        while ( (an_instance = it.current()) != 0 ) 
+        {
+            an_instance->checkIncoming();
+            ++it;
+        }        
+    
+    //
+    //  If we're waiting to release the speakers, do so if enough time had elapsed
+    //
+    
+    if(waiting_for_speaker_release)
+    {
+        if(speaker_release_timer.elapsed() > 30 * 1000) // 30 seconds
+        {
+            turnOffSpeakers();
+            waiting_for_speaker_release = false;
+        }
+    }
+    maop_mutex.unlock();
+}
+
+void AudioPlugin::turnOnSpeakers()
+{
+#ifdef MFD_RTSP_SUPPORT
+
+    maop_mutex.lock();
+
+    //
+    //  Tell all speakers (maop instances) to listen to our rtsp stream
+    //
+    
+    QPtrListIterator<MaopInstance> it( maop_instances );
+    MaopInstance *an_instance;
+    while ( (an_instance = it.current()) != 0 ) 
+    {
+        an_instance->sendRequest(QString("open %1").arg(rtsp_out->getUrl()));
+        ++it;
+    }        
+    
+    //
+    //  If we just turned them on, we can't be waiting for a speaker release
+    //
+    
+    waiting_for_speaker_release = false;
+    
+    maop_mutex.unlock();
+#endif
+}
+
+void AudioPlugin::turnOffSpeakers()
+{
+    //
+    //  The maop mutex should be locked 
+    //
+    
+    if(maop_mutex.tryLock())
+    {
+        warning("AudioPlugin::turnOffSpeakers() called without maop_mutex being locked");
+        maop_mutex.unlock();
+    }
+    
+    //
+    //  Tell all speakers (maop instances) to stop listening to our stream
+    //
+    
+    QPtrListIterator<MaopInstance> it( maop_instances );
+    MaopInstance *an_instance;
+    while ( (an_instance = it.current()) != 0 ) 
+    {
+        an_instance->sendRequest(QString("close %1").arg(rtsp_out->getUrl()));
+        ++it;
+    }        
+    
+}
+
 AudioPlugin::~AudioPlugin()
 {
+    maop_instances.clear();
+
     if (output)
     {
         delete output;

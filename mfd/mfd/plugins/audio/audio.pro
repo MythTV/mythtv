@@ -16,6 +16,9 @@ SOURCES += main.cpp audio.cpp audiolistener.cpp rtspout.cpp livemedia.cpp
 HEADERS += daapinput.h   ../daapclient/daaprequest.h   ../daapclient/server_types.h 
 SOURCES += daapinput.cpp ../daapclient/daaprequest.cpp
 
+HEADERS += maopinstance.h
+SOURCES += maopinstance.cpp
+
 LIBS += -logg -lvorbisfile -lvorbis -mfdlib
 LIBS += -lmad -lid3tag -lcdaudio -lFLAC -lcdda_interface -lcdda_paranoia
 

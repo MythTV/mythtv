@@ -121,6 +121,7 @@ bool mfdplugin_can_unload()
         {
             delete a_dummy;
             a_dummy = NULL;
+            return true;
         }
         return false;
     }

@@ -31,12 +31,14 @@ class RtspOut: public MFDRtspPlugin
 
     void run();
     void stop();
+    QString getUrl(){ return serving_url;  }
 
   private:
 
     char            watch_variable;
     LiveSubsession *live_subsession;
     AudioOutput    *audio_output;
+    QString         serving_url;
 };
 
 #endif  // MFD_RTSP_SUPPORT

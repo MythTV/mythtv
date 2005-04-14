@@ -56,6 +56,7 @@ bool mfdplugin_can_unload()
         {
             delete mmusic_watcher;
             mmusic_watcher = NULL;
+            return true;
         }
         return false;
     }

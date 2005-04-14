@@ -21,6 +21,7 @@
 #include "../../mdserver.h"
 
 #include "decoder.h"
+#include "maopinstance.h"
 
 class AudioListener;
 
@@ -51,6 +52,11 @@ class AudioPlugin: public MFDServicePlugin
     void    nextPrevAudio(bool forward);
     void    handleMetadataChange(int which_collection, bool external=false);
     void    deleteOutput();        
+    void    handleServiceChange();
+    void    addMaopSpeakers(QString l_address, uint l_port, QString l_name);
+    void    checkSpeakers();
+    void    turnOnSpeakers();
+    void    turnOffSpeakers();
         
   private:
   
@@ -88,6 +94,11 @@ class AudioPlugin: public MFDServicePlugin
 #ifdef MFD_RTSP_SUPPORT
     RtspOut       *rtsp_out;
 #endif
+
+    QMutex                 maop_mutex;
+    QPtrList<MaopInstance> maop_instances;
+    bool                   waiting_for_speaker_release;
+    QTime                  speaker_release_timer;
 };
 
 #endif  // audio_h_

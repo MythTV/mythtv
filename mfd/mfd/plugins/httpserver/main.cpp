@@ -55,6 +55,7 @@ bool mfdplugin_can_unload()
         {
             delete http_server;
             http_server = NULL;
+            return true;
         }
         return false;
     }

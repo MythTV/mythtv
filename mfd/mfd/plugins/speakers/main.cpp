@@ -1,17 +1,17 @@
 /*
 	main.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
-    entry point for http server
+    entry point for speakers plugin
 
 */
 
-#include "discwatcher.h"
+#include "speakers.h"
 #include "../../mfd.h"
 
-extern DiscWatcher *disc_watcher;
+Speakers *speakers = NULL;
 
 extern "C" {
 bool         mfdplugin_init(MFD*, int);
@@ -22,15 +22,15 @@ bool         mfdplugin_can_unload();
 
 bool mfdplugin_init(MFD *owner, int identifier)
 {
-    disc_watcher = new DiscWatcher(owner, identifier);
+    speakers = new Speakers(owner, identifier);
     return true;
 }
 
 bool mfdplugin_run()
 {
-    if(disc_watcher)
+    if(speakers)
     {
-        disc_watcher->start();
+        speakers->start();
         return true;
     }
     return false;
@@ -38,22 +38,22 @@ bool mfdplugin_run()
 
 bool mfdplugin_stop()
 {
-    if(disc_watcher)
+    if(speakers)
     {
-        disc_watcher->stop();
-        disc_watcher->wakeUp();
+        speakers->stop();
+        speakers->wakeUp();
     }
     return true;
 }
 
 bool mfdplugin_can_unload()
 {
-    if(disc_watcher)
+    if(speakers)
     {
-        if(!disc_watcher->running())
+        if(!speakers->running())
         {
-            delete disc_watcher;
-            disc_watcher = NULL;
+            delete speakers;
+            speakers = NULL;
             return true;
         }
         return false;

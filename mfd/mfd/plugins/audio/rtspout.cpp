@@ -91,6 +91,8 @@ void RtspOut::run()
         local_hostname = my_hostname;
     }
 
+    serving_url = QString("rtsp://%1:%2/").arg(local_hostname).arg(2346);
+
     Service *rtsp_service = new Service(
                                         QString("Myth Audio Streaming on %1").arg(local_hostname),
                                         QString("rtsp"),

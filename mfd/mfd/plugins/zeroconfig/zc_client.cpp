@@ -199,6 +199,10 @@ const QString MFDService::getShortType()
     {
         short_type = "http";
     }
+    else if(service_type == "_maop._tcp.")
+    {
+        short_type = "maop";
+    }
     else if(service_type == "_raop._tcp.")
     {
         short_type = "raop";
@@ -592,6 +596,7 @@ void ZeroConfigClient::run()
     browseForService(&mDNSStorage, "_daap._tcp.");
     browseForService(&mDNSStorage, "_mdcap._tcp.");
     browseForService(&mDNSStorage, "_http._tcp.");
+    browseForService(&mDNSStorage, "_maop._tcp.");
     browseForService(&mDNSStorage, "_raop._tcp.");
     browseForService(&mDNSStorage, "_rtsp._tcp.");
 

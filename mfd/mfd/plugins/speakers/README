@@ -1,0 +1,13 @@
+
+The mfd speakers plugin is a bit of code that can be asked to listen to an
+RTSP stream and output the audio (audio only) via hardware (ie. a
+soundcard). It has a simple telnet protocol that understands how to:
+
+open rtsp://somehost:aport/
+close
+
+The mfd audio plugin listens for service announcements from speaker plugins
+on the local LAN (service type maop - Myth Audio Output Porotocl) and knows
+how to make them listen in when something is playing and close themselves
+off when there's nothing to listen to.
+
