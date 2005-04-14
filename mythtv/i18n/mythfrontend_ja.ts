@@ -4073,10 +4073,6 @@ MythTVは終了します。</translation>
         <translation>X WindowのビデオモードをTVのとき切替える。&quot;xrandr&quot;のサポートが必要です。</translation>
     </message>
     <message>
-        <source>Alt Aspect</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>GUI Size (px)</source>
         <translation type="obsolete">GUIサイズ (px)</translation>
     </message>

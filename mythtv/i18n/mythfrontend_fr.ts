@@ -229,6 +229,45 @@
         <source>Only shows marked as HDTV</source>
         <translation>Seules les diffusions HDTV</translation>
     </message>
+    <message>
+        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movie of the Week (complete example - use FindWeekly)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVBTransportsEditor</name>
+    <message>
+        <source>DVB Transport Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to delete this transport?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete the transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished">Non</translation>
+    </message>
+    <message>
+        <source>Transport Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="unfinished">Édition..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="unfinished">Suppression..</translation>
+    </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>
@@ -794,6 +833,14 @@
     <message>
         <source>Save it so I can watch it again</source>
         <translation>Le Sauver afin de le regarder à nouveau</translation>
+    </message>
+    <message>
+        <source>Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3265,7 +3312,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
-        <translation>Marquer automatiquement les pubs</translation>
+        <translation type="obsolete">Marquer automatiquement les pubs</translation>
     </message>
     <message>
         <source>Enable stricter Commercial Detection code.  Disable if some commercials are not being detected.</source>
@@ -3477,19 +3524,19 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>Y</source>
-        <translation>Y</translation>
+        <translation type="obsolete">Y</translation>
     </message>
     <message>
         <source>Alt Aspect</source>
-        <translation>Aspect alternatif</translation>
+        <translation type="obsolete">Aspect alternatif</translation>
     </message>
     <message>
         <source>GUI Size (px)</source>
-        <translation>Dimension de l&apos;interface (px)</translation>
+        <translation type="obsolete">Dimension de l&apos;interface (px)</translation>
     </message>
     <message>
         <source>Physical Size</source>
-        <translation>Taille physique</translation>
+        <translation type="obsolete">Taille physique</translation>
     </message>
     <message>
         <source>Toggles between windowed and borderless operation.</source>
@@ -4640,27 +4687,27 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Horizontal resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Résolution horizontale pour le mode vidéo de l&apos;interface. Ce mode doit être défini dans votre fichier de configuration de X.</translation>
+        <translation type="obsolete">Résolution horizontale pour le mode vidéo de l&apos;interface. Ce mode doit être défini dans votre fichier de configuration de X.</translation>
     </message>
     <message>
         <source>Vertical resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Résolution verticale pour le mode vidéo de l&apos;interface. Ce mode doit être définit dans votre fichier de configuration de X.</translation>
+        <translation type="obsolete">Résolution verticale pour le mode vidéo de l&apos;interface. Ce mode doit être définit dans votre fichier de configuration de X.</translation>
     </message>
     <message>
         <source>Horizontal resolution of video mode which needs a special output resolution.</source>
-        <translation>Résolution horizontale des modes vidéos qui nécessitent une résolution spéciale</translation>
+        <translation type="obsolete">Résolution horizontale des modes vidéos qui nécessitent une résolution spéciale</translation>
     </message>
     <message>
         <source>Vertical resolution of video mode which needs a special output resolution.</source>
-        <translation>Résolution verticale des modes vidéos qui nécessitent une résolution spéciale</translation>
+        <translation type="obsolete">Résolution verticale des modes vidéos qui nécessitent une résolution spéciale</translation>
     </message>
     <message>
         <source>Horizontal resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Résolution horizontale du mode vidéo de relecture. Ce mode doit être défini dans votre fichier de configuration X Window.</translation>
+        <translation type="obsolete">Résolution horizontale du mode vidéo de relecture. Ce mode doit être défini dans votre fichier de configuration X Window.</translation>
     </message>
     <message>
         <source>Vertical resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation>Résolution verticale du mode vidéo de relecture. Ce mode doit être défini dans votre fichier de configuration X Window.</translation>
+        <translation type="obsolete">Résolution verticale du mode vidéo de relecture. Ce mode doit être défini dans votre fichier de configuration X Window.</translation>
     </message>
     <message>
         <source>Video Mode Settings</source>
@@ -4668,7 +4715,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Default Display (px)</source>
-        <translation>Affichage par défaut (px)</translation>
+        <translation type="obsolete">Affichage par défaut (px)</translation>
     </message>
     <message>
         <source>Default size is 25.</source>
@@ -4960,11 +5007,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>X</source>
-        <translation>X</translation>
+        <translation type="obsolete">X</translation>
     </message>
     <message>
         <source>If X&apos;s DisplaySize indicates 16:9, fudge vertical size into 4:3, and visa-versa</source>
-        <translation>Si la taille d&apos;affichage de X indique 16:9, Interpoler la taille verticale à 4:3, et vice et versa</translation>
+        <translation type="obsolete">Si la taille d&apos;affichage de X indique 16:9, Interpoler la taille verticale à 4:3, et vice et versa</translation>
     </message>
     <message>
         <source>MythTV can check the signal strength when you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before MythTV gives up trying to get an acceptable signal.</source>
@@ -5444,7 +5491,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation>Ceci est la méthode par défaut pour le marquage automatique des pubs lorsque un nouvel enregistrement est programmé.</translation>
+        <translation type="obsolete">Ceci est la méthode par défaut pour le marquage automatique des pubs lorsque un nouvel enregistrement est programmé.</translation>
     </message>
     <message>
         <source>Sort Episodes</source>
@@ -5689,7 +5736,7 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     </message>
     <message>
         <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
-        <translation>Si Xinerama est utilisé, afficher sur l&apos;écran spécifié. -1 signifie sur tous les écrans</translation>
+        <translation type="obsolete">Si Xinerama est utilisé, afficher sur l&apos;écran spécifié. -1 signifie sur tous les écrans</translation>
     </message>
     <message>
         <source>TV audio through PVR-350 only</source>
@@ -5773,6 +5820,191 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     </message>
     <message>
         <source>Job Queue (Job Commands)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bad Menu File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Menu File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed out waiting for signal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital TV standard.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation Used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8VSB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM64</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM256</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skipping Back.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Auto Commercial Flagging setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #1&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #1&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #2&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #2&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #3&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #3&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #4&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run on the specified screen or spanning all screens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution of video which needs a special output resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution of video which needs a special output resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resolution of screen when not watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default screen resolution when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen resolution when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default refresh rate when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh rate when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ration when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5872,6 +6104,18 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     <message>
         <source>Tuner %1 </source>
         <translation>La carte TV %1</translation>
+    </message>
+    <message>
+        <source>On %1 %2 from %3.%4
+%5
+%6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2 from %3.%4
+%5
+No other details</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
