@@ -40,6 +40,9 @@ struct SeekSpeedInfo {
     float rew_repos;
 };
 
+// uncomment define to use MythTV with fluxbox as the window manager
+//#define FLUXBOX_HACK
+
 #define MAX_REPO_LEVEL 3
 SeekSpeedInfo seek_speed_array[MAX_REPO_LEVEL][9] =
 {
@@ -317,7 +320,27 @@ bool TV::Init(bool createWindow)
         bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
         bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
 
-        saved_gui_bounds = QRect(mainWindow->pos(), mainWindow->size());
+        saved_gui_bounds = QRect(mainWindow->geometry().topLeft(), mainWindow->size());
+
+#ifdef FLUXBOX_HACK
+        // Qt doesn't work correctly when fluxbox is the window manager
+        // Try to undo the 'off by one' error that results.
+        if (!fullscreen && !gContext->GetNumSetting("RunFrontendInWindow", 0))
+        {
+            VERBOSE(VB_PLAYBACK, QString("Fluxbox: %1x%2")
+                    .arg(saved_gui_bounds.x()).arg(saved_gui_bounds.y()));
+            saved_gui_bounds.setX(saved_gui_bounds.x()-1);
+            saved_gui_bounds.setY(saved_gui_bounds.y()-1);
+        }
+#endif
+        // if width && height are zero users expect fullscreen playback
+        if (!fullscreen)
+        {
+            int gui_width = 0, gui_height = 0;
+            gContext->GetResolutionSetting("Gui", gui_width, gui_height);
+            fullscreen |= (0 == gui_width && 0 == gui_height);
+        }
+
         QRect player_bounds = saved_gui_bounds;
         if (fullscreen)
         {
@@ -338,10 +361,19 @@ bool TV::Init(bool createWindow)
             maxHeight = display_res->GetMaxHeight();
             mainWindow->resize(QSize(maxWidth, maxHeight));
             mainWindow->setFixedSize(QSize(maxWidth, maxHeight));
+
+            // bit of a hack, but it's ok if the window is too
+            // big in fullscreen mode
+            if (fullscreen)
+                player_bounds.setSize(QSize(maxWidth, maxHeight));
         }
 
         // player window sizing
-        myWindow = new MythDialog(mainWindow, "video playback window");
+        int flags = Qt::WStyle_Customize | Qt::WStyle_NormalBorder;
+        if (gContext->GetNumSetting("RunFrontendInWindow", 0))
+            flags = Qt::WStyle_Customize | Qt::WStyle_NoBorder;
+        myWindow = new MythDialog(mainWindow, "video playback window", flags);
+
         myWindow->installEventFilter(this);
         myWindow->setNoErase();
         if (switchMode && display_res)
@@ -386,6 +418,7 @@ TV::~TV(void)
         {
             gContext->GetMainWindow()->resize(saved_gui_bounds.size());
             gContext->GetMainWindow()->setFixedSize(saved_gui_bounds.size());
+            gContext->GetMainWindow()->show();
             gContext->GetMainWindow()->move(saved_gui_bounds.topLeft());
         }
     }
