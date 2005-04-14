@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.03.02 (xris)
+#Last Updated: 2005.04.13 (xris)
 #
 #  transcode.pm
 #
@@ -255,11 +255,10 @@ package export::transcode;
         }
     # Use the cutlist?  (only for mpeg files -- nuv files are handled by mythtranscode)
         if ($self->{'use_cutlist'} && $episode->{'cutlist'} && $episode->{'cutlist'} =~ /\d/) {
-            my @skiplist;
-            foreach my $cut (split("\n", $episode->{'cutlist'})) {
-                push @skiplist, (split(" - ", $cut))[0]."-".(split(" - ", $cut))[1];
-            }
-            $transcode .= " -J skip=\"".join(" ", @skiplist)."\"";
+            my $cutlist = $episode->{'cutlist'};
+            $cutlist =~ tr/ //d;
+            $cutlist =~ tr/\n/ /;
+            $transcode .= " -J skip=\"$cutlist\"";
         }
     # Filters
         if ($self->{'zoom_filter'}) {
