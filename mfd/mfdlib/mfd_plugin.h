@@ -108,7 +108,7 @@ class MFDBasePlugin : public QThread
     
     bool                    services_changed_flag;
     QMutex                  services_changed_mutex;
-    
+
 };
 
 class MFDCapabilityPlugin : public MFDBasePlugin
@@ -175,7 +175,9 @@ class MFDServicePlugin : public MFDBasePlugin
     void            markUnused(ServiceRequestThread *which_one);
     virtual void    handleMetadataChange(int which_collection, bool external=false);
     virtual void    handleServiceChange();
-
+    virtual void    addFileDescriptorToWatch(int fd);
+    virtual void    removeFileDescriptorToWatch(int fd);
+    
   protected:
 
     uint    port_number;
@@ -242,6 +244,14 @@ class MFDServicePlugin : public MFDBasePlugin
     QValueList<QString>  internal_messages;
     QMutex             internal_messages_mutex;
 
+    //
+    //  A mutex and a value list of other file descriptors to watch when the
+    //  pluging goes into its select() call during
+    //  waitForSomethingToHappen()
+    //
+
+    QMutex                  other_file_descriptors_mutex;
+    QValueList<int>         other_file_descriptors_to_watch;    
 
 };
 

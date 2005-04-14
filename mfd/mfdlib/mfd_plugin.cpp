@@ -799,6 +799,25 @@ void MFDServicePlugin::waitForSomethingToHappen()
     client_sockets_mutex.unlock();
 
     //
+    //  And now, any other file descriptors we were told to watch
+    //
+    
+    other_file_descriptors_mutex.lock();
+        QValueList<int>::iterator fd_it;
+        for ( fd_it  = other_file_descriptors_to_watch.begin(); 
+              fd_it != other_file_descriptors_to_watch.end(); 
+              ++fd_it )
+        {
+            FD_SET((*fd_it), &readfds);
+            if(nfds <= (*fd_it))
+            {
+                nfds = (*fd_it) + 1;
+            }
+        }
+    other_file_descriptors_mutex.unlock();
+    
+
+    //
     //  Finally, add the control pipe
     //
             
@@ -931,6 +950,38 @@ void MFDServicePlugin::handleServiceChange()
     
     warning("services changed being handled by base class MFDServicePlugin::handleServiceChange()");
 
+}
+
+void MFDServicePlugin::addFileDescriptorToWatch(int fd)
+{
+    other_file_descriptors_mutex.lock();
+        if( other_file_descriptors_to_watch.find(fd) != other_file_descriptors_to_watch.end())
+        {
+            warning("asked to add a file descriptor to watch that is already being watched");
+        }
+        else
+        {
+            other_file_descriptors_to_watch.append(fd);
+        }
+    other_file_descriptors_mutex.unlock();
+}
+
+void MFDServicePlugin::removeFileDescriptorToWatch(int fd)
+{
+    other_file_descriptors_mutex.lock();
+        if( other_file_descriptors_to_watch.find(fd) == other_file_descriptors_to_watch.end())
+        {
+            warning("asked to remove a file descriptor to watch that is not being watched");
+        }
+        else
+        {
+            int numb_removed = other_file_descriptors_to_watch.remove(fd);
+            if(numb_removed != 1)
+            {
+                warning("removed a file descriptor to watch, and more than one came off");
+            }
+        }
+    other_file_descriptors_mutex.unlock();
 }
 
 MFDServicePlugin::~MFDServicePlugin()
