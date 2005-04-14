@@ -40,9 +40,6 @@ struct SeekSpeedInfo {
     float rew_repos;
 };
 
-// uncomment define to use MythTV with fluxbox as the window manager
-//#define FLUXBOX_HACK
-
 #define MAX_REPO_LEVEL 3
 SeekSpeedInfo seek_speed_array[MAX_REPO_LEVEL][9] =
 {
@@ -322,17 +319,20 @@ bool TV::Init(bool createWindow)
 
         saved_gui_bounds = QRect(mainWindow->geometry().topLeft(), mainWindow->size());
 
-#ifdef FLUXBOX_HACK
-        // Qt doesn't work correctly when fluxbox is the window manager
-        // Try to undo the 'off by one' error that results.
-        if (!fullscreen && !gContext->GetNumSetting("RunFrontendInWindow", 0))
+        // adjust for window manager wierdness.
         {
-            VERBOSE(VB_PLAYBACK, QString("Fluxbox: %1x%2")
-                    .arg(saved_gui_bounds.x()).arg(saved_gui_bounds.y()));
-            saved_gui_bounds.setX(saved_gui_bounds.x()-1);
-            saved_gui_bounds.setY(saved_gui_bounds.y()-1);
+            int xbase, width, ybase, height;
+            float wmult, hmult;
+            gContext->GetScreenSettings(xbase, width, wmult,
+                                        ybase, height, hmult);
+            if (abs(saved_gui_bounds.x()-xbase < 3) &&
+                abs(saved_gui_bounds.y()-ybase < 3))
+            {
+                saved_gui_bounds.setX(xbase);
+                saved_gui_bounds.setY(ybase);
+            }
         }
-#endif
+
         // if width && height are zero users expect fullscreen playback
         if (!fullscreen)
         {
