@@ -359,8 +359,6 @@ bool TV::Init(bool createWindow)
             // the initial dimensions
             maxWidth = display_res->GetMaxWidth();
             maxHeight = display_res->GetMaxHeight();
-            mainWindow->resize(QSize(maxWidth, maxHeight));
-            mainWindow->setFixedSize(QSize(maxWidth, maxHeight));
 
             // bit of a hack, but it's ok if the window is too
             // big in fullscreen mode
@@ -369,15 +367,10 @@ bool TV::Init(bool createWindow)
         }
 
         // player window sizing
-        int flags = Qt::WStyle_Customize | Qt::WStyle_NormalBorder;
-        if (gContext->GetNumSetting("RunFrontendInWindow", 0))
-            flags = Qt::WStyle_Customize | Qt::WStyle_NoBorder;
-        myWindow = new MythDialog(mainWindow, "video playback window", flags);
+        myWindow = new MythDialog(mainWindow, "video playback window");
 
         myWindow->installEventFilter(this);
         myWindow->setNoErase();
-        if (switchMode && display_res)
-            myWindow->resize(QSize(maxWidth, maxHeight));
         QRect win_bounds(0, 0, player_bounds.width(), player_bounds.height());
         myWindow->setGeometry(win_bounds);
         myWindow->setFixedSize(win_bounds.size());
