@@ -4,6 +4,7 @@
 
 #ifdef USING_XVMC
 
+#include <qwindowdefs.h>
 #include "../libmyth/mythcontext.h"
 #include <X11/extensions/XvMC.h>
 
