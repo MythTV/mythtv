@@ -307,7 +307,7 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
             if (QString(query.value(0).toString()) == "channel_numbers")
             {
                 PrivateTypes.ChannelNumbers = query.value(1).toInt();
-                SIPARSER(QString("ChannelNumbers Present using Descriptor %d")
+                SIPARSER(QString("ChannelNumbers Present using Descriptor %1")
                          .arg(PrivateTypes.ChannelNumbers));
             }
             if (QString(query.value(0).toString()) == "force_guide_present")
