@@ -1,8 +1,0 @@
-
-    The http server plugin provides a no frills client interface to the mfd.
-Point a browser at:
-
-        http://theIPthisMFDisRunningOn:PortNumber/
-
-    By default, the portNumber is 2345.
-

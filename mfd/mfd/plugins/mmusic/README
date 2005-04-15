@@ -1,9 +1,0 @@
-
-    The mfd mythmusic plugin monitors audio files that are "owned" by the
-myth music tables and keeps building an in memory metadata collection of
-them.
-
-    This plugin does _not_ play audio files (see the audio plugin). It does
-not, in and of itself, serve out any content. It just scans the directory
-that mythmusic owns and keeps the database in sync, staying on top of file
-additions or deletions.

@@ -1,9 +1,0 @@
-
-The mfd dummy plugin does very little. It exists for two reasons:
-
-    1) It is a very simple plugin that developers can look
-       at to see how mfd plugins work.
-
-    2) If the mfd can't load the dummy plugin at runtime, 
-       there's a good chance that something is misconfigured. 
-
