@@ -3744,7 +3744,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                 {
                     JobQueue::ChangeJobComment(jobID, QObject::tr(
                                                "%1 Frames Completed @ %2 fps.")
-                                               .arg(currentFrame->frameNumber)
+                                               .arg((long)
+                                                    currentFrame->frameNumber)
                                                .arg(flagFPS));
                 }
             }
