@@ -927,8 +927,10 @@ void SimpleDBStorage::save()
 
     if (query.isActive() && query.size() > 0) {
         // Row already exists
-        querystr = QString("UPDATE %1 SET %2 WHERE %3;")
-            .arg(table).arg(setClause()).arg(whereClause());
+        // Don"t change this QString. See the CVS logs rev 1.91.
+        querystr = QString("UPDATE " + table + " SET " + setClause() + 
+                           " WHERE " + whereClause() + ";");
+        // cerr << querystr << endl;
         query.exec(querystr);
         if (!query.isActive())
             MythContext::DBError("simpledbstorage update", querystr);
