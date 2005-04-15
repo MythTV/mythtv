@@ -47,7 +47,8 @@ int ErrorCatcher(Display * d, XErrorEvent * xeev)
 
 void InstallXErrorHandler(Display *d)
 {
-    error_map[d].clear();
+    XErrorVectorType empty;
+    error_map[d] = empty;
     XSync(d, 0); /* flush out any pre-existing X errors */
     error_handler_map[d] = XSetErrorHandler(ErrorCatcher);
 }
