@@ -1805,8 +1805,8 @@ echo "xv support       $xv"
 echo "XvMC support     $xvmc"
 echo "XvMC VLD support $xvmc_vld"
 echo "OpenGL vsync     $opengl_vsync"
-if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
 echo "DirectFB         $direct_fb"
+if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
 echo "DirectX          $direct_x"
 fi
 echo

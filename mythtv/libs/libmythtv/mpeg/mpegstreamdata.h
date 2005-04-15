@@ -135,7 +135,7 @@ inline int MPEGStreamData::VersionPMT() const {
     return (_pmt) ? int(_pmt->Version()) : -1;
 }
 
-inline void MPEGStreamData::HandleAdaptationFieldControl(const TSPacket* tspacket)
+inline void MPEGStreamData::HandleAdaptationFieldControl(const TSPacket*)
 {
     // TODO
     //AdaptationFieldControl afc(tspacket.data()+4);

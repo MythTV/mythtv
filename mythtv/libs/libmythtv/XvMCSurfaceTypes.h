@@ -12,6 +12,10 @@ extern "C" {
 #include "../libavcodec/xvmc_render.h"
 }
 
+#ifndef USING_XVMC_VLD
+#define XVMC_VLD 0x0020000
+#endif
+
 class XvMCSurfaceTypes 
 {
   public:
@@ -29,7 +33,7 @@ class XvMCSurfaceTypes
     inline int find(int pminWidth, int pminHeight, int chroma, bool vld,
                     bool idct, int mpeg, int pminSubpictureWidth, 
                     int pminSubpictureHeight);
-        
+
     bool hasChroma420(int surface) const 
     {
         return XVMC_CHROMA_FORMAT_420 == surfaces[surface].chroma_format;
@@ -84,10 +88,7 @@ class XvMCSurfaceTypes
 
     bool hasVLDAcceleration(int surface) const
     {
-#ifdef USING_XVMC_VLD
         return XVMC_VLD == (surfaces[surface].mc_type & XVMC_VLD);
-#endif
-        return 0;
     }
 
     bool hasMPEG1Support(int surface) const 
