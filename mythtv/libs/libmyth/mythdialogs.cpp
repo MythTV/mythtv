@@ -258,6 +258,10 @@ void MythMainWindow::Init(void)
 
     bool hideCursor = gContext->GetNumSetting("HideMouseCursor", 1);
     setCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
+#if QT_VERSION == 0x030303
+    // hack needed by John Poet on Qt 3.3.3
+    qApp->setOverrideCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
+#endif
 #ifdef QWS
 #if QT_VERSION >= 0x030300
     QWSServer::setCursorVisible(!hideCursor);
