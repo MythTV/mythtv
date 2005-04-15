@@ -928,6 +928,7 @@ int SIScan::GenerateNewChanID()
 void SIScan::AddEvents()
 {
     MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery query2(MSqlQuery::InitCon());
     QString theQuery;
     int counter = 0;
 
@@ -997,25 +998,66 @@ void SIScan::AddEvents()
 #endif
         for (e = events->begin() ; e != events->end() ; ++e)
         {
-
-            query.prepare("select * from  program where chanid=:CHANID and "
-                      "starttime=:STARTTIME and title=:TITLE;");
+            query.prepare("select starttime, endtime, title "
+                        "from program where chanid=:CHANID and "
+                        "((starttime>=:STARTTIME and starttime<:ENDTIME) "
+                        "and not (starttime=:STARTTIME "
+                        "and endtime=:ENDTIME and title=:TITLE))");
             query.bindValue(":CHANID",ChanID);
             query.bindValue(":STARTTIME",(*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")));
             query.bindValue(":ENDTIME",(*e).EndTime.toString(QString("yyyy-MM-dd hh:mm:00")));
             query.bindValue(":TITLE",(*e).Event_Name.utf8());
 
             if(!query.exec())
-                MythContext::DBError("Checking Event", query);
-
+                MythContext::DBError("Checking Rescheduled Event", query);
             if (!query.isActive())
-                MythContext::DBError("Checking Event", query);
+                MythContext::DBError("Checking Rescheduled Event", query);
+
+            for (query.first(); query.isValid(); query.next()) 
+            // New guide data overriding existing
+            // Possibly more than one conflict
+            {
+                VERBOSE(VB_GENERAL, QString("Schedule Change on Channel %1")
+                     .arg(ChanID));
+                VERBOSE(VB_GENERAL, QString("Old: %1 %2 %3")
+                    .arg(query.value(0).toString())
+                    .arg(query.value(1).toString())
+                    .arg(query.value(2).toString()));
+                VERBOSE(VB_GENERAL, QString("New: %1 %2 %3") 
+                    .arg((*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")))
+                    .arg((*e).EndTime.toString(QString("yyyy-MM-dd hh:mm:00")))
+                    .arg((*e).Event_Name.utf8()));
+                // Delete old EPG record.
+                query2.prepare("delete from program where chanid=:CHANID and "
+                    "starttime=:STARTTIME and endtime=:ENDTIME and title=:TITLE");
+                query2.bindValue(":CHANID",ChanID);
+                query2.bindValue(":STARTTIME",query.value(0).toString());
+                query2.bindValue(":ENDTIME",query.value(1).toString());
+                query2.bindValue(":TITLE",query.value(2).toString());
+                if(!query2.exec())
+                    MythContext::DBError("Deleting Rescheduled Event", query2);
+                if (!query2.isActive())
+                    MythContext::DBError("Deleting Rescheduled Event", query2);
+            }
+
+            query.prepare("select 1 from program where chanid=:CHANID and "
+                        "starttime=:STARTTIME and endtime=:ENDTIME and "
+                        "title=:TITLE");
+            query.bindValue(":CHANID",ChanID);
+            query.bindValue(":STARTTIME",(*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")));
+            query.bindValue(":ENDTIME",(*e).EndTime.toString(QString("yyyy-MM-dd hh:mm:00")));
+            query.bindValue(":TITLE",(*e).Event_Name.utf8());
+
+            if(!query.exec())
+                MythContext::DBError("Checking If Event Exists", query);
+            if (!query.isActive())
+                MythContext::DBError("Checking If Event Exists", query);
 
             if (query.size() <= 0)
             {
-                 counter++;
+                counter++;
 
-                 query.prepare("INSERT INTO program (chanid,starttime,endtime,"
+                query.prepare("REPLACE INTO program (chanid,starttime,endtime,"
                           "title,description,subtitle,category,"
                           "stereo,closecaptioned,hdtv,airdate,originalairdate)"
                           "VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,:DESCRIPTION,:SUBTITLE,:CATEGORY,:STEREO,:CLOSECAPTIONED,:HDTV,:AIRDATE,:ORIGINALAIRDATE);");
@@ -1036,7 +1078,7 @@ void SIScan::AddEvents()
                     MythContext::DBError("Adding Event", query);
 
                 if (!query.isActive())
-                   MythContext::DBError("Adding Event", query);
+                    MythContext::DBError("Adding Event", query);
 
                 for(QValueList<Person>::Iterator it=(*e).Credits.begin();it!=(*e).Credits.end();it++)
                 {
@@ -1063,7 +1105,6 @@ void SIScan::AddEvents()
                     if (!query.isActive())
                         MythContext::DBError("Adding Event (Credits)", query);
                 }
-
             }
         }
 
@@ -1079,4 +1120,3 @@ void SIScan::AddEvents()
     }
     pthread_mutex_unlock(&events_lock);
 }
-
