@@ -675,6 +675,18 @@ for opt do
   esac
 done
 
+has_library()
+{
+    LIBPATHS=`cat /etc/ld.so.conf | grep -v "#"`
+    HAS_IT="no"
+    for LIBPATH in $LIBPATHS ; do
+        if test x`ls $LIBPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
+            HAS_IT="yes"
+        fi
+    done
+    expr $HAS_IT : "yes" > /dev/null
+}
+
 CCONFIG="$CCONFIG $compile_type"
 if test x$compile_type = x"profile" ; then
     PROFILEFLAGS="-g -DNDEBUG"
@@ -1606,12 +1618,10 @@ fi
 
 #test for lirc client libraries
 if test x"$lirc" = x"yes" ; then
-   lirc="no"
-   lirc_c1=`ls /usr/lib/liblirc_client.so* 2> /dev/null | head -n 1`
-   lirc_c2=`ls /usr/local/lib/liblirc_client.so* 2> /dev/null | head -n 1`
-   if test x"$lirc_c1" != x"" -o x"$lirc_c2" != x"" ; then
-       lirc="yes"
-   fi
+    lirc="no"
+    if has_library liblirc_client.so ; then
+        lirc="yes"
+    fi
 fi
 
 #test for lirc client header
@@ -1630,16 +1640,8 @@ fi
 
 if test x"$firewire_cable_box" = x"yes" ; then
     firewire_cable_box="no"
-    libiec1=`ls /usr/local/lib/libiec61883* 2> /dev/null | head -n 1`
-    libiec2=`ls /usr/lib/libiec61883* 2> /dev/null | head -n 1`
-    libiec3=`ls /usr/lib64/libiec61883* 2> /dev/null | head -n 1`
-    if test x"$libiec1" != x"" -o x"$libiec2" != x"" -o x"$libiec3" != x"" ; then
-        libraw1=`ls /usr/local/lib/libraw1394* 2> /dev/null | head -n 1`
-        libraw2=`ls /usr/lib/libraw1394* 2> /dev/null | head -n 1`
-        libraw3=`ls /usr/lib64/libraw1394* 2> /dev/null | head -n 1`
-        if test x"$libraw1" != x"" -o x"$libraw2" != x"" -o x"$libraw3" != x"" ; then
+    if has_library libiec61883 ; then
             firewire_cable_box="yes"
-        fi
     fi
 fi
 
@@ -1665,7 +1667,7 @@ fi
 
 if test x"$xv" = x"yes" ; then
     xv="no"
-    if test x`ls /usr/X11R6/lib/libXv.* 2> /dev/null | head -n 1` != x"" ; then
+    if has_library libXv ; then
         xv="yes"
     fi
 fi
@@ -1673,29 +1675,34 @@ fi
 VENDOR_XVMC_LIBS=""
 if test x"$xvmc" = x"yes"; then
     xvmc="no"
-    nvidia_xvmc=`ls /usr/X11R6/lib/libXvMCNVIDIA* 2> /dev/null | head -n 1`
-    if test x`ls /usr/X11R6/lib/libXvMCW.* 2> /dev/null | head -n 1` != x"" ; then
+    if has_library libXvMCW ; then
         VENDOR_XVMC_LIBS="-lXvMCW"
         xvmc="yes"
-    elif test x"$nvidia_xvmc" != x""; then
+    elif has_library libXvMCNVIDIA ; then
         VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
         xvmc="yes"
-    elif test x`ls /usr/X11R6/lib/libI810XvMC.* 2> /dev/null | head -n 1` != x"" ; then
+    elif has_library libI810XvMC ; then
         VENDOR_XVMC_LIBS="-lI810XvMC"
         xvmc="yes"
     fi
 fi
 
-if test x`ls /usr/X11R6/lib/libviaXvMC.* 2> /dev/null | head -n 1` = x"" ; then
+if has_library libviaXvMC ; then
+    echo > /dev/null
+else
     xvmc_vld="no"
 fi
 if test x"$xvmc_vld" = x"yes" ; then
-    if test x`ls /usr/X11R6/lib/libXvMCW.* 2> /dev/null | head -n 1` != x"" ; then
+    if has_library libXvMCW ; then
         VENDOR_XVMC_LIBS="-lXvMCW"
     else
         VENDOR_XVMC_LIBS="-lviaXvMC"
     fi
     xvmc="yes"
+fi
+
+if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCW" ; then
+    CCONFIG="$CCONFIG using_xvmcw"
 fi
 
 if test x"$opengl_vsync" = x"yes" ; then
