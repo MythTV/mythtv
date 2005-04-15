@@ -653,7 +653,7 @@ void DVBRecorder::ReadFromDMX()
 
             if (pktbuf[1] & 0x80)
             {
-                WARNING("Uncorrectable error in packet, dropped.");
+                VERBOSE(VB_CHANNEL,"Uncorrectable error in packet, dropped.");
                 ++_bad_packet_count;
                 continue;
             }
@@ -685,7 +685,7 @@ void DVBRecorder::ReadFromDMX()
 
                 if (_continuity_count[pid] != cc)
                 {
-                    WARNING("Transport Stream Continuity Error. PID = " << pid );
+                    VERBOSE(VB_CHANNEL,"Transport Stream Continuity Error. PID = " << pid );
                     RECORD(QString("PID %1 _continuity_count %2 cc %3")
                            .arg(pid).arg(_continuity_count[pid]).arg(cc));
                     _continuity_count[pid] = cc;
@@ -1051,4 +1051,3 @@ void DVBRecorder::DebugTSHeader(unsigned char* buffer, int len)
 
 //TODO
 }
-
