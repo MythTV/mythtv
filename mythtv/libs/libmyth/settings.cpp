@@ -928,7 +928,7 @@ void SimpleDBStorage::save()
     if (query.isActive() && query.size() > 0) {
         // Row already exists
         querystr = QString("UPDATE %1 SET %2 WHERE %3;")
-            .arg(table, setClause(), whereClause());
+            .arg(table).arg(setClause()).arg(whereClause());
         query.exec(querystr);
         if (!query.isActive())
             MythContext::DBError("simpledbstorage update", querystr);
