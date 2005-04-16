@@ -210,6 +210,9 @@ void CommDetect::customEvent(QCustomEvent *e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 
+        VERBOSE(VB_ALL, QString("CommDetect::CustomEvent - Recieved Event: "
+                                "'%1'").arg(message));
+
         if ((watchingRecording) &&
             (message.left(14) == "DONE_RECORDING"))
         {
@@ -756,32 +759,6 @@ bool CommDetect::CheckRatingSymbol(void)
         return(true);
 
     return(false);
-}
-
-void CommDetect::SetMinMaxPixels(VideoFrame *frame)
-{
-    if (!logoFrameCount)
-    {
-        memset(logoMaxValues, 0, width * height);
-        memset(logoMinValues, 255, width * height);
-        memset(logoFrame, 0, width * height);
-        memset(logoMask, 0, width * height);
-        memset(logoCheckMask, 0, width * height);
-    }
-
-    logoFrameCount++;
-
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            unsigned char pixel = frame->buf[y * width + x];
-            if (logoMaxValues[y * width + x] < pixel)
-                logoMaxValues[y * width + x] = pixel;
-            if (logoMinValues[y * width + x] > pixel)
-                logoMinValues[y * width + x] = pixel;
-        }
-    }
 }
 
 bool CommDetect::FrameIsBlank(void)

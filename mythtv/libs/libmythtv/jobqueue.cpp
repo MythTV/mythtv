@@ -1493,7 +1493,8 @@ void JobQueue::DoTranscodeThread(void)
     childThreadStarted = true;
 
     ChangeJobStatus(jobID, JOB_RUNNING);
-    bool useCutlist = !!(GetJobFlags(jobID) & JOB_USE_CUTLIST);
+    bool hasCutlist = !!(program_info->getProgramFlags() & FL_CUTLIST);
+    bool useCutlist = !!(GetJobFlags(jobID) & JOB_USE_CUTLIST) && hasCutlist;
 
     controlFlagsLock.lock();
     jobControlFlags[key] = &controlTranscoding;
@@ -1561,6 +1562,8 @@ void JobQueue::DoTranscodeThread(void)
                                 .arg(program_info->chanid).arg(startts);
                 query.prepare(querystr);
                 query.exec();
+
+                program_info->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
             } else {
                 MSqlQuery query(MSqlQuery::InitCon());
                 QString querystr;

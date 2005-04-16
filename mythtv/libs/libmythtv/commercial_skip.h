@@ -97,8 +97,6 @@ class CommDetect : public QObject
     void DumpMap(QMap<long long, int> &map);
     void DumpLogo(bool fromCurrentFrame = false);
 
-    void SetMinMaxPixels(VideoFrame *frame);
-
     void SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed);
     void SetLogoMaskArea();
     void GetLogoMask(unsigned char *mask);
