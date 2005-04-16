@@ -678,6 +678,8 @@ done
 has_library()
 {
     LIBPATHS=`cat /etc/ld.so.conf | grep -v "#"`
+    LIBPATHS="$LIBPATHS `echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
+    LIBPATHS="`echo $LIBPATHS /lib /usr/lib | sed s/'\/ '/' '/g` "
     HAS_IT="no"
     for LIBPATH in $LIBPATHS ; do
         if test x`ls $LIBPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
@@ -955,6 +957,9 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : "pentium2" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
    elif expr "$processor" : ".*Mendocino" > /dev/null ; then
+       ARCHFLAGS="-march=pentium2"
+       optimize="small"
+   elif expr "$processor" : ".*Klamath" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
        optimize="small"
 # Athlon 64
