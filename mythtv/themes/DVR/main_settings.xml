@@ -1,0 +1,199 @@
+<mythmenu name="SETUP">
+   <button>
+      <type>SETTINGS_GENERAL</type>
+      <text>General</text>
+      <text lang="IT">Generale</text>
+      <text lang="ES">General</text>
+      <text lang="CA">General</text>
+      <text lang="FR">Général</text>
+      <text lang="DE">Grundeinstellungen</text>
+      <text lang="DK">Generelt</text>
+      <text lang="NL">Algemeen</text>
+      <text lang="PT">Configurações Gerais</text>
+      <text lang="SV">Generellt</text>
+      <text lang="JA">全般</text>
+      <action>SETTINGS MAINGENERAL</action>
+   </button>
+
+   <button>
+      <type>SETTINGS_APPEARANCE</type>
+      <text>Appearance</text>
+      <text lang="IT">Aspetto</text>
+      <text lang="ES">Aspecto</text>
+      <text lang="CA">Aspecte</text>
+      <text lang="FR">Apparence</text>
+      <text lang="DE">Erscheinungsbild</text>
+      <text lang="DK">Udseende</text>
+      <text lang="NL">Uiterlijk</text>
+      <text lang="PT">Configurar Aparência</text>
+      <text lang="SV">Utseende</text>
+      <text lang="JA">画面表示</text>
+      <action>SETTINGS APPEARANCE</action>
+   </button>
+
+   <button>
+     <type>SETTINGS_TV</type>
+     <text>TV Settings</text>
+     <text lang="CA">Configuració de TV</text>
+     <text lang="ES">Configuración de TV</text>
+     <text lang="FR">Options TV</text>
+     <text lang="DE">TV</text>
+     <text lang="DK">TV indstillinger</text>
+     <text lang="NL">TV Instellingen</text>
+     <text lang="PT">Configurar Televisão</text>
+     <text lang="SV">TV-inställningar</text>
+     <text lang="JA">TV設定</text>
+     <action>MENU tv_settings.xml</action>
+   </button>
+
+   <button>
+     <type>SETTINGS_MUSIC</type>
+     <text>Music Settings</text>
+     <text lang="ES">Configurar Música</text>
+     <text lang="CA">Configurar Música</text>
+     <text lang="DE">Musik</text>
+     <text lang="DK">Musik indstillinger</text>
+     <text lang="NL">Muziek Instellingen</text>
+     <text lang="PT">Configurar Música</text>
+     <text lang="SV">Musikinställningar</text>
+     <text lang="JA">ミュージック設定</text>
+     <action>CONFIGPLUGIN mythmusic</action>
+     <depends>mythmusic</depends>
+   </button>
+
+   <button>
+       <type>SETTINGS_VIDEO</type>
+       <text>Videos Settings</text>
+       <text lang="ES">Configurar Videos</text>
+       <text lang="CA">Configurar Videos</text>
+       <text lang="DE">Videos</text>
+       <text lang="DK">Video indstillinger</text>
+       <text lang="NL">Films Instellingen</text>
+       <text lang="PT">Configurar Filmes</text>
+       <text lang="SV">Videoinställningar</text>
+       <text lang="JA">ビデオ設定</text>
+       <action>CONFIGPLUGIN mythvideo</action>
+       <depends>mythvideo</depends>
+   </button>
+
+   <button>
+     <type>SETTINGS_DVD</type>
+     <text>DVD Settings</text>
+     <text lang="DE">DVD</text>
+     <text lang="PT">Configurar DVD</text>
+     <text lang="ES">Configurar DVD</text>
+     <text lang="CA">Configurar DVD</text>
+     <text lang="NL">DVD Instellingen</text>
+     <text lang="SV">DVD-inställningar</text>
+     <text lang="JA">DVD設定</text>
+     <action>CONFIGPLUGIN mythdvd</action>
+     <depends>mythdvd</depends>
+   </button>
+
+   <button>
+      <type>SETTINGS_FM</type>
+      <text>Radio Settings</text>
+      <text lang="DE">Radio</text>
+      <action>CONFIGPLUGIN mythFM</action>
+      <depends>mythFM</depends>
+   </button>
+
+   <button>
+      <type>SETTINGS_IMAGES</type>
+      <text>Images Settings</text>
+      <text lang="ES">Configurar Fotos</text>
+      <text lang="CA">Configurar Imatges</text>
+      <text lang="DE">Bilder</text>
+      <text lang="DK">Billed indstillinger</text>
+      <text lang="NL">Beelden Instellingen</text>
+      <text lang="PT">Configurar Fotos</text>
+      <text lang="SV">Galleriinställningar</text>
+      <text lang="JA">イメージ設定</text>
+      <action>CONFIGPLUGIN mythgallery</action>
+      <depends>mythgallery</depends>
+   </button>
+
+   <button>
+     <type>SETTINGS_GAME</type>
+     <text>Game Settings</text>
+     <text lang="ES">Configurar Juegos</text>
+     <text lang="CA">Configurar Jocs</text>
+     <text lang="DE">Spiele</text>
+     <text lang="DK">Spil indstillinger</text>
+     <text lang="NL">Spelen Instellingen</text>
+     <text lang="PT">Configurar Jogos</text>
+     <text lang="SV">Spelinställningar</text>
+     <text lang="JA">ゲーム設定</text>
+     <action>CONFIGPLUGIN mythgame</action>
+     <depends>mythgame</depends>
+   </button>
+
+   <button>
+     <type>SETTINGS_WEATHER</type>
+     <text>Weather Settings</text>
+     <text lang="ES">Configurar El Tiempo</text>
+     <text lang="CA">Configurar El Temps</text>
+     <text lang="DE">Wetter</text>
+     <text lang="DK">Vejr indstililnger</text>
+     <text lang="NL">"Het Weer" Instellingen</text>
+     <text lang="PT">Configurar Meteorologia</text>
+     <text lang="SV">Väderinställningar</text>
+     <text lang="JA">天気設定</text>
+     <action>CONFIGPLUGIN mythweather</action>
+     <depends>mythweather</depends>
+   </button>
+
+   <button>
+     <type>SETTINGS_NEWS</type>
+     <text>News Settings</text>
+     <text lang="DE">Nachrichten</text>
+     <text lang="CA">Configurar Notícies</text>
+     <text lang="ES">Configurar Noticias</text>
+     <text lang="NL">Nieuws Instellingen</text>
+     <text lang="SV">Nyhetsinställningar</text>
+     <text lang="JA">ニュース設定</text>
+     <action>CONFIGPLUGIN mythnews</action>
+     <depends>mythnews</depends>
+   </button>
+
+   <button>
+     <type>SETTINGS_WEBPAGE</type>
+     <text>Web Settings</text>
+     <text lang="DE">WWW</text>
+     <text lang="SV">Webb-inställningar</text>
+     <text lang="JA">Web設定</text>
+     <action>CONFIGPLUGIN mythbookmarkmanager</action>
+     <depends>mythbookmarkmanager</depends>
+   </button>
+
+   <button>
+      <type>SETTINGS_RECIPE</type>
+      <text>Recipe Settings</text>
+      <text lang="DE">Rezepte</text>
+      <action>CONFIGPLUGIN mythRecipe</action>
+      <depends>mythRecipe</depends>
+   </button>
+
+   <button>
+      <type>PHONE</type>
+      <text>Phone Settings</text>
+      <text lang="DE">Telefon</text>
+      <action>CONFIGPLUGIN mythphone</action>
+      <depends>mythphone</depends>
+   </button>
+
+   <button>
+     <type>SETTINGS_XBOX</type>
+     <text>Xbox Settings</text>
+     <text lang="PT">Configurar XBox</text>
+     <text lang="CA">Configurar XBox</text>
+     <text lang="ES">Configurar XBox</text>
+     <text lang="DE">Xbox</text>
+     <text lang="NL">Xbox Instellingen</text>
+     <text lang="SV">Xbox-inställningar</text>
+     <text lang="JA">XBox設定</text>
+     <action>SETTINGS XBOXSETTINGS</action>
+     <dependssetting>EnableXbox</dependssetting>
+   </button>
+
+</mythmenu>

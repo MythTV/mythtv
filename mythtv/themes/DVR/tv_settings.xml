@@ -1,0 +1,92 @@
+<mythmenu name="TVSETUP">
+
+   <button>
+      <type>TV_SETTINGS_GENERAL</type>
+      <text>General</text>
+      <text lang="IT">Generale</text>
+      <text lang="ES">General</text>
+      <text lang="CA">General</text>
+      <text lang="NL">Algemeen</text>
+      <text lang="FR">Général</text>
+      <text lang="DE">Allgemeines</text>
+      <text lang="DK">Generelt</text>
+      <text lang="PT">Configurações Gerais</text>
+      <text lang="SV">Generellt</text>
+      <text lang="JA">一般</text>
+      <text lang="FI">Yleiset</text>
+      <text lang="ZH_TW">一般</text>
+      <action>SETTINGS GENERAL</action>
+   </button>
+
+   <button>
+      <type>TV_SETTINGS_PROGRAM_GUIDE</type>
+      <text>Program Guide</text>
+      <text lang="IT">Guida programmi</text>
+      <text lang="ES">Guía de programas</text>
+      <text lang="CA">Guia de programes</text>
+      <text lang="NL">Programma Gids</text>
+      <text lang="FR">Guide des programmes</text>
+      <text lang="DE">Programmübersicht</text>
+      <text lang="DK">Program Guide</text>
+      <text lang="PT">Configurações do Guia</text>
+      <text lang="SV">Programguide</text>
+      <text lang="JA">番組ガイド</text>
+      <text lang="FI">Ohjelmaopas</text>
+      <text lang="ZH_TW">節目表</text>
+      <alttext lang="DE">EPG</alttext>
+      <action>SETTINGS EPG</action>
+   </button>
+
+   <button>
+      <type>TV_SETTINGS_PLAYBACK</type>
+      <text>Playback</text>
+      <text lang="IT">Riproduzione</text>
+      <text lang="ES">Reproducción</text>
+      <text lang="CA">Reproducció</text>
+      <text lang="NL">Afspelen</text>
+      <text lang="FR">Visionnage</text>
+      <text lang="DE">Wiedergabe</text>
+      <text lang="DK">Afspilning</text>
+      <text lang="PT">Configurações de Leitura</text>
+      <text lang="SV">Uppspelning</text>
+      <text lang="JA">再生</text>
+      <text lang="FI">Toisto</text>
+      <text lang="ZH_TW">重播</text>
+      <action>SETTINGS PLAYBACK</action>
+   </button>
+
+   <button>
+      <type>TV_SETTINGS_RECORDING_PROFILES</type>
+      <text>Recording Profiles</text>
+      <text lang="IT">Registrazione</text>
+      <text lang="ES">Grabación</text>
+      <text lang="CA">Gravació</text>
+      <text lang="NL">Opnemen</text>
+      <text lang="FR">Profils d'enregistrement</text>
+      <text lang="DE">Aufnahmeprofile</text>
+      <text lang="DK">Optagelse</text>
+      <text lang="PT">Configurações de Gravação</text>
+      <text lang="SV">Inspelningsprofiler</text>
+      <text lang="JA">録画プロフィール</text>
+      <text lang="FI">Nauhoitusprofiilit</text>
+      <text lang="ZH_TW">錄影設定</text>
+      <alttext lang="SV">Inspelning</alttext>
+      <alttext lang="DE">Profile</alttext>
+      <action>SETTINGS RECORDING</action>
+   </button>
+
+   <button>
+      <type>TV_SETTINGS_RECPRIORITIES</type>
+      <text>Recording Priorities</text>
+      <text lang="FR">Priorités d'enregistrement</text>
+      <text lang="DE">Prioritäten</text>
+      <text lang="SV">Inspelningsprioriteter</text>
+      <text lang="JA">録画優先順位</text>
+      <text lang="FI">Nauhoitusprioriteetit</text>
+      <text lang="ZH_TW">錄影優先次序</text>
+      <alttext lang="DE">Prioritäten</alttext>
+      <action>MENU recpriorities_settings.xml</action>
+   </button>
+
+</mythmenu>
+

@@ -1,0 +1,106 @@
+<mythmenu name="MAIN">
+
+   <button>
+      <type>TV_WATCH_RECORDINGS</type>
+      <text>Watch Recordings</text>
+      <text lang="IT">Guarda una registrazione</text>
+      <text lang="ES">Ver Grabaciones</text>
+      <text lang="CA">Veure Gravacions</text>
+      <text lang="NL">Opnames Bekijken</text>
+      <text lang="FR">Visionner</text>
+      <text lang="DE">Aufnahmen ansehen</text>
+      <text lang="DK">Afspil optagelser</text>
+      <text lang="PT">Ver Gravações</text>
+      <text lang="SV">Titta på inspelningar</text>
+      <text lang="JA">録画再生</text>
+      <alttext lang="DE">Wiedergabe</alttext>
+      <action>TV_WATCH_RECORDING</action>
+   </button>
+
+   <button>
+      <type>TV_SCHEDULE_RECORDINGS</type>
+      <text>Schedule Recordings</text>
+      <text lang="IT">Programma una registrazione</text>
+      <text lang="ES">Programar Grabaciones</text>
+      <text lang="CA">Programar Gravacions</text>
+      <text lang="NL">Opnames Plannen</text>
+      <text lang="FR">Programmer des enregistrements</text>
+      <text lang="DE">Aufnahmen planen</text>
+      <text lang="DK">Optag udsendelse</text>
+      <text lang="PT">Gravação Programada</text>
+      <text lang="SV">Schemalägg inspelningar</text>
+      <text lang="JA">録画予約</text>
+      <alttext>Schedule</alttext>
+      <alttext lang="FR">Programmer</alttext>
+      <alttext lang="ES">Temporizadores</alttext>
+      <alttext lang="CA">Temporitzadors</alttext>
+      <alttext lang="DK">Optagelser</alttext>
+      <alttext lang="NL">Planning</alttext>
+      <alttext lang="PT">Programar</alttext>
+      <alttext lang="SV">Schemalägg</alttext>
+      <alttext lang="JA">予約</alttext>
+      <alttext lang="IT">Programmazione</alttext>
+      <alttext lang="DE">Planung</alttext>
+      <action>MENU tv_schedule.xml</action>
+   </button>
+
+   <button>
+      <type>TV_RECPRIORITIES</type>
+      <text>Recording Priorities</text>
+      <text lang="DE">Aufnahmeprioritäten</text>
+      <text lang="NL">Opname Prioriteiten</text>      
+      <text lang="SV">Inspelningsprioriteter</text>
+      <text lang="JA">録画優先順位</text>
+      <alttext>Priorities</alttext>
+      <alttext lang="SV">Prioriteter</alttext>
+      <alttext lang="NL">Prioriteiten</alttext>
+      <alttext lang="DE">Prioritäten</alttext>
+      <action>TV_SET_RECPRIORITIES</action>
+   </button>
+
+   <button>
+      <type>TV_CONFLICTS</type>
+      <text>Upcoming Recordings</text>
+      <text lang="IT">Correggi i conflitti</text>
+      <text lang="ES">Resolver conflictos</text>
+      <text lang="CA">Resoldre Conflictes</text>
+      <text lang="NL">Geplande Opnames</text>
+      <text lang="FR">Gestion des conflits</text>
+      <text lang="DE">Aufnahmeplan</text>
+      <text lang="DK">Løs optagelseskonflikter</text>
+      <text lang="PT">Resolver Conflitos</text>
+      <text lang="SV">Kommande inspelningar</text>
+      <text lang="JA">予約衝突修正</text>
+      <text lang="FI">Tulevat Nauhoitukset</text>
+      <text lang="ZH_TW">修正預設錄影衝突</text>
+      <action>TV_FIX_CONFLICTS</action>
+   </button>
+
+   <button>
+     <type>MENU_UTILITIES_SETUP</type>
+     <text>Utilities / Setup</text>
+     <text lang="IT">Impostazioni</text>
+     <text lang="ES">Configurar</text>
+     <text lang="CA">Configurar</text>
+     <text lang="FR">Configuration</text>
+     <text lang="DE">Zubehör / Konfiguration</text>
+     <text lang="DK">Konfiguration</text>
+     <text lang="NL">Beheer</text>
+     <text lang="PT">Configurações</text>
+     <text lang="SV">Verktyg / Inställningar</text>
+     <text lang="JA">設定</text>
+     <text lang="FI">Oheis/Asetukset</text>
+     <text lang="ZH_TW">工具/設定</text>
+     <alttext lang="DE">Verschiedenes</alttext>
+     <alttext lang="SV">Inställningar</alttext>
+     <action>MENU util_menu.xml</action>
+   </button>
+
+   <!-- <button>
+     <type>SHUTDOWN</type>
+     <text>Shutdown</text>
+     <text lang="SV">Avstängning</text>
+     <text lang="DE">Beenden</text>
+     <action>SHUTDOWN</action>
+   </button> -->
+</mythmenu>

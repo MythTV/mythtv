@@ -1,0 +1,68 @@
+<mythmenu name="TV">
+
+   <button>
+      <type>TV_WATCH_TV</type>
+      <text>Watch TV</text>
+      <text lang="IT">Guarda la TV</text>
+      <text lang="ES">Ver la TV</text>
+      <text lang="CA">Veure la TV</text>
+      <text lang="NL">Kijk TV</text>
+      <text lang="FR">Regarder la TV</text>
+      <text lang="DE">Fernsehen</text>
+      <text lang="DK">Se TV</text>
+      <text lang="PT">Ver Televisão</text>
+      <text lang="SV">Se på TV</text>
+      <text lang="JA">TVを見る</text>
+      <action>TV_WATCH_LIVE</action>
+   </button>
+
+   <button>
+      <type>TV_DELETE</type>
+      <text>Delete Recordings</text>
+      <text lang="IT">Elimina una registrazione</text>
+      <text lang="ES">Borrar Grabaciones</text>
+      <text lang="CA">Esborrar Gravacions</text>
+      <text lang="NL">Opnames Verwijderen</text>
+      <text lang="FR">Supprimer</text>
+      <text lang="DE">Aufnahmen löschen</text>
+      <text lang="DK">Slet optagelser</text>
+      <text lang="PT">Apagar Gravações</text>
+      <text lang="SV">Radera inspelningar</text>
+      <text lang="JA">録画削除</text>
+      <alttext lang="DE">Löschen</alttext>
+      <action>TV_DELETE</action>
+   </button> 
+
+<!-- EXECTV sample.  %s args in order are video, audio, and vbi devices
+   <button>
+      <type>TV_PLAYBACK</type>
+      <text>Passthrough Mode</text>
+      <text lang="PT">Modo Directo de TV</text>
+      <text lang="ES">TV directo</text>
+      <text lang="CA">TV directe</text>
+      <text lang="DE">TV direkt</text>
+      <text lang="SV">TV direkt</text>
+      <text lang="JA">パススルーモード</text>
+      <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
+   </button>
+-->
+
+   <button>
+      <type>TV_PREVIOUS</type>
+      <text>Previously Recorded</text>
+      <text lang="SV">Föregående</text>
+      <text lang="DE">Alte Aufnahmen</text>
+      <action>TV_PREVIOUS</action>
+   </button>
+
+   <button>
+      <type>TV_STATUS</type>
+      <text>System Status</text>
+      <text lang="DE">Systemstatus</text>
+      <text lang="SV">Systemstatus</text>
+      <text lang="JA">システムステータス</text>
+      <action>TV_STATUS</action>
+   </button>
+
+
+</mythmenu>

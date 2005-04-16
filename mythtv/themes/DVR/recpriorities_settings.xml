@@ -1,0 +1,28 @@
+<mythmenu name="SETUP_TVRECPRIORITIES">
+
+   <button>
+      <type>TV_RECPRIORITIES_SETTINGS_GENERAL</type>
+      <text>Set Recording Priorities</text>
+      <text lang="DE">Aufnahmen</text>
+      <text lang="SV">Inspelningsprioriteter</text>
+      <alttext>Recording Priorities</alttext>
+      <alttext lang="DE">Aufnahmen</alttext>
+      <alttext lang="SV">Inspelning</alttext>
+      <action>SETTINGS GENERALRECPRIORITIES</action>
+   </button>
+
+   <button>
+      <type>TV_RECPRIORITIES_CHANNEL</type>
+      <text>Set Channel Recording Priorities</text>
+      <text lang="DE">Sender</text>
+      <text lang="SV">Kanalprioriteter</text>
+      <text lang="JA">チャンネル録画優先順位設定</text>
+      <alttext>Channel Priorities</alttext>
+      <alttext lang="SV">Kanal</alttext>
+      <alttext lang="JA">チャンネル優先順位</alttext>
+      <alttext lang="DE">Sender</alttext>
+      <action>SETTINGS CHANNELRECPRIORITIES</action>
+   </button>
+
+</mythmenu>
+

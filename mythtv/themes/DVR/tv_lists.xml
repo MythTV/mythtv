@@ -1,0 +1,68 @@
+<mythmenu name="LISTS">
+
+   <button>
+      <type>TV_SEARCH_NEW_TITLES</type>
+      <text>New Titles</text>
+      <text lang="DE">Neue Sendungen</text>
+      <text lang="FR">Nouveaux titres</text>
+      <text lang="SV">Nya titlar</text>
+      <text lang="JA">新タイトル</text>
+      <text lang="NL">Nieuwe Titels</text>
+      <text lang="FI">Uudet Ohjelmat</text>
+      <text lang="ZH_TW">新標題</text>
+      <action>TV_SEARCH_NEW</action>
+   </button>
+
+   <button>
+      <type>TV_SEARCH_MOVIES</type>
+      <text>Movies</text>
+      <text lang="DE">Spielfilme</text>
+      <text lang="SV">Filmer</text>
+      <text lang="FR">Films</text>
+      <text lang="JA">映画</text>
+      <text lang="NL">Films</text>
+      <text lang="FI">Elokuvat</text>
+      <text lang="ZH_TW">電影</text>
+      <action>TV_SEARCH_MOVIE</action>
+   </button>
+
+   <button>
+      <type>TV_SEARCH_CATEGORIES</type>
+      <text>Categories</text>
+      <text lang="DE">Kategorien</text>
+      <text lang="SV">Kategori</text>
+      <text lang="FR">Catégories</text>
+      <text lang="JA">カテゴリー</text>
+      <text lang="NL">Categorie</text>
+      <text lang="FI">Kategoriat</text>
+      <text lang="ZH_TW">種類</text>
+      <action>TV_SEARCH_CATEGORY</action>
+   </button>
+   
+   <button>
+      <type>TV_SEARCH_CHANNELS</type>
+      <text>Channels</text>
+      <text lang="DE">Sender</text>
+      <text lang="SV">Kanal</text>
+      <text lang="FR">Chaînes</text>
+      <text lang="NL">Zender</text>
+      <text lang="JA">チャンネル</text>
+      <text lang="FI">Kanavat</text>
+      <text lang="ZH_TW">電視台</text>
+      <action>TV_SEARCH_CHANNEL</action>
+   </button>
+
+   <button>
+      <type>TV_SEARCH_TIMES</type>
+      <text>Time</text>
+      <text lang="NL">Tijdstip</text>
+      <text lang="SV">Tid</text>
+      <text lang="FR">Durée</text>
+      <text lang="JA">時間</text>
+      <text lang="DE">Sendezeit</text>
+      <text lang="FI">Aika</text>
+      <text lang="ZH_TW">時間</text>
+      <action>TV_SEARCH_TIME</action>
+   </button>
+
+</mythmenu>

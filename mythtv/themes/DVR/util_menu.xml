@@ -1,0 +1,177 @@
+<mythmenu name="MAIN">
+
+   <button>
+     <type>TV</type>
+     <text>TV</text>
+     <text lang="PT">Televisão</text>
+     <text lang="SV">TV</text>
+     <text lang="DE">TV</text>
+     <action>MENU tvmenu.xml</action>
+   </button>
+
+   <button>
+     <type>MUSIC</type>
+     <text>Music</text>
+     <text lang="IT">Musica</text>
+     <text lang="ES">Música</text>
+     <text lang="CA">Música</text>
+     <text lang="NL">Muziek</text>
+     <text lang="FR">Musique</text>
+     <text lang="DE">Musik</text>
+     <text lang="DK">Musik</text>
+     <text lang="PT">Música</text>
+     <text lang="SV">Musik</text>
+     <text lang="JA">ミュージック</text>
+     <action>PLUGIN mythmusic</action>
+     <depends>mythmusic</depends>
+   </button>
+
+   <button>
+     <type>VIDEO</type>
+     <text>Videos</text>
+     <text lang="IT">Video</text>
+     <text lang="ES">Video</text>
+     <text lang="CA">Vídeo</text>
+     <text lang="NL">Films</text>
+     <text lang="FR">Vidéos</text>
+     <text lang="DE">Videos</text>
+     <text lang="DK">Film</text>
+     <text lang="PT">Filmes</text>
+     <text lang="SV">Video</text>
+     <text lang="JA">ビデオ</text>
+     <action>PLUGIN mythvideo</action>
+     <depends>mythvideo</depends>
+   </button>
+
+   <button>
+     <type>DVD</type>
+     <text>DVD</text>
+     <text lang="DE">DVD</text>
+     <text lang="PT">DVD</text>
+     <text lang="SV">DVD</text>
+     <action>PLUGIN mythdvd</action>
+     <depends>mythdvd</depends>
+   </button>
+
+   <button>
+      <type>FM</type>
+      <text>Radio</text>
+      <text lang="DE">Radio</text>
+      <action>PLUGIN mythFM</action>
+      <depends>mythFM</depends>
+   </button>
+
+   <button>
+     <type>IMAGES</type>
+     <text>Images</text>
+     <text lang="IT">Immagini</text>
+     <text lang="ES">Fotos</text>
+     <text lang="CA">Imatges</text>
+     <text lang="NL">Beelden</text>
+     <text lang="FR">Images</text>
+     <text lang="DE">Bilder</text>
+     <text lang="DK">Billeder</text>
+     <text lang="PT">Fotos</text>
+     <text lang="SV">Galleri</text>
+     <text lang="JA">イメージ</text>
+     <action>PLUGIN mythgallery</action>
+     <depends>mythgallery</depends>
+   </button>
+
+   <button>
+     <type>GAME</type>
+     <text>Games</text>
+     <text lang="IT">Giochi</text>
+     <text lang="ES">Juegos</text>
+     <text lang="CA">Jocs</text>
+     <text lang="NL">Spelen</text>
+     <text lang="FR">Jeux</text>
+     <text lang="DE">Spiele</text>
+     <text lang="DK">Spil</text>
+     <text lang="PT">Jogos</text>
+     <text lang="SV">Spel</text>
+     <text lang="JA">ゲーム</text>
+     <action>PLUGIN mythgame</action>
+     <depends>mythgame</depends>
+   </button>
+
+   <button>
+     <type>WEATHER</type>
+     <text>Weather</text>
+     <text lang="IT">Meteo</text>
+     <text lang="ES">El Tiempo</text>
+     <text lang="CA">El Temps</text>
+     <text lang="NL">Het Weer</text>
+     <text lang="FR">Météo</text>
+     <text lang="DE">Wetter</text>
+     <text lang="DK">Vejret</text>
+     <text lang="PT">Meteorologia</text>
+     <text lang="SV">Väder</text>
+     <text lang="JA">天気</text>
+     <action>PLUGIN mythweather</action>
+     <depends>mythweather</depends>
+   </button>
+
+   <button>
+     <type>NEWS</type>
+     <text>News Feeds</text>
+     <text lang="DE">Nachrichten</text>
+     <text lang="CA">Notícies</text>
+     <text lang="ES">Noticias</text>
+     <text lang="NL">Nieuws</text>
+     <text lang="SV">Nyheter</text>
+     <text lang="JA">ニュース</text>
+     <action>PLUGIN mythnews</action>
+     <depends>mythnews</depends>
+   </button>
+
+   <button>
+      <type>WEBPAGE</type>
+      <text>Web</text>
+      <text lang="DE">WWW</text>
+      <text lang="SV">Webb</text>
+      <text lang="JA">ウェブ</text>
+      <action>PLUGIN mythbookmarkmanager</action>
+      <depends>mythbookmarkmanager</depends>
+   </button>
+
+   <button>
+      <type>PHONE</type>
+      <text>Phone</text>
+      <text lang="DE">Telefon</text>
+      <action>PLUGIN mythphone</action>
+      <depends>mythphone</depends>
+   </button>
+
+   <button>
+      <type>RECIPE</type>
+      <text>Recipes</text>
+      <text lang="DE">Rezepte</text>
+      <action>PLUGIN mythRecipe</action>
+      <depends>mythRecipe</depends>
+   </button>
+
+   <button>
+     <type>SETUP</type>
+     <text>Setup</text>
+     <text lang="IT">Impostazioni</text>
+     <text lang="ES">Configurar</text>
+     <text lang="CA">Configurar</text>
+     <text lang="FR">Configuration</text>
+     <text lang="DE">Konfiguration</text>
+     <text lang="DK">Konfiguration</text>
+     <text lang="NL">Instellingen</text>
+     <text lang="PT">Configurações</text>
+     <text lang="SV">Inställningar</text>
+     <text lang="JA">設定</text>
+     <action>MENU main_settings.xml</action>
+   </button>
+
+   <!-- <button>
+     <type>SHUTDOWN</type>
+     <text>Shutdown</text>
+     <text lang="SV">Avstängning</text>
+     <text lang="DE">Beenden</text>
+     <action>SHUTDOWN</action>
+   </button> -->
+</mythmenu>
