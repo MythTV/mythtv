@@ -3535,7 +3535,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 
     if ((!hardware_encode) && (commDetect) && (!pip_mode))
     {
-        commDetect->ProcessNextFrame(frame, (fnum-startnum)>>1 );
+        commDetect->ProcessFrame(frame, (fnum-startnum)>>1 );
         if (commDetect->FrameIsBlank())
         {
             commDetect->GetBlankFrameMap(blank_frames);

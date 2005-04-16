@@ -24,9 +24,6 @@ CommDetect::CommDetect(int w, int h, double fps, int method)
     logoMinValues = NULL;
     tmpBuf = NULL;
 
-    logoGoodEdgeThreshold = 0.75;
-    logoBadEdgeThreshold = 0.85;
-
     currentAspect = COMM_ASPECT_WIDE;
 
     curFrameNumber = -1;
@@ -116,8 +113,38 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     totalMinBrightness = 0;
     blankFrameCount = 0;
 
-    border = gContext->GetNumSetting("CommBorder", 20);
-    blankFrameMaxDiff = gContext->GetNumSetting("CommBlankFrameMaxDiff", 25);
+    commDetectBorder =
+              gContext->GetNumSetting("CommDetectBorder", 20);
+    commDetectBlankFrameMaxDiff =
+              gContext->GetNumSetting("CommDetectBlankFrameMaxDiff", 25);
+    commDetectDarkBrightness =
+              gContext->GetNumSetting("CommDetectDarkBrightness", 80);
+    commDetectDimBrightness =
+              gContext->GetNumSetting("CommDetectDimBrightness", 120);
+    commDetectBoxBrightness =
+              gContext->GetNumSetting("CommDetectBoxBrightness", 30);
+    commDetectDimAverage =
+              gContext->GetNumSetting("CommDetectDimAverage", 35);
+    commDetectMaxCommBreakLength =
+              gContext->GetNumSetting("CommDetectMaxCommBreakLength", 395);
+    commDetectMinCommBreakLength =
+              gContext->GetNumSetting("CommDetectMinCommBreakLength", 60);
+    commDetectMinShowLength =
+              gContext->GetNumSetting("CommDetectMinShowLength", 65);
+    commDetectMaxCommLength =
+              gContext->GetNumSetting("CommDetectMaxCommLength", 125);
+    commDetectLogoSamplesNeeded =
+              gContext->GetNumSetting("CommDetectLogoSamplesNeeded", 240);
+    commDetectLogoSampleSpacing =
+              gContext->GetNumSetting("CommDetectLogoSampleSpacing", 2);
+    commDetectLogoSecondsNeeded = commDetectLogoSamplesNeeded *
+                                  commDetectLogoSampleSpacing;
+    commDetectLogoGoodEdgeThreshold =
+              gContext->GetSetting("CommDetectLogoGoodEdgeThreshold", "0.75")
+                                   .toDouble();
+    commDetectLogoBadEdgeThreshold =
+              gContext->GetSetting("CommDetectLogoBadEdgeThreshold", "0.85")
+                                   .toDouble();
 
     aggressiveDetection = true;
     currentAspect = COMM_ASPECT_WIDE;
@@ -127,7 +154,6 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     if(fabs(((w*1.0)/h) - 1.333333) < 0.1)
         currentAspect = COMM_ASPECT_NORMAL;
 
-    lastFrameWasBlank = false;
     lastFrameWasSceneChange = false;
 
     memset(lastHistogram, 0, sizeof(lastHistogram));
@@ -270,19 +296,40 @@ void CommDetect::SetVideoParams(float aspect)
     }
 }
 
-void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
+void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
 {
+    int max = 0;
+    int min = 255;
+    int avg = 0;
+    unsigned char pixel;
+    int blankPixelsChecked = 0;
+    long long totBrightness = 0;
+    unsigned char rowMax[height];
+    unsigned char colMax[width];
+    int topDarkRow = commDetectBorder;
+    int bottomDarkRow = height - commDetectBorder - 1;
+    int leftDarkCol = commDetectBorder;
+    int rightDarkCol = width - commDetectBorder - 1;
     int flagMask = 0;
+    int *curHistogram = histogram;
     FrameInfoEntry fInfo;
 
     if (!frame || frame_number == -1 || frame->codec != FMT_YV12)
+    {
+        VERBOSE(VB_COMMFLAG, "CommDetect: Invalid video frame or codec, "
+                             "unable to process frame.");
         return;
+    }
+
+    if (!width || !height)
+    {
+        VERBOSE(VB_COMMFLAG, "CommDetect: Width or Height is 0, "
+                             "unable to process frame.");
+        return;
+    }
 
     curFrameNumber = frame_number;
     framePtr = frame->buf;
-
-    lastFrameWasBlank = frameIsBlank;
-    lastFrameWasSceneChange = sceneHasChanged;
 
     fInfo.minBrightness = -1;
     fInfo.maxBrightness = -1;
@@ -295,10 +342,177 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
     frameInfo[curFrameNumber] = fInfo;
 
     if (commDetectMethod & COMM_DETECT_BLANKS)
-        frameIsBlank = CheckFrameIsBlank();
+    {
+        memset(&rowMax, 0, sizeof(rowMax));
+        memset(&colMax, 0, sizeof(colMax));
+
+        frameIsBlank = false;
+    }
 
     if (commDetectMethod & COMM_DETECT_SCENE)
-        sceneHasChanged = CheckSceneHasChanged();
+    {
+        lastFrameWasSceneChange = sceneHasChanged;
+        sceneHasChanged = false;
+
+        if (lastHistogram[0] == -1)
+            curHistogram = lastHistogram;
+        else
+            memcpy(lastHistogram, histogram, sizeof(histogram));
+
+        memset(curHistogram, 0, sizeof(histogram));
+    }
+
+    stationLogoPresent = false;
+
+    for(int y = commDetectBorder; y < (height - commDetectBorder);
+                                  y += vertSpacing)
+    {
+        for(int x = commDetectBorder; x < (width - commDetectBorder);
+                                      x += horizSpacing)
+        {
+            pixel = framePtr[y * width + x];
+
+            if ((commDetectMethod & COMM_DETECT_BLANKS) &&
+                ((aggressiveDetection) ||
+                 (!logoInfoAvailable) ||
+                 ((logoInfoAvailable) &&
+                  ((y < logoMinY) || (y > logoMaxY)) &&
+                  ((x < logoMinX) || (x > logoMaxX)))))
+            {
+                blankPixelsChecked++;
+                totBrightness += pixel;
+
+                if (pixel < min)
+                    min = pixel;
+
+                if (pixel > max)
+                    max = pixel;
+
+                if (pixel > rowMax[y])
+                    rowMax[y] = pixel;
+
+                if (pixel > colMax[x])
+                    colMax[x] = pixel;
+            }
+
+            if (commDetectMethod & COMM_DETECT_SCENE)
+                curHistogram[pixel]++;
+        }
+    }
+
+    if (commDetectMethod & COMM_DETECT_BLANKS)
+    {
+        for(int y = commDetectBorder; y < (height - commDetectBorder);
+                                      y += vertSpacing)
+        {
+            if (rowMax[y] > commDetectBoxBrightness)
+                break;
+            else
+                topDarkRow = y;
+        }
+
+        for(int y = commDetectBorder; y < (height - commDetectBorder);
+                                      y += vertSpacing)
+            if (rowMax[y] >= commDetectBoxBrightness)
+                bottomDarkRow = y;
+
+        for(int x = commDetectBorder; x < (width - commDetectBorder);
+                                      x += horizSpacing)
+        {
+            if (colMax[x] > commDetectBoxBrightness)
+                break;
+            else
+                leftDarkCol = x;
+        }
+
+        for(int x = commDetectBorder; x < (width - commDetectBorder);
+                                      x += horizSpacing)
+            if (colMax[x] >= commDetectBoxBrightness)
+                rightDarkCol = x;
+
+        if ((topDarkRow > commDetectBorder) &&
+            (topDarkRow < (height * .20)) &&
+            (bottomDarkRow < (height - commDetectBorder)) &&
+            (bottomDarkRow > (height * .80)))
+        {
+            frameInfo[curFrameNumber].format = COMM_FORMAT_LETTERBOX;
+        }
+        else if ((leftDarkCol > commDetectBorder) &&
+                 (leftDarkCol < (width * .20)) &&
+                 (rightDarkCol < (width - commDetectBorder)) &&
+                 (rightDarkCol > (width * .80)))
+        {
+            frameInfo[curFrameNumber].format = COMM_FORMAT_PILLARBOX;
+        }
+        else
+        {
+            frameInfo[curFrameNumber].format = COMM_FORMAT_NORMAL;
+        }
+
+        avg = totBrightness / blankPixelsChecked;
+
+        frameInfo[curFrameNumber].minBrightness = min;
+        frameInfo[curFrameNumber].maxBrightness = max;
+        frameInfo[curFrameNumber].avgBrightness = avg;
+
+        if (verboseDebugging)
+            VERBOSE(VB_COMMFLAG,QString()
+                    .sprintf("Fr: %6ld - Br: min %03d, max "
+                             "%03d, avg %03d, fmt %d, asp %d",
+                             (long)curFrameNumber, min, max, avg,
+                             frameInfo[curFrameNumber].format,
+                             frameInfo[curFrameNumber].aspect));
+
+        totalMinBrightness += min;
+        commDetectDimAverage = min + 10;
+
+        if (((max - min) <= commDetectBlankFrameMaxDiff) &&
+            (max < commDetectDimBrightness))
+            frameIsBlank = true;
+
+        if ((!aggressiveDetection) && 
+            ((max - min) <= commDetectBlankFrameMaxDiff))
+            frameIsBlank = true;
+
+        if ((!aggressiveDetection) &&
+            ((max < commDetectDarkBrightness) ||
+             ((max < commDetectDimBrightness) && (avg < commDetectDimAverage))))
+            frameIsBlank = true;
+    }
+
+    if (commDetectMethod & COMM_DETECT_SCENE)
+    {
+        if (lastFrameWasSceneChange)
+        {
+            memcpy(lastHistogram, histogram, sizeof(histogram));
+            frameInfo[curFrameNumber].sceneChangePercent = 0;
+        }
+        else if (curHistogram != lastHistogram)
+        {
+            long similar = 0;
+
+            for(int i = 0; i < 256; i++)
+            {
+                if (histogram[i] < lastHistogram[i])
+                    similar += histogram[i];
+                else
+                    similar += lastHistogram[i];
+            }
+
+            sceneChangePercent = (int)(100.0 * similar /
+                                       ((width - (commDetectBorder * 2)) *
+                                        (height - (commDetectBorder * 2)) /
+                                         (vertSpacing * horizSpacing)));
+
+            frameInfo[curFrameNumber].sceneChangePercent = sceneChangePercent;
+
+            if (sceneChangePercent < 85)
+            {
+                memcpy(lastHistogram, histogram, sizeof(histogram));
+                sceneHasChanged = true;
+            }
+        }
+    }
 
     if ((logoInfoAvailable) && (commDetectMethod & COMM_DETECT_LOGO))
     {
@@ -339,196 +553,6 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
 #endif
 
     framesProcessed++;
-}
-
-bool CommDetect::CheckFrameIsBlank(void)
-{
-    int DarkBrightness = 80;
-    int DimBrightness = 120;
-    int BoxBrightness = 30;
-    int DimAVG = 35;
-    bool abort = false;
-    int max = 0;
-    int min = 255;
-    int avg = 0;
-    unsigned char pixel;
-    int pixelsChecked = 0;
-    long long totBrightness = 0;
-    unsigned char rowMax[height];
-    unsigned char colMax[width];
-    int topDarkRow = border;
-    int bottomDarkRow = height - border - 1;
-    int leftDarkCol = border;
-    int rightDarkCol = width - border - 1;
-
-    if (!width || !height)
-        return(false);
-
-    memset(&rowMax, 0, sizeof(rowMax));
-    memset(&colMax, 0, sizeof(colMax));
-
-    for(int y = border; y < (height - border) && !abort;
-                        y += vertSpacing)
-    {
-        for(int x = border; x < (width - border) && !abort;
-                            x += horizSpacing)
-        {
-            if ((!aggressiveDetection) &&
-                (logoInfoAvailable) &&
-                (y >= logoMinY) && (y <= logoMaxY) &&
-                (x >= logoMinX) && (x <= logoMaxX))
-                continue;
-
-            pixel = framePtr[y * width + x];
-
-            pixelsChecked++;
-            totBrightness += pixel;
-
-            if (pixel < min)
-                min = pixel;
-
-            if (pixel > max)
-                max = pixel;
-
-            if (pixel > rowMax[y])
-                rowMax[y] = pixel;
-
-            if (pixel > colMax[x])
-                colMax[x] = pixel;
-        }
-    }
-
-    for(int y = border; y < (height - border); y += vertSpacing)
-    {
-        if (rowMax[y] > BoxBrightness)
-            break;
-        else
-            topDarkRow = y;
-    }
-
-    for(int y = border; y < (height - border); y += vertSpacing)
-        if (rowMax[y] >= BoxBrightness)
-            bottomDarkRow = y;
-
-    for(int x = border; x < (width - border); x += horizSpacing)
-    {
-        if (colMax[x] > BoxBrightness)
-            break;
-        else
-            leftDarkCol = x;
-    }
-
-    for(int x = border; x < (width - border); x += horizSpacing)
-        if (colMax[x] >= BoxBrightness)
-            rightDarkCol = x;
-
-    if ((topDarkRow > border) &&
-        (topDarkRow < (height * .20)) &&
-        (bottomDarkRow < (height - border)) &&
-        (bottomDarkRow > (height * .80)))
-    {
-        frameInfo[curFrameNumber].format = COMM_FORMAT_LETTERBOX;
-    }
-    else if ((leftDarkCol > border) &&
-             (leftDarkCol < (width * .20)) &&
-             (rightDarkCol < (width - border)) &&
-             (rightDarkCol > (width * .80)))
-    {
-        frameInfo[curFrameNumber].format = COMM_FORMAT_PILLARBOX;
-    }
-    else
-    {
-        frameInfo[curFrameNumber].format = COMM_FORMAT_NORMAL;
-    }
-
-
-    avg = totBrightness / pixelsChecked;
-
-    frameInfo[curFrameNumber].minBrightness = min;
-    frameInfo[curFrameNumber].maxBrightness = max;
-    frameInfo[curFrameNumber].avgBrightness = avg;
-
-    if (verboseDebugging)
-        VERBOSE(VB_COMMFLAG,QString().sprintf("Fr: %6ld - Br: min %03d, max "
-                                             "%03d, avg %03d, fmt %d, asp %d",
-                                             (long)curFrameNumber, min, max, avg,
-                                             frameInfo[curFrameNumber].format,
-                                             frameInfo[curFrameNumber].aspect));
-
-    totalMinBrightness += min;
-    DimAVG = min + 10;
-
-    if (((max - min) <= blankFrameMaxDiff) &&
-        (max < DimBrightness))
-        return(true);
-
-    if ((!aggressiveDetection) && 
-        ((max - min) <= blankFrameMaxDiff))
-        return(true);
-
-    if ((!aggressiveDetection) &&
-        ((max < DarkBrightness) ||
-         ((max < DimBrightness) && (avg < DimAVG))))
-        return(true);
-
-    return(false);
-}
-
-bool CommDetect::CheckSceneHasChanged(void)
-{
-    if (!width || !height)
-        return(false);
-
-    if (lastHistogram[0] == -1)
-    {
-        memset(lastHistogram, 0, sizeof(lastHistogram));
-        for(int y = border; y < (height - border); y += vertSpacing)
-            for(int x = border; x < (width - border); x += horizSpacing)
-                lastHistogram[framePtr[y * width + x]]++;
-
-        return(false);
-    }
-
-    memcpy(lastHistogram, histogram, sizeof(histogram));
-
-    // compare current frame with last frame here
-    memset(histogram, 0, sizeof(histogram));
-    for(int y = border; y < (height - border); y += vertSpacing)
-        for(int x = border; x < (width - border); x += horizSpacing)
-            histogram[framePtr[y * width + x]]++;
-
-    if (lastFrameWasSceneChange)
-    {
-        memcpy(lastHistogram, histogram, sizeof(histogram));
-        frameInfo[curFrameNumber].sceneChangePercent = 0;
-
-        return(false);
-    }
-
-    long similar = 0;
-
-    for(int i = 0; i < 256; i++)
-    {
-        if (histogram[i] < lastHistogram[i])
-            similar += histogram[i];
-        else
-            similar += lastHistogram[i];
-    }
-
-    sceneChangePercent = (int)(100.0 * similar /
-                               ((width - (border * 2)) *
-                                (height - (border * 2)) /
-                                 (vertSpacing * horizSpacing)));
-
-    frameInfo[curFrameNumber].sceneChangePercent = sceneChangePercent;
-
-    if (sceneChangePercent < 85)
-    {
-        memcpy(lastHistogram, histogram, sizeof(histogram));
-        return(true);
-    }
-
-    return(false);
 }
 
 bool CommDetect::CheckStationLogo(void)
@@ -643,11 +667,11 @@ bool CommDetect::CheckRatingSymbol(void)
 
     memset(tmpBuf, ' ', width * height);
 
-    if (min_x < border)
-        min_x = border;
+    if (min_x < commDetectBorder)
+        min_x = commDetectBorder;
 
-    if (min_y < border)
-        min_y = border;
+    if (min_y < commDetectBorder)
+        min_y = commDetectBorder;
 
     for(int y = min_y; y <= max_y; y++)
     {
@@ -1161,7 +1185,8 @@ void CommDetect::BuildAllMethodsCommList(void)
     {
         fbp = &fblock[curBlock];
 
-        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %6d %6d %5d",
+        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d "
+                    "%5.2f %6d %6d %5d",
                     curBlock, (int)(fbp->start / fps) / 60,
                     (int)((fbp->start / fps )) % 60,
                     fbp->start, fbp->end, fbp->frames, fbp->length,
@@ -1175,17 +1200,17 @@ void CommDetect::BuildAllMethodsCommList(void)
             if (verboseDebugging)
                 VERBOSE(VB_COMMFLAG, QString("      FRAMES > %1").arg(fps));
 
-            if (fbp->length > MAX_COMM_LENGTH)
+            if (fbp->length > commDetectMaxCommLength)
             {
                 if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG, "      length > max_comm_length, +20");
+                    VERBOSE(VB_COMMFLAG, "      length > max comm length, +20");
                 fbp->score += 20;
             }
 
-            if (fbp->length > MAX_COMM_BREAK_LENGTH)
+            if (fbp->length > commDetectMaxCommBreakLength)
             {
                 if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG, "      length > max_comm_break_length,"
+                    VERBOSE(VB_COMMFLAG, "      length > max comm break length,"
                                          " +20");
                 fbp->score += 20;
             }
@@ -1198,18 +1223,18 @@ void CommDetect::BuildAllMethodsCommList(void)
                     VERBOSE(VB_COMMFLAG, "      length > 4 && logoCount > "
                                          "frames * 0.60 && bfCount < frames "
                                          "* .10");
-                if (fbp->length > MAX_COMM_BREAK_LENGTH)
+                if (fbp->length > commDetectMaxCommBreakLength)
                 {
                     if (verboseDebugging)
                         VERBOSE(VB_COMMFLAG, "      length > "
-                                             "max_comm_break_length, +20");
+                                             "max comm break length, +20");
                     fbp->score += 20;
                 }
                 else
                 {
                     if (verboseDebugging)
                         VERBOSE(VB_COMMFLAG, "      length <= "
-                                            "max_comm_break_length, +10");
+                                            "max comm break length, +10");
                     fbp->score += 10;
                 }
             }
@@ -1346,7 +1371,8 @@ void CommDetect::BuildAllMethodsCommList(void)
             }
         }
 
-        msg.sprintf("  NOW %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %6d %6d %5d",
+        msg.sprintf("  NOW %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d "
+                    "%5.2f %6d %6d %5d",
                     (int)(fbp->start / fps) / 60,
                     (int)((fbp->start / fps )) % 60,
                     fbp->start, fbp->end, fbp->frames, fbp->length,
@@ -1372,7 +1398,8 @@ void CommDetect::BuildAllMethodsCommList(void)
     {
         fbp = &fblock[curBlock];
 
-        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %6d %6d %5d",
+        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d "
+                    "%5.2f %6d %6d %5d",
                     curBlock, (int)(fbp->start / fps) / 60,
                     (int)((fbp->start / fps )) % 60,
                     fbp->start, fbp->end, fbp->frames, fbp->length,
@@ -1467,7 +1494,8 @@ void CommDetect::BuildAllMethodsCommList(void)
             }
         }
 
-        msg.sprintf("  NOW %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %6d %6d %5d",
+        msg.sprintf("  NOW %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d "
+                    "%5.2f %6d %6d %5d",
                     (int)(fbp->start / fps) / 60,
                     (int)((fbp->start / fps )) % 60,
                     fbp->start, fbp->end, fbp->frames, fbp->length,
@@ -1495,19 +1523,21 @@ void CommDetect::BuildAllMethodsCommList(void)
         thisScore = fbp->score;
 
         if ((breakStart >= 0) &&
-            ((fbp->end - breakStart) > (MAX_COMM_BREAK_LENGTH * fps)))
+            ((fbp->end - breakStart) > (commDetectMaxCommBreakLength * fps)))
         {
-            if (((fbp->start - breakStart) > (MIN_COMM_BREAK_LENGTH * fps)) || 
+            if (((fbp->start - breakStart) >
+                               (commDetectMinCommBreakLength * fps)) || 
                 (lastEnd == 0))
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG,
-                            QString("Closing commercial block at start of frame "
-                                    "block %1 with length %2, frame block length "
-                                    "of %3 frames would put comm block "
-                                    "length over max of %4 seconds.")
+                            QString("Closing commercial block at start of "
+                                    "frame block %1 with length %2, frame "
+                                    "block length of %3 frames would put comm "
+                                    "block length over max of %4 seconds.")
                                     .arg(curBlock).arg(fbp->start - breakStart)
-                                    .arg(fbp->frames).arg(MAX_COMM_BREAK_LENGTH));
+                                    .arg(fbp->frames)
+                                    .arg(commDetectMaxCommBreakLength));
 
                 commBreakMap[breakStart] = MARK_COMM_START;
                 commBreakMap[fbp->start] = MARK_COMM_END;
@@ -1525,7 +1555,7 @@ void CommDetect::BuildAllMethodsCommList(void)
                                     "%3 seconds.")
                                     .arg(curBlock)
                                     .arg(fbp->start - breakStart)
-                                    .arg(MIN_COMM_BREAK_LENGTH));
+                                    .arg(commDetectMinCommBreakLength));
                 breakStart = -1;
             }
         }
@@ -1537,7 +1567,7 @@ void CommDetect::BuildAllMethodsCommList(void)
         {
             if ((lastScore > 0) || (curBlock == 0))
             {
-                if ((fbp->start - lastEnd) < (MIN_SHOW_LENGTH * fps))
+                if ((fbp->start - lastEnd) < (commDetectMinShowLength * fps))
                 {
                     commBreakMap.erase(lastStart);
                     commBreakMap.erase(lastEnd);
@@ -1551,7 +1581,7 @@ void CommDetect::BuildAllMethodsCommList(void)
                                             "frame %1 because show less than "
                                             "%2 seconds")
                                             .arg(breakStart)
-                                            .arg(MIN_SHOW_LENGTH));
+                                            .arg(commDetectMinShowLength));
                         else
                             VERBOSE(VB_COMMFLAG,
                                     QString("Opening initial commercial block "
@@ -1571,7 +1601,8 @@ void CommDetect::BuildAllMethodsCommList(void)
             }
             else if (curBlock == maxBlock)
             {
-                if ((fbp->end - breakStart) > (MIN_COMM_BREAK_LENGTH * fps))
+                if ((fbp->end - breakStart) >
+                                (commDetectMinCommBreakLength * fps))
                 {
                     if (fbp->end <= (framesProcessed - (int)(2 * fps) - 2))
                     {
@@ -1598,14 +1629,15 @@ void CommDetect::BuildAllMethodsCommList(void)
                                         .arg(curBlock)
                                         .arg(fbp->start - breakStart)
                                         .arg(fbp->frames)
-                                        .arg(MIN_COMM_BREAK_LENGTH));
+                                        .arg(commDetectMinCommBreakLength));
                     breakStart = -1;
                 }
             }
         }
         else if ((thisScore > 0) && (lastScore < 0) && (breakStart != -1))
         {
-            if ((fbp->start - breakStart) > (MIN_COMM_BREAK_LENGTH * fps))
+            if ((fbp->start - breakStart) >
+                              (commDetectMinCommBreakLength * fps))
             {
                 commBreakMap[breakStart] = MARK_COMM_START;
                 commBreakMap[fbp->start] = MARK_COMM_END;
@@ -1627,12 +1659,13 @@ void CommDetect::BuildAllMethodsCommList(void)
                                     "length under min of %4 seconds.")
                                     .arg(curBlock).arg(fbp->start - breakStart)
                                     .arg(fbp->frames)
-                                    .arg(MIN_COMM_BREAK_LENGTH));
+                                    .arg(commDetectMinCommBreakLength));
             }
             breakStart = -1;
         }
 
-        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %6d %6d %5d",
+        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d "
+                    "%5.2f %6d %6d %5d",
                     curBlock, (int)(fbp->start / fps) / 60,
                     (int)((fbp->start / fps )) % 60,
                     fbp->start, fbp->end, fbp->frames, fbp->length,
@@ -2435,8 +2468,8 @@ bool CommDetect::CheckEdgeLogo(void)
     double goodEdgeRatio = (double)goodEdges / (double)testEdges;
     double badEdgeRatio = (double)badEdges / (double)testNotEdges;
 
-    if ((goodEdgeRatio > logoGoodEdgeThreshold) &&
-        (badEdgeRatio < logoBadEdgeThreshold))
+    if ((goodEdgeRatio > commDetectLogoGoodEdgeThreshold) &&
+        (badEdgeRatio < commDetectLogoBadEdgeThreshold))
         return true;
     else
         return false;
@@ -2444,10 +2477,10 @@ bool CommDetect::CheckEdgeLogo(void)
 
 void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
 {
-    int seekIncrement = (int)(LOGO_SAMPLE_SPACING * fps);
+    int seekIncrement = (int)(commDetectLogoSampleSpacing * fps);
     long long seekFrame;
     int loops;
-    int maxLoops = LOGO_SAMPLES_NEEDED;
+    int maxLoops = commDetectLogoSamplesNeeded;
     EdgeMaskEntry *edgeCounts;
     int pos, i, x, y, dx, dy;
     int edgeDiffs[] = { 5, 7, 10, 15, 20, 30, 40, 50, 60, 0 };
@@ -2750,12 +2783,12 @@ void CommDetect::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
     unsigned char p;
     int pos, x, y;
 
-    for (y = border + r; y < (height - border - r); y++)
+    for (y = commDetectBorder + r; y < (height - commDetectBorder - r); y++)
     {
         if ((y > (height/4)) && (y < (height * 3 / 4)))
             continue;
 
-        for (x = border + r; x < (width - border - r); x++)
+        for (x = commDetectBorder + r; x < (width - commDetectBorder - r); x++)
         {
             int edgeCount = 0;
 

@@ -3546,7 +3546,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         int curCmd;
 
         if (commercialskipmethod & COMM_DETECT_LOGO)
-            additionalSleep = LOGO_SECONDS_NEEDED;
+            additionalSleep = commDetect->GetLogoSecondsNeeded();
 
         if (jobID != -1)
         {
@@ -3599,7 +3599,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         gContext->GetNumSetting("CommSkipAllBlanks", 1));
 
     if ((commercialskipmethod & COMM_DETECT_LOGO) &&
-        ((totalLength == 0) || (totalLength > LOGO_SECONDS_NEEDED)))
+        ((totalLength == 0) ||
+         (totalLength > commDetect->GetLogoSecondsNeeded())))
     {
         if (inJobQueue)
         {
@@ -3751,7 +3752,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             }
         }
 
-        commDetect->ProcessNextFrame(currentFrame, currentFrame->frameNumber);
+        commDetect->ProcessFrame(currentFrame, currentFrame->frameNumber);
 
         GetFrame(1,true);
 
@@ -4094,7 +4095,7 @@ bool NuppelVideoPlayer::FrameIsBlank(VideoFrame *frame)
 {
     if (commercialskipmethod & COMM_DETECT_BLANKS)
     {
-        commDetect->ProcessNextFrame(frame);
+        commDetect->ProcessFrame(frame);
 
         return commDetect->FrameIsBlank();
     }

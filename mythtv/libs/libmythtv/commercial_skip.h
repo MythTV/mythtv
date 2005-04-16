@@ -43,15 +43,6 @@ enum frameFormats {
     COMM_FORMAT_MAX
 };
 
-// Set max comm break length to 00:08:05 minutes & max comm length to 00:02:05
-#define MIN_COMM_BREAK_LENGTH   60
-#define MAX_COMM_BREAK_LENGTH  395
-#define MAX_COMM_LENGTH        125
-#define MIN_SHOW_LENGTH         65
-#define LOGO_SAMPLES_NEEDED    240
-#define LOGO_SAMPLE_SPACING      2
-#define LOGO_SECONDS_NEEDED    (LOGO_SAMPLES_NEEDED * LOGO_SAMPLE_SPACING)
-
 extern "C" {
 #include "frame.h"
 }
@@ -71,7 +62,7 @@ class CommDetect : public QObject
     void SetWatchingRecording(bool watching, RemoteEncoder *rec,
                               NuppelVideoPlayer *nvp);
 
-    void ProcessNextFrame(VideoFrame *frame, long long frame_number = -1);
+    void ProcessFrame(VideoFrame *frame, long long frame_number = -1);
     void SetVerboseDebugging(bool beVerbose = true)
                              { verboseDebugging = beVerbose; };
 
@@ -113,6 +104,7 @@ class CommDetect : public QObject
     void GetLogoMask(unsigned char *mask);
     void SetLogoMask(unsigned char *mask);
 
+    int GetLogoSecondsNeeded(void) { return commDetectLogoSecondsNeeded; };
 
   private:
     typedef struct edgemaskentry {
@@ -148,8 +140,6 @@ class CommDetect : public QObject
         int score;
     } FrameBlock;
 
-    bool CheckFrameIsBlank(void);
-    bool CheckSceneHasChanged(void);
     bool CheckStationLogo(void);
     bool CheckEdgeLogo(void);
     bool CheckRatingSymbol(void);
@@ -166,6 +156,22 @@ class CommDetect : public QObject
 
     bool aggressiveDetection;
 
+    int commDetectBorder;
+    int commDetectBlankFrameMaxDiff;
+    int commDetectDarkBrightness;
+    int commDetectDimBrightness;
+    int commDetectBoxBrightness;
+    int commDetectDimAverage;
+    int commDetectMaxCommBreakLength;
+    int commDetectMinCommBreakLength;
+    int commDetectMinShowLength;
+    int commDetectMaxCommLength;
+    int commDetectLogoSamplesNeeded;
+    int commDetectLogoSampleSpacing;
+    int commDetectLogoSecondsNeeded;
+    double commDetectLogoGoodEdgeThreshold;
+    double commDetectLogoBadEdgeThreshold;
+
     int commDetectMethod;
     bool verboseDebugging;
 
@@ -175,8 +181,6 @@ class CommDetect : public QObject
     int height;
     int horizSpacing;
     int vertSpacing;
-    int border;
-    int blankFrameMaxDiff;
     double fps;
     double fpm;
     bool blankFramesOnly;
@@ -207,8 +211,6 @@ class CommDetect : public QObject
     unsigned char *tmpBuf;
     bool logoInfoAvailable;
     int logoEdgeDiff;
-    double logoGoodEdgeThreshold;
-    double logoBadEdgeThreshold;
     int logoFrameCount;
     int logoMinX;
     int logoMaxX;
