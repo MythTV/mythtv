@@ -708,7 +708,7 @@
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation>^(Der |Ein |Eine )</translation>
+        <translation>^(Der |Die |Das |Ein |Eine )</translation>
     </message>
     <message>
         <source>Play from beginning</source>
@@ -4599,7 +4599,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>The Job Queue will be limited to running this many simultaneous jobs on this backend.</source>
-        <translation>Auf diesem Backend werden maximal so viele Aufträge aus der Auftragsliste gleichzeitig bearbeitet werden.</translation>
+        <translation>Auf diesem Backend werden maximal so viele Aufträge aus der Auftragsliste gleichzeitig bearbeitet.</translation>
     </message>
     <message>
         <source>Job Queue Check frequency (in seconds)</source>
@@ -4869,7 +4869,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Original Airdate</source>
-        <translation>Erstausstrahlung</translation>
+        <translation>Aufgenommen</translation>
     </message>
     <message>
         <source>Program ID</source>
@@ -5137,7 +5137,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Recording Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufgenommen von</translation>
     </message>
     <message>
         <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
@@ -5720,7 +5720,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Original Air date</source>
-        <translation>Erstausstrahlung</translation>
+        <translation>Produktionsjahr/Sendezeit</translation>
     </message>
     <message>
         <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
@@ -6097,7 +6097,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <source>On %1 %2 from %3.%4
 %5
 %6</source>
-        <translation>Bei %1 %2 von %3.%4
+        <translation>Am %1 um %2 von %3.%4:
 %5
 %6</translation>
     </message>
@@ -6105,7 +6105,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <source>On %1 %2 from %3.%4
 %5
 No other details</source>
-        <translation>Bei %1 %2 von %3.%4
+        <translation>Am %1 um %2 von %3.%4:
 %5
 Keine weiteren Informationen</translation>
     </message>
