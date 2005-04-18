@@ -975,13 +975,12 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 # Athlon
    elif expr "$processor" : "athlon" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
-   elif expr "$processor" : ".*AMD Athlon(tm)" > /dev/null ; then
+   elif expr "$processor" : ".*AMD Athlon(..)" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
-   elif expr "$processor" : ".*AMD Athlon(TM)" > /dev/null ; then
-       ARCHFLAGS="-march=athlon"
-   elif expr "$processor" : ".*AMD Duron(TM)" > /dev/null ; then
+   elif expr "$processor" : ".*AMD Duron(..)" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
        optimize="small"
+# K6
    elif expr "$processor" : ".*AMD-K6(tm) 3D processor" > /dev/null ; then
        ARCHFLAGS="-march=pentium-mmx"
        optimize="small"
@@ -998,7 +997,7 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
        ARCHFLAGS="-march=c3"
        optimize="small"
        cpu_raw="c3"
-   elif expr "$processor" : ".*VIA Samuel 2" > /dev/null ; then
+   elif expr "$processor" : ".*VIA Samuel" > /dev/null ; then
        ARCHFLAGS="-march=c3"
        optimize="small"
        cpu_raw="c3"
