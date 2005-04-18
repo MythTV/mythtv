@@ -2,8 +2,8 @@
 
   <background style="normal">
     <image>bkg/grey.jpeg</image>
-    <buttonarea>115,155,410,390</buttonarea>
-    <visiblerowlimit>6</visiblerowlimit>
+    <buttonarea>100,140,430,420</buttonarea>
+    <visiblerowlimit>7</visiblerowlimit>
   </background>
 
   <titles>
@@ -44,7 +44,7 @@
     <area>5,3,3,3</area>
     <color>white</color>
       <fontname>Arial</fontname>
-      <fontsize>28</fontsize>
+      <fontsize>25</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
       <centered>no</centered>
@@ -62,7 +62,7 @@
       <area>5,3,3,3</area>
       <color>#F7862B</color>
       <fontname>Arial</fontname>
-      <fontsize>28</fontsize>
+      <fontsize>25</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
       <centered>no</centered>
