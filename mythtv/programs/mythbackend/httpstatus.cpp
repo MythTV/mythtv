@@ -574,8 +574,8 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
                             break;
 
                         default:
-                            statusColor = "class=\"jobqueued";
-                            jobColor = "class=\"jobqueued";
+                            statusColor = "class=\"jobqueued\"";
+                            jobColor = "class=\"jobqueued\"";
                             break;
                     }
 
