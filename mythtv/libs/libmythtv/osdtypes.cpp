@@ -1498,12 +1498,16 @@ void OSDTypePositionIndicator::PositionUp(void)
 {
     if (m_curposition > m_offset)
         m_curposition--;
+    else if (m_curposition == m_offset)
+        m_curposition = m_numpositions - 1;
 }
 
 void OSDTypePositionIndicator::PositionDown(void)
 {
     if (m_curposition < m_numpositions - 1)
         m_curposition++;
+    else if (m_curposition == m_numpositions - 1) 
+        m_curposition = m_offset;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
