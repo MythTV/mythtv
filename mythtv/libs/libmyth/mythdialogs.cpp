@@ -257,11 +257,6 @@ void MythMainWindow::Init(void)
     setFont(gContext->GetMediumFont());
 
     bool hideCursor = gContext->GetNumSetting("HideMouseCursor", 1);
-    setCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
-#if QT_VERSION == 0x030303
-    // hack needed by John Poet on Qt 3.3.3
-    qApp->setOverrideCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
-#endif
 #ifdef QWS
 #if QT_VERSION >= 0x030300
     QWSServer::setCursorVisible(!hideCursor);
@@ -305,6 +300,10 @@ void MythMainWindow::Init(void)
     gContext->ThemeWidget(this);
 
     Show();
+
+    // Set cursor call must come after Show() to work on some systems.
+    setCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
+
     move(d->xbase, d->ybase);
 }
 
