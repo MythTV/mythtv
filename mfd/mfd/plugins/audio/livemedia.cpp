@@ -149,9 +149,9 @@ FramedSource* LiveSubsession::createNewStreamSource(
     //  just builds a chain (ups-> byte swapper -> out as rtp)
     //
 
+    // return ups;
     return EndianSwap16::createNew(envir(), ups);
     
-    //return ups;
 
 }
 

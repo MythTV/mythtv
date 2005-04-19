@@ -369,10 +369,10 @@ fi
 if test "$rtsp" = "yes" ; then
     echo "                       rtsp support: yes"        
 	echo "      prefix for livemedia includes: $livemediaprefix"
-#    echo "#    Build rtsp " >> ./config.pro
-#    echo " " >> ./config.pro
-#    echo "SUBDIRS += ./plugins/rtspserver " >> ./config.pro
-#    echo " " >> ./config.pro
+	echo "#    Build speakers plugin" >> ./config.pro
+	echo " " >> ./config.pro
+	echo "SUBDIRS += ./mfd/plugins/speakers " >> ./config.pro
+    echo " " >> ./config.pro
     echo "//  Include rtsp support " >> ./config.h
     echo " " >> ./config.h
     echo "#define MFD_RTSP_SUPPORT 1" >> ./config.h

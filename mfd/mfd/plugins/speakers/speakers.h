@@ -11,6 +11,8 @@
 
 #include "mfd_plugin.h"
 
+class RtspIn;
+
 class Speakers: public MFDServicePlugin
 {
 
@@ -28,7 +30,7 @@ class Speakers: public MFDServicePlugin
   private:
   
     QString current_url;
-
+    RtspIn  *rtsp_in;
 };
 
 #endif  // speakers_h_

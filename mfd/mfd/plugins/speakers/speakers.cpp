@@ -8,11 +8,13 @@
 */
 
 #include "speakers.h"
+#include "rtspin.h"
 
 Speakers::Speakers(MFD *owner, int identity)
       :MFDServicePlugin(owner, identity, 2347, "speakers (maop)")
 {
     current_url = "";
+    rtsp_in = NULL;
 }
 
 void Speakers::run()
@@ -128,6 +130,18 @@ void Speakers::openStream(QString stream_url)
     {
         log(QString("attempting to open stream on %1").arg(stream_url), 5);
         current_url = stream_url;
+        
+        if(rtsp_in)
+        {
+            //
+            //  It exists, tell it to switch to new stream
+            //
+        }
+        else
+        {
+            rtsp_in = new RtspIn(this, current_url);
+            rtsp_in->start();
+        }
         announceStatus();
     }
 }
@@ -142,6 +156,20 @@ void Speakers::closeStream(QString stream_url)
     {
         log("closing connection", 5);
         current_url = "";
+        if(rtsp_in)
+        {
+            while(rtsp_in->running())
+            {
+                rtsp_in->stop();
+                usleep(200);
+            }
+            delete rtsp_in;
+            rtsp_in = NULL;
+        }
+        else
+        {
+            warning("asked to close a stream, but don't have one open");
+        }
         announceStatus();
     }
 }
@@ -160,4 +188,14 @@ void Speakers::announceStatus()
 
 Speakers::~Speakers()
 {
+    if(rtsp_in)
+    {
+        while(rtsp_in->running())
+        {
+            rtsp_in->stop();
+            usleep(200);
+        }
+        delete rtsp_in;
+        rtsp_in = NULL;
+    }
 }
