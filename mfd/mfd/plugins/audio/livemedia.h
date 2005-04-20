@@ -12,6 +12,8 @@
     
 */
 
+#ifdef MFD_RTSP_SUPPORT
+
 #include <deque>
 using namespace std;
 
@@ -88,5 +90,5 @@ private:
 
 
 
-
+#endif
 #endif

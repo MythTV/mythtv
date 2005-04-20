@@ -1,3 +1,4 @@
+#ifdef MFD_RTSP_SUPPORT
 /*
     livemedia.cpp
 
@@ -191,3 +192,5 @@ RTPSink* LiveSubsession::createNewRTPSink(
 LiveSubsession::~LiveSubsession()
 {
 }
+
+#endif

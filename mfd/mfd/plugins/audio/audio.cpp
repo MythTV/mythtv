@@ -1326,6 +1326,7 @@ void AudioPlugin::turnOnSpeakers()
 
 void AudioPlugin::turnOffSpeakers()
 {
+#ifdef MFD_RTSP_SUPPORT
     //
     //  The maop mutex should be locked 
     //
@@ -1347,7 +1348,7 @@ void AudioPlugin::turnOffSpeakers()
         an_instance->sendRequest(QString("close %1").arg(rtsp_out->getUrl()));
         ++it;
     }        
-    
+#endif
 }
 
 AudioPlugin::~AudioPlugin()
