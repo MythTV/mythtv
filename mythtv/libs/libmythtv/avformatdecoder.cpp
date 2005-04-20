@@ -254,6 +254,10 @@ void AvFormatDecoder::Reset(void)
 {
     SeekReset();
 
+#if 0
+    // mpegts.c already clears the streams, so this code results in 
+    // silence on livetv with mpeg-ts recordings.
+
     // Clear out the existing mpeg streams
     // so we can get a clean set from the 
     // new seek position.
@@ -267,6 +271,7 @@ void AvFormatDecoder::Reset(void)
             av_remove_stream(ic, st->id);
         }
     }
+#endif
 
     m_positionMap.clear();
     framesPlayed = 0;
