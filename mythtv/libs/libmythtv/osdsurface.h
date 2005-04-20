@@ -29,7 +29,14 @@ class OSDSurface
     void AddRect(QRect &newrect);
 
     bool Changed(void) { return changed; }
-    void SetChanged(bool change) { changed = change; }
+    void SetChanged(bool change)
+    {
+        changed = change;
+        if (change) 
+            ++revision;
+    }
+    int GetRevision() { return revision; }
+    int revision;
 
     unsigned char *yuvbuffer;
 

@@ -202,6 +202,7 @@ OSDSurface::OSDSurface(int w, int h)
         blendconstfunc = &blendconst_mmx;
     }
 #endif
+    revision = 0;
 }
 
 OSDSurface::~OSDSurface()
