@@ -15,6 +15,7 @@ using namespace std;
 
 #include "livemedia.h"
 
+
 LiveTaskScheduler* LiveTaskScheduler::createNew()
 {
     return new LiveTaskScheduler();
@@ -24,7 +25,6 @@ LiveTaskScheduler::LiveTaskScheduler()
 {
 }
         
-        
 void LiveTaskScheduler::stepOnce(unsigned t)
 {
     BasicTaskScheduler::SingleStep(t);
@@ -33,6 +33,7 @@ void LiveTaskScheduler::stepOnce(unsigned t)
 LiveTaskScheduler::~LiveTaskScheduler()
 {
 }
+
         
 /*
 ---------------------------------------------------------------------

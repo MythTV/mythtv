@@ -25,6 +25,13 @@ RtspIn::RtspIn(Speakers *owner, const QString &l_rtsp_url)
     parent= owner;
     keep_going = true;
     rtsp_url = l_rtsp_url;
+    
+    scheduler = NULL;
+    env = NULL;
+    rtsp_client = NULL;
+    media_session = NULL;
+    sub_session = NULL;
+    audio_output_sink = NULL;
 }
 
 
@@ -41,21 +48,14 @@ void RtspIn::run()
     //  things all run in a single thread (ie. this QThread).
     //
 
-    LiveTaskScheduler *scheduler = LiveTaskScheduler::createNew();
-    UsageEnvironment *env = BasicUsageEnvironment::createNew(*scheduler);
+    scheduler = LiveTaskScheduler::createNew();
+    env = BasicUsageEnvironment::createNew(*scheduler);
 
-    //
-    //  Make note of what time it is now
-    //
-
-    struct timeval startTime;
-    gettimeofday(&startTime, NULL);
-      
     //
     //  Create the liveMedia RTSP client
     //
 
-    RTSPClient *rtsp_client = RTSPClient::createNew(*env);
+    rtsp_client = RTSPClient::createNew(*env);
 
     //
     //  Do a DESCRIBE request, which sets some internal stuff in the
@@ -68,13 +68,14 @@ void RtspIn::run()
     //  Using the returned sdp description, create a liveMedia MediaSession
     //    
     
-    MediaSession *media_session = MediaSession::createNew(*env, sdp_description);
+    media_session = MediaSession::createNew(*env, sdp_description);
     delete[] sdp_description;
     
     if (!media_session)
     {
         warning(QString("failed to create a valid media session from this url: %1")
                 .arg(rtsp_url));
+        cleanUp();
         return;
     }
       
@@ -85,14 +86,13 @@ void RtspIn::run()
     
     
     MediaSubsessionIterator iter(*media_session);
-    MediaSubsession *sub_session;
-    
     sub_session = iter.next();
 
     if (!sub_session)
     {
         warning(QString("no subsession in SDP from %1, giving up")
                 .arg(rtsp_url));
+        cleanUp();
         return;
     }
 
@@ -111,6 +111,7 @@ void RtspIn::run()
         warning(QString("failed to initiate first subsession from "
                         "SDP in %1, giving up")
                         .arg(rtsp_url));
+        cleanUp();
         return;
     }
 
@@ -127,6 +128,7 @@ void RtspIn::run()
         warning(QString("failed to setup first subsession from "
                         "SDP in %1, givinp up")
                         .arg(rtsp_url));
+        cleanUp();
         return;
     }
     else
@@ -150,7 +152,7 @@ void RtspIn::run()
     //  up being delivered to it).
     //
     
-    AudioOutputSink *audio_output_sink = AudioOutputSink::createNew(*env);
+    audio_output_sink = AudioOutputSink::createNew(*env);
     sub_session->sink = audio_output_sink;
     sub_session->sink->startPlaying(*(sub_session->readSource()), NULL, NULL);
 
@@ -162,6 +164,7 @@ void RtspIn::run()
     {
         warning(QString("failed to initiate playback of %1, giving up")
                 .arg(rtsp_url));
+        cleanUp();
         return;
     }
     
@@ -170,6 +173,7 @@ void RtspIn::run()
         scheduler->stepOnce(2000000);   // at most 2,000,000 microseconds = 2 seconds
     }
 
+    cleanUp();
 }
 
 void RtspIn::stop()
@@ -177,6 +181,43 @@ void RtspIn::stop()
     keep_going_mutex.lock();
         keep_going = false;
     keep_going_mutex.unlock();
+}
+
+void RtspIn::cleanUp()
+{
+    if(audio_output_sink)
+    {
+        Medium::close(audio_output_sink);
+        //Medium::close() deletes it
+        sub_session->sink = NULL;
+        audio_output_sink = NULL;
+    }
+    if(media_session && rtsp_client)
+    {
+        rtsp_client->teardownMediaSession(*media_session);
+    }
+    if(media_session)
+    {
+        Medium::close(media_session);
+        media_session = NULL;
+    }
+    if(rtsp_client)
+    {
+        Medium::close(rtsp_client);
+    }
+    
+    if(env)
+    {
+        env->reclaim();
+        env = NULL;
+    }
+    
+    if(scheduler)
+    {
+        delete scheduler;
+        scheduler = NULL; 
+    }
+
 }
 
 void RtspIn::warning(const QString &warn_message)

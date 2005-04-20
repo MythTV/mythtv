@@ -1266,6 +1266,7 @@ void AudioPlugin::addMaopSpeakers(QString l_address, uint l_port, QString l_name
 
 void AudioPlugin::checkSpeakers()
 {
+#ifdef MFD_RTSP_SUPPORT
     //
     //  Give a little processing time in this main thread of the audio
     //  plugin to checking whether there's any coming in from the
@@ -1287,13 +1288,15 @@ void AudioPlugin::checkSpeakers()
     
     if(waiting_for_speaker_release)
     {
-        if(speaker_release_timer.elapsed() > 30 * 1000) // 30 seconds
+        //if(speaker_release_timer.elapsed() > 30 * 1000) // 30 seconds
+        if(speaker_release_timer.elapsed() > 1 * 1000) // 30 seconds
         {
             turnOffSpeakers();
             waiting_for_speaker_release = false;
         }
     }
     maop_mutex.unlock();
+#endif
 }
 
 void AudioPlugin::turnOnSpeakers()

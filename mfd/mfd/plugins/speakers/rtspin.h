@@ -15,6 +15,12 @@
 #include <qstring.h>
 
 class Speakers;
+class LiveTaskScheduler;
+class UsageEnvironment;
+class RTSPClient;
+class MediaSession;
+class MediaSubsession;
+class AudioOutputSink;
 
 class RtspIn: public QThread
 {
@@ -29,6 +35,7 @@ class RtspIn: public QThread
 
   private:
 
+    void    cleanUp();
     void    warning(const QString &warn_message);
     void    log(const QString &log_message, int verbosity_level);
     
@@ -37,6 +44,17 @@ class RtspIn: public QThread
     QMutex      keep_going_mutex;
     QString     rtsp_url;
     Speakers   *parent;
+    
+    //
+    //  liveMedia objects
+    //
+    
+    LiveTaskScheduler   *scheduler;
+    UsageEnvironment    *env;
+    RTSPClient          *rtsp_client;
+    MediaSession        *media_session;
+    MediaSubsession     *sub_session;
+    AudioOutputSink     *audio_output_sink;
 };
 
 #endif  // rtspin_h_
