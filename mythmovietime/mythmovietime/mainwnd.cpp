@@ -183,6 +183,8 @@ void MMTMainWindow::keyPressEvent(QKeyEvent *e)
 
 void MMTMainWindow::doMenu(UIListGenericTree* item, bool infoMenu)
 {
+    int buttonCount = 0;
+    
     MMTDBItem *curItem = dynamic_cast<MMTDBItem*>(item);
     
     if (ActivePopup || !curItem)
@@ -195,11 +197,13 @@ void MMTMainWindow::doMenu(UIListGenericTree* item, bool infoMenu)
     {
         if (curItem->getFilmID() > 0 )
         {
+            buttonCount++;
             ActivePopup->addButton(tr("Full Film Details"), this, SLOT(doFullFilmInfo()));
         }
         
         if (!curItem->getOfficialURL().isEmpty() )
         {
+            buttonCount++;
             ActivePopup->addButton(tr("Visit Movie Website"), this, SLOT(doVisitSite()));
         }
 
@@ -209,11 +213,20 @@ void MMTMainWindow::doMenu(UIListGenericTree* item, bool infoMenu)
             
             if (!showItem->getTicketURL().isEmpty() )
             {
+                buttonCount++;
                 ActivePopup->addButton(tr("Buy Ticket"), this, SLOT(doBuyTicket()));
             }
-       }
+        }
         
-        ActivePopup->ShowPopup(this, SLOT(closeActivePopup()));
+        if (buttonCount)              
+        {
+            ActivePopup->ShowPopup(this, SLOT(closeActivePopup()));
+        }
+        else
+        {
+            delete ActivePopup;
+            ActivePopup = NULL;
+        }
     }
 }
 

@@ -57,7 +57,7 @@ static GlobalSlider *DefaultRadius()
     GlobalSlider *gs = new GlobalSlider("MMTRadius", 1, 100, 1);
     gs->setLabel(QObject::tr("Radius"));
     gs->setValue(25);
-    gs->setHelpText(QObject::tr("How far out from your postal code Myth should look for theatres."));
+    gs->setHelpText(QObject::tr("How far out from your postal code Movie Times should look for theatres."));
     return gs;
 }
 
@@ -66,10 +66,20 @@ static GlobalSlider *DefaultDays()
     GlobalSlider *gs = new GlobalSlider("MMTDays", 1, 14, 1);
     gs->setLabel(QObject::tr("Days"));
     gs->setValue(7);
-    gs->setHelpText(QObject::tr("How far many days of movie data Myth should fetch."));
+    gs->setHelpText(QObject::tr("How far many days of movie data Movie Times should fetch."));
     return gs;
 }
 
+
+static GlobalCheckBox *KeepFilms()
+{
+    GlobalCheckBox *gc = new GlobalCheckBox("MMTKeepFilmData");
+    gc->setLabel(QObject::tr("Keep Film Data"));
+    gc->setValue(0);
+    gc->setHelpText(QObject::tr("If enabled film data will not be deleted when new data is  "
+                                "retrieved."));
+    return gc;
+}
 
 
 MMTGeneralSettings::MMTGeneralSettings()
@@ -85,6 +95,7 @@ MMTGeneralSettings::MMTGeneralSettings()
     gen->addChild(Postal());
     gen->addChild(DefaultRadius());
     gen->addChild(DefaultDays());
+    gen->addChild(KeepFilms());
     addChild(gen);
     
     gContext->SaveSetting("MMT-Last-Fetch", "");

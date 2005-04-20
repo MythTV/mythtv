@@ -86,7 +86,8 @@ bool fetchData()
     
     daysSince = QDate::currentDate().daysTo(QDate::fromString(lastFetch, Qt::ISODate));
     
-    if (daysSince == 0)
+    
+    if (daysSince >= 0)
     {
         return true;
     }
