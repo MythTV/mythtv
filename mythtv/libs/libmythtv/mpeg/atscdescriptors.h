@@ -322,8 +322,10 @@ AC3Descriptor {
 };
 */
 
-// a_57a.pdf p6 Tables 6.1,6.2,7.1
-// Something like an ISBN for TV shows
+/** \class ContentIdentifierDescriptor
+ *   This is something like an ISBN for TV shows.
+ *   See also: a_57a.pdf page6 Tables 6.1, 6.2, and 7.1
+ */
 class ContentIdentifierDescriptor : public ATSCDescriptor {
     ContentIdentifierDescriptor(const unsigned char* data) :
         ATSCDescriptor(data) {

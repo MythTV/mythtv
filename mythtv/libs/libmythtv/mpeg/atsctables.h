@@ -13,34 +13,35 @@
 // it's unreliable we will need to be able to prefer the
 // downloaded XMLTV data.
 
-/*
-  Overall structure
-
-  base_PID ---> STT (Time),
-                RRT (Censorship),
-                MGT (Guide management),
-                VCT (Channel Guide)
-
-  MGT ---> (PID_A,EIT[0],version_number),
-           (PID_B,EIT[1],version_number),      etc,
-           (PID_X,RTT,version_number),
-           (PID_Y,RTT,version_number),         etc,
-           (PID_1,Event ETT,version_number),
-           (PID_2,Event ETT,version_number),   etc,
-           (PID_m,Channel ETT,version_number),
-           (PID_n,Channel ETT,version_number), etc.
-    Each EIT[i] is valid for 3 hours,
-    EIT[0] is always the current programming.
-    Other tables are described by descriptors,
-    such as Subtitle Descriptors.
-
-  VCT ---> (channel-A,source-id[0]),
-           (channel-B,source-id[1]), etc.
-
-  New VCTs can be sent with a new version number to update the programming
-    in an EIT, then when the data is complete a new MGT is sent with an
-    updated version_number for that EIT, updating the data.
-*/
+/** \file atsctables.h
+ *   Overall structure
+ *   \code
+ *     base_PID ---> STT (Time),
+ *                   RRT (Censorship),
+ *                   MGT (Guide management),
+ *                   VCT (Channel Guide)
+ *   
+ *     MGT ---> (PID_A,EIT[0],version_number),
+ *              (PID_B,EIT[1],version_number),      etc,
+ *              (PID_X,RTT,version_number),
+ *              (PID_Y,RTT,version_number),         etc,
+ *              (PID_1,Event ETT,version_number),
+ *              (PID_2,Event ETT,version_number),   etc,
+ *              (PID_m,Channel ETT,version_number),
+ *              (PID_n,Channel ETT,version_number), etc.
+ *       Each EIT[i] is valid for 3 hours,
+ *       EIT[0] is always the current programming.
+ *       Other tables are described by descriptors,
+ *       such as Subtitle Descriptors.
+ *   
+ *     VCT ---> (channel-A,source-id[0]),
+ *              (channel-B,source-id[1]), etc.
+ *   \endcode
+ *   
+ *   New VCTs can be sent with a new version number to update the programming
+ *   in an EIT, then when the data is complete a new MGT is sent with an
+ *   updated version_number for that EIT, updating the data.
+ */
 
 #define secs_Between_1Jan1970_6Jan1980 315982800
 
@@ -50,11 +51,14 @@ namespace TableClass {
     };
 }
 
+/** \class MasterGuideTable
+ *  \brief This table tells the decoder on which PIDs to find other tables,
+ *         and their sizes and each table's current version number.
+ */
 class MasterGuideTable : PSIPTable {
   public:
     MasterGuideTable(const PSIPTable& table) : PSIPTable(table)
     {
-    //       Name             bits  loc  expected value
     // start_code_prefix        8   0.0          0
     // table_id                 8   1.0       0xC7
         assert(0xc7==TableID());
@@ -130,6 +134,11 @@ class MasterGuideTable : PSIPTable {
     mutable vector<unsigned char*> _ptrs; // used to parse
 };
 
+/** \class TerrestrialVirtualChannelTable
+ *  \brief This table contains information about the terrestrial
+ *         channels transmitted on this multiplex.
+ *  \sa CableVirtualChannelTable
+ */
 class TerrestrialVirtualChannelTable : public PSIPTable {
   public:
     TerrestrialVirtualChannelTable(const PSIPTable& table) : PSIPTable(table)
@@ -239,7 +248,11 @@ class TerrestrialVirtualChannelTable : public PSIPTable {
     mutable vector<unsigned char*> _ptrs;
 };
 
-// titles, start times, other channel info
+/** \class EventInformationTable
+ *  \brief EventInformationTables contain program titles, start times,
+ *         and channel information.
+ *  \sa ExtendedTextTable, TerrestrialVirtualChannelTable, CableVirtualChannelTable
+ */
 class EventInformationTable : public PSIPTable {
   public:
     EventInformationTable(const PSIPTable& table) : PSIPTable(table)
@@ -307,7 +320,11 @@ class EventInformationTable : public PSIPTable {
     mutable vector<unsigned char*> _ptrs;
 };
 
-// subtitles
+/** \class ExtendedTextTable
+ *  \brief ExtendedTextTable contain additional text not
+ *         contained in EventInformationTables.
+ *  \sa EventInformationTable
+ */
 class ExtendedTextTable : public PSIPTable {
   public:
     ExtendedTextTable(const PSIPTable& table) : PSIPTable(table)
@@ -353,7 +370,13 @@ class ExtendedTextTable : public PSIPTable {
     // CRC_32                  32
 };
 
-// a_65b.pdf p 23
+/** \class SystemTimeTable
+ *  \brief This table contains the GPS time at the time of transmission.
+ *
+ *   It can we used to detect drift between GPS and UTC time, this
+ *   is currently at 13 seconds.
+ *   See also: a_65b.pdf page 23
+ */
 class SystemTimeTable : public PSIPTable {
   public:
     SystemTimeTable(const PSIPTable& table) : PSIPTable(table)

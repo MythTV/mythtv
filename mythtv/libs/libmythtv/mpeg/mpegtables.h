@@ -6,15 +6,18 @@
 #include <cassert>
 #include "pespacket.h"
 
-// special ATSC restrictions on PMT,PAT tables
-// max 400ms,100ms between PMTs,PATs, resp.
-// no adaptation headers in PMT,PAT or PSIP packets
-//   (?unless version number is discontinuous?)
-// PES Payload must not be scrambled (1999 Sarnoff)
-// No Clock in PES, no MPEG-1 System Fields, no CRC or priv. data
-// no more than one frame per PES packet
-
-// program 0 is network information table in DVB streams
+/** \file mpegtables.h
+ *  \code
+ *   special ATSC restrictions on PMT,PAT tables
+ *   max 400ms,100ms between PMTs,PATs, resp.
+ *   no adaptation headers in PMT,PAT or PSIP packets
+ *     (?unless version number is discontinuous?)
+ *   PES Payload must not be scrambled (1999 Sarnoff)
+ *   No Clock in PES, no MPEG-1 System Fields, no CRC or priv. data
+ *   no more than one frame per PES packet
+ *   program 0 is network information table in DVB streams
+ *  \endcode
+ */
 
 namespace StreamID {
     enum {
@@ -33,6 +36,7 @@ namespace StreamID {
         PrivData   = 0x06,
     };
 };
+
 namespace TableID {
     enum {
         PAT = 0x00, PMT = 0x02,
@@ -41,6 +45,10 @@ namespace TableID {
     };
 };
 
+/** \class PSIPTable
+ *  \brief A PSIP table is a special type of PES packet containing an
+ *         MPEG, ATSC, or DVB table.
+ */
 class PSIPTable : public PESPacket {
   private:
     // creates non-clone version, for View
@@ -140,30 +148,23 @@ class PSIPTable : public PESPacket {
     static const unsigned int PSIP_OFFSET=9; // general PSIP header offset
 };
 
-/**
-  PID 0: Program Association Table -- lists all other
-  PIDs that make up the program(s) in the whole stream.
-  Based on info in this table, and on which subprogram
-  the user desires, we should determine which PIDs'
-  payloads to write to the ring buffer.
-
-  Example PAT scan code is in the pcHDTV's dtvscan.c,
-  demux_ts_parse_pat
-
-  NOTE: Broadcasters are encouraged to keep the
-  subprogram:PID mapping constant.  If we store this data
-  in the channel database, we can branch-predict which
-  PIDs we are looking for, and can thus "tune" the
-  subprogram more quickly.
-
-  We rewrite the PAT to describe just the one
-  stream we are recording.  Always use the same set of
-  PIDs so the decoder has an easier time following
-  channel changes.
-
-  Basically, the output PMT is pid 0x10, video is 0x11 and
-  audio is 0x14.
-*/
+/** \class ProgramAssociationTable
+ *  \brief The Program Association Table lists all the programs
+ *         in a stream, and is alwyas found on PID 0.
+ *
+ *   Based on info in this table and the ProgramMapTable 
+ *   for the program we are interested in we should
+ *   be able determine which PID to write to the ringbuffer
+ *   when given the program stream to record.
+ *
+ *   NOTE: Broadcasters are encouraged to keep the
+ *   subprogram:PID mapping constant.  If we store this data
+ *   in the channel database, we can branch-predict which
+ *   PIDs we are looking for, and can thus "tune" the
+ *   subprogram more quickly.
+ *
+ *  \sa ProgramMapTable
+ */
 
 extern const unsigned char init_patheader[9];
 
@@ -232,6 +233,11 @@ class ProgramAssociationTable : public PSIPTable {
 
 extern const unsigned char DEFAULT_PMT_HEADER[9];
 
+/** \class ProgramMapTable
+ *  \brief A PMT table maps a program described in the ProgramAssociationTable
+ *         to various PID's which describe the multimedia contents of the
+ *         program.
+ */
 class ProgramMapTable : public PSIPTable {
     static const unsigned int pmt_header=4; // minimum PMT header offset
     mutable vector<unsigned char*> _ptrs; // used to parse
@@ -355,16 +361,26 @@ class ProgramMapTable : public PSIPTable {
     }
 };
 
+/** \class AdaptationFieldControl
+ *  \brief AdaptationFieldControl is used to transmit various important
+ *         stream attributes.
+ *   These include such things as the PCR and flags discontiunities in the
+ *   program, such as when a commercial or another program begins. This is
+ *   currently just passed through the MythTV recorders to the recorded
+ *   stream.
+ */
 class AdaptationFieldControl {
   public:
     AdaptationFieldControl(const unsigned char* packet) : _data(packet) { ; }
 
-    // adaptation header length
-    // (after which is payload data)         8   0.0
+    /** adaptation header length
+     * (after which is payload data)         8   0.0
+     */
     unsigned int Length() const { return _data[0]; }
 
-    // discontinuity_indicator
-    // (time base may change)                1   1.0
+    /** discontinuity_indicator
+     *  (time base may change)               1   1.0
+     */
     bool Discontinuity() const { return _data[1]&0x80; }
     // random_access_indicator (?)           1   1.1
     bool RandomAccess() const { return bool(_data[1]&0x40); }
@@ -373,18 +389,21 @@ class AdaptationFieldControl {
 
 // Each of the following extends the adaptation header.  In order:
 
-    // PCR flag (we have PCR data)           1   1.3
-    // (adds 6 bytes after adaptation header)
+    /** PCR flag (we have PCR data)          1   1.3
+     *  (adds 6 bytes after adaptation header)
+     */
     bool PCR() const { return bool(_data[1]&0x10); }
-    // OPCR flag (we have OPCR data)         1   1.4
-    // (adds 6 bytes) ((Original) Program Clock Reference; used to time output)
+    /** OPCR flag (we have OPCR data)        1   1.4
+     *  (adds 6 bytes) ((Original) Program Clock Reference; used to time output)
+     */
     bool OPCR() const { return bool(_data[1]&0x08); }
-    // splicing_point_flag                   1   1.5
-    // (adds 1 byte) (we have splice point data)
-    // (splice data is packets until a good splice point for
-    //  e.g. commercial insertion -- if these are still set,
-    //  might be a good way to recognize potential commercials
-    //  for flagging)
+    /** splicing_point_flag                  1   1.5
+     *  (adds 1 byte) (we have splice point data)
+     *  Splice data is packets until a good splice point for
+     *  e.g. commercial insertion -- if these are still set,
+     *  might be a good way to recognize potential commercials
+     *  for flagging.
+     */
     bool SplicingPoint() const { return bool(_data[1]&0x04); }
     //  transport_private_data_flag          1   1.6
     // (adds 1 byte)
