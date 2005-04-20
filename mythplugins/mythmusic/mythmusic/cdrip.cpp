@@ -360,12 +360,16 @@ void Ripper::compilationChanged(bool state)
         {
             data = decoder->getMetadata(trackno);
 
-            // Make metadata appear to be just a normal track.
-            data->setCompilationArtist("");
-            data->setArtist(artistname);
-            data->setCompilation(false);
-            decoder->commitMetadata(data);
-            delete data;
+            //  Metadata will be NULL for non-audio tracks
+            if(data)
+            {
+                // Make metadata appear to be just a normal track.
+                data->setCompilationArtist("");
+                data->setArtist(artistname);
+                data->setCompilation(false);
+                decoder->commitMetadata(data);
+                delete data;
+            }
         }
         
         // Visual updates
@@ -379,12 +383,16 @@ void Ripper::compilationChanged(bool state)
         {
             data = decoder->getMetadata(trackno);
 
-            // Make metadata appear to be just a normal track.
-            data->setCompilationArtist(artistname);
-            data->setArtist(table->text(trackno - 1, 2));
-            data->setCompilation(true);
-            decoder->commitMetadata(data);
-            delete data;
+            //  Metadata will be NULL for non-audio tracks
+            if(data)
+            {
+                // Make metadata appear to be just a normal track.
+                data->setCompilationArtist(artistname);
+                data->setArtist(table->text(trackno - 1, 2));
+                data->setCompilation(true);
+                decoder->commitMetadata(data);
+                delete data;
+            }
         }
 
         // Visual updates
