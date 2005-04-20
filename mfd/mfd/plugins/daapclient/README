@@ -12,10 +12,10 @@ libopendaap:
 
         http://crazney.net/programs/itunes/libopendaap.html
 
-    Version 0.2.0 (source release number) is required. Higher versions will
+    Version 0.3.0 (source release number) is required. Higher versions will
 probably work as well.
 
-    Note that as of version 0.3, libopendaap has a very annoying habit of
+    Note that as of version 0.3.0, libopendaap has a very annoying habit of
 not naming the library properly under a Linux build (it calls it
 libopendaap.0.1.0, rather than libopendaap.so.0.1.0). The following
 hack-around (as root) should fix that:
