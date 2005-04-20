@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: MythWeather.</TITLE>
+ <TITLE>Installing and using MythTV: MythMusic. </TITLE>
  <LINK HREF="mythtv-HOWTO-17.html" REL=next>
  <LINK HREF="mythtv-HOWTO-15.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc16" REL=contents>
@@ -12,16 +12,221 @@
 <A HREF="mythtv-HOWTO-15.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc16">Contents</A>
 <HR>
-<H2><A NAME="s16">16.</A> <A HREF="mythtv-HOWTO.html#toc16">MythWeather.</A></H2>
+<H2><A NAME="s16">16.</A> <A HREF="mythtv-HOWTO.html#toc16">MythMusic. </A></H2>
 
-<P>The MythWeather module will obtain the weather information for the
-location that you specify.  You must be running MythTV v0.10 or later 
-in order to use MythWeather.</P>
-<P>Change into the MythWeather directory, then make and make install:
+<P>MythMusic has a number of prerequisites that must be satisfied before it
+is operational.  Depending on your distribution, some of these prerequisites can
+be satisfied through the various package managers.  If your distribution doesn't
+offer pre-compiled versions of the software below, then follow the generic
+instructions for manually compiling and installing the software.</P>
+<P>The prerequisites for MythMusic are:
+<UL>
+<LI>MAD</LI>
+<LI>id3tag</LI>
+<LI>libvorbis-devel</LI>
+<LI>FLAC</LI>
+<LI>libcdaudio</LI>
+<LI>CDParanoia</LI>
+</UL>
+</P>
+
+<H2><A NAME="ss16.1">16.1</A> <A HREF="mythtv-HOWTO.html#toc16.1">Manual installation of prerequisites</A>
+</H2>
+
+<P>These instructions are for distributions which don't have pre-compiled
+versions of the software necessary to run MythTV.</P>
+<P>Download MAD from 
+<A HREF="http://www.mars.org/home/rob/proj/mpeg/">http://www.mars.org/home/rob/proj/mpeg/</A>  Save it to a directory you
+can find later.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd mythweather
-$ qmake mythweather.pro
+$ tar -xzf mad-0.14.2b.tar.gz
+$ cd mad-0.14.2b
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download libid3tag from 
+<A HREF="http://www.underbit.com/products/mad/">http://www.underbit.com/products/mad/</A> Save it to a directory you can
+find later.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf libid3tag-0.15.0b.tar.gz
+$ cd libid3tag-0.15.0b
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download FLAC from 
+<A HREF="http://flac.sourceforge.net">http://flac.sourceforge.net</A> and install:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf flac-1.1.0.tar.gz
+$ cd flac-1.1.0
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download libcdaudio from 
+<A HREF="http://sourceforge.net/project/showfiles.php?group_id=27134">libcdaudio.sourceforge.net</A> and
+install:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf libcdaudio-0.99.9.tar.gz
+$ cd libcdaudio-0.99.9
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download cdparanoia from 
+<A HREF="http://www.xiph.org/paranoia/download/cdparanoia-III-alpha9.8.src.tgz">http://www.xiph.org/paranoia/down.html</A>.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+$ cd cdparanoia-III-alpha9.8
+$ ./configure
+$ make
+$ su
+# make install
+# cd /usr/lib
+# ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+# ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss16.2">16.2</A> <A HREF="mythtv-HOWTO.html#toc16.2">Mandrake 9.0</A>
+</H2>
+
+<P>Mandrake 9.0 has a number of the prerequisites available on the
+installation CD.  Some of the software you're going to need will have to be
+obtained from the "contrib" or "cooker" development repositories. 
+Applications downloaded from "cooker" come from the development branch, so
+there may be issues with some software.  It isn't recommended that you mix
+cooker and release-level software.</P>
+
+<P><B>urpmi</B> is the simplest tool for installation of packages from the
+command line.  The difficult part is the configuration, but this has been
+made easier at the following website: 
+<A HREF="http://addmedia.linuxfornewbies.org/">http://addmedia.linuxfornewbies.org/</A> The website will allow
+you to choose a mirror site and then present the command-line configuration
+text for that mirror.  You will most likely need to add a "Contrib" mirror
+to your setup.  Once you have done that, you can proceed.  If <B>urpmi</B>
+prompts you about other modules that need to be installed to satisfy
+dependencies, say "Yes".</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio1 cdparanoia
+# urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
+# urpmi libcdaudio1-devel libid3tag0 libid3tag0-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>Additional options with MythMusic</H3>
+
+<P>Additional visualizations have been added to MythMusic.  If you wish to
+use these, there are some prerequisites you must install prior to compiling.</P>
+<P>
+<UL>
+<LI>fftw</LI>
+<LI>OpenGL</LI>
+<LI>SDL</LI>
+</UL>
+</P>
+<P><CODE>fftw</CODE> may be obtained from 
+<A HREF="http://www.fftw.org/">http://www.fftw.org/</A>.  In Mandrake 9.1 it may be installed by
+typing:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libfftw2 libfftw2-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><CODE>OpenGL</CODE> should be installed on practically all distributions. 
+However, you will need the devel module.  In Mandrake 9.1 it may be
+installed by typing:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libMesaGLU1-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><CODE>SDL</CODE> may be obtained from 
+<A HREF="http://www.libsdl.org">http://www.libsdl.org</A>.  In Mandrake 9.1 it may be installed by
+typing:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libSDL1.2 libSDL1.2-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss16.3">16.3</A> <A HREF="mythtv-HOWTO.html#toc16.3">Red Hat Linux 9</A>
+</H2>
+
+<P>Red Hat provides packages for several of the prerequisites, making 
+installation very simple. Of the prerequisites, Red Hat provides 
+packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably 
+already have installed). To install these all at once, simply type (all on
+the same line):
+<BLOCKQUOTE><CODE>
+<PRE>
+$ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you get the following message: "None of the packages you requested 
+were found, or they are already updated" it probably means you already 
+have all of those packages installed.</P>
+<P>You must install the remaining packages, (MAD, FLAC, libcdaudio and
+optionally fftw) manually following the installation directions above. When
+installing fftw do not use the rpm package offered on the website because it
+will cause an error, so use the source package instead.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: you can use the instructions given at the 
+<A HREF="mythtv-HOWTO-3.html#atrpms">automated installation section</A> to install all of MythMusic in one
+step.</CAPTION>
+</FIGURE>
+</P>
+<H2><A NAME="ss16.4">16.4</A> <A HREF="mythtv-HOWTO.html#toc16.4">Compiling MythMusic</A>
+</H2>
+
+<P>Once all the prerequisites have been installed, you can proceed with
+compiling MythMusic.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd mythplugins
+$ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
+$ qmake mythplugins.pro
 $ make
 $ su
 # make install
@@ -29,38 +234,117 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>MythWeather uses MSNBC.com as its source for weather data and weather.com
-for its radar image.</P>
-<P>These are the keyboard commands for MythWeather:
+
+<H2><A NAME="ss16.5">16.5</A> <A HREF="mythtv-HOWTO.html#toc16.5">Configuring MythMusic</A>
+</H2>
+
+<P>Configuration of MythMusic occurs in two places.  The main mythfrontend
+Setup is for global MythMusic configuration.  Go to the
+Setup/MythMusic/General Setup screen and adjust it for your particular
+configuration.</P>
+<P>The second configuration screen is within the MythMusic program and will
+allow you rescan your music library, etc.</P>
+<P>Here's some explanation about the Ignore_ID3 and The NonID3FileNameFormat:</P>
+<P>If Ignore_ID3 is set to TRUE, MythMusic will try to determine the
+Genre, Artist, Album, Track Number, and Title from the filename of the
+mp3 file.  The NonID3FileNameFormat variable should be set to the
+directory/file format where the mp3 files are stored.  For instance, I
+store mine in the above shown Genre/Artist/Album/Track format.  MythMusic
+will then use this information to fill in the proper fields when it
+populates the musicmetadata table rather than searching for an ID3 tag in
+the mp3 file.</P>
+<P>The files can be laid out in any format, such as:</P>
+<P>Genre/Artist/Album/Title
+Artist/Genre/Album/Title
+Artist/Album/Title (with Genre left as Unknown)</P>
+<P>The track number is optional but can be specified with the title by using
+the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is used,
+then the filename can have a space, hyphen, or underscore separating the
+track number from the track title.  Keywords are case insensitive, so if
+you specify GENRE it's the same as Genre in the format field.</P>
+<P>The Ignore_ID3 option does not disable the code that determines the track
+length, just the portion that tries to read ID3 info.</P>
+
+<H2><A NAME="ss16.6">16.6</A> <A HREF="mythtv-HOWTO.html#toc16.6">Using MythMusic</A>
+</H2>
+
+<P>MythMusic is fairly simple to use.  It is recommended that you insert the
+CD before selecting "Import CD".  You should also ensure that your system
+doesn't try to automount the CD and begin playing it automatically.</P>
+<P>Another item to consider:  there are some CDs that contain computer data
+that runs as a "CD Extra" when inserted into some Windows PCs and
+Macintoshes.  As of 2003-06-10, MythMusic doesn't support track skipping or
+individual track selection, so if you have a CD with "CD Extra" data you
+will not be able to encode it; MythMusic will hang attempting to encode the
+non-audio data.</P>
+<P>Here's some information on playlist management:</P>
+<P>Q: How do I create a new playlist?  
+A: Using the MythMusic "Select Music" menu option, setup the playlist as you
+normally would by adding songs or other playlists as needed.  When you are
+ready to save the new playlist, highlight "Active Play Queue" at the bottom
+of the selection tree and hit the "i" key. This will pop up a menu allowing
+you to name and save the new playlist.  You can also hit Enter to bring up
+the popup on the Active Play Queue. This does not work on the playlists
+above, as Enter is obviously bound to checking/unchecking the boxes. Any
+number (ie. keypad on remote) will also bring up the menu in both cases.</P>
+<P>Q: How do I enter the playlist name in the text field without a keyboard?
+A: Use the keypad number keys (bound to your remote) to select letters
+quasi-cell phone style. Keys 2-9 work pretty much like any cell phone text
+entry. 1 cycles through a few special characters, delete, and space. 0 is
+like a CAPS LOCK. Hard to describe, fairly easy to use. You will soon be
+able to specify the cycle timing in a Setup screen. You can type fairly
+quickly through a combination of jumping around the number keys AND hitting
+a non-number key (right arrow is particularly good for this) to force the
+current character.</P>
+<P>Q: How do I edit a playlist? 
+A: Highlight the playlist in the selection tree and hit the "i" key then
+select "Move to Active Play Queue" in the popup.  You can now modify the
+"Active Play Queue" like normal, adding songs and playlists by selecting
+them from the song tree.  When you are done, highlight the "Active Play
+Queue" in the selection tree and hit the "i" key then select "Save Back to
+Playlist Tree".  And whatever you were editing as your Active Queue before
+you moved an existing playlist "on top" of Active reappears. Think of Active
+has having a push on, pop off capability, but with a depth of only 1.</P>
+<P>Q: How do I delete an item from a playlist?
+A: Highlight the item in the selection tree and hit the "d" key.</P>
+<P>Q: How do I rearrange the songs in my playlist?
+A: Highlight a song and hit the "space" bar, the song will now have pair of
+red arrows in front of it.  Use the up and down arrow keys to move it around
+in the playlist.  When you have it where you want it, hit the "space" bar
+again.</P>
+<P>Q: How do I delete a playlist?
+A: Highlight the playlist in the selection tree and hit the "i" key then
+select "Delete this Playlist" from the popup.</P>
+
+<H2><A NAME="ss16.7">16.7</A> <A HREF="mythtv-HOWTO.html#toc16.7">Troubleshooting MythMusic</A>
+</H2>
+
+<P>You may run into errors when running MythMusic.</P>
+<H3>When I run MythMusic and try and look up a CD, I get an error message </H3>
+
+<P>The full text of the message will say: </P>
+<P>databasebox.o: Couldn't find your CD. It may not be in the freedb database. 
+More likely, however, is that you need to delete &nbsp;/.cddb and &nbsp;/.cdserverrc
+and restart mythmusic. Have a nice day.</P>
+<P>If you get this message, you should go to the home directory of whatever
+user MythMusic is running as and type:
 <BLOCKQUOTE><CODE>
 <PRE>
-Left Key             Goes back one page, and extends the time spent
-                     on the page you are on.
-Right Key            Goes forward one page, see above.
-Space                Pause, wait on the current page until space is hit
-                     again.
-Numeric Keys         You can check other weather by keying in other ZIP codes.
-Enter Key            Switch between Celsius and Fahrenheit. Can also
-                     be used a way to force a data update.
-"m" Key              Resets the location to the database default, then updates the data.
-"i"                  Enter / Save settings
-ESC                  Exit the settings screen without saving / Exit the program
+rm .cdserverrc
+rm -rf .cddb/
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>MythWeather also has an "Aggressiveness" setting.  This affects how long
-MythWeather waits for data from the msnbc.com website before timing out.  If
-you are on a slow connection, or have a slow DNS, or MythWeather just
-doesn't seem to be working and you've already tried everything else, then
-try increasing the aggressiveness level parameter.  This parameter is
-inverse; a higher number actually means that MythWeather will be less
-aggressive, and will therefore wait longer before timing out.</P>
-<P>MythWeather will print debugging information on the terminal.  If you wish
-to see additional debugging information while MythWeather is running, run
-mythweather from the command line with as <CODE>mythweather --debug</CODE></P>
-<P>You may also force mythweather to re-run the configuration by starting it on
-the command line as <CODE>mythweather --configure</CODE>.  These two options are
-mutually exclusive.</P>
+<P>These files aren't automatically deleted because of a conscious design
+decision by the author that programs that automatically delete things are
+bad.</P>
+<P>The files are used to locally cache CD lookups. If you are re-inserting
+CDs, your machine will not actually have to go out to the Internet to
+determine what is on them.  However, the URL used to access the freedb
+database has recently changed, so the stale information in the files from
+previous runs of MythMusic would cause the error above.  Once the files have
+been deleted the stale information will be gone and your local database
+will be rebuilt as you use CDs.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-17.html">Next</A>

@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-04-10, v0.18.00
+<date>2005-04-20, v0.18.01
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1254,10 +1254,14 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 </caption>
 </figure>
 The other MythTV modules may be downloaded from CVS the same way; replace
-"mythtv" with "mythweather", "mythgallery", "mythmusic", etc.
+"mythtv" with "myththemes" or "mythplugins".
 
-If you wish to stay up-to-date with CVS, you may replace "checkout mythtv"
-with <tt>update mythtv</tt> after you've done your initial download.
+If you wish to stay up-to-date with CVS, go into the MythTV subdirectory and type:
+<tscreen><verb>
+$ cd mythtv
+$ cvs -z3 update -PAd
+</verb></tscreen>
+after you've done your initial download.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -4121,16 +4125,101 @@ set, you will also see a "Clear override" to undo your changes. This
 option makes it very easy to try out some "what if" attempts when
 deciding on your best strategy in a difficult situation.
 
+<sect>MythPlugins. <label id="mythplugins_">
+<p>MythTV has a rich set of plugins available.  Beginning with MythTV v0.18,
+a single tarball contains all of the plugins. Once you have downloaded
+the tarball, untar it and run the <bf>configure</bf> script:
+
+<tscreen><verb>
+$ tar -xjf mythplugins-0.18.tar.bz2
+$ cd mythplugins
+$ ./configure --help
+
+Usage:   configure [options]
+Options: [defaults in brackets after descriptions]
+NB:      all --enable-* options can be reversed with --disable-*
+
+Generic options:
+  --help                   print this message
+  --enable-all             Enable all options
+  --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
+
+MythBrowser related options:
+  --enable-mythbrowser     build the mythbrowser plugin [default=yes]
+
+MythDVD related options:
+  --enable-mythdvd         build the mythdvd plugin [default=yes]
+  --enable-transcode       enable DVD ripping and transcoding [default=no]
+  --enable-vcd             enable VCD playing [default=no]
+
+MythGallery related options:
+  --enable-mythgallery     build the mythgallery plugin [default=yes]
+  --enable-exif            enable reading of EXIF headers [default=no]
+
+MythGame related options:
+  --enable-mythgame        build the mythgame plugin [default=yes]
+
+MythMusic related options:
+  --enable-mythmusic       build the mythmusic plugin [default=yes]
+  --enable-fftw            enable fftw visualizers [default=no]
+  --enable-sdl             use SDL for the synaesthesia output [default=no]
+  --enable-aac             enable AAC/MP4 audio file decompression [default=no]
+
+MythNews related options:
+  --enable-mythnews        build the mythnews plugin [default=yes]
+
+MythPhone related options:
+  --enable-mythphone       build the mythphone plugin [default=yes]
+  --enable-festival        enable festival TTS Engine [default=no]
+
+MythVideo related options:
+  --enable-mythvideo       build the mythvideo plugin [default=yes]
+
+MythWeather related options:
+  --enable-mythweather     build the mythweather plugin [default=yes]
+</verb></tscreen>
+
+The sections detailing configuration of the plugins assume that you are
+already in the <tt>~/mythplugins/</tt> directory.
+
+Note that a single <bf>configure</bf> script now does configuration for all
+modules.  By default, it will compile all modules.  If you do not wish to
+compile a module, either because it is of no use to you, or you do not have
+the prerequisites, the simplest course of action is to go through the
+various sections below, satisfying the prerequisites, and then compile all
+modules at once.
+
+For example, you would only like to compile and install MythGallery and
+MythMusic.  For MythGallery, you would like to use the EXIF data in the .JPG
+file to present additional information onscreen.  For MythMusic, you would
+like to enable support for the opengl and FFT visualizations.  The command
+line would look like:
+
+<tscreen><verb>
+$ cd ~/mythplugins
+$ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
+$ qmake mythplugins.pro
+$ make
+$ su -
+# make install
+# exit
+$
+</verb></tscreen>
+
+For simplicity, the examples below will disable compilation of all other
+modules other than the one being discussed.
+
 <sect>MythWeb.
-<p>The MythWeb allows you to use a web page to control various
-aspects of your MythTV system.  MythWeb is a separate application, but it's
-dependent on MythTV being installed and operational.
+<p>MythWeb allows you to use a web page to control various aspects of your
+MythTV system.  MythWeb is a separate application, but it's dependent on
+MythTV being installed and operational.
 
 <sect1>Installation and prerequisites
-<p>Download mythweb from <url url="http://www.mythtv.org/"
-name="http://www.mythtv.org/"> and save it to a location where you can find
-it.  The next step depends on whether your distribution has a web server and
-if you have PHP support.
+
+<p>Mythweb is a part of the <bf>mythplugins</bf> package.  See <ref
+id="mythplugins_" name="MythPlugins"> for instructions on downloading the
+tarball. The next step depends on whether your distribution has a web server
+and if you have PHP support.
 
 <sect2>Mandrake 9.0
 <p>Mandrake 9.0 has <bf>apache</bf> and <bf>PHP</bf> pre-packaged, so
@@ -4156,8 +4245,7 @@ Mandrake Control Center.
 <sect1>Completing the installation
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.18.tar.bz2
-$ cd mythweb-0.18
+$ cd ~/mythplugins/mythweb
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4208,21 +4296,22 @@ web browser and go to site:
 separate application, but it's dependent on MythTV being installed and
 operational.
 <sect1>Installation and prerequisites
-<p>Download MythGallery from <url url="http://www.mythtv.org/"
-name="http://www.mythtv.org/"> and save it to a location where you can find
-it.  There are a number of transitions available, some requiring OpenGL
+
+<p>MythGallery is a part of the <bf>mythplugins</bf> package.  See <ref
+id="mythplugins_" name="MythPlugins"> for instructions on downloading the
+tarball.
+
+There are a number of transitions available, some requiring OpenGL
 support.  You will also need to install a TIFF library.  Under Mandrake, you 
 would perform the following command:
 <tscreen><verb>
 # urpmi libtiff3-devel
 </verb></tscreen>
-Once you have satisfied the prerequisites for your distribution, download
-and install the application:
+Once you have satisfied the prerequisites for your distribution, install the application:
 <tscreen><verb>
-$ tar -xjf mythgallery-0.18.tar.bz2
-$ cd mythgallery-0.18
-$ ./configure --enable-opengl
-$ qmake mythgallery.pro
+$ cd ~/mythplugins
+$ ./configure --disable-all --enable-opengl --enable-mythgallery
+$ qmake mythplugins.pro
 $ make
 # su
 # make install
@@ -4488,36 +4577,23 @@ step.
 </figure>
 <sect1>Compiling MythMusic
 <p>Once all the prerequisites have been installed, you can proceed with
-getting MythMusic going. Make sure that you run <tt>./configure</tt> first. 
-If you wish to use the new visualizations, make sure you install the
-prerequisites.  Run <tt>./configure --help</tt> for help.
+compiling MythMusic.
 
-<code>
-NOTE for Red Hat users: Before compiling, make the following modification 
-to settings.pro, otherwise the compile will fail:
-
-Find the following text:
-INCLUDEPATH *= /usr/local/include
-
-immediately below that add
-INCLUDEPATH *= /usr/include/cdda
-
-save and close settings.pro and proceed with compiling MythMusic.
-</code>
 <tscreen><verb>
-$ qmake mythmusic.pro
+$ cd mythplugins
+$ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
+$ qmake mythplugins.pro
 $ make
 $ su
 # make install
 # exit
-$ ./configure
 </verb></tscreen>
 
 <sect1>Configuring MythMusic
 <p>Configuration of MythMusic occurs in two places.  The main mythfrontend
 Setup is for global MythMusic configuration.  Go to the
 Setup/MythMusic/General Setup screen and adjust it for your particular
-setup.
+configuration.
 
 The second configuration screen is within the MythMusic program and will
 allow you rescan your music library, etc.
@@ -4638,14 +4714,15 @@ been deleted the stale information will be gone and your local database
 will be rebuilt as you use CDs.
 
 <sect>MythWeather.
-<p>The MythWeather module will obtain the weather information for the
-location that you specify.  You must be running MythTV v0.10 or later 
-in order to use MythWeather.
 
-Change into the MythWeather directory, then make and make install:
+<p>MythWeather is a part of the <bf>mythplugins</bf> package.  See <ref
+id="mythplugins_" name="MythPlugins"> for instructions on downloading the
+tarball.
+
 <tscreen><verb>
-$ cd mythweather
-$ qmake mythweather.pro
+$ cd mythplugins
+$ ./configure --disable-all --enable-mythweather
+$ qmake mythplugins.pro
 $ make
 $ su
 # make install
@@ -4687,13 +4764,17 @@ the command line as <tt>mythweather --configure</tt>.  These two options are
 mutually exclusive.
 
 <sect>MythVideo.
-<p>The MythVideo application will allow you to use an external program to
-watch media files that are not directly supported by MythTV.
+<p>MythVideo is a part of the <bf>mythplugins</bf> package.  See <ref
+id="mythplugins_" name="MythPlugins"> for instructions on downloading the
+tarball.
 
-Change into the MythVideo directory, then make and make install:
+MythVideo will allow you to use an external program to watch media files
+that are not directly supported by MythTV.
+
 <tscreen><verb>
-$ cd mythvideo
-$ qmake mythvideo.pro
+$ cd ~/mythplugins
+$ ./configure --disable-all --enable-mythvideo
+$ qmake mythplugins.pro
 $ make
 $ su
 # make install
@@ -4703,7 +4784,9 @@ $ su
 See MythVideo's <tt>README</tt> file for additional information.
 
 <sect>MythDVD.
-<p>MythDVD is an application which rips DVDs and makes them available for
+<p>MythDVD is a part of the <bf>mythplugins</bf> package.  See <ref
+id="mythplugins_" name="MythPlugins"> for instructions on downloading the
+tarball.  MythDVD is an application which rips DVDs and makes them available for
 use with MythVideo.  You may also transcode the DVD content from MPEG-2 to
 other formats which should greatly reduce the amount of space the DVD
 material takes up on your hard drive.
@@ -4726,12 +4809,12 @@ prerequisites using the following command:
 # urpmi xvid xvid-devel fame libfame0.9-devel transcode libdvdcss
 </verb></tscreen>
 
-Next comes the configuration and compilation.  If you don't want to
-transcode, then the first command in the next example can simply be
-<tt>./configure</tt>
+In the example below, we have enabled support for transcoding and for VCD
+playing.  You may remove these options if you don't need them.
 <tscreen><verb>
-$ ./configure --enable-transcode
-$ qmake mythdvd.pro
+$ cd ~/mythplugins
+$ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
+$ qmake mythplugins.pro
 $ make
 $ su
 # make install
@@ -4761,7 +4844,17 @@ section called <ref id="mythbackend_autostart" name="Automatically starting
 mythbackend at system boot time"> to start mtd instead of mythbackend.
 
 <sect>MythNews.
-<p>
+<p>MythNews is a part of the <bf>mythplugins</bf> package.  See <ref
+id="mythplugins_" name="MythPlugins"> for instructions on downloading the
+tarball.  MythNews is a RSS reader.
+<tscreen><verb>
+$ cd ~/mythplugins
+$ ./configure --disable-all --enable-mythnews
+$ qmake mythplugins.pro
+$ make
+$ su
+# make install
+</verb></tscreen>
 
 <sect>Troubleshooting.
 <sect1>Compiling
@@ -7485,6 +7578,9 @@ settings.pro since everything is now done in the configure script.  Update
 debugging to reflect new configure script.  Update XMLTV version.  bjm's
 selective restore of program information/migration section added.
 (2004-09-01!)
+
+v0.18.01, 2005-04-20.  Change all the plugins stuff since it's all within
+the mythplugins tarball instead of individual ones.
 
 -->
 

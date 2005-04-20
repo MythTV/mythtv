@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: MythGame.</TITLE>
+ <TITLE>Installing and using MythTV: MythGallery.</TITLE>
  <LINK HREF="mythtv-HOWTO-15.html" REL=next>
  <LINK HREF="mythtv-HOWTO-13.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc14" REL=contents>
@@ -12,7 +12,122 @@
 <A HREF="mythtv-HOWTO-13.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc14">Contents</A>
 <HR>
-<H2><A NAME="s14">14.</A> <A HREF="mythtv-HOWTO.html#toc14">MythGame.</A></H2>
+<H2><A NAME="s14">14.</A> <A HREF="mythtv-HOWTO.html#toc14">MythGallery.</A></H2>
+
+<P>MythGallery is a photo and slideshow application.  MythGallery is a
+separate application, but it's dependent on MythTV being installed and
+operational.</P>
+<H2><A NAME="ss14.1">14.1</A> <A HREF="mythtv-HOWTO.html#toc14.1">Installation and prerequisites</A>
+</H2>
+
+<P>MythGallery is a part of the <B>mythplugins</B> package.  See 
+<A HREF="mythtv-HOWTO-12.html#mythplugins_">MythPlugins</A> for instructions on downloading the
+tarball.</P>
+<P>There are a number of transitions available, some requiring OpenGL
+support.  You will also need to install a TIFF library.  Under Mandrake, you 
+would perform the following command:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libtiff3-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Once you have satisfied the prerequisites for your distribution, install the application:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd ~/mythplugins
+$ ./configure --disable-all --enable-opengl --enable-mythgallery
+$ qmake mythplugins.pro
+$ make
+# su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The configuration for MythGallery is accessed through the main Setup option
+in mythfrontend.  Make sure you set your pictures directory to wherever
+you're storing your photos.</P>
+<P>The controls for MythGallery can be found in the README that comes with the
+application.</P>
+<H2><A NAME="ss14.2">14.2</A> <A HREF="mythtv-HOWTO.html#toc14.2">Using MythGallery</A>
+</H2>
+
+<P>When you first start MythGallery, you will see a thumbnail view of any
+folders and pictures in the Gallery Directory you specified in setup.  If
+this is the first time you have accessed this directory, the thumbnails will
+be generated on the fly.  If the Gallery Dir is writable, these thumbnails
+will be cached thus speeding up future access.  On the left is a greyed-out
+menu of options.</P>
+<P>Use the arrow keys to select a folder or picture to open/view with the
+Select key, or use the Menu key to toggle access the menu on the left.  The
+menu options are as follows:
+<UL>
+<LI> Slideshow - Will cycle through all the pictures in the current folder. 
+The currently selected item must be a picture (not a folder) for this to
+work.  It does not currently traverse subfolders.</LI>
+<LI> Rotate CW - Rotate the current image 90 degrees in the clockwise
+direction.  This change persists if the current directory is writable.</LI>
+<LI> Rotate CCW - As above except the direction of rotation is counter(anti)
+clockwise.</LI>
+<LI> Import - Import pictures into your Gallery Dir.  This option is
+described in the next section.</LI>
+<LI> Settings - Access the MythGallery settings screen.</LI>
+</UL>
+</P>
+<H2><A NAME="ss14.3">14.3</A> <A HREF="mythtv-HOWTO.html#toc14.3">Importing Pictures</A>
+</H2>
+
+<P>The import path in the setup dialog is a colon separated list of
+directories and/or executable files.  When the import key is pressed, a new
+directory (the destination directory) under the current directory will be
+created and the import path will be searched.  If the item in the import
+path is a directory (the source directory), the contents of that directory
+will be copied to the destination directory. If you would like the source
+directory to be that of a removable device, it might be a good idea to use
+autofs.  See the automount howto at 
+<A HREF="www.linuxdoc.org">www.linuxdoc.org</A> for info on how to get it working.</P>
+<P>If the item in the import path is an executable file, MythGallery will
+attempt to execute it with the destination directory as its sole argument.
+Be careful when using executable scripts that the script runs unattended
+(doesn't need user intervention) and returns properly, otherwise it could
+create the appearance of MythGallery hanging (e.g. running
+<B>smbclient</B> and prompting for password).  Also be sure that scripts
+have executable permissions set.</P>
+<P>Here is an example script that a user may want to run
+on import: 
+<BLOCKQUOTE><CODE>
+<PRE>
+#!/bin/csh
+
+if ($#argv == 0) then 
+        echo "Usage: $0 dest_dir" 
+        exit 
+endif 
+
+cd $argv[1]
+
+# get stuff over the network
+wget http://www.somesite.dom/dir/file1.jpg 
+wget http://www.somesite.dom/dir/file2.jpg
+wget http://www.somesite.dom/dir/file3.jpg
+
+# stuff that requires manual module loading and/or fs mounting
+modprobe camera_module
+mount /dev/camera /mnt/camera
+cp /mnt/camera/* $argv[1]
+umount /mnt/camera
+rmmod camera_module
+
+# perform some processing
+foreach pname (`ls *.jpg`)
+        jpegtran -flip vertical $pname > $pname.new
+        mv $pname.new $pname
+end
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-15.html">Next</A>

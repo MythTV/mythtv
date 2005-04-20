@@ -42,9 +42,16 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 </FIGURE>
 
 The other MythTV modules may be downloaded from CVS the same way; replace
-"mythtv" with "mythweather", "mythgallery", "mythmusic", etc.</P>
-<P>If you wish to stay up-to-date with CVS, you may replace "checkout mythtv"
-with <CODE>update mythtv</CODE> after you've done your initial download.</P>
+"mythtv" with "myththemes" or "mythplugins".</P>
+<P>If you wish to stay up-to-date with CVS, go into the MythTV subdirectory and type:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd mythtv
+$ cvs -z3 update -PAd
+</PRE>
+</CODE></BLOCKQUOTE>
+
+after you've done your initial download.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
@@ -240,7 +247,7 @@ account for your particular location and the channels that you have.  This
 configuration will be imported into MythTV when you first run the
 <B>setup</B> program.</P>
 <P>See the section called 
-<A HREF="mythtv-HOWTO-21.html#MigratingtoDD">Migrating from XMLTV to DataDirect</A> for instructions on moving to to DataDirect if you are
+<A HREF="mythtv-HOWTO-22.html#MigratingtoDD">Migrating from XMLTV to DataDirect</A> for instructions on moving to to DataDirect if you are
 currently using XMLTV.  If you are starting from a fresh installation, the
 simplest thing is to immediately start using DataDirect.</P>
 <P>
