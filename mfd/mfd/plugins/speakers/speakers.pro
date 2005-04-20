@@ -7,7 +7,14 @@ INCLUDEPATH += $${LIVEMEDIAPREFIX}/liveMedia
 INCLUDEPATH += $${LIVEMEDIAPREFIX}/groupsock
 INCLUDEPATH += $${LIVEMEDIAPREFIX}/UsageEnvironment
 INCLUDEPATH += $${LIVEMEDIAPREFIX}/BasicUsageEnvironment
-
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/liveMedia/include
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/groupsock/include
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/UsageEnvironment/include
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/BasicUsageEnvironment/include
+LIBS += -L$${LIVEMEDIAPREFIX}/liveMedia
+LIBS += -L$${LIVEMEDIAPREFIX}/groupsock
+LIBS += -L$${LIVEMEDIAPREFIX}/UsageEnvironment
+LIBS += -L$${LIVEMEDIAPREFIX}/BasicUsageEnvironment
 LIBS += -lliveMedia
 LIBS += -lgroupsock
 LIBS += -lBasicUsageEnvironment
