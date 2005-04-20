@@ -6,6 +6,11 @@
 #include <qstring.h>
 #include <qmap.h>
 
+/** \class TSStats
+ *  \brief Collects statistics on the number of TSPacket's seen on each PID.
+ *
+ *  \sa TSPacket, HDTVRecorder
+ */
 class TSStats
 {
   public:

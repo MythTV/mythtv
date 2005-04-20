@@ -8,26 +8,28 @@ using namespace std;
 #include <map>
 #include "DisplayResScreen.h"
 
-/**********************************************************
- *  The DisplayRes module allows for the display resolution
- *  and refresh rateto be changed "on the fly", using an
+/** \class DisplayRes
+ *  \brief The DisplayRes module allows for the display resolution
+ *         and refresh rateto be changed "on the fly".
+ *
+ *  Resolution and refresh rate can be changed using an
  *  explicit call or based on the video resolution.
  *
  *  The SwitchToVideoMode routine takes care of the actual
  *  work involved in changing the display mode. There are
  *  currently XRandR and OSX Carbon implementation so this
  *  works for X11 and OSX.
- **********************************************************/
+ */
 
 typedef enum { GUI = 0, VIDEO = 1, CUSTOM_GUI = 2, CUSTOM_VIDEO = 3 } tmode;
 
 class DisplayRes {
   public:
-    // Factory method that returns DisplayRes singleton
+    /// Factory method that returns DisplayRes singleton
     static DisplayRes *GetDisplayRes(void);
 
-    // Initialize is called automatically on creation, but 
-    // should be called again if the configuration is changed.
+    /// Initialize is called automatically on creation, but 
+    /// should be called again if the configuration is changed.
     bool Initialize(void);
 
     // These return true if mode is changed

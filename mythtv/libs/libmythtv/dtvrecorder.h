@@ -13,6 +13,18 @@
 
 class TSPacket;
 
+/** \class DTVRecorder
+ *  \brief This is a specialization of RecorderBase used to
+ *         handle DVB and ATSC streams.
+ *
+ *  This class is an abstract class. If you are using a
+ *  pcHDTV card with the bttv drivers, ATSC streams are
+ *  handled by the HDTVRecorder. If you are using DVB
+ *  drivers DVBRecorder is used. If you are using firewire
+ *  cable box input the FirewireRecorder is used.
+ *
+ *  \sa DVBRecorder, HDTVRecorder, FirewrireRecorder
+ */
 class DTVRecorder: public RecorderBase
 {
   public:

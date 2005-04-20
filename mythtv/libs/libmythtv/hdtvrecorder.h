@@ -17,6 +17,13 @@ struct AVFormatContext;
 struct AVPacket;
 class ATSCStreamData;
 
+/** \class HDTVRecorder
+ *  \brief This is a specialization of DTVRecorder used to 
+ *         handle streams from bttv drivers, such as the
+ *         vendor drivers for the the HD-2000 and HD-3000.
+ *
+ *  \sa DTVRecorder, DVBRecorder
+ */
 class HDTVRecorder : public DTVRecorder
 {
     friend class ATSCStreamData;

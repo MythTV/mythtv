@@ -18,6 +18,12 @@ using namespace std;
 #include "dvbchannel.h"
 #include "dvbsiparser.h"
 
+/** \class DVBRecorder
+ *  \brief This is a specialization of DTVRecorder used to
+ *         handle streams from DVB drivers.
+ *
+ *  \sa DTVRecorder, HDTVRecorder
+ */
 class DVBRecorder: public QObject, public DTVRecorder
 {
     Q_OBJECT

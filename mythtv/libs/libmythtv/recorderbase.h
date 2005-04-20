@@ -12,6 +12,18 @@ class RingBuffer;
 class ProgramInfo;
 class RecordingProfile;
 
+/** \class RecorderBase
+ *  \brief This is the abstract base class for supporting 
+ *         recorder hardware.
+ *
+ *  For a digital streams specialization, see the DTVRecorder.
+ *  For a specialization for MPEG hardware encoded analog streams,
+ *  see MpegRecorder.
+ *  For a specialization for software encoding of frame grabber
+ *  recorders, see NuppelVideoRecorder.
+ *
+ *  \sa TVRec
+ */
 class RecorderBase
 {
   public:

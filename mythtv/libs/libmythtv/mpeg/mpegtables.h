@@ -364,6 +364,7 @@ class ProgramMapTable : public PSIPTable {
 /** \class AdaptationFieldControl
  *  \brief AdaptationFieldControl is used to transmit various important
  *         stream attributes.
+ *
  *   These include such things as the PCR and flags discontiunities in the
  *   program, such as when a commercial or another program begins. This is
  *   currently just passed through the MythTV recorders to the recorded

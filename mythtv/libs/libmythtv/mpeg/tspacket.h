@@ -15,7 +15,13 @@ using namespace std;
 #define MPEG_PAT_PID  0x0000
 #define ATSC_PSIP_PID 0x1ffb
 
-
+/** \class TSHeader
+ *  \brief Used to access header of a TSPacket.
+ *
+ *  This class is also used to determine which PID a PESPacket arrived on.
+ *
+ *  \sa TSPacket, PESPacket, HDTVRecorder
+ */
 class TSHeader {
   public:
     TSHeader() { _tsdata[0] = SYNC_BYTE; }
@@ -107,6 +113,11 @@ class TSHeader {
     unsigned char _tsdata[4];
 };
 
+/** \class TSHeader
+ *  \brief Used to access the data of a Transport Stream packet.
+ *
+ *  \sa TSHeader, PESPacket, HDTVRecorder
+ */
 class TSPacket : public TSHeader
 {
     friend class PESPacket;
