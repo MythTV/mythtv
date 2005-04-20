@@ -5314,13 +5314,6 @@
   system doesn't try to automount the CD and begin playing it
   automatically.
 
-  Another item to consider:  there are some CDs that contain computer
-  data that runs as a "CD Extra" when inserted into some Windows PCs and
-  Macintoshes.  As of 2003-06-10, MythMusic doesn't support track
-  skipping or individual track selection, so if you have a CD with "CD
-  Extra" data you will not be able to encode it; MythMusic will hang
-  attempting to encode the non-audio data.
-
   Here's some information on playlist management:
 
   Q: How do I create a new playlist?  A: Using the MythMusic "Select
@@ -5357,7 +5350,6 @@
 
   Q: How do I delete an item from a playlist?  A: Highlight the item in
   the selection tree and hit the "d" key.
-
 
   Q: How do I rearrange the songs in my playlist?  A: Highlight a song
   and hit the "space" bar, the song will now have pair of red arrows in
@@ -5429,17 +5421,18 @@
   These are the keyboard commands for MythWeather:
 
 
-       Left Key             Goes back one page, and extends the time spent
-                            on the page you are on.
-       Right Key            Goes forward one page, see above.
-       Space                Pause, wait on the current page until space is hit
-                            again.
-       Numeric Keys         You can check other weather by keying in other ZIP codes.
-       Enter Key            Switch between Celsius and Fahrenheit. Can also
-                            be used a way to force a data update.
-       "m" Key              Resets the location to the database default, then updates the data.
-       "i"                  Enter / Save settings
-       ESC                  Exit the settings screen without saving / Exit the program
+
+  Left Key             Goes back one page, and extends the time spent
+                       on the page you are on.
+  Right Key            Goes forward one page, see above.
+  Space                Pause, wait on the current page until space is hit
+                       again.
+  Numeric Keys         You can check other weather by keying in other ZIP codes.
+  Enter Key            Switch between Celsius and Fahrenheit. Can also
+                       be used a way to force a data update.
+  "m" Key              Resets the location to the database default, then updates the data.
+  "i"                  Enter / Save settings
+  ESC                  Exit the settings screen without saving / Exit the program
 
 
 
@@ -5485,7 +5478,6 @@
   See MythVideo's README file for additional information.
 
 
-
   [1m19.  MythDVD.[0m
 
   MythDVD is a part of the [1mmythplugins [22mpackage.  See ``MythPlugins'' for
@@ -5494,7 +5486,6 @@
   may also transcode the DVD content from MPEG-2 to other formats which
   should greatly reduce the amount of space the DVD material takes up on
   your hard drive.
-
   MythDVD has a number of prerequisites to enable transcoding
   functionality.  If you only wish to play DVDs rather than convert them
   to something like MPEG-4 or xvid you may skip the prerequisite
@@ -5548,15 +5539,14 @@
 
   The last line of text should show something like:
 
-  mtd is listening on port 2342
+
+       mtd is listening on port 2342
 
 
 
   This indicates that mtd is ready for use.  Once you've successfully
   tested mtd in the foreground, type [1mCTRL-C [22mto stop mtd.  You may then
   start it as a background (daemon) process.
-
-
        $ mtd -d
 
 
@@ -5615,6 +5605,7 @@
   This is due to the broken Qt that is being distributed by Suse.  To
   work around this, edit libs/libavcodec/Makefile and remove any "-fPIC"
   you find there and then recompile.
+
 
 
   [1m21.1.3.  make: *** No rule to make target[0m
@@ -5678,12 +5669,13 @@
   that you're running with the debugging code, then compile and install.
 
 
-       $ make distclean
-       $ ./configure --compile-type=debug
-       $ make
-       $ su
-       # make install
-       # exit
+
+  $ make distclean
+  $ ./configure --compile-type=debug
+  $ make
+  $ su
+  # make install
+  # exit
 
 
 
@@ -5735,11 +5727,11 @@
   instructions.
 
 
-
   [1m21.2.4.  Illegal Instruction[0m
 
   This error used to occur when users compiled MythTV with incorrect CPU
   options.  This should no longer occur with the new [1mconfigure [22mscript.
+
 
   [1m21.2.5.  MythTV is crashing your system[0m
 
