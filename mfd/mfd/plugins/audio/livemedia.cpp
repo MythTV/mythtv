@@ -1,4 +1,3 @@
-#ifdef MFD_RTSP_SUPPORT
 /*
     livemedia.cpp
 
@@ -19,6 +18,7 @@ using namespace std;
 #include <uLawAudioFilter.hh>
 #include <GroupsockHelper.hh>
 #include "livemedia.h"
+#ifdef MFD_RTSP_SUPPORT
 
 UniversalPCMSource* UniversalPCMSource::createNew(UsageEnvironment& env, AudioOutput& ao)
 {

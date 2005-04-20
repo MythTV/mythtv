@@ -12,6 +12,7 @@
     
 */
 
+#include "../../../config.h"
 #ifdef MFD_RTSP_SUPPORT
 
 #include <deque>
