@@ -10,7 +10,6 @@ extern "C" {
 }
 #endif
 
-
 #define DEBUG_FRAME_LOCKS 0
 
 #define TRY_LOCK_SPINS                 100
@@ -24,10 +23,61 @@ int next_dbg_str = 0;
  *  This class creates tracks the state of the buffers used by 
  *  various Video Output classes.
  *  
- *  The states available for a buffer are available, used,
- *  limbo, process, and displayed.
+ *  The states available for a buffer are available, limbo, used,
+ *  process, and displayed.
  *  
- *  
+ *  The two most important states are available and used.
+ *  Used is implemented as a FIFO, and is used to buffer
+ *  frames ready for display. A decoder may decode frames
+ *  out of order but must add them to the used queue in
+ *  order. The available buffers are buffers that are ready
+ *  to be used by the decoder.
+ *
+ *  Generally a buffer leaves the available state via
+ *  GetNextFreeFrame(bool,bool,BufferType) and enters the
+ *  limbo state. It then leaves the limbo state via 
+ *  ReleaseFrame(VideoFrame*) and enters the used state.
+ *  Then it leaves the used state via DoneDisplayingFrame()
+ *  and enters the available state.
+ *
+ *  At any point, DiscardFrame(VideoFrame*) can be called
+ *  to remove the frame from the current state and add it
+ *  to the available list.
+ *
+ *  However, there are two additional states available, these
+ *  are currently used by VideoOutputXv for XvMC support.
+ *  These are the process and displayed state. The process
+ *  state simply indicates that the frame has been picked up
+ *  in the VideoOutput::ProcessFrame() call, but
+ *  VideoOutput::Show() has not yet used the frame. This
+ *  is needed because a frame other than a used frame
+ *  is being held by VideoOutput and we don't want to lose
+ *  it if the stream is reset. The displayed state indicates
+ *  that DoneDisplayingFrame() has been called for the frame,
+ *  but it can not yet be added to available because it is
+ *  still being displayed. VideoOutputXv calls
+ *  DiscardFrame(VideoFrame*) on the frames no longer
+ *  being displayed at the end of the next 
+ *  DoneDisplayingFrame(), finally adding them to available.
+ *
+ *  Frame locking is also available, the locks are reqursive
+ *  QMutex locks. If more than one frame lock is needed the
+ *  LockFrames should generally be called with all the needed
+ *  locks in the list, and no locks currently held. This 
+ *  function will spin until all the locks can be held at
+ *  once, avoiding deadlocks from mismatched locking order.
+ *
+ *  The only method that returns with a lock held on the VideoBuffers
+ *  object itself, preventing anyone else from using the VideoBuffers
+ *  class, inluding to unlocking frames, is the begin_lock(BufferType).
+ *  This method is to be used with extreme caution, in particular one
+ *  should not attempt to acquire any locks before end_lock() is called.
+ *
+ *  There are also frame inheritence tracking functions, these are
+ *  used by VideoOutputXv to avoid throwing away displayed frames too
+ *  early. See videoout_xv.cpp for their use.
+ *
+ * \see VideoOutput
  */
 
 VideoBuffers::VideoBuffers()
@@ -57,7 +107,7 @@ VideoBuffers::~VideoBuffers()
  * \param numdecode            number of buffers to allocate for normal use
  * \param extra_for_pause      allocate an extra buffer, a scratch a frame for pause
  * \param need_free            maximum number of buffers needed in display
- *                             and process
+ *                             and pause
  * \param needprebuffer_normal number buffers you can put in used or limbo normally
  * \param needprebuffer_small  number of buffers you can put in used or limbo 
  *                             after SetPrebuffering(false) has been called.
@@ -123,7 +173,7 @@ void VideoBuffers::Reset()
     available.clear();
     used.clear();
     limbo.clear();
-    process.clear();
+    pause.clear();
     displayed.clear();
     parents.clear();
     children.clear();
@@ -171,16 +221,20 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(bool with_lock,
         frame = available.dequeue();
         while (frame && used.contains(frame))
         {
-            VERBOSE(VB_GENERAL, "GetNextFreeFrame() served a busy frame. Dropping."
-                    "    "<<GetStatus());
+            VERBOSE(VB_GENERAL,
+                    QString("GetNextFreeFrame() served a busy frame %1. Dropping."
+                            "   %2")
+                    .arg(DebugString(frame)).arg(GetStatus()));
             frame = available.dequeue();
         }
 
         // only way this should be triggered if we're in unsafe mode
         if (!frame && allow_unsafe)
         {
-            VERBOSE(VB_IMPORTANT, "GetNextFreeFrame() is getting a busy frame."
-                    "        "<<GetStatus());
+            VERBOSE(VB_IMPORTANT,
+                    QString("GetNextFreeFrame() is getting a busy frame %1."
+                            "       %2")
+                    .arg(DebugString(frame)).arg(GetStatus()));
             frame = used.dequeue();
             if (EnoughFreeFrames())
                 available_wait.wakeAll();
@@ -206,8 +260,11 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(bool with_lock,
         {
             if (frame)
             {
-                VERBOSE(VB_IMPORTANT, "GetNextFreeFrame() unable to lock frame. "
-                        <<DebugString(frame)<<" Dropping. "<<GetStatus());
+                VERBOSE(VB_IMPORTANT,
+                        QString("GetNextFreeFrame() unable to lock frame %1. "
+                                "Dropping %2")
+                        .arg(DebugString(frame))
+                        .arg(GetStatus()));
                 DiscardFrame(frame);
             }
             ++tries;
@@ -285,17 +342,25 @@ void VideoBuffers::DoneDisplayingFrame(void)
 void VideoBuffers::DiscardFrame(VideoFrame *frame)
 {
     global_lock.lock();
-    if (TryLockFrame(frame, "DiscardFrame"))
+    bool ok = TryLockFrame(frame, "DiscardFrame A");
+    for (uint i=0; i<5 && !ok; i++)
+    {
+        global_lock.unlock();
+        usleep(50);
+        global_lock.lock();
+        ok = TryLockFrame(frame, "DiscardFrame B");
+    }
+
+    if (ok)
     {
         safeEnqueue(kVideoBuffer_avail, frame);
-        if (EnoughFreeFrames())
-            available_wait.wakeAll();
-
         UnlockFrame(frame, "DiscardFrame");
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Unable to Discard Frame "<<DebugString(frame));
+        VERBOSE(VB_IMPORTANT, QString("VideoBuffers::DiscardFrame(): "
+                                      "Unable to obtain lock on %1, %2")
+                .arg(DebugString(frame, true)).arg(GetStatus()));
     }
     global_lock.unlock();
 }
@@ -313,8 +378,8 @@ frame_queue_t *VideoBuffers::queue(BufferType type)
         q = &displayed;
     else if (type == kVideoBuffer_limbo)
         q = &limbo;
-    else if (type == kVideoBuffer_process)
-        q = &process;
+    else if (type == kVideoBuffer_pause)
+        q = &pause;
     global_lock.unlock();
 
     return q;
@@ -333,8 +398,8 @@ const frame_queue_t *VideoBuffers::queue(BufferType type) const
         q = &displayed;
     else if (type == kVideoBuffer_limbo)
         q = &limbo;
-    else if (type == kVideoBuffer_process)
-        q = &process;
+    else if (type == kVideoBuffer_pause)
+        q = &pause;
     global_lock.unlock();
 
     return q;
@@ -390,7 +455,7 @@ void VideoBuffers::enqueue(BufferType type, VideoFrame *frame)
             q->remove(frame);
             q->enqueue(frame);
             global_lock.unlock();
-            if (q == &available)
+            if (q == &available && EnoughFreeFrames())
                 available_wait.wakeAll();
         }
     }
@@ -409,8 +474,8 @@ void VideoBuffers::remove(BufferType type, VideoFrame *frame)
             displayed.remove(frame);
         if ((type & kVideoBuffer_limbo) == kVideoBuffer_limbo)
             limbo.remove(frame);
-        if ((type & kVideoBuffer_process) == kVideoBuffer_process)
-            process.remove(frame);
+        if ((type & kVideoBuffer_pause) == kVideoBuffer_pause)
+            pause.remove(frame);
         global_lock.unlock();
     }
 }
@@ -430,10 +495,13 @@ void VideoBuffers::requeue(BufferType dst, BufferType src, int num)
 
 void VideoBuffers::safeEnqueue(BufferType dst, VideoFrame* frame)
 {
-    global_lock.lock();
-    remove(kVideoBuffer_all, frame);
-    enqueue(dst, frame);
-    global_lock.unlock();
+    if (frame)
+    {
+        global_lock.lock();
+        remove(kVideoBuffer_all, frame);
+        enqueue(dst, frame);
+        global_lock.unlock();
+    }
 }
 
 frame_queue_t::iterator VideoBuffers::begin_lock(BufferType type)
@@ -442,7 +510,8 @@ frame_queue_t::iterator VideoBuffers::begin_lock(BufferType type)
     frame_queue_t *q = queue(type);
     if (q)
         return q->begin();
-    return available.begin();
+    else
+        return available.begin();
 }
 
 frame_queue_t::iterator VideoBuffers::end(BufferType type)
@@ -510,41 +579,45 @@ const VideoFrame *VideoBuffers::GetScratchFrame(void) const
  */
 void VideoBuffers::DiscardFrames(void)
 {
-    for (uint i=0; i<size(); i++)
-        RemoveInheritence(at(i));
-
     global_lock.lock();
-    VERBOSE(VB_PLAYBACK, QString("DiscardFrames()       used %1 limbo %2")
-            .arg(DebugString(used))
-            .arg(DebugString(limbo)));
+    VERBOSE(VB_PLAYBACK, QString("VideoBuffers::DiscardFrames(): %1")
+            .arg(GetStatus()));
 
-    while (!used.empty())
-        DiscardFrame(used.dequeue());
+    // Remove inheritence of all frames not in displayed or pause
+    frame_queue_t ula(used);
+    ula.insert(ula.end(), limbo.begin(), limbo.end());
+    ula.insert(ula.end(), available.begin(), available.end());
+    frame_queue_t::iterator it;
+    for (it = ula.begin(); it != ula.end(); ++it)
+        RemoveInheritence(*it);
 
-    while (!limbo.empty())
-        DiscardFrame(limbo.dequeue());
+    // Discard frames
+    frame_queue_t discards(used);
+    discards.insert(discards.end(), limbo.begin(), limbo.end());
+    for (it = discards.begin(); it != discards.end(); ++it)
+        DiscardFrame(*it);
 
-    const uint nbuf = available.count() +
-        displayed.count() + process.count();
-    if (nbuf != size())
+    // Verify that things are kosher
+    if (available.count() + pause.count() + displayed.count() != size())
     {
         for (uint i=0; i < size(); i++)
         {
             if (!available.contains(at(i)) &&
-                !process.contains(at(i)) &&
+                !pause.contains(at(i)) &&
                 !displayed.contains(at(i)))
             {
-                VERBOSE(VB_IMPORTANT, "ERROR: "<<DebugString(at(i), true)
-                        <<" not in available, process, or displayed   "
-                        <<GetStatus());
+                VERBOSE(VB_IMPORTANT,
+                        QString("VideoBuffers::DiscardFrames(): ERROR, %1 not "
+                                "in available, pause, or displayed %2")
+                        .arg(DebugString(at(i), true))
+                        .arg(GetStatus()));
                 DiscardFrame(at(i));
             }
         }
     }
 
-    VERBOSE(VB_PLAYBACK, "DiscardFrames() -- done() "<<GetStatus());
-
-    available_wait.wakeAll();
+    VERBOSE(VB_PLAYBACK, QString("VideoBuffers::DiscardFrames(): %1 -- done()")
+            .arg(GetStatus()));
 
     global_lock.unlock();
 }
@@ -629,8 +702,8 @@ void VideoBuffers::LockFrames(vector<const VideoFrame*>& vec, const QString& own
                     UnlockFrame(vec[i], "");
             usleep(50);
 #if DEBUG_FRAME_LOCKS
-            VERBOSE(VB_PLAYBACK, "no lock, frames: "<<DebugString(vec)
-                    <<" "<<GetStatus()<<" "<<owner);
+            VERBOSE(VB_PLAYBACK, QString("no lock, frames: %1 %2 %3")
+                    .arg(DebugString(vec)).arg(GetStatus()).arg(owner));
 #endif
         }
     }
@@ -648,8 +721,8 @@ bool VideoBuffers::TryLockFrame(const VideoFrame *frame, const QString &owner)
     frame_lock.lock();
 #if DEBUG_FRAME_LOCKS
     if (owner!="")
-        VERBOSE(VB_PLAYBACK, "try lock frame:  "
-                <<DebugString(frame)<<" "<<GetStatus()<<" "<<owner);
+        VERBOSE(VB_PLAYBACK, QString("try lock frame:  %1 %2 %3")
+                .arg(DebugString(frame)).arg(GetStatus()).arg(owner));
 #endif
 
     frame_lock_map_t::iterator it = frame_locks.find(frame);
@@ -665,7 +738,6 @@ bool VideoBuffers::TryLockFrame(const VideoFrame *frame, const QString &owner)
     {
         QString str = (ok) ? "got lock:        " : "try lock failed: ";
         VERBOSE(VB_PLAYBACK, str.append(DebugString(frame)));
-
     }
 #endif
     frame_lock.unlock();
@@ -683,8 +755,8 @@ void VideoBuffers::UnlockFrame(const VideoFrame *frame, const QString &owner)
     frame_lock.lock();
 #if DEBUG_FRAME_LOCKS
     if (owner!="")
-        VERBOSE(VB_PLAYBACK, "unlocking frame: "
-                <<DebugString(frame)<<" "<<GetStatus()<<" "<<owner);
+        VERBOSE(VB_PLAYBACK, QString("unlocking frame: %1 %2 %3")
+                .arg(DebugString(frame)).arg(GetStatus()).arg(owner));
 #endif
 
     frame_lock_map_t::iterator it = frame_locks.find(frame);
@@ -697,8 +769,8 @@ void VideoBuffers::UnlockFrames(vector<const VideoFrame*>& vec, const QString& o
 {
     (void)owner;
 #if DEBUG_FRAME_LOCKS
-    VERBOSE(VB_PLAYBACK, "unlocking frames:"<<DebugString(vec)<<" "
-            <<GetStatus()<<" "<<owner);
+    VERBOSE(VB_PLAYBACK, QString("unlocking frames:%1 %2 %3")
+            .arg(DebugString(vec)).arg(GetStatus()).arg(owner));
 #endif
     for (uint i=0; i<vec.size(); i++)
         UnlockFrame(vec[i], "");
@@ -706,6 +778,7 @@ void VideoBuffers::UnlockFrames(vector<const VideoFrame*>& vec, const QString& o
 
 void VideoBuffers::AddInheritence(const VideoFrame *frame)
 {
+    (void)frame;
 #ifdef USING_XVMC
     inheritence_lock.lock();
     
@@ -718,7 +791,8 @@ void VideoBuffers::AddInheritence(const VideoFrame *frame)
         VideoFrame *past = xvmc_surf_to_frame[render->p_past_surface];
         if (past==frame)
         {
-            VERBOSE(VB_IMPORTANT, "AddInheritence("<<DebugString(frame)<<") past=frame");
+            VERBOSE(VB_IMPORTANT, QString("AddInheritence(%1) past=frame")
+                    .arg(DebugString(frame)));
             VERBOSE(VB_IMPORTANT, "render->p_surface      = "<<
                     ((void*)render->p_surface));
             VERBOSE(VB_IMPORTANT, "render->p_past_surface = "<<
@@ -741,7 +815,8 @@ void VideoBuffers::AddInheritence(const VideoFrame *frame)
         VideoFrame *future = xvmc_surf_to_frame[render->p_future_surface];
         if (future==frame)
         {
-            VERBOSE(VB_IMPORTANT, "AddInheritence("<<DebugString(frame)<<") future=frame");
+            VERBOSE(VB_IMPORTANT, QString("AddInheritence(%1) future=frame")
+                    .arg(DebugString(frame)));
             VERBOSE(VB_IMPORTANT, "render->p_surface        = "<<
                     ((void*)render->p_surface));
             VERBOSE(VB_IMPORTANT, "render->p_future_surface = "<<
@@ -755,14 +830,17 @@ void VideoBuffers::AddInheritence(const VideoFrame *frame)
                 new_parents.push_back(future);
             else
             {
-                VERBOSE(VB_IMPORTANT, "AddInheritence future "
-                        <<DebugString(future)<<" NOT in used or in limbo");
+                VERBOSE(VB_IMPORTANT,
+                        QString("AddInheritence future %1 NOT in used "
+                                "or in limbo").arg(DebugString(future)));
                 if (displayed.contains(future))
-                    VERBOSE(VB_IMPORTANT, "AddInheritence future "
-                            <<DebugString(future)<<" is in done");
+                    VERBOSE(VB_IMPORTANT,
+                            QString("AddInheritence future %1 "
+                                    " is in done").arg(DebugString(future)));
                 if (limbo.contains(future))
-                    VERBOSE(VB_IMPORTANT, "AddInheritence future "
-                            <<DebugString(future)<<" is in limbo");
+                    VERBOSE(VB_IMPORTANT,
+                            QString("AddInheritence future %1 "
+                                    " is in limbo").arg(DebugString(future)));
             }
         }
 
@@ -873,18 +951,54 @@ VideoFrame* VideoBuffers::GetOSDFrame(VideoFrame *frame)
     xvmc_render_state_t* r = GetRender(frame);
     VideoFrame* f = NULL;
     if (r)
-        f = (VideoFrame *)(r->p_osd_target_surface_render);
-    UnlockFrame(frame, "GetOSDFrame");
+        f = (VideoFrame*) (r->p_osd_target_surface_render);
+
+    QString dbg_str("GetOSDFrame ");
+#if DEBUG_FRAME_LOCKS
+    if (f)
+        dbg_str.append(DebugString(f, true));
+#endif
+    UnlockFrame(frame, dbg_str);
+
     return f;
 }
 
 void VideoBuffers::SetOSDFrame(VideoFrame *frame, VideoFrame *osd)
 {
+    if (frame==osd)
+    {
+        VERBOSE(VB_IMPORTANT, QString("SetOSDFrame() -- frame==osd %1")
+                .arg(GetStatus()));
+        return;
+    }
+
     LockFrame(frame, "SetOSDFrame");
     xvmc_render_state_t* r = GetRender(frame);
     if (r)
+    {
+        global_lock.lock();
+
+        VideoFrame* old_osd = (VideoFrame*) r->p_osd_target_surface_render;
+        if (old_osd)
+            xvmc_osd_parent[old_osd] = NULL;
+
         r->p_osd_target_surface_render = osd;
+
+        if (osd)
+            xvmc_osd_parent[osd] = frame;
+
+        global_lock.unlock();
+    }
     UnlockFrame(frame, "SetOSDFrame");
+}
+
+VideoFrame* VideoBuffers::GetOSDParent(VideoFrame *osd)
+{
+    VideoFrame *parent = NULL;
+    global_lock.lock();
+    parent = xvmc_osd_parent[osd];
+    global_lock.unlock();
+    return parent;
 }
 
 #endif
@@ -950,7 +1064,7 @@ bool VideoBuffers::CreateBuffers(int width, int height,
         xvmc_vo_surf_t *surf    = (xvmc_vo_surf_t*) surfs[i];
         xvmc_render_state_t *render = new xvmc_render_state_t;
         allocated_structs.push_back((unsigned char*)render);
-        memset(render, 0, sizeof(xvmc_render_state_t));
+        bzero(render, sizeof(xvmc_render_state_t));
         buffers[i].buf          = (unsigned char*) render;
 
         // constants
@@ -1017,7 +1131,9 @@ void VideoBuffers::DeleteBuffers()
     for (uint i = 0; i < allocated_arrays.size(); i++)
         delete [] allocated_arrays[i];
     allocated_arrays.clear();
+#ifdef USING_XVMC
     xvmc_surf_to_frame.clear();
+#endif
 }
 
 static unsigned long long to_bitmap(const frame_queue_t& list);
@@ -1033,20 +1149,20 @@ QString VideoBuffers::GetStatus(int n)
         unsigned long long u = to_bitmap(used);
         unsigned long long d = to_bitmap(displayed);
         unsigned long long l = to_bitmap(limbo);
-        unsigned long long p = to_bitmap(process);
+        unsigned long long p = to_bitmap(pause);
         for (uint i=0; i<(uint)n; i++)
         {
             unsigned long long mask = 1<<i;
             if (a & mask)
                 str += "A";
             else if (u & mask)
-                str += "u";
+                str += "U";
             else if (d & mask)
                 str += "d";
             else if (l & mask)
                 str += "L";
             else if (p & mask)
-                str += "P";
+                str += "p";
             else
                 str += " ";
         }
@@ -1079,16 +1195,11 @@ QString dbg_str_arr[40] =
 };
 QString dbg_str_arr_short[40] =
 {
-"A","B","C","D",
-"E","F","G","H", // 8
-"a","b","c","d",
-"e","f","g","h", // 16
-"0","1","2","3",
-"4","5","6","7", // 24
-"I","J","K","L",
-"M","N","O","P", // 32
-"i","j","k","l",
-"m","n","o","p", // 40
+    "A","B","C","D","E","F","G","H", // 8
+    "a","b","c","d","e","f","g","h", // 16
+    "0","1","2","3","4","5","6","7", // 24
+    "I","J","K","L","M","N","O","P", // 32
+    "i","j","k","l","m","n","o","p", // 40
 };
 
 map<const VideoFrame *, int> dbg_str;

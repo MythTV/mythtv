@@ -9,6 +9,7 @@ extern "C" {
 #include <vector>
 #include <map>
 #include <qmutex.h>
+#include <qstring.h>
 #include <qwaitcondition.h>
 #include "mythdeque.h"
 
@@ -23,7 +24,9 @@ typedef map<const void*, VideoFrame*>         surf_to_frame_map_t;
 typedef map<const unsigned char*, void*>      buffer_map_t;
 typedef map<const VideoFrame*, uint>          vbuffer_map_t;
 typedef map<const VideoFrame*, QMutex*>       frame_lock_map_t;
+typedef map<const VideoFrame*, VideoFrame*>   frame_to_frame_map_t;
 typedef vector<unsigned char*>                uchar_vector_t;
+
 
 const QString& DebugString(const VideoFrame *frame, bool short_str=false);
 const QString& DebugString(uint str_num, bool short_str=false);
@@ -35,7 +38,7 @@ enum BufferType
     kVideoBuffer_avail     = 0x00000001,
     kVideoBuffer_limbo     = 0x00000002,
     kVideoBuffer_used      = 0x00000004,
-    kVideoBuffer_process   = 0x00000008,
+    kVideoBuffer_pause     = 0x00000008,
     kVideoBuffer_displayed = 0x00000010,
     kVideoBuffer_all       = 0x0000001F,
 };
@@ -80,6 +83,7 @@ class VideoBuffers
     void end_lock() { global_lock.unlock(); } // this unlocks VideoBuffer
     uint size(BufferType type) const;
     bool contains(BufferType type, VideoFrame*) const;
+
     VideoFrame *GetScratchFrame(void);
     const VideoFrame *GetScratchFrame() const;
     VideoFrame *GetLastDecodedFrame(void) { return at(vpos); }
@@ -118,18 +122,20 @@ class VideoBuffers
     VideoFrame* FutureFrame(VideoFrame *frame);
     VideoFrame* GetOSDFrame(VideoFrame *frame);
     void SetOSDFrame(VideoFrame *frame, VideoFrame *osd);
+    VideoFrame* GetOSDParent(VideoFrame *osd);
     bool CreateBuffers(int width, int height,
                        Display *disp,
                        void* xvmc_ctx,
                        void* xvmc_surf_info,
                        vector<void*> surfs);
 #endif
-  private:
+
     QString GetStatus(int n=-1); // debugging method
+  private:
     frame_queue_t         *queue(BufferType type);
     const frame_queue_t   *queue(BufferType type) const;
 
-    frame_queue_t          available, used, limbo, process, displayed;
+    frame_queue_t          available, used, limbo, pause, displayed;
     vbuffer_map_t          vbufferMap; // videobuffers to buffer's index
     frame_vector_t         buffers;
     uchar_vector_t         allocated_structs; // for DeleteBuffers
@@ -156,8 +162,8 @@ class VideoBuffers
     frame_lock_map_t       frame_locks;
 
 #ifdef USING_XVMC
-  public:
     surf_to_frame_map_t    xvmc_surf_to_frame;
+    frame_to_frame_map_t   xvmc_osd_parent;
 #endif
 };
 
