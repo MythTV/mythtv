@@ -320,28 +320,22 @@ Other key 2 </TD><TD> c </TD><TD> Change tuner card input
 
 <P>MythTV is "themeable", meaning that the visual appearance of the program
 can be modified by the user without re-compiling or altering the program
-functionality.  The MythTV website has a Themes section; pick a theme you'd
-like to use and download it to your system.</P>
-<P>Once it's on your machine, you must move the file and untar it:
+functionality.  Download the MythThemes tarball from the website and untar it:</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ su
-# cp funhouse.tar.gz /usr/local/share/mythtv/themes
-# cd /usr/local/share/mythtv/themes
-# tar -xzf funhouse.tar.gz
+$ tar -xjf myththemes-0.18.tar.bz2
+$ cd ~/myththemes-0.18
+$ qmake myththemes.pro
+$ su -
+# make install
 # exit
+$
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>The theme will now be available in the mythfrontend Appearance section.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  if the theme file you downloaded is a <CODE>bz2</CODE> file, use
-<CODE>tar -xjf</CODE> rather than <CODE>tar -xzf</CODE>.</CAPTION>
-</FIGURE>
-</P>
+
 <H2><A NAME="ss11.3">11.3</A> <A HREF="mythtv-HOWTO.html#toc11.3">Adding DirecTV information to the database</A>
 </H2>
 

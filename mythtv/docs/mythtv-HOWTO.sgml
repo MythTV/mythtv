@@ -3556,27 +3556,20 @@ Other key 2            | c                | Change tuner card input
 <sect1>Using themes with MythTV
 <p>MythTV is "themeable", meaning that the visual appearance of the program
 can be modified by the user without re-compiling or altering the program
-functionality.  The MythTV website has a Themes section; pick a theme you'd
-like to use and download it to your system.
+functionality.  Download the MythThemes tarball from the website and untar it:
 
-Once it's on your machine, you must move the file and untar it:
 <tscreen><verb>
-$ su
-# cp funhouse.tar.gz /usr/local/share/mythtv/themes
-# cd /usr/local/share/mythtv/themes
-# tar -xzf funhouse.tar.gz
+$ tar -xjf myththemes-0.18.tar.bz2
+$ cd ~/myththemes-0.18
+$ qmake myththemes.pro
+$ su -
+# make install
 # exit
-</verb></tscreen>
+$
+</verb</tscreen>
 
 The theme will now be available in the mythfrontend Appearance section.
 
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  if the theme file you downloaded is a <tt>bz2</tt> file, use
-<tt>tar -xjf</tt> rather than <tt>tar -xzf</tt>.
-</caption>
-</figure>
 <!-- REMOVE ME START -->
 <sect1>Adding DirecTV information to the database
 <p>A script used to exist for adding DirecTV pay-per-view information into
@@ -4180,7 +4173,7 @@ MythWeather related options:
 </verb></tscreen>
 
 The sections detailing configuration of the plugins assume that you are
-already in the <tt>~/mythplugins/</tt> directory.
+already in the <tt>~/mythplugins-0.18/</tt> directory.
 
 Note that a single <bf>configure</bf> script now does configuration for all
 modules.  By default, it will compile all modules.  If you do not wish to
@@ -4196,7 +4189,7 @@ like to enable support for the opengl and FFT visualizations.  The command
 line would look like:
 
 <tscreen><verb>
-$ cd ~/mythplugins
+$ cd ~/mythplugins-0.18
 $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
 $ qmake mythplugins.pro
 $ make
@@ -4245,7 +4238,7 @@ Mandrake Control Center.
 <sect1>Completing the installation
 <p>
 <tscreen><verb>
-$ cd ~/mythplugins/mythweb
+$ cd ~/mythplugins-0.18/mythweb
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4309,7 +4302,7 @@ would perform the following command:
 </verb></tscreen>
 Once you have satisfied the prerequisites for your distribution, install the application:
 <tscreen><verb>
-$ cd ~/mythplugins
+$ cd ~/mythplugins-0.18
 $ ./configure --disable-all --enable-opengl --enable-mythgallery
 $ qmake mythplugins.pro
 $ make
@@ -4765,7 +4758,7 @@ MythVideo will allow you to use an external program to watch media files
 that are not directly supported by MythTV.
 
 <tscreen><verb>
-$ cd ~/mythplugins
+$ cd ~/mythplugins-0.18
 $ ./configure --disable-all --enable-mythvideo
 $ qmake mythplugins.pro
 $ make
@@ -4805,7 +4798,7 @@ prerequisites using the following command:
 In the example below, we have enabled support for transcoding and for VCD
 playing.  You may remove these options if you don't need them.
 <tscreen><verb>
-$ cd ~/mythplugins
+$ cd ~/mythplugins-0.18
 $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
 $ qmake mythplugins.pro
 $ make
@@ -4841,7 +4834,7 @@ mythbackend at system boot time"> to start mtd instead of mythbackend.
 id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.  MythNews is a RSS reader.
 <tscreen><verb>
-$ cd ~/mythplugins
+$ cd ~/mythplugins-0.18
 $ ./configure --disable-all --enable-mythnews
 $ qmake mythplugins.pro
 $ make

@@ -4106,17 +4106,18 @@
 
   MythTV is "themeable", meaning that the visual appearance of the
   program can be modified by the user without re-compiling or altering
-  the program functionality.  The MythTV website has a Themes section;
-  pick a theme you'd like to use and download it to your system.
-
-  Once it's on your machine, you must move the file and untar it:
+  the program functionality.  Download the MythThemes tarball from the
+  website and untar it:
 
 
-       $ su
-       # cp funhouse.tar.gz /usr/local/share/mythtv/themes
-       # cd /usr/local/share/mythtv/themes
-       # tar -xzf funhouse.tar.gz
+
+       $ tar -xjf myththemes-0.18.tar.bz2
+       $ cd ~/myththemes-0.18
+       $ qmake myththemes.pro
+       $ su -
+       # make install
        # exit
+       $
 
 
 
@@ -4124,9 +4125,6 @@
   section.
 
 
-
-        [1mNOTE[22m:  if the theme file you downloaded is a bz2 file, use
-  tar -xjf rather than tar -xzf.
 
   [1m11.3.  Adding DirecTV information to the database[0m
 
@@ -4257,6 +4255,7 @@
      roughly be the time your systems need to bootup, and if you have
      Slave backends, you'll need to ensure this value is long enough for
      all your machines to perform their bootup cycle.
+
   +o  "Wakeup time format" is the format of the wakeup time that is given
      in the "Set wakeuptime command" as a parameter "$time". You need to
      set this according to your wakeup mechanism. If you need secondss
@@ -4322,6 +4321,8 @@
 
        #! /bin/sh
        echo $@ | nc $SERVER $PORT
+
+
 
   This simply cats the parameters (that is $time) to my 24/7 server. On
   my $SERVER I have (x)inetd listening on $PORT starting a little script
@@ -4794,7 +4795,7 @@
 
 
   The sections detailing configuration of the plugins assume that you
-  are already in the ~/mythplugins/ directory.
+  are already in the ~/mythplugins-0.18/ directory.
 
   Note that a single [1mconfigure [22mscript now does configuration for all
   modules.  By default, it will compile all modules.  If you do not wish
@@ -4809,7 +4810,7 @@
   MythMusic, you would like to enable support for the opengl and FFT
   visualizations.  The command line would look like:
 
-       $ cd ~/mythplugins
+       $ cd ~/mythplugins-0.18
        $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
        $ qmake mythplugins.pro
        $ make
@@ -4863,7 +4864,7 @@
 
 
 
-  $ cd ~/mythplugins/mythweb
+  $ cd ~/mythplugins-0.18/mythweb
   $ su
   # mkdir /var/www/html/mythweb
   # cp -r . /var/www/html/mythweb
@@ -4941,7 +4942,7 @@
   install the application:
 
 
-       $ cd ~/mythplugins
+       $ cd ~/mythplugins-0.18
        $ ./configure --disable-all --enable-opengl --enable-mythgallery
        $ qmake mythplugins.pro
        $ make
@@ -5465,7 +5466,7 @@
 
 
 
-       $ cd ~/mythplugins
+       $ cd ~/mythplugins-0.18
        $ ./configure --disable-all --enable-mythvideo
        $ qmake mythplugins.pro
        $ make
@@ -5517,7 +5518,7 @@
   VCD playing.  You may remove these options if you don't need them.
 
 
-       $ cd ~/mythplugins
+       $ cd ~/mythplugins-0.18
        $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
        $ qmake mythplugins.pro
        $ make
@@ -5565,7 +5566,7 @@
   reader.
 
 
-       $ cd ~/mythplugins
+       $ cd ~/mythplugins-0.18
        $ ./configure --disable-all --enable-mythnews
        $ qmake mythplugins.pro
        $ make
