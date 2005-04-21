@@ -75,11 +75,11 @@ MaopInstance::MaopInstance(AudioPlugin *owner, QString l_name, QString l_address
                 .arg(port), 4);
 
     //
-    //  Prime the pump by sending a status command
+    //  Send initial request to get status
     //
     
     sendRequest("status");
-    
+
     //
     //  Keep track of the file descriptor for this socket
     //
@@ -115,6 +115,8 @@ void MaopInstance::checkIncoming()
     //  See if there's anything coming in from the actual maop service
     //
     
+    client_socket_mutex.lock();
+
     if (client_socket_to_maop_service->bytesAvailable())
     {
         char incoming[4096];
@@ -169,6 +171,7 @@ void MaopInstance::checkIncoming()
             }
         }
     }
+    client_socket_mutex.unlock();
 }
 
 void MaopInstance::sendRequest(const QString &the_request)
@@ -176,18 +179,48 @@ void MaopInstance::sendRequest(const QString &the_request)
     QString newlined_request = the_request;
     newlined_request.append("\n");
     client_socket_mutex.lock();
+
         int length = client_socket_to_maop_service->writeBlock(newlined_request.ascii(), newlined_request.length());
+
+        if (length < 0)
+        {
+            //
+            //  An "error" occured. If the error is type 0 (No Error), try some
+            //  more
+            //     
+
+            if (client_socket_to_maop_service->error() == QSocketDevice::NoError)
+            {
+                int try_more = 0;
+            
+                while(try_more < 10)
+                {
+                    length = client_socket_to_maop_service->writeBlock(newlined_request.ascii(), newlined_request.length());
+                    if(length >= 0)
+                    {
+                        try_more = 20;
+                    }
+                    else
+                    {
+                        usleep(200);
+                        try_more++;
+                    }
+                }
+            }
+        }
+        
+        if(length < 0)
+        {
+            warning(QString("maop instance could not talk to maop service (Error #%1)")
+                            .arg(client_socket_to_maop_service->error()));
+            all_is_well = false;
+        }   
+        else if (length != (int) newlined_request.length())
+        {
+            warning("maop instance could not send correct amount of data to maop service");
+            all_is_well = false;
+        }
     client_socket_mutex.unlock();
-    if (length < 0)
-    {
-        warning("maop instance could not talk to maop service");
-        all_is_well = false;
-    }
-    else if (length != (int) newlined_request.length())
-    {
-        warning("maop instance could not send correct amount of data to maop service");
-        all_is_well = false;
-    }
 }
 
 
