@@ -70,7 +70,6 @@ class CommDetect : public QObject
     bool SceneHasChanged(void);
 
     void SetAggressiveDetection(bool onOff)  { aggressiveDetection = onOff; }
-    void SetCommSkipAllBlanks(bool onOff)  { skipAllBlanks = onOff; }
 
     void ClearAllMaps(void);
     void GetCommBreakMap(QMap<long long, int> &marks);
@@ -147,7 +146,6 @@ class CommDetect : public QObject
     void ConvertShowMapToCommMap(QMap<long long, int>&map);
 
     void CleanupFrameInfo(void);
-    void DumpFrameInfo(void);
     void UpdateFrameBlock(FrameBlock *fbp, FrameInfoEntry finfo, int format,
                           int aspect);
     void DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges, int edgeDiff);
@@ -167,6 +165,7 @@ class CommDetect : public QObject
     int commDetectLogoSamplesNeeded;
     int commDetectLogoSampleSpacing;
     int commDetectLogoSecondsNeeded;
+    bool commDetectBlankCanHaveLogo;
     double commDetectLogoGoodEdgeThreshold;
     double commDetectLogoBadEdgeThreshold;
 
@@ -229,8 +228,6 @@ class CommDetect : public QObject
     bool frameIsBlank;
     bool sceneHasChanged;
     bool stationLogoPresent;
-
-    int sceneChangePercent;
 
     bool lastFrameWasBlank;
     bool lastFrameWasSceneChange;

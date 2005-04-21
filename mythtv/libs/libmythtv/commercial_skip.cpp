@@ -145,6 +145,9 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     commDetectLogoBadEdgeThreshold =
               gContext->GetSetting("CommDetectLogoBadEdgeThreshold", "0.85")
                                    .toDouble();
+    skipAllBlanks = !!gContext->GetNumSetting("CommSkipAllBlanks", 1);
+    commDetectBlankCanHaveLogo =
+              !!gContext->GetNumSetting("CommDetectBlankCanHaveLogo", 1);
 
     aggressiveDetection = true;
     currentAspect = COMM_ASPECT_WIDE;
@@ -164,8 +167,6 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     frameIsBlank = false;
     sceneHasChanged = false;
     stationLogoPresent = false;
-
-    skipAllBlanks = true;
 
     framePtr = NULL;
 
@@ -384,7 +385,8 @@ void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
             pixel = framePtr[y * width + x];
 
             if ((commDetectMethod & COMM_DETECT_BLANKS) &&
-                ((!logoInfoAvailable) ||
+                ((!commDetectBlankCanHaveLogo) ||
+                 (!logoInfoAvailable) ||
                  ((logoInfoAvailable) &&
                   ((y < logoMinY) || (y > logoMaxY) ||
                    (x < logoMinX) || (x > logoMaxX)))))
@@ -1043,6 +1045,8 @@ void CommDetect::BuildAllMethodsCommList(void)
     int aspect = COMM_ASPECT_NORMAL;
     QString msg;
     long formatCounts[COMM_FORMAT_MAX];
+    QMap<long long, int> tmpCommMap;
+    QMap<long long, int>::Iterator it;
 
     commBreakMap.clear();
 
@@ -1677,6 +1681,62 @@ void CommDetect::BuildAllMethodsCommList(void)
 
         commBreakMap[breakStart] = MARK_COMM_START;
         commBreakMap[framesProcessed - (int)(2 * fps) - 2] = MARK_COMM_END;
+    }
+
+    // include/exclude blanks from comm breaks
+    tmpCommMap = commBreakMap;
+    commBreakMap.clear();
+
+    if (verboseDebugging)
+        VERBOSE(VB_COMMFLAG, "Adjusting start/end marks according to blanks.");
+    for (it = tmpCommMap.begin(); it != tmpCommMap.end(); ++it)
+    {
+        if (it.data() == MARK_COMM_START)
+        {
+            lastStart = it.key();
+            if (skipAllBlanks)
+            {
+                while ((lastStart > 0) &&
+                       (frameInfo[lastStart - 1].flagMask & COMM_FRAME_BLANK))
+                    lastStart--;
+            }
+            else
+            {
+                while ((lastStart < (framesProcessed - (2 * fps))) &&
+                       (frameInfo[lastStart + 1].flagMask & COMM_FRAME_BLANK))
+                    lastStart++;
+            }
+
+            if (verboseDebugging)
+                VERBOSE(VB_COMMFLAG, QString("Start Mark: %1 -> %2")
+                                             .arg((long)it.key())
+                                             .arg((long)lastStart));
+
+            commBreakMap[lastStart] = MARK_COMM_START;
+        }
+        else
+        {
+            lastEnd = it.key();
+            if (skipAllBlanks)
+            {
+                while ((lastEnd < (framesProcessed - (2 * fps))) &&
+                       (frameInfo[lastEnd + 1].flagMask & COMM_FRAME_BLANK))
+                    lastEnd++;
+            }
+            else
+            {
+                while ((lastEnd > 0) &&
+                       (frameInfo[lastEnd - 1].flagMask & COMM_FRAME_BLANK))
+                    lastEnd--;
+            }
+
+            if (verboseDebugging)
+                VERBOSE(VB_COMMFLAG, QString("End Mark  : %1 -> %2")
+                                             .arg((long)it.key())
+                                             .arg((long)lastEnd));
+
+            commBreakMap[lastEnd] = MARK_COMM_END;
+        }
     }
 
     delete [] fblock;
@@ -2744,20 +2804,6 @@ void CommDetect::CleanupFrameInfo(void)
             if ((before > 6) && (after > 6))
                 frameInfo[i].flagMask = value | COMM_FRAME_LOGO_PRESENT;
         }
-    }
-}
-
-void CommDetect::DumpFrameInfo(void)
-{
-    FrameInfoEntry fi;
-
-    for (long i = 1; i <= framesProcessed; i++)
-    {
-        fi = frameInfo[i];
-        VERBOSE(VB_COMMFLAG, QString().sprintf(
-               "Frame: %6ld -> %3d %3d %3d %3d %04x",
-               i, fi.minBrightness, fi.maxBrightness, fi.avgBrightness,
-               fi.sceneChangePercent, fi.flagMask ));
     }
 }
 
