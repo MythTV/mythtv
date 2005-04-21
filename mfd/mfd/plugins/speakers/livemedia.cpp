@@ -69,7 +69,14 @@ AudioOutputSink::AudioOutputSink(UsageEnvironment& env, unsigned buffer_size)
                : MediaSink(env), fBufferSize(buffer_size)
 {
     fBuffer = new unsigned char[buffer_size];
-    audio_output = AudioOutput::OpenAudio("/dev/dsp", 16, 2, 44100, AUDIOOUTPUT_MUSIC, true );
+    QString adevice = gContext->GetSetting("AudioDevice");
+    if(adevice.length() < 1)
+    {
+        warning("You do not have an AudioDevice in your settings table, "
+                "will try /dev/dsp");
+        adevice = "/dev/dsp";
+    }
+    audio_output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, AUDIOOUTPUT_MUSIC, false);
     audio_output->setBufferSize(256 * 1024);
     audio_output->SetBlocking(false);
 }
