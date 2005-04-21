@@ -20,6 +20,16 @@ Speakers::Speakers(MFD *owner, int identity)
 void Speakers::run()
 {
     //
+    //  Init our sockets
+    //
+    
+    if ( !initServerSocket())
+    {
+        fatal("could not initialize core server socket");
+        return;
+    }
+    
+    //
     //  Get the name of the host we are running on
     //
 
@@ -52,16 +62,6 @@ void Speakers::run()
     QApplication::postEvent(parent, se);
     delete maop_service;
 
-    //
-    //  Init our sockets
-    //
-    
-    if ( !initServerSocket())
-    {
-        fatal("could not initialize core server socket");
-        return;
-    }
-    
     while(keep_going)
     {
         //
