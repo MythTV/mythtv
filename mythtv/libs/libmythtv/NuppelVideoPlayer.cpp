@@ -3531,6 +3531,9 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     QTime flagTime;
     flagTime.start();
 
+    if (OpenFile() < 0)
+        return(254);
+
     if (m_playbackinfo->recendts < QDateTime::currentDateTime())
         SetWatchingRecording(false);
 
@@ -3545,6 +3548,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         int additionalSleep = 0;
         int curCmd;
 
+        commDetect->SetWatchingRecording(true, nvr_enc, this);
+
         if (commercialskipmethod & COMM_DETECT_LOGO)
             additionalSleep = commDetect->GetLogoSecondsNeeded();
 
@@ -3554,7 +3559,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                                       QObject::tr("Building Detection Buffer"));
         }
 
-        while(i < (initialSleep + additionalSleep))
+        while((i < (initialSleep + additionalSleep)) && (watchingrecording))
         {
             if ((jobID != -1) &&
                 ((i % 5) == 0))
@@ -3573,12 +3578,6 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         }
     }
 
-    if (OpenFile() < 0)
-        return(254);
-
-    if (watchingrecording)
-        commDetect->SetWatchingRecording(true, nvr_enc, this);
-
     m_playbackinfo->SetCommFlagged(COMM_FLAG_PROCESSING);
 
     if (!InitVideo())
@@ -3594,9 +3593,6 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         txtbuffers[i].buffer = new unsigned char[text_size];
 
     ClearAfterSeek();
-
-    commDetect->SetCommSkipAllBlanks(
-        gContext->GetNumSetting("CommSkipAllBlanks", 1));
 
     if ((commercialskipmethod & COMM_DETECT_LOGO) &&
         ((totalLength == 0) ||

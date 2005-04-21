@@ -218,7 +218,7 @@ void CommDetect::customEvent(QCustomEvent *e)
         QString message = me->Message();
 
         VERBOSE(VB_COMMFLAG,
-                QString("CommDetect::CustomEvent - Recieved Event: '%1'")
+                QString("CommDetect::CustomEvent - Received Event: '%1'")
                 .arg(message));
 
         if ((watchingRecording) &&
@@ -229,7 +229,7 @@ void CommDetect::customEvent(QCustomEvent *e)
             int cardnum = tokens[1].toInt();
             int filelen = tokens[2].toInt();
 
-            message = QString("CommDetect::CustomEvent - Recieved a "
+            message = QString("CommDetect::CustomEvent - Received a "
                               "DONE_RECORDING event for card %1.  ")
                               .arg(cardnum);
 
@@ -267,7 +267,11 @@ void CommDetect::SetWatchingRecording(bool watching, RemoteEncoder *rec,
                 "Setting up CommDetect Listener, flagging Live recording.");
     }
     else
+    {
         gContext->removeListener(this);
+        VERBOSE(VB_COMMFLAG,
+                "Removing CommDetect Listener, flagging prerecorded program.");
+    }
 }
 
 void CommDetect::SetVideoParams(float aspect)

@@ -311,6 +311,9 @@ int FlagCommercials(QString chanid, QString starttime)
             recorder = RemoteGetExistingRecorder(program_info);
             if (recorder)
                 nvp->SetRecorder(recorder);
+            else
+                cerr << "Unable to get remote recorder, flagging info may be "
+                     << "negatively affected." << endl;
         }
         breaksFound = nvp->FlagCommercials(showPercentage, fullSpeed,
                                            inJobQueue);
