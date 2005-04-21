@@ -37,7 +37,11 @@ http://www.live.com/liveMedia/
     called liblivemedia-dev, and almost certainly packages for other
     distributions as well. Note that this is not _strictly_ required (you
     can turn it off with ./configure --disable-rtsp), but is very, very
-    highly recommended.
+    highly recommended. You can set the directory prefix for live with
+    --with-livemedia-prefix=foo (if you've built the liveMedia library from
+    source (NB: it has no "make install") in, say /usr/local/src, then you
+    probably want --with-livemedia-prefix=/usr/local/src/live/).
+
 
 FAAD2 library
 http://www.audiocoding.com/
