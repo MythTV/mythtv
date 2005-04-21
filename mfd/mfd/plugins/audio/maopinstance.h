@@ -16,12 +16,14 @@
 
 class AudioPlugin;
 
+#include "../../../mfdlib/service.h"
+
 class MaopInstance
 {
 
   public:
 
-    MaopInstance(AudioPlugin *owner, QString l_name, QString l_address, uint l_port);
+    MaopInstance(AudioPlugin *owner, QString l_name, QString l_address, uint l_port, ServiceLocationDescription l_location);
     ~MaopInstance();
     
     QString getName(){ return name; }
@@ -30,22 +32,26 @@ class MaopInstance
     int     getFileDescriptor(){ return socket_fd; }
     void    checkIncoming();
     void    sendRequest(const QString &the_request);
+    void    markForUse(bool y_or_n){ marked_for_use = y_or_n; }
+    bool    markedForUse(){ return marked_for_use; }
     
   private:
 
     void log(const QString &log_message, int verbosity);
     void warning(const QString &warn_message);
     
-    QString         name;
-    QString         address;
-    uint            port;
-    bool            all_is_well;
-    QMutex          client_socket_mutex;
-    QSocketDevice  *client_socket_to_maop_service;
-    AudioPlugin    *parent;
-    int             socket_fd;
-    bool            currently_open;
-    QString         current_url;
+    QString                     name;
+    QString                     address;
+    uint                        port;
+    ServiceLocationDescription  location;
+    bool                        all_is_well;
+    QMutex                      client_socket_mutex;
+    QSocketDevice              *client_socket_to_maop_service;
+    AudioPlugin                *parent;
+    int                         socket_fd;
+    bool                        currently_open;
+    QString                     current_url;
+    bool                        marked_for_use;
 };
 
 #endif  // maopinstance_h_

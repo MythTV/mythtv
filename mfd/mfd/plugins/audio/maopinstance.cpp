@@ -16,16 +16,18 @@ using namespace std;
 #include "maopinstance.h"
 #include "audio.h"
 
-MaopInstance::MaopInstance(AudioPlugin *owner, QString l_name, QString l_address, uint l_port)
+MaopInstance::MaopInstance(AudioPlugin *owner, QString l_name, QString l_address, uint l_port, ServiceLocationDescription l_location)
 {
     parent = owner;
     name = l_name;
     address = l_address;
     port = l_port;
+    location = l_location;
     client_socket_to_maop_service = NULL;
     socket_fd = -1;
     current_url = "";
     currently_open = false;
+    marked_for_use = false;
     
     all_is_well = true;
     

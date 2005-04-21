@@ -694,7 +694,7 @@ void AudioPlugin::stopAudio()
         //  wake them up 
         //
     
-        if(decoder)
+        if (decoder)
         {
             decoder->mutex()->lock();
                 decoder->cond()->wakeAll();
@@ -817,7 +817,7 @@ void AudioPlugin::handleInternalMessage(QString the_message)
         //
 
         stopAudio();
-        if(decoder)
+        if (decoder)
         {
             decoder = NULL;
         }
@@ -1097,11 +1097,11 @@ void AudioPlugin::handleMetadataChange(int which_collection, bool /*external*/)
         bool stop_current_track = false;
         bool exit_current_list  = false;
         
-        if(which_collection == current_collection)
+        if (which_collection == current_collection)
         {
             metadata_server->lockMetadata();
                 MetadataContainer *which_one = metadata_server->getMetadataContainer(which_collection);
-                if(which_one)
+                if (which_one)
                 {
                     QValueList<int> item_deletions = which_one->getMetadataDeletions();
                     if (item_deletions.contains(current_metadata))
@@ -1123,12 +1123,12 @@ void AudioPlugin::handleMetadataChange(int which_collection, bool /*external*/)
         }
 
     playlist_mode_mutex.unlock();
-    if(exit_current_list)
+    if (exit_current_list)
     {
         stopPlaylistMode();
     }
     state_of_play_mutex->unlock();
-    if(stop_current_track)
+    if (stop_current_track)
     {
         stopAudio();
     }
@@ -1168,12 +1168,12 @@ void AudioPlugin::handleServiceChange()
 
             while ( (an_instance = iter.current()) != 0 )
             {
-                if( !service_lister->findDiscoveredService(an_instance->getName()) )
+                if ( !service_lister->findDiscoveredService(an_instance->getName()) )
                 {
                     log(QString("removed speakers resource called \"%1\" (total now %2)")
                         .arg(an_instance->getName()).arg(maop_instances.count() - 1), 5);
                     int fd = an_instance->getFileDescriptor();
-                    if(fd > 0)
+                    if (fd > 0)
                     {
                         removeFileDescriptorToWatch(fd);
                     }
@@ -1198,13 +1198,12 @@ void AudioPlugin::handleServiceChange()
               ++it )
         {
             //
-            //  We just try and add any that are not on this host, as the
-            //  addDaapServer() method checks for dupes
+            //  We add all, as the addMaopSpeakers() method checks for dupes
             //
                 
             if ( (*it).getType() == "maop")
             {
-                addMaopSpeakers((*it).getAddress(), (*it).getPort(), (*it).getName() );
+                addMaopSpeakers((*it).getAddress(), (*it).getPort(), (*it).getName(), (*it).getLocation() );
             }
                 
         }
@@ -1213,7 +1212,7 @@ void AudioPlugin::handleServiceChange()
     
 }
 
-void AudioPlugin::addMaopSpeakers(QString l_address, uint l_port, QString l_name)
+void AudioPlugin::addMaopSpeakers(QString l_address, uint l_port, QString l_name, ServiceLocationDescription l_location)
 {
     //
     //  If it's new, add it ... otherwise ignore it
@@ -1226,26 +1225,30 @@ void AudioPlugin::addMaopSpeakers(QString l_address, uint l_port, QString l_name
     MaopInstance *an_instance;
     for ( an_instance = maop_instances.first(); an_instance; an_instance = maop_instances.next() )
     {
-        if(an_instance->isThisYou(l_name, l_address, l_port))
+        if (an_instance->isThisYou(l_name, l_address, l_port))
         {
             already_have_it = true;
             break;
         }
     }
     
-    if(!already_have_it)
+    if (!already_have_it)
     {
-        MaopInstance *new_maop_instance = new MaopInstance(this, l_name, l_address, l_port);
-        if(new_maop_instance->allIsWell())
+        MaopInstance *new_maop_instance = new MaopInstance(this, l_name, l_address, l_port, l_location);
+        if (new_maop_instance->allIsWell())
         {
             int fd = new_maop_instance->getFileDescriptor();
-            if(fd > 0)
+            if (fd > 0)
             {
                 log(QString("adding speakers resource called \"%1\" via maop://%2:%3 (total now %4)")
                     .arg(l_name)
                     .arg(l_address)
                     .arg(l_port)
                     .arg(maop_instances.count() + 1), 5);
+                if (l_location == SLT_HOST)
+                {
+                    new_maop_instance->markForUse(true);
+                }
                 maop_instances.append(new_maop_instance);
                 addFileDescriptorToWatch(fd);
             }
@@ -1290,9 +1293,9 @@ void AudioPlugin::checkSpeakers()
     //  If we're waiting to release the speakers, do so if enough time had elapsed
     //
     
-    if(waiting_for_speaker_release)
+    if (waiting_for_speaker_release)
     {
-        if(speaker_release_timer.elapsed() > 30 * 1000) // 30 seconds
+        if (speaker_release_timer.elapsed() > 30 * 1000) // 30 seconds
         {
             turnOffSpeakers();
             waiting_for_speaker_release = false;
@@ -1309,14 +1312,18 @@ void AudioPlugin::turnOnSpeakers()
     maop_mutex.lock();
 
     //
-    //  Tell all speakers (maop instances) to listen to our rtsp stream
+    //  Tell all speakers we have marked for use to listen to our rtsp
+    //  stream
     //
     
     QPtrListIterator<MaopInstance> it( maop_instances );
     MaopInstance *an_instance;
     while ( (an_instance = it.current()) != 0 ) 
     {
-        an_instance->sendRequest(QString("open %1").arg(rtsp_out->getUrl()));
+        if (an_instance->markedForUse())
+        {
+            an_instance->sendRequest(QString("open %1").arg(rtsp_out->getUrl()));
+        }
         ++it;
     }        
     
@@ -1337,7 +1344,7 @@ void AudioPlugin::turnOffSpeakers()
     //  The maop mutex should be locked 
     //
     
-    if(maop_mutex.tryLock())
+    if (maop_mutex.tryLock())
     {
         warning("AudioPlugin::turnOffSpeakers() called without maop_mutex being locked");
         maop_mutex.unlock();
@@ -1351,7 +1358,10 @@ void AudioPlugin::turnOffSpeakers()
     MaopInstance *an_instance;
     while ( (an_instance = it.current()) != 0 ) 
     {
-        an_instance->sendRequest("close");
+        if (an_instance->markedForUse())
+        {
+            an_instance->sendRequest("close");
+        }
         ++it;
     }        
 #endif
@@ -1362,7 +1372,7 @@ AudioPlugin::~AudioPlugin()
     maop_instances.clear();
 
 #ifdef MFD_RTSP_SUPPORT
-    if(rtsp_out)
+    if (rtsp_out)
     {
         rtsp_out->stop();
         rtsp_out->wakeUp();
