@@ -224,6 +224,12 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal,
 
     RegisterKey("Global", "HELP", "Help", "F1");
 
+    RegisterKey("Global", "USERFUNC1", "User defined function 1", "F2");
+    RegisterKey("Global", "USERFUNC2", "User defined function 2", "F3");
+    RegisterKey("Global", "USERFUNC3", "User defined function 3", "F4");
+    RegisterKey("Global", "USERFUNC4", "User defined function 4", "F5");
+    RegisterKey("Global", "USERFUNC5", "User defined function 5", "F6");
+
     RegisterKey("Global", "0", "0", "0");
     RegisterKey("Global", "1", "1", "1");
     RegisterKey("Global", "2", "2", "2");
@@ -1002,6 +1008,13 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
                 }
                 else
                     focusNextPrevChild(true);
+            }
+            else if (action.left(8) == "USERFUNC")
+            {
+                QString func = "UserFunction"+action.right(1);
+                QString command = gContext->GetSetting(func, "");
+                if (command.length())
+                    myth_system((QString("%1 ").arg(command)).local8Bit());
             }
             else if (action == "MENU")
                 emit menuButtonPressed();
