@@ -164,9 +164,9 @@ void AudioPlugin::run()
         checkSpeakers();
     }
 
-    moap_mutex.lock();
+    maop_mutex.lock();
         turnOffSpeakers();
-    moap_mutex.unlock();
+    maop_mutex.unlock();
     
     stopAudio();
 }
