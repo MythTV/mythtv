@@ -37,7 +37,7 @@ extern yuv2rgb_fun yuv2rgb;
 void yuv2rgb_init (int bpp, int mode);
 yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode);
 yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode);
-yuv2rgb_fun yuv2rgb_init_mlib (int bpp, int mode);
+//yuv2rgb_fun yuv2rgb_init_mlib (int bpp, int mode);
 
 // actually does to i420
 void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,

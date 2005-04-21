@@ -8,6 +8,7 @@
 #include "uitypes.h"
 #include "xmlparse.h"
 #include "programinfo.h"
+#include "yuv2rgb.h"
 
 #include <pthread.h>
 
@@ -292,6 +293,10 @@ class PlaybackBox : public MythDialog
 
     bool playingSomething;
     bool titleView;
+
+    yuv2rgb_fun    conv_yuv2rgba;
+    unsigned char *conv_rgba_buf;
+    QSize          conv_rgba_size;
 };
 
 #endif

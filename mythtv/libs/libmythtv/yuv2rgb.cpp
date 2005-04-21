@@ -42,6 +42,11 @@
 #endif
 #include "yuv2rgb.h"
 
+/** \file yuv2rgb.cpp
+ *  \brief Contains various YUV, VUY and RGBA colorspace conversion rutines.
+ *
+ */
+
 static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
                            unsigned char *pu, unsigned char *pv,
                            int h_size, int v_size, int rgb_stride,
@@ -325,6 +330,15 @@ static void mmx_argb32 (uint8_t * image,
 }
 #endif
 
+/** \fn yuv2rgb_init_mmxext(int bpp, int mode)
+ *  \brief This returns a yuv to rgba converter, using
+ *          mmxext if MMX was compiled in.
+ *
+ *  \param mode must be MODE_RGB
+ *  \param bpp must be 32
+ *
+ *  \return function pointer or NULL if converter could not be found.
+ */
 yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode)
 {
 #ifdef MMX
@@ -340,6 +354,15 @@ yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode)
     return NULL; /* Fallback to C */
 }
 
+/** \fn yuv2rgb_init_mmx (int bpp, int mode)
+ *  \brief This returns a yuv to rgba converter, using
+ *         mmx if MMX was compiled in.
+ *
+ *  \param mode must be MODE_RGB
+ *  \param bpp must be 32
+ *
+ *  \return function pointer or NULL if converter could not be found.
+ */
 yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
 {
 #ifdef MMX
@@ -795,6 +818,12 @@ static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
 }
 #endif
 
+/** \fn vuy2yuv_init_altivec (void)
+ *  \brief This returns a vuy to yuv converter, using
+ *         Altivec if it was compiled in.
+ *
+ *  \return function pointer or NULL if converter could not be found.
+ */
 vuy2yuv_fun vuy2yuv_init_altivec (void)
 {
 #ifdef HAVE_ALTIVEC

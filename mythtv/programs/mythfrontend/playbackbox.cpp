@@ -26,7 +26,6 @@ using namespace std;
 #include "tv.h"
 #include "oldsettings.h"
 #include "NuppelVideoPlayer.h"
-#include "yuv2rgb.h"
 
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -191,11 +190,16 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     }
     else
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("Failed to get selector object"),
-                                  QObject::tr("Myth could not locate the selector object within your "
-                                  "theme.\nPlease make that your ui.xml is valid.\n\nMyth will now exit."));
+        MythPopupBox::showOkPopup(
+            gContext->GetMainWindow(),
+            QObject::tr("Failed to get selector object"),
+            QObject::tr(
+                "Myth could not locate the selector object within your theme.\n"
+                "Please make that your ui.xml is valid.\n"
+                "\n"
+                "Myth will now exit."));
                                   
-        cerr << "Failed to get selector object.\n";
+        VERBOSE(VB_IMPORTANT, "Failed to get selector object.");
         exit(22);
         return;
     }
@@ -236,6 +240,11 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 
     if (recGroupPassword != "")
         showRecGroupChooser();
+
+    // Initialize yuv2rgba conversion stuff
+    conv_yuv2rgba  = yuv2rgb_init_mmx(32, MODE_RGB);
+    conv_rgba_buf  = NULL;
+    conv_rgba_size = QSize(0,0);
 }
 
 PlaybackBox::~PlaybackBox(void)
@@ -253,6 +262,9 @@ PlaybackBox::~PlaybackBox(void)
         delete curitem;
     if (delitem)
         delete delitem;
+
+    if (conv_rgba_buf)
+        delete [] conv_rgba_buf;
 }
 
 /* blocks until playing has stopped */
@@ -769,21 +781,23 @@ void PlaybackBox::updateVideo(QPainter *p)
             return;
         }
 
-        unsigned char *buf = frame->buf;
+        unsigned char *yuv_buf = frame->buf;
+        if (conv_rgba_size.width() != w || conv_rgba_size.height() != h)
+        { 
+            if (conv_rgba_buf)
+                delete [] conv_rgba_buf;
+            conv_rgba_buf = new unsigned char[w * h * 4];
+        }
 
-        unsigned char *outputbuf = new unsigned char[w * h * 4];
-        yuv2rgb_fun convert = yuv2rgb_init_mmx(32, MODE_RGB);
-
-        convert(outputbuf, buf, buf + (w * h), buf + (w * h * 5 / 4), w, h, 
-                w * 4, w, w / 2, 0);
+        conv_yuv2rgba(conv_rgba_buf,
+                      yuv_buf, yuv_buf + (w * h), yuv_buf + (w * h * 5 / 4),
+                      w, h, w * 4, w, w / 2, 0);
 
         nvp->ReleaseCurrentFrame(frame);
 
-        QImage img(outputbuf, w, h, 32, NULL, 65536 * 65536, 
+        QImage img(conv_rgba_buf, w, h, 32, NULL, 65536 * 65536, 
                    QImage::LittleEndian);
         img = img.scale(videoRect.width(), videoRect.height());
-
-        delete [] outputbuf;
 
         p->drawImage(videoRect.x(), videoRect.y(), img);
     }
