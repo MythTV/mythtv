@@ -145,6 +145,7 @@ void Speakers::doSomething(const QStringList &tokens, int socket_identifier)
 void Speakers::openStream(QString stream_url)
 {
     rtsp_in_mutex.lock();
+
     //
     //  If we're told to listen to something we're already listening to,
     //  ignore it
@@ -158,14 +159,21 @@ void Speakers::openStream(QString stream_url)
         if(rtsp_in)
         {
             //
-            //  It exists, tell it to switch to new stream
+            //  It exists (listening to something else), delete it and make a new one
             //
+            
+            while(rtsp_in->running())
+            {
+                rtsp_in->stop();
+                usleep(200);
+            }
+            
+            delete rtsp_in;
+            rtsp_in = NULL;
         }
-        else
-        {
-            rtsp_in = new RtspIn(this, current_url);
-            rtsp_in->start();
-        }
+
+        rtsp_in = new RtspIn(this, current_url);
+        rtsp_in->start();
         announceStatus();
     }
     rtsp_in_mutex.unlock();
