@@ -20,6 +20,22 @@ using namespace std;
 #include "rtspin.h"
 #include "livemedia.h"
 
+extern "C" void afterPlayingCallback(void* clientData)
+{
+    RtspIn *rtsp_in_object = (RtspIn *)clientData;
+    rtsp_in_object->handleAfterPlaying();
+}
+
+extern "C" void subsessionByeCallback(void* clientData)
+{
+    RtspIn *rtsp_in_object = (RtspIn *)clientData;
+    rtsp_in_object->handleByeCallback();
+}
+
+/*
+---------------------------------------------------------------------
+*/
+
 RtspIn::RtspIn(Speakers *owner, const QString &l_rtsp_url)
 {
     parent= owner;
@@ -55,7 +71,11 @@ void RtspIn::run()
     //  Create the liveMedia RTSP client
     //
 
-    rtsp_client = RTSPClient::createNew(*env);
+    rtsp_client = RTSPClient::createNew(
+                                        *env, 
+                                        0,  // Change to 1 for console debugging
+                                        "MythTV speakers"
+                                       );
 
     //
     //  Do a DESCRIBE request, which sets some internal stuff in the
@@ -115,10 +135,9 @@ void RtspIn::run()
         return;
     }
 
-    int fd = sub_session->rtpSource()->RTPgs()->socketNum();
-    increaseReceiveBufferTo( *env, fd, 100000 );
+    int socket_fd = sub_session->rtpSource()->RTPgs()->socketNum();
+    increaseReceiveBufferTo( *env, socket_fd, 100000 );
     
-   
     //
     //  Setup the subsession
     //
@@ -130,10 +149,6 @@ void RtspIn::run()
                         .arg(rtsp_url));
         cleanUp();
         return;
-    }
-    else
-    {
-                                        
     }
  
     //
@@ -154,7 +169,9 @@ void RtspIn::run()
     
     audio_output_sink = AudioOutputSink::createNew(*env);
     sub_session->sink = audio_output_sink;
-    sub_session->sink->startPlaying(*(sub_session->readSource()), NULL, NULL);
+    sub_session->sink->startPlaying(*(sub_session->readSource()), afterPlayingCallback, this);
+    sub_session->rtcpInstance()->setByeHandler(subsessionByeCallback, this);
+                                  
 
     //
     //  Ensure playing will occur in the liveMedia event loop
@@ -168,16 +185,72 @@ void RtspIn::run()
         return;
     }
     
+    QTime schedule_timer;
+    schedule_timer.start();
+    
     while(keep_going)
     {
-        scheduler->stepOnce(2000000);   // at most 2,000,000 microseconds = 2 seconds
+        //
+        //  We time how long it takes for the scheduler to step. If it takes
+        //  too long, we know something is wrong (e.g. the source has gone
+        //  away). There should be a more elegant way of doing this (?). We
+        //  could check the socket_fd I suppose. Anyway, the following does
+        //  work, and is perfectly acceptable given this is all supposed to
+        //  be happening on a local LAN.
+        //
+        
+        schedule_timer.restart();
+        scheduler->stepOnce(5000000);   // at most 5,000,000 microseconds = 5 seconds
+        if (schedule_timer.elapsed() > 4000)
+        {
+            //
+            //  Nothing happend for more than 4 seconds, give up
+            //
+            
+            warning("no rtsp activity for more than 5 seconds (source gone?). Giving up.");
+            keep_going_mutex.lock();
+                keep_going = false;
+            keep_going_mutex.unlock();
+        }
     }
 
     cleanUp();
+    
+    //
+    //  Wake up the parent (Speaker object). That will make the parent check
+    //  if we are still running, and since we're now quitting, it can delete
+    //  us.
+    //
+
+    parent->wakeUp();
 }
 
 void RtspIn::stop()
 {
+    keep_going_mutex.lock();
+        keep_going = false;
+    keep_going_mutex.unlock();
+}
+
+void RtspIn::handleAfterPlaying()
+{
+    //
+    //  Whatever was being streamed to us has apparently ended
+    //
+    
+    warning("RtspIn got handleAfterPlaying(), will clean up and unload");
+    keep_going_mutex.lock();
+        keep_going = false;
+    keep_going_mutex.unlock();
+}
+
+void RtspIn::handleByeCallback()
+{
+    //
+    //  Server said BYE
+    //
+    
+    warning("RtspIn got BYE from server, will clean up and unload");
     keep_going_mutex.lock();
         keep_going = false;
     keep_going_mutex.unlock();

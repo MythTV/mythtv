@@ -32,6 +32,8 @@ class RtspIn: public QThread
 
     void run();
     void stop();
+    void handleAfterPlaying();
+    void handleByeCallback();
 
   private:
 

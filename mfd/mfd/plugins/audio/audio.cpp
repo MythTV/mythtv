@@ -164,6 +164,7 @@ void AudioPlugin::run()
         checkSpeakers();
     }
 
+    turnOffSpeakers();
     stopAudio();
 }
 
@@ -1288,8 +1289,7 @@ void AudioPlugin::checkSpeakers()
     
     if(waiting_for_speaker_release)
     {
-        //if(speaker_release_timer.elapsed() > 30 * 1000) // 30 seconds
-        if(speaker_release_timer.elapsed() > 1 * 1000) // 30 seconds
+        if(speaker_release_timer.elapsed() > 30 * 1000) // 30 seconds
         {
             turnOffSpeakers();
             waiting_for_speaker_release = false;
@@ -1348,7 +1348,7 @@ void AudioPlugin::turnOffSpeakers()
     MaopInstance *an_instance;
     while ( (an_instance = it.current()) != 0 ) 
     {
-        an_instance->sendRequest(QString("close %1").arg(rtsp_out->getUrl()));
+        an_instance->sendRequest("close");
         ++it;
     }        
 #endif
@@ -1357,6 +1357,18 @@ void AudioPlugin::turnOffSpeakers()
 AudioPlugin::~AudioPlugin()
 {
     maop_instances.clear();
+
+#ifdef MFD_RTSP_SUPPORT
+    if(rtsp_out)
+    {
+        rtsp_out->stop();
+        rtsp_out->wakeUp();
+        rtsp_out->wait();
+        
+        delete rtsp_out;
+        rtsp_out = NULL;
+    }
+#endif 
 
     if (output)
     {
@@ -1376,22 +1388,6 @@ AudioPlugin::~AudioPlugin()
         state_of_play_mutex = NULL;
     }
     
-#ifdef MFD_RTSP_SUPPORT
-    if(rtsp_out)
-    {
-        rtsp_out->stop();
-        rtsp_out->wakeUp();
-        rtsp_out->wait();
-        
-        delete rtsp_out;
-        rtsp_out = NULL;
-    }
-    if(output)
-    {
-        delete output;
-        output = NULL;
-    }
-#endif 
    
     if (audio_listener)
     {

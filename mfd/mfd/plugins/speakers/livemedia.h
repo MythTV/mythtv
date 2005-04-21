@@ -26,9 +26,17 @@ class LiveTaskScheduler : public BasicTaskScheduler
 {
   public:
   
-    static  LiveTaskScheduler* createNew();
-    virtual ~LiveTaskScheduler();
-    void    stepOnce(unsigned t);
+    static      LiveTaskScheduler* createNew();
+    virtual    ~LiveTaskScheduler();
+    void        stepOnce(unsigned t);
+    void        doEventLoop(char* watchVariable);
+    TaskToken   scheduleDelayedTask(
+                                    int microseconds, 
+                                    TaskFunc* proc, 
+                                    void* clientData
+                                   );
+    void        unscheduleDelayedTask(TaskToken& prevTask);
+                                                      
 
   protected:
   

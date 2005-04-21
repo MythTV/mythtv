@@ -15,7 +15,6 @@ using namespace std;
 
 #include "livemedia.h"
 
-
 LiveTaskScheduler* LiveTaskScheduler::createNew()
 {
     return new LiveTaskScheduler();
@@ -28,6 +27,25 @@ LiveTaskScheduler::LiveTaskScheduler()
 void LiveTaskScheduler::stepOnce(unsigned t)
 {
     BasicTaskScheduler::SingleStep(t);
+}
+
+void LiveTaskScheduler::doEventLoop(char* watchVariable)
+{
+    BasicTaskScheduler::doEventLoop(watchVariable);
+}
+
+TaskToken LiveTaskScheduler::scheduleDelayedTask(
+                                                    int microsecs, 
+                                                    TaskFunc* proc, 
+                                                    void* clientd
+                                                )
+{
+    return BasicTaskScheduler::scheduleDelayedTask(microsecs, proc, clientd);
+}
+                                                      
+void LiveTaskScheduler::unscheduleDelayedTask(TaskToken& prevTask)
+{
+    BasicTaskScheduler::unscheduleDelayedTask(prevTask);
 }
 
 LiveTaskScheduler::~LiveTaskScheduler()
@@ -52,7 +70,7 @@ AudioOutputSink::AudioOutputSink(UsageEnvironment& env, unsigned buffer_size)
 {
     fBuffer = new unsigned char[buffer_size];
     audio_output = AudioOutput::OpenAudio("/dev/dsp", 16, 2, 44100, AUDIOOUTPUT_MUSIC, true );
-    audio_output->setBufferSize(65536);
+    audio_output->setBufferSize(256 * 1024);
     audio_output->SetBlocking(false);
 }
 
@@ -70,16 +88,15 @@ void AudioOutputSink::afterGettingFrame(
 
 void AudioOutputSink::afterGettingFrame1(
                                             unsigned frameSize,
-                                            struct timeval presentationTime
+                                            struct timeval /* presentationTime */
                                         ) 
 {
 
 
     //
-    //  HACK, swap endian
-    //
-
-
+    //  RTP uses network byte ordering (big endian) in all cases. But PCM
+    //  should be little endian, so we swap it around
+    //  
 
     unsigned numValues = frameSize/2;
     short* value = (short*)fBuffer;

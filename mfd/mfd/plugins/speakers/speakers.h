@@ -24,12 +24,14 @@ class Speakers: public MFDServicePlugin
     void run();
     void doSomething(const QStringList &tokens, int socket_identifier);
     void openStream(QString stream_url);
-    void closeStream(QString stream_url);
+    void closeStream();
     void announceStatus();
 
   private:
   
     QString current_url;
+
+    QMutex   rtsp_in_mutex;
     RtspIn  *rtsp_in;
 };
 

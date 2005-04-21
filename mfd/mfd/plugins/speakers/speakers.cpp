@@ -71,6 +71,29 @@ void Speakers::run()
         updateSockets();
         waitForSomethingToHappen();
         checkInternalMessages();
+        
+        //
+        //  Check the rtsp_in object, as it might have detected a problem
+        //  (e.g. closed RTSP source) and shut itse;f down.
+        //
+        
+        rtsp_in_mutex.lock();
+
+        if (rtsp_in)
+        {
+            if(! rtsp_in->running())
+            {
+                warning(QString("low level RTSP/rtp communications appears to "
+                                "have stopped. Will stop listening to  %1")
+                                .arg(current_url));
+                rtsp_in_mutex.unlock();
+                closeStream();
+                rtsp_in_mutex.lock();
+            }
+        }
+        
+        
+        rtsp_in_mutex.unlock();
     }
 
 }
@@ -89,6 +112,10 @@ void Speakers::doSomething(const QStringList &tokens, int socket_identifier)
         {
             announceStatus();
         }
+        else if (tokens[0] == "close")
+        {
+            closeStream();
+        }
         else
         {
             ok = false;
@@ -96,11 +123,7 @@ void Speakers::doSomething(const QStringList &tokens, int socket_identifier)
     }
     else 
     {
-        if (tokens[0] == "close")
-        {
-            closeStream(tokens[1]);
-        }
-        else if (tokens[0] == "open")
+        if (tokens[0] == "open")
         {
             openStream(tokens[1]);
         }
@@ -121,6 +144,7 @@ void Speakers::doSomething(const QStringList &tokens, int socket_identifier)
 
 void Speakers::openStream(QString stream_url)
 {
+    rtsp_in_mutex.lock();
     //
     //  If we're told to listen to something we're already listening to,
     //  ignore it
@@ -144,34 +168,30 @@ void Speakers::openStream(QString stream_url)
         }
         announceStatus();
     }
+    rtsp_in_mutex.unlock();
 }
 
-void Speakers::closeStream(QString stream_url)
+void Speakers::closeStream()
 {
-    //
-    //  Only close a connection if we were listening to it
-    //
-    
-    if (stream_url == current_url)
+    rtsp_in_mutex.lock();
+    log("closing connection", 5);
+    current_url = "";
+    if(rtsp_in)
     {
-        log("closing connection", 5);
-        current_url = "";
-        if(rtsp_in)
+        while(rtsp_in->running())
         {
-            while(rtsp_in->running())
-            {
-                rtsp_in->stop();
-                usleep(200);
-            }
-            delete rtsp_in;
-            rtsp_in = NULL;
+            rtsp_in->stop();
+            usleep(200);
         }
-        else
-        {
-            warning("asked to close a stream, but don't have one open");
-        }
-        announceStatus();
+        delete rtsp_in;
+        rtsp_in = NULL;
     }
+    else
+    {
+        warning("asked to close a stream, but don't have one open");
+    }
+    announceStatus();
+    rtsp_in_mutex.unlock();
 }
 
 void Speakers::announceStatus()
