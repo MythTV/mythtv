@@ -9,6 +9,8 @@ LINUXDOC_HTML_SPLIT := 1
 all: $(TARGETS)
 clean:
 	rm -f $(TARGETS) $(patsubst %.html,%-[0-9]*.html,$(filter %.html,$(TARGETS)))
+	rm -Rf doxygen-dev-docs doxygen-warnings.txt
+
 distclean: clean
 
 validate: mythtv-HOWTO.sgml
@@ -35,3 +37,6 @@ validate: mythtv-HOWTO.sgml
 
 index.html: mythtv-HOWTO.html
 	cp $< $@
+
+doxygen:
+	doxygen doxygen-create-developer-docs.cfg
