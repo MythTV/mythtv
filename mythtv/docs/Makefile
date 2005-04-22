@@ -38,5 +38,5 @@ validate: mythtv-HOWTO.sgml
 index.html: mythtv-HOWTO.html
 	cp $< $@
 
-doxygen:
+devdocs:
 	doxygen doxygen-create-developer-docs.cfg
