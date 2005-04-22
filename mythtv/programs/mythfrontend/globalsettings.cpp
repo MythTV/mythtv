@@ -2360,37 +2360,6 @@ public:
      };
 };
 
-static GlobalLineEdit *MythUserFunction(uint i)
-{
-    GlobalLineEdit *be = new GlobalLineEdit(QString("UserFunction%1").arg(i));
-    be->setLabel(QObject::tr("User Function %1").arg(i));
-    be->setValue("");
-    be->setHelpText(QObject::tr("User specified function #%1. "
-                                "By default this function is triggered "
-                                "by pressing the F%2 function key.")
-                    .arg(i).arg(i+1));
-    return be;
-}
-
-class MythFunctionSettings: public VerticalConfigurationGroup,
-                            public TriggeredConfigurationGroup {
-public:
-     MythFunctionSettings():
-         VerticalConfigurationGroup(false),
-         TriggeredConfigurationGroup(false) {
-
-         setLabel(QObject::tr("Myth User Functions"));
-         setUseLabel(false);
-
-         for (uint i=1; i<=4; i++)
-         {
-             Setting* function = MythUserFunction(i);
-             addChild(function);
-             setTrigger(function);
-         }
-     };
-};
-
 static HostCheckBox *LCDShowTime()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowTime");
@@ -2805,9 +2774,6 @@ MainGeneralSettings::MainGeneralSettings()
 
     MythFillSettings *mythfill = new MythFillSettings();
     addChild(mythfill);
-
-    MythFunctionSettings *mythfunctions = new MythFunctionSettings();
-    addChild(mythfunctions);
 }
 
 PlaybackSettings::PlaybackSettings()
