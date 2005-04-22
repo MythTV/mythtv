@@ -476,7 +476,7 @@ static GlobalCheckBox *AutoCommflagWhileRecording()
     gc->setHelpText(QObject::tr("If set and Auto Commercial Flagging is ON for "
                                 "a recording, the flagging job will be started "
                                 "as soon as the recording starts.  NOT "
-                                "recommended on underpowered systems"));
+                                "recommended on underpowered systems."));
     return gc;
 };
 
