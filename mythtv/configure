@@ -2343,7 +2343,6 @@ fi
 
 if test x"$opengl_vsync" = x"yes" ; then
   CCONFIG="$CCONFIG using_opengl_vsync"
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_OPENGL_VSYNC"
   echo "CONFIG_OPENGL_VSYNC_LIBS=$CONFIG_OPENGL_VSYNC_LIBS" >> config.mak
 fi
 
