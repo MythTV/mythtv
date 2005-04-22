@@ -106,27 +106,27 @@ Z pritiskom na PRESLEDNICO/ENTER nad izbranim vnosom, se le ta izbriše. </trans
     </message>
     <message>
         <source>Enter URL</source>
-        <translation type="unfinished"></translation>
+        <translation>Vnesi URL</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Vredu</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Prekliči</translation>
     </message>
     <message>
         <source>      Remove Tab      </source>
-        <translation type="unfinished"></translation>
+        <translation>      Odstrani Zavihek      </translation>
     </message>
     <message>
         <source>       Zoom Out       </source>
-        <translation type="unfinished"></translation>
+        <translation>       Pomanjšaj       </translation>
     </message>
     <message>
         <source>       Zoom In        </source>
-        <translation type="unfinished"></translation>
+        <translation>       Povečaj       </translation>
     </message>
 </context>
 </TS>

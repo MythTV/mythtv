@@ -107,66 +107,66 @@
     </message>
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Izvajalec kompilacije:   </translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Narejeno</translation>
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>DB Statistika</translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished">Različni izvajalci</translation>
+        <translation>Različni izvajalci</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor izvajalca</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor izvajalca kompilacije</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor albuma</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor zvrsti</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Shranim spremembe?</translation>
     </message>
     <message>
         <source>Save to Database Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Shrani samo v bazo</translation>
     </message>
     <message>
         <source>Save to File Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Shrani samo v datoteko</translation>
     </message>
     <message>
         <source>Save to File and Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Shrani v datoteko in bazo</translation>
     </message>
     <message>
         <source>Exit/Do Not Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Izhod/Ne shrani</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Prekliči</translation>
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ste prepričani, da želite shraniti spremenjeni metapodatek v datoteko?</translation>
     </message>
 </context>
 <context>
@@ -284,135 +284,135 @@
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="unfinished">Uredi predvajalni seznam</translation>
+        <translation>Uredi predvajalni seznam</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="unfinished">Vizualizacija</translation>
+        <translation>Vizualizacija</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Uredi predvajalni seznam</translation>
+        <translation>3 Uredi predvajalni seznam</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation type="unfinished">4 Vizualizacija</translation>
+        <translation>4 Vizualizacija</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Mešaj: Pametno</translation>
+        <translation>1 Mešaj: Pametno</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation type="unfinished">Mešaj: Pametno</translation>
+        <translation>Mešaj: Pametno</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Mešaj: Naključno</translation>
+        <translation>1 Mešaj: Naključno</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation type="unfinished">Mešaj: Naključno</translation>
+        <translation>Mešaj: Naključno</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Mešaj: Nobeden</translation>
+        <translation>1 Mešaj: Nobeden</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="unfinished">Mešaj: Nobeden</translation>
+        <translation>Mešaj: Nobeden</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Ponovi: Vse</translation>
+        <translation>2 Ponovi: Vse</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="unfinished">Ponovi: Vse</translation>
+        <translation>Ponovi: Vse</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Ponovi: Komad</translation>
+        <translation>2 Ponovi: Skladba</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="unfinished">Ponovi: Komad</translation>
+        <translation>Ponovi: Skladba</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Ponovi: Nobenega</translation>
+        <translation>2 Ponovi: Nobenega</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="unfinished">Ponovi: Nobenega</translation>
+        <translation>Ponovi: Nobenega</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="unfinished">domač imenik predvajalnega seznama</translation>
+        <translation>domači imenik predvajalnega seznama</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="unfinished">Predvajalni tok.</translation>
+        <translation>Predvajalni tok.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="unfinished">Tok medpolnjenja.</translation>
+        <translation>Tok predpolnjenja.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="unfinished">Tok pavziran.</translation>
+        <translation>Tok pavziran.</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation type="unfinished">kbps</translation>
+        <translation>kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="unfinished">kHz</translation>
+        <translation>kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished">kanal</translation>
+        <translation>kanal</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="unfinished">Napaka izhoda.</translation>
+        <translation>Izhodna napaka.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="unfinished">Tok ustavljen.</translation>
+        <translation>Tok ustavljen.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="unfinished">Predvajanje toka končano.</translation>
+        <translation>Predvajanje toka končano.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="unfinished">Napaka dekoderja.</translation>
+        <translation>Dekodirna napaka.</translation>
     </message>
     <message>
         <source>Smart playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Pametni predvajalni seznam</translation>
     </message>
     <message>
         <source>All Tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Vsa glasba</translation>
     </message>
     <message>
         <source>Tracks by current Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Glasba tega izvajalca</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Glasba tega albuma</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Glasba te zvrsti</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Glasba tega leta</translation>
     </message>
 </context>
 <context>
@@ -491,7 +491,7 @@
     </message>
     <message>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation>Če nastavljeno, bo MythMusic izpustil preverjanje ID3 oznak v datotekah in samo poizkušal ugotoviti Zvrst, Izvajalca, Album, Številko komada in Naslov iz imena datoteke.</translation>
+        <translation>Če nastavljeno, bo MythMusic izpustil preverjanje ID3 oznak v datotekah in samo poizkušal ugotoviti Zvrst, Izvajalca, Album, Številko skladbe in Naslov iz imena datoteke.</translation>
     </message>
     <message>
         <source>Automatically lookup CDs</source>
@@ -563,7 +563,7 @@
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation>Definira mesto/ime za novo pesem. Veljavn znaki so: STIL, IZVAJALEC, ALBUM, KOMAD, NASLOV, LETO, / in -. &apos;-&apos; bo zamenjana z znakovnim razmikom</translation>
+        <translation>Definira mesto/ime za novo pesem. Veljavn znaki so: STIL, IZVAJALEC, ALBUM, SKLADBA, NASLOV, LETO, / in -. &apos;-&apos; bo zamenjana z znakovnim razmikom</translation>
     </message>
     <message>
         <source>Token separator</source>
@@ -611,7 +611,7 @@
     </message>
     <message>
         <source>Rating Weight</source>
-        <translation>Teža ocene</translation>
+        <translation>Stopnja ocene</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
@@ -975,7 +975,7 @@
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
-        <translation type="unfinished"></translation>
+        <translation>CD: %1 ~ %2 - %3</translation>
     </message>
 </context>
 <context>
@@ -1034,317 +1034,317 @@
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Več-Izvajalcev?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamenjaj Naslove &amp;&amp; Izvajalce</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Naslov</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Izvajalec</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Dolžina</translation>
     </message>
 </context>
 <context>
     <name>SmartPLCriteriaRow</name>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor izvajalca</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor albuma</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor zvrsti</translation>
     </message>
     <message>
         <source>Select a Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor naslova</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor kompilacije izvajalca</translation>
     </message>
 </context>
 <context>
     <name>SmartPLDateDialog</name>
     <message>
         <source>Edit Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Spremeni datum</translation>
     </message>
     <message>
         <source>Fixed Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Fiksni datum</translation>
     </message>
     <message>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation>Dan</translation>
     </message>
     <message>
         <source>Month</source>
-        <translation type="unfinished"></translation>
+        <translation>Mesec</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Leto</translation>
     </message>
     <message>
         <source>Use Current Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Uporabi trenutni datum</translation>
     </message>
     <message>
         <source>+/- Days</source>
-        <translation type="unfinished"></translation>
+        <translation>+/- Dnevi</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Vredu</translation>
+        <translation>Vredu</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Prekliči</translation>
     </message>
     <message>
         <source>Invalid Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Nepravilni datum</translation>
     </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>
     <message>
         <source>Order By Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Uredi po poljih</translation>
     </message>
     <message>
         <source>1 Add</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Dodaj</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj</translation>
     </message>
     <message>
         <source>2 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Briši</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Briši</translation>
     </message>
     <message>
         <source>3 Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Prestavi navzgor</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Prestavi navzgor</translation>
     </message>
     <message>
         <source>4 Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Prestavi navzdol</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Prestavi navzdol</translation>
     </message>
     <message>
         <source>5 Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Naraščajoče</translation>
     </message>
     <message>
         <source>Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Naraščajoče</translation>
     </message>
     <message>
         <source>6 Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>6 Padajoče</translation>
     </message>
     <message>
         <source>Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Padajoče</translation>
     </message>
     <message>
         <source>7 OK</source>
-        <translation type="unfinished"></translation>
+        <translation>7 Vredu</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Vredu</translation>
+        <translation>Vredu</translation>
     </message>
 </context>
 <context>
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Pregledovalnik rezultatov pametnega predvajalnega seznama</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Izhod</translation>
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Izvajalec</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Album    </translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Naslov</translation>
     </message>
     <message>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Zvrst</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Leto</translation>
     </message>
     <message>
         <source>Track No.</source>
-        <translation type="unfinished"></translation>
+        <translation>Št. sklad.</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Pametni predvajalni seznami</translation>
     </message>
     <message>
         <source>1 Select</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Izberi</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Izberi</translation>
     </message>
     <message>
         <source>2 New</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Nova</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nova</translation>
     </message>
     <message>
         <source>3 Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Uredi</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Uredi</translation>
     </message>
     <message>
         <source>4 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Briši</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Briši</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ste prepričadi, da želite brisati ta pametni seznam predvajanja?</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Urejevalnik pametnega predv. seznama</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorija:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Naslov:</translation>
     </message>
     <message>
         <source>Match</source>
-        <translation type="unfinished"></translation>
+        <translation>Podobnost</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Vse</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>Katerakoli</translation>
     </message>
     <message>
         <source>Of The Following Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>Od naslednjih pogojev</translation>
     </message>
     <message>
         <source>Order By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Uredi po:</translation>
     </message>
     <message>
         <source>Matches:</source>
-        <translation type="unfinished"></translation>
+        <translation>Podobnostih:</translation>
     </message>
     <message>
         <source>Limit:</source>
-        <translation type="unfinished"></translation>
+        <translation>Omejitvah:</translation>
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Prekliči</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Shrani</translation>
     </message>
     <message>
         <source>Show Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Prikaži rezultate</translation>
     </message>
     <message>
         <source>Smart Playlist Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorije pametnega predv. seznama</translation>
     </message>
     <message>
         <source>New Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Nova kategorija</translation>
     </message>
     <message>
         <source>Delete Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Briši kategorijo</translation>
     </message>
     <message>
         <source>Rename Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Preimenuj kategorijo</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this Category?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ste prepričani, da želite izbrisati to kategorijo?</translation>
     </message>
     <message>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbrisani bodo tudi pametni predvajalni seznami pripadajoči tej kategoriji.</translation>
     </message>
 </context>
 <context>
@@ -1355,51 +1355,51 @@
     </message>
     <message>
         <source>Track Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Podatki o skladbi</translation>
     </message>
     <message>
         <source>Artist:</source>
-        <translation type="unfinished"></translation>
+        <translation>Izvajalec:</translation>
     </message>
     <message>
         <source>Album:</source>
-        <translation type="unfinished"></translation>
+        <translation>Album:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Naslov:</translation>
     </message>
     <message>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zvrst:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Leto:</translation>
     </message>
     <message>
         <source>Track No.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Št. skladbe:</translation>
     </message>
     <message>
         <source>Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocena:</translation>
     </message>
     <message>
         <source>Play Count:</source>
-        <translation type="unfinished"></translation>
+        <translation>Št. predvajanj:</translation>
     </message>
     <message>
         <source>Last Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zadnjič predvajana:</translation>
     </message>
     <message>
         <source>Compilation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kompilacija:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ime datoteke:</translation>
     </message>
 </context>
 </TS>

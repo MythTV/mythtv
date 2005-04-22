@@ -636,15 +636,15 @@
     </message>
     <message>
         <source>COLD</source>
-        <translation type="unfinished"></translation>
+        <translation>MRZLO</translation>
     </message>
     <message>
         <source>COLDEST</source>
-        <translation type="unfinished"></translation>
+        <translation>FULL MRZLO</translation>
     </message>
     <message>
         <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished"></translation>
+        <translation>TEMPERATURA ZRAKA</translation>
     </message>
 </context>
 <context>
@@ -888,12 +888,14 @@
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth ni mogel, znotraj časovnega intervala (%1 sekund), sprejeti vremenskih podatkov.
+Pritisnite VREDU ali poizkušajte z daljšim časovnim intervalom. Pritisnite PREKLIČI za poizkus brez radarskih posnetkov.</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth ni mogel, znotraj časovnega intervala (%1 sekund), sprejeti vremenskih podatkov.
+Pritisnite VREDU ali poizkušajte z daljšim časovnim intervalom. Pritisnite PREKLIČI za preklic.</translation>
     </message>
 </context>
 </TS>

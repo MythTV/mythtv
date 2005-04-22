@@ -290,7 +290,7 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>Display mythdvd menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Prikaži MythDvd menu</translation>
     </message>
 </context>
 <context>

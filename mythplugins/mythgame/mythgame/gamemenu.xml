@@ -7,6 +7,7 @@
      <text lang="PT">Jogos</text>
      <text lang="SV">Spel</text>
      <text lang="DE">Spiele</text>
+     <text lang="SI">Igre</text>
      <action>GAME_PLAY</action>
   </button>
 

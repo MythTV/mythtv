@@ -14,6 +14,7 @@
       <text lang="FR">Configuration générale</text>
       <text lang="JA">全般設定</text>
       <text lang="FI">Yleiset Asetukset</text>
+      <text lang="SI">Splošne nastavitve</text>
       <action>MUSIC_SET_GENERAL</action>
    </button>
 
@@ -31,6 +32,7 @@
       <text lang="FR">Configuration du lecteur</text>
       <text lang="JA">プレイヤー設定</text>
       <text lang="FI">Soittoasetukset</text>
+      <text lang="SI">Nastavitve predvajanja</text>
       <action>MUSIC_SET_PLAYER</action>
    </button>
 
@@ -46,6 +48,7 @@
       <text lang="FR">Configuration de l'extraction</text>
       <text lang="JA">リッパー設定</text>
       <text lang="FI">Tuontiasetukset</text>
+      <text lang="SI">Nastavitve ripanja</text>
       <action>MUSIC_SET_RIPPER</action>
    </button>
 </mythmenu>

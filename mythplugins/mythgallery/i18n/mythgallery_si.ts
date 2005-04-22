@@ -98,7 +98,7 @@
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Naključno</translation>
     </message>
 </context>
 <context>
@@ -173,11 +173,11 @@
     </message>
     <message>
         <source>Command run to display movie files</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukaz za prikaz filmov</translation>
     </message>
     <message>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta ukaz se bo izvedel ob izboru filma</translation>
     </message>
 </context>
 <context>

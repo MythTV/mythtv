@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Favourites</source>
-        <translation type="unfinished"></translation>
+        <translation>Priljubljene</translation>
     </message>
 </context>
 <context>
@@ -842,11 +842,11 @@ Prosim vnesite pravilno pot in poizkusite ponovno.</translation>
     </message>
     <message>
         <source>Favourite display order</source>
-        <translation type="unfinished"></translation>
+        <translation>Priljubljen vrstni red</translation>
     </message>
     <message>
         <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="unfinished"></translation>
+        <translation>Vrstni red sortiranja iger, označen kot priljubljene - za vse sisteme. Možno: sistem, leto, zvrst in ime igre</translation>
     </message>
 </context>
 <context>
