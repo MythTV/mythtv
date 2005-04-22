@@ -3531,9 +3531,6 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     QTime flagTime;
     flagTime.start();
 
-    if (OpenFile() < 0)
-        return(254);
-
     if (m_playbackinfo->recendts < QDateTime::currentDateTime())
         SetWatchingRecording(false);
 
@@ -3547,8 +3544,6 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         int initialSleep = 30;
         int additionalSleep = 0;
         int curCmd;
-
-        commDetect->SetWatchingRecording(true, nvr_enc, this);
 
         if (commercialskipmethod & COMM_DETECT_LOGO)
             additionalSleep = commDetect->GetLogoSecondsNeeded();
@@ -3571,11 +3566,23 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             }
 
             if (i == initialSleep)
+            {
                 flagTime.start();
+
+                if (OpenFile() < 0)
+                    return(254);
+
+                commDetect->SetWatchingRecording(true, nvr_enc, this);
+            }
 
             sleep(1);
             i++;
         }
+    }
+    else
+    {
+        if (OpenFile() < 0)
+            return(254);
     }
 
     m_playbackinfo->SetCommFlagged(COMM_FLAG_PROCESSING);

@@ -309,7 +309,7 @@ int FlagCommercials(QString chanid, QString starttime)
             gContext->ConnectToMasterServer();
 
             recorder = RemoteGetExistingRecorder(program_info);
-            if (recorder)
+            if (recorder && (recorder->GetRecorderNumber() != -1))
                 nvp->SetRecorder(recorder);
             else
                 cerr << "Unable to get remote recorder, flagging info may be "
