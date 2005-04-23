@@ -27,7 +27,6 @@
 #include <sys/stat.h>
 #include <sys/poll.h>
 
-//#include <string.h>
 #include <mythcontext.h>
 #include "util-x11.h"
 
@@ -63,6 +62,9 @@ int VideoSync::m_forceskip = 0;
         delete trial; \
     }
 
+/** \fn VideoSync::BestMethod(int, int, bool)
+ *  \brief Returns the most sophisticated video sync method available.
+ */
 VideoSync *VideoSync::BestMethod(int frame_interval, int refresh_interval,
                                  bool interlaced)
 {
@@ -93,6 +95,10 @@ VideoSync *VideoSync::BestMethod(int frame_interval, int refresh_interval,
     return NULL;
 }
 
+/** \fn VideoSync::VideoSync(int, int, bool)
+ *  \brief Used by BestMethod(int, int, bool) to initialize
+ *         video synchronization method.
+ */
 VideoSync::VideoSync(int frameint, int refreshint, bool interlaced) :
     m_frame_interval(frameint), m_refresh_interval(refreshint), 
     m_interlaced(interlaced) 
@@ -108,6 +114,9 @@ void VideoSync::Start()
     gettimeofday(&m_nexttrigger, NULL); // now
 }
 
+/** \fn VideoSync::SetFrameInterval(int fr, bool intr)
+ *  \brief Change frame interval and interlacing attributes
+ */
 void VideoSync::SetFrameInterval(int fr, bool intr)
 {
     m_frame_interval = fr;
@@ -134,6 +143,11 @@ void VideoSync::OffsetTimeval(struct timeval& tv, int offset)
     }
 }
 
+/** \fn VideoSync::UpdateNexttrigger()
+ *  \brief Internal method to tells video synchronization method to use
+ *         the next frame (or field, if interlaced) for CalcDelay() 
+ *         and WaitForFrame().
+ */
 void VideoSync::UpdateNexttrigger()
 {
     // Offset by frame interval -- if interlaced, only delay by half
@@ -144,6 +158,15 @@ void VideoSync::UpdateNexttrigger()
         OffsetTimeval(m_nexttrigger, m_frame_interval);
 }
 
+/** \fn VideoSync::CalcDelay()
+ *  \brief Calculates the delay to the next frame.
+ *
+ *   Regardless of the timing method, if delay is greater than two full
+ *   frames (could be greater than 20 or greater than 200), we don't want
+ *   to freeze while waiting for a huge delay. Instead, contine playing 
+ *   video at half speed and continue to read new audio and video frames
+ *   from the file until the sync is 'in the ballpark'.
+ */
 int VideoSync::CalcDelay()
 {
     struct timeval now;
@@ -155,12 +178,6 @@ int VideoSync::CalcDelay()
                   (m_nexttrigger.tv_usec - now.tv_usec);
 
     //cout << "delay " << ret_val << endl;
-
-    // Regardless of the timing method, if delay is greater than two full
-    // frames (could be greater than 20 or greater than 200), we don't want
-    // to freeze while waiting for a huge delay. Instead, contine playing 
-    // video at half speed and continue to read new audio and video frames
-    // from the file until the sync is 'in the ballpark'.
 
     if (ret_val > m_frame_interval * 2)
     {
@@ -177,14 +194,16 @@ int VideoSync::CalcDelay()
     return ret_val;
 }
 
+/** \fn VideoSync::KeepPhase()
+ *  \brief Keep our nexttrigger from drifting too close to the exact retrace.
+ *
+ *   If delay is near zero, some frames will be delay < 0 and others
+ *   delay > 0 which would cause continous rapid fire stuttering.
+ *   This method is only useful for those sync methods where WaitForFrame
+ *   targets hardware retrace rather than targeting nexttrigger.
+ */
 void VideoSync::KeepPhase()
 {
-    // Keep our nexttrigger from drifting too close to the exact retrace.
-    // If delay is near zero, some frames will be delay < 0 and others
-    // delay > 0 which would cause continous rapid fire stuttering.
-    // This method is only useful for those sync methods where WaitForFrame
-    // targets hardware retrace rather than targeting nexttrigger.
-
     // cerr << m_delay << endl;
     if (m_delay < -(m_refresh_interval/2))
         OffsetTimeval(m_nexttrigger, 200);
@@ -541,9 +560,10 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
         r = glXGetVideoSyncSGI(&count);
         X11U;
 
-        /// UNSAFE UNSAFE UNSAFE UNSAFE UNSAFE
+        // POSSIBLY UNSAFE -- POSSIBLY UNSAFE
         r = glXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
-        /// UNSAFE UNSAFE UNSAFE UNSAFE UNSAFE
+        // POSSIBLY UNSAFE -- POSSIBLY UNSAFE
+
 
         m_delay = CalcDelay();
         //cerr << "\tDelay at sync: " << m_delay;
@@ -555,11 +575,9 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
         // Wait for any remaining retrace intervals in one pass.
         n = m_delay / m_refresh_interval + 1;
 
-
-        /// UNSAFE UNSAFE UNSAFE UNSAFE UNSAFE
+        // POSSIBLY UNSAFE -- POSSIBLY UNSAFE
         r = glXWaitVideoSyncSGI((n+1), (count+n)%(n+1), &count);
-        /// UNSAFE UNSAFE UNSAFE UNSAFE UNSAFE
-
+        // POSSIBLY UNSAFE -- POSSIBLY UNSAFE
 
         m_delay = CalcDelay();
         //cerr << "Wait " << n << " intervals. Count " << count;
@@ -573,12 +591,16 @@ void OpenGLVideoSync::AdvanceTrigger()
     UpdateNexttrigger();
 }
 
+/** \fn OpenGLVideoSync::Stop()
+ *  \brief Stops VSync; must be called from main thread.
+ *
+ *   This method should be called from the MAIN THREAD to work around
+ *   a bug in some OpenGL implementations, where if the thread that
+ *   has the current GL context goes away, no other thread can ever
+ *   have it.
+ */
 void OpenGLVideoSync::Stop()
 {
-    // This method should be called from the MAIN THREAD to work around
-    // a bug in some OpenGL implementations, where if the thread that
-    // has the current GL context goes away, no other thread can ever
-    // have it.
     X11S(glXMakeCurrent(m_display, 0, 0));
 }
 #endif /* USING_OPENGL_VSYNC */

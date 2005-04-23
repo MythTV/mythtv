@@ -53,6 +53,7 @@ typedef struct _XDisplay Display;
 
 extern bool tryingVideoSync;
 
+/// \brief Virtual base class for all video synchronization classes.
 class VideoSync
 // virtual base class
 {
@@ -60,17 +61,31 @@ class VideoSync
     VideoSync(int fi, int ri, bool intr);
     virtual ~VideoSync() {}
 
+    /// \brief Returns name of instanciated VSync method.
     virtual QString getName() const = 0;
+    /// \brief Tries to initialize VSync method.
     virtual bool TryInit() = 0;
+
+    /// \brief Start VSync; must be called from main thread.
     virtual void Start();
 
+    /** \brief Waits for next a frame or field.
+     *  \param sync_delay time until the desired frame or field
+     *  \sa CalcDelay(), KeepPhase()
+     */
     virtual void WaitForFrame(int sync_delay) = 0;
+
+    /// \brief Use the next frame or field for CalcDelay() and WaitForFrame(int).
     virtual void AdvanceTrigger() = 0;
 
     void SetFrameInterval(int fi, bool interlaced);
+
+    /// \brief Returns whether AdvanceTrigger() advances
+    ///        a field or frame at a time.
     bool isInterlaced() const { return m_interlaced; }
 
-    virtual void Stop() {} // will be called from main thread
+    /// \brief Stops VSync; must be called from main thread.
+    virtual void Stop() {}
     static VideoSync *BestMethod(int frame_interval, int refresh_interval,
                                  bool interlaced);
  protected:
@@ -88,10 +103,13 @@ class VideoSync
     static int m_forceskip;
 };
 
+/** \brief Video synchronization class employing /dev/drm0
+ *
+ *   Polls /dev/drm0 to wait for retrace.  Phase-maintaining, meaning
+ *   WaitForFrame should always return approximately the same time after
+ *   a vertical retrace.
+ */
 class DRMVideoSync : public VideoSync
-// Polls /dev/drm0 to wait for retrace.  Phase-maintaining, meaning
-// WaitForFrame should always return approximately the same time after
-// a vertical retrace.
 {
  public:
     DRMVideoSync(int frame_interval, int refresh_interval, bool interlaced);
@@ -109,8 +127,14 @@ class DRMVideoSync : public VideoSync
     
 };
 
+/** \brief Video synchronization class employing /dev/nvidia0
+ *
+ *   Polls /dev/nvidia0 to wait for retrace.  Phase-maintaining, meaning
+ *   WaitForFrame should always return approximately the same time after
+ *   a vertical retrace. This does not work with version 50 or later
+ *   of the nVidia vendor drivers.
+ */
 class nVidiaVideoSync : public VideoSync
-// Polls /dev/nvidia0 to wait for retrace.  Phase-maintaining.
 {
  public:
     nVidiaVideoSync(int frame_interval, int refresh_interval, bool interlaced);
@@ -129,8 +153,16 @@ class nVidiaVideoSync : public VideoSync
 };
 
 #ifdef USING_OPENGL_VSYNC
+/** \brief Video synchronization class employing SGI_video_sync
+ *         OpenGL extension.
+ *
+ *   Uses glXWaitVideoSyncSGI() to wait for retrace.  Phase-maintaining,
+ *   meaning WaitForFrame should always return approximately the same time 
+ *   after a vertical retrace.
+ *
+ *   This works with version 50 or later of the nVidia vendor drivers.
+ */
 class OpenGLVideoSync : public VideoSync
-// Calls glXWaitVideoSyncSGI to wait for retrace.  Phase-maintaining.
 {
 public:
     OpenGLVideoSync(int frame_interval, int refresh_interval, bool interlaced);
@@ -151,8 +183,17 @@ private:
 #endif /* USING_OPENGL_VSYNC */
 
 #ifdef __linux__
+/** \brief Video synchronization class employing /dev/rtc
+ *  
+ *  Non-phase-maintaining. There may occasionally be short periods 
+ *  of jitter that eventually go away.
+ *
+ *  You may need to issue the following command before this will work:
+ * \code
+ *  echo 1024 > /proc/sys/dev/rtc/max-user-freq
+ * \endcode
+ */
 class RTCVideoSync : public VideoSync
-// Reads /dev/rtc to time frame intervals.  Not phase-maintaining.
 {
 public:
     RTCVideoSync(int frame_interval, int refresh_interval, bool interlaced);
@@ -168,10 +209,17 @@ private:
 };
 #endif
 
+/** \brief Video synchronization classes employing usleep() and busy-waits.
+ *  
+ *  Non-phase-maintaining. There may occasionally be short periods 
+ *  of jitter that eventually go away.
+ *
+ *  This method does not maintain phase and uses the most CPU of any of
+ *  the VSync methods. But it is the catch-all fallback algorithm,
+ *  TryInit() always succeeds.
+ *
+ */
 class BusyWaitVideoSync : public VideoSync
-// USleeps as long as possible, then busy-waits.  Like old "Jitter
-// Reduction."  Not phase-maintaining.  Fallback algorithm; TryInit
-// always succeeds.
 {
 public:
     BusyWaitVideoSync(int frame_interval, int refresh_interval, 
@@ -188,11 +236,17 @@ private:
     int m_fudge;
 };
 
+/** \brief Video synchronization classes employing only usleep().
+ *
+ *   Calls usleep() for the entire remaining frame interval.  Horribly
+ *   inaccurate on < Linux 2.6 kernels; not very accurate there either.
+ *   Not phase-maintaining. Not tried automatically.
+ *
+ *   This only used when NVP's 'disablevideo' is true (i.e. for 
+ *   commercial flagging and for transcoding), since it doesn't
+ *   waste CPU cycles busy-waiting like BusyWaitVideoSync.
+ */
 class USleepVideoSync : public VideoSync
-// USleeps for the entire remaining frame interval.  Horribly
-// inaccurate on < Linux 2.6 kernels; not very accurate there either.
-// Not phase-maintaining.  Not tried automatically; only used when
-// 'disablevideo' is true.
 {
 public:
     USleepVideoSync(int frame_interval, int refresh_interval, 
