@@ -486,7 +486,7 @@ bool VideoOutputXv::InitVideoBuffers(bool use_xvmc, bool use_xv, bool use_shm)
                       1+XVMC_OSD_RES_NUM /*need_free*/,
                       5-XVMC_OSD_RES_NUM /*needprebuffer_normal*/,
                       5-XVMC_OSD_RES_NUM /*needprebuffer_small*/,
-                      1 /*keepprebuffer*/);
+                      1 /*keepprebuffer*/, true /*use_frame_locking*/);
         done = InitXvMC();
 
         if (!done)
@@ -496,7 +496,7 @@ bool VideoOutputXv::InitVideoBuffers(bool use_xvmc, bool use_xv, bool use_shm)
 
     // Create ffmpeg VideoFrames    
     if (!done)
-        vbuffers.Init(31, true, 1, 12, 4, 2);
+        vbuffers.Init(31, true, 1, 12, 4, 2, false);
 
     // Fall back to XVideo if there is an xv_port
     if (!done && use_xv)

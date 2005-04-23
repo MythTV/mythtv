@@ -85,7 +85,8 @@ VideoBuffers::VideoBuffers()
     : numbuffers(0), needfreeframes(0), needprebufferframes(0),
       needprebufferframes_normal(0), needprebufferframes_small(0),
       keepprebufferframes(0), need_extra_for_pause(false), rpos(0), vpos(0),
-      frame_lock(true), inheritence_lock(false), global_lock(true)
+      global_lock(true), inheritence_lock(false), use_frame_locks(true),
+      frame_lock(true)
 {
 }
 
@@ -117,7 +118,8 @@ VideoBuffers::~VideoBuffers()
  */
 void VideoBuffers::Init(uint numdecode, bool extra_for_pause, 
                         uint need_free, uint needprebuffer_normal,
-                        uint needprebuffer_small, uint keepprebuffer)
+                        uint needprebuffer_small, uint keepprebuffer,
+                        bool enable_frame_locking)
 {
     global_lock.lock();
 
@@ -144,6 +146,7 @@ void VideoBuffers::Init(uint numdecode, bool extra_for_pause,
     needprebufferframes_small   = needprebuffer_small;
     keepprebufferframes         = keepprebuffer;
     need_extra_for_pause        = extra_for_pause;
+    use_frame_locks             = enable_frame_locking;
 
     for (uint i = 0; i < numdecode; i++)
         enqueue(kVideoBuffer_avail, at(i));
@@ -656,6 +659,9 @@ void VideoBuffers::ClearAfterSeek(void)
 
 void VideoBuffers::LockFrame(const VideoFrame *frame, const QString &owner)
 {
+    if (!use_frame_locks)
+        return;
+    
     QMutex *mutex = NULL;
     (void)owner;
 
@@ -682,6 +688,9 @@ void VideoBuffers::LockFrame(const VideoFrame *frame, const QString &owner)
 
 void VideoBuffers::LockFrames(vector<const VideoFrame*>& vec, const QString& owner)
 {
+    if (!use_frame_locks)
+        return;
+
     (void)owner;
     bool ok;
     vector<bool> oks;
@@ -713,6 +722,9 @@ void VideoBuffers::LockFrames(vector<const VideoFrame*>& vec, const QString& own
 
 bool VideoBuffers::TryLockFrame(const VideoFrame *frame, const QString &owner)
 {
+    if (!use_frame_locks)
+        return true;
+
     QMutex *mutex = NULL;
     (void)owner;
 
@@ -748,6 +760,9 @@ bool VideoBuffers::TryLockFrame(const VideoFrame *frame, const QString &owner)
 
 void VideoBuffers::UnlockFrame(const VideoFrame *frame, const QString &owner)
 {
+    if (!use_frame_locks)
+        return;
+
     (void)owner;
 
     if (!frame)
@@ -768,6 +783,9 @@ void VideoBuffers::UnlockFrame(const VideoFrame *frame, const QString &owner)
 
 void VideoBuffers::UnlockFrames(vector<const VideoFrame*>& vec, const QString& owner)
 {
+    if (!use_frame_locks)
+        return;
+
     (void)owner;
 #if DEBUG_FRAME_LOCKS
     VERBOSE(VB_PLAYBACK, QString("unlocking frames:%1 %2 %3")

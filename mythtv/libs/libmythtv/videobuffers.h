@@ -51,7 +51,8 @@ class VideoBuffers
 
     void Init(uint numdecode, bool extra_for_pause, 
               uint need_free, uint needprebuffer_normal,
-              uint needprebuffer_small, uint keepprebuffer);
+              uint needprebuffer_small, uint keepprebuffer,
+              bool enable_frame_locking = false);
 
     bool CreateBuffers(int width, int height, vector<unsigned char*> bufs);
     bool CreateBuffers(int width, int height);
@@ -156,9 +157,11 @@ class VideoBuffers
     uint                   rpos;
     uint                   vpos;
 
-    QMutex                 frame_lock;
-    QMutex                 inheritence_lock;
     mutable QMutex         global_lock;
+    QMutex                 inheritence_lock;
+
+    bool                   use_frame_locks;
+    QMutex                 frame_lock;
     frame_lock_map_t       frame_locks;
 
 #ifdef USING_XVMC
