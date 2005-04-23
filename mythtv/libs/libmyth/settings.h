@@ -54,6 +54,10 @@ public:
     virtual void setEnabled(bool b) { enabled = b; }
     bool isEnabled() { return enabled; }
 
+public slots:
+    virtual void enableOnSet(const QString &val);
+    virtual void enableOnUnset(const QString &val);
+
 protected:
     bool labelAboveWidget; 
     bool enabled;
@@ -792,21 +796,6 @@ class HostRefreshRateComboBox: virtual public HostComboBox
   private:
     static const vector<short> GetRefreshRates(const QString &resolution);
 };
-
-#ifdef USING_XVMC
-class XvMCHostCheckBox : virtual public HostCheckBox
-{
-    Q_OBJECT
-  public:
-    XvMCHostCheckBox(const QString &name) : HostCheckBox(name) { ; }
-    virtual ~XvMCHostCheckBox() { ; }
-  public slots:
-    inline virtual void UseLibMPEG2(const QString &val)
-    {
-        setEnabled( val == "0" );
-    }
-};
-#endif
 
 class HostTimeBox: public ComboBoxSetting, public HostSetting {
   public:

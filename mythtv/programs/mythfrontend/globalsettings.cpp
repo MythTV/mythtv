@@ -2094,9 +2094,9 @@ static HostCheckBox *PVR350UseInternalSound()
 }
 
 #ifdef USING_XVMC
-static XvMCHostCheckBox *UseXVMC()
+static HostCheckBox *UseXVMC()
 {
-    XvMCHostCheckBox *gc = new XvMCHostCheckBox("UseXVMC");
+    HostCheckBox *gc = new HostCheckBox("UseXVMC");
     gc->setLabel(QObject::tr("Use hardware XvMC MPEG Decoding (incompatible with libmpeg2)"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr(
@@ -2110,9 +2110,9 @@ static XvMCHostCheckBox *UseXVMC()
 #endif
 
 #ifdef USING_XVMC_VLD
-static XvMCHostCheckBox *UseXvMcVld()
+static HostCheckBox *UseXvMcVld()
 {
-    XvMCHostCheckBox *gc = new XvMCHostCheckBox("UseXvMcVld");
+    HostCheckBox *gc = new HostCheckBox("UseXvMcVld");
     gc->setLabel(QObject::tr("Use hardware XVMC VLD Decoding (incompatible with libmpeg2)"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enables the use of viaXvMC hardware MPEG "
@@ -2146,16 +2146,16 @@ public:
          addTarget("0", new VerticalConfigurationGroup(true));
 
 #ifdef USING_XVMC
-         XvMCHostCheckBox *use_xvmc = UseXVMC();
+         HostCheckBox *use_xvmc = UseXVMC();
          addChild(use_xvmc);
          connect(use_mpeg, SIGNAL(valueChanged(const QString&)),
-                 use_xvmc, SLOT(UseLibMPEG2(const QString&)));
+                 use_xvmc, SLOT(enableOnUnset(const QString&)));
 #endif
 #ifdef USING_XVMC_VLD
-         XvMCHostCheckBox *use_xvmc_vld = UseXvMcVld();
+         HostCheckBox *use_xvmc_vld = UseXvMcVld();
          addChild(UseXvMcVld());
          connect(use_mpeg, SIGNAL(valueChanged(const QString&)),
-                 use_xvmc_vld, SLOT(UseLibMPEG2(const QString&)));
+                 use_xvmc_vld, SLOT(enableOnUnset(const QString&)));
 #endif
     };
 };

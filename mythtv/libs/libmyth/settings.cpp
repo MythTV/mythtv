@@ -30,21 +30,56 @@
 #include "mythdbcon.h"
 #include "DisplayRes.h"
 
+/** \class Configurable
+ *  \brief Configurable is the root of all the database aware widgets.
+ *
+ *   This is an abstract class and several methods must be implemented
+ *   in children. load(), save(), and byName(QString), are all abstract.
+ *   And while configWidget(ConfigurationGroup *, QWidget*, const char*)
+ *   has an implementation, all it does is print an error message and
+ *   return a NULL pointer.
+ */
+
 QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) 
 {
     (void)cg;
     (void)parent;
     (void)widgetName;
-    cout << "BUG: Configurable is visible, but has no configWidget\n";
+    VERBOSE(VB_IMPORTANT, "BUG: Configurable is visible, but has no "
+            "configWidget");
     return NULL;
 }
 
-ConfigurationGroup::~ConfigurationGroup()  {
-    for(childList::iterator i = children.begin() ;
-        i != children.end() ;
-        ++i )
-        delete *i;
+/** \fn Configurable::enableOnSet(const QString &)
+ *  \brief This slot allows you to enable this configurable when a
+ *         binary configurable is set to true.
+ *  \param signal value, should be "0" to disable, other to disable.
+ */
+void Configurable::enableOnSet(const QString &val)
+{
+    setEnabled( val != "0" );
+}
+
+/** \fn Configurable::enableOnUnset(const QString &)
+ *  \brief This slot allows you to enable this configurable when a
+ *         binary configurable is set to false.
+ *  \param signal value, should be "0" to enable, other to disable.
+ */
+void Configurable::enableOnUnset(const QString &val)
+{
+    setEnabled( val == "0" );
+}
+
+ConfigurationGroup::~ConfigurationGroup()
+{
+    childList::iterator it = children.begin();
+    while (it != children.end())
+    {
+        if (*it)
+            delete *it;
+        ++it;
+    }
 }
 
 Setting* ConfigurationGroup::byName(QString name) {
