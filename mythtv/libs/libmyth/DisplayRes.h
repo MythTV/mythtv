@@ -112,26 +112,6 @@ class DisplayRes {
     const vector<short> GetRefreshRates(int width, int height) const;
     /** @} */
 
-    // These are for backward compatability
-    static DisplayRes *getDisplayRes(void);
-    bool switchToGUI(void) { return SwitchToGUI(); }
-    int vwidth, vheight;
-    bool switchToVid(int width, int height)
-    {
-        vwidth=width;
-        vheight=height;
-        return SwitchToVideo(width, height, 0);
-    }
-    bool switchToCustom(int width, int height)
-    {
-        return SwitchToCustomGUI(width, height, 0);
-    }
-    int Width(void)       const { return GetWidth(); }
-    int Height(void)      const { return GetHeight(); }
-    int Width_mm(void)    const { return GetPhysicalWidth(); }
-    int Height_mm(void)   const { return GetPhysicalHeight(); }
-    int vidWidth(void)    const { return vwidth; }
-    int vidHeight(void)    const { return vheight; }
   protected:
     /// \brief DisplayRes is an abstract class, instanciate with GetDisplayRes(void)
     DisplayRes(void) : max_width(0), max_height(0) {;}

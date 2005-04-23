@@ -160,9 +160,10 @@ class NuppelVideoPlayer
     void SetEffDsp(int dsprate);
     void SetFileLength(int total, int frames);
 
-    VideoFrame *GetNextVideoFrame(void);
+    VideoFrame *GetNextVideoFrame(bool allow_unsafe = true);
     void ReleaseNextVideoFrame(VideoFrame *buffer, long long timecode);
     void DiscardVideoFrame(VideoFrame *buffer);
+    void DiscardVideoFrames(void);
 
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
@@ -208,6 +209,8 @@ class NuppelVideoPlayer
     bool IsErrored() { return errored; }
 
  protected:
+    void DisplayPauseFrame(void);
+    void DisplayNormalFrame(void);
     void OutputVideoLoop(void);
     void IvtvVideoLoop(void);
 
@@ -304,6 +307,7 @@ class NuppelVideoPlayer
 
     /* Video circular buffer */
     bool prebuffering;  /* don't play until done prebuffering */
+    int prebuffer_tries;/* how often have we tried waiting? */
     QMutex prebuffering_lock;
     QWaitCondition prebuffering_wait;
 

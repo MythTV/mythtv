@@ -731,6 +731,7 @@ public:
         SimpleDBStorage("settings", "data") {
         setName(name);
     };
+    virtual ~HostSetting() { ; }
 
 protected:
     virtual QString whereClause(void);
@@ -768,6 +769,7 @@ class HostCheckBox: public CheckBoxSetting, public HostSetting {
   public:
     HostCheckBox(const QString &name) :
         HostSetting(name) { }
+    virtual ~HostCheckBox() { ; }
 };
 
 class HostComboBox: public ComboBoxSetting, public HostSetting {
@@ -790,6 +792,21 @@ class HostRefreshRateComboBox: virtual public HostComboBox
   private:
     static const vector<short> GetRefreshRates(const QString &resolution);
 };
+
+#ifdef USING_XVMC
+class XvMCHostCheckBox : virtual public HostCheckBox
+{
+    Q_OBJECT
+  public:
+    XvMCHostCheckBox(const QString &name) : HostCheckBox(name) { ; }
+    virtual ~XvMCHostCheckBox() { ; }
+  public slots:
+    inline virtual void UseLibMPEG2(const QString &val)
+    {
+        setEnabled( val == "0" );
+    }
+};
+#endif
 
 class HostTimeBox: public ComboBoxSetting, public HostSetting {
   public:

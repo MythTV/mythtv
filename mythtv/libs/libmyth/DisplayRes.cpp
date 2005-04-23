@@ -170,19 +170,15 @@ const vector<short> DisplayRes::GetRefreshRates(int width, int height) const {
     return drv[t].RefreshRates();
 }
 
-// begin --- for backward compatability
-#include "mythcontext.h"
-DisplayRes *DisplayRes::getDisplayRes(void)
-{
-    if (gContext->GetNumSetting("UseVideoModes", 0))
-        return DisplayRes::GetDisplayRes();
-    else
-        return NULL;
-}
-// end  ---  for backward compatability
-
-// Helper function
-const vector<DisplayResScreen> GetVideoModes()
+/** \fn GetVideoModes(void)
+ *  \relates DisplayRes
+ *  \brief Returns all video modes available.
+ * 
+ *   This is a conveniance class that instanciates a DisplayRes
+ *   class if needed, and returns a copy of vector returned by
+ *   DisplayRes::GetVideoModes(void).
+ */
+const vector<DisplayResScreen> GetVideoModes(void)
 {
     DisplayRes *display_res = DisplayRes::GetDisplayRes();
     if (display_res)

@@ -15,10 +15,6 @@
 #include "videoout_ivtv.h"
 #endif
 
-#ifdef USING_XVMC
-#include "videoout_xvmc.h"
-#endif
-
 #ifdef USING_DIRECTFB
 #include "videoout_directfb.h"
 #endif
@@ -39,18 +35,13 @@
 
 #include "filtermanager.h"
 
-VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
+VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, bool is_mpeg_video)
 {
     (void)type;
 
 #ifdef USING_IVTV
     if (type == kVideoOutput_IVTV)
         return new VideoOutputIvtv();
-#endif
-
-#ifdef USING_XVMC
-    if (type == kVideoOutput_XvMC)
-        return new VideoOutputXvMC();
 #endif
 
 #ifdef USING_DIRECTFB
@@ -62,7 +53,7 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 #endif
 
 #ifdef USING_XV
-    return new VideoOutputXv();
+    return new VideoOutputXv(is_mpeg_video);
 #endif
 
 #ifdef Q_OS_MACX
@@ -73,16 +64,68 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
     return NULL;
 }
 
+/** \class VideoOutput
+ * This class serves as the base class for all video output methods.
+ *
+ * The basic use is:
+ * \code
+ * VideoOutputType type = kVideoOutput_Default;
+ * vo = VideoOutput::InitVideoOut(type);
+ * vo->Init(width, height, aspect ...);
+ *
+ * // Then create two threads.
+ * // In the decoding thread
+ * while (decoding)
+ * {
+ *     if (vo->WaitForAvailable(1000)
+ *     {
+ *         frame = vo->GetNextFreeFrame(); // remove frame from "available"
+ *         av_lib_process(frame);   // do something to fill it.
+ *         // call DrawSlice()      // if you need piecemeal processing by VideoOutput
+ *         vo->ReleaseFrame(frame); // enqueues frame in "used" queue
+ *     }
+ * }
+ *  
+ * // In the displaying thread
+ * while (playing)
+ * {
+ *     if (videoOutput->EnoughPrebufferedFrames())
+ *     {
+ *         // Sets "Last Shown Frame" to head of "used" queue
+ *         videoOutput->StartDisplayingFrame();
+ *         // Get pointer to "Last Shown Frame"
+ *         frame = videoOutput->GetLastShownFrame();
+ *         // add OSD, do any filtering, etc.
+ *         vo->ProcessFrame(frame, osd, filters, pict-in-pict);
+ *         // tells show what frame to be show, do other last minute stuff
+ *         vo->PrepareFrame(frame, scan);
+ *         // here you wait until it's time to show the frame
+ *         // Show blits the last prepared frame to the screen as quickly as possible
+ *         vo->Show(scan);
+ *         // remove frame from the head of "used", vo must get it into "available" eventually.
+ *         vo->DoneDisplayingFrame();
+ *     }
+ * }
+ * delete vo;
+ * \endcode
+ *
+ * Note: Show() may be called multiple times between PrepareFrame() and DoneDisplayingFrame().
+ * But if a frame is ever removed from available via GetNextFreeFrame(), you must either call
+ * DoneDisplayFrame() on it or call DiscardFrame(VideoFrame*) on it.
+ *
+ * Note: ProcessFrame() may be called multiple times on a frame, to update an OSD for example.
+ *
+ * The VideoBuffers class handles the buffer tracking, see it for more details on
+ * the states a buffer can take before it becomes available for reuse.
+ *
+ * \see VideoBuffers, NuppelVideoPlayer
+ */
+
 VideoOutput::VideoOutput()
 {
     letterbox = kLetterbox_Off;
-    rpos = 0;
-    vpos = 0;
 
     framesPlayed = 0;
-
-    vbuffers = NULL;
-    numbuffers = 0;
 
     needrepaint = false;
 
@@ -118,13 +161,6 @@ VideoOutput::~VideoOutput()
 {
     ShutdownPipResize();
 
-    QMap<VideoFrame*, int>::iterator iter = vbufferMap.begin();
-    for (;iter != vbufferMap.end(); iter++)
-        if (iter.key()->qscale_table != NULL)
-            delete [] iter.key()->qscale_table;
-
-    if (vbuffers)
-        delete [] vbuffers;
     if (m_deintFilter)
         delete m_deintFilter;
     if (m_deintFiltMan)
@@ -254,18 +290,39 @@ bool VideoOutput::SetupDeinterlace(bool interlaced)
     return m_deinterlacing;
 }
 
+/**
+ * \fn VideoOutput::NeedsDoubleFramerate() const
+ * Should Prepare() and Show() be called twice for every ProcessFrame().
+ *
+ * \return m_deintfiltername == "bobdeint" && m_deinterlacing
+ */
 bool VideoOutput::NeedsDoubleFramerate() const
 {
     // Bob deinterlace requires doubling framerate
     return (m_deintfiltername == "bobdeint" && m_deinterlacing);
 }
 
+/**
+ * \fn VideoOutput::ApproveDeintFilter(const QString& filtername) const
+ * Approves all deinterlace filters, except bobdeint, which
+ * must be supported by a specific video output class.
+ *
+ * \return filtername != "bobdeint"
+ */
 bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
 {
     // Default to not supporting bob deinterlace
     return (filtername != "bobdeint");
 }
 
+/**
+ * \fn VideoOutput::AspectSet(float aspect)
+ * Sets VideoOutput::videoAspect to aspect, and sets 
+ * VideoOutput::XJ_aspect the letterbox type, unless
+ * the letterbox type is kLetterbox_Fill.
+ * 
+ * \param aspect aspect ratio to use
+ */
 void VideoOutput::AspectSet(float aspect)
 {
     videoAspect = aspect;
@@ -289,6 +346,11 @@ void VideoOutput::AspectSet(float aspect)
     }
 }
 
+/**
+ * \fn VideoOutput::AspectChanged(float aspect)
+ * Calls AspectSet(float aspect).
+ * \param aspect aspect ratio to use
+ */
 void VideoOutput::AspectChanged(float aspect)
 {
     AspectSet(aspect);
@@ -300,23 +362,7 @@ void VideoOutput::InputChanged(int width, int height, float aspect)
     XJ_height = height;
     AspectSet(aspect);
     
-    video_buflock.lock();
-
-    availableVideoBuffers.clear();
-    vbufferMap.clear();
-
-    for (int i = 0; i < numbuffers; i++)
-    {
-        availableVideoBuffers.enqueue(&(vbuffers[i]));
-        vbufferMap[&(vbuffers[i])] = i;
-    }
-
-    usedVideoBuffers.clear();
-    busyVideoBuffers.clear();
-
-    availableVideoBuffers_wait.wakeAll();
-
-    video_buflock.unlock();
+    DiscardFrames();
 }
 
 void VideoOutput::EmbedInWidget(WId wid, int x, int y, int w, int h)
@@ -674,6 +720,7 @@ void VideoOutput::MoveResize(void)
             QString("Image size. imgx %1, imgy: %2, imgw: %3, imgh: %4")
            .arg(imgx).arg(imgy).arg(imgw).arg(imgh));
 
+    needrepaint = true;
     DrawUnusedRects();
 }
 
@@ -732,113 +779,6 @@ void VideoOutput::ToggleLetterbox(int letterboxMode)
     AspectChanged(videoAspect);
 }
 
-int VideoOutput::ValidVideoFrames(void)
-{
-    video_buflock.lock();
-    int ret = (int)usedVideoBuffers.count();
-    video_buflock.unlock();
-
-    return ret;
-}
-
-int VideoOutput::FreeVideoFrames(void)
-{
-    return (int)availableVideoBuffers.count();
-}
-
-bool VideoOutput::EnoughFreeFrames(void)
-{
-    return (FreeVideoFrames() >= needfreeframes);
-}
-
-bool VideoOutput::EnoughDecodedFrames(void)
-{
-    return (ValidVideoFrames() >= needprebufferframes);
-}
-
-bool VideoOutput::EnoughPrebufferedFrames(void)
-{
-    return (ValidVideoFrames() >= keepprebufferframes);
-}
-
-VideoFrame *VideoOutput::GetNextFreeFrame(void)
-{
-    video_buflock.lock();
-    VideoFrame *next = availableVideoBuffers.dequeue();
-
-    while (next && busyVideoBuffers.findRef(next) != -1)
-    {
-        VERBOSE(VB_GENERAL,QString("GetNextFreeFrame() served a busy frame. "
-                                   "Dropping. #Frames=%1/%2.")
-                .arg(availableVideoBuffers.count() + usedVideoBuffers.count())
-                .arg(numbuffers));
-        next = availableVideoBuffers.dequeue();
-    }
-
-    // only way this should be triggered if we're in unsafe mode
-    if (!next)
-    {
-        next = usedVideoBuffers.dequeue();
-        busyVideoBuffers.removeRef(next);
-        if (EnoughFreeFrames())
-            availableVideoBuffers_wait.wakeAll();
-    }
-
-    video_buflock.unlock();
-
-    return next;
-}
-
-void VideoOutput::ReleaseFrame(VideoFrame *frame)
-{
-    vpos = vbufferMap[frame];
-
-    video_buflock.lock();
-    usedVideoBuffers.enqueue(frame);
-    busyVideoBuffers.append(frame);
-    video_buflock.unlock();
-}
-
-void VideoOutput::DiscardFrame(VideoFrame *frame)
-{
-    video_buflock.lock();
-    availableVideoBuffers.enqueue(frame);
-    if (EnoughFreeFrames())
-        availableVideoBuffers_wait.wakeAll();
-    video_buflock.unlock();
-}
-
-VideoFrame *VideoOutput::GetLastDecodedFrame(void)
-{
-    return &(vbuffers[vpos]);
-}
-
-VideoFrame *VideoOutput::GetLastShownFrame(void)
-{
-    return &(vbuffers[rpos]);
-}
-
-void VideoOutput::StartDisplayingFrame(void)
-{
-    rpos = vbufferMap[usedVideoBuffers.head()];
-}
-
-void VideoOutput::DoneDisplayingFrame(void)
-{
-    video_buflock.lock();
-
-    VideoFrame *buf = usedVideoBuffers.dequeue();
-    if (buf)
-    {
-        availableVideoBuffers.enqueue(buf);
-        busyVideoBuffers.removeRef(buf);
-        if (EnoughFreeFrames())
-            availableVideoBuffers_wait.wakeAll();
-    }
-
-    video_buflock.unlock();
-}
-
 int VideoOutput::ChangePictureAttribute(int attribute, int newValue)
 {
     (void)attribute;
@@ -890,77 +830,6 @@ int VideoOutput::ChangeHue(bool up)
     hue = (result == -1) ? hue : result;
 
     return hue;
-}
-
-void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause, 
-                              int need_free, int needprebuffer_normal,
-                              int needprebuffer_small, int keepprebuffer)
-{
-    int numcreate = numdecode + ((extra_for_pause) ? 1 : 0);
-
-    vbuffers = new VideoFrame[numcreate + 1];
-
-    for (int i = 0; i < numdecode; i++)
-    {
-        availableVideoBuffers.enqueue(&(vbuffers[i]));
-        vbufferMap[&(vbuffers[i])] = i;
-    }
-
-    for (int i = 0; i < numcreate; i++)
-    {
-        vbuffers[i].codec = FMT_NONE;
-        vbuffers[i].width = vbuffers[i].height = 0;
-        vbuffers[i].bpp = vbuffers[i].size = 0;
-        vbuffers[i].buf = NULL;
-        vbuffers[i].timecode = 0;
-        vbuffers[i].frameNumber = 0;
-        vbuffers[i].qscale_table = NULL;
-        vbuffers[i].qstride = 0;
-        vbuffers[i].interlaced_frame = -1;
-        vbuffers[i].top_field_first = 1;
-    }
-
-    numbuffers = numdecode;
-    needfreeframes = need_free;
-    needprebufferframes = needprebuffer_normal;
-    needprebufferframes_normal = needprebuffer_normal;
-    needprebufferframes_small = needprebuffer_small;
-    keepprebufferframes = keepprebuffer;
-
-    availableVideoBuffers_wait.wakeAll();
-}
-
-void VideoOutput::ClearAfterSeek(void)
-{
-    video_buflock.lock();
-
-    for (int i = 0; i < numbuffers; i++)
-        vbuffers[i].timecode = 0;
-
-    while (usedVideoBuffers.count() > 1)
-    {
-        VideoFrame *buffer = usedVideoBuffers.dequeue();
-        availableVideoBuffers.enqueue(buffer);
-    }
-
-    if (usedVideoBuffers.count() > 0)
-    {
-        VideoFrame *buffer = usedVideoBuffers.dequeue();
-        availableVideoBuffers.enqueue(buffer);
-        vpos = vbufferMap[buffer];
-        rpos = vpos;
-    }
-    else
-    {
-        vpos = rpos = 0;
-    }
-
-    if (EnoughFreeFrames())
-        availableVideoBuffers_wait.wakeAll();
-
-    busyVideoBuffers.clear();
-
-    video_buflock.unlock();
 }
 
 void VideoOutput::DoPipResize(int pipwidth, int pipheight)
@@ -1084,7 +953,8 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     pipplayer->ReleaseCurrentFrame(pipimage);
 }
 
-int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride)
+int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
+                            int revision)
 {
     int retval = -1;
 
@@ -1101,6 +971,8 @@ int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride)
         //gettimeofday(&three, NULL);
         if (surface)
         {
+            bool changed = (revision==-1) ? surface->Changed() :
+                surface->GetRevision() != revision;
             switch (frame->codec)
             {
                 case FMT_YV12:
@@ -1112,28 +984,28 @@ int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride)
                 case FMT_AI44:
                 {
                     unsigned char *ai44ptr = frame->buf;
-                    if (surface->Changed())
+                    if (changed)
                         BlendSurfaceToI44(surface, ai44ptr, true, stride);
                     break;
                 }
                 case FMT_IA44:
                 {
                     unsigned char *ia44ptr = frame->buf;
-                    if (surface->Changed())
+                    if (changed)
                         BlendSurfaceToI44(surface, ia44ptr, false, stride);
                     break;
                 }
                 case FMT_ARGB32:
                 {
                     unsigned char *argbptr = frame->buf;
-                    if (surface->Changed())
+                    if (changed)
                         BlendSurfaceToARGB(surface, argbptr, stride);
                     break;
                 }
                 default:
                     break;
             }
-            retval = surface->Changed() ? 1 : 0;
+            retval = changed ? 1 : 0;
         }
         //gettimeofday(&four, NULL);
         //timersub(&four, &three, &dtwo);

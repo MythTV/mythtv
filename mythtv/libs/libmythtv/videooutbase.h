@@ -7,11 +7,9 @@ extern "C" {
 }
 
 #include <qframe.h>
-#include <qmutex.h>
-#include <qmap.h>
 #include <qptrqueue.h>
-#include <qwaitcondition.h>
 #include <qptrlist.h>
+#include "videobuffers.h"
 
 using namespace std;
 
@@ -89,7 +87,7 @@ enum FrameScanType {
 class VideoOutput
 {
   public:
-    static VideoOutput *InitVideoOut(VideoOutputType type);
+    static VideoOutput *InitVideoOut(VideoOutputType type, bool is_mpeg_video);
 
     VideoOutput();
     virtual ~VideoOutput();
@@ -99,7 +97,7 @@ class VideoOutput
                       int winh, WId embedid = 0);
 
     virtual bool SetupDeinterlace(bool i);
-    virtual bool NeedsDoubleFramerate() const;
+    virtual bool NeedsDoubleFramerate(void) const;
     virtual bool ApproveDeintFilter(const QString& filtername) const;
 
     virtual void PrepareFrame(VideoFrame *buffer, FrameScanType) = 0;
@@ -128,33 +126,10 @@ class VideoOutput
     int GetLetterbox(void) { return letterbox; }
     void ToggleLetterbox(int letterboxMode = kLetterbox_Toggle);
 
-    int ValidVideoFrames(void);
-    int FreeVideoFrames(void);
-
-    bool EnoughFreeFrames(void);
-    QWaitCondition *availableVideoBuffersWait(void) 
-                    { return &availableVideoBuffers_wait; }
-
-    bool EnoughDecodedFrames(void);
-    bool EnoughPrebufferedFrames(void);
-    
-    VideoFrame *GetNextFreeFrame(void);
-    void ReleaseFrame(VideoFrame *frame);
-    void DiscardFrame(VideoFrame *frame);
-
-    VideoFrame *GetLastDecodedFrame(void);
-    VideoFrame *GetLastShownFrame(void);
-
-    void StartDisplayingFrame(void);
-    void DoneDisplayingFrame(void);
-
-    virtual void UpdatePauseFrame(void) = 0;
     // pass in null to use the pause frame, if it exists.
     virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
                               FilterChain *filterList,
                               NuppelVideoPlayer *pipPlayer) = 0;
-
-    void ClearAfterSeek(void);
 
     void ExposeEvent(void) { needrepaint = true; }
 
@@ -169,16 +144,38 @@ class VideoOutput
 
     bool AllowPreviewEPG(void) { return allowpreviewepg; }
 
+    virtual bool hasMCAcceleration() const { return false; }
     virtual bool hasIDCTAcceleration() const { return false; }
-
-    void SetPrebuffering(bool normal) 
-        { needprebufferframes = (normal ? needprebufferframes_normal : 
-                                 needprebufferframes_small); };
+    virtual bool hasVLDAcceleration() const { return false; }
 
     void SetFramesPlayed(long long fp) { framesPlayed = fp; };
     long long GetFramesPlayed(void) { return framesPlayed; };
 
     bool IsErrored() { return errored; }
+
+    // Video Buffer Management
+    void SetPrebuffering(bool normal) { vbuffers.SetPrebuffering(normal); }
+    void ClearAfterSeek(void) { vbuffers.ClearAfterSeek(); }
+    bool WaitForAvailable(uint w) { return vbuffers.WaitForAvailable(w); }
+
+    int ValidVideoFrames(void) { return vbuffers.ValidVideoFrames(); }
+    int FreeVideoFrames(void) { return vbuffers.FreeVideoFrames(); }
+    bool EnoughFreeFrames(void) { return vbuffers.EnoughFreeFrames(); }
+    bool EnoughDecodedFrames(void) { return vbuffers.EnoughDecodedFrames(); }
+    bool EnoughPrebufferedFrames(void) { return vbuffers.EnoughPrebufferedFrames(); }
+    
+    virtual VideoFrame *GetNextFreeFrame(bool with_lock = false,
+                                         bool allow_unsafe = false)
+        { return vbuffers.GetNextFreeFrame(with_lock, allow_unsafe); }
+    virtual void ReleaseFrame(VideoFrame *frame) { vbuffers.ReleaseFrame(frame); }
+    virtual void StartDisplayingFrame(void) { vbuffers.StartDisplayingFrame(); }
+    virtual void DoneDisplayingFrame(void) { vbuffers.DoneDisplayingFrame(); }
+    virtual void DiscardFrame(VideoFrame *frame) { vbuffers.DiscardFrame(frame); }
+    virtual void DiscardFrames(void) { vbuffers.DiscardFrames(); }
+
+    VideoFrame *GetLastDecodedFrame(void) { return vbuffers.GetLastDecodedFrame(); }
+    VideoFrame *GetLastShownFrame(void)  { return vbuffers.GetLastShownFrame(); }
+    virtual void UpdatePauseFrame(void) = 0;
 
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
@@ -186,7 +183,7 @@ class VideoOutput
                      int keepprebuffer);
 
     virtual void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
-    int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1);
+    int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1, int revision = -1);
 
     void BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr,
                             int stride = -1);
@@ -226,8 +223,6 @@ class VideoOutput
 
     int brightness, contrast, colour, hue;
 
-    int numbuffers;
-
     int letterbox;
 
     int PIPLocation;
@@ -236,27 +231,9 @@ class VideoOutput
     int ZoomedUp;
     int ZoomedRight;
 
-    VideoFrame *vbuffers;
-
-    QMutex video_buflock;
-
-    QMap<VideoFrame *, int> vbufferMap;
-    QPtrQueue<VideoFrame> availableVideoBuffers;
-    QPtrQueue<VideoFrame> usedVideoBuffers;
-    QPtrList<VideoFrame> busyVideoBuffers;
-
-    int rpos;
-    int vpos;
-
-    int needfreeframes;
-    int needprebufferframes;
-    int needprebufferframes_normal;
-    int needprebufferframes_small;;
-    int keepprebufferframes;
+    VideoBuffers vbuffers;
 
     bool needrepaint;
-
-    QWaitCondition availableVideoBuffers_wait;
 
     int desired_piph;
     int desired_pipw;

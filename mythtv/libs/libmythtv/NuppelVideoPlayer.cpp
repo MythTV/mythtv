@@ -57,10 +57,6 @@ extern "C" {
 #undef GetFileSize
 #endif
 
-#ifdef USING_XVMC
-#include "videoout_xvmc.h" // for hasIDCTAcceleration() call
-#endif
-
 #ifdef CONFIG_DARWIN
 extern "C" {
 int isnan(double);
@@ -82,6 +78,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(ProgramInfo *info)
 
     prebuffering_lock.lock();
     prebuffering = false;
+    prebuffer_tries = 0;
     prebuffering_wait.wakeAll();
     prebuffering_lock.unlock();
 
@@ -403,13 +400,14 @@ bool NuppelVideoPlayer::InitVideo(void)
 
             if (!widget)
             {
-                cerr << "Couldn't find 'tv playback' widget\n";
+                VERBOSE(VB_IMPORTANT, "Couldn't find 'tv playback' widget");
                 widget = window->currentWidget();
                 assert(widget);
             }
         }
 
-        videoOutput = VideoOutput::InitVideoOut(forceVideoOutput);
+        videoOutput = VideoOutput::InitVideoOut(forceVideoOutput,
+                                                decoder->IsXvMCCompatible());
 
         if (!videoOutput)
         {
@@ -418,7 +416,7 @@ bool NuppelVideoPlayer::InitVideo(void)
         }
 
         if (gContext->GetNumSetting("DecodeExtraAudio", 0))
-            decoder->setLowBuffers();
+            decoder->SetLowBuffers(true);
 
         if (!videoOutput->Init(video_width, video_height, video_aspect,
                                widget->winId(), 0, 0, widget->width(),
@@ -428,17 +426,46 @@ bool NuppelVideoPlayer::InitVideo(void)
             return false;
         }
 
-#ifdef USING_XVMC
         // We must tell the AvFormatDecoder whether we are using
         // an IDCT or MC pixel format.
-        if (kVideoOutput_XvMC == forceVideoOutput)
+        bool reopen = true;
+        if (videoOutput->hasVLDAcceleration())
         {
-            bool idct = videoOutput->hasIDCTAcceleration();
-            decoder->SetPixelFormat((idct) ? PIX_FMT_XVMC_MPEG2_IDCT :
-                                             PIX_FMT_XVMC_MPEG2_MC);
+            decoder->SetMPEG2Codec(CODEC_ID_MPEG2VIDEO_XVMC_VLD);
+            ForceVideoOutputType(kVideoOutput_XvMC);
         }
-#endif
-
+        else if (videoOutput->hasIDCTAcceleration())
+        {
+            decoder->SetMPEG2Codec(CODEC_ID_MPEG2VIDEO_XVMC);
+            decoder->SetPixelFormat(PIX_FMT_XVMC_MPEG2_IDCT);
+            ForceVideoOutputType(kVideoOutput_XvMC);
+        }
+        else if (videoOutput->hasMCAcceleration())
+        {
+            decoder->SetMPEG2Codec(CODEC_ID_MPEG2VIDEO_XVMC);
+            decoder->SetPixelFormat(PIX_FMT_XVMC_MPEG2_MC);
+            ForceVideoOutputType(kVideoOutput_XvMC);
+        }
+        else
+        {
+            decoder->SetMPEG2Codec(CODEC_ID_MPEG2VIDEO);
+            reopen = false;
+        }
+        if (reopen)
+        {
+            VERBOSE(VB_PLAYBACK, QString("Reopening: %1")
+                    .arg(ringBuffer->GetFilename()));
+            char buf[2024];
+            int ret = decoder->OpenFile(ringBuffer, false, buf);
+            if (ret < 0)
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("NVP: Couldn't open decoder for: %1")
+                        .arg(ringBuffer->GetFilename()));
+                return false;
+            }
+            DiscardVideoFrames();
+        }
     }
 
     if (embedid > 0)
@@ -469,7 +496,22 @@ void NuppelVideoPlayer::ReinitVideo(void)
 
     videofiltersLock.lock();
     videoOutput->InputChanged(video_width, video_height, video_aspect);
-    ReinitOSD();
+    if (videoOutput->IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, "ReinitVideo(): videoOutput->IsErrored()");
+        qApp->lock();
+        DialogBox dialog(gContext->GetMainWindow(),
+                         QObject::tr("Failed to Reinit Video."));
+        dialog.AddButton(QObject::tr("Return to menu."));
+        dialog.exec();
+        qApp->unlock();
+        errored = true;
+    }
+    else
+    {
+        ReinitOSD();
+    }
+
     videofiltersLock.unlock();
 
     ClearAfterSeek();
@@ -566,6 +608,9 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     if (reinit)
         ReinitVideo();
 
+    if (IsErrored())
+        return;
+
     videofiltersLock.lock();
 
     m_scan = detectInterlace(scan, m_scan, video_frame_rate, video_height);
@@ -615,7 +660,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     {
         if (!ringBuffer)
         {
-            cerr << "Warning: Old player ringbuf creation\n";
+            VERBOSE(VB_IMPORTANT, "NVP::OpenFile() Warning, old player exited"
+                    "before new ring buffer created");
             ringBuffer = new RingBuffer(filename, false);
             weMadeBuffer = true;
             livetv = false;
@@ -625,8 +671,9 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
         if (!ringBuffer->IsOpen())
         {
-            fprintf(stderr, "File not found: %s\n",
-                    ringBuffer->GetFilename().ascii());
+            VERBOSE(VB_IMPORTANT,
+                    QString("NVP::OpenFile(): Error, file not found: %1")
+                    .arg(ringBuffer->GetFilename().ascii()));
             return -1;
         }
     }
@@ -640,7 +687,9 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (ringBuffer->Read(testbuf, 2048) != 2048)
     {
-        cerr << "Couldn't read file: " << ringBuffer->GetFilename() << endl;
+        VERBOSE(VB_IMPORTANT,
+                QString("NVP::OpenFile(): Error, couldn't read file: %1")
+                .arg(ringBuffer->GetFilename()));
         return -1;
     }
 
@@ -688,10 +737,12 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
 
     int ret;
-    if ((ret = decoder->OpenFile(ringBuffer, disablevideo, testbuf)) < 0)
+    // We still want to locate decoder for video even if disablevideo is true
+    bool disable_video_decoding = false; // set to true for audio only decodeing
+    if ((ret = decoder->OpenFile(ringBuffer, disable_video_decoding, testbuf)) < 0)
     {
-        cerr << "Couldn't open decoder for: " << ringBuffer->GetFilename()
-             << endl;
+        VERBOSE(VB_IMPORTANT, QString("Couldn't open decoder for: %1")
+                .arg(ringBuffer->GetFilename()));
         return -1;
     }
 
@@ -763,9 +814,9 @@ int NuppelVideoPlayer::tbuffer_numfree(void)
        MAXTBUFFER - 1. */
 }
 
-VideoFrame *NuppelVideoPlayer::GetNextVideoFrame(void)
+VideoFrame *NuppelVideoPlayer::GetNextVideoFrame(bool allow_unsafe)
 {
-    return videoOutput->GetNextFreeFrame();
+    return videoOutput->GetNextFreeFrame(false, allow_unsafe);
 }
 
 void NuppelVideoPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
@@ -781,6 +832,11 @@ void NuppelVideoPlayer::DiscardVideoFrame(VideoFrame *buffer)
     videoOutput->DiscardFrame(buffer);
 }
 
+void NuppelVideoPlayer::DiscardVideoFrames()
+{
+    videoOutput->DiscardFrames();
+}
+
 void NuppelVideoPlayer::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 {
     videoOutput->DrawSlice(frame, x, y, w, h);
@@ -793,7 +849,7 @@ void NuppelVideoPlayer::AddTextData(char *buffer, int len,
     {
         if (!tbuffer_numfree())
         {
-            cerr << "text buffer overflow\n";
+            VERBOSE(VB_IMPORTANT, "NVP::AddTextData(): Text buffer overflow");
             return;
         }
 
@@ -822,7 +878,7 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
         {
             //cout << "waiting for video buffer to drain.\n";
             setPrebuffering(false);
-            if (!videoOutput->availableVideoBuffersWait()->wait(10))
+            if (!videoOutput->WaitForAvailable(10))
             {
                 if (++videobuf_retries >= 200)
                 {
@@ -1378,12 +1434,10 @@ void NuppelVideoPlayer::AVSync(void)
 
         if (m_double_framerate)
         {
-            if (forceVideoOutput != kVideoOutput_XvMC)
-            {
-                // XvMC does not need the frame again
-                if (buffer)
-                    videoOutput->PrepareFrame(buffer, kScan_Intr2ndField);
-            }
+            // XvMC does not need the frame again
+            if (!videoOutput->hasMCAcceleration() && buffer)
+                videoOutput->PrepareFrame(buffer, kScan_Intr2ndField);
+
             // Display the second field
             videosync->AdvanceTrigger();
             videosync->WaitForFrame(0);
@@ -1495,6 +1549,97 @@ void NuppelVideoPlayer::ShutdownAVSync(void)
     }
 }
 
+void NuppelVideoPlayer::DisplayPauseFrame(void)
+{
+    if (!video_actually_paused)
+        videoOutput->UpdatePauseFrame();
+
+    if (resetvideo)
+    {
+        videoOutput->UpdatePauseFrame();
+        resetvideo = false;
+    }
+
+    video_actually_paused = true;
+    videoThreadPaused.wakeAll();
+
+    if (videoOutput->IsErrored())
+    {
+        errored = true;
+        return;
+    }
+
+    videofiltersLock.lock();
+    videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
+    videofiltersLock.unlock();
+
+    videoOutput->PrepareFrame(NULL, kScan_Ignore);
+
+    usleep(frame_interval);
+
+    videoOutput->Show(kScan_Ignore);
+    videosync->Start();
+}
+
+void NuppelVideoPlayer::DisplayNormalFrame(void)
+{
+    video_actually_paused = false;
+    resetvideo = false;
+    
+    prebuffering_lock.lock();
+    if (prebuffering)
+    {
+        VERBOSE(VB_PLAYBACK, "waiting for prebuffer... "<<prebuffer_tries);
+        if (!prebuffering_wait.wait(&prebuffering_lock,
+                                    frame_interval * 4 / 1000))
+        {
+            // timed out.. do we need to know?
+        }
+        ++prebuffer_tries;
+        if (prebuffer_tries > 10)
+        {
+            VERBOSE(VB_IMPORTANT, "Prebuffer wait timed out 10 times.");
+            if (!videoOutput->EnoughFreeFrames())
+            {
+                VERBOSE(VB_IMPORTANT, "Prebuffer wait timed out, and "
+                        "not enough free frames. Discarding buffers.");
+                DiscardVideoFrames();
+            }
+            prebuffer_tries = 0;
+        }
+        prebuffering_lock.unlock();
+        videosync->Start();
+        return;
+    }
+    prebuffering_lock.unlock();
+
+    if (!videoOutput->EnoughPrebufferedFrames())
+    {
+        VERBOSE(VB_GENERAL, "prebuffering pause");
+        setPrebuffering(true);
+        return;
+    }
+
+    prebuffering_lock.lock();
+    prebuffer_tries = 0;
+    prebuffering_lock.unlock();
+
+    videoOutput->StartDisplayingFrame();
+
+    VideoFrame *frame = videoOutput->GetLastShownFrame();
+
+    if (cc)
+        ShowText();
+
+    videofiltersLock.lock();
+    videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
+    videofiltersLock.unlock();
+
+    AVSync();
+
+    videoOutput->DoneDisplayingFrame();
+}
+
 void NuppelVideoPlayer::OutputVideoLoop(void)
 {
     lastaudiotime = 0;
@@ -1565,77 +1710,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         }
 
         if (pausevideo)
-        {
-            if (!video_actually_paused)
-                videoOutput->UpdatePauseFrame();
-
-            if (resetvideo)
-            {
-                videoOutput->UpdatePauseFrame();
-                resetvideo = false;
-            }
-
-            video_actually_paused = true;
-            videoThreadPaused.wakeAll();
-
-            if (videoOutput->IsErrored())
-            {
-                errored = true;
-                continue;
-            }
-
-            videofiltersLock.lock();
-            videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
-            videofiltersLock.unlock();
-
-            videoOutput->PrepareFrame(NULL, kScan_Ignore);
-
-            //printf("video waiting for unpause\n");
-            usleep(frame_interval);
-
-            videoOutput->Show(kScan_Ignore);
-            videosync->Start();
-            continue;
-        }
-        video_actually_paused = false;
-        resetvideo = false;
-
-        prebuffering_lock.lock();
-        if (prebuffering)
-        {
-            VERBOSE(VB_PLAYBACK, "waiting for prebuffer...");
-            if (!prebuffering_wait.wait(&prebuffering_lock,
-                                        frame_interval * 4 / 1000))
-                VERBOSE(VB_PLAYBACK, "prebuffer wait timed out..");
-            prebuffering_lock.unlock();
-            videosync->Start();
-            continue;
-        }
-        prebuffering_lock.unlock();
-
-        if (!videoOutput->EnoughPrebufferedFrames())
-        {
-            VERBOSE(VB_GENERAL, "prebuffering pause");
-            setPrebuffering(true);
-            continue;
-        }
-
-        videoOutput->StartDisplayingFrame();
-
-        VideoFrame *frame = videoOutput->GetLastShownFrame();
-
-        if (cc)
-            ShowText();
-
-        videofiltersLock.lock();
-        videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
-        videofiltersLock.unlock();
-
-        AVSync();
-
-        videoOutput->DoneDisplayingFrame();
-
-        //sched_yield();
+            DisplayPauseFrame();
+        else
+            DisplayNormalFrame();
     }
 
     vidExitLock.lock();
@@ -2142,7 +2219,8 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
                 newbuffer = (short int *)realloc(warplbuff, newlen);
                 if (!newbuffer)
                 {
-                    cerr << "Couldn't allocate warped audio buffer!" << endl;
+                    VERBOSE(VB_IMPORTANT, "NVP::AddAudioData: Error, could "
+                            "not allocate warped audio buffer!");
                     return;
                 }
                 warplbuff = newbuffer;
@@ -2197,7 +2275,8 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
                 newlbuffer = (short int *)realloc(warplbuff, newlen);
                 if (!newlbuffer)
                 {
-                    cerr << "Couldn't allocate left warped audio buffer!\n";
+                    VERBOSE(VB_IMPORTANT, "NVP::AddAudioData: Error, could "
+                            "not allocate left warped audio buffer!");
                     return;
                 }
                 warplbuff = newlbuffer;
@@ -2205,7 +2284,8 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
                 newrbuffer = (short int *)realloc(warprbuff, newlen);
                 if (!newrbuffer)
                 {
-                    cerr << "Couldn't allocate right warped audio buffer!\n";
+                    VERBOSE(VB_IMPORTANT, "NVP::AddAudioData: Error, could "
+                            "not allocate right warped audio buffer!");
                     return;
                 }
                 warprbuff = newrbuffer;
@@ -2233,7 +2313,8 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
         }
 
         if (!audioOutput->AddSamples(buffers, samples, timecode))
-            VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
+            VERBOSE(VB_IMPORTANT, "NVP::AddAudioData: Error, audio "
+                    "buffer overflow, audio data lost!");
     }
 }
 
@@ -3432,7 +3513,7 @@ void NuppelVideoPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
         decoder->SetRawAudioState(true);
 
     decoder->setExactSeeks(true);
-    decoder->setLowBuffers();
+    decoder->SetLowBuffers(true);
 }
 
 bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm_iter,

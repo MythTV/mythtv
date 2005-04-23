@@ -798,7 +798,8 @@ static HostCheckBox *UseMPEG2Dec()
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, libmpeg2 will be used instead "
                     "of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. "
-                    "This can be faster. Not available when XvMC is used."));
+                    "This can be faster.\nWARNING: Enabling this option"
+                    "will disable XvMC video output."));
     return gc;
 }
 
@@ -2093,23 +2094,32 @@ static HostCheckBox *PVR350UseInternalSound()
 }
 
 #ifdef USING_XVMC
-static HostCheckBox *UseXVMC()
+static XvMCHostCheckBox *UseXVMC()
 {
-    HostCheckBox *gc = new HostCheckBox("UseXVMC");
-    gc->setLabel(QObject::tr("Use hardware XvMC MPEG Decoding"));
+    XvMCHostCheckBox *gc = new XvMCHostCheckBox("UseXVMC");
+    gc->setLabel(QObject::tr("Use hardware XvMC MPEG Decoding (incompatible with libmpeg2)"));
     gc->setValue(false);
+    gc->setHelpText(QObject::tr(
+                        "This enables the hardware accelerated MPEG decoding"
+                        "available with many popular video output cards.")+
+                    QObject::tr(
+                        "This is incompatible with libmpeg2 decoding, and"
+                        "will be disabled if libmpeg2 decoding is selected."));
     return gc;
 };
 #endif
 
 #ifdef USING_XVMC_VLD
-static HostCheckBox *UseXvMcVld()
+static XvMCHostCheckBox *UseXvMcVld()
 {
-    HostCheckBox *gc = new HostCheckBox("UseXvMcVld");
-    gc->setLabel(QObject::tr("Use HW XVMC VLD Decoding (Via only)"));
+    XvMCHostCheckBox *gc = new XvMCHostCheckBox("UseXvMcVld");
+    gc->setLabel(QObject::tr("Use hardware XVMC VLD Decoding (incompatible with libmpeg2)"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enables the use of viaXvMC HW Mpeg decoding "
-                    "for the Via Unichrome Chipset"));
+    gc->setHelpText(QObject::tr("Enables the use of viaXvMC hardware MPEG "
+                                "decoding for the Via Unichrome Chipset")+
+                    QObject::tr(
+                        "This is incompatible with libmpeg2 decoding, and"
+                        "will be disabled if libmpeg2 decoding is selected."));
     return gc;
 };
 #endif
@@ -2117,7 +2127,7 @@ static HostCheckBox *UseXvMcVld()
 class HwDecSettings: public  VerticalConfigurationGroup,
                      public TriggeredConfigurationGroup {
 public:
-     HwDecSettings():
+     HwDecSettings(HostCheckBox *use_mpeg):
          VerticalConfigurationGroup(false),
          TriggeredConfigurationGroup(false) {
          setLabel(QObject::tr("Hardware Decoding Settings"));
@@ -2136,10 +2146,16 @@ public:
          addTarget("0", new VerticalConfigurationGroup(true));
 
 #ifdef USING_XVMC
-         addChild(UseXVMC());
+         XvMCHostCheckBox *use_xvmc = UseXVMC();
+         addChild(use_xvmc);
+         connect(use_mpeg, SIGNAL(valueChanged(const QString&)),
+                 use_xvmc, SLOT(UseLibMPEG2(const QString&)));
 #endif
 #ifdef USING_XVMC_VLD
+         XvMCHostCheckBox *use_xvmc_vld = UseXvMcVld();
          addChild(UseXvMcVld());
+         connect(use_mpeg, SIGNAL(valueChanged(const QString&)),
+                 use_xvmc_vld, SLOT(UseLibMPEG2(const QString&)));
 #endif
     };
 };
@@ -2782,7 +2798,8 @@ PlaybackSettings::PlaybackSettings()
     general->setLabel(QObject::tr("General playback"));
     general->addChild(new DeinterlaceSettings());
     general->addChild(CustomFilters());
-    general->addChild(UseMPEG2Dec());
+    HostCheckBox *use_mpeg = UseMPEG2Dec();
+    general->addChild(use_mpeg);
     general->addChild(RealtimePriority());
     general->addChild(UseVideoTimebase());
     general->addChild(DecodeExtraAudio());
@@ -2822,7 +2839,7 @@ PlaybackSettings::PlaybackSettings()
     pbox2->addChild(UseGroupNameAsAllPrograms());
     addChild(pbox2);
 
-    addChild(new HwDecSettings());
+    addChild(new HwDecSettings(use_mpeg));
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
     seek->setLabel(QObject::tr("Seeking"));

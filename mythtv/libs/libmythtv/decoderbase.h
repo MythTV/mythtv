@@ -25,7 +25,7 @@ class DecoderBase
     void setLiveTVMode(bool live) { livetv = live; }
     void setRecorder(RemoteEncoder *recorder) { nvr_enc = recorder; }
 
-    void setLowBuffers(void) { lowbuffers = true; }
+    void SetLowBuffers(bool low) { lowbuffers = low; }
 
     virtual void setWatchingRecording(bool mode);
     virtual bool GetFrame(int onlyvideo) = 0;
@@ -50,6 +50,8 @@ class DecoderBase
     long long GetFramesRead(void) { return framesRead; };
 
     virtual void SetPixelFormat(const int) { }
+    virtual bool IsXvMCCompatible() { return false; }
+    virtual void SetMPEG2Codec(const int) { }
 
     virtual bool SyncPositionMap(void);
     virtual bool PosMapFromDb(void);

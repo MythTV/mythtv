@@ -2,6 +2,7 @@
 #include <iostream>
 using namespace std;
 
+#include "mythcontext.h"
 #include "videoout_null.h"
 
 const int kNumBuffers = 31;
@@ -13,6 +14,7 @@ const int kKeepPrebuffer = 2;
 VideoOutputNull::VideoOutputNull(void)
                : VideoOutput()
 {
+    VERBOSE(VB_PLAYBACK, "VideoOutputNull()");
     XJ_started = 0; 
 
     pauseFrame.buf = NULL;
@@ -20,6 +22,7 @@ VideoOutputNull::VideoOutputNull(void)
 
 VideoOutputNull::~VideoOutputNull()
 {
+    VERBOSE(VB_PLAYBACK, "~VideoOutputNull()");
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
@@ -41,23 +44,26 @@ void VideoOutputNull::Zoom(int direction)
 void VideoOutputNull::InputChanged(int width, int height, float aspect)
 {
     VideoOutput::InputChanged(width, height, aspect);
-
-    DeleteNullBuffers();
-    CreateNullBuffers();
+    vbuffers.DeleteBuffers();
 
     MoveResize();
 
-    scratchFrame = &(vbuffers[kNumBuffers]);
+    if (!vbuffers.CreateBuffers(XJ_width, XJ_height))
+    {
+        VERBOSE(VB_IMPORTANT, "VideoOutputNull::InputChanged(): "
+                "Failed to recreate buffers");
+        errored = true;
+    }
 
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
-    pauseFrame.height = scratchFrame->height;
-    pauseFrame.width = scratchFrame->width;
-    pauseFrame.bpp = scratchFrame->bpp;
-    pauseFrame.size = scratchFrame->size;
-    pauseFrame.buf = new unsigned char[pauseFrame.size];
-    pauseFrame.frameNumber = scratchFrame->frameNumber;
+    pauseFrame.height = vbuffers.GetScratchFrame()->height;
+    pauseFrame.width  = vbuffers.GetScratchFrame()->width;
+    pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
+    pauseFrame.size   = vbuffers.GetScratchFrame()->size;
+    pauseFrame.buf    = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 }
 
 int VideoOutputNull::GetRefreshRate(void)
@@ -69,44 +75,24 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
                            WId winid, int winx, int winy, int winw, 
                            int winh, WId embedid)
 {
-    VideoOutput::InitBuffers(kNumBuffers, true, kNeedFreeFrames, 
-                             kPrebufferFramesNormal, kPrebufferFramesSmall, 
-                             kKeepPrebuffer);
+    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames, 
+                  kPrebufferFramesNormal, kPrebufferFramesSmall, 
+                  kKeepPrebuffer);
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 
-    if (!CreateNullBuffers())
+    if (!vbuffers.CreateBuffers(XJ_width, XJ_height))
         return false;
 
-    scratchFrame = &(vbuffers[kNumBuffers]);
-
-    pauseFrame.height = scratchFrame->height;
-    pauseFrame.width = scratchFrame->width;
-    pauseFrame.bpp = scratchFrame->bpp;
-    pauseFrame.size = scratchFrame->size;
-    pauseFrame.buf = new unsigned char[pauseFrame.size];
-    pauseFrame.frameNumber = scratchFrame->frameNumber;
+    pauseFrame.height = vbuffers.GetScratchFrame()->height;
+    pauseFrame.width  = vbuffers.GetScratchFrame()->width;
+    pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
+    pauseFrame.size   = vbuffers.GetScratchFrame()->size;
+    pauseFrame.buf    = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
     MoveResize();
     XJ_started = true;
-
-    return true;
-}
-
-bool VideoOutputNull::CreateNullBuffers(void)
-{
-    for (int i = 0; i < numbuffers + 1; i++)
-    {
-        vbuffers[i].height = XJ_height;
-        vbuffers[i].width = XJ_width;
-        vbuffers[i].bpp = 12;
-        vbuffers[i].size = XJ_height * XJ_width * 3 / 2;
-        vbuffers[i].codec = FMT_YV12;
-        vbuffers[i].buf = new unsigned char[vbuffers[i].size + 64];
-        memset(vbuffers[i].buf, 0, XJ_height * XJ_width);
-        memset(vbuffers[i].buf + XJ_height * XJ_width, 127, 
-               XJ_height * XJ_width / 2);
-    }
 
     return true;
 }
@@ -117,16 +103,7 @@ void VideoOutputNull::Exit(void)
     {
         XJ_started = false;
 
-        DeleteNullBuffers();
-    }
-}
-
-void VideoOutputNull::DeleteNullBuffers()
-{
-    for (int i = 0; i < numbuffers + 1; i++)
-    {
-        delete [] vbuffers[i].buf;
-        vbuffers[i].buf = NULL;
+        vbuffers.DeleteBuffers();
     }
 }
 
@@ -151,7 +128,7 @@ void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     (void)t;
 
     if (!buffer)
-        buffer = scratchFrame;
+        buffer = vbuffers.GetScratchFrame();
 
     framesPlayed = buffer->frameNumber + 1;
 }
@@ -166,10 +143,12 @@ void VideoOutputNull::DrawUnusedRects(bool)
 
 void VideoOutputNull::UpdatePauseFrame(void)
 {
-    VideoFrame *pauseb = scratchFrame;
-    if (usedVideoBuffers.count() > 0)
-        pauseb = usedVideoBuffers.head();
-    memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
+    VideoFrame *pauseb = vbuffers.GetScratchFrame();
+    VideoFrame *pauseu = vbuffers.head(kVideoBuffer_used);
+    if (pauseu)
+        memcpy(pauseFrame.buf, pauseu->buf, pauseu->size);
+    else
+        memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
 }
 
 void VideoOutputNull::ProcessFrame(VideoFrame *frame, OSD *osd,

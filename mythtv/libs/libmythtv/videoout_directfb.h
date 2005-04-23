@@ -25,14 +25,11 @@ class VideoOutputDirectfb: public VideoOutput
     void Show(FrameScanType);
 
     void InputChanged(int width, int height, float aspect);
-        void AspectChanged(float aspect);
+    void AspectChanged(float aspect);
     void Zoom(int direction);
 
-        float GetDisplayAspect(void);
-        void VideoOutputDirectfb::MoveResize();
-
-    //void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
-    //void StopEmbedding(void);
+    float GetDisplayAspect(void);
+    void MoveResize();
 
     int GetRefreshRate(void);
 
@@ -46,40 +43,39 @@ class VideoOutputDirectfb: public VideoOutput
     int ChangePictureAttribute(int attributeType, int newValue);
 
   private:
-
-        QObject *widget;
-
-    DirectfbData *data;
-
-    bool XJ_started;
-
-    VideoFrame *scratchFrame;
-    VideoFrame pauseFrame;
-
     bool CreateDirectfbBuffers(DFBSurfaceDescription);
     void DeleteDirectfbBuffers(void);
     bool InitOsdSurface(OSD *osd);
+
+    bool          XJ_started;
+    VideoFrame    pauseFrame;
+    QObject      *widget;
+    DirectfbData *data;
 };
 
 DFBEnumerationResult LayerCallback(unsigned int id,
-  DFBDisplayLayerDescription desc, void *data);
+                                   DFBDisplayLayerDescription desc,
+                                   void *data);
 
-static inline void * memcpy_pic(unsigned char * dst, unsigned char * src, int bytesPerLine, int height, int dstStride, int srcStride)
+static inline void * memcpy_pic(unsigned char * dst, unsigned char * src,
+                                int bytesPerLine, int height,
+                                int dstStride, int srcStride)
 {
-        int i;
-        void *retval=dst;
+    int i;
+    void *retval=dst;
 
-        if (dstStride == srcStride) memcpy(dst, src, srcStride*height);
-        else
+    if (dstStride == srcStride)
+        memcpy(dst, src, srcStride*height);
+    else
+    {
+        for (i=0; i<height; i++)
         {
-                for(i=0; i<height; i++)
-                {
-                        memcpy(dst, src, bytesPerLine);
-                        src+= srcStride;
-                        dst+= dstStride;
-                }
+            memcpy(dst, src, bytesPerLine);
+            src+= srcStride;
+            dst+= dstStride;
         }
+    }
 
-        return retval;
+    return retval;
 }
 #endif

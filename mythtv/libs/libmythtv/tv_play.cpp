@@ -363,7 +363,12 @@ bool TV::Init(bool createWindow)
             // bit of a hack, but it's ok if the window is too
             // big in fullscreen mode
             if (fullscreen)
+            {
                 player_bounds.setSize(QSize(maxWidth, maxHeight));
+
+                // resize possibly avoids a bug on some systems
+                mainWindow->resize(player_bounds.size());
+            }
         }
 
         // player window sizing

@@ -32,12 +32,9 @@ class VideoOutputNull : public VideoOutput
 
   private:
     void Exit(void);
-    bool CreateNullBuffers(void);
-    void DeleteNullBuffers(void);
 
     bool XJ_started;
 
-    VideoFrame *scratchFrame;
     VideoFrame pauseFrame;
 };
 

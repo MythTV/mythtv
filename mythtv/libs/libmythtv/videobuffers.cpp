@@ -1,8 +1,9 @@
 // Copyright (c) 2005, Daniel Thor Kristjansson
 // based on earlier work in MythTV's videout_xvmc.cpp
 
-#include "videobuffers.h"
 #include "mythcontext.h"
+#include "videobuffers.h"
+#include "videoout_xv.h" // for xvmc_vo_surf_t
 
 #ifdef USING_XVMC
 extern "C" {
@@ -221,20 +222,20 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(bool with_lock,
         frame = available.dequeue();
         while (frame && used.contains(frame))
         {
-            VERBOSE(VB_GENERAL,
-                    QString("GetNextFreeFrame() served a busy frame %1. Dropping."
-                            "   %2")
-                    .arg(DebugString(frame)).arg(GetStatus()));
+            VERBOSE(VB_IMPORTANT,
+                    QString("GetNextFreeFrame() served a busy frame %1. "
+                            "Dropping. %2")
+                    .arg(DebugString(frame, true)).arg(GetStatus()));
             frame = available.dequeue();
         }
 
         // only way this should be triggered if we're in unsafe mode
         if (!frame && allow_unsafe)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("GetNextFreeFrame() is getting a busy frame %1."
-                            "       %2")
-                    .arg(DebugString(frame)).arg(GetStatus()));
+            VERBOSE(VB_PLAYBACK,
+                    QString("GetNextFreeFrame() is getting a busy frame %1. "
+                            "      %2")
+                    .arg(DebugString(frame, true)).arg(GetStatus()));
             frame = used.dequeue();
             if (EnoughFreeFrames())
                 available_wait.wakeAll();
@@ -262,9 +263,9 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(bool with_lock,
             {
                 VERBOSE(VB_IMPORTANT,
                         QString("GetNextFreeFrame() unable to lock frame %1. "
-                                "Dropping %2")
-                        .arg(DebugString(frame))
-                        .arg(GetStatus()));
+                                "Dropping %2. w/lock(%3) unsafe(%4)")
+                        .arg(DebugString(frame)).arg(GetStatus())
+                        .arg(with_lock).arg(allow_unsafe));
                 DiscardFrame(frame);
             }
             ++tries;
@@ -785,63 +786,37 @@ void VideoBuffers::AddInheritence(const VideoFrame *frame)
     frame_map_t::iterator it = parents.find(frame);
     if (it == parents.end())
     {
-        xvmc_render_state_t *render = (xvmc_render_state_t*) frame->buf;
         // find "parents"...
         frame_queue_t new_parents;
-        VideoFrame *past = xvmc_surf_to_frame[render->p_past_surface];
-        if (past==frame)
-        {
-            VERBOSE(VB_IMPORTANT, QString("AddInheritence(%1) past=frame")
+        VideoFrame *past = PastFrame(frame);
+        if (past == frame)
+            VERBOSE(VB_IMPORTANT, QString("AddInheritence(%1) Error, past=frame")
                     .arg(DebugString(frame)));
-            VERBOSE(VB_IMPORTANT, "render->p_surface      = "<<
-                    ((void*)render->p_surface));
-            VERBOSE(VB_IMPORTANT, "render->p_past_surface = "<<
-                    ((void*)render->p_past_surface));
-        }
-        if (past && past!=frame)
+        else if (past)
         {
-            if (used.contains(past))
-                new_parents.push_back(past);
-            else if (displayed.contains(past))
-                new_parents.push_back(past);
-            else if (limbo.contains(past))
+            bool in_correct_buffer =
+                used.contains(past) || displayed.contains(past) ||
+                limbo.contains(past) || pause.contains(past);
+            if (in_correct_buffer)
                 new_parents.push_back(past);
             else
-            {
-                VERBOSE(VB_IMPORTANT, "AddInheritence past   "<<DebugString(past)
-                        <<" NOT in used or in done");
-            }
+                VERBOSE(VB_IMPORTANT, QString("AddInheritence past %1 NOT "
+                                              "in used or in done. %2")
+                        .arg(DebugString(past)).arg(GetStatus()));
         }
-        VideoFrame *future = xvmc_surf_to_frame[render->p_future_surface];
-        if (future==frame)
-        {
-            VERBOSE(VB_IMPORTANT, QString("AddInheritence(%1) future=frame")
+
+        VideoFrame *future = FutureFrame(frame);
+        if (future == frame)
+            VERBOSE(VB_IMPORTANT, QString("AddInheritence(%1) Error, future=frame")
                     .arg(DebugString(frame)));
-            VERBOSE(VB_IMPORTANT, "render->p_surface        = "<<
-                    ((void*)render->p_surface));
-            VERBOSE(VB_IMPORTANT, "render->p_future_surface = "<<
-                    ((void*)render->p_future_surface));
-        }
-        if (future && future!=frame)
+        else if (future)
         {
-            if (used.contains(future))
-                new_parents.push_back(future);
-            else if (limbo.contains(future))
+            if (used.contains(future) || limbo.contains(future))
                 new_parents.push_back(future);
             else
-            {
-                VERBOSE(VB_IMPORTANT,
-                        QString("AddInheritence future %1 NOT in used "
-                                "or in limbo").arg(DebugString(future)));
-                if (displayed.contains(future))
-                    VERBOSE(VB_IMPORTANT,
-                            QString("AddInheritence future %1 "
-                                    " is in done").arg(DebugString(future)));
-                if (limbo.contains(future))
-                    VERBOSE(VB_IMPORTANT,
-                            QString("AddInheritence future %1 "
-                                    " is in limbo").arg(DebugString(future)));
-            }
+                VERBOSE(VB_IMPORTANT, QString("AddInheritence future %1 NOT "
+                                              "in used or in limbo. %2")
+                        .arg(DebugString(future)).arg(GetStatus()));
         }
 
         parents[frame] = new_parents;
@@ -886,11 +861,12 @@ void VideoBuffers::RemoveInheritence(const VideoFrame *frame)
     else
     {
         parents[frame] = new_parents;
-        VERBOSE(VB_IMPORTANT, "RemoveInheritenc:"<<DebugString(frame)
-                <<" parents.size() = "<<parents.size());
+        VERBOSE(VB_IMPORTANT, QString("RemoveInheritenc:%1 parents.size() = ")
+                .arg(DebugString(frame)).arg(parents.size()));
         frame_queue_t::iterator pit = new_parents.begin();
         for (int i=0; pit != new_parents.end() && i<8; (++pit), (++i))
-            VERBOSE(VB_IMPORTANT, "Parent #"<<i<<": "<<DebugString(*pit));
+            VERBOSE(VB_IMPORTANT, QString("Parent #%1: %2")
+                    .arg(i).arg(DebugString(*pit)));
     }
 
     inheritence_lock.unlock();
@@ -923,10 +899,18 @@ inline xvmc_render_state_t *GetRender(VideoFrame *frame)
         return NULL;
 }
 
-VideoFrame* VideoBuffers::PastFrame(VideoFrame *frame)
+inline const xvmc_render_state_t *GetRender(const VideoFrame *frame)
+{
+    if (frame)
+        return (const xvmc_render_state_t*) frame->buf;
+    else
+        return NULL;
+}
+
+VideoFrame* VideoBuffers::PastFrame(const VideoFrame *frame)
 {
     LockFrame(frame, "PastFrame");
-    xvmc_render_state_t* r = GetRender(frame);
+    const xvmc_render_state_t* r = GetRender(frame);
     VideoFrame* f = NULL;
     if (r)
         f = xvmc_surf_to_frame[r->p_past_surface];
@@ -934,10 +918,10 @@ VideoFrame* VideoBuffers::PastFrame(VideoFrame *frame)
     return f;
 }
 
-VideoFrame* VideoBuffers::FutureFrame(VideoFrame *frame)
+VideoFrame* VideoBuffers::FutureFrame(const VideoFrame *frame)
 {
     LockFrame(frame, "FutureFrame");
-    xvmc_render_state_t* r = GetRender(frame);
+    const xvmc_render_state_t* r = GetRender(frame);
     VideoFrame* f = NULL;
     if (r)
         f = xvmc_surf_to_frame[r->p_future_surface];
@@ -945,10 +929,10 @@ VideoFrame* VideoBuffers::FutureFrame(VideoFrame *frame)
     return f;
 }
 
-VideoFrame* VideoBuffers::GetOSDFrame(VideoFrame *frame)
+VideoFrame* VideoBuffers::GetOSDFrame(const VideoFrame *frame)
 {
     LockFrame(frame, "GetOSDFrame");
-    xvmc_render_state_t* r = GetRender(frame);
+    const xvmc_render_state_t* r = GetRender(frame);
     VideoFrame* f = NULL;
     if (r)
         f = (VideoFrame*) (r->p_osd_target_surface_render);
@@ -992,11 +976,10 @@ void VideoBuffers::SetOSDFrame(VideoFrame *frame, VideoFrame *osd)
     UnlockFrame(frame, "SetOSDFrame");
 }
 
-VideoFrame* VideoBuffers::GetOSDParent(VideoFrame *osd)
+VideoFrame* VideoBuffers::GetOSDParent(const VideoFrame *osd)
 {
-    VideoFrame *parent = NULL;
     global_lock.lock();
-    parent = xvmc_osd_parent[osd];
+    VideoFrame *parent = xvmc_osd_parent[osd];
     global_lock.unlock();
     return parent;
 }
@@ -1037,16 +1020,6 @@ bool VideoBuffers::CreateBuffers(int width, int height, vector<unsigned char*> b
 }
 
 #ifdef USING_XVMC
-
-typedef struct
-{
-    XvMCSurface         surface;
-    XvMCBlockArray      blocks;
-    XvMCMacroBlockArray macro_blocks;
-    uint num_data_blocks;
-    uint num_mv_blocks;
-} xvmc_vo_surf_t;
-
 bool VideoBuffers::CreateBuffers(int width, int height,
                                  Display *disp, 
                                  void *p_xvmc_ctx,
@@ -1058,6 +1031,21 @@ bool VideoBuffers::CreateBuffers(int width, int height,
 
     static unsigned char *ffmpeg_vld_hack = (unsigned char*)
         "avlib should not use this private data in XvMC-VLD mode.";
+
+    if (surfs.size()>allocSize())
+    {
+        VERBOSE(VB_PLAYBACK,
+                "Woo Hoo! We have more XvMC Surfaces than we need");
+        Reset();
+        bool extra_for_pause = allocSize() > numbuffers;
+        bool normal = (needprebufferframes_normal == needprebufferframes);
+        uint increment = surfs.size() - allocSize();
+        
+        Init(numbuffers, extra_for_pause, 
+             needfreeframes, needprebufferframes_normal+increment-1,
+             needprebufferframes_small, keepprebufferframes+1);
+        SetPrebuffering(normal);
+    }
 
     for (uint i = 0; i < allocSize(); i++)
     {
@@ -1088,7 +1076,7 @@ bool VideoBuffers::CreateBuffers(int width, int height,
         buffers[i].priv[0]      = ffmpeg_vld_hack;
         buffers[i].priv[1]      = ffmpeg_vld_hack;
 
-        if (surf->num_data_blocks)
+        if (surf->blocks.blocks)
         {
             render->data_blocks = surf->blocks.blocks;
             buffers[i].priv[0]  = (unsigned char*) &(surf->blocks);
@@ -1180,7 +1168,8 @@ QString VideoBuffers::GetStatus(int n)
  ** Debugging functions below **
  *******************************/
 
-QString dbg_str_arr[40] =
+#define DBG_STR_ARR_SIZE 40
+QString dbg_str_arr[DBG_STR_ARR_SIZE] =
 {
     "A       ",    " B      ",    "  C     ",    "   D    ",
     "    E   ",    "     F  ",    "      G ",    "       H", // 8
@@ -1193,7 +1182,7 @@ QString dbg_str_arr[40] =
     "i       ",    " j      ",    "  k     ",    "   l    ",
     "    m   ",    "     n  ",    "      o ",    "       p", // 40
 };
-QString dbg_str_arr_short[40] =
+QString dbg_str_arr_short[DBG_STR_ARR_SIZE] =
 {
     "A","B","C","D","E","F","G","H", // 8
     "a","b","c","d","e","f","g","h", // 16
@@ -1210,7 +1199,7 @@ int DebugNum(const VideoFrame *frame)
     if (it == dbg_str.end())
     {
         dbg_str[frame] = next_dbg_str;
-        next_dbg_str = (next_dbg_str+1) % 40;
+        next_dbg_str = (next_dbg_str+1) % DBG_STR_ARR_SIZE;
     }
     return dbg_str[frame];
 }

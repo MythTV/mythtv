@@ -41,7 +41,6 @@ class VideoOutputQuartz : public VideoOutput
 
     QuartzData * data;
 
-    VideoFrame * scratchFrame;
     VideoFrame   pauseFrame;
 };
 

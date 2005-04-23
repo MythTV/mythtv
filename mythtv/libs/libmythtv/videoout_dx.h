@@ -42,12 +42,9 @@ class VideoOutputDX : public VideoOutput
 
   private:
     void Exit(void);
-    bool CreateVideoBuffers(void);
-    void DeleteVideoBuffers(void);
 
     bool XJ_started;
 
-    VideoFrame *scratchFrame;
     VideoFrame pauseFrame;
     
     HWND wnd;

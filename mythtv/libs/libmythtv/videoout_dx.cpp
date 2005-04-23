@@ -105,26 +105,24 @@ void VideoOutputDX::InputChanged(int width, int height, float aspect)
 {
     VideoOutput::InputChanged(width, height, aspect);
 
-    DeleteVideoBuffers();
+    vbuffers.DeleteBuffers();
     
     DirectXCloseSurface();
     MakeSurface();
     
-    CreateVideoBuffers();
+    vbuffers.CreateBuffers(XJ_width, XJ_height);
 
     MoveResize();
-
-    scratchFrame = &(vbuffers[kNumBuffers]);
 
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
-    pauseFrame.height = scratchFrame->height;
-    pauseFrame.width = scratchFrame->width;
-    pauseFrame.bpp = scratchFrame->bpp;
-    pauseFrame.size = scratchFrame->size;
-    pauseFrame.buf = new unsigned char[pauseFrame.size];
-    pauseFrame.frameNumber = scratchFrame->frameNumber;
+    pauseFrame.height = vbuffers.GetScratchFrame()->height;
+    pauseFrame.width  = vbuffers.GetScratchFrame()->width;
+    pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
+    pauseFrame.size   = vbuffers.GetScratchFrame()->size;
+    pauseFrame.buf    = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 }
 
 int VideoOutputDX::GetRefreshRate(void)
@@ -153,14 +151,15 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
                            WId winid, int winx, int winy, int winw, 
                            int winh, WId embedid)
 {
-    VideoOutput::InitBuffers(kNumBuffers, true, kNeedFreeFrames, 
-                             kPrebufferFramesNormal, kPrebufferFramesSmall, 
-                             kKeepPrebuffer);
+    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames, 
+                  kPrebufferFramesNormal, kPrebufferFramesSmall, 
+                  kKeepPrebuffer);
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 
     wnd = winid;
 
+    vbuffers.CreateBuffers(XJ_width, XJ_height);
     MoveResize();
 
     /* Initialise DirectDraw if not already done.
@@ -197,32 +196,15 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
     if (!CreateVideoBuffers())
         return false;
     
-    scratchFrame = &(vbuffers[kNumBuffers]);
-
-    pauseFrame.height = scratchFrame->height;
-    pauseFrame.width = scratchFrame->width;
-    pauseFrame.bpp = scratchFrame->bpp;
-    pauseFrame.size = scratchFrame->size;
-    pauseFrame.buf = new unsigned char[pauseFrame.size];
-    pauseFrame.frameNumber = scratchFrame->frameNumber;
+    pauseFrame.height = vbuffers.GetScratchFrame()->height;
+    pauseFrame.width  = vbuffers.GetScratchFrame()->width;
+    pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
+    pauseFrame.size   = vbuffers.GetScratchFrame()->size;
+    pauseFrame.buf    = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
     
     XJ_started = true;
     
-    return true;
-}
-
-bool VideoOutputDX::CreateVideoBuffers(void)
-{
-    for (int i = 0; i < numbuffers + 1; i++)
-    {
-        vbuffers[i].height = XJ_height;
-        vbuffers[i].width = XJ_width;
-        vbuffers[i].bpp = 12;
-        vbuffers[i].size = XJ_height * XJ_width * 3 / 2;
-        vbuffers[i].codec = FMT_YV12;
-        vbuffers[i].buf = new unsigned char[vbuffers[i].size + 64];
-    }
-
     return true;
 }
 
@@ -232,16 +214,7 @@ void VideoOutputDX::Exit(void)
     {
         XJ_started = false;
 
-        DeleteVideoBuffers();
-    }
-}
-
-void VideoOutputDX::DeleteVideoBuffers()
-{
-    for (int i = 0; i < numbuffers + 1; i++)
-    {
-        delete [] vbuffers[i].buf;
-        vbuffers[i].buf = NULL;
+        vbuffers.DeleteBuffers();
     }
 }
 
@@ -274,7 +247,7 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     int stride;
     
     if (!buffer)
-        buffer = scratchFrame;
+        buffer = vbuffers.GetScratchFrame();
 
     framesPlayed = buffer->frameNumber + 1;
 
@@ -443,10 +416,12 @@ void VideoOutputDX::DrawUnusedRects(bool)
 
 void VideoOutputDX::UpdatePauseFrame(void)
 {
-    VideoFrame *pauseb = scratchFrame;
-    if (usedVideoBuffers.count() > 0)
-        pauseb = usedVideoBuffers.head();
-    memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
+    VideoFrame *pauseb = vbuffers.GetScratchFrame();
+    VideoFrame *pauseu = vbuffers.head(kVideoBuffer_used);
+    if (pauseu)
+        memcpy(pauseFrame.buf, pauseu->buf, pauseu->size);
+    else
+        memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
 }
 
 void VideoOutputDX::ProcessFrame(VideoFrame *frame, OSD *osd,
@@ -461,8 +436,8 @@ void VideoOutputDX::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     if (!frame)
     {
-        frame = scratchFrame;
-        CopyFrame(scratchFrame, &pauseFrame);
+        frame = vbuffers.GetScratchFrame();
+        CopyFrame(vbuffers.GetScratchFrame(), &pauseFrame);
     }
 
     if (m_deinterlacing && m_deintFilter != NULL)

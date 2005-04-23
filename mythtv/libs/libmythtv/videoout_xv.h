@@ -1,84 +1,179 @@
 #ifndef VIDEOOUT_XV_H_
 #define VIDEOOUT_XV_H_
 
-struct XvData;
+#include <set>
+#include <qwindowdefs.h>
 
-#include <DisplayRes.h>
+#include "DisplayRes.h"
 #include "videooutbase.h"
 
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
+#include <X11/extensions/XShm.h>
+#include <X11/extensions/Xv.h>
+#include <X11/extensions/Xvlib.h>
+
+#ifdef USING_XVMC
+class XvMCOSD;
+#include "XvMCSurfaceTypes.h"
+extern "C" {
+#include "../libavcodec/xvmc_render.h"
+}
+typedef struct
+{
+    XvMCSurface         surface;
+    XvMCBlockArray      blocks;
+    XvMCMacroBlockArray macro_blocks;
+} xvmc_vo_surf_t;
+#endif // USING_XVMC
+
 class NuppelVideoPlayer;
+
+typedef enum VideoOutputSubType {
+    XVUnknown = 0, Xlib, XShm, XVideo, XVideoMC, XVideoIDCT, XVideoVLD,
+} VOSType;
 
 class VideoOutputXv : public VideoOutput
 {
   public:
-    VideoOutputXv();
+    VideoOutputXv(bool is_mpeg_video);
    ~VideoOutputXv();
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
     bool SetupDeinterlace(bool interlaced);
     bool ApproveDeintFilter(const QString& filtername) const;
-    void PrepareFrame(VideoFrame *buffer, FrameScanType);
-    void Show(FrameScanType );
+
+    void ProcessFrame(VideoFrame *frame, OSD *osd,
+                      FilterChain *filterList,
+                      NuppelVideoPlayer *pipPlayer);
+    void PrepareFrame(VideoFrame*, FrameScanType);
+    void DrawSlice(VideoFrame*, int x, int y, int w, int h);
+    void Show(FrameScanType);
 
     void InputChanged(int width, int height, float aspect);
     void Zoom(int direction);
     void AspectChanged(float aspect);
-
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
     void StopEmbedding(void);
-
     int GetRefreshRate(void);
-
     void DrawUnusedRects(bool sync = true);
-
     float GetDisplayAspect(void);
-
     void UpdatePauseFrame(void);
-    void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      FilterChain *filterList,
-                      NuppelVideoPlayer *pipPlayer);
-
     int ChangePictureAttribute(int attributeType, int newValue);
 
+    virtual bool hasMCAcceleration(void) const
+        { return XVideoMC <= VideoOutputSubType(); }
+    virtual bool hasIDCTAcceleration(void) const
+        { return XVideoIDCT <= VideoOutputSubType(); }
+    virtual bool hasVLDAcceleration(void) const
+        { return XVideoVLD == VideoOutputSubType(); }
   private:
+    VOSType VideoOutputSubType() const { return video_output_subtype; }
+
+    int GrabSuitableXvPort(bool use_xvmc);
+
+    VideoFrame *GetNextFreeFrame(bool allow_unsafe);
+    void DiscardFrame(VideoFrame*);
+    void DiscardFrames(void);
+    void DoneDisplayingFrame(void);
+
+    void ProcessFrameXvMC(VideoFrame *frame, OSD *osd);
+    void ProcessFrameMem(VideoFrame *frame, OSD *osd,
+                         FilterChain *filterList,
+                         NuppelVideoPlayer *pipPlayer);
+
+    void PrepareFrameXvMC(VideoFrame *);
+    void PrepareFrameXv(VideoFrame *);
+    void PrepareFrameMem(VideoFrame *, FrameScanType);
+
+    void ShowXvMC(FrameScanType scan);
+    void ShowXVideo(FrameScanType scan);
+
+    void ResizeForVideo(uint width, uint height);
+    void InitDisplayMeasurements(uint width, uint height);
     void InitColorKey(bool turnoffautopaint);
-    void Exit(void);
-    bool CreateXvBuffers(void);
-    bool CreateShmBuffers(void);
-    bool CreateXBuffers(void);
-    void DeleteXvBuffers(void);
-    void DeleteShmBuffers(void);
-    void DeleteXBuffers(void);
 
-    DisplayRes * display_res;
+    bool InitVideoBuffers(bool use_xvmc, bool use_xv, bool use_shm);
+    bool InitXvMC(void);
+    bool InitXVideo(void);
+    bool InitXShm(void);
+    bool InitXlib(void);
 
-    XvData *data;
+    bool CreateXvMCBuffers(void);
+    bool CreateBuffers(VOSType subtype);
+    vector<void*> CreateXvMCSurfaces(uint num, bool create_xvmc_blocks);
+    vector<unsigned char*> CreateShmImages(uint num, bool use_xv);
+    void CreatePauseFrame(void);
 
-    int XJ_screen_num;
-    unsigned long XJ_white,XJ_black;
-    int XJ_started;
-    int XJ_depth;
-    int XJ_caught_error;
-    int XJ_screenx, XJ_screeny;
-    int XJ_screenwidth, XJ_screenheight;
+    void DeleteBuffers(VOSType subtype, bool delete_pause_frame);
 
-    int xv_port;
-    int colorid;
+    // XvMC specific helper functions
+    bool IsDisplaying(VideoFrame* frame);
+    bool IsRendering(VideoFrame* frame);
+    void SyncSurface(VideoFrame* frame, int past_future = 0);
+    void FlushSurface(VideoFrame* frame);
 
-    int use_shm;
+    // Basic X11 info
+    Window               XJ_root;
+    Window               XJ_win;
+    Window               XJ_curwin;
+    GC                   XJ_gc;
+    Screen              *XJ_screen;
+    Display             *XJ_disp;
+    int                  XJ_screen_num;
+    unsigned long        XJ_white;
+    unsigned long        XJ_black;
+    int                  XJ_depth;
+    int                  XJ_screenx;
+    int                  XJ_screeny;
+    int                  XJ_screenwidth;
+    int                  XJ_screenheight;
+    bool                 XJ_started;
 
-    long long framesShown;
-    int showFrame;
-    int fps;
-    time_t stop_time;
+    // Used for all non-XvMC drawing
+    VideoFrame           av_pause_frame;
+    vector<XShmSegmentInfo> XJ_shm_infos;
 
-    unsigned char *scratchspace;
+    // Basic non-Xv drawing info
+    XImage              *XJ_non_xv_image;
+    long long            non_xv_frames_shown;
+    int                  non_xv_show_frame;
+    int                  non_xv_fps;
+    int                  non_xv_av_format;
+    time_t               non_xv_stop_time;
 
-    pthread_mutex_t lock;
+    // Basic Xv drawing info
+    int                  xv_port;
+    int                  xv_colorkey;
+    bool                 xv_draw_colorkey;
+    int                  xv_chroma;
+    unsigned char       *xv_color_conv_buf;
+    buffer_map_t         xv_buffers;
 
-    VideoFrame *scratchFrame;
-    VideoFrame pauseFrame;
+#ifdef USING_XVMC 
+    // Basic XvMC drawing info
+    XvMCSurfaceInfo      xvmc_surf_info;
+    int                  xvmc_surf_type;
+    int                  xvmc_chroma;
+    XvMCContext          xvmc_ctx;
+    vector<void*>        xvmc_surfs;
+
+    QMutex               xvmc_osd_lock;
+    MythDeque<XvMCOSD*>  xvmc_osd_available;
+    XvMCOSD* GetAvailableOSD();
+    void ReturnAvailableOSD(XvMCOSD*);
+#endif // USING_XVMC
+
+////// OTHER ///////////
+    VOSType              video_output_subtype;
+    DisplayRes          *display_res;
+    float                display_aspect;
+    QMutex               global_lock;
+    QMutex               x11_lock;
+    bool                 allow_xvmc;
+////////////////////////
+    void CheckDisplayedFramesForAvailability(void);
 };
 
-#endif
+#endif // VIDEOOUT_XV_H_

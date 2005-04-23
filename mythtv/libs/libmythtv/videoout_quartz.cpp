@@ -1292,9 +1292,9 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                    .arg(winh)
                    .arg(embedid));
 
-    VideoOutput::InitBuffers(kNumBuffers, true, kNeedFreeFrames, 
-                             kPrebufferFramesNormal, kPrebufferFramesSmall, 
-                             kKeepPrebuffer);
+    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames, 
+                  kPrebufferFramesNormal, kPrebufferFramesSmall, 
+                  kKeepPrebuffer);
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 
@@ -1433,29 +1433,27 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
 
 bool VideoOutputQuartz::CreateQuartzBuffers(void)
 {
-    for (int i = 0; i < numbuffers + 1; i++)
+    for (int i = 0; i < vbuffers.allocSize(); i++)
     {
-        vbuffers[i].width  = XJ_width;
-        vbuffers[i].height = XJ_height;
-        vbuffers[i].bpp    = 12;
-        vbuffers[i].size   = XJ_width * XJ_height * vbuffers[i].bpp / 8;
-        vbuffers[i].codec  = FMT_YV12;
+        vbuffers.at(i)->width  = XJ_width;
+        vbuffers.at(i)->height = XJ_height;
+        vbuffers.at(i)->bpp    = 12;
+        vbuffers.at(i)->size   = XJ_width * XJ_height * vbuffers.at(i)->bpp / 8;
+        vbuffers.at(i)->codec  = FMT_YV12;
 
-        vbuffers[i].buf = new unsigned char[vbuffers[i].size + 64];
+        vbuffers.at(i)->buf = new unsigned char[vbuffers.at(i)->size + 64];
     }
 
     // Set up pause and scratch frames
-    scratchFrame = &(vbuffers[kNumBuffers]);
-
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
-    pauseFrame.height = scratchFrame->height;
-    pauseFrame.width  = scratchFrame->width;
-    pauseFrame.bpp    = scratchFrame->bpp;
-    pauseFrame.size   = scratchFrame->size;
+    pauseFrame.height = vbuffers.GetScratchFrame()->height;
+    pauseFrame.width  = vbuffers.GetScratchFrame()->width;
+    pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
+    pauseFrame.size   = vbuffers.GetScratchFrame()->size;
     pauseFrame.buf    = new unsigned char[pauseFrame.size];
-    pauseFrame.frameNumber = scratchFrame->frameNumber;
+    pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
     // Set up pixel storage and image description for source
     data->pixelLock.lock();
@@ -1562,10 +1560,10 @@ void VideoOutputQuartz::DeleteQuartzBuffers()
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
-    for (int i = 0; i < numbuffers + 1; i++)
+    for (int i = 0; i < vbuffers.allocSize(); i++)
     {
-        delete [] vbuffers[i].buf;
-        vbuffers[i].buf = NULL;
+        delete [] vbuffers.at(i)->buf;
+        vbuffers.at(i)->buf = NULL;
     }
 }
 
@@ -1640,7 +1638,7 @@ void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     (void)t;
 
     if (!buffer)
-        buffer = scratchFrame;
+        buffer = vbuffers.GetScratchFrame();
 
     framesPlayed = buffer->frameNumber + 1;
 }
@@ -1665,10 +1663,12 @@ void VideoOutputQuartz::DrawUnusedRects(bool)
 
 void VideoOutputQuartz::UpdatePauseFrame(void)
 {
-    VideoFrame *pauseb = scratchFrame;
-    if (usedVideoBuffers.count() > 0)
-        pauseb = usedVideoBuffers.head();
-    memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
+    VideoFrame *pauseb = vbuffers.GetScratchFrame();
+    VideoFrame *pauseu = vbuffers.head(kVideoBuffer_used);
+    if (pauseu)
+        memcpy(pauseFrame.buf, pauseu->buf, pauseu->size);
+    else
+        memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
 }
 
 void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
@@ -1677,8 +1677,8 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
 {
     if (!frame)
     {
-        frame = scratchFrame;
-        CopyFrame(scratchFrame, &pauseFrame);
+        frame = vbuffers.GetScratchFrame();
+        CopyFrame(vbuffers.GetScratchFrame(), &pauseFrame);
     }
 
     if (filterList)

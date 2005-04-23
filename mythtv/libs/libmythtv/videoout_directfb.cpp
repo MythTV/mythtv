@@ -307,12 +307,13 @@ int VideoOutputDirectfb::GetRefreshRate(void)
 }
 
 bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
-                               int winx, int winy, int winw, int winh, WId embedid)
+                               int winx, int winy, int /*winw*/, int /*winh*/,
+                               WId embedid)
 {
     DFBResult ret;
     DFBSurfaceDescription desc;
     DFBDisplayLayerConfig conf;
-    DFBDisplayLayerDescription ldesc;
+    //DFBDisplayLayerDescription ldesc;
 
     widget = QWidget::find(winid);
 
@@ -415,9 +416,9 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
            );
 
     //setup video input buffers
-    VideoOutput::InitBuffers(kNumBuffers, true, kNeedFreeFrames,
-                             kPrebufferFramesNormal, kPrebufferFramesSmall, 
-                             kKeepPrebuffer);
+    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
+                  kPrebufferFramesNormal, kPrebufferFramesSmall, 
+                  kKeepPrebuffer);
     desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_HEIGHT | DSDESC_WIDTH | DSDESC_PIXELFORMAT);
     desc.width = width;
     desc.height = height;
@@ -451,14 +452,13 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
 
     //this stuff is right from Xv - look at this sometime
     //first frame of the buffers
-    scratchFrame = &(vbuffers[kNumBuffers]);
 
-    pauseFrame.height = scratchFrame->height;
-    pauseFrame.width = scratchFrame->width;
-    pauseFrame.bpp = scratchFrame->bpp;
-    pauseFrame.size = scratchFrame->size;
-    pauseFrame.buf = new unsigned char[pauseFrame.size];
-    pauseFrame.frameNumber = scratchFrame->frameNumber;
+    pauseFrame.height = vbuffers.GetScratchFrame()->height;
+    pauseFrame.width  = vbuffers.GetScratchFrame()->width;
+    pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
+    pauseFrame.size   = vbuffers.GetScratchFrame()->size;
+    pauseFrame.buf    = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
     VideoOutput::Init(width, height, aspect, winid, winx, winy, data->screen_width, data->screen_height,
                       embedid);
@@ -496,10 +496,10 @@ float VideoOutputDirectfb::GetDisplayAspect(void)
     return (float)data->screen_width / (float)data->screen_height;
 }
 
-void VideoOutputDirectfb::PrepareFrame(VideoFrame *buffer, FrameScanType t)
+void VideoOutputDirectfb::PrepareFrame(VideoFrame *buffer, FrameScanType)
 {
     if (!buffer)
-        buffer=scratchFrame;
+        buffer = vbuffers.GetScratchFrame();
 
     framesPlayed = buffer->frameNumber + 1;
 
@@ -566,7 +566,7 @@ void VideoOutputDirectfb::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     }
 }
 
-void VideoOutputDirectfb::Show(FrameScanType t)
+void VideoOutputDirectfb::Show(FrameScanType)
 {
 
     DFBCHECK(data->videoSurface->Flip(data->videoSurface, NULL, DSFLIP_ONSYNC));
@@ -593,11 +593,12 @@ void VideoOutputDirectfb::DrawUnusedRects(bool)
 void VideoOutputDirectfb::UpdatePauseFrame(void)
 {
     //**FIXME - is this all we need?
-    VideoFrame *pauseb = scratchFrame;
-    if (usedVideoBuffers.count() > 0)
-        pauseb = usedVideoBuffers.head();
-
-    memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
+    VideoFrame *pauseb = vbuffers.GetScratchFrame();
+    VideoFrame *pauseu = vbuffers.head(kVideoBuffer_used);
+    if (pauseu)
+        memcpy(pauseFrame.buf, pauseu->buf, pauseu->size);
+    else
+        memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
 }
 
 void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
@@ -606,8 +607,8 @@ void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
 {
     if (!frame)
     {
-        frame = scratchFrame;
-        CopyFrame(scratchFrame, &pauseFrame);
+        frame = vbuffers.GetScratchFrame();
+        CopyFrame(vbuffers.GetScratchFrame(), &pauseFrame);
     }
 
     if (m_deinterlacing && m_deintFilter != NULL)
@@ -635,17 +636,15 @@ void VideoOutputDirectfb::InputChanged(int width, int height, float aspect)
     CreateDirectfbBuffers(desc);
     MoveResize();
 
-    scratchFrame = &(vbuffers[kNumBuffers]);
-
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
-    pauseFrame.height = scratchFrame->height;
-    pauseFrame.width = scratchFrame->width;
-    pauseFrame.bpp = scratchFrame->bpp;
-    pauseFrame.size = scratchFrame->size;
-    pauseFrame.buf = new unsigned char[pauseFrame.size];
-    pauseFrame.frameNumber = scratchFrame->frameNumber;
+    pauseFrame.height = vbuffers.GetScratchFrame()->height;
+    pauseFrame.width  = vbuffers.GetScratchFrame()->width;
+    pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
+    pauseFrame.size   = vbuffers.GetScratchFrame()->size;
+    pauseFrame.buf    = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 }
 
 void VideoOutputDirectfb::AspectChanged(float aspect)
@@ -690,21 +689,22 @@ bool VideoOutputDirectfb::CreateDirectfbBuffers(DFBSurfaceDescription desc)
     desc.flags = (DFBSurfaceDescriptionFlags)(desc.flags | DSDESC_CAPS);
     desc.caps=DSCAPS_SYSTEMONLY;
 
-    for (int i = 0; i < numbuffers + 1; i++)
+    for (uint i = 0; i < vbuffers.allocSize(); i++)
     {
         IDirectFBSurface *bufferSurface;
         unsigned char *bufferSurfaceData;
         DFBCHECKFAIL(data->dfb->CreateSurface(data->dfb, &desc, &bufferSurface), false);
         DFBCHECKFAIL(bufferSurface->Lock(bufferSurface, DSLF_WRITE, (void **)&bufferSurfaceData, &pitch), false);
         data->buffers[bufferSurfaceData] = bufferSurface;
-        vbuffers[i].height = desc.height;
-        vbuffers[i].width = desc.width;
+
+        vbuffers.at(i)->height = desc.height;
+        vbuffers.at(i)->width  = desc.width;
         //**FIXME set the three following parameters correctly
-        vbuffers[i].bpp = 12;
-        vbuffers[i].size = desc.height * desc.width * 3 / 2;
+        vbuffers.at(i)->bpp    = 12;
+        vbuffers.at(i)->size   = desc.height * desc.width * 3 / 2;
         //The format FMT_YV12 is a I420 ???? - Can the buffer format change ????
-        vbuffers[i].codec = FMT_YV12;
-        vbuffers[i].buf = bufferSurfaceData;
+        vbuffers.at(i)->codec  = FMT_YV12;
+        vbuffers.at(i)->buf    = bufferSurfaceData;
     }
 
     return true;
@@ -712,14 +712,14 @@ bool VideoOutputDirectfb::CreateDirectfbBuffers(DFBSurfaceDescription desc)
 
 void VideoOutputDirectfb::DeleteDirectfbBuffers(void)
 {
-    for (int i = 0; i < numbuffers + 1; i++)
+    for (uint i = 0; i < vbuffers.allocSize(); i++)
     {
-        vbuffers[i].buf = NULL;
+        vbuffers.at(i)->buf = NULL;
 
-        if (vbuffers[i].qscale_table)
+        if (vbuffers.at(i)->qscale_table)
         {
-            delete [] vbuffers[i].qscale_table;
-            vbuffers[i].qscale_table = NULL;
+            delete [] vbuffers.at(i)->qscale_table;
+            vbuffers.at(i)->qscale_table = NULL;
         }
     }
     BufferMap::iterator iter;
@@ -779,7 +779,7 @@ DFBEnumerationResult LayerCallback(unsigned int id,
 {
     struct DirectfbData *vodata = (DirectfbData*)data;
     DFBResult ret;
-    IDirectFBSurface *surface;
+    //IDirectFBSurface *surface;
 
     if (id == DLID_PRIMARY)
         return DFENUM_OK;

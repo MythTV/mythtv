@@ -35,7 +35,8 @@ class AvFormatDecoderPrivate
     void ResetMPEG2();
     int DecodeMPEG2Video(AVCodecContext *avctx, AVFrame *picture,
                          int *got_picture_ptr, uint8_t *buf, int buf_size);
-    
+    bool UsingNonXvMCDecoder() { return (bool) mpeg2dec; }
+
     AvFormatDecoder *parent;
     mpeg2dec_t *mpeg2dec;
 };
@@ -136,7 +137,7 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
 
 
 AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
-               : DecoderBase(parent, pginfo)
+    : DecoderBase(parent, pginfo), mpeg2_codec(CODEC_ID_MPEG2VIDEO)
 {
     d = new AvFormatDecoderPrivate(this);
     
@@ -180,6 +181,12 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
 
 AvFormatDecoder::~AvFormatDecoder()
 {
+    CloseContext();
+    delete d;
+}
+
+void AvFormatDecoder::CloseContext()
+{
     if (ic)
     {
         for (int i = 0; i < ic->nb_streams; i++)
@@ -195,7 +202,7 @@ AvFormatDecoder::~AvFormatDecoder()
         av_close_input_file(ic);
         ic = NULL;
     }
-    delete d;
+    d->DestroyMPEG2();
 }
 
 void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
@@ -213,6 +220,7 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
 
     if (doflush)
     {
+        VERBOSE(VB_PLAYBACK, "AvFormatDecoder::SeekReset() flushing");
         for (int i = 0; i < ic->nb_streams; i++)
         {
             AVCodecContext *enc = &ic->streams[i]->codec;
@@ -220,14 +228,9 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
                 avcodec_flush_buffers(enc);
         }
 
-        VideoFrame *buffer;
-        for (buffer = inUseBuffers.first(); buffer; 
-             buffer = inUseBuffers.next())
-        {
-            m_parent->DiscardVideoFrame(buffer);
-        }
+        // TODO here we may need to wait for flushing to complete...
 
-        inUseBuffers.clear();
+        m_parent->DiscardVideoFrames();
     }
 
     while (storedPackets.count() > 0)
@@ -250,9 +253,12 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
     }
 }
 
-void AvFormatDecoder::Reset(void)
+void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
 {
-    SeekReset();
+    VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder::Reset(%1, %2)")
+            .arg(reset_video_data).arg(seek_reset));
+    if (seek_reset)
+        SeekReset();
 
 #if 0
     // mpegts.c already clears the streams, so this code results in 
@@ -264,7 +270,9 @@ void AvFormatDecoder::Reset(void)
     for (int i = ic->nb_streams - 1; i >= 0; i--)
     {
         AVStream *st = ic->streams[i];
+#ifdef USING_XVMC_VLD
         if (st->codec.codec_type == CODEC_TYPE_AUDIO)
+#endif
         {
             if (st->codec.codec)
                 avcodec_close(&st->codec);
@@ -273,11 +281,14 @@ void AvFormatDecoder::Reset(void)
     }
 #endif
 
-    m_positionMap.clear();
-    framesPlayed = 0;
-    framesRead = 0;
-    seen_gop = false;
-    seq_count = 0;
+    if (reset_video_data)
+    {
+        m_positionMap.clear();
+        framesPlayed = 0;
+        framesRead = 0;
+        seen_gop = false;
+        seq_count = 0;
+    }
 }
 
 bool AvFormatDecoder::CanHandle(char testbuf[2048], const QString &filename)
@@ -384,6 +395,12 @@ void AvFormatDecoder::InitByteContext(void)
     ic->pb.max_packet_size = 0;
 }
 
+
+bool AvFormatDecoder::IsXvMCCompatible()
+{
+    return !d->UsingNonXvMCDecoder();
+}
+
 static QMap<void*, enum PixelFormat> _PixelFormatsMap;
 
 /*
@@ -411,17 +428,53 @@ void AvFormatDecoder::SetPixelFormat(const int pixFormat)
     }
 }
 
+void AvFormatDecoder::SetMPEG2Codec(const int codec_id)
+{
+    mpeg2_codec = (CodecID) codec_id;
+}
+
 extern "C" void HandleStreamChange(void* data) {
     AvFormatDecoder* decoder = (AvFormatDecoder*) data;
     int cnt = decoder->ic->nb_streams;
-    VERBOSE(VB_IMPORTANT, QString("streams_changed() -- stream count %1").arg(cnt));
+    VERBOSE(VB_PLAYBACK, QString("streams_changed() -- stream count %1").arg(cnt));
     decoder->ScanStreams(false);
 }
 
-int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
-                              char testbuf[2048])
+/** \fn AvFormatDecoder::OpenFile(RingBuffer*, bool, char[2048])
+ *  OpenFile opens a ringbuffer for playback.
+ *
+ *  OpenFile deletes any existing context then reads the first
+ *  few kilobytes out of the ringbuffer and then seeks to the 
+ *  beginning of the buffer. It then calls ScanStreams to find
+ *  any valid streams to decode. If possible a position map is
+ *  also built for quick skipping.
+ *
+ *  /param rbuffer pointer to a valid ringuffer.
+ *  /param novideo if true then no video is sought in ScanSreams.
+ *  /param _testbuf this paramater is not used by AvFormatDecoder.
+ */
+int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char _testbuf[2048])
 {
+    (void) _testbuf;
+
+    CloseContext();
+
     ringBuffer = rbuffer;
+
+    // we read the test buffer ourselves, we need more data
+    uint testbuf_size = 4 * 1024;
+    char testbuf[testbuf_size];
+    {
+        ringBuffer->Seek(0, SEEK_SET);
+        if ((uint)ringBuffer->Read(testbuf, testbuf_size) != testbuf_size)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("AvFormatDecoder: Couldn't read file: %1")
+                    .arg(ringBuffer->GetFilename()));
+            return -1;
+        }
+        ringBuffer->Seek(0, SEEK_SET);
+    }
 
     AVInputFormat *fmt = NULL;
     char *filename = (char *)(rbuffer->GetFilename().ascii());
@@ -429,12 +482,13 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     AVProbeData probe;
     probe.filename = filename;
     probe.buf = (unsigned char *)testbuf;
-    probe.buf_size = 2048;
+    probe.buf_size = testbuf_size;
 
     fmt = av_probe_input_format(&probe, true);
     if (!fmt)
     {
-        VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Couldn't decode file: \"%1\".").arg(filename));
+        VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Couldn't decode "
+                                      "file: \"%1\".").arg(filename));
         return -1;
     }
 
@@ -443,7 +497,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     ic = av_alloc_format_context();
     if (!ic)
     {
-        VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Couldn't allocate format context."));
+        VERBOSE(VB_IMPORTANT, "AvFormatDecoder: Error, could not "
+                "allocate format context.");
         return -1;
     }
 
@@ -452,16 +507,16 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     int err = av_open_input_file(&ic, filename, fmt, 0, &params);
     if (err < 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: avformat error (%1) on av_open_input_file call.")
-                                      .arg(err));
+        VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: avformat error (%1) "
+                                      "on av_open_input_file call.").arg(err));
         return -1;
     }
 
     int ret = av_find_stream_info(ic);
     if (ret < 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder could not find codec parameters for \"%1\".")
-                                      .arg(filename));
+        VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: could not find codec "
+                                      "parameters for \"%1\".").arg(filename));
         av_close_input_file(ic);
         ic = NULL;
         return -1;
@@ -482,18 +537,22 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     ringBuffer->CalcReadAheadThresh(bitrate);
 
-    if ((m_playbackinfo) || livetv || watchingrecording)
+    if (!recordingHasPositionMap)
     {
-        recordingHasPositionMap = SyncPositionMap();
-        if (recordingHasPositionMap && !livetv && !watchingrecording)
+        if ((m_playbackinfo) || livetv || watchingrecording)
         {
-            hasFullPositionMap = true;
-            gopset = true;
+            recordingHasPositionMap = SyncPositionMap();
+            if (recordingHasPositionMap && !livetv && !watchingrecording)
+            {
+                hasFullPositionMap = true;
+                gopset = true;
+            }
         }
     }
 
     if (!recordingHasPositionMap)
     {
+        VERBOSE(VB_PLAYBACK, "recording has no position -- guessing at length");
         // the pvr-250 seems to overreport the bitrate by * 2
         float bytespersec = (float)bitrate / 8 / 2;
         float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
@@ -519,7 +578,82 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         VERBOSE(VB_PLAYBACK, "Partial position map found");
     }
 
+    VERBOSE(VB_PLAYBACK,
+            QString("AvFormatDecoder: Successfully opened decoder for file: "
+                    "\"%1\". novideo(%2)").arg(filename).arg(novideo));
+
     return recordingHasPositionMap;
+}
+
+void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
+{
+    fps = (double)enc->frame_rate / enc->frame_rate_base;
+
+    float aspect_ratio;
+    if (enc->sample_aspect_ratio.num == 0)
+        aspect_ratio = 0;
+    else
+        aspect_ratio = av_q2d(enc->sample_aspect_ratio) *
+            enc->width / enc->height;
+
+    if (aspect_ratio <= 0.0)
+        aspect_ratio = (float)enc->width / (float)enc->height;
+
+    current_width = enc->width;
+    current_height = enc->height;
+    current_aspect = aspect_ratio;
+
+    enc->opaque = NULL;
+    enc->get_buffer = NULL;
+    enc->release_buffer = NULL;
+    enc->draw_horiz_band = NULL;
+    enc->slice_flags = 0;
+
+    enc->error_resilience = FF_ER_COMPLIANT;
+    enc->workaround_bugs = FF_BUG_AUTODETECT;
+    enc->error_concealment = FF_EC_GUESS_MVS | FF_EC_DEBLOCK;
+    enc->idct_algo = FF_IDCT_AUTO;
+    enc->debug = 0;
+    enc->rate_emu = 0;
+    enc->error_rate = 0;
+
+    AVCodec *codec = avcodec_find_decoder(enc->codec_id);    
+
+    if (!gContext->GetNumSetting("DecodeExtraAudio", 0))
+        SetLowBuffers(false);
+
+    if (codec && (codec->id == CODEC_ID_MPEG2VIDEO_XVMC ||
+                  codec->id == CODEC_ID_MPEG2VIDEO_XVMC_VLD))
+    {
+        enc->flags |= CODEC_FLAG_EMU_EDGE;
+        enc->opaque = (void *)this;
+        enc->get_buffer = get_avf_buffer_xvmc;
+        enc->release_buffer = release_avf_buffer_xvmc;
+        enc->draw_horiz_band = render_slice_xvmc;
+        enc->slice_flags = SLICE_FLAG_CODED_ORDER |
+            SLICE_FLAG_ALLOW_FIELD;
+        directrendering = true;
+        SetLowBuffers(true);
+    }
+    else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
+             !(enc->width % 16))
+    {
+        enc->flags |= CODEC_FLAG_EMU_EDGE;
+        enc->opaque = (void *)this;
+        enc->get_buffer = get_avf_buffer;
+        enc->release_buffer = release_avf_buffer;
+        enc->draw_horiz_band = NULL;
+        directrendering = true;
+    }
+
+    int align_width = enc->width;
+    int align_height = enc->height;
+
+    if (directrendering)
+        avcodec_align_dimensions(enc, &align_width, &align_height);
+
+    m_parent->SetVideoParams(align_width, align_height, fps,
+                             keyframedist, aspect_ratio, kScan_Detect);
 }
 
 int AvFormatDecoder::ScanStreams(bool novideo)
@@ -540,7 +674,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     for (int i = 0; i < ic->nb_streams; i++)
     {
         AVCodecContext *enc = &ic->streams[i]->codec;
-        VERBOSE(VB_PLAYBACK, "AVFD");
         VERBOSE(VB_PLAYBACK, QString("AVFD: Opening Stream #%1: codec id %2").
                 arg(i).arg(enc->codec_id));
 
@@ -549,89 +682,27 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             case CODEC_TYPE_VIDEO:
             {
                 assert(enc->codec_id);
-
                 bitrate += enc->bit_rate;
-
-                fps = (double)enc->frame_rate / enc->frame_rate_base;
-
-                float aspect_ratio;
-                if (enc->sample_aspect_ratio.num == 0)
-                    aspect_ratio = 0;
-                else
-                    aspect_ratio = av_q2d(enc->sample_aspect_ratio) *
-                                   enc->width / enc->height;
-
-                if (aspect_ratio <= 0.0)
-                    aspect_ratio = (float)enc->width / (float)enc->height;
-
-                current_width = enc->width;
-                current_height = enc->height;
-                current_aspect = aspect_ratio;
-
-                enc->error_resilience = FF_ER_COMPLIANT;
-                enc->workaround_bugs = FF_BUG_AUTODETECT;
-                enc->error_concealment = FF_EC_GUESS_MVS | FF_EC_DEBLOCK;
-                enc->idct_algo = FF_IDCT_AUTO;
-                enc->debug = 0;
-                enc->rate_emu = 0;
-                enc->error_rate = 0;
+                if (novideo)
+                    break;
 
                 d->DestroyMPEG2();
-                if (!novideo && (enc->codec_id == CODEC_ID_MPEG1VIDEO ||
-                    enc->codec_id == CODEC_ID_MPEG2VIDEO))
+                if (CODEC_ID_NONE != mpeg2_codec &&
+                    (CODEC_ID_MPEG1VIDEO == enc->codec_id ||
+                     CODEC_ID_MPEG2VIDEO == enc->codec_id ||
+                     CODEC_ID_MPEG2VIDEO_XVMC == enc->codec_id ||
+                     CODEC_ID_MPEG2VIDEO_XVMC_VLD == enc->codec_id))
                 {
-#ifdef USING_XVMC
-                    if (gContext->GetNumSetting("UseXVMC", 1))
-                    {
-                        enc->codec_id = CODEC_ID_MPEG2VIDEO_XVMC;
-                        //enc->get_format = getFormat;
-                    }
-#endif
-#ifdef USING_XVMC_VLD
-                    if (gContext->GetNumSetting("UseXvMcVld", 1))
-                        enc->codec_id = CODEC_ID_MPEG2VIDEO_XVMC_VLD;
-#endif
+                    enc->codec_id = mpeg2_codec;
+                    //enc->get_format = getFormat;
+                }
+                InitVideoCodec(enc);
                     // Only use libmpeg2 when not using XvMC
-                    if (enc->codec_id == CODEC_ID_MPEG1VIDEO ||
-                        enc->codec_id == CODEC_ID_MPEG2VIDEO)
-                        d->InitMPEG2();
-                }
-
-                AVCodec *codec = avcodec_find_decoder(enc->codec_id);
-
-                if (codec && (codec->id == CODEC_ID_MPEG2VIDEO_XVMC ||
-                              codec->id == CODEC_ID_MPEG2VIDEO_XVMC_VLD))
+                if (CODEC_ID_MPEG1VIDEO == enc->codec_id ||
+                    CODEC_ID_MPEG2VIDEO == enc->codec_id)
                 {
-                    enc->flags |= CODEC_FLAG_EMU_EDGE;
-                    enc->get_buffer = get_avf_buffer_xvmc;
-                    enc->release_buffer = release_avf_buffer_xvmc;
-                    enc->draw_horiz_band = render_slice_xvmc;
-                    enc->opaque = (void *)this;
-                    directrendering = true;
-                    enc->slice_flags = SLICE_FLAG_CODED_ORDER |
-                                       SLICE_FLAG_ALLOW_FIELD;
-                    setLowBuffers();
-                    m_parent->ForceVideoOutputType(kVideoOutput_XvMC);
+                    d->InitMPEG2();
                 }
-                else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
-                    !(enc->width % 16))
-                {
-                    enc->flags |= CODEC_FLAG_EMU_EDGE;
-                    enc->draw_horiz_band = NULL;
-                    enc->get_buffer = get_avf_buffer;
-                    enc->release_buffer = release_avf_buffer;
-                    enc->opaque = (void *)this;
-                    directrendering = true;
-                }
-
-                int align_width = enc->width;
-                int align_height = enc->height;
-
-                if (directrendering)
-                    avcodec_align_dimensions(enc, &align_width, &align_height);
-
-                m_parent->SetVideoParams(align_width, align_height, fps,
-                                         keyframedist, aspect_ratio, kScan_Detect);
                 break;
             }
             case CODEC_TYPE_AUDIO:
@@ -645,15 +716,17 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             case CODEC_TYPE_DATA:
             {
                 bitrate += enc->bit_rate;
-                VERBOSE(VB_PLAYBACK, QString("AvFormatDecoder: data codec, ignoring (%1).")
-                                             .arg(enc->codec_type));
+                VERBOSE(VB_PLAYBACK,
+                        QString("AvFormatDecoder: data codec, ignoring (%1)")
+                        .arg(enc->codec_type));
                 break;
             }
             default:
             {
                 bitrate += enc->bit_rate;
-                VERBOSE(VB_PLAYBACK, QString("AvFormatDecoder: Unknown codec type (%1).")
-                                             .arg(enc->codec_type));
+                VERBOSE(VB_PLAYBACK,
+                        QString("AvFormatDecoder: Unknown codec type (%1)")
+                        .arg(enc->codec_type));
                 break;
             }
         }
@@ -707,6 +780,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     // Select a new track at the next opportunity.
     currentAudioTrack = -1;
+
+    if (m_parent->IsErrored())
+        scanerror = -1;
+
     return scanerror;
 }
 
@@ -814,7 +891,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
 
-    VideoFrame *frame = nd->m_parent->GetNextVideoFrame();
+    VideoFrame *frame = nd->m_parent->GetNextVideoFrame(true);
 
     int width = frame->width;
     int height = frame->height;
@@ -831,8 +908,6 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
     pic->type = FF_BUFFER_TYPE_USER;
 
     pic->age = 256 * 256 * 256 * 64;
-
-    nd->inUseBuffers.append(frame);
 
     return 1;
 }
@@ -857,7 +932,7 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    VideoFrame *frame = nd->m_parent->GetNextVideoFrame();
+    VideoFrame *frame = nd->m_parent->GetNextVideoFrame(false);
 
     pic->data[0] = frame->priv[0];
     pic->data[1] = frame->priv[1];
@@ -871,8 +946,6 @@ int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
     pic->type = FF_BUFFER_TYPE_USER;
 
     pic->age = 256 * 256 * 256 * 64;
-
-    nd->inUseBuffers.append(frame);
 
 #ifdef USING_XVMC
     xvmc_render_state_t *render = (xvmc_render_state_t *)frame->buf;
@@ -914,12 +987,17 @@ void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
     (void)offset;
     (void)type;
 
-    AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
+    if (s && src && s->opaque && src->opaque)
+    {
+        AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
 
-    int width = s->width;
+        int width = s->width;
 
-    VideoFrame *frame = (VideoFrame *)src->opaque;
-    nd->m_parent->DrawSlice(frame, 0, y, width, height);
+        VideoFrame *frame = (VideoFrame *)src->opaque;
+        nd->m_parent->DrawSlice(frame, 0, y, width, height);
+    }
+    else
+        cerr<<"render_slice_xvmc called with bad avctx or src"<<endl;
 }
 
 void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
@@ -1635,8 +1713,9 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     picframe->frameNumber = framesPlayed;
                     m_parent->ReleaseNextVideoFrame(picframe, temppts);
-                    if (directrendering)
-                        inUseBuffers.removeRef(picframe);
+                    if (!directrendering)
+                        m_parent->DiscardVideoFrame(picframe);
+
                     gotvideo = 1;
                     framesPlayed++;
 

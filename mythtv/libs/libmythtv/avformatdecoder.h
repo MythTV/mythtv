@@ -31,15 +31,18 @@ class AvFormatDecoder : public DecoderBase
     AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo);
    ~AvFormatDecoder();
 
-    void Reset(void);
+    void CloseContext();
+    void Reset(bool reset_video_data = true, bool seek_reset = true);
 
-    /// Perform an av_probe_input_format on the passed data to see if we can decode it with this class.
+    /// Perform an av_probe_input_format on the passed data to see if we
+    /// can decode it with this class.
     static bool CanHandle(char testbuf[2048], const QString &filename);
 
     /// Open our file and set up or audio and video parameters.
     int OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048]);
 
-    /// Decode a frame of video/audio.  If onlyvideo is set, just decode the video portion.
+    /// Decode a frame of video/audio. If onlyvideo is set, 
+    /// just decode the video portion.
     bool GetFrame(int onlyvideo);
 
     bool isLastFrameKey(void) { return false; }
@@ -56,8 +59,8 @@ class AvFormatDecoder : public DecoderBase
 
     /// This is a No-op for this class.
     void SetRawVideoState(bool state) { (void)state; }
-    /// This is a No-op for this class.
 
+    /// This is a No-op for this class.
     bool GetRawVideoState(void) { return false; }
 
     /// This is a No-op for this class.
@@ -66,6 +69,8 @@ class AvFormatDecoder : public DecoderBase
     QString GetEncodingType(void) { return QString("MPEG-2"); }
 
     void SetPixelFormat(const int);
+    bool IsXvMCCompatible();
+    void SetMPEG2Codec(const int codec_id);
 
     virtual void incCurrentAudioTrack();
     virtual void decCurrentAudioTrack();
@@ -97,8 +102,10 @@ class AvFormatDecoder : public DecoderBase
     friend int close_avf(URLContext *h);
 
     void InitByteContext(void);
+    void InitVideoCodec(AVCodecContext *enc);
 
-    /// Preprocess a packet, setting the video parms if nessesary. Also feeds HandleGopStart for MPEG2 files.
+    /// Preprocess a packet, setting the video parms if nessesary.
+    /// Also feeds HandleGopStart for MPEG2 files.
     void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
 
     float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
@@ -147,8 +154,6 @@ class AvFormatDecoder : public DecoderBase
     bool seen_gop;
     int seq_count; ///< A counter used to determine if we need to force a call to HandleGopStart
 
-    QPtrList<VideoFrame> inUseBuffers;
-
     QPtrList<AVPacket> storedPackets;
 
     int firstgoppos;
@@ -167,6 +172,8 @@ class AvFormatDecoder : public DecoderBase
 
     QValueVector<int> audioStreams;
     int wantedAudioStream;
+
+    CodecID mpeg2_codec;
 };
 
 #endif

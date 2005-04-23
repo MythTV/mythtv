@@ -118,11 +118,11 @@ class VideoBuffers
     bool HasChildren(const VideoFrame *frame);
 
 #ifdef USING_XVMC
-    VideoFrame* PastFrame(VideoFrame *frame);
-    VideoFrame* FutureFrame(VideoFrame *frame);
-    VideoFrame* GetOSDFrame(VideoFrame *frame);
+    VideoFrame* PastFrame(const VideoFrame *frame);
+    VideoFrame* FutureFrame(const VideoFrame *frame);
+    VideoFrame* GetOSDFrame(const VideoFrame *frame);
     void SetOSDFrame(VideoFrame *frame, VideoFrame *osd);
-    VideoFrame* GetOSDParent(VideoFrame *osd);
+    VideoFrame* GetOSDParent(const VideoFrame *osd);
     bool CreateBuffers(int width, int height,
                        Display *disp,
                        void* xvmc_ctx,
