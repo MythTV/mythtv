@@ -27,12 +27,14 @@ int GetNumberOfXineramaScreens()
     int nr_xinerama_screens = 0;
 
 #ifdef Q_WS_X11
+    X11L;
     Display *d = XOpenDisplay(NULL);
     int event_base = 0, error_base = 0;
     if (XineramaQueryExtension(d, &event_base, &error_base) &&
         XineramaIsActive(d))
         XFree(XineramaQueryScreens(d, &nr_xinerama_screens));
     XCloseDisplay(d);
+    X11U;
 #endif // Q_WS_X11
 
     return nr_xinerama_screens;
@@ -51,8 +53,10 @@ void InstallXErrorHandler(Display *d)
 {
     XErrorVectorType empty;
     error_map[d] = empty;
+    X11L;
     XSync(d, 0); /* flush out any pre-existing X errors */
     error_handler_map[d] = XSetErrorHandler(ErrorCatcher);
+    X11U;
 }
 
 void PrintXErrors(Display *d, const vector<XErrorEvent>& events)
@@ -60,7 +64,7 @@ void PrintXErrors(Display *d, const vector<XErrorEvent>& events)
     for (int i = events.size() -1; i>=0; --i)
     {
         char buf[200];
-        XGetErrorText(d, events[i].error_code, buf, sizeof(buf));
+        X11S(XGetErrorText(d, events[i].error_code, buf, sizeof(buf)));
 	VERBOSE(VB_IMPORTANT, endl
                 <<"XError type: "<<events[i].type<<endl
                 <<"    display: "<<events[i].display<<endl
@@ -75,12 +79,14 @@ void PrintXErrors(Display *d, const vector<XErrorEvent>& events)
 vector<XErrorEvent> UninstallXErrorHandler(Display *d, bool printErrors)
 {
     vector<XErrorEvent> events;
+    X11L;
     XErrorCallbackType old_handler = error_handler_map[d];
     XSync(d, 0); /* flush pending X calls so we see any errors */
+    X11U;
     if (old_handler)
     {
         error_handler_map[d] = NULL;
-        XSetErrorHandler(old_handler);
+        X11S(XSetErrorHandler(old_handler));
         events = error_map[d];
         error_map[d].clear();
         if (printErrors)

@@ -109,9 +109,12 @@ VideoOutputXv::~VideoOutputXv()
     VERBOSE(VB_PLAYBACK, "~VideoOutputXv()");
     if (XJ_started) 
     {
+        X11L;
         XSetForeground(XJ_disp, XJ_gc, XJ_black);
         XFillRectangle(XJ_disp, XJ_curwin, XJ_gc,
                        dispx, dispy, dispw, disph);
+        X11U;
+
         m_deinterlacing = false;
     }
 
@@ -120,15 +123,18 @@ VideoOutputXv::~VideoOutputXv()
     // ungrab port...
     if (xv_port >= 0)
     {
-        XvUngrabPort(XJ_disp, xv_port, CurrentTime);
+        X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
         xv_port = -1;
     }
 
     if (XJ_started) 
     {
         XJ_started = false;
+
+        X11L;
         XFreeGC(XJ_disp, XJ_gc);
         XCloseDisplay(XJ_disp);
+        X11U;
     }
 
     // Switch back to desired resolution for GUI
@@ -206,8 +212,14 @@ int VideoOutputXv::GetRefreshRate(void)
     XF86VidModeModeLine mode_line;
     int dot_clock;
 
-    if (!XF86VidModeGetModeLine(XJ_disp, XJ_screen_num, &dot_clock, &mode_line))
+    int ret = False;
+    X11S(ret = XF86VidModeGetModeLine(XJ_disp, XJ_screen_num, &dot_clock, &mode_line));
+    if (!ret)
+    {
+        VERBOSE(VB_IMPORTANT, "VideoOutputXv::GetRefreshRate() -- "
+                "failed to query mode line");
         return -1;
+    }
 
     double rate = (double)((double)(dot_clock * 1000.0) /
                            (double)(mode_line.htotal * mode_line.vtotal));
@@ -275,9 +287,9 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
         // The very first Resize needs to be the maximum possible
         // desired res, because X will mask off anything outside
         // the initial dimensions
-        XMoveResizeWindow(XJ_disp, XJ_win, 0, 0,
-                          display_res->GetMaxWidth(),
-                          display_res->GetMaxHeight());
+        X11S(XMoveResizeWindow(XJ_disp, XJ_win, 0, 0,
+                               display_res->GetMaxWidth(),
+                               display_res->GetMaxHeight()));
         ResizeForVideo(width, height);
     }
     else
@@ -296,9 +308,10 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
 
     // TODO these calculations are not quite right
     int event_base, error_base;
-    bool usingXinerama =
-        (XineramaQueryExtension(XJ_disp, &event_base, &error_base) &&
-         XineramaIsActive(XJ_disp));
+    bool usingXinerama = false;
+    X11S(usingXinerama = 
+         (XineramaQueryExtension(XJ_disp, &event_base, &error_base) &&
+          XineramaIsActive(XJ_disp)));
     if (w_mm == 0 || h_mm == 0 || usingXinerama)
     {
         w_mm = (int)(300 * XJ_aspect);
@@ -580,7 +593,7 @@ bool VideoOutputXv::InitXvMC()
         for (uint i=0; i<xvmc_osd_available.size(); i++)
             delete xvmc_osd_available[i];
         xvmc_osd_available.clear();
-        XvUngrabPort(XJ_disp, xv_port, CurrentTime);
+        X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
         xv_port = -1;
     }
 
@@ -612,7 +625,7 @@ bool VideoOutputXv::InitXVideo()
     bool foundimageformat = false;
     int formats = 0;
     XvImageFormatValues *fo;
-    fo = XvListImageFormats(XJ_disp, xv_port, &formats);
+    X11S(fo = XvListImageFormats(XJ_disp, xv_port, &formats));
     for (int i = 0; i < formats; i++)
     {
         if (fo[i].id == GUID_I420_PLANAR)
@@ -635,12 +648,12 @@ bool VideoOutputXv::InitXVideo()
     } 
 
     if (fo)
-        XFree(fo);
+        X11S(XFree(fo));
 
     if (!foundimageformat)
     {
         VERBOSE(VB_IMPORTANT, "Couldn't find the proper XVideo image format.");
-        XvUngrabPort(XJ_disp, xv_port, CurrentTime);
+        X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
         xv_port = -1;
     }
 
@@ -653,7 +666,7 @@ bool VideoOutputXv::InitXVideo()
     {
         VERBOSE(VB_IMPORTANT, "Failed to create XVideo Buffers.");
         DeleteBuffers(XVideo, false);
-        XvUngrabPort(XJ_disp, xv_port, CurrentTime);
+        X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
         xv_port = -1;
         ok = false;
     }
@@ -747,10 +760,11 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
 
     XV_INIT_FATAL_ERROR_TEST(winid <= 0, "Invalid Window ID.");
 
-    XJ_disp = XOpenDisplay(NULL);
+    X11S(XJ_disp = XOpenDisplay(NULL));
     XV_INIT_FATAL_ERROR_TEST(!XJ_disp, "Failed to open display.");
 
     // Initialize X stuff
+    X11L;
     XJ_screen     = DefaultScreenOfDisplay(XJ_disp);
     XJ_screen_num = DefaultScreen(XJ_disp);
     XJ_white      = XWhitePixel(XJ_disp, XJ_screen_num);
@@ -758,6 +772,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     XJ_curwin     = winid;
     XJ_win        = winid;
     XJ_root       = DefaultRootWindow(XJ_disp);
+    X11U;
 
     // Basic setup
     VideoOutput::Init(width, height, aspect,
@@ -785,8 +800,10 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     if (use_xvmc && embedid > 0)
         XJ_curwin = XJ_win = embedid;
 
+    X11L;
     XJ_gc = XCreateGC(XJ_disp, XJ_win, 0, 0);
     XJ_depth = DefaultDepthOfScreen(XJ_screen);
+    X11U;
 
     bool ok = InitVideoBuffers(use_xvmc, use_xv, use_shm);
     XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
@@ -817,15 +834,16 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
     XvAttribute *attributes;
     int attrib_count;
 
-    attributes = XvQueryPortAttributes(XJ_disp, xv_port, &attrib_count);
+    X11S(attributes = XvQueryPortAttributes(XJ_disp, xv_port, &attrib_count));
     for (int i = (attributes) ? 0 : attrib_count; i < attrib_count; i++)
     {
         if (!strcmp(attributes[i].name, "XV_AUTOPAINT_COLORKEY"))
         {
-            xv_atom = XInternAtom(XJ_disp, "XV_AUTOPAINT_COLORKEY", False);
+            X11S(xv_atom = XInternAtom(XJ_disp, "XV_AUTOPAINT_COLORKEY", False));
             if (xv_atom == None)
                 continue;
 
+            X11L;
             if (turnoffautopaint)
                 ret = XvSetPortAttribute(XJ_disp, xv_port, xv_atom, 0);
             else
@@ -835,24 +853,25 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
             // turn of colorkey drawing if autopaint is on
             if (Success == ret && xv_val)
                 xv_draw_colorkey = false;
+            X11U;
         }
     }
     if (attributes)
-        XFree(attributes);
+        X11S(XFree(attributes));
 
     if (xv_draw_colorkey)
     {
-        xv_atom = XInternAtom(XJ_disp, "XV_COLORKEY", False);
+        X11S(xv_atom = XInternAtom(XJ_disp, "XV_COLORKEY", False));
         if (xv_atom != None)
         {
-            ret = XvGetPortAttribute(XJ_disp, xv_port, xv_atom, 
-                                     &xv_colorkey);
+            X11S(ret = XvGetPortAttribute(XJ_disp, xv_port, xv_atom, 
+                                          &xv_colorkey));
 
             if (ret == Success && xv_colorkey == 0)
             {
                 const int default_colorkey = 1;
-                ret = XvSetPortAttribute(XJ_disp, xv_port, xv_atom,
-                                         default_colorkey);
+                X11S(ret = XvSetPortAttribute(XJ_disp, xv_port, xv_atom,
+                                              default_colorkey));
                 if (ret == Success)
                 {
                     VERBOSE(VB_PLAYBACK, "0 is the only bad color key for "
@@ -923,9 +942,10 @@ static uint calcBPM(int chroma)
 bool VideoOutputXv::CreateXvMCBuffers(void)
 {
 #ifdef USING_XVMC
-    int ret = XvMCCreateContext(XJ_disp, xv_port, xvmc_surf_type, 
-                                XJ_width, XJ_height, XVMC_DIRECT,
-                                &(xvmc_ctx));
+    int ret = Success;
+    X11S(ret = XvMCCreateContext(XJ_disp, xv_port, xvmc_surf_type, 
+                                 XJ_width, XJ_height, XVMC_DIRECT,
+                                 &(xvmc_ctx)));
     if (ret != Success)
     {
         VERBOSE(VB_IMPORTANT, QString("Unable to create XvMC Context, "
@@ -954,7 +974,7 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
     for (uint i=0; i<xvmc_osd_available.size(); i++)
         xvmc_osd_available[i]->CreateBuffer(xvmc_ctx, XJ_width, XJ_height);
 
-    X11S(XSync(XJ_disp, 0));
+    X11S(XSync(XJ_disp, False));
 
     return true;
 #else
@@ -1077,10 +1097,12 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                     ((XImage*)image)->data = XJ_shm_infos[i].shmaddr;
                 xv_buffers[(unsigned char*) XJ_shm_infos[i].shmaddr] = image;
                 XJ_shm_infos[i].readOnly = False;
+
                 X11L;
                 XShmAttach(XJ_disp, &XJ_shm_infos[i]);
-                XSync(XJ_disp, 0); // needed for FreeBSD?
+                XSync(XJ_disp, False); // needed for FreeBSD?
                 X11U;
+
                 // mark for delete immediately - it won't be removed until detach
                 shmctl(XJ_shm_infos[i].shmid, IPC_RMID, 0);
 
@@ -1113,7 +1135,7 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
         vector<unsigned char*> bufs = 
             CreateShmImages(vbuffers.allocSize(), true);
         ok = vbuffers.CreateBuffers(XJ_width, XJ_height, bufs);
-        X11S(XSync(XJ_disp, 0));
+        X11S(XSync(XJ_disp, False));
         if (xv_chroma != GUID_I420_PLANAR)
             xv_color_conv_buf = new unsigned char[XJ_width * XJ_height * 3 / 2];
     }
@@ -1201,7 +1223,6 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
         XvMCDestroyBlocks(XJ_disp, &(surf->blocks));
 
         X11U;
-
     }
     xvmc_surfs.clear();
 
@@ -1647,13 +1668,15 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
                 dispw, disph);
 
     global_lock.lock();
-
+ 
+    X11L;
     if (XShm == video_output_subtype)
         XShmPutImage(XJ_disp, XJ_curwin, XJ_gc, XJ_non_xv_image,
                      0, 0, 0, 0, dispw, disph, False);
     else
         XPutImage(XJ_disp, XJ_curwin, XJ_gc, XJ_non_xv_image, 
                   0, 0, 0, 0, dispw, disph);
+    X11U;
 
     global_lock.unlock();
 
@@ -1816,15 +1839,15 @@ void VideoOutputXv::ShowXVideo(FrameScanType scan)
     global_lock.lock();
     vbuffers.LockFrame(frame, "ShowXVideo");
 
-    XvShmPutImage(XJ_disp, xv_port, XJ_curwin,
-                  XJ_gc, image, imgx, src_y, imgw,
-                  (3 != field) ? (imgh/2) : imgh,
-                  dispxoff, dest_y, dispwoff, disphoff, False);
+    X11S(XvShmPutImage(XJ_disp, xv_port, XJ_curwin,
+                       XJ_gc, image, imgx, src_y, imgw,
+                       (3 != field) ? (imgh/2) : imgh,
+                       dispxoff, dest_y, dispwoff, disphoff, False));
 
     vbuffers.UnlockFrame(frame, "ShowXVideo");
     global_lock.unlock();
 
-    XSync(XJ_disp, False);
+    X11S(XSync(XJ_disp, False));
 }
 
 // this is documented in videooutbase.cpp
@@ -1842,7 +1865,7 @@ void VideoOutputXv::Show(FrameScanType scan)
     else if (VideoOutputSubType() == XVideo)
         ShowXVideo(scan);
     else
-        XSync(XJ_disp, False);
+        X11S(XSync(XJ_disp, False));
 }
 
 /**
@@ -1855,6 +1878,8 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
     // boboff assumes the smallest interlaced resolution is 480 lines
     int boboff = (int)round(((float)disphoff) / 480 - 0.001f);
     boboff = (m_deinterlacing && m_deintfiltername == "bobdeint") ? boboff : 0;
+
+    X11L;
 
     if (xv_draw_colorkey && needrepaint)
     {
@@ -1884,6 +1909,8 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
 
     if (sync)
         XSync(XJ_disp, false);
+
+    X11U;
 }
 
 /**
@@ -1913,10 +1940,10 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     if (hasVLDAcceleration())
     {
         vbuffers.LockFrame(frame, "DrawSlice -- VLD");
-        status = XvMCPutSlice2(XJ_disp, &xvmc_ctx, 
-                               (char*)render->slice_data, 
-                               render->slice_datalen, 
-                               render->slice_code);
+        X11S(status = XvMCPutSlice2(XJ_disp, &xvmc_ctx, 
+                                    (char*)render->slice_data, 
+                                    render->slice_datalen, 
+                                    render->slice_code));
         if (Success != status)
             VERBOSE(VB_PLAYBACK, "XvMCPutSlice, error: "<<status);
 
@@ -1938,24 +1965,24 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
         vbuffers.LockFrames(locks, "DrawSlice");
 
         // Sync past & future I and P frames
-        X11L;
-        status = XvMCRenderSurface(XJ_disp, &xvmc_ctx, 
-                                   render->picture_structure, 
-                                   render->p_surface,
-                                   render->p_past_surface, 
-                                   render->p_future_surface,
-                                   render->flags,
-                                   render->filled_mv_blocks_num,
-                                   render->start_mv_blocks_num,
-                                   (XvMCMacroBlockArray *)frame->priv[1], 
-                                   (XvMCBlockArray *)frame->priv[0]);
-        X11U;
+        X11S(status =
+             XvMCRenderSurface(XJ_disp, &xvmc_ctx, 
+                               render->picture_structure, 
+                               render->p_surface,
+                               render->p_past_surface, 
+                               render->p_future_surface,
+                               render->flags,
+                               render->filled_mv_blocks_num,
+                               render->start_mv_blocks_num,
+                               (XvMCMacroBlockArray *)frame->priv[1], 
+                               (XvMCBlockArray *)frame->priv[0]));
+
         if (Success != status)
             VERBOSE(VB_PLAYBACK, 
                     QString("XvMCRenderSurface, error: %1 (%2)")
                     .arg(ErrorStringXvMC(status)).arg(status));
         else
-            X11S(FlushSurface(frame));
+            FlushSurface(frame);
 
         render->start_mv_blocks_num = 0;
         render->filled_mv_blocks_num = 0;
@@ -2487,9 +2514,7 @@ void VideoOutputXv::FlushSurface(VideoFrame* frame)
         Display *disp     = render->disp;
         XvMCSurface *surf = render->p_surface;
         if (disp && IsRendering(frame))
-        {
             X11S(XvMCFlushSurface(disp, surf));
-        }
     }
 #endif // USING_XVMC
 }

@@ -13,6 +13,7 @@ namespace X11
 #include <iostream>
 
 #include "DisplayResX.h"
+#include "util-x11.h"
 
 using namespace X11;
 
@@ -29,16 +30,18 @@ DisplayResX::~DisplayResX(void)
 
 bool DisplayResX::GetDisplaySize(int &width_mm, int &height_mm) const
 {
-    Display *display = XOpenDisplay(NULL);
+    Display *display = NULL;
+    X11S(display = XOpenDisplay(NULL));
     if (display == NULL)
         return false;
 
+    X11L;
     int screen_num = DefaultScreen(display);
-
     width_mm = DisplayWidthMM(display, screen_num);
     height_mm = DisplayHeightMM(display, screen_num);
-
     XCloseDisplay(display);
+    X11U;
+
     return true;
 }
 
@@ -55,6 +58,7 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, short desired_rate)
         if (!cfg)
             return false;
 
+        X11L;
         Rotation rot;
         XRRConfigCurrentConfiguration(cfg, &rot);
         
@@ -64,6 +68,7 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, short desired_rate)
         
         XRRFreeScreenConfigInfo(cfg);
         XCloseDisplay(display);
+        X11U;
 
         if (RRSetConfigSuccess != status)
             cerr<<"DisplaResX: XRRSetScreenConfigAndRate() call failed."<<endl;
@@ -84,10 +89,12 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
         return m_video_modes;
 
     int num_sizes, num_rates;
-    XRRScreenSize *sizes = XRRConfigSizes(cfg, &num_sizes);
+    XRRScreenSize *sizes = NULL;
+    X11S(sizes = XRRConfigSizes(cfg, &num_sizes));
     for (int i = 0; i < num_sizes; ++i)
     {
-        short *rates = XRRRates(display, DefaultScreen(display), i, &num_rates);
+        short *rates = NULL;
+        X11S(rates = XRRRates(display, DefaultScreen(display), i, &num_rates));
         DisplayResScreen scr(sizes[i].width, sizes[i].height,
                              sizes[i].mwidth, sizes[i].mheight,
                              rates, num_rates);
@@ -96,21 +103,24 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
     m_video_modes_unsorted = m_video_modes;
     sort(m_video_modes.begin(), m_video_modes.end());
 
+    X11L;
     XRRFreeScreenConfigInfo(cfg);
     XCloseDisplay(display);
+    X11U;
 
     return m_video_modes;
 }
 
 static XRRScreenConfiguration *GetScreenConfig(Display*& display)
 {
-    display = XOpenDisplay(NULL);
+    X11S(display = XOpenDisplay(NULL));
     if (!display)
     {
         cerr<<"DisplaResX: Unable to XOpenDisplay"<<endl;
         return NULL;
     }
 
+    X11L;
     Window root = RootWindow(display, DefaultScreen(display));
     XRRScreenConfiguration *cfg = XRRGetScreenInfo(display, root);
     if (!cfg)
@@ -119,5 +129,7 @@ static XRRScreenConfiguration *GetScreenConfig(Display*& display)
             XCloseDisplay(display);
         cerr<<"DisplaResX: Unable to XRRgetScreenInfo"<<endl;
     }
+    X11U;
+
     return cfg;
 }
