@@ -5,6 +5,8 @@
 
 #include "mythcontext.h"
 
+QMutex x11_lock;
+
 #ifdef Q_WS_X11
 #define USING_XV
 #include "util-x11.h"

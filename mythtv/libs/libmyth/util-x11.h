@@ -16,4 +16,10 @@ std::vector<XErrorEvent> UninstallXErrorHandler(Display *d, bool printErrors = t
 
 int GetNumberOfXineramaScreens();
 
+extern QMutex x11_lock;
+
+#define X11L x11_lock.lock()
+#define X11U x11_lock.unlock()
+#define X11S(arg) do { X11L; arg; X11U; } while (0)
+
 #endif // __UTIL_X11_H__

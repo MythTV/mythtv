@@ -7,6 +7,7 @@
 #include <qwindowdefs.h>
 #include "../libmyth/mythcontext.h"
 #include <X11/extensions/XvMC.h>
+#include "util-x11.h"
 
 extern "C" {
 #include "../libavcodec/xvmc_render.h"
@@ -21,12 +22,12 @@ class XvMCSurfaceTypes
   public:
     XvMCSurfaceTypes(Display *dpy, XvPortID port) : num(0) 
     {
-        surfaces = XvMCListSurfaceTypes(dpy, port, &num);
+        X11S(surfaces = XvMCListSurfaceTypes(dpy, port, &num));
     }
         
     ~XvMCSurfaceTypes() 
     {
-        XFree(surfaces);
+        X11S(XFree(surfaces));
     }
 
     /// Find an appropriate surface on the current port.

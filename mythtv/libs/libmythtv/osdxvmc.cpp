@@ -7,19 +7,17 @@
 #include <sys/shm.h>
 
 #include "osdxvmc.h"
+#include "videoout_xv.h"
 
-extern "C" XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*,
-                                      int, int, XShmSegmentInfo*);
+extern "C" XvImage *XvShmCreateImage(Display*, XvPortID, int, char*,
+                                     int, int, XShmSegmentInfo*);
 
 #define NO_SUBPICTURE      0
 #define OVERLAY_SUBPICTURE 1
 #define BLEND_SUBPICTURE   2
 #define BACKEND_SUBPICTURE 3
 
-static inline void SyncSurface(Display *disp, XvMCSurface *surf);
 static inline xvmc_render_state_t *GetRender(VideoFrame *frame);
-
-
 
 XvMCOSD::XvMCOSD(Display *disp, int port, int surface_type_id,
                  int xvmc_surf_flags)
@@ -30,8 +28,9 @@ XvMCOSD::XvMCOSD(Display *disp, int port, int surface_type_id,
 {
     // subpicture init
     int num = 0;
-    XvImageFormatValues *xvfmv = 
-        XvMCListSubpictureTypes(XJ_disp, xv_port, surface_type_id, &num);
+    XvImageFormatValues *xvfmv = NULL;
+    X11S(xvfmv = XvMCListSubpictureTypes(XJ_disp, xv_port,
+                                         surface_type_id, &num));
 
     for (int i = (xvfmv) ? 0 : num; i < num; i++)
     {
@@ -45,7 +44,7 @@ XvMCOSD::XvMCOSD(Display *disp, int port, int surface_type_id,
     }
 
     if (xvfmv)
-        XFree(xvfmv);
+        X11S(XFree(xvfmv));
 }
 
 void XvMCOSD::CreateBuffer(XvMCContext &xvmc_ctx, int width, int height)
@@ -62,8 +61,9 @@ void XvMCOSD::CreateBuffer(XvMCContext &xvmc_ctx, int width, int height)
     XJ_height = height;
 
     osd_subpict_clear_color = 0;
-    int ret = XvMCCreateSubpicture(XJ_disp, &xvmc_ctx, &osd_subpict,
-                                   XJ_width, XJ_height, osd_subpict_info.id);
+    int ret = Success;
+    X11S(ret = XvMCCreateSubpicture(XJ_disp, &xvmc_ctx, &osd_subpict,
+                                    XJ_width, XJ_height, osd_subpict_info.id));
 
     if (ret != Success)
     {
@@ -73,12 +73,15 @@ void XvMCOSD::CreateBuffer(XvMCContext &xvmc_ctx, int width, int height)
         return;
     }
 
+    X11L;
     XvMCClearSubpicture(XJ_disp, &osd_subpict, 0, 0, XJ_width,
                         XJ_height, osd_subpict_clear_color);
 
     osd_xv_image = XvShmCreateImage(XJ_disp, xv_port,
                                     osd_subpict_info.id, NULL,
-                                    XJ_width, XJ_height, &XJ_osd_shm_info);
+                                    XJ_width, XJ_height,
+                                    &XJ_osd_shm_info);
+    X11U;
 
     if (!osd_xv_image)
     {
@@ -94,7 +97,7 @@ void XvMCOSD::CreateBuffer(XvMCContext &xvmc_ctx, int width, int height)
 
     osd_xv_image->data = XJ_osd_shm_info.shmaddr;
 
-    XShmAttach(XJ_disp, &XJ_osd_shm_info);
+    X11S(XShmAttach(XJ_disp, &XJ_osd_shm_info));
 
     shmctl(XJ_osd_shm_info.shmid, IPC_RMID, 0);
 
@@ -122,7 +125,7 @@ void XvMCOSD::CreateBuffer(XvMCContext &xvmc_ctx, int width, int height)
             }
         }
 
-        XvMCSetSubpicturePalette(XJ_disp, &osd_subpict, osd_palette);
+        X11S(XvMCSetSubpicturePalette(XJ_disp, &osd_subpict, osd_palette));
     }
     osd_subpict_alloc = true;
 }
@@ -132,6 +135,7 @@ void XvMCOSD::DeleteBuffer()
     if (!osd_subpict_alloc)
         return;
 
+    X11L;
     XvMCDestroySubpicture(XJ_disp, &osd_subpict);
 
     XShmDetach(XJ_disp, &XJ_osd_shm_info);
@@ -140,7 +144,10 @@ void XvMCOSD::DeleteBuffer()
     osd_subpict_alloc = false;
     XFree(osd_xv_image);
     XFlush(XJ_disp);
-    XSync(XJ_disp, false);
+    X11U;
+    usleep(50);
+
+    X11S(XSync(XJ_disp, false));
 
     if (osd_palette)
         delete [] osd_palette;
@@ -151,33 +158,39 @@ void XvMCOSD::CompositeOSD(VideoFrame* frame, VideoFrame* osdframe)
     if (!osd_subpict_alloc)
         return;
 
+    X11L;
     XvMCCompositeSubpicture(XJ_disp, &osd_subpict, 
                             osd_xv_image, 0, 0,
                             XJ_width, XJ_height, 0, 0);
     // delay sync until after getnextfreeframe...
     XvMCFlushSubpicture(XJ_disp, &osd_subpict);
+    X11U;
 
     if (osd_subpict_mode == BLEND_SUBPICTURE && osdframe)
     {
         xvmc_render_state_t *render = GetRender(frame);
         xvmc_render_state_t *osdren = GetRender(osdframe);
 
-        XvMCSyncSubpicture(XJ_disp, &osd_subpict);
-        SyncSurface(XJ_disp, render->p_surface);
+        X11S(XvMCSyncSubpicture(XJ_disp, &osd_subpict));
+        VideoOutputXv::SyncSurface(frame);
+        
+        X11L;
         XvMCBlendSubpicture2(XJ_disp, render->p_surface,
                              osdren->p_surface, &osd_subpict,
                              0, 0, XJ_width, XJ_height,
                              0, 0, XJ_width, XJ_height);
         XvMCFlushSurface(XJ_disp, osdren->p_surface);
+        X11U;
     }
     else if (osd_subpict_mode == BACKEND_SUBPICTURE)
     {
-        VERBOSE(VB_IMPORTANT, "In OSD backend...");
+        X11L;
         XvMCSyncSubpicture(XJ_disp, &osd_subpict);
         XvMCBlendSubpicture(XJ_disp, GetRender(frame)->p_surface,
                             &osd_subpict, 0, 0, XJ_width,
                             XJ_height, 0, 0, XJ_width, XJ_height);
         XvMCFlushSurface(XJ_disp, GetRender(frame)->p_surface);
+        X11U;
     }
 
 }
@@ -199,20 +212,6 @@ static inline xvmc_render_state_t *GetRender(VideoFrame *frame)
         return (xvmc_render_state_t*) frame->buf;
     else
         return NULL;
-}
-
-static inline void SyncSurface(Display *disp, XvMCSurface *surf)
-{
-    if (!surf)
-        return;
-
-    int res = 0, status = 0;
-
-    res = XvMCGetSurfaceStatus(disp, surf, &status);
-    if (res)
-        VERBOSE(VB_PLAYBACK, QString("Error XvMCGetSurfaceStatus %1").arg(res));
-    if (status & XVMC_RENDERING)
-        XvMCSyncSurface(disp, surf);
 }
 
 #endif // USING_XVMC

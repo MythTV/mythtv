@@ -109,10 +109,10 @@ class VideoOutputXv : public VideoOutput
     void DeleteBuffers(VOSType subtype, bool delete_pause_frame);
 
     // XvMC specific helper functions
-    bool IsDisplaying(VideoFrame* frame);
-    bool IsRendering(VideoFrame* frame);
-    void SyncSurface(VideoFrame* frame, int past_future = 0);
-    void FlushSurface(VideoFrame* frame);
+    static bool IsDisplaying(VideoFrame* frame);
+    static bool IsRendering(VideoFrame* frame);
+    static void SyncSurface(VideoFrame* frame, int past_future = 0);
+    static void FlushSurface(VideoFrame* frame);
 
     // Basic X11 info
     Window               XJ_root;
@@ -170,10 +170,12 @@ class VideoOutputXv : public VideoOutput
     DisplayRes          *display_res;
     float                display_aspect;
     QMutex               global_lock;
-    QMutex               x11_lock;
     bool                 allow_xvmc;
 ////////////////////////
     void CheckDisplayedFramesForAvailability(void);
+#ifdef USING_XVMC
+    friend class XvMCOSD;
+#endif // USING_XVMC
 };
 
 #endif // VIDEOOUT_XV_H_

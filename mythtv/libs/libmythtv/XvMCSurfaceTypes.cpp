@@ -3,7 +3,8 @@
 
 static inline Display* createXvMCDisplay() 
 {
-    Display *disp = XOpenDisplay(NULL);
+    Display *disp = NULL;
+    X11S(disp = XOpenDisplay(NULL));
     if (!disp) 
     {
         VERBOSE(VB_IMPORTANT, "XOpenDisplay failed");
@@ -13,25 +14,29 @@ static inline Display* createXvMCDisplay()
     unsigned int p_version, p_release, p_request_base, p_event_base, 
                  p_error_base;
 
-    int ret = XvQueryExtension(disp, &p_version, &p_release, 
-                               &p_request_base, &p_event_base, &p_error_base);
+    int ret = Success;
+    X11S(ret = XvQueryExtension(disp, &p_version, &p_release, 
+                                &p_request_base, &p_event_base,
+                                &p_error_base));
     if (ret != Success) 
     {
         VERBOSE(VB_IMPORTANT, "XvQueryExtension failed");
-        XCloseDisplay(disp);
+        X11S(XCloseDisplay(disp));
         return 0;
     }
 
     int mc_eventBase = 0, mc_errorBase = 0;
-    if (True != XvMCQueryExtension(disp, &mc_eventBase, &mc_errorBase))
+    X11S(ret = XvMCQueryExtension(disp, &mc_eventBase, &mc_errorBase));
+    if (True != ret)
     {
         VERBOSE(VB_IMPORTANT, "XvMC extension not found");
-        XCloseDisplay(disp);
+        X11S(XCloseDisplay(disp));
         return 0;
     }
 
     int mc_version, mc_release;
-    if (Success == XvMCQueryVersion(disp, &mc_version, &mc_release))
+    X11S(ret = XvMCQueryVersion(disp, &mc_version, &mc_release));
+    if (Success == ret)
         VERBOSE(VB_PLAYBACK, QString("Using XvMC version: %1.%2").
                 arg(mc_version).arg(mc_release));
     return disp;
@@ -127,20 +132,21 @@ inline bool XvMCSurfaceTypes::hasIDCT(int width, int height,
     unsigned int p_num_adaptors = 0;
 
     Window root = DefaultRootWindow(disp);
-    int ret = XvQueryAdaptors(disp, root, &p_num_adaptors, &ai);
+    int ret = Success;
+    X11S(ret = XvQueryAdaptors(disp, root, &p_num_adaptors, &ai));
 
     if (ret != Success) 
     {
         printf("XvQueryAdaptors failed.\n");
         if (!pdisp)
-            XCloseDisplay(disp);
+            X11S(XCloseDisplay(disp));
         return false;
     }
 
     if (!ai) 
     {
         if (!pdisp)
-            XCloseDisplay(disp);
+            X11S(XCloseDisplay(disp));
         return false; // huh? no xv capable video adaptors?
     }
 
@@ -157,18 +163,22 @@ inline bool XvMCSurfaceTypes::hasIDCT(int width, int height,
                                p, s);
         if (0 != p) 
         {
+            X11L;
             if (p_num_adaptors > 0)
                 XvFreeAdaptorInfo(ai);
             if (!pdisp)
                 XCloseDisplay(disp);
+            X11U;
             return true;
         }
     }
 
+    X11L;
     if (p_num_adaptors > 0)
         XvFreeAdaptorInfo(ai);
     if (!pdisp)
         XCloseDisplay(disp);
+    X11U;
 
     return false;
 }

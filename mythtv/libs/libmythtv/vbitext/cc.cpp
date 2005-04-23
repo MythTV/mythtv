@@ -114,7 +114,7 @@ static int decode(unsigned char *vbiline)
     return packedbits & parityok(packedbits);
 }
 
-
+#if 0
 static int webtv_check(char *buf, int len)
 {
     unsigned long sum;
@@ -172,6 +172,7 @@ static int webtv_check(char *buf, int len)
     }
     return 0;
 }
+#endif
 
 struct cc *cc_open(const char *vbi_name)
 {

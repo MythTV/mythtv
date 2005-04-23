@@ -54,6 +54,7 @@ static QString xvflags2str(int flags);
         Status XvMCPutSlice2(Display*, XvMCContext*, char*, int, int)
             { return XvMCBadSurface; }
 #   endif
+    static inline QString ErrorStringXvMC(int);
 #endif // USING_XVMC
 
 #define GUID_I420_PLANAR 0x30323449
@@ -61,7 +62,6 @@ static QString xvflags2str(int flags);
 
 static void SetFromEnv(Display *d, bool &useXvMC, bool &useXV, bool &useShm);
 static void SetFromXvSupport(Display *d, bool &useXvMC, bool &useXV);
-static QString ErrorStringXvMC(int);
 
 /** \class  VideoOutputXv
  * Supports common video output methods used with X11 Servers.
@@ -92,7 +92,7 @@ VideoOutputXv::VideoOutputXv(bool is_mpeg_video)
       xvmc_osd_lock(false),
 #endif
       video_output_subtype(XVUnknown), display_res(NULL),
-      display_aspect(1.0), global_lock(true), x11_lock(true),
+      display_aspect(1.0), global_lock(true),
       allow_xvmc(is_mpeg_video)
 {
     VERBOSE(VB_PLAYBACK, "VideoOutputXv()");
@@ -254,8 +254,8 @@ void VideoOutputXv::ResizeForVideo(uint width, uint height)
             dispw = display_res->GetWidth();
             disph = display_res->GetHeight();
             // Resize X window to fill new resolution
-            XMoveResizeWindow(XJ_disp, XJ_win,
-                              dispx, dispy, dispw, disph);
+            X11S(XMoveResizeWindow(XJ_disp, XJ_win,
+                                   dispx, dispy, dispw, disph));
         }
     }
 }
@@ -354,7 +354,8 @@ int VideoOutputXv::GrabSuitableXvPort(bool need_xvmc)
     // get the list of Xv ports
     XvAdaptorInfo *ai = NULL;
     uint p_num_adaptors = 0;
-    int ret = XvQueryAdaptors(XJ_disp, XJ_root, &p_num_adaptors, &ai);
+    int ret = Success;
+    X11S(ret = XvQueryAdaptors(XJ_disp, XJ_root, &p_num_adaptors, &ai));
     if (Success != ret) 
     {
         VERBOSE(VB_IMPORTANT, "XVideo supported, but no free Xv ports "
@@ -396,8 +397,9 @@ int VideoOutputXv::GrabSuitableXvPort(bool need_xvmc)
                 
                 if (!surf.size())
                     continue;
-                
-                if (Success != XvGrabPort(XJ_disp, p, CurrentTime))
+
+                X11S(ret = XvGrabPort(XJ_disp, p, CurrentTime));
+                if (Success != ret)
                     continue;
                 
                 surf.set(surfNum, &xvmc_surf_info);
@@ -408,8 +410,11 @@ int VideoOutputXv::GrabSuitableXvPort(bool need_xvmc)
             else
             {
                 for (p = firstPort; (p <= lastPort) && (port == -1); ++p)
-                    if (Success == XvGrabPort(XJ_disp, p, CurrentTime))
+                {
+                    X11S(ret = XvGrabPort(XJ_disp, p, CurrentTime));
+                    if (Success == ret)
                         port = p;
+                }
             }
         }
         if (port != -1)
@@ -423,7 +428,7 @@ int VideoOutputXv::GrabSuitableXvPort(bool need_xvmc)
 
     // free list of Xv ports
     if (ai)
-        XvFreeAdaptorInfo(ai);
+        X11S(XvFreeAdaptorInfo(ai));
 
     return port;
 }
@@ -949,7 +954,7 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
     for (uint i=0; i<xvmc_osd_available.size(); i++)
         xvmc_osd_available[i]->CreateBuffer(xvmc_ctx, XJ_width, XJ_height);
 
-    XSync(XJ_disp, 0);
+    X11S(XSync(XJ_disp, 0));
 
     return true;
 #else
@@ -974,6 +979,9 @@ vector<void*> VideoOutputXv::CreateXvMCSurfaces(uint num, bool create_xvmc_block
     {
         xvmc_vo_surf_t *surf = new xvmc_vo_surf_t;
         bzero(surf, sizeof(xvmc_vo_surf_t));
+
+        X11L;
+
         int ret = XvMCCreateSurface(XJ_disp, &xvmc_ctx, &(surf->surface));
         ok &= (Success == ret);
 
@@ -999,6 +1007,9 @@ vector<void*> VideoOutputXv::CreateXvMCSurfaces(uint num, bool create_xvmc_block
                 ok = false;
             }
         }
+
+        X11U;
+
         if (!ok)
         {
             delete surf;
@@ -1033,6 +1044,9 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
         XJ_shm_infos.push_back(blank);
         void *image = NULL;
         int size = 0;
+
+        X11L;
+
         if (use_xv)
         {
             image = XvShmCreateImage(XJ_disp, xv_port, xv_chroma, 0, 
@@ -1048,6 +1062,9 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
             size = img->bytes_per_line * img->height + 64;
             image = img;
         }
+
+        X11U;
+
         if (image)
         {
             XJ_shm_infos[i].shmid = shmget(IPC_PRIVATE, size, IPC_CREAT|0777);
@@ -1060,8 +1077,10 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                     ((XImage*)image)->data = XJ_shm_infos[i].shmaddr;
                 xv_buffers[(unsigned char*) XJ_shm_infos[i].shmaddr] = image;
                 XJ_shm_infos[i].readOnly = False;
+                X11L;
                 XShmAttach(XJ_disp, &XJ_shm_infos[i]);
                 XSync(XJ_disp, 0); // needed for FreeBSD?
+                X11U;
                 // mark for delete immediately - it won't be removed until detach
                 shmctl(XJ_shm_infos[i].shmid, IPC_RMID, 0);
 
@@ -1094,7 +1113,7 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
         vector<unsigned char*> bufs = 
             CreateShmImages(vbuffers.allocSize(), true);
         ok = vbuffers.CreateBuffers(XJ_width, XJ_height, bufs);
-        XSync(XJ_disp, 0);
+        X11S(XSync(XJ_disp, 0));
         if (xv_chroma != GUID_I420_PLANAR)
             xv_color_conv_buf = new unsigned char[XJ_width * XJ_height * 3 / 2];
     }
@@ -1107,6 +1126,9 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
         }
         else
         {
+
+            X11L;
+
             int bytes_per_line = XJ_depth / 8 * dispw;
             int scrn = DefaultScreen(XJ_disp);
             Visual *visual = DefaultVisual(XJ_disp, scrn);
@@ -1114,6 +1136,9 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
                                            ZPixmap, /*offset*/0, /*data*/0,
                                            dispw, disph, /*bitmap_pad*/0,
                                            bytes_per_line);
+
+            X11U;
+
             if (!XJ_non_xv_image)
             {
                 VERBOSE(VB_IMPORTANT, "XCreateImage failed: "
@@ -1162,15 +1187,21 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
     for (uint i=0; i<xvmc_surfs.size(); i++)
     {
         xvmc_vo_surf_t *surf = (xvmc_vo_surf_t*) xvmc_surfs[i];
-        XvMCHideSurface(XJ_disp, &(surf->surface));
+        X11S(XvMCHideSurface(XJ_disp, &(surf->surface)));
     }
     DiscardFrames();
     for (uint i=0; i<xvmc_surfs.size(); i++)
     {
         xvmc_vo_surf_t *surf = (xvmc_vo_surf_t*) xvmc_surfs[i];
+
+        X11L;
+
         XvMCDestroySurface(XJ_disp, &(surf->surface));
         XvMCDestroyMacroBlocks(XJ_disp, &(surf->macro_blocks));
         XvMCDestroyBlocks(XJ_disp, &(surf->blocks));
+
+        X11U;
+
     }
     xvmc_surfs.clear();
 
@@ -1207,15 +1238,15 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
 
     for (uint i=0; i<XJ_shm_infos.size(); ++i)
     {
-        XShmDetach(XJ_disp, &(XJ_shm_infos[i]));
+        X11S(XShmDetach(XJ_disp, &(XJ_shm_infos[i])));
         XvImage *image = (XvImage*) 
             xv_buffers[(unsigned char*)XJ_shm_infos[i].shmaddr];
         if (image)
         {
             if ((XImage*)image == (XImage*)XJ_non_xv_image)
-                XDestroyImage((XImage*)XJ_non_xv_image);
+                X11S(XDestroyImage((XImage*)XJ_non_xv_image));
             else
-                XFree(XJ_non_xv_image);
+                X11S(XFree(XJ_non_xv_image));
         }
         if (XJ_shm_infos[i].shmaddr)
             shmdt(XJ_shm_infos[i].shmaddr);
@@ -1228,7 +1259,7 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
 
 #ifdef USING_XVMC
     if (XVideo < subtype)
-        XvMCDestroyContext(XJ_disp, &xvmc_ctx);
+        X11S(XvMCDestroyContext(XJ_disp, &xvmc_ctx));
 #endif // USING_XVMC
 }
 
@@ -1251,7 +1282,7 @@ void VideoOutputXv::EmbedInWidget(WId wid, int x, int y, int w, int h)
         // Switch to resolution of widget
         XWindowAttributes   attr;
 
-        XGetWindowAttributes(XJ_disp, wid, &attr);
+        X11S(XGetWindowAttributes(XJ_disp, wid, &attr));
         display_res->SwitchToCustomGUI(attr.width, attr.height);
     }
 
@@ -1734,12 +1765,12 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
     XvMCSurface *surf = showingsurface->p_surface;
 
     // actually display the frame 
-    x11_lock.lock();
+    X11L;
     XvMCPutSurface(XJ_disp, surf, XJ_curwin,
                    imgx, src_y, imgw, imgh,
                    dispxoff, dest_y, dispwoff, disphoff, field);
     XFlush(XJ_disp); // send XvMCPutSurface call to X11 server
-    x11_lock.unlock();
+    X11U;
 
     // if not using_pause_frame, clear old process buffer
     if (!using_pause_frame)
@@ -1907,7 +1938,7 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
         vbuffers.LockFrames(locks, "DrawSlice");
 
         // Sync past & future I and P frames
-        x11_lock.lock();
+        X11L;
         status = XvMCRenderSurface(XJ_disp, &xvmc_ctx, 
                                    render->picture_structure, 
                                    render->p_surface,
@@ -1918,13 +1949,13 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
                                    render->start_mv_blocks_num,
                                    (XvMCMacroBlockArray *)frame->priv[1], 
                                    (XvMCBlockArray *)frame->priv[0]);
+        X11U;
         if (Success != status)
             VERBOSE(VB_PLAYBACK, 
                     QString("XvMCRenderSurface, error: %1 (%2)")
                     .arg(ErrorStringXvMC(status)).arg(status));
         else
-            FlushSurface(frame);
-        x11_lock.unlock();
+            X11S(FlushSurface(frame));
 
         render->start_mv_blocks_num = 0;
         render->filled_mv_blocks_num = 0;
@@ -2096,11 +2127,8 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
                 it = vbuffers.begin_lock(kVideoBuffer_displayed);
                 for (;it != vbuffers.end(kVideoBuffer_displayed); ++it)
                     if (*it != frame)
-                    {
-                        x11_lock.lock();
-                        XvMCHideSurface(XJ_disp, GetRender(*it)->p_surface);
-                        x11_lock.unlock();
-                    }
+                        X11S(XvMCHideSurface(XJ_disp,
+                                             GetRender(*it)->p_surface));
                 vbuffers.end_lock();
 
                 CheckDisplayedFramesForAvailability();
@@ -2124,9 +2152,7 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
             if (osdframe && vbuffers.TryLockFrame(osdframe, "ProcessFrameXvMC -- OSD"))
             {
                 vbuffers.SetOSDFrame(osdframe, NULL);
-                x11_lock.lock();
                 xvmc_osd->CompositeOSD(frame, osdframe);
-                x11_lock.unlock();
                 vbuffers.UnlockFrame(osdframe, "ProcessFrameXvMC -- OSD");
                 vbuffers.SetOSDFrame(frame, osdframe);
             }
@@ -2138,9 +2164,7 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
         }
         if (ret >= 0 && !xvmc_osd->NeedFrame())
         {
-            x11_lock.lock();
             xvmc_osd->CompositeOSD(frame);
-            x11_lock.unlock();
         }
     }
     ReturnAvailableOSD(xvmc_osd);
@@ -2272,12 +2296,12 @@ int VideoOutputXv::ChangePictureAttribute(int attributeType, int newValue)
     if (newValue < 0) newValue = 0;
     if (newValue >= 100) newValue = 99;
 
-    attribute = XInternAtom (XJ_disp, attrName, False);
+    X11S(attribute = XInternAtom (XJ_disp, attrName, False));
     if (!attribute) {
         return -1;
     }
 
-    attributes = XvQueryPortAttributes(XJ_disp, xv_port, &howmany);
+    X11S(attributes = XvQueryPortAttributes(XJ_disp, xv_port, &howmany));
     if (!attributes) {
         return -1;
     }
@@ -2290,7 +2314,7 @@ int VideoOutputXv::ChangePictureAttribute(int attributeType, int newValue)
 
             value = (int) (port_min + (range/100.0) * newValue);
 
-            XvSetPortAttribute(XJ_disp, xv_port, attribute, value);
+            X11S(XvSetPortAttribute(XJ_disp, xv_port, attribute, value));
 
             return newValue;
         }
@@ -2378,6 +2402,7 @@ void VideoOutputXv::CheckDisplayedFramesForAvailability(void)
 
 bool VideoOutputXv::IsDisplaying(VideoFrame* frame)
 {
+    (void)frame;
 #ifdef USING_XVMC
     xvmc_render_state_t *render = GetRender(frame);
     if (render)
@@ -2386,11 +2411,7 @@ bool VideoOutputXv::IsDisplaying(VideoFrame* frame)
         XvMCSurface *surf = render->p_surface;
         int res = 0, status = 0;
         if (disp && surf)
-        {
-            x11_lock.lock();
-            res = XvMCGetSurfaceStatus(disp, surf, &status);
-            x11_lock.unlock();
-        }
+            X11S(res = XvMCGetSurfaceStatus(disp, surf, &status));
         if (Success == res)
             return (status & XVMC_DISPLAYING);
         else
@@ -2402,6 +2423,7 @@ bool VideoOutputXv::IsDisplaying(VideoFrame* frame)
 
 bool VideoOutputXv::IsRendering(VideoFrame* frame)
 {
+    (void)frame;
 #ifdef USING_XVMC
     xvmc_render_state_t *render = GetRender(frame);
     if (render)
@@ -2410,11 +2432,7 @@ bool VideoOutputXv::IsRendering(VideoFrame* frame)
         XvMCSurface *surf = render->p_surface;
         int res = 0, status = 0;
         if (disp && surf)
-        {
-            x11_lock.lock();
-            res = XvMCGetSurfaceStatus(disp, surf, &status);
-            x11_lock.unlock();
-        }
+            X11S(res = XvMCGetSurfaceStatus(disp, surf, &status));
         if (Success == res)
             return (status & XVMC_RENDERING);
         else
@@ -2426,6 +2444,8 @@ bool VideoOutputXv::IsRendering(VideoFrame* frame)
 
 void VideoOutputXv::SyncSurface(VideoFrame* frame, int past_future)
 {
+    (void)frame;
+    (void)past_future;
 #ifdef USING_XVMC
     xvmc_render_state_t *render = GetRender(frame);
     if (render)
@@ -2439,20 +2459,16 @@ void VideoOutputXv::SyncSurface(VideoFrame* frame, int past_future)
 
         if (disp && surf)
         {
-            int status = 0;
+            int status = 0, res = Success;
 
-            x11_lock.lock();
-            int res = XvMCGetSurfaceStatus(disp, surf, &status);
-            x11_lock.unlock();
+            X11S(res = XvMCGetSurfaceStatus(disp, surf, &status));
 
-            if (res)
+            if (res != Success)
                 VERBOSE(VB_PLAYBACK,
                         QString("Error#3 XvMCGetSurfaceStatus %1").arg(res));
             if (status & XVMC_RENDERING)
             {
-                x11_lock.lock();
-                XvMCFlushSurface(disp, surf);
-                x11_lock.unlock();
+                X11S(XvMCFlushSurface(disp, surf));
                 while (IsRendering(frame))
                     usleep(50);
             }
@@ -2463,6 +2479,7 @@ void VideoOutputXv::SyncSurface(VideoFrame* frame, int past_future)
 
 void VideoOutputXv::FlushSurface(VideoFrame* frame)
 { 
+    (void)frame;
 #ifdef USING_XVMC
     xvmc_render_state_t *render = GetRender(frame);
     if (render)
@@ -2471,9 +2488,7 @@ void VideoOutputXv::FlushSurface(VideoFrame* frame)
         XvMCSurface *surf = render->p_surface;
         if (disp && IsRendering(frame))
         {
-            x11_lock.lock();
-            XvMCFlushSurface(disp, surf);
-            x11_lock.unlock();
+            X11S(XvMCFlushSurface(disp, surf));
         }
     }
 #endif // USING_XVMC
@@ -2493,7 +2508,7 @@ static void SetFromEnv(Display *d, bool &useXvMC, bool &useXVideo, bool &useShm)
     {
         const char *dispname = DisplayString(d);
         if ((dispname) && (*dispname == ':'))
-            useShm = (bool) XShmQueryExtension(d);
+            X11S(useShm = (bool) XShmQueryExtension(d));
     }
     if (!useXVideo)
         useXvMC = false;
@@ -2505,8 +2520,8 @@ static void SetFromXvSupport(Display *d, bool &useXvMC, bool &useXVideo)
     if (useXvMC)
     {
 #ifdef USING_XVMC
-        int mc_event, mc_err;
-        int ret = XvMCQueryExtension(d, &mc_event, &mc_err);
+        int mc_event, mc_err, ret;
+        X11S(ret = XvMCQueryExtension(d, &mc_event, &mc_err));
         if (True != ret)
         {
             VERBOSE(VB_IMPORTANT, "XvMC output requested, "
@@ -2515,7 +2530,8 @@ static void SetFromXvSupport(Display *d, bool &useXvMC, bool &useXVideo)
         }
 
         int mc_ver, mc_rel;
-        if (Success == XvMCQueryVersion(d, &mc_ver, &mc_rel))
+        X11S(ret = XvMCQueryVersion(d, &mc_ver, &mc_rel));
+        if (Success == ret)
             VERBOSE(VB_PLAYBACK, "XvMC version: "<<mc_ver<<"."<<mc_rel);
 #else // !USING_XVMC
         VERBOSE(VB_IMPORTANT, "XvMC output requested, "
@@ -2527,8 +2543,9 @@ static void SetFromXvSupport(Display *d, bool &useXvMC, bool &useXVideo)
     // find out about XVideo support
     if (useXVideo)
     {
-        uint p_ver, p_rel, p_req, p_event, p_err;
-        int ret = XvQueryExtension(d, &p_ver, &p_rel, &p_req, &p_event, &p_err);
+        uint p_ver, p_rel, p_req, p_event, p_err, ret;
+        X11S(ret = XvQueryExtension(d, &p_ver, &p_rel,
+                                    &p_req, &p_event, &p_err));
         if (Success != ret)
         {
             VERBOSE(VB_IMPORTANT, "XVideo output requested, "
@@ -2555,6 +2572,7 @@ static QString xvflags2str(int flags)
     return str;
 }
 
+#ifdef USING_XVMC
 static QString ErrorStringXvMC(int val)
 {
     QString str = "unrecognized return value";
@@ -2570,10 +2588,9 @@ static QString ErrorStringXvMC(int val)
 
 static xvmc_render_state_t *GetRender(VideoFrame *frame)
 {
-#ifdef USING_XVMC
     if (frame)
         return (xvmc_render_state_t*) frame->buf;
-#endif // USING_XVMC
     return NULL;
 }
+#endif // USING_XVMC
 
