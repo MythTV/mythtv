@@ -2011,20 +2011,33 @@ void VideoOutputXv::UpdatePauseFrame(void)
 {
     if (VideoOutputSubType() <= XVideo)
     {
-        vector<const VideoFrame*> locks;
-        locks.push_back(&av_pause_frame);
-        locks.push_back(vbuffers.GetScratchFrame());
-        vbuffers.LockFrames(locks, "UpdatePauseFrame");
+        // Try used frame first, then fall back to scratch frame.
+        vbuffers.LockFrame(&av_pause_frame, "UpdatePauseFrame -- pause");
 
+        vbuffers.begin_lock(kVideoBuffer_used);
+        VideoFrame *used_frame = NULL;
         if (vbuffers.size(kVideoBuffer_used) > 0)
         {
-            vbuffers.UnlockFrames(locks, "UpdatePauseFrame -- used");
-            locks.pop_back();
-            locks.push_back(vbuffers.head(kVideoBuffer_used));
-            vbuffers.LockFrames(locks, "UpdatePauseFrame -- used");
+            used_frame = vbuffers.head(kVideoBuffer_used);
+            if (!vbuffers.TryLockFrame(used_frame, "UpdatePauseFrame -- used"))
+                used_frame = NULL;
         }
-        CopyFrame(&av_pause_frame, vbuffers.head(kVideoBuffer_used));
-        vbuffers.UnlockFrames(locks, "UpdatePauseFrame");
+        if (used_frame)
+        {
+            CopyFrame(&av_pause_frame, used_frame);
+            vbuffers.UnlockFrame(used_frame, "UpdatePauseFrame -- used");
+        }
+        vbuffers.end_lock();
+
+        if (!used_frame &&
+            vbuffers.TryLockFrame(vbuffers.GetScratchFrame(),
+                                  "UpdatePauseFrame -- scratch"))
+        {
+            CopyFrame(&av_pause_frame, vbuffers.GetScratchFrame());
+            vbuffers.UnlockFrame(vbuffers.GetScratchFrame(),
+                                 "UpdatePauseFrame -- scratch");
+        }
+        vbuffers.UnlockFrame(&av_pause_frame, "UpdatePauseFrame - used");
     }
 #ifdef USING_XVMC
     else
