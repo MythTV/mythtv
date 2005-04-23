@@ -537,12 +537,13 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     {
 
         X11L;
-
         r = glXMakeCurrent(m_display, m_drawable, m_context);
         r = glXGetVideoSyncSGI(&count);
-        r = glXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
-
         X11U;
+
+        /// UNSAFE UNSAFE UNSAFE UNSAFE UNSAFE
+        r = glXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
+        /// UNSAFE UNSAFE UNSAFE UNSAFE UNSAFE
 
         m_delay = CalcDelay();
         //cerr << "\tDelay at sync: " << m_delay;
@@ -553,7 +554,13 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     {
         // Wait for any remaining retrace intervals in one pass.
         n = m_delay / m_refresh_interval + 1;
-        X11S(r = glXWaitVideoSyncSGI((n+1), (count+n)%(n+1), &count));
+
+
+        /// UNSAFE UNSAFE UNSAFE UNSAFE UNSAFE
+        r = glXWaitVideoSyncSGI((n+1), (count+n)%(n+1), &count);
+        /// UNSAFE UNSAFE UNSAFE UNSAFE UNSAFE
+
+
         m_delay = CalcDelay();
         //cerr << "Wait " << n << " intervals. Count " << count;
         //cerr  << " Delay " << m_delay << endl;
