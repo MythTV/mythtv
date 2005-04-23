@@ -194,10 +194,6 @@ void Speakers::closeStream()
         delete rtsp_in;
         rtsp_in = NULL;
     }
-    else
-    {
-        warning("asked to close a stream, but don't have one open");
-    }
     announceStatus();
     rtsp_in_mutex.unlock();
 }

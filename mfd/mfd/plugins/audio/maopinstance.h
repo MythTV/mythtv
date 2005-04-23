@@ -23,10 +23,18 @@ class MaopInstance
 
   public:
 
-    MaopInstance(AudioPlugin *owner, QString l_name, QString l_address, uint l_port, ServiceLocationDescription l_location);
+    MaopInstance(
+                    AudioPlugin *owner, 
+                    QString l_name, 
+                    QString l_address, 
+                    uint l_port, 
+                    ServiceLocationDescription l_location,
+                    int l_id
+                );
     ~MaopInstance();
     
     QString getName(){ return name; }
+    QString getAddress(){ return address; }
     bool    isThisYou(QString l_name, QString l_address, uint l_port);
     bool    allIsWell(){ return all_is_well; }
     int     getFileDescriptor(){ return socket_fd; }
@@ -34,6 +42,8 @@ class MaopInstance
     void    sendRequest(const QString &the_request);
     void    markForUse(bool y_or_n){ marked_for_use = y_or_n; }
     bool    markedForUse(){ return marked_for_use; }
+    int     getId(){ return id; }
+    QString getHostname();
     
   private:
 
@@ -42,6 +52,7 @@ class MaopInstance
     
     QString                     name;
     QString                     address;
+    QString                     hostname;
     uint                        port;
     ServiceLocationDescription  location;
     bool                        all_is_well;
@@ -52,6 +63,7 @@ class MaopInstance
     bool                        currently_open;
     QString                     current_url;
     bool                        marked_for_use;
+    int                         id;
 };
 
 #endif  // maopinstance_h_

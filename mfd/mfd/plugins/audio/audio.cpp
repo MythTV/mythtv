@@ -58,7 +58,7 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     maop_instances.setAutoDelete(true);
     speaker_release_timer.start();
     waiting_for_speaker_release = false;
-    
+    unique_speaker_id = 0;
 }
 
 void AudioPlugin::swallowOutputUpdate(int type, int numb_seconds, int channels, int bitrate, int frequency)
@@ -370,11 +370,64 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                     {
                         sendMessage("stop", socket_identifier);
                     }
+                    
+                    listSpeakers();
 
                 play_data_mutex.unlock();
             playlist_mode_mutex.unlock();
             
 
+        }
+        else if (tokens[0] == "speakerlist")
+        {
+            listSpeakers();
+        }
+        else if (tokens[0] == "speakername")
+        {
+            if(tokens.count() < 1)
+            {
+                ok = false;
+            }
+            else
+            {
+                bool convert_ok;
+                int which_one = tokens[1].toInt(&convert_ok);
+                if (convert_ok)
+                {
+                    nameSpeakers(which_one, socket_identifier);
+                }
+                else
+                {
+                    ok = false;
+                }
+            }
+        }
+        else if (tokens[0] == "speakeruse")
+        {
+            if(tokens.count() < 3)
+            {
+                ok = false;
+            }
+            else
+            {            
+                bool convert_ok;
+                int which_one = tokens[1].toInt(&convert_ok);
+                if (convert_ok)
+                {
+                    if(tokens[2] == "yes")
+                    {
+                        useSpeakers(which_one, true);
+                    }
+                    else if (tokens[2] == "no")
+                    {
+                        useSpeakers(which_one, false);
+                    }
+                }
+                else
+                {
+                    ok = false;
+                }
+            }
         }
         else
         {
@@ -1222,6 +1275,7 @@ void AudioPlugin::addMaopSpeakers(QString l_address, uint l_port, QString l_name
     bool already_have_it = false;
 
     maop_mutex.lock();
+
     MaopInstance *an_instance;
     for ( an_instance = maop_instances.first(); an_instance; an_instance = maop_instances.next() )
     {
@@ -1234,7 +1288,14 @@ void AudioPlugin::addMaopSpeakers(QString l_address, uint l_port, QString l_name
     
     if (!already_have_it)
     {
-        MaopInstance *new_maop_instance = new MaopInstance(this, l_name, l_address, l_port, l_location);
+        MaopInstance *new_maop_instance = new MaopInstance(
+                                                            this, 
+                                                            l_name, 
+                                                            l_address, 
+                                                            l_port, 
+                                                            l_location,
+                                                            bumpSpeakerId()
+                                                          );
         if (new_maop_instance->allIsWell())
         {
             int fd = new_maop_instance->getFileDescriptor();
@@ -1268,6 +1329,7 @@ void AudioPlugin::addMaopSpeakers(QString l_address, uint l_port, QString l_name
             delete new_maop_instance;
         }
     }
+
     maop_mutex.unlock();
 }
 
@@ -1289,18 +1351,18 @@ void AudioPlugin::checkSpeakers()
             ++it;
         }        
     
-    //
-    //  If we're waiting to release the speakers, do so if enough time had elapsed
-    //
+        //
+        //  If we're waiting to release the speakers, do so if enough time had elapsed
+        //
     
-    if (waiting_for_speaker_release)
-    {
-        if (speaker_release_timer.elapsed() > 30 * 1000) // 30 seconds
+        if (waiting_for_speaker_release)
         {
-            turnOffSpeakers();
-            waiting_for_speaker_release = false;
+            if (speaker_release_timer.elapsed() > 30 * 1000) // 30 seconds
+            {
+                turnOffSpeakers();
+                waiting_for_speaker_release = false;
+            }
         }
-    }
     maop_mutex.unlock();
 #endif
 }
@@ -1365,6 +1427,104 @@ void AudioPlugin::turnOffSpeakers()
         ++it;
     }        
 #endif
+}
+
+void AudioPlugin::listSpeakers()
+{
+    QString response ="speakerlist";
+
+    maop_mutex.lock();
+
+        QPtrListIterator<MaopInstance> it( maop_instances );
+        MaopInstance *an_instance;
+        while ( (an_instance = it.current()) != 0 ) 
+        {
+            response.append(QString(" %1").arg(an_instance->getId()));
+            if (an_instance->markedForUse())
+            {
+                response.append(" yes");
+            }
+            else
+            {
+                response.append(" no");
+            }
+            ++it;
+        }
+    
+    maop_mutex.unlock();
+    sendMessage(response);
+}
+
+void AudioPlugin::nameSpeakers(int which_one, int socket_identifier)
+{
+
+    QString response ="speakername ";
+    bool ok = false;
+
+    maop_mutex.lock();
+
+        QPtrListIterator<MaopInstance> it( maop_instances );
+        MaopInstance *an_instance;
+        while ( (an_instance = it.current()) != 0 ) 
+        {
+            if (an_instance->getId() == which_one)
+            {
+                ok = true;
+                response.append(QString("%1 ").arg(which_one));
+                response.append(an_instance->getHostname());
+            }
+            ++it;
+        }
+    
+    maop_mutex.unlock();
+    
+    if(ok)
+    {
+        sendMessage(response, socket_identifier);
+    }
+    else
+    {
+        log("client asked for name of speakers that do not exist, ignoring request", 4);
+    }
+}
+
+void AudioPlugin::useSpeakers(int which_one, bool turn_on)
+{
+    maop_mutex.lock();
+
+        QPtrListIterator<MaopInstance> it( maop_instances );
+        MaopInstance *an_instance;
+        while ( (an_instance = it.current()) != 0 ) 
+        {
+            if (an_instance->getId() == which_one)
+            {
+                if ( turn_on == an_instance->markedForUse())
+                {
+                    //  already in the correct state
+                }
+                else
+                {
+                    if( turn_on )
+                    {
+                        an_instance->markForUse(true);
+                        if(is_playing || is_paused)
+                        {
+                            an_instance->sendRequest(QString("open %1").arg(rtsp_out->getUrl()));
+                        }
+                    }
+                    else
+                    {
+                        an_instance->markForUse(false);
+                        an_instance->sendRequest("close");
+                    }
+                }
+            }
+            ++it;
+        }
+    
+    maop_mutex.unlock();
+    
+    listSpeakers();
 }
 
 AudioPlugin::~AudioPlugin()

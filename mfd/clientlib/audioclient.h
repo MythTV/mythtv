@@ -14,6 +14,28 @@
 
 #include "serviceclient.h"
 
+class SpeakerTracker
+{
+
+  public:
+
+    SpeakerTracker(int l_id, const QString yes_or_no);
+    ~SpeakerTracker();
+    
+    void    markForDeletion(bool b){ marked_for_deletion = b; }
+    bool    markedForDeletion(){ return marked_for_deletion; }
+    bool    possiblyUnmarkForDeletion(const QString &id_string, const QString &inuse_string);
+    int     getId(){ return id; }
+    QString getInUse(){ if (in_use) return QString("yes"); return QString("no"); }
+ 
+  private:
+
+    int     id;
+    QString name;   
+    bool    in_use;
+    bool    marked_for_deletion;
+};
+
 class AudioClient : public ServiceClient
 {
 
@@ -38,7 +60,12 @@ class AudioClient : public ServiceClient
     void parseFromAudio(QStringList &tokens);
     void executeCommand(QStringList new_command);
     void askForStatus();
+    void syncSpeakerList(QStringList &tokens);
     ~AudioClient();
+
+  private:
+  
+    QPtrList<SpeakerTracker>    speakers;
 
 };
 

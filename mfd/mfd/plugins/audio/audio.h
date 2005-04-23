@@ -57,7 +57,10 @@ class AudioPlugin: public MFDServicePlugin
     void    checkSpeakers();
     void    turnOnSpeakers();
     void    turnOffSpeakers();
-        
+    void    listSpeakers();
+    void    nameSpeakers(int which_ont, int socket_identifier);
+    void    useSpeakers(int which_one, bool turn_on);
+    int     bumpSpeakerId(){ unique_speaker_id++; return unique_speaker_id; }
   private:
   
     QIODevice   *input;
@@ -99,6 +102,7 @@ class AudioPlugin: public MFDServicePlugin
     QPtrList<MaopInstance> maop_instances;
     bool                   waiting_for_speaker_release;
     QTime                  speaker_release_timer;
+    int                    unique_speaker_id;
 };
 
 #endif  // audio_h_

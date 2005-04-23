@@ -16,18 +16,27 @@ using namespace std;
 #include "maopinstance.h"
 #include "audio.h"
 
-MaopInstance::MaopInstance(AudioPlugin *owner, QString l_name, QString l_address, uint l_port, ServiceLocationDescription l_location)
+MaopInstance::MaopInstance(
+                            AudioPlugin *owner, 
+                            QString l_name, 
+                            QString l_address, 
+                            uint l_port, 
+                            ServiceLocationDescription l_location,
+                            int l_id
+                          )
 {
     parent = owner;
     name = l_name;
     address = l_address;
     port = l_port;
     location = l_location;
+    id = l_id;
     client_socket_to_maop_service = NULL;
     socket_fd = -1;
     current_url = "";
     currently_open = false;
     marked_for_use = false;
+    hostname = "";
     
     all_is_well = true;
     
@@ -87,6 +96,19 @@ MaopInstance::MaopInstance(AudioPlugin *owner, QString l_name, QString l_address
     //
     
     socket_fd = client_socket_to_maop_service->socket();
+
+    //
+    //  Try and guess the host name from the service name. Why not just do a
+    //  gethostbyaddr? Because nowhere in any of the mfd do we do normal
+    //  host resolution (people do have hosts without /etc/hosts that refer
+    //  to each other)
+    //
+    
+    hostname = name.section(" on ", -1);
+    if (hostname.length() < 1)
+    {
+        hostname = address;
+    }
 }
 
 bool MaopInstance::isThisYou(QString l_name, QString l_address, uint l_port)
@@ -225,6 +247,10 @@ void MaopInstance::sendRequest(const QString &the_request)
     client_socket_mutex.unlock();
 }
 
+QString MaopInstance::getHostname()
+{
+    return hostname;
+}
 
 void MaopInstance::log(const QString &log_message, int verbosity)
 {

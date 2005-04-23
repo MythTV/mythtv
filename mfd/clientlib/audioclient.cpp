@@ -17,6 +17,79 @@ using namespace std;
 #include "events.h"
 #include "mfdinterface.h"
 
+
+SpeakerTracker::SpeakerTracker(int l_id, const QString yes_or_no)
+{
+    id = l_id;
+    if(yes_or_no == "yes")
+    {
+        in_use = true;
+    }
+    else if (yes_or_no == "no")
+    {
+        in_use = false;
+    }
+    else
+    {
+        cerr << "speaker tracker created with second argument neither "
+             << "\"yes\" nor \"no\". Assuming no"
+             <<endl;
+    }
+    marked_for_deletion = false;
+}
+
+bool SpeakerTracker::possiblyUnmarkForDeletion(
+                                                const QString &id_string, 
+                                                const QString &inuse_string
+                                              )
+{
+    bool ok;
+    int target_id = id_string.toInt(&ok);
+    if (ok)
+    {
+        if (target_id == id)
+        {
+            marked_for_deletion = false;
+            if (inuse_string == "yes")
+            {
+                in_use = true;
+            }
+            else if (inuse_string == "no")
+            {
+                in_use = false;
+            } 
+            else
+            {
+                cerr << "speaker tracker cannot determine if speaker is "
+                     << "in use cause it was passed an in_use string of \""
+                     << inuse_string
+                     << "\""
+                     << endl;
+            }
+            return true;
+        }
+    }
+    else
+    {
+        cerr << "speaker tracker cannot check id cause it was "
+             << "passed a string of \""
+             << id_string
+             << "\""
+             << endl;
+    }
+    return false;
+}
+
+SpeakerTracker::~SpeakerTracker()
+{
+}
+
+
+
+/*
+---------------------------------------------------------------------
+*/
+
 AudioClient::AudioClient(
                             MfdInterface *the_mfd,
                             int an_mfd,
@@ -32,6 +105,7 @@ AudioClient::AudioClient(
                             "audio"
                           )
 {
+    speakers.setAutoDelete(true);
 }
 
 void AudioClient::playTrack(int container, int id)
@@ -193,6 +267,17 @@ void AudioClient::parseFromAudio(QStringList &tokens)
                                                             );
         QApplication::postEvent(mfd_interface, ape);
         return;
+    }
+    
+    if(tokens[0] == "speakerlist")
+    {
+        //
+        //  Getting a list of speakers available.
+        //
+        
+        syncSpeakerList(tokens);
+        return;
+        
     }
     
     cerr << "getting tokens from audio server I don't understand: "
@@ -383,8 +468,101 @@ void AudioClient::askForStatus()
     client_socket_to_service->writeBlock(command.ascii(), command.length());
 }
 
+void AudioClient::syncSpeakerList(QStringList &tokens)
+{
+    //
+    //  Mark all my speakers for deletion
+    //    
+    
+    SpeakerTracker *a_speaker;
+    QPtrListIterator<SpeakerTracker> iter( speakers );
+
+    while ( (a_speaker = iter.current()) != 0 )
+    {
+        a_speaker->markForDeletion(true);
+        ++iter;
+    }
+
+    //
+    //  Unmark any that are actually in existence
+    //
+    
+    for (uint i = 1; i < tokens.count() - 1; i = i + 2)
+    {
+        bool found_it = false;
+        a_speaker = iter.toFirst();
+        while ( (a_speaker = iter.current()) != 0 )
+        {
+            if (a_speaker->possiblyUnmarkForDeletion(tokens[i], tokens[i+1]))
+            {
+                found_it = true;
+            }
+            ++iter;
+        }
+        if (!found_it)
+        {
+            bool ok;
+            int new_id = tokens[i].toInt(&ok);
+            if (ok)
+            {
+                SpeakerTracker *new_speaker = new SpeakerTracker(new_id, tokens[i + 1]);
+                speakers.append(new_speaker);
+            }
+            else
+            {
+                cerr << "audio client is getting bad characters that cannot be "
+                     << "parsed into a speaker id: \""
+                     << tokens[i]
+                     << "\""
+                     << endl;
+            }
+        }
+    }
+
+    //
+    //  Delete those still marked for deletion
+    //
+    
+    a_speaker = iter.toFirst();
+    while ( (a_speaker = iter.current()) != 0 )
+    {
+        if(a_speaker->markedForDeletion())
+        {
+            speakers.remove(a_speaker);
+        }
+        else
+        {
+            ++iter;
+        }
+    }
+    
+
+    //
+    //  Debugging
+    //
+    
+    cout << "speaker status: "
+         << endl << endl;
+         
+    a_speaker = iter.toFirst();
+    while ( (a_speaker = iter.current()) != 0 )
+    {
+        cout << "speaker with id of "
+             << a_speaker->getId()
+             << " marked for use as: "
+             << a_speaker->getInUse()
+             << endl;
+        ++iter;
+    }
+    
+         
+        
+        
+}
+
 AudioClient::~AudioClient()
 {
+    speakers.clear();
 }
 
 
