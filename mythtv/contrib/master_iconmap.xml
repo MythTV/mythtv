@@ -390,6 +390,18 @@
         <network>FOXSPORTS</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>FCSA</callsign>
+        <network>FOXSPORTS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>FCSC</callsign>
+        <network>FOXSPORTS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>FCSP</callsign>
+        <network>FOXSPORTS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>FUSE</callsign>
         <network>FUSE</network>
     </callsigntonetwork>
@@ -2658,6 +2670,34 @@
         <network>CINEMAX</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>MOMAXP</callsign>
+        <network>CINEMAX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ACMAXP</callsign>
+        <network>CINEMAX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>THMAXP</callsign>
+        <network>CINEMAX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>5MAX</callsign>
+        <network>CINEMAX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WOMAX</callsign>
+        <network>CINEMAX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>OMAX</callsign>
+        <network>CINEMAX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ATMAX</callsign>
+        <network>CINEMAX</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>MPLEX</callsign>
         <network>ENCORE</network>
     </callsigntonetwork>
@@ -2743,6 +2783,18 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>SHOW</callsign>
+        <network>SHOWTIME</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>FAMZP</callsign>
+        <network>SHOWTIME</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>WOMENP</callsign>
+        <network>SHOWTIME</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>NEXTP</callsign>
         <network>SHOWTIME</network>
     </callsigntonetwork>
     <callsigntonetwork>
