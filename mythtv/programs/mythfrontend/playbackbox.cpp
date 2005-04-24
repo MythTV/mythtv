@@ -158,6 +158,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     fullRect = QRect(0, 0, size().width(), size().height());
     listRect = QRect(0, 0, 0, 0);
     infoRect = QRect(0, 0, 0, 0);
+    groupRect = QRect(0, 0, 0, 0);
     usageRect = QRect(0, 0, 0, 0);
     videoRect = QRect(0, 0, 0, 0);
     curGroupRect = QRect(0, 0, 0, 0);
@@ -338,6 +339,8 @@ void PlaybackBox::parseContainer(QDomElement &element)
         infoRect = area;
     if (name.lower() == "video")
         videoRect = area;
+    if (name.lower() == "group_info")
+        groupRect = area;        
     if (name.lower() == "usage")
         usageRect = area;
     if (name.lower() == "cur_group")
@@ -648,8 +651,12 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
 void PlaybackBox::updateInfo(QPainter *p)
 {
     QRect pr = infoRect;
-    QPixmap pix(pr.size());
     bool updateGroup = (inTitle && haveGroupInfoSet);
+    if (updateGroup)
+        pr = groupRect;
+        
+    QPixmap pix(pr.size());
+    
     pix.fill(this, pr.topLeft());
     
     if (titleList.count() > 1 && curitem && !updateGroup)
