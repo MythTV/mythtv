@@ -51,14 +51,15 @@ class HttpComms : public QObject
     
     static QString getHttp(QString& url, int timeoutMS = 10000, 
                            int maxRetries = 3, int maxRedirects = 3,
+                           bool allowGzip = false,
                            Credentials* webCred = NULL);
     
-    static bool getHttpFile(QString& file, QString& url, int timeoutMS = 10000,
-                           int maxRetries = 3, int maxRedirects = 3,
-                           Credentials* webCred = NULL);
+    static bool getHttpFile(const QString& file, QString& url, int timeoutMS = 10000,
+                            int maxRetries = 3, int maxRedirects = 3, 
+                            bool allowGzip = false, Credentials* webCred = NULL);
     
     
-    void request(QUrl &url, int timeoutms = -1);
+    void request(QUrl &url, int timeoutms = -1, bool allowGzip = false);
     void request(QUrl &url, QHttpRequestHeader &header, int timeoutms = -1);
     
     void setCookie( const QString& cookie ) { m_cookie = cookie; }

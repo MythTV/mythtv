@@ -58,7 +58,7 @@ void HttpComms::init()
 
 }
 
-void HttpComms::request(QUrl &url, int timeoutms)
+void HttpComms::request(QUrl &url, int timeoutms, bool allowGzip)
 {
     QHttpRequestHeader header("GET", url.encodedPathAndQuery());
     QString userAgent = "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
@@ -66,7 +66,10 @@ void HttpComms::request(QUrl &url, int timeoutms)
 
     header.setValue("Host", url.host());
     header.setValue("User-Agent", userAgent);
-
+    
+    if (allowGzip)
+        header.setValue( "Accept-Encoding", "gzip");
+    
     request(url, header, timeoutms);
 }
 
@@ -260,7 +263,7 @@ void HttpComms::timeout()
 // getHttp - static function for grabbing http data for a url
 //           this is a synchronous function, it will block according to the vars
 QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries, 
-                           int maxRedirects, Credentials* webCred)
+                           int maxRedirects, bool allowGzip,  Credentials* webCred)
 {
     int redirectCount = 0;
     int timeoutCount = 0;
@@ -286,10 +289,8 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
         if (webCred)
             httpGrabber->setCredentials(*webCred, CRED_WEB);
             
-        httpGrabber->request(qurl, timeoutMS);            
-        
-        if (webCred)
-            httpGrabber->setCredentials(*webCred, CRED_WEB);
+        httpGrabber->request(qurl, timeoutMS, allowGzip);            
+       
 
         while (!httpGrabber->isDone())
         {
@@ -350,8 +351,9 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
 
 // getHttpFile - static function for grabbing a file from an http url
 //      this is a synchronous function, it will block according to the vars
-bool HttpComms::getHttpFile(QString& filename, QString& url, int timeoutMS, 
-                            int maxRetries, int maxRedirects, Credentials* webCred)
+bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS, 
+                            int maxRetries, int maxRedirects, 
+                            bool allowGzip, Credentials* webCred)
 {
     int redirectCount = 0;
     int timeoutCount = 0;
@@ -380,7 +382,7 @@ bool HttpComms::getHttpFile(QString& filename, QString& url, int timeoutMS,
         if (webCred)
             httpGrabber->setCredentials(*webCred, CRED_WEB);
             
-        httpGrabber->request(qurl, timeoutMS);            
+        httpGrabber->request(qurl, timeoutMS, allowGzip);            
 
         while (!httpGrabber->isDone())
         {
