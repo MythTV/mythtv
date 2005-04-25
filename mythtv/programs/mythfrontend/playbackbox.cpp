@@ -196,7 +196,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
             QObject::tr("Failed to get selector object"),
             QObject::tr(
                 "Myth could not locate the selector object within your theme.\n"
-                "Please make that your ui.xml is valid.\n"
+                "Please make sure that your ui.xml is valid.\n"
                 "\n"
                 "Myth will now exit."));
                                   
