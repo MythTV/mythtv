@@ -32,10 +32,10 @@
 #define PCM_SAMPLES_PER_MS        8
 
 // WIN32 driver constants
-#define NUM_MIC_BUFFERS		16	
-#define MIC_BUFFER_SIZE		MAX_DECOMP_AUDIO_SAMPLES
-#define NUM_SPK_BUFFERS		16	
-#define SPK_BUFFER_SIZE		MIC_BUFFER_SIZE // Need to keep these the same (see RTPPACKET)
+#define NUM_MIC_BUFFERS           16
+#define MIC_BUFFER_SIZE           MAX_DECOMP_AUDIO_SAMPLES
+#define NUM_SPK_BUFFERS           16
+#define SPK_BUFFER_SIZE           MIC_BUFFER_SIZE // Need to keep these the same (see RTPPACKET)
 
 #define RTP_STATS_INTERVAL        1 // Seconds between sending statistics 
 
@@ -44,7 +44,7 @@ class rtp;
 class RtpEvent : public QCustomEvent
 {
 public:
-    enum Type { RxVideoFrame = (QEvent::User + 300), RtpDebugEv, RtpStatisticsEv };
+    enum Type { RxVideoFrame = (QEvent::User + 300), RtpDebugEv, RtpStatisticsEv, RtpRtcpStatsEv };
 
     RtpEvent(Type t, QString s="") : QCustomEvent(t) { text=s; }
     RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2, int s3, int s4, int s5, int s6, 
@@ -53,6 +53,8 @@ public:
                pkInDisc=s5; pkOutDrop=s6;
                byteIn=s7; byteOut=s8; bytePlayed=s9; framesIn=s10; framesOut=s11; framesInDisc=s12; 
                framesOutDisc=s13;}
+    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2) : QCustomEvent(t) 
+             { rtpThread=r; timestamp=tm; msPeriod = ms; rtcpFractionLoss=s1; rtcpTotalLoss=s2;}    
     ~RtpEvent()                 {  }
     QString msg()               { return text;}
     rtp *owner()                { return rtpThread; }
@@ -69,6 +71,8 @@ public:
     int getFramesInDiscarded()  { return framesInDisc; }
     int getFramesOutDiscarded() { return framesOutDisc; }
     int getPeriod()             { return msPeriod; }
+    int getRtcpFractionLoss()   { return rtcpFractionLoss; }
+    int getRtcpTotalLoss()      { return rtcpTotalLoss; }
 
 
 private:
@@ -90,7 +94,8 @@ private:
     int byteIn;
     int byteOut;
     int bytePlayed;
-
+    int rtcpFractionLoss;
+    int rtcpTotalLoss;
 };
 
 
@@ -106,6 +111,44 @@ typedef struct RTPPACKET
     uchar   RtpData[IP_MAX_MTU-RTP_HEADER_SIZE-UDP_HEADER_SIZE];
 } RTPPACKET;
 
+#define RTCP_PERIOD           10 // Seconds
+#define MAX_RTCP_SR_BLOCKS    1
+
+typedef struct RTCP_SR_BLOCK
+{
+    ulong   Ssrc;
+    uchar   fractionLost;
+    uchar   totPacketLostMsb;
+    ushort  totPacketLostLsw;
+    ulong   extHighestSeqNumRx;
+    ulong   arrivalJitter;
+    ulong   lastSR;
+    ulong   delayLastSR;
+} RTCP_SR_BLOCK;
+
+typedef struct RTCP_SR // Sender Report
+{
+    ulong   RtcpSsrc;
+    ulong   RtcpNtpTimestampMsw;
+    ulong   RtcpNtpTimestampLsw;
+    ulong   RtcpTimestamp;
+    ulong   RtcpSendPkCount;
+    ulong   RtcpSendOctetCount;
+    RTCP_SR_BLOCK srBlock[MAX_RTCP_SR_BLOCKS];
+} RTCP_SR;
+
+typedef struct RTCPPACKET
+{
+    uchar   RtcpVPRC;
+    uchar   RtcpPT;
+    ushort  RtcpLen;
+    union
+    {
+        RTCP_SR sr;
+    } d;
+    char padding[1500]; // Room used on receiving RTCP packets, in case they contain more blocks than we cater for
+} RTCPPACKET;
+
 typedef struct 
 {
     uchar  dtmfDigit;
@@ -117,6 +160,13 @@ typedef struct
 {
     ulong h263hdr;
 } H263_RFC2190_HDR;
+
+
+#define RTCP_SENDER_REPORT      200
+#define RTCP_RECEIVER_REPORT    201
+#define RTCP_SOURCES_DESCR      202
+#define RTCP_GOODBYE            203
+#define RTCP_APP_DEFINED        204
 
 #define H263HDR(s)              ((s)<<13)
 #define H263HDR_GETSZ(h)        (((h)>>13) & 0x7)
@@ -302,6 +352,10 @@ private:
     void AddToneToAudio(short *buffer, int Samples);
     void Debug(QString dbg);
     void CheckSendStatistics();
+    void SendRtcpStatistics();
+    void RtcpSendReceive(bool forceSend=false);
+    void sendRtcpSenderReport(uint txPkCnt, uint txOctetCnt, long rxSsrc, uint rxPkCnt, uint rxPkLost, ushort highestRxSeq);
+    void parseRtcpMessage(RTCPPACKET *rtcpPacket, int len);
 
 #ifdef WIN32
     bool StartTx();
@@ -333,7 +387,9 @@ private:
     QObject *eventWindow;
     QMutex rtpMutex;
     QSocketDevice *rtpSocket;
+    QSocketDevice *rtcpSocket;
     QWaitCondition *eventCond;
+    QTime timeNextRtcpTx;
     codec   *Codec;
     Jitter *pJitter;
     TxShaper *pTxShaper;
@@ -357,8 +413,9 @@ private:
     int SilenceLen;
     uchar rtpMPT;
     uchar rtpMarker;
+    ulong peerSsrc;
     QHostAddress yourIP;
-    int myPort, yourPort;
+    int myPort, yourPort, myRtcpPort, yourRtcpPort;
     rtpTxMode txMode;
     rtpRxMode rxMode;
     QString micDevice;
@@ -393,6 +450,7 @@ private:
     // Stats
     QTime timeNextStatistics;
     QTime timeLastStatistics;
+    QTime timeLastRtcpStatistics;
     int pkIn;
     int pkOut;
     int pkMissed;
@@ -408,6 +466,10 @@ private:
     int framesOutDiscarded;
     short micPower;
     short spkPower;
+    uint prevRxPkLost;
+    uint prevRxPkCnt;    
+    int rtcpFractionLoss;
+    int rtcpTotalLoss;
 };
 
 

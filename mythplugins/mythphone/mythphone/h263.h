@@ -60,6 +60,7 @@ class H263Container
     bool H263StartDecoder(int w, int h);
     uchar *H263EncodeFrame(const uchar *yuvFrame, int *len);
     uchar *H263DecodeFrame(const uchar *h263Frame, int h263FrameLen, uchar *rgbBuffer, int rgbBufferSize);
+    void H263ForceIFrame();
     void H263StopEncoder();
     void H263StopDecoder();
 

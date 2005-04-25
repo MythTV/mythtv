@@ -156,8 +156,8 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
     addDirectoryPopup = NULL;
     incallPopup = NULL;
     statsPopup = NULL;
-    audioPkInOutLabel = audioBytesInOutLabel = audioAvgBwLabel = 0;
-    videoResLabel = videoPkOutLabel = videoPkInLabel = videoBytesInOutLabel = videoAvgBwLabel = videoFramesInOutDiscLabel = videoAvgFpsLabel = videoWebcamFpsLabel = 0;
+    audioPkInOutLabel = audioPkRtcpLabel = 0;
+    videoResLabel = videoPkOutLabel = videoPkInLabel = videoPkRtcpLabel = videoFramesInOutDiscLabel = videoAvgFpsLabel = videoWebcamFpsLabel = 0;
     currentCallEntry = 0;
 
     // Used to load voicemail messages in and play them
@@ -408,6 +408,16 @@ QString spk;
                 ProcessAudioRtpStatistics(re);
             else if (re->owner() == rtpVideo)
                 ProcessVideoRtpStatistics(re);
+        }
+        break;
+
+    case RtpEvent::RtpRtcpStatsEv:
+        {
+            RtpEvent *re = (RtpEvent *)event;
+            if (re->owner() == rtpAudio)
+                ProcessAudioRtcpStatistics(re);
+            else if (re->owner() == rtpVideo)
+                ProcessVideoRtcpStatistics(re);
         }
         break;
 
@@ -923,6 +933,20 @@ void PhoneUIBox::ProcessVideoRtpStatistics(RtpEvent *stats)
                           stats->getBytesIn(), stats->getBytesOut(),
                           stats->getFramesIn(), stats->getFramesOut(), 
                           stats->getFramesInDiscarded(), stats->getFramesOutDiscarded());
+}
+
+
+void PhoneUIBox::ProcessAudioRtcpStatistics(RtpEvent *stats)
+{
+    updateAudioRtcpStatistics(stats->getRtcpFractionLoss(), stats->getRtcpTotalLoss());
+}
+
+
+void PhoneUIBox::ProcessVideoRtcpStatistics(RtpEvent *stats)
+{
+    updateVideoRtcpStatistics(stats->getRtcpFractionLoss(), stats->getRtcpTotalLoss());
+    if (stats->getRtcpFractionLoss() > 0)
+        h263->H263ForceIFrame();
 }
 
 
@@ -1785,8 +1809,7 @@ void PhoneUIBox::showStatistics(bool showVideo)
 
     statsPopup->addLabel(tr("Audio"), MythPopupBox::Medium);
     audioPkInOutLabel    = statsPopup->addLabel(tr("Packets In/Out/Lost/Late:             "), MythPopupBox::Small);
-    // (not useful) audioBytesInOutLabel = statsPopup->addLabel("KBytes In/Out: ", MythPopupBox::Small);
-    audioAvgBwLabel      = statsPopup->addLabel(tr("Average Kbps In/Out: "), MythPopupBox::Small);
+    audioPkRtcpLabel     = statsPopup->addLabel(tr("Packets Lost by Peer:                 "), MythPopupBox::Small);
 
     if (showVideo)
     {
@@ -1797,8 +1820,7 @@ void PhoneUIBox::showStatistics(bool showVideo)
                                                      MythPopupBox::Small);
         videoPkInLabel        = statsPopup->addLabel(tr("Packets In/Lost/Disc/Late: "), MythPopupBox::Small);
         videoPkOutLabel       = statsPopup->addLabel(tr("Packets Out/Dropped: "), MythPopupBox::Small);
-        // (not useful) videoBytesInOutLabel  = statsPopup->addLabel("KBytes In/Out: ", MythPopupBox::Small);
-        videoAvgBwLabel       = statsPopup->addLabel(tr("Average Kbps In/Out: "), MythPopupBox::Small);
+        videoPkRtcpLabel      = statsPopup->addLabel(tr("Packets Lost by Peer: "), MythPopupBox::Small);
         videoFramesInOutDiscLabel = statsPopup->addLabel(tr("Video Frames In/Out/Disc: "), MythPopupBox::Small);
         videoAvgFpsLabel      = statsPopup->addLabel(tr("Average FPS In/Out: "), MythPopupBox::Small);
         videoWebcamFpsLabel   = statsPopup->addLabel(tr("Webcam Frames Delivered/Dropped: "), MythPopupBox::Small);
@@ -1815,20 +1837,30 @@ void PhoneUIBox::updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkO
 {
     (void)pkInDisc;
     (void)pkOutDrop;
+    (void)bIn;
+    (void)bOut;
     if (!statsPopup)
         return;
 
     audioPkInOutLabel->setText(tr("Packets In/Out/Lost/Late: ") + QString::number(pkIn) + " / " + 
                                QString::number(pkOut) + " / " + QString::number(pkLost)
                                + " / " + QString::number(pkLate));
-    //audioBytesInOutLabel->setText("KBytes In/Out: " + QString::number(bIn/1000) + "K / " + QString::number(bOut/1000) + "K");
-    if (ConnectTime.elapsed()/1000 != 0)
-        audioAvgBwLabel->setText (tr("Average Kbps In/Out:") + QString::number(bIn/ConnectTime.elapsed()/1000*8/1000) + "kbps / " + QString::number(bOut/ConnectTime.elapsed()/1000*8/1000) + "kbps");
+}
+
+
+void PhoneUIBox::updateAudioRtcpStatistics(int fractionLoss, int totalLoss)
+{
+    if (!statsPopup)
+        return;
+
+    audioPkRtcpLabel->setText(tr("Packets Lost by Peer: ") + QString::number(fractionLoss) + " / " + QString::number(totalLoss));
 }
 
 
 void PhoneUIBox::updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut, int fIn, int fOut, int fDiscIn, int fDiscOut)
 {
+    (void)bIn;
+    (void)bOut;
     if ((!statsPopup) || (videoPkInLabel == 0))
         return;
 
@@ -1837,14 +1869,20 @@ void PhoneUIBox::updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkO
                                 + " / " + QString::number(pkLate));
     videoPkOutLabel->setText(tr("Packets Out/Dropped: ") + QString::number(pkOut) + " / " + 
                                QString::number(pkOutDrop));
-    //videoBytesInOutLabel->setText("KBytes In/Out: " + QString::number(bIn/1000) + "K / " + QString::number(bOut/1000) + "K");
-    if (ConnectTime.elapsed()/1000 != 0)
-        videoAvgBwLabel->setText(tr("Average Kbps In/Out: ") + QString::number(bIn/ConnectTime.elapsed()/1000*8/1000) + "kbps / " + QString::number(bOut/ConnectTime.elapsed()/1000*8/1000) + "kbps");
     videoFramesInOutDiscLabel->setText(tr("Video Frames In/Out/Disc: ") + QString::number(fIn) + " / " + QString::number(fOut) + " / " + QString::number(fDiscIn) + " / " + QString::number(fDiscOut));
     if (ConnectTime.elapsed()/1000 != 0)
         videoAvgFpsLabel->setText(tr("Average FPS In/Out: ") + QString::number(fIn/ConnectTime.elapsed()/1000) + " / " + QString::number(fOut/ConnectTime.elapsed()/1000));
     if ((ConnectTime.elapsed()/1000 != 0) && (txClient != 0))
         videoWebcamFpsLabel->setText(tr("Webcam Frames Delivered/Dropped: ") + QString::number(wcDeliveredFrames) + " / " + QString::number(wcDroppedFrames));
+}
+
+
+void PhoneUIBox::updateVideoRtcpStatistics(int fractionLoss, int totalLoss)
+{
+    if ((!statsPopup) || (videoPkInLabel == 0))
+        return;
+
+    videoPkRtcpLabel->setText(tr("Packets Lost by Peer: ") + QString::number(fractionLoss) + " / " + QString::number(totalLoss));
 }
 
 
@@ -1856,8 +1894,8 @@ void PhoneUIBox::closeStatisticsPopup()
     statsPopup->hide();
     delete statsPopup;
     statsPopup = NULL;
-    audioPkInOutLabel = audioBytesInOutLabel = audioAvgBwLabel = 0;
-    videoResLabel = videoPkOutLabel = videoPkInLabel = videoBytesInOutLabel = videoAvgBwLabel = videoFramesInOutDiscLabel = videoAvgFpsLabel = 0;
+    audioPkInOutLabel = audioPkRtcpLabel = 0;
+    videoResLabel = videoPkOutLabel = videoPkInLabel = videoPkRtcpLabel = videoFramesInOutDiscLabel = videoAvgFpsLabel = 0;
 }
 
 

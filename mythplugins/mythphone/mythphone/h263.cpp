@@ -60,7 +60,7 @@ bool H263Container::H263StartEncoder(int w, int h, int fps)
     /* frames per second */
     h263EncContext->frame_rate = fps;  
     h263EncContext->frame_rate_base= 1;
-    h263EncContext->gop_size = fps*5; /* emit one intra frame every five secs */
+    h263EncContext->gop_size = 600; // Max allowed by library. Was fps*5; /* emit one intra frame every five secs */
     h263EncContext->max_b_frames=0;
 
     /* open it */
@@ -136,6 +136,15 @@ uchar *H263Container::H263DecodeFrame(const uchar *h263Frame, int h263FrameLen, 
         return rgbBuffer;
     }
     return 0;
+}
+
+void H263Container::H263ForceIFrame()
+{
+    // libavcodec does not support forcing an I-frame, so close & reopen encoder for now
+    while (lastCompressedSize != 0)
+        lastCompressedSize = avcodec_encode_video(h263EncContext, PostEncodeFrame, MaxPostEncodeSize, NULL);
+    avcodec_close(h263EncContext);
+    avcodec_open(h263EncContext, h263Encoder);
 }
 
 void H263Container::H263StopEncoder()

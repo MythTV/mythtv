@@ -42,7 +42,9 @@ rtp::rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, i
     eventWindow = callingApp;
     yourIP.setAddress(remoteIP);
     myPort = localPort;
+    myRtcpPort = localPort+1;
     yourPort = remotePort;
+    yourRtcpPort = yourPort+1;
     txMode = txm;
     rxMode = rxm;
     micDevice = micDev;
@@ -89,6 +91,12 @@ rtp::rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, i
     dtmfOut = "";
     videoToTx = 0;
     eventCond = 0;
+    prevRxPkLost = 0;
+    prevRxPkCnt = 0;   
+    rtcpFractionLoss = 0;
+    rtcpTotalLoss = 0;
+    peerSsrc = 0; 
+    timeNextRtcpTx = (QTime::currentTime()).addSecs(RTCP_PERIOD);
 
 #ifdef WIN32
     hwndLast = callingApp->winId();
@@ -189,6 +197,7 @@ void rtp::rtpAudioThreadWorker()
         }
 
         SendWaitingDtmf();
+        RtcpSendReceive();
         CheckSendStatistics();        
     }
 
@@ -222,6 +231,7 @@ void rtp::rtpVideoThreadWorker()
         StreamInVideo();
         transmitQueuedVideo();
 
+        RtcpSendReceive();
         CheckSendStatistics();        
     }
 
@@ -251,6 +261,7 @@ void rtp::rtpVideoThreadWorker()
 void rtp::rtpInitialise()
 {
     rtpSocket             = 0;
+    rtcpSocket            = 0;
     rxMsPacketSize        = 20;
     rxPCMSamplesPerPacket = rxMsPacketSize * PCM_SAMPLES_PER_MS;
     txMsPacketSize        = 20;
@@ -292,12 +303,14 @@ void rtp::rtpInitialise()
     framesIn = 0;
     framesOut = 0;
     framesOutDiscarded = 0;
+    rtcpFractionLoss = 0;
+    rtcpTotalLoss = 0;
     micPower = 0;
     spkPower = 0;
     spkInBuffer = 0;
     
     timeNextStatistics = QTime::currentTime().addSecs(RTP_STATS_INTERVAL);
-    timeLastStatistics = QTime::currentTime();
+    timeLastStatistics = timeLastRtcpStatistics = QTime::currentTime();
 
 
     pJitter = new Jitter();
@@ -737,12 +750,26 @@ void rtp::CheckSendStatistics()
     }
 }
 
+void rtp::SendRtcpStatistics()
+{
+    QTime now = QTime::currentTime();
+    int statsMsPeriod = timeLastRtcpStatistics.msecsTo(now);
+    timeLastRtcpStatistics = now;
+    if (eventWindow)
+        QApplication::postEvent(eventWindow, 
+                    new RtpEvent(RtpEvent::RtpRtcpStatsEv, this, now, statsMsPeriod,
+                                    rtcpFractionLoss, rtcpTotalLoss));
+}
+
 void rtp::OpenSocket()
 {
     rtpSocket = new QSocketDevice (QSocketDevice::Datagram);
     rtpSocket->setBlocking(false);
     rtpSocket->setSendBufferSize(49152);
     rtpSocket->setReceiveBufferSize(49152);
+
+    rtcpSocket = new QSocketDevice (QSocketDevice::Datagram);
+    rtcpSocket->setBlocking(false);
 
 #ifndef WIN32
     QString ifName = gContext->GetSetting("SipBindInterface");
@@ -761,10 +788,10 @@ void rtp::OpenSocket()
 #endif
 
 #ifdef WIN32  // SIOCGIFADDR not supported on Windows
-	char         hostname[100];
-	HOSTENT FAR *hostAddr;
+    char         hostname[100];
+    HOSTENT FAR *hostAddr;
     int ifNum = atoi(gContext->GetSetting("SipBindInterface"));
-	if ((gethostname(hostname, 100) != 0) || ((hostAddr = gethostbyname(hostname)) == NULL)) 
+    if ((gethostname(hostname, 100) != 0) || ((hostAddr = gethostbyname(hostname)) == NULL)) 
     {
         cerr << "Failed to find network interface " << endl;
         delete rtpSocket;
@@ -785,6 +812,13 @@ void rtp::OpenSocket()
         delete rtpSocket;
         rtpSocket = 0;
     }
+
+    if (!rtcpSocket->bind(myIP, myRtcpPort))
+    {
+        cerr << "Failed to bind for RTCP connection " << myIP.toString() << endl;
+        delete rtcpSocket;
+        rtcpSocket = 0;
+    }
 }
 
 
@@ -795,6 +829,12 @@ void rtp::CloseSocket()
         rtpSocket->close();
         delete rtpSocket;
         rtpSocket = 0;
+    }
+    if (rtcpSocket)
+    {
+        rtcpSocket->close();
+        delete rtcpSocket;
+        rtcpSocket = 0;
     }
 }
 
@@ -982,6 +1022,7 @@ void rtp::StreamInAudio()
                         {
                             rxFirstFrame = FALSE;
                             rxSeqNum = JBuf->RtpSequenceNumber;
+                            peerSsrc = JBuf->RtpSourceID;
                         }
                         if (PKLATE(rxSeqNum, JBuf->RtpSequenceNumber))
                         {
@@ -1174,6 +1215,7 @@ void rtp::StreamInVideo()
                 {
                     rxFirstFrame = FALSE;
                     videoFrameFirstSeqNum = rxSeqNum = JBuf->RtpSequenceNumber;
+                    peerSsrc = JBuf->RtpSourceID;
                 }
                 if (JBuf->RtpSequenceNumber < videoFrameFirstSeqNum)
                 {
@@ -1220,6 +1262,7 @@ void rtp::StreamInVideo()
                 framesInDiscarded++;
                 pkMissed += missing;
                 pkInDisc += valid;
+                RtcpSendReceive(true); // Force RTCP to tell remote party we lost a packet, causes I-Frame
             }
             else
             {
@@ -1643,6 +1686,108 @@ void rtp::fillPacketfromBuffer(RTPPACKET &RTPpacket)
         }
     }
     rtpMutex.unlock();
+}
+
+void rtp::RtcpSendReceive(bool forceSend)
+{
+    if (rtcpSocket)
+    {
+        int rtcpLen;
+        RTCPPACKET rtcpPacket;
+        if ((rtcpLen = rtcpSocket->readBlock((char *)&rtcpPacket, sizeof(RTCPPACKET))) > 0)
+        {
+            parseRtcpMessage(&rtcpPacket, rtcpLen);
+        }
+
+        // Check if its time to send a periodic RTCP SR, or if we are
+        // being demanded that we send one, check its not too soon
+        // after the last one
+        if ((timeNextRtcpTx <= QTime::currentTime()) || 
+            (forceSend && (timeNextRtcpTx < (QTime::currentTime()).addSecs(RTCP_PERIOD-1))))
+        {
+            sendRtcpSenderReport(pkOut, bytesOut, peerSsrc, pkIn, pkMissed, rxSeqNum-1);
+            timeNextRtcpTx = (QTime::currentTime()).addSecs(RTCP_PERIOD);
+        }
+    }
+}
+
+void rtp::sendRtcpSenderReport(uint txPkCnt, uint txOctetCnt, long rxSsrc, uint rxPkCnt, uint rxPkLost, ushort highestRxSeq)
+{
+    uint deltaPkLost = rxPkLost - prevRxPkLost;
+    uint deltaPkRxed = rxPkCnt  - prevRxPkCnt;
+    prevRxPkLost = rxPkLost;
+    prevRxPkCnt = rxPkCnt;
+
+    if (rtcpSocket)
+    {
+        RTCPPACKET rtcpPacket;
+        int len = sizeof(RTCP_SR_BLOCK) + 28;
+        
+        rtcpPacket.RtcpVPRC                            = 0x81; // Version 2, no padding, count=1
+        rtcpPacket.RtcpPT                              = RTCP_SENDER_REPORT;
+        rtcpPacket.RtcpLen                             = htons(((sizeof(RTCP_SR_BLOCK) + 28)/4)-1);
+        rtcpPacket.d.sr.RtcpSsrc                       = 0x666;
+        rtcpPacket.d.sr.RtcpNtpTimestampMsw            = 0;
+        rtcpPacket.d.sr.RtcpNtpTimestampLsw            = 0;
+        rtcpPacket.d.sr.RtcpTimestamp                  = htonl(txTimeStamp);
+        rtcpPacket.d.sr.RtcpSendPkCount                = htonl(txPkCnt);
+        rtcpPacket.d.sr.RtcpSendOctetCount             = htonl(txOctetCnt);
+        
+        rtcpPacket.d.sr.srBlock[0].Ssrc                = rxSsrc;
+        if ((deltaPkLost+deltaPkRxed) == 0)
+            rtcpPacket.d.sr.srBlock[0].fractionLost    = 0;
+        else
+            rtcpPacket.d.sr.srBlock[0].fractionLost    = 256*deltaPkLost/(deltaPkLost+deltaPkRxed);
+         // ensure if we have pkt loss but fraction is low we don't send zero
+        if ((rtcpPacket.d.sr.srBlock[0].fractionLost == 0) && (deltaPkLost > 0))
+            rtcpPacket.d.sr.srBlock[0].fractionLost = 1;
+        rtcpPacket.d.sr.srBlock[0].totPacketLostMsb    = rxPkLost >> 16;
+        rtcpPacket.d.sr.srBlock[0].totPacketLostLsw    = htons(rxPkLost);
+        rtcpPacket.d.sr.srBlock[0].extHighestSeqNumRx  = htonl(highestRxSeq);
+        rtcpPacket.d.sr.srBlock[0].arrivalJitter       = 0;
+        rtcpPacket.d.sr.srBlock[0].lastSR              = 0;
+        rtcpPacket.d.sr.srBlock[0].delayLastSR         = 0;
+        
+        rtcpSocket->writeBlock((char *)&rtcpPacket.RtcpVPRC, len, yourIP, yourRtcpPort);
+    }
+}
+
+void rtp::parseRtcpMessage(RTCPPACKET *rtcpPacket, int len)
+{
+    while (len > 0)
+    {
+        int chunkLen = (ntohs(rtcpPacket->RtcpLen)+1)*4;
+        len -= chunkLen;
+        
+        switch (rtcpPacket->RtcpPT)
+        {
+        case RTCP_SENDER_REPORT:
+            if (ntohl(rtcpPacket->RtcpVPRC & 0x1F) > 0)
+            {
+                rtcpFractionLoss = rtcpPacket->d.sr.srBlock[0].fractionLost;
+                rtcpTotalLoss = ((rtcpPacket->d.sr.srBlock[0].totPacketLostMsb << 16) +
+                                 ntohs(rtcpPacket->d.sr.srBlock[0].totPacketLostLsw));
+                SendRtcpStatistics();
+            }
+            break;
+        case RTCP_RECEIVER_REPORT:
+            break;
+        case RTCP_SOURCES_DESCR:
+            break;
+        case RTCP_GOODBYE:
+            break;
+        case RTCP_APP_DEFINED:
+            break;
+        default:
+            cout << "Received RTCP Unknown Message" << endl;
+            len = 0;
+            break;
+        }
+        
+        if (len > 0)
+            rtcpPacket = (RTCPPACKET *)(((uchar *)rtcpPacket) + chunkLen);
+    }
+    
 }
 
 

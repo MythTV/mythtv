@@ -120,6 +120,8 @@ class PhoneUIBox : public MythThemedDialog
     const char *videoResToCifMode(int w);
     void    ProcessAudioRtpStatistics(RtpEvent *stats);
     void    ProcessVideoRtpStatistics(RtpEvent *stats);
+    void    ProcessAudioRtcpStatistics(RtpEvent *stats);
+    void    ProcessVideoRtcpStatistics(RtpEvent *stats);
     void    doMenuPopup();
     void    doUrlPopup(char key, bool DigitsOrUrl);
     void    doIMPopup(QString otherParty, QString callId, QString Msg);
@@ -136,6 +138,8 @@ class PhoneUIBox : public MythThemedDialog
     void    showStatistics(bool showVideo);
     void    updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut);
     void    updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut, int fIn, int fOut, int fDiscIn, int fDiscOut);
+    void    updateAudioRtcpStatistics(int fractionLoss, int totalLoss);
+    void    updateVideoRtcpStatistics(int fractionLoss, int totalLoss);
 
     void    wireUpTheme();
     DirectoryContainer *DirContainer;
@@ -215,12 +219,10 @@ class PhoneUIBox : public MythThemedDialog
 
     MythPopupBox *statsPopup;
     QLabel *audioPkInOutLabel;
-    QLabel *audioBytesInOutLabel;
-    QLabel *audioAvgBwLabel;
+    QLabel *audioPkRtcpLabel;
     QLabel *videoPkInLabel;
     QLabel *videoPkOutLabel;
-    QLabel *videoBytesInOutLabel;
-    QLabel *videoAvgBwLabel;
+    QLabel *videoPkRtcpLabel;
     QLabel *videoFramesInOutDiscLabel;
     QLabel *videoAvgFpsLabel;
     QLabel *videoWebcamFpsLabel;
