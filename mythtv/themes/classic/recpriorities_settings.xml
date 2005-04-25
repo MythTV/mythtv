@@ -5,9 +5,11 @@
       <text>Set Recording Priorities</text>
       <text lang="DE">Aufnahmen</text>
       <text lang="SV">Inspelningsprioriteter</text>
+      <text lang="SI">Nast. snemalne prioritete</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
       <alttext lang="SV">Inspelning</alttext>
+      <alttext lang="SI">Snemalne prioritete</alttext>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -17,10 +19,12 @@
       <text lang="DE">Sender</text>
       <text lang="SV">Kanalprioriteter</text>
       <text lang="JA">チャンネル録画優先順位設定</text>
+      <text lang="SI">Nast. kanalne snem. prioritete</text>
       <alttext>Channel Priorities</alttext>
       <alttext lang="SV">Kanal</alttext>
       <alttext lang="JA">チャンネル優先順位</alttext>
       <alttext lang="DE">Sender</alttext>
+      <alttext lang="SI">Kanalne prioritete</alttext>
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 

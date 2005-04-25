@@ -15,6 +15,7 @@
       <text lang="JA">録画予約</text>
       <text lang="FI">Ajasta Nauhoituksia</text>
       <text lang="ZH_TW">預設錄影</text>
+      <text lang="SI">Planiranje snemanj</text>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -28,6 +29,7 @@
       <text lang="JA">録画優先順位</text>
       <text lang="FI">Aseta Prioriteetteja</text>
       <text lang="ZH_TW">錄影優先次序</text>
+      <text lang="SI">Nastavitve prioritet</text>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -46,6 +48,7 @@
       <text lang="JA">予約衝突修正</text>
       <text lang="FI">Tulevat Nauhoitukset</text>
       <text lang="ZH_TW">修正預設錄影衝突</text>
+      <text lang="SI">Prihajajoča snemanja</text>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 
@@ -64,6 +67,7 @@
       <text lang="JA">録画削除</text>
       <text lang="FI">Poista Nauhoituksia</text>
       <text lang="ZH_TW">刪除錄影</text>
+      <text lang="SI">Brisanje snemanj</text>
       <action>TV_DELETE</action>
    </button>
 
@@ -77,6 +81,7 @@
       <text lang="FR">Anciens enregistrements</text>
       <text lang="FI">Aiemmin Nauhoitetut</text>
       <text lang="ZH_TW">以前的錄影</text>
+      <text lang="SI">Že posneto</text>
       <action>TV_PREVIOUS</action>
    </button>
 

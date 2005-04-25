@@ -15,15 +15,15 @@
     </message>
     <message>
         <source>Advanced Configuration</source>
-        <translation type="unfinished">Napredne nastavitve</translation>
+        <translation>Napredne nastavitve</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemalne možnosti</translation>
     </message>
     <message>
         <source>Diseqc</source>
-        <translation type="unfinished"></translation>
+        <translation>Diseqc</translation>
     </message>
 </context>
 <context>
@@ -103,170 +103,170 @@
     <name>CustomRecord</name>
     <message>
         <source>Power Search Recording Rule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Urejevalec naprednega iskanja snemalnih pravil</translation>
     </message>
     <message>
         <source>Rule Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ime pravila</translation>
     </message>
     <message>
         <source>Match words in the title</source>
-        <translation type="unfinished"></translation>
+        <translation>Išči besede v naslovu</translation>
     </message>
     <message>
         <source>Match in any descriptive field</source>
-        <translation type="unfinished"></translation>
+        <translation>Išči po katerem koli opisu</translation>
     </message>
     <message>
         <source>Limit by category</source>
-        <translation type="unfinished"></translation>
+        <translation>Omejitev po kategoriji</translation>
     </message>
     <message>
         <source>New episodes only</source>
-        <translation type="unfinished"></translation>
+        <translation>Samo nove serije</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Zanemari nedefinirane serije (Data Direct)</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Zanemari nedefinirane serije (XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tip karegorije</translation>
     </message>
     <message>
         <source>Limit movies by the year of release</source>
-        <translation type="unfinished"></translation>
+        <translation>Omeji filme po letu izdaje</translation>
     </message>
     <message>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Minmalna ocena (0.0 do 1.0 samo za filme)</translation>
     </message>
     <message>
         <source>Exclude one station</source>
-        <translation type="unfinished"></translation>
+        <translation>Zanemari eno postajo</translation>
     </message>
     <message>
         <source>Match related callsigns</source>
-        <translation type="unfinished"></translation>
+        <translation>Išči podobne kratice</translation>
     </message>
     <message>
         <source>Only channels from a specific video source</source>
-        <translation type="unfinished"></translation>
+        <translation>Samo kanali iz specifičnega video vira</translation>
     </message>
     <message>
         <source>Only channels marked as commercial free</source>
-        <translation type="unfinished"></translation>
+        <translation>amo kanali označeni kot brez reklam</translation>
     </message>
     <message>
         <source>Anytime on a specific day of the week</source>
-        <translation type="unfinished"></translation>
+        <translation>Kadarkoli na določen dan v tednu</translation>
     </message>
     <message>
         <source>Only on weekdays (Monday through Friday)</source>
-        <translation type="unfinished"></translation>
+        <translation>Samo na dneve v tednu (od ponedeljka do petka)</translation>
     </message>
     <message>
         <source>Only on weekends</source>
-        <translation type="unfinished"></translation>
+        <translation>Samo za vikende</translation>
     </message>
     <message>
         <source>Only in primetime</source>
-        <translation type="unfinished"></translation>
+        <translation>Samo v času največje gledanosti</translation>
     </message>
     <message>
         <source>Not in primetime</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne v času največje gledanosti</translation>
     </message>
     <message>
         <source>Multiple sports teams (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Mnogovrstne športne ekipe (celoten primer)</translation>
     </message>
     <message>
         <source>Sci-fi B-movies (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Znanstveno-fantastični B-filmi (celoten primer)</translation>
     </message>
     <message>
         <source>Add this example clause</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj primer</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Test</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished">Snemaj</translation>
+        <translation>Snemaj</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Prekliči</translation>
+        <translation>Prekliči</translation>
     </message>
     <message>
         <source>or</source>
-        <translation type="unfinished"></translation>
+        <translation>ali</translation>
     </message>
     <message>
         <source>Match an exact title</source>
-        <translation type="unfinished"></translation>
+        <translation>Išči točen naslov</translation>
     </message>
     <message>
         <source>Match an exact episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Išči točno serijo</translation>
     </message>
     <message>
         <source>An error was found when checking</source>
-        <translation type="unfinished"></translation>
+        <translation>Med preverjanjem je prišlo do napake</translation>
     </message>
     <message>
         <source>The database error was</source>
-        <translation type="unfinished"></translation>
+        <translation>Napaka baze je bila</translation>
     </message>
     <message>
         <source>Only shows marked as HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Samo oddaje označene kot HDTV</translation>
     </message>
     <message>
         <source>SportsCenter Overnight (complete example - use FindDaily)</source>
-        <translation type="unfinished"></translation>
+        <translation>ŠportniCenter čez noč (celotni primer - uporabite NajdiDnevno)</translation>
     </message>
     <message>
         <source>Movie of the Week (complete example - use FindWeekly)</source>
-        <translation type="unfinished"></translation>
+        <translation>Filmi čez teden (celoten primer - uporabite NajdiTedensko)</translation>
     </message>
 </context>
 <context>
     <name>DVBTransportsEditor</name>
     <message>
         <source>DVB Transport Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Urejevalec DVB prometa</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete this transport?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ste prepričani, da želite izbrisati ta promet?</translation>
     </message>
     <message>
         <source>Yes, delete the transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Da, izbriši promet</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne, ne izbriši</translation>
     </message>
     <message>
         <source>Transport Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Prometni menu</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished">Spremeni...</translation>
+        <translation>Spremeni..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbriši..</translation>
     </message>
 </context>
 <context>
@@ -324,7 +324,7 @@
     </message>
     <message>
         <source>Record one showing of this title</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemaj eno oddajo tega naslova</translation>
     </message>
 </context>
 <context>
@@ -387,7 +387,7 @@
     </message>
     <message>
         <source>Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>Preklicano</translation>
     </message>
 </context>
 <context>
@@ -445,27 +445,27 @@
     </message>
     <message>
         <source>Date or day of the week</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum ali dan v tednu</translation>
     </message>
     <message>
         <source>minute</source>
-        <translation type="unfinished"></translation>
+        <translation>minute</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minute</translation>
+        <translation>minut</translation>
     </message>
     <message>
         <source>Title (optional):</source>
-        <translation type="unfinished"></translation>
+        <translation>Naslov (možnost):</translation>
     </message>
     <message>
         <source>Set Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Nastavi snemalne možnosti</translation>
     </message>
     <message>
         <source>Manual Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Ročno snemanje</translation>
     </message>
 </context>
 <context>
@@ -494,11 +494,11 @@
     <name>MythSearchDialog</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Vredu</translation>
+        <translation>Vredu</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Prekliči</translation>
+        <translation>Prekliči</translation>
     </message>
 </context>
 <context>
@@ -708,182 +708,182 @@
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation type="unfinished"></translation>
+        <translation>^(The |A |An )</translation>
     </message>
     <message>
         <source>Play from beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>Predvajaj od začetka</translation>
     </message>
     <message>
         <source>Play from bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Predvajaj zaznamek</translation>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaradi preračunavanj nad mejo bo serija ignorirana.  Kadar je premalo prostora na disku bo Avto-brisanje uporabljeno za odstranitev takšnih programov.</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne ohrani te serije</translation>
     </message>
     <message>
         <source>Preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohrani to serijo</translation>
     </message>
     <message>
         <source>Play from...</source>
-        <translation type="unfinished"></translation>
+        <translation>Predvajaj iz...</translation>
     </message>
     <message>
         <source>Storage Options</source>
-        <translation type="unfinished">Nastavitve za shrambo zajema</translation>
+        <translation>Nastavitve za shrambo zajema</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemalne možnosti</translation>
     </message>
     <message>
         <source>Job Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opravilne možnosti</translation>
     </message>
     <message>
         <source>Show group list as recording groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Prikaži seznam skupin, kot snemalne skupine</translation>
     </message>
     <message>
         <source>Show group list as titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Prikaži seznam skupin, kot naslove</translation>
     </message>
     <message>
         <source>Shuffle Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Mešano predvajanje</translation>
     </message>
     <message>
         <source>Playlist options</source>
-        <translation type="unfinished"></translation>
+        <translation>Možnosti predvajalnega seznama</translation>
     </message>
     <message>
         <source>Add this Category/Title Group to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj to Kategorijo/Naslov Skupine v predvajalni seznam</translation>
     </message>
     <message>
         <source>Add this Recording Group to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj to snemalno skupino v predvajalni seznam</translation>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj to snemanje predvajalni seznam</translation>
     </message>
     <message>
         <source>There are %1 items in the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>V predvajalnem seznamu je %1 stvari.</translation>
     </message>
     <message>
         <source>There is %1 item in the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>V predvajalnem seznamu je %1 stvar.</translation>
     </message>
     <message>
         <source>Clear Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Isprazni predvajalni seznam</translation>
     </message>
     <message>
         <source>Toggle playlist for this Category/Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Menjaj predvajalni seznam za to kategorijo/naslov</translation>
     </message>
     <message>
         <source>Toggle playlist for this Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Menjaj predvajalni seznam za to snemalno skupino</translation>
     </message>
     <message>
         <source>Toggle playlist for this recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Menjaj predvajalni seznam za to snemanje</translation>
     </message>
     <message>
         <source>These actions affect all items in the playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta dejanja vplivajo na vse stvari v predvajalnem seznamu</translation>
     </message>
     <message>
         <source>Remove from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstrani iz predvajalnega seznama</translation>
     </message>
     <message>
         <source>Add to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj v predvajalni seznam</translation>
     </message>
     <message>
         <source>User Job</source>
-        <translation type="unfinished"></translation>
+        <translation>Uporabniško opravilo</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop</translation>
     </message>
     <message>
         <source>Begin</source>
-        <translation type="unfinished"></translation>
+        <translation>Začni</translation>
     </message>
     <message>
         <source>Delete it, but allow it to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Briši, ampak dopusti ponovno snemanje</translation>
     </message>
     <message>
         <source>Delete it</source>
-        <translation type="unfinished"></translation>
+        <translation>Briši</translation>
     </message>
     <message>
         <source>Save it so I can watch it again</source>
-        <translation type="unfinished"></translation>
+        <translation>Shrani, tako da lahko gledam kasneje</translation>
     </message>
     <message>
         <source>Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Skupina</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Geslo:</translation>
     </message>
 </context>
 <context>
     <name>PreviousBox</name>
     <message>
         <source>Previously Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Že posneto</translation>
     </message>
     <message>
         <source>Select Sort Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Izberite vrstni red urejanja</translation>
     </message>
     <message>
         <source>Sort by Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Uredi po naslovu</translation>
     </message>
     <message>
         <source>Reverse Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Obraten vrstni red naslovov</translation>
     </message>
     <message>
         <source>Sort by Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Uredi po času</translation>
     </message>
     <message>
         <source>Reverse Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Obraten vrstni red časov</translation>
     </message>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>OPOZORILO: odstranjevanje teh stvari iz seznama ne bo izbrisalo nobenega posnetka.</translation>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation type="unfinished"></translation>
+        <translation>Obdrži to serijo v seznamu</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstrani to serijo iz seznama</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstrani vse serije tega naslova</translation>
     </message>
 </context>
 <context>
@@ -1037,43 +1037,43 @@
     </message>
     <message>
         <source>Select Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Izberi oceno</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Izberi</translation>
     </message>
     <message>
         <source>4 stars</source>
-        <translation type="unfinished"></translation>
+        <translation>4 zvezdice</translation>
     </message>
     <message>
         <source>At least 3 1/2 stars</source>
-        <translation type="unfinished"></translation>
+        <translation>Vsaj 3 1/2 zvezdice</translation>
     </message>
     <message>
         <source>At least 3 stars</source>
-        <translation type="unfinished"></translation>
+        <translation>Vsaj 3 zvezdice</translation>
     </message>
     <message>
         <source>At least 2 stars</source>
-        <translation type="unfinished"></translation>
+        <translation>Vsaj 2 zvezdici</translation>
     </message>
     <message>
         <source>Power Recording Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Napredno snemalno pravilo</translation>
     </message>
     <message>
         <source>(Any Program Type)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Katerikoli tip programa)</translation>
     </message>
     <message>
         <source>(Any Category)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Katerakoli kategorija)</translation>
     </message>
     <message>
         <source>(Any Station)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Katerakoli postaja)</translation>
     </message>
 </context>
 <context>
@@ -1112,39 +1112,39 @@
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation type="unfinished"></translation>
+        <translation>^(The |A |An )</translation>
     </message>
     <message>
         <source>Recording with override options</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemanje z možnostjo prepisa</translation>
     </message>
     <message>
         <source>Recording in this timeslot</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemanje v tem času</translation>
     </message>
     <message>
         <source>Recording on this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemanje na tem kanalu</translation>
     </message>
     <message>
         <source>Recording one showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemanje ene oddaje</translation>
     </message>
     <message>
         <source>Not allowed to record this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Te oddaje ni dovoljeno snemati</translation>
     </message>
     <message>
         <source>Recording a showing daily</source>
-        <translation type="unfinished"></translation>
+        <translation>Dnevno snemanje oddaje</translation>
     </message>
     <message>
         <source>Recording a showing weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>Tedensko snemanje oddaje</translation>
     </message>
     <message>
         <source>Recording %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>snemanje %1 od %2</translation>
     </message>
 </context>
 <context>
@@ -4731,1328 +4731,1332 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>(New Channel)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Novi kanal)</translation>
     </message>
     <message>
         <source>star</source>
-        <translation type="unfinished"></translation>
+        <translation>zvezdica</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Naslov</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Opis</translation>
     </message>
     <message>
         <source>Part %1 of %2, </source>
-        <translation type="unfinished"></translation>
+        <translation>Del %1 od %2, </translation>
     </message>
     <message>
         <source>HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation>HDTV</translation>
     </message>
     <message>
         <source>CC</source>
         <comment>Close Captioned</comment>
-        <translation type="unfinished">CC</translation>
+        <translation>CC</translation>
     </message>
     <message>
         <source>Subtitled</source>
-        <translation type="unfinished"></translation>
+        <translation>Podnaslov</translation>
     </message>
     <message>
         <source>Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>Stereo</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorija</translation>
     </message>
     <message>
         <source>Type</source>
         <comment>category_type</comment>
-        <translation type="unfinished">Tip</translation>
+        <translation>Tip</translation>
     </message>
     <message>
         <source>Episode Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Št. serije</translation>
     </message>
     <message>
         <source>Original Airdate</source>
-        <translation type="unfinished"></translation>
+        <translation>Originalni datum predvajanja</translation>
     </message>
     <message>
         <source>Program ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID programa</translation>
     </message>
     <message>
         <source>Actors</source>
-        <translation type="unfinished"></translation>
+        <translation>Igralci</translation>
     </message>
     <message>
         <source>Guest Star</source>
-        <translation type="unfinished"></translation>
+        <translation>Igra še</translation>
     </message>
     <message>
         <source>Director</source>
-        <translation type="unfinished"></translation>
+        <translation>Režiser</translation>
     </message>
     <message>
         <source>Filesize</source>
-        <translation type="unfinished"></translation>
+        <translation>Velikost datoteke</translation>
     </message>
     <message>
         <source>Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemalna skupina</translation>
     </message>
     <message>
         <source>Stop recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustavi snemanje</translation>
     </message>
     <message>
         <source>Commercial Flag new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Označi reklame novim snemanjem</translation>
     </message>
     <message>
         <source>Do not Commercial Flag new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne označi reklam novim snemanjem</translation>
     </message>
     <message>
         <source>Run &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Zagon &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Do not run &apos;%1&apos; for new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne zaženi &apos;%1&apos; za nova snemanja</translation>
     </message>
     <message>
         <source>The horizontal offset the GUI will be displayed at.  May only work if run in a window.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horizintalni offset GUI-a.  Lahko da ne bo delovalo, če teče v oknu.</translation>
     </message>
     <message>
         <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichrome Chipset</source>
-        <translation type="unfinished"></translation>
+        <translation>Omogoči uporabo viaXvMC HW Mpeg dekodiranja za Via čipovje</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
-        <translation type="unfinished"></translation>
+        <translation>Če potrebno prilagodi video</translation>
     </message>
     <message>
         <source>If checked, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če omogočeno, bo video prilagojen za vaš zaslon. Če onemogočeno, se videa ne bo dalo povečati.</translation>
     </message>
     <message>
         <source>Frames to skip in fullscreen mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Izpust okvirjev v celozaslonskem načinu</translation>
     </message>
     <message>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prikazan video v celozaslonskem načinu ali ne-okenskem načinu bo izpuščal okvirje. Nastavi na 0 za prikaz vseh okvirjev. Veljavno le v primeru, kadar sta omogočeni možnosti &quot;uporabi GUI velikost za predvajanje TV&quot; ali &quot;Poženi frontend v oknu&quot;.</translation>
     </message>
     <message>
         <source>Video in main window</source>
-        <translation type="unfinished"></translation>
+        <translation>Video v glavnem oknu</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če omogočeno, bo video prikazan v glavnem oknu. Onemogoči kadar želiš video na namizju ali v lebdečem oknu. Veljavno le v primeru, kadar sta omogočeni možnosti &quot;uporabi GUI velikost za predvajanje TV&quot; in &quot;Poženi frontend v oknu&quot;.</translation>
     </message>
     <message>
         <source>Frames to skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Izpuščanje okvirjev</translation>
     </message>
     <message>
         <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video v glavnem oknu bo izpuščal okvirje. Nastavi na 0 za prikaz vseh okvirjev.</translation>
     </message>
     <message>
         <source>Opacity</source>
-        <translation type="unfinished"></translation>
+        <translation>Prozornost</translation>
     </message>
     <message>
         <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prozornost glavnega okna. Nastavi na 100 za neprozornost in 0 za popolno prozornost.</translation>
     </message>
     <message>
         <source>Video in floating window</source>
-        <translation type="unfinished"></translation>
+        <translation>Video v lebdečem oknu</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če omogočeno, bo video prikazan v lebdečem oknu. Veljavno le v primeru, kadar sta omogočeni možnosti &quot;uporabi GUI velikost za predvajanje TV&quot; in &quot;Poženi frontend v oknu&quot;.</translation>
     </message>
     <message>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video v lebdečem oknu bo izpuščal okvirje. 0 za prikaz vseh okvirjev.</translation>
     </message>
     <message>
         <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prozornost lebdečega okna. 100 za neprozornost in 0 za popolno transparentnost.</translation>
     </message>
     <message>
         <source>Video in the dock</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaklenjen video</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če omogočeno, bo video prikazan v zaklenjeni ikoni aplikacije. Veljavno le v primeru, kadar sta omogočeni možnosti &quot;uporabi GUI velikost za predvajanje TV&quot; in &quot;Poženi frontend v oknu&quot;.</translation>
     </message>
     <message>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video v zaklenjeni ikoni bo izpuščal okvirje. Nastavi na 0 za prikaz vseh okvirjev.</translation>
     </message>
     <message>
         <source>Video on the desktop</source>
-        <translation type="unfinished"></translation>
+        <translation>Video na namizju</translation>
     </message>
     <message>
         <source>If checked, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če omogočeno, bo video prikazan na namizju, za vsemi ikonami. Veljavno le v primeru, kadar sta omogočeni možnosti &quot;uporabi GUI velikost za predvajanje TV&quot; in &quot;Poženi frontend v oknu&quot;.</translation>
     </message>
     <message>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video na namizju bo izpuščal okvirje. Nastavi na 0 za prikaz vseh okvirjev.</translation>
     </message>
     <message>
         <source>Mac OS X video settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Mac OS X video nastavitve</translation>
     </message>
     <message>
         <source>Machine Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Status računalnika</translation>
     </message>
     <message>
         <source>Machine Status shows some operating system statistics of this machine</source>
-        <translation type="unfinished"></translation>
+        <translation>Status prikaže nekatere statistične podatke o računalniku</translation>
     </message>
     <message>
         <source>and the MythTV server</source>
-        <translation type="unfinished"></translation>
+        <translation>in MythTv strežniku</translation>
     </message>
     <message>
         <source>used</source>
-        <translation type="unfinished"></translation>
+        <translation>uporabljeno</translation>
     </message>
     <message>
         <source>free</source>
-        <translation type="unfinished"></translation>
+        <translation>prosto</translation>
     </message>
     <message>
         <source>Uptime</source>
-        <translation type="unfinished"></translation>
+        <translation>Čas delovanja</translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistem</translation>
     </message>
     <message>
         <source>This machine</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta računalnik</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Naloženo</translation>
     </message>
     <message>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>neznano</translation>
     </message>
     <message>
         <source>failed</source>
-        <translation type="unfinished"></translation>
+        <translation>napaka</translation>
     </message>
     <message>
         <source>RAM</source>
-        <translation type="unfinished"></translation>
+        <translation>RAM</translation>
     </message>
     <message>
         <source>Swap</source>
-        <translation type="unfinished"></translation>
+        <translation>Swap</translation>
     </message>
     <message>
         <source>MythTV server</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV strežnik</translation>
     </message>
     <message>
         <source>Disk space:</source>
-        <translation type="unfinished"></translation>
+        <translation>Prostor na disku:</translation>
     </message>
     <message>
         <source>Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemanja</translation>
     </message>
     <message>
         <source>DB error - RecordFilePrefix unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>DB napaka - RecordFilePrefix neznana</translation>
     </message>
     <message>
         <source>TV buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>TV predpolnilnik</translation>
     </message>
     <message>
         <source>DB error - LiveBufferDir unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>DB napaka -  LiveBufferDir neznan</translation>
     </message>
     <message>
         <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation type="unfinished"></translation>
+        <translation>Želite pred začetkom nastavitev izbrisati vse nastavitve kartic za zajem?</translation>
     </message>
     <message>
         <source>No, leave my card settings alone</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne, pusti kartice pri miru</translation>
     </message>
     <message>
         <source>Yes, delete my card settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Da, briši nastavitve kartic</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Uporabi poljubno identiteto za preference frontenda</translation>
     </message>
     <message>
         <source>Wake-On-LAN settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Wake-On-LAN nastavitve</translation>
     </message>
     <message>
         <source>Database Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfiguracija baze</translation>
     </message>
     <message>
         <source>All database settings take effect when you restart this program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vse bazne nastavitve pridejo v veljavo po ponovnem zagonu programa.</translation>
     </message>
     <message>
         <source>Myth could not connect to the database. Please verify your database settings below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth se ni mogel povezati k bazi. Prosim preverite spodnje nastavitve baze.</translation>
     </message>
     <message>
         <source>Host name</source>
-        <translation type="unfinished"></translation>
+        <translation>Domena</translation>
     </message>
     <message>
         <source>The host name or IP address of the machine hosting the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Domena ali IP naslov računalnika, ki ponuja bazo. Info je potreben.</translation>
     </message>
     <message>
         <source>Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Baza</translation>
     </message>
     <message>
         <source>The name of the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ime baze. Info je potreben.</translation>
     </message>
     <message>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>Uporabnik</translation>
     </message>
     <message>
         <source>The user name to use while connecting to the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uporabniško ime za povezavo k bazi. Info je potreben.</translation>
     </message>
     <message>
         <source>The password to use while connecting to the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geslo za povezavo k bazi. Info je potreben.</translation>
     </message>
     <message>
         <source>Database type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tip baze</translation>
     </message>
     <message>
         <source>MySQL</source>
-        <translation type="unfinished"></translation>
+        <translation>MySQL</translation>
     </message>
     <message>
         <source>The database implementation used for your server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Implementacija baze uporabljena na vašem strežniku.</translation>
     </message>
     <message>
         <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če se domena frontenda pogosto menjuje, označite to okence in vnesite unikatno ime za identifikacijo. Če neoznačeno, bo za shranjevanje nastavitev v bazo uporabljeno ime računalnika.</translation>
     </message>
     <message>
         <source>Custom identifier</source>
-        <translation type="unfinished"></translation>
+        <translation>Poljubni identifikator</translation>
     </message>
     <message>
         <source>An identifier to use while saving the settings for this frontend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Identifikator uporabljen med shranjevanjem nastavitev frontenda.</translation>
     </message>
     <message>
         <source>Use Wake-On-LAN to wake database</source>
-        <translation type="unfinished"></translation>
+        <translation>Uporabi Wake-On-LAN za zbujanje baze</translation>
     </message>
     <message>
         <source>If checked, the frontend will use Wake-On-LAN parameters to reconnect to the database server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če omogočeno, bo frontend uporabil Wake-On-LAN parametre za povezavo k strežniku z bazo.</translation>
     </message>
     <message>
         <source>Reconnect time</source>
-        <translation type="unfinished"></translation>
+        <translation>Čas ponovne povezave</translation>
     </message>
     <message>
         <source>The time in seconds to wait for the server to wake up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Čas vzbujevanja strežnika, v sekundah.</translation>
     </message>
     <message>
         <source>Retry attempts</source>
-        <translation type="unfinished"></translation>
+        <translation>Ponovni poizkusi</translation>
     </message>
     <message>
         <source>The number of retries to wake the server before the frontend gives up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Število ponovnih poizkusov vzbujevanja strežnika, preden frontend odneha.</translation>
     </message>
     <message>
         <source>Wake command</source>
-        <translation type="unfinished"></translation>
+        <translation>Vzbujevalni ukaz</translation>
     </message>
     <message>
         <source>The command executed on this frontend to wake up the database server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukaz izvršen za vzbujanje strežnika z bazo.</translation>
     </message>
     <message>
         <source>%1% Completed @ %2 fps.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1% Končano @ %2 fps.</translation>
     </message>
     <message>
         <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="unfinished"></translation>
+        <translation>Neprepreteni algoritem. &apos;Jedro&apos; potrebuje SSE. &apos;Bob&apos; potrebuje Xv ali XvMC video izhod.</translation>
     </message>
     <message>
         <source>Enable gamma correction for video</source>
-        <translation type="unfinished"></translation>
+        <translation>Omogoči poravek svetilnosti videa</translation>
     </message>
     <message>
         <source>If checked, QuickTime will correct the gamma of the video to match your monitor.  Turning this off can save some CPU cycles.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če omogočeno, bo Quickime popravil svetilnost gledanega videa.  Če izklopite boste prihranili nekaj procesorske moči.</translation>
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>uporabi Altivec-napredno barvno pretvorbo</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če omogočeno, bo YUV 4:2:0 pretvorjen v UYVY 4:2:2.  Če neomogočeno, bo pretvorbo napravil QuickTime.</translation>
     </message>
     <message>
         <source>Recording Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Gostitelj snemanja</translation>
     </message>
     <message>
         <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Želite pred začetkom nastavitev izbrisati vse nastavitve podatkov in kanalov? Ne bo vplivalo na obstoječa snemanja.</translation>
     </message>
     <message>
         <source>No, leave my channel settings alone</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne, pusti kanale pri miru</translation>
     </message>
     <message>
         <source>Yes, delete my channel settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Da, izbriši nastavitve kanalov</translation>
     </message>
     <message>
         <source>Scan for channels(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Iskanje kanalov</translation>
     </message>
     <message>
         <source>This button will scan for digital channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta gumb prične iskanje digitalnih kanalov.</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Napredno</translation>
     </message>
     <message>
         <source>Advanced editing options for digital channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Napredno urejanje možnosti za digitalne kanale</translation>
     </message>
     <message>
         <source>Use on air guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Uporabi vodiča &quot;po zraku&quot;</translation>
     </message>
     <message>
         <source>If set the guide information will be taken from the On Air Channel guide.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če nastavljeno bodo informacije za vodiča vzete od vodiča &quot;po zraku&quot;.</translation>
     </message>
     <message>
         <source>Unable to initialize video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nisem mogel preizkusiti videa.</translation>
     </message>
     <message>
         <source>Error was encountered while displaying video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Med predvajanjem videa se je pojavila napaka.</translation>
     </message>
     <message>
         <source>Return to Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Vrnitev na menu</translation>
     </message>
     <message>
         <source>Searching for Logo</source>
-        <translation type="unfinished"></translation>
+        <translation>Iskanje logotipa</translation>
     </message>
     <message>
         <source>Single Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Enojno snemanje</translation>
     </message>
     <message>
         <source>Record Daily</source>
-        <translation type="unfinished"></translation>
+        <translation>Dnevno snemanje</translation>
     </message>
     <message>
         <source>Record Weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>Tedensko snemanje</translation>
     </message>
     <message>
         <source>Channel Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalno snemanje</translation>
     </message>
     <message>
         <source>Record All</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemaj vse</translation>
     </message>
     <message>
         <source>Find One</source>
-        <translation type="unfinished"></translation>
+        <translation>Najdi eno</translation>
     </message>
     <message>
         <source>Find Daily</source>
-        <translation type="unfinished"></translation>
+        <translation>Najdi dnevno</translation>
     </message>
     <message>
         <source>Find Weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>Najdi tedensko</translation>
     </message>
     <message>
         <source>Previously Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Že posneto</translation>
     </message>
     <message>
         <source>Currently Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Trenutno snemanje</translation>
     </message>
     <message>
         <source>Inactive</source>
-        <translation type="unfinished"></translation>
+        <translation>Neaktivno</translation>
     </message>
     <message>
         <source>this recording schedule is inactive.</source>
-        <translation type="unfinished"></translation>
+        <translation>ta plan snemanja je neaktiven.</translation>
     </message>
     <message>
         <source>Find ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Najdi ID</translation>
     </message>
     <message>
         <source>6 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation>6 MHz</translation>
     </message>
     <message>
         <source>7 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation>7 MHz</translation>
     </message>
     <message>
         <source>8 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation>8 MHz</translation>
     </message>
     <message>
         <source>Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Promet</translation>
     </message>
     <message>
         <source>Capture Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Kartica za zajem</translation>
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished"></translation>
+        <translation>Iskanje</translation>
     </message>
     <message>
         <source>Scan Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivnost iskanja</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemaj eno oddajo tega naslova</translation>
     </message>
     <message>
         <source>Record one showing of this title every week</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemaj eno oddajo tega naslova vsak teden</translation>
     </message>
     <message>
         <source>Record one showing of this title every day</source>
-        <translation type="unfinished"></translation>
+        <translation>Snemaj eno oddajo tega naslova vsak dan</translation>
     </message>
     <message>
         <source>This recording schedule is inactive</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta plan snemanja je neaktiven</translation>
     </message>
     <message>
         <source>This recording schedule is active</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta plan snemanja je aktiven</translation>
     </message>
     <message>
         <source>Delete oldest if this would exceed the max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Če se bo preseglo število maksimalnik serij, briši najstarejše</translation>
     </message>
     <message>
         <source>Record in TS format instead of PS.</source>
-        <translation type="unfinished"></translation>
+        <translation>Namesto v PS snemaj v TS formatu.</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Onemogoču promet toka v pretvorbi toka programskega toka. TS snemanje naredi večje datoteke, ampak zmanjša možnost napak.</translation>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC Tip vhoda: (DVB-S)</translation>
     </message>
     <message>
         <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Izberi tip vhoda za DVB-S kartice. Pusti na Enojni LNB/Vhod za DVB-C ali DVB-T. Vhodi so mapirani iz možnosti vhodnih povezav v glavnem menuju</translation>
     </message>
     <message>
         <source>pcHDTV capture card (HD-2000, HD-3000)</source>
-        <translation type="unfinished"></translation>
+        <translation>pcHDTV kartica za zajem (HD-2000, HD-3000)</translation>
     </message>
     <message>
         <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation type="unfinished"></translation>
+        <translation>Definirana frekvenca (v Hz) pri kateri se bodo nastavitve za NLB preklopile iz visokin na nizke in obratno.</translation>
     </message>
     <message>
         <source>This defines the offset (in Hz) the frequency coming from the lnb will be in high setting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Definiran zamik (v Hz) frekvence prihajajoče iz LNB, visoke nastavitve.</translation>
     </message>
     <message>
         <source>This defines the offset (in Hz) the frequency coming from the lnb will be in low setting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Definiran zamik (v Hz) frekvence prihajajoče iz LNB, nizke nastavitve.</translation>
     </message>
     <message>
         <source>DiSEqC Satellite Location</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokacija DiSEqC satelita</translation>
     </message>
     <message>
         <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zemljepisna dolžina ciljnega satelita.  Za zahodno hemisfero uporabite negativno vrednost.  Vrednost je kot decimalka.</translation>
     </message>
     <message>
         <source>Free to air channels only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanali samo &quot;po zraku&quot;.</translation>
     </message>
     <message>
         <source>If set, only free to air channels will be used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če nastavljeno, bodo uporabljeni samo kanali &quot;po zraku&quot;.</translation>
     </message>
     <message>
         <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Zemljepisna širina vašega satelitskega krožnika na zemlji.  Uporabljeno za DiSEqC podporo.  Format 35.78 za 35.78 stopinj severne zemljepisne širine</translation>
     </message>
     <message>
         <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Zemljepisna dolžina vašega satelitskega krožnika na zemlji.  Uporabljeno za DiSEqC podporo.  Format -78.93 za 78.93 stopinj severne zemljepisne dolžine</translation>
     </message>
     <message>
         <source>Diseqc Options</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC Možnosti</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished">Vsi</translation>
+        <translation>Vsi</translation>
     </message>
     <message>
         <source>Use libmpeg2 for decoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Za dekodiranje uporabi libmpeg2</translation>
     </message>
     <message>
         <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če omogočeno bo namesto ffmpeg dekodiranja MPEG-1 in MPEG-2 videa uporabljen libmpeg2. Bo hitreje. Ni na voljo kadar je v uporabi XvMC.</translation>
     </message>
     <message>
         <source>4/3</source>
-        <translation type="unfinished">4/3</translation>
+        <translation>4/3</translation>
     </message>
     <message>
         <source>16/9</source>
-        <translation type="unfinished">16/9</translation>
+        <translation>16/9</translation>
     </message>
     <message>
         <source>16/9 Stretch</source>
-        <translation type="unfinished">16/9 raztegni</translation>
+        <translation>16/9 raztegni</translation>
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
-        <translation type="unfinished"></translation>
+        <translation>To bo spremenilo vsa razmerja slike pri snemanjih, isto kot pritisk tipke W, med predvajanjem. &quot;Zapolnilo&quot; bo okno, uporabno pri predvajanju videa v 4:3 razmerju na TV.</translation>
     </message>
     <message>
         <source>HD Ringbuffer size (KB)</source>
-        <translation type="unfinished"></translation>
+        <translation>HD velikost krožnega predpolnilnika (KB)</translation>
     </message>
     <message>
         <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
-        <translation type="unfinished"></translation>
+        <translation>Krožni predpolnilnik HD naprave, dopušča opravljanje mythbackenda v stresnem delovanju. Večji kot je predpolnilnik, dalši so lahko stresni trenutki. Prevelika vrednost pa lahko povzroči sesutje.</translation>
     </message>
     <message>
         <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Najdi eno, najdi tedensko in najdi dnevno tipom snemanja bo dodeljena dodatna prioritetna vrednost. </translation>
     </message>
     <message>
         <source>Follow symbolic links when deleting files</source>
-        <translation type="unfinished"></translation>
+        <translation>Med brisanjem datotek sledi simbolnim povezavam</translation>
     </message>
     <message>
         <source>Sort Episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Uredi serije</translation>
     </message>
     <message>
         <source>Record date</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum snemanja</translation>
     </message>
     <message>
         <source>Selects how to sort a shows episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Izberite vrsto urejanja prikazanih episod</translation>
     </message>
     <message>
         <source>S</source>
         <comment>RecTypeChar kSingleRecord</comment>
-        <translation type="unfinished">S</translation>
+        <translation>S</translation>
     </message>
     <message>
         <source>T</source>
         <comment>RecTypeChar kTimeslotRecord</comment>
-        <translation type="unfinished">T</translation>
+        <translation>T</translation>
     </message>
     <message>
         <source>W</source>
         <comment>RecTypeChar kWeekslotRecord</comment>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecTypeChar kChannelRecord</comment>
-        <translation type="unfinished">C</translation>
+        <translation>C</translation>
     </message>
     <message>
         <source>A</source>
         <comment>RecTypeChar kAllRecord</comment>
-        <translation type="unfinished">A</translation>
+        <translation>A</translation>
     </message>
     <message>
         <source>F</source>
         <comment>RecTypeChar kFindOneRecord</comment>
-        <translation type="unfinished">F</translation>
+        <translation>F</translation>
     </message>
     <message>
         <source>d</source>
         <comment>RecTypeChar kFindDailyRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>d</translation>
     </message>
     <message>
         <source>w</source>
         <comment>RecTypeChar kFindWeeklyRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>w</translation>
     </message>
     <message>
         <source>O</source>
         <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
-        <translation type="unfinished">O</translation>
+        <translation>O</translation>
     </message>
     <message>
         <source>D</source>
         <comment>RecStatusChar rsDeleted</comment>
-        <translation type="unfinished">D</translation>
+        <translation>D</translation>
     </message>
     <message>
         <source>S</source>
         <comment>RecStatusChar rsStopped</comment>
-        <translation type="unfinished">S</translation>
+        <translation>S</translation>
     </message>
     <message>
         <source>R</source>
         <comment>RecStatusChar rsRecorded</comment>
-        <translation type="unfinished">R</translation>
+        <translation>R</translation>
     </message>
     <message>
         <source>X</source>
         <comment>RecStatusChar rsDontRecord</comment>
-        <translation type="unfinished">X</translation>
+        <translation>X</translation>
     </message>
     <message>
         <source>P</source>
         <comment>RecStatusChar rsPreviousRecording</comment>
-        <translation type="unfinished">P</translation>
+        <translation>P</translation>
     </message>
     <message>
         <source>R</source>
         <comment>RecStatusChar rsCurrentRecording</comment>
-        <translation type="unfinished">R</translation>
+        <translation>R</translation>
     </message>
     <message>
         <source>r</source>
         <comment>RecStatusChar rsRepeat</comment>
-        <translation type="unfinished">r</translation>
+        <translation>r</translation>
     </message>
     <message>
         <source>E</source>
         <comment>RecStatusChar rsEarlierShowing</comment>
-        <translation type="unfinished">E</translation>
+        <translation>E</translation>
     </message>
     <message>
         <source>T</source>
         <comment>RecStatusChar rsTooManyRecordings</comment>
-        <translation type="unfinished">T</translation>
+        <translation>T</translation>
     </message>
     <message>
         <source>N</source>
         <comment>RecStatusChar rsCancelled</comment>
-        <translation type="unfinished">N</translation>
+        <translation>N</translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecStatusChar rsConflict</comment>
-        <translation type="unfinished">C</translation>
+        <translation>C</translation>
     </message>
     <message>
         <source>L</source>
         <comment>RecStatusChar rsLaterShowing</comment>
-        <translation type="unfinished">L</translation>
+        <translation>L</translation>
     </message>
     <message>
         <source>K</source>
         <comment>RecStatusChar rsLowDiskSpace</comment>
-        <translation type="unfinished">K</translation>
+        <translation>K</translation>
     </message>
     <message>
         <source>B</source>
         <comment>RecStatusChar rsTunerBusy</comment>
-        <translation type="unfinished">B</translation>
+        <translation>B</translation>
     </message>
     <message>
         <source>x</source>
         <comment>RecStatusChar rsInactive</comment>
-        <translation type="unfinished"></translation>
+        <translation>x</translation>
     </message>
     <message>
         <source>Firewire Model</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire model</translation>
     </message>
     <message>
         <source>Firewire Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire port</translation>
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire port na vaši napravi.</translation>
     </message>
     <message>
         <source>Firewire Node</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire node</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire node je oddaljena naprava.</translation>
     </message>
     <message>
         <source>Firewire Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire hitrost</translation>
     </message>
     <message>
         <source>100Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>100Mbps</translation>
     </message>
     <message>
         <source>200Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>200Mbps</translation>
     </message>
     <message>
         <source>400Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>400Mbps</translation>
     </message>
     <message>
         <source>Default Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Privzeti vhod</translation>
     </message>
     <message>
         <source>Only MPEG2TS is supported at this time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Trenutno je podprt samo MPEG2TS.</translation>
     </message>
     <message>
         <source>FireWire Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire vhod</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Dovoli preskok kanalov v vodiču</translation>
     </message>
     <message>
         <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če omogočeno, boste lahko s pritiskom na številko spremenili kanal.</translation>
     </message>
     <message>
         <source>Select your preferred language</source>
-        <translation type="unfinished"></translation>
+        <translation>Izberite priljubljeni jezik</translation>
     </message>
     <message>
         <source>Frequency (Option has no default)
 The frequency for this channel in Hz.</source>
-        <translation type="unfinished"></translation>
+        <translation>Frekvenca (možnost nima privzete vrednosti)
+Frekvenca kanala v Hz.</translation>
     </message>
     <message>
         <source>Symbol Rate (Option has no default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Simbolno razmerje (možnost nima privzete vrednosti)</translation>
     </message>
     <message>
         <source>Polarity (Option has no default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Polariteta (možnost nima privzete vrednosti)</translation>
     </message>
     <message>
         <source>Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inverzija (Privzeto: Avto):
+Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo.</translation>
     </message>
     <message>
         <source>Bandwidth (Default: Auto)
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Pasovna širina (Privzeto: Avto)
+</translation>
     </message>
     <message>
         <source>Modulation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Modulacija (Privzeto: Avto)</translation>
     </message>
     <message>
         <source>Constellation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sozvezdje (Privzeto: Avto)</translation>
     </message>
     <message>
         <source>Forward Error Correction (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Napredno odpravljanje napak (Privzeto: Avto)</translation>
     </message>
     <message>
         <source>Low Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Nizko prioritetno kodno razmerje (Privzeto: Avto)</translation>
     </message>
     <message>
         <source>High Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Visoko prioritetno kodno razmerje (Privzeto: Avto)</translation>
     </message>
     <message>
         <source>Guard Interval (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Varnostni interval (Privzeto: Avto)</translation>
     </message>
     <message>
         <source>Transmission Mode (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Način oddajanja (Privzeto: Avto)</translation>
     </message>
     <message>
         <source>Hierarchy (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hierarhija (Privzeto: Avto)</translation>
     </message>
     <message>
         <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire model je za prihodnjo uporabo, v primeru posebnih nastavitev naprav.</translation>
     </message>
     <message>
         <source>CPU friendly preview of recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>CPU prijazno predvajanje snemanj</translation>
     </message>
     <message>
         <source>When enabled, recording previews will play with reduced FPS to save CPU.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kadar omogočeno, bodo snemanja predvajana z zmanjšanim FPS.</translation>
     </message>
     <message>
         <source>Menu Pop-up Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Čas prikazovanja Menuja</translation>
     </message>
     <message>
         <source>The time (in seconds) that the menu will remain visible after navigation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Koliko časa  (v sek) bo viden menu, po končani navigaciji.</translation>
     </message>
     <message>
         <source>Enable realtime priority threads</source>
-        <translation type="unfinished"></translation>
+        <translation>Omogoči realno-časovno prioritetno nitnost </translation>
     </message>
     <message>
         <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kadar poganjate mythfrontend z pravicami super uporabnika, se lahko določenim nitim določi dodatna prioriteta. Če mythfrontend med predvajanjem zmrzuje, onemogočite to možnost.</translation>
     </message>
     <message>
         <source>Enable LCD device</source>
-        <translation type="unfinished"></translation>
+        <translation>Omogoči LCD napravo</translation>
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uporaba LCD naprave, za predvajanje informacij o MythTV statusu. Za (de)aktivacijo potrebuje ponovni zagon mythfrontenda.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>teglobalne nastavitve omogočijo predčasen začetek snemanja. Ne vplivajo na sam plan. Ingorirajo se v primeru, kadar sta bili splanirani sve snemanji, brez zadostnega časa med njima.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>teglobalne nastavitve omogočijo kasnejše končanje snemanja. Ne vplivajo na sam plan. Ingorirajo se v primeru, kadar sta bili splanirani sve snemanji, brez zadostnega časa med njima.</translation>
     </message>
     <message>
         <source>Resize Video while transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Med transkodiranjem raztegni video</translation>
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation type="unfinished"></translation>
+        <translation>Absolutno ne snemaj</translation>
     </message>
     <message>
         <source>Firewire Connection Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tip firewire povezave</translation>
     </message>
     <message>
         <source>Point to Point</source>
-        <translation type="unfinished"></translation>
+        <translation>Point to Point</translation>
     </message>
     <message>
         <source>Broadcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Oddajanje</translation>
     </message>
     <message>
         <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation>Uporabi Mpeg-4 kodiranje (Plextor ConvertX, itd)</translation>
     </message>
     <message>
         <source>Original Air date</source>
-        <translation type="unfinished"></translation>
+        <translation>Originalni datum predvajanja</translation>
     </message>
     <message>
         <source>TV audio through PVR-350 only</source>
-        <translation type="unfinished"></translation>
+        <translation>TV zvok samo čez PVR-350</translation>
     </message>
     <message>
         <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Normalno je zvok PVR-350 povezan na zvočno kartico, tukaj pa definirate, če ni tako. Kadar je ta možnost omogočena MythTV ne more kontrolirati glasnosti.</translation>
     </message>
     <message>
         <source>Building Detection Buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>Detektor grajenja predpolnilnika</translation>
     </message>
     <message>
         <source>%1 Frames Completed @ %2 fps.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 okvirjev končano @ %2 fps.</translation>
     </message>
     <message>
         <source>Terrestrial</source>
-        <translation type="unfinished"></translation>
+        <translation>Zemeljski</translation>
     </message>
     <message>
         <source>Cable</source>
-        <translation type="unfinished"></translation>
+        <translation>Kabeljski</translation>
     </message>
     <message>
         <source>ATSC Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC promet</translation>
     </message>
     <message>
         <source>ATSC transport, cable or terrestrial</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC promet, kabeljski ali zemeljski</translation>
     </message>
     <message>
         <source>Use hardware MPEG decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Uporabi strojno MPEG dekodiranje</translation>
     </message>
     <message>
         <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
-        <translation type="unfinished"></translation>
+        <translation>Če ima vaša DVB kartica vgrajen MPEG dekodirnik, ga lahko tukaj aktivirate. (Samo za določene kartice &amp; nekatere USB naprave).</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
-        <translation type="unfinished"></translation>
+        <translation>V Myth-u skrij miškin kurzor</translation>
     </message>
     <message>
         <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Spremeni vidljivost miškinega kurzorja. Večina gumbov v Myth-u ne reagira na klike, uporabljeno samo za preprečitev izgube kurzorja.</translation>
     </message>
     <message>
         <source>Job Queue Start Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Začetni čas čakanja opravila</translation>
     </message>
     <message>
         <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta nastavitve kontrolira začetni čas čakanja opravila. Okno katero določi začetek opravila.</translation>
     </message>
     <message>
         <source>Job Queue End Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Končni čas čakanja opravila</translation>
     </message>
     <message>
         <source>This setting controls the end of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta nastavitve kontrolira končni čas čakanja opravila. Okno katero določi začetek opravila.</translation>
     </message>
     <message>
         <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
-        <translation type="unfinished"></translation>
+        <translation>Pred označevanjem reklam poženi trenskodirna opravila</translation>
     </message>
     <message>
         <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Če nastavljeno in če sta vklopljeni obe možnosti, avto-transkodiranje in avto-označevanje reklam, bo transkodiranje aktivirano prej, drugače pa bo prej zagnano označevanje reklam.</translation>
     </message>
     <message>
         <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
-        <translation type="unfinished"></translation>
+        <translation>Po začetku snemanj, zaženi avtomatsko označevanje reklam</translation>
     </message>
     <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
-        <translation type="unfinished"></translation>
+        <translation>Če nastavljeno in je za snemanje omogočeno avtomatsko označevanje reklam, se bo označevanje začelo takoj po pričetku snemanje.  Ni primerno za šibkejše sisteme</translation>
     </message>
     <message>
         <source>Job Queue (Job Commands)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vrsta opravil (opravilni ukazi)</translation>
     </message>
     <message>
         <source>Bad Menu File</source>
-        <translation type="unfinished"></translation>
+        <translation>Slaba menu datoteka</translation>
     </message>
     <message>
         <source>No Menu File</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu datoteka ne obstaja</translation>
     </message>
     <message>
         <source>Timed out waiting for signal.</source>
-        <translation type="unfinished"></translation>
+        <translation>Potekel je čas čakanja signala.</translation>
     </message>
     <message>
         <source>Signal Locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Signal zaklenjen</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Ni zaklenjen</translation>
     </message>
     <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
-        <translation type="unfinished"></translation>
+        <translation>Ta del prikaže vsak promet MythTv-ja. Prikazana polja so Frekvenca, Simbolno razmerje, ID omrežja in ID prometa </translation>
     </message>
     <message>
         <source>Standard</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <source>Digital TV standard.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Standard digitalne TV.
+</translation>
     </message>
     <message>
         <source>DVB</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB</translation>
     </message>
     <message>
         <source>ATSC</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC</translation>
     </message>
     <message>
         <source>Modulation Used</source>
-        <translation type="unfinished"></translation>
+        <translation>Uporabljena modulacija</translation>
     </message>
     <message>
         <source>8VSB</source>
-        <translation type="unfinished"></translation>
+        <translation>8VSB</translation>
     </message>
     <message>
         <source>QAM64</source>
-        <translation type="unfinished"></translation>
+        <translation>QAM64</translation>
     </message>
     <message>
         <source>QAM256</source>
-        <translation type="unfinished"></translation>
+        <translation>QAM256</translation>
     </message>
     <message>
         <source>Bandwidth (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasovna širina (Privzeto: Avto)</translation>
     </message>
     <message>
         <source>DVB Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB promet</translation>
     </message>
     <message>
         <source>Transport Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Možnosti prometa</translation>
     </message>
     <message>
         <source>Skipping Back.</source>
-        <translation type="unfinished"></translation>
+        <translation>Izpuščanje nazaj.</translation>
     </message>
     <message>
         <source>Default Auto Commercial Flagging setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Privzete nastavitve označevanja reklam</translation>
     </message>
     <message>
         <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>TO so privzete vrednosti uporabljene za označevanje reklam, kadar je ustvarjen plan snemanja.</translation>
     </message>
     <message>
         <source>Default &apos;Run User Job #1&apos; setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Privzeta nastavitev &apos;Poženi uporabniško opravilo #1&apos; </translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>TO so privzete vrednosti &apos;Poženi uporabniško opravilo #1&apos; , kadar je ustvarjen plan snemanja.</translation>
     </message>
     <message>
         <source>Default &apos;Run User Job #2&apos; setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Privzeta nastavitev &apos;Poženi uporabniško opravilo #2&apos; </translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #2&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>TO so privzete vrednosti &apos;Poženi uporabniško opravilo #2&apos; , kadar je ustvarjen plan snemanja.</translation>
     </message>
     <message>
         <source>Default &apos;Run User Job #3&apos; setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Privzeta nastavitev &apos;Poženi uporabniško opravilo #3&apos; </translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #3&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>TO so privzete vrednosti &apos;Poženi uporabniško opravilo #3&apos; , kadar je ustvarjen plan snemanja.</translation>
     </message>
     <message>
         <source>Default &apos;Run User Job #4&apos; setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Privzeta nastavitev &apos;Poženi uporabniško opravilo #4&apos; </translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>TO so privzete vrednosti &apos;Poženi uporabniško opravilo #4&apos; , kadar je ustvarjen plan snemanja.</translation>
     </message>
     <message>
         <source>Run on the specified screen or spanning all screens.</source>
-        <translation type="unfinished"></translation>
+        <translation>Poženi na določenem zaslonu ali raztegni vsa okna.</translation>
     </message>
     <message>
         <source>In X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
     <message>
         <source>Horizontal resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horizintalna resolucija videa, ki potrebuje posebne pogoje.</translation>
     </message>
     <message>
         <source>In Y</source>
-        <translation type="unfinished"></translation>
+        <translation>Y</translation>
     </message>
     <message>
         <source>Vertical resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikalna resolucija videa, ki potrebuje posebne pogoje.</translation>
     </message>
     <message>
         <source>GUI</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI</translation>
     </message>
     <message>
         <source>Resolution of screen when not watching a video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Resolucija zaslona, kadar se ne gleda TV.</translation>
     </message>
     <message>
         <source>Default screen resolution when watching a video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Privzeta resolucija zaslona, med gledanjem TV.</translation>
     </message>
     <message>
         <source>Screen resolution when watching a video at a specific resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Resolucija zaslona posebnega videa, med gledanjem TV.</translation>
     </message>
     <message>
         <source>Video Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Video izhod</translation>
     </message>
     <message>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Izhod</translation>
     </message>
     <message>
         <source>Default refresh rate when watching a video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Privzeto osveževanje videa med gledanjem.</translation>
     </message>
     <message>
         <source>Refresh rate when watching a video at a specific resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Privzeto osveževanje posebnega videa med gledanjem.</translation>
     </message>
     <message>
         <source>Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Razmerje</translation>
     </message>
     <message>
         <source>Aspect ratio when watching a video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Razmerje slike med gledanjem videa.</translation>
     </message>
     <message>
         <source>Aspect ration when watching a video at a specific resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Privzeto razmerje slike posebnega videa, med gledanjem.</translation>
     </message>
     <message>
         <source>Aspect</source>
-        <translation type="unfinished"></translation>
+        <translation>Razmerje</translation>
     </message>
     <message>
         <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Za uporabo razmerje monitorja, pusti &quot;Privzeto&quot;.  Nastavi na 16:9 ali 4:3 za drugo razmerje alike.</translation>
     </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Napredek iskanja</translation>
     </message>
     <message>
         <source>Tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Uglaševanje</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Prekliči</translation>
+        <translation>Prekliči</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tip iskanja</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished"></translation>
+        <translation>Iskanje</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Čarovnik iskanja</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Napaka prometa</translation>
     </message>
     <message>
         <source>Error detecting card type</source>
-        <translation type="unfinished"></translation>
+        <translation>Napaka v iskanju kartice</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Napaka pri predelavi podatkov</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardTuningPage</name>
     <message>
         <source>Tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Uglaševanje</translation>
     </message>
     <message>
         <source>Failed to open the card</source>
-        <translation type="unfinished"></translation>
+        <translation>Nisem mogel odpreti kartice</translation>
     </message>
     <message>
         <source>Failed to probe the card</source>
-        <translation type="unfinished"></translation>
+        <translation>Nisem mogel preizkusiti kartice</translation>
     </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
         <source>or later</source>
-        <translation type="unfinished"></translation>
+        <translation>ali pozneje</translation>
     </message>
 </context>
 <context>
@@ -6089,13 +6093,17 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <source>On %1 %2 from %3.%4
 %5
 %6</source>
-        <translation type="unfinished"></translation>
+        <translation>Na %1 %2 od %3.%4
+%5
+%6</translation>
     </message>
     <message>
         <source>On %1 %2 from %3.%4
 %5
 No other details</source>
-        <translation type="unfinished"></translation>
+        <translation>Na %1 %2 od %3.%4
+%5
+Ni ostalih podatkov</translation>
     </message>
 </context>
 <context>
@@ -6498,63 +6506,63 @@ No other details</source>
     </message>
     <message>
         <source>Time Stretch %1X</source>
-        <translation type="unfinished"></translation>
+        <translation>Časovni razpon %1X</translation>
     </message>
     <message>
         <source>Adjust Time Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>Spremeni časovni razteg</translation>
     </message>
     <message>
         <source>Adjust</source>
-        <translation type="unfinished"></translation>
+        <translation>Spremeni</translation>
     </message>
     <message>
         <source>0.5X</source>
-        <translation type="unfinished"></translation>
+        <translation>0.5X</translation>
     </message>
     <message>
         <source>0.9X</source>
-        <translation type="unfinished"></translation>
+        <translation>0.9X</translation>
     </message>
     <message>
         <source>1.0X</source>
-        <translation type="unfinished"></translation>
+        <translation>1.0X</translation>
     </message>
     <message>
         <source>1.1X</source>
-        <translation type="unfinished"></translation>
+        <translation>1.1X</translation>
     </message>
     <message>
         <source>1.5X</source>
-        <translation type="unfinished"></translation>
+        <translation>1.5X</translation>
     </message>
     <message>
         <source>Sleep</source>
-        <translation type="unfinished"></translation>
+        <translation>Mirovanje</translation>
     </message>
     <message>
         <source>Sleep Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Mirovanje izključeno</translation>
     </message>
     <message>
         <source>Fill</source>
-        <translation type="unfinished">Zapolni</translation>
+        <translation>Zapolni</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished">Izklop</translation>
+        <translation>Izklop</translation>
     </message>
     <message>
         <source>1.2X</source>
-        <translation type="unfinished"></translation>
+        <translation>1.2X</translation>
     </message>
     <message>
         <source>1.3X</source>
-        <translation type="unfinished"></translation>
+        <translation>1.3X</translation>
     </message>
     <message>
         <source>1.4X</source>
-        <translation type="unfinished"></translation>
+        <translation>1.4X</translation>
     </message>
 </context>
 <context>
@@ -6653,59 +6661,59 @@ No other details</source>
     </message>
     <message>
         <source>Source:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vir:</translation>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Uredi po naslovu    (2) Uredi po prioriteti    (4) Uredi po tipu</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor posnetka za popolno brisanje</translation>
     </message>
     <message>
         <source>Select a recording to watch</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor posnetka za gledanje</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase:</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor posnetka za popolno brisanje:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor posnetka za gledanje:</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase.</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor posnetka za popolno brisanje.</translation>
     </message>
     <message>
         <source>Select a recording to watch.</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbor posnetka za gledanje.</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Izberite is črko s katero se oddaja začne, potem pritisnite IZBERI ali desno smerno tipko</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Izberite naslov programa, ki ga iščete. Ko ste končali se vrnite z levo snermo tipko. Pritisnite IZBERI za nastavitev plana snemanja.</translation>
     </message>
     <message>
         <source>Airdate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum oddajanja:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Opis:</translation>
+        <translation>Opis:</translation>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>
-        <translation type="unfinished"></translation>
+        <translation>Status sistema - Izberite si kategorijo za pregled statusa</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta zaslon prikaže status različnih komponent sistema</translation>
     </message>
 </context>
 <context>

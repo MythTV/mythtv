@@ -12,6 +12,7 @@
      <text lang="JA">ニュース</text>
      <text lang="FI">Uutiset</text>
      <text lang="ZH_TW">網上新聞</text>
+     <text lang="SI">Novice</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -19,6 +20,7 @@
      <type>MOVIETIMES</type>
      <text>Movie Times</text>
      <text lang="FI">Elokuvien Ajat</text>
+     <text lang="SI">Čas filmov</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -38,6 +40,7 @@
      <text lang="JA">天気</text>
      <text lang="FI">Säätiedotus</text>
      <text lang="ZH_TW">天氣報告</text>
+     <text lang="SI">Vreme</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -51,6 +54,7 @@
       <text lang="JA">ウェブ</text>
       <text lang="FI">Nettiselain</text>
       <text lang="ZH_TW">互聯網</text>
+      <text lang="SI">Splet</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -65,6 +69,7 @@
      <text lang="JA">レシピ</text>
      <text lang="DE">Rezepte</text>
      <text lang="FI">Reseptit</text>
+     <text lang="SI">Recepti</text> 
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>
@@ -79,6 +84,7 @@
       <text lang="JA">システムステータス</text>
       <text lang="FI">Systeemin Tila</text>
       <text lang="ZH_TW">系統狀態</text>
+      <text lang="SI">Status sistema</text>
       <action>TV_STATUS</action>
    </button>
 

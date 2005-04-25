@@ -14,6 +14,7 @@
       <text lang="JA">DVD再生</text>
       <text lang="FI">Toista DVD</text>
       <text lang="ZH_TW">播放DVD</text>
+      <text lang="SI">Predvajaj DVD</text>
       <action>JUMP Play DVD</action>
       <depends>mythdvd</depends>
    </button>
@@ -32,6 +33,7 @@
       <text lang="JA">VCD再生</text>
       <text lang="FI">Toista VCD</text>
       <text lang="ZH_TW">播放VCD</text>
+      <text lang="SI">Predvajaj VCD</text>
       <action>JUMP Play VCD</action>
       <depends>mythdvd</depends>
    </button>
@@ -51,6 +53,7 @@
       <text lang="JA">DVD取込</text>
       <text lang="FI">Tuo DVD</text>
       <text lang="ZH_TW">輸入DVD</text>
+      <text lang="SI">Ripanje DVD</text>
       <action>JUMP Rip DVD</action>
       <depends>mythdvd</depends>
    </button>
@@ -70,6 +73,7 @@
       <text lang="JA">CD取込</text>
       <text lang="FI">Tuo CD</text>
       <text lang="ZH_TW">輸入音樂CD</text>
+      <text lang="SI">Ripanje CD</text>
       <action>JUMP Rip CD</action>
       <depends>mythmusic</depends>
    </button>

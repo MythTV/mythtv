@@ -12,6 +12,7 @@
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
       <text lang="JA">全般</text>
+      <text lang="SI">Splošno</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -28,6 +29,7 @@
       <text lang="PT">Configurar Aparência</text>
       <text lang="SV">Utseende</text>
       <text lang="JA">画面表示</text>
+      <text lang="SI">Vzgled</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
@@ -43,6 +45,7 @@
      <text lang="PT">Configurar Televisão</text>
      <text lang="SV">TV-inställningar</text>
      <text lang="JA">TV設定</text>
+     <text lang="SI">TV nastavitve</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -57,6 +60,7 @@
      <text lang="PT">Configurar Música</text>
      <text lang="SV">Musikinställningar</text>
      <text lang="JA">ミュージック設定</text>
+     <text lang="SI">Glasbene nastavitve</text>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -72,6 +76,7 @@
        <text lang="PT">Configurar Filmes</text>
        <text lang="SV">Videoinställningar</text>
        <text lang="JA">ビデオ設定</text>
+       <text lang="SI">Video nastavitve</text>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -86,6 +91,7 @@
      <text lang="NL">DVD Instellingen</text>
      <text lang="SV">DVD-inställningar</text>
      <text lang="JA">DVD設定</text>
+     <text lang="SI">DVD nastavitve</text>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -94,6 +100,7 @@
       <type>SETTINGS_FM</type>
       <text>Radio Settings</text>
       <text lang="DE">Radio</text>
+      <text lang="SI">Radio nastavitve</text>
       <action>CONFIGPLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -109,6 +116,7 @@
       <text lang="PT">Configurar Fotos</text>
       <text lang="SV">Galleriinställningar</text>
       <text lang="JA">イメージ設定</text>
+      <text lang="SI">Nastavitve slik</text>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>
@@ -124,6 +132,7 @@
      <text lang="PT">Configurar Jogos</text>
      <text lang="SV">Spelinställningar</text>
      <text lang="JA">ゲーム設定</text>
+     <text lang="SI">Nastavitve iger</text>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -139,6 +148,7 @@
      <text lang="PT">Configurar Meteorologia</text>
      <text lang="SV">Väderinställningar</text>
      <text lang="JA">天気設定</text>
+     <text lang="SI">Nastavitve vremena</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -152,6 +162,7 @@
      <text lang="NL">Nieuws Instellingen</text>
      <text lang="SV">Nyhetsinställningar</text>
      <text lang="JA">ニュース設定</text>
+     <text lang="SI">Nastavitve novic</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -162,6 +173,7 @@
      <text lang="DE">WWW</text>
      <text lang="SV">Webb-inställningar</text>
      <text lang="JA">Web設定</text>
+     <text lang="SI">Nastavitve spleta</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -170,6 +182,7 @@
       <type>SETTINGS_RECIPE</type>
       <text>Recipe Settings</text>
       <text lang="DE">Rezepte</text>
+      <text lang="SI">Nastavitve receptov</text>
       <action>CONFIGPLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -178,6 +191,7 @@
       <type>PHONE</type>
       <text>Phone Settings</text>
       <text lang="DE">Telefon</text>
+      <text lang="SI">Nastavitve telefona</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -192,6 +206,7 @@
      <text lang="NL">Xbox Instellingen</text>
      <text lang="SV">Xbox-inställningar</text>
      <text lang="JA">XBox設定</text>
+     <text lang="SI">Nastavitve Xbox</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>

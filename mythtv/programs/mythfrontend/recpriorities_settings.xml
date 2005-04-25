@@ -7,10 +7,12 @@
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="FI">Nauhoitusprioriteetit</text>
       <text lang="JA">録画優先順位設定</text>
+      <text lang="SI">Nastavitve snemalnih prioritet</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
       <alttext lang="SV">Inspelning</alttext>
       <alttext lang="JA">録画優先順位</alttext>
+      <alttext lang="SI">Snemalne prioritete</alttext>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -24,12 +26,14 @@
       <text lang="FI">Kanavaprioriteetit</text>
       <text lang="NL">Prioriteit per kanaal</text>
       <text lang="ZH_TW">電視台錄影優先次序</text>
+      <text lang="SI">Nast. prior. snemanja kanalov</text>
       <alttext>Channel Priorities</alttext>
       <alttext lang="FR">Priorités</alttext>
       <alttext lang="JA">チャンネル優先順位</alttext>
       <alttext lang="DE">Sender</alttext>
       <alttext lang="SV">Kanal</alttext>
       <alttext lang="NL">Prioriteiten</alttext>      
+      <alttext lang="SI">Prioritete kanalov</alttext>
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 

@@ -13,6 +13,7 @@
       <text lang="PT">Ver Televisão</text>
       <text lang="SV">Se på TV</text>
       <text lang="JA">TVを見る</text>
+      <text lang="SI">Gledanje TV</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -29,6 +30,7 @@
       <text lang="PT">Apagar Gravações</text>
       <text lang="SV">Radera inspelningar</text>
       <text lang="JA">録画削除</text>
+      <text lang="SI">Brisanje Snemanj</text>
       <alttext lang="DE">Löschen</alttext>
       <action>TV_DELETE</action>
    </button> 
@@ -52,6 +54,7 @@
       <text>Previously Recorded</text>
       <text lang="SV">Föregående</text>
       <text lang="DE">Alte Aufnahmen</text>
+      <text lang="SI">Že posneto</text>
       <action>TV_PREVIOUS</action>
    </button>
 
@@ -61,6 +64,7 @@
       <text lang="DE">Systemstatus</text>
       <text lang="SV">Systemstatus</text>
       <text lang="JA">システムステータス</text>
+      <text lang="SI">Status sistema</text>
       <action>TV_STATUS</action>
    </button>
 

@@ -15,6 +15,7 @@
       <text lang="JA">TV放送</text>
       <text lang="FI">Katso TV:tä</text>
       <text lang="ZH_TW">觀看電視</text>
+      <text lang="SI">Glej TV</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -28,6 +29,7 @@
      <text lang="JA">メディアライブラリ</text>
      <text lang="FI">Mediakirjasto</text>
      <text lang="ZH_TW">媒體館</text>
+     <text lang="SI">Media</text>
      <alttext lang="SV">Bibliotek</alttext>
      <action>MENU library.xml</action>
    </button>
@@ -47,6 +49,7 @@
       <text lang="JA">録画予約</text>
       <text lang="FI">Hallitse Nauhoituksia</text>
       <text lang="ZH_TW">管理電視錄影</text>
+      <text lang="SI">Urejanje snemanj</text>
       <alttext lang="DE">Verwaltung</alttext>
       <alttext lang="SV">Hantera</alttext>
       <action>MENU manage_recordings.xml</action>
@@ -62,6 +65,7 @@
      <text lang="JA">インフォメーションセンター</text>
      <text lang="FI">Tiedotepalvelu</text>
      <text lang="ZH_TW">資訊中心</text>
+     <text lang="SI">Info center</text>
      <alttext lang="DE">Infocenter</alttext>
      <alttext lang="SV">Infocenter</alttext>
      <action>MENU info_menu.xml</action>
@@ -77,6 +81,7 @@
      <text lang="JA">オプティカルディスク</text>
      <text lang="FI">DVD ja CD</text>
      <text lang="ZH_TW">光碟</text>
+     <text lang="SI">CD/DVD</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
@@ -90,6 +95,7 @@
      <text lang="NL">Telefoon</text>     
      <text lang="SV">Telefon</text>
      <text lang="FR">Téléphone</text>
+     <text lang="SI">Telefon</text>
      <action>PLUGIN mythphone</action>
      <depends>mythphone</depends>
    </button>
@@ -109,6 +115,7 @@
      <text lang="JA">設定</text>
      <text lang="FI">Oheis/Asetukset</text>
      <text lang="ZH_TW">工具/設定</text>
+     <text lang="SI">Nastavitve</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <alttext lang="SV">Inställningar</alttext>
      <action>MENU util_menu.xml</action>

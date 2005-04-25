@@ -13,6 +13,7 @@
       <text lang="PT">Guia de Programação</text>
       <text lang="SV">Programguide</text>
       <text lang="JA">番組ガイド</text>
+      <text lang="SI">Programski vodič</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Parilla</alttext>
@@ -23,6 +24,7 @@
       <alttext lang="NL">Guia</alttext>
       <alttext lang="SV">Guide</alttext>
       <alttext lang="JA">ガイド</alttext>
+      <alttext lang="SI">Vodič</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -39,6 +41,7 @@
       <text lang="PT">Procurar Programa</text>
       <text lang="SV">Programletaren</text>
       <text lang="JA">番組検索</text>
+      <text lang="SI">Iskalec programov</text>
       <alttext>Finder</alttext>
       <alttext lang="FR">Recherche</alttext>
       <alttext lang="ES">Buscar</alttext>
@@ -49,6 +52,7 @@
       <alttext lang="PT">Procurar</alttext>
       <alttext lang="SV">Sökaren</alttext>
       <alttext lang="JA">検索</alttext>
+      <alttext lang="SI">Iskalec</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -59,9 +63,11 @@
       <text lang="SV">Sök i TV-tablå</text>
       <text lang="NL">Zoekfunctie</text>
       <text lang="JA">リスト検索</text>
+      <text lang="SI">Iskanje seznamov</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök tablå</alttext>
       <alttext lang="NL">Zoek</alttext>      
+      <alttext lang="SI">Iskanje</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -98,6 +104,7 @@
       <text lang="SV">Avancerad</text>
       <text lang="JA">カスタム録画</text>
       <text lang="DE">freie Planung</text>
+      <text lang="SI">Poljubno snemanje</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -112,6 +119,7 @@
       <text lang="PT">Gravação Manual</text>
       <text lang="SV">Manuell schemaläggning</text>
       <text lang="JA">手動予約</text>
+      <text lang="SI">Ročno snemanje</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
@@ -121,6 +129,7 @@
       <alttext lang="PT">Manual</alttext>
       <alttext lang="SV">Manuell</alttext>
       <alttext lang="JA">手動</alttext>
+      <alttext lang="SI">Ročno</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 
@@ -131,10 +140,12 @@
       <text lang="NL">Opname Prioriteiten</text>      
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
+      <text lang="SI">Snemalne prioritete</text>
       <alttext>Priorities</alttext>
       <alttext lang="SV">Prioriteter</alttext>
       <alttext lang="NL">Prioriteiten</alttext>
       <alttext lang="DE">Prioritäten</alttext>
+      <alttext lang="SI">Prioritete</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -153,6 +164,7 @@
       <text lang="JA">予約衝突修正</text>
       <text lang="FI">Tulevat Nauhoitukset</text>
       <text lang="ZH_TW">修正預設錄影衝突</text>
+      <text lang="SI">Prihajajoča snemanja</text>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

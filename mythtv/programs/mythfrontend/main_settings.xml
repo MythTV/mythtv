@@ -15,6 +15,7 @@
       <text lang="JA">全般</text>
       <text lang="FI">Yleiset</text>
       <text lang="ZH_TW">一般設定</text>
+      <text lang="SI">Splošno</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -33,6 +34,7 @@
       <text lang="JA">画面表示</text>
       <text lang="FI">Näkymä</text>
       <text lang="ZH_TW">外觀設定</text>
+      <text lang="SI">Vzgled</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
@@ -46,6 +48,7 @@
      <text lang="JA">TV設定</text>
      <text lang="FI">TV:n Asetukset</text>
      <text lang="ZH_TW">電視設定</text>
+     <text lang="SI">TV nastavitve</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -59,6 +62,7 @@
      <text lang="JA">メディア設定</text>
      <text lang="FI">Media</text>
      <text lang="ZH_TW">媒體設定</text>
+     <text lang="SI">Media nastavitve</text>
      <action>MENU media_settings.xml</action>
      <depends>mythvideo mythmusic mythgallery mythfm mythgame</depends>
    </button>
@@ -73,6 +77,7 @@
      <text lang="JA">インフォセンター設定</text>
      <text lang="FI">Tiedoteasetukset</text>
      <text lang="ZH_TW">資訊中心設定</text>
+     <text lang="SI">Nastavitve info centra</text>
      <action>MENU info_settings.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe</depends> 
    </button>
@@ -90,6 +95,7 @@
      <text lang="JA">XBox設定</text>
      <text lang="FI">Xbox Asetukset</text>
      <text lang="ZH_TW">XBox設定</text>
+     <text lang="SI">Xbox nastavitve</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
@@ -102,6 +108,7 @@
       <text lang="SV">Telefon</text>
       <text lang="NL">Telefoon Instellingen</text>      
       <text lang="FI">Puhelimen Asetukset</text>
+      <text lang="SI">Nastavitve telefona</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>

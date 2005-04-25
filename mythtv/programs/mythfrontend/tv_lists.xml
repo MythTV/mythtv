@@ -10,6 +10,7 @@
       <text lang="NL">Nieuwe Titels</text>
       <text lang="FI">Uudet Ohjelmat</text>
       <text lang="ZH_TW">新標題</text>
+      <text lang="SI">Novi naslovi</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -23,6 +24,7 @@
       <text lang="NL">Films</text>
       <text lang="FI">Elokuvat</text>
       <text lang="ZH_TW">電影</text>
+      <text lang="SI">Filmi</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -36,6 +38,7 @@
       <text lang="NL">Categorie</text>
       <text lang="FI">Kategoriat</text>
       <text lang="ZH_TW">種類</text>
+      <text lang="SI">Kategorije</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -49,6 +52,7 @@
       <text lang="JA">チャンネル</text>
       <text lang="FI">Kanavat</text>
       <text lang="ZH_TW">電視台</text>
+      <text lang="SI">Kanali</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -62,6 +66,7 @@
       <text lang="DE">Sendezeit</text>
       <text lang="FI">Aika</text>
       <text lang="ZH_TW">時間</text>
+      <text lang="SI">Čas</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 

@@ -294,6 +294,16 @@
       </textarea>
     </container>
 
+<container name="jumptochannel">
+<area>20,20,115,25</area>
+<textarea name="channel" draworder="4" align="right">
+<font>info</font>
+<area>0,0,115,25</area>
+<cutdown>no</cutdown>
+</textarea>
+</container>
+
+
   </window>
 
    <window name="programguide-video">

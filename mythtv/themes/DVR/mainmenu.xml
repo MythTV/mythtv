@@ -13,6 +13,7 @@
       <text lang="PT">Ver Gravações</text>
       <text lang="SV">Titta på inspelningar</text>
       <text lang="JA">録画再生</text>
+      <text lang="SI">Predvajanje snemanj</text>
       <alttext lang="DE">Wiedergabe</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
@@ -32,6 +33,7 @@
       <text lang="JA">予約衝突修正</text>
       <text lang="FI">Tulevat Nauhoitukset</text>
       <text lang="ZH_TW">修正預設錄影衝突</text>
+      <text lang="SI">Prihajajoča snemanja</text>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 
@@ -48,6 +50,7 @@
       <text lang="PT">Gravação Programada</text>
       <text lang="SV">Schemalägg inspelningar</text>
       <text lang="JA">録画予約</text>
+      <text lang="SI">Plan snemanj</text>
       <alttext>Schedule</alttext>
       <alttext lang="FR">Programmer</alttext>
       <alttext lang="ES">Temporizadores</alttext>
@@ -59,6 +62,7 @@
       <alttext lang="JA">予約</alttext>
       <alttext lang="IT">Programmazione</alttext>
       <alttext lang="DE">Planung</alttext>
+      <alttext lang="SI">Planiranje</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -69,10 +73,12 @@
       <text lang="NL">Opname Prioriteiten</text>      
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
+      <text lang="SI">Snemalne prirotete</text>
       <alttext>Priorities</alttext>
       <alttext lang="SV">Prioriteter</alttext>
       <alttext lang="NL">Prioriteiten</alttext>
       <alttext lang="DE">Prioritäten</alttext>
+      <alttext lang="SI">Prioritete</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -91,6 +97,7 @@
      <text lang="JA">設定</text>
      <text lang="FI">Oheis/Asetukset</text>
      <text lang="ZH_TW">工具/設定</text>
+     <text lang="SI">Nastavitve</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <alttext lang="SV">Inställningar</alttext>
      <action>MENU util_menu.xml</action>
