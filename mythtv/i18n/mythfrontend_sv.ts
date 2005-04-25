@@ -4121,10 +4121,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Detta anger hur ofta (i sekunder) att kolla om en inspelning pågår för att uppdatera Xbox-lysdioden.</translation>
     </message>
     <message>
-        <source>Use hardware XvMC MPEG Decoding</source>
-        <translation>Använd XvMC MPEG-hårdvaruavkodning</translation>
-    </message>
-    <message>
         <source>Log MythTV events to database</source>
         <translation>Logga MythTV-händelser till databas</translation>
     </message>
@@ -4497,10 +4493,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Standardstorlek är 12.</translation>
     </message>
     <message>
-        <source>Use HW XVMC VLD Decoding (Via only)</source>
-        <translation>Använd XVMC VLD hårdvaruavkodning (endast VIA)</translation>
-    </message>
-    <message>
         <source>Commercial Skip</source>
         <translation>Reklamöverhoppning</translation>
     </message>
@@ -4627,10 +4619,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
         <translation>Tillåt program som tas bort automatiskt (av funktionen autoradera) att bli återinspelade om de visas igen.</translation>
-    </message>
-    <message>
-        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichrome Chipset</source>
-        <translation>Använd viaXvMC MPEG-hårdvaruavkodning för Via Unichrome-chipsetet</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
@@ -5195,10 +5183,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Använd libmpeg2 för avkodning</translation>
     </message>
     <message>
-        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
-        <translation>Använd libmpeg2 i stället för ffmpeg för avkodning av MPEG-1 och MPEG-2 bildrutor. Detta kan vara snabbare. Inte tillgängligt när XvMC används.</translation>
-    </message>
-    <message>
         <source>Scan for channels(s)</source>
         <translation>Sök efter kanaler</translation>
     </message>
@@ -5720,10 +5704,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Starta automatisk reklamflaggning när inspelningen startar</translation>
     </message>
     <message>
-        <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
-        <translation>Om automatisk reklamflaggning är aktiverad, börja detta så fort inspelningen startar. EJ rekommenderat på svagare system</translation>
-    </message>
-    <message>
         <source>Job Queue (Job Commands)</source>
         <translation>Jobbkö (jobbkommando)</translation>
     </message>
@@ -5914,8 +5894,38 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Använd &quot;Standard&quot; för att använda den kvot som skärmen rapporterar. 16:9 eller 4:3 tvingar fram en specifik kvot.</translation>
     </message>
     <message>
-        <source>X</source>
-        <translation type="obsolete">X</translation>
+        <source>Failed to Reinit Video.</source>
+        <translation>Misslyckades återstarta video.</translation>
+    </message>
+    <message>
+        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster.
+WARNING: Enabling this optionwill disable XvMC video output.</source>
+        <translation>Använd libmpeg2 i stället för ffmpeg för avkodning av MPEG-1 och MPEG-2 bildrutor. Detta kan vara snabbare.
+VARNING: Detta val avaktiverar XvMC videoutmatning.</translation>
+    </message>
+    <message>
+        <source>Use hardware XvMC MPEG Decoding (incompatible with libmpeg2)</source>
+        <translation>Använd XvMC MPEG-hårdvaruavkodning (inkompatibelt med libmpeg2)</translation>
+    </message>
+    <message>
+        <source>This enables the hardware accelerated MPEG decodingavailable with many popular video output cards.</source>
+        <translation>Aktiverar hårdvaruaccelererad MPEG-avkodning med flera populära grafikkort.</translation>
+    </message>
+    <message>
+        <source>This is incompatible with libmpeg2 decoding, andwill be disabled if libmpeg2 decoding is selected.</source>
+        <translation>Detta är inkompatibelt med libmpeg2-avkodning och avaktiveras om libmpeg2-avkodning aktiveras.</translation>
+    </message>
+    <message>
+        <source>Use hardware XVMC VLD Decoding (incompatible with libmpeg2)</source>
+        <translation>Använd XvMC VLD-hårdvaruavkodning (inkompatibelt med libmpeg2)</translation>
+    </message>
+    <message>
+        <source>Enables the use of viaXvMC hardware MPEG decoding for the Via Unichrome Chipset</source>
+        <translation>Aktiverar hårdvaruaccelererad MPEG-avkodning för Via Unichrome-chipsetet</translation>
+    </message>
+    <message>
+        <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems.</source>
+        <translation>Om automatisk reklamflaggning är aktiverad, börja detta så fort inspelningen startar.  EJ rekommenderat på svagare system.</translation>
     </message>
 </context>
 <context>
