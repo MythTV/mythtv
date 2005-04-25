@@ -21,6 +21,7 @@
 
 typedef QValueVector<int> IntVector;
 
+class SpeakerTracker;
 
 class MfeDialog : public MythThemedDialog
 {
@@ -55,6 +56,7 @@ class MfeDialog : public MythThemedDialog
     void togglePause();
     void seekAudio(bool forward_or_back);
     void nextPrevAudio(bool next_or_prev);
+    void speakerList(QPtrList<SpeakerTracker>* speakers);
 
   private:
 
@@ -94,6 +96,12 @@ class MfeDialog : public MythThemedDialog
     UIListGenericTree   *manage_node;
     UIListGenericTree   *connect_node;
     UIListGenericTree   *setup_node;
+    
+    //
+    //  Speaker Node, subset of setup
+    //
+    
+    UIListGenericTree   *speaker_node;
     
     //
     //  GUI widgets

@@ -1,4 +1,4 @@
-/*
+    /*
 	mfedialog.cpp
 
 	Copyright (c) 2004 Thor Sigvaldason and Isaac Richards
@@ -8,6 +8,8 @@
 
 #include <mythtv/mythcontext.h>
 #include <mfdclient/playlist.h>
+#include <mfdclient/speakertracker.h>
+
 #include "mfedialog.h"
 
 MfeDialog::MfeDialog(
@@ -399,6 +401,37 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
             }
         }
     }
+    else if(node->getAttribute(1) == 6)
+    {
+        //
+        //  Speaker of some sort; toggle them on and off
+        //
+        
+        if(node->getCheck() == 0)
+        {
+            node->setCheck(2);
+            if(current_mfd)
+            {
+                mfd_interface->toggleSpeakers(current_mfd->getId(), node->getAttribute(0), true);
+            }
+        }
+        else if(node->getCheck() == 2)
+        {
+            node->setCheck(0);
+            if(current_mfd)
+            {
+                mfd_interface->toggleSpeakers(current_mfd->getId(), node->getAttribute(0), false);
+            }
+        }
+        else
+        {
+            cerr << "how exactly is a speaker neither on nor off?"
+                 << endl;
+        }
+
+        menu->refresh();
+
+    }
 }
 
 
@@ -458,10 +491,11 @@ void MfeDialog::wireUpTheme()
 
     menu_root_node = new UIListGenericTree(NULL, "Menu Root Node");
 
-    browse_node =  new UIListGenericTree(menu_root_node, " Browse Music");
-    manage_node =  new UIListGenericTree(menu_root_node, " Manage Content");
+    browse_node  = new UIListGenericTree(menu_root_node, " Browse Music");
+    manage_node  = new UIListGenericTree(menu_root_node, " Manage Content");
     connect_node = new UIListGenericTree(menu_root_node, " Control other Myth Boxes");
     setup_node   = new UIListGenericTree(menu_root_node, " Settings");
+    speaker_node = new UIListGenericTree(setup_node, " Speakers");
     
     menu->SetTree(menu_root_node);
 
@@ -498,6 +532,9 @@ void MfeDialog::connectUpMfd()
 
     connect(mfd_interface, SIGNAL(playlistCheckDone()),
             this, SLOT(playlistCheckDone()));
+            
+    connect(mfd_interface, SIGNAL(speakerList(QPtrList<SpeakerTracker>*)),
+            this, SLOT(speakerList(QPtrList<SpeakerTracker>*)));
 }
 
 void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool found)
@@ -773,7 +810,6 @@ void MfeDialog::paused(int which_mfd, bool paused)
             if(paused)
             {
                 pause_button->show();
-                
             }
             else
             {
@@ -996,6 +1032,35 @@ void MfeDialog::switchToMfd(int an_mfd_id)
     
     current_mfd = target_mfd;
     syncToCurrentMfd();
+}
+
+void MfeDialog::speakerList(QPtrList<SpeakerTracker>* speakers)
+{
+    QStringList route_to_current = menu->getRouteToCurrent();
+
+    speaker_node->deleteAllChildren();
+
+    SpeakerTracker *a_speaker;
+    QPtrListIterator<SpeakerTracker> iter( *speakers );
+
+    while ( (a_speaker = iter.current()) != 0 )
+    {
+        UIListGenericTree *new_node = new UIListGenericTree(speaker_node, a_speaker->getName());
+        new_node->setAttribute(1, 6);
+        new_node->setAttribute(0, a_speaker->getId());
+        if(a_speaker->getInUse() == "yes")
+        {
+            new_node->setCheck(2);
+        }
+        else
+        {
+            new_node->setCheck(0);
+        }
+        ++iter;
+    }
+
+    menu->tryToSetCurrent(route_to_current);
+    menu->refresh();
 }
 
 MfeDialog::~MfeDialog()
