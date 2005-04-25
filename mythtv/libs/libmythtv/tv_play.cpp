@@ -4098,32 +4098,32 @@ void TV::BuildOSDTreeMenu(void)
     item = new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), 
                              "TOGGLEMANUALZOOM");
 
-    int speedX10 = (int)(ceil(normal_speed * 10));
+    int speedX100 = (int)(round(normal_speed * 100));
     item = new OSDGenericTree(treeMenu, tr("Adjust Time Stretch"), "TOGGLESTRETCH");
     subitem = new OSDGenericTree(item, tr("Adjust"), "TOGGLESTRETCH");
     subitem = new OSDGenericTree(item, tr("0.5X"), "TOGGLESTRETCH0.5",
-                                 (speedX10 == 5) ? 1 : 0, NULL,
+                                 (speedX100 == 50) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("0.9X"), "TOGGLESTRETCH0.9",
-                                 (speedX10 == 9) ? 1 : 0, NULL,
+                                 (speedX100 == 90) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.0X"), "TOGGLESTRETCH1.0",
-                                 (speedX10 == 10) ? 1 : 0, NULL,
+                                 (speedX100 == 100) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.1X"), "TOGGLESTRETCH1.1",
-                                 (speedX10 == 11) ? 1 : 0, NULL,
+                                 (speedX100 == 110) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.2X"), "TOGGLESTRETCH1.2",
-                                 (speedX10 == 12) ? 1 : 0, NULL,
+                                 (speedX100 == 120) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.3X"), "TOGGLESTRETCH1.3",
-                                 (speedX10 == 13) ? 1 : 0, NULL,
+                                 (speedX100 == 130) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.4X"), "TOGGLESTRETCH1.4",
-                                 (speedX10 == 14) ? 1 : 0, NULL,
+                                 (speedX100 == 140) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.5X"), "TOGGLESTRETCH1.5",
-                                 (speedX10 == 15) ? 1 : 0, NULL,
+                                 (speedX100 == 150) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
 
     // add sleep items to menu
