@@ -16,6 +16,7 @@ using namespace std;
 #include "discoverythread.h"
 #include "playlistchecker.h"
 #include "events.h"
+#include "speakertracker.h"
 
 MfdInterface::MfdInterface(int client_screen_width, int client_screen_height)
 {
@@ -298,6 +299,52 @@ void MfdInterface::askForStatus(int which_mfd)
     }
 }
 
+void MfdInterface::toggleSpeakers(int which_mfd, int which_speaker, bool on_or_off)
+{
+    //
+    //  Find the instance, toggle it's speaker
+    //  
+
+    bool found_it = false;
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+
+        if (an_mfd->getId() == which_mfd)
+        {
+            if(on_or_off)
+            {
+                an_mfd->addPendingCommand(
+                                            QStringList::split(" ", 
+                                            QString("audio speakeruse %1 yes")
+                                            .arg(which_speaker))
+                                         );
+            }
+            else
+            {
+                an_mfd->addPendingCommand(
+                                            QStringList::split(" ", 
+                                            QString("audio speakeruse %1 no")
+                                            .arg(which_speaker))
+                                         );
+            }
+
+            found_it = true;
+            break;
+        }
+    }
+    
+    if (!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for a toggleSpeaker() request"
+             << endl;
+    }
+}
+
 void MfdInterface::commitListEdits(
                                     int which_mfd, 
                                     UIListGenericTree *playlist_tree,
@@ -499,6 +546,15 @@ void MfdInterface::customEvent(QCustomEvent *ce)
     else if (ce->type() == MFD_CLIENTLIB_EVENT_PLAYLIST_CHECKED)
     {
         emit playlistCheckDone();
+    }
+    else if (ce->type() == MFD_CLIENTLIB_EVENT_SPEAKER_LIST)
+    {
+        MfdSpeakerListEvent *sle = (MfdSpeakerListEvent*)ce;
+        QPtrList<SpeakerTracker>* speakers = sle->getSpeakerList();
+        if(speakers)
+        {
+            emit speakerList(speakers);
+        }
     }
     
     else

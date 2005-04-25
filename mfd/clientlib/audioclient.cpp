@@ -18,78 +18,6 @@ using namespace std;
 #include "mfdinterface.h"
 
 
-SpeakerTracker::SpeakerTracker(int l_id, const QString yes_or_no)
-{
-    id = l_id;
-    if(yes_or_no == "yes")
-    {
-        in_use = true;
-    }
-    else if (yes_or_no == "no")
-    {
-        in_use = false;
-    }
-    else
-    {
-        cerr << "speaker tracker created with second argument neither "
-             << "\"yes\" nor \"no\". Assuming no"
-             <<endl;
-    }
-    marked_for_deletion = false;
-}
-
-bool SpeakerTracker::possiblyUnmarkForDeletion(
-                                                const QString &id_string, 
-                                                const QString &inuse_string
-                                              )
-{
-    bool ok;
-    int target_id = id_string.toInt(&ok);
-    if (ok)
-    {
-        if (target_id == id)
-        {
-            marked_for_deletion = false;
-            if (inuse_string == "yes")
-            {
-                in_use = true;
-            }
-            else if (inuse_string == "no")
-            {
-                in_use = false;
-            } 
-            else
-            {
-                cerr << "speaker tracker cannot determine if speaker is "
-                     << "in use cause it was passed an in_use string of \""
-                     << inuse_string
-                     << "\""
-                     << endl;
-            }
-            return true;
-        }
-    }
-    else
-    {
-        cerr << "speaker tracker cannot check id cause it was "
-             << "passed a string of \""
-             << id_string
-             << "\""
-             << endl;
-    }
-    return false;
-}
-
-SpeakerTracker::~SpeakerTracker()
-{
-}
-
-
-
-/*
----------------------------------------------------------------------
-*/
-
 AudioClient::AudioClient(
                             MfdInterface *the_mfd,
                             int an_mfd,
@@ -136,7 +64,7 @@ void AudioClient::stopAudio()
 void AudioClient::pauseAudio(bool y_or_n)
 {
     QString command;
-    if(y_or_n)
+    if (y_or_n)
     {
         command = QString("pause on \n");
     }
@@ -175,12 +103,12 @@ void AudioClient::handleIncoming()
     char in_buffer[2049];
     
     int amount_read = client_socket_to_service->readBlock(in_buffer, 2048);
-    if(amount_read < 0)
+    if (amount_read < 0)
     {
         cerr << "audioclient.o: error reading from service" << endl;
         return;
     }
-    else if(amount_read == 0)
+    else if (amount_read == 0)
     {
         return;
     }
@@ -204,28 +132,28 @@ void AudioClient::handleIncoming()
 
 void AudioClient::parseFromAudio(QStringList &tokens)
 {
-    if(tokens.count() < 1)
+    if (tokens.count() < 1)
     {
         cerr << "audioclient.o: got no tokens to parse" 
              << endl;
         return;
     }
     
-    if(tokens[0] == "pause")
+    if (tokens[0] == "pause")
     {
-        if(tokens.count() < 2)
+        if (tokens.count() < 2)
         {
             cerr << "audioclient.o: got pause token, but no on or off"
                  << endl;
             return;
         }
-        if(tokens[1] == "on")
+        if (tokens[1] == "on")
         {
             MfdAudioPausedEvent *ape = new MfdAudioPausedEvent(mfd_id, true);
             QApplication::postEvent(mfd_interface, ape);
             return;
         }
-        else if(tokens[1] == "off")
+        else if (tokens[1] == "off")
         {
             MfdAudioPausedEvent *ape = new MfdAudioPausedEvent(mfd_id, false);
             QApplication::postEvent(mfd_interface, ape);
@@ -237,16 +165,16 @@ void AudioClient::parseFromAudio(QStringList &tokens)
         return;
     }
     
-    if(tokens[0] == "stop")
+    if (tokens[0] == "stop")
     {
         MfdAudioStoppedEvent *ase = new MfdAudioStoppedEvent(mfd_id);
         QApplication::postEvent(mfd_interface, ase);
         return;
     }
     
-    if(tokens[0] == "playing")
+    if (tokens[0] == "playing")
     {
-        if(tokens.count() < 9)
+        if (tokens.count() < 9)
         {
             cerr << "audio server seems to be playing, but it's not "
                  << "sending the correct number of tokens"
@@ -269,7 +197,7 @@ void AudioClient::parseFromAudio(QStringList &tokens)
         return;
     }
     
-    if(tokens[0] == "speakerlist")
+    if (tokens[0] == "speakerlist")
     {
         //
         //  Getting a list of speakers available.
@@ -280,6 +208,12 @@ void AudioClient::parseFromAudio(QStringList &tokens)
         
     }
     
+    if (tokens[0] == "speakername")
+    {
+        nameSpeakers(tokens);
+        return;
+    }
+    
     cerr << "getting tokens from audio server I don't understand: "
          << tokens.join(" ")
          << endl;
@@ -287,7 +221,7 @@ void AudioClient::parseFromAudio(QStringList &tokens)
 
 void AudioClient::executeCommand(QStringList new_command)
 {
-    if(new_command.count() < 1)
+    if (new_command.count() < 1)
     {
         cerr << "audioclient.o: asked to executeCommand(), "
              << "but got no commands."
@@ -295,13 +229,13 @@ void AudioClient::executeCommand(QStringList new_command)
         return;
     }
     
-    if(new_command[0] == "play")
+    if (new_command[0] == "play")
     {
         //
         //  Make sure we have enough tokens for a "play" command
         //  
         
-        if(new_command.count() < 5)
+        if (new_command.count() < 5)
         {
             cerr << "audioclient.o: asked to play audio, but not "
                  << "enough tokens provided to know what to play."
@@ -316,7 +250,7 @@ void AudioClient::executeCommand(QStringList new_command)
         bool ok = true;
 
         int container = new_command[1].toInt(&ok);
-        if(container < 0 || !ok)
+        if (container < 0 || !ok)
         {
             cerr << "audioclient.o: error converting play command's "
                  << "container token." 
@@ -325,7 +259,7 @@ void AudioClient::executeCommand(QStringList new_command)
         }
         
         int type = new_command[2].toInt(&ok);
-        if(type < 1 || type > 2 || !ok)
+        if (type < 1 || type > 2 || !ok)
         {
             cerr << "audioclient.o: error converting play command's "
                  << "type token." 
@@ -334,7 +268,7 @@ void AudioClient::executeCommand(QStringList new_command)
         }
         
         int which_id = new_command[3].toInt(&ok);
-        if(which_id < 0 || !ok)
+        if (which_id < 0 || !ok)
         {
             cerr << "audioclient.o: error converting play command's "
                  << "which_id token." 
@@ -343,7 +277,7 @@ void AudioClient::executeCommand(QStringList new_command)
         }
         
         int index = new_command[4].toInt(&ok);
-        if(index < 0 || !ok)
+        if (index < 0 || !ok)
         {
             cerr << "audioclient.o: error converting play command's "
                  << "index token." 
@@ -355,17 +289,17 @@ void AudioClient::executeCommand(QStringList new_command)
         //  Either basic metadata item (type = 1) or an entry in a playlist (type = 2)
         //
         
-        if(type == 1)
+        if (type == 1)
         {
             playTrack(container, which_id);
         }
-        else if(type == 2)
+        else if (type == 2)
         {
             playList(container, which_id, index);
         }
         
     }
-    else if(new_command[0] == "stop")
+    else if (new_command[0] == "stop")
     {
         //
         //  Stop the audio 
@@ -373,13 +307,13 @@ void AudioClient::executeCommand(QStringList new_command)
         
         stopAudio();        
     }
-    else if(new_command[0] == "pause")
+    else if (new_command[0] == "pause")
     {
         //
         //  Turn audio pause on or off
         //
         
-        if(new_command.count() < 2)
+        if (new_command.count() < 2)
         {
             cerr << "audioclient.o: pause is a useless command "
                  << "unless you add \"on\" or \"off\"."
@@ -387,11 +321,11 @@ void AudioClient::executeCommand(QStringList new_command)
             return;
         }
 
-        if(new_command[1] == "on")
+        if (new_command[1] == "on")
         {
             pauseAudio(true);
         }
-        else if(new_command[1] == "off")
+        else if (new_command[1] == "off")
         {
             pauseAudio(false);
         }
@@ -402,13 +336,13 @@ void AudioClient::executeCommand(QStringList new_command)
                  << endl;
         }
     }
-    else if(new_command[0] == "seek")
+    else if (new_command[0] == "seek")
     {
         //
         //  Seek some number of seconds
         //
         
-        if(new_command.count() < 2)
+        if (new_command.count() < 2)
         {
             cerr << "audioclient.o: seek is a useless command "
                  << "without amount."
@@ -418,7 +352,7 @@ void AudioClient::executeCommand(QStringList new_command)
 
         bool ok = true;
         int amount = new_command[1].toInt(&ok);
-        if(!ok)
+        if (!ok)
         {
             cerr << "audioclient.o: could not parse seek amount"
                  << endl;
@@ -427,7 +361,7 @@ void AudioClient::executeCommand(QStringList new_command)
 
         seekAudio(amount);
     }    
-    else if(new_command[0] == "next")
+    else if (new_command[0] == "next")
     {
         //
         //  Next track
@@ -435,7 +369,7 @@ void AudioClient::executeCommand(QStringList new_command)
         
         nextAudio();
     }    
-    else if(new_command[0] == "prev")
+    else if (new_command[0] == "prev")
     {
         //
         //  Next track
@@ -443,14 +377,22 @@ void AudioClient::executeCommand(QStringList new_command)
         
         prevAudio();
     }    
-    else if(new_command[0] == "status")
+    else if (new_command[0] == "status")
     {
         //
         //  Send status
         //
 
         askForStatus();
-    }        
+    }  
+    else if (new_command[0] == "speakeruse")
+    {
+        //
+        //  Toggle speakers
+        //
+        
+        toggleSpeakers(new_command.join(" "));
+    }      
     else
     {
         cerr << "audioclient.o: I don't understand this "
@@ -465,6 +407,12 @@ void AudioClient::executeCommand(QStringList new_command)
 void AudioClient::askForStatus()
 {
     QString command = QString("status \n");
+    client_socket_to_service->writeBlock(command.ascii(), command.length());
+}
+
+void AudioClient::toggleSpeakers(const QString &full_command)
+{
+    QString command = QString("%1\n").arg(full_command);
     client_socket_to_service->writeBlock(command.ascii(), command.length());
 }
 
@@ -526,7 +474,7 @@ void AudioClient::syncSpeakerList(QStringList &tokens)
     a_speaker = iter.toFirst();
     while ( (a_speaker = iter.current()) != 0 )
     {
-        if(a_speaker->markedForDeletion())
+        if (a_speaker->markedForDeletion())
         {
             speakers.remove(a_speaker);
         }
@@ -536,6 +484,104 @@ void AudioClient::syncSpeakerList(QStringList &tokens)
         }
     }
     
+    
+    //
+    //  Find first one that does not have a name, make a name request for it
+    //
+
+    a_speaker = iter.toFirst();
+    while ( (a_speaker = iter.current()) != 0 )
+    {
+        if (! a_speaker->haveName())
+        {
+            QString command = QString("speakername %1\n").arg(a_speaker->getId());
+            cout << endl << "will send \"" << command << "\"" << endl;
+            client_socket_to_service->writeBlock(command.ascii(), command.length());
+            break;
+        }
+        ++iter;
+    }
+
+    //
+    //  Each time we get a list may be the last, so we send an event
+    //
+    
+    MfdSpeakerListEvent *sle = new MfdSpeakerListEvent(&speakers);
+    QApplication::postEvent(mfd_interface, sle);
+}
+
+void AudioClient::nameSpeakers(QStringList &tokens)
+{
+
+    if(tokens.count() < 2)
+    {
+        cerr << "AudioClient::nameSpeakers() can't do so if given no speakers"
+             << endl;
+        return;
+    }
+    
+    bool ok;
+    
+    int target_id = tokens[1].toInt(&ok);
+    
+    if(!ok)
+    {
+        cerr << "AudioClient::nameSpeakers() got bogus speaker id of \""
+             << tokens[1]
+             << "\""
+             << endl;
+        return;
+    }
+    
+
+    //
+    //  Find the speaker in question
+    //    
+    
+    SpeakerTracker *a_speaker;
+    SpeakerTracker *target_speaker = NULL;
+    QPtrListIterator<SpeakerTracker> iter( speakers );
+
+    while ( (a_speaker = iter.current()) != 0 )
+    {
+        if (target_id == a_speaker->getId())
+        {
+            target_speaker = a_speaker;
+            break;
+        }
+        ++iter;
+    }
+
+    if (!target_speaker)
+    {
+        cerr << "AudioClient::nameSpeakers() got reference to non-existant "
+             << "speaker"
+             << endl;
+        return;
+    }
+
+    
+    QString new_name;
+    if(tokens.count() > 2)
+    {
+        for (uint i = 2; i < tokens.count(); i++)
+        {
+            if(i > 2)
+            {
+                new_name.append(" ");
+            }
+            new_name.append(tokens[i]);
+        }
+    }
+    else
+    {
+        new_name = "noname";
+    }
+    
+    target_speaker->setName(new_name);
+
+
+    /*
 
     //
     //  Debugging
@@ -549,15 +595,22 @@ void AudioClient::syncSpeakerList(QStringList &tokens)
     {
         cout << "speaker with id of "
              << a_speaker->getId()
-             << " marked for use as: "
+             << " is called \""
+             << a_speaker->getName()
+             << "\" and is marked for use as: "
              << a_speaker->getInUse()
              << endl;
         ++iter;
     }
     
-         
-        
-        
+    */
+    
+    //
+    //  Each time we get a name may be the last, so we send an event
+    //
+    
+    MfdSpeakerListEvent *sle = new MfdSpeakerListEvent(&speakers);
+    QApplication::postEvent(mfd_interface, sle);
 }
 
 AudioClient::~AudioClient()

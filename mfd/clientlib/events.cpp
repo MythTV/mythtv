@@ -9,6 +9,7 @@
 */
 
 #include "events.h"
+#include "speakertracker.h"
 
 MfdDiscoveryEvent::MfdDiscoveryEvent(
                                      bool  is_it_lost_or_found,
@@ -172,5 +173,37 @@ MfdPlaylistCheckedEvent::MfdPlaylistCheckedEvent()
                     :QCustomEvent(MFD_CLIENTLIB_EVENT_PLAYLIST_CHECKED)
 
 {
+}
+
+/*
+---------------------------------------------------------------------
+*/
+
+MfdSpeakerListEvent::MfdSpeakerListEvent(QPtrList<SpeakerTracker> *l_speakers)
+                    :QCustomEvent(MFD_CLIENTLIB_EVENT_SPEAKER_LIST)
+{
+
+    //
+    //  Make my own copy of the list of speakers for use when this event
+    //  gets passed elsewhere
+    //    
+    
+    speakers.setAutoDelete(true);
+    
+    SpeakerTracker *a_speaker;
+    QPtrListIterator<SpeakerTracker> iter( *l_speakers );
+
+    while ( (a_speaker = iter.current()) != 0 )
+    {
+        SpeakerTracker *new_speaker = new SpeakerTracker(a_speaker->getId(), a_speaker->getInUse());
+        new_speaker->setName(a_speaker->getName());
+        speakers.append(new_speaker);
+        ++iter;
+    }
+}
+
+MfdSpeakerListEvent::~MfdSpeakerListEvent()
+{
+    speakers.clear();
 }
 

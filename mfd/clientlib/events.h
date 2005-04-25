@@ -11,6 +11,7 @@
 */
 
 #include <qevent.h>
+#include <qptrlist.h>
 
 #include "mfdcontent.h"
 
@@ -21,7 +22,9 @@
 #define MFD_CLIENTLIB_EVENT_METADATA            65428
 #define MFD_CLIENTLIB_EVENT_AUDIOPLUGIN_EXISTS  65427
 #define MFD_CLIENTLIB_EVENT_PLAYLIST_CHECKED    65426
+#define MFD_CLIENTLIB_EVENT_SPEAKER_LIST        65425
 
+class SpeakerTracker;
 
 class MfdDiscoveryEvent: public QCustomEvent
 {
@@ -192,6 +195,23 @@ class MfdPlaylistCheckedEvent: public QCustomEvent
 
 };
 
+class MfdSpeakerListEvent: public QCustomEvent
+{
+    //
+    //  Sent by the audio client code whenever the speakers change
+    //
+    
+  public:
+
+    MfdSpeakerListEvent(QPtrList<SpeakerTracker> *l_speakers);
+    ~MfdSpeakerListEvent();
+    
+    QPtrList<SpeakerTracker>* getSpeakerList(){ return &speakers; }
+    
+  private:
+  
+    QPtrList<SpeakerTracker> speakers;
+};
 
 
 #endif

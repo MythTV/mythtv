@@ -19,6 +19,7 @@
 class DiscoveryThread;
 class PlaylistChecker;
 class MfdInstance;
+class SpeakerTracker;
 
 class MfdInterface : public QObject
 {
@@ -45,6 +46,7 @@ class MfdInterface : public QObject
     void nextAudio(int which_mfd);
     void prevAudio(int which_mfd);
     void askForStatus(int which_mfd);
+    void toggleSpeakers(int which_mfd, int which_speaker, bool on_or_off);
 
     //
     //  For sending updates back the mfd metadata server
@@ -85,6 +87,7 @@ class MfdInterface : public QObject
     void audioPlaying(int, int, int, int, int, int, int, int, int);
     void metadataChanged(int, MfdContentCollection*);
     void playlistCheckDone();
+    void speakerList(QPtrList<SpeakerTracker> *speakers);
 
   protected:
   

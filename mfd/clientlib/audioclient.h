@@ -3,7 +3,7 @@
 /*
 	audioclient.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	client object to talk to an mfd's audio playing service
@@ -13,28 +13,7 @@
 #include <qstringlist.h>
 
 #include "serviceclient.h"
-
-class SpeakerTracker
-{
-
-  public:
-
-    SpeakerTracker(int l_id, const QString yes_or_no);
-    ~SpeakerTracker();
-    
-    void    markForDeletion(bool b){ marked_for_deletion = b; }
-    bool    markedForDeletion(){ return marked_for_deletion; }
-    bool    possiblyUnmarkForDeletion(const QString &id_string, const QString &inuse_string);
-    int     getId(){ return id; }
-    QString getInUse(){ if (in_use) return QString("yes"); return QString("no"); }
- 
-  private:
-
-    int     id;
-    QString name;   
-    bool    in_use;
-    bool    marked_for_deletion;
-};
+#include "speakertracker.h"
 
 class AudioClient : public ServiceClient
 {
@@ -60,7 +39,9 @@ class AudioClient : public ServiceClient
     void parseFromAudio(QStringList &tokens);
     void executeCommand(QStringList new_command);
     void askForStatus();
+    void toggleSpeakers(const QString &full_command);
     void syncSpeakerList(QStringList &tokens);
+    void nameSpeakers(QStringList &tokens);
     ~AudioClient();
 
   private:
