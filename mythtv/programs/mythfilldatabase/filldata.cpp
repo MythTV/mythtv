@@ -1443,6 +1443,8 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
                 QString partnumber(part.section('/',0,0).stripWhiteSpace());
                 QString parttotal(part.section('/',1,1).stripWhiteSpace());
 
+                pginfo->catType = "series";
+
                 if (!episode.isEmpty())
                 {
                     tmp = episode.toInt() + 1;
@@ -1473,6 +1475,7 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
                      info.attribute("system") == "onscreen" &&
                      pginfo->subtitle.isEmpty())
             {
+                 pginfo->catType = "series";
                  pginfo->subtitle = getFirstText(info);
             }
         }
