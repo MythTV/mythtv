@@ -604,6 +604,7 @@ void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
                              keyframedist, aspect_ratio, kScan_Detect);
 }
 
+#ifdef USING_XVMC
 static int xvmc_stream_type(int codec_id)
 {
     switch (codec_id)
@@ -627,6 +628,7 @@ static int xvmc_stream_type(int codec_id)
 
 static int xvmc_pixel_format(enum PixelFormat pix_fmt)
 {
+    (void) pix_fmt;
     int xvmc_chroma = XVMC_CHROMA_FORMAT_420;
 #if 0
 // We don't support other chromas yet
@@ -639,6 +641,7 @@ static int xvmc_pixel_format(enum PixelFormat pix_fmt)
 #endif
     return xvmc_chroma;
 }
+#endif // USING_XVMC
 
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
