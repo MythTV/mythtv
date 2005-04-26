@@ -10,6 +10,7 @@
       <text lang="FI">Nimikkeet</text>
       <text lang="ZH_TW">標題</text>
       <text lang="SI">Naslovi</text>
+      <text lang="ET">Pealkirjad</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -23,6 +24,7 @@
       <text lang="FI">Avainsanat</text>
       <text lang="ZH_TW">關鍵字</text>
       <text lang="SI">Ključne besede</text>
+      <text lang="ET">Võtmesõnad</text>
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -34,6 +36,7 @@
       <text lang="DE">nach Personen</text>
       <text lang="FI">Ihmiset</text>
       <text lang="SI">Osebe</text>
+      <text lang="ET">Inimesed</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -45,6 +48,8 @@
       <text lang="DE">Erweiterte Suche</text>
       <text lang="FI">Lisävalinnat</text>
       <text lang="SI">Napredno</text>
+      <text lang="ET">Muud valikud</text>
+      <alttext lang="ET">Muud</alttext>
       <action>TV_SEARCH_POWER</action>
    </button>
 

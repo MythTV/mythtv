@@ -11,6 +11,7 @@
       <text lang="FI">Musiikkityökalut</text>
       <text lang="ZH_TW">音樂工具</text>
       <text lang="SI">Glasbena orodja</text>
+      <text lang="ET">Muusikatööriistad</text>
       <action>PLUGIN mythmusic</action>
       <depends>mythmusic</depends>	
    </button>
@@ -30,6 +31,7 @@
      <text lang="FI">Videonhallinta</text>
      <text lang="ZH_TW">電影工具</text>
      <text lang="SI">Video manager</text>
+     <text lang="ET">Videohaldus</text>
      <action>JUMP Video Manager</action>
      <depends>mythvideo</depends>
    </button>
@@ -50,6 +52,7 @@
      <text lang="FI">Asetukset</text>
      <text lang="ZH_TW">設定</text>
      <text lang="SI">Nastavitve</text>
+     <text lang="ET">Seaded</text>
      <action>MENU main_settings.xml</action>
    </button>
 

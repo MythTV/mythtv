@@ -14,6 +14,7 @@
       <text lang="SV">Se på TV</text>
       <text lang="JA">TVを見る</text>
       <text lang="SI">Gledanje TV</text>
+      <text lang="ET">Vaata telerit</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -31,7 +32,9 @@
       <text lang="SV">Radera inspelningar</text>
       <text lang="JA">録画削除</text>
       <text lang="SI">Brisanje Snemanj</text>
+      <text lang="ET">Kustuta salvestusi</text>
       <alttext lang="DE">Löschen</alttext>
+      <alttext lang="ET">Kustuta</alttext>
       <action>TV_DELETE</action>
    </button> 
 
@@ -45,6 +48,7 @@
       <text lang="DE">TV direkt</text>
       <text lang="SV">TV direkt</text>
       <text lang="JA">パススルーモード</text>
+      <text lang="ET">TV läbilase</text>
       <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
    </button>
 -->
@@ -55,6 +59,7 @@
       <text lang="SV">Föregående</text>
       <text lang="DE">Alte Aufnahmen</text>
       <text lang="SI">Že posneto</text>
+      <text lang="ET">Varem salvestatud</text>
       <action>TV_PREVIOUS</action>
    </button>
 
@@ -65,6 +70,7 @@
       <text lang="SV">Systemstatus</text>
       <text lang="JA">システムステータス</text>
       <text lang="SI">Status sistema</text>
+      <text lang="ET">Süsteemi olek</text>
       <action>TV_STATUS</action>
    </button>
 

@@ -16,6 +16,7 @@
       <text lang="FI">Yleiset</text>
       <text lang="ZH_TW">一般</text>
       <text lang="SI">Splošno</text>
+      <text lang="ET">Üldine</text>
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -35,7 +36,9 @@
       <text lang="FI">Ohjelmaopas</text>
       <text lang="ZH_TW">節目表</text>
       <text lang="SI">Programski vodič</text>
+      <text lang="ET">Telekava</text>
       <alttext lang="DE">EPG</alttext>
+      <alttext lang="ET">Kava</alttext>
       <action>SETTINGS EPG</action>
    </button>
 
@@ -55,6 +58,7 @@
       <text lang="FI">Toisto</text>
       <text lang="ZH_TW">重播</text>
       <text lang="SI">Predvajanje</text>
+      <text lang="ET">Mahamängimine</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -74,8 +78,10 @@
       <text lang="FI">Nauhoitusprofiilit</text>
       <text lang="ZH_TW">錄影設定</text>
       <text lang="SI">Snemalni profili</text>
+      <text lang="ET">Salvestamisprofiilid</text>
       <alttext lang="SV">Inspelning</alttext>
       <alttext lang="DE">Profile</alttext>
+      <alttext lang="ET">Profiilid</alttext>
       <action>SETTINGS RECORDING</action>
    </button>
 
@@ -89,7 +95,9 @@
       <text lang="FI">Nauhoitusprioriteetit</text>
       <text lang="ZH_TW">錄影優先次序</text>
       <text lang="SI">Snemalne prioritete</text>
+      <text lang="ET">Salvestamisprioriteedid</text>
       <alttext lang="DE">Prioritäten</alttext>
+      <alttext lang="ET">Prioriteedid</alttext>
       <action>MENU recpriorities_settings.xml</action>
    </button>
 

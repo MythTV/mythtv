@@ -14,6 +14,7 @@
       <text lang="SV">Programguide</text>
       <text lang="JA">番組ガイド</text>
       <text lang="SI">Programski vodič</text>
+      <text lang="ET">Telekava</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Parilla</alttext>
@@ -25,6 +26,7 @@
       <alttext lang="SV">Guide</alttext>
       <alttext lang="JA">ガイド</alttext>
       <alttext lang="SI">Vodič</alttext>
+      <alttext lang="ET">Kava</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -42,6 +44,7 @@
       <text lang="SV">Programletaren</text>
       <text lang="JA">番組検索</text>
       <text lang="SI">Iskalec programov</text>
+      <text lang="ET">Programmiotsija</text>
       <alttext>Finder</alttext>
       <alttext lang="FR">Recherche</alttext>
       <alttext lang="ES">Buscar</alttext>
@@ -53,6 +56,7 @@
       <alttext lang="SV">Sökaren</alttext>
       <alttext lang="JA">検索</alttext>
       <alttext lang="SI">Iskalec</alttext>
+      <alttext lang="ET">Otsija</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -64,10 +68,12 @@
       <text lang="NL">Zoekfunctie</text>
       <text lang="JA">リスト検索</text>
       <text lang="SI">Iskanje seznamov</text>
+      <text lang="ET">Otsi telekavu</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök tablå</alttext>
       <alttext lang="NL">Zoek</alttext>      
       <alttext lang="SI">Iskanje</alttext>
+      <alttext lang="ET">Telekavad</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -85,6 +91,7 @@
       <text lang="PT">Gravar Agora</text>
       <text lang="SV">Omedelbar inspelning</text>
       <text lang="JA">簡単録画</text>
+      <text lang="ET">Kohene salvestamine</text>
       <alttext>Instant Record</alttext>
       <alttext lang="FR">Enreg. manuel</alttext>
       <alttext lang="ES">Grab. inst.</alttext>
@@ -105,6 +112,7 @@
       <text lang="JA">カスタム録画</text>
       <text lang="DE">freie Planung</text>
       <text lang="SI">Poljubno snemanje</text>
+      <text lang="ET">Kohandatud salvestamine</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -120,6 +128,7 @@
       <text lang="SV">Manuell schemaläggning</text>
       <text lang="JA">手動予約</text>
       <text lang="SI">Ročno snemanje</text>
+      <text lang="ET">Käsitsi salvestamine</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
@@ -130,6 +139,7 @@
       <alttext lang="SV">Manuell</alttext>
       <alttext lang="JA">手動</alttext>
       <alttext lang="SI">Ročno</alttext>
+      <alttext lang="ET">Käsitsi</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 

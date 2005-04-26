@@ -10,6 +10,7 @@
      <text lang="FI">1. Yleiset</text>
      <text lang="FR">1. Général</text>
      <text lang="SI">1. Splošno</text>
+     <text lang="ET">1. Üldine</text>
      <action>GENERAL</action>
    </button>
 
@@ -23,6 +24,7 @@
      <text lang="FI">2. TV-kortit</text>
      <text lang="FR">2. Cartes d'aquisition</text>
      <text lang="SI">2. Kartice za zajem</text>
+     <text lang="ET">2. TV-kaardid</text>
      <action>CAPTURE CARDS</action>
    </button>
 
@@ -36,6 +38,7 @@
      <text lang="FI">3. Kuvanlähteet</text>
      <text lang="FR">3. Sources vidéos</text>
      <text lang="SI">3. Video viri</text>
+     <text lang="ET">3. Videosisendid</text>
      <action>VIDEO SOURCES</action>
    </button>
 
@@ -49,6 +52,7 @@
      <text lang="FI">4. Sisääntuloasetukset</text>
      <text lang="FR">4. Connections en entrée</text>
      <text lang="SI">4. Vhodne povezave</text>
+     <text lang="ET">4. Sisendite ühendused</text>
      <action>CARD INPUTS</action>
    </button>
 
@@ -61,6 +65,7 @@
      <text lang="FI">5. Kanavanviritys</text>
      <text lang="FR">5. Éditeur de chaînes</text>
      <text lang="SI">5. Urejanje kanalov</text>
+     <text lang="ET">5. Kanaliredaktor</text>
      <action>CHANNEL EDITOR</action>
    </button>
 

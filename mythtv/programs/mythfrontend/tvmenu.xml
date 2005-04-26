@@ -16,6 +16,7 @@
       <text lang="FI">Katso Televisiota</text>
       <text lang="ZH_TW">觀看電視</text>
       <text lang="SI">Gledanje TV</text>
+      <text lang="ET">Vaata telerit</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -35,6 +36,7 @@
       <text lang="FI">Ajasta Nauhoituksia</text>
       <text lang="ZH_TW">預設錄影</text>
       <text lang="SI">Plan snemanj</text>
+      <text lang="ET">Planeeri salvestamisi</text>
       <alttext>Schedule</alttext>
       <alttext lang="FR">Programmation</alttext>
       <alttext lang="ES">Temporizadores</alttext>
@@ -48,6 +50,7 @@
       <alttext lang="DE">Planung</alttext>
       <alttext lang="ZH_TW">預錄</alttext>
       <alttext lang="SI">Plan</alttext>
+      <alttext lang="ET">Planeerimine</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -67,6 +70,8 @@
       <text lang="FI">Katso Nauhoitukset</text>
       <text lang="ZH_TW">觀看預錄節目</text>
       <text lang="SI">Predvajanje snemanj</text>
+      <text lang="ET">Vaata salvestusi</text>
+      <alttext lang="ET">Salvestused</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -86,6 +91,8 @@
       <text lang="FI">Poista Nauhoituksia</text>
       <text lang="ZH_TW">刪除錄影</text>
       <text lang="SI">Brisanje snemanj</text>
+      <text lang="ET">Kustuta salvestusi</text>
+      <alttext lang="ET">Kustuta</alttext>
       <action>TV_DELETE</action>
    </button> 
 
@@ -99,6 +106,7 @@
       <text lang="DE">TV direkt</text>
       <text lang="SV">TV direkt</text>
       <text lang="JA">パススルーモード</text>
+      <text lang="ET">TV läbilase</text>
       <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
    </button>
 -->
@@ -114,6 +122,7 @@
       <text lang="FI">Systeemin Tila</text>
       <text lang="ZH_TW">系統狀態</text>
       <text lang="SI">Status sistema</text>
+      <text lang="ET">Süsteemi olek</text>
       <action>TV_STATUS</action>
    </button>
 

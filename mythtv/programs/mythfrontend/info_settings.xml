@@ -15,6 +15,7 @@
      <text lang="FI">Sään Asetukset</text>
      <text lang="ZH_TW">天氣報告設定</text>
      <text lang="SI">Nastavitve vremena</text>
+     <text lang="ET">Ilmateate seaded</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -32,6 +33,7 @@
      <text lang="FI">Uutisten Asetukset</text>
      <text lang="ZH_TW">網上新聞設定</text>
      <text lang="SI">Nastavitve novic</text>
+     <text lang="ET">Uudiste seaded</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -41,6 +43,7 @@
      <text>Movie Time Settings</text>
      <text lang="FI">Elokuvien Aika-asetukset</text>
      <text lang="SI">Nastavitve čas filmov</text>
+     <text lang="ET">Filmiaegade seaded</text>
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -56,6 +59,7 @@
      <text lang="FI">Nettiasetukset</text>
      <text lang="ZH_TW">互聯網設定</text>
      <text lang="SI">Spletne nastavitve</text>
+     <text lang="ET">Veebi seaded</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -70,7 +74,9 @@
      <text lang="FI">Reseptiasetukset</text>
      <text lang="NL">Kookboek Instellingen</text>     
      <text lang="SI">Nastavitve receptov</text>
+     <text lang="ET">Retseptide seaded</text>     
      <alttext lang="DE">Rezepte</alttext>
+     <alttext lang="ET">Retseptid</alttext>
      <action>CONFIGPLUGIN mythrecipe</action>
      <depends>mythrecipe</depends>
    </button>

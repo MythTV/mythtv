@@ -16,6 +16,7 @@
       <text lang="FI">Katso Nauhoitukset</text>
       <text lang="ZH_TW">觀看預錄節目</text>
       <text lang="SI">Gledanje snemanj</text>
+      <text lang="ET">Vaata salvestusi</text>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -34,6 +35,7 @@
      <text lang="FI">Katso Videoita</text>
      <text lang="ZH_TW">播放電影</text>
      <text lang="SI">Gledanje filmov</text>
+     <text lang="ET">Vaata videot</text>
      <action>JUMP MythVideo</action>
      <depends>mythvideo</depends>
    </button>
@@ -54,6 +56,7 @@
       <text lang="FI">Kuuntele Musiikkia</text>
       <text lang="ZH_TW">播放音樂</text>
       <text lang="SI">Predvajanje glasbe</text>
+      <text lang="ET">Kuula muusikat</text>
       <action>JUMP Play music</action>
       <depends>mythmusic</depends>
    </button>
@@ -68,6 +71,7 @@
      <text lang="FR">Écouter la radio</text>
      <text lang="FI">Kuuntele Radiota</text>
      <text lang="SI">Poslušanje radia</text>
+     <text lang="ET">Kuula raadiot</text>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>
    </button>
@@ -88,6 +92,7 @@
      <text lang="FI">Kuvagalleria</text>
      <text lang="ZH_TW">照相館</text>
      <text lang="SI">Gledanje slik</text>
+     <text lang="ET">Pildialbum</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
    </button>
@@ -108,6 +113,7 @@
      <text lang="FI">Pelit</text>
      <text lang="ZH_TW">遊戲</text>
      <text lang="SI">Igranje iger</text>
+     <text lang="ET">Mängi mänge</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>

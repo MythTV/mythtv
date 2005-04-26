@@ -7,6 +7,7 @@
      <text lang="SV">TV</text>
      <text lang="DE">TV</text>
      <text lang="SI">TV</text>
+     <text lang="ET">TV</text>
      <action>MENU tvmenu.xml</action>
    </button>
 
@@ -24,6 +25,7 @@
      <text lang="SV">Musik</text>
      <text lang="JA">ミュージック</text>
      <text lang="SI">Glasba</text>
+     <text lang="ET">Muusika</text>
      <action>PLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -42,6 +44,7 @@
      <text lang="SV">Video</text>
      <text lang="JA">ビデオ</text>
      <text lang="SI">Filmi</text>
+     <text lang="ET">Videod</text>
      <action>PLUGIN mythvideo</action>
      <depends>mythvideo</depends>
    </button>
@@ -53,6 +56,7 @@
      <text lang="PT">DVD</text>
      <text lang="SV">DVD</text>
      <text lang="SI">DVD</text>
+     <text lang="ET">DVD</text>
      <action>PLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -62,6 +66,7 @@
       <text>Radio</text>
       <text lang="DE">Radio</text>
       <text lang="SI">Radio</text>
+      <text lang="ET">Raadio</text>
       <action>PLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -80,6 +85,7 @@
      <text lang="SV">Galleri</text>
      <text lang="JA">イメージ</text>
      <text lang="SI">Slike</text>
+     <text lang="ET">Pildid</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
    </button>
@@ -98,6 +104,7 @@
      <text lang="SV">Spel</text>
      <text lang="JA">ゲーム</text>
      <text lang="SI">Igre</text>
+     <text lang="ET">Mängud</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -116,6 +123,7 @@
      <text lang="SV">Väder</text>
      <text lang="JA">天気</text>
      <text lang="SI">Vreme</text>
+     <text lang="ET">Ilm</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -130,6 +138,7 @@
      <text lang="SV">Nyheter</text>
      <text lang="JA">ニュース</text>
      <text lang="SI">Novice</text>
+     <text lang="ET">Uudised</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -141,6 +150,7 @@
       <text lang="SV">Webb</text>
       <text lang="JA">ウェブ</text>
       <text lang="SI">Splet</text>
+      <text lang="ET">Veeb</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -150,6 +160,7 @@
       <text>Phone</text>
       <text lang="DE">Telefon</text>
       <text lang="SI">Telefon</text>
+      <text lang="ET">Telefon</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -159,6 +170,7 @@
       <text>Recipes</text>
       <text lang="DE">Rezepte</text>
       <text lang="SI">Recepti</text>
+      <text lang="ET">Retseptid</text>
       <action>PLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -177,6 +189,7 @@
      <text lang="SV">Inställningar</text>
      <text lang="JA">設定</text>
      <text lang="SI">Nastavitve</text>
+     <text lang="ET">Seadistused</text>
      <action>MENU main_settings.xml</action>
    </button>
 
@@ -185,6 +198,7 @@
      <text>Shutdown</text>
      <text lang="SV">Avstängning</text>
      <text lang="DE">Beenden</text>
+     <text lang="ET">Seiskamine</text>
      <action>SHUTDOWN</action>
    </button> -->
 </mythmenu>

@@ -16,6 +16,7 @@
       <text lang="FI">Katso TV:tä</text>
       <text lang="ZH_TW">觀看電視</text>
       <text lang="SI">Glej TV</text>
+      <text lang="ET">Vaata telerit</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -30,7 +31,9 @@
      <text lang="FI">Mediakirjasto</text>
      <text lang="ZH_TW">媒體館</text>
      <text lang="SI">Media</text>
+     <text lang="ET">Meediakataloog</text>
      <alttext lang="SV">Bibliotek</alttext>
+     <alttext lang="ET">Kataloog</alttext>
      <action>MENU library.xml</action>
    </button>
    
@@ -50,8 +53,10 @@
       <text lang="FI">Hallitse Nauhoituksia</text>
       <text lang="ZH_TW">管理電視錄影</text>
       <text lang="SI">Urejanje snemanj</text>
+      <text lang="ET">Halda salvestusi</text>
       <alttext lang="DE">Verwaltung</alttext>
       <alttext lang="SV">Hantera</alttext>
+      <alttext lang="ET">Salvestused</alttext>
       <action>MENU manage_recordings.xml</action>
    </button>
 
@@ -66,8 +71,10 @@
      <text lang="FI">Tiedotepalvelu</text>
      <text lang="ZH_TW">資訊中心</text>
      <text lang="SI">Info center</text>
+     <text lang="ET">Infokeskus</text>
      <alttext lang="DE">Infocenter</alttext>
      <alttext lang="SV">Infocenter</alttext>
+     <alttext lang="ET">Info</alttext>
      <action>MENU info_menu.xml</action>
    </button>
 
@@ -82,6 +89,7 @@
      <text lang="FI">DVD ja CD</text>
      <text lang="ZH_TW">光碟</text>
      <text lang="SI">CD/DVD</text>
+     <text lang="ET">DVD ja CD</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
@@ -96,6 +104,7 @@
      <text lang="SV">Telefon</text>
      <text lang="FR">Téléphone</text>
      <text lang="SI">Telefon</text>
+     <text lang="ET">Telefon</text>
      <action>PLUGIN mythphone</action>
      <depends>mythphone</depends>
    </button>
@@ -116,6 +125,7 @@
      <text lang="FI">Oheis/Asetukset</text>
      <text lang="ZH_TW">工具/設定</text>
      <text lang="SI">Nastavitve</text>
+     <text lang="ET">Utiliidid / seaded</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <alttext lang="SV">Inställningar</alttext>
      <action>MENU util_menu.xml</action>
@@ -127,6 +137,7 @@
      <text lang="SV">Avstängning</text>
      <text lang="NL">Uitschakelen</text>
      <text lang="DE">Beenden</text>
+     <text lang="ET">Seiska</text>
      <action>SHUTDOWN</action>
    </button> -->
 
