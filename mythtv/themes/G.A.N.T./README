@@ -13,12 +13,6 @@
   copyrighted to Paul Davey and used with permission, and the rest that's made
   by me are copyrighted to me.
   
-== What needs to be done? =====================================================
-  * Still issues with long translated strings. Shouldn't AltText kick in?
-  * qtlook.txt needs work.
-  * MythMusic support is on its way.
-  * MythWeather support is on its way.
-
 == Contact & author ===========================================================
   Oscar Carlsson <oscar[dot]carlsson[at]home[dot]se>
 ===============================================================================
