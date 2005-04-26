@@ -120,9 +120,13 @@ void XvMCSurfaceTypes::find(int minWidth, int minHeight,
         }
     }
 }
-        
-inline bool XvMCSurfaceTypes::hasIDCT(int width, int height,
-                                      int chroma, Display *pdisp) 
+
+bool XvMCSurfaceTypes::has(Display *pdisp,
+                           XvMCAccelID accel_type,
+                           uint stream_type,
+                           int chroma,
+                           uint width,       uint height,
+                           uint osd_width,   uint osd_height)
 {
     Display* disp = pdisp;
     if (!pdisp)
@@ -157,7 +161,8 @@ inline bool XvMCSurfaceTypes::hasIDCT(int width, int height,
         if (ai[i].type == 0)
             continue;
         XvMCSurfaceTypes::find(width, height, chroma,
-                               false, true, 2, 0, 0,
+                               XvVLD == accel_type, XvIDCT == accel_type,
+                               stream_type, osd_width, osd_height,
                                disp, ai[i].base_id, 
                                ai[i].base_id + ai[i].num_ports - 1,
                                p, s);

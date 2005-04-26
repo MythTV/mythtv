@@ -35,7 +35,7 @@
 
 #include "filtermanager.h"
 
-VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, bool is_mpeg_video)
+VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, CodecID av_codec_id)
 {
     (void)type;
 
@@ -53,7 +53,7 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, bool is_mpeg_video)
 #endif
 
 #ifdef USING_XV
-    return new VideoOutputXv(is_mpeg_video);
+    return new VideoOutputXv(av_codec_id);
 #endif
 
 #ifdef Q_OS_MACX

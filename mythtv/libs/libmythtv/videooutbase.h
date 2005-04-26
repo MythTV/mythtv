@@ -10,6 +10,7 @@ extern "C" {
 #include <qptrqueue.h>
 #include <qptrlist.h>
 #include "videobuffers.h"
+#include "../libavcodec/avcodec.h" // for CodecID
 
 using namespace std;
 
@@ -87,7 +88,8 @@ enum FrameScanType {
 class VideoOutput
 {
   public:
-    static VideoOutput *InitVideoOut(VideoOutputType type, bool is_mpeg_video);
+    static VideoOutput *InitVideoOut(VideoOutputType type,
+                                     CodecID av_codec_id);
 
     VideoOutput();
     virtual ~VideoOutput();

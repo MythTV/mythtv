@@ -13,12 +13,12 @@
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
 
+#include "../libavcodec/avcodec.h"
+
 #ifdef USING_XVMC
 class XvMCOSD;
 #include "XvMCSurfaceTypes.h"
-extern "C" {
 #include "../libavcodec/xvmc_render.h"
-}
 typedef struct
 {
     XvMCSurface         surface;
@@ -36,8 +36,13 @@ typedef enum VideoOutputSubType {
 class VideoOutputXv : public VideoOutput
 {
   public:
-    VideoOutputXv(bool is_mpeg_video);
+    VideoOutputXv(CodecID av_codec_id);
    ~VideoOutputXv();
+
+    static CodecID GetBestSupportedCodec(uint width, uint height,
+                                         uint osd_width, uint osd_height,
+                                         uint stream_type, int xvmc_chroma,
+                                         bool &with_idct);
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
@@ -71,7 +76,7 @@ class VideoOutputXv : public VideoOutput
   private:
     VOSType VideoOutputSubType() const { return video_output_subtype; }
 
-    int GrabSuitableXvPort(bool use_xvmc);
+    int GrabSuitableXvPort(VOSType type);
 
     VideoFrame *GetNextFreeFrame(bool allow_unsafe);
     void DiscardFrame(VideoFrame*);
@@ -94,8 +99,8 @@ class VideoOutputXv : public VideoOutput
     void InitDisplayMeasurements(uint width, uint height);
     void InitColorKey(bool turnoffautopaint);
 
-    bool InitVideoBuffers(bool use_xvmc, bool use_xv, bool use_shm);
-    bool InitXvMC(void);
+    bool InitVideoBuffers(VOSType xvmc_type, bool use_xv, bool use_shm);
+    bool InitXvMC(VOSType);
     bool InitXVideo(void);
     bool InitXShm(void);
     bool InitXlib(void);
@@ -170,7 +175,7 @@ class VideoOutputXv : public VideoOutput
     DisplayRes          *display_res;
     float                display_aspect;
     QMutex               global_lock;
-    bool                 allow_xvmc;
+    CodecID              av_codec_id;
 ////////////////////////
     void CheckDisplayedFramesForAvailability(void);
 #ifdef USING_XVMC

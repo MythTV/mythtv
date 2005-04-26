@@ -42,9 +42,9 @@ static QString xvflags2str(int flags);
 
 #ifdef USING_XVMC
 #   define AGGRESSIVE_BUFFER_MANAGEMENT
-#   define XVMC_OSD_NUM 2
-#   define XVMC_OSD_RES_NUM 2
-#   define XVMC_MIN_SURF_NUM 8
+#   define XVMC_OSD_NUM       2
+#   define XVMC_OSD_RES_NUM   2
+#   define XVMC_MIN_SURF_NUM  8
 #   define XVMC_MAX_SURF_NUM 16
     static inline xvmc_render_state_t *GetRender(VideoFrame *frame);
 
@@ -60,8 +60,9 @@ static QString xvflags2str(int flags);
 #define GUID_I420_PLANAR 0x30323449
 #define GUID_YV12_PLANAR 0x32315659
 
-static void SetFromEnv(Display *d, bool &useXvMC, bool &useXV, bool &useShm);
-static void SetFromXvSupport(Display *d, bool &useXvMC, bool &useXV);
+static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
+                       bool &useXV, bool &useShm);
+static void SetFromHW(Display *d, bool &useXvMC, bool &useXV, bool& useShm);
 
 /** \class  VideoOutputXv
  * Supports common video output methods used with X11 Servers.
@@ -75,7 +76,7 @@ static void SetFromXvSupport(Display *d, bool &useXvMC, bool &useXV);
  * \see VideoOutput, VideoBuffers
  *
  */
-VideoOutputXv::VideoOutputXv(bool is_mpeg_video)
+VideoOutputXv::VideoOutputXv(CodecID codec_id)
     : VideoOutput(),
       XJ_root(0),  XJ_win(0), XJ_curwin(0), XJ_gc(0), XJ_screen(NULL),
       XJ_disp(NULL), XJ_screen_num(0), XJ_white(0), XJ_black(0), XJ_depth(0),
@@ -93,7 +94,7 @@ VideoOutputXv::VideoOutputXv(bool is_mpeg_video)
 #endif
       video_output_subtype(XVUnknown), display_res(NULL),
       display_aspect(1.0), global_lock(true),
-      allow_xvmc(is_mpeg_video)
+      av_codec_id(codec_id)
 {
     VERBOSE(VB_PLAYBACK, "VideoOutputXv()");
     bzero(&av_pause_frame, sizeof(av_pause_frame));
@@ -339,12 +340,12 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
 }
 
 /**
- * \fn VideoOutputXv::GrabSuitableXvPort(bool need_xvmc)
+ * \fn VideoOutputXv::GrabSuitableXvPort(VOSType)
  * Internal function used to grab a XVideo port with the desired properties.
  *
  * \return port number if it succeeds, else -1.
  */
-int VideoOutputXv::GrabSuitableXvPort(bool need_xvmc)
+int VideoOutputXv::GrabSuitableXvPort(VOSType type)
 {
     uint neededFlags[] = { XvInputMask,
                            XvInputMask,
@@ -358,9 +359,9 @@ int VideoOutputXv::GrabSuitableXvPort(bool need_xvmc)
 
     QString msg[] =
     {
-        "XvMC surface found and with VLD support on port %1",
-        "XvMC surface found and with IDCT support on port %1",
-        "XvMC surface found and with MC support on port %1",
+        "XvMC surface found with VLD support on port %1",
+        "XvMC surface found with IDCT support on port %1",
+        "XvMC surface found with MC support on port %1",
         "XVideo surface found on port %1"
     };
 
@@ -378,8 +379,26 @@ int VideoOutputXv::GrabSuitableXvPort(bool need_xvmc)
 
     // find an Xv port
     int port = -1;
-    const uint begin = (need_xvmc) ? 0 : 3;
-    const uint end = (need_xvmc) ? 3 : 4;
+    uint begin = 0, end = 4;
+    switch (type)
+    {
+        case XVideo:
+            begin = 3; end = 4;
+            break;
+        case XVideoMC:
+            begin = 2; end = 3;
+            break;
+        case XVideoIDCT:
+            begin = 1; end = 2;
+            break;
+        case XVideoVLD:
+            begin = 0; end = 1;
+            break;
+        default:
+            break;
+    }
+    VERBOSE(VB_IMPORTANT, "begin("<<begin<<") end("<<end<<")");
+
     for (uint j = begin; j < end; ++j)
     {
         VERBOSE(VB_PLAYBACK, QString("@ j=%1 Looking for flag[s]: %2")
@@ -483,21 +502,22 @@ void VideoOutputXv::CreatePauseFrame(void)
 }
 
 /**
- * \fn VideoOutputXv::InitVideoBuffers(bool use_xvmc, bool use_xv, bool use_shm)
+ * \fn VideoOutputXv::InitVideoBuffers(bool,bool,bool,bool,bool)
  * Creates and initializes video buffers.
  *
  * \sideeffect sets video_output_subtype if it succeeds.
  *
  * \return success or failure at creating any buffers.
  */
-bool VideoOutputXv::InitVideoBuffers(bool use_xvmc, bool use_xv, bool use_shm)
+bool VideoOutputXv::InitVideoBuffers(VOSType xvmc_type,
+                                     bool use_xv, bool use_shm)
 {
-    bool done = false;
+    (void)xvmc_type;
 
+    bool done = false;
     // If use_xvmc try to create XvMC buffers
-    (void) use_xvmc;
 #ifdef USING_XVMC
-    if (use_xvmc)
+    if (xvmc_type > XVideo)
     {
         // Create ffmpeg VideoFrames    
         vbuffers.Init(8 /*numdecode*/, false /*extra_for_pause*/,
@@ -505,7 +525,7 @@ bool VideoOutputXv::InitVideoBuffers(bool use_xvmc, bool use_xv, bool use_shm)
                       5-XVMC_OSD_RES_NUM /*needprebuffer_normal*/,
                       5-XVMC_OSD_RES_NUM /*needprebuffer_small*/,
                       1 /*keepprebuffer*/, true /*use_frame_locking*/);
-        done = InitXvMC();
+        done = InitXvMC(xvmc_type);
 
         if (!done)
             vbuffers.Reset();
@@ -528,7 +548,7 @@ bool VideoOutputXv::InitVideoBuffers(bool use_xvmc, bool use_xv, bool use_shm)
     if (!done)
         done = InitXlib();
 
-    // All XVideo & XvMC methods allow the display to be adjusted
+    // XVideo & XvMC output methods allow the picture to be adjusted
     if (done && VideoOutputSubType() >= XVideo &&
         gContext->GetNumSetting("UseOutputPictureControls", 0))
     {
@@ -542,17 +562,17 @@ bool VideoOutputXv::InitVideoBuffers(bool use_xvmc, bool use_xv, bool use_shm)
 }
 
 /**
- * \fn VideoOutputXv::InitXvMC()
- * Creates and initializes video buffers.
+ * \fn VideoOutputXv::InitXvMC(VOSType)
+ *  Creates and initializes video buffers.
  *
  * \sideeffect sets video_output_subtype if it succeeds.
  *
  * \return success or failure at creating any buffers.
  */
-bool VideoOutputXv::InitXvMC()
+bool VideoOutputXv::InitXvMC(VOSType type)
 {
 #ifdef USING_XVMC
-    xv_port = GrabSuitableXvPort(true);
+    xv_port = GrabSuitableXvPort(type);
     if (xv_port == -1)
     {
         VERBOSE(VB_IMPORTANT, "Could not find suitable XvMC surface.");
@@ -613,7 +633,7 @@ bool VideoOutputXv::InitXvMC()
  */
 bool VideoOutputXv::InitXVideo()
 {
-    xv_port = GrabSuitableXvPort(false);
+    xv_port = GrabSuitableXvPort(XVideo);
     if (xv_port == -1)
     {
         VERBOSE(VB_IMPORTANT, "Could not find suitable XVideo surface.");
@@ -736,6 +756,69 @@ bool VideoOutputXv::InitXlib()
     return ok;
 }
 
+/** \fn VideoOutputXv::GetBestSupportedCodec(uint,uint,uint,uint,uint,bool&)
+ *
+ * \bug as of the writing of this function there are no codec id's
+ *      in avcodec for XvMC support for H263 and MPEG4. So this
+ *      function will return CODEC_ID_MPEG2VIDEO_XVMC if the stream
+ *      type is 3 (H263) or 4 (MPEG4) and XvMC is supported for those
+ *      surfaces.
+ * \return CodecID for the best supported codec on the main display.
+ */
+CodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
+                                             uint osd_width, uint osd_height,
+                                             uint stream_type, int xvmc_chroma,
+                                             bool &with_idct)
+{
+#ifdef USING_XVMC
+    Display *disp;
+    X11S(disp = XOpenDisplay(NULL));
+
+    // Disable features based on environment and DB values.
+    bool use_xvmc_vld = false, use_xvmc_idct = false, use_xvmc = false;
+    bool use_xv = true, use_shm = true;
+#ifdef USING_XVMC_VLD
+    use_xvmc_vld = use_xvmc = gContext->GetNumSetting("UseXvMcVld", 1);
+#endif
+    if (!use_xvmc)
+        use_xvmc_idct = use_xvmc = gContext->GetNumSetting("UseXVMC", 1);
+    else if (!use_xvmc_idct)
+        use_xvmc_idct = gContext->GetNumSetting("UseXVMC", 1);
+
+    SetFromEnv(use_xvmc_vld, use_xvmc_idct, use_xvmc, use_xv, use_shm);
+    SetFromHW(disp, use_xvmc, use_xv, use_shm);
+
+    with_idct = false;
+    CodecID ret = CODEC_ID_MPEG2VIDEO;
+    if (use_xvmc_vld &&
+        XvMCSurfaceTypes::has(disp, XvVLD, stream_type, xvmc_chroma,
+                              width, height, osd_width, osd_height))
+    {
+        ret = CODEC_ID_MPEG2VIDEO_XVMC_VLD;
+    }
+    else if (use_xvmc_idct &&
+        XvMCSurfaceTypes::has(disp, XvIDCT, stream_type, xvmc_chroma,
+                              width, height, osd_width, osd_height))
+    {
+        ret = CODEC_ID_MPEG2VIDEO_XVMC;
+        with_idct = true;
+    }
+    else if (use_xvmc &&
+             XvMCSurfaceTypes::has(disp, XvMC, stream_type, xvmc_chroma,
+                                   width, height, osd_width, osd_height))
+    {
+        ret = CODEC_ID_MPEG2VIDEO_XVMC;
+    }
+
+    X11L;
+    XCloseDisplay(disp);
+    X11U;
+    return ret;
+#else
+    return CODEC_ID_MPEG2VIDEO;
+#endif
+}
+
 #define XV_INIT_FATAL_ERROR_TEST(test,msg) \
 do { \
     if (test) \
@@ -752,9 +835,9 @@ do { \
  *
  * \return success or failure.
  */
-bool VideoOutputXv::Init(int width, int height, float aspect, 
-                         WId winid, int winx, int winy, int winw, 
-                         int winh, WId embedid)
+bool VideoOutputXv::Init(
+    int width, int height, float aspect, 
+    WId winid, int winx, int winy, int winw, int winh, WId embedid)
 {
     needrepaint = true;
 
@@ -772,6 +855,8 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     XJ_curwin     = winid;
     XJ_win        = winid;
     XJ_root       = DefaultRootWindow(XJ_disp);
+    XJ_gc         = XCreateGC(XJ_disp, XJ_win, 0, 0);
+    XJ_depth      = DefaultDepthOfScreen(XJ_screen);
     X11U;
 
     // Basic setup
@@ -782,30 +867,21 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     // Set resolution/measurements (check XRandR, Xinerama, config settings)
     InitDisplayMeasurements(width, height);
 
-    // Disable features based on environment variables.
-    bool use_xvmc_vld = false, use_xvmc = false, use_xv = true, use_shm = true;
-#ifdef USING_XVMC_VLD
-    use_xvmc_vld = use_xvmc = gContext->GetNumSetting("UseXvMcVld", 1);
-#endif
-#ifdef USING_XVMC
-    if (!use_xvmc)
-        use_xvmc = gContext->GetNumSetting("UseXVMC", 1);
-#endif
+    // Set use variables...
+    bool vld = (CODEC_ID_MPEG2VIDEO_XVMC_VLD == av_codec_id);
+    bool idct = (CODEC_ID_MPEG2VIDEO_XVMC == av_codec_id);
+    bool mc = idct, xv = !vld && !idct, shm = xv;
+    SetFromEnv(vld, idct, mc, xv, shm);
+    SetFromHW(XJ_disp, mc, xv, shm);
+    VOSType xvmc_type = vld ? XVideoVLD : 
+        (idct ? XVideoIDCT : (mc ? XVideoMC : XVideo));
 
-    SetFromEnv(XJ_disp, use_xvmc, use_xv, use_shm);
-    SetFromXvSupport(XJ_disp, use_xvmc, use_xv);
-    if (!allow_xvmc)
-        use_xvmc_vld = use_xvmc = false;
-
-    if (use_xvmc && embedid > 0)
+    // Set embedding window id
+    if (embedid > 0)
         XJ_curwin = XJ_win = embedid;
 
-    X11L;
-    XJ_gc = XCreateGC(XJ_disp, XJ_win, 0, 0);
-    XJ_depth = DefaultDepthOfScreen(XJ_screen);
-    X11U;
-
-    bool ok = InitVideoBuffers(use_xvmc, use_xv, use_shm);
+    // Create video buffers
+    bool ok = InitVideoBuffers(xvmc_type, xv, shm);
     XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
 
     if (video_output_subtype >= XVideo)
@@ -2532,27 +2608,23 @@ void VideoOutputXv::FlushSurface(VideoFrame* frame)
 #endif // USING_XVMC
 }
 
-static void SetFromEnv(Display *d, bool &useXvMC, bool &useXVideo, bool &useShm)
+static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
+                       bool &useXVideo, bool &useShm)
 {
     // can be used to force non-Xv mode as well as non-Xv/non-Shm mode
+    if (getenv("NO_XVMC_VLD"))
+        useXvVLD = false;
+    if (getenv("NO_XVMC_IDCT"))
+        useXvIDCT = false;
     if (getenv("NO_XVMC"))
-        useXvMC = false;
+        useXvVLD = useXvIDCT = useXvMC = false;
     if (getenv("NO_XV"))
-        useXVideo = false;
-    useShm = false;
+         useXvVLD = useXvIDCT = useXvMC = useXVideo = false;
     if (getenv("NO_SHM"))
-        useXVideo = false;
-    else
-    {
-        const char *dispname = DisplayString(d);
-        if ((dispname) && (*dispname == ':'))
-            X11S(useShm = (bool) XShmQueryExtension(d));
-    }
-    if (!useXVideo)
-        useXvMC = false;
+        useXVideo = useShm = false;
 }
 
-static void SetFromXvSupport(Display *d, bool &useXvMC, bool &useXVideo)
+static void SetFromHW(Display *d, bool &useXvMC, bool &useXVideo, bool &useShm)
 {
     // find out about XvMC support
     if (useXvMC)
@@ -2591,6 +2663,13 @@ static void SetFromXvSupport(Display *d, bool &useXvMC, bool &useXVideo)
             useXVideo = false;
             useXvMC = false;
         }
+    }
+
+    if (useShm)
+    {
+        const char *dispname = DisplayString(d);
+        if ((dispname) && (*dispname == ':'))
+            X11S(useShm = (bool) XShmQueryExtension(d));
     }
 }
 

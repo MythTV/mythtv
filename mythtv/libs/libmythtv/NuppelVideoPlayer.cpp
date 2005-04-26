@@ -151,7 +151,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(ProgramInfo *info)
     next_normal_speed = true;
     videobuf_retries = 0;
 
-    disablevideo = disableaudio = false;
+    using_null_videoout = disableaudio = false;
 
     setpipplayer = pipplayer = NULL;
     needsetpipplayer = false;
@@ -290,7 +290,7 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     if (decoder && videoOutput)
     {
         //cout << "updating frames played" << endl;
-        if (disablevideo || forceVideoOutput == kVideoOutput_IVTV)
+        if (using_null_videoout || forceVideoOutput == kVideoOutput_IVTV)
             decoder->UpdateFramesPlayed();
         else
             framesPlayed = videoOutput->GetFramesPlayed();
@@ -375,7 +375,7 @@ void NuppelVideoPlayer::ForceVideoOutputType(VideoOutputType type)
 bool NuppelVideoPlayer::InitVideo(void)
 {
     InitFilters();
-    if (disablevideo)
+    if (using_null_videoout)
     {
         videoOutput = new VideoOutputNull();
         if (!videoOutput->Init(video_width, video_height, video_aspect,
@@ -407,7 +407,7 @@ bool NuppelVideoPlayer::InitVideo(void)
         }
 
         videoOutput = VideoOutput::InitVideoOut(forceVideoOutput,
-                                                decoder->IsXvMCCompatible());
+                                                decoder->GetVideoCodecID());
 
         if (!videoOutput)
         {
@@ -424,47 +424,6 @@ bool NuppelVideoPlayer::InitVideo(void)
         {
             errored = true;
             return false;
-        }
-
-        // We must tell the AvFormatDecoder whether we are using
-        // an IDCT or MC pixel format.
-        bool reopen = true;
-        if (videoOutput->hasVLDAcceleration())
-        {
-            decoder->SetMPEG2Codec(CODEC_ID_MPEG2VIDEO_XVMC_VLD);
-            ForceVideoOutputType(kVideoOutput_XvMC);
-        }
-        else if (videoOutput->hasIDCTAcceleration())
-        {
-            decoder->SetMPEG2Codec(CODEC_ID_MPEG2VIDEO_XVMC);
-            decoder->SetPixelFormat(PIX_FMT_XVMC_MPEG2_IDCT);
-            ForceVideoOutputType(kVideoOutput_XvMC);
-        }
-        else if (videoOutput->hasMCAcceleration())
-        {
-            decoder->SetMPEG2Codec(CODEC_ID_MPEG2VIDEO_XVMC);
-            decoder->SetPixelFormat(PIX_FMT_XVMC_MPEG2_MC);
-            ForceVideoOutputType(kVideoOutput_XvMC);
-        }
-        else
-        {
-            decoder->SetMPEG2Codec(CODEC_ID_MPEG2VIDEO);
-            reopen = false;
-        }
-        if (reopen)
-        {
-            VERBOSE(VB_PLAYBACK, QString("Reopening: %1")
-                    .arg(ringBuffer->GetFilename()));
-            char buf[2024];
-            int ret = decoder->OpenFile(ringBuffer, false, buf);
-            if (ret < 0)
-            {
-                VERBOSE(VB_IMPORTANT,
-                        QString("NVP: Couldn't open decoder for: %1")
-                        .arg(ringBuffer->GetFilename()));
-                return false;
-            }
-            DiscardVideoFrames();
         }
     }
 
@@ -701,7 +660,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     if (NuppelDecoder::CanHandle(testbuf))
         decoder = new NuppelDecoder(this, m_playbackinfo);
 #ifdef USING_IVTV
-    else if (!disablevideo && IvtvDecoder::CanHandle(testbuf,
+    else if (!using_null_videoout && IvtvDecoder::CanHandle(testbuf,
                                                      ringBuffer->GetFilename()))
     {
         decoder = new IvtvDecoder(this, m_playbackinfo);
@@ -710,7 +669,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     }
 #endif
     else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
-        decoder = new AvFormatDecoder(this, m_playbackinfo);
+        decoder = new AvFormatDecoder(this, m_playbackinfo, using_null_videoout);
+
 
     if (!decoder)
     {
@@ -737,7 +697,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
 
     int ret;
-    // We still want to locate decoder for video even if disablevideo is true
+    // We still want to locate decoder for video even if using_null_videoout is true
     bool disable_video_decoding = false; // set to true for audio only decodeing
     if ((ret = decoder->OpenFile(ringBuffer, disable_video_decoding, testbuf)) < 0)
     {
@@ -1357,7 +1317,7 @@ void NuppelVideoPlayer::InitAVSync(void)
         refreshrate = frame_interval;
     vsynctol = refreshrate / 4;
 
-    if (!disablevideo)
+    if (!using_null_videoout)
     {
         if (usevideotimebase)
             VERBOSE(VB_PLAYBACK, "Using video as timebase");
@@ -1402,7 +1362,7 @@ void NuppelVideoPlayer::AVSync(void)
             "frame to keep audio in sync").arg(diverge));
         lastsync = true;
     }
-    else if (!disablevideo)
+    else if (!using_null_videoout)
     {
         if (videoOutput->IsErrored())
         {   // this check prevents calling prepareframe
@@ -1664,7 +1624,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     float temp_speed = (play_speed == 0.0) ? audio_stretchfactor : play_speed;
     int fr_int = (int)(1000000.0 / video_frame_rate / temp_speed);
-    if (disablevideo)
+    if (using_null_videoout)
     {
         videosync = new USleepVideoSync(fr_int, 0, false);
     }
@@ -1891,7 +1851,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         return;
     }
 
-    if (!disablevideo)
+    if (!using_null_videoout)
     {
         int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
         videoOutput->GetVisibleSize(dispx, dispy, dispw, disph);
@@ -1929,7 +1889,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     decoder_thread = pthread_self();
     pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
 
-    if (!disablevideo)
+    if (!using_null_videoout)
     {
         // Request that the video output thread run with realtime priority.
         // If mythyv/mythfrontend was installed SUID root, this will work.
@@ -2099,7 +2059,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         GetFrame(audioOutput == NULL || !normal_speed);
 
-        if (disablevideo || forceVideoOutput == kVideoOutput_IVTV)
+        if (using_null_videoout || forceVideoOutput == kVideoOutput_IVTV)
             decoder->UpdateFramesPlayed();
         else
             framesPlayed = videoOutput->GetFramesPlayed();
@@ -2138,7 +2098,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     audioOutput = NULL;
 
 /*
-    if (!disablevideo)
+    if (!using_null_videoout)
     {
         // Reset to default scheduling
         struct sched_param sp = {0};
@@ -3386,7 +3346,7 @@ void NuppelVideoPlayer::LoadCommBreakList(void)
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
                                        int &vh)
 {
-    disablevideo = true;
+    using_null_videoout = true;
 
     if (OpenFile() < 0)
         return NULL;
@@ -3595,7 +3555,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     blankMap.clear();
     commBreakMap.clear();
 
-    disablevideo = true;
+    using_null_videoout = true;
 
     if (ringBuffer && !ringBuffer->IsOpen())
         return(254);
@@ -3944,7 +3904,7 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
 
     killplayer = false;
     framesPlayed = 0;
-    disablevideo = true;
+    using_null_videoout = true;
 
     if (OpenFile() < 0)
         return(0);

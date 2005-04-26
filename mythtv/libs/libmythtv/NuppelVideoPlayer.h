@@ -51,9 +51,9 @@ class NuppelVideoPlayer
 
     void SetParentWidget(QWidget *widget) { parentWidget = widget; }
 
-    void SetAsPIP(void) { disableaudio = disablevideo = true; }
+    void SetAsPIP(void) { disableaudio = using_null_videoout = true; }
     void SetNoAudio(void) { disableaudio = true; }
-    void SetNoVideo(void) { disablevideo = true; }
+    void SetNullVideo(void) { using_null_videoout = true; }
 
     void SetAudioDevice(QString device) { audiodevice = device; }
     void SetFileName(QString lfilename) { filename = lfilename; }
@@ -361,7 +361,7 @@ class NuppelVideoPlayer
 
     OSD *osd;
 
-    bool disablevideo;
+    bool using_null_videoout;
     bool disableaudio;
 
     NuppelVideoPlayer *pipplayer;

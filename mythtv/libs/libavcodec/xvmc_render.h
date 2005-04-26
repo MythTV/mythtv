@@ -1,6 +1,10 @@
 #ifndef XVMC_RENDER_H_
 #define XVMC_RENDER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
@@ -64,5 +68,9 @@ typedef   struct{
   XvMCContext *ctx;
 
 } xvmc_render_state_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

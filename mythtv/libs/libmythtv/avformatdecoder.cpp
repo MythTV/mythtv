@@ -12,10 +12,13 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 
-extern "C" {
 #ifdef USING_XVMC
+#include "videoout_xv.h"
+extern "C" {
 #include "libavcodec/xvmc_render.h"
+}
 #endif
+extern "C" {
 #include "libavcodec/liba52/a52.h"
 #include "../libmythmpeg2/mpeg2.h"
 }
@@ -35,7 +38,6 @@ class AvFormatDecoderPrivate
     void ResetMPEG2();
     int DecodeMPEG2Video(AVCodecContext *avctx, AVFrame *picture,
                          int *got_picture_ptr, uint8_t *buf, int buf_size);
-    bool UsingNonXvMCDecoder() { return (bool) mpeg2dec; }
 
     AvFormatDecoder *parent;
     mpeg2dec_t *mpeg2dec;
@@ -120,8 +122,10 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
                     picture->data[2] = info->display_fbuf->buf[2];
                     picture->opaque  = info->display_fbuf->id;
                     *got_picture_ptr = 1;
-                    picture->top_field_first = !!(info->display_picture->flags & PIC_FLAG_TOP_FIELD_FIRST);
-                    picture->interlaced_frame = !(info->display_picture->flags & PIC_FLAG_PROGRESSIVE_FRAME);
+                    picture->top_field_first = !!(info->display_picture->flags &
+                                                  PIC_FLAG_TOP_FIELD_FIRST);
+                    picture->interlaced_frame = !(info->display_picture->flags &
+                                                  PIC_FLAG_PROGRESSIVE_FRAME);
                 }
                 return buf_size;
             case STATE_INVALID:
@@ -135,9 +139,10 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
     }
 }
 
-
-AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
-    : DecoderBase(parent, pginfo), mpeg2_codec(CODEC_ID_MPEG2VIDEO)
+AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
+                                 bool use_null_videoout)
+    : DecoderBase(parent, pginfo), using_null_videoout(use_null_videoout),
+      video_codec_id(CODEC_ID_NONE)
 {
     d = new AvFormatDecoderPrivate(this);
     
@@ -395,44 +400,6 @@ void AvFormatDecoder::InitByteContext(void)
     ic->pb.max_packet_size = 0;
 }
 
-
-bool AvFormatDecoder::IsXvMCCompatible()
-{
-    return !d->UsingNonXvMCDecoder();
-}
-
-static QMap<void*, enum PixelFormat> _PixelFormatsMap;
-
-/*
-static enum PixelFormat getFormat(struct AVCodecContext *cc,
-                                  const enum PixelFormat *pixfmts)
-{
-    if (_PixelFormatsMap.end() != _PixelFormatsMap.find(cc))
-    {
-        return _PixelFormatsMap[cc];
-    }
-
-    VERBOSE(VB_IMPORTANT, "Pixel format not set, returning pixfmts[0]");
-    return pixfmts[0];
-}
-*/
-
-void AvFormatDecoder::SetPixelFormat(const int pixFormat)
-{
-    PixelFormat pix = (PixelFormat)pixFormat;
-    for (int i = 0; i < ic->nb_streams; i++)
-    {
-        AVCodecContext *cc = &ic->streams[i]->codec;
-        if (CODEC_TYPE_VIDEO == cc->codec_type)
-            _PixelFormatsMap[cc]=pix;
-    }
-}
-
-void AvFormatDecoder::SetMPEG2Codec(const int codec_id)
-{
-    mpeg2_codec = (CodecID) codec_id;
-}
-
 extern "C" void HandleStreamChange(void* data) {
     AvFormatDecoder* decoder = (AvFormatDecoder*) data;
     int cnt = decoder->ic->nb_streams;
@@ -443,9 +410,8 @@ extern "C" void HandleStreamChange(void* data) {
 /** \fn AvFormatDecoder::OpenFile(RingBuffer*, bool, char[2048])
  *  OpenFile opens a ringbuffer for playback.
  *
- *  OpenFile deletes any existing context then reads the first
- *  few kilobytes out of the ringbuffer and then seeks to the 
- *  beginning of the buffer. It then calls ScanStreams to find
+ *  OpenFile deletes any existing context then use testbuf to
+ *  guess at the stream type. It then calls ScanStreams to find
  *  any valid streams to decode. If possible a position map is
  *  also built for quick skipping.
  *
@@ -453,28 +419,11 @@ extern "C" void HandleStreamChange(void* data) {
  *  /param novideo if true then no video is sought in ScanSreams.
  *  /param _testbuf this paramater is not used by AvFormatDecoder.
  */
-int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char _testbuf[2048])
+int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048])
 {
-    (void) _testbuf;
-
     CloseContext();
 
     ringBuffer = rbuffer;
-
-    // we read the test buffer ourselves, we need more data
-    uint testbuf_size = 4 * 1024;
-    char testbuf[testbuf_size];
-    {
-        ringBuffer->Seek(0, SEEK_SET);
-        if ((uint)ringBuffer->Read(testbuf, testbuf_size) != testbuf_size)
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("AvFormatDecoder: Couldn't read file: %1")
-                    .arg(ringBuffer->GetFilename()));
-            return -1;
-        }
-        ringBuffer->Seek(0, SEEK_SET);
-    }
 
     AVInputFormat *fmt = NULL;
     char *filename = (char *)(rbuffer->GetFilename().ascii());
@@ -482,7 +431,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char _testbuf[2
     AVProbeData probe;
     probe.filename = filename;
     probe.buf = (unsigned char *)testbuf;
-    probe.buf_size = testbuf_size;
+    probe.buf_size = 2048;
 
     fmt = av_probe_input_format(&probe, true);
     if (!fmt)
@@ -633,7 +582,6 @@ void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
         enc->slice_flags = SLICE_FLAG_CODED_ORDER |
             SLICE_FLAG_ALLOW_FIELD;
         directrendering = true;
-        SetLowBuffers(true);
     }
     else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
              !(enc->width % 16))
@@ -654,6 +602,42 @@ void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
 
     m_parent->SetVideoParams(align_width, align_height, fps,
                              keyframedist, aspect_ratio, kScan_Detect);
+}
+
+static int xvmc_stream_type(int codec_id)
+{
+    switch (codec_id)
+    {
+        case CODEC_ID_MPEG1VIDEO:
+            return 1;
+        case CODEC_ID_MPEG2VIDEO:
+        case CODEC_ID_MPEG2VIDEO_XVMC:
+        case CODEC_ID_MPEG2VIDEO_XVMC_VLD:
+            return 2;
+#if 0
+// We don't support these yet.
+        case CODEC_ID_H263:
+            return 3;
+        case CODEC_ID_MPEG4:
+            return 4;
+#endif
+    }
+    return 0;
+}
+
+static int xvmc_pixel_format(enum PixelFormat pix_fmt)
+{
+    int xvmc_chroma = XVMC_CHROMA_FORMAT_420;
+#if 0
+// We don't support other chromas yet
+    if (PIX_FMT_YUV420P == pix_fmt)
+        xvmc_chroma = XVMC_CHROMA_FORMAT_420;
+    else if (PIX_FMT_YUV422P == pix_fmt)
+        xvmc_chroma = XVMC_CHROMA_FORMAT_422;
+    else if (PIX_FMT_YUV420P == pix_fmt)
+        xvmc_chroma = XVMC_CHROMA_FORMAT_444;
+#endif
+    return xvmc_chroma;
 }
 
 int AvFormatDecoder::ScanStreams(bool novideo)
@@ -687,22 +671,29 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     break;
 
                 d->DestroyMPEG2();
-                if (CODEC_ID_NONE != mpeg2_codec &&
-                    (CODEC_ID_MPEG1VIDEO == enc->codec_id ||
-                     CODEC_ID_MPEG2VIDEO == enc->codec_id ||
-                     CODEC_ID_MPEG2VIDEO_XVMC == enc->codec_id ||
-                     CODEC_ID_MPEG2VIDEO_XVMC_VLD == enc->codec_id))
+#ifdef USING_XVMC
+                if (!using_null_videoout && xvmc_stream_type(enc->codec_id))
                 {
-                    enc->codec_id = mpeg2_codec;
-                    //enc->get_format = getFormat;
+                    bool idct;
+                    enc->codec_id = VideoOutputXv::GetBestSupportedCodec(
+                        /* disp dim     */ enc->width, enc->height,
+                        /* osd dim      */ /*enc->width*/ 0, /*enc->height*/ 0,
+                        /* mpeg type    */ xvmc_stream_type(enc->codec_id),
+                        /* xvmc pix fmt */ xvmc_pixel_format(enc->pix_fmt),
+                        /* with_idct    */ idct);
+                    if (CODEC_ID_MPEG2VIDEO_XVMC == enc->codec_id)
+                        enc->pix_fmt = (idct) ?
+                            PIX_FMT_XVMC_MPEG2_IDCT : PIX_FMT_XVMC_MPEG2_MC;
                 }
+#endif // USING_XVMC
                 InitVideoCodec(enc);
-                    // Only use libmpeg2 when not using XvMC
+                // Only use libmpeg2 when not using XvMC
                 if (CODEC_ID_MPEG1VIDEO == enc->codec_id ||
                     CODEC_ID_MPEG2VIDEO == enc->codec_id)
                 {
                     d->InitMPEG2();
                 }
+                video_codec_id = enc->codec_id;
                 break;
             }
             case CODEC_TYPE_AUDIO:

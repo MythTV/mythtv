@@ -28,7 +28,8 @@ class AvFormatDecoder : public DecoderBase
 {
     friend void HandleStreamChange(void*);
   public:
-    AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo);
+    AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
+                    bool use_null_video_out);
    ~AvFormatDecoder();
 
     void CloseContext();
@@ -68,9 +69,7 @@ class AvFormatDecoder : public DecoderBase
 
     QString GetEncodingType(void) { return QString("MPEG-2"); }
 
-    void SetPixelFormat(const int);
-    bool IsXvMCCompatible();
-    void SetMPEG2Codec(const int codec_id);
+    CodecID GetVideoCodecID() { return video_codec_id; }
 
     virtual void incCurrentAudioTrack();
     virtual void decCurrentAudioTrack();
@@ -173,7 +172,8 @@ class AvFormatDecoder : public DecoderBase
     QValueVector<int> audioStreams;
     int wantedAudioStream;
 
-    CodecID mpeg2_codec;
+    bool using_null_videoout;
+    CodecID video_codec_id;
 };
 
 #endif

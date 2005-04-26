@@ -317,7 +317,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     }
 
     nvp = new NuppelVideoPlayer(m_proginfo);
-    nvp->SetNoVideo();
+    nvp->SetNullVideo();
 
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime statustime = curtime;
