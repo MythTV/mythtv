@@ -185,7 +185,7 @@ void adjustRegion(uint8_t *buf, uint8_t *end, const uint8_t *table)
     }
 }
 
-#if i386
+#ifdef i386
 void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
                      const mmx_t *shift, const mmx_t *scale, const mmx_t *min,
                      const mmx_t *clamp1, const mmx_t *clamp2)

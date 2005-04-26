@@ -10,7 +10,7 @@ using namespace std;
 #define MM_SSE    0x0008 /* SSE functions */
 #define MM_SSE2   0x0010 /* PIV SSE2 functions */
 
-#ifdef i386
+#ifdef MMX
 
 #include "mmx.h"
 
@@ -188,7 +188,7 @@ OSDSurface::OSDSurface(int w, int h)
     blendcolumnfunc = &blendcolumn;
     blendcolorfunc = &blendcolor;
     blendconstfunc = &blendconst;
-#if defined(i386) && defined(MMX)
+#ifdef MMX
     usemmx = (mm_support() & MM_MMX);
     if (usemmx)
     {
@@ -285,7 +285,7 @@ static inline void blendalpha8_c(unsigned char *src, unsigned char *dest,
          dest[i] = blendColorsAlpha(src[i], dest[i], alpha[i * mult]);
 }
 
-#if i386
+#ifdef MMX
 // cribbed from Jason Tackaberry's vf_bmovl2 source
 static inline void blendalpha8_mmx(unsigned char *src, unsigned char *dest,
                                    unsigned char *alpha, bool uvplane)
@@ -381,7 +381,7 @@ static inline void blendalpha8_mmx(unsigned char *src, unsigned char *dest,
 
 blendtoyv12_8_fun blendtoyv12_8_init(OSDSurface *surface)
 {
-#if i386
+#ifdef MMX
     if (surface->usemmx)
         return blendalpha8_mmx;
 #endif
@@ -408,7 +408,7 @@ static inline void blendtoargb_8_c(OSDSurface *surf, unsigned char *src,
     }
 }
 
-#if i386
+#ifdef MMX
 #define movntq(src, dest) movq_r2m(src, dest);
 static inline void blendtoargb_8_mmx(OSDSurface * /*surf*/, unsigned char *src,
                                      unsigned char *usrc, unsigned char *vsrc,
@@ -507,7 +507,7 @@ static inline void blendtoargb_8_mmx(OSDSurface * /*surf*/, unsigned char *src,
 
 blendtoargb_8_fun blendtoargb_8_init(OSDSurface *surface)
 {
-#if i386
+#ifdef MMX
     if (surface->usemmx)
         return blendtoargb_8_mmx;
 #endif
@@ -520,7 +520,7 @@ struct dither8_context
     int amask;
     int ishift;
     int imask;
-#if i386
+#ifdef MMX
     mmx_t amask_mmx;
     mmx_t imask_mmx;
 #endif
@@ -542,7 +542,7 @@ static inline void dithertoia44_8_c(unsigned char *src, unsigned char *dest,
     }
 }
 
-#if i386
+#ifdef MMX
 static inline void dithertoia44_8_mmx(unsigned char *src, unsigned char *dest,
                                       unsigned char *alpha,
                                       const unsigned char *dmp, int xpos,
@@ -622,7 +622,7 @@ static inline void dithertoia44_8_mmx(unsigned char *src, unsigned char *dest,
 
 dithertoia44_8_fun dithertoia44_8_init(OSDSurface* /*surface*/)
 {
-#if i386
+#ifdef MMX
 // mmx version seems to be about the same speed, no reason to use it.
 //    if (surface->usemmx)
 //        return dithertoia44_8_mmx;
@@ -630,7 +630,7 @@ dithertoia44_8_fun dithertoia44_8_init(OSDSurface* /*surface*/)
     return dithertoia44_8_c;
 }
 
-#if i386
+#ifdef MMX
 static mmx_t mask_0f = {0x0f0f0f0f0f0f0f0fLL};
 static mmx_t mask_f0 = {0xf0f0f0f0f0f0f0f0LL};
 #endif
@@ -644,7 +644,7 @@ dither8_context *init_dithertoia44_8_context(bool first)
         context->amask = 0x0f;
         context->ishift = 4;
         context->imask = 0xf0;
-#if i386
+#ifdef MMX
         context->amask_mmx = mask_0f;
         context->imask_mmx = mask_f0;
 #endif
@@ -655,7 +655,7 @@ dither8_context *init_dithertoia44_8_context(bool first)
         context->amask = 0xf0;
         context->ishift = 0;
         context->imask = 0x0f;
-#if i386
+#ifdef MMX
         context->amask_mmx = mask_f0;
         context->imask_mmx = mask_0f;
 #endif

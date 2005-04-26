@@ -2277,7 +2277,7 @@ fi
 fi
 
 if test x"$mmx" = x"yes"; then
-  CONFIG_DEFINES="$CONFIG_DEFINES MMX"
+  CONFIG_DEFINES="$CONFIG_DEFINES MMX i386"
 fi
 
 if test x"$ivtv" = x"yes" ; then
