@@ -2289,12 +2289,23 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
 }
 
 #ifdef USING_XVMC
+#if XVMC_OSD_NUM == 1
+
 XvMCOSD* VideoOutputXv::GetAvailableOSD()
 { 
-#if XVMC_OSD_NUM == 1
     xvmc_osd_lock.lock();
     return xvmc_osd_available.head();
-#else
+}
+
+void VideoOutputXv::ReturnAvailableOSD(XvMCOSD*)
+{
+    xvmc_osd_lock.unlock();
+}
+
+#else // if XVMC_OSD_NUM != 1
+
+XvMCOSD* VideoOutputXv::GetAvailableOSD()
+{ 
     XvMCOSD *val = NULL;
     xvmc_osd_lock.lock();
     while (!xvmc_osd_available.size())
@@ -2306,18 +2317,16 @@ XvMCOSD* VideoOutputXv::GetAvailableOSD()
     val = xvmc_osd_available.dequeue();
     xvmc_osd_lock.unlock();
     return val;
-#endif
 }
 
 void VideoOutputXv::ReturnAvailableOSD(XvMCOSD* avail)
 {
-    (void)avail;
-#if XVMC_OSD_NUM != 1
     xvmc_osd_lock.lock();
     xvmc_osd_available.push_front(avail);
-#endif
     xvmc_osd_lock.unlock();
 }
+#endif // if XVMC_OSD_NUM != 1
+
 #endif // USING_XVMC
 
 void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
