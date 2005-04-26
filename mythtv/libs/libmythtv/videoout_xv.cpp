@@ -1922,8 +1922,6 @@ void VideoOutputXv::ShowXVideo(FrameScanType scan)
 
     vbuffers.UnlockFrame(frame, "ShowXVideo");
     global_lock.unlock();
-
-    X11S(XSync(XJ_disp, False));
 }
 
 // this is documented in videooutbase.cpp
@@ -1936,12 +1934,15 @@ void VideoOutputXv::Show(FrameScanType scan)
         return;
     }
 
+    if (needrepaint && (VideoOutputSubType() >= XVideo))
+        DrawUnusedRects(/* don't do a sync*/false);
+
     if (VideoOutputSubType() > XVideo)
         ShowXvMC(scan);
     else if (VideoOutputSubType() == XVideo)
         ShowXVideo(scan);
-    else
-        X11S(XSync(XJ_disp, False));
+
+    X11S(XSync(XJ_disp, False));
 }
 
 /**
@@ -2387,9 +2388,6 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
         ProcessFrameMem(frame, osd, filterList, pipPlayer);
     else
         ProcessFrameXvMC(frame, osd);
-
-    if (needrepaint && (VideoOutputSubType() >= XVideo))
-        DrawUnusedRects(/* don't do a sync*/false);
 }
 
 int VideoOutputXv::ChangePictureAttribute(int attributeType, int newValue)

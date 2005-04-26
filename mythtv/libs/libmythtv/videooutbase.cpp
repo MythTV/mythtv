@@ -721,7 +721,6 @@ void VideoOutput::MoveResize(void)
            .arg(imgx).arg(imgy).arg(imgw).arg(imgh));
 
     needrepaint = true;
-    DrawUnusedRects();
 }
 
 void VideoOutput::Zoom(int direction)
