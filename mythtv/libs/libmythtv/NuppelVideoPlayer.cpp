@@ -1858,9 +1858,12 @@ void NuppelVideoPlayer::StartPlaying(void)
         osd = new OSD(video_width, video_height, frame_interval,
                       dispx, dispy, dispw, disph);
 
-        if (forceVideoOutput != kVideoOutput_Default &&
-            forceVideoOutput != kVideoOutput_IVTV)
+        if ((CODEC_ID_MPEG2VIDEO_XVMC_VLD == decoder->GetVideoCodecID() ||
+             CODEC_ID_MPEG2VIDEO_XVMC == decoder->GetVideoCodecID()) &&
+            (600 < video_height))
+        {            
             osd->DisableFade();
+        }
     }
 
     playing = true;

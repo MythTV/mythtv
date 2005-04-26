@@ -27,7 +27,6 @@ struct ImgReSampleContext;
 enum VideoOutputType
 {
     kVideoOutput_Default = 0,
-    kVideoOutput_XvMC,
     kVideoOutput_VIA,
     kVideoOutput_IVTV,
     kVideoOutput_Directfb
