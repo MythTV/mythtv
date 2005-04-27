@@ -20,4 +20,4 @@ HEADERS +=          mfedialog.h   mfdinfo.h   playlistdialog.h   netflasher.h
 
 SOURCES += main.cpp mfedialog.cpp mfdinfo.cpp playlistdialog.cpp netflasher.cpp
 
-LIBS += -L/usr/local/lib -lmfdclient
+LIBS += -L$${PREFIX}/lib -lmfdclient
