@@ -179,7 +179,7 @@ MfdPlaylistCheckedEvent::MfdPlaylistCheckedEvent()
 ---------------------------------------------------------------------
 */
 
-MfdSpeakerListEvent::MfdSpeakerListEvent(QPtrList<SpeakerTracker> *l_speakers)
+MfdSpeakerListEvent::MfdSpeakerListEvent(int which_mfd, QPtrList<SpeakerTracker> *l_speakers)
                     :QCustomEvent(MFD_CLIENTLIB_EVENT_SPEAKER_LIST)
 {
 
@@ -200,7 +200,15 @@ MfdSpeakerListEvent::MfdSpeakerListEvent(QPtrList<SpeakerTracker> *l_speakers)
         speakers.append(new_speaker);
         ++iter;
     }
+    
+    mfd_id = which_mfd;
 }
+
+int MfdSpeakerListEvent::getMfd()
+{
+    return mfd_id;
+}
+
 
 MfdSpeakerListEvent::~MfdSpeakerListEvent()
 {

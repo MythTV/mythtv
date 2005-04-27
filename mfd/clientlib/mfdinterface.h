@@ -87,7 +87,7 @@ class MfdInterface : public QObject
     void audioPlaying(int, int, int, int, int, int, int, int, int);
     void metadataChanged(int, MfdContentCollection*);
     void playlistCheckDone();
-    void speakerList(QPtrList<SpeakerTracker> *speakers);
+    void speakerList(int, QPtrList<SpeakerTracker> *speakers);
 
   protected:
   

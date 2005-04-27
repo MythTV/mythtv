@@ -505,7 +505,7 @@ void AudioClient::syncSpeakerList(QStringList &tokens)
     //  Each time we get a list may be the last, so we send an event
     //
     
-    MfdSpeakerListEvent *sle = new MfdSpeakerListEvent(&speakers);
+    MfdSpeakerListEvent *sle = new MfdSpeakerListEvent(mfd_id, &speakers);
     QApplication::postEvent(mfd_interface, sle);
 }
 
@@ -580,8 +580,9 @@ void AudioClient::nameSpeakers(QStringList &tokens)
     target_speaker->setName(new_name);
 
 
+    
     /*
-
+    
     //
     //  Debugging
     //
@@ -604,11 +605,30 @@ void AudioClient::nameSpeakers(QStringList &tokens)
     
     */
     
+
+    //
+    //  Find first one that does not have a name, make a name request for it
+    //
+
+    a_speaker = iter.toFirst();
+    while ( (a_speaker = iter.current()) != 0 )
+    {
+        if (! a_speaker->haveName())
+        {
+            QString command = QString("speakername %1\n").arg(a_speaker->getId());
+            client_socket_to_service->writeBlock(command.ascii(), command.length());
+            break;
+        }
+        ++iter;
+    }
+
+    
+    
     //
     //  Each time we get a name may be the last, so we send an event
     //
     
-    MfdSpeakerListEvent *sle = new MfdSpeakerListEvent(&speakers);
+    MfdSpeakerListEvent *sle = new MfdSpeakerListEvent(mfd_id, &speakers);
     QApplication::postEvent(mfd_interface, sle);
 }
 

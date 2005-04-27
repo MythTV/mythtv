@@ -553,7 +553,7 @@ void MfdInterface::customEvent(QCustomEvent *ce)
         QPtrList<SpeakerTracker>* speakers = sle->getSpeakerList();
         if(speakers)
         {
-            emit speakerList(speakers);
+            emit speakerList(sle->getMfd(), speakers);
         }
     }
     

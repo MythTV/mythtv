@@ -203,13 +203,15 @@ class MfdSpeakerListEvent: public QCustomEvent
     
   public:
 
-    MfdSpeakerListEvent(QPtrList<SpeakerTracker> *l_speakers);
+    MfdSpeakerListEvent(int which_mfd, QPtrList<SpeakerTracker> *l_speakers);
     ~MfdSpeakerListEvent();
     
     QPtrList<SpeakerTracker>* getSpeakerList(){ return &speakers; }
+    int                getMfd();
     
   private:
   
+    int                 mfd_id;
     QPtrList<SpeakerTracker> speakers;
 };
 
