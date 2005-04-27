@@ -7,7 +7,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "programinfo.h"
-#include "../libavcodec/avcodec.h" // for CodecID
+#include "videooutbase.h" // for MythCodecID
 
 class RingBuffer;
 
@@ -50,7 +50,7 @@ class DecoderBase
     virtual void UpdateFramesPlayed(void);
     long long GetFramesRead(void) { return framesRead; };
 
-    virtual CodecID GetVideoCodecID() { return CODEC_ID_NONE; }
+    virtual MythCodecID GetVideoCodecID() { return kCodec_NONE; }
     virtual bool SyncPositionMap(void);
     virtual bool PosMapFromDb(void);
     virtual bool PosMapFromEnc(void);

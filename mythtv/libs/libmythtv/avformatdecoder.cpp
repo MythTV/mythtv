@@ -142,7 +142,7 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
 AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
                                  bool use_null_videoout)
     : DecoderBase(parent, pginfo), using_null_videoout(use_null_videoout),
-      video_codec_id(CODEC_ID_NONE)
+      video_codec_id(kCodec_NONE)
 {
     d = new AvFormatDecoderPrivate(this);
     
@@ -677,17 +677,25 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 #ifdef USING_XVMC
                 if (!using_null_videoout && xvmc_stream_type(enc->codec_id))
                 {
-                    bool idct;
-                    enc->codec_id = VideoOutputXv::GetBestSupportedCodec(
+                    MythCodecID mcid;
+                    mcid = VideoOutputXv::GetBestSupportedCodec(
                         /* disp dim     */ enc->width, enc->height,
                         /* osd dim      */ /*enc->width*/ 0, /*enc->height*/ 0,
                         /* mpeg type    */ xvmc_stream_type(enc->codec_id),
-                        /* xvmc pix fmt */ xvmc_pixel_format(enc->pix_fmt),
-                        /* with_idct    */ idct);
-                    if (CODEC_ID_MPEG2VIDEO_XVMC == enc->codec_id)
+                        /* xvmc pix fmt */ xvmc_pixel_format(enc->pix_fmt));
+                    bool vcd, idct, mc;
+                    enc->codec_id = myth2av_codecid(mcid, vcd, idct, mc);
+                    video_codec_id = mcid;
+                    if (kCodec_NORMAL_END < mcid && kCodec_STD_XVMC_END > mcid)
+                    {
                         enc->pix_fmt = (idct) ?
                             PIX_FMT_XVMC_MPEG2_IDCT : PIX_FMT_XVMC_MPEG2_MC;
+                    }
                 }
+                else
+                    video_codec_id = kCodec_MPEG2; // default to MPEG2
+#else
+                video_codec_id = kCodec_MPEG2; // default to MPEG2
 #endif // USING_XVMC
                 InitVideoCodec(enc);
                 // Only use libmpeg2 when not using XvMC
@@ -696,7 +704,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 {
                     d->InitMPEG2();
                 }
-                video_codec_id = enc->codec_id;
                 break;
             }
             case CODEC_TYPE_AUDIO:
@@ -754,10 +761,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         {
             VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Could not "
                     "open codec aborting. reason %1").arg(open_val));
-            av_close_input_file(ic);
+            //av_close_input_file(ic); // causes segfault
             ic = NULL;
             scanerror = -1;
-            continue;
+            break;
         }
 
         if (enc->codec_type == CODEC_TYPE_AUDIO)

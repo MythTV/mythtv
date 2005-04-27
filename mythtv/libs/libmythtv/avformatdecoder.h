@@ -69,7 +69,7 @@ class AvFormatDecoder : public DecoderBase
 
     QString GetEncodingType(void) { return QString("MPEG-2"); }
 
-    CodecID GetVideoCodecID() { return video_codec_id; }
+    MythCodecID GetVideoCodecID() { return video_codec_id; }
 
     virtual void incCurrentAudioTrack();
     virtual void decCurrentAudioTrack();
@@ -173,7 +173,7 @@ class AvFormatDecoder : public DecoderBase
     int wantedAudioStream;
 
     bool using_null_videoout;
-    CodecID video_codec_id;
+    MythCodecID video_codec_id;
 };
 
 #endif

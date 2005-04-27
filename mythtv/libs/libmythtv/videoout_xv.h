@@ -36,13 +36,12 @@ typedef enum VideoOutputSubType {
 class VideoOutputXv : public VideoOutput
 {
   public:
-    VideoOutputXv(CodecID av_codec_id);
+    VideoOutputXv(MythCodecID av_codec_id);
    ~VideoOutputXv();
 
-    static CodecID GetBestSupportedCodec(uint width, uint height,
-                                         uint osd_width, uint osd_height,
-                                         uint stream_type, int xvmc_chroma,
-                                         bool &with_idct);
+    static MythCodecID GetBestSupportedCodec(uint width, uint height,
+                                             uint osd_width, uint osd_height,
+                                             uint stream_type, int xvmc_chroma);
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
@@ -175,12 +174,15 @@ class VideoOutputXv : public VideoOutput
     DisplayRes          *display_res;
     float                display_aspect;
     QMutex               global_lock;
-    CodecID              av_codec_id;
+    MythCodecID          myth_codec_id;
 ////////////////////////
     void CheckDisplayedFramesForAvailability(void);
 #ifdef USING_XVMC
     friend class XvMCOSD;
 #endif // USING_XVMC
 };
+
+CodecID myth2av_codecid(MythCodecID codec_id,
+                        bool& vld, bool& idct, bool& mc);
 
 #endif // VIDEOOUT_XV_H_

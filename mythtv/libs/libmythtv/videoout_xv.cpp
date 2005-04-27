@@ -76,7 +76,7 @@ static void SetFromHW(Display *d, bool &useXvMC, bool &useXV, bool& useShm);
  * \see VideoOutput, VideoBuffers
  *
  */
-VideoOutputXv::VideoOutputXv(CodecID codec_id)
+VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     : VideoOutput(),
       XJ_root(0),  XJ_win(0), XJ_curwin(0), XJ_gc(0), XJ_screen(NULL),
       XJ_disp(NULL), XJ_screen_num(0), XJ_white(0), XJ_black(0), XJ_depth(0),
@@ -94,7 +94,7 @@ VideoOutputXv::VideoOutputXv(CodecID codec_id)
 #endif
       video_output_subtype(XVUnknown), display_res(NULL),
       display_aspect(1.0), global_lock(true),
-      av_codec_id(codec_id)
+      myth_codec_id(codec_id)
 {
     VERBOSE(VB_PLAYBACK, "VideoOutputXv()");
     bzero(&av_pause_frame, sizeof(av_pause_frame));
@@ -756,19 +756,13 @@ bool VideoOutputXv::InitXlib()
     return ok;
 }
 
-/** \fn VideoOutputXv::GetBestSupportedCodec(uint,uint,uint,uint,uint,bool&)
+/** \fn VideoOutputXv::GetBestSupportedCodec(uint,uint,uint,uint,uint)
  *
- * \bug as of the writing of this function there are no codec id's
- *      in avcodec for XvMC support for H263 and MPEG4. So this
- *      function will return CODEC_ID_MPEG2VIDEO_XVMC if the stream
- *      type is 3 (H263) or 4 (MPEG4) and XvMC is supported for those
- *      surfaces.
- * \return CodecID for the best supported codec on the main display.
+ * \return MythCodecID for the best supported codec on the main display.
  */
-CodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
-                                             uint osd_width, uint osd_height,
-                                             uint stream_type, int xvmc_chroma,
-                                             bool &with_idct)
+MythCodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
+                                                 uint osd_width, uint osd_height,
+                                                 uint stream_type, int xvmc_chroma)
 {
 #ifdef USING_XVMC
     Display *disp;
@@ -788,26 +782,24 @@ CodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
     SetFromEnv(use_xvmc_vld, use_xvmc_idct, use_xvmc, use_xv, use_shm);
     SetFromHW(disp, use_xvmc, use_xv, use_shm);
 
-    with_idct = false;
-    CodecID ret = CODEC_ID_MPEG2VIDEO;
+    MythCodecID ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
     if (use_xvmc_vld &&
         XvMCSurfaceTypes::has(disp, XvVLD, stream_type, xvmc_chroma,
                               width, height, osd_width, osd_height))
     {
-        ret = CODEC_ID_MPEG2VIDEO_XVMC_VLD;
+        ret = (MythCodecID)(kCodec_MPEG1_VLD + (stream_type-1));
     }
     else if (use_xvmc_idct &&
         XvMCSurfaceTypes::has(disp, XvIDCT, stream_type, xvmc_chroma,
                               width, height, osd_width, osd_height))
     {
-        ret = CODEC_ID_MPEG2VIDEO_XVMC;
-        with_idct = true;
+        ret = (MythCodecID)(kCodec_MPEG1_IDCT + (stream_type-1));
     }
     else if (use_xvmc &&
              XvMCSurfaceTypes::has(disp, XvMC, stream_type, xvmc_chroma,
                                    width, height, osd_width, osd_height))
     {
-        ret = CODEC_ID_MPEG2VIDEO_XVMC;
+        ret = (MythCodecID)(kCodec_MPEG1_XVMC + (stream_type-1));
     }
 
     X11L;
@@ -815,7 +807,7 @@ CodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
     X11U;
     return ret;
 #else
-    return CODEC_ID_MPEG2VIDEO;
+    return kCodec_MPEG1 + (stream_type-1);
 #endif
 }
 
@@ -868,9 +860,9 @@ bool VideoOutputXv::Init(
     InitDisplayMeasurements(width, height);
 
     // Set use variables...
-    bool vld = (CODEC_ID_MPEG2VIDEO_XVMC_VLD == av_codec_id);
-    bool idct = (CODEC_ID_MPEG2VIDEO_XVMC == av_codec_id);
-    bool mc = idct, xv = !vld && !idct, shm = xv;
+    bool vld, idct, mc;
+    myth2av_codecid(myth_codec_id, vld, idct, mc);
+    bool xv = !vld && !idct, shm = xv;
     SetFromEnv(vld, idct, mc, xv, shm);
     SetFromHW(XJ_disp, mc, xv, shm);
     VOSType xvmc_type = vld ? XVideoVLD : 
@@ -2696,6 +2688,79 @@ static QString xvflags2str(int flags)
     return str;
 }
 
+CodecID myth2av_codecid(MythCodecID codec_id,
+                        bool& vld, bool& idct, bool& mc)
+{
+    vld = idct = mc = false;
+    CodecID ret = CODEC_ID_NONE;
+    switch (codec_id)
+    {
+        case kCodec_MPEG1:
+            ret = CODEC_ID_MPEG1VIDEO;
+            break;
+        case kCodec_MPEG2:
+            ret = CODEC_ID_MPEG2VIDEO;
+            break;
+        case kCodec_H263:
+            ret = CODEC_ID_H263;
+            break;
+        case kCodec_MPEG4:
+            ret = CODEC_ID_MPEG4;
+            break;
+
+        case kCodec_MPEG1_XVMC:
+            mc = true;
+            ret = CODEC_ID_MPEG2VIDEO_XVMC;
+            break;
+        case kCodec_MPEG2_XVMC:
+            mc = true;
+            ret = CODEC_ID_MPEG2VIDEO_XVMC;
+            break;
+        case kCodec_H263_XVMC:
+            VERBOSE(VB_IMPORTANT, "Error: XvMC H263 not supported by ffmpeg");
+            break;
+        case kCodec_MPEG4_XVMC:
+            VERBOSE(VB_IMPORTANT, "Error: XvMC MPEG4 not supported by ffmpeg");
+            break;
+
+        case kCodec_MPEG1_IDCT:
+            idct = mc = true;
+            ret = CODEC_ID_MPEG2VIDEO_XVMC;
+            break;
+        case kCodec_MPEG2_IDCT:
+            idct = mc = true;
+            ret = CODEC_ID_MPEG2VIDEO_XVMC;
+            break;
+        case kCodec_H263_IDCT:
+            VERBOSE(VB_IMPORTANT, "Error: XvMC-IDCT H263 not supported by ffmpeg");
+            break;
+        case kCodec_MPEG4_IDCT:
+            VERBOSE(VB_IMPORTANT, "Error: XvMC-IDCT MPEG4 not supported by ffmpeg");
+            break;
+
+        case kCodec_MPEG1_VLD:
+            vld = true;
+            ret = CODEC_ID_MPEG2VIDEO_XVMC_VLD;
+            break;
+        case kCodec_MPEG2_VLD:
+            vld = true;
+            ret = CODEC_ID_MPEG2VIDEO_XVMC_VLD;
+            break;
+        case kCodec_H263_VLD:
+            VERBOSE(VB_IMPORTANT, "Error: XvMC-VLD H263 not supported by ffmpeg");
+            break;
+        case kCodec_MPEG4_VLD:
+            VERBOSE(VB_IMPORTANT, "Error: XvMC-VLD MPEG4 not supported by ffmpeg");
+            break;
+        default:
+            VERBOSE(VB_IMPORTANT, QString("Error: MythCodecID %1 has not been "
+                                          "added to myth2av_codecid")
+                    .arg(codec_id));
+            break;
+    } // switch(codec_id)
+    return ret;
+}
+
 #ifdef USING_XVMC
 static QString ErrorStringXvMC(int val)
 {
@@ -2717,4 +2782,3 @@ static xvmc_render_state_t *GetRender(VideoFrame *frame)
     return NULL;
 }
 #endif // USING_XVMC
-

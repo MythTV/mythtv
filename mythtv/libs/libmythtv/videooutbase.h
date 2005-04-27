@@ -10,7 +10,6 @@ extern "C" {
 #include <qptrqueue.h>
 #include <qptrlist.h>
 #include "videobuffers.h"
-#include "../libavcodec/avcodec.h" // for CodecID
 
 using namespace std;
 
@@ -30,6 +29,39 @@ enum VideoOutputType
     kVideoOutput_VIA,
     kVideoOutput_IVTV,
     kVideoOutput_Directfb
+};
+
+enum MythCodecID
+{
+// if you add anything to this list please update
+// myth2av_codecid in videoout_xv.cpp
+    kCodec_NONE = 0,
+
+    kCodec_MPEG1,
+    kCodec_MPEG2,
+    kCodec_H263,
+    kCodec_MPEG4,
+    
+    kCodec_NORMAL_END,
+
+    kCodec_MPEG1_XVMC,
+    kCodec_MPEG2_XVMC,
+    kCodec_H263_XVMC,
+    kCodec_MPEG4_XVMC,
+
+    kCodec_MPEG1_IDCT,
+    kCodec_MPEG2_IDCT,
+    kCodec_H263_IDCT,
+    kCodec_MPEG4_IDCT,
+
+    kCodec_STD_XVMC_END,
+
+    kCodec_MPEG1_VLD,
+    kCodec_MPEG2_VLD,
+    kCodec_H263_VLD,
+    kCodec_MPEG4_VLD,
+
+    kCodec_SPECIAL_END,
 };
 
 enum PictureAttribute
@@ -88,7 +120,7 @@ class VideoOutput
 {
   public:
     static VideoOutput *InitVideoOut(VideoOutputType type,
-                                     CodecID av_codec_id);
+                                     MythCodecID av_codec_id);
 
     VideoOutput();
     virtual ~VideoOutput();
