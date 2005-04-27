@@ -766,7 +766,7 @@ is_x86_mmx() {
 if test x"$mmx" = x"default"; then
     mmx="no"
     if test x"$cpu" = x"x86_64"; then
-        mmx="yes"
+        mmx="no" # there is a bug in MythTV's MMX support for x86_64
     fi
     # defaults to mmx="yes" with i686 (despite pentiumpro),
     if is_x86_mmx "$cpu_raw"; then
