@@ -56,7 +56,7 @@ class MfeDialog : public MythThemedDialog
     void togglePause();
     void seekAudio(bool forward_or_back);
     void nextPrevAudio(bool next_or_prev);
-    void speakerList(QPtrList<SpeakerTracker>* speakers);
+    void speakerList(int which_mfd, QPtrList<SpeakerTracker>* speakers);
 
   private:
 
@@ -65,6 +65,7 @@ class MfeDialog : public MythThemedDialog
     void syncToCurrentMfd();
     void updateConnectionList();
     void switchToMfd(int an_mfd_id);
+    void updateSpeakerDisplay();
     
     MfdInterface    *mfd_interface;   
 

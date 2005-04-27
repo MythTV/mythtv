@@ -67,7 +67,7 @@
                 <dropdelay> is number of milliseconds to wait between each
                 step of scrolling a message down. If 0, no drop down
                 -->
-                <dropdelay>15</dropdelay>
+                <dropdelay>0</dropdelay>
 
                 <!--
                 <droppause> is number of milliseconds to wait after the drop

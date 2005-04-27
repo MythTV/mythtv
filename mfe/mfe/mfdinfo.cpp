@@ -27,6 +27,7 @@ MfdInfo::MfdInfo( int an_id, const QString &a_name, const QString &a_host)
     previous_item = -2;
     current_elapsed = -1;
     is_stopped = true;
+    my_speakers.setAutoDelete(true);
 }
 
 AudioMetadata*  MfdInfo::getAudioMetadata(int collection_id, int item_id)
@@ -196,6 +197,28 @@ int MfdInfo::countTracks(UIListGenericTree *playlist_tree)
         return mfd_content_collection->countTracks(playlist_tree);
     }
     return 0;
+}
+
+void MfdInfo::setSpeakerList(QPtrList<SpeakerTracker>* new_speakers)
+{
+    //
+    //  We have a new canonical list of speakers for this mfd. Make a copy
+    //  and store them.
+    //   
+    
+    my_speakers.clear();
+    
+    SpeakerTracker *a_speaker;
+    QPtrListIterator<SpeakerTracker> iter( *new_speakers );
+
+    while ( (a_speaker = iter.current()) != 0 )
+    {
+        SpeakerTracker *new_speaker = new SpeakerTracker(a_speaker->getId(), a_speaker->getInUse());
+        new_speaker->setName(a_speaker->getName());
+        my_speakers.append(new_speaker);
+        ++iter;
+    }
+    
 }
 
 void MfdInfo::printTree(UIListGenericTree *node, int depth)

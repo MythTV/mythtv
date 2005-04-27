@@ -13,6 +13,8 @@
 
 #include <mfdclient/mfdcontent.h>
 #include <mfdclient/metadata.h>
+#include <mfdclient/speakertracker.h>
+
 
 class MfdInfo
 {
@@ -58,22 +60,24 @@ class MfdInfo
                                                     int item_id
                                                 );
 
-    void                    alterPlaylist(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
-    void                    setCurrentPlayingData();
-    bool                    setCurrentPlayingData(int which_container, int which_metadata, int numb_seconds);
-    QStringList             getPlayingStrings(){return playing_strings;}
-    void                    clearCurrentPlayingData(){playing_strings.clear(); previous_item = -2; previous_container = -2;}
-    double                  getPercentPlayed(){return played_percentage;}
+    void                        alterPlaylist(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
+    void                        setCurrentPlayingData();
+    bool                        setCurrentPlayingData(int which_container, int which_metadata, int numb_seconds);
+    QStringList                 getPlayingStrings(){return playing_strings;}
+    void                        clearCurrentPlayingData(){playing_strings.clear(); previous_item = -2; previous_container = -2;}
+    double                      getPercentPlayed(){return played_percentage;}
     
-    void                    setPauseState(bool new_state){ pause_state = new_state; }
-    bool                    getPauseState(){return pause_state;}
+    void                        setPauseState(bool new_state){ pause_state = new_state; }
+    bool                        getPauseState(){return pause_state;}
 
-    bool                    knowsWhatsPlaying(){return knows_whats_playing;}
-    bool                    isStopped(){return is_stopped;}
-    void                    isStopped(bool yon){is_stopped = yon;}
-    void                    markNodeAsHeld(UIListGenericTree* node, bool held_or_not);
-    void                    printTree(UIListGenericTree* node, int depth=0);
-    int                     countTracks(UIListGenericTree *playlist_tree);
+    bool                        knowsWhatsPlaying(){return knows_whats_playing;}
+    bool                        isStopped(){return is_stopped;}
+    void                        isStopped(bool yon){is_stopped = yon;}
+    void                        markNodeAsHeld(UIListGenericTree* node, bool held_or_not);
+    void                        printTree(UIListGenericTree* node, int depth=0);
+    int                         countTracks(UIListGenericTree *playlist_tree);
+    void                        setSpeakerList(QPtrList<SpeakerTracker>* speakers);
+    QPtrList<SpeakerTracker>   *getSpeakerList(){ return &my_speakers; }
     
   private:
   
@@ -88,12 +92,13 @@ class MfdInfo
     int         previous_item;
     int         current_elapsed;
 
-    MfdContentCollection *mfd_content_collection;
-    QStringList previous_tree_position;
-    QStringList playing_strings;
-    double      played_percentage;
-    bool        pause_state;
-    bool        is_stopped;
+    MfdContentCollection       *mfd_content_collection;
+    QStringList                 previous_tree_position;
+    QStringList                 playing_strings;
+    double                      played_percentage;
+    bool                        pause_state;
+    bool                        is_stopped;
+    QPtrList<SpeakerTracker>    my_speakers;
 };
 
 

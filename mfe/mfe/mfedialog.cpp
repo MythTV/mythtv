@@ -533,8 +533,8 @@ void MfeDialog::connectUpMfd()
     connect(mfd_interface, SIGNAL(playlistCheckDone()),
             this, SLOT(playlistCheckDone()));
             
-    connect(mfd_interface, SIGNAL(speakerList(QPtrList<SpeakerTracker>*)),
-            this, SLOT(speakerList(QPtrList<SpeakerTracker>*)));
+    connect(mfd_interface, SIGNAL(speakerList(int, QPtrList<SpeakerTracker>*)),
+            this, SLOT(speakerList(int, QPtrList<SpeakerTracker>*)));
 }
 
 void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool found)
@@ -969,7 +969,8 @@ void MfeDialog::syncToCurrentMfd()
                 pause_button->hide();
             }
         }
-        
+        updateConnectionList();
+        updateSpeakerDisplay();
     }
     else
     {
@@ -983,6 +984,7 @@ void MfeDialog::syncToCurrentMfd()
         menu->GoHome();
         now_playing_texts->clearTexts();
         time_progress->SetUsed(0);
+        speaker_node->deleteAllChildren();
     }
 }
 
@@ -1034,33 +1036,55 @@ void MfeDialog::switchToMfd(int an_mfd_id)
     syncToCurrentMfd();
 }
 
-void MfeDialog::speakerList(QPtrList<SpeakerTracker>* speakers)
+void MfeDialog::speakerList(int which_mfd, QPtrList<SpeakerTracker>* speakers)
 {
-    QStringList route_to_current = menu->getRouteToCurrent();
 
-    speaker_node->deleteAllChildren();
-
-    SpeakerTracker *a_speaker;
-    QPtrListIterator<SpeakerTracker> iter( *speakers );
-
-    while ( (a_speaker = iter.current()) != 0 )
+    MfdInfo *target_mfd = available_mfds.find(which_mfd);
+    if(!target_mfd)
     {
-        UIListGenericTree *new_node = new UIListGenericTree(speaker_node, a_speaker->getName());
-        new_node->setAttribute(1, 6);
-        new_node->setAttribute(0, a_speaker->getId());
-        if(a_speaker->getInUse() == "yes")
-        {
-            new_node->setCheck(2);
-        }
-        else
-        {
-            new_node->setCheck(0);
-        }
-        ++iter;
+        cerr << "can't store speaker information for an mfd that doesn't exist" << endl;
+        return;
     }
+    
+    target_mfd->setSpeakerList(speakers);
+    
+    if(current_mfd == target_mfd)
+    {
+        updateSpeakerDisplay();
+    }
+}
+    
+void MfeDialog::updateSpeakerDisplay()
+{
+    if(current_mfd)
+    {
+        QStringList route_to_current = menu->getRouteToCurrent();
 
-    menu->tryToSetCurrent(route_to_current);
-    menu->refresh();
+        speaker_node->deleteAllChildren();
+
+        QPtrList<SpeakerTracker> *speakers = current_mfd->getSpeakerList();
+        SpeakerTracker *a_speaker;
+        QPtrListIterator<SpeakerTracker> iter( *speakers );
+
+        while ( (a_speaker = iter.current()) != 0 )
+        {
+            UIListGenericTree *new_node = new UIListGenericTree(speaker_node, a_speaker->getName());
+            new_node->setAttribute(1, 6);
+            new_node->setAttribute(0, a_speaker->getId());
+            if(a_speaker->getInUse() == "yes")
+            {
+                new_node->setCheck(2);
+            }
+            else
+            {
+                new_node->setCheck(0);
+            }
+            ++iter;
+        }
+
+        menu->tryToSetCurrent(route_to_current);
+        menu->refresh();
+    }
 }
 
 MfeDialog::~MfeDialog()
