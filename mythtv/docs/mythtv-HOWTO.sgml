@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-04-20, v0.18.01
+<date>2005-04-, v0.18.01
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1583,7 +1583,7 @@ Add mysql to your USE variable.  i.e. <tt>USE="mysql ...."</tt>
 # emerge mythtv
 </verb></tscreen>
 <sect>MySQL.<label id="mysql">
-<sect1>Distribution-specific information.
+<sect1>Distribution-specific information
 <sect2>Mandrake 9.0
 <p>If this is the system maintaining the database, make sure that MySQL is
 running and started at boot.  Click on Mandrake Control
@@ -4125,7 +4125,7 @@ the tarball, untar it and run the <bf>configure</bf> script:
 
 <tscreen><verb>
 $ tar -xjf mythplugins-0.18.tar.bz2
-$ cd mythplugins
+$ cd mythplugins-0.18
 $ ./configure --help
 
 Usage:   configure [options]
@@ -4273,7 +4273,7 @@ address]/mythweb/</bf>
 otherwise you will get a <tt>404 Page not Found</tt> error.
 </caption>
 </figure>
-<sect1>Resetting the key binding table.
+<sect1>Resetting the key binding table
 <p>MythWeb allows you to configure which keys are bound to which actions
 within MythTV.  If you'd like to reset this back to the default, execute the
 following command:
@@ -4573,7 +4573,7 @@ step.
 compiling MythMusic.
 
 <tscreen><verb>
-$ cd mythplugins
+$ cd ~/mythplugins-0.18
 $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
 $ qmake mythplugins.pro
 $ make
@@ -4706,7 +4706,7 @@ id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.
 
 <tscreen><verb>
-$ cd mythplugins
+$ cd ~/mythplugins-0.18
 $ ./configure --disable-all --enable-mythweather
 $ qmake mythplugins.pro
 $ make
@@ -5605,7 +5605,7 @@ mysql> drop database mythconverg;
 mysql> quit
 </verb></tscreen>
 
-<sect1>Moving your data to new hardware.
+<sect1>Moving your data to new hardware
 <p>This assumes that you will be moving your data to newer / bigger hardware
 and don't want to lose your programs.
 
@@ -7564,10 +7564,9 @@ settings.pro since everything is now done in the configure script.  Update
 debugging to reflect new configure script.  Update XMLTV version.  bjm's
 selective restore of program information/migration section added.
 (2004-09-01!)
-
 v0.18.01, 2005-04-20.  Change all the plugins stuff since it's all within
 the mythplugins tarball instead of individual ones.
-
+v0.18.02, 2005-04-  Fix a few more directory issues WRT the plugins.
 -->
 
 <!--
