@@ -26,6 +26,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
+#include <mythtv/mythdbcon.h>
 
 #include "mainwnd.h"
 #include "settings.h"
@@ -95,8 +96,24 @@ bool fetchData()
     
 
     
-    QString user = gContext->GetSetting("MMTUser");
-    QString passwd = gContext->GetSetting("MMTPass");
+    QString user;
+    QString passwd;
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare( "SELECT userid, password FROM videosource WHERE xmltvgrabber = 'mythplus'");
+    
+    if (query.exec() && query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        user = query.value(0).toString();
+        passwd = query.value(1).toString();
+    }
+    else
+    {
+        user = gContext->GetSetting("MMTUser");
+        passwd = gContext->GetSetting("MMTPass");
+    }
+    
     QString zip = gContext->GetSetting("PostalCode");
     double radius = gContext->GetSetting("Radius", "25").toDouble();
     
