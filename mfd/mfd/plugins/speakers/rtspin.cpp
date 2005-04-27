@@ -303,7 +303,7 @@ void RtspIn::handleAfterReading(unsigned frameSize, struct timeval /* presentati
     bool result = audio_output->AddSamples( (char *) rtp_incoming_buffer, frameSize / 4, -1);
 
     //
-    //  Should be paring attention to the presentation time here. For now,
+    //  Should be paying attention to the presentation time here. For now,
     //  just through away samples if the audio card's buffer is full
     //
 
@@ -335,7 +335,16 @@ void RtspIn::cleanUp()
 
         while ((subsession = iter.next()) != NULL) 
         {
-            rtsp_client->teardownMediaSubsession(*subsession);
+            //
+            //  Teardowns can take a while, especially if the other end has
+            //  died. We only wait for them to happen if our parent (the
+            //  speaker object) is not trying to shut down.
+            //
+            
+            if(parent->keepGoing())
+            {
+                rtsp_client->teardownMediaSubsession(*subsession);
+            }
         }
     }
 
