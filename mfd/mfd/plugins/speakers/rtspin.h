@@ -15,25 +15,29 @@
 #include <qstring.h>
 
 class Speakers;
-class LiveTaskScheduler;
+class BasicTaskScheduler;
 class UsageEnvironment;
 class RTSPClient;
 class MediaSession;
 class MediaSubsession;
-class AudioOutputSink;
+class AudioOutput;
 
 class RtspIn: public QThread
 {
 
   public:
 
-    RtspIn(Speakers *owner, const QString &l_rtsp_url);
+    RtspIn(
+            Speakers *owner, 
+            const QString &l_rtsp_url, 
+            unsigned l_rtp_incoming_buffer_size = 65535
+          );
     ~RtspIn();
 
     void run();
     void stop();
-    void handleAfterPlaying();
-    void handleByeCallback();
+    void handleAfterReading(unsigned frameSize, struct timeval presentationTime);
+    void handleSourceClosure();
 
   private:
 
@@ -51,12 +55,15 @@ class RtspIn: public QThread
     //  liveMedia objects
     //
     
-    LiveTaskScheduler   *scheduler;
-    UsageEnvironment    *env;
-    RTSPClient          *rtsp_client;
-    MediaSession        *media_session;
-    MediaSubsession     *sub_session;
-    AudioOutputSink     *audio_output_sink;
+    BasicTaskScheduler *scheduler;
+    UsageEnvironment   *env;
+    RTSPClient         *rtsp_client;
+    MediaSession       *media_session;
+    MediaSubsession    *sub_session;
+    char                blocking_flag;
+    unsigned char      *rtp_incoming_buffer;
+    unsigned            rtp_incoming_buffer_size;
+    AudioOutput        *audio_output;
 };
 
 #endif  // rtspin_h_

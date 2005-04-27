@@ -495,7 +495,6 @@ void AudioClient::syncSpeakerList(QStringList &tokens)
         if (! a_speaker->haveName())
         {
             QString command = QString("speakername %1\n").arg(a_speaker->getId());
-            cout << endl << "will send \"" << command << "\"" << endl;
             client_socket_to_service->writeBlock(command.ascii(), command.length());
             break;
         }

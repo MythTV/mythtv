@@ -15,28 +15,40 @@ using namespace std;
 #include <GroupsockHelper.hh>
 #include <BasicUsageEnvironment.hh>
 
+#include <mythtv/audiooutput.h>
 
 #include "speakers.h"
 #include "rtspin.h"
-#include "livemedia.h"
+#include "settings.h"
 
-extern "C" void afterPlayingCallback(void* clientData)
+static void afterReading(
+                            void* clientData, 
+                            unsigned frameSize,
+                            unsigned,   //  numTruncatedBytes
+                            struct timeval presentationTime,
+                            unsigned    // durationInMicroseconds
+                        )
 {
     RtspIn *rtsp_in_object = (RtspIn *)clientData;
-    rtsp_in_object->handleAfterPlaying();
+    rtsp_in_object->handleAfterReading(frameSize, presentationTime);
 }
 
-extern "C" void subsessionByeCallback(void* clientData)
+
+static void onSourceClosure(void* clientData)
 {
     RtspIn *rtsp_in_object = (RtspIn *)clientData;
-    rtsp_in_object->handleByeCallback();
+    rtsp_in_object->handleSourceClosure();
 }
 
 /*
 ---------------------------------------------------------------------
 */
 
-RtspIn::RtspIn(Speakers *owner, const QString &l_rtsp_url)
+RtspIn::RtspIn(
+                Speakers *owner, 
+                const QString &l_rtsp_url, 
+                unsigned l_rtp_incoming_buffer_size
+              )
 {
     parent= owner;
     keep_going = true;
@@ -47,7 +59,31 @@ RtspIn::RtspIn(Speakers *owner, const QString &l_rtsp_url)
     rtsp_client = NULL;
     media_session = NULL;
     sub_session = NULL;
-    audio_output_sink = NULL;
+    blocking_flag = 0;
+    rtp_incoming_buffer_size = l_rtp_incoming_buffer_size;
+    rtp_incoming_buffer = new unsigned char[rtp_incoming_buffer_size];
+
+    //
+    //  Need an audio output object to actually stuff the PCM data into.
+    //
+    
+    QString adevice = mfdContext->GetSetting("AudioDevice");
+    if (adevice.length() < 1)
+    {
+        adevice = mfdContext->getSetting("AudioOutputDevice");
+        if (adevice.length() < 1)
+        {
+            warning("You have neither an AudioDevice nor an AudioOutputDevice "
+                    "in your settings table, "
+                    "will try /dev/dsp");
+            adevice = "/dev/dsp";
+        }
+    }
+
+    audio_output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, AUDIOOUTPUT_MUSIC, false);
+    audio_output->setBufferSize(256 * 1024);
+    audio_output->SetBlocking(false);
+
 }
 
 
@@ -64,7 +100,7 @@ void RtspIn::run()
     //  things all run in a single thread (ie. this QThread).
     //
 
-    scheduler = LiveTaskScheduler::createNew();
+    scheduler = BasicTaskScheduler::createNew();
     env = BasicUsageEnvironment::createNew(*scheduler);
 
     //
@@ -76,6 +112,14 @@ void RtspIn::run()
                                         0,  // Change to 1 for console debugging
                                         "MythTV speakers"
                                        );
+                                       
+    if (rtsp_client == NULL)
+    {
+        warning(QString("failed to create an rtsp session from this url: %1")
+                .arg(rtsp_url));
+        cleanUp();
+        return;
+    }
 
     //
     //  Do a DESCRIBE request, which sets some internal stuff in the
@@ -142,7 +186,7 @@ void RtspIn::run()
     //  Setup the subsession
     //
 
-    if(!rtsp_client->setupMediaSubsession(*sub_session, false, true))
+    if (!rtsp_client->setupMediaSubsession(*sub_session, false, false))
     {
         warning(QString("failed to setup first subsession from "
                         "SDP in %1, givinp up")
@@ -162,22 +206,12 @@ void RtspIn::run()
         .arg(sub_session->clientPortNum() + 1)
         , 6);
 
-    //
-    //  Make an AudioOutputSink and attach it to the chain (so PCM bits end
-    //  up being delivered to it).
-    //
-    
-    audio_output_sink = AudioOutputSink::createNew(*env);
-    sub_session->sink = audio_output_sink;
-    sub_session->sink->startPlaying(*(sub_session->readSource()), afterPlayingCallback, this);
-    sub_session->rtcpInstance()->setByeHandler(subsessionByeCallback, this);
-                                  
 
     //
     //  Ensure playing will occur in the liveMedia event loop
     //
     
-    if( ! rtsp_client->playMediaSession(*media_session))
+    if ( ! rtsp_client->playMediaSession(*media_session))
     {
         warning(QString("failed to initiate playback of %1, giving up")
                 .arg(rtsp_url));
@@ -185,33 +219,29 @@ void RtspIn::run()
         return;
     }
     
-    QTime schedule_timer;
-    schedule_timer.start();
-    
     while(keep_going)
     {
+
         //
-        //  We time how long it takes for the scheduler to step. If it takes
-        //  too long, we know something is wrong (e.g. the source has gone
-        //  away). There should be a more elegant way of doing this (?). We
-        //  could check the socket_fd I suppose. Anyway, the following does
-        //  work, and is perfectly acceptable given this is all supposed to
-        //  be happening on a local LAN.
+        //  This will block until new data arrives (unless our stop()
+        //  command sets blocking_flag to non-0 in another thread)
         //
-        
-        schedule_timer.restart();
-        scheduler->stepOnce(5000000);   // at most 5,000,000 microseconds = 5 seconds
-        if (schedule_timer.elapsed() > 4000)
-        {
-            //
-            //  Nothing happend for more than 4 seconds, give up
-            //
-            
-            warning("no rtsp activity for more than 5 seconds (source gone?). Giving up.");
-            keep_going_mutex.lock();
-                keep_going = false;
-            keep_going_mutex.unlock();
-        }
+        //  The crux of what's going on below is that once some data
+        //  arrives, the afterReading function fires with the new data.
+        //
+
+        blocking_flag = 0;
+        sub_session->readSource()->getNextFrame(
+                                                rtp_incoming_buffer,
+                                                rtp_incoming_buffer_size, 
+                                                afterReading,
+                                                this,
+                                                onSourceClosure,
+                                                this 
+                                               );
+
+        TaskScheduler& scheduler = sub_session->readSource()->envir().taskScheduler();
+        scheduler.doEventLoop(&blocking_flag);
     }
 
     cleanUp();
@@ -229,68 +259,110 @@ void RtspIn::stop()
 {
     keep_going_mutex.lock();
         keep_going = false;
+        blocking_flag = ~0;
     keep_going_mutex.unlock();
 }
 
-void RtspIn::handleAfterPlaying()
+void RtspIn::handleAfterReading(unsigned frameSize, struct timeval /* presentationTime */)
 {
     //
-    //  Whatever was being streamed to us has apparently ended
+    //  Set the blocking flag to non-zero so that the liveMedia event loop
+    //  "falls through" in our main keep_going loop.
+    //
+
+    blocking_flag = ~0;
+    
+    //
+    //  Deal with something that should not be able to happen
     //
     
-    warning("RtspIn got handleAfterPlaying(), will clean up and unload");
-    keep_going_mutex.lock();
-        keep_going = false;
-    keep_going_mutex.unlock();
+    if(frameSize > rtp_incoming_buffer_size)
+    {
+        warning(QString("asked liveMedia not to give us more than %1 "
+                        "bytes, yet it gave us %2. Quitting in the "
+                        "interests of not segfaulting")
+                        .arg(rtp_incoming_buffer_size)
+                        .arg(frameSize));
+        stop();
+        return;
+    }
+
+    //
+    //  RTP uses network byte ordering (big endian) in all cases. But PCM
+    //  should be little endian, so we swap it around
+    //  
+
+    unsigned numValues = frameSize/2;
+    short* value = (short*)rtp_incoming_buffer;
+    for (unsigned i = 0; i < numValues; ++i)
+    {
+        short const orig = value[i];
+        value[i] = ((orig&0xFF)<<8) | ((orig&0xFF00)>>8);
+    }
+
+    bool result = audio_output->AddSamples( (char *) rtp_incoming_buffer, frameSize / 4, -1);
+
+    //
+    //  Should be paring attention to the presentation time here. For now,
+    //  just through away samples if the audio card's buffer is full
+    //
+
+    if (!result)
+    {
+        warning("throwing away audio samples, fix presentation time code");
+    }
+    
+
 }
 
-void RtspIn::handleByeCallback()
+void RtspIn::handleSourceClosure()
 {
     //
-    //  Server said BYE
+    //  Server going away
     //
     
-    warning("RtspIn got BYE from server, will clean up and unload");
-    keep_going_mutex.lock();
-        keep_going = false;
-    keep_going_mutex.unlock();
+    warning("RtspIn told source (server) is going away, so is stopping");
+    stop();
 }
 
 void RtspIn::cleanUp()
 {
-    if(audio_output_sink)
+
+    if (media_session && rtsp_client)
     {
-        Medium::close(audio_output_sink);
-        //Medium::close() deletes it
-        sub_session->sink = NULL;
-        audio_output_sink = NULL;
+        MediaSubsessionIterator iter(*media_session);
+        MediaSubsession* subsession;
+
+        while ((subsession = iter.next()) != NULL) 
+        {
+            rtsp_client->teardownMediaSubsession(*subsession);
+        }
     }
-    if(media_session && rtsp_client)
+
+    UsageEnvironment* env = NULL;
+    TaskScheduler* scheduler = NULL;
+
+    if (media_session != NULL) 
     {
-        rtsp_client->teardownMediaSession(*media_session);
-    }
-    if(media_session)
-    {
+        env = &(media_session->envir());
+        scheduler = &(env->taskScheduler());
         Medium::close(media_session);
-        media_session = NULL;
     }
-    if(rtsp_client)
+
+    
+    if (rtsp_client)
     {
         Medium::close(rtsp_client);
     }
-    
-    if(env)
+    if (env)
     {
         env->reclaim();
-        env = NULL;
     }
-    
-    if(scheduler)
+    if (scheduler)
     {
         delete scheduler;
-        scheduler = NULL; 
+        scheduler = NULL;
     }
-
 }
 
 void RtspIn::warning(const QString &warn_message)
@@ -311,4 +383,14 @@ void RtspIn::log(const QString &log_message, int verbosity)
 
 RtspIn::~RtspIn()
 {
+    if (rtp_incoming_buffer)
+    {
+        delete [] rtp_incoming_buffer;
+        rtp_incoming_buffer = NULL;
+    }
+    if (audio_output)
+    {
+        delete audio_output;
+        audio_output = NULL;
+    }
 }

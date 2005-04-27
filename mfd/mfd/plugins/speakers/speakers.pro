@@ -27,8 +27,8 @@ TARGET = mfdplugin-speakers
 target.path = $${PREFIX}/lib/mythtv/mfdplugins
 INSTALLS += target
 
-HEADERS +=          speakers.h	 rtspin.h	livemedia.h
-SOURCES += main.cpp speakers.cpp rtspin.cpp livemedia.cpp
+HEADERS +=          speakers.h	 rtspin.h
+SOURCES += main.cpp speakers.cpp rtspin.cpp
 
 
 
