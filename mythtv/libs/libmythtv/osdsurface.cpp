@@ -188,7 +188,7 @@ OSDSurface::OSDSurface(int w, int h)
     blendcolumnfunc = &blendcolumn;
     blendcolorfunc = &blendcolor;
     blendconstfunc = &blendconst;
-#ifdef MMX
+#ifdef i386 /* these do not yet work on x86_64 */
     usemmx = (mm_support() & MM_MMX);
     if (usemmx)
     {

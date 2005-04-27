@@ -571,6 +571,7 @@ bool VideoOutputXv::InitVideoBuffers(VOSType xvmc_type,
  */
 bool VideoOutputXv::InitXvMC(VOSType type)
 {
+    (void)type;
 #ifdef USING_XVMC
     xv_port = GrabSuitableXvPort(type);
     if (xv_port == -1)
@@ -764,6 +765,8 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
                                                  uint osd_width, uint osd_height,
                                                  uint stream_type, int xvmc_chroma)
 {
+    (void)width, (void)height, (void)osd_width, (void)osd_height;
+    (void)stream_type, (void)xvmc_chroma;
 #ifdef USING_XVMC
     Display *disp;
     X11S(disp = XOpenDisplay(NULL));
@@ -807,7 +810,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
     X11U;
     return ret;
 #else
-    return kCodec_MPEG1 + (stream_type-1);
+    return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 #endif
 }
 
