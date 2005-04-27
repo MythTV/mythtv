@@ -3584,29 +3584,63 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     // later.
     if (watchingrecording)
     {
-        int i = 0;
-        int initialSleep = 30;
-        int additionalSleep = 0;
-        int curCmd;
+        int initialSleep = 35;
+        int totalSleep = initialSleep;
+        int logoSamplesNeeded =
+                gContext->GetNumSetting("CommDetectLogoSamplesNeeded",
+                                        DEFAULT_LOGO_SECONDS_NEEDED);
+        int logoSampleSpacing =
+                gContext->GetNumSetting("CommDetectLogoSampleSpacing",
+                                        DEFAULT_LOGO_SAMPLE_SPACING);
 
         if (commercialskipmethod & COMM_DETECT_LOGO)
-            additionalSleep = commDetect->GetLogoSecondsNeeded();
+            totalSleep += (logoSamplesNeeded * logoSampleSpacing);
 
-        if (jobID != -1)
+        if (m_playbackinfo->recstartts.addSecs(totalSleep)
+                < QDateTime::currentDateTime())
+        {
+            initialSleep = 0;
+            totalSleep = 0;
+        }
+        else if (m_playbackinfo->recstartts < QDateTime::currentDateTime())
+        {
+            int offset =
+                m_playbackinfo->recstartts.secsTo(QDateTime::currentDateTime());
+
+            totalSleep -= offset;
+            if (totalSleep < 0)
+                totalSleep = 0;
+
+            initialSleep -= offset;
+            if (initialSleep < 0)
+                initialSleep = 0;
+        }
+
+        if ((jobID != -1) && (totalSleep))
         {
             JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,
                                       QObject::tr("Building Detection Buffer"));
         }
 
-        while((i < (initialSleep + additionalSleep)) && (watchingrecording))
+        // Go through this loop at least once, even if totalSleep is 0 so that
+        // we start the flag timer, open the file, etc. properly
+        int i = 0;
+        while((i <= totalSleep) && (watchingrecording))
         {
-            if ((jobID != -1) &&
-                ((i % 5) == 0))
+            if ((i % 10) == 0)
             {
-                curCmd = JobQueue::GetJobCmd(jobID);
+                VERBOSE(VB_COMMFLAG,
+                        QString("Commercial Flagger has %1 seconds left to "
+                                "sleep waiting for the recorder to get ahead.")
+                                .arg(totalSleep - i));
 
-                if (curCmd == JOB_STOP)
-                    return(255);
+                if (jobID != -1)
+                {
+                    int curCmd = JobQueue::GetJobCmd(jobID);
+
+                    if (curCmd == JOB_STOP)
+                        return(255);
+                }
             }
 
             if (i == initialSleep)
@@ -3895,6 +3929,9 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                                       + QObject::tr("Commercial Breaks Found"));
         }
     }
+
+    VERBOSE(VB_COMMFLAG, QString("NVP::FlagCommercials found %1 breaks")
+                                 .arg(comms_found));
 
     return(comms_found);
 }

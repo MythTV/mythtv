@@ -43,6 +43,9 @@ enum frameFormats {
     COMM_FORMAT_MAX
 };
 
+#define DEFAULT_LOGO_SECONDS_NEEDED  240
+#define DEFAULT_LOGO_SAMPLE_SPACING  2
+
 extern "C" {
 #include "frame.h"
 }

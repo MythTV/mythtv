@@ -134,9 +134,11 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     commDetectMaxCommLength =
               gContext->GetNumSetting("CommDetectMaxCommLength", 125);
     commDetectLogoSamplesNeeded =
-              gContext->GetNumSetting("CommDetectLogoSamplesNeeded", 240);
+              gContext->GetNumSetting("CommDetectLogoSamplesNeeded",
+                                      DEFAULT_LOGO_SECONDS_NEEDED);
     commDetectLogoSampleSpacing =
-              gContext->GetNumSetting("CommDetectLogoSampleSpacing", 2);
+              gContext->GetNumSetting("CommDetectLogoSampleSpacing",
+                                      DEFAULT_LOGO_SAMPLE_SPACING);
     commDetectLogoSecondsNeeded = commDetectLogoSamplesNeeded *
                                   commDetectLogoSampleSpacing;
     commDetectLogoGoodEdgeThreshold =

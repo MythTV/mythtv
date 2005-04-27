@@ -1522,6 +1522,9 @@ void JobQueue::DoTranscodeThread(void)
         retry = false;
         ChangeJobStatus(jobID, JOB_STARTING);
 
+        VERBOSE(VB_JOBQUEUE, QString("JobQueue running app: '%1'")
+                                     .arg(command));
+
         myth_system(command.ascii());
 
         int status = GetJobStatus(jobID);
@@ -1669,6 +1672,8 @@ void JobQueue::DoFlagCommercialsThread(void)
     if (stillRecording)
         cmd += " -l";
 
+    VERBOSE(VB_JOBQUEUE, QString("JobQueue running app: '%1'").arg(cmd));
+
     breaksFound = myth_system(cmd.ascii());
 
     controlFlagsLock.lock();
@@ -1789,6 +1794,9 @@ void JobQueue::DoUserJobThread(void)
         case  2:
         default: break;
     }
+
+    VERBOSE(VB_JOBQUEUE, QString("JobQueue running app: '%1'")
+                                 .arg(runningJobCommands[key]));
 
     myth_system(runningJobCommands[key].ascii());
 
