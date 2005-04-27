@@ -1224,7 +1224,10 @@ int DebugNum(const VideoFrame *frame)
 
 const QString& DebugString(const VideoFrame *frame, bool short_str)
 {
-    return ((short_str) ? dbg_str_arr_short : dbg_str_arr)[DebugNum(frame)];
+    if (short_str)
+        return dbg_str_arr_short[DebugNum(frame)];
+    else
+        return dbg_str_arr[DebugNum(frame)];
 }
 
 const QString& DebugString(uint i, bool short_str)
