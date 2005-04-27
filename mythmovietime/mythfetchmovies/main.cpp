@@ -24,6 +24,7 @@
 #include <unistd.h>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include "ddmovie.h"
 
 void showUsage()
@@ -54,13 +55,30 @@ int main(int argc, char *argv[])
     }
     
     QString filename;
-    QString user = gContext->GetSetting("MMTUser");
-    QString passwd = gContext->GetSetting("MMTPass");
+    QString user;
+    QString passwd;
+    
     QString zip = gContext->GetSetting("PostalCode");
     double radius = gContext->GetSetting("Radius", "25").toDouble();
     
     int argpos = 1;
     
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare( "SELECT userid, password FROM videosource WHERE xmltvgrabber = 'mythplus'");
+    
+    if (query.exec() && query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        user = query.value(0).toString();
+        passwd = query.value(1).toString();
+    }
+    else
+    {
+        user = gContext->GetSetting("MMTUser");
+        passwd = gContext->GetSetting("MMTPass");
+    }
+    
+        
     while (argpos < a.argc())
     {
         if (!strcmp(a.argv()[argpos], "--file"))
@@ -98,10 +116,6 @@ int main(int argc, char *argv[])
         
         ++argpos;
     }
-
-            
-    
-    
     
     
     

@@ -17,6 +17,8 @@ isEmpty(QMAKE_EXTENSION_LIB) {
 }
 
 # Input
-HEADERS += ddmovie.h 
+HEADERS += ddmovie.h
 
 SOURCES += main.cpp ddmovie.cpp
+
+

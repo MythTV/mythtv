@@ -24,8 +24,46 @@
 
 #include "mythtv/mythcontext.h"
 #include <mythtv/mythdbcon.h>
+#include <mythtv/httpcomms.h>
 #include "ddmovie.h"
- 
+
+
+class DataDirectMoviesRequest : public QHttpRequestHeader
+{
+    public:
+        const QString& getUrl() const { return URL; }
+        DataDirectMoviesRequest(const QString& custId, const QString& postalCode, 
+                                double radius, int days, bool useStaging) 
+        {
+            QString host;
+             
+            if (useStaging)
+            {
+                host = gContext->GetSetting("movietime-ddhost",
+                                            "webservices.stage.tms.tribune.com");
+            }
+            else
+            {
+                host = gContext->GetSetting("movietime-prod-ddhost",
+                                            "movies.datadirect.zap2it.com");
+            }
+            
+            
+            URL = QString("http://%1/moviedata/xmd?customer=%2&postalCode=%3&radius=%4&numberOfDays=%5")
+                          .arg(host)
+                          .arg(custId)
+                          .arg(postalCode)
+                          .arg(radius)
+                          .arg(days);
+                          
+            setRequest("GET", URL);
+            setValue("Host", host); 
+        };
+    protected:
+        QString URL;
+};
+
+
 
 FILE* TMSMovieDirect::fetchData(const QString& user, const QString& pass, 
                                 const QString& postalCode, double radius, int days)
@@ -33,29 +71,23 @@ FILE* TMSMovieDirect::fetchData(const QString& user, const QString& pass,
     FILE* ret = NULL;
     
     QString ddMoviesURL = gContext->GetSetting("movietime-ddurl",
+                                               //"http://movies.datadirect.zap2it.com/moviedata/xmd");
                                                "http://webservices.stage.tms.tribune.com/moviedata/xmd");
     QString ddCustID = gContext->GetSetting("movietime-ddcustomer", "TNV01");
                     
-    QString url = QString("%1?customer=%2\\&postalCode=%3\\&radius=%4\\&numberOfDays=%5")
+    //QString url = QString("%1?customer=%2\\&postalCode=%3\\&radius=%4\\&numberOfDays=%5")
+    QString url = QString("%1?customer=%2&postalCode=%3&radius=%4&numberOfDays=%5")
                           .arg(ddMoviesURL)
                           .arg(ddCustID)
                           .arg(postalCode)
                           .arg(radius)
                           .arg(days);
     
+    HttpComms::Credentials cred(user, pass);
+    QString tempFile("/tmp/mythmovietime.gz");
+    HttpComms::getHttpFile(tempFile, url, 10000, 3, 3, true, &cred );
 
-    QString command = QString("wget --http-user='%1' --http-passwd='%2' "
-                              "--header='Accept-Encoding:gzip'"
-                              " %3 --output-document=- | gzip -df")
-                             .arg(user)
-                             .arg(pass)
-                             .arg(url);
-
-
-
-    
-    
-    ret = popen(command.ascii(), "r");
+    ret = popen("cat /tmp/mythmovietime.gz | gzip -df", "r");
     return ret;
 }
 
@@ -69,9 +101,12 @@ bool TMSMovieDirect::store()
     query.exec( "TRUNCATE TABLE movietime_showtimes");
     query.exec( "TRUNCATE TABLE movietime_movies");
     query.exec( "TRUNCATE TABLE movietime_moviemessages");
-    query.exec( "TRUNCATE TABLE movietime_films");
-    query.exec( "TRUNCATE TABLE movietime_crew");
-    query.exec( "TRUNCATE TABLE movietime_advisories");
+    if (gContext->GetNumSetting("MMTKeepFilmData", 0) == 0)
+    {
+        query.exec( "TRUNCATE TABLE movietime_films");
+        query.exec( "TRUNCATE TABLE movietime_crew");
+        query.exec( "TRUNCATE TABLE movietime_advisories");
+    }
     
     // Store the films
     for ( FilmList::iterator it = Films.begin(); it != Films.end(); ++it )
@@ -406,6 +441,7 @@ bool TMSMovie::store(const QString& theaterID)
     MSqlQuery query(MSqlQuery::InitCon());
     int rowID = 0;
     
+    
     query.prepare("INSERT INTO movietime_movies (filmid, movietitle, ticketurl, "
                   "date, theaterid, timestitle, timesticketurl) "
                   "VALUES (:FILMID, :MOVIET, :TICKET, :DATE, :THEATER, "
@@ -637,6 +673,19 @@ bool TMSTimes::parse(const QDomElement& elem)
 bool TMSFilm::store()
 {
     MSqlQuery query(MSqlQuery::InitCon());
+    
+    if (gContext->GetNumSetting("MMTKeepFilmData", 0) != 0)
+    {
+        query.prepare( "SELECT filmid FROM movietime_films "
+                       "WHERE filmid = :FILMID" );
+        query.bindValue(":FILMID",   FilmID);                                     
+    
+        if (query.exec() && query.isActive() && query.numRowsAffected() > 0)
+        {
+            return true;
+        }
+    }
+
     
     query.prepare("INSERT INTO movietime_films (filmid, title, description, "
                   "runtime, releasedate, colorcode, soundtrack, soundmix, "

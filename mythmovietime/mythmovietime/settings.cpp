@@ -22,7 +22,7 @@
  * ============================================================ */
 
 #include "settings.h"
- 
+#include <mythtv/mythdbcon.h> 
 
 static GlobalLineEdit *UserName()
 {
@@ -84,11 +84,17 @@ static GlobalCheckBox *KeepFilms()
 
 MMTGeneralSettings::MMTGeneralSettings()
 {
-    VerticalConfigurationGroup* auth = new VerticalConfigurationGroup(false);
-    auth->setLabel(QObject::tr("Authentication Settings"));
-    auth->addChild(UserName());
-    auth->addChild(Password());
-    addChild(auth);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare( "SELECT userid, password FROM videosource WHERE xmltvgrabber = 'mythplus'");
+    
+    if (!query.exec() || !query.isActive() || !query.numRowsAffected() <= 0)
+    {
+        VerticalConfigurationGroup* auth = new VerticalConfigurationGroup(false);
+        auth->setLabel(QObject::tr("Authentication Settings"));
+        auth->addChild(UserName());
+        auth->addChild(Password());
+        addChild(auth);
+    }
     
     VerticalConfigurationGroup* gen = new VerticalConfigurationGroup(false);
     gen->setLabel(QObject::tr("General Settings"));

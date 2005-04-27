@@ -12,9 +12,9 @@ INCLUDEPATH += ../mythfetchmovies
 
 TARGET = mythmovietime
 
-HEADERS += mainwnd.h mtdbitem.h settings.h 
+HEADERS += mainwnd.h mtdbitem.h settings.h
 SOURCES += main.cpp mainwnd.cpp mtdbitem.cpp dbcheck.cpp 
-SOURCES += settings.cpp  ../mythfetchmovies/ddmovie.cpp
+SOURCES += settings.cpp ../mythfetchmovies/ddmovie.cpp
 
 
 target.path = $${PREFIX}/lib/mythtv/plugins
