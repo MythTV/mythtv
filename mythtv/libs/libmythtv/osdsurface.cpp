@@ -188,7 +188,8 @@ OSDSurface::OSDSurface(int w, int h)
     blendcolumnfunc = &blendcolumn;
     blendcolorfunc = &blendcolor;
     blendconstfunc = &blendconst;
-#ifdef i386 /* these do not yet work on x86_64 */
+/* these do not yet work on x86_64, which does not define i386 */
+#if defined(i386) && defined(MMX)
     usemmx = (mm_support() & MM_MMX);
     if (usemmx)
     {
@@ -381,6 +382,7 @@ static inline void blendalpha8_mmx(unsigned char *src, unsigned char *dest,
 
 blendtoyv12_8_fun blendtoyv12_8_init(OSDSurface *surface)
 {
+    (void)surface;
 #ifdef MMX
     if (surface->usemmx)
         return blendalpha8_mmx;
@@ -507,6 +509,7 @@ static inline void blendtoargb_8_mmx(OSDSurface * /*surf*/, unsigned char *src,
 
 blendtoargb_8_fun blendtoargb_8_init(OSDSurface *surface)
 {
+    (void)surface;
 #ifdef MMX
     if (surface->usemmx)
         return blendtoargb_8_mmx;
