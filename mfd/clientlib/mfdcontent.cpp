@@ -374,13 +374,17 @@ void MfdContentCollection::addNewPlaylistAbility(const QString &collection_name)
     {
         new_playlist_tree = new UIListGenericTree(NULL, "New Playlist");
         new_playlist_tree->setPixmap(pixnewplaylist);
+        new_playlist_tree->setInt(collection_id);
         new_playlist_tree->setAttribute(1, 4);
     }
-    
-    UIListGenericTree *new_node = new UIListGenericTree(new_playlist_tree, QString("in %1").arg(collection_name));
-    new_node->setPixmap(pixnewplaylist);
-    new_node->setInt(collection_id);
-    new_node->setAttribute(1, 4);
+    else
+    {
+        cerr << "Someone has figured out how to have more than one editable "
+             << "music collection on a single mfd. Need to improve "
+             << "MfdContentCollection::addNewPlaylistAbility() to handle "
+             << "child nodes."
+             << endl;
+    }
 }
 
 void MfdContentCollection::recursivelyAddSubPlaylist(

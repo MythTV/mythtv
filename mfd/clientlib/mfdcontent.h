@@ -111,6 +111,7 @@ class MfdContentCollection
     UIListGenericTree *audio_genre_tree;
     UIListGenericTree *audio_playlist_tree;
     UIListGenericTree *audio_collection_tree;
+    
     UIListGenericTree *new_playlist_tree;
     UIListGenericTree *editable_playlist_tree;
 
