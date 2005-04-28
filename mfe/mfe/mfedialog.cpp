@@ -1,7 +1,7 @@
     /*
 	mfedialog.cpp
 
-	Copyright (c) 2004 Thor Sigvaldason and Isaac Richards
+	Copyright (c) 2004-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 */
@@ -303,6 +303,25 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
             }
         }
     }
+    else if(node->getAttribute(1) == 4 && node->getInt() > 0)
+    {
+        //
+        //  Find the mfd this playlist should get created on
+        //
+        
+        MfdInfo *target_mfd = available_mfds.find(node->getInt());
+        if(!target_mfd)
+        {
+            cerr << "something weirdly wrong with new playlist tree" << endl;
+            return;
+        }
+        
+        //
+        //  Pop up a dialogue to get a new playlist name
+        //
+        
+        cout << "Pop a playlist name dialog" << endl;
+    }
     else if(node->getAttribute(1) == 5)
     {
         //
@@ -430,7 +449,6 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
         }
 
         menu->refresh();
-
     }
 }
 
@@ -910,6 +928,8 @@ void MfeDialog::syncToCurrentMfd()
 
         browse_node->pruneAllChildren();
         browse_node->setDrawArrow(false);
+        manage_node->pruneAllChildren();
+        manage_node->setDrawArrow(false);
 
         MfdContentCollection *current_collection = current_mfd->getMfdContentCollection();
         
@@ -920,6 +940,24 @@ void MfeDialog::syncToCurrentMfd()
             browse_node->addNode(current_collection->getAudioGenreTree());
             browse_node->addNode(current_collection->getAudioPlaylistTree());
             browse_node->addNode(current_collection->getAudioCollectionTree());
+
+            //
+            //  Add nodes that let us manage content
+            //
+            
+            UIListGenericTree *new_nodes = current_collection->getNewPlaylistTree();
+            if(new_nodes)
+            {
+                manage_node->addNode(new_nodes);
+                manage_node->setDrawArrow(true);
+            }
+
+            UIListGenericTree *edit_nodes = current_collection->getEditablePlaylistTree();
+            if(edit_nodes)
+            {
+                manage_node->addNode(edit_nodes);
+                manage_node->setDrawArrow(true);
+            }
         }
 
         //

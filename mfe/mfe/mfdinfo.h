@@ -3,7 +3,7 @@
 /*
 	mfdinfo.h
 
-	Copyright (c) 2004 Thor Sigvaldason and Isaac Richards
+	Copyright (c) 2004-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 */
