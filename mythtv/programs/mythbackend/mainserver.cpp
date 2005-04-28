@@ -750,6 +750,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
     QString ip = gContext->GetSetting("BackendServerIP");
     QString port = gContext->GetSetting("BackendServerPort");
+    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
     QString thequery = "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
                        "recorded.title,recorded.subtitle,recorded.description,"
@@ -768,7 +769,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
     if (type == "Delete")
         thequery += " DESC";
-    thequery += ";";
+
+    thequery += ", " + chanorder + " DESC;";
 
     QStringList outputlist;
     QString fileprefix = gContext->GetFilePrefix();

@@ -217,6 +217,15 @@ static bool comp_retry(ProgramInfo *a, ProgramInfo *b)
     return comp_common(a, b);
 }
 
+static bool comp_timechannel(ProgramInfo *a, ProgramInfo *b)
+{
+    if (a->recstartts != b->recstartts)
+        return a->recstartts < b->recstartts;
+    if(a->chanstr.toInt() > 0 && b->chanstr.toInt() > 0)
+        return a->chanstr.toInt() < b->chanstr.toInt();
+    return a->chanstr < b->chanstr;
+}
+
 void Scheduler::FillEncoderFreeSpaceCache()
 {
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
@@ -769,6 +778,7 @@ void Scheduler::getAllPending(RecList *retList)
 
     QDateTime now = QDateTime::currentDateTime();
 
+    reclist.sort(comp_timechannel);
     RecIter i = reclist.begin();
     for (; i != reclist.end(); i++)
     {
@@ -788,6 +798,7 @@ void Scheduler::getAllPending(QStringList &strList)
 
     QDateTime now = QDateTime::currentDateTime();
 
+    reclist.sort(comp_timechannel);
     RecIter i = reclist.begin();
     for (; i != reclist.end(); i++)
     {
