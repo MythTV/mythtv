@@ -4,56 +4,80 @@
 #include <iostream>
 using namespace std;
 
-#define MM_MMX    0x0001 /* standard MMX */
-#define MM_3DNOW  0x0004 /* AMD 3DNOW */
-#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
-#define MM_SSE    0x0008 /* SSE functions */
-#define MM_SSE2   0x0010 /* PIV SSE2 functions */
+#define MM_MMX       0x0001 /* standard MMX */
+#define MM_3DNOW     0x0004 /* AMD 3DNOW */
+#define MM_MMXEXT    0x0002 /* SSE integer functions or AMD MMX ext */
+#define MM_SSE       0x0008 /* SSE functions */
+#define MM_SSE2      0x0010 /* PIV SSE2 functions */
+#define MM_3DNOWEXT  0x0020 /* AMD 3DNowExt */
 
 #ifdef MMX
 
 #include "mmx.h"
 
+#if defined(MMX) && !defined(i386)
+#  define REG_b "rbx"
+#  define REG_S "rsi"
+#else
+#  define REG_b "ebx"
+#  define REG_S "esi"
+#endif
+
+/* ebx saving is necessary for PIC. gcc seems unable to see it alone */
 #define cpuid(index,eax,ebx,ecx,edx)\
     __asm __volatile\
-        ("movl %%ebx, %%esi\n\t"\
+        ("mov %%"REG_b", %%"REG_S"\n\t"\
          "cpuid\n\t"\
-         "xchgl %%ebx, %%esi"\
+         "xchg %%"REG_b", %%"REG_S\
          : "=a" (eax), "=S" (ebx),\
            "=c" (ecx), "=d" (edx)\
          : "0" (index));
 
 #define        emms()                  __asm__ __volatile__ ("emms")
 
-/* Function to test if multimedia instructions are supported...  */
+/** Function to test if multimedia instructions are supported...  */
 int mm_support(void)
 {
-    int rval;
+    int rval = 0, max_ext_level=0, ext_caps=0;
+    long a, c; // long's needed for x86_64 compatibility
     int eax, ebx, ecx, edx;
 
     __asm__ __volatile__ (
                           /* See if CPUID instruction is supported ... */
                           /* ... Get copies of EFLAGS into eax and ecx */
                           "pushf\n\t"
-                          "popl %0\n\t"
-                          "movl %0, %1\n\t"
+                          "pop %0\n\t"
+                          "mov %0, %1\n\t"
 
                           /* ... Toggle the ID bit in one copy and store */
                          /*     to the EFLAGS reg */
-                          "xorl $0x200000, %0\n\t"
+                          "xor $0x200000, %0\n\t"
                           "push %0\n\t"
                           "popf\n\t"
 
                           /* ... Get the (hopefully modified) EFLAGS */
                           "pushf\n\t"
-                          "popl %0\n\t"
-                          : "=a" (eax), "=c" (ecx)
+                          "pop %0\n\t"
+                          : "=a" (a), "=c" (c)
                           :
                           : "cc"
                           );
 
-    if (eax == ecx)
+    if (a == c)
         return 0; /* CPUID not supported */
+
+    /* x86-64, C3, Tranmeta Crusoe test */
+    cpuid(0x80000000, max_ext_level, ebx, ecx, edx);
+    if ((uint)max_ext_level >= 0x80000001)
+    {
+        cpuid(0x80000001, eax, ebx, ecx, ext_caps);
+        if (ext_caps & (1<<31))
+            rval |= MM_3DNOW;
+        if (ext_caps & (1<<30))
+            rval |= MM_3DNOWEXT;
+        if (ext_caps & (1<<23))
+            rval |= MM_MMX;
+    }
 
     cpuid(0, eax, ebx, ecx, edx);
 
@@ -62,7 +86,6 @@ int mm_support(void)
         ecx == 0x6c65746e) {
 
         /* intel */
-    inteltest:
         cpuid(1, eax, ebx, ecx, edx);
         if ((edx & 0x00800000) == 0)
             return 0;
@@ -76,36 +99,14 @@ int mm_support(void)
                edx == 0x69746e65 &&
                ecx == 0x444d4163) {
         /* AMD */
-        cpuid(0x80000000, eax, ebx, ecx, edx);
-        if ((unsigned)eax < 0x80000001)
-            goto inteltest;
-        cpuid(0x80000001, eax, ebx, ecx, edx);
-        if ((edx & 0x00800000) == 0)
-            return 0;
-        rval = MM_MMX;
-        if (edx & 0x80000000)
-            rval |= MM_3DNOW;
-        if (edx & 0x00400000)
+        if (ext_caps & (1<<22))
             rval |= MM_MMXEXT;
-        return rval;
     } else if (ebx == 0x746e6543 &&
                edx == 0x48727561 &&
                ecx == 0x736c7561) {  /*  "CentaurHauls" */
         /* VIA C3 */
-        cpuid(0x80000000, eax, ebx, ecx, edx);
-        if ((unsigned)eax < 0x80000001)
-            goto inteltest;
-        cpuid(0x80000001, eax, ebx, ecx, edx);
-        rval = 0;
-        if ( edx & ( 1 << 31) )
-          rval |= MM_3DNOW;
-        if ( edx & ( 1 << 23) )
-          rval |= MM_MMX;
-        if ( edx & ( 1 << 24) )
-          rval |= MM_MMXEXT;
-        if (rval==0)
-            goto inteltest;
-        return rval;
+        if (ext_caps & (1<<24))
+            rval |= MM_MMXEXT;
     } else if (ebx == 0x69727943 &&
                edx == 0x736e4978 &&
                ecx == 0x64616574) {
@@ -118,31 +119,34 @@ int mm_support(void)
            According to the table, the only CPU which supports level
            2 is also the only one which supports extended CPUID levels.
         */
-        if (eax != 2)
-            goto inteltest;
-        cpuid(0x80000001, eax, ebx, ecx, edx);
-        if ((eax & 0x00800000) == 0)
-            return 0;
-        rval = MM_MMX;
-        if (eax & 0x01000000)
+        if (eax < 2)
+            return rval;
+        if (ext_caps & (1<<24))
             rval |= MM_MMXEXT;
-        return rval;
-    } else if (ebx == 0x756e6547 &&
-               edx == 0x54656e69 &&
-               ecx == 0x3638784d) {
-        /* Tranmeta Crusoe */
-        cpuid(0x80000000, eax, ebx, ecx, edx);
-        if ((unsigned)eax < 0x80000001)
-            return 0;
-        cpuid(0x80000001, eax, ebx, ecx, edx);
-        if ((edx & 0x00800000) == 0)
-            return 0;
-        return MM_MMX;
-    } else {
-        return 0;
     }
+    return rval;
 }
 #endif
+
+QString cpuid2str(int mm_flags)
+{
+    QString str;
+    if (mm_flags & MM_MMX)
+        str+="MMX, ";
+    if (mm_flags & MM_3DNOW)
+        str+="3DNow, ";
+    if (mm_flags & MM_MMXEXT)
+        str+="MMXEXT, ";
+    if (mm_flags & MM_SSE)
+        str+="SSE, ";
+    if (mm_flags & MM_SSE2)
+        str+"SSE2, ";
+    if (mm_flags & MM_3DNOWEXT)
+        str+"3DNowEXT, ";
+    if (str.length()>=2)
+        str = str.left(str.length()-2);
+    return str;
+}
 
 OSDSurface::OSDSurface(int w, int h)
 {
@@ -190,7 +194,10 @@ OSDSurface::OSDSurface(int w, int h)
     blendconstfunc = &blendconst;
 /* these do not yet work on x86_64, which does not define i386 */
 #if defined(i386) && defined(MMX)
+    //cerr<<QString("cpu extension flags detected: %1")
+    //    .arg(cpuid2str(mm_support()));
     usemmx = (mm_support() & MM_MMX);
+    
     if (usemmx)
     {
         rec_lut[0] = 0;
