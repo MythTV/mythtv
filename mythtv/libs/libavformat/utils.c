@@ -2093,10 +2093,11 @@ void av_remove_stream(AVFormatContext *s, int id) {
     int i;
     for (i=0; i<s->nb_streams; i++)
         if (s->streams[i]->id == id) {
-            printf("av_remove_stream 0x%x\n", id);
+            av_log(NULL, AV_LOG_DEBUG, "av_remove_stream 0x%x\n", id);
             s->nb_streams--;
             if (s->nb_streams-i>0)
-                memmove(&s->streams[i], &s->streams[i+1], (s->nb_streams-i)*sizeof(AVFormatContext *));
+                memmove(&s->streams[i], &s->streams[i+1],
+                        (s->nb_streams-i)*sizeof(AVFormatContext *));
             continue;
         }
     for (i=0; i<s->nb_streams; i++)

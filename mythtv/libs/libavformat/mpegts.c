@@ -371,7 +371,7 @@ static MpegTSService *new_service(MpegTSContext *ts, int sid,
     MpegTSService *service;
 
 #ifdef DEBUG_SI
-    printf("new_service: sid=0x%04x provider='%s' name='%s'\n", 
+    av_log(NULL, AV_LOG_DEBUG, "new_service: sid=0x%04x provider='%s' name='%s'\n", 
            sid, provider_name, name);
 #endif
 
@@ -402,7 +402,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     int changes = 0;
     
 #ifdef DEBUG_SI
-    printf("PMT:\n");
+    av_log(NULL, AV_LOG_DEBUG, "PMT:\n");
     av_hex_dump(stdout, (uint8_t *)section, section_len);
 #endif
     p_end = section + section_len - 4;
@@ -410,7 +410,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     if (parse_section_header(h, &p, p_end) < 0)
         return;
 #ifdef DEBUG_SI
-    printf("sid=0x%x sec_num=%d/%d\n", h->id, h->sec_num, h->last_sec_num);
+    av_log(NULL, AV_LOG_DEBUG, "sid=0x%x sec_num=%d/%d\n", h->id, h->sec_num, h->last_sec_num);
 #endif
     if (h->tid != PMT_TID || (ts->req_sid >= 0 && h->id != ts->req_sid) )
         return;
@@ -420,7 +420,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
         return;
     ts->pcr_pid = pcr_pid;
 #ifdef DEBUG_SI
-    printf("pcr_pid=0x%x\n", pcr_pid);
+    av_log(NULL, AV_LOG_DEBUG, "pcr_pid=0x%x\n", pcr_pid);
 #endif
     program_info_length = get16(&p, p_end) & 0xfff;
     if (program_info_length < 0)
@@ -428,6 +428,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     p += program_info_length;
     if (p >= p_end)
         return;
+
 /* create new streams */
     int i=0;
     for (i=0; i<PMT_PIDS_MAX; i++)
@@ -451,7 +452,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
             return;
 
 #ifdef DEBUG_SI
-        printf("stream_type=%d pid=0x%x\n", stream_type, pid);
+        av_log(NULL, AV_LOG_DEBUG, "stream_type=%d pid=0x%x\n", stream_type, pid);
 #endif
 
         /* now create ffmpeg stream */
@@ -500,7 +501,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     /* notify stream_changed listeners */
     AVFormatContext *s = ts->stream;
     if (changes && s->streams_changed) {
-        printf("streams_changed()\n");
+        av_log(NULL, AV_LOG_DEBUG, "streams_changed()\n");
         s->streams_changed(s->stream_change_data);
     }
 }
@@ -513,7 +514,7 @@ static void pat_cb(void *opaque, const uint8_t *section, int section_len)
     int sid, pmt_pid;
 
 #ifdef DEBUG_SI
-    printf("PAT:\n");
+    av_log(NULL, AV_LOG_DEBUG, "PAT:\n");
     av_hex_dump(stdout, (uint8_t *)section, section_len);
 #endif
     p_end = section + section_len - 4;
@@ -531,7 +532,7 @@ static void pat_cb(void *opaque, const uint8_t *section, int section_len)
         if (pmt_pid < 0)
             break;
 #ifdef DEBUG_SI
-        printf("sid=0x%x pid=0x%x req_sid=0x%x\n", sid, pmt_pid, ts->req_sid);
+        av_log(NULL, AV_LOG_DEBUG, "sid=0x%x pid=0x%x req_sid=0x%x\n", sid, pmt_pid, ts->req_sid);
 #endif
         if (sid == 0x0000) {
             /* NIT info */
@@ -564,7 +565,7 @@ static void pat_scan_cb(void *opaque, const uint8_t *section, int section_len)
     char buf[256];
 
 #ifdef DEBUG_SI
-    printf("PAT:\n");
+    av_log(NULL, AV_LOG_DEBUG, "PAT:\n");
     av_hex_dump(stdout, (uint8_t *)section, section_len);
 #endif
     p_end = section + section_len - 4;
@@ -582,7 +583,7 @@ static void pat_scan_cb(void *opaque, const uint8_t *section, int section_len)
         if (pmt_pid < 0)
             break;
 #ifdef DEBUG_SI
-        printf("sid=0x%x pid=0x%x\n", sid, pmt_pid);
+        av_log(NULL, AV_LOG_DEBUG, "sid=0x%x pid=0x%x\n", sid, pmt_pid);
 #endif
         if (sid == 0x0000) {
             /* NIT info */
@@ -605,7 +606,7 @@ static void pat_scan_cb(void *opaque, const uint8_t *section, int section_len)
     mpegts_close_filter(ts, ts->pat_filter);
     ts->pat_filter = NULL;
 #ifdef DEBUG_SI
-    printf("end of scan PAT\n");
+    av_log(NULL, AV_LOG_DEBUG, "end of scan PAT\n");
 #endif    
 }
 
