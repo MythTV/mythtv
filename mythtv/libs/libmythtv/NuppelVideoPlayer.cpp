@@ -3651,6 +3651,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                     return(254);
 
                 commDetect->SetWatchingRecording(true, nvr_enc, this);
+                totalLength = 0;
             }
 
             sleep(1);
