@@ -221,6 +221,8 @@ static bool comp_timechannel(ProgramInfo *a, ProgramInfo *b)
 {
     if (a->recstartts != b->recstartts)
         return a->recstartts < b->recstartts;
+    if(a->chanstr == b->chanstr)
+        return a->chanid < b->chanid;
     if(a->chanstr.toInt() > 0 && b->chanstr.toInt() > 0)
         return a->chanstr.toInt() < b->chanstr.toInt();
     return a->chanstr < b->chanstr;
@@ -778,7 +780,6 @@ void Scheduler::getAllPending(RecList *retList)
 
     QDateTime now = QDateTime::currentDateTime();
 
-    reclist.sort(comp_timechannel);
     RecIter i = reclist.begin();
     for (; i != reclist.end(); i++)
     {
@@ -787,6 +788,7 @@ void Scheduler::getAllPending(RecList *retList)
             p->recstatus = rsRecorded;
         retList->push_back(new ProgramInfo(*p));
     }
+    retList->sort(comp_timechannel);
 }
 
 void Scheduler::getAllPending(QStringList &strList)
@@ -798,13 +800,21 @@ void Scheduler::getAllPending(QStringList &strList)
 
     QDateTime now = QDateTime::currentDateTime();
 
-    reclist.sort(comp_timechannel);
+    RecList *retList = new RecList;
+
     RecIter i = reclist.begin();
     for (; i != reclist.end(); i++)
     {
         ProgramInfo *p = *i;
         if (p->recstatus == rsRecording && p->recendts < now)
             p->recstatus = rsRecorded;
+        retList->push_back(new ProgramInfo(*p));
+    }
+    retList->sort(comp_timechannel);
+
+    for (i = retList->begin(); i != retList->end(); i++)
+    {
+        ProgramInfo *p = *i;
         p->ToStringList(strList);
     }
 }
