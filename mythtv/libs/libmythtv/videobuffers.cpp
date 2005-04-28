@@ -3,12 +3,9 @@
 
 #include "mythcontext.h"
 #include "videobuffers.h"
-#include "videoout_xv.h" // for xvmc_vo_surf_t
 
 #ifdef USING_XVMC
-extern "C" {
-#include "../libavcodec/xvmc_render.h"
-}
+#include "videoout_xv.h" // for xvmc stuff
 #endif
 
 #define DEBUG_FRAME_LOCKS 0

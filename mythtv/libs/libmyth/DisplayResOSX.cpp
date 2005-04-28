@@ -34,7 +34,7 @@ bool DisplayResOSX::GetDisplaySize(int &width_mm, int &height_mm) const
 
     width_mm = get_int_val(dict, CFSTR(kDisplayHorizontalImageSize));
     height_mm = get_int_val(dict, CFSTR(kDisplayVerticalImageSize));
-    CFRelease(dict);
+    //CFRelease(dict); // this release causes a segfault
     
     return true;
 }
@@ -117,7 +117,6 @@ const DisplayResVector& DisplayResOSX::GetVideoModes() const
         int width = get_int_val(displayMode, kCGDisplayWidth);
         int height = get_int_val(displayMode, kCGDisplayHeight);
         int refresh = get_int_val(displayMode, kCGDisplayRefreshRate);
-        CFRelease(displayMode);
 
         uint key = DisplayResScreen::CalcKey(width, height, 0);
 
