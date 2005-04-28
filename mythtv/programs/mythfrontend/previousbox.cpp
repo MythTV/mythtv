@@ -137,6 +137,8 @@ void PreviousBox::keyPressEvent(QKeyEvent *e)
             chooseView();
         else if (action == "SELECT" || action == "RIGHT")
             select();
+        else if (action == "DELETE")
+            deleteItem();
         else if (action == "LEFT")
             accept();
         else if (action == "INFO")
@@ -675,14 +677,7 @@ void PreviousBox::removalDialog()
 
     if (ret == rm_episode)
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM oldrecorded "
-                      "WHERE chanid = :CHANID AND starttime = :STARTTIME ;");
-        query.bindValue(":CHANID", pi->chanid);
-        query.bindValue(":STARTTIME", pi->startts.toString(Qt::ISODate));
-        query.exec();
-        ScheduledRecording::signalChange(0);
-        fillItemList();
+        deleteItem();
     }
     else if (ret == rm_title)
     {
@@ -694,8 +689,23 @@ void PreviousBox::removalDialog()
         ScheduledRecording::signalChange(0);
         fillItemList();
     }
+}
 
-    return;
+void PreviousBox::deleteItem()
+{
+    ProgramInfo *pi = itemList.at(curItem);
+
+    if (!pi)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM oldrecorded "
+                  "WHERE chanid = :CHANID AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", pi->chanid);
+    query.bindValue(":STARTTIME", pi->startts.toString(Qt::ISODate));
+    query.exec();
+    ScheduledRecording::signalChange(0);
+    fillItemList();
 }
 
 void PreviousBox::customEvent(QCustomEvent *e)

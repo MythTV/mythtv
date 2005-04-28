@@ -29,6 +29,7 @@ class PreviousBox : public MythDialog
     void details(void);
     void chooseView(void);
     void removalDialog(void);
+    void deleteItem(void);
 
   protected:
     void paintEvent(QPaintEvent *);
