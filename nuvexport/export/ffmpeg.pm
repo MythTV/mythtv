@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.04.02 (xris)
+#Last Updated: 2005.04.28 (xris)
 #
 #  ffmpeg.pm
 #
@@ -30,6 +30,9 @@ package export::ffmpeg;
     # Make sure we have ffmpeg
         my $ffmpeg = find_program('ffmpeg')
             or push @{$self->{'errors'}}, 'You need ffmpeg to use this exporter.';
+    # Make sure we have ffmpeg
+        my $yuvdenoise = find_program('yuvdenoise')
+            or push @{$self->{'errors'}}, 'You need yuvdenoise (part of mjpegtools) to use this exporter.';
     # Audio only?
         $self->{'audioonly'} = $audioonly;
     # Gather the supported codecs
@@ -285,7 +288,7 @@ package export::ffmpeg;
                     die "\n\nffmpeg had critical errors:\n\n$warnings";
                 }
             # Another error?
-                elsif ($l =~ /^Error\swhile/m) {
+                elsif ($l =~ /\bError\swhile\b/m) {
                     $warnings .= $l;
                     die "\n\nffmpeg had critical errors:\n\n$warnings";
                 }
