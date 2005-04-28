@@ -397,7 +397,6 @@ int VideoOutputXv::GrabSuitableXvPort(VOSType type)
         default:
             break;
     }
-    VERBOSE(VB_IMPORTANT, "begin("<<begin<<") end("<<end<<")");
 
     for (uint j = begin; j < end; ++j)
     {
@@ -2698,6 +2697,10 @@ CodecID myth2av_codecid(MythCodecID codec_id,
     CodecID ret = CODEC_ID_NONE;
     switch (codec_id)
     {
+        case kCodec_NONE:
+            ret = CODEC_ID_NONE;
+            break;
+
         case kCodec_MPEG1:
             ret = CODEC_ID_MPEG1VIDEO;
             break;
