@@ -1863,6 +1863,9 @@ void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapReques
             //
             //  It's a new playlist to add
             //
+            
+            warning("don't know how to do new lists yet");
+            
         }
         else
         {
@@ -1920,6 +1923,13 @@ void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapReques
                                                     "",
                                                     parsed_list_id
                                                  );
+
+            //
+            //  It must be editable, because a user just edited it
+            //                                     
+            
+            new_playlist->isEditable(true);
+                                                 
             //
             //  Add the items passed in the mdcap commit request
             //
