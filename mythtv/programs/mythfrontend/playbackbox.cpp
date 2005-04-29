@@ -725,6 +725,11 @@ void PlaybackBox::updateVideo(QPainter *p)
             cerr << "Error: File missing\n";
 
             state = kStopping;
+
+            ProgramInfo *tmpItem = findMatchingProg(rec);
+            if (tmpItem)
+                tmpItem->availableStatus = asFileNotFound;
+
             return;
         }
         state = kStarting;
@@ -1042,6 +1047,9 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
                 if (playList.grep(key).count())
                     ltype->EnableForcedFont(cnt, "tagged");
+
+                if (tempInfo->availableStatus != asAvailable)
+                    ltype->EnableForcedFont(cnt, "inactive");
             }
         } 
     } 
@@ -1117,6 +1125,8 @@ void PlaybackBox::cursorRight()
         skipUpdate = false;
         update(fullRect);
     }
+    else if (curitem->availableStatus != asAvailable)
+        showAvailablePopup(curitem);
     else if (arrowAccel)
         showActionsSelected();    
 }
@@ -1200,6 +1210,15 @@ bool PlaybackBox::FillList()
         oldoriginalAirDate = p->originalAirDate;
     }
 
+    QMap<QString, AvailableStatusType> asCache;
+    QString asKey;
+    for (unsigned int i = 0; i < progLists[""].count(); i++)
+    {
+        p = progLists[""].at(i);
+        asKey = p->chanid + ":" + p->startts.toString(Qt::ISODate);
+        asCache[asKey] = p->availableStatus;
+    }
+
     titleList.clear();
     progLists.clear();
     // Clear autoDelete for the "all" list since it will share the
@@ -1211,6 +1230,7 @@ bool PlaybackBox::FillList()
     QMap<QString, QString> sortedList;
     QRegExp prefixes = tr("^(The |A |An )");
     QString sTitle = "";
+    int catsAsRecGroups = gContext->GetNumSetting("UseCategoriesAsRecGroups");
 
     vector<ProgramInfo *> *infoList;
     infoList = RemoteGetRecordedList(listOrder == 0 || type == Delete);
@@ -1228,6 +1248,12 @@ bool PlaybackBox::FillList()
                  (p->category == recGroup ) &&
                  ( !recGroupPwCache.contains(p->recgroup))))
             {
+                asKey = p->chanid + ":" + p->startts.toString(Qt::ISODate);
+                if (asCache.contains(asKey))
+                    p->availableStatus = asCache[asKey];
+                else
+                    p->availableStatus = asAvailable;
+
                 if (titleView) // Normal title view 
                 {
                     progLists[""].prepend(p);
@@ -1242,7 +1268,7 @@ bool PlaybackBox::FillList()
                     progLists[p->recgroup].prepend(p);
                     sortedList[p->recgroup] = p->recgroup;
                     // If categories are used as recording groups...
-                    if (gContext->GetNumSetting("UseCategoriesAsRecGroups"))
+                    if (catsAsRecGroups)
                     {
                         // Recording groups and categories overlap so set flag
                         progLists[p->category].setAutoDelete(false);
@@ -1479,7 +1505,8 @@ void PlaybackBox::playSelectedPlaylist(bool random)
         if (tmpItem)
         {
             ProgramInfo *rec = new ProgramInfo(*tmpItem);
-            playNext = play(rec);
+            if (rec->availableStatus == asAvailable)
+                playNext = play(rec);
             delete rec;
         }
         randomList.remove(it);
@@ -1494,7 +1521,10 @@ void PlaybackBox::playSelected()
     if (!curitem)
         return;
 
-    play(curitem);
+    if (curitem->availableStatus != asAvailable)
+        showAvailablePopup(curitem);
+    else
+        play(curitem);
 }
 
 void PlaybackBox::stopSelected()
@@ -1516,7 +1546,10 @@ void PlaybackBox::deleteSelected()
 
     if (!playList.count())
     {
-        remove(curitem);
+        if (curitem->availableStatus != asPendingDelete)
+            remove(curitem);
+        else
+            showAvailablePopup(curitem);
     }
     else
     {
@@ -1526,7 +1559,7 @@ void PlaybackBox::deleteSelected()
         for (it = playList.begin(); it != playList.end(); ++it )
         {
             tmpItem = findMatchingProg(*it);
-            if (tmpItem)
+            if (tmpItem && (tmpItem->availableStatus != asPendingDelete))
                 remove(tmpItem);
         }
     }
@@ -1549,6 +1582,12 @@ void PlaybackBox::upcoming()
     if (!curitem)
         return;
 
+    if (curitem->availableStatus != asAvailable)
+    {
+        showAvailablePopup(curitem);
+        return;
+    }
+
     ProgLister *pl = new ProgLister(plTitle, curitem->title,
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
@@ -1562,7 +1601,10 @@ void PlaybackBox::details()
     if (!curitem)
         return;
 
-    curitem->showDetails();
+    if (curitem->availableStatus != asAvailable)
+        showAvailablePopup(curitem);
+    else
+        curitem->showDetails();
 }
 
 void PlaybackBox::selected()
@@ -1640,7 +1682,7 @@ void PlaybackBox::showMenu()
                                  this, SLOT(togglePlayListTitle()));
             }
         }
-        else 
+        else if (curitem->availableStatus == asAvailable)
         {
             popup->addButton(tr("Add this recording to Playlist"), this,
                              SLOT(togglePlayListItem()));
@@ -1664,7 +1706,10 @@ void PlaybackBox::showActionsSelected()
     if (inTitle && haveGroupInfoSet)
         return;
 
-    showActions(curitem);
+    if (curitem->availableStatus != asAvailable)
+        showAvailablePopup(curitem);
+    else
+        showActions(curitem);
 }
 
 bool PlaybackBox::play(ProgramInfo *rec)
@@ -1680,6 +1725,16 @@ bool PlaybackBox::play(ProgramInfo *rec)
             QString("PlaybackBox::play(): Error, %1 file not found")
             .arg(rec->pathname);
         VERBOSE(VB_IMPORTANT, msg);
+
+        ProgramInfo *tmpItem = findMatchingProg(rec);
+        if (tmpItem)
+        {
+            tmpItem->availableStatus = asFileNotFound;
+            showAvailablePopup(tmpItem);
+        }
+
+        skipUpdate = false;
+        update(fullRect);
         return false;
     }
 
@@ -1758,9 +1813,10 @@ void PlaybackBox::stop(ProgramInfo *rec)
     RemoteStopRecording(rec);
 }
 
-void PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory)
+bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
+                           bool forceMetadataDelete)
 {
-    RemoteDeleteRecording(rec, forgetHistory);
+    return RemoteDeleteRecording(rec, forgetHistory, forceMetadataDelete);
 }
 
 void PlaybackBox::remove(ProgramInfo *toDel)
@@ -1794,7 +1850,10 @@ void PlaybackBox::showActions(ProgramInfo *toExp)
 
     delitem = new ProgramInfo(*toExp);
 
-    showActionPopup(delitem);
+    if (delitem->availableStatus != asAvailable)
+        showAvailablePopup(delitem);
+    else
+        showActionPopup(delitem);
 }
 
 void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
@@ -1808,20 +1867,25 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
                              popupHighlight, "delete popup");
-    QString message1;
+    QString message1 = "";
+    QString message2 = "";
     switch (types)
     {
         case EndOfRecording:
              message1 = tr("You have finished watching:"); break;
         case DeleteRecording:
              message1 = tr("Are you sure you want to delete:"); break;
+        case ForceDeleteRecording:
+             message1 = tr("ERROR: Recorded file does not exist.");
+             message2 = tr("Are you sure you want to delete:");
+             break;
         case AutoExpireRecording:
              message1 = tr("Allow this program to AutoExpire?"); break;
         case StopRecording:
              message1 = tr("Are you sure you want to stop:"); break;
     }
     
-    initPopup(popup, program, message1, "");
+    initPopup(popup, program, message1, message2);
 
     QString tmpmessage;
     const char *tmpslot = NULL;
@@ -1847,6 +1911,10 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              tmpmessage = tr("Yes, delete it"); 
              tmpslot = SLOT(doDelete());
              break;
+        case ForceDeleteRecording:
+             tmpmessage = tr("Yes, delete it"); 
+             tmpslot = SLOT(doForceDelete());
+             break;
         case AutoExpireRecording:
              tmpmessage = tr("Yes, AutoExpire"); 
              tmpslot = SLOT(doAutoExpire());
@@ -1866,6 +1934,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              tmpslot = SLOT(noDelete());
              break;
         case DeleteRecording:
+        case ForceDeleteRecording:
              tmpmessage = tr("No, keep it, I changed my mind"); 
              tmpslot = SLOT(noDelete());
              break;
@@ -1880,7 +1949,8 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     }
     QButton *noButton = popup->addButton(tmpmessage, this, tmpslot);
 
-    if (types == EndOfRecording || types == DeleteRecording)
+    if (types == EndOfRecording || types == DeleteRecording ||
+        types == ForceDeleteRecording)
         noButton->setFocus();
     else
     {
@@ -1893,6 +1963,31 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     popup->ShowPopup(this, SLOT(doCancel())); 
 
     expectingPopup = true;
+}
+
+void PlaybackBox::showAvailablePopup(ProgramInfo *rec)
+{
+    switch (rec->availableStatus)
+    {
+        case asAvailable:
+                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                               QObject::tr("Recording Unavailable"),
+                               QObject::tr("This recording is currently "
+                                           "Available"));
+                 break;
+        case asPendingDelete:
+                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                               QObject::tr("Recording Unavailable"),
+                               QObject::tr("This recording is currently being\n"
+                                           "deleted and is unavailable"));
+                 break;
+        case asFileNotFound:
+                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                               QObject::tr("Recording Unavailable"),
+                               QObject::tr("The file for this recording can "
+                                           "not be found"));
+                 break;
+    }
 }
 
 void PlaybackBox::showPlaylistPopup()
@@ -2438,7 +2533,10 @@ void PlaybackBox::doPreserveEpisode(void)
 
     cancelPopup();
 
-    delitem->SetPreserveEpisode(true);
+    if (delitem->availableStatus != asAvailable)
+        showAvailablePopup(delitem);
+    else
+        delitem->SetPreserveEpisode(true);
 }
 
 void PlaybackBox::noPreserveEpisode(void)
@@ -2448,7 +2546,10 @@ void PlaybackBox::noPreserveEpisode(void)
 
     cancelPopup();
 
-    delitem->SetPreserveEpisode(false);
+    if (delitem->availableStatus != asAvailable)
+        showAvailablePopup(delitem);
+    else
+        delitem->SetPreserveEpisode(false);
 }
 
 void PlaybackBox::askStop(void)
@@ -2494,12 +2595,19 @@ void PlaybackBox::doEditScheduled()
 
     cancelPopup();
 
-    ScheduledRecording record;
-    record.loadByProgram(curitem);
-    record.exec();
+    if (curitem->availableStatus != asAvailable)
+    {
+        showAvailablePopup(curitem);
+    }
+    else
+    {
+        ScheduledRecording record;
+        record.loadByProgram(curitem);
+        record.exec();
     
-    connected = FillList();
-    update(fullRect);
+        connected = FillList();
+        update(fullRect);
+    }
 }    
 
 void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
@@ -2714,7 +2822,7 @@ void PlaybackBox::doPlaylistDelete(void)
     {
         tmpItem = findMatchingProg(*it);
         if (tmpItem)
-            RemoteDeleteRecording(tmpItem, false);
+            RemoteDeleteRecording(tmpItem, false, false);
     }
 
     connected = FillList();
@@ -2729,7 +2837,42 @@ void PlaybackBox::doDelete(void)
 
     cancelPopup();
 
-    doRemove(delitem, false);
+    if (delitem->availableStatus == asPendingDelete)
+    {
+        showAvailablePopup(delitem);
+        return;
+    }
+
+    bool result = doRemove(delitem, false, false);
+
+    state = kChanging;
+
+    timer->start(500);
+
+    if (result)
+    {
+        ProgramInfo *tmpItem = findMatchingProg(delitem);
+        if (tmpItem)
+            tmpItem->availableStatus = asPendingDelete;
+    }
+    else
+        showDeletePopup(delitem, ForceDeleteRecording);
+}
+
+void PlaybackBox::doForceDelete(void)
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    if (delitem->availableStatus == asPendingDelete)
+    {
+        showAvailablePopup(delitem);
+        return;
+    }
+
+    doRemove(delitem, true, true);
 
     state = kChanging;
 
@@ -2743,11 +2886,26 @@ void PlaybackBox::doDeleteForgetHistory(void)
 
     cancelPopup();
 
-    doRemove(delitem, true);
+    if (delitem->availableStatus == asPendingDelete)
+    {
+        showAvailablePopup(delitem);
+        return;
+    }
+
+    bool result = doRemove(delitem, true, false);
 
     state = kChanging;
 
     timer->start(500);
+
+    if (result)
+    {
+        ProgramInfo *tmpItem = findMatchingProg(delitem);
+        if (tmpItem)
+            tmpItem->availableStatus = asPendingDelete;
+    }
+    else
+        showDeletePopup(delitem, ForceDeleteRecording);
 }
 
 ProgramInfo *PlaybackBox::findMatchingProg(ProgramInfo *pginfo)
@@ -2897,7 +3055,7 @@ void PlaybackBox::togglePlayListTitle(void)
     for( unsigned int i = 0; i < progLists[currentTitle].count(); i++)
     {
         p = progLists[currentTitle].at(i);
-        if (p)
+        if (p && (p->availableStatus == asAvailable))
             togglePlayListItem(p);
     }
 
@@ -2912,6 +3070,12 @@ void PlaybackBox::togglePlayListItem(void)
 
     if (!curitem)
         return;
+
+    if (curitem->availableStatus != asAvailable)
+    {
+        showAvailablePopup(curitem);
+        return;
+    }
 
     togglePlayListItem(curitem);
 
@@ -2928,6 +3092,12 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
 
     if (!pginfo)
         return;
+
+    if (pginfo->availableStatus != asAvailable)
+    {
+        showAvailablePopup(pginfo);
+        return;
+    }
 
     key  = pginfo->chanid + "_" + pginfo->startts.toString(Qt::ISODate);
 

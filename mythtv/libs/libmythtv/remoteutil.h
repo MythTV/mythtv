@@ -14,7 +14,8 @@ bool RemoteGetUptime(time_t &uptime);
 bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 bool RemoteCheckFile(ProgramInfo *pginfo);
 void RemoteStopRecording(ProgramInfo *pginfo);
-void RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory);
+bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
+                           bool forceMetadataDelete = false);
 bool RemoteReactivateRecording(ProgramInfo *pginfo);
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist);
 vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo);

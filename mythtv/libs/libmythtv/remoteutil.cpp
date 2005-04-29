@@ -130,13 +130,22 @@ void RemoteStopRecording(ProgramInfo *pginfo)
     gContext->SendReceiveStringList(strlist);
 }
 
-void RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory)
+bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
+                           bool forceMetadataDelete)
 {
+    bool result = false;
     QStringList strlist;
-    strlist = QString("DELETE_RECORDING");
+
+    if (forceMetadataDelete)
+        strlist = QString("FORCE_DELETE_RECORDING");
+    else
+        strlist = QString("DELETE_RECORDING");
     pginfo->ToStringList(strlist);
 
     gContext->SendReceiveStringList(strlist);
+
+    if (strlist[0].toInt() == -2)
+        result = false;
 
     if (forgetHistory)
     {
@@ -145,6 +154,8 @@ void RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory)
 
         gContext->SendReceiveStringList(strlist);
     }
+
+    return result;
 }
 
 bool RemoteReactivateRecording(ProgramInfo *pginfo)

@@ -77,6 +77,12 @@ enum RecStatusType {
     rsTunerBusy = 12
 };
 
+enum AvailableStatusType {
+    asAvailable = 0,
+    asPendingDelete,
+    asFileNotFound
+};
+
 class ScheduledRecording;
 class QGridLayout;
 
@@ -234,6 +240,7 @@ class ProgramInfo
     QDateTime recstartts;
     QDateTime recendts;
 
+    AvailableStatusType availableStatus;
     
     bool isVideo;
     int lenMins;

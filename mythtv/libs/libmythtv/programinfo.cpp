@@ -31,7 +31,7 @@ ProgramInfo::ProgramInfo(void)
     chanOutputFilters = "";
     year = "";
     stars = 0;
-    
+    availableStatus = asAvailable;    
 
     pathname = "";
     filesize = 0;
@@ -122,6 +122,8 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     lastmodified = other.lastmodified;
     spread = other.spread;
     startCol = other.startCol;
+
+    availableStatus = other.availableStatus;
 
     recstatus = other.recstatus;
     savedrecstatus = other.savedrecstatus;

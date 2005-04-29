@@ -74,6 +74,7 @@ class PlaybackBox : public MythDialog
     void askDelete();
     void doDelete();
     void doDeleteForgetHistory();
+    void doForceDelete();
     void noDelete();
 
     void doAutoExpire();
@@ -180,16 +181,19 @@ class PlaybackBox : public MythDialog
     void killPlayerSafe(void);
     void startPlayer(ProgramInfo *rec);
 
-    void doRemove(ProgramInfo *, bool forgetHistory);
+    bool doRemove(ProgramInfo *, bool forgetHistory, bool forceMetadataDelete);
     void promptEndOfRecording(ProgramInfo *);
     typedef enum {
-         EndOfRecording,DeleteRecording,AutoExpireRecording,StopRecording
+         EndOfRecording,DeleteRecording,AutoExpireRecording,StopRecording,
+         ForceDeleteRecording
     } deletePopupType;
     void showDeletePopup(ProgramInfo *, deletePopupType);
     void showActionPopup(ProgramInfo *program);
     void initPopup(MythPopupBox *popup, ProgramInfo *program, 
                    QString message, QString message2);
     void cancelPopup();
+
+    void showAvailablePopup(ProgramInfo *rec);
 
     bool fileExists(ProgramInfo *pginfo);
 

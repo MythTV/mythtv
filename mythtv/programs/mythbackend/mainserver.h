@@ -59,6 +59,7 @@ class MainServer : public QObject
         QDateTime recendts;
         QString filename;
         QString title;
+        bool forceMetadataDelete;
     } DeleteStruct;
 
     void ProcessRequestWork(RefSocket *sock);
@@ -70,8 +71,10 @@ class MainServer : public QObject
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
-    void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs);
-    void DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
+    void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
+                               bool forceMetadataDelete);
+    void DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
+                                 bool forceMetadataDelete);
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleReactivateRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleRescheduleRecordings(int recordid, PlaybackSock *pbs);

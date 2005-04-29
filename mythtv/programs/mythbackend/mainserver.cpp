@@ -301,7 +301,11 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
     }
     else if (command == "DELETE_RECORDING")
     {
-        HandleDeleteRecording(listline, pbs);
+        HandleDeleteRecording(listline, pbs, false);
+    }
+    else if (command == "FORCE_DELETE_RECORDING")
+    {
+        HandleDeleteRecording(listline, pbs, true);
     }
     else if (command == "REACTIVATE_RECORDING")
     {
@@ -483,7 +487,7 @@ void MainServer::customEvent(QCustomEvent *e)
             {
                 if (gContext->GetNumSetting("RerecordAutoExpired", 0))
                     pinfo->DeleteHistory();
-                DoHandleDeleteRecording(pinfo, NULL);
+                DoHandleDeleteRecording(pinfo, NULL, false);
             }
             else
             {
@@ -1064,7 +1068,8 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
     // allow deleting files where the recording failed (ie, filesize == 0)
     if ((!checkFile.exists()) &&
-        (pginfo->filesize > 0))
+        (pginfo->filesize > 0) &&
+        (!ds->forceMetadataDelete))
     {
         VERBOSE(VB_ALL, QString("ERROR when trying to delete file: %1. File "
                                 "doesn't exist.  Database metadata"
@@ -1426,15 +1431,17 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     delete pginfo;
 }
 
-void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
+void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
+                                       bool forceMetadataDelete)
 {
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
 
-    DoHandleDeleteRecording(pginfo, pbs);
+    DoHandleDeleteRecording(pginfo, pbs, forceMetadataDelete);
 }
 
-void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
+void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
+                                         bool forceMetadataDelete)
 {
     QSocket *pbssock = NULL;
     if (pbs)
@@ -1469,7 +1476,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         }
     }
 
-    int recnum = -1;
+    int resultCode = -1;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
@@ -1478,7 +1485,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
         if (elink->isLocal() && elink->MatchesRecording(pginfo))
         {
-            recnum = iter.key();
+            resultCode = iter.key();
 
             elink->StopRecording();
 
@@ -1503,7 +1510,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     bool fileExists = checkFile.exists();
 
     // allow deleting of files where the recording failed meaning size == 0
-    if ((fileExists) || (pginfo->filesize == 0))
+    if ((fileExists) || (pginfo->filesize == 0) || (forceMetadataDelete))
     {
         DeleteStruct *ds = new DeleteStruct;
         ds->ms = this;
@@ -1512,6 +1519,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         ds->chanid = pginfo->chanid;
         ds->recstartts = pginfo->recstartts;
         ds->recendts = pginfo->recendts;
+        ds->forceMetadataDelete = forceMetadataDelete;
 
         pginfo->SetDeleteFlag(true);
 
@@ -1535,22 +1543,16 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
                            QString("File %1 does not exist for %2 when trying "
                                    "to delete recording.")
                                    .arg(filename).arg(logInfo));
+        resultCode = -2;
     }
 
     if (pbssock)
     {
-        QStringList outputlist;
-
-        if (fileExists)
-            outputlist = QString::number(recnum);
-        else
-            outputlist << "BAD: Tried to delete a file that was in "
-                          "the database but wasn't on the disk.";
-
+        QStringList outputlist = QString::number(resultCode);
         SendResponse(pbssock, outputlist);
     }
 
-    if ((fileExists) || (pginfo->filesize == 0))
+    if ((fileExists) || (pginfo->filesize == 0) || (forceMetadataDelete))
     {
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
