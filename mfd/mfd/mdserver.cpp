@@ -1858,14 +1858,46 @@ void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapReques
             return;
         }
     
+        lockMetadata();
+
+        MetadataContainer *metadata_container = getMetadataContainer(parsed_collection_id);
+                
+        if(!metadata_container)
+        {
+            warning("could not find metadata container referenced by a "
+                    "mdcap commit request");
+             delete group_contents;
+             if(list_contents)
+             {
+                delete list_contents;
+                list_contents = NULL;
+              }
+              unlockMetadata();
+              return;
+        }
+                
+        //
+        //  Create a new playlist
+        //
+
+        Playlist *new_playlist = new Playlist(
+                                                parsed_collection_id,
+                                                parsed_list_name,
+                                                "",
+                                                parsed_list_id
+                                             );
+
+        int new_db_id = -1;
+        int new_playlist_id = 0;
         if(parsed_new_flag)
         {
             //
             //  It's a new playlist to add
             //
             
-            warning("don't know how to do new lists yet");
-            
+            new_playlist->userNewList(true);
+            new_playlist_id = metadata_container->bumpPlaylistId();
+            new_playlist->setId(new_playlist_id);
         }
         else
         {
@@ -1873,180 +1905,124 @@ void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapReques
             //  Try and find the container and playlist in question
             //
             
-            lockMetadata();
-
-                MetadataContainer *metadata_container = getMetadataContainer(parsed_collection_id);
-                
-                if(!metadata_container)
-                {
-                    warning("could not find metadata container referenced by a "
-                            "mdcap commit request");
-                    delete group_contents;
-                    if(list_contents)
-                    {
-                        delete list_contents;
-                        list_contents = NULL;
-                    }
-                    unlockMetadata();
-                    return;
-                }
-                
-                Playlist *existing_playlist = getPlaylistByContainerAndId(
-                                                                parsed_collection_id,
-                                                                parsed_list_id
-                                                                         );
-                if(!existing_playlist)
-                {
-                    warning("could not find playlist to update specified by "
-                            "mdcap commit request");
-                    delete group_contents;
-                    if(list_contents)
-                    {
-                        delete list_contents;
-                        list_contents = NULL;
-                    }
-                    unlockMetadata();
-                    return;
-                }
-            
-                int new_db_id = existing_playlist->getDbId();
-
-            unlockMetadata();
-
-            //
-            //  Create a new playlist
-            //
-
-            Playlist *new_playlist = new Playlist(
-                                                    parsed_collection_id,
-                                                    parsed_list_name,
-                                                    "",
-                                                    parsed_list_id
-                                                 );
-
-            //
-            //  It must be editable, because a user just edited it
-            //                                     
-            
-            new_playlist->isEditable(true);
-                                                 
-            //
-            //  Add the items passed in the mdcap commit request
-            //
-
-            MdcapInput actual_list(list_contents);
-            while(actual_list.size() > 0)
+            Playlist *existing_playlist = getPlaylistByContainerAndId(
+                                                            parsed_collection_id,
+                                                            parsed_list_id
+                                                                     );
+            if(!existing_playlist)
             {
-                new_playlist->addToList(actual_list.popListItem());
-            }
-            
-            //
-            //  Set it's database id to the same as it was before the edit
-            //
-            
-            new_playlist->setDbId(new_db_id);
-
-            //
-            //  If the db is not -1, this came out of a database. So .... we
-            //  need to map the item/list entries we just stuffed into it
-            //  to database id entries.
-            //
-
-            if(new_db_id > 0)
-            {
-                lockMetadata();
-    
-                    MetadataContainer *metadata_container = getMetadataContainer(parsed_collection_id);
-
-                    if(!metadata_container)
-                    {
-                        warning("could not get metadata container needed for"
-                                "mdcap commit request");
-
-                        delete new_playlist;
-                        delete group_contents;
-                        if(list_contents)
-                        {
-                            delete list_contents;
-                            list_contents = NULL;
-                        }
-                        unlockMetadata();
-                        return;
-                    }
-                    
-                    QIntDict<Metadata> *all_the_metadata 
-                                    = metadata_container->getMetadata();
-                    QIntDict<Playlist> *all_the_playlist 
-                                    = metadata_container->getPlaylists();
-
-                    if(all_the_metadata && all_the_playlist)
-                    {
-
-                        new_playlist->mapIdToDatabase(
-                                                        all_the_metadata,
-                                                        all_the_playlist
-                                                     );
-                    }
-                    else
-                    {
-                        warning("can't call mapIdToDatabase(), because of "
-                                "NULLs for metadata and/or playlists");
-                    } 
+                warning("could not find playlist to update specified by "
+                        "mdcap commit request");
+                delete group_contents;
+                if(list_contents)
+                {
+                    delete list_contents;
+                    list_contents = NULL;
+                }
                 unlockMetadata();
+                return;
             }
-
-            //
-            //  Now mark the playlist as internally changed. We do this so
-            //  that the plugin that originally created this collection can
-            //  discover (via querying after a MetadataChanged event) that
-            //  the collection it "owns" has changed. This is typically used
-            //  by, say, the mmusic plugin to realize that a playlist has
-            //  changed and so it should really save it back to the
-            //  database.
-            //
-
-            new_playlist->internalChange(true);
-
-            //
-            //  We create enough bits and pieces to do our own internal
-            //  Atomic Data Delta. Don't have to delete any of these, as
-            //  they get deleted as part of the AtomicDataDelta();
-            //
             
-            QIntDict<Metadata> *empty_new_metadata = new QIntDict<Metadata>;
-            QValueList<int>     empty_metadata_additions;
-            QValueList<int>     empty_metadata_deletions;
-            QIntDict<Playlist> *new_playlists = new QIntDict<Playlist>;
-            QValueList<int>     playlist_additions;
-            QValueList<int>     playlist_deletions;
-            
-            new_playlists->insert(parsed_list_id, new_playlist);
-            playlist_additions.push_back(parsed_list_id);
+            new_db_id = existing_playlist->getDbId();
+            new_playlist_id = parsed_list_id;
 
-            doAtomicDataDelta(
-                                metadata_container,
-                                empty_new_metadata,
-                                empty_metadata_additions,
-                                empty_metadata_deletions,
-                                new_playlists,
-                                playlist_additions,
-                                playlist_deletions,
-                                false
-                             );
-
-            //
-            //  Announce to anyone who cares that metadata has changed
-            //
-
-            MetadataChangeEvent *mce = new MetadataChangeEvent(parsed_collection_id, true);
-            QApplication::postEvent(parent, mce);    
-            
-            //
-            //  Push the changes out to any and all mdcap connected clients
-            //
-            
-            dealWithHangingUpdates();
         }
+
+        //
+        //  It must be editable, because a user just edited it
+        //                                     
+            
+        new_playlist->isEditable(true);
+                                                 
+        //
+        //  Add the items passed in the mdcap commit request
+        //
+
+        MdcapInput actual_list(list_contents);
+        while(actual_list.size() > 0)
+        {
+            new_playlist->addToList(actual_list.popListItem());
+        }
+            
+        //
+        //  Set it's database id to the same as it was before the edit or -1 if it's new
+        //
+            
+        new_playlist->setDbId(new_db_id);
+
+        QIntDict<Metadata> *all_the_metadata 
+                        = metadata_container->getMetadata();
+        QIntDict<Playlist> *all_the_playlist 
+                        = metadata_container->getPlaylists();
+
+        if(all_the_metadata && all_the_playlist)
+        {
+            new_playlist->mapIdToDatabase(
+                                            all_the_metadata,
+                                            all_the_playlist
+                                         );
+        }
+        else
+        {
+            warning("can't call mapIdToDatabase(), because of "
+                    "NULLs for metadata and/or playlists");
+        } 
+
+        unlockMetadata();
+
+        //
+        //  Now mark the playlist as internally changed. We do this so
+        //  that the plugin that originally created this collection can
+        //  discover (via querying after a MetadataChanged event) that
+        //  the collection it "owns" has changed. This is typically used
+        //  by, say, the mmusic plugin to realize that a playlist has
+        //  changed and so it should really save it back to the
+        //  database.
+        //
+
+        new_playlist->internalChange(true);
+
+        //
+        //  We create enough bits and pieces to do our own internal
+        //  Atomic Data Delta. Don't have to delete any of these, as
+        //  they get deleted as part of the AtomicDataDelta();
+        //
+            
+        QIntDict<Metadata> *empty_new_metadata = new QIntDict<Metadata>;
+        QValueList<int>     empty_metadata_additions;
+        QValueList<int>     empty_metadata_deletions;
+        QIntDict<Playlist> *new_playlists = new QIntDict<Playlist>;
+        QValueList<int>     playlist_additions;
+        QValueList<int>     playlist_deletions;
+            
+        new_playlists->insert(new_playlist_id, new_playlist);
+        playlist_additions.push_back(new_playlist_id);
+
+        doAtomicDataDelta(
+                            metadata_container,
+                            empty_new_metadata,
+                            empty_metadata_additions,
+                            empty_metadata_deletions,
+                            new_playlists,
+                            playlist_additions,
+                            playlist_deletions,
+                            false
+                         );
+
+        //
+        //  Announce to anyone who cares that metadata has changed
+        //
+
+        MetadataChangeEvent *mce = new MetadataChangeEvent(parsed_collection_id, true);
+        QApplication::postEvent(parent, mce);    
+            
+        //
+        //  Push the changes out to any and all mdcap connected clients if
+        //  this was not a new list
+        //
+            
+        dealWithHangingUpdates();
+            
     }
     
     delete group_contents;

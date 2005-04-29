@@ -124,6 +124,15 @@ MfdContentCollection::MfdContentCollection(
     audio_artist_tree->setAttribute(1, 1);
     audio_genre_tree->setAttribute(1, 1);
     audio_playlist_tree->setAttribute(1, 2);
+
+    //
+    //  Create trees for use when the user is trying to edit a new playlist
+    //
+    
+    new_pristine_playlist_tree = NULL;
+    new_working_playlist_tree = NULL;
+    new_user_playlist = NULL;
+    
 }
 
 void MfdContentCollection::addMetadata(Metadata *new_item, const QString &collection_name, MetadataCollection *collection)
@@ -368,18 +377,21 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
     }
 }
 
-void MfdContentCollection::addNewPlaylistAbility(const QString &collection_name)
+void MfdContentCollection::addNewPlaylistAbility(const QString &collection_name, int l_collection_id)
 {
     if (!new_playlist_tree)
     {
         new_playlist_tree = new UIListGenericTree(NULL, "New Playlist");
         new_playlist_tree->setPixmap(pixnewplaylist);
-        new_playlist_tree->setInt(collection_id);
+        new_playlist_tree->setInt(l_collection_id);
         new_playlist_tree->setAttribute(1, 4);
     }
     else
     {
-        cerr << "Someone has figured out how to have more than one editable "
+        cerr << "A collection called \""
+             << collection_name
+             << "\" want to be added to the list of editable collections. "
+             << "This means someone has figured out how to have more than one editable "
              << "music collection on a single mfd. Need to improve "
              << "MfdContentCollection::addNewPlaylistAbility() to handle "
              << "child nodes."
@@ -925,12 +937,24 @@ AudioMetadata* MfdContentCollection::getAudioItem(int which_collection, int whic
 
 ClientPlaylist* MfdContentCollection::getAudioPlaylist(int which_collection, int which_id)
 {
-    int dictionary_key =   which_collection
-                        * METADATA_UNIVERSAL_ID_DIVIDER
-                        + which_id;
+    if(which_id > -1)
+    {
+        int dictionary_key = which_collection
+                             * METADATA_UNIVERSAL_ID_DIVIDER
+                             + which_id;
 
 
-    return audio_playlist_dictionary[dictionary_key];
+        return audio_playlist_dictionary[dictionary_key];
+    }
+    
+    if(new_user_playlist)
+    {
+        delete new_user_playlist;
+    }
+
+    new_user_playlist = new ClientPlaylist(-1, "New Playlist");
+    new_user_playlist->setCollectionId(which_collection);
+    return new_user_playlist;
 }
 
 UIListGenericTree* MfdContentCollection::getPlaylistTree(
@@ -939,6 +963,36 @@ UIListGenericTree* MfdContentCollection::getPlaylistTree(
                                                             bool pristine
                                                         )
 {
+    if(which_playlist == -1)
+    {
+        //
+        //  User is trying to create a new playlist
+        //
+        
+        if(pristine)
+        {
+            if(new_pristine_playlist_tree)
+            {
+                delete new_pristine_playlist_tree;
+            }
+            new_pristine_playlist_tree = new UIListGenericTree(NULL, "user never sees this");
+            new_pristine_playlist_tree->setInt(-1);
+            new_pristine_playlist_tree->setAttribute(0, which_collection);
+            return new_pristine_playlist_tree;
+        }
+        else
+        {
+            if(new_working_playlist_tree)
+            {
+                delete new_working_playlist_tree;
+            }
+            new_working_playlist_tree = new UIListGenericTree(NULL, "user never sees this");
+            new_working_playlist_tree->setInt(-1);
+            new_working_playlist_tree->setAttribute(0, which_collection);
+            return new_working_playlist_tree;
+        }
+        
+    }
 
     int lookup_key =   (which_collection
                        * METADATA_UNIVERSAL_ID_DIVIDER)
@@ -1424,7 +1478,7 @@ bool MfdContentCollection::crossReferenceExists(ClientPlaylist *subject, ClientP
 
 
     bool ref_exists = false;
-    uint check;
+    int check;
 
     QValueList<PlaylistEntry> *the_list = object->getListPtr();
     QValueList<PlaylistEntry>::iterator l_it;
@@ -1446,7 +1500,6 @@ bool MfdContentCollection::crossReferenceExists(ClientPlaylist *subject, ClientP
                                                 subject->getCollectionId(),
                                                 (*l_it).getId()
                                                             );
-;
                 if (new_check)
                 {
                     ref_exists = crossReferenceExists(subject, new_check, new_depth);
@@ -1632,6 +1685,7 @@ void MfdContentCollection::processContentTree(
     
     int which_collection = playlist_tree->getAttribute(0);
     int which_playlist = playlist_tree->getInt();
+
 
     ClientPlaylist *playlist = getAudioPlaylist(
                                                 which_collection,
@@ -1883,6 +1937,24 @@ MfdContentCollection::~MfdContentCollection()
     {
         delete editable_playlist_tree;
         editable_playlist_tree = NULL;
+    }
+    
+    if(new_pristine_playlist_tree)
+    {
+        delete new_pristine_playlist_tree;
+        new_pristine_playlist_tree = NULL;
+    }
+    
+    if(new_working_playlist_tree)
+    {
+        delete new_working_playlist_tree;
+        new_working_playlist_tree = NULL;
+    }
+    
+    if(new_user_playlist)
+    {
+        delete new_user_playlist;
+        new_user_playlist = NULL;
     }
 }
 

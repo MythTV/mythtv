@@ -307,6 +307,9 @@ class Playlist
     QMap<int, int>*  getIndirectMap(){return &indirect_map;}
     bool             isEditable(){return is_editable;}
     void             isEditable(bool yes_or_no){is_editable = yes_or_no;}
+    bool             userNewList(){ return user_new_list; }
+    void             userNewList(bool y_or_n){ user_new_list = y_or_n; }
+    
 
   private:
   
@@ -328,6 +331,12 @@ class Playlist
     //
 
     QMap<int, int>  indirect_map;
+    
+    //
+    //  For marking lists as new from the user
+    //
+    
+    bool            user_new_list;
 };
 
 #endif

@@ -17,7 +17,7 @@ ClientPlaylist::ClientPlaylist(
                                 int l_collection_id, 
                                 QString new_name, 
                                 QValueList<PlaylistEntry> *my_entries, 
-                                uint my_id
+                                int my_id
                               )
 {
 
@@ -32,6 +32,19 @@ ClientPlaylist::ClientPlaylist(
         entries.push_back((*it));
     }
 
+}
+
+ClientPlaylist::ClientPlaylist(int l_collection_id, QString new_name)
+{
+    //
+    //  Used to make a blank playlist when the user wants to construct a new
+    //  one.
+    //
+
+    collection_id = l_collection_id;
+    id = -1;
+    name = new_name;
+    is_editable = true;
 }
 
 bool ClientPlaylist::containsItem(int item_id)

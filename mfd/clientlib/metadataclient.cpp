@@ -432,7 +432,7 @@ void MetadataClient::processResponse(MdcapResponse *mdcap_response)
     //  Debugging output
     //
     
-    // printMetadata();
+    //printMetadata();
     
     //
     //  Time to build a tree
@@ -1524,7 +1524,7 @@ void MetadataClient::buildTree()
         
         if(a_collection->isEditable())
         {
-            new_collection->addNewPlaylistAbility(a_collection->getName());
+            new_collection->addNewPlaylistAbility(a_collection->getName(), a_collection->getId());
         }
         
         //

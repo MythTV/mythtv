@@ -123,6 +123,8 @@ class MetadataContainer
     MetadataCollectionContentType  getContentType(){ return content_type;}
     MetadataCollectionLocationType getLocationType(){ return location_type;}
     MetadataCollectionServerType   getServerType(){ return server_type;}
+    
+    int     bumpPlaylistId(){current_playlist_id++; return current_playlist_id;}
  
   protected:
 
@@ -133,7 +135,6 @@ class MetadataContainer
                             bool delta,
                             bool prune_dead = false
                         );
-    int     bumpPlaylistId(){current_playlist_id++; return current_playlist_id;}
     void    checkPlaylists();
   
     MFD *parent;

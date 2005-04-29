@@ -79,6 +79,7 @@ class MMusicWatcher: public MFDServicePlugin
     void            handleMetadataChange(int which_collection, bool external);
     void            possiblySaveToDb();
     void            persistPlaylist(Playlist *a_playlist);
+    void            createPlaylistInDb(Playlist *a_playlist);
     
   private:
 

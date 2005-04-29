@@ -28,29 +28,35 @@ class ClientPlaylist
                 int l_collection_id, 
                 QString new_name, 
                 PlaylistEntryList *my_entries, 
-                uint my_id
+                int my_id
             );
+            
+    ClientPlaylist(
+                    int l_collection_id,
+                    QString new_name
+                  );
 
     virtual ~ClientPlaylist();
 
-    uint                       getId(){return id;}
-    uint                       getCollectionId(){return collection_id;}    
-    QString                    getName(){return name;}
-    uint                       getCount(){return entries.count();}
-    void                       setActualTrackCount(int x){ actual_track_count = x;}
-    uint                       getActualTrackCount(){ return actual_track_count; }
-    QValueList<PlaylistEntry>* getListPtr(){return &entries;}
-    bool                       containsItem(int item_id);
-    bool                       isEditable(){return is_editable;}
-    void                       isEditable(bool y_or_n){ is_editable = y_or_n; }
+    int                         getId(){return id;}
+    int                         getCollectionId(){return collection_id;}    
+    void                        setCollectionId(int new_id){ collection_id = new_id; }
+    QString                     getName(){return name;}
+    int                         getCount(){return entries.count();}
+    void                        setActualTrackCount(int x){ actual_track_count = x;}
+    int                         getActualTrackCount(){ return actual_track_count; }
+    QValueList<PlaylistEntry>*  getListPtr(){return &entries;}
+    bool                        containsItem(int item_id);
+    bool                        isEditable(){return is_editable;}
+    void                        isEditable(bool y_or_n){ is_editable = y_or_n; }
 
   private:
   
     QString           name;
     PlaylistEntryList entries;
-    uint              id;
-    uint              collection_id;
-    uint              actual_track_count;
+    int               id;
+    int               collection_id;
+    int               actual_track_count;
     bool              is_editable;
 };
 

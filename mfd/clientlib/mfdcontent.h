@@ -35,7 +35,7 @@ class MfdContentCollection
 
     void addMetadata(Metadata *an_item, const QString &collection_name, MetadataCollection *collection);
     void addPlaylist(ClientPlaylist *a_playlist, MetadataCollection *collection);
-    void addNewPlaylistAbility(const QString &collection_name);
+    void addNewPlaylistAbility(const QString &collection_name, int l_collection_id);
     void recursivelyAddSubPlaylist(
                                     UIListGenericTree *where_to_add, 
                                     MetadataCollection *collection, 
@@ -130,6 +130,15 @@ class MfdContentCollection
 
     QIntDict<UIListGenericTree> editable_playlist_trees;
     QIntDict<UIListGenericTree> pristine_playlist_trees;
+
+
+    //
+    //  Used when the user is trying to make a new playlist
+    //
+
+    UIListGenericTree          *new_pristine_playlist_tree;
+    UIListGenericTree          *new_working_playlist_tree;
+    ClientPlaylist             *new_user_playlist;
 
     int   client_width;
     int   client_height;

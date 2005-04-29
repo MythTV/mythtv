@@ -229,6 +229,7 @@ Playlist::Playlist(
 
     internal_change = false;
     waiting_for_list = false;
+    user_new_list = false;
 }
 
 Playlist::Playlist(
@@ -254,6 +255,7 @@ Playlist::Playlist(
 
     internal_change = false;
     waiting_for_list = false;
+    user_new_list = false;
 }
 
 void Playlist::mapDatabaseToId(

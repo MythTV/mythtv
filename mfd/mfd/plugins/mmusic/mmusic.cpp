@@ -1561,7 +1561,14 @@ void MMusicWatcher::possiblySaveToDb()
             {
                 if(it.current()->internalChange())
                 {
-                    persistPlaylist(it.current());
+                    if(it.current()->userNewList())
+                    {
+                        createPlaylistInDb(it.current());
+                    }
+                    else
+                    {
+                        persistPlaylist(it.current());
+                    }
                     it.current()->internalChange(false);
                 }
             }
@@ -1617,6 +1624,74 @@ void MMusicWatcher::persistPlaylist(Playlist *a_playlist)
                .arg(a_playlist->getName())
                .arg(db_song_list->size()), 3);
 }
+
+void MMusicWatcher::createPlaylistInDb(Playlist *a_playlist)
+{
+    //
+    //  Make a string of the database id entries that comprise this playlist
+    //
+ 
+    QValueList<int> *db_song_list = a_playlist->getDbList();
+    QString db_song_list_string = "";
+    
+    if(db_song_list->size() > 0)
+    {
+        db_song_list_string = QString("%1").arg(db_song_list->first());
+    }
+    if(db_song_list->size() > 1)
+    {
+        QValueList<int>::iterator it;
+        it = db_song_list->begin();
+        ++it;
+        for ( ; it != db_song_list->end(); ++it )
+        {
+            db_song_list_string.append( QString(",%1").arg((*it)) );
+        }
+    }
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("INSERT INTO musicplaylist (name, hostname, songlist) values (?, ?, ?) ; ");
+
+    query.bindValue(0, a_playlist->getName().utf8());
+    query.bindValue(1, mfdContext->getHostName());
+    query.bindValue(2, db_song_list_string);
+        
+    query.exec();
+    
+    if(!query.isActive())
+    {
+        warning(QString("bad response from database when trying to create "
+                        "a playlist called \"%1\"")
+                       .arg(a_playlist->getName()));
+        return;
+    }
+    
+    query.prepare("SELECT playlistid FROM musicplaylist WHERE name = ? AND hostname = ? AND songlist = ? ; ");
+
+    query.bindValue(0, a_playlist->getName().utf8());
+    query.bindValue(1, mfdContext->getHostName());
+    query.bindValue(2, db_song_list_string);
+
+    query.exec();
+
+    if(!query.isActive() || query.numRowsAffected() < 1)
+    {
+        warning("could not get back the id of a playlist I just inserted. BAD");
+        return;
+    }
+    
+    query.next();
+    a_playlist->setDbId(query.value(0).toInt());
+    a_playlist->userNewList(false);
+    
+    log(QString("created playlist called \"%1\" (db id of %2) in the database "
+                "(%2 entries)")
+               .arg(a_playlist->getName())
+               .arg(a_playlist->getDbId())
+               .arg(db_song_list->size()), 3);
+}
+
 
 MMusicWatcher::~MMusicWatcher()
 {
