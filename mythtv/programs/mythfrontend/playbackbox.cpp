@@ -1978,7 +1978,7 @@ void PlaybackBox::showAvailablePopup(ProgramInfo *rec)
         case asPendingDelete:
                  MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                QObject::tr("Recording Unavailable"),
-                               QObject::tr("This recording is currently being\n"
+                               QObject::tr("This recording is currently being "
                                            "deleted and is unavailable"));
                  break;
         case asFileNotFound:
