@@ -2006,7 +2006,7 @@ void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapReques
                             new_playlists,
                             playlist_additions,
                             playlist_deletions,
-                            false
+                            true
                          );
 
         //
