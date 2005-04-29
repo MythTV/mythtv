@@ -290,6 +290,7 @@ void PlaybackBox::killPlayerSafe(void)
             usleep(500);
             qApp->lock();
         }
+        state = kStopped;
     }
 
     setEnabled(true);
@@ -317,8 +318,9 @@ void PlaybackBox::LoadWindow(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
-                exit(23);
+                VERBOSE(VB_IMPORTANT,
+                        QString("PlaybackBox::LoadWindow(): Ignoring unknown "
+                                "element, %1. ").arg(e.tagName()));
             }
         }
     }
@@ -351,16 +353,14 @@ void PlaybackBox::parseContainer(QDomElement &element)
 void PlaybackBox::parsePopup(QDomElement &element)
 {
     QString name = element.attribute("name", "");
-    if (name.isNull() || name.isEmpty())
+    if (name.isNull() || name.isEmpty() || name != "confirmdelete")
     {
-        cerr << "Popup needs a name\n";
-        exit(24);
-    }
-
-    if (name != "confirmdelete")
-    {
-        cerr << "Unknown popup name! (try using 'confirmdelete')\n";
-        exit(25);
+        if (name.isNull())
+            name = "(null)";
+        VERBOSE(VB_IMPORTANT,
+                QString("PlaybackBox::parsePopup(): Popup name must "
+                        "be 'confirmdelete' but was '%1'").arg(name));
+        return;
     }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -387,8 +387,9 @@ void PlaybackBox::parsePopup(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown popup child: " << info.tagName() << endl;
-                exit(26);
+                VERBOSE(VB_IMPORTANT,
+                        QString("PlaybackBox::parsePopup(): Unknown child %1")
+                        .arg(info.tagName()));
             }
         }
     }
@@ -722,7 +723,8 @@ void PlaybackBox::updateVideo(QPainter *p)
 
         if (fileExists(rec) == false)
         {
-            cerr << "Error: File missing\n";
+            VERBOSE(VB_IMPORTANT, QString("Error: File '%1' missing.")
+                    .arg(rec->pathname));
 
             state = kStopping;
 
@@ -1453,7 +1455,9 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
     {
         if (rbuffer || nvp)
         {
-            cerr << "ERROR: preview window didn't clean up\n";
+            VERBOSE(VB_IMPORTANT,
+                    "PlaybackBox::startPlayer(): Error, last preview window "
+                    "didn't clean up. Not starting a new preview.");
             return;
         }
 

@@ -161,6 +161,7 @@ class VideoOutputXv : public VideoOutput
     int                  xvmc_surf_type;
     int                  xvmc_chroma;
     XvMCContext          xvmc_ctx;
+    bool                 xvmc_ctx_exists;
     vector<void*>        xvmc_surfs;
 
     QMutex               xvmc_osd_lock;

@@ -208,11 +208,19 @@ unsigned ThreadedFileWriter::Write(const void *data, unsigned count)
     return count;
 }
 
+/** \fn ThreadedFileWriter::Seek(long long pos, int whence)
+ *  \brief Seek to a position within stream; May be unsafe.
+ *
+ *   This method is unsafe if Start() has been called and
+ *   the call us not preceeded by StopReads(). You probably
+ *   want to follow Seek() with a StartReads() in this case.
+ *
+ *   This method assumes that we don't seek very often. It does
+ *   not use a high performance approach... we just block until
+ *   the write thread empties the buffer.
+ */
 long long ThreadedFileWriter::Seek(long long pos, int whence)
 {
-    /* Assumes that we don't seek very often. This is not a high
-       performance approach... we just block until the write thread
-       empties the buffer. */
     Flush();
 
     return lseek(fd, pos, whence);
@@ -537,6 +545,7 @@ RingBuffer::~RingBuffer(void)
     if (fd2 >= 0)
     {
         close(fd2);
+        fd2 = -1;
     }
 }
 
@@ -597,7 +606,10 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
             if (errno == EAGAIN)
                 continue;
 
-            perror("ERROR: file I/O problem in 'safe_read()'");
+            VERBOSE(VB_IMPORTANT,
+                    QString("ERROR: file I/O problem in 'safe_read()' %1")
+                    .arg(strerror(errno)));
+
             errcnt++;
             numfailures++;
             if (errcnt == 3)

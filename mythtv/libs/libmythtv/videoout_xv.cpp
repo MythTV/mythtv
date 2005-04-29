@@ -90,7 +90,7 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       xv_color_conv_buf(NULL),
 #ifdef USING_XVMC
       xvmc_surf_type(0), xvmc_chroma(XVMC_CHROMA_FORMAT_420),
-      xvmc_osd_lock(false),
+      xvmc_ctx_exists(false), xvmc_osd_lock(false), 
 #endif
       video_output_subtype(XVUnknown), display_res(NULL),
       display_aspect(1.0), global_lock(true),
@@ -417,7 +417,7 @@ int VideoOutputXv::GrabSuitableXvPort(VOSType type)
             {
 #ifdef USING_XVMC
                 int surfNum;
-                XvMCSurfaceTypes::find(XJ_width, min(XJ_height,1), xvmc_chroma,
+                XvMCSurfaceTypes::find(XJ_width, XJ_height, xvmc_chroma,
                                        useVLD[j], useIDCT[j], 2, 0, 0,
                                        XJ_disp, firstPort, lastPort,
                                        p, surfNum);
@@ -1022,6 +1022,7 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
                 "status(%1): %2").arg(ret).arg(ErrorStringXvMC(ret)));
         return false;
     }
+    xvmc_ctx_exists = true;
 
     bool createBlocks = !(XVMC_VLD == (xvmc_surf_info.mc_type & XVMC_VLD));
     xvmc_surfs = CreateXvMCSurfaces(XVMC_MAX_SURF_NUM, createBlocks);
@@ -1349,8 +1350,11 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
     XJ_non_xv_image = NULL;
 
 #ifdef USING_XVMC
-    if (XVideo < subtype)
+    if (xvmc_ctx_exists)
+    {
+        xvmc_ctx_exists = false;
         X11S(XvMCDestroyContext(XJ_disp, &xvmc_ctx));
+    }
 #endif // USING_XVMC
 }
 

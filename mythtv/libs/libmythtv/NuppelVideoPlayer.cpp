@@ -638,12 +638,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     }
 
     ringBuffer->Start();
-    long long startpos = ringBuffer->GetTotalReadPosition();
-
-    decoder = NULL;
-
     char testbuf[2048];
-
     if (ringBuffer->Read(testbuf, 2048) != 2048)
     {
         VERBOSE(VB_IMPORTANT,
@@ -652,10 +647,18 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         return -1;
     }
 
-    ringBuffer->Seek(startpos, SEEK_SET);
+    // Seek back to begining so that OpenFile can find PAT/PMT more quickly
+    ringBuffer->Pause();
+    ringBuffer->WaitForPause();
+    ringBuffer->Seek(0, SEEK_SET);
+    ringBuffer->Unpause();
 
+    // delete any pre-existing recorder
     if (decoder)
+    {
         delete decoder;
+        decoder = NULL;
+    }
 
     if (NuppelDecoder::CanHandle(testbuf))
         decoder = new NuppelDecoder(this, m_playbackinfo);
