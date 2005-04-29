@@ -479,7 +479,7 @@ void MdcapOutput::addItemType(int item_type)
     
     if(item_type < 1)
     {
-        cerr << "sending out a negative item id, not good" << endl;
+        cerr << "mdcapoutput.o: sending out a negative item id, not good" << endl;
     }
     
     append(MarkupCodes::item_type);
@@ -497,7 +497,7 @@ void MdcapOutput::addItemId(int item_id)
     
     if(item_id < 1)
     {
-        cerr << "sending out a negative item id, not good" << endl;
+        cerr << "mdcapoutput.o: sending out a negative item id, not good" << endl;
     }
     
     append(MarkupCodes::item_id);
@@ -630,7 +630,7 @@ void MdcapOutput::addListId(int list_id)
     
     if(list_id < 1)
     {
-        cerr << "sending out a negative list id, not good" << endl;
+        cerr << "mdcapoutput.o: sending out a negative list id, not good" << endl;
     }
     
     append(MarkupCodes::list_id);
