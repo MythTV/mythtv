@@ -114,12 +114,12 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
     
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = QString("write->%1 %2:").arg(socket->socket())
-                                              .arg(payload);
+        QString msg = QString("write->%1 %2").arg(socket->socket())
+                                             .arg(payload);
 
-        if (msg.length() > 58)
+        if (msg.length() > 88)
         {
-            msg.truncate(55);
+            msg.truncate(85);
             msg += "...";
         }
         VERBOSE(VB_NETWORK, msg);
@@ -279,6 +279,25 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
 
     QString str = QString::fromUtf8(utf8.data());
 
+    QCString payload;
+    payload = payload.setNum(str.length());
+    payload += "        ";
+    payload.truncate(8);
+    payload += str;
+    
+    if ((print_verbose_messages & VB_NETWORK) != 0)
+    {
+        QString msg = QString("read <-%1 %2").arg(socket->socket())
+                                             .arg(payload);
+
+        if (msg.length() > 88)
+        {
+            msg.truncate(85);
+            msg += "...";
+        }
+        VERBOSE(VB_NETWORK, msg);
+    }
+
     list = QStringList::split("[]:[]", str, true);
 
     return true;
@@ -375,11 +394,12 @@ bool WriteStringList(QSocket *socket, QStringList &list)
 
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = payload;
+        QString msg = QString("write->%1 %2").arg(socket->socket())
+                                             .arg(payload);
 
-        if (msg.length() > 53)
+        if (msg.length() > 88)
         {
-            msg.truncate(50);
+            msg.truncate(85);
             msg += "...";
         }
         VERBOSE(VB_NETWORK, msg);
@@ -506,6 +526,25 @@ bool ReadStringList(QSocket *socket, QStringList &list)
     }
 
     QString str = QString::fromUtf8(utf8.data());
+
+    QCString payload;
+    payload = payload.setNum(str.length());
+    payload += "        ";
+    payload.truncate(8);
+    payload += str;
+    
+    if ((print_verbose_messages & VB_NETWORK) != 0)
+    {
+        QString msg = QString("read <-%1 %2").arg(socket->socket())
+                                             .arg(payload);
+
+        if (msg.length() > 88)
+        {
+            msg.truncate(85);
+            msg += "...";
+        }
+        VERBOSE(VB_NETWORK, msg);
+    }
 
     list = QStringList::split("[]:[]", str, true);
 
