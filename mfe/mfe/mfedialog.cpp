@@ -1,10 +1,13 @@
-    /*
+/*
 	mfedialog.cpp
 
 	Copyright (c) 2004-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 */
+
+#include <stdlib.h>
+#include <sys/time.h>
 
 #include <mythtv/mythcontext.h>
 #include <mfdclient/playlist.h>
@@ -26,6 +29,8 @@ MfeDialog::MfeDialog(
     //
     
     net_flasher = NULL;
+    playlist_popup = NULL;
+    playlist_name_edit = NULL;
 
     //
     //  Or one of these
@@ -59,6 +64,12 @@ MfeDialog::MfeDialog(
     //
 
     updateForeground();
+
+    //
+    //  Do silly things
+    //
+    
+    doSillyThings();
 
 } 
 
@@ -305,22 +316,21 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
     }
     else if(node->getAttribute(1) == 4 && node->getInt() > 0)
     {
-        //
-        //  Find the mfd this playlist should get created on
-        //
-        
-        MfdInfo *target_mfd = available_mfds.find(node->getInt());
-        if(!target_mfd)
+        cout << "       node->getInt() = " << node->getInt() << endl;
+        cout << "node->getAttribute(0) = " << node->getAttribute(0) << endl;
+        cout << "node->getAttribute(1) = " << node->getAttribute(1) << endl;
+        cout << "node->getAttribute(2) = " << node->getAttribute(2) << endl;
+        cout << "node->getAttribute(3) = " << node->getAttribute(3) << endl;
+
+        if(current_mfd)
         {
-            cerr << "something weirdly wrong with new playlist tree" << endl;
-            return;
+            //
+            //  Pop up a dialogue to get a new playlist name
+            //
+        
+            content_collection_for_new_playlist = node->getInt();
+            showNewPlaylistPopup();
         }
-        
-        //
-        //  Pop up a dialogue to get a new playlist name
-        //
-        
-        cout << "Pop a playlist name dialog" << endl;
     }
     else if(node->getAttribute(1) == 5)
     {
@@ -338,79 +348,7 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
             
             if(current_mfd)
             {
-                UIListGenericTree *pristine_playlist_tree
-                    = current_mfd->getPlaylistTree(
-                                                    node->getAttribute(0),
-                                                    node->getInt(),
-                                                    true
-                                                  );
-                                                  
-                UIListGenericTree *working_playlist_tree
-                    = current_mfd->getPlaylistTree(
-                                                    node->getAttribute(0),
-                                                    node->getInt(),
-                                                    false
-                                                  );
-                                                  
-                
-
-                UIListGenericTree *pristine_content_tree
-                    = current_mfd->getContentTree(
-                                                    node->getAttribute(0),
-                                                    true
-                                                 );
-                
-                UIListGenericTree *working_content_tree
-                    = current_mfd->getContentTree(
-                                                    node->getAttribute(0),
-                                                    false
-                                                 );
-                
-                if(
-                    pristine_content_tree && 
-                    pristine_playlist_tree &&
-                    working_content_tree &&
-                    working_playlist_tree
-                  )
-                {
-
-                    QString playlist_name = node->getString();
-                    mfd_id_for_playlist_dialog = current_mfd->getId();
-                    playlist_dialog = new PlaylistDialog(
-                                                        gContext->GetMainWindow(),
-                                                        "playlist_dialog",
-                                                        "mfe-",
-                                                        mfd_interface,
-                                                        current_mfd,
-                                                        pristine_playlist_tree,
-                                                        pristine_content_tree,
-                                                        working_playlist_tree,
-                                                        working_content_tree,
-                                                        playlist_name
-                                                        );
-                    playlist_dialog->exec();
-                    if(playlist_dialog->commitEdits())
-                    {
-                        mfd_interface->commitListEdits(
-                                                        mfd_id_for_playlist_dialog,
-                                                        playlist_dialog->getWorkingPlaylist(),
-                                                        false,
-                                                        playlist_name
-                                                      );
-                    }
-                    delete playlist_dialog;
-                    playlist_dialog = NULL;
-                    mfd_id_for_playlist_dialog = -1;
-                }
-                else
-                {
-                    cerr << "mfedialog.o: current mfd could not give us a "
-                         << "playlist tree for playlist id of "
-                         << node->getInt()
-                         << " in collection with id of "
-                         << node->getAttribute(0)
-                         << endl;
-                }
+                doPlaylistDialog(node->getAttribute(0), node->getInt(), node->getString());
             }
             else
             {
@@ -449,6 +387,64 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
         }
 
         menu->refresh();
+    }
+}
+
+void MfeDialog::doPlaylistDialog(int collection_id, int playlist_id, const QString playlist_name)
+{
+    if(!current_mfd)
+    {
+        cerr << "something called MfeDialog::doPlaylistDialog() while current_mfd == NULL" << endl;
+        return;
+    }
+
+    UIListGenericTree *pristine_playlist_tree = current_mfd->getPlaylistTree(collection_id, playlist_id, true);
+    UIListGenericTree *working_playlist_tree  = current_mfd->getPlaylistTree(collection_id, playlist_id, false);
+    UIListGenericTree *pristine_content_tree  = current_mfd->getContentTree(collection_id, true);
+    UIListGenericTree *working_content_tree   = current_mfd->getContentTree(collection_id, false);
+                
+    if ( pristine_content_tree && pristine_playlist_tree && working_content_tree && working_playlist_tree)
+    {
+        mfd_id_for_playlist_dialog = current_mfd->getId();
+        playlist_dialog = new PlaylistDialog(
+                                                gContext->GetMainWindow(),
+                                                "playlist_dialog",
+                                                "mfe-",
+                                                mfd_interface,
+                                                current_mfd,
+                                                pristine_playlist_tree,
+                                                pristine_content_tree,
+                                                working_playlist_tree,
+                                                working_content_tree,
+                                                playlist_name
+                                            );
+        playlist_dialog->exec();
+        if(playlist_dialog->commitEdits())
+        {
+            bool is_new = false;
+            if(playlist_id == -1)
+            {
+                is_new = true;
+            }
+            mfd_interface->commitListEdits(
+                                            mfd_id_for_playlist_dialog,
+                                            playlist_dialog->getWorkingPlaylist(),
+                                            is_new,
+                                            playlist_name
+                                          );
+        }
+        delete playlist_dialog;
+        playlist_dialog = NULL;
+        mfd_id_for_playlist_dialog = -1;
+    }
+    else
+    {
+        cerr << "mfedialog.o: current mfd could not give us a "
+             << "playlist tree for playlist id of "
+             << playlist_id
+             << " in collection with id of "
+             << collection_id
+             << endl;
     }
 }
 
@@ -500,6 +496,12 @@ void MfeDialog::wireUpTheme()
     {
         network_icon->hide();
         net_flasher = new NetFlasher(network_icon);
+    }
+ 
+    background_image = getUIImageType("mfe_background");
+    if(!background_image)
+    {
+        cerr << "You have no mfe_background image declared" << endl;
     }
  
     //
@@ -1123,6 +1125,145 @@ void MfeDialog::updateSpeakerDisplay()
         menu->tryToSetCurrent(route_to_current);
         menu->refresh();
     }
+}
+
+void MfeDialog::showNewPlaylistPopup()
+{
+
+    if (playlist_popup)
+    {
+        return;
+    }
+
+    playlist_popup = new MythPopupBox(gContext->GetMainWindow(), "playlist_popup");
+    
+    if(background_image)
+    {
+        playlist_popup->setErasePixmap(background_image->GetImage());
+    }
+
+
+    playlist_name_edit = new MythRemoteLineEdit(playlist_popup);
+    playlist_name_edit->setText(constructPlaylistName());
+    playlist_name_edit->setAlignment(Qt::AlignHCenter);
+    playlist_popup->addWidget(playlist_name_edit);
+
+    QButton *create_b = playlist_popup->addButton("Create This Playlist",
+                                               this, SLOT(createNewPlaylist()));
+
+    QButton *cancel_b = playlist_popup->addButton("Cancel",
+                                               this, SLOT(hideNewPlaylistPopup()));
+
+    playlist_popup->ShowPopup(this, SLOT(hideNewPlaylistPopup()));
+
+    cancel_b->setFocus();   // avoiding -Wall
+    create_b->setFocus();
+
+}
+
+void MfeDialog::hideNewPlaylistPopup()
+{
+
+    if (!playlist_popup)
+    {
+        return;
+    }
+    
+    playlist_popup->hide();
+    {
+        delete playlist_popup;
+        playlist_popup = NULL;
+    }
+}
+
+void MfeDialog::createNewPlaylist()
+{
+    QString new_playlist_name;
+    if(playlist_name_edit)
+    {
+        new_playlist_name = playlist_name_edit->text();
+    }
+    hideNewPlaylistPopup();
+    
+    if(new_playlist_name.length() > 0 && current_mfd)
+    {
+        doPlaylistDialog(content_collection_for_new_playlist, -1, new_playlist_name);
+        content_collection_for_new_playlist = -1;
+    }
+}
+
+QString MfeDialog::constructPlaylistName()
+{
+    QString response;
+
+    if(rand() % 100 > 50)
+    {
+        response.append(possessors[rand() % possessors.count()]);
+        response.append(" ");
+    }
+    else
+    {
+        response.append(modifiers[rand() % modifiers.count()]);
+        response.append(" ");
+    }
+
+    response.append(modifiers[rand() % modifiers.count()]);
+    response.append(" ");
+
+    response.append(nouns[rand() % nouns.count()]);
+
+    return response;
+}
+
+void MfeDialog::doSillyThings()
+{
+
+    //
+    //  (Pseudo-)Randomly Seed the (Pseudo-)Random number generator
+    //
+
+    struct timeval tv;
+    gettimeofday(&tv,0);
+    unsigned int seed = tv.tv_sec + tv.tv_usec;
+    srand(seed);
+
+    //
+    //  Fill in some data structures that let us create random playlist
+    //  names
+    //
+    
+    possessors.append("Big Daddy's");
+    possessors.append("Chutt's");
+    possessors.append("Everyone's");
+    possessors.append("Existentially");
+    possessors.append("Foobar's");
+    possessors.append("His Majesty's");
+    possessors.append("Infinitely");
+    possessors.append("Squarely");
+    possessors.append("Yo Mama's");
+    possessors.append("Zippy's");
+
+    modifiers.append("Blue");
+    modifiers.append("Cacaphonous");
+    modifiers.append("Diabolical");
+    modifiers.append("Easy");
+    modifiers.append("Efficient");
+    modifiers.append("Inverted");
+    modifiers.append("Obtuse");
+    modifiers.append("Orthogonal");
+    modifiers.append("Pedantic");
+    modifiers.append("Tempted");
+    
+    nouns.append("Accoutrement");
+    nouns.append("Appliance");
+    nouns.append("Big Bah");
+    nouns.append("Breakdown");
+    nouns.append("Device");
+    nouns.append("Endeavour");
+    nouns.append("Freedom");
+    nouns.append("Mountains");
+    nouns.append("Mix");
+    nouns.append("Wonder Bread");
 }
 
 MfeDialog::~MfeDialog()

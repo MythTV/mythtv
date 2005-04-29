@@ -43,7 +43,9 @@ class MfeDialog : public MythThemedDialog
 
   public slots:
 
+    void doSillyThings();
     void handleTreeSignals(UIListGenericTree *node);
+    void doPlaylistDialog(int collection_id, int playlist_id, const QString playlist_name);
     void mfdDiscovered(int which_mfd, QString name, QString host, bool found);
     void audioPluginDiscovered(int which_mfd);
     void paused(int which_mfd, bool paused); 
@@ -57,6 +59,8 @@ class MfeDialog : public MythThemedDialog
     void seekAudio(bool forward_or_back);
     void nextPrevAudio(bool next_or_prev);
     void speakerList(int which_mfd, QPtrList<SpeakerTracker>* speakers);
+    void hideNewPlaylistPopup();
+    void createNewPlaylist();
 
   private:
 
@@ -66,6 +70,8 @@ class MfeDialog : public MythThemedDialog
     void updateConnectionList();
     void switchToMfd(int an_mfd_id);
     void updateSpeakerDisplay();
+    void showNewPlaylistPopup();
+    QString constructPlaylistName();
     
     MfdInterface    *mfd_interface;   
 
@@ -123,6 +129,7 @@ class MfeDialog : public MythThemedDialog
     UIPushButtonType *prev_button;
 
     UIImageType *network_icon;
+    UIImageType *background_image;
 
     //
     //  Thing that flashes to indicate network (ie. mdcap data arrival)
@@ -137,8 +144,24 @@ class MfeDialog : public MythThemedDialog
     //
     
     PlaylistDialog *playlist_dialog;
-    int mfd_id_for_playlist_dialog;    
+    int mfd_id_for_playlist_dialog;
+    int content_collection_for_new_playlist;
+
+
+    //
+    //  Widgets for the New Playlist popup
+    //
     
+    MythPopupBox        *playlist_popup;
+    MythRemoteLineEdit  *playlist_name_edit;
+
+    //
+    //  Some data storage for building random playlist names
+    //    
+    
+    QStringList possessors;
+    QStringList modifiers;
+    QStringList nouns;
 };
 
 
