@@ -43,7 +43,7 @@ static void UpdateDBVersionNumber(const QString &newnumber)
 static void performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
-    VERBOSE(VB_ALL, QString("Upgrading to MythMusic schema version ") + 
+    VERBOSE(VB_ALL, QString("Upgrading to MythMovieTime schema version ") + 
             version);
 
     MSqlQuery query(MSqlQuery::InitCon());
