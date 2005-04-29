@@ -2743,8 +2743,11 @@ void CommDetect::CleanupFrameInfo(void)
         int minAvg = -1;
         int newThreshold = -1;
 
-        VERBOSE(VB_COMMFLAG, "Didn't find enough blank frames, rechecking data "
-                             "using higher threshold.");
+        VERBOSE(VB_COMMFLAG,
+                QString("CommDetect: Only found %1 blank frames but wanted at "
+                        "least %2, rechecking data using higher threshold.")
+                        .arg(blankFrameCount)
+                        .arg((int)(framesProcessed * 0.0004)));
         blankFrameMap.clear();
         blankFrameCount = 0;
 
