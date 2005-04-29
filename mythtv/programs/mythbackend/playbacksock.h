@@ -32,7 +32,7 @@ class PlaybackSock
     void GetFreeSpace(int &totalspace, int &usedspace);
     int StopRecording(ProgramInfo *pginfo);
     int CheckRecordingActive(ProgramInfo *pginfo);
-    int DeleteRecording(ProgramInfo *pginfo);
+    int DeleteRecording(ProgramInfo *pginfo, bool forceMetadataDelete = false);
     void FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost);
     void GenPreviewPixmap(ProgramInfo *pginfo);
     bool CheckFile(ProgramInfo *pginfo);

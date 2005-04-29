@@ -1455,7 +1455,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
 
         if (slave) 
         {
-           num = slave->DeleteRecording(pginfo);
+           num = slave->DeleteRecording(pginfo, forceMetadataDelete);
 
            if (num > 0)
            {
@@ -1467,7 +1467,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
 
            if (pbssock)
            {
-               QStringList outputlist = "0";
+               QStringList outputlist = QString::number(num);
                SendResponse(pbssock, outputlist);
            }
 

@@ -133,7 +133,7 @@ void RemoteStopRecording(ProgramInfo *pginfo)
 bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
                            bool forceMetadataDelete)
 {
-    bool result = false;
+    bool result = true;
     QStringList strlist;
 
     if (forceMetadataDelete)

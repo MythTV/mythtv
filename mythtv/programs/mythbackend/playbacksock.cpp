@@ -96,9 +96,15 @@ int PlaybackSock::StopRecording(ProgramInfo *pginfo)
     return strlist[0].toInt();
 }
 
-int PlaybackSock::DeleteRecording(ProgramInfo *pginfo)
+int PlaybackSock::DeleteRecording(ProgramInfo *pginfo, bool forceMetadataDelete)
 {
-    QStringList strlist = QString("DELETE_RECORDING");
+    QStringList strlist;
+
+    if (forceMetadataDelete)
+        strlist = QString("FORCE_DELETE_RECORDING");
+    else
+        strlist = QString("DELETE_RECORDING");
+
     pginfo->ToStringList(strlist);
 
     SendReceiveStringList(strlist);
