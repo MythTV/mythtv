@@ -3523,6 +3523,27 @@ void TV::customEvent(QCustomEvent *e)
             wantsToQuit = true;
             exitPlayer = true;
         }
+        else if (message.left(15) == "COMMFLAG_UPDATE")
+        {
+            QStringList tokens = QStringList::split(" ", message);
+            QString evchanid = tokens[1];
+            QDateTime evstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
+
+            if ((playbackinfo->chanid == evchanid) &&
+                (playbackinfo->recstartts == evstartts))
+            {
+                QMap<long long, int> newMap;
+                QStringList mark;
+                QStringList marks = QStringList::split(",", tokens[3]);
+                for (int i = 0; i < marks.size(); i++)
+                {
+                    mark = QStringList::split(":", marks[i]);
+                    newMap[mark[0].toInt()] = mark[1].toInt();
+                }
+
+                nvp->SetCommBreakMap(newMap);
+            }
+        }
     }
 }
 

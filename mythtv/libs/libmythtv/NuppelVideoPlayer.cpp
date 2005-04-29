@@ -3536,6 +3536,17 @@ bool NuppelVideoPlayer::LastFrameIsBlank(void)
     return FrameIsBlank(videoOutput->GetLastDecodedFrame());
 }
 
+void NuppelVideoPlayer::SetCommBreakMap(QMap<long long, int> &newMap)
+{
+    VERBOSE(VB_COMMFLAG,
+            QString("Setting New Commercial Break List, old size %1, new %2")
+                    .arg(commBreakMap.size()).arg(newMap.size()));
+
+    commBreakMap.clear();
+    commBreakMap = newMap;
+    hascommbreaktable = true;
+}
+
 int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                                        bool inJobQueue)
 {
@@ -3551,6 +3562,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     struct timeval endTime;
     VideoFrame *currentFrame;
     long long myTotalFrames = 0;
+    QString lastCommBreakUpdateMsg = "";
 
     killplayer = false;
     framesPlayed = 0;
@@ -3841,6 +3853,38 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         if (watchingrecording)
         {
             qApp->processEvents();
+
+            if ((currentFrame->frameNumber) &&
+                ((currentFrame->frameNumber % 500) == 0))
+            {
+                commDetect->GetCommBreakMap(commBreakMap);
+
+                if (commBreakMap.size())
+                {
+                    QMap<long long, int>::Iterator it = commBreakMap.begin();
+                    QString message = "COMMFLAG_UPDATE ";
+                    message += m_playbackinfo->chanid + " " +
+                               m_playbackinfo->recstartts.toString(Qt::ISODate);
+
+                    for (it = commBreakMap.begin();
+                         it != commBreakMap.end(); ++it)
+                    {
+                        if (it != commBreakMap.begin())
+                            message += ",";
+                        else
+                            message += " ";
+                        message += QString("%1:%2").arg(it.key())
+                                                   .arg(it.data());
+                    }
+
+                    if (message != lastCommBreakUpdateMsg)
+                    {
+                        RemoteSendMessage(message);
+                        lastCommBreakUpdateMsg = message;
+                    }
+                }
+            }
+
             usecPerFrame = (long)(1.0 / video_frame_rate * 1000000);
             gettimeofday(&endTime, NULL);
 
@@ -3898,6 +3942,24 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     {
         m_playbackinfo->SetMarkupFlag(MARK_UPDATED_CUT, true);
         m_playbackinfo->SetCommBreakList(commBreakMap);
+
+        QMap<long long, int>::Iterator it = commBreakMap.begin();
+        QString message = "COMMFLAG_UPDATE ";
+        message += m_playbackinfo->chanid + " " +
+                   m_playbackinfo->recstartts.toString(Qt::ISODate);
+
+        for (it = commBreakMap.begin();
+             it != commBreakMap.end(); ++it)
+        {
+            if (it != commBreakMap.begin())
+                message += ",";
+            else
+                message += " ";
+            message += QString("%1:%2").arg(it.key())
+                                       .arg(it.data());
+        }
+
+        RemoteSendMessage(message);
     }
     comms_found = commBreakMap.size() / 2;
 

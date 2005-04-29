@@ -62,6 +62,7 @@ class NuppelVideoPlayer
     void SetAutoCommercialSkip(int autoskip);
     void SetTryUnflaggedSkip(bool tryskip) { tryunflaggedskip = tryskip; };
     void SetCommercialSkipMethod(int method) { commercialskipmethod = method; }
+    void SetCommBreakMap(QMap<long long, int> &newMap);
 
     int OpenFile(bool skipDsp = false);
     void StartPlaying(void);
