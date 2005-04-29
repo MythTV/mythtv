@@ -81,9 +81,9 @@ With the stickykeys option selected:
 With the video paused:
 
 - Left arrow to rewind 1 frame
-- < to rewind 1 second
+- < or comma to rewind 1 second
 - Right arrow to advance 1 frame
-- > to advance 1 second
+- > or period to advance 1 second
 
 Watching TV only:
 
@@ -136,8 +136,8 @@ While watching a recording:
     10 minutes.
   - The page up and down keys move forward and backward to the nearest cut
     point.
-  - The < and > keys move forward or backward by 10 times the normal jump
-    amount.
+  - The < or comma and > or period keys move forward or backward by 10 times
+    the normal jump amount.
   - Space/Enter allows you to set or delete a cut point.
   - 'Z' loads the commercial skip list (if one exists) into the cutlist.
   - 'C' and 'Q' clear all cut points in the cutlist.
@@ -155,8 +155,8 @@ EPG
 - The keys A, D, S, W perform the same as left, right, down and up.
 - PageUp and PageDown move the channel list up or down a page.
 - Home and End move the highlight left or right by one day.
-- Control-Left and Control Right and < and > move the highlight left or 
-  right by one page.
+- Control-Left and Control Right, <, >, period and comma keys move the
+  highlight left or right by one page.
 - The keys 9, 3, 7 and 1 (like a numeric keypad) perform the same as PageUp,
   PageDown, Home and End.
 - I will bring up more information about a show, and allow you to schedule 
