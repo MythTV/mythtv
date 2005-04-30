@@ -114,8 +114,8 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
     
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = QString("write->%1 %2").arg(socket->socket())
-                                             .arg(payload);
+        QString msg = QString("write -> %1 %2").arg(socket->socket(), 2)
+                                               .arg(payload);
 
         if (msg.length() > 88)
         {
@@ -287,8 +287,8 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
     
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = QString("read <-%1 %2").arg(socket->socket())
-                                             .arg(payload);
+        QString msg = QString("read  <- %1 %2").arg(socket->socket(), 2)
+                                               .arg(payload);
 
         if (msg.length() > 88)
         {
@@ -394,8 +394,8 @@ bool WriteStringList(QSocket *socket, QStringList &list)
 
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = QString("write->%1 %2").arg(socket->socket())
-                                             .arg(payload);
+        QString msg = QString("write -> %1 %2").arg(socket->socket(), 2)
+                                               .arg(payload);
 
         if (msg.length() > 88)
         {
@@ -535,8 +535,8 @@ bool ReadStringList(QSocket *socket, QStringList &list)
     
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = QString("read <-%1 %2").arg(socket->socket())
-                                             .arg(payload);
+        QString msg = QString("read  <- %1 %2").arg(socket->socket(), 2)
+                                               .arg(payload);
 
         if (msg.length() > 88)
         {
