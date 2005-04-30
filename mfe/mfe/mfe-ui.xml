@@ -207,14 +207,16 @@
     
         <container name="background">
             <area>0,0,800,600</area>
-            <image name="mfe_background" draworder="0" fleximage="no">
-                <filename>mfe_back.png</filename>
+            <image name="mfe_pledit_back" draworder="0" fleximage="no">
+                <filename>mfe_pledit_back.png</filename>
                 <position>0,0</position>
             </image>
+            <!--
             <image name="mfe_playlistedit_back" draworder="0" fleximage="no">
                 <filename>mfe_playlistedit_back.png</filename>
                 <position>0,450</position>
             </image>
+            -->
         </container>
 
         <container name="title">
