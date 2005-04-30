@@ -121,6 +121,18 @@ class MetadataServer : public MFDHttpPlugin
     void buildUpdateResponse(MdcapOutput *response);
     void dealWithHangingUpdates();
     void dealWithListCommit(HttpInRequest *http_request, MdcapRequest *mdcap_request);
+    bool dealWithListEdit(
+                            int which_collection, 
+                            int which_list, 
+                            const QString &list_name,
+                            QValueVector<char> *list_contents
+                         );
+    bool dealWithNewList(
+                            int which_collection, 
+                            const QString &list_name,
+                            QValueVector<char> *list_contents
+                         );
+                             
     
   private:
 

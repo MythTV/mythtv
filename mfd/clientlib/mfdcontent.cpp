@@ -1415,6 +1415,7 @@ void MfdContentCollection::checkParent(UIListGenericTree *node)
     {
         bool all_on = true;
         bool one_on = false;
+        bool all_inactive = true;
 
         QPtrList<GenericTree> *all_children = parent->getAllChildren();
         QPtrListIterator<GenericTree> it(*all_children);
@@ -1422,6 +1423,10 @@ void MfdContentCollection::checkParent(UIListGenericTree *node)
         while ((child = it.current()) != 0)
         {
             UIListGenericTree *ui_child = (UIListGenericTree *) child;
+            if (ui_child->getActive())
+            {
+                all_inactive = false;
+            }
             if (ui_child->getCheck() > 0 && ui_child->getActive())
             {
                 one_on = true;
@@ -1433,7 +1438,11 @@ void MfdContentCollection::checkParent(UIListGenericTree *node)
             ++it;
         }
 
-        if (all_on)
+        if (all_inactive)
+        {
+            parent->setCheck(0);
+        }
+        else if (all_on)
         {
             parent->setCheck(2);
         }
