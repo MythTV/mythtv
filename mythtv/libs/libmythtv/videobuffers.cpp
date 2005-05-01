@@ -1,6 +1,7 @@
 // Copyright (c) 2005, Daniel Thor Kristjansson
 // based on earlier work in MythTV's videout_xvmc.cpp
 
+#include <unistd.h>
 #include "mythcontext.h"
 #include "videobuffers.h"
 
