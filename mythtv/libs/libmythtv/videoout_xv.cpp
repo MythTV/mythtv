@@ -71,13 +71,16 @@ static void SetFromHW(Display *d, bool &useXvMC, bool &useXV, bool& useShm);
  * inverse discrete cosine transform (XvMC-IDCT) acceleration, XVideo with 
  * motion vector (XvMC) acceleration, and normal XVideo with color transform
  * and scaling acceleration only. When none of these will work, we also try 
- * to use X Shared memory, and if that fails standard Xlib output.
+ * to use X Shared memory, and if that fails we try standard Xlib output.
  *
  * \see VideoOutput, VideoBuffers
  *
  */
 VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     : VideoOutput(),
+      myth_codec_id(codec_id), video_output_subtype(XVUnknown),
+      display_res(NULL), display_aspect(1.0), global_lock(true),
+
       XJ_root(0),  XJ_win(0), XJ_curwin(0), XJ_gc(0), XJ_screen(NULL),
       XJ_disp(NULL), XJ_screen_num(0), XJ_white(0), XJ_black(0), XJ_depth(0),
       XJ_screenx(0), XJ_screeny(0), XJ_screenwidth(0), XJ_screenheight(0),
@@ -87,14 +90,11 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       non_xv_fps(0), non_xv_av_format(PIX_FMT_NB), non_xv_stop_time(0),
 
       xv_port(-1), xv_colorkey(0), xv_draw_colorkey(false), xv_chroma(0),
-      xv_color_conv_buf(NULL),
+      xv_color_conv_buf(NULL)
 #ifdef USING_XVMC
-      xvmc_surf_type(0), xvmc_chroma(XVMC_CHROMA_FORMAT_420),
-      xvmc_ctx_exists(false), xvmc_osd_lock(false), 
+      , xvmc_chroma(XVMC_CHROMA_FORMAT_420), xvmc_ctx(NULL),
+      xvmc_osd_lock(false)
 #endif
-      video_output_subtype(XVUnknown), display_res(NULL),
-      display_aspect(1.0), global_lock(true),
-      myth_codec_id(codec_id)
 {
     VERBOSE(VB_PLAYBACK, "VideoOutputXv()");
     bzero(&av_pause_frame, sizeof(av_pause_frame));
@@ -340,12 +340,14 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
 }
 
 /**
- * \fn VideoOutputXv::GrabSuitableXvPort(VOSType)
+ * \fn VideoOutputXv::GrabSuitableXvPort(Display*,Window,MythCodecID,uint,uint,int,XvMCSurfaceInfo*)
  * Internal function used to grab a XVideo port with the desired properties.
  *
  * \return port number if it succeeds, else -1.
  */
-int VideoOutputXv::GrabSuitableXvPort(VOSType type)
+int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root, MythCodecID mcodecid,
+                                      uint width, uint height,
+                                      int xvmc_chroma, XvMCSurfaceInfo* xvmc_surf_info)
 {
     uint neededFlags[] = { XvInputMask,
                            XvInputMask,
@@ -355,7 +357,9 @@ int VideoOutputXv::GrabSuitableXvPort(VOSType type)
     bool useVLD[]  = { true,  false, false, false };
     bool useIDCT[] = { false, true,  false, false };
 
-    (void)useVLD[0]; (void)useIDCT[0]; // avoid compiler warning
+    // avoid compiler warnings
+    (void)width; (void)height; (void)xvmc_chroma; (void)xvmc_surf_info;
+    (void)useVLD[0]; (void)useIDCT[0];
 
     QString msg[] =
     {
@@ -369,7 +373,7 @@ int VideoOutputXv::GrabSuitableXvPort(VOSType type)
     XvAdaptorInfo *ai = NULL;
     uint p_num_adaptors = 0;
     int ret = Success;
-    X11S(ret = XvQueryAdaptors(XJ_disp, XJ_root, &p_num_adaptors, &ai));
+    X11S(ret = XvQueryAdaptors(disp, root, &p_num_adaptors, &ai));
     if (Success != ret) 
     {
         VERBOSE(VB_IMPORTANT, "XVideo supported, but no free Xv ports "
@@ -378,23 +382,27 @@ int VideoOutputXv::GrabSuitableXvPort(VOSType type)
     }
 
     // find an Xv port
-    int port = -1;
+    int port = -1, stream_type = 0;
     uint begin = 0, end = 4;
-    switch (type)
+    switch (mcodecid)
     {
-        case XVideo:
-            begin = 3; end = 4;
-            break;
-        case XVideoMC:
-            begin = 2; end = 3;
-            break;
-        case XVideoIDCT:
-            begin = 1; end = 2;
-            break;
-        case XVideoVLD:
-            begin = 0; end = 1;
-            break;
+        case kCodec_MPEG1_XVMC: (stream_type = 1),(begin = 2),(end = 3); break;
+        case kCodec_MPEG2_XVMC: (stream_type = 2),(begin = 2),(end = 3); break;
+        case kCodec_H263_XVMC:  (stream_type = 3),(begin = 2),(end = 3); break;
+        case kCodec_MPEG4_XVMC: (stream_type = 4),(begin = 2),(end = 3); break;
+
+        case kCodec_MPEG1_IDCT: (stream_type = 1),(begin = 1),(end = 2); break;
+        case kCodec_MPEG2_IDCT: (stream_type = 2),(begin = 1),(end = 2); break;
+        case kCodec_H263_IDCT:  (stream_type = 3),(begin = 1),(end = 2); break;
+        case kCodec_MPEG4_IDCT: (stream_type = 4),(begin = 1),(end = 2); break;
+
+        case kCodec_MPEG1_VLD:  (stream_type = 1),(begin = 0),(end = 1); break;
+        case kCodec_MPEG2_VLD:  (stream_type = 2),(begin = 0),(end = 1); break;
+        case kCodec_H263_VLD:   (stream_type = 3),(begin = 0),(end = 1); break;
+        case kCodec_MPEG4_VLD:  (stream_type = 4),(begin = 0),(end = 1); break;
+
         default:
+            begin = 3; end = 4;
             break;
     }
 
@@ -417,24 +425,25 @@ int VideoOutputXv::GrabSuitableXvPort(VOSType type)
             {
 #ifdef USING_XVMC
                 int surfNum;
-                XvMCSurfaceTypes::find(XJ_width, XJ_height, xvmc_chroma,
-                                       useVLD[j], useIDCT[j], 2, 0, 0,
-                                       XJ_disp, firstPort, lastPort,
+                XvMCSurfaceTypes::find(width, height, xvmc_chroma,
+                                       useVLD[j], useIDCT[j], stream_type,
+                                       0, 0,
+                                       disp, firstPort, lastPort,
                                        p, surfNum);
                 if (surfNum<0)
                     continue;
                 
-                XvMCSurfaceTypes surf(XJ_disp, p);
+                XvMCSurfaceTypes surf(disp, p);
                 
                 if (!surf.size())
                     continue;
 
-                X11S(ret = XvGrabPort(XJ_disp, p, CurrentTime));
+                X11S(ret = XvGrabPort(disp, p, CurrentTime));
                 if (Success != ret)
                     continue;
                 
-                surf.set(surfNum, &xvmc_surf_info);
-                xvmc_surf_type = surf.surfaceTypeID(surfNum);
+                if (xvmc_surf_info)
+                    surf.set(surfNum, xvmc_surf_info);
                 port = p;
 #endif // USING_XVMC
             }
@@ -442,7 +451,7 @@ int VideoOutputXv::GrabSuitableXvPort(VOSType type)
             {
                 for (p = firstPort; (p <= lastPort) && (port == -1); ++p)
                 {
-                    X11S(ret = XvGrabPort(XJ_disp, p, CurrentTime));
+                    X11S(ret = XvGrabPort(disp, p, CurrentTime));
                     if (Success == ret)
                         port = p;
                 }
@@ -501,22 +510,22 @@ void VideoOutputXv::CreatePauseFrame(void)
 }
 
 /**
- * \fn VideoOutputXv::InitVideoBuffers(bool,bool,bool,bool,bool)
+ * \fn VideoOutputXv::InitVideoBuffers(MythCodecID,bool,bool)
  * Creates and initializes video buffers.
  *
  * \sideeffect sets video_output_subtype if it succeeds.
  *
  * \return success or failure at creating any buffers.
  */
-bool VideoOutputXv::InitVideoBuffers(VOSType xvmc_type,
+bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
                                      bool use_xv, bool use_shm)
 {
-    (void)xvmc_type;
+    (void)mcodecid;
 
     bool done = false;
     // If use_xvmc try to create XvMC buffers
 #ifdef USING_XVMC
-    if (xvmc_type > XVideo)
+    if (mcodecid > kCodec_NORMAL_END)
     {
         // Create ffmpeg VideoFrames    
         vbuffers.Init(8 /*numdecode*/, false /*extra_for_pause*/,
@@ -524,7 +533,7 @@ bool VideoOutputXv::InitVideoBuffers(VOSType xvmc_type,
                       5-XVMC_OSD_RES_NUM /*needprebuffer_normal*/,
                       5-XVMC_OSD_RES_NUM /*needprebuffer_small*/,
                       1 /*keepprebuffer*/, true /*use_frame_locking*/);
-        done = InitXvMC(xvmc_type);
+        done = InitXvMC(mcodecid);
 
         if (!done)
             vbuffers.Reset();
@@ -561,18 +570,20 @@ bool VideoOutputXv::InitVideoBuffers(VOSType xvmc_type,
 }
 
 /**
- * \fn VideoOutputXv::InitXvMC(VOSType)
+ * \fn VideoOutputXv::InitXvMC(MythCodecID)
  *  Creates and initializes video buffers.
  *
  * \sideeffect sets video_output_subtype if it succeeds.
  *
  * \return success or failure at creating any buffers.
  */
-bool VideoOutputXv::InitXvMC(VOSType type)
+bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
 {
-    (void)type;
+    (void)mcodecid;
 #ifdef USING_XVMC
-    xv_port = GrabSuitableXvPort(type);
+    xv_port = GrabSuitableXvPort(XJ_disp, XJ_root, mcodecid,
+                                 XJ_width, XJ_height, xvmc_chroma,
+                                 &xvmc_surf_info);
     if (xv_port == -1)
     {
         VERBOSE(VB_IMPORTANT, "Could not find suitable XvMC surface.");
@@ -633,7 +644,8 @@ bool VideoOutputXv::InitXvMC(VOSType type)
  */
 bool VideoOutputXv::InitXVideo()
 {
-    xv_port = GrabSuitableXvPort(XVideo);
+    xv_port = GrabSuitableXvPort(XJ_disp, XJ_root, kCodec_MPEG2,
+                                 XJ_width, XJ_height);
     if (xv_port == -1)
     {
         VERBOSE(VB_IMPORTANT, "Could not find suitable XVideo surface.");
@@ -756,7 +768,7 @@ bool VideoOutputXv::InitXlib()
     return ok;
 }
 
-/** \fn VideoOutputXv::GetBestSupportedCodec(uint,uint,uint,uint,uint)
+/** \fn VideoOutputXv::GetBestSupportedCodec(uint,uint, uint,uint, uint,int)
  *
  * \return MythCodecID for the best supported codec on the main display.
  */
@@ -804,9 +816,45 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
         ret = (MythCodecID)(kCodec_MPEG1_XVMC + (stream_type-1));
     }
 
-    X11L;
-    XCloseDisplay(disp);
-    X11U;
+    bool ok = true;
+    if (ret>kCodec_NORMAL_END)
+    {
+        Window root;
+        XvMCSurfaceInfo info;
+
+        ok = false;
+        X11S(root = DefaultRootWindow(disp));
+        int port = GrabSuitableXvPort(disp, root, ret, width, height,
+                                      xvmc_chroma, &info);
+        if (port>=0)
+        {
+            XvMCContext *ctx =
+                CreateXvMCContext(disp, port, info.surface_type_id,
+                                  width, height);
+            ok = NULL != ctx;
+            DeleteXvMCContext(disp, ctx);
+            X11S(XvUngrabPort(disp, port, CurrentTime));
+        }
+    }
+    X11S(XCloseDisplay(disp));
+
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, "Could not open XvMC port...\n"
+                "\n"
+                "\t\t\tYou may wish to verify that your DISPLAY\n"
+                "\t\t\tenvironment variable does not use an external\n"
+                "\t\t\tnetwork connection.\n"
+#ifdef USING_XVMCW
+                "\n"
+                "\t\t\tYou may also wish to verify that\n"
+                "\t\t\t/etc/X11/XvMCConfig contains the correct\n"
+                "\t\t\tvendor's XvMC library.\n"
+#endif
+            );
+        ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
+    }
+
     return ret;
 #else
     return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
@@ -862,20 +910,18 @@ bool VideoOutputXv::Init(
     InitDisplayMeasurements(width, height);
 
     // Set use variables...
-    bool vld, idct, mc;
+    bool vld, idct, mc, xv, shm;
     myth2av_codecid(myth_codec_id, vld, idct, mc);
-    bool xv = !vld && !idct, shm = xv;
+    xv = shm = !vld && !idct;
     SetFromEnv(vld, idct, mc, xv, shm);
     SetFromHW(XJ_disp, mc, xv, shm);
-    VOSType xvmc_type = vld ? XVideoVLD : 
-        (idct ? XVideoIDCT : (mc ? XVideoMC : XVideo));
 
     // Set embedding window id
     if (embedid > 0)
         XJ_curwin = XJ_win = embedid;
 
     // Create video buffers
-    bool ok = InitVideoBuffers(xvmc_type, xv, shm);
+    bool ok = InitVideoBuffers(myth_codec_id, xv, shm);
     XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
 
     if (video_output_subtype >= XVideo)
@@ -1009,20 +1055,49 @@ static uint calcBPM(int chroma)
 }
 #endif
 
-bool VideoOutputXv::CreateXvMCBuffers(void)
+XvMCContext* VideoOutputXv::CreateXvMCContext(
+    Display* disp, int port, int surf_type, int width, int height)
 {
+    (void)disp; (void)port; (void)surf_type; (void)width; (void)height;
 #ifdef USING_XVMC
     int ret = Success;
-    X11S(ret = XvMCCreateContext(XJ_disp, xv_port, xvmc_surf_type, 
-                                 XJ_width, XJ_height, XVMC_DIRECT,
-                                 &(xvmc_ctx)));
+    XvMCContext *ctx = new XvMCContext;
+    X11S(ret = XvMCCreateContext(disp, port, surf_type, width, height,
+                                 XVMC_DIRECT, ctx));
     if (ret != Success)
     {
         VERBOSE(VB_IMPORTANT, QString("Unable to create XvMC Context, "
                 "status(%1): %2").arg(ret).arg(ErrorStringXvMC(ret)));
-        return false;
+        delete ctx;
+        ctx = NULL;
     }
-    xvmc_ctx_exists = true;
+    return ctx;
+#else // if !USING_XVMC 
+    return NULL;
+#endif // !USING_XVMC
+}
+
+void VideoOutputXv::DeleteXvMCContext(Display* disp, XvMCContext*& ctx)
+{
+    (void)disp; (void)ctx;
+#ifdef USING_XVMC
+    if (ctx)
+    {
+        X11S(XvMCDestroyContext(disp, ctx));
+        delete ctx;
+        ctx = NULL;
+    }
+#endif // !USING_XVMC
+}
+
+bool VideoOutputXv::CreateXvMCBuffers(void)
+{
+#ifdef USING_XVMC
+    xvmc_ctx = CreateXvMCContext(XJ_disp, xv_port,
+                                 xvmc_surf_info.surface_type_id,
+                                 XJ_width, XJ_height);
+    if (!xvmc_ctx)
+        return false;
 
     bool createBlocks = !(XVMC_VLD == (xvmc_surf_info.mc_type & XVMC_VLD));
     xvmc_surfs = CreateXvMCSurfaces(XVMC_MAX_SURF_NUM, createBlocks);
@@ -1033,7 +1108,7 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
         return false;
     }
 
-    bool ok = vbuffers.CreateBuffers(XJ_width, XJ_height, XJ_disp, &xvmc_ctx,
+    bool ok = vbuffers.CreateBuffers(XJ_width, XJ_height, XJ_disp, xvmc_ctx,
                                      &xvmc_surf_info, xvmc_surfs);
     if (!ok)
     {
@@ -1043,7 +1118,7 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
     }
 
     for (uint i=0; i<xvmc_osd_available.size(); i++)
-        xvmc_osd_available[i]->CreateBuffer(xvmc_ctx, XJ_width, XJ_height);
+        xvmc_osd_available[i]->CreateBuffer(*xvmc_ctx, XJ_width, XJ_height);
 
     X11S(XSync(XJ_disp, False));
 
@@ -1073,12 +1148,12 @@ vector<void*> VideoOutputXv::CreateXvMCSurfaces(uint num, bool create_xvmc_block
 
         X11L;
 
-        int ret = XvMCCreateSurface(XJ_disp, &xvmc_ctx, &(surf->surface));
+        int ret = XvMCCreateSurface(XJ_disp, xvmc_ctx, &(surf->surface));
         ok &= (Success == ret);
 
         if (create_xvmc_blocks && ok)
         {
-            ret = XvMCCreateBlocks(XJ_disp, &xvmc_ctx, num_data_blocks,
+            ret = XvMCCreateBlocks(XJ_disp, xvmc_ctx, num_data_blocks,
                                    &(surf->blocks));
             if (Success != ret)
             {
@@ -1089,7 +1164,7 @@ vector<void*> VideoOutputXv::CreateXvMCSurfaces(uint num, bool create_xvmc_block
 
         if (create_xvmc_blocks && ok)
         {
-            ret = XvMCCreateMacroBlocks(XJ_disp, &xvmc_ctx, num_mv_blocks,
+            ret = XvMCCreateMacroBlocks(XJ_disp, xvmc_ctx, num_mv_blocks,
                                         &(surf->macro_blocks));
             if (Success != ret)
             {
@@ -1350,11 +1425,7 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
     XJ_non_xv_image = NULL;
 
 #ifdef USING_XVMC
-    if (xvmc_ctx_exists)
-    {
-        xvmc_ctx_exists = false;
-        X11S(XvMCDestroyContext(XJ_disp, &xvmc_ctx));
-    }
+    DeleteXvMCContext(XJ_disp, xvmc_ctx);
 #endif // USING_XVMC
 }
 
@@ -2015,7 +2086,7 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     if (hasVLDAcceleration())
     {
         vbuffers.LockFrame(frame, "DrawSlice -- VLD");
-        X11S(status = XvMCPutSlice2(XJ_disp, &xvmc_ctx, 
+        X11S(status = XvMCPutSlice2(XJ_disp, xvmc_ctx, 
                                     (char*)render->slice_data, 
                                     render->slice_datalen, 
                                     render->slice_code));
@@ -2041,7 +2112,7 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 
         // Sync past & future I and P frames
         X11S(status =
-             XvMCRenderSurface(XJ_disp, &xvmc_ctx, 
+             XvMCRenderSurface(XJ_disp, xvmc_ctx, 
                                render->picture_structure, 
                                render->p_surface,
                                render->p_past_surface, 

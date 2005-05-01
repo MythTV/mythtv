@@ -25,7 +25,10 @@ typedef struct
     XvMCBlockArray      blocks;
     XvMCMacroBlockArray macro_blocks;
 } xvmc_vo_surf_t;
-#endif // USING_XVMC
+#else // if !USING_XVMC
+class XvMCContext;
+class XvMCSurfaceInfo;
+#endif // !USING_XVMC
 
 class NuppelVideoPlayer;
 
@@ -38,10 +41,6 @@ class VideoOutputXv : public VideoOutput
   public:
     VideoOutputXv(MythCodecID av_codec_id);
    ~VideoOutputXv();
-
-    static MythCodecID GetBestSupportedCodec(uint width, uint height,
-                                             uint osd_width, uint osd_height,
-                                             uint stream_type, int xvmc_chroma);
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
@@ -72,10 +71,24 @@ class VideoOutputXv : public VideoOutput
         { return XVideoIDCT <= VideoOutputSubType(); }
     virtual bool hasVLDAcceleration(void) const
         { return XVideoVLD == VideoOutputSubType(); }
+
+    static MythCodecID GetBestSupportedCodec(uint width, uint height,
+                                             uint osd_width, uint osd_height,
+                                             uint stream_type, int xvmc_chroma);
+
+    static int GrabSuitableXvPort(Display* disp, Window root,
+                                  MythCodecID type,
+                                  uint width, uint height,
+                                  int xvmc_chroma = 0,
+                                  XvMCSurfaceInfo* si = NULL);
+
+    static XvMCContext* CreateXvMCContext(Display* disp, int port,
+                                          int surf_type,
+                                          int width, int height);
+    static void DeleteXvMCContext(Display* disp, XvMCContext*& ctx);
+
   private:
     VOSType VideoOutputSubType() const { return video_output_subtype; }
-
-    int GrabSuitableXvPort(VOSType type);
 
     VideoFrame *GetNextFreeFrame(bool allow_unsafe);
     void DiscardFrame(VideoFrame*);
@@ -98,8 +111,8 @@ class VideoOutputXv : public VideoOutput
     void InitDisplayMeasurements(uint width, uint height);
     void InitColorKey(bool turnoffautopaint);
 
-    bool InitVideoBuffers(VOSType xvmc_type, bool use_xv, bool use_shm);
-    bool InitXvMC(VOSType);
+    bool InitVideoBuffers(MythCodecID, bool use_xv, bool use_shm);
+    bool InitXvMC(MythCodecID);
     bool InitXVideo(void);
     bool InitXShm(void);
     bool InitXlib(void);
@@ -117,6 +130,18 @@ class VideoOutputXv : public VideoOutput
     static bool IsRendering(VideoFrame* frame);
     static void SyncSurface(VideoFrame* frame, int past_future = 0);
     static void FlushSurface(VideoFrame* frame);
+    void CheckDisplayedFramesForAvailability(void);
+#ifdef USING_XVMC 
+    XvMCOSD* GetAvailableOSD();
+    void ReturnAvailableOSD(XvMCOSD*);
+#endif // USING_XVMC
+
+    // Misc.
+    MythCodecID          myth_codec_id;
+    VOSType              video_output_subtype;
+    DisplayRes          *display_res;
+    float                display_aspect;
+    QMutex               global_lock;
 
     // Basic X11 info
     Window               XJ_root;
@@ -158,27 +183,13 @@ class VideoOutputXv : public VideoOutput
 #ifdef USING_XVMC 
     // Basic XvMC drawing info
     XvMCSurfaceInfo      xvmc_surf_info;
-    int                  xvmc_surf_type;
     int                  xvmc_chroma;
-    XvMCContext          xvmc_ctx;
-    bool                 xvmc_ctx_exists;
+    XvMCContext         *xvmc_ctx;
     vector<void*>        xvmc_surfs;
 
+    // Basic XvMC drawing info
     QMutex               xvmc_osd_lock;
     MythDeque<XvMCOSD*>  xvmc_osd_available;
-    XvMCOSD* GetAvailableOSD();
-    void ReturnAvailableOSD(XvMCOSD*);
-#endif // USING_XVMC
-
-////// OTHER ///////////
-    VOSType              video_output_subtype;
-    DisplayRes          *display_res;
-    float                display_aspect;
-    QMutex               global_lock;
-    MythCodecID          myth_codec_id;
-////////////////////////
-    void CheckDisplayedFramesForAvailability(void);
-#ifdef USING_XVMC
     friend class XvMCOSD;
 #endif // USING_XVMC
 };
