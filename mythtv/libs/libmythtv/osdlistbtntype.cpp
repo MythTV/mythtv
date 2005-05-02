@@ -358,6 +358,12 @@ void OSDListTreeType::Draw(OSDSurface *surface, int fade, int maxfade,
 void OSDListTreeType::FillLevelFromTree(OSDGenericTree *item, 
                                         OSDListBtnType *list)
 {
+    if (!list)
+    {
+        VERBOSE(VB_IMPORTANT, "OSDListTreeType::FillLevelFromTree() "
+                "called with no list. Ignoring call.");
+        return;
+    }
     list->Reset();
 
     QPtrList<GenericTree> *itemlist = item->getAllChildren();
@@ -956,11 +962,6 @@ OSDListBtnTypeItem::OSDListBtnTypeItem(OSDListBtnType* lbtype,
                                        OSDTypeImage *pixmap, bool checkable,
                                        bool showArrow, CheckState state)
 {
-    if (!lbtype) {
-        VERBOSE(VB_IMPORTANT, "OSDListBtnTypeItem: trying to creating item without parent");
-        exit(-16);
-    }
-    
     m_parent    = lbtype;
     m_text      = text;
     m_pixmap    = pixmap;
