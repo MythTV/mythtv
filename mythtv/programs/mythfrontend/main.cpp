@@ -334,9 +334,20 @@ void startTV(void)
 void showStatus(void)
 {
     StatusBox statusbox(gContext->GetMainWindow(), "status box");
-    qApp->unlock();
-    statusbox.exec();
-    qApp->lock();
+    if (statusbox.IsErrored())
+    {
+        MythPopupBox::showOkPopup(
+            gContext->GetMainWindow(), QObject::tr("Theme Error"),
+            QString(QObject::tr(
+                        "Your theme does not contain elements required "
+                        "to display the status screen.")));
+    }
+    else
+    {
+        qApp->unlock();
+        statusbox.exec();
+        qApp->lock();
+    }
 }
 
 void TVMenuCallback(void *data, QString &selection)

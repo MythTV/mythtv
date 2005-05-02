@@ -37,7 +37,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 StatusBox::StatusBox(MythMainWindow *parent, const char *name)
-         : MythDialog(parent, name)
+    : MythDialog(parent, name), errored(false)
 {
     // Set this value to the number of items in icon_list
     // to prevent scrolling off the bottom
@@ -48,6 +48,8 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
 
     setNoErase();
     LoadTheme();
+    if (IsErrored())
+        return;
   
     icon_list->SetItemText(item_count++, QObject::tr("Listings Status"));
     icon_list->SetItemText(item_count++, QObject::tr("Tuner Status"));
@@ -229,7 +231,12 @@ void StatusBox::LoadTheme()
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    theme->LoadTheme(xmldata, "status", "status-");
+    if (!theme->LoadTheme(xmldata, "status", "status-"))
+    {
+        VERBOSE(VB_IMPORTANT, "StatusBox: Unable to load theme.");
+        errored = true;
+        return;
+    }
 
     for (QDomNode child = xmldata.firstChild(); !child.isNull();
          child = child.nextSibling()) {
@@ -253,53 +260,63 @@ void StatusBox::LoadTheme()
                     ContentRect = area;
             }
             else {
-                cerr << "Unknown element: " << e.tagName()
-                          << endl;
-                exit(-1);
+                QString msg =
+                    QString(tr("The theme you are using contains an "
+                               "unknown element ('%1').  It will be ignored"))
+                    .arg(e.tagName());
+                VERBOSE(VB_IMPORTANT, msg);
+                errored = true;
             }
         }
     }
 
     selector = theme->GetSet("selector");
-    if (!selector) {
-        cerr << "StatusBox: Failed to get selector container." << endl;
-        exit(-1);
+    if (!selector)
+    {
+        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get selector container.");
+        errored = true;
     }
 
     icon_list = (UIListType*)selector->GetType("icon_list");
-    if (!icon_list) {
-        cerr << "StatusBox: Failed to get icon list area." << endl;
-        exit(-1);
+    if (!icon_list)
+    {
+        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get icon list area.");
+        errored = true;
     }
 
     content = theme->GetSet("content");
-    if (!content) {
-        cerr << "StatusBox: Failed to get content container." << endl;
-        exit(-1);
+    if (!content)
+    {
+        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get content container.");
+        errored = true;
     }
 
     list_area = (UIListType*)content->GetType("list_area");
-    if (!list_area) {
-        cerr << "StatusBox: Failed to get list area." << endl;
-        exit(-1);
+    if (!list_area)
+    {
+        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get list area.");
+        errored = true;
     }
 
     topbar = theme->GetSet("topbar");
-    if (!topbar) {
-        cerr << "StatusBox: Failed to get topbar container." << endl;
-        exit(-1);
+    if (!topbar)
+    {
+        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get topbar container.");
+        errored = true;
     }
 
     heading = (UITextType*)topbar->GetType("heading");
-    if (!heading) {
-        cerr << "StatusBox: Failed to get heading area." << endl;
-        exit(-1);
+    if (!heading)
+    {
+        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get heading area.");
+        errored = true;
     }
 
     helptext = (UITextType*)topbar->GetType("helptext");
-    if (!helptext) {
-        cerr << "StatusBox: Failed to get helptext area." << endl;
-        exit(-1);
+    if (!helptext)
+    {
+        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get helptext area.");
+        errored = true;
     }
 }
 

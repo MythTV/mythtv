@@ -15,6 +15,8 @@ class StatusBox : public MythDialog
     StatusBox(MythMainWindow *parent, const char *name = 0);
    ~StatusBox(void);
 
+   bool IsErrored() const { return errored; }
+
   protected slots:
 
   protected:
@@ -59,6 +61,7 @@ class StatusBox : public MythDialog
     MythMainWindow *my_parent;
 
     bool isBackend;
+    bool errored;
 };
 
 #endif
