@@ -226,20 +226,27 @@ public:
 };
 
 void DataDirectLineupSelector::fillSelections(const QString &uid,
-                                              const QString &pwd) 
+                                              const QString &pwd,
+                                              int _source) 
 {
     if (uid.isEmpty() || pwd.isEmpty())
         return;
 
     qApp->processEvents();
 
-    QString waitMsg = tr("Fetching lineups from DataDirect service...");
+    QString waitMsg;
+    if (_source == DD_ZAP2IT)
+    
+        waitMsg = tr("Fetching lineups from DataDirect service...");
+    else
+        waitMsg = tr("Fetching lineups from the Myth Plus service...");
+        
     VERBOSE(VB_GENERAL, waitMsg);
     MythProgressDialog pdlg(waitMsg, 2);
 
     clearSelections();
 
-    DataDirectProcessor ddp;
+    DataDirectProcessor ddp(_source);
     ddp.setUserID(uid);
     ddp.setPassword(pwd);
 
@@ -267,15 +274,18 @@ void DataDirect_config::load()
         (password->getValue() != lastloadedpassword)) 
     {
         lineupselector->fillSelections(userid->getValue(), 
-                                       password->getValue());
+                                       password->getValue(),
+                                       source);
         lastloadeduserid = userid->getValue();
         lastloadedpassword = password->getValue();
     }
 }
 
-DataDirect_config::DataDirect_config(const VideoSource& _parent)
+DataDirect_config::DataDirect_config(const VideoSource& _parent, int _source)
                  : parent(_parent) 
 {
+    cerr << "new DataDirect_config source == " << _source << endl;
+    source = _source;
     setUseLabel(false);
     setUseFrame(false);
 
@@ -297,7 +307,7 @@ DataDirect_config::DataDirect_config(const VideoSource& _parent)
 
 void DataDirect_config::fillDataDirectLineupSelector(void)
 {
-    lineupselector->fillSelections(userid->getValue(), password->getValue());
+    lineupselector->fillSelections(userid->getValue(), password->getValue(), source);
 }
 
 void RegionSelector::fillSelections() {
@@ -509,9 +519,12 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent)
 
     // only save settings for the selected grabber
     setSaveAll(false);
-
+ 
     addTarget("datadirect", new DataDirect_config(parent));
     grabber->addSelection("North America (DataDirect)", "datadirect");
+    
+    addTarget("technovera", new DataDirect_config(parent, DD_LXM));
+    grabber->addSelection("LxM (United States)", "technovera");
 
     addTarget("tv_grab_de_tvtoday", new XMLTV_generic_config(parent, "tv_grab_de_tvtoday"));
     grabber->addSelection("Germany (tvtoday)", "tv_grab_de_tvtoday");

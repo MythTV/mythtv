@@ -7,6 +7,8 @@
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
 
+enum DD_PROVIDERS { DD_ZAP2IT, DD_LXM };
+
 class DataDirectProcessor;
 
 class DataDirectStation 
@@ -220,8 +222,9 @@ class DDStructureParser: public QXmlDefaultHandler
 class DataDirectProcessor
 {
   public:
-    DataDirectProcessor() 
+    DataDirectProcessor( int _source = DD_ZAP2IT ) 
     {
+        source = _source;
         stations.clear();
         lineups.clear();
         lineupmaps.clear();
@@ -235,11 +238,13 @@ class DataDirectProcessor
     QString getUserID() const { return userid; }
     QString getPassword() const { return password; }
     QString getLineup() const { return selectedlineupid; }
-
+    int getSource() {return source;}
+    
     void setUserID(QString uid) { userid = uid; };
     void setPassword(QString pwd) { password = pwd; };
     void setLineup(QString lid) { selectedlineupid = lid; };
-
+    void setSource(int _source) {source = _source;}
+    
     QDateTime getActualListingsFrom() const { return actuallistingsfrom; }
     QDateTime getActualListingsTo() const { return actuallistingsto; }
 
@@ -268,6 +273,8 @@ class DataDirectProcessor
     QValueList<DataDirectLineupMap> lineupmaps;
      
   private:
+    int source;
+    
     QString selectedlineupid;
     QString userid;
     QString password;

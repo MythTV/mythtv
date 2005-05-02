@@ -89,7 +89,7 @@ public:
    };
 
  public slots:
-    void fillSelections(const QString& uid, const QString& pwd);
+    void fillSelections(const QString& uid, const QString& pwd, int source);
 };
 
 class DataDirectButton: public ButtonSetting, public TransientStorage {
@@ -106,7 +106,7 @@ class DataDirectPassword;
 class DataDirect_config: public VerticalConfigurationGroup {
     Q_OBJECT
 public:
-    DataDirect_config(const VideoSource& _parent); 
+    DataDirect_config(const VideoSource& _parent, int _source = DD_ZAP2IT); 
 
     virtual void load();
 
@@ -123,6 +123,7 @@ protected:
     DataDirectButton* button;
     QString lastloadeduserid;
     QString lastloadedpassword;
+    int source;
 };
 
 class XMLTV_uk_config: public VerticalConfigurationGroup {

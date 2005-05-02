@@ -8,6 +8,12 @@
 #include <qstring.h>
 #include <cerrno>
 
+
+
+const QString DataDirectURLS[] = { "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService",
+                                   "http://webservices.technovera.tmsdatadirect.com/technovera/tvlistings/xtvdService"};
+
+
 // XXX Program duration should be stored as seconds, not as a QTime.
 //     limited to 24 hours this way.
 
@@ -443,9 +449,10 @@ FILE *DataDirectProcessor::getInputFile(bool plineupsOnly, QDateTime pstartDate,
 {
     FILE *ret = NULL;
     if (inputfilename.isNull())
-    {
-        QString ddurl("http://datadirect.webservices.zap2it.com/tvlistings/xtvdService");
-
+    {   
+        //QString ddurl("http://datadirect.webservices.zap2it.com/tvlistings/xtvdService");
+        QString ddurl(DataDirectURLS[source]);
+         
         if (plineupsOnly) 
         {
             pstartDate = QDateTime(QDate::currentDate().addDays(2),
