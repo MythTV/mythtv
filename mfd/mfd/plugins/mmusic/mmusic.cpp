@@ -1765,14 +1765,15 @@ void MMusicWatcher::deletePlaylist(int a_playlist_id)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("DELETE FROM musicplaylist WHERE intid = ? ; ");
+    query.prepare("DELETE FROM musicplaylist WHERE playlistid = ? ; ");
 
     query.bindValue(0, playlist_database_id);
         
     query.exec();
 
-    log(QString("deleted a playlist called %1 from the musicplaylist database")
-                .arg(playlist_name), 2);
+    log(QString("deleted a playlist called %1 (db id of %2) from the musicplaylist database")
+                .arg(playlist_name)
+                .arg(playlist_database_id), 2);
     
 }
 
