@@ -440,7 +440,7 @@ void MfeDialog::doPlaylistDialog(int collection_id, int playlist_id, const QStri
                                                 playlist_name
                                             );
         playlist_dialog->exec();
-        if(playlist_dialog->commitEdits())
+        if (playlist_dialog->commitEdits())
         {
             bool is_new = false;
             if(playlist_id == -1)
@@ -453,6 +453,14 @@ void MfeDialog::doPlaylistDialog(int collection_id, int playlist_id, const QStri
                                             is_new,
                                             playlist_name
                                           );
+        }
+        else if (playlist_dialog->playlistDeletedElsewhere() )
+        {
+            MythPopupBox::showOkPopup(
+                                        gContext->GetMainWindow(), 
+                                        "", 
+                                        QString("The playlist you were editing was deleted out from under you")
+                                     );
         }
         delete playlist_dialog;
         playlist_dialog = NULL;

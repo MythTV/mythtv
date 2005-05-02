@@ -27,7 +27,7 @@ PlaylistDialog::PlaylistDialog(
                               )
           :MythThemedDialog(parent, window_name, theme_filename)
 {
-
+    playlist_deleted_elsewhere = false;
     //
     //  Pointer to the mfd client library
     //
@@ -343,12 +343,28 @@ void PlaylistDialog::swapToNewPristine()
                                                             which_playlist,
                                                             true
                                                          );
-                                                         
+    if (!pristine_playlist_tree)
+    {
+        //  
+        //  Uh, oh. Playlist we were in the middle of editing got deleted
+        //  somewhere else
+        //
+        
+        playlist_deleted_elsewhere = true;
+        close();
+        return;
+    }                                           
     working_playlist_tree = current_mfd->getPlaylistTree(
                                                             which_collection,
                                                             which_playlist,
                                                             false
                                                          );
+    if (!working_playlist_tree)
+    {
+        playlist_deleted_elsewhere = true;
+        close();
+        return;
+    }
                                                          
     pristine_content_tree = current_mfd->getContentTree(
                                                         which_collection,
@@ -392,6 +408,11 @@ void PlaylistDialog::swapToNewPristine()
 
 bool PlaylistDialog::commitEdits()
 {
+    if(playlist_deleted_elsewhere)
+    {
+        return false;
+    }
+    
     //
     //  If someone is asking us this question, it means that we are about to
     //  disappear. As long as we're not running pristine and at least one

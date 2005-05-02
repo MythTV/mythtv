@@ -42,6 +42,7 @@ class PlaylistDialog : public MythThemedDialog
     ~PlaylistDialog();
 
     UIListGenericTree* getWorkingPlaylist(){return working_playlist_tree; }
+    bool playlistDeletedElsewhere(){ return playlist_deleted_elsewhere; }
 
   public slots:
   
@@ -163,10 +164,11 @@ class PlaylistDialog : public MythThemedDialog
     QStringList persistent_route_to_playlist;
 
     //
-    //  A little timer used to stop screenflashing where
-    //  working->pristine->working cycles happen too fast to bother actually
-    //  showing them
+    //  A flag to keep track of if the playlist we were editing was deleted
+    //  out from under us
     //
+    
+    bool    playlist_deleted_elsewhere;
 
 };
 
