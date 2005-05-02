@@ -117,7 +117,9 @@ class MetadataContainer
                                     QValueList<int> playlist_in,
                                     QValueList<int> playlist_out,
                                     bool rewrite_playlists = false,
-                                    bool prune_dead = false
+                                    bool prune_dead = false,
+                                    bool map_out_all_playlists = false
+                                    
                                 );
 
     MetadataCollectionContentType  getContentType(){ return content_type;}
@@ -125,7 +127,7 @@ class MetadataContainer
     MetadataCollectionServerType   getServerType(){ return server_type;}
     
     int     bumpPlaylistId(){current_playlist_id++; return current_playlist_id;}
- 
+    
   protected:
 
     void    mapPlaylists(

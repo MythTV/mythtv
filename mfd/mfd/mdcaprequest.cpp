@@ -25,7 +25,7 @@ MdcapRequest::MdcapRequest()
     //
     
     container_id = -1;
-    commit_list_id = -1;
+    list_id = -1;
     generation = 0;
     delta = 0;
     item_request = false;
@@ -174,12 +174,64 @@ void MdcapRequest::parsePath(HttpInRequest *http_request)
             http_request->getResponse()->setError(400);
             return;
         }
-        commit_list_id = request_tokens[3].toInt(&ok);
+        
+        list_id = request_tokens[3].toInt(&ok);
         if(!ok || container_id < 1) 
         {
             container_id = -1;
-            commit_list_id = -1;
+            list_id = -1;
             warning(QString("bad list id in commit request: \"%1\"")
+                    .arg(the_path));
+            setRequestType(MDCAP_REQUEST_SCREWEDUP);
+            http_request->getResponse()->setError(400);
+            return;
+        }
+
+    }
+    else if(the_path.startsWith("/remove") && the_path.contains("list"))
+    {
+        setRequestType(MDCAP_REQUEST_REMOVE_LIST);
+
+        //
+        //  Parse out /remove request details
+        //
+        
+        QStringList request_tokens = QStringList::split( "/", the_path );
+        if(request_tokens.count() < 4)
+        {
+            warning(QString("bad /remove request: \"%1\"")
+                    .arg(the_path));
+            setRequestType(MDCAP_REQUEST_SCREWEDUP);
+            http_request->getResponse()->setError(400);
+            return;
+        }
+
+        bool ok;
+        container_id = request_tokens[1].toInt(&ok);
+        if(!ok || container_id < 1) 
+        {
+            container_id = -1;
+            warning(QString("bad container id in remove request: \"%1\"")
+                    .arg(the_path));
+            setRequestType(MDCAP_REQUEST_SCREWEDUP);
+            http_request->getResponse()->setError(400);
+            return;
+        }
+        if(request_tokens[2] != "list")
+        {
+            container_id = -1;
+            warning(QString("bad 3rd token in list remove request: \"%1\"")
+                    .arg(the_path));
+            setRequestType(MDCAP_REQUEST_SCREWEDUP);
+            http_request->getResponse()->setError(400);
+            return;
+        }
+        list_id = request_tokens[3].toInt(&ok);
+        if(!ok || container_id < 1) 
+        {
+            container_id = -1;
+            list_id = -1;
+            warning(QString("bad list id in remove request: \"%1\"")
                     .arg(the_path));
             setRequestType(MDCAP_REQUEST_SCREWEDUP);
             http_request->getResponse()->setError(400);

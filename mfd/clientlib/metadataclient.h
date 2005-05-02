@@ -48,6 +48,9 @@ class MetadataClient : public ServiceClient
                             QString playlist_name
                         );
 
+    void executeCommand(QStringList new_command);
+
+
     //
     //  Methods for handling different responses from the server
     //

@@ -80,6 +80,7 @@ class MMusicWatcher: public MFDServicePlugin
     void            possiblySaveToDb();
     void            persistPlaylist(Playlist *a_playlist);
     void            createPlaylistInDb(Playlist *a_playlist);
+    void            deletePlaylist(int a_playlist_id);
     
   private:
 

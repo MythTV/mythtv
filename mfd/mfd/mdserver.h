@@ -92,7 +92,8 @@ class MetadataServer : public MFDHttpPlugin
                                                     QValueList<int> playlist_additions,
                                                     QValueList<int> playlist_deletions,
                                                     bool rewrite_playlists = false,
-                                                    bool prune_dead = false
+                                                    bool prune_dead = false,
+                                                    bool mapout_all_playlists = false
                                                  );
 
     int                         getLastDestroyedCollection();
@@ -132,6 +133,7 @@ class MetadataServer : public MFDHttpPlugin
                             const QString &list_name,
                             QValueVector<char> *list_contents
                          );
+    void dealWithListRemove(MdcapRequest *mdcap_request);
                              
     
   private:

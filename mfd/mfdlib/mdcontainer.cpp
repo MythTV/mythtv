@@ -198,7 +198,8 @@ void MetadataContainer::dataDelta(
                                     QValueList<int> playlist_in,
                                     QValueList<int> playlist_out,
                                     bool rewrite_playlists,
-                                    bool prune_dead
+                                    bool prune_dead,
+                                    bool map_out_all_playlists
                                 )
 {
 
@@ -290,6 +291,68 @@ void MetadataContainer::dataDelta(
         playlist_deletions = playlist_out;
 
         checkPlaylists();
+    }
+
+    if(map_out_all_playlists)
+    {
+        QValueList<int> mapped_playlist_in = playlist_additions;
+
+        QIntDictIterator<Playlist> mapout_it( *current_playlists );
+        for ( ; mapout_it.current(); ++mapout_it )
+        {
+            //
+            //  Take note of how this playlist currently maps
+            //
+        
+            QValueList<int> old_list = mapout_it.current()->getList();
+        
+            //
+            //  And if it is currently editable
+            //
+        
+            bool was_editable = mapout_it.current()->isEditable();
+            mapout_it.current()->isEditable(true);
+
+            //
+            //  Make it map out
+            //
+
+            mapout_it.current()->mapDatabaseToId(
+                                                    current_metadata, 
+                                                    mapout_it.current()->getDbList(), 
+                                                    mapout_it.current()->getListPtr(),
+                                                    current_playlists, 
+                                                    0,   // initial depth is 0
+                                                    !editable,    // editable containers should not flatten playlist
+                                                    prune_dead
+                                                );
+                                            
+            //
+            //  Get its new list
+            //
+        
+            QValueList<int> new_list = mapout_it.current()->getList();
+
+            //
+            //  See if the lists have changed
+            //
+        
+            if ( old_list != new_list || was_editable != mapout_it.current()->isEditable())
+            {
+
+                //
+                //  This goes on the list of changed/added playlists
+                //
+                
+                if( ! mapped_playlist_in.contains(mapout_it.current()->getId()) )
+                {
+                    playlist_in.push_back(mapout_it.current()->getId());
+                }
+            } 
+        }
+        
+        playlist_additions = mapped_playlist_in;
+        
     }
     
     ++generation;

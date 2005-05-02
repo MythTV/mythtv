@@ -384,6 +384,48 @@ void MfdInterface::commitListEdits(
     }
 }
 
+void MfdInterface::deletePlaylist(
+                                    int which_mfd,
+                                    int which_collection,
+                                    int which_playlist
+                                 )
+{
+
+    //
+    //  This has to happen here in the main execution thread, as
+    //  playlist_tree will probably get deleted very shortly after we return
+    //
+
+    bool found_it = false;
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if (an_mfd->getId() == which_mfd)
+        {
+            an_mfd->addPendingCommand(
+                                        QStringList::split(" ", QString("metadata pl_delete %1 %2")
+                                                .arg(which_collection)
+                                                .arg(which_playlist))
+                                     );
+
+
+            found_it = true;
+            break;
+        }
+    }
+    
+    if (!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for a deletePlaylist() request"
+             << endl;
+    }
+
+}
+
 void MfdInterface::startPlaylistCheck(
                                         MfdContentCollection *mfd_collection,
                                         UIListGenericTree *playlist, 

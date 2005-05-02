@@ -198,23 +198,7 @@ void MMusicWatcher::run()
         //  See if any metadata change events have come through
         //
 
-        metadata_changed_mutex.lock();
-            if(metadata_changed_flag)
-            {
-                //
-                //  The mfd has "pushed" us the information that some
-                //  collection of metadata has changed. Deal with it
-                //  (default implementation is to do nothing)
-                //
-
-                int which_collection;
-                bool external_flag;
-                which_collection = metadata_collection_last_changed;
-                external_flag = metadata_change_external_flag;
-                metadata_changed_flag = false;
-                handleMetadataChange(which_collection, external_flag);
-            }
-        metadata_changed_mutex.unlock();
+        checkMetadataChanges();
 
         //
         //  Check to see if our sweep interval has elapsed (default is 15
@@ -1531,6 +1515,7 @@ void MMusicWatcher::loadPlaylists()
 
 void MMusicWatcher::handleMetadataChange(int which_collection, bool external)
 {
+
     //
     //  We only care if the change was to the collection we're responsible
     //  for, and the change was external (which means something else changed
@@ -1551,6 +1536,8 @@ void MMusicWatcher::possiblySaveToDb()
     //  having changed
     //
     
+    QValueList<int> playlist_delete_list;
+    
     metadata_server->lockMetadata();
         if(metadata_container)
         {
@@ -1561,7 +1548,11 @@ void MMusicWatcher::possiblySaveToDb()
             {
                 if(it.current()->internalChange())
                 {
-                    if(it.current()->userNewList())
+                    if(it.current()->markedForDeletion())
+                    {
+                        playlist_delete_list.push_back(it.current()->getId());
+                    }
+                    else if(it.current()->userNewList())
                     {
                         createPlaylistInDb(it.current());
                     }
@@ -1574,6 +1565,18 @@ void MMusicWatcher::possiblySaveToDb()
             }
         }
     metadata_server->unlockMetadata();
+    
+    //
+    //  Now that we have released the lock, try and delete any playlists
+    //  what we found marked for deletion
+    //
+    
+    QValueList<int>::Iterator iter;
+    
+    for (iter = playlist_delete_list.begin(); iter != playlist_delete_list.end(); iter++)
+    {
+        deletePlaylist( (*iter) );
+    }
 }
 
 void MMusicWatcher::persistPlaylist(Playlist *a_playlist)
@@ -1690,6 +1693,87 @@ void MMusicWatcher::createPlaylistInDb(Playlist *a_playlist)
                .arg(a_playlist->getName())
                .arg(a_playlist->getDbId())
                .arg(db_song_list->size()), 3);
+}
+
+void MMusicWatcher::deletePlaylist(int a_playlist_id)
+{
+
+    int playlist_database_id = -1;
+    QString playlist_name;
+
+    //
+    //  Need to find it, but only to grab it's database id and name
+    //
+    
+    metadata_server->lockMetadata();
+        if(metadata_container)
+        {
+            Playlist *the_playlist = metadata_container->getPlaylist(a_playlist_id);
+            if(the_playlist)
+            {
+                playlist_database_id = the_playlist->getDbId();
+                playlist_name = the_playlist->getName();
+            }
+        }
+    metadata_server->unlockMetadata();
+    
+    if(playlist_database_id < 0)
+    {
+        warning("could not find playlist that I was supposed to delete");
+        return;
+    }
+    
+
+    //
+    //  Make an completely empty set of data for an AtomicDataDelta
+    //
+    
+    QIntDict<Metadata> *empty_new_metadata = new QIntDict<Metadata>;
+    QValueList<int>     empty_metadata_additions;
+    QValueList<int>     empty_metadata_deletions;
+    QIntDict<Playlist> *empty_new_playlists = new QIntDict<Playlist>;
+    QValueList<int>     empty_playlist_additions;
+    QValueList<int>     empty_playlist_deletions;
+    
+    //
+    //  Put out single playlist deletion into the above
+    //
+
+    empty_playlist_deletions.push_back(a_playlist_id);
+    
+    //
+    //  Send the AtomicDataDelta, which will pull this playlist out of this
+    //  content collection
+    //
+
+    metadata_server->doAtomicDataDelta(
+                                        metadata_container, 
+                                        empty_new_metadata, 
+                                        empty_metadata_additions,
+                                        empty_metadata_deletions,
+                                        empty_new_playlists,
+                                        empty_playlist_additions,
+                                        empty_playlist_deletions,
+                                        false,
+                                        first_sweep_done,
+                                        true
+                                      );
+
+    //
+    //  Actually take it out of the database
+    //
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM musicplaylist WHERE intid = ? ; ");
+
+    query.bindValue(0, playlist_database_id);
+        
+    query.exec();
+
+    log(QString("deleted a playlist called %1 from the musicplaylist database")
+                .arg(playlist_name), 2);
+    
 }
 
 

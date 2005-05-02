@@ -128,6 +128,58 @@ void MetadataClient::commitListEdits(
 
 }
 
+void MetadataClient::executeCommand(QStringList new_command)
+{
+
+    if(new_command.count() != 3)
+    {
+        cerr << "wrong number of tokens to MetadataClient::executeCommand(): "
+             << new_command.join(" ")
+             << endl;
+        return;
+    }
+
+    if(new_command[0] != "pl_delete")
+    {
+        cerr << "MetadataClient::executeCommand() bad command: "
+             << new_command.join(" ")
+             << endl;
+        return;
+    }
+
+    bool ok = false;
+    
+    int collection_number = new_command[1].toInt(&ok);
+    if(!ok)
+    {
+        cerr << "MetadataClient::executeCommand() bad collection number: "
+             << new_command.join(" ")
+             << endl;
+        return;
+    }
+
+    int playlist_number = new_command[2].toInt(&ok);
+    if(!ok)
+    {
+        cerr << "MetadataClient::executeCommand() bad playlist number: "
+             << new_command.join(" ")
+             << endl;
+        return;
+    }
+    
+    //
+    //  Create a mdcap output request object with the correct URL
+    //
+    
+    QString commit_url = QString("/remove/%1/list/%2/")
+                                .arg(collection_number)
+                                .arg(playlist_number);
+
+    MdcapRequest commit_request(commit_url, ip_address);
+    commit_request.addGetVariable("session-id", session_id);
+    commit_request.send(client_socket_to_service);
+}
+
 void MetadataClient::handleIncoming()
 {
     //

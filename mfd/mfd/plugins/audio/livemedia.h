@@ -15,9 +15,6 @@
 #include "../../../config.h"
 #ifdef MFD_RTSP_SUPPORT
 
-#include <deque>
-using namespace std;
-
 #include <OnDemandServerMediaSubsession.hh>
 #include <FramedSource.hh>
 #include <BasicUsageEnvironment.hh>

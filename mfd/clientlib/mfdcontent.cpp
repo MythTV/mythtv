@@ -28,6 +28,7 @@ using namespace std;
 
 #include "pixmaps/container_pix.xpm"
 #include "pixmaps/edit_playlist_pix.xpm"
+#include "pixmaps/del_playlist_pix.xpm"
 #include "pixmaps/edit_track_pix.xpm"
 #include "pixmaps/new_playlist_pix.xpm"
 #include "pixmaps/playlist_pix.xpm"
@@ -43,6 +44,7 @@ using namespace std;
 static bool pixmaps_are_setup = false;
 static QPixmap *pixcontainer = NULL;
 static QPixmap *pixeditplaylist = NULL;
+static QPixmap *pixdelplaylist = NULL;
 static QPixmap *pixedittrack = NULL;
 static QPixmap *pixnewplaylist = NULL;
 static QPixmap *pixplaylist = NULL;
@@ -116,6 +118,7 @@ MfdContentCollection::MfdContentCollection(
     
     new_playlist_tree = NULL;
     editable_playlist_tree = NULL;
+    deletable_playlist_tree = NULL;
 
     //
     //  Set some core attributes
@@ -132,7 +135,7 @@ MfdContentCollection::MfdContentCollection(
     new_pristine_playlist_tree = NULL;
     new_working_playlist_tree = NULL;
     new_user_playlist = NULL;
-    
+
 }
 
 void MfdContentCollection::addMetadata(Metadata *new_item, const QString &collection_name, MetadataCollection *collection)
@@ -266,6 +269,28 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
         edit_node->setInt(new_playlist->getId()); 
         edit_node->setAttribute(0, new_playlist->getCollectionId());
         edit_node->setAttribute(1, 5);  //  magic number for edit playlist command
+
+        //
+        //  If it's editable, it must be deletable
+        //
+
+        //
+        //  Make the root deletable playlists node (this could be the first
+        //  deletable playlist)
+        //
+        
+        if (!deletable_playlist_tree)
+        {
+            deletable_playlist_tree = new UIListGenericTree(NULL, "Delete Playlists");
+            deletable_playlist_tree->setPixmap(pixdelplaylist);
+            deletable_playlist_tree->setAttribute(1, 8);    //  delete magic number
+        }
+
+        UIListGenericTree *delete_node = new UIListGenericTree(deletable_playlist_tree, new_playlist->getName());
+        delete_node->setPixmap(pixdelplaylist);
+        delete_node->setInt(new_playlist->getId()); 
+        delete_node->setAttribute(0, new_playlist->getCollectionId());
+        delete_node->setAttribute(1, 8);  //  magic number for edit playlist command
 
         //
         //  Create an entry in the checkable list user's use to edit playlists
@@ -908,8 +933,10 @@ uint MfdContentCollection::countPlaylistTracks(ClientPlaylist *playlist, uint co
                                                         playlist->getCollectionId(),
                                                         (*l_it).getId()
                                                        );
-
-            counter = countPlaylistTracks( sub_list, counter);
+            if(sub_list)
+            {
+                counter = countPlaylistTracks( sub_list, counter);
+            }
         }
         else
         {
@@ -1549,6 +1576,12 @@ void MfdContentCollection::sort()
         editable_playlist_tree->reOrderAsSorted();
     }
     
+    if (deletable_playlist_tree)
+    {
+        deletable_playlist_tree->sortByString();
+        deletable_playlist_tree->reOrderAsSorted();
+    }
+    
     //
     //  Sort all the selectable content trees
     //  
@@ -1586,6 +1619,7 @@ void MfdContentCollection::setupPixmaps()
         {
             pixcontainer = scalePixmap((const char **)container_pix_xpm, client_wmult, client_hmult);
             pixeditplaylist = scalePixmap((const char **)edit_playlist_pix_xpm, client_wmult, client_hmult);
+            pixdelplaylist = scalePixmap((const char **)del_playlist_pix_xpm, client_wmult, client_hmult);
             pixedittrack = scalePixmap((const char **)edit_track_pix_xpm, client_wmult, client_hmult);
             pixnewplaylist = scalePixmap((const char **)new_playlist_pix_xpm, client_wmult, client_hmult);
             pixplaylist = scalePixmap((const char **)playlist_pix_xpm, client_wmult, client_hmult);
@@ -1598,6 +1632,7 @@ void MfdContentCollection::setupPixmaps()
         {
             pixcontainer = new QPixmap((const char **)container_pix_xpm);
             pixeditplaylist = new QPixmap((const char **)edit_playlist_pix_xpm);
+            pixdelplaylist = new QPixmap((const char **)del_playlist_pix_xpm);
             pixedittrack = new QPixmap((const char **)edit_track_pix_xpm);
             pixnewplaylist = new QPixmap((const char **)new_playlist_pix_xpm);
             pixplaylist = new QPixmap((const char **)playlist_pix_xpm);
@@ -1946,6 +1981,12 @@ MfdContentCollection::~MfdContentCollection()
     {
         delete editable_playlist_tree;
         editable_playlist_tree = NULL;
+    }
+    
+    if (deletable_playlist_tree)
+    {
+        delete deletable_playlist_tree;
+        deletable_playlist_tree = NULL;
     }
     
     if(new_pristine_playlist_tree)

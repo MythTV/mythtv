@@ -60,6 +60,17 @@ class MfdInterface : public QObject
                         );
 
     //
+    //  To get rid of playlists
+    //
+    
+    void    deletePlaylist(
+                            int which_mfd,
+                            int which_collection,
+                            int which_playlist
+                          );
+                            
+
+    //
     //  Methods that will ask this library to perform some background work
     //  on behalf of the linked in client
     //    

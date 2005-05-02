@@ -194,6 +194,11 @@ void MetadataServer::handleIncoming(HttpInRequest *http_request, int client_id)
         http_request->sendResponse(false);
         dealWithListCommit(http_request, mdcap_request);
     }
+    else if(mdcap_request->getRequestType() == MDCAP_REQUEST_REMOVE_LIST)
+    {
+        http_request->sendResponse(false);
+        dealWithListRemove(mdcap_request);
+    }
     else
     {
         warning("unhandled request type");
@@ -796,7 +801,8 @@ void MetadataServer::doAtomicDataDelta(
                                         QValueList<int> playlist_additions,
                                         QValueList<int> playlist_deletions,
                                         bool rewrite_playlists,
-                                        bool prune_dead
+                                        bool prune_dead,
+                                        bool map_out_all_playlists
                                      )
 {
 
@@ -863,7 +869,8 @@ void MetadataServer::doAtomicDataDelta(
                                     playlist_additions,
                                     playlist_deletions,
                                     rewrite_playlists,
-                                    prune_dead
+                                    prune_dead,
+                                    map_out_all_playlists
                                     );
                                    
                     new_metadata = NULL;
@@ -1753,7 +1760,7 @@ void MetadataServer::dealWithHangingUpdates()
 void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapRequest *mdcap_request)
 {
    log(QString("beginning list commit for list %1 in container %2")
-               .arg(mdcap_request->getCommitListId())
+               .arg(mdcap_request->getListId())
                .arg(mdcap_request->getContainerId()), 8);
 
     
@@ -1848,7 +1855,7 @@ void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapReques
             return;
         }
     
-        if(parsed_list_id != mdcap_request->getCommitListId())
+        if(parsed_list_id != mdcap_request->getListId())
         {
             warning("list id in mdcap request differs between "
                     "url and payload");
@@ -2054,35 +2061,10 @@ bool MetadataServer::dealWithListEdit(
                         new_playlists,
                         playlist_additions,
                         playlist_deletions,
-                        false
-                     );
-
-    //
-    //  The new playlist is now in place in the content collection. 
-    //  However, any playlists that have references to this playlist are now
-    //  out of date. We could be very clever about looking only for
-    //  playlists that have references to this playlist, but it's far
-    //  simpler to just update them all.
-    //
-            
-    empty_new_metadata = new QIntDict<Metadata>;
-    empty_metadata_additions.clear();
-    empty_metadata_deletions.clear();
-    new_playlists = new QIntDict<Playlist>;
-    playlist_additions.clear();
-    playlist_deletions.clear();
-            
-    doAtomicDataDelta(
-                        metadata_container,
-                        empty_new_metadata,
-                        empty_metadata_additions,
-                        empty_metadata_deletions,
-                        new_playlists,
-                        playlist_additions,
-                        playlist_deletions,
+                        false,
+                        false,
                         true
                      );
-
     return true;
 }         
 
@@ -2188,6 +2170,51 @@ bool MetadataServer::dealWithNewList(
                      );
     return true;
 }         
+
+void MetadataServer::dealWithListRemove(MdcapRequest *mdcap_request)
+{
+    int which_collection = mdcap_request->getContainerId();
+    int which_list = mdcap_request->getListId();
+
+    lockMetadata();
+
+    MetadataContainer *metadata_container = getMetadataContainer(which_collection);
+                
+    if(!metadata_container)
+    {
+        warning("could not find metadata container referenced by a "
+                "mdcap remove request");
+        unlockMetadata();
+        return;
+    }
+                
+    Playlist *existing_playlist = getPlaylistByContainerAndId(
+                                                                which_collection,
+                                                                which_list
+                                                             );
+    if(!existing_playlist)
+    {
+        warning("could not find playlist to remove specified by "
+                "mdcap remove request");
+        unlockMetadata();
+        return;
+    }
+
+    //
+    //  We just mark it for deletion and send a Metadata Change Event. The
+    //  plugin responsible for this playlist will discover it is marked for
+    //  deletion and deal with it.
+    //
+
+    existing_playlist->internalChange(true);
+    existing_playlist->markedForDeletion(true);
+
+    unlockMetadata();
+
+    MetadataChangeEvent *mce = new MetadataChangeEvent(which_collection, true);
+    QApplication::postEvent(parent, mce);    
+}
+
 
 MetadataServer::~MetadataServer()
 {

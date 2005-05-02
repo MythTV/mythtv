@@ -50,12 +50,13 @@ class MfdContentCollection
     void tallyPlaylists();
     uint countPlaylistTracks(ClientPlaylist *playlist, uint counter);
 
-    UIListGenericTree* getAudioArtistTree(){     return audio_artist_tree;     }
-    UIListGenericTree* getAudioGenreTree(){      return audio_genre_tree;      }
-    UIListGenericTree* getAudioPlaylistTree(){   return audio_playlist_tree;   }
-    UIListGenericTree* getAudioCollectionTree(){ return audio_collection_tree; }
-    UIListGenericTree* getNewPlaylistTree(){     return new_playlist_tree;     }
-    UIListGenericTree* getEditablePlaylistTree(){return editable_playlist_tree;}
+    UIListGenericTree* getAudioArtistTree(){        return audio_artist_tree;      }
+    UIListGenericTree* getAudioGenreTree(){         return audio_genre_tree;       }
+    UIListGenericTree* getAudioPlaylistTree(){      return audio_playlist_tree;    }
+    UIListGenericTree* getAudioCollectionTree(){    return audio_collection_tree;  }
+    UIListGenericTree* getNewPlaylistTree(){        return new_playlist_tree;      }
+    UIListGenericTree* getEditablePlaylistTree(){   return editable_playlist_tree; }
+    UIListGenericTree* getDeletablePlaylistTree(){  return deletable_playlist_tree;}
     
     AudioMetadata*     getAudioItem(int which_collection, int which_id);
     ClientPlaylist*    getAudioPlaylist(int which_collection, int which_id);
@@ -114,6 +115,7 @@ class MfdContentCollection
     
     UIListGenericTree *new_playlist_tree;
     UIListGenericTree *editable_playlist_tree;
+    UIListGenericTree *deletable_playlist_tree;
 
 
     //

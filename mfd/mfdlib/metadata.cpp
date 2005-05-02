@@ -230,6 +230,7 @@ Playlist::Playlist(
     internal_change = false;
     waiting_for_list = false;
     user_new_list = false;
+    marked_for_deletion = false;
 }
 
 Playlist::Playlist(
@@ -256,6 +257,7 @@ Playlist::Playlist(
     internal_change = false;
     waiting_for_list = false;
     user_new_list = false;
+    marked_for_deletion = false;
 }
 
 void Playlist::mapDatabaseToId(
@@ -382,9 +384,12 @@ void Playlist::mapDatabaseToId(
             }
             else
             {
-                cerr << "playlist had a reference to another playlist "
-                     << "that does not exist" 
-                     << endl;
+                //
+                //  cerr << "playlist had a reference to another playlist "
+                //     << "that does not exist" 
+                //     << endl;
+                //
+                //  ^^ which is fine, 'cause someone may have just deleted a playlist
             }
         }
         if(advance_iter)

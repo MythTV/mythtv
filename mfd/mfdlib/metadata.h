@@ -309,7 +309,8 @@ class Playlist
     void             isEditable(bool yes_or_no){is_editable = yes_or_no;}
     bool             userNewList(){ return user_new_list; }
     void             userNewList(bool y_or_n){ user_new_list = y_or_n; }
-    
+    bool             markedForDeletion(){ return marked_for_deletion; }
+    void             markedForDeletion( bool y_or_n){ marked_for_deletion = y_or_n; }
 
   private:
   
@@ -337,6 +338,12 @@ class Playlist
     //
     
     bool            user_new_list;
+
+    //
+    //  For indicating that a list should be deleted
+    //
+    
+    bool            marked_for_deletion;
 };
 
 #endif

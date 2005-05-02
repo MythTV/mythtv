@@ -18,6 +18,7 @@
 #include <qptrlist.h>
 #include <qvaluelist.h>
 #include <qsocketdevice.h>
+#include <deque>
 #include <vector>
 using namespace std;
 
@@ -51,6 +52,37 @@ class SocketBuffer
   
     QStringList tokens;
     int         socket_identifier;
+    
+};
+
+class MetadataEvent
+{
+    //
+    //  Similarly, mfdplugins can get passed metadata (changed) events by
+    //  other processes outside of their main thread(s). This is a tiny
+    //  class for storing those events until the main thread(s) can deal
+    //  with them (each mfd_plugin has a class member which is a
+    //  std::deque<MetadataEvent> for pushing events onto the end of the
+    //  queue and pulling them off the front when there is time to process
+    //  them). The "external" flag just indicates if the metadata collection
+    //  was changed by an object that does not "own" it.
+    
+  public:
+    
+    MetadataEvent(int l_collection_id, bool l_external)
+    {
+        collection_id = l_collection_id;
+        external = l_external;
+    }
+    ~MetadataEvent(){;}
+    
+    int     getCollectionId(){ return collection_id; }
+    bool    getExternal(){ return external; }
+    
+  private:
+  
+    int     collection_id;
+    bool    external;
     
 };
 
@@ -101,14 +133,12 @@ class MFDBasePlugin : public QThread
     
     QString                 name;
     
-    bool                    metadata_changed_flag;
-    int                     metadata_collection_last_changed;
-    bool                    metadata_change_external_flag;
-    QMutex                  metadata_changed_mutex;
-    
     bool                    services_changed_flag;
     QMutex                  services_changed_mutex;
 
+    QMutex                  metadata_changed_mutex;
+    int                     metadata_collection_last_changed;
+    std::deque<MetadataEvent>   metadata_events;
 };
 
 class MFDCapabilityPlugin : public MFDBasePlugin

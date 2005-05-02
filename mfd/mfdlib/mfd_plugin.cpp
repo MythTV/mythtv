@@ -25,10 +25,8 @@ MFDBasePlugin::MFDBasePlugin(MFD *owner, int identifier, const QString &a_name)
     unique_identifier = identifier;
     keep_going = true;
     name = a_name;
-    metadata_changed_flag = false;
-    metadata_change_external_flag = false;
-    metadata_collection_last_changed = 0;
     services_changed_flag = false;
+    metadata_collection_last_changed = 1;
 }
 
 
@@ -133,11 +131,25 @@ bool MFDBasePlugin::keepGoing()
 
 void MFDBasePlugin::metadataChanged(int which_collection, bool external)
 {
+    //
+    //  Arbitrary limit, may need adjustment in some contexts (?).
+    //
+    
+    uint max_metadata_event_queue_size = 100;
+
     metadata_changed_mutex.lock();
-        metadata_changed_flag = true;
-        metadata_change_external_flag = external;
+        MetadataEvent an_event(which_collection, external);
+        metadata_events.push_back(an_event);
+        if (metadata_events.size() > max_metadata_event_queue_size)
+        {
+            warning(QString("more than %1 unprocessed metadata events on the queue, "
+                            "throuwing away oldest")
+                           .arg(max_metadata_event_queue_size));
+            metadata_events.pop_front();
+        }
         metadata_collection_last_changed = which_collection;
     metadata_changed_mutex.unlock();
+
     wakeUp();
 }
 
@@ -649,21 +661,12 @@ void MFDServicePlugin::checkInternalMessages()
 void MFDServicePlugin::checkMetadataChanges()
 {
     metadata_changed_mutex.lock();
-        if(metadata_changed_flag)
+        std::deque<MetadataEvent>::iterator iter = metadata_events.begin();
+        for (; iter != metadata_events.end(); iter++)
         {
-            //
-            //  The mfd has "pushed" us the information that some collection
-            //  of metadata has changed. Deal with it (default
-            //  implementation is to do nothing)
-            //
-
-            int which_collection;
-            bool external_flag;
-            which_collection = metadata_collection_last_changed;
-            external_flag = metadata_change_external_flag;
-            metadata_changed_flag = false;
-            handleMetadataChange(which_collection, external_flag);
+            handleMetadataChange((*iter).getCollectionId(), (*iter).getExternal());
         }
+        metadata_events.clear();
     metadata_changed_mutex.unlock();
 }
 
