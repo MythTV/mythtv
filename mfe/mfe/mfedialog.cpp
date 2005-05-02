@@ -316,12 +316,6 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
     }
     else if(node->getAttribute(1) == 4 && node->getInt() > 0)
     {
-        cout << "       node->getInt() = " << node->getInt() << endl;
-        cout << "node->getAttribute(0) = " << node->getAttribute(0) << endl;
-        cout << "node->getAttribute(1) = " << node->getAttribute(1) << endl;
-        cout << "node->getAttribute(2) = " << node->getAttribute(2) << endl;
-        cout << "node->getAttribute(3) = " << node->getAttribute(3) << endl;
-
         if(current_mfd)
         {
             //
@@ -340,12 +334,6 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
         
         if(node->getInt() > 0)
         {
-            //
-            //  We need a UIListGenericTree object that contains everything
-            //  that could go on this playlist and is already "checked" to
-            //  indicate things already on this playlist
-            //
-            
             if(current_mfd)
             {
                 doPlaylistDialog(node->getAttribute(0), node->getInt(), node->getString());
@@ -388,6 +376,39 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
 
         menu->refresh();
     }
+    else if(node->getAttribute(1) == 8)
+    {
+        //
+        //  User wants to delete a playlist
+        //
+        
+        if(current_mfd && node->getInt() > 0)
+        {
+            //
+            //  Pop up a dialogue to get a new playlist name
+            //
+        
+            int node_mfd_id = current_mfd->getId();
+            int node_collection_id = node->getAttribute(0);
+            int node_playlist_id = node->getInt();
+        
+            if(MythPopupBox::showOkCancelPopup(
+                                                gContext->GetMainWindow(), 
+                                                "", 
+                                                QString("Are you sure you want to delete a playlist called \"%1\"?")
+                                                .arg(node->getString()), 
+                                                true
+                                              ))
+            {
+                mfd_interface->deletePlaylist(
+                                                node_mfd_id, 
+                                                node_collection_id,
+                                                node_playlist_id
+                                             );
+            }
+        }
+    }
+
 }
 
 void MfeDialog::doPlaylistDialog(int collection_id, int playlist_id, const QString playlist_name)
@@ -669,6 +690,13 @@ void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collecti
             manage_node->setDrawArrow(false);
             manage_node->pruneAllChildren();
 
+            UIListGenericTree *delete_nodes = new_collection->getDeletablePlaylistTree();
+            if(delete_nodes)
+            {
+                manage_node->addNode(delete_nodes);
+                manage_node->setDrawArrow(true);
+            }
+
             UIListGenericTree *new_nodes = new_collection->getNewPlaylistTree();
             if(new_nodes)
             {
@@ -947,6 +975,13 @@ void MfeDialog::syncToCurrentMfd()
             //  Add nodes that let us manage content
             //
             
+            UIListGenericTree *delete_nodes = current_collection->getDeletablePlaylistTree();
+            if(delete_nodes)
+            {
+                manage_node->addNode(delete_nodes);
+                manage_node->setDrawArrow(true);
+            }
+
             UIListGenericTree *new_nodes = current_collection->getNewPlaylistTree();
             if(new_nodes)
             {
@@ -960,6 +995,7 @@ void MfeDialog::syncToCurrentMfd()
                 manage_node->addNode(edit_nodes);
                 manage_node->setDrawArrow(true);
             }
+
         }
 
         //
@@ -1233,37 +1269,70 @@ void MfeDialog::doSillyThings()
     //
     
     possessors.append("Big Daddy's");
+    possessors.append("Certainly");
     possessors.append("Chutt's");
+    possessors.append("Deviously");
     possessors.append("Everyone's");
     possessors.append("Existentially");
+    possessors.append("Flatly");
     possessors.append("Foobar's");
     possessors.append("His Majesty's");
     possessors.append("Infinitely");
+    possessors.append("Neatly");
+    possessors.append("Nobody's");
+    possessors.append("One's");
+    possessors.append("The Other's");
+    possessors.append("Our");
+    possessors.append("Plainly");
     possessors.append("Squarely");
+    possessors.append("Walter's");
     possessors.append("Yo Mama's");
     possessors.append("Zippy's");
 
+
     modifiers.append("Blue");
+    modifiers.append("Bouncy");
+    modifiers.append("Buzzed");
     modifiers.append("Cacaphonous");
+    modifiers.append("Dark");
     modifiers.append("Diabolical");
+    modifiers.append("Dotted");
     modifiers.append("Easy");
     modifiers.append("Efficient");
+    modifiers.append("Happy");
     modifiers.append("Inverted");
     modifiers.append("Obtuse");
+    modifiers.append("Odd");
     modifiers.append("Orthogonal");
     modifiers.append("Pedantic");
+    modifiers.append("Refracted");
+    modifiers.append("Spotted");
+    modifiers.append("Sublime");
     modifiers.append("Tempted");
+    modifiers.append("Weak");
+    
     
     nouns.append("Accoutrement");
     nouns.append("Appliance");
     nouns.append("Big Bah");
+    nouns.append("Bottom");
     nouns.append("Breakdown");
+    nouns.append("Creep");
     nouns.append("Device");
     nouns.append("Endeavour");
+    nouns.append("Expanse");
+    nouns.append("Expression");
     nouns.append("Freedom");
+    nouns.append("Gesture");
+    nouns.append("Inversion");
     nouns.append("Mountains");
     nouns.append("Mix");
+    nouns.append("Other");
+    nouns.append("Staples");
+    nouns.append("Stretch");
+    nouns.append("Top");
     nouns.append("Wonder Bread");
+
 }
 
 MfeDialog::~MfeDialog()
