@@ -811,7 +811,11 @@ static int ac3_parse(AVCodecParserContext *s1,
 #endif
 
 AVCodecParser mpegvideo_parser = {
-    { CODEC_ID_MPEG1VIDEO, CODEC_ID_MPEG2VIDEO },
+    { CODEC_ID_MPEG1VIDEO,
+      CODEC_ID_MPEG2VIDEO,
+      CODEC_ID_MPEG2VIDEO_XVMC,
+      CODEC_ID_MPEG2VIDEO_XVMC_VLD,
+    },
     sizeof(ParseContext1),
     NULL,
     mpegvideo_parse,
