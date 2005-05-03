@@ -1044,37 +1044,6 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
 
 // XMLTV stuff
 
-QDateTime fromXMLTVDate(QString &text)
-{
-    int year, month, day, hour, min, sec;
-    QDate ldate;
-    QTime ltime;
-    QDateTime dt;
-
-    if (text == QString::null)
-        return dt;
-
-    if (text.find(QRegExp("^\\d{12}")) != 0)
-        return dt;
-
-    year = atoi(text.mid(0, 4).ascii());
-    month = atoi(text.mid(4, 2).ascii());
-    day = atoi(text.mid(6, 2).ascii());
-    hour = atoi(text.mid(8, 2).ascii());
-    min = atoi(text.mid(10, 2).ascii());
-    if (text.find(QRegExp("^\\d\\d"), 12) == 0)
-        sec = atoi(text.mid(12, 2).ascii());
-    else
-        sec = 0;
-
-    ldate = QDate(year, month, day);
-    ltime = QTime(hour, min, sec);
-
-    dt = QDateTime(ldate, ltime);
-
-    return dt; 
-}
-
 QString getFirstText(QDomElement element)
 {
     for (QDomNode dname = element.firstChild(); !dname.isNull();
@@ -1212,63 +1181,70 @@ int TimezoneToInt (QString timezone)
     return result;
 }
 
-void addTimeOffset(QString &timestr, int localTimezoneOffset)
+// localTimezoneOffset: 841 == "None", -841 == "Auto", other == fixed offset
+void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffset = 841)
 {
-    if (timestr.isEmpty() || abs(localTimezoneOffset) > 840)
+    if (timestr.isEmpty())
+    {
+        cerr << "Ignoring empty timestamp." << endl;
         return;
+    }
 
     QStringList split = QStringList::split(" ", timestr);
     QString ts = split[0];
-    int ts_offset = localTimezoneOffset;
+    bool ok;
+    int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
 
-    if (split.size() > 1)
+    if (ts.length() == 14)
+    {
+        year  = ts.left(4).toInt(&ok, 10);
+        month = ts.mid(4,2).toInt(&ok, 10);
+        day   = ts.mid(6,2).toInt(&ok, 10);
+        hour  = ts.mid(8,2).toInt(&ok, 10);
+        min   = ts.mid(10,2).toInt(&ok, 10);
+        sec   = ts.mid(12,2).toInt(&ok, 10);
+    }
+    else if (ts.length() == 12)
+    {
+        year  = ts.left(4).toInt(&ok, 10);
+        month = ts.mid(4,2).toInt(&ok, 10);
+        day   = ts.mid(6,2).toInt(&ok, 10);
+        hour  = ts.mid(8,2).toInt(&ok, 10);
+        min   = ts.mid(10,2).toInt(&ok, 10);
+        sec   = 0;
+    }
+    else
+    {
+        cerr << "Ignoring unknown timestamp format: " << ts << endl;
+        return;
+    }
+
+    dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec));
+
+    if ((split.size() > 1) && (localTimezoneOffset <= 840))
     {
         QString tmp = split[1];
         tmp.stripWhiteSpace();
 
-        ts_offset = TimezoneToInt(tmp);
+        int ts_offset = TimezoneToInt(tmp);
         if (abs(ts_offset) > 840)
-            ts_offset = localTimezoneOffset;
+        {
+            ts_offset = 0;
+            localTimezoneOffset = 841;
+        }
+        dt = dt.addSecs(-ts_offset * 60);
     }
 
-    int diff = localTimezoneOffset - ts_offset;
-    int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
-
-    if (diff != 0)
+    if (localTimezoneOffset < -840)
     {
-        bool ok;
-                    
-            if (ts.length() == 14)
-            {
-                year  = ts.left(4).toInt(&ok, 10);
-                month = ts.mid(4,2).toInt(&ok, 10);
-                day   = ts.mid(6,2).toInt(&ok, 10);
-                hour  = ts.mid(8,2).toInt(&ok, 10);
-                min   = ts.mid(10,2).toInt(&ok, 10);
-                sec   = ts.mid(12,2).toInt(&ok, 10);
-            }
-            else if (ts.length() == 12)
-            {
-                year  = ts.left(4).toInt(&ok, 10);
-                month = ts.mid(4,2).toInt(&ok, 10);
-                day   = ts.mid(6,2).toInt(&ok, 10);
-                hour  = ts.mid(8,2).toInt(&ok, 10);
-                min   = ts.mid(10,2).toInt(&ok, 10);
-                sec   = 0;
-            }
-            else
-            {
-                diff = 0;
-                cerr << "Ignoring unknown timestamp format: " << ts << endl;
-            }
+        dt = MythUTCToLocal(dt);
+    }
+    else if (abs(localTimezoneOffset) <= 840)
+    {
+        dt = dt.addSecs(localTimezoneOffset * 60 );
     }
 
-    if (diff != 0)
-    {
-        QDateTime dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec));
-        dt = dt.addSecs(diff * 60 );
-        timestr = dt.toString("yyyyMMddhhmmss");
-    }
+    timestr = dt.toString("yyyyMMddhhmmss");
 }
 
 void parseCredits(QDomElement &element, ProgInfo *pginfo)
@@ -1302,11 +1278,11 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
     pginfo->stars = "";
 
     QString text = element.attribute("start", "");
-    addTimeOffset(text, localTimezoneOffset);
+    fromXMLTVDate(text, pginfo->start, localTimezoneOffset);
     pginfo->startts = text;
 
     text = element.attribute("stop", "");
-    addTimeOffset(text, localTimezoneOffset);
+    fromXMLTVDate(text, pginfo->end, localTimezoneOffset);
     pginfo->endts = text;
 
     text = element.attribute("channel", "");
@@ -1321,9 +1297,6 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
         pginfo->clumpidx = split[0];
         pginfo->clumpmax = split[1];
     }
-
-    pginfo->start = fromXMLTVDate(pginfo->startts);
-    pginfo->end = fromXMLTVDate(pginfo->endts);
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -1602,16 +1575,16 @@ bool parseFile(QString filename, QValueList<ChanInfo> *chanlist,
 
     if (config_offset == "Auto")
     {
-        time_t now = time(NULL);
-        struct tm local_tm;
-        localtime_r(&now, &local_tm);
-        localTimezoneOffset = local_tm.tm_gmtoff / 60;
+        localTimezoneOffset = -841; // we mark auto with the -ve of the disable magic number
     }
     else if (config_offset != "None")
     {
         localTimezoneOffset = TimezoneToInt(config_offset);
         if (abs(localTimezoneOffset) > 840)
+        {
             cerr << "Ignoring invalid TimeOffset " << config_offset << endl;
+            localTimezoneOffset = 841;
+        }
     }
 
     QDomElement docElem = doc.documentElement();
@@ -2590,6 +2563,14 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         command.sprintf("nice %s --days=4  --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), 
                         configfile.ascii(), filename.ascii());
+    else if (xmltv_grabber == "tv_grab_be_tvb")
+        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), offset, configfile.ascii(),
+                        filename.ascii());
+    else if (xmltv_grabber == "tv_grab_be_tlm")
+        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), offset, configfile.ascii(),
+                        filename.ascii());
     else
     {
         isNorthAmerica = true;
@@ -2612,7 +2593,9 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          xmltv_grabber == "tv_grab_fr" ||
          xmltv_grabber == "tv_grab_fi" ||
          xmltv_grabber == "tv_grab_jp" ||
-         xmltv_grabber == "tv_grab_pt"))
+         xmltv_grabber == "tv_grab_pt" ||
+         xmltv_grabber == "tv_grab_be_tvb" ||
+         xmltv_grabber == "tv_grab_be_tlm"))
          command += " --quiet";
 
 
@@ -2781,7 +2764,9 @@ bool fillData(QValueList<Source> &sourcelist)
                  xmltv_grabber == "tv_grab_se_swedb" ||
                  xmltv_grabber == "tv_grab_no" ||
                  xmltv_grabber == "tv_grab_ee" ||
-                 xmltv_grabber == "tv_grab_de_tvtoday")
+                 xmltv_grabber == "tv_grab_de_tvtoday" ||
+                 xmltv_grabber == "tv_grab_be_tvb" ||
+                 xmltv_grabber == "tv_grab_be_tlm")
         {
             if (xmltv_grabber == "tv_grab_no")
                 listing_wrap_offset = 6 * 3600;
@@ -2826,6 +2811,10 @@ bool fillData(QValueList<Source> &sourcelist)
                 maxday = 14;
             else if (xmltv_grabber == "tv_grab_de_tvtoday")
                 maxday = 7;
+            else if (xmltv_grabber == "tv_grab_be_tvb")
+                maxday = 5;
+            else if (xmltv_grabber == "tv_grab_be_tlm")
+                maxday = 5;
 
             for (int i = 0; i < maxday; i++)
             {

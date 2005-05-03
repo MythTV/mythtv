@@ -230,11 +230,10 @@ static GlobalComboBox *TimeOffset()
     gc->addSelection("-0130");
     gc->addSelection("-0100");
     gc->addSelection("-0030");
-    gc->setHelpText(QObject::tr("If your local timezone does not match the "
-                    "timezone returned by XMLTV, use this setting to have "
-                    "mythfilldatabase adjust the program start and end times."
-                    "None disables this feature, Auto automatically "
-                    "detects your local timezone"));
+    gc->setHelpText(QObject::tr("Adjust the relative timezone of the XMLTV EPG data read "
+                    "by mythfilldatabase.  'Auto' converts the XMLTV time to local time "
+                    "using your computer's timezone.  'None' ignores the "
+                    "XMLTV timezone, interpreting times as local."));
     return gc;
 };
 
