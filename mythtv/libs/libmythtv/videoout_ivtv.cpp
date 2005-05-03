@@ -50,6 +50,7 @@ VideoOutputIvtv::VideoOutputIvtv(void)
     last_normal = true;
     last_mask = 2;
     osdbuffer = NULL;
+    alphaState = kAlpha_Solid;
 }
 
 VideoOutputIvtv::~VideoOutputIvtv()
@@ -58,26 +59,8 @@ VideoOutputIvtv::~VideoOutputIvtv()
 
     if (fbfd > 0)
     {
-        struct ivtvfb_ioctl_state_info fbstate;
-        memset(&fbstate, 0, sizeof(fbstate));
-
-        if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
-        {
-            perror("IVTVFB_IOCTL_GET_STATE");
-            return;
-        }
-
-        fbstate.status |= IVTVFB_STATUS_GLOBAL_ALPHA;
-        fbstate.status &= ~IVTVFB_STATUS_LOCAL_ALPHA;
-        fbstate.alpha = 255;
-
-        if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
-        {
-            perror("IVTVFB_IOCTL_SET_STATE");
-            return;
-        }
-
         ClearOSD();       
+        SetAlpha(kAlpha_Solid);
  
         close(fbfd);
     }
@@ -90,41 +73,57 @@ void VideoOutputIvtv::ClearOSD(void)
 {
     if (fbfd > 0) 
     {
-        if (driver_version >= 0x00000200)
-        {
-            struct ivtvfb_ioctl_blt_fill_args args;
-            args.rasterop = 0xa;
-            args.alpha_mode = 0x1;
-            args.alpha_mask = 0x0;
-            args.width = XJ_width;
-            args.height = XJ_height;
-            args.x = args.y = 0;
-            args.destPixelMask = 0xffffffff;
-            args.colour = 0;
-            if (ioctl(fbfd, IVTVFB_IOCTL_BLT_FILL, &args) < 0) 
-                perror("IVTVFB_IOCTL_BLT_FILL");
-        }
-        else
-        {
-            struct ivtv_osd_coords osdcoords;
-            memset(&osdcoords, 0, sizeof(osdcoords));
+        struct ivtv_osd_coords osdcoords;
+        memset(&osdcoords, 0, sizeof(osdcoords));
 
-            if (ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords) < 0)
-                perror("IVTVFB_IOCTL_GET_ACTIVE_BUFFER");
-            struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
-            memset(&prep, 0, sizeof(prep));
+        if (ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords) < 0)
+            perror("IVTVFB_IOCTL_GET_ACTIVE_BUFFER");
+        struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
+        memset(&prep, 0, sizeof(prep));
 
-            prep.source = osdbuf_aligned;
-            prep.dest_offset = 0;
-            prep.count = osdcoords.max_offset;
+        prep.source = osdbuf_aligned;
+        prep.dest_offset = 0;
+        prep.count = osdcoords.max_offset;
 
-            memset(osdbuf_aligned, 0x00, osdbufsize);
+        memset(osdbuf_aligned, 0x00, osdbufsize);
 
-            if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
-                perror("IVTVFB_IOCTL_PREP_FRAME");
-        }
-        lastcleared = true;
+        if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
+            perror("IVTVFB_IOCTL_PREP_FRAME");
     }
+}
+
+void VideoOutputIvtv::SetAlpha(eAlphaState newAlphaState)
+{
+    if (alphaState == newAlphaState)
+        return;
+
+    alphaState = newAlphaState;
+
+    struct ivtvfb_ioctl_state_info fbstate;
+    memset(&fbstate, 0, sizeof(fbstate));
+    if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
+        perror("IVTVFB_IOCTL_GET_STATE");
+
+    if (alphaState == kAlpha_Local)
+    {
+        fbstate.status &= ~IVTVFB_STATUS_GLOBAL_ALPHA;
+        fbstate.status |= IVTVFB_STATUS_LOCAL_ALPHA;
+    }
+    else
+    {
+        fbstate.status |= IVTVFB_STATUS_GLOBAL_ALPHA;
+        fbstate.status &= ~IVTVFB_STATUS_LOCAL_ALPHA;
+    }
+
+    if (alphaState == kAlpha_Solid)
+        fbstate.alpha = 255;
+    else if (alphaState == kAlpha_Clear)
+        fbstate.alpha = 0;
+    else if (alphaState == kAlpha_Embedded)
+        fbstate.alpha = gContext->GetNumSetting("PVR350EPGAlphaValue", 164);
+
+    if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
+        perror("IVTVFB_IOCTL_SET_STATE");
 }
 
 void VideoOutputIvtv::InputChanged(int width, int height, float aspect)
@@ -185,25 +184,6 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
             return false;
         }
 
-        struct ivtvfb_ioctl_state_info fbstate;
-        memset(&fbstate, 0, sizeof(fbstate));
-
-        if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
-        {
-            perror("IVTVFB_IOCTL_GET_STATE");
-            return false;
-        }
-
-        fbstate.status &= ~IVTVFB_STATUS_GLOBAL_ALPHA;
-        fbstate.status |= IVTVFB_STATUS_LOCAL_ALPHA;
-        fbstate.alpha = 0;
-
-        if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
-        {
-            perror("IVTVFB_IOCTL_SET_STATE");
-            return false;
-        }
-
         struct ivtvfb_ioctl_get_frame_buffer igfb;
         memset(&igfb, 0, sizeof(igfb));
 
@@ -221,8 +201,6 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
         memset(osdbuf_aligned, 0x00, osdbufsize);
 
         ClearOSD();
-
-        usleep(20000);
 
         struct ivtv_osd_coords osdcoords;
         memset(&osdcoords, 0, sizeof(osdcoords));
@@ -267,50 +245,6 @@ void VideoOutputIvtv::Open(void)
         perror("VIDIOC_QUERYCAP");
     else
         driver_version = vcap.version;
-}
-
-void VideoOutputIvtv::EmbedInWidget(WId wid, int x, int y, int w, int h)
-{
-    if (embedding)
-        return;
-
-    struct ivtvfb_ioctl_state_info fbstate;
-    memset(&fbstate, 0, sizeof(fbstate));
-
-    if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
-        perror("IVTVFB_IOCTL_GET_STATE");
-
-    fbstate.status |= IVTVFB_STATUS_GLOBAL_ALPHA;
-    fbstate.status &= ~IVTVFB_STATUS_LOCAL_ALPHA;
-
-    int usealpha = gContext->GetNumSetting("PVR350EPGAlphaValue", 164);
-    fbstate.alpha = usealpha;
-
-    if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
-        perror("IVTVFB_IOCTL_SET_STATE");
-
-    VideoOutput::EmbedInWidget(wid, x, y, w, h);
-}
-
-void VideoOutputIvtv::StopEmbedding(void)
-{
-    if (!embedding)
-        return;
-
-    struct ivtvfb_ioctl_state_info fbstate;
-    memset(&fbstate, 0, sizeof(fbstate));
-
-    if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
-        perror("IVTVFB_IOCTL_GET_STATE");
-
-    fbstate.status &= ~IVTVFB_STATUS_GLOBAL_ALPHA;
-    fbstate.status |= IVTVFB_STATUS_LOCAL_ALPHA;
-    fbstate.alpha = 0;
-
-    if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
-        perror("IVTVFB_IOCTL_SET_STATE");
-
-    VideoOutput::StopEmbedding();
 }
 
 void VideoOutputIvtv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
@@ -426,6 +360,11 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     {
         bool drawanyway = false;
 
+        if (embedding && alphaState != kAlpha_Embedded)
+            SetAlpha(kAlpha_Embedded);
+        else if (!embedding && alphaState == kAlpha_Embedded && lastcleared)
+            SetAlpha(kAlpha_Clear);
+
         VideoFrame tmpframe;
         tmpframe.codec = FMT_ARGB32;
         tmpframe.buf = (unsigned char *)osdbuf_aligned;
@@ -453,10 +392,15 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
 
         if (lastcleared && drawanyway)
         {
-            ClearOSD();
+            if (!embedding)
+                SetAlpha(kAlpha_Clear);
+            lastcleared = true;
         } 
         else if (ret > 0 || drawanyway)
         {
+            if (embedding)
+                return;
+
             struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
             memset(&prep, 0, sizeof(prep));
 
@@ -466,6 +410,8 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
 
             if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
                 perror("IVTVFB_IOCTL_PREP_FRAME");
+            if (alphaState != kAlpha_Local)
+                SetAlpha(kAlpha_Local);
         }
     }
 }

@@ -268,7 +268,7 @@ TV::TV(void)
       // Window info (GUI is optional, transcoding, preview img, etc)
       myWindow(NULL), embedid(0), embx(0), emby(0), embw(0), embh(0)
 {
-    bzero(channelKeys, sizeof(channelKeys));
+    memset(channelKeys, 0, sizeof(channelKeys));
     lastLcdUpdate = QDateTime::currentDateTime();
     lastLcdUpdate.addYears(-1); // make last LCD update last year..
 

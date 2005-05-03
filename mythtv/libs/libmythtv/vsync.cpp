@@ -514,6 +514,7 @@ bool OpenGLVideoSync::TryInit()
         X11S(ret = glXGetVideoSyncSGI(&count));
         if (GLX_BAD_CONTEXT == ret)
             VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Bad Context for VSync");
+        VERBOSE(VB_PLAYBACK, "Using OpenGLVideoSync");
         return GLX_BAD_CONTEXT != ret;
     }
     else

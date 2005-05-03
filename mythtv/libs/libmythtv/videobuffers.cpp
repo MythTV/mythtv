@@ -130,7 +130,7 @@ void VideoBuffers::Init(uint numdecode, bool extra_for_pause,
     buffers.resize(numcreate);
     for (uint i = 0; i < numcreate; i++)
     {
-        bzero(at(i), sizeof(VideoFrame));
+        memset(at(i), 0, sizeof(VideoFrame));
         at(i)->codec            = FMT_NONE;
         at(i)->interlaced_frame = -1;
         at(i)->top_field_first  = +1;
@@ -1068,7 +1068,7 @@ bool VideoBuffers::CreateBuffers(int width, int height,
         xvmc_vo_surf_t *surf    = (xvmc_vo_surf_t*) surfs[i];
         xvmc_render_state_t *render = new xvmc_render_state_t;
         allocated_structs.push_back((unsigned char*)render);
-        bzero(render, sizeof(xvmc_render_state_t));
+        memset(render, 0, sizeof(xvmc_render_state_t));
         buffers[i].buf          = (unsigned char*) render;
 
         // constants

@@ -21,9 +21,6 @@ class VideoOutputIvtv: public VideoOutput
 
     void InputChanged(int width, int height, float aspect);
 
-    void EmbedInWidget(WId wid, int x, int y, int w, int h);
-    void StopEmbedding(void);
-
     int GetRefreshRate(void);
 
     void DrawUnusedRects(bool sync = true);
@@ -55,7 +52,10 @@ class VideoOutputIvtv: public VideoOutput
     int GetFramesPlayed(void);
 
   private:
+    typedef enum { kAlpha_Solid, kAlpha_Local, kAlpha_Clear, kAlpha_Embedded } eAlphaState;
+
     void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
+    void SetAlpha(eAlphaState newAlpha);
  
     int videofd;
     int fbfd;
@@ -83,6 +83,7 @@ class VideoOutputIvtv: public VideoOutput
     float last_speed;
     bool last_normal;
     int last_mask;
+    eAlphaState alphaState;
 };
 
 #endif

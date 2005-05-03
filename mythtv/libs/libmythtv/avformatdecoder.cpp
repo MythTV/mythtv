@@ -1574,7 +1574,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         else
                             skipaudio = false;
                     }
-                        
                     if (do_ac3_passthru)
                     {
                         data_size = pkt->size;
