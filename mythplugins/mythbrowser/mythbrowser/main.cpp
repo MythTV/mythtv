@@ -17,6 +17,7 @@
 #include <klocale.h>
 #include "tabview.h"
 
+#include "mythtv/exitcodes.h"
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 #include "mythtv/langsettings.h"
@@ -83,12 +84,16 @@ int main(int argc, char **argv)
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    gContext->Init(true);
+    if (!gContext->Init(true))
+    {
+        VERBOSE(VB_IMPORTANT, "MythBrowser: Could not initialize myth context. Exiting.");
+        return FRONTEND_EXIT_NO_MYTHCONTEXT;
+    }
 
     if (!MSqlQuery::testDBConnection())
     {
-        printf("couldn't open db\n");
-        return -1;
+        VERBOSE(VB_IMPORTANT, "MythBrowser: Couldn't open db. Exiting.");
+        return FRONTEND_EXIT_DB_ERROR;
     }
 
     LanguageSettings::load("mythbrowser");
@@ -114,5 +119,5 @@ int main(int argc, char **argv)
     
     setupKeys();    
     
-    return a.exec();
+    return a.exec(); // exit(a.exec())
 }

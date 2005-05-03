@@ -17,6 +17,7 @@
 using namespace std;
 #include <unistd.h>
 
+#include <mythtv/exitcodes.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/langsettings.h>
@@ -26,6 +27,9 @@ using namespace std;
 #if TRANSCODE_SUPPORT
 #include "mtd.h"
 #endif
+
+#define MTD_EXIT_DEAMONIZING_ERROR                FRONTEND_EXIT_START-1
+#define MTD_EXIT_NO_TRANSCODE_SUPPORT             FRONTEND_EXIT_START-2
 
 int main(int argc, char **argv)
 {
@@ -62,13 +66,13 @@ int main(int argc, char **argv)
                    special_port > 65534)
                 {
                     cerr << "mtd: Bad port number" << endl;
-                    return -1;
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
             } 
             else 
             {
                 cerr << "mtd: Missing argument to -p/--port option\n";
-                return -1;
+                return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
         else
@@ -78,7 +82,7 @@ int main(int argc, char **argv)
                     "-p or --port number  A port number to listen on (default is 2442) " << endl <<
                     "-d or --daemon       Runs mtd as a daemon " << endl <<
                     "-n or --nodaemon     Does not run mtd as a daemon (default)" << endl;
-            return -1;
+            return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
     
@@ -91,7 +95,7 @@ int main(int argc, char **argv)
         if(daemon(0, 1) < 0)
         {
             cerr << "mtd: Failed to run as a daemon. Bailing out." << endl ;
-            return -1;
+            return MTD_EXIT_DEAMONIZING_ERROR;
         }
         cout << endl;
     }
@@ -102,12 +106,16 @@ int main(int argc, char **argv)
     
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    gContext->Init(false);
+    if (!gContext->Init(false))
+    {
+        cerr << "Could not initialize myth context. Exiting." << endl;
+        return FRONTEND_EXIT_NO_MYTHCONTEXT;
+    }
 
     if (!MSqlQuery::testDBConnection())
     {
         cerr << "mtd: Couldn't open database. I go away now. " << endl;
-        return -1;
+        return FRONTEND_EXIT_DB_ERROR;
     }
 
     UpgradeDVDDatabaseSchema();
@@ -149,12 +157,12 @@ int main(int argc, char **argv)
     a.exec();
                                 
     delete gContext;
-    return 0;
+    return FRONTEND_EXIT_OK;
 #else
     argc = argc;
     *argv = *argv; // -Wall
     cerr << "main.o: mtd was built without transcode support. It won't do anything." << endl;
-    return -1;
+    return MTD_EXIT_NO_TRANSCODE_SUPPORT;
 #endif
 }
 
