@@ -679,7 +679,7 @@ void SIParser::ParsePMT(tablehead_t* head, uint8_t* buffer, int size)
             case 0x09:
                 {
                     CAPMTObject cad = ParseDescriptorCA(&buffer[pos], buffer[pos+1]);
-                    p.CA.insert(cad.CASystemID, cad);
+                    p.CA.append(cad);
                     p.hasCA = true;
                 }
                 break;
@@ -753,7 +753,7 @@ void SIParser::ParsePMT(tablehead_t* head, uint8_t* buffer, int size)
                 // so any CA descriptors should *not* be added to the descriptor list.
                 // We need a CAPMTObject to send to the CAM though.
                 CAPMTObject cad = ParseDescriptorCA(descriptor, descriptor_len);
-                e.CA.insert(cad.CASystemID, cad);
+                e.CA.append(cad);
                 p.hasCA = true;
             }
             else

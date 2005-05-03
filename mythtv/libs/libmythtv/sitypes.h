@@ -273,7 +273,7 @@ public:
     uint8_t  Data_Length;
     uint8_t  Data[256];
 };
-typedef QMap<uint16_t, CAPMTObject> CAMap;
+typedef QValueList<CAPMTObject> CAList;
 
 class Descriptor
 {
@@ -299,7 +299,7 @@ public:
     uint16_t PID;
     QString Description;
     QString Language;
-    CAMap CA;
+    CAList CA;
     DescriptorList Descriptors;
     bool Record;
 };
@@ -429,7 +429,7 @@ public:
     uint16_t PCRPID;
     uint16_t ServiceID;
     uint16_t PMTPID;
-    CAMap CA;
+    CAList CA;
     DescriptorList Descriptors;
     QValueList<ElementaryPIDObject> Components;
 

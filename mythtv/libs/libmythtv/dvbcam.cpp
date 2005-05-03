@@ -280,12 +280,12 @@ void DVBCam::SendPMT(PMTObject &pmt, uint8_t cplm)
         const unsigned short *casids = ciHandler->GetCaSystemIds(s);
         if (!casids)
         {
-            ERROR(QString("CA: GetCaSystemIds returned NULL!"));
+            ERROR(QString("CA: GetCaSystemIds returned NULL! (Slot #%1)").arg(s));
             continue;
         }
         if (!*casids)
         {
-            ERROR(QString("CA: CAM supports no CA systems!"));
+            ERROR(QString("CA: CAM supports no CA systems! (Slot #%1)").arg(s));
             continue;
         }
 
@@ -293,13 +293,16 @@ void DVBCam::SendPMT(PMTObject &pmt, uint8_t cplm)
         cCiCaPmt capmt(pmt.ServiceID, cplm);
 
         // Add CA descriptors for the service
-        for (int q = 0; casids[q]; q++)
+        CAList::Iterator ca;
+        for (ca = pmt.CA.begin(); ca!= pmt.CA.end(); ++ca)
         {
-            CAMap::Iterator ca = pmt.CA.find(casids[q]);
-            if (ca != pmt.CA.end())
+            for (int q = 0; casids[q]; q++)
             {
-                GENERAL(QString("CA: Adding CA descriptor: CASID=0x%1, ECM PID=%2").arg((*ca).CASystemID, 0, 16).arg((*ca).PID));
-                capmt.AddCaDescriptor((*ca).CASystemID, (*ca).PID, (*ca).Data_Length, (*ca).Data);
+                if ((*ca).CASystemID == casids[q])
+                {
+                    GENERAL(QString("CA: Adding CA descriptor: CASID=0x%1, ECM PID=%2").arg((*ca).CASystemID, 0, 16).arg((*ca).PID));
+                    capmt.AddCaDescriptor((*ca).CASystemID, (*ca).PID, (*ca).Data_Length, (*ca).Data);
+                }
             }
         }
 
@@ -309,16 +312,18 @@ void DVBCam::SendPMT(PMTObject &pmt, uint8_t cplm)
         {
             if ((*es).Record)
             {
-                GENERAL(QString("CA: Adding stream: %1, PID=%2").arg((*es).Description).arg((*es).PID));
+                GENERAL(QString("CA: Adding elementary stream: %1, PID=%2").arg((*es).Description).arg((*es).PID));
                 capmt.AddElementaryStream((*es).Orig_Type, (*es).PID);
 
-                for (int q = 0; casids[q]; q++)
+                for (ca = (*es).CA.begin(); ca != (*es).CA.end(); ++ca)
                 {
-                    CAMap::Iterator ca = (*es).CA.find(casids[q]);
-                    if (ca != (*es).CA.end())
+                    for (int q = 0; casids[q]; q++)
                     {
-                        GENERAL(QString("CA: Adding CA descriptor: CASID=0x%1,ECM PID=%2").arg((*ca).CASystemID, 0, 16).arg((*ca).PID));
-                        capmt.AddCaDescriptor((*ca).CASystemID, (*ca).PID, (*ca).Data_Length, (*ca).Data);
+                        if ((*ca).CASystemID == casids[q])
+                        {
+                            GENERAL(QString("CA: Adding elementary CA descriptor: CASID=0x%1, ECM PID=%2").arg((*ca).CASystemID, 0, 16).arg((*ca).PID));
+                            capmt.AddCaDescriptor((*ca).CASystemID, (*ca).PID, (*ca).Data_Length, (*ca).Data);
+                        }
                     }
                 }
             }
