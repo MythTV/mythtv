@@ -35,6 +35,7 @@ extern "C" {
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythwidgets.h>
+#include <mythtv/lcddevice.h>
 
 using namespace std;
 
@@ -266,6 +267,7 @@ Ripper::Ripper(MythMainWindow *parent, const char *name)
 
 
     MythPushButton *ripit = new MythPushButton(tr("Import this CD"), firstdiag);
+    ripit->setFocus ();
     vbox->addWidget(ripit);
 
     connect(ripit, SIGNAL(clicked()), this, SLOT(ripthedisc())); 
@@ -606,6 +608,31 @@ void Ripper::reject()
     done(Rejected);
 }
 
+static long int getSectorCount (QString &cddevice, int tracknum)
+{
+    cdrom_drive *device = cdda_identify(cddevice.ascii(), 0, NULL);
+
+    if (!device)
+        return -1;
+
+    if (cdda_open(device))
+    {
+        cdda_close(device);
+        return -1;
+    }
+
+    // we only care about audio tracks
+    if (cdda_track_audiop (device, tracknum)) {
+        cdda_verbose_set(device, CDDA_MESSAGE_FORGETIT, CDDA_MESSAGE_FORGETIT);
+        long int start = cdda_track_firstsector(device, tracknum);
+        long int end = cdda_track_lastsector(device, tracknum);
+        cdda_close(device);
+        return end - start + 1;        
+    }
+
+    return 0;
+}
+
 void Ripper::ripthedisc(void)
 {
     firstdiag->hide();
@@ -661,6 +688,23 @@ void Ripper::ripthedisc(void)
     musicdir = QDir::cleanDirPath(musicdir);
     if (!musicdir.endsWith("/"))
         musicdir += "/";
+
+    totalSectors = 0;
+    totalSectorsDone = 0;
+    for (int trackno = 0; trackno < decoder->getNumTracks(); trackno++)
+    {
+        totalSectors += getSectorCount (cddevice, trackno + 1);
+    }
+    overall->setTotalSteps (totalSectors);
+
+    if (class LCD * lcd = LCD::Get()) 
+    {
+        QString lcd_tots = tr("Importing ") + artistname + " - " + albumname;
+        QPtrList<LCDTextItem> textItems;
+        textItems.setAutoDelete(true);
+        textItems.append(new LCDTextItem(1, ALIGN_CENTERED, lcd_tots, "Generic", false));
+        lcd->switchToGeneric(&textItems);
+    }
 
     for (int trackno = 0; trackno < decoder->getNumTracks(); trackno++)
     {
@@ -726,7 +770,6 @@ void Ripper::ripthedisc(void)
             // Set the flag to show that we have ripped new files
             somethingwasripped = true;
 
-            overall->setProgress(trackno + 1);
             qApp->processEvents();
 
             delete encoder;
@@ -829,11 +872,18 @@ int Ripper::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
         if (every15 <= 0) 
         {
             every15 = 15;
-            current->setProgress(curpos - start);
+            current->setProgress(curpos - start);           
+            overall->setProgress(totalSectorsDone + (curpos - start));
+            if (class LCD * lcd = LCD::Get()) 
+            {
+                float fProgress = (float)(totalSectorsDone + (curpos - start))/totalSectors;
+                lcd->setGenericProgress(fProgress);
+            }
             qApp->processEvents();
         }
     }
 
+    totalSectorsDone += end - start + 1;
     current->setProgress(end);
     qApp->processEvents();
         

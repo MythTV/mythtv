@@ -71,6 +71,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void showVolume(bool on_or_off);
     void wipeTrackInfo();
     void toggleFullBlankVisualizer();
+    void end();
 
     // popup menu
     void showMenu();

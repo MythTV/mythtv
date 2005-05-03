@@ -68,8 +68,8 @@ static HostLineEdit *TreeLevels()
     gc->setValue("splitartist artist album title");
     gc->setHelpText(QObject::tr("Order in which to sort the Music "
                     "Tree. Possible values are a space-separated list of "
-                    "genre, splitartist, artist, album, and title OR the "
-                    "keyword \"directory\" to indicate that "
+                    "genre, splitartist, splitartist1, artist, album, and "
+                    "title OR the keyword \"directory\" to indicate that "
                     "the onscreen tree mirrors the filesystem."));
     return gc;
 };

@@ -63,6 +63,8 @@ class Ripper : public MythDialog
     QProgressBar *current;
 
     int totaltracks;
+    long int totalSectors;
+    long int totalSectorsDone;
 
     QString albumname, artistname, genrename;
 

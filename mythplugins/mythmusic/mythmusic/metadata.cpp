@@ -16,7 +16,7 @@ struct FieldSplitInfo {
    QString dispStr;
 };
 
-static FieldSplitInfo splitArray[] =
+static FieldSplitInfo splitArray4[] =
 { 
   {"ABCDE", " (A B C D E)"},
   {"FGHIJ", " (F G H I J)"},
@@ -24,10 +24,40 @@ static FieldSplitInfo splitArray[] =
   {"PQRST", " (P Q R S T)"},
   {"UVWXYZ", " (U V W X Y Z)"}
 };
+const int kSplitArray4_Max = sizeof splitArray4 / sizeof splitArray4[0];
+
+static FieldSplitInfo splitArray1[] =
+{ 
+  {"A", " (A)"},
+  {"B", " (B)"},
+  {"C", " (C)"},
+  {"D", " (D)"},
+  {"E", " (E)"},
+  {"F", " (F)"},
+  {"G", " (G)"},
+  {"H", " (H)"},
+  {"I", " (I)"},
+  {"J", " (J)"},
+  {"K", " (K)"},
+  {"L", " (L)"},
+  {"M", " (M)"},
+  {"N", " (N)"},
+  {"O", " (O)"},
+  {"P", " (P)"},
+  {"Q", " (Q)"},
+  {"R", " (R)"},
+  {"S", " (S)"},
+  {"T", " (T)"},
+  {"U", " (U)"},
+  {"V", " (V)"},
+  {"W", " (W)"},
+  {"X", " (X)"},
+  {"Y", " (Y)"},
+  {"Z", " (Z)"},
+};
+const int kSplitArray1_Max = sizeof splitArray1 / sizeof splitArray1[0];
 
 static QString thePrefix = "the ";
-
-const int kSplitArray_Max = sizeof splitArray / sizeof splitArray[0];
 
 bool operator==(const Metadata& a, const Metadata& b)
 {
@@ -449,12 +479,33 @@ void Metadata::getField(const QString &field, QString *data)
         else
             firstchar = FormatArtist().left(1).upper();
 
-        for (int i = 0; i < kSplitArray_Max; i++)
+        for (int i = 0; i < kSplitArray4_Max; i++)
         {
-            if (splitArray[i].testStr.contains(firstchar))
+            if (splitArray4[i].testStr.contains(firstchar))
             {
                 set = true;
-                *data = QObject::tr("Artists") + splitArray[i].dispStr;
+                *data = QObject::tr("Artists") + splitArray4[i].dispStr;
+            }
+        }
+
+        if (!set)
+            *data = QObject::tr("Artists") + " (" + firstchar + ")";
+    }
+    else if (field == "splitartist1")
+    {
+        bool set = false;
+        QString firstchar;
+        if (FormatArtist().left(4).lower() == thePrefix)
+            firstchar = FormatArtist().mid(4, 1).upper();
+        else
+            firstchar = FormatArtist().left(1).upper();
+
+        for (int i = 0; i < kSplitArray1_Max; i++)
+        {
+            if (splitArray1[i].testStr.contains(firstchar))
+            {
+                set = true;
+                *data = QObject::tr("Artists") + splitArray1[i].dispStr;
             }
         }
 

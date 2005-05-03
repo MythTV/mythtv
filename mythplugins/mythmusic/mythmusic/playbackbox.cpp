@@ -129,7 +129,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
         // Set please wait on the LCD
         QPtrList<LCDTextItem> textItems;
         textItems.setAutoDelete(true);
-
+        
         textItems.append(new LCDTextItem(1, ALIGN_CENTERED, "Please Wait", 
                          "Generic"));
         lcd->switchToGeneric(&textItems);
@@ -184,6 +184,11 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     // Ready to go. Let's update the foreground just to be safe.
 
     updateForeground();
+
+    if (class LCD * lcd = LCD::Get())
+    {
+        lcd->switchToTime();
+    }
 }
 
 PlaybackBoxMusic::~PlaybackBoxMusic(void)
@@ -205,6 +210,8 @@ PlaybackBoxMusic::~PlaybackBoxMusic(void)
         gContext->SaveSetting("RepeatMode", "all");
     else
         gContext->SaveSetting("RepeatMode", "none");
+    if (class LCD * lcd = LCD::Get())
+        lcd->switchToTime();
 }
 
 void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
@@ -658,19 +665,16 @@ void PlaybackBoxMusic::checkForPlaylists()
             updateForeground();
             mainvisual->setVisual(visual_mode);
             
-            if(curMeta)
+            if (curMeta) 
             {
-                if ( class LCD *lcd = LCD::Get())
+                if (class LCD * lcd = LCD::Get()) 
                 {
-                    //Show the artist stuff on the LCD
+                    // Set track info on the LCD
                     QPtrList<LCDTextItem> textItems;
                     textItems.setAutoDelete(true);
-
-                    textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
-                                    curMeta->Artist() +" [" + 
-                                    curMeta->Album() + "] " +
-                                    curMeta->Title(), "Generic", true));
-                    lcd->switchToGeneric(&textItems);
+                    lcd->switchToMusic(curMeta->Artist (), 
+                                       curMeta->Album (), 
+                                       curMeta->Title ());
                 }
             }
         }    
@@ -744,15 +748,9 @@ void PlaybackBoxMusic::showVolume(bool on_or_off)
                         if (class LCD * lcd = LCD::Get())
                         {
                             //Show the artist stuff on the LCD
-                            QPtrList<LCDTextItem> textItems;
-                            textItems.setAutoDelete(true);
-
-                            textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
-                                             curMeta->FormatArtist() +" [" + 
-                                             curMeta->Album() + "] " +
-                                             curMeta->FormatTitle(), "Generic", true));
-
-                            lcd->switchToGeneric(&textItems);
+                            lcd->switchToMusic(curMeta->Artist (), 
+                                               curMeta->Album (), 
+                                               curMeta->Title ());
                             lcd_volume_visible = false;
                         }
                     }
@@ -1062,11 +1060,15 @@ void PlaybackBoxMusic::next()
         // and down the tree.
         if (music_tree_list->nextActive(true, show_whole_tree))
             music_tree_list->activate();
+        else 
+            end();
     }
     else
     {
         if (music_tree_list->nextActive(false, show_whole_tree))
-            music_tree_list->activate();
+            music_tree_list->activate(); 
+        else 
+            end();
     }
      
     if (visualizer_status > 0 && cycle_visualizer)
@@ -1330,6 +1332,14 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
     {
         case OutputEvent::Playing:
         {
+            if (class LCD * lcd = LCD::Get()) {
+                // Set track info on the LCD
+                QPtrList<LCDTextItem> textItems;
+                textItems.setAutoDelete(true);
+                lcd->switchToMusic(curMeta->Artist (), 
+                                   curMeta->Album (), 
+                                   curMeta->Title ());
+            }
             statusString = tr("Playing stream.");
             break;
         }
@@ -1376,17 +1386,7 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
                 {
                     float percent_heard = ((float)rs / 
                                            (float)curMeta->Length()) * 1000.0;
-                    // Changed to use the Channel stuff as it allows us to
-                    // display Artist, Album, and Title, as well as a progress bar
-                    lcd->setGenericProgress(percent_heard);
-
-                    QPtrList<LCDTextItem> textItems;
-                    textItems.setAutoDelete(true);
-
-                    textItems.append(new LCDTextItem(3, ALIGN_RIGHT,
-                                                     time_string, "Generic"));
-
-                    lcd->outputText(&textItems);
+                    lcd->setMusicProgress(time_string, percent_heard);
                 }
             }
 
@@ -1511,14 +1511,9 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
         if (class LCD * lcd = LCD::Get())
         {
             // Set the Artist and Tract on the LCD
-            QPtrList<LCDTextItem> textItems;
-            textItems.setAutoDelete(true);
-
-            textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
-                             curMeta->FormatArtist() + " [" + curMeta->Album() + "] " +
-                             curMeta->FormatTitle(), "Generic", true));
-
-            lcd->outputText(&textItems);
+            lcd->switchToMusic(curMeta->Artist (), 
+                               curMeta->Album (), 
+                               curMeta->Title ());
         }
 
         maxTime = curMeta->Length() / 1000;
@@ -1602,6 +1597,12 @@ void PlaybackBoxMusic::toggleFullBlankVisualizer()
         visual_mode_timer->stop();
         setUpdatesEnabled(false);
     }
+}
+
+void PlaybackBoxMusic::end()
+{
+    if (class LCD * lcd = LCD::Get ()) 
+        lcd->switchToTime ();
 }
 
 void PlaybackBoxMusic::wireUpTheme()
