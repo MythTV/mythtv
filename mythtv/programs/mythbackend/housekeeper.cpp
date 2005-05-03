@@ -226,7 +226,7 @@ void HouseKeeper::runFillDatabase()
         for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
             close(i);
         system(command.ascii());
-        _exit(0);
+        _exit(0); // this exit is ok, non-error exit from system command.
     }
 }
 

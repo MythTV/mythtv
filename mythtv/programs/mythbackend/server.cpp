@@ -7,11 +7,6 @@ using namespace std;
 MythServer::MythServer(int port, QObject *parent)
           : QServerSocket(port, 1, parent)
 {
-    if (!ok())
-    {
-        cerr << "Failed to bind port: " << port << endl;
-        exit(6);
-    }
 }
 
 void MythServer::newConnection(int socket)

@@ -21,9 +21,10 @@ using namespace std;
 #include "remoteutil.h"
 #include "housekeeper.h"
 
-#include "libmythtv/programinfo.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
+#include "libmyth/exitcodes.h"
+#include "libmythtv/programinfo.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jobqueue.h"
 
@@ -35,8 +36,9 @@ QString pidfile;
 QString lockfile_location;
 HouseKeeper *housekeeping = NULL;
 
-bool setupTVs(bool ismaster)
+bool setupTVs(bool ismaster, bool &error)
 {
+    error = false;
     QString localhostname = gContext->GetHostName();
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -107,7 +109,7 @@ bool setupTVs(bool ismaster)
                 cerr << msg;
                 gContext->LogEntry("mythbackend", LP_CRITICAL,
                                    "Problem with capture cards", msg);
-                exit(2);
+                error = true;
             }
 
             if (!ismaster)
@@ -191,7 +193,7 @@ int main(int argc, char **argv)
                 if (logfile.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -l/--logfile option\n";
-                    return -1;
+                    return BACKEND_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
@@ -208,7 +210,7 @@ int main(int argc, char **argv)
                 if (pidfile.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -p/--pidfile option\n";
-                    return -1;
+                    return BACKEND_EXIT_INVALID_CMDLINE;
                 } 
                 else
                 {
@@ -231,7 +233,7 @@ int main(int argc, char **argv)
                 if (temp.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -v/--verbose option\n";
-                    return -1;
+                    return BACKEND_EXIT_INVALID_CMDLINE;
                 } 
                 else
                 {
@@ -327,7 +329,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
-                return -1;
+                return BACKEND_EXIT_INVALID_CMDLINE;
             }
         } 
         else if (!strcmp(a.argv()[argpos],"--printsched"))
@@ -353,7 +355,7 @@ int main(int argc, char **argv)
         else if (!strcmp(a.argv()[argpos],"--version"))
         {
             cout << MYTH_BINARY_VERSION << endl;
-            exit(0);
+            return BACKEND_EXIT_OK;
         }
         else
         {
@@ -376,7 +378,7 @@ int main(int argc, char **argv)
                     "--resched                      Force the scheduler to update" << endl <<
                     "--nosched                      Do not perform any scheduling" << endl <<
                     "--version                      Version information" << endl;
-            return -1;
+            return BACKEND_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -390,7 +392,7 @@ int main(int argc, char **argv)
         {
             perror(logfile.ascii());
             cerr << "Error opening logfile\n";
-            return -1;
+            return BACKEND_EXIT_OPENING_LOGFILE_ERROR;
         }
     }
     
@@ -402,7 +404,7 @@ int main(int argc, char **argv)
         {
             perror(pidfile.ascii());
             cerr << "Error opening pidfile";
-            return -1;
+            return BACKEND_EXIT_OPENING_PIDFILE_ERROR;
         }
     }
 
@@ -413,7 +415,7 @@ int main(int argc, char **argv)
         if (daemon(0, 1) < 0)
         {
             perror("daemon");
-            return -1;
+            return BACKEND_EXIT_DEAMONIZING_ERROR;
         }
 
 
@@ -436,10 +438,10 @@ int main(int argc, char **argv)
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    if(!gContext->Init(false))
+    if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return -1;
+        return BACKEND_EXIT_NO_MYTHCONTEXT;
     }
     gContext->SetBackend(true);
 
@@ -448,7 +450,7 @@ int main(int argc, char **argv)
     if (!UpgradeTVDatabaseSchema())
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
-        return -1;
+        return BACKEND_EXIT_DB_OUTOFDATE;
     }    
 
     if (printsched || testsched)
@@ -470,23 +472,25 @@ int main(int argc, char **argv)
         print_verbose_messages |= VB_SCHEDULE;
         sched->PrintList(true);
         cleanup();
-        exit(0);
+        return BACKEND_EXIT_OK;
     }
 
     if (resched)
     {
         gContext->SetBackend(false);
 
+        bool ok = false;
         if (gContext->ConnectToMasterServer())
         {
             VERBOSE(VB_IMPORTANT, "Connected to master for reschedule");
             ScheduledRecording::signalChange(-1);
+            ok = true;
         }
         else
             VERBOSE(VB_IMPORTANT, "Cannot connect to master for reschedule");
 
         cleanup();
-        exit(0);
+        return (ok) ? BACKEND_EXIT_OK : BACKEND_EXIT_NO_CONNECT;
     }
 
     if (printexpire)
@@ -495,7 +499,7 @@ int main(int argc, char **argv)
         expirer->FillExpireList();
         expirer->PrintExpireList();
         cleanup();
-        exit(0);
+        return BACKEND_EXIT_OK;
     }
 
     int port = gContext->GetNumSetting("BackendServerPort", 6543);
@@ -511,7 +515,7 @@ int main(int argc, char **argv)
         cerr << "No setting found for this machine's BackendServerIP.\n"
              << "Please run setup on this machine and modify the first page\n"
              << "of the general settings.\n";
-        exit(3);
+        return BACKEND_EXIT_NO_IP_ADDRESS;
     }
 
     if (masterip == myip)
@@ -532,7 +536,10 @@ int main(int argc, char **argv)
                            "MythBackend started as a slave backend", "");
     }
  
-    bool runsched = setupTVs(ismaster);
+    bool fatal_error = false;
+    bool runsched = setupTVs(ismaster, fatal_error);
+    if (fatal_error)
+        return BACKEND_EXIT_CAP_CARD_SETUP_ERROR;
 
     if (ismaster && runsched && !nosched)
     {
@@ -567,7 +574,7 @@ int main(int argc, char **argv)
                  << "Be sure that \'" << gContext->GetSetting("RecordFilePrefix")
                  << "\' exists and that both \nthe directory and that "
                  << "file are writeable by this user.\n";
-            return -1;
+            return BACKEND_EXIT_OPENING_VLOCKFILE_ERROR;
         }
     }
 
@@ -589,5 +596,5 @@ int main(int argc, char **argv)
     gContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");
     cleanup();
 
-    return 0;
+    return BACKEND_EXIT_OK;
 }

@@ -26,6 +26,7 @@ using namespace std;
 #include <sys/mount.h>
 #endif
 
+#include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
 #include "libmyth/mythdbcon.h"
@@ -113,12 +114,25 @@ MainServer::MainServer(bool master, int port, int statusport,
     masterBackendOverride = gContext->GetSetting("MasterBackendOverride", 0);
 
     mythserver = new MythServer(port);
+    if (!mythserver->ok())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Failed to bind port %1. Exiting.")
+                .arg(port));
+        exit(BACKEND_BUGGY_EXIT_NO_BIND_MAIN);
+    }
+
     connect(mythserver, SIGNAL(newConnect(RefSocket *)), 
             SLOT(newConnection(RefSocket *)));
     connect(mythserver, SIGNAL(endConnect(RefSocket *)), 
             SLOT(endConnection(RefSocket *)));
 
     statusserver = new HttpStatus(this, statusport);    
+    if (!statusserver->ok())
+    { 
+        VERBOSE(VB_IMPORTANT, QString("Failed to bind to port %1. Exiting.")
+                .arg(statusport));
+        exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
+    }
 
     gContext->addListener(this);
 
@@ -639,7 +653,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         if (iter == encoderList->end())
         {
             VERBOSE(VB_ALL, "Unknown encoder.");
-            exit(4);
+            exit(BACKEND_BUGGY_EXIT_UNKNOWN_ENC);
         }
 
         EncoderLink *enc = iter.data();
@@ -2502,7 +2516,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     if (iter == encoderList->end())
     {
         VERBOSE(VB_ALL, QString("Unknown encoder: %1").arg(recnum));
-        exit(0);
+        exit(BACKEND_BUGGY_EXIT_UNKNOWN_ENC);
     }
 
     EncoderLink *enc = iter.data();
@@ -2584,7 +2598,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     {
         VERBOSE(VB_ALL, QString("Unknown file transfer socket: %1")
                                .arg(recnum));
-        exit(0);
+        exit(BACKEND_BUGGY_EXIT_UNKNOWN_FILE_SOCK);
     }
 
     QString command = slist[1];

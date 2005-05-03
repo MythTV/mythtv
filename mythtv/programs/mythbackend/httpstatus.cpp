@@ -16,12 +16,6 @@ HttpStatus::HttpStatus(MainServer *parent, int port)
           : QServerSocket(port, 1)
 {
     m_parent = parent;
-
-    if (!ok())
-    { 
-        cerr << "Failed to bind to port " << port << endl;
-        exit(0);
-    }
 }
 
 void HttpStatus::newConnection(int socket)

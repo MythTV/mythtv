@@ -26,6 +26,7 @@ using namespace std;
 #include "libmythtv/programinfo.h"
 #include "libmythtv/scheduledrecording.h"
 #include "encoderlink.h"
+#include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
 #include "mainserver.h"
 #include "remoteutil.h"
@@ -84,7 +85,7 @@ void Scheduler::verifyCards(void)
     {
         cerr << "ERROR: no capture cards are defined in the database.\n";
         cerr << "Perhaps you should read the installation instructions?\n";
-        exit(5);
+        exit(BACKEND_BUGGY_EXIT_NO_CAP_CARD);
     }
 
     query.prepare("SELECT sourceid,name FROM videosource ORDER BY sourceid;");
@@ -115,8 +116,9 @@ void Scheduler::verifyCards(void)
 
     if (numsources <= 0)
     {
-        cerr << "ERROR: No channel sources defined in the database\n";
-        exit(0);
+        VERBOSE(VB_IMPORTANT, "ERROR: No channel sources "
+                "defined in the database");
+        exit(BACKEND_BUGGY_EXIT_NO_CHAN_DATA);
     }
 }
 
