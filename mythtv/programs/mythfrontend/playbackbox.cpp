@@ -123,8 +123,15 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     popup = NULL;
     curitem = NULL;
     delitem = NULL;
- 
+
+    // titleView controls showing titles in group list 
     titleView = true;
+
+    // useCategories controls showing categories in group list
+    useCategories = false;
+
+    // useRecGroups controls showing of recording groups in group list
+    useRecGroups = false;
 
     if (gContext->GetNumSetting("UseArrowAccels", 1))
         arrowAccel = true;
@@ -154,6 +161,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         recGroupType[recGroup] = "category";
     else
         recGroupType[recGroup] = "recgroup";
+
+    setDefaultView(gContext->GetNumSetting("DisplayGroupDefaultView", 0));
 
     fullRect = QRect(0, 0, size().width(), size().height());
     listRect = QRect(0, 0, 0, 0);
@@ -266,6 +275,28 @@ PlaybackBox::~PlaybackBox(void)
 
     if (conv_rgba_buf)
         delete [] conv_rgba_buf;
+}
+
+void PlaybackBox::setDefaultView(int defaultView)
+{
+    switch (defaultView)
+    {
+        default:
+        case TitlesOnly: titleView = true; useCategories = false; 
+                         useRecGroups = false; break;
+        case TitlesCategories: titleView = true; useCategories = true; 
+                               useRecGroups = false; break;
+        case TitlesCategoriesRecGroups: titleView = true; useCategories = true;
+                                        useRecGroups = true; break;
+        case TitlesRecGroups: titleView = true; useCategories = false; 
+                              useRecGroups = true; break;
+        case Categories: titleView = false; useCategories = true; 
+                         useRecGroups = false; break;
+        case CategoriesRecGroups: titleView = false; useCategories = true; 
+                                  useRecGroups = true; break;
+        case RecGroups: titleView = false; useCategories = false; 
+                        useRecGroups = true; break;
+    }
 }
 
 /* blocks until playing has stopped */
@@ -1250,6 +1281,9 @@ bool PlaybackBox::FillList()
                  (p->category == recGroup ) &&
                  ( !recGroupPwCache.contains(p->recgroup))))
             {
+                if ((titleView) || (useCategories) || (useRecGroups))
+                    progLists[""].prepend(p);
+
                 asKey = p->chanid + ":" + p->startts.toString(Qt::ISODate);
                 if (asCache.contains(asKey))
                     p->availableStatus = asCache[asKey];
@@ -1258,25 +1292,29 @@ bool PlaybackBox::FillList()
 
                 if (titleView) // Normal title view 
                 {
-                    progLists[""].prepend(p);
                     progLists[p->title].prepend(p);
                     sTitle = p->title;
                     sTitle.remove(prefixes);
                     sortedList[sTitle] = p->title;
                 } 
-                else 
+
+                if (useRecGroups) // Show recording groups                 
                 { 
-                    progLists[""].prepend(p);
                     progLists[p->recgroup].prepend(p);
                     sortedList[p->recgroup] = p->recgroup;
-                    // If categories are used as recording groups...
-                    if (catsAsRecGroups)
-                    {
-                        // Recording groups and categories overlap so set flag
+
+                    // If another view is also used, unset autodelete as another group will do it.
+                    if ((useCategories) || (titleView))
+                        progLists[p->recgroup].setAutoDelete(false);
+                }
+
+                if (useCategories) // Show categories
+                {
+                    progLists[p->category].prepend(p);
+                    sortedList[p->category] = p->category;
+                    // If another view is also used, unset autodelete as another group will do it
+                    if ((useRecGroups) || (titleView)) 
                         progLists[p->category].setAutoDelete(false);
-                        progLists[p->category].prepend(p);
-                        sortedList[p->category] = p->category;
-                    }
                 }
             }
             else
@@ -1300,26 +1338,22 @@ bool PlaybackBox::FillList()
 
     QString episodeSort = gContext->GetSetting("PlayBoxEpisodeSort", "Date");
 
-    if (titleView)
+    if (episodeSort == "OrigAirDate")
     {
-        if (episodeSort == "OrigAirDate")
+        QMap<QString, ProgramList>::Iterator Iprog;
+        for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
         {
-            QMap<QString, ProgramList>::Iterator Iprog;
-            for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
-            {
-                if (!Iprog.key().isEmpty())
-                    Iprog.data().Sort(comp_originalAirDate);
-            }
-            
+            if (!Iprog.key().isEmpty())
+                Iprog.data().Sort(comp_originalAirDate);
         }
-        else if (episodeSort == "Id")
+    }
+    else if (episodeSort == "Id")
+    {
+        QMap<QString, ProgramList>::Iterator Iprog;
+        for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
         {
-            QMap<QString, ProgramList>::Iterator Iprog;
-            for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
-            {
-                if (!Iprog.key().isEmpty())
-                    Iprog.data().Sort(comp_programid);
-            }
+            if (!Iprog.key().isEmpty())
+                Iprog.data().Sort(comp_programid);
         }
     }
     
@@ -1357,12 +1391,12 @@ bool PlaybackBox::FillList()
         {
             p = l->at(i);
 
-            if (episodeSort == "OrigAirDate" && titleView && titleIndex > 0)
+            if (episodeSort == "OrigAirDate" && titleIndex > 0)
             {
                 if (oldoriginalAirDate > p->originalAirDate)
                     break;
             }
-            else if (episodeSort == "Id" && titleView && titleIndex > 0)
+            else if (episodeSort == "Id" && titleIndex > 0)
             {
                 if (oldprogramid > p->programid)
                     break;
@@ -1651,19 +1685,15 @@ void PlaybackBox::showMenu()
                                   MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 
-    QButton *topButton = popup->addButton(tr("Change Group View"), this,
+    QButton *topButton = popup->addButton(tr("Change Group Filter"), this,
                      SLOT(showRecGroupChooser()));
+
+    popup->addButton(tr("Change Group View"), this, 
+                     SLOT(showViewChanger()));
 
     if (recGroupType[recGroup] == "recgroup")
         popup->addButton(tr("Change Group Password"), this,
                          SLOT(showRecGroupPasswordChanger()));
-
-    if (titleView)
-        popup->addButton(tr("Show group list as recording groups"), this,
-                         SLOT(toggleTitleView()));
-    else
-        popup->addButton(tr("Show group list as titles"), this,
-                         SLOT(toggleTitleView()));
 
     if (playList.count())
     {
@@ -1674,17 +1704,8 @@ void PlaybackBox::showMenu()
     {
         if (inTitle)
         {
-            if (titleView)
-            {
-                popup->addButton(
-                    tr("Add this Category/Title Group to Playlist"), this,
-                       SLOT(togglePlayListTitle()));
-            }
-            else 
-            {
-                popup->addButton(tr("Add this Recording Group to Playlist"),
-                                 this, SLOT(togglePlayListTitle()));
-            }
+            popup->addButton(tr("Add this Group to Playlist"), this,
+                             SLOT(togglePlayListTitle()));
         }
         else if (curitem->availableStatus == asAvailable)
         {
@@ -3503,6 +3524,73 @@ void PlaybackBox::showIconHelp(void)
     setActiveWindow();
 }
 
+void PlaybackBox::showViewChanger(void)
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+
+    MythPopupBox tmpPopup(gContext->GetMainWindow(),
+                                              true, popupForeground,
+                                              popupBackground, popupHighlight,
+                                              "change group view");
+    choosePopup = &tmpPopup;
+
+    QLabel *label = choosePopup->addLabel(tr("Change Group View"),
+                                  MythPopupBox::Large, false);
+    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+
+    QStringList views;
+
+    views += tr("Show Titles only");
+    views += tr("Show Titles and Categories");
+    views += tr("Show Titles, Categories, and Recording Groups");
+    views += tr("Show Titles and Recording Groups");
+    views += tr("Show Categories only");
+    views += tr("Show Categories and Recording Groups");
+    views += tr("Show Recording Groups only");
+
+    chooseComboBox = new MythComboBox(false, choosePopup);
+    chooseComboBox->insertStringList(views);
+    chooseComboBox->setAcceptOnSelect(true);
+    choosePopup->addWidget(chooseComboBox);
+
+    connect(chooseComboBox, SIGNAL(accepted(int)), this,
+            SLOT(chooseSetGroupView()));
+
+    chooseComboBox->setFocus();
+    choosePopup->ExecPopup();
+
+    delete chooseComboBox;
+    chooseComboBox = NULL;
+
+    skipUpdate = false;
+    skipCnt = 2;
+    update(fullRect);
+
+    setActiveWindow();
+}
+
+void PlaybackBox::chooseSetGroupView(void)
+{
+    if (!chooseComboBox)
+        return;
+
+    setDefaultView(chooseComboBox->currentItem());
+
+    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
+    titleIndex = 0;
+    progIndex = 0;
+    playList.clear();
+
+    connected = FillList();
+    skipUpdate = false;
+    update(fullRect);
+    choosePopup->done(0);
+}
+
 void PlaybackBox::showRecGroupChooser(void)
 {
     if (expectingPopup)
@@ -3542,6 +3630,7 @@ void PlaybackBox::showRecGroupChooser(void)
         groups += recGroup;
 
     if (query.isActive() && query.size() > 0)
+    {
         while (query.next())
         {
             QString key = QString::fromUtf8(query.value(0).toString());
@@ -3555,23 +3644,23 @@ void PlaybackBox::showRecGroupChooser(void)
                 recGroupType[key] = "recgroup";
             }
         }
+    }
 
-    if (gContext->GetNumSetting("UseCategoriesAsRecGroups"))
+    query.prepare("SELECT DISTINCT category from recorded;");
+
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
-        query.prepare("SELECT DISTINCT category from recorded;");
+        while (query.next())
+        {
+            QString key = QString::fromUtf8(query.value(0).toString());
 
-        if (query.exec() && query.isActive() && query.size() > 0)
-            while (query.next())
+            if ((key != recGroup) && (key != ""))
             {
-                QString key = QString::fromUtf8(query.value(0).toString());
-
-                if ((key != recGroup) && (key != ""))
-                {
-                    groups += key;
-                    if ( !recGroupType.contains(key))
-                        recGroupType[key] = "category";
-                }
+                groups += key;
+                if (!recGroupType.contains(key))
+                    recGroupType[key] = "category";
             }
+        }
     }
 
     if (recGroup != "All Programs")

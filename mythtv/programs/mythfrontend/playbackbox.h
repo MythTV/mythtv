@@ -27,6 +27,9 @@ class PlaybackBox : public MythDialog
     Q_OBJECT
   public:
     typedef enum { Play, Delete } BoxType;
+    typedef enum { TitlesOnly, TitlesCategories, TitlesCategoriesRecGroups,
+                   TitlesRecGroups, Categories, CategoriesRecGroups, RecGroups} ViewType;
+
 
     PlaybackBox(BoxType ltype, MythMainWindow *parent, const char *name = 0);
    ~PlaybackBox(void);
@@ -91,6 +94,7 @@ class PlaybackBox : public MythDialog
 
     void chooseComboBoxChanged(void);
     void chooseSetViewGroup(void);
+    void chooseSetGroupView(void);
     void changeComboBoxChanged(void);
     void changeSetRecGroup(void);
     void changeRecGroupPassword();
@@ -123,6 +127,7 @@ class PlaybackBox : public MythDialog
     void togglePlayListItem(void);
     void playSelectedPlaylist(bool random);
     void doPlayList(void);
+    void showViewChanger(void);
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
@@ -298,6 +303,10 @@ class PlaybackBox : public MythDialog
 
     bool playingSomething;
     bool titleView;
+
+    bool useRecGroups;
+    bool useCategories;
+    void setDefaultView(int defaultView);
 
     yuv2rgb_fun    conv_yuv2rgba;
     unsigned char *conv_rgba_buf;

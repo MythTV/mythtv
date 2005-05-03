@@ -221,23 +221,38 @@ static GlobalLineEdit *AllRecGroupPassword()
 static HostComboBox *DisplayRecGroup()
 {
     HostComboBox *gc = new HostComboBox("DisplayRecGroup");
-    gc->setLabel(QObject::tr("Default Recording Group to display"));
+    gc->setLabel(QObject::tr("Default group filter to apply"));
 
     gc->addSelection(QObject::tr("All Programs"), QString("All Programs"));
     gc->addSelection(QObject::tr("Default"), QString("Default"));
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT DISTINCT recgroup from recorded");
+    query.prepare("SELECT DISTINCT recgroup from recorded;");
 
     if (query.exec() && query.isActive() && query.size() > 0)
+    {
         while (query.next())
+        {
             if (query.value(0).toString() != "Default")
             {
                 QString recgroup = QString::fromUtf8(query.value(0).toString());
                 gc->addSelection(recgroup, recgroup);
             }
+        }
+    }
 
-    gc->setHelpText(QObject::tr("Default Recording Group to display "
+    query.prepare("SELECT DISTINCT category from recorded;");
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            QString key = QString::fromUtf8(query.value(0).toString());
+            gc->addSelection(key, key);
+        }
+    }
+
+    gc->setHelpText(QObject::tr("Default group filter to apply "
                     "on the View Recordings screen."));
     return gc;
 }
@@ -245,23 +260,30 @@ static HostComboBox *DisplayRecGroup()
 static HostCheckBox *RememberRecGroup()
 {
     HostCheckBox *gc = new HostCheckBox("RememberRecGroup");
-    gc->setLabel(QObject::tr("Save current Recording Group view when changed"));
+    gc->setLabel(QObject::tr("Save current group filter when changed"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("Remember the last selected Recording "
-                    "Group instead of displaying the Default group "
+    gc->setHelpText(QObject::tr("Remember the last selected filter "
+                    "instead of displaying the default filter "
                     "whenever you enter the playback screen."));
 
     return gc;
 }
 
-static HostCheckBox *UseCategoriesAsRecGroups()
+static HostComboBox *DefaultView()
 {
-    HostCheckBox *gc = new HostCheckBox("UseCategoriesAsRecGroups");
-    gc->setLabel(QObject::tr("Use program categories as display groups"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Add the list of program categories to the "
-                    "list of Recording Groups used for display.  Only programs "
-                    "in non-password protected groups will be listed."));
+    HostComboBox *gc = new HostComboBox("DisplayGroupDefaultView");
+    gc->setLabel(QObject::tr("Default View"));
+
+    gc->addSelection(QObject::tr("Show Titles only"), "0");
+    gc->addSelection(QObject::tr("Show Titles and Categories"), "1");
+    gc->addSelection(QObject::tr("Show Titles, Categories, and Recording Groups"), "2");
+    gc->addSelection(QObject::tr("Show Titles and Recording Groups"), "3");
+    gc->addSelection(QObject::tr("Show Categories only"), "4");
+    gc->addSelection(QObject::tr("Show Categories and Recording Groups"), "5");
+    gc->addSelection(QObject::tr("Show Recording Groups only"), "6");
+
+    gc->setHelpText(QObject::tr("Select what type of grouping to show on the Watch Recordings screen "
+                    "by default."));
 
     return gc;
 }
@@ -269,10 +291,10 @@ static HostCheckBox *UseCategoriesAsRecGroups()
 static HostCheckBox *UseGroupNameAsAllPrograms()
 {
     HostCheckBox *gc = new HostCheckBox("DispRecGroupAsAllProg");
-    gc->setLabel(QObject::tr("Show group name instead of \"All Programs\""));
+    gc->setLabel(QObject::tr("Show filter name instead of \"All Programs\""));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Use the name of the display group currently "
-                    "being shown in place of the term \"All Programs\" in the "
+    gc->setHelpText(QObject::tr("Use the name of the display filter currently "
+                    "applied in place of the term \"All Programs\" in the "
                     "playback screen."));
     return gc;
 }
@@ -2835,8 +2857,8 @@ PlaybackSettings::PlaybackSettings()
     pbox2->addChild(AllRecGroupPassword());
     pbox2->addChild(DisplayRecGroup());
     pbox2->addChild(RememberRecGroup());
-    pbox2->addChild(UseCategoriesAsRecGroups());
     pbox2->addChild(UseGroupNameAsAllPrograms());
+    pbox2->addChild(DefaultView());
     addChild(pbox2);
 
     addChild(new HwDecSettings(use_mpeg));
