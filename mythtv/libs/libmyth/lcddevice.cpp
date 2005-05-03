@@ -17,8 +17,18 @@
 #include <qapplication.h>
 #include <qregexp.h>
 
-//#define LCD_DEVICE_DEBUG
+/*
+  LCD_DEVICE_DEBUG control how much debug info we get
+  0 = none
+  1 = LCDd info 
+  2 = screen switchinfo info
+  10 = every command sent and error received
+ */
+#define LCD_DEVICE_DEBUG 0
 #define LCD_START_COL 3
+
+#define LCD_VERSION_4 1
+#define LCD_VERSION_5 2
 
 LCD::LCD()
    :QObject(NULL, "LCD")
@@ -28,7 +38,7 @@ LCD::LCD()
     // Note that this does *not* include opening the socket and initiating 
     // communications with the LDCd daemon.
 
-#ifdef LCD_DEVICE_DEBUG
+#if LCD_DEVICE_DEBUG > 0
     cout << "lcddevice: An LCD object now exists (LCD() was called)" << endl ;
 #endif
 
@@ -104,6 +114,31 @@ class LCD * LCD::Get(void)
     if (m_lcd == NULL && m_server_unavailable == false)
         m_lcd = new LCD;
     return m_lcd;
+}
+
+void LCD::SetupLCD (void) {
+    QString lcd_host;
+    int lcd_port;
+
+    if (m_lcd) {
+        delete m_lcd;
+        m_lcd = NULL;
+        m_server_unavailable = false;
+    }
+
+    lcd_host = gContext->GetSetting("LCDHost", "localhost");
+    lcd_port = gContext->GetNumSetting("LCDPort", 13666);
+
+    if (lcd_host.length() > 0 && lcd_port > 1024)
+    {
+        class LCD * lcd = LCD::Get();
+        if (lcd->connectToHost(lcd_host, lcd_port) == false) {
+            delete m_lcd;
+            m_lcd = NULL;
+            m_server_unavailable = false;
+        }
+    }
+  
 }
 
 bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
@@ -193,7 +228,7 @@ void LCD::sendToServer(const QString &someText)
  
     if (connected)
     {
-#ifdef LCD_DEVICE_DEBUG
+#if LCD_DEVICE_DEBUG > 9
         cout << "lcddevice: Sending to Server: " << someText << endl ;
 #endif
         // Just stream the text out the socket
@@ -207,6 +242,55 @@ void LCD::sendToServer(const QString &someText)
         send_buffer += someText;
         send_buffer += "\n";
     }
+}
+
+void LCD::setPriority(const QString &screen, PRIORITY priority)
+{
+    QString aString;
+
+    aString = "screen_set ";
+    aString += screen;
+    aString += " priority ";
+
+    switch (priority) {
+    case TOP: 
+      aString += QString::number (prioTop);
+      break;
+    case URGENT: 
+      aString += QString::number (prioUrgent);
+      break;
+    case HIGH:
+      aString += QString::number (prioHigh);
+      break;
+    case MEDIUM: 
+      aString += QString::number (prioMedium);
+      break;
+    case LOW:
+      aString += QString::number (prioLow);
+      break;
+    }
+
+    sendToServer (aString);
+}
+
+void LCD::setHeartbeat (const QString &screen, bool onoff) {
+    QString msg;
+    if (onoff) {
+        if (pVersion == LCD_VERSION_4) {
+            msg = "widget_add " + screen + " heartbeat";
+	}
+	if (pVersion == LCD_VERSION_5) {
+            msg = "screen_set " + screen + " heartbeat on";
+	}
+    } else {
+        if (pVersion == LCD_VERSION_4) {
+	    msg = "widget_del " + screen + " heartbeat";
+	}
+	if (pVersion == LCD_VERSION_5) {
+            msg = "screen_set " + screen + " heartbeat off";
+	}
+    }
+    sendToServer (msg);
 }
 
 void LCD::restartConnection()
@@ -240,7 +324,7 @@ void LCD::serverSendingData()
     {
         lineFromServer = socket->readLine();
 
-#ifdef LCD_DEVICE_DEBUG        
+#if LCD_DEVICE_DEBUG > 9
         // Make debugging be less noisy
         if (lineFromServer != "success\n")
             cout << "lcddevice: Received from server: " << lineFromServer ;
@@ -263,14 +347,33 @@ void LCD::serverSendingData()
             }
             
             // Skip through some stuff
-            
             it++; // server version
+            QString server_version = *it;
             it++; // the string "protocol"
             it++; // protocol version
+            QString protocol_version = *it;
+	    setVersion (server_version, protocol_version);
             it++; // the string "lcd"
             it++; // the string "wid";
             it++; // Ah, the LCD width
             
+            // default priorities
+            prioTop = 64;
+            prioUrgent = 128;
+            prioHigh = 240;
+            prioMedium = 248;
+            prioLow = 252;
+            if (protocolVersion == "0.3") {
+                if (serverVersion.startsWith ("CVS-current")) {
+                    // Latest CVS versions of LCDd has priorities switched
+                    prioTop = 252;
+                    prioUrgent = 248;
+                    prioHigh = 240;
+                    prioMedium = 128;
+                    prioLow = 64;
+                }
+            }
+
             tempString = *it;
             setWidth(tempString.toInt());
 
@@ -295,9 +398,7 @@ void LCD::serverSendingData()
 
             init();
 
-#ifdef LCD_DEVICE_DEBUG
             describeServer();    
-#endif
         }
 
         if (aList.first() == "huh?")
@@ -337,17 +438,19 @@ void LCD::init()
     retryTimer->stop();
 
     QString aString;
-    int i;
 
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    
+   
+    // Get LCD settings
     lcd_showmusic=(gContext->GetSetting("LCDShowMusic", "1")=="1");
+    lcd_showmusic_items=(gContext->GetSetting("LCDShowMusicItems", "ArtistAlbumTitle")); 
     lcd_showtime=(gContext->GetSetting("LCDShowTime", "1")=="1");
     lcd_showchannel=(gContext->GetSetting("LCDShowChannel", "1")=="1");
     lcd_showgeneric=(gContext->GetSetting("LCDShowGeneric", "1")=="1");
     lcd_showvolume=(gContext->GetSetting("LCDShowVolume", "1")=="1");
     lcd_showmenu=(gContext->GetSetting("LCDShowMenu", "1")=="1");
     lcd_backlighton=(gContext->GetSetting("LCDBacklightOn", "1")=="1");
+    lcd_heartbeaton=(gContext->GetSetting("LCDHeartBeatOn", "1")=="1");
     aString = gContext->GetSetting("LCDPopupTime", "5");
     lcd_popuptime = aString.toInt() * 1000;
 
@@ -364,8 +467,8 @@ void LCD::init()
     // "current one")
 
     sendToServer("screen_add Time");
-    sendToServer("widget_del Time heartbeat");
-    sendToServer("screen_set Time priority 255");
+    setHeartbeat ("Time", lcd_heartbeaton);
+    setPriority("Time", LOW);
     if (lcd_backlighton)
         sendToServer("screen_set Time backlight on");
     else
@@ -378,39 +481,43 @@ void LCD::init()
     // the ghetto way
 
     sendToServer("screen_add Menu");
-    sendToServer("widget_del Menu heartbeat");
-    sendToServer("screen_set Menu priority 255");
+    setHeartbeat ("Menu", lcd_heartbeaton);
+    setPriority("Menu", LOW);
     sendToServer("screen_set Menu backlight on");
     sendToServer("widget_add Menu topWidget string");
-    sendToServer("widget_add Menu menuWidget1 string");
-    sendToServer("widget_add Menu menuWidget2 string");
-    sendToServer("widget_add Menu menuWidget3 string");
-    sendToServer("widget_add Menu menuWidget4 string");
-    sendToServer("widget_add Menu menuWidget5 string");
+    for (unsigned int i = 1; i < lcdHeight; i++) {
+         aString = "widget_add Menu menuWidget";
+         aString += QString::number (i);
+         aString += " string";
+         sendToServer(aString);
+    }
 
     // The Music Screen
 
     sendToServer("screen_add Music");
-    sendToServer("widget_del Music heartbeat");
-    sendToServer("screen_set Music priority 255");
+    setHeartbeat ("Music", lcd_heartbeaton);
+    setPriority("Music", LOW);
     sendToServer("screen_set Music backlight on");
     sendToServer("widget_add Music topWidget string");
-    
+    sendToServer("widget_add Music timeWidget string");
+    sendToServer("widget_add Music progressBar hbar");
+
+#if 0
     // Have to put in 10 bars for equalizer
-    
-    for (i = 0; i < 10; i++)
+    for (int i = 0; i < 10; i++)
     {
         aString = "widget_add Music vbar";
         aString += QString::number(i);
         aString += " vbar";
         sendToServer(aString);
     }
+#endif
 
     // The Channel Screen
     
     sendToServer("screen_add Channel");
-    sendToServer("widget_del Channel heartbeat");
-    sendToServer("screen_set Channel priority 255");
+    setHeartbeat ("Channel", lcd_heartbeaton);
+    setPriority("Channel", LOW);
     sendToServer("screen_set Channel backlight on");
     sendToServer("widget_add Channel topWidget string");
     sendToServer("widget_add Channel botWidget string");
@@ -419,8 +526,8 @@ void LCD::init()
     // The Generic Screen
 
     sendToServer("screen_add Generic");
-    sendToServer("widget_del Generic heartbeat");
-    sendToServer("screen_set Generic priority 255");
+    setHeartbeat ("Generic", lcd_heartbeaton);
+    setPriority("Generic", LOW);
     sendToServer("screen_set Generic backlight on");
     sendToServer("widget_add Generic textWidget1 string");
     sendToServer("widget_add Generic textWidget2 string");
@@ -430,8 +537,8 @@ void LCD::init()
     // The Volume Screen
 
     sendToServer("screen_add Volume");
-    sendToServer("widget_del Volume heartbeat");
-    sendToServer("screen_set Volume priority 255");
+    setHeartbeat ("Volume", lcd_heartbeaton);
+    setPriority("Volume", LOW);
     sendToServer("screen_set Volume backlight on");
     sendToServer("widget_add Volume topWidget string");
     sendToServer("widget_add Volume botWidget string");
@@ -482,10 +589,51 @@ void LCD::setCellHeight(unsigned int x)
         cellHeight = x;
 }
 
+void LCD::setVersion(const QString &sversion, const QString &pversion)
+{
+    protocolVersion = pversion;
+    serverVersion = sversion;
+
+    // the pVersion number is used internally to designate which protocol
+    // version LCDd is using:
+    if (protocolVersion.find(QRegExp("0[.]4"), 0) != -1) {
+	pVersion = LCD_VERSION_4;
+        prioTop = 64;
+        prioUrgent = 128;
+        prioHigh = 240;
+        prioMedium = 248;
+        prioLow = 252;
+    } else {
+        pVersion = LCD_VERSION_5;
+        prioTop = 252;
+        prioUrgent = 248;
+        prioHigh = 240;
+        prioMedium = 128;
+        prioLow = 64;
+    }
+}
+
 void LCD::describeServer()
 {
+#if LCD_DEVICE_DEBUG > 0
     VERBOSE(VB_GENERAL, QString("lcddevice: The server is %1x%2 with each cell being %3x%4." )
                         .arg(lcdWidth).arg(lcdHeight).arg(cellWidth).arg(cellHeight));
+    VERBOSE(VB_GENERAL, QString("lcddevice: LCDd version %1, protocol version %2.")
+            .arg(serverVersion).arg(protocolVersion));
+#endif
+#if LCD_DEVICE_DEBUG > 1
+    VERBOSE(VB_GENERAL, QString("lcddevice: MythTV LCD settings:"));
+    VERBOSE(VB_GENERAL, QString("lcddevice: - showmusic      : %1").arg(lcd_showmusic));
+    VERBOSE(VB_GENERAL, QString("lcddevice: - showmusicitems : %1").arg(lcd_showmusic_items));
+    VERBOSE(VB_GENERAL, QString("lcddevice: - showtime       : %1").arg(lcd_showtime));
+    VERBOSE(VB_GENERAL, QString("lcddevice: - showchannel    : %1").arg(lcd_showchannel));
+    VERBOSE(VB_GENERAL, QString("lcddevice: - showgeneric    : %1").arg(lcd_showgeneric));
+    VERBOSE(VB_GENERAL, QString("lcddevice: - showvolume     : %1").arg(lcd_showvolume));
+    VERBOSE(VB_GENERAL, QString("lcddevice: - showmenu       : %1").arg(lcd_showmenu));
+    VERBOSE(VB_GENERAL, QString("lcddevice: - backlighton    : %1").arg(lcd_backlighton));
+    VERBOSE(VB_GENERAL, QString("lcddevice: - heartbeaton    : %1").arg(lcd_heartbeaton));
+    VERBOSE(VB_GENERAL, QString("lcddevice: - popuptime      : %1").arg(lcd_popuptime));
+#endif
 }
 
 void LCD::veryBadThings(int anError)
@@ -533,13 +681,16 @@ void LCD::stopAll()
     // The usual reason things would get this far and then lcd_ready being 
     // false is the connection died and we're trying to re-establish the 
     // connection
+#if LCD_DEVICE_DEBUG > 1
+    cout << "lcddevice: stopAll " << endl ;
+#endif
     if (lcd_ready)
     {
-        sendToServer("screen_set Music priority 255");
-        sendToServer("screen_set Channel priority 255");
-        sendToServer("screen_set Generic priority 255");
-        sendToServer("screen_set Volume priority 255");
-        sendToServer("screen_set Menu priority 255");
+        setPriority("Music", LOW);
+        setPriority("Channel", LOW);
+        setPriority("Generic", LOW);
+        setPriority("Volume", LOW);
+        setPriority("Menu", LOW);
     }
 
     preScrollTimer->stop();
@@ -555,7 +706,7 @@ void LCD::stopAll()
 
 void LCD::startTime()
 {
-    sendToServer("screen_set Time priority 128");
+    setPriority("Time", MEDIUM);
     timeTimer->start(1000, FALSE);
     outputTime();
     theMode = 0;    
@@ -579,6 +730,7 @@ void LCD::outputText(QPtrList<LCDTextItem> *textItems)
     {
         ++it;
         num.setNum(curItem->getRow());
+
         if (curItem->getScroll())
             assignScrollingText(curItem->getText(), "textWidget" + num, 
                                 curItem->getRow());
@@ -626,7 +778,7 @@ void LCD::outputCenteredText(QString theScreen, QString theText, QString widget,
     aString += " ";
     aString += QString::number(row);
     aString += " \"";
-    aString += theText;
+    aString += theText.replace ('"', "\"");
     aString += "\"";
     sendToServer(aString);
 }
@@ -640,7 +792,7 @@ void LCD::outputLeftText(QString theScreen, QString theText, QString widget,
     aString += " " + widget + " 1 ";
     aString += QString::number(row);
     aString += " \"";
-    aString += theText;
+    aString += theText.replace ('"', "\"");
     aString += "\"";
     sendToServer(aString);
 }
@@ -660,7 +812,7 @@ void LCD::outputRightText(QString theScreen, QString theText, QString widget,
     aString += " ";
     aString += QString::number(row);
     aString += " \"";
-    aString += theText;
+    aString += theText.replace ('"', "\"");
     aString += "\"";
     sendToServer(aString);
 }
@@ -712,14 +864,20 @@ void LCD::assignScrollingText(QString theText, QString theWidget, int theRow)
     }
 }
 
-void LCD::startMusic(QString artist, QString track)
+void LCD::startMusic(QString artist, QString album, QString track)
 {
     QString aString;
     if (lcd_showmusic)
-      sendToServer("screen_set Music priority 64");
+      setPriority("Music", HIGH);
     musicTimer->start(100, FALSE);
     aString = artist;
-    aString += " - ";
+    if (lcd_showmusic_items == "ArtistAlbumTitle") {
+        aString += " [";
+        aString += album;
+        aString += "] ";
+    } else {
+        aString += " - ";
+    } 
     aString += track;
     theMode = 1;
     assignScrollingText(aString);
@@ -729,7 +887,7 @@ void LCD::startChannel(QString channum, QString title, QString subtitle)
 {
     QString aString;
     if (lcd_showchannel)
-      sendToServer("screen_set Channel priority 64");
+      setPriority("Channel", HIGH);
     aString = channum;
     theMode = 2;
     assignScrollingText(aString, "topWidget", 1);
@@ -756,7 +914,7 @@ void LCD::startGeneric(QPtrList<LCDTextItem> * textItems)
     QString aString;
 
     if (lcd_showgeneric)
-      sendToServer("screen_set Generic priority 64");
+      setPriority("Generic", HIGH);
 
     // Clear out the LCD.  Do this before checking if its empty incase the user
     //  wants to just clear the lcd
@@ -803,7 +961,7 @@ void LCD::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
 
     // Menu is higher priority than volume
     if (lcd_showmenu) 
-        sendToServer("screen_set Menu priority 15");
+        setPriority("Menu", URGENT);
 
     // Write out the app name
     outputCenteredText("Menu", app_name, "topWidget", 1);
@@ -903,21 +1061,25 @@ void LCD::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
     counter = 1;
     curItem = it.toFirst();
 
-    // Move the iterator to selectedItem -1
-    if (selectedItem != 1 && it.count() >= lcdHeight)
+    // Move the iterator to selectedItem lcdHeight/2, if > 1, -1.
+    unsigned int midPoint = (lcdHeight/2) - 1;
+    if (selectedItem > midPoint && it.count() >= lcdHeight-1)
     {
         while (counter != selectedItem)
         {
             ++it;
             ++counter;
         }
-        --it;
+        it -= midPoint;
+        counter -= midPoint;
     }
 
-    // Back up one if were at the end so the last item shows up at the bottom 
+    // Back up one if we're at the end so the last item shows up at the bottom 
     // of the display
-    if (counter == it.count() && counter != 1)
-        --it;
+    if (counter + midPoint > it.count() - midPoint && counter > midPoint)
+    {
+        it -= (counter+(lcdHeight/2)- 1) - (it.count () - midPoint);
+    }
 
     counter = 1;
     while ((curItem = it.current()) != 0)
@@ -1192,9 +1354,10 @@ void LCD::scrollMenuText()
 void LCD::startVolume(QString app_name)
 {
     if (lcd_showvolume)
-      sendToServer("screen_set Volume priority 32");
+      setPriority("Volume", TOP);
     outputCenteredText("Volume", "Myth " + app_name + " Volume");
     volume_level = 0.0;
+
     outputVolume();
 }
 
@@ -1202,7 +1365,7 @@ void LCD::unPopMenu()
 {
     // Stop the scrolling timer
     menuScrollTimer->stop();
-    sendToServer("screen_set Menu priority 255");
+    setPriority("Menu", LOW);
 }
 
 void LCD::setLevels(int numbLevels, float *values)
@@ -1253,6 +1416,22 @@ void LCD::setGenericProgress(float value)
         generic_progress = 1.0;
 
     outputGeneric();
+}
+
+void LCD::setMusicProgress(QString time, float value)
+{
+    if (!lcd_ready)
+        return;
+
+    music_progress = value;
+    music_time = time;
+
+    if (music_progress < 0.0)
+        music_progress = 0.0;
+    else if (music_progress > 1.0)
+        music_progress = 1.0;
+
+    outputMusic();
 }
 
 void LCD::setVolumeLevel(float value)
@@ -1317,6 +1496,18 @@ void LCD::outputMusic()
 {
     QString aString;
 
+    if (lcdHeight > 2) {
+      outputCenteredText("Music", music_time, "timeWidget", 2);
+    }
+
+    aString = "widget_set Music progressBar 1 ";
+    aString += QString::number(lcdHeight);
+    aString += " ";
+    aString += QString::number((int)rint(music_progress * lcdWidth * 
+                               cellWidth));
+    sendToServer(aString);
+
+#if 0
     for(int i = 0; i < 10; i++)
     {
         aString = "widget_set Music vbar";
@@ -1330,6 +1521,7 @@ void LCD::outputMusic()
                                    (cellHeight -1)));
         sendToServer(aString);
     }
+#endif
 }
 
 void LCD::outputChannel()
@@ -1371,18 +1563,22 @@ void LCD::switchToTime()
 {
     if (!lcd_ready)
         return;
-
     stopAll();
+#if LCD_DEVICE_DEBUG > 1
+    cout << "lcddevice: switchToTime " << endl ;
+#endif
     startTime();
 }
 
-void LCD::switchToMusic(const QString &artist, const QString &track)
+void LCD::switchToMusic(const QString &artist, const QString &album, const QString &track)
 {
     if (!lcd_ready)
         return;
-
     stopAll();
-    startMusic(artist, track);
+#if LCD_DEVICE_DEBUG > 1
+    cout << "lcddevice: switchToMusic " << endl ;
+#endif
+    startMusic(artist, album, track);
 }
 
 void LCD::switchToChannel(QString channum, QString title, QString subtitle)
@@ -1391,6 +1587,9 @@ void LCD::switchToChannel(QString channum, QString title, QString subtitle)
         return;
 
     stopAll();
+#if LCD_DEVICE_DEBUG > 1
+    cout << "lcddevice: switchToChannel " << endl ;
+#endif
     startChannel(channum, title, subtitle);
 }
 
@@ -1399,8 +1598,10 @@ void LCD::switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
 {
     if (!lcd_ready)
         return;
-
-    stopAll();
+    //stopAll();
+#if LCD_DEVICE_DEBUG > 1
+    cout << "lcddevice: switchToMenu " << endl ;
+#endif
     startMenu(menuItems, app_name, popMenu);
 }
 
@@ -1408,8 +1609,10 @@ void LCD::switchToGeneric(QPtrList<LCDTextItem> *textItems)
 {
     if (!lcd_ready)
         return;
-
     stopAll();
+#if LCD_DEVICE_DEBUG > 1
+    cout << "lcddevice: switchToGeneric " << endl ;
+#endif
     startGeneric(textItems);
 }
 
@@ -1419,6 +1622,9 @@ void LCD::switchToVolume(QString app_name)
         return;
 
     stopAll();
+#if LCD_DEVICE_DEBUG > 1
+    cout << "lcddevice: switchToVolume " << endl ;
+#endif
     startVolume(app_name);
 }
 
@@ -1426,12 +1632,17 @@ void LCD::switchToNothing()
 {
     if (!lcd_ready)
         return;
-
     stopAll();
+#if LCD_DEVICE_DEBUG > 1
+    cout << "lcddevice: switchToNothing " << endl ;
+#endif
 }
 
 void LCD::shutdown()
 {
+#if LCD_DEVICE_DEBUG > 1
+    cout << "lcddevice: shutdown " << endl ;
+#endif
     stopAll();
 
     //  Remove all the widgets and screens for a clean exit from the server
@@ -1457,12 +1668,16 @@ void LCD::shutdown()
     sendToServer("screen_del Menu menuWidget4");
     sendToServer("screen_del Menu menuWidget5");
 
+#if 0
     QString aString;
     for (int i = 0 ; i < 10; i++)
     {
         aString = QString("widget_del Music vbar%1").arg(i);
         sendToServer(aString);
     }
+#endif
+    sendToServer("widget_del Music progressBar");
+    sendToServer("widget_del Music timeWidget");
     sendToServer("widget_del Music topWidget");
     sendToServer("screen_del Music");
     
@@ -1480,7 +1695,7 @@ LCD::~LCD()
 {
     m_lcd = NULL;
 
-#ifdef LCD_DEVICE_DEBUG
+#if LCD_DEVICE_DEBUG > 0
     cout << "lcddevice: An LCD device is being snuffed out of existence "
             "(~LCD() was called)" << endl ;
 #endif

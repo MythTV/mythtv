@@ -2402,8 +2402,7 @@ static HostCheckBox *LCDShowTime()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowTime");
     gc->setLabel(QObject::tr("LCD Displays Time"));
-    gc->setHelpText(QObject::tr("Display current time on idle LCD display. "
-                    "Need to restart mythfrontend to (de)activate it."));
+    gc->setHelpText(QObject::tr("Display current time on idle LCD display. "));
     gc->setValue(true);
     return gc;
 }
@@ -2412,8 +2411,7 @@ static HostCheckBox *LCDShowMenu()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowMenu");
     gc->setLabel(QObject::tr("LCD Displays Menus"));
-    gc->setHelpText(QObject::tr("Display selected menu on LCD display. "
-                    "Need to restart mythfrontend to (de)activate it."));
+    gc->setHelpText(QObject::tr("Display selected menu on LCD display. "));
     gc->setValue(true);
     return gc;
 }
@@ -2433,9 +2431,18 @@ static HostCheckBox *LCDShowMusic()
     HostCheckBox *gc = new HostCheckBox("LCDShowMusic");
     gc->setLabel(QObject::tr("LCD Displays Music Artist and Title"));
     gc->setHelpText(QObject::tr("Display playing artist and song title in "
-                    "MythMusic. Need to restart mythfrontend to (de)activate "
-                    "it."));
+                    "MythMusic."));
     gc->setValue(true);
+    return gc;
+}
+
+static HostComboBox *LCDShowMusicItems()
+{
+    HostComboBox *gc = new HostComboBox("LCDShowMusicItems");
+    gc->setLabel(QObject::tr("Items"));
+    gc->addSelection(QObject::tr("Artist - Title"), "ArtistTitle");
+    gc->addSelection(QObject::tr("Artist [Album] Title"), "ArtistAlbumTitle");
+    gc->setHelpText(QObject::tr("Which items to show when playing music."));
     return gc;
 }
 
@@ -2443,8 +2450,7 @@ static HostCheckBox *LCDShowChannel()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowChannel");
     gc->setLabel(QObject::tr("LCD Displays Channel Information"));
-    gc->setHelpText(QObject::tr("Display tuned channel information. Need to "
-                    "restart mythfrontend to (de)activate it."));
+    gc->setHelpText(QObject::tr("Display tuned channel information."));
     gc->setValue(true);
     return gc;
 }
@@ -2453,8 +2459,7 @@ static HostCheckBox *LCDShowVolume()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowVolume");
     gc->setLabel(QObject::tr("LCD Displays Volume Information"));
-    gc->setHelpText(QObject::tr("Display volume level information. Need to "
-                    "restart mythfrontend to (de)activate it."));
+    gc->setHelpText(QObject::tr("Display volume level information."));
     gc->setValue(true);
     return gc;
 }
@@ -2463,8 +2468,7 @@ static HostCheckBox *LCDShowGeneric()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowGeneric");
     gc->setLabel(QObject::tr("LCD Displays Generic Information"));
-    gc->setHelpText(QObject::tr("Display generic information. Need to "
-                    "restart mythfrontend to (de)activate it."));
+    gc->setHelpText(QObject::tr("Display generic information."));
     gc->setValue(true);
     return gc;
 }
@@ -2473,9 +2477,17 @@ static HostCheckBox *LCDBacklightOn()
 {
     HostCheckBox *gc = new HostCheckBox("LCDBacklightOn");
     gc->setLabel(QObject::tr("LCD Backlight Always On"));
-    gc->setHelpText(QObject::tr("Turn on the backlight permanently. Need to "
-                    "restart mythfrontend to (de)activate it."));
+    gc->setHelpText(QObject::tr("Turn on the backlight permanently."));
     gc->setValue(true);
+    return gc;
+}
+
+static HostCheckBox *LCDHeartBeatOn()
+{
+    HostCheckBox *gc = new HostCheckBox("LCDHeartBeatOn");
+    gc->setLabel(QObject::tr("LCD HeartBeat Always On"));
+    gc->setHelpText(QObject::tr("Turn on the LCD heartbeat"));
+    gc->setValue(false);
     return gc;
 }
 
@@ -2484,8 +2496,7 @@ static HostCheckBox *LCDEnable()
     HostCheckBox *gc = new HostCheckBox("LCDEnable");
     gc->setLabel(QObject::tr("Enable LCD device"));
     gc->setHelpText(QObject::tr("Use an LCD display to view MythTV status "
-                    "information. Need to restart mythfrontend to "
-                    "(de)activate it."));
+                    "information."));
     gc->setValue(false);
     return gc;
 }
@@ -2507,13 +2518,16 @@ public:
          ConfigurationGroup* setHoriz = new HorizontalConfigurationGroup(false);
          ConfigurationGroup* setLeft  = new VerticalConfigurationGroup(false);
          ConfigurationGroup* setRight = new VerticalConfigurationGroup(false);
+
          setLeft->addChild(LCDShowTime());
          setLeft->addChild(LCDShowMenu());
          setLeft->addChild(LCDShowMusic());
+         setLeft->addChild(LCDShowMusicItems());
          setLeft->addChild(LCDShowChannel());
          setRight->addChild(LCDShowVolume());
          setRight->addChild(LCDShowGeneric());
          setRight->addChild(LCDBacklightOn());
+         setRight->addChild(LCDHeartBeatOn());
          setHoriz->addChild(setLeft);
          setHoriz->addChild(setRight);
          settings->addChild(setHoriz);

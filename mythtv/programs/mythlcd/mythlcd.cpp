@@ -120,19 +120,19 @@ void MythLCD::doMusic()
     switch (rand() % 5)
     {
         case 0:
-            lcddev->switchToMusic("2U", "1-1/4");
+            lcddev->switchToMusic("2U", "", "1-1/4");
             break;
         case 1:
-            lcddev->switchToMusic("Bernie", "Concrete Ducky");
+            lcddev->switchToMusic("Bernie", "", "Concrete Ducky");
             break;
         case 2:
-            lcddev->switchToMusic("Vid Sicous", "Their Way");
+            lcddev->switchToMusic("Vid Sicous", "", "Their Way");
             break;
         case 3:
-            lcddev->switchToMusic("Idle Eric", "Edward the Quarter Bee");
+            lcddev->switchToMusic("Idle Eric", "", "Edward the Quarter Bee");
             break;
         case 4 :
-            lcddev->switchToMusic("Dave Brebuck", "Take Half a Dozen");
+            lcddev->switchToMusic("Dave Brebuck", "", "Take Half a Dozen");
             break;
     }
     

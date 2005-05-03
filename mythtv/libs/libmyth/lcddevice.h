@@ -112,6 +112,7 @@ class LCD : public QObject
    ~LCD();
 
     static class LCD * Get(void);
+    static void SetupLCD (void);
 
     // Used to actually connect to an LCD device       
     bool connectToHost(const QString &hostname, unsigned int port);
@@ -124,7 +125,7 @@ class LCD : public QObject
     // Note: the use of switchToMusic and setLevels is discouraged, because it 
     // has become obvious that most LCD devices cannot handle communications 
     // fast enough to make them useful.
-    void switchToMusic(const QString &artist, const QString &track);
+    void switchToMusic(const QString &artist, const QString &album, const QString &track);
 
     // You can set 10 (or less) equalizer values here (between 0.0 and 1.0)
     void setLevels(int numbLevels, float *values);
@@ -155,6 +156,9 @@ class LCD : public QObject
 
     // Do a progress bar with the generic level between 0 and 1.0
     void setGenericProgress(float generic_progress);
+
+    // Do a music progress bar with the generic level between 0 and 1.0
+    void setMusicProgress(QString time, float generic_progress);
 
     // Show the Volume Level top_text scrolls
     void switchToVolume(QString app_name);
@@ -210,12 +214,18 @@ class LCD : public QObject
                          QString widget = "topWidget", int row = 1);
    
     void sendToServer(const QString &someText);
+
+    enum PRIORITY {TOP, URGENT, HIGH, MEDIUM, LOW};
+    void setPriority(const QString &screen, PRIORITY priority);
+
+    void setHeartbeat (const QString &screen, bool onoff);
+
     void init();
     void assignScrollingText(QString theText, QString theWidget = "topWidget", 
                              int theRox = 1);
 
     void startTime();
-    void startMusic(QString artist, QString track);
+    void startMusic(QString artist, QString album, QString track);
     void startChannel(QString channum, QString title, QString subtitle);
     void startGeneric(QPtrList<LCDTextItem> * textItems);
     void startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
@@ -243,17 +253,31 @@ class LCD : public QObject
     void setHeight(unsigned int);
     void setCellWidth(unsigned int);
     void setCellHeight(unsigned int);
+    void setVersion(const QString &, const QString &);
     void describeServer();
+    
+    unsigned int prioTop;
+    unsigned int prioUrgent;
+    unsigned int prioHigh;
+    unsigned int prioMedium;
+    unsigned int prioLow;
 
     unsigned int lcdWidth;
     unsigned int lcdHeight;
     unsigned int cellWidth;
     unsigned int cellHeight;
+
+    QString serverVersion;
+    QString protocolVersion;
+    int pVersion;
         
     float EQlevels[10];
     float progress;
     float generic_progress;
     float volume_level;
+
+    float music_progress;
+    QString music_time;
 
     QString scrollingText;
     QString scrollWidget;
@@ -281,7 +305,9 @@ class LCD : public QObject
     bool lcd_showchannel;
     bool lcd_showvolume;
     bool lcd_backlighton;
-    int  lcd_popuptime;
+    bool lcd_heartbeaton;
+    int  lcd_popuptime;    
+    QString lcd_showmusic_items;
 
     int (*GetLEDMask)(void);
 };

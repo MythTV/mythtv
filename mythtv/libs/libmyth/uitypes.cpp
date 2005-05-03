@@ -2650,9 +2650,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
     //  Put something on the LCD device (if one exists)
     //
 
-    class LCD *lcddev = LCD::Get();
- 
-    if (lcddev)
+    if (class LCD *lcddev = LCD::Get())
     {
         QString msg = current_node->getString();
         GenericTree *parent = current_node->getParent();
@@ -2688,8 +2686,10 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
  
             QString title;
             title = (parent->getParent()) ? "<< " : "   ";
+            title += (current_node->childCount () > 0) ? " >> " : "  ";
             if (!menuItems.isEmpty())
             {
+                printf ("managedtree::draw\n");
                 lcddev->switchToMenu(&menuItems, title);
             }
         }

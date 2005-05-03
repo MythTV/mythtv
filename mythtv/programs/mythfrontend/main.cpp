@@ -406,6 +406,11 @@ void TVMenuCallback(void *data, QString &selection)
         gContext->GetMainWindow()->Init();
         gContext->UpdateImageCache();
         menu->ReloadTheme();
+
+        LCD::SetupLCD ();
+        if(class LCD * lcd = LCD::Get()) {
+            lcd->setupLEDs(RemoteGetRecordingMask);
+        }
     } 
     else if (sel == "settings recording") 
     {
@@ -722,8 +727,6 @@ static void *run_priv_thread(void *data)
    
 int main(int argc, char **argv)
 {
-    QString lcd_host;
-    int lcd_port;
     QString geometry = "";
 #ifdef Q_WS_X11
     // Remember any -geometry argument which QApplication init will remove
@@ -997,14 +1000,8 @@ int main(int argc, char **argv)
 
     VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
-    lcd_host = gContext->GetSetting("LCDHost", "localhost");
-    lcd_port = gContext->GetNumSetting("LCDPort", 13666);
-    if (lcd_host.length() > 0 && lcd_port > 1024)
-    {
-        class LCD * lcd = LCD::Get();
-        if (lcd->connectToHost(lcd_host, lcd_port) == false)
-            delete lcd;
-        else
+    LCD::SetupLCD ();
+    if (class LCD *lcd = LCD::Get ()) {
             lcd->setupLEDs(RemoteGetRecordingMask);
     }
 
@@ -1062,7 +1059,7 @@ int main(int argc, char **argv)
             qApp->unlock();
             return 0;
         }
-        else
+        else 
         {
             pluginname = "myth" + pluginname;
             if (pmanager->run_plugin(pluginname))
