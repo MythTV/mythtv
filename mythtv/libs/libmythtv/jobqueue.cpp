@@ -13,6 +13,7 @@
 #include <iostream>
 using namespace std;
 
+#include "exitcodes.h"
 #include "jobqueue.h"
 #include "programinfo.h"
 #include "libmyth/mythcontext.h"
@@ -1677,7 +1678,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     breaksFound = myth_system(cmd.ascii());
 
     controlFlagsLock.lock();
-    if (breaksFound == 127)
+    if (breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR)
     {
         msg = QString("Commercial Flagging ERRORED for %1, unable to find "
                       "mythcommflag, check your PATH.")
@@ -1690,7 +1691,7 @@ void JobQueue::DoFlagCommercialsThread(void)
                         "ERROR: Unable to find mythcommflag.");
     }
     else if ((*(jobControlFlags[key]) == JOB_STOP) ||
-             (breaksFound == 255))
+             (breaksFound >= COMMFLAG_EXIT_START))
     {
         msg = QString("ABORTED Commercial Flagging for %1.")
                       .arg(logDesc);
@@ -1701,7 +1702,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         ChangeJobStatus(jobID, JOB_ABORTED,
                         "Job aborted by user.");
     }
-    else if (breaksFound == 254)
+    else if (breaksFound ==  COMMFLAG_EXIT_NO_PROGRAM_DATA)
     {
         msg = QString("ERROR in Commercial Flagging for %1, problem opening "
                       "file or initting decoder, check backend log.")
@@ -1713,7 +1714,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         ChangeJobStatus(jobID, JOB_ERRORED,
                         "Job ERRORED, unable to open file or init decoder.");
     }
-    else if (breaksFound >= 200)
+    else if (breaksFound >= COMMFLAG_EXIT_START)
     {
         msg = QString("Commercial Flagging ERRORED for %1 with result %2.")
                       .arg(logDesc).arg(breaksFound);

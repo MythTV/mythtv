@@ -14,6 +14,7 @@
 #include <ctime>
 #include <cmath>
 
+#include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
 #include "libmythtv/commercial_skip.h"
 #include "libmythtv/NuppelVideoPlayer.h"
@@ -83,7 +84,7 @@ void CopySkipListToCutList(QString chanid, QString starttime)
     {
         cerr << "No program data exists for channel " <<
             chanid.ascii() << "at " << starttime.ascii() << endl;
-        exit(-1);
+        exit(COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA);
     }
 
     pginfo->GetCommBreakList(cutlist);
@@ -108,7 +109,7 @@ int FlagCommercials(QString chanid, QString starttime)
     {
         printf( "No program data exists for channel %s at %s\n",
             chanid.ascii(), starttime.ascii());
-        return(0);
+        return COMMFLAG_EXIT_NO_PROGRAM_DATA;
     }
 
     QString filename = program_info->GetRecordFilename("...");
@@ -124,13 +125,13 @@ int FlagCommercials(QString chanid, QString starttime)
             printf( "IN USE\n" );
             printf( "                        "
                         "(the program is already being flagged elsewhere)\n" );
-            return(0);
+            return COMMFLAG_EXIT_IN_USE;
         }
     }
     else
     {
         if ((!force) && (program_info->IsCommProcessing()))
-            return(0);
+            return COMMFLAG_EXIT_IN_USE;
     }
 
     filename = program_info->GetPlaybackURL();
@@ -139,7 +140,7 @@ int FlagCommercials(QString chanid, QString starttime)
     {
         if (!quiet)
             printf( "0 (test)\n" );
-        return(0);
+        return COMMFLAG_EXIT_TEST_MODE;
     }
 
     blanks.clear();
@@ -241,7 +242,7 @@ int FlagCommercials(QString chanid, QString starttime)
             delete commDetect;
         }
         delete program_info;
-        return(0);
+        return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
     else if (justBlanks)
     {
@@ -276,7 +277,7 @@ int FlagCommercials(QString chanid, QString starttime)
                 printf( "no blanks\n" );
         }
         delete program_info;
-        return(0);
+        return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
@@ -286,7 +287,7 @@ int FlagCommercials(QString chanid, QString starttime)
         cerr << "Unable to open commflag db connection\n";
         delete tmprbuf;
         delete program_info;
-        return(0);
+        return COMMFLAG_EXIT_DB_ERROR;
     }
     
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer(program_info);
@@ -359,7 +360,7 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 1], "--", 2))
             {
                 printf("missing or invalid parameters for --chanid option\n");
-                exit(7);
+                return COMMFLAG_EXIT_INVALID_CHANID;
             }
             
             chanid += a.argv()[++argpos];
@@ -371,7 +372,7 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 1], "--", 2))
             {
                 printf("missing or invalid parameters for --starttime option\n");
-                exit(8);
+                return COMMFLAG_EXIT_INVALID_STARTTIME;
             }
             
             starttime += a.argv()[++argpos];
@@ -465,7 +466,7 @@ int main(int argc, char *argv[])
             else
             {
                 cerr << "Missing argument to -V option\n";
-                return -1;
+                return COMMFLAG_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
@@ -477,7 +478,7 @@ int main(int argc, char *argv[])
                 if (temp.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -v/--verbose option\n";
-                    return -1;
+                    return COMMFLAG_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
@@ -557,7 +558,7 @@ int main(int argc, char *argv[])
             } else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
-                return -1;
+                return COMMFLAG_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-h") ||
@@ -596,12 +597,12 @@ int main(int argc, char *argv[])
                     "      if either is used." << endl << endl <<
                     "If no command line arguments are specified, all" << endl <<
                     "unflagged videos will be flagged." << endl << endl;
-            exit(9);
+            return COMMFLAG_EXIT_INVALID_CMDLINE;
         }
         else
         {
             printf("illegal option: '%s' (use --help)\n", a.argv()[argpos]);
-            exit(10);
+            return COMMFLAG_EXIT_INVALID_CMDLINE;
         }
 
         ++argpos;
@@ -612,19 +613,20 @@ int main(int argc, char *argv[])
     if(!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return -1;
+        return COMMFLAG_EXIT_NO_MYTHCONTEXT;
     }
 
     if ((chanid.isEmpty() && !starttime.isEmpty()) ||
         (!chanid.isEmpty() && starttime.isEmpty()))
     {
-        printf( "You must specify both the Channel ID and the Start Time\n");
-        exit(12);
+        VERBOSE(VB_IMPORTANT, "You must specify both the Channel ID "
+                "and the Start Time.");
+        return COMMFLAG_EXIT_INVALID_CMDLINE;
     }
 
     if (copyToCutlist) {
         CopySkipListToCutList(chanid, starttime);
-        exit(0);
+        return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
 
     if (inJobQueue) {
@@ -649,7 +651,7 @@ int main(int argc, char *argv[])
 
         delete gContext;
 
-        exit(breaksFound);
+        return breaksFound; // exit(breaksFound);
     }
 
     // be nice to other programs since FlagCommercials() can consume 100% CPU
@@ -758,7 +760,7 @@ int main(int argc, char *argv[])
         else
         {
              MythContext::DBError("Querying recorded programs", recordedquery);
-             exit(13);
+             return COMMFLAG_EXIT_DB_ERROR;
         }
     }
 
@@ -772,5 +774,5 @@ int main(int argc, char *argv[])
         printf( "Finished commercial break flagging at %s", ctime(&time_now));
     }
 
-    exit(0);
+    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }

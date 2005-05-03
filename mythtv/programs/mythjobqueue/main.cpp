@@ -14,6 +14,7 @@
 #include <ctime>
 #include <cmath>
 
+#include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
 #include "libmythtv/jobqueue.h"
 #include "libmyth/mythdbcon.h"
@@ -46,7 +47,7 @@ int main(int argc, char *argv[])
                 if (temp.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -v/--verbose option\n";
-                    return -1;
+                    return JOBQUEUE_EXIT_INVALID_CMDLINE;
                 } else
                 {
                     QStringList verboseOpts;
@@ -125,7 +126,7 @@ int main(int argc, char *argv[])
             } else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
-                return -1;
+                return JOBQUEUE_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-h") ||
@@ -138,12 +139,12 @@ int main(int argc, char *argv[])
                     "                             channel,osd,file,schedule,jobqueue," << endl <<
                     "                             network,commflag" << endl <<
                     endl;
-            exit(9);
+            return JOBQUEUE_EXIT_INVALID_CMDLINE;
         }
         else
         {
             printf("illegal option: '%s' (use --help)\n", a.argv()[argpos]);
-            exit(10);
+            return JOBQUEUE_EXIT_INVALID_CMDLINE;
         }
 
         ++argpos;
@@ -154,7 +155,7 @@ int main(int argc, char *argv[])
     if(!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return -1;
+        return JOBQUEUE_EXIT_NO_MYTHCONTEXT;
     }
 
     jobqueue = new JobQueue(false);
@@ -163,5 +164,5 @@ int main(int argc, char *argv[])
 
     delete gContext;
 
-    exit(0);
+    return JOBQUEUE_EXIT_OK;
 }
