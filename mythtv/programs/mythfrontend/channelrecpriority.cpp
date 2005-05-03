@@ -18,6 +18,7 @@ using namespace std;
 #include "channelrecpriority.h"
 #include "tv.h"
 
+#include "exitcodes.h"
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -67,8 +68,9 @@ ChannelRecPriority::ChannelRecPriority(MythMainWindow *parent, const char *name)
     }
     else
     {
-        cerr << "MythFrontEnd: ChannelRecPriority - Failed to get selector.\n";
-        exit(19);
+        VERBOSE(VB_IMPORTANT, "MythFrontEnd: ChannelRecPriority - "
+                "Failed to get selector.");
+        exit(FRONTEND_BUGGY_EXIT_NO_SELECTOR);
     }
 
     bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
@@ -186,8 +188,8 @@ void ChannelRecPriority::LoadWindow(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
-                exit(20);
+                VERBOSE(VB_IMPORTANT, QString("Unknown child element: %1. Ignoring.")
+                        .arg(e.tagName()));
             }
         }
     }

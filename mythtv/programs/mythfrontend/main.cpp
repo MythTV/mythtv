@@ -27,6 +27,7 @@ using namespace std;
 #include "globalsettings.h"
 #include "profilegroup.h"
 
+#include "exitcodes.h"
 #include "themedmenu.h"
 #include "programinfo.h"
 #include "mythcontext.h"
@@ -42,6 +43,7 @@ using namespace std;
 #include "lcddevice.h"
 #include "langsettings.h"
 
+#define NO_EXIT  0
 #define QUIT     1
 #define HALT     2
 
@@ -406,6 +408,8 @@ void TVMenuCallback(void *data, QString &selection)
         gContext->GetMainWindow()->Init();
         gContext->UpdateImageCache();
         menu->ReloadTheme();
+        if (!menu->foundTheme())
+            exit(FRONTEND_BUGGY_EXIT_NO_THEME);
 
         LCD::SetupLCD ();
         if(class LCD * lcd = LCD::Get()) {
@@ -490,12 +494,11 @@ int handleExit(void)
     int result = diag.exec();
     switch (result)
     {
+        case 1: return NO_EXIT;
         case 2: return QUIT;
         case 3: return HALT;
-        default: return 0;
+        default: return NO_EXIT;
     }
-
-    return 0;
 }
 
 void haltnow()
@@ -512,7 +515,7 @@ int RunMenu(QString themedir)
                           gContext->GetMainWindow(), "mainmenu");
     menu->setCallback(TVMenuCallback, gContext);
    
-    int exitstatus = 0;
+    int exitstatus = NO_EXIT;
  
     if (menu->foundTheme())
     {
@@ -765,7 +768,7 @@ int main(int argc, char **argv)
                 if (logfile.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -l/--logfile option\n";
-                    return -1;
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
@@ -775,7 +778,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -l/--logfile option\n";
-                return -1;
+                return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         } else if (!strcmp(a.argv()[argpos],"-v") ||
             !strcmp(a.argv()[argpos],"--verbose"))
@@ -786,7 +789,7 @@ int main(int argc, char **argv)
                 if (temp.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -v/--verbose option\n";
-                    return -1;
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
                 } else
                 {
                     QStringList verboseOpts;
@@ -870,13 +873,13 @@ int main(int argc, char **argv)
             } else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
-                return -1;
+                return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"--version"))
         {
             cout << MYTH_BINARY_VERSION << endl;
-            exit(0);
+            return FRONTEND_EXIT_OK;
         }
         else if (!strcmp(a.argv()[argpos],"-geometry") ||
                  !strcmp(a.argv()[argpos],"--geometry"))
@@ -887,7 +890,7 @@ int main(int argc, char **argv)
                 if (geometry.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -geometry option\n";
-                    return -1;
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
                 else
                     ++argpos;
@@ -895,7 +898,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -geometry option\n";
-                return -1;
+                return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
         else if ((argpos + 1 == a.argc()) &&
@@ -926,7 +929,7 @@ int main(int argc, char **argv)
                     "Environment Variables:" << endl <<
                     "$MYTHTVDIR                     Set the installation prefix" << endl <<
                     "$MYTHCONFDIR                   Set the config dir (instead of ~/.mythtv)" << endl;
-            return -1;
+            return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -939,7 +942,7 @@ int main(int argc, char **argv)
         if (logfd < 0)
         {
             perror("open(logfile)");
-            return -1;
+            return FRONTEND_EXIT_OPENING_LOGFILE_ERROR;
         }
     }
 
@@ -965,16 +968,17 @@ int main(int argc, char **argv)
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-
-    if (geometry != "")
-        if (!gContext->ParseGeometryOverride(geometry))
-            cerr << "Illegal -geometry argument '"
-                 << geometry <<"' (ignored)\n";
-
-    if(!gContext->Init())
+    if (!gContext->Init())
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return -1;
+        return FRONTEND_EXIT_NO_MYTHCONTEXT;
+    }
+
+    if (geometry != "" && !gContext->ParseGeometryOverride(geometry))
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("Illegal -geometry argument '%1' (ignored)")
+                .arg(geometry));
     }
 
     // Create priveleged thread, then drop privs
@@ -992,8 +996,8 @@ int main(int argc, char **argv)
     {
         VERBOSE(VB_IMPORTANT,
                 "Couldn't upgrade database to new schema, exiting.");
-        return -1;
-    }    
+        return FRONTEND_EXIT_DB_OUTOFDATE;
+    }
 
     VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
@@ -1019,7 +1023,7 @@ int main(int argc, char **argv)
     if (themedir == "")
     {
         cerr << "Couldn't find theme " << themename << endl;
-        exit(21);
+        return FRONTEND_EXIT_NO_THEME;
     }
 
     gContext->LoadQtConfig();
@@ -1057,7 +1061,7 @@ int main(int argc, char **argv)
         if (pmanager->run_plugin(pluginname))
         {
             qApp->unlock();
-            return 0;
+            return FRONTEND_EXIT_OK;
         }
         else 
         {
@@ -1065,7 +1069,7 @@ int main(int argc, char **argv)
             if (pmanager->run_plugin(pluginname))
             {
                 qApp->unlock();
-                return 0;
+                return FRONTEND_EXIT_OK;
             }
         }
     }
@@ -1104,5 +1108,5 @@ int main(int argc, char **argv)
 
     delete mainWindow;
     delete gContext;
-    return exitstatus;
+    return FRONTEND_EXIT_OK;
 }

@@ -16,6 +16,7 @@
 #include <cassert>
 using namespace std;
 
+#include "exitcodes.h"
 #include "previousbox.h"
 #include "proglist.h"
 #include "scheduledrecording.h"
@@ -213,8 +214,9 @@ void PreviousBox::LoadWindow(QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("Unknown element: %1, exiting").arg(e.tagName()));
-                exit(-17);
+                VERBOSE(VB_IMPORTANT,
+                        QString("PreviousBox: Unknown child element: %1. "
+                                "Ignoring.").arg(e.tagName()));
             }
         }
     }

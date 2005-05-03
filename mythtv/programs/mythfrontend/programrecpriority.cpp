@@ -21,6 +21,7 @@ using namespace std;
 #include "proglist.h"
 #include "tv.h"
 
+#include "exitcodes.h"
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -130,8 +131,9 @@ ProgramRecPriority::ProgramRecPriority(MythMainWindow *parent,
     }
     else
     {
-        cerr << "MythFrontEnd: ProgramRecPriority - Failed to get selector object.\n";
-        exit(27);
+        VERBOSE(VB_IMPORTANT, "MythFrontEnd::ProgramRecPriority(): "
+                "Failed to get selector object.");
+        exit(FRONTEND_BUGGY_EXIT_NO_SELECTOR);
     }
 
     bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
@@ -288,8 +290,9 @@ void ProgramRecPriority::LoadWindow(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
-                exit(28);
+                VERBOSE(VB_IMPORTANT,
+                        QString("ProgramRecPriority: Unknown child element: "
+                                "%1. Ignoring.").arg(e.tagName()));
             }
         }
     }

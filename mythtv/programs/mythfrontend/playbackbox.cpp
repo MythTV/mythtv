@@ -27,6 +27,7 @@ using namespace std;
 #include "oldsettings.h"
 #include "NuppelVideoPlayer.h"
 
+#include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "programinfo.h"
@@ -210,7 +211,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
                 "Myth will now exit."));
                                   
         VERBOSE(VB_IMPORTANT, "Failed to get selector object.");
-        exit(22);
+        exit(FRONTEND_BUGGY_EXIT_NO_SELECTOR);
         return;
     }
 

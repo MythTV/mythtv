@@ -18,6 +18,7 @@ using namespace std;
 #include "proglist.h"
 #include "tv.h"
 
+#include "exitcodes.h"
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "remoteutil.h"
@@ -52,8 +53,9 @@ ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name)
     }
     else
     {
-        cerr << "MythFrontEnd: ViewSchedule - Failed to get selector object.\n";
-        exit(29);
+        VERBOSE(VB_IMPORTANT, "ViewScheduled::ViewScheduled(): "
+                "Failed to get selector object.");
+        exit(FRONTEND_BUGGY_EXIT_NO_SELECTOR);
     }
 
     updateBackground();
@@ -153,8 +155,9 @@ void ViewScheduled::LoadWindow(QDomElement &element)
                 parseContainer(e);
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
-                exit(30);
+                VERBOSE(VB_IMPORTANT,
+                        QString("ViewScheduled: Unknown child element: %1. "
+                                "Ignoring.").arg(e.tagName()));
             }
         }
     }
