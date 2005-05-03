@@ -13,6 +13,7 @@
 #include <qsocketdevice.h>
 #include <qhostaddress.h>
 
+#include <cerrno>
 #include <cmath>
 #include <queue>
 
