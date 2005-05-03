@@ -471,14 +471,23 @@ void TVRec::HandleStateChange(void)
     {
         SetChannel(true);  
         rbuffer = new RingBuffer(outputFilename, true);
+        if (rbuffer->IsOpen())
+        {
+            StartedRecording();
 
-        StartedRecording();
+            tmpInternalState = nextState;
+            nextState = kState_None;
 
-        tmpInternalState = nextState;
-        nextState = kState_None;
+            startRecorder = true;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "TVRec: Failed to open ringbuffer. "
+                    "Aborting new recording.");
+            delete rbuffer;
+            rbuffer = NULL;
+        }
         changed = true;
-
-        startRecorder = true;
     }   
     else if (tmpInternalState == kState_RecordingOnly && 
              nextState == kState_None)
@@ -542,6 +551,9 @@ void TVRec::HandleStateChange(void)
         bool error = false;
 
         SetupRecorder(profile);
+        if (IsErrored())
+            error = true;
+
         if (channel != NULL)
         {
             // If there is a tuner make sure this is a valid station
@@ -588,7 +600,7 @@ void TVRec::HandleStateChange(void)
         else
             VERBOSE(VB_IMPORTANT, "Tuning Error -- aborting recording");
 
-        if (nvr->IsRecording())
+        if (!error && nvr->IsRecording())
         {
             // evil.
             if (channel)
@@ -662,9 +674,9 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 
         nvr->Initialize();
 #else
-        cerr << "Compiled without ivtv support\n";
+        VERBOSE(VB_IMPORTANT, "MPEG Recorder requested, but MythTV was "
+                "compiled without ivtv driver support.");
 #endif
-        return;
     }
     else if (cardtype == "HDTV")
     {
@@ -675,7 +687,6 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
         nvr->Initialize();
-        return;
     }
     else if (cardtype == "FIREWIRE")
     {
@@ -689,8 +700,10 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         nvr->SetOption("model", firewire_options.model);
         nvr->SetOption("connection", firewire_options.connection);
         nvr->Initialize();
+#else
+        VERBOSE(VB_IMPORTANT, "FireWire Recorder requested, but MythTV was "
+                "compiled without firewire support.");
 #endif
-        return;
     }
     else if (cardtype == "DVB")
     {
@@ -711,20 +724,27 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         nvr->SetOption("expire_data_days",
                        gContext->GetNumSetting("DVBMonitorRetention", 3));
         nvr->Initialize();
+#else
+        VERBOSE(VB_IMPORTANT, "DVB Recorder requested, but MythTV was "
+                "compiled without DVB support.");
 #endif
-        return;
+    }
+    else
+    {
+        // V4L/MJPEG/GO7007 from here on
+
+        nvr = new NuppelVideoRecorder(channel);
+
+        nvr->SetRingBuffer(rbuffer);
+
+        nvr->SetOption("skipbtaudio", skip_btaudio);
+        nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
+ 
+        nvr->Initialize();
     }
 
-    // V4L/MJPEG/GO7007 from here on
-
-    nvr = new NuppelVideoRecorder(channel);
-
-    nvr->SetRingBuffer(rbuffer);
-
-    nvr->SetOption("skipbtaudio", skip_btaudio);
-    nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
- 
-    nvr->Initialize();
+    if (nvr->IsErrored())
+        errored = true;
 }
 
 void TVRec::TeardownRecorder(bool killFile)
@@ -838,7 +858,6 @@ char *TVRec::GetScreenGrab(ProgramInfo *pginfo, const QString &filename,
                            int &video_width, int &video_height)
 {
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
-
 
     if (!MSqlQuery::testDBConnection())
         return NULL;
@@ -1750,7 +1769,7 @@ void TVRec::StopPlaying(void)
     exitPlayer = true;
 }
 
-void TVRec::SetupRingBuffer(QString &path, long long &filesize, 
+bool TVRec::SetupRingBuffer(QString &path, long long &filesize, 
                             long long &fillamount, bool pip)
 {
     ispip = pip;
@@ -1766,7 +1785,18 @@ void TVRec::SetupRingBuffer(QString &path, long long &filesize,
     fillamount = fillamount * 1024 * 1024;
 
     rbuffer = new RingBuffer(path, filesize, fillamount);
-    rbuffer->SetWriteBufferMinWriteSize(1);
+    if (rbuffer->IsOpen())
+    {
+        rbuffer->SetWriteBufferMinWriteSize(1);
+        return true;
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, "TVRec: Failed to open RingBuffer file.");
+        delete rbuffer;
+        rbuffer = NULL;
+        return false;
+    }
 }
 
 void TVRec::SpawnLiveTV(void)

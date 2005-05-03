@@ -389,16 +389,14 @@ void EncoderLink::StopPlaying(void)
     cerr << "Should be local only query: StopPlaying\n";
 }
 
-void EncoderLink::SetupRingBuffer(QString &path, long long &filesize,
+bool EncoderLink::SetupRingBuffer(QString &path, long long &filesize,
                                   long long &fillamount, bool pip)
 {
     if (local)
-    {
-        tv->SetupRingBuffer(path, filesize, fillamount, pip);
-        return;
-    }
+        return tv->SetupRingBuffer(path, filesize, fillamount, pip);
 
     cerr << "Should be local only query: SetupRingBuffer\n";
+    return false;
 }
 
 void EncoderLink::SpawnLiveTV(void)

@@ -48,6 +48,8 @@ public:
     ThreadedFileWriter(const char *filename, int flags, mode_t mode);
     ~ThreadedFileWriter();      /* commits all writes and closes the file. */
 
+    bool Open();
+
     long long Seek(long long pos, int whence);
     unsigned Write(const void *data, unsigned count);
 
@@ -69,16 +71,22 @@ private:
     // allow DiskLoop() to flush buffer completely ignoring low watermark
     void Flush(void);
 
-    unsigned long tfw_buf_size;
-    unsigned long tfw_min_write_size;
-    int fd;
-    char *buf;
-    unsigned rpos,wpos;
+    const char     *filename;
+    int             flags;
+    mode_t          mode;
+    int             fd;
+
+    bool            no_writes;
+    bool            flush;
+
+    unsigned long   tfw_buf_size;
+    unsigned long   tfw_min_write_size;
+    unsigned int    rpos;
+    unsigned int    wpos;
+    char           *buf;
+    int             in_dtor;
+    pthread_t       writer;
     pthread_mutex_t buflock;
-    int in_dtor;
-    pthread_t writer;
-    bool no_writes;
-    bool flush;
 };
 
 static unsigned safe_write(int fd, const void *data, unsigned sz)
@@ -122,26 +130,27 @@ void *ThreadedFileWriter::boot_writer(void *wotsit)
     return NULL;
 }
 
-ThreadedFileWriter::ThreadedFileWriter(const char *filename,
-                                       int flags, mode_t mode)
+ThreadedFileWriter::ThreadedFileWriter(const char *fname,
+                                       int pflags, mode_t pmode)
+    : filename(fname), flags(pflags), mode(pmode), fd(-1),
+      no_writes(false), flush(false), tfw_buf_size(0),
+      tfw_min_write_size(0), rpos(0), wpos(0), buf(NULL),
+      in_dtor(0)
 {
     pthread_mutex_t init = PTHREAD_MUTEX_INITIALIZER;
-
-    no_writes = false;
     buflock = init;
-    buf = NULL;
-    rpos = wpos = 0;
-    in_dtor = 0;
-    flush = false;
+}
 
+bool ThreadedFileWriter::Open()
+{
     fd = open(filename, flags, mode);
 
     if (fd < 0)
     {
-        /* oops! */
-        VERBOSE(VB_IMPORTANT,"ERROR opening file in ThreadedFileWriter.");
-        perror(filename);
-        exit(FIXME_BUG__LIBRARY_EXIT_TFW_FAILED_OPEN);
+        VERBOSE(VB_IMPORTANT,
+                QString("ERROR opening file '%1' in ThreadedFileWriter. %2")
+            .arg(filename).arg(strerror(errno)));
+        return false;
     }
     else
     {
@@ -149,6 +158,7 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
         tfw_buf_size = TFW_DEF_BUF_SIZE;
         tfw_min_write_size = TFW_MIN_WRITE_SIZE;
         pthread_create(&writer, NULL, boot_writer, this);
+        return true;
     }
 }
 
@@ -156,14 +166,14 @@ ThreadedFileWriter::~ThreadedFileWriter()
 {
     no_writes = true;
 
-    Flush();
-    in_dtor = 1; /* tells child thread to exit */
-
-    pthread_join(writer, NULL);
-
     if (fd >= 0)
+    {
+        Flush();
+        in_dtor = 1; /* tells child thread to exit */
+        pthread_join(writer, NULL);
         close(fd);
-    fd = -1;
+        fd = -1;
+    }
 
     if (buf)
     {
@@ -371,7 +381,13 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
         tfw = new ThreadedFileWriter(filename.ascii(),
                                      O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE,
                                      0644);
-        writemode = true;
+        if (tfw->Open())
+            writemode = true;
+        else
+        {
+            delete tfw;
+            tfw = NULL;
+        }
     }
     else
     {
@@ -479,7 +495,13 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
         tfw = new ThreadedFileWriter(filename.ascii(),
                                      O_WRONLY|O_CREAT|O_TRUNC|O_LARGEFILE,
                                      0644);
-        fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
+        if (tfw->Open())
+            fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
+        else
+        {
+            delete tfw;
+            tfw = NULL;
+        }
     }
     else
     {

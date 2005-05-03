@@ -586,6 +586,12 @@ void NuppelVideoRecorder::Initialize(void)
         ringBuffer = new RingBuffer("output.nuv", true);
         weMadeBuffer = true;
         livetv = false;
+        if (!ringBuffer->IsOpen())
+        {
+            VERBOSE(VB_IMPORTANT, "NVR: Could not open RingBuffer");
+            errored = true;
+            return;
+        }
     }
     else
         livetv = ringBuffer->LiveMode();

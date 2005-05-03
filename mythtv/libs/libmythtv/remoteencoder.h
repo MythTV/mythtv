@@ -28,7 +28,7 @@ class RemoteEncoder
     void FillPositionMap(int start, int end,
                          QMap<long long, long long> &positionMap);
     void StopPlaying(void);
-    void SetupRingBuffer(QString &path, long long &filesize, 
+    bool SetupRingBuffer(QString &path, long long &filesize, 
                          long long &fillamount, bool pip = false);
     void SpawnLiveTV(void);
     void StopLiveTV(void);

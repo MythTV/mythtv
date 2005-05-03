@@ -228,7 +228,7 @@ void RemoteEncoder::StopPlaying(void)
     SendReceiveStringList(strlist);
 }
 
-void RemoteEncoder::SetupRingBuffer(QString &path, long long &filesize,
+bool RemoteEncoder::SetupRingBuffer(QString &path, long long &filesize,
                                     long long &fillamount, bool pip)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -237,10 +237,12 @@ void RemoteEncoder::SetupRingBuffer(QString &path, long long &filesize,
 
     SendReceiveStringList(strlist);
 
-    path = strlist[0];
+    bool ok = (strlist[0] == "ok");
+    path = strlist[1];
 
-    filesize = decodeLongLong(strlist, 1);
-    fillamount = decodeLongLong(strlist, 3);
+    filesize = decodeLongLong(strlist, 2);
+    fillamount = decodeLongLong(strlist, 4);
+    return ok;
 }
 
 void RemoteEncoder::SpawnLiveTV(void)

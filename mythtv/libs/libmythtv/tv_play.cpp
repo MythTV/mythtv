@@ -680,30 +680,39 @@ void TV::HandleStateChange(void)
         QString name = "";
 
         recorder->Setup();
-        recorder->SetupRingBuffer(name, filesize, smudge);
-
-        prbuffer = new RingBuffer(name, filesize, smudge, recorder);
-
-        tmpInternalState = nextState;
-        changed = true;
-
-        persistentbrowsemode =
-            gContext->GetNumSetting("PersistentBrowseMode", 0);
-
-        recorder->SpawnLiveTV();
-
-        gContext->DisableScreensaver();
-        StartPlayerAndRecorder(true, false);
-        if (recorder->IsRecording())
-            StartPlayerAndRecorder(false, true);
-        else
+        if (!recorder->SetupRingBuffer(name, filesize, smudge))
         {
-            VERBOSE(VB_IMPORTANT, "LiveTV not successfully started");
+            VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Error, "
+                    "failed to start RingBuffer on backend. Aborting.");
             tmpInternalState = internalState;
             nextState = internalState;
-            StopPlayerAndRecorder(true, false);
-            gContext->RestoreScreensaver();
             recorder = NULL;
+        }
+        else
+        {
+            prbuffer = new RingBuffer(name, filesize, smudge, recorder);
+
+            tmpInternalState = nextState;
+            changed = true;
+
+            persistentbrowsemode =
+                gContext->GetNumSetting("PersistentBrowseMode", 0);
+
+            recorder->SpawnLiveTV();
+
+            gContext->DisableScreensaver();
+            StartPlayerAndRecorder(true, false);
+            if (recorder->IsRecording())
+                StartPlayerAndRecorder(false, true);
+            else
+            {
+                VERBOSE(VB_IMPORTANT, "LiveTV not successfully started");
+                tmpInternalState = internalState;
+                nextState = internalState;
+                StopPlayerAndRecorder(true, false);
+                gContext->RestoreScreensaver();
+                recorder = NULL;
+            }
         }
     }
     else if (internalState == kState_WatchingLiveTV && 
@@ -1990,7 +1999,14 @@ void TV::TogglePIPView(void)
         long long smudge = 0;
 
         piprecorder->Setup();
-        piprecorder->SetupRingBuffer(name, filesize, smudge, true);
+        if (!piprecorder->SetupRingBuffer(name, filesize, smudge, true))
+        {
+            VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Error, failed "
+                    "to start RingBuffer for PiP on backend. Aborting.");
+            delete testrec;
+            piprecorder = NULL;
+            return;
+        }
 
         piprbuffer = new RingBuffer(name, filesize, smudge, piprecorder);
 

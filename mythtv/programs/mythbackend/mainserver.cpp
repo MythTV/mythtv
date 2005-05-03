@@ -2214,11 +2214,16 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         long long filesize = 0;
         long long fillamount = 0;
 
-        enc->SetupRingBuffer(path, filesize, fillamount, pip);
+        bool ok = enc->SetupRingBuffer(path, filesize, fillamount, pip);
 
         QString ip = gContext->GetSetting("BackendServerIP");
         QString port = gContext->GetSetting("BackendServerPort");
         QString url = QString("rbuf://") + ip + ":" + port + path;
+
+        if (ok)
+            retlist<<"ok";
+        else
+            retlist<<"not_ok";
 
         retlist << url;
         encodeLongLong(retlist, filesize);

@@ -106,7 +106,7 @@ class TVRec
     long long GetFreeSpace(long long totalreadpos);
     long long GetKeyframePosition(long long desired);
     void StopPlaying(void);
-    void SetupRingBuffer(QString &path, long long &filesize, 
+    bool SetupRingBuffer(QString &path, long long &filesize, 
                          long long &fillamount, bool pip = false);
     void SpawnLiveTV(void);
     void StopLiveTV(void);
