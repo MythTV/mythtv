@@ -991,7 +991,11 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
             if (!quiet)
                 cout << "From : " << fromdatetime.toString() 
                      << " To : " << todatetime.toString() << " (UTC)\n";
-            ddprocessor.grabData(false, fromdatetime, todatetime);
+            if (!ddprocessor.grabData(false, fromdatetime, todatetime))
+            {
+                cout << "Encountered error in grabbing data..\n";
+                return false;
+            }
         }
 
         dddataretrieved = true;
