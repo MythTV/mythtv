@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
+#include <cerrno>
 
 #include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
