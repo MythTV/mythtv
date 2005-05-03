@@ -2,6 +2,8 @@
 #include <qptrqueue.h>
 #include <qptrstack.h>
 #include "programinfo.h"
+#include "exitcodes.h"
+#include "mythcontext.h"
 
 extern "C" {
 #include "avformat.h"
@@ -40,7 +42,7 @@ class MPEG2trans
     MPEG2trans(QMap<long long, int> *map);
     ~MPEG2trans(void);
     int DoTranscode(QString inputFilename, QString outputFilename);
-    void BuildKeyframeIndex(QString filename, QMap <long long, long long> &posMap);
+    int BuildKeyframeIndex(QString filename, QMap <long long, long long> &posMap);
   private:
     uint32_t parse_seq_header(uint8_t *PES_data, bool store);
     uint32_t get_gop_data(uint8_t *PES_data, gop_timestamp_t *gopts, 

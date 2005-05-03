@@ -5,7 +5,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <netinet/in.h>
-#include <cassert>
 #include <cstdarg>
 #include <cstring>
 #include <getopt.h>
@@ -103,10 +102,10 @@ uint32_t GetBits::GetNext(int num)
 
 void GetBits::MarkerBit(void)
 {
-    if (! GetNext(1))
+    if (!GetNext(1))
     {
-        cerr <<  "Marker bit was not valid!\n";
-        exit(31);
+        VERBOSE(VB_IMPORTANT, "Marker bit was not valid!");
+        exit(TRANSCODE_BUGGY_EXIT_INVALID_MARKER);
     }
 }
 
@@ -203,8 +202,8 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
         audioQueue.enqueue(buffer);
         if (audioPool.isEmpty() )
         {
-            cerr << "Ran out of audio buffers!\n";
-            exit(32);
+            VERBOSE(VB_IMPORTANT, "Ran out of audio buffers!");
+            exit(TRANSCODE_BUGGY_EXIT_NO_AUDIO_BUFFERS);
         }
         DPRINTF(1, "AUDMUX : %d buffers left\n", audioPool.count());
     }
@@ -222,8 +221,8 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
         }
         if (videoPool.isEmpty())
         {
-            cerr << "Ran out of video buffers!\n";
-            exit(33);
+            VERBOSE(VB_IMPORTANT, "Ran out of video buffers!");
+            exit(TRANSCODE_BUGGY_EXIT_NO_VIDEO_BUFFERS);
         }
         DPRINTF(1, "VIDMUX : %d buffers left\n", videoPool.count());
     }
@@ -249,8 +248,8 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
            parameters). */
         if (av_set_parameters(outputContext, NULL) < 0)
         {
-            cerr << "Invalid output format parameters\n";
-            exit(34);
+            VERBOSE(VB_IMPORTANT, "Invalid output format parameters");
+            exit(TRANSCODE_BUGGY_EXIT_INVALID_OUT_PARAMS);
         }
         /* write the stream header, if any */
         av_write_header(outputContext);
@@ -272,8 +271,8 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
             audioout_st->codec.coded_frame= &avframe;
             if (av_write_frame(outputContext, buf->getPkt()) != 0)
             {
-                cerr << "Error while writing audio frame\n";
-                exit(35);
+                VERBOSE(VB_IMPORTANT, "Error while writing audio frame");
+                exit(TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR);
             }
             DPRINTF(1, "AUDIO PTS (initial): %lld (stored): %lld\n", buf->getPTS(), PTS2INT(audioout_st->pts, audioout_st));
             audpts += PTS2INT(audioout_st->pts, audioout_st) - bufpts;
@@ -289,8 +288,8 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
             videoout_st->codec.coded_frame= &avframe;
             if (av_write_frame(outputContext, buf->getPkt()) != 0)
             {
-                cerr << "Error while writing audio frame\n";
-                exit(36);
+                VERBOSE(VB_IMPORTANT, "Error while writing video frame");
+                exit(TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR);
             }
             DPRINTF(1, "VIDEO PTS (initial): %lld (stored): %lld\n", buf->getPTS(), PTS2INT(videoout_st->pts, videoout_st));
             vidpts += PTS2INT(videoout_st->pts, videoout_st) - bufpts;
@@ -371,8 +370,8 @@ uint32_t MPEG2trans::process_mp2_audio(AVPacket *pkt)
         uint8_t pad;
         if (buf[1] != 0xfd)
         {
-            cerr << "Only MP2 audio is currently supported\n";
-            assert(0);
+            VERBOSE(VB_IMPORTANT, "Only MP2 audio is currently supported");
+            exit(TRANSCODE_BUGGY_EXIT_INVALID_AUDIO);
         }
         GetBits *gb = new GetBits(buf + 2);
         audio_bitrate = gb->GetNext(4);
@@ -396,7 +395,7 @@ uint32_t MPEG2trans::process_mp2_audio(AVPacket *pkt)
             case 14: audio_bitrate = 384000; break;
             default:
                fprintf(stderr, "Unsupported bitrate 0x%02x\n", audio_bitrate);
-               assert(0);
+               exit(TRANSCODE_BUGGY_EXIT_INVALID_AUDIO);
         }
         switch (audio_freq) {
             case 0: audio_freq = 44100; break;
@@ -404,7 +403,7 @@ uint32_t MPEG2trans::process_mp2_audio(AVPacket *pkt)
             case 2: audio_freq = 32000; break;
             default:
                 fprintf(stderr, "Unsupported frequency 0x%02x\n", audio_freq);
-                assert(0);
+                exit(TRANSCODE_BUGGY_EXIT_INVALID_AUDIO);
         }
         frame_len = (144 * audio_bitrate / audio_freq) + pad;
         return frame_len;
@@ -665,105 +664,117 @@ bool MPEG2trans::process_video(AVPacket *pkt, bool gopsearch)
     }
     else // something went terribly wrong!
     {
-        assert(0);
+        exit(TRANSCODE_BUGGY_EXIT_INVALID_VIDEO);
     }
     return(false);
 }
 
 int MPEG2trans::DoTranscode(QString inputFilename, QString outputFilename)
 {
-   AVPacket pkt1, *pkt = &pkt1;
-   AVFormatParameters params, *ap = &params;
-   int i, err;
+    AVPacket pkt1, *pkt = &pkt1;
+    AVFormatParameters params, *ap = &params;
+    int i, err;
 
-   inputContext = NULL; //av_mallocz(sizeof(AVFormatContext));
-   ap = (AVFormatParameters *)calloc(sizeof(AVFormatParameters), 1);   
-   if ((err = av_open_input_file(&inputContext, inputFilename, NULL, 0, ap)) 
-       < 0) {
-     cerr << "failed to open file '" << inputFilename 
-          << "' errcode: " << err << "\n";
-     exit(37);
-   }
-   if (av_find_stream_info(inputContext) < 0) {
-     cerr << "Couldn't find stream paramters for ' " << inputFilename << "'\n";
-     exit(38);
-   }
-   for(i = 0; i < inputContext->nb_streams; i++) {
-     AVCodecContext *enc = &inputContext->streams[i]->codec;
-     cerr << "Stream: " << i << " Type: " << enc->codec_type << "\n";
-     switch(enc->codec_type) {
-       case CODEC_TYPE_AUDIO:
-         if (!use_ac3 && 
-             (inputContext->streams[i])->codec.codec_id == CODEC_ID_AC3) {
-           use_ac3 = 1;
-           audioin_index = i;
-         } else if (audioin_index == -1) 
-           audioin_index = i;
-         break;
-       case CODEC_TYPE_VIDEO:
-         videoin_index = i;
-         break;
-       default:
-         break;
-     }
-   }
-   dump_format(inputContext, 0, inputFilename, 0);
-
-   {
-    AVOutputFormat *fmt;
-    /* initialize libavcodec, and register all codecs and formats */
-    
-    /* auto detect the output format from the name. default is
-       mpeg. */
-    fmt = guess_format("vob", NULL, NULL);
-    if (!fmt) {
-        cerr << "Could not find suitable output format\n";
-        exit(39);
-    }
-   
-    /* allocate the output media context */
-    outputContext = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
-    if (!outputContext) {
-        cerr << "Memory error\n";
-        exit(40);
-    }
-    outputContext->oformat = fmt;
-    snprintf(outputContext->filename,
-             sizeof(outputContext->filename), "%s", outputFilename.ascii());
-
-    /* add the audio and video streams using the default format codecs
-       and initialize the codecs */
-    videoout_st = av_new_stream(outputContext, 0);
-    audioout_st = av_new_stream(outputContext, 1);
-
-    if (! videoout_st || !audioout_st)
+    inputContext = NULL; //av_mallocz(sizeof(AVFormatContext));
+    ap = (AVFormatParameters*) calloc(sizeof(AVFormatParameters), 1);
+    err = av_open_input_file(&inputContext, inputFilename, NULL, 0, ap);
+    if (err < 0)
     {
-         fprintf(stderr, "Couldn't find relevant audio and video streams!\n");
-         assert(0);
+        VERBOSE(VB_IMPORTANT, QString("Failed to open file '%1', error code %2")
+                .arg(inputFilename).arg(err));
+        return 1;
     }
+    err = av_find_stream_info(inputContext);
+    if (err < 0)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("Could not find stream paramters for '%1',"
+                        " error code %2").arg(inputFilename).arg(err));
+        return 2;
+    }
+    for (i = 0; i < inputContext->nb_streams; i++)
+    {
+        AVCodecContext *enc = &inputContext->streams[i]->codec;
+        VERBOSE(VB_GENERAL, QString("Stream: %1 Type: %2")
+                .arg(i).arg(enc->codec_type));
+        switch(enc->codec_type) {
+            case CODEC_TYPE_AUDIO:
+                if (!use_ac3 && 
+                    (inputContext->streams[i])->codec.codec_id == CODEC_ID_AC3) {
+                    use_ac3 = 1;
+                    audioin_index = i;
+                } else if (audioin_index == -1) 
+                    audioin_index = i;
+                break;
+            case CODEC_TYPE_VIDEO:
+                videoin_index = i;
+                break;
+            default:
+                break;
+        }
+    }
+    dump_format(inputContext, 0, inputFilename, 0);
 
-    /* open the output file, if needed */
-    if (url_fopen(&outputContext->pb, outputFilename, URL_WRONLY) < 0) {
-            cerr << "Could not open '" << outputFilename << "'\n";
-            exit(41);
-    }
+        AVOutputFormat *fmt;
+        /* initialize libavcodec, and register all codecs and formats */
     
-   }
-   while (av_read_frame(inputContext, pkt) >= 0) {
-     DPRINTF(1, "PKT (%s): %lu %llu\n",((pkt->stream_index == audioin_index) ? "AUDIO" : "VIDEO"),
-                                 pkt->size, pkt->pts);
-     if (pkt->stream_index == audioin_index)
-       process_audio(pkt);
-     else if (pkt->stream_index == videoin_index)
-       process_video(pkt);
-   }
-   av_close_input_file(inputContext);
+        /* auto detect the output format from the name. default is
+           mpeg. */
+        fmt = guess_format("vob", NULL, NULL);
+        if (!fmt)
+        {
+            VERBOSE(VB_IMPORTANT, "Could not find suitable output format.");
+            return 3;
+        }
+   
+        /* allocate the output media context */
+        outputContext = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
+        if (!outputContext)
+        {
+            VERBOSE(VB_IMPORTANT, "Could not allocate memory.");
+            return 4;
+        }
+        outputContext->oformat = fmt;
+        snprintf(outputContext->filename,
+                 sizeof(outputContext->filename), "%s", outputFilename.ascii());
+
+        /* add the audio and video streams using the default format codecs
+           and initialize the codecs */
+        videoout_st = av_new_stream(outputContext, 0);
+        audioout_st = av_new_stream(outputContext, 1);
+
+        if (!videoout_st || !audioout_st)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "Could not find relevant audio and video streams!");
+            return 5;
+        }
+
+        /* open the output file, if needed */
+        if (url_fopen(&outputContext->pb, outputFilename, URL_WRONLY) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Could not open output file '%1'")
+                    .arg(outputFilename));
+            return 6;
+        }
+
+    while (av_read_frame(inputContext, pkt) >= 0)
+    {
+        DPRINTF(1, "PKT (%s): %lu %llu\n",((pkt->stream_index == audioin_index) ? "AUDIO" : "VIDEO"),
+                pkt->size, pkt->pts);
+        if (pkt->stream_index == audioin_index)
+            process_audio(pkt);
+        else if (pkt->stream_index == videoin_index)
+            process_video(pkt);
+    }
+    av_close_input_file(inputContext);
 
     /* write the trailer, if any */
     av_write_trailer(outputContext);
     
     /* free the streams */
-    while(outputContext->nb_streams) {
+    while (outputContext->nb_streams)
+    {
         av_freep(&outputContext->streams[--outputContext->nb_streams]);
     }
 
@@ -772,7 +783,7 @@ int MPEG2trans::DoTranscode(QString inputFilename, QString outputFilename)
 
     /* free the stream */
     av_free(outputContext);
-    return(0);
+    return 0;
 }
 
 uint32_t MPEG2trans::parse_seq_header(uint8_t *PES_data, bool store)
@@ -955,7 +966,7 @@ void MPEG2trans::init_videoout_stream()
                c->bit_rate, c->width, c->height, (float)c->frame_rate / c->frame_rate_base);
 }
 
-void MPEG2trans::BuildKeyframeIndex(QString filename, QMap <long long, long long> &posMap)
+int MPEG2trans::BuildKeyframeIndex(QString filename, QMap <long long, long long> &posMap)
 {
     AVPacket pkt1, *pkt = &pkt1;
     AVFormatParameters params, *ap = &params;
@@ -964,16 +975,24 @@ void MPEG2trans::BuildKeyframeIndex(QString filename, QMap <long long, long long
 
     inputContext = NULL; //av_mallocz(sizeof(AVFormatContext));
     ap = (AVFormatParameters *)calloc(sizeof(AVFormatParameters), 1);   
-    if ((err = av_open_input_file(&inputContext, filename, NULL, 0, ap)) < 0) {
-        cerr << "failed to open file '" << filename 
-             << "' errcode: " << err << "\n";
-        exit(42);
+    err = av_open_input_file(&inputContext, filename, NULL, 0, ap);
+    if (err < 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Failed to open file '%1', error code %2")
+                .arg(filename).arg(err));
+        return 1;
     }
-    if (av_find_stream_info(inputContext) < 0) {
-        cerr << "Couldn't find stream paramters for ' " << filename << "'\n";
-        exit(43);
+    err = av_find_stream_info(inputContext);
+    if (err < 0)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("Could not find stream paramters for '%1',"
+                        " error code %2").arg(filename).arg(err));
+        return 2;
     }
-    for(i = 0; i < inputContext->nb_streams; i++) {
+
+    for (i = 0; i < inputContext->nb_streams; i++)
+    {
         AVCodecContext *enc = &inputContext->streams[i]->codec;
         if (enc->codec_type == CODEC_TYPE_VIDEO)
         {
@@ -983,11 +1002,14 @@ void MPEG2trans::BuildKeyframeIndex(QString filename, QMap <long long, long long
     }
 
     while (av_read_frame(inputContext, pkt) >= 0)
+    {
         if (pkt->stream_index == videoin_index)
         {
             if (process_video(pkt, true))
                 posMap[count] = pkt->startpos;
             count++;
         }
+    }
     av_close_input_file(inputContext);
+    return 0;
 }

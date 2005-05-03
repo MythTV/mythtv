@@ -11,6 +11,7 @@
 #include <fstream>
 using namespace std;
 
+#include "exitcodes.h"
 #include "programinfo.h"
 #include "jobqueue.h"
 #include "mythcontext.h"
@@ -69,7 +70,7 @@ int main(int argc, char *argv[])
     if(!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return -1;
+        return TRANSCODE_EXIT_NO_MYTHCONTEXT;
     }
 
     int found_starttime = 0;
@@ -91,7 +92,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -s/--starttime option\n";
                 usage(a.argv()[0]);
-                return -1;
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         } 
         else if (!strcmp(a.argv()[argpos],"-c") ||
@@ -107,7 +108,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -c/--chanid option\n";
                 usage(a.argv()[0]);
-                return -1;
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         } 
         else if (!strcmp(a.argv()[argpos],"-i") ||
@@ -123,7 +124,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -i/--infile option\n";
                 usage(a.argv()[0]);
-                return -1;
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-V"))
@@ -136,7 +137,7 @@ int main(int argc, char *argv[])
             else
             {
                 cerr << "Missing argument to -V option\n";
-                return -1;
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
@@ -148,7 +149,7 @@ int main(int argc, char *argv[])
                 if (temp.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -v/--verbose option\n";
-                    return -1;
+                    return TRANSCODE_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
@@ -228,7 +229,7 @@ int main(int argc, char *argv[])
             } else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
-                return -1;
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-p") ||
@@ -243,7 +244,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -c/--chanid option\n";
                 usage(a.argv()[0]);
-                return -1;
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-l") ||
@@ -296,7 +297,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -f/--fifodir option\n";
                 usage(a.argv()[0]);
-                return -1;
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"--fifosync"))
@@ -311,7 +312,7 @@ int main(int argc, char *argv[])
                  !strcmp(a.argv()[argpos],"--help")) 
         {
             usage(a.argv()[0]);
-            return(0);
+            return TRANSCODE_EXIT_OK;
         }
     }
 
@@ -319,42 +320,36 @@ int main(int argc, char *argv[])
         (found_infile && (found_chanid || found_starttime)) ) 
     {
          cerr << "Must specify -i OR -c AND -s options!\n";
-         return -1;
+         return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
     if (found_infile && (use_db || build_index))
     {
          cerr << "Can't specify --database or --buildindex with --infile\n";
-         return -1;
+         return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
     if (use_db && build_index)
     {
          cerr << "Can't specify both --database and --buildindex\n";
-         return -1;
+         return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
     if (keyframesonly && fifodir != NULL)
     {
          cerr << "Cannot specify both --fifodir and --allkeys\n";
-         return -1;
+         return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
     if (fifosync && fifodir == NULL)
     {
          cerr << "Must specify --fifodir to use --fifosync\n";
-         return -1;
+         return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
 
     if (verboseString != "")
         VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
-    //if (!db)
-    //{
-    //    printf("Couldn't connect to database\n");
-    //    return -1;
-    //}
-
     if (!MSqlQuery::testDBConnection())
     {
         printf("couldn't open db\n");
-        return -1;
+        return TRANSCODE_EXIT_DB_ERROR;
     }
 
     ProgramInfo *pginfo = NULL;
@@ -367,7 +362,7 @@ int main(int argc, char *argv[])
         {
             cerr << "Couldn't find recording " << chanid << " " 
                  << startts.toString() << endl;
-            return -1;
+            return TRANSCODE_EXIT_NO_RECORDING_DATA;
         }
 
         infile = pginfo->GetPlaybackURL();
@@ -379,7 +374,7 @@ int main(int argc, char *argv[])
                "Mythtranscode is currently unable to transcode remote "
                "files.")
                .arg(infile));
-        exit(0);
+        return TRANSCODE_EXIT_REMOTE_FILE;
     }
 
     tmpfile = infile + ".tmp";
@@ -395,10 +390,11 @@ int main(int argc, char *argv[])
     if (found_infile)
     {
         MPEG2trans *mpeg2trans = new MPEG2trans(&deleteMap);
-        mpeg2trans->DoTranscode(infile, tmpfile);
-        mpeg2trans->BuildKeyframeIndex(tmpfile, posMap);
+        int err = mpeg2trans->DoTranscode(infile, tmpfile);
+        if (err || mpeg2trans->BuildKeyframeIndex(tmpfile, posMap))
+            return TRANSCODE_EXIT_UNKNOWN_ERROR;
         UpdatePositionMap(posMap, tmpfile + ".map", NULL);
-        exit(0);
+        return TRANSCODE_EXIT_OK;
     }
     Transcode *transcode = new Transcode(pginfo);
 
@@ -413,7 +409,7 @@ int main(int argc, char *argv[])
                                    profilename, useCutlist, 
                                    (fifosync || keyframesonly), use_db,
                                    fifodir);
-    int retval;
+    int exitcode = TRANSCODE_EXIT_OK;
     if (result == REENCODE_MPEG2TRANS)
     {
         if (useCutlist)
@@ -421,14 +417,17 @@ int main(int argc, char *argv[])
         MPEG2trans *mpeg2trans = new MPEG2trans(&deleteMap);
         if (build_index)
         {
-            mpeg2trans->BuildKeyframeIndex(infile, posMap);
+            if (mpeg2trans->BuildKeyframeIndex(infile, posMap))
+                return TRANSCODE_EXIT_UNKNOWN_ERROR;
             UpdatePositionMap(posMap, NULL, pginfo);
         }
         else
         {
-            mpeg2trans->DoTranscode(infile, tmpfile);
-            mpeg2trans->BuildKeyframeIndex(tmpfile, posMap);
+            int err = mpeg2trans->DoTranscode(infile, tmpfile);
+            if (err || mpeg2trans->BuildKeyframeIndex(tmpfile, posMap))
+                return TRANSCODE_EXIT_UNKNOWN_ERROR;
             UpdatePositionMap(posMap, tmpfile + ".map", NULL);
+            return TRANSCODE_EXIT_OK;
         }
         // this is a hack, since the mpeg2 transcoder doesn't return anything
         // useful yet.
@@ -439,7 +438,6 @@ int main(int argc, char *argv[])
         if (use_db)
             JobQueue::ChangeJobStatus(jobID, JOB_STOPPING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 done").arg(infile));
-        retval = 0;
     } 
     else if (result == REENCODE_CUTLIST_CHANGE)
     {
@@ -447,7 +445,7 @@ int main(int argc, char *argv[])
             JobQueue::ChangeJobStatus(jobID, JOB_RETRY);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 aborted because of "
                                     "cutlist update").arg(infile));
-        retval = 1;
+        exitcode = TRANSCODE_EXIT_ERROR_CUTLIST_UPDATE;
     }
     else if (result == REENCODE_STOPPED)
     {
@@ -455,20 +453,20 @@ int main(int argc, char *argv[])
             JobQueue::ChangeJobStatus(jobID, JOB_ABORTING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 stopped because of "
                                     "stop command").arg(infile));
-        retval = 1;
+        exitcode = TRANSCODE_EXIT_STOPPED;
     }
     else
     {
         if (use_db)
             JobQueue::ChangeJobStatus(jobID, JOB_ERRORING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 failed").arg(infile));
-        retval = -1;
+        exitcode = TRANSCODE_EXIT_UNKNOWN_ERROR;
     }
 
     delete transcode;
     delete pginfo;
     delete gContext;
-    return retval;
+    return exitcode;
 }
 void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
                        ProgramInfo *pginfo)
