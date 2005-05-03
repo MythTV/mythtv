@@ -32,19 +32,19 @@ struct SmartPLField
 
 static SmartPLField SmartPLFields[] = 
 {
-    "",              "",                               ftString,   0,    0,    0,
-    "Artist",        "artist",                         ftString,   0,    0,    0,
-    "Album",         "album",                          ftString,   0,    0,    0,
-    "Title",         "title",                          ftString,   0,    0,    0,
-    "Genre",         "genre",                          ftString,   0,    0,    0,
-    "Year",          "year",                           ftNumeric,  1900, 2099, 2000,
-    "Track No.",     "tracknum",                       ftNumeric,  0,    99,   0,
-    "Rating",        "rating",                         ftNumeric,  0,    10,   0,
-    "Play Count",    "playcount",                      ftNumeric,  0,    9999, 0,
-    "Compilation",   "compilation",                    ftBoolean,  0,    0,    0,
-    "Comp. Artist",  "compilation_artist",             ftString,   0,    0,    0, 
-    "Last Play",     "FROM_DAYS(TO_DAYS(lastplay))",   ftDate,     0,    0,    0,
-    "Date Imported", "FROM_DAYS(TO_DAYS(date_added))", ftDate,     0,    0,    0   
+    { "",              "",                               ftString,   0,    0,    0 },
+    { "Artist",        "artist",                         ftString,   0,    0,    0 },
+    { "Album",         "album",                          ftString,   0,    0,    0 },
+    { "Title",         "title",                          ftString,   0,    0,    0 },
+    { "Genre",         "genre",                          ftString,   0,    0,    0 },
+    { "Year",          "year",                           ftNumeric,  1900, 2099, 2000 },
+    { "Track No.",     "tracknum",                       ftNumeric,  0,    99,   0 },
+    { "Rating",        "rating",                         ftNumeric,  0,    10,   0 },
+    { "Play Count",    "playcount",                      ftNumeric,  0,    9999, 0 },
+    { "Compilation",   "compilation",                    ftBoolean,  0,    0,    0 },
+    { "Comp. Artist",  "compilation_artist",             ftString,   0,    0,    0 },
+    { "Last Play",     "FROM_DAYS(TO_DAYS(lastplay))",   ftDate,     0,    0,    0 },
+    { "Date Imported", "FROM_DAYS(TO_DAYS(date_added))", ftDate,     0,    0,    0 },
 };        
 
 struct SmartPLOperator
@@ -57,14 +57,14 @@ struct SmartPLOperator
 
 static SmartPLOperator SmartPLOperators[] = 
 {
-    "is equal to",     1,  false, true,
-    "is not equal to", 1,  false, true,
-    "is greater than", 1,  false, false,
-    "is less than",    1,  false, false,     
-    "starts with",     1,  true,  false,
-    "ends with",       1,  true,  false,
-    "contains",        1,  true,  false,
-    "is between",      2,  false, false,
+    { "is equal to",     1,  false, true },
+    { "is not equal to", 1,  false, true },
+    { "is greater than", 1,  false, false },
+    { "is less than",    1,  false, false },
+    { "starts with",     1,  true,  false },
+    { "ends with",       1,  true,  false },
+    { "contains",        1,  true,  false },
+    { "is between",      2,  false, false },
 };
 
 static int SmartPLOperatorsCount = sizeof(SmartPLOperators) / sizeof(SmartPLOperators[0]);

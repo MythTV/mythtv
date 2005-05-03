@@ -59,7 +59,15 @@ static void checkVisFactories(void)
     }
 }
 
+VisualBase::VisualBase(bool screensaverenable)
+    : xscreensaverenable(screensaverenable)
+{
+    if (!gContext->GetScreensaverEnabled())
+        return;
 
+    if (!xscreensaverenable)
+        gContext->DoDisableScreensaver();
+}
 
 MainVisual::MainVisual(QWidget *parent, const char *name)
     : QWidget( parent, name ), vis( 0 ), playing( FALSE ), fps( 20 )
@@ -834,6 +842,6 @@ VisualBase::~VisualBase()
     //	that derived classes
     //	can destruct properly
     //
+    if (!xscreensaverenable)
+        gContext->DoRestoreScreensaver();
 }
-
-

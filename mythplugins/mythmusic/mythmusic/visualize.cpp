@@ -349,6 +349,7 @@ VisualBase *AlbumArtFactory::create(MainVisual *parent, long int winid)
 
 
 Blank::Blank()
+    : VisualBase(true)
 {
     fps = 20;
 }

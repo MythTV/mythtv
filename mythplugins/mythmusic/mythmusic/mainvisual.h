@@ -49,7 +49,8 @@ public:
 class VisualBase
 {
   public:
-    virtual ~VisualBase();
+    VisualBase(bool screensaverenable = false);
+    virtual ~VisualBase(void);
 
     // return true if the output should stop
     virtual bool process( VisualNode *node ) = 0;
@@ -59,6 +60,7 @@ class VisualBase
 
   protected:
     int fps;
+    bool xscreensaverenable;
 };
 
 // base class to handle things like frame rate...
