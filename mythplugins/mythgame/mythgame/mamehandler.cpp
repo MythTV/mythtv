@@ -436,7 +436,7 @@ void MameHandler::processGames()
                                     map<QString, QString>::iterator i;;
                                     if ((!CatMap.empty()) && ((i = CatMap.find(rom->Romname().latin1())) != CatMap.end()))
                                     {
-                                        rom->setGenre((*i).second);
+                                        rom->setGenre((*i).second.stripWhiteSpace());
                                         //cout << "Genre = " << (*i).second.latin1() << endl;
                                     }
                                     else
