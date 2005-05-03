@@ -24,7 +24,7 @@
 #include <cstdio>
 #include <ctime>
 
-
+#include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
 #include "libmythtv/scheduledrecording.h"
 #include "libmythtv/datadirect.h"
@@ -1596,7 +1596,7 @@ bool parseFile(QString filename, QValueList<ChanInfo> *chanlist,
     {
         cerr << "Don't use tv_grab_na_dd, use the internal datadirect grabber."
              << endl;
-        exit(14);
+        exit(FILLDB_BUGGY_EXIT_SRC_IS_DD);
     }
 
     QString aggregatedTitle;
@@ -2491,9 +2491,12 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         return grabDDData(source, offset, *qCurrentDate, DD_LXM);
         
     char tempfilename[] = "/tmp/mythXXXXXX";
-    if (mkstemp(tempfilename) == -1) {
-         perror("mkstemp");
-         exit(15);
+    if (mkstemp(tempfilename) == -1)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("Error creating temporary file in /tmp, %1")
+                .arg(strerror(errno)));
+        exit(FILLDB_BUGGY_EXIT_ERR_OPEN_TMPFILE);
     }
 
     QString filename = QString(tempfilename);
@@ -3175,7 +3178,7 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 3], "--", 2))
             {
                 printf("missing or invalid parameters for --file option\n");
-                return -1;
+                return FILLDB_EXIT_INVALID_CMDLINE;
             }
 
             fromfile_id = atoi(a.argv()[++argpos]);
@@ -3195,7 +3198,7 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 4], "--", 2))
             {
                 printf("missing or invalid parameters for --dd-file option\n");
-                return -1;
+                return FILLDB_EXIT_INVALID_CMDLINE;
             }
 
             fromfile_id = atoi(a.argv()[++argpos]);
@@ -3214,7 +3217,7 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 2], "--", 2))
             {
                 printf("missing or invalid parameters for --xawchannels option\n");
-                return -1;
+                return FILLDB_EXIT_INVALID_CMDLINE;
             }
 
             fromxawfile_id = atoi(a.argv()[++argpos]);
@@ -3233,7 +3236,7 @@ int main(int argc, char *argv[])
             if (((argpos + 1) >= a.argc()))
             {
                 printf("missing parameter for --graboptions option\n");
-                return -1;
+                return FILLDB_EXIT_INVALID_CMDLINE;
             }
 
             graboptions = QString(" ") + QString(a.argv()[++argpos]);
@@ -3334,7 +3337,7 @@ int main(int argc, char *argv[])
                 {
                     cerr << "Unknown icon group '" << a.argv()[argpos]
                             << "' for --reset-icon-map option" << endl;
-                    return -1;
+                    return FILLDB_EXIT_UNKNOWN_ICON_GROUP;
                 }
             }
         }
@@ -3419,13 +3422,13 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "  --manual and --update can not be used together.\n";
             cout << "\n";
-            return -1;
+            return FILLDB_EXIT_INVALID_CMDLINE;
         }
         else
         {
             fprintf(stderr, "illegal option: '%s' (use --help)\n",
                     a.argv()[argpos]);
-            return -1;
+            return FILLDB_EXIT_INVALID_CMDLINE;
         }
 
         ++argpos;
@@ -3436,7 +3439,7 @@ int main(int argc, char *argv[])
     if(!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return -1;
+        return FILLDB_EXIT_NO_MYTHCONTEXT;
     }
 
     gContext->LogEntry("mythfilldatabase", LP_INFO,
@@ -3475,7 +3478,7 @@ int main(int argc, char *argv[])
         }
 
         if (!grabDataFromFile(fromfile_id, fromfile_name))
-            return -1;
+            return FILLDB_EXIT_GRAB_DATA_FAILED;
 
         clearOldDBEntries();
 
@@ -3547,13 +3550,13 @@ int main(int argc, char *argv[])
                                      "Could not find any defined channel "
                                      "sources - did you run the setup "
                                      "program?");
-                  exit(16);
+                  return FILLDB_EXIT_NO_CHAN_SRC;
              }
         }
         else
         {
              MythContext::DBError("loading channel sources", sourcequery);
-             exit(17);
+             return FILLDB_EXIT_DB_ERROR;
         }
     
         if (!fillData(sourcelist))
@@ -3561,7 +3564,7 @@ int main(int argc, char *argv[])
              cerr << "Failed to fetch some program info\n";
              gContext->LogEntry("mythfilldatabase", LP_WARNING,
                                 "Failed to fetch some program info", "");
-             exit(18);
+             return FILLDB_EXIT_DB_ERROR;
         }
     }
 
@@ -3656,5 +3659,5 @@ int main(int argc, char *argv[])
 
     delete gContext;
 
-    return 0;
+    return FILLDB_EXIT_OK;
 }

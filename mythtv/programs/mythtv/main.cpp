@@ -5,6 +5,7 @@
 #include "tv.h"
 #include "programinfo.h"
 
+#include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
 #include "libmyth/mythdialogs.h"
@@ -75,7 +76,7 @@ int main(int argc, char *argv[])
     if (!gContext->Init())
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return -1;
+        return TV_EXIT_NO_MYTHCONTEXT;
     }
 
     // Create priveleged thread, then drop privs
@@ -93,10 +94,10 @@ int main(int argc, char *argv[])
     QString themedir = gContext->FindThemeDir(themename);
     if (themedir == "")
     {   
-        QString msg = QString("Fatal Error 44: Couldn't find theme '%1'.")
+        QString msg = QString("Fatal Error: Couldn't find theme '%1'.")
             .arg(themename);
         VERBOSE(VB_IMPORTANT, msg);
-        return 44; // exit(44)
+        return TV_EXIT_NO_THEME;
     }
     
     gContext->LoadQtConfig();
@@ -104,9 +105,9 @@ int main(int argc, char *argv[])
     QString auddevice = gContext->GetSetting("AudioOutputDevice");
     if (auddevice == "" || auddevice == QString::null)
     {
-        VERBOSE(VB_IMPORTANT, "Fatal Error 47: You need "
+        VERBOSE(VB_IMPORTANT, "Fatal Error: Audio not configured, you need "
                 "to run 'mythfrontend', not 'mythtv'.");
-        return 47; // exit(47)
+        return TV_EXIT_NO_AUDIO;
     }
 
     print_verbose_messages |= VB_PLAYBACK | VB_LIBAV;// | VB_AUDIO;
@@ -120,8 +121,8 @@ int main(int argc, char *argv[])
     TV *tv = new TV();
     if (!tv->Init())
     {
-        VERBOSE(VB_IMPORTANT, "Fatal Error 51: Error initializing TV class.");
-        return 51; // exit(51)
+        VERBOSE(VB_IMPORTANT, "Fatal Error: Could not initializing TV class.");
+        return TV_EXIT_NO_TV;
     }
 
     if (a.argc() > 1)
@@ -154,5 +155,5 @@ int main(int argc, char *argv[])
     }
     delete gContext;
 
-    return 0; // exit(0)
+    return TV_EXIT_OK;
 }

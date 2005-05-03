@@ -1,13 +1,17 @@
+#include <cstdlib>
+#include <sys/types.h>
+#include <sys/socket.h>
+
+#include <iostream>
+
 #include <qapplication.h>
 #include <qsocketdevice.h>
 #include <qstring.h>
 #include <qcstring.h>
 #include <qfile.h>
 #include <qhostaddress.h>
-#include <stdlib.h>
-#include <iostream>
-#include <sys/types.h>
-#include <sys/socket.h>
+
+#include "exitcodes.h"
 
 using namespace std;
 
@@ -88,7 +92,7 @@ int main(int argc, char *argv[])
     if (a.argc() == 0)
     {
         printHelp();
-        return 0; // exit(0)
+        return TVOSD_EXIT_OK;
     }
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -98,7 +102,7 @@ int main(int argc, char *argv[])
         if (arg.startsWith("-h") || arg.startsWith("--help"))
         {
             printHelp();
-            return 0; // exit(0)
+            return TVOSD_EXIT_OK;
         }
 
         if (arg.startsWith("--template="))
@@ -113,7 +117,7 @@ int main(int argc, char *argv[])
         cerr << "--template=<value> argument is required\n"
              << "  <value> can be 'alert', 'cid', 'scroller', or a "
              << "filename of a template\n";
-        return 48; // exit(48)
+        return TVOSD_EXIT_INVALID_CMDLINE;
     }
 
     if (templatearg == "cid")
@@ -128,7 +132,7 @@ int main(int argc, char *argv[])
         if (!mfile.open(IO_ReadOnly))
         {
             cerr << "Unable to open template file '" << templatearg << "'\n";
-            return 49; // exit(49)
+            return TVOSD_EXIT_NO_TEMPLATE;
         }
 
         QByteArray mdata = mfile.readAll();
@@ -190,7 +194,7 @@ int main(int argc, char *argv[])
         < 0)
     {
         perror("Set broadcast");
-        return 50; // exit(50)
+        return TVOSD_EXIT_SOCKET_ERROR;
     }
 
     QCString utf8 = message.utf8();
@@ -206,6 +210,6 @@ int main(int argc, char *argv[])
              << " and port: " << port << endl;
     }
    
-    return 0; // exit(0)
+    return TVOSD_EXIT_OK;
 }
 

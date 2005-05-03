@@ -8,6 +8,7 @@ target.path = $${PREFIX}/bin
 INSTALLS = target
 
 LIBS += $$EXTRA_LIBS 
+INCLUDEPATH += ../../libs/libmyth
 
 # Input
 SOURCES += main.cpp
