@@ -184,6 +184,7 @@ class OSDTypeText : public OSDType
                     int fade, int maxfade, int xoff, int yoff);
 
     QRect m_displaysize;
+    QRect m_screensize;
     QString m_message;
     QString m_default_msg;
 

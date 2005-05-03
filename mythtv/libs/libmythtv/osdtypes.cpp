@@ -446,6 +446,7 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
     m_altfont = NULL;
     
     m_displaysize = displayrect;
+    m_screensize = displayrect;
     m_multiline = false;
     m_centered = false;
     m_right = false;
@@ -462,6 +463,7 @@ OSDTypeText::OSDTypeText(const OSDTypeText &other)
            : OSDType(other.m_name)
 {
     m_displaysize = other.m_displaysize;
+    m_screensize = other.m_screensize;
     m_message = other.m_message;
     m_default_msg = other.m_default_msg;
     m_font = other.m_font;
@@ -500,12 +502,12 @@ void OSDTypeText::SetDefaultText(const QString &text)
 
 void OSDTypeText::Reinit(float wchange, float hchange)
 {
-    int width = (int)(m_displaysize.width() * wchange);
-    int height = (int)(m_displaysize.height() * hchange);
-    int x = (int)(m_displaysize.x() * wchange);
-    int y = (int)(m_displaysize.y() * hchange);
+    int width = (int)(m_screensize.width() * wchange);
+    int height = (int)(m_screensize.height() * hchange);
+    int x = (int)(m_screensize.x() * wchange);
+    int y = (int)(m_screensize.y() * hchange);
 
-    m_displaysize = QRect(x, y, width, height);
+    m_displaysize = m_screensize = QRect(x, y, width, height);
 }
 
 void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
@@ -598,6 +600,7 @@ void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
     {
         if (!m_scrollinit)
         {
+            m_displaysize = m_screensize;
             if (m_scrollx < 0)
             {
                 int numspaces = m_displaysize.width() / m_font->SpaceWidth();
