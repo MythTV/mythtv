@@ -204,7 +204,7 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     else
         systemFilter += ")";
 
-    //  create two top level nodes - this could be moved to a config based
+    //  create a few top level nodes - this could be moved to a config based
     //  approach with multiple roots if/when someone has the time to create
     //  the relevant dialog screens
     levels = gContext->GetSetting("GameAllTreeLevels");
@@ -213,6 +213,25 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     m_gameTreeItems.push_back(new GameTreeItem(root));
     node = m_gameTree->addNode(tr("All Games"), m_gameTreeItems.size(), false);
 
+    root = new GameTreeRoot("gamename", systemFilter);
+    m_gameTreeRoots.push_back(root);
+    m_gameTreeItems.push_back(new GameTreeItem(root));
+    node = m_gameTree->addNode(tr("-   By Name"), m_gameTreeItems.size(), false);
+
+    root = new GameTreeRoot("year gamename", systemFilter);
+    m_gameTreeRoots.push_back(root);
+    m_gameTreeItems.push_back(new GameTreeItem(root));
+    node = m_gameTree->addNode(tr("-   By Year"), m_gameTreeItems.size(), false);
+
+    root = new GameTreeRoot("system gamename", systemFilter);
+    m_gameTreeRoots.push_back(root);
+    m_gameTreeItems.push_back(new GameTreeItem(root));
+    node = m_gameTree->addNode(tr("-   By System"), m_gameTreeItems.size(), false);
+
+    root = new GameTreeRoot("genre gamename", systemFilter);
+    m_gameTreeRoots.push_back(root);
+    m_gameTreeItems.push_back(new GameTreeItem(root));
+    node = m_gameTree->addNode(tr("-   By Genre"), m_gameTreeItems.size(), false);
     levels = gContext->GetSetting("GameFavTreeLevels");
     root = new GameTreeRoot(levels, systemFilter + " and favorite=1");
     m_gameTreeRoots.push_back(root);
