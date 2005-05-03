@@ -1656,7 +1656,7 @@ fi
 
 if test x"$firewire_cable_box" = x"yes" ; then
     firewire_cable_box="no"
-    if has_library libiec61883 ; then
+    if has_library libiec61883 -a has_library libavc1394 ; then
             firewire_cable_box="yes"
     fi
 fi
@@ -2295,7 +2295,7 @@ fi
 if test x"$firewire_cable_box" = x"yes" ; then
   CCONFIG="$CCONFIG using_firewire"
   CONFIG_DEFINES="$CONFIG_DEFINES USING_FIREWIRE"
-  echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883" >> config.mak
+  echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394" >> config.mak
 fi
 
 if test x"$lirc" = x"yes" ; then

@@ -126,7 +126,7 @@ bool TVRec::Init(void)
     else if (cardtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
-        channel = new FirewireChannel(this);
+        channel = new FirewireChannel(firewire_options, this);
         channel->Open();
         if (inputname.isEmpty())
             channel->SetChannelByString(startchannel);
