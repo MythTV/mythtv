@@ -13,6 +13,7 @@
 #include "frequencies.h"
 #include "tv.h"
 #include "mythcontext.h"
+#include "exitcodes.h"
 
 #include <iostream>
 using namespace std;
@@ -189,7 +190,7 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
         }
         msg.append(strerror(errno));
         VERBOSE(VB_IMPORTANT, msg);
-        _exit(1); // this exit is ok, we are just exiting from the channel changing fork with an error.
+        _exit(CHANNEL__EXIT__EXECL_ERROR); // this exit is ok
     }
     else
     {   // child contains the pid of the new process
@@ -223,7 +224,13 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
         if (WIFEXITED(status))
         {   // program exited normally
             int ret = WEXITSTATUS(status);
-            if (ret)
+            if (CHANNEL__EXIT__EXECL_ERROR == ret)
+            {
+                VERBOSE(VB_IMPORTANT, QString("ChannelBase: Could not execute "
+                                              "external tuning program."));
+                return false;
+            }
+            else if (ret)
             {   // external tuning program returned error value
                 VERBOSE(VB_IMPORTANT,
                         QString("ChannelBase: external tuning program "

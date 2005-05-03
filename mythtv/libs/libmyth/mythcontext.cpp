@@ -62,7 +62,7 @@ class MythContextPrivate
     void StoreGUIsettings(void);
 
     void LoadLogSettings(void);
-    void LoadDatabaseSettings(bool reload);
+    bool LoadDatabaseSettings(bool reload);
     
     bool FixSettingsFile(void);
     bool WriteSettingsFile(const DatabaseParams &params,
@@ -275,7 +275,8 @@ cout << "Total desktop width=" << desktop->width() <<
 bool MythContextPrivate::Init(bool gui)
 {
     m_gui = gui;
-    LoadDatabaseSettings(false);
+    if (!LoadDatabaseSettings(false))
+        return false;
 
     serverSock = NULL;
     eventSock = new QSocket(0);
@@ -397,7 +398,7 @@ void MythContextPrivate::LoadLogSettings(void)
     m_logprintlevel = parent->GetNumSetting("LogPrintLevel", LP_ERROR);
 }
 
-void MythContextPrivate::LoadDatabaseSettings(bool reload)
+bool MythContextPrivate::LoadDatabaseSettings(bool reload)
 {
     if (reload)
     {
@@ -410,7 +411,7 @@ void MythContextPrivate::LoadDatabaseSettings(bool reload)
     {
         VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
         if (!FixSettingsFile())
-            exit(-29);
+            return false;
         else
             parent->LoadSettingsFiles("mysql.txt");
     }
@@ -425,16 +426,19 @@ void MythContextPrivate::LoadDatabaseSettings(bool reload)
         char localhostname[1024];
         if (gethostname(localhostname, 1024))
         {
-            perror("gethostname");
-            VERBOSE(VB_IMPORTANT, "MCP: Could not determine host name, exiting");
-            exit(-29);
+            VERBOSE(VB_IMPORTANT,
+                    QString("MCP: Error, could not determine "
+                            "host name. '%1'").arg(strerror(errno)));
+            return false;
         }
         m_localhostname = localhostname;
     }
+    return true;
 }
 
 bool MythContextPrivate::FixSettingsFile(void)
 {
+    VERBOSE(VB_IMPORTANT, "Trying to create a basic mysql.txt file");
     DatabaseParams defaultParams = parent->GetDatabaseParams();
     
     return WriteSettingsFile(defaultParams);
@@ -669,26 +673,25 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
 }
 
 MythContext::MythContext(const QString &binversion)
-           : QObject()
+    : QObject(), d(NULL), app_binary_version(binversion)
 {
     qInitNetworkProtocols();
-
-    if (binversion != MYTH_BINARY_VERSION)
-    {
-        VERBOSE(VB_IMPORTANT, QString("This app was compiled against libmyth version: %1")
-                .arg(binversion));
-        VERBOSE(VB_IMPORTANT, QString("but the library is version: %1").arg(MYTH_BINARY_VERSION));
-        VERBOSE(VB_IMPORTANT, "You probably want to recompile everything, and do a");
-        VERBOSE(VB_IMPORTANT, "'make distclean' first. exiting.");
-        exit(-30);
-    }
-
-    d = new MythContextPrivate(this);
-
 }
 
 bool MythContext::Init(bool gui)
 {
+    if (app_binary_version != MYTH_BINARY_VERSION)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("This app was compiled against libmyth version: %1"
+                "\n\t\t\tbut the library is version: %2"
+                "\n\t\t\tYou probably want to recompile everything, and do a"
+                "\n\t\t\t'make distclean' first.")
+                .arg(app_binary_version).arg(MYTH_BINARY_VERSION));
+        return false;
+    }
+
+    d = new MythContextPrivate(this);
 
     if (!d->Init(gui))
         return false;
@@ -2409,7 +2412,7 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
     bool ret = true;
     DatabaseParams cur_params = GetDatabaseParams();
     
-    // only rewrite file if it hasn't changed
+    // only rewrite file if it has changed
     if (params.dbHostName   != cur_params.dbHostName          ||
         params.dbUserName   != cur_params.dbUserName          ||
         params.dbPassword   != cur_params.dbPassword          ||
@@ -2426,7 +2429,7 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
     {
         ret = d->WriteSettingsFile(params, true);
         if (ret)
-            d->LoadDatabaseSettings(true);
+            ret = d->LoadDatabaseSettings(true);
     }
     return ret;
 }

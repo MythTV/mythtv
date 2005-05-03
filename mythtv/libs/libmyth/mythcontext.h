@@ -12,7 +12,6 @@
 #include <qsocketdevice.h>
 #include <qstringlist.h>
 #include <qnetwork.h> 
-#include <qmutex.h>
 
 #include <iostream>
 #include <sstream>
@@ -162,7 +161,7 @@ class MythPrivRequest
     void *m_data;
 };
 
-#define MYTH_BINARY_VERSION "0.18.20050423-1"
+#define MYTH_BINARY_VERSION "0.18.20050503-1"
 #define MYTH_PROTO_VERSION "15"
 
 extern int print_verbose_messages;
@@ -340,6 +339,7 @@ class MythContext : public QObject
     void RemoveCacheDir(const QString &dirname);
 
     MythContextPrivate *d;
+    QString app_binary_version;
 };
 
 extern MythContext *gContext;

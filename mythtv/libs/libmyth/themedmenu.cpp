@@ -15,6 +15,7 @@
 #include <cmath>
 using namespace std;
 
+#include "exitcodes.h"
 #include "themedmenu.h"
 #include "mythcontext.h"
 #include "util.h"
@@ -95,11 +96,11 @@ class ThemedMenuPrivate
    ~ThemedMenuPrivate();
 
     bool keyPressHandler(QKeyEvent *e);
-    void ReloadTheme(void);
+    bool ReloadTheme(void);
 
-    void parseMenu(const QString &menuname, int row = -1, int col = -1);
+    bool parseMenu(const QString &menuname, int row = -1, int col = -1);
 
-    void parseSettings(const QString &dir, const QString &menuname);
+    bool parseSettings(const QString &dir, const QString &menuname);
 
     void parseBackground(const QString &dir, QDomElement &element);
     void parseLogo(const QString &dir, QDomElement &element);
@@ -119,7 +120,7 @@ class ThemedMenuPrivate
 
     void addButton(const QString &type, const QString &text,
                    const QString &alttext, const QStringList &action);
-    void layoutButtons(void);
+    bool layoutButtons(void);
     void positionButtons(bool resetpos);
     bool makeRowVisible(int newrow, int oldrow, bool forcedraw = true);
 
@@ -1248,7 +1249,7 @@ void ThemedMenuPrivate::setDefaults(void)
     watermarkRect = QRect(0, 0, 0, 0);
 }
 
-void ThemedMenuPrivate::parseSettings(const QString &dir, 
+bool ThemedMenuPrivate::parseSettings(const QString &dir, 
                                       const QString &menuname)
 {
     QString filename = dir + menuname;
@@ -1260,7 +1261,7 @@ void ThemedMenuPrivate::parseSettings(const QString &dir,
     {
         VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate::parseSettings(): "
                                       "Can't open: %1").arg(filename));
-        return;
+        return false;
     }
 
     QString errorMsg;
@@ -1280,8 +1281,7 @@ void ThemedMenuPrivate::parseSettings(const QString &dir,
                                               "return to the main menu.")
                                               .arg(menuname)));
         menulevel = 0;
-        parseMenu("mainmenu.xml");
-        return;
+        return parseMenu("mainmenu.xml");
     }
 
     f.close();
@@ -1336,8 +1336,8 @@ void ThemedMenuPrivate::parseSettings(const QString &dir,
             else
             {
                 VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown "
-                                            "element %1").arg(e.tagName()));
-                return;
+                                            "element %1. Ignoring.")
+                        .arg(e.tagName()));
             }
         }
         n = n.nextSibling();
@@ -1346,18 +1346,18 @@ void ThemedMenuPrivate::parseSettings(const QString &dir,
     if (!setbackground)
     {
         VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing background element");
-        return;
+        return false;
     }
 
     if (!setbuttondef)
     {
         VERBOSE(VB_IMPORTANT,
                 "ThemedMenuPrivate: Missing genericbutton definition");
-        return;
+        return false;
     }
 
     parseFonts = false;
-    return;
+    return true;
 }
 
 void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
@@ -1446,7 +1446,7 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
         addButton(type, text, alttext, action);
 }
 
-void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
+bool ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 {
     QString filename = findMenuFile(menuname);
 
@@ -1459,7 +1459,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
                                       "menu file %1").arg(menuname));
         if (menuname == "mainmenu.xml" )
         {
-            exit(-38);
+            return false;
         }
         else
         {
@@ -1469,8 +1469,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
                                     "We will now return to the main menu.").
                             arg(menuname)));
             menulevel = 0;
-            parseMenu("mainmenu.xml");
-            return;
+            return parseMenu("mainmenu.xml");
         }
     }
 
@@ -1487,7 +1486,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
         if (menuname == "mainmenu.xml" )
         {
-            exit(-39);
+            return false;
         }
 
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
@@ -1497,8 +1496,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
                                               "return to the main menu.")
                                               .arg(menuname)));
         menulevel = 0;
-        parseMenu("mainmenu.xml");
-        return;
+        return parseMenu("mainmenu.xml");
     }
 
     f.close();
@@ -1524,7 +1522,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
             {
                 VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Unknown "
                                               "element %1").arg(e.tagName()));
-                exit(-40);
+                return false;
             }
         }
         n = n.nextSibling();
@@ -1534,10 +1532,11 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
     {
         VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: No buttons "
                                       "for menu %1").arg(menuname));
-        exit(-41);
+        return false;
     }
 
-    layoutButtons();
+    if (!layoutButtons())
+        return false;
     positionButtons(true);
 
     if (row != -1 && col != -1)
@@ -1593,6 +1592,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
     selection = "";
     parent->update(menuRect());
+    return true;
 }
 
 void ThemedMenuPrivate::updateLCD()
@@ -1662,7 +1662,7 @@ void ThemedMenuPrivate::addButton(const QString &type, const QString &text,
     buttonList.push_back(newbutton);
 }
 
-void ThemedMenuPrivate::layoutButtons(void)
+bool ThemedMenuPrivate::layoutButtons(void)
 {
     int numbuttons = buttonList.size();
   
@@ -1675,14 +1675,14 @@ void ThemedMenuPrivate::layoutButtons(void)
     {
         VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Must have "
                 "room for at least 1 row of buttons");
-        exit(-43);
+        return false;
     }
     
     if (columns < 1)
     {
         VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Must have "
                 "room for at least 1 column of buttons");
-        exit(-44);
+        return false;
     }
 
     if (balancerows)
@@ -1739,6 +1739,7 @@ void ThemedMenuPrivate::layoutButtons(void)
         if (newrow.numitems > 0)
             buttonRows.push_back(newrow);
     }            
+    return true;
 }
 
 void ThemedMenuPrivate::positionButtons(bool resetpos)
@@ -2155,7 +2156,7 @@ void ThemedMenuPrivate::drawText(QPainter *p, const QRect &rect,
     }
 }
 
-void ThemedMenuPrivate::ReloadTheme(void)
+bool ThemedMenuPrivate::ReloadTheme(void)
 {
     
     globalFontMap.clear();
@@ -2209,7 +2210,9 @@ void ThemedMenuPrivate::ReloadTheme(void)
     gContext->ThemeWidget(parent);
 
     
-    parseSettings(themedir, "theme.xml");
+    bool ok = parseSettings(themedir, "theme.xml");
+    if (!ok)
+        return ok;
 
     QString file = menufiles.back().name;
     int row = menufiles.back().row;
@@ -2217,7 +2220,7 @@ void ThemedMenuPrivate::ReloadTheme(void)
     menufiles.pop_back();
     menulevel--;
 
-    parseMenu(file, row, col);
+    return parseMenu(file, row, col);
 }
 
 bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
@@ -2391,6 +2394,7 @@ QString ThemedMenuPrivate::findMenuFile(const QString &menuname)
 
 bool ThemedMenuPrivate::handleAction(const QString &action)
 {
+    bool ok = true;
     if (action.left(5) == "EXEC ")
     {
         QString rest = action.right(action.length() - 5);
@@ -2447,7 +2451,7 @@ bool ThemedMenuPrivate::handleAction(const QString &action)
             return true;
         }
 
-        parseMenu(rest);
+        ok = parseMenu(rest);
     }
     else if (action.left(6) == "UPMENU")
     {
@@ -2459,7 +2463,7 @@ bool ThemedMenuPrivate::handleAction(const QString &action)
 
         menulevel -= 2;
  
-        parseMenu(file, row, col);
+        ok = parseMenu(file, row, col);
     }
     else if (action.left(12) == "CONFIGPLUGIN")
     {
@@ -2492,6 +2496,11 @@ bool ThemedMenuPrivate::handleAction(const QString &action)
         {
             callback(callbackdata, selection);
         }
+    }
+
+    if (!ok)
+    {
+        exit(FIXME_BUG__LIBRARY_EXIT_NO_THEME);
     }
 
     return true;
@@ -2594,7 +2603,6 @@ void ThemedMenu::Init(const char *cdir, const char *menufile)
     QString dir = QString(cdir) + "/";
     QString filename = dir + "theme.xml";
 
-    d->foundtheme = true;
     QFile filetest(filename);
     if (!filetest.exists())
     {
@@ -2608,9 +2616,8 @@ void ThemedMenu::Init(const char *cdir, const char *menufile)
 
     ReloadExitKey();
 
-    d->parseSettings(dir, "theme.xml");
-
-    d->parseMenu(menufile);
+    if (d->foundtheme = d->parseSettings(dir, "theme.xml"))
+        d->foundtheme = d->parseMenu(menufile);
 }
 
 ThemedMenu::~ThemedMenu(void)
@@ -2674,7 +2681,8 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
 
 void ThemedMenu::ReloadTheme(void)
 {
-    d->ReloadTheme();
+    if (!d->ReloadTheme())
+        d->foundtheme = false;
 }
 
 void ThemedMenu::keyPressEvent(QKeyEvent *e)

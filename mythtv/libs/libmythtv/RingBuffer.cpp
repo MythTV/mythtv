@@ -16,6 +16,7 @@
 
 using namespace std;
 
+#include "exitcodes.h"
 #include "RingBuffer.h"
 #include "mythcontext.h"
 #include "remotefile.h"
@@ -140,7 +141,7 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
         /* oops! */
         VERBOSE(VB_IMPORTANT,"ERROR opening file in ThreadedFileWriter.");
         perror(filename);
-        exit(-10);
+        exit(FIXME_BUG__LIBRARY_EXIT_TFW_FAILED_OPEN);
     }
     else
     {

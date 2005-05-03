@@ -1639,12 +1639,6 @@ UIListBtnTypeItem::UIListBtnTypeItem(UIListBtnType* lbtype, const QString& text,
                                      QPixmap *pixmap, bool checkable,
                                      CheckState state, bool showArrow)
 {
-    if (!lbtype) {
-        std::cerr << "UIListBtnTypeItem: trying to creating item without parent"
-                  << std::endl;
-        exit(-45);
-    }
-    
     m_parent    = lbtype;
     m_text      = text;
     m_pixmap    = pixmap;

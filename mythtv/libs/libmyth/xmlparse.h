@@ -38,7 +38,7 @@ class XMLParse
     void parseRemoteEdit(LayerSet *, QDomElement &);
     void parseStatusBar(LayerSet *, QDomElement &);
     void parseImage(LayerSet *, QDomElement &);
-    void parseAnimatedImage(LayerSet *, QDomElement &);
+    bool parseAnimatedImage(LayerSet *, QDomElement &);
     void parseRepeatedImage(LayerSet *, QDomElement &);
     void parsePushButton(LayerSet *, QDomElement &);
     void parseTextButton(LayerSet *, QDomElement &);

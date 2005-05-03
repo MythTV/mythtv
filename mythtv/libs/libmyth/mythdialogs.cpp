@@ -1510,9 +1510,14 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
     theme->SetHMult(hmult);
     if (!theme->LoadTheme(xmldata, window_name, theme_filename))
     {
-        cerr << "dialogbox.o: Couldn't find your theme. I'm outta here" << endl;
-        cerr << window_name << " - " <<  theme_filename << endl;
-        exit(-31);
+        QString msg = 
+            QString(tr("Could not locate '%1' in theme '%2'"
+                       "\n\nReturning to previous menu."))
+            .arg(window_name).arg(theme_filename);
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                  tr("Missing UI Element"), msg);
+        done(-1);
+        return;
     }
 
     loadWindow(xmldata);
@@ -1613,9 +1618,10 @@ void MythThemedDialog::loadWindow(QDomElement &element)
             }
             else
             {
-                cerr << "dialogbox.o: I don't understand this DOM Element:" 
-                     << e.tagName() << endl;
-                exit(-32);
+                VERBOSE(VB_IMPORTANT,
+                        QString("MythThemedDialog::loadWindow(): Do not "
+                                "understand DOM Element: '%1'. Ignoring.")
+                        .arg(e.tagName()));
             }
         }
     }
@@ -1635,9 +1641,8 @@ void MythThemedDialog::parseContainer(QDomElement &element)
     theme->parseContainer(element, name, a_context, area);
     if (name.length() < 1)
     {
-        cerr << "dialogbox.o: I told an object to parse a container and it "
-                "didn't give me a name back\n";
-        exit(-33);
+        VERBOSE(VB_IMPORTANT, "Failed to parse a container. Ignoring.");
+        return;
     }
 
     LayerSet *container_reference = theme->GetSet(name);
@@ -2531,6 +2536,16 @@ MythSearchDialog::~MythSearchDialog()
 ---------------------------------------------------------------------
  */
 
+/** \fn MythImageFileDialog(QString*,QString,MythMainWindow*,QString,QString,const char*,bool)
+ *  \brief Locates an image file dialog in the current theme.
+ *
+ *   MythImageFileDialog's expect there to be certain
+ *   elements in the theme, or they will fail.
+ *
+ *   For example, we use the size of the background
+ *   pixmap to define the geometry of the dialog. If
+ *   the pixmap ain't there, we need to fail.
+ */
 MythImageFileDialog::MythImageFileDialog(QString *result,
                                          QString top_directory,
                                          MythMainWindow *parent, 
@@ -2547,18 +2562,6 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     selected_file = result;
     initial_node = NULL;
     
-    //
-    //  MythImageFileDialog's expect there to be certain
-    //  elements in the theme, or they will fail.
-    //
-
-    //
-    //  For example, we use the size of the background
-    //  pixmap to define the geometry of the dialog. If
-    //  the pixmap ain't there, we need to fail.
-    //
-    
-
     UIImageType *file_browser_background = getUIImageType("file_browser_background");
     if (file_browser_background)
     {
@@ -2570,8 +2573,13 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     }
     else
     {
-        cerr << "myhdialogs.o: Could not find a UIImageType called file_browser_background in your theme." << endl;
-        exit(-34);
+        QString msg = 
+            QString(tr("The theme you are is missing 'file_browser_background' "
+                       "element. \n\nReturning to previous menu."));
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                  tr("Missing UI Element"), msg);
+        done(-1);
+        return;
     }
 
     //
@@ -2598,9 +2606,14 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
                 this, SLOT(handleTreeListEntered(int, IntVector*)));
     }
     else
-    {
-        cerr << "mythdialogs.o: Could not find a UIManagedTreeListType called file_browser in your theme." << endl;
-        exit(-35);
+    { 
+        QString msg = 
+            QString(tr("The theme you are is missing 'file_browser' element. "
+                       "\n\nReturning to previous menu."));
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                  tr("Missing UI Element"), msg);
+        done(-1);
+        return;
     }    
     
     //
@@ -2827,10 +2840,13 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
                                    const char *name)
     : QScrollView(parent, name)
 {
-    if (!parent) {
-        std::cerr << "MythScrollDialog: Trying to create a dialog without a parent"
-                  << std::endl;
-        exit(-36);
+    if (!parent)
+    {
+        VERBOSE(VB_IMPORTANT, 
+                "MythScrollDialog: Programmer error, trying to create "
+                "a dialog without a parent.");
+        done(-1);
+        return;
     }
 
     m_parent     = parent;
@@ -2919,9 +2935,12 @@ void MythScrollDialog::setArea(int w, int h)
 void MythScrollDialog::setAreaMultiplied(int areaWTimes, int areaHTimes)
 {
     if (areaWTimes < 1 || areaHTimes < 1) {
-        std::cerr << "MythScrollDialog: invalid areaWTimes or areaHTimes"
-                  << std::endl;
-        exit(-37);
+        VERBOSE(VB_IMPORTANT,
+                QString("MythScrollDialog::setAreaMultiplied(%1,%2): "
+                        "Warning, Invalid areaWTimes or areaHTimes. "
+                        "Setting to 1.")
+                .arg(areaWTimes).arg(areaHTimes));
+        areaWTimes = areaHTimes = 1;
     }
 
     resizeContents(m_screenWidth*areaWTimes,

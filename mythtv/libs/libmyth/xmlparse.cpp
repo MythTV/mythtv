@@ -449,21 +449,23 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     container->bumpUpLayers(order.toInt());
 }
 
-void XMLParse::parseAnimatedImage(LayerSet *container, QDomElement &element)
+bool XMLParse::parseAnimatedImage(LayerSet *container, QDomElement &element)
 {
     int context = -1;
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Animated Image needs a name\n";
-        exit(-46);
+        VERBOSE(VB_IMPORTANT,
+                "XMLParse::parseAnimatedImage(): image needs a name");
+        return false;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "Animated Image needs an order\n";
-        exit(-47);
+        VERBOSE(VB_IMPORTANT,
+                "XMLParse::parseAnimatedImage(): image needs a draw order");
+        return false;
     }
 
     QString filename = "";
@@ -473,6 +475,7 @@ void XMLParse::parseAnimatedImage(LayerSet *container, QDomElement &element)
     QPoint skipin = QPoint(0, 0);
     QString interval, startinterval, imagecount;
 
+    bool ok = true;
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -517,11 +520,15 @@ void XMLParse::parseAnimatedImage(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in image\n";
-                exit(-49);
+                VERBOSE(VB_IMPORTANT,
+                        QString("XMLParse::parseAnimatedImage(): Unknown "
+                                "tag (%1) in image").arg(info.tagName()));
+                ok = false;
             }
         }
     }
+    if (!ok)
+        return ok;
 
     UIAnimatedImageType *image = new UIAnimatedImageType(name, filename, imagecount.toInt(),
         interval.toInt(), startinterval.toInt(), order.toInt(), pos);
@@ -546,6 +553,7 @@ void XMLParse::parseAnimatedImage(LayerSet *container, QDomElement &element)
     image->SetParent(container);
     container->AddType(image);
     container->bumpUpLayers(order.toInt());
+    return true;
 }
 
 void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
@@ -1049,6 +1057,7 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
 
     layerMap[name] = container;
 
+    bool ok = true;
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -1071,7 +1080,8 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             }
             else if (info.tagName() == "animatedimage")
             {
-                parseAnimatedImage(container, info);
+                if (!parseAnimatedImage(container, info))
+                    ok = false;
             }
             else if (info.tagName() == "repeatedimage")
             {
@@ -1149,11 +1159,20 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             }
             else
             {
-                cerr << "Unknown container child: " << info.tagName() << endl;
-                return;
+                VERBOSE(VB_IMPORTANT,
+                        QString("Container %1 contains unknown child: %2")
+                        .arg(name).arg(info.tagName()));
+                ok = false;
             }
         }
     }
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Could not parse container '%1'. "
+                                      "Ignoring.").arg(name));
+        return;
+    }
+
     if (context != -1)
         container->SetContext(context);
 

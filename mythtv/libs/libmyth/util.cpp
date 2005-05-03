@@ -23,6 +23,7 @@
 #include <iostream>
 using namespace std;
 
+#include "exitcodes.h"
 #include "util.h"
 #include "mythcontext.h"
 
@@ -713,7 +714,7 @@ int myth_system(const QString &command, int flags)
         perror("execl");
 
         /* Failed to exec */
-        _exit(127);
+        _exit(MYTHSYSTEM__EXIT__EXECL_ERROR); // this exit is ok
     }
     else
     {
