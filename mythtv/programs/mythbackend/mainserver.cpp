@@ -422,7 +422,48 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
             VERBOSE(VB_ALL, "Bad QUERY_IS_ACTIVE_BACKEND");
         else
             HandleIsActiveBackendQuery(listline, pbs);
-        
+    }
+    else if (command == "QUERY_COMMBREAK")
+    {
+        if (tokens.size() != 3)
+            VERBOSE(VB_ALL, "Bad QUERY_COMMBREAK");
+        else
+            HandleCommBreakQuery(tokens[1], tokens[2], pbs);
+    }
+    else if (command == "QUERY_CUTLIST")
+    {
+        if (tokens.size() != 3)
+            VERBOSE(VB_ALL, "Bad QUERY_CUTLIST");
+        else
+            HandleCutlistQuery(tokens[1], tokens[2], pbs);
+    }
+    else if (command == "QUERY_BOOKMARK")
+    {
+        if (tokens.size() != 3)
+            VERBOSE(VB_ALL, "Bad QUERY_BOOKMARK");
+        else
+            HandleBookmarkQuery(tokens[1], tokens[2], pbs);
+    }
+    else if (command == "SET_BOOKMARK")
+    {
+        if (tokens.size() != 5)
+            VERBOSE(VB_ALL, "Bad SET_BOOKMARK");
+        else
+            HandleSetBookmark(tokens, pbs);
+    }
+    else if (command == "QUERY_SETTING")
+    {
+        if (tokens.size() != 3)
+            VERBOSE(VB_ALL, "Bad QUERY_SETTING");
+        else
+            HandleSettingQuery(tokens, pbs);
+    }
+    else if (command == "SET_SETTING")
+    {
+        if (tokens.size() != 4)
+            VERBOSE(VB_ALL, "Bad SET_SETTING");
+        else
+            HandleSetSetting(tokens, pbs);
     }
     else if (command == "SHUTDOWN_NOW")
     {
@@ -2581,11 +2622,197 @@ void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
     }
     else
         retlist << "TRUE";
-    
-    SendResponse(pbs->getSocket(), retlist);
-} 
 
-void MainServer::HandleFileTransferQuery(QStringList &slist, 
+    SendResponse(pbs->getSocket(), retlist);
+}
+
+// Helper function for the guts of HandleCommBreakQuery + HandleCutListQuery
+void MainServer::HandleCutMapQuery(const QString &chanid, 
+                                   const QString &starttime,
+                                   PlaybackSock *pbs, bool commbreak)
+{
+    QSocket *pbssock = NULL;
+    if (pbs)
+        pbssock = pbs->getSocket();
+
+    QMap<long long, int> markMap;
+    QMap<long long, int>::Iterator it;
+    QDateTime startdt;
+    startdt.setTime_t((uint)atoi(starttime));
+    QStringList retlist;
+    int rowcnt = 0;
+
+    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
+                                                              startdt);
+
+    if (commbreak)
+        pginfo->GetCommBreakList(markMap);
+    else
+        pginfo->GetCutList(markMap);
+
+    for (it = markMap.begin(); it != markMap.end(); ++it)
+    {
+        rowcnt++;
+        QString intstr = QString("%1").arg(it.data());
+        retlist << intstr;
+        encodeLongLong(retlist,it.key());
+    }
+
+    if (rowcnt > 0)
+        retlist.prepend(QString("%1").arg(rowcnt));
+    else
+        retlist << "-1";
+
+    if (pbssock)
+        SendResponse(pbssock, retlist);
+
+    return;
+}
+
+void MainServer::HandleCommBreakQuery(const QString &chanid,
+                                      const QString &starttime,
+                                      PlaybackSock *pbs)
+{
+// Commercial break query
+// Format:  QUERY_COMMBREAK <chanid> <starttime>
+// chanid is chanid, starttime is startime of prorgram in
+//   # of seconds since Jan 1, 1970, in UTC time.  Same format as in
+//   a ProgramInfo structure in a string list.
+// Return structure is [number of rows] followed by a triplet of values:
+//   each triplet : [type] [long portion 1] [long portion 2]
+// type is the value in the map, right now 4 = commbreak start, 5= end
+    return HandleCutMapQuery(chanid, starttime, pbs, true);
+}
+
+void MainServer::HandleCutlistQuery(const QString &chanid,
+                                    const QString &starttime,
+                                    PlaybackSock *pbs)
+{
+// Cutlist query
+// Format:  QUERY_CUTLIST <chanid> <starttime>
+// chanid is chanid, starttime is startime of prorgram in
+//   # of seconds since Jan 1, 1970, in UTC time.  Same format as in
+//   a ProgramInfo structure in a string list.
+// Return structure is [number of rows] followed by a triplet of values:
+//   each triplet : [type] [long portion 1] [long portion 2]
+// type is the value in the map, right now 0 = commbreak start, 1 = end
+    return HandleCutMapQuery(chanid, starttime, pbs, false);
+}
+
+
+void MainServer::HandleBookmarkQuery(const QString &chanid,
+                                     const QString &starttime,
+                                     PlaybackSock *pbs)
+// Bookmark query
+// Format:  QUERY_BOOKMARK <chanid> <starttime>
+// chanid is chanid, starttime is startime of prorgram in
+//   # of seconds since Jan 1, 1970, in UTC time.  Same format as in
+//   a ProgramInfo structure in a string list.
+// Return value is a long-long encoded as two separate values
+{
+    QSocket *pbssock = NULL;
+    if (pbs)
+        pbssock = pbs->getSocket();
+
+    QDateTime startdt;
+    startdt.setTime_t((uint)atoi(starttime));
+    QStringList retlist;
+    long long bookmark;
+
+    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
+                                                              startdt);
+    bookmark = pginfo->GetBookmark();
+
+    encodeLongLong(retlist,bookmark);
+
+    if (pbssock)
+        SendResponse(pbssock, retlist);
+
+    return;
+}
+
+
+void MainServer::HandleSetBookmark(QStringList &tokens,
+                                   PlaybackSock *pbs)
+{
+// Bookmark query
+// Format:  SET_BOOKMARK <chanid> <starttime> <long part1> <long part2>
+// chanid is chanid, starttime is startime of prorgram in
+//   # of seconds since Jan 1, 1970, in UTC time.  Same format as in
+//   a ProgramInfo structure in a string list.  The two longs are the two
+//   portions of the bookmark value to set.
+
+    QSocket *pbssock = NULL;
+    if (pbs)
+        pbssock = pbs->getSocket();
+
+    QString chanid = tokens[1];
+    QString starttime = tokens[2];
+    QStringList bookmarklist;
+    bookmarklist << tokens[3];
+    bookmarklist << tokens[4];
+
+    QDateTime startdt;
+    startdt.setTime_t((uint)atoi(starttime));
+    QStringList retlist;
+    long long bookmark = decodeLongLong(bookmarklist, 0);
+
+    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
+                                                              startdt);
+    pginfo->SetBookmark(bookmark);
+
+    retlist << "OK";
+    if (pbssock)
+        SendResponse(pbssock, retlist);
+
+    return;
+}
+
+void MainServer::HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs)
+{
+// Format: QUERY_SETTING <hostname> <setting>
+// Returns setting value as a string
+
+    QSocket *pbssock = NULL;
+    if (pbs)
+        pbssock = pbs->getSocket();
+
+    QString hostname = tokens[1];
+    QString setting = tokens[2];
+    QStringList retlist;
+
+    QString retvalue = gContext->GetSettingOnHost(setting, hostname, "-1");
+
+    retlist << retvalue;
+    if (pbssock)
+        SendResponse(pbssock, retlist);
+
+    return;
+}
+
+void MainServer::HandleSetSetting(QStringList &tokens,
+                                  PlaybackSock *pbs)
+{
+// Format: SET_SETTING <hostname> <setting> <value>
+    QSocket *pbssock = NULL;
+    if (pbs)
+        pbssock = pbs->getSocket();
+
+    QString hostname = tokens[1];
+    QString setting = tokens[2];
+    QString svalue = tokens[3];
+    QStringList retlist;
+
+    gContext->SaveSettingOnHost(setting, hostname, svalue);
+
+    retlist << "OK";
+    if (pbssock)
+        SendResponse(pbssock, retlist);
+
+    return;
+}
+
+void MainServer::HandleFileTransferQuery(QStringList &slist,
                                          QStringList &commands,
                                          PlaybackSock *pbs)
 {

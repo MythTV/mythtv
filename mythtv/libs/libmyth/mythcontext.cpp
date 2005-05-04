@@ -1481,36 +1481,42 @@ void MythContext::SaveSetting(const QString &key, int newValue)
 
 void MythContext::SaveSetting(const QString &key, const QString &newValue)
 {
+    SaveSettingOnHost(key, newValue, d->m_localhostname);
+}
+
+void MythContext::SaveSettingOnHost(const QString &key, const QString &host,
+                                    const QString &newValue)
+{
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
     {
         query.prepare("DELETE FROM settings WHERE value = :KEY "
                       "AND hostname = :HOSTNAME ;");
         query.bindValue(":KEY", key);
-        query.bindValue(":HOSTNAME", d->m_localhostname);
-        
+        query.bindValue(":HOSTNAME", host);
+
         if (!query.exec() || !query.isActive())
                 MythContext::DBError("Clear setting", query);
-    
+
         query.prepare("INSERT settings ( value, data, hostname ) "
                       "VALUES ( :VALUE, :DATA, :HOSTNAME );");
         query.bindValue(":VALUE", key);
         query.bindValue(":DATA", newValue);
-        query.bindValue(":HOSTNAME", d->m_localhostname);
-        
+        query.bindValue(":HOSTNAME", host);
+
         if (!query.exec() || !query.isActive())
-                MythContext::DBError("Save new setting", query);
+                MythContext::DBError("Save new setting on host", query);
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, 
+        VERBOSE(VB_IMPORTANT,
              QString("Database not open while trying to save setting: %1")
                                 .arg(key));
     }
 
 }
 
-QString MythContext::GetSetting(const QString &key, const QString &defaultval) 
+QString MythContext::GetSetting(const QString &key, const QString &defaultval)
 {
     bool found = false;
     QString value;

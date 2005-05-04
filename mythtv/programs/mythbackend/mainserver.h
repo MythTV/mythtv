@@ -104,6 +104,17 @@ class MainServer : public QObject
                              PlaybackSock *pbs);
     void HandleLockTuner(PlaybackSock *pbs);
     void HandleFreeTuner(int cardid, PlaybackSock *pbs);
+    void HandleCutMapQuery(const QString &chanid, const QString &starttime,
+                           PlaybackSock *pbs, bool commbreak);
+    void HandleCommBreakQuery(const QString &chanid, const QString &starttime,
+                              PlaybackSock *pbs);
+    void HandleCutlistQuery(const QString &chanid, const QString &starttime,
+                            PlaybackSock *pbs);
+    void HandleBookmarkQuery(const QString &chanid, const QString &starttime,
+                             PlaybackSock *pbs);
+    void HandleSetBookmark(QStringList &tokens, PlaybackSock *pbs);
+    void HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs);
+    void HandleSetSetting(QStringList &tokens, PlaybackSock *pbs);
     void HandleVersion(QSocket *socket, QString version);
     void HandleBackendRefresh(QSocket *socket);
     void HandleQueryLoad(PlaybackSock *pbs);
