@@ -324,6 +324,22 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
     }
     else
     {
+        // We want to handle jump to channel before everything else
+        // The reason is because the number keys could be mapped to
+        // other things. If this is the case, then the jump to channel
+        // will not work correctly.
+        if (jumpToChannelEnabled) 
+        {
+            int digit;
+            if (jumpToChannelGetInputDigit(actions, digit)) 
+            {
+                jumpToChannelDigitPress(digit);
+                // Set handled = true here so that it won't process any
+                // more actions.
+                handled = true;
+            }
+        }        
+	      
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
@@ -349,9 +365,6 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
                 dayLeft();
             else if (action == "DAYRIGHT")
                 dayRight();
-            else if (jumpToChannelEnabled &&
-                     ((action[0] >= '0') && (action[0] <= '9')))
-                jumpToChannelDigitPress(action.toInt());
             else if (jumpToChannelEnabled && jumpToChannelActive &&
                      (action == "ESCAPE"))
                 jumpToChannelCancel();
@@ -1760,9 +1773,10 @@ void GuideGrid::jumpToChannelDeleteLastDigit()
 {
     jumpToChannel /= 10;
     
-    if (jumpToChannel == 0) {
+    if (jumpToChannel == 0) 
         jumpToChannelCancel();
-    }
+    else 
+        jumpToChannelShowSelection();
 }
 
 void GuideGrid::jumpToChannelShowSelection()
@@ -1819,3 +1833,20 @@ void GuideGrid::jumpToChannelTimeout()
     jumpToChannelCommit();
 }
 
+// function returns true if it is able to find a mapping to a digit and false
+// otherwise.
+bool GuideGrid::jumpToChannelGetInputDigit(QStringList &actions, int &digit)
+{
+    for (unsigned int i = 0; i < actions.size(); ++i) 
+    {
+        QString action = actions[i];
+        if (action[0] >= '0' && action[0] <= '9') 
+        {
+            digit = action.toInt();
+            return true;
+        }
+    }
+    
+    // There were no actions that resolved to a digit
+    return false;
+}
