@@ -1849,7 +1849,7 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType scan)
 static void calc_bob(FrameScanType scan, int imgh, int disphoff,
                     int imgy, int dispyoff,
                     int frame_height, int top_field_first,
-                    int &field, int &src_y, int &dest_y, int& xv_src_y_incr)
+                    int &field, int &src_y, int &dest_y)
 {
     int dst_half_line_in_src = 0, dest_y_incr = 0, src_y_incr = 0;
     // a negative offset y gives us bobbing, so adjust...
@@ -1863,13 +1863,13 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
         (scan == kScan_Intr2ndField && top_field_first == 0))
     {
         field = 1;
-        xv_src_y_incr = imgy / 2;
+        src_y = imgy / 2;
     }
     else if ((scan == kScan_Interlaced && top_field_first == 0) ||
              (scan == kScan_Intr2ndField && top_field_first == 1))
     {
         field = 2;
-        xv_src_y_incr = (frame_height + imgy) / 2;
+        src_y = (frame_height + imgy) / 2;
         dst_half_line_in_src = (int) round(((float)disphoff)/imgh - 0.001f);
     }
 
@@ -1905,12 +1905,12 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
     vbuffers.LockFrame(frame, "ShowXvMC");
 
     // calculate bobbing params
-    int field = 3, src_y = imgy, dest_y = dispyoff, xv_src_y_incr = 0;
+    int field = 3, src_y = imgy, dest_y = dispyoff;
     if (m_deinterlacing)
     {
         calc_bob(scan, imgh, disphoff, imgy, dispyoff,
                  frame->height, frame->top_field_first,
-                 field, src_y, dest_y, xv_src_y_incr);
+                 field, src_y, dest_y);
     }
     if (hasVLDAcceleration())
     {   // don't do bob-adjustment for VLD drivers
@@ -1971,13 +1971,12 @@ void VideoOutputXv::ShowXVideo(FrameScanType scan)
         return;
     }
 
-    int field = 3, src_y = imgy, dest_y = dispyoff, xv_src_y_incr = 0;
+    int field = 3, src_y = imgy, dest_y = dispyoff;
     if (m_deinterlacing && (m_deintfiltername == "bobdeint"))
     {
         calc_bob(scan, imgh, disphoff, imgy, dispyoff,
                  frame->height, frame->top_field_first,
-                 field, src_y, dest_y, xv_src_y_incr);
-        src_y += xv_src_y_incr;
+                 field, src_y, dest_y);
     }
 
     vbuffers.UnlockFrame(frame, "ShowXVideo");
