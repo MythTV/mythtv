@@ -53,7 +53,7 @@ class AudioPlugin: public MFDServicePlugin
     void    handleMetadataChange(int which_collection, bool external=false);
     void    deleteOutput();        
     void    handleServiceChange();
-    void    addMaopSpeakers(QString l_address, uint l_port, QString l_name, ServiceLocationDescription l_location);
+    void    addMaopSpeakers(QString l_address, uint l_port, QString l_name, ServiceLocationDescription l_location, bool *something_changed);
     void    checkSpeakers();
     void    turnOnSpeakers();
     void    turnOffSpeakers();

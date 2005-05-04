@@ -1200,6 +1200,8 @@ void AudioPlugin::deleteOutput()
 
 void AudioPlugin::handleServiceChange()
 {
+    bool something_changed = false;
+    
     //
     //  Something has changed in available services. I need to query the mfd
     //  and make sure I know about all maop services (i.e. all available
@@ -1231,6 +1233,7 @@ void AudioPlugin::handleServiceChange()
                         removeFileDescriptorToWatch(fd);
                     }
                     maop_instances.remove( an_instance );
+                    something_changed = true;
                 }
                 ++iter;
             }
@@ -1256,16 +1259,27 @@ void AudioPlugin::handleServiceChange()
                 
             if ( (*it).getType() == "maop")
             {
-                addMaopSpeakers((*it).getAddress(), (*it).getPort(), (*it).getName(), (*it).getLocation() );
+                addMaopSpeakers((*it).getAddress(), (*it).getPort(), (*it).getName(), (*it).getLocation(), &something_changed );
             }
                 
         }
 
     service_lister->unlockDiscoveredList();
+
+    if(something_changed)
+    {
+        listSpeakers();
+    }
     
 }
 
-void AudioPlugin::addMaopSpeakers(QString l_address, uint l_port, QString l_name, ServiceLocationDescription l_location)
+void AudioPlugin::addMaopSpeakers(
+                                    QString l_address, 
+                                    uint l_port, 
+                                    QString l_name, 
+                                    ServiceLocationDescription l_location, 
+                                    bool *something_changed
+                                 )
 {
     //
     //  If it's new, add it ... otherwise ignore it
@@ -1311,6 +1325,7 @@ void AudioPlugin::addMaopSpeakers(QString l_address, uint l_port, QString l_name
                     new_maop_instance->markForUse(true);
                 }
                 maop_instances.append(new_maop_instance);
+                *something_changed = true;
                 addFileDescriptorToWatch(fd);
             }
             else
