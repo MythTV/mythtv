@@ -68,15 +68,14 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
         render->p_past_surface = findPastSurface(s, render);
         render->p_future_surface = findFutureSurface(s);
         if (!render->p_past_surface)
-            av_log(avctx, AV_LOG_ERROR, "error: decoding B frame and past frameis null!");
+            av_log(avctx, AV_LOG_ERROR, "error: decoding B frame and past frame is null!");
         else if (!render->p_future_surface)
             av_log(avctx, AV_LOG_ERROR, "error: decoding B frame and future frame is null!");
         break;
     case  P_TYPE:
         render->p_past_surface = findPastSurface(s, render);
-        render->p_future_surface = render->p_surface;	
         if (!render->p_past_surface)
-            av_log(avctx, AV_LOG_ERROR, "error: decoding P frame and past frameis null!");
+            av_log(avctx, AV_LOG_ERROR, "error: decoding P frame and past frame is null!");
         break;
     }
 
