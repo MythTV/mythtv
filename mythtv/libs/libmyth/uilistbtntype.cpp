@@ -724,6 +724,12 @@ bool UIListTreeType::tryToSetCurrent(QStringList route)
         else
         {
             keep_going = false;
+
+            //
+            //  Try to at least move to same level that the route was at
+            //
+            
+            MoveRight(false);
         }
         ++it;
     }
