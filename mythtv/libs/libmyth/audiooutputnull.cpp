@@ -25,6 +25,9 @@ AudioOutputNULL::AudioOutputNULL(QString audiodevice, int laudio_bits,
                : AudioOutputBase(audiodevice, laudio_bits, laudio_channels,
                                  laudio_samplerate, source, set_initial_vol)
 {
+    locked_audio_channels = laudio_channels;
+    locked_audio_bits = laudio_bits;
+    locked_audio_samplerate = laudio_samplerate;
     Reconfigure(laudio_bits, laudio_channels, laudio_samplerate);
     current_buffer_size = 0;
 }
@@ -38,6 +41,11 @@ bool AudioOutputNULL::OpenDevice()
 {
     fragment_size = NULLAUDIO_OUTPUT_BUFFER_SIZE / 2;
     soundcard_buffer_size = NULLAUDIO_OUTPUT_BUFFER_SIZE;
+    
+    audio_bits = locked_audio_bits;
+    audio_channels = locked_audio_channels;
+    audio_samplerate = locked_audio_samplerate;
+    
     return true;
 }
 
