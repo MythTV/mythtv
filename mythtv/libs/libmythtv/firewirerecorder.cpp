@@ -23,7 +23,13 @@ int read_tspacket (unsigned char *tspacket, int len, unsigned int dropped, void 
      if(dropped) {
          VERBOSE(VB_GENERAL,QString("Firewire: %1 packet(s) dropped.").arg(dropped));
      }
-     fw->ProcessTSPacket(tspacket,len);
+
+     if(tspacket[0] == SYNC_BYTE) {
+         fw->ProcessTSPacket(tspacket,len);
+     } else {
+        VERBOSE(VB_GENERAL,QString("Firewire: out of sync mpeg2ts packet"));
+     }
+
      return 1;
 }
 
