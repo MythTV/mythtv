@@ -249,6 +249,7 @@ class PlaybackBox : public MythDialog
     QRect fullRect;
     QRect listRect;
     QRect infoRect;
+    QRect groupRect;
     QRect usageRect;
     QRect videoRect;
     QRect curGroupRect;
