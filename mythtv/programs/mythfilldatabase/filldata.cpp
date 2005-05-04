@@ -941,11 +941,12 @@ void DataDirectProgramUpdate(Source source)
     //cerr << "Done...\n";
 }
 
-bool grabDDData(Source source, int poffset, QDate pdate) 
+bool grabDDData(Source source, int poffset, QDate pdate, int ddSource) 
 {
     ddprocessor.setLineup(source.lineupid);
     ddprocessor.setUserID(source.userid);
     ddprocessor.setPassword(source.password);
+    ddprocessor.setSource(ddSource);
 
     bool needtoretrieve = true;
 
@@ -2505,7 +2506,9 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     QString xmltv_grabber = source.xmltvgrabber;
 
     if (xmltv_grabber == "datadirect")
-        return grabDDData(source, offset, *qCurrentDate);
+        return grabDDData(source, offset, *qCurrentDate, DD_ZAP2IT);
+    else if (xmltv_grabber == "technovera")
+        return grabDDData(source, offset, *qCurrentDate, DD_LXM);
 
     char tempfilename[] = "/tmp/mythXXXXXX";
     if (mkstemp(tempfilename) == -1) {
@@ -2760,13 +2763,14 @@ bool fillData(QValueList<Source> &sourcelist)
             if (!grabData(*it, 0))
                 ++failures;
         }
-        else if (xmltv_grabber == "datadirect" && dd_grab_all)
+        else if ((xmltv_grabber == "datadirect" || xmltv_grabber == "technovera") && dd_grab_all)
         {
             QDate qCurrentDate = QDate::currentDate();
 
             grabData(*it, 0, &qCurrentDate);
         }
         else if (xmltv_grabber == "datadirect" ||
+                 xmltv_grabber == "technovera" ||
                  xmltv_grabber == "tv_grab_se_swedb" ||
                  xmltv_grabber == "tv_grab_no" ||
                  xmltv_grabber == "tv_grab_ee" ||
@@ -2804,6 +2808,8 @@ bool fillData(QValueList<Source> &sourcelist)
             int maxday = 9;
 
             if (xmltv_grabber == "datadirect")
+                maxday = 14;
+            else if (xmltv_grabber == "technovera")
                 maxday = 14;
             else if (xmltv_grabber == "tv_grab_no")
                 maxday = 7;
