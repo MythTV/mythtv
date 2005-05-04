@@ -63,6 +63,7 @@ class Scheduler : public QObject
     void UpdateManuals(int recordid);
     void PruneOldRecords(void);
     void AddNewRecords(void);
+    void AddNotListed(void);
     void BuildNewRecordsQueries(int recordid, QStringList &from, QStringList &where);
     void PruneOverlaps(void);
     void BuildListMaps(void);

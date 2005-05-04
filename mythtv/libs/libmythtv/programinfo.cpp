@@ -1941,24 +1941,26 @@ QString ProgramInfo::RecStatusChar(void)
         return QObject::tr("P", "RecStatusChar rsPreviousRecording");
     case rsCurrentRecording:
         return QObject::tr("R", "RecStatusChar rsCurrentRecording");
-    case rsRepeat:
-        return QObject::tr("r", "RecStatusChar rsRepeat");    
     case rsEarlierShowing:
         return QObject::tr("E", "RecStatusChar rsEarlierShowing");
     case rsTooManyRecordings:
         return QObject::tr("T", "RecStatusChar rsTooManyRecordings");
     case rsCancelled:
-        return QObject::tr("N", "RecStatusChar rsCancelled");
+        return QObject::tr("c", "RecStatusChar rsCancelled");
     case rsConflict:
         return QObject::tr("C", "RecStatusChar rsConflict");
     case rsLaterShowing:
         return QObject::tr("L", "RecStatusChar rsLaterShowing");
+    case rsRepeat:
+        return QObject::tr("r", "RecStatusChar rsRepeat");    
+    case rsInactive:
+        return QObject::tr("x", "RecStatusChar rsInactive");
     case rsLowDiskSpace:
         return QObject::tr("K", "RecStatusChar rsLowDiskSpace");
     case rsTunerBusy:
         return QObject::tr("B", "RecStatusChar rsTunerBusy");
-    case rsInactive:
-        return QObject::tr("x", "RecStatusChar rsInactive");
+    case rsNotListed:
+        return QObject::tr("N", "RecStatusChar rsNotListed");
     default:
         return "-";
     }
@@ -1998,14 +2000,16 @@ QString ProgramInfo::RecStatusText(void)
             return QObject::tr("Conflicting");
         case rsLaterShowing:
             return QObject::tr("Later Showing");
+        case rsRepeat:
+            return QObject::tr("Repeat");            
+        case rsInactive:
+            return QObject::tr("Inactive");            
         case rsLowDiskSpace:
             return QObject::tr("Low Disk Space");
         case rsTunerBusy:
             return QObject::tr("Tuner Busy");
-        case rsRepeat:
-            return QObject::tr("Repeat");            
-        case rsInactive:
-            return QObject::tr("Inactive");
+        case rsNotListed:
+            return QObject::tr("Not Listed");
         default:
             return QObject::tr("Unknown");
         }
@@ -2071,12 +2075,6 @@ QString ProgramInfo::RecStatusDesc(void)
             message += QObject::tr("this episode will be recorded at an "
                                    "earlier time instead.");
             break;
-        case rsRepeat:
-            message += QObject::tr("this episode is a repeat.");
-            break;            
-        case rsInactive:
-            message += QObject::tr("this recording schedule is inactive.");
-            break;
         case rsTooManyRecordings:
             message += QObject::tr("too many recordings of this program have "
                                    "already been recorded.");
@@ -2092,12 +2090,22 @@ QString ProgramInfo::RecStatusDesc(void)
             message += QObject::tr("this episode will be recorded at a "
                                    "later time.");
             break;
+        case rsRepeat:
+            message += QObject::tr("this episode is a repeat.");
+            break;            
+        case rsInactive:
+            message += QObject::tr("this recording schedule is inactive.");
+            break;
         case rsLowDiskSpace:
             message += QObject::tr("there wasn't enough disk space available.");
             break;
         case rsTunerBusy:
             message += QObject::tr("the tuner card was already being used.");
             break;
+        case rsNotListed:
+            message += QObject::tr("this show does not match the current "
+                                   "program listings.");
+            break;            
         default:
             message += QObject::tr("you should never see this.");
             break;

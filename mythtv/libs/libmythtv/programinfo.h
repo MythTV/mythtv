@@ -74,7 +74,8 @@ enum RecStatusType {
     rsRepeat = 9,
     rsInactive = 10,
     rsLowDiskSpace = 11,
-    rsTunerBusy = 12
+    rsTunerBusy = 12,
+    rsNotListed = 13
 };
 
 enum AvailableStatusType {

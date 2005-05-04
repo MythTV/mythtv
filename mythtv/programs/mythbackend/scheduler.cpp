@@ -252,6 +252,8 @@ bool Scheduler::FillRecordList(void)
     PruneOldRecords();
     VERBOSE(VB_SCHEDULE, "AddNewRecords...");
     AddNewRecords();
+    VERBOSE(VB_SCHEDULE, "AddNotListed...");
+    AddNotListed();
 
     VERBOSE(VB_SCHEDULE, "Sort by time...");
     reclist.sort(comp_overlap);
@@ -1957,6 +1959,91 @@ void Scheduler::AddNewRecords(void) {
             delete r;
             rec = reclist.erase(rec);
         }
+    }
+
+    RecIter tmp = tmpList.begin();
+    for ( ; tmp != tmpList.end(); tmp++)
+        reclist.push_back(*tmp);
+}
+
+void Scheduler::AddNotListed(void) {
+
+    struct timeval dbstart, dbend;
+    RecList tmpList;
+
+    QString query = QString(
+"SELECT record.recordid, record.type, record.chanid, "
+"record.starttime, record.startdate, record.endtime, record.enddate, "
+"record.startoffset, record.endoffset, "
+"record.title, record.subtitle, record.description, "
+"channel.channum, channel.callsign, channel.name "
+"FROM record "
+" INNER JOIN channel ON (channel.chanid = record.chanid) "
+" LEFT JOIN recordmatch on record.recordid = recordmatch.recordid "
+"WHERE (type = %1 OR type = %2) AND recordmatch.chanid IS NULL")
+        .arg(kSingleRecord)
+        .arg(kOverrideRecord);
+
+    VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
+
+    gettimeofday(&dbstart, NULL);
+    MSqlQuery result(MSqlQuery::SchedCon());
+    result.prepare(query);
+    result.exec();
+    gettimeofday(&dbend, NULL);
+
+    if (!result.isActive())
+    {
+        MythContext::DBError("AddNotListed", result);
+        return;
+    }
+
+    VERBOSE(VB_SCHEDULE, QString(" |-- %1 results in %2 sec. Processing...")
+            .arg(result.size())
+            .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
+                  (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
+
+    while (result.next())
+    {
+        ProgramInfo *p = new ProgramInfo;
+        p->recstatus = rsNotListed;
+        p->recordid = result.value(0).toInt();
+        p->rectype = RecordingType(result.value(1).toInt());
+        p->chanid = result.value(2).toString();
+
+        p->startts.setTime(result.value(3).toTime());
+        p->startts.setDate(result.value(4).toDate());
+        p->endts.setTime(result.value(5).toTime());
+        p->endts.setDate(result.value(6).toDate());
+
+        p->recstartts = p->startts.addSecs(result.value(7).toInt() * -60);
+        p->recendts = p->endts.addSecs(result.value(8).toInt() * 60);
+
+        if (p->recstartts >= p->recendts)
+        {
+            // start/end-offsets are invalid so ignore
+            p->recstartts = p->startts;
+            p->recendts = p->endts;
+        }
+
+        // Don't bother if the end time has already passed
+        if (p->recendts < schedTime)
+            continue;
+
+        p->title = QString::fromUtf8(result.value(9).toString());
+        p->subtitle = QString::fromUtf8(result.value(10).toString());
+        p->description = QString::fromUtf8(result.value(11).toString());
+
+        p->chanstr = result.value(12).toString();
+        p->chansign = QString::fromUtf8(result.value(13).toString());
+        p->channame = QString::fromUtf8(result.value(14).toString());
+
+        p->schedulerid = p->startts.toString() + "_" + p->chanid;
+
+        if (p == NULL)
+            continue;
+
+        tmpList.push_back(p);
     }
 
     RecIter tmp = tmpList.begin();
