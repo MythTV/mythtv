@@ -682,7 +682,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         /* disp dim     */ enc->width, enc->height,
                         /* osd dim      */ /*enc->width*/ 0, /*enc->height*/ 0,
                         /* mpeg type    */ xvmc_stream_type(enc->codec_id),
-                        /* xvmc pix fmt */ xvmc_pixel_format(enc->pix_fmt));
+                        /* xvmc pix fmt */ xvmc_pixel_format(enc->pix_fmt),
+                        /* test surface */ kCodec_NORMAL_END > video_codec_id);
                     bool vcd, idct, mc;
                     enc->codec_id = myth2av_codecid(mcid, vcd, idct, mc);
                     video_codec_id = mcid;

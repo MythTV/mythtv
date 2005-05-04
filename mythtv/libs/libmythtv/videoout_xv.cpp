@@ -768,13 +768,14 @@ bool VideoOutputXv::InitXlib()
     return ok;
 }
 
-/** \fn VideoOutputXv::GetBestSupportedCodec(uint,uint, uint,uint, uint,int)
+/** \fn VideoOutputXv::GetBestSupportedCodec(uint,uint, uint,uint, uint,int, bool)
  *
  * \return MythCodecID for the best supported codec on the main display.
  */
 MythCodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
                                                  uint osd_width, uint osd_height,
-                                                 uint stream_type, int xvmc_chroma)
+                                                 uint stream_type, int xvmc_chroma,
+                                                 bool test_surface)
 {
     (void)width, (void)height, (void)osd_width, (void)osd_height;
     (void)stream_type, (void)xvmc_chroma;
@@ -817,7 +818,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
     }
 
     bool ok = true;
-    if (ret>kCodec_NORMAL_END)
+    if (test_surface && ret>kCodec_NORMAL_END)
     {
         Window root;
         XvMCSurfaceInfo info;
