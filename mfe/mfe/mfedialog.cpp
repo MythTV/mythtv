@@ -387,28 +387,17 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
             //
             //  Pop up a dialogue to get a new playlist name
             //
+
+            node->setActive(false);
+            menu->refresh();
         
-            int node_mfd_id = current_mfd->getId();
-            int node_collection_id = node->getAttribute(0);
-            int node_playlist_id = node->getInt();
-        
-            if(MythPopupBox::showOkCancelPopup(
-                                                gContext->GetMainWindow(), 
-                                                "", 
-                                                QString("Are you sure you want to delete a playlist called \"%1\"?")
-                                                .arg(node->getString()), 
-                                                true
-                                              ))
-            {
-                mfd_interface->deletePlaylist(
-                                                node_mfd_id, 
-                                                node_collection_id,
-                                                node_playlist_id
-                                             );
-            }
+            mfd_interface->deletePlaylist(
+                                            current_mfd->getId(), 
+                                            node->getAttribute(0),
+                                            node->getInt()
+                                         );
         }
     }
-
 }
 
 void MfeDialog::doPlaylistDialog(int collection_id, int playlist_id, const QString playlist_name)

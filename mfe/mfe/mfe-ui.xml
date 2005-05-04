@@ -211,12 +211,6 @@
                 <filename>mfe_pledit_back.png</filename>
                 <position>0,0</position>
             </image>
-            <!--
-            <image name="mfe_playlistedit_back" draworder="0" fleximage="no">
-                <filename>mfe_playlistedit_back.png</filename>
-                <position>0,450</position>
-            </image>
-            -->
         </container>
 
         <container name="title">
