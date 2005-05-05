@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-04-20, v0.18.01
+  2005-05-05, v0.18.02
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -57,7 +57,7 @@
            3.2.1.3 Debian
         3.2.2 Manual installation
         3.2.3 Graphical installation tools
-           3.2.3.1 Mandrake 9.0
+           3.2.3.1 Mandrake
         3.2.4 Command-line installation
            3.2.4.1 Mandrake
               3.2.4.1.1 Mandrake 9.0
@@ -92,26 +92,26 @@
      5.5 Gentoo
 
   6. MySQL.
-     6.1 Distribution-specific information.
-        6.1.1 Mandrake 9.0
+     6.1 Distribution-specific information
+        6.1.1 Mandrake
         6.1.2 Red Hat Linux and Fedora Core
         6.1.3 Gentoo
      6.2 Setting up the initial database
-        6.2.1 Mandrake 9.0 and Red Hat Linux/Fedora Core
+        6.2.1 Mandrake and Red Hat Linux/Fedora Core
         6.2.2 Debian 3.0
         6.2.3 Gentoo
         6.2.4 Modifying access to the MySQL database for multiple systems
 
   7. Configuring Sound.
      7.1 Graphically setting up the mixer
-        7.1.1 Mandrake 9.0 and Red Hat Linux/Fedora Core
+        7.1.1 Mandrake and Red Hat Linux/Fedora Core
            7.1.1.1 Using OSS drivers.
            7.1.1.2 Using ALSA.
      7.2 Setting the mixer from the command line
 
   8. Setting up a remote control.
      8.1 Gentoo
-     8.2 Mandrake 9.0
+     8.2 Mandrake
         8.2.1 Obtaining the kernel
      8.3 Red Hat Linux/Fedora Core
      8.4 Obtaining and compiling lirc
@@ -185,9 +185,9 @@
   12. MythPlugins.
   13. MythWeb.
      13.1 Installation and prerequisites
-        13.1.1 Mandrake 9.0
+        13.1.1 Mandrake
      13.2 Completing the installation
-     13.3 Resetting the key binding table.
+     13.3 Resetting the key binding table
      13.4 Resetting the theme.
 
   14. MythGallery.
@@ -198,7 +198,7 @@
   15. MythGame.
   16. MythMusic.
      16.1 Manual installation of prerequisites
-     16.2 Mandrake 9.0
+     16.2 Mandrake
         16.2.1 Additional options with MythMusic
      16.3 Red Hat Linux 9
      16.4 Compiling MythMusic
@@ -267,7 +267,7 @@
         22.4.3 Overscan Dimensions
      22.5 Saving or restoring the database
      22.6 Deleting the MySQL database
-     22.7 Moving your data to new hardware.
+     22.7 Moving your data to new hardware
      22.8 btaudio
      22.9 Removing unwanted channels
      22.10 NFS
@@ -275,7 +275,7 @@
      22.12 Automatically starting mythbackend at system boot time
         22.12.1 Red Hat And Mandrake
            22.12.1.1 Log files
-           22.12.1.2 Mandrake 9.x
+           22.12.1.2 Mandrake
         22.12.2 Gentoo
      22.13 Advanced Backend Configurations
      22.14 What is this transcoder thing, and how do I use it?
@@ -1198,9 +1198,9 @@
 
   [1m3.2.1.2.  Mandrake[0m
 
-  Thac has created RPMs for MythTV for Mandrake 9.0, 9.1 and 9.2 which
-  may be obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/>
-  If you have problems with the RPMs, please send him email directly at
+  Thac has created RPMs for MythTV for Mandrake 9.0 and above which may
+  be obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/> If
+  you have problems with the RPMs, please send him email directly at
   thac@nyvalls.se <thac@nyvalls.se>.
 
 
@@ -1264,16 +1264,13 @@
   components, you should be aware that not all packages include the necessary
   headers for compiling packages.  If you're having trouble compiling, ensure
   that you've installed the -devel version of a prerequisite.
-
-  NOTE:  Other than where noted, Mandrake 9.1 and 10.0 users may follow the
-  Mandrake 9.0 instructions.
   ______________________________________________________________________
 
 
 
   [1m3.2.3.  Graphical installation tools[0m
 
-  [1m3.2.3.1.  Mandrake 9.0[0m
+  [1m3.2.3.1.  Mandrake[0m
 
   On systems running KDE, a tool which will allow you to see what
   packages are available and if they're installed on your system can be
@@ -1290,12 +1287,10 @@
   perl distribution.  In each case, we're looking to make sure that the
   primary module is getting installed.
 
-
   Click the magnifying glass or press [1mCTRL-F [22mand enter "perl" as your
   search term.  You should find it under the "Perl" folder.  You need at
   least the perl 5.80 base package installed.  If not, click on the
   "Mark" button.
-
   If you are going to be installing MySQL on this system, search for
   mysql - it should be under "Databases".  Make sure that mysql and
   mysql-clients are installed.  If not, click on "Mark".
@@ -1357,10 +1352,11 @@
   answer "YES".
 
 
-       $ su
-       # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
-       # urpmi XFree86-devel perl
-       # urpmi libqt3-devel
+
+  $ su
+  # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
+  # urpmi XFree86-devel perl
+  # urpmi libqt3-devel
 
 
 
@@ -1415,6 +1411,7 @@
 
   All the necessary files will be downloaded and built. Even on a fast
   machine this may take a lot of time if you need to do a full Qt build.
+
 
   [1m3.2.4.3.  Debian.[0m
 
@@ -1473,8 +1470,6 @@
 
 
   [1m4.1.  Software requirements for compiling MythTV[0m
-
-
 
   [1m4.1.1.  General requirements[0m
 
@@ -1541,8 +1536,10 @@
        /usr/lib/qt3/bin/qmake
 
 
+
   For Mandrake, you should see a value like /usr/lib/qt3 for QTDIR and
   /usr/lib/qt3/bin should be in $PATH.
+
 
   For Gentoo, you should see a value like /usr/qt/3 for QTDIR and
   /usr/qt/3/bin should be in $PATH.
@@ -1560,9 +1557,8 @@
 
   [1m4.3.2.1.  Mandrake[0m
 
-  The following instructions work for Mandrake 9.0 and 9.1 using [1mbash [22mas
-  the shell, and may be applicable for a distribution which uses
-  /etc/profile.d.
+  The following instructions work for Mandrake using [1mbash [22mas the shell,
+  and may be applicable for a distribution which uses /etc/profile.d.
 
 
 
@@ -1662,6 +1658,7 @@
        .
        .
        export PATH QTDIR
+
 
 
   [1m4.3.3.  Device Permissions[0m
@@ -2094,9 +2091,9 @@
 
   [1m6.  MySQL.[0m
 
-  [1m6.1.  Distribution-specific information.[0m
+  [1m6.1.  Distribution-specific information[0m
 
-  [1m6.1.1.  Mandrake 9.0[0m
+  [1m6.1.1.  Mandrake[0m
 
   If this is the system maintaining the database, make sure that MySQL
   is running and started at boot.  Click on Mandrake Control
@@ -2153,7 +2150,7 @@
 
 
 
-  [1m6.2.1.  Mandrake 9.0 and Red Hat Linux/Fedora Core[0m
+  [1m6.2.1.  Mandrake and Red Hat Linux/Fedora Core[0m
 
 
 
@@ -2253,7 +2250,7 @@
 
   [1m7.1.  Graphically setting up the mixer[0m
 
-  [1m7.1.1.  Mandrake 9.0 and Red Hat Linux/Fedora Core[0m
+  [1m7.1.1.  Mandrake and Red Hat Linux/Fedora Core[0m
 
   Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandrake, or
 
@@ -2373,7 +2370,7 @@
 
 
 
-          [1mNOTE[22m:If you are running Mandrake 9.1, you may install
+            [1mNOTE[22m:If you are running Mandrake, you may install
   [1mlirc [22mby executing: # urpmi lirc lirc-remotes and bypass the manual
   compilation steps described below by jumping to the ``Completing the
   lirc install'' section. See the contrib/mandrake91.etc.sysconfig.lircd
@@ -2399,7 +2396,7 @@
 
 
 
-  [1m8.2.  Mandrake 9.0[0m
+  [1m8.2.  Mandrake[0m
 
   lircd has two prerequisites:  [1mdialog[22m, available in Mandrake through
   the "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the
@@ -3356,12 +3353,16 @@
   [1m9.4.1.  Periodically running mythfilldatabase[0m
 
   In order to keep your database filled, [1mmythfilldatabase [22mshould be run
-  once a day.  To use MythTV's built-in capability, you'll need to run
-  the [1mmythfrontend [22mSetup option.  From the MythFrontend, enter the
+  once a day.
+
+  To use MythTV's built-in capability, you'll need to run the
+  [1mmythfrontend [22mSetup option.  From the MythFrontend, enter the
   Setup>General screen and advance to "Mythfilldatabase", the fourth
   screen.  Select the checkbox, then complete the options as you see
   fit.  The [1mmythbackend [22mprogram will now run [1mmythfilldatabase [22mat the
   times you specify.
+
+
   [1m9.5.  Grabbing channel icons for DataDirect users[0m
 
   While the DataDirect TV listings service has several advantages, it
@@ -3548,6 +3549,7 @@
   video frames.  In other words, a negative image. This would rarely be
   useful but may be a good example to verify that your filter strings
   take effect.
+
 
   o  The "linearblend" filter
 
@@ -3808,7 +3810,6 @@
   from the Xbox-Linux project site at http://xbox-linux.sf.net/
   <http://xbox-linux.sf.net/>. The program you need is part of the
   eds_i2c_staff module in CVS.  Note the spelling.
-
 
   Once you have installed [1mblink [22myou will need to set permissions.  [1mblink[0m
   needs write permission to the i2c device to function properly.  There
@@ -4746,7 +4747,7 @@
 
 
   $ tar -xjf mythplugins-0.18.tar.bz2
-  $ cd mythplugins
+  $ cd mythplugins-0.18
   $ ./configure --help
 
   Usage:   configure [options]
@@ -4840,9 +4841,9 @@
   support.
 
 
-  [1m13.1.1.  Mandrake 9.0[0m
+  [1m13.1.1.  Mandrake[0m
 
-  Mandrake 9.0 has [1mapache [22mand [1mPHP [22mpre-packaged, so installation is quite
+  Mandrake has [1mapache [22mand [1mPHP [22mpre-packaged, so installation is quite
   simple.  Once you have installed the two programs, either with the
   graphical installer (see instructions in ``Graphic Install Tools'') or
   through the command line (section ``Command Line''), and you've
@@ -4900,7 +4901,7 @@
         [1mNOTE[22m: Make sure that you have a trailing slash on the URL,
   otherwise you will get a 404 Page not Found error.
 
-  [1m13.3.  Resetting the key binding table.[0m
+  [1m13.3.  Resetting the key binding table[0m
 
   MythWeb allows you to configure which keys are bound to which actions
   within MythTV.  If you'd like to reset this back to the default,
@@ -5158,9 +5159,9 @@
 
 
 
-  [1m16.2.  Mandrake 9.0[0m
+  [1m16.2.  Mandrake[0m
 
-  Mandrake 9.0 has a number of the prerequisites available on the
+  Mandrake has a number of the prerequisites available on the
   installation CD.  Some of the software you're going to need will have
   to be obtained from the "contrib" or "cooker" development
   repositories.  Applications downloaded from "cooker" come from the
@@ -5201,7 +5202,7 @@
   +o  SDL
 
   fftw may be obtained from http://www.fftw.org/ <http://www.fftw.org/>.
-  In Mandrake 9.1 it may be installed by typing:
+  In Mandrake it may be installed by typing:
 
 
        # urpmi libfftw2 libfftw2-devel
@@ -5209,8 +5210,8 @@
 
 
   OpenGL should be installed on practically all distributions.  However,
-  you will need the devel module.  In Mandrake 9.1 it may be installed
-  by typing:
+  you will need the devel module.  In Mandrake it may be installed by
+  typing:
 
 
        # urpmi libMesaGLU1-devel
@@ -5218,8 +5219,7 @@
 
 
   SDL may be obtained from http://www.libsdl.org
-  <http://www.libsdl.org>.  In Mandrake 9.1 it may be installed by
-  typing:
+  <http://www.libsdl.org>.  In Mandrake it may be installed by typing:
 
 
        # urpmi libSDL1.2 libSDL1.2-devel
@@ -5233,6 +5233,7 @@
   packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably
   already have installed). To install these all at once, simply type
   (all on the same line):
+
 
   $ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
 
@@ -5260,7 +5261,7 @@
 
 
 
-       $ cd mythplugins
+       $ cd ~/mythplugins-0.18
        $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
        $ qmake mythplugins.pro
        $ make
@@ -5406,7 +5407,7 @@
 
 
 
-       $ cd mythplugins
+       $ cd ~/mythplugins-0.18
        $ ./configure --disable-all --enable-mythweather
        $ qmake mythplugins.pro
        $ make
@@ -6470,7 +6471,7 @@
 
 
 
-  [1m22.7.  Moving your data to new hardware.[0m
+  [1m22.7.  Moving your data to new hardware[0m
 
   This assumes that you will be moving your data to newer / bigger
   hardware and don't want to lose your programs.
@@ -6745,7 +6746,7 @@
 
 
 
-  [1m22.12.1.2.  Mandrake 9.x[0m
+  [1m22.12.1.2.  Mandrake[0m
 
   Mandrake adds one more twist in the form of the msec utility, which
   runs regularly and (at the default or any higher security level) sets
