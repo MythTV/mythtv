@@ -592,14 +592,6 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
 
     InstallXErrorHandler(XJ_disp);
 
-    for (uint i=0; i<XVMC_OSD_NUM; i++)
-    {
-        XvMCOSD *xvmc_osd =
-            new XvMCOSD(XJ_disp, xv_port, xvmc_surf_info.surface_type_id,
-                        xvmc_surf_info.flags);
-        xvmc_osd_available.push_back(xvmc_osd);
-    }
-
     // create XvMC buffers
     bool ok = CreateXvMCBuffers();
     vector<XErrorEvent> errs = UninstallXErrorHandler(XJ_disp);
@@ -621,9 +613,11 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
     else
     {
         VERBOSE(VB_IMPORTANT, "Failed to create XvMC Buffers.");
+        xvmc_osd_lock.lock();
         for (uint i=0; i<xvmc_osd_available.size(); i++)
             delete xvmc_osd_available[i];
         xvmc_osd_available.clear();
+        xvmc_osd_lock.unlock();
         X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
         xv_port = -1;
     }
@@ -1118,8 +1112,17 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
         return false;
     }
 
-    for (uint i=0; i<xvmc_osd_available.size(); i++)
-        xvmc_osd_available[i]->CreateBuffer(*xvmc_ctx, XJ_width, XJ_height);
+    xvmc_osd_lock.lock();
+    for (uint i=0; i<XVMC_OSD_NUM; i++)
+    {
+        XvMCOSD *xvmc_osd =
+            new XvMCOSD(XJ_disp, xv_port, xvmc_surf_info.surface_type_id,
+                        xvmc_surf_info.flags);
+        xvmc_osd->CreateBuffer(*xvmc_ctx, XJ_width, XJ_height);
+        xvmc_osd_available.push_back(xvmc_osd);
+    }
+    xvmc_osd_lock.unlock();
+
 
     X11S(XSync(XJ_disp, False));
 
@@ -1374,12 +1377,14 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
     xvmc_surfs.clear();
 
     // OSD buffers
+    xvmc_osd_lock.lock();
     for (uint i=0; i<xvmc_osd_available.size(); i++)
     {
         xvmc_osd_available[i]->DeleteBuffer();
         delete xvmc_osd_available[i];
     }
     xvmc_osd_available.clear();
+    xvmc_osd_lock.unlock();
 #endif // USING_XVMC
 
     vbuffers.DeleteBuffers();
@@ -1848,34 +1853,62 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType scan)
 }
 
 static void calc_bob(FrameScanType scan, int imgh, int disphoff,
-                    int imgy, int dispyoff,
-                    int frame_height, int top_field_first,
-                    int &field, int &src_y, int &dest_y)
+                     int imgy, int dispyoff,
+                     int frame_height, int top_field_first,
+                     int &field, int &src_y, int &dest_y,
+                     int& xv_src_y_incr, int &xv_dest_y_incr)
 {
     int dst_half_line_in_src = 0, dest_y_incr = 0, src_y_incr = 0;
+    field = 3;
+    src_y = imgy;
+    dest_y = dispyoff;
+    xv_src_y_incr = 0;
     // a negative offset y gives us bobbing, so adjust...
     if (dispyoff < 0)
     {
         dest_y_incr = -dispyoff;
-        src_y_incr = (int) (dest_y_incr * imgh * 0.5 / disphoff);
+        src_y_incr = (int) (dest_y_incr * imgh / disphoff);
+        xv_src_y_incr -= (int) (0.5 * dest_y_incr * imgh / disphoff);
     }
 
     if ((scan == kScan_Interlaced && top_field_first == 1) ||
         (scan == kScan_Intr2ndField && top_field_first == 0))
     {
         field = 1;
-        src_y = imgy / 2;
+        xv_src_y_incr = - imgy / 2;
     }
     else if ((scan == kScan_Interlaced && top_field_first == 0) ||
              (scan == kScan_Intr2ndField && top_field_first == 1))
     {
         field = 2;
-        src_y = (frame_height + imgy) / 2;
-        dst_half_line_in_src = (int) round(((float)disphoff)/imgh - 0.001f);
+        xv_src_y_incr += (frame_height - imgy) / 2;
+
+        dst_half_line_in_src =
+            max((int) round((((double)disphoff)/imgh) - 0.00001), 0);
     }
+    xv_dest_y_incr = dst_half_line_in_src;
 
     src_y += src_y_incr;
-    dest_y += dst_half_line_in_src + dest_y_incr;
+    dest_y += dest_y_incr;
+
+    // DEBUG
+#if 0
+    static int last_dest_y_field[3] = { -1000, -1000, -1000, };
+    int last_dest_y = last_dest_y_field[field];
+
+    if (last_dest_y != dest_y)
+    {
+        cerr<<"####### Field "<<field<<" #######"<<endl;
+        cerr<<"         src_y: "<<src_y<<endl;
+        cerr<<"        dest_y: "<<dest_y<<endl;
+        cerr<<" xv_src_y_incr: "<<xv_src_y_incr<<endl;
+        cerr<<"xv_dest_y_incr: "<<xv_dest_y_incr<<endl;
+        cerr<<"      disphoff: "<<disphoff<<endl;
+        cerr<<"          imgh: "<<imgh<<endl;
+        cerr<<endl;
+    }
+    last_dest_y_field[field] = dest_y;
+#endif
 }
 
 void VideoOutputXv::ShowXvMC(FrameScanType scan)
@@ -1907,11 +1940,12 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
 
     // calculate bobbing params
     int field = 3, src_y = imgy, dest_y = dispyoff;
+    int xv_src_y_incr = 0, xv_dest_y_incr = 0;
     if (m_deinterlacing)
     {
         calc_bob(scan, imgh, disphoff, imgy, dispyoff,
                  frame->height, frame->top_field_first,
-                 field, src_y, dest_y);
+                 field, src_y, dest_y, xv_src_y_incr, xv_dest_y_incr);
     }
     if (hasVLDAcceleration())
     {   // don't do bob-adjustment for VLD drivers
@@ -1972,12 +2006,14 @@ void VideoOutputXv::ShowXVideo(FrameScanType scan)
         return;
     }
 
-    int field = 3, src_y = imgy, dest_y = dispyoff;
+    int field = 3, src_y = imgy, dest_y = dispyoff, xv_src_y_incr = 0, xv_dest_y_incr = 0;
     if (m_deinterlacing && (m_deintfiltername == "bobdeint"))
     {
         calc_bob(scan, imgh, disphoff, imgy, dispyoff,
                  frame->height, frame->top_field_first,
-                 field, src_y, dest_y);
+                 field, src_y, dest_y, xv_src_y_incr, xv_dest_y_incr);
+        src_y += xv_src_y_incr;
+        dest_y += xv_dest_y_incr;
     }
 
     vbuffers.UnlockFrame(frame, "ShowXVideo");
@@ -2021,8 +2057,8 @@ void VideoOutputXv::Show(FrameScanType scan)
  */
 void VideoOutputXv::DrawUnusedRects(bool sync)
 {
-    // boboff assumes the smallest interlaced resolution is 480 lines
-    int boboff = (int)round(((float)disphoff) / 480 - 0.001f);
+    // boboff assumes the smallest interlaced resolution is 480 lines - 5%
+    int boboff = (int)round(((double)disphoff) / 456 - 0.00001);
     boboff = (m_deinterlacing && m_deintfiltername == "bobdeint") ? boboff : 0;
 
     X11L;
