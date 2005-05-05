@@ -870,9 +870,10 @@ class FirewireModel: public ComboBoxSetting, public CCSetting {
  	CCSetting(parent, "firewire_model") {
             setLabel(QObject::tr("Firewire Model"));
             addSelection(QObject::tr("Other"));
-            setHelpText(QObject::tr("Firewire Model is for future use in case "
-                                    "there is a need to model specific "
-                                    "workarounds.")); 
+            addSelection(QObject::tr("DCT-6200"));
+            setHelpText(QObject::tr("Select DCT-6200 to enable internal "
+                                    "channel-changing support, Other "
+                                    "for any other supported device.")); 
 
         }
 };

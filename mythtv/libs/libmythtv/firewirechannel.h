@@ -11,13 +11,24 @@
 #include <qstring.h>
 #include "tv_rec.h"
 #include "channelbase.h"
+#include <libavc1394/avc1394.h>
 
 using namespace std;
+
+// 6200 defines for channel changes, taken from contrib/6200ch.c
+#define AVC1394_SUBUNIT_TYPE_6200 	(9 << 19)  /* uses a reserved subunit type */ 
+#define AVC1394_6200_COMMAND_CHANNEL 	0x00007C00 /* 6200 subunit command */
+#define AVC1394_6200_OPERAND_SET 	0x00000020 /* 6200 subunit command operand */
+
+#define DCT6200_CMD0 AVC1394_CTYPE_CONTROL | AVC1394_SUBUNIT_TYPE_6200 | \
+        AVC1394_SUBUNIT_ID_0 | AVC1394_6200_COMMAND_CHANNEL | \
+        AVC1394_6200_OPERAND_SET
+
 
 class FirewireChannel : public ChannelBase
 {
  public:
-    FirewireChannel(TVRec *parent);
+    FirewireChannel(firewire_options_t firewire_opts, TVRec *parent);
     ~FirewireChannel(void);
 
     bool SetChannelByString(const QString &chan);
@@ -27,7 +38,11 @@ class FirewireChannel : public ChannelBase
     void SwitchToInput(int newcapchannel, bool setstarting)
                       { (void)newcapchannel; (void)setstarting; }
     void SetExternalChanger(void);
-
+private:
+    firewire_options_t fw_opts;
+    nodeid_t fwnode;
+    raw1394handle_t fwhandle;
+    bool isopen;
 };
 
 #endif
