@@ -89,7 +89,7 @@ static HostSlider *MixerVolume()
     gs->setLabel(QObject::tr("Master Mixer Volume"));
     gs->setValue(70);
     gs->setHelpText(QObject::tr("Initial volume for the Master Mixer.  "
-                    "This affects all sound created by the soundcard.  "
+                    "This affects all sound created by the sound card.  "
                     "Note: Do not set this too low."));
     return gs;
 }
@@ -578,8 +578,8 @@ static GlobalCheckBox *RerecordAutoExpired()
                              "automatically expired"));
     bc->setValue(false);
     bc->setHelpText(QObject::tr("If set, programs that are automatically "
-                                "deleted (expired) will be allowed to "
-                                "re-recorded if they are shown again."));
+                    "deleted (expired) will be allowed to be "
+                    "re-recorded if they are shown again."));
     return bc;
 }
 
@@ -873,10 +873,10 @@ static HostCheckBox *PersistentBrowseMode()
 static HostCheckBox *AggressiveBuffer()
 {
     HostCheckBox *gc = new HostCheckBox("AggressiveSoundcardBuffer");
-    gc->setLabel(QObject::tr("Aggressive Soundcard Buffering"));
+    gc->setLabel(QObject::tr("Aggressive Sound card Buffering"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, MythTV will pretend to have "
-                   "a smaller soundcard buffer than is really present.  This "
+                   "a smaller sound card buffer than is really present.  This "
                    "may speed up seeking, but can also cause playback "
                    "problems."));
     return gc;
@@ -961,9 +961,9 @@ static HostCheckBox *EndOfRecordingExitPrompt()
     HostCheckBox *gc = new HostCheckBox("EndOfRecordingExitPrompt");
     gc->setLabel(QObject::tr("Prompt at end of recording"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, a "
-                    "menu will be displayed allowing you to delete the "
-                    "recording when it has finished playing."));
+    gc->setHelpText(QObject::tr("If set, a menu will be displayed allowing "
+                    "you to delete the recording when it has finished "
+                    "playing."));
     return gc;
 }
 
@@ -1143,7 +1143,7 @@ static HostComboBox *XineramaScreen()
     gc->setLabel(QObject::tr("Xinerama screen"));
     gc->setValue(0);
     gc->setHelpText(QObject::tr("Run on the specified screen or "
-                                "spanning all screens."));
+                    "spanning all screens."));
     return gc;
 }
 
@@ -1252,7 +1252,7 @@ static HostCheckBox *UseVideoModes()
     gc->setLabel(QObject::tr("Separate video modes for GUI and TV playback"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Switch X Window video modes for TV. "
-                                "Requires \"xrandr\" support."));
+                    "Requires \"xrandr\" support."));
     return gc;
 }
 
@@ -1264,7 +1264,7 @@ static HostSpinBox *VidModeWidth(int idx)
     gs->setLabelAboveWidget(idx<1);
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Horizontal resolution of video "
-                                "which needs a special output resolution."));
+                    "which needs a special output resolution."));
     return gs;
 }
 
@@ -1276,7 +1276,7 @@ static HostSpinBox *VidModeHeight(int idx)
     gs->setLabelAboveWidget(idx<1);
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Vertical resolution of video "
-                                "which needs a special output resolution."));
+                    "which needs a special output resolution."));
     return gs;
 }
 
@@ -1286,7 +1286,7 @@ static HostComboBox *GuiVidModeResolution()
     gc->setLabel(QObject::tr("GUI"));
     gc->setLabelAboveWidget(true);
     gc->setHelpText(QObject::tr("Resolution of screen "
-                                "when not watching a video."));
+                    "when not watching a video."));
     
     const vector<DisplayResScreen> scr = GetVideoModes();
     for (uint i=0; i<scr.size(); ++i)
@@ -1363,7 +1363,7 @@ static HostComboBox *TVVidModeForceAspect(int idx=-1)
 {
     QString dhelp = QObject::tr("Aspect ratio when watching a video.");
     QString ohelp = QObject::tr("Aspect ration when watching a "
-                                "video at a specific resolution.");
+                    "video at a specific resolution.");
 
     QString qstr = (idx<0) ? "TVVidModeForceAspect" :
         QString("TVVidModeForceAspect%1").arg(idx);
@@ -1440,9 +1440,9 @@ static HostCheckBox *HideMouseCursor()
     gc->setLabel(QObject::tr("Hide Mouse Cursor in Myth"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("Toggles mouse cursor visibility. "
-                                "Most of the Myth GUI does not respond "
-                                "to mouse clicks, this is only to avoid "
-                                "\"losing\" your mouse cursor."));
+                    "Most of the Myth GUI does not respond "
+                    "to mouse clicks, this is only to avoid "
+                    "\"losing\" your mouse cursor."));
     return gc;
 };
 
@@ -1452,7 +1452,8 @@ static HostCheckBox *RunInWindow()
     HostCheckBox *gc = new HostCheckBox("RunFrontendInWindow");
     gc->setLabel(QObject::tr("Run the frontend in a window"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Toggles between windowed and borderless operation."));
+    gc->setHelpText(QObject::tr("Toggles between windowed and "
+                    "borderless operation."));
     return gc;
 }
 
@@ -1668,11 +1669,11 @@ static GlobalSpinBox *HDRingbufferSize()
 					    25*188, 512*188, 25*188);
     bs->setLabel(QObject::tr("HD Ringbuffer size (KB)"));
     bs->setHelpText(QObject::tr("The HD device ringbuffer allows the "
-				"backend to weather moments of stress. "
-				"The larger the ringbuffer, the longer "
-				"the moments of stress can be. However, "
-				"setting the size too large can cause "
-				"swapping, which is detrimental."));
+                    "backend to weather moments of stress. "
+                    "The larger the ringbuffer, the longer "
+                    "the moments of stress can be. However, "
+                    "setting the size too large can cause "
+                    "swapping, which is detrimental."));
     bs->setValue(50*188);
     return bs;
 }
@@ -1895,8 +1896,8 @@ static GlobalSpinBox *GRFindOneRecordRecPriority()
                                             -99, 99, 1);
     bs->setLabel(QObject::tr("Find One Recordings Priority"));
     bs->setHelpText(QObject::tr("Find One, Find Weekly and Find Daily "
-                                "recording types will receive this "
-                                "additional recording priority value."));
+                    "recording types will receive this "
+                    "additional recording priority value."));
     bs->setValue(0);
     return bs;
 }
@@ -2008,7 +2009,7 @@ static HostCheckBox *EnableXbox()
 {
     HostCheckBox *gc = new HostCheckBox("EnableXbox");
     gc->setLabel(QObject::tr("Enable Xbox Hardware"));
-    gc->setHelpText(QObject::tr("This enables support for Xbox Specific "
+    gc->setHelpText(QObject::tr("This enables support for Xbox specific "
                     "hardware. Requires a frontend restart for changes to "
                     "take effect."));
     gc->setValue(false);
@@ -2095,7 +2096,7 @@ static HostCheckBox *PVR350OutputEnable()
     gc->setValue(false);
     gc->setHelpText(QObject::tr("MythTV can use the PVR-350's TV out and MPEG "
                     "decoder for high quality playback.  This requires that "
-                    "the ivtv-fb kernel module is also loaded and set up "
+                    "the ivtv-fb kernel module is also loaded and configured "
                     "properly."));
     return gc;
 }
@@ -2124,7 +2125,7 @@ static HostCheckBox *PVR350UseInternalSound()
     HostCheckBox *gc = new HostCheckBox("PVR350InternalAudioOnly");
     gc->setLabel(QObject::tr("TV audio through PVR-350 only"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Normally PVR-350 audio is looped into a soundcard, "
+    gc->setHelpText(QObject::tr("Normally, PVR-350 audio is looped into a sound card; "
                     "here you can indicate when that is not the case. "
                     "MythTV cannot control TV volume when this option is checked."));
     return gc;
