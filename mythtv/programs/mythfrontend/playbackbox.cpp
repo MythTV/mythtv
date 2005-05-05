@@ -13,6 +13,7 @@
 #include <qpainter.h>
 #include <qheader.h>
 #include <qfile.h>
+#include <qfileinfo.h>
 #include <qsqldatabase.h>
 #include <qmap.h>
 
@@ -3267,6 +3268,24 @@ bool PlaybackBox::fileExists(ProgramInfo *pginfo)
     return checkFile.exists();
 }
 
+QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
+{
+    QString filename = pginfo->pathname;
+    filename += ".png";
+
+    if (filename.left(7) == "myth://")
+    {
+        Qt::DateFormat f = Qt::TextDate;
+        QString filetime = RemoteGetPreviewLastModified(pginfo);
+        QDateTime retLastModified = QDateTime::fromString(filetime,f);
+        return retLastModified;
+    }
+
+    QFileInfo retfinfo(filename);
+
+    return retfinfo.lastModified();
+}
+
 QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 {
     QPixmap retpixmap;
@@ -3274,25 +3293,36 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     if (!generatePreviewPixmap)
         return retpixmap;
         
-    // Check and see if we've already tried this one.    
+    QString filename = pginfo->pathname;
+    filename += ".png";
+
+    previewLastModified = getPreviewLastModified(pginfo);
+    if (previewLastModified <  pginfo->lastmodified &&
+        previewLastModified >= pginfo->endts &&
+        !pginfo->IsEditing() && 
+        !pginfo->IsCommProcessing())
+    {
+        RemoteGeneratePreviewPixmap(pginfo);
+        previewLastModified = getPreviewLastModified(pginfo);
+    }
+
+    // Check and see if we've already tried this one.
     if (pginfo->startts == previewStartts &&
-        pginfo->chanid == previewChanid)
+        pginfo->chanid == previewChanid &&
+        previewLastModified == previewFilets)
     {
         if (previewPixmap)
             retpixmap = *previewPixmap;
         
         return retpixmap;
     }
-    
+
     if (previewPixmap)
     {
         delete previewPixmap;
         previewPixmap = NULL;
     }
     
-    QString filename = pginfo->pathname;
-    filename += ".png";
-
     int screenheight = 0, screenwidth = 0;
     float wmult = 0, hmult = 0;
 
@@ -3303,11 +3333,18 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     {
         previewStartts = pginfo->startts;
         previewChanid = pginfo->chanid;
+        previewFilets = previewLastModified;
         retpixmap = *previewPixmap;
         return retpixmap;
     }
 
-    QImage *image = gContext->CacheRemotePixmap(filename);
+    //if this is a remote frontend, then we need to refresh the pixmap
+    //if another frontend has already regenerated the stale pixmap on the disk
+    bool refreshPixmap = false;    
+    if (previewLastModified >= previewFilets)
+        refreshPixmap = true;    
+
+    QImage *image = gContext->CacheRemotePixmap(filename, refreshPixmap);
 
     if (!image)
     {
@@ -3319,10 +3356,11 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
             retpixmap = *previewPixmap;
             previewStartts = pginfo->startts;
             previewChanid = pginfo->chanid;
+            previewFilets = previewLastModified;
             return retpixmap;
         }
 
-        image = gContext->CacheRemotePixmap(filename);
+        image = gContext->CacheRemotePixmap(filename, refreshPixmap);
     }
 
     if (image)
@@ -3350,6 +3388,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     retpixmap = *previewPixmap;
     previewStartts = pginfo->startts;
     previewChanid = pginfo->chanid;
+    previewFilets = previewLastModified;
 
     return retpixmap;
 }

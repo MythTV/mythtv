@@ -95,6 +95,7 @@ class MainServer : public QObject
     void HandleGetRecorderFromNum(QStringList &slist, PlaybackSock *pbs);
     void HandleMessage(QStringList &slist, PlaybackSock *pbs);
     void HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs);
+    void HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs);
     void HandleIsRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleCheckRecordingActive(QStringList &slist, PlaybackSock *pbs);
     void HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs);

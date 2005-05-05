@@ -137,6 +137,7 @@ class PlaybackBox : public MythDialog
     void UpdateProgressBar(void);
 
     QString cutDown(QString, QFont *, int);
+    QDateTime getPreviewLastModified(ProgramInfo *);
     QPixmap getPixmap(ProgramInfo *);
     QPainter backup;
     bool play(ProgramInfo *);
@@ -295,6 +296,8 @@ class PlaybackBox : public MythDialog
     QString chooseGroupPassword;
     bool groupnameAsAllProg;
     QPixmap *previewPixmap;
+    QDateTime previewLastModified;
+    QDateTime previewFilets;
     QDateTime previewStartts;
     QString previewChanid;
     int listOrder;

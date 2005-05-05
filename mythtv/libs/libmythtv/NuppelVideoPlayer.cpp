@@ -3372,9 +3372,31 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
 
     ClearAfterSeek();
 
-    int number = (int)(secondsin * video_frame_rate);
+    long long number = (int)(secondsin * video_frame_rate);
     if (number >= totalFrames)
         number = totalFrames / 2;
+
+    previewFromBookmark = gContext->GetNumSetting("PreviewFromBookmark");
+    if (previewFromBookmark != 0)
+    {
+        bookmarkseek = GetBookmark();
+        if (bookmarkseek > 30)
+            number = bookmarkseek;
+    }
+
+    LoadCommBreakList();
+    LoadCutList();
+    long long oldnumber = number;
+    while ((CommDetect::FrameIsInBreakMap(number, commBreakMap, totalFrames) || 
+           (CommDetect::FrameIsInBreakMap(number, deleteMap, totalFrames))))
+    {
+        number += 30 * video_frame_rate;
+        if (number >= totalFrames)
+        {
+            number = oldnumber;
+            break;
+        }
+    }
 
     GetFrame(1, true);
 

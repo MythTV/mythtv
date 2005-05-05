@@ -131,6 +131,16 @@ void PlaybackSock::GenPreviewPixmap(ProgramInfo *pginfo)
     SendReceiveStringList(strlist);
 }
 
+QString PlaybackSock::PixmapLastModified(ProgramInfo *pginfo)
+{
+    QStringList strlist = QString("QUERY_PIXMAP_LASTMODIFIED");
+    pginfo->ToStringList(strlist);
+
+    SendReceiveStringList(strlist);
+
+    return strlist[0];
+}
+
 bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
 {
     QStringList strlist = "QUERY_CHECKFILE";

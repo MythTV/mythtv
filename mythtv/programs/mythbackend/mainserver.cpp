@@ -393,6 +393,10 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
     {
         HandleGenPreviewPixmap(listline, pbs);
     }
+    else if (command == "QUERY_PIXMAP_LASTMODIFIED")
+    {
+        HandlePixmapLastModified(listline, pbs);
+    }
     else if (command == "QUERY_ISRECORDING") 
     {
         HandleIsRecording(listline, pbs);
@@ -3041,7 +3045,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (elink == NULL)
     {
-        VERBOSE(VB_ALL, QString("Couldn't find backend for: %1 : %2")
+        VERBOSE(VB_ALL, QString("Couldn't find EncoderLink when trying to "
+                                "generate preview pixmap for: %1 : %2")
                                .arg(pginfo->title).arg(pginfo->subtitle));
         QStringList outputlist = "BAD";
         SendResponse(pbssock, outputlist);
@@ -3080,6 +3085,65 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     } 
 
     delete [] data;
+    delete pginfo;
+}
+
+void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
+{
+    QSocket *pbssock = pbs->getSocket();
+
+    ProgramInfo *pginfo = new ProgramInfo();
+    pginfo->FromStringList(slist, 1);
+
+    QDateTime lastmodified;
+    QStringList strlist;
+    Qt::DateFormat f = Qt::TextDate;
+
+    if (ismaster && pginfo->hostname != gContext->GetHostName())
+    {
+        PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
+
+        if (slave) 
+        {
+             QString slavetime = slave->PixmapLastModified(pginfo);
+
+             strlist += slavetime;
+             SendResponse(pbssock, strlist);
+             delete pginfo;
+             return;
+        }
+        else
+        { 
+            VERBOSE(VB_ALL, QString("Couldn't find backend for: %1 : %2")
+                                   .arg(pginfo->title).arg(pginfo->subtitle));
+        }
+    }
+
+    if (pginfo->hostname != gContext->GetHostName())
+    {
+        VERBOSE(VB_ALL, QString("Got requested for last modified date and time "
+                                "of preview pixmap on %1")
+                                .arg(pginfo->hostname));
+
+        QStringList outputlist = "BAD";
+        SendResponse(pbssock, outputlist);
+        delete pginfo;
+        return;
+    }
+
+    QUrl qurl = pginfo->pathname;
+    QString filename = qurl.path();
+
+    if (qurl.host() != "")
+        filename = LocalFilePath(qurl);
+
+    filename += ".png";
+
+    QFileInfo finfo(filename);
+    lastmodified = finfo.lastModified();
+
+    strlist += lastmodified.toString(f);
+    SendResponse(pbssock, strlist);
     delete pginfo;
 }
 

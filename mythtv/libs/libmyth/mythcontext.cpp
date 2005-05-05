@@ -1785,7 +1785,15 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
             filename = d->m_themepathname + fi.fileName();
             checkFile.setName(filename);
             if (!checkFile.exists())
+            {
                 filename = baseDir + fi.fileName();
+                checkFile.setName(filename);
+                if (!checkFile.exists())
+                {
+                    cerr << "Unable to find image file: " << filename << endl;
+                    return NULL;
+                }
+            }
         }
         else
         {
@@ -1891,7 +1899,15 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
             filename = d->m_themepathname + fi.fileName();
             checkFile.setName(filename);
             if (!checkFile.exists())
+            {
                 filename = baseDir + fi.fileName();
+                checkFile.setName(filename);
+                if (!checkFile.exists())
+                {
+                    cerr << "Unable to find image file: " << filename << endl;
+                    return NULL;
+                }
+            }
         }
         else
         {
@@ -1934,16 +1950,14 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
     return ret;
 }
 
-QImage *MythContext::CacheRemotePixmap(const QString &url)
+QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
 {
     QUrl qurl = url;
     if (qurl.host() == "")
         return NULL;
-
-    if (d->imageCache.contains(url))
-    {
+ 
+    if ((d->imageCache.contains(url)) && (reCache == false))
         return &(d->imageCache[url]);
-    }
 
     RemoteFile *rf = new RemoteFile(url);
 

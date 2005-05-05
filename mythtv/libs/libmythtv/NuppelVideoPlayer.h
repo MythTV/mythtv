@@ -405,7 +405,8 @@ class NuppelVideoPlayer
     ProgramInfo *m_playbackinfo;
 
     long long bookmarkseek;
-
+    bool previewFromBookmark;
+    
     int consecutive_blanks;
     int skipcommercials;
     int autocommercialskip;

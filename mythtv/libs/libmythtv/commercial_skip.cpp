@@ -835,9 +835,6 @@ void CommDetect::GetCommBreakMap(QMap<long long, int> &marks)
                                       marks = logoCommBreakMap;
                                       break;
 
-                                      // FIXME, probably should NOT base this
-                                      // on whether there's a blank-marked
-                                      // comm map?????
         case COMM_DETECT_ALL:         BuildAllMethodsCommList();
                                       marks = commBreakMap;
                                       break;
@@ -2104,15 +2101,21 @@ void CommDetect::DeleteCommAtFrame(QMap<long long, int> &commMap,
     }
 }
 
-bool CommDetect::FrameIsInBreakMap(long long f, QMap<long long, int> &breakMap)
+bool CommDetect::FrameIsInBreakMap(long long f, QMap<long long, int> &breakMap,
+                                   long long maxFrame)
 {
-    for(long long i = f; i < framesProcessed; i++)
+    if (breakMap.isEmpty())
+        return(false);
+
+    for(long long i = f; i < maxFrame; i++)
         if (breakMap.contains(i)) 
         {
             int type = breakMap[i];
-            if ((type == MARK_COMM_END) || (i == f))
+
+            if ((type == MARK_COMM_END) || (type == MARK_CUT_END) || (i == f))
                 return(true);
-            if (type == MARK_COMM_START)
+
+            if ((type == MARK_COMM_START) || (type == MARK_CUT_START))
                 return(false);
         }
 
@@ -2120,13 +2123,22 @@ bool CommDetect::FrameIsInBreakMap(long long f, QMap<long long, int> &breakMap)
         if (breakMap.contains(i)) 
         {
             int type = breakMap[i];
-            if ((type == MARK_COMM_START) || (i == f))
+
+            if ((type == MARK_COMM_START) ||
+                (type == MARK_CUT_START) ||
+                (i == f))
                 return(true);
-            if (type == MARK_COMM_END)
+
+            if ((type == MARK_COMM_END) || (type == MARK_CUT_END))
                 return(false);
         }
 
     return(false);
+}
+
+bool CommDetect::FrameIsInBreakMap(long long f, QMap<long long, int> &breakMap)
+{
+    return FrameIsInBreakMap(f, breakMap, framesProcessed);
 }
 
 void CommDetect::DumpMap(QMap<long long, int> &map)

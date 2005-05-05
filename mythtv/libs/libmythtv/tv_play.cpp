@@ -3551,7 +3551,7 @@ void TV::customEvent(QCustomEvent *e)
                 QMap<long long, int> newMap;
                 QStringList mark;
                 QStringList marks = QStringList::split(",", tokens[3]);
-                for (int i = 0; i < marks.size(); i++)
+                for (unsigned int i = 0; i < marks.size(); i++)
                 {
                     mark = QStringList::split(":", marks[i]);
                     newMap[mark[0].toInt()] = mark[1].toInt();

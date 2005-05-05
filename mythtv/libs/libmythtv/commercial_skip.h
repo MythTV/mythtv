@@ -94,6 +94,9 @@ class CommDetect : public QObject
     void MergeBlankCommList(void);
     void DeleteCommAtFrame(QMap<long long, int> &commMap, long long frame);
 
+    static bool FrameIsInBreakMap(long long f, QMap<long long, int> &breakMap,
+                                  long long maxFrame);
+
     bool FrameIsInBreakMap(long long f, QMap<long long, int> &breakMap);
 
     void DumpMap(QMap<long long, int> &map);

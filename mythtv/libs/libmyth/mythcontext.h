@@ -161,7 +161,7 @@ class MythPrivRequest
     void *m_data;
 };
 
-#define MYTH_BINARY_VERSION "0.18.20050503-1"
+#define MYTH_BINARY_VERSION "0.18.20050504-1"
 #define MYTH_PROTO_VERSION "16"
 
 extern int print_verbose_messages;
@@ -288,7 +288,7 @@ class MythContext : public QObject
 
     bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false);
 
-    QImage *CacheRemotePixmap(const QString &url);
+    QImage *CacheRemotePixmap(const QString &url, bool reCache = false);
 
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);

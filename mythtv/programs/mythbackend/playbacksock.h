@@ -35,6 +35,7 @@ class PlaybackSock
     int DeleteRecording(ProgramInfo *pginfo, bool forceMetadataDelete = false);
     void FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost);
     void GenPreviewPixmap(ProgramInfo *pginfo);
+    QString PixmapLastModified(ProgramInfo *pginfo);
     bool CheckFile(ProgramInfo *pginfo);
 
     bool IsBusy(int capturecardnum);

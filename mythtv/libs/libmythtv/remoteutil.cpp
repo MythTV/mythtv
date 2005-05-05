@@ -303,6 +303,19 @@ void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo)
 
     gContext->SendReceiveStringList(strlist);
 }
+    
+QString RemoteGetPreviewLastModified(ProgramInfo *pginfo)
+{
+    QString retdatetime;
+
+    QStringList strlist = "QUERY_PIXMAP_LASTMODIFIED"; 
+    pginfo->ToStringList(strlist);
+    
+    if (!gContext->SendReceiveStringList(strlist))
+        return retdatetime;
+
+    return strlist[0];
+}
 
 void RemoteFillProginfo(ProgramInfo *pginfo, const QString &playbackhostname)
 {

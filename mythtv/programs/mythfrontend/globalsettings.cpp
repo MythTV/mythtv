@@ -982,11 +982,26 @@ static GlobalSpinBox *PreviewPixmapOffset()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("PreviewPixmapOffset", 0, 600, 1);
     bs->setLabel(QObject::tr("Time offset for thumbnail preview images"));
-    bs->setHelpText(QObject::tr("MythTV will make a thumbnail image this "
-                    "many seconds from the beginning of the recording. "
-                    "Useful to skip over advertisements."));
+    bs->setHelpText(QObject::tr("MythTV will use this offset to make a "
+                    "thumbnail image this many seconds from the beginning "
+                    "of the recording, unless this offset happens to be "
+                    "between cutpoints or inside a flagged advertisement."));
     bs->setValue(64);
     return bs;
+}
+
+static HostCheckBox *PreviewFromBookmark()
+{
+    HostCheckBox *gc = new HostCheckBox("PreviewFromBookmark");
+    gc->setLabel(QObject::tr("Generate preview image from a bookmark "
+                 "if possible"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If enabled, MythTV will ignore the above "
+                    "time offset, and use the bookmark inside the recording, "
+                    "as the offset for creating a thumbnail image. "
+                    "As with the above, MythTV will honour cutlists "
+                    "and increase this offset if necessary."));
+    return gc;
 }
 
 static HostCheckBox *PlaybackPreview()
@@ -2860,6 +2875,7 @@ PlaybackSettings::PlaybackSettings()
     pbox->addChild(PlayBoxEpisodeSort());
     pbox->addChild(GeneratePreviewPixmaps());
     pbox->addChild(PreviewPixmapOffset());
+    pbox->addChild(PreviewFromBookmark());
     pbox->addChild(PlaybackPreview());
     pbox->addChild(PlaybackPreviewLowCPU());
     pbox->addChild(PBBStartInTitle());
