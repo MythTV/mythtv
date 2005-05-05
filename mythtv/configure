@@ -3,10 +3,12 @@
 # ffmpeg configure script (c) 2000, 2001, 2002 Fabrice Bellard
 #
 
-x86_mmx_cpus="pentium-mmx,i686,pentium2,pentium3,pentium3m"
-x86_mmx_cpus="$x86_mmx_cpus,i686,pentium-m,pentium4,pentium4m,prescott,athlon,athlon-xp"
-x86_cpus="i386,i486,i586,pentium,pentiumpro,${x86_mmx_cpus}"
-x86_cmov_cpus="pentium-m,pentium4,pentium4m,prescott,athlon,athlon-xp,pentiumpro,i686,c3-2"
+x86_mmx_cpus="pentium-mmx,pentium2,pentium3,pentium3m,pentium-m"
+x86_mmx_cpus="$x86_mmx_cpus,pentium4,pentium4m,prescott,athlon,athlon-xp"
+x86_mmx_cpus="$x86_mmx_cpus,c3,c3-2"
+x86_cpus="i386,i486,i586,i686,pentium,pentiumpro,${x86_mmx_cpus}"
+x86_cmov_cpus="i686,pentiumpro,pentium2,pentium3,pentium3m,pentium-m,pentium4,"
+x86_cmov_cpus="pentium4m,prescott,athlon,athlon-xp,c3-2"
 
 # default parameters
 compile_type="release"
@@ -675,6 +677,30 @@ for opt do
   esac
 done
 
+has_library()
+{
+    LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
+    LIBPATHS="$LIBPATHS `echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
+
+    # recurse down just one level, should be enough in most cases
+    INCL=`cat /etc/ld.so.conf | grep -v "#" | grep "include "`
+    SRCH=`echo $INCL | sed s/"include "//g`
+    for x in $SRCH ; do
+        LP_APPEND=`cat /etc/$x | grep -v "#" | grep -v "include"`
+        LIBPATHS="$LIBPATHS $LP_APPEND"
+    done
+
+    LIBPATHS="`echo $LIBPATHS /lib /usr/lib | sed s/'\/ '/' '/g` "
+
+    HAS_IT="no"
+    for LIBPATH in $LIBPATHS ; do
+        if test x`ls $LIBPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
+            HAS_IT="yes"
+        fi
+    done
+    expr $HAS_IT : "yes" > /dev/null
+}
+
 CCONFIG="$CCONFIG $compile_type"
 if test x$compile_type = x"profile" ; then
     PROFILEFLAGS="-g -DNDEBUG"
@@ -945,6 +971,12 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : ".*Mendocino" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
        optimize="small"
+   elif expr "$processor" : ".*Klamath" > /dev/null ; then
+       ARCHFLAGS="-march=pentium2"
+       optimize="small"
+   elif expr "$processor" : ".*Deschutes" > /dev/null ; then
+       ARCHFLAGS="-march=pentium2"
+       optimize="small"
 # Athlon 64
    elif expr "$processor" : ".*AMD Athlon(tm) 64" > /dev/null ; then
        ARCHFLAGS="-march=k8"
@@ -958,14 +990,13 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 # Athlon
    elif expr "$processor" : "athlon" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
-   elif expr "$processor" : ".*AMD Athlon(tm)" > /dev/null ; then
+   elif expr "$processor" : ".*AMD Athlon(..)" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
-   elif expr "$processor" : ".*AMD Athlon(TM)" > /dev/null ; then
-       ARCHFLAGS="-march=athlon"
-   elif expr "$processor" : ".*AMD Duron(TM)" > /dev/null ; then
+   elif expr "$processor" : ".*AMD Duron(..)" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
        optimize="small"
-   elif expr "$processor" : ".*AMD-K6(tm) 3D processor" > /dev/null ; then
+# K6
+   elif expr "$processor" : ".*AMD-K6(tm) 3D" > /dev/null ; then
        ARCHFLAGS="-march=pentium-mmx"
        optimize="small"
 # Transmeta Crusoe
@@ -981,7 +1012,7 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
        ARCHFLAGS="-march=c3"
        optimize="small"
        cpu_raw="c3"
-   elif expr "$processor" : ".*VIA Samuel 2" > /dev/null ; then
+   elif expr "$processor" : ".*VIA Samuel" > /dev/null ; then
        ARCHFLAGS="-march=c3"
        optimize="small"
        cpu_raw="c3"
@@ -1606,12 +1637,10 @@ fi
 
 #test for lirc client libraries
 if test x"$lirc" = x"yes" ; then
-   lirc="no"
-   lirc_c1=`ls /usr/lib/liblirc_client.so* 2> /dev/null | head -n 1`
-   lirc_c2=`ls /usr/local/lib/liblirc_client.so* 2> /dev/null | head -n 1`
-   if test x"$lirc_c1" != x"" -o x"$lirc_c2" != x"" ; then
-       lirc="yes"
-   fi
+    lirc="no"
+    if has_library liblirc_client.so ; then
+        lirc="yes"
+    fi
 fi
 
 #test for lirc client header
@@ -1630,16 +1659,8 @@ fi
 
 if test x"$firewire_cable_box" = x"yes" ; then
     firewire_cable_box="no"
-    libiec1=`ls /usr/local/lib/libiec61883* 2> /dev/null | head -n 1`
-    libiec2=`ls /usr/lib/libiec61883* 2> /dev/null | head -n 1`
-    libiec3=`ls /usr/lib64/libiec61883* 2> /dev/null | head -n 1`
-    if test x"$libiec1" != x"" -o x"$libiec2" != x"" -o x"$libiec3" != x"" ; then
-        libraw1=`ls /usr/local/lib/libraw1394* 2> /dev/null | head -n 1`
-        libraw2=`ls /usr/lib/libraw1394* 2> /dev/null | head -n 1`
-        libraw3=`ls /usr/lib64/libraw1394* 2> /dev/null | head -n 1`
-        if test x"$libraw1" != x"" -o x"$libraw2" != x"" -o x"$libraw3" != x"" ; then
+    if has_library libiec61883 -a has_library libavc1394 ; then
             firewire_cable_box="yes"
-        fi
     fi
 fi
 
@@ -1665,7 +1686,7 @@ fi
 
 if test x"$xv" = x"yes" ; then
     xv="no"
-    if test x`ls /usr/X11R6/lib/libXv.* 2> /dev/null | head -n 1` != x"" ; then
+    if has_library libXv ; then
         xv="yes"
     fi
 fi
@@ -1673,29 +1694,34 @@ fi
 VENDOR_XVMC_LIBS=""
 if test x"$xvmc" = x"yes"; then
     xvmc="no"
-    nvidia_xvmc=`ls /usr/X11R6/lib/libXvMCNVIDIA* 2> /dev/null | head -n 1`
-    if test x`ls /usr/X11R6/lib/libXvMCW.* 2> /dev/null | head -n 1` != x"" ; then
+    if has_library libXvMCW ; then
         VENDOR_XVMC_LIBS="-lXvMCW"
         xvmc="yes"
-    elif test x"$nvidia_xvmc" != x""; then
+    elif has_library libXvMCNVIDIA ; then
         VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
         xvmc="yes"
-    elif test x`ls /usr/X11R6/lib/libI810XvMC.* 2> /dev/null | head -n 1` != x"" ; then
+    elif has_library libI810XvMC ; then
         VENDOR_XVMC_LIBS="-lI810XvMC"
         xvmc="yes"
     fi
 fi
 
-if test x`ls /usr/X11R6/lib/libviaXvMC.* 2> /dev/null | head -n 1` = x"" ; then
+if has_library libviaXvMC ; then
+    echo > /dev/null
+else
     xvmc_vld="no"
 fi
 if test x"$xvmc_vld" = x"yes" ; then
-    if test x`ls /usr/X11R6/lib/libXvMCW.* 2> /dev/null | head -n 1` != x"" ; then
+    if has_library libXvMCW ; then
         VENDOR_XVMC_LIBS="-lXvMCW"
     else
         VENDOR_XVMC_LIBS="-lviaXvMC"
     fi
     xvmc="yes"
+fi
+
+if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCW" ; then
+    CCONFIG="$CCONFIG using_xvmcw"
 fi
 
 if test x"$opengl_vsync" = x"yes" ; then
@@ -1798,8 +1824,8 @@ echo "xv support       $xv"
 echo "XvMC support     $xvmc"
 echo "XvMC VLD support $xvmc_vld"
 echo "OpenGL vsync     $opengl_vsync"
-if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
 echo "DirectFB         $direct_fb"
+if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
 echo "DirectX          $direct_x"
 fi
 echo
@@ -2255,6 +2281,9 @@ fi
 
 if test x"$mmx" = x"yes"; then
   CONFIG_DEFINES="$CONFIG_DEFINES MMX"
+  if test x"$cpu" != x"x86_64" ; then
+    CONFIG_DEFINES="$CONFIG_DEFINES i386"
+  fi
 fi
 
 if test x"$ivtv" = x"yes" ; then
@@ -2269,7 +2298,7 @@ fi
 if test x"$firewire_cable_box" = x"yes" ; then
   CCONFIG="$CCONFIG using_firewire"
   CONFIG_DEFINES="$CONFIG_DEFINES USING_FIREWIRE"
-  echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883" >> config.mak
+  echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394" >> config.mak
 fi
 
 if test x"$lirc" = x"yes" ; then
@@ -2332,7 +2361,6 @@ fi
 
 if test x"$opengl_vsync" = x"yes" ; then
   CCONFIG="$CCONFIG using_opengl_vsync"
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_OPENGL_VSYNC"
   echo "CONFIG_OPENGL_VSYNC_LIBS=$CONFIG_OPENGL_VSYNC_LIBS" >> config.mak
 fi
 
