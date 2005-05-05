@@ -44,9 +44,13 @@
                 <filename>mfe_brushed_bottom.png</filename>
                 <position>0,520</position>
             </image>
+            <blackhole name="visual_blackhole">
+                <area>150,140,500,300</area>
+            </blackhole>
+            
             <textarea name="temp_message" draworder="0" align="center">
                 <font>temp_font</font>
-                <area>0,285,800,30</area>
+                <area>0,485,800,30</area>
                 <value>This will be the main display area. For now, hit M for menu</value>
             </textarea>
         </container>

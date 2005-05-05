@@ -14,6 +14,7 @@
 #include <mfdclient/speakertracker.h>
 
 #include "mfedialog.h"
+#include "visualize/stereoscope.h"
 
 MfeDialog::MfeDialog(
                         MythMainWindow *parent, 
@@ -45,6 +46,7 @@ MfeDialog::MfeDialog(
         
     mfd_interface = an_mfd_interface;
 
+    visualizer = new StereoScope(this);
     //
     //  Wire up the theme
     //
@@ -58,6 +60,14 @@ MfeDialog::MfeDialog(
     current_mfd = NULL;
     available_mfds.setAutoDelete(true);
     connectUpMfd();
+
+    //
+    //  Fire up the visualizer
+    //
+    
+    visualizer->setGeometry(visual_blackhole->getScreenArea());
+    visualizer->show();
+
 
     //
     //  Redraw ourselves
@@ -104,6 +114,7 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
                 {
                     menu->toggleShow();
                     handled = true;
+                    visualizer->show();
                 }
             }
             break;
@@ -128,6 +139,11 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
                 //
                 
                 menu->GoHome();
+                visualizer->hide();
+            }
+            else
+            {
+                visualizer->show();
             }
             handled = true;
             break;
@@ -522,6 +538,9 @@ void MfeDialog::wireUpTheme()
         cerr << "You have no mfe_background image declared" << endl;
     }
  
+    visual_blackhole = getUIBlackHoleType("visual_blackhole");
+
+ 
     //
     // Make the first few nodes in the tree that everything else hangs off
     // as children
@@ -573,6 +592,9 @@ void MfeDialog::connectUpMfd()
             
     connect(mfd_interface, SIGNAL(speakerList(int, QPtrList<SpeakerTracker>*)),
             this, SLOT(speakerList(int, QPtrList<SpeakerTracker>*)));
+            
+    connect(mfd_interface, SIGNAL(audioData(int, uchar*, int)),
+            this, SLOT(audioData(int, uchar*, int)));
 }
 
 void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool found)
@@ -1225,6 +1247,21 @@ void MfeDialog::createNewPlaylist()
     }
 }
 
+void MfeDialog::audioData(int which_mfd, uchar *audio_data, int length)
+{
+    //
+    //  This slot is called when audio data arrives (via mfdclient library, via rtsp)
+    //
+    
+    if(current_mfd)
+    {
+        if(current_mfd->getId() == which_mfd)
+        {
+            visualizer->add(audio_data, (unsigned int) length, 0, 2, 16);
+        }
+    }
+}
+
 QString MfeDialog::constructPlaylistName()
 {
     QString response;
@@ -1345,6 +1382,12 @@ MfeDialog::~MfeDialog()
     {
         delete net_flasher;
         net_flasher = NULL;
+    }
+    
+    if(visualizer)
+    {
+        delete visualizer;
+        visualizer = NULL;
     }
 }
 
