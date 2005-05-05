@@ -419,17 +419,30 @@ void nVidiaVideoSync::AdvanceTrigger()
 }
 
 #ifdef USING_OPENGL_VSYNC
-/* Try to create an OpenGL surface so we can use glXWaitVideoSyncSGI:
- * http://osgcvs.no-ip.com/osgarchiver/archives/June2002/0022.html
- * http://www.ac3.edu.au/SGI_Developer/books/OpenGLonSGI/sgi_html/ch10.html#id37188
- * http://www.inb.mu-luebeck.de/~boehme/xvideo_sync.html
+
+/** \class OpenGLVideoSync
+ *  \brief Video synchronization method employing SGI_video_sync
+ *         OpenGL extension.
+ *
+ *   Special care must be taken with this video sync method due 
+ *   to a bad interaction between some pthread implementations
+ *   and OpenGL. OpenGL DIRECT contexts can not be shared between
+ *   processes. And some pthread implementations, notably a common
+ *   one on Linux, treat each thread as a seperate process.
+ *   Hence Start(), Stop() and WaitForFrame() must all be called
+ *   from the same thread.
+ *
+ *  \sa http://osgcvs.no-ip.com/osgarchiver/archives/June2002/0022.html
+ *  \sa http://www.ac3.edu.au/SGI_Developer/books/OpenGLonSGI/sgi_html/ch10.html#id37188
+ *  \sa http://www.inb.mu-luebeck.de/~boehme/xvideo_sync.html
+ *
  */
-OpenGLVideoSync::OpenGLVideoSync(int fr, int ri, bool intl) : 
-    VideoSync(fr, ri, intl)
+
+OpenGLVideoSync::OpenGLVideoSync(int frame_interval, int refresh_interval,
+                                 bool interlaced)
+    : VideoSync(frame_interval, refresh_interval, interlaced),
+      m_display(NULL), m_drawable(0), m_context(0)
 {
-    m_display = NULL;
-    m_drawable = 0;
-    m_context = 0;
 }
 
 OpenGLVideoSync::~OpenGLVideoSync()
@@ -438,6 +451,10 @@ OpenGLVideoSync::~OpenGLVideoSync()
         X11S(XCloseDisplay(m_display));
 }
 
+/** \fn OpenGLVideoSync::TryInit()
+ *  \brief Try to create an OpenGL surface so we can use glXWaitVideoSyncSGI:
+ *  \return true if this method can be employed, false if it can not.
+ */
 bool OpenGLVideoSync::TryInit()
 {
     X11S(m_display = XOpenDisplay(NULL));
@@ -525,64 +542,83 @@ bool OpenGLVideoSync::TryInit()
     }
 }
 
+/** \fn checkGLSyncError(QString, int)
+ *  \brief Prints an error messages for SGI_video_sync extension calls.
+ *
+ *  \return true if all is ok, false if there is an error
+ */
+bool checkGLSyncError(const QString& hdr, int err)
+{
+    QString errStr("");
+    switch (err)
+    {
+        case False:
+            break;
+        case GLX_BAD_CONTEXT:
+            errStr = "Bad Context";
+            break;
+        case GLX_BAD_VALUE:
+            errStr = "Bad Value";
+            break;
+        default:
+            errStr = QString("Unknown Error 0x%1").arg(err,0,16);
+            break;
+    }
+    if (errStr != "")
+    {
+        VERBOSE(VB_IMPORTANT, hdr+" reported error: "+errStr);
+        return false;
+    }
+    return true;
+}
+
 void OpenGLVideoSync::Start()
 {
+    int err;
+    // Bind OpenGL context to current thread.
+    X11S(err = glXMakeCurrent(m_display, m_drawable, m_context));
+    if (err != True)
+    {
+        VERBOSE(VB_PLAYBACK,
+                "OpenGLVideoSync::Start(): Failed to make GLX context "
+                "current context. A/V Sync will probably fail.");
+    }
+
     // Wait for a refresh so we start out synched
     unsigned int count;
-    int r;
+    err = glXGetVideoSyncSGI(&count);
+    checkGLSyncError("OpenGLVideoSync::Start(): Frame Number Query", err);
+    err = glXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
+    checkGLSyncError("OpenGLVideoSync::Start(): A/V Sync", err);
 
-    X11L;
-
-    r = glXMakeCurrent(m_display, m_drawable, m_context);
-    r = glXGetVideoSyncSGI(&count);
-    r = glXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
-
-    X11U;
-
+    // Initialize next trigger 
     VideoSync::Start();
 }
 
 void OpenGLVideoSync::WaitForFrame(int sync_delay)
 {
-    unsigned int count, n;
-    int r;
-
+    const QString msg1("First A/V Sync"), msg2("Second A/V Sync");
     OffsetTimeval(m_nexttrigger, sync_delay);
 
-    m_delay = CalcDelay();
-    //cerr << "WaitForFrame at : " << m_delay;
+    unsigned int frameNum = 0;
+    int err = glXGetVideoSyncSGI(&frameNum);
+    checkGLSyncError("Frame Number Query", err);
 
     // Always sync to the next retrace execpt when we are very late.
-    if (m_delay > -(m_refresh_interval/2)) 
+    if ((m_delay = CalcDelay()) > -(m_refresh_interval/2)) 
     {
-
-        X11L;
-        r = glXMakeCurrent(m_display, m_drawable, m_context);
-        r = glXGetVideoSyncSGI(&count);
-        X11U;
-
-        // POSSIBLY UNSAFE -- POSSIBLY UNSAFE
-        r = glXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
-        // POSSIBLY UNSAFE -- POSSIBLY UNSAFE
-
-
+        err = glXWaitVideoSyncSGI(2, (frameNum+1)%2 ,&frameNum);
+        checkGLSyncError(msg1, err);
         m_delay = CalcDelay();
-        //cerr << "\tDelay at sync: " << m_delay;
     }
-    //cerr << endl;
 
+    // Wait for any remaining retrace intervals in one pass.
     if (m_delay > 0)
     {
-        // Wait for any remaining retrace intervals in one pass.
-        n = m_delay / m_refresh_interval + 1;
-
-        // POSSIBLY UNSAFE -- POSSIBLY UNSAFE
-        r = glXWaitVideoSyncSGI((n+1), (count+n)%(n+1), &count);
-        // POSSIBLY UNSAFE -- POSSIBLY UNSAFE
-
+        uint n = m_delay / m_refresh_interval + 1;
+        err = glXWaitVideoSyncSGI((n+1), (frameNum+n)%(n+1), &frameNum);
+        checkGLSyncError(msg2, err);
         m_delay = CalcDelay();
-        //cerr << "Wait " << n << " intervals. Count " << count;
-        //cerr  << " Delay " << m_delay << endl;
     }
 }
 
@@ -595,10 +631,6 @@ void OpenGLVideoSync::AdvanceTrigger()
 /** \fn OpenGLVideoSync::Stop()
  *  \brief Stops VSync; must be called from main thread.
  *
- *   This method should be called from the MAIN THREAD to work around
- *   a bug in some OpenGL implementations, where if the thread that
- *   has the current GL context goes away, no other thread can ever
- *   have it.
  */
 void OpenGLVideoSync::Stop()
 {

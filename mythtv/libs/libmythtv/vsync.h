@@ -66,10 +66,18 @@ class VideoSync
     /// \brief Tries to initialize VSync method.
     virtual bool TryInit() = 0;
 
-    /// \brief Start VSync; must be called from main thread.
+    /** \brief Start VSync; must be called from main thread.
+     *
+     *   Start(), WaitForFrame(), and Stop() should always be called
+     *   from same thread, to prevent bad interactions with pthreads.
+     */
     virtual void Start();
 
     /** \brief Waits for next a frame or field.
+     *
+     *   Start(), WaitForFrame(), and Stop() should always be called
+     *   from same thread, to prevent bad interactions with pthreads.
+     *
      *  \param sync_delay time until the desired frame or field
      *  \sa CalcDelay(), KeepPhase()
      */
@@ -84,7 +92,11 @@ class VideoSync
     ///        a field or frame at a time.
     bool isInterlaced() const { return m_interlaced; }
 
-    /// \brief Stops VSync; must be called from main thread.
+    /** \brief Stops VSync; must be called from main thread.
+     *
+     *   Start(), WaitForFrame(), and Stop() should always be called
+     *   from same thread, to prevent bad interactions with pthreads.
+     */
     virtual void Stop() {}
     static VideoSync *BestMethod(int frame_interval, int refresh_interval,
                                  bool interlaced);
