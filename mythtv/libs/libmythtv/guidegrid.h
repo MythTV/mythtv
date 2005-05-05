@@ -175,6 +175,7 @@ class GuideGrid : public MythDialog
     void jumpToChannelShowSelection();
     void jumpToChannelDeleteLastDigit();
     void jumpToChannelDigitPress(int);
+    bool jumpToChannelGetInputDigit(QStringList & actions, int & digit);
     int jumpToChannel;
     int jumpToChannelPreviousStartChannel;
     int jumpToChannelPreviousRow;
