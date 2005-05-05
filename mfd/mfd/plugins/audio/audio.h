@@ -103,6 +103,7 @@ class AudioPlugin: public MFDServicePlugin
     bool                   waiting_for_speaker_release;
     QTime                  speaker_release_timer;
     int                    unique_speaker_id;
+    bool                   active_streaming;
 };
 
 #endif  // audio_h_

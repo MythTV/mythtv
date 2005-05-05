@@ -17,7 +17,8 @@
 enum MfdServiceType
 {
     MFD_SERVICE_AUDIO_CONTROL = 0,
-    MFD_SERVICE_METADATA
+    MFD_SERVICE_METADATA,
+    MFD_SERVICE_RTSP_CLIENT
 };
 
 
@@ -39,7 +40,7 @@ class ServiceClient
 
     virtual ~ServiceClient();
 
-    bool            connect();
+    virtual bool    connect();
     int             getSocket();
     MfdServiceType  getType(){return service_type;}
     QString         getAddress(){return ip_address;}

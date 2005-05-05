@@ -391,11 +391,6 @@ void MfdInterface::deletePlaylist(
                                  )
 {
 
-    //
-    //  This has to happen here in the main execution thread, as
-    //  playlist_tree will probably get deleted very shortly after we return
-    //
-
     bool found_it = false;
     for(
         MfdInstance *an_mfd = mfd_instances->first();
@@ -410,7 +405,6 @@ void MfdInterface::deletePlaylist(
                                                 .arg(which_collection)
                                                 .arg(which_playlist))
                                      );
-
 
             found_it = true;
             break;
@@ -467,6 +461,45 @@ void MfdInterface::stopPlaylistCheck()
     }
 }
 
+
+void MfdInterface::turnVizDataStreamOn(int which_mfd, bool on_or_off)
+{
+    //
+    //  Find the instance
+    //  
+
+    bool found_it = false;
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if (an_mfd->getId() == which_mfd)
+        {
+            if(on_or_off)
+            {
+                cout << "mfdinterface.o: turning on rtsp for visualizations" << endl;
+                an_mfd->addPendingCommand(QStringList::split(" ", "rtsp on"));    
+            }
+            else
+            {
+                cout << "mfdinterface.o: turning off rtsp for visualizations" << endl;
+                an_mfd->addPendingCommand(QStringList::split(" ", "rtsp off"));
+            }
+            found_it = true;
+            break;
+        }
+    }
+
+    if (!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "to turn VizDataStream on/off"
+             << endl;
+    }
+    
+}
 
 void MfdInterface::customEvent(QCustomEvent *ce)
 {
@@ -598,7 +631,17 @@ void MfdInterface::customEvent(QCustomEvent *ce)
             emit speakerList(sle->getMfd(), speakers);
         }
     }
-    
+    else if (ce->type() == MFD_CLIENTLIB_EVENT_AUDIO_DATA)
+    {
+        MfdAudioDataEvent *ade = (MfdAudioDataEvent*)ce;
+        emit audioData(ade->getMfd(), ade->getAudioData(), ade->getLength());
+    }
+    else if (ce->type() == MFD_CLIENTLIB_EVENT_SPEAKER_STREAM)
+    {
+        MfdSpeakerStreamEvent *sse = (MfdSpeakerStreamEvent*)ce;
+        turnVizDataStreamOn(sse->getMfd(), sse->getOnOrOff());
+
+    }
     else
     {
         cerr << "mfdinterface is getting CustomEvents it does not understand" 

@@ -178,6 +178,14 @@ void MetadataClient::executeCommand(QStringList new_command)
     MdcapRequest commit_request(commit_url, ip_address);
     commit_request.addGetVariable("session-id", session_id);
     commit_request.send(client_socket_to_service);
+    
+    //
+    //  Do a quick an dirty internal delete so the user gets some feedback
+    //  that their delete command was accepted
+    //
+    
+    // buildTree(collection_number, playlist_number);
+    
 }
 
 void MetadataClient::handleIncoming()

@@ -215,3 +215,64 @@ MfdSpeakerListEvent::~MfdSpeakerListEvent()
     speakers.clear();
 }
 
+/*
+---------------------------------------------------------------------
+*/
+
+MfdAudioDataEvent::MfdAudioDataEvent(int which_mfd, uchar *l_audio_data, int l_length)
+                    :QCustomEvent(MFD_CLIENTLIB_EVENT_AUDIO_DATA)
+{
+    mfd_id = which_mfd;
+    
+    length = l_length;
+    
+    audio_data = new uchar [length];
+    
+    memcpy(audio_data, l_audio_data, length);
+}
+
+int MfdAudioDataEvent::getMfd()
+{
+    return mfd_id;
+}
+
+uchar* MfdAudioDataEvent::getAudioData()
+{
+    return audio_data;
+}
+
+int MfdAudioDataEvent::getLength()
+{
+    return length;
+}
+
+MfdAudioDataEvent::~MfdAudioDataEvent()
+{
+    delete [] audio_data;
+}
+
+
+/*
+---------------------------------------------------------------------
+*/
+
+MfdSpeakerStreamEvent::MfdSpeakerStreamEvent(int which_mfd, bool l_on_or_off)
+                    :QCustomEvent(MFD_CLIENTLIB_EVENT_SPEAKER_STREAM)
+{
+    mfd_id = which_mfd;
+    on_or_off = l_on_or_off;
+}
+
+int MfdSpeakerStreamEvent::getMfd()
+{
+    return mfd_id;
+}
+
+bool MfdSpeakerStreamEvent::getOnOrOff()
+{
+    return on_or_off;
+}
+
+MfdSpeakerStreamEvent::~MfdSpeakerStreamEvent()
+{
+}

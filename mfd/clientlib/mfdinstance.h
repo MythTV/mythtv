@@ -58,6 +58,7 @@ class MfdInstance : public QThread
     
     void addAudioClient(const QString &address, uint a_port);
     void addMetadataClient(const QString &address, uint a_port);
+    void addRtspClient(const QString &address, uint a_port);
 
     void removeServiceClient(
                                 MfdServiceType type, 

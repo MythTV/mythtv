@@ -205,13 +205,31 @@ void AudioClient::parseFromAudio(QStringList &tokens)
         
         syncSpeakerList(tokens);
         return;
-        
     }
     
     if (tokens[0] == "speakername")
     {
         nameSpeakers(tokens);
         return;
+    }
+    
+    if(tokens[0] == "speakerstream")
+    {
+        if(tokens.count() == 2)
+        {
+            if(tokens[1] == "on")
+            {
+                MfdSpeakerStreamEvent *sse = new MfdSpeakerStreamEvent(mfd_id, true);
+                QApplication::postEvent(mfd_interface, sse);
+                return;
+            }
+            else if(tokens[1] == "off")
+            {
+                MfdSpeakerStreamEvent *sse = new MfdSpeakerStreamEvent(mfd_id, false);
+                QApplication::postEvent(mfd_interface, sse);
+                return;
+            }
+        }        
     }
     
     cerr << "getting tokens from audio server I don't understand: "

@@ -18,6 +18,7 @@ using namespace std;
 #include "mfdinstance.h"
 #include "audioclient.h"
 #include "metadataclient.h"
+#include "rtspclient.h"
 #include "events.h"
 
 MfdInstance::MfdInstance(
@@ -416,6 +417,34 @@ void MfdInstance::parseFromMfd(QStringList &tokens)
                          << endl;
                 }
             }
+            else if(tokens[3] == "rtsp")
+            {
+                if(tokens[1] == "found")
+                {
+                    //
+                    //  Add rtsp client (to do music visualizations)
+                    //
+                    addRtspClient(tokens[4], tokens[5].toUInt());
+                }
+                else if(tokens[1] == "lost")
+                {
+                    //
+                    //  Remove rtsp client
+                    //
+                    removeServiceClient(
+                                        MFD_SERVICE_RTSP_CLIENT,
+                                        tokens[4],
+                                        tokens[5].toUInt()
+                                       );
+                }
+                else
+                {
+                    cerr << "mfdinstance.o: got rtsp announcement "
+                         << "where 2nd token was neither \""
+                         << "found\" nor \"lost\""
+                         << endl;
+                }
+            }
         }
     }    
 }
@@ -459,6 +488,22 @@ void MfdInstance::addMetadataClient(const QString &address, uint a_port)
              << "but could not connect"
              << endl;
         delete new_metadata;
+    }
+}
+
+void MfdInstance::addRtspClient(const QString &address, uint a_port)
+{
+    RtspClient *new_rtsp = new RtspClient(mfd_interface, mfd_id, address, a_port);
+    if(new_rtsp->connect())
+    {
+        my_service_clients->append(new_rtsp);
+    }
+    else
+    {
+        cerr << "mfdinstance.o: tried to create an rtsp client, "
+             << "but could not connect"
+             << endl;
+        delete new_rtsp;
     }
 }
 

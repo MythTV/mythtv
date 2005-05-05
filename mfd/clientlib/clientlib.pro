@@ -21,7 +21,8 @@ HEADERS += mfdinterface.h   discoverythread.h   mfdinstance.h \
            ../mfdlib/httpheader.h \
            ../mfdlib/httpgetvar.h \
            mdcaprequest.h mdcapresponse.h metadatacollection.h ../mfdlib/metadata.h \
-           playlist.h playlistentry.h mfdcontent.h playlistchecker.h speakertracker.h
+           playlist.h playlistentry.h mfdcontent.h playlistchecker.h speakertracker.h \
+           rtspclient.h rtspin.h
 
 SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
            ./mdnsd/mdnsd.c ./mdnsd/1035.c discovered.cpp \
@@ -31,7 +32,8 @@ SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
            ../mfdlib/httpheader.cpp \
            ../mfdlib/httpgetvar.cpp \
            mdcaprequest.cpp mdcapresponse.cpp metadatacollection.cpp ../mfdlib/metadata.cpp \
-           playlist.cpp playlistentry.cpp mfdcontent.cpp playlistchecker.cpp speakertracker.cpp
+           playlist.cpp playlistentry.cpp mfdcontent.cpp playlistchecker.cpp speakertracker.cpp \
+           rtspclient.cpp rtspin.cpp
 
 inc.path = $${PREFIX}/include/mfdclient/
 inc.files  = mfdinterface.h mfdcontent.h ../mfdlib/metadata.h playlist.h playlistentry.h speakertracker.h
@@ -39,4 +41,23 @@ inc.files  = mfdinterface.h mfdcontent.h ../mfdlib/metadata.h playlist.h playlis
 LIBS += -L../mdcaplib -lmdcap -Wl,--export-dynamic
 
 INSTALLS += inc
+
+!isEmpty(MFD_RTSP_SUPPORT) {
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/liveMedia
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/groupsock
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/UsageEnvironment
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/BasicUsageEnvironment
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/liveMedia/include
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/groupsock/include
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/UsageEnvironment/include
+INCLUDEPATH += $${LIVEMEDIAPREFIX}/BasicUsageEnvironment/include
+LIBS += -L$${LIVEMEDIAPREFIX}/liveMedia
+LIBS += -L$${LIVEMEDIAPREFIX}/groupsock
+LIBS += -L$${LIVEMEDIAPREFIX}/UsageEnvironment
+LIBS += -L$${LIVEMEDIAPREFIX}/BasicUsageEnvironment
+LIBS += -lliveMedia
+LIBS += -lgroupsock
+LIBS += -lBasicUsageEnvironment
+LIBS += -lUsageEnvironment
+}
 

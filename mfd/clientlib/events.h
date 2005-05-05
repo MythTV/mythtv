@@ -23,6 +23,8 @@
 #define MFD_CLIENTLIB_EVENT_AUDIOPLUGIN_EXISTS  65427
 #define MFD_CLIENTLIB_EVENT_PLAYLIST_CHECKED    65426
 #define MFD_CLIENTLIB_EVENT_SPEAKER_LIST        65425
+#define MFD_CLIENTLIB_EVENT_AUDIO_DATA          65424
+#define MFD_CLIENTLIB_EVENT_SPEAKER_STREAM      65423
 
 class SpeakerTracker;
 
@@ -215,5 +217,47 @@ class MfdSpeakerListEvent: public QCustomEvent
     QPtrList<SpeakerTracker> speakers;
 };
 
+class MfdAudioDataEvent: public QCustomEvent
+{
+    //
+    //  Sent by rtsp in object as it receives PCM data 
+    //
+    
+  public:
+  
+    MfdAudioDataEvent(int which_mfd, uchar *l_audio_data, int l_length);
+    ~MfdAudioDataEvent();
+
+    int     getMfd();
+    uchar*   getAudioData();
+    int     getLength();
+    
+  private:
+  
+    int     mfd_id;
+    uchar    *audio_data;
+    int     length;
+};
+
+class MfdSpeakerStreamEvent: public QCustomEvent
+{
+    //
+    //  Sent by audioclient instance when it notices speaker streaming has
+    //  been turned on or off
+    //
+    
+  public:
+  
+    MfdSpeakerStreamEvent(int which_mfd, bool l_on_or_off);
+    ~MfdSpeakerStreamEvent();
+
+    int     getMfd();
+    bool    getOnOrOff();
+    
+  private:
+  
+    int     mfd_id;
+    bool    on_or_off;
+};
 
 #endif

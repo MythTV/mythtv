@@ -83,6 +83,8 @@ class MfdInterface : public QObject
                             QIntDict<bool> *playlist_deletions
                            );
     void stopPlaylistCheck();
+
+    void turnVizDataStreamOn(int which_mfd, bool yes_or_no);
     
   signals:
 
@@ -99,6 +101,7 @@ class MfdInterface : public QObject
     void metadataChanged(int, MfdContentCollection*);
     void playlistCheckDone();
     void speakerList(int, QPtrList<SpeakerTracker> *speakers);
+    void audioData(int, uchar*, int);
 
   protected:
   

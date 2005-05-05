@@ -31,6 +31,7 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     elapsed_time = 0;
     is_playing = false;
     is_paused = false;
+    active_streaming = false;
     state_of_play_mutex = new QMutex(true);    
     metadata_server = parent->getMetadataServer();
     stopPlaylistMode();
@@ -369,6 +370,14 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                     else
                     {
                         sendMessage("stop", socket_identifier);
+                    }
+                    if(active_streaming)
+                    {
+                        sendMessage("speakerstream on", socket_identifier);
+                    }
+                    else
+                    {
+                        sendMessage("speakerstream off", socket_identifier);
                     }
                     
                     listSpeakers();
@@ -1393,6 +1402,7 @@ void AudioPlugin::turnOnSpeakers()
     //  stream
     //
     
+    int numb_turned_on = 0;
     QPtrListIterator<MaopInstance> it( maop_instances );
     MaopInstance *an_instance;
     while ( (an_instance = it.current()) != 0 ) 
@@ -1400,6 +1410,12 @@ void AudioPlugin::turnOnSpeakers()
         if (an_instance->markedForUse())
         {
             an_instance->sendRequest(QString("open %1").arg(rtsp_out->getUrl()));
+            numb_turned_on++;
+            if(numb_turned_on == 1)
+            {
+                sendMessage("speakerstream on");
+                active_streaming = true;
+            }
         }
         ++it;
     }        
@@ -1409,7 +1425,6 @@ void AudioPlugin::turnOnSpeakers()
     //
     
     waiting_for_speaker_release = false;
-    
     maop_mutex.unlock();
 #endif
 }
@@ -1441,6 +1456,8 @@ void AudioPlugin::turnOffSpeakers()
         }
         ++it;
     }        
+    active_streaming = false;
+    sendMessage("speakerstream off");
 #endif
 }
 
