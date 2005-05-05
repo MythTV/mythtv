@@ -1886,10 +1886,25 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
         dst_half_line_in_src =
             max((int) round((((double)disphoff)/imgh) - 0.00001), 0);
     }
-    xv_dest_y_incr = dst_half_line_in_src;
-
     src_y += src_y_incr;
     dest_y += dest_y_incr;
+
+#define NVIDIA_6629
+#ifdef NVIDIA_6629
+    xv_dest_y_incr = dst_half_line_in_src;
+    // nVidia v 66.29, does proper compensation when imgh==frame_height
+    // but we need to compensate when the difference is >= 5%
+    int mod = 0;
+    if (frame_height>=(int)(imgh+(0.05*frame_height)) && 2==field)
+    {
+        int nrml = round((((double)disphoff)/frame_height) - 0.00001);
+        mod = -dst_half_line_in_src;
+        dest_y += mod;
+        xv_dest_y_incr -= mod;
+    }
+#else
+    dest_y += dst_half_line_in_src;
+#endif
 
     // DEBUG
 #if 0
@@ -1905,6 +1920,7 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
         cerr<<"xv_dest_y_incr: "<<xv_dest_y_incr<<endl;
         cerr<<"      disphoff: "<<disphoff<<endl;
         cerr<<"          imgh: "<<imgh<<endl;
+        cerr<<"           mod: "<<mod<<endl;
         cerr<<endl;
     }
     last_dest_y_field[field] = dest_y;
