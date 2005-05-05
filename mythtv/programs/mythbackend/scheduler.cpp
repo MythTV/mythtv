@@ -1598,7 +1598,7 @@ void Scheduler::UpdateMatches(int recordid) {
         }
 
         VERBOSE(VB_SCHEDULE, QString(" |-- %1 results in %2 sec.")
-                .arg(result.size())
+                .arg(result.numRowsAffected())
                 .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
                       (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
 
