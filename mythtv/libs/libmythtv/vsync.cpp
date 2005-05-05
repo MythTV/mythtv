@@ -447,8 +447,14 @@ OpenGLVideoSync::OpenGLVideoSync(int frame_interval, int refresh_interval,
 
 OpenGLVideoSync::~OpenGLVideoSync()
 {
-    if (m_display != NULL)
+    if (m_display)
+    {
+        if (m_context)
+            glXDestroyContext(m_display, m_context);
+        if (m_drawable)
+            X11S(XDestroyWindow(m_display, m_drawable));
         X11S(XCloseDisplay(m_display));
+    }
 }
 
 /** \fn OpenGLVideoSync::TryInit()
@@ -517,22 +523,30 @@ bool OpenGLVideoSync::TryInit()
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Failed to create dummy window");
         return false;
     }
+    m_drawable = w;
+
     X11S(m_context = glXCreateContext(m_display, vis, None, GL_TRUE));
     if (m_context == NULL)
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Failed to create GLX context");
         return false;
     }
-    m_drawable = w;
     X11S(ret = glXMakeCurrent(m_display, m_drawable, m_context));
     if (ret != False)
     {
         unsigned int count;
         X11S(ret = glXGetVideoSyncSGI(&count));
-        if (GLX_BAD_CONTEXT == ret)
+        if (True == ret)
+        {
+            VERBOSE(VB_PLAYBACK, "Using OpenGLVideoSync");
+            return true;
+        }
+        else if (GLX_BAD_CONTEXT == ret)
             VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Bad Context for VSync");
-        VERBOSE(VB_PLAYBACK, "Using OpenGLVideoSync");
-        return GLX_BAD_CONTEXT != ret;
+        else
+            VERBOSE(VB_PLAYBACK, QString("OpenGLVideoSync: Could not get "
+                                         "VSync support ret=%1").arg(ret));
+        return false;
     }
     else
     {
