@@ -167,6 +167,15 @@ class MfeDialog : public MythThemedDialog
     QStringList possessors;
     QStringList modifiers;
     QStringList nouns;
+
+    //
+    //  A little timer to decide to make a menu either appear at the
+    //  beginning or where the user last was depending on how much time has
+    //  elapsed
+    //
+
+    QTime   menu_lastuse_time;
+
 };
 
 

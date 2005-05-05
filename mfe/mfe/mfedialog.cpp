@@ -81,6 +81,12 @@ MfeDialog::MfeDialog(
     
     doSillyThings();
 
+    //
+    //  Start the menu last use timer
+    //
+    
+    menu_lastuse_time.start();
+
 } 
 
 void MfeDialog::keyPressEvent(QKeyEvent *e)
@@ -115,16 +121,31 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
                     menu->toggleShow();
                     handled = true;
                     visualizer->show();
+                    menu_lastuse_time.restart();
                 }
             }
             break;
             
         case Key_Right:
         
-            if(!menu->MoveRight())
+            if(menu->isShown())
             {
-                menu->select();
+                if(!menu->MoveRight())
+                {
+                    menu->select();
+                }
             }
+            else
+            {
+                visualizer->hide();
+                handled = true;
+                menu->toggleShow();
+                if(menu_lastuse_time.elapsed() > 10 * 1000) //  10 seconds
+                {
+                    menu->GoHome();
+                }
+            }
+            
             handled = true;
             break;
 
@@ -138,11 +159,15 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
                 //  "expert" mode ?)
                 //
                 
-                menu->GoHome();
+                if(menu_lastuse_time.elapsed() > 10 * 1000) //  10 seconds
+                {
+                    menu->GoHome();
+                }
                 visualizer->hide();
             }
             else
             {
+                menu_lastuse_time.restart();
                 visualizer->show();
             }
             handled = true;
@@ -217,6 +242,7 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
             {
                 menu->toggleShow();
                 handled = true;
+                menu_lastuse_time.restart();
             }
             break;
             
@@ -1075,8 +1101,9 @@ void MfeDialog::syncToCurrentMfd()
         if(menu->isShown())
         {
             menu->toggleShow();
+            menu_lastuse_time.restart();
         }
-        menu->GoHome();
+        //menu->GoHome();
         now_playing_texts->clearTexts();
         time_progress->SetUsed(0);
         speaker_node->deleteAllChildren();
