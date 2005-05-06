@@ -66,6 +66,7 @@ package export::transcode;
         my $mythtranscode = '';
 
         my $aspect;
+        my $inaspect;
         my $width;
         my $height;
         my $pad_h;
@@ -82,27 +83,34 @@ package export::transcode;
         if ($num_cpus > 1) {
             $transcode .= ' -u 100,'.($num_cpus);
         }
+
+        if ($self->val('force_aspect')) {
+            $inaspect = $self->val('force_aspect');
+            print "Forcing input aspect ratio of $inaspect\n";
+        } else {
+            $inaspect = $episode->{'finfo'}{'aspect'};
+        }
+
     # Import aspect ratio
-        if ($episode->{'finfo'}{'aspect'}) {
-            $transcode .= ' --import_asr ';
-            if ($episode->{'finfo'}{'aspect'} == 1          || $episode->{'finfo'}{'aspect'} eq '1:1') {
-                $transcode .= '1';
+        if ($inaspect) {
+            if ($inaspect == 1          || $inaspect eq '1:1') {
+                $transcode .= ' --import_asr 1';
             }
-            elsif ($episode->{'finfo'}{'aspect'} =~ m/^1.3/ || $episode->{'finfo'}{'aspect'} eq '4:3') {
-                $transcode .= '2';
+            elsif ($inaspect =~ m/^1.3/ || $inaspect eq '4:3') {
+                $transcode .= ' --import_asr 2';
             }
-            elsif ($episode->{'finfo'}{'aspect'} =~ m/^1.7/ || $episode->{'finfo'}{'aspect'} eq '16:9') {
-                $transcode .= '3';
+            elsif ($inaspect =~ m/^1.7/ || $inaspect eq '16:9') {
+                $transcode .= ' --import_asr 3';
             }
-            elsif ($episode->{'finfo'}{'aspect'} == 2.21    || $episode->{'finfo'}{'aspect'} eq '2.21:1') {
-                $transcode .= '4';
+            elsif ($inaspect == 2.21    || $inaspect eq '2.21:1') {
+                $transcode .= ' --import_asr 4';
             }
         }
     # Output aspect ratio
         if ($self->{'out_aspect'}) {
             $aspect = $self->{'out_aspect'};
         } else {
-            $aspect = $episode->{'finfo'}{'aspect'};
+            $aspect = $inaspect;
         }
 
         if ($self->{'aspect_stretched'}) {
@@ -112,7 +120,7 @@ package export::transcode;
             # Stretch the width to the full aspect ratio for calculating
             $width = int($self->{'height'} * $aspect + 0.5);
             # Calculate the height required to keep the source in aspect
-            $height = $width / $episode->{'finfo'}{'aspect'};
+            $height = $width / $inaspect;
             # Round to nearest even number
             $height = int(($height + 2) / 4) * 4;
             # Calculate how much to pad the height (both top & bottom)
@@ -126,14 +134,14 @@ package export::transcode;
             if ($self->{'width'} / $self->{'height'} <= $aspect) {
                 # We need to letterbox
                 $width = $self->{'width'};
-                $height = $width / $episode->{'finfo'}{'aspect'};
+                $height = $width / $inaspect;
                 $height = int(($height + 2) / 4) * 4;
                 $pad_h = int(($self->{'height'} - $height) / 2);
                 $pad_w = 0;
             } else {
                 # We need to pillarbox
                 $height = $self->{'height'};
-                $width = $height * $episode->{'finfo'}{'aspect'};
+                $width = $height * $inaspect;
                 $width = int(($width + 2) / 4) * 4;
                 $pad_w = int(($self->{'width'} - $width) / 2);
                 $pad_h = 0;

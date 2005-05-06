@@ -35,6 +35,7 @@ package export::generic;
     add_arg('noise_reduction|denoise|nr!',   'Enable noise reduction.');
     add_arg('fast_denoise|fast-denoise',     'Use fast noise reduction instead of standard.');
     add_arg('crop!',                         'Crop out broadcast overscan.');
+    add_arg('force_aspect|force-aspect=f',   'Force input aspect ratio rather than detect it.');
 
 # Load defaults
     sub load_defaults {
