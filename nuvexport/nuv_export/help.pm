@@ -15,8 +15,11 @@
 
     else {
         print "Help section still needs to be updated.\n"
-             ."   For now, use `man nuvexport` or visit the nuvexport"
-             ." wiki at https://svn.forevermore.net/nuvexport/\n\n";
+             ."   For now, use `man nuvexport` or visit the nuvexport "
+             ."wiki at\n"
+             ."   https://svn.forevermore.net/nuvexport/\n\n";
     }
 
     exit;
+
+# vim:ts=4:sw=4:ai:et:si:sts=4
