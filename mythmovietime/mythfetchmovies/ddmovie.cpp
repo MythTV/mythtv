@@ -10,7 +10,7 @@
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
- * Public License as published by the Free Software Foundation;
+ * Public License as published bythe Free Software Foundation;
  * either version 2, or (at your option)
  * any later version.
  *
@@ -29,7 +29,7 @@
 
 
 class DataDirectMoviesRequest : public QHttpRequestHeader
-{
+{ 
     public:
         const QString& getUrl() const { return URL; }
         DataDirectMoviesRequest(const QString& custId, const QString& postalCode, 
@@ -71,8 +71,8 @@ FILE* TMSMovieDirect::fetchData(const QString& user, const QString& pass,
     FILE* ret = NULL;
     
     QString ddMoviesURL = gContext->GetSetting("movietime-ddurl",
-                                               //"http://movies.datadirect.zap2it.com/moviedata/xmd");
-                                               "http://webservices.stage.tms.tribune.com/moviedata/xmd");
+                                               "http://movies.datadirect.zap2it.com/moviedata/xmd");
+                                               //"http://webservices.stage.tms.tribune.com/moviedata/xmd");
     QString ddCustID = gContext->GetSetting("movietime-ddcustomer", "TNV01");
                     
     //QString url = QString("%1?customer=%2\\&postalCode=%3\\&radius=%4\\&numberOfDays=%5")
