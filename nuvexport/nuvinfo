@@ -19,6 +19,7 @@
 # Print the info
     print "\ninfo for: $file\n\n";
     foreach $key (sort keys %info) {
+        next unless defined $info{$key};
         print ' ' x (23 - length($key)) if (length($key) < 23);
         print "$key:  $info{$key}\n";
     }
