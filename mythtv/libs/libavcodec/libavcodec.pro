@@ -7,7 +7,7 @@ CONFIG += thread dll warn_off
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-VERSION = 0.18.0
+VERSION = 0.18.1
 
 INCLUDEPATH = ../ ../../ 
 
