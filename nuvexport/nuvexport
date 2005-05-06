@@ -102,7 +102,7 @@
     }
 
 # Print the help - for now, this is just perldoc
-    if (arg('help')) {
+    if (defined arg('help')) {
         require nuv_export::help;
     }
 

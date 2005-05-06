@@ -128,7 +128,7 @@ package nuv_export::cli;
     add_arg('version',                'Show the version and exit');
 
 # Load the commandline options
-    add_arg('help',  'Show nuvexport help');
+    add_arg('help:s',  'Show nuvexport help');
     add_arg('debug', 'Enable debug mode');
 
 # Load the commandline arguments
