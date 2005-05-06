@@ -496,8 +496,8 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
 
     int bw  = backRegPix.width();
     int bh  = backRegPix.height();
-    int sw  = (int)(7*wmult);
-    int sh  = (int)(7*hmult);
+    int sw  = (int)(11*wmult);
+    int sh  = (int)(11*hmult);
 
 
     if (image && !image->isNull())
