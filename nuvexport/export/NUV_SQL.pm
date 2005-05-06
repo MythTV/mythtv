@@ -79,7 +79,7 @@ package export::NUV_SQL;
         load_finfo($episode);
     # Create a show-name directory?
         if ($self->{'create_dir'}) {
-            $self->{'path'} .= '/'.$self->get_outfile($episode);
+            $self->{'path'} = $self->get_outfile($episode, '');
             mkdir($self->{'path'}, 0755) or die "Can't create $self->{'path'}:  $!\n\n";
         }
     # Load the three files we'll be using
