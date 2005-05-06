@@ -536,7 +536,7 @@ bool OpenGLVideoSync::TryInit()
     {
         unsigned int count;
         X11S(ret = glXGetVideoSyncSGI(&count));
-        if (True == ret)
+        if (ret == 0)
         {
             VERBOSE(VB_PLAYBACK, "Using OpenGLVideoSync");
             return true;
