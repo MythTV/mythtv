@@ -11,10 +11,9 @@ class HttpComms : public QObject
 {
     Q_OBJECT
   public:
-    HttpComms(QUrl &url);
-    HttpComms(QUrl &url, int timeoutms);
-    HttpComms(QUrl &url, QHttpRequestHeader &header);
-
+    HttpComms();
+    HttpComms(QUrl &url, int timeoutms = -1);
+    HttpComms(QUrl &url, QHttpRequestHeader &header, int timeoutms = -1);
     virtual ~HttpComms();
 
     bool isDone(void) { return m_done; }
@@ -31,13 +30,61 @@ class HttpComms : public QObject
 
     bool isTimedout(void) { return m_timeout; }
 
+    class Credentials
+    {
+        public:
+            Credentials( const QString& _user="", const QString& _pass="") { user = _user; pass = _pass; }
+            QString user;
+            QString pass;
+    };                           
+    
+    enum CredentialTypes { CRED_WEB, CRED_PROXY };
+    
+    void setCredentials(const Credentials& cred, int credType)
+    { 
+        if (credType == CRED_PROXY)
+            m_proxyCredentials = cred;
+        else
+            m_webCredentials = cred;
+    }
+    
+    
     static QString getHttp(QString& url, int timeoutMS = 10000, 
-                           int maxRetries = 3, int maxRedirects = 3);
-    static bool getHttpFile(QString& file, QString& url, int timeoutMS = 10000,
-                           int maxRetries = 3, int maxRedirects = 3);
+                           int maxRetries = 3, int maxRedirects = 3,
+                           bool allowGzip = false,
+                           Credentials* webCred = NULL);
+    
+    static bool getHttpFile(const QString& file, QString& url, int timeoutMS = 10000,
+                            int maxRetries = 3, int maxRedirects = 3, 
+                            bool allowGzip = false, Credentials* webCred = NULL);
+    
+    
+    void request(QUrl &url, int timeoutms = -1, bool allowGzip = false);
+    void request(QUrl &url, QHttpRequestHeader &header, int timeoutms = -1);
+    
+    void setCookie( const QString& cookie ) { m_cookie = cookie; }
+    const QString& getCookie() const { return m_cookie; }
+        
   protected:
-    void init(QUrl &url);
-    void init(QUrl &url, QHttpRequestHeader &header);
+    struct DigestAuthInfo
+    {
+        QCString nc;
+        QCString qop;
+        QCString realm;
+        QCString nonce;
+        QCString method;
+        QCString cnonce;
+        QCString username;
+        QCString password;
+        QStrList digestURI;
+        QCString algorithm;
+        QCString entityBody;
+    };
+    
+    void init();
+    
+    void calculateDigestResponse( DigestAuthInfo& info, QCString& Response );
+    bool createDigestAuth( bool isForProxy, const QString& authStr, QHttpRequestHeader* request );
     
   private slots:
     void timeout();
@@ -50,13 +97,19 @@ class HttpComms : public QObject
     int m_statusCode;
     QString m_redirectedURL;
     QString m_responseReason;
+    Credentials m_webCredentials;
+    Credentials m_proxyCredentials;
     QHttp *http;
     bool m_done;
     QByteArray m_data;
-    QString m_url;
+    QUrl m_url;
     QTimer* m_timer;
     bool m_timeout;
-    int  m_debug;
+    bool m_authNeeded;
+    int m_timeoutInterval;
+    QString m_cookie;
+    
+    QHttpRequestHeader m_curRequest;
 };
 
 #endif
