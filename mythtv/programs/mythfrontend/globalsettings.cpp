@@ -1842,7 +1842,7 @@ static GlobalSpinBox *GRSingleRecordRecPriority()
     bs->setLabel(QObject::tr("Single Recordings Priority"));
     bs->setHelpText(QObject::tr("Single Recordings will receive this "
                     "additional recording priority value."));
-    bs->setValue(0);
+    bs->setValue(1);
     return bs;
 }
 
@@ -1898,7 +1898,7 @@ static GlobalSpinBox *GRFindOneRecordRecPriority()
     bs->setHelpText(QObject::tr("Find One, Find Weekly and Find Daily "
                     "recording types will receive this "
                     "additional recording priority value."));
-    bs->setValue(0);
+    bs->setValue(-1);
     return bs;
 }
 

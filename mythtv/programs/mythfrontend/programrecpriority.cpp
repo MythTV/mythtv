@@ -687,16 +687,16 @@ void ProgramRecPriority::FillList(void)
 //    cerr << " programs" << endl;
 
     // get all the recording type recording priority values
-    rtRecPriors[0] = gContext->GetNumSetting("SingleRecordRecPriority", 0);
+    rtRecPriors[0] = gContext->GetNumSetting("SingleRecordRecPriority", 1);
     rtRecPriors[1] = gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
     rtRecPriors[2] = gContext->GetNumSetting("ChannelRecordRecPriority", 0);
     rtRecPriors[3] = gContext->GetNumSetting("AllRecordRecPriority", 0);
     rtRecPriors[4] = gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
-    rtRecPriors[5] = gContext->GetNumSetting("FindOneRecordRecPriority", 0);
+    rtRecPriors[5] = gContext->GetNumSetting("FindOneRecordRecPriority", -1);
     rtRecPriors[6] = gContext->GetNumSetting("OverrideRecordRecPriority", 0);
     rtRecPriors[7] = gContext->GetNumSetting("OverrideRecordRecPriority", 0);
-    rtRecPriors[8] = gContext->GetNumSetting("FindOneRecordRecPriority", 0);
-    rtRecPriors[9] = gContext->GetNumSetting("FindOneRecordRecPriority", 0);
+    rtRecPriors[8] = gContext->GetNumSetting("FindOneRecordRecPriority", -1);
+    rtRecPriors[9] = gContext->GetNumSetting("FindOneRecordRecPriority", -1);
     
     // get channel recording priorities and recording types associated with each
     // program from db

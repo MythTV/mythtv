@@ -748,7 +748,7 @@ int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
     switch (type)
     {
         case kSingleRecord:
-            return gContext->GetNumSetting("SingleRecordRecPriority", 0);
+            return gContext->GetNumSetting("SingleRecordRecPriority", 1);
         case kTimeslotRecord:
             return gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
         case kWeekslotRecord:
@@ -760,7 +760,7 @@ int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
         case kFindOneRecord:
         case kFindDailyRecord:
         case kFindWeeklyRecord:
-            return gContext->GetNumSetting("FindOneRecordRecPriority", 0);
+            return gContext->GetNumSetting("FindOneRecordRecPriority", -1);
         case kOverrideRecord:
         case kDontRecord:
             return gContext->GetNumSetting("OverrideRecordRecPriority", 0);
