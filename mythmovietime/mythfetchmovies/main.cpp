@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     int argpos = 1;
     
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare( "SELECT userid, password FROM videosource WHERE xmltvgrabber = 'mythplus'");
+    query.prepare( "SELECT userid, password FROM videosource WHERE xmltvgrabber = 'technovera'");
     
     if (query.exec() && query.isActive() && query.numRowsAffected() > 0)
     {
