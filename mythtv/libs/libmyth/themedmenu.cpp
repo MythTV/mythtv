@@ -192,6 +192,7 @@ class ThemedMenuPrivate
     int exitModifier;
 
     bool spreadbuttons;
+    bool buttoncenter;
 
     QMap<QString, QPixmap> titleIcons;
     QPixmap *curTitle;
@@ -201,6 +202,7 @@ class ThemedMenuPrivate
     bool drawTitle;
 
     QPixmap backgroundPixmap;
+    QPixmap* buttonBackground;
 
     bool ignorekeys;
 
@@ -243,6 +245,7 @@ ThemedMenuPrivate::ThemedMenuPrivate(ThemedMenu *lparent, float lwmult,
     buttonactive = NULL;
     uparrow = NULL;
     downarrow = NULL;
+    buttonBackground = NULL;
 
     ignorekeys = false;
 }
@@ -259,6 +262,8 @@ ThemedMenuPrivate::~ThemedMenuPrivate()
         delete uparrow;
     if (downarrow)
         delete downarrow;
+    if (buttonBackground)
+        delete buttonBackground;
 
     QMap<QString, ButtonIcon>::Iterator it;
     for (it = allButtonIcons.begin(); it != allButtonIcons.end(); ++it)
@@ -292,7 +297,7 @@ void ThemedMenuPrivate::parseBackground(const QString &dir,
     QString path;
 
     bool hasarea = false;
-
+    buttoncenter = true;
     spreadbuttons = true;
     maxColumns = 20;        // Arbitrary number
     visiblerowlimit = 6;    // the old default
@@ -323,12 +328,24 @@ void ThemedMenuPrivate::parseBackground(const QString &dir,
 
                 buttonArea = tmpArea;
                 hasarea = true;
+                if (info.hasAttribute( "background" ))
+                {
+                    cerr << "Loading " << info.attribute( "background" ) << endl;
+                    QString bPath = dir + info.attribute( "background" );
+                    buttonBackground = gContext->LoadScalePixmap(bPath);
+                }
             }
             else if (info.tagName() == "buttonspread")
             {
                 QString val = getFirstText(info);
                 if (val == "no")
                     spreadbuttons = false;
+            }
+            else if (info.tagName() == "buttoncenter")
+            {
+                QString val = getFirstText(info);
+                if (val == "no")
+                    buttoncenter = false;
             }
             else if (info.tagName() == "balancerows")
             {
@@ -1732,7 +1749,10 @@ void ThemedMenuPrivate::positionButtons(bool resetpos)
     if (!spreadbuttons)
     {
         yspacing = 0;
-        ystart = (buttonArea.height() - buttonnormal->height() * rows) / 2;
+        if (buttoncenter)
+        {
+            ystart = (buttonArea.height() - buttonnormal->height() * rows) / 2;
+        }
     }
 
     int row = 1;
@@ -1861,6 +1881,10 @@ void ThemedMenuPrivate::drawInactiveButtons(void)
     paintLogo(&tmp);
     paintTitle(&tmp);
 
+    if (buttonBackground)
+    {
+        tmp.drawPixmap(buttonArea.topLeft(), *buttonBackground);
+    }
     ThemedButton *store = activebutton;
     activebutton = NULL;
     
