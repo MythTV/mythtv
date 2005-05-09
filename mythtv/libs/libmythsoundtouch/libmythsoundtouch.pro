@@ -9,7 +9,7 @@ INSTALLS = target
 
 VERSION = 0.18.0 
 
-INCLUDEPATH += ../../ 
+INCLUDEPATH += ../../libs/libavcodec ../..
 
 QMAKE_CXXFLAGS_RELEASE += -fPIC -DPIC
 QMAKE_CXXFLAGS_DEBUG   += -fPIC -DPIC

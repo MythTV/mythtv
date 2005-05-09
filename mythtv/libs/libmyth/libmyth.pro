@@ -149,3 +149,7 @@ using_xrandr {
     HEADERS += DisplayResX.h
     SOURCES += DisplayResX.cpp
 }
+
+contains( TARGET_MMX, yes ) {
+    HEADERS += ../../libs/libavcodec/i386/mmx.h ../../libs/libavcodec/dsputil.h
+}

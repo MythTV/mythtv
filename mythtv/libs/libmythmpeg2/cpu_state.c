@@ -30,7 +30,7 @@
 #include "attributes.h"
 #include "mpeg2_internal.h"
 #ifdef ARCH_X86
-#include "mmx.h"
+#include "i386/mmx.h"
 #endif
 
 void (* mpeg2_cpu_state_save) (cpu_state_t * state) = NULL;

@@ -47,7 +47,7 @@ QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 
 HEADERS += commercial_skip.h filter.h format.h frame.h frequencies.h 
 HEADERS += guidegrid.h infostructs.h jitterometer.h lzoconf.h #infodialog.h
-HEADERS += minilzo.h mmx.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 
+HEADERS += minilzo.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 
 HEADERS += osdtypes.h programinfo.h profilegroup.h recordingprofile.h 
 HEADERS += remoteencoder.h remoteutil.h RingBuffer.h scheduledrecording.h 
 HEADERS += RTjpegN.h ttfont.h tv_play.h tv_rec.h videosource.h yuv2rgb.h
@@ -149,3 +149,6 @@ using_opengl_vsync {
     DEFINES += USING_OPENGL_VSYNC
 }
 
+contains( TARGET_MMX, yes ) {
+    HEADERS += ../../libs/libavcodec/i386/mmx.h ../../libs/libavcodec/dsputil.h
+}

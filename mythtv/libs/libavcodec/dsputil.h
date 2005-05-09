@@ -28,6 +28,10 @@
 #ifndef DSPUTIL_H
 #define DSPUTIL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "common.h"
 #include "avcodec.h"
 
@@ -398,6 +402,13 @@ static inline int get_penalty_factor(int lambda, int lambda2, int type){
  */
 #define emms_c()
 
+#define MM_MMX    0x0001 /* standard MMX */
+#define MM_3DNOW  0x0004 /* AMD 3DNOW */
+#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
+#define MM_SSE    0x0008 /* SSE functions */
+#define MM_SSE2   0x0010 /* PIV SSE2 functions */
+#define MM_3DNOWEXT  0x0020 /* AMD 3DNowExt */
+
 /* should be defined by architectures supporting
    one or more MultiMedia extension */
 int mm_support(void);
@@ -407,13 +418,6 @@ int mm_support(void);
 #if defined(HAVE_MMX)
 
 #undef emms_c
-
-#define MM_MMX    0x0001 /* standard MMX */
-#define MM_3DNOW  0x0004 /* AMD 3DNOW */
-#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
-#define MM_SSE    0x0008 /* SSE functions */
-#define MM_SSE2   0x0010 /* PIV SSE2 functions */
-#define MM_3DNOWEXT  0x0020 /* AMD 3DNowExt */
 
 extern int mm_flags;
 
@@ -631,6 +635,10 @@ static always_inline long int lrintf(float x)
 #define _ISOC9X_SOURCE
 #endif
 #include <math.h>
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

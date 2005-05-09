@@ -4,18 +4,13 @@
 #include <iostream>
 using namespace std;
 
-#define MM_MMX       0x0001 /* standard MMX */
-#define MM_3DNOW     0x0004 /* AMD 3DNOW */
-#define MM_MMXEXT    0x0002 /* SSE integer functions or AMD MMX ext */
-#define MM_SSE       0x0008 /* SSE functions */
-#define MM_SSE2      0x0010 /* PIV SSE2 functions */
-#define MM_3DNOWEXT  0x0020 /* AMD 3DNowExt */
-
 #ifdef MMX
 
-#include "mmx.h"
+#include "config.h"
+#include "dsputil.h"
+#include "i386/mmx.h"
 
-#if defined(MMX) && !defined(i386)
+#ifdef ARCH_X86_64
 #  define REG_b "rbx"
 #  define REG_S "rsi"
 #else
@@ -33,8 +28,7 @@ using namespace std;
            "=c" (ecx), "=d" (edx)\
          : "0" (index));
 
-#define        emms()                  __asm__ __volatile__ ("emms")
-
+#if 0
 /** Function to test if multimedia instructions are supported...  */
 int mm_support(void)
 {
@@ -50,7 +44,7 @@ int mm_support(void)
                           "mov %0, %1\n\t"
 
                           /* ... Toggle the ID bit in one copy and store */
-                         /*     to the EFLAGS reg */
+			  /*     to the EFLAGS reg */
                           "xor $0x200000, %0\n\t"
                           "push %0\n\t"
                           "popf\n\t"
@@ -64,7 +58,7 @@ int mm_support(void)
                           );
 
     if (a == c)
-        return 0; /* CPUID not supported */
+      return 0; /* CPUID not supported */
 
     /* x86-64, C3, Tranmeta Crusoe test */
     cpuid(0x80000000, max_ext_level, ebx, ecx, edx);
@@ -85,7 +79,7 @@ int mm_support(void)
         edx == 0x49656e69 &&
         ecx == 0x6c65746e) {
 
-        /* intel */
+      /* intel */
         cpuid(1, eax, ebx, ecx, edx);
         if ((edx & 0x00800000) == 0)
             return 0;
@@ -98,27 +92,27 @@ int mm_support(void)
     } else if (ebx == 0x68747541 &&
                edx == 0x69746e65 &&
                ecx == 0x444d4163) {
-        /* AMD */
-        if (ext_caps & (1<<22))
+      /* AMD */
+      if (ext_caps & (1<<22))
             rval |= MM_MMXEXT;
     } else if (ebx == 0x746e6543 &&
                edx == 0x48727561 &&
                ecx == 0x736c7561) {  /*  "CentaurHauls" */
-        /* VIA C3 */
-        if (ext_caps & (1<<24))
+      /* VIA C3 */
+      if (ext_caps & (1<<24))
             rval |= MM_MMXEXT;
     } else if (ebx == 0x69727943 &&
                edx == 0x736e4978 &&
                ecx == 0x64616574) {
-        /* Cyrix Section */
-        /* See if extended CPUID level 80000001 is supported */
-        /* The value of CPUID/80000001 for the 6x86MX is undefined
+      /* Cyrix Section */
+      /* See if extended CPUID level 80000001 is supported */
+      /* The value of CPUID/80000001 for the 6x86MX is undefined
            according to the Cyrix CPU Detection Guide (Preliminary
            Rev. 1.01 table 1), so we'll check the value of eax for
            CPUID/0 to see if standard CPUID level 2 is supported.
            According to the table, the only CPU which supports level
            2 is also the only one which supports extended CPUID levels.
-        */
+      */
         if (eax < 2)
             return rval;
         if (ext_caps & (1<<24))
@@ -147,6 +141,7 @@ QString cpuid2str(int mm_flags)
         str = str.left(str.length()-2);
     return str;
 }
+#endif
 
 OSDSurface::OSDSurface(int w, int h)
 {
@@ -193,10 +188,11 @@ OSDSurface::OSDSurface(int w, int h)
     blendcolorfunc = &blendcolor;
     blendconstfunc = &blendconst;
 /* these do not yet work on x86_64, which does not define i386 */
-#if defined(i386) && defined(MMX)
+#if defined(MMX)
     //cerr<<QString("cpu extension flags detected: %1")
     //    .arg(cpuid2str(mm_support()));
     usemmx = (mm_support() & MM_MMX);
+    //usemmx = true;
     
     if (usemmx)
     {

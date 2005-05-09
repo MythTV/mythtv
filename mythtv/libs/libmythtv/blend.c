@@ -1,8 +1,8 @@
 #include "blend.h"
 
-#ifdef i386
+#ifdef MMX
 
-#include "mmx.h"
+#include "i386/mmx.h"
 
 static const mmx_t mm_cpool[] =
 {
@@ -1212,7 +1212,7 @@ void blendcolumn_mmx (uint8_t * ysrc, uint8_t * usrc, uint8_t * vsrc,
     }
     emms();
 }
-#endif /*i386*/
+#endif /*MMX*/
 
 void blendregion (uint8_t * ysrc, uint8_t * usrc, uint8_t * vsrc,
                   uint8_t * asrc, int srcstrd,

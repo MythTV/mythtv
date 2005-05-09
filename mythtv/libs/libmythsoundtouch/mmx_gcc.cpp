@@ -60,7 +60,7 @@ using namespace soundtouch;
 #  define SI(A,B...) A
 #  define GI(X...) X
 #else
-#  include "../libmythtv/mmx.h"
+#  include "i386/mmx.h"
 #  define _mm_empty() __asm__ __volatile__ ("emms")
 #  define __m64 mmx_t
 #  define SI(A,B...) B

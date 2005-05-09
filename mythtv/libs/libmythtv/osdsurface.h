@@ -2,10 +2,9 @@
 #define OSDSURFACE_H_
 
 #include <qregion.h>
-extern "C"
-{
 #include "blend.h"
-}
+
+#define MAX_NEG_CROP 1024
 
 static inline unsigned char blendColorsAlpha(int src, int dest, int alpha)
 {
@@ -53,7 +52,7 @@ class OSDSurface
 
     QRegion usedRegions;
 
-#ifdef i386
+#ifdef MMX
     short int rec_lut[256];
 #else
     short int * rec_lut;
@@ -70,7 +69,6 @@ class OSDSurface
 
     bool usemmx;
 
-#define MAX_NEG_CROP 384
     unsigned char cropTbl[256 + 2 * MAX_NEG_CROP];
     unsigned char *cm;
 };

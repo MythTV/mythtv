@@ -28,7 +28,6 @@
 #include "RTjpegN.h"
 
 #ifdef MMX
-#include "mmx.h"
 static mmx_t RTjpeg_ones;
 static mmx_t RTjpeg_half;
 static mmx_t RTjpeg_C4;

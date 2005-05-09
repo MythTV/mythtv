@@ -30,7 +30,7 @@
 #include "mpeg2.h"
 #include "attributes.h"
 #include "mpeg2_internal.h"
-#include "mmx.h"
+#include "i386/mmx.h"
 
 #define ROW_SHIFT 15
 #define COL_SHIFT 6

@@ -22,13 +22,15 @@ SOURCES += cpu_accel.c cpu_state.c \
 inc.path = $${PREFIX}/include/mythtv/mpeg2dec/
 inc.files = mpeg2.h
 
+INCLUDEPATH += ../../libs/libavcodec
+
 INSTALLS += inc
 
 contains( TARGET_ALTIVEC, yes ) {
     SOURCES += motion_comp_altivec.c idct_altivec.c
 }
 contains( TARGET_MMX, yes ) {
-    HEADERS += mmx.h
+    HEADERS += ../../libs/libavcodec/i386/mmx.h ../../libs/libavcodec/dsputil.h
     SOURCES += motion_comp_mmx.c idct_mmx.c
 }
 contains( TARGET_ARCH_SPARC, yes ) {

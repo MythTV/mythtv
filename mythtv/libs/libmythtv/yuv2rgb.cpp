@@ -29,7 +29,7 @@
 #include "config.h"
 
 #ifdef MMX
-#include "mmx.h"
+#include "libavcodec/i386/mmx.h"
 #define CPU_MMXEXT 0
 #define CPU_MMX 1
 #endif
