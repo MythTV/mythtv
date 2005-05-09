@@ -1626,7 +1626,7 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
     QString wherepart = QString("cardinput.cardid = capturecard.cardid AND "
                                 "capturecard.cardid = \"%1\" AND "
                                 "capturecard.hostname = \"%2\" AND "
-                                "AND channel.visible = 1 "
+                                "channel.visible = 1 AND"
                                 "cardinput.sourceid = channel.sourceid ")
                                 .arg(cardid)
                                 .arg(gContext->GetHostName());
