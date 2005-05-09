@@ -126,7 +126,7 @@ const DisplayResVector& DisplayResOSX::GetVideoModes() const
         else
             screen_map[key].AddRefreshRate(refresh);
     }
-    CFRelease(displayModes);
+    //CFRelease(displayModes); // this release causes a segfault
 
     DisplayResMapCIt it = screen_map.begin();
     for (; screen_map.end() != it; ++it)
