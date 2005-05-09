@@ -1871,7 +1871,7 @@ void PhoneUIBox::updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkO
                                QString::number(pkOutDrop));
     videoFramesInOutDiscLabel->setText(tr("Video Frames In/Out/Disc: ") + QString::number(fIn) + " / " + QString::number(fOut) + " / " + QString::number(fDiscIn) + " / " + QString::number(fDiscOut));
     if (ConnectTime.elapsed()/1000 != 0)
-        videoAvgFpsLabel->setText(tr("Average FPS In/Out: ") + QString::number(fIn/ConnectTime.elapsed()/1000) + " / " + QString::number(fOut/ConnectTime.elapsed()/1000));
+        videoAvgFpsLabel->setText(tr("Average FPS In/Out: ") + QString::number(fIn*1000/ConnectTime.elapsed()) + " / " + QString::number(fOut*1000/ConnectTime.elapsed()));
     if ((ConnectTime.elapsed()/1000 != 0) && (txClient != 0))
         videoWebcamFpsLabel->setText(tr("Webcam Frames Delivered/Dropped: ") + QString::number(wcDeliveredFrames) + " / " + QString::number(wcDroppedFrames));
 }
