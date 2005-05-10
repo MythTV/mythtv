@@ -346,7 +346,11 @@ class UIListType : public UIType
     enum ItemArrows  { ARROW_NONE, ARROW_LEFT, ARROW_RIGHT, ARROW_BOTH };
 
     void SetCount(int cnt) { m_count = cnt;
-                             m_selheight = (int)(m_area.height() / m_count); }
+                             if (m_count)
+                                 m_selheight = (int)(m_area.height() / m_count);
+                             else
+                                 m_selheight = 0;
+                         }
 
     void SetItemText(int, int, QString);
     void SetItemText(int, QString);
