@@ -275,6 +275,10 @@
         <source>Fetching lineups from DataDirect service...</source>
         <translation>Hämtar programutbud från DataDirect-tjänst...</translation>
     </message>
+    <message>
+        <source>Fetching lineups from the Myth Plus service...</source>
+        <translation>Hämtar programutbud från Myth Plus-tjänsten...</translation>
+    </message>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -480,6 +484,29 @@
     </message>
 </context>
 <context>
+    <name>MythImageFileDialog</name>
+    <message>
+        <source>The theme you are using is missing &apos;file_browser_background&apos; element. 
+
+Returning to previous menu.</source>
+        <translation>Temat du använder saknar &apos;file_browser_background&apos;-elementet.
+
+Återvänder till föregående meny.</translation>
+    </message>
+    <message>
+        <source>Missing UI Element</source>
+        <translation>UI-element saknas</translation>
+    </message>
+    <message>
+        <source>The theme you are using is missing &apos;file_browser&apos; element. 
+
+Returning to previous menu.</source>
+        <translation>Temat du använder saknar &apos;file_browser&apos;-elementet.
+
+Återvänder till föregående meny.</translation>
+    </message>
+</context>
+<context>
     <name>MythPopupBox</name>
     <message>
         <source>OK</source>
@@ -499,6 +526,21 @@
     <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
+    </message>
+</context>
+<context>
+    <name>MythThemedDialog</name>
+    <message>
+        <source>Could not locate &apos;%1&apos; in theme &apos;%2&apos;
+
+Returning to previous menu.</source>
+        <translation>Hittade inte &apos;%1&apos; i tema &apos;%2&apos;
+
+Återvänder till föregående meny.</translation>
+    </message>
+    <message>
+        <source>Missing UI Element</source>
+        <translation>UI-element saknas</translation>
     </message>
 </context>
 <context>
@@ -752,11 +794,11 @@
     </message>
     <message>
         <source>Show group list as recording groups</source>
-        <translation>Visa grupplista som inspelningsgrupper</translation>
+        <translation type="obsolete">Visa grupplista som inspelningsgrupper</translation>
     </message>
     <message>
         <source>Show group list as titles</source>
-        <translation>Visa grupplista som titlar</translation>
+        <translation type="obsolete">Visa grupplista som titlar</translation>
     </message>
     <message>
         <source>Playlist options</source>
@@ -764,11 +806,11 @@
     </message>
     <message>
         <source>Add this Category/Title Group to Playlist</source>
-        <translation>Lägg till denna kategori/titelgrupp i spellistan</translation>
+        <translation type="obsolete">Lägg till denna kategori/titelgrupp i spellistan</translation>
     </message>
     <message>
         <source>Add this Recording Group to Playlist</source>
-        <translation>Lägg till denna inspelningsgrupp i spellistan</translation>
+        <translation type="obsolete">Lägg till denna inspelningsgrupp i spellistan</translation>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
@@ -841,6 +883,46 @@
     <message>
         <source>Password:</source>
         <translation>Lösenord:</translation>
+    </message>
+    <message>
+        <source>Change Group Filter</source>
+        <translation>Ändra gruppfilter</translation>
+    </message>
+    <message>
+        <source>Add this Group to Playlist</source>
+        <translation>Lägg till grupp i spellista</translation>
+    </message>
+    <message>
+        <source>ERROR: Recorded file does not exist.</source>
+        <translation>FEL: Inspelad fil existerar inte.</translation>
+    </message>
+    <message>
+        <source>Show Titles only</source>
+        <translation>Visa endast titlar</translation>
+    </message>
+    <message>
+        <source>Show Titles and Categories</source>
+        <translation>Visa titlar och kategorier</translation>
+    </message>
+    <message>
+        <source>Show Titles, Categories, and Recording Groups</source>
+        <translation>Visa titlar, kategorier och inspelningsgrupper</translation>
+    </message>
+    <message>
+        <source>Show Titles and Recording Groups</source>
+        <translation>Visa titlar och inspelningsgrupper</translation>
+    </message>
+    <message>
+        <source>Show Categories only</source>
+        <translation>Visa endast kategorier</translation>
+    </message>
+    <message>
+        <source>Show Categories and Recording Groups</source>
+        <translation>Visa kategorier och inspelningsgrupper</translation>
+    </message>
+    <message>
+        <source>Show Recording Groups only</source>
+        <translation>Visa endast inspelningsgrupper</translation>
     </message>
 </context>
 <context>
@@ -1311,7 +1393,7 @@
     </message>
     <message>
         <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation>Startvärde för huvudvolymen. Denna påverkar volymen på alla ljudkällor på ljudkortet. OBS! Sätt inte denna för lågt.</translation>
+        <translation type="obsolete">Startvärde för huvudvolymen. Denna påverkar volymen på alla ljudkällor på ljudkortet. OBS! Sätt inte denna för lågt.</translation>
     </message>
     <message>
         <source>PCM Mixer Volume</source>
@@ -1531,7 +1613,7 @@
     </message>
     <message>
         <source>Aggressive Soundcard Buffering</source>
-        <translation>Aggressiv ljudkortsbuffring</translation>
+        <translation type="obsolete">Aggressiv ljudkortsbuffring</translation>
     </message>
     <message>
         <source>Clear Saved Position on playback</source>
@@ -1747,7 +1829,7 @@
     </message>
     <message>
         <source>This enables support for Xbox Specific hardware. Requires a frontend restart for changes to take effect.</source>
-        <translation>Slår på stöd för hårdvara som är specifik för Xbox. Kräver en omstart av datorn för att aktivera ändringarna.</translation>
+        <translation type="obsolete">Slår på stöd för hårdvara som är specifik för Xbox. Kräver en omstart av datorn för att aktivera ändringarna.</translation>
     </message>
     <message>
         <source>Xbox Linux Distribution</source>
@@ -2039,7 +2121,7 @@
     </message>
     <message>
         <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and set up properly.</source>
-        <translation>MythTV kan använda ett PVR-350-kort för högkvalitativ TV-ut / MPEG-avkodning. Detta förutsätter att ivtv-fb är inladdad och inställd korrekt.</translation>
+        <translation type="obsolete">MythTV kan använda ett PVR-350-kort för högkvalitativ TV-ut / MPEG-avkodning. Detta förutsätter att ivtv-fb är inladdad och inställd korrekt.</translation>
     </message>
     <message>
         <source>Video device for the PVR-350 MPEG decoder</source>
@@ -3052,23 +3134,23 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Default Recording Group to display</source>
-        <translation>Förvald inspelningsgrupp att visa</translation>
+        <translation type="obsolete">Förvald inspelningsgrupp att visa</translation>
     </message>
     <message>
         <source>Save current Recording Group view when changed</source>
-        <translation>Spara vald inspelningsgruppsvy när den ändras</translation>
+        <translation type="obsolete">Spara vald inspelningsgruppsvy när den ändras</translation>
     </message>
     <message>
         <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
-        <translation>Kom ihåg den senast valda inspelningsgruppen istället för att visa den förvalda gruppen när du går in i &apos;Visa inspelningar&apos;.</translation>
+        <translation type="obsolete">Kom ihåg den senast valda inspelningsgruppen istället för att visa den förvalda gruppen när du går in i &apos;Visa inspelningar&apos;.</translation>
     </message>
     <message>
         <source>Use program categories as display groups</source>
-        <translation>Använd programkategorier som visningsgrupper</translation>
+        <translation type="obsolete">Använd programkategorier som visningsgrupper</translation>
     </message>
     <message>
         <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
-        <translation>Lägg till programkategorier till inspelningsgrupperna. Endast program i icke lösenordsskyddade grupper kommer att visas.</translation>
+        <translation type="obsolete">Lägg till programkategorier till inspelningsgrupperna. Endast program i icke lösenordsskyddade grupper kommer att visas.</translation>
     </message>
     <message>
         <source>View Recordings</source>
@@ -3396,7 +3478,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Display current time on idle LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Visa klocka på overksam LCD. Kräver omstart av mythfrontend.</translation>
+        <translation type="obsolete">Visa klocka på overksam LCD. Kräver omstart av mythfrontend.</translation>
     </message>
     <message>
         <source>LCD Displays Menus</source>
@@ -3404,7 +3486,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Display selected menu on LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Visa aktuellt meny. Kräver omstart av mythfrontend.</translation>
+        <translation type="obsolete">Visa aktuellt meny. Kräver omstart av mythfrontend.</translation>
     </message>
     <message>
         <source>LCD Displays Music Artist and Title</source>
@@ -3412,7 +3494,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Visa aktuellt låtinformation från MythMusic. Kräver omstart av mythfrontend.</translation>
+        <translation type="obsolete">Visa aktuellt låtinformation från MythMusic. Kräver omstart av mythfrontend.</translation>
     </message>
     <message>
         <source>LCD Displays Channel Information</source>
@@ -3420,7 +3502,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Display tuned channel information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Visa aktuellt kanalinformation. Kräver omstart av mythfrontend.</translation>
+        <translation type="obsolete">Visa aktuellt kanalinformation. Kräver omstart av mythfrontend.</translation>
     </message>
     <message>
         <source>LCD Displays Volume Information</source>
@@ -3428,7 +3510,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Display volume level information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Visa volyminformation. Kräver omstart av mythfrontend.</translation>
+        <translation type="obsolete">Visa volyminformation. Kräver omstart av mythfrontend.</translation>
     </message>
     <message>
         <source>LCD Displays Generic Information</source>
@@ -3436,7 +3518,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Display generic information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Visa allmän information. Kräver omstart av mythfrontend.</translation>
+        <translation type="obsolete">Visa allmän information. Kräver omstart av mythfrontend.</translation>
     </message>
     <message>
         <source>LCD device display</source>
@@ -3567,7 +3649,7 @@ så du måste ställa in dessa manuellt.</translation>
 Please make that your ui.xml is valid.
 
 Myth will now exit.</source>
-        <translation>MythTV kunde inte hitta väljarobjektet i ditt tema.
+        <translation type="obsolete">MythTV kunde inte hitta väljarobjektet i ditt tema.
 Kontrollera att ui.xml är korrekt.
 
 MythTV kommer nu att avslutas.</translation>
@@ -3670,7 +3752,7 @@ MythTV kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None disables this feature, Auto automatically detects your local timezone</source>
-        <translation>Om din lokala tidszon inte överensstämmer med XMLTV, använd denna inställningen för att korrigera detta. Detta bör inte behövas i Sverige, utan &apos;None&apos; ska kunna användas</translation>
+        <translation type="obsolete">Om din lokala tidszon inte överensstämmer med XMLTV, använd denna inställningen för att korrigera detta. Detta bör inte behövas i Sverige, utan &apos;None&apos; ska kunna användas</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
@@ -3858,11 +3940,11 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Default Recording Group to display on the View Recordings screen.</source>
-        <translation>Förvald inspelningsgrupp att visa på skärmen Visa inspelningar.</translation>
+        <translation type="obsolete">Förvald inspelningsgrupp att visa på skärmen Visa inspelningar.</translation>
     </message>
     <message>
         <source>Use the name of the display group currently being shown in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation>Använd namnet på aktuell visningsgruppen i stället för termen &quot;Alla program&quot; på skärmen Visa inspelningar.</translation>
+        <translation type="obsolete">Använd namnet på aktuell visningsgruppen i stället för termen &quot;Alla program&quot; på skärmen Visa inspelningar.</translation>
     </message>
     <message>
         <source>Start in Title section</source>
@@ -3946,7 +4028,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>If enabled, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
-        <translation>Låtsas att ljudkortsbufferten är mindre än vad den egentligen är. Detta kan snabba upp snabbspolning men kan också orsaka uppspelningsproblem.</translation>
+        <translation type="obsolete">Låtsas att ljudkortsbufferten är mindre än vad den egentligen är. Detta kan snabba upp snabbspolning men kan också orsaka uppspelningsproblem.</translation>
     </message>
     <message>
         <source>Automatically clear saved position on a recording when the recording is played back.  If disabled, you can mark the beginning with rewind then save position.</source>
@@ -3978,7 +4060,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>MythTV will make a thumbnail image this many seconds from the beginning of the recording. Useful to skip over advertisements.</source>
-        <translation>MythTV skapar en förhandsgranskningsbild så här många sekunder från början av inspelningen. Användbart för att hoppa över reklam.</translation>
+        <translation type="obsolete">MythTV skapar en förhandsgranskningsbild så här många sekunder från början av inspelningen. Användbart för att hoppa över reklam.</translation>
     </message>
     <message>
         <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
@@ -4158,7 +4240,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Show group name instead of &quot;All Programs&quot;</source>
-        <translation>Visa gruppnamn i stället för &quot;Alla program&quot;</translation>
+        <translation type="obsolete">Visa gruppnamn i stället för &quot;Alla program&quot;</translation>
     </message>
     <message>
         <source>Show group summary</source>
@@ -4174,7 +4256,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Sätter på bakgrundsbelysningen permanent. Kräver omstart av mythfrontend för att börja gälla.</translation>
+        <translation type="obsolete">Sätter på bakgrundsbelysningen permanent. Kräver omstart av mythfrontend för att börja gälla.</translation>
     </message>
     <message>
         <source>Directed By</source>
@@ -4618,7 +4700,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
-        <translation>Tillåt program som tas bort automatiskt (av funktionen autoradera) att bli återinspelade om de visas igen.</translation>
+        <translation type="obsolete">Tillåt program som tas bort automatiskt (av funktionen autoradera) att bli återinspelade om de visas igen.</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
@@ -5411,7 +5493,7 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>N</source>
         <comment>RecStatusChar rsCancelled</comment>
-        <translation>a</translation>
+        <translation type="obsolete">a</translation>
     </message>
     <message>
         <source>C</source>
@@ -5589,7 +5671,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Använd en LCD-display för att visa statusinformation. Omstart av mythfrontend krävs för att (av)aktivera.</translation>
+        <translation type="obsolete">Använd en LCD-display för att visa statusinformation. Omstart av mythfrontend krävs för att (av)aktivera.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
@@ -5633,7 +5715,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
-        <translation>Normalt loopas ljudet från PVR-350 genom ljudkortet, ändra här om så inte är fallet. MythTV kan inte kontrollera TV-volymen med detta alternativ aktiverat.</translation>
+        <translation type="obsolete">Normalt loopas ljudet från PVR-350 genom ljudkortet, ändra här om så inte är fallet. MythTV kan inte kontrollera TV-volymen med detta alternativ aktiverat.</translation>
     </message>
     <message>
         <source>Building Detection Buffer</source>
@@ -5900,7 +5982,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster.
 WARNING: Enabling this optionwill disable XvMC video output.</source>
-        <translation>Använd libmpeg2 i stället för ffmpeg för avkodning av MPEG-1 och MPEG-2 bildrutor. Detta kan vara snabbare.
+        <translation type="obsolete">Använd libmpeg2 i stället för ffmpeg för avkodning av MPEG-1 och MPEG-2 bildrutor. Detta kan vara snabbare.
 VARNING: Detta val avaktiverar XvMC videoutmatning.</translation>
     </message>
     <message>
@@ -5926,6 +6008,224 @@ VARNING: Detta val avaktiverar XvMC videoutmatning.</translation>
     <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems.</source>
         <translation>Om automatisk reklamflaggning är aktiverad, börja detta så fort inspelningen startar.  EJ rekommenderat på svagare system.</translation>
+    </message>
+    <message>
+        <source>c</source>
+        <comment>RecStatusChar rsCancelled</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N</source>
+        <comment>RecStatusChar rsNotListed</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Listed</source>
+        <translation>Ej listad</translation>
+    </message>
+    <message>
+        <source>this show does not match the current program listings.</source>
+        <translation>denna visning matchar inte de nuvarande programlistorna.</translation>
+    </message>
+    <message>
+        <source>Initial volume for the Master Mixer.  This affects all sound created by the sound card.  Note: Do not set this too low.</source>
+        <translation>Startvärde för huvudvolymen. Denna påverkar volymen på alla ljudkällor på ljudkortet. OBS! Sätt inte denna för lågt.</translation>
+    </message>
+    <message>
+        <source>Default group filter to apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default group filter to apply on the View Recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save current group filter when changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remember the last selected filter instead of displaying the default filter whenever you enter the playback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default View</source>
+        <translation>Standardvy</translation>
+    </message>
+    <message>
+        <source>Show Titles only</source>
+        <translation>Visa endast titlar</translation>
+    </message>
+    <message>
+        <source>Show Titles and Categories</source>
+        <translation>Visa titlar och kategorier</translation>
+    </message>
+    <message>
+        <source>Show Titles, Categories, and Recording Groups</source>
+        <translation>Visa titlar, kategorier och inspelningsgrupper</translation>
+    </message>
+    <message>
+        <source>Show Titles and Recording Groups</source>
+        <translation>Visa titlar och inspelningsgrupper</translation>
+    </message>
+    <message>
+        <source>Show Categories only</source>
+        <translation>Visa endast kategorier</translation>
+    </message>
+    <message>
+        <source>Show Categories and Recording Groups</source>
+        <translation>Visa kategorier och inspelningsgrupper</translation>
+    </message>
+    <message>
+        <source>Show Recording Groups only</source>
+        <translation>Visa endast inspelningsgrupper</translation>
+    </message>
+    <message>
+        <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show filter name instead of &quot;All Programs&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, programs that are automatically deleted (expired) will be allowed to be re-recorded if they are shown again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster.
+WARNING: Enabling this option will disable XvMC video output.</source>
+        <translation>Använd libmpeg2 i stället för ffmpeg för avkodning av MPEG-1 och MPEG-2, vilket kan vara snabbare.
+VARNING: Detta val avaktiverar XvMC-videoutmatning.</translation>
+    </message>
+    <message>
+        <source>Aggressive Sound card Buffering</source>
+        <translation>Aggressiv ljudkortsbuffring</translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV will pretend to have a smaller sound card buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
+        <translation>Låtsas att ljudkortsbufferten är mindre än vad den egentligen är. Detta kan snabba upp snabbspolning men kan också orsaka uppspelningsproblem.</translation>
+    </message>
+    <message>
+        <source>MythTV will use this offset to make a thumbnail image this many seconds from the beginning of the recording, unless this offset happens to be between cutpoints or inside a flagged advertisement.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate preview image from a bookmark if possible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV will ignore the above time offset, and use the bookmark inside the recording as the offset for creating a thumbnail image. As with the above, MythTV will honour cutlists and increase this offset if necessary.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This enables support for Xbox specific hardware. Requires a frontend restart for changes to take effect.</source>
+        <translation>Slår på stöd för hårdvara som är specifik för Xbox. Omstart av MythTV krävs för att aktivera ändringarna.</translation>
+    </message>
+    <message>
+        <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and configured properly.</source>
+        <translation>MythTV kan använda ett PVR-350-kort för högkvalitativ TV-ut / MPEG-avkodning. Detta förutsätter att ivtv-fb är laddad och korrekt konfigurerad.</translation>
+    </message>
+    <message>
+        <source>Normally, PVR-350 audio is looped into a sound card; here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
+        <translation>Normalt loopas ljudet från PVR-350 genom ljudkortet, ändra här om så inte är fallet. MythTV kan inte kontrollera TV-volymen med detta alternativ aktiverat.</translation>
+    </message>
+    <message>
+        <source>Display current time on idle LCD display. </source>
+        <translation>Visa klocka på overksam LCD-display.</translation>
+    </message>
+    <message>
+        <source>Display selected menu on LCD display. </source>
+        <translation>Visa vald meny på LCD-display.</translation>
+    </message>
+    <message>
+        <source>Display playing artist and song title in MythMusic.</source>
+        <translation>Visa aktuell artist och låt från MythMusic.</translation>
+    </message>
+    <message>
+        <source>Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist - Title</source>
+        <translation>Artist - Titel</translation>
+    </message>
+    <message>
+        <source>Artist [Album] Title</source>
+        <translation>Artist [Album] Titel</translation>
+    </message>
+    <message>
+        <source>Which items to show when playing music.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display tuned channel information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display volume level information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display generic information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the backlight permanently.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD HeartBeat Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the LCD heartbeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use an LCD display to view MythTV status information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error</source>
+        <translation>Temafel</translation>
+    </message>
+    <message>
+        <source>Your theme does not contain elements required to display the status screen.</source>
+        <translation>Temat som används innehåller inte element som krävs för att visa statusskärmen.</translation>
+    </message>
+    <message>
+        <source>Myth could not locate the selector object within your theme.
+Please make sure that your ui.xml is valid.
+
+Myth will now exit.</source>
+        <translation>MythTV kunde inte hitta väljarobjektet i det aktuella temat.
+Kontrollera att ui.xml är korrekt.
+
+Myth kommer nu att avslutas.</translation>
+    </message>
+    <message>
+        <source>Recording Unavailable</source>
+        <translation>Inspelning otillgänglig</translation>
+    </message>
+    <message>
+        <source>This recording is currently Available</source>
+        <translation>Denna inspelning är tillgänglig</translation>
+    </message>
+    <message>
+        <source>This recording is currently being deleted and is unavailable</source>
+        <translation>Denna inspelning tas bort och är otillgänglig</translation>
+    </message>
+    <message>
+        <source>The file for this recording can not be found</source>
+        <translation>Filen för denna inspelning kan ej hittas</translation>
+    </message>
+    <message>
+        <source>Adjust the relative timezone of the XMLTV EPG data read by mythfilldatabase.  &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the XMLTV timezone, interpreting times as local.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6040,6 +6340,10 @@ No other details</source>
         <translation>På %1 %2 från %3.%4
 %5
 Inga andra detaljer</translation>
+    </message>
+    <message>
+        <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
+        <translation>Temat som används innehåller ett okänt element (&apos;%1&apos;) som kommer att ignoreras</translation>
     </message>
 </context>
 <context>
