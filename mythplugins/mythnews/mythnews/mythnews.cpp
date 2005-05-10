@@ -282,7 +282,24 @@ void MythNews::updateInfoView()
                 ttype =
                     (UITextType *)container->GetType("description");
                 if (ttype)
-                    ttype->SetText(article->description());
+                {
+                    QString artText(article->description());
+                    
+                    if( artText.find(QRegExp("</(p|P)>")) )
+                    {
+                        artText.replace( QRegExp("<(p|P)>"), "");
+                        artText.replace( QRegExp("</(p|P)>"), "\n\n");
+                    }
+                    else
+                    {
+                        artText.replace( QRegExp("<(p|P)>"), "\n\n");
+                        artText.replace( QRegExp("</(p|P)>"), "");
+                    }                        
+                    artText.replace( QRegExp("<(br|BR|)>"), "\n");
+                    artText.replace( QRegExp("</(a|A|b|B|i|I)>"), "");
+                    artText.replace( QRegExp("<(a|A|).*>"), "");
+                    ttype->SetText(artText);
+                }
             }
         }
         else {
