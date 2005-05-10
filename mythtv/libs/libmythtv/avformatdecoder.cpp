@@ -253,6 +253,9 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
 void AvFormatDecoder::Reset(void)
 {
     SeekReset();
+#if 0
+    // mpegts.c already clears the stream, so this code results in
+    // silence on live tv with mpeg-ts recordings.
 
     // Clear out the existing mpeg streams
     // so we can get a clean set from the 
@@ -267,6 +270,7 @@ void AvFormatDecoder::Reset(void)
             av_remove_stream(ic, st->id);
         }
     }
+#endif
 
     m_positionMap.clear();
     framesPlayed = 0;
