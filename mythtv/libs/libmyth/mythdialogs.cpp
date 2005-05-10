@@ -2574,7 +2574,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     else
     {
         QString msg = 
-            QString(tr("The theme you are is missing 'file_browser_background' "
+            QString(tr("The theme you are using is missing 'file_browser_background' "
                        "element. \n\nReturning to previous menu."));
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   tr("Missing UI Element"), msg);
@@ -2608,7 +2608,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     else
     { 
         QString msg = 
-            QString(tr("The theme you are is missing 'file_browser' element. "
+            QString(tr("The theme you are using is missing 'file_browser' element. "
                        "\n\nReturning to previous menu."));
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   tr("Missing UI Element"), msg);
