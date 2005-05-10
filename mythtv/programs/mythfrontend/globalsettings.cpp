@@ -820,7 +820,7 @@ static HostCheckBox *UseMPEG2Dec()
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, libmpeg2 will be used instead "
                     "of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. "
-                    "This can be faster.\nWARNING: Enabling this option"
+                    "This can be faster.\nWARNING: Enabling this option "
                     "will disable XvMC video output."));
     return gc;
 }
@@ -997,7 +997,7 @@ static HostCheckBox *PreviewFromBookmark()
                  "if possible"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If enabled, MythTV will ignore the above "
-                    "time offset, and use the bookmark inside the recording, "
+                    "time offset, and use the bookmark inside the recording "
                     "as the offset for creating a thumbnail image. "
                     "As with the above, MythTV will honour cutlists "
                     "and increase this offset if necessary."));
