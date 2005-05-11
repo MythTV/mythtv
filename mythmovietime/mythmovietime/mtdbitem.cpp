@@ -696,7 +696,7 @@ void MMTTheaterItem::populateTreeWithDates(UIListGenericTree*)
     MMTShowingItem* tempItem;
     
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare( "SELECT rowid, Date"
+    query.prepare( "SELECT rowid, Date "
                    "FROM movietime_movies "
                    "WHERE filmid = :FILMID AND "
                    "TheaterID = :THEATERID" );
