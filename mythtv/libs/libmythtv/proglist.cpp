@@ -300,13 +300,14 @@ void ProgLister::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
  
-    if (updateAll || r.intersects(viewRect))
-        updateView(&p);
+    
     if (updateAll || r.intersects(listRect))
         updateList(&p);
     if (updateAll || r.intersects(infoRect))
         updateInfo(&p);
-
+    if (updateAll || r.intersects(viewRect))
+        updateView(&p);
+    
     updateAll = false;
 }
 
