@@ -1,5 +1,8 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.11 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  mythtv::nuvinfo.pm
 #
@@ -131,7 +134,9 @@ package mythtv::nuvinfo;
         ($info{'height'})                = $data =~ m/^ID_VIDEO_HEIGHT=(\d+)/m;
         ($info{'fps'})                   = $data =~ m/^ID_VIDEO_FPS=(\d+(?:\.\d*)?)/m;
         ($info{'audio_sample_rate'})     = $data =~ m/^ID_AUDIO_RATE=(\d+)/m;
-        ($info{'audio_bits_per_sample'}) = $data =~ m/^ID_AUDIO_BITRATE=(\d+)/m;
+        # this is a different kind of "bits" than transcode and other programs expect
+        #($info{'audio_bits_per_sample'}) = $data =~ m/^ID_AUDIO_BITRATE=(\d+)/m;
+        $info{'audio_bits_per_sample'} = 16;
         ($info{'audio_channels'})        = $data =~ m/^ID_AUDIO_NCH=(\d+)/m;
         ($info{'mpeg_stream_type'})      = $data =~ m/^ID_VIDEO_FPS=(\d+(?:\.\d*)?)/m;
         ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=(\d+(?:[\.\,]\d*)?)/m;
