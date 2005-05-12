@@ -57,7 +57,7 @@ inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h
 inc.files += uilistbtntype.h uiphoneentry.h generictree.h managedlist.h
 inc.files += visual.h volumebase.h output.h langsettings.h qmdcodec.h
-inc.files += exitcodes.h
+inc.files += exitcodes.h mythconfig.h mythconfig.mak
 
 using_oss {
     DEFINES += USING_OSS
