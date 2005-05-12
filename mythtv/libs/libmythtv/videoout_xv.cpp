@@ -40,6 +40,8 @@ extern "C" {
 
 static QString xvflags2str(int flags);
 
+//#define DEBUG_PAUSE /* enable to debug XvMC pause frame */
+
 #ifdef USING_XVMC
 #   define AGGRESSIVE_BUFFER_MANAGEMENT
 #   define XVMC_OSD_NUM       2
@@ -1539,6 +1541,23 @@ void VideoOutputXv::DiscardFrame(VideoFrame *frame)
     }
 }
 
+void VideoOutputXv::ClearAfterSeek(void)
+{
+    VERBOSE(VB_PLAYBACK, "ClearAfterSeek()");    
+    DiscardFrames();
+#ifdef USING_XVMC
+    if (VideoOutputSubType() > XVideo)
+    {
+        for (uint i=0; i<xvmc_surfs.size(); i++)
+        {
+            xvmc_vo_surf_t *surf = (xvmc_vo_surf_t*) xvmc_surfs[i];
+            X11S(XvMCHideSurface(XJ_disp, &(surf->surface)));
+        }
+        DiscardFrames();
+    }
+#endif
+}
+
 #define DQ_COPY(DST, SRC) \
     do { \
         DST.insert(DST.end(), vbuffers.begin_lock(SRC), vbuffers.end(SRC)); \
@@ -1897,7 +1916,7 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
     int mod = 0;
     if (frame_height>=(int)(imgh+(0.05*frame_height)) && 2==field)
     {
-        int nrml = round((((double)disphoff)/frame_height) - 0.00001);
+        //int nrml = (int) round((((double)disphoff)/frame_height) - 0.00001);
         mod = -dst_half_line_in_src;
         dest_y += mod;
         xv_dest_y_incr -= mod;
@@ -1938,8 +1957,10 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
     if (vbuffers.size(kVideoBuffer_pause))
     {
         frame = vbuffers.head(kVideoBuffer_pause);
+#ifdef DEBUG_PAUSE
         VERBOSE(VB_PLAYBACK, QString("use pause frame: %1 ShowXvMC")
                 .arg(DebugString(frame)));
+#endif // DEBUG_PAUSE
         using_pause_frame = true;
     }
     else if (vbuffers.size(kVideoBuffer_used))
@@ -2313,8 +2334,10 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
 
         if (success)
         {
+#ifdef DEBUG_PAUSE
             VERBOSE(VB_PLAYBACK, QString("use pause frame: %1 ProcessFrameXvMC")
                     .arg(DebugString(frame)));
+#endif // DEBUG_PAUSE
             vbuffers.SetOSDFrame(frame, NULL);
         }
         else

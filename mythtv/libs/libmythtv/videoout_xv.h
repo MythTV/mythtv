@@ -54,6 +54,8 @@ class VideoOutputXv : public VideoOutput
     void DrawSlice(VideoFrame*, int x, int y, int w, int h);
     void Show(FrameScanType);
 
+    void ClearAfterSeek(void);
+
     void InputChanged(int width, int height, float aspect);
     void Zoom(int direction);
     void AspectChanged(float aspect);

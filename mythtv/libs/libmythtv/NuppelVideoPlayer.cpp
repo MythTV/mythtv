@@ -1385,7 +1385,8 @@ void NuppelVideoPlayer::AVSync(void)
         }
 
         videosync->WaitForFrame(avsync_adjustment);
-        videoOutput->Show(m_scan);
+        if (!resetvideo)
+            videoOutput->Show(m_scan);
 
         if (videoOutput->IsErrored())
         {
@@ -1404,7 +1405,8 @@ void NuppelVideoPlayer::AVSync(void)
             // Display the second field
             videosync->AdvanceTrigger();
             videosync->WaitForFrame(0);
-            videoOutput->Show(kScan_Intr2ndField);
+            if (!resetvideo)
+                videoOutput->Show(kScan_Intr2ndField);
         }
     }
     else
@@ -1537,9 +1539,6 @@ void NuppelVideoPlayer::DisplayPauseFrame(void)
     videofiltersLock.unlock();
 
     videoOutput->PrepareFrame(NULL, kScan_Ignore);
-
-    usleep(frame_interval);
-
     videoOutput->Show(kScan_Ignore);
     videosync->Start();
 }
@@ -3390,7 +3389,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     while ((CommDetect::FrameIsInBreakMap(number, commBreakMap, totalFrames) || 
            (CommDetect::FrameIsInBreakMap(number, deleteMap, totalFrames))))
     {
-        number += 30 * video_frame_rate;
+        number += (long long) (30 * video_frame_rate);
         if (number >= totalFrames)
         {
             number = oldnumber;
