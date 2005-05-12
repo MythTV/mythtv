@@ -848,12 +848,19 @@ void RingBuffer::ReadAheadThread(void)
         {
             readaheadpaused = true;
             pauseWait.wakeAll();
-            usleep(100);
+            usleep(5000);
             totfree = ReadBufFree();
             continue;
         }
 
         readaheadpaused = false;
+
+        if (totfree < readblocksize)
+        {
+            usleep(50000);
+            totfree = ReadBufFree();
+            continue;
+        }
 
         pthread_rwlock_rdlock(&rwlock);
         if (totfree > readblocksize && !commserror)
@@ -967,8 +974,6 @@ void RingBuffer::ReadAheadThread(void)
 
         if ((used >= fill_threshold || wantseek) && !pausereadthread)
             usleep(500);
-        else if (!pausereadthread)
-            sched_yield();
     }
 
     delete [] readAheadBuffer;
