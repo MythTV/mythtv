@@ -1672,7 +1672,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         }
 
         if (pausevideo)
+        {
+            usleep(frame_interval);
             DisplayPauseFrame();
+        }
         else
             DisplayNormalFrame();
     }
