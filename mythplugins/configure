@@ -19,14 +19,15 @@ news="yes"
 phone="yes"
 browser="yes"
 
-opengl="no"
-fftw_lib="no"
-sdl="no"
-aac="no"
-transcode="no"
-vcdsupport="no"
-exif="no"
-festival="no"
+opengl="default"
+fftw_lib="default"
+fftw_lib3="no "   # not yet supported in MythMusic
+sdl="default"
+aac="no"          # compile fails w/libfaad v2.0
+transcode="no"    # need to check for more stuff?
+vcdsupport="no"   # no config detection rutine
+exif="default"
+festival="no"     # no config detection/setup rutine
 
 for opt do
   case "$opt" in
@@ -137,6 +138,89 @@ for opt do
                  festival="no"
   esac
 done
+
+has_library()
+{
+    LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
+    LIBPATHS="$LIBPATHS `echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
+
+    # recurse down just one level, should be enough in most cases
+    INCL=`cat /etc/ld.so.conf | grep -v "#" | grep "include "`
+    SRCH=`echo $INCL | sed s/"include "//g`
+    for x in $SRCH ; do
+        LP_APPEND=`cat /etc/$x | grep -v "#" | grep -v "include"`
+        LIBPATHS="$LIBPATHS $LP_APPEND"
+    done
+
+    LIBPATHS="`echo $LIBPATHS /lib /usr/lib | sed s/'\/ '/' '/g` "
+
+    HAS_IT="no"
+    for LIBPATH in $LIBPATHS ; do
+        if test x`ls $LIBPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
+            HAS_IT="yes"
+        fi
+    done
+    expr $HAS_IT : "yes" > /dev/null
+}
+
+if test "$opengl" = "default" ; then
+    opengl="no"
+    if has_library libGL.so ; then
+        opengl="yes"
+    fi
+fi
+
+if test "$fftw_lib3" = "default" ; then
+    fftw_lib3="no"
+    if has_library libfftw3f_threads.so ; then
+        if has_library libfftw3_threads.so ; then
+            fftw_lib3="yes"
+        fi
+    fi
+fi
+
+if test "$fftw_lib" = "default" ; then
+    fftw_lib="no"
+    if has_library libfftw.so ; then
+        if has_library librfftw.so ; then
+            fftw_lib="yes"
+        fi
+    fi
+fi
+
+if test "$sdl" = "default" ; then
+    sdl="no"
+    if test x`which sdl-config` != x ; then
+        sdl="yes"
+    fi
+fi
+
+if test "$aac" = "default" ; then
+    aac="no"
+    if has_library libfaad.so ; then
+        if has_library libmp4ff.so ; then
+            aac="yes"
+        fi
+    fi
+fi
+
+if test "$transcode" = "default" ; then
+    transcode="no"
+    if has_library libdvdread.so ; then
+        transcode="yes"
+    fi
+fi
+
+# vcd support detection rutine does here
+
+if test "$exif" = "default" ; then
+    exif="no"
+    if has_library libexif.so ; then
+        exif="yes"
+    fi
+fi
+
+# Festival detection rutine goes here
 
 if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
 cat << EOF
@@ -430,7 +514,12 @@ if test "$music" = "yes" ; then
         echo "        OpenGL        support will not be included in MythMusic"
     fi
 
-    if test "$fftw_lib" = "yes" ; then
+    if test "$fftw_lib3" = "yes" ; then
+        echo "        FFTW v.3      support will be included in MythMusic"
+        echo "#define FFTW_SUPPORT3 1" >> ./mythmusic/mythmusic/config.h
+        echo "LIBS += -lfftw3f_threads -lfftw3_threads" >> \
+             ./mythmusic/mythmusic/config.pro
+    elif test "$fftw_lib" = "yes" ; then
         echo "        FFTW          support will be included in MythMusic"
         echo "#define FFTW_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
         echo "LIBS += -lrfftw -lfftw" >> ./mythmusic/mythmusic/config.pro
