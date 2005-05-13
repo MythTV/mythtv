@@ -225,8 +225,8 @@ file, and look for:
 <BLOCKQUOTE><CODE>
 <PRE>
 Section "ServerFlags"
-    #DontZap # disable &lt;Crtl>&lt;Alt>&lt;BS> (server abort)
-    #DontZoom # disable &lt;Crtl>&lt;Alt>&lt;KP_+>/&lt;KP_-> (resolution switching)
+    #DontZap # disable &lt;Ctrl>&lt;Alt>&lt;BS> (server abort)
+    #DontZoom # disable &lt;Ctrl>&lt;Alt>&lt;KP_+>/&lt;KP_-> (resolution switching)
     AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
 
     Option "blank time" "0"
@@ -368,7 +368,7 @@ reboot your setting will be preserved.</P>
 
 <H3>On-screen Display shows incorrect program length.</H3>
 
-<P>This may occur when MythTV doesn't have an accurate seektable.  Run
+<P>This may occur when MythTV doesn't have an accurate seek table.  Run
 <B>mythcommflag --rebuild</B></P>
 
 <H3><A NAME="Troubleshooting_Audio"></A> Troubleshooting audio </H3>
@@ -500,7 +500,7 @@ apply in that case.</P>
 <P>There is no such thing as "Canada Cable"; Canada uses the same
 frequencies as the United States.  "Canada Cable" was a hack that some
 people used when they would discover that their channels were off-by-one,
-ie, when tuning to channel 42, they might get channel 41 or 43.  This is
+i.e. when tuning to channel 42, they might get channel 41 or 43.  This is
 actually due to the tuner on the video capture device being mis-detected. 
 You must manually specify the tuner type in your <CODE>/etc/modules.conf</CODE>. 
 See the video4linux mailing list (

@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-05-, v0.18.03
+<date>2005-05-13, v0.18.03
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -72,7 +72,7 @@ See <url url="http://linpvr.org/" name="http://linpvr.org/"> if you'd like
 to install MythTV onto a VIA Epia M machine.
 
 See <url url="http://bit.blkbk.com/" name="http://bit.blkbk.com/"> if you'd
-like to install MythTV on an XBox.
+like to install MythTV on a Xbox.
 
 See <url url="http://wilsonet.com/mythtv/"
 name="http://wilsonet.com/mythtv/"> for instructions tailored to RedHat's
@@ -294,7 +294,7 @@ may be useful if you are running multiple encoders.
 
 <sect2>Hard Disk(s)
 <p>Encoded video takes up a lot of hard disk space. The exact amount depends
-on the encoding scheme, the size of the raw images, and the frames per
+on the encoding scheme, the size of the raw images and the frames per
 second, but typical values for MythTV range from 700 megabytes/hour for
 MPEG-4, 2 GB/hour for MPEG-2 and RTjpeg and 7 GB/hour for ATSC HDTV.
 
@@ -404,7 +404,7 @@ encoding.
 
 <bf>NOTE</bf>:  Motherboards with the Via chipset are notoriously bad with
 DMA and have caused numerous issues with ivtv, including hard locks.  See
-the ivtv website (url url="http://ivtv.sf.net" name="http://ivtv.sf.net")
+the ivtv website <url url="http://ivtv.sf.net" name="http://ivtv.sf.net">
 for the latest information on what works and what doesn't.
 
 Here are some data points for encoding:
@@ -552,8 +552,8 @@ If you want to use MythTV with a standard television, you will need a
 physical connection from your video card to your TV set, which can either be
 a TV-out port on the card itself or an external adapter that converts the
 VGA signal to an appropriate video signal. "Appropriate" depends on a number
-of factors, such as video standard (NTSC vs PAL) type of input connection
-(Composite vs SVideo), etc.
+of factors, such as video standard (NTSC vs. PAL) type of input connection
+(Composite vs. SVideo), etc.
 
 Note that with some video cards and X drivers, XVideo extensions are
 only supported on the VGA output, and not on the TV output.
@@ -674,7 +674,7 @@ You must indicate that you are using external audio control on the PVR-350 setup
 </enum>
 
 <sect3>Other Options
-<p>Some devices with on-board TV-out capability, such as XBoxes converted to 
+<p>Some devices with on-board TV-out capability, such as Xboxes converted to 
 Linux and some laptops, can be used as MythTV frontends to display on a 
 television screen. Please consult the mythtv-users mailing list for messages 
 that report the details of these special arrangements.
@@ -1438,7 +1438,7 @@ configuration will be imported into MythTV when you first run the
 <bf>setup</bf> program.
 
 See the section called <ref id="MigratingtoDD" name="Migrating from XMLTV
-to DataDirect"> for instructions on moving to to DataDirect if you are
+to DataDirect"> for instructions on moving to DataDirect if you are
 currently using XMLTV.  If you are starting from a fresh installation, the
 simplest thing is to immediately start using DataDirect.
 
@@ -1459,7 +1459,7 @@ see what is available and to override and automatically detected options.
 See the <tt>config.log</tt> file after running <bf>configure</bf> to see
 previous runs.
 
-On a single cpu machine, you would type the following to compile MythTV:
+On a single CPU machine, you would type the following to compile MythTV:
 <tscreen><verb>
 $ qmake mythtv.pro
 $ make
@@ -1822,7 +1822,7 @@ if the user had pressed the keys on the keyboard.  The file
 <figure loc="here">
 <eps file="warning.eps" height="1cm">
 <img src="warning.png">
-<caption><bf>NOTE</bf>:If you are running Mandrake, you may install
+<caption><bf>NOTE</bf>: If you are running Mandrake, you may install
 <bf>lirc</bf> by executing: <tt># urpmi lirc lirc-remotes</tt> and bypass
 the manual compilation steps described below by jumping to the <ref
 id="completing_lirc_install" name="Completing the lirc install"> section. 
@@ -2596,7 +2596,7 @@ further items to configure, thereby returning you to the command line.
 
 <sect2>Channel Editor
 <p>The channel editor is used to globally alter channel information,
-including items like hue, contrast, finetuning and others.  Users in North
+including items like hue, contrast, fine tuning and others.  Users in North
 America shouldn't run the channel editor until after completing initial
 setup and running <bf>mythfilldatabase</bf> at least once to populate the
 database.
@@ -2749,7 +2749,7 @@ command:
 $ perl mkiconmap.pl
 </verb></tscreen>
 
-You will be asked for your zipcode and the service that you use. If there
+You will be asked for your zip code and the service that you use. If there
 are no errors, the <tt>iconmap.xml</tt> file that you need for the next step
 will be created.
 
@@ -3164,7 +3164,7 @@ the frontend should poll the backend to determine if the status has changed.
 <p><figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE to Red Hat/Fedora users</bf>:Red Hat Linux and Fedora Core
+<caption><bf>NOTE to Red Hat/Fedora users</bf>: Red Hat Linux and Fedora Core
 ship with Gnome as
 the default desktop environment.  However, Gnome seems to have issues with
 window focus and window switching which sometimes cause mythfrontend to
@@ -3279,7 +3279,7 @@ G	| rotate between the various Picture Adjustments (Colour, Hue, etc.)&nbsp;
 H	| Channel history. Each repeat steps back through the previous channels.  @     
 O	| Turns on 'Browse' mode, allowing user to browse channels and program&nbsp; 
           info while watching current show FullScreen.				  @     
-Y	| switch between multiple capture cards.&nbsp; <bf>NOTE</bf>:
+Y	| switch between multiple capture cards.&nbsp; <bf>NOTE</bf>:&nbsp;
 	  you will lose your LiveTV buffer on your current card. Useful&nbsp;
 	  for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.) @
 </tabular>
@@ -3603,7 +3603,7 @@ need to ensure this value is long enough for all your machines to perform
 their bootup cycle.
 <item>"Wakeup time format" is the format of the wakeup time that is given in
 the "Set wakeuptime command" as a parameter "$time". You need to set this
-according to your wakeup mechanism. If you need secondss since the epoch
+according to your wakeup mechanism. If you need seconds since the epoch
 (1970-01-01) set the "Wakeup time format" to "time_t".
 <item>"Set wakeuptime command" is the command executed to set the new wakeuptime. 
 <item>"Server Halt Command" is the command executed to shutdown the Master
@@ -3620,7 +3620,7 @@ waits again for the timeout.
 that a new client connect is needed before a shutdown occurs, unless you have
 the "Wait for client connect" setting disabled, in which case this is the same as
 returning "1".  An example of a use for this return value is to prevent the shutdown
-if a user is currently logged in, or if a specific program (ie. transcode,
+if a user is currently logged in, or if a specific program (i.e. transcode,
 automatic updates, etc.) is currently running. If you don't need it, leave
 the field blank.
 </itemize>
@@ -3836,7 +3836,7 @@ want to record in any situation.
 
 <sect2>Priority
 <p>By default, all shows you select are have equal value to the
-scheduler.  There are a set of rules to to make good choices when
+scheduler.  There are a set of rules to make good choices when
 two or more shows are in conflict. However, priority values let the
 scheduler know what you want so that it can set the schedule based
 on your preferences.
@@ -4559,7 +4559,7 @@ of the selection tree and hit the "i" key. This will pop up a menu allowing
 you to name and save the new playlist.  You can also hit Enter to bring up
 the popup on the Active Play Queue. This does not work on the playlists
 above, as Enter is obviously bound to checking/unchecking the boxes. Any
-number (ie. keypad on remote) will also bring up the menu in both cases.
+number (i.e. keypad on remote) will also bring up the menu in both cases.
 
 Q: How do I enter the playlist name in the text field without a keyboard?
 A: Use the keypad number keys (bound to your remote) to select letters
@@ -4955,8 +4955,8 @@ Edit your <tt>/etc/X11/XF86Config-4</tt> or <tt>/etc/X11/xorg.conf</tt>
 file, and look for:
 <tscreen><verb>
 Section "ServerFlags"
-    #DontZap # disable <Crtl><Alt><BS> (server abort)
-    #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+    #DontZap # disable <Ctrl><Alt><BS> (server abort)
+    #DontZoom # disable <Ctrl><Alt><KP_+>/<KP_-> (resolution switching)
     AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
 
     Option "blank time" "0"
@@ -5084,7 +5084,7 @@ reboot your setting will be preserved.
 
 <sect2>Frontend appears to be slow at jumping / seeking.
 <sect2>On-screen Display shows incorrect program length.
-<p>This may occur when MythTV doesn't have an accurate seektable.  Run
+<p>This may occur when MythTV doesn't have an accurate seek table.  Run
 <bf>mythcommflag --rebuild</bf>
 
 <sect2>Troubleshooting audio <label id="Troubleshooting_Audio">
@@ -5223,7 +5223,7 @@ name="http://www.mythtv.org/pipermail/mythtv-users/2003-April/002527.html">
 <p>There is no such thing as "Canada Cable"; Canada uses the same
 frequencies as the United States.  "Canada Cable" was a hack that some
 people used when they would discover that their channels were off-by-one,
-ie, when tuning to channel 42, they might get channel 41 or 43.  This is
+i.e. when tuning to channel 42, they might get channel 41 or 43.  This is
 actually due to the tuner on the video capture device being mis-detected. 
 You must manually specify the tuner type in your <tt>/etc/modules.conf</tt>. 
 See the video4linux mailing list (<url
@@ -6092,7 +6092,7 @@ The software packages you will want are:
 <item>mjpegtools
 <item>avidemux2
 <item>transcode - not necessary for this, but useful for working with video
-<item>k3b - a gui for burning DVD's and CD's.  Not necessary, but useful.
+<item>k3b - a GUI for burning DVD's and CD's.  Not necessary, but useful.
 </itemize>
 
 1. Find the file you want.
@@ -6257,7 +6257,7 @@ as <tt>menu1.png</tt>.
 
 <p> To create the DVD menu, an XML file is used.  An example
 <tt>menu.xml</tt> file is shown below.  The autoorder line is used to decide
-what takes precident for ordering.  If your buttons are ordered primarily by
+what takes precedent for ordering.  If your buttons are ordered primarily by
 rows, then select "rows".  If your ordering is by column, then choose
 "columns".
 
@@ -6553,7 +6553,7 @@ These instructions work for Mandrake 9.1 on a backend machine which is
 hosting a single PVR-250 capture card.
 
 Install the Mandrake kernel source.  If you are using a different Mandrake
-kernel level (ie, not 2.4.21-0.16mdk as in the example below, then alter the
+kernel level (i.e. not 2.4.21-0.16mdk as in the example below, then alter the
 <bf>urpmi</bf> command appropriately.)
 <tscreen><verb>
 $ uname -a
@@ -7235,8 +7235,8 @@ bearing on the performance of MythTV.  In Linux, deleting a file will
 utilize I/O bandwidth until the deletion has been completed.  If deleting
 the file takes long enough, the video capture buffer may overrun, thereby
 resulting in dropped frames.  Some filesystems are faster at deleting files
-than others and, for multi-gigbyte MythTV video files, these differences can
-be significant.
+than others and, for multi-gigabyte MythTV video files, these differences
+can be significant.
 
 Fortunately, there are published tests (<url
 url="http://aurora.zemris.fer.hr/filesystems/big.html"
@@ -7408,7 +7408,7 @@ DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
 </verb></tscreen>
 
 If you are using 8VSB (Over-the-Air HDTV), run the <bf>azap</bf> program. 
-Replace ZIPCODE with your zipcode.  The perl script will connect to <url
+Replace ZIPCODE with your zip code.  The perl script will connect to <url
 url="http://www.antennaweb.org" name="http://www.antennaweb.org"> to obtain
 your HDTV channels.
 <tscreen><verb>
