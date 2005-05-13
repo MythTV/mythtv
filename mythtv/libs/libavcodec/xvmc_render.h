@@ -12,7 +12,7 @@ extern "C" {
 #include <X11/extensions/Xvlib.h>
 #include <X11/extensions/XvMClib.h>
 
-#ifdef USING_XVMC_VLD
+#ifdef HAVE_XVMC_VLD
 #include <stdint.h>
 #include <X11/extensions/vldXvMC.h>
 #endif

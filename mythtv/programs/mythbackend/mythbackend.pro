@@ -35,3 +35,5 @@ HEADERS += playbacksock.h scheduler.h server.h housekeeper.h
 SOURCES += autoexpire.cpp encoderlink.cpp filetransfer.cpp httpstatus.cpp
 SOURCES += main.cpp mainserver.cpp playbacksock.cpp scheduler.cpp server.cpp
 SOURCES += housekeeper.cpp
+
+using_dvb:DEFINES += USING_DVB

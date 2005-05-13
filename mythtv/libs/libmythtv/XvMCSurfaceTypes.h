@@ -11,7 +11,7 @@
 
 #include "../libavcodec/xvmc_render.h"
 
-#ifndef USING_XVMC_VLD
+#ifndef XVMC_VLD
 #define XVMC_VLD 0x0020000
 #endif
 

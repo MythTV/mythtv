@@ -101,7 +101,10 @@ macx {
 }
 
 using_x11 {
+    using_xvmc:DEFINES += USING_XVMC
     using_xvmcw:DEFINES += USING_XVMCW
+    using_xvmc_vld:DEFINES += USING_XVMC_VLD
+
     using_xv {
         SOURCES += videoout_xv.cpp XvMCSurfaceTypes.cpp osdxvmc.cpp
         HEADERS += videoout_xv.h XvMCSurfaceTypes.h osdxvmc.h
@@ -110,11 +113,15 @@ using_x11 {
 }
 
 using_ivtv {
+    DEFINES += USING_IVTV
     SOURCES += mpegrecorder.cpp ivtvdecoder.cpp videoout_ivtv.cpp
     HEADERS += mpegrecorder.h ivtvdecoder.h videoout_ivtv.h
 }
+using_ivtv_header:DEFINES += USING_IVTV_HEADER
 
 using_dvb {
+    DEFINES += USING_DVB
+    using_dvb_eit:DEFINES += USING_DVB_EIT
     SOURCES += dvbrecorder.cpp dvbchannel.cpp dvbdiseqc.cpp dvbcam.cpp
     SOURCES += dvbtransporteditor.cpp dvbsiparser.cpp siparser.cpp siscan.cpp
     SOURCES += scanwizard.cpp dvbsignalmonitor.cpp sitypes.cpp
@@ -129,6 +136,7 @@ using_dvb {
 }
 
 using_firewire {
+    DEFINES += USING_FIREWIRE
     SOURCES += firewirerecorder.cpp firewirechannel.cpp
     HEADERS += firewirerecorder.h firewirechannel.h
 }

@@ -146,6 +146,7 @@ using_x11 {
 }
 
 using_xrandr {
+    DEFINES += USING_XRANDR
     HEADERS += DisplayResX.h
     SOURCES += DisplayResX.cpp
 }

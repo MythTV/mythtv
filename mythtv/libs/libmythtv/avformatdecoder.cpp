@@ -275,6 +275,8 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
     for (int i = ic->nb_streams - 1; i >= 0; i--)
     {
         AVStream *st = ic->streams[i];
+    /// NOTE: As of the 12th of May, 2005 VLD is defined whenever libXVMCW
+    ///       exits, so the following hack will no longer work.
 #ifdef USING_XVMC_VLD
         if (st->codec.codec_type == CODEC_TYPE_AUDIO)
 #endif

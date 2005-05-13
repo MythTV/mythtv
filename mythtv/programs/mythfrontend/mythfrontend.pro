@@ -52,3 +52,7 @@ SOURCES += customrecord.cpp
 macx {
     RC_FILE += mythfrontend.icns
 }
+
+using_xvmc:DEFINES += USING_XVMC
+using_xvmc_vld:DEFINES += USING_XVMC_VLD
+using_xrandr:DEFINES += USING_XRANDR

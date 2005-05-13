@@ -49,7 +49,7 @@ x11="yes"
 xrandr="yes"
 xv="yes"
 xvmc="no"
-xvmc_vld="no"
+xvmc_vld="yes"
 opengl_vsync="no"
 direct_fb="no"
 direct_x="no"
@@ -153,7 +153,7 @@ echo "  --disable-x11            disable X11 support"
 echo "  --disable-xrandr         disable X11 resolution switching"
 echo "  --disable-xv             disable XVideo   (X11 video output accel.)"
 echo "  --enable-xvmc            enable XvMC      (Linux/BSD MPEG accel.)"
-echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
+#echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
 echo "  --enable-opengl-vsync    enable OpenGL vsync method"
 echo "  --enable-directfb        enable DirectFB  (Linux non-X11 video)"
 echo "  --enable-directx         enable DirectX   (Microsoft video)"
@@ -1695,33 +1695,27 @@ VENDOR_XVMC_LIBS=""
 if test x"$xvmc" = x"yes"; then
     xvmc="no"
     if has_library libXvMCW ; then
+        CCONFIG="$CCONFIG using_xvmcw"
         VENDOR_XVMC_LIBS="-lXvMCW"
+        xvmc="yes"
+    elif has_library libviaXvMC ; then
+        VENDOR_XVMC_LIBS="-lviaXvMC"
         xvmc="yes"
     elif has_library libXvMCNVIDIA ; then
         VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
         xvmc="yes"
+        if test x"$xvmc_vld" = x"yes"; then
+            xvmc_vld="no"
+        fi
     elif has_library libI810XvMC ; then
         VENDOR_XVMC_LIBS="-lI810XvMC"
         xvmc="yes"
+        if test x"$xvmc_vld" = x"yes"; then
+            xvmc_vld="no"
+        fi
     fi
-fi
-
-if has_library libviaXvMC ; then
-    echo > /dev/null
 else
     xvmc_vld="no"
-fi
-if test x"$xvmc_vld" = x"yes" ; then
-    if has_library libXvMCW ; then
-        VENDOR_XVMC_LIBS="-lXvMCW"
-    else
-        VENDOR_XVMC_LIBS="-lviaXvMC"
-    fi
-    xvmc="yes"
-fi
-
-if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCW" ; then
-    CCONFIG="$CCONFIG using_xvmcw"
 fi
 
 if test x"$opengl_vsync" = x"yes" ; then
@@ -2290,16 +2284,14 @@ fi
 
 if test x"$ivtv" = x"yes" ; then
   CCONFIG="$CCONFIG using_ivtv"
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_IVTV"
 fi
 
 if test x"$ivtv_header" = x"yes" ; then
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_IVTV_HEADER"
+  CCONFIG="$CCONFIG using_ivtv_header"
 fi
 
 if test x"$firewire_cable_box" = x"yes" ; then
   CCONFIG="$CCONFIG using_firewire"
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_FIREWIRE"
   echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394" >> $MYTH_CONFIG_MAK
 fi
 
@@ -2314,12 +2306,11 @@ fi
 
 if test x"$dvb" = x"yes" ; then
   CCONFIG="$CCONFIG using_dvb"
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_DVB"
   CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH $dvb_path"
 fi
 
 if test x"$dvb_eit" = x"yes" ; then
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_DVB_EIT"
+  CCONFIG="$CCONFIG using_dvb_eit"
 fi
 
 if test x"$x11" = x"yes" ; then
@@ -2333,17 +2324,14 @@ fi
 
 if test x"$xrandr" = x"yes" ; then
   CCONFIG="$CCONFIG using_xrandr"
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_XRANDR"
 fi
 
 if test x"$xvmc" = x"yes" ; then
   CCONFIG="$CCONFIG using_xvmc"
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_XVMC"
 fi
 
 if test x"$xvmc_vld" = x"yes" ; then
   CCONFIG="$CCONFIG using_xvmc_vld"
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_XVMC_VLD"
 fi
 
 if test x"$VENDOR_XVMC_LIBS" != x"" ; then
