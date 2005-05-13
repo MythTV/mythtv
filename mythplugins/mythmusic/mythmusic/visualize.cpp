@@ -9,9 +9,9 @@
         music visualizers
 */
 
+#include <cmath>
 #include "mainvisual.h"
 #include "visualize.h"
-#include "math.h"
 #include "inlines.h"
 #include "decoder.h"
 
@@ -25,7 +25,16 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 
+#define FFTW_N 512
+extern "C" {
+void *av_malloc(unsigned int size);
+void av_free(void *ptr);
+}
+
 Spectrum::Spectrum()
+#if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
+    : lin(NULL), rin(NULL), lout(NULL), rout(NULL)
+#endif
 {
     // Setup the "magical" audio data transformations
     // provided by the Fast Fourier Transforms library
@@ -34,16 +43,45 @@ Spectrum::Spectrum()
     falloff = 3.0;
     fps = 20;
         
-#ifdef FFTW_SUPPORT
-    plan =  rfftw_create_plan(512, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
-#endif
+#ifdef FFTW3_SUPPORT
+    lin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
+    rin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
+    lout = (myth_fftw_complex*)
+        av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
+    rout = (myth_fftw_complex*)
+        av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
+
+    lplan = fftw_plan_dft_r2c_1d(FFTW_N, lin, (myth_fftw_complex_cast*)lout, FFTW_MEASURE);
+    rplan = fftw_plan_dft_r2c_1d(FFTW_N, rin, (myth_fftw_complex_cast*)rout, FFTW_MEASURE);
+#elif FFTW2_SUPPORT
+    lin = av_malloc(sizeof(fftw_real)*FFTW_N);
+    rin = av_malloc(sizeof(fftw_real)*FFTW_N);
+    lout = av_malloc(sizeof(fftw_real)*FFTW_N*2);
+    rout = av_malloc(sizeof(fftw_real)*FFTW_N*2);
+
+    plan = rfftw_create_plan(FFTW_N, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
+#endif // FFTW2_SUPPORT
+
     startColor = QColor(0,0,255);
     targetColor = QColor(255,0,0); 
 }
 
 Spectrum::~Spectrum()
 {
-#ifdef FFTW_SUPPORT
+#if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
+    if (lin)
+        av_free(lin);
+    if (rin)
+        av_free(rin);
+    if (lout)
+        av_free(lout);
+    if (rout)
+        av_free(rout);
+#endif
+#ifdef FFTW3_SUPPORT
+    fftw_destroy_plan(lplan);
+    fftw_destroy_plan(rplan);
+#elif FFTW2_SUPPORT
     rfftw_destroy_plan(plan);
 #endif
 }
@@ -74,9 +112,10 @@ void Spectrum::resize(const QSize &newsize)
         magnitudes[os] = 0.0;
     }
 
-    scaleFactor = double( size.height() / 2 ) / log( 512.0 );
+    scaleFactor = double( size.height() / 2 ) / log( (double)(FFTW_N) );
 }
 
+template<typename T> T sq(T a) { return a*a; };
 
 bool Spectrum::process(VisualNode *node)
 {
@@ -84,7 +123,8 @@ bool Spectrum::process(VisualNode *node)
     // and break it down into spectrum
     // values
     bool allZero = TRUE;
-#ifdef FFTW_SUPPORT        // Don't do any real processing if libfftw isn't available
+    // Don't do any real processing if libfftw isn't available
+#if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
     uint i;
     long w = 0, index;
     QRect *rectsp = rects.data();
@@ -101,20 +141,30 @@ bool Spectrum::process(VisualNode *node)
     else
         i = 0;
 
-    fast_reals_set(lin + i, rin + i, 0, 512 - i);
+    fast_reals_set(lin + i, rin + i, 0, FFTW_N - i);
 
+#ifdef FFTW3_SUPPORT
+    fftw_execute(lplan);
+    fftw_execute(rplan);
+#elif FFTW2_SUPPORT
     rfftw_one(plan, lin, lout);
     rfftw_one(plan, rin, rout);
+#endif
 
     index = 1;
     for (i = 0; i < rects.count(); i++, w += analyzerBarWidth)
-    {
-        magL = (log(lout[index] * lout[index] + 
-                    lout[512 - index] * lout[512 - index]) - 22.0) * 
+    {        
+#ifdef FFTW3_SUPPORT
+        magL = (log(sq(real(lout[index])) + sq(real(lout[FFTW_N - index]))) - 22.0) * 
                scaleFactor;
-        magR = (log(rout[index] * rout[index] + 
-                    rout[512 - index] * rout[512 - index]) - 22.0) * 
+        magR = (log(sq(real(rout[index])) + sq(real(rout[FFTW_N - index]))) - 22.0) * 
                scaleFactor;
+#elif FFTW2_SUPPORT
+        magL = (log(sq(lout[index]) + sq(lout[FFTW_N - index])) - 22.0) * 
+               scaleFactor;
+        magR = (log(sq(rout[index]) + sq(rout[FFTW_N - index])) - 22.0) * 
+               scaleFactor;
+#endif
 
         if (magL > size.height() / 2)
         {
@@ -188,7 +238,7 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     // just uses some Qt methods to draw on a pixmap.
     // MainVisual then bitblts that onto the screen.
 
-#ifdef FFTW_SUPPORT
+#if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
     QRect *rectsp = rects.data();
     double r, g, b, per;
 
@@ -546,9 +596,26 @@ Gears::Gears(QWidget *parent, const char *name)
     angle = 0.0;
     view_roty = 30.0;
 
-#ifdef FFTW_SUPPORT
-    plan =  rfftw_create_plan(512, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
-#endif
+#ifdef FFTW3_SUPPORT
+    lin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
+    rin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
+    lout = (myth_fftw_complex*)
+        av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
+    rout = (myth_fftw_complex*)
+        av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
+
+    lplan = fftw_plan_dft_r2c_1d(FFTW_N, lin, (myth_fftw_complex_cast*) lout, FFTW_MEASURE);
+    rplan = fftw_plan_dft_r2c_1d(FFTW_N, rin, (myth_fftw_complex_cast*) rout, FFTW_MEASURE);
+#elif FFTW2_SUPPORT
+    lin = av_malloc(sizeof(fftw_real)*FFTW_N);
+    rin = av_malloc(sizeof(fftw_real)*FFTW_N);
+    lout = av_malloc(sizeof(fftw_real)*FFTW_N*2);
+    rout = av_malloc(sizeof(fftw_real)*FFTW_N*2);
+
+    plan = rfftw_create_plan(FFTW_N, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
+#endif // FFTW2_SUPPORT
+
+
     startColor = QColor(0,0,255);
     targetColor = QColor(255,0,0); 
 
@@ -557,7 +624,20 @@ Gears::Gears(QWidget *parent, const char *name)
 
 Gears::~Gears()
 {
-#ifdef FFTW_SUPPORT
+#if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
+    if (lin)
+        av_free(lin);
+    if (rin)
+        av_free(rin);
+    if (lout)
+        av_free(lout);
+    if (rout)
+        av_free(rout);
+#endif
+#ifdef FFTW3_SUPPORT
+    fftw_destroy_plan(lplan);
+    fftw_destroy_plan(rplan);
+#elif FFTW2_SUPPORT
     rfftw_destroy_plan(plan);
 #endif
 }
@@ -582,7 +662,7 @@ void Gears::resize(const QSize &newsize)
         magnitudes[os] = 0.0;
     }
 
-    scaleFactor = double( size.height() / 2 ) / log( 512.0 );
+    scaleFactor = double( size.height() / 2 ) / log( (double)FFTW_N );
     //resizeGL(newsize.width(), newsize.height());
     setGeometry(0, 0, newsize.width(), newsize.height());
 }
@@ -591,7 +671,7 @@ void Gears::resize(const QSize &newsize)
 bool Gears::process(VisualNode *node)
 {
     bool allZero = TRUE;
-#ifdef FFTW_SUPPORT
+#if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
     uint i;
     long w = 0, index;
     QRect *rectsp = rects.data();
@@ -612,16 +692,26 @@ bool Gears::process(VisualNode *node)
         i = 0;
     }
 
-    fast_reals_set(lin + i, rin + i, 0, 512 - i);
-
+    fast_reals_set(lin + i, rin + i, 0, FFTW_N - i);
+#ifdef FFTW3_SUPPORT
+    fftw_execute(lplan);
+    fftw_execute(rplan);
+#elif FFTW2_SUPPORT
     rfftw_one(plan, lin, lout);
     rfftw_one(plan, rin, rout);
-
+#endif
     index = 1;
     for (i = 0; i < rects.count(); i++, w += analyzerBarWidth)
     {
-        magL = (log(lout[index] * lout[index] + lout[512 - index] * lout[512 - index]) - 22.0) * scaleFactor;
-        magR = (log(rout[index] * rout[index] + rout[512 - index] * rout[512 - index]) - 22.0) * scaleFactor;
+#ifdef FFTW3_SUPPORT
+        magL = (log(sq(real(lout[index])) + sq(real(lout[FFTW_N - index]))) - 22.0) * 
+               scaleFactor;
+        magR = (log(sq(real(rout[index])) + sq(real(rout[FFTW_N - index]))) - 22.0) * 
+               scaleFactor;
+#elif FFTW2_SUPPORT
+        magL = (log(lout[index] * lout[index] + lout[FFTW_N - index] * lout[FFTW_N - index]) - 22.0) * scaleFactor;
+        magR = (log(rout[index] * rout[index] + rout[FFTW_N - index] * rout[FFTW_N - index]) - 22.0) * scaleFactor;
+#endif
 
         if (magL > size.height() / 2)
         {        

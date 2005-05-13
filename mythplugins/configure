@@ -21,7 +21,7 @@ browser="yes"
 
 opengl="default"
 fftw_lib="default"
-fftw_lib3="no "   # not yet supported in MythMusic
+fftw_lib3="default"
 sdl="default"
 aac="no"          # compile fails w/libfaad v2.0
 transcode="no"    # need to check for more stuff?
@@ -516,16 +516,16 @@ if test "$music" = "yes" ; then
 
     if test "$fftw_lib3" = "yes" ; then
         echo "        FFTW v.3      support will be included in MythMusic"
-        echo "#define FFTW_SUPPORT3 1" >> ./mythmusic/mythmusic/config.h
-        echo "LIBS += -lfftw3f_threads -lfftw3_threads" >> \
+        echo "#define FFTW3_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
+        echo "LIBS += -lfftw3 -lm" >> \
              ./mythmusic/mythmusic/config.pro
     elif test "$fftw_lib" = "yes" ; then
-        echo "        FFTW          support will be included in MythMusic"
-        echo "#define FFTW_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
+        echo "        FFTW v.2      support will be included in MythMusic"
+        echo "#define FFTW2_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
         echo "LIBS += -lrfftw -lfftw" >> ./mythmusic/mythmusic/config.pro
     fi
 
-    if test "$fftw_lib" = "no" ; then
+    if test "$fftw_lib" = "no" -a "$fftw_lib3" = "no" ; then
         echo "        FFTW          support will not be included in MythMusic"
     fi
 

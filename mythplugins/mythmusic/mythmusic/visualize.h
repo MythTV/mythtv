@@ -17,10 +17,25 @@
 #include "constants.h"
 #include "config.h"
 
-#ifdef	FFTW_SUPPORT
+#include <complex>
+extern "C" {
+#ifdef FFTW3_SUPPORT
+#include <fftw3.h>
+#define myth_fftw_float double /* need to use different plan function to change */
+#define fftw_real myth_fftw_float
+#define myth_fftw_complex std::complex<myth_fftw_float>
+#if (myth_fftw_float == double)
+#define myth_fftw_complex_cast fftw_complex
+#elif (myth_fftw_float == float)
+#define myth_fftw_complex_cast fftwf_complex
+#elif (myth_fftw_float == long double)
+#define myth_fftw_complex_cast fftwl_complex
+#endif
+#elif	FFTW2_SUPPORT
 #include <rfftw.h>
 #include <fftw.h>
 #endif		
+}
 
 #ifdef OPENGL_SUPPORT
 #include <qgl.h>
@@ -51,9 +66,13 @@ class Spectrum : public VisualBase
     double scaleFactor, falloff;
     int analyzerBarWidth;
 
-#ifdef FFTW_SUPPORT
+#ifdef FFTW3_SUPPORT
+    fftw_plan lplan, rplan;
+    myth_fftw_float *lin, *rin;
+    myth_fftw_complex *lout, *rout;
+#elif FFTW2_SUPPORT
     rfftw_plan plan;
-    fftw_real lin[512], rin[512], lout[1024], rout[1024];
+    fftw_real *lin, *rin, *lout, *rout;
 #endif
 };
 
@@ -143,9 +162,13 @@ class Gears : public QGLWidget, public VisualBase
     int analyzerBarWidth;
     GLfloat angle, view_roty;
 
-#ifdef FFTW_SUPPORT
+#ifdef FFTW3_SUPPORT
+    fftw_plan lplan, rplan;
+    myth_fftw_float *lin, *rin;
+    myth_fftw_complex *lout, *rout;
+#elif FFTW2_SUPPORT
     rfftw_plan plan;
-    fftw_real lin[512], rin[512], lout[1024], rout[1024];
+    fftw_real *lin, *rin, *lout, *rout;
 #endif
 };
 
