@@ -211,21 +211,37 @@ screen.</P>
 
 <H3>Input Connections</H3>
 
-<P>The final configuration item is Input Connections.  On this screen, you will
-associate the various video sources you defined earlier with a physical
+<P>The final configuration item is Input Connections.  On this screen, you
+will associate the various video sources you defined earlier with a physical
 input to a encoder card.  It's entirely possible that you have multiple
 tuners, and each tuner has a different input, so on this screen you let
 MythTV know which device will connect to which input source.</P>
 <P>When you start this screen, you should see a listing of the various input
 connections available on each of the Capture cards you defined earlier.  For
 example, you may have a capture card with a tuner, a SVideo and a Composite
-connection.  If you wanted to associate the tuner (a.k.a., "Television") with
-an "Antenna" source you defined in Video Sources, you would move to the
-/dev/videodevice (Television) -> line and press the space bar.  Using the
-left and right arrow keys will show you the various choices you have already
-created for video source.  In our case, you would use the left/right cursor
-keys until "Antenna" was shown in the Video Source field.  Press down to
-move to the next setting, all of which should be self-explanatory.</P>
+connection.  If you wanted to associate the tuner (a.k.a., "Television")
+with an "Antenna" source you defined in Video Sources, you would move to the
+<CODE>/dev/videodevice (Television) -> </CODE> line and press the space bar. 
+Using the left and right arrow keys will show you the various choices you
+have already created for video source.  In our case, you would use the
+left/right cursor keys until "Antenna" was shown in the Video Source field. 
+Press down to move to the next setting, all of which should be
+self-explanatory.</P>
+<P>If you have multiple input connection types (Such as Tuner 0 and Tuner 1),
+it's very, very likely that it is the lowest numbered input that is actually
+available on the device.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  If you have a Hauppauge PVR-500, you must think of
+it has two PVR-150's on a single PCI card.  For example, if you have a
+single PVR-500 card, it will appear as <CODE>/dev/video0</CODE> and
+<CODE>/dev/video1</CODE>.  Each <CODE>/dev/video</CODE> device will have a Tuner 0
+and Tuner 1 input, so you would choose Tuner 0 for <B>both</B> devices.</CAPTION>
+</FIGURE>
+</P>
+
 <P>Once you're done, press RETURN to go back to the Input Connections screen. 
 You would then finish associating the video sources to any other hardware
 devices you have available.</P>

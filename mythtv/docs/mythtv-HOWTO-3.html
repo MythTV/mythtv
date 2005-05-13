@@ -32,9 +32,8 @@ guidance but stop short of offering specific recommendations.</P>
 hardware more than a typical desktop. Encoder cards generate DMA across the
 PCI bus.  The CPU is busy encoding / decoding video. Hard drives are
 constantly reading and writing data. Building a MythTV system on older /
-"spare" hardware may be an exercise in frustration.  Using hardware that is
-marginal for the intended application will cause many, many hours of
-frustration!</P>
+"spare" hardware may be an exercise in frustration and can waste many hours
+of valuable time.</P>
 <P>For more detail about actual configurations that others have used, Mark
 Cooper has setup a hardware database at 
 <A HREF="http://pvrhw.goldfish.org/">http://pvrhw.goldfish.org/</A>. The
@@ -88,9 +87,10 @@ simultaneously serve content to a remote frontend.</LI>
 </UL>
 </P>
 <P>The second mode of operation is where MythTV is paired with a hardware-based
-video encoder, such as a Matrox G200 or a Hauppauge WinTV-PVR-250/350.  In
-this mode, because the video encoding is being done by a dedicated video
-processor, the host CPU requirements are quite low.  See the 
+video encoder, such as a Matrox G200 or a Hauppauge
+WinTV-PVR-150/250/350/500.  In this mode, because the video encoding is
+being done by a dedicated video processor, the host CPU requirements are
+quite low.  See the 
 <A HREF="#video_capture_device">Video Capture Device</A> section for details.</P>
 <P>If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use the
 hardware-based video decoder for playback, which further reduces CPU
@@ -107,8 +107,8 @@ may be useful if you are running multiple encoders.</P>
 
 <P>Encoded video takes up a lot of hard disk space. The exact amount depends
 on the encoding scheme, the size of the raw images, and the frames per
-second, but typical values for MythTV range from 700 megabytes/hour to 2
-gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTjpeg.</P>
+second, but typical values for MythTV range from 700 megabytes/hour for
+MPEG-4, 2 GB/hour for MPEG-2 and RTjpeg and 7 GB/hour for ATSC HDTV.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
@@ -208,11 +208,12 @@ the bttv modules by typing:
 encoding to software, some higher-end cards incorporate hardware-based
 encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project 
-<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge PVR-250, PVR-350,
-Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. (The PVR-350 can
-simultaneously be used as an output device.) Using the on-board MPEG-2
-encoder drastically reduces the CPU requirements for encoding.</P>
+<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge
+PVR-150/250/350/500, Avermedia M179, Hauppauge "Freestyle" or Yuan M600
+cards will allow you to use dedicated hardware encoders rather than your
+CPU. (The PVR-350 can simultaneously be used as an output device.) Using the
+on-board MPEG-2 encoder drastically reduces the CPU requirements for
+encoding.</P>
 <P><B>NOTE</B>:  Motherboards with the Via chipset are notoriously bad with
 DMA and have caused numerous issues with ivtv, including hard locks.  See
 the ivtv website (url url="http://ivtv.sf.net" name="http://ivtv.sf.net")
@@ -271,7 +272,7 @@ sufficient.</P>
 <P>For 1920x1080i->1920x1080p with the better deinterlacing methods
 done in real time a 2.4GHz CPU is taxed, but should work if you use "Bob and
 Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
-accelleration.  If you enable the hardware accelleration, you may be able to
+acceleration.  If you enable the hardware acceleration, you may be able to
 use a 1.8GHz processor.</P>
 
 <H3>Firewire.</H3>
@@ -284,8 +285,6 @@ use a 1.8GHz processor.</P>
 available from 
 <A HREF="http://www.plextor.com/english/support/LinuxSDK.htm">http://www.plextor.com/english/support/LinuxSDK.htm</A>. MythTV uses the
 Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low.</P>
-<P><B>NOTE</B>: MythTV support for the Plextor devices is in CVS as of
-2005-03-19.</P>
 
 <H3>Hardware known NOT to work and other issues</H3>
 

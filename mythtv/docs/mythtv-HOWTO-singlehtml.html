@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-05-05, v0.18.02
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-05-, v0.18.03
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -435,9 +435,8 @@ guidance but stop short of offering specific recommendations.</P>
 hardware more than a typical desktop. Encoder cards generate DMA across the
 PCI bus.  The CPU is busy encoding / decoding video. Hard drives are
 constantly reading and writing data. Building a MythTV system on older /
-"spare" hardware may be an exercise in frustration.  Using hardware that is
-marginal for the intended application will cause many, many hours of
-frustration!</P>
+"spare" hardware may be an exercise in frustration and can waste many hours
+of valuable time.</P>
 <P>For more detail about actual configurations that others have used, Mark
 Cooper has setup a hardware database at 
 <A HREF="http://pvrhw.goldfish.org/">http://pvrhw.goldfish.org/</A>. The
@@ -491,9 +490,10 @@ simultaneously serve content to a remote frontend.</LI>
 </UL>
 </P>
 <P>The second mode of operation is where MythTV is paired with a hardware-based
-video encoder, such as a Matrox G200 or a Hauppauge WinTV-PVR-250/350.  In
-this mode, because the video encoding is being done by a dedicated video
-processor, the host CPU requirements are quite low.  See the 
+video encoder, such as a Matrox G200 or a Hauppauge
+WinTV-PVR-150/250/350/500.  In this mode, because the video encoding is
+being done by a dedicated video processor, the host CPU requirements are
+quite low.  See the 
 <A HREF="#video_capture_device">Video Capture Device</A> section for details.</P>
 <P>If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use the
 hardware-based video decoder for playback, which further reduces CPU
@@ -510,8 +510,8 @@ may be useful if you are running multiple encoders.</P>
 
 <P>Encoded video takes up a lot of hard disk space. The exact amount depends
 on the encoding scheme, the size of the raw images, and the frames per
-second, but typical values for MythTV range from 700 megabytes/hour to 2
-gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTjpeg.</P>
+second, but typical values for MythTV range from 700 megabytes/hour for
+MPEG-4, 2 GB/hour for MPEG-2 and RTjpeg and 7 GB/hour for ATSC HDTV.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
@@ -611,11 +611,12 @@ the bttv modules by typing:
 encoding to software, some higher-end cards incorporate hardware-based
 encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project 
-<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge PVR-250, PVR-350,
-Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. (The PVR-350 can
-simultaneously be used as an output device.) Using the on-board MPEG-2
-encoder drastically reduces the CPU requirements for encoding.</P>
+<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge
+PVR-150/250/350/500, Avermedia M179, Hauppauge "Freestyle" or Yuan M600
+cards will allow you to use dedicated hardware encoders rather than your
+CPU. (The PVR-350 can simultaneously be used as an output device.) Using the
+on-board MPEG-2 encoder drastically reduces the CPU requirements for
+encoding.</P>
 <P><B>NOTE</B>:  Motherboards with the Via chipset are notoriously bad with
 DMA and have caused numerous issues with ivtv, including hard locks.  See
 the ivtv website (url url="http://ivtv.sf.net" name="http://ivtv.sf.net")
@@ -674,7 +675,7 @@ sufficient.</P>
 <P>For 1920x1080i->1920x1080p with the better deinterlacing methods
 done in real time a 2.4GHz CPU is taxed, but should work if you use "Bob and
 Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
-accelleration.  If you enable the hardware accelleration, you may be able to
+acceleration.  If you enable the hardware acceleration, you may be able to
 use a 1.8GHz processor.</P>
 
 <H3>Firewire.</H3>
@@ -687,8 +688,6 @@ use a 1.8GHz processor.</P>
 available from 
 <A HREF="http://www.plextor.com/english/support/LinuxSDK.htm">http://www.plextor.com/english/support/LinuxSDK.htm</A>. MythTV uses the
 Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low.</P>
-<P><B>NOTE</B>: MythTV support for the Plextor devices is in CVS as of
-2005-03-19.</P>
 
 <H3>Hardware known NOT to work and other issues</H3>
 
@@ -1519,6 +1518,21 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 
 The other MythTV modules may be downloaded from CVS the same way; replace
 "mythtv" with "myththemes" or "mythplugins".</P>
+<P>MythTV also maintains a CVS branch that incorporates bugfixes for issues
+discovered after a release has been packaged into a tarball.</P>
+<P>If you would like to use code from this release branch, you would execute the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
+Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
+CVS password: mythtv
+
+$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs co -r release-0-18-fixes mythtv
+
+$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs co -r release-0-18-fixes mythplugins
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>If you wish to stay up-to-date with CVS, go into the MythTV subdirectory and type:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -2950,21 +2964,37 @@ screen.</P>
 
 <H3>Input Connections</H3>
 
-<P>The final configuration item is Input Connections.  On this screen, you will
-associate the various video sources you defined earlier with a physical
+<P>The final configuration item is Input Connections.  On this screen, you
+will associate the various video sources you defined earlier with a physical
 input to a encoder card.  It's entirely possible that you have multiple
 tuners, and each tuner has a different input, so on this screen you let
 MythTV know which device will connect to which input source.</P>
 <P>When you start this screen, you should see a listing of the various input
 connections available on each of the Capture cards you defined earlier.  For
 example, you may have a capture card with a tuner, a SVideo and a Composite
-connection.  If you wanted to associate the tuner (a.k.a., "Television") with
-an "Antenna" source you defined in Video Sources, you would move to the
-/dev/videodevice (Television) -> line and press the space bar.  Using the
-left and right arrow keys will show you the various choices you have already
-created for video source.  In our case, you would use the left/right cursor
-keys until "Antenna" was shown in the Video Source field.  Press down to
-move to the next setting, all of which should be self-explanatory.</P>
+connection.  If you wanted to associate the tuner (a.k.a., "Television")
+with an "Antenna" source you defined in Video Sources, you would move to the
+<CODE>/dev/videodevice (Television) -> </CODE> line and press the space bar. 
+Using the left and right arrow keys will show you the various choices you
+have already created for video source.  In our case, you would use the
+left/right cursor keys until "Antenna" was shown in the Video Source field. 
+Press down to move to the next setting, all of which should be
+self-explanatory.</P>
+<P>If you have multiple input connection types (Such as Tuner 0 and Tuner 1),
+it's very, very likely that it is the lowest numbered input that is actually
+available on the device.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  If you have a Hauppauge PVR-500, you must think of
+it has two PVR-150's on a single PCI card.  For example, if you have a
+single PVR-500 card, it will appear as <CODE>/dev/video0</CODE> and
+<CODE>/dev/video1</CODE>.  Each <CODE>/dev/video</CODE> device will have a Tuner 0
+and Tuner 1 input, so you would choose Tuner 0 for <B>both</B> devices.</CAPTION>
+</FIGURE>
+</P>
+
 <P>Once you're done, press RETURN to go back to the Input Connections screen. 
 You would then finish associating the video sources to any other hardware
 devices you have available.</P>
@@ -8042,7 +8072,7 @@ $
 </CODE></BLOCKQUOTE>
 
 <B>NOTE</B>: if you have anything in the unc column ("uncorrectable
-errors") you will probably have problems with HDTV.  Check you antenna,
+errors") you will probably have problems with HDTV.  Check your antenna,
 cables, etc.</P>
 <P>Once you have confirmed that your card is able to lock onto a HDTV signal it
 is time to configure MythTV. Start the setup program, and in the Capture

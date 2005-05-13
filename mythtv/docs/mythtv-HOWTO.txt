@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-05-05, v0.18.02
+  2005-05-, v0.18.03
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -549,8 +549,7 @@
   generate DMA across the PCI bus.  The CPU is busy encoding / decoding
   video. Hard drives are constantly reading and writing data. Building a
   MythTV system on older / "spare" hardware may be an exercise in
-  frustration.  Using hardware that is marginal for the intended
-  application will cause many, many hours of frustration!
+  frustration and can waste many hours of valuable time.
 
   For more detail about actual configurations that others have used,
   Mark Cooper has setup a hardware database at
@@ -596,6 +595,7 @@
   guideline, plan on 1GHz per encoder if you are doing software-based
   encoding, less if you are using a hardware-based encoder.
 
+
   Here are a few data points:
 
   +o  A PIII/733MHz system can encode one video stream using the MPEG-4
@@ -618,9 +618,10 @@
 
   The second mode of operation is where MythTV is paired with a
   hardware-based video encoder, such as a Matrox G200 or a Hauppauge
-  WinTV-PVR-250/350.  In this mode, because the video encoding is being
-  done by a dedicated video processor, the host CPU requirements are
-  quite low.  See the ``Video Capture Device'' section for details.
+  WinTV-PVR-150/250/350/500.  In this mode, because the video encoding
+  is being done by a dedicated video processor, the host CPU
+  requirements are quite low.  See the ``Video Capture Device'' section
+  for details.
 
   If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use
   the hardware-based video decoder for playback, which further reduces
@@ -640,8 +641,8 @@
   Encoded video takes up a lot of hard disk space. The exact amount
   depends on the encoding scheme, the size of the raw images, and the
   frames per second, but typical values for MythTV range from 700
-  megabytes/hour to 2 gigabyte/hour for MPEG-4 and larger for MPEG-2 and
-  RTjpeg.
+  megabytes/hour for MPEG-4, 2 GB/hour for MPEG-2 and RTjpeg and 7
+  GB/hour for ATSC HDTV.
 
 
 
@@ -657,7 +658,6 @@
   with almost no CPU impact.
 
   See the Troubleshooting ``section'' for more information.
-
 
   [1m3.1.4.  Filesystems[0m
 
@@ -741,11 +741,11 @@
   hardware-based encoding. Using either a G200 MJPEG encoder card, or a
   MPEG-2 encoder card supported by the IvyTV project
   http://ivtv.sourceforge.net/ <http://ivtv.sourceforge.net/> such as
-  the Hauppauge PVR-250, PVR-350, Avermedia M179, Hauppauge "Freestyle"
-  or Yuan M600 cards will allow you to use dedicated hardware encoders
-  rather than your CPU. (The PVR-350 can simultaneously be used as an
-  output device.) Using the on-board MPEG-2 encoder drastically reduces
-  the CPU requirements for encoding.
+  the Hauppauge PVR-150/250/350/500, Avermedia M179, Hauppauge
+  "Freestyle" or Yuan M600 cards will allow you to use dedicated
+  hardware encoders rather than your CPU. (The PVR-350 can
+  simultaneously be used as an output device.) Using the on-board MPEG-2
+  encoder drastically reduces the CPU requirements for encoding.
 
   [1mNOTE[22m:  Motherboards with the Via chipset are notoriously bad with DMA
   and have caused numerous issues with ivtv, including hard locks.  See
@@ -817,7 +817,7 @@
   For 1920x1080i->1920x1080p with the better deinterlacing methods done
   in real time a 2.4GHz CPU is taxed, but should work if you use "Bob
   and Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2
-  hardware accelleration.  If you enable the hardware accelleration, you
+  hardware acceleration.  If you enable the hardware acceleration, you
   may be able to use a 1.8GHz processor.
 
 
@@ -834,9 +834,6 @@
   Plextor to capture hardware encoded MPEG-4, so the host CPU
   requirements are low.
 
-  [1mNOTE[22m: MythTV support for the Plextor devices is in CVS as of
-  2005-03-19.
-
 
   [1m3.1.6.  Hardware known NOT to work and other issues[0m
 
@@ -844,7 +841,6 @@
   +o  Hauppauge WinTV-D or -HD (no driver)
 
   +o  Hauppauge WinTV-USB series
-
 
   +o  Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880)
      cards (no driver - this is not the PVR-250/350 series of cards
@@ -971,7 +967,6 @@
      reported.
 
 
-
   [1m3.1.9.2.  Matrox[0m
 
   The standard Matrox driver included with XFree86 does not support TV-
@@ -1037,11 +1032,11 @@
   http://www.probo.com/timr/savage40.html
   <http://www.probo.com/timr/savage40.html> for details.
 
-
   Specific cards:
 
   +o  Savage 2000 AGP. Has Composite and SVideo ports. Does not support
      XVideo.
+
 
   +o  S3 Savage IX 8MB AGP. Has SVideo output. Reported to work.
 
@@ -1104,6 +1099,9 @@
   There are a few ways of installing programs on Linux systems; you can
   either use a pre-compiled package, or install from a tarball after
   satisfying any prerequisites.
+
+
+
       [1mNOTE[22m: you must have the MySQL database software installed on a
   system to store the master database.  This does not necessarily mean
   that MySQL must run on one of the MythTV boxes.
@@ -1714,13 +1712,27 @@
   other MythTV modules may be downloaded from CVS the same way; replace
   "mythtv" with "myththemes" or "mythplugins".
 
+  MythTV also maintains a CVS branch that incorporates bugfixes for
+  issues discovered after a release has been packaged into a tarball.
+
+  If you would like to use code from this release branch, you would
+  execute the following:
+       $ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
+       Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
+       CVS password: mythtv
+
+       $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs co -r release-0-18-fixes mythtv
+
+       $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs co -r release-0-18-fixes mythplugins
+
+
+
   If you wish to stay up-to-date with CVS, go into the MythTV
   subdirectory and type:
 
 
-
-  $ cd mythtv
-  $ cvs -z3 update -PAd
+       $ cd mythtv
+       $ cvs -z3 update -PAd
 
 
 
@@ -1764,6 +1776,7 @@
   by following the links from "Using" through "Download...".
 
 
+
   [1m5.1.  Building LAME[0m
 
   Open a shell and switch to the directory where you saved lame.
@@ -1780,6 +1793,8 @@
 
 
   Check that it worked:
+
+
        # ls -l /usr/local/lib
        -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
        -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
@@ -1840,6 +1855,8 @@
 
 
        $ tar -xjf xmltv-0.5.39.tar.bz2
+
+
 
   Install the xmltv prerequisites.  The following prerequisites are the
   minimum required; when you actually start running the xmltv setup pro-
@@ -1903,6 +1920,7 @@
 
   +o  It's easier on the Zap2It servers, since they're not generating
      hundreds of custom HTML pages when you scrape their listings.
+
   +o  The service is available free of charge by periodically filling in
      surveys similar to the one presented during registration, and the
      data provider has no intention of charging for it in the future.
@@ -1946,9 +1964,8 @@
   On a single cpu machine, you would type the following to compile
   MythTV:
 
-
-       $ qmake mythtv.pro
-       $ make
+  $ qmake mythtv.pro
+  $ make
 
 
 
@@ -2021,10 +2038,10 @@
 
 
 
-  $ su
-  # chmod a+s /usr/local/bin/mythfrontend
-  # exit
-  $
+       $ su
+       # chmod a+s /usr/local/bin/mythfrontend
+       # exit
+       $
 
 
 
@@ -2066,8 +2083,6 @@
   Run the mythfrontend program on your frontend machine, and a "Database
   Configuration" screen should appear.  Set the "Host name" field to
   point to your Master backend's IP address.
-
-
   [1m5.5.  Gentoo[0m
 
   Installation of MythTV on Gentoo consists of simply emerging the
@@ -2084,8 +2099,7 @@
   Add mysql to your USE variable.  i.e. USE="mysql ...."
 
 
-
-  # emerge mythtv
+       # emerge mythtv
 
 
 
@@ -2128,7 +2142,6 @@
        # /sbin/service mysqld start
 
 
-
   [1m6.1.3.  Gentoo[0m
 
   After installing MySQL you need to initialize the database by running
@@ -2141,7 +2154,6 @@
   which may or may not be one of your MythTV boxes.  If the database is
   on a non-MythTV machine you'll need to copy the database/mc.sql file
   to it.
-
 
   To setup the initial MySQL databases:
 
@@ -2196,10 +2208,9 @@
   all, and allows access from any host.
 
 
-
-  $ mysql -u root mythconverg
-  mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
-  mysql> flush privileges;
+       $ mysql -u root mythconverg
+       mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+       mysql> flush privileges;
 
 
 
@@ -2246,7 +2257,6 @@
 
   There are two ways to do this.  Graphically, and from the command
   line.
-
 
   [1m7.1.  Graphically setting up the mixer[0m
 
@@ -2375,9 +2385,6 @@
   compilation steps described below by jumping to the ``Completing the
   lirc install'' section. See the contrib/mandrake91.etc.sysconfig.lircd
   file for an example of how to configure lircd.
-
-
-
      [1mNOTE[22m:  If you wish to use the remote control that comes with the
   Hauppauge PVR-250/350 cards, you will need to run the lirc 0.7.0pre2
   code. See the example installation in the "Hauppauge PVR-250 remote
@@ -2438,10 +2445,11 @@
   2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file
   as well.
 
+  $ tar -xjf lirc-0.6.6.tar.bz2
+  $ cd lirc-0.6.6
+  $ ./setup.sh
 
-       $ tar -xjf lirc-0.6.6.tar.bz2
-       $ cd lirc-0.6.6
-       $ ./setup.sh
+
 
   You're going to need to know what sort of receiver you have and where
   it's connected.  In the case of the Pinnacle Studio TV card, with the
@@ -2557,8 +2565,6 @@
   guide/ch-custom-kernel.html
   <http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-
   guide/ch-custom-kernel.html>
-
-
 
      [1mNOTE[22m: Suitable Red Hat kernels for MythTV (i2c update, v4l2 API,
   CONFIG_SERIAL modularized) are available from ATrpms:
@@ -2681,7 +2687,10 @@
   now try to start lircd again:
 
 
-       # /usr/local/sbin/lircd
+
+  # /usr/local/sbin/lircd
+
+
 
   Now, we're going to add the commands necessary for lircd to run each
   time we boot. Mandrake 9.1 users, you can execute:
@@ -2741,7 +2750,6 @@
   button as it is defined in your /etc/lircd.conf. If you don't see any-
   thing at this point, you need to troubleshoot further by going back to
   the lirc home page and investigating from there.
-
 
   If it is working, then press [1mCTRL-C [22mto abort the program.  Once you
   know that your remote is working, you can either recompile MythTV with
@@ -3201,6 +3209,19 @@
   "Antenna" was shown in the Video Source field.  Press down to move to
   the next setting, all of which should be self-explanatory.
 
+  If you have multiple input connection types (Such as Tuner 0 and Tuner
+  1), it's very, very likely that it is the lowest numbered input that
+  is actually available on the device.
+
+
+
+        [1mNOTE[22m:  If you have a Hauppauge PVR-500, you must think of
+  it has two PVR-150's on a single PCI card.  For example, if you have a
+  single PVR-500 card, it will appear as /dev/video0 and /dev/video1.
+  Each /dev/video device will have a Tuner 0 and Tuner 1 input, so you
+  would choose Tuner 0 for [1mboth [22mdevices.
+
+
   Once you're done, press RETURN to go back to the Input Connections
   screen.  You would then finish associating the video sources to any
   other hardware devices you have available.
@@ -3215,6 +3236,7 @@
   Press ESC to return to the main menu, and press ESC again if you have
   no further items to configure, thereby returning you to the command
   line.
+
 
 
   [1m9.1.5.  Channel Editor[0m
@@ -3236,26 +3258,27 @@
   error followed by a "200 OK" when the connection to Zap2It is being
   established.
 
-  From : Sun Jun 13 05:00:00 2004 To : Mon Jun 14 05:00:00 2004 (UTC)
-  --02:58:01--
-  http://datadirect.webservices.zap2it.com/tvlistings/xtvdService
-             => -'
-  Resolving datadirect.webservices.zap2it.com... 206.18.98.160
-  Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
-  connected.
-  HTTP request sent, awaiting response... 401 Unauthorized
-  Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
-  connected.
-  HTTP request sent, awaiting response... 200 OK
-  Length: unspecified [text/xml]
 
-      [    <=>                              ] 114,125       63.57K/s
+       From : Sun Jun 13 05:00:00 2004 To : Mon Jun 14 05:00:00 2004 (UTC)
+       --02:58:01--
+       http://datadirect.webservices.zap2it.com/tvlistings/xtvdService
+                  => -'
+       Resolving datadirect.webservices.zap2it.com... 206.18.98.160
+       Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
+       connected.
+       HTTP request sent, awaiting response... 401 Unauthorized
+       Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
+       connected.
+       HTTP request sent, awaiting response... 200 OK
+       Length: unspecified [text/xml]
 
-  02:58:03 (63.53 KB/s) - -' saved [114125]
+           [    <=>                              ] 114,125       63.57K/s
 
-  Your subscription expires on 08/20/2004 12:00:00 AM
-  Grab complete.  Actual data from Sun Jun 13 05:00:00 2004 to Mon Jun 14
-  00:00:00 2004 (UTC)
+       02:58:03 (63.53 KB/s) - -' saved [114125]
+
+       Your subscription expires on 08/20/2004 12:00:00 AM
+       Grab complete.  Actual data from Sun Jun 13 05:00:00 2004 to Mon Jun 14
+       00:00:00 2004 (UTC)
 
 
 
@@ -3274,22 +3297,23 @@
   As of MythTV v0.18, the available options are:
 
 
-       $ mythbackend -h
-       Valid options are:
-       -l or --logfile filename       Writes STDERR and STDOUT messages to filename
-       -p or --pidfile filename       Write PID of mythbackend to filename
-       -d or --daemon                 Runs mythbackend as a daemon
-       -v or --verbose debug-level    Prints more information
-                                      Accepts any combination (separated by comma)
-                                      of all,none,quiet,record,playback,channel,
-                                      osd,file,schedule,network,commflag,audio,
-                                      libav,jobqueue
-       --printexpire                  List of auto-expire programs
-       --printsched                   Upcoming scheduled programs
-       --testsched                    Test run scheduler (ignore existing schedule)
-       --resched                      Force the scheduler to update
-       --nosched                      Do not perform any scheduling
-       --version                      Version information
+
+  $ mythbackend -h
+  Valid options are:
+  -l or --logfile filename       Writes STDERR and STDOUT messages to filename
+  -p or --pidfile filename       Write PID of mythbackend to filename
+  -d or --daemon                 Runs mythbackend as a daemon
+  -v or --verbose debug-level    Prints more information
+                                 Accepts any combination (separated by comma)
+                                 of all,none,quiet,record,playback,channel,
+                                 osd,file,schedule,network,commflag,audio,
+                                 libav,jobqueue
+  --printexpire                  List of auto-expire programs
+  --printsched                   Upcoming scheduled programs
+  --testsched                    Test run scheduler (ignore existing schedule)
+  --resched                      Force the scheduler to update
+  --nosched                      Do not perform any scheduling
+  --version                      Version information
 
 
 
@@ -3298,6 +3322,7 @@
   process.  For example, you may add this to your rc.local file, or you
   can follow the steps outlined in the section called ``Automatically
   starting mythbackend at system boot time''.
+
 
   [1m9.3.  Configuring a non-master backend[0m
 
@@ -3396,7 +3421,8 @@
   database and grab any new icons with the command:
 
 
-       $ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
+
+  $ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
 
 
 
@@ -3452,6 +3478,7 @@
   This set of screens is mostly concerned with how MythTV will look on
   your system.  From here, you can choose different themes and set the
   resolution of your system.
+
 
 
   [1m10.3.  Program Guide[0m
@@ -3550,7 +3577,6 @@
   useful but may be a good example to verify that your filter strings
   take effect.
 
-
   o  The "linearblend" filter
 
   It is a simple deinterlacing filter that ignores parameters and works
@@ -3581,6 +3607,7 @@
   the image from the other field. It is considered to be less
   distracting to watch than linearblend or no filter at all. It accepts
   one or two integer parameters separated by a colon.
+
 
   The first parameter is the filter threshold and defaults to 12.
   Adjacent lines differing by more than the threshold value are
@@ -3713,6 +3740,7 @@
   +o  MJPEG - Zoran-based cards; see http://mjpeg.sourceforge.net
      <http://mjpeg.sourceforge.net>
 
+
   +o  MPEG-2 - iTVC15/16 based cards (Hauppauge PVR-250/PVR-350); see
      http://ivtv.sourceforge.net <http://ivtv.sourceforge.net>
 
@@ -3839,6 +3867,7 @@
   backend to determine if the status has changed.
 
 
+
   [1m11.  Using MythTV.[0m
 
 
@@ -3870,8 +3899,34 @@
                 I     edit recording options from the EPG, "Program Finder", "Program Recording Priorities", or "Fix Scheduling Conflicts" screens. From the Playback and Delete screens, 'I' presents options for recorded shows such as Auto Expire or Stop Recording. Pressing 'I' while on the Recording Options screen will take you to the Advanced Recording Options screen.
 
 
-
   [1m11.1.2.  Watching TV or a recording[0m
+
+
+  [1m11.1.3.  Watching TV only[0m
+
+
+  G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
+  H           Channel history. Each repeat steps back through the previous channels.
+  O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
+  Y           switch between multiple capture cards.  [1mNOTE[22m:you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
+
+
+  [1m11.1.4.  LiveTV Browse Mode[0m
+
+
+             Left     browse program prior to current listed program
+            Right     browse program following current listed program
+               Up     browse program on channel above current listed channel/program
+             Down     browse program on channel below current listed channel/program
+                /     browse program on next favorite channel
+              0-9     enter a channel number to browse
+  Space/Enter         change channel to channel of current listed program
+              R/r     Toggle recording of current program (cycles through types)
+            ESC/O     Exit Browse mode
+
+
+  [1m11.1.5.  Playback Recording Zoom Mode[0m
+
 
 
   Up or down          keys change the channel
@@ -3930,31 +3985,13 @@
             Right     advance 1 frame
                 >     advance 1 second
 
-
-  [1m11.1.3.  Watching TV only[0m
-
+  [1m11.1.6.  If you have two or more tuner cards[0m
 
 
-  G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
-  H           Channel history. Each repeat steps back through the previous channels.
-  O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
-  Y           switch between multiple capture cards.  [1mNOTE[22m:you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
+  V           toggle Picture-in-picture on or off
+  B           toggles the window focus (lets you change channels on the PiP window)
+  N           swaps the two channels by changing channels on both cards
 
-  [1m11.1.4.  LiveTV Browse Mode[0m
-
-
-             Left     browse program prior to current listed program
-            Right     browse program following current listed program
-               Up     browse program on channel above current listed channel/program
-             Down     browse program on channel below current listed channel/program
-                /     browse program on next favorite channel
-              0-9     enter a channel number to browse
-  Space/Enter         change channel to channel of current listed program
-              R/r     Toggle recording of current program (cycles through types)
-            ESC/O     Exit Browse mode
-
-
-  [1m11.1.5.  Playback Recording Zoom Mode[0m
 
 
              Left     Move video to Left
@@ -3965,15 +4002,6 @@
   PageDown            Zoom Out
   Space/Enter         Exit Zoom mode leaving picture at current size and position
               ESC     Exit Zoom mode and return to original size
-
-
-  [1m11.1.6.  If you have two or more tuner cards[0m
-
-
-  V           toggle Picture-in-picture on or off
-  B           toggles the window focus (lets you change channels on the PiP window)
-  N           swaps the two channels by changing channels on both cards
-
 
   [1m11.1.7.  Watching a recording only[0m
 
@@ -3999,7 +4027,6 @@
   [1m11.1.8.  EPG[0m
 
 
-
            Arrows     are used to move the highlighted program point around
        A, D, S, W     perform the same as left, right, down and up
   PageUp/PageDown     move the channel list up or down a page
@@ -4016,6 +4043,7 @@
                 ?     mark/unmark the current channel as a "favorite"
            / or 4     toggle the guide listing between all channels and filtered "favorites"
 
+
   [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
 
 
@@ -4026,6 +4054,7 @@
          Home/End            toggle sort priority
                        I     edit recording options
                      ESC     commits changes and exits
+
 
 
   [1m11.1.10.  Viewing Scheduled Recordings/Resolving Conflicts[0m
@@ -4063,7 +4092,6 @@
     I           move a program from one Recording Group to another
 
 
-
   [1m11.1.14.  Watch Recordings Screen[0m
 
 
@@ -4088,6 +4116,14 @@
   more keys then you can access all of the features.  With only 16 keys
   most features are usable.
 
+
+  [1m11.2.  Using themes with MythTV[0m
+
+  MythTV is "themeable", meaning that the visual appearance of the
+  program can be modified by the user without re-compiling or altering
+  the program functionality.  Download the MythThemes tarball from the
+  website and untar it:
+
       REMOTE CONTROL     LIRC KEYSTROKE     FUNCTION
                0 - 9     0 - 9              channel selection, EPG navigation, ff/rew speed setting (with stickykeys)
           Left Arrow     Left               scroll left, rewind
@@ -4101,17 +4137,6 @@
          Other key 1     i                  Information
          Other key 2     c                  Change tuner card input
 
-
-
-  [1m11.2.  Using themes with MythTV[0m
-
-  MythTV is "themeable", meaning that the visual appearance of the
-  program can be modified by the user without re-compiling or altering
-  the program functionality.  Download the MythThemes tarball from the
-  website and untar it:
-
-
-
        $ tar -xjf myththemes-0.18.tar.bz2
        $ cd ~/myththemes-0.18
        $ qmake myththemes.pro
@@ -4124,7 +4149,6 @@
 
   The theme will now be available in the mythfrontend Appearance
   section.
-
 
 
   [1m11.3.  Adding DirecTV information to the database[0m
@@ -4358,7 +4382,8 @@
   and add the following to /etc/services:
 
 
-       mythwake        $PORT/tcp
+
+  mythwake        $PORT/tcp
 
 
 
@@ -4382,7 +4407,6 @@
   [1mSECURITY WARNING[22m: Be sure to secure $SERVER:$PORT from untrusted net-
   works, because this allows 3rd parties to run arbitrary code on your
   server!
-
 
 
   [1m11.6.2.2.  Using BIOS wakeup to wake your Master backend.[0m
@@ -4489,7 +4513,6 @@
 
   Singles will record without regard to duplicate matching.
 
-
   The standard recurring methods of All, Channel, Weekly and Daily use
   the descriptive information in the TV listings to try to record only
   one showing of each unique episode. However, This goal is sometimes
@@ -4517,6 +4540,8 @@
   Daily and Find Weekly rules are best for news or current events shows
   that are repeated. However, these may be useful in other situations
   where the standard recording rules may not work correctly.
+
+
   [1m11.7.3.  Conflicts[0m
 
   As you add more shows that you would like to record, the scheduler
@@ -4649,6 +4674,7 @@
   all inputs for the channel are used for higher priority shows. It will
   check to see if any of the other shows could be recorded at another
   time so that the conflicting show can be recorded in it's place.
+
   Generally, this is a good strategy but there are tradeoffs. If a
   higher priority show is postponed, you will not get to watch it until
   it is recorded in the later timeslot. There is also a risk that the TV
@@ -8585,8 +8611,8 @@
 
 
   [1mNOTE[22m: if you have anything in the unc column ("uncorrectable errors")
-  you will probably have problems with HDTV.  Check you antenna, cables,
-  etc.
+  you will probably have problems with HDTV.  Check your antenna,
+  cables, etc.
 
   Once you have confirmed that your card is able to lock onto a HDTV
   signal it is time to configure MythTV. Start the setup program, and in

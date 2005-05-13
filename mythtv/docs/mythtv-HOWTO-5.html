@@ -43,6 +43,21 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 
 The other MythTV modules may be downloaded from CVS the same way; replace
 "mythtv" with "myththemes" or "mythplugins".</P>
+<P>MythTV also maintains a CVS branch that incorporates bugfixes for issues
+discovered after a release has been packaged into a tarball.</P>
+<P>If you would like to use code from this release branch, you would execute the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
+Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
+CVS password: mythtv
+
+$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs co -r release-0-18-fixes mythtv
+
+$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs co -r release-0-18-fixes mythplugins
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>If you wish to stay up-to-date with CVS, go into the MythTV subdirectory and type:
 <BLOCKQUOTE><CODE>
 <PRE>
