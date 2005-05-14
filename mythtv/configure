@@ -701,6 +701,18 @@ has_library()
     expr $HAS_IT : "yes" > /dev/null
 }
 
+has_header()
+{
+    HPATHS="/usr/local/include /usr/include /usr/include/g++-v3 usr/X11R6/include"
+    HAS_IT="no"
+    for HPATH in $HPATHS ; do
+        if test x`ls $HPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
+            HAS_IT="yes"
+        fi
+    done
+    expr $HAS_IT : "yes" > /dev/null
+}
+
 CCONFIG="$CCONFIG $compile_type"
 if test x$compile_type = x"profile" ; then
     PROFILEFLAGS="-g -DNDEBUG"
@@ -1679,7 +1691,7 @@ fi
 
 if test x"$xrandr" = x"yes" ; then
     xrandr="no"
-    if test -f /usr/X11R6/include/X11/extensions/Xrandr.h ; then
+    if has_header X11/extensions/Xrandr.h ; then
         xrandr="yes"
     fi
 fi
@@ -1698,6 +1710,11 @@ if test x"$xvmc" = x"yes"; then
         CCONFIG="$CCONFIG using_xvmcw"
         VENDOR_XVMC_LIBS="-lXvMCW"
         xvmc="yes"
+        if has_header X11/extensions/vldXvMC.h ; then
+            echo > /dev/null
+        else
+            xvmc_vld="no"
+        fi
     elif has_library libviaXvMC ; then
         VENDOR_XVMC_LIBS="-lviaXvMC"
         xvmc="yes"
