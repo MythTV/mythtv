@@ -1,5 +1,7 @@
 .qmake.internal.cache
 Makefile
+mythconfig.h
+mythconfig.mak
 libmyth.so.*
 libmyth-*
 moc_*
