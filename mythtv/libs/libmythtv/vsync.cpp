@@ -419,25 +419,6 @@ void nVidiaVideoSync::AdvanceTrigger()
 }
 
 #ifdef USING_OPENGL_VSYNC
-
-/** \class OpenGLVideoSync
- *  \brief Video synchronization method employing SGI_video_sync
- *         OpenGL extension.
- *
- *   Special care must be taken with this video sync method due 
- *   to a bad interaction between some pthread implementations
- *   and OpenGL. OpenGL DIRECT contexts can not be shared between
- *   processes. And some pthread implementations, notably a common
- *   one on Linux, treat each thread as a seperate process.
- *   Hence Start(), Stop() and WaitForFrame() must all be called
- *   from the same thread.
- *
- *  \sa http://osgcvs.no-ip.com/osgarchiver/archives/June2002/0022.html
- *  \sa http://www.ac3.edu.au/SGI_Developer/books/OpenGLonSGI/sgi_html/ch10.html#id37188
- *  \sa http://www.inb.mu-luebeck.de/~boehme/xvideo_sync.html
- *
- */
-
 OpenGLVideoSync::OpenGLVideoSync(int frame_interval, int refresh_interval,
                                  bool interlaced)
     : VideoSync(frame_interval, refresh_interval, interlaced),
@@ -556,7 +537,7 @@ bool OpenGLVideoSync::TryInit()
     }
 }
 
-/** \fn checkGLSyncError(QString, int)
+/** \fn checkGLSyncError(const QString&, int)
  *  \brief Prints an error messages for SGI_video_sync extension calls.
  *
  *  \return true if all is ok, false if there is an error

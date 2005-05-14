@@ -869,7 +869,7 @@ do { \
 } while (false)
 
 /**
- * \fn VideoOutputXv::Init()
+ * \fn VideoOutputXv::Init(int,int,float,WId,int,int,int,int,WId)
  * Initializes class for video output.
  *
  * \return success or failure.
@@ -933,7 +933,7 @@ bool VideoOutputXv::Init(
 #undef XV_INIT_FATAL_ERROR_TEST
 
 /**
- * \fn VideoOutputXv::InitColorKey()
+ * \fn VideoOutputXv::InitColorKey(bool)
  * Initializes color keying support used by XVideo output methods.
  *
  * \param turnoffautopaint turn off or on XV_AUTOPAINT_COLORKEY property.
@@ -1758,7 +1758,7 @@ void VideoOutputXv::PrepareFrameXv(VideoFrame *frame)
 }
 
 /**
- * \fn VideoOutputXv::PrepareFrameMem(VideoFrame *frame)
+ * \fn VideoOutputXv::PrepareFrameMem(VideoFrame*, FrameScanType)
  *  
  *  
  */

@@ -113,7 +113,7 @@ class TSHeader {
     unsigned char _tsdata[4];
 };
 
-/** \class TSHeader
+/** \class TSPacket
  *  \brief Used to access the data of a Transport Stream packet.
  *
  *  \sa TSHeader, PESPacket, HDTVRecorder

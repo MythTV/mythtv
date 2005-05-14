@@ -64,7 +64,7 @@ QString DisplayResScreen::toString() const
     return str;
 }
 
-QStringList DisplayResScreen::Convert(const DisplayResVector& dsr)
+QStringList DisplayResScreen::Convert(const vector<DisplayResScreen>& dsr)
 {
     QStringList slist;
     for (uint i=0; i<dsr.size(); ++i)
@@ -80,7 +80,7 @@ DisplayResVector DisplayResScreen::Convert(const QStringList& slist)
     return dsr;
 }
 
-int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
+int DisplayResScreen::FindBestMatch(const vector<DisplayResScreen>& dsr,
                                     const DisplayResScreen& d,
                                     short& target_rate)
 {

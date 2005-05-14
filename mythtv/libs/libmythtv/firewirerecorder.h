@@ -21,7 +21,7 @@
 
 #define FIREWIRE_CHANNEL_BROADCAST	63
 
-/** \class DVBRecorder
+/** \class FirewireRecorder
  *  \brief This is a specialization of DTVRecorder used to
  *         handle DVB and ATSC streams from a firewire input.
  *

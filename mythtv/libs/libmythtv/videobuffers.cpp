@@ -94,7 +94,7 @@ VideoBuffers::~VideoBuffers()
 }
 
 /**
- * \fn VideoBuffers::Init(uint, bool, uint, uint, uint, uint)
+ * \fn VideoBuffers::Init(uint, bool, uint, uint, uint, uint, bool)
  *  Creates buffers and sets various buffer management parameters.
  *  
  *  This normally creates numdecode buffers, but it creates

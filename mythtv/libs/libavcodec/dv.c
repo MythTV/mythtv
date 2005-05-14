@@ -25,7 +25,7 @@
  */
 
 /**
- * @file dv.c
+ * @file libavcodec/dv.c
  * DV codec.
  */
 #include "avcodec.h"

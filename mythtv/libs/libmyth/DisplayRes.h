@@ -36,7 +36,7 @@ class DisplayRes {
      */
     bool Initialize(void);
 
-    /** \defgroup vid_mode_switch Resolution/Refresh Rate Changing methods.
+    /** \name Resolution/Refresh Rate Changing methods.
      *   These return true if mode is changed
      * @{
      */
@@ -71,7 +71,7 @@ class DisplayRes {
     /** @} */
 
 
-    /** \defgroup vid_mode_current Queries of current video mode
+    /** \name Queries of current video mode
      * @{
      */
 
@@ -98,7 +98,7 @@ class DisplayRes {
     /** @} */
 
 
-    /** \defgroup vid_mode_global These methods are global for all video modes
+    /** \name These methods are global for all video modes
      * @{
      */
 

@@ -51,20 +51,20 @@ QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
     return NULL;
 }
 
-/** \fn Configurable::enableOnSet(const QString &)
+/** \fn Configurable::enableOnSet(const QString &val)
  *  \brief This slot allows you to enable this configurable when a
  *         binary configurable is set to true.
- *  \param signal value, should be "0" to disable, other to disable.
+ *  \param val signal value, should be "0" to disable, other to disable.
  */
 void Configurable::enableOnSet(const QString &val)
 {
     setEnabled( val != "0" );
 }
 
-/** \fn Configurable::enableOnUnset(const QString &)
+/** \fn Configurable::enableOnUnset(const QString &val)
  *  \brief This slot allows you to enable this configurable when a
  *         binary configurable is set to false.
- *  \param signal value, should be "0" to enable, other to disable.
+ *  \param val signal value, should be "0" to enable, other to disable.
  */
 void Configurable::enableOnUnset(const QString &val)
 {

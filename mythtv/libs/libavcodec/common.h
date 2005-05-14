@@ -1,5 +1,5 @@
 /**
- * @file common.h
+ * @file libavcodec/common.h
  * common internal api header.
  */
 

@@ -2537,7 +2537,7 @@ MythSearchDialog::~MythSearchDialog()
 ---------------------------------------------------------------------
  */
 
-/** \fn MythImageFileDialog(QString*,QString,MythMainWindow*,QString,QString,const char*,bool)
+/** \fn MythImageFileDialog::MythImageFileDialog(QString*,QString,MythMainWindow*,QString,QString,const char*,bool)
  *  \brief Locates an image file dialog in the current theme.
  *
  *   MythImageFileDialog's expect there to be certain
