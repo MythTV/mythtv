@@ -87,6 +87,10 @@ Database::Database(
     {
          metadata_container = metadata_server->createContainer(name, MCCT_audio, MCLT_lan, MST_daap_itunes47);
     }
+    else if(daap_server_type == DAAP_SERVER_ITUNES48)
+    {
+         metadata_container = metadata_server->createContainer(name, MCCT_audio, MCLT_lan, MST_daap_itunes48);
+    }
     else
     {
          metadata_container = metadata_server->createContainer(name, MCCT_audio, MCLT_lan);

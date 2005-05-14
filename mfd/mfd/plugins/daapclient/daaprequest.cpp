@@ -45,6 +45,12 @@ DaapRequest::DaapRequest(
     //  type
     //
     
+    if(server_type == DAAP_SERVER_ITUNES48)
+    {
+        addHeader("User-Agent: iTunes/4.8 (Windows; N)");
+        addHeader("Accept-Language: en-us, en;q=5.0");
+        addHeader("Client-DAAP-Version: 3.0");
+    }
     if(server_type == DAAP_SERVER_ITUNES47)
     {
         addHeader("User-Agent: iTunes/4.7 (Windows; N)");
@@ -119,7 +125,8 @@ bool DaapRequest::send(QSocketDevice *where_to_send, bool add_validation)
             }
             else
             {
-                if(server_type == DAAP_SERVER_ITUNES47 ||
+                if(server_type == DAAP_SERVER_ITUNES48 ||
+                   server_type == DAAP_SERVER_ITUNES47 ||
                    server_type == DAAP_SERVER_ITUNES46 ||
                    server_type == DAAP_SERVER_ITUNES45 )
                 {
