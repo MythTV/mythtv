@@ -3140,9 +3140,15 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
     filename += ".png";
 
     QFileInfo finfo(filename);
-    lastmodified = finfo.lastModified();
 
-    strlist += lastmodified.toString(f);
+    if (finfo.exists())
+    {
+        lastmodified = finfo.lastModified();
+        strlist = lastmodified.toString(f);
+    }
+    else
+        strlist = "BAD";   
+ 
     SendResponse(pbssock, strlist);
     delete pginfo;
 }
