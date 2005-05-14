@@ -900,6 +900,9 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                     if (!st->parser) {
                         /* no parser available : just output the raw packets */
                         st->need_parsing = 0;
+			av_log(s, AV_LOG_ERROR,
+                               "Parser not found for Codec Id: %d !\n",
+                               st->codec.codec_id);
                     }
 		}
 	    }
