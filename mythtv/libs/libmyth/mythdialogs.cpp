@@ -651,6 +651,7 @@ bool MythMainWindow::HandleMedia(QString& handler, const QString &mrl, const QSt
 
 void MythMainWindow::keyPressEvent(QKeyEvent *e)
 {
+    e->accept();
     QWidget *current = currentWidget();
     if (current && current->isEnabled())
         qApp->notify(current, e);
