@@ -2065,7 +2065,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "GROUP BY recordid "
 "ORDER BY title ASC;");
 
-    MSqlQuery result(MSqlQuery::SchedCon());
+    MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(query);
 
     if (result.exec() && result.isActive() && result.size() > 0)
