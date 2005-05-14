@@ -54,10 +54,10 @@ Spectrum::Spectrum()
     lplan = fftw_plan_dft_r2c_1d(FFTW_N, lin, (myth_fftw_complex_cast*)lout, FFTW_MEASURE);
     rplan = fftw_plan_dft_r2c_1d(FFTW_N, rin, (myth_fftw_complex_cast*)rout, FFTW_MEASURE);
 #elif FFTW2_SUPPORT
-    lin = av_malloc(sizeof(fftw_real)*FFTW_N);
-    rin = av_malloc(sizeof(fftw_real)*FFTW_N);
-    lout = av_malloc(sizeof(fftw_real)*FFTW_N*2);
-    rout = av_malloc(sizeof(fftw_real)*FFTW_N*2);
+    lin = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N);
+    rin = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N);
+    lout = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N*2);
+    rout = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N*2);
 
     plan = rfftw_create_plan(FFTW_N, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
 #endif // FFTW2_SUPPORT
@@ -607,10 +607,10 @@ Gears::Gears(QWidget *parent, const char *name)
     lplan = fftw_plan_dft_r2c_1d(FFTW_N, lin, (myth_fftw_complex_cast*) lout, FFTW_MEASURE);
     rplan = fftw_plan_dft_r2c_1d(FFTW_N, rin, (myth_fftw_complex_cast*) rout, FFTW_MEASURE);
 #elif FFTW2_SUPPORT
-    lin = av_malloc(sizeof(fftw_real)*FFTW_N);
-    rin = av_malloc(sizeof(fftw_real)*FFTW_N);
-    lout = av_malloc(sizeof(fftw_real)*FFTW_N*2);
-    rout = av_malloc(sizeof(fftw_real)*FFTW_N*2);
+    lin = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N);
+    rin = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N);
+    lout = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N*2);
+    rout = (fftw_real*) av_malloc(sizeof(fftw_real)*FFTW_N*2);
 
     plan = rfftw_create_plan(FFTW_N, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
 #endif // FFTW2_SUPPORT
