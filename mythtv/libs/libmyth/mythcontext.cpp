@@ -1484,8 +1484,8 @@ void MythContext::SaveSetting(const QString &key, const QString &newValue)
     SaveSettingOnHost(key, newValue, d->m_localhostname);
 }
 
-void MythContext::SaveSettingOnHost(const QString &key, const QString &host,
-                                    const QString &newValue)
+void MythContext::SaveSettingOnHost(const QString &key, const QString &newValue
+                                    const QString &host)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())

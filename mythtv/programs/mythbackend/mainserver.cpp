@@ -2807,7 +2807,7 @@ void MainServer::HandleSetSetting(QStringList &tokens,
     QString svalue = tokens[3];
     QStringList retlist;
 
-    gContext->SaveSettingOnHost(setting, hostname, svalue);
+    gContext->SaveSettingOnHost(setting, svalue, hostname);
 
     retlist << "OK";
     if (pbssock)

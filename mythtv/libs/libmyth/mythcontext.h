@@ -251,8 +251,8 @@ class MythContext : public QObject
     void SaveSetting(const QString &key, int newValue);
     void SaveSetting(const QString &key, const QString &newValue);
     QString GetSetting(const QString &key, const QString &defaultval = "");
-    void SaveSettingOnHost(const QString &key, const QString &host,
-                           const QString &newValue);
+    void SaveSettingOnHost(const QString &key, const QString &newValue,
+                           const QString &host);
 
     // Convenience setting query methods
     int GetNumSetting(const QString &key, int defaultval = 0);
