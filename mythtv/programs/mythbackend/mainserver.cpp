@@ -356,6 +356,10 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
     {
         HandleGetFreeRecorderCount(pbs);
     }
+    else if (command == "GET_FREE_RECORDER_LIST")
+    {
+        HandleGetFreeRecorderList(pbs);
+    }
     else if (command == "GET_NEXT_FREE_RECORDER")
     {
         HandleGetNextFreeRecorder(listline, pbs);
@@ -2111,6 +2115,31 @@ void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
+void MainServer::HandleGetFreeRecorderList(PlaybackSock *pbs)
+{
+    QSocket *pbssock = pbs->getSocket();
+
+    QStringList strlist;
+
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = iter.data();
+
+        if ((elink->isConnected()) &&
+            (!elink->IsBusy()) &&
+            (!elink->isTunerLocked()))
+        {
+            strlist << QString::number(iter.key());
+        }
+    }
+
+    if (strlist.size() == 0)
+        strlist << "0";
+
+    SendResponse(pbssock, strlist);
+}
+
 void MainServer::HandleGetNextFreeRecorder(QStringList &slist, 
                                            PlaybackSock *pbs)
 {
@@ -2384,6 +2413,11 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     {
         QString name = slist[2];
         retlist << QString::number((int)(enc->CheckChannel(name)));
+    }
+    else if (command == "SHOULD_SWITCH_CARD")
+    {
+        QString chanid = slist[2];
+        retlist << QString::number((int)(enc->ShouldSwitchToAnotherCard(chanid)));
     }
     else if (command == "CHECK_CHANNEL_PREFIX")
     {

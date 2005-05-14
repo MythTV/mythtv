@@ -47,6 +47,7 @@ class RemoteEncoder
     void ToggleChannelFavorite(void);
     void SetChannel(QString channel);
     bool CheckChannel(QString channel);
+    bool ShouldSwitchToAnotherCard(QString channelid);
     bool CheckChannelPrefix(QString channel, bool &unique);
     void GetNextProgram(int direction,
                         QString &title, QString &subtitle, QString &desc, 

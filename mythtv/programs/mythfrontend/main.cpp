@@ -330,6 +330,14 @@ void startTV(void)
         }
     }
 
+    while (tv->IsMenuRunning()) 
+    {
+        qApp->unlock();
+        qApp->processEvents();
+        usleep(10000);
+        qApp->lock();
+    }
+
     delete tv;
 }
 

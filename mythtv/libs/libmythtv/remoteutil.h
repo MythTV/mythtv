@@ -23,6 +23,7 @@ vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo);
 void RemoteSendMessage(const QString &message);
 RemoteEncoder *RemoteRequestRecorder(void);
 RemoteEncoder *RemoteRequestNextFreeRecorder(int curr);
+RemoteEncoder *RemoteRequestFreeRecorderFromList(QStringList &qualifiedRecorders);
 RemoteEncoder *RemoteGetExistingRecorder(ProgramInfo *pginfo);
 RemoteEncoder *RemoteGetExistingRecorder(int recordernum);
 void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo);

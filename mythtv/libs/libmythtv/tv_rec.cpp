@@ -1210,6 +1210,82 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
     }
 }
 
+bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        return false;
+
+    query.prepare("SELECT channel.channum, channel.callsign "
+                  "FROM channel "
+                  "WHERE channel.chanid = :CHANID;");
+    query.bindValue(":CHANID", chanid);
+    if (!query.exec() || !query.isActive() || query.size() == 0) {
+        MythContext::DBError("ShouldSwitchToAnotherCard", query);
+        return false;
+    }
+
+    query.next();
+    QString channelname = query.value(0).toString();
+    QString callsign = query.value(1).toString();
+
+    query.prepare("SELECT channel.channum "
+                  "FROM channel,cardinput "
+                  "WHERE (channel.chanid = :CHANID OR "
+                  "(channel.channum = :CHANNUM AND "
+                  "channel.callsign = :CALLSIGN)) AND "
+                  "channel.sourceid = cardinput.sourceid AND "
+                  "cardinput.cardid = :CARDID;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":CHANNUM", channelname);
+    query.bindValue(":CALLSIGN", callsign);
+    query.bindValue(":CARDID", m_capturecardnum);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("ShouldSwitchToAnotherCard", query);
+    }
+    else if (query.size() > 0)
+    {
+        VERBOSE(VB_CHANNEL, QString("Found channel (%1) on current card(%2).")
+                            .arg(channelname).arg(m_capturecardnum) );
+        return false;
+    }
+
+    // We didn't find it on the current card, so now we check other cards.
+    query.prepare("SELECT channel.channum, cardinput.cardid "
+                  "FROM channel,cardinput "
+                  "WHERE (channel.chanid = :CHANID OR "
+                  "(channel.channum = :CHANNUM AND "
+                  "channel.callsign = :CALLSIGN)) AND "
+                  "channel.sourceid = cardinput.sourceid AND "
+                  "cardinput.cardid != :CARDID;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":CHANNUM", channelname);
+    query.bindValue(":CALLSIGN", callsign);
+    query.bindValue(":CARDID", m_capturecardnum);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("ShouldSwitchToAnotherCard", query);
+    }
+    else if (query.size() > 0)
+    {
+        query.next();
+        QString channelname = query.value(0).toString();
+        QString capturecardnum = query.value(1).toString();
+        VERBOSE(VB_CHANNEL, QString("Found channel (%1) on different card(%2).")
+                            .arg(channelname).arg(capturecardnum) );
+
+        return true;
+    }
+
+    VERBOSE( VB_CHANNEL, QString("Did not find channel id(%1) on any card.")
+                         .arg(chanid));
+    return false;
+}
+
 bool TVRec::CheckChannel(QString name)
 {
     if (!channel)

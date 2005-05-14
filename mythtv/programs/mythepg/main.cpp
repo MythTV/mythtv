@@ -38,12 +38,12 @@ int main(int argc, char **argv)
 
     TV::InitKeys();
 
-    QString chanstr = RunProgramGuide(startchannel);
+    RunProgramGuide(startchannel);
 
     int chan = 0;
     
-    if (chanstr != "")
-        chan = atoi(chanstr.ascii());
+    if (startchannel != "")
+        chan = atoi(startchannel.ascii());
 
     delete gContext;
 

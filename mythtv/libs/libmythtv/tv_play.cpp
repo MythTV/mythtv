@@ -242,7 +242,7 @@ TV::TV(void)
       // Fast forward state
       doing_ff_rew(0), ff_rew_index(0), speed_index(0), normal_speed(1.0f),
       // Channel changing state variables
-      channelqueued(false), channelkeysstored(0), 
+      channelqueued(false), channelkeysstored(0), lookForChannel(0),
       lastCC(""), lastCCDir(0), muteTimer(new QTimer(this)),
       // previous channel functionality state variables
       times_pressed(0), prevChannelTimer(new QTimer(this)),
@@ -441,7 +441,24 @@ int TV::LiveTV(bool showDialogs)
 {
     if (internalState == kState_None)
     {
-        RemoteEncoder *testrec = RemoteRequestNextFreeRecorder(lastRecorderNum);
+        RemoteEncoder *testrec = NULL;
+
+        if (lookForChannel)
+        {
+            QStringList reclist;
+            GetValidRecorderList(channelid, reclist);
+            testrec = RemoteRequestFreeRecorderFromList(reclist);
+            lookForChannel = false;
+            channelqueued = true;
+            channelid = "";
+        }
+        else
+        {
+            // The default behavior for starting live tv is to get the next
+            // free recorder.  This is also how switching to the next recorder
+            // works
+            testrec = RemoteRequestNextFreeRecorder(lastRecorderNum);
+        }
 
         if (!testrec)
             return 0;
@@ -2599,6 +2616,9 @@ QString TV::QueuedChannel(void)
 
 void TV::ChannelClear(bool hideosd)
 {
+    if (lookForChannel)
+        return;
+
     if (hideosd && osd) 
         osd->HideSet("channel_number");
 
@@ -2606,6 +2626,7 @@ void TV::ChannelClear(bool hideosd)
     channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
     channelKeys[4] = 0;
     channelkeysstored = 0;
+    channelid = "";
 }
 
 void TV::ChannelKey(char key)
@@ -2697,6 +2718,36 @@ void TV::ChannelCommit(void)
 void TV::ChangeChannelByString(QString &name, bool force)
 {
     bool muted = false;
+
+    if (!channelid.isEmpty() && 
+        activerecorder->ShouldSwitchToAnotherCard(channelid))
+    {
+        RemoteEncoder *testrec = NULL;
+        QStringList reclist;
+        GetValidRecorderList(channelid, reclist);
+        testrec = RemoteRequestFreeRecorderFromList(reclist);
+        if (!testrec || !testrec->IsValidRecorder())
+        {
+            ChannelClear();
+            ShowNoRecorderDialog();
+            if (testrec)
+                delete testrec;
+            return;
+        }
+
+        if (!channame_vector.empty() && channame_vector.back() == name)
+        {
+            // need to remove it if the new channel is the same as the old.
+            channame_vector.pop_back();
+        }
+
+        // found the card on a different recorder.
+        delete testrec;
+        lookForChannel = true;
+        channelqueued = true;
+        SwitchCards();
+        return;
+    }
 
     if (!channame_vector.empty() && channame_vector.back() == name)
         return;
@@ -3172,12 +3223,13 @@ void TV::doLoadMenu(void)
     if (nvp && nvp->getVideoOutput())
         allowsecondary = nvp->getVideoOutput()->AllowPreviewEPG();
 
-    QString chanstr = RunProgramGuide(channame, true, this, allowsecondary);
+    QString chanid = RunProgramGuide(channame, true, this, allowsecondary);
 
-    if (chanstr != "")
+    if (channame != "" && chanid != "")
     {
-        chanstr = chanstr.left(4);
-        sprintf(channelKeys, "%s", chanstr.ascii());
+        channame = channame.left(4);
+        sprintf(channelKeys, "%s", channame.ascii());
+        channelid = chanid;
         channelqueued = true; 
     }
 
@@ -3458,12 +3510,13 @@ void TV::ToggleLetterbox(int letterboxMode)
         osd->SetSettingsText(text, 3);
 }
 
-void TV::EPGChannelUpdate(QString chanstr)
+void TV::EPGChannelUpdate(QString chanid, QString chanstr)
 {
-    if (chanstr != "")
+    if (chanid != "" && chanstr != "")
     {
         chanstr = chanstr.left(4);
         sprintf(channelKeys, "%s", chanstr.ascii());
+        channelid = chanid;
         channelqueued = true; 
     }
 }
@@ -4315,5 +4368,39 @@ void TV::ToggleSleepTimer(const QString time)
     {
         cout << "No sleep timer?";
     }
+}
+
+void TV::GetValidRecorderList (const QString & chanid, QStringList & reclist)
+{
+    reclist.clear();
+    // Query the database to determine which source is being used currently.
+    // set the EPG so that it only displays the channels of the current source
+    MSqlQuery query(MSqlQuery::InitCon());
+    // We want to get the current source id for this recorder
+    QString queryChanid = "SELECT I.cardid FROM channel C LEFT JOIN "
+                          "cardinput I ON C.sourceid = I.sourceid "
+                          "WHERE C.chanid = " + chanid + ";";
+    query.prepare(queryChanid);
+    query.exec();
+    if (query.isActive() && query.size() > 0) {
+        while (query.next ()) {
+            reclist << query.value(0).toString();
+        }
+    }
+}
+
+void TV::ShowNoRecorderDialog(void)
+{
+    QString errorText = tr("MythTV is already using all available "
+                           "inputs for the channel you selected. "
+                           "If you want to watch an in-progress recording, "
+                           "select one from the playback menu.  If you "
+                           "want to watch live TV, cancel one of the "
+                           "in-progress recordings from the delete "
+                           "menu.");
+
+    MythPopupBox::showOkPopup(
+            gContext->GetMainWindow(), QObject::tr("Channel Change Error"),
+            errorText);
 }
 

@@ -120,6 +120,7 @@ class TVRec
     int ChangeBrightness(bool direction);
     int ChangeHue(bool direction);
     bool CheckChannel(QString name);
+    bool ShouldSwitchToAnotherCard(QString chanid);
     bool CheckChannelPrefix(QString name, bool &unique);
     void GetNextProgram(int direction,
                         QString &title, QString &subtitle, QString &desc,

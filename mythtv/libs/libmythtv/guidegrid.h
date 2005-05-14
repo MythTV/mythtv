@@ -26,7 +26,7 @@ class QWidget;
 #define MAX_DISPLAY_TIMES 30
 
 // Use this function to instantiate a guidegrid instance.
-QString RunProgramGuide(QString startchannel, bool thread = false, 
+QString RunProgramGuide(QString &startchannel, bool thread = false, 
                         TV *player = NULL, bool allowsecondaryepg = true);
 
 
@@ -38,6 +38,7 @@ class GuideGrid : public MythDialog
               bool allowsecondaryepg = true, const char *name = 0);
    ~GuideGrid();
 
+    QString getLastChannelId(void);
     QString getLastChannel(void);
 
   protected slots:

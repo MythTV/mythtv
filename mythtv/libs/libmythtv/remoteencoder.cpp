@@ -386,6 +386,21 @@ bool RemoteEncoder::CheckChannel(QString channel)
     return retval;
 }
 
+bool RemoteEncoder::ShouldSwitchToAnotherCard(QString channelid)
+{
+    // this function returns true if the channelid is not a valid
+    // channel on the current recorder. It queries to server in order
+    // to determine this.
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "SHOULD_SWITCH_CARD";
+    strlist << channelid;
+
+    SendReceiveStringList(strlist);
+
+    bool retval = strlist[0].toInt();
+    return retval;
+}
+
 bool RemoteEncoder::CheckChannelPrefix(QString channel, bool &unique) 
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);

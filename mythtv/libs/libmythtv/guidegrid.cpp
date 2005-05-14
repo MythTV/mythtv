@@ -30,10 +30,10 @@ using namespace std;
 #include "util.h"
 #include "remoteutil.h"
 
-QString RunProgramGuide(QString startchannel, bool thread, TV *player,
+QString RunProgramGuide(QString &startchannel, bool thread, TV *player,
                         bool allowsecondaryepg)
 {
-    QString chanstr;
+    QString chanid;
    
     if (thread)
         qApp->lock();
@@ -56,7 +56,8 @@ QString RunProgramGuide(QString startchannel, bool thread, TV *player,
     else
         gg->exec();
 
-    chanstr = gg->getLastChannel();
+    chanid = gg->getLastChannelId();
+    startchannel = gg->getLastChannel();
 
     if (thread)
         qApp->lock();
@@ -66,7 +67,7 @@ QString RunProgramGuide(QString startchannel, bool thread, TV *player,
     if (thread)
         qApp->unlock();
 
-    return chanstr;
+    return chanid;
 }
 
 GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
@@ -504,6 +505,17 @@ QString GuideGrid::getLastChannel(void)
 
     if (selectState)
         return m_channelInfos[chanNum].chanstr;
+    return 0;
+}
+
+QString GuideGrid::getLastChannelId(void)
+{
+    unsigned int chanNum = m_currentRow + m_currentStartChannel;
+    if (chanNum >= m_channelInfos.size())
+        chanNum -= m_channelInfos.size();
+
+    if (selectState)
+        return QString::number(m_channelInfos[chanNum].chanid);
     return 0;
 }
 
@@ -1722,7 +1734,8 @@ void GuideGrid::channelUpdate(void)
     if (chanNum < 0)
         chanNum = 0;
 
-    m_player->EPGChannelUpdate(m_channelInfos[chanNum].chanstr);
+    m_player->EPGChannelUpdate(QString::number(m_channelInfos[chanNum].chanid),
+                               m_channelInfos[chanNum].chanstr);
 }
 
 //

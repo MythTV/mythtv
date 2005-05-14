@@ -533,6 +533,15 @@ bool EncoderLink::CheckChannel(QString name)
     return false;
 }
 
+bool EncoderLink::ShouldSwitchToAnotherCard(QString channelid)
+{
+    if (local)
+        return tv->ShouldSwitchToAnotherCard(channelid);
+
+    cerr << "Should be local only query: ShouldSwitchToAnotherCard\n";
+    return false;
+}
+
 bool EncoderLink::CheckChannelPrefix(QString name, bool &unique)
 {
     if (local)

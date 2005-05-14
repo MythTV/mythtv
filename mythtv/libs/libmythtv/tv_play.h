@@ -36,6 +36,7 @@ class TV : public QObject
     bool Init(bool createWindow = true);
 
     int LiveTV(bool showDialogs = true);
+    void ShowNoRecorderDialog(void);
     void StopLiveTV(void) { exitPlayer = true; }
     void FinishRecording(void);
     bool WantsToQuit(void) { return wantsToQuit; }
@@ -76,7 +77,8 @@ class TV : public QObject
     // for the guidegrid to use
     void EmbedOutput(WId wid, int x, int y, int w, int h);
     void StopEmbeddingOutput(void);
-    void EPGChannelUpdate(QString chanstr);
+    void EPGChannelUpdate(QString chanid, QString chanstr);
+    void GetValidRecorderList(const QString & channum, QStringList & reclist);
    
     bool getRequestDelete(void) { return requestDelete; }
     bool getEndOfRecording(void) { return endOfRecording; }
@@ -273,6 +275,8 @@ class TV : public QObject
     bool channelqueued;
     char channelKeys[5];
     int channelkeysstored;
+    bool lookForChannel;
+    QString channelid;
     QString lastCC;      // last channel
     int lastCCDir;       // last channel changing direction
     QTimer *muteTimer;   // for temporary audio muting during channel changes

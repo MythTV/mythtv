@@ -245,6 +245,31 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int curr)
     return new RemoteEncoder(num, hostname, port);
 }
 
+// Takes a QStringList of recorder numbers. Returns the first available
+// free recorder from this list.
+RemoteEncoder *RemoteRequestFreeRecorderFromList(QStringList &qualifiedRecorders)
+{
+    QStringList strlist = "GET_FREE_RECORDER_LIST";
+
+    if (!gContext->SendReceiveStringList(strlist, true))
+        return NULL;
+
+    for (QStringList::iterator recIter = qualifiedRecorders.begin();
+         recIter != qualifiedRecorders.end(); ++recIter) 
+    {
+        if (strlist.find(*recIter) == strlist.end()) 
+        {
+            // did not find it in the free recorder list. We
+            // move on to check the next recorder
+            continue;
+        }
+        // at this point we found a free recorder that fulfills our request
+        return RemoteGetExistingRecorder((*recIter).toInt());
+    }
+    // didn't find anything. just return NULL.
+    return NULL;
+}
+
 RemoteEncoder *RemoteRequestRecorder(void)
 {
     QStringList strlist = "GET_FREE_RECORDER";
