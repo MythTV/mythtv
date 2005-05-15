@@ -641,7 +641,6 @@ void ScanWizardScanType::scanTypeChanged(const QString& str)
     if (nVideoDev >= 0)
         nCardType = CardUtil::cardDVBType(nVideoDev);
     int nPane = OptionalTypeSetting::Blank;
-cerr << "ScanWizardScanType::scanTypeChanged " << str << " scan type "<< nType<<" card type " << nCardType << " video dev " << nVideoDev << endl;
     switch (nType)
     {
     case ScanTypeSetting::FullScan:
