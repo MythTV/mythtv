@@ -156,8 +156,15 @@ package export::NUV_SQL;
     # Copy the file
         else {
             print "\nCopying $episode->{'filename'} to $self->{'path'}/$nuv_file\n";
-            copy("$episode->{'filename'}", "$self->{'path'}/$nuv_file")
-                or die "Couldn't copy specified .nuv file:  $!\n\n";
+        # use hard links when copying within a filesystem
+            if ((stat($episode->{'filename'}))[0] == (stat($self->{path}))[0]) {
+                link("$episode->{'filename'}", "$self->{'path'}/$nuv_file")
+                    or die "Couldn't hard link specified .nuv file:  $!\n\n";
+            }
+            else {
+                copy("$episode->{'filename'}", "$self->{'path'}/$nuv_file")
+                    or die "Couldn't copy specified .nuv file:  $!\n\n";
+            }
         }
     }
 
