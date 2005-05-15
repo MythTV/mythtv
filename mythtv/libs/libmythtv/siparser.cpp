@@ -6,6 +6,7 @@
 #include <qdatetime.h>
 #include <qtextcodec.h>
 #include <qregexp.h>
+#include <qptrvector.h>
 #include "dvbtypes.h"
 #include "atsc_huffman.h"
 
@@ -1291,13 +1292,16 @@ if (e.ServiceID == EIT_DEBUG_SID) {
         uint8_t *bd4D_data = NULL;
         QString bd4D_lang;
         int bd4E_prio = -1;
-        uint8_t *bd4E_data = NULL;
         QString bd4E_lang;
 
         // Parse descriptors
         descriptor_length = ((buffer[pos+10] & 0x0F) << 8) | buffer[pos+11];
         pos+=12;
         des_pos = pos;
+
+        // Hold extended event information from multiple descriptors.
+        QPtrVector<uint8_t> exEvInfos;
+
         while (des_pos < (pos + descriptor_length)) 
         { 
             switch (buffer[des_pos]) 
@@ -1329,19 +1333,34 @@ if (e.ServiceID == EIT_DEBUG_SID) {
                         QString lang = QString::fromLatin1((const char*) &buffer[des_pos + 3], 3);
                         int prio = LanguagePriority[lang];
 
+                        int desc_number = (buffer[des_pos + 2]>>4) & 0xf;
+                        int last_desc_number = buffer[des_pos + 2] & 0xf;
+
+                        if (desc_number > last_desc_number)
+                        {
+                            // Completely broken descriptor. Ignore this one.
+                            break;
+                        }
+
 #ifdef EIT_DEBUG_SID
 if (e.ServiceID == EIT_DEBUG_SID) {
        fprintf(stdout,"EIT_EVENT: 4E descriptor, lang %s, prio %i\n", lang.ascii(), prio);
 }
 #endif
 
-                        if ((prio > 0 && prio < bd4E_prio) || bd4E_prio == -1)
+                        if (prio == 0 && (bd4E_prio == -1 || bd4E_prio == 0))
                         {
-                            // this descriptor is better than what we have
-                            // => store a reference to this one
-                            bd4E_lang = lang;
+                            exEvInfos.resize (last_desc_number + 1);
+                            exEvInfos.insert (desc_number, &buffer[des_pos]);
                             bd4E_prio = prio;
-                            bd4E_data = &buffer[des_pos];
+                            bd4E_lang = lang;
+                        }
+                        else if (prio > 0 && (prio < bd4E_prio || bd4E_prio <= 0))
+                        {
+                            exEvInfos.resize (last_desc_number);
+                            exEvInfos.insert (desc_number, &buffer[des_pos]);
+                            bd4E_prio = prio;
+                            bd4E_lang = lang;
                         }
                     }
                     break;
@@ -1365,8 +1384,14 @@ if (e.ServiceID == EIT_DEBUG_SID) {
                 return;
         }
 
+        // Process extended event descriptions if we gathered some
+        for (unsigned int i = 0; i < exEvInfos.size (); ++i)
+        {
+            if (exEvInfos[i])
+                ProcessExtendedEventDescriptor (exEvInfos[i], exEvInfos[i][1] + 2, e);
+        }
 
-        // Resolve data for "best" 4D & 4E descriptors
+        // Resolve data for "best" 4D
         if (bd4D_data != NULL)
         {
 #ifdef EIT_DEBUG_SID
@@ -1377,17 +1402,6 @@ if (e.ServiceID == EIT_DEBUG_SID) {
             e.LanguageCode = bd4D_lang;
             ProcessShortEventDescriptor(bd4D_data, bd4D_data[1] + 2, e);
         }
-        if (bd4E_data != NULL)
-        {
-#ifdef EIT_DEBUG_SID
-if (e.ServiceID == EIT_DEBUG_SID) {
-        fprintf(stdout, "EIT_EVENT: using 4E data for language='%s'\n", bd4E_lang.ascii());
-}
-#endif
-            e.LanguageCode = bd4E_lang;
-            ProcessExtendedEventDescriptor(bd4E_data, bd4E_data[1] + 2, e);
-        }
-
 
         EITFixUp(e);
 
@@ -1905,9 +1919,9 @@ void SIParser::ProcessExtendedEventDescriptor(uint8_t *buf,int size,Event &e)
     if (buf[6] != 0)
       return;
 
+    // Append description to already existing.
     int text_length = buf[7] & 0xFF;
-    e.Description = DecodeText(buf + 8, text_length);
-
+    e.Description += DecodeText(buf + 8, text_length);
 }
 
 QString SIParser::ParseDescriptorLanguage(uint8_t* buffer, int size)
