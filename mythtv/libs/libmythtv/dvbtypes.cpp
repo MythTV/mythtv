@@ -127,6 +127,8 @@ QString DVBTuning::hierarchy() const
 
 QString DVBTuning::modulation() const
 {
+
+#if (DVB_API_VERSION_MINOR == 1)
     switch(params.u.vsb.modulation)
     {
         case QPSK:
@@ -141,16 +143,16 @@ QString DVBTuning::modulation() const
             return "qam_128";
         case QAM_256:
             return "qam_256";
-#if (DVB_API_VERSION_MINOR == 1)
         case VSB_8:
             return "8vsb";
         case VSB_16:
             return "16vsb";
-#endif
         case QAM_AUTO:
         default:
             return "auto";
     }
+#endif
+    return "auto";
 }
 
 bool DVBTuning::parseATSC(const QString& frequency, const QString modulation)
