@@ -38,7 +38,7 @@
 #    would like to do.  Use --mode or any of the mode symlinks (like
 #    nuvexport-xvid) to override.
 #
-    mode=xvid
+#    mode=xvid
 
 #
 #  Setting underscores to yes will convert whitespace in filenames to an
@@ -80,7 +80,7 @@
 #    and transcode exporters call).  It can be almost twice as slow as the
 #    default "fast" normal noise reduction, but it considerably more effective.
 #
-#    fast_denoise = yes
+    fast_denoise = yes
 
 </generic>
 
