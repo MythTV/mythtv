@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
-#Last Updated: 2005.03.29 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  export::ffmpeg::VCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>

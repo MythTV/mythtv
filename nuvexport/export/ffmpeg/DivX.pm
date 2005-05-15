@@ -1,4 +1,7 @@
-#Last Updated: 2005.04.13 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  export::ffmpeg::DivX
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>

@@ -1,5 +1,8 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.04.13 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  export::ffmpeg::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>

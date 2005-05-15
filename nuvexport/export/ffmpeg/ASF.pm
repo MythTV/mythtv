@@ -1,4 +1,7 @@
-#Last Updated: 2005.03.11 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  export::ffmpeg::ASF
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -153,14 +156,14 @@ package export::ffmpeg::ASF;
         else {
             $self->{'ffmpeg_xtra'} = ' -vcodec msmpeg4'
                                    . ' -b ' . $self->{'v_bitrate'}
-                                   . (($self->{'vbr'}) 
+                                   . (($self->{'vbr'})
                                       ? " -qmin $self->{'quantisation'}"
                                       . ' -qmax 31 -minrate 32'
                                       . ' -maxrate '.(2*$self->{'v_bitrate'})
                                       . ' -bt 32 -bufsize 65535'
                                       : '')
 #                                   . ' -lumi_mask 0.05 -dark_mask 0.02'
-#                                   . ' -scplx_mask 0.7' 
+#                                   . ' -scplx_mask 0.7'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
                                    . ' -f asf';

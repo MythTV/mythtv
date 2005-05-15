@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
-#Last Updated: 2005.03.07 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  export::ffmpeg::DVD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>

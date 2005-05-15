@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
-#Last Updated: 2005.04.02 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #   nuvexport::ui
 #

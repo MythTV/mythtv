@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
-#Last Updated: 2005.01.17 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  export::NUV_SQL
 #  Maintained by Chris Petersen <mythtv@forevermore.net>

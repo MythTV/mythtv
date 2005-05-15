@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
-#Last Updated: 2004.00.00 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  nuv_export::task
 #

@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
-#Last Updated: 2005.02.16 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  help.pm
 #

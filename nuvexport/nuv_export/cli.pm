@@ -1,4 +1,3 @@
-#!/usr/bin/perl -w
 #
 # $Date$
 # $Revision$
@@ -112,7 +111,7 @@ package nuv_export::cli;
 
 # Load the following extra parameters from the commandline
     add_arg('search-only',            'Search only, do not do anything with the found recordings');
-    add_arg('confirm',                'Confirm commandline-entered choices');
+    add_arg('confirm!',               'Confirm commandline-entered choices');
 
     add_arg('title=s',                'Find programs to convert based on their title.');
     add_arg('subtitle|episode=s',     'Find programs to convert based on their subtitle (episode name).');

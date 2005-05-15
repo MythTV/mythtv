@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
-#Last Updated: 2005.03.07 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  nuv_export::shared_utils
 #

@@ -1,6 +1,10 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.26 (xris)
-#nuvinfo.pl
+#
+# $Date$
+# $Revision$
+# $Author$
+#
+#   nuvinfo.pl
 
 # Add a couple of include paths so we can load the various export and gui modules
     use File::Basename;

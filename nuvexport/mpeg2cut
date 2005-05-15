@@ -1,6 +1,8 @@
 #! /bin/sh
 #
-# vim:ts=4:sw=4:ai:et:si:sts=4
+# $Date$
+# $Revision$
+# $Author$
 #
 # Cut MPEG2 files to remove cutlists...
 # Written by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -172,4 +174,6 @@ nice -n 19 lvemux -r -1 -sh ${OFFSET} -v ${BASENAME}.m2v -a ${BASENAME}.mp2 \
 echo Cleaning up
 rm ${FILENAME}.idx ${BASENAME}.m2v ${BASENAME}.mp2 ${BASENAME}.m2v.idx
 rm ${BASENAME}.cut ${BASENAME}.cut2
+
+# vim:ts=4:sw=4:ai:et:si:sts=4
 

@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
-#Last Updated: 2004.11.15 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  mythtv::db
 #

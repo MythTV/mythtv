@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
-#Last Updated: 2005.03.02 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  export::transcode::DVCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
