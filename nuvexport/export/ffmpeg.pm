@@ -1,5 +1,8 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.04.28 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  ffmpeg.pm
 #
@@ -21,7 +24,7 @@ package export::ffmpeg;
     use mythtv::recordings;
 
 # In case people would rather use yuvdenoise to deinterlace
-    add_arg('deint_in_yuvdenoise|deint-in-yuvdenoise', 'Deinterlace in yuvdenoise instead of ffmpeg');
+    add_arg('deint_in_yuvdenoise|deint-in-yuvdenoise!', 'Deinterlace in yuvdenoise instead of ffmpeg');
 
 # Check for ffmpeg
     sub init_ffmpeg {

@@ -1,5 +1,8 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.04.13 (xris)
+#
+# $Date$
+# $Revision$
+# $Author$
 #
 #  transcode.pm
 #
@@ -20,7 +23,8 @@ package export::transcode;
     use mythtv::recordings;
 
 # Load the following extra parameters from the commandline
-    add_arg('zoom_filter:s', 'Which zoom filter to use.');
+    add_arg('zoom_filter:s',        'Which zoom filter to use.');
+    add_arg('force_mythtranscode!', 'Force use of mythtranscode, even on mpeg files.');
 
 # Check for transcode
     sub init_transcode {
@@ -129,7 +133,8 @@ package export::transcode;
             $width = $self->{'width'};
             # No padding on the width
             $pad_w = 0;
-        } else {
+        }
+        else {
             # The output will need letter/pillarboxing
             if ($self->{'width'} / $self->{'height'} <= $aspect) {
                 # We need to letterbox
@@ -167,59 +172,59 @@ package export::transcode;
         my $fpsout = $self->{'out_fps'};
         $transcode .= " --export_fps $fpsout";
         if ($fpsout == 23.976) {
-            $transcode .= ",1";
+            $transcode .= ',1';
         }
         elsif ($fpsout == 24) {
-            $transcode .= ",2";
+            $transcode .= ',2';
         }
         elsif ($fpsout == 25) {
-            $transcode .= ",3";
+            $transcode .= ',3';
         }
         elsif ($fpsout == 29.97) {
-            $transcode .= ",4";
+            $transcode .= ',4';
         }
         elsif ($fpsout == 30) {
-            $transcode .= ",5";
+            $transcode .= ',5';
         }
         elsif ($fpsout == 50) {
-            $transcode .= ",6";
+            $transcode .= ',6';
         }
         elsif ($fpsout == 59.94) {
-            $transcode .= ",7";
+            $transcode .= ',7';
         }
         elsif ($fpsout == 60) {
-            $transcode .= ",8";
+            $transcode .= ',8';
         }
         elsif ($fpsout == 1) {
-            $transcode .= ",9";
+            $transcode .= ',9';
         }
         elsif ($fpsout == 5) {
-            $transcode .= ",10";
+            $transcode .= ',10';
         }
         elsif ($fpsout == 10) {
-            $transcode .= ",11";
+            $transcode .= ',11';
         }
         elsif ($fpsout == 12) {
-            $transcode .= ",12";
+            $transcode .= ',12';
         }
         elsif ($fpsout == 15) {
-            $transcode .= ",13";
+            $transcode .= ',13';
         }
 
         if ($fpsout != $episode->{'finfo'}{'fps'}) {
-            $transcode .= " -J fps=" . $episode->{'finfo'}{'fps'} . ":" .
-                          $fpsout . ":pre";
+            $transcode .= ' -J fps=' . $episode->{'finfo'}{'fps'} . ':' .
+                          $fpsout . ':pre';
         }
 
     # Resize & pad
-        $transcode .= " -Z $width"."x$height";
-        if( $pad_h || $pad_w ) {
-            $transcode .= " -Y ".(-1*$pad_h).",".(-1*$pad_w).",".(-1*$pad_h).
-                          ",".(-1*$pad_w);
+        $transcode .= " -Z ${width}x$height";
+        if ( $pad_h || $pad_w ) {
+            $transcode .= ' -Y '.(-1*$pad_h).','.(-1*$pad_w).','.(-1*$pad_h).
+                          ','.(-1*$pad_w);
         }
 
-    # Not an mpeg
-        unless ($episode->{'finfo'}{'is_mpeg'}) {
+    # Not an mpeg, or force mythtranscode
+        if ($self->val('force_mythtranscode') || !$episode->{'finfo'}{'is_mpeg'}) {
         # swap red/blue -- used with svcd, need to see if it's needed everywhere
             $transcode .= ' -k';
         # Set up the fifo dirs?
@@ -232,18 +237,7 @@ package export::transcode;
         #    $mythtranscode .= ' --fifosync' if ($skip_audio);
         # let transcode handle the cutlist -- got too annoyed with the first/last frame(s) showing up no matter what I told mythtranscode
             #$mythtranscode .= ' --honorcutlist' if ($self->{'use_cutlist'});
-        }
-    # Figure out the input files
-        if ($episode->{'finfo'}{'is_mpeg'}) {
-            $transcode .= " -i $episode->{'filename'} -x ";
-            if ($episode->{'finfo'}{'mpeg_stream_type'} eq 'pes') {
-                $transcode .= 'vob';
-            }
-            else {
-                $transcode .= 'mpeg2';
-            }
-        }
-        else {
+        # Figure out the input files
             $transcode .= " -i /tmp/fifodir_$$/vidout -p /tmp/fifodir_$$/audout"
                          .' -H 0 -x raw'
                          .' -g '.join('x', $episode->{'finfo'}{'width'}, $episode->{'finfo'}{'height'})
@@ -252,6 +246,16 @@ package export::transcode;
                          .' -n 0x1'
                          .' -e '.join(',', $episode->{'finfo'}{'audio_sample_rate'}, $episode->{'finfo'}{'audio_bits_per_sample'}, $episode->{'finfo'}{'audio_channels'})
                          ;
+        }
+    # Is an mpeg
+        else {
+            $transcode .= " -i $episode->{'filename'} -x ";
+            if ($episode->{'finfo'}{'mpeg_stream_type'} eq 'pes') {
+                $transcode .= 'vob';
+            }
+            else {
+                $transcode .= 'mpeg2';
+            }
         }
     # Crop?
         if ($self->{'crop'}) {
@@ -277,7 +281,16 @@ package export::transcode;
             #smartyuv|smartdeinter|dilyuvmmx
         }
         if ($self->{'noise_reduction'}) {
-            $transcode .= " -J yuvdenoise=mode=2";
+            $transcode .= ' -J yuvdenoise=mode=';
+            if ($self->arg('fast_denoise')) {
+                $transcode .= 2;
+            }
+            elsif ($self->{'deinterlace'}) {
+                $transcode .= 0;
+            }
+            else {
+                $transcode .= 1;
+            }
         }
     # Add any additional settings from the child module
         $transcode .= ' '.$self->{'transcode_xtra'};
@@ -377,7 +390,6 @@ package export::transcode;
             rmdir "/tmp/fifodir_$$";
         }
     }
-
 
 # Return true
 1;

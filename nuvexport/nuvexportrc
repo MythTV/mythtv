@@ -19,38 +19,38 @@
 #
 <nuvexport>
 
-    #
-    #  Set export_prog to ffmpeg, transcode or mencoder, depending on your
-    #    preference of program for exports.  This is equivalent to --ffmpeg,
-    #    --transcode or --mencoder
-    #
+#
+#  Set export_prog to ffmpeg, transcode or mencoder, depending on your
+#    preference of program for exports.  This is equivalent to --ffmpeg,
+#    --transcode or --mencoder
+#
     export_prog=ffmpeg
 
-    #
-    #  Any other parameters set in this file are equivalent to using the equivalent
-    #    setting as a commandline option.  For boolean options like --deinterlace
-    #    (--nodeinterlace), use deinterlace=yes (or no, true or false) instead.
-    #    Actual commandline options will override anything in this file.
-    #
+#
+#  Any other parameters set in this file are equivalent to using the equivalent
+#    setting as a commandline option.  For boolean options like --deinterlace
+#    (--nodeinterlace), use deinterlace=yes (or no, true or false) instead.
+#    Actual commandline options will override anything in this file.
+#
 
-    #
-    #  Preferred mode -- if you don't set this, nuvexport will ask you what you
-    #    would like to do.  Use --mode or any of the mode symlinks (like
-    #    nuvexport-xvid) to override.
-    #
-    #mode=xvid
+#
+#  Preferred mode -- if you don't set this, nuvexport will ask you what you
+#    would like to do.  Use --mode or any of the mode symlinks (like
+#    nuvexport-xvid) to override.
+#
+    mode=xvid
 
-    #
-    #  Setting underscores to yes will convert whitespace in filenames to an
-    #    underscore character (which some people seem to prefer)
-    #
+#
+#  Setting underscores to yes will convert whitespace in filenames to an
+#    underscore character (which some people seem to prefer)
+#
     underscores=no
 
-    #
-    #  Setting require_cutlist to yes will tell nuvexport to show only those
-    #    recordings that have a cutlist
-    #
-    #require_cutlist=yes
+#
+#  Setting require_cutlist to yes will tell nuvexport to show only those
+#    recordings that have a cutlist
+#
+#    require_cutlist=no
 
 </nuvexport>
 
@@ -70,36 +70,44 @@
     deinterlace     = yes
     crop            = yes
 
-</generic>
-
 #
 #  You can create settings for each export module type.  These are the
 #    second-most generic sections, and will only be reached if there are no
 #    matches in the full or generic module names.
 #
+#  If you have a particularly dirty signal, you might want to try to disable
+#    fast_denoise (it's actually part of yuvdenoise, which both the ffmpeg
+#    and transcode exporters call).  It can be almost twice as slow as the
+#    default "fast" normal noise reduction, but it considerably more effective.
+#
+#    fast_denoise = yes
+
+</generic>
 
 <ffmpeg>
 #
-# ffmpeg is almost twice as fast if you disable noise reduction
+#  ffmpeg is almost twice as fast if you disable noise reduction
 #
 #    noise_reduction = no
 #
-# If you have a clean signal, you might want to try to use fast_denoise
-# with ffmpeg (it's actually part of yuvdenoise, which the ffmpeg exporter
-# uses).  It can be almost twice as fast as normal noise reduction, but is
-# nowhere near as effective.
+#  By default, nuvexport's ffmpeg module lets ffmpeg handle deinterlacing.
+#    I've found that this provides the best results, but if you wish to let
+#    yuvdenoise do it instead, set deint_in_yuvdenoise to a true value.
 #
-#    fast_denoise = yes
-#
-# By default, nuvexport's ffmpeg module lets ffmpeg handle deinterlacing.
-# I've found that this provides the best results, but if you wish to let
-# yuvdenoise do it instead, set deint_in_yuvdenoise to a true value.
-#
-#    deint_in_yuvdenoise = yes
+#    deint_in_yuvdenoise = no
 #
 </ffmpeg>
 
 <transcode>
+
+#
+#  Setting always_use_mythtranscode to yes will force nuvexport to call
+#    mythtranscode when using the transcode exporter.  This may help problems
+#    that some people have been having with transcode not recognizing certain
+#    dvb recordings.
+#
+#    force_mythtranscode=no
+
 </transcode>
 
 <mencoder>

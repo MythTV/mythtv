@@ -134,13 +134,13 @@ package mythtv::nuvinfo;
         ($info{'height'})                = $data =~ m/^ID_VIDEO_HEIGHT=(\d+)/m;
         ($info{'fps'})                   = $data =~ m/^ID_VIDEO_FPS=(\d+(?:\.\d*)?)/m;
         ($info{'audio_sample_rate'})     = $data =~ m/^ID_AUDIO_RATE=(\d+)/m;
-        # this is a different kind of "bits" than transcode and other programs expect
-        #($info{'audio_bits_per_sample'}) = $data =~ m/^ID_AUDIO_BITRATE=(\d+)/m;
-        $info{'audio_bits_per_sample'} = 16;
+        ($info{'audio_bitrate'})         = $data =~ m/^ID_AUDIO_BITRATE=(\d+)/m;
+        ($info{'audio_bits_per_sample'}) = $data =~ m/^AUDIO:.+?ch,\s*[su](8|16)/mi;
         ($info{'audio_channels'})        = $data =~ m/^ID_AUDIO_NCH=(\d+)/m;
         ($info{'mpeg_stream_type'})      = $data =~ m/^ID_VIDEO_FPS=(\d+(?:\.\d*)?)/m;
         ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=(\d+(?:[\.\,]\d*)?)/m;
         ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=(\d+(?:\.\d*)?)/m;
+    # Stream type
         if ($data =~ m/\bMPEG-(PE?S) file format detected/m) {
             $info{'mpeg_stream_type'} = lc($1);
         }
