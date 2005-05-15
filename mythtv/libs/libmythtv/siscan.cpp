@@ -718,7 +718,35 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     else
         return;    
 
-// TODO: Process Steps 3 and 4.. Only a partial 4 is being done now..
+    // Clear out entries in the channel table that don't exist anymore
+    QString deleteQuery = "delete from channel where not (";
+    for (s = SDT.begin() ; s != SDT.end() ; ++s )
+    {
+        if (s == SDT.begin())
+            deleteQuery += "(";
+        else
+            deleteQuery += " or (";
+
+        if ( (*s).ChanNum != -1)
+            deleteQuery += QString("channum = \"%1\" and ").arg((*s).ChanNum);
+
+        deleteQuery += QString("callsign = \"%1\" and serviceid=%2 and atscsrcid=%3) ")
+                       .arg((*s).ServiceName.utf8())
+                       .arg((*s).ServiceID)
+                       .arg((*s).ATSCSourceID);
+    }
+    deleteQuery += QString(") and mplexid = %1")
+                           .arg(chan->GetCurrentTransportDBID());
+
+    query.prepare(deleteQuery);
+
+    if(!query.exec())
+        MythContext::DBError("Deleting non-existant channels", query);
+
+    if (!query.isActive())
+        MythContext::DBError("Deleting non-existant channels", query);
+
+
     for (s = SDT.begin() ; s != SDT.end() ; ++s )
     {
         // Its a TV Service so add it also only do FTA
@@ -753,7 +781,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                     emit ServiceScanUpdateText(status);
                     // Get next chanid and determine what Transport its on
 
-                    chanid = GenerateNewChanID();
+                    chanid = GenerateNewChanID(localSourceID);
 
                     int ChanNum;
                     if( (*s).ChanNum == -1 )
@@ -1114,7 +1142,7 @@ int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId
 
 }
 
-int SIScan::GenerateNewChanID()
+int SIScan::GenerateNewChanID(int sourceID)
 {
 
     MSqlQuery query(MSqlQuery::InitCon());

@@ -107,7 +107,7 @@ private:
     void CheckNIT(NITObject& NIT);
 
     void UpdateServicesInDB(QMap_SDTObject SDT);
-    int  GenerateNewChanID();
+    int  GenerateNewChanID(int SourceID);
     int  GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexID);
     void AddEvents();
 
