@@ -18,6 +18,20 @@
 
 using namespace std;
 
+static QString StripHTMLTags(const QString& src)
+{
+    QString dst(src);
+
+    // First replace some tags with some ASCII formatting
+    dst.replace( QRegExp("<br[^>]*>"), "\n" );
+    dst.replace( QRegExp("<p[^>]*>"),  "\n" );
+    dst.replace( QRegExp("<li[^>]*>"), "\n- " );
+    // And finally remve any remaining tags
+    dst.replace( QRegExp("<[^>]*>"), "" );
+
+    return dst;
+}
+
 ProgramInfo::ProgramInfo(void)
 {
     spread = -1;
@@ -332,7 +346,7 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap)
     
     progMap["title"] = title;
     progMap["subtitle"] = subtitle;
-    progMap["description"] = description;
+    progMap["description"] = StripHTMLTags(description);
     progMap["category"] = category;
     progMap["callsign"] = chansign;
     progMap["commfree"] = chancommfree;
