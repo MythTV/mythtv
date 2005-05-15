@@ -94,7 +94,7 @@ public slots:
 class ScanCountry: public ComboBoxSetting,TransientStorage
 {
 public:
-    enum Lang{AU,FI,SE,UK};
+    enum Lang{AU,FI,SE,UK,DE};
 
     ScanCountry();
 };

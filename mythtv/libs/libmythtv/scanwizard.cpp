@@ -559,6 +559,8 @@ ScanCountry::ScanCountry()
                  country==QLocale::Sweden);
     addSelection(QObject::tr("United Kingdom"),QString::number(UK),
                  country==QLocale::UnitedKingdom);
+    addSelection(QObject::tr("Germany"),QString::number(DE),
+                 country==QLocale::Germany);
 }
 
 ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard) : 
