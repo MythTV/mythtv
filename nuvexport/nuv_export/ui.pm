@@ -49,7 +49,7 @@ package nuv_export::ui;
     # Look for a filename or channel/starttime
         else {
             my $chanid    = arg('chanid');
-            my $starttimg = arg('starttime');
+            my $starttime = arg('starttime');
         # Filename specified on the command line -- extract the chanid and starttime
             if (arg('infile')) {
                 if (arg('infile') =~ /\b(\d+)_(\d+)_\d+\.nuv$/) {

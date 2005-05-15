@@ -2,7 +2,7 @@
 # Last Updated: 2005.02.28 (xris)
 
 # Version
-    $VERSION = '0.2 0.20050514.cvs';
+    $VERSION = '0.2 0.20050515.cvs';
 
 # Autoflush buffers
     $|++;
