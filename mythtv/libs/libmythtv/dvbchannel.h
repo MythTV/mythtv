@@ -38,6 +38,7 @@ public:
     void CloseDVB();
 
     fe_type_t GetCardType() { return info.type; };
+    bool GetTuningParams(DVBTuning &tuning);
 
     bool SetTransportByInt(int mplexid);
     bool SetChannelByString(const QString &chan);
@@ -49,27 +50,6 @@ public:
 
     void GetCurrentChannel(dvb_channel_t *& chan)
         { chan = &chan_opts; };
-
-    bool ParseQPSK(const QString& frequency, const QString& inversion,
-                   const QString& symbol_rate, const QString& fec_inner,
-                   const QString& pol, 
-                   const QString& diseqc_type, const QString& diseqc_port,
-                   const QString& diseqc_pos,
-                   const QString& lnb_lof_switch, const QString& lnb_lof_hi,
-                   const QString& lnb_lof_lo, dvb_tuning_t& t);
-
-    bool ParseQAM(const QString& frequency, const QString& inversion,
-                  const QString& symbol_rate, const QString& fec_inner,
-                  const QString& modulation, dvb_tuning_t& t);
-
-    bool ParseOFDM(const QString& frequency, const QString& inversion,
-                   const QString& bandwidth, const QString& coderate_hp,
-                   const QString& coderate_lp, const QString& constellation,
-                   const QString& trans_mode, const QString& guard_interval,
-                   const QString& hierarchy, dvb_tuning_t& p);
-
-    bool ParseATSC(const QString& frequency, const QString modulation,
-                   dvb_tuning_t& t);
 
     bool Tune(dvb_channel_t& channel, bool all=false);
     bool TuneTransport(dvb_channel_t& channel, bool all=false, int timeout=30000);
@@ -106,10 +86,10 @@ private:
 
     bool ParseTransportQuery(MSqlQuery& query);
 
-    bool TuneQPSK(dvb_tuning_t& tuning, bool reset, bool& havetuned);
-    bool TuneQAM(dvb_tuning_t& tuning, bool reset, bool& havetuned);
-    bool TuneOFDM(dvb_tuning_t& tuning, bool reset, bool& havetuned);
-    bool TuneATSC(dvb_tuning_t& tuning, bool reset, bool& havetuned);
+    bool TuneQPSK(DVBTuning& tuning, bool reset, bool& havetuned);
+    bool TuneQAM(DVBTuning& tuning, bool reset, bool& havetuned);
+    bool TuneOFDM(DVBTuning& tuning, bool reset, bool& havetuned);
+    bool TuneATSC(DVBTuning& tuning, bool reset, bool& havetuned);
 
     static void *SpawnSectionReader(void *param);
     static void *SpawnSIParser(void *param);
@@ -121,7 +101,7 @@ private:
 
     dvb_frontend_info   info;
     dvb_channel_t       chan_opts;
-    dvb_tuning_t        prev_tuning;
+    DVBTuning        prev_tuning;
 
     int     cardnum;
     volatile int fd_frontend;

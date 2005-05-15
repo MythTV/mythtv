@@ -45,6 +45,11 @@ class ATSCPane;
 class QAMPane;
 class SIScan;
 class DVBChannel;
+class ScanOptionalConfig;
+class ScanCountry;
+class OptionalTypeSetting;
+class ScanWizard;
+class ScanWizardScanner;
 
 class VideoSourceSetting: public ComboBoxSetting
 {
@@ -86,22 +91,42 @@ public slots:
     void sourceID(const QString& str);
 };
 
+class ScanCountry: public ComboBoxSetting,TransientStorage
+{
+public:
+    enum Lang{AU,FI,SE,UK};
+
+    ScanCountry();
+};
+
 class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
 {
 public:
-    enum Type {FullScan,FullTransportScan,TransportScan} ;
+    enum Type {FullScan,FullTunedScan,FullTransportScan,TransportScan} ;
 
     ScanTypeSetting()
     {
         setLabel(QObject::tr("Scan Type"));
         addSelection(tr("Full Scan"),QString::number(FullScan),true);
+        addSelection(tr("Full Scan (Tuned)"),QString::number(FullTunedScan));
         addSelection(tr("Full Scan of Existing Transports"),QString::number(FullTransportScan));
         addSelection(tr("Existing Transport Scan"),QString::number(TransportScan));
     }
 };
 
-class ScanWizardTuningPage;
-class ScanWizardScanner;
+class ScanOptionalConfig: public VerticalConfigurationGroup,
+                   public TriggeredConfigurationGroup 
+{
+    Q_OBJECT
+public:
+    ScanOptionalConfig(ScanWizard* wizard);
+
+    OptionalTypeSetting *optionalTypeSetting;
+    TransportSetting *transport;
+    ScanCountry *country;
+protected slots:
+    void triggerChanged(const QString&);
+};
 
 class ScanWizardScanType: public VerticalConfigurationGroup
 {
@@ -116,19 +141,21 @@ protected slots:
 protected:
     ScanWizard *parent;
 
-    TransportSetting *transport;
+    ScanOptionalConfig *scanConfig;
     CaptureCardSetting *capturecard;
     VideoSourceSetting *videoSource;
     ScanTypeSetting *scanType;
+
+signals:
+    void scanOptionChange(const QString&);
 };
 
 class ScanWizard: public ConfigurationWizard 
 {
     Q_OBJECT
-    friend class ScanWizardTuningPage;
     friend class ScanWizardScanType;
     friend class ScanWizardScanner;
-
+    friend class ScanOptionalConfig;
 public:
     ScanWizard();
 
@@ -155,7 +182,8 @@ protected:
 
     ScanWizardScanType *page1;
     int videoSource() {return page1->videoSource->getValue().toInt();}
-    int transport() {return page1->transport->getValue().toInt();}
+    int transport() {return page1->scanConfig->transport->getValue().toInt();}
+    int country() {return page1->scanConfig->country->getValue().toInt();}
     int captureCard() {return page1->capturecard->getValue().toInt();}
     int scanType() {return page1->scanType->getValue().toInt();}
 };
@@ -163,16 +191,6 @@ protected:
 class ScanSignalMeter: public ProgressSetting, public TransientStorage {
 public:
     ScanSignalMeter(int steps): ProgressSetting(steps) {};
-};
-
-class ScanWizardTuningPage : public HorizontalConfigurationGroup, public TriggeredConfigurationGroup
-{
-    Q_OBJECT
-public:
-    ScanWizardTuningPage(ScanWizard* parent);
-
-protected slots:
-    virtual void triggerChanged(const QString& value);
 };
 
 class LogList: public ListBoxSetting, public TransientStorage

@@ -244,6 +244,8 @@ private:
 class SDTObject
 {
 public:
+    enum {TV=1,RADIO=2};
+
     SDTObject() { Reset(); }
     void Reset();
 
@@ -422,6 +424,7 @@ public:
     PMTObject() { Reset(); }
     void Reset();
 
+    bool RadioService() { return hasAudio; }
     bool TelevisionService() { return hasVideo && hasAudio; }
     bool OnAir() { return TelevisionService(); }
     bool FTA() { return !hasCA; }

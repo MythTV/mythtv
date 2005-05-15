@@ -56,7 +56,7 @@ DVBDiSEqC::~DVBDiSEqC()
 {
 }
 
-bool DVBDiSEqC::Set(dvb_tuning_t& tuning, bool reset, bool& havetuned)
+bool DVBDiSEqC::Set(DVBTuning& tuning, bool reset, bool& havetuned)
 {
 
     switch(tuning.diseqc_type)
@@ -100,7 +100,7 @@ bool DVBDiSEqC::Set(dvb_tuning_t& tuning, bool reset, bool& havetuned)
                         Backward Compatible Methods
  ****************************************************************************/
 
-bool DVBDiSEqC::ToneVoltageLnb(dvb_tuning_t& tuning, bool reset, bool& havetuned)
+bool DVBDiSEqC::ToneVoltageLnb(DVBTuning& tuning, bool reset, bool& havetuned)
 {
     CHANNEL(QString("Setting LNB: %1 %2")
             .arg(tuning.tone==SEC_TONE_ON?"Tone ON":"Tone OFF")
@@ -135,7 +135,7 @@ bool DVBDiSEqC::ToneVoltageLnb(dvb_tuning_t& tuning, bool reset, bool& havetuned
     return true;
 }
 
-bool DVBDiSEqC::ToneSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned)
+bool DVBDiSEqC::ToneSwitch(DVBTuning& tuning, bool reset, bool& havetuned)
 {
     CHANNEL(QString("DiSEqC Tone Switch - Port %1/2").arg(tuning.diseqc_port));
 
@@ -162,7 +162,7 @@ bool DVBDiSEqC::ToneSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned)
                     Diseqc 1.x Compatible Methods
  ****************************************************************************/
 
-bool DVBDiSEqC::SendDiSEqCMessage(dvb_tuning_t& tuning, dvb_diseqc_master_cmd &cmd)
+bool DVBDiSEqC::SendDiSEqCMessage(DVBTuning& tuning, dvb_diseqc_master_cmd &cmd)
 {
     // Turn off tone burst
     if (ioctl(fd_frontend, FE_SET_TONE, SEC_TONE_OFF) == -1) 
@@ -322,7 +322,7 @@ bool DVBDiSEqC::SendDiSEqCMessage(dvb_diseqc_master_cmd &cmd)
     return true;
 }
 
-bool DVBDiSEqC::Diseqc1xSwitch_10way(dvb_tuning_t& tuning, bool reset, 
+bool DVBDiSEqC::Diseqc1xSwitch_10way(DVBTuning& tuning, bool reset, 
                                bool& havetuned)
 {
     if (reset) 
@@ -368,7 +368,7 @@ bool DVBDiSEqC::Diseqc1xSwitch_10way(dvb_tuning_t& tuning, bool reset,
     return true;
 }
 
-bool DVBDiSEqC::Diseqc1xSwitch(dvb_tuning_t& tuning, bool reset, 
+bool DVBDiSEqC::Diseqc1xSwitch(DVBTuning& tuning, bool reset, 
                                bool& havetuned)
 {
     if (reset) 
@@ -492,7 +492,7 @@ bool DVBDiSEqC::PositionerDriveWest(int timestep)
     return true;
 }
 
-bool DVBDiSEqC::PositionerGoto(dvb_tuning_t& tuning, bool reset, bool& havetuned)
+bool DVBDiSEqC::PositionerGoto(DVBTuning& tuning, bool reset, bool& havetuned)
 {
     // A reset seems to be required for my positioner to work consistently
     GENERAL(QString("DiSEqC 1.2 Motor - Goto Stored Position %1")
@@ -527,7 +527,7 @@ bool DVBDiSEqC::PositionerGoto(dvb_tuning_t& tuning, bool reset, bool& havetuned
     return true;
 }
 
-bool DVBDiSEqC::PositionerStore(dvb_tuning_t& tuning)
+bool DVBDiSEqC::PositionerStore(DVBTuning& tuning)
 {
     if (!DiseqcReset()) 
     {
@@ -643,7 +643,7 @@ bool DVBDiSEqC::PositionerDisableLimits()
                                 Diseqc v1.3 (Goto X)
  ****************************************************************************/
 
-bool DVBDiSEqC::PositionerGotoAngular(dvb_tuning_t& tuning, bool reset, 
+bool DVBDiSEqC::PositionerGotoAngular(DVBTuning& tuning, bool reset, 
                                       bool& havetuned) 
 {
     // TODO: Send information here to FE saying motor is moving and

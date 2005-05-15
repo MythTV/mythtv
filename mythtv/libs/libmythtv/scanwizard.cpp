@@ -31,6 +31,7 @@
  */
 #include <qapplication.h>
 #include <qptrlist.h>
+#include <qlocale.h>
 #include "mythcontext.h"
 #include "dvbchannel.h"
 #include "videosource.h"
@@ -374,11 +375,11 @@ void CaptureCardSetting::sourceID(const QString& str)
 class OFDMPane : public HorizontalConfigurationGroup
 {
 public:
-    OFDMPane() 
+    OFDMPane() : HorizontalConfigurationGroup(false,false,true,true)
     {
         setUseFrame(false);
-        VerticalConfigurationGroup *left=new VerticalConfigurationGroup(false,true);
-        VerticalConfigurationGroup *right=new VerticalConfigurationGroup(false,true);
+        VerticalConfigurationGroup *left=new VerticalConfigurationGroup(false,true,true,false);
+        VerticalConfigurationGroup *right=new VerticalConfigurationGroup(false,true,true,false);
         left->addChild(pfrequency=new ScanFrequency());
         left->addChild(pbandwidth=new ScanBandwidth());
         left->addChild(pinversion=new ScanInversion());
@@ -390,19 +391,6 @@ public:
         right->addChild(phierarchy=new ScanHierarchy());
         addChild(left);
         addChild(right);
-     }
-
-     void enable(bool fEnable)
-     {
-        pfrequency->setEnabled(fEnable);
-        pbandwidth->setEnabled(fEnable);
-        pinversion->setEnabled(fEnable);
-        pconstellation->setEnabled(fEnable);
-        pcoderate_lp->setEnabled(fEnable);
-        pcoderate_hp->setEnabled(fEnable);
-        ptrans_mode->setEnabled(fEnable);
-        pguard_interval->setEnabled(fEnable);
-        phierarchy->setEnabled(fEnable);
      }
 
      QString frequency() { return pfrequency->getValue();}
@@ -430,27 +418,18 @@ protected:
 class QPSKPane : public HorizontalConfigurationGroup
 {
 public:
-    QPSKPane() 
+    QPSKPane() : HorizontalConfigurationGroup(false,false,true,false) 
     {
         setUseFrame(false);
         VerticalConfigurationGroup *left=new VerticalConfigurationGroup(false,true);
         VerticalConfigurationGroup *right=new VerticalConfigurationGroup(false,true);
         left->addChild(pfrequency = new ScanFrequency());
+        left->addChild(ppolarity = new ScanPolarity());
         left->addChild(psymbolrate=new ScanSymbolRate());
-        left->addChild(pinversion=new ScanInversion());
         right->addChild(pfec=new ScanFec());
-        right->addChild(ppolarity = new ScanPolarity());
+        right->addChild(pinversion=new ScanInversion());
         addChild(left);
         addChild(right);     
-    }
-
-    void enable(bool fEnable)
-    {
-        pfrequency->setEnabled(fEnable);
-        psymbolrate->setEnabled(fEnable);
-        pinversion->setEnabled(fEnable);
-        pfec->setEnabled(fEnable);
-        ppolarity->setEnabled(fEnable);
     }
 
     QString frequency() {return pfrequency->getValue();}
@@ -470,8 +449,9 @@ protected:
 class QAMPane : public HorizontalConfigurationGroup
 {
 public:
-    QAMPane() 
+    QAMPane() : HorizontalConfigurationGroup(false,false,true,false) 
     {
+        setUseFrame(false);
         VerticalConfigurationGroup *left=new VerticalConfigurationGroup(false,true);
         VerticalConfigurationGroup *right=new VerticalConfigurationGroup(false,true);
         left->addChild(pfrequency = new ScanFrequency());
@@ -481,15 +461,6 @@ public:
         right->addChild(pfec=new ScanFec());
         addChild(left);
         addChild(right);     
-    }
-
-    void enable(bool fEnable)
-    {
-        pfrequency->setEnabled(fEnable);
-        psymbolrate->setEnabled(fEnable);
-        pinversion->setEnabled(fEnable);
-        pfec->setEnabled(fEnable);
-        pmodulation->setEnabled(fEnable);
     }
 
     QString frequency() {return pfrequency->getValue();}
@@ -509,14 +480,10 @@ protected:
 class ATSCPane : public HorizontalConfigurationGroup
 {
 public:
-    ATSCPane()
+    ATSCPane()  : HorizontalConfigurationGroup(false,false,true,false)
     {
+        setUseFrame(false);
         addChild(patscTransport=new ScanATSCTransport());
-    }
-
-    void enable(bool fEnable)
-    {
-        patscTransport->setEnabled(fEnable);
     }
 
     int atscTransport() {return patscTransport->getValue().toInt();}
@@ -527,8 +494,10 @@ protected:
 class ErrorPane : public HorizontalConfigurationGroup
 {
 public:
-    ErrorPane(const QString& error)
+    ErrorPane(const QString& error) :
+            HorizontalConfigurationGroup(false,false,true,false)
     {
+        setUseFrame(false);
         TransLabelSetting* label = new TransLabelSetting();
         label->setValue(error);
         addChild(label);
@@ -549,22 +518,100 @@ public:
     }
 };
 
+class BlankSetting: public TransLabelSetting
+{
+public:
+     BlankSetting() : TransLabelSetting()
+     {
+         setLabel("");
+     }
+};
+
+class OptionalTypeSetting : public ComboBoxSetting, public TransientStorage
+{
+public:
+    enum {Error_Open,Error_Probe,QPSK,QAM,OFDM,ATSC,Country,Transport,Blank};
+    OptionalTypeSetting()
+    {
+        addSelection("ERROR_OPEN",QString::number(Error_Open));
+        addSelection("ERROR_PROBE",QString::number(Error_Probe));
+        addSelection("QPSK",QString::number(QPSK));
+        addSelection("QAM",QString::number(QAM));
+        addSelection("OFDM",QString::number(OFDM));
+        addSelection("ATSC",QString::number(ATSC));
+        addSelection("Full-scan:country",QString::number(Country));
+        addSelection("Given transport",QString::number(Transport));
+        addSelection("Blank",QString::number(Blank));
+    }
+};
+
+ScanCountry::ScanCountry()
+{
+    QLocale locale = QLocale::system();
+    QLocale::Country country = locale.country();
+
+    setLabel(tr("Country"));
+    addSelection(QObject::tr("Australia"),QString::number(AU),
+                 country==QLocale::Australia);
+    addSelection(QObject::tr("Finland"),QString::number(FI),
+                 country==QLocale::Finland);
+    addSelection(QObject::tr("Sweden"),QString::number(SE),
+                 country==QLocale::Sweden);
+    addSelection(QObject::tr("United Kingdom"),QString::number(UK),
+                 country==QLocale::UnitedKingdom);
+}
+
+ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard) : 
+                  VerticalConfigurationGroup(false,false,true,true)
+{
+    setUseLabel(false);
+
+    optionalTypeSetting=new OptionalTypeSetting();
+    optionalTypeSetting->setVisible(false);
+    addChild(optionalTypeSetting);
+    setTrigger(optionalTypeSetting);
+    // only save settings for the selected grabber
+    setSaveAll(false);
+
+    addTarget(QString::number(OptionalTypeSetting::Error_Open),
+             new ErrorPane(QObject::tr("Failed to open the card")));
+    addTarget(QString::number(OptionalTypeSetting::Error_Probe),
+             new ErrorPane(QObject::tr("Failed to probe the card")));
+    addTarget(QString::number(OptionalTypeSetting::QAM),wizard->paneQAM);
+    addTarget(QString::number(OptionalTypeSetting::QPSK),wizard->paneQPSK);
+    addTarget(QString::number(OptionalTypeSetting::OFDM),wizard->paneOFDM);
+    addTarget(QString::number(OptionalTypeSetting::ATSC),wizard->paneATSC);
+    country = new ScanCountry();
+    addTarget(QString::number(OptionalTypeSetting::Country),country);
+    transport = new TransportSetting();
+    addTarget(QString::number(OptionalTypeSetting::Transport),transport);
+    addTarget(QString::number(OptionalTypeSetting::Blank),new BlankSetting());
+}
+
+void ScanOptionalConfig::triggerChanged(const QString& value)
+{
+    TriggeredConfigurationGroup::triggerChanged(value);
+}
+
 ScanWizardScanType::ScanWizardScanType(ScanWizard *_parent) : parent(_parent)
 {
     setLabel(tr("Scan Type"));
     setUseLabel(false);
+
     videoSource = new VideoSourceSetting();
-    scanType = new ScanTypeSetting();
-    transport = new TransportSetting();
     capturecard = new CaptureCardSetting();
 
-    addChild(videoSource);
-    addChild(capturecard);
+    HorizontalConfigurationGroup *h1 = new HorizontalConfigurationGroup(false,false,true,true);
+    h1->addChild(videoSource);
+    h1->addChild(capturecard);
+    addChild(h1);
+    scanType = new ScanTypeSetting();
     addChild(scanType);
-    addChild(transport);
+    scanConfig = new ScanOptionalConfig(_parent);
+    addChild(scanConfig);
 
     connect(videoSource, SIGNAL(valueChanged(const QString&)),
-        transport, SLOT(sourceID(const QString&)));
+        scanConfig->transport, SLOT(sourceID(const QString&)));
     connect(videoSource, SIGNAL(valueChanged(const QString&)),
         capturecard, SLOT(sourceID(const QString&)));
 
@@ -573,51 +620,63 @@ ScanWizardScanType::ScanWizardScanType(ScanWizard *_parent) : parent(_parent)
 
     connect(scanType, SIGNAL(valueChanged(const QString&)),
         this, SLOT(scanTypeChanged(const QString&)));
-    scanTypeChanged(scanType->getValue());
+    connect(capturecard, SIGNAL(valueChanged(const QString&)),
+        this, SLOT(scanTypeChanged(const QString&)));
+
+    connect(this,SIGNAL(scanOptionChange(const  QString&)),
+        scanConfig,SLOT(triggerChanged(const QString&)));
+    scanTypeChanged("");
 }
 
 void ScanWizardScanType::scanTypeChanged(const QString& str)
 {
-    unsigned nType = str.toInt();
-    bool fEnable = false;
-    if ((nType == ScanTypeSetting::FullScan) ||
-        (nType == ScanTypeSetting::FullTransportScan))
-       transport->setEnabled(false);
-    if (nType == ScanTypeSetting::TransportScan)
-       transport->setEnabled(true);
-    if (nType == ScanTypeSetting::FullScan)
-        fEnable = true;
+    (void)str;
+    int nCard = capturecard->getValue().toInt();
+    int nType = scanType->getValue().toInt();
 
-    parent->paneOFDM->enable(fEnable);
-    parent->paneQPSK->enable(fEnable);
-    parent->paneATSC->enable(fEnable);
-    parent->paneQAM->enable(fEnable);
-}
-
-
-ScanWizardTuningPage::ScanWizardTuningPage(ScanWizard *parent)
-{
-    setLabel(tr("Tuning"));
-    setUseLabel(false);
-
-    CardTypeSetting *card = new CardTypeSetting();
-    card->setVisible(false);
-    addChild(card);
-     
-    setTrigger(card);
-    setSaveAll(false);
-
-    addTarget("0", new ErrorPane(tr("Failed to open the card")));
-    addTarget("1", new ErrorPane(tr("Failed to probe the card")));
-    addTarget("2", parent->paneQPSK);
-    addTarget("3",  parent->paneQAM);
-    addTarget("4", parent->paneOFDM);
-    addTarget("5", parent->paneATSC);
-}
-
-void ScanWizardTuningPage::triggerChanged(const QString& value)
-{
-    TriggeredConfigurationGroup::triggerChanged(value);
+    int nVideoDev = CardUtil::videoDeviceFromCardID(nCard);
+    int nCardType = CardUtil::ERROR_OPEN;
+    if (nVideoDev >= 0)
+        nCardType = CardUtil::cardDVBType(nVideoDev);
+    int nPane = OptionalTypeSetting::Blank;
+cerr << "ScanWizardScanType::scanTypeChanged " << str << " scan type "<< nType<<" card type " << nCardType << " video dev " << nVideoDev << endl;
+    switch (nType)
+    {
+    case ScanTypeSetting::FullScan:
+        if (nCardType == CardUtil::OFDM)
+        {
+            nPane = OptionalTypeSetting::Country;
+            break;
+        }
+        //Fall through
+    case ScanTypeSetting::FullTunedScan:
+        switch (nCardType)
+        {
+        case CardUtil::QPSK:
+            nPane = OptionalTypeSetting::QPSK;
+            break;
+        case CardUtil::QAM:
+            nPane = OptionalTypeSetting::QAM;
+            break;
+        case CardUtil::OFDM:
+            nPane = OptionalTypeSetting::OFDM;
+            break;
+        case CardUtil::ATSC:
+            nPane = OptionalTypeSetting::ATSC;
+            break;
+        case CardUtil::ERROR_OPEN:
+            nPane = OptionalTypeSetting::Error_Open;
+            break;
+        default:
+            nPane = OptionalTypeSetting::Error_Probe;
+            break;
+        }
+        break;
+    case ScanTypeSetting::TransportScan:
+        nPane = OptionalTypeSetting::Transport;
+        break;
+    }
+    emit scanOptionChange(QString::number(nPane));
 }
 
 LogList::LogList() : n(0)
@@ -718,12 +777,23 @@ void ScanWizardScanner::customEvent( QCustomEvent * e )
                 connect(dvbchannel->siparser, SIGNAL(TableLoaded()),
                            this,SLOT(TableLoaded()));
                 popupProgress->progress((TUNED_PCT*PROGRESS_MAX)/100);
-                if (parent->scanType()==ScanTypeSetting::FullScan)
+                if (parent->scanType()==ScanTypeSetting::FullTunedScan)
                 {
                      if (parent->nCardType == CardUtil::ATSC)
                         scanner->ATSCScanTransport(parent->videoSource(),
                           parent->paneATSC->atscTransport());
                      else
+                        scanner->ScanTransports();
+                }
+                else if (parent->scanType()==ScanTypeSetting::FullScan)
+                {
+                    if (parent->nCardType == CardUtil::ATSC)
+                        scanner->ATSCScanTransport(parent->videoSource(),
+                          parent->paneATSC->atscTransport());
+                    else if (parent->nCardType == CardUtil::OFDM)
+                        scanner->DVBTScanTransport(parent->videoSource(),
+                            parent->country());
+                    else
                         scanner->ScanTransports();
                 }
                 else if (parent->scanType()==ScanTypeSetting::FullTransportScan)
@@ -777,7 +847,8 @@ void *ScanWizardScanner::SpawnTune(void *param)
             return NULL;
         }
     }
-    else if (parent->scanType() == ScanTypeSetting::FullScan)
+    else if ((parent->scanType() == ScanTypeSetting::FullTunedScan) ||
+             (parent->scanType() == ScanTypeSetting::FullScan))
     {
         if (!scanner->dvbchannel->TuneTransport(scanner->chan_opts,true))
         {
@@ -806,6 +877,8 @@ void ScanWizardScanner::serviceScanPctComplete(int pct)
 
 void ScanWizardScanner::updateText(const QString& str)
 {
+    if (str.isEmpty())
+         return;
     ScannerEvent* e=new ScannerEvent(ScanWizardScanner::ScannerEvent::Update);
     e->strValue(str);
     QApplication::postEvent(this,e);
@@ -961,7 +1034,15 @@ void ScanWizardScanner::scan()
     popupProgress->exec(this);
 
     memset(&chan_opts.tuning,0,sizeof(chan_opts.tuning));
-    if (parent->scanType() == ScanTypeSetting::FullScan)
+
+    //We can't do a full scan for DVB-C or DVB-S
+    int scanType = parent->scanType();
+    if ((scanType == ScanTypeSetting::FullScan) &&
+         ((parent->nCardType==CardUtil::QPSK) ||
+          (parent->nCardType==CardUtil::QAM)))
+        scanType = ScanTypeSetting::FullTunedScan;
+
+    if (scanType == ScanTypeSetting::FullTunedScan)
     {
         bool fParseError = false;
         switch (parent->nCardType)
@@ -969,7 +1050,7 @@ void ScanWizardScanner::scan()
            case CardUtil::OFDM:
            {
                OFDMPane *pane = parent->paneOFDM;
-               if (!dvbchannel->ParseOFDM(
+               if (!chan_opts.tuning.parseOFDM(
                               pane->frequency(),
                               pane->inversion(),
                               pane->bandwidth(),
@@ -978,8 +1059,7 @@ void ScanWizardScanner::scan()
                               pane->constellation(),
                               pane->trans_mode(),
                               pane->guard_interval(),
-                              pane->hierarchy(),
-                              chan_opts.tuning))
+                              pane->hierarchy()))
                {
                     fParseError = true;
                     break;
@@ -1001,7 +1081,7 @@ void ScanWizardScanner::scan()
                {
                    QPSKPane *pane = parent->paneQPSK;
                    query.next();
-                   if (!dvbchannel->ParseQPSK(
+                   if (!chan_opts.tuning.parseQPSK(
                                   pane->frequency(),
                                   pane->inversion(),
                                   pane->symbolrate(),
@@ -1012,8 +1092,8 @@ void ScanWizardScanner::scan()
                                   query.value(2).toString(), // diseqc_pos
                                   query.value(3).toString(), // lnb_lof_switch
                                   query.value(4).toString(), // lnb_lof_hi
-                                  query.value(5).toString(), // lnb_lof_lo
-                                  chan_opts.tuning))
+                                  query.value(5).toString()  // lnb_lof_lo
+                                  ))
                         fParseError = true;
                    }
                    else
@@ -1022,12 +1102,11 @@ void ScanWizardScanner::scan()
            case CardUtil::QAM:
            {
                QAMPane *pane = parent->paneQAM;
-               if (!dvbchannel->ParseQAM(pane->frequency(),
+               if (!chan_opts.tuning.parseQAM(pane->frequency(),
                                         pane->inversion(),
                                         pane->symbolrate(),
                                         pane->fec(),
-                                        pane->modulation(),
-                                        chan_opts.tuning))
+                                        pane->modulation()))
                {
                     fParseError = true;
                     break;
@@ -1057,31 +1136,33 @@ void ScanWizardScanner::scan()
             return;
         }
     }
+    else if (scanType == ScanTypeSetting::FullScan)
+    {
+       ScannerEvent* e=new ScannerEvent(ScanWizardScanner::ScannerEvent::TuneComplete);
+       e->intValue(ScanWizardScanner::ScannerEvent::OK);
+       QApplication::postEvent(this,e);
+       return;
+    }
 
     tunerthread_running = true;
     pthread_create(&tuner_thread, NULL, SpawnTune, this);
 }
 
-ScanWizard::ScanWizard() : nVideoDev(-1), nCardType(CardUtil::ERROR_PROBE), 
-    nCaptureCard(-1)
+ScanWizard::ScanWizard() : nVideoDev(-1),
+          nCardType(CardUtil::ERROR_PROBE), nCaptureCard(-1)
 {
-    paneQPSK =  new QPSKPane();
     paneQAM = new QAMPane();
     paneOFDM = new OFDMPane();
+    paneQPSK = new QPSKPane();
     paneATSC = new ATSCPane();
 
     page1 = new ScanWizardScanType(this);
-    ScanWizardTuningPage *page2 = new ScanWizardTuningPage(this);
-    ScanWizardScanner *page3 = new ScanWizardScanner(this);
+    ScanWizardScanner *page2 = new ScanWizardScanner(this);
 
-    connect(this,SIGNAL(cardTypeChanged(const QString&)),
-             page2,SLOT(triggerChanged(const QString&)));
-
-    connect(this,SIGNAL(scan()), page3 ,SLOT(scan()));
+    connect(this,SIGNAL(scan()), page2 ,SLOT(scan()));
 
     addChild(page1);
     addChild(page2);
-    addChild(page3);
 }
 
 void ScanWizard::captureCard(const QString& str)
@@ -1114,5 +1195,9 @@ void ScanWizard::pageSelected(const QString& strTitle)
 {
     if (strTitle == ScanWizardScanner::strTitle)
        emit scan();
+    //This is a bit hacky, but it seems to be needed otherwise the
+    //trigger pane on page 1 doesn't seem to update, this is seen
+    //when you escape back to page 1
+    page1->scanTypeChanged(""); 
 }
 

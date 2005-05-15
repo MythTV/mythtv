@@ -173,6 +173,12 @@ void DVBTransportsEditor::del() {
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("TransportEditor Delete DVBTransport", query);
+
+        querystr = QString("DELETE FROM channel "
+                                   "WHERE mplexid ='%1'").arg(m_nID);
+        query.prepare(querystr);
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("TransportEditor Delete associated channels", query);
         m_list->fillSelections();
     }
 }

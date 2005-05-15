@@ -1157,7 +1157,9 @@ void SIParser::ParseSDT(tablehead_t* head, uint8_t* buffer, int size)
         bool eit_requested = false;
 #ifdef USING_DVB_EIT
 
-        if ((s.EITPresent) && (s.ServiceType == 1) && ((!PrivateTypes.GuideOnSingleTransport) ||
+        if ((s.EITPresent) && 
+            (s.ServiceType == SDTObject::TV) && 
+            ((!PrivateTypes.GuideOnSingleTransport) ||
             ((PrivateTypes.GuideOnSingleTransport) && 
             (PrivateTypes.GuideTransportID == PrivateTypes.CurrentTransportID)))) 
         {

@@ -124,7 +124,7 @@ using_dvb {
     using_dvb_eit:DEFINES += USING_DVB_EIT
     SOURCES += dvbrecorder.cpp dvbchannel.cpp dvbdiseqc.cpp dvbcam.cpp
     SOURCES += dvbtransporteditor.cpp dvbsiparser.cpp siparser.cpp siscan.cpp
-    SOURCES += scanwizard.cpp dvbsignalmonitor.cpp sitypes.cpp
+    SOURCES += scanwizard.cpp dvbsignalmonitor.cpp sitypes.cpp dvbtypes.cpp
     SOURCES += dvbdev/dvbdev.c dvbdev/transform.c dvbdev/ringbuffy.c 
     SOURCES += dvbdev/dvbci.cpp
 

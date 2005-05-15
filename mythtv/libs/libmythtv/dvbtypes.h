@@ -44,8 +44,9 @@ typedef vector<uint16_t> dvb_pid_t;
 // of the pmt and or the pmtcache
 typedef vector<uint16_t> dvb_caid_t;
 
-typedef struct dvbtuning
+class DVBTuning
 {
+public:
     struct dvb_frontend_parameters params;
     fe_sec_voltage_t    voltage;
     fe_sec_tone_mode_t  tone;
@@ -55,11 +56,43 @@ typedef struct dvbtuning
     unsigned int lnb_lof_switch;
     unsigned int lnb_lof_hi;
     unsigned int lnb_lof_lo;
-} dvb_tuning_t;
+
+    //Helper functions to get the paramaters as DB friendly strings
+    QString inversion() const;
+    QString bandwidth() const;
+    QString hpCoderate() const {return coderate(params.u.ofdm.code_rate_HP);}
+    QString lpCoderate() const {return coderate(params.u.ofdm.code_rate_HP);}
+    QString constellation() const;
+    QString transmissionMode() const;
+    QString guardInterval() const;
+    QString hierarchy() const;
+    QString modulation() const;
+
+    bool parseATSC(const QString& frequency, const QString modulation);
+    bool parseOFDM(const QString& frequency, const QString& inversion,
+                   const QString& bandwidth, const QString& coderate_hp,
+                   const QString& coderate_lp, const QString& constellation,
+                   const QString& trans_mode, const QString& guard_interval,
+                   const QString& hierarchy);
+    bool parseQPSK(const QString& frequency, const QString& inversion,
+                   const QString& symbol_rate, const QString& fec_inner,
+                   const QString& pol, 
+                   const QString& diseqc_type, const QString& diseqc_port,
+                   const QString& diseqc_pos,
+                   const QString& lnb_lof_switch, const QString& lnb_lof_hi,
+                   const QString& lnb_lof_lo);
+
+    bool parseQAM(const QString& frequency, const QString& inversion,
+                  const QString& symbol_rate, const QString& fec_inner,
+                  const QString& modulation);
+
+protected:
+    QString coderate(fe_code_rate_t coderate) const;
+};
 
 typedef struct dvbchannel
 {
-    dvb_tuning_t    tuning;
+    DVBTuning      tuning;
 
     PMTObject       pmt;
     bool            PMTSet;
@@ -104,5 +137,10 @@ typedef map<uint16_t, ipack*> pid_ipack_t;
 
 #define RECORD(args...) \
     VERBOSE(VB_RECORD, QString("DVB#%1 ").arg(cardnum) << args);
+
+#define ERROR_TUNING(args...) \
+    VERBOSE(VB_IMPORTANT, QString("DVB ERROR - ")<< args);
+#define WARNING_TUNING(args...) \
+    VERBOSE(VB_GENERAL, QString("DVB WARNING - ") << args);
 
 #endif // DVB_TYPES_H

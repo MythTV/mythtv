@@ -22,32 +22,32 @@ public:
     DVBDiSEqC(int cardnum, int fd_frontend);
     ~DVBDiSEqC();
 
-    bool Set(dvb_tuning_t& tuning, bool reset, bool& havetuned);
+    bool Set(DVBTuning& tuning, bool reset, bool& havetuned);
     bool DiseqcReset();
 
 private:
     int cardnum;
     int fd_frontend;
-    dvb_tuning_t prev_tuning;
+    DVBTuning prev_tuning;
     int repeat;
 
     
-    bool SendDiSEqCMessage(dvb_tuning_t& tuning, dvb_diseqc_master_cmd &cmd);
+    bool SendDiSEqCMessage(DVBTuning& tuning, dvb_diseqc_master_cmd &cmd);
     bool SendDiSEqCMessage(dvb_diseqc_master_cmd &cmd);
     
-    bool ToneVoltageLnb(dvb_tuning_t& tuning, bool reset, bool& havetuned);
-    bool ToneSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned);
-    bool Diseqc1xSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned);
-    bool Diseqc1xSwitch_10way(dvb_tuning_t& tuning, bool reset, bool& havetuned);
-    bool PositionerGoto(dvb_tuning_t& tuning, bool reset, bool& havetuned);
-    bool PositionerStore(dvb_tuning_t& tuning);
+    bool ToneVoltageLnb(DVBTuning& tuning, bool reset, bool& havetuned);
+    bool ToneSwitch(DVBTuning& tuning, bool reset, bool& havetuned);
+    bool Diseqc1xSwitch(DVBTuning& tuning, bool reset, bool& havetuned);
+    bool Diseqc1xSwitch_10way(DVBTuning& tuning, bool reset, bool& havetuned);
+    bool PositionerGoto(DVBTuning& tuning, bool reset, bool& havetuned);
+    bool PositionerStore(DVBTuning& tuning);
     bool PositionerStopMovement();
     bool PositionerStoreEastLimit();
     bool PositionerStoreWestLimit();
     bool PositionerDisableLimits();   
     bool PositionerDriveEast(int timestep);
     bool PositionerDriveWest(int timestep);
-    bool PositionerGotoAngular(dvb_tuning_t& tuning, bool reset, 
+    bool PositionerGotoAngular(DVBTuning& tuning, bool reset, 
                                bool& havetuned);
 
     // Still need to be written

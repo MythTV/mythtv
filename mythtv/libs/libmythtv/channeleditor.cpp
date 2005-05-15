@@ -352,6 +352,8 @@ void ChannelEditor::advanced()
 #ifdef USING_DVB
     DVBTransportsEditor advancedDialog;
     advancedDialog.exec();
+    list->fillSelections();
+    list->setFocus();
 #endif
 }
 

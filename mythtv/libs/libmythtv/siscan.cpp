@@ -11,7 +11,87 @@
 
 
 #define CHECKNIT_TIMER 5000
+#define DVBTSCAN_TIMEOUT 40000
 //#define SISCAN_DEBUG
+
+struct FrequencyTable
+{
+    int frequencyStart;                 //The staring centre frequency
+    int frequencyEnd;                   //The ending centre frequency
+    int frequencyStep;                  //The step in frequency
+    QString name_format;                //pretty name format
+    int name_offset;                    //Offset to add to the pretty name
+    fe_spectral_inversion_t inversion;
+    fe_bandwidth_t bandwidth;
+    fe_code_rate_t coderate_hp;
+    fe_code_rate_t coderate_lp;
+    fe_modulation_t constellation;  
+    fe_transmit_mode_t trans_mode; 
+    fe_guard_interval_t guard_interval;
+    fe_hierarchy_t hierarchy;
+    fe_modulation_t modulation;
+    int offset1;                       //The first offset from the centre f'
+    int offset2;                       //The second offset from the center f'
+};
+
+FrequencyTable frequenciesUK[]=
+{
+   {474000000,850000000,8000000,"",0,INVERSION_OFF,BANDWIDTH_8_MHZ,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_2K,GUARD_INTERVAL_1_32,HIERARCHY_NONE,QAM_AUTO,166670,-166670},
+   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
+};
+
+FrequencyTable frequenciesFI[]=
+{
+   {474000000,850000000,8000000,"",0,INVERSION_OFF,BANDWIDTH_8_MHZ,FEC_AUTO,FEC_AUTO,QAM_64,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,0,0},
+   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
+};
+
+FrequencyTable frequenciesSE[]=
+{
+   {474000000,850000000,8000000,"",0,INVERSION_OFF,BANDWIDTH_8_MHZ,FEC_AUTO,FEC_AUTO,QAM_64,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,0,0},
+   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
+};
+
+FrequencyTable frequenciesAU[]=
+{
+   // VHF 6-12
+   {177500000,226500000,7000000,"",0,INVERSION_OFF,
+    BANDWIDTH_7_MHZ,FEC_AUTO,FEC_AUTO,QAM_64,
+    TRANSMISSION_MODE_8K,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,125000,0},
+   // UHF 28-69
+   {529500000,816500000,7000000,"",0,INVERSION_OFF,
+    BANDWIDTH_7_MHZ,FEC_AUTO,FEC_AUTO,QAM_64,
+    TRANSMISSION_MODE_8K,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,125000,0},
+
+   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
+};
+
+FrequencyTable *frequenciesDVBT[]=
+{
+   frequenciesAU,
+   frequenciesFI,
+   frequenciesSE,
+   frequenciesUK,
+};
+
+FrequencyTable frequenciesATSC_T[]=
+{
+
+   // VHF 2-6 
+   {57000000,85000000,6000000,"ATSC Channel %1",2,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,VSB_8,0,0},
+   // VHF 7-13
+   {177000000,213000000,6000000,"ATSC Channel %1",7,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,VSB_8,0,0},
+   // UHF 14-69
+   {473000000,803000000,6000000,"ATSC Channel %1",14,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,VSB_8,0,0},
+   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
+};
+
+FrequencyTable frequenciesATSC_C[]=
+{
+   {75000000,801000000,6000000,"QAM Channel %1",1,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_256,0,0},
+   {10000000,52000000,6000000,"QAM Channel T-%1",7,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_256,0,0},
+   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
+};
 
 SIScan::SIScan(DVBChannel* advbchannel, int _sourceID)
 {
@@ -61,7 +141,6 @@ bool SIScan::ScanTransports()
 
 bool SIScan::ScanServicesSourceID(int SourceID)
 {
-
     if (scanMode == TRANSPORT_LIST)
         return false;
 
@@ -110,6 +189,59 @@ bool SIScan::ScanServices(int TransportID)
     return chan->siparser->FindServices();
 }
 
+int SIScan::CreateMultiplex(const fe_type_t cardType,
+                            const TransportScanList& a, 
+                            const DVBTuning& tuning)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("INSERT into dtv_multiplex (frequency, "
+                   "sistandard, sourceid,inversion,bandwidth,hp_code_rate,lp_code_rate,constellation,transmission_mode,guard_interval,hierarchy,modulation) "
+                   "VALUES (:FREQUENCY,:STANDARD,:SOURCEID,:INVERSION,:BANDWIDTH,:CODERATE_HP,:CODERATE_LP,:CONSTELLATION,:TRANS_MODE,:GUARD_INTERVAL,:HIERARCHY,:MODULATION);");
+    query.bindValue(":STANDARD",a.standard);
+    query.bindValue(":FREQUENCY",tuning.params.frequency);
+    query.bindValue(":SOURCEID",a.SourceID);
+
+    switch (cardType)
+    {
+    case FE_QAM: //TODO
+    case FE_QPSK:
+         break;
+    case FE_OFDM:
+        query.bindValue(":INVERSION",tuning.inversion());
+        query.bindValue(":BANDWIDTH",tuning.bandwidth());
+        query.bindValue(":CODERATE_HP",tuning.hpCoderate());
+        query.bindValue(":CODERATE_LP",tuning.lpCoderate());
+        query.bindValue(":CONSTELLATION",tuning.constellation());
+        query.bindValue(":TRANS_MODE",tuning.transmissionMode());
+        query.bindValue(":GUARD_INTERVAL",tuning.guardInterval());
+        query.bindValue(":HIERARCHY",tuning.hierarchy());
+        break; 
+#if (DVB_API_VERSION_MINOR == 1)
+         case FE_ATSC:
+             query.bindValue(":MODULATION",tuning.modulation());
+         break; 
+#endif
+    }
+
+    if(!query.exec())
+        MythContext::DBError("Inserting new transport", query);
+    if (!query.isActive())
+         MythContext::DBError("Adding transport to Database.", query);
+    query.prepare("select max(mplexid) from dtv_multiplex;");
+    if(!query.exec())
+        MythContext::DBError("Getting ID of new Transport", query);
+    if (!query.isActive())
+        MythContext::DBError("Getting ID of new Transport.", query);
+
+    int transport = -1;
+    if (query.size() > 0)
+    {
+        query.next();
+        transport = query.value(0).toInt();
+    }
+    return transport;
+}
+ 
 void SIScan::StartScanner()
 {
     SIPARSER("Starting SIScanner");
@@ -145,14 +277,6 @@ void SIScan::StartScanner()
             {
 
                 /* We could just look at the transportsCount here but it's not really thread safe */
-/*                QValueList<TransportScanList>::Iterator i;
-                bool fAll = true;
-                for (i = scanTransports.begin() ; i != scanTransports.end() && fAll ; ++i)
-                    if (!(*i).complete)
-                        fAll = false;
-                if (fAll)
-                    emit ServiceScanComplete();
-*/
                 emit PctServiceScanComplete(((transportsToScan-transportsCount)*100)/transportsToScan);
                 sourceIDTransportTuned = false;
             }
@@ -197,17 +321,36 @@ void SIScan::StartScanner()
                             scanMode = IDLE; 
          
                         bool result = false;                
+                        dvb_channel_t t;
                         if ((*i).mplexid == -1)
                         {
                             /* For ATSC / Cable try for 2 seconds to tune otherwise give up */
-                            dvb_channel_t t;
-                            t.tuning = (*i).tuning;
-                            t.sistandard = "atsc";
-                            result = chan->TuneTransport(t,true,2000);
+                            t.sistandard =  (*i).standard;
+                            result=0;
+
+                            if ((*i).offset1)
+                            {
+                                t.tuning = (*i).tuning;
+                                t.tuning.params.frequency+=(*i).offset1;
+                                result = chan->TuneTransport(t,true,(*i).timeoutTune);
+                            }
+                            
+                            if (!result && (*i).offset2)
+                            {
+                                t.tuning = (*i).tuning;
+                                t.tuning.params.frequency+=(*i).offset2;
+                                result = chan->TuneTransport(t,true,(*i).timeoutTune);
+                            }
+
+                            if (!result)
+                            {
+                                t.tuning = (*i).tuning;
+                                result = chan->TuneTransport(t,true,(*i).timeoutTune);
+                            }
                         }
                         else 
                             result = chan->SetTransportByInt((*i).mplexid);
-
+        
                         if (!result)
                         {
                             int pct = ((transportsToScan-transportsCount)*100)/transportsToScan;
@@ -220,31 +363,18 @@ void SIScan::StartScanner()
                         {
                             if ((*i).mplexid == -1)
                             {
-                                MSqlQuery query(MSqlQuery::InitCon());
-                                query.prepare("INSERT into dtv_multiplex (frequency, "
-                                               "modulation, sistandard, sourceid) "
-                                               "VALUES (:FREQUENCY,:MODULATION,\"atsc\",:SOURCEID);");
-                                query.bindValue(":FREQUENCY",(*i).Frequency);
-                                query.bindValue(":MODULATION",(*i).Modulation);
-                                query.bindValue(":SOURCEID",(*i).SourceID);
-                                if(!query.exec())
-                                    MythContext::DBError("Inserting new transport", query);
-                                if (!query.isActive())
-                                     MythContext::DBError("Adding transport to Database.", query);
-
-                                query.prepare("select max(mplexid) from dtv_multiplex;");
-                                if(!query.exec())
-                                    MythContext::DBError("Getting ID of new Transport", query);
-                                if (!query.isActive())
-                                    MythContext::DBError("Getting ID of new Transport.", query);
-
-                                if (query.size() > 0)
-                                {
-                                    query.next();
-                                    chan->SetCurrentTransportDBID(query.value(0).toInt());
-                                }
-
+                                int transport;
+                                DVBTuning tuning;
+                                //read the actual values back from the card
+                                if (chan->GetTuningParams(tuning))
+                                    transport = CreateMultiplex(chan->GetCardType(),(*i),tuning);
+                                else
+                                    transport = CreateMultiplex(chan->GetCardType(),(*i),(*i).tuning);
+                                if (transport >=0) 
+                                    chan->SetCurrentTransportDBID(transport);
                             }
+                            else
+                                chan->SetCurrentTransportDBID((*i).mplexid);
                             timer.start();
                             chan->siparser->FindServices();
                             sourceIDTransportTuned = true;
@@ -269,76 +399,175 @@ void SIScan::StopScanner()
 
 }
 
+void SIScan::verifyTransport(TransportScanList& t)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    /* See if mplexid is already in the database */
+    QString theQuery = QString("select mplexid from dtv_multiplex where "
+                       "sourceid = %1 and frequency = %2")
+                       .arg(t.SourceID)
+                       .arg(t.tuning.params.frequency);
+    query.prepare(theQuery);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Check for existing transport", query);
+
+    if (query.size() > 0)
+    {
+        query.next();
+        t.mplexid = query.value(0).toInt();            
+        return;
+    }
+
+    if (t.offset1)
+    {
+        theQuery = QString("select mplexid from dtv_multiplex where "
+                       "sourceid = %1 and frequency = %2")
+                       .arg(t.SourceID)
+                       .arg(t.tuning.params.frequency+t.offset1);
+        query.prepare(theQuery);
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("Check for existing transport", query);
+
+        if (query.size() > 0)
+        {
+            query.next();
+            t.mplexid = query.value(0).toInt();            
+            return;
+        }
+    }
+
+    if (t.offset2)
+    {
+        theQuery = QString("select mplexid from dtv_multiplex where "
+                       "sourceid = %1 and frequency = %2")
+                       .arg(t.SourceID)
+                       .arg(t.tuning.params.frequency+t.offset2);
+        query.prepare(theQuery);
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("Check for existing transport", query);
+
+        if (query.size() > 0)
+        {
+            query.next();
+            t.mplexid = query.value(0).toInt();            
+            return;
+        }
+    }
+
+    t.mplexid = -1;
+}
+
 bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
 {
-
+#if (DVB_API_VERSION_MINOR == 1)
     if (scanMode == TRANSPORT_LIST)
         return false;
 
-    struct CHANLIST* curList;
-    QString Modulation;
-    QString NamePrefix;
-
+    FrequencyTable *t = NULL;
     switch (FrequencyBand)
     {
         case 0:
-                   curList = chanlists[0].list;
-                   /* Ensure scan only does 2-69 */
-                   transportsCount = transportsToScan = 68;
-                   Modulation = "8vsb";
-                   NamePrefix = "ATSC Channel";
-                   break;
+            t = frequenciesATSC_T;
+            break;
         case 1:
-                   curList = chanlists[1].list;
-                   transportsCount = transportsToScan = chanlists[1].count; 
-                   Modulation = "qam_256";
-                   NamePrefix = "QAM Channel";
-                   break;
+            t = frequenciesATSC_C;
+            break;
         default:
-                   return false;
+            return false;
     }
+
+    scanTransports.clear();
+    transportsCount=0;
+	
+    /* Now generate a list of frequencies to scan and add it to the atscScanTransportList */
+    while (t && t->frequencyStart)
+    {
+        FrequencyTable *f = t;
+        int name_num = f->name_offset;
+        QString strNameFormat = f->name_format;
+        for (int x = f->frequencyStart ;x<=f->frequencyEnd; x+=f->frequencyStep)
+        {
+            TransportScanList a;
+            a.SourceID = SourceID;
+            a.standard="atsc";
+            a.timeoutTune = TransportScanList::ATSC_TUNINGTIMEOUT;
+            a.FriendlyName = strNameFormat.arg(name_num);
+            a.tuning.params.frequency = x;
+            a.tuning.params.inversion = f->inversion;
+            a.tuning.params.u.vsb.modulation = f->modulation;
+            
+            verifyTransport(a); 
+            
+            scanTransports += a;
+            name_num++;
+            transportsCount++;
+        }    
+        t++;
+    }
+ 
+    transportsToScan=transportsCount;
+    timer.start();
+    ScanTimeout = CHECKNIT_TIMER;
+    sourceIDTransportTuned = false;
+    scanMode = TRANSPORT_LIST;    
+    return true;
+#else
+    (void)SourceID;
+    (void)FrequencyBand;
+    return false;
+#endif
+}
+
+
+
+bool SIScan::DVBTScanTransport(int SourceID,unsigned country)
+{
+    if (scanMode == TRANSPORT_LIST)
+        return false;
 
     scanTransports.clear();
 	
     /* Now generate a list of frequencies to scan and add it to the atscScanTransportList */
 
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    for (int x = 0 ; x < transportsToScan ; x++)
+    transportsCount=0;
+    FrequencyTable *t = frequenciesDVBT[country];
+    while (t && t->frequencyStart)
     {
-        TransportScanList a;
-        uint32_t freq = (curList[x].freq + 1750) * 1000;
-        a.FriendlyName = QString("%1 %2").arg(NamePrefix).arg(curList[x].name);
-        QString Frequency = QString("%1").arg(freq);
-        a.Frequency = Frequency;
-        a.Modulation = Modulation;
-        a.SourceID = SourceID;
-        chan->ParseATSC(Frequency,Modulation,a.tuning);
-
-        /* See if mplexid is already in the database */
-        QString theQuery = QString("select mplexid from dtv_multiplex where "
-                           "sourceid = %1 and frequency = %2")
-                           .arg(SourceID)
-                           .arg(Frequency);
-
-        query.prepare(theQuery);
-    
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("Check for existing transport", query);
-    
-        if (query.size() <= 0)
-            a.mplexid = -1;
-        else
+        FrequencyTable *f = t;
+        for (int x = f->frequencyStart ;x<=f->frequencyEnd; x+=f->frequencyStep)
         {
-            query.next();
-            a.mplexid = query.value(0).toInt();            
-        }
-        scanTransports += a;
+            TransportScanList a;
+            a.SourceID = SourceID;
+            a.standard="dvb";
+            a.timeoutTune = TransportScanList::DVBT_TUNINGTIMEOUT;
+            
+            a.tuning.params.frequency = x;
+            a.tuning.params.inversion = f->inversion;
+            a.tuning.params.u.ofdm.bandwidth = f->bandwidth;
+            a.tuning.params.u.ofdm.code_rate_HP = f->coderate_hp;
+            a.tuning.params.u.ofdm.code_rate_LP = f->coderate_lp;
+            a.tuning.params.u.ofdm.constellation = f->constellation;
+            a.tuning.params.u.ofdm.transmission_mode = f->trans_mode;
+            a.tuning.params.u.ofdm.guard_interval = f->guard_interval;
+            a.tuning.params.u.ofdm.hierarchy_information = f->hierarchy;
+            
+            a.offset1 = f->offset1;
+            a.offset2 = f->offset2;
 
-    }    
-
+            verifyTransport(a); 
+            
+            scanTransports += a;
+            transportsCount++;
+        }    
+        t++;
+    }
+    
+    transportsToScan=transportsCount;
     timer.start();
-    ScanTimeout = CHECKNIT_TIMER;
+    ScanTimeout = DVBTSCAN_TIMEOUT;
     sourceIDTransportTuned = false;
     scanMode = TRANSPORT_LIST;    
     return true;
@@ -371,7 +600,6 @@ void SIScan::TransportTableComplete()
 
 void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
 {
-
     /* This will be fixed post .17 to be more elegant */
     int localSourceID = -1;
 
@@ -440,7 +668,6 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     if (!query.isActive())
          MythContext::DBError("Check Channel full in channel/dtv_multiplex.", query);
 
-
     if (query.size() > 0)
     {
         query.next();
@@ -470,8 +697,8 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     }
 
 // Get the freetoaironly field from cardinput 
-
-    QString FTAQuery = QString("SELECT freetoaironly from cardinput,dtv_multiplex, "
+    QString FTAQuery = QString("SELECT freetoaironly "
+                               "from cardinput,dtv_multiplex, "
                                "capturecard WHERE "
                                "cardinput.sourceid = dtv_multiplex.sourceid AND "
                                "cardinput.cardid = capturecard.cardid AND "
@@ -483,24 +710,19 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     if(!query.exec())      
         MythContext::DBError("Getting FreeToAir for cardinput", query);
             
-    if (!query.isActive())
-        MythContext::DBError("Getting FreeToAir for cardinput", query);
-
     if (query.size() > 0)
     {
         query.next();
-        FTAOnly = query.value(0).toInt();
+        FTAOnly = query.value(0).toBool();
     }
     else
-    {
         return;    
-    }
 
 // TODO: Process Steps 3 and 4.. Only a partial 4 is being done now..
     for (s = SDT.begin() ; s != SDT.end() ; ++s )
     {
         // Its a TV Service so add it also only do FTA
-        if(((*s).ServiceType == 1) &&
+        if(((*s).ServiceType==SDTObject::TV) &&
            (!FTAOnly || (FTAOnly && ((*s).CAStatus == 0))))
         {
             // See if transport already in database based on serviceid,networkid  and transportid
@@ -521,7 +743,6 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
             // If channel not present add it
             if (query.size() <= 0)
             {
-
                     if ((*s).ServiceName.stripWhiteSpace().isEmpty())
                     {
                         (*s).ServiceName = "Unnamed Channel";
@@ -596,7 +817,6 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                 emit ServiceScanUpdateText(status);
             }
     }
-
 }
 
 void SIScan::CheckNIT(NITObject& NIT)
@@ -615,7 +835,8 @@ void SIScan::CheckNIT(NITObject& NIT)
         //Parse the default transport object
         if (transport.Type == "DVB-T")
         {
-            if (!chan->ParseOFDM(QString::number(transport.Frequency),
+            if (!chan_opts.tuning.parseOFDM(
+                             QString::number(transport.Frequency),
                              transport.Inversion,
                              transport.Bandwidth,
                              transport.CodeRateHP,
@@ -623,8 +844,7 @@ void SIScan::CheckNIT(NITObject& NIT)
                              transport.Constellation,
                              transport.TransmissionMode,
                              transport.GuardInterval,
-                             transport.Hiearchy,
-                             chan_opts.tuning))
+                             transport.Hiearchy))
             {
                 //cerr << "failed to parse transport\n";
                 break;
@@ -632,12 +852,12 @@ void SIScan::CheckNIT(NITObject& NIT)
         }
         else if (transport.Type == "DVB-C")
         {
-            if (!chan->ParseQAM(QString::number(transport.Frequency),
+            if (!chan_opts.tuning.parseQAM(
+                             QString::number(transport.Frequency),
                              transport.Inversion,
                              QString::number(transport.SymbolRate),
                              transport.FEC_Inner,
-                             transport.Modulation,
-                             chan_opts.tuning))
+                             transport.Modulation))
             {
                 //cerr << "failed to parse transport\n";
                 break;

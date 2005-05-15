@@ -15,32 +15,43 @@ typedef enum { IDLE, TRANSPORT_LIST, EIT_CRAWL } SCANMODE;
 class TransportScanList
 {
 public:
+    enum {DVBT_TUNINGTIMEOUT=1000, ATSC_TUNINGTIMEOUT=2000};
+
     TransportScanList()
     {
         mplexid = -1;
         complete = false;
         scanning = false;
-        Frequency = "";
-        Modulation = "";
         FriendlyName = "";
+        offset1 = 0;
+        offset2 = 0;
+        timeoutTune = ATSC_TUNINGTIMEOUT; 
     }
+
     TransportScanList(int _mplexid)
     {
         mplexid = _mplexid;
         complete = false;
         scanning = false;
+        FriendlyName = "";
+        offset1 = 0;
+        offset2 = 0;
+        timeoutTune = ATSC_TUNINGTIMEOUT; 
     }
+
     int mplexid;                /* DB Mplexid */
     bool complete;              /* scan status */
-    dvb_tuning_t tuning;        /* DVB Tuning struct if mplexid == -1 */
+    QString standard;           /* DVB/ATSC */
+    DVBTuning tuning;        /* DVB Tuning struct if mplexid == -1 */
+
     QString FriendlyName;       /* Name to display in scanner dialog */
-    QString Frequency;          /* Frequency as QString */
-    QString Modulation;         /* Modulation as QString */
     int SourceID;               /* Associated SourceID */
     bool UseTimer;              /* Set if timer is used after lock for getting PAT */
 
     bool scanning;              /* Probbably Unnecessary */
-
+    int offset1;                /* First frequency offset */
+    int offset2;                /* Second frequency offset */
+    unsigned timeoutTune;      /* Timeout to tune to a frequency*/
 };
 
 class SIScan : public QObject
@@ -56,6 +67,7 @@ public:
     void StopScanner();
 
     bool ATSCScanTransport(int SourceID, int FrequencyBand);
+    bool DVBTScanTransport(int SourceID, unsigned country);
     bool ScanTransports();
     bool ScanServices(int TransportID = -1);
     bool ScanServicesSourceID(int SourceID);
@@ -85,6 +97,11 @@ private:
 
     static void *ServiceScanThreadHelper(void*);
     static void *TransportScanThreadHelper(void*);
+
+    void verifyTransport(TransportScanList& t);
+
+    int CreateMultiplex(const fe_type_t cardType,const TransportScanList& a,
+                    const DVBTuning& tuning);
 
     void UpdateTransportsInDB(NITObject NIT);
     void CheckNIT(NITObject& NIT);

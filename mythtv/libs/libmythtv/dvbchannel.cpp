@@ -435,7 +435,7 @@ bool DVBChannel::GetTransportOptions(int mplexid)
 
 void DVBChannel::PrintChannelOptions()
 {
-    dvb_tuning_t& t = chan_opts.tuning;
+    DVBTuning& t = chan_opts.tuning;
 
     QString msg;
     switch(info.type)
@@ -587,7 +587,7 @@ void DVBChannel::PrintChannelOptions()
 
 void DVBChannel::CheckOptions()
 {
-    dvb_tuning_t& t = chan_opts.tuning;
+    DVBTuning& t = chan_opts.tuning;
 
     if ((t.params.inversion == INVERSION_AUTO)
         && !(info.caps & FE_CAN_INVERSION_AUTO))
@@ -726,13 +726,13 @@ bool DVBChannel::ParseTransportQuery(MSqlQuery& query)
     switch(info.type)
     {
         case FE_QPSK:
-            if (!ParseQPSK(query.value(0).toString(), query.value(1).toString(),
-                           query.value(2).toString(), query.value(3).toString(),
-                           query.value(4).toString(), query.value(5).toString(),
-                           query.value(6).toString(), query.value(7).toString(),
-                           query.value(8).toString(), query.value(9).toString(),
-                           query.value(10).toString(),
-                           chan_opts.tuning))
+            if (!chan_opts.tuning.parseQPSK(query.value(0).toString(), 
+                          query.value(1).toString(),
+                          query.value(2).toString(), query.value(3).toString(),
+                          query.value(4).toString(), query.value(5).toString(),
+                          query.value(6).toString(), query.value(7).toString(),
+                          query.value(8).toString(), query.value(9).toString(),
+                          query.value(10).toString()))
             {
                 pthread_mutex_unlock(&chan_opts.lock);
                 return false;
@@ -740,9 +740,9 @@ bool DVBChannel::ParseTransportQuery(MSqlQuery& query)
             chan_opts.sistandard = query.value(11).toString();
             break;
         case FE_QAM:
-            if (!ParseQAM(query.value(0).toString(), query.value(1).toString(),
-                          query.value(2).toString(), query.value(3).toString(),
-                          query.value(4).toString(), chan_opts.tuning))
+            if (!chan_opts.tuning.parseQAM(query.value(0).toString(), 
+                        query.value(1).toString(), query.value(2).toString(),
+                        query.value(3).toString(), query.value(4).toString()))
             {
                 pthread_mutex_unlock(&chan_opts.lock);
                 return false;
@@ -750,11 +750,11 @@ bool DVBChannel::ParseTransportQuery(MSqlQuery& query)
             chan_opts.sistandard = query.value(5).toString();
             break;
         case FE_OFDM:
-            if (!ParseOFDM(query.value(0).toString(), query.value(1).toString(),
-                           query.value(2).toString(), query.value(3).toString(),
-                           query.value(4).toString(), query.value(5).toString(),
-                           query.value(6).toString(), query.value(7).toString(),
-                           query.value(8).toString(), chan_opts.tuning))
+            if (!chan_opts.tuning.parseOFDM(query.value(0).toString(), 
+                        query.value(1).toString(), query.value(2).toString(),
+                        query.value(3).toString(), query.value(4).toString(),
+                        query.value(5).toString(), query.value(6).toString(),
+                        query.value(7).toString(), query.value(8).toString()))
             {
                 pthread_mutex_unlock(&chan_opts.lock);
                 return false;
@@ -763,8 +763,8 @@ bool DVBChannel::ParseTransportQuery(MSqlQuery& query)
             break;
 #if (DVB_API_VERSION_MINOR == 1)
         case FE_ATSC:
-            if (!ParseATSC(query.value(0).toString(), query.value(1).toString(),
-                 chan_opts.tuning))
+            if (!chan_opts.tuning.parseATSC(query.value(0).toString(), 
+                                            query.value(1).toString()))
             {
                 pthread_mutex_unlock(&chan_opts.lock);
                 return false;
@@ -775,256 +775,6 @@ bool DVBChannel::ParseTransportQuery(MSqlQuery& query)
     }
 
     pthread_mutex_unlock(&chan_opts.lock);
-
-    return true;
-}
-
-bool DVBChannel::ParseATSC(const QString& frequency, const QString modulation,
-                              dvb_tuning_t& t)
-{
-#if (DVB_API_VERSION_MINOR == 1)
-    t.params.frequency = frequency.toInt();
-
-    dvb_vsb_parameters& p = t.params.u.vsb;
-
-    if (modulation == "qam_256")   p.modulation = QAM_256;
-    else if (modulation == "qam_64")    p.modulation = QAM_64;
-    else if (modulation == "8vsb")    p.modulation = VSB_8;
-    else if (modulation == "16vsb")    p.modulation = VSB_16;
-    else {
-        WARNING("Invalid modulationulation parameter '" << modulation
-                << "', falling back to '8vsb'.");
-        p.modulation = VSB_8;
-    }
-#else
-   (void)frequency;
-   (void)modulation;
-   (void)t;
-#endif
-    return true;
-
-}
-
-// TODO: Add in DiseqcPos when diseqc class supports it
-bool DVBChannel::ParseQPSK(const QString& frequency, const QString& inversion,
-                           const QString& symbol_rate, const QString& fec_inner,
-                           const QString& pol, 
-                           const QString& diseqc_type, const QString& diseqc_port,
-                           const QString& diseqc_pos,
-                           const QString& lnb_lof_switch, const QString& lnb_lof_hi,
-                           const QString& lnb_lof_lo, dvb_tuning_t& t)
-{
-    dvb_qpsk_parameters& p = t.params.u.qpsk;
-
-    t.params.frequency = frequency.toInt();
-
-    switch(inversion[0]) {
-        case '1': t.params.inversion = INVERSION_ON;    break;
-        case '0': t.params.inversion = INVERSION_OFF;   break;
-        case 'a': t.params.inversion = INVERSION_AUTO;  break;
-        default : ERROR("Invalid inversion, aborting.");
-                  return false;
-    }
-
-    p.symbol_rate = symbol_rate.toInt();
-    if (p.symbol_rate == 0) {
-        ERROR("Invalid symbol rate parameter '" << symbol_rate
-              << "', aborting.");
-        return false;
-    }
-
-    if (fec_inner == "none")        p.fec_inner = FEC_NONE;
-    else if (fec_inner == "auto")   p.fec_inner = FEC_AUTO;
-    else if (fec_inner == "8/9")    p.fec_inner = FEC_8_9;
-    else if (fec_inner == "7/8")    p.fec_inner = FEC_7_8;
-    else if (fec_inner == "6/7")    p.fec_inner = FEC_6_7;
-    else if (fec_inner == "5/6")    p.fec_inner = FEC_5_6;
-    else if (fec_inner == "4/5")    p.fec_inner = FEC_4_5;
-    else if (fec_inner == "3/4")    p.fec_inner = FEC_3_4;
-    else if (fec_inner == "2/3")    p.fec_inner = FEC_2_3;
-    else if (fec_inner == "1/2")    p.fec_inner = FEC_1_2;
-    else {
-        WARNING("Invalid fec_inner parameter '" << fec_inner
-                << "', falling back to 'auto'.");
-        p.fec_inner = FEC_AUTO;
-    }
-
-    switch(pol[0]) {
-        case 'v': case 'r': t.voltage = SEC_VOLTAGE_13; break;
-        case 'h': case 'l': t.voltage = SEC_VOLTAGE_18; break;
-        default : ERROR("Invalid polarization, aborting.");
-                  return false;
-    }
-
-    t.diseqc_type = diseqc_type.toInt();
-    t.diseqc_port = diseqc_port.toInt();
-    t.diseqc_pos = diseqc_pos.toFloat();
-    t.lnb_lof_switch = lnb_lof_switch.toInt();
-    t.lnb_lof_hi = lnb_lof_hi.toInt();
-    t.lnb_lof_lo = lnb_lof_lo.toInt();
-    return true;
-}
-
-bool DVBChannel::ParseQAM(const QString& frequency, const QString& inversion,
-                          const QString& symbol_rate, const QString& fec_inner,
-                          const QString& modulation, dvb_tuning_t& t)
-{
-    dvb_qam_parameters& p = t.params.u.qam;
-
-    t.params.frequency = frequency.toInt();
-
-    switch(inversion[0]) {
-        case '1': t.params.inversion = INVERSION_ON;    break;
-        case '0': t.params.inversion = INVERSION_OFF;   break;
-        case 'a': t.params.inversion = INVERSION_AUTO;  break;
-        default : ERROR("Invalid inversion, aborting.");
-                  return false;
-    }
-
-    p.symbol_rate = symbol_rate.toInt();
-    if (p.symbol_rate == 0) {
-        ERROR("Invalid symbol rate parameter '" << symbol_rate
-              << "', aborting.");
-        return false;
-    }
-
-    if (fec_inner == "none")        p.fec_inner = FEC_NONE;
-    else if (fec_inner == "auto")   p.fec_inner = FEC_AUTO;
-    else if (fec_inner == "8/9")    p.fec_inner = FEC_8_9;
-    else if (fec_inner == "7/8")    p.fec_inner = FEC_7_8;
-    else if (fec_inner == "6/7")    p.fec_inner = FEC_6_7;
-    else if (fec_inner == "5/6")    p.fec_inner = FEC_5_6;
-    else if (fec_inner == "4/5")    p.fec_inner = FEC_4_5;
-    else if (fec_inner == "3/4")    p.fec_inner = FEC_3_4;
-    else if (fec_inner == "2/3")    p.fec_inner = FEC_2_3;
-    else if (fec_inner == "1/2")    p.fec_inner = FEC_1_2;
-    else {
-        WARNING("Invalid fec_inner parameter '" << fec_inner
-                << "', falling back to 'auto'.");
-        p.fec_inner = FEC_AUTO;
-    }
-
-    if (modulation == "qpsk")           p.modulation = QPSK;
-    else if (modulation == "auto")      p.modulation = QAM_AUTO;
-    else if (modulation == "qam_256")   p.modulation = QAM_256;
-    else if (modulation == "qam_128")   p.modulation = QAM_128;
-    else if (modulation == "qam_64")    p.modulation = QAM_64;
-    else if (modulation == "qam_32")    p.modulation = QAM_32;
-    else if (modulation == "qam_16")    p.modulation = QAM_16;
-    else {
-        WARNING("Invalid modulationulation parameter '" << modulation
-                << "', falling bac to 'auto'.");
-        p.modulation = QAM_AUTO;
-    }
-
-    return true;
-}
-
-// TODO: Change to be representative of what dvbscanner stores fields as
-bool DVBChannel::ParseOFDM(const QString& frequency, const QString& inversion,
-                           const QString& bandwidth, const QString& coderate_hp,
-                           const QString& coderate_lp, const QString& constellation,
-                           const QString& trans_mode, const QString& guard_interval,
-                           const QString& hierarchy, dvb_tuning_t& t)
-{
-    dvb_ofdm_parameters& p = t.params.u.ofdm;
-
-    t.params.frequency = frequency.toInt();
-
-    switch(inversion[0]) {
-        case '1': t.params.inversion = INVERSION_ON;    break;
-        case '0': t.params.inversion = INVERSION_OFF;   break;
-        case 'a': t.params.inversion = INVERSION_AUTO;  break;
-        default : ERROR("Invalid inversion, aborting.");
-                  return false;
-    }
-
-    switch(bandwidth[0]) {
-        case 'a': p.bandwidth = BANDWIDTH_AUTO; break;
-        case '8': p.bandwidth = BANDWIDTH_8_MHZ; break;
-        case '7': p.bandwidth = BANDWIDTH_7_MHZ; break;
-        case '6': p.bandwidth = BANDWIDTH_6_MHZ; break;
-        default: WARNING("Invalid bandwidth parameter '" << bandwidth
-                         << "', falling back to 'auto'.");
-                 p.bandwidth = BANDWIDTH_AUTO;
-    }
-
-    if (coderate_hp == "none")      p.code_rate_HP = FEC_NONE;
-    else if (coderate_hp == "auto") p.code_rate_HP = FEC_AUTO;
-    else if (coderate_hp == "8/9")  p.code_rate_HP = FEC_8_9;
-    else if (coderate_hp == "7/8")  p.code_rate_HP = FEC_7_8;
-    else if (coderate_hp == "6/7")  p.code_rate_HP = FEC_6_7;
-    else if (coderate_hp == "5/6")  p.code_rate_HP = FEC_5_6;
-    else if (coderate_hp == "4/5")  p.code_rate_HP = FEC_4_5;
-    else if (coderate_hp == "3/4")  p.code_rate_HP = FEC_3_4;
-    else if (coderate_hp == "2/3")  p.code_rate_HP = FEC_2_3;
-    else if (coderate_hp == "1/2")  p.code_rate_HP = FEC_1_2;
-    else {
-        WARNING("Invalid hp code rate parameter '" << coderate_hp
-                << "', falling back to 'auto'.");
-        p.code_rate_HP = FEC_AUTO;
-    }
-
-    if (coderate_lp == "none")      p.code_rate_LP = FEC_NONE;
-    else if (coderate_lp == "auto") p.code_rate_LP = FEC_AUTO;
-    else if (coderate_lp == "8/9")  p.code_rate_LP = FEC_8_9;
-    else if (coderate_lp == "7/8")  p.code_rate_LP = FEC_7_8;
-    else if (coderate_lp == "6/7")  p.code_rate_LP = FEC_6_7;
-    else if (coderate_lp == "5/6")  p.code_rate_LP = FEC_5_6;
-    else if (coderate_lp == "4/5")  p.code_rate_LP = FEC_4_5;
-    else if (coderate_lp == "3/4")  p.code_rate_LP = FEC_3_4;
-    else if (coderate_lp == "2/3")  p.code_rate_LP = FEC_2_3;
-    else if (coderate_lp == "1/2")  p.code_rate_LP = FEC_1_2;
-    else {
-        WARNING("Invalid lp code rate parameter '" << coderate_lp
-                << "', falling back to 'auto'.");
-        p.code_rate_LP = FEC_AUTO;
-    }
-
-    if (constellation == "auto")            p.constellation = QAM_AUTO;
-    else if (constellation == "qpsk")       p.constellation = QPSK;
-    else if (constellation == "qam_16")     p.constellation = QAM_16;
-    else if (constellation == "qam_32")     p.constellation = QAM_32;
-    else if (constellation == "qam_64")     p.constellation = QAM_64;
-    else if (constellation == "qam_128")    p.constellation = QAM_128;
-    else if (constellation == "qam_256")    p.constellation = QAM_256;
-    else {
-        WARNING("Invalid constellation parameter '" << constellation
-                << "', falling bac to 'auto'.");
-        p.constellation = QAM_AUTO;
-    }
-
-    switch (trans_mode[0])
-    {
-        case 'a': p.transmission_mode = TRANSMISSION_MODE_AUTO; break;
-        case '2': p.transmission_mode = TRANSMISSION_MODE_2K; break;
-        case '8': p.transmission_mode = TRANSMISSION_MODE_8K; break;
-        default: WARNING("invalid transmission mode parameter '" << trans_mode
-                         << "', falling back to 'auto'.");
-                  p.transmission_mode = TRANSMISSION_MODE_AUTO;
-    }
-
-    switch (hierarchy[0]) {
-        case 'a': p.hierarchy_information = HIERARCHY_AUTO; break;
-        case 'n': p.hierarchy_information = HIERARCHY_NONE; break;
-        case '1': p.hierarchy_information = HIERARCHY_1; break;
-        case '2': p.hierarchy_information = HIERARCHY_2; break;
-        case '4': p.hierarchy_information = HIERARCHY_4; break;
-        default: WARNING("invalid hierarchy parameter '" << hierarchy
-                         << "', falling back to 'auto'.");
-                 p.hierarchy_information = HIERARCHY_AUTO;
-    }
-
-    if (guard_interval == "auto")       p.guard_interval = GUARD_INTERVAL_AUTO;
-    else if (guard_interval == "1/4")     p.guard_interval = GUARD_INTERVAL_1_4;
-    else if (guard_interval == "1/8")     p.guard_interval = GUARD_INTERVAL_1_8;
-    else if (guard_interval == "1/16")    p.guard_interval = GUARD_INTERVAL_1_16;
-    else if (guard_interval == "1/32")    p.guard_interval = GUARD_INTERVAL_1_32;
-    else {
-        WARNING("invalid guard interval parameter '" << guard_interval
-                << "', falling back to 'auto'.");
-        p.guard_interval = GUARD_INTERVAL_AUTO;
-    }
 
     return true;
 }
@@ -1103,7 +853,7 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
     if (stopTuning)
         return false;
 
-    dvb_tuning_t& tuning = channel.tuning;
+    DVBTuning& tuning = channel.tuning;
 
     if (fd_frontend < 0)
     {
@@ -1216,7 +966,22 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
     }
 }
 
-bool DVBChannel::TuneQPSK(dvb_tuning_t& tuning, bool reset, bool& havetuned)
+bool DVBChannel::GetTuningParams(DVBTuning& tuning)
+{
+    if (fd_frontend < 0)
+    {
+        ERROR("Card not open!");
+        return false;
+    }
+    if (ioctl(fd_frontend, FE_GET_FRONTEND, &tuning.params) < 0)
+    {
+        ERRNO("Getting Frontend failed.");
+        return false;
+    }
+    return true;
+}
+
+bool DVBChannel::TuneQPSK(DVBTuning& tuning, bool reset, bool& havetuned)
 {
     int frequency = tuning.params.frequency;
     if (tuning.params.frequency >= tuning.lnb_lof_switch)
@@ -1260,7 +1025,7 @@ bool DVBChannel::TuneQPSK(dvb_tuning_t& tuning, bool reset, bool& havetuned)
     return true;
 }
 
-bool DVBChannel::TuneATSC(dvb_tuning_t& tuning, bool reset, bool& havetuned)
+bool DVBChannel::TuneATSC(DVBTuning& tuning, bool reset, bool& havetuned)
 {
 #if (DVB_API_VERSION_MINOR == 1)
     if (reset ||
@@ -1284,7 +1049,7 @@ bool DVBChannel::TuneATSC(dvb_tuning_t& tuning, bool reset, bool& havetuned)
     return true;
 }
 
-bool DVBChannel::TuneQAM(dvb_tuning_t& tuning, bool reset, bool& havetuned)
+bool DVBChannel::TuneQAM(DVBTuning& tuning, bool reset, bool& havetuned)
 {
     if (reset ||
         prev_tuning.params.frequency != tuning.params.frequency ||
@@ -1310,7 +1075,7 @@ bool DVBChannel::TuneQAM(dvb_tuning_t& tuning, bool reset, bool& havetuned)
     return true;
 }
 
-bool DVBChannel::TuneOFDM(dvb_tuning_t& tuning, bool reset, bool& havetuned)
+bool DVBChannel::TuneOFDM(DVBTuning& tuning, bool reset, bool& havetuned)
 {
     if (reset ||
         prev_tuning.params.frequency != tuning.params.frequency ||
