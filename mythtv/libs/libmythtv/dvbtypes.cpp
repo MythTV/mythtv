@@ -151,8 +151,9 @@ QString DVBTuning::modulation() const
         default:
             return "auto";
     }
-#endif
+#else
     return "auto";
+#endif
 }
 
 bool DVBTuning::parseATSC(const QString& frequency, const QString modulation)
@@ -174,7 +175,6 @@ bool DVBTuning::parseATSC(const QString& frequency, const QString modulation)
 #else
    (void)frequency;
    (void)modulation;
-   (void)t;
 #endif
     return true;
 }
