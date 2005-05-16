@@ -261,7 +261,7 @@ bool doUpgradeTVDatabaseSchema(void)
 "  UNIQUE (name, hostname)"
 ");",
 "INSERT INTO profilegroups SET name = \"Software Encoders (v4l based)\", cardtype = 'V4L', is_default = 1;",
-"INSERT INTO profilegroups SET name = \"MPEG-2 Encoders (PVR-250, PVR-350)\", cardtype = 'MPEG', is_default = 1;",
+"INSERT INTO profilegroups SET name = \"MPEG-2 Encoders (PVR-x50, PVR-500)\", cardtype = 'MPEG', is_default = 1;",
 "INSERT INTO profilegroups SET name = \"Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)\", cardtype = 'MJPEG', is_default = 1;",
 "INSERT INTO profilegroups SET name = \"Hardware HDTV\", cardtype = 'HDTV', is_default = 1;",
 "INSERT INTO profilegroups SET name = \"Hardware DVB Encoders\", cardtype = 'DVB', is_default = 1;",
@@ -2087,7 +2087,7 @@ bool InitializeDatabase(void)
 "  UNIQUE KEY name (name)"
 ");",
 "INSERT INTO profilegroups SET name = 'Software Encoders (v4l based)', cardtype = 'V4L', is_default = 1;",
-"INSERT INTO profilegroups SET name = 'MPEG-2 Encoders (PVR-250, PVR-350)', cardtype = 'MPEG', is_default = 1;",
+"INSERT INTO profilegroups SET name = 'MPEG-2 Encoders (PVR-x50, PVR-500)', cardtype = 'MPEG', is_default = 1;",
 "INSERT INTO profilegroups SET name = 'Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)', cardtype = 'MJPEG', is_default = 1;",
 "INSERT INTO profilegroups SET name = 'Hardware HDTV', cardtype = 'HDTV', is_default = 1;",
 "INSERT INTO profilegroups SET name = 'Hardware DVB Encoders', cardtype = 'DVB', is_default = 1;",

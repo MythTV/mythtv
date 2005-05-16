@@ -1106,7 +1106,7 @@ void CardType::fillSelections(SelectSetting* setting)
     setting->addSelection(QObject::tr("Standard V4L capture card"), "V4L");
     setting->addSelection(QObject::tr("MJPEG capture card (Matrox G200, DC10)"),
                           "MJPEG");
-    setting->addSelection(QObject::tr("MPEG-2 Encoder card (PVR-250, PVR-350)"),
+    setting->addSelection(QObject::tr("MPEG-2 Encoder card (PVR-x50, PVR-500)"),
                           "MPEG");
     setting->addSelection(QObject::tr("pcHDTV capture card (HD-2000, HD-3000)"),
                           "HDTV");
