@@ -1345,6 +1345,13 @@ bool MythContext::ParseGeometryOverride(const QString geometry)
 
     bool parsed;
 
+    if (!d)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "MythContextPrivate not initted, can't store geometry.");
+        return false;
+    }
+
     d->m_geometry_w = geo[1].toInt(&parsed);
     if (!parsed)
     {
