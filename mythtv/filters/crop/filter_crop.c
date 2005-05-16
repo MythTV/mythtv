@@ -162,12 +162,6 @@ int cropMMX(VideoFilter *f, VideoFrame *frame)
   TF_END(tf, "Crop: ");
   return 0;
 }
-#else // MMX
-int cropMMX(VideoFilter *f, VideoFrame *frame)
-{ 
-  fprintf(stderr,"cropMMX: attempt to use MMX version of crop on non-mmx system\n");
-  return crop(f, frame);
-}
 #endif
 
 VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
@@ -220,8 +214,12 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
   filter->xcrop1 = xp1;
   filter->xcrop2 = (*width/16) - xp2;
   
-  if (mm_support()&MM_MMX) filter->vf.filter = &cropMMX;
-  else filter->vf.filter = &crop;
+#ifdef MMX
+  if ( mm_support() & MM_MMX)
+    filter->vf.filter = &cropMMX;
+  else
+#endif
+    filter->vf.filter = &crop;
 
   filter->vf.cleanup = NULL;
   TF_INIT(filter);

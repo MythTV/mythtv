@@ -363,16 +363,7 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
 
   return 0;
 }
-#else // MMX
-int quickdnrMMX(VideoFilter *f, VideoFrame *frame) {
-     (void)f; (void)frame;
-     return 0;
-};
-int quickdnr2MMX(VideoFilter *f, VideoFrame *frame) {
-     (void)f; (void)frame;
-     return 0;
-};
-#endif // MMX
+#endif /* MMX */
 
 void cleanup(VideoFilter *vf)
 {
@@ -450,6 +441,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     double_threshold = 1;
   }
 
+#ifdef MMX
   if(mm_support() > MM_MMXEXT) {
     if(double_threshold) filter->vf.filter = &quickdnr2MMX;
     else filter->vf.filter = &quickdnrMMX;
@@ -476,7 +468,9 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     }
 
   }
-  else if(double_threshold) filter->vf.filter = &quickdnr2;
+  else
+#endif
+  if(double_threshold) filter->vf.filter = &quickdnr2;
   else filter->vf.filter = &quickdnr;
 
   filter->first = 1;
