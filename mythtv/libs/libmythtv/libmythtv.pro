@@ -75,7 +75,8 @@ SOURCES += videobuffers.cpp
 
 
 unix {
-  !macx {
+    # The backend uses these, but the frontend doesn't.
+    # Comment out for a faster frontend-only build!
     HEADERS += channel.h
     HEADERS += mpeg/tsstats.h mpeg/tspacket.h mpeg/pespacket.h
     HEADERS += mpeg/mpegtables.h mpeg/atsctables.h
@@ -87,7 +88,6 @@ unix {
     SOURCES += mpeg/mpegstreamdata.cpp mpeg/atscstreamdata.cpp
     SOURCES += mpeg/mpegtables.cpp mpeg/atsctables.cpp
     SOURCES += mpeg/atscdescriptors.cpp mpeg/atscdescriptorsmap.cpp
-  }
 }
 
 macx {
