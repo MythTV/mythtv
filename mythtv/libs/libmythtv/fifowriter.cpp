@@ -13,6 +13,11 @@
 #include "fifowriter.h"
 #include "mythcontext.h"
 
+#include "config.h"
+#ifdef CONFIG_DARWIN
+    #include <sys/aio.h>    // O_SYNC
+#endif
+
 #include <iostream>
 using namespace std;
 

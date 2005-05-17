@@ -1,7 +1,9 @@
 #ifndef __LINUX_VIDEODEV_H
 #define __LINUX_VIDEODEV_H
 
-#ifdef __FreeBSD__
+#include "config.h"
+
+#if defined(__FreeBSD__) || defined(CONFIG_DARWIN)
 #include <sys/types.h>
 typedef unsigned long __u32;
 typedef unsigned short __u16;

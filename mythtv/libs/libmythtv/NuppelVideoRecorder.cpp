@@ -4,7 +4,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/soundcard.h>
+#ifdef USING_OSS
+    #include <sys/soundcard.h>
+#endif
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <cerrno>
@@ -608,6 +610,11 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
     int frag, blocksize = 4096;
     int tmp;
 
+#ifdef CONFIG_DARWIN
+    VERBOSE(VB_IMPORTANT, QString("NVR::AudioInit() This Unix doesn't support"
+                                  " device files for audio access. Skipping"));
+    return 1;
+#else
     if (!skipdevice)
     {
         if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY | O_NONBLOCK)))
@@ -656,6 +663,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 
         close(afd);
     }
+#endif
 
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
     blocksize *= 4;
@@ -2086,6 +2094,12 @@ void *NuppelVideoRecorder::VbiThread(void *param)
 
 void NuppelVideoRecorder::doAudioThread(void)
 {
+#ifdef CONFIG_DARWIN
+    VERBOSE(VB_IMPORTANT,
+            QString("NVR::doAudioThread() This Unix doesn't support"
+                    " device files for audio access. Skipping"));
+    return;
+#else
     int afmt = 0, trigger = 0;
     int afd = 0, act = 0, lastread = 0;
     int frag = 0, blocksize = 0;
@@ -2219,6 +2233,7 @@ void NuppelVideoRecorder::doAudioThread(void)
 
     delete [] buffer;
     close(afd);
+#endif
 }
 
 struct VBIData
