@@ -36,4 +36,6 @@ SOURCES += autoexpire.cpp encoderlink.cpp filetransfer.cpp httpstatus.cpp
 SOURCES += main.cpp mainserver.cpp playbacksock.cpp scheduler.cpp server.cpp
 SOURCES += housekeeper.cpp
 
+using_oss:DEFINES += USING_OSS
+
 using_dvb:DEFINES += USING_DVB

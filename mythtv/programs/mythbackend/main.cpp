@@ -9,6 +9,11 @@
 #include <libgen.h>
 #include <signal.h>
 
+#include "../../config.h"
+#ifdef CONFIG_DARWIN
+    #include <sys/aio.h>    // O_SYNC
+#endif
+
 #include <iostream>
 #include <fstream>
 using namespace std;

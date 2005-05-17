@@ -11,7 +11,9 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <fcntl.h>
-#include <sys/soundcard.h>
+#ifdef USING_OSS
+    #include <sys/soundcard.h>
+#endif
 #include <sys/ioctl.h>
 
 #include <list>
@@ -31,6 +33,7 @@ using namespace std;
 #include "libmyth/util.h"
 #include "libmyth/mythdbcon.h"
 
+#include "../../config.h"
 #include "mainserver.h"
 #include "scheduler.h"
 #include "httpstatus.h"
@@ -739,6 +742,10 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             if (audiodevice.right(4) == audiooutputdevice.right(4) &&
                 (cardtype == "V4L" || cardtype == "MJPEG")) //they match
             {
+#ifdef CONFIG_DARWIN
+                VERBOSE(VB_ALL, QString("Audio device files are not"
+                                        " supported on this Unix."));
+#else
                 int dsp_fd = open(audiodevice, O_RDWR | O_NONBLOCK);
                 if (dsp_fd != -1)
                 {
@@ -767,6 +774,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                     VERBOSE(VB_ALL, QString("Could not open audio device: %1")
                                            .arg(audiodevice));
                 }
+#endif // CONFIG_DARWIN
             }
         }
     }
