@@ -94,9 +94,16 @@ macx {
     SOURCES += videoout_quartz.cpp
     HEADERS += videoout_quartz.h
 
-    # videoout_quartz.cpp uses CoreGraphics from ApplicationServices
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks -F/System/Library/Frameworks/Carbon.framework/Frameworks
-    LIBS           += -framework ApplicationServices -framework QuickTime -framework Carbon
+    # Mac OS X Frameworks
+    FWKS = ApplicationServices Carbon QuickTime
+
+    # The following trick shortens the command line, but depends on
+    # the shell expanding Csh-style braces. Luckily, Bash and Zsh do.
+    FC = $$join(FWKS,",","{","}")
+
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
+    LIBS           += -framework $$join(FWKS," -framework ")
+
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC9000000
 }
 
@@ -156,6 +163,8 @@ using_opengl_vsync {
     CONFIG += opengl
     DEFINES += USING_OPENGL_VSYNC
 }
+
+using_oss:DEFINES += USING_OSS
 
 contains( TARGET_MMX, yes ) {
     HEADERS += ../../libs/libavcodec/i386/mmx.h ../../libs/libavcodec/dsputil.h
