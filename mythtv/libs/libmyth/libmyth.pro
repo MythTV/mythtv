@@ -76,16 +76,15 @@ macx {
     SOURCES += audiooutputca.cpp screensaver-osx.cpp DisplayResOSX.cpp
 
     # Mac OS X Frameworks
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/IOKit.framework/Frameworks
-    LIBS += -framework IOKit
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
-    LIBS += -framework Carbon
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
-    LIBS += -framework ApplicationServices
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/CoreAudio.framework/Frameworks
-    LIBS += -framework CoreAudio
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/AudioUnit.framework/Frameworks
-    LIBS += -framework AudioUnit
+    FWKS = ApplicationServices AudioUnit Carbon CoreAudio IOKit
+
+    # The following trick is tidier, and shortens the command line, but it
+    # depends on the shell expanding Csh-style braces. Luckily, Bash & Zsh do.
+    FC = $$join(FWKS,",","{","}")
+
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
+    LIBS           += -framework $$join(FWKS," -framework ")
+
 
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC6000000
 }
