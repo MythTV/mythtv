@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef USING_OSS
+#ifndef CONFIG_DARWIN
     #include <sys/soundcard.h>
 #endif
 #include <sys/ioctl.h>
