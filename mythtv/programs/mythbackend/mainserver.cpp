@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <fcntl.h>
-#ifdef USING_OSS
+#ifndef CONFIG_DARWIN
     #include <sys/soundcard.h>
 #endif
 #include <sys/ioctl.h>
