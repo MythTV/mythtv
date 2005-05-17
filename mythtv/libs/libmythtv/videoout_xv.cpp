@@ -50,9 +50,9 @@ static QString xvflags2str(int flags);
 #   define XVMC_MAX_SURF_NUM 16
     static inline xvmc_render_state_t *GetRender(VideoFrame *frame);
 
-#   if defined(USING_XVMCW)
+#   if defined(USING_XVMCW) || defined(USING_XVMC_VLD)
         extern "C" Status XvMCPutSlice2(Display*,XvMCContext*,char*,int,int);
-#   elif !defined(USING_XVMC_VLD) && !defined(USING_XVMCW)
+#   else
         Status XvMCPutSlice2(Display*, XvMCContext*, char*, int, int)
             { return XvMCBadSurface; }
 #   endif
