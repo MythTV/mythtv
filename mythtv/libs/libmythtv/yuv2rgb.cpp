@@ -33,7 +33,9 @@
 #define CPU_MMXEXT 0
 #define CPU_MMX 1
 #endif
+
 #ifdef HAVE_ALTIVEC
+extern "C" int has_altivec(void);    // in libavcodec/ppc/dsputil_altivec.c
 #ifdef HAVE_ALTIVEC_H
 #include <altivec.h>
 #else
@@ -678,15 +680,15 @@ static void altivec_yuv420_2vuy (uint8_t * image, uint8_t * py,
                             vuy_stride, y_stride, uv_stride);
     }
 }
-#endif
 
 yuv2vuy_fun yuv2vuy_init_altivec (void)
 {
-#ifdef HAVE_ALTIVEC
-    return altivec_yuv420_2vuy;
-#endif
-    return non_vec_yuv420_2vuy; /* Fallback to C */
+    if (has_altivec())
+        return altivec_yuv420_2vuy;
+    else
+        return non_vec_yuv420_2vuy; /* Fallback to C */
 }
+#endif // HAVE_ALTIVEC
 
 static void non_vec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
                                  uint8_t * pu, uint8_t * pv,
@@ -816,7 +818,6 @@ static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
                             vuy_stride, y_stride, uv_stride);
     }
 }
-#endif
 
 /** \fn vuy2yuv_init_altivec (void)
  *  \brief This returns a vuy to yuv converter, using
@@ -826,8 +827,9 @@ static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
  */
 vuy2yuv_fun vuy2yuv_init_altivec (void)
 {
-#ifdef HAVE_ALTIVEC
-    return altivec_2vuy_yuv420;
-#endif
-    return non_vec_2vuy_yuv420; /* Fallback to C */
+    if (has_altivec())
+        return altivec_2vuy_yuv420;
+    else
+        return non_vec_2vuy_yuv420; /* Fallback to C */
 }
+#endif // HAVE_ALTIVEC
