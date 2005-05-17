@@ -15,6 +15,8 @@ extern "C" {
 }
 typedef int (*XErrorCallbackType)(Display *, XErrorEvent *);
 typedef vector<XErrorEvent>       XErrorVectorType;
+#else
+#include <qapplication.h>
 #endif // Q_WS_X11
 
 #ifdef Q_WS_X11
@@ -35,6 +37,8 @@ int GetNumberOfXineramaScreens()
         XFree(XineramaQueryScreens(d, &nr_xinerama_screens));
     XCloseDisplay(d);
     X11U;
+#else
+    nr_xinerama_screens = QApplication::desktop()->numScreens();
 #endif // Q_WS_X11
 
     return nr_xinerama_screens;
