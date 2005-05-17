@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-05-13, v0.18.03
+<date>2005-05-16, v0.18.04
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -108,7 +108,7 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.18.
+This HOWTO is for MythTV v0.18.1
 
 <sect1>Document conventions
 <p>The following conventions are used throughout this document.<newline>
@@ -1446,8 +1446,8 @@ simplest thing is to immediately start using DataDirect.
 <sect1>Manually building MythTV
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.18.tar.bz2
-$ cd mythtv-0.18
+$ tar -xjf mythtv-0.18.1.tar.bz2
+$ cd mythtv-0.18.1
 $ ./configure
 </verb></tscreen>
 
@@ -2132,7 +2132,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.18/configfiles
+$ cd ~/mythtv-0.18.1/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2643,7 +2643,7 @@ mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <tt>mythbackend -h</tt> for help.
 
-As of MythTV v0.18, the available options are:
+As of MythTV v0.18.1, the available options are:
 <tscreen><verb>
 $ mythbackend -h
 Valid options are:
@@ -2852,7 +2852,7 @@ during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
 effects of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
-version 0.18.
+version 0.18.1.
 <sect2>Applying filters
 <p>One or more filters can be included in a "filter chain". The filters to
 be used are identified in a "filter string". A filter string is a group of
@@ -3482,8 +3482,8 @@ can be modified by the user without re-compiling or altering the program
 functionality.  Download the MythThemes tarball from the website and untar it:
 
 <tscreen><verb>
-$ tar -xjf myththemes-0.18.tar.bz2
-$ cd ~/myththemes-0.18
+$ tar -xjf myththemes-0.18.1.tar.bz2
+$ cd ~/myththemes-0.18.1
 $ qmake myththemes.pro
 $ su -
 # make install
@@ -4047,8 +4047,8 @@ a single tarball contains all of the plugins. Once you have downloaded
 the tarball, untar it and run the <bf>configure</bf> script:
 
 <tscreen><verb>
-$ tar -xjf mythplugins-0.18.tar.bz2
-$ cd mythplugins-0.18
+$ tar -xjf mythplugins-0.18.1.tar.bz2
+$ cd mythplugins-0.18.1
 $ ./configure --help
 
 Usage:   configure [options]
@@ -4096,7 +4096,7 @@ MythWeather related options:
 </verb></tscreen>
 
 The sections detailing configuration of the plugins assume that you are
-already in the <tt>~/mythplugins-0.18/</tt> directory.
+already in the <tt>~/mythplugins-0.18.1/</tt> directory.
 
 Note that a single <bf>configure</bf> script now does configuration for all
 modules.  By default, it will compile all modules.  If you do not wish to
@@ -4112,7 +4112,7 @@ like to enable support for the opengl and FFT visualizations.  The command
 line would look like:
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
 $ qmake mythplugins.pro
 $ make
@@ -4161,7 +4161,7 @@ Mandrake Control Center.
 <sect1>Completing the installation
 <p>
 <tscreen><verb>
-$ cd ~/mythplugins-0.18/mythweb
+$ cd ~/mythplugins-0.18.1/mythweb
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4225,7 +4225,7 @@ would perform the following command:
 </verb></tscreen>
 Once you have satisfied the prerequisites for your distribution, install the application:
 <tscreen><verb>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-opengl --enable-mythgallery
 $ qmake mythplugins.pro
 $ make
@@ -4496,7 +4496,7 @@ step.
 compiling MythMusic.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
 $ qmake mythplugins.pro
 $ make
@@ -4629,7 +4629,7 @@ id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-mythweather
 $ qmake mythplugins.pro
 $ make
@@ -4681,7 +4681,7 @@ MythVideo will allow you to use an external program to watch media files
 that are not directly supported by MythTV.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-mythvideo
 $ qmake mythplugins.pro
 $ make
@@ -4721,7 +4721,7 @@ prerequisites using the following command:
 In the example below, we have enabled support for transcoding and for VCD
 playing.  You may remove these options if you don't need them.
 <tscreen><verb>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
 $ qmake mythplugins.pro
 $ make
@@ -4757,7 +4757,7 @@ mythbackend at system boot time"> to start mtd instead of mythbackend.
 id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.  MythNews is a RSS reader.
 <tscreen><verb>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-mythnews
 $ qmake mythplugins.pro
 $ make
@@ -7497,7 +7497,7 @@ v0.18.03, 2005-05-13.  Add text for pulling release-branch CVS code.  Add
 text about PVR-500 being two PVR-150's.  Expand on choosing lowest numbered
 input device in each class.  Remove note that Plextor is in CVS since it's
 now in released code.  Add more information on hard drive requirements.  Spelling.
-
+v0.18.04, 2005-05-16.  Bump to v0.18.1.
 -->
 
 <!--

@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-05-13, v0.18.03
+  2005-05-16, v0.18.04
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -433,7 +433,7 @@
   at http://www.mythtv.org/docs/mythtv-HOWTO.pdf
   <http://www.mythtv.org/docs/mythtv-HOWTO.pdf>.
 
-  This HOWTO is for MythTV v0.18.
+  This HOWTO is for MythTV v0.18.1
 
 
   [1m1.5.  Document conventions[0m
@@ -1947,8 +1947,8 @@
   Unpack MythTV
 
 
-       $ tar -xjf mythtv-0.18.tar.bz2
-       $ cd mythtv-0.18
+       $ tar -xjf mythtv-0.18.1.tar.bz2
+       $ cd mythtv-0.18.1
        $ ./configure
 
 
@@ -2726,7 +2726,7 @@
 
 
 
-       $ cd ~/mythtv-0.18/configfiles
+       $ cd ~/mythtv-0.18.1/configfiles
        $ cp lircrc.example ~/.lircrc
 
 
@@ -3293,7 +3293,7 @@
   doing to the console.  If you'd like to see the options that are
   available for mythbackend, type mythbackend -h for help.
 
-  As of MythTV v0.18, the available options are:
+  As of MythTV v0.18.1, the available options are:
 
 
 
@@ -3525,7 +3525,7 @@
   the video image, including hiding the effects of an interlaced image
   or reducing the effects of noise in a poor video signal. The following
   is a brief introduction to introduce you to the filters that are
-  available in MythTV version 0.18.
+  available in MythTV version 0.18.1.
 
   [1m10.4.2.  Applying filters[0m
 
@@ -4136,8 +4136,8 @@
          Other key 1     i                  Information
          Other key 2     c                  Change tuner card input
 
-       $ tar -xjf myththemes-0.18.tar.bz2
-       $ cd ~/myththemes-0.18
+       $ tar -xjf myththemes-0.18.1.tar.bz2
+       $ cd ~/myththemes-0.18.1
        $ qmake myththemes.pro
        $ su -
        # make install
@@ -4771,8 +4771,8 @@
 
 
 
-  $ tar -xjf mythplugins-0.18.tar.bz2
-  $ cd mythplugins-0.18
+  $ tar -xjf mythplugins-0.18.1.tar.bz2
+  $ cd mythplugins-0.18.1
   $ ./configure --help
 
   Usage:   configure [options]
@@ -4821,7 +4821,7 @@
 
 
   The sections detailing configuration of the plugins assume that you
-  are already in the ~/mythplugins-0.18/ directory.
+  are already in the ~/mythplugins-0.18.1/ directory.
 
   Note that a single [1mconfigure [22mscript now does configuration for all
   modules.  By default, it will compile all modules.  If you do not wish
@@ -4836,7 +4836,7 @@
   MythMusic, you would like to enable support for the opengl and FFT
   visualizations.  The command line would look like:
 
-       $ cd ~/mythplugins-0.18
+       $ cd ~/mythplugins-0.18.1
        $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
        $ qmake mythplugins.pro
        $ make
@@ -4890,7 +4890,7 @@
 
 
 
-  $ cd ~/mythplugins-0.18/mythweb
+  $ cd ~/mythplugins-0.18.1/mythweb
   $ su
   # mkdir /var/www/html/mythweb
   # cp -r . /var/www/html/mythweb
@@ -4968,7 +4968,7 @@
   install the application:
 
 
-       $ cd ~/mythplugins-0.18
+       $ cd ~/mythplugins-0.18.1
        $ ./configure --disable-all --enable-opengl --enable-mythgallery
        $ qmake mythplugins.pro
        $ make
@@ -5286,7 +5286,7 @@
 
 
 
-       $ cd ~/mythplugins-0.18
+       $ cd ~/mythplugins-0.18.1
        $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
        $ qmake mythplugins.pro
        $ make
@@ -5432,7 +5432,7 @@
 
 
 
-       $ cd ~/mythplugins-0.18
+       $ cd ~/mythplugins-0.18.1
        $ ./configure --disable-all --enable-mythweather
        $ qmake mythplugins.pro
        $ make
@@ -5492,7 +5492,7 @@
 
 
 
-       $ cd ~/mythplugins-0.18
+       $ cd ~/mythplugins-0.18.1
        $ ./configure --disable-all --enable-mythvideo
        $ qmake mythplugins.pro
        $ make
@@ -5544,7 +5544,7 @@
   VCD playing.  You may remove these options if you don't need them.
 
 
-       $ cd ~/mythplugins-0.18
+       $ cd ~/mythplugins-0.18.1
        $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
        $ qmake mythplugins.pro
        $ make
@@ -5592,7 +5592,7 @@
   reader.
 
 
-       $ cd ~/mythplugins-0.18
+       $ cd ~/mythplugins-0.18.1
        $ ./configure --disable-all --enable-mythnews
        $ qmake mythplugins.pro
        $ make

@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-05-13, v0.18.03
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-05-16, v0.18.04
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -323,7 +323,7 @@ archives, or post your question to the MythTV-users mailing list. </CAPTION>
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html">http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html</A> or as a PDF
 at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">http://www.mythtv.org/docs/mythtv-HOWTO.pdf</A>.</P>
-<P>This HOWTO is for MythTV v0.18.</P>
+<P>This HOWTO is for MythTV v0.18.1</P>
 
 <H2><A NAME="ss1.5">1.5</A> <A HREF="#toc1.5">Document conventions</A>
 </H2>
@@ -1749,8 +1749,8 @@ simplest thing is to immediately start using DataDirect.</P>
 <P>Unpack MythTV
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.18.tar.bz2
-$ cd mythtv-0.18
+$ tar -xjf mythtv-0.18.1.tar.bz2
+$ cd mythtv-0.18.1
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2536,7 +2536,7 @@ interact directly with </P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythtv-0.18/configfiles
+$ cd ~/mythtv-0.18.1/configfiles
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -3066,7 +3066,7 @@ $ mythbackend
 <P>mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <CODE>mythbackend -h</CODE> for help.</P>
-<P>As of MythTV v0.18, the available options are:
+<P>As of MythTV v0.18.1, the available options are:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mythbackend -h
@@ -3282,7 +3282,7 @@ during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
 effects of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
-version 0.18.</P>
+version 0.18.1.</P>
 <H3>Applying filters</H3>
 
 <P>One or more filters can be included in a "filter chain". The filters to
@@ -3871,8 +3871,8 @@ functionality.  Download the MythThemes tarball from the website and untar it:</
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf myththemes-0.18.tar.bz2
-$ cd ~/myththemes-0.18
+$ tar -xjf myththemes-0.18.1.tar.bz2
+$ cd ~/myththemes-0.18.1
 $ qmake myththemes.pro
 $ su -
 # make install
@@ -4447,8 +4447,8 @@ the tarball, untar it and run the <B>configure</B> script:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythplugins-0.18.tar.bz2
-$ cd mythplugins-0.18
+$ tar -xjf mythplugins-0.18.1.tar.bz2
+$ cd mythplugins-0.18.1
 $ ./configure --help
 
 Usage:   configure [options]
@@ -4497,7 +4497,7 @@ MythWeather related options:
 </CODE></BLOCKQUOTE>
 </P>
 <P>The sections detailing configuration of the plugins assume that you are
-already in the <CODE>~/mythplugins-0.18/</CODE> directory.</P>
+already in the <CODE>~/mythplugins-0.18.1/</CODE> directory.</P>
 <P>Note that a single <B>configure</B> script now does configuration for all
 modules.  By default, it will compile all modules.  If you do not wish to
 compile a module, either because it is of no use to you, or you do not have
@@ -4512,7 +4512,7 @@ line would look like:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
 $ qmake mythplugins.pro
 $ make
@@ -4572,7 +4572,7 @@ Mandrake Control Center.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.18/mythweb
+$ cd ~/mythplugins-0.18.1/mythweb
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4648,7 +4648,7 @@ would perform the following command:
 Once you have satisfied the prerequisites for your distribution, install the application:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-opengl --enable-mythgallery
 $ qmake mythplugins.pro
 $ make
@@ -4956,7 +4956,7 @@ compiling MythMusic.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
 $ qmake mythplugins.pro
 $ make
@@ -5080,7 +5080,7 @@ tarball.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-mythweather
 $ qmake mythplugins.pro
 $ make
@@ -5133,7 +5133,7 @@ that are not directly supported by MythTV.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-mythvideo
 $ qmake mythplugins.pro
 $ make
@@ -5184,7 +5184,7 @@ prerequisites using the following command:
 playing.  You may remove these options if you don't need them.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
 $ qmake mythplugins.pro
 $ make
@@ -5234,7 +5234,7 @@ section called
 tarball.  MythNews is a RSS reader.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.18
+$ cd ~/mythplugins-0.18.1
 $ ./configure --disable-all --enable-mythnews
 $ qmake mythplugins.pro
 $ make
