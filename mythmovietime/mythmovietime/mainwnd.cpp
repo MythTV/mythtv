@@ -211,7 +211,7 @@ void MMTMainWindow::doMenu(UIListGenericTree* item, bool infoMenu)
         if (showItem)
         {
             
-            if (!showItem->getTicketURL().isEmpty() )
+            if (!showItem->getTicketURL().isEmpty() && (showItem->getTicketURL().length() > 10) )
             {
                 buttonCount++;
                 ActivePopup->addButton(tr("Buy Ticket"), this, SLOT(doBuyTicket()));
@@ -282,6 +282,7 @@ void MMTMainWindow::doBuyTicket()
     closeActivePopup();
     if (pItem)
     {
+        
         launchBrowser(pItem->getTicketURL());
     }
 }
