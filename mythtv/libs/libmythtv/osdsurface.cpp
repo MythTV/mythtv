@@ -187,13 +187,8 @@ OSDSurface::OSDSurface(int w, int h)
     blendcolumnfunc = &blendcolumn;
     blendcolorfunc = &blendcolor;
     blendconstfunc = &blendconst;
-/* these do not yet work on x86_64, which does not define i386 */
 #if defined(MMX)
-    //cerr<<QString("cpu extension flags detected: %1")
-    //    .arg(cpuid2str(mm_support()));
     usemmx = (mm_support() & MM_MMX);
-    //usemmx = true;
-    
     if (usemmx)
     {
         rec_lut[0] = 0;
