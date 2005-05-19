@@ -154,8 +154,11 @@ class VideoOutput
 
     virtual void DrawUnusedRects(bool sync = true) = 0;
 
+    /// \brief Returns current display aspect ratio.
     virtual float GetDisplayAspect(void) { return 4.0/3; }
 
+    /// \brief Returns current letterboxing mode
+    /// \sa ToggleLetterbox(int)
     int GetLetterbox(void) { return letterbox; }
     void ToggleLetterbox(int letterboxMode = kLetterbox_Toggle);
 
@@ -164,50 +167,95 @@ class VideoOutput
                               FilterChain *filterList,
                               NuppelVideoPlayer *pipPlayer) = 0;
 
+    /// \brief Tells video output that a full repaint is needed.
     void ExposeEvent(void) { needrepaint = true; }
 
     int ChangeBrightness(bool up);
     int ChangeContrast(bool up);
     int ChangeColour(bool up);
     int ChangeHue(bool up);
+
+    /// \brief Returns current playback brightness
     int GetCurrentBrightness(void) { return brightness; }
+    /// \brief Returns current playback contrast
     int GetCurrentContrast(void) { return contrast; }
+    /// \brief Returns current playback colour
     int GetCurrentColour(void) { return colour; }
+    /// \brief Returns current playback hue
     int GetCurrentHue(void) { return hue; }
 
     bool AllowPreviewEPG(void) { return allowpreviewepg; }
 
+    /// \brief Returns true iff Motion Compensation acceleration is available.
     virtual bool hasMCAcceleration() const { return false; }
+    /// \brief Returns true iff Inverse Discrete Cosine Transform acceleration
+    ///        is available.
     virtual bool hasIDCTAcceleration() const { return false; }
+    /// \brief Returns true iff VLD acceleration is available.
     virtual bool hasVLDAcceleration() const { return false; }
 
+    /// \brief Sets the number of frames played
     void SetFramesPlayed(long long fp) { framesPlayed = fp; };
+    /// \brief Returns the number of frames played
     long long GetFramesPlayed(void) { return framesPlayed; };
 
+    /// \brief Returns true if a fatal error has been encountered.
     bool IsErrored() { return errored; }
 
     // Video Buffer Management
+    /// \brief Sets whether to use a normal number of buffers or fewer buffers.
     void SetPrebuffering(bool normal) { vbuffers.SetPrebuffering(normal); }
+    /// \brief Tells video output to toss decoded buffers due to a seek
     void ClearAfterSeek(void) { vbuffers.ClearAfterSeek(); }
+    /// \brief Blocks until a frame is available for decoding onto.
     bool WaitForAvailable(uint w) { return vbuffers.WaitForAvailable(w); }
 
+    /// \brief Returns number of frames that are fully decoded.
     int ValidVideoFrames(void) { return vbuffers.ValidVideoFrames(); }
+    /// \brief Returns number of frames available for decoding onto.
     int FreeVideoFrames(void) { return vbuffers.FreeVideoFrames(); }
+    /// \brief Returns true iff enough frames are available to decode onto.
     bool EnoughFreeFrames(void) { return vbuffers.EnoughFreeFrames(); }
+    /// \brief Returns true iff there are plenty of decoded frames ready
+    ///        for display.
     bool EnoughDecodedFrames(void) { return vbuffers.EnoughDecodedFrames(); }
+    /// \brief Returns true iff we have at least the minimum number of
+    ///        decoded frames ready for display.
     bool EnoughPrebufferedFrames(void) { return vbuffers.EnoughPrebufferedFrames(); }
     
+    /**
+     * \brief Blocks until it is possible to return a frame for decoding onto.
+     * \param with_lock if true frames are properly locked, but this means you
+     *        must unlock them when you are done, so this is disabled by default.
+     * \param allow_unsafe if true then that are queued for display can be
+     *       returned as frames to decode onto, this defaults to false.
+     */
     virtual VideoFrame *GetNextFreeFrame(bool with_lock = false,
                                          bool allow_unsafe = false)
         { return vbuffers.GetNextFreeFrame(with_lock, allow_unsafe); }
+    /// \brief Releases a frame from the ready for decoding queue onto the
+    ///        queue of frames ready for display.
     virtual void ReleaseFrame(VideoFrame *frame) { vbuffers.ReleaseFrame(frame); }
+    /// \brief Tell GetLastShownFrame() to return the next frame from the head
+    ///        of the queue of frames to display.
     virtual void StartDisplayingFrame(void) { vbuffers.StartDisplayingFrame(); }
+    /// \brief Releases frame returned from GetLastShownFrame() onto the 
+    ///        queue of frames ready for decoding onto.
     virtual void DoneDisplayingFrame(void) { vbuffers.DoneDisplayingFrame(); }
+    /// \brief Releases frame from any queue onto the 
+    ///        queue of frames ready for decoding onto.
     virtual void DiscardFrame(VideoFrame *frame) { vbuffers.DiscardFrame(frame); }
+    /// \brief Releases all frames not being actively displayed from any queue
+    ///        onto the queue of frames ready for decoding onto.
     virtual void DiscardFrames(void) { vbuffers.DiscardFrames(); }
 
+    /// \bug not implemented correctly. vpos is not updated.
     VideoFrame *GetLastDecodedFrame(void) { return vbuffers.GetLastDecodedFrame(); }
+
+    /// \brief Returns frame from the head of the ready to be displayed queue,
+    ///        if StartDisplayingFrame has been called.
     VideoFrame *GetLastShownFrame(void)  { return vbuffers.GetLastShownFrame(); }
+    /// \brief Updates frame displayed when video is paused.
     virtual void UpdatePauseFrame(void) = 0;
 
   protected:
@@ -227,7 +275,7 @@ class VideoOutput
  
     virtual int ChangePictureAttribute(int attributeType, int newValue);
 
-    void CopyFrame(VideoFrame* to, VideoFrame* from);
+    static void CopyFrame(VideoFrame* to, const VideoFrame* from);
 
     void DoPipResize(int pipwidth, int pipheight);
     void ShutdownPipResize(void);

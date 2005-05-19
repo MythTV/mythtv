@@ -67,7 +67,7 @@ static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
 static void SetFromHW(Display *d, bool &useXvMC, bool &useXV, bool& useShm);
 
 /** \class  VideoOutputXv
- * Supports common video output methods used with X11 Servers.
+ * Supports common video output methods used with %X11 Servers.
  *
  * This class suppurts XVideo with VLD acceleration (XvMC-VLD), XVideo with
  * inverse discrete cosine transform (XvMC-IDCT) acceleration, XVideo with 

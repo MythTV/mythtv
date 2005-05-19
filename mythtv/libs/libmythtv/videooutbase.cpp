@@ -35,6 +35,12 @@
 
 #include "filtermanager.h"
 
+/**
+ * \fn VideoOutput::InitVideoOut(VideoOutputType, MythCodecID)
+ * \brief Creates a VideoOutput class compatible with both "type" and
+ *        "codec_id".
+ * \return instance of VideoOutput if successful, NULL otherwise.
+ */
 VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, MythCodecID codec_id)
 {
     (void)type;
@@ -64,8 +70,9 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, MythCodecID codec_i
     return NULL;
 }
 
-/** \class VideoOutput
- * This class serves as the base class for all video output methods.
+/**
+ * \class VideoOutput
+ * \brief This class serves as the base class for all video output methods.
  *
  * The basic use is:
  * \code
@@ -121,6 +128,11 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, MythCodecID codec_i
  * \see VideoBuffers, NuppelVideoPlayer
  */
 
+/**
+ * \fn VideoOutput::VideoOutput()
+ * \brief This constructor for VideoOutput must be followed by an 
+ *        Init(int,int,float,WId,int,int,int,int,WId) call.
+ */
 VideoOutput::VideoOutput()
 {
     letterbox = kLetterbox_Off;
@@ -157,6 +169,10 @@ VideoOutput::VideoOutput()
     errored = false;
 }
 
+/**
+ * \fn VideoOutput::~VideoOutput()
+ * \brief Shuts down video output.
+ */
 VideoOutput::~VideoOutput()
 {
     ShutdownPipResize();
@@ -167,6 +183,11 @@ VideoOutput::~VideoOutput()
         delete m_deintFiltMan;
 }
 
+/**
+ * \fn Init(int,int,float,WId,int,int,int,int,WId)
+ * \brief Performs most of the initialization for VideoOutput.
+ * \return true if successful, false otherwise.
+ */
 bool VideoOutput::Init(int width, int height, float aspect, WId winid,
                        int winx, int winy, int winw, int winh, WId embedid)
 {
@@ -228,13 +249,18 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     return true;
 }
 
+/**
+ * \fn VideoOutput::SetupDeinterlace(bool)
+ * \brief Attempts to enable or disable deinterlacing.
+ * \return true if successful, false otherwise.
+ */
 bool VideoOutput::SetupDeinterlace(bool interlaced)
 {
     if (VideoOutputNull *null = dynamic_cast<VideoOutputNull *>(this))
     {
         (void)null;
         // null vidout doesn't deinterlace
-        return false;
+        return !interlaced;
     }
 
     if (m_deinterlacing == interlaced)
@@ -292,7 +318,7 @@ bool VideoOutput::SetupDeinterlace(bool interlaced)
 
 /**
  * \fn VideoOutput::NeedsDoubleFramerate() const
- * Should Prepare() and Show() be called twice for every ProcessFrame().
+ * \brief Should Prepare() and Show() be called twice for every ProcessFrame().
  *
  * \return m_deintfiltername == "bobdeint" && m_deinterlacing
  */
@@ -304,8 +330,8 @@ bool VideoOutput::NeedsDoubleFramerate() const
 
 /**
  * \fn VideoOutput::ApproveDeintFilter(const QString& filtername) const
- * Approves all deinterlace filters, except bobdeint, which
- * must be supported by a specific video output class.
+ * \brief Approves all deinterlace filters, except bobdeint, which
+ *        must be supported by a specific video output class.
  *
  * \return filtername != "bobdeint"
  */
@@ -317,9 +343,9 @@ bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
 
 /**
  * \fn VideoOutput::AspectSet(float aspect)
- * Sets VideoOutput::videoAspect to aspect, and sets 
- * VideoOutput::XJ_aspect the letterbox type, unless
- * the letterbox type is kLetterbox_Fill.
+ * \brief Sets VideoOutput::videoAspect to aspect, and sets 
+ *        VideoOutput::XJ_aspect the letterbox type, unless
+ *        the letterbox type is kLetterbox_Fill.
  * 
  * \param aspect aspect ratio to use
  */
@@ -348,7 +374,7 @@ void VideoOutput::AspectSet(float aspect)
 
 /**
  * \fn VideoOutput::AspectChanged(float aspect)
- * Calls AspectSet(float aspect).
+ * \brief Calls AspectSet(float aspect).
  * \param aspect aspect ratio to use
  */
 void VideoOutput::AspectChanged(float aspect)
@@ -356,6 +382,12 @@ void VideoOutput::AspectChanged(float aspect)
     AspectSet(aspect);
 }
 
+/**
+ * \fn VideoOutput::InputChanged(int, int, float)
+ * \brief Tells video output to discard decoded frames and wait for new ones.
+ * \bug We set the new width height and aspect ratio here, but we should
+ *      do this based on the new video frames in Show().
+ */
 void VideoOutput::InputChanged(int width, int height, float aspect)
 {
     XJ_width = width;
@@ -365,6 +397,16 @@ void VideoOutput::InputChanged(int width, int height, float aspect)
     DiscardFrames();
 }
 
+/**
+ * \fn VideoOutput::EmbedInWidget(WId, int, int, int, int)
+ * \brief Tells video output to embed video in an existing window.
+ * \param wid window to embed in.
+ * \param x   X location where to locate video
+ * \param y   Y location where to locate video
+ * \param w   width of video
+ * \param h   height of video
+ * \sa StopEmbedding()
+ */
 void VideoOutput::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     (void)wid;
@@ -384,6 +426,11 @@ void VideoOutput::EmbedInWidget(WId wid, int x, int y, int w, int h)
     MoveResize();
 }
 
+/**
+ * \fn VideoOutput::StopEmbedding(void)
+ * \brief Tells video output to stop embedding video in an existing window.
+ * \sa EmbedInWidget(WId, int, int, int, int)
+ */ 
 void VideoOutput::StopEmbedding(void)
 {
     dispx = olddispx;
@@ -396,6 +443,11 @@ void VideoOutput::StopEmbedding(void)
     MoveResize();
 }
 
+/**
+ * \fn VideoOutput::DrawSlice(VideoFrame*, int, int, int, int)
+ * \brief Informs video output of new data for frame,
+ *        used for XvMC acceleration.
+ */
 void VideoOutput::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 {
     (void)frame;
@@ -405,6 +457,14 @@ void VideoOutput::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     (void)h;
 }
 
+/**
+ * \fn VideoOutput::GetDrawSize(int&,int&,int&,int&)
+ * \brief Returns video output width, height, and location.
+ * \param xoff    X location where video is located in window
+ * \param yoff    Y location where video is located in window
+ * \param width   width of video output
+ * \param height  height of video output
+ */
 void VideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
 {
     xoff = imgx;
@@ -413,6 +473,14 @@ void VideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
     height = imgh;
 }
 
+/**
+ * \fn VideoOutput::GetVisibleSize(int&,int&,int&,int&)
+ * \brief Returns visible portions of video.
+ * \param xoff    X location where visible video is located in window
+ * \param yoff    Y location where visible video is located in window
+ * \param width   visible width of video output
+ * \param height  visible height of video output
+ */
 void VideoOutput::GetVisibleSize(int &xoff, int &yoff, int &width, int &height)
 {
     xoff   = imgx;
@@ -454,6 +522,12 @@ void VideoOutput::GetVisibleSize(int &xoff, int &yoff, int &width, int &height)
     }
 }
 
+/**
+ * \fn VideoOutput::MoveResize()
+ * \brief performs all the calculations for video framing and any resizing.
+ *
+ * \sa Zoom(int), ToggleLetterbox(int)
+ */
 void VideoOutput::MoveResize(void)
 {
     int yoff, xoff;
@@ -723,6 +797,12 @@ void VideoOutput::MoveResize(void)
     needrepaint = true;
 }
 
+/**
+ * \fn VideoOutput::Zoom(int)
+ * \brief Sets up zooming into to different parts of the video, the zoom
+ *        is actually applied in MoveResize().
+ * \sa ToggleLetterbox(int), GetLetterbox()
+ */
 void VideoOutput::Zoom(int direction)
 {
     switch (direction)
@@ -763,6 +843,12 @@ void VideoOutput::Zoom(int direction)
     }
 }
 
+/**
+ * \fn VideoOutput::ToggleLetterbox(int)
+ * \brief Sets up letterboxing for various standard video frame and
+ *        monitor dimentions. These are actually applied in MoveResize().
+ * \sa Zoom(int), 
+ */
 void VideoOutput::ToggleLetterbox(int letterboxMode)
 {
     if (letterboxMode == kLetterbox_Toggle)
@@ -778,6 +864,13 @@ void VideoOutput::ToggleLetterbox(int letterboxMode)
     AspectChanged(videoAspect);
 }
 
+/**
+ * \fn VideoOutput::ChangePictureAttribute(int, int)
+ * \brief Sets a specified picture attribute.
+ * \param attribute Picture attribute to set.
+ * \param newValue  Value to set attribute to.
+ * \return Set value if it succeeds, -1 if it does not.
+ */
 int VideoOutput::ChangePictureAttribute(int attribute, int newValue)
 {
     (void)attribute;
@@ -785,6 +878,11 @@ int VideoOutput::ChangePictureAttribute(int attribute, int newValue)
     return -1;
 }
 
+/**
+ * \fn VideoOutput::ChangeBrightness(bool)
+ * \brief Increases brightenss if "up" is true, decreases it otherwise.
+ * \return new value if it succeeds, old value if it does not.
+ */
 int VideoOutput::ChangeBrightness(bool up)
 {
     int result;
@@ -797,6 +895,11 @@ int VideoOutput::ChangeBrightness(bool up)
     return brightness;
 }
 
+/**
+ * \fn VideoOutput::ChangeContrast(bool)
+ * \brief Increases contrast if "up" is true, decreases it otherwise.
+ * \return new value if it succeeds, old value if it does not.
+ */
 int VideoOutput::ChangeContrast(bool up)
 {
     int result;
@@ -809,6 +912,11 @@ int VideoOutput::ChangeContrast(bool up)
     return contrast;
 }
 
+/**
+ * \fn VideoOutput::ChangeColour(bool)
+ * \brief Increases colour phase if "up" is true, decreases it otherwise.
+ * \return new value if it succeeds, old value if it does not.
+ */
 int VideoOutput::ChangeColour(bool up)
 {
     int result;
@@ -820,6 +928,11 @@ int VideoOutput::ChangeColour(bool up)
     return colour;
 }
 
+/**
+ * \fn VideoOutput::ChangeHue(bool)
+ * \brief Increases Hue phase if "up" is true, decreases it otherwise.
+ * \return new value if it succeeds, old value if it does not.
+ */
 int VideoOutput::ChangeHue(bool up)
 {
     int result;
@@ -831,6 +944,13 @@ int VideoOutput::ChangeHue(bool up)
     return hue;
 }
 
+/**
+ * \fn VideoOutput::DoPipResize(int,int)
+ * \brief Sets up Picture in Picture image resampler.
+ * \param pipwidth  input width
+ * \param pipheight input height
+ * \sa ShutdownPipResize(), ShowPip(VideoFrame*,NuppelVideoPlayer*)
+ */
 void VideoOutput::DoPipResize(int pipwidth, int pipheight)
 {
     if (pipwidth != desired_piph || pipheight != desired_pipw)
@@ -849,6 +969,12 @@ void VideoOutput::DoPipResize(int pipwidth, int pipheight)
     }
 }
 
+/**
+ * \fn VideoOutput::ShutdownPipResize()
+ * \brief Shuts down Picture in Picture image resampler.
+ * \sa VideoOutput::DoPipResize(int,int),
+ *     ShowPip(VideoFrame*,NuppelVideoPlayer*)
+ */
 void VideoOutput::ShutdownPipResize(void)
 {
     if (piptmpbuf)
@@ -863,6 +989,14 @@ void VideoOutput::ShutdownPipResize(void)
     pipw_in = pipw_out = -1;
 }
 
+/**
+ * \fn VideoOutput::ShowPip(VideoFrame*,NuppelVideoPlayer*)
+ * \brief Composites PiP image onto a video frame.
+ * Note: This only works with memory backed VideoFrames,
+ *       that is not XvMC.
+ * \param frame     Frame to composite PiP onto.
+ * \param pipplayer Picture-in-Picture NVP.
+ */
 void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 {
     if (!pipplayer)
@@ -952,6 +1086,11 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     pipplayer->ReleaseCurrentFrame(pipimage);
 }
 
+/**
+ * \fn VideoOutput::DisplayOSD(VideoFrame*,OSD *,int,int)
+ * \brief If the OSD has changed, this will convert the OSD buffer
+ *        to the OSDSurface's color format.
+ */ 
 int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
                             int revision)
 {
@@ -1015,6 +1154,11 @@ int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
     return retval;
 }
 
+/**
+ * \fn VideoOutput::BlendSurfaceToYV12(OSDSurface*,unsigned char*,int)
+ * \brief Used by DisplayOSD(VideoFrame*,OSD *,int,int) to convert
+ *        between color spaces and strides.
+ */
 void VideoOutput::BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr,
                                      int stride)
 {
@@ -1114,6 +1258,11 @@ void VideoOutput::BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr,
     }
 }
 
+/**
+ * \fn VideoOutput::BlendSurfaceToI44(OSDSurface*,unsigned char*,int)
+ * \brief Used by DisplayOSD(VideoFrame*,OSD *,int,int) to convert
+ *        between color spaces and strides.
+ */
 void VideoOutput::BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
                                     bool ifirst, int stride)
 {
@@ -1199,6 +1348,11 @@ void VideoOutput::BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
     delete_dithertoia44_8_context(dcontext);
 }
 
+/**
+ * \fn VideoOutput::BlendSurfaceToARGB(OSDSurface*,unsigned char*,int)
+ * \brief Used by DisplayOSD(VideoFrame*,OSD *,int,int) to convert
+ *        between color spaces and strides.
+ */
 void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface, 
                                      unsigned char *argbptr, int stride)
 {
@@ -1274,7 +1428,15 @@ void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface,
     }
 }
 
-void VideoOutput::CopyFrame(VideoFrame *to, VideoFrame *from)
+/**
+ * \fn VideoOutput::CopyFrame(VideoFrame *, VideoFrame *)
+ * \brief Copies frame data from one VideoFrame to another.
+ * 
+ *  Note: The frames must have the same width, height, and format.
+ * \param to   The destination frame.
+ * \param from The source frame 
+ */
+void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
 {
     if (to == NULL || from == NULL)
         return;

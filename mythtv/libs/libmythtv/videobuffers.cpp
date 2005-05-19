@@ -20,9 +20,9 @@ int next_dbg_str = 0;
 /**
  * \class VideoBuffers
  *  This class creates tracks the state of the buffers used by 
- *  various Video Output classes.
+ *  various VideoOutput derived classes.
  *  
- *  The states available for a buffer are available, limbo, used,
+ *  The states available for a buffer are: available, limbo, used,
  *  process, and displayed.
  *  
  *  The two most important states are available and used.
