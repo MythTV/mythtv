@@ -1265,7 +1265,6 @@ bool PlaybackBox::FillList()
     QMap<QString, QString> sortedList;
     QRegExp prefixes = tr("^(The |A |An )");
     QString sTitle = "";
-    int catsAsRecGroups = gContext->GetNumSetting("UseCategoriesAsRecGroups");
 
     vector<ProgramInfo *> *infoList;
     infoList = RemoteGetRecordedList(listOrder == 0 || type == Delete);
