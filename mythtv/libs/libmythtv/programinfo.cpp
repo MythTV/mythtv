@@ -32,6 +32,13 @@ static QString StripHTMLTags(const QString& src)
     return dst;
 }
 
+/** \class ProgramInfo
+ *  \brief Holds information on a TV Program one might wish to record.
+ */
+
+/** \fn ProgramInfo::ProgramInfo(const ProgramInfo &other) 
+ *  \brief Null constructor.
+ */
 ProgramInfo::ProgramInfo(void)
 {
     spread = -1;
@@ -92,7 +99,10 @@ ProgramInfo::ProgramInfo(void)
 
     record = NULL;
 }   
-        
+
+/** \fn ProgramInfo::ProgramInfo(const ProgramInfo &other) 
+ *  \brief Copy constructor.
+ */
 ProgramInfo::ProgramInfo(const ProgramInfo &other)
 {           
     record = NULL;
@@ -100,12 +110,17 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     clone(other);
 }
 
-
+/** \fn ProgramInfo::operator=(const ProgramInfo &other) 
+ *  \brief Copies important fields from other ProgramInfo.
+ */
 ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other) 
 { 
     return clone(other); 
 }
 
+/** \fn ProgramInfo::clone(const ProgramInfo &other) 
+ *  \brief Copies important fields from other ProgramInfo.
+ */
 ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
 {
     if (record)
@@ -179,12 +194,18 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     return *this;
 }
 
+/** \fn ProgramInfo::~ProgramInfo() 
+ *  \brief Destructor deletes "record" if it exists.
+ */
 ProgramInfo::~ProgramInfo() 
 {
     if (record != NULL)
         delete record;
 }
 
+/** \fn ProgramInfo::MakeUniqueKey() const
+ *  \brief Creates a unique string that can be used to identify a recording.
+ */
 QString ProgramInfo::MakeUniqueKey(void) const
 {
     return title + ":" + chanid + ":" + startts.toString(Qt::ISODate);
@@ -201,6 +222,12 @@ QString ProgramInfo::MakeUniqueKey(void) const
 
 #define FLOAT_TO_LIST(x)     sprintf(tmp, "%f", (x)); list << tmp;
 
+/** \fn ProgramInfo::ToStringList(QStringList&)
+ *  \brief Serializes ProgramInfo into a QStringList which can be passed
+ *         over a socket.
+ *  \sa FromStringList(QStringList&,int),
+ *      FromStringList(QStringList&,QStringList::iterator&)
+ */
 void ProgramInfo::ToStringList(QStringList &list)
 {
     char tmp[64];
@@ -246,6 +273,15 @@ void ProgramInfo::ToStringList(QStringList &list)
     INT_TO_LIST(hasAirDate)     
 }
 
+/** \fn ProgramInfo::FromStringList(QStringList&,int)
+ *  \brief Uses a QStringList to initialize this ProgramInfo instance.
+ *  \param list   QStringList containing serialized ProgramInfo.
+ *  \param offset First field in list to treat as beginning of
+ *                serialized ProgramInfo.
+ *  \return true if it succeeds, false if it fails.
+ *  \sa ToStringList(QStringList&),
+ *      FromStringList(QStringList&,QStringList::iterator&)
+ */
 bool ProgramInfo::FromStringList(QStringList &list, int offset)
 {
     QStringList::iterator it = list.at(offset);
@@ -275,7 +311,14 @@ bool ProgramInfo::FromStringList(QStringList &list, int offset)
 
 #define FLOAT_FROM_LIST(x)     NEXT_STR() (x) = atof(ts.ascii());
 
-
+/** \fn ProgramInfo::ToStringList(QStringList &list)
+ *  \brief Uses a QStringList to initialize this ProgramInfo instance.
+ *  \param list   QStringList containing serialized ProgramInfo.
+ *  \param it     Iterator pointing to first field in list to treat as
+ *                beginning of serialized ProgramInfo.
+ *  \return true if it succeeds, false if it fails.
+ *  \sa ToStringList(QStringList&), FromStringList(QStringList&,int)
+ */
 bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
 {
     const char* listerror = "ProgramInfo::FromStringList, not enough items"
@@ -328,6 +371,10 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     return true;
 }
 
+/** \fn ProgramInfo::ToStringList(QStringList&)
+ *  \brief Converts ProgramInfo into QString QMap containing each field
+ *         in ProgramInfo converted into lockalized strings.
+ */
 void ProgramInfo::ToMap(QMap<QString, QString> &progMap)
 {
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
@@ -500,6 +547,9 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap)
     
 }
 
+/** \fn ProgramInfo::CalculateLength(void)
+ *  \brief Returns length of program/recording in seconds.
+ */
 int ProgramInfo::CalculateLength(void)
 {
     if (isVideo)
@@ -508,6 +558,12 @@ int ProgramInfo::CalculateLength(void)
         return startts.secsTo(endts);
 }
 
+/** \fn ProgramInfo::GetProgramAtDateTime(const QString&, QDateTime&)
+ *  \brief Returns a new ProgramInfo() for the program that air at
+ *         "dtime" on "channel".
+ *  \param channel Channel ID on which to search for program.
+ *  \param dtime   Date and Time for which we desire the program.
+ */
 ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel, 
                                                QDateTime &dtime)
 {
@@ -575,12 +631,18 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     }
 }
 
+/** \fn GetProgramFromRecorded(const QString&, QDateTime&)
+ *  \brief Returns a new ProgramInfo() for an existing recording.
+ */
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel, 
                                                  QDateTime &dtime)
 {
     return GetProgramFromRecorded(channel, dtime.toString("yyyyMMddhhmm00"));
 }
 
+/** \fn GetProgramFromRecorded(const QString&, const QString&)
+ *  \brief Returns a new ProgramInfo() for an existing recording.
+ */
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel, 
                                                  const QString &starttime)
 {
@@ -655,15 +717,19 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
     return NULL;
 }
 
-
+/** \fn ProgramInfo::IsFindApplicable(void)
+ *  \brief Returns true iff rectype is kFindDailyRecord or kFindWeeklyRecord.
+ */
 bool ProgramInfo::IsFindApplicable(void) const
 {
     return rectype == kFindDailyRecord ||
            rectype == kFindWeeklyRecord;
 }
 
-
-// -1 for no data, 0 for no, 1 for weekdaily, 2 for weekly.
+/** \fn ProgramInfo::IsProgramRecurring(void)
+ *  \brief Returns 0 if program is not recurring, 1 if recurring daily on weekdays,
+ *         2 if recurring weekly, and -1 when there is insufficient data.
+ */
 int ProgramInfo::IsProgramRecurring(void)
 {
     QDateTime dtime = startts;
@@ -709,7 +775,11 @@ int ProgramInfo::IsProgramRecurring(void)
     return 0;
 }
 
-RecordingType ProgramInfo::GetProgramRecordingStatus()
+/** \fn ProgramInfo::GetProgramRecordingStatus()
+ *  \brief Returns the recording type for this ProgramInfo.
+ *  \sa RecordingType
+ */
+RecordingType ProgramInfo::GetProgramRecordingStatus(void)
 {
     if (record == NULL) 
     {
@@ -720,7 +790,11 @@ RecordingType ProgramInfo::GetProgramRecordingStatus()
     return record->getRecordingType();
 }
 
-QString ProgramInfo::GetProgramRecordingProfile()
+/** \fn ProgramInfo::GetProgramRecordingProfile()
+ *  \brief Returns recording profile name that will be, or was used,
+ *         for this program.
+ */
+QString ProgramInfo::GetProgramRecordingProfile(void)
 {
     if (record == NULL)
     {
@@ -731,7 +805,11 @@ QString ProgramInfo::GetProgramRecordingProfile()
     return record->getProfileName();
 }
 
-int ProgramInfo::GetAutoRunJobs()
+/** \fn ProgramInfo::GetAutoRunJobs()
+ *  \brief Returns a bitmap of which jobs are attached to this ProgramInfo.
+ *  \sa JobTypes
+ */
+int ProgramInfo::GetAutoRunJobs(void)
 {
     if (record == NULL) 
     {
@@ -742,6 +820,10 @@ int ProgramInfo::GetAutoRunJobs()
     return record->GetAutoRunJobs();
 }
 
+/** \fn ProgramInfo::GetChannelRecPriority(const QString&)
+ *  \brief Returns Recording Priority of channel.
+ *  \param chanid Channel ID of channel whose priority we desire.
+ */
 int ProgramInfo::GetChannelRecPriority(const QString &chanid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -757,6 +839,9 @@ int ProgramInfo::GetChannelRecPriority(const QString &chanid)
     return 0;
 }
 
+/** \fn ProgramInfo::GetRecordingTypeRecPriority(RecordingType)
+ *  \brief Returns recording priority change needed due to RecordingType.
+ */
 int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
 {
     switch (type)
@@ -947,6 +1032,10 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
     return false;
 }
 
+/** \fn ProgramInfo::GetRecordBasename(void)
+ *  \brief Returns a filename for a recording based on the
+ *         recording channel and date.
+ */
 QString ProgramInfo::GetRecordBasename(void)
 {
     QString starts = recstartts.toString("yyyyMMddhhmm00");
@@ -958,6 +1047,10 @@ QString ProgramInfo::GetRecordBasename(void)
     return retval;
 }               
 
+/** \fn ProgramInfo::GetRecordFilename(const QString&)
+ *  \brief Returns prefix+"/"+GetRecordBasename()
+ *  \param prefix Prefix to apply to GetRecordBasename().
+ */
 QString ProgramInfo::GetRecordFilename(const QString &prefix)
 {
     QString starts = recstartts.toString("yyyyMMddhhmm00");
@@ -969,7 +1062,12 @@ QString ProgramInfo::GetRecordFilename(const QString &prefix)
     return retval;
 }               
 
-QString ProgramInfo::GetPlaybackURL(QString playbackHost) {
+/** \fn ProgramInfo::GetPlaybackURL(QString)
+ *  \brief Returns URL to where MythTV would stream the
+ *         this program from, were it to be streamed.
+ */
+QString ProgramInfo::GetPlaybackURL(QString playbackHost)
+{
     QString tmpURL;
     QString m_hostname = gContext->GetHostName();
 
@@ -998,6 +1096,12 @@ QString ProgramInfo::GetPlaybackURL(QString playbackHost) {
     return tmpURL;
 }
 
+/** \fn ProgramInfo::StartedRecording()
+ *  \brief Inserts this ProgramInfo into the database as an existing recording.
+ *  
+ *  This method, of course, only works if a recording has been scheduled
+ *  and started.
+ */
 void ProgramInfo::StartedRecording()
 {
     if (record == NULL) {

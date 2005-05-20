@@ -100,7 +100,7 @@ class ProgramInfo
 
     bool IsFindApplicable(void) const;
     
-    // returns 0 for one-time, 1 for weekdaily, 2 for weekly
+    // returns 0 for one-time, 1 for weekdaily, 2 for weekly, -1 otherwise
     int IsProgramRecurring(void);
 
     // checks for duplicates according to dupmethod
