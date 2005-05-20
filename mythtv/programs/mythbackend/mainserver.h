@@ -44,6 +44,7 @@ class MainServer : public QObject
   protected slots:
     void reconnectTimeout(void);
     void masterServerDied(void);
+    void deferredDeleteSlot(void);
 
   private slots:
     void newConnection(RefSocket *);
@@ -166,6 +167,16 @@ class MainServer : public QObject
     Scheduler *m_sched;
 
     QMutex readReadyLock;
+
+    struct DeferredDeleteStruct
+    {
+        PlaybackSock *sock; 
+        QDateTime ts; 
+    };
+
+    QMutex deferredDeleteLock;
+    QTimer *deferredDeleteTimer;
+    QValueList<DeferredDeleteStruct> deferredDeleteList;
 };
 
 #endif

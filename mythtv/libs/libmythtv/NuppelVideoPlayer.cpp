@@ -960,10 +960,8 @@ void NuppelVideoPlayer::ToggleCC(char mode, int arg)
         cc = true;
         if (mode == 1)
         {
-            // TODO: teletext page select
-            //if (arg)
-            //    vbipagenr = (arg & 0xffff) << 16;
-            //msg = QString("%1%2").arg(QObject::tr("TXT pg")).arg(vbipagenr);
+            if (arg)
+                vbipagenr = arg;
             msg = QObject::tr("TXT on");
         }
         else if (mode == 2)

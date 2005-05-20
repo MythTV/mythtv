@@ -147,6 +147,11 @@ MainServer::MainServer(bool master, int port, int statusport,
         masterServerReconnect->start(1000, true);
     }
 
+    deferredDeleteTimer = new QTimer(this);
+    connect(deferredDeleteTimer, SIGNAL(timeout()), this,
+            SLOT(deferredDeleteSlot()));
+    deferredDeleteTimer->start(30 * 1000);
+
     if (sched)
         sched->SetMainServer(this);
 }
@@ -159,6 +164,8 @@ MainServer::~MainServer()
         delete statusserver;
     if (masterServerReconnect)
         delete masterServerReconnect;
+    if (deferredDeleteTimer)
+        delete deferredDeleteTimer;
 }
 
 void MainServer::newConnection(RefSocket *socket)
@@ -3203,6 +3210,24 @@ void MainServer::HandleBackendRefresh(QSocket *socket)
     SendResponse(socket, retlist);    
 }
 
+void MainServer::deferredDeleteSlot(void)
+{
+    QMutexLocker lock(&deferredDeleteLock);
+
+    if (deferredDeleteList.size() == 0)
+        return;
+
+    DeferredDeleteStruct dds = deferredDeleteList.front();
+    while (dds.ts.secsTo(QDateTime::currentDateTime()) > 30)
+    {
+        delete dds.sock;
+        deferredDeleteList.pop_front();
+        if (deferredDeleteList.size() == 0)
+            return;
+        dds = deferredDeleteList.front();
+    }
+}
+
 void MainServer::endConnection(RefSocket *socket)
 {
     vector<PlaybackSock *>::iterator it = playbackList.begin();
@@ -3231,7 +3256,13 @@ void MainServer::endConnection(RefSocket *socket)
                 MythEvent me(message);
                 gContext->dispatch(me);
             }
-            delete (*it);
+            DeferredDeleteStruct dds;
+            dds.sock = *it;
+            dds.ts = QDateTime::currentDateTime();
+
+            QMutexLocker lock(&deferredDeleteLock);
+
+            deferredDeleteList.push_back(dds);
             playbackList.erase(it);
             return;
         }

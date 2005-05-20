@@ -1641,7 +1641,14 @@ void TV::ProcessKeypress(QKeyEvent *e)
         handled = true;
 
         if (action == "TOGGLECC")
-            DoToggleCC(0);
+        {
+            bool valid = false;
+            int page = QueuedChannel().toInt(&valid, 16) << 16;
+            if (!valid)
+                page = 0;
+            ChannelClear();
+            DoToggleCC(page);
+        }
         else if (action == "SKIPCOMMERCIAL")
             DoSkipCommercials(1);
         else if (action == "SKIPCOMMBACK")

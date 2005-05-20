@@ -1125,7 +1125,7 @@ void GuideGrid::paintChannels(QPainter *p)
 
         if (type)
         {
-            if (chinfo->iconpath != "none" && chinfo->iconpath != "")
+            if (!chinfo->iconpath.isEmpty() && chinfo->iconpath != "none")
             {
                 int iconsize = 0;
                 iconsize = type->GetSize();
