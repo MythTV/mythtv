@@ -15,6 +15,7 @@ using namespace std;
 
 #include "rtspclient.h"
 #include "rtspin.h"
+#include "mfdinterface.h"
 
 RtspClient::RtspClient(
                             MfdInterface *the_mfd,
@@ -51,7 +52,12 @@ void RtspClient::turnOn()
 {
     if(! rtsp_in)
     {
-        rtsp_in = new RtspIn(mfd_interface, mfd_id, QString("rtsp://%1:%2/").arg(ip_address).arg(port));
+        rtsp_in = new RtspIn(
+                                mfd_interface, 
+                                mfd_id, 
+                                QString("rtsp://%1:%2/").arg(ip_address).arg(port), 
+                                mfd_interface->getRegisteredVisualization()
+                            );
         rtsp_in->start();
     }
 }

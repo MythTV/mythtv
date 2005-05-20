@@ -22,6 +22,7 @@ using namespace std;
 #include "mfdinterface.h"
 #include "rtspin.h"
 #include "events.h"
+#include "visualbase.h"
 
 static void afterReading(
                             void* clientData, 
@@ -50,6 +51,7 @@ RtspIn::RtspIn(
                 MfdInterface *owner,
                 int l_mfd_id,
                 const QString &l_rtsp_url, 
+                VisualBase *viz,
                 unsigned l_rtp_incoming_buffer_size
               )
 {
@@ -66,6 +68,8 @@ RtspIn::RtspIn(
     blocking_flag = 0;
     rtp_incoming_buffer_size = l_rtp_incoming_buffer_size;
     rtp_incoming_buffer = new unsigned char[rtp_incoming_buffer_size];
+
+    registered_visualizer = viz;
 
 }
 
@@ -276,15 +280,20 @@ void RtspIn::handleAfterReading(unsigned frameSize, struct timeval /* presentati
         value[i] = ((orig&0xFF)<<8) | ((orig&0xFF00)>>8);
     }
 
-
     //
-    //  Just post this as an event. That percolates it up and over to the
-    //  client in it's main (GUI) thread.
+    //  If we have visualizer registered, call it's add() method directly
+    //  with new PCM data (better for that to happen in this thread, so that
+    //  the main GUI thread only needs to ask the visualizer to draw itself)
     //
+    
+    registered_visualizer_mutex.lock();
+    
+        if(registered_visualizer)
+        {
+            registered_visualizer->add(rtp_incoming_buffer, frameSize, 0, 2, 16);
+        }
 
-    MfdAudioDataEvent *ade = new MfdAudioDataEvent( mfd_id, rtp_incoming_buffer, frameSize);
-    QApplication::postEvent(parent, ade);
-    return;
+    registered_visualizer_mutex.unlock();
     
 }
 
@@ -296,6 +305,18 @@ void RtspIn::handleSourceClosure()
     
     warning("RtspIn told source (server) is going away, so is stopping");
     stop();
+}
+
+void RtspIn::registerVisualizer(VisualBase *viz)
+{
+    registered_visualizer_mutex.lock();
+        registered_visualizer = viz;
+    registered_visualizer_mutex.unlock();
+}
+
+void RtspIn::deregisterVisualizer()
+{
+    registerVisualizer(NULL);
 }
 
 void RtspIn::cleanUp()

@@ -20,6 +20,7 @@ class DiscoveryThread;
 class PlaylistChecker;
 class MfdInstance;
 class SpeakerTracker;
+class VisualBase;
 
 class MfdInterface : public QObject
 {
@@ -84,7 +85,15 @@ class MfdInterface : public QObject
                            );
     void stopPlaylistCheck();
 
-    void turnVizDataStreamOn(int which_mfd, bool yes_or_no);
+
+    //
+    //  Methods that have something to do with vizualizations
+    //
+
+    void        turnVizDataStreamOn(int which_mfd, bool yes_or_no);
+    void        registerVisualization(VisualBase *viz);
+    void        deregisterVisualization();
+    VisualBase* getRegisteredVisualization(){ return visualization; }
     
   signals:
 
@@ -127,6 +136,8 @@ class MfdInterface : public QObject
     
     int client_width;
     int client_height;
+    
+    VisualBase *visualization;
 
 };
 

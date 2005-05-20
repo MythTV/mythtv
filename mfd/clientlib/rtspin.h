@@ -19,6 +19,7 @@ class UsageEnvironment;
 class RTSPClient;
 class MediaSession;
 class MediaSubsession;
+class VisualBase;
 
 class MfdInterface;
 
@@ -31,6 +32,7 @@ class RtspIn: public QThread
             MfdInterface *owner,
             int l_mfd_id,
             const QString &l_rtsp_url, 
+            VisualBase *viz,
             unsigned l_rtp_incoming_buffer_size = 65535
           );
     ~RtspIn();
@@ -39,6 +41,8 @@ class RtspIn: public QThread
     void stop();
     void handleAfterReading(unsigned frameSize, struct timeval presentationTime);
     void handleSourceClosure();
+    void registerVisualizer(VisualBase *viz);
+    void deregisterVisualizer();
 
   private:
 
@@ -52,6 +56,8 @@ class RtspIn: public QThread
     QString         rtsp_url;
     MfdInterface    *parent;
     int             mfd_id;
+    VisualBase      *registered_visualizer;
+    QMutex          registered_visualizer_mutex;
     
     //
     //  liveMedia objects

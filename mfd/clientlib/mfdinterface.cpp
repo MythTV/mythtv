@@ -17,9 +17,15 @@ using namespace std;
 #include "playlistchecker.h"
 #include "events.h"
 #include "speakertracker.h"
+#include "visualbase.h"
 
 MfdInterface::MfdInterface(int client_screen_width, int client_screen_height)
 {
+    //
+    //  Until we're told otherwise, their is no vizualizer
+    //
+    
+    visualization = NULL;
 
     //
     //  Store information about the GUI client that has loaded us as a library
@@ -501,6 +507,19 @@ void MfdInterface::turnVizDataStreamOn(int which_mfd, bool on_or_off)
     
 }
 
+void MfdInterface::registerVisualization(VisualBase *viz)
+{
+    if(viz)
+    {
+        visualization = viz;
+    }
+}
+
+void MfdInterface::deregisterVisualization()
+{
+    registerVisualization(NULL);
+}
+
 void MfdInterface::customEvent(QCustomEvent *ce)
 {
     //
@@ -631,11 +650,13 @@ void MfdInterface::customEvent(QCustomEvent *ce)
             emit speakerList(sle->getMfd(), speakers);
         }
     }
+/*
     else if (ce->type() == MFD_CLIENTLIB_EVENT_AUDIO_DATA)
     {
         MfdAudioDataEvent *ade = (MfdAudioDataEvent*)ce;
         emit audioData(ade->getMfd(), ade->getAudioData(), ade->getLength());
     }
+*/
     else if (ce->type() == MFD_CLIENTLIB_EVENT_SPEAKER_STREAM)
     {
         MfdSpeakerStreamEvent *sse = (MfdSpeakerStreamEvent*)ce;
