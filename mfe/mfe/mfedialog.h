@@ -62,7 +62,6 @@ class MfeDialog : public MythThemedDialog
     void speakerList(int which_mfd, QPtrList<SpeakerTracker>* speakers);
     void hideNewPlaylistPopup();
     void createNewPlaylist();
-    void audioData(int which_mfd, uchar *audio_data, int length);
 
   private:
 

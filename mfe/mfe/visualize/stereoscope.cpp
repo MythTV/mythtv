@@ -60,6 +60,7 @@ StereoScope::StereoScope(QWidget *parent)
     setGeometry(0,0,800,600);
 }
 
+
 void StereoScope::add(uchar *b, unsigned long b_len, unsigned long w, int c, int p)
 {
     long len = b_len, cnt;

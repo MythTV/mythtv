@@ -10,9 +10,11 @@
 	
 */
 
+#include <mfdclient/visualbase.h>
+
 #include "visual.h"
 
-class StereoScope : public QWidget
+class StereoScope : public QWidget, public VisualBase
 {
 
   Q_OBJECT

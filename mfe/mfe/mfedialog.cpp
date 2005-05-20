@@ -46,7 +46,16 @@ MfeDialog::MfeDialog(
         
     mfd_interface = an_mfd_interface;
 
+
+    //
+    //  Creat the visualization, and register it through the mfd_interface
+    //  (so it will automatically get fed PCM data in another thread
+    //  whenever audio is playing)
+    //
+
     visualizer = new StereoScope(this);
+    mfd_interface->registerVisualization(visualizer);
+
     //
     //  Wire up the theme
     //
@@ -619,8 +628,6 @@ void MfeDialog::connectUpMfd()
     connect(mfd_interface, SIGNAL(speakerList(int, QPtrList<SpeakerTracker>*)),
             this, SLOT(speakerList(int, QPtrList<SpeakerTracker>*)));
             
-    connect(mfd_interface, SIGNAL(audioData(int, uchar*, int)),
-            this, SLOT(audioData(int, uchar*, int)));
 }
 
 void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool found)
@@ -1274,21 +1281,6 @@ void MfeDialog::createNewPlaylist()
     }
 }
 
-void MfeDialog::audioData(int which_mfd, uchar *audio_data, int length)
-{
-    //
-    //  This slot is called when audio data arrives (via mfdclient library, via rtsp)
-    //
-    
-    if(current_mfd)
-    {
-        if(current_mfd->getId() == which_mfd)
-        {
-            visualizer->add(audio_data, (unsigned int) length, 0, 2, 16);
-        }
-    }
-}
-
 QString MfeDialog::constructPlaylistName()
 {
     QString response;
@@ -1398,6 +1390,13 @@ void MfeDialog::doSillyThings()
 
 MfeDialog::~MfeDialog()
 {
+
+    mfd_interface->deregisterVisualization();
+    if(visualizer)
+    {
+        delete visualizer;
+        visualizer = NULL;
+    }
     available_mfds.clear();
     if(menu_root_node)
     {
