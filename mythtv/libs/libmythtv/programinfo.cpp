@@ -18,6 +18,14 @@
 
 using namespace std;
 
+/** \fn StripHTMLTags(const QString&)
+ *  \brief Returns a copy of "src" with all the HTML tags removed.
+ *
+ *   Three tags a respected: <br> and <p> are replaced with newlines,
+ *   and <li> is replaced with a newline followed by "- ".
+ *  \param src String to be processed.
+ *  \return Stripped string.
+ */
 static QString StripHTMLTags(const QString& src)
 {
     QString dst(src);
@@ -33,10 +41,16 @@ static QString StripHTMLTags(const QString& src)
 }
 
 /** \class ProgramInfo
- *  \brief Holds information on a TV Program one might wish to record.
+ *  \brief Holds information on a %TV Program one might wish to record.
+ *
+ *  ProgramInfo can also contain partial information for a program we wish to
+ *  find in the schedule, and may also contain information on a video we
+ *  wish to view. This class is serializable from frontend to backend and
+ *  back and is the basic unit of information on anything we may wish to
+ *  view or record.
  */
 
-/** \fn ProgramInfo::ProgramInfo(const ProgramInfo &other) 
+/** \fn ProgramInfo::ProgramInfo(void)
  *  \brief Null constructor.
  */
 ProgramInfo::ProgramInfo(void)
@@ -222,13 +236,13 @@ QString ProgramInfo::MakeUniqueKey(void) const
 
 #define FLOAT_TO_LIST(x)     sprintf(tmp, "%f", (x)); list << tmp;
 
-/** \fn ProgramInfo::ToStringList(QStringList&)
+/** \fn ProgramInfo::ToStringList(QStringList&) const
  *  \brief Serializes ProgramInfo into a QStringList which can be passed
  *         over a socket.
  *  \sa FromStringList(QStringList&,int),
  *      FromStringList(QStringList&,QStringList::iterator&)
  */
-void ProgramInfo::ToStringList(QStringList &list)
+void ProgramInfo::ToStringList(QStringList &list) const
 {
     char tmp[64];
 
@@ -290,7 +304,7 @@ bool ProgramInfo::FromStringList(QStringList &list, int offset)
 
 #define NEXT_STR()             if (it == listend)     \
                                {                      \
-                                   cerr << listerror; \
+                                   VERBOSE(VB_IMPORTANT, listerror); \
                                    return false;      \
                                }                      \
                                ts = *it++;            \
@@ -311,7 +325,7 @@ bool ProgramInfo::FromStringList(QStringList &list, int offset)
 
 #define FLOAT_FROM_LIST(x)     NEXT_STR() (x) = atof(ts.ascii());
 
-/** \fn ProgramInfo::ToStringList(QStringList &list)
+/** \fn ProgramInfo::FromStringList(QStringList&,QStringList::iterator&)
  *  \brief Uses a QStringList to initialize this ProgramInfo instance.
  *  \param list   QStringList containing serialized ProgramInfo.
  *  \param it     Iterator pointing to first field in list to treat as
@@ -371,11 +385,11 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     return true;
 }
 
-/** \fn ProgramInfo::ToStringList(QStringList&)
+/** \fn ProgramInfo::ToMap(QMap<QString, QString> &progMap) const
  *  \brief Converts ProgramInfo into QString QMap containing each field
  *         in ProgramInfo converted into lockalized strings.
  */
-void ProgramInfo::ToMap(QMap<QString, QString> &progMap)
+void ProgramInfo::ToMap(QMap<QString, QString> &progMap) const
 {
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
@@ -547,16 +561,26 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap)
     
 }
 
-/** \fn ProgramInfo::CalculateLength(void)
+/** \fn ProgramInfo::CalculateLength(void) const
  *  \brief Returns length of program/recording in seconds.
  */
-int ProgramInfo::CalculateLength(void)
+int ProgramInfo::CalculateLength(void) const
 {
     if (isVideo)
         return lenMins * 60;
     else
         return startts.secsTo(endts);
 }
+
+/** \fn ProgramInfo::SecsTillStart() const
+ *  \brief Returns number of seconds until the program starts,
+ *         including a negative number if program was in the past.
+ */
+int ProgramInfo::SecsTillStart(void) const
+{
+    return QDateTime::currentDateTime().secsTo(startts);
+}
+
 
 /** \fn ProgramInfo::GetProgramAtDateTime(const QString&, QDateTime&)
  *  \brief Returns a new ProgramInfo() for the program that air at
@@ -565,7 +589,7 @@ int ProgramInfo::CalculateLength(void)
  *  \param dtime   Date and Time for which we desire the program.
  */
 ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel, 
-                                               QDateTime &dtime)
+                                               const QDateTime &dtime)
 {
     ProgramList schedList;
     ProgramList progList;
@@ -635,7 +659,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
  *  \brief Returns a new ProgramInfo() for an existing recording.
  */
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel, 
-                                                 QDateTime &dtime)
+                                                 const QDateTime &dtime)
 {
     return GetProgramFromRecorded(channel, dtime.toString("yyyyMMddhhmm00"));
 }
@@ -718,7 +742,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
 }
 
 /** \fn ProgramInfo::IsFindApplicable(void)
- *  \brief Returns true iff rectype is kFindDailyRecord or kFindWeeklyRecord.
+ *  \brief Returns true if a search should be employed to find a matcing program.
  */
 bool ProgramInfo::IsFindApplicable(void) const
 {
@@ -726,11 +750,11 @@ bool ProgramInfo::IsFindApplicable(void) const
            rectype == kFindWeeklyRecord;
 }
 
-/** \fn ProgramInfo::IsProgramRecurring(void)
+/** \fn ProgramInfo::IsProgramRecurring(void) const
  *  \brief Returns 0 if program is not recurring, 1 if recurring daily on weekdays,
  *         2 if recurring weekly, and -1 when there is insufficient data.
  */
-int ProgramInfo::IsProgramRecurring(void)
+int ProgramInfo::IsProgramRecurring(void) const
 {
     QDateTime dtime = startts;
 
@@ -776,8 +800,9 @@ int ProgramInfo::IsProgramRecurring(void)
 }
 
 /** \fn ProgramInfo::GetProgramRecordingStatus()
- *  \brief Returns the recording type for this ProgramInfo.
- *  \sa RecordingType
+ *  \brief Returns the recording type for this ProgramInfo, creating
+ *         "record" field if neccissary.
+ *  \sa RecordingType, ScheduledRecording
  */
 RecordingType ProgramInfo::GetProgramRecordingStatus(void)
 {
@@ -792,7 +817,8 @@ RecordingType ProgramInfo::GetProgramRecordingStatus(void)
 
 /** \fn ProgramInfo::GetProgramRecordingProfile()
  *  \brief Returns recording profile name that will be, or was used,
- *         for this program.
+ *         for this program, creating "record" field if neccissary.
+ *  \sa ScheduledRecording
  */
 QString ProgramInfo::GetProgramRecordingProfile(void)
 {
@@ -807,7 +833,7 @@ QString ProgramInfo::GetProgramRecordingProfile(void)
 
 /** \fn ProgramInfo::GetAutoRunJobs()
  *  \brief Returns a bitmap of which jobs are attached to this ProgramInfo.
- *  \sa JobTypes
+ *  \sa JobTypes, getProgramFlags()
  */
 int ProgramInfo::GetAutoRunJobs(void)
 {
@@ -868,6 +894,11 @@ int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
     }
 }
 
+/** \fn ProgramInfo::ApplyRecordStateChange(RecordingType)
+ *  \brief Sets RecordingType of "record", creating "record" if it
+ *         does not exist.
+ *  \param newstate State to apply to "record" RecordingType.
+ */
 // newstate uses same values as return of GetProgramRecordingState
 void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
 {
@@ -878,6 +909,12 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
     record->save();
 }
 
+/** \fn ProgramInfo::ApplyRecordTimeChange(const QDateTime&, const QDateTime&)
+ *  \brief Sets start and end times of "record", creating "record" if it
+ *         does not exist.
+ *  \param newstartts New start time.
+ *  \param newendts   New end time.
+ */
 void ProgramInfo::ApplyRecordTimeChange(const QDateTime &newstartts, 
                                         const QDateTime &newendts)
 {
@@ -889,6 +926,11 @@ void ProgramInfo::ApplyRecordTimeChange(const QDateTime &newstartts,
     }
 }
 
+/** \fn ProgramInfo::ApplyRecordRecPriorityChange(int)
+ *  \brief Sets recording priority of "record", creating "record" if it
+ *         does not exist.
+ *  \param newrecpriority New recording priority.
+ */
 void ProgramInfo::ApplyRecordRecPriorityChange(int newrecpriority)
 {
     GetProgramRecordingStatus();
@@ -896,6 +938,11 @@ void ProgramInfo::ApplyRecordRecPriorityChange(int newrecpriority)
     record->save();
 }
 
+/** \fn ProgramInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
+ *  \brief Sets the recording group, both in this ProgramInfo
+ *         and in the database.
+ *  \param newrecgroup New recording group.
+ */
 void ProgramInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -914,7 +961,25 @@ void ProgramInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
     recgroup = newrecgroup;
 }
 
-void ProgramInfo::ToggleRecord()
+/** \fn ProgramInfo::ToggleRecord()
+ *  \brief Cycles through recording types.
+ *
+ *   If the program recording status is kNotRecording, 
+ *   ApplyRecordStateChange(kSingleRecord) is called.
+ *   If the program recording status is kSingleRecording, 
+ *   ApplyRecordStateChange(kFindOneRecord) is called.
+ *   <br>etc...
+ *
+ *   The states in order are: kNotRecording, kSingleRecord, kFindOneRecord,
+ *     kWeekslotRecord, kFindWeeklyRecord, kTimeslotRecord, kFindDailyRecord,
+ *     kChannelRecord, kAllRecord.<br>
+ *   And: kOverrideRecord, kDontRecord.
+ *
+ *   That is if you the recording is in any of the first set of states,
+ *   we cycle through those, if not we toggle between kOverrideRecord and
+ *   kDontRecord.
+ */
+void ProgramInfo::ToggleRecord(void)
 {
     RecordingType curType = GetProgramRecordingStatus();
 
@@ -957,19 +1022,29 @@ void ProgramInfo::ToggleRecord()
     }
 }
 
-ScheduledRecording* ProgramInfo::GetScheduledRecording()
+/** \fn ProgramInfo::GetScheduledRecording()
+ *  \brief Returns the "record" field, creating it if necessary.
+ */
+ScheduledRecording* ProgramInfo::GetScheduledRecording(void)
 {
     GetProgramRecordingStatus();
     return record;
 }
 
-int ProgramInfo::getRecordID()
+/** \fn ProgramInfo::getRecordID()
+ *  \brief Returns a record id, creating "record" it if necessary.
+ */
+int ProgramInfo::getRecordID(void)
 {
     GetProgramRecordingStatus();
     recordid = record->getRecordID();
     return recordid;
 }
 
+/** \fn ProgramInfo::IsSameProgram(const ProgramInfo&) const
+ *  \brief Checks for duplicates according to dupmethod.
+ *  \param other ProgramInfo to compare this one with.
+ */
 bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 {
     if (rectype == kFindOneRecord)
@@ -1006,7 +1081,12 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 
     return true;
 }
- 
+
+/** \fn ProgramInfo::IsSameTimeslot(const ProgramInfo&) const
+ *  \brief Checks chanid, start/end times for equality.
+ *  \param other ProgramInfo to compare this one with.
+ *  \return true if this program shares same time slot as "other" program.
+ */
 bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
 {
     if (title != other.title)
@@ -1019,6 +1099,12 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
     return false;
 }
 
+/** \fn ProgramInfo::IsSameProgramTimeslot(const ProgramInfo&) const
+ *  \brief Checks chanid or chansign, start/end times,
+ *         cardid, inputid for fully inclusive overlap.
+ *  \param other ProgramInfo to compare this one with.
+ *  \return true if this program is contained in time slot of "other" program.
+ */
 bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
 {
     if (title != other.title)
@@ -1032,11 +1118,11 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
     return false;
 }
 
-/** \fn ProgramInfo::GetRecordBasename(void)
+/** \fn ProgramInfo::GetRecordBasename(void) const
  *  \brief Returns a filename for a recording based on the
  *         recording channel and date.
  */
-QString ProgramInfo::GetRecordBasename(void)
+QString ProgramInfo::GetRecordBasename(void) const
 {
     QString starts = recstartts.toString("yyyyMMddhhmm00");
     QString ends = recendts.toString("yyyyMMddhhmm00");
@@ -1047,26 +1133,20 @@ QString ProgramInfo::GetRecordBasename(void)
     return retval;
 }               
 
-/** \fn ProgramInfo::GetRecordFilename(const QString&)
+/** \fn ProgramInfo::GetRecordFilename(const QString&) const
  *  \brief Returns prefix+"/"+GetRecordBasename()
  *  \param prefix Prefix to apply to GetRecordBasename().
  */
-QString ProgramInfo::GetRecordFilename(const QString &prefix)
+QString ProgramInfo::GetRecordFilename(const QString &prefix) const
 {
-    QString starts = recstartts.toString("yyyyMMddhhmm00");
-    QString ends = recendts.toString("yyyyMMddhhmm00");
-
-    QString retval = QString("%1/%2_%3_%4.nuv").arg(prefix).arg(chanid)
-                             .arg(starts).arg(ends);
-    
-    return retval;
+    return QString("%1/%2").arg(prefix).arg(GetRecordBasename());
 }               
 
-/** \fn ProgramInfo::GetPlaybackURL(QString)
- *  \brief Returns URL to where MythTV would stream the
+/** \fn ProgramInfo::GetPlaybackURL(QString) const
+ *  \brief Returns URL to where %MythTV would stream the
  *         this program from, were it to be streamed.
  */
-QString ProgramInfo::GetPlaybackURL(QString playbackHost)
+QString ProgramInfo::GetPlaybackURL(QString playbackHost) const
 {
     QString tmpURL;
     QString m_hostname = gContext->GetHostName();
@@ -1102,7 +1182,7 @@ QString ProgramInfo::GetPlaybackURL(QString playbackHost)
  *  This method, of course, only works if a recording has been scheduled
  *  and started.
  */
-void ProgramInfo::StartedRecording()
+void ProgramInfo::StartedRecording(void)
 {
     if (record == NULL) {
         record = new ScheduledRecording();
@@ -1175,13 +1255,22 @@ void ProgramInfo::StartedRecording()
         MythContext::DBError("Copy program ratings on record", query);    
 }
 
-void ProgramInfo::FinishedRecording(bool prematurestop) 
+/** \fn ProgramInfo::FinishedRecording(bool prematurestop) 
+ *  \brief If not a premature stop, adds program to history of recorded 
+ *         programs. If the recording type is kFindOneRecord this find
+ *         is removed.
+ *  \param prematurestop If true, we only fetch the recording status.
+ */
+void ProgramInfo::FinishedRecording(bool prematurestop)
 {
     GetProgramRecordingStatus();
     if (!prematurestop)
         record->doneRecording(*this);
 }
 
+/** \fn ProgramInfo::SetFilesize(long long)
+ *  \brief Sets recording file size in database, and sets "filesize" field.
+ */
 void ProgramInfo::SetFilesize(long long fsize)
 {
     filesize = fsize;
@@ -1199,7 +1288,10 @@ void ProgramInfo::SetFilesize(long long fsize)
                              query);
 }
 
-long long ProgramInfo::GetFilesize()
+/** \fn ProgramInfo::GetFilesize()
+ *  \brief Gets recording file size from database, and sets "filesize" field.
+ */
+long long ProgramInfo::GetFilesize(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     
@@ -1220,7 +1312,13 @@ long long ProgramInfo::GetFilesize()
     return filesize;
 }
 
-void ProgramInfo::SetBookmark(long long pos)
+/** \fn ProgramInfo::SetBookmark(long long pos) const
+ *  \brief Sets a bookmark position in database.
+ *
+ *   If this is a %MythTV recording the bookmark is put in the "recorded"
+ *   table, if not it is put in the "videobookmarks" table.
+ */
+void ProgramInfo::SetBookmark(long long pos) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1264,7 +1362,16 @@ void ProgramInfo::SetBookmark(long long pos)
                              query);
 }
 
-long long ProgramInfo::GetBookmark()
+/** \fn ProgramInfo::GetBookmark()
+ *  \brief Gets any bookmark position in database,
+ *         unless "ignoreBookmark" is set.
+ *
+ *   If this is a %MythTV recording the bookmark is queried from the "recorded"
+ *   table, if not it is queried from the "videobookmarks" table.
+ *  \return Bookmark position in bytes if the query is executed and succeeds,
+ *          zero otherwise.
+ */
+long long ProgramInfo::GetBookmark(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
     long long pos = 0;
@@ -1299,7 +1406,12 @@ long long ProgramInfo::GetBookmark()
     return pos;
 }
 
-bool ProgramInfo::IsEditing()
+/** \fn ProgramInfo::IsEditing() const
+ *  \brief Queries "recorded" table for its "editing" field
+ *         and returns true if it is set to true.
+ *  \return true iff we have started, but not finished, editing.
+ */
+bool ProgramInfo::IsEditing(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1318,7 +1430,11 @@ bool ProgramInfo::IsEditing()
     return false;
 }
 
-void ProgramInfo::SetEditing(bool edit)
+/** \fn ProgramInfo::SetEditing(bool) const
+ *  \brief Sets "editing" field in "recorded" table to "edit"
+ *  \param edit Editing state to set.
+ */
+void ProgramInfo::SetEditing(bool edit) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
     
@@ -1335,7 +1451,11 @@ void ProgramInfo::SetEditing(bool edit)
                              query);
 }
 
-void ProgramInfo::SetDeleteFlag(bool deleteFlag)
+/** \fn ProgramInfo::SetDeleteFlag(int) const
+ *  \brief Set "deletepending" field in "recorded" table to "deleteFlag".
+ *  \param deleteFlag value to set delete pending field to.
+ */
+void ProgramInfo::SetDeleteFlag(bool deleteFlag) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1355,7 +1475,11 @@ void ProgramInfo::SetDeleteFlag(bool deleteFlag)
         MythContext::DBError("Set delete flag", query);
 }
 
-bool ProgramInfo::IsCommFlagged()
+/** \fn ProgramInfo::IsCommFlagged() const
+ *  \brief Returns true if commercial flagging has been started
+ *         according to "commflagged" field in "recorded" table.
+ */
+bool ProgramInfo::IsCommFlagged(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
     
@@ -1374,7 +1498,11 @@ bool ProgramInfo::IsCommFlagged()
     return false;
 }
 
-void ProgramInfo::SetCommFlagged(int flag)
+/** \fn ProgramInfo::SetCommFlagged(int) const
+ *  \brief Set "commflagged" field in "recorded" table to "flag".
+ *  \param flag value to set commercial flagging field to.
+ */
+void ProgramInfo::SetCommFlagged(int flag) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1391,7 +1519,12 @@ void ProgramInfo::SetCommFlagged(int flag)
                              query);
 }
 
-bool ProgramInfo::IsCommProcessing()
+/** \fn ProgramInfo::IsCommProcessing() const
+ *  \brief Returns true if commercial flagging has been started
+ *         but not completed according to "commflagged" field in
+ *         "recorded" table.
+ */
+bool ProgramInfo::IsCommProcessing(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
     
@@ -1410,7 +1543,11 @@ bool ProgramInfo::IsCommProcessing()
     return false;
 }
 
-void ProgramInfo::SetPreserveEpisode(bool preserveEpisode)
+/** \fn ProgramInfo::SetPreserveEpisode(bool) const
+ *  \brief Set "preserve" field in "recorded" table to "preserveEpisode".
+ *  \param preserveEpisode value to set preserve field to.
+ */
+void ProgramInfo::SetPreserveEpisode(bool preserveEpisode) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1426,7 +1563,11 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode)
         MythContext::DBError("PreserveEpisode update", query);
 }
 
-void ProgramInfo::SetAutoExpire(bool autoExpire)
+/** \fn ProgramInfo::SetAutoExpire(bool autoExpire) const
+ *  \brief Set "autoexpire" field in "recorded" table to "autoExpire".
+ *  \param autoEpisode value to set auto expire field to.
+ */
+void ProgramInfo::SetAutoExpire(bool autoExpire) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1443,7 +1584,10 @@ void ProgramInfo::SetAutoExpire(bool autoExpire)
                              query);
 }
 
-bool ProgramInfo::GetAutoExpireFromRecorded()
+/** \fn ProgramInfo::GetAutoExpireFromRecorded(void) const
+ *  \brief Returns "autoexpire" field from "recorded" table.
+ */
+bool ProgramInfo::GetAutoExpireFromRecorded(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1462,7 +1606,10 @@ bool ProgramInfo::GetAutoExpireFromRecorded()
     return false;
 }
 
-bool ProgramInfo::GetPreserveEpisodeFromRecorded()
+/** \fn ProgramInfo::GetPreserveEpisodeFromRecorded(void) const
+ *  \brief Returns "preserve" field from "recorded" table.
+ */
+bool ProgramInfo::GetPreserveEpisodeFromRecorded(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1481,7 +1628,10 @@ bool ProgramInfo::GetPreserveEpisodeFromRecorded()
     return false;
 }
 
-bool ProgramInfo::UsesMaxEpisodes()
+/** \fn ProgramInfo::UsesMaxEpisodes(void) const
+ *  \brief Returns "maxepisodes" field from "record" table.
+ */
+bool ProgramInfo::UsesMaxEpisodes(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1498,7 +1648,7 @@ bool ProgramInfo::UsesMaxEpisodes()
     return false;
 }
 
-void ProgramInfo::GetCutList(QMap<long long, int> &delMap)
+void ProgramInfo::GetCutList(QMap<long long, int> &delMap) const
 {
 //    GetMarkupMap(delMap, db, MARK_CUT_START);
 //    GetMarkupMap(delMap, db, MARK_CUT_END, true);
@@ -1528,7 +1678,8 @@ void ProgramInfo::GetCutList(QMap<long long, int> &delMap)
                 long long start = 0, end = 0;
                 if (sscanf((*i).ascii(), "%lld - %lld", &start, &end) != 2)
                 {
-                    cerr << "Malformed cutlist list: " << *i << endl;
+                    VERBOSE(VB_IMPORTANT,
+                            QString("Malformed cutlist list: %1").arg(*i));
                 }
                 else
                 {
@@ -1540,7 +1691,7 @@ void ProgramInfo::GetCutList(QMap<long long, int> &delMap)
     }
 }
 
-void ProgramInfo::SetCutList(QMap<long long, int> &delMap)
+void ProgramInfo::SetCutList(QMap<long long, int> &delMap) const
 {
 //    ClearMarkupMap(db, MARK_CUT_START);
 //    ClearMarkupMap(db, MARK_CUT_END);
@@ -1585,32 +1736,32 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap)
 
 void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
                                     long long min_frame, 
-                                    long long max_frame)
+                                    long long max_frame) const
 {
     ClearMarkupMap(MARK_BLANK_FRAME, min_frame, max_frame);
     SetMarkupMap(frames, MARK_BLANK_FRAME, min_frame, max_frame);
 }
 
-void ProgramInfo::GetBlankFrameList(QMap<long long, int> &frames)
+void ProgramInfo::GetBlankFrameList(QMap<long long, int> &frames) const
 {
     GetMarkupMap(frames, MARK_BLANK_FRAME);
 }
 
-void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames)
+void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames) const
 {
     ClearMarkupMap(MARK_COMM_START);
     ClearMarkupMap(MARK_COMM_END);
     SetMarkupMap(frames);
 }
 
-void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames)
+void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames) const
 {
     GetMarkupMap(frames, MARK_COMM_START);
     GetMarkupMap(frames, MARK_COMM_END, true);
 }
 
 void ProgramInfo::ClearMarkupMap(int type, long long min_frame, 
-                                           long long max_frame)
+                                           long long max_frame) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString comp = "";
@@ -1657,7 +1808,7 @@ void ProgramInfo::ClearMarkupMap(int type, long long min_frame,
 
 void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks,
                                int type, long long min_frame, 
-                               long long max_frame)
+                               long long max_frame) const
 {
     QMap<long long, int>::Iterator i;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1724,7 +1875,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks,
 }
 
 void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks,
-                               int type, bool mergeIntoMap)
+                               int type, bool mergeIntoMap) const
 {
     if (!mergeIntoMap)
         marks.clear();
@@ -1759,7 +1910,7 @@ void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks,
     }
 }
 
-bool ProgramInfo::CheckMarkupFlag(int type)
+bool ProgramInfo::CheckMarkupFlag(int type) const
 {
     QMap<long long, int> flagMap;
 
@@ -1768,7 +1919,7 @@ bool ProgramInfo::CheckMarkupFlag(int type)
     return(flagMap.contains(0));
 }
 
-void ProgramInfo::SetMarkupFlag(int type, bool flag)
+void ProgramInfo::SetMarkupFlag(int type, bool flag) const
 {
     ClearMarkupMap(type);
 
@@ -1781,7 +1932,8 @@ void ProgramInfo::SetMarkupFlag(int type, bool flag)
     }
 }
 
-void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type)
+void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap,
+                                 int type) const
 {
     posMap.clear();
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1812,7 +1964,7 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type)
     }
 }
 
-void ProgramInfo::ClearPositionMap(int type)
+void ProgramInfo::ClearPositionMap(int type) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
   
@@ -1840,7 +1992,7 @@ void ProgramInfo::ClearPositionMap(int type)
 }
 
 void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
-                                 long long min_frame, long long max_frame)
+                                 long long min_frame, long long max_frame) const
 {
     QMap<long long, long long>::Iterator i;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1931,7 +2083,7 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
 }
 
 void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
-                                      int type)
+                                      int type) const
 {
     QMap<long long, long long>::Iterator i;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1976,13 +2128,19 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
     }
 }
 
-void ProgramInfo::DeleteHistory()
+/** \fn ProgramInfo::DeleteHistory()
+ *  \brief Deletes recording history, creating "record" it if necessary.
+ */
+void ProgramInfo::DeleteHistory(void)
 {
     GetProgramRecordingStatus();
     record->forgetHistory(*this);
 }
 
-QString ProgramInfo::RecTypeChar(void)
+/** \fn ProgramInfo::RecTypeChar(void) const
+ *  \brief Converts "rectype" into a human readable character.
+ */
+QString ProgramInfo::RecTypeChar(void) const
 {
     switch (rectype)
     {
@@ -2011,7 +2169,10 @@ QString ProgramInfo::RecTypeChar(void)
     }
 }
 
-QString ProgramInfo::RecTypeText(void)
+/** \fn ProgramInfo::RecTypeText(void) const
+ *  \brief Converts "rectype" into a human readable description.
+ */
+QString ProgramInfo::RecTypeText(void) const
 {
     switch (rectype)
     {
@@ -2039,7 +2200,10 @@ QString ProgramInfo::RecTypeText(void)
     }
 }
 
-QString ProgramInfo::RecStatusChar(void)
+/** \fn ProgramInfo::RecStatusChar(void) const
+ *  \brief Converts "recstatus" into a human readable character.
+ */
+QString ProgramInfo::RecStatusChar(void) const
 {
     switch (recstatus)
     {
@@ -2084,7 +2248,10 @@ QString ProgramInfo::RecStatusChar(void)
     }
 }
 
-QString ProgramInfo::RecStatusText(void)
+/** \fn ProgramInfo::RecStatusText(void) const
+ *  \brief Converts "recstatus" into a short human readable description.
+ */
+QString ProgramInfo::RecStatusText(void) const
 {
     if (rectype == kNotRecording)
         return QObject::tr("Not Recording");
@@ -2136,7 +2303,10 @@ QString ProgramInfo::RecStatusText(void)
     return QObject::tr("Unknown");;
 }
 
-QString ProgramInfo::RecStatusDesc(void)
+/** \fn ProgramInfo::RecStatusChar(void) const
+ *  \brief Converts "recstatus" into a long human readable description.
+ */
+QString ProgramInfo::RecStatusDesc(void) const
 {
     QString message;
     QDateTime now = QDateTime::currentDateTime();
@@ -2233,18 +2403,33 @@ QString ProgramInfo::RecStatusDesc(void)
     return message;
 }
 
-QString ProgramInfo::ChannelText(QString format)
+/** \fn ProgramInfo::ChannelText(const QString&) const
+ *  \brief Returns channel info using "format".
+ *
+ *   There are three tags in "format" that will be replaced
+ *   with the approriate info. These tags are "<num>", "<sign>",
+ *   and "<name>", they replaced with the channel number,
+ *   channel call sign, and channel name, respectively.
+ *  \param format formatting string.
+ *  \return formatted string.
+ */
+QString ProgramInfo::ChannelText(const QString &format) const
 {
-    format.replace("<num>", chanstr)
+    QString chan(format);
+    chan.replace("<num>", chanstr)
         .replace("<sign>", chansign)
         .replace("<name>", channame);
-
-    return format;
+    return chan;
 }
 
-void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
+/** \fn ProgramInfo::FillInRecordInfo(const vector<ProgramInfo *>&)
+ *  \brief If a ProgramInfo in "reclist" matching this program exists,
+ *         it is used to set recording info in this ProgramInfo.
+ *  \return true if match is found, false otherwise.
+ */
+bool ProgramInfo::FillInRecordInfo(const vector<ProgramInfo *> &reclist)
 {
-    vector<ProgramInfo *>::iterator i;
+    vector<ProgramInfo *>::const_iterator i;
     ProgramInfo *found = NULL;
     int pfound = 0;
 
@@ -2275,9 +2460,14 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
         cardid = found->cardid;
         inputid = found->inputid;
     }
+    return found;
 }
 
-void ProgramInfo::Save()
+/** \fn ProgramInfo::Save() const
+ *  \brief Saves this ProgramInfo to the database, replacing any existing
+ *         program in the same timeslot on the same channel.
+ */
+void ProgramInfo::Save(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2311,7 +2501,15 @@ void ProgramInfo::Save()
                              query);
 }
 
-QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent, QString searchtitle)
+/** \fn ProgramInfo::DisplayWidget(QWidget*, QString) const
+ *  \brief Returns a 4x2 QGridLayout containing program information.
+ *
+ *   Each QLabel with info will be a child of "parent".
+ *  \param parent      QWidget that information in the form of QLabels will be added.
+ *  \param searchtitle If this is not "" a title QLabel will be added.
+ */
+QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent,
+                                        QString searchtitle) const
 {
     int row = 0;
     float wmult, hmult;
@@ -2394,23 +2592,35 @@ QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent, QString searchtitle)
     return grid;
 }
 
-void ProgramInfo::EditRecording()
+/** \fn ProgramInfo::EditRecording(void)
+ *  \brief Creates a dialog for editing the recording status,
+ *         blocking until user leaves dialog.
+ */
+void ProgramInfo::EditRecording(void)
 {
     if (recordid == 0)
         EditScheduled();
     else if (recstatus <= rsWillRecord)
-        handleRecording();
+        ShowRecordingDialog();
     else
-        handleNotRecording();
+        ShowNotRecordingDialog();
 }
 
-void ProgramInfo::EditScheduled()
+/** \fn ProgramInfo::EditScheduled(void)
+ *  \brief Creates a dialog for editing the recording status,
+ *         blocking until user leaves dialog.
+ */
+void ProgramInfo::EditScheduled(void)
 {
     GetProgramRecordingStatus();
     record->exec();
 }
 
-void ProgramInfo::showDetails()
+/** \fn ProgramInfo::showDetails() const
+ *  \brief Pops up a DialogBox with program info, blocking until user exits
+ *         the dialog.
+ */
+void ProgramInfo::showDetails(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
@@ -2640,7 +2850,11 @@ void ProgramInfo::showDetails()
     delete details_dialog;
 }
 
-int ProgramInfo::getProgramFlags()
+/** \fn ProgramInfo::getProgramFlags() const
+ *  \brief Returns a bitmap of which jobs have been completed for recording.
+ *  \sa GetAutoRunJobs()
+ */
+int ProgramInfo::getProgramFlags(void) const
 {
     int flags = 0;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2667,7 +2881,7 @@ int ProgramInfo::getProgramFlags()
     return flags;
 }
 
-void ProgramInfo::handleRecording()
+void ProgramInfo::ShowRecordingDialog(void)
 {
     QDateTime now = QDateTime::currentDateTime();
 
@@ -2781,7 +2995,7 @@ void ProgramInfo::handleRecording()
     return;
 }
 
-void ProgramInfo::handleNotRecording()
+void ProgramInfo::ShowNotRecordingDialog(void)
 {
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
@@ -2940,6 +3154,12 @@ void ProgramInfo::handleNotRecording()
     return;
 }
 
+/* ************************************************************************* *
+ *                                                                           *
+ *        Below this comment various ProgramList functions are defined.      *
+ *                                                                           *
+ * ************************************************************************* */
+
 bool ProgramList::FromScheduler(bool &hasConflicts)
 {
     clear();
@@ -2948,7 +3168,8 @@ bool ProgramList::FromScheduler(bool &hasConflicts)
     QStringList slist = QString("QUERY_GETALLPENDING");
     if (!gContext->SendReceiveStringList(slist) || slist.size() < 2)
     {
-        cerr << "error querying master in ProgramList::FromScheduler" << endl;
+        VERBOSE(VB_IMPORTANT,
+                "ProgramList::FromScheduler(): Error querying master.");
         return false;
     }
 
@@ -2969,7 +3190,8 @@ bool ProgramList::FromScheduler(bool &hasConflicts)
 
     if (count() != slist[1].toUInt())
     {
-        cerr << "length mismatch in ProgramList::FromScheduler" << endl;
+        VERBOSE(VB_IMPORTANT,
+                "ProgramList::FromScheduler(): Length mismatch");
         clear();
         result = false;
     }
@@ -3124,12 +3346,20 @@ bool ProgramList::FromOldRecorded(const QString sql)
     return true;
 }
 
+/** \fn ProgramList::FromRecorded(const QString, ProgramList&)
+ *  \brief <b>Stub.</b>
+ *  \deprecated
+ */
 bool ProgramList::FromRecorded(const QString, ProgramList&)
 {
     clear();
     return false;
 }
 
+/** \fn ProgramList::FromRecord(const QString)
+ *  \brief <b>Stub.</b>
+ *  \deprecated
+ */
 bool ProgramList::FromRecord(const QString)
 {
     clear();
