@@ -197,11 +197,11 @@ void MythUIType::makeDebugImages()
 
     QImage *temp_image = new QImage(m_Area.width(), 1, 32);
     temp_image->fill(m_debug_color.rgb());
-    m_debug_hor_line = MythImage::FromQImage(temp_image);
+    m_debug_hor_line = MythImage::FromQImage(&temp_image);
 
     temp_image = new QImage(1, m_Area.height(), 32);
     temp_image->fill(m_debug_color.rgb());
-    m_debug_ver_line = MythImage::FromQImage(temp_image);
+    m_debug_ver_line = MythImage::FromQImage(&temp_image);
 }
 
 void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
@@ -442,5 +442,31 @@ void MythUIType::AddFocusableChildrenToList(QPtrList<MythUIType> &focusList)
     QValueVector<MythUIType *>::Iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
         (*it)->AddFocusableChildrenToList(focusList);
+}
+
+QFont MythUIType::CreateFont(const QString &face, int pointSize,
+                             int weight, bool italic)
+{
+    return GetMythMainWindow()->CreateFont(face, pointSize, weight, italic);
+}
+
+QRect MythUIType::NormRect(const QRect &rect)
+{
+    return GetMythMainWindow()->NormRect(rect);
+}
+
+QPoint MythUIType::NormPoint(const QPoint &point)
+{
+    return GetMythMainWindow()->NormPoint(point);
+}
+
+int MythUIType::NormX(const int x)
+{
+    return GetMythMainWindow()->NormX(x);
+}
+
+int MythUIType::NormY(const int y)
+{
+    return GetMythMainWindow()->NormY(y);
 }
 

@@ -40,11 +40,6 @@ class MythScreenType : public MythUIType
     QPtrList<MythUIType> m_FocusWidgetList;
 
     MythScreenStack *m_ScreenStack;
-    
-    float wmult, hmult;
-    int screenwidth, screenheight;
-    int xbase, ybase;
-    
 };
 
 #endif

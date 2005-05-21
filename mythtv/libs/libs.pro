@@ -6,4 +6,4 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 # Directories
-SUBDIRS += libavcodec libavformat libmythsamplerate libmythsoundtouch libmythmpeg2 libmyth libmythtv #libmythui
+SUBDIRS += libavcodec libavformat libmythsamplerate libmythsoundtouch libmythmpeg2 libmyth libmythtv libmythui

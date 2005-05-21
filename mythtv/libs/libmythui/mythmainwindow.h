@@ -74,6 +74,15 @@ class MythMainWindow : public QGLWidget
 
     void AllowInput(bool allow);
 
+    QRect GetUIScreenRect();
+
+    QFont CreateFont(const QString &face, int pointSize = 12,
+                     int weight = QFont::Normal, bool italic = FALSE);
+    QRect NormRect(const QRect &rect);
+    QPoint NormPoint(const QPoint &point);
+    int NormX(const int x);
+    int NormY(const int y);
+ 
   public slots:
     void drawTimeout();
 

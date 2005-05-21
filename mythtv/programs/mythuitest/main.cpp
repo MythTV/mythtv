@@ -10,6 +10,7 @@ using namespace std;
 #include "mythscreentype.h"
 #include "mythcontext.h"
 #include "test1.h"
+#include "oldsettings.h"
 
 int main(int argc, char *argv[])
 {
@@ -27,12 +28,6 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    if (!MSqlQuery::testDBConnection())
-    {
-        printf("couldn't open db\n");
-        return -1;
-    }
-
     gContext->LoadQtConfig();
 
     MythMainWindow *mainWindow = GetMythMainWindow();
@@ -40,17 +35,25 @@ int main(int argc, char *argv[])
     mainWindow->Init();
     mainWindow->Show();
 
+    QRect uiSize = mainWindow->GetUIScreenRect();
+
     MythScreenStack *background = new MythScreenStack(mainWindow, "background");
     MythScreenType *backgroundscreen = new MythScreenType(background, 
                                                           "backgroundscreen");
-    MythUIImage *backimg = new MythUIImage("images/grey.jpeg", backgroundscreen,
+    QString backgroundname = gContext->qtconfig()->GetSetting("BackgroundPixmap");
+    backgroundname = gContext->GetThemeDir() + backgroundname;
+
+    MythUIImage *backimg = new MythUIImage(backgroundname, backgroundscreen,
                                            "backimg");
-    backimg->SetPosition(QPoint(0, 0));
+    backimg->SetPosition(mainWindow->NormPoint(QPoint(0, 0)));
+    backimg->SetSize(uiSize.width(), uiSize.height());
     backimg->Load();
 
     MythUIImage *logo = new MythUIImage("images/myth_logo.png", 
                                         backgroundscreen, "logo");
-    logo->SetPosition(QPoint(20, 170));
+    QPoint logoPos = QPoint(mainWindow->NormX(20), 
+                            uiSize.height() - mainWindow->NormY(430));
+    logo->SetPosition(logoPos);
     logo->AdjustAlpha(2, 2);
     logo->Load();
 

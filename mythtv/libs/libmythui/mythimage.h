@@ -18,13 +18,13 @@ class MythImage : public QImage
     virtual void SetChanged(bool change = true) { m_Changed = change; }
     bool IsChanged() { return m_Changed; }
 
-    // overload = ?
     void Assign(const QImage &img);
-
     void Assign(const QPixmap &pix);
 
     // *NOTE* *DELETES* img!
-    static MythImage *FromQImage(QImage *img);
+    static MythImage *FromQImage(QImage **img);
+
+    bool Load(const QString &filename);
 
   protected:
     bool m_Changed;

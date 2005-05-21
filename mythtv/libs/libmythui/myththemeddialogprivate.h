@@ -28,9 +28,7 @@ class MythUIThemedDialogPrivate
     MythUIThemedDialogPrivate(MythUIThemedDialog *l_owner,
                               const QString &screen_name,
                               const QString &theme_file,
-                              const QString &theme_dir,
-                              float lwmult,
-                              float lhmult);
+                              const QString &theme_dir);
     
     void addWidgetToMap(MythUIType *new_widget);
 
@@ -51,7 +49,6 @@ class MythUIThemedDialogPrivate
     QString                     m_screen_name;
     QString                     m_theme_file;
     QString                     m_theme_dir;
-    float                       wmult, hmult;
     MythXMLParser               m_xml_parser;
     QDomElement                 m_xml_data;
     QPtrList<MythUIContainer>   m_containers;

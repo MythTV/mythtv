@@ -5,7 +5,7 @@ TEMPLATE = subdirs
 
 # Directories
 SUBDIRS += mythepg mythprogfind mythtv mythfrontend mythcommflag mythlcd 
-SUBDIRS += mythtvosd mythjobqueue #mythuitest
+SUBDIRS += mythtvosd mythjobqueue mythuitest
 
 #
 #	mythuitest  should(?) go back into SUBDIRS (above) when we've figured

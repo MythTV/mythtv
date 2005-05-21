@@ -80,7 +80,7 @@ void MythOpenGLPainter::Begin(QWidget *parent)
     glViewport(0, 0, parent->width(), parent->height());
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, 800, 600, 0, -999999, 999999);
+    glOrtho(0, parent->width(), parent->height(), 0, -999999, 999999);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(0.375, 0.375, 0.0);

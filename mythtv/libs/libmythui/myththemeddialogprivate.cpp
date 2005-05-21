@@ -12,9 +12,7 @@ MythUIThemedDialogPrivate::MythUIThemedDialogPrivate(
                                        MythUIThemedDialog *l_owner, 
                                        const QString &screen_name,
                                        const QString &theme_file,
-                                       const QString &theme_dir,
-                                       float lwmult,
-                                       float lhmult
+                                       const QString &theme_dir
                                                     )
 {
     m_owner = l_owner;
@@ -23,11 +21,6 @@ MythUIThemedDialogPrivate::MythUIThemedDialogPrivate(
     m_theme_file = theme_file;
     m_theme_dir = theme_dir;
     
-    wmult = lwmult;
-    hmult = lhmult;
-    
-    m_xml_parser.SetWMult(wmult);
-    m_xml_parser.SetHMult(hmult);
     m_xml_parser.setOwner(m_owner, this);
     m_xml_parser.setTheme(theme_file, theme_dir);
     

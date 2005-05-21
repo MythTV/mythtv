@@ -33,10 +33,7 @@ MythUIThemedDialog::MythUIThemedDialog(MythScreenStack *parent,
     d = new MythUIThemedDialogPrivate(this, 
                                       screen_name, 
                                       theme_file, 
-                                      theme_dir,
-                                      wmult, 
-                                      hmult);
-
+                                      theme_dir);
 }
 
 bool MythUIThemedDialog::keyPressEvent(QKeyEvent *e)

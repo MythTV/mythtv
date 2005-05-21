@@ -15,27 +15,28 @@ TestScreen1::TestScreen1(MythScreenStack *parent, const char *name)
            : MythScreenType(parent, name)
 {
     MythFontProperties fontProp1;
-    fontProp1.face = QFont("Arial", 48, QFont::Bold);
+    fontProp1.face = CreateFont("Arial", 48, QFont::Bold);
     fontProp1.color = QColor(Qt::white);
     fontProp1.hasShadow = true;
-    fontProp1.shadowOffset = QPoint(4, 4);
+    fontProp1.shadowOffset = NormPoint(QPoint(4, 4));
     fontProp1.shadowColor = QColor(Qt::black);
     fontProp1.shadowAlpha = 64;
 
-    QRect mainRect = QRect(0, 0, 800, 600);
+    QRect mainRect = GetMythMainWindow()->GetUIScreenRect();
     MythUIText *main = new MythUIText("Welcome to MythTV", fontProp1, mainRect,
                                       mainRect, this, "welcome");
     main->SetJustification(Qt::AlignCenter);
 
     MythFontProperties fontProp;
-    fontProp.face = QFont("Arial", 14);
+    fontProp.face = CreateFont("Arial", 14);
     fontProp.color = QColor(Qt::white);
     fontProp.hasShadow = true;
-    fontProp.shadowOffset = QPoint(1, 1);
+    fontProp.shadowOffset = NormPoint(QPoint(1, 1));
     fontProp.shadowColor = QColor(Qt::black);
     fontProp.shadowAlpha = 64;
 
-    QRect textRect = QRect(0, 400, 800, 200);
+    QRect textRect = NormRect(QRect(0, mainRect.height() * 2 / 3, 
+                                    mainRect.width(), mainRect.height() / 3));
     MythUIText *text = new MythUIText("[ Press any key to continue. ]",
                                       fontProp, textRect, textRect, this,
                                       "label");
@@ -206,7 +207,7 @@ void TestScreen1::Launch4(void)
     diag->AddButton("Anything else?");
 
     TestMove *tm = new TestMove(diag, "move");
-    tm->SetPosition(QPoint(0, 150));
+    tm->SetPosition(NormPoint(QPoint(0, 150)));
 
     m_ScreenStack->AddScreen(diag);
 }
@@ -221,7 +222,7 @@ void TestScreen1::Launch5(void)
     MythUIAnimatedImage *aniwait = new MythUIAnimatedImage("images/watch%1.png",
                                                            1, 16,
                                                            30, diag, "ani");
-    aniwait->SetPosition(QPoint(350, 275));
+    aniwait->SetPosition(NormPoint(QPoint(350, 275)));
     aniwait->Load();
 
     m_ScreenStack->AddScreen(diag);
@@ -272,10 +273,10 @@ TestMove::TestMove(MythUIType *parent, const char *name)
     MythUIImage *image;
 
     image = new MythUIImage("images/tv.png", this, "tv image");
-    image->SetPosition(QPoint(30, 30));
+    image->SetPosition(NormPoint(QPoint(30, 30)));
     image->Load();
 
-    QFont fontFace("Arial", 28, QFont::Bold);
+    QFont fontFace = CreateFont("Arial", 28, QFont::Bold);
 
     MythFontProperties fontProp;
     fontProp.face = fontFace;
@@ -283,12 +284,12 @@ TestMove::TestMove(MythUIType *parent, const char *name)
     fontProp.hasShadow = false;
     fontProp.hasOutline = false;
 
-    MythUIText *text = new MythUIText("Hello!", fontProp,
-                                      QRect(0, 0, 200, 200),
-                                      QRect(0, 0, 200, 200),
-                                      this, "text test");
+    new MythUIText("Hello!", fontProp,
+                   NormRect(QRect(0, 0, 200, 200)),
+                   NormRect(QRect(0, 0, 200, 200)),
+                   this, "text test");
 
-    MoveTo(QPoint(500, 0), QPoint(1, 0));
+    MoveTo(NormPoint(QPoint(500, 0)), NormPoint(QPoint(1, 0)));
     connect(this, SIGNAL(FinishedMoving()), SLOT(moveDone()));
 
     position = 0;
@@ -298,8 +299,8 @@ void TestMove::moveDone()
 {
     switch (position)
     {
-        case 0: MoveTo(QPoint(0, 0), QPoint(-1, 0)); break;
-        case 1: MoveTo(QPoint(500, 0), QPoint(1, 0)); break;
+        case 0: MoveTo(NormPoint(QPoint(0, 0)), NormPoint(QPoint(-1, 0))); break;
+        case 1: MoveTo(NormPoint(QPoint(500, 0)), NormPoint(QPoint(1, 0))); break;
         default: break;
     }
 

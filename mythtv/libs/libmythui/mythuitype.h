@@ -6,6 +6,7 @@
 #include <qobjectlist.h>
 #include <qptrlist.h>
 #include <qvaluevector.h>
+#include <qfont.h>
 
 class MythImage;
 class MythPainter;
@@ -88,6 +89,13 @@ class MythUIType : public QObject
     void makeDebugImages();
 
     int CalcAlpha(int alphamod);
+
+    QFont CreateFont(const QString &face, int pointSize = 12,
+                     int weight = QFont::Normal, bool italic = FALSE);
+    QRect NormRect(const QRect &rect);
+    QPoint NormPoint(const QPoint &point);
+    int NormX(const int width);
+    int NormY(const int height);
 
     QValueVector<MythUIType *> m_ChildrenList;
 

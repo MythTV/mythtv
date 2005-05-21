@@ -19,15 +19,12 @@
 class MythUIContainer : public MythUIType
 {
   public:
-
     MythUIContainer(MythUIType *parent, const char *name);
    ~MythUIContainer();
 
     void    setArea(QRect area ) { m_Area = area; }
     QRect   getArea(){ return m_Area; }
     QPoint  getPosition() { return m_Area.topLeft(); }
-
 };
-
 
 #endif

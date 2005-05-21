@@ -4,7 +4,6 @@
 #include <qtimer.h>
 #include <qpainter.h>
 #include <qpixmap.h>
-#include <qsqldatabase.h>
 #include <qkeysequence.h>
 #include <qpaintdevicemetrics.h>
 #ifdef QWS
@@ -23,6 +22,7 @@
 #include "mythpainter_ogl.h"
 #include "mythpainter_qt.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 
 //#include "screensaver.h"
 
@@ -91,6 +91,7 @@ class MythMainWindowPrivate
     float wmult, hmult;
     int screenwidth, screenheight;
     int xbase, ybase;
+    bool does_fill_screen;
 
     bool ignore_lirc_keys;
 
@@ -342,45 +343,73 @@ void MythMainWindow::paintEvent(QPaintEvent *pe)
 
 void MythMainWindow::Init(void)
 {
-
     gContext->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
                                 d->ybase, d->screenheight, d->hmult);
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
-    //setFont(gContext->GetMediumFont());
-
     bool hideCursor = gContext->GetNumSetting("HideMouseCursor", 1);
-    setCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
 #ifdef QWS
 #if QT_VERSION >= 0x030300
     QWSServer::setCursorVisible(!hideCursor);
 #endif
 #endif
 
-    setGeometry(100, 100, 800, 600);
+    if (gContext->GetNumSetting("RunFrontendInWindow", 0))
+        d->does_fill_screen = false;
+    else
+        d->does_fill_screen = true;
 
-    if (d->painter->GetName() != "OpenGL")
-        setFixedSize(QSize(800, 600));
+    // Set window border based on fullscreen attribute
+    Qt::WFlags flags = 0;
+    if (d->does_fill_screen)
+        flags = Qt::WStyle_Customize  |
+                Qt::WStyle_NoBorder;
+    else
+        flags = Qt::WStyle_Customize | Qt::WStyle_NormalBorder;
 
-    WFlags flags = getWFlags();
-    flags |= WRepaintNoErase;
-#ifdef QWS
-    flags |= WResizeNoErase;
+    // Workarounds for Qt/Mac bugs
+#ifdef Q_WS_MACX
+    if (d->does_fill_screen)
+    {
+  #if QT_VERSION >= 0x030303
+        flags = Qt::WStyle_Customize | Qt::WStyle_Splash;
+  #else
+        // Qt/Mac 3.3.2 and earlier have problems with input focus
+        // when a borderless window is created more than once,
+        // so we have to force windows to have borders
+        flags = Qt::WStyle_Customize | Qt::WStyle_DialogBorder;
+
+        // Move this window up enough to hide its title bar, which in
+        // all the OS X releases so far is the same height as the menubar
+        d->ybase -= GetMBarHeight();
+  #endif
+    }
 #endif
-    setWFlags(flags);
+
+    reparent(parentWidget(), flags, pos());
 
     Show();
+
+    // Set cursor call must come after Show() to work on some systems.
+    setCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
+
     move(d->xbase, d->ybase);
 }
 
 void MythMainWindow::Show(void)
 {
-    //if (gContext->GetNumSetting("RunFrontendInWindow", 0))
-        show();
-    //else
-    //    showFullScreen();
+    show();
+#ifdef Q_WS_MACX
+    if (d->does_fill_screen)
+        HideMenuBar();
+    else
+        ShowMenuBar();
+#endif
+
     setActiveWindow();
+    raise();
+    qApp->wakeUpGuiThread();    // ensures that setActiveWindow() occurs
 }
 
 void MythMainWindow::ExitToMainMenu(void)
@@ -473,37 +502,41 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
 {
     QString keybind = key;
 
-    QSqlDatabase *db = QSqlDatabase::database();
-
-    QString thequery = QString("SELECT keylist FROM keybindings WHERE "
-                               "context = \"%1\" AND action = \"%2\" AND "
-                               "hostname = \"%2\";")
-                              .arg(context).arg(action)
-                              .arg(gContext->GetHostName());
-
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (query.isConnected())
     {
-        query.next();
+        query.prepare("SELECT keylist FROM keybindings WHERE "
+                      "context = :CONTEXT AND action = :ACTION AND "
+                      "hostname = :HOSTNAME ;");
+        query.bindValue(":CONTEXT", context);
+        query.bindValue(":ACTION", action);
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-        keybind = query.value(0).toString();
-    }
-    else
-    {
-        QString inskey = keybind;
-        inskey.replace('\\', "\\\\");
-        inskey.replace('\"', "\\\"");
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            query.next();
+            keybind = query.value(0).toString();
+        }
+        else
+        {
+            QString inskey = keybind;
+            inskey.replace('\\', "\\\\");
 
-        thequery = QString("INSERT INTO keybindings (context, action, "
-                           "description, keylist, hostname) VALUES "
-                           "(\"%1\", \"%2\", \"%3\", \"%4\", \"%5\");")
-                           .arg(context).arg(action).arg(description)
-                           .arg(inskey).arg(gContext->GetHostName());
+            query.prepare("INSERT INTO keybindings (context, action, "
+                          "description, keylist, hostname) VALUES "
+                          "( :CONTEXT, :ACTION, :DESCRIPTION, :KEYLIST, "
+                          ":HOSTNAME );");
+            query.bindValue(":CONTEXT", context);
+            query.bindValue(":ACTION", action);
+            query.bindValue(":DESCRIPTION", description);
+            query.bindValue(":KEYLIST", inskey);
+            query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-        query = db->exec(thequery);
-        if (!query.isActive())
-            MythContext::DBError("Insert Keybinding", query);
+            if (!query.exec() || !query.isActive())
+            {
+                MythContext::DBError("Insert Keybinding", query);
+            }
+        }
     }
 
     QKeySequence keyseq(keybind);
@@ -541,37 +574,40 @@ void MythMainWindow::RegisterJump(const QString &destination,
 {
     QString keybind = key;
 
-    QSqlDatabase *db = QSqlDatabase::database();
-
-    QString thequery = QString("SELECT keylist FROM jumppoints WHERE "
-                               "destination = \"%1\" and hostname = \"%2\";")
-                              .arg(destination).arg(gContext->GetHostName());
-
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (query.isConnected())
     {
-        query.next();
+        query.prepare("SELECT keylist FROM jumppoints WHERE "
+                      "destination = :DEST and hostname = :HOST ;");
+        query.bindValue(":DEST", destination);
+        query.bindValue(":HOST", gContext->GetHostName());
+
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            query.next();
+            keybind = query.value(0).toString();
+        }
+        else
+        {
+            QString inskey = keybind;
+            inskey.replace('\\', "\\\\");
+            inskey.replace('\"', "\\\"");
+
+            query.prepare("INSERT INTO jumppoints (destination, description, "
+                          "keylist, hostname) VALUES ( :DEST, :DESC, :KEYLIST, "
+                          ":HOST );");
+            query.bindValue(":DEST", destination);
+            query.bindValue(":DEDC", description);
+            query.bindValue(":KEYLIST", inskey);
+            query.bindValue(":HOST", gContext->GetHostName());
+
+            if (!query.exec() || !query.isActive())
+            {
+                MythContext::DBError("Insert Jump Point", query);
+            }
+        }
+    }
  
-        keybind = query.value(0).toString();
-    }
-    else
-    {
-        QString inskey = keybind;
-        inskey.replace('\\', "\\\\");
-        inskey.replace('\"', "\\\"");
-
-        thequery = QString("INSERT INTO jumppoints (destination, description, "
-                           "keylist, hostname) VALUES (\"%1\", \"%2\", \"%3\", "
-                           "\"%4\");").arg(destination).arg(description)
-                                      .arg(inskey)
-                                      .arg(gContext->GetHostName());
-
-        query = db->exec(thequery);
-        if (!query.isActive())
-            MythContext::DBError("Insert Jump Point", query);
-    }
-   
     JumpData jd = { callback, destination, description };
     d->destinationMap[destination] = jd;
  
@@ -840,7 +876,8 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
     return key_target;
 }
 
-QFont CreateFont(const QString &face, int pointSize, int weight, bool italic)
+QFont MythMainWindow::CreateFont(const QString &face, int pointSize, 
+                                 int weight, bool italic)
 {
     // Store w/h mult in MainWindow, and query here
     //pointSize = pointSize * GetMythMainWindow()->GetHMult();
@@ -851,7 +888,44 @@ QFont CreateFont(const QString &face, int pointSize, int weight, bool italic)
     // Maybe just a helper function in MyhtMainWindow to calc this all?
     float desired = 100.0;
     pointSize = (int)(pointSize * desired / pdm.logicalDpiY());
+    pointSize = (int)(pointSize * d->hmult);
 
     return QFont(face, pointSize, weight, italic);
+}
+
+QRect MythMainWindow::NormRect(const QRect &rect)
+{
+    QRect ret;
+    ret.setWidth((int)(rect.width() * d->wmult));
+    ret.setHeight((int)(rect.height() * d->hmult));
+    ret.moveTopLeft(QPoint((int)(rect.x() * d->wmult),
+                           (int)(rect.y() * d->hmult)));
+    ret = ret.normalize();
+
+    return ret;
+}
+
+QPoint MythMainWindow::NormPoint(const QPoint &point)
+{
+    QPoint ret;
+    ret.setX((int)(point.x() * d->wmult));
+    ret.setY((int)(point.y() * d->hmult));
+
+    return ret;
+}
+
+int MythMainWindow::NormX(const int x)
+{
+    return (int)(x * d->wmult);
+}
+
+int MythMainWindow::NormY(const int y)
+{
+    return (int)(y * d->hmult);
+}
+
+QRect MythMainWindow::GetUIScreenRect(void)
+{
+    return QRect(0, 0, d->screenwidth, d->screenheight);
 }
 

@@ -66,7 +66,7 @@ void MythUIAnimatedImage::Load(void)
         MythImage *image = GetMythPainter()->GetFormatImage();
         QString filename = QString(m_Filepattern).arg(i);
 
-        image->load(filename);
+        image->Load(filename);
 
         if (m_ForceW != -1 || m_ForceH != -1)
         {

@@ -7,6 +7,7 @@
 #include <cmath>
 using namespace std;
 
+#include "exitcodes.h"
 #include "themedmenu.h"
 #include "mythcontext.h"
 #include "util.h"
@@ -35,6 +36,7 @@ struct ThemedButton
 {
     QPoint pos;
     QRect  posRect;
+    QRect  paintRect;
 
     ButtonIcon *buttonicon;
     QPoint iconPos;
@@ -71,6 +73,9 @@ static QPoint parsePoint(const QString &text)
     QPoint retval;
     if (sscanf(text.data(), "%d,%d", &x, &y) == 2)
         retval = QPoint(x, y);
+
+    retval = GetMythMainWindow()->NormPoint(retval);
+
     return retval;
 }
 
@@ -80,6 +85,8 @@ static QRect parseRect(const QString &text)
     QRect retval;
     if (sscanf(text.data(), "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
         retval = QRect(x, y, w, h);
+
+    retval = GetMythMainWindow()->NormRect(retval);
 
     return retval;
 }
@@ -101,11 +108,10 @@ class ThemedMenuPrivate;
 class ThemedMenuState
 {
   public:
-    ThemedMenuState(float lwmult, float lhmult,
-                    int lscreenwidth, int lscreenheight);
+    ThemedMenuState();
    ~ThemedMenuState();
 
-    void parseSettings(const QString &dir, const QString &menuname);
+    bool parseSettings(const QString &dir, const QString &menuname);
 
     void parseBackground(const QString &dir, QDomElement &element);
     void parseLogo(const QString &dir, QDomElement &element);
@@ -121,22 +127,15 @@ class ThemedMenuState
     void Reset(void);
     void setDefaults(void);
 
-    QRect menuRect() const;
-
     void setTitleIcon(const QString &menumode);
     ButtonIcon *getButtonIcon(const QString &type);
 
     void paintLogo(MythPainter *p, int alpha);
     void paintTitle(MythPainter *p, int alpha);
+    void paintButtonBackground(MythPainter *p, int alpha);
     void paintWatermark(MythPainter *p, int alpha, MythImage *watermark);
 
     void drawScrollArrows(MythPainter *p, int alpha, bool up, bool down);
-
-    float wmult;
-    float hmult;
-
-    int screenwidth;
-    int screenheight;
 
     QRect buttonArea;
 
@@ -156,7 +155,9 @@ class ThemedMenuState
 
     bool killable;
 
+    bool balancerows;
     bool spreadbuttons;
+    bool buttoncenter;
 
     QMap<QString, MythImage *> titleIcons;
     MythImage *curTitle;
@@ -164,6 +165,8 @@ class ThemedMenuState
     QPoint titlePos;
     QRect titleRect;
     bool drawTitle;
+
+    MythImage *buttonBackground;
 
     MythImage *uparrow;
     QRect uparrowRect;
@@ -174,6 +177,7 @@ class ThemedMenuState
     QRect watermarkRect;
 
     bool allowreorder;
+    int maxColumns;
 
     int visiblerowlimit;
 
@@ -188,21 +192,19 @@ class ThemedMenuPrivate
 {
   public:
     ThemedMenuPrivate(ThemedMenu *lparent, const char *cdir, 
-                      float lwmult, float lhmult,
-                      int lscreenwidth, int lscreenheight, 
                       ThemedMenuState *lstate);
    ~ThemedMenuPrivate();
 
     bool keyPressHandler(QKeyEvent *e);
-    void ReloadTheme(void);
+    bool ReloadTheme(void);
 
-    void parseMenu(const QString &menuname, int row = -1, int col = -1);
+    bool parseMenu(const QString &menuname, int row = -1, int col = -1);
 
     void parseThemeButton(QDomElement &element);
 
     void addButton(const QString &type, const QString &text,
                    const QString &alttext, const QStringList &action);
-    void layoutButtons(void);
+    bool layoutButtons(void);
     void positionButtons(bool resetpos);
     bool makeRowVisible(int newrow, int oldrow, bool forcedraw = true);
 
@@ -252,21 +254,17 @@ class ThemedMenuPrivate
 
 /////////////////////////////////////////////////////////////////////////////
 
-ThemedMenuState::ThemedMenuState(float lwmult, float lhmult, int lscreenwidth,
-                                 int lscreenheight)
+ThemedMenuState::ThemedMenuState()
 {
-    wmult = lwmult;
-    hmult = lhmult;
-    screenwidth = lscreenwidth;
-    screenheight = lscreenheight;
-
     allowreorder = true;
+    balancerows = true;
 
     logo = NULL;
     buttonnormal = NULL;
     buttonactive = NULL;
     uparrow = NULL;
     downarrow = NULL;
+    buttonBackground = NULL;
 
     loaded = false;
 
@@ -290,12 +288,15 @@ void ThemedMenuState::Reset(void)
         delete uparrow;
     if (downarrow)
         delete downarrow;
+    if (buttonBackground)
+        delete buttonBackground;
 
     logo = NULL;
     buttonnormal = NULL;
     buttonactive = NULL;
     uparrow = NULL;
     downarrow = NULL;
+    buttonBackground = NULL;
 
     QMap<QString, ButtonIcon>::Iterator it;
     for (it = allButtonIcons.begin(); it != allButtonIcons.end(); ++it)
@@ -341,7 +342,7 @@ ButtonIcon *ThemedMenuState::getButtonIcon(const QString &type)
     return NULL;
 }
 
-void ThemedMenuState::parseBackground(const QString& /* dir */, QDomElement& element)
+void ThemedMenuState::parseBackground(const QString &dir, QDomElement& element)
 {
     // bool tiledbackground = false;
     // QPixmap *bground = NULL;    
@@ -349,7 +350,9 @@ void ThemedMenuState::parseBackground(const QString& /* dir */, QDomElement& ele
 
     bool hasarea = false;
 
+    buttoncenter = true;
     spreadbuttons = true;
+    maxColumns = 20;        // Arbitrary number
     visiblerowlimit = 6;    // the old default
 
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -363,21 +366,39 @@ void ThemedMenuState::parseBackground(const QString& /* dir */, QDomElement& ele
             }
             else if (info.tagName() == "buttonarea")
             {
-                QRect tmpArea = parseRect(getFirstText(info));
-
-                tmpArea.moveTopLeft(QPoint((int)(tmpArea.x() * wmult), 
-                                           (int)(tmpArea.y() * hmult)));
-                tmpArea.setWidth((int)(tmpArea.width() * wmult));
-                tmpArea.setHeight((int)(tmpArea.height() * hmult));
-
-                buttonArea = tmpArea;
+                buttonArea = parseRect(getFirstText(info));
                 hasarea = true;
+
+                if (info.hasAttribute( "background" ))
+                {
+                    cerr << "Loading " << info.attribute("background") << endl;
+                    QString bPath = dir + info.attribute("background");
+                    QImage *image = gContext->LoadScaleImage(bPath);
+                    buttonBackground = MythImage::FromQImage(&image);
+                }
             }
             else if (info.tagName() == "buttonspread")
             {
                 QString val = getFirstText(info);
                 if (val == "no")
                     spreadbuttons = false;
+            }
+            else if (info.tagName() == "buttoncenter")
+            {
+                QString val = getFirstText(info);
+                if (val == "no")
+                    buttoncenter = false;
+            }
+            else if (info.tagName() == "balancerows")
+            {
+                QString val = getFirstText(info);
+                if (val == "no")
+                    balancerows = false;
+            }
+            else if (info.tagName() == "columns")
+            {
+                QString val = getFirstText(info);
+                maxColumns = val.toInt();
             }
             else if (info.tagName() == "visiblerowlimit")
             {
@@ -424,8 +445,7 @@ void ThemedMenuState::parseShadow(TextAttributes &attributes,
             else if (info.tagName() == "offset")
             {
                 QPoint p = parsePoint(getFirstText(info));
-                attributes.font.shadowOffset.setX((int)(p.x() * wmult));
-                attributes.font.shadowOffset.setY((int)(p.y() * hmult));
+                attributes.font.shadowOffset = p;
                 hasoffset = true;
             }
             else if (info.tagName() == "alpha")
@@ -485,7 +505,7 @@ void ThemedMenuState::parseOutline(TextAttributes &attributes,
             else if (info.tagName() == "size")
             {
                 int size = atoi(getFirstText(info).ascii());
-                attributes.font.outlineSize = (int)(size * hmult);
+                attributes.font.outlineSize = GetMythMainWindow()->NormY(size);
                 hassize = true;
             }
             else
@@ -530,13 +550,6 @@ void ThemedMenuState::parseText(TextAttributes &attributes,
             {
                 hasarea = true;
                 attributes.textRect = parseRect(getFirstText(info));
-                attributes.textRect.moveTopLeft(QPoint(
-                                       (int)(attributes.textRect.x() * wmult),
-                                       (int)(attributes.textRect.y() * hmult)));
-                attributes.textRect.setWidth((int)
-                                       (attributes.textRect.width() * wmult));
-                attributes.textRect.setHeight((int)
-                                       (attributes.textRect.height() * hmult));
                 attributes.textRect = QRect(attributes.textRect.x(), 
                                             attributes.textRect.y(),
                                             buttonnormal->width() - 
@@ -604,8 +617,9 @@ void ThemedMenuState::parseText(TextAttributes &attributes,
         }
     }
 
-    attributes.font.face = QFont(fontname, (int)ceil(fontsize * hmult), weight, 
-                                 italic);
+    QFont face = GetMythMainWindow()->CreateFont(fontname, fontsize, weight, 
+                                                 italic);
+    attributes.font.face = face;
 
     if (!hasarea)
     {
@@ -638,7 +652,7 @@ void ThemedMenuState::parseButtonDefinition(const QString &dir,
                 tmp = gContext->LoadScaleImage(setting);
                 if (tmp)
                 {
-                    buttonnormal = MythImage::FromQImage(tmp);
+                    buttonnormal = MythImage::FromQImage(&tmp);
                     hasnormal = true;
                 }
             }
@@ -648,7 +662,7 @@ void ThemedMenuState::parseButtonDefinition(const QString &dir,
                 tmp = gContext->LoadScaleImage(setting);
                 if (tmp)
                 {
-                    buttonactive = MythImage::FromQImage(tmp);
+                    buttonactive = MythImage::FromQImage(&tmp);
                     hasactive = true;
                 }
             }
@@ -704,9 +718,6 @@ void ThemedMenuState::parseButtonDefinition(const QString &dir,
         activeAttributes = normalAttributes;
     }
 
-    watermarkPos.setX((int)(watermarkPos.x() * wmult));
-    watermarkPos.setY((int)(watermarkPos.y() * hmult));
-
     watermarkRect = QRect(watermarkPos, QSize(0, 0));
 }
 
@@ -729,7 +740,7 @@ void ThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
                 QImage *tmp = gContext->LoadScaleImage(logopath); 
                 if (tmp)
                 {
-                    logo = MythImage::FromQImage(tmp);
+                    logo = MythImage::FromQImage(&tmp);
                     hasimage = true;
                 }
             }
@@ -759,8 +770,6 @@ void ThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
         return;
     }
 
-    logopos.setX((int)(logopos.x() * wmult));
-    logopos.setY((int)(logopos.y() * hmult));
     logoRect = QRect(logopos.x(), logopos.y(), logo->width(),
                      logo->height());
 }
@@ -787,7 +796,7 @@ void ThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
                 QString name = info.attribute("mode", "");
                 if (name != "")
                 {
-                    titleIcons[name] = MythImage::FromQImage(tmppix);
+                    titleIcons[name] = MythImage::FromQImage(&tmppix);
                 }
                 else
                 {
@@ -823,9 +832,6 @@ void ThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
         VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing position tag in titles");
         return;
     }
-
-    titlePos.setX((int)(titlePos.x() * wmult));
-    titlePos.setY((int)(titlePos.y() * hmult));
 }
 
 void ThemedMenuState::parseArrow(const QString &dir, QDomElement &element, 
@@ -877,19 +883,17 @@ void ThemedMenuState::parseArrow(const QString &dir, QDomElement &element,
         return;
     }
 
-    arrowpos.setX((int)(arrowpos.x() * wmult));
-    arrowpos.setY((int)(arrowpos.y() * hmult));
     arrowrect = QRect(arrowpos.x(), arrowpos.y(), pix->width(),
                       pix->height());
 
     if (up)
     {
-        uparrow = MythImage::FromQImage(pix);
+        uparrow = MythImage::FromQImage(&pix);
         uparrowRect = arrowrect;
     }
     else
     {
-        downarrow = MythImage::FromQImage(pix);
+        downarrow = MythImage::FromQImage(&pix);
         downarrowRect = arrowrect;
     }
 }
@@ -931,8 +935,6 @@ void ThemedMenuState::parseButton(const QString &dir, QDomElement &element)
             else if (info.tagName() == "offset")
             {
                 offset = parsePoint(getFirstText(info));
-                offset.setX((int)(offset.x() * wmult));
-                offset.setY((int)(offset.y() * hmult));
                 hasoffset = true;
             }
             else if (info.tagName() == "watermarkimage")
@@ -972,9 +974,9 @@ void ThemedMenuState::parseButton(const QString &dir, QDomElement &element)
     ButtonIcon newbutton;
 
     newbutton.name = name;
-    newbutton.icon = MythImage::FromQImage(image);
+    newbutton.icon = MythImage::FromQImage(&image);
     newbutton.offset = offset;
-    newbutton.activeicon = MythImage::FromQImage(activeimage);
+    newbutton.activeicon = MythImage::FromQImage(&activeimage);
 
     if (watermark)
     {
@@ -985,7 +987,7 @@ void ThemedMenuState::parseButton(const QString &dir, QDomElement &element)
             watermarkRect.setHeight(watermark->height());
     }
 
-    newbutton.watermark = MythImage::FromQImage(watermark);
+    newbutton.watermark = MythImage::FromQImage(&watermark);
 
     allButtonIcons[name] = newbutton;
 }
@@ -994,6 +996,7 @@ void ThemedMenuState::setDefaults(void)
 {
     logo = NULL;
     buttonnormal = buttonactive = NULL;
+    balancerows = true;
 
     normalAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | Qt::WordBreak;
     activeAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | Qt::WordBreak;
@@ -1008,7 +1011,7 @@ void ThemedMenuState::setDefaults(void)
     watermarkRect = QRect(0, 0, 0, 0);
 }
 
-void ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
+bool ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
 {
     QString filename = dir + menuname;
 
@@ -1019,7 +1022,7 @@ void ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
     {
         VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate::parseSettings(): "
                                       "Can't open: %1").arg(filename));
-        return;
+        return false;
     }
 
     QString errorMsg;
@@ -1032,7 +1035,7 @@ void ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
                                       "at line: %2  column: %3 msg: %4").
                 arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
         f.close();
-        return;
+        return false;
     }
 
     f.close();
@@ -1083,7 +1086,6 @@ void ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
             {
                 VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown "
                                             "element %1").arg(e.tagName()));
-                return;
             }
         }
         n = n.nextSibling();
@@ -1092,23 +1094,18 @@ void ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
     if (!setbackground)
     {
         VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing background element");
-        return;
+        return false;
     }
 
     if (!setbuttondef)
     {
         VERBOSE(VB_IMPORTANT,
                 "ThemedMenuPrivate: Missing genericbutton definition");
-        return;
+        return false;
     }
 
     loaded = true;
-}
-
-QRect ThemedMenuState::menuRect() const
-{
-    QRect r(0, 0, screenwidth, screenheight);
-    return r;
+    return true;
 }
 
 void ThemedMenuState::drawScrollArrows(MythPainter *p, int alpha, bool up,
@@ -1138,6 +1135,12 @@ void ThemedMenuState::paintTitle(MythPainter *p, int alpha)
         p->DrawImage(titleRect.topLeft(), curTitle, alpha);
 }
 
+void ThemedMenuState::paintButtonBackground(MythPainter *p, int alpha)
+{
+    if (buttonBackground)
+        p->DrawImage(buttonArea.topLeft(), buttonBackground, alpha);
+}
+
 void ThemedMenuState::paintWatermark(MythPainter *p, int alpha, 
                                      MythImage *watermark)
 {
@@ -1150,14 +1153,11 @@ void ThemedMenuState::paintWatermark(MythPainter *p, int alpha,
 /////////////////////////////////////////////////////////////////////////////
 
 ThemedMenuPrivate::ThemedMenuPrivate(ThemedMenu *lparent, const char *cdir,
-                                     float lwmult, float lhmult, 
-                                     int lscreenwidth, int lscreenheight, 
                                      ThemedMenuState *lstate)
 {
     if (!lstate)
     {
-        m_state = new ThemedMenuState(lwmult, lhmult, lscreenwidth,
-                                      lscreenheight);
+        m_state = new ThemedMenuState();
         allocedstate = true;
     }
     else
@@ -1265,7 +1265,7 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
         addButton(type, text, alttext, action);
 }
 
-void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
+bool ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 {
     QString filename = findMenuFile(menuname);
 
@@ -1278,7 +1278,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
                                       "menu file %1").arg(menuname));
         if(menuname == "mainmenu.xml" )
         {
-            exit(0);
+            return false;
         }
         else
         {
@@ -1288,7 +1288,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
                                       QObject::tr(QString("Myth could not locate the menu file %1.\n\n"
                                       "We will now return to the main menu.").arg(menuname)));
 #endif
-            return;
+            return false;
         }
         
         
@@ -1307,7 +1307,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
         if (menuname == "mainmenu.xml" )
         {
-            exit(0);
+            return false;
         }
 
         parent->GetScreenStack()->PopScreen();
@@ -1319,7 +1319,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
                                               "return to the main menu.")
                                               .arg(menuname)));
 #endif
-        return;
+        return false;
     }
 
     f.close();
@@ -1345,7 +1345,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
             {
                 VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Unknown "
                                               "element %1").arg(e.tagName()));
-                exit(1);
+                return false;
             }
         }
         n = n.nextSibling();
@@ -1355,10 +1355,11 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
     {
         VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: No buttons "
                                       "for menu %1").arg(menuname));
-        exit(1);
+        return false;
     }
 
-    layoutButtons();
+    if (!layoutButtons())
+        return false;
     positionButtons(true);
 
     if (row != -1 && col != -1)
@@ -1421,6 +1422,8 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 #if 0
     parent->update(menuRect());
 #endif
+
+    return true;
 }
 
 void ThemedMenuPrivate::addButton(const QString &type, const QString &text, 
@@ -1439,37 +1442,42 @@ void ThemedMenuPrivate::addButton(const QString &type, const QString &text,
     buttonList.push_back(newbutton);
 }
 
-void ThemedMenuPrivate::layoutButtons(void)
+bool ThemedMenuPrivate::layoutButtons(void)
 {
     int numbuttons = buttonList.size();
   
     columns = m_state->buttonArea.width() / m_state->buttonnormal->width();
+    columns = columns > m_state->maxColumns ? m_state->maxColumns : columns;
+
     maxrows = m_state->buttonArea.height() / m_state->buttonnormal->height();
 
-    if (maxrows < 2)
+    if (maxrows < 1)
     {
         VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Must have "
-                "room for at least 2 rows of buttons");
-        exit(1);
+                "room for at least 1 row of buttons");
+        return false;
     }
     
     if (columns < 1)
     {
         VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Must have "
                 "room for at least 1 column of buttons");
-        exit(1);
+        return false;
     }
 
-    // keep the rows balanced
-    if (numbuttons <= 4)
+    if (m_state->balancerows)
     {
-        if (columns > 2)
-            columns = 2;
-    }
-    else
-    {
-        if (columns > 3)
-            columns = 3;
+        // keep the rows balanced
+        if (numbuttons <= 4)
+        {
+            if (columns > 2)
+                columns = 2;
+        }
+        else
+        {
+            if (columns > 3)
+                columns = 3;
+        }
     }    
 
     // limit it to 6 items displayed at one time
@@ -1510,7 +1518,9 @@ void ThemedMenuPrivate::layoutButtons(void)
  
         if (newrow.numitems > 0)
             buttonRows.push_back(newrow);
-    }            
+    }           
+
+    return true; 
 }
 
 void ThemedMenuPrivate::positionButtons(bool resetpos)
@@ -1527,7 +1537,8 @@ void ThemedMenuPrivate::positionButtons(bool resetpos)
     if (!m_state->spreadbuttons)
     {
         yspacing = 0;
-        ystart = (buttonArea.height() - buttonHeight * rows) / 2;
+        if (m_state->buttoncenter)
+            ystart = (buttonArea.height() - buttonHeight * rows) / 2;
     }
 
     int row = 1;
@@ -1557,6 +1568,7 @@ void ThemedMenuPrivate::positionButtons(bool resetpos)
         for (; biter != (*menuiter).buttons.end(); biter++)
         {
             int xpos = xspacing * col + (buttonWidth * (col - 1));
+            xpos = (m_state->maxColumns == 1) ? 0 : xpos;
             xpos += buttonArea.x();
 
             ThemedButton *tbutton = (*biter);
@@ -1575,6 +1587,11 @@ void ThemedMenuPrivate::positionButtons(bool resetpos)
                                           tbutton->iconPos.y(),
                                           tbutton->buttonicon->icon->width(),
                                           tbutton->buttonicon->icon->height());
+                tbutton->paintRect = tbutton->posRect.unite(tbutton->iconRect);
+            }
+            else
+            {
+                tbutton->paintRect = tbutton->posRect;
             }
             
             col++;
@@ -1776,7 +1793,7 @@ void ThemedMenuPrivate::paintButton(unsigned int button, MythPainter *p,
     }
 }
 
-void ThemedMenuPrivate::ReloadTheme(void)
+bool ThemedMenuPrivate::ReloadTheme(void)
 {
     buttonList.clear();
     buttonRows.clear();
@@ -1785,25 +1802,17 @@ void ThemedMenuPrivate::ReloadTheme(void)
  
     m_state->Reset();
  
-#if 0
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-    parent->setFixedSize(QSize(screenwidth, screenheight));
-
-    parent->setFont(gContext->GetMediumFont());
-    parent->setCursor(QCursor(Qt::BlankCursor));
-
-    gContext->ThemeWidget(parent);
-#endif
-
     QString themedir = gContext->GetThemeDir();
-    m_state->parseSettings(themedir, "theme.xml");
+    bool ok = m_state->parseSettings(themedir, "theme.xml");
+    if (!ok)
+        return ok;
 
     QString file = menufiles.back().name;
     int row = menufiles.back().row;
     int col = menufiles.back().col;
     menufiles.pop_back();
 
-    parseMenu(file, row, col);
+    return parseMenu(file, row, col);
 }
 
 bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
@@ -1829,14 +1838,21 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
         }
 
         if (action == "UP")
-        { 
-            if (currentrow > 0)
-                currentrow--;
-            else if (columns == 1)
-                currentrow = buttonRows.size() - 1;
+        {
+            if (maxrows > 1)
+            {
+                if (currentrow > 0)
+                   currentrow--;
+                else if (columns == 1)
+                    currentrow = buttonRows.size() - 1;
 
-            if (currentcolumn >= buttonRows[currentrow].numitems)
-                currentcolumn = buttonRows[currentrow].numitems - 1;
+                if (currentcolumn >= buttonRows[currentrow].numitems)
+                    currentcolumn = buttonRows[currentrow].numitems - 1;
+            }
+            else
+            {
+                handled = false;
+            }
         }
         else if (action == "PAGEUP")
         {
@@ -1849,16 +1865,25 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
         {
             if (currentcolumn > 0)
                 currentcolumn--;
+            else
+                currentcolumn = buttonRows[currentrow].numitems - 1;
         }
         else if (action == "DOWN")
         {
-            if (currentrow < (int)buttonRows.size() - 1)
-                currentrow++;
-            else if (columns == 1)
-                currentrow = 0;
+            if (maxrows > 1)
+            {
+                if (currentrow < (int)buttonRows.size() - 1)
+                    currentrow++;
+                else if (columns == 1)
+                    currentrow = 0;
 
-            if (currentcolumn >= buttonRows[currentrow].numitems)
-                currentcolumn = buttonRows[currentrow].numitems - 1;
+                if (currentcolumn >= buttonRows[currentrow].numitems)
+                    currentcolumn = buttonRows[currentrow].numitems - 1;
+            }
+            else
+            {
+                handled = false;
+            }
         }
         else if (action == "PAGEDOWN")
         {
@@ -1872,6 +1897,8 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
         {
             if (currentcolumn < buttonRows[currentrow].numitems - 1)
                 currentcolumn++;
+            else
+                currentcolumn = 0;
         }
         else if (action == "SELECT")
         {
@@ -1949,8 +1976,8 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 #if 0
     parent->update(watermarkRect);
     if (lastbutton)
-        parent->update(lastbutton->posRect);
-    parent->update(activebutton->posRect);
+        parent->update(lastbutton->paintRect);
+    parent->update(activebutton->paintRect);
 #endif
 
     return true;
@@ -2177,6 +2204,7 @@ void ThemedMenuPrivate::Draw(MythPainter *p,
 {
     m_state->paintLogo(p, alphaMod);
     m_state->paintTitle(p, alphaMod);
+    m_state->paintButtonBackground(p, alphaMod);
 
     paintWatermark(p, alphaMod);
 
@@ -2195,13 +2223,7 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
                        bool allowreorder, ThemedMenuState *state)
           : MythScreenType(parent, name)
 {
-    float wmult = 1, hmult = 1;
-    int screenwidth = 800;
-    int screenheight = 600;
-
-    d = new ThemedMenuPrivate(this, cdir, wmult, hmult, 
-                              screenwidth, screenheight,
-                              state);
+    d = new ThemedMenuPrivate(this, cdir, state);
     d->m_state->allowreorder = allowreorder;
 
     Init(cdir, menufile);
@@ -2225,9 +2247,10 @@ void ThemedMenu::Init(const char *cdir, const char *menufile)
     ReloadExitKey();
 
     if (!d->m_state->loaded)
-        d->m_state->parseSettings(dir, "theme.xml");
+        d->foundtheme = d->m_state->parseSettings(dir, "theme.xml");
 
-    d->parseMenu(menufile);
+    if (d->foundtheme)
+        d->parseMenu(menufile);
 }
 
 ThemedMenu::~ThemedMenu(void)
@@ -2287,7 +2310,8 @@ void ThemedMenu::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
 
 void ThemedMenu::ReloadTheme(void)
 {
-    d->ReloadTheme();
+    if (!d->ReloadTheme())
+        d->foundtheme = false;
 }
 
 bool ThemedMenu::keyPressEvent(QKeyEvent *e)

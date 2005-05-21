@@ -284,7 +284,7 @@ void MythXMLParser::parseFont(QDomElement &element)
     //  size no matter what the DPI of the display we're running on
     //
 
-    QFont temp = CreateFont(face, size);
+    QFont temp = GetMythMainWindow()->CreateFont(face, size);
 
     if (bold.lower() == "yes" ||
         bold.lower() == "true")
@@ -868,7 +868,7 @@ void MythXMLParser::parseTree(MythUIContainer *container, QDomElement &element)
     MythFontProperties *default_font = GetFont("myth_xml_parser_default_tree_font");
     if(!default_font)
     {
-        QFont temp_font = CreateFont("Arial", 12);
+        QFont temp_font = GetMythMainWindow()->CreateFont("Arial", 12);
         default_font = new MythFontProperties();
         
     }

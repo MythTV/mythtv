@@ -65,7 +65,7 @@ void MythUIImage::SetSkip(int x, int y)
 
 void MythUIImage::Load(void)
 {
-    m_Image->load(m_Filename);
+    m_Image->Load(m_Filename);
 
     if (m_ForceW != -1 || m_ForceH != -1)
     {

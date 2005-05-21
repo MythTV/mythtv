@@ -16,17 +16,7 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const char *name,
     m_CurrentFocusWidget = NULL;
 
     m_ScreenStack = parent;
-
     m_IsDeleting = false;
-
-    //
-    //  Set the GUI size and multiples from the current settings in the
-    //  database.
-    //
-
-    gContext->GetScreenSettings(xbase, screenwidth, wmult,
-                                ybase, screenheight, hmult);
-
 }
 
 MythScreenType::~MythScreenType()

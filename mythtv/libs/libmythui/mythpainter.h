@@ -21,14 +21,6 @@ class MythPainter
     virtual bool SupportsAnimation(void) = 0;
     virtual bool SupportsAlpha(void) = 0;
 
-    void SetScreenMultiple(float wmult, float hmult) { m_Wmult = wmult;
-                                                       m_Hmult = hmult;
-                                                     }
-
-    void GetScreenMultiples(float &wmult, float &hmult) { wmult = m_Wmult;
-                                                          hmult = m_Hmult;
-                                                        }
-
     virtual void Begin(QWidget *parent) { m_Parent = parent; }
     virtual void End() { m_Parent = NULL; }
 
@@ -49,9 +41,6 @@ class MythPainter
     virtual void DeleteFormatImage(MythImage *im) = 0;
 
   protected:
-    float m_Wmult;
-    float m_Hmult;
-
     QWidget *m_Parent;
 };
 
