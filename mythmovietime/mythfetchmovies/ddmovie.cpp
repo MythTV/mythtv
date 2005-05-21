@@ -85,7 +85,7 @@ FILE* TMSMovieDirect::fetchData(const QString& user, const QString& pass,
     
     HttpComms::Credentials cred(user, pass);
     QString tempFile("/tmp/mythmovietime.gz");
-    HttpComms::getHttpFile(tempFile, url, 10000, 3, 3, true, &cred );
+    HttpComms::getHttpFile(tempFile, url, 30000, 3, 3, true, &cred );
 
     ret = popen("cat /tmp/mythmovietime.gz | gzip -df", "r");
     return ret;
