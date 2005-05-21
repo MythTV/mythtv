@@ -17,7 +17,6 @@ using namespace std;
 
 #include "programrecpriority.h"
 #include "scheduledrecording.h"
-#include "infodialog.h"
 #include "proglist.h"
 #include "tv.h"
 

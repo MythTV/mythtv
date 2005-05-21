@@ -209,8 +209,6 @@ class ProgramInfo
 
 
     // GUI stuff
-    QGridLayout* DisplayWidget(QWidget *parent = NULL,
-                               QString searchtitle = "") const;
     void showDetails(void) const;
     void EditRecording(void);
     void EditScheduled(void);

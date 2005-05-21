@@ -47,7 +47,7 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 
     if (doLoadTheme(ele, winName, themefile))
     {    
-        cout << "XMLParse::LoadTheme(): Using default theme file" << endl;
+        //cout << "XMLParse::LoadTheme(): Using default theme file" << endl;
         return true;
     }
     
@@ -61,7 +61,7 @@ bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
 
     if (!f.open(IO_ReadOnly))
     {    
-        cerr << "XMLParse::LoadTheme(): Can't open: " << themeFile << endl;
+        //cerr << "XMLParse::LoadTheme(): Can't open: " << themeFile << endl;
         return false;
     }
      
