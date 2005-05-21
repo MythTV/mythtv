@@ -45,11 +45,13 @@
 
 #define secs_Between_1Jan1970_6Jan1980 315982800
 
-namespace TableClass {
+class TableClass {
+  public:
     typedef enum {
-        UNKNOWN=-1, TVCTc=0, TVCTnc, CVCTc, CVCTnc, ETTc, DCCSCT, EIT, ETTe, DCCT, RRT
+        UNKNOWN=-1, TVCTc=0, TVCTnc, CVCTc, CVCTnc,
+        ETTc, DCCSCT, EIT, ETTe, DCCT, RRT
     };
-}
+};
 
 /** \class MasterGuideTable
  *  \brief This table tells the decoder on which PIDs to find other tables,

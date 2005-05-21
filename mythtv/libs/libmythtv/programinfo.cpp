@@ -582,11 +582,13 @@ int ProgramInfo::SecsTillStart(void) const
 }
 
 
-/** \fn ProgramInfo::GetProgramAtDateTime(const QString&, QDateTime&)
- *  \brief Returns a new ProgramInfo() for the program that air at
+/** \fn ProgramInfo::GetProgramAtDateTime(const QString&, const QDateTime&)
+ *  \brief Returns a new ProgramInfo for the program that air at
  *         "dtime" on "channel".
- *  \param channel Channel ID on which to search for program.
+ *  \param channel %Channel ID on which to search for program.
  *  \param dtime   Date and Time for which we desire the program.
+ *  \return Pointer to a ProgramInfo from database if it succeeds, Pointer to an
+ *          "Unknown" ProgramInfo if it does not find anything in database.
  */
 ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel, 
                                                const QDateTime &dtime)
@@ -655,8 +657,9 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     }
 }
 
-/** \fn GetProgramFromRecorded(const QString&, QDateTime&)
- *  \brief Returns a new ProgramInfo() for an existing recording.
+/** \fn ProgramInfo::GetProgramFromRecorded(const QString&, const QDateTime&)
+ *  \brief Returns a new ProgramInfo for an existing recording.
+ *  \return Pointer to a ProgramInfo if it succeeds, NULL otherwise.
  */
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel, 
                                                  const QDateTime &dtime)
@@ -664,8 +667,9 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
     return GetProgramFromRecorded(channel, dtime.toString("yyyyMMddhhmm00"));
 }
 
-/** \fn GetProgramFromRecorded(const QString&, const QString&)
- *  \brief Returns a new ProgramInfo() for an existing recording.
+/** \fn ProgramInfo::GetProgramFromRecorded(const QString&, const QString&)
+ *  \brief Returns a new ProgramInfo for an existing recording.
+ *  \return Pointer to a ProgramInfo if it succeeds, NULL otherwise.
  */
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel, 
                                                  const QString &starttime)
@@ -741,7 +745,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
     return NULL;
 }
 
-/** \fn ProgramInfo::IsFindApplicable(void)
+/** \fn ProgramInfo::IsFindApplicable(void) const
  *  \brief Returns true if a search should be employed to find a matcing program.
  */
 bool ProgramInfo::IsFindApplicable(void) const
@@ -801,7 +805,7 @@ int ProgramInfo::IsProgramRecurring(void) const
 
 /** \fn ProgramInfo::GetProgramRecordingStatus()
  *  \brief Returns the recording type for this ProgramInfo, creating
- *         "record" field if neccissary.
+ *         "record" field if necessary.
  *  \sa RecordingType, ScheduledRecording
  */
 RecordingType ProgramInfo::GetProgramRecordingStatus(void)
@@ -817,7 +821,7 @@ RecordingType ProgramInfo::GetProgramRecordingStatus(void)
 
 /** \fn ProgramInfo::GetProgramRecordingProfile()
  *  \brief Returns recording profile name that will be, or was used,
- *         for this program, creating "record" field if neccissary.
+ *         for this program, creating "record" field if necessary.
  *  \sa ScheduledRecording
  */
 QString ProgramInfo::GetProgramRecordingProfile(void)
@@ -848,13 +852,13 @@ int ProgramInfo::GetAutoRunJobs(void)
 
 /** \fn ProgramInfo::GetChannelRecPriority(const QString&)
  *  \brief Returns Recording Priority of channel.
- *  \param chanid Channel ID of channel whose priority we desire.
+ *  \param channel %Channel ID of channel whose priority we desire.
  */
-int ProgramInfo::GetChannelRecPriority(const QString &chanid)
+int ProgramInfo::GetChannelRecPriority(const QString &channel)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recpriority FROM channel WHERE chanid = :CHANID ;");
-    query.bindValue(":CHANID", chanid);
+    query.bindValue(":CHANID", channel);
     
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -1451,7 +1455,7 @@ void ProgramInfo::SetEditing(bool edit) const
                              query);
 }
 
-/** \fn ProgramInfo::SetDeleteFlag(int) const
+/** \fn ProgramInfo::SetDeleteFlag(bool) const
  *  \brief Set "deletepending" field in "recorded" table to "deleteFlag".
  *  \param deleteFlag value to set delete pending field to.
  */
@@ -2303,7 +2307,7 @@ QString ProgramInfo::RecStatusText(void) const
     return QObject::tr("Unknown");;
 }
 
-/** \fn ProgramInfo::RecStatusChar(void) const
+/** \fn ProgramInfo::RecStatusDesc(void) const
  *  \brief Converts "recstatus" into a long human readable description.
  */
 QString ProgramInfo::RecStatusDesc(void) const

@@ -19,7 +19,9 @@
  *  \endcode
  */
 
-namespace StreamID {
+class StreamID
+{
+  public:
     enum {
         MPEG1Video = 0x01,
         MPEG2Video = 0x02,
@@ -37,7 +39,9 @@ namespace StreamID {
     };
 };
 
-namespace TableID {
+class TableID
+{
+  public:
     enum {
         PAT = 0x00, PMT = 0x02,
         STUFFING = 0x80, CAPTION = 0x86, CENSOR = 0x87,

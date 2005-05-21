@@ -121,7 +121,7 @@ class ProgramInfo
     bool IsSameProgram(const ProgramInfo& other) const;
     bool IsSameTimeslot(const ProgramInfo& other) const;
     bool IsSameProgramTimeslot(const ProgramInfo& other) const;
-    static int GetChannelRecPriority(const QString &chanid);
+    static int GetChannelRecPriority(const QString &channel);
     static int GetRecordingTypeRecPriority(RecordingType type);
 
     // Used to query and set ScheduledRecording info
@@ -137,7 +137,7 @@ class ProgramInfo
     void ToggleRecord(void);
     void DeleteHistory(void);
 
-    /// Used to update database with recording info
+    // Used to update database with recording info
     void StartedRecording(void);
     void FinishedRecording(bool prematurestop);
     void ApplyRecordRecGroupChange(const QString &newrecgroup);
@@ -182,30 +182,30 @@ class ProgramInfo
     void SetPreserveEpisode(bool preserveEpisode) const;
 
     // Commercial/Edit flagging maps
-    void GetCutList(frm_dir_map_t &delMap) const;
-    void GetBlankFrameList(frm_dir_map_t &frames) const;
-    void GetCommBreakList(frm_dir_map_t &frames) const;
+    void GetCutList(frm_dir_map_t &) const;
+    void GetBlankFrameList(frm_dir_map_t &) const;
+    void GetCommBreakList(frm_dir_map_t &) const;
 
-    void SetCutList(frm_dir_map_t &delMap) const;
-    void SetBlankFrameList(frm_dir_map_t &frames,
+    void SetCutList(frm_dir_map_t &) const;
+    void SetBlankFrameList(frm_dir_map_t &,
                            long long min_frm = -1, long long max_frm = -1) const;
-    void SetCommBreakList(frm_dir_map_t &frames) const;
+    void SetCommBreakList(frm_dir_map_t &) const;
 
     // Flagging map support methods
     bool CheckMarkupFlag(int type) const;
     void GetMarkupMap(frm_dir_map_t&, int type, bool merge = false) const;
     void SetMarkupFlag(int type, bool processing) const;
-    void SetMarkupMap(frm_dir_map_t &marks, int type = -100,
+    void SetMarkupMap(frm_dir_map_t &, int type = -100,
                       long long min_frm = -1, long long max_frm = -1) const;
     void ClearMarkupMap(int type = -100,
                         long long min_frm = -1, long long max_frm = -1) const;
 
     // Keyframe positions Map
-    void GetPositionMap(frm_pos_map_t &posMap, int type) const;
+    void GetPositionMap(frm_pos_map_t &, int type) const;
     void ClearPositionMap(int type) const;
-    void SetPositionMap(frm_pos_map_t &posMap, int type,
+    void SetPositionMap(frm_pos_map_t &, int type,
                         long long min_frm = -1, long long max_frm = -1) const;
-    void SetPositionMapDelta(frm_pos_map_t &posMap, int type) const;
+    void SetPositionMapDelta(frm_pos_map_t &, int type) const;
 
 
     // GUI stuff

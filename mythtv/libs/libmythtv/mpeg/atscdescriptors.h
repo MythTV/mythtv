@@ -323,7 +323,7 @@ AC3Descriptor {
 */
 
 /** \class ContentIdentifierDescriptor
- *   This is something like an ISBN for TV shows.
+ *   This is something like an ISBN for %TV shows.
  *   See also: a_57a.pdf page6 Tables 6.1, 6.2, and 7.1
  */
 class ContentIdentifierDescriptor : public ATSCDescriptor {
