@@ -63,11 +63,12 @@ static int raw_read_header(AVFormatContext *s, AVFormatParameters *ap)
             av_set_pts_info(st, 64, 1, st->codec.sample_rate);
             break;
         case CODEC_TYPE_VIDEO:
-            st->codec.frame_rate      = ap->frame_rate;
-            st->codec.frame_rate_base = ap->frame_rate_base;
+            av_set_pts_info(st, 64, ap->time_base.num, ap->time_base.den);
             st->codec.width = ap->width;
             st->codec.height = ap->height;
-	    st->codec.pix_fmt = ap->pix_fmt;
+            st->codec.pix_fmt = ap->pix_fmt;
+            if(st->codec.pix_fmt == PIX_FMT_NONE)
+                st->codec.pix_fmt= PIX_FMT_YUV420P;
             break;
         default:
             return -1;
@@ -188,6 +189,21 @@ static int ac3_read_header(AVFormatContext *s,
     return 0;
 }
 
+static int shorten_read_header(AVFormatContext *s,
+                               AVFormatParameters *ap)
+{
+    AVStream *st;
+
+    st = av_new_stream(s, 0);
+    if (!st)
+        return AVERROR_NOMEM;
+    st->codec.codec_type = CODEC_TYPE_AUDIO;
+    st->codec.codec_id = CODEC_ID_SHORTEN;
+    st->need_parsing = 1;
+    /* the parameters will be extracted from the compressed bitstream */
+    return 0;
+}
+
 /* dts read */
 static int dts_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
@@ -221,16 +237,14 @@ static int video_read_header(AVFormatContext *s,
 
     /* for mjpeg, specify frame rate */
     /* for mpeg4 specify it too (most mpeg4 streams dont have the fixed_vop_rate set ...)*/
-    if (st->codec.codec_id == CODEC_ID_MJPEG || 
-        st->codec.codec_id == CODEC_ID_MPEG4) {
-        if (ap && ap->frame_rate) {
-            st->codec.frame_rate      = ap->frame_rate;
-            st->codec.frame_rate_base = ap->frame_rate_base;
-        } else {
-            st->codec.frame_rate      = 25;
-            st->codec.frame_rate_base = 1;
-        }
+    if (ap && ap->time_base.num) {
+        av_set_pts_info(st, 64, ap->time_base.num, ap->time_base.den);
+    } else if ( st->codec.codec_id == CODEC_ID_MJPEG || 
+                st->codec.codec_id == CODEC_ID_MPEG4 ||
+                st->codec.codec_id == CODEC_ID_H264) {
+        av_set_pts_info(st, 64, 1, 25);
     }
+
     return 0;
 }
 
@@ -294,6 +308,17 @@ static int h261_probe(AVProbeData *p)
     }
     return 0;
 }
+
+AVInputFormat shorten_iformat = {
+    "shn",
+    "raw shn",
+    0,
+    NULL,
+    shorten_read_header,
+    raw_read_partial_packet,
+    raw_read_close,
+    .extensions = "shn",
+};
 
 AVInputFormat ac3_iformat = {
     "ac3",
@@ -619,7 +644,7 @@ AVInputFormat rawvideo_iformat = {
     raw_read_header,
     rawvideo_read_packet,
     raw_read_close,
-    .extensions = "yuv",
+    .extensions = "yuv,cif,qcif",
     .value = CODEC_ID_RAWVIDEO,
 };
 
@@ -672,6 +697,9 @@ AVOutputFormat null_oformat = {
 
 int raw_init(void)
 {
+
+    av_register_input_format(&shorten_iformat);
+
     av_register_input_format(&ac3_iformat);
     av_register_output_format(&ac3_oformat);
 

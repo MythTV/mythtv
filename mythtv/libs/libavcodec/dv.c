@@ -25,7 +25,7 @@
  */
 
 /**
- * @file libavcodec/dv.c
+ * @file dv.c
  * DV codec.
  */
 #include "avcodec.h"
@@ -263,6 +263,7 @@ static const int mb_area_start[5] = { 1, 6, 21, 43, 64 };
 
 #ifndef ALT_BITSTREAM_READER
 #warning only works with ALT_BITSTREAM_READER
+static int re_index; //Hack to make it compile
 #endif
 
 static inline int get_bits_left(GetBitContext *s)
@@ -941,6 +942,7 @@ static int dvvideo_encode_frame(AVCodecContext *c, uint8_t *buf, int buf_size,
     return s->sys->frame_size;
 }
 
+#ifdef CONFIG_DVVIDEO_ENCODER
 AVCodec dvvideo_encoder = {
     "dvvideo",
     CODEC_TYPE_VIDEO,
@@ -953,6 +955,7 @@ AVCodec dvvideo_encoder = {
     CODEC_CAP_DR1,
     NULL
 };
+#endif // CONFIG_DVVIDEO_ENCODER
 
 AVCodec dvvideo_decoder = {
     "dvvideo",

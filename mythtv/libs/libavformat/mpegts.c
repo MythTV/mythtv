@@ -120,7 +120,6 @@ static void write_section_data(AVFormatContext *s, MpegTSFilter *tss1,
 {
     MpegTSSectionFilter *tss = &tss1->u.section_filter;
     int len;
-    unsigned int crc;
     
     if (is_start) {
         memcpy(tss->section_buf, buf, buf_size);
@@ -146,14 +145,10 @@ static void write_section_data(AVFormatContext *s, MpegTSFilter *tss1,
     }
 
     if (tss->section_h_size != -1 && tss->section_index >= tss->section_h_size) {
-        if (tss->check_crc) {
-            crc = mpegts_crc32(tss->section_buf, tss->section_h_size);
-            if (crc != 0)
-                goto invalid_crc;
-        }
-        tss->section_cb(tss->opaque, tss->section_buf, tss->section_h_size);
-    invalid_crc:
         tss->end_of_section_reached = 1;
+        if (!tss->check_crc ||
+            mpegts_crc32(tss->section_buf, tss->section_h_size) == 0)
+            tss->section_cb(tss->opaque, tss->section_buf, tss->section_h_size);
     }
 }
 
@@ -803,7 +798,7 @@ static void init_stream(AVStream *st, int stream_type, int code)
     }
     st->codec.codec_type = codec_type;
     st->codec.codec_id = codec_id;
-    av_set_pts_info(st, 60, 1, 90000);
+    av_set_pts_info(st, 33, 1, 90000);
 }
 
 static int create_stream(PESContext *pes, int code)
@@ -1035,9 +1030,12 @@ static void handle_packet(MpegTSContext *ts, const uint8_t *packet, int64_t posi
             if (p + len > p_end)
                 return;
             if (len && cc_ok) {
-                /* write remaning section bytes */
+                /* write remaining section bytes */
                 write_section_data(s, tss, 
                                    p, len, 0);
+                /* check whether filter has been closed */
+                if (!ts->pids[pid])
+                    return;
             }
             p += len;
             if (p < p_end) {
@@ -1317,7 +1315,7 @@ static int mpegts_read_header(AVFormatContext *s,
         ts->cur_pcr = pcrs[0] - ts->pcr_incr * packet_count[0];
         s->bit_rate = (TS_PACKET_SIZE * 8) * 27e6 / ts->pcr_incr;
         st->codec.bit_rate = s->bit_rate;
-        st->start_time = ts->cur_pcr * 1000000.0 / 27.0e6;
+        st->start_time = ts->cur_pcr;
 #if 0
         printf("start=%0.3f pcr=%0.3f incr=%d\n",
                st->start_time / 1000000.0, pcrs[0] / 27e6, ts->pcr_incr);

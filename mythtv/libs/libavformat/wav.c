@@ -39,6 +39,7 @@ const CodecTag codec_wav_tags[] = {
     { CODEC_ID_SONIC, 0x2048 },
     { CODEC_ID_SONIC_LS, 0x2048 },
     { CODEC_ID_ADPCM_CT, 0x200 },
+    { CODEC_ID_ADPCM_SWF, ('S'<<8)+'F' },
     { 0, 0 },
 };
 
@@ -64,7 +65,7 @@ int put_wav_header(ByteIOContext *pb, AVCodecContext *enc)
         bps = 8;
     } else if (enc->codec_id == CODEC_ID_MP2 || enc->codec_id == CODEC_ID_MP3) {
         bps = 0;
-    } else if (enc->codec_id == CODEC_ID_ADPCM_IMA_WAV || enc->codec_id == CODEC_ID_ADPCM_MS) {
+    } else if (enc->codec_id == CODEC_ID_ADPCM_IMA_WAV || enc->codec_id == CODEC_ID_ADPCM_MS || enc->codec_id == CODEC_ID_ADPCM_G726) { //
         bps = 4;
     } else {
         bps = 16;
@@ -73,6 +74,8 @@ int put_wav_header(ByteIOContext *pb, AVCodecContext *enc)
     if (enc->codec_id == CODEC_ID_MP2 || enc->codec_id == CODEC_ID_MP3) {
         blkalign = enc->frame_size; //this is wrong, but seems many demuxers dont work if this is set correctly
         //blkalign = 144 * enc->bit_rate/enc->sample_rate;
+    } else if (enc->codec_id == CODEC_ID_ADPCM_G726) { //
+        blkalign = 1;
     } else if (enc->block_align != 0) { /* specified by the codec */
         blkalign = enc->block_align;
     } else

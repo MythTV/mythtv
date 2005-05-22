@@ -316,7 +316,7 @@ static int rm_write_header(AVFormatContext *s)
             break;
         case CODEC_TYPE_VIDEO:
             rm->video_stream = stream;
-            stream->frame_rate = (float)codec->frame_rate / (float)codec->frame_rate_base;
+            stream->frame_rate = (float)codec->time_base.den / (float)codec->time_base.num;
             /* XXX: dummy values */
             stream->packet_max_size = 4096;
             stream->nb_packets = 0;
@@ -500,19 +500,21 @@ static void rm_read_audio_stream_info(AVFormatContext *s, AVStream *st,
         st->codec.codec_type = CODEC_TYPE_AUDIO;
         st->codec.codec_id = CODEC_ID_RA_144;
     } else {
+        int flavor, sub_packet_h, coded_framesize;
         /* old version (4) */
         get_be32(pb); /* .ra4 */
-        get_be32(pb);
-        get_be16(pb);
+        get_be32(pb); /* data size */
+        get_be16(pb); /* version2 */
         get_be32(pb); /* header size */
-        get_be16(pb); /* add codec info */
-        get_be32(pb); /* coded frame size */
+        flavor= get_be16(pb); /* add codec info / flavor */
+        coded_framesize= get_be32(pb); /* coded frame size */
         get_be32(pb); /* ??? */
         get_be32(pb); /* ??? */
         get_be32(pb); /* ??? */
-        get_be16(pb); /* 1 */ 
-        get_be16(pb); /* coded frame size */
-        get_be32(pb);
+        sub_packet_h= get_be16(pb); /* 1 */ 
+        st->codec.block_align= get_be16(pb); /* frame size */
+        get_be16(pb); /* sub packet size */
+        get_be16(pb); /* ??? */
         st->codec.sample_rate = get_be16(pb);
         get_be32(pb);
         st->codec.channels = get_be16(pb);
@@ -521,6 +523,16 @@ static void rm_read_audio_stream_info(AVFormatContext *s, AVStream *st,
         st->codec.codec_type = CODEC_TYPE_AUDIO;
         if (!strcmp(buf, "dnet")) {
             st->codec.codec_id = CODEC_ID_AC3;
+        } else if (!strcmp(buf, "28_8")) {
+            st->codec.codec_id = CODEC_ID_RA_288;
+            st->codec.extradata_size= 10;
+            st->codec.extradata= av_mallocz(st->codec.extradata_size);
+            /* this is completly braindead and broken, the idiot who added this codec and endianness
+               specific reordering to mplayer and libavcodec/ra288.c should be drowned in a see of cola */
+            //FIXME pass the unpermutated extradata
+            ((uint16_t*)st->codec.extradata)[1]= sub_packet_h;
+            ((uint16_t*)st->codec.extradata)[2]= flavor;
+            ((uint16_t*)st->codec.extradata)[3]= coded_framesize;
         } else {
             st->codec.codec_id = CODEC_ID_NONE;
             pstrcpy(st->codec.codec_name, sizeof(st->codec.codec_name),
@@ -594,7 +606,7 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
                tag,
                tag_size);
 #endif
-        if (tag_size < 10)
+        if (tag_size < 10 && tag != MKTAG('D', 'A', 'T', 'A'))
             goto fail;
         switch(tag) {
         case MKTAG('P', 'R', 'O', 'P'):
@@ -629,8 +641,8 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
             start_time = get_be32(pb); /* start time */
             get_be32(pb); /* preroll */
             duration = get_be32(pb); /* duration */
-            st->start_time = start_time * (AV_TIME_BASE / 1000);
-            st->duration = duration * (AV_TIME_BASE / 1000);
+            st->start_time = start_time;
+            st->duration = duration;
             get_str8(pb, buf, sizeof(buf)); /* desc */
             get_str8(pb, buf, sizeof(buf)); /* mimetype */
             codec_data_size = get_be32(pb);
@@ -658,7 +670,7 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
                     goto fail1;
                 st->codec.width = get_be16(pb);
                 st->codec.height = get_be16(pb);
-                st->codec.frame_rate_base= 1;
+                st->codec.time_base.num= 1;
                 fps= get_be16(pb);
                 st->codec.codec_type = CODEC_TYPE_VIDEO;
                 get_be32(pb);
@@ -670,7 +682,7 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 get_buffer(pb, st->codec.extradata, st->codec.extradata_size);
                 
 //                av_log(NULL, AV_LOG_DEBUG, "fps= %d fps2= %d\n", fps, fps2);
-                st->codec.frame_rate = fps * st->codec.frame_rate_base;
+                st->codec.time_base.den = fps * st->codec.time_base.num;
                 /* modification of h263 codec version (!) */
 #ifdef WORDS_BIGENDIAN
                 h263_hack_version = ((uint32_t*)st->codec.extradata)[1];
@@ -842,7 +854,8 @@ resync:
             rm->remaining_len-= len;
         }
 
-        if(st->discard){
+        if(  (st->discard >= AVDISCARD_NONKEY && !(flags&2))
+           || st->discard >= AVDISCARD_ALL){
             url_fskip(pb, len);
             goto resync;
         }

@@ -725,6 +725,7 @@ char *pp_help=
 "*	*		a	autoq		CPU power dependent enabler\n"
 "			c	chrom		chrominance filtering enabled\n"
 "			y	nochrom		chrominance filtering disabled\n"
+"			n	noluma		luma filtering disabled\n"
 "hb	hdeblock	(2 threshold)		horizontal deblocking filter\n"
 "	1. difference factor: default=32, higher -> more deblocking\n"
 "	2. flatness threshold: default=39, lower -> more deblocking\n"
@@ -746,6 +747,7 @@ char *pp_help=
 "l5	lowpass5				FIR lowpass deinterlacer\n"
 "de	default					hb:a,vb:a,dr:a\n"
 "fa	fast					h1:a,v1:a,dr:a\n"
+"ac						ha:a:128:7,va:a,dr:a\n"
 "tn	tmpnoise	(3 threshold)		temporal noise reducer\n"
 "			1. <= 2. <= 3.		larger -> stronger filtering\n"
 "fq	forceQuant	<quantizer>		force quantizer\n"
@@ -790,6 +792,7 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
 		char *filterName;
 		int q= 1000000; //PP_QUALITY_MAX;
 		int chrom=-1;
+		int luma=-1;
 		char *option;
 		char *options[OPTIONS_ARRAY_SIZE];
 		int i;
@@ -817,6 +820,7 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
 			if(!strcmp("autoq", option) || !strcmp("a", option)) q= quality;
 			else if(!strcmp("nochrom", option) || !strcmp("y", option)) chrom=0;
 			else if(!strcmp("chrom", option) || !strcmp("c", option)) chrom=1;
+			else if(!strcmp("noluma", option) || !strcmp("n", option)) luma=0;
 			else
 			{
 				options[numOfUnknownOptions] = option;
@@ -863,7 +867,7 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
 				filterNameOk=1;
 				if(!enable) break; // user wants to disable it
 
-				if(q >= filters[i].minLumQuality)
+				if(q >= filters[i].minLumQuality && luma)
 					ppMode->lumMode|= filters[i].mask;
 				if(chrom==1 || (chrom==-1 && filters[i].chromDefault))
 					if(q >= filters[i].minChromQuality)
@@ -1051,18 +1055,20 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
 	int mbHeight= (height+15)>>4;
 	PPMode *mode = (PPMode*)vm;
 	PPContext *c = (PPContext*)vc;
-        int minStride= MAX(srcStride[0], dstStride[0]);
+	int minStride= MAX(ABS(srcStride[0]), ABS(dstStride[0]));
+	int absQPStride = ABS(QPStride);
 
-	if(c->stride < minStride || c->qpStride < QPStride)
+	// c->stride and c->QPStride are always positive
+	if(c->stride < minStride || c->qpStride < absQPStride)
 		reallocBuffers(c, width, height, 
 				MAX(minStride, c->stride), 
-				MAX(c->qpStride, QPStride));
+				MAX(c->qpStride, absQPStride));
 
 	if(QP_store==NULL || (mode->lumMode & FORCE_QUANT)) 
 	{
 		int i;
 		QP_store= c->forcedQPTable;
-		QPStride= 0;
+		absQPStride = QPStride = 0;
 		if(mode->lumMode & FORCE_QUANT)
 			for(i=0; i<mbWidth; i++) QP_store[i]= mode->forcedQuant;
 		else
@@ -1072,7 +1078,7 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
 
 	if(pict_type & PP_PICT_TYPE_QP2){
 		int i;
-		const int count= mbHeight * QPStride;
+		const int count= mbHeight * absQPStride;
 		for(i=0; i<(count>>2); i++){
 			((uint32_t*)c->stdQPTable)[i] = (((uint32_t*)QP_store)[i]>>1) & 0x7F7F7F7F;
 		}
@@ -1080,6 +1086,7 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
 			c->stdQPTable[i] = QP_store[i]>>1;
 		}
                 QP_store= c->stdQPTable;
+		QPStride= absQPStride;		
 	}
 
 if(0){
@@ -1095,13 +1102,22 @@ for(y=0; y<mbHeight; y++){
 
 	if((pict_type&7)!=3)
 	{
-		int i;
-		const int count= mbHeight * QPStride;
-		for(i=0; i<(count>>2); i++){
-			((uint32_t*)c->nonBQPTable)[i] = ((uint32_t*)QP_store)[i] & 0x3F3F3F3F;
-		}
-		for(i<<=2; i<count; i++){
-			c->nonBQPTable[i] = QP_store[i] & 0x3F;
+		if (QPStride >= 0) {
+			int i;
+			const int count= mbHeight * QPStride;
+			for(i=0; i<(count>>2); i++){
+				((uint32_t*)c->nonBQPTable)[i] = ((uint32_t*)QP_store)[i] & 0x3F3F3F3F;
+			}
+			for(i<<=2; i<count; i++){
+				c->nonBQPTable[i] = QP_store[i] & 0x3F;
+			}
+		} else {
+			int i,j;
+			for(i=0; i<mbHeight; i++) {
+		    		for(j=0; j<absQPStride; j++) {
+					c->nonBQPTable[i*absQPStride+j] = QP_store[i*QPStride+j] & 0x3F;
+				}
+			}
 		}
 	}
 
@@ -1125,8 +1141,8 @@ for(y=0; y<mbHeight; y++){
 	}
 	else if(srcStride[1] == dstStride[1] && srcStride[2] == dstStride[2])
 	{
-		memcpy(dst[1], src[1], srcStride[1]*height);
-		memcpy(dst[2], src[2], srcStride[2]*height);
+		linecpy(dst[1], src[1], height, srcStride[1]);
+		linecpy(dst[2], src[2], height, srcStride[2]);
 	}
 	else
 	{

@@ -957,13 +957,13 @@ void MPEG2trans::init_videoout_stream()
     c->width = video_width;
     c->height = video_height;
     /* frames per second */
-    c->frame_rate = video_frame_rate;
-    c->frame_rate_base = 1000;
+    c->time_base.den = video_frame_rate;
+    c->time_base.num = 1000;
     c->gop_size = 12; /* emit one intra frame every twelve frames at most */
     /* just for testing, we also add B frames */
     c->max_b_frames = 2;
     DPRINTF(1, "VIDEO: bitrate: %d size: %dx%d framerate: %f\n", 
-               c->bit_rate, c->width, c->height, (float)c->frame_rate / c->frame_rate_base);
+               c->bit_rate, c->width, c->height, video_frame_rate / 1000.0);
 }
 
 int MPEG2trans::BuildKeyframeIndex(QString filename, QMap <long long, long long> &posMap)

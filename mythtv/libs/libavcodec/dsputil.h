@@ -28,10 +28,6 @@
 #ifndef DSPUTIL_H
 #define DSPUTIL_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "common.h"
 #include "avcodec.h"
 
@@ -72,17 +68,9 @@ extern uint32_t squareTbl[512];
 extern uint8_t cropTbl[256 + 2 * MAX_NEG_CROP];
 
 /* VP3 DSP functions */
-void vp3_dsp_init_c(void);
-void vp3_idct_c(int16_t *input_data, int16_t *dequant_matrix,
-    int coeff_count, DCTELEM *output_data);
-
-void vp3_dsp_init_mmx(void);
-void vp3_idct_mmx(int16_t *input_data, int16_t *dequant_matrix,
-    int coeff_count, DCTELEM *output_data);
-
-void vp3_dsp_init_sse2(void);
-void vp3_idct_sse2(int16_t *input_data, int16_t *dequant_matrix,
-    int coeff_count, DCTELEM *output_data);
+void ff_vp3_idct_c(DCTELEM *block/* align 16*/);
+void ff_vp3_idct_put_c(uint8_t *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
+void ff_vp3_idct_add_c(uint8_t *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
 
 /* minimum alignment rules ;)
 if u notice errors in the align stuff, need more alignment for some asm code for some cpu
@@ -278,6 +266,13 @@ typedef struct DSPContext {
      */
     void (*sub_hfyu_median_prediction)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w, int *left, int *left_top);
     void (*bswap_buf)(uint32_t *dst, uint32_t *src, int w);
+
+    void (*h264_v_loop_filter_luma)(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0);
+    void (*h264_h_loop_filter_luma)(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0);
+    void (*h264_v_loop_filter_chroma)(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0);
+    void (*h264_h_loop_filter_chroma)(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0);
+    void (*h264_v_loop_filter_chroma_intra)(uint8_t *pix, int stride, int alpha, int beta);
+    void (*h264_h_loop_filter_chroma_intra)(uint8_t *pix, int stride, int alpha, int beta);
     
     void (*h263_v_loop_filter)(uint8_t *src, int stride, int qscale);
     void (*h263_h_loop_filter)(uint8_t *src, int stride, int qscale);
@@ -322,29 +317,12 @@ typedef struct DSPContext {
 #define FF_LIBMPEG2_IDCT_PERM 2
 #define FF_SIMPLE_IDCT_PERM 3
 #define FF_TRANSPOSE_IDCT_PERM 4
+#define FF_PARTTRANS_IDCT_PERM 5
 
     int (*try_8x8basis)(int16_t rem[64], int16_t weight[64], int16_t basis[64], int scale);
     void (*add_8x8basis)(int16_t rem[64], int16_t basis[64], int scale);
 #define BASIS_SHIFT 16
 #define RECON_SHIFT 6
-
-    /**
-     * This function handles any initialization for the VP3 DSP functions.
-     */
-    void (*vp3_dsp_init)(void);
-
-    /** 
-     * This function is responsible for taking a block of zigzag'd,
-     * quantized DCT coefficients and reconstructing the original block of
-     * samples.
-     * @param input_data 64 zigzag'd, quantized DCT coefficients
-     * @param dequant_matrix 64 zigzag'd quantizer coefficients
-     * @param coeff_count index of the last coefficient
-     * @param output_samples space for 64 DCTELEMs where the transformed
-     * samples will be stored
-     */
-    void (*vp3_idct)(int16_t *input_data, int16_t *dequant_matrix,
-        int coeff_count, DCTELEM *output_samples);
  
     void (*h264_idct_add)(uint8_t *dst, DCTELEM *block, int stride);
 } DSPContext;
@@ -402,13 +380,6 @@ static inline int get_penalty_factor(int lambda, int lambda2, int type){
  */
 #define emms_c()
 
-#define MM_MMX    0x0001 /* standard MMX */
-#define MM_3DNOW  0x0004 /* AMD 3DNOW */
-#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
-#define MM_SSE    0x0008 /* SSE functions */
-#define MM_SSE2   0x0010 /* PIV SSE2 functions */
-#define MM_3DNOWEXT  0x0020 /* AMD 3DNowExt */
-
 /* should be defined by architectures supporting
    one or more MultiMedia extension */
 int mm_support(void);
@@ -418,6 +389,13 @@ int mm_support(void);
 #if defined(HAVE_MMX)
 
 #undef emms_c
+
+#define MM_MMX    0x0001 /* standard MMX */
+#define MM_3DNOW  0x0004 /* AMD 3DNOW */
+#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
+#define MM_SSE    0x0008 /* SSE functions */
+#define MM_SSE2   0x0010 /* PIV SSE2 functions */
+#define MM_3DNOWEXT  0x0020 /* AMD 3DNowExt */
 
 extern int mm_flags;
 
@@ -635,10 +613,6 @@ static always_inline long int lrintf(float x)
 #define _ISOC9X_SOURCE
 #endif
 #include <math.h>
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif

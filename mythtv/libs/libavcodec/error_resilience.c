@@ -346,7 +346,7 @@ static void guess_mv(MpegEncContext *s){
                 s->mv_dir = MV_DIR_FORWARD;
                 s->mb_intra=0;
                 s->mv_type = MV_TYPE_16X16;
-                s->mb_skiped=0;
+                s->mb_skipped=0;
 
 		s->dsp.clear_blocks(s->block[0]);
 
@@ -474,7 +474,7 @@ int score_sum=0;
                     s->mv_dir = MV_DIR_FORWARD;
                     s->mb_intra=0;
                     s->mv_type = MV_TYPE_16X16;
-                    s->mb_skiped=0;
+                    s->mb_skipped=0;
 
 		    s->dsp.clear_blocks(s->block[0]);
 
@@ -677,8 +677,8 @@ void ff_er_frame_end(MpegEncContext *s){
             
         for(i=0; i<2; i++){
             pic->ref_index[i]= av_mallocz(size * sizeof(uint8_t));
-            pic->motion_val_base[i]= av_mallocz((size+2) * 2 * sizeof(uint16_t));
-            pic->motion_val[i]= pic->motion_val_base[i]+2;
+            pic->motion_val_base[i]= av_mallocz((size+4) * 2 * sizeof(uint16_t));
+            pic->motion_val[i]= pic->motion_val_base[i]+4;
         }
         pic->motion_subsample_log2= 3;
         s->current_picture= *s->current_picture_ptr;
@@ -858,7 +858,7 @@ void ff_er_frame_end(MpegEncContext *s){
             
             s->mv_dir = MV_DIR_FORWARD;
             s->mb_intra=0;
-            s->mb_skiped=0;
+            s->mb_skipped=0;
             if(IS_8X8(mb_type)){
                 int mb_index= mb_x*2 + mb_y*2*s->b8_stride;
                 int j;
@@ -897,7 +897,7 @@ void ff_er_frame_end(MpegEncContext *s){
                 s->mv_dir = MV_DIR_FORWARD|MV_DIR_BACKWARD;
                 s->mb_intra=0;
                 s->mv_type = MV_TYPE_16X16;
-                s->mb_skiped=0;
+                s->mb_skipped=0;
                 
                 if(s->pp_time){
                     int time_pp= s->pp_time;

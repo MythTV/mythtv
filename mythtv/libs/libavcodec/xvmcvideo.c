@@ -256,7 +256,7 @@ static inline void setup_context(MpegEncContext *s)
     // Do I need to export quant when I could not perform postprocessing?
     // Anyway, it doesn't hurt.
     s->current_picture.qscale_table[s->mb_y * s->mb_stride + s->mb_x] = s->qscale;
-    s->mb_skiped = 0; //MC doesn't skip blocks
+    s->mb_skipped = 0; //MC doesn't skip blocks
 }
 
 static inline XvMCMacroBlock *macroblock(const xvmc_render_state_t *render,

@@ -538,7 +538,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
 
 void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
 {
-    fps = (double)enc->frame_rate / enc->frame_rate_base;
+    fps = 1 / av_q2d(enc->time_base);
 
     float aspect_ratio;
     if (enc->sample_aspect_ratio.num == 0)
@@ -1166,8 +1166,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                         int align_width = width;
                         int align_height = height;
 
-                        fps = (double)context->frame_rate / 
-                                      context->frame_rate_base;
+                        fps = 1 / av_q2d(context->time_base); 
 
                         if (directrendering)
                             avcodec_align_dimensions(context, &align_width, 
@@ -1492,10 +1491,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         len = pkt->size;
         ptr = pkt->data;
         pts = 0;
-        if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
-            pts = pkt->dts / (AV_TIME_BASE / 1000);
 
         AVStream *curstream = ic->streams[pkt->stream_index];
+
+        if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+            pts = av_q2d(curstream->time_base) * pkt->dts * 1000;
 
         if (storevideoframes &&
             curstream->codec.codec_type == CODEC_TYPE_VIDEO)
@@ -1556,7 +1556,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 case CODEC_TYPE_AUDIO:
                 {
                     if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
-                        lastapts = pkt->pts / (AV_TIME_BASE / 1000);
+                        lastapts = av_q2d(curstream->time_base) * pkt->pts * 1000;
 
                     if (onlyvideo != 0 ||
                         (pkt->stream_index != wantedAudioStream))
@@ -1679,16 +1679,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         lastvpts = temppts;
                     else
                         temppts = lastvpts;
-
-                    // update video clock for next frame
-                    int frame_delay = (int)(1000.0 / fps);
-
-                    if (mpa_pic.repeat_pict)
-                    {
-                        //cerr << "repeat, unhandled?\n";
-                        frame_delay += (int)(mpa_pic.repeat_pict *
-                                             frame_delay * 0.5);
-                    }
 
 /* XXX: Broken.
                     if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&

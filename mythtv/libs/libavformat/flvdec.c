@@ -44,7 +44,6 @@ static int flv_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
     int offset, flags;
-    AVStream *st;
     
     s->ctx_flags |= AVFMTCTX_NOHEADER; //ok we have a header but theres no fps, codec type, sample_rate, ...
 
@@ -60,7 +59,7 @@ static int flv_read_header(AVFormatContext *s,
 static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
     int ret, i, type, size, pts, flags, is_audio;
-    AVStream *st;
+    AVStream *st = NULL;
     
  for(;;){
     url_fskip(&s->pb, 4); /* size of previous packet */
@@ -103,10 +102,13 @@ static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
             return AVERROR_NOMEM;
 
         av_set_pts_info(st, 24, 1, 1000); /* 24 bit pts in ms */
-        st->codec.frame_rate_base= 1;
-        st->codec.frame_rate= 1000;
+        st->codec.time_base= (AVRational){1,1000};
     }
-    if(st->discard){
+//    av_log(NULL, AV_LOG_DEBUG, "%d %X %d \n", is_audio, flags, st->discard);
+    if(  (st->discard >= AVDISCARD_NONKEY && !((flags >> 4)==1 ||  is_audio))
+       ||(st->discard >= AVDISCARD_BIDIR  &&  ((flags >> 4)==3 && !is_audio))
+       || st->discard >= AVDISCARD_ALL
+       ){
         url_fskip(&s->pb, size);
         continue;
     }
@@ -122,16 +124,25 @@ static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
             else
                 st->codec.sample_rate = (44100<<((flags>>2)&3))>>3;
             switch(flags >> 4){/* 0: uncompressed 1: ADPCM 2: mp3 5: Nellymoser 8kHz mono 6: Nellymoser*/
+	    case 0: if (flags&2) st->codec.codec_id = CODEC_ID_PCM_S16BE;
+		    else st->codec.codec_id = CODEC_ID_PCM_S8; break;
+	    case 1: st->codec.codec_id = CODEC_ID_ADPCM_SWF; break;
             case 2: st->codec.codec_id = CODEC_ID_MP3; break;
+	    // this is not listed at FLV but at SWF, strange...
+	    case 3: if (flags&2) st->codec.codec_id = CODEC_ID_PCM_S16LE;
+		    else st->codec.codec_id = CODEC_ID_PCM_S8; break;
             default:
+    		av_log(s, AV_LOG_INFO, "Unsupported audio codec (%x)\n", flags >> 4);
                 st->codec.codec_tag= (flags >> 4);
             }
+	    st->codec.bits_per_sample = (flags & 2) ? 16 : 8;
         }
     }else{
             st->codec.codec_type = CODEC_TYPE_VIDEO;
             switch(flags & 0xF){
             case 2: st->codec.codec_id = CODEC_ID_FLV1; break;
             default:
+    		av_log(s, AV_LOG_INFO, "Unsupported video codec (%x)\n", flags & 0xf);
                 st->codec.codec_tag= flags & 0xF;
             }
     }
@@ -150,7 +161,7 @@ static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
     pkt->pts = pts;
     pkt->stream_index = st->index;
     
-    if (!is_audio && ((flags >> 4)==1))
+    if (is_audio || ((flags >> 4)==1))
 	pkt->flags |= PKT_FLAG_KEY;
     
     return ret;

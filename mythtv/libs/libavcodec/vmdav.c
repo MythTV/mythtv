@@ -19,7 +19,7 @@
  */
 
 /**
- * @file libavcodec/vmdav.c
+ * @file vmdvideo.c
  * Sierra VMD audio & video decoders
  * by Vladimir "VAG" Gneushev (vagsoft at mail.ru)
  * for more information on the Sierra VMD format, visit:

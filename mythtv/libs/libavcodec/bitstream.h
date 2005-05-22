@@ -14,6 +14,8 @@
 //#define A32_BITSTREAM_READER
 #define LIBMPEG2_BITSTREAM_READER_HACK //add BERO
  
+extern const uint8_t ff_reverse[256];
+
 #if defined(ARCH_X86) || defined(ARCH_X86_64)
 // avoid +32 for shift optimization (gcc should do that ...)
 static inline  int32_t NEG_SSR32( int32_t a, int8_t s){
@@ -128,7 +130,7 @@ typedef struct RL_VLC_ELEM {
     uint8_t run;
 } RL_VLC_ELEM;
 
-#ifdef ARCH_SPARC
+#if defined(ARCH_SPARC) || defined(ARCH_ARMV4L)
 #define UNALIGNED_STORES_ARE_BAD
 #endif
 
@@ -291,6 +293,20 @@ static inline void skip_put_bytes(PutBitContext *s, int n){
 }
 
 /**
+ * skips the given number of bits.
+ * must only be used if the actual values in the bitstream dont matter
+ */
+static inline void skip_put_bits(PutBitContext *s, int n){
+#ifdef ALT_BITSTREAM_WRITER
+    s->index += n;
+#else
+    s->bit_left -= n;
+    s->buf_ptr-= s->bit_left>>5;
+    s->bit_left &= 31;
+#endif        
+}
+
+/**
  * Changes the end of the buffer.
  */
 static inline void set_put_bits_buffer_size(PutBitContext *s, int size){
@@ -352,6 +368,16 @@ static inline int unaligned32_be(const void *v)
 #endif
 }
 
+static inline int unaligned32_le(const void *v)
+{
+#ifdef CONFIG_ALIGN
+       const uint8_t *p=v;
+       return (((p[3]<<8) | p[2])<<16) | (p[1]<<8) | (p[0]);
+#else
+       return le2me_32( unaligned32(v)); //original
+#endif
+}
+
 #ifdef ALT_BITSTREAM_READER
 #   define MIN_CACHE_BITS 25
 
@@ -362,11 +388,19 @@ static inline int unaligned32_be(const void *v)
 #   define CLOSE_READER(name, gb)\
         (gb)->index= name##_index;\
 
+# ifdef ALT_BITSTREAM_READER_LE
+#   define UPDATE_CACHE(name, gb)\
+        name##_cache= unaligned32_le( ((const uint8_t *)(gb)->buffer)+(name##_index>>3) ) >> (name##_index&0x07);\
+
+#   define SKIP_CACHE(name, gb, num)\
+        name##_cache >>= (num);
+# else
 #   define UPDATE_CACHE(name, gb)\
         name##_cache= unaligned32_be( ((const uint8_t *)(gb)->buffer)+(name##_index>>3) ) << (name##_index&0x07);\
 
 #   define SKIP_CACHE(name, gb, num)\
-        name##_cache <<= (num);\
+        name##_cache <<= (num);
+# endif
 
 // FIXME name?
 #   define SKIP_COUNTER(name, gb, num)\
@@ -381,8 +415,13 @@ static inline int unaligned32_be(const void *v)
 #   define LAST_SKIP_BITS(name, gb, num) SKIP_COUNTER(name, gb, num)
 #   define LAST_SKIP_CACHE(name, gb, num) ;
 
+# ifdef ALT_BITSTREAM_READER_LE
+#   define SHOW_UBITS(name, gb, num)\
+        ((name##_cache) & (NEG_USR32(0xffffffff,num)))
+# else
 #   define SHOW_UBITS(name, gb, num)\
         NEG_USR32(name##_cache, num)
+# endif
 
 #   define SHOW_SBITS(name, gb, num)\
         NEG_SSR32(name##_cache, num)
@@ -413,7 +452,7 @@ static inline int get_bits_count(GetBitContext *s){
 #   define UPDATE_CACHE(name, gb)\
     if(name##_bit_count >= 0){\
         name##_cache+= (int)be2me_16(*(uint16_t*)name##_buffer_ptr) << name##_bit_count;\
-        ((uint16_t*)name##_buffer_ptr)++;\
+        name##_buffer_ptr += 2;\
         name##_bit_count-= 16;\
     }\
 
@@ -600,8 +639,13 @@ static inline unsigned int get_bits1(GetBitContext *s){
 #ifdef ALT_BITSTREAM_READER
     int index= s->index;
     uint8_t result= s->buffer[ index>>3 ];
+#ifdef ALT_BITSTREAM_READER_LE
+    result>>= (index&0x07);
+    result&= 1;
+#else
     result<<= (index&0x07);
     result>>= 8 - 1;
+#endif
     index++;
     s->index= index;
 
@@ -671,7 +715,9 @@ void align_get_bits(GetBitContext *s);
 int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
              const void *bits, int bits_wrap, int bits_size,
              const void *codes, int codes_wrap, int codes_size,
-             int use_static);
+             int flags);
+#define INIT_VLC_USE_STATIC 1
+#define INIT_VLC_LE         2
 void free_vlc(VLC *vlc);
 
 /**
@@ -711,7 +757,7 @@ void free_vlc(VLC *vlc);
     SKIP_BITS(name, gb, n)\
 }
 
-#define GET_RL_VLC(level, run, name, gb, table, bits, max_depth)\
+#define GET_RL_VLC(level, run, name, gb, table, bits, max_depth, need_update)\
 {\
     int n, index, nb_bits;\
 \
@@ -720,8 +766,10 @@ void free_vlc(VLC *vlc);
     n     = table[index].len;\
 \
     if(max_depth > 1 && n < 0){\
-        LAST_SKIP_BITS(name, gb, bits)\
-        UPDATE_CACHE(name, gb)\
+        SKIP_BITS(name, gb, bits)\
+        if(need_update){\
+            UPDATE_CACHE(name, gb)\
+        }\
 \
         nb_bits = -n;\
 \

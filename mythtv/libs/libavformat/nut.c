@@ -420,7 +420,7 @@ static void put_str(ByteIOContext *bc, const char *string){
     put_buffer(bc, string, len);
 }
 
-static void put_s(ByteIOContext *bc, uint64_t val){
+static void put_s(ByteIOContext *bc, int64_t val){
     if (val<=0) put_v(bc, -2*val  );
     else        put_v(bc,  2*val-1);
 }
@@ -599,8 +599,8 @@ static int nut_write_header(AVFormatContext *s)
 
 	if (codec->codec_type == CODEC_TYPE_VIDEO)
 	{
-	    nom = codec->frame_rate;
-	    denom = codec->frame_rate_base;
+	    nom = codec->time_base.den;
+	    denom = codec->time_base.num;
 	}
 	else
 	{
@@ -931,7 +931,7 @@ static int decode_main_header(NUTContext *nut){
     }
 
     if(check_checksum(bc)){
-        av_log(s, AV_LOG_ERROR, "Main header checksum missmatch\n");
+        av_log(s, AV_LOG_ERROR, "Main header checksum mismatch\n");
         return -1;
     }
 
@@ -980,6 +980,7 @@ static int decode_stream_header(NUTContext *nut){
     nom = get_v(bc);
     denom = get_v(bc);
     nut->stream[stream_id].msb_timestamp_shift = get_v(bc);
+    st->codec.has_b_frames=
     nut->stream[stream_id].decode_delay= get_v(bc);
     get_byte(bc); /* flags */
 
@@ -1000,9 +1001,6 @@ static int decode_stream_header(NUTContext *nut){
         st->codec.sample_aspect_ratio.num= get_v(bc);
         st->codec.sample_aspect_ratio.den= get_v(bc);
         get_v(bc); /* csp type */
-
-        st->codec.frame_rate = nom;
-        st->codec.frame_rate_base = denom;
     }
     if (class == 32) /* AUDIO */
     {
@@ -1011,7 +1009,7 @@ static int decode_stream_header(NUTContext *nut){
         st->codec.channels = get_v(bc);
     }
     if(check_checksum(bc)){
-        av_log(s, AV_LOG_ERROR, "Stream header %d checksum missmatch\n", stream_id);
+        av_log(s, AV_LOG_ERROR, "Stream header %d checksum mismatch\n", stream_id);
         return -1;
     }
     av_set_pts_info(s->streams[stream_id], 60, denom, nom);
@@ -1051,7 +1049,7 @@ static int decode_info_header(NUTContext *nut){
         }
         
         if(!strcmp(type, "v")){
-            int value= get_v(bc);
+            get_v(bc);
         }else{
             if(!strcmp(name, "Author"))
                 get_str(bc, s->author, sizeof(s->author));
@@ -1066,7 +1064,7 @@ static int decode_info_header(NUTContext *nut){
         }
     }
     if(check_checksum(bc)){
-        av_log(s, AV_LOG_ERROR, "Info header checksum missmatch\n");
+        av_log(s, AV_LOG_ERROR, "Info header checksum mismatch\n");
         return -1;
     }
     return 0;
@@ -1222,14 +1220,18 @@ av_log(s, AV_LOG_DEBUG, "fs:%lld fc:%d ft:%d kf:%d pts:%lld size:%d mul:%d lsb:%
 static int decode_frame(NUTContext *nut, AVPacket *pkt, int frame_code, int frame_type, int64_t frame_start){
     AVFormatContext *s= nut->avf;
     ByteIOContext *bc = &s->pb;
-    int size, stream_id, key_frame;
-    int64_t pts;
+    int size, stream_id, key_frame, discard;
+    int64_t pts, last_IP_pts;
     
     size= decode_frame_header(nut, &key_frame, &pts, &stream_id, frame_code, frame_type, frame_start);
     if(size < 0)
         return -1;
 
-    if(s->streams[ stream_id ]->discard){
+    discard= s->streams[ stream_id ]->discard;
+    last_IP_pts= s->streams[ stream_id ]->last_IP_pts;
+    if(  (discard >= AVDISCARD_NONKEY && !key_frame)
+       ||(discard >= AVDISCARD_BIDIR && last_IP_pts != AV_NOPTS_VALUE && last_IP_pts > pts)
+       || discard >= AVDISCARD_ALL){
         url_fskip(bc, size);
         return 1;
     }
@@ -1433,7 +1435,7 @@ static AVOutputFormat nut_oformat = {
     "video/x-nut",
     "nut",
     sizeof(NUTContext),
-#ifdef CONFIG_VORBIS
+#ifdef CONFIG_LIBVORBIS
     CODEC_ID_VORBIS,
 #elif defined(CONFIG_MP3LAME)
     CODEC_ID_MP3,

@@ -34,6 +34,9 @@ AVCodecParserContext *av_parser_init(int codec_id)
     AVCodecParserContext *s;
     AVCodecParser *parser;
     int ret;
+    
+    if(codec_id == CODEC_ID_NONE)
+        return NULL;
 
     for(parser = av_first_parser; parser != NULL; parser = parser->next) {
         if (parser->codec_ids[0] == codec_id ||
@@ -320,6 +323,7 @@ static const AVRational mpeg2_aspect[16]={
     {0,1},
 };
 
+//FIXME move into mpeg12.c
 static void mpegvideo_extract_headers(AVCodecParserContext *s, 
                                       AVCodecContext *avctx,
                                       const uint8_t *buf, int buf_size)
@@ -355,9 +359,9 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
                 }
                 avcodec_set_dimensions(avctx, pc->width, pc->height);
                 frame_rate_index = buf[3] & 0xf;
-                avctx->bit_rate = ((buf[4] << 10) | (buf[5] << 2) | (buf[6] >> 6)) * 400;
-                pc->frame_rate = avctx->frame_rate = frame_rate_tab[frame_rate_index];
-                avctx->frame_rate_base = MPEG1_FRAME_RATE_BASE;
+                pc->frame_rate = avctx->time_base.den = frame_rate_tab[frame_rate_index];
+                avctx->time_base.num = MPEG1_FRAME_RATE_BASE;
+                avctx->bit_rate = ((buf[4]<<10) | (buf[5]<<2) | (buf[6]>>6))*400;
                 avctx->codec_id = CODEC_ID_MPEG1VIDEO;
                 avctx->sub_id = 1;
             }
@@ -370,18 +374,18 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
                     if (bytes_left >= 6) {
                         horiz_size_ext = ((buf[1] & 1) << 1) | (buf[2] >> 7);
                         vert_size_ext = (buf[2] >> 5) & 3;
+                        bit_rate_ext = ((buf[2] & 0x1F)<<7) | (buf[3]>>1);
                         frame_rate_ext_n = (buf[5] >> 5) & 3;
                         frame_rate_ext_d = (buf[5] & 0x1f);
                         pc->progressive_sequence = buf[1] & (1 << 3);
-                        avctx->has_b_frames= buf[5] >> 7;
-                        bit_rate_ext = ((buf[2] & 0x1f) << 7) | ((buf[3] & 0xfe) >> 1);
+                        avctx->has_b_frames= !(buf[5] >> 7);
 
-                        avctx->bit_rate += (bit_rate_ext << 12) * 400;
                         pc->width  |=(horiz_size_ext << 12);
                         pc->height |=( vert_size_ext << 12);
+                        avctx->bit_rate += (bit_rate_ext << 18) * 400;
                         avcodec_set_dimensions(avctx, pc->width, pc->height);
-                        avctx->frame_rate = pc->frame_rate * (frame_rate_ext_n + 1);
-                        avctx->frame_rate_base = MPEG1_FRAME_RATE_BASE * (frame_rate_ext_d + 1);
+                        avctx->time_base.den = pc->frame_rate * (frame_rate_ext_n + 1);
+                        avctx->time_base.num = MPEG1_FRAME_RATE_BASE * (frame_rate_ext_d + 1);
                         avctx->codec_id = CODEC_ID_MPEG2VIDEO;
                         avctx->sub_id = 2; /* forces MPEG2 */
                         if (pc->aspect_ratio_info <= 1)
@@ -457,7 +461,7 @@ static int mpegvideo_parse(AVCodecParserContext *s,
     mpegvideo_extract_headers(s, avctx, buf, buf_size);
 #if 0
     printf("pict_type=%d frame_rate=%0.3f repeat_pict=%d\n", 
-           s->pict_type, (double)avctx->frame_rate / avctx->frame_rate_base, s->repeat_pict);
+           s->pict_type, (double)avctx->time_base.den / avctx->time_base.num, s->repeat_pict);
 #endif
 
     *poutbuf = (uint8_t *)buf;
@@ -558,6 +562,7 @@ typedef struct MpegAudioParseContext {
 #define MPA_HEADER_SIZE 4
 
 /* header + layer + bitrate + freq + lsf/mpeg25 */
+#undef SAME_HEADER_MASK /* mpegaudio.h defines different version */
 #define SAME_HEADER_MASK \
    (0xffe00000 | (3 << 17) | (3 << 10) | (3 << 19))
 
@@ -614,7 +619,7 @@ static int mpegaudio_parse(AVCodecParserContext *s1,
 
                 ret = mpa_decode_header(avctx, header);
                 if (ret < 0) {
-                    s->header_count= -2;  
+                    s->header_count= -2;
 		    /* no sync found : move by one byte (inefficient, but simple!) */
 		    memmove(s->inbuf, s->inbuf + 1, s->inbuf_ptr - s->inbuf - 1);
 		    s->inbuf_ptr--;
@@ -628,6 +633,7 @@ static int mpegaudio_parse(AVCodecParserContext *s1,
                     s->header= header;
                     s->header_count++;
                     s->frame_size = ret;
+                    
 #if 0
                     /* free format: prepare to compute frame size */
 		    if (decode_header(s, header) == 1) {
@@ -811,10 +817,10 @@ static int ac3_parse(AVCodecParserContext *s1,
 #endif
 
 AVCodecParser mpegvideo_parser = {
-    { CODEC_ID_MPEG1VIDEO,
+    { CODEC_ID_MPEG1VIDEO, 
       CODEC_ID_MPEG2VIDEO,
       CODEC_ID_MPEG2VIDEO_XVMC,
-      CODEC_ID_MPEG2VIDEO_XVMC_VLD,
+      CODEC_ID_MPEG2VIDEO_XVMC_VLD
     },
     sizeof(ParseContext1),
     NULL,

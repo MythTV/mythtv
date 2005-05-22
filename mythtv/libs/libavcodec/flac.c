@@ -143,6 +143,7 @@ static int64_t get_utf8(GetBitContext *gb)
     return val;
 }
 
+#if 0
 static int skip_utf8(GetBitContext *gb)
 {
     int ones=0, bytes;
@@ -163,6 +164,7 @@ static int skip_utf8(GetBitContext *gb)
     }
     return 0;
 }
+#endif
 
 static int get_crc8(const uint8_t *buf, int count){
     int crc=0;
@@ -554,7 +556,7 @@ static int decode_frame(FLACContext *s)
     skip_bits(&s->gb, 8);
     crc8= get_crc8(s->gb.buffer, get_bits_count(&s->gb)/8);
     if(crc8){
-        av_log(s->avctx, AV_LOG_ERROR, "header crc missmatch crc=%2X\n", crc8);
+        av_log(s->avctx, AV_LOG_ERROR, "header crc mismatch crc=%2X\n", crc8);
         return -1;
     }
     
@@ -591,12 +593,12 @@ static int flac_decode_frame(AVCodecContext *avctx,
     int16_t *samples = data;
 
     if(s->max_framesize == 0){
-        s->max_framesize= 8192; // should hopefully be enough for the first header
+        s->max_framesize= 65536; // should hopefully be enough for the first header
         s->bitstream= av_fast_realloc(s->bitstream, &s->allocated_bitstream_size, s->max_framesize);
     }
 
     if(1 && s->max_framesize){//FIXME truncated
-            buf_size= FFMIN(buf_size, s->max_framesize - s->bitstream_size);
+            buf_size= FFMAX(FFMIN(buf_size, s->max_framesize - s->bitstream_size), 0);
             input_buf_size= buf_size;
 
             if(s->bitstream_index + s->bitstream_size + buf_size > s->allocated_bitstream_size){
@@ -634,10 +636,20 @@ static int flac_decode_frame(AVCodecContext *avctx,
             if(metadata_size){
                 switch(metadata_type)
                 {
-                case METADATA_TYPE_STREAMINFO:
+                case METADATA_TYPE_STREAMINFO:{
                     metadata_streaminfo(s);
+
+                    /* Buffer might have been reallocated, reinit bitreader */
+                    if(buf != &s->bitstream[s->bitstream_index])
+                    {
+                        int bits_count = get_bits_count(&s->gb);
+                        buf= &s->bitstream[s->bitstream_index];
+                        init_get_bits(&s->gb, buf, buf_size*8);
+                        skip_bits(&s->gb, bits_count);
+                    }
+ 
                     dump_headers(s);
-                    break;
+                    break;}
                 default:
                     for(i=0; i<metadata_size; i++)
                         skip_bits(&s->gb, 8);

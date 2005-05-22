@@ -486,9 +486,9 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     if (targetbitrate == -1)
         usebitrate = -1;
 
-    mpa_ctx->frame_rate = (int)ceil(video_frame_rate * 100 *
+    mpa_ctx->time_base.den = (int)ceil(video_frame_rate * 100 *
                                     framerate_multiplier);
-    mpa_ctx->frame_rate_base = 100;
+    mpa_ctx->time_base.num = 100;
     mpa_ctx->bit_rate = usebitrate;
     mpa_ctx->bit_rate_tolerance = usebitrate * 100;
     mpa_ctx->qmin = maxquality;
@@ -515,7 +515,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx->idct_algo = FF_IDCT_AUTO;
     mpa_ctx->prediction_method = FF_PRED_LEFT;
     if (codec.lower() == "huffyuv" || codec.lower() == "mjpeg")
-        mpa_ctx->strict_std_compliance = -1;
+        mpa_ctx->strict_std_compliance = FF_COMPLIANCE_INOFFICIAL;
 
     pthread_mutex_lock(&avcodeclock); 
     if (avcodec_open(mpa_ctx, mpa_codec) < 0)
@@ -3422,7 +3422,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         mpa_picture.linesize[0] = frame->width;
         mpa_picture.linesize[1] = frame->width / 2;
         mpa_picture.linesize[2] = frame->width / 2;
-        mpa_picture.pts = timecode * 1000;
+        mpa_picture.pts = frame->frameNumber;
         mpa_picture.type = FF_BUFFER_TYPE_SHARED;
 
         if (wantkeyframe)

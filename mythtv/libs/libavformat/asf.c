@@ -182,7 +182,7 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
 	    asf->packet_size = asf->hdr.max_pktsize;
             asf->nb_packets = asf->hdr.packets_count;
         } else if (!memcmp(&g, &stream_header, sizeof(GUID))) {
-            int type, total_size, type_specific_size;
+            int type, total_size, type_specific_size, sizeX;
             unsigned int tag1;
             int64_t pos1, pos2;
 
@@ -196,9 +196,9 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
             if (!asf_st)
                 goto fail;
             st->priv_data = asf_st;
-            st->start_time = asf->hdr.preroll * (int64_t)AV_TIME_BASE / 1000;
+            st->start_time = asf->hdr.preroll;
             st->duration = asf->hdr.send_time / 
-                (10000000 / AV_TIME_BASE) - st->start_time;
+                (10000000 / 1000) - st->start_time;
             get_guid(pb, &g);
             if (!memcmp(&g, &audio_stream, sizeof(GUID))) {
                 type = CODEC_TYPE_AUDIO;
@@ -217,9 +217,6 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
 
             get_le32(pb);
 	    st->codec.codec_type = type;
-            /* 1 fps default (XXX: put 0 fps instead) */
-            st->codec.frame_rate = 1000; 
-            st->codec.frame_rate_base = 1;
             if (type == CODEC_TYPE_AUDIO) {
                 get_wav_header(pb, &st->codec, type_specific_size);
                 st->need_parsing = 1;
@@ -264,7 +261,7 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 get_le32(pb);
                 get_byte(pb);
                 size = get_le16(pb); /* size */
-                get_le32(pb); /* size */
+                sizeX= get_le32(pb); /* size */
                 st->codec.width = get_le32(pb);
 		st->codec.height = get_le32(pb);
                 /* not available for asf */
@@ -272,6 +269,8 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
 		st->codec.bits_per_sample = get_le16(pb); /* depth */
                 tag1 = get_le32(pb);
 		url_fskip(pb, 20);
+//                av_log(NULL, AV_LOG_DEBUG, "size:%d tsize:%d sizeX:%d\n", size, total_size, sizeX);
+                size= sizeX;
 		if (size > 40) {
 		    st->codec.extradata_size = size - 40;
 		    st->codec.extradata = av_mallocz(st->codec.extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
@@ -545,7 +544,10 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 	    asf->packet_size_left -= rsize;
 	    //printf("___objsize____  %d   %d    rs:%d\n", asf->packet_obj_size, asf->packet_frag_offset, rsize);
 
-	    if (asf->stream_index < 0 || s->streams[asf->stream_index]->discard) {
+	    if (asf->stream_index < 0
+                || s->streams[asf->stream_index]->discard >= AVDISCARD_ALL
+                || (!asf->packet_key_frame && s->streams[asf->stream_index]->discard >= AVDISCARD_NONKEY)
+                ) {
                 asf->packet_time_start = 0;
 		/* unhandled packet (should not happen) */
 		url_fskip(pb, asf->packet_frag_size);
@@ -574,7 +576,7 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 	    asf_st->frag_offset = 0;
 	    if (asf->packet_frag_offset != 0) {
 		url_fskip(pb, asf->packet_frag_size);
-		av_log(s, AV_LOG_INFO, "ff asf parser skiping %db\n", asf->packet_frag_size);
+		av_log(s, AV_LOG_INFO, "ff asf parser skipping %db\n", asf->packet_frag_size);
 		asf->packet_size_left -= asf->packet_frag_size;
 		continue;
 	    }

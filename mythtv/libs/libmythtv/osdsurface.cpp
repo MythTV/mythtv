@@ -6,9 +6,11 @@ using namespace std;
 
 #ifdef MMX
 
+extern "C" {
 #include "config.h"
 #include "dsputil.h"
 #include "i386/mmx.h"
+}
 
 #ifdef ARCH_X86_64
 #  define REG_b "rbx"

@@ -36,7 +36,7 @@ static int yuv4_generate_header(AVFormatContext *s, char* buf)
     width = st->codec.width;
     height = st->codec.height;
 
-    av_reduce(&raten, &rated, st->codec.frame_rate, st->codec.frame_rate_base, (1UL<<31)-1);
+    av_reduce(&raten, &rated, st->codec.time_base.den, st->codec.time_base.num, (1UL<<31)-1);
     
     aspectn = st->codec.sample_aspect_ratio.num;
     aspectd = st->codec.sample_aspect_ratio.den;
@@ -170,7 +170,7 @@ AVOutputFormat yuv4mpegpipe_oformat = {
     "yuv4mpegpipe",
     "YUV4MPEG pipe format",
     "",
-    "yuv4mpeg",
+    "y4m",
     sizeof(int),
     CODEC_ID_NONE,
     CODEC_ID_RAWVIDEO,
@@ -192,7 +192,7 @@ static int yuv4_read_header(AVFormatContext *s, AVFormatParameters *ap)
     int i;
     ByteIOContext *pb = &s->pb;
     int width=-1, height=-1, raten=0, rated=0, aspectn=0, aspectd=0,interlaced_frame=0,top_field_first=0;
-    enum PixelFormat pix_fmt=PIX_FMT_NB,alt_pix_fmt=PIX_FMT_NB;
+    enum PixelFormat pix_fmt=PIX_FMT_NONE,alt_pix_fmt=PIX_FMT_NONE;
     AVStream *st;
     
     for (i=0; i<MAX_YUV4_HEADER; i++) {
@@ -300,8 +300,8 @@ static int yuv4_read_header(AVFormatContext *s, AVFormatParameters *ap)
         return -1;        
     }
     
-    if (pix_fmt == PIX_FMT_NB) {
-        if (alt_pix_fmt == PIX_FMT_NB)
+    if (pix_fmt == PIX_FMT_NONE) {
+        if (alt_pix_fmt == PIX_FMT_NONE)
             pix_fmt = PIX_FMT_YUV420P;
         else
             pix_fmt = alt_pix_fmt;
@@ -323,8 +323,7 @@ static int yuv4_read_header(AVFormatContext *s, AVFormatParameters *ap)
     st->codec.width = width;
     st->codec.height = height;
     av_reduce(&raten, &rated, raten, rated, (1UL<<31)-1);
-    st->codec.frame_rate = raten;
-    st->codec.frame_rate_base = rated;
+    av_set_pts_info(st, 64, rated, raten);
     st->codec.pix_fmt = pix_fmt;
     st->codec.codec_type = CODEC_TYPE_VIDEO;
     st->codec.codec_id = CODEC_ID_RAWVIDEO;
@@ -375,15 +374,26 @@ static int yuv4_read_close(AVFormatContext *s)
     return 0;
 }
 
+static int yuv4_probe(AVProbeData *pd)
+{
+    /* check file header */
+    if (pd->buf_size <= sizeof(Y4M_MAGIC))
+        return 0;
+    if (strncmp(pd->buf, Y4M_MAGIC, sizeof(Y4M_MAGIC)-1)==0)
+        return AVPROBE_SCORE_MAX;
+    else
+        return 0;
+}
+
 AVInputFormat yuv4mpegpipe_iformat = {
     "yuv4mpegpipe",
     "YUV4MPEG pipe format",
     0,
-    NULL,
+    yuv4_probe,
     yuv4_read_header,
     yuv4_read_packet,
     yuv4_read_close,
-    .extensions = "yuv4mpeg"
+    .extensions = "y4m"
 };
 
 int yuv4mpeg_init(void)

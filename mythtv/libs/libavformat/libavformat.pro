@@ -24,7 +24,7 @@ SOURCES += img.c ipmovie.c mov.c movenc.c mp3.c mpeg.c mpegts.c mpegtsenc.c
 SOURCES += mpjpeg.c nut.c os_support.c rm.c psxstr.c raw.c flic.c audio.c
 SOURCES += segafilm.c swf.c utils.c wav.c wc3movie.c westwood.c yuv4mpeg.c
 SOURCES += sierravmd.c asf-enc.c matroska.c img2.c electronicarts.c sol.c
-SOURCES += nsvdec.c
+SOURCES += nsvdec.c ogg2.c oggparsevorbis.c oggparsetheora.c oggparseflac.c
 
 # not using:  barpainet.* beosaudio.cpp, dv1394.*, dc1394.c, framehook.*
 # not using:  gif.c gifdec.c grab.c http.c jpeg.c png.c pnm.c rtp.*

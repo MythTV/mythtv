@@ -172,6 +172,17 @@ offset_t url_ftell(ByteIOContext *s)
     return url_fseek(s, 0, SEEK_CUR);
 }
 
+offset_t url_fsize(ByteIOContext *s)
+{
+    offset_t size;
+    
+    if (!s->seek)
+        return -EPIPE;
+    size = s->seek(s->opaque, -1, SEEK_END) + 1;
+    s->seek(s->opaque, s->pos, SEEK_SET);
+    return size;
+}
+
 int url_feof(ByteIOContext *s)
 {
     return s->eof_reached;
@@ -333,10 +344,28 @@ int get_buffer(ByteIOContext *s, unsigned char *buf, int size)
         if (len > size)
             len = size;
         if (len == 0) {
-            fill_buffer(s);
-            len = s->buf_end - s->buf_ptr;
-            if (len == 0)
-                break;
+            if(size > s->buffer_size && !s->update_checksum){
+                len = s->read_packet(s->opaque, buf, size);
+                if (len <= 0) {
+                    /* do not modify buffer if EOF reached so that a seek back can
+                    be done without rereading data */
+                    s->eof_reached = 1;
+                    if(len<0)
+                        s->error= len;
+                    break;
+                } else {
+                    s->pos += len;
+                    size -= len;
+                    buf += len;
+                    s->buf_ptr = s->buffer;
+                    s->buf_end = s->buffer/* + len*/;
+                }
+            }else{
+                fill_buffer(s);
+                len = s->buf_end - s->buf_ptr;
+                if (len == 0)
+                    break;
+            }
         } else {
             memcpy(buf, s->buf_ptr, len);
             buf += len;

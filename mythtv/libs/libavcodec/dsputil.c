@@ -31,6 +31,9 @@
 #include "simple_idct.h"
 #include "faandct.h"
 
+/* snow.c */
+void ff_spatial_dwt(int *buffer, int width, int height, int stride, int type, int decomposition_count);
+
 uint8_t cropTbl[256 + 2 * MAX_NEG_CROP] = {0, };
 uint32_t squareTbl[512] = {0, };
 
@@ -289,6 +292,7 @@ static int sse16_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 
 
 static inline int w_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, int w, int h, int type){
+#ifdef CONFIG_SNOW_ENCODER //idwt is in snow.c
     int s, i, j;
     const int dec_count= w==8 ? 3 : 4;
     int tmp[16*16];
@@ -335,6 +339,7 @@ static inline int w_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, in
         pix1 += line_size;
         pix2 += line_size;
     }
+
     ff_spatial_dwt(tmp, w, h, 16, type, dec_count);
 
     s=0;
@@ -366,6 +371,7 @@ static inline int w_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, in
     assert(s>=0); 
     
     return s>>2;
+#endif
 }
 
 static int w53_8_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, int h){
@@ -2378,7 +2384,7 @@ H264_MC(avg_, 16)
 #define op_scale2(x)  dst[x] = clip_uint8( (src[x]*weights + dst[x]*weightd + offset) >> (log2_denom+1))
 #define H264_WEIGHT(W,H) \
 static void weight_h264_pixels ## W ## x ## H ## _c(uint8_t *block, int stride, int log2_denom, int weight, int offset){ \
-    int x, y; \
+    int attribute_unused x, y; \
     offset <<= log2_denom; \
     if(log2_denom) offset += 1<<(log2_denom-1); \
     for(y=0; y<H; y++, block += stride){ \
@@ -2404,7 +2410,7 @@ static void weight_h264_pixels ## W ## x ## H ## _c(uint8_t *block, int stride, 
     } \
 } \
 static void biweight_h264_pixels ## W ## x ## H ## _c(uint8_t *dst, uint8_t *src, int stride, int log2_denom, int weightd, int weights, int offsetd, int offsets){ \
-    int x, y; \
+    int attribute_unused x, y; \
     int offset = (offsets + offsetd + 1) >> 1; \
     offset = ((offset << 1) + 1) << log2_denom; \
     for(y=0; y<H; y++, dst += stride, src += stride){ \
@@ -2635,6 +2641,120 @@ static void h261_loop_filter_c(uint8_t *src, int stride){
             src[xy] = (temp[yz-1] + 2*temp[yz] + temp[yz+1] + 8)>>4;
         }
     }
+}
+
+static inline void h264_loop_filter_luma_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta, int8_t *tc0)
+{
+    int i, d;
+    for( i = 0; i < 4; i++ ) {
+        if( tc0[i] < 0 ) {
+            pix += 4*ystride;
+            continue;
+        }
+        for( d = 0; d < 4; d++ ) {
+            const int p0 = pix[-1*xstride];
+            const int p1 = pix[-2*xstride];
+            const int p2 = pix[-3*xstride];
+            const int q0 = pix[0];
+            const int q1 = pix[1*xstride];
+            const int q2 = pix[2*xstride];
+    
+            if( ABS( p0 - q0 ) < alpha &&
+                ABS( p1 - p0 ) < beta &&
+                ABS( q1 - q0 ) < beta ) {
+    
+                int tc = tc0[i];
+                int i_delta;
+    
+                if( ABS( p2 - p0 ) < beta ) {
+                    pix[-2*xstride] = p1 + clip( (( p2 + ( ( p0 + q0 + 1 ) >> 1 ) ) >> 1) - p1, -tc0[i], tc0[i] );
+                    tc++;
+                }
+                if( ABS( q2 - q0 ) < beta ) {
+                    pix[   xstride] = q1 + clip( (( q2 + ( ( p0 + q0 + 1 ) >> 1 ) ) >> 1) - q1, -tc0[i], tc0[i] );
+                    tc++;
+                }
+    
+                i_delta = clip( (((q0 - p0 ) << 2) + (p1 - q1) + 4) >> 3, -tc, tc );
+                pix[-xstride] = clip_uint8( p0 + i_delta );    /* p0' */
+                pix[0]        = clip_uint8( q0 - i_delta );    /* q0' */
+            }
+            pix += ystride;
+        }
+    }
+}
+static void h264_v_loop_filter_luma_c(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0)
+{
+    h264_loop_filter_luma_c(pix, stride, 1, alpha, beta, tc0);
+}
+static void h264_h_loop_filter_luma_c(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0)
+{
+    h264_loop_filter_luma_c(pix, 1, stride, alpha, beta, tc0);
+}
+
+static inline void h264_loop_filter_chroma_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta, int8_t *tc0)
+{
+    int i, d;
+    for( i = 0; i < 4; i++ ) {
+        const int tc = tc0[i];
+        if( tc <= 0 ) {
+            pix += 2*ystride;
+            continue;
+        }
+        for( d = 0; d < 2; d++ ) {
+            const int p0 = pix[-1*xstride];
+            const int p1 = pix[-2*xstride];
+            const int q0 = pix[0];
+            const int q1 = pix[1*xstride];
+
+            if( ABS( p0 - q0 ) < alpha &&
+                ABS( p1 - p0 ) < beta &&
+                ABS( q1 - q0 ) < beta ) {
+
+                int delta = clip( (((q0 - p0 ) << 2) + (p1 - q1) + 4) >> 3, -tc, tc );
+
+                pix[-xstride] = clip_uint8( p0 + delta );    /* p0' */
+                pix[0]        = clip_uint8( q0 - delta );    /* q0' */
+            }
+            pix += ystride;
+        }
+    }
+}
+static void h264_v_loop_filter_chroma_c(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0)
+{
+    h264_loop_filter_chroma_c(pix, stride, 1, alpha, beta, tc0);
+}
+static void h264_h_loop_filter_chroma_c(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0)
+{
+    h264_loop_filter_chroma_c(pix, 1, stride, alpha, beta, tc0);
+}
+
+static inline void h264_loop_filter_chroma_intra_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta)
+{
+    int d;
+    for( d = 0; d < 8; d++ ) {
+        const int p0 = pix[-1*xstride];
+        const int p1 = pix[-2*xstride];
+        const int q0 = pix[0];
+        const int q1 = pix[1*xstride];
+
+        if( ABS( p0 - q0 ) < alpha &&
+            ABS( p1 - p0 ) < beta &&
+            ABS( q1 - q0 ) < beta ) {
+
+            pix[-xstride] = ( 2*p1 + p0 + q1 + 2 ) >> 2;   /* p0' */
+            pix[0]        = ( 2*q1 + q0 + p1 + 2 ) >> 2;   /* q0' */
+        }
+        pix += ystride;
+    }
+}
+static void h264_v_loop_filter_chroma_intra_c(uint8_t *pix, int stride, int alpha, int beta)
+{
+    h264_loop_filter_chroma_intra_c(pix, stride, 1, alpha, beta);
+}
+static void h264_h_loop_filter_chroma_intra_c(uint8_t *pix, int stride, int alpha, int beta)
+{
+    h264_loop_filter_chroma_intra_c(pix, 1, stride, alpha, beta);
 }
 
 static inline int pix_abs16_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
@@ -3551,6 +3671,11 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
             c->idct_add= ff_jref_idct_add;
             c->idct    = j_rev_dct;
             c->idct_permutation_type= FF_LIBMPEG2_IDCT_PERM;
+        }else if(avctx->idct_algo==FF_IDCT_VP3){
+            c->idct_put= ff_vp3_idct_put_c;
+            c->idct_add= ff_vp3_idct_add_c;
+            c->idct    = ff_vp3_idct_c;
+            c->idct_permutation_type= FF_NO_IDCT_PERM;
         }else{ //accurate/default
             c->idct_put= simple_idct_put;
             c->idct_add= simple_idct_add;
@@ -3560,10 +3685,6 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     }
 
     c->h264_idct_add= ff_h264_idct_add_c;
-
-    /* VP3 DSP support */
-    c->vp3_dsp_init = vp3_dsp_init_c;
-    c->vp3_idct = vp3_idct_c;
 
     c->get_pixels = get_pixels_c;
     c->diff_pixels = diff_pixels_c;
@@ -3736,6 +3857,13 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->diff_bytes= diff_bytes_c;
     c->sub_hfyu_median_prediction= sub_hfyu_median_prediction_c;
     c->bswap_buf= bswap_buf;
+
+    c->h264_v_loop_filter_luma= h264_v_loop_filter_luma_c;
+    c->h264_h_loop_filter_luma= h264_h_loop_filter_luma_c;
+    c->h264_v_loop_filter_chroma= h264_v_loop_filter_chroma_c;
+    c->h264_h_loop_filter_chroma= h264_h_loop_filter_chroma_c;
+    c->h264_v_loop_filter_chroma_intra= h264_v_loop_filter_chroma_intra_c;
+    c->h264_h_loop_filter_chroma_intra= h264_h_loop_filter_chroma_intra_c;
     
     c->h263_h_loop_filter= h263_h_loop_filter_c;
     c->h263_v_loop_filter= h263_v_loop_filter_c;
@@ -3786,6 +3914,10 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     case FF_TRANSPOSE_IDCT_PERM:
         for(i=0; i<64; i++)
             c->idct_permutation[i]= ((i&7)<<3) | (i>>3);
+        break;
+    case FF_PARTTRANS_IDCT_PERM:
+        for(i=0; i<64; i++)
+            c->idct_permutation[i]= (i&0x24) | ((i&3)<<3) | ((i>>3)&3);
         break;
     default:
         av_log(avctx, AV_LOG_ERROR, "Internal error, IDCT permutation not set\n");

@@ -39,11 +39,13 @@ static const uint64_t mm_wtwo attribute_used __attribute__ ((aligned(8))) = 0x00
 
 static const uint64_t ff_pw_20 attribute_used __attribute__ ((aligned(8))) = 0x0014001400140014ULL;
 static const uint64_t ff_pw_3  attribute_used __attribute__ ((aligned(8))) = 0x0003000300030003ULL;
+static const uint64_t ff_pw_4  attribute_used __attribute__ ((aligned(8))) = 0x0004000400040004ULL;
 static const uint64_t ff_pw_5  attribute_used __attribute__ ((aligned(8))) = 0x0005000500050005ULL;
 static const uint64_t ff_pw_16 attribute_used __attribute__ ((aligned(8))) = 0x0010001000100010ULL;
 static const uint64_t ff_pw_32 attribute_used __attribute__ ((aligned(8))) = 0x0020002000200020ULL;
 static const uint64_t ff_pw_15 attribute_used __attribute__ ((aligned(8))) = 0x000F000F000F000FULL;
 
+static const uint64_t ff_pb_3F attribute_used __attribute__ ((aligned(8))) = 0x3F3F3F3F3F3F3F3FULL;
 static const uint64_t ff_pb_FC attribute_used __attribute__ ((aligned(8))) = 0xFCFCFCFCFCFCFCFCULL;
 
 #define JUMPALIGN() __asm __volatile (".balign 8"::)
@@ -690,6 +692,265 @@ static void h263_h_loop_filter_mmx(uint8_t *src, int stride, int qscale){
            "r" ((long)(3*stride))
     );
 }
+
+
+// out: o = |x-y|>a
+// clobbers: t
+#define DIFF_GT_MMX(x,y,a,o,t)\
+    "movq     "#y", "#t"  \n\t"\
+    "movq     "#x", "#o"  \n\t"\
+    "psubusb  "#x", "#t"  \n\t"\
+    "psubusb  "#y", "#o"  \n\t"\
+    "por      "#t", "#o"  \n\t"\
+    "psubusb  "#a", "#o"  \n\t"
+
+// in: mm0=p1 mm1=p0 mm2=q0 mm3=q1
+// out: mm5=beta-1, mm7=mask
+// clobbers: mm4,mm6
+#define H264_DEBLOCK_MASK(alpha1, beta1) \
+    "pshufw $0, "#alpha1", %%mm4 \n\t"\
+    "pshufw $0, "#beta1 ", %%mm5 \n\t"\
+    "packuswb  %%mm4, %%mm4      \n\t"\
+    "packuswb  %%mm5, %%mm5      \n\t"\
+    DIFF_GT_MMX(%%mm1, %%mm2, %%mm4, %%mm7, %%mm6) /* |p0-q0| > alpha-1 */\
+    DIFF_GT_MMX(%%mm0, %%mm1, %%mm5, %%mm4, %%mm6) /* |p1-p0| > beta-1 */\
+    "por       %%mm4, %%mm7      \n\t"\
+    DIFF_GT_MMX(%%mm3, %%mm2, %%mm5, %%mm4, %%mm6) /* |q1-q0| > beta-1 */\
+    "por       %%mm4, %%mm7      \n\t"\
+    "pxor      %%mm6, %%mm6      \n\t"\
+    "pcmpeqb   %%mm6, %%mm7      \n\t"
+
+// in: mm0=p1 mm1=p0 mm2=q0 mm3=q1 mm7=(tc&mask)
+// out: mm1=p0' mm2=q0'
+// clobbers: mm0,3-6
+#define H264_DEBLOCK_P0_Q0(pb_01, pb_3f)\
+        /* a = q0^p0^((p1-q1)>>2) */\
+        "movq    %%mm0, %%mm4  \n\t"\
+        "psubb   %%mm3, %%mm4  \n\t"\
+        "psrlw   $2,    %%mm4  \n\t"\
+        "pxor    %%mm1, %%mm4  \n\t"\
+        "pxor    %%mm2, %%mm4  \n\t"\
+        /* b = p0^(q1>>2) */\
+        "psrlw   $2,    %%mm3  \n\t"\
+        "pand "#pb_3f", %%mm3  \n\t"\
+        "movq    %%mm1, %%mm5  \n\t"\
+        "pxor    %%mm3, %%mm5  \n\t"\
+        /* c = q0^(p1>>2) */\
+        "psrlw   $2,    %%mm0  \n\t"\
+        "pand "#pb_3f", %%mm0  \n\t"\
+        "movq    %%mm2, %%mm6  \n\t"\
+        "pxor    %%mm0, %%mm6  \n\t"\
+        /* d = (c^b) & ~(b^a) & 1 */\
+        "pxor    %%mm5, %%mm6  \n\t"\
+        "pxor    %%mm4, %%mm5  \n\t"\
+        "pandn   %%mm6, %%mm5  \n\t"\
+        "pand "#pb_01", %%mm5  \n\t"\
+        /* delta = (avg(q0, p1>>2) + (d&a))
+         *       - (avg(p0, q1>>2) + (d&~a)) */\
+        "pavgb   %%mm2, %%mm0  \n\t"\
+        "movq    %%mm5, %%mm6  \n\t"\
+        "pand    %%mm4, %%mm6  \n\t"\
+        "paddusb %%mm6, %%mm0  \n\t"\
+        "pavgb   %%mm1, %%mm3  \n\t"\
+        "pandn   %%mm5, %%mm4  \n\t"\
+        "paddusb %%mm4, %%mm3  \n\t"\
+        /* p0 += clip(delta, -tc0, tc0)
+         * q0 -= clip(delta, -tc0, tc0) */\
+        "movq    %%mm0, %%mm4  \n\t"\
+        "psubusb %%mm3, %%mm0  \n\t"\
+        "psubusb %%mm4, %%mm3  \n\t"\
+        "pminub  %%mm7, %%mm0  \n\t"\
+        "pminub  %%mm7, %%mm3  \n\t"\
+        "paddusb %%mm0, %%mm1  \n\t"\
+        "paddusb %%mm3, %%mm2  \n\t"\
+        "psubusb %%mm3, %%mm1  \n\t"\
+        "psubusb %%mm0, %%mm2  \n\t"
+
+// in: mm0=p1 mm1=p0 mm2=q0 mm3=q1 mm7=(tc&mask) %8=mm_bone
+// out: (q1addr) = clip( (q2+((p0+q0+1)>>1))>>1, q1-tc0, q1+tc0 )
+// clobbers: q2, tmp, tc0
+#define H264_DEBLOCK_Q1(p1, q2, q2addr, q1addr, tc0, tmp)\
+        "movq     %%mm1,  "#tmp"   \n\t"\
+        "pavgb    %%mm2,  "#tmp"   \n\t"\
+        "pavgb    "#tmp", "#q2"    \n\t" /* avg(p2,avg(p0,q0)) */\
+        "pxor   "q2addr", "#tmp"   \n\t"\
+        "pand     %8,     "#tmp"   \n\t" /* (p2^avg(p0,q0))&1 */\
+        "psubusb  "#tmp", "#q2"    \n\t" /* (p2+((p0+q0+1)>>1))>>1 */\
+        "movq     "#p1",  "#tmp"   \n\t"\
+        "psubusb  "#tc0", "#tmp"   \n\t"\
+        "paddusb  "#p1",  "#tc0"   \n\t"\
+        "pmaxub   "#tmp", "#q2"    \n\t"\
+        "pminub   "#tc0", "#q2"    \n\t"\
+        "movq     "#q2",  "q1addr" \n\t"
+
+static inline void h264_loop_filter_luma_mmx2(uint8_t *pix, int stride, int alpha1, int beta1, int8_t *tc0)
+{
+    uint64_t tmp0;
+    uint64_t tc = (uint8_t)tc0[1]*0x01010000 | (uint8_t)tc0[0]*0x0101;
+    // with luma, tc0=0 doesn't mean no filtering, so we need a separate input mask
+    uint32_t mask[2] = { (tc0[0]>=0)*0xffffffff, (tc0[1]>=0)*0xffffffff };
+
+    asm volatile(
+        "movq    (%1,%3), %%mm0    \n\t" //p1
+        "movq    (%1,%3,2), %%mm1  \n\t" //p0
+        "movq    (%2),    %%mm2    \n\t" //q0
+        "movq    (%2,%3), %%mm3    \n\t" //q1
+        H264_DEBLOCK_MASK(%6, %7)
+        "pand     %5,     %%mm7    \n\t"
+        "movq     %%mm7,  %0       \n\t"
+
+        /* filter p1 */
+        "movq     (%1),   %%mm3    \n\t" //p2
+        DIFF_GT_MMX(%%mm1, %%mm3, %%mm5, %%mm6, %%mm4) // |p2-p0|>beta-1
+        "pandn    %%mm7,  %%mm6    \n\t"
+        "pcmpeqb  %%mm7,  %%mm6    \n\t"
+        "pand     %%mm7,  %%mm6    \n\t" // mask & |p2-p0|<beta
+        "pshufw  $80, %4, %%mm4    \n\t"
+        "pand     %%mm7,  %%mm4    \n\t" // mask & tc0
+        "movq     %8,     %%mm7    \n\t"
+        "pand     %%mm6,  %%mm7    \n\t" // mask & |p2-p0|<beta & 1
+        "pand     %%mm4,  %%mm6    \n\t" // mask & |p2-p0|<beta & tc0
+        "paddb    %%mm4,  %%mm7    \n\t" // tc++
+        H264_DEBLOCK_Q1(%%mm0, %%mm3, "(%1)", "(%1,%3)", %%mm6, %%mm4)
+
+        /* filter q1 */
+        "movq    (%2,%3,2), %%mm4  \n\t" //q2
+        DIFF_GT_MMX(%%mm2, %%mm4, %%mm5, %%mm6, %%mm3) // |q2-q0|>beta-1
+        "pandn    %0,     %%mm6    \n\t"
+        "pcmpeqb  %0,     %%mm6    \n\t"
+        "pand     %0,     %%mm6    \n\t"
+        "pshufw  $80, %4, %%mm5    \n\t"
+        "pand     %%mm6,  %%mm5    \n\t"
+        "pand     %8,     %%mm6    \n\t"
+        "paddb    %%mm6,  %%mm7    \n\t"
+        "movq    (%2,%3), %%mm3    \n\t"
+        H264_DEBLOCK_Q1(%%mm3, %%mm4, "(%2,%3,2)", "(%2,%3)", %%mm5, %%mm6)
+
+        /* filter p0, q0 */
+        H264_DEBLOCK_P0_Q0(%8, %9)
+        "movq      %%mm1, (%1,%3,2) \n\t"
+        "movq      %%mm2, (%2)      \n\t"
+
+        : "=m"(tmp0)
+        : "r"(pix-3*stride), "r"(pix), "r"((long)stride),
+          "m"(tc), "m"(*(uint64_t*)mask), "m"(alpha1), "m"(beta1),
+          "m"(mm_bone), "m"(ff_pb_3F)
+    );
+}
+
+static void h264_v_loop_filter_luma_mmx2(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0)
+{
+    if((tc0[0] & tc0[1]) >= 0)
+        h264_loop_filter_luma_mmx2(pix, stride, alpha-1, beta-1, tc0);
+    if((tc0[2] & tc0[3]) >= 0)
+        h264_loop_filter_luma_mmx2(pix+8, stride, alpha-1, beta-1, tc0+2);
+}
+static void h264_h_loop_filter_luma_mmx2(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0)
+{
+    //FIXME: could cut some load/stores by merging transpose with filter
+    // also, it only needs to transpose 6x8
+    uint8_t trans[8*8];
+    int i;
+    for(i=0; i<2; i++, pix+=8*stride, tc0+=2) {
+        if((tc0[0] & tc0[1]) < 0)
+            continue;
+        transpose4x4(trans,       pix-4,          8, stride);
+        transpose4x4(trans  +4*8, pix,            8, stride);
+        transpose4x4(trans+4,     pix-4+4*stride, 8, stride);
+        transpose4x4(trans+4+4*8, pix  +4*stride, 8, stride);
+        h264_loop_filter_luma_mmx2(trans+4*8, 8, alpha-1, beta-1, tc0);
+        transpose4x4(pix-2,          trans  +2*8, stride, 8);
+        transpose4x4(pix-2+4*stride, trans+4+2*8, stride, 8);
+    }
+}
+
+static inline void h264_loop_filter_chroma_mmx2(uint8_t *pix, int stride, int alpha1, int beta1, int8_t *tc0)
+{
+    asm volatile(
+        "movq    (%0),    %%mm0     \n\t" //p1
+        "movq    (%0,%2), %%mm1     \n\t" //p0
+        "movq    (%1),    %%mm2     \n\t" //q0
+        "movq    (%1,%2), %%mm3     \n\t" //q1
+        H264_DEBLOCK_MASK(%4, %5)
+        "movd      %3,    %%mm6     \n\t"
+        "punpcklbw %%mm6, %%mm6     \n\t"
+        "pand      %%mm6, %%mm7     \n\t" // mm7 = tc&mask
+        H264_DEBLOCK_P0_Q0(%6, %7)
+        "movq      %%mm1, (%0,%2)   \n\t"
+        "movq      %%mm2, (%1)      \n\t"
+
+        :: "r"(pix-2*stride), "r"(pix), "r"((long)stride),
+           "r"(*(uint32_t*)tc0),
+           "m"(alpha1), "m"(beta1), "m"(mm_bone), "m"(ff_pb_3F)
+    );
+}
+
+static void h264_v_loop_filter_chroma_mmx2(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0)
+{
+    h264_loop_filter_chroma_mmx2(pix, stride, alpha-1, beta-1, tc0);
+}
+
+static void h264_h_loop_filter_chroma_mmx2(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0)
+{
+    //FIXME: could cut some load/stores by merging transpose with filter
+    uint8_t trans[8*4];
+    transpose4x4(trans, pix-2, 8, stride);
+    transpose4x4(trans+4, pix-2+4*stride, 8, stride);
+    h264_loop_filter_chroma_mmx2(trans+2*8, 8, alpha-1, beta-1, tc0);
+    transpose4x4(pix-2, trans, stride, 8);
+    transpose4x4(pix-2+4*stride, trans+4, stride, 8);
+}
+
+// p0 = (p0 + q1 + 2*p1 + 2) >> 2
+#define H264_FILTER_CHROMA4(p0, p1, q1, one) \
+    "movq    "#p0", %%mm4  \n\t"\
+    "pxor    "#q1", %%mm4  \n\t"\
+    "pand   "#one", %%mm4  \n\t" /* mm4 = (p0^q1)&1 */\
+    "pavgb   "#q1", "#p0"  \n\t"\
+    "psubusb %%mm4, "#p0"  \n\t"\
+    "pavgb   "#p1", "#p0"  \n\t" /* dst = avg(p1, avg(p0,q1) - ((p0^q1)&1)) */\
+
+static inline void h264_loop_filter_chroma_intra_mmx2(uint8_t *pix, int stride, int alpha1, int beta1)
+{
+    asm volatile(
+        "movq    (%0),    %%mm0     \n\t"
+        "movq    (%0,%2), %%mm1     \n\t"
+        "movq    (%1),    %%mm2     \n\t"
+        "movq    (%1,%2), %%mm3     \n\t"
+        H264_DEBLOCK_MASK(%3, %4)
+        "movq    %%mm1,   %%mm5     \n\t"
+        "movq    %%mm2,   %%mm6     \n\t"
+        H264_FILTER_CHROMA4(%%mm1, %%mm0, %%mm3, %5) //p0'
+        H264_FILTER_CHROMA4(%%mm2, %%mm3, %%mm0, %5) //q0'
+        "psubb   %%mm5,   %%mm1     \n\t"
+        "psubb   %%mm6,   %%mm2     \n\t"
+        "pand    %%mm7,   %%mm1     \n\t"
+        "pand    %%mm7,   %%mm2     \n\t"
+        "paddb   %%mm5,   %%mm1     \n\t"
+        "paddb   %%mm6,   %%mm2     \n\t"
+        "movq    %%mm1,   (%0,%2)   \n\t"
+        "movq    %%mm2,   (%1)      \n\t"
+        :: "r"(pix-2*stride), "r"(pix), "r"((long)stride),
+           "m"(alpha1), "m"(beta1), "m"(mm_bone)
+    );
+}
+
+static void h264_v_loop_filter_chroma_intra_mmx2(uint8_t *pix, int stride, int alpha, int beta)
+{
+    h264_loop_filter_chroma_intra_mmx2(pix, stride, alpha-1, beta-1);
+}
+
+static void h264_h_loop_filter_chroma_intra_mmx2(uint8_t *pix, int stride, int alpha, int beta)
+{
+    //FIXME: could cut some load/stores by merging transpose with filter
+    uint8_t trans[8*4];
+    transpose4x4(trans, pix-2, 8, stride);
+    transpose4x4(trans+4, pix-2+4*stride, 8, stride);
+    h264_loop_filter_chroma_intra_mmx2(trans+2*8, 8, alpha-1, beta-1);
+    transpose4x4(pix-2, trans, stride, 8);
+    transpose4x4(pix-2+4*stride, trans+4, stride, 8);
+}
+
 
 #ifdef CONFIG_ENCODERS
 static int pix_norm1_mmx(uint8_t *pix, int line_size) {
@@ -2916,6 +3177,10 @@ static void add_8x8basis_mmx(int16_t rem[64], int16_t basis[64], int scale){
 void ff_mmx_idct(DCTELEM *block);
 void ff_mmxext_idct(DCTELEM *block);
 
+void ff_vp3_idct_sse2(int16_t *input_data);
+void ff_vp3_idct_mmx(int16_t *data);
+void ff_vp3_dsp_init_mmx(void);
+
 /* XXX: those functions should be suppressed ASAP when all IDCTs are
    converted */
 static void ff_libmpeg2mmx_idct_put(uint8_t *dest, int line_size, DCTELEM *block)
@@ -2936,6 +3201,26 @@ static void ff_libmpeg2mmx2_idct_put(uint8_t *dest, int line_size, DCTELEM *bloc
 static void ff_libmpeg2mmx2_idct_add(uint8_t *dest, int line_size, DCTELEM *block)
 {
     ff_mmxext_idct (block);
+    add_pixels_clamped_mmx(block, dest, line_size);
+}
+static void ff_vp3_idct_put_sse2(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    ff_vp3_idct_sse2(block);
+    put_signed_pixels_clamped_mmx(block, dest, line_size);
+}
+static void ff_vp3_idct_add_sse2(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    ff_vp3_idct_sse2(block);
+    add_pixels_clamped_mmx(block, dest, line_size);
+}
+static void ff_vp3_idct_put_mmx(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    ff_vp3_idct_mmx(block);
+    put_signed_pixels_clamped_mmx(block, dest, line_size);
+}
+static void ff_vp3_idct_add_mmx(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    ff_vp3_idct_mmx(block);
     add_pixels_clamped_mmx(block, dest, line_size);
 }
     
@@ -2997,16 +3282,20 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
                     c->idct    = ff_mmx_idct;
                 }
                 c->idct_permutation_type= FF_LIBMPEG2_IDCT_PERM;
+            }else if(idct_algo==FF_IDCT_VP3){
+                if(mm_flags & MM_SSE2){
+                    c->idct_put= ff_vp3_idct_put_sse2;
+                    c->idct_add= ff_vp3_idct_add_sse2;
+                    c->idct    = ff_vp3_idct_sse2;
+                    c->idct_permutation_type= FF_TRANSPOSE_IDCT_PERM;
+                }else{
+                    ff_vp3_dsp_init_mmx();
+                    c->idct_put= ff_vp3_idct_put_mmx;
+                    c->idct_add= ff_vp3_idct_add_mmx;
+                    c->idct    = ff_vp3_idct_mmx;
+                    c->idct_permutation_type= FF_PARTTRANS_IDCT_PERM;
+                }
             }
-        }
-
-        /* VP3 optimized DSP functions */
-        if (mm_flags & MM_SSE2) {
-            c->vp3_dsp_init = vp3_dsp_init_sse2;
-            c->vp3_idct = vp3_idct_sse2;
-        } else {
-            c->vp3_dsp_init = vp3_dsp_init_mmx;
-            c->vp3_idct = vp3_idct_mmx;
         }
 
 #ifdef CONFIG_ENCODERS
@@ -3183,6 +3472,13 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             dspfunc(avg_h264_qpel, 1, 8);
             dspfunc(avg_h264_qpel, 2, 4);
 #undef dspfunc
+
+            c->h264_v_loop_filter_luma= h264_v_loop_filter_luma_mmx2;
+            c->h264_h_loop_filter_luma= h264_h_loop_filter_luma_mmx2;
+            c->h264_v_loop_filter_chroma= h264_v_loop_filter_chroma_mmx2;
+            c->h264_h_loop_filter_chroma= h264_h_loop_filter_chroma_mmx2;
+            c->h264_v_loop_filter_chroma_intra= h264_v_loop_filter_chroma_intra_mmx2;
+            c->h264_h_loop_filter_chroma_intra= h264_h_loop_filter_chroma_intra_mmx2;
 
 #ifdef CONFIG_ENCODERS
             c->sub_hfyu_median_prediction= sub_hfyu_median_prediction_mmx2;

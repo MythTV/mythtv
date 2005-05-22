@@ -177,10 +177,12 @@ static void common_init(MpegEncContext * s)
         s->y_dc_scale_table= wmv1_y_dc_scale_table;
         s->c_dc_scale_table= wmv1_c_dc_scale_table;
         break;
+#if defined(CONFIG_WMV3_DECODER)||defined(CONFIG_VC9_DECODER)
     case 6:
         s->y_dc_scale_table= wmv3_dc_scale_table;
         s->c_dc_scale_table= wmv3_dc_scale_table;
         break;
+#endif
 
     }
 
@@ -438,7 +440,7 @@ void msmpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
 
 void msmpeg4_encode_ext_header(MpegEncContext * s)
 {
-        put_bits(&s->pb, 5, s->avctx->frame_rate / s->avctx->frame_rate_base); //yes 29.97 -> 29
+        put_bits(&s->pb, 5, s->avctx->time_base.den / s->avctx->time_base.num); //yes 29.97 -> 29
 
         put_bits(&s->pb, 11, FFMIN(s->bit_rate/1024, 2047));
 
@@ -1492,7 +1494,7 @@ static int msmpeg4v12_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
                 s->mv_type = MV_TYPE_16X16;
                 s->mv[0][0][0] = 0;
                 s->mv[0][0][1] = 0;
-                s->mb_skiped = 1;
+                s->mb_skipped = 1;
                 return 0;
             }
         }
@@ -1552,6 +1554,7 @@ static int msmpeg4v12_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
         }
     }
 
+    s->dsp.clear_blocks(s->block[0]);
     for (i = 0; i < 6; i++) {
         if (msmpeg4_decode_block(s, block[i], i, (cbp >> (5 - i)) & 1, NULL) < 0)
 	{
@@ -1580,7 +1583,7 @@ static int msmpeg4v34_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
                 s->mv_type = MV_TYPE_16X16;
                 s->mv[0][0][0] = 0;
                 s->mv[0][0][1] = 0;
-                s->mb_skiped = 1;
+                s->mb_skipped = 1;
                 *mb_type_ptr = MB_TYPE_SKIP | MB_TYPE_L0 | MB_TYPE_16x16;
 
                 return 0;
@@ -1644,6 +1647,7 @@ static int msmpeg4v34_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
         }
     }
 
+    s->dsp.clear_blocks(s->block[0]);
     for (i = 0; i < 6; i++) {
         if (msmpeg4_decode_block(s, block[i], i, (cbp >> (5 - i)) & 1, NULL) < 0)
 	{
@@ -1731,7 +1735,7 @@ static inline int msmpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
     OPEN_READER(re, &s->gb);
     for(;;) {
         UPDATE_CACHE(re, &s->gb);
-        GET_RL_VLC(level, run, re, &s->gb, rl_vlc, TEX_VLC_BITS, 2);
+        GET_RL_VLC(level, run, re, &s->gb, rl_vlc, TEX_VLC_BITS, 2, 0);
         if (level==0) {
             int cache;
             cache= GET_CACHE(re, &s->gb);
@@ -1829,7 +1833,7 @@ static inline int msmpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
 #else
                     SKIP_BITS(re, &s->gb, 2);
 #endif
-                    GET_RL_VLC(level, run, re, &s->gb, rl_vlc, TEX_VLC_BITS, 2);
+                    GET_RL_VLC(level, run, re, &s->gb, rl_vlc, TEX_VLC_BITS, 2, 1);
                     i+= run + rl->max_run[run>>7][level/qmul] + run_diff; //FIXME opt indexing
                     level = (level ^ SHOW_SBITS(re, &s->gb, 1)) - SHOW_SBITS(re, &s->gb, 1);
                     LAST_SKIP_BITS(re, &s->gb, 1);
@@ -1848,7 +1852,7 @@ static inline int msmpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
 #else
                 SKIP_BITS(re, &s->gb, 1);
 #endif
-                GET_RL_VLC(level, run, re, &s->gb, rl_vlc, TEX_VLC_BITS, 2);
+                GET_RL_VLC(level, run, re, &s->gb, rl_vlc, TEX_VLC_BITS, 2, 1);
                 i+= run;
                 level = level + rl->max_level[run>>7][(run-1)&63] * qmul;//FIXME opt indexing
                 level = (level ^ SHOW_SBITS(re, &s->gb, 1)) - SHOW_SBITS(re, &s->gb, 1);

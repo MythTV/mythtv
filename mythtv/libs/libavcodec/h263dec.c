@@ -195,11 +195,10 @@ static int decode_slice(MpegEncContext *s){
             }
 
             /* DCT & quantize */
-	    s->dsp.clear_blocks(s->block[0]);
-            
+           
             s->mv_dir = MV_DIR_FORWARD;
             s->mv_type = MV_TYPE_16X16;
-//            s->mb_skiped = 0;
+//            s->mb_skipped = 0;
 //printf("%d %d %06X\n", ret, get_bits_count(&s->gb), show_bits(&s->gb, 24));
             ret= s->decode_mb(s, s->block);
 
@@ -451,7 +450,7 @@ uint64_t time= rdtsc();
         }else if(s->codec_id==CODEC_ID_H263){
             next= h263_find_frame_end(&s->parse_context, buf, buf_size);
         }else{
-            av_log(s->avctx, AV_LOG_ERROR, "this codec doesnt support truncated bitstreams\n");
+            av_log(s->avctx, AV_LOG_ERROR, "this codec does not support truncated bitstreams\n");
             return -1;
         }
         
@@ -503,7 +502,7 @@ retry:
         ret = h263_decode_picture_header(s);
     }
     
-    if(ret==FRAME_SKIPED) return get_consumed_bytes(s, buf_size);
+    if(ret==FRAME_SKIPPED) return get_consumed_bytes(s, buf_size);
 
     /* skip if the header was thrashed */
     if (ret < 0){
@@ -783,12 +782,6 @@ printf("%Ld\n", rdtsc()-time);
     return get_consumed_bytes(s, buf_size);
 }
 
-static const AVOption mpeg4_decoptions[] =
-{
-    AVOPTION_SUB(avoptions_workaround_bug),
-    AVOPTION_END()
-};
-
 AVCodec mpeg4_decoder = {
     "mpeg4",
     CODEC_TYPE_VIDEO,
@@ -799,7 +792,6 @@ AVCodec mpeg4_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED | CODEC_CAP_DELAY,
-    .options = mpeg4_decoptions,
     .flush= ff_mpeg_flush,
 };
 
@@ -826,7 +818,6 @@ AVCodec msmpeg4v1_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
-    mpeg4_decoptions,
 };
 
 AVCodec msmpeg4v2_decoder = {
@@ -839,7 +830,6 @@ AVCodec msmpeg4v2_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
-    mpeg4_decoptions,
 };
 
 AVCodec msmpeg4v3_decoder = {
@@ -852,7 +842,6 @@ AVCodec msmpeg4v3_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
-    .options = mpeg4_decoptions,
 };
 
 AVCodec wmv1_decoder = {
@@ -865,7 +854,6 @@ AVCodec wmv1_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
-    mpeg4_decoptions,
 };
 
 AVCodec h263i_decoder = {
@@ -878,7 +866,6 @@ AVCodec h263i_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
-    mpeg4_decoptions,
 };
 
 AVCodec flv_decoder = {

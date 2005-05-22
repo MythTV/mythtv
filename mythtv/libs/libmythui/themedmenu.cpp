@@ -369,7 +369,7 @@ void ThemedMenuState::parseBackground(const QString &dir, QDomElement& element)
                 buttonArea = parseRect(getFirstText(info));
                 hasarea = true;
 
-                if (info.hasAttribute( "background" ))
+                if (info.hasAttribute("background"))
                 {
                     cerr << "Loading " << info.attribute("background") << endl;
                     QString bPath = dir + info.attribute("background");
