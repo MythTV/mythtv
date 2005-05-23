@@ -209,7 +209,6 @@ class TV : public QObject
     QString PlayMesg(void);
 
     // Configuration variables from database
-    int repoLevel;
     QString baseFilters;
     int fftime;
     int rewtime;
@@ -224,7 +223,7 @@ class TV : public QObject
 
     // Configuretion variables from DB in RunTV
     int stickykeys;
-    int ff_rew_repos;
+    float ff_rew_repos;
     bool ff_rew_reverse;
     bool smartForward;
     

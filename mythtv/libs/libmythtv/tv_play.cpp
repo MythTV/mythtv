@@ -36,49 +36,22 @@ using namespace std;
 struct SeekSpeedInfo {
     QString   dispString;
     float  scaling;
-    float ff_repos;
-    float rew_repos;
 };
 
-#define MAX_REPO_LEVEL 3
-SeekSpeedInfo seek_speed_array[MAX_REPO_LEVEL][9] =
+SeekSpeedInfo seek_speed_array[8] =
 {
-    // Less adjustment overall, no adjustment on the low end
-    {
-     {  "3X",    3.0,   1.50,   2.50},
-     {  "5X",    5.0,   2.50,   2.50},
-     { "10X",   10.0,   5.00,   5.00},
-     { "20X",   20.0,  10.00,  10.00},
-     { "30X",   30.0,  15.00,  15.00},
-     { "60X",   60.0,  30.00,  30.00},
-     {"120X",  120.0,  60.00,  60.00},
-     {"180X",  180.0,  90.00,  90.00}},
-    
-    // Less adjustment overall
-    {
-     {  "3X",    3.0,   2.50,   2.50},
-     {  "5X",    5.0,   3.75,   3.75},
-     { "10X",   10.0,   7.50,   7.50},
-     { "20X",   20.0,  15.00,  15.00},
-     { "30X",   30.0,  22.50,  22.50},
-     { "60X",   60.0,  45.00,  45.00},
-     {"120X",  120.0,  90.00,  90.00},
-     {"180X",  180.0, 135.00, 135.00}},
-    
-    // More adjustment (this is the default)
-    {
-     {  "3X",    3.0,   3.00,   3.00},
-     {  "5X",    5.0,   5.00,   5.00},
-     { "10X",   10.0,  10.00,  10.00},
-     { "20X",   20.0,  20.00,  20.00},
-     { "30X",   30.0,  30.00,  30.00},
-     { "60X",   60.0,  60.00,  60.00},
-     {"120X",  120.0, 120.00, 120.00},
-     {"180X",  180.0, 180.00, 180.00}},
+    {  "3X",    3.0},
+    {  "5X",    5.0},
+    { "10X",   10.0},
+    { "20X",   20.0},
+    { "30X",   30.0},
+    { "60X",   60.0},
+    {"120X",  120.0},
+    {"180X",  180.0}
 };
 
 const int SSPEED_NORMAL = 0;
-const int SSPEED_MAX = sizeof seek_speed_array[0] / sizeof seek_speed_array[0][0];
+const int SSPEED_MAX = sizeof seek_speed_array / sizeof seek_speed_array[0];
 
 struct SleepTimer {
     QString   dispString;
@@ -215,13 +188,13 @@ void *SpawnDecode(void *param)
 TV::TV(void)
     : QObject(),
       // Configuration variables from database
-      repoLevel(0), baseFilters(""), fftime(0), rewtime(0),
+      baseFilters(""), fftime(0), rewtime(0),
       jumptime(0), usePicControls(false), smartChannelChange(false),
       showBufferedWarnings(false), bufferedChannelThreshold(0),
       MuteIndividualChannels(false), arrowAccel(false),
       vbimode(0), 
       // Configuretion variables from DB in RunTV
-      stickykeys(0), ff_rew_repos(0), ff_rew_reverse(false),
+      stickykeys(0), ff_rew_repos(1.00), ff_rew_reverse(false),
       smartForward(false),
       // Configuration varibles from DB just before playback
       autoCommercialSkip(false), tryUnflaggedSkip(false),
@@ -291,10 +264,6 @@ bool TV::Init(bool createWindow)
         errored = true;
         return false;
     }
-
-    repoLevel = gContext->GetNumSetting("TVRepositionLevel", 2);
-    if ((repoLevel >= MAX_REPO_LEVEL) || (repoLevel < 0))
-        repoLevel = MAX_REPO_LEVEL - 1;
 
     baseFilters += gContext->GetSetting("CustomFilters");
     fftime = gContext->GetNumSetting("FastForwardAmount", 30);
@@ -1132,7 +1101,7 @@ void TV::RunTV(void)
     }
 
     stickykeys = gContext->GetNumSetting("StickyKeys");
-    ff_rew_repos = gContext->GetNumSetting("FFRewRepos", 1);
+    ff_rew_repos = gContext->GetNumSetting("FFRewReposTime", 100) / 100.0;
     ff_rew_reverse = gContext->GetNumSetting("FFRewReverse", 1);
     smartForward = gContext->GetNumSetting("SmartForward", 0);
 
@@ -2334,13 +2303,10 @@ float TV::StopFFRew(void)
     if (!doing_ff_rew)
         return time;
 
-    if (ff_rew_repos)
-    {
-        if (doing_ff_rew > 0)
-            time = -seek_speed_array[repoLevel][ff_rew_index].ff_repos;
-        else
-            time = seek_speed_array[repoLevel][ff_rew_index].rew_repos;
-    }
+    if (doing_ff_rew > 0)
+        time = -seek_speed_array[ff_rew_index].scaling * ff_rew_repos;
+    else
+        time = seek_speed_array[ff_rew_index].scaling * ff_rew_repos;
 
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
@@ -2393,8 +2359,8 @@ void TV::SetFFRew(int index)
         speed = -1.0;
     }
 
-    mesg += seek_speed_array[repoLevel][ff_rew_index].dispString;
-    speed *= seek_speed_array[repoLevel][ff_rew_index].scaling;
+    mesg += seek_speed_array[ff_rew_index].dispString;
+    speed *= seek_speed_array[ff_rew_index].scaling;
 
     activenvp->Play(speed, false);
     UpdatePosOSD(0.0, mesg, -1);

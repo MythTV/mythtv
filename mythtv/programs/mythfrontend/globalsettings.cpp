@@ -644,16 +644,17 @@ static HostCheckBox *StickyKeys()
     return gc;
 }
 
-static HostCheckBox *FFRewRepos()
+static HostSpinBox *FFRewReposTime()
 {
-    HostCheckBox *gc = new HostCheckBox("FFRewRepos");
-    gc->setLabel(QObject::tr("Reposition after fast forward/rewind"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("When exiting sticky keys fast forward/rewind "
-                    "mode, reposition before resuming normal playback. This "
+    HostSpinBox *gs = new HostSpinBox("FFRewReposTime", 0, 200, 5);
+    gs->setLabel(QObject::tr("Fast forward/rewind reposition amount"));
+    gs->setValue(100);
+    gs->setHelpText(QObject::tr("When exiting sticky keys fast forward/rewind "
+                    "mode, reposition this many 1/100th seconds before "
+                    "resuming normal playback. This"
                     "compensates for the reaction time between seeing "
                     "where to resume playback and actually exiting seeking."));
-    return gc;
+    return gs;
 }
 
 static HostCheckBox *FFRewReverse()
@@ -2900,7 +2901,7 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(RewindAmount());
     seek->addChild(SmartForward());
     seek->addChild(StickyKeys());
-    seek->addChild(FFRewRepos());
+    seek->addChild(FFRewReposTime());
     seek->addChild(FFRewReverse());
     seek->addChild(ExactSeeking());
     seek->addChild(JumpAmount());
