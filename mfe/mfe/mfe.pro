@@ -18,9 +18,10 @@ INSTALLS += uifiles
 
 HEADERS +=          mfedialog.h   mfdinfo.h   playlistdialog.h   netflasher.h
 HEADERS += visualize/visual.h   visualize/visualnode.h   visualize/stereoscope.h
-HEADERS += visualize/inlines.h
+HEADERS += visualize/inlines.h  visualize/visualwrapper.h
 
 SOURCES += main.cpp mfedialog.cpp mfdinfo.cpp playlistdialog.cpp netflasher.cpp
 SOURCES += visualize/visual.cpp visualize/visualnode.cpp visualize/stereoscope.cpp
+SOURCES += visualize/visualwrapper.cpp
 
 LIBS += -L$${PREFIX}/lib -lmfdclient

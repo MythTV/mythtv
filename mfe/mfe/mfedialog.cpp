@@ -14,7 +14,7 @@
 #include <mfdclient/speakertracker.h>
 
 #include "mfedialog.h"
-#include "visualize/stereoscope.h"
+#include "visualize/visualwrapper.h"
 
 MfeDialog::MfeDialog(
                         MythMainWindow *parent, 
@@ -53,8 +53,8 @@ MfeDialog::MfeDialog(
     //  whenever audio is playing)
     //
 
-    visualizer = new StereoScope(this);
-    mfd_interface->registerVisualization(visualizer);
+    visual_wrapper = new VisualWrapper(this);
+    mfd_interface->registerVisualization(visual_wrapper);
 
     //
     //  Wire up the theme
@@ -71,12 +71,15 @@ MfeDialog::MfeDialog(
     connectUpMfd();
 
     //
-    //  Fire up the visualizer
+    //  Fire up the visualizer and set geometry to small size.
     //
     
-    visualizer->setGeometry(visual_blackhole->getScreenArea());
-    visualizer->show();
+    visual_wrapper->storeSmallGeometry(visual_blackhole->getScreenArea());
+    visual_wrapper->storeLargeGeometry(QRect(0, 0, this->width(), this->height()));
+    visual_wrapper->setGeometry(visual_blackhole->getScreenArea());
+    visual_wrapper->show();
 
+    
 
     //
     //  Redraw ourselves
@@ -129,7 +132,7 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
                 {
                     menu->toggleShow();
                     handled = true;
-                    visualizer->show();
+                    visual_wrapper->show();
                     menu_lastuse_time.restart();
                 }
             }
@@ -146,7 +149,7 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
             }
             else
             {
-                visualizer->hide();
+                visual_wrapper->hide();
                 handled = true;
                 menu->toggleShow();
                 if(menu_lastuse_time.elapsed() > 10 * 1000) //  10 seconds
@@ -172,12 +175,12 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
                 {
                     menu->GoHome();
                 }
-                visualizer->hide();
+                visual_wrapper->hide();
             }
             else
             {
                 menu_lastuse_time.restart();
-                visualizer->show();
+                visual_wrapper->show();
             }
             handled = true;
             break;
@@ -193,6 +196,17 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
         case Key_S:
 
             stopAudio();
+            handled = true;
+            break;
+
+        case Key_4:
+            toggleVizFullscreen();
+            handled = true;
+            break;
+
+        case Key_6:
+        
+            cycleVisualizer();
             handled = true;
             break;
 
@@ -247,11 +261,17 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
         
         case Key_Escape:
         
-            if(menu->isShown())
+            if(visual_wrapper->isFullScreen())
+            {
+                visual_wrapper->toggleSize();
+                handled = true;
+            }
+            else if(menu->isShown())
             {
                 menu->toggleShow();
                 handled = true;
                 menu_lastuse_time.restart();
+                visual_wrapper->show();
             }
             break;
             
@@ -780,6 +800,7 @@ void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collecti
             {
                 current_mfd->setCurrentPlayingData();
                 now_playing_texts->setTexts(current_mfd->getPlayingStrings());
+                visual_wrapper->assignOverlayText(current_mfd->getPlayingStrings());
                 time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
             }    
         }
@@ -936,6 +957,7 @@ void MfeDialog::stopped(int which_mfd)
         if(relevant_mfd == current_mfd)
         {
             now_playing_texts->clearTexts();
+            visual_wrapper->assignOverlayText(QStringList());
             time_progress->SetUsed(0);
 
             //
@@ -984,6 +1006,7 @@ void MfeDialog::playing(
             if(update_texts)
             {
                 now_playing_texts->setTexts(current_mfd->getPlayingStrings());
+                visual_wrapper->assignOverlayText(current_mfd->getPlayingStrings());
             }
             time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
             
@@ -1076,6 +1099,7 @@ void MfeDialog::syncToCurrentMfd()
             pause_button->hide();
             stop_button->show();
             now_playing_texts->clearTexts();
+            visual_wrapper->assignOverlayText(QStringList());
             time_progress->SetUsed(0);
         }
         else
@@ -1087,6 +1111,7 @@ void MfeDialog::syncToCurrentMfd()
                 current_mfd->setCurrentPlayingData();
             }
             now_playing_texts->setTexts(current_mfd->getPlayingStrings());
+            visual_wrapper->assignOverlayText(current_mfd->getPlayingStrings());
             time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
             if(current_mfd->getPauseState())
             {
@@ -1112,6 +1137,7 @@ void MfeDialog::syncToCurrentMfd()
         }
         //menu->GoHome();
         now_playing_texts->clearTexts();
+        visual_wrapper->assignOverlayText(QStringList());
         time_progress->SetUsed(0);
         speaker_node->deleteAllChildren();
     }
@@ -1388,15 +1414,20 @@ void MfeDialog::doSillyThings()
 
 }
 
+void MfeDialog::toggleVizFullscreen()
+{
+    visual_wrapper->toggleSize();
+}
+
+void MfeDialog::cycleVisualizer()
+{
+    cout << "I should be cycling the visual_wrapper" << endl;
+}
+
 MfeDialog::~MfeDialog()
 {
 
     mfd_interface->deregisterVisualization();
-    if(visualizer)
-    {
-        delete visualizer;
-        visualizer = NULL;
-    }
     available_mfds.clear();
     if(menu_root_node)
     {
@@ -1410,10 +1441,5 @@ MfeDialog::~MfeDialog()
         net_flasher = NULL;
     }
     
-    if(visualizer)
-    {
-        delete visualizer;
-        visualizer = NULL;
-    }
 }
 

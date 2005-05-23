@@ -9,46 +9,61 @@
 	Base class for mfe visualizations
 	
 */
-//  #include "polygon.h"
-//  #include "constants.h"
 
 #include <qwidget.h>
-#include <qtimer.h>
-#include <qmemarray.h>
-#include <qpixmap.h>
-//  #include <qptrlist.h>
-//  #include <qstringlist.h>
+
+#include <mfdclient/visualbase.h>
 
 #include "visualnode.h"
 
-class MfeVisualizer : public QWidget
+class MfeVisualizer : public VisualBase
 {
-
-  Q_OBJECT
 
   public:
 
     MfeVisualizer();
     virtual ~MfeVisualizer();
 
-    virtual void add(uchar *b, unsigned long b_len, unsigned long w, int c, int p);
-    virtual bool process( VisualNode *node ) = 0;
-    virtual bool draw( QPainter *, const QColor & ) = 0;
-    virtual void resize( const QSize &size ) = 0;
+    //
+    //  This is called in a separate thread, when PCM audio data arrives. It
+    //  is the raw audio data that has come over rtsp. Note that channels
+    //  will always be 2 and bits per channel will always be 16 for the
+    //  forseeable future (unless someone rewrites all the mfd rtsp
+    //  streaming stuff to handle over formats).
+    //
 
-    void paintEvent( QPaintEvent * );
-    void resizeEvent( QResizeEvent * );
+    virtual void add(
+                        uchar          *raw_audio_data_buffer, 
+                        unsigned long   length_of_buffer, 
+                        int             numb_channels, 
+                        int             bits_per_channel
+                    );
+
+
+    //
+    //  This is called whenever the visualizer needs to resize (usually
+    //  going from small to fullscreen and back again).
+    //
+
+    virtual void resize(QSize new_size, QColor background_color);
+
+    //
+    //  This is called whenever it should draw itself. Returns true if it
+    //  drew anything.
+    //
+
+    virtual bool update(QPixmap *pixmap_to_draw_on);
+    
+    //
+    //  A way to get the desired frames per second for any given visualization
+    //
   
-  public slots:
-
-    void timeout();         
-
+    virtual int getFps(){ return fps; }
+  
   private:
 
-    QTimer  *timer;
     int     fps;
-    QPixmap pixmap;
-    QPtrList<VisualNode> nodes;
+
 };
 
 #endif

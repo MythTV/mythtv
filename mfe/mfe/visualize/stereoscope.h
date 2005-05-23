@@ -10,39 +10,33 @@
 	
 */
 
+//  #include <qpixmap.h>
+
 #include <mfdclient/visualbase.h>
 
 #include "visual.h"
 
-class StereoScope : public QWidget, public VisualBase
+class StereoScope : public MfeVisualizer
 {
-
-  Q_OBJECT
 
   public:
 
-    StereoScope(QWidget *parent);
+    StereoScope();
     virtual ~StereoScope();
 
-    void add(uchar *b, unsigned long b_len, unsigned long w, int c, int p);
-    //void resize( const QSize &size );
+    void add(uchar *b, unsigned long b_len, int c, int p);
+    void resize(QSize new_size, QColor background_color);
+    bool update(QPixmap *pixmap_to_draw_on);
+
+
+  protected:
+
     bool process( VisualNode *node );
     bool draw( QPainter *p, const QColor &back );
 
-    void paintEvent( QPaintEvent * );
-    void resizeEvent( QResizeEvent * );
-  
-  public slots:
-
-    void timeout();         
-
-
-
-protected:
-
     QTimer  *timer;
     int     fps;
-    QPixmap pixmap;
+//    QPixmap pixmap;
     QPtrList<VisualNode> nodes;
 
     QColor startColor, targetColor;

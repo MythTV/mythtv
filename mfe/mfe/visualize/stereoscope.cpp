@@ -11,57 +11,26 @@
 #include "stereoscope.h"
 #include "inlines.h"
 
-//  #include "mainvisual.h"
-//  #include "constants.h"
-//  #include <mythtv/audiooutput.h>
-//  #include "synaesthesia.h"
-//  #include "bumpscope.h"
-//  #include "visualize.h"
-//  #include "goom/mythgoom.h"
-
-//  #include <qtimer.h>
 #include <qpainter.h>
-#include <qevent.h>
-//  #include <qapplication.h>
-//  #include <qspinbox.h>
-//  #include <qpixmap.h>
-//  #include <qcursor.h>
-//  #include <qstring.h>
-//  #include <qregexp.h>
-
-//  #include <math.h>
-//  #include <stdio.h>
-
-//  #include <mythtv/mythcontext.h>
-//  #include <mythtv/mythdialogs.h>
-
-
-
+#include <qpixmap.h>
 
 #include <iostream>
 using namespace std;
 
 
-StereoScope::StereoScope(QWidget *parent)
-            :QWidget(parent, "stereoscope")
+StereoScope::StereoScope()
+            :MfeVisualizer()
 {
     fps = 45;
     rubberband = false;
     falloff = 1.0;
 
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
-    timer->start(1000 / fps); 
-
-
-    startColor = Qt::green;
+    startColor = Qt::blue;
     targetColor = Qt::red;
-
-    setGeometry(0,0,800,600);
 }
 
 
-void StereoScope::add(uchar *b, unsigned long b_len, unsigned long w, int c, int p)
+void StereoScope::add(uchar *b, unsigned long b_len, int c, int p)
 {
     long len = b_len, cnt;
     short *l = 0, *r = 0;
@@ -96,17 +65,17 @@ void StereoScope::add(uchar *b, unsigned long b_len, unsigned long w, int c, int
     else
         len = 0;
 
-    nodes.append(new VisualNode(l, r, len, w));
+    nodes.append(new VisualNode(l, r, len, 0));
     
 }
 
 
 
-void StereoScope::timeout()
+bool StereoScope::update(QPixmap *pixmap_to_draw_on)
 {
     if(nodes.count() < 1)
     {
-        return;  
+        return false;  
     }
 
     VisualNode *node = NULL;
@@ -121,50 +90,27 @@ void StereoScope::timeout()
     }
 
 
-    QPainter p(&pixmap);
+    QPainter p(pixmap_to_draw_on);
     draw(&p, Qt::black);
-    bitBlt(this, 0, 0, &pixmap);
+    return true;
 }
 
-void StereoScope::paintEvent(QPaintEvent *)
+void StereoScope::resize( QSize new_size, QColor)
 {
-    bitBlt(this, 0, 0, &pixmap);
-}
-
-void StereoScope::resizeEvent( QResizeEvent *event )
-{
-    pixmap.resize(event->size());
-    pixmap.fill(backgroundColor());
-    QWidget::resizeEvent( event );
-    my_size = event->size();
+    my_size = new_size;
+    my_size = new_size;
     uint os = magnitudes.size();
     magnitudes.resize( my_size.width() * 2 );
     for ( ; os < magnitudes.size(); os++ )
 	magnitudes[os] = 0.0;
+
 }
-
-
-
-
 
 
 StereoScope::~StereoScope()
 {
 }
 
-/*
-void StereoScope::resize( const QSize &newsize )
-{
-
-    size = newsize;
-
-    uint os = magnitudes.size();
-    magnitudes.resize( size.width() * 2 );
-    for ( ; os < magnitudes.size(); os++ )
-	magnitudes[os] = 0.0;
-
-}
-*/
 
 bool StereoScope::process( VisualNode *node )
 {
@@ -364,7 +310,7 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 	    b = 0;
 
 	p->setPen( QColor( int(r), int(g), int(b) ) );
-        p->setPen(Qt::red);
+        //p->setPen(Qt::red);
 	p->drawLine( i - 1, (int)((my_size.height() / 4) + magnitudesp[i - 1]),
 		     i, (int)((my_size.height() / 4) + magnitudesp[i]));
 
@@ -401,7 +347,7 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 	    b = 0;
 
 	p->setPen( QColor( int(r), int(g), int(b) ) );
-        p->setPen(Qt::red);
+    //    p->setPen(Qt::red);
 	p->drawLine( i - 1, (int)((my_size.height() * 3 / 4) +
 		     magnitudesp[i + my_size.width() - 1]),
 		     i, (int)((my_size.height() * 3 / 4) + 

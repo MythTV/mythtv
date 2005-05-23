@@ -22,7 +22,7 @@
 typedef QValueVector<int> IntVector;
 
 class SpeakerTracker;
-class StereoScope;
+class VisualWrapper;
 
 class MfeDialog : public MythThemedDialog
 {
@@ -62,6 +62,8 @@ class MfeDialog : public MythThemedDialog
     void speakerList(int which_mfd, QPtrList<SpeakerTracker>* speakers);
     void hideNewPlaylistPopup();
     void createNewPlaylist();
+    void toggleVizFullscreen();
+    void cycleVisualizer();
 
   private:
 
@@ -133,7 +135,7 @@ class MfeDialog : public MythThemedDialog
     UIImageType *background_image;
 
     UIBlackHoleType *visual_blackhole;
-    StereoScope     *visualizer;
+    VisualWrapper   *visual_wrapper;
 
     //
     //  Thing that flashes to indicate network (ie. mdcap data arrival)
