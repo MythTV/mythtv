@@ -260,6 +260,8 @@ class MythPushButton : public QPushButton
     QColor origcolor;
     QString helptext;
     bool arrowAccel;
+
+    QStringList keyPressActions;
 };
 
 class MythCheckBox: public QCheckBox

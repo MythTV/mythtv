@@ -934,9 +934,13 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
+    keyPressActions.clear();
+
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
                                                      actions))
     {
+        keyPressActions = actions;
+
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
@@ -970,19 +974,15 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
 void MythPushButton::keyReleaseEvent(QKeyEvent *e)
 {
     bool handled = false;
-    QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
-                                                     actions))
+    QStringList actions = keyPressActions;
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        QString action = actions[i];
+        if (action == "SELECT")
         {
-            QString action = actions[i];
-            if (action == "SELECT")
-            {
-                QKeyEvent tempe(QEvent::KeyRelease, Key_Space, ' ', 0, " ");
-                QPushButton::keyReleaseEvent(&tempe);
-                handled = true;
-            }
+            QKeyEvent tempe(QEvent::KeyRelease, Key_Space, ' ', 0, " ");
+            QPushButton::keyReleaseEvent(&tempe);
+            handled = true;
         }
     }
 
