@@ -556,6 +556,7 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
     }
 }
 
+#ifdef HAVE_ALTIVEC
 static void non_vec_yuv420_2vuy (uint8_t * image, uint8_t * py,
                                  uint8_t * pu, uint8_t * pv,
                                  int h_size, int v_size,
@@ -590,7 +591,6 @@ static void non_vec_yuv420_2vuy (uint8_t * image, uint8_t * py,
     }
 }
 
-#ifdef HAVE_ALTIVEC
 // Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
 
 #define VEC_NEXT_LINES()                                                    \
@@ -688,7 +688,6 @@ yuv2vuy_fun yuv2vuy_init_altivec (void)
     else
         return non_vec_yuv420_2vuy; /* Fallback to C */
 }
-#endif // HAVE_ALTIVEC
 
 static void non_vec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
                                  uint8_t * pu, uint8_t * pv,
@@ -724,7 +723,6 @@ static void non_vec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
     }
 }
 
-#ifdef HAVE_ALTIVEC
 // Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
 
 #define VEC_READ_LINE(ptr, y, uv)                                           \

@@ -82,6 +82,7 @@ void FrameBuffer::setPkt(uint8_t *data, uint32_t newsize, int64_t newpts,
     newpkt.size = newsize;
     newpkt.pts = newpts;
     newpkt.data = data;
+    newpkt.flags = 0;
     setPkt(&newpkt, del);
 }
 

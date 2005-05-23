@@ -107,6 +107,9 @@ public:
 
     /// Clears all the samples.
     virtual void clear() = 0;
+
+    /// Destructor to shut gcc 4 up
+    virtual ~FIFOSamplePipe() {}
 };
 
 

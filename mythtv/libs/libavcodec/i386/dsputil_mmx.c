@@ -847,6 +847,7 @@ static void h264_v_loop_filter_luma_mmx2(uint8_t *pix, int stride, int alpha, in
 }
 static void h264_h_loop_filter_luma_mmx2(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0)
 {
+#if 0
     //FIXME: could cut some load/stores by merging transpose with filter
     // also, it only needs to transpose 6x8
     uint8_t trans[8*8];
@@ -862,6 +863,7 @@ static void h264_h_loop_filter_luma_mmx2(uint8_t *pix, int stride, int alpha, in
         transpose4x4(pix-2,          trans  +2*8, stride, 8);
         transpose4x4(pix-2+4*stride, trans+4+2*8, stride, 8);
     }
+#endif
 }
 
 static inline void h264_loop_filter_chroma_mmx2(uint8_t *pix, int stride, int alpha1, int beta1, int8_t *tc0)

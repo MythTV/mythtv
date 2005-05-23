@@ -978,9 +978,9 @@ void AlphaBlender::blendImage(const QImage &image, const QColor &color)
 
     for (int i = 0; i < size; i++)
     {
-        *data++ = b[*data];
-        *data++ = g[*data];
-        *data++ = r[*data];
+        *data = b[*data]; data++;
+        *data = g[*data]; data++;
+        *data = r[*data]; data++;
         data++;
     }
 }

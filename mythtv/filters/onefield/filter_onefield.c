@@ -41,8 +41,8 @@ int oneFieldFilter(VideoFilter *f, VideoFrame *frame)
     yoff = yuvptr;
     for (y = 0; y < ymax; y += 2) 
     {
-        char *src = (bottom ? &(yoff[(y+1)*stride]) : &(yoff[y*stride]));
-        char *dst = (bottom ? &(yoff[y*stride]) : &(yoff[(y+1)*stride]));
+        unsigned char *src = (bottom ? &(yoff[(y+1)*stride]) : &(yoff[y*stride]));
+        unsigned char *dst = (bottom ? &(yoff[y*stride]) : &(yoff[(y+1)*stride]));
         memcpy(dst, src, stride);
     }
  
@@ -54,8 +54,8 @@ int oneFieldFilter(VideoFilter *f, VideoFrame *frame)
  
     for (y = 0; y < ymax; y += 2)
     {
-        char *src = (bottom ? &(uoff[(y+1)*stride]) : &(uoff[y*stride]));
-        char *dst = (bottom ? &(uoff[y*stride]) : &(uoff[(y+1)*stride]));
+        unsigned char *src = (bottom ? &(uoff[(y+1)*stride]) : &(uoff[y*stride]));
+        unsigned char *dst = (bottom ? &(uoff[y*stride]) : &(uoff[(y+1)*stride]));
         memcpy(dst, src, stride);
         src = (bottom ? &(voff[(y+1)*stride]) : &(voff[y*stride]));
         dst = (bottom ? &(voff[y*stride]) : &(voff[(y+1)*stride]));

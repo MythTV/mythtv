@@ -285,7 +285,7 @@ vt_line(struct vbi *vbi, unsigned char *p)
                return 4;
 
            //printf("enhance on %x/%x\n", cvtp->pgno, cvtp->subno);
-           add_enhance(rvtp->enh, d, t);
+           add_enhance(rvtp->enh, d, (unsigned int *)t);
            return 0;
        }
        case 27:

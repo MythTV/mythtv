@@ -2331,7 +2331,9 @@ if test "$gpl" = "yes" ; then
   echo "CONFIG_GPL=yes" >> $MYTH_CONFIG_MAK
 fi
 
+echo "#ifndef restrict" >> $TMPH
 echo "#define restrict $_restrict" >> $TMPH
+echo "#endif" >> $TMPH
 
 if test "$optimize" = "small"; then
   echo "#define always_inline"  >> $TMPH

@@ -1495,7 +1495,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         AVStream *curstream = ic->streams[pkt->stream_index];
 
         if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
-            pts = av_q2d(curstream->time_base) * pkt->dts * 1000;
+            pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
         if (storevideoframes &&
             curstream->codec.codec_type == CODEC_TYPE_VIDEO)
@@ -1556,7 +1556,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 case CODEC_TYPE_AUDIO:
                 {
                     if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
-                        lastapts = av_q2d(curstream->time_base) * pkt->pts * 1000;
+                        lastapts = (long long)(av_q2d(curstream->time_base) * pkt->pts * 1000);
 
                     if (onlyvideo != 0 ||
                         (pkt->stream_index != wantedAudioStream))
