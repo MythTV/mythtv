@@ -18,6 +18,7 @@ using namespace std;
 #include "visualwrapper.h"
 #include "visual.h"
 #include "stereoscope.h"
+#include "monoscope.h"
 
 
 VisualWrapper::VisualWrapper(QWidget *parent)
@@ -27,7 +28,7 @@ VisualWrapper::VisualWrapper(QWidget *parent)
     is_full_screen = false;
     small_geometry = QRect(0, 0, 100, 100);
     large_geometry = QRect(0, 0, 100, 100);
-    current_visualizer = new StereoScope();
+    current_visualizer = new MonoScope();
 
     //
     //  Start the timer that calls the visualization redrawing
@@ -35,7 +36,7 @@ VisualWrapper::VisualWrapper(QWidget *parent)
     
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
-    timer->start(1000 / 100);    // 40 = fps
+    timer->start(1000 / current_visualizer->getFps());
 
 
     //
@@ -142,7 +143,7 @@ void VisualWrapper::doTextOverlay()
     if (text_overlay_mode == MTOM_BRIGHTENING)
     {
         p.setPen(QColor(text_overlay_brightness, text_overlay_brightness, text_overlay_brightness));
-        text_overlay_brightness += 5;
+        text_overlay_brightness += 10;
         if(text_overlay_brightness >= 255)
         {
             text_overlay_brightness = 255;
@@ -152,7 +153,7 @@ void VisualWrapper::doTextOverlay()
     else if (text_overlay_mode == MTOM_SOLID)
     {
         p.setPen(QColor(255, 255, 255));
-        text_overlay_brightness--;
+        text_overlay_brightness -= 2;
         if(text_overlay_brightness < 0)
         {
             text_overlay_brightness = 255;
@@ -162,7 +163,7 @@ void VisualWrapper::doTextOverlay()
     else if (text_overlay_mode == MTOM_FADING)
     {
         p.setPen(QColor(text_overlay_brightness, text_overlay_brightness, text_overlay_brightness));
-        text_overlay_brightness -= 5;
+        text_overlay_brightness -= 10;
         if(text_overlay_brightness < 0)
         {
             text_overlay_brightness = 0;
@@ -172,7 +173,7 @@ void VisualWrapper::doTextOverlay()
     else if (text_overlay_mode == MTOM_BLANK)
     {
         p.setPen(QColor(0, 0, 0));
-        text_overlay_brightness += 1;
+        text_overlay_brightness += 2;
         if(text_overlay_brightness >= 255)
         {
             text_overlay_brightness = 0;
@@ -200,6 +201,38 @@ void VisualWrapper::assignOverlayText(QStringList string_list)
     current_text_overlay_index = 0;
     text_overlay_mode = MTOM_BRIGHTENING;
     text_overlay_brightness = 0;
+}
+
+
+void VisualWrapper::cycleVisualizations()
+{
+    current_visualizer_mutex.lock();
+        if(current_visualizer)
+        {
+            if (current_visualizer->getVisualizationType() == MVT_MONOSCOPE)
+            {
+                delete current_visualizer;
+                current_visualizer = new StereoScope();
+                current_visualizer->resize(this->size(), Qt::black);
+            }
+            else if (current_visualizer->getVisualizationType() == MVT_STEREOSCOPE)
+            {
+                delete current_visualizer;
+                current_visualizer = new MonoScope();
+                current_visualizer->resize(this->size(), Qt::black);
+            }
+            else
+            {
+                cerr << "visualwrapper.o: can't cycle because can't get type" << endl;
+            }
+        }
+        else
+        {
+            cerr << "visualwrapper.o: hard to cycle when there's no current" << endl;
+        }
+       
+    current_visualizer_mutex.unlock();
+
 }
 
 VisualWrapper::~VisualWrapper()

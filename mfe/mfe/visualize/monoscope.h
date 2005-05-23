@@ -1,25 +1,25 @@
-#ifndef STEREOSCOPE_H_
-#define STEREOSCOPE_H_
+#ifndef MONOSCOPE_H_
+#define MONOSCOPE_H_
 /*
-	stereoscope.h
+	monoscope.h
 
 	Copyright (c) 2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
-	A stereoscope visualization
+	A monoscope visualization
 	
 */
 
 #include <mfdclient/visualbase.h>
 #include "visual.h"
 
-class StereoScope : public MfeVisualizer
+class MonoScope : public MfeVisualizer
 {
 
   public:
 
-    StereoScope();
-    virtual ~StereoScope();
+    MonoScope();
+    virtual ~MonoScope();
 
     void add(uchar *b, unsigned long b_len, int c, int p);
     void resize(QSize new_size, QColor background_color);

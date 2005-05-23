@@ -21,12 +21,14 @@ using namespace std;
 StereoScope::StereoScope()
             :MfeVisualizer()
 {
-    fps = 45;
+    fps = 40;
     rubberband = false;
     falloff = 1.0;
 
     startColor = Qt::blue;
     targetColor = Qt::red;
+    
+    visualization_type = MVT_STEREOSCOPE;
 }
 
 

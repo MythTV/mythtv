@@ -1421,7 +1421,7 @@ void MfeDialog::toggleVizFullscreen()
 
 void MfeDialog::cycleVisualizer()
 {
-    cout << "I should be cycling the visual_wrapper" << endl;
+    visual_wrapper->cycleVisualizations();
 }
 
 MfeDialog::~MfeDialog()

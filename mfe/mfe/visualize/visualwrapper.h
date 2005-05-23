@@ -47,6 +47,7 @@ class VisualWrapper : public QWidget, public VisualBase
     
     void assignOverlayText(QStringList string_list);
     bool isFullScreen(){ return is_full_screen; }
+    void cycleVisualizations();
 
   public slots:
   

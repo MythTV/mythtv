@@ -16,6 +16,12 @@
 
 #include "visualnode.h"
 
+enum MfeVisualizationType
+{
+    MVT_MONOSCOPE = 0,
+    MVT_STEREOSCOPE
+};
+
 class MfeVisualizer : public VisualBase
 {
 
@@ -60,10 +66,16 @@ class MfeVisualizer : public VisualBase
   
     virtual int getFps(){ return fps; }
   
-  private:
-
-    int     fps;
-
+    //
+    //  Programmatically find out what the current viz is
+    //
+    
+    MfeVisualizationType    getVisualizationType(){ return visualization_type; }
+  
+  protected:
+  
+    int                     fps;
+    MfeVisualizationType    visualization_type;
 };
 
 #endif
