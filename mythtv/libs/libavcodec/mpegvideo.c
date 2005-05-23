@@ -1298,9 +1298,9 @@ int MPV_encode_init(AVCodecContext *avctx)
     /* for mjpeg, we do include qscale in the matrix */
     if (s->out_format != FMT_MJPEG) {
         convert_matrix(&s->dsp, s->q_intra_matrix, s->q_intra_matrix16, 
-                       s->intra_matrix, s->intra_quant_bias, avctx->qmin, 31, 1);
+                       s->intra_matrix, s->intra_quant_bias, 1, 31, 1);
         convert_matrix(&s->dsp, s->q_inter_matrix, s->q_inter_matrix16, 
-                       s->inter_matrix, s->inter_quant_bias, avctx->qmin, 31, 0);
+                       s->inter_matrix, s->inter_quant_bias, 1, 31, 0);
     }
 
     if(ff_rate_control_init(s) < 0)
