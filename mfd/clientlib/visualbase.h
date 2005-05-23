@@ -20,11 +20,8 @@ class VisualBase
     VisualBase();
     virtual ~VisualBase();
 
-    virtual void add(uchar *b, unsigned long b_len, unsigned long w, int c, int p) = 0;
+    virtual void    add(uchar *b, unsigned long b_len, int c, int p) = 0;
 
-  protected:
-  
-    QMutex  data_mutex;
 };
 
 #endif

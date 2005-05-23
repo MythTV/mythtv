@@ -290,7 +290,7 @@ void RtspIn::handleAfterReading(unsigned frameSize, struct timeval /* presentati
     
         if(registered_visualizer)
         {
-            registered_visualizer->add(rtp_incoming_buffer, frameSize, 0, 2, 16);
+            registered_visualizer->add(rtp_incoming_buffer, frameSize, 2, 16);
         }
 
     registered_visualizer_mutex.unlock();
