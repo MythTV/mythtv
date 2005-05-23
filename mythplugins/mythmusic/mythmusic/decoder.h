@@ -119,6 +119,7 @@ public:
     virtual const QString &extension() const = 0; // file extension, ie. ".mp3" or ".ogg"
     virtual const QString &description() const = 0; // file type, ie. "MPEG Audio Files"
     virtual Decoder *create(const QString &, QIODevice *, AudioOutput *, bool) = 0;
+    virtual ~DecoderFactory() {}
 };
 
 class VorbisDecoderFactory : public DecoderFactory

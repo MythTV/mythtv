@@ -45,6 +45,8 @@ void CheckFreeDBServerFile(void)
         struct cddb_serverlist list;
         struct cddb_host proxy_host;
 
+        memset(&cddbconf, 0, sizeof(cddbconf));
+
         cddbconf.conf_access = CDDB_ACCESS_REMOTE;
         list.list_len = 1;
         strncpy(list.list_host[0].host_server.server_name,

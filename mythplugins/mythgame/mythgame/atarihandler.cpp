@@ -123,13 +123,13 @@ bool AtariHandler::IsValidRom(QString Path)
     return (Path.right(4) == ".bin");;
 }
 
-QString AtariHandler::GetGameName(QString Path)
+QString AtariHandler::GetGameName(QString)
 {
     // TODO: read stella.pro
     return QString();
 }
 
-void AtariHandler::GetMetadata(QString GameName, QString* Genre, int* Year)
+void AtariHandler::GetMetadata(QString, QString*, int*)
 {
     // ???
     return;

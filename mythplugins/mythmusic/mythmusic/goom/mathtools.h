@@ -11,12 +11,12 @@
 #define iman_				0
 #endif //BigEndian_
 
-#ifdef HAVE_MMX
-#define F2I(dbl,i) \
-{double d = dbl + _double2fixmagic; i = ((int*)&d)[iman_] >> _shiftamt; }
-#else
+//#ifdef HAVE_MMX
+//#define F2I(dbl,i) 
+//{double d = dbl + _double2fixmagic; i = ((int*)&d)[iman_] >> _shiftamt; }
+//#else
 #define F2I(dbl,i) i=(int)dbl;
-#endif
+//#endif
 
 #if 0
 #define SINCOS(f,s,c) \

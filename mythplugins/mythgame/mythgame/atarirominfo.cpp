@@ -2,7 +2,7 @@
 #include <qfile.h>
 #include "atarirominfo.h"
 
-bool AtariRomInfo::FindImage(QString type, QString* result)
+bool AtariRomInfo::FindImage(QString, QString*)
 {
     return false;
 }

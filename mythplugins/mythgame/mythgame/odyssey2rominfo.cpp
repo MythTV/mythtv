@@ -2,7 +2,7 @@
 #include <qfile.h>
 #include "odyssey2rominfo.h"
 
-bool Odyssey2RomInfo::FindImage(QString type, QString* result)
+bool Odyssey2RomInfo::FindImage(QString, QString*)
 {
     return false;
 }

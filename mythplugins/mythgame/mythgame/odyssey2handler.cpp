@@ -122,13 +122,13 @@ bool Odyssey2Handler::IsValidRom(QString Path)
     return (Path.right(4) == ".bin");
 }
 
-QString Odyssey2Handler::GetGameName(QString Path)
+QString Odyssey2Handler::GetGameName(QString)
 {
     // TODO: read stella.pro
     return QString();
 }
 
-void Odyssey2Handler::GetMetadata(QString GameName, QString* Genre, int* Year)
+void Odyssey2Handler::GetMetadata(QString, QString*, int*)
 {
     // ???
     return;

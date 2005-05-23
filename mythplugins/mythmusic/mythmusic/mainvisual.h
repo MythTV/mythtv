@@ -122,6 +122,7 @@ class VisFactory
     virtual const QString &name(void) const = 0;
     virtual const QString &description(void) const = 0;
     virtual VisualBase *create(MainVisual *parent, long int winid) = 0;
+    virtual ~VisFactory() {}
 };
 
 class StereoScope : public VisualBase
