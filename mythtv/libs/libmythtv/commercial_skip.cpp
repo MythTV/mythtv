@@ -2147,7 +2147,6 @@ void CommDetect::DumpMap(QMap<long long, int> &map)
     QString msg;
 
     VERBOSE(VB_COMMFLAG, "---------------------------------------------------");
-    cerr << endl;
     for (it = map.begin(); it != map.end(); ++it)
     {
         long long frame = it.key();
