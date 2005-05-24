@@ -24,9 +24,7 @@ static const mmx_t mm_cpool[] = {
     { ub: {15, 15, 15, 15, 15, 15, 15, 15} }
 };
     
-#else
-int mm_support(void) { return 0; }
-#endif // MMX
+#endif /* MMX */
 
 typedef struct ThisFilter
 {
@@ -134,7 +132,7 @@ void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
         buf++;
     }
 }
-#endif
+#endif /* MMX */
 
 int adjustFilter (VideoFilter *vf, VideoFrame *frame)
 {
@@ -271,10 +269,10 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     filter->cfilt = fillTableMMX (filter->ctable, &(filter->cshift),
                                     &(filter->cscale), &(filter->cmin),
                                     cmin, cmax, 16, 240, cgamma);
-#else /* MMX */
+#else
     fillTable (filter->ytable, ymin, ymax, 16, 235, ygamma);
     fillTable (filter->ctable, cmin, cmax, 16, 240, cgamma);
-#endif /* MMX */
+#endif
 
     filter->yend = *width * *height;
     

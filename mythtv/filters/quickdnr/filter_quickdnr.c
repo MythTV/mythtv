@@ -22,7 +22,7 @@
 
 #ifdef MMX
 #include "i386/mmx.h"
-#endif // !MMX
+#endif
 
 //Regular filter
 #define LUMA_THRESHOLD_DEFAULT 15

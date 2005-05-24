@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "config.h"
 #include "dsputil.h"
-#include "i386/mmx.h"
+#include "../mm_arch.h"
 
 #define PAVGB(a,b)   "pavgb " #a ", " #b " \n\t"
 #define PAVGUSB(a,b) "pavgusb " #a ", " #b " \n\t"
@@ -30,7 +30,6 @@ typedef struct LBFilter
     TF_STRUCT;
 } LBFilter;
 
-#define MM_ALTIVEC 0x0020 /* Altivec */
 
 #ifdef i386
 
@@ -128,24 +127,12 @@ void linearBlend3DNow(unsigned char *src, int stride)
     );
 }
 
-int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame) {(void)f; (void)frame; return 0;};
-#else // MMX
-#define emms()
-void linearBlendMMX(unsigned char *src, int stride) {(void)src; (void)stride;};
-void linearBlend3DNow(unsigned char *src, int stride) {(void)src;(void)stride;};
+#endif
 
 #ifdef HAVE_ALTIVEC
 
-#ifdef HAVE_ALTIVEC_H
-#include <altivec.h>
-#else
-#include <Accelerate/Accelerate.h>
-#endif
-
 // we fall back to the default routines in some situations
 void linearBlend(unsigned char *src, int stride);
-
-int mm_support(void) { return MM_ALTIVEC; }
 
 inline void linearBlendAltivec(unsigned char *src, int stride)
 {
@@ -173,7 +160,7 @@ int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame)
     int stride = width;
     int ymax = height - 8;
     int x,y;
-    unsigned char *src;
+    unsigned char *src = 0;
     unsigned char *uoff;
     unsigned char *voff;
     TF_VARS;
@@ -246,11 +233,7 @@ int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame)
     return 0;
 }
 
-#else  // Altivec
-int mm_support(void) { return 0; };
-int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame) {(void)f; (void)frame; return 0;};
-#endif // Altivec
-#endif // i386
+#endif /* HAVE_ALTIVEC */
 
 void linearBlend(unsigned char *src, int stride)
 {
@@ -339,8 +322,10 @@ int linearBlendFilter(VideoFilter *f, VideoFrame *frame)
         }
     }
 
+#ifdef MMX
     if ((vf->mm_flags & MM_MMXEXT) || (vf->mm_flags & MM_3DNOW))
         emms();
+#endif
 
     TF_END(vf, "LinearBlend: ");
     return 0;
@@ -366,15 +351,18 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     }
 
     filter->filter = &linearBlendFilter;
+    filter->subfilter = &linearBlend;    /* Default, non accellerated */
     filter->mm_flags = mm_support();
+#ifdef MMX
     if (filter->mm_flags & MM_MMXEXT)
         filter->subfilter = &linearBlendMMX;
     else if (filter->mm_flags & MM_3DNOW)
         filter->subfilter = &linearBlend3DNow;
-    else if (filter->mm_flags && MM_ALTIVEC)
+#endif
+#ifdef HAVE_ALTIVEC
+    if (filter->mm_flags & MM_ALTIVEC)
         filter->filter = &linearBlendFilterAltivec;
-    else
-        filter->subfilter = &linearBlend;
+#endif
 
     filter->cleanup = NULL;
     TF_INIT(filter);

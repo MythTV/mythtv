@@ -19,7 +19,7 @@
 
 #ifdef MMX
 #include "i386/mmx.h"
-#endif // !MMX
+#endif
 
 static const char FILTER_NAME[] = "crop";
 
@@ -162,7 +162,7 @@ int cropMMX(VideoFilter *f, VideoFrame *frame)
   TF_END(tf, "Crop: ");
   return 0;
 }
-#endif
+#endif /* MMX */
 
 VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
                         int *width, int *height, char *options)

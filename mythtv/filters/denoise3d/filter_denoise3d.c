@@ -26,10 +26,7 @@
 #ifdef MMX
 #include "i386/mmx.h"
 static const mmx_t mz = { 0x0LL };
-#else
-#define emms()  do {} while (0)
-int mm_support(void) { return 0; }
-#endif // MMX
+#endif
 
 typedef struct ThisFilter
 {
@@ -270,18 +267,7 @@ denoiseMMX (uint8_t * Frame,
         LinePrev += W;
     }
 }
-#else // MMX
-static void
-denoiseMMX (uint8_t * Frame,
-            uint8_t * FramePrev,
-            uint8_t * Line,
-            int W, int H,
-            uint8_t * Spatial, uint8_t * Temporal)
-{
-     (void)Frame; (void)FramePrev; (void)Line; (void)W; (void)H;
-     (void)Spatial; (void)Temporal;
-}
-#endif // MMX
+#endif /* MMX */
 
 static int
 denoise3DFilter (VideoFilter * f, VideoFrame * frame)
@@ -307,8 +293,10 @@ denoise3DFilter (VideoFilter * f, VideoFrame * frame)
     (filter->filtfunc) (yuvptr + filter->voff, filter->prev + filter->voff,
                         filter->line, filter->cwidth, filter->cheight,
                         filter->coefs[2] + 256, filter->coefs[3] + 256);
+#ifdef MMX
     if (filter->mm_flags & MM_MMX)
         emms();
+#endif
     TF_END(filter, "Denoise3D: ");
     return 0;
 }
@@ -360,15 +348,15 @@ NewDenoise3DFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     filter->cwidth = *width / 2;
     filter->cheight = *height / 2;
 
+#ifdef MMX
     filter->mm_flags = mm_support();
     if (filter->mm_flags & MM_MMX)
-    {
         filter->filtfunc = &denoiseMMX;
-    }
     else
-    {
+#else
+        filter->mm_flags = 0,
+#endif
         filter->filtfunc = &denoise;
-    }
     filter->vf.filter = &denoise3DFilter;
     filter->vf.cleanup = &Denoise3DFilterCleanup;
     TF_INIT(filter);

@@ -23,9 +23,7 @@ static const mmx_t mm_cpool[] =
     { 0x0000000000000000LL },
 };
 
-#else // MMX
-#define emms()
-int mm_support(void) { return 0; };
+#else
 #define mmx_t int
 #endif
 
@@ -245,10 +243,6 @@ KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
             > Threshold - 1)
             LineCur[X] = LineCur1U[X];
 }
-#else
-void KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold) {
-     (void)Plane; (void)Line; (void)W; (void)H; (void)Threshold;
-}
 #endif
 
 static int
@@ -309,15 +303,20 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     if (numopts < 1)
         filter->threshold = 12;
 
-    filter->mm_flags = mm_support();
     filter->width = *width;
     filter->height = *height;
     filter->cwidth = *width / 2;
     filter->uoff = *width * *height;
+#ifdef MMX
+    filter->mm_flags = mm_support();
     if (filter->mm_flags & MM_MMX)
         filter->filtfunc = &KDP_MMX;
     else
+#else
+        filter->mm_flags = 0,
+#endif
         filter->filtfunc = &KDP;
+
     switch (inpixfmt)
     {
         case FMT_YUV422P:
