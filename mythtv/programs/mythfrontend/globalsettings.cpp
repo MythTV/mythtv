@@ -651,7 +651,7 @@ static HostSpinBox *FFRewReposTime()
     gs->setValue(100);
     gs->setHelpText(QObject::tr("When exiting sticky keys fast forward/rewind "
                     "mode, reposition this many 1/100th seconds before "
-                    "resuming normal playback. This"
+                    "resuming normal playback. This "
                     "compensates for the reaction time between seeing "
                     "where to resume playback and actually exiting seeking."));
     return gs;
