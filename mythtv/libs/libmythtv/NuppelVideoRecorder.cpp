@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "config.h"
 #ifndef CONFIG_DARWIN
     #include <sys/soundcard.h>
 #endif
@@ -15,8 +16,6 @@
 #include <qstringlist.h>
 
 #include <iostream>
-#include "config.h"
-
 using namespace std;
 
 #include "mythcontext.h"
