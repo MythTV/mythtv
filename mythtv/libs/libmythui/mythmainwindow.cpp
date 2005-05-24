@@ -9,6 +9,9 @@
 #ifdef QWS
 #include <qwindowsystem_qws.h>
 #endif
+#ifdef Q_WS_MACX
+#import <HIToolbox/Menus.h>   // For GetMBarHeight()
+#endif
 
 #ifdef USE_LIRC
 #include <pthread.h>
