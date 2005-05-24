@@ -353,7 +353,8 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     filter->filter = &linearBlendFilter;
     filter->subfilter = &linearBlend;    /* Default, non accellerated */
     filter->mm_flags = mm_support();
-#ifdef MMX
+//#ifdef MMX
+#if defined(MMX) && defined(i386)
     if (filter->mm_flags & MM_MMXEXT)
         filter->subfilter = &linearBlendMMX;
     else if (filter->mm_flags & MM_3DNOW)

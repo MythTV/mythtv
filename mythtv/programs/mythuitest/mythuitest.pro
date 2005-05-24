@@ -5,6 +5,8 @@ INCLUDEPATH += ../../libs/libmythui ../../libs/libmyth
 DEPENDPATH += ../../libs/libmythui ../../libs/libmyth
 
 LIBS += -L../../libs/libmythui -lmythui-$$LIBVERSION
+LIBS += -L../../libs/libmyth -lmyth-$$LIBVERSION
+
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
 }
@@ -14,9 +16,6 @@ isEmpty(QMAKE_EXTENSION_LIB) {
 TARGETDEPS += ../../libs/libmythui/libmythui-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 macx {
-    # OS X complains about indirectly linked libraries
-    LIBS += -L../../libs/libmyth -lmyth-$$LIBVERSION
-    
     # Duplication of source with libmyth (e.g. oldsettings.cpp)
     # means that the linker complains, so we have to ignore duplicates 
     QMAKE_LFLAGS += -multiply_defined suppress

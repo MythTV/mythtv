@@ -50,7 +50,7 @@ INSTALLS += inc
 #
 
 using_x11 {
-    LIBS += -L/usr/X11R6/lib -lXinerama
+    LIBS += $$EXTRA_LIBS
 }
 
 macx {
