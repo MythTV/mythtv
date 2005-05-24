@@ -8,6 +8,7 @@
 
 using namespace std;
 
+#include "mythconfig.h"
 #include "ivtvdecoder.h"
 #include "RingBuffer.h"
 #include "NuppelVideoPlayer.h"
