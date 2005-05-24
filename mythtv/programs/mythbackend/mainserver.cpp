@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <fcntl.h>
+#include "../../config.h"
 #ifndef CONFIG_DARWIN
     #include <sys/soundcard.h>
 #endif
@@ -33,7 +34,6 @@ using namespace std;
 #include "libmyth/util.h"
 #include "libmyth/mythdbcon.h"
 
-#include "../../config.h"
 #include "mainserver.h"
 #include "scheduler.h"
 #include "httpstatus.h"
