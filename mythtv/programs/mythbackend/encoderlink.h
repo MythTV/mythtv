@@ -16,34 +16,44 @@ class EncoderLink
 
    ~EncoderLink();
 
-    void setSocket(PlaybackSock *lsock) { sock = lsock; }
+    /// \brief Used to set the socket for a non-local EncoderLink.
+    void SetSocket(PlaybackSock *lsock) { sock = lsock; }
+    /// \brief Returns the socket, if set, for a non-local EncoderLink.
+    PlaybackSock *GetSocket(void) { return sock; }
 
-    PlaybackSock *getSocket() { return sock; }
-    QString getHostname() { return hostname; }
+    /// \brief Returns the remote host for a non-local EncoderLink.
+    QString GetHostName(void) { return hostname; }
+    /// \brief Returns true for a local EncoderLink.
+    bool IsLocal(void) { return local; }
+    /// \brief Returns true if the EncoderLink instance is usable.
+    bool IsConnected(void) { return (IsLocal() || GetSocket()!=NULL); }
 
-    QString recordfileprefix;
+    /// \brief Returns the cardid used to refer to the recorder in the DB.
+    int GetCardID(void) { return m_capturecardnum; }
+    /// \brief Returns the TVRec used by a local EncoderLink instance.
+    TVRec *GetTVRec(void) { return tv; }
 
-    TVRec *getTV() { return tv; }
-
-    bool isLocal() { return local; }
-
-    bool isConnected();
-    int getCardId() { return m_capturecardnum; }
-
-    int LockTuner();
-    void FreeTuner();
-    bool isTunerLocked();
+    int LockTuner(void);
+    /// \brief Unlock the tuner.
+    /// \sa LockTuner(), IsTunerLocked()
+    void FreeTuner(void) { locked = false; }
+    /// \brief Returns true iff the tuner is locked.
+    /// \sa LockTuner(), FreeTuner()
+    bool IsTunerLocked(void) { return locked; }
     
-    void cacheFreeSpace();
-    bool isLowOnFreeSpace();
-    int getFreeSpace() { return freeSpace; }
+    long long GetFreeDiskSpace(long long &total, long long &used,
+                               bool from_cache=false);
+    long long GetFreeDiskSpace(bool from_cache=false);
+    long long GetMaxBitrate(void);
 
     bool IsBusy(void);
     bool IsBusyRecording(void);
 
     TVState GetState();
-    bool isRecording(ProgramInfo *rec); // scheduler call only.
+    bool IsRecording(ProgramInfo *rec); // scheduler call only.
 
+    bool HasEnoughFreeSpace(const ProgramInfo *rec,
+                            bool try_to_use_cache = false);
     bool MatchesRecording(ProgramInfo *rec);
     void RecordPending(ProgramInfo *rec, int secsleft);
     int StartRecording(ProgramInfo *rec);
@@ -69,14 +79,14 @@ class EncoderLink
     void ToggleInputs(void);
     void ToggleChannelFavorite(void);
     void ChangeChannel(int channeldirection);
-    void SetChannel(QString name);
+    void SetChannel(const QString &name);
     int ChangeContrast(bool direction);
     int ChangeBrightness(bool direction);
     int ChangeColour(bool direction);
     int ChangeHue(bool direction);
-    bool CheckChannel(QString name);
-    bool ShouldSwitchToAnotherCard(QString channelid);
-    bool CheckChannelPrefix(QString name, bool &unique);
+    bool CheckChannel(const QString &name);
+    bool ShouldSwitchToAnotherCard(const QString &channelid);
+    bool CheckChannelPrefix(const QString &name, bool &unique);
     void GetNextProgram(int direction,
                         QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime,
@@ -89,7 +99,7 @@ class EncoderLink
                         QString &channelname, QString &chanid,
                         QString &seriesid, QString &programid, QString &chanFilters, 
                         QString &repeat, QString &airdate, QString &stars);
-    void GetInputName(QString &inputname);
+    QString GetInputName();
 
     void SetReadThreadSock(QSocket *rsock);
     QSocket *GetReadThreadSocket(void);
@@ -107,7 +117,7 @@ class EncoderLink
     PlaybackSock *sock;
     QString hostname;
 
-    int freeSpace;
+    long long freeDiskSpaceKB;
 
     TVRec *tv;
 
@@ -117,6 +127,7 @@ class EncoderLink
     QDateTime endRecordingTime;
     QDateTime startRecordingTime;
     QString chanid;
+    QString recordfileprefix;
 };
 
 #endif

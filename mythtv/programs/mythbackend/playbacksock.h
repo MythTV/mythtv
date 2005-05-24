@@ -29,7 +29,7 @@ class PlaybackSock
     void setIP(QString &lip) { ip = lip; }
     QString getIP(void) { return ip; }
 
-    void GetFreeSpace(int &totalspace, int &usedspace);
+    void GetFreeDiskSpace(long long &totalspace, long long &usedspace);
     int StopRecording(ProgramInfo *pginfo);
     int CheckRecordingActive(ProgramInfo *pginfo);
     int DeleteRecording(ProgramInfo *pginfo, bool forceMetadataDelete = false);
@@ -40,6 +40,7 @@ class PlaybackSock
 
     bool IsBusy(int capturecardnum);
     int GetEncoderState(int capturecardnum);
+    long long GetMaxBitrate(int capturecardnum);
     bool EncoderIsRecording(int capturecardnum, ProgramInfo *pginfo);
     int StartRecording(int capturecardnum, ProgramInfo *pginfo);
     void RecordPending(int capturecardnum, ProgramInfo *pginfo, int secsleft);

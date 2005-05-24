@@ -8,8 +8,19 @@ using namespace std;
 class ProgramInfo;
 class RemoteEncoder;
 
+/** \class FileSystemInfo
+ *  \brief Holds hostname, total space, and used space in kilobytes.
+ */
+class FileSystemInfo
+{
+  public:
+    QString hostname;
+    long long totalSpaceKB;
+    long long usedSpaceKB;
+};
+
 vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype);
-void RemoteGetFreeSpace(int &totalspace, int &usedspace);
+vector<FileSystemInfo> RemoteGetFreeSpace();
 bool RemoteGetLoad(float load[3]);
 bool RemoteGetUptime(time_t &uptime);
 bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);

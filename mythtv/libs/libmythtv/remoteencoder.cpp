@@ -165,6 +165,18 @@ long long RemoteEncoder::GetFreeSpace(long long totalreadpos)
     return retval;
 }
 
+long long RemoteEncoder::GetMaxBitrate()
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "GET_MAX_BITRATE";
+
+    SendReceiveStringList(strlist);
+
+    long long retval = decodeLongLong(strlist, 0);
+
+    return retval;
+}
+
 long long RemoteEncoder::GetKeyframePosition(long long desired)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);

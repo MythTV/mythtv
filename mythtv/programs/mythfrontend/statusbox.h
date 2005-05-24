@@ -1,10 +1,13 @@
 #ifndef STATUSBOX_H_
 #define STATUSBOX_H_
 
+#include <qstringlist.h>
 #include "mythwidgets.h"
 #include "mythdialogs.h"
 #include "uitypes.h"
 #include "xmlparse.h"
+
+typedef QMap<QString, unsigned int> recprof2bps_t;
 
 class LayerSet;
 
@@ -57,6 +60,7 @@ class StatusBox : public MythDialog
     QMap<int, QString> contentDetail;
     QMap<int, QString> contentFont;
     QMap<int, QString> contentData;
+    recprof2bps_t      recordingProfilesBPS;
 
     MythMainWindow *my_parent;
 

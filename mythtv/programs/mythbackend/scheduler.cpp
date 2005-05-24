@@ -22,15 +22,14 @@ using namespace std;
 #include <sys/wait.h>
 
 #include "scheduler.h"
-
-#include "libmythtv/programinfo.h"
-#include "libmythtv/scheduledrecording.h"
 #include "encoderlink.h"
-#include "libmyth/exitcodes.h"
-#include "libmyth/mythcontext.h"
 #include "mainserver.h"
 #include "remoteutil.h"
+#include "libmyth/exitcodes.h"
+#include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
+#include "libmythtv/programinfo.h"
+#include "libmythtv/scheduledrecording.h"
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList)
 {
@@ -234,10 +233,7 @@ void Scheduler::FillEncoderFreeSpaceCache()
 {
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
     for (; enciter != m_tvList->end(); ++enciter)
-    {
-        EncoderLink *enc = enciter.data();
-        enc->cacheFreeSpace();
-    }
+        enciter.data()->GetFreeDiskSpace(false); // update cache value
 }
 
 bool Scheduler::FillRecordList(void)
@@ -1029,29 +1025,24 @@ void Scheduler::RunScheduler(void)
             // cerr << "nexttv = " << nextRecording->cardid;
             // cerr << " title: " << nextRecording->title << endl;
 
-            if (nexttv->isLowOnFreeSpace())
+            if (!nexttv->HasEnoughFreeSpace(nextRecording))
             {
-                FillEncoderFreeSpaceCache();
-                if (nexttv->isLowOnFreeSpace())
-                {
-                    msg = QString("SUPPRESSED recording '%1' on channel"
-                                  " %2 on cardid %3, sourceid %4.  Only"
-                                  " %5 Megs of disk space available.")
-                        .arg(nextRecording->title.local8Bit())
-                        .arg(nextRecording->chanid)
-                        .arg(nextRecording->cardid)
-                        .arg(nextRecording->sourceid)
-                        .arg(nexttv->getFreeSpace());
-                    VERBOSE(VB_GENERAL, msg);
-
-                    QMutexLocker lockit(reclist_lock);
-                    nextRecording->recstatus = rsLowDiskSpace;
-                    statuschanged = true;
-                    continue;
-                }
+                msg = QString("SUPPRESSED recording '%1' on channel"
+                              " %2 on cardid %3, sourceid %4.  Only"
+                              " %5 Megs of disk space available.")
+                    .arg(nextRecording->title.local8Bit())
+                    .arg(nextRecording->chanid)
+                    .arg(nextRecording->cardid)
+                    .arg(nextRecording->sourceid)
+                    .arg((long)nexttv->GetFreeDiskSpace(true)/1024);
+                VERBOSE(VB_GENERAL, msg);
+                QMutexLocker lockit(reclist_lock);
+                nextRecording->recstatus = rsLowDiskSpace;
+                statuschanged = true;
+                continue;
             }
 
-            if (nexttv->isTunerLocked())
+            if (nexttv->IsTunerLocked())
             {
                 msg = QString("SUPPRESSED recording \"%1\" on channel: "
                               "%2 on cardid: %3, sourceid %4. Tuner "
@@ -1644,8 +1635,8 @@ void Scheduler::AddNewRecords(void) {
     for (; enciter != m_tvList->end(); ++enciter)
     {
         EncoderLink *enc = enciter.data();
-        if (enc->isConnected())
-            cardMap[enc->getCardId()] = true;
+        if (enc->IsConnected())
+            cardMap[enc->GetCardID()] = true;
     }
 
     QMap<int, bool> tooManyMap;

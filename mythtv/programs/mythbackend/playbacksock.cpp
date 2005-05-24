@@ -66,14 +66,17 @@ bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
     return ok;
 }
 
-void PlaybackSock::GetFreeSpace(int &totalspace, int &usedspace)
+/** \fn RemoteGetFreeSpace(long long&, long long&)
+ *  \brief Returns total and used space in kilobytes.
+ */
+void PlaybackSock::GetFreeDiskSpace(long long &totalKB, long long &usedKB)
 {
-    QStringList strlist = QString("QUERY_FREESPACE");
+    QStringList strlist = QString("QUERY_FREE_SPACE");
 
     SendReceiveStringList(strlist);
 
-    totalspace = strlist[0].toInt();
-    usedspace = strlist[1].toInt();
+    totalKB = decodeLongLong(strlist, 0);
+    usedKB = decodeLongLong(strlist, 2);
 }
 
 int PlaybackSock::CheckRecordingActive(ProgramInfo *pginfo)
@@ -164,6 +167,10 @@ bool PlaybackSock::IsBusy(int capturecardnum)
     return state;
 }
 
+/** \fn PlaybackSock::GetEncoderState(int)
+ *   Returns the maximum bits per second the recorder can produce.
+ *  \param capturecardnum Recorder ID in the database.
+ */
 int PlaybackSock::GetEncoderState(int capturecardnum)
 {
     QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
@@ -173,6 +180,17 @@ int PlaybackSock::GetEncoderState(int capturecardnum)
 
     int state = strlist[0].toInt();
     return state;
+}
+
+long long PlaybackSock::GetMaxBitrate(int capturecardnum)
+{
+    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
+    strlist << "GET_MAX_BITRATE";
+
+    SendReceiveStringList(strlist);
+
+    long long ret = decodeLongLong(strlist, 0);
+    return ret;
 }
 
 bool PlaybackSock::EncoderIsRecording(int capturecardnum, ProgramInfo *pginfo)

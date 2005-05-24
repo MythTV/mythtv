@@ -36,6 +36,15 @@ using namespace std;
 #include "util.h"
 #include "mythdbcon.h"
 
+/** \class StatusBox
+ *  \brief Reports on various status items.
+ *
+ *  StatusBox reports on the listing status, that is how far
+ *  into the future program listings exits. It also reports
+ *  on the status of each tuner, the log entries, the status
+ *  of the job queue, and the machine status.
+ */
+
 StatusBox::StatusBox(MythMainWindow *parent, const char *name)
     : MythDialog(parent, name), errored(false)
 {
@@ -83,6 +92,9 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
     min_level = gContext->GetNumSetting("LogDefaultView",1);
     my_parent = parent;
     clicked();
+
+    recordingProfilesBPS["HDTV"]    = 19400000;
+    recordingProfilesBPS["average"] =  5500000;
 }
 
 StatusBox::~StatusBox(void)
@@ -901,55 +913,81 @@ void StatusBox::doJobQueueStatus()
 
 // Some helper routines for doMachineStatus() that format the output strings
 
-#define MB (1024*1024)
-
-static const QString usageStr(float total, float used, float free)
+/** \fn sm_str(long long, int)
+ *  \brief Returns a short string describing an amount of space, choosing
+ *         one of a number of useful units, "TB", "GB", "MB", or "KB".
+ *  \param sizeKB Number of kilobytes.
+ *  \param prec   Precision to use if we have less than ten of whatever
+ *                unit is chosen.
+ */
+static const QString sm_str(long long sizeKB, int prec=1)
 {
-    char  buff1[10];       // QString::arg(double) doesn't allow %0.2f,
-    char  buff2[10];       // so we need to use sprintf() with a buffer
-    char *units  = "MB";
-    char *format = "%0.0f";
-
-    if (total == 0.0)
-        return "unknown";
-
-    if (total > 1024)
-        units = "GB", format = "%0.2f",
-        total /= 1024, used /= 1024, free /= 1024;
-
-    sprintf(buff1, format, total);
-
-    QString s = QString("%1 %2").arg(buff1).arg(units);
-    //QString s = QString("%1 %2 %3")
-                //.arg(buff1).arg(units).arg(QObject::tr("total"));
-
-
-    // If, some some reason, we didn't get the usage stats, shorten output:
-
-    if (used == 0 && free == 0)
-        return s;
-
-
-    sprintf(buff1, format, used);
-    sprintf(buff2, format, free);
-
-    return s + ", " +
-           QString("%1 %2 %3")
-           .arg(buff1).arg(units).arg(QObject::tr("used"))
-           + ", " +
-           QString("%1 %2 %3 (%4%)")
-           .arg(buff2).arg(units).arg(QObject::tr("free"))
-           .arg((int)(100*free/total));
+    if (sizeKB>1024*1024*1024) // Terabytes
+    {
+        double sizeGB = sizeKB/(1024*1024*1024);
+        return QString("%1 TB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
+    }
+    else if (sizeKB>1024*1024) // Gigabytes
+    {
+        double sizeGB = sizeKB/(1024*1024);
+        return QString("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
+    }
+    else if (sizeKB>1024) // Megabytes
+    {
+        double sizeMB = sizeKB/1024;
+        return QString("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
+    }
+    // Kilobytes
+    return QString("%1 KB").arg(sizeKB);
 }
 
-static const QString diskUsageStr(const char *path)
+static const QString usage_str_kb(long long total,
+                                  long long used,
+                                  long long free)
 {
-    double total, free, used;
+    QString ret = QObject::tr("Unknown");
+    if (total > 0.0 && used > 0.0 && free > 0.0)
+    {
+        double percent = (100.0*free)/total;
+        ret = QObject::tr("%1 total, %2 used, %3 (or %4%) free.")
+            .arg(sm_str(total)).arg(sm_str(used))
+            .arg(sm_str(free)).arg(percent, 0, 'f', (percent >= 10.0) ? 0 : 2);
+    }
+    return ret;
+}
 
-    if (diskUsage(path, total, used, free))
-        return usageStr (total, used, free);
-    else
-        return QString("%1 - %2").arg(path).arg(strerror(errno));
+static const QString usage_str_mb(float total, float used, float free)
+{
+    return usage_str_kb((long long)(total*1024), (long long)(used*1024),
+                        (long long)(free*1024));
+}
+
+static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
+                                        long long used, long long free,
+                                        const recprof2bps_t& prof2bps)
+{
+    const QString tail = QObject::tr(", using recording profile '%1'");
+    const QString avg = QObject::tr(", using your typical recording profile.");
+    out<<usage_str_kb(total, used, free);
+    if (free<0)
+        return;
+
+    recprof2bps_t::const_iterator it = prof2bps.begin();
+    for (; it != prof2bps.end(); ++it)
+    {
+        const QString pro = (it.key()=="average") ? avg : tail.arg(it.key());
+        long long bytesPerMin = (it.data() >> 1) * 15;
+        uint minLeft = ((free<<5)/bytesPerMin)<<5;
+        minLeft = (minLeft/15)*15;
+        uint hoursLeft = minLeft/60;
+        if (hoursLeft > 3)
+            out<<QObject::tr("%1 hours left %2").arg(hoursLeft).arg(pro);
+        else if (minLeft > 90)
+            out<<QObject::tr("%1 hours and %2 minutes left %3")
+                .arg(hoursLeft).arg(minLeft%60).arg(pro);
+        else
+            out<<QObject::tr("%1 minutes left %2").arg(minLeft).arg(pro);
+    }
 }
 
 static const QString uptimeStr(time_t uptime)
@@ -993,6 +1031,39 @@ static const QString uptimeStr(time_t uptime)
     }
 }
 
+/** \fn eliminate_duplicates(vector<FileSystemInfo> fsInfos)
+ *  \brief Removes unique entries for hosts sharing space, replacing
+ *         the "hostname" field with a comma sperated list of hosts.
+ *  \param fsInfos File system info classes to process.
+ */
+static void eliminate_duplicates(vector<FileSystemInfo>& fsInfos)
+{
+    vector<FileSystemInfo>::iterator it1, it2;
+    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
+    {
+        it2 = it1;
+        for (it2++; it2 != fsInfos.end(); it2++)
+        {
+            if ((it1->totalSpaceKB == it2->totalSpaceKB) &&
+                (it1->usedSpaceKB*0.95 < it2->usedSpaceKB) &&
+                (it1->usedSpaceKB*1.05 > it2->usedSpaceKB))
+            {
+                it1->hostname = it1->hostname + ", " + it2->hostname;
+                fsInfos.erase(it2);
+                it2 = it1;
+            }
+        }
+    }
+}
+
+/** \fn StatusBox::doMachineStatus()
+ *  \brief Should machine status.
+ *  
+ *   This returns statisics for master backend when using
+ *   a frontend only machine. And returns info on the current
+ *   system if frontend is running on a backend machine.
+ *  \bug We should report on all backends and the current frontend.
+ */
 void StatusBox::doMachineStatus()
 {
     int           count(0);
@@ -1038,12 +1109,12 @@ void StatusBox::doMachineStatus()
         usedM = totalM - freeM;
         if (totalM > 0)
             contentLines[count++] = "   " + QObject::tr("RAM") +
-                                    ": "  + usageStr(totalM, usedM, freeM);
+                                    ": "  + usage_str_mb(totalM, usedM, freeM);
         usedS = totalS - freeS;
         if (totalS > 0)
             contentLines[count++] = "   " +
                                     QObject::tr("Swap") +
-                                    ": "  + usageStr(totalS, usedS, freeS);
+                                    ": "  + usage_str_mb(totalS, usedS, freeS);
     }
 
     if (!isBackend)
@@ -1074,69 +1145,34 @@ void StatusBox::doMachineStatus()
             usedM = totalM - freeM;
             if (totalM > 0)
                 contentLines[count++] = "   " + QObject::tr("RAM") +
-                                        ": "  + usageStr(totalM, usedM, freeM);
+                                        ": "  + usage_str_mb(totalM, usedM, freeM);
             usedS = totalS - freeS;
             if (totalS > 0)
                 contentLines[count++] = "   " + QObject::tr("Swap") +
-                                        ": "  + usageStr(totalS, usedS, freeS);
+                                        ": "  + usage_str_mb(totalS, usedS, freeS);
         }
     }
 
     // get free disk space
-    contentLines[count++] = QString(QObject::tr("Disk space:"));
-
-    if (isBackend)
+    vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
+    eliminate_duplicates(fsInfos);
+    for (uint i=0; i<fsInfos.size(); i++)
     {
-        QString str;
+        QStringList list;
+        disk_usage_with_rec_time_kb(list,
+            fsInfos[i].totalSpaceKB, fsInfos[i].usedSpaceKB,
+            fsInfos[i].totalSpaceKB - fsInfos[i].usedSpaceKB,
+            recordingProfilesBPS);
 
-        contentLines[count] = "   " + QString(QObject::tr("Recordings")) + ": ";
+        contentLines[count++] = 
+            QObject::tr("Disk usage on %1:").arg(fsInfos[i].hostname);
 
-        // Perform the database queries
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT * FROM settings "
-                      "WHERE value=\"RecordFilePrefix\" "
-                      "AND hostname = :HOSTNAME ;");
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
-        query.exec();
-
-        // did we get results?
-        if (query.isActive() && query.numRowsAffected())
-        {
-            // skip to first result
-            query.next();
-            str = diskUsageStr(query.value(1).toCString());
-        }
-        else
-            str = QString(QObject::tr("DB error - RecordFilePrefix unknown"));
-        contentLines[count++].append(str);
-
-        // Ditto for the second path
-        contentLines[count] = "   " + QString(QObject::tr("TV buffer")) + ": ";
-
-        query.prepare("SELECT * FROM settings "
-                      "WHERE value=\"LiveBufferDir\" "
-                      "AND hostname = :HOSTNAME ;");
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
-        query.exec();
-        if (query.isActive() && query.numRowsAffected())
-        {
-            query.next();
-            str = diskUsageStr(query.value(1).toCString());
-        }
-        else
-            str = QString(QObject::tr("DB error - LiveBufferDir unknown"));
-        contentLines[count++].append(str);
-    }
-    else
-    {
-        int  total, used;
-        RemoteGetFreeSpace(total, used);
-        if (total)
-            contentLines[count++] = "   " + usageStr(total, used, total - used);
-        else
-            contentLines[count++] = "   " + QString(QObject::tr("Unknown"));
+        QStringList::iterator it = list.begin();
+        for (;it != list.end(); ++it)
+            contentLines[count++] =  QString("   ") + (*it);
     }
 
     contentTotalLines = count;
     update(ContentRect);
 }
+

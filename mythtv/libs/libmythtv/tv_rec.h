@@ -104,6 +104,7 @@ class TVRec
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
     long long GetFreeSpace(long long totalreadpos);
+    long long GetMaxBitrate();
     long long GetKeyframePosition(long long desired);
     void StopPlaying(void);
     bool SetupRingBuffer(QString &path, long long &filesize, 

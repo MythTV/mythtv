@@ -11,6 +11,7 @@
 #include <iostream>
 using namespace std;
 
+#include "mythconfig.h"
 #include "tv_rec.h"
 #include "osd.h"
 #include "mythcontext.h"
@@ -1378,9 +1379,11 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
     return ret;
 }
 
-/*
- * Returns true if name is either a valid channel name or a valid channel
- * prefix.  If name is a valid channel name and not a valid channel prefix
+/** \fn TVRec::CheckChannelPrefix(QString name, bool &unique)
+ *  \brief Returns true if name is either a valid channel name 
+ *         or a valid channel prefix.
+ *
+ * If name is a valid channel name and not a valid channel prefix
  * unique is set to true.
  * For example, if name == "36" and "36", "360", "361", "362", and "363" are
  * valid channel names, this function would return true but set *unique to
@@ -1838,6 +1841,26 @@ long long TVRec::GetFreeSpace(long long totalreadpos)
                rbuffer->GetTotalWritePosition() - rbuffer->GetSmudgeSize();
 
     return -1;
+}
+
+/** \fn TVRec::GetMaxBitrate()
+ *   Returns the maximum bits per second this recorder can produce.
+ */
+long long TVRec::GetMaxBitrate()
+{
+    long long bitrate;
+    if (cardtype == "MPEG")
+        bitrate = 10080000LL; // use DVD max bit rate
+    else if (cardtype == "HDTV")
+        bitrate = 19400000LL; // 1080i
+    else if (cardtype == "FIREWIRE")
+        bitrate = 19400000LL; // 1080i
+    else if (cardtype == "DVB")
+        bitrate = 19400000LL; // 1080i
+    else // frame grabber
+        bitrate = 10080000LL; // use DVD max bit rate, probably too big
+
+    return bitrate;
 }
 
 void TVRec::StopPlaying(void)

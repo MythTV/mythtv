@@ -79,7 +79,7 @@ class MainServer : public QObject
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleReactivateRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleRescheduleRecordings(int recordid, PlaybackSock *pbs);
-    void HandleQueryFreeSpace(PlaybackSock *pbs);
+    void HandleQueryFreeSpace(PlaybackSock *pbs, bool allBackends);
     void HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryGuideDataThrough(PlaybackSock *pbs);
     void HandleGetPendingRecordings(PlaybackSock *pbs);
@@ -89,6 +89,7 @@ class MainServer : public QObject
     void HandleGetFreeRecorder(PlaybackSock *pbs);
     void HandleGetFreeRecorderCount(PlaybackSock *pbs);
     void HandleGetFreeRecorderList(PlaybackSock *pbs);
+    void HandleGetConnectedRecorderList(PlaybackSock *pbs);
     void HandleRecorderQuery(QStringList &slist, QStringList &commands,
                              PlaybackSock *pbs);
     void HandleFileTransferQuery(QStringList &slist, QStringList &commands,
@@ -126,7 +127,6 @@ class MainServer : public QObject
 
     void SendResponse(QSocket *pbs, QStringList &commands);
 
-    void getFreeSpace(int &total, int &used);
     void getGuideDataThrough(QDateTime &GuideDataThrough);
 
     PlaybackSock *getSlaveByHostname(QString &hostname);

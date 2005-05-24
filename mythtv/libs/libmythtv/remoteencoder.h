@@ -24,6 +24,8 @@ class RemoteEncoder
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
     long long GetFreeSpace(long long totalreadpos);
+    long long GetFreeDiskSpace();
+    long long GetMaxBitrate();
     long long GetKeyframePosition(long long desired);
     void FillPositionMap(int start, int end,
                          QMap<long long, long long> &positionMap);

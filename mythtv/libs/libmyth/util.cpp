@@ -10,17 +10,16 @@ using namespace std;
 // System specific C headers
 #include <sys/types.h>
 #include <sys/wait.h>
-#ifdef __linux__
+#include <sys/stat.h>
+
+#ifdef linux
+#include <sys/vfs.h>
 #include <sys/statvfs.h>
 #include <sys/sysinfo.h>
-#endif
-#if defined(__FreeBSD__) || defined(CONFIG_DARWIN)
+#else
 #include <sys/sysctl.h>
 #include <sys/param.h>
 #include <sys/mount.h>
-#endif
-#ifdef CONFIG_DARWIN
-#include <mach/mach.h>
 #endif
 
 // Qt headers
@@ -128,7 +127,7 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
     
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = QString("WriteStringList: write -> %1 %2")
+        QString msg = QString("write -> %1 %2")
             .arg(socket->socket(), 2).arg(payload);
 
         if (msg.length() > 88)
@@ -420,7 +419,7 @@ bool WriteStringList(QSocket *socket, QStringList &list)
 
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = QString("WriteStringList: write -> %1 %2")
+        QString msg = QString("write -> %1 %2")
             .arg(socket->socket(), 2).arg(payload);
 
         if (msg.length() > 88)
@@ -572,7 +571,7 @@ bool ReadStringList(QSocket *socket, QStringList &list)
     
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = QString("ReadStringList: read <- %1 %2")
+        QString msg = QString("read  <- %1 %2")
             .arg(socket->socket(), 2).arg(payload);
 
         if (msg.length() > 88)
@@ -977,33 +976,29 @@ bool getUptime(time_t &uptime)
     return true;
 }
 
-/** \fn diskUsage(const char*,double&,double&,double&)
- *  \brief Returns approximate memory usage in megabytes on file system 
- *         containing the file "fs".
- *  \todo Memory Statistics are not supported (by MythTV) on NT or DOS.
- *  \return Returns true if successful, false otherwise.
+/** \fn getDiskSpace(const QString&,long long&,long long&)
+ *  \brief Returns free space on disk containing file in KiB,
+ *          or -1 if it does not succeed.
+ *  \param file_on_disk file on the file system we wish to stat.
  */
-bool diskUsage(const char *fs, double &total, double &used, double &free)
+long long getDiskSpace(const QString &file_on_disk,
+                       long long &total, long long &used)
 {
-    double MB = (1024*1024);
-    // stat the file system
+    struct statfs statbuf;
+    bzero(&statbuf, sizeof(statbuf));
+    long long freespace = -1;
+    if (statfs(file_on_disk.local8Bit(), &statbuf) == 0)
+    {
+        freespace = statbuf.f_bsize * (statbuf.f_bavail >> 10);
+        total = statbuf.f_bsize * (statbuf.f_blocks >> 10);
+        used  = total - freespace;
+    }
+    else
+    {
+        freespace = total = used = -1;
+    }
 
-#ifdef __linux__
-#define STAT statvfs
-#elif defined(__FreeBSD__) || defined(CONFIG_DARWIN)
-#define STAT statfs
-#endif
-
-    struct STAT sbuff;
-    if (STAT(fs, &sbuff) == -1)
-        return false;
-
-    // see http://en.wikipedia.org/wiki/Megabyte
-
-    total = (double)sbuff.f_blocks * sbuff.f_bsize / MB;
-    free  = (double)sbuff.f_bfree  * sbuff.f_bsize / MB;
-    used   = total - free;
-    return true;
+    return freespace;
 }
 
 /** \fn getMemStats(int&,int&,int&,int&)
@@ -1057,9 +1052,9 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     // This is a real hack. I have not found a way to ask the kernel how much
     // swap it is using, and the dynamic_pager daemon doesn't even seem to be
     // able to report what filesystem it is using for the swapfiles. So, we do:
-    double total, used, free;
-    diskUsage("/private/var/vm", total, used, free);
-    totalVM = (int)total, freeVM = (int)free;
+    long long total, used, free;
+    free = getDiskSpace("/private/var/vm", total, used);
+    totalVM = (int)(total*1024LL), freeVM = (int)(free*1024LL);
 
 #else
     VERBOSE(VB_IMPORTANT, "getMemStats(): Unknown platform. "

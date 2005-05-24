@@ -877,10 +877,16 @@ void PlaybackBox::updateUsage(QPainter *p)
                 return;
         }
 
+        vector<FileSystemInfo> fsInfos;
         if (updateFreeSpace && connected)
         {
             updateFreeSpace = false;
-            RemoteGetFreeSpace(freeSpaceTotal, freeSpaceUsed);
+            fsInfos = RemoteGetFreeSpace();
+            if (fsInfos.size()>0)
+            {
+                freeSpaceTotal = (int) (fsInfos[0].totalSpaceKB >> 10);
+                freeSpaceUsed = (int) (fsInfos[0].usedSpaceKB >> 10);
+            }
             freeSpaceTimer->start(15000);
         }    
 

@@ -8,8 +8,9 @@
 #include <qwaitcondition.h>
 #include <qregexp.h>
 
-#include <unistd.h>
 #include <cstdlib>
+#include <cerrno>
+#include <unistd.h>
 #include <fcntl.h>
 #include "../../config.h"
 #ifndef CONFIG_DARWIN
@@ -39,6 +40,7 @@ using namespace std;
 #include "httpstatus.h"
 #include "programinfo.h"
 #include "jobqueue.h"
+#include "autoexpire.h"
 
 class ProcessRequestThread : public QThread
 {
@@ -104,6 +106,7 @@ MainServer::MainServer(bool master, int port, int statusport,
     masterServer = NULL;
 
     encoderList = tvList;
+    AutoExpire::Update(encoderList, true);
 
     for (int i = 0; i < 5; i++)
     {
@@ -278,9 +281,13 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
         else
             HandleQueryRecordings(tokens[1], pbs);
     }
-    else if (command == "QUERY_FREESPACE")
+    else if (command == "QUERY_FREE_SPACE")
     {
-        HandleQueryFreeSpace(pbs);
+        HandleQueryFreeSpace(pbs, false);
+    }
+    else if (command == "QUERY_FREE_SPACE_LIST")
+    {
+        HandleQueryFreeSpace(pbs, true);
     }
     else if (command == "QUERY_LOAD")
     {
@@ -687,8 +694,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         for (; iter != encoderList->end(); ++iter)
         {
             EncoderLink *elink = iter.data();
-            if (elink->getHostname() == commands[2])
-                elink->setSocket(pbs);
+            if (elink->GetHostName() == commands[2])
+                elink->SetSocket(pbs);
         }
 
         if (m_sched)
@@ -700,6 +707,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         gContext->dispatch(me);
 
         playbackList.push_back(pbs);
+
+        AutoExpire::Update(encoderList, false);
     }
     else if (commands[1] == "RingBuffer")
     {
@@ -719,7 +728,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         enc->SetReadThreadSock(socket);
 
-        if (enc->isLocal())
+        if (enc->IsLocal())
         {
             int dsp_status, soundcardcaps;
             QString audiodevice, audiooutputdevice, querytext;
@@ -1100,6 +1109,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     // sleep a little to let frontends reload the recordings list
     // after deleteing a recording, then we can hammer the DB and filesystem
     sleep(3);
+    usleep(rand()%2000);
 
     deletelock.lock();
 
@@ -1170,17 +1180,24 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
     JobQueue::DeleteAllJobs(ds->chanid, ds->recstartts);
 
-    QString filename;
+    int err;
+    QString filename = ds->filename;
     bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
 
-    filename = ds->filename;
+    VERBOSE(VB_FILE, QString("About to unlink/delete file: %1").arg(filename));
     if (followLinks)
     {
         QFileInfo finfo(filename);
-        if (finfo.isSymLink())
-            unlink(finfo.readLink().ascii());
+        if (finfo.isSymLink() && (err = unlink(finfo.readLink().local8Bit())))
+        {
+            VERBOSE(VB_IMPORTANT, QString("Error deleting '%1' @ '%2', %3")
+                    .arg(filename).arg(finfo.readLink().local8Bit())
+                    .arg(strerror(errno)));
+        }
     }
-    unlink(filename.ascii());
+    if ((err = unlink(filename.local8Bit())))
+        VERBOSE(VB_IMPORTANT, QString("Error deleting '%1', %2")
+                .arg(filename).arg(strerror(errno)));
     
     sleep(2);
 
@@ -1207,10 +1224,16 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     if (followLinks)
     {
         QFileInfo finfo(filename);
-        if (finfo.isSymLink())
-            unlink(finfo.readLink().ascii());
+        if (finfo.isSymLink() && (err = unlink(finfo.readLink().local8Bit())))
+        {
+            VERBOSE(VB_IMPORTANT, QString("Error deleting '%1' @ '%2', %3")
+                    .arg(filename).arg(finfo.readLink().local8Bit())
+                    .arg(strerror(errno)));
+        }
     }
-    unlink(filename.ascii());
+    if ((err = unlink(filename.local8Bit())))
+        VERBOSE(VB_IMPORTANT, QString("Error deleting '%1', %2")
+                .arg(filename).arg(strerror(errno)));
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
@@ -1314,7 +1337,7 @@ void MainServer::HandleCheckRecordingActive(QStringList &slist,
         {
             EncoderLink *elink = iter.data();
 
-            if (elink->isLocal() && elink->MatchesRecording(pginfo))
+            if (elink->IsLocal() && elink->MatchesRecording(pginfo))
                 result = iter.key();
         }
     }
@@ -1377,7 +1400,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     {
         EncoderLink *elink = iter.data();
 
-        if (elink->isLocal() && elink->MatchesRecording(pginfo))
+        if (elink->IsLocal() && elink->MatchesRecording(pginfo))
         {
             recnum = iter.key();
 
@@ -1525,6 +1548,8 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
     if (pbs)
         pbssock = pbs->getSocket();
 
+    // If this recording was made by a another recorder, and that
+    // recorder is available, tell it to do the deletion.
     if (ismaster && pginfo->hostname != gContext->GetHostName())
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
@@ -1554,6 +1579,8 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         }
     }
 
+    // Tell all encoders to stop recordering to the file being deleted.
+    // Hopefully this is never triggered.
     int resultCode = -1;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
@@ -1561,7 +1588,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
     {
         EncoderLink *elink = iter.data();
 
-        if (elink->isLocal() && elink->MatchesRecording(pginfo))
+        if (elink->IsLocal() && elink->MatchesRecording(pginfo))
         {
             resultCode = iter.key();
 
@@ -1587,7 +1614,10 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
     QFile checkFile(filename);
     bool fileExists = checkFile.exists();
 
-    // allow deleting of files where the recording failed meaning size == 0
+    // Allow deleting of files where the recording failed meaning size == 0
+    // But do not allow deleting of files that appear to be completely absent.
+    // The latter condition indicates the filesystem containing the file is
+    // most likely absent and deleting the file metadata is unsafe.
     if ((fileExists) || (pginfo->filesize == 0) || (forceMetadataDelete))
     {
         DeleteStruct *ds = new DeleteStruct;
@@ -1630,6 +1660,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         SendResponse(pbssock, outputlist);
     }
 
+    // Tell MythTV frontends that the recording list needs to be updated.
     if ((fileExists) || (pginfo->filesize == 0) || (forceMetadataDelete))
     {
         MythEvent me("RECORDING_LIST_CHANGE");
@@ -1698,59 +1729,37 @@ void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
 
 }
 
-void MainServer::getFreeSpace(int &totalspace, int &usedspace)
-{
-    struct statfs statbuf;
-    if (statfs(recordfileprefix.ascii(), &statbuf) == 0) 
-    {
-        // total space available to user is total blocks - reserved blocks
-        totalspace = (statbuf.f_blocks - (statbuf.f_bfree - statbuf.f_bavail)) /
-                      (1024*1024/statbuf.f_bsize);
-        usedspace = totalspace - (statbuf.f_bavail) /
-                      (1024*1024/statbuf.f_bsize);
-    }
-
-    if (ismaster)
-    {
-        vector<PlaybackSock *>::iterator iter = playbackList.begin();
-        for (; iter != playbackList.end(); iter++)
-        {
-            PlaybackSock *lsock = (*iter);
-            if (lsock->isSlaveBackend())
-            {
-                int remtotal = -1, remused = -1;
-                lsock->GetFreeSpace(remtotal, remused);
-                totalspace += remtotal;
-                usedspace += remused;
-            }
-        }
-    }
-
-    QString filename = gContext->GetSetting("RecordFilePrefix") + 
-                                             "/nfslockfile.lock";
-    QFile checkFile(filename);
-
-    if (!ismaster)
-    {
-        if (checkFile.exists())  //found the lockfile, so don't count the space
-        {
-            totalspace = 0;
-            usedspace = 0;
-        }
-    }
-}
-
-void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
-{
-    QSocket *pbssock = pbs->getSocket();
-
-    int totalspace = -1, usedspace = -1;
-
-    getFreeSpace(totalspace, usedspace);
-
+void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
+{    
     QStringList strlist;
-    strlist << QString::number(totalspace) << QString::number(usedspace);
-    SendResponse(pbssock, strlist);
+    long long totalKB = -1, usedKB = -1;
+    getDiskSpace(recordfileprefix, totalKB, usedKB);
+    if (!allHosts)
+    {
+        encodeLongLong(strlist, totalKB);
+        encodeLongLong(strlist, usedKB);
+        SendResponse(pbs->getSocket(), strlist);
+    }
+    else
+    {
+        strlist<<gContext->GetHostName();
+        encodeLongLong(strlist, totalKB);
+        encodeLongLong(strlist, usedKB);
+
+        QMap<int, EncoderLink *>::Iterator eit = encoderList->begin();
+        while (ismaster && eit != encoderList->end())
+        {
+            if (eit.data()->IsConnected() && !eit.data()->IsLocal())
+            {
+                eit.data()->GetFreeDiskSpace(totalKB, usedKB);
+                strlist<<eit.data()->GetHostName();
+                encodeLongLong(strlist, totalKB);
+                encodeLongLong(strlist, usedKB);
+            }
+            ++eit;
+        }
+        SendResponse(pbs->getSocket(), strlist);
+    }
 }
 
 void MainServer::HandleQueryLoad(PlaybackSock *pbs)
@@ -1933,15 +1942,15 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs)
     {
         EncoderLink *elink = iter.data();
 
-        if (elink->isLocal())
+        if (elink->IsLocal())
             enchost = gContext->GetHostName();
         else
-            enchost = elink->getHostname();
+            enchost = elink->GetHostName();
 
         if ((enchost == pbshost) &&
-            (elink->isConnected()) &&
+            (elink->IsConnected()) &&
             (!elink->IsBusy()) &&
-            (!elink->isTunerLocked()))
+            (!elink->IsTunerLocked()))
         {
             encoder = elink;
             break;
@@ -2052,13 +2061,13 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 
         if (!lastcard)
         {
-            if (elink->isLocal())
+            if (elink->IsLocal())
                 enchost = gContext->GetHostName();
             else
-                enchost = elink->getHostname();
+                enchost = elink->GetHostName();
 
-            if (enchost == pbshost && elink->isConnected() &&
-                !elink->IsBusy() && !elink->isTunerLocked())
+            if (enchost == pbshost && elink->IsConnected() &&
+                !elink->IsBusy() && !elink->IsTunerLocked())
             {
                 encoder = elink;
                 retval = iter.key();
@@ -2068,8 +2077,8 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
             }
         }
 
-        if ((retval == -1 || lastcard) && elink->isConnected() &&
-            !elink->IsBusy() && !elink->isTunerLocked())
+        if ((retval == -1 || lastcard) && elink->IsConnected() &&
+            !elink->IsBusy() && !elink->IsTunerLocked())
         {
             encoder = elink;
             retval = iter.key();
@@ -2082,7 +2091,7 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
         
     if (encoder)
     {
-        if (encoder->isLocal())
+        if (encoder->IsLocal())
         {
             strlist << gContext->GetSetting("BackendServerIP");
             strlist << gContext->GetSetting("BackendServerPort");
@@ -2090,10 +2099,10 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
         else
         {
             strlist << gContext->GetSettingOnHost("BackendServerIP", 
-                                                  encoder->getHostname(),
+                                                  encoder->GetHostName(),
                                                   "nohostname");
             strlist << gContext->GetSettingOnHost("BackendServerPort", 
-                                                  encoder->getHostname(), "-1");
+                                                  encoder->GetHostName(), "-1");
         }
     }
     else
@@ -2117,9 +2126,9 @@ void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
     {
         EncoderLink *elink = iter.data();
 
-        if ((elink->isConnected()) &&
+        if ((elink->IsConnected()) &&
             (!elink->IsBusy()) &&
-            (!elink->isTunerLocked()))
+            (!elink->IsTunerLocked()))
         {
             count++;
         }
@@ -2141,9 +2150,9 @@ void MainServer::HandleGetFreeRecorderList(PlaybackSock *pbs)
     {
         EncoderLink *elink = iter.data();
 
-        if ((elink->isConnected()) &&
+        if ((elink->IsConnected()) &&
             (!elink->IsBusy()) &&
-            (!elink->isTunerLocked()))
+            (!elink->IsTunerLocked()))
         {
             strlist << QString::number(iter.key());
         }
@@ -2190,9 +2199,9 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
             elink = iter.data();
 
             if ((retval == -1) &&
-                (elink->isConnected()) &&
+                (elink->IsConnected()) &&
                 (!elink->IsBusy()) &&
-                (!elink->isTunerLocked()))
+                (!elink->IsTunerLocked()))
             {
                 encoder = elink;
                 retval = iter.key();
@@ -2214,7 +2223,7 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
         
     if (encoder)
     {
-        if (encoder->isLocal())
+        if (encoder->IsLocal())
         {
             strlist << gContext->GetSetting("BackendServerIP");
             strlist << gContext->GetSetting("BackendServerPort");
@@ -2222,10 +2231,10 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
         else
         {
             strlist << gContext->GetSettingOnHost("BackendServerIP", 
-                                                  encoder->getHostname(),
+                                                  encoder->GetHostName(),
                                                   "nohostname");
             strlist << gContext->GetSettingOnHost("BackendServerPort", 
-                                                  encoder->getHostname(), "-1");
+                                                  encoder->GetHostName(), "-1");
         }
     }
     else
@@ -2282,6 +2291,11 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         long long pos = decodeLongLong(slist, 2);
 
         long long value = enc->GetFreeSpace(pos);
+        encodeLongLong(retlist, value);
+    }
+    else if (command == "GET_MAX_BITRATE")
+    {
+        long long value = enc->GetMaxBitrate();
         encodeLongLong(retlist, value);
     }
     else if (command == "GET_KEYFRAME_POS")
@@ -2563,8 +2577,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     {
         QString name = slist[2];
 
-        QString input = "";
-        enc->GetInputName(input);
+        QString input = enc->GetInputName();
 
         retlist << input;
     }
@@ -2655,6 +2668,11 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
  
         retlist << "OK";
         delete pginfo;
+    }
+    else if (command == "GET_MAX_BITRATE")
+    {
+        long long value = enc->GetMaxBitrate();
+        encodeLongLong(retlist, value);
     }
 
     SendResponse(pbssock, retlist);
@@ -2936,7 +2954,7 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
     {
         EncoderLink *elink = iter.data();
 
-        if (elink->isConnected() && elink->MatchesRecording(pginfo))
+        if (elink->IsConnected() && elink->MatchesRecording(pginfo))
         {
             retval = iter.key();
             encoder = elink;
@@ -2947,7 +2965,7 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
 
     if (encoder)
     {
-        if (encoder->isLocal())
+        if (encoder->IsLocal())
         {
             strlist << gContext->GetSetting("BackendServerIP");
             strlist << gContext->GetSetting("BackendServerPort");
@@ -2955,10 +2973,10 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
         else
         {
             strlist << gContext->GetSettingOnHost("BackendServerIP",
-                                                  encoder->getHostname(),
+                                                  encoder->GetHostName(),
                                                   "nohostname");
             strlist << gContext->GetSettingOnHost("BackendServerPort",
-                                                  encoder->getHostname(), "-1");
+                                                  encoder->GetHostName(), "-1");
         }
     }
     else
@@ -2985,9 +3003,9 @@ void MainServer::HandleGetRecorderFromNum(QStringList &slist,
     if(iter != encoderList->end())
         encoder =  iter.data();
 
-    if (encoder && encoder->isConnected())
+    if (encoder && encoder->IsConnected())
     {
-        if (encoder->isLocal())
+        if (encoder->IsLocal())
         {
             strlist << gContext->GetSetting("BackendServerIP");
             strlist << gContext->GetSetting("BackendServerPort");
@@ -2995,10 +3013,10 @@ void MainServer::HandleGetRecorderFromNum(QStringList &slist,
         else
         {
             strlist << gContext->GetSettingOnHost("BackendServerIP",
-                                                  encoder->getHostname(),
+                                                  encoder->GetHostName(),
                                                   "nohostname");
             strlist << gContext->GetSettingOnHost("BackendServerPort",
-                                                  encoder->getHostname(), "-1");
+                                                  encoder->GetHostName(), "-1");
         }
     }
     else
@@ -3088,7 +3106,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     for (; iter != encoderList->end(); ++iter)
     {
-        if (iter.data()->isLocal())
+        if (iter.data()->IsLocal())
             elink = iter.data();
     }
 
@@ -3245,8 +3263,8 @@ void MainServer::endConnection(RefSocket *socket)
                 for (; iter != encoderList->end(); ++iter)
                 {
                     EncoderLink *elink = iter.data();
-                    if (elink->getSocket() == (*it))
-                        elink->setSocket(NULL);
+                    if (elink->GetSocket() == (*it))
+                        elink->SetSocket(NULL);
                 }
                 if (m_sched)
                     m_sched->Reschedule(0);
@@ -3291,7 +3309,7 @@ void MainServer::endConnection(RefSocket *socket)
             for (; i != encoderList->end(); ++i)
             {
                 EncoderLink *enc = i.data();
-                if (enc->isLocal())
+                if (enc->IsLocal())
                 {
                     while (enc->GetState() == kState_ChangingState)
                         usleep(500);
@@ -3515,6 +3533,8 @@ void MainServer::reconnectTimeout(void)
 
     // Handle any messages sent before the readyRead signal was connected.
     ProcessRequest(masterServerSock);
+
+    AutoExpire::Update(encoderList, false);
 }
 
 // returns true, if a client (slavebackends are not counted!)
@@ -3590,23 +3610,23 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
 
         if (elink != NULL)
         {
-            isLocal = elink->isLocal();
+            isLocal = elink->IsLocal();
 
             QDomElement encoder = pDoc->createElement("Encoder");
             encoders.appendChild(encoder);
 
-            encoder.setAttribute("id"            , elink->getCardId()       );
+            encoder.setAttribute("id"            , elink->GetCardID()       );
             encoder.setAttribute("local"         , isLocal                  );
-            encoder.setAttribute("connected"     , elink->isConnected()     );
+            encoder.setAttribute("connected"     , elink->IsConnected()     );
             encoder.setAttribute("state"         , elink->GetState()        );
-            encoder.setAttribute("lowOnFreeSpace", elink->isLowOnFreeSpace());
+            //encoder.setAttribute("lowOnFreeSpace", elink->isLowOnFreeSpace());
 
             if (isLocal)
                 encoder.setAttribute("hostname", gContext->GetHostName());
             else
-                encoder.setAttribute("hostname", elink->getHostname());
+                encoder.setAttribute("hostname", elink->GetHostName());
 
-            if (elink->isConnected())
+            if (elink->IsConnected())
                 numencoders++;
 
             switch (elink->GetState())
@@ -3782,13 +3802,13 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
 
     // drive space   ---------------------
 
-    int iTotal = -1, iUsed = -1;
+    long long iTotal = -1, iUsed = -1, iAvail = -1;
 
-    getFreeSpace(iTotal, iUsed);
+    iAvail = getDiskSpace(recordfileprefix, iTotal, iUsed);
 
-    storage.setAttribute("total", iTotal);
-    storage.setAttribute("used" , iUsed);
-    storage.setAttribute("free" , iTotal - iUsed);
+    storage.setAttribute("total", (int)(iTotal>>10));
+    storage.setAttribute("used" , (int)(iUsed>>10));
+    storage.setAttribute("free" , (int)(iAvail>>10));
 
     // load average ---------------------
 

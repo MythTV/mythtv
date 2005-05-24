@@ -8,6 +8,9 @@
 
 #include <time.h>
 
+#define MYTH_SYSTEM_DONT_BLOCK_LIRC          0x1 //< myth_system() flag to avoid blocking
+#define MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU 0x2 //< myth_system() flag to avoid blocking
+
 class QPixmap;
 class QImage;
 class QPainter;
@@ -37,8 +40,6 @@ long long decodeLongLong(QStringList &list, QStringList::iterator &it);
 
 QRgb blendColors(QRgb source, QRgb add, int alpha);
 
-#define MYTH_SYSTEM_DONT_BLOCK_LIRC (1)
-#define MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU (2)
 uint myth_system(const QString &command, int flags = 0);
 
 QString cutDownString(const QString &text, QFont *testFont, uint maxwidth);
@@ -49,7 +50,8 @@ int MythSecsTo(const QDateTime &from, const QDateTime &to);
 long long stringToLongLong(const QString &str);
 QString longLongToString(long long ll);
 
-bool diskUsage(const char *path, double &total, double &used, double &free);
+long long getDiskSpace(const QString&,long long&,long long&);
 bool getUptime(time_t &uptime);
 bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
-#endif
+
+#endif // UTIL_H_

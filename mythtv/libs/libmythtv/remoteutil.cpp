@@ -1,5 +1,6 @@
 #include <qstringlist.h>
 
+#include "util.h"
 #include "remoteutil.h"
 #include "programinfo.h"
 #include "mythcontext.h"
@@ -42,20 +43,27 @@ vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
     return info;
 }
 
-void RemoteGetFreeSpace(int &totalspace, int &usedspace)
+/** \fn RemoteGetFreeSpace()
+ *  \brief Returns total and used space in kilobytes for each backend.
+ */
+vector<FileSystemInfo> RemoteGetFreeSpace()
 {
-    QStringList strlist = QString("QUERY_FREESPACE");
+    FileSystemInfo fsInfo;
+    vector<FileSystemInfo> fsInfos;
+    QStringList strlist = QString("QUERY_FREE_SPACE_LIST");
 
     if (gContext->SendReceiveStringList(strlist))
     {
-        totalspace = strlist[0].toInt();
-        usedspace = strlist[1].toInt();
+        QStringList::iterator it = strlist.begin();
+        while (it != strlist.end())
+        {
+            fsInfo.hostname = *(it++);
+            fsInfo.totalSpaceKB = decodeLongLong(strlist, it);
+            fsInfo.usedSpaceKB = decodeLongLong(strlist, it);
+            fsInfos.push_back(fsInfo);
+        }
     }
-    else
-    {
-        totalspace = 0;
-        usedspace = 0;
-    }
+    return fsInfos;
 }
 
 bool RemoteGetLoad(float load[3])

@@ -418,7 +418,7 @@ static HostCheckBox *TryUnflaggedSkip()
 static GlobalCheckBox *AutoCommercialFlag()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoCommercialFlag");
-    bc->setLabel(QObject::tr("Default Auto Commercial Flagging setting"));
+    bc->setLabel(QObject::tr("Commercial Flag New Recordings"));
     bc->setValue(true);
     bc->setHelpText(QObject::tr("This is the default value used for the Auto-"
                     "Commercial Flagging setting when a new scheduled "
@@ -426,47 +426,17 @@ static GlobalCheckBox *AutoCommercialFlag()
     return bc;
 }
 
-static GlobalCheckBox *AutoRunUserJob1()
+static GlobalCheckBox *AutoRunUserJob(uint job_num)
 {
-    GlobalCheckBox *bc = new GlobalCheckBox("AutoRunUserJob1");
-    bc->setLabel(QObject::tr("Default 'Run User Job #1' setting"));
+    QString dbStr = QString("AutoRunUserJob%1").arg(job_num);
+    QString label = QObject::tr("Run User Job #%1 On New Recordings")
+        .arg(job_num);
+    GlobalCheckBox *bc = new GlobalCheckBox(dbStr);
+    bc->setLabel(label);
     bc->setValue(false);
     bc->setHelpText(QObject::tr("This is the default value used for the "
-                    "'Run User Job #1' setting when a new scheduled "
-                    "recording is created."));
-    return bc;
-}
-
-static GlobalCheckBox *AutoRunUserJob2()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("AutoRunUserJob2");
-    bc->setLabel(QObject::tr("Default 'Run User Job #2' setting"));
-    bc->setValue(false);
-    bc->setHelpText(QObject::tr("This is the default value used for the "
-                    "'Run User Job #2' setting when a new scheduled "
-                    "recording is created."));
-    return bc;
-}
-
-static GlobalCheckBox *AutoRunUserJob3()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("AutoRunUserJob3");
-    bc->setLabel(QObject::tr("Default 'Run User Job #3' setting"));
-    bc->setValue(false);
-    bc->setHelpText(QObject::tr("This is the default value used for the "
-                    "'Run User Job #3' setting when a new scheduled "
-                    "recording is created."));
-    return bc;
-}
-
-static GlobalCheckBox *AutoRunUserJob4()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("AutoRunUserJob4");
-    bc->setLabel(QObject::tr("Default 'Run User Job #4' setting"));
-    bc->setValue(false);
-    bc->setHelpText(QObject::tr("This is the default value used for the "
-                    "'Run User Job #4' setting when a new scheduled "
-                    "recording is created."));
+                    "'Run User Job #%1' setting when a new scheduled "
+                    "recording is created.").arg(job_num));
     return bc;
 }
 
@@ -513,30 +483,30 @@ static HostSpinBox *CommNotifyAmount()
     return gs;
 }
 
-static GlobalSpinBox *AutoExpireDiskThreshold()
+static GlobalCheckBox *AutoExpireEnabled()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireDiskThreshold", 
-                                            0, 200, 1);
-    bs->setLabel(QObject::tr("Auto Expire Free Disk Space Threshold "
-                 "(in Gigabytes)"));
-    bs->setHelpText(QObject::tr("Trigger AutoExpire when available disk "
-                    "space is below this value.  Disable AutoExpire by "
-                    "setting to 0."));
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireEnabled");
+    bc->setLabel(QObject::tr("Auto Expire Enabled"));
+    bc->setValue(true);
+    bc->setHelpText(QObject::tr("When enabled, old programs will be "
+                                "deleted to make space for new ones."));
+    return bc;
+}
+
+static GlobalSpinBox *AutoExpireExtraSpace()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireExtraSpace", 0, 200, 1);
+    bs->setLabel(QObject::tr("Extra Disk Space (in Gigabytes)"));
+    bs->setHelpText(QObject::tr(
+                        "Extra disk space you want on the recording "
+                        "file system beyond what MythTV requires. "
+                        "This is useful if you use the recording file system "
+                        "for data other than MythTV recordings."));
     bs->setValue(0);
     return bs;
 };
 
-static GlobalSpinBox *AutoExpireFrequency()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireFrequency", 1, 60, 10, 
-                                            true);
-    bs->setLabel(QObject::tr("Auto Expire Frequency (in minutes)"));
-    bs->setHelpText(QObject::tr("How often the AutoExpire process "
-                    "checks for free disk space."));
-    bs->setValue(10);
-    return bs;
-}
-
+#if 0
 static GlobalComboBox *AutoExpireMethod()
 {
     GlobalComboBox *bc = new GlobalComboBox("AutoExpireMethod");
@@ -546,7 +516,9 @@ static GlobalComboBox *AutoExpireMethod()
                     "shows to AutoExpire first."));
     return bc;
 }
+#endif
 
+#if 0
 static GlobalCheckBox *AutoExpireDefault()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireDefault");
@@ -557,7 +529,9 @@ static GlobalCheckBox *AutoExpireDefault()
                     "Existing recordings will keep their current value."));
     return bc;
 }
+#endif
 
+#if 0
 static GlobalSpinBox *MinRecordDiskThreshold()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("MinRecordDiskThreshold",
@@ -570,7 +544,9 @@ static GlobalSpinBox *MinRecordDiskThreshold()
     bs->setValue(300);
     return bs;
 }
+#endif
 
+#if 0
 static GlobalCheckBox *RerecordAutoExpired()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("RerecordAutoExpired");
@@ -582,6 +558,7 @@ static GlobalCheckBox *RerecordAutoExpired()
                     "re-recorded if they are shown again."));
     return bc;
 }
+#endif
 
 static GlobalSpinBox *RecordPreRoll()
 {
@@ -1654,7 +1631,7 @@ static GlobalSpinBox *ATSCCheckSignalThreshold()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("ATSCCheckSignalThreshold",
                                             50, 90, 1);
-    bs->setLabel(QObject::tr("ATSC Signal Threshold"));
+    bs->setLabel(QObject::tr("ATSC Signal Threshold (%)"));
     bs->setHelpText(QObject::tr("Threshold for a signal to be considered "
                     "acceptable. If you set this too low MythTV may "
                     "crash, and if you set it too high you may not be "
@@ -2958,43 +2935,34 @@ PlaybackSettings::PlaybackSettings()
 GeneralSettings::GeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
-    general->setLabel(QObject::tr("General"));
-    general->addChild(RecordPreRoll());
-    general->addChild(RecordOverTime());
+    general->setLabel(QObject::tr("General (Basic)"));
     general->addChild(ChannelOrdering());
+    general->addChild(ChannelFormat());
+    general->addChild(LongChannelFormat());
     general->addChild(SmartChannelChange());
     general->addChild(LastFreeCard());
+    general->addChild(AutoExpireEnabled());
     addChild(general);
 
-    VerticalConfigurationGroup* gen2 = new VerticalConfigurationGroup(false);
-    gen2->setLabel(QObject::tr("General (page 2)"));
-    gen2->addChild(ChannelFormat());
-    gen2->addChild(LongChannelFormat());
-    gen2->addChild(ATSCCheckSignalWait());
-    gen2->addChild(ATSCCheckSignalThreshold());
-    gen2->addChild(HDRingbufferSize());
-    addChild(gen2);
-
-    VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
-    autoexp->setLabel(QObject::tr("Global Auto Expire Settings"));
-    autoexp->addChild(AutoExpireDiskThreshold());
-    autoexp->addChild(MinRecordDiskThreshold());
-    autoexp->addChild(AutoExpireFrequency());
-    autoexp->addChild(AutoExpireMethod());
-    autoexp->addChild(AutoExpireDefault());
-    autoexp->addChild(RerecordAutoExpired());
-    addChild(autoexp);
-
     VerticalConfigurationGroup* jobs = new VerticalConfigurationGroup(false);
-    jobs->setLabel(QObject::tr("Job Queue"));
+    jobs->setLabel(QObject::tr("General (Jobs)"));
     jobs->addChild(AutoCommercialFlag());
     jobs->addChild(CommercialSkipMethod());
     jobs->addChild(AggressiveCommDetect());
-    jobs->addChild(AutoRunUserJob1());
-    jobs->addChild(AutoRunUserJob2());
-    jobs->addChild(AutoRunUserJob3());
-    jobs->addChild(AutoRunUserJob4());
+    for (uint i=1; i<=4; ++i)
+        jobs->addChild(AutoRunUserJob(i));
     addChild(jobs);
+
+    VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
+    general2->setLabel(QObject::tr("General (Advanced)"));
+    general2->addChild(AutoExpireExtraSpace());
+    general2->addChild(RecordPreRoll());
+    general2->addChild(RecordOverTime());
+    general2->addChild(ATSCCheckSignalThreshold());
+    general2->addChild(ATSCCheckSignalWait());
+    general2->addChild(HDRingbufferSize());
+    addChild(general2);
+
 }
 
 EPGSettings::EPGSettings()
