@@ -3569,7 +3569,8 @@ void NuppelVideoPlayer::SetCommBreakMap(QMap<long long, int> &newMap)
 
     commBreakMap.clear();
     commBreakMap = newMap;
-    hascommbreaktable = true;
+    hascommbreaktable = !commBreakMap.isEmpty();
+    SetCommBreakIter();
 }
 
 int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
