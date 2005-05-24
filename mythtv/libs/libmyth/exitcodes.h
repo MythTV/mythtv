@@ -1,8 +1,8 @@
 #ifndef __MYTH_EXIT_CODES__
 #define __MYTH_EXIT_CODES__
 
-
 #define GENERIC_EXIT_OK                             0
+#define GENERIC_EXIT_NOT_OK                       255
 #define GENERIC_EXIT_NO_MYTHCONTEXT               254
 #define GENERIC_EXIT_NO_THEME                     253
 #define GENERIC_EXIT_INVALID_CMDLINE              252

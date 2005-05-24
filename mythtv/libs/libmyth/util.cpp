@@ -1,12 +1,15 @@
-#include <qapplication.h>
+// C++ headers
+#include <iostream>
+using namespace std;
 
-#include <sys/types.h>
-#include <sys/wait.h>
+// C headers
+#include <cerrno>
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "config.h"
-
+// System specific C headers
+#include <sys/types.h>
+#include <sys/wait.h>
 #ifdef __linux__
 #include <sys/statvfs.h>
 #include <sys/sysinfo.h>
@@ -20,17 +23,18 @@
 #include <mach/mach.h>
 #endif
 
-#include <iostream>
-using namespace std;
-
-#include "exitcodes.h"
-#include "util.h"
-#include "mythcontext.h"
-
+// Qt headers
+#include <qapplication.h>
 #include <qimage.h>
 #include <qpainter.h>
 #include <qpixmap.h>
 #include <qfont.h>
+
+// Myth headers
+#include "mythconfig.h"
+#include "exitcodes.h"
+#include "util.h"
+#include "mythcontext.h"
 
 #ifdef USE_LIRC
 #include "lircevent.h"
@@ -40,8 +44,12 @@ using namespace std;
 #include "jsmenuevent.h"
 #endif
 
-#define SOCKET_BUF_SIZE  128000
+#define SOCKET_BUF_SIZE  128000 //< Socket buffer size
 
+/** \fn SocDevErrStr(int)
+ *  \brief Returns QString describing a QSocketDevice
+ *         error in a human readable form.
+ */
 QString SocDevErrStr(int error)
 {
     QString errorMsg = "N/A";
@@ -70,7 +78,10 @@ QString SocDevErrStr(int error)
    return errorMsg;         
 }
 
-bool connectSocket(QSocketDevice *socket, const QString &host, int port)
+/** \fn connectSocket(QSocketDevice*,const QString&,uint)
+ *  \brief Connect to backend socket (frontend call).
+ */
+bool connectSocket(QSocketDevice *socket, const QString &host, uint port)
 {
     QHostAddress hadr;
     hadr.setAddress(host);
@@ -95,12 +106,14 @@ bool connectSocket(QSocketDevice *socket, const QString &host, int port)
     return result;
 }
 
+/** \fn WriteStringList(QSocketDevice*,QStringList&)
+ *  \brief Write a string list to the socket (frontend call).
+ */
 bool WriteStringList(QSocketDevice *socket, QStringList &list)
-{// QSocketDevice (frontend)
-    
+{
     if (!socket->isOpen() || socket->error())
     {
-        VERBOSE(VB_ALL, "WriteStringList: Bad socket");
+        VERBOSE(VB_IMPORTANT, "WriteStringList: Bad socket");
         return false;
     }    
     
@@ -115,8 +128,8 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
     
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = QString("write -> %1 %2").arg(socket->socket(), 2)
-                                               .arg(payload);
+        QString msg = QString("WriteStringList: write -> %1 %2")
+            .arg(socket->socket(), 2).arg(payload);
 
         if (msg.length() > 88)
         {
@@ -144,15 +157,17 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
             if (btw > 0)
             {
                 timer.start();
-                VERBOSE(VB_GENERAL, QString("Partial WriteStringList: %1")
-                                            .arg(written));
+                VERBOSE(VB_GENERAL,
+                        QString("WriteStringList: Partial WriteStringList: %1")
+                        .arg(written));
             }                                
         }
         else if (sret < 0 && socket->error() != QSocketDevice::NoError)
         {
-            VERBOSE(VB_GENERAL, QString("Error writing stringlist "
-                                        "(writeBlock): %1")
-                                        .arg(SocDevErrStr(socket->error())));
+            VERBOSE(VB_IMPORTANT,
+                    QString("WriteStringList: Error writing string list "
+                            "(writeBlock): %1")
+                    .arg(SocDevErrStr(socket->error())));
             socket->close();
             return false;
         }
@@ -171,8 +186,11 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
     return true;
 }
 
+/** \fn ReadStringList(QSocketDevice*,QStringList&,bool)
+ *  \brief Read a string list from the socket (frontend call).
+ */
 bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
-{// QSocketDevice (frontend)
+{
     list.clear();
 
     if (!socket->isOpen() || socket->error())
@@ -304,8 +322,11 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
     return true;
 }
 
-bool WriteBlock(QSocketDevice *socket, void *data, int len)
-{// QSocketDevice
+/** \fn WriteBlock(QSocketDevice*,void*,uint)
+ *  \brief Write a block of raw data to the socket (frontend call).
+ */
+bool WriteBlock(QSocketDevice *socket, void *data, uint len)
+{
     
     if (!socket->isOpen() || socket->error())
     {
@@ -313,8 +334,8 @@ bool WriteBlock(QSocketDevice *socket, void *data, int len)
         return false;
     }    
     
-    int written = 0;
-    int zerocnt = 0;
+    uint written = 0;
+    uint zerocnt = 0;
     
     while (written < len)
     {
@@ -330,7 +351,7 @@ bool WriteBlock(QSocketDevice *socket, void *data, int len)
         if (sret > 0)
         {
             zerocnt = 0;
-            written += sret;
+            written += (uint) sret;
             if (written < len)
                 usleep(500);
         }
@@ -356,26 +377,30 @@ bool WriteBlock(QSocketDevice *socket, void *data, int len)
     return true;
 }
 
-
-// QSocket (backend version)
+/** \fn WriteStringList(QSocketDevice*,QStringList&)
+ *  \brief Write a string list to the socket (backend call).
+ */
 bool WriteStringList(QSocket *socket, QStringList &list)
 {
     if (list.size() <= 0)
     {
-        VERBOSE(VB_ALL, "invalid stringlist in WriteStringList");
+        VERBOSE(VB_IMPORTANT,
+                "WriteStringList: Error, invalid string list.");
         return false;
     }
 
     if (!socket || socket->state() != QSocket::Connected)
     {
-        VERBOSE(VB_ALL, "writing to unconnected socket in WriteStringList");
+        VERBOSE(VB_IMPORTANT,
+                "WriteStringList: Error, writing to unconnected socket.");
         return false;
     }
 
     QString str = list.join("[]:[]");
     if (str == QString::null)
     {
-        VERBOSE(VB_ALL, "joined null string in WriteStringList");
+        VERBOSE(VB_IMPORTANT,
+                "WriteStringList: Error, joined null string.");
         return false;
     }
 
@@ -395,8 +420,8 @@ bool WriteStringList(QSocket *socket, QStringList &list)
 
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = QString("write -> %1 %2").arg(socket->socket(), 2)
-                                               .arg(payload);
+        QString msg = QString("WriteStringList: write -> %1 %2")
+            .arg(socket->socket(), 2).arg(payload);
 
         if (msg.length() > 88)
         {
@@ -413,7 +438,8 @@ bool WriteStringList(QSocket *socket, QStringList &list)
     {
         if (socket->state() != QSocket::Connected)
         {
-            VERBOSE(VB_ALL, "writing to unconnected socket #2");
+            VERBOSE(VB_IMPORTANT,
+                    "WriteStringList: Error, writing to unconnected socket.");
             return false;
         }
 
@@ -423,7 +449,8 @@ bool WriteStringList(QSocket *socket, QStringList &list)
 
         if (temp < 0)
         {
-            VERBOSE(VB_ALL, "writeBlock failed!");
+            VERBOSE(VB_IMPORTANT,
+                    "WriteStringList: Error, socket->writeBlock() failed.");
             return false;
         }
 
@@ -432,7 +459,9 @@ bool WriteStringList(QSocket *socket, QStringList &list)
         size -= temp;
         if (size > 0)
         {
-            printf("Partial WriteStringList %u\n", written);
+            VERBOSE(VB_GENERAL,
+                    QString("WriteStringList: Partial WriteStringList %1.")
+                    .arg(written));
             qApp->processEvents();
 
             if (++errorcount > 50)
@@ -451,8 +480,11 @@ bool WriteStringList(QSocket *socket, QStringList &list)
     return retval;
 }
 
+/** \fn ReadStringList(QSocketDevice*,QStringList&)
+ *  \brief Read a string list from the socket (backend call).
+ */
 bool ReadStringList(QSocket *socket, QStringList &list)
-{// QSocket (backend)
+{
     list.clear();
 
     qApp->lock();
@@ -502,7 +534,8 @@ bool ReadStringList(QSocket *socket, QStringList &list)
 
         if (temp < 0)
         {
-            VERBOSE(VB_IMPORTANT, "ReadStringList failed.  Bailing..\n");
+            VERBOSE(VB_IMPORTANT,
+                    "ReadStringList: Failed to read from socket. Bailing.");
             return false;
         }
 
@@ -513,7 +546,8 @@ bool ReadStringList(QSocket *socket, QStringList &list)
         {
             if (++zerocnt >= 100)
             {
-                printf("EOF readStringList %u\n", read);
+                VERBOSE(VB_IMPORTANT, QString("ReadStringList: Error, EOF %1")
+                        .arg(read));
                 break; 
             }
             usleep(500);
@@ -521,7 +555,9 @@ bool ReadStringList(QSocket *socket, QStringList &list)
 
             if (zerocnt == 5)
             {
-                printf("Waiting for data: %u %u\n", read, size);
+                VERBOSE(VB_GENERAL,
+                        QString("ReadStringList: Waiting for data: %1 %2")
+                        .arg(read).arg(size));
             }
         }
     }
@@ -536,8 +572,8 @@ bool ReadStringList(QSocket *socket, QStringList &list)
     
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
-        QString msg = QString("read  <- %1 %2").arg(socket->socket(), 2)
-                                               .arg(payload);
+        QString msg = QString("ReadStringList: read <- %1 %2")
+            .arg(socket->socket(), 2).arg(payload);
 
         if (msg.length() > 88)
         {
@@ -552,8 +588,11 @@ bool ReadStringList(QSocket *socket, QStringList &list)
     return true;
 }
 
-bool WriteBlock(QSocket *socket, void *data, int len)
-{// QSocket (backend)
+/** \fn WriteBlock(QSocket*,void*,uint)
+ *  \brief Write a block of raw data to the socket (backend call).
+ */
+bool WriteBlock(QSocket *socket, void *data, uint len)
+{
     int size = len;
     int written = 0;
 
@@ -568,7 +607,8 @@ bool WriteBlock(QSocket *socket, void *data, int len)
         size -= temp;
         if (size > 0)
         {
-            printf("Partial WriteBlock %u\n", written);
+            VERBOSE(VB_GENERAL, QString("WriteBlock: Partial write (%1/%2)")
+                    .arg(written).arg(len));
             qApp->processEvents();
 
             if (++errorcount > 50)
@@ -589,8 +629,11 @@ bool WriteBlock(QSocket *socket, void *data, int len)
     return true;
 }
 
-int ReadBlock(QSocket *socket, void *data, int maxlen)
-{// QSocket (backend)
+/** \fn ReadBlock(QSocket*,void*,uint)
+ *  \brief Read a block of raw data from the socket (backend call).
+ */
+int ReadBlock(QSocket *socket, void *data, uint maxlen)
+{
     int read = 0;
     int size = maxlen;
     unsigned int zerocnt = 0;
@@ -606,7 +649,8 @@ int ReadBlock(QSocket *socket, void *data, int maxlen)
         {
             if (++zerocnt >= 100)
             {
-                printf("EOF ReadBlock %u\n", read);
+                VERBOSE(VB_IMPORTANT,
+                        QString("ReadBlock: Error, EOF %1").arg(read));
                 break; 
             }
             usleep(500);
@@ -617,17 +661,49 @@ int ReadBlock(QSocket *socket, void *data, int maxlen)
     return maxlen;
 }
 
-
-
+/** \fn encodeLongLong(QStringList&,long long)
+ *  \brief Encodes a long for streaming in the MythTV protocol.
+ *
+ *   We need this for Qt3.1 compatibility, since it will not
+ *   print or read a 64 bit number directly.
+ *   We encode the long long as strings representing two signed
+ *   32 bit integers.
+ *
+ *  \sa decodeLongLong(QStringList&,uint)
+ *      decodeLongLong(QStringList&,QStringList::iterator&)
+ */
 void encodeLongLong(QStringList &list, long long num)
 {
     list << QString::number((int)(num >> 32));
     list << QString::number((int)(num & 0xffffffffLL));
 }
 
-long long decodeLongLong(QStringList &list, int offset)
+/** \fn decodeLongLong(QStringList&,uint)
+ *  \brief Inefficiently decodes a long encoded for streaming in the MythTV protocol.
+ *
+ *   We need this for Qt3.1 compatibility, since it will not
+ *   print or read a 64 bit number directly.
+ *
+ *   The long long is represented as two signed 32 bit integers.
+ *
+ *   Note: This decode performs two O(n) linear searches of the list,
+ *         The iterator decode function is much more efficient.
+ *
+ *  \param list   List to search for offset and offset+1 in.
+ *  \param offset Offset in list where to find first 32 bits of
+ *                long long.
+ *  \sa encodeLongLong(QStringList&,long long),
+ *      decodeLongLong(QStringList&,QStringList::iterator&)
+ */
+long long decodeLongLong(QStringList &list, uint offset)
 {
     long long retval = 0;
+    if (offset >= list.size())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "decodeLongLong() called with offset >= list size.");
+        return retval;
+    }
 
     int l1 = list[offset].toInt();
     int l2 = list[offset + 1].toInt();
@@ -637,20 +713,54 @@ long long decodeLongLong(QStringList &list, int offset)
     return retval;
 }
 
+/** \fn decodeLongLong(QStringList&,QStringList::iterator&)
+ *  \brief Decodes a long encoded for streaming in the MythTV protocol.
+ *
+ *   We need this for Qt3.1 compatibility, since it will not
+ *   print or read a 64 bit number directly.
+ *
+ *   The long long is represented as two signed 32 bit integers.
+ *
+ *  \param list   List to search for offset and offset+1 in.
+ *  \param it     Iterator pointing to first 32 bits of long long.
+ *  \sa encodeLongLong(QStringList&,long long),
+ *      decodeLongLong(QStringList&,uint)
+ */
 long long decodeLongLong(QStringList &list, QStringList::iterator &it)
 {
     (void)list;
 
     long long retval = 0;
 
-    int l1 = (*(it++)).toInt();
-    int l2 = (*(it++)).toInt();
+    bool ok = true;
+    int l1=0, l2=0;
+
+    if (it == list.end())
+        ok = false;
+    else
+        l1 = (*(it++)).toInt();
+
+    if (it == list.end())
+        ok = false;
+    else
+        l2 = (*(it++)).toInt();
  
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "decodeLongLong() called with the iterator too close "
+                "to the end of the list.");
+        return 0;
+    }
+
     retval = ((long long)(l2) & 0xffffffffLL) | ((long long)(l1) << 32);
 
     return retval;
 } 
 
+/** \fn blendColors(QRgb source, QRgb add, int alpha)
+ *  \brief Inefficient alpha blending function.
+ */
 QRgb blendColors(QRgb source, QRgb add, int alpha)
 {
     int sred = qRed(source);
@@ -672,8 +782,15 @@ QRgb blendColors(QRgb source, QRgb add, int alpha)
     return qRgb(sred, sgreen, sblue);
 }
 
-int myth_system(const QString &command, int flags)
+/** \fn myth_system(const QString&, int)
+ *  \brief Runs a system command inside the /bin/sh shell.
+ *  
+ *  Note: Returns GENERIC_EXIT_NOT_OK if it can not execute the command.
+ *  \return Exit value from command as an unsigned int in range [0,255].
+ */
+uint myth_system(const QString &command, int flags)
 {
+    (void)flags; /* Kill warning */
 #ifdef USE_LIRC
     LircEventLock lirc_lock(!(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC));
 #endif
@@ -682,18 +799,15 @@ int myth_system(const QString &command, int flags)
     JoystickMenuEventLock joystick_lock(!(flags & MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU));
 #endif
 
-    /* Kill warning, I presume */
-#if ! defined(USE_LIRC) && ! defined(USE_JOYSTICK_MENU)
-    (void)flags;
-#endif
-
     pid_t child = fork();
 
     if (child < 0)
     {
         /* Fork failed */
-        perror("fork");
-        return -1;
+        VERBOSE(VB_IMPORTANT,
+                QString("myth_system(): Error, fork() failed because %1")
+                .arg(strerror(errno)));
+        return GENERIC_EXIT_NOT_OK;
     }
     else if (child == 0)
     {
@@ -711,7 +825,12 @@ int myth_system(const QString &command, int flags)
 
         /* Run command */
         execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
-        perror("execl");
+        if (errno)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("myth_system(): Error, execl() failed because %1")
+                    .arg(strerror(errno)));
+        }
 
         /* Failed to exec */
         _exit(MYTHSYSTEM__EXIT__EXECL_ERROR); // this exit is ok
@@ -721,19 +840,26 @@ int myth_system(const QString &command, int flags)
         /* Parent */
         int status;
 
-        if (waitpid(child, &status, 0) < 0) {
-            perror("waitpid");
-            return -1;
+        if (waitpid(child, &status, 0) < 0)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("myth_system(): Error, waitpid() failed because %1")
+                    .arg(strerror(errno)));
+            return GENERIC_EXIT_NOT_OK;
         }
         return WEXITSTATUS(status);
     }
+    return GENERIC_EXIT_NOT_OK;
 }
 
-QString cutDownString(QString text, QFont *testFont, int maxwidth)
+/** \fn cutDownString(const QString&, QFont*, uint)
+ *  \brief Returns a string based on "text" that fits within "maxwidth" pixels.
+ */
+QString cutDownString(const QString &text, QFont *testFont, uint maxwidth)
 {
     QFontMetrics fm(*testFont);
 
-    int curFontWidth = fm.width(text);
+    uint curFontWidth = fm.width(text);
     if (curFontWidth > maxwidth)
     {
         QString testInfo = "";
@@ -741,7 +867,7 @@ QString cutDownString(QString text, QFont *testFont, int maxwidth)
         int tmaxwidth = maxwidth - fm.width("LLL");
         int count = 0;
 
-        while (curFontWidth < tmaxwidth)
+        while ((int)curFontWidth < tmaxwidth)
         {
             testInfo = text.left(count);
             curFontWidth = fm.width(testInfo);
@@ -749,18 +875,24 @@ QString cutDownString(QString text, QFont *testFont, int maxwidth)
         }
 
         testInfo = testInfo + "...";
-        text = testInfo;
+        return testInfo;
     }
 
     return text;
 }
 
+/** \fn MythSecsTo(const QDateTime&, const QDateTime&)
+ *  \brief Returns "'to' - 'from'" for two QDateTime's in seconds.
+ */
 int MythSecsTo(const QDateTime &from, const QDateTime &to)
 {
    return (from.time().secsTo(to.time()) +
            from.date().daysTo(to.date()) * 60 * 60 * 24);
 }
 
+/** \fn MythUTCToLocal(const QDateTime&)
+ *  \brief Converts a QDateTime in UTC to local time.
+ */
 QDateTime MythUTCToLocal(const QDateTime &utc)
 {
     QDateTime local = QDateTime(QDate(1970, 1, 1));
@@ -772,6 +904,11 @@ QDateTime MythUTCToLocal(const QDateTime &utc)
     return localdt;
 }
     
+/** \fn stringToLongLong(const QString &str)
+ *  \brief Converts QString representing long long to a long long.
+ *
+ *   This is needed to input 64 bit numbers with Qt 3.1.
+ */
 long long stringToLongLong(const QString &str)
 {
     long long retval = 0;
@@ -782,6 +919,11 @@ long long stringToLongLong(const QString &str)
     return retval;
 }
 
+/** \fn longLongToString(long long)
+ *  \brief Returns QString representation of long long.
+ *
+ *   This is needed to output 64 bit numbers with Qt 3.1.
+ */
 QString longLongToString(long long ll)
 {
     char str[21];
@@ -790,6 +932,11 @@ QString longLongToString(long long ll)
     return str;
 }
 
+/** \fn getUptime(time_t&)
+ *  \brief Returns uptime statistics.
+ *  \todo Update Statistics are not supported (by MythTV) on NT or DOS.
+ *  \return true if successful, false otherwise.
+ */
 bool getUptime(time_t &uptime)
 {
 #ifdef __linux__
@@ -830,10 +977,15 @@ bool getUptime(time_t &uptime)
     return true;
 }
 
-#define MB (1024*1024)
-
+/** \fn diskUsage(const char*,double&,double&,double&)
+ *  \brief Returns approximate memory usage in megabytes on file system 
+ *         containing the file "fs".
+ *  \todo Memory Statistics are not supported (by MythTV) on NT or DOS.
+ *  \return Returns true if successful, false otherwise.
+ */
 bool diskUsage(const char *fs, double &total, double &used, double &free)
 {
+    double MB = (1024*1024);
     // stat the file system
 
 #ifdef __linux__
@@ -854,20 +1006,27 @@ bool diskUsage(const char *fs, double &total, double &used, double &free)
     return true;
 }
 
+/** \fn getMemStats(int&,int&,int&,int&)
+ *  \brief Returns memory statistics in megabytes.
+ *
+ *  \todo Memory Statistics are not supported (by MythTV) on NT or DOS.
+ *  \return true if it succeeds, false otherwise.
+ */
 bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 {
+    size_t MB = (1024*1024);
 #ifdef __linux__
     struct sysinfo sinfo;
     if (sysinfo(&sinfo) == -1)
     {
-        VERBOSE(VB_ALL, "sysinfo() error");
+        VERBOSE(VB_IMPORTANT, "getMemStats(): Error, sysinfo() call failed.");
         return false;
     }
     else
-        totalMB = (sinfo.totalram  * sinfo.mem_unit)/MB,
-        freeMB  = (sinfo.freeram   * sinfo.mem_unit)/MB,
-        totalVM = (sinfo.totalswap * sinfo.mem_unit)/MB,
-        freeVM  = (sinfo.freeswap  * sinfo.mem_unit)/MB;
+        totalMB = (int)((sinfo.totalram  * sinfo.mem_unit)/MB),
+        freeMB  = (int)((sinfo.freeram   * sinfo.mem_unit)/MB),
+        totalVM = (int)((sinfo.totalswap * sinfo.mem_unit)/MB),
+        freeVM  = (int)((sinfo.freeswap  * sinfo.mem_unit)/MB);
 
 #elif defined(CONFIG_DARWIN)
     mach_port_t             mp;
@@ -884,7 +1043,8 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     if (host_statistics(mp, HOST_VM_INFO,
                         (host_info_t)&s, &count) != KERN_SUCCESS)
     {
-        VERBOSE(VB_ALL, "Failed to get vm statistics.");
+        VERBOSE(VB_IMPORTANT, "getMemStats(): Error, "
+                "failed to get virtual memory statistics.");
         return false;
     }
 
@@ -902,7 +1062,8 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     totalVM = (int)total, freeVM = (int)free;
 
 #else
-    VERBOSE(VB_ALL, "Unknown platform. How do I get the memory stats?");
+    VERBOSE(VB_IMPORTANT, "getMemStats(): Unknown platform. "
+            "How do I get the memory stats?");
     return false;
 #endif
 
