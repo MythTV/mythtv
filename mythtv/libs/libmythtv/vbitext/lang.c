@@ -58,7 +58,7 @@ static unsigned char lang_chars[1+8+8][16] =
 
 
 
-static struct mark { unsigned char *g0, *latin1, *latin2; } marks[16] =
+static struct mark { char *g0, *latin1, *latin2; } marks[16] =
 {
     /* none */         { "#",
                          "¤",
@@ -214,7 +214,7 @@ enhance(struct enhance *eh, struct vt_page *vtp)
                        if (adr < VT_WIDTH && row < VT_HEIGHT)
                        {
                            struct mark *mark = marks + (mode - 16);
-                           unsigned char *x;
+                           char *x;
 
                            if ((x = strchr(mark->g0, data)))
                            {
