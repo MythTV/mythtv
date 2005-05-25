@@ -759,8 +759,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 (cardtype == "V4L" || cardtype == "MJPEG")) //they match
             {
 #ifdef CONFIG_DARWIN
-                VERBOSE(VB_ALL, QString("Audio device files are not"
-                                        " supported on this Unix."));
+                VERBOSE(VB_ALL, QString("Audio device files are not "
+                                        "supported on this Unix."));
 #else
                 int dsp_fd = open(audiodevice, O_RDWR | O_NONBLOCK);
                 if (dsp_fd != -1)
@@ -770,11 +770,11 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                     if (dsp_status != -1)
                     {
                         if (!(soundcardcaps & DSP_CAP_DUPLEX))
-                            VERBOSE(VB_ALL, QString(" WARNING:  Capture device"
-                                                    " %1 is not reporting full "
-                                                    "duplex capability.\nSee "
-                                                    "docs/mythtv-HOWTO, section"
-                                                    " 20.13 for more "
+                            VERBOSE(VB_ALL, QString(" WARNING:  Capture device "
+                                                    "%1 is not reporting full "
+                                                    "duplex capability.\nSee the "
+                                                    "Troubleshooting Audio section "
+                                                    "of the mythtv-HOWTO for more "
                                                     "information.")
                                                     .arg(audiodevice));
                     }
