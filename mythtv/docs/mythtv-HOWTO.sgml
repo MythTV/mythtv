@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-05-16, v0.18.04
+<date>2005-05-25, v0.18.05
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1744,9 +1744,9 @@ the settings so that this is your default.
 drivers recommended by the MythTV team. The OSS drivers do work for many
 people, and for many cards. We recommend that you give OSS a try since it is
 already included in the vendor distribution. However, some people report problems (sync
-and jitter) with OSS, and in addition it does not support full duplex on
+and jitter) with OSS, and in addition it does not support full-duplex on
 some cards.  Full duplex is required if you want to record and play sound
-using just one sound card. ALSA has good full duplex support, and also has
+using just one sound card. ALSA has good full-duplex support, and also has
 drivers for some built-in (motherboard) sound cards that OSS does not.
 Installing ALSA is less painful than you might think, so if OSS does not
 work for you, installing ALSA is not too difficult. For those of you who do
@@ -5167,6 +5167,7 @@ If you're using multiple sound cards and multiple tuners, use <tt>alsamixer
 -c 1</tt> to work with the second sound card.  The first card is #0, the
 second card is #1, etc.
 
+<sect2>Mythbackend reports that your card is not reporting full duplex capabilities
 <sect2>The mythbackend program told me to look at this section
 <p>mythbackend does a check to see if your sound device is capable of full
 duplex operation.  If it's not, it's most likely that you're going to run
@@ -5174,12 +5175,13 @@ into issues when you try to record and play sound at the same time.  If your
 backend is a separate machine than your frontend, then there's no problem,
 since you're only going to be doing one thing at a time with the card. 
 Likewise, if you're running the frontend and backend on the same machine,
-but you're using btaudio or a Hauppauge PVR-250 as your recording source,
-and using the playback function of your sound card, then you also shouldn't
+but you're using btaudio or a hardware encoder card such as the Hauppauge
+PVR-250, DVB cards or HDTV capture cards as your recording source and you're
+only using the playback function of your sound card, then you also shouldn't
 have an issue, since the sound card isn't being asked to perform two
 functions at once.
 
-If you can't get your sound card to go full duplex and need it to, then check
+If you can't get your sound card to go full-duplex and need it to, then check
 your distribution for updated sound drivers.  If your sound card is not
 capable of full-duplex operation, either because the drivers don't support
 it, or it has been designed that way, then you're pretty much out of luck
@@ -6504,7 +6506,7 @@ the Tivo has a direct-connect capability.
 <item>Use a firewire connection.  There is a <tt>6200ch.c</tt> in the MythTV
 contrib directory which may work for you.
 </enum>
-<sect1>Configuring one machine to flag all commercials.
+<sect1>Configuring one machine to flag all commercials
 <p>Commercial flagging can be CPU intensive.  By default, the backend that
 created a recording is the one which will flag commercials.  You may wish to
 use a different machine to run commercial flagging.
@@ -7492,12 +7494,12 @@ the mythplugins tarball instead of individual ones.
 v0.18.02, 2005-05-05.  Fix a few more directory issues WRT the plugins.  Get
 rid of Mandrake versioning where it's no longer needed.  Get rid of the old
 crontab stuff since native mythfilldatabase is better.
-
 v0.18.03, 2005-05-13.  Add text for pulling release-branch CVS code.  Add
 text about PVR-500 being two PVR-150's.  Expand on choosing lowest numbered
 input device in each class.  Remove note that Plextor is in CVS since it's
 now in released code.  Add more information on hard drive requirements.  Spelling.
 v0.18.04, 2005-05-16.  Bump to v0.18.1.
+v0.18.05, 2005-05-25.  Alter some of the troubleshooting text about full duplex.
 -->
 
 <!--

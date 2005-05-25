@@ -442,6 +442,8 @@ artsd</CODE> from the command line to stop the artsd program.</P>
 -c 1</CODE> to work with the second sound card.  The first card is #0, the
 second card is #1, etc.</P>
 
+<H3>Mythbackend reports that your card is not reporting full duplex capabilities</H3>
+
 <H3>The mythbackend program told me to look at this section</H3>
 
 <P>mythbackend does a check to see if your sound device is capable of full
@@ -450,11 +452,12 @@ into issues when you try to record and play sound at the same time.  If your
 backend is a separate machine than your frontend, then there's no problem,
 since you're only going to be doing one thing at a time with the card. 
 Likewise, if you're running the frontend and backend on the same machine,
-but you're using btaudio or a Hauppauge PVR-250 as your recording source,
-and using the playback function of your sound card, then you also shouldn't
+but you're using btaudio or a hardware encoder card such as the Hauppauge
+PVR-250, DVB cards or HDTV capture cards as your recording source and you're
+only using the playback function of your sound card, then you also shouldn't
 have an issue, since the sound card isn't being asked to perform two
 functions at once.</P>
-<P>If you can't get your sound card to go full duplex and need it to, then check
+<P>If you can't get your sound card to go full-duplex and need it to, then check
 your distribution for updated sound drivers.  If your sound card is not
 capable of full-duplex operation, either because the drivers don't support
 it, or it has been designed that way, then you're pretty much out of luck
