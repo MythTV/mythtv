@@ -747,6 +747,7 @@ bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
 
 void AudioPlugin::stopAudio()
 {
+    
     state_of_play_mutex->lock();
 
         if (decoder && decoder->running())
@@ -769,6 +770,7 @@ void AudioPlugin::stopAudio()
 
         if (output)
         {
+            output->Pause(false);
             deleteOutput();
         }
 
@@ -792,6 +794,7 @@ void AudioPlugin::stopAudio()
     maop_mutex.unlock();
     speaker_release_timer.restart();
     sendMessage("stop");
+
 }
 
 void AudioPlugin::pauseAudio(bool true_or_false)
