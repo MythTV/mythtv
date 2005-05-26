@@ -794,7 +794,7 @@ void AudioPlugin::stopAudio()
     maop_mutex.unlock();
     speaker_release_timer.restart();
     sendMessage("stop");
-
+    stopPlaylistMode();
 }
 
 void AudioPlugin::pauseAudio(bool true_or_false)
@@ -937,11 +937,14 @@ void AudioPlugin::setPlaylistMode(int container, int id, int index)
 void AudioPlugin::stopPlaylistMode()
 {
     playlist_mode_mutex.lock();
+        if(playlist_mode)
+        {
+            log(QString("leaving playlist mode"), 7);
+        }
         playlist_mode = false;
         current_playlist_container = -1;
         current_playlist_id = -1;
         current_playlist_item_index = -1;
-        log(QString("leaving playlist mode"), 7);
         current_chain_playlist.clear();
         current_chain_position.clear();
     playlist_mode_mutex.unlock();
