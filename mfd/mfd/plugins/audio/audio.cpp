@@ -34,6 +34,7 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     active_streaming = false;
     state_of_play_mutex = new QMutex(true);    
     metadata_server = parent->getMetadataServer();
+    playlist_mode = false;
     stopPlaylistMode();
     audio_listener = new AudioListener(this);
 #ifdef MFD_RTSP_SUPPORT
@@ -327,6 +328,7 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
         else if (tokens[0] == "stop")
         {
             stopAudio();
+            stopPlaylistMode();
         }
         else if (tokens[0] == "next")
         {
@@ -794,7 +796,6 @@ void AudioPlugin::stopAudio()
     maop_mutex.unlock();
     speaker_release_timer.restart();
     sendMessage("stop");
-    stopPlaylistMode();
 }
 
 void AudioPlugin::pauseAudio(bool true_or_false)
