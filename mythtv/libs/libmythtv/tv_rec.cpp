@@ -1877,6 +1877,12 @@ void TVRec::StopPlaying(void)
 bool TVRec::SetupRingBuffer(QString &path, long long &filesize, 
                             long long &fillamount, bool pip)
 {
+    if (rbuffer)
+    {
+        VERBOSE(VB_ALL, "TVRec: Attempting to setup multiple ringbuffers on one connection.");
+        return false;
+    }
+
     ispip = pip;
     filesize = gContext->GetNumSetting("BufferSize", 5);
     fillamount = gContext->GetNumSetting("MaxBufferFill", 50);
