@@ -72,6 +72,7 @@ ProgramInfo::ProgramInfo(void)
     filesize = 0;
     hostname = "";
     programflags = 0;
+    transcoder = 0;
 
     startts = QDateTime::currentDateTime();
     endts = startts;
@@ -188,6 +189,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     recpriority = other.recpriority;
     recgroup = other.recgroup;
     programflags = other.programflags;
+    transcoder = other.transcoder;
 
     hasAirDate = other.hasAirDate;
     repeat = other.repeat;
@@ -680,7 +682,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
                   "channel.callsign,channel.name,channel.commfree, "
                   "channel.outputfilters,seriesid,programid,filesize, "
                   "lastmodified,stars,previouslyshown,originalairdate, "
-                  "hostname,recordid "
+                  "hostname,recordid,transcoder "
                   "FROM recorded "
                   "LEFT JOIN channel "
                   "ON recorded.chanid = channel.chanid "
@@ -734,6 +736,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         }
         proginfo->hostname = query.value(18).toString();
         proginfo->recordid = query.value(19).toInt();
+        proginfo->transcoder = query.value(20).toInt();
 
         proginfo->spread = -1;
 
@@ -1200,11 +1203,11 @@ void ProgramInfo::StartedRecording(void)
     query.prepare("INSERT INTO recorded (chanid,starttime,endtime,title,"
                   " subtitle,description,hostname,category,recgroup,"
                   " autoexpire,recordid,seriesid,programid,stars,"
-                  " previouslyshown,originalairdate,findid)"
+                  " previouslyshown,originalairdate,findid,transcoder)"
                   " VALUES(:CHANID,:STARTS,:ENDS,:TITLE,:SUBTITLE,:DESC,"
                   " :HOSTNAME,:CATEGORY,:RECGROUP,:AUTOEXP,:RECORDID,"
                   " :SERIESID,:PROGRAMID,:STARS,:REPEAT,:ORIGAIRDATE,"
-                  " :FINDID);");
+                  " :FINDID,:TRANSCODER);");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTS", starts);
     query.bindValue(":ENDS", ends);
@@ -1222,6 +1225,7 @@ void ProgramInfo::StartedRecording(void)
     query.bindValue(":STARS", stars);
     query.bindValue(":REPEAT", repeat);
     query.bindValue(":ORIGAIRDATE", originalAirDate);
+    query.bindValue(":TRANSCODER", record->GetTranscoder());
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("WriteRecordedToDB", query);

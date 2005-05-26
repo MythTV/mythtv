@@ -27,6 +27,7 @@ ScheduledRecording::ScheduledRecording()
     dupmethod = NULL;
     autoexpire = NULL;
     autotranscode = NULL;
+    transcoder = NULL;
     autocommflag = NULL;
     autouserjob1 = NULL;
     autouserjob2 = NULL;
@@ -342,6 +343,10 @@ bool ScheduledRecording::GetAutoExpire(void) const {
 
 void ScheduledRecording::SetAutoExpire(bool expire) {
     autoexpire->setValue(expire);
+}
+
+int ScheduledRecording::GetTranscoder(void) const {
+    return transcoder->getValue().toInt();
 }
 
 int ScheduledRecording::GetAutoRunJobs(void) const {
@@ -742,7 +747,10 @@ void ScheduledRecording::setDefault(bool haschannel)
     
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
 
-    autotranscode->setValue(0);
+    autotranscode->setValue(gContext->GetNumSetting("AutoTranscode", 0));
+    transcoder->fillSelections();
+    transcoder->setValue(gContext->GetNumSetting("DefaultTranscoder",
+                         RecordingProfile::TranscoderAutodetect));
     autocommflag->setValue(gContext->GetNumSetting("AutoCommercialFlag", 1));
     autouserjob1->setValue(gContext->GetNumSetting("AutoRunUserJob1", 0));
     autouserjob2->setValue(gContext->GetNumSetting("AutoRunUserJob2", 0));

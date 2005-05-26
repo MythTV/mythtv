@@ -266,7 +266,7 @@ int FlagCommercials(QString chanid, QString starttime)
             program_info->SetCommBreakList(breaks);
 
             if (!quiet)
-                printf( "%d -> %d\n",
+                printf( "%ld -> %ld\n",
                     orig_breaks.count() / 2, breaks.count() / 2);
 
             delete commDetect;
@@ -302,7 +302,8 @@ int FlagCommercials(QString chanid, QString starttime)
     }
     else
     {
-        if (stillRecording)
+        if ((stillRecording) &&
+            (program_info->recendts > QDateTime::currentDateTime()))
         {
             RemoteEncoder *recorder;
 
@@ -313,8 +314,8 @@ int FlagCommercials(QString chanid, QString starttime)
             if (recorder && (recorder->GetRecorderNumber() != -1))
                 nvp->SetRecorder(recorder);
             else
-                cerr << "Unable to get remote recorder, flagging info may be "
-                     << "negatively affected." << endl;
+                cerr << "Unable to find active recorder for this recording, "
+                     << "flagging info may be negatively affected." << endl;
         }
         breaksFound = nvp->FlagCommercials(showPercentage, fullSpeed,
                                            inJobQueue);
@@ -776,3 +777,5 @@ int main(int argc, char *argv[])
 
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -346,6 +346,7 @@ class SRJobQueueGroup : public ManagedListGroup
 
         friend class SRRootGroup;
         class SRAutoTranscode* autoTranscode;
+        class SRTranscoderSelector* transcoder;
         class SRAutoCommFlag* autoCommFlag;
         class SRAutoUserJob1* autoUserJob1;
         class SRAutoUserJob2* autoUserJob2;
@@ -550,6 +551,30 @@ class SRAutoTranscode: public SRSelectSetting
             addSelection("Do not Transcode new recordings", 0);
             setValue(0);
             _parent.setAutoTranscodeObj(this);
+        }
+};
+
+class SRTranscoderSelector: public SRSelectSetting {
+    public:
+        SRTranscoderSelector(ScheduledRecording& _parent, ManagedList* _list,
+                             ManagedListGroup* _group)
+            : SRSelectSetting(_parent, "transcoderList",
+                              QObject::tr("[ Select transcoder ]"), _group,
+                              "transcoder", _list )
+        {
+            _parent.setTranscoderObj(this);
+        }
+
+
+        virtual void load() {
+            fillSelections();
+            SRSelectSetting::load();
+        }
+
+        virtual void fillSelections() {
+            clearSelections();
+            RecordingProfile::fillSelections(selectItem,
+                RecordingProfile::TranscoderGroup);
         }
 };
 

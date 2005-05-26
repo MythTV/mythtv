@@ -72,11 +72,14 @@ SRJobQueueGroup::SRJobQueueGroup(ScheduledRecording& _rec, ManagedList* _parentL
                                         _parent, "postProcessing"),
                        schedRec(_rec)
 {
-    autoTranscode = new SRAutoTranscode(_rec, _parentList, this);
-//    addItem(autoTranscode->getItem(), -1);
-
     autoCommFlag = new SRAutoCommFlag(_rec, _parentList, this);
     addItem(autoCommFlag->getItem(), -1);
+
+    autoTranscode = new SRAutoTranscode(_rec, _parentList, this);
+    addItem(autoTranscode->getItem(), -1);
+
+    transcoder = new SRTranscoderSelector(_rec, _parentList, this);
+    addItem(transcoder->getItem(), -1);
 
     autoUserJob1 = new SRAutoUserJob1(_rec, _parentList, this);
     addItem(autoUserJob1->getItem(), -1);

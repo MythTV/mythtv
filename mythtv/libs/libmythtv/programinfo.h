@@ -286,6 +286,7 @@ class ProgramInfo
     int findid;
 
     int programflags;
+    int transcoder;
     QString chanOutputFilters;
     
     QString seriesid;

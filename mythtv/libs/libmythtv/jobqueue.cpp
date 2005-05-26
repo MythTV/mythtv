@@ -523,9 +523,9 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
     if (! (tmpStatus & JOB_DONE) && (tmpCmd & JOB_STOP))
         return false;
     query.prepare("INSERT jobqueue (chanid, starttime, inserttime, type, "
-                         "status, hostname, args, comment, flags) "
+                         "status, statustime, hostname, args, comment, flags) "
                      "VALUES (:CHANID, :STARTTIME, now(), :JOBTYPE, :STATUS, "
-                         ":HOST, :ARGS, :COMMENT, :FLAGS);");
+                         "now(), :HOST, :ARGS, :COMMENT, :FLAGS);");
 
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", startts);
@@ -960,17 +960,9 @@ QString JobQueue::StatusText(int status)
 {
     switch (status)
     {
-        case JOB_QUEUED:    return tr("Queued");
-        case JOB_PENDING:   return tr("Pending");
-        case JOB_STARTING:  return tr("Starting");
-        case JOB_RUNNING:   return tr("Running");
-        case JOB_PAUSED:    return tr("Paused");
-        case JOB_STOPPING:  return tr("Stopping");
-        case JOB_DONE:      return tr("Done (Invalid status!)");
-        case JOB_FINISHED:  return tr("Finished");
-        case JOB_ABORTED:   return tr("Aborted");
-        case JOB_ERRORED:   return tr("Errored");
-        case JOB_CANCELLED: return tr("Cancelled");
+#define JOBSTATUS_STATUSTEXT(A,B,C) case A: return C;
+        JOBSTATUS_MAP(JOBSTATUS_STATUSTEXT)
+        default: break;
     }
     return tr("Undefined");
 }
@@ -991,7 +983,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
                       "j.args, j.comment, r.endtime "
                   "FROM jobqueue j, recorded r "
                   "WHERE j.chanid = r.chanid AND j.starttime = r.starttime "
-                  "ORDER BY j.starttime, j.chanid, j.id;");
+                  "ORDER BY j.inserttime, j.chanid, j.id;");
 
     if (!query.exec() || !query.isActive())
     {
@@ -1484,6 +1476,10 @@ void JobQueue::DoTranscodeThread(void)
     ProgramInfo *program_info = new ProgramInfo(*m_pginfo);
     int controlTranscoding = JOB_RUN;
     QString key;
+    QString logDesc = QString("\"%1\" recorded from channel %2 at %3")
+                          .arg(program_info->title.local8Bit())
+                          .arg(program_info->chanid)
+                          .arg(program_info->startts.toString());
     QString startts = program_info->startts.toString("yyyyMMddhhmm00");
     
     key = QString("%1_%2")
@@ -1505,23 +1501,61 @@ void JobQueue::DoTranscodeThread(void)
     // DO TRANSCODE STUFF HERE //
     /////////////////////////////
     QString path = "mythtranscode";
+    int transcoder = program_info->transcoder;
+    QString profilearg = transcoder == RecordingProfile::TranscoderAutodetect ?
+                            "autodetect" :
+                            QString::number(transcoder);
     QString command = QString("%1 -V %2 -c %3 -s %4 -p %5 -d %6")
                       .arg(path.ascii())
                       .arg(print_verbose_messages)
                       .arg(program_info->chanid)
                       .arg(program_info->recstartts.toString(Qt::ISODate))
-                      .arg("autodetect")
+                      .arg(profilearg.ascii())
                       .arg(useCutlist ? "-l" : "");
 
     if (jobQueueCPU < 2)
         nice(17);
 
+    QString transcoderName;
+    if (transcoder == RecordingProfile::TranscoderAutodetect)
+    {
+        transcoderName = "Autodetect";
+    }
+    else
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT name FROM recordingprofiles WHERE id = :ID;");
+        query.bindValue(":ID", transcoder);
+        query.exec();
+        if (query.isActive() && query.size() > 0 && query.next())
+        {
+            transcoderName = query.value(0).toString();
+        }
+        else
+        {
+            /* Unexpected value; log it. */
+            transcoderName = QString("Autodetect(%1)").arg(transcoder);
+        }
+    }
+
+    QString msg;
     bool retry = true;
     int retrylimit = 3;
     while (retry)
     {
+        QString statusText;
+
         retry = false;
         ChangeJobStatus(jobID, JOB_STARTING);
+
+        statusText = StatusText(GetJobStatus(jobID));
+        msg = QString("\"%1\" transcode of %2: %3.")
+                      .arg(transcoderName)
+                      .arg(logDesc)
+                      .arg(statusText);
+        VERBOSE(VB_GENERAL, msg);
+        gContext->LogEntry("transcode", LP_NOTICE,
+                           QString("Transcode %1").arg(statusText), msg);
 
         VERBOSE(VB_JOBQUEUE, QString("JobQueue running app: '%1'")
                                      .arg(command));
@@ -1598,6 +1632,14 @@ void JobQueue::DoTranscodeThread(void)
             } else // Unrecoerable error
                 ChangeJobStatus(jobID, JOB_ERRORED);
         }
+        statusText = StatusText(GetJobStatus(jobID));
+        msg = QString("\"%1\" transcode of %2: %3.")
+                      .arg(transcoderName)
+                      .arg(logDesc)
+                      .arg(statusText);
+        VERBOSE(VB_GENERAL, msg);
+        gContext->LogEntry("transcode", LP_NOTICE,
+                           QString("Transcode %1").arg(statusText), msg);
     }
     controlFlagsLock.lock();
     runningJobIDs.erase(key);

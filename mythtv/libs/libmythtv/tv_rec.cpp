@@ -77,7 +77,7 @@ TVRec::TVRec(int capturecardnum)
     curRecording = NULL;
     pendingRecording = NULL;
     profileName = "";
-    autoTranscode = 0;
+    autoTranscode = false;
 
     QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
@@ -547,7 +547,10 @@ void TVRec::HandleStateChange(void)
         VERBOSE(VB_RECORD, msg);
 
         // Determine whether to automatically run the transcoder or not
-        autoTranscode = profile.byName("autotranscode")->getValue().toInt();
+        Setting *profileAutoTranscode = profile.byName("autotranscode");
+        autoTranscode = (profileAutoTranscode &&
+                         profileAutoTranscode->getValue().toInt() != 0) ?
+                         true : false;
 
         bool error = false;
 
@@ -830,8 +833,11 @@ void TVRec::TeardownRecorder(bool killFile)
                  ((!autoTranscode) || (autoTranscode && !transcodeFirst))))
                 jobTypes = jobTypes & (~JOB_COMMFLAG);
 
-            if (autoTranscode)
-                jobTypes |= JOB_TRANSCODE;
+            if (!autoTranscode)
+            {
+                /* Only auto-transcode if recording profile allows it. */
+                jobTypes &= ~JOB_TRANSCODE;
+            }
 
             if (jobTypes)
             {

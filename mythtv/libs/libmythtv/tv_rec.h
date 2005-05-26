@@ -235,7 +235,7 @@ class TVRec
     QDateTime recordPendingStart;
 
     QString profileName;
-    int autoTranscode;
+    bool autoTranscode;
 
     dvb_options_t dvb_options;
     firewire_options_t firewire_options;

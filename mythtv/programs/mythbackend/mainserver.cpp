@@ -1254,7 +1254,9 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                     .arg(strerror(errno)));
         }
     }
-    if ((err = unlink(filename.local8Bit())))
+
+    checkFile.setName(filename);
+    if (checkFile.exists() && (err = unlink(filename.local8Bit())))
         VERBOSE(VB_IMPORTANT, QString("Error deleting '%1', %2")
                 .arg(filename).arg(strerror(errno)));
 
@@ -1540,9 +1542,6 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     if (pginfo->chancommfree)
         jobTypes = jobTypes & (~JOB_COMMFLAG);
-
-//    if (autoTranscode)
-//        jobTypes |= JOB_TRANSCODE;
 
     if (jobTypes)
     {

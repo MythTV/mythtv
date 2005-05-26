@@ -32,7 +32,7 @@ void usage(char *progname)
     cerr << "\t--starttime    or -s: Takes a starttime for the\n";
     cerr << "\t\trecording. REQUIRED\n";
     cerr << "\t--infile       or -i: Input file (Alternative to -c and -s)\n";
-    cerr << "\t--profile      or -p: Takes a profile number of 'autodetect'\n";
+    cerr << "\t--profile      or -p: Takes a profile number or 'autodetect'\n";
     cerr << "\t\trecording profile. REQUIRED\n";
     cerr << "\t--honorcutlist or -l: Specifies whether to use the cutlist.\n";
     cerr << "\t--allkeys      or -k: Specifies that the output file\n";

@@ -17,6 +17,7 @@ SOURCES += ../libs/libmythtv/dvbtransporteditor.cpp
 SOURCES += ../libs/libmythtv/NuppelVideoPlayer.cpp
 SOURCES += ../libs/libmythtv/guidegrid.cpp
 SOURCES += ../libs/libmythtv/infodialog.cpp
+SOURCES += ../libs/libmythtv/jobqueue.h
 SOURCES += ../libs/libmythtv/jobqueue.cpp
 SOURCES += ../libs/libmythtv/progfind.cpp
 SOURCES += ../libs/libmythtv/proglist.cpp

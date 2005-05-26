@@ -9,7 +9,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 
-const QString currentDatabaseVersion = "1084";
+const QString currentDatabaseVersion = "1085";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -1651,6 +1651,42 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 };
         if (!performActualUpdate(updates, "1084", dbver))
             return false;
+    }
+
+    if (dbver == "1084")
+    {
+        const QString updates[] = {
+"INSERT INTO recordingprofiles SET name = 'High Quality', profilegroup = 6;",
+"INSERT INTO recordingprofiles SET name = 'Medium Quality', profilegroup = 6;",
+"INSERT INTO recordingprofiles SET name = 'Low Quality', profilegroup = 6;",
+"REPLACE INTO settings SET value = 'DefaultTranscoder', data = '0';",
+"ALTER TABLE record ADD COLUMN transcoder INT NOT NULL DEFAULT 0;",
+"ALTER TABLE recorded ADD COLUMN transcoder INT NOT NULL DEFAULT 0;",
+""
+};
+        if (!performActualUpdate(updates, "1085", dbver))
+            return false;
+
+        MSqlQuery recordids(MSqlQuery::InitCon());
+        recordids.prepare(
+            "SELECT r.recordid"
+            "  FROM record r, recordingprofiles p, codecparams c"
+            "  WHERE c.name = 'autotranscode'"
+            "    AND c.value = 1"
+            "    AND c.profile = p.id"
+            "    AND r.profile = p.name"
+            ";");
+        if (recordids.exec() && recordids.isActive() && recordids.size() > 0)
+        {
+            MSqlQuery update(MSqlQuery::InitCon());
+            while (recordids.next())
+            {
+                update.prepare(QString(
+                    "UPDATE record SET autotranscode = 1 WHERE recordid = %1;")
+                    .arg(recordids.value(0).toInt()));
+                update.exec();
+            }
+        }
     }
 
     return true;

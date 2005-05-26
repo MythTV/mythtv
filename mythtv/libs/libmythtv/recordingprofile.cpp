@@ -9,8 +9,6 @@
 
 #include "managedlist.h"
 
-#define TRANSCODER_GROUP 6
-
 QString RecordingProfileParam::whereClause(void) {
   return QString("id = %1").arg(parentProfile.getProfileNum());
 }
@@ -621,8 +619,11 @@ class AutoTranscode: public CodecParam, public CheckBoxSetting {
 public:
     AutoTranscode(const RecordingProfile& parent):
         CodecParam(parent, "autotranscode") {
-        setLabel(QObject::tr("Automatically transcode after recording"));
+        setLabel(QObject::tr("Enable auto-transcode after recording"));
         setValue(false);
+	    setHelpText(QObject::tr("Automatically transcode when a recording is "
+                                "made using this profile and the recording's "
+                                "schedule is configurd to allow transcoding."));
     };
 };
 
@@ -837,7 +838,8 @@ int RecordingProfileEditor::exec() {
     return QDialog::Rejected;
 }
 
-void RecordingProfile::fillSelections(SelectSetting* setting, int group)
+void RecordingProfile::fillSelections(SelectSetting* setting, int group,
+                                      bool foldautodetect)
 {
     if (group == 0)
     {
@@ -854,12 +856,35 @@ void RecordingProfile::fillSelections(SelectSetting* setting, int group)
 
         if (result.exec() && result.isActive() && result.size() > 0)
         {
+            if (group == RecordingProfile::TranscoderGroup && foldautodetect)
+            {
+                setting->addSelection(QString("Autodetect"),
+                                      QString::number(
+                                      RecordingProfile::TranscoderAutodetect));
+            }
             while (result.next())
             {
-                if (group == TRANSCODER_GROUP)
+                if (group == RecordingProfile::TranscoderGroup)
                 {
-                    setting->addSelection(QString( "From %1").arg(result.value(0).toString()),
-                                          result.value(1).toString());
+                    if (result.value(0).toString() == "RTjpeg/MPEG4" ||
+                        result.value(0).toString() == "MPEG2")
+                    {
+                        if (foldautodetect)
+                        {
+                            /* Hide; used by "Autodetect". */
+                        }
+                        else
+                        {
+                            setting->addSelection(QString("Autodetect from %1")
+                                              .arg(result.value(0).toString()),
+                                              result.value(1).toString());
+                        }
+                    }
+                    else
+                    {
+                        setting->addSelection(result.value(0).toString(),
+                                              result.value(1).toString());
+                    }
                 }
                 else
                 {
@@ -891,17 +916,35 @@ void RecordingProfile::fillSelections(SelectManagedListItem* setting, int group)
 
         if (result.exec() && result.isActive() && result.size() > 0)
         {
+            if (group == RecordingProfile::TranscoderGroup)
+            {
+                setting->addSelection(QString("Transcode using Autodetect"),
+                                      QString::number(
+                                      RecordingProfile::TranscoderAutodetect));
+            }
             while (result.next())
             {
-                if (group == TRANSCODER_GROUP)
+                if (group == RecordingProfile::TranscoderGroup)
                 {
-                    setting->addSelection(QString( "From %1").arg(result.value(0).toString()),
-                                          result.value(1).toString());
+                    /* RTjpeg/MPEG4 and MPEG2 are used by "Autodetect". */
+                    if (result.value(0).toString() != "RTjpeg/MPEG4" &&
+                        result.value(0).toString() != "MPEG2")
+                    {
+                        QString tempLabel(QObject::tr(
+                                          "Transcode using \"%1\""));
+                        setting->addSelection(QString(tempLabel)
+                                              .arg(result.value(0).toString()),
+                                              result.value(1).toString(),
+                                              false);
+                    }
                 }
                 else
                 {
-                    setting->addSelection(result.value(0).toString() ,result.value(1).toString(), false);
-
+                    QString tempLabel(QObject::tr(
+                                      "Record using the \"%1\" profile"));
+                    setting->addSelection(QString(tempLabel)
+                                          .arg(result.value(0).toString()),
+                                          result.value(1).toString(), false);
                 }
             }
         }

@@ -4,6 +4,7 @@
 #include "dbsettings.h"
 #include "langsettings.h"
 #include "globalsettings.h"
+#include "recordingprofile.h"
 #include "scheduledrecording.h"
 #include "util-x11.h"
 #include "DisplayRes.h"
@@ -422,6 +423,29 @@ static GlobalCheckBox *AutoCommercialFlag()
     bc->setValue(true);
     bc->setHelpText(QObject::tr("This is the default value used for the Auto-"
                     "Commercial Flagging setting when a new scheduled "
+                    "recording is created."));
+    return bc;
+}
+
+static GlobalCheckBox *AutoTranscode()
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoTranscode");
+    bc->setLabel(QObject::tr("Default Auto Transcode setting"));
+    bc->setValue(false);
+    bc->setHelpText(QObject::tr("This is the default value used for the Auto-"
+                    "Transcode setting when a new scheduled "
+                    "recording is created."));
+    return bc;
+}
+
+static GlobalComboBox *DefaultTranscoder()
+{
+    GlobalComboBox *bc = new GlobalComboBox("DefaultTranscoder");
+    bc->setLabel(QObject::tr("Default Transcoder"));
+    RecordingProfile::fillSelections(bc, RecordingProfile::TranscoderGroup,
+                                     true);
+    bc->setHelpText(QObject::tr("This is the default value used for the "
+                    "transcoder setting when a new scheduled "
                     "recording is created."));
     return bc;
 }
@@ -2949,6 +2973,8 @@ GeneralSettings::GeneralSettings()
     jobs->addChild(AutoCommercialFlag());
     jobs->addChild(CommercialSkipMethod());
     jobs->addChild(AggressiveCommDetect());
+    jobs->addChild(AutoTranscode());
+    jobs->addChild(DefaultTranscoder());
     for (uint i=1; i<=4; ++i)
         jobs->addChild(AutoRunUserJob(i));
     addChild(jobs);

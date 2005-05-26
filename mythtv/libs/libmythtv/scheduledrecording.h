@@ -21,6 +21,7 @@ class SRProfileSelector;
 class SRDupIn;
 class SRDupMethod;
 class SRAutoTranscode;
+class SRTranscoderSelector;
 class SRAutoCommFlag;
 class SRAutoUserJob1;
 class SRAutoUserJob2;
@@ -76,6 +77,8 @@ public:
     int GetMaxEpisodes(void) const;
     bool GetMaxNewest(void) const;
 
+    int GetTranscoder(void) const;
+
     int GetAutoRunJobs(void) const;
 
     void setStart(const QDateTime& start);
@@ -127,6 +130,7 @@ public:
     void setDupInObj(SRDupIn* val) {dupin = val;}
     void setDupMethodObj(SRDupMethod* val) {dupmethod = val;}
     void setAutoTranscodeObj(SRAutoTranscode* val) {autotranscode = val;}
+    void setTranscoderObj(SRTranscoderSelector* val) {transcoder = val;}
     void setAutoCommFlagObj(SRAutoCommFlag* val) {autocommflag = val;}
     void setAutoUserJob1Obj(SRAutoUserJob1* val) {autouserjob1 = val;}
     void setAutoUserJob2Obj(SRAutoUserJob2* val) {autouserjob2 = val;}
@@ -191,6 +195,7 @@ protected:
     class SRDupIn* dupin;
     class SRDupMethod* dupmethod;
     class SRAutoTranscode* autotranscode;
+    class SRTranscoderSelector* transcoder;
     class SRAutoCommFlag* autocommflag;
     class SRAutoUserJob1* autouserjob1;
     class SRAutoUserJob2* autouserjob2;

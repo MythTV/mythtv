@@ -13,26 +13,31 @@
 
 using namespace std;
 
-// When Updating this enum, also update the JobQueue::StatusText() method.
+// Strings are used by JobQueue::StatusText()
+#define JOBSTATUS_MAP(F) \
+    F(JOB_UNKNOWN,      0x0000, tr("Unknown")) \
+    F(JOB_QUEUED,       0x0001, tr("Queued")) \
+    F(JOB_PENDING,      0x0002, tr("Pending")) \
+    F(JOB_STARTING,     0x0003, tr("Starting")) \
+    F(JOB_RUNNING,      0x0004, tr("Running")) \
+    F(JOB_STOPPING,     0x0005, tr("Stopping")) \
+    F(JOB_PAUSED,       0x0006, tr("Paused")) \
+    F(JOB_RETRY,        0x0007, tr("Retrying")) \
+    F(JOB_ERRORING,     0x0008, tr("Erroring")) \
+    F(JOB_ABORTING,     0x0009, tr("Aborting")) \
+    /* \
+     * JOB_DONE is a mask to indicate the job is done no matter what the \
+     * status \
+     */ \
+    F(JOB_DONE,         0x0100, tr("Done (Invalid status!)")) \
+    F(JOB_FINISHED,     0x0110, tr("Finished")) \
+    F(JOB_ABORTED,      0x0120, tr("Aborted")) \
+    F(JOB_ERRORED,      0x0130, tr("Errored")) \
+    F(JOB_CANCELLED,    0x0140, tr("Cancelled")) \
+
 enum JobStatus {
-    JOB_QUEUED        = 0x0001,
-    JOB_PENDING       = 0x0002,
-    JOB_STARTING      = 0x0003,
-    JOB_RUNNING       = 0x0004,
-    JOB_STOPPING      = 0x0005,
-    JOB_PAUSED        = 0x0006,
-    JOB_RETRY         = 0x0007,
-    JOB_ERRORING      = 0x0008,
-    JOB_ABORTING      = 0x0009,
-
-    // JOB_DONE is a mask to indicate the job is done no matter what the status
-    JOB_DONE          = 0x0100,
-    JOB_FINISHED      = 0x0110,
-    JOB_ABORTED       = 0x0120,
-    JOB_ERRORED       = 0x0130,
-    JOB_CANCELLED     = 0x0140,
-
-    JOB_UNKNOWN       = 0x0000
+#define JOBSTATUS_ENUM(A,B,C)   A = B ,
+    JOBSTATUS_MAP(JOBSTATUS_ENUM)
 };
 
 enum JobCmds {
@@ -89,6 +94,7 @@ typedef struct jobqueueentry {
 
 class JobQueue : public QObject
 {
+    Q_OBJECT
   public:
     JobQueue(bool master);
     ~JobQueue(void);

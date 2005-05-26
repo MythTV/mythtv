@@ -72,8 +72,10 @@ public:
     virtual bool loadByCard(QString name, int cardid);
     virtual bool loadByGroup(QString name, QString group);
 
+    static const int TranscoderAutodetect = 0;  /* sentinel value */
+    static const int TranscoderGroup = 6;       /* hard-coded DB value */
     static void fillSelections(SelectSetting* setting,
-                               int group);
+                               int group, bool foldautodetect = false);
     static void fillSelections(SelectManagedListItem* setting,
                                int group);                           
                                
