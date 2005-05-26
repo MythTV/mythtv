@@ -17,7 +17,7 @@ class EncoderLink
    ~EncoderLink();
 
     /// \brief Used to set the socket for a non-local EncoderLink.
-    void SetSocket(PlaybackSock *lsock) { sock = lsock; }
+    void SetSocket(PlaybackSock *lsock);
     /// \brief Returns the socket, if set, for a non-local EncoderLink.
     PlaybackSock *GetSocket(void) { return sock; }
 

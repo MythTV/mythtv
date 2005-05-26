@@ -7,13 +7,18 @@ using namespace std;
 #include "playbacksock.h"
 #include "programinfo.h"
 #include "server.h"
+#include "mainserver.h"
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
 
-PlaybackSock::PlaybackSock(RefSocket *lsock, QString lhostname, bool wantevents)
+PlaybackSock::PlaybackSock(MainServer *parent, RefSocket *lsock, 
+                           QString lhostname, bool wantevents)
 {
+    m_parent = parent;
     QString localhostname = gContext->GetHostName();
+
+    refCount = 0;
 
     sock = lsock;
     hostname = lhostname;
@@ -21,6 +26,8 @@ PlaybackSock::PlaybackSock(RefSocket *lsock, QString lhostname, bool wantevents)
     ip = "";
     backend = false;
     expectingreply = false;
+
+    disconnected = false;
 
     if (hostname == localhostname)
         local = true;
@@ -31,6 +38,22 @@ PlaybackSock::PlaybackSock(RefSocket *lsock, QString lhostname, bool wantevents)
 PlaybackSock::~PlaybackSock()
 {
     sock->DownRef();
+}
+
+void PlaybackSock::UpRef(void)
+{
+    refCount++;
+}
+
+bool PlaybackSock::DownRef(void)
+{
+    refCount--;
+    if (refCount < 0)
+    {
+        m_parent->DeletePBS(this);
+        return true;
+    }
+    return false;
 }
 
 bool PlaybackSock::SendReceiveStringList(QStringList &strlist)

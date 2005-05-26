@@ -274,6 +274,9 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
         return;
     }
 
+    // Increase refcount while using..
+    pbs->UpRef();
+
     if (command == "QUERY_RECORDINGS")
     {
         if (tokens.size() != 2)
@@ -538,6 +541,9 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
         
         SendResponse(pbssock, strlist);
     }
+
+    // Decrease refcount..
+    pbs->DownRef();
 }
 
 void MainServer::MarkUnused(ProcessRequestThread *prt)
@@ -612,12 +618,21 @@ void MainServer::customEvent(QCustomEvent *e)
 
         QPtrList<PlaybackSock> sentSet;
 
+        // Make a local copy of the list, upping the refcount as we go..
+        vector<PlaybackSock *> localPBSList;
         vector<PlaybackSock *>::iterator iter = playbackList.begin();
         for (; iter != playbackList.end(); iter++)
         {
             PlaybackSock *pbs = (*iter);
+            pbs->UpRef();
+            localPBSList.push_back(pbs);
+        }
 
-            if (sentSet.containsRef(pbs))
+        for (iter = localPBSList.begin(); iter != localPBSList.end(); iter++)
+        {
+            PlaybackSock *pbs = (*iter);
+
+            if (sentSet.containsRef(pbs) || pbs->IsDisconnected())
                 continue;
 
             sentSet.append(pbs);
@@ -646,6 +661,13 @@ void MainServer::customEvent(QCustomEvent *e)
                 // was deleted elsewhere, so the iterator's invalid.
                 iter = playbackList.begin();
             }
+        }
+
+        // Done with the pbs list, so decrement all the instances..
+        for (iter = localPBSList.begin(); iter != localPBSList.end(); iter++)
+        {
+            PlaybackSock *pbs = (*iter);
+            pbs->DownRef();
         }
     }
 }
@@ -679,14 +701,14 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         VERBOSE(VB_GENERAL, "MainServer::HandleAnnounce Playback");
         VERBOSE(VB_ALL, QString("adding: %1 as a client (events: %2)")
                                .arg(commands[2]).arg(wantevents));
-        PlaybackSock *pbs = new PlaybackSock(socket, commands[2], wantevents);
+        PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2], wantevents);
         playbackList.push_back(pbs);
     }
     else if (commands[1] == "SlaveBackend")
     {
         VERBOSE(VB_ALL, QString("adding: %1 as a slave backend server")
                                .arg(commands[2]));
-        PlaybackSock *pbs = new PlaybackSock(socket, commands[2], false);
+        PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2], false);
         pbs->setAsSlaveBackend();
         pbs->setIP(commands[3]);
 
@@ -951,9 +973,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             QFile checkFile(lpath);
 
             if (proginfo->hostname != gContext->GetHostName())
-            {
                 slave = getSlaveByHostname(proginfo->hostname);
-            }
 
             if ((masterBackendOverride && checkFile.exists()) || 
                 (proginfo->hostname == gContext->GetHostName()) ||
@@ -1014,6 +1034,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     }
                 }
             }
+
+            if (slave)
+                slave->DownRef();
 
             proginfo->ToStringList(outputlist);
 
@@ -1326,9 +1349,11 @@ void MainServer::HandleCheckRecordingActive(QStringList &slist,
     if (ismaster && pginfo->hostname != gContext->GetHostName())
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
-
         if (slave)
+        {
             result = slave->CheckRecordingActive(pginfo);
+            slave->DownRef();
+        }
     }
     else
     {
@@ -1389,6 +1414,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             }
  
             delete pginfo;
+            slave->DownRef();
             return;
         }
     }
@@ -1558,24 +1584,25 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
 
         if (slave) 
         {
-           num = slave->DeleteRecording(pginfo, forceMetadataDelete);
+            num = slave->DeleteRecording(pginfo, forceMetadataDelete);
 
-           if (num > 0)
-           {
-               (*encoderList)[num]->StopRecording();
-               pginfo->recstatus = rsDeleted;
-               if (m_sched)
-                   m_sched->UpdateRecStatus(pginfo);
-           }
+            if (num > 0)
+            {
+                (*encoderList)[num]->StopRecording();
+                pginfo->recstatus = rsDeleted;
+                if (m_sched)
+                    m_sched->UpdateRecStatus(pginfo);
+            }
 
-           if (pbssock)
-           {
-               QStringList outputlist = QString::number(num);
-               SendResponse(pbssock, outputlist);
-           }
+            if (pbssock)
+            {
+                QStringList outputlist = QString::number(num);
+                SendResponse(pbssock, outputlist);
+            }
 
-           delete pginfo;
-           return;
+            delete pginfo;
+            slave->DownRef();
+            return;
         }
     }
 
@@ -1824,6 +1851,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
         if (slave) 
         {
              exists = slave->CheckFile(pginfo);
+             slave->DownRef();
 
              QStringList outputlist = QString::number(exists);
              SendResponse(pbssock, outputlist);
@@ -2686,8 +2714,12 @@ void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
     
     if (gContext->GetHostName() != queryhostname)
     {
-        if (getSlaveByHostname(queryhostname) != NULL)
+        PlaybackSock *slave = getSlaveByHostname(queryhostname);
+        if (slave != NULL)
+        {
             retlist << "TRUE";
+            slave->DownRef();
+        }
         else
             retlist << "FALSE";
     }
@@ -3076,7 +3108,10 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
             VERBOSE(VB_ALL, QString("Couldn't find backend for: %1 : %2")
                                    .arg(pginfo->title).arg(pginfo->subtitle));
         else
+        {
             slave->GenPreviewPixmap(pginfo);
+            slave->DownRef();
+        }
 
         QStringList outputlist = "OK";
         SendResponse(pbssock, outputlist);
@@ -3173,6 +3208,7 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
         if (slave) 
         {
              QString slavetime = slave->PixmapLastModified(pginfo);
+             slave->DownRef();
 
              strlist += slavetime;
              SendResponse(pbssock, strlist);
@@ -3246,6 +3282,16 @@ void MainServer::deferredDeleteSlot(void)
     }
 }
 
+void MainServer::DeletePBS(PlaybackSock *sock)
+{
+    DeferredDeleteStruct dds;
+    dds.sock = sock;
+    dds.ts = QDateTime::currentDateTime();
+
+    QMutexLocker lock(&deferredDeleteLock);
+    deferredDeleteList.push_back(dds);
+}
+
 void MainServer::endConnection(RefSocket *socket)
 {
     vector<PlaybackSock *>::iterator it = playbackList.begin();
@@ -3274,13 +3320,8 @@ void MainServer::endConnection(RefSocket *socket)
                 MythEvent me(message);
                 gContext->dispatch(me);
             }
-            DeferredDeleteStruct dds;
-            dds.sock = *it;
-            dds.ts = QDateTime::currentDateTime();
-
-            QMutexLocker lock(&deferredDeleteLock);
-
-            deferredDeleteList.push_back(dds);
+            (*it)->SetDisconnected();
+            (*it)->DownRef();
             playbackList.erase(it);
             return;
         }
@@ -3349,6 +3390,7 @@ PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
         if (pbs->isSlaveBackend() && 
             ((pbs->getHostname() == hostname) || (pbs->getIP() == hostname)))
         {
+            pbs->UpRef();
             return pbs;
         }
     }
@@ -3469,7 +3511,7 @@ void MainServer::masterServerDied(void)
         }
     }
 
-    delete masterServer;
+    masterServer->DownRef();
     masterServer = NULL;
     masterServerReconnect->start(1000, true);
 }
@@ -3497,7 +3539,7 @@ void MainServer::reconnectTimeout(void)
         {
             VERBOSE(VB_ALL, "Connection to master server timed out.");
             masterServerReconnect->start(1000, true);
-            delete masterServerSock;
+            masterServerSock->DownRef();
             return;
         }
     }
@@ -3506,7 +3548,7 @@ void MainServer::reconnectTimeout(void)
     {
         VERBOSE(VB_ALL, "Could not connect to master server.");
         masterServerReconnect->start(1000, true);
-        delete masterServerSock;
+        masterServerSock->DownRef();
         return;
     }
 
@@ -3526,7 +3568,7 @@ void MainServer::reconnectTimeout(void)
     connect(masterServerSock, SIGNAL(connectionClosed()), this, 
             SLOT(masterServerDied()));
 
-    masterServer = new PlaybackSock(masterServerSock, server, true);
+    masterServer = new PlaybackSock(this, masterServerSock, server, true);
     playbackList.push_back(masterServer);
 
     masterServerSock->Unlock();

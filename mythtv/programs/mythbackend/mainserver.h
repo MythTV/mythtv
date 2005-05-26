@@ -41,6 +41,8 @@ class MainServer : public QObject
     void ProcessRequest(RefSocket *sock); 
     void MarkUnused(ProcessRequestThread *prt);
 
+    void DeletePBS(PlaybackSock *pbs);
+
   protected slots:
     void reconnectTimeout(void);
     void masterServerDied(void);

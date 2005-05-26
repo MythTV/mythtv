@@ -22,7 +22,9 @@ class RefSocket : public QSocket
     void Lock() { lock.lock(); }
     void Unlock() { lock.unlock(); }
 
-  private:
+  protected:
+    virtual ~RefSocket() {}
+
     int refCount;
     bool inUse;
     QMutex lock;

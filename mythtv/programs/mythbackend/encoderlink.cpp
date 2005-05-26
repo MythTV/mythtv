@@ -39,6 +39,9 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
 {
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
     startRecordingTime = endRecordingTime;
+
+    if (sock)
+        sock->UpRef();
 }
 
 /** \fn EncoderLink::EncoderLink(int, TVRec *)
@@ -62,6 +65,21 @@ EncoderLink::~EncoderLink(void)
 {
     if (tv)
         delete tv;
+}
+
+/** \fn EncoderLink::SetSocket(PlaybackSock *lsock)
+ *  \brief Used to set the socket for a non-local EncoderLink
+ *
+ *  Increases refcount on lsock, decreases refcount on old sock, if exists.
+ */
+void EncoderLink::SetSocket(PlaybackSock *lsock)
+{
+    if (lsock)
+        lsock->UpRef();
+
+    if (sock)
+        sock->DownRef();
+    sock = lsock;
 }
 
 /** \fn EncoderLink::IsBusy()

@@ -7,12 +7,20 @@
 
 class ProgramInfo;
 class RefSocket;
+class MainServer;
 
 class PlaybackSock
 {
   public:
-    PlaybackSock(RefSocket *lsock, QString lhostname, bool wantevents);
-   ~PlaybackSock();
+    PlaybackSock(MainServer *parent, RefSocket *lsock, 
+                 QString lhostname, bool wantevents);
+    virtual ~PlaybackSock();
+
+    void UpRef(void);
+    bool DownRef(void);
+
+    void SetDisconnected(void) { disconnected = true; }
+    bool IsDisconnected(void) { return disconnected; }
 
     RefSocket *getSocket(void) { return sock; }
     QString getHostname(void) { return hostname; }
@@ -60,6 +68,11 @@ class PlaybackSock
     QMutex sockLock;
 
     bool expectingreply;
+    bool disconnected;
+
+    int refCount;
+
+    MainServer *m_parent;
 };
 
 #endif
