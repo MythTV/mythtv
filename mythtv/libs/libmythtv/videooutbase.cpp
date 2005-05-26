@@ -1090,342 +1090,58 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
  * \fn VideoOutput::DisplayOSD(VideoFrame*,OSD *,int,int)
  * \brief If the OSD has changed, this will convert the OSD buffer
  *        to the OSDSurface's color format.
+ *
+ *  If the destination format is either IA44 or AI44 the osd is
+ *  converted to greyscale.
  */ 
 int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
                             int revision)
 {
-    int retval = -1;
+    if (!osd)
+        return -1;
 
-    //struct timeval one, two, three, four;
-    //struct timeval done = {0, 0}, dtwo = {0, 0};
+    OSDSurface *surface = osd->Display();
+    if (!surface)
+        return -1;
 
-    if (osd)
+    bool changed = (-1 == revision) ?
+        surface->Changed() : (surface->GetRevision()!=revision);
+
+    switch (frame->codec)
     {
-        //gettimeofday(&one, NULL);
-        OSDSurface *surface = osd->Display();
-        //gettimeofday(&two, NULL);
-        //timersub(&two, &one, &done);
-
-        //gettimeofday(&three, NULL);
-        if (surface)
+        case FMT_YV12:
         {
-            bool changed = (revision==-1) ? surface->Changed() :
-                surface->GetRevision() != revision;
-            switch (frame->codec)
-            {
-                case FMT_YV12:
-                {
-                    unsigned char *yuvptr = frame->buf;
-                    BlendSurfaceToYV12(surface, yuvptr, stride);
-                    break;
-                }
-                case FMT_AI44:
-                {
-                    unsigned char *ai44ptr = frame->buf;
-                    if (changed)
-                        BlendSurfaceToI44(surface, ai44ptr, true, stride);
-                    break;
-                }
-                case FMT_IA44:
-                {
-                    unsigned char *ia44ptr = frame->buf;
-                    if (changed)
-                        BlendSurfaceToI44(surface, ia44ptr, false, stride);
-                    break;
-                }
-                case FMT_ARGB32:
-                {
-                    unsigned char *argbptr = frame->buf;
-                    if (changed)
-                        BlendSurfaceToARGB(surface, argbptr, stride);
-                    break;
-                }
-                default:
-                    break;
-            }
-            retval = changed ? 1 : 0;
+            surface->BlendToYV12(frame->buf);
+            break;
         }
-        //gettimeofday(&four, NULL);
-        //timersub(&four, &three, &dtwo);
-    }
-
-    //cout << done.tv_usec << " " << dtwo.tv_usec << endl;
-
-    return retval;
-}
-
-/**
- * \fn VideoOutput::BlendSurfaceToYV12(OSDSurface*,unsigned char*,int)
- * \brief Used by DisplayOSD(VideoFrame*,OSD *,int,int) to convert
- *        between color spaces and strides.
- */
-void VideoOutput::BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr,
-                                     int stride)
-{
-    blendtoyv12_8_fun blender = blendtoyv12_8_init(surface);
-
-    unsigned char *uptrdest = yuvptr + surface->width * surface->height;
-    unsigned char *vptrdest = uptrdest + surface->width * surface->height / 4;
-
-    (void)stride;
-
-    QMemArray<QRect> rects = surface->usedRegions.rects();
-    QMemArray<QRect>::Iterator it = rects.begin();
-    for (; it != rects.end(); ++it)
-    {
-        QRect drawRect = *it;
-
-        int startcol, startline, endcol, endline;
-        startcol = drawRect.left();
-        startline = drawRect.top();
-        endcol = drawRect.right();
-        endline = drawRect.bottom();
-
-        unsigned char *src, *usrc, *vsrc;
-        unsigned char *dest, *udest, *vdest;
-        unsigned char *alpha;
-
-        int yoffset;
-
-        for (int y = startline; y <= endline; y++)
+        case FMT_AI44:
         {
-            yoffset = y * surface->width;
-
-            src = surface->y + yoffset + startcol;
-            dest = yuvptr + yoffset + startcol;
-            alpha = surface->alpha + yoffset + startcol;
-
-            for (int x = startcol; x <= endcol; x++)
-            {
-                if (x + 8 >= endcol)
-                {
-                    if (*alpha != 0)
-                        *dest = blendColorsAlpha(*src, *dest, *alpha);
-                    src++;
-                    dest++;
-                    alpha++;
-                }
-                else
-                {
-                    blender(src, dest, alpha, false);
-                    src += 8;
-                    dest += 8;
-                    alpha += 8;
-                    x += 7;
-                }
-            }
-
-            alpha = surface->alpha + yoffset + startcol;
-
-            if (y % 2 == 0)
-            {
-                usrc = surface->u + yoffset / 4 + startcol / 2;
-                udest = uptrdest + yoffset / 4 + startcol / 2;
-
-                vsrc = surface->v + yoffset / 4 + startcol / 2;
-                vdest = vptrdest + yoffset / 4 + startcol / 2;
-
-                for (int x = startcol; x <= endcol; x += 2)
-                {
-                    alpha = surface->alpha + yoffset + x;
-
-                    if (x + 16 >= endcol)
-                    {
-                        if (*alpha != 0)
-                        {
-                            *udest = blendColorsAlpha(*usrc, *udest, *alpha);
-                            *vdest = blendColorsAlpha(*vsrc, *vdest, *alpha);
-                        }
-
-                        usrc++;
-                        udest++;
-                        vsrc++;
-                        vdest++;
-                    }
-                    else
-                    {
-                        blender(usrc, udest, alpha, true);
-                        blender(vsrc, vdest, alpha, true);
-                        usrc += 8;
-                        udest += 8;
-                        vsrc += 8;
-                        vdest += 8;
-                        x += 14;
-                    }
-                }
-            }
+            if (stride < 0)
+                stride = XJ_width; // 8 bits per pixel
+            if (changed)
+                surface->DitherToAI44(frame->buf, stride, XJ_height);
+            break;
         }
-    }
-}
-
-/**
- * \fn VideoOutput::BlendSurfaceToI44(OSDSurface*,unsigned char*,int)
- * \brief Used by DisplayOSD(VideoFrame*,OSD *,int,int) to convert
- *        between color spaces and strides.
- */
-void VideoOutput::BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
-                                    bool ifirst, int stride)
-{
-    int ashift = ifirst ? 0 : 4;
-    int amask = ifirst ? 0x0f : 0xf0;
-
-    int ishift = ifirst ? 4 : 0;
-    int imask = ifirst ? 0xf0 : 0x0f; 
-
-    if (stride < 0)
-        stride = XJ_width;
-
-    dithertoia44_8_fun ditherer = dithertoia44_8_init(surface);
-    dither8_context *dcontext = init_dithertoia44_8_context(ifirst);
-
-    memset(yuvptr, 0x0, stride * XJ_height);
-
-    QMemArray<QRect> rects = surface->usedRegions.rects();
-    QMemArray<QRect>::Iterator it = rects.begin();
-    for (; it != rects.end(); ++it)
-    {
-        QRect drawRect = *it;
-
-        int startcol, startline, endcol, endline;
-        startcol = drawRect.left();
-        startline = drawRect.top();
-        endcol = drawRect.right();
-        endline = drawRect.bottom();
-
-        unsigned char *src;
-        unsigned char *dest;
-        unsigned char *alpha;
-
-        const unsigned char *dmp;
-
-        int yoffset;
-        int destyoffset;
-
-        int grey;
-
-        for (int y = startline; y <= endline; y++)
+        case FMT_IA44:
         {
-            yoffset = y * surface->width;
-            destyoffset = y * stride;
-
-            src = surface->y + yoffset + startcol;
-            dest = yuvptr + destyoffset + startcol;
-            alpha = surface->alpha + yoffset + startcol;
-
-            dmp = DM[(y) & (DM_HEIGHT - 1)];
-
-            for (int x = startcol; x <= endcol; x++)
-            {
-                if (x + 8 >= endcol)
-                {
-                    if (*alpha != 0)
-                    {
-                        grey = *src + ((dmp[(x & (DM_WIDTH - 1))] << 2) >> 4);
-                        grey = (grey - (grey >> 4)) >> 4;
-
-                        *dest = (((*alpha >> 4) << ashift) & amask) |
-                                (((grey) << ishift) & imask);
-                    }
-                    else
-                        *dest = 0;
-
-                    src++;
-                    dest++;
-                    alpha++;
-                }
-                else
-                {
-                    ditherer(src, dest, alpha, dmp, x, dcontext);
-                    src += 8;
-                    dest += 8;
-                    alpha += 8;
-                    x += 7;
-                }
-            }
+            if (stride < 0)
+                    stride = XJ_width; // 8 bits per pixel
+            if (changed)
+                surface->DitherToIA44(frame->buf, stride, XJ_height);
+            break;
         }
-    }
-
-    delete_dithertoia44_8_context(dcontext);
-}
-
-/**
- * \fn VideoOutput::BlendSurfaceToARGB(OSDSurface*,unsigned char*,int)
- * \brief Used by DisplayOSD(VideoFrame*,OSD *,int,int) to convert
- *        between color spaces and strides.
- */
-void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface, 
-                                     unsigned char *argbptr, int stride)
-{
-    if (stride < 0)
-        stride = XJ_width;
-
-    blendtoargb_8_fun blender = blendtoargb_8_init(surface);
-    unsigned char *cm = surface->cm;
-
-    memset(argbptr, 0x0, stride * XJ_height);
-
-    QMemArray<QRect> rects = surface->usedRegions.rects();
-    QMemArray<QRect>::Iterator it = rects.begin();
-    for (; it != rects.end(); ++it)
-    {
-        QRect drawRect = *it;
-
-        int startcol, startline, endcol, endline;
-        startcol = drawRect.left();
-        startline = drawRect.top();
-        endcol = drawRect.right();
-        endline = drawRect.bottom();
-
-        unsigned char *src, *usrcbase, *vsrcbase, *usrc, *vsrc;
-        unsigned char *dest;
-        unsigned char *alpha;
-
-        int yoffset;
-        int destyoffset;
-
-        int cb, cr, r_add, g_add, b_add;
-        int r, g, b, y0;
-
-        for (int y = startline; y <= endline; y++)
+        case FMT_ARGB32:
         {
-            yoffset = y * surface->width;
-            destyoffset = y * stride;
-
-            src = surface->y + yoffset + startcol;
-            dest = argbptr + destyoffset + startcol * 4;
-            alpha = surface->alpha + yoffset + startcol;
-
-            usrcbase = surface->u + (y / 2) * (surface->width / 2);
-            vsrcbase = surface->v + (y / 2) * (surface->width / 2);
-
-            for (int x = startcol; x <= endcol; x++)
-            {
-                usrc = usrcbase + x / 2;
-                vsrc = vsrcbase + x / 2;
-
-                if (x + 8 >= endcol)
-                {
-                    if (*alpha != 0)
-                    {
-                        YUV_TO_RGB1(*usrc, *vsrc);
-                        YUV_TO_RGB2(r, g, b, *src);
-                        RGBA_OUT(dest, r, g, b, *alpha);
-                    }
-                    src++;
-                    alpha++;
-                    dest += 4;
-                }
-                else
-                {
-                    blender(surface, src, usrc, vsrc, alpha, dest);
-                    src += 8;
-                    dest += 32;
-                    alpha += 8;
-                    x += 7;
-                } 
-            }
+            if (stride < 0)
+                stride = XJ_width*4; // 32 bits per pixel
+            if (changed)
+                surface->BlendToARGB(frame->buf, stride, XJ_height);
+            break;
         }
+        default:
+            break;
     }
+    return (changed) ? 1 : 0;
 }
 
 /**

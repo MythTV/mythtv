@@ -266,13 +266,6 @@ class VideoOutput
     virtual void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
     int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1, int revision = -1);
 
-    void BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr,
-                            int stride = -1);
-    void BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
-                           bool alphafirst, int stride = -1);   
-    void BlendSurfaceToARGB(OSDSurface *surface, unsigned char *argbptr,
-                            int stride = -1);
- 
     virtual int ChangePictureAttribute(int attributeType, int newValue);
 
     static void CopyFrame(VideoFrame* to, const VideoFrame* from);

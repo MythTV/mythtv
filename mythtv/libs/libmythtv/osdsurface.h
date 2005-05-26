@@ -35,6 +35,15 @@ class OSDSurface
             ++revision;
     }
     int GetRevision() { return revision; }
+
+    void BlendToYV12(unsigned char *yuvptr) const;
+    void BlendToARGB(unsigned char *argbptr,
+                     uint stride, uint height) const;
+    void DitherToI44(unsigned char *outbuf, bool ifirst,
+                     uint stride, uint height) const;
+    void DitherToIA44(unsigned char* outbuf, uint stride, uint height) const;
+    void DitherToAI44(unsigned char* outbuf, uint stride, uint height) const;
+
     int revision;
 
     unsigned char *yuvbuffer;
@@ -76,13 +85,13 @@ class OSDSurface
 typedef void (*blendtoyv12_8_fun)(unsigned char *src, unsigned char *dest,
                                   unsigned char *alpha, bool uvplane);
 
-blendtoyv12_8_fun blendtoyv12_8_init(OSDSurface *surface);
+blendtoyv12_8_fun blendtoyv12_8_init(const OSDSurface *surface);
 
-typedef void (*blendtoargb_8_fun)(OSDSurface *surf, unsigned char *src, 
+typedef void (*blendtoargb_8_fun)(const OSDSurface *surf, unsigned char *src, 
                                   unsigned char *usrc, unsigned char *vsrc, 
                                   unsigned char *alpha, unsigned char *dest);
 
-blendtoargb_8_fun blendtoargb_8_init(OSDSurface *surface);
+blendtoargb_8_fun blendtoargb_8_init(const OSDSurface *surface);
            
 
 struct dither8_context;
@@ -92,7 +101,7 @@ typedef void (*dithertoia44_8_fun)(unsigned char *src, unsigned char *dest,
                                    const unsigned char *dmp, int xpos,
                                    dither8_context *context);
 
-dithertoia44_8_fun dithertoia44_8_init(OSDSurface *surface);
+dithertoia44_8_fun dithertoia44_8_init(const OSDSurface *surface);
 dither8_context *init_dithertoia44_8_context(bool first);
 void delete_dithertoia44_8_context(dither8_context *context);
 

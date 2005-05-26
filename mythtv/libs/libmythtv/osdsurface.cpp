@@ -31,7 +31,10 @@ extern "C" {
          : "0" (index));
 
 #if 0
-/** Function to test if multimedia instructions are supported...  */
+
+/** \fn mm_support()
+ *  \brief Function to test if multimedia instructions are supported.
+ */
 int mm_support(void)
 {
     int rval = 0, max_ext_level=0, ext_caps=0;
@@ -380,7 +383,7 @@ static inline void blendalpha8_mmx(unsigned char *src, unsigned char *dest,
 }
 #endif
 
-blendtoyv12_8_fun blendtoyv12_8_init(OSDSurface *surface)
+blendtoyv12_8_fun blendtoyv12_8_init(const OSDSurface *surface)
 {
     (void)surface;
 #ifdef MMX
@@ -390,13 +393,13 @@ blendtoyv12_8_fun blendtoyv12_8_init(OSDSurface *surface)
     return blendalpha8_c;
 }
 
-static inline void blendtoargb_8_c(OSDSurface *surf, unsigned char *src,
+static inline void blendtoargb_8_c(const OSDSurface *surf, unsigned char *src,
                                    unsigned char *usrc, unsigned char *vsrc,
                                    unsigned char *alpha, unsigned char *dest)
 {
     int r, g, b, y0;
     int cb, cr, r_add, g_add, b_add;
-    unsigned char *cm = surf->cm;
+    const unsigned char *cm = surf->cm;
 
     int i, j;
 
@@ -412,7 +415,7 @@ static inline void blendtoargb_8_c(OSDSurface *surf, unsigned char *src,
 
 #ifdef MMX
 #define movntq(src, dest) movq_r2m(src, dest);
-static inline void blendtoargb_8_mmx(OSDSurface * /*surf*/, unsigned char *src,
+static inline void blendtoargb_8_mmx(const OSDSurface * /*surf*/, unsigned char *src,
                                      unsigned char *usrc, unsigned char *vsrc,
                                      unsigned char *alpha, unsigned char *dest)
 {
@@ -507,7 +510,7 @@ static inline void blendtoargb_8_mmx(OSDSurface * /*surf*/, unsigned char *src,
 }
 #endif
 
-blendtoargb_8_fun blendtoargb_8_init(OSDSurface *surface)
+blendtoargb_8_fun blendtoargb_8_init(const OSDSurface *surface)
 {
     (void)surface;
 #ifdef MMX
@@ -623,7 +626,7 @@ static inline void dithertoia44_8_mmx(unsigned char *src, unsigned char *dest,
 }
 #endif
 
-dithertoia44_8_fun dithertoia44_8_init(OSDSurface* /*surface*/)
+dithertoia44_8_fun dithertoia44_8_init(const OSDSurface* /*surface*/)
 {
 #ifdef MMX
 // mmx version seems to be about the same speed, no reason to use it.
@@ -672,4 +675,305 @@ void delete_dithertoia44_8_context(dither8_context *context)
     delete context;
 }
 
+/** \fn OSDSurface::BlendToYV12(unsigned char *) const
+ *  \brief Alpha blends OSDSurface to yuv buffer of the same size.
+ *  \param yuvptr Pointer to YUV buffer to blend OSD to.
+ */
+void OSDSurface::BlendToYV12(unsigned char *yuvptr) const
+{
+    const OSDSurface *surface = this;
+    blendtoyv12_8_fun blender = blendtoyv12_8_init(surface);
 
+    unsigned char *uptrdest = yuvptr + surface->width * surface->height;
+    unsigned char *vptrdest = uptrdest + surface->width * surface->height / 4;
+
+    QMemArray<QRect> rects = surface->usedRegions.rects();
+    QMemArray<QRect>::Iterator it = rects.begin();
+    for (; it != rects.end(); ++it)
+    {
+        QRect drawRect = *it;
+
+        int startcol, startline, endcol, endline;
+        startcol = drawRect.left();
+        startline = drawRect.top();
+        endcol = drawRect.right();
+        endline = drawRect.bottom();
+
+        unsigned char *src, *usrc, *vsrc;
+        unsigned char *dest, *udest, *vdest;
+        unsigned char *alpha;
+
+        int yoffset;
+
+        for (int y = startline; y <= endline; y++)
+        {
+            yoffset = y * surface->width;
+
+            src = surface->y + yoffset + startcol;
+            dest = yuvptr + yoffset + startcol;
+            alpha = surface->alpha + yoffset + startcol;
+
+            for (int x = startcol; x <= endcol; x++)
+            {
+                if (x + 8 >= endcol)
+                {
+                    if (*alpha != 0)
+                        *dest = blendColorsAlpha(*src, *dest, *alpha);
+                    src++;
+                    dest++;
+                    alpha++;
+                }
+                else
+                {
+                    blender(src, dest, alpha, false);
+                    src += 8;
+                    dest += 8;
+                    alpha += 8;
+                    x += 7;
+                }
+            }
+
+            alpha = surface->alpha + yoffset + startcol;
+
+            if (y % 2 == 0)
+            {
+                usrc = surface->u + yoffset / 4 + startcol / 2;
+                udest = uptrdest + yoffset / 4 + startcol / 2;
+
+                vsrc = surface->v + yoffset / 4 + startcol / 2;
+                vdest = vptrdest + yoffset / 4 + startcol / 2;
+
+                for (int x = startcol; x <= endcol; x += 2)
+                {
+                    alpha = surface->alpha + yoffset + x;
+
+                    if (x + 16 >= endcol)
+                    {
+                        if (*alpha != 0)
+                        {
+                            *udest = blendColorsAlpha(*usrc, *udest, *alpha);
+                            *vdest = blendColorsAlpha(*vsrc, *vdest, *alpha);
+                        }
+
+                        usrc++;
+                        udest++;
+                        vsrc++;
+                        vdest++;
+                    }
+                    else
+                    {
+                        blender(usrc, udest, alpha, true);
+                        blender(vsrc, vdest, alpha, true);
+                        usrc += 8;
+                        udest += 8;
+                        vsrc += 8;
+                        vdest += 8;
+                        x += 14;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** \fn OSDSurface::BlendToARGB(unsigned char *,uint,uint) const
+ *  \brief Alpha blends OSDSurface to ARGB buffer.
+ *
+ *  \param stride Length of each line in output buffer in bytes
+ *  \param height Number of lines in output buffer
+ */
+void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride, uint height) const
+{
+    const OSDSurface *surface = this;
+    blendtoargb_8_fun blender = blendtoargb_8_init(surface);
+    const unsigned char *cm = surface->cm;
+
+    bzero(argbptr, stride * height);
+
+    QMemArray<QRect> rects = surface->usedRegions.rects();
+    QMemArray<QRect>::Iterator it = rects.begin();
+    for (; it != rects.end(); ++it)
+    {
+        QRect drawRect = *it;
+
+        int startcol, startline, endcol, endline;
+        startcol = drawRect.left();
+        startline = drawRect.top();
+        endcol = drawRect.right();
+        endline = drawRect.bottom();
+
+        unsigned char *src, *usrcbase, *vsrcbase, *usrc, *vsrc;
+        unsigned char *dest;
+        unsigned char *alpha;
+
+        int yoffset;
+        int destyoffset;
+
+        int cb, cr, r_add, g_add, b_add;
+        int r, g, b, y0;
+
+        for (int y = startline; y <= endline; y++)
+        {
+            yoffset = y * surface->width;
+            destyoffset = y * stride;
+
+            src = surface->y + yoffset + startcol;
+            dest = argbptr + destyoffset + startcol * 4;
+            alpha = surface->alpha + yoffset + startcol;
+
+            usrcbase = surface->u + (y / 2) * (surface->width / 2);
+            vsrcbase = surface->v + (y / 2) * (surface->width / 2);
+
+            for (int x = startcol; x <= endcol; x++)
+            {
+                usrc = usrcbase + x / 2;
+                vsrc = vsrcbase + x / 2;
+
+                if (x + 8 >= endcol)
+                {
+                    if (*alpha != 0)
+                    {
+                        YUV_TO_RGB1(*usrc, *vsrc);
+                        YUV_TO_RGB2(r, g, b, *src);
+                        RGBA_OUT(dest, r, g, b, *alpha);
+                    }
+                    src++;
+                    alpha++;
+                    dest += 4;
+                }
+                else
+                {
+                    blender(surface, src, usrc, vsrc, alpha, dest);
+                    src += 8;
+                    dest += 32;
+                    alpha += 8;
+                    x += 7;
+                } 
+            }
+        }
+    }
+}
+
+/** \fn OSDSurface::DitherToI44(unsigned char*,bool,uint,uint) const
+ *  \brief Copies and converts OSDSurface to either a greyscale
+ *         IA44 or AI44 buffer.
+ *  \sa DitherToIA44(unsigned char*,uint,uint) const,
+ *      DitherToAI44(unsigned char*,uint,uint) const.
+ *
+ *  \param outbuf Output buffer
+ *  \param ifirst If true output buffer is AI44, otherwise it is IA44
+ *  \param stride Length of each line in output buffer in bytes
+ *  \param height Number of lines in output buffer
+ */
+void OSDSurface::DitherToI44(unsigned char *outbuf, bool ifirst,
+                             uint stride, uint height) const
+{
+    const OSDSurface *surface = this;
+    int ashift = ifirst ? 0 : 4;
+    int amask = ifirst ? 0x0f : 0xf0;
+
+    int ishift = ifirst ? 4 : 0;
+    int imask = ifirst ? 0xf0 : 0x0f; 
+
+    dithertoia44_8_fun ditherer = dithertoia44_8_init(surface);
+    dither8_context *dcontext = init_dithertoia44_8_context(ifirst);
+
+    bzero(outbuf, stride * height);
+
+    QMemArray<QRect> rects = surface->usedRegions.rects();
+    QMemArray<QRect>::Iterator it = rects.begin();
+    for (; it != rects.end(); ++it)
+    {
+        QRect drawRect = *it;
+
+        int startcol, startline, endcol, endline;
+        startcol = drawRect.left();
+        startline = drawRect.top();
+        endcol = drawRect.right();
+        endline = drawRect.bottom();
+
+        unsigned char *src;
+        unsigned char *dest;
+        unsigned char *alpha;
+
+        const unsigned char *dmp;
+
+        int yoffset;
+        int destyoffset;
+
+        int grey;
+
+        for (int y = startline; y <= endline; y++)
+        {
+            yoffset = y * surface->width;
+            destyoffset = y * stride;
+
+            src = surface->y + yoffset + startcol;
+            dest = outbuf + destyoffset + startcol;
+            alpha = surface->alpha + yoffset + startcol;
+
+            dmp = DM[(y) & (DM_HEIGHT - 1)];
+
+            for (int x = startcol; x <= endcol; x++)
+            {
+                if (x + 8 >= endcol)
+                {
+                    if (*alpha != 0)
+                    {
+                        grey = *src + ((dmp[(x & (DM_WIDTH - 1))] << 2) >> 4);
+                        grey = (grey - (grey >> 4)) >> 4;
+
+                        *dest = (((*alpha >> 4) << ashift) & amask) |
+                                (((grey) << ishift) & imask);
+                    }
+                    else
+                        *dest = 0;
+
+                    src++;
+                    dest++;
+                    alpha++;
+                }
+                else
+                {
+                    ditherer(src, dest, alpha, dmp, x, dcontext);
+                    src += 8;
+                    dest += 8;
+                    alpha += 8;
+                    x += 7;
+                }
+            }
+        }
+    }
+
+    delete_dithertoia44_8_context(dcontext);
+}
+
+/** \fn OSDSurface::DitherToIA44(unsigned char*,uint,uint) const
+ *  \brief Copies and converts OSDSurface to a greyscale IA44 buffer.
+ *
+ *  \param outbuf Output buffer
+ *  \param stride Length of each line in output buffer in bytes
+ *  \param height Number of lines in output buffer
+ *  \sa DitherToI44(unsigned char*,bool,uint,uint) const,
+ *      DitherToAI44(unsigned char*,uint,uint) const.
+ */
+void OSDSurface::DitherToIA44(unsigned char* outbuf,
+                              uint stride, uint height) const
+{
+    DitherToI44(outbuf, false, stride, height);
+}
+
+/** \fn OSDSurface::DitherToAI44(unsigned char*,bool,uint,uint) const
+ *  \brief Copies and converts OSDSurface to a greyscale AI44 buffer.
+ *
+ *  \param outbuf Output buffer
+ *  \param stride Length of each line in output buffer in bytes
+ *  \param height Number of lines in output buffer
+ *  \sa DitherToI44(unsigned char*,bool,uint,uint) const,
+ *      DitherToIA44(unsigned char*,uint,uint) const.
+ */
+void OSDSurface::DitherToAI44(unsigned char* outbuf,
+                              uint stride, uint height) const
+{
+    DitherToI44(outbuf, true, stride, height);
+}
