@@ -422,6 +422,10 @@ void JobQueue::ProcessQueue(void)
                     continue;
                 }
 
+                // never start or claim more than one job in a single run
+                if (startedJobAlready)
+                    continue;
+
                 if ((inTimeWindow) &&
                     (hostname == "") &&
                     (!ClaimJob(id)))
@@ -444,10 +448,6 @@ void JobQueue::ProcessQueue(void)
                     VERBOSE(VB_JOBQUEUE, message);
                     continue;
                 }
-
-                // never start more than one job at a time
-                if (startedJobAlready)
-                    continue;
 
                 message = QString("JobQueue: Processing '%1' job for chanid "
                                   "%2 @ %3, current status is '%4'")
