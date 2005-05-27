@@ -9,17 +9,18 @@
 	Base class for mfe visualizations
 	
 */
-
+#include <deque>
+using namespace std;
 #include <qwidget.h>
-
 #include <mfdclient/visualbase.h>
-
 #include "visualnode.h"
+
 
 enum MfeVisualizationType
 {
     MVT_MONOSCOPE = 0,
-    MVT_STEREOSCOPE
+    MVT_STEREOSCOPE,
+    MVT_GOOM
 };
 
 class MfeVisualizer : public VisualBase
@@ -76,6 +77,9 @@ class MfeVisualizer : public VisualBase
   
     int                     fps;
     MfeVisualizationType    visualization_type;
+//    QPtrList<VisualNode>    nodes;
+    std::deque<VisualNode*> nodes;
+    
 };
 
 #endif

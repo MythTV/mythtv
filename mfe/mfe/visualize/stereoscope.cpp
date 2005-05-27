@@ -9,7 +9,6 @@
 */
 
 #include "stereoscope.h"
-#include "inlines.h"
 
 #include <qpainter.h>
 #include <qpixmap.h>
@@ -31,65 +30,25 @@ StereoScope::StereoScope()
     visualization_type = MVT_STEREOSCOPE;
 }
 
-
-void StereoScope::add(uchar *b, unsigned long b_len, int c, int p)
-{
-    long len = b_len, cnt;
-    short *l = 0, *r = 0;
-
-    len /= c;
-    len /= (p / 8);
-    
-    if (len > 256)
-        len = 256;
-
-    cnt = len;
-
-    if (c == 2) 
-    {
-        l = new short[len];
-        r = new short[len];
-
-        if (p == 8)
-            stereo16_from_stereopcm8(l, r, b, cnt);
-        else if (p == 16)
-            stereo16_from_stereopcm16(l, r, (short *) b, cnt);
-    } 
-    else if (c == 1) 
-    {
-        l = new short[len];
-
-        if (p == 8)
-            mono16_from_monopcm8(l, b, cnt);
-        else if (p == 16)
-            mono16_from_monopcm16(l, (short *) b, cnt);
-    } 
-    else
-        len = 0;
-
-    nodes.append(new VisualNode(l, r, len, 0));
-    
-}
-
-
-
 bool StereoScope::update(QPixmap *pixmap_to_draw_on)
 {
-    if(nodes.count() < 1)
+    if(nodes.size() < 1)
     {
         return false;  
     }
 
-    VisualNode *node = NULL;
-    while( (node = nodes.first()) )
+    std::deque<VisualNode*>::iterator iter;
+    int process_at_most = 0;
+    for (iter = nodes.begin(); iter != nodes.end(); iter++)
     {
-        if(nodes.count() < 3)
+        if (process_at_most < 2)
         {
-            process(node);
+            process( (*iter) );
         }
-        delete node;
-        nodes.removeFirst();
+        ++process_at_most;
     }
+    nodes.clear();
+
 
 
     QPainter p(pixmap_to_draw_on);

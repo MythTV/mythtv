@@ -19,7 +19,7 @@ using namespace std;
 #include "visual.h"
 #include "stereoscope.h"
 #include "monoscope.h"
-
+#include "goom/mythgoom.h"
 
 VisualWrapper::VisualWrapper(QWidget *parent)
               :QWidget(parent, "visualchooser")
@@ -68,10 +68,12 @@ void VisualWrapper::paintEvent( QPaintEvent* )
         }
     current_visualizer_mutex.unlock();
 
+
     if(update_happened)
     {
         blitPixmapToScreen();
     }
+
 }
 
 void VisualWrapper::resizeEvent( QResizeEvent *re )
@@ -95,6 +97,8 @@ void VisualWrapper::timeout()
             update_happened = current_visualizer->update(&pixmap);
         }
     current_visualizer_mutex.unlock();
+
+
     if(update_happened)
     {
         blitPixmapToScreen();
@@ -216,6 +220,12 @@ void VisualWrapper::cycleVisualizations()
                 current_visualizer->resize(this->size(), Qt::black);
             }
             else if (current_visualizer->getVisualizationType() == MVT_STEREOSCOPE)
+            {
+                delete current_visualizer;
+                current_visualizer = new Goom();
+                current_visualizer->resize(this->size(), Qt::black);
+            }
+            else if (current_visualizer->getVisualizationType() == MVT_GOOM)
             {
                 delete current_visualizer;
                 current_visualizer = new MonoScope();
