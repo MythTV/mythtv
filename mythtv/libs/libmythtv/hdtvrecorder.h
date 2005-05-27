@@ -16,6 +16,10 @@
 struct AVFormatContext;
 struct AVPacket;
 class ATSCStreamData;
+class ProgramAssociationTable;
+class ProgramMapTable;
+class VirtualChannelTable;
+class MasterGuideTable;
 
 /** \class HDTVRecorder
  *  \brief This is a specialization of DTVRecorder used to 
@@ -26,6 +30,7 @@ class ATSCStreamData;
  */
 class HDTVRecorder : public DTVRecorder
 {
+    Q_OBJECT
     friend class ATSCStreamData;
     friend class TSPacketProcessor;
   public:
@@ -59,17 +64,19 @@ class HDTVRecorder : public DTVRecorder
 
     int ResyncStream(unsigned char *buffer, int curr_pos, int len);
 
-    void WritePAT();
-    void WritePMT();
-
     static void *boot_ringbuffer(void *);
     void fill_ringbuffer(void);
     int ringbuf_read(unsigned char *buffer, size_t count);
 
-
     ATSCStreamData* StreamData() { return _atsc_stream_data; }
     const ATSCStreamData* StreamData() const { return _atsc_stream_data; }
 
+ private slots:
+    void WritePAT(ProgramAssociationTable*);
+    void WritePMT(ProgramMapTable*);
+    void ProcessMGT(const MasterGuideTable*);
+    void ProcessVCT(uint pid, const VirtualChannelTable*);
+ private:
     ATSCStreamData* _atsc_stream_data;
 
     // statistics

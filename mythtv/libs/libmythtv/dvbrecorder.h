@@ -24,7 +24,7 @@ using namespace std;
  *
  *  \sa DTVRecorder, HDTVRecorder
  */
-class DVBRecorder: public QObject, public DTVRecorder
+class DVBRecorder: public DTVRecorder
 {
     Q_OBJECT
 public:

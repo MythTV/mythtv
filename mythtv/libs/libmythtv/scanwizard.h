@@ -45,6 +45,7 @@ class ATSCPane;
 class QAMPane;
 class SIScan;
 class DVBChannel;
+class DVBSignalMonitor;
 class ScanOptionalConfig;
 class ScanCountry;
 class OptionalTypeSetting;
@@ -220,7 +221,7 @@ public:
     void exec(ScanWizardScanner *parent);
     void signalToNoise(int value);
     void signalStrength(int value);
-    void dvbStatus(const QString& value);
+    void dvbLock(int value);
     void status(const QString& value);
 
     void progress(int value) { progressBar->setValue(value);}
@@ -247,7 +248,7 @@ protected slots:
 
     void TableLoaded();
 
-    void dvbStatus(const QString& str);
+    void dvbLock(int);
     void dvbSNR(int);
     void dvbSignalStrength(int);
 
@@ -262,7 +263,7 @@ protected:
 
     public:
         enum TYPE {ServiceScanComplete,Update,TableLoaded,ServicePct,
-                   DVBSNR,DVBSignalStrength,DVBStatus,TuneComplete };
+                   DVBSNR,DVBSignalStrength,DVBLock,TuneComplete };
         enum TUNING { OK, ERROR_TUNE};
 
         ScannerEvent(TYPE t) : QCustomEvent(t+QEvent::User) {}
@@ -285,6 +286,7 @@ protected:
     pthread_t scanner_thread;
     pthread_t tuner_thread;
     DVBChannel* dvbchannel;
+    DVBSignalMonitor* monitor;
     SIScan* scanner;
     dvb_channel_t chan_opts;
     ScanProgressPopup *popupProgress;

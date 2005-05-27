@@ -12,12 +12,12 @@ class HDTVRecorder;
 class PSIPTable;
 class RingBuffer;
 
-class MPEGStreamData {
+class MPEGStreamData : public QObject
+{
+    Q_OBJECT
   public:
-    MPEGStreamData(int desiredChannel, int desiredSubchannel) :
-        _pat(0), _pmt(0), _desired_program(-1),
-        _desired_channel(desiredChannel),
-        _desired_subchannel(desiredSubchannel)
+    MPEGStreamData(int desiredProgram)
+        : _pat(0), _pmt(0), _desired_program(desiredProgram)
     {
         _pids_listening[MPEG_PAT_PID] = true;
         _pids_listening[ATSC_PSIP_PID] = true;
@@ -25,7 +25,7 @@ class MPEGStreamData {
         _pid_video = _pid_pmt = 0xffffffff;
     }
     virtual ~MPEGStreamData();
-    virtual void Reset(int desiredChannel = -1, int desiredSubchannel = -1);
+    virtual void Reset(int desiredProgram);
 
     PSIPTable* AssemblePSIP(const TSPacket* tspacket);
     bool AssemblePSIP(PSIPTable& psip, TSPacket* tspacket);
@@ -80,17 +80,16 @@ class MPEGStreamData {
     inline void HandleAdaptationFieldControl(const TSPacket* tspacket);
 
     int DesiredProgram() const { return _desired_program; }
-    int DesiredChannel() const { return _desired_channel; }
-    int DesiredSubchannel() const { return _desired_subchannel; }
-  protected:
-    void setDesiredProgram(int p) { _desired_program = p; }
+    void SetDesiredProgram(int p) { _desired_program = p; }
+  signals:
+    void UpdatePAT(ProgramAssociationTable*);
+    void UpdatePMT(ProgramMapTable*);
+
   private:
     ProgramAssociationTable* _pat;
     ProgramMapTable* _pmt;
 
     int _desired_program;
-    int _desired_channel;
-    int _desired_subchannel;
     unsigned int _pid_video;
     unsigned int _pid_pmt;
 

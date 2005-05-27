@@ -42,11 +42,11 @@
 
 #include "scanwizard.h"
 
-//Max range of the progress bar
+/// Max range of the progress bar
 #define PROGRESS_MAX  1000
-//Percentage to set to after the transports have been scanned
+/// Percentage to set to after the transports have been scanned
 #define TRANSPORT_PCT 10
-//Percentage to set to after the fist tune
+/// Percentage to set to after the fist tune
 #define TUNED_PCT     5
 
 class ScanATSCTransport: public ComboBoxSetting, public TransientStorage
@@ -700,6 +700,7 @@ ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent) :
     tunerthread_running = false;
     scanner = NULL;
     dvbchannel = NULL;
+    monitor = NULL;
     scanthread_running = false;
     setLabel(strTitle);
     setUseLabel(false);
@@ -721,6 +722,12 @@ void ScanWizardScanner::finish()
             pthread_join(scanner_thread,NULL);
         delete scanner;
         scanner = NULL;
+    }
+
+    if (monitor)
+    {
+        delete monitor;
+        monitor = NULL;
     }
 
     if (dvbchannel)
@@ -753,8 +760,8 @@ void ScanWizardScanner::customEvent( QCustomEvent * e )
      case ScanWizardScanner::ScannerEvent::ServicePct:
          popupProgress->progress(scanEvent->intValue()*PROGRESS_MAX/100);
          break;
-     case ScanWizardScanner::ScannerEvent::DVBStatus:
-         popupProgress->dvbStatus(scanEvent->strValue());
+     case ScanWizardScanner::ScannerEvent::DVBLock:
+         popupProgress->dvbLock(scanEvent->intValue());
          break;
      case ScanWizardScanner::ScannerEvent::DVBSNR:
          popupProgress->signalToNoise(scanEvent->intValue());
@@ -885,10 +892,10 @@ void ScanWizardScanner::updateText(const QString& str)
     QApplication::postEvent(this,e);
 }
 
-void ScanWizardScanner::dvbStatus(const QString& str)
+void ScanWizardScanner::dvbLock(int locked)
 {
-    ScannerEvent* e=new ScannerEvent(ScanWizardScanner::ScannerEvent::DVBStatus);
-    e->strValue(str);
+    ScannerEvent* e=new ScannerEvent(ScanWizardScanner::ScannerEvent::DVBLock);
+    e->intValue(locked);
     QApplication::postEvent(this,e);
 }
 
@@ -952,9 +959,9 @@ void ScanProgressPopup::signalStrength(int value)
     ss->setValue(value);
 }
 
-void ScanProgressPopup::dvbStatus(const QString& value)
+void ScanProgressPopup::dvbLock(int value)
 {
-    sl->setValue(value);
+    sl->setValue(value ? "Locked" : "No Lock");
 }
 
 void ScanProgressPopup::status(const QString& value)
@@ -989,7 +996,6 @@ void ScanWizardScanner::scan()
     if(!dvbchannel->Open())
        return;
 
-    dvbchannel->StartMonitor();
     scanner = new SIScan(dvbchannel, parent->videoSource());
     
     scanner->SetForceUpdate(true);
@@ -1025,10 +1031,15 @@ void ScanWizardScanner::scan()
     connect(scanner,SIGNAL(PctServiceScanComplete(int)),
             this,SLOT(serviceScanPctComplete(int)));
 
+    monitor = new DVBSignalMonitor(-1, dvbchannel->GetCardNum(), dvbchannel);
+
     // Signal Meters Need connecting here
-    connect(dvbchannel->monitor,SIGNAL(Status(const QString& )),this,SLOT(dvbStatus(const QString&)));
-    connect(dvbchannel->monitor,SIGNAL(StatusSignalToNoise(int)),this,SLOT(dvbSNR(int)));
-    connect(dvbchannel->monitor,SIGNAL(StatusSignalStrength(int)),this,SLOT(dvbSignalStrength(int)));
+    connect(monitor,SIGNAL(StatusSignalLock(int)),this,SLOT(dvbLock(int)));
+    connect(monitor,SIGNAL(StatusSignalToNoise(int)),this,SLOT(dvbSNR(int)));
+    connect(monitor,SIGNAL(StatusSignalStrength(int)),
+            this,SLOT(dvbSignalStrength(int)));
+
+    monitor->Start();
 
     popupProgress = new ScanProgressPopup(this);
     popupProgress->progress(0);

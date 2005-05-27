@@ -20,7 +20,7 @@
 #include <iostream>
 using namespace std;
 
-Channel::Channel(TVRec *parent, const QString &videodevice, bool strength)
+Channel::Channel(TVRec *parent, const QString &videodevice)
        : ChannelBase(parent)
 {
     device = videodevice;
@@ -33,7 +33,6 @@ Channel::Channel(TVRec *parent, const QString &videodevice, bool strength)
     videomode_v4l1 = VIDEO_MODE_NTSC;
     videomode_v4l2 = V4L2_STD_NTSC;
     currentFormat = "";
-    usingATSCstrength = strength;
 }
 
 Channel::~Channel(void)
@@ -496,103 +495,6 @@ bool Channel::SetChannelByString(const QString &chan)
     return true;
 }
 
-template<typename V>
-V clamp(V val, V minv, V maxv) { return std::min(maxv, std::max(minv, val)); }
-
-// Returns ATSC signal strength 0-100. >75 is good.
-int signalStrengthATSC(int device, int input) 
-{
-    struct video_signal vsig;
-    memset(&vsig, 0, sizeof(vsig));
-
-    int ioctlval = ioctl(device,VIDIOCGSIGNAL,&vsig);
-    if (ioctlval == -1) 
-    {
-        VERBOSE(VB_IMPORTANT, QString("Channel::signalStrengthATSC(), error: %1").
-                arg(strerror(errno)));
-        return 0;
-    }
-
-    int signal = (input == 0) ? vsig.strength : vsig.aux;
-
-    if ((signal & 0xff) != 0x43) 
-        return 0;
-    else 
-        return clamp(101 - (signal >> 9), 0, 100);
-}
-
-// Returns ATSC signal strength 0-100. >75 is good. Using v4l2.
-int signalStrengthATSC_v4l2(int device, int input)
-{
-    struct v4l2_tuner vsig;
-    memset(&vsig, 0, sizeof(vsig));
-
-    vsig.index = input;
-
-    int ioctlval = ioctl(device,VIDIOC_G_TUNER, &vsig);
-    if (ioctlval == -1)
-    {
-        VERBOSE(VB_IMPORTANT, 
-                QString("Channel(%1)::signalStrengthATSC_v4l2(), error: %2").
-                arg(device).arg(strerror(errno)));
-        return 0;
-    }
-    VERBOSE(VB_CHANNEL,
-            QString("Channel(%1)::signalStrengthATSC_v4l2(): signal "
-                    "strength: %1").arg(device).arg(vsig.signal));
-
-    return clamp(vsig.signal, 0, 100);
-}
-
-bool Channel::CheckSignal(int msecTotal, int reqSignal, int input) 
-{
-    int msecSleep = 500, maxSignal = 0, i = 0;
-
-    msecTotal = max(msecSleep, msecTotal);
-
-    if (input < 0)
-        input = 0;
-
-    if (videofd < 0) 
-    {
-        VERBOSE(VB_IMPORTANT, QString("Channel(%1)::CheckSignal() called "
-                                      "with invalid videofd").arg(device));
-        return false;
-    }
-
-    if (usingATSCstrength) 
-    {
-        VERBOSE(VB_CHANNEL, 
-                QString("Channel(%1)::CheckSignal(%2, %3, %4): "
-                        "usingv4l2(%5)").arg(device).arg(msecTotal).
-                arg(reqSignal).arg(input).arg(bool(usingv4l2)));
-
-        for (i = 0; i < (msecTotal / msecSleep) + 1; i++) 
-        {
-            if (i != 0) 
-                usleep(msecSleep * 1000);
-            if (usingv4l2)
-                maxSignal = max(maxSignal, signalStrengthATSC_v4l2(videofd, 
-                                input));
-            else
-                maxSignal = max(maxSignal, signalStrengthATSC(videofd, input));
-
-
-            if (maxSignal >= reqSignal) 
-                break;
-        }
-        VERBOSE(VB_CHANNEL,
-                QString("Channel(%1)::CheckSignal(): Maximum signal "
-                        "strength detected: %1\% after %2 msec wait").
-                arg(device).arg(maxSignal).arg(i * msecSleep));
-
-        if (maxSignal < reqSignal) 
-            return false;
-    }
-
-    return true;
-}
-
 bool Channel::TuneTo(const QString &channum, int finetune)
 {
     int i = GetCurrentChannelNum(channum);
@@ -608,43 +510,11 @@ bool Channel::TuneTo(const QString &channum, int finetune)
     return TuneToFrequency(frequency);
 }
 
-bool Channel::CheckSignalFull(void)
-{
-#if FAKE_VIDEO
-    return true;
-#endif
-
-    int signalThresholdWait = 5000;
-    int signalThreshold = 65;
-    if (usingATSCstrength)
-    {
-        signalThresholdWait =
-            gContext->GetNumSetting("ATSCCheckSignalWait", 5000);
-        signalThreshold =
-            gContext->GetNumSetting("ATSCCheckSignalThreshold", 65);
-    }
-
-    int deviceInput = max(currentcapchannel, 0);
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::CheckSignalFull(): input = %2").
-            arg(device).arg(deviceInput));
-
-    return CheckSignal(signalThresholdWait, signalThreshold, deviceInput);
-}
-
 bool Channel::TuneToFrequency(int frequency)
 {
     VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneToFrequency(%2)").
             arg(device).arg(frequency));
     int ioctlval = 0;
-    int signalThresholdWait = 5000;
-    int signalThreshold = 65;
-    if (usingATSCstrength) 
-    {
-        signalThresholdWait =
-            gContext->GetNumSetting("ATSCCheckSignalWait", 5000);
-        signalThreshold =
-            gContext->GetNumSetting("ATSCCheckSignalThreshold", 65);
-    }
 
     if (usingv4l2)
     {
@@ -662,10 +532,8 @@ bool Channel::TuneToFrequency(int frequency)
                     arg(device).arg(ioctlval).arg(strerror(errno)));
             return false;
         }
-        
 
-        return CheckSignal(signalThresholdWait, signalThreshold,
-                           currentcapchannel);
+        return true;
     }
 
     ioctlval = ioctl(videofd, VIDIOCSFREQ, &frequency);
@@ -678,7 +546,7 @@ bool Channel::TuneToFrequency(int frequency)
         return false;
     }
 
-    return CheckSignal(signalThresholdWait, signalThreshold, currentcapchannel);
+    return true;
 }
 
 void Channel::SwitchToInput(int newcapchannel, bool setstarting)

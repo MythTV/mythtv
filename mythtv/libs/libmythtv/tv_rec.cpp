@@ -150,7 +150,7 @@ bool TVRec::Init(void)
     }
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
     {
-        Channel *achannel = new Channel(this, videodev, (cardtype == "HDTV"));
+        Channel *achannel = new Channel(this, videodev);
         channel = achannel; // here for SetFormat()->RetrieveInputChannels()
         channel->Open();
         achannel->SetFormat(gContext->GetSetting("TVFormat"));
@@ -557,27 +557,6 @@ void TVRec::HandleStateChange(void)
         SetupRecorder(profile);
         if (IsErrored())
             error = true;
-
-        if (channel != NULL)
-        {
-            // If there is a tuner make sure this is a valid station
-            // hdtv will block for a long time if we try to get
-            // mpeg ts packets from outer space.
-            bool success = channel->Open();
-            if (success)
-            {
-                success = channel->CheckSignalFull();
-                success = true;
-                if (!success)
-                {
-                    VERBOSE(VB_IMPORTANT, "Signal level too low?");
-                    error = true;
-                }
-                channel->Close();
-            } 
-            else
-                error = true;
-        }
 
         if (!error)
         {

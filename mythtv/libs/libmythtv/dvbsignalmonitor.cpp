@@ -1,105 +1,144 @@
+#include <cerrno>
+#include <cstring>
 #include <unistd.h>
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dvbsignalmonitor.h"
+#include "dvbchannel.h"
 
-const QString DVBSignalMonitor::TIMEOUT(QObject::tr("Timed out waiting for signal."));
-const QString DVBSignalMonitor::LOCKED(QObject::tr("Signal Locked"));
-const QString DVBSignalMonitor::NOTLOCKED(QObject::tr("No Lock"));
-
-DVBSignalMonitor::DVBSignalMonitor(int _cardnum, int _fd_frontend):
-    cardnum(_cardnum), fd_frontend(_fd_frontend)
+/** \fn DVBSignalMonitor::DVBSignalMonitor(int,int,int)
+ *  \brief Initializes signal lock and signal values.
+ *
+ *   Start() must be called to actually begin continuous
+ *   signal monitoring. The timeout is set to 3 seconds,
+ *   and the signal threshold is initialized to 0%.
+ *
+ *  \param capturecardnum Recorder number to monitor,
+ *                        if this is less than 0, SIGNAL events will not be
+ *                        sent to the frontend even if SetNotifyFrontend(true)
+ *                        is called.
+ *  \param cardnum DVB card number.
+ *  \param channel DVBChannel for card.
+ */
+DVBSignalMonitor::DVBSignalMonitor(int _capturecardnum, int _cardnum,
+                                   DVBChannel* _channel):
+    DTVSignalMonitor(_capturecardnum, _channel->GetFd(), 0), cardnum(_cardnum),
+    signalToNoise(QObject::tr("Signal To Noise"), "snr", 0,  true, 0, 65535, 0),
+    bitErrorRate(
+        QObject::tr("Bit Error Rate"), "ber", 65535, false, 0, 65535, 0),
+    uncorrectedBlocks(
+        QObject::tr("Uncorrected Blocks"), "ucb", 65535,  false, 0, 65535, 0),
+    channel(_channel)
 {
-    running = false;
-    exit = false;
+    // These two values should probably come from the database...
+    int wait = 3000; // timeout when waiting on signal
+    int threshold = 0; // signal strength threshold in %
 
-    if (fd_frontend >=0)
-       fd_frontend = dup(fd_frontend);
-    //signal_monitor_interval = 0;
-    //expire_data_days = 3;
+    signalLock.SetTimeout(wait);
+    signalStrength.SetTimeout(wait);
+    signalStrength.SetThreshold(threshold);
+    signalStrength.SetMax(65535);
+
+    dvb_stats_t stats;
+    bzero(&stats, sizeof(stats));
+    uint newflags = 0;
+    QString msg = QString("DVBSignalMonitor(%1,%2): %3 (%4)")
+        .arg(_capturecardnum).arg(_cardnum);
+
+#define DVB_IO(WHAT,WHERE,ERRMSG,FLAG) \
+    if (ioctl(fd, WHAT, WHERE)) \
+        VERBOSE(VB_IMPORTANT, msg.arg(ERRMSG).arg(strerror(errno))); \
+    else newflags |= FLAG;
+
+
+    DVB_IO(FE_READ_SIGNAL_STRENGTH, &stats.ss,
+          "Warning, can not measure Signal Strength", kDTVSigMon_WaitForSig);
+    DVB_IO(FE_READ_SNR, &stats.snr,
+          "Warning, can not measure S/N", kDVBSigMon_WaitForSNR);
+    DVB_IO(FE_READ_BER, &stats.ber,
+          "Warning, can not measure Bit Error Rate", kDVBSigMon_WaitForBER);
+    DVB_IO(FE_READ_UNCORRECTED_BLOCKS, &stats.ub,
+          "Warning, can not count Uncorrected Blocks", kDVBSigMon_WaitForUB);
+    DVB_IO(FE_READ_STATUS, &stats.status, "Error, can not read status!", 0);
+    AddFlags(newflags);
+#undef DVB_IO
 }
 
+/** \fn DVBSignalMonitor::~DVBSignalMonitor()
+ *  \brief Stops monitoring thread.
+ */
 DVBSignalMonitor::~DVBSignalMonitor()
 {
 }
 
-void DVBSignalMonitor::Start()
+QStringList DVBSignalMonitor::GetStatusList(bool kick)
 {
-    if (!running)
-        pthread_create(&monitor_thread, NULL, SpawnMonitorLoop, this);
+    QStringList list = DTVSignalMonitor::GetStatusList(kick);
+    if (HasFlags(kDVBSigMon_WaitForSNR))
+        list<<signalToNoise.GetName()<<signalToNoise.GetStatus();
+    if (HasFlags(kDVBSigMon_WaitForBER))
+        list<<bitErrorRate.GetName()<<bitErrorRate.GetStatus();
+    if (HasFlags(kDVBSigMon_WaitForUB))
+        list<<uncorrectedBlocks.GetName()<<uncorrectedBlocks.GetStatus();
+    return list;
 }
 
-void DVBSignalMonitor::Stop()
-{
-    exit = true;
-    pthread_join(monitor_thread, NULL);
-}
-
-void DVBSignalMonitor::MonitorLoop()
+/** \fn DVBSignalMonitor::UpdateValues()
+ *  \brief Fills in frontend stats and emits status Qt signals.
+ *
+ *   This uses FillFrontendStats(int,dvb_stats_t&)
+ *   to actually collect the signal values. It is automatically
+ *   called by MonitorLoop(), after Start() has been used to start
+ *   the signal monitoring thread.
+ */
+void DVBSignalMonitor::UpdateValues()
 {
     dvb_stats_t stats;
 
-    running = true;
-    exit = false;
+/*
+    dvb_channel_t *cur_chan;
+    channel->GetCurrentChannel(cur_chan);
+*/
 
-    bool PrevLockedState = false;
-
-    GENERAL("DVB Signal Monitor Starting");
-
-    while (!exit && (fd_frontend >= 0))
+    if (FillFrontendStats(fd, stats) && !(stats.status & FE_TIMEDOUT))
     {
-        if (FillFrontendStats(stats))
-        {
-            emit StatusSignalToNoise((int) stats.snr);
+        int wasLocked = signalLock.GetValue();
+        int locked = (stats.status & FE_HAS_LOCK) ? 1 : 0;
+        signalLock.SetValue(locked);
+        signalStrength.SetValue((int) stats.ss);
+        signalToNoise.SetValue((int) stats.snr);
+        bitErrorRate.SetValue(stats.ber);
+        uncorrectedBlocks.SetValue(stats.ub);
+        
+        emit StatusSignalLock(locked);
+        if (HasFlags(kDTVSigMon_WaitForSig))
             emit StatusSignalStrength((int) stats.ss);
+        if (HasFlags(kDVBSigMon_WaitForSNR))
+            emit StatusSignalToNoise((int) stats.snr);
+        if (HasFlags(kDVBSigMon_WaitForBER))
             emit StatusBitErrorRate(stats.ber);
+        if (HasFlags(kDVBSigMon_WaitForUB))
             emit StatusUncorrectedBlocks(stats.ub);
 
-            QString str = "";
-            if (stats.status & FE_TIMEDOUT)
-            {
-                str = TIMEOUT;
-            }
-            else
-            {
-                if (stats.status & FE_HAS_LOCK)
-                {
-                    str = LOCKED;
-                    if (!PrevLockedState)
-                    {
-                        GENERAL("Signal Locked");
-                        PrevLockedState = true;
-                    }
-                }
-                else
-                {
-                    str = NOTLOCKED;
-                    if (PrevLockedState)
-                    {
-                        GENERAL("Signal Lost");
-                        PrevLockedState = false;
-                    }
-                }
-            }
-            emit Status(str);
-        }
-
-        usleep(250 * 1000);
+        if (wasLocked != signalLock.GetValue())
+            GENERAL((wasLocked ? "Signal Lost" : "Signal Lock"));
     }
-    if (fd_frontend>=0)
-       close(fd_frontend);
-
-    running = false;
-    GENERAL("DVB Signal Monitor Stopped");
+ 
+    update_done = true;
 }
 
-void* DVBSignalMonitor::SpawnMonitorLoop(void* self)
-{
-    ((DVBSignalMonitor*)self)->MonitorLoop();
-    return NULL;
-}
-
-bool DVBSignalMonitor::FillFrontendStats(dvb_stats_t& stats)
+/** \fn DVBSignalMonitor::FillFrontendStats(int,dvb_stats_t&)
+ *  \brief Returns signal statistics for the frontend file descriptor.
+ *
+ *   This function uses five ioctl's FE_READ_SNR, FE_READ_SIGNAL_STRENGTH
+ *   FE_READ_BER, FE_READ_UNCORRECTED_BLOCKS, and FE_READ_STATUS to obtain
+ *   statistics from the frontend.
+ *
+ *  \param fd_frontend File descriptor for DVB frontend device.
+ *  \param stats Used to return the statistics collected.
+ *  \return true if successful, false if there is an error.
+ */
+bool DVBSignalMonitor::FillFrontendStats(int fd_frontend, dvb_stats_t& stats)
 {
     if (fd_frontend < 0)
         return false;
@@ -116,99 +155,3 @@ bool DVBSignalMonitor::FillFrontendStats(dvb_stats_t& stats)
 
     return true;
 }
-
-/*
-void DVBRecorder::QualityMonitorSample(int cardid,
-                                       dvb_stats_t& sample)
-{
-    QString sql = QString("INSERT INTO dvb_signal_quality("
-                          "sampletime, cardid, fe_snr, fe_ss, fe_ber, "
-                          "fe_unc, myth_cont, myth_over, myth_pkts) "
-                          "VALUES(NOW(), "
-                          "\"%1\",\"%2\",\"%3\",\"%4\","
-                          "\"%5\",\"%6\",\"%7\",\"%8\");")
-        .arg(cardid)
-        .arg(sample.snr & 0xffff)
-        .arg(sample.ss & 0xffff).arg(sample.ber).arg(sample.ub)
-        .arg(cont_errors).arg(stream_overflows).arg(bad_packets);
-
-    MSqlQuery result(MSqlQuery::InitCon());
-    // = db_conn->exec(sql);
-
-    if (!result.isActive())
-        MythContext::DBError("DVB quality sample insert failed", result);
-}
-
-void *DVBRecorder::QualityMonitorThread()
-{
-    dvb_stats_t fe_stats;
-
-    int cardid = GetIDForCardNumber(cardnum);
-
-    // loop until cancelled, wake at intervals and log data
-
-    while (!signal_monitor_quit)
-    {
-        sleep(signal_monitor_interval);
-
-        if (signal_monitor_quit)
-            break;
-
-        if (cardid >= 0 &&
-            && dvbchannel != NULL &&
-            dvbchannel -> FillFrontendStats(fe_stats))
-        {
-
-            QualityMonitorSample(cardid, fe_stats);
-        }
-    }
-
-    RECORD("DVB Quality monitor thread stopped for card " << cardnum);
-    return NULL;
-}
-
-void DVBRecorder::ExpireQualityData()
-{
-    RECORD("Expiring DVB quality data older than " << expire_data_days <<
-           " day(s)");
-
-
-    QString sql = QString("DELETE FROM dvb_signal_quality "
-                          "WHERE sampletime < "
-                          "SUBDATE(NOW(), INTERVAL \"%1\" DAY);").
-        arg(expire_data_days);
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    // = db_conn->exec(sql);
-
-    if (!query.isActive())
-        MythContext::DBError("Could not expire DVB signal data",
-                             query);
-
-}
-
-// we need the capture card id and I can't see an easy way to get it
-// from this object
-int DVBRecorder::GetIDForCardNumber(int cardnum)
-{
-    int cardid = -1;
-
-    MSqlQuery result(MSqlQuery::InitCon());
-    // = db_conn->exec(QString("SELECT cardid FROM capturecard "
-                                        "WHERE videodevice=\"%1\" AND "
-                                        " cardtype='DVB';").arg(cardnum));
-
-    if (result.isActive() && result.numRowsAffected() > 0)
-    {
-        result.next();
-
-        cardid = result.value(0).toInt();
-    }
-    else
-        RECORD("Could not get cardid for card number " << cardnum);
-
-
-    return cardid;
-}
-
-*/

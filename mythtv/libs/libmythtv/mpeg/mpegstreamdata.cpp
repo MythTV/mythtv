@@ -13,12 +13,9 @@ MPEGStreamData::~MPEGStreamData()
         delete _pmt;
 }
 
-void MPEGStreamData::Reset(int desiredChannel, int desiredSubchannel) {
-    if (desiredChannel>0)
-        _desired_channel = desiredChannel;
-    if (desiredSubchannel>0)
-        _desired_subchannel = desiredSubchannel;
-    _desired_program = -1;
+void MPEGStreamData::Reset(int desiredProgram)
+{
+    _desired_program = desiredProgram;
     SetPAT(0);
     SetPMT(0);
     //for (...) delete (partial_pes_packets::iterator); // TODO delete old PES packets

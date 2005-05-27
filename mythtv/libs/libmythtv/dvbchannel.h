@@ -24,7 +24,6 @@ using namespace std;
 
 class TVRec;
 class DVBCam;
-class DVBSignalMonitor;
 
 class DVBChannel : public QObject, public ChannelBase
 {
@@ -48,6 +47,8 @@ public:
     void SwitchToInput(int newcapchannel, bool setstarting)
                       { (void)newcapchannel; (void)setstarting; }
 
+    int GetFd() { return fd_frontend; }
+
     void GetCurrentChannel(dvb_channel_t *& chan)
         { chan = &chan_opts; };
 
@@ -60,11 +61,7 @@ public:
 
     void SetCAPMT(PMTObject pmt);
 
-    void StartMonitor();
-    void StopMonitor();
-
     DVBSIParser*        siparser;
-    DVBSignalMonitor*   monitor;
 
 public slots:
     void SetPMT(PMTObject NewPMT);

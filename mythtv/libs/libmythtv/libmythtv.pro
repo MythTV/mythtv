@@ -81,6 +81,8 @@ unix {
     HEADERS += mpeg/tsstats.h mpeg/tspacket.h mpeg/pespacket.h
     HEADERS += mpeg/mpegtables.h mpeg/atsctables.h
     HEADERS += mpeg/mpegstreamdata.h mpeg/atscdescriptors.h mpeg/atscstreamdata.h
+    HEADERS += signalmonitorvalue.h signalmonitor.h dtvsignalmonitor.h
+    HEADERS += pchdtvsignalmonitor.h
 
     SOURCES += channel.cpp NuppelVideoRecorder.cpp tv_rec.cpp channelbase.cpp
     SOURCES += hdtvrecorder.cpp fifowriter.cpp
@@ -88,6 +90,8 @@ unix {
     SOURCES += mpeg/mpegstreamdata.cpp mpeg/atscstreamdata.cpp
     SOURCES += mpeg/mpegtables.cpp mpeg/atsctables.cpp
     SOURCES += mpeg/atscdescriptors.cpp mpeg/atscdescriptorsmap.cpp
+    SOURCES += signalmonitorvalue.cpp signalmonitor.cpp dtvsignalmonitor.cpp
+    SOURCES += pchdtvsignalmonitor.cpp
 }
 
 macx {

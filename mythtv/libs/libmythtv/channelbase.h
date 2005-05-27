@@ -32,10 +32,6 @@ class ChannelBase
     virtual bool ChannelUp(void);
     virtual bool ChannelDown(void);
     virtual bool NextFavorite(void);
-    virtual bool CheckSignalFull(void) { return true; }
-    virtual bool CheckSignal(int /*msecWait = 5000*/, 
-                             int /*requiredSignalPercentage = 70*/,
-                             int /*input = 0*/) { return true; }
 
     virtual int ChangeColour(bool up) { (void)up; return 0; };
     virtual int ChangeBrightness(bool up) { (void)up; return 0; };
@@ -62,6 +58,7 @@ class ChannelBase
     virtual int GetCurrentInputNum(void);
 
     virtual void SetFd(int fd) { (void)fd; }
+    virtual int GetFd() = 0;
 
     virtual QString GetOrdering() { return channelorder; }
 

@@ -74,6 +74,7 @@ using namespace std;
 #include "programinfo.h"
 #include "channel.h"
 #include "mpegtables.h"
+#include "atsctables.h"
 #include "atscstreamdata.h"
 
 extern "C" {
@@ -105,6 +106,15 @@ HDTVRecorder::HDTVRecorder()
     : DTVRecorder(), _atsc_stream_data(0), _resync_count(0)
 {
     _atsc_stream_data = new ATSCStreamData(-1, DEFAULT_SUBCHANNEL);
+    connect(_atsc_stream_data, SIGNAL(UpdatePAT(ProgramAssociationTable*)),
+            this, SLOT(WritePAT(ProgramAssociationTable*)));
+    connect(_atsc_stream_data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
+            this, SLOT(ProcessMGT(const MasterGuideTable*)));
+    connect(_atsc_stream_data,
+            SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
+            this, SLOT(ProcessVCT(uint, const VirtualChannelTable*)));
+    connect(_atsc_stream_data, SIGNAL(UpdatePMT(ProgramMapTable*)),
+            this, SLOT(WritePMT(ProgramMapTable*)));
 
     _buffer_size = TSPacket::SIZE * 1500;
     if ((_buffer = new unsigned char[_buffer_size])) {
@@ -663,13 +673,11 @@ int HDTVRecorder::ResyncStream(unsigned char *buffer, int curr_pos, int len)
     return pos;
 }
 
-void HDTVRecorder::WritePAT() {
-    if (StreamData()->PAT()) {
-        ProgramAssociationTable* pat = StreamData()->PAT();
-        int next = (pat->tsheader()->ContinuityCounter()+1)&0xf;
-        pat->tsheader()->SetContinuityCounter(next);
-        ringBuffer->Write(pat->tsheader()->data(), TSPacket::SIZE);
-    }
+void HDTVRecorder::WritePAT(ProgramAssociationTable *pat)
+{
+    int next = (pat->tsheader()->ContinuityCounter()+1)&0xf;
+    pat->tsheader()->SetContinuityCounter(next);
+    ringBuffer->Write(pat->tsheader()->data(), TSPacket::SIZE);
 }
 
 #if WHACK_A_BUG_VIDEO
@@ -686,9 +694,8 @@ static int WABA_wait_a_while = WABA_WAIT;
 bool WABA_started = false;
 #endif
 
-void HDTVRecorder::WritePMT() {
-    if (StreamData()->PMT()) {
-        ProgramMapTable* pmt = StreamData()->PMT();
+void HDTVRecorder::WritePMT(ProgramMapTable* pmt) {
+    if (pmt) {
         int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
         pmt->tsheader()->SetContinuityCounter(next);
 
@@ -744,6 +751,64 @@ void HDTVRecorder::WritePMT() {
     }
 }
 
+/** \fn HDTVRecorder::ProcessMGT(const MasterGuideTable*)
+ *  \brief Processes Master Guide Table, by enabling the 
+ *         scanning of all PIDs listed.
+ */
+void HDTVRecorder::ProcessMGT(const MasterGuideTable *mgt)
+{
+    for (unsigned int i=0; i<mgt->TableCount(); i++)
+        StreamData()->AddListeningPID(mgt->TablePID(i));
+}
+
+/** \fn HDTVRecorder::ProcessVCT(uint, const VirtualChannelTable*)
+ *  \brief Processes Virtual Channel Tables by finding the program
+ *         number to use.
+ *  \bug Assumes there is only one VCT, will break on Cable.
+ */
+void HDTVRecorder::ProcessVCT(uint /*pid*/, const VirtualChannelTable *vct)
+{
+    if (vct->ChannelCount() < 1)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "HDTVRecorder::ProcessVCT: table has no channels");
+        return;
+    }
+
+    bool found = false;    
+    for (uint i=0; i<vct->ChannelCount(); i++)
+    {
+        if ((StreamData()->DesiredMajorChannel() == -1 ||
+             vct->MajorChannel(i)==(uint)StreamData()->DesiredMajorChannel()) &&
+            vct->MinorChannel(i)==(uint)StreamData()->DesiredMinorChannel())
+        {
+            VERBOSE(VB_RECORD, QString("***Desired subchannel %1")
+                    .arg(StreamData()->DesiredMinorChannel()));
+            if (vct->ProgramNumber(i) != (uint)StreamData()->DesiredProgram())
+            {
+                VERBOSE(VB_RECORD, 
+                        QString("Resetting desired program from %1"
+                                " to %2")
+                        .arg(StreamData()->DesiredProgram())
+                        .arg(vct->ProgramNumber(i)));
+                // Do a (partial?) reset here if old desired
+                // program is not 0?
+                StreamData()->SetDesiredProgram(vct->ProgramNumber(i));
+                found = true;
+            }
+        }
+    }
+    if (!found)
+    {
+        VERBOSE(VB_IMPORTANT, 
+                QString("Desired subchannel %1 not found;"
+                        " using %2 instead")
+                .arg(StreamData()->DesiredMinorChannel())
+                .arg(vct->MinorChannel(0)));
+        StreamData()->SetDesiredProgram(vct->ProgramNumber(0));
+    }
+}
+
 void HDTVRecorder::HandleVideo(const TSPacket* tspacket)
 {
     FindKeyframes(tspacket);
@@ -790,7 +855,7 @@ bool HDTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
             else if (StreamData()->IsAudioPID(lpid))
                 HandleAudio(&tspacket);
             else if (StreamData()->IsListeningPID(lpid))
-                StreamData()->HandleTables(&tspacket, this);
+                StreamData()->HandleTables(&tspacket);
             else if (StreamData()->IsWritingPID(lpid))
                 ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
             else if (StreamData()->VersionMGT()>=0)

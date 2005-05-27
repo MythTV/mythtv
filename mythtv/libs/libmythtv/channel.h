@@ -17,7 +17,7 @@ class TVRec;
 class Channel : public ChannelBase
 {
  public:
-    Channel(TVRec *parent, const QString &videodevice, bool strength = false);
+    Channel(TVRec *parent, const QString &videodevice);
     virtual ~Channel(void);
 
     bool Open(void);
@@ -30,6 +30,7 @@ class Channel : public ChannelBase
     bool ChannelUp(void);
     bool ChannelDown(void);
 
+    int GetSignal(int &msecWait, int &requiredSignalPercentage);
     bool CheckSignalFull(void);
     bool CheckSignal(int msecWait = 5000, 
                      int requiredSignalPercentage = 65,
@@ -50,6 +51,7 @@ class Channel : public ChannelBase
     void SwitchToInput(int newcapchannel, bool setstarting);
 
     void SetFd(int fd); 
+    int GetFd() { return videofd; }
 
     bool IsCommercialFree() { return commfree; }
 
@@ -77,8 +79,6 @@ class Channel : public ChannelBase
     int defaultFreqTable;
 
     bool commfree;
-
-    bool usingATSCstrength;
 };
 
 #endif

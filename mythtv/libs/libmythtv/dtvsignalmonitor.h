@@ -38,6 +38,11 @@ enum {
     kDTVSigMon_WaitForVCT = 0x00080000,
     kDTVSigMon_WaitForNIT = 0x00100000,
     kDTVSigMon_WaitForSDT = 0x00200000,
+    kDTVSigMon_WaitForSig = 0x00400000,
+
+    kDVBSigMon_WaitForSNR = 0x01000000,
+    kDVBSigMon_WaitForBER = 0x02000000,
+    kDVBSigMon_WaitForUB  = 0x04000000,
 };
 
 class DTVSignalMonitor: public SignalMonitor
@@ -57,6 +62,7 @@ class DTVSignalMonitor: public SignalMonitor
 
     void AddFlags(uint _flags);
     void RemoveFlags(uint _flags);
+    bool HasFlags(uint _flags) const { return (flags & _flags) == _flags; }
 
     /// \brief Return true if we've seen a PAT.
     bool HasPAT() const { return (bool)(kDTVSigMon_PATSeen & flags); }

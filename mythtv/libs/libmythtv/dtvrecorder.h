@@ -25,8 +25,9 @@ class TSPacket;
  *
  *  \sa DVBRecorder, HDTVRecorder, FirewrireRecorder
  */
-class DTVRecorder: public RecorderBase
+class DTVRecorder: public QObject, public RecorderBase
 {
+    Q_OBJECT
   public:
     DTVRecorder::DTVRecorder() : 
         _first_keyframe(0), _position_within_gop_header(0),

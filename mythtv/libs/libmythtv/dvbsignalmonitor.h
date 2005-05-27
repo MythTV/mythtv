@@ -1,54 +1,36 @@
 #ifndef DVBSIGNALMONITOR_H
 #define DVBSIGNALMONITOR_H
 
-#include <pthread.h>
-#include <qobject.h>
-
+#include "dtvsignalmonitor.h"
+#include "qstringlist.h"
 #include "dvbtypes.h"
 
-class DVBSignalMonitor: public QObject
+class DVBChannel;
+
+class DVBSignalMonitor: public DTVSignalMonitor
 {
     Q_OBJECT
-
 public:
-    DVBSignalMonitor(int cardnum, int fd_frontend);
-    ~DVBSignalMonitor();
-    
-    void Start();
-    void Stop();
+    DVBSignalMonitor(int capturecardnum, int cardnum, DVBChannel* _channel);
+    virtual ~DVBSignalMonitor();
+
+    virtual QStringList GetStatusList(bool kick);
 
 signals:
-    void Status(dvb_stats_t &stats);
-    void Status(const QString &val);
-
     void StatusSignalToNoise(int);
-    void StatusSignalStrength(int);
     void StatusBitErrorRate(int);
     void StatusUncorrectedBlocks(int);
 
 private:
-    void MonitorLoop();
-    static void* SpawnMonitorLoop(void*);
-    bool FillFrontendStats(dvb_stats_t &stats);
+    virtual void UpdateValues();
 
-    //int GetIDForCardNumber(int cardnum);
-    //void* QualityMonitorThread();
-    //void QualityMonitorSample(int cardnum, dvb_stats_t& sample);
-    //void ExpireQualityData();
+    static bool FillFrontendStats(int fd_frontend, dvb_stats_t &stats);
 
-    static const QString TIMEOUT;
-    static const QString LOCKED;
-    static const QString NOTLOCKED;
-
-    //int     signal_monitor_interval;
-    //int     expire_data_days;
-
-
-    pthread_t   monitor_thread;
-    int         cardnum;
-    int         fd_frontend;
-    bool        running;
-    bool        exit;
+    int cardnum;
+    SignalMonitorValue signalToNoise;
+    SignalMonitorValue bitErrorRate;
+    SignalMonitorValue uncorrectedBlocks;
+    DVBChannel* channel;
 };
 
 #endif // DVBSIGNALMONITOR_H

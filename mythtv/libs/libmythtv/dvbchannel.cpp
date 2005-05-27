@@ -56,7 +56,6 @@ using namespace std;
 #include "dvbdiseqc.h"
 #include "dvbcam.h"
 #include "dvbsiparser.h"
-#include "dvbsignalmonitor.h"
 
 //Timeout between checking for a tuning lock micro seconds
 #define TUNER_INTERVAL 300000
@@ -72,7 +71,6 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     stopTuning = false;
 
     siparser = NULL;
-    monitor = NULL;
     dvbcam = new DVBCam(cardnum);
 
     pthread_mutex_init(&chan_opts.lock, NULL);
@@ -99,8 +97,6 @@ void DVBChannel::CloseDVB()
     VERBOSE(VB_ALL, "Closing DVB channel");
     if (fd_frontend >= 0)
     {
-        StopMonitor();
-
         close(fd_frontend);
         fd_frontend = -1;
 
@@ -120,22 +116,6 @@ void DVBChannel::CloseDVB()
             diseqc = NULL;
         }
     }
-}
-
-void DVBChannel::StopMonitor()
-{
-    if (monitor)
-    {
-        monitor->Stop();
-        delete monitor;
-        monitor = NULL;
-    }
-}
-
-void DVBChannel::StartMonitor()
-{
-    monitor = new DVBSignalMonitor(cardnum, fd_frontend);
-    monitor->Start();
 }
 
 void DVBChannel::StopTuning()
