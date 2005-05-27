@@ -173,10 +173,6 @@ MainServer::~MainServer()
 
 void MainServer::newConnection(RefSocket *socket)
 {
-    char msg[256];
-    sprintf(msg, "New Socket: %p", socket);
-    VERBOSE(VB_ALL, msg);
-
     connect(socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
 }
 
@@ -622,7 +618,6 @@ void MainServer::customEvent(QCustomEvent *e)
 
         QPtrList<PlaybackSock> sentSet;
 
-        VERBOSE(VB_ALL, "Starting message sending..");
         // Make a local copy of the list, upping the refcount as we go..
         vector<PlaybackSock *> localPBSList;
         vector<PlaybackSock *>::iterator iter = playbackList.begin();
@@ -674,8 +669,6 @@ void MainServer::customEvent(QCustomEvent *e)
             PlaybackSock *pbs = (*iter);
             pbs->DownRef();
         }
-
-        VERBOSE(VB_ALL, "Ending message sending..");
     }
 }
 
@@ -709,7 +702,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         if (pbs->getSocket() == socket)
         {
             VERBOSE(VB_ALL, QString("Client %1 is trying to announce a socket "
-                                    "multiple times.  This is bad.")
+                                    "multiple times.")
                                     .arg(commands[2]));
             WriteStringList(socket, retlist);
             return;
@@ -3294,7 +3287,6 @@ void MainServer::deferredDeleteSlot(void)
     DeferredDeleteStruct dds = deferredDeleteList.front();
     while (dds.ts.secsTo(QDateTime::currentDateTime()) > 30)
     {
-printf("deferred delete of socket: %p\n", dds.sock);
         delete dds.sock;
         deferredDeleteList.pop_front();
         if (deferredDeleteList.size() == 0)
@@ -3315,10 +3307,6 @@ void MainServer::DeletePBS(PlaybackSock *sock)
 
 void MainServer::endConnection(RefSocket *socket)
 {
-    char msg[256];
-    sprintf(msg, "Socket closing %p", socket);
-    VERBOSE(VB_ALL, msg);
-
     vector<PlaybackSock *>::iterator it = playbackList.begin();
     for (; it != playbackList.end(); ++it)
     {
@@ -3347,9 +3335,6 @@ void MainServer::endConnection(RefSocket *socket)
                 gContext->dispatch(me);
             }
 
-            sprintf(msg, "PBS closed: %p", pbs);
-            VERBOSE(VB_ALL, msg);
-
             pbs->SetDisconnected();
             playbackList.erase(it);
 
@@ -3368,9 +3353,6 @@ void MainServer::endConnection(RefSocket *socket)
         QSocket *sock = (*ft)->getSocket();
         if (sock == socket)
         {
-            sprintf(msg, "FileTransfer closed: %p", (*ft));
-            VERBOSE(VB_ALL, msg);
-
             socket->DownRef();
             delete (*ft);
             fileTransferList.erase(ft);
@@ -3406,18 +3388,13 @@ void MainServer::endConnection(RefSocket *socket)
                     }
                 }
             }
-
-            sprintf(msg, "RingBuf socket closing: %p\n", socket);
-            VERBOSE(VB_ALL, msg);
-
             socket->DownRef();
             ringBufList.erase(rt);
             return;
         }
     }
 
-    sprintf(msg, "Unknown socket closing: %p\n", socket);
-    VERBOSE(VB_ALL, msg);
+    VERBOSE(VB_ALL, "Unknown socket closing");
 }
 
 PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
@@ -3556,11 +3533,6 @@ void MainServer::masterServerDied(void)
         }
     }
 
-    char msg[512];
-    sprintf(msg, "Master server connection (%p %p) has died.", masterServer, 
-            masterServer->getSocket());
-
-    VERBOSE(VB_ALL, msg);
     if (!deleted)
         VERBOSE(VB_ALL, "Unable to find master server connection in pbs list.");
     
@@ -3623,11 +3595,6 @@ void MainServer::reconnectTimeout(void)
 
     masterServer = new PlaybackSock(this, masterServerSock, server, true);
     playbackList.push_back(masterServer);
-
-    char msg[512];
-    sprintf(msg, "New master server connection (%p %p)", masterServer, 
-            masterServerSock);
-    VERBOSE(VB_ALL, msg);
 
     masterServerSock->Unlock();
 

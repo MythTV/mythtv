@@ -48,7 +48,6 @@ void PlaybackSock::UpRef(void)
 bool PlaybackSock::DownRef(void)
 {
     refCount--;
-printf("pbsock: downref: %d\n", refCount);
     if (refCount < 0)
     {
         m_parent->DeletePBS(this);
