@@ -37,6 +37,7 @@ bool MonoScope::update(QPixmap *pixmap_to_draw_on)
         return false;  
     }
 
+/*
     std::deque<VisualNode*>::iterator iter;
     int process_at_most = 0;
     for (iter = nodes.begin(); iter != nodes.end(); iter++)
@@ -47,6 +48,9 @@ bool MonoScope::update(QPixmap *pixmap_to_draw_on)
         }
         ++process_at_most;
     }
+*/
+
+    process(nodes.back());
     nodes.clear();
 
 

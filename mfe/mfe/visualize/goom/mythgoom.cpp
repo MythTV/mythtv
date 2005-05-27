@@ -19,7 +19,7 @@ using namespace std;
 Goom::Goom()
      :MfeVisualizer()
 {
-    fps = 40;
+    fps = 20;
     visualization_type = MVT_GOOM;
     buffer = NULL;
     goom_init(800, 600, 0);
@@ -64,6 +64,7 @@ bool Goom::update(QPixmap *pixmap_to_draw_on)
     }
 
 
+/*
     std::deque<VisualNode*>::iterator iter;
     int process_at_most = 0;
     for (iter = nodes.begin(); iter != nodes.end(); iter++)
@@ -74,7 +75,8 @@ bool Goom::update(QPixmap *pixmap_to_draw_on)
         }
         ++process_at_most;
     }
-                         
+*/
+    process(nodes.back());
     nodes.clear();
 
     QPainter p(pixmap_to_draw_on);
