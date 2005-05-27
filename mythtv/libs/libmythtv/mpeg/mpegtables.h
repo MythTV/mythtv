@@ -43,9 +43,28 @@ class TableID
 {
   public:
     enum {
-        PAT = 0x00, PMT = 0x02,
-        STUFFING = 0x80, CAPTION = 0x86, CENSOR = 0x87,
-        ECN = 0xA0, SRVLOC = 0xA1, TSS = 0xA2, CMPNAME = 0xA3
+        PAT      = 0x00,
+        PMT      = 0x02,
+
+        STUFFING = 0x80,
+        CAPTION  = 0x86,
+        CENSOR   = 0x87,
+
+        ECN      = 0xA0,
+        SRVLOC   = 0xA1,
+        TSS      = 0xA2,
+        CMPNAME  = 0xA3,
+
+        MGT      = 0xC7,
+        TVCT     = 0xC8,
+        CVCT     = 0xC9,
+        RRT      = 0xCA,
+        EIT      = 0xCB,
+        ETT      = 0xCC,
+        STT      = 0xCD,
+
+        DCCT     = 0xD3,
+        DCCSCT   = 0xD4,
     };
 };
 
@@ -184,7 +203,7 @@ class ProgramAssociationTable : public PSIPTable {
     }
   public:
     ProgramAssociationTable(const PSIPTable &table) : PSIPTable(table) {
-        assert(0x00==TableID());
+        assert(TableID::PAT == TableID());
     }
 
     // transport stream ID, program ID, count
@@ -258,7 +277,7 @@ class ProgramMapTable : public PSIPTable {
   public:
     ProgramMapTable(const PSIPTable& table) :
         PSIPTable(table) {
-        assert(TableID::PMT==TableID());
+        assert(TableID::PMT == TableID());
         Parse();
     }
 
