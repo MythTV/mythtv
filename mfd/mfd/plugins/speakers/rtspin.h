@@ -36,7 +36,7 @@ class RtspIn: public QThread
 
     void run();
     void stop();
-    void handleAfterReading(unsigned frameSize, struct timeval presentationTime);
+    void handleAfterReading(unsigned frameSize, struct timeval p_time);
     void handleSourceClosure();
 
   private:

@@ -27,6 +27,23 @@ MFDBasePlugin::MFDBasePlugin(MFD *owner, int identifier, const QString &a_name)
     name = a_name;
     services_changed_flag = false;
     metadata_collection_last_changed = 1;
+    
+    hostname = "unknown";
+    
+    //
+    //  Since almost every plugin needs to know the hostname of the machine
+    //  it's running on, we do that here in the base constructor.
+    //
+    
+    char my_hostname[2049];
+    if(gethostname(my_hostname, 2048) < 0)
+    {
+        warning("could not call gethostname(), using \"unknown\", which will probably not work");
+    }
+    else
+    {
+        hostname = my_hostname;
+    }
 }
 
 

@@ -132,6 +132,7 @@ class MFDBasePlugin : public QThread
     QMutex                  main_wait_mutex;
     
     QString                 name;
+    QString                 hostname;
     
     bool                    services_changed_flag;
     QMutex                  services_changed_mutex;

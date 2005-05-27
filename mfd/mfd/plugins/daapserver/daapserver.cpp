@@ -13,6 +13,7 @@
 #include "mfd_events.h"
 #include "httpinrequest.h"
 #include "httpoutresponse.h"
+#include "settings.h"
 
 #include "daapserver.h"
 #include "mcc_bitfield.h"
@@ -27,32 +28,21 @@ const int   DAAP_OK = 200;
 
 
 DaapServer::DaapServer(MFD *owner, int identity)
-      :MFDHttpPlugin(owner, identity, 3689, "daap server", 2)
+      :MFDHttpPlugin(owner, identity, mfdContext->getNumSetting("mfd_daapserver_port"), "daap server", 2)
 {
     metadata_server = owner->getMetadataServer();
     metadata_containers = metadata_server->getMetadataContainers();    
-    QString local_hostname = "unknown";
-    char my_hostname[2049];
-    if(gethostname(my_hostname, 2048) < 0)
-    {
-        warning("could not call gethostname()");
-        return;
-    }
-    else
-    {
-        local_hostname = my_hostname;
-    }
 
-    service_name = QString("MythMusic on %1").arg(local_hostname); 
+    service_name = QString("MythMusic on %1").arg(hostname); 
 
     //
     //  Register this (daap) service
     //
 
     Service *daap_service = new Service(
-                                        QString("MythMusic on %1").arg(local_hostname),
+                                        QString("MythMusic on %1").arg(hostname),
                                         QString("daap"),
-                                        local_hostname,
+                                        hostname,
                                         SLT_HOST,
                                         (uint) port_number
                                        );

@@ -16,14 +16,14 @@
 #include "httpinrequest.h"
 #include "httpoutresponse.h"
 #include "../../servicelister.h"
+#include "settings.h"
 
 ClientHttpServer *http_server = NULL;
 
 
 ClientHttpServer::ClientHttpServer(MFD *owner, int identity)
-      :MFDHttpPlugin(owner, identity, 2345, "http server", 1)
+      :MFDHttpPlugin(owner, identity, mfdContext->getNumSetting("mfd_httpufpi_port"), "http server", 1)
 {
-    my_hostname = mfdContext->getHostName();
     core_table_columns = 3;
 
     //
@@ -42,16 +42,16 @@ void ClientHttpServer::run()
     //  Register ourself as an available service
     //
 
-    QString service_name = QString("UFPI on %1").arg(mfdContext->getHostName()); 
+    QString service_name = QString("UFPI on %1").arg(hostname); 
 
     //
     //  Register this (http) service
     //
 
     Service *http_service = new Service(
-                                        QString("UFPI on %1").arg(my_hostname),
+                                        QString("UFPI on %1").arg(hostname),
                                         QString("http"),
-                                        my_hostname,
+                                        hostname,
                                         SLT_HOST,
                                         (uint) port_number
                                        );
@@ -88,7 +88,7 @@ void ClientHttpServer::run()
     
     int connect_tries = 0;
     
-    while(! (client_socket_to_audio->connect(this_address, 2343)))
+    while(! (client_socket_to_audio->connect(this_address, mfdContext->getNumSetting("mfd_audio_port"))))
     {
         //
         //  We give this a few attempts. It can take a few on non-blocking sockets.
@@ -441,7 +441,7 @@ void ClientHttpServer::addTopHTML(HttpOutResponse *response)
 
     response->addToPayload("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
     response->addToPayload("<head>");
-    response->addToPayload(QString("<title>MFD on %1</title>").arg(my_hostname));
+    response->addToPayload(QString("<title>MFD on %1</title>").arg(hostname));
     response->addToPayload("</head>");
     response->addToPayload("<body bgcolor=\"#FFFFFF\" text=\"#000000\" link=\"#0000FF\" vlink=\"#000080\" alink=\"#FF0000\">");
     response->addToPayload("<center>");

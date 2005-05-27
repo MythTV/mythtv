@@ -20,6 +20,7 @@ discwatchersupport="yes"
 mfdclient="yes"
 rtsp="yes"
 livemediaprefix="/usr/include"
+transcoder="yes"
 
 for opt do
   case "$opt" in
@@ -46,6 +47,10 @@ for opt do
   --enable-mythmusic) mmusic="yes"
   ;;
   --disable-mythmusic) mmusic="no"
+  ;;
+  --enable-transcoder) transcoder="yes"
+  ;;
+  --disable-transcoder) transcoder="no"
   ;;
   --enable-wmasupport) wmasupport="yes"
   ;;
@@ -117,17 +122,18 @@ Options: [defaults in brackets after descriptions]
 Standard options:
   --help               print this message
 
-  --enable-zeroconfig  enable auto discovery of services       [default=yes]
-  --enable-audio       enable audio playing                    [default=yes]
-  --enable-wmasupport  include ability to play wma audio files [default=yes]
-  --enable-aacsupport  include ability to play aac audio files [default=no ]
-  --enable-daapserver  enable serving audio via daap           [default=yes]
-  --enable-daapclient  enable consuming audio via daap         [default=yes]
-  --enable-httpserver  enable basic client interface via http  [default=yes]
-  --enable-mythmusic   enable serving mythmusic audio content  [default=yes]
-  --enable-discwatcher monitor optical drives for content      [default=yes]
-  --enable-mfdclient   build libmfdclient                      [default=yes]
-  --enable-rtsp        rtsp support (HIGHLY recommended)       [default=no]
+  --enable-zeroconfig  enable auto discovery of services        [default=yes]
+  --enable-audio       enable audio playing                     [default=yes]
+  --enable-wmasupport  include ability to play wma audio files  [default=yes]
+  --enable-aacsupport  include ability to play aac audio files  [default=no ]
+  --enable-daapserver  enable serving audio via daap            [default=yes]
+  --enable-daapclient  enable consuming audio via daap          [default=yes]
+  --enable-httpserver  enable basic client interface via http   [default=yes]
+  --enable-mythmusic   enable serving mythmusic audio content   [default=yes]
+  --enable-transcoder  enable transcoding services (eg. CD rip) [default=yes]
+  --enable-discwatcher monitor optical drives for content       [default=yes]
+  --enable-mfdclient   build libmfdclient                       [default=yes]
+  --enable-rtsp        rtsp support (HIGHLY recommended)        [default=no]
 
   --with-livemedia-prefix=[DIR] path to liveMedia/groupsock/etc include files
 
@@ -327,6 +333,23 @@ fi
 if test "$mmusic" = "no" ; then
     echo "                  mythmusic support: no"
 fi
+
+#
+#   Transcoder
+#
+
+if test "$transcoder" = "yes" ; then
+    echo "                 transcoder support: yes"        
+    echo "#    Build the transcoder plugin " >> ./config.pro
+    echo " " >> ./config.pro
+    echo "SUBDIRS += ./mfd/plugins/transcoder " >> ./config.pro
+    echo " " >> ./config.pro
+fi
+
+if test "$transcoder" = "no" ; then
+    echo "                 transcoder support: no"
+fi
+
 
 
 #

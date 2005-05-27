@@ -263,7 +263,7 @@ void RtspIn::stop()
     keep_going_mutex.unlock();
 }
 
-void RtspIn::handleAfterReading(unsigned frameSize, struct timeval /* presentationTime */)
+void RtspIn::handleAfterReading(unsigned frameSize, struct timeval /* p_time */ )
 {
     //
     //  Set the blocking flag to non-zero so that the liveMedia event loop
@@ -286,6 +286,50 @@ void RtspIn::handleAfterReading(unsigned frameSize, struct timeval /* presentati
         stop();
         return;
     }
+
+    //
+    //  Check that the presentation time (the time this audio should be
+    //  played) is not too far off from the current time
+    //
+    
+    
+/*
+    
+    struct timeval now, spread;
+    gettimeofday(&now, NULL);
+    
+    cout << "time is " << now.tv_sec;
+    cout << "  presentation time is " << p_time.tv_sec;
+
+    
+    if (now.tv_usec < p_time.tv_usec)
+    {
+        int nsec = (p_time.tv_usec - now.tv_usec) / 1000000 + 1;
+        p_time.tv_usec -= 1000000 * nsec;
+        p_time.tv_sec += nsec;
+    }
+    if (now.tv_usec - p_time.tv_usec > 1000000)
+    {
+        int nsec = (now.tv_usec - p_time.tv_usec) / 1000000;
+        p_time.tv_usec += 1000000 * nsec;
+        p_time.tv_sec -= nsec;
+    }
+
+    spread.tv_sec = now.tv_sec - p_time.tv_sec;
+    spread.tv_usec = now.tv_usec - p_time.tv_usec;
+                                               
+    if( now.tv_sec < p_time.tv_sec)
+    {
+        cout << " spread is -" << spread.tv_sec << "." << spread.tv_usec;
+    }
+    else
+    {
+        cout << " spread is +" << spread.tv_sec << "." << spread.tv_usec;
+    }
+
+    cout << " (amount of souncard buffer used is " << audio_output->getBufferedOnSoundcard() << ")" << endll
+
+*/
 
     //
     //  RTP uses network byte ordering (big endian) in all cases. But PCM

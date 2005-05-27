@@ -211,6 +211,10 @@ const QString MFDService::getShortType()
     {
         short_type = "rtsp";
     }
+    else if(service_type == "_mtcp._tcp.")
+    {
+        short_type = "mtcp";
+    }
 
     return short_type;
 }
@@ -599,6 +603,7 @@ void ZeroConfigClient::run()
     browseForService(&mDNSStorage, "_maop._tcp.");
     browseForService(&mDNSStorage, "_raop._tcp.");
     browseForService(&mDNSStorage, "_rtsp._tcp.");
+    browseForService(&mDNSStorage, "_mtcp._tcp.");
 
     //
     //  Set up some file descriptors and a pipe. This lets a separate thread

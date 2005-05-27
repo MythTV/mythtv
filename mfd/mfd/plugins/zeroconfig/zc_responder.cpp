@@ -287,29 +287,33 @@ bool ZeroConfigResponder::registerService(
     {
         strict_service_type = "_mfdp._tcp.";
     }
-    if(service_type == "macp")
+    else if(service_type == "macp")
     {
         strict_service_type = "_macp._tcp.";
     }
-    if(service_type == "daap")
+    else if(service_type == "daap")
     {
         strict_service_type = "_daap._tcp.";
     }
-    if(service_type == "mdcap")
+    else if(service_type == "mdcap")
     {
         strict_service_type = "_mdcap._tcp.";
     }
-    if(service_type == "http")
+    else if(service_type == "http")
     {
         strict_service_type = "_http._tcp.";
     }
-    if(service_type == "maop")
+    else if(service_type == "maop")
     {
         strict_service_type = "_maop._tcp.";
     }
-    if(service_type == "rtsp")
+    else if(service_type == "rtsp")
     {
         strict_service_type = "_rtsp._tcp.";
+    }
+    else if(service_type == "mtcp")
+    {
+        strict_service_type = "_mtcp._tcp.";
     }
 
     if(strict_service_type.length() < 1)

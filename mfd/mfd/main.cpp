@@ -130,7 +130,7 @@ int main(int argc, char **argv)
         {
             cerr << "Invalid argument: " << a.argv()[argpos] << endl <<
                     "Valid options are: " << endl <<
-                    "-p or --port number               A port number to listen on (default is 2342) " << endl <<
+                    "-p or --port number               A port number to listen on (default is " << MFD_MAIN_PORT << ") " << endl <<
                     "-l or --logging-verbosity number  Amount of info to log (1 = least, 10 = most) " << endl <<
                     "-d or --daemon                    Runs mfd as a daemon " << endl <<
                     "-n or --nodaemon                  Does not run mfd as a daemon " << endl;
@@ -161,8 +161,7 @@ int main(int argc, char **argv)
     //  Figure out port to listen on
     //
 
-    int assigned_port = 2342;
-    assigned_port = gContext->GetNumSetting("MFDPort", 2342);
+    int assigned_port = mfdContext->GetNumSetting("mfd_main_port");
 
     if(special_port > 0)
     {

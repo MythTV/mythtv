@@ -1471,7 +1471,7 @@ void MMusicWatcher::loadPlaylists()
         
     query.bindValue(0, "backup_playlist_storage");
     query.bindValue(1, "default_playlist_storage");
-    query.bindValue(2, mfdContext->getHostName());
+    query.bindValue(2, hostname);
         
     query.exec();
 
@@ -1657,7 +1657,7 @@ void MMusicWatcher::createPlaylistInDb(Playlist *a_playlist)
     query.prepare("INSERT INTO musicplaylist (name, hostname, songlist) values (?, ?, ?) ; ");
 
     query.bindValue(0, a_playlist->getName().utf8());
-    query.bindValue(1, mfdContext->getHostName());
+    query.bindValue(1, hostname);
     query.bindValue(2, db_song_list_string);
         
     query.exec();
@@ -1673,7 +1673,7 @@ void MMusicWatcher::createPlaylistInDb(Playlist *a_playlist)
     query.prepare("SELECT playlistid FROM musicplaylist WHERE name = ? AND hostname = ? AND songlist = ? ; ");
 
     query.bindValue(0, a_playlist->getName().utf8());
-    query.bindValue(1, mfdContext->getHostName());
+    query.bindValue(1, hostname);
     query.bindValue(2, db_song_list_string);
 
     query.exec();

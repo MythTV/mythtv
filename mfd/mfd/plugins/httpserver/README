@@ -4,5 +4,5 @@ Point a browser at:
 
         http://theIPthisMFDisRunningOn:PortNumber/
 
-    By default, the portNumber is 2345.
+    If built withouth changing the default, the portNumber is 2345.
 

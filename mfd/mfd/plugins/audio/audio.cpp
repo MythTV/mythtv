@@ -20,9 +20,10 @@
 #include "constants.h"
 #include "audiolistener.h"
 #include "rtspout.h"
+#include "settings.h"
 
 AudioPlugin::AudioPlugin(MFD *owner, int identity)
-      :MFDServicePlugin(owner, identity, 2343, "audio")
+      :MFDServicePlugin(owner, identity, mfdContext->getNumSetting("mfd_audio_port"), "audio")
 {
     input = NULL;
     output = NULL;
@@ -113,27 +114,15 @@ void AudioPlugin::swallowOutputUpdate(int type, int numb_seconds, int channels, 
 
 void AudioPlugin::run()
 {
-    char my_hostname[2049];
-    QString local_hostname = "unknown";
-
-    if (gethostname(my_hostname, 2048) < 0)
-    {
-        warning("could not call gethostname()");
-    }
-    else
-    {
-        local_hostname = my_hostname;
-    }
-
     //
     //  Have our macp service (Myth Audio Control Protocol) broadcast on
     //  the local lan
     //
 
     Service *macp_service = new Service(
-                                        QString("Myth Audio Control on %1").arg(local_hostname),
+                                        QString("Myth Audio Control on %1").arg(hostname),
                                         QString("macp"),
-                                        local_hostname,
+                                        hostname,
                                         SLT_HOST,
                                         (uint) port_number
                                        );

@@ -21,10 +21,10 @@
 
 #include "rtspout.h"
 #include "livemedia.h"
-
+#include "settings.h"
 
 RtspOut::RtspOut(MFD *owner, int identity, AudioOutput *ao)
-      :MFDRtspPlugin(owner, identity, 2347, "audio rtsp server")
+      :MFDRtspPlugin(owner, identity, mfdContext->getNumSetting("mfd_audiortspcontrol_port"), "audio rtsp server")
 {
     log("rtsp sub-plugin came into existence", 9);
     watch_variable = 0;
@@ -51,7 +51,7 @@ void RtspOut::stop()
         {
             QSocketDevice poker;
             poker.setBlocking(false);
-            if(!poker.connect(this_host, 2346))
+            if(!poker.connect(this_host, mfdContext->getNumSetting("mfd_audiortsp_port")))
             {
                 output_warning = true;
             }
@@ -80,25 +80,16 @@ void RtspOut::run()
     //  Register this (rtsp) service
     //
 
-    QString local_hostname = "unknown";
-    char my_hostname[2049];
-    if(gethostname(my_hostname, 2048) < 0)
-    {
-        warning("could not call gethostname()");
-    }
-    else
-    {
-        local_hostname = my_hostname;
-    }
+    int actual_rtsp_port = mfdContext->getNumSetting("mfd_audiortsp_port");
 
-    serving_url = QString("rtsp://%1:%2/").arg(local_hostname).arg(2346);
+    serving_url = QString("rtsp://%1:%2/").arg(hostname).arg(actual_rtsp_port);
 
     Service *rtsp_service = new Service(
-                                        QString("Myth Audio Streaming on %1").arg(local_hostname),
+                                        QString("Myth Audio Streaming on %1").arg(hostname),
                                         QString("rtsp"),
-                                        local_hostname,
+                                        hostname,
                                         SLT_HOST,
-                                        (uint) 2346
+                                        (uint) actual_rtsp_port
                                        );
  
     ServiceEvent *se = new ServiceEvent( true, true, *rtsp_service);
@@ -108,7 +99,7 @@ void RtspOut::run()
     BasicTaskScheduler* scheduler = BasicTaskScheduler::createNew();
     UsageEnvironment *env = BasicUsageEnvironment::createNew(*scheduler);
 
-    RTSPServer* rtspServer = RTSPServer::createNew(*env, 2346, NULL);
+    RTSPServer* rtspServer = RTSPServer::createNew(*env, actual_rtsp_port, NULL);
     if (rtspServer == NULL)
     {
         warning(QString("failed to create an RTSP server: %1")

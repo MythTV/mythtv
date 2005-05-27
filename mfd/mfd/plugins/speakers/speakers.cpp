@@ -9,9 +9,10 @@
 
 #include "speakers.h"
 #include "rtspin.h"
+#include "settings.h"
 
 Speakers::Speakers(MFD *owner, int identity)
-      :MFDServicePlugin(owner, identity, 2347, "speakers (maop)")
+      :MFDServicePlugin(owner, identity, mfdContext->getNumSetting("mfd_speakercontrol_port"), "speakers (maop)")
 {
     current_url = "";
     rtsp_in = NULL;
@@ -30,30 +31,14 @@ void Speakers::run()
     }
     
     //
-    //  Get the name of the host we are running on
-    //
-
-    char my_hostname[2049];
-    QString local_hostname = "unknown";
-
-    if (gethostname(my_hostname, 2048) < 0)
-    {
-        warning("could not call gethostname()");
-    }
-    else
-    {
-        local_hostname = my_hostname;
-    }
-
-    //
     //  Have our maop service (Myth Audio Output Protocol) broadcast on
     //  the local lan
     //
 
     Service *maop_service = new Service(
-                                        QString("Myth Audio Output on %1").arg(local_hostname),
+                                        QString("Myth Audio Output on %1").arg(hostname),
                                         QString("maop"),
-                                        local_hostname,
+                                        hostname,
                                         SLT_HOST,
                                         (uint) port_number
                                        );

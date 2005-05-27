@@ -1,0 +1,4 @@
+
+    This is meant to be a generic transcoding plugin. Right now, all it does
+is convert wav audio data on CD's into oggs/flacs/mp3s. At some point it
+will do more.

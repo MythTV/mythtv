@@ -21,6 +21,7 @@
 #include "mdserver.h"
 #include "servicelister.h"
 #include "signalthread.h"
+#include "settings.h"
 
 extern SignalThread *signal_thread;
 
@@ -70,7 +71,7 @@ MFD::MFD(uint port, bool log_stdout, int logging_verbosity)
     //  containers)
     //
     
-    metadata_server = new MetadataServer(this, 2344);
+    metadata_server = new MetadataServer(this, mfdContext->getNumSetting("mfd_metadata_port"));
     metadata_server->start();
 
     //
