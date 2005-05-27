@@ -495,25 +495,25 @@ void ProgramRecPriority::edit(void)
                 int rtRecPriors[11];
                 rtRecPriors[0] = 0;
                 rtRecPriors[kSingleRecord] = 
-                        gContext->GetNumSetting("SingleRecordRecPrior", 1);
+                    gContext->GetNumSetting("SingleRecordRecPriority", 1);
                 rtRecPriors[kTimeslotRecord] = 
-                        gContext->GetNumSetting("TimeslotRecordRecPrior", 0);
+                    gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
                 rtRecPriors[kChannelRecord] = 
-                        gContext->GetNumSetting("ChannelRecordRecPrior", 0);
+                    gContext->GetNumSetting("ChannelRecordRecPriority", 0);
                 rtRecPriors[kAllRecord] = 
-                        gContext->GetNumSetting("AllRecordRecPrior", 0);
+                    gContext->GetNumSetting("AllRecordRecPriority", 0);
                 rtRecPriors[kWeekslotRecord] = 
-                        gContext->GetNumSetting("WeekslotRecordRecPrior", 0);
+                    gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
                 rtRecPriors[kFindOneRecord] = 
-                        gContext->GetNumSetting("FindOneRecordRecPrior", -1);
+                    gContext->GetNumSetting("FindOneRecordRecPriority", -1);
                 rtRecPriors[kOverrideRecord] = 
-                        gContext->GetNumSetting("OverrideRecordRecPrior", 0);
+                    gContext->GetNumSetting("OverrideRecordRecPriority", 0);
                 rtRecPriors[kDontRecord] = 
-                        gContext->GetNumSetting("OverrideRecordRecPrior", 0);
+                    gContext->GetNumSetting("OverrideRecordRecPriority", 0);
                 rtRecPriors[kFindDailyRecord] = 
-                        gContext->GetNumSetting("FindOneRecordRecPrior", -1);
+                    gContext->GetNumSetting("FindOneRecordRecPriority", -1);
                 rtRecPriors[kFindWeeklyRecord] = 
-                        gContext->GetNumSetting("FindOneRecordRecPrior", -1);
+                    gContext->GetNumSetting("FindOneRecordRecPriority", -1);
 
                 // set the recording priorities of that program 
                 progInfo->recpriority = recPriority;
@@ -699,25 +699,25 @@ void ProgramRecPriority::FillList(void)
     // get all the recording type recording priority values
     rtRecPriors[0] = 0;
     rtRecPriors[kSingleRecord] = 
-            gContext->GetNumSetting("SingleRecordRecPrior", 1);
+        gContext->GetNumSetting("SingleRecordRecPriority", 1);
     rtRecPriors[kTimeslotRecord] = 
-            gContext->GetNumSetting("TimeslotRecordRecPrior", 0);
+        gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
     rtRecPriors[kChannelRecord] = 
-            gContext->GetNumSetting("ChannelRecordRecPrior", 0);
+        gContext->GetNumSetting("ChannelRecordRecPriority", 0);
     rtRecPriors[kAllRecord] = 
-            gContext->GetNumSetting("AllRecordRecPrior", 0);
+        gContext->GetNumSetting("AllRecordRecPriority", 0);
     rtRecPriors[kWeekslotRecord] = 
-            gContext->GetNumSetting("WeekslotRecordRecPrior", 0);
+        gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
     rtRecPriors[kFindOneRecord] = 
-            gContext->GetNumSetting("FindOneRecordRecPrior", -1);
+        gContext->GetNumSetting("FindOneRecordRecPriority", -1);
     rtRecPriors[kOverrideRecord] = 
-            gContext->GetNumSetting("OverrideRecordRecPrior", 0);
+        gContext->GetNumSetting("OverrideRecordRecPriority", 0);
     rtRecPriors[kDontRecord] = 
-            gContext->GetNumSetting("OverrideRecordRecPrior", 0);
+        gContext->GetNumSetting("OverrideRecordRecPriority", 0);
     rtRecPriors[kFindDailyRecord] = 
-            gContext->GetNumSetting("FindOneRecordRecPrior", -1);
+        gContext->GetNumSetting("FindOneRecordRecPriority", -1);
     rtRecPriors[kFindWeeklyRecord] = 
-            gContext->GetNumSetting("FindOneRecordRecPrior", -1);
+        gContext->GetNumSetting("FindOneRecordRecPriority", -1);
     
     // get channel recording priorities and recording types associated with each
     // program from db
