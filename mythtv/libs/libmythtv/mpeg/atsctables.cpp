@@ -45,7 +45,7 @@ void MasterGuideTable::Parse() const {
 }
 
 
-void TerrestrialVirtualChannelTable::Parse() const {
+void VirtualChannelTable::Parse() const {
     _ptrs.clear();
     _ptrs.push_back(const_cast<unsigned char*>(pesdata())+11);
     for (unsigned int i=0; i<ChannelCount(); i++)
@@ -142,6 +142,66 @@ QString TerrestrialVirtualChannelTable::toString() const {
     return str;
 }
 
+QString CableVirtualChannelTable::toString(int chan) const {
+    static QString modnames[6] =
+    {
+        QObject::tr("[Reserved]"),  QObject::tr("Analog"),
+        QObject::tr("SCTE mode 1"), QObject::tr("SCTE mode 2"),
+        QObject::tr("ATSC 8-VSB"),  QObject::tr("ATSC 16-VSB"),
+    };
+
+    QString str;
+    str.append(QString("Channel #%1 ").arg(chan));
+    str.append(QString("name(%1) %2-%3 ").arg(ShortChannelName(chan)).
+               arg(MajorChannel(chan)).arg(MinorChannel(chan)));
+
+    if (ModulationMode(chan) > 5)
+        str.append(QString("mod(UNKNOWN %1) ").arg(ModulationMode(chan)));
+    else
+        str.append(QString("mod(%1) ").arg(modnames[ModulationMode(chan)]));
+
+    str.append(QString("cTSID(0x%1)\n").arg(ChannelTransportStreamID(chan), 0, 16));
+    str.append(QString(" pnum(%1) ").arg(ProgramNumber(chan)));
+    str.append(QString("ETM_loc(%1) ").arg(ETMlocation(chan)));
+    str.append(QString("access_ctrl(%1) ").arg(IsAccessControlled(chan)));
+    str.append(QString("hidden(%1)\n").arg(IsHidden(chan)));
+
+    str.append(QString("path_select(%1) ").arg(IsPathSelect(chan)));
+    str.append(QString("out_of_band(%1) ").arg(IsOutOfBand(chan)));
+
+    str.append(QString("hide_guide(%1) ").arg(IsHiddenInGuide(chan)));
+    str.append(QString("service_type(%1) ").arg(ServiceType(chan)));
+    str.append(QString("source_id(%1)\n").arg(SourceID(chan)));
+    if (0!=DescriptorsLength(chan)) {
+        str.append(QString(" descriptors length(%1) ").arg(DescriptorsLength(chan)));
+        vector<const unsigned char*> desc = 
+            ATSCDescriptor::Parse(Descriptors(chan), DescriptorsLength(chan));
+        str.append(QString("count(%1)\n").arg(desc.size()));
+        for (uint i=0; i<desc.size(); i++)
+            str.append(QString("  %1\n").arg(ATSCDescriptor(desc[i]).toString()));
+    }
+    return str;
+}
+
+QString CableVirtualChannelTable::toString() const {
+    QString str;
+    str.append(QString("VCT Cable: channels(%1) tsid(0x%2) ").
+               arg(ChannelCount()).arg(TransportStreamID(), 0, 16));
+    str.append(QString("seclength(%3)\n").arg(Length()));
+    for (unsigned int i=0; i<ChannelCount(); i++) {
+        str.append(toString(i)).append("\n");
+    }
+    if (0!=GlobalDescriptorsLength()) {
+        str.append(QString("global descriptors length: %1\n").arg(GlobalDescriptorsLength()));
+        vector<const unsigned char*> desc = 
+            ATSCDescriptor::Parse(GlobalDescriptors(), GlobalDescriptorsLength());
+        str.append(QString("global descriptors count: %1\n").arg(desc.size()));
+        for (uint i=0; i<desc.size(); i++)
+            str.append(QString(" %1\n").arg(ATSCDescriptor(desc[i]).toString()));
+    }
+    return str;
+}
+
 QString EventInformationTable::toString() const {
     QString str;
     str.append(QString("Event Information Table\n"));
@@ -170,4 +230,14 @@ QString ExtendedTextTable::toString() const {
         arg(SourceID()).arg(EventID()).arg(ExtendedTextTableID()).arg(IsChannelETM()).arg(IsEventETM());
     str.append(ExtendedTextMessage().toString());
     return str;
+}
+
+int VirtualChannelTable::Find(int major, int minor) const
+{
+    for (uint i=0; i<ChannelCount(); i++)
+    {
+        if ((MajorChannel(i) == (uint)major) && (MinorChannel(i) == (uint)minor))
+            return (int)i;
+    }
+    return -1;
 }

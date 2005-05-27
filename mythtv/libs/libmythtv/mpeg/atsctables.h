@@ -63,7 +63,7 @@ class MasterGuideTable : PSIPTable {
     {
     // start_code_prefix        8   0.0          0
     // table_id                 8   1.0       0xC7
-        assert(0xc7==TableID());
+        assert(TableID::MGT == TableID());
         Parse();
     // section_syntax_indicator 1   2.0          1
     // private_indicator        1   2.1          1
@@ -136,22 +136,23 @@ class MasterGuideTable : PSIPTable {
     mutable vector<unsigned char*> _ptrs; // used to parse
 };
 
-/** \class TerrestrialVirtualChannelTable
- *  \brief This table contains information about the terrestrial
+/** \class VirtualChannelTable
+ *  \brief This table contains information about the
  *         channels transmitted on this multiplex.
- *  \sa CableVirtualChannelTable
+ *  \sa TerrestrialVirtualChannelTable,
+ *      CableVirtualChannelTable
  */
-class TerrestrialVirtualChannelTable : public PSIPTable {
-  public:
-    TerrestrialVirtualChannelTable(const PSIPTable& table) : PSIPTable(table)
+class VirtualChannelTable : public PSIPTable
+{
+  protected:
+    VirtualChannelTable(const PSIPTable& table) : PSIPTable(table)
     {
     //       Name             bits  loc  expected value
     // start_code_prefix        8   0.0          0
     // table_id                 8   1.0       0xC8
-        assert(0xC8==TableID());
-        Parse();
     }
-    ~TerrestrialVirtualChannelTable() { ; }
+  public:
+    ~VirtualChannelTable() { ; }
 
     // transport_stream_id     16   4.0
     uint TransportStreamID() const { return TableIDExtension(); }
@@ -213,7 +214,7 @@ class TerrestrialVirtualChannelTable : public PSIPTable {
     bool IsHiddenInGuide(uint i) const {
         return bool(_ptrs[i][26] & 0x2);
     }
-    //   reserved               3  26.7          7
+    //   reserved               6  26.7       0x3f 
     //   service_type           6  27.2
     uint ServiceType(uint i) const {
         return _ptrs[i][27] & 0x3f;
@@ -244,10 +245,122 @@ class TerrestrialVirtualChannelTable : public PSIPTable {
     }
     // CRC_32                  32
     void Parse() const;
+    int Find(int major, int minor) const;
+  protected:
+    mutable vector<unsigned char*> _ptrs;
+};
+
+/** \class TerrestrialVirtualChannelTable
+ *  \brief This table contains information about the terrestrial
+ *         channels transmitted on this multiplex.
+ *  \sa CableVirtualChannelTable
+ */
+class TerrestrialVirtualChannelTable : public VirtualChannelTable
+{
+  public:
+    TerrestrialVirtualChannelTable(const PSIPTable& table)
+        : VirtualChannelTable(table)
+    {
+    //       Name             bits  loc  expected value
+    // start_code_prefix        8   0.0          0
+    // table_id                 8   1.0       0xC8
+        assert(TableID::TVCT == TableID());
+        Parse();
+    }
+    ~TerrestrialVirtualChannelTable() { ; }
+
+    // transport_stream_id     16   4.0
+    // num_channels_in_section  8  10.0
+
+    // for(i=0; i<num_channels_in_section; i++) {
+    //   short_name          7*16   0.0 (7 UTF-16 chars padded by 0x0000)
+    //   reserved               4  14.0        0xf
+
+    //   major_channel_number  10  14.4
+    // 14 RRRR JJJJ 15 jjjj jjmm  16 MMMM MMMM
+    //              JJ JJjj jjjj  mm MMMM MMMM
+    //   minor_channel_number  10  15.6
+    //   modulation_mode        8  17.0
+    //   carrier_frequency     32  18.0 deprecated
+    //   channel_TSID          16  22.0
+    //   program_number        16  24.0
+    //   ETM_location           2  26.0
+    //   access_controlled      1  26.2
+    //   hidden                 1  26.3
+    //   reserved               2  26.4          3
+    //   hide_guide             1  26.6
+    //   reserved               6  26.7       0x3f 
+    //   service_type           6  27.2
+    //   source_id             16  28.0
+    //   reserved               6  30.0       0xfb
+    //   descriptors_length    10  30.6-31
+    //   for (i=0;i<N;i++) { descriptor() }
+    // }
+    // reserved                 6             0xfb
+    // additional_descriptors_length 10
+    // for (j=0; j<N; j++) { additional_descriptor() }
+    // CRC_32                  32
     QString toString() const;
     QString toString(int) const;
-  private:
-    mutable vector<unsigned char*> _ptrs;
+};
+
+
+/** \class CableVirtualChannelTable
+ *  \brief This table contains information about the cable
+ *         channels transmitted on this multiplex.
+ *  \sa TerrestrialVirtualChannelTable
+ */
+class CableVirtualChannelTable : public VirtualChannelTable
+{
+  public:
+    CableVirtualChannelTable(const PSIPTable& table)
+        : VirtualChannelTable(table)
+    {
+    //       Name             bits  loc  expected value
+    // start_code_prefix        8   0.0          0
+    // table_id                 8   1.0       0xC8
+        assert(TableID::CVCT == TableID());
+        Parse();
+    }
+    ~CableVirtualChannelTable() { ; }
+
+    // for(i=0; i<num_channels_in_section; i++) {
+    //   short_name          7*16   0.0 (7 UTF-16 chars padded by 0x0000)
+    //   reserved               4  14.0        0xf
+
+    //   major_channel_number  10  14.4
+    // 14 RRRR JJJJ 15 jjjj jjmm  16 MMMM MMMM
+    //              JJ JJjj jjjj  mm MMMM MMMM
+    //   minor_channel_number  10  15.6
+    //   modulation_mode        8  17.0
+    //   carrier_frequency     32  18.0 deprecated
+    //   channel_TSID          16  22.0
+    //   program_number        16  24.0
+    //   ETM_location           2  26.0
+    //   access_controlled      1  26.2
+    //   hidden                 1  26.3
+    //   path_select            1  26.4
+    bool IsPathSelect(uint i) const {
+        return bool(_ptrs[i][26] & 0x8);
+    }
+    //   out_of_band            1  26.5
+    bool IsOutOfBand(uint i) const {
+        return bool(_ptrs[i][26] & 0x4);
+    }
+    //   hide_guide             1  26.6
+    //   reserved               3  26.7          7
+    //   service_type           6  27.2
+    //   source_id             16  28.0
+    //   reserved               6  30.0       0xfb
+    //   descriptors_length    10  30.6-31
+    //   for (i=0;i<N;i++) { descriptor() }
+    // }
+    // reserved                 6             0xfb
+    // additional_descriptors_length 10
+    // for (j=0; j<N; j++) { additional_descriptor() }
+    // CRC_32                  32
+    QString toString() const;
+    QString toString(int) const;
 };
 
 /** \class EventInformationTable
@@ -262,7 +375,7 @@ class EventInformationTable : public PSIPTable {
     //       Name             bits  loc  expected value
     // start_code_prefix        8   0.0          0
     // table_id                 8   1.0       0xCB
-        assert(0xcb==TableID());
+        assert(TableID::EIT == TableID());
         Parse();
     }
     ~EventInformationTable() { ; }
@@ -334,7 +447,7 @@ class ExtendedTextTable : public PSIPTable {
     //       Name             bits  loc  expected value
     // start_code_prefix        8   0.0          0
     // table_id                 8   1.0       0xCC
-        assert(0xcc==TableID());
+        assert(TableID::ETT == TableID());
     // section_syntax_indicator 1   2.0          1
     // private_indicator        1   2.1          1
     // reserved                 2   2.2          3
@@ -386,7 +499,7 @@ class SystemTimeTable : public PSIPTable {
     //       Name             bits  loc  expected value
     // start_code_prefix        8   0.0          0
     // table_id                 8   1.0       0xCD
-        assert(0xCD==TableID());
+        assert(TableID::STT == TableID());
     // section_syntax_indicator 1   2.0          1
     // private_indicator        1   2.1          1
     // reserved                 2   2.2          3
@@ -430,5 +543,43 @@ class SystemTimeTable : public PSIPTable {
         return str;
     }
 };
+
+/** \class RatingRegionTable
+ *  \brief No one has had time to decode this table yet...
+ */
+class RatingRegionTable : public PSIPTable
+{
+  public:
+    RatingRegionTable(const PSIPTable& table) : PSIPTable(table)
+    {
+        assert(TableID::RRT == TableID());
+    }
+};
+
+/** \class DirectedChannelChangeTable
+ *  \brief No one has had time to decode this table yet...
+ */
+class DirectedChannelChangeTable : public PSIPTable
+{
+  public:
+    DirectedChannelChangeTable(const PSIPTable& table) : PSIPTable(table)
+    {
+        assert(TableID::DCCT == TableID());
+    }
+};
+
+/** \class DirectedChannelChangeSelectionCodeTable
+ *  \brief No one has had time to decode this table yet...
+ */
+class DirectedChannelChangeSelectionCodeTable : public PSIPTable
+{
+  public:
+    DirectedChannelChangeSelectionCodeTable(const PSIPTable& table)
+        : PSIPTable(table)
+    {
+        assert(TableID::DCCSCT == TableID());
+    }
+};
+
 
 #endif // _ATSC_TABLES_H_
