@@ -1,0 +1,4 @@
+.qmake.internal.cache
+moc_*
+Makefile
+libmythtv-*
