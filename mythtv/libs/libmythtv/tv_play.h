@@ -226,6 +226,8 @@ class TV : public QObject
     float ff_rew_repos;
     bool ff_rew_reverse;
     bool smartForward;
+    static const int SSPEED_MAX = 8;
+    int seek_speed[SSPEED_MAX];
     
     // Configuration variables from DB just before playback
     int autoCommercialSkip;

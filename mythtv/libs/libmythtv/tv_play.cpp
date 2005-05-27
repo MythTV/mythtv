@@ -33,25 +33,7 @@ using namespace std;
 #include "audiooutput.h"
 #include "DisplayRes.h"
 
-struct SeekSpeedInfo {
-    QString   dispString;
-    float  scaling;
-};
-
-SeekSpeedInfo seek_speed_array[8] =
-{
-    {  "3X",    3.0},
-    {  "5X",    5.0},
-    { "10X",   10.0},
-    { "20X",   20.0},
-    { "30X",   30.0},
-    { "60X",   60.0},
-    {"120X",  120.0},
-    {"180X",  180.0}
-};
-
 const int SSPEED_NORMAL = 0;
-const int SSPEED_MAX = sizeof seek_speed_array / sizeof seek_speed_array[0];
 
 struct SleepTimer {
     QString   dispString;
@@ -1104,6 +1086,14 @@ void TV::RunTV(void)
     ff_rew_repos = gContext->GetNumSetting("FFRewReposTime", 100) / 100.0;
     ff_rew_reverse = gContext->GetNumSetting("FFRewReverse", 1);
     smartForward = gContext->GetNumSetting("SmartForward", 0);
+    seek_speed[0] = gContext->GetNumSetting("FFRewSpeed0", 3);
+    seek_speed[1] = gContext->GetNumSetting("FFRewSpeed1", 5);
+    seek_speed[2] = gContext->GetNumSetting("FFRewSpeed2", 10);
+    seek_speed[3] = gContext->GetNumSetting("FFRewSpeed3", 20);
+    seek_speed[4] = gContext->GetNumSetting("FFRewSpeed4", 30);
+    seek_speed[5] = gContext->GetNumSetting("FFRewSpeed5", 60);
+    seek_speed[6] = gContext->GetNumSetting("FFRewSpeed6", 120);
+    seek_speed[7] = gContext->GetNumSetting("FFRewSpeed7", 180);
 
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
@@ -2304,9 +2294,9 @@ float TV::StopFFRew(void)
         return time;
 
     if (doing_ff_rew > 0)
-        time = -seek_speed_array[ff_rew_index].scaling * ff_rew_repos;
+        time = -seek_speed[ff_rew_index] * ff_rew_repos;
     else
-        time = seek_speed_array[ff_rew_index].scaling * ff_rew_repos;
+        time = seek_speed[ff_rew_index] * ff_rew_repos;
 
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
@@ -2319,11 +2309,21 @@ float TV::StopFFRew(void)
 void TV::ChangeFFRew(int direction)
 {
     if (doing_ff_rew == direction)
-        SetFFRew((ff_rew_index + 1) % SSPEED_MAX);
+    {
+        while (++ff_rew_index < SSPEED_MAX)
+            if (seek_speed[ff_rew_index])
+                break;
+        if (ff_rew_index >= SSPEED_MAX)
+            ff_rew_index = SSPEED_NORMAL;
+        SetFFRew(ff_rew_index);
+    }
     else if (!ff_rew_reverse && doing_ff_rew == -direction)
     {
-        if (ff_rew_index > SSPEED_NORMAL)
-            SetFFRew((ff_rew_index - 1) % SSPEED_MAX);
+        while (--ff_rew_index >= SSPEED_NORMAL)
+            if (seek_speed[ff_rew_index])
+                break;
+        if (ff_rew_index >= SSPEED_NORMAL)
+            SetFFRew(ff_rew_index);
         else
         {
             float time = StopFFRew();
@@ -2344,23 +2344,23 @@ void TV::SetFFRew(int index)
     if (!doing_ff_rew)
         return;
 
+    if (!seek_speed[index])
+        return;
+
     ff_rew_index = index;
     float speed;
 
     QString mesg;
     if (doing_ff_rew > 0)
     {
-        mesg = tr("Forward ");
-        speed = 1.0;
+        mesg = tr("Forward %1X").arg(seek_speed[ff_rew_index]);
+        speed = seek_speed[ff_rew_index];
     }
     else
     {
-        mesg = tr("Rewind ");
-        speed = -1.0;
+        mesg = tr("Rewind %1X").arg(seek_speed[ff_rew_index]);
+        speed = -seek_speed[ff_rew_index];
     }
-
-    mesg += seek_speed_array[ff_rew_index].dispString;
-    speed *= seek_speed_array[ff_rew_index].scaling;
 
     activenvp->Play(speed, false);
     UpdatePosOSD(0.0, mesg, -1);
