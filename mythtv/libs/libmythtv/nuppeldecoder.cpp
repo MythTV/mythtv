@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <assert.h>
+#include <errno.h>
 
 #include <iostream>
 #include <pthread.h>
