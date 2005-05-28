@@ -2656,9 +2656,8 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
         GenericTree *parent = current_node->getParent();
         if (parent == NULL)
         {
-            cerr << "UIManagedTreeListType: LCD sees no "
-                 << "parent to current_node" 
-                 << endl;
+            VERBOSE(VB_IMPORTANT, "UIManagedTreeListType: LCD sees no "
+                 "parent to current_node" );
         }
         else 
         {
@@ -2689,7 +2688,6 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             title += (current_node->childCount () > 0) ? " >> " : "  ";
             if (!menuItems.isEmpty())
             {
-                printf ("managedtree::draw\n");
                 lcddev->switchToMenu(&menuItems, title);
             }
         }
