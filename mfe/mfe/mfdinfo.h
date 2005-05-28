@@ -78,6 +78,8 @@ class MfdInfo
     int                         countTracks(UIListGenericTree *playlist_tree);
     void                        setSpeakerList(QPtrList<SpeakerTracker>* speakers);
     QPtrList<SpeakerTracker>   *getSpeakerList(){ return &my_speakers; }
+    bool                        hasTranscoder(){ return has_transcoder; }
+    void                        hasTranscoder(bool x){ has_transcoder = x; }
     
   private:
   
@@ -99,6 +101,7 @@ class MfdInfo
     bool                        pause_state;
     bool                        is_stopped;
     QPtrList<SpeakerTracker>    my_speakers;
+    bool                        has_transcoder;
 };
 
 

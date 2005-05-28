@@ -49,6 +49,7 @@ class MfeDialog : public MythThemedDialog
     void doPlaylistDialog(int collection_id, int playlist_id, const QString playlist_name);
     void mfdDiscovered(int which_mfd, QString name, QString host, bool found);
     void audioPluginDiscovered(int which_mfd);
+    void transcoderPluginDiscovered(int which_mfd);
     void paused(int which_mfd, bool paused); 
     void stopped(int which_mfd);
     void playing(int, int, int, int, int, int, int, int, int);
@@ -106,6 +107,7 @@ class MfeDialog : public MythThemedDialog
     UIListGenericTree   *manage_node;
     UIListGenericTree   *connect_node;
     UIListGenericTree   *setup_node;
+    UIListGenericTree   *import_node;
     
     //
     //  Speaker Node, subset of setup

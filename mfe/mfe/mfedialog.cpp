@@ -469,6 +469,18 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
                                          );
         }
     }
+    else if(node->getAttribute(1) == 9 && node->getActive())
+    {
+        //
+        //  User wants to import (rip) a CD
+        //
+ 
+        if(current_mfd && node->getInt() > 0)
+        {
+            node->setActive(false);
+            mfd_interface->ripCollection(current_mfd->getId(), node->getInt());
+        }
+    }
 }
 
 void MfeDialog::doPlaylistDialog(int collection_id, int playlist_id, const QString playlist_name)
@@ -605,6 +617,7 @@ void MfeDialog::wireUpTheme()
 
     browse_node  = new UIListGenericTree(menu_root_node, " Browse Music");
     manage_node  = new UIListGenericTree(menu_root_node, " Manage Content");
+    import_node  = new UIListGenericTree(menu_root_node, " Import Content");
     connect_node = new UIListGenericTree(menu_root_node, " Control other Myth Boxes");
     setup_node   = new UIListGenericTree(menu_root_node, " Settings");
     speaker_node = new UIListGenericTree(setup_node, " Speakers");
@@ -629,6 +642,9 @@ void MfeDialog::connectUpMfd()
 
     connect(mfd_interface, SIGNAL(audioPluginDiscovery(int)),
             this, SLOT(audioPluginDiscovered(int)));
+
+    connect(mfd_interface, SIGNAL(transcoderPluginDiscovery(int)),
+            this, SLOT(transcoderPluginDiscovered(int)));
 
     connect(mfd_interface, SIGNAL(audioPaused(int, bool)),
             this, SLOT(paused(int, bool)));
@@ -719,6 +735,14 @@ void MfeDialog::audioPluginDiscovered(int which_mfd)
     mfd_interface->askForStatus(which_mfd);
 }
 
+void MfeDialog::transcoderPluginDiscovered(int which_mfd)
+{
+    if(available_mfds.find(which_mfd))
+    {
+        available_mfds[which_mfd]->hasTranscoder(true);
+    }
+}
+
 void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collection)
 {
     if(net_flasher)
@@ -781,6 +805,23 @@ void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collecti
             {
                 manage_node->addNode(edit_nodes);
                 manage_node->setDrawArrow(true);
+            }
+
+            //
+            //  Setup any available import nodes
+            //
+            
+            import_node->pruneAllChildren();
+            import_node->setDrawArrow(false);
+
+            if(current_mfd->hasTranscoder())
+            {
+                UIListGenericTree *import_cd_nodes = new_collection->getImportCDTree();
+                if(import_cd_nodes)
+                {
+                    import_node->addNode(import_cd_nodes);
+                    import_node->setDrawArrow(true);
+                }
             }
 
             //
@@ -1035,6 +1076,8 @@ void MfeDialog::syncToCurrentMfd()
         browse_node->setDrawArrow(false);
         manage_node->pruneAllChildren();
         manage_node->setDrawArrow(false);
+        import_node->pruneAllChildren();
+        import_node->setDrawArrow(false);
 
         MfdContentCollection *current_collection = current_mfd->getMfdContentCollection();
         
@@ -1070,7 +1113,20 @@ void MfeDialog::syncToCurrentMfd()
                 manage_node->addNode(edit_nodes);
                 manage_node->setDrawArrow(true);
             }
+            
+            //
+            //  Add import nodes
+            //
 
+            if(current_mfd->hasTranscoder())
+            {
+                UIListGenericTree *import_cd_nodes = current_collection->getImportCDTree();
+                if(import_cd_nodes)
+                {
+                    import_node->addNode(import_cd_nodes);
+                    import_node->setDrawArrow(true);
+                }
+            }
         }
 
         //

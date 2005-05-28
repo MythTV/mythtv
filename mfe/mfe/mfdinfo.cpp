@@ -28,6 +28,7 @@ MfdInfo::MfdInfo( int an_id, const QString &a_name, const QString &a_host)
     current_elapsed = -1;
     is_stopped = true;
     my_speakers.setAutoDelete(true);
+    has_transcoder = false;
 }
 
 AudioMetadata*  MfdInfo::getAudioMetadata(int collection_id, int item_id)
