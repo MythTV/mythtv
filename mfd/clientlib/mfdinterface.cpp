@@ -426,6 +426,36 @@ void MfdInterface::deletePlaylist(
 
 }
 
+void MfdInterface::ripCollection(int which_mfd, int which_collection)
+{
+    bool found_it = false;
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if (an_mfd->getId() == which_mfd)
+        {
+            an_mfd->addPendingCommand(
+                                        QStringList::split(" ", QString("transcoder ripaudiocd %1 ")
+                                                .arg(which_collection))
+                                     );
+
+            found_it = true;
+            break;
+        }
+    }
+    
+    if (!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for a ripCollection() request"
+             << endl;
+    }
+
+}
+
 void MfdInterface::startPlaylistCheck(
                                         MfdContentCollection *mfd_collection,
                                         UIListGenericTree *playlist, 
@@ -662,6 +692,11 @@ void MfdInterface::customEvent(QCustomEvent *ce)
         MfdSpeakerStreamEvent *sse = (MfdSpeakerStreamEvent*)ce;
         turnVizDataStreamOn(sse->getMfd(), sse->getOnOrOff());
 
+    }
+    else if ( ce->type() == MFD_CLIENTLIB_EVENT_TRANSCODER_EXISTS)
+    {
+        MfdTranscoderPluginExistsEvent *tpee = (MfdTranscoderPluginExistsEvent*)ce;
+        emit transcoderPluginDiscovery(tpee->getMfd());
     }
     else
     {

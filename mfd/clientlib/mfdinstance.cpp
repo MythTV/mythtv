@@ -19,6 +19,7 @@ using namespace std;
 #include "audioclient.h"
 #include "metadataclient.h"
 #include "rtspclient.h"
+#include "transcoderclient.h"
 #include "events.h"
 
 MfdInstance::MfdInstance(
@@ -445,6 +446,34 @@ void MfdInstance::parseFromMfd(QStringList &tokens)
                          << endl;
                 }
             }
+            else if(tokens[3] == "mtcp")
+            {
+                if(tokens[1] == "found")
+                {
+                    //
+                    //  Add transcoder client (to rip stuff, see progress)
+                    //
+                    addMtcpClient(tokens[4], tokens[5].toUInt());
+                }
+                else if(tokens[1] == "lost")
+                {
+                    //
+                    //  Remove transcoder client
+                    //
+                    removeServiceClient(
+                                        MFD_SERVICE_TRANSCODER,
+                                        tokens[4],
+                                        tokens[5].toUInt()
+                                       );
+                }
+                else
+                {
+                    cerr << "mfdinstance.o: got mtcp announcement "
+                         << "where 2nd token was neither \""
+                         << "found\" nor \"lost\""
+                         << endl;
+                }
+            }
         }
     }    
 }
@@ -476,7 +505,7 @@ void MfdInstance::addAudioClient(const QString &address, uint a_port)
 
 void MfdInstance::addMetadataClient(const QString &address, uint a_port)
 {
-    MetadataClient *new_metadata = new MetadataClient(mfd_interface, mfd_id, address, a_port);
+    MetadataClient *new_metadata = new MetadataClient(mfd_interface, mfd_id, address, a_port, this);
     if(new_metadata->connect())
     {
         my_service_clients->append(new_metadata);
@@ -504,6 +533,24 @@ void MfdInstance::addRtspClient(const QString &address, uint a_port)
              << "but could not connect"
              << endl;
         delete new_rtsp;
+    }
+}
+
+void MfdInstance::addMtcpClient(const QString &address, uint a_port)
+{
+    TranscoderClient *new_transcoder = new TranscoderClient(mfd_interface, mfd_id, address, a_port);
+    if(new_transcoder->connect())
+    {
+        my_service_clients->append(new_transcoder);
+        MfdTranscoderPluginExistsEvent *tpee = new MfdTranscoderPluginExistsEvent(mfd_id);
+        QApplication::postEvent(mfd_interface, tpee);
+    }
+    else
+    {
+        cerr << "mfdinstance.o: tried to create a transcoder (mtcp) client, "
+             << "but could not connect"
+             << endl;
+        delete new_transcoder;
     }
 }
 
@@ -680,6 +727,30 @@ void MfdInstance::executeCommands(QStringList new_command)
              << "\""
              << endl;
     }
+}
+
+bool MfdInstance::hasTranscoder()
+{
+    bool return_value = false;
+
+    //
+    //  See if we can find a transcoder
+    //
+
+    for(
+        ServiceClient *an_sc = my_service_clients->first();
+        an_sc;
+        an_sc = my_service_clients->next()
+       )
+    {
+        if(an_sc->getType()    == MFD_SERVICE_TRANSCODER)
+        {
+            return_value = true;
+            break;
+        }
+    }
+    
+    return return_value;
 }
 
 MfdInstance::~MfdInstance()    

@@ -59,6 +59,7 @@ class MfdInstance : public QThread
     void addAudioClient(const QString &address, uint a_port);
     void addMetadataClient(const QString &address, uint a_port);
     void addRtspClient(const QString &address, uint a_port);
+    void addMtcpClient(const QString &address, uint a_port);
 
     void removeServiceClient(
                                 MfdServiceType type, 
@@ -67,6 +68,12 @@ class MfdInstance : public QThread
                             );
 
     virtual void    addPendingCommand(QStringList new_command);
+
+    //
+    //  Do we have a transcoder 
+    //
+    
+    bool hasTranscoder();
  
   private:
   

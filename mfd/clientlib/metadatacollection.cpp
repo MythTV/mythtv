@@ -53,6 +53,7 @@ MetadataCollection::MetadataCollection(
     
     editable = false;
     ripable = false;
+    being_ripped = false;
 }
 
 bool MetadataCollection::itemsUpToDate()

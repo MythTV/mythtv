@@ -1,69 +1,161 @@
 /*
-	metadataclient.cpp
+	transcoderclient.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
-	client object to talk to an mfd's metadata service
+	client object to talk to an mfd's transcoder service
 
 */
 
 #include <iostream>
 using namespace std;
 
-#include <qapplication.h>
-#include <qdatetime.h>
+#include "transcoderclient.h"
+#include "../mfdlib/httpoutrequest.h"
+#include "../mfdlib/httpinresponse.h"
 
-#include <mythtv/generictree.h>
-
-#include "metadataclient.h"
-#include "mfdinterface.h"
-#include "mfdinstance.h"
-#include "mfdcontent.h"
-
-#include "mdcaprequest.h"
-#include "mdcapresponse.h"
-#include "events.h"
-
-#include "../mdcaplib/markupcodes.h"
-
-
-MetadataClient::MetadataClient(
+TranscoderClient::TranscoderClient(
                             MfdInterface *the_mfd,
                             int an_mfd,
                             const QString &l_ip_address,
-                            uint l_port,
-                            MfdInstance *owner
+                            uint l_port
                         )
             :ServiceClient(
                             the_mfd,
                             an_mfd,
-                            MFD_SERVICE_METADATA,
+                            MFD_SERVICE_TRANSCODER,
                             l_ip_address,
                             l_port,
-                            "metadata"
+                            "transcoder"
                           )
 {
-    //
-    //  until I'm logged in, I have no session_id
-
-    //
-    
-    session_id = 0;
-    
-    //
-    //  if we remove our delete a metadata collection, it should get deleted from memory
-    //
-    
-    metadata_collections.setAutoDelete(true);
-    
-    //
-    //  Link to out parent
-    //
-    
-    parent = owner;
 }
 
+void TranscoderClient::executeCommand(QStringList new_command)
+{
+
+    if(new_command.count() != 2)
+    {
+        cerr << "wrong number of tokens to TranscoderClient::executeCommand(): "
+             << new_command.join(" ")
+             << endl;
+        return;
+    }
+
+    if(new_command[0] == "ripaudiocd")
+    {
+        bool ok;
+        int which_collection = new_command[1].toInt(&ok);
+        if(!ok)
+        {
+            cerr << "could not parse \""
+                 << new_command[1]
+                 << "\" into a collection number in "
+                 << "TranscoderClient::executeCommand()"
+                 <<endl;
+            return;
+        }
+        if(which_collection < 1)
+        {
+            cerr << "bad collection number ("
+                 << which_collection
+                 << ") is TranscoderClient::executeCommand()"
+                 <<endl;
+            return;
+        }
+        requestRipAudioCd(which_collection);
+    }
+}
+
+void TranscoderClient::handleIncoming()
+{
+    
+    static int buffer_size = 8192;
+    char incoming[buffer_size];
+    int length = 0;
+
+    HttpInResponse *new_response = NULL;
+    
+    length = client_socket_to_service->readBlock(incoming, buffer_size);
+    
+    while(length > 0)
+    {
+        if(!new_response)
+        {
+            new_response = new HttpInResponse(incoming, length);
+        }
+        else
+        {
+            new_response->appendToPayload(incoming, length);
+        }
+
+        if(new_response->complete())
+        {
+            length = 0;
+        }
+        else
+        {
+            if(new_response->allIsWell())
+            {
+                bool wait_a_while = true;
+                while(wait_a_while)
+                {
+                    bool server_still_there = true;
+                    
+                    if(client_socket_to_service->waitForMore(1000, &server_still_there) < 1)
+                    {
+                        if(!server_still_there)
+                        {
+                            new_response->allIsWell(false);
+                            wait_a_while = false;
+                            length = 0;
+                        }
+                    }
+                    else
+                    {
+                        length = client_socket_to_service->readBlock(incoming, buffer_size);
+                        if(length > 0)
+                        {
+                            wait_a_while = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                length = 0;
+            }
+        }
+    }
+    
+    if(new_response)
+    {
+        if(new_response->allIsWell())
+        {
+            //processResponse(new_response);
+            delete new_response;
+            new_response = NULL;
+        }
+        else
+        {
+            cerr << "got an error on an http response in transcoder" << endl;
+        }
+    }
+}
+
+
+
+void TranscoderClient::requestRipAudioCd(int collection_id)
+{
+    HttpOutRequest request("/startjob", ip_address);
+    request.addHeader("Job-Type: AudioCD");
+    request.addHeader(QString("Container: %1").arg(collection_id));
+    request.send(client_socket_to_service);
+}
+
+
+/*
 void MetadataClient::sendFirstRequest()
 {
     //
@@ -134,66 +226,6 @@ void MetadataClient::commitListEdits(
 
     commit_request.send(client_socket_to_service);
 
-}
-
-void MetadataClient::executeCommand(QStringList new_command)
-{
-
-    if(new_command.count() != 3)
-    {
-        cerr << "wrong number of tokens to MetadataClient::executeCommand(): "
-             << new_command.join(" ")
-             << endl;
-        return;
-    }
-
-    if(new_command[0] != "pl_delete")
-    {
-        cerr << "MetadataClient::executeCommand() bad command: "
-             << new_command.join(" ")
-             << endl;
-        return;
-    }
-
-    bool ok = false;
-    
-    int collection_number = new_command[1].toInt(&ok);
-    if(!ok)
-    {
-        cerr << "MetadataClient::executeCommand() bad collection number: "
-             << new_command.join(" ")
-             << endl;
-        return;
-    }
-
-    int playlist_number = new_command[2].toInt(&ok);
-    if(!ok)
-    {
-        cerr << "MetadataClient::executeCommand() bad playlist number: "
-             << new_command.join(" ")
-             << endl;
-        return;
-    }
-    
-    //
-    //  Create a mdcap output request object with the correct URL
-    //
-    
-    QString commit_url = QString("/remove/%1/list/%2/")
-                                .arg(collection_number)
-                                .arg(playlist_number);
-
-    MdcapRequest commit_request(commit_url, ip_address);
-    commit_request.addGetVariable("session-id", session_id);
-    commit_request.send(client_socket_to_service);
-    
-    //
-    //  Do a quick an dirty internal delete so the user gets some feedback
-    //  that their delete command was accepted
-    //
-    
-    // buildTree(collection_number, playlist_number);
-    
 }
 
 void MetadataClient::handleIncoming()
@@ -1047,7 +1079,6 @@ int MetadataClient::parseCollection(MdcapInput &mdcap_input)
     uint32_t new_collection_type = 0;
     bool     new_collection_editable = false;
     bool     new_collection_ripable = false;
-    bool     new_collection_being_ripped = false;
 
     bool all_is_well = true;
     while(mdcap_input.size() > 0 && all_is_well)
@@ -1074,10 +1105,6 @@ int MetadataClient::parseCollection(MdcapInput &mdcap_input)
                 
             case MarkupCodes::collection_is_ripable:
                 new_collection_ripable = mdcap_input.popCollectionRipable();
-                break;
-                
-            case MarkupCodes::collection_being_ripped:
-                new_collection_being_ripped = mdcap_input.popCollectionBeingRipped();
                 break;
                 
             case MarkupCodes::collection_count:
@@ -1182,7 +1209,6 @@ int MetadataClient::parseCollection(MdcapInput &mdcap_input)
                                        );
             new_collection->setEditable(new_collection_editable);
             new_collection->setRipable(new_collection_ripable);
-            new_collection->setBeingRipped(new_collection_being_ripped);
             metadata_collections.append(new_collection);
         }
              
@@ -1602,15 +1628,6 @@ void MetadataClient::buildTree()
         }
         
         //
-        //  If this collection is ripable (eg. it's a CD), add ability for user to rip it
-        //
-        
-        if(a_collection->isRipable())
-        {
-            new_collection->addRipAbility(a_collection->getName(), a_collection->getId(), a_collection->beingRipped());
-        }
-        
-        //
         //  Sort everything
         //
         
@@ -1636,8 +1653,8 @@ void MetadataClient::buildTree()
     MfdMetadataChangedEvent *mce = new MfdMetadataChangedEvent(mfd_id, new_collection);
     QApplication::postEvent(mfd_interface, mce);
 }
+*/
 
-MetadataClient::~MetadataClient()
+TranscoderClient::~TranscoderClient()
 {
-    metadata_collections.clear();
 }

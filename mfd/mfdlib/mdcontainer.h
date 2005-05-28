@@ -81,6 +81,8 @@ class MetadataContainer
     void                setEditable(bool x) { editable = x; }
     bool                isRipable() { return ripable; }
     void                setRipable(bool x) { ripable = x; }
+    bool                isBeingRipped(){ return being_ripped; }
+    void                setBeingRipped(bool x){ being_ripped = x; }
     uint                getMetadataCount();
     uint                getPlaylistCount();
     void                setName(const QString &a_name){my_name = a_name;}
@@ -160,6 +162,7 @@ class MetadataContainer
     int     generation;                        
     bool    editable;
     bool    ripable;
+    bool    being_ripped;
 };
 
 #endif

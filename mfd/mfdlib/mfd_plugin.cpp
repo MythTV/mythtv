@@ -80,9 +80,12 @@ void MFDBasePlugin::warning(const QString &warning_message)
 void MFDBasePlugin::fatal(const QString &death_rattle)
 {
     fatal_mutex.lock();
+        QString death_string = QString("%1 plugin %2")
+                              .arg(name)
+                              .arg(death_rattle);
         if(parent)
         {
-            FatalEvent *fe = new FatalEvent(death_rattle, unique_identifier);
+            FatalEvent *fe = new FatalEvent(death_string, unique_identifier);
             QApplication::postEvent(parent, fe);    
         }
         else

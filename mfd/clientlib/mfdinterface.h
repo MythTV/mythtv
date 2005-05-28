@@ -70,6 +70,14 @@ class MfdInterface : public QObject
                             int which_playlist
                           );
                             
+    //
+    //  To rip a collection
+    //
+    
+    void    ripCollection(
+                            int which_mfd,
+                            int which_collection
+                         );
 
     //
     //  Methods that will ask this library to perform some background work
@@ -87,7 +95,7 @@ class MfdInterface : public QObject
 
 
     //
-    //  Methods that have something to do with vizualizations
+    //  Methods that have something to do with visualizations
     //
 
     void        turnVizDataStreamOn(int which_mfd, bool yes_or_no);
@@ -104,6 +112,7 @@ class MfdInterface : public QObject
 
     void mfdDiscovery(int, QString, QString, bool);
     void audioPluginDiscovery(int);
+    void transcoderPluginDiscovery(int);
     void audioPaused(int, bool);
     void audioStopped(int);
     void audioPlaying(int, int, int, int, int, int, int, int, int);

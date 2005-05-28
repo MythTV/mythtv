@@ -347,6 +347,12 @@ void DeviceWatcher::updateAudioCDMetadata()
     
     current_metadata_container = 
         metadata_server->createContainer(playlist_name, MCCT_audio, MCLT_host);
+    
+    //
+    //  It's an audio CD, so it's ripable
+    //
+    
+    current_metadata_container->setRipable(true);
 
     //
     //  Set the right collection id (now that we have a collection id) for

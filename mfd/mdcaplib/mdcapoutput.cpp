@@ -399,6 +399,23 @@ void MdcapOutput::addCollectionRipable(bool yes_or_no)
     }
 }
 
+void MdcapOutput::addCollectionBeingRipped(bool yes_or_no)
+{
+    //
+    //  Being Ripped is 2 bytes
+    //
+
+    append(MarkupCodes::collection_being_ripped);
+    if(yes_or_no)
+    {
+        append((uint8_t) 1);
+    }    
+    else
+    {
+        append((uint8_t) 0);
+    }
+}
+
 void MdcapOutput::addCollectionGeneration(int collection_generation)
 {
     //

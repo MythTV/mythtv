@@ -1,0 +1,42 @@
+#ifndef IMPORTJOB_H_
+#define IMPORTJOB_H_
+/*
+	importjob.h
+
+	(c) 2005 Thor Sigvaldason and Isaac Richards
+	Part of the mythTV project
+	
+	Base class for jobs that involve importing content
+*/
+
+#include <qstring.h>
+
+#include "job.h"
+
+class MetadataServer;
+
+class ImportJob: public TranscoderJob
+{
+
+  public:
+
+    ImportJob(
+                    Transcoder     *owner,
+                    int             l_job_id,
+                    QString         l_scratch_dir_string,
+                    QString         l_destination_dir_string,
+                    MetadataServer *l_metadata_server,
+                    int             l_container_id
+             );
+
+    virtual ~ImportJob();
+
+  protected:
+  
+    QString         scratch_dir_string;
+    QString         destination_dir_string;
+    MetadataServer *metadata_server;
+    int             container_id;
+};
+
+#endif  // importjob_h_

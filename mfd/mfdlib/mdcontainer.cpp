@@ -41,6 +41,7 @@ MetadataContainer::MetadataContainer(
     generation = 1;
     editable = false;
     ripable = false;
+    being_ripped = false;
 }
 
 void MetadataContainer::log(const QString &log_message, int verbosity)

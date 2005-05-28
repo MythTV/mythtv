@@ -60,6 +60,8 @@ class MetadataCollection
     bool          isEditable(){ return editable; }
     void          setRipable(bool x){ ripable = x; }
     bool          isRipable(){ return ripable; }    
+    void          setBeingRipped(bool x){ being_ripped = x; }
+    bool          beingRipped(){ return being_ripped; }
 
     //
     //  Get at the contents
@@ -91,6 +93,7 @@ class MetadataCollection
     
     bool         editable;
     bool         ripable;
+    bool         being_ripped;
 };
 
 #endif

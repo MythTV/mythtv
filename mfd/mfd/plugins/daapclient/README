@@ -12,11 +12,10 @@ libopendaap:
 
         http://crazney.net/programs/itunes/libopendaap.html
 
-    Version 0.3.0 (source release number) is required. Higher versions will
-probably work as well.
+    Version 0.3.0 (source release number) or higher is required. 
 
-    Note that as of version 0.3.0, libopendaap has a very annoying habit of
-not naming the library properly under a Linux build (it calls it
+    Note that version 0.3.0 of libopendaap has a very annoying habit of not
+naming the library properly under a Linux build (it calls it
 libopendaap.0.1.0, rather than libopendaap.so.0.1.0). The following
 hack-around (as root) should fix that:
 
@@ -28,3 +27,4 @@ hack-around (as root) should fix that:
         ln -s libopendaap.so.0.1.0 libopendaap.so
         ldconfig
 
+    Version 0.4.0 has fixed this annoyance, and shoudl be used instead.

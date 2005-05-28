@@ -1,42 +1,35 @@
-#ifndef METADATACLIENT_H_
-#define METADATACLIENT_H_
+#ifndef TRANSCODERCLIENT_H_
+#define TRANSCODERCLIENT_H_
 /*
-	metadataclient.h
+	transcoderclient.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
-	client object to talk to an mfd's metadata server
+	client object to talk to an mfd's transcoder server
 
 */
 
-#include <qptrlist.h>
-
-#include <mythtv/uilistbtntype.h>
-
 #include "serviceclient.h"
-#include "../mdcaplib/mdcapinput.h"
-#include "../mdcaplib/mdcapoutput.h"
-#include "metadatacollection.h"
 
-class MdcapResponse;
-class MfdInstance;
-
-class MetadataClient : public ServiceClient
+class TranscoderClient : public ServiceClient
 {
 
   public:
 
-    MetadataClient(
+    TranscoderClient(
                     MfdInterface *the_mfd,
                     int an_mfd,
                     const QString &l_ip_address,
-                    uint l_port,
-                    MfdInstance *owner
+                    uint l_port
                   );
-    ~MetadataClient();
+    ~TranscoderClient();
 
+    void executeCommand(QStringList new_command);
     void handleIncoming();
+    void requestRipAudioCd(int collection_id);
+
+/*
     void processResponse(MdcapResponse *mdcap_response);
     void sendFirstRequest();
 
@@ -49,9 +42,6 @@ class MetadataClient : public ServiceClient
                             bool new_playlist,
                             QString playlist_name
                         );
-
-    void executeCommand(QStringList new_command);
-
 
     //
     //  Methods for handling different responses from the server
@@ -101,9 +91,11 @@ class MetadataClient : public ServiceClient
         
   private:
   
-    uint32_t                        session_id;
+    uint32_t session_id;
     QPtrList<MetadataCollection>    metadata_collections;
-    MfdInstance                    *parent;
+*/
+
+
 };
 
 #endif

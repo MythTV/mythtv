@@ -239,3 +239,22 @@ bool MfdSpeakerStreamEvent::getOnOrOff()
 MfdSpeakerStreamEvent::~MfdSpeakerStreamEvent()
 {
 }
+
+/*
+---------------------------------------------------------------------
+*/
+
+MfdTranscoderPluginExistsEvent::MfdTranscoderPluginExistsEvent(
+                                                                int which_mfd
+                                                              )
+                    :QCustomEvent(MFD_CLIENTLIB_EVENT_TRANSCODER_EXISTS)
+
+{
+    mfd_id = which_mfd;
+}
+
+int MfdTranscoderPluginExistsEvent::getMfd()
+{
+    return mfd_id;
+}
+

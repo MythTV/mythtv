@@ -1702,6 +1702,7 @@ void MetadataServer::buildUpdateResponse(MdcapOutput *response)
             }
             response->addCollectionEditable(container->isEditable());
             response->addCollectionRipable(container->isRipable());
+            response->addCollectionBeingRipped(container->isBeingRipped());
             response->addCollectionCount(container->getMetadataCount());
             response->addCollectionName(container->getName());
             response->addCollectionGeneration(container->getGeneration());

@@ -119,6 +119,8 @@ MfdContentCollection::MfdContentCollection(
     new_playlist_tree = NULL;
     editable_playlist_tree = NULL;
     deletable_playlist_tree = NULL;
+    
+    import_cd_tree = NULL;
 
     //
     //  Set some core attributes
@@ -422,6 +424,26 @@ void MfdContentCollection::addNewPlaylistAbility(const QString &collection_name,
              << "child nodes."
              << endl;
     }
+}
+
+void MfdContentCollection::addRipAbility(const QString &collection_name, int l_collection_id, bool is_being_ripped)
+{
+    if (!import_cd_tree)
+    {
+        import_cd_tree = new UIListGenericTree(NULL, "Import CD");
+        import_cd_tree->setPixmap(pixalbum);
+        import_cd_tree->setInt(0);
+    }
+
+    UIListGenericTree *import_cd = new UIListGenericTree(import_cd_tree, collection_name);
+    import_cd->setPixmap(pixalbum);
+    import_cd->setInt(l_collection_id);
+    import_cd->setAttribute(1, 9);
+    
+    if (is_being_ripped)
+    {
+        import_cd->setActive(false);
+    } 
 }
 
 void MfdContentCollection::recursivelyAddSubPlaylist(
@@ -2005,6 +2027,12 @@ MfdContentCollection::~MfdContentCollection()
     {
         delete new_user_playlist;
         new_user_playlist = NULL;
+    }
+    
+    if(import_cd_tree)
+    {
+        delete import_cd_tree;
+        import_cd_tree = NULL;
     }
 }
 

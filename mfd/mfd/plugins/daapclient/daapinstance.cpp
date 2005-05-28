@@ -1252,6 +1252,15 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
                 dmap_data >> a_u32_variable;
                 break;
                 
+            case 'msas':
+            
+                //
+                //  DMAP authenticationschemes (another mystery to be ignored)
+                //
+                
+                dmap_data >> a_u32_variable;
+                break;
+                
             default:
                 warning(QString("got an unknown tag type (%1) "
                         "while doing doServerInfoResponse()")

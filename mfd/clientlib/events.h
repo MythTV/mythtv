@@ -24,6 +24,7 @@
 #define MFD_CLIENTLIB_EVENT_PLAYLIST_CHECKED    65426
 #define MFD_CLIENTLIB_EVENT_SPEAKER_LIST        65425
 #define MFD_CLIENTLIB_EVENT_SPEAKER_STREAM      65424
+#define MFD_CLIENTLIB_EVENT_TRANSCODER_EXISTS   65423
 
 class SpeakerTracker;
 
@@ -236,5 +237,24 @@ class MfdSpeakerStreamEvent: public QCustomEvent
     int     mfd_id;
     bool    on_or_off;
 };
+
+class MfdTranscoderPluginExistsEvent: public QCustomEvent
+{
+    //
+    //  Sent by mfdinstance when it discovers a transcoder plugin in it's mfd
+    //
+    
+  public:
+  
+    MfdTranscoderPluginExistsEvent(int which_mfd);
+
+    int                getMfd();
+
+  private:
+  
+    int                mfd_id;
+};
+
+
 
 #endif

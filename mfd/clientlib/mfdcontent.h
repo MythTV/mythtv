@@ -36,6 +36,7 @@ class MfdContentCollection
     void addMetadata(Metadata *an_item, const QString &collection_name, MetadataCollection *collection);
     void addPlaylist(ClientPlaylist *a_playlist, MetadataCollection *collection);
     void addNewPlaylistAbility(const QString &collection_name, int l_collection_id);
+    void addRipAbility(const QString &collection_name, int l_collection_id, bool is_being_ripped=false);
     void recursivelyAddSubPlaylist(
                                     UIListGenericTree *where_to_add, 
                                     MetadataCollection *collection, 
@@ -57,6 +58,7 @@ class MfdContentCollection
     UIListGenericTree* getNewPlaylistTree(){        return new_playlist_tree;      }
     UIListGenericTree* getEditablePlaylistTree(){   return editable_playlist_tree; }
     UIListGenericTree* getDeletablePlaylistTree(){  return deletable_playlist_tree;}
+    UIListGenericTree* getImportCDTree(){           return import_cd_tree;         }
     
     AudioMetadata*     getAudioItem(int which_collection, int which_id);
     ClientPlaylist*    getAudioPlaylist(int which_collection, int which_id);
@@ -117,6 +119,7 @@ class MfdContentCollection
     UIListGenericTree *editable_playlist_tree;
     UIListGenericTree *deletable_playlist_tree;
 
+    UIListGenericTree *import_cd_tree;
 
     //
     //  The following multimap allows a given playlist entry to find

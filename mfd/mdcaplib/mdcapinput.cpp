@@ -415,7 +415,7 @@ bool MdcapInput::popCollectionEditable()
     }
     
     cerr << "mdcapinput.o: asked to popCollectionEditable(), but value was "
-         << "neither true not false"
+         << "neither true nor false"
          << endl;
     return false;
 }
@@ -457,7 +457,49 @@ bool MdcapInput::popCollectionRipable()
     }
     
     cerr << "mdcapinput.o: asked to popCollectionRipable(), but value was "
-         << "neither true not false"
+         << "neither true nor false"
+         << endl;
+    return false;
+}
+
+
+bool MdcapInput::popCollectionBeingRipped()
+{
+    //
+    //  Being Ripped is 2 bytes
+    //  1 - content markup code
+    //  2 - int; 0 is false
+    //           1 is true
+    //
+    
+    if(amountLeft() < 2)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionBeingRipped(), but not enough "
+             << "bytes left";
+        return false;
+    }
+    
+    char content_code = popByte();
+    if(content_code != MarkupCodes::collection_being_ripped)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionBeingRipped(), but "
+             << "content code is not collection_being_ripped "
+             << endl;
+        return false;
+    }
+    
+    uint8_t result = popByte();
+    if(result == 1)
+    {
+        return true;
+    }
+    else if(result == 0)
+    {
+        return false;
+    }
+    
+    cerr << "mdcapinput.o: asked to popCollectionBeingRipped(), but value was "
+         << "neither true nor false"
          << endl;
     return false;
 }
@@ -527,7 +569,7 @@ bool MdcapInput::popUpdateType()
     }
     
     cerr << "mdcapinput.o: asked to popUpdateType(), but value was "
-         << "neither true not false"
+         << "neither true nor false"
          << endl;
     return false;
 }
@@ -878,7 +920,7 @@ bool MdcapInput::popItemDupFlag()
     }
     
     cerr << "mdcapinput.o: asked to popItemDupFlag(), but value was "
-         << "neither true not false"
+         << "neither true nor false"
          << endl;
     return false;
 }
@@ -1183,7 +1225,7 @@ bool MdcapInput::popListEditable()
     }
     
     cerr << "mdcapinput.o: asked to popListEditable(), but value was "
-         << "neither true not false"
+         << "neither true nor false"
          << endl;
     return false;
 }
@@ -1284,7 +1326,7 @@ bool MdcapInput::popCommitListType()
     }
     
     cerr << "mdcapinput.o: asked to popCommitListType(), but value was "
-         << "neither true not false"
+         << "neither true nor false"
          << endl;
     return false;
 }
