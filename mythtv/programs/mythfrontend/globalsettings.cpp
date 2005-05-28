@@ -2133,6 +2133,19 @@ static HostCheckBox *PVR350UseInternalSound()
     return gc;
 }
 
+#ifdef USING_OPENGL_VSYNC
+static HostCheckBox *UseOpenGLVSync()
+{
+    HostCheckBox *gc = new HostCheckBox("UseOpenGLVSync");
+    gc->setLabel(QObject::tr("Enable OpenGL vertical sync for timing"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If it is supported by your hardware/drivers, "
+                    "MythTV will use OpenGL vertical syncing for video timing, reducing "
+                    "frame jitter."));
+    return gc;
+}
+#endif
+
 #ifdef USING_XVMC
 static HostCheckBox *UseXVMC()
 {
@@ -2185,6 +2198,10 @@ public:
 
          addTarget("0", new VerticalConfigurationGroup(true));
 
+#ifdef USING_OPENGL_VSYNC
+         HostCheckBox *use_opengl_vsync = UseOpenGLVSync();
+         addChild(use_opengl_vsync);
+#endif
 #ifdef USING_XVMC
          HostCheckBox *use_xvmc = UseXVMC();
          addChild(use_xvmc);

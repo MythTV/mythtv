@@ -56,3 +56,4 @@ macx {
 using_xvmc:DEFINES += USING_XVMC
 using_xvmc_vld:DEFINES += USING_XVMC_VLD
 using_xrandr:DEFINES += USING_XRANDR
+using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC

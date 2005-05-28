@@ -84,7 +84,10 @@ VideoSync *VideoSync::BestMethod(int frame_interval, int refresh_interval,
     TESTVIDEOSYNC(nVidiaVideoSync)
     TESTVIDEOSYNC(DRMVideoSync)
 #ifdef USING_OPENGL_VSYNC
-    TESTVIDEOSYNC(OpenGLVideoSync)
+    if ((gContext->GetNumSetting("UseOpenGLVSync", 1)) && (getenv("NO_OPENGL_VSYNC") == NULL))
+    {
+        TESTVIDEOSYNC(OpenGLVideoSync)
+    }
 #endif
 #ifdef __linux__
     TESTVIDEOSYNC(RTCVideoSync)
