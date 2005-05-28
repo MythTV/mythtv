@@ -35,7 +35,14 @@
      <action>JUMP Video Manager</action>
      <depends>mythvideo</depends>
    </button>
-   
+    
+    <button>
+      <type>SETUP_KEYS</type>
+      <text>Edit Keys</text>
+      <action>PLUGIN mythcontrols</action>
+      <depends>mythcontrols</depends>	
+   </button>
+      
    <button>
      <type>SETUP_MENU</type>
      <text>Setup</text>

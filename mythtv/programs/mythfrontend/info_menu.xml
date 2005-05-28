@@ -1,4 +1,18 @@
 <mythmenu name="INFO">
+   <button>
+     <type>PHONE</type>
+     <text>Phone</text>
+     <text lang="JA">電話</text>
+     <text lang="DE">Telefon</text>
+     <text lang="FI">Puhelin</text>
+     <text lang="NL">Telefoon</text>     
+     <text lang="SV">Telefon</text>
+     <text lang="FR">Téléphone</text>
+     <text lang="SI">Telefon</text>
+     <text lang="ET">Telefon</text>
+     <action>PLUGIN mythphone</action>
+     <depends>mythphone</depends>
+   </button>
 
    <button>
      <type>NEWS</type>
