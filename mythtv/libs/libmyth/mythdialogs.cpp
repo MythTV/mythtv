@@ -433,6 +433,34 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     return retval;
 }
 
+void MythMainWindow::ClearKeylist(const QString &context, const QString &action)
+{
+    KeyContext * keycontext = d->keyContexts[context];
+    if (keycontext == NULL) return;
+
+    QMap<int,QStringList>::Iterator it;
+    for (it = keycontext->actionMap.begin();
+	 it != keycontext->actionMap.end();
+	 it++)
+    {
+
+	/* find a pair with the action we are looking for */
+	QStringList::iterator at = it.data().find(action);
+
+	/* until the end of actions is reached check for keys */
+	while (at != it.data().end())
+	{
+	    /* the key should never contain duplicate actions */
+	    at = it.data().remove(at);
+	    /* but just in case, look again */
+	    at = it.data().find(at, action);
+	}
+
+	/* dont keep unbound keys in the map */
+	if (it.data().isEmpty()) keycontext->actionMap.erase(it);
+    }
+}
+
 void MythMainWindow::RegisterKey(const QString &context, const QString &action,
                                  const QString &description, const QString &key)
 {
