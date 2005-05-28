@@ -1,0 +1,45 @@
+MythControls
+Beta Version
+
+GENERAL
+-------
+
+This is an early release of mythcontrols.  There are probably bugs,
+and the theme needs alot of work.  Feel free to email me (see the
+AUTHOR file) or the developers list with any suggestions or bug
+reports.  Actually, _PLEASE_ email me with any theme/interface
+suggestions.  If anyone is good with the gimp, I'd love an icon.
+
+
+BUILD/CONFIGURATION INSTRUCTIONS
+--------------------------------
+
+Adjust your prefix in settings.pro, then execute:
+
+qmake mythcontrols.pro
+make
+
+
+INSTALLATION INSTRUCTIONS
+-------------------------
+
+Having built MythControls, execute:
+
+make install.
+
+Following the installation of the library and UI files, you need to
+update the MythTV menus to include MythControls.
+
+The most logical place (I can think of) to include the MythControls
+menu item is in the main settings menu.  To add the MythControls menu
+item to the main settings menu, add the following to
+main_settings.xml:
+
+<button>
+  <type>CONTROL_MENU</type>
+  <text>Controls</text>
+  <action>PLUGIN mythcontrols</action>
+  <depends>mythcontrols</depends>
+</button>
+
+I think that is all you need to do.

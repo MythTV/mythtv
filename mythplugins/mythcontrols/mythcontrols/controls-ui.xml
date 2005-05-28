@@ -1,0 +1,167 @@
+<mythuitheme>
+
+ <window name="controls">
+
+  <font name="active" face="Arial">
+   <color>#ffffff</color>
+   <size>16</size>
+   <bold>yes</bold>
+  </font>
+
+  <font name="inactive" face="Arial">
+   <color>#9999cc</color>
+   <size>16</size>
+   <bold>yes</bold>
+  </font>
+
+  <font name="selectable" face="Arial">
+   <color>#8cdeff</color>
+   <size>16</size>
+   <bold>yes</bold>
+  </font>
+
+  <font name="labels" face="Arial">
+   <color>#ffffff</color>
+   <size>16</size>
+   <shadow>1,1</shadow>
+   <bold>yes</bold>
+  </font>
+
+  <font name="keysfont" face="Arial">
+   <color>#ffffff</color>
+   <size>12</size>
+   <shadow>1,1</shadow>
+   <bold>yes</bold>
+  </font>
+
+  <font name="directorfnt" face="Arial">
+   <color>#ffffff</color>
+   <size>18</size>
+   <shadow>1,1</shadow>
+   <bold>yes</bold>
+  </font>
+
+  <font name="moviedata" face="Arial">
+   <color>#ffff33</color>
+   <size>16</size>
+   <shadow>1,1</shadow>
+   <bold>yes</bold>
+  </font>
+
+  <font name="inactive_font" face="Arial">
+   <color>#9999cc</color>
+   <size>16</size>
+   <bold>yes</bold>
+  </font>
+
+  <font name="bigtitle" face="Arial">
+   <color>#ffffff</color>
+   <dropcolor>#000000</dropcolor>
+   <size>50</size>
+   <shadow>3,3</shadow>
+   <bold>yes</bold>
+  </font>
+
+  <font name="titlefnt" face="Arial">
+   <color>#ffffff</color>
+   <dropcolor>#000000</dropcolor>
+   <shadow>1,1</shadow>
+   <size>27</size>
+   <bold>yes</bold>
+  </font>
+
+  <font name="leadfnt" face="Arial">
+   <color>#ffffff</color>
+   <dropcolor>#000000</dropcolor>
+   <shadow>1,1</shadow>
+   <size>40</size>
+   <bold>yes</bold>
+  </font>
+
+  <font name="info" face="Arial">
+   <color>#ffffff</color>
+   <size>14</size>
+   <shadow>1,1</shadow>
+   <bold>yes</bold>
+  </font>
+
+  <font name="message" face="Arial">
+   <color>#ffffff</color>
+   <size>16</size>
+   <shadow>1,1</shadow>
+   <bold>yes</bold>
+  </font>
+
+  <container name="controls">
+   <area>0,0,800,305</area>
+
+   <managedtreelist name="controltree" draworder="1" bins="2">
+    <area>0,40,800,310</area>
+
+    <image function="selectionbar" filename="bar.png"/>
+    <image function="uparrow" filename="scrollarrow-up.png"/>
+    <image function="downarrow" filename="scrollarrow-dn.png"/>
+    <image function="leftarrow" filename="scrollarrow-left.png"/>
+    <image function="rightarrow" filename="scrollarrow-right.png"/>
+
+    <bin number="1">
+     <area>30,22,190,250</area>
+     <fcnfont name="active" function="active"></fcnfont>
+     <fcnfont name="inactive" function="inactive"></fcnfont>
+     <fcnfont name="active" function="selected"></fcnfont>
+     <fcnfont name="selectable" function="selectable"></fcnfont>     
+    </bin>
+
+    <bin number="2">
+     <area>240,18,525,265</area>
+     <fcnfont name="active" function="active"></fcnfont>
+     <fcnfont name="inactive" function="inactive"></fcnfont>
+     <fcnfont name="active" function="selected"></fcnfont>
+     <fcnfont name="selectable" function="selectable"></fcnfont>     
+    </bin>
+
+   </managedtreelist>
+
+   <image name="showinglines" draworder="2" fleximage="yes">
+    <filename>showings.png</filename>
+    <position>0,4</position>
+   </image>
+
+  </container>
+
+  <container name="actioninfo">
+   <area>20,400,780,500</area>
+
+   <textarea name="action_keys_label" draworder="1" allign="left">
+    <font>info</font>
+    <area>20,10,130,30</area>
+    <value>Keys:</value>
+   </textarea>
+
+   <textarea name="action_keys" draworder="1" allign="left">
+    <font>info</font>
+    <area>175,10,680,30</area>
+   </textarea>
+
+   <textarea name="action_description_label" draworder="1" allign="left">
+    <font>info</font>
+    <area>20,40,140,60</area>
+    <value>Description:</value>
+   </textarea>
+
+   <textarea name="action_description" draworder="1" allign="left">
+    <font>info</font>
+    <multiline>yes</multiline>
+    <area>175,40,580,80</area>
+   </textarea>
+
+   <image name="datalines" draworder="3" fleximage="no">
+    <filename>rk-lines.png</filename>
+    <position>0,0</position>
+    <staticsize>760,100</staticsize>
+   </image>
+
+  </container>
+
+ </window>
+</mythuitheme>

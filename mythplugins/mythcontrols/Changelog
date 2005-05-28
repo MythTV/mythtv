@@ -1,0 +1,21 @@
+13/05/05	Micah
+	* Mandatory keys are bound to their defaults if nothing else
+	  is bound to them.
+	* Conflicts are now resolved.
+	* Cleaned up how keys strings are parsed (split and joined).
+	  QKeySequence take care of truncating key strings.
+	* Broke classes into individual files.  Compile time is much
+	  faster.
+
+12/05/05	Micah
+	* Conflicts are now detected.  Resolution still needs to be done.
+	* Duplicate keys are not added.
+
+06/05/05	Micah
+	* Using QDicts.  Much easier.
+	* Removed limit of four keybindings per action.
+
+03/04/05	Micah
+
+	* Initial Version which uses ManagedTreeList.  This will
+	  probably change.
