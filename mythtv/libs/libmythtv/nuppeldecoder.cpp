@@ -1,15 +1,18 @@
+// C headers
+#include <cerrno>
+#include <cassert>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <assert.h>
-#include <errno.h>
-
-#include <iostream>
 #include <pthread.h>
-#include "config.h"
 
+// C++ headers
+#include <iostream>
 using namespace std;
 
+// MythTV headers
+#include "mythconfig.h"
 #include "nuppeldecoder.h"
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
@@ -298,8 +301,11 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         struct rtframeheader seek_frameheader;
 
         int seekret = ringBuffer->Seek(extradata.seektable_offset, SEEK_SET);
-        if (seekret == -1) {
-            perror("seek");
+        if (seekret == -1)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("NuppelDecoder::OpenFile(): seek error (%1)")
+                    .arg(strerror(errno)));
         }
 
         ReadFrameheader(&seek_frameheader);
@@ -362,12 +368,11 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         int kfa_ret = ringBuffer->Seek(extradata.keyframeadjust_offset, 
                                        SEEK_SET);
-        if (kfa_ret == -1) {
-            char b[100];
-            if (strerror_r(errno,b,sizeof(b))) b[0] = 0;
-            b[99] = 0;
-            VERBOSE(VB_IMPORTANT, QString("keyframeadjust: %1: %2")
-                    .arg(errno).arg(b));
+        if (kfa_ret == -1)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("NuppelDecoder::OpenFile(): keyframeadjust (%1)")
+                    .arg(strerror(errno)));
         }
 
         ringBuffer->Read(&kfa_frameheader, FRAMEHEADERSIZE);
