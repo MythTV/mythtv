@@ -2,6 +2,7 @@
 #include "signalmonitor.h"
 #include <sys/types.h>
 #include <signal.h>
+#include <unistd.h>
 
 /** \class SignalMonitor
  *  \brief Signal monitoring base class.
