@@ -149,16 +149,16 @@ int main(int argc, char *argv[])
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
-    if (geometry != "")
-        if (!gContext->ParseGeometryOverride(geometry))
-            cerr << "Illegal -geometry argument '"
-                 << geometry << "' (ignored)\n";
-
     if (!gContext->Init(true))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return -1;
     }
+
+    if (geometry != "")
+        if (!gContext->ParseGeometryOverride(geometry))
+            cerr << "Illegal -geometry argument '"
+                 << geometry << "' (ignored)\n";
 
     if (!MSqlQuery::testDBConnection())
     {
