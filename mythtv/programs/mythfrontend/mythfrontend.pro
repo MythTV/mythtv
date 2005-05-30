@@ -52,3 +52,8 @@ SOURCES += customrecord.cpp
 macx {
     RC_FILE += mythfrontend.icns
 }
+
+using_opengl_vsync {
+    CONFIG += opengl
+    DEFINES += USING_OPENGL_VSYNC
+}
