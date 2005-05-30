@@ -79,8 +79,8 @@ int FileTransfer::RequestBlock(int size)
         
         if (rbuffer->GetStopReads() || ret <= 0)
             break;
-            
-        if (!WriteBlock(sock->socketDevice(), requestBuffer, ret))
+
+        if (!WriteBlock(sock->socketDevice(), requestBuffer, (uint)ret))
         {
             tot = -1;
             break;
