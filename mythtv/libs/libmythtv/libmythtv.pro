@@ -95,6 +95,9 @@ unix {
 }
 
 macx {
+    HEADERS -= pchdtvsignalmonitor.h
+    SOURCES -= pchdtvsignalmonitor.cpp
+
     SOURCES += videoout_quartz.cpp
     HEADERS += videoout_quartz.h
 
