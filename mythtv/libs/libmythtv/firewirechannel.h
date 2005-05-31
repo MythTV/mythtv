@@ -38,6 +38,7 @@ class FirewireChannel : public ChannelBase
     void SwitchToInput(int newcapchannel, bool setstarting)
                       { (void)newcapchannel; (void)setstarting; }
     void SetExternalChanger(void);
+    virtual int GetFd() { return 0; }
 private:
     firewire_options_t fw_opts;
     nodeid_t fwnode;
