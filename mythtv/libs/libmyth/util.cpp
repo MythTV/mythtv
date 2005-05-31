@@ -35,6 +35,10 @@ using namespace std;
 #include "util.h"
 #include "mythcontext.h"
 
+#ifdef CONFIG_DARWIN
+#include <mach/mach.h> 
+#endif
+
 #ifdef USE_LIRC
 #include "lircevent.h"
 #endif
