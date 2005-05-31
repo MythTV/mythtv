@@ -175,13 +175,6 @@
       <depends>mythRecipe</depends>
    </button>
 
-    <button>
-      <type>SETUP_KEYS</type>
-      <text>Edit Keys</text>
-      <action>PLUGIN mythcontrols</action>
-      <depends>mythcontrols</depends>
-   </button>
-
    <button>
      <type>SETUP</type>
      <text>Setup</text>

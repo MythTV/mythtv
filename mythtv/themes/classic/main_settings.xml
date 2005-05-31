@@ -35,6 +35,13 @@
       <action>SETTINGS APPEARANCE</action>
    </button>
 
+    <button>
+      <type>SETUP_KEYS</type>
+      <text>Edit Keys</text>
+      <action>PLUGIN mythcontrols</action>
+      <depends>mythcontrols</depends>
+   </button>
+
    <button>
      <type>SETTINGS_TV</type>
      <text>TV Settings</text>
