@@ -40,6 +40,9 @@ bool copyToCutlist = false;
 
 double fps = 29.97; 
 
+#define print_v0(ARGS...) printf(ARGS)
+#define print_v1(ARGS...) do { if (!quiet) printf(ARGS); } while (0)
+
 void BuildVideoMarkup(QString& filename)
 {
     ProgramInfo* program_info = new ProgramInfo;
@@ -53,7 +56,7 @@ void BuildVideoMarkup(QString& filename)
 
     if (!MSqlQuery::testDBConnection())
     {
-        cerr << "Unable to open commflag db connection\n";
+        VERBOSE(VB_IMPORTANT, "Unable to open DB connection for commercial flagging.");
         delete tmprbuf;
         delete program_info;
         return;
@@ -64,8 +67,7 @@ void BuildVideoMarkup(QString& filename)
 
     nvp->RebuildSeekTable(!quiet);
 
-    if (!quiet)
-        printf( "Rebuilt\n" );
+    print_v1( "Rebuilt\n" );
 
     delete nvp;
     delete tmprbuf;
@@ -82,8 +84,9 @@ void CopySkipListToCutList(QString chanid, QString starttime)
 
     if (!pginfo)
     {
-        cerr << "No program data exists for channel " <<
-            chanid.ascii() << "at " << starttime.ascii() << endl;
+        VERBOSE(VB_IMPORTANT,
+                QString("No program data exists for channel %1 at %2")
+                .arg(chanid.ascii()).arg(starttime.ascii()));
         exit(COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA);
     }
 
@@ -107,39 +110,29 @@ int FlagCommercials(QString chanid, QString starttime)
 
     if (!program_info)
     {
-        printf( "No program data exists for channel %s at %s\n",
-            chanid.ascii(), starttime.ascii());
+        VERBOSE(VB_IMPORTANT,
+                QString("No program data exists for channel %1 at %2")
+                .arg(chanid.ascii()).arg(starttime.ascii()));
         return COMMFLAG_EXIT_NO_PROGRAM_DATA;
     }
 
     QString filename = program_info->GetRecordFilename("...");
 
-    if (!quiet)
+    print_v1( "%-6.6s  %-14.14s  %-41.41s  ", chanid.ascii(),
+              starttime.ascii(), program_info->title.ascii());
+    fflush( stdout );
+    if ((!force) && (program_info->IsCommProcessing()))
     {
-        printf( "%-6.6s  %-14.14s  %-41.41s  ",
-            chanid.ascii(), starttime.ascii(), program_info->title.ascii());
-        fflush( stdout );
-    
-        if ((!force) && (program_info->IsCommProcessing()))
-        {
-            printf( "IN USE\n" );
-            printf( "                        "
-                        "(the program is already being flagged elsewhere)\n" );
-            return COMMFLAG_EXIT_IN_USE;
-        }
-    }
-    else
-    {
-        if ((!force) && (program_info->IsCommProcessing()))
-            return COMMFLAG_EXIT_IN_USE;
+        VERBOSE(VB_IMPORTANT,
+                "Error, the program is already being flagged elsewhere.");
+        return COMMFLAG_EXIT_IN_USE;
     }
 
     filename = program_info->GetPlaybackURL();
 
     if (testMode)
     {
-        if (!quiet)
-            printf( "0 (test)\n" );
+        print_v1( "0 (test)\n" );
         return COMMFLAG_EXIT_TEST_MODE;
     }
 
@@ -154,12 +147,12 @@ int FlagCommercials(QString chanid, QString starttime)
             QMap<long long, int>::Iterator i;
             long long last_blank = -1;
 
-            printf( "\n" );
+            print_v0( "\n" );
 
             program_info->GetCommBreakList(breaks);
             if (!breaks.empty())
             {
-                printf( "Breaks (from recordedmarkup table)\n" );
+                print_v0( "Breaks (from recordedmarkup table)\n" );
                 for (i = breaks.begin(); i != breaks.end(); ++i)
                 {
                     long long frame = i.key();
@@ -169,9 +162,9 @@ int FlagCommercials(QString chanid, QString starttime)
                     int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
                     int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
                                 (hour * 60 * 60 * my_fps));
-                    printf( "%7lld : %d (%02d:%02d:%02d.%02d) (%d)\n",
-                        i.key(), i.data(), hour, min, sec, frm,
-                        (int)(frame / my_fps));
+                    print_v0( "%7lld : %d (%02d:%02d:%02d.%02d) (%d)\n",
+                              i.key(), i.data(), hour, min, sec, frm,
+                              (int)(frame / my_fps));
                 }
             }
 
@@ -187,21 +180,21 @@ int FlagCommercials(QString chanid, QString starttime)
                     int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
                     int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
                                 (hour * 60 * 60 * my_fps));
-                    printf( "(skip %lld)\nBlank: (%02d:%02d:%02d.%02d) (%d) ",
-                        frame - last_blank, hour, min, sec, frm,
-                        (int)(frame / my_fps));
+                    print_v0( "(skip %lld)\nBlank: (%02d:%02d:%02d.%02d) (%d) ",
+                              frame - last_blank, hour, min, sec, frm,
+                              (int)(frame / my_fps));
                 }
-                printf( "%lld ", frame );
+                print_v0( "%lld ", frame );
                 last_blank = frame;
             }
-            printf( "\n" );
+            print_v0( "\n" );
 
             // build break list and print what it would be
             CommDetect *commDetect = new CommDetect(0, 0, fps,
                                                     commDetectMethod);
             commDetect->SetBlankFrameMap(blanks);
             commDetect->GetBlankCommMap(comms);
-            printf( "Commercials (computed using only blank frame detection)\n" );
+            print_v0( "Commercials (computed using only blank frame detection)\n" );
             for (i = comms.begin(); i != comms.end(); ++i)
             {
                 long long frame = i.key();
@@ -211,14 +204,14 @@ int FlagCommercials(QString chanid, QString starttime)
                 int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
                 int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
                             (hour * 60 * 60 * my_fps));
-                printf( "%7lld : %d (%02d:%02d:%02d.%02d) (%d)\n",
-                    i.key(), i.data(), hour, min, sec, frm,
-                    (int)(frame / my_fps));
+                print_v0( "%7lld : %d (%02d:%02d:%02d.%02d) (%d)\n",
+                          i.key(), i.data(), hour, min, sec, frm,
+                          (int)(frame / my_fps));
             }
 
             commDetect->GetBlankCommBreakMap(breaks);
 
-            printf( "Breaks (computed using only blank frame detection)\n" );
+            print_v0( "Breaks (computed using only blank frame detection)\n" );
             for (i = breaks.begin(); i != breaks.end(); ++i)
             {
                 long long frame = i.key();
@@ -228,14 +221,14 @@ int FlagCommercials(QString chanid, QString starttime)
                 int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
                 int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
                             (hour * 60 * 60 * my_fps));
-                printf( "%7lld : %d (%02d:%02d:%02d.%02d) (%d)\n",
-                    i.key(), i.data(), hour, min, sec, frm,
-                    (int)(frame / my_fps));
+                print_v0( "%7lld : %d (%02d:%02d:%02d.%02d) (%d)\n",
+                          i.key(), i.data(), hour, min, sec, frm,
+                          (int)(frame / my_fps));
             }
 
             if (justBlanks)
             {
-                printf( "Saving new commercial break list to database.\n" );
+                print_v0( "Saving new commercial break list to database.\n" );
                 program_info->SetCommBreakList(breaks);
             }
 
@@ -265,16 +258,13 @@ int FlagCommercials(QString chanid, QString starttime)
             commDetect->GetCommBreakMap(breaks);
             program_info->SetCommBreakList(breaks);
 
-            if (!quiet)
-                printf( "%ld -> %ld\n",
-                    orig_breaks.count() / 2, breaks.count() / 2);
+            print_v1( "%d -> %d\n", orig_breaks.count()/2, breaks.count()/2);
 
             delete commDetect;
         }
         else
         {
-            if (!quiet)
-                printf( "no blanks\n" );
+            print_v1( "no blanks\n" );
         }
         delete program_info;
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
@@ -284,7 +274,7 @@ int FlagCommercials(QString chanid, QString starttime)
 
     if (!MSqlQuery::testDBConnection())
     {
-        cerr << "Unable to open commflag db connection\n";
+        VERBOSE(VB_IMPORTANT, "Unable to open commflag DB connection");
         delete tmprbuf;
         delete program_info;
         return COMMFLAG_EXIT_DB_ERROR;
@@ -297,8 +287,7 @@ int FlagCommercials(QString chanid, QString starttime)
     {
         nvp->RebuildSeekTable();
 
-        if (!quiet)
-            printf( "Rebuilt\n" );
+        print_v1( "Rebuilt\n" );
     }
     else
     {
@@ -314,14 +303,14 @@ int FlagCommercials(QString chanid, QString starttime)
             if (recorder && (recorder->GetRecorderNumber() != -1))
                 nvp->SetRecorder(recorder);
             else
-                cerr << "Unable to find active recorder for this recording, "
-                     << "flagging info may be negatively affected." << endl;
+                 VERBOSE(VB_IMPORTANT, 
+                         "Unable to find active recorder for this recording, "
+                         "\n\t\t\tflagging info may be negatively affected.");
         }
         breaksFound = nvp->FlagCommercials(showPercentage, fullSpeed,
                                            inJobQueue);
 
-        if (!quiet)
-            printf( "%d\n", breaksFound );
+        print_v1( "%d\n", breaksFound );
     }
 
     delete nvp;
@@ -360,7 +349,8 @@ int main(int argc, char *argv[])
             if (((argpos + 1) >= a.argc()) ||
                 !strncmp(a.argv()[argpos + 1], "--", 2))
             {
-                printf("missing or invalid parameters for --chanid option\n");
+                VERBOSE(VB_IMPORTANT,
+                        "Missing or invalid parameters for --chanid option");
                 return COMMFLAG_EXIT_INVALID_CHANID;
             }
             
@@ -372,7 +362,8 @@ int main(int argc, char *argv[])
             if (((argpos + 1) >= a.argc()) ||
                 !strncmp(a.argv()[argpos + 1], "--", 2))
             {
-                printf("missing or invalid parameters for --starttime option\n");
+                VERBOSE(VB_IMPORTANT,
+                        "Missing or invalid parameters for --starttime option");
                 return COMMFLAG_EXIT_INVALID_STARTTIME;
             }
             
@@ -394,7 +385,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"--video"))
         {
             filename = (a.argv()[++argpos]);
-            cerr << filename << endl;
+            VERBOSE(VB_GENERAL, filename);
             isVideo = true;
             rebuildSeekTable = true;
             beNice = false;
@@ -466,7 +457,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                cerr << "Missing argument to -V option\n";
+                VERBOSE(VB_IMPORTANT, "Missing argument to -V option");
                 return COMMFLAG_EXIT_INVALID_CMDLINE;
             }
         }
@@ -478,7 +469,8 @@ int main(int argc, char *argv[])
                 QString temp = a.argv()[argpos+1];
                 if (temp.startsWith("-"))
                 {
-                    cerr << "Invalid or missing argument to -v/--verbose option\n";
+                    VERBOSE(VB_IMPORTANT, "Invalid or missing "
+                            "argument to -v/--verbose option");
                     return COMMFLAG_EXIT_INVALID_CMDLINE;
                 }
                 else
@@ -551,58 +543,62 @@ int main(int argc, char *argv[])
                         }
                         else
                         {
-                            cerr << "Unknown argument for -v/--verbose: "
-                                 << *it << endl;;
+                            VERBOSE(VB_IMPORTANT,
+                                    QString("Unknown argument for -v/"
+                                            "--verbose: %1").arg(*it));
                         }
                     }
                 }
             } else
             {
-                cerr << "Missing argument to -v/--verbose option\n";
+                VERBOSE(VB_IMPORTANT,
+                        "Missing argument to -v/--verbose option");
                 return COMMFLAG_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-h") ||
                  !strcmp(a.argv()[argpos],"--help"))
         {
-            cerr << "Valid Options are:" << endl <<
-                    "-c OR --chanid chanid        Flag recording with given channel ID" << endl <<
-                    "-s OR --starttime starttime  Flag recording with given starttime" << endl <<
-                    "-f OR --file filename        Flag recording with specific filename" << endl <<
-                    "--video filename             Rebuild the seektable for a video (non-recording) file" << endl <<
-                    "--sleep                      Give up some CPU time after processing" << endl <<
-                    "--rebuild                    Do not flag commercials, just rebuild seektable" << endl <<
-                    "--gencutlist                 Copy the commercial skip list to the cutlist" << endl <<
-                    "                             each frame." << endl <<
-                    "-v OR --verbose debug-level  Prints more information" << endl <<
-                    "                             Accepts any combination (separated by comma)" << endl << 
-                    "                             of all,none,quiet,record,playback," << endl <<
-                    "                             channel,osd,file,schedule,network,commflag" << endl <<
-                    "--quiet                      Turn OFF display (also causes the program to" << endl <<
-                    "                             sleep a little every frame so it doesn't hog CPU)" << endl <<
-                    "                             (takes precedence over --blanks if given first)" << endl <<
-                    "--blanks                     Show list of blank frames if already in database" << endl <<
-                    "                             (takes precedence over --quiet if given first)" << endl <<
-                    "--fps fps                    Set the Frames Per Second.  Only necessary when" << endl <<
-                    "                             running with the '--blanks' option since all" << endl <<
-                    "                             other processing modes get the frame rate from" << endl <<
-                    "                             the player." << endl <<
-                    "--all                        Re-run commercial flagging for all recorded" << endl <<
-                    "                             programs using current detection method." << endl <<
-                    "--force                      Force flagging of a video even if mythcommflag" << endl <<
-                    "                             thinks it is already in use by another instance." << endl <<
-                    "--hogcpu                     Do not nice the flagging process." << endl <<
-                    "                             WARNING: This will consume all free CPU time." << endl <<
-                    "-h OR --help                 This text" << endl << endl <<
-                    "Note: both --chanid and --starttime must be used together" << endl <<
-                    "      if either is used." << endl << endl <<
-                    "If no command line arguments are specified, all" << endl <<
-                    "unflagged videos will be flagged." << endl << endl;
+            VERBOSE(VB_IMPORTANT,
+                    "Valid Options are:\n"
+                    "-c OR --chanid chanid        Flag recording with given channel ID\n"
+                    "-s OR --starttime starttime  Flag recording with given starttime\n"
+                    "-f OR --file filename        Flag recording with specific filename\n"
+                    "--video filename             Rebuild the seektable for a video (non-recording) file\n"
+                    "--sleep                      Give up some CPU time after processing\n"
+                    "--rebuild                    Do not flag commercials, just rebuild seektable\n"
+                    "--gencutlist                 Copy the commercial skip list to the cutlist\n"
+                    "                             each frame.\n"
+                    "-v OR --verbose debug-level  Prints more information\n"
+                    "                             Accepts any combination (separated by comma)\n" 
+                    "                             of all,none,quiet,record,playback,\n"
+                    "                             channel,osd,file,schedule,network,commflag\n"
+                    "--quiet                      Turn OFF display (also causes the program to\n"
+                    "                             sleep a little every frame so it doesn't hog CPU)\n"
+                    "                             takes precedence over --blanks if given first)\n"
+                    "--blanks                     Show list of blank frames if already in database\n"
+                    "                             (takes precedence over --quiet if given first)\n"
+                    "--fps fps                    Set the Frames Per Second.  Only necessary when\n"
+                    "                             running with the '--blanks' option since all\n"
+                    "                             other processing modes get the frame rate from\n"
+                    "                             the player.\n"
+                    "--all                        Re-run commercial flagging for all recorded\n"
+                    "                             programs using current detection method.\n"
+                    "--force                      Force flagging of a video even if mythcommflag\n"
+                    "                             thinks it is already in use by another instance.\n"
+                    "--hogcpu                     Do not nice the flagging process.\n"
+                    "                             WARNING: This will consume all free CPU time.\n"
+                    "-h OR --help                 This text\n\n"
+                    "Note: both --chanid and --starttime must be used together\n"
+                    "      if either is used.\n\n"
+                    "If no command line arguments are specified, all\n"
+                    "unflagged videos will be flagged.\n\n");
             return COMMFLAG_EXIT_INVALID_CMDLINE;
         }
         else
         {
-            printf("illegal option: '%s' (use --help)\n", a.argv()[argpos]);
+            VERBOSE(VB_IMPORTANT, QString("Illegal option: '%1' (use --help)")
+                    .arg(a.argv()[argpos]));
             return COMMFLAG_EXIT_INVALID_CMDLINE;
         }
 
@@ -667,36 +663,36 @@ int main(int argc, char *argv[])
 
         VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
-        printf( "\n" );
-        printf( "MythTV Commercial Flagger, started at %s", ctime(&time_now));
+        print_v0( "\n" );
+        print_v0( "MythTV Commercial Flagger, started at %s", ctime(&time_now));
 
-        printf( "\n" );
+        print_v0( "\n" );
         if (!isVideo)
         {
             if (!rebuildSeekTable)
             {
-                printf( "Flagging commercial breaks for:\n" );
+                print_v0( "Flagging commercial breaks for:\n" );
                 if (a.argc() == 1)
-                    printf( "ALL Un-flagged programs\n" );
+                    print_v0( "ALL Un-flagged programs\n" );
             }
             else
             {
-                printf( "Rebuilding SeekTable(s) for:\n" );
+                print_v0( "Rebuilding SeekTable(s) for:\n" );
             }
 
-            printf( "ChanID  Start Time      "
+            print_v0( "ChanID  Start Time      "
                     "Title                                      " );
             if (rebuildSeekTable)
-                printf("Status\n");
+                print_v0("Status\n");
             else
-                printf("Breaks\n");
+                print_v0("Breaks\n");
 
-            printf( "------  --------------  "
-                    "-----------------------------------------  ------\n" );
+            print_v0( "------  --------------  "
+                      "-----------------------------------------  ------\n" );
         }
         else
         {
-            printf( "Building seek table for: %s\n", (const char*)filename);
+            print_v0( "Building seek table for: %s\n", (const char*)filename);
         }
     }
 
@@ -769,11 +765,7 @@ int main(int argc, char *argv[])
 
     time_now = time(NULL);
 
-    if (!quiet)
-    {
-        printf( "\n" );
-        printf( "Finished commercial break flagging at %s", ctime(&time_now));
-    }
+    print_v1( "\nFinished commercial break flagging at %s", ctime(&time_now));
 
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
