@@ -18,6 +18,8 @@
 #include "cdinput.h"
 #include "encoder.h"
 #include "vorbisencoder.h"
+#include "flacencoder.h"
+#include "lameencoder.h"
 
 AudioCdJob::AudioCdJob(
                         Transcoder                 *owner,
@@ -175,7 +177,7 @@ void AudioCdJob::run()
 
         QString destination_filename = destination_dir_string;
         handleFileTokens(destination_filename, private_copy_of_metadata);
-        if (quality == MFD_TRANSCODER_AUDIO_QUALITY_PERFECT)
+        if (quality == MFD_TRANSCODER_AUDIO_QUALITY_PERFECT || codec == MFD_TRANSCODER_AUDIO_CODEC_FLAC)
         {
             destination_filename.append(".flac");
         }
@@ -285,14 +287,31 @@ bool AudioCdJob::ripAndEncodeTrack(QUrl track_url, QString destination_filename,
     }
 
 
-    encoder = new VorbisEncoder(temp_filename, 3, metadata);
-
     bool success = true;
     bool done = false;
     char *buffer = new char[4097];
     int total_read = 0;
     int file_size = source->size();
     int amount_read = 0;
+
+    if (quality == MFD_TRANSCODER_AUDIO_QUALITY_PERFECT || codec == MFD_TRANSCODER_AUDIO_CODEC_FLAC)
+    {
+        encoder = new FlacEncoder(temp_filename, quality, metadata);
+    }
+    else if (codec == MFD_TRANSCODER_AUDIO_CODEC_OGG)
+    {
+        encoder = new VorbisEncoder(temp_filename, quality, metadata);
+    }
+    else if (codec == MFD_TRANSCODER_AUDIO_CODEC_MP3)
+    {
+        encoder = new LameEncoder(temp_filename, quality, metadata);
+    }
+    else
+    {
+        warning("unknown or non-sensical codec quality settings will setting encoder");
+        done = true;
+        success = false;
+    }
 
     while(!done)
     {

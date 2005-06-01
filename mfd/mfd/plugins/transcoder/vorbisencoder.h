@@ -2,9 +2,9 @@
 #define VORBISENCODER_H_
 
 #include <qstring.h>
+#include "encoder.h"
 
 class AudioMetadata;
-class Encoder;
 
 #include <vorbis/vorbisenc.h>
 

@@ -4,7 +4,6 @@
 #include <qprogressbar.h>
 
 #include "metadata.h"
-#include "encoder.h"
 #include "vorbisencoder.h"
 
 
