@@ -1517,16 +1517,24 @@ void MMusicWatcher::handleMetadataChange(int which_collection, bool external)
 {
 
     //
-    //  We only care if the change was to the collection we're responsible
-    //  for, and the change was external (which means something else changed
-    //  our metadata on us). Typically, this would mean a user edited
-    //  something, so we need to persist changed back to the database.
+    //  We certainly care if the change was to the collection we're
+    //  responsible for, and the change was external (which means something
+    //  else changed our metadata on us). Typically, this would mean a user
+    //  edited something, so we need to persist changed back to the
+    //  database.
     //
 
-    if(which_collection == container_id && external)
+    if (which_collection == container_id && external)
     {
         possiblySaveToDb();
     }
+
+    //
+    //  We also care if another local audio collection was just marked as no
+    //  longer being ripped (which means there will probably be new files
+    //  for us to sweep).
+    //
+    
 }
 
 void MMusicWatcher::possiblySaveToDb()

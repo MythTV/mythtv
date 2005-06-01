@@ -9,7 +9,7 @@
 	Base class for jobs that involve importing content
 */
 
-#include <qstring.h>
+#include <qdir.h>
 
 #include "job.h"
 
@@ -30,6 +30,7 @@ class ImportJob: public TranscoderJob
              );
 
     virtual ~ImportJob();
+    virtual bool setupScratch();
 
   protected:
   
@@ -37,6 +38,7 @@ class ImportJob: public TranscoderJob
     QString         destination_dir_string;
     MetadataServer *metadata_server;
     int             container_id;
+    QDir           *scratch_dir;
 };
 
 #endif  // importjob_h_

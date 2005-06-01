@@ -1154,6 +1154,8 @@ int MetadataClient::parseCollection(MdcapInput &mdcap_input)
                      << "which is pretty awful of it"
                      << endl;
             }
+
+            a_collection->setBeingRipped(new_collection_being_ripped);
             
         }
         else
@@ -1184,6 +1186,9 @@ int MetadataClient::parseCollection(MdcapInput &mdcap_input)
             new_collection->setRipable(new_collection_ripable);
             new_collection->setBeingRipped(new_collection_being_ripped);
             metadata_collections.append(new_collection);
+            
+            
+            
         }
              
         return new_collection_id;

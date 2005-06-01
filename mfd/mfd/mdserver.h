@@ -99,6 +99,8 @@ class MetadataServer : public MFDHttpPlugin
     int                         getLastDestroyedCollection();
     QValueList<int>             getLastDestroyedMetadataList(){return last_destroyed_metadata;}
     QValueList<int>             getLastDestroyedPlaylistList(){return last_destroyed_playlists;}
+    void                        markCollectionAsBeingRipped(int collection_id, bool being_ripped);
+
 
     //
     //  mdcap related serving functions

@@ -359,6 +359,16 @@ void MetadataContainer::dataDelta(
     ++generation;
 }
 
+void MetadataContainer::clearDeltasAndBumpGeneration()
+{
+    QValueList<int> empty_list;
+    metadata_additions = empty_list;
+    metadata_deletions = empty_list;
+    playlist_additions = empty_list;
+    playlist_deletions = empty_list;
+    generation++;
+}
+
 void MetadataContainer::mapPlaylists(
                                         QIntDict<Playlist>* new_playlists, 
                                         QValueList<int> playlist_in,

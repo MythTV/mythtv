@@ -130,6 +130,7 @@ class MetadataContainer
     MetadataCollectionServerType   getServerType(){ return server_type;}
     
     int     bumpPlaylistId(){current_playlist_id++; return current_playlist_id;}
+    void    clearDeltasAndBumpGeneration();
     
   protected:
 

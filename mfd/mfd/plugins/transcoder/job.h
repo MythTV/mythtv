@@ -13,6 +13,7 @@
 using namespace std;
 
 #include <qthread.h>
+#include <qstring.h>
 
 class Transcoder;
 
@@ -26,11 +27,24 @@ class TranscoderJob: public QThread
                     int             l_job_id
                  );
     virtual ~TranscoderJob();
+    virtual void stop();
+
+    void log(const QString &log_message, int verbosity);
+    void warning(const QString &warn_message);
+    int  getId();
 
   protected:
   
+    bool            keep_going;
+    QMutex          keep_going_mutex;
     Transcoder     *parent;
     int             job_id;
+
+    QString         major_status_description;
+    QString         minor_status_description;
+    int             major_status;   //  0-100 inclusive
+    int             minor_status;   //  0-100 inclusive
+    QMutex          status_mutex;
 
 };
 

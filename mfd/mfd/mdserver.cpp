@@ -952,6 +952,38 @@ int MetadataServer::getLastDestroyedCollection()
     return return_value;
 }
 
+void MetadataServer::markCollectionAsBeingRipped(int collection_id, bool being_ripped)
+{
+    lockMetadata();
+
+    MetadataContainer *metadata_container = getMetadataContainer(collection_id);
+                
+    if(!metadata_container)
+    {
+        log("could not find metadata container to mark with rip status (shutting down?)", 3);
+        unlockMetadata();
+        return;
+    }
+    
+    metadata_container->setBeingRipped(being_ripped);
+    metadata_container->clearDeltasAndBumpGeneration();
+
+    if(metadata_container->isLocal() && metadata_container->isAudio())
+    {
+        metadata_local_audio_generation_mutex.lock();
+            ++metadata_local_audio_generation;
+        metadata_local_audio_generation_mutex.unlock();
+    }
+
+    unlockMetadata();
+    
+    MetadataChangeEvent *mce = new MetadataChangeEvent(collection_id, true);
+    QApplication::postEvent(parent, mce);   
+
+    dealWithHangingUpdates(); 
+
+}
+
 void MetadataServer::updateDictionary(
                                         MetadataContainer *target, 
                                         QValueList<int> metadata_deletions, 

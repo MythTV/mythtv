@@ -25,7 +25,7 @@ Transcoder::Transcoder(MFD *owner, int identity)
     status_generation = 1;
     top_level_directory = NULL;
     music_destination_directory = NULL;
-
+    jobs.setAutoDelete(true);
 }
 
 
@@ -222,7 +222,23 @@ void Transcoder::run()
         waitForSomethingToHappen();
         checkInternalMessages();
         checkMetadataChanges();
+        checkJobs();
     }
+    
+    //
+    //  Tell any jobs that are still in existence that they have to stop,
+    //  then kill them all off
+    //
+    
+    jobs_mutex.lock();
+        TranscoderJob *a_job;
+        for(a_job = jobs.first(); a_job; a_job = jobs.next())
+        {
+            a_job->stop();
+            a_job->wait();
+        }
+        jobs.clear();
+    jobs_mutex.unlock();
 }
 
 void Transcoder::handleIncoming(HttpInRequest *httpin_request, int)
@@ -327,7 +343,8 @@ void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
             //
             
             
-            TranscoderJob *new_job = new AudioCdJob(    
+            jobs_mutex.lock();
+                TranscoderJob *new_job = new AudioCdJob(    
                                                         this, 
                                                         bumpStatusGeneration(),
                                                         top_level_directory->path(),
@@ -336,8 +353,12 @@ void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
                                                         container_id,
                                                         MFD_TRANSCODER_AUDIO_CODEC_OGG,
                                                         MFD_TRANSCODER_AUDIO_QUALITY_HIGH
-                                                    );
-            new_job->start();
+                                                       );
+                log(QString("started new audio cd job (total now %1)").arg(jobs.count() + 1), 3);
+                new_job->start();
+                jobs.append(new_job);
+            jobs_mutex.unlock();
+            updateStatusClients();
             
         }
         else
@@ -351,6 +372,46 @@ void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
         warning("unrecognized Job-Type in Transcoder::handleStartJobRequest()");
     }
 
+}
+
+void Transcoder::checkJobs()
+{
+    bool something_changed = false;
+    jobs_mutex.lock();
+        
+        //
+        //  If any jobs have stopped (done, error, whatever), then we need
+        //  to delete them and up the generation counter
+        //
+
+        TranscoderJob *a_job;
+        for(a_job = jobs.first(); a_job; a_job = jobs.next())
+        {
+            if(a_job->finished())
+            {
+                something_changed = true;
+                log(QString("job %1 exited, removing from list (total now %2)")
+                            .arg(a_job->getId())
+                            .arg(jobs.count() - 1), 2);
+                jobs.remove(a_job);
+            }
+        }
+        
+    jobs_mutex.unlock();
+    
+    if(something_changed)
+    {
+        bumpStatusGeneration();
+        updateStatusClients();
+    }
+}
+
+void Transcoder::updateStatusClients()
+{
+    //
+    //  Tell every connected client with an unanswered /status request that
+    //  things have changed
+    //
 }
 
 int Transcoder::bumpStatusGeneration()
