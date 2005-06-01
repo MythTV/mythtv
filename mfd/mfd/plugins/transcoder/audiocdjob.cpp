@@ -16,6 +16,7 @@
 #include "audiocdjob.h"
 #include "transcoder.h"
 #include "cdinput.h"
+#include "../audio/daapinput.h"
 #include "encoder.h"
 #include "vorbisencoder.h"
 #include "flacencoder.h"
@@ -246,7 +247,7 @@ bool AudioCdJob::ripAndEncodeTrack(QUrl track_url, QString destination_filename,
 
     log(QString("attempting to rip this url: \"%1\"").arg(track_url), 3);
 
-    CdInput   *source = NULL;
+    QIODevice *source = NULL;
     Encoder   *encoder = NULL;
 
     if (!track_url.isValid())
@@ -261,11 +262,11 @@ bool AudioCdJob::ripAndEncodeTrack(QUrl track_url, QString destination_filename,
     }
     else if (track_url.protocol() == "file")
     {
-        warning("can't do file:// ripping yet");
+        source = new QFile(track_url.path());
     }
     else if (track_url.protocol() == "daap")
     {
-        warning("can't do daap:// ripping yet");
+        source = new DaapInput(parent, track_url, DAAP_SERVER_MYTH);
     }
     else
     {
@@ -278,7 +279,7 @@ bool AudioCdJob::ripAndEncodeTrack(QUrl track_url, QString destination_filename,
         return false;
     }
 
-    if(! source->open())
+    if(! source->open(IO_ReadOnly))
     {
         warning(QString("could not open source for rip: \"%1\"")
                         .arg(track_url.toString()));
