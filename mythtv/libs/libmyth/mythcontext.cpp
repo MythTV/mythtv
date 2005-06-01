@@ -1531,10 +1531,11 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
     {
-        QString querystr = QString("SELECT data FROM settings WHERE value "
-                                   " = '%1' AND hostname = '%2';")
-                                  .arg(key).arg(d->m_localhostname);
-        query.exec(querystr);
+        query.prepare("SELECT data FROM settings WHERE value "
+                      " = :KEY AND hostname = :HOSTNAME ;");
+        query.bindValue(":KEY", key);
+        query.bindValue(":HOSTNAME", d->m_localhostname);
+        query.exec();
 
         if (query.isActive() && query.size() > 0)
         {
@@ -1544,9 +1545,10 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
         }
         else
         {
-            querystr = QString("SELECT data FROM settings WHERE value = '%1' AND "
-                               "hostname IS NULL;").arg(key);
-            query.exec(querystr);
+            query.prepare("SELECT data FROM settings WHERE value = :KEY AND "
+                          "hostname IS NULL;");
+            query.bindValue(":KEY", key);
+            query.exec();
 
             if (query.isActive() && query.size() > 0)
             {
