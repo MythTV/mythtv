@@ -478,6 +478,7 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
         if(current_mfd && node->getInt() > 0)
         {
             node->setActive(false);
+            menu->refresh();
             mfd_interface->ripCollection(current_mfd->getId(), node->getInt());
         }
     }
