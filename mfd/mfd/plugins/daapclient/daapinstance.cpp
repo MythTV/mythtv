@@ -740,6 +740,16 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
     }
     
     //
+    //  Check if there's a "ripable" Header in there
+    //
+    
+    bool ripable = false;
+    if(daap_response->getHeader("Ripable") == "Yes")
+    {
+        ripable = true;
+    }
+    
+    //
     //  Get a reference to the payload, and make a u8 version of it. Why? 
     //  Because libdaap needs a u8 to create a TagInput object, and I'm too
     //  stupid to figure out a smarter way to do this. 
@@ -808,7 +818,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
     {
         if(current_request_db)
         {
-            current_request_db->doDatabaseItemsResponse(rebuilt_internal);            
+            current_request_db->doDatabaseItemsResponse(rebuilt_internal, ripable);            
         }
         else
         {

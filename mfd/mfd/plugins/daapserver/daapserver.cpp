@@ -1164,6 +1164,16 @@ void DaapServer::sendDatabase(HttpInRequest *http_request, DaapRequest *daap_req
         {
             if(a_container->isAudio() && a_container->isLocal() )
             {
+                //
+                //  If the container is ripable (ie. it's an audio cd), and
+                //  the client is another myth box, add a Ripable header.
+                //
+
+                if(a_container->isRipable() && daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
+                {
+                    http_request->getResponse()->addHeader("Ripable: Yes");
+                }
+
                 QIntDict<Metadata>     *which_metadata;
                 which_metadata = a_container->getMetadata();
                     
