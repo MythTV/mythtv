@@ -2781,7 +2781,7 @@ int ProgramInfo::getProgramFlags(void) const
                   "editing, bookmark FROM recorded WHERE "
                   "chanid = :CHANID AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm"));
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
