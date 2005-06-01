@@ -135,7 +135,7 @@ int Database::getFirstPlaylistWithoutList()
     return return_value;
 }
 
-void Database::doDatabaseItemsResponse(TagInput& dmap_data, bool ripable)
+void Database::doDatabaseItemsResponse(TagInput& dmap_data)
 {
 
     Tag a_tag;
@@ -144,7 +144,6 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data, bool ripable)
     bool database_items_status = false;
     int new_numb_items = -1;
     int new_received_numb_items = -1;
-    metadata_container->setRipable(ripable);
 
     while(!dmap_data.isFinished())
     {

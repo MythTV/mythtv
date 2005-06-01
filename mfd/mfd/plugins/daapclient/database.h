@@ -51,7 +51,7 @@ class Database
     int     getDaapId(){return daap_id;}
     int     getFirstPlaylistWithoutList();
 
-    void    doDatabaseItemsResponse(TagInput &dmap_data, bool ripable);
+    void    doDatabaseItemsResponse(TagInput &dmap_data);
     void    parseItems(TagInput &dmap_data, int how_many_now);
     void    parseDeletions(TagInput &dmap_data);    
 
