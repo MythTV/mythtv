@@ -10,7 +10,8 @@ using namespace std;
 
 typedef enum {
     AUDIOOUTPUT_VIDEO,
-    AUDIOOUTPUT_MUSIC
+    AUDIOOUTPUT_MUSIC,
+    AUDIOOUTPUT_TELEPHONY
 } AudioOutputSource;
 
 class AudioOutput : public VolumeBase, public OutputListeners
