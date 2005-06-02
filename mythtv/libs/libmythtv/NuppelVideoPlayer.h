@@ -64,7 +64,7 @@ class NuppelVideoPlayer
     void SetCommercialSkipMethod(int method) { commercialskipmethod = method; }
     void SetCommBreakMap(QMap<long long, int> &newMap);
 
-    int OpenFile(bool skipDsp = false);
+    int OpenFile(bool skipDsp = false, bool initCommFlag = true);
     void StartPlaying(void);
     void StopPlaying(void) { killplayer = true; decoder_thread_alive = false; }
 
@@ -208,6 +208,12 @@ class NuppelVideoPlayer
     long long CalcMaxFFTime(long long ff);
 
     bool IsErrored() { return errored; }
+
+    long long GetAudioTimecodeOffset() { return audio_timecode_offset; }
+    long long AdjustAudioTimecodeOffset(long long v) { 
+        audio_timecode_offset += v;
+        return audio_timecode_offset; 
+    }
 
  protected:
     void DisplayPauseFrame(void);
@@ -425,13 +431,14 @@ class NuppelVideoPlayer
     DecoderBase *decoder;
 
     /* avsync stuff */
-    int lastaudiotime;
+    long long lastaudiotime;
     int delay;
     int avsync_delay;
     int avsync_adjustment;
     int avsync_avg;
     int avsync_oldavg;
     int refreshrate;
+    long long audio_timecode_offset;
 
     QMutex decoder_lock;
     int frame_interval; // always adjusted for play_speed

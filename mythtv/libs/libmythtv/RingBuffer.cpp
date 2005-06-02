@@ -41,6 +41,367 @@ using namespace std;
 #define READ_TEST_SIZE 204
 #define OPEN_READ_ATTEMPTS 5
 
+#define DVD_BLOCK_SIZE 2048
+#ifdef HAVE_DVDNAV
+#  include <dvdnav/dvdnav.h>
+#  include <dvdnav/nav_read.h>
+
+static const char *dvdnav_menu_table[] = {
+  NULL,
+  NULL,
+  "Title",
+  "Root",
+  "Subpicture",
+  "Audio",
+  "Angle",
+  "Part"
+};
+
+#define DVD_MENU_MAX 7
+
+// A spiffy little class to allow a RingBuffer to read from DVDs.
+// This should really be a specialized version of the RingBuffer, but
+// until it's all done and tested I'm not real sure about what stuff
+// needs to be in a RingBufferBase class.
+class DVDRingBufferPriv
+{
+    public:
+    
+        DVDRingBufferPriv() 
+        {
+            dvdnav = NULL;
+            dvdBlockRPos = 0;
+            dvdBlockWPos = 0;
+            part = 0;
+            title = 0;           
+        }
+        
+        long long Seek(long long pos, int whence)
+        {
+            dvdnav_sector_search(this->dvdnav, pos / DVD_BLOCK_SIZE , whence);
+            return GetReadPosition();
+        }
+            
+        int getTitle() { return title;}
+        
+        int getPart() { return part;}
+        
+        void getPartAndTitle( int& _part, int& _title)
+        {
+            _part = part;
+            _title = _title;
+        }
+        
+        bool isInMenu() { return (title == 0); }
+        
+        void getDescForPos(QString& desc)
+        {
+            if (isInMenu())
+            {
+                if((part <= DVD_MENU_MAX) && dvdnav_menu_table[part] )
+                {
+                    desc = QString("%1 Menu").arg(dvdnav_menu_table[part]);
+                }
+            }
+            else
+            {
+                desc = QObject::tr("Title %1 chapter %2").arg(title).arg(part);
+            }
+        }
+        
+        
+        bool open(const QString& filename)  
+        {
+            dvdnav_status_t dvdRet = dvdnav_open(&dvdnav, filename);
+            if (dvdRet == DVDNAV_STATUS_ERR)
+            {
+                VERBOSE(VB_IMPORTANT, QString("Failed to open DVD device at %1").arg(filename));
+                return false;
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, QString("Opened DVD device at %1").arg(filename));
+                dvdnav_set_readahead_flag(dvdnav, 1);
+                dvdnav_set_PGC_positioning_flag(dvdnav, 1);
+                
+                int numTitles = 0;
+                maxPart = 0;
+                mainTitle = 0;
+                int titleParts = 0;
+                char buf[DVD_BLOCK_SIZE *5];
+                safe_read(buf, DVD_BLOCK_SIZE *5);
+                dvdRet == dvdnav_get_number_of_titles(dvdnav, &numTitles);
+                
+                if( dvdRet == DVDNAV_STATUS_ERR)
+                {
+                    VERBOSE(VB_IMPORTANT, QString("Failed to get the number of titles on the DVD" ));
+                } 
+                else
+                {
+                    VERBOSE(VB_IMPORTANT, QString("There are %1 titles on the disk").arg(numTitles));
+                    
+                    for( int curTitle = 0; curTitle < numTitles; curTitle++)
+                    {
+                        dvdnav_get_number_of_parts(dvdnav, curTitle, &titleParts);
+                        VERBOSE(VB_IMPORTANT, QString("There are title %1 has %2 parts.")
+                                              .arg(curTitle).arg(titleParts));
+                        if (titleParts > maxPart)
+                        {
+                            maxPart = titleParts;
+                            mainTitle = curTitle;
+                        }
+                    }
+                    VERBOSE(VB_IMPORTANT, QString("%1 selected as the main title.").arg(mainTitle));
+                }                
+                
+                dvdnav_title_play(dvdnav, mainTitle);
+                dvdnav_current_title_info(dvdnav, &title, &part);
+                return true;
+            }
+        }
+        
+        bool isOpen() { return dvdnav;}
+        
+        long long GetReadPosition()
+        {
+            uint32_t pos;
+            uint32_t length;
+            
+            if (dvdnav)        
+                dvdnav_get_position(dvdnav, &pos, &length);
+            
+            return pos * DVD_BLOCK_SIZE;
+        }
+
+        long long GetTotalReadPosition()
+        {
+            uint32_t pos;
+            uint32_t length;
+            
+            if (dvdnav)        
+                dvdnav_get_position(dvdnav, &pos, &length);
+            
+            return length * DVD_BLOCK_SIZE;
+        }
+
+        
+        int safe_read(void *data, unsigned sz)
+        {
+            unsigned tot = 0;
+            dvdnav_status_t dvdStat;
+            unsigned char* blockBuf = NULL;
+            int dvdEvent = 0;
+            int dvdEventSize = 0;
+            int needed = sz;
+            char *dest = (char*)data;
+            int offset = 0;
+        
+            while (needed)
+            {
+                blockBuf = dvdBlockWriteBuf;
+                
+                // Use the next_cache_block instead of the next_block to avoid a memcpy inside libdvdnav
+                dvdStat = dvdnav_get_next_cache_block( dvdnav, &blockBuf, &dvdEvent, &dvdEventSize);
+                if(dvdStat == DVDNAV_STATUS_ERR) 
+                {
+                    VERBOSE(VB_IMPORTANT, QString("Error reading block from DVD: %1")
+                                                 .arg(dvdnav_err_to_string(dvdnav)));
+                    return -1;
+                }
+                
+                
+                
+                switch (dvdEvent)
+                {
+                    case DVDNAV_BLOCK_OK:
+                        // We need at least a DVD blocks worth of data so copy it in.
+                        memcpy(dest + offset, blockBuf, DVD_BLOCK_SIZE);
+                        
+                        tot += DVD_BLOCK_SIZE;
+                        
+                        if (blockBuf != dvdBlockWriteBuf)
+                        {
+                            dvdnav_free_cache_block(dvdnav, blockBuf);
+                        }
+              
+                        break;
+                    case DVDNAV_CELL_CHANGE:
+                        {
+                            dvdnav_cell_change_event_t *cell_event = (dvdnav_cell_change_event_t*) (blockBuf);
+                            pgLength  = cell_event->pg_length;
+                            pgcLength = cell_event->pgc_length;
+                            cellStart = cell_event->cell_start;
+                            pgStart   = cell_event->pg_start;
+                            
+                            VERBOSE(VB_PLAYBACK, QString("DVDNAV_CELL_CHANGE: pg_length == %1, pgc_length == %2, "
+                                                  "cell_start == %3, pg_start == %4")
+                                                  .arg(pgLength).arg(pgcLength).arg(cellStart).arg(pgStart));
+                            
+                            dvdnav_current_title_info(dvdnav, &title, &part);            
+                            if (title == 0)
+                            {
+                                pci_t* pci = dvdnav_get_current_nav_pci(dvdnav);
+                                dvdnav_button_select(dvdnav, pci, 1);
+                            }
+                            
+                            if (blockBuf != dvdBlockWriteBuf)
+                            {
+                                dvdnav_free_cache_block(dvdnav, blockBuf);
+                            }
+                            
+                        }
+                        break;
+                    case DVDNAV_SPU_CLUT_CHANGE:
+                        VERBOSE(VB_PLAYBACK, "DVDNAV_SPU_CLUT_CHANGE happened.");
+                        break;
+                    
+                    case DVDNAV_SPU_STREAM_CHANGE:
+                        {
+                        dvdnav_spu_stream_change_event_t* spu = (dvdnav_spu_stream_change_event_t*)(blockBuf);
+                        VERBOSE(VB_PLAYBACK, QString( "DVDNAV_SPU_STREAM_CHANGE: "
+                                                       "physical_wide==%1, physical_letterbox==%2, "
+                                                       "physical_pan_scan==%3, logical==%4")
+                                                .arg(spu->physical_wide).arg(spu->physical_letterbox)
+                                                .arg(spu->physical_pan_scan).arg(spu->logical));
+                        
+                        if (blockBuf != dvdBlockWriteBuf)
+                        {
+                            dvdnav_free_cache_block(dvdnav, blockBuf);
+                        }                                                   
+                        }
+                        break;
+                    case DVDNAV_AUDIO_STREAM_CHANGE:
+                        {
+                        dvdnav_audio_stream_change_event_t* apu = (dvdnav_audio_stream_change_event_t*)(blockBuf);
+                        VERBOSE(VB_PLAYBACK, QString( "DVDNAV_AUDIO_STREAM_CHANGE: "
+                                                       "physical==%1, logical==%2")
+                                               .arg(apu->physical).arg(apu->logical));
+                            
+                        if (blockBuf != dvdBlockWriteBuf)
+                        {
+                            dvdnav_free_cache_block(dvdnav, blockBuf);
+                        }                                                   
+                        }
+                        break;
+                    case DVDNAV_NAV_PACKET:
+                        lastNav = (dvdnav_t *)blockBuf;
+                        break;
+                    case DVDNAV_HOP_CHANNEL:
+                        VERBOSE(VB_PLAYBACK, "DVDNAV_HOP_CHANNEL happened.");
+                        break;                        
+                    case DVDNAV_NOP:
+                        break;
+                    case DVDNAV_VTS_CHANGE:
+                        {
+                        dvdnav_vts_change_event_t* vts = (dvdnav_vts_change_event_t*)(blockBuf);
+                        VERBOSE(VB_PLAYBACK, QString( "DVDNAV_VTS_CHANGE: "
+                                                       "old_vtsN==%1, new_vtsN==%2")
+                                                        .arg(vts->old_vtsN).arg(vts->new_vtsN));
+                            
+                        if (blockBuf != dvdBlockWriteBuf)
+                        {
+                            dvdnav_free_cache_block(dvdnav, blockBuf);
+                        }                                                   
+                        }
+                        break;
+                    case DVDNAV_HIGHLIGHT:
+                        {
+                        dvdnav_highlight_event_t* hl = (dvdnav_highlight_event_t*)(blockBuf);
+                        VERBOSE(VB_PLAYBACK, QString( "DVDNAV_HIGHLIGHT: "
+                                                       "display==%1, palette==%2, "
+                                                       "sx==%3, sy==%4, ex==%5, ey==%6, "
+                                                       "pts==%7, buttonN==%8")
+                                                       .arg(hl->display).arg(hl->palette)
+                                                       .arg(hl->sx).arg(hl->sy)
+                                                       .arg(hl->ex).arg(hl->ey)
+                                                       .arg(hl->pts).arg(hl->buttonN));
+                        if (blockBuf != dvdBlockWriteBuf)
+                        {
+                            dvdnav_free_cache_block(dvdnav, blockBuf);
+                        }                                                   
+
+                        }
+                        break;
+                    case DVDNAV_WAIT:
+                        VERBOSE(VB_PLAYBACK, "DVDNAV_WAIT recieved clearing it");
+                        dvdnav_wait_skip(dvdnav);
+                        break;
+                    default:
+                        cerr << "Got DVD event " << dvdEvent << endl;            
+                        break;
+                }
+            
+                needed = sz - tot;
+                offset = tot;
+            }
+        
+            return tot;
+        }
+        
+        void nextTrack()
+        {
+            int newPart = part + 1;
+            if (newPart < maxPart)
+                dvdnav_part_play(dvdnav, title, newPart);
+        }
+        
+        void prevTrack()
+        {
+            int newPart = part - 1;
+            if (newPart < 0)
+                newPart = 0;
+            
+            dvdnav_part_play(dvdnav, title, newPart);
+        }
+        
+    protected:
+        dvdnav_t *dvdnav;
+        unsigned char dvdBlockWriteBuf[DVD_BLOCK_SIZE];
+        unsigned char* dvdBlockReadBuf;
+        int dvdBlockRPos;
+        int dvdBlockWPos;
+        long long pgLength;
+        long long pgcLength;
+        long long cellStart;
+        long long pgStart;
+        dvdnav_t *lastNav; // This really belongs in the player.
+        int part;
+        int title;
+        int maxPart;
+        int mainTitle;
+};    
+
+
+
+bool RingBuffer::IsOpen(void) 
+{ 
+    return (tfw || fd2 > -1 || remotefile || (dvdPriv && dvdPriv->isOpen())); 
+}
+
+#else
+
+// Stub version to cut down on the ifdefs.
+class DVDRingBufferPriv
+{
+    public:
+        DVDRingBufferPriv(){}
+        bool open(const QString& filename){return false;}
+        bool isOpen() { return false;}
+        long long Seek(long long pos, int whence) { return 0; }
+        int safe_read(void *data, unsigned sz) { return -1; }
+        long long GetReadPosition() { return 0; }
+        long long GetTotalReadPosition() { return 0; }
+        void getPartAndTitle( int& title, int& part) { title = 0; part = 0; }
+        void nextTrack();
+        void prevTrack();
+        void getDescForPos(QString& desc);
+};
+
+
+
+#endif // DVDNAV
+
+
 
 class ThreadedFileWriter
 {
@@ -365,9 +726,10 @@ unsigned ThreadedFileWriter::BufFree()
 
 RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
 {
+    
     int openAttempts = OPEN_READ_ATTEMPTS;
     Init();
-
+    
     startreadahead = usereadahead;
 
     normalfile = true;
@@ -392,6 +754,7 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
     else
     {
         bool is_local = false;
+        bool is_dvd = false;
         if ((filename.left(7) == "myth://") &&
             (filename.length() > 7 ))
         {
@@ -410,6 +773,30 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
                     filename = local_pathname;
                 }
             }
+        }
+        else if (filename.left(4) == "dvd:")
+        {
+            is_dvd = true;
+            dvdPriv = new DVDRingBufferPriv;
+            startreadahead = false;
+            int pathLen = filename.find(QRegExp("/"), 4);
+            if (pathLen != -1)
+            {
+                QString tempFilename = filename.right(filename.length() -  pathLen);
+
+                QFile checkFile(tempFilename);
+
+                if (!checkFile.exists())
+                    filename = "/dev/dvd";
+                else
+                    filename = tempFilename;
+            }
+
+            else
+            {
+                filename = "/dev/dvd";
+            }
+            
         }
         else
             is_local = true;
@@ -455,6 +842,11 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
             {
                 oldfile = true;
             }
+        }
+        else if (is_dvd)
+        {
+            dvdPriv->open(filename);    
+            readblocksize = DVD_BLOCK_SIZE * 62;
         }
         else
         {
@@ -524,7 +916,8 @@ void RingBuffer::Init(void)
 {
     oldfile = false; 
     startreadahead = true;
-
+    dvdPriv = NULL;
+    
     readaheadrunning = false;
     readaheadpaused = false;
     wantseek = false;
@@ -532,11 +925,12 @@ void RingBuffer::Init(void)
     fill_min = -1;
 
     readblocksize = 128000;
-
+   
     recorder_num = 0;
     remoteencoder = NULL;
     tfw = NULL;
     remotefile = NULL;
+    
     fd2 = -1;
 
     totalwritepos = writepos = 0;
@@ -613,6 +1007,7 @@ void RingBuffer::Reset(void)
 
     pthread_rwlock_unlock(&rwlock);
 }
+
 
 int RingBuffer::safe_read(int fd, void *data, unsigned sz)
 {
@@ -881,6 +1276,11 @@ void RingBuffer::ReadAheadThread(void)
                                         totfree);
                         internalreadpos += ret;
                     }
+                    else if (dvdPriv)
+                    {                        
+                        ret = dvdPriv->safe_read(readAheadBuffer + rbwpos, totfree);
+                        internalreadpos += ret;
+                    }
                     else
                     {
                         ret = safe_read(fd2, readAheadBuffer + rbwpos, totfree);
@@ -920,6 +1320,11 @@ void RingBuffer::ReadAheadThread(void)
 
                     internalreadpos = left;
                 }
+                else if (dvdPriv)
+                {                        
+                        ret = dvdPriv->safe_read(readAheadBuffer + rbwpos, totfree);
+                        internalreadpos += ret;
+                }
                 else
                 {
                     ret = safe_read(fd2, readAheadBuffer + rbwpos, totfree);
@@ -928,7 +1333,8 @@ void RingBuffer::ReadAheadThread(void)
             }
 
             readAheadLock.lock();
-            rbwpos = (rbwpos + ret) % READ_AHEAD_SIZE;
+            if (ret > 0 )
+                rbwpos = (rbwpos + ret) % READ_AHEAD_SIZE;
             readAheadLock.unlock();
 
             if (ret == 0 && normalfile && !stopreads)
@@ -999,11 +1405,20 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
     {
         while (!readsallowed && !stopreads)
         {
-            if (!readsAllowedWait.wait(5000))
+            if (!readsAllowedWait.wait(1000))
             {
                  VERBOSE(VB_IMPORTANT, "taking too long to be allowed to read..");
                  readErr++;
-                 if (readErr > 2)
+                 
+                 // HACK Sometimes the readhead thread gets borked on startup.
+               /*  if ((readErr % 2) && (rbrpos ==0))
+                 {
+                    VERBOSE(VB_IMPORTANT, "restarting readhead thread..");
+                    KillReadAheadThread();
+                    StartupReadAheadThread();
+                 }                    
+                   */ 
+                 if (readErr > 10)
                  {
                      VERBOSE(VB_IMPORTANT, "Took more than 10 seconds to be allowed to read, "
                                            "aborting.");
@@ -1091,6 +1506,11 @@ int RingBuffer::Read(void *buf, int count)
                 {
                     ret = safe_read(remotefile, buf, count);
                     totalreadpos += ret;
+                    readpos += ret;
+                }
+                else if (dvdPriv)
+                {                        
+                    ret = dvdPriv->safe_read(buf, count);
                     readpos += ret;
                 }
                 else
@@ -1289,8 +1709,13 @@ long long RingBuffer::Seek(long long pos, int whence)
     long long ret = -1;
     if (normalfile)
     {
+    
         if (remotefile)
             ret = remotefile->Seek(pos, whence, readpos);
+        else if(dvdPriv)
+        {
+            dvdPriv->Seek(pos, whence);
+        }
         else
         {
             if (whence == SEEK_SET)
@@ -1416,12 +1841,26 @@ long long RingBuffer::GetFreeSpaceWithReadChange(long long readchange)
 
 long long RingBuffer::GetReadPosition(void)
 {
-    return readpos;
+    if (dvdPriv)
+    {
+        return dvdPriv->GetReadPosition();
+    }
+    else
+    {
+        return readpos;
+    }
 }
 
 long long RingBuffer::GetTotalReadPosition(void)
 {
-    return totalreadpos;
+    if (dvdPriv)
+    {
+        return dvdPriv->GetTotalReadPosition();
+    }
+    else
+    {
+        return totalreadpos;
+    }
 }
 
 long long RingBuffer::GetWritePosition(void)
@@ -1448,4 +1887,30 @@ long long RingBuffer::GetRealFileSize(void)
     if (stat(filename.ascii(), &st) == 0)
         return st.st_size;
     return -1;
+}
+
+void RingBuffer::getPartAndTitle(int& title, int& part)
+{
+    if (dvdPriv)
+        dvdPriv->getPartAndTitle(title, part);
+}
+
+
+void RingBuffer::getDescForPos(QString& desc)
+{
+    if (dvdPriv)
+        dvdPriv->getDescForPos(desc);
+}
+
+
+void RingBuffer::nextTrack()
+{
+   if (dvdPriv)
+        dvdPriv->nextTrack();
+}
+
+void RingBuffer::prevTrack()
+{
+   if (dvdPriv)
+        dvdPriv->prevTrack();
 }

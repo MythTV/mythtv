@@ -58,6 +58,7 @@ CONFIG_INCLUDEPATH=""
 CONFIG_DEFINES=""
 PROFILEFLAGS=""
 proc_opt="no"
+dvd="yes"
 
 KERNEL_RELEASE=`uname -r 2>/dev/null`
 if test x"$KERNEL_RELEASE" != x"" ; then
@@ -128,6 +129,7 @@ echo "  --disable-audio-oss      disable OSS audio support"
 echo "  --disable-audio-alsa     disable ALSA audio support"
 echo "  --disable-audio-arts     disable aRts audio support"
 echo "  --disable-audio-jack     disable JACK audio support"
+echo "  --disable-dvd            disable native DVD playback"
 #echo "  --disable-audio-beos     disable BeOS audio support [default=no]"
 #echo "  --disable-v4l            disable video4linux grabbing [default=no]"
 #echo "  --disable-dv1394         disable DV1394 grabbing [default=no]"
@@ -723,6 +725,10 @@ for opt do
   --enable-directx) direct_x="yes"
   ;;
   --disable-directx) direct_x="no"
+  ;;
+  --enable-dvd) dvd="yes"
+  ;;
+  --disable-dvd) dvd="no"
   ;;
   esac
 done
@@ -1778,6 +1784,14 @@ if test x"$xv" = x"yes" ; then
     fi
 fi
 
+if test x"$dvd" = x"yes" ; then
+    dvd="no"
+    if has_library libdvdnav ; then
+        dvd="yes"
+    fi
+fi
+
+
 VENDOR_XVMC_LIBS=""
 if test x"$xvmc" = x"yes"; then
     xvmc="no"
@@ -1922,6 +1936,9 @@ echo "DirectFB         $direct_fb"
 if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
 echo "DirectX          $direct_x"
 fi
+echo
+echo "# Misc Features"
+echo "DVD playback     $dvd"
 echo
 
 MYTH_CONFIG_H=libs/libmyth/mythconfig.h
@@ -2439,6 +2456,13 @@ if test x"$xv" = x"yes" ; then
   CCONFIG="$CCONFIG using_xv"
   echo "CONFIG_XV_LIBS=-lXinerama -lXv -lX11 -lXext -lXxf86vm" >> $MYTH_CONFIG_MAK
 fi
+
+if test x"$dvd" = x"yes" ; then
+  CCONFIG="$CCONFIG using_dvdnav"
+  CONFIG_DEFINES="$CONFIG_DEFINES HAVE_DVDNAV"
+  echo "CONFIG_DVD_LIBS=-ldvdnav" >> $MYTH_CONFIG_MAK
+fi
+
 
 if test x"$xrandr" = x"yes" ; then
   CCONFIG="$CCONFIG using_xrandr"

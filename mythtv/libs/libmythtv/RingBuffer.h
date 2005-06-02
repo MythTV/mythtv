@@ -6,9 +6,12 @@
 #include <qmutex.h>
 #include <pthread.h>
 
+
+
 class RemoteFile;
 class RemoteEncoder;
 class ThreadedFileWriter;
+class DVDRingBufferPriv;
 
 class RingBuffer
 {
@@ -20,8 +23,11 @@ class RingBuffer
                RemoteEncoder *enc = NULL);
     
    ~RingBuffer();
-
-    bool IsOpen(void) { return (tfw || fd2 > -1 || remotefile); }
+#ifdef HAVE_DVDNAV
+    bool IsOpen(void);
+#else
+    bool IsOpen(void) { return (tfw || fd2 > -1 || remotefile); }    
+#endif    
     
     int Read(void *buf, int count);
     int Write(const void *buf, int count);
@@ -64,18 +70,28 @@ class RingBuffer
     void Unpause(void);
     bool isPaused(void);
     void WaitForPause(void);
-
+    
+    bool isDVD() {return dvdPriv;}
+    
+    
     void CalcReadAheadThresh(int estbitrate);
 
     long long GetRealFileSize(void);
 
+    void getPartAndTitle( int& title, int& part);
+    void getDescForPos(QString& desc);
+    
+    void nextTrack();
+    void prevTrack();
+    
   protected:
     static void *startReader(void *type);
     void ReadAheadThread(void);
 
   private:
     void Init(void);
-
+    
+    int safe_read_dvd(void *data, unsigned sz);
     int safe_read(int fd, void *data, unsigned sz);
     int safe_read(RemoteFile *rf, void *data, unsigned sz);
 
@@ -146,7 +162,11 @@ class RingBuffer
 
     bool commserror;
 
+
+    DVDRingBufferPriv *dvdPriv;
+
     bool oldfile;
+    
 };
 
 #endif

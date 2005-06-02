@@ -185,7 +185,9 @@ TV::TV(void)
       internalState(kState_None), nextState(kState_None), changeState(false),
       menurunning(false), runMainLoop(false), wantsToQuit(true), 
       exitPlayer(false), paused(false), errored(false),
-      stretchAdjustment(false), editmode(false), zoomMode(false),
+      stretchAdjustment(false), 
+      audiosyncAdjustment(false),
+      editmode(false), zoomMode(false),
       update_osd_pos(false), endOfRecording(false), requestDelete(false),
       doSmartForward(false), switchingCards(false), lastRecorderNum(-1),
       queuedTranscode(false), getRecorderPlaybackInfo(false), 
@@ -721,10 +723,13 @@ void TV::HandleStateChange(void)
                 if (!checkFile.exists())
                     tmpFilename = inputFilename;
             }
+            
+            prbuffer = new RingBuffer(tmpFilename, false);
         }
         else
         {
             tmpFilename = inputFilename;
+            
         }
 
         prbuffer = new RingBuffer(tmpFilename, false);
@@ -1591,6 +1596,28 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
     }
    
+    if (audiosyncAdjustment)
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            action = actions[i];
+            handled = true;
+
+            if (action == "LEFT")
+                ChangeAudioSync(-1);
+            else if (action == "RIGHT")
+                ChangeAudioSync(1);
+            else if (action == "UP")
+                ChangeAudioSync(-10);
+            else if (action == "DOWN")
+                ChangeAudioSync(10);
+            else if (action == "TOGGLEAUDIOSYNC")
+                ClearOSD();
+            else
+                handled = false;
+        }
+    }
+   
     if (handled)
         return;
 
@@ -1657,6 +1684,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             ChangeTimeStretch(0);   // just display
         }
+        else if (action == "TOGGLEAUDIOSYNC")
+            ChangeAudioSync(0);   // just display
         else if (action == "TOGGLEPICCONTROLS")
         {
             if (usePicControls)
@@ -1713,9 +1742,29 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ChangeFFRew(-1);
         }
         else if (action == "JUMPRWND")
-            DoSeek(-jumptime * 60, tr("Jump Back"));
+        {
+            if(prbuffer->isDVD())
+            {
+                prbuffer->prevTrack();
+                UpdatePosOSD(0.0, tr("Previous Chapter"));
+            }
+            else
+            {
+                DoSeek(-jumptime * 60, tr("Jump Back"));
+            }
+        }
         else if (action == "JUMPFFWD")
-            DoSeek(jumptime * 60, tr("Jump Ahead"));
+        {
+            if(prbuffer->isDVD())
+            {
+                prbuffer->nextTrack();
+                UpdatePosOSD(0.0, tr("Next Chapter"));
+            }
+            else
+            {
+                DoSeek(jumptime * 60, tr("Jump Ahead"));
+            }
+        }
         else if (action == "JUMPSTART" && activenvp)
         {
             DoSeek(-activenvp->GetFramesPlayed(), tr("Jump to Beginning"));
@@ -1949,9 +1998,29 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "TOGGLEBROWSE")
                 ShowOSDTreeMenu();
             else if (action == "CHANNELUP")
-                DoSeek(-jumptime * 60, tr("Jump Back"));
+            {
+                if(prbuffer->isDVD())
+                {
+                    prbuffer->prevTrack();
+                    UpdatePosOSD(0.0, tr("Previous Chapter"));
+                }
+                else
+                {
+                    DoSeek(-jumptime * 60, tr("Jump Back"));
+                }
+            }    
             else if (action == "CHANNELDOWN")
-                DoSeek(jumptime * 60, tr("Jump Ahead"));
+            {
+                if(prbuffer->isDVD())
+                {
+                    prbuffer->nextTrack();
+                    UpdatePosOSD(0.0, tr("Next Chapter"));
+                }
+                else
+                {
+                    DoSeek(jumptime * 60, tr("Jump Ahead"));
+                }
+            }
             else if (action == "TOGGLESLEEP")
                 ToggleSleepTimer();
             else
@@ -2155,7 +2224,7 @@ void TV::DoInfo(void)
         return;
 
     oset = osd->GetSet("status");
-    if ((oset) && (oset->Displaying()))
+    if ((oset) && (oset->Displaying()) && !prbuffer->isDVD())
     {
         QMap<QString, QString> infoMap;
         playbackinfo->ToMap(infoMap);
@@ -2903,9 +2972,9 @@ bool TV::ClearOSD(void)
 void TV::ToggleOSD(void)
 {
     OSDSet *oset = osd->GetSet("program_info");
-    if (osd && (oset) && oset->Displaying())
+    if (osd && (oset) && (oset->Displaying() || prbuffer->isDVD()))
         osd->HideAll();
-    else
+    else if (!prbuffer->isDVD())
         UpdateOSD();
 }
 
@@ -3393,6 +3462,29 @@ void TV::ChangeTimeStretch(int dir, bool allowEdit)
     }
 }
 
+// dir in 10ms jumps
+void TV::ChangeAudioSync(int dir, bool allowEdit)
+{
+    if (!audiosyncAdjustment)
+        audiosyncBaseline = activenvp->GetAudioTimecodeOffset();
+
+    audiosyncAdjustment = allowEdit;
+
+    long long newval = activenvp->AdjustAudioTimecodeOffset(dir*10) - 
+                        audiosyncBaseline;
+
+    if (osd && !browsemode)
+    {
+        QString text = QString(" %1 ms").arg(newval);
+        text = tr("Audio Sync") + text;
+
+        int val = (int)newval;
+        osd->StartPause((val/2)+500, false, tr("Adjust Audio Sync"), text, 10, 
+                        kOSDFunctionalType_AudioSyncAdjust);
+        update_osd_pos = false;
+    }
+}
+
 void TV::ToggleMute(void)
 {
     kMuteState mute_status;
@@ -3766,6 +3858,9 @@ void TV::HandleOSDClosed(int osdType)
         case kOSDFunctionalType_TimeStretchAdjust:
             stretchAdjustment = false;
             break;
+        case kOSDFunctionalType_AudioSyncAdjust:
+            audiosyncAdjustment = false;
+            break;
         case kOSDFunctionalType_Default:
             break;
     }
@@ -3948,6 +4043,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
 
         ChangeTimeStretch(0, !floatRead);   // just display
     }
+    else if (action.left(15) == "TOGGLEAUDIOSYNC")
+        ChangeAudioSync(0);
     else if (action.left(11) == "TOGGLESLEEP")
     {
         ToggleSleepTimer(action.left(13));
@@ -4160,6 +4257,8 @@ void TV::BuildOSDTreeMenu(void)
 
     item = new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), 
                              "TOGGLEMANUALZOOM");
+
+    item = new OSDGenericTree(treeMenu, tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
 
     int speedX100 = (int)(round(normal_speed * 100));
     item = new OSDGenericTree(treeMenu, tr("Adjust Time Stretch"), "TOGGLESTRETCH");

@@ -211,6 +211,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(ProgramInfo *info)
     videosync = NULL;
 
     errored = false;
+    audio_timecode_offset = 0;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -613,7 +614,7 @@ void NuppelVideoPlayer::SetFileLength(int total, int frames)
     totalFrames = frames;
 }
 
-int NuppelVideoPlayer::OpenFile(bool skipDsp)
+int NuppelVideoPlayer::OpenFile(bool skipDsp, bool commFlagging)
 {
     if (!skipDsp)
     {
@@ -726,12 +727,15 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     }
     bookmarkseek = GetBookmark();
 
-    commDetect = new CommDetect(video_width, video_height, video_frame_rate,
+    if (commFlagging)
+    {
+        commDetect = new CommDetect(video_width, video_height, video_frame_rate,
                                 commercialskipmethod);
-
-    commDetect->SetAggressiveDetection(
+    
+        commDetect->SetAggressiveDetection(
                     gContext->GetNumSetting("AggressiveCommDetect", 1));
-
+    }
+    
     return 0;
 }
 
@@ -1439,9 +1443,31 @@ void NuppelVideoPlayer::AVSync(void)
     if (audioOutput && normal_speed)
     {
         // ms, same scale as timecodes
-        lastaudiotime = audioOutput->GetAudiotime();
+         lastaudiotime = audioOutput->GetAudiotime() + audio_timecode_offset;
+         VERBOSE(VB_PLAYBACK, QString("A/V timecodes audio %1 video %2 frameinterval %3 avdel %4 avg %5 tcoffset %6")
+                 .arg(lastaudiotime)
+                 .arg(buffer->timecode)
+                 .arg(frame_interval)
+                 .arg(buffer->timecode - lastaudiotime)
+                 .arg(avsync_avg)
+                 .arg(audio_timecode_offset)
+                 );
         if (lastaudiotime != 0 && buffer->timecode != 0)
-        { // lastaudiotime = 0 after a seek
+          { // lastaudiotime == 0 after a seek
+             if (labs(buffer->timecode - lastaudiotime)>1000000)
+             {
+                 VERBOSE(VB_IMPORTANT, QString("A/V timecodes audio %1 video %2 frameinterval %3 avdel %4 avg %5")
+                         .arg(lastaudiotime)
+                         .arg(buffer->timecode)
+                         .arg(frame_interval)
+                         .arg(buffer->timecode - lastaudiotime)
+                         .arg(avsync_avg)
+                         );
+                 lastaudiotime = audioOutput->GetAudiotime();
+                 audio_timecode_offset = buffer->timecode - lastaudiotime;
+                 VERBOSE(VB_IMPORTANT, QString("A/V audio timecode instantaneously diverged by %1")
+                         .arg(audio_timecode_offset));
+             }
             // The time at the start of this frame (ie, now) is given by
             // last->timecode
             int delta = buffer->timecode - prevtc - (frame_interval / 1000);
@@ -3685,7 +3711,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             {
                 flagTime.start();
 
-                if (OpenFile() < 0)
+                if (OpenFile(false, true) < 0)
                     return(254);
 
                 commDetect->SetWatchingRecording(true, nvr_enc, this);
@@ -3699,7 +3725,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     }
     else
     {
-        if (OpenFile() < 0)
+        if (OpenFile(false, true) < 0)
             return(254);
     }
 
@@ -3873,7 +3899,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             }
         }
 
-        commDetect->ProcessFrame(currentFrame, currentFrame->frameNumber);
+        if (commDetect)
+            commDetect->ProcessFrame(currentFrame, currentFrame->frameNumber);
 
         GetFrame(1,true);
 
@@ -3884,7 +3911,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             if ((currentFrame->frameNumber) &&
                 ((currentFrame->frameNumber % 500) == 0))
             {
-                commDetect->GetCommBreakMap(commBreakMap);
+                if (commDetect)
+                    commDetect->GetCommBreakMap(commBreakMap);
 
                 if (commBreakMap.size())
                 {
@@ -4222,8 +4250,23 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
             }
         }
 
+        
         return (int)(1000 - ret);
     }
+    else if (ringBuffer->isDVD())
+    {
+        long long rPos = ringBuffer->GetReadPosition();
+        long long tPos = ringBuffer->GetTotalReadPosition();
+        
+        ringBuffer->getDescForPos(desc);
+        
+        
+        if (rPos)
+            return  (rPos / tPos) * 1000.0;
+        else
+            return 0;
+    }                
+    
 
     int playbackLen;
     if (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder())
@@ -4267,7 +4310,7 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
 
 bool NuppelVideoPlayer::FrameIsBlank(VideoFrame *frame)
 {
-    if (commercialskipmethod & COMM_DETECT_BLANKS)
+    if ((commercialskipmethod & COMM_DETECT_BLANKS) && commDetect)
     {
         commDetect->ProcessFrame(frame);
 

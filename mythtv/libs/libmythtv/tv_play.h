@@ -153,6 +153,7 @@ class TV : public QObject
     void NormalSpeed(void);
     void ChangeSpeed(int direction);
     void ChangeTimeStretch(int dir, bool allowEdit = true);
+    void ChangeAudioSync(int dir, bool allowEdit = true);
     float StopFFRew(void);
     void ChangeFFRew(int direction);
     void SetFFRew(int index);
@@ -245,6 +246,8 @@ class TV : public QObject
     bool paused;
     bool errored;
     bool stretchAdjustment; // is time stretch turned on
+    bool audiosyncAdjustment; // is audiosync turned on
+    long long audiosyncBaseline;
     bool editmode;       // are we in video editing mode
     bool zoomMode;
     bool update_osd_pos; // redisplay osd?
