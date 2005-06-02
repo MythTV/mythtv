@@ -17,6 +17,7 @@
 #endif
 
 #include <dtmffilter.h>
+#include <audiodrv.h>
 
 
 #define IP_MAX_MTU                1500     // Max size of rxed RTP packet
@@ -27,15 +28,6 @@
 #define UDP_HEADER_SIZE           28
 #define	MESSAGE_SIZE              80       // bytes to send per 10ms
 #define	ULAW_BYTES_PER_MS         8        // bytes to send per 1ms
-#define MAX_COMP_AUDIO_SIZE       320      // This would equate to 40ms sample size
-#define MAX_DECOMP_AUDIO_SAMPLES  (MAX_COMP_AUDIO_SIZE) // CHANGE FOR HIGHER COMPRESSION CODECS; G.711 has same no. samples after decomp.
-#define PCM_SAMPLES_PER_MS        8
-
-// WIN32 driver constants
-#define NUM_MIC_BUFFERS           16
-#define MIC_BUFFER_SIZE           MAX_DECOMP_AUDIO_SAMPLES
-#define NUM_SPK_BUFFERS           16
-#define SPK_BUFFER_SIZE           MIC_BUFFER_SIZE // Need to keep these the same (see RTPPACKET)
 
 #define RTP_STATS_INTERVAL        1 // Seconds between sending statistics 
 
@@ -48,11 +40,12 @@ public:
 
     RtpEvent(Type t, QString s="") : QCustomEvent(t) { text=s; }
     RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2, int s3, int s4, int s5, int s6, 
-             int s7, int s8, int s9, int s10, int s11, int s12, int s13) : QCustomEvent(t) 
+             int s7, int s8, int s9, int s10, int s11, int s12, int s13, int s14, int s15, int s16)
+              : QCustomEvent(t) 
              { rtpThread=r; timestamp=tm; msPeriod = ms; pkIn=s1; pkOut=s2; pkMiss=s3; pkLate=s4; 
                pkInDisc=s5; pkOutDrop=s6;
                byteIn=s7; byteOut=s8; bytePlayed=s9; framesIn=s10; framesOut=s11; framesInDisc=s12; 
-               framesOutDisc=s13;}
+               framesOutDisc=s13; minPlayout=s14; avgPlayout=s15; maxPlayout=s16; }
     RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2) : QCustomEvent(t) 
              { rtpThread=r; timestamp=tm; msPeriod = ms; rtcpFractionLoss=s1; rtcpTotalLoss=s2;}    
     ~RtpEvent()                 {  }
@@ -73,7 +66,9 @@ public:
     int getPeriod()             { return msPeriod; }
     int getRtcpFractionLoss()   { return rtcpFractionLoss; }
     int getRtcpTotalLoss()      { return rtcpTotalLoss; }
-
+    int getMinPlayout()         { return minPlayout; }
+    int getAvgPlayout()         { return avgPlayout; }
+    int getMaxPlayout()         { return maxPlayout; }
 
 private:
     QString text;
@@ -96,6 +91,9 @@ private:
     int bytePlayed;
     int rtcpFractionLoss;
     int rtcpTotalLoss;
+    int minPlayout;
+    int avgPlayout;
+    int maxPlayout;
 };
 
 
@@ -153,7 +151,7 @@ typedef struct
 {
     uchar  dtmfDigit;
     uchar  dtmfERVolume;
-    short dtmfDuration;
+    short  dtmfDuration;
 } DTMF_RFC2833;
 
 typedef struct 
@@ -234,18 +232,19 @@ class Jitter : public QPtrList<RTPPACKET>
 public:
     Jitter();
     ~Jitter();
-    RTPPACKET *	GetJBuffer();
-    void		FreeJBuffer(RTPPACKET *Buf);
-    void    InsertDTMF(RTPPACKET *Buffer);
-    void		InsertJBuffer(RTPPACKET *Buffer);
+    RTPPACKET *GetJBuffer();
+    void       FreeJBuffer(RTPPACKET *Buf);
+    void       InsertDTMF(RTPPACKET *Buffer);
+    void       InsertJBuffer(RTPPACKET *Buffer);
     RTPPACKET *DequeueJBuffer(ushort seqNum, int &reason);  
-    int     DumpAllJBuffers(bool StopAtMarkerBit);
+    int        DumpAllJBuffers(bool StopAtMarkerBit);
     virtual int compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2);
-    int AnyData() { return count(); };
-    bool isPacketQueued(ushort Seq);
-    int GotAllBufsInFrame(ushort seq, int offset);
-    void CountMissingPackets(ushort seq, ushort &cntValid, ushort &cntMissing);
-    void Debug();
+    int        AnyData() { return count(); };
+    bool       isPacketQueued(ushort Seq);
+    int        countPacketsInFrontOf(ushort Seq);
+    int        GotAllBufsInFrame(ushort seq, int offset);
+    void       CountMissingPackets(ushort seq, ushort &cntValid, ushort &cntMissing);
+    void       Debug();
 
 
 private:
@@ -294,11 +293,12 @@ private:
 };
 
 
+
 class rtp : public QThread
 {
 
 public:
-    rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, int mediaPay, int dtmfPay, QString micDev, QString spkDev, rtpTxMode txm=RTP_TX_AUDIO_FROM_MICROPHONE, rtpRxMode rxm=RTP_RX_AUDIO_TO_SPEAKER);
+    rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, int mediaPay, int playout, int dtmfPay, QString micDev, QString spkDev, rtpTxMode txm=RTP_TX_AUDIO_FROM_MICROPHONE, rtpRxMode rxm=RTP_RX_AUDIO_TO_SPEAKER);
     ~rtp();
 	virtual void run();
 
@@ -321,15 +321,13 @@ public:
     void PlayToneToSpeaker(short *tone, int Samples);
     void setMaxBandwidth(int kbps) { rtpMutex.lock(); if (pTxShaper) pTxShaper->setMaxBandwidth(kbps*1000/8); rtpMutex.unlock(); }
     int  getCodecBandwidth() { int res=0; rtpMutex.lock(); if (Codec) res = Codec->bandwidth(); rtpMutex.unlock(); return res; }
+    void changePlayoutDelay(int ms) { rtpMutex.lock(); adjustPlayoutDelay = ms; rtpMutex.unlock(); }
 
 private:
     void rtpThreadWorker();
     void rtpAudioThreadWorker();
     void rtpVideoThreadWorker();
     void rtpInitialise();
-    void StartTxRx();
-    int  OpenAudioDevice(QString devName, int mode);
-    void StopTxRx();
     void OpenSocket();
     void CloseSocket();
     void StreamInVideo();
@@ -337,7 +335,6 @@ private:
     void StreamInAudio();
     void PlayOutAudio();
     bool isSpeakerHungry();
-    bool isMicrophoneData();
     void recordInPacket(short *data, int dataBytes);
     void HandleRxDTMF(RTPPACKET *RTPpacket);
     void SendWaitingDtmf();
@@ -356,32 +353,12 @@ private:
     void RtcpSendReceive(bool forceSend=false);
     void sendRtcpSenderReport(uint txPkCnt, uint txOctetCnt, long rxSsrc, uint rxPkCnt, uint rxPkLost, ushort highestRxSeq);
     void parseRtcpMessage(RTCPPACKET *rtcpPacket, int len);
+    int  GetAdjustPlayout();
+    int  measurePlayoutDelay(int seqNum);
+    bool CheckAnyAudioQueued(int i);
 
-#ifdef WIN32
-    bool StartTx();
-    bool StartRx();
-    bool StopTx();
-    bool StopRx();
 
-    HWND        hwndLast;
-    int         MicDevice;
-    int         SpeakerDevice;
-
-    // Microphone stuff
-    HWAVEIN     hMicrophone;
-    WAVEHDR     micBufferDescr[NUM_MIC_BUFFERS];
-    short       MicBuffer[NUM_MIC_BUFFERS][MIC_BUFFER_SIZE];
-    int         micCurrBuffer;
-
-    // Speaker stuff
-    HWAVEOUT    hSpeaker;
-    WAVEHDR     spkBufferDescr[NUM_SPK_BUFFERS];
-    short       SpkBuffer[NUM_SPK_BUFFERS][SPK_BUFFER_SIZE];
-#else
-    short SpkBuffer[1][SPK_BUFFER_SIZE];
-#endif
-    int spkInBuffer;
-
+    AudioDriver *audio;
     DtmfFilter *DTMFFilter;
     
     QObject *eventWindow;
@@ -397,20 +374,10 @@ private:
     int txMsPacketSize;
     int rxPCMSamplesPerPacket;
     int txPCMSamplesPerPacket;
-    int SpkJitter;
-    bool SpeakerOn;
-    bool MicrophoneOn;
-    ulong rxTimestamp;
     ushort rxSeqNum;
     bool rxFirstFrame;
     ushort txSequenceNumber;
     ulong txTimeStamp;
-    int PlayoutDelay;
-    int speakerFd;
-    int microphoneFd;
-    short SilenceBuffer[MAX_DECOMP_AUDIO_SAMPLES];
-    int PlayLen;
-    int SilenceLen;
     uchar rtpMPT;
     uchar rtpMarker;
     ulong peerSsrc;
@@ -418,8 +385,6 @@ private:
     int myPort, yourPort, myRtcpPort, yourRtcpPort;
     rtpTxMode txMode;
     rtpRxMode rxMode;
-    QString micDevice;
-    QString spkDevice;
     bool oobError;
     bool killRtpThread;
     short *txBuffer;
@@ -431,10 +396,8 @@ private:
     int recBufferLen, recBufferMaxLen;
     int audioPayload;
     int dtmfPayload;
-    int spkLowThreshold;
-    bool spkSeenData;
-    int spkUnderrunCount;
     bool micMuted;
+    int adjustPlayoutDelay;
 
     short *ToneToSpk;
     int ToneToSpkSamples;
@@ -470,6 +433,13 @@ private:
     uint prevRxPkCnt;    
     int rtcpFractionLoss;
     int rtcpTotalLoss;
+    
+    int minPlayout;
+    int maxPlayout;
+    int totPlayout; // These two used to find avg
+    int cntPlayout;
+    int avgPlayout;
+    int nominalPlayout;
 };
 
 
