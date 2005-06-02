@@ -18,7 +18,7 @@
 #ifndef WIN32
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
-#include <mythtv/volumecontrol.h>
+//#include <mythtv/volumecontrol.h>
 #include "directory.h"
 #endif
 
@@ -58,12 +58,11 @@ class Tone : public QObject
         short  *toneBuffer;
         bool    Loop;
         QTimer *audioTimer;
-        int     playPtr;
 #ifdef WIN32        
         HWAVEOUT    hSpeaker;
         WAVEHDR     spkBufferDescr;
 #else        
-        int         hSpeaker;
+        AudioOutput *mythOutput;
 #endif        
 };
 

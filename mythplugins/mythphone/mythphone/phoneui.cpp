@@ -91,12 +91,12 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
     sipStack->UiWatch(DirContainer->ListAllEntries(true));
 
     // Possibly (user-defined) control the volume
-    volume_control = NULL;
+//    volume_control = NULL;
     volume_display_timer = new QTimer(this);
     VolumeMode = VOL_VOLUME;
     volume_icon->SetImage(gContext->FindThemeDir("default") + "/mp_volume_icon.png");
     volume_icon->LoadImage();
-    volume_control = new VolumeControl(true);
+//    volume_control = new VolumeControl(true);
     connect(volume_display_timer, SIGNAL(timeout()), this, SLOT(hideVolume()));
     
     rtpAudio = 0;
@@ -156,7 +156,7 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
     addDirectoryPopup = NULL;
     incallPopup = NULL;
     statsPopup = NULL;
-    audioPkInOutLabel = audioPkRtcpLabel = 0;
+    audioPkInOutLabel = audioPlayoutLabel = audioPkRtcpLabel = 0;
     videoResLabel = videoPkOutLabel = videoPkInLabel = videoPkRtcpLabel = videoFramesInOutDiscLabel = videoAvgFpsLabel = videoWebcamFpsLabel = 0;
     currentCallEntry = 0;
 
@@ -489,29 +489,21 @@ QString spk;
     QWidget::customEvent(event);
 }
 
-
-void PhoneUIBox::PlaceorAnswerCall(QString url, QString name, QString Mode, bool onLocalLan)
+void PhoneUIBox::PlaceCall(QString url, QString name, QString Mode, bool onLocalLan)
 {
-    switch (State)
-    {
-    case SIP_IDLE:
-        sipStack->PlaceNewCall(Mode, url, name, onLocalLan);
+    sipStack->PlaceNewCall(Mode, url, name, onLocalLan);
 
-        // Add an entry into the Placed Calls dir
-        if (currentCallEntry)
-            delete currentCallEntry;
-        currentCallEntry = new CallRecord(name, url, false, (QDateTime::currentDateTime()).toString());
-        phoneUIStatusBar->updateMidCallCaller(((name != 0) && (name.length() > 0)) ? name : url);
-        break;
-
-    case SIP_ICONNECTING:
-        sipStack->AnswerRingingCall(Mode, onLocalLan);
-        break;
-    default:
-        break;
-    }
+    // Add an entry into the Placed Calls dir
+    if (currentCallEntry)
+        delete currentCallEntry;
+    currentCallEntry = new CallRecord(name, url, false, (QDateTime::currentDateTime()).toString());
+    phoneUIStatusBar->updateMidCallCaller(((name != 0) && (name.length() > 0)) ? name : url);
 }
 
+void PhoneUIBox::AnswerCall(QString Mode, bool onLocalLan)
+{
+    sipStack->AnswerRingingCall(Mode, onLocalLan);
+}
 
 void PhoneUIBox::keypadPressed(char k)
 {
@@ -548,7 +540,7 @@ void PhoneUIBox::StartVideo(int lPort, QString remoteIp, int remoteVideoPort, in
 {
     videoCifModeToRes(rxVidRes, rxWidth, rxHeight);
 
-    rtpVideo = new rtp (this, lPort, remoteIp, remoteVideoPort, videoPayload, -1, "", "", RTP_TX_VIDEO, RTP_RX_VIDEO);
+    rtpVideo = new rtp (this, lPort, remoteIp, remoteVideoPort, videoPayload, -1, -1, "", "", RTP_TX_VIDEO, RTP_RX_VIDEO);
 
     if (h263->H263StartEncoder(txWidth, txHeight, txFps) && 
         h263->H263StartDecoder(rxWidth, rxHeight))
@@ -642,7 +634,8 @@ void PhoneUIBox::LoopbackButtonPushed()
         phoneUIStatusBar->DisplayCallState(QString(tr("Audio and Video Looped to ") + loopIp));
         int lvPort = atoi((const char *)gContext->GetSetting("VideoLocalPort"));
         int laPort = atoi((const char *)gContext->GetSetting("AudioLocalPort"));
-        rtpAudio = new rtp (this, laPort, loopIp, laPort, 0, -1, 
+        int playout = atoi((const char *)gContext->GetSetting("PlayoutVideoCall"));
+        rtpAudio = new rtp (this, laPort, loopIp, laPort, 0, playout, -1, 
                             gContext->GetSetting("MicrophoneDevice"), 
                             gContext->GetSetting("AudioOutputDevice"));
         powerDispTimer->start(100);
@@ -918,7 +911,8 @@ void PhoneUIBox::ProcessAudioRtpStatistics(RtpEvent *stats)
                                               stats->getPeriod());
     updateAudioStatistics(stats->getPkIn(), stats->getPkMissed(), stats->getPkLate(), 
                           stats->getPkOut(), stats->getPkInDisc(), stats->getPkOutDrop(), 
-                          stats->getBytesIn(), stats->getBytesOut());
+                          stats->getBytesIn(), stats->getBytesOut(),
+                          stats->getMinPlayout(), stats->getAvgPlayout(), stats->getMaxPlayout());
 }
 
 
@@ -958,7 +952,10 @@ void PhoneUIBox::startRTP(int audioPayload, int videoPayload, int dtmfPayload, i
         int laPort = atoi((const char *)gContext->GetSetting("AudioLocalPort"));
         QString spk = gContext->GetSetting("AudioOutputDevice");
         QString mic = gContext->GetSetting("MicrophoneDevice");
-        rtpAudio = new rtp (this, laPort, remoteIp, audioPort, audioPayload, dtmfPayload, mic, spk);
+        int playout = (videoPayload != -1) ?
+                        atoi((const char *)gContext->GetSetting("PlayoutVideoCall")) :
+                        atoi((const char *)gContext->GetSetting("PlayoutAudioCall"));
+        rtpAudio = new rtp (this, laPort, remoteIp, audioPort, audioPayload, playout, dtmfPayload, mic, spk);
         OnScreenClockTimer->start(1000);
         phoneUIStatusBar->DisplayInCallStats(true);
         phoneUIStatusBar->updateMidCallAudioCodec(audioCodec);
@@ -1027,7 +1024,7 @@ void PhoneUIBox::alertUser(QString callerUser, QString callerName, QString calle
     
     bool AutoanswerEnabled = gContext->GetNumSetting("SipAutoanswer",1);
     if ((AutoanswerEnabled) && (entry)) // Only allow autoanswer from matched entries
-        PlaceorAnswerCall(entry->getUri(), entry->getNickName(), txVideoMode, true);
+        AnswerCall(txVideoMode, true);
     else
     {
         // Popup the caller's details
@@ -1327,7 +1324,7 @@ void PhoneUIBox::closeUrlPopup()
 
 void PhoneUIBox::dialUrlVideo()
 {
-    PlaceorAnswerCall(urlField==0 ? urlRemoteField->text() : urlField->text(), "", txVideoMode);
+    PlaceCall(urlField==0 ? urlRemoteField->text() : urlField->text(), "", txVideoMode);
     closeUrlPopup();                           
 
     // If we got here via the menu popup
@@ -1339,7 +1336,7 @@ void PhoneUIBox::dialUrlVideo()
 
 void PhoneUIBox::dialUrlVoice()
 {
-    PlaceorAnswerCall(urlField==0 ? urlRemoteField->text() : urlField->text(), "", "AUDIOONLY");
+    PlaceCall(urlField==0 ? urlRemoteField->text() : urlField->text(), "", "AUDIOONLY");
     closeUrlPopup();
 
     // If we got here via the menu popup
@@ -1718,14 +1715,26 @@ void PhoneUIBox::doCallPopup(DirEntry *entry, QString DialorAnswer, bool audioOn
             drawCallPopupCallHistory(incallPopup, RecentCalls.prev());
         }
     
-        if (!audioOnly)
-        {
-            QButton *button1 = incallPopup->addButton(DialorAnswer + tr(" Videocall"), this, SLOT(incallDialVideoSelected()));
-            button1->setFocus();
-        }
-        QButton *button2 = incallPopup->addButton(DialorAnswer + tr(" Voice-Only"), this, SLOT(incallDialVoiceSelected()));
+        QButton *button2=0;
         if (DialorAnswer == "Dial")
+        {
+            if (!audioOnly)
+            {
+                QButton *button1 = incallPopup->addButton(DialorAnswer + tr(" Videocall"), this, SLOT(outcallDialVideoSelected()));
+                button1->setFocus();
+            }
+            button2 = incallPopup->addButton(DialorAnswer + tr(" Voice-Only"), this, SLOT(outcallDialVoiceSelected()));
             incallPopup->addButton(tr("Send an Instant Message"), this, SLOT(incallSendIMSelected()));
+        }
+        else
+        {
+            if (!audioOnly)
+            {
+                QButton *button1 = incallPopup->addButton(DialorAnswer + tr(" Videocall"), this, SLOT(incallDialVideoSelected()));
+                button1->setFocus();
+            }
+            button2 = incallPopup->addButton(DialorAnswer + tr(" Voice-Only"), this, SLOT(incallDialVoiceSelected()));
+        }
         
         if (audioOnly)
             button2->setFocus();
@@ -1746,17 +1755,29 @@ void PhoneUIBox::closeCallPopup()
 
 void PhoneUIBox::incallDialVideoSelected()
 {
-    PlaceorAnswerCall(callLabelUrl->text(), callLabelName->text(), txVideoMode, entryIsOnLocalLan);
+    AnswerCall(txVideoMode, entryIsOnLocalLan);
     closeCallPopup();
 }
  
 void PhoneUIBox::incallDialVoiceSelected()
 {
-    PlaceorAnswerCall(callLabelUrl->text(), callLabelName->text(), "AUDIOONLY", entryIsOnLocalLan);
+    AnswerCall("AUDIOONLY", entryIsOnLocalLan);
     closeCallPopup();
 }
 
-void PhoneUIBox::incallSendIMSelected()
+void PhoneUIBox::outcallDialVideoSelected()
+{
+    PlaceCall(callLabelUrl->text(), callLabelName->text(), txVideoMode, entryIsOnLocalLan);
+    closeCallPopup();
+}
+ 
+void PhoneUIBox::outcallDialVoiceSelected()
+{
+    PlaceCall(callLabelUrl->text(), callLabelName->text(), "AUDIOONLY", entryIsOnLocalLan);
+    closeCallPopup();
+}
+
+void PhoneUIBox::outcallSendIMSelected()
 {
     QString OtherParty = callLabelUrl->text();
     closeCallPopup();
@@ -1809,6 +1830,7 @@ void PhoneUIBox::showStatistics(bool showVideo)
 
     statsPopup->addLabel(tr("Audio"), MythPopupBox::Medium);
     audioPkInOutLabel    = statsPopup->addLabel(tr("Packets In/Out/Lost/Late:             "), MythPopupBox::Small);
+    audioPlayoutLabel    = statsPopup->addLabel(tr("Playout Delay Min/Avg/Max:            "), MythPopupBox::Small);
     audioPkRtcpLabel     = statsPopup->addLabel(tr("Packets Lost by Peer:                 "), MythPopupBox::Small);
 
     if (showVideo)
@@ -1832,8 +1854,7 @@ void PhoneUIBox::showStatistics(bool showVideo)
     statsPopup->ShowPopup(this, SLOT(closeStatisticsPopup()));
 }
 
-
-void PhoneUIBox::updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut)
+void PhoneUIBox::updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut, int minPlayout, int avgPlayout, int maxPlayout)
 {
     (void)pkInDisc;
     (void)pkOutDrop;
@@ -1845,6 +1866,8 @@ void PhoneUIBox::updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkO
     audioPkInOutLabel->setText(tr("Packets In/Out/Lost/Late: ") + QString::number(pkIn) + " / " + 
                                QString::number(pkOut) + " / " + QString::number(pkLost)
                                + " / " + QString::number(pkLate));
+    audioPlayoutLabel->setText(tr("Playout Delay Min/Avg/Max: ") + QString::number(minPlayout) + " / " + 
+                               QString::number(avgPlayout) + " / " + QString::number(maxPlayout));
 }
 
 
@@ -1894,7 +1917,7 @@ void PhoneUIBox::closeStatisticsPopup()
     statsPopup->hide();
     delete statsPopup;
     statsPopup = NULL;
-    audioPkInOutLabel = audioPkRtcpLabel = 0;
+    audioPkInOutLabel = audioPlayoutLabel = audioPkRtcpLabel = 0;
     videoResLabel = videoPkOutLabel = videoPkInLabel = videoPkRtcpLabel = videoFramesInOutDiscLabel = videoAvgFpsLabel = 0;
 }
 
@@ -1905,8 +1928,8 @@ void PhoneUIBox::changeVolume(bool up_or_down)
     {
     default:
     case VOL_VOLUME:
-        if (gContext->GetNumSetting("MythControlsVolume", 0))
-            volume_control->AdjustCurrentVolume(up_or_down ? 2 : -2);
+//        if (gContext->GetNumSetting("MythControlsVolume", 0))
+//            volume_control->AdjustCurrentVolume(up_or_down ? 2 : -2);
         break;
     case VOL_MICVOLUME:
         break;
@@ -2059,7 +2082,7 @@ void PhoneUIBox::showVolume(bool on_or_off)
             {
             case VOL_VOLUME:
             default:
-                volume_status->SetUsed(volume_control->GetCurrentVolume());
+//                volume_status->SetUsed(volume_control->GetCurrentVolume());
                 break;
             case VOL_MICVOLUME:
                 volume_status->SetUsed(50);
@@ -2274,8 +2297,8 @@ PhoneUIBox::~PhoneUIBox(void)
     // Flush the events through the event queue now all the event-producing threads are closed
     QApplication::sendPostedEvents(this, 0);
     
-    if (volume_control)
-        delete volume_control;
+//    if (volume_control)
+//        delete volume_control;
     delete DirContainer;
     if (vmail)
         delete vmail;

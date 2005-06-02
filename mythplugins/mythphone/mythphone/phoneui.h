@@ -18,7 +18,7 @@
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
-#include <mythtv/volumecontrol.h>
+//#include <mythtv/volumecontrol.h>
 
 #include "directory.h"
 #include "webcam.h"
@@ -75,7 +75,9 @@ class PhoneUIBox : public MythThemedDialog
     void closeCallPopup();
     void incallDialVoiceSelected();
     void incallDialVideoSelected();
-    void incallSendIMSelected();
+    void outcallDialVoiceSelected();
+    void outcallDialVideoSelected();
+    void outcallSendIMSelected();
     void menuCallUrl();
     void menuAddContact();
     void menuDirAdd();
@@ -100,6 +102,8 @@ class PhoneUIBox : public MythThemedDialog
     void hideVolume(){showVolume(false);}
     void showVolume(bool on_or_off);
     void DisplayMicSpkPower();
+    void statsIncreaseAudioPlayout();
+    void statsDecreaseAudioPlayout();
 
 
   private:
@@ -108,7 +112,8 @@ class PhoneUIBox : public MythThemedDialog
     void    ProcessRxVideoFrame();
     void    ProcessSipStateChange();
     void    ProcessSipNotification();
-    void    PlaceorAnswerCall(QString url, QString name, QString Mode, bool onLocalLan=false);
+    void    PlaceCall(QString url, QString name, QString Mode, bool onLocalLan=false);
+    void    AnswerCall(QString Mode, bool onLocalLan=false);
     void    HangUp();
     void    StartVideo(int lPort, QString remoteIp, int remoteVideoPort, int videoPayload, QString rxVidRes);
     void    StopVideo();
@@ -136,7 +141,7 @@ class PhoneUIBox : public MythThemedDialog
     void    stopRTP(bool stopAudio=true, bool stopVideo=true);
     void    alertUser(QString callerUser, QString callerName, QString callerUrl, bool inAudioOnly);
     void    showStatistics(bool showVideo);
-    void    updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut);
+    void    updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut, int minPlayout, int avgPlayout, int maxPlayout);
     void    updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut, int fIn, int fOut, int fDiscIn, int fDiscOut);
     void    updateAudioRtcpStatistics(int fractionLoss, int totalLoss);
     void    updateVideoRtcpStatistics(int fractionLoss, int totalLoss);
@@ -172,7 +177,7 @@ class PhoneUIBox : public MythThemedDialog
     QTimer *OnScreenClockTimer;
     QTime ConnectTime;
  
-    VolumeControl     *volume_control;
+//    VolumeControl     *volume_control;
     QTimer            *volume_display_timer;
     UIStatusBarType   *volume_status;
     enum {VOL_VOLUME, VOL_MICVOLUME, VOL_BRIGHTNESS, VOL_CONTRAST, VOL_COLOUR, VOL_TXSIZE, VOL_TXRATE, VOL_AUDCODEC } VolumeMode;
@@ -219,6 +224,7 @@ class PhoneUIBox : public MythThemedDialog
 
     MythPopupBox *statsPopup;
     QLabel *audioPkInOutLabel;
+    QLabel *audioPlayoutLabel;
     QLabel *audioPkRtcpLabel;
     QLabel *videoPkInLabel;
     QLabel *videoPkOutLabel;

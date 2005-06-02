@@ -13,7 +13,7 @@
 #ifndef WIN32
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
-#include <mythtv/volumecontrol.h>
+//#include <mythtv/volumecontrol.h>
 
 #include "directory.h"
 #endif

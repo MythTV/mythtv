@@ -59,8 +59,13 @@ bool H263Container::H263StartEncoder(int w, int h, int fps)
     h263EncContext->width = w;  
     h263EncContext->height = h;
     /* frames per second */
+#ifdef WIN32 // Windows version uses older avcodec library
+    h263EncContext->frame_rate = fps;  
+    h263EncContext->frame_rate_base = 1;
+#else
     h263EncContext->time_base.den = fps;  
     h263EncContext->time_base.num = 1;
+#endif
     h263EncContext->gop_size = 600; // Max allowed by library. Was fps*5; /* emit one intra frame every five secs */
     h263EncContext->max_b_frames=0;
 

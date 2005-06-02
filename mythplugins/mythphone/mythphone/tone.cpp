@@ -122,7 +122,7 @@ Tone *TelephonyTones::dtmf(int Id)
 Tone::Tone(int freqHz, int volume, int ms, QObject *parent, const char *name) : QObject(parent, name)
 {
 #ifndef WIN32
-    hSpeaker = -1;
+    mythOutput = 0;
 #else    
     hSpeaker = 0;
 #endif    
@@ -138,7 +138,7 @@ Tone::Tone(int freqHz, int volume, int ms, QObject *parent, const char *name) : 
 Tone::Tone(const Tone &t, QObject *parent, const char *name) : QObject(parent, name)
 {
 #ifndef WIN32
-    hSpeaker = -1;
+    mythOutput = 0;
 #else    
     hSpeaker = 0;
 #endif    
@@ -152,7 +152,7 @@ Tone::Tone(const Tone &t, QObject *parent, const char *name) : QObject(parent, n
 Tone::Tone(int ms, QObject *parent, const char *name) : QObject(parent, name)
 {
 #ifndef WIN32
-    hSpeaker = -1;
+    mythOutput = 0;
 #else    
     hSpeaker = 0;
 #endif    
@@ -166,7 +166,7 @@ Tone::Tone(int ms, QObject *parent, const char *name) : QObject(parent, name)
 Tone::Tone(wavfile &wav, QObject *parent, const char *name) : QObject(parent, name)
 {
 #ifndef WIN32
-    hSpeaker = -1;
+    mythOutput = 0;
 #else    
     hSpeaker = 0;
 #endif    
@@ -230,34 +230,21 @@ void Tone::Play(QString deviceName, bool loop)
         waveOutWrite(hSpeaker, &spkBufferDescr, sizeof(WAVEHDR));
     }
 #else
-    if (hSpeaker == -1)
+    if (mythOutput == 0)
     {
         OpenSpeaker(deviceName);
         Loop = loop;
-    
-        if (hSpeaker >= 0)
+
+        if (mythOutput)
         {
-            int b;
-            audio_buf_info info;
-            ioctl(hSpeaker, SNDCTL_DSP_GETOSPACE, &info);
-
-            playPtr = 0;
-            if (info.bytes > (int)(Samples*sizeof(short)))
-            {
-                b = write(hSpeaker, (uchar *)toneBuffer, Samples*sizeof(short));
-            }
-            else
-            {
-                b = write(hSpeaker, (uchar *)toneBuffer, info.bytes);
-                playPtr = info.bytes;
-            }
-
+            mythOutput->AddSamples((char *)toneBuffer, Samples, 100); // Set timecode to a static, known value
+            
             audioTimer = new QTimer(this);
             connect(audioTimer, SIGNAL(timeout()), this, SLOT(audioTimerExpiry()));
-            audioTimer->start((b / sizeof(short)) / 8, true); // Note this is /9 instead of /8 to make the timer expire "before" the sound stops
+            audioTimer->start(Samples / 8, true); // At 8khz, convert to ms by "/8"
         }
         else
-            cout << "Could not open " << deviceName << " to play tone\n";
+            cout << "MythPhone: could not open " << deviceName << " to play tone\n";
     }
 #endif    
 }
@@ -265,24 +252,10 @@ void Tone::Play(QString deviceName, bool loop)
 void Tone::audioTimerExpiry()
 {
 #ifndef WIN32
-    if ((Loop || (playPtr != 0)) && (hSpeaker >= 0))
+    if ((Loop) && (mythOutput != 0))
     {
-        int b;
-        audio_buf_info info;
-        ioctl(hSpeaker, SNDCTL_DSP_GETOSPACE, &info);
-
-        if (info.bytes > (int)((Samples*sizeof(short))-playPtr))
-        {
-            b = write(hSpeaker, (uchar *)toneBuffer+playPtr, (Samples*sizeof(short))-playPtr);
-            playPtr = 0;
-        }
-        else
-        {
-            b = write(hSpeaker, (uchar *)toneBuffer+playPtr, info.bytes);
-            playPtr += info.bytes;
-        }
-
-        audioTimer->start((b / sizeof(short)) / 8, true); // Note this is /9 instead of /8 to make the timer expire "before" the sound stops
+        mythOutput->AddSamples((char *)toneBuffer, Samples, 100); // Set timecode to a static, known value
+        audioTimer->start(Samples / 8, true); 
     }
     else 
         Stop();
@@ -297,14 +270,6 @@ void Tone::Stop()
         delete audioTimer;
         audioTimer = 0;
     }
-#ifndef WIN32
-    if (hSpeaker >= 0)
-    {
-        int r = 1;
-        if (ioctl(hSpeaker, SNDCTL_DSP_RESET, &r) == -1)
-            cerr << "Error terminating playback\n";
-    }
-#endif    
     CloseSpeaker();
 }
 
@@ -340,59 +305,12 @@ void Tone::OpenSpeaker(QString devName)
         return;
 
 #else
-    int fd = open(devName, O_WRONLY, 0);
-    if (fd == -1)
+    mythOutput = AudioOutput::OpenAudio(devName, 16, 1, 8000, AUDIOOUTPUT_TELEPHONY, true);
+    if (mythOutput)
     {
-        cerr << "Cannot open device " << devName << endl;
-        return;
-    }                  
-
-    int format = AFMT_S16_LE;
-    if (ioctl(fd, SNDCTL_DSP_SETFMT, &format) == -1)
-    {
-        cerr << "Error setting audio driver format\n";
-        close(fd);
-        return;
+        mythOutput->SetBlocking(false);
+        mythOutput->SetEffDsp(8000 * 100);
     }
-
-    int channels = 1;
-    if (ioctl(fd, SNDCTL_DSP_CHANNELS, &channels) == -1)
-    {
-        cerr << "Error setting audio driver num-channels\n";
-        close(fd);
-        return;
-    }
-
-    int speed = 8000; // 8KHz
-    if (ioctl(fd, SNDCTL_DSP_SPEED, &speed) == -1)
-    {
-        cerr << "Error setting audio driver speed\n";
-        close(fd);
-        return;
-    }
-
-    if ((format != AFMT_S16_LE) || (channels != 1) || (speed != 8000))
-    {
-        cerr << "Error setting audio driver; " << format << ", " << channels << ", " << speed << endl;
-        close(fd);
-        return;
-    }
-
-/*    uint frag_size = 0x7FFF0010; // unlimited number of fragments; fragment size=65535 bytes (ok for up to 3 seconds)
-    if (ioctl(fd, SNDCTL_DSP_SETFRAGMENT, &frag_size) == -1)
-    {
-        cerr << "Error setting audio fragment size\n";
-        close(fd);
-        return -1;
-    }
-*/
-    int flags;
-    if ((flags = fcntl(fd, F_GETFL, 0)) > 0) 
-    {
-        flags &= O_NDELAY;
-        fcntl(fd, F_SETFL, flags);
-    }
-    hSpeaker = fd;
 #endif
 }
 
@@ -411,9 +329,9 @@ void Tone::CloseSpeaker()
         return;
     hSpeaker = 0;
 #else
-    if (hSpeaker >= 0)
-        close(hSpeaker);   // For some reason, this blocks for ~ 1s.  I have no idea why
-    hSpeaker = -1;
+    if (mythOutput)
+        delete mythOutput;
+    mythOutput = 0;
 #endif
 }
 
@@ -423,7 +341,7 @@ bool Tone::Playing()
 #ifdef WIN32
     return (hSpeaker != 0); 
 #else
-    return (hSpeaker != -1); 
+    return (mythOutput != 0); 
 #endif    
 };
 
