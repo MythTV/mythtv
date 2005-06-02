@@ -61,8 +61,24 @@ bool AudioOutputALSA::OpenDevice()
        const int bits_per_byte = 8;
        int fbytes = (audio_bits * audio_channels * audio_samplerate) / 
                     (bits_per_byte * video_frame_rate);
+                    
+        For telephony apps, a much shorter fragment size is needed to reduce the
+        delay, and fragments should be multiples of the RTP packet size (10ms). 
+        20ms delay should be the max introduced by the driver, which equates
+        to 320 bytes at 8000 samples/sec and mono 16-bit samples
     */
-    fragment_size = 4096;
+    if (source == AUDIOOUTPUT_TELEPHONY)
+    {
+        fragment_size = 320;
+        buffer_time = 80000;  // 80 ms
+        period_time = buffer_time / 4;  // 20ms
+    }
+    else
+    {
+        fragment_size = 4096;
+        buffer_time = 500000;  // .5 seconds
+        period_time = buffer_time / 4;  // 4 interrupts per buffer
+    }
 
     if (audio_bits == 8)
         format = SND_PCM_FORMAT_S8;
@@ -85,9 +101,6 @@ bool AudioOutputALSA::OpenDevice()
         Error(QString("Unknown sample format: %1 bits.").arg(audio_bits));
         return false;
     }
-
-    buffer_time = 500000;  // .5 seconds
-    period_time = buffer_time / 4;  // 4 interrupts per buffer
 
     err = SetParameters(pcm_handle, SND_PCM_ACCESS_MMAP_INTERLEAVED,
                         format, audio_channels, audio_samplerate, buffer_time,
