@@ -479,7 +479,7 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
         {
             node->setActive(false);
             menu->refresh();
-            mfd_interface->ripCollection(current_mfd->getId(), node->getInt());
+            mfd_interface->ripPlaylist(current_mfd->getId(), node->getInt(), node->getAttribute(0));
         }
     }
 }
