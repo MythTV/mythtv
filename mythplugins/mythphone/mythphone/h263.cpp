@@ -52,6 +52,7 @@ bool H263Container::H263StartEncoder(int w, int h, int fps)
 
     h263EncContext = avcodec_alloc_context();
     
+    h263EncContext->pix_fmt = PIX_FMT_YUV420P;
     /* put sample parameters */
     h263EncContext->bit_rate = 2000000;
     /* resolution must be a multiple of two */
