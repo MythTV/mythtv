@@ -311,6 +311,7 @@ bool AudioCdJob::ripAndEncodeTrack(QUrl track_url, QString destination_filename,
         //  Ignore the 44 byte wav header
         //
 
+        amount_read = 44;
         if (source->readBlock(buffer, 44) != 44)
         {
             warning("couldn't eat through wav header in a cd rip");
