@@ -93,11 +93,11 @@ static HostLineEdit *TransmitBandwidth()
 --------------- General VXML Settings ---------------
 */
 
-static HostLineEdit *TimeToAnswer()
+static HostSpinBox *TimeToAnswer()
 {
-    HostLineEdit *gc = new HostLineEdit("TimeToAnswer");
+    HostSpinBox *gc = new HostSpinBox("TimeToAnswer", 1, 30, 1);
     gc->setLabel(QObject::tr("Time to Answer"));
-    gc->setValue("10");
+    gc->setValue(10);
     gc->setHelpText(QObject::tr("The time in seconds a call rings before being "
                     "automatically answered and diverted to a VXML script."));
     return gc;
@@ -205,8 +205,28 @@ static HostComboBox *MicrophoneDevice()
     gc->addSelection("None");
     gc->fillSelectionsFromDir(dev);
     gc->setHelpText(QObject::tr("Select the device path for your microphone. "
-		                "Currently this CANNOT be the same device as used for "
-		                "audio output."));
+                                "Currently this CANNOT be the same device as used for "
+                                "audio output."));
+    return gc;
+};
+
+static HostSpinBox *PlayoutAudioCall()
+{
+    HostSpinBox *gc = new HostSpinBox("PlayoutAudioCall", 10, 300, 5);
+    gc->setLabel(QObject::tr("Jitter Buffer (Audio Call)"));
+    gc->setValue(40);
+    gc->setHelpText(QObject::tr("Size of the playout buffer in ms for an audio call. "));
+    return gc;
+};
+
+static HostSpinBox *PlayoutVideoCall()
+{
+    HostSpinBox *gc = new HostSpinBox("PlayoutVideoCall", 10, 300, 5);
+    gc->setLabel(QObject::tr("Jitter Buffer (Video Call)"));
+    gc->setValue(110);
+    gc->setHelpText(QObject::tr("Size of the playout buffer in ms for a video call. "
+                                "This should be bigger than for an audio call because "
+                                "CPU usage causes jitter and to sync video & audio."));
     return gc;
 };
 
@@ -328,12 +348,11 @@ MythPhoneSettings::MythPhoneSettings()
     sipProxySet->addChild(SipProxyAuthName());
     sipProxySet->addChild(SipProxyAuthPassword());
     sipProxySet->addChild(MySipName());
-    //sipProxySet->addChild(MySipUser());
+    sipProxySet->addChild(SipAutoanswer());
     addChild(sipProxySet);
 
     VerticalConfigurationGroup* sipSet = new VerticalConfigurationGroup(false);
-    sipSet->setLabel(QObject::tr("SIP Settings"));
-    sipSet->addChild(CodecPriorityList());
+    sipSet->setLabel(QObject::tr("IP Settings"));
     sipSet->addChild(SipBindInterface());
     sipSet->addChild(SipLocalPort());
     sipSet->addChild(NatTraversalMethod());
@@ -342,24 +361,30 @@ MythPhoneSettings::MythPhoneSettings()
     sipSet->addChild(VideoLocalPort());
     addChild(sipSet);
 
-    VerticalConfigurationGroup* vxmlSet = new VerticalConfigurationGroup(false);
-    vxmlSet->setLabel(QObject::tr("VXML Settings"));
-    vxmlSet->addChild(SipAutoanswer());
-    vxmlSet->addChild(TimeToAnswer());
-    vxmlSet->addChild(DefaultVxmlUrl());
-    vxmlSet->addChild(DefaultVoicemailPrompt());
-    vxmlSet->addChild(TTSVoice());
-    addChild(vxmlSet);
+    VerticalConfigurationGroup* audioSet = new VerticalConfigurationGroup(false);
+    audioSet->setLabel(QObject::tr("AUDIO Settings"));
+    audioSet->addChild(MicrophoneDevice());
+    audioSet->addChild(CodecPriorityList());
+    audioSet->addChild(PlayoutAudioCall());
+    audioSet->addChild(PlayoutVideoCall());
+    addChild(audioSet);
 
     VerticalConfigurationGroup* webcamSet = new VerticalConfigurationGroup(false);
     webcamSet->setLabel(QObject::tr("WEBCAM Settings"));
     webcamSet->addChild(WebcamDevice());
-    webcamSet->addChild(MicrophoneDevice());
     webcamSet->addChild(TxResolution());
     webcamSet->addChild(TransmitFPS());
     webcamSet->addChild(TransmitBandwidth());
     webcamSet->addChild(CaptureResolution());
     addChild(webcamSet);
+    
+    VerticalConfigurationGroup* vxmlSet = new VerticalConfigurationGroup(false);
+    vxmlSet->setLabel(QObject::tr("VXML Settings"));
+    vxmlSet->addChild(TimeToAnswer());
+    vxmlSet->addChild(DefaultVxmlUrl());
+    vxmlSet->addChild(DefaultVoicemailPrompt());
+    vxmlSet->addChild(TTSVoice());
+    addChild(vxmlSet);
 }
 
 
