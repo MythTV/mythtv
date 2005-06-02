@@ -296,6 +296,30 @@ bool AudioCdJob::ripAndEncodeTrack(QUrl track_url, QString destination_filename,
     int file_size = source->size();
     int amount_read = 0;
 
+    //
+    //  Check file types
+    //
+    
+    QString file_extension = track_url.fileName().section('.',-1);
+    if (file_extension == "cda")
+    {
+        //  cool
+    }
+    else if (file_extension == "wav")
+    {
+        //
+        //  Ignore the 44 byte wav header
+        //
+
+        if (source->readBlock(buffer, 44) != 44)
+        {
+            warning("couldn't eat through wav header in a cd rip");
+            done = true;
+            success = false;
+        }
+    }
+    
+
     if (quality == MFD_TRANSCODER_AUDIO_QUALITY_PERFECT || codec == MFD_TRANSCODER_AUDIO_CODEC_FLAC)
     {
         encoder = new FlacEncoder(temp_filename, quality, metadata);
@@ -349,6 +373,11 @@ bool AudioCdJob::ripAndEncodeTrack(QUrl track_url, QString destination_filename,
         }
     }
   
+    if(buffer)
+    {
+        delete [] buffer;
+        buffer= NULL;
+    }
     
     if (source)
     {
