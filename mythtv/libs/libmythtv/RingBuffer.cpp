@@ -392,9 +392,9 @@ class DVDRingBufferPriv
         long long GetReadPosition() { return 0; }
         long long GetTotalReadPosition() { return 0; }
         void getPartAndTitle( int& title, int& part) { title = 0; part = 0; }
-        void nextTrack();
-        void prevTrack();
-        void getDescForPos(QString& desc);
+        void nextTrack(){};
+        void prevTrack(){};
+        void getDescForPos(QString& desc){}; 
 };
 
 
