@@ -984,6 +984,45 @@ void MetadataServer::markCollectionAsBeingRipped(int collection_id, bool being_r
 
 }
 
+void MetadataServer::markPlaylistAsBeingRipped(int collection_id, int playlist_id, bool being_ripped)
+{
+    lockMetadata();
+
+    Playlist *playlist = getPlaylistByContainerAndId(collection_id, playlist_id);
+    MetadataContainer *metadata_container = getMetadataContainer(collection_id);
+                
+    if(!playlist)
+    {
+        log("could not find playlist to mark with rip status (shutting down?)", 3);
+        unlockMetadata();
+        return;
+    }
+    
+    if(!metadata_container)
+    {
+        log("could not find container to mark with playlist rip status (shutting down?)", 3);
+        unlockMetadata();
+        return;
+    }
+    
+    playlist->setBeingRipped(being_ripped);
+    metadata_container->clearDeltasAndBumpGeneration();
+
+    if(metadata_container->isLocal() && metadata_container->isAudio())
+    {
+        metadata_local_audio_generation_mutex.lock();
+            ++metadata_local_audio_generation;
+        metadata_local_audio_generation_mutex.unlock();
+    }
+
+    unlockMetadata();
+    
+    MetadataChangeEvent *mce = new MetadataChangeEvent(collection_id, true);
+    QApplication::postEvent(parent, mce);   
+
+    dealWithHangingUpdates(); 
+}
+
 void MetadataServer::updateDictionary(
                                         MetadataContainer *target, 
                                         QValueList<int> metadata_deletions, 
@@ -1633,6 +1672,8 @@ void MetadataServer::addAudioList(
         response->addListId(a_playlist->getId());
         response->addListName(a_playlist->getName());
         response->addListEditable(a_playlist->isEditable());
+        response->addListRipable(a_playlist->isRipable());
+        response->addListBeingRipped(a_playlist->isBeingRipped());
         QValueList<int> *list_items = a_playlist->getListPtr();
         QValueList<int>::iterator item_it;
         for(item_it = list_items->begin(); item_it != list_items->end(); ++item_it)

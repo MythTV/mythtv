@@ -705,6 +705,41 @@ void MdcapOutput::addListEditable(bool yes_or_no)
 }
 
 
+void MdcapOutput::addListRipable(bool yes_or_no)
+{
+    //
+    //  Ripable is 2 bytes
+    //
+
+    append(MarkupCodes::list_is_ripable);
+    if(yes_or_no)
+    {
+        append((uint8_t) 1);
+    }    
+    else
+    {
+        append((uint8_t) 0);
+    }
+}
+
+void MdcapOutput::addListBeingRipped(bool yes_or_no)
+{
+    //
+    //  Being ripped is 2 bytes
+    //
+
+    append(MarkupCodes::list_being_ripped);
+    if(yes_or_no)
+    {
+        append((uint8_t) 1);
+    }    
+    else
+    {
+        append((uint8_t) 0);
+    }
+}
+
+
 
 void MdcapOutput::append(char a_char)
 {

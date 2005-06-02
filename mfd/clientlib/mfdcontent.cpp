@@ -320,6 +320,15 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
     }
 
     //
+    //  If it's ripable, but it on the rip list
+    //
+    
+    if (new_playlist->isRipable())
+    {
+        addRipAbility(new_playlist->getName(), new_playlist->getCollectionId(), new_playlist->getId(), new_playlist->isBeingRipped());
+    }
+
+    //
     //  Find or "create as we go" another node for this playlist in the "By
     //  Collection Tree"
     //
@@ -426,7 +435,7 @@ void MfdContentCollection::addNewPlaylistAbility(const QString &collection_name,
     }
 }
 
-void MfdContentCollection::addRipAbility(const QString &collection_name, int l_collection_id, bool is_being_ripped)
+void MfdContentCollection::addRipAbility(const QString &collection_name, int l_collection_id, int playlist_id, bool is_being_ripped)
 {
     if (!import_cd_tree)
     {
@@ -438,6 +447,7 @@ void MfdContentCollection::addRipAbility(const QString &collection_name, int l_c
     UIListGenericTree *import_cd = new UIListGenericTree(import_cd_tree, collection_name);
     import_cd->setPixmap(pixalbum);
     import_cd->setInt(l_collection_id);
+    import_cd->setAttribute(0, playlist_id);
     import_cd->setAttribute(1, 9);
     
     if (is_being_ripped)

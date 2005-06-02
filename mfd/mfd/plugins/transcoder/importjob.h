@@ -26,7 +26,8 @@ class ImportJob: public TranscoderJob
                     QString         l_scratch_dir_string,
                     QString         l_destination_dir_string,
                     MetadataServer *l_metadata_server,
-                    int             l_container_id
+                    int             l_container_id,
+                    int             l_playlist_id
              );
 
     virtual ~ImportJob();
@@ -38,6 +39,7 @@ class ImportJob: public TranscoderJob
     QString         destination_dir_string;
     MetadataServer *metadata_server;
     int             container_id;
+    int             playlist_id;
     QDir           *scratch_dir;
 };
 

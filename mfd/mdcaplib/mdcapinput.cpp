@@ -1232,6 +1232,90 @@ bool MdcapInput::popListEditable()
 
 
 
+bool MdcapInput::popListRipable()
+{
+    //
+    //  Ripable is 2 bytes
+    //  1 - content markup code
+    //  2 - int; 0 is false
+    //           1 is true
+    //
+    
+    if(amountLeft() < 2)
+    {
+        cerr << "mdcapinput.o: asked to popListRipable(), but not enough "
+             << "bytes left";
+        return false;
+    }
+    
+    char content_code = popByte();
+    if(content_code != MarkupCodes::list_is_ripable)
+    {
+        cerr << "mdcapinput.o: asked to popListRipable(), but "
+             << "content code is not list_is_ripable "
+             << endl;
+        return false;
+    }
+    
+    uint8_t result = popByte();
+    if(result == 1)
+    {
+        return true;
+    }
+    else if(result == 0)
+    {
+        return false;
+    }
+    
+    cerr << "mdcapinput.o: asked to popListRipable(), but value was "
+         << "neither true nor false"
+         << endl;
+    return false;
+}
+
+bool MdcapInput::popListBeingRipped()
+{
+    //
+    //  Being ripped is 2 bytes
+    //  1 - content markup code
+    //  2 - int; 0 is false
+    //           1 is true
+    //
+    
+    if(amountLeft() < 2)
+    {
+        cerr << "mdcapinput.o: asked to popListBeingRipped(), but not enough "
+             << "bytes left";
+        return false;
+    }
+    
+    char content_code = popByte();
+    if(content_code != MarkupCodes::list_being_ripped)
+    {
+        cerr << "mdcapinput.o: asked to popListBeingRipped(), but "
+             << "content code is not list_being_ripped "
+             << endl;
+        return false;
+    }
+    
+    uint8_t result = popByte();
+    if(result == 1)
+    {
+        return true;
+    }
+    else if(result == 0)
+    {
+        return false;
+    }
+    
+    cerr << "mdcapinput.o: asked to popListBeingRipped(), but value was "
+         << "neither true nor false"
+         << endl;
+    return false;
+}
+
+
+
 uint32_t MdcapInput::popDeletedItem()
 {
     //

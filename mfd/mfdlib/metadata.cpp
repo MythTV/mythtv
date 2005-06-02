@@ -203,6 +203,8 @@ Playlist::Playlist(
     id = new_id;
     db_id = -1;
     is_editable = false;
+    ripable = false;
+    is_being_ripped = false;
     name = new_name;
 
     raw_song_list = raw_songlist;
@@ -245,6 +247,8 @@ Playlist::Playlist(
     id = new_id;
     db_id = -1;
     is_editable = false;
+    ripable = false;
+    is_being_ripped = false;
     name = new_name;
 
     QValueList<int>::iterator it;

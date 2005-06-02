@@ -64,5 +64,7 @@ const char MarkupCodes::item_dup_flag;
 const char MarkupCodes::list_id;
 const char MarkupCodes::list_item;
 const char MarkupCodes::list_is_editable;
+const char MarkupCodes::list_is_ripable;
+const char MarkupCodes::list_being_ripped;
 const char MarkupCodes::deleted_list;
 const char MarkupCodes::commit_list_type;

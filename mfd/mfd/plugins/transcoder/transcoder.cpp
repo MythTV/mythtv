@@ -336,6 +336,15 @@ void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
         QString container_id_string = httpin_request->getHeader("Container");
         bool ok;
         int container_id = container_id_string.toInt(&ok);
+        if(!ok)
+        {
+            warning(QString("could not parse container id from \"%1\" to "
+                            "start audio cd rip").arg(container_id_string));
+            return;
+        }
+        QString playlist_id_string = httpin_request->getHeader("Playlist");
+        int playlist_id = playlist_id_string.toInt(&ok);
+        
         if(ok)
         {
             //
@@ -351,6 +360,7 @@ void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
                                                         music_destination_directory->path(),
                                                         metadata_server,
                                                         container_id,
+                                                        playlist_id,
                                                         MFD_TRANSCODER_AUDIO_CODEC_OGG,
                                                         MFD_TRANSCODER_AUDIO_QUALITY_HIGH
                                                        );
@@ -363,8 +373,8 @@ void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
         }
         else
         {
-            warning(QString("could not parse container id from \"%1\" to "
-                            "start audio cd rip").arg(container_id_string));
+            warning(QString("could not parse playlist id from \"%1\" to "
+                            "start audio cd rip").arg(playlist_id_string));
         }
     }
     else

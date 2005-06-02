@@ -36,7 +36,7 @@ class MfdContentCollection
     void addMetadata(Metadata *an_item, const QString &collection_name, MetadataCollection *collection);
     void addPlaylist(ClientPlaylist *a_playlist, MetadataCollection *collection);
     void addNewPlaylistAbility(const QString &collection_name, int l_collection_id);
-    void addRipAbility(const QString &collection_name, int l_collection_id, bool is_being_ripped=false);
+    void addRipAbility(const QString &collection_name, int l_collection_id, int playlist_id, bool is_being_ripped=false);
     void recursivelyAddSubPlaylist(
                                     UIListGenericTree *where_to_add, 
                                     MetadataCollection *collection, 

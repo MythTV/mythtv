@@ -379,6 +379,7 @@ void DeviceWatcher::updateAudioCDMetadata()
                                             songlist,
                                             1
                                          );
+    new_playlist->setRipable(true);
     new_playlists->insert(1, new_playlist);
     playlist_additions.push_back(1);
 

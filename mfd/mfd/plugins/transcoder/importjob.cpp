@@ -19,7 +19,8 @@ ImportJob::ImportJob(
                         QString         l_scratch_dir_string,
                         QString         l_destination_dir_string,
                         MetadataServer *l_metadata_server,
-                        int             l_container_id
+                        int             l_container_id,
+                        int             l_playlist_id
                     )
           :TranscoderJob(owner, l_job_id)
 {
@@ -27,6 +28,7 @@ ImportJob::ImportJob(
     destination_dir_string = l_destination_dir_string;
     metadata_server = l_metadata_server;
     container_id = l_container_id;
+    playlist_id = l_playlist_id;
     scratch_dir = NULL;
 }
 

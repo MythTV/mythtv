@@ -71,13 +71,15 @@ class MfdInterface : public QObject
                           );
                             
     //
-    //  To rip a collection
+    //  Rip a playlist
     //
     
-    void    ripCollection(
-                            int which_mfd,
-                            int which_collection
-                         );
+    void    ripPlaylist(
+                        int which_mfd,
+                        int which_collection,
+                        int which_playlist
+                       );
+                
 
     //
     //  Methods that will ask this library to perform some background work

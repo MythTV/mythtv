@@ -35,7 +35,7 @@ TranscoderClient::TranscoderClient(
 void TranscoderClient::executeCommand(QStringList new_command)
 {
 
-    if(new_command.count() != 2)
+    if(new_command.count() != 3)
     {
         cerr << "wrong number of tokens to TranscoderClient::executeCommand(): "
              << new_command.join(" ")
@@ -64,7 +64,25 @@ void TranscoderClient::executeCommand(QStringList new_command)
                  <<endl;
             return;
         }
-        requestRipAudioCd(which_collection);
+        int which_playlist = new_command[2].toInt(&ok);
+        if(!ok)
+        {
+            cerr << "could not parse \""
+                 << new_command[2]
+                 << "\" into a playlist number in "
+                 << "TranscoderClient::executeCommand()"
+                 <<endl;
+            return;
+        }
+        if(which_playlist < 1)
+        {
+            cerr << "bad playlist number ("
+                 << which_playlist
+                 << ") is TranscoderClient::executeCommand()"
+                 <<endl;
+            return;
+        }
+        requestRipAudioCd(which_collection, which_playlist);
     }
 }
 
@@ -146,11 +164,12 @@ void TranscoderClient::handleIncoming()
 
 
 
-void TranscoderClient::requestRipAudioCd(int collection_id)
+void TranscoderClient::requestRipAudioCd(int collection_id, int playlist_id)
 {
     HttpOutRequest request("/startjob", ip_address);
     request.addHeader("Job-Type: AudioCD");
     request.addHeader(QString("Container: %1").arg(collection_id));
+    request.addHeader(QString("Playlist: %1").arg(playlist_id));
     request.send(client_socket_to_service);
 }
 

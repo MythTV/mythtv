@@ -311,6 +311,10 @@ class Playlist
     void             userNewList(bool y_or_n){ user_new_list = y_or_n; }
     bool             markedForDeletion(){ return marked_for_deletion; }
     void             markedForDeletion( bool y_or_n){ marked_for_deletion = y_or_n; }
+    bool             isRipable(){ return ripable; }
+    void             setRipable(bool x){ ripable = x; }
+    bool             isBeingRipped(){ return is_being_ripped; }
+    void             setBeingRipped(bool x){ is_being_ripped = x; }
 
   private:
   
@@ -325,6 +329,8 @@ class Playlist
     bool             waiting_for_list;
     bool             is_editable;
     QString          raw_song_list;
+    bool             ripable;
+    bool             is_being_ripped;
 
     //
     //  Stupid thing to handle one too many levels of indirection in

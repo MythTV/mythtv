@@ -25,6 +25,8 @@ ClientPlaylist::ClientPlaylist(
     id = my_id;
     name = new_name;
     is_editable = false;
+    is_ripable = false;
+    is_being_ripped = false;
 
     PlaylistEntryList::iterator it;
     for(it = my_entries->begin(); it != my_entries->end(); ++it)
@@ -45,6 +47,8 @@ ClientPlaylist::ClientPlaylist(int l_collection_id, QString new_name)
     id = -1;
     name = new_name;
     is_editable = true;
+    is_ripable = false;
+    is_being_ripped = false;
 }
 
 bool ClientPlaylist::containsItem(int item_id)

@@ -298,6 +298,8 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
 
     int new_list_id = -1;
     bool new_list_editable = false;
+    bool new_list_ripable = false;
+    bool new_list_being_ripped = false;
     QString new_list_name;
     QValueList<PlaylistEntry> list_entries;
     
@@ -321,6 +323,14 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
             case MarkupCodes::list_is_editable:
                 new_list_editable = mdcap_input.popListEditable();
                 break;
+                
+            case MarkupCodes::list_is_ripable:
+                new_list_ripable = mdcap_input.popListRipable();
+                break;    
+                
+            case MarkupCodes::list_being_ripped:
+                new_list_being_ripped = mdcap_input.popListBeingRipped();
+                break;    
                 
             case MarkupCodes::added_list_item_group:
                 {
@@ -400,6 +410,8 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
                                                             new_list_id
                                                          );
         new_playlist->isEditable(new_list_editable);
+        new_playlist->isRipable(new_list_ripable);
+        new_playlist->setBeingRipped(new_list_being_ripped);
         playlists.insert(new_list_id, new_playlist);
     }
 }

@@ -134,6 +134,7 @@ TypeRegistry::Var    TypeRegistry::list[] = {
 	{ 'aePI', "com.apple.itunes.itms-playlistid", VT_INT32},
 	{ 'aeAI', "com.apple.itunes.itms-artistid", VT_INT32},
 	{ 'aeSI', "com.apple.itunes.itms-songid", VT_INT32},
+
 	//
 	//  This type was added for myth <--> myth to enable exchange of myth
 	//  digests (oddly calculated md5 checksums). It is not part of
@@ -143,6 +144,12 @@ TypeRegistry::Var    TypeRegistry::list[] = {
 
 	{ 'mypi', "myth.persistentiddigest", VT_STRING },
 
+    //
+    //  Another myth <---> myth only tag, this one indicating that a
+    //  playlist is ripable
+    //
+    
+    { 'mypr', "myth.playlistripable", VT_INT8 }, 
 
 };
 

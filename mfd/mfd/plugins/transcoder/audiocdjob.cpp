@@ -29,6 +29,7 @@ AudioCdJob::AudioCdJob(
                         QString                     l_destination_dir_string,
                         MetadataServer             *l_metadata_server,
                         int                         l_container_id,
+                        int                         l_playlist_id,
                         MfdTranscoderAudioCodec     l_codec,
                         MfdTranscoderAudioQuality   l_quality
                       )
@@ -38,7 +39,8 @@ AudioCdJob::AudioCdJob(
                         l_scratch_dir_string, 
                         l_destination_dir_string,
                         l_metadata_server,
-                        l_container_id
+                        l_container_id,
+                        l_playlist_id
                      )
 {
     codec = l_codec;
@@ -70,47 +72,46 @@ void AudioCdJob::run()
     
     bool all_is_well = false;
     QValueList<int> metadata_list;
-    QString collection_name;
+    QString playlist_name;
     metadata_server->lockMetadata();
-        MetadataContainer *which_one = metadata_server->getMetadataContainer(container_id);
+
+        Playlist *which_one = metadata_server->getPlaylistByContainerAndId(container_id, playlist_id);
+
         if(which_one)
         {
             all_is_well = true;
-            if (! which_one->isAudio())
+
+            if (!which_one->isRipable())
             {
                 all_is_well = false;
-                warning("asked to rip cd, but collection is not of type audio");
-            }
-            else if (!which_one->isRipable())
-            {
-                all_is_well = false;
-                warning("asked to rip cd, but collection is not ripable");
+                warning("asked to rip cd, but playlist is not ripable");
             }
             else if (which_one->isBeingRipped())
             {
                 all_is_well = false;
-                warning("asked to rip cd, but collection is already being ripped");
+                warning("asked to rip cd, but playlist is already being ripped");
             }
             else
             {
-                collection_name = which_one->getName();
+                playlist_name = which_one->getName();
 
                 //
                 //  Get a list of int's that represent all the tracks
                 //
 
-                QIntDict<Metadata> *all_the_metadata = which_one->getMetadata();
-                QIntDictIterator<Metadata> it( *all_the_metadata );
-                for ( ; it.current(); ++it )
+                QValueList<int> all_the_metadata = which_one->getList();
+                QValueList<int>::Iterator it;
+                for ( it = all_the_metadata.begin(); it != all_the_metadata.end(); ++it )
                 {
-                    metadata_list.push_back(it.current()->getId());
+                    metadata_list.push_back((*it));
                 }
             }
         }
         else
         {
             all_is_well = false;
-            warning(QString("No metadata container with an id of %i. Nothing to rip")
+            warning(QString("No playlist with an id of %1 in a container with an id of %1. Nothing to rip")
+                            .arg(playlist_id)
                             .arg(container_id));
         }
     metadata_server->unlockMetadata();
@@ -124,11 +125,11 @@ void AudioCdJob::run()
     //  Ask the metadata server to mark the collection as being ripped
     //
     
-    metadata_server->markCollectionAsBeingRipped(container_id, true);
+    metadata_server->markPlaylistAsBeingRipped(container_id, playlist_id, true);
 
     log(QString("starting to rip %1 tracks from \"%2\"")
                 .arg(metadata_list.count())
-                .arg(collection_name), 3);
+                .arg(playlist_name), 3);
 
 
     //
@@ -218,7 +219,7 @@ void AudioCdJob::run()
     //  All done, this collection is now longer being ripped
     //
 
-    metadata_server->markCollectionAsBeingRipped(container_id, false);
+    metadata_server->markPlaylistAsBeingRipped(container_id, playlist_id, false);
 
     //
     //  If the user has set it, eject the CD

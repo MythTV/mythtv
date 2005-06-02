@@ -94,8 +94,10 @@ class MarkupCodes
     static const char list_id                 = 99;
     static const char list_item               = 100;
     static const char list_is_editable        = 101;
-    static const char deleted_list            = 102;
-    static const char commit_list_type        = 103;  // new or edit of existing
+    static const char list_is_ripable         = 102;
+    static const char list_being_ripped       = 103;
+    static const char deleted_list            = 104;
+    static const char commit_list_type        = 105;  // new or edit of existing
 
   private:
 

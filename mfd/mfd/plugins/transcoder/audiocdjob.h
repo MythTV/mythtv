@@ -41,6 +41,7 @@ class AudioCdJob: public ImportJob
                     QString                     l_destination_dir_string,
                     MetadataServer             *l_metadata_server,
                     int                         l_container_id,
+                    int                         l_playlist_id,
                     MfdTranscoderAudioCodec     l_codec,
                     MfdTranscoderAudioQuality   l_quality
              );

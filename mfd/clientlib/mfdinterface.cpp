@@ -426,8 +426,9 @@ void MfdInterface::deletePlaylist(
 
 }
 
-void MfdInterface::ripCollection(int which_mfd, int which_collection)
+void MfdInterface::ripPlaylist(int which_mfd, int which_collection, int which_playlist)
 {
+
     bool found_it = false;
     for(
         MfdInstance *an_mfd = mfd_instances->first();
@@ -438,8 +439,9 @@ void MfdInterface::ripCollection(int which_mfd, int which_collection)
         if (an_mfd->getId() == which_mfd)
         {
             an_mfd->addPendingCommand(
-                                        QStringList::split(" ", QString("transcoder ripaudiocd %1 ")
-                                                .arg(which_collection))
+                                        QStringList::split(" ", QString("transcoder ripaudiocd %1 %2")
+                                                .arg(which_collection)
+                                                .arg(which_playlist))
                                      );
 
             found_it = true;

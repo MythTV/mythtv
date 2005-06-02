@@ -1397,6 +1397,17 @@ void DaapServer::sendContainers(HttpInRequest *http_request, DaapRequest *daap_r
                                     response << Tag('miid') << (u32) a_playlist->getUniversalId() << end ;
                                     response << Tag('minm') << a_playlist->getName().utf8() << end ;
                                     response << Tag('mimc') << (u32) a_playlist->getFlatCount() << end ;
+                                    if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
+                                    {
+                                        if(a_playlist->isRipable())
+                                        {
+                                            response << Tag('mypr') << (u8) 1 << end;
+                                        }
+                                        else
+                                        {
+                                            response << Tag('mypr') << (u8) 0 << end;
+                                        }
+                                    }
                                 response << end;
                             }
                         }

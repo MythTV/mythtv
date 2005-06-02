@@ -1610,10 +1610,10 @@ void MetadataClient::buildTree()
         //  If this collection is ripable (eg. it's a CD), add ability for user to rip it
         //
         
-        if(a_collection->isRipable())
-        {
-            new_collection->addRipAbility(a_collection->getName(), a_collection->getId(), a_collection->beingRipped());
-        }
+        //if(a_collection->isRipable())
+        //{
+        //    new_collection->addRipAbility(a_collection->getName(), a_collection->getId(), a_collection->beingRipped());
+        //}
         
         //
         //  Sort everything

@@ -49,6 +49,10 @@ class ClientPlaylist
     bool                        containsItem(int item_id);
     bool                        isEditable(){return is_editable;}
     void                        isEditable(bool y_or_n){ is_editable = y_or_n; }
+    bool                        isRipable(){return is_ripable;}
+    void                        isRipable(bool y_or_n){ is_ripable = y_or_n; }
+    bool                        isBeingRipped(){ return is_being_ripped; }
+    void                        setBeingRipped(bool y_or_n){ is_being_ripped = y_or_n; }
 
   private:
   
@@ -58,6 +62,8 @@ class ClientPlaylist
     int               collection_id;
     int               actual_track_count;
     bool              is_editable;
+    bool              is_ripable;
+    bool              is_being_ripped;
 };
 
 #endif

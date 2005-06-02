@@ -27,7 +27,7 @@ class TranscoderClient : public ServiceClient
 
     void executeCommand(QStringList new_command);
     void handleIncoming();
-    void requestRipAudioCd(int collection_id);
+    void requestRipAudioCd(int collection_id, int playlist_id);
 
 /*
     void processResponse(MdcapResponse *mdcap_response);
