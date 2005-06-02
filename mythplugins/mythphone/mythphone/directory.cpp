@@ -99,8 +99,9 @@ void DirEntry::writeTree(GenericTree *tree_to_write_to, GenericTree *sdTree)
 
     if ((SpeedDial) && (sdTree != 0))
     {
-        // Default "selectable" to FALSE on speed-dials as it gets changed to true based on presence status
-        sub_node = sdTree->addNode(NickName, 0, false); 
+        // Did default "selectable" to FALSE on speed-dials as it gets changed to true based on presence status
+        // But this caused problems with endpoints that don't support presence
+        sub_node = sdTree->addNode(NickName, 0, true); 
         sub_node->setAttribute(0, TA_SPEEDDIALENTRY);
         sub_node->setAttribute(1, id);
         sub_node->setAttribute(2, getAlphaSortId(NickName));
@@ -278,10 +279,12 @@ void Directory::ChangePresenceStatus(QString Uri, int Status, QString StatusStri
         {
             if (!SpeeddialsOnly) 
             {
-                (it->getTreeNode())->setSelectable(Status == ICON_PRES_OFFLINE ? false : true);
+                // Did set "selectable" to FALSE on speed-dials that are not present, 
+                // But this caused problems with endpoints that don't support presence
+                //(it->getTreeNode())->setSelectable(Status == ICON_PRES_OFFLINE ? false : true);
                 (it->getTreeNode())->setString(it->getNickName() + "      (" + StatusString + ")");
             }
-            (it->getSpeeddialNode())->setSelectable(Status == ICON_PRES_OFFLINE ? false : true);
+            //(it->getSpeeddialNode())->setSelectable(Status == ICON_PRES_OFFLINE ? false : true);
             (it->getSpeeddialNode())->setAttribute(3, Status);
             (it->getSpeeddialNode())->setString(it->getNickName() + "      (" + StatusString + ")");
         }
