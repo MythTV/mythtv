@@ -1899,6 +1899,7 @@ int av_find_stream_info(AVFormatContext *ic)
                && duration_count[i]<20 && st->codec.codec_type == CODEC_TYPE_VIDEO)
                 break;
         }
+
         if (i == ic->nb_streams) {
             /* NOTE: if the format has no header, then we need to read
                some packets to get most of the streams, so we cannot
@@ -1958,7 +1959,7 @@ int av_find_stream_info(AVFormatContext *ic)
         if (pkt->duration != 0)
             st->codec_info_nb_frames++;
 
-        if(st->codec.codec_type == CODEC_TYPE_VIDEO){
+        {
             int index= pkt->stream_index;
             int64_t last= last_dts[index];
             int64_t duration= pkt->dts - last;
@@ -1972,6 +1973,8 @@ int av_find_stream_info(AVFormatContext *ic)
                     duration_sum[index] += duration;
                     duration_count[index]+= factor;
                 }
+                if(st->codec_info_nb_frames == 0)
+                    st->codec_info_duration += duration;
             }
             last_dts[pkt->stream_index]= pkt->dts;
         }
@@ -1996,7 +1999,7 @@ int av_find_stream_info(AVFormatContext *ic)
              (st->codec.codec_id == CODEC_ID_MPEG4 && !st->need_parsing))*/)
             try_decode_frame(st, pkt->data, pkt->size);
         
-        if (st->codec_info_duration >= MAX_STREAM_DURATION) {
+        if (av_rescale_q(st->codec_info_duration, st->time_base, AV_TIME_BASE_Q) >= MAX_STREAM_DURATION) {
             break;
         }
         count++;
