@@ -118,19 +118,15 @@ void playDVD(void)
     
     QString command_string = gContext->GetSetting("DVDPlayerCommand");
 
-    if(command_string.length() < 1)
+    if ( (command_string.find("internal", 0, false) > -1)||
+         (command_string.length() < 1))
     {
-        //
-        //  User probably never did setup
-        //
-        DialogBox *no_player_dialog = new DialogBox(gContext->GetMainWindow(),
-                   QObject::tr("\n\nYou have no DVD Player command defined."));
-        no_player_dialog->AddButton(QObject::tr("OK, I'll go run Setup"));
-        no_player_dialog->exec();
-        
-        delete no_player_dialog;
+        QString filename = QString("dvd:/%1" ).arg(gContext->GetSetting("DVDDeviceLocation"));
+        command_string = "Internal";
+        gContext->GetMainWindow()->HandleMedia(command_string, filename);
         return;
     }
+    
     else
     {
         if(command_string.contains("%d"))
