@@ -1087,6 +1087,7 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
                     {
                         new_ripable = false;
                     }
+                    break;
                     
                 default:
                     
