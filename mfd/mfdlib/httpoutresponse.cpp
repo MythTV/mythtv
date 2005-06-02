@@ -1856,7 +1856,7 @@ void HttpOutResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_cl
             return;
         }
 
-        long total_numb_samples  = ((end - start + 1) * CD_FRAMESAMPLES);
+        long total_numb_samples  = ((end - start) * CD_FRAMESAMPLES);
 
         //
         //  If we multiple the total number of samples x 2 (channels) and by
