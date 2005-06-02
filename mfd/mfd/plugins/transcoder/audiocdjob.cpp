@@ -222,11 +222,11 @@ void AudioCdJob::run()
     metadata_server->markPlaylistAsBeingRipped(container_id, playlist_id, false);
 
     //
-    //  If the user has set it, eject the CD
+    //  If the user has set it, and the cd is local, eject the CD
     //
     
     bool EjectCD = mfdContext->GetNumSetting("EjectCDAfterRipping",1);
-    if (EjectCD) 
+    if (EjectCD && track_url.protocol() == "cd")  
     {
         ejectCd(track_url.dirPath());	
     }
