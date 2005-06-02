@@ -150,6 +150,13 @@ TypeRegistry::Var    TypeRegistry::list[] = {
     //
     
     { 'mypr', "myth.playlistripable", VT_INT8 }, 
+    
+    //
+    //  And another one, indicating that a playlist is currently being
+    //  ripped.
+    //
+    
+    { 'mypb', "myth.playlistbeingripped", VT_INT8 },
 
 };
 
@@ -161,7 +168,9 @@ void TypeRegistry::registerVar( const Var* var ) {
     //  Don't send the code that is mfd specific
     //    
 
-    if(var->mnemonic != 'mypi')
+    if(var->mnemonic != 'mypi' &&
+       var->mnemonic != 'mypr' &&
+       var->mnemonic != 'mypb')
     {
 	    container << Tag( 'mdcl' ) <<
 		    Tag( 'mcnm' ) << var->mnemonic  << end <<

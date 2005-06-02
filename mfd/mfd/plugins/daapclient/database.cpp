@@ -1020,6 +1020,7 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
         QString new_playlist_name = "";
         int     new_playlist_expected_count = 1;
         bool    new_ripable = false;
+        bool    new_being_ripped = false;
         
         TagInput internal_listing(listing);
         while(!internal_listing.isFinished())
@@ -1089,6 +1090,24 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
                     }
                     break;
                     
+                case 'mypb':
+                
+                    //
+                    //  This is myth <--> myth only tag that says this
+                    //  playlist is being ripped
+                    //  
+                    
+                    internal_listing >> a_u8_variable;
+                    if(a_u8_variable)
+                    {
+                        new_being_ripped = true;
+                    }
+                    else
+                    {
+                        new_being_ripped = false;
+                    }
+                    break;
+                    
                 default:
                     
                     warning("unknown tag while parsing "
@@ -1120,6 +1139,7 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
             new_playlist->waitingForList(true);
             new_playlists->insert(new_playlist->getId(), new_playlist);
             new_playlist->setRipable(new_ripable);
+            new_playlist->setBeingRipped(new_being_ripped);
             
         }
         else

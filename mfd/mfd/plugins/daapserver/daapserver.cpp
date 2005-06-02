@@ -1407,6 +1407,14 @@ void DaapServer::sendContainers(HttpInRequest *http_request, DaapRequest *daap_r
                                         {
                                             response << Tag('mypr') << (u8) 0 << end;
                                         }
+                                        if(a_playlist->isBeingRipped())
+                                        {
+                                            response << Tag('mypb') << (u8) 1 << end;
+                                        }
+                                        else
+                                        {
+                                            response << Tag('mypb') << (u8) 0 << end;
+                                        }
                                     }
                                 response << end;
                             }
