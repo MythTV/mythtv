@@ -131,16 +131,14 @@ bool HttpOutRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *w
 {
         
     //  Debugging:
-    /*
+    
+    
     cout << "=========== Debugging Output - HTTP request being sent  ==================" << endl;
     for(uint i = 0; i < block_to_send.size(); i++)
     {
         cout << block_to_send.at(i);
     }
     cout << "==========================================================================" << endl;
-    */
-
-
 
 
     //
@@ -220,16 +218,50 @@ bool HttpOutRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *w
                 if(bytes_sent < 0)
                 {
                     //
-                    //  Hmm, select() said we were ready, but now we're
-                    //  getting an error ... server has gone away?
+                    //  If the error is QSocketDevice::NoError, keep trying
+                    //  for a while
                     //
-                    
-                    warning("http out request seems to have "
-                            "lost contact with the server ");
-                    return false;
+
+                    if (where_to_send->error() == QSocketDevice::NoError)
+                    {
+                        int try_more = 0;
+                        bytes_sent = 0;
+                        while(try_more < 10)
+                        {
+                            bytes_sent = where_to_send->writeBlock( 
+                                                                    &(block_to_send[amount_written]), 
+                                                                    block_to_send.size() - amount_written
+                                                                  );
+                            if(bytes_sent >= 0)
+                            {
+                                try_more = 20;
+                            }
+                            else
+                            {
+                                usleep(200);
+                                try_more++;
+                                if(try_more >= 10)
+                                {
+                                    warning("server not reachable even after multiple attempts, giving up");
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //
+                        //  Hmm, select() said we were ready, but now we're
+                        //  getting an error ... server has gone away?
+                        //
+
+                        warning("http out request seems to have "
+                                "lost contact with the server ");
+                        return false;
+                    }
                 
                 }
-                else if(bytes_sent >= (int) (block_to_send.size() - amount_written))
+                if(bytes_sent >= (int) (block_to_send.size() - amount_written))
                 {
                     //
                     //  All done
