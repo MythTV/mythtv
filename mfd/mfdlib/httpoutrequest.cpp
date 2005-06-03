@@ -132,14 +132,14 @@ bool HttpOutRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *w
         
     //  Debugging:
     
-    
+    /*
     cout << "=========== Debugging Output - HTTP request being sent  ==================" << endl;
     for(uint i = 0; i < block_to_send.size(); i++)
     {
         cout << block_to_send.at(i);
     }
     cout << "==========================================================================" << endl;
-
+    */
 
     //
     //  May be overkill, but we do everything on select()'s in case the
