@@ -4262,7 +4262,7 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
         
         
         if (rPos)
-            return  (rPos / tPos) * 1000.0;
+            return (int)((rPos / tPos) * 1000.0);
         else
             return 0;
     }                
