@@ -551,7 +551,7 @@ void AudioOutputALSA::SetupMixer(void)
     int err;
 
     QString alsadevice = gContext->GetSetting("MixerDevice", "default");
-    QString device = alsadevice.remove(QString("ALSA"));
+    QString device = alsadevice.remove(QString("ALSA:"));
 
     if (mixer_handle != NULL)
         CloseMixer();
