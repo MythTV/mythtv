@@ -255,29 +255,14 @@ void MythUIType::SetPosition(QPoint pos)
     SetRedraw();
 }
 
-QRect MythUIType::CalculateScreenArea(void)
+void MythUIType::SetArea(QRect rect)
 {
-    if (m_Area != QRect(0, 0, 0, 0))
-        return m_Area;
+    m_Area = rect;
+    SetRedraw();
+}
 
-    QRegion region;
-
-    QValueVector<MythUIType *>::Iterator it;
-    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
-    {
-        QRect childArea = (*it)->CalculateScreenArea();
-        childArea.moveBy(m_Area.x(), m_Area.y());
-
-        region = region.unite(childArea);
-    }
-
-    int x = m_Area.x();
-    int y = m_Area.y();
-
-    m_Area = region.boundingRect();
-    m_Area.setX(x);
-    m_Area.setY(y);
-
+QRect MythUIType::GetArea(void)
+{
     return m_Area;
 }
 

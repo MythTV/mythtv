@@ -40,8 +40,8 @@ class MythUIType : public QObject
     virtual void Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod = 255);
 
     virtual void SetPosition(QPoint pos);
-    virtual QRect CalculateScreenArea(void);
-    void GetArea(void);
+    virtual void SetArea(QRect rect);
+    virtual QRect GetArea(void);
 
     QString cutDown(const QString &data, QFont *font,
                     bool multiline = false, int overload_width = -1,
@@ -103,7 +103,7 @@ class MythUIType : public QObject
     bool m_HasFocus;
     bool m_CanHaveFocus;
 
-    QRect m_Area; // parent relative
+    QRect m_Area;
 
     bool m_NeedsRedraw;
 

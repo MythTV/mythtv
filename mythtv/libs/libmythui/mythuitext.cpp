@@ -102,8 +102,7 @@ void MythUIText::Draw(MythPainter *p, int xoffset, int yoffset,
         bool multiline = (m_Justification & Qt::WordBreak);
 
         if (m_Cutdown)
-            m_CutMessage = cutDown(m_Message, &(m_Font->face), multiline,
-                                   m_Area.width(), m_Area.height());
+            m_CutMessage = cutDown(m_Message, &(m_Font->face), multiline);
         else
             m_CutMessage = m_Message;
     }
