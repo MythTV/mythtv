@@ -305,6 +305,7 @@ public:
     DescriptorList Descriptors;
     bool Record;
 };
+typedef QValueList<ElementaryPIDObject> ComponentList;
 
 class Person
 {
@@ -420,25 +421,39 @@ public:
 
 class PMTObject
 {
-public:
+  public:
     PMTObject() { Reset(); }
+    PMTObject(const PMTObject &other);
+    PMTObject& operator=(const PMTObject &other);
+    void shallowCopy(const PMTObject &other);
+    void deepCopy(const PMTObject &other);
     void Reset();
 
-    bool RadioService() { return hasAudio; }
-    bool TelevisionService() { return hasVideo && hasAudio; }
-    bool OnAir() { return TelevisionService(); }
-    bool FTA() { return !hasCA; }
+    /// \brief Returns true if PMT contains at least one audio stream
+    bool HasAudioService() const { return hasAudio; }
+    /// \brief Returns true if PMT contains at least one video stream
+    bool HasVideoService() const { return hasVideo; }
+    /// \brief Returns true if PMT contains at least one video stream
+    ///        and one audio stream
+    bool HasTelevisionService() const { return hasVideo && hasAudio; }
+    /// \brief Returns true if the streams are not encrypted ("Free-To-Air")
+    bool FTA() const { return !hasCA; }
 
-    uint16_t PCRPID;
-    uint16_t ServiceID;
-    uint16_t PMTPID;
-    CAList CA;
+    /// @deprecated Use HasTelevisionService() instead.
+    bool OnAir() const { return HasTelevisionService(); }
+
+  public:
+    uint16_t       PCRPID;
+    uint16_t       ServiceID;
+    uint16_t       PMTPID;
+    CAList         CA;
     DescriptorList Descriptors;
-    QValueList<ElementaryPIDObject> Components;
+    ComponentList  Components;
 
-    bool hasCA;
-    bool hasAudio;
-    bool hasVideo;
+    // helper variables
+    bool           hasCA;
+    bool           hasAudio;
+    bool           hasVideo;
 };
 
 /* PAT Handler */

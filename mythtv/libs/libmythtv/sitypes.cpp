@@ -285,6 +285,72 @@ void NetworkObject::Reset()
     LinkagePresent = 0;
 }
 
+/** \fn PMTObject::PMTObject(const PMTObject&)
+ *  \brief Performs shallow copy.
+ */
+PMTObject::PMTObject(const PMTObject &other)
+{
+    shallowCopy(other);
+}
+
+/** \fn PMTObject::operator=(const PMTObject&)
+ *  \brief Performs shallow copy.
+ */
+PMTObject &PMTObject::operator=(const PMTObject &other)
+{
+    shallowCopy(other);
+    return *this;
+}
+
+/** \fn PMTObject::shallowCopy(const PMTObject&)
+ *  \brief Copies each field in PMT, but shares QPtrVector data.
+ */
+void PMTObject::shallowCopy(const PMTObject &other)
+{
+    PCRPID      = other.PCRPID;
+    ServiceID   = other.ServiceID;
+    PMTPID      = other.PMTPID;
+    CA          = other.CA;
+    Descriptors = other.Descriptors;
+    Components  = other.Components;
+    hasCA       = other.hasCA;
+    hasAudio    = other.hasAudio;
+    hasVideo    = other.hasVideo;
+}
+
+/** \fn PMTObject::deepCopy(const PMTObject&)
+ *  \brief Copies each simple field in PMT, and copies each element in the CA,
+ *         Descriptors and Components QPtrVector fields into new QPtrVector's.
+ */
+void PMTObject::deepCopy(const PMTObject &other)
+{
+    PCRPID      = other.PCRPID;
+    ServiceID   = other.ServiceID;
+    PMTPID      = other.PMTPID;
+
+    CA.clear();
+    CAList::const_iterator cit;
+    for (cit = other.CA.begin(); cit!=other.CA.end(); ++cit)
+        CA.append(*cit);
+
+    Descriptors.clear();
+    DescriptorList::const_iterator dit;
+    for (dit = other.Descriptors.begin(); dit!=other.Descriptors.end(); ++dit)
+        Descriptors.append(*dit);
+
+    Components.clear();
+    QValueList<ElementaryPIDObject>::const_iterator eit;
+    for (eit = other.Components.begin(); eit!=other.Components.end(); ++eit)
+        Components.append(*eit);
+
+    hasCA       = other.hasCA;
+    hasAudio    = other.hasAudio;
+    hasVideo    = other.hasVideo;
+}
+
+/** \fn PMTObject::Reset()
+ *  \brief Resets all values in the PMTObject to their initial values.
+ */
 void PMTObject::Reset()
 {
     ServiceID = 0;
