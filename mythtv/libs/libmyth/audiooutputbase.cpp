@@ -105,7 +105,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
                                  int laudio_samplerate)
 {
     if (laudio_bits == audio_bits && laudio_channels == audio_channels &&
-        laudio_samplerate == audio_samplerate)
+        laudio_samplerate == audio_samplerate && !need_resampler)
         return;
 
     KillAudio();
