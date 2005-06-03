@@ -38,7 +38,7 @@ class OSDSurface
 
     void BlendToYV12(unsigned char *yuvptr) const;
     void BlendToARGB(unsigned char *argbptr,
-                     uint stride, uint height) const;
+                     uint stride, uint height, bool blendtoblack=false) const;
     void DitherToI44(unsigned char *outbuf, bool ifirst,
                      uint stride, uint height) const;
     void DitherToIA44(unsigned char* outbuf, uint stride, uint height) const;

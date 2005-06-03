@@ -776,13 +776,33 @@ void OSDSurface::BlendToYV12(unsigned char *yuvptr) const
     }
 }
 
-/** \fn OSDSurface::BlendToARGB(unsigned char *,uint,uint) const
+static void BlendToBlack(unsigned char *argbptr, uint width, uint height)
+{
+    for (uint i=0; i<width*height; i++)
+    {
+        uint argb = ((uint*)argbptr)[i];
+        uint a = (argb>>24);
+        if (argb && a<250)
+        {
+            uint r = (argb>>16)&0xff, g = (argb>>8)&0xff, b = (argb)&0xff;
+            RGBA_OUT(&argbptr[i*4], (a*r)>>8, (a*g)>>8, (a*b)>>8, 128);
+        }
+    }
+}
+
+/** \fn OSDSurface::BlendToARGB(unsigned char *,uint,uint,bool) const
  *  \brief Alpha blends OSDSurface to ARGB buffer.
  *
- *  \param stride Length of each line in output buffer in bytes
- *  \param height Number of lines in output buffer
+ *  \todo Currently blend_to_black is implemented as a post process
+ *        on the whole frame, it would make sense to make this more
+ *        efficient by integrating it into the process.
+ *
+ *  \param stride         Length of each line in output buffer in bytes
+ *  \param height         Number of lines in output buffer
+ *  \param blend_to_black Uses Alpha to blend buffer to black
  */
-void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride, uint height) const
+void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride, uint height,
+                             bool blend_to_black) const
 {
     const OSDSurface *surface = this;
     blendtoargb_8_fun blender = blendtoargb_8_init(surface);
@@ -852,6 +872,8 @@ void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride, uint height) c
             }
         }
     }
+    if (blend_to_black)
+        BlendToBlack(argbptr, stride>>2, height);
 }
 
 /** \fn OSDSurface::DitherToI44(unsigned char*,bool,uint,uint) const
