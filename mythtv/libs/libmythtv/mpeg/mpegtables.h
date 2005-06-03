@@ -19,6 +19,9 @@
  *  \endcode
  */
 
+/** \class TableID
+ *  \brief Contains listing of Stream ID's for various A/V Stream types.
+ */
 class StreamID
 {
   public:
@@ -39,13 +42,45 @@ class StreamID
     };
 };
 
+/** \class TableID
+ *  \brief Contains listing of Table ID's for various tables (PAT=0,PMT=2,etc).
+ */
 class TableID
 {
   public:
     enum {
-        PAT      = 0x00,
+        PAT      = 0x00, // always on pid 0x00
+        CAT      = 0x01, // always on pid 0x01
         PMT      = 0x02,
+        TSDT     = 0x03, // always on pid 0x02
 
+        // DVB manditory
+        NIT      = 0x40, // always on pid 0x10
+        SDT      = 0x42, // always on pid 0x11
+        PF_EIT   = 0x4e, // always on pid 0x12
+        TDT      = 0x70, // always on pid 0x14
+
+        // DVB optional
+        NITo     = 0x41, // always on pid 0x10
+        SDTo     = 0x46, // always on pid 0x11
+        BAT      = 0x4a, // always on pid 0x11
+        PF_EITo  = 0x4f, // always on pid 0x12
+        SC_EITbeg = 0x50, // always on pid 0x12
+        SC_EITend = 0x5f, // always on pid 0x12
+        SC_EITbego = 0x60, // always on pid 0x12
+        SC_EITendo = 0x6f, // always on pid 0x12
+        RST      = 0x71, // always on pid 0x13
+        ST       = 0x72, // any pid 0x10-0x14
+        TOT      = 0x73, // always on pid 0x14
+        RNT      = 0x74, // always on pid 0x16
+        CT       = 0x75,
+        RCT      = 0x76,
+        CIT      = 0x77, // always on pid 0x12
+        MPEFEC   = 0x78,
+        DIT      = 0x7e, // always on pid 0x1e
+        SIT      = 0x7f, // always on pid 0x1f
+
+        // ATSC
         STUFFING = 0x80,
         CAPTION  = 0x86,
         CENSOR   = 0x87,
