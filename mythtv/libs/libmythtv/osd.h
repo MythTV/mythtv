@@ -21,7 +21,8 @@ enum OSDFunctionalType
     kOSDFunctionalType_PictureAdjust,
     kOSDFunctionalType_RecPictureAdjust,
     kOSDFunctionalType_SmartForward,
-    kOSDFunctionalType_TimeStretchAdjust
+    kOSDFunctionalType_TimeStretchAdjust,
+    kOSDFunctionalType_AudioSyncAdjust
 };
 
 class QImage;
