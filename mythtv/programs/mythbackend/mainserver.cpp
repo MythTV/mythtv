@@ -3184,7 +3184,9 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     {
         QImage img(data, width, height, 32, NULL, 65536 * 65536,
                    QImage::LittleEndian);
-        img = img.smoothScale(160, 120);
+        img = img.smoothScale(gContext->GetNumSetting("PreviewPixmapWidth", 160),
+                              gContext->GetNumSetting("PreviewPixmapHeight", 120), 
+                              QImage::ScaleMin);
 
         filename += ".png";
         img.save(filename.ascii(), "PNG");
