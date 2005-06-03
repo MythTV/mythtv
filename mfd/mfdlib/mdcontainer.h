@@ -131,6 +131,7 @@ class MetadataContainer
     
     int     bumpPlaylistId(){current_playlist_id++; return current_playlist_id;}
     void    clearDeltasAndBumpGeneration();
+    void    tagPlaylistAsChanged(int playlist_id);
     
   protected:
 

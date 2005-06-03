@@ -1006,7 +1006,7 @@ void MetadataServer::markPlaylistAsBeingRipped(int collection_id, int playlist_i
     }
     
     playlist->setBeingRipped(being_ripped);
-    metadata_container->clearDeltasAndBumpGeneration();
+    metadata_container->tagPlaylistAsChanged(playlist_id);
 
     if(metadata_container->isLocal() && metadata_container->isAudio())
     {
@@ -1257,7 +1257,6 @@ void MetadataServer::possiblySendUpdate(HttpInRequest *http_request, int client_
                 {
                     send_an_update = true;
                 }
-                    
             }    
         }        
     }

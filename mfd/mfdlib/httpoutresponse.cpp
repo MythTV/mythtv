@@ -1887,7 +1887,7 @@ void HttpOutResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_cl
 
         if(range_begin > 0 && range_begin < 44)
         {
-            warning("client asked to seek in an ogg "
+            warning("client asked to seek in an cda "
                     "stream to somewhere inside the "
                     "header");
             range_begin = 44;

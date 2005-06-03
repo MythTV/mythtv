@@ -320,7 +320,7 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
     }
 
     //
-    //  If it's ripable, but it on the rip list
+    //  If it's ripable, put it on the rip list
     //
     
     if (new_playlist->isRipable())
