@@ -12,26 +12,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-// Myth & database connections
-
-// Rule #1: Never use QSqlQuery or QSqlDatabase directly.
-// Rule #2: Never use QSqlQuery or QSqlDatabase directly.
-// Rule #3: Use MSqlQuery for all DB stuff.
-
-// MSqlQuery is tied to a connection pool in Mythcontext. DB connections are
-// automatically set up by creating an MSqlQuery object. Use the helper 
-// functions to create an MSqlQuery object e.g. 
-// MSqlQuery query(MSqlQuery::InitCon());
-// The MSqlQuery object gets exclusive access to the connection for its 
-// lifetime. The connection is automatically returned when the MSqlQuery 
-// object is destroyed.
-
-// Note: Due to a bug in some Qt/MySql combinations, QSqlDatabase connections
-// will crash if closed and reopend - so we never close them and keep them in
-// a pool. 
-
-// QSqlDatabase wrapper
-
+/// \brief QSqlDatabase wrapper, used by MSqlQuery. Do not use directly.
 class MSqlDatabase
 {
   friend class MDBManager;
@@ -51,9 +32,7 @@ class MSqlDatabase
     QSqlDatabase *m_db;
 };
 
-
-// DB connection pool
-
+/// \brief DB connection pool, used by MSqlQuery. Do not use directly.
 class MDBManager
 {
   friend class MSqlQuery;
@@ -78,7 +57,7 @@ class MDBManager
     MSqlDatabase *m_DDCon;
 };
 
-
+/// \brief MSqlDatabase Info, used by MSqlQuery. Do not use directly.
 typedef struct _MSqlQueryInfo
 {
     MSqlDatabase *db;
@@ -86,30 +65,49 @@ typedef struct _MSqlQueryInfo
     bool returnConnection;
 } MSqlQueryInfo;
 
-// QSqlQuery wrapper
-
+/** \brief QSqlQuery wrapper that fetches a DB connection from the connection pool.
+ *
+ *   Myth & database connections
+ *   Rule #1: Never use QSqlQuery or QSqlDatabase directly.
+ *   Rule #2: Never use QSqlQuery or QSqlDatabase directly.
+ *   Rule #3: Use MSqlQuery for all DB stuff.
+ *
+ *   MSqlQuery is tied to a connection pool in MythContext. DB connections are
+ *   automatically set up by creating an MSqlQuery object. Use the helper 
+ *   functions to create an MSqlQuery object e.g. 
+ *   MSqlQuery query(MSqlQuery::InitCon());
+ *   The MSqlQuery object gets exclusive access to the connection for its 
+ *   lifetime. The connection is automatically returned when the MSqlQuery 
+ *   object is destroyed.
+ *
+ *   Note: Due to a bug in some Qt/MySql combinations, QSqlDatabase connections
+ *   will crash if closed and reopend - so we never close them and keep them in
+ *   a pool. 
+ */
 class MSqlQuery : public QSqlQuery
 {
   public:
-    // Get DB connection from pool 
+    /// \brief Get DB connection from pool 
     MSqlQuery(const MSqlQueryInfo &qi);
-    // Returns conneciton to pool
+    /// \brief Returns conneciton to pool
     ~MSqlQuery();
 
-    // Only updated once during object creation
+    /// \brief Only updated once during object creation
     bool isConnected(void) { return m_isConnected; }
 
-    // QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
+    /// \brief QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
     bool prepare(const QString &query);
 
-    // Checks DB connection + login (login info via Mythcontext)
+    /// \brief Checks DB connection + login (login info via Mythcontext)
     static bool testDBConnection();
 
-    // Only use this in combination with MSqlQuery constructor
+    /// \brief Only use this in combination with MSqlQuery constructor
     static MSqlQueryInfo InitCon();
 
-    // Dedicated connections. (Requierd for using temporary SQL tables.)
+    /// \brief Returns dedicated connection. (Required for using temporary SQL tables.)
     static MSqlQueryInfo SchedCon();
+
+    /// \brief Returns dedicated connection. (Required for using temporary SQL tables.)
     static MSqlQueryInfo DDCon();
 
   private:
