@@ -3,6 +3,8 @@
 
 #include <qfont.h>
 #include <qcolor.h>
+#include <qpoint.h>
+#include <qmap.h>
 
 struct MythFontProperties
 {
@@ -26,5 +28,25 @@ struct MythFontProperties
     QColor  outlineColor;
     int     outlineSize;
 };
+
+class GlobalFontMap
+{
+  // singleton
+  protected:
+    GlobalFontMap() {}
+
+  public:
+    MythFontProperties *GetFont(const QString &text);
+    bool AddFont(const QString &text, MythFontProperties *fontProp);
+
+    void Clear(void);
+
+    static GlobalFontMap *GetGlobalFontMap(void);
+
+  private:
+    QMap<QString, MythFontProperties> m_globalFontMap;
+};
+
+GlobalFontMap *GetGlobalFontMap(void);
 
 #endif
