@@ -3171,7 +3171,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     int len = 0;
     int width = 0, height = 0;
-    int secondsin = gContext->GetNumSetting("PreviewPixmapOffset", 64);
+    int secondsin = gContext->GetNumSetting("PreviewPixmapOffset", 64) +
+                    gContext->GetNumSetting("RecordPreRoll",0);
 
     unsigned char *data = (unsigned char *)elink->GetScreenGrab(pginfo, 
                                                                 filename, 
