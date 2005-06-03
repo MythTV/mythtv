@@ -128,9 +128,15 @@ class DVDRingBufferPriv
                 maxPart = 0;
                 mainTitle = 0;
                 int titleParts = 0;
-                char buf[DVD_BLOCK_SIZE *5];
-                safe_read(buf, DVD_BLOCK_SIZE *5);
+                dvdnav_title_play(dvdnav, 0);
                 dvdRet == dvdnav_get_number_of_titles(dvdnav, &numTitles);
+                if (numTitles == 0 )
+                {
+                    char buf[DVD_BLOCK_SIZE * 5];
+                    VERBOSE(VB_IMPORTANT, QString("Reading %1 bytes from the drive").arg(DVD_BLOCK_SIZE * 5));
+                    safe_read(buf, DVD_BLOCK_SIZE * 5);
+                    dvdRet == dvdnav_get_number_of_titles(dvdnav, &numTitles);
+                }
                 
                 if( dvdRet == DVDNAV_STATUS_ERR)
                 {
@@ -320,6 +326,19 @@ class DVDRingBufferPriv
                             dvdnav_free_cache_block(dvdnav, blockBuf);
                         }                                                   
 
+                        }
+                        break;
+                    case DVDNAV_STILL_FRAME:
+                        {
+                        dvdnav_still_event_t* still = (dvdnav_still_event_t*)(blockBuf);
+                        VERBOSE(VB_PLAYBACK, QString("DVDNAV_STILL_FRAME: needs displayed for %1 seconds")
+                                             .arg(still->length));
+                        if (blockBuf != dvdBlockWriteBuf)
+                        {
+                            dvdnav_free_cache_block(dvdnav, blockBuf);
+                        }                                                   
+                        
+                        dvdnav_still_skip(dvdnav);
                         }
                         break;
                     case DVDNAV_WAIT:
