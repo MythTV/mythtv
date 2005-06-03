@@ -1336,7 +1336,7 @@ bool AvFormatDecoder::autoSelectAudioTrack()
     
     while ((selectedTrack == -1) && (minChannels >= 0))
     {
-        for (track = maxTracks; track >= 0; track--)
+        for (track = 0; track <= maxTracks; track++)
         {
             int tempStream = audioStreams[track];
             AVCodecContext *e = &ic->streams[tempStream]->codec;
@@ -1361,13 +1361,13 @@ bool AvFormatDecoder::autoSelectAudioTrack()
                 }
             }
         }
-        if (selectedTrack == -1)
+        if (selectedTrack > maxTracks)
         {
             minChannels--;
         }
     }
 
-    if (selectedTrack == -1)
+    if (selectedTrack  > maxTracks)
     {
         VERBOSE(VB_AUDIO,
                 QString("No suitable audio track exists."));
