@@ -1,3 +1,4 @@
+#include <cmath>
 #include <unistd.h>
 
 #include "ClassicCommDetector.h"
