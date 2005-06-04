@@ -85,9 +85,14 @@ class MythMainWindow : public QDialog
     bool TranslateKeyPress(const QString &context, QKeyEvent *e, 
                            QStringList &actions);
 
-    void ClearKeylist(const QString &context, const QString &action);
+    void ClearKey(const QString &context, const QString &action);
+    void BindKey(const QString &context, const QString &action,
+		 const QString &key);
     void RegisterKey(const QString &context, const QString &action,
                      const QString &description, const QString &key);
+
+    void ClearJump(const QString &destination);
+    void BindJump(const QString &destination, const QString &key);
     void RegisterJump(const QString &destination, const QString &description,
                       const QString &key, void (*callback)(void));
     void RegisterMediaHandler(const QString &destination, 

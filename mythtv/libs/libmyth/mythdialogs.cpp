@@ -433,7 +433,7 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     return retval;
 }
 
-void MythMainWindow::ClearKeylist(const QString &context, const QString &action)
+void MythMainWindow::ClearKey(const QString &context, const QString &action)
 {
     KeyContext * keycontext = d->keyContexts[context];
     if (keycontext == NULL) return;
@@ -458,6 +458,37 @@ void MythMainWindow::ClearKeylist(const QString &context, const QString &action)
 
 	/* dont keep unbound keys in the map */
 	if (it.data().isEmpty()) keycontext->actionMap.erase(it);
+    }
+}
+
+void MythMainWindow::BindKey(const QString &context, const QString &action,
+			     const QString &key)
+{
+    QKeySequence keyseq(key);
+
+    if (!d->keyContexts[context])
+        d->keyContexts.insert(context, new KeyContext());
+
+    for (unsigned int i = 0; i < keyseq.count(); i++)
+    {
+        int keynum = keyseq[i];
+        keynum &= ~Qt::UNICODE_ACCEL;
+
+        QStringList dummyaction = "";
+        if (d->keyContexts[context]->GetMapping(keynum, dummyaction))
+        {
+            VERBOSE(VB_GENERAL, QString("Key %1 is bound to multiple actions "
+                                        "in context %2.")
+                    .arg(key).arg(context));
+        }
+
+        d->keyContexts[context]->AddMapping(keynum, action);
+        //VERBOSE(VB_GENERAL, QString("Binding: %1 to action: %2 (%3)")
+        //                           .arg(key).arg(action)
+        //                           .arg(context));
+
+        if (action == "ESCAPE" && context == "Global" && i == 0)
+            d->escapekey = keynum;
     }
 }
 
@@ -504,33 +535,62 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
         }
     }
 
+    BindKey(context, action, keybind);
+}
 
-    QKeySequence keyseq(keybind);
-
-    if (!d->keyContexts[context])
-        d->keyContexts.insert(context, new KeyContext());
-
-    for (unsigned int i = 0; i < keyseq.count(); i++)
+void MythMainWindow::ClearJump(const QString &destination)
+{
+    /* make sure that the jump point exists (using [] would add it)*/
+    if (d->destinationMap.find(destination) == d->destinationMap.end())
     {
-        int keynum = keyseq[i];
+	VERBOSE(VB_GENERAL, "Cannot clear ficticious jump point"+destination);
+	return;
+    }
+
+    QMap<int, JumpData*>::Iterator it;
+    for (it = d->jumpMap.begin(); it != d->jumpMap.end(); ++it)
+    {
+
+	JumpData *jd = it.data();
+	if (jd->destination == destination)
+	    d->jumpMap.remove(it);
+    }
+}
+
+
+void MythMainWindow::BindJump(const QString &destination, const QString &key)
+{
+    /* make sure the jump point exists */
+    if (d->destinationMap.find(destination) == d->destinationMap.end())
+    {
+	VERBOSE(VB_GENERAL,"Cannot bind to ficticious jump point"+destination);
+	return;
+    }
+
+    QKeySequence keyseq(key);
+
+    if (!keyseq.isEmpty())
+    {
+        int keynum = keyseq[0];
         keynum &= ~Qt::UNICODE_ACCEL;
 
-        QStringList dummyaction = "";
-        if (d->keyContexts[context]->GetMapping(keynum, dummyaction))
+        if (d->jumpMap.count(keynum) == 0)
         {
-            VERBOSE(VB_GENERAL, QString("Key %1 is bound to multiple actions "
-                                        "in context %2.")
-                    .arg(keybind).arg(context));
+            //VERBOSE(VB_GENERAL, QString("Binding: %1 to JumpPoint: %2")
+            //                           .arg(keybind).arg(destination));
+
+            d->jumpMap[keynum] = &d->destinationMap[destination];
         }
-
-        d->keyContexts[context]->AddMapping(keynum, action);
-        //VERBOSE(VB_GENERAL, QString("Binding: %1 to action: %2 (%3)")
-        //                           .arg(key).arg(action)
-        //                           .arg(context));
-
-        if (action == "ESCAPE" && context == "Global" && i == 0)
-            d->escapekey = keynum;
+        else
+        {
+            VERBOSE(VB_GENERAL, QString("Key %1 is already bound to a jump "
+                                        "point.").arg(key));
+        }
     }
+    //else
+    //    VERBOSE(VB_GENERAL, QString("JumpPoint: %2 exists, no keybinding")
+    //                               .arg(destination));
+
 }
 
 void MythMainWindow::RegisterJump(const QString &destination, 
@@ -577,29 +637,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
     JumpData jd = { callback, destination, description };
     d->destinationMap[destination] = jd;
  
-    QKeySequence keyseq(keybind);
-
-    if (!keyseq.isEmpty())
-    {
-        int keynum = keyseq[0];
-        keynum &= ~Qt::UNICODE_ACCEL;
-
-        if (d->jumpMap.count(keynum) == 0)
-        {
-            //VERBOSE(VB_GENERAL, QString("Binding: %1 to JumpPoint: %2")
-            //                           .arg(keybind).arg(destination));
-
-            d->jumpMap[keynum] = &d->destinationMap[destination];
-        }
-        else
-        {
-            VERBOSE(VB_GENERAL, QString("Key %1 is already bound to a jump "
-                                        "point.").arg(keybind));
-        }
-    }
-    //else
-    //    VERBOSE(VB_GENERAL, QString("JumpPoint: %2 exists, no keybinding")
-    //                               .arg(destination));
+    BindJump(destination, keybind);
 }
 
 void MythMainWindow::JumpTo(const QString& destination)
