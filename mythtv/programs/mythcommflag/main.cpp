@@ -13,20 +13,24 @@
 #include <cstdio>
 #include <ctime>
 #include <cmath>
+#include <sys/time.h>
 
 #include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
-#include "libmythtv/commercial_skip.h"
 #include "libmythtv/NuppelVideoPlayer.h"
 #include "libmythtv/programinfo.h"
 #include "libmythtv/remoteutil.h"
+#include "libmythtv/jobqueue.h"
+#include "libmythtv/remoteencoder.h"
 #include "libmyth/mythdbcon.h"
+
+#include "CommDetectorBase.h"
+#include "CommDetectorFactory.h"
+#include "SlotRelayer.h"
+#include "CustomEventRelayer.h"
 
 using namespace std;
 
-bool testMode = false;
-bool showBlanks = false;
-bool justBlanks = false;
 bool quiet = false;
 bool force = false;
 
@@ -37,22 +41,27 @@ bool beNice = true;
 bool inJobQueue = false;
 bool stillRecording = false;
 bool copyToCutlist = false;
+bool watchingRecording = false;
+CommDetectorBase* commDetector = NULL;
+RemoteEncoder* recorder = NULL;
+ProgramInfo* program_info = NULL;
+int commDetectMethod = -1;
+bool dontSubmitCommbreakListToDB =  false;
+QString outputfilename;
+bool onlyDumpDBCommercialBreakList = false;
 
-double fps = 29.97; 
-
-#define print_v0(ARGS...) printf(ARGS)
-#define print_v1(ARGS...) do { if (!quiet) printf(ARGS); } while (0)
+int jobID = -1;
+int lastCmd = -1;
 
 void BuildVideoMarkup(QString& filename)
 {
-    ProgramInfo* program_info = new ProgramInfo;
+    program_info = new ProgramInfo;
     program_info->recstartts = QDateTime::currentDateTime().addSecs( -180 * 60);
     program_info->recendts = QDateTime::currentDateTime().addSecs(-1);
     program_info->isVideo = true;
     program_info->pathname = filename;
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
-
 
     if (!MSqlQuery::testDBConnection())
     {
@@ -67,7 +76,7 @@ void BuildVideoMarkup(QString& filename)
 
     nvp->RebuildSeekTable(!quiet);
 
-    print_v1( "Rebuilt\n" );
+    cerr << "Rebuilt\n";
 
     delete nvp;
     delete tmprbuf;
@@ -99,14 +108,233 @@ void CopySkipListToCutList(QString chanid, QString starttime)
     pginfo->SetCutList(cutlist);
 }
 
+void streamOutCommercialBreakList(ostream& output,
+                                  QMap<long long, int>& commercialBreakList)
+{
+    if (commercialBreakList.empty())
+        output << "No breaks" << endl;
+    else
+    {
+        for (QMap<long long, int>::iterator it = commercialBreakList.begin();
+             it!=commercialBreakList.end(); it++)
+        {
+            output << "framenum: " << it.key() << "\tmarktype: " << it.data()
+                   << endl;
+        }
+    }
+    output << "----------------------------" << endl;
+}
+
+void commDetectorBreathe()
+{
+    //this is connected to the commdetectors breathe signal so we get a chance
+    //while its busy to see if the user already told us to stop.
+    qApp->processEvents();
+
+    if (jobID != -1)
+    {
+        int curCmd = JobQueue::GetJobCmd(jobID);
+        if (curCmd==lastCmd)
+            return;
+
+        switch (curCmd)
+        {
+                case JOB_STOP:
+                {
+                    commDetector->stop();
+                    break;
+                }
+                case JOB_PAUSE:
+                {
+                    JobQueue::ChangeJobStatus(jobID, JOB_PAUSED,
+                                              QObject::tr("Paused"));
+                    commDetector->pause();
+                    break;
+                }
+                case JOB_RESUME:
+                {
+                    JobQueue::ChangeJobStatus(jobID, JOB_PAUSED,
+                                              QObject::tr("Running"));
+                    commDetector->resume();
+                    break;
+                }
+        }
+    }
+}
+
+void commDetectorStatusUpdate(const QString& status)
+{
+    if (jobID != -1)
+        JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,  status);
+}
+
+void commDetectorGotNewCommercialBreakList()
+{
+    QMap<long long, int> newCommercialMap;
+    commDetector->getCommercialBreakList(newCommercialMap);
+
+    QMap<long long, int>::Iterator it = newCommercialMap.begin();
+    QString message = "COMMFLAG_UPDATE ";
+    message += program_info->chanid + " " +
+               program_info->recstartts.toString(Qt::ISODate);
+
+    for (it = newCommercialMap.begin();
+            it != newCommercialMap.end(); ++it)
+    {
+        if (it != newCommercialMap.begin())
+            message += ",";
+        else
+            message += " ";
+        message += QString("%1:%2").arg(it.key())
+                   .arg(it.data());
+    }
+
+    VERBOSE(VB_COMMFLAG,
+            QString("mythcommflag sending update: %1").arg(message));
+
+    RemoteSendMessage(message);
+}
+
+void incomingCustomEvent(QCustomEvent* e)
+{
+    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)e;
+        QString message = me->Message();
+
+        message = message.simplifyWhiteSpace();
+        QStringList tokens = QStringList::split(" ", message);
+
+        VERBOSE(VB_COMMFLAG,
+                QString("mythcommflag: Received Event: '%1'")
+                .arg(message));
+
+        if ((watchingRecording) &&
+            (tokens[0] == "DONE_RECORDING"))
+        {
+            int cardnum = tokens[1].toInt();
+            int filelen = tokens[2].toInt();
+
+            message = QString("mythcommflag: Received a "
+                              "DONE_RECORDING event for card %1.  ")
+                              .arg(cardnum);
+
+            if (cardnum == recorder->GetRecorderNumber())
+            {
+                commDetector->recordingFinished(filelen);
+                watchingRecording = false;
+                message += "Informed CommDetector that recording has finished.";
+                VERBOSE(VB_COMMFLAG, message);
+            }
+        }
+
+        if (tokens[0] == "COMMFLAG_REQUEST")
+        {
+            QString chanid = tokens[1];
+            QString starttime = tokens[2];
+            QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
+
+            message = QString("mythcommflag: Received a "
+                              "COMMFLAG_REQUEST event for chanid %1 @ %2.  ")
+                              .arg(chanid).arg(starttime);
+
+            if ((program_info->chanid == chanid) &&
+                (program_info->startts == startts))
+            {
+                commDetector->requestCommBreakMapUpdate();
+                message += "Requested CommDetector to generate new break list.";
+                VERBOSE(VB_COMMFLAG, message);
+            }
+        }
+    }
+}
+
+int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
+                      NuppelVideoPlayer* nvp, int commDetectMethod)
+{
+    CommDetectorFactory factory;
+    commDetector = factory.makeCommDetector(commDetectMethod, showPercentage,
+                                            fullSpeed, nvp,
+                                            program_info->recstartts,
+                                            program_info->recendts);
+
+    jobID = -1;
+
+    if (inJobQueue)
+    {
+        jobID = JobQueue::GetJobID(JOB_COMMFLAG, program_info->chanid,
+                                   program_info->startts);
+
+        if (jobID != -1)
+            VERBOSE(VB_COMMFLAG,
+                QString("mythcommflag: Processing JobID %1").arg(jobID));
+        else
+            VERBOSE(VB_COMMFLAG, "mythcommflag: Unable to determine jobID");
+    }
+
+    program_info->SetCommFlagged(COMM_FLAG_PROCESSING);
+
+    CustomEventRelayer cer(incomingCustomEvent);
+    SlotRelayer a(commDetectorBreathe);
+    SlotRelayer b(commDetectorStatusUpdate);
+    SlotRelayer c(commDetectorGotNewCommercialBreakList);
+    QObject::connect(commDetector, SIGNAL(breathe()), &a, SLOT(relay()));
+    QObject::connect(commDetector, SIGNAL(statusUpdate(const QString&)), &b,
+                     SLOT(relay(const QString&)));
+    QObject::connect(commDetector, SIGNAL(gotNewCommercialBreakList()), &c,
+                     SLOT(relay()));
+
+    VERBOSE(VB_COMMFLAG, "mythcommflag sending COMMFLAG_START notification");
+    QString message = "COMMFLAG_START ";
+    message += program_info->chanid + " " +
+               program_info->recstartts.toString(Qt::ISODate);
+    RemoteSendMessage(message);
+
+
+    int result = commDetector->go();
+    int comms_found = 0;
+
+    if (result >= 0)
+    {
+        QMap<long long, int> commBreakList;
+        commDetector->getCommercialBreakList(commBreakList);
+        comms_found = commBreakList.size() / 2;
+
+        if (!dontSubmitCommbreakListToDB)
+        {
+            program_info->SetMarkupFlag(MARK_UPDATED_CUT, true);
+            program_info->SetCommBreakList(commBreakList);
+            program_info->SetCommFlagged(COMM_FLAG_DONE);
+        }
+        if (outputfilename.length())
+        {
+            fstream outputstream(outputfilename, ios::app | ios::out );
+            outputstream << "commercialBreakListFor: " << program_info->title
+                         << " on " << program_info->chanid << " @ "
+                         << program_info->startts.toString(Qt::ISODate) << endl;
+            streamOutCommercialBreakList(outputstream, commBreakList);
+        }
+    }
+    else
+    {
+        if (!dontSubmitCommbreakListToDB)
+            program_info->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
+    }
+
+    delete commDetector;
+
+    return comms_found;
+}
+
 int FlagCommercials(QString chanid, QString starttime)
 {
     int breaksFound = 0;
-    int commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
+    if (commDetectMethod==-1)
+        commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
                                                    COMM_DETECT_BLANKS);
     QMap<long long, int> blanks;
-    ProgramInfo *program_info =
-        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+    recorder = NULL;
+    program_info = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
 
     if (!program_info)
     {
@@ -116,159 +344,53 @@ int FlagCommercials(QString chanid, QString starttime)
         return COMMFLAG_EXIT_NO_PROGRAM_DATA;
     }
 
-    QString filename = program_info->GetRecordFilename("...");
-
-    print_v1( "%-6.6s  %-14.14s  %-41.41s  ", chanid.ascii(),
-              starttime.ascii(), program_info->title.ascii());
-    fflush( stdout );
-    if ((!force) && (program_info->IsCommProcessing()))
+    if (onlyDumpDBCommercialBreakList)
     {
-        VERBOSE(VB_IMPORTANT,
-                "Error, the program is already being flagged elsewhere.");
-        return COMMFLAG_EXIT_IN_USE;
-    }
-
-    filename = program_info->GetPlaybackURL();
-
-    if (testMode)
-    {
-        print_v1( "0 (test)\n" );
-        return COMMFLAG_EXIT_TEST_MODE;
-    }
-
-    blanks.clear();
-    if (showBlanks)
-    {
-        program_info->GetBlankFrameList(blanks);
-        if (!blanks.empty())
+        QMap<long long, int> commBreakList;
+        program_info->GetCommBreakList(commBreakList);
+        if (outputfilename.length())
         {
-            QMap<long long, int> comms;
-            QMap<long long, int> breaks;
-            QMap<long long, int>::Iterator i;
-            long long last_blank = -1;
-
-            print_v0( "\n" );
-
-            program_info->GetCommBreakList(breaks);
-            if (!breaks.empty())
-            {
-                print_v0( "Breaks (from recordedmarkup table)\n" );
-                for (i = breaks.begin(); i != breaks.end(); ++i)
-                {
-                    long long frame = i.key();
-                    int my_fps = (int)ceil(fps);
-                    int hour = (frame / my_fps) / 60 / 60;
-                    int min = (frame / my_fps) / 60 - (hour * 60);
-                    int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
-                    int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
-                                (hour * 60 * 60 * my_fps));
-                    print_v0( "%7lld : %d (%02d:%02d:%02d.%02d) (%d)\n",
-                              i.key(), i.data(), hour, min, sec, frm,
-                              (int)(frame / my_fps));
-                }
-            }
-
-            for (i = blanks.begin(); i != blanks.end(); ++i)
-            {
-                long long frame = i.key();
-
-                if ((frame - 1) != last_blank)
-                {
-                    int my_fps = (int)ceil(fps);
-                    int hour = (frame / my_fps) / 60 / 60;
-                    int min = (frame / my_fps) / 60 - (hour * 60);
-                    int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
-                    int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
-                                (hour * 60 * 60 * my_fps));
-                    print_v0( "(skip %lld)\nBlank: (%02d:%02d:%02d.%02d) (%d) ",
-                              frame - last_blank, hour, min, sec, frm,
-                              (int)(frame / my_fps));
-                }
-                print_v0( "%lld ", frame );
-                last_blank = frame;
-            }
-            print_v0( "\n" );
-
-            // build break list and print what it would be
-            CommDetect *commDetect = new CommDetect(0, 0, fps,
-                                                    commDetectMethod);
-            commDetect->SetBlankFrameMap(blanks);
-            commDetect->GetBlankCommMap(comms);
-            print_v0( "Commercials (computed using only blank frame detection)\n" );
-            for (i = comms.begin(); i != comms.end(); ++i)
-            {
-                long long frame = i.key();
-                int my_fps = (int)ceil(fps);
-                int hour = (frame / my_fps) / 60 / 60;
-                int min = (frame / my_fps) / 60 - (hour * 60);
-                int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
-                int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
-                            (hour * 60 * 60 * my_fps));
-                print_v0( "%7lld : %d (%02d:%02d:%02d.%02d) (%d)\n",
-                          i.key(), i.data(), hour, min, sec, frm,
-                          (int)(frame / my_fps));
-            }
-
-            commDetect->GetBlankCommBreakMap(breaks);
-
-            print_v0( "Breaks (computed using only blank frame detection)\n" );
-            for (i = breaks.begin(); i != breaks.end(); ++i)
-            {
-                long long frame = i.key();
-                int my_fps = (int)ceil(fps);
-                int hour = (frame / my_fps) / 60 / 60;
-                int min = (frame / my_fps) / 60 - (hour * 60);
-                int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
-                int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
-                            (hour * 60 * 60 * my_fps));
-                print_v0( "%7lld : %d (%02d:%02d:%02d.%02d) (%d)\n",
-                          i.key(), i.data(), hour, min, sec, frm,
-                          (int)(frame / my_fps));
-            }
-
-            if (justBlanks)
-            {
-                print_v0( "Saving new commercial break list to database.\n" );
-                program_info->SetCommBreakList(breaks);
-            }
-
-            delete commDetect;
-        }
-        delete program_info;
-        return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
-    }
-    else if (justBlanks)
-    {
-        program_info->GetBlankFrameList(blanks);
-        if (!blanks.empty())
-        {
-            QMap<long long, int> comms;
-            QMap<long long, int> breaks;
-            QMap<long long, int> orig_breaks;
-            CommDetect *commDetect = new CommDetect(0, 0, fps,
-                                                    commDetectMethod);
-
-            comms.clear();
-            breaks.clear();
-            orig_breaks.clear();
-
-            program_info->GetCommBreakList(orig_breaks);
-
-            commDetect->SetBlankFrameMap(blanks);
-            commDetect->GetCommBreakMap(breaks);
-            program_info->SetCommBreakList(breaks);
-
-            print_v1( "%d -> %d\n", orig_breaks.count()/2, breaks.count()/2);
-
-            delete commDetect;
+            fstream output(outputfilename, ios::app | ios::out );
+            output << "commercialBreakListFor: " << program_info->title
+                   << " on " << program_info->chanid << " @ "
+                   << program_info->startts.toString(Qt::ISODate) << endl;
+            streamOutCommercialBreakList(output, commBreakList);
         }
         else
         {
-            print_v1( "no blanks\n" );
+            cout << "commercialBreakListFor: " << program_info->title
+                 << " on " << program_info->chanid << " @ "
+                 << program_info->startts.toString(Qt::ISODate) << endl;
+            streamOutCommercialBreakList(cout, commBreakList);
         }
         delete program_info;
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
+
+    QString filename = program_info->GetRecordFilename("...");
+
+    if (!quiet)
+    {
+        cerr << chanid.leftJustify(6, ' ', true) << "  "
+             << starttime.leftJustify(14, ' ', true) << "  "
+             << program_info->title.leftJustify(41, ' ', true) << "  ";
+        cerr.flush();
+
+        if ((!force) && (program_info->IsCommProcessing()))
+        {
+            cerr << "IN USE\n";
+            cerr << "                        "
+                    "(the program is already being flagged elsewhere)\n";
+            return COMMFLAG_EXIT_IN_USE;
+        }
+    }
+    else
+    {
+        if ((!force) && (program_info->IsCommProcessing()))
+            return COMMFLAG_EXIT_IN_USE;
+    }
+
+    filename = program_info->GetPlaybackURL();
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
 
@@ -279,39 +401,43 @@ int FlagCommercials(QString chanid, QString starttime)
         delete program_info;
         return COMMFLAG_EXIT_DB_ERROR;
     }
-    
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(program_info);
+
+    NuppelVideoPlayer* nvp = new NuppelVideoPlayer(program_info);
     nvp->SetRingBuffer(tmprbuf);
 
     if (rebuildSeekTable)
     {
         nvp->RebuildSeekTable();
 
-        print_v1( "Rebuilt\n" );
+        if (!quiet)
+            cerr << "Rebuilt\n";
+
+        delete nvp;
+        delete tmprbuf;
+        delete program_info;
+
+        return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
-    else
+
+    if ((stillRecording) &&
+        (program_info->recendts > QDateTime::currentDateTime()))
     {
-        if ((stillRecording) &&
-            (program_info->recendts > QDateTime::currentDateTime()))
-        {
-            RemoteEncoder *recorder;
+        nvp->SetWatchingRecording(true);
+        gContext->ConnectToMasterServer();
 
-            nvp->SetWatchingRecording(true);
-            gContext->ConnectToMasterServer();
-
-            recorder = RemoteGetExistingRecorder(program_info);
-            if (recorder && (recorder->GetRecorderNumber() != -1))
-                nvp->SetRecorder(recorder);
-            else
-                 VERBOSE(VB_IMPORTANT, 
-                         "Unable to find active recorder for this recording, "
-                         "\n\t\t\tflagging info may be negatively affected.");
-        }
-        breaksFound = nvp->FlagCommercials(showPercentage, fullSpeed,
-                                           inJobQueue);
-
-        print_v1( "%d\n", breaksFound );
+        recorder = RemoteGetExistingRecorder(program_info);
+        if (recorder && (recorder->GetRecorderNumber() != -1))
+            nvp->SetRecorder(recorder);
+        else
+            cerr << "Unable to find active recorder for this recording, "
+                 << "flagging info may be negatively affected." << endl;
     }
+
+    breaksFound = DoFlagCommercials(showPercentage, fullSpeed, inJobQueue,
+                                    nvp, commDetectMethod);
+
+    if (!quiet)
+        cerr << breaksFound << "\n";
 
     delete nvp;
     delete tmprbuf;
@@ -327,9 +453,11 @@ int main(int argc, char *argv[])
     bool isVideo = false;
 
     QString filename;
-        
+
     QString chanid;
     QString starttime;
+    QString allStart = "19700101000000";
+    QString allEnd   = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
     time_t time_now;
     bool allRecorded = false;
     QString verboseString = QString("");
@@ -338,7 +466,7 @@ int main(int argc, char *argv[])
 
     QString binname = finfo.baseName();
 
-    print_verbose_messages = VB_IMPORTANT;
+    print_verbose_messages = VB_NONE;
     verboseString = "important";
 
     while (argpos < a.argc())
@@ -390,18 +518,17 @@ int main(int argc, char *argv[])
             rebuildSeekTable = true;
             beNice = false;
         }
-        else if (!strcmp(a.argv()[argpos], "--blanks"))
+        else if (!strcmp(a.argv()[argpos],"--method"))
         {
-            if (!quiet)
-                showBlanks = true;
+            QString method = (a.argv()[++argpos]);
+            bool ok;
+            commDetectMethod = method.toInt(&ok);
+            if (!ok)
+                commDetectMethod = -1;
         }
         else if (!strcmp(a.argv()[argpos], "--gencutlist"))
         {
             copyToCutlist = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--justblanks"))
-        {
-            justBlanks = true;
         }
         else if (!strcmp(a.argv()[argpos], "-j"))
         {
@@ -415,21 +542,32 @@ int main(int argc, char *argv[])
         {
             allRecorded = true;
         }
-        else if (!strcmp(a.argv()[argpos], "--fps"))
+        else if (!strcmp(a.argv()[argpos], "--allstart"))
         {
-            fps = atof(a.argv()[++argpos]);
+            if (((argpos + 1) >= a.argc()) ||
+                !strncmp(a.argv()[argpos + 1], "--", 2))
+            {
+                cerr << "Missing or invalid parameter for --allstart\n";
+                return COMMFLAG_EXIT_INVALID_STARTTIME;
+            }
+            
+            allStart = a.argv()[++argpos];
         }
-        else if (!strcmp(a.argv()[argpos], "--test"))
+        else if (!strcmp(a.argv()[argpos], "--allend"))
         {
-            testMode = true;
+            if (((argpos + 1) >= a.argc()) ||
+                !strncmp(a.argv()[argpos + 1], "--", 2))
+            {
+                cerr << "Missing or invalid parameter for --allend\n";
+                return COMMFLAG_EXIT_INVALID_STARTTIME;
+            }
+            
+            allEnd = a.argv()[++argpos];
         }
         else if (!strcmp(a.argv()[argpos], "--quiet"))
         {
-            if (!showBlanks)
-            {
-                quiet = true;
-                showPercentage = false;
-            }
+            quiet = true;
+            showPercentage = false;
         }
         else if (!strcmp(a.argv()[argpos], "--sleep"))
         {
@@ -448,6 +586,29 @@ int main(int argc, char *argv[])
         {
             beNice = false;
         }
+        else if (!strcmp(a.argv()[argpos], "--dontwritetodb"))
+        {
+            dontSubmitCommbreakListToDB = true;
+        }
+        else if (!strcmp(a.argv()[argpos], "--onlydumpdb"))
+        {
+            onlyDumpDBCommercialBreakList = true;
+        }
+        else if (!strcmp(a.argv()[argpos], "--outputfile"))
+        {
+            if (a.argc() > argpos)
+            {
+                outputfilename = a.argv()[++argpos];
+                //clear file.
+                fstream output(outputfilename, ios::out);
+            }
+            else
+            {
+                cerr << "Missing argument to --outputfile option\n";
+                return -1;
+            }
+        }
+
         else if (!strcmp(a.argv()[argpos],"-V"))
         {
             if (a.argc() > argpos)
@@ -476,9 +637,9 @@ int main(int argc, char *argv[])
                 else
                 {
                     QStringList verboseOpts;
-                    verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
+                    verboseOpts = QStringList::split(',', a.argv()[argpos+1]);
                     ++argpos;
-                    for (QStringList::Iterator it = verboseOpts.begin(); 
+                    for (QStringList::Iterator it = verboseOpts.begin();
                          it != verboseOpts.end(); ++it )
                     {
                         if (!strcmp(*it,"none"))
@@ -549,7 +710,8 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
-            } else
+            }
+            else
             {
                 VERBOSE(VB_IMPORTANT,
                         "Missing argument to -v/--verbose option");
@@ -578,12 +740,12 @@ int main(int argc, char *argv[])
                     "                             takes precedence over --blanks if given first)\n"
                     "--blanks                     Show list of blank frames if already in database\n"
                     "                             (takes precedence over --quiet if given first)\n"
-                    "--fps fps                    Set the Frames Per Second.  Only necessary when\n"
-                    "                             running with the '--blanks' option since all\n"
-                    "                             other processing modes get the frame rate from\n"
-                    "                             the player.\n"
                     "--all                        Re-run commercial flagging for all recorded\n"
                     "                             programs using current detection method.\n"
+                    "--allstart YYYYMMDDHHMMSS    when using --all, only flag programs starting\n"
+                    "                             after the 'allstart' date (default = Jan 1, 1970).\n"
+                    "--allend YYYYMMDDHHMMSS      when using --all, only flag programs ending\n"
+                    "                             before the 'allend' date (default is now).\n"
                     "--force                      Force flagging of a video even if mythcommflag\n"
                     "                             thinks it is already in use by another instance.\n"
                     "--hogcpu                     Do not nice the flagging process.\n"
@@ -621,12 +783,14 @@ int main(int argc, char *argv[])
         return COMMFLAG_EXIT_INVALID_CMDLINE;
     }
 
-    if (copyToCutlist) {
+    if (copyToCutlist)
+    {
         CopySkipListToCutList(chanid, starttime);
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
 
-    if (inJobQueue) {
+    if (inJobQueue)
+    {
         int jobQueueCPU = gContext->GetNumSetting("JobQueueCPU", 0);
 
         if (beNice || jobQueueCPU < 2)
@@ -639,9 +803,6 @@ int main(int argc, char *argv[])
 
         quiet = true;
         isVideo = false;
-        showBlanks = false;
-        justBlanks = false;
-        testMode = false;
         showPercentage = false;
 
         int breaksFound = FlagCommercials(chanid, starttime);
@@ -663,36 +824,35 @@ int main(int argc, char *argv[])
 
         VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
-        print_v0( "\n" );
-        print_v0( "MythTV Commercial Flagger, started at %s", ctime(&time_now));
+        cerr << "\nMythTV Commercial Flagger, started at "
+             << ctime(&time_now);
 
-        print_v0( "\n" );
         if (!isVideo)
         {
             if (!rebuildSeekTable)
             {
-                print_v0( "Flagging commercial breaks for:\n" );
+                cerr << "Flagging commercial breaks for:\n";
                 if (a.argc() == 1)
-                    print_v0( "ALL Un-flagged programs\n" );
+                    cerr << "ALL Un-flagged programs\n";
             }
             else
             {
-                print_v0( "Rebuilding SeekTable(s) for:\n" );
+                cerr << "Rebuilding SeekTable(s) for:\n";
             }
 
-            print_v0( "ChanID  Start Time      "
-                    "Title                                      " );
+            cerr << "ChanID  Start Time      "
+                    "Title                                      ";
             if (rebuildSeekTable)
-                print_v0("Status\n");
+                cerr << "Status\n";
             else
-                print_v0("Breaks\n");
+                cerr << "Breaks\n";
 
-            print_v0( "------  --------------  "
-                      "-----------------------------------------  ------\n" );
+            cerr << "------  --------------  "
+                    "-----------------------------------------  ------\n";
         }
         else
         {
-            print_v0( "Building seek table for: %s\n", (const char*)filename);
+            cerr << "Building seek table for: " << filename << "\n";
         }
     }
 
@@ -708,18 +868,19 @@ int main(int argc, char *argv[])
     {
         MSqlQuery recordedquery(MSqlQuery::InitCon());
         QString querystr = QString("SELECT chanid, starttime "
-                                    "FROM recorded "
-                                    "WHERE endtime < now() "
-                                   "ORDER BY starttime;");
+                                   "FROM recorded "
+                                   "WHERE starttime >= %1 and endtime <= %2 "
+                                   "ORDER BY starttime;")
+                                   .arg(allStart).arg(allEnd);
         recordedquery.exec(querystr);
-        
+
         if ((recordedquery.isActive()) && (recordedquery.numRowsAffected() > 0))
         {
             while (recordedquery.next())
             {
                 QDateTime startts =
                     QDateTime::fromString(recordedquery.value(1).toString(),
-                                                      Qt::ISODate);
+                                          Qt::ISODate);
                 starttime = startts.toString("yyyyMMddhhmm");
                 starttime += "00";
 
@@ -738,12 +899,14 @@ int main(int argc, char *argv[])
                                                 "WHERE chanid = %1 "
                                                 "AND starttime = %2 "
                                                 "AND type in (%3,%4);")
-                                                .arg(chanid).arg(starttime)
+                                                .arg(chanid)
+                                                .arg(starttime)
                                                 .arg(MARK_COMM_START)
                                                 .arg(MARK_COMM_END);
 
                     markupquery.exec(markupstr);
-                    if (markupquery.isActive() && markupquery.numRowsAffected() > 0)
+                    if ((markupquery.isActive()) &&
+                        (markupquery.numRowsAffected() > 0))
                     {
                         if (markupquery.next())
                         {
@@ -756,8 +919,8 @@ int main(int argc, char *argv[])
         }
         else
         {
-             MythContext::DBError("Querying recorded programs", recordedquery);
-             return COMMFLAG_EXIT_DB_ERROR;
+            MythContext::DBError("Querying recorded programs", recordedquery);
+            return COMMFLAG_EXIT_DB_ERROR;
         }
     }
 
@@ -765,9 +928,11 @@ int main(int argc, char *argv[])
 
     time_now = time(NULL);
 
-    print_v1( "\nFinished commercial break flagging at %s", ctime(&time_now));
+    cerr << "\nFinished commercial break flagging at "
+         << ctime(&time_now) << "\n";
 
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
+
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

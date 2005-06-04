@@ -732,7 +732,6 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 
 void TVRec::TeardownRecorder(bool killFile)
 {
-    QMap<long long, int> blank_frame_map;
     QString oldProfileName = profileName;
 
     int filelen = -1;
@@ -755,9 +754,6 @@ void TVRec::TeardownRecorder(bool killFile)
 
         nvr->StopRecording();
         profileName = "";
-
-        if (prevRecording && !killFile)
-            nvr->GetBlankFrameMap(blank_frame_map);
 
         if (encode)
             pthread_join(encode, NULL);
@@ -797,8 +793,6 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if ((prevRecording) && (!killFile))
     {
-        prevRecording->SetBlankFrameList(blank_frame_map);
-
         if (!prematurelystopped)
         {
             int jobTypes;

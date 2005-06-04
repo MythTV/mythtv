@@ -47,8 +47,6 @@ class NuppelVideoPlayer
     NuppelVideoPlayer(ProgramInfo *info = NULL);
    ~NuppelVideoPlayer();
 
-    friend class CommDetect;
-
     void SetParentWidget(QWidget *widget) { parentWidget = widget; }
 
     void SetAsPIP(void) { disableaudio = using_null_videoout = true; }
@@ -60,11 +58,10 @@ class NuppelVideoPlayer
 
     void SetExactSeeks(bool exact) { exactseeks = exact; }
     void SetAutoCommercialSkip(int autoskip);
-    void SetTryUnflaggedSkip(bool tryskip) { tryunflaggedskip = tryskip; };
     void SetCommercialSkipMethod(int method) { commercialskipmethod = method; }
     void SetCommBreakMap(QMap<long long, int> &newMap);
 
-    int OpenFile(bool skipDsp = false, bool initCommFlag = true);
+    int OpenFile(bool skipDsp = false);
     void StartPlaying(void);
     void StopPlaying(void) { killplayer = true; decoder_thread_alive = false; }
 
@@ -208,7 +205,9 @@ class NuppelVideoPlayer
     long long CalcMaxFFTime(long long ff);
 
     bool IsErrored() { return errored; }
-
+    bool InitVideo(void);
+    VideoFrame* GetRawVideoFrame(long long frameNumber = -1);
+    
     long long GetAudioTimecodeOffset() { return audio_timecode_offset; }
     long long AdjustAudioTimecodeOffset(long long v) { 
         audio_timecode_offset += v;
@@ -226,8 +225,6 @@ class NuppelVideoPlayer
     VideoOutputType forceVideoOutput;
 
  private:
-    bool InitVideo(void);
-
     void InitFilters(void);
 
     bool GetVideoPause(void);
@@ -249,12 +246,11 @@ class NuppelVideoPlayer
 
     int GetStatusbarPos(void);
 
-    bool FrameIsBlank(VideoFrame *frame);
-    bool LastFrameIsBlank(void);
     int SkipTooCloseToEnd(int frames);
     void SkipCommercialsByBlanks(void);
     bool DoSkipCommercials(int direction);
     void AutoCommercialSkip(void);
+    bool FrameIsInMap(long long frameNumber, QMap<long long, int> &breakMap);
 
     void JumpToFrame(long long frame);
     void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }
@@ -278,7 +274,6 @@ class NuppelVideoPlayer
     bool IsInDelete(long long testframe);
     void SaveCutList(void);
     void LoadCutList(void);
-    void LoadBlankList(void);
     void LoadCommBreakList(void);
     void DisableEdit(void);
     void SetDeleteIter(void);
@@ -361,8 +356,6 @@ class NuppelVideoPlayer
     long long rewindtime, fftime;
     RemoteEncoder *nvr_enc;
 
-    class CommDetect *commDetect;
-
     int totalLength;
     long long totalFrames;
 
@@ -413,13 +406,11 @@ class NuppelVideoPlayer
     long long bookmarkseek;
     bool previewFromBookmark;
     
-    int consecutive_blanks;
     int skipcommercials;
     int autocommercialskip;
     int commercialskipmethod;
     int commrewindamount;
     int commnotifyamount;
-    bool tryunflaggedskip;
     int lastCommSkipDirection;
     long long lastCommSkipStart;
     time_t lastCommSkipTime;

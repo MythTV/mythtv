@@ -64,7 +64,6 @@ class DTVRecorder: public QObject, public RecorderBase
     void Initialize(void) {;}
     int GetVideoFd(void) { return _stream_fd; }
 
-    void GetBlankFrameMap(QMap<long long, int> &blank_frame_map);
     virtual void Reset();
   protected:
     void FinishRecording(void);

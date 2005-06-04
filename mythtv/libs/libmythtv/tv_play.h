@@ -232,7 +232,6 @@ class TV : public QObject
     
     // Configuration variables from DB just before playback
     int autoCommercialSkip;
-    bool tryUnflaggedSkip;
     int osd_display_time;
 
     // State variables

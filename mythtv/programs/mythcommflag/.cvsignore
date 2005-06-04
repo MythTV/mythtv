@@ -1,3 +1,4 @@
 .qmake.internal.cache
+moc_*
 Makefile
 mythcommflag

@@ -128,8 +128,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(ProgramInfo *info)
     weMadeBuffer = false;
     osd = NULL;
 
-    commDetect = NULL;
-
     audio_bits = -1;
     audio_channels = 2;
     audio_samplerate = 44100;
@@ -166,8 +164,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(ProgramInfo *info)
     exactseeks = false;
 
     autocommercialskip = 0;
-    commercialskipmethod = gContext->GetNumSetting("CommercialSkipMethod",
-                                                   COMM_DETECT_BLANKS);
     commrewindamount = gContext->GetNumSetting("CommRewindAmount",0);
     commnotifyamount = gContext->GetNumSetting("CommNotifyAmount",0);
     lastCommSkipDirection = 0;
@@ -180,7 +176,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(ProgramInfo *info)
     seekamountpos = 4;
     deleteframe = 0;
     hasdeletetable = false;
-    hasblanktable = false;
     hascommbreaktable = false;
 
     dialogname = "";
@@ -225,9 +220,7 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
         delete ringBuffer;
     if (osd)
         delete osd;
-    if (commDetect)
-        delete commDetect;
-
+    
     for (int i = 0; i < MAXTBUFFER; i++)
     {
         if (txtbuffers[i].buffer)
@@ -561,8 +554,6 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     if (aspect > 0.0f)
     {
         video_aspect = aspect;
-        if (commDetect)
-            commDetect->SetVideoParams(aspect);
     }
 
     if (reinit)
@@ -614,7 +605,7 @@ void NuppelVideoPlayer::SetFileLength(int total, int frames)
     totalFrames = frames;
 }
 
-int NuppelVideoPlayer::OpenFile(bool skipDsp, bool commFlagging)
+int NuppelVideoPlayer::OpenFile(bool skipDsp)
 {
     if (!skipDsp)
     {
@@ -727,15 +718,6 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, bool commFlagging)
     }
     bookmarkseek = GetBookmark();
 
-    if (commFlagging)
-    {
-        commDetect = new CommDetect(video_width, video_height, video_frame_rate,
-                                commercialskipmethod);
-    
-        commDetect->SetAggressiveDetection(
-                    gContext->GetNumSetting("AggressiveCommDetect", 1));
-    }
-    
     return 0;
 }
 
@@ -1809,7 +1791,6 @@ void NuppelVideoPlayer::ResetPlaying(void)
 
 void NuppelVideoPlayer::StartPlaying(void)
 {
-    consecutive_blanks = 0;
     killplayer = false;
     framesPlayed = 0;
 
@@ -1900,12 +1881,6 @@ void NuppelVideoPlayer::StartPlaying(void)
     rewindtime = fftime = 0;
     skipcommercials = 0;
 
-    // in the player, pretend we use Blank-frame detection so we can
-    // utilize the blank-frame info from the recorder if no commercial
-    // skip list exists.
-    if (commDetect)
-        commDetect->SetCommDetectMethod(COMM_DETECT_BLANKS);
-
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];
 
@@ -1951,13 +1926,6 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         if (gContext->GetNumSetting("ClearSavedPosition", 1))
             m_playbackinfo->SetBookmark(0);
-    }
-
-    LoadBlankList();
-    if (!blankMap.isEmpty())
-    {
-        hasblanktable = true;
-        blankIter = blankMap.begin();
     }
 
     LoadCommBreakList();
@@ -2623,7 +2591,6 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
         osd->ClearAllCCText();
 
     SetDeleteIter();
-    SetBlankIter();
     SetCommBreakIter();
 }
 
@@ -2647,26 +2614,6 @@ void NuppelVideoPlayer::SetDeleteIter(void)
 
         if (deleteIter.data() == 0)
             ++deleteIter;
-    }
-}
-
-void NuppelVideoPlayer::SetBlankIter(void)
-{
-    blankIter = blankMap.begin();
-    if (hasblanktable)
-    {
-        while (blankIter != blankMap.end())
-        {
-            if ((framesPlayed + 2) > blankIter.key())
-            {
-                ++blankIter;
-            }
-            else
-                break;
-        }
-
-        if (blankIter != blankMap.begin())
-            --blankIter;
     }
 }
 
@@ -3359,20 +3306,43 @@ void NuppelVideoPlayer::LoadCutList(void)
     m_playbackinfo->GetCutList(deleteMap);
 }
 
-void NuppelVideoPlayer::LoadBlankList(void)
-{
-    if (!m_playbackinfo)
-        return;
-
-    m_playbackinfo->GetBlankFrameList(blankMap);
-}
-
 void NuppelVideoPlayer::LoadCommBreakList(void)
 {
     if (!m_playbackinfo)
         return;
 
     m_playbackinfo->GetCommBreakList(commBreakMap);
+}
+
+bool NuppelVideoPlayer::FrameIsInMap(long long frameNumber,
+                                     QMap<long long, int> &breakMap)
+{
+    if (breakMap.isEmpty())
+        return false;
+
+    QMap<long long, int>::Iterator it = breakMap.find(frameNumber);
+
+    if (it != breakMap.end())
+        return true;
+
+    int lastType = MARK_UNSET;
+    for (it = breakMap.begin(); it != breakMap.end(); ++it)
+    {
+        if (it.key() > frameNumber)
+        {
+            int type = it.data();
+
+            if (((type == MARK_COMM_END) ||
+                 (type == MARK_CUT_END)) &&
+                ((lastType == MARK_COMM_START) ||
+                 (lastType == MARK_CUT_START)))
+                return true;
+        }
+
+        lastType = it.data();
+    }
+
+    return false;
 }
 
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
@@ -3413,8 +3383,8 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     LoadCommBreakList();
     LoadCutList();
     long long oldnumber = number;
-    while ((CommDetect::FrameIsInBreakMap(number, commBreakMap, totalFrames) || 
-           (CommDetect::FrameIsInBreakMap(number, deleteMap, totalFrames))))
+    while ((FrameIsInMap(number, commBreakMap) || 
+           (FrameIsInMap(number, deleteMap))))
     {
         number += (long long) (30 * video_frame_rate);
         if (number >= totalFrames)
@@ -3469,6 +3439,21 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     vh = video_height;
 
     return (char *)outputbuf;
+}
+
+VideoFrame* NuppelVideoPlayer::GetRawVideoFrame(long long frameNumber)
+{
+    //todo: let GetScreenGrab() above here use this method to get its framedata.
+
+    if (frameNumber >= 0)
+    {
+        JumpToFrame(frameNumber);
+        ClearAfterSeek();
+    }
+
+    GetFrame(1,true);
+
+    return videoOutput->GetLastDecodedFrame();
 }
 
 QString NuppelVideoPlayer::GetEncodingType(void)
@@ -3582,10 +3567,6 @@ bool NuppelVideoPlayer::WriteStoredData(RingBuffer *outRingBuffer,
     decoder->WriteStoredData(outRingBuffer, writevideo, timecodeOffset);
     return writevideo;
 }
-bool NuppelVideoPlayer::LastFrameIsBlank(void)
-{
-    return FrameIsBlank(videoOutput->GetLastDecodedFrame());
-}
 
 void NuppelVideoPlayer::SetCommBreakMap(QMap<long long, int> &newMap)
 {
@@ -3597,461 +3578,6 @@ void NuppelVideoPlayer::SetCommBreakMap(QMap<long long, int> &newMap)
     commBreakMap = newMap;
     hascommbreaktable = !commBreakMap.isEmpty();
     SetCommBreakIter();
-}
-
-int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
-                                       bool inJobQueue)
-{
-    int comms_found = 0;
-    int percentage = 0;
-    int jobID = -1;
-    bool flaggingPaused = false;
-    float flagFPS = 0.0;
-    float elapsed = 0.0;
-    long usecPerFrame = 0;
-    long usecSleep = 0;
-    struct timeval startTime;
-    struct timeval endTime;
-    VideoFrame *currentFrame;
-    long long myTotalFrames = 0;
-    QString lastCommBreakUpdateMsg = "";
-
-    killplayer = false;
-    framesPlayed = 0;
-
-    blankMap.clear();
-    commBreakMap.clear();
-
-    using_null_videoout = true;
-
-    if (ringBuffer && !ringBuffer->IsOpen())
-        return(254);
-
-    if (inJobQueue)
-    {
-        jobID = JobQueue::GetJobID(JOB_COMMFLAG,
-                                  m_playbackinfo->chanid,
-                                  m_playbackinfo->startts);
-        JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,
-                                  "0% " + QObject::tr("Completed"));
-    }
-
-    QTime flagTime;
-    flagTime.start();
-
-    if (m_playbackinfo->recendts < QDateTime::currentDateTime())
-        SetWatchingRecording(false);
-
-    // if we're running flagging during recording sleep a while to let the
-    // recorder get a little ways ahead of us.  We need this buffer in order
-    // to run logo detection.  flagging will be allowed to catch back up
-    // later.
-    if (watchingrecording)
-    {
-        int initialSleep = 35;
-        int totalSleep = initialSleep;
-        int logoSamplesNeeded =
-                gContext->GetNumSetting("CommDetectLogoSamplesNeeded",
-                                        DEFAULT_LOGO_SECONDS_NEEDED);
-        int logoSampleSpacing =
-                gContext->GetNumSetting("CommDetectLogoSampleSpacing",
-                                        DEFAULT_LOGO_SAMPLE_SPACING);
-
-        if (commercialskipmethod & COMM_DETECT_LOGO)
-            totalSleep += (logoSamplesNeeded * logoSampleSpacing);
-
-        if (m_playbackinfo->recstartts.addSecs(totalSleep)
-                < QDateTime::currentDateTime())
-        {
-            initialSleep = 0;
-            totalSleep = 0;
-        }
-        else if (m_playbackinfo->recstartts < QDateTime::currentDateTime())
-        {
-            int offset =
-                m_playbackinfo->recstartts.secsTo(QDateTime::currentDateTime());
-
-            totalSleep -= offset;
-            if (totalSleep < 0)
-                totalSleep = 0;
-
-            initialSleep -= offset;
-            if (initialSleep < 0)
-                initialSleep = 0;
-        }
-
-        if ((jobID != -1) && (totalSleep))
-        {
-            JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,
-                                      QObject::tr("Building Detection Buffer"));
-        }
-
-        // Go through this loop at least once, even if totalSleep is 0 so that
-        // we start the flag timer, open the file, etc. properly
-        int i = 0;
-        while((i <= totalSleep) && (watchingrecording))
-        {
-            if ((i % 10) == 0)
-            {
-                VERBOSE(VB_COMMFLAG,
-                        QString("Commercial Flagger has %1 seconds left to "
-                                "sleep waiting for the recorder to get ahead.")
-                                .arg(totalSleep - i));
-
-                if (jobID != -1)
-                {
-                    int curCmd = JobQueue::GetJobCmd(jobID);
-
-                    if (curCmd == JOB_STOP)
-                        return(255);
-                }
-            }
-
-            if (i == initialSleep)
-            {
-                flagTime.start();
-
-                if (OpenFile(false, true) < 0)
-                    return(254);
-
-                commDetect->SetWatchingRecording(true, nvr_enc, this);
-
-                totalLength = 0;
-            }
-
-            sleep(1);
-            i++;
-        }
-    }
-    else
-    {
-        if (OpenFile(false, true) < 0)
-            return(254);
-    }
-
-    m_playbackinfo->SetCommFlagged(COMM_FLAG_PROCESSING);
-
-    if (!InitVideo())
-    {
-        VERBOSE(VB_IMPORTANT,
-                "NVP: Unable to initialize video for FlagCommercials.");
-        playing = false;
-        m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
-        return(254);
-    }
-
-    for (int i = 0; i < MAXTBUFFER; i++)
-        txtbuffers[i].buffer = new unsigned char[text_size];
-
-    ClearAfterSeek();
-
-    if ((commercialskipmethod & COMM_DETECT_LOGO) &&
-        ((totalLength == 0) ||
-         (totalLength > commDetect->GetLogoSecondsNeeded())))
-    {
-        if (inJobQueue)
-        {
-            JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,
-                                      QObject::tr("Searching for Logo"));
-        }
-
-        if (showPercentage)
-        {
-            printf( "Finding Logo" );
-            fflush( stdout );
-        }
-        commDetect->SearchForLogo(this, fullSpeed);
-        if (showPercentage)
-        {
-            printf( "\b\b\b\b\b\b\b\b\b\b\b\b            "
-                    "\b\b\b\b\b\b\b\b\b\b\b\b" );
-            fflush( stdout );
-        }
-    }
-
-    // the meat of the offline commercial detection code, scan through whole
-    // file looking for indications of commercial breaks
-    GetFrame(1,true);
-
-    usecPerFrame = (long)(1.0 / video_frame_rate * 1000000);
-
-    if (!watchingrecording)
-        myTotalFrames = totalFrames;
-    else
-        myTotalFrames = (long long)(video_frame_rate *
-                                    (m_playbackinfo->recendts.toTime_t()
-                                     - m_playbackinfo->recstartts.toTime_t()));
-    if (showPercentage)
-    {
-        if (myTotalFrames)
-            printf( "%3d%%/      ", 0 );
-        else
-            printf( "%6lld/      ", 0LL );
-    }
-
-    while (!eof)
-    {
-        if (watchingrecording)
-            gettimeofday(&startTime, NULL);
-
-        currentFrame = videoOutput->GetLastDecodedFrame();
-
-        if ((jobID != -1) &&
-            (((currentFrame->frameNumber % 500) == 0)) ||
-             (((currentFrame->frameNumber % 100) == 0) && (watchingrecording)))
-        {
-            int curCmd;
-
-            curCmd = JobQueue::GetJobCmd(jobID);
-
-            if (curCmd == JOB_STOP)
-            {
-                playing = false;
-                killplayer = true;
-
-                m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
-
-                return(255);
-            }
-            else if (curCmd == JOB_PAUSE)
-            {
-                if (!flaggingPaused && jobID != -1)
-                {
-                    JobQueue::ChangeJobStatus(jobID, JOB_PAUSED,
-                                              QObject::tr("Paused"));
-
-                    flaggingPaused = true;
-                }
-                sleep(1);
-                continue;
-            }
-        }
-
-        if (flaggingPaused && jobID != -1)
-        {
-            JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,
-                                      QObject::tr("Restarting"));
-            JobQueue::ChangeJobFlags(jobID, JOB_RUN);
-
-            flaggingPaused = false;
-        }
-
-        // sleep a little so we don't use all cpu even if we're niced
-        if (!fullSpeed && !watchingrecording)
-            usleep(10000);
-
-        if (((jobID != -1) &&
-            ((currentFrame->frameNumber % 500) == 0)) ||
-             ((showPercentage || watchingrecording) &&
-              (currentFrame->frameNumber % 100) == 0))
-        {
-            elapsed = flagTime.elapsed() / 1000.0;
-
-            if (elapsed)
-                flagFPS = currentFrame->frameNumber / elapsed;
-            else
-                flagFPS = 0.0;
-
-            if (myTotalFrames)
-                percentage = currentFrame->frameNumber * 100 / myTotalFrames;
-            else
-                percentage = 0;
-
-            if (percentage > 100)
-                percentage = 100;
-
-            if (showPercentage)
-            {
-                if (myTotalFrames)
-                {
-                    printf( "\b\b\b\b\b\b\b\b\b\b\b" );
-                    printf( "%3d%%/%3dfps", percentage, (int)flagFPS );
-                }
-                else
-                {
-                    printf( "\b\b\b\b\b\b\b\b\b\b\b\b\b" );
-                    printf( "%6lld/%3dfps", currentFrame->frameNumber,
-                            (int)flagFPS);
-                }
-                fflush( stdout );
-            }
-
-            if ((jobID != -1) &&
-                (((currentFrame->frameNumber % 500) == 0)) ||
-                 (((currentFrame->frameNumber % 100) == 0) &&
-                  (watchingrecording)))
-            {
-                if (myTotalFrames)
-                {
-                    JobQueue::ChangeJobComment(jobID, QObject::tr(
-                                               "%1% Completed @ %2 fps.")
-                                               .arg(percentage)
-                                               .arg(flagFPS));
-                }
-                else
-                {
-                    JobQueue::ChangeJobComment(jobID, QObject::tr(
-                                               "%1 Frames Completed @ %2 fps.")
-                                               .arg((long)
-                                                    currentFrame->frameNumber)
-                                               .arg(flagFPS));
-                }
-            }
-        }
-
-        if (commDetect)
-            commDetect->ProcessFrame(currentFrame, currentFrame->frameNumber);
-
-        GetFrame(1,true);
-
-        if (watchingrecording)
-        {
-            qApp->processEvents();
-
-            if ((currentFrame->frameNumber) &&
-                ((currentFrame->frameNumber % 500) == 0))
-            {
-                if (commDetect)
-                    commDetect->GetCommBreakMap(commBreakMap);
-
-                if (commBreakMap.size())
-                {
-                    QMap<long long, int>::Iterator it = commBreakMap.begin();
-                    QString message = "COMMFLAG_UPDATE ";
-                    message += m_playbackinfo->chanid + " " +
-                               m_playbackinfo->recstartts.toString(Qt::ISODate);
-
-                    for (it = commBreakMap.begin();
-                         it != commBreakMap.end(); ++it)
-                    {
-                        if (it != commBreakMap.begin())
-                            message += ",";
-                        else
-                            message += " ";
-                        message += QString("%1:%2").arg(it.key())
-                                                   .arg(it.data());
-                    }
-
-                    if (message != lastCommBreakUpdateMsg)
-                    {
-                        RemoteSendMessage(message);
-                        lastCommBreakUpdateMsg = message;
-                    }
-                }
-            }
-
-            usecPerFrame = (long)(1.0 / video_frame_rate * 1000000);
-            gettimeofday(&endTime, NULL);
-
-            usecSleep = usecPerFrame -
-                            (((endTime.tv_sec - startTime.tv_sec) * 1000000) +
-                              (endTime.tv_usec - startTime.tv_usec));
-
-            elapsed = flagTime.elapsed() / 1000.0;
-
-            if (elapsed)
-            {
-                flagFPS = currentFrame->frameNumber / elapsed;
-
-                if ((flagFPS < (video_frame_rate - 1.0)) &&
-                    (usecSleep > 0))
-                    usecSleep = (long)(usecSleep * 0.33);
-                else if (flagFPS > (video_frame_rate * 0.99))
-                    usecSleep = (long)(usecPerFrame * 1.5);
-            }
-
-            if (usecSleep > 0)
-                usleep(usecSleep);
-        }
-    }
-
-    if (showPercentage)
-    {
-        elapsed = flagTime.elapsed() / 1000.0;
-
-        if (elapsed)
-            flagFPS = currentFrame->frameNumber / elapsed;
-        else
-            flagFPS = 0.0;
-
-        if (myTotalFrames)
-            printf( "\b\b\b\b\b\b      \b\b\b\b\b\b" );
-        else
-            printf( "\b\b\b\b\b\b\b\b\b\b\b\b\b             "
-                    "\b\b\b\b\b\b\b\b\b\b\b\b\b" );
-    }
-
-    if (commercialskipmethod & COMM_DETECT_BLANKS)
-    {
-        commDetect->GetBlankFrameMap(blankMap);
-
-        if (blankMap.size())
-        {
-            m_playbackinfo->SetBlankFrameList(blankMap);
-        }
-    }
-
-    commDetect->GetCommBreakMap(commBreakMap);
-
-    if (commBreakMap.size())
-    {
-        m_playbackinfo->SetMarkupFlag(MARK_UPDATED_CUT, true);
-        m_playbackinfo->SetCommBreakList(commBreakMap);
-
-        QMap<long long, int>::Iterator it = commBreakMap.begin();
-        QString message = "COMMFLAG_UPDATE ";
-        message += m_playbackinfo->chanid + " " +
-                   m_playbackinfo->recstartts.toString(Qt::ISODate);
-
-        for (it = commBreakMap.begin();
-             it != commBreakMap.end(); ++it)
-        {
-            if (it != commBreakMap.begin())
-                message += ",";
-            else
-                message += " ";
-            message += QString("%1:%2").arg(it.key())
-                                       .arg(it.data());
-        }
-
-        RemoteSendMessage(message);
-    }
-    comms_found = commBreakMap.size() / 2;
-
-    playing = false;
-    killplayer = true;
-
-    if (!hasFullPositionMap)
-        decoder->SetPositionMap();
-
-    m_playbackinfo->SetCommFlagged(COMM_FLAG_DONE);
-
-    if (jobID != -1)
-    {
-        elapsed = flagTime.elapsed() / 1000.0;
-
-        if (myTotalFrames && (elapsed > 0.0))
-        {
-            flagFPS = myTotalFrames / elapsed;
-            JobQueue::ChangeJobStatus(jobID, JOB_STOPPING,
-                                      QObject::tr("Completed, %1 FPS")
-                                                  .arg(flagFPS) + ", "
-                                      + QString("%1").arg(comms_found) + " "
-                                      + QObject::tr("Commercial Breaks Found"));
-        }
-        else
-        {
-            JobQueue::ChangeJobStatus(jobID, JOB_STOPPING,
-                                      QObject::tr("Completed") + ", "
-                                      + QString("%1").arg(comms_found) + " "
-                                      + QObject::tr("Commercial Breaks Found"));
-        }
-    }
-
-    VERBOSE(VB_COMMFLAG, QString("NVP::FlagCommercials found %1 breaks")
-                                 .arg(comms_found));
-
-    return(comms_found);
 }
 
 bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb, void* cbData)
@@ -4308,20 +3834,6 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
     return (int)(ret);
 }
 
-bool NuppelVideoPlayer::FrameIsBlank(VideoFrame *frame)
-{
-    if ((commercialskipmethod & COMM_DETECT_BLANKS) && commDetect)
-    {
-        commDetect->ProcessFrame(frame);
-
-        return commDetect->FrameIsBlank();
-    }
-    else
-    {
-        return false;
-    }
-}
-
 void NuppelVideoPlayer::AutoCommercialSkip(void)
 {
     if (hascommbreaktable)
@@ -4397,345 +3909,144 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
     }
 }
 
-void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
-{
-    int scanned_frames;
-    int blanks_found;
-    int found_blank_seq;
-    int first_blank_frame;
-    int saved_position;
-    int min_blank_frame_seq = 1;
-    int comm_lengths[] = { 30, 15, 60, 0 }; // commercial lengths
-    int comm_window = 2;                    // seconds to scan for break
-
-    if ((hasblanktable) && (!hascommbreaktable))
-    {
-        commDetect->ClearAllMaps();
-        commDetect->SetBlankFrameMap(blankMap);
-        commDetect->GetCommBreakMap(commBreakMap);
-        if (!commBreakMap.isEmpty())
-        {
-            hascommbreaktable = true;
-            DoSkipCommercials(1);
-            return;
-        }
-    }
-
-    saved_position = framesPlayed;
-
-    // rewind 2 seconds in case user hit Skip right after a break
-    JumpToNetFrame((long long int)(-2 * video_frame_rate));
-
-    // scan through up to 64 seconds to find first break
-    // 64 == 2 seconds we rewound, plus up to 62 seconds to find first break
-    scanned_frames = blanks_found = found_blank_seq = first_blank_frame = 0;
-
-    GetFrame(1, true);
-    while (!eof && (scanned_frames < (64 * video_frame_rate)) && !killplayer)
-    {
-        if (LastFrameIsBlank())
-        {
-            blanks_found++;
-            if (!first_blank_frame)
-                first_blank_frame = framesPlayed;
-            if (blanks_found >= min_blank_frame_seq)
-                break;
-        }
-        else if (blanks_found)
-        {
-            blanks_found = 0;
-            first_blank_frame = 0;
-        }
-        if (SkipTooCloseToEnd(min_blank_frame_seq - blanks_found))
-        {
-            JumpToFrame(saved_position);
-            if (osd)
-                osd->EndPause();
-            return;
-        }
-
-        scanned_frames++;
-        GetFrame(1, true);
-    }
-
-    if (killplayer)
-        return;
-
-    if (!first_blank_frame)
-    {
-        JumpToFrame(saved_position);
-        if (osd)
-            osd->EndPause();
-        return;
-    }
-
-    // if we make it here, then a blank was found
-    int blank_seq_found = 0;
-    int commercials_found = 0;
-    long long starting_pos = framesPlayed;
-    do
-    {
-        if (killplayer)
-            break;
-
-        int *comm_length = comm_lengths;
-
-        blank_seq_found = 0;
-        saved_position = framesPlayed;
-        while (*comm_length && !killplayer)
-        {
-            long long int new_frame = saved_position +
-                       (long long int)((*comm_length - 1) * video_frame_rate);
-            if (SkipTooCloseToEnd(new_frame))
-            {
-                comm_length++;
-                continue;
-            }
-
-            JumpToFrame(new_frame);
-
-            scanned_frames = blanks_found = found_blank_seq = 0;
-            first_blank_frame = 0;
-            while (scanned_frames < (comm_window * video_frame_rate) &&
-                   !killplayer)
-            {
-                GetFrame(1, true);
-                if (LastFrameIsBlank())
-                {
-                    blanks_found++;
-                    if (!first_blank_frame)
-                        first_blank_frame = framesPlayed;
-                    if (blanks_found >= min_blank_frame_seq)
-                        break;
-                }
-                else if (blanks_found)
-                {
-                    blanks_found = 0;
-                    first_blank_frame = 0;
-                }
-
-                if (SkipTooCloseToEnd(min_blank_frame_seq - blanks_found))
-                {
-                    JumpToFrame(saved_position);
-                    return;
-                }
-
-                scanned_frames++;
-            }
-
-            if (blanks_found >= min_blank_frame_seq)
-            {
-                if (osd)
-                {
-                    QString comm_msg;
-                    QString desc;
-                    int spos = calcSliderPos(desc);
-
-                    blank_seq_found = 1;
-
-                    commercials_found++;
-                    comm_msg = QString(QObject::tr("Found %1 sec. commercial"))
-                                      .arg(*comm_length);
-
-                    osd->StartPause(spos, false, comm_msg, desc, 5);
-                }
-                break;
-            }
-
-            comm_length++;
-        }
-    } while ((blank_seq_found) &&
-             ((framesPlayed - starting_pos) < (300 * video_frame_rate)));
-
-    if (killplayer)
-        return;
-
-    if (osd)
-        osd->EndPause();
-
-    JumpToFrame(saved_position);
-
-    // skip all blank frames so we get right to the show
-    GetFrame(1, true);
-    while (LastFrameIsBlank() && !killplayer)
-        GetFrame(1, true);
-}
-
 bool NuppelVideoPlayer::DoSkipCommercials(int direction)
 {
-    if (( !hasblanktable && !hascommbreaktable) ||
-        (livetv) ||
-        (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
-    {
-        hasblanktable = false;
-        hascommbreaktable = false;
-        LoadBlankList();
-        if (!blankMap.isEmpty())
-        {
-            hasblanktable = true;
-            blankIter = blankMap.begin();
-            commBreakMap.clear();
-        }
-    }
-
-    if (( ! hascommbreaktable) &&
-        (hasblanktable))
-    {
-        commDetect->ClearAllMaps();
-        commDetect->SetBlankFrameMap(blankMap);
-        commDetect->GetCommBreakMap(commBreakMap);
-        if (!commBreakMap.isEmpty())
-            hascommbreaktable = true;
-    }
-
-    if (!hascommbreaktable && !tryunflaggedskip)
+    if (!hascommbreaktable)
     {
         QString desc = "";
         int pos = calcSliderPos(desc);
         QString mesg = QObject::tr("Not Flagged");
         if (osd)
             osd->StartPause(pos, false, mesg, desc, 2);
+
+        QString message = "COMMFLAG_REQUEST ";
+        message += m_playbackinfo->chanid + " " +
+                   m_playbackinfo->startts.toString(Qt::ISODate);
+        RemoteSendMessage(message);
+
         return false;
     }
 
-    if (hascommbreaktable)
+    if ((direction == (0 - lastCommSkipDirection)) &&
+        ((time(NULL) - lastCommSkipTime) <= 3))
     {
-        if ((direction == (0 - lastCommSkipDirection)) &&
-            ((time(NULL) - lastCommSkipTime) <= 3))
-        {
-            QString comm_msg = QString(QObject::tr("Skipping Back."));
-            QString desc;
-            int spos = calcSliderPos(desc);
-            if (osd)
-                osd->StartPause(spos, false, comm_msg, desc, 2);
-
-            if (lastCommSkipStart > (2.0 * video_frame_rate))
-                lastCommSkipStart -= (long long) (2.0 * video_frame_rate);
-
-            JumpToFrame(lastCommSkipStart);
-            lastCommSkipDirection = 0;
-            lastCommSkipTime = time(NULL);
-            return true;
-        }
-        lastCommSkipDirection = direction;
-        lastCommSkipStart = framesPlayed;
-        lastCommSkipTime = time(NULL);
-
-        SetCommBreakIter();
-
-        if ((commBreakIter == commBreakMap.begin()) &&
-            (direction < 0))
-        {
-            QString comm_msg = QString(QObject::tr("Start of program."));
-            QString desc;
-            int spos = calcSliderPos(desc);
-            if (osd)
-                osd->StartPause(spos, false, comm_msg, desc, 2);
-
-            JumpToFrame(0);
-            return true;
-        }
-
-        if ((direction > 0) &&
-            ((commBreakIter == commBreakMap.end()) ||
-             ((totalFrames) &&
-              ((commBreakIter.key() + (10 * video_frame_rate)) > totalFrames))))
-        {
-            QString comm_msg = QString(QObject::tr("At End, can not Skip."));
-            QString desc;
-            int spos = calcSliderPos(desc);
-            if (osd)
-                osd->StartPause(spos, false, comm_msg, desc, 2);
-            return false;
-        }
-
-        if (direction < 0)
-        {
-            commBreakIter--;
-
-            int skipped_seconds = (int)((commBreakIter.key() -
-                    framesPlayed) / video_frame_rate);
-
-            // special case when hitting 'skip backwards' <3 seconds after break
-            if (skipped_seconds > -3)
-            {
-                if (commBreakIter == commBreakMap.begin())
-                {
-                    QString comm_msg = QString(QObject::tr("Start of program."));
-                    QString desc;
-                    skipped_seconds = (int)((0 -
-                                             framesPlayed) / video_frame_rate);
-                    int spos = calcSliderPos(desc);
-                    if (osd)
-                        osd->StartPause(spos, false, comm_msg, desc, 2);
-
-                    JumpToFrame(0);
-                    return true;
-                }
-                else
-                    commBreakIter--;
-            }
-        }
-        else if (commBreakIter.data() == MARK_COMM_START)
-        {
-            int skipped_seconds = (int)((commBreakIter.key() -
-                    framesPlayed) / video_frame_rate);
-
-            // special case when hitting 'skip' < 20 seconds before break
-            if (skipped_seconds < 20)
-            {
-                commBreakIter++;
-
-                if (commBreakIter == commBreakMap.end())
-                {
-                    QString comm_msg =
-                                QString(QObject::tr("At End, can not Skip."));
-                    QString desc;
-                    int spos = calcSliderPos(desc);
-                    if (osd)
-                        osd->StartPause(spos, false, comm_msg, desc, 2);
-                    return false;
-                }
-            }
-        }
-
+        QString comm_msg = QString(QObject::tr("Skipping Back."));
+        QString desc;
+        int spos = calcSliderPos(desc);
         if (osd)
-        {
-            int skipped_seconds = (int)((commBreakIter.key() -
-                    framesPlayed) / video_frame_rate);
-            QString skipTime;
-            skipTime.sprintf("%d:%02d", skipped_seconds / 60,
-                             abs(skipped_seconds) % 60);
-            QString comm_msg = QString(QObject::tr("Skip %1")).arg(skipTime);
-            QString desc;
-            int spos = calcSliderPos(desc);
             osd->StartPause(spos, false, comm_msg, desc, 2);
-        }
 
-        if (direction > 0)
-            JumpToFrame(commBreakIter.key() -
-                        (int)(commrewindamount * video_frame_rate));
-        else
-            JumpToFrame(commBreakIter.key());
-        commBreakIter++;
+        if (lastCommSkipStart > (2.0 * video_frame_rate))
+            lastCommSkipStart -= (long long) (2.0 * video_frame_rate);
 
-        GetFrame(1, true);
-        if (gContext->GetNumSetting("CommSkipAllBlanks",0))
-            while (LastFrameIsBlank() && !eof && !killplayer)
-                GetFrame(1, true);
+        JumpToFrame(lastCommSkipStart);
+        lastCommSkipDirection = 0;
+        lastCommSkipTime = time(NULL);
+        return true;
+    }
+    lastCommSkipDirection = direction;
+    lastCommSkipStart = framesPlayed;
+    lastCommSkipTime = time(NULL);
 
+    SetCommBreakIter();
+
+    if ((commBreakIter == commBreakMap.begin()) &&
+        (direction < 0))
+    {
+        QString comm_msg = QString(QObject::tr("Start of program."));
+        QString desc;
+        int spos = calcSliderPos(desc);
+        if (osd)
+            osd->StartPause(spos, false, comm_msg, desc, 2);
+
+        JumpToFrame(0);
         return true;
     }
 
-    if (commercialskipmethod & COMM_DETECT_BLANKS)
-        SkipCommercialsByBlanks();
-    else if (osd)
-        osd->EndPause();
+    if ((direction > 0) &&
+        ((commBreakIter == commBreakMap.end()) ||
+         ((totalFrames) &&
+          ((commBreakIter.key() + (10 * video_frame_rate)) > totalFrames))))
+    {
+        QString comm_msg = QString(QObject::tr("At End, can not Skip."));
+        QString desc;
+        int spos = calcSliderPos(desc);
+        if (osd)
+            osd->StartPause(spos, false, comm_msg, desc, 2);
+        return false;
+    }
+
+    if (direction < 0)
+    {
+        commBreakIter--;
+
+        int skipped_seconds = (int)((commBreakIter.key() -
+                framesPlayed) / video_frame_rate);
+
+        // special case when hitting 'skip backwards' <3 seconds after break
+        if (skipped_seconds > -3)
+        {
+            if (commBreakIter == commBreakMap.begin())
+            {
+                QString comm_msg = QString(QObject::tr("Start of program."));
+                QString desc;
+                skipped_seconds = (int)((0 - framesPlayed) / video_frame_rate);
+                int spos = calcSliderPos(desc);
+                if (osd)
+                    osd->StartPause(spos, false, comm_msg, desc, 2);
+
+                JumpToFrame(0);
+                return true;
+            }
+            else
+                commBreakIter--;
+        }
+    }
+    else if (commBreakIter.data() == MARK_COMM_START)
+    {
+        int skipped_seconds = (int)((commBreakIter.key() -
+                framesPlayed) / video_frame_rate);
+
+        // special case when hitting 'skip' < 20 seconds before break
+        if (skipped_seconds < 20)
+        {
+            commBreakIter++;
+
+            if (commBreakIter == commBreakMap.end())
+            {
+                QString comm_msg =
+                            QString(QObject::tr("At End, can not Skip."));
+                QString desc;
+                int spos = calcSliderPos(desc);
+                if (osd)
+                    osd->StartPause(spos, false, comm_msg, desc, 2);
+                return false;
+            }
+        }
+    }
+
+    if (osd)
+    {
+        int skipped_seconds = (int)((commBreakIter.key() -
+                framesPlayed) / video_frame_rate);
+        QString skipTime;
+        skipTime.sprintf("%d:%02d", skipped_seconds / 60,
+                         abs(skipped_seconds) % 60);
+        QString comm_msg = QString(QObject::tr("Skip %1")).arg(skipTime);
+        QString desc;
+        int spos = calcSliderPos(desc);
+        osd->StartPause(spos, false, comm_msg, desc, 2);
+    }
+
+    if (direction > 0)
+        JumpToFrame(commBreakIter.key() -
+                    (int)(commrewindamount * video_frame_rate));
+    else
+        JumpToFrame(commBreakIter.key());
+    commBreakIter++;
 
     return true;
 }
-
-
 
 void NuppelVideoPlayer::incCurrentAudioTrack()
 {

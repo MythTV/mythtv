@@ -734,8 +734,3 @@ long long MpegRecorder::GetKeyframePosition(long long desired)
 
     return ret;
 }
-
-void MpegRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
-{
-    (void)blank_frame_map;
-}

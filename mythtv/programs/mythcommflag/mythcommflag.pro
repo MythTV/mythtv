@@ -28,4 +28,5 @@ DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libavcodec
 DEPENDPATH += ../../libs/libavformat
 
 # Input
-SOURCES += main.cpp
+SOURCES += main.cpp ClassicCommDetector.cpp CommDetectorFactory.cpp CommDetectorBase.cpp
+HEADERS += CommDetectorBase.h ClassicCommDetector.h SlotRelayer.h CustomEventRelayer.h CommDetectorFactory.h

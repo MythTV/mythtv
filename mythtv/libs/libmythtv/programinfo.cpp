@@ -10,7 +10,6 @@
 #include "scheduledrecording.h"
 #include "util.h"
 #include "mythcontext.h"
-#include "commercial_skip.h"
 #include "dialogbox.h"
 #include "remoteutil.h"
 #include "jobqueue.h"
@@ -1740,19 +1739,6 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap) const
     if (!query.exec() || !query.isActive())
         MythContext::DBError("cutlist update", 
                              query);
-}
-
-void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
-                                    long long min_frame, 
-                                    long long max_frame) const
-{
-    ClearMarkupMap(MARK_BLANK_FRAME, min_frame, max_frame);
-    SetMarkupMap(frames, MARK_BLANK_FRAME, min_frame, max_frame);
-}
-
-void ProgramInfo::GetBlankFrameList(QMap<long long, int> &frames) const
-{
-    GetMarkupMap(frames, MARK_BLANK_FRAME);
 }
 
 void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames) const

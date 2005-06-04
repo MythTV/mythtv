@@ -39,7 +39,6 @@ class MpegRecorder : public RecorderBase
     int GetVideoFd(void);
 
     long long GetKeyframePosition(long long desired);
-    void GetBlankFrameMap(QMap<long long, int> &blank_frame_map);
 
   private:
     bool SetupRecording();

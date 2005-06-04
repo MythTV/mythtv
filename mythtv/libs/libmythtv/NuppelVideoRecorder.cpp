@@ -20,7 +20,6 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "NuppelVideoRecorder.h"
-#include "commercial_skip.h"
 #include "vbitext/cc.h"
 #include "channelbase.h"
 #include "filtermanager.h"
@@ -82,7 +81,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     strm = NULL;   
     mp3buf = NULL;
 
-    commDetect = NULL;
     transcoding = false;
 
     act_video_encode = 0;
@@ -175,8 +173,6 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         lame_close(gf);  
     if (strm)
         delete [] strm;
-    if (commDetect)
-        delete commDetect;
     if (fd >= 0)
         close(fd);
     if (seektable)
@@ -951,9 +947,6 @@ void NuppelVideoRecorder::StartRecording(void)
     else
         useavcodec = true;
 
-    if (!hardware_encode)
-        blank_frames.clear();
-
     if (useavcodec)
         useavcodec = SetupAVCodec();
 
@@ -980,25 +973,6 @@ void NuppelVideoRecorder::StartRecording(void)
         VERBOSE(VB_IMPORTANT, "NVR: Error, couldn't spawn children");
         errored = true;
         return;
-    }
-
-    if ((!pip_mode) && (curRecording) && (curRecording->chancommfree == 0))
-    {
-        int commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
-                                                       COMM_DETECT_BLANKS);
-
-        if (commDetectMethod & COMM_DETECT_BLANKS)
-        {
-            if (commDetect)
-                commDetect->Init(w_out, h_out, video_frame_rate,
-                                 commDetectMethod);
-            else
-                commDetect = new CommDetect(w_out, h_out, video_frame_rate,
-                                            commDetectMethod);
-
-            commDetect->SetAggressiveDetection(
-                            gContext->GetNumSetting("AggressiveCommDetect", 1));
-        }
     }
 
     // save the start time
@@ -3553,24 +3527,6 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     frameofgop++;
     framesWritten++;
 
-    if ((!hardware_encode) && (commDetect) && (!pip_mode))
-    {
-        commDetect->ProcessFrame(frame, (fnum-startnum)>>1 );
-        if (commDetect->FrameIsBlank())
-        {
-            commDetect->GetBlankFrameMap(blank_frames);
-
-            if (curRecording && 
-                ((blank_frames.size() % 15 ) == 0))
-            {
-                curRecording->SetBlankFrameList(blank_frames,
-                        prev_bframe_save_pos, (fnum-startnum)>>1 );
-
-                prev_bframe_save_pos = ((fnum-startnum)>>1) + 1;
-            }
-        }
-    }
-   
     // now we reset the last frame number so that we can find out
     // how many frames we didn't get next time
     lf = fnum;
@@ -3727,10 +3683,4 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
         WriteFrameheader(&frameheader);
         ringBuffer->Write(buf, len);
     }
-}
-
-void NuppelVideoRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
-{
-    if (commDetect)
-        commDetect->GetBlankFrameMap(blank_frame_map);
 }

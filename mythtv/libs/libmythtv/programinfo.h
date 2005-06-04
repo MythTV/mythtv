@@ -183,12 +183,9 @@ class ProgramInfo
 
     // Commercial/Edit flagging maps
     void GetCutList(frm_dir_map_t &) const;
-    void GetBlankFrameList(frm_dir_map_t &) const;
     void GetCommBreakList(frm_dir_map_t &) const;
 
     void SetCutList(frm_dir_map_t &) const;
-    void SetBlankFrameList(frm_dir_map_t &,
-                           long long min_frm = -1, long long max_frm = -1) const;
     void SetCommBreakList(frm_dir_map_t &) const;
 
     // Flagging map support methods

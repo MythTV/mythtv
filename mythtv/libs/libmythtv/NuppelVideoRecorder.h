@@ -19,7 +19,6 @@
 
 #include "recorderbase.h"
 
-#include "commercial_skip.h"
 #include "minilzo.h"
 #include "format.h"
 
@@ -76,7 +75,6 @@ class NuppelVideoRecorder : public RecorderBase
     void SetTranscoding(bool value) { transcoding = value; };
 
     long long GetKeyframePosition(long long desired);
-    void GetBlankFrameMap(QMap<long long, int> &blank_frame_map);
 
     // reencode stuff
     void StreamAllocate(void);
@@ -155,15 +153,12 @@ class NuppelVideoRecorder : public RecorderBase
     int usebttv;
     float video_aspect;
 
-    CommDetect *commDetect;
     bool transcoding;
 
     int mp3quality;
     char *mp3buf;
     int mp3buf_size;
     lame_global_flags *gf;
-
-    QMap<long long, int> blank_frames;
 
     RTjpeg *rtjc;
 

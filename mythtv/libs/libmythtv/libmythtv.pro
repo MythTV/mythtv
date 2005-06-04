@@ -45,7 +45,7 @@ QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 
 # libmythtv proper
 
-HEADERS += commercial_skip.h filter.h format.h frame.h frequencies.h 
+HEADERS += filter.h format.h frame.h frequencies.h 
 HEADERS += guidegrid.h infostructs.h jitterometer.h lzoconf.h #infodialog.h
 HEADERS += minilzo.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 
 HEADERS += osdtypes.h programinfo.h profilegroup.h recordingprofile.h 
@@ -59,7 +59,7 @@ HEADERS += osdlistbtntype.h blend.h datadirect.h sr_dialog.h
 HEADERS += sr_items.h sr_root.h recordingtypes.h jobqueue.h dtvrecorder.h
 HEADERS += videobuffers.h
 
-SOURCES += commercial_skip.cpp frequencies.c guidegrid.cpp #infodialog.cpp 
+SOURCES += frequencies.c guidegrid.cpp #infodialog.cpp 
 SOURCES += infostructs.cpp jitterometer.cpp minilzo.cpp NuppelVideoPlayer.cpp 
 SOURCES += osd.cpp osdtypes.cpp programinfo.cpp recordingprofile.cpp 
 SOURCES += remoteencoder.cpp remoteutil.cpp RingBuffer.cpp RTjpegN.cpp 

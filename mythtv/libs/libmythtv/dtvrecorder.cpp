@@ -69,11 +69,6 @@ long long DTVRecorder::GetKeyframePosition(long long desired)
     return ret;
 }
 
-void DTVRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
-{
-    (void)blank_frame_map;
-}
-
 void DTVRecorder::Reset()
 {
     _error = false;

@@ -404,18 +404,6 @@ static HostComboBox *AutoCommercialSkip()
     return gc;
 }
 
-static HostCheckBox *TryUnflaggedSkip()
-{
-    HostCheckBox *gc = new HostCheckBox("TryUnflaggedSkip");
-    gc->setLabel(QObject::tr("Skip Unflagged Commercials"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Try to skip commercial breaks even if they "
-                    "have not been flagged.  This does not always work well "
-                    "and can disrupt playback if commercial breaks aren't "
-                    "detected properly."));
-    return gc;
-}
-
 static GlobalCheckBox *AutoCommercialFlag()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoCommercialFlag");
@@ -2931,7 +2919,6 @@ PlaybackSettings::PlaybackSettings()
     comms->addChild(CommRewindAmount());
     comms->addChild(CommNotifyAmount());
     comms->addChild(CommSkipAllBlanks());
-    comms->addChild(TryUnflaggedSkip());
     addChild(comms);
 
     VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);

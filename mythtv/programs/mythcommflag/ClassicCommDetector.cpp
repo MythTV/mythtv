@@ -1,20 +1,55 @@
-#include <stdlib.h>
-#include <math.h>
 #include <unistd.h>
 
-#include <qstringlist.h>
+#include "ClassicCommDetector.h"
+#include "libmythtv/NuppelVideoPlayer.h"
 
-#include "commercial_skip.h"
-#include "programinfo.h"
-#include "util.h"
+#include "qstring.h"
+#include "libmyth/mythcontext.h"
+#include "libmythtv/programinfo.h"
 
-//#include "commercial_debug.h"
+// This is used as a bitmask.
+enum SkipTypes {
+    COMM_DETECT_OFF         = 0x00,
+    COMM_DETECT_BLANKS      = 0x01,
+    COMM_DETECT_SCENE       = 0x02,
+    COMM_DETECT_BLANK_SCENE = 0x03,
+    COMM_DETECT_LOGO        = 0x04,
+    COMM_DETECT_ALL         = 0xFF
+};
 
-CommDetect::CommDetect(int w, int h, double fps, int method)
+enum frameMaskValues {
+    COMM_FRAME_BLANK         = 0x0001,
+    COMM_FRAME_SCENE_CHANGE  = 0x0002,
+    COMM_FRAME_LOGO_PRESENT  = 0x0004,
+    COMM_FRAME_ASPECT_CHANGE = 0x0008,
+    COMM_FRAME_RATING_SYMBOL = 0x0010
+};
+
+enum frameAspects {
+    COMM_ASPECT_NORMAL = 0,
+    COMM_ASPECT_WIDE
+};
+
+enum frameFormats {
+    COMM_FORMAT_NORMAL = 0,
+    COMM_FORMAT_LETTERBOX,
+    COMM_FORMAT_PILLARBOX,
+    COMM_FORMAT_MAX
+};
+
+ClassicCommDetector::ClassicCommDetector(int commDetectMethod_in,
+                                         bool showProgress_in,
+                                         bool fullSpeed_in,
+                                         NuppelVideoPlayer* nvp_in,
+                                         const QDateTime& recordingStartedAt_in,
+                                         const QDateTime& recordingStopsAt_in) :
+        commDetectMethod(commDetectMethod_in),
+        showProgress(showProgress_in),
+        fullSpeed(fullSpeed_in),
+        nvp(nvp_in),
+        recordingStartedAt(recordingStartedAt_in),
+        recordingStopsAt(recordingStopsAt_in)
 {
-#ifdef SHOW_DEBUG_WIN
-    comm_debug_init(w, h);
-#endif
 
     edgeMask = NULL;
     logoFrame = NULL;
@@ -23,6 +58,55 @@ CommDetect::CommDetect(int w, int h, double fps, int method)
     logoMaxValues = NULL;
     logoMinValues = NULL;
     tmpBuf = NULL;
+
+    stillRecording = recordingStopsAt > QDateTime::currentDateTime();
+    
+    commDetectBorder =
+        gContext->GetNumSetting("CommDetectBorder", 20);
+    commDetectBlankFrameMaxDiff =
+        gContext->GetNumSetting("CommDetectBlankFrameMaxDiff", 25);
+    commDetectDarkBrightness =
+        gContext->GetNumSetting("CommDetectDarkBrightness", 80);
+    commDetectDimBrightness =
+        gContext->GetNumSetting("CommDetectDimBrightness", 120);
+    commDetectBoxBrightness =
+        gContext->GetNumSetting("CommDetectBoxBrightness", 30);
+    commDetectDimAverage =
+        gContext->GetNumSetting("CommDetectDimAverage", 35);
+    commDetectMaxCommBreakLength =
+        gContext->GetNumSetting("CommDetectMaxCommBreakLength", 395);
+    commDetectMinCommBreakLength =
+        gContext->GetNumSetting("CommDetectMinCommBreakLength", 60);
+    commDetectMinShowLength =
+        gContext->GetNumSetting("CommDetectMinShowLength", 65);
+    commDetectMaxCommLength =
+        gContext->GetNumSetting("CommDetectMaxCommLength", 125);
+    commDetectLogoSamplesNeeded =
+        gContext->GetNumSetting("CommDetectLogoSamplesNeeded", 240);
+    commDetectLogoSampleSpacing =
+        gContext->GetNumSetting("CommDetectLogoSampleSpacing", 2);
+    commDetectLogoSecondsNeeded = commDetectLogoSamplesNeeded *
+                                  commDetectLogoSampleSpacing;
+    commDetectLogoGoodEdgeThreshold =
+        gContext->GetSetting("CommDetectLogoGoodEdgeThreshold", "0.75")
+        .toDouble();
+    commDetectLogoBadEdgeThreshold =
+        gContext->GetSetting("CommDetectLogoBadEdgeThreshold", "0.85")
+        .toDouble();
+    skipAllBlanks = !!gContext->GetNumSetting("CommSkipAllBlanks", 1);
+    commDetectBlankCanHaveLogo =
+        !!gContext->GetNumSetting("CommDetectBlankCanHaveLogo", 1);
+}
+
+void ClassicCommDetector::Init()
+{
+    width = nvp->GetVideoWidth();
+    height = nvp->GetVideoHeight();
+    fps = nvp->GetFrameRate();
+
+#ifdef SHOW_DEBUG_WIN
+    comm_debug_init(width, height);
+#endif
 
     currentAspect = COMM_ASPECT_WIDE;
 
@@ -33,51 +117,9 @@ CommDetect::CommDetect(int w, int h, double fps, int method)
     else
         verboseDebugging = false;
 
-    Init(w, h, fps, method);
-}
-
-CommDetect::~CommDetect(void)
-{
-    framePtr = NULL;
-
-    if (edgeMask)
-        delete [] edgeMask;
-
-    if (logoFrame)
-        delete [] logoFrame;
-
-    if (logoMask)
-        delete [] logoMask;
-
-    if (logoCheckMask)
-        delete [] logoCheckMask;
-
-    if (logoMaxValues)
-        delete [] logoMaxValues;
-
-    if (logoMinValues)
-        delete [] logoMinValues;
-
-    if (tmpBuf)
-        delete [] tmpBuf;
-
-#ifdef SHOW_DEBUG_WIN
-    comm_debug_destroy();
-#endif
-}
-
-void CommDetect::Init(int w, int h, double frame_rate, int method)
-{
     VERBOSE(VB_COMMFLAG, "Commercial Detection initialized: width = " <<
-            w << ", height = " << h << ", fps = " << frame_rate <<
-            ", method = " << method);
-
-    commDetectMethod = method;
-
-    width = w;
-    height = h;
-    fps = frame_rate;
-    fpm = fps * 60;
+            width << ", height = " << height << ", fps = " <<
+            nvp->GetFrameRate() << ", method = " << commDetectMethod);
 
     if ((width * height) > 1000000)
     {
@@ -113,50 +155,16 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     totalMinBrightness = 0;
     blankFrameCount = 0;
 
-    commDetectBorder =
-              gContext->GetNumSetting("CommDetectBorder", 20);
-    commDetectBlankFrameMaxDiff =
-              gContext->GetNumSetting("CommDetectBlankFrameMaxDiff", 25);
-    commDetectDarkBrightness =
-              gContext->GetNumSetting("CommDetectDarkBrightness", 80);
-    commDetectDimBrightness =
-              gContext->GetNumSetting("CommDetectDimBrightness", 120);
-    commDetectBoxBrightness =
-              gContext->GetNumSetting("CommDetectBoxBrightness", 30);
-    commDetectDimAverage =
-              gContext->GetNumSetting("CommDetectDimAverage", 35);
-    commDetectMaxCommBreakLength =
-              gContext->GetNumSetting("CommDetectMaxCommBreakLength", 395);
-    commDetectMinCommBreakLength =
-              gContext->GetNumSetting("CommDetectMinCommBreakLength", 60);
-    commDetectMinShowLength =
-              gContext->GetNumSetting("CommDetectMinShowLength", 65);
-    commDetectMaxCommLength =
-              gContext->GetNumSetting("CommDetectMaxCommLength", 125);
-    commDetectLogoSamplesNeeded =
-              gContext->GetNumSetting("CommDetectLogoSamplesNeeded",
-                                      DEFAULT_LOGO_SECONDS_NEEDED);
-    commDetectLogoSampleSpacing =
-              gContext->GetNumSetting("CommDetectLogoSampleSpacing",
-                                      DEFAULT_LOGO_SAMPLE_SPACING);
-    commDetectLogoSecondsNeeded = commDetectLogoSamplesNeeded *
-                                  commDetectLogoSampleSpacing;
-    commDetectLogoGoodEdgeThreshold =
-              gContext->GetSetting("CommDetectLogoGoodEdgeThreshold", "0.75")
-                                   .toDouble();
-    commDetectLogoBadEdgeThreshold =
-              gContext->GetSetting("CommDetectLogoBadEdgeThreshold", "0.85")
-                                   .toDouble();
-    skipAllBlanks = !!gContext->GetNumSetting("CommSkipAllBlanks", 1);
-    commDetectBlankCanHaveLogo =
-              !!gContext->GetNumSetting("CommDetectBlankCanHaveLogo", 1);
-
     aggressiveDetection = true;
     currentAspect = COMM_ASPECT_WIDE;
     decoderFoundAspectChanges = false;
 
+    lastSentCommBreakMap.clear();
+    commBreakMapUpdateRequested = false;
+    sendCommBreakMapUpdates = false;
+
     // Check if close to 4:3
-    if(fabs(((w*1.0)/h) - 1.333333) < 0.1)
+    if(fabs(((width*1.0)/height) - 1.333333) < 0.1)
         currentAspect = COMM_ASPECT_NORMAL;
 
     lastFrameWasSceneChange = false;
@@ -212,71 +220,329 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     }
 }
 
-void CommDetect::customEvent(QCustomEvent *e)
+ClassicCommDetector::~ClassicCommDetector()
+{}
+
+bool ClassicCommDetector::go()
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    nvp->SetNullVideo();
+    
+    int requiredHeadStart = 30;
+    if (commDetectMethod & COMM_DETECT_LOGO)
     {
-        MythEvent *me = (MythEvent *)e;
-        QString message = me->Message();
+        requiredHeadStart += commDetectLogoSecondsNeeded;
+    }
 
-        VERBOSE(VB_COMMFLAG,
-                QString("CommDetect::CustomEvent - Received Event: '%1'")
-                .arg(message));
+    int a = 0;
+    while (a < requiredHeadStart)
+    {
+        emit(breathe());
+        if (m_bStop)
+            return false;
+        sleep(2);
+        a = recordingStartedAt.secsTo(QDateTime::currentDateTime());
+    }
 
-        if ((watchingRecording) &&
-            (message.left(14) == "DONE_RECORDING"))
+    if (nvp->OpenFile() < 0)
+        return(false);
+
+    Init();
+
+    aggressiveDetection = gContext->GetNumSetting("AggressiveCommDetect", 1);
+
+    if (!nvp->InitVideo())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "NVP: Unable to initialize video for FlagCommercials.");
+        return(false);
+    }
+
+    if ((commDetectMethod & COMM_DETECT_LOGO) &&
+        ((nvp->GetLength() == 0) ||
+         (nvp->GetLength() > commDetectLogoSecondsNeeded)))
+    {
+        emit(statusUpdate("Searching for Logo"));
+
+        if (showProgress)
         {
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
-            int cardnum = tokens[1].toInt();
-            int filelen = tokens[2].toInt();
+            cerr << "Finding Logo";
+            cerr.flush();
+        }
 
-            message = QString("CommDetect::CustomEvent - Received a "
-                              "DONE_RECORDING event for card %1.  ")
-                              .arg(cardnum);
+        SearchForLogo();
 
-            if (cardnum == recorder->GetRecorderNumber())
-            {
-                m_parent->SetWatchingRecording(false);
-                m_parent->SetLength(filelen);
-                watchingRecording = false;
-
-                message += "This is the recording we are flagging, turning "
-                           "watchingRecording OFF.";
-            }
-            else
-            {
-                message += "Ignoring event, this is not the recording we are "
-                           "flaggign.";
-            }
-
-            VERBOSE(VB_COMMFLAG, message);
+        if (showProgress)
+        {
+            cerr << "\b\b\b\b\b\b\b\b\b\b\b\b            "
+                    "\b\b\b\b\b\b\b\b\b\b\b\b";
+            cerr.flush();
         }
     }
-}
 
-void CommDetect::SetWatchingRecording(bool watching, RemoteEncoder *rec,
-                                      NuppelVideoPlayer *nvp)
-{
-    watchingRecording = watching;
-    recorder = rec;
-    m_parent = nvp;
+    QTime flagTime;
+    flagTime.start();
+    
+    long usecPerFrame = (long)(1.0 / nvp->GetFrameRate() * 1000000);
 
-    if (watching)
-    {
-        gContext->addListener(this);
-        VERBOSE(VB_COMMFLAG,
-                "Setting up CommDetect Listener, flagging Live recording.");
-    }
+    long long myTotalFrames;
+    if (recordingStopsAt < QDateTime::currentDateTime() )
+        myTotalFrames = nvp->GetTotalFrameCount();
     else
+        myTotalFrames = (long long)(nvp->GetFrameRate() *
+                        (recordingStartedAt.secsTo(recordingStopsAt)));
+
+    if (showProgress)
     {
-        gContext->removeListener(this);
-        VERBOSE(VB_COMMFLAG,
-                "Removing CommDetect Listener, flagging prerecorded program.");
+        if (myTotalFrames)
+            cerr << "  0%/      ";
+        else
+            cerr << "     0/      ";
+        cerr.flush();
     }
+
+ 
+    float flagFPS;
+    long long  currentFrameNumber;
+    float aspect = nvp->GetVideoAspect();
+    float newAspect = aspect;
+
+    SetVideoParams(aspect);
+
+    emit(breathe());
+
+    while (!nvp->GetEof())
+    {
+        struct timeval startTime;
+        if (stillRecording)
+            gettimeofday(&startTime, NULL);
+
+        VideoFrame* currentFrame = nvp->GetRawVideoFrame();
+        currentFrameNumber = currentFrame->frameNumber;
+
+        //Lucas: maybe we should make the nuppelvideoplayer send out a signal
+        //when the aspect ratio changes.
+        //In order to not change too many things at a time, I"m using basic
+        //polling for now.
+        newAspect = nvp->GetVideoAspect();
+        if (newAspect != aspect)
+        {
+            SetVideoParams(aspect);
+            aspect = newAspect;
+        }
+
+        if (((currentFrameNumber % 500) == 0) ||
+            (((currentFrameNumber % 100) == 0) &&
+             (stillRecording)))
+        {
+            emit(breathe());
+            if (m_bStop)
+                return false;
+        }
+
+        if ((sendCommBreakMapUpdates) &&
+            ((commBreakMapUpdateRequested) ||
+             ((currentFrameNumber % 500) == 0)))
+        {
+            QMap<long long,int> commBreakMap;
+            QMap<long long, int>::Iterator it;
+            QMap<long long, int>::Iterator lastIt;
+            bool mapsAreIdentical = false;
+
+            getCommercialBreakList(commBreakMap);
+
+            if ((commBreakMap.size() == 0) &&
+                (lastSentCommBreakMap.size() == 0))
+            {
+                mapsAreIdentical = true;
+            }
+            else if (commBreakMap.size() == lastSentCommBreakMap.size())
+            {
+                // assume true for now and set false if we find a difference
+                mapsAreIdentical = true;
+                for (it = commBreakMap.begin();
+                     it != commBreakMap.end() && mapsAreIdentical; ++it)
+                {
+                    lastIt = lastSentCommBreakMap.find(it.key());
+                    if ((lastIt == lastSentCommBreakMap.end()) ||
+                        (lastIt.data() != it.data()))
+                        mapsAreIdentical = false;
+                }
+            }
+
+            if (commBreakMapUpdateRequested || !mapsAreIdentical)
+            {
+                emit(gotNewCommercialBreakList());
+                lastSentCommBreakMap = commBreakMap;
+            }
+
+            if (commBreakMapUpdateRequested)
+                commBreakMapUpdateRequested = false;
+        }
+
+        while (m_bPaused)
+        {
+            emit(breathe());
+            sleep(1);
+        }
+
+        // sleep a little so we don't use all cpu even if we're niced
+        if (!fullSpeed && !stillRecording)
+            usleep(10000);
+
+        if (((currentFrameNumber % 500) == 0) ||
+            ((showProgress || stillRecording) &&
+             ((currentFrameNumber % 100) == 0)))
+        {
+            float elapsed = flagTime.elapsed() / 1000.0;
+
+            if (elapsed)
+                flagFPS = currentFrameNumber / elapsed;
+            else
+                flagFPS = 0.0;
+
+            int percentage;
+            if (myTotalFrames)
+                percentage = currentFrameNumber * 100 / myTotalFrames;
+            else
+                percentage = 0;
+
+            if (percentage > 100)
+                percentage = 100;
+
+            if (showProgress)
+            {
+                if (myTotalFrames)
+                {
+                    cerr << "\b\b\b\b\b\b\b\b\b\b\b"
+                         << QString::number(percentage).rightJustify(3, ' ')
+                         << "%/"
+                         << QString::number((int)flagFPS).rightJustify(3, ' ')
+                         << "fps";
+                }
+                else
+                {
+                    cerr << "\b\b\b\b\b\b\b\b\b\b\b\b\b"
+                         << QString::number(currentFrameNumber)
+                                            .rightJustify(6, ' ')
+                         << "/"
+                         << QString::number((int)flagFPS).rightJustify(3, ' ')
+                         << "fps";
+                }
+                cerr.flush();
+            }
+
+            if (myTotalFrames)
+                emit(statusUpdate(QObject::tr("%1% Completed @ %2 fps.")
+                                              .arg(percentage).arg(flagFPS)));
+            else
+                emit(statusUpdate(QObject::tr("%1 Frames Completed @ %2 fps.")
+                                              .arg((long)currentFrameNumber)
+                                              .arg(flagFPS)));
+        }
+
+        ProcessFrame(currentFrame, currentFrameNumber);
+
+        if (stillRecording)
+        {
+            usecPerFrame = (long)(1.0 / nvp->GetFrameRate() * 1000000);
+
+            struct timeval endTime;
+            gettimeofday(&endTime, NULL);
+
+            long long usecSleep =
+                      usecPerFrame -
+                      (((endTime.tv_sec - startTime.tv_sec) * 1000000) +
+                       (endTime.tv_usec - startTime.tv_usec));
+
+            const int alwaysStayNSecondsBehind = 120;
+            
+            int secondsRecorded =
+                recordingStartedAt.secsTo(QDateTime::currentDateTime());
+            int secondsFlagged = (int)(framesProcessed / fps);
+            
+            if ((secondsRecorded - secondsFlagged) > alwaysStayNSecondsBehind)
+                usecSleep = (long)(usecSleep * 0.33);
+            else
+                usecSleep = (long)(usecPerFrame * 1.5);
+            
+            if (usecSleep > 0)
+                usleep(usecSleep);
+        }
+    }
+
+    if (showProgress)
+    {
+        float elapsed = flagTime.elapsed() / 1000.0;
+
+        if (elapsed)
+            flagFPS = currentFrameNumber / elapsed;
+        else
+            flagFPS = 0.0;
+
+        if (myTotalFrames)
+            cerr << "\b\b\b\b\b\b      \b\b\b\b\b\b";
+        else
+            cerr << "\b\b\b\b\b\b\b\b\b\b\b\b\b             "
+                    "\b\b\b\b\b\b\b\b\b\b\b\b\b";
+        cerr.flush();
+    }
+
+    return true;
 }
 
-void CommDetect::SetVideoParams(float aspect)
+void ClassicCommDetector::getCommercialBreakList(QMap<long long, int> &marks)
+{
+
+    VERBOSE(VB_COMMFLAG, "CommDetect::GetCommBreakMap()");
+
+    marks.clear();
+
+    CleanupFrameInfo();
+
+    switch (commDetectMethod)
+    {
+            case COMM_DETECT_OFF:         return;
+
+            case COMM_DETECT_BLANKS:      BuildBlankFrameCommList();
+                                          marks = blankCommBreakMap;
+                                          break;
+
+            case COMM_DETECT_SCENE:       BuildSceneChangeCommList();
+                                          marks = sceneCommBreakMap;
+                                          break;
+
+            case COMM_DETECT_BLANK_SCENE: BuildBlankFrameCommList();
+                                          BuildSceneChangeCommList();
+                                          BuildMasterCommList();
+                                          marks = commBreakMap;
+                                          break;
+
+            case COMM_DETECT_LOGO:        BuildLogoCommList();
+                                          marks = logoCommBreakMap;
+                                          break;
+
+            case COMM_DETECT_ALL:         BuildAllMethodsCommList();
+                                          marks = commBreakMap;
+                                          break;
+    }
+
+    VERBOSE(VB_COMMFLAG, "Final Commercial Break Map" );
+}
+
+void ClassicCommDetector::recordingFinished(long long totalFileSize)
+{
+    (void)totalFileSize;
+
+    stillRecording = false;
+}
+
+void ClassicCommDetector::requestCommBreakMapUpdate(void)
+{
+    commBreakMapUpdateRequested = true;
+    sendCommBreakMapUpdates = true;
+}
+
+void ClassicCommDetector::SetVideoParams(float aspect)
 {
     int newAspect = COMM_ASPECT_WIDE;
 
@@ -291,8 +557,8 @@ void CommDetect::SetVideoParams(float aspect)
     {
         VERBOSE(VB_COMMFLAG,
                 QString("Aspect Ratio changed from %1 to %2 at frame %3")
-                        .arg(currentAspect).arg(newAspect)
-                        .arg((long)curFrameNumber));
+                .arg(currentAspect).arg(newAspect)
+                .arg((long)curFrameNumber));
 
         if (frameInfo.contains(curFrameNumber))
         {
@@ -307,13 +573,14 @@ void CommDetect::SetVideoParams(float aspect)
             VERBOSE(VB_COMMFLAG, QString("Unable to keep track of Aspect ratio "
                                          "change because frameInfo for frame "
                                          "number %1 does not exist.")
-                                         .arg((long)curFrameNumber));
+                    .arg((long)curFrameNumber));
         }
         currentAspect = newAspect;
     }
 }
 
-void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
+void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
+                                       long long frame_number)
 {
     int max = 0;
     int min = 255;
@@ -335,14 +602,14 @@ void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
     if (!frame || frame_number == -1 || frame->codec != FMT_YV12)
     {
         VERBOSE(VB_COMMFLAG, "CommDetect: Invalid video frame or codec, "
-                             "unable to process frame.");
+                "unable to process frame.");
         return;
     }
 
     if (!width || !height)
     {
         VERBOSE(VB_COMMFLAG, "CommDetect: Width or Height is 0, "
-                             "unable to process frame.");
+                "unable to process frame.");
         return;
     }
 
@@ -383,10 +650,10 @@ void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
     stationLogoPresent = false;
 
     for(int y = commDetectBorder; y < (height - commDetectBorder);
-                                  y += vertSpacing)
+            y += vertSpacing)
     {
         for(int x = commDetectBorder; x < (width - commDetectBorder);
-                                      x += horizSpacing)
+                x += horizSpacing)
         {
             pixel = framePtr[y * width + x];
 
@@ -421,7 +688,7 @@ void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
     if (commDetectMethod & COMM_DETECT_BLANKS)
     {
         for(int y = commDetectBorder; y < (height - commDetectBorder);
-                                      y += vertSpacing)
+                y += vertSpacing)
         {
             if (rowMax[y] > commDetectBoxBrightness)
                 break;
@@ -430,12 +697,12 @@ void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
         }
 
         for(int y = commDetectBorder; y < (height - commDetectBorder);
-                                      y += vertSpacing)
+                y += vertSpacing)
             if (rowMax[y] >= commDetectBoxBrightness)
                 bottomDarkRow = y;
 
         for(int x = commDetectBorder; x < (width - commDetectBorder);
-                                      x += horizSpacing)
+                x += horizSpacing)
         {
             if (colMax[x] > commDetectBoxBrightness)
                 break;
@@ -444,7 +711,7 @@ void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
         }
 
         for(int x = commDetectBorder; x < (width - commDetectBorder);
-                                      x += horizSpacing)
+                x += horizSpacing)
             if (colMax[x] >= commDetectBoxBrightness)
                 rightDarkCol = x;
 
@@ -482,7 +749,7 @@ void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
             frameIsBlank = true;
 
         // Are we non-strict and the frame is blank
-        if ((!aggressiveDetection) && 
+        if ((!aggressiveDetection) &&
             ((max - min) <= commDetectBlankFrameMaxDiff))
             frameIsBlank = true;
 
@@ -516,7 +783,7 @@ void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
             sceneChangePercent = (int)(100.0 * similar /
                                        ((width - (commDetectBorder * 2)) *
                                         (height - (commDetectBorder * 2)) /
-                                         (vertSpacing * horizSpacing)));
+                                        (vertSpacing * horizSpacing)));
 
             frameInfo[curFrameNumber].sceneChangePercent = sceneChangePercent;
 
@@ -560,16 +827,16 @@ void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
     frameInfo[curFrameNumber].flagMask = flagMask;
 
     if (verboseDebugging)
-        VERBOSE(VB_COMMFLAG, QString().sprintf(
-               "Frame: %6ld -> %3d %3d %3d %3d %1d %1d %04x",
-               (long)curFrameNumber,
-               frameInfo[curFrameNumber].minBrightness,
-               frameInfo[curFrameNumber].maxBrightness,
-               frameInfo[curFrameNumber].avgBrightness,
-               frameInfo[curFrameNumber].sceneChangePercent,
-               frameInfo[curFrameNumber].format,
-               frameInfo[curFrameNumber].aspect,
-               frameInfo[curFrameNumber].flagMask ));
+        VERBOSE(VB_COMMFLAG,
+                QString().sprintf("Frame: %6ld -> %3d %3d %3d %3d %1d %1d %04x",
+                                  (long)curFrameNumber,
+                                  frameInfo[curFrameNumber].minBrightness,
+                                  frameInfo[curFrameNumber].maxBrightness,
+                                  frameInfo[curFrameNumber].avgBrightness,
+                                  frameInfo[curFrameNumber].sceneChangePercent,
+                                  frameInfo[curFrameNumber].format,
+                                  frameInfo[curFrameNumber].aspect,
+                                  frameInfo[curFrameNumber].flagMask ));
 
 #ifdef SHOW_DEBUG_WIN
     comm_debug_show(frame->buf);
@@ -579,220 +846,7 @@ void CommDetect::ProcessFrame(VideoFrame *frame, long long frame_number)
     framesProcessed++;
 }
 
-bool CommDetect::CheckStationLogo(void)
-{
-    long in_sum = 0;
-    int in_pixels = 0;
-    long out_sum = 0;
-    int out_pixels = 0;
-
-    if (!logoInfoAvailable)
-        return(false);
-
-    for (int y = logoMinY - 2; y <= (logoMaxY + 2); y += 5)
-    {
-        for (int x = logoMinX - 2; x <= (logoMaxX + 2); x += 5)
-        {
-            int index = (y + 2) * width + x + 2;
-
-            if (logoCheckMask[index] == 0)
-                continue;
-
-            in_sum = in_pixels = 0;
-            out_sum = out_pixels = 0;
-
-            for (int y2 = 0; y2 < 5; y2++)
-            {
-                index = (y + y2) * width + x;
-                unsigned char *maskPtr = &logoMask[index];
-                unsigned char *fPtr = &framePtr[index];
-                for (int x2 = 0; x2 < 5; x2++)
-                {
-                    if (*maskPtr == 1)
-                    {
-                        in_sum += *fPtr;
-                        in_pixels++;
-                    }
-                    else if (*maskPtr == 3)
-                    {
-                        out_sum += *fPtr;
-                        out_pixels++;
-                    }
-                    index++;
-                    maskPtr++;
-                    fPtr++;
-                }
-            }
-
-            if ((in_pixels >= 5) && (out_pixels >= 5))
-            {
-                int in_avg = in_sum / in_pixels;
-                int out_avg = out_sum / out_pixels;
-
-                if (in_avg < (out_avg - 10))
-                {
-                    return(false);
-                }
-            }
-        }
-    }
-
-    in_sum = in_pixels = 0;
-    out_sum = out_pixels = 0;
-
-    for (int y = logoMinY - 2; y <= (logoMaxY + 2); y++)
-    {
-        int index = y * width + logoMinX - 2;
-        unsigned char *maskPtr = &logoMask[index];
-        unsigned char *fPtr = &framePtr[index];
-        for (int x = logoMinX - 2; x <= (logoMaxX + 2); x++)
-        {
-            if (*maskPtr == 1)
-            {
-                in_sum += *fPtr;
-                in_pixels++;
-            }
-            else if (*maskPtr == 3)
-            {
-                out_sum += *fPtr;
-                out_pixels++;
-            }
-            index++;
-            maskPtr++;
-            fPtr++;
-        }
-    }
-
-    if (!in_pixels || !out_pixels)
-        return(false);
-
-    int in_avg = in_sum / in_pixels;
-    int out_avg = out_sum / out_pixels;
-
-    if (in_avg > (out_avg + 10))
-        return(true);
-
-    return(false);
-}
-
-bool CommDetect::CheckRatingSymbol(void)
-{
-    int min_x = (int)(width * 0.03);
-    int max_x = (int)(width * 0.25);
-    int min_y = (int)(height * 0.05);
-    int max_y = (int)(height * 0.27);
-    int ratMax = 160;
-    int r, g, b;
-    int Y, U, V;
-    int index, offset, yOffset;
-    int whitePixels = 0;
-    unsigned char *uPtr = &framePtr[width * height];
-    unsigned char *vPtr = &framePtr[width * height * 5 / 4];
-
-    memset(tmpBuf, ' ', width * height);
-
-    if (min_x < commDetectBorder)
-        min_x = commDetectBorder;
-
-    if (min_y < commDetectBorder)
-        min_y = commDetectBorder;
-
-    for(int y = min_y; y <= max_y; y++)
-    {
-        yOffset = y * width / 2;
-        for(int x = min_x; x <= max_x; x++)
-        {
-            index = y * width + x;
-            offset = yOffset + (x / 2);
-            Y = framePtr[index];
-            U = uPtr[offset];
-            V = vPtr[offset];
-
-            r = Y + (14075 * (V - 128)) / 10000;
-            g = Y - ((3455 * (U - 128)) - (7169 * (V - 128)))/10000;
-            b = Y + (17790 * (U - 128))/10000;
-
-            if ((r > ratMax) && (g > ratMax) && (b > ratMax))
-            {
-                tmpBuf[index] = 'W';
-                whitePixels++;
-            }
-        }
-    }
-
-    if (whitePixels < 40)
-        return(false);
-
-    int startingCol = max_x;
-    int endingCol = min_x;
-    int startingRow = max_y;
-    int endingRow = min_y;
-    int minWidth = (int)(width * 0.025);
-    int maxWidth = (int)(width * 0.06);
-    int minHeight = (int)(height * 0.035);
-    int maxHeight = (int)(height * 0.080);
-    for(int x = min_x; x <= max_x; x++)
-    {
-        int whitePixels = 0;
-        for(int y = min_y; y <= max_y; y++)
-        {
-            if (tmpBuf[y * width + x] == 'W')
-                whitePixels++;
-        }
-
-        if ((whitePixels < maxHeight) &&
-            (whitePixels > minHeight))
-        {
-            if (x < startingCol)
-                startingCol = x;
-            if (x > endingCol)
-                endingCol = x;
-        }
-    }
-
-    int symWidth = endingCol - startingCol;
-    if ((symWidth < minWidth) && (symWidth > maxWidth))
-        return(false);
-
-    for(int y = min_y; y <= max_y; y++)
-    {
-        int whitePixels = 0;
-        int yOffset = y * width;
-        for(int x = min_x; x <= max_x; x++)
-        {
-            if (tmpBuf[yOffset + x] == 'W')
-                whitePixels++;
-        }
-
-        if ((whitePixels < maxWidth) &&
-            (whitePixels > minWidth))
-        {
-            if (y < startingRow)
-                startingRow = y;
-            if (y > endingRow)
-                endingRow = y;
-        }
-    }
-
-    int symHeight = endingRow - startingRow;
-    if ((symWidth > minWidth) && (symWidth < maxWidth) &&
-        (symHeight > minHeight) && (symHeight < maxHeight))
-        return(true);
-
-    return(false);
-}
-
-bool CommDetect::FrameIsBlank(void)
-{
-    return(frameIsBlank);
-}
-
-bool CommDetect::SceneHasChanged(void)
-{
-    return(sceneHasChanged);
-}
-
-void CommDetect::ClearAllMaps(void)
+void ClassicCommDetector::ClearAllMaps(void)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::ClearAllMaps()");
 
@@ -805,68 +859,7 @@ void CommDetect::ClearAllMaps(void)
     commBreakMap.clear();
 }
 
-void CommDetect::GetCommBreakMap(QMap<long long, int> &marks)
-{
-    VERBOSE(VB_COMMFLAG, "CommDetect::GetCommBreakMap()");
-
-    marks.clear();
-
-    CleanupFrameInfo();
-
-    switch (commDetectMethod)
-    {
-        case COMM_DETECT_OFF:         return;
-
-        case COMM_DETECT_BLANKS:      BuildBlankFrameCommList();
-                                      marks = blankCommBreakMap;
-                                      break;
-
-        case COMM_DETECT_SCENE:       BuildSceneChangeCommList();
-                                      marks = sceneCommBreakMap;
-                                      break;
-
-        case COMM_DETECT_BLANK_SCENE: BuildBlankFrameCommList();
-                                      BuildSceneChangeCommList();
-                                      BuildMasterCommList();
-                                      marks = commBreakMap;
-                                      break;
-
-        case COMM_DETECT_LOGO:        BuildLogoCommList();
-                                      marks = logoCommBreakMap;
-                                      break;
-
-        case COMM_DETECT_ALL:         BuildAllMethodsCommList();
-                                      marks = commBreakMap;
-                                      break;
-    }
-
-    VERBOSE(VB_COMMFLAG, "Final Commercial Break Map" );
-    DumpMap(marks);
-}
-
-void CommDetect::SetBlankFrameMap(QMap<long long, int> &blanks)
-{
-    VERBOSE(VB_COMMFLAG, "CommDetect::SetBlankFrameMap()");
-
-    blankFrameMap = blanks;
-}
-
-void CommDetect::GetBlankFrameMap(QMap<long long, int> &blanks,
-                                  long long start_frame)
-{
-    VERBOSE(VB_COMMFLAG, "CommDetect::GetBlankFrameMap()");
-
-    QMap<long long, int>::Iterator it;
-
-    if (start_frame == -1)
-        blanks.clear();
-
-    for (it = blankFrameMap.begin(); it != blankFrameMap.end(); ++it)
-        if ((start_frame == -1) || (it.key() >= start_frame))
-            blanks[it.key()] = it.data();
-}
-
-void CommDetect::GetBlankCommMap(QMap<long long, int> &comms)
+void ClassicCommDetector::GetBlankCommMap(QMap<long long, int> &comms)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::GetBlankCommMap()");
 
@@ -876,7 +869,7 @@ void CommDetect::GetBlankCommMap(QMap<long long, int> &comms)
     comms = blankCommMap;
 }
 
-void CommDetect::GetBlankCommBreakMap(QMap<long long, int> &comms)
+void ClassicCommDetector::GetBlankCommBreakMap(QMap<long long, int> &comms)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::GetBlankCommBreakMap()");
 
@@ -886,8 +879,8 @@ void CommDetect::GetBlankCommBreakMap(QMap<long long, int> &comms)
     comms = blankCommBreakMap;
 }
 
-void CommDetect::GetSceneChangeMap(QMap<long long, int> &scenes,
-                                   long long start_frame)
+void ClassicCommDetector::GetSceneChangeMap(QMap<long long, int> &scenes,
+        long long start_frame)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::GetSceneChangeMap()");
 
@@ -901,7 +894,7 @@ void CommDetect::GetSceneChangeMap(QMap<long long, int> &scenes,
             scenes[it.key()] = it.data();
 }
 
-void CommDetect::BuildMasterCommList(void)
+void ClassicCommDetector::BuildMasterCommList(void)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::BuildMasterCommList()");
 
@@ -940,7 +933,7 @@ void CommDetect::BuildMasterCommList(void)
         for(unsigned int i = 0; i < blankCommBreakMap.size(); i++)
             if ((it.data() == MARK_COMM_END) &&
                 (it.key() > max_blank))
-                    max_blank = it.key();
+                max_blank = it.key();
 
         it = sceneCommBreakMap.begin();
         for(unsigned int i = 0; i < sceneCommBreakMap.size(); i++)
@@ -1000,8 +993,9 @@ void CommDetect::BuildMasterCommList(void)
     }
 }
 
-void CommDetect::UpdateFrameBlock(FrameBlock *fbp, FrameInfoEntry finfo,
-                                  int format, int aspect)
+void ClassicCommDetector::UpdateFrameBlock(FrameBlock *fbp,
+                                           FrameInfoEntry finfo,
+                                           int format, int aspect)
 {
     int value = 0;
 
@@ -1023,7 +1017,8 @@ void CommDetect::UpdateFrameBlock(FrameBlock *fbp, FrameInfoEntry finfo,
         fbp->aspectMatch++;
 }
 
-void CommDetect::BuildAllMethodsCommList(void)
+
+void ClassicCommDetector::BuildAllMethodsCommList(void)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::BuildAllMethodsCommList()");
 
@@ -1047,7 +1042,7 @@ void CommDetect::BuildAllMethodsCommList(void)
     long aspectFrames = 0;
     int aspect = COMM_ASPECT_NORMAL;
     QString msg;
-    long formatCounts[COMM_FORMAT_MAX];
+    long long formatCounts[COMM_FORMAT_MAX];
     QMap<long long, int> tmpCommMap;
     QMap<long long, int>::Iterator it;
 
@@ -1073,7 +1068,7 @@ void CommDetect::BuildAllMethodsCommList(void)
 
     if (decoderFoundAspectChanges)
     {
-        for(long i = 0; i < framesProcessed; i++ )
+        for(long long i = 0; i < framesProcessed; i++ )
         {
             if (frameInfo[i].aspect == COMM_ASPECT_NORMAL)
                 aspectFrames++;
@@ -1087,9 +1082,11 @@ void CommDetect::BuildAllMethodsCommList(void)
     }
     else
     {
-        for(long i = 0; i < framesProcessed; i++ )
+        for (int i=0;i<COMM_FORMAT_MAX;i++) formatCounts[i]=0;
+
+        for(long long i = 0; i < framesProcessed; i++ )
             formatCounts[frameInfo[i].aspect]++;
-       
+
         for(int i = 0; i < COMM_FORMAT_MAX; i++)
         {
             if (formatCounts[i] > formatFrames)
@@ -1168,9 +1165,9 @@ void CommDetect::BuildAllMethodsCommList(void)
 
     VERBOSE(VB_COMMFLAG, "Initial Block pass");
     VERBOSE(VB_COMMFLAG, "Block StTime StFrm  EndFrm Frames Secs    "
-                         "Bf  Lg Cnt RT Cnt SC Cnt SC Rt FmtMch AspMch Score");
+            "Bf  Lg Cnt RT Cnt SC Cnt SC Rt FmtMch AspMch Score");
     VERBOSE(VB_COMMFLAG, "----- ------ ------ ------ ------ ------- "
-                         "--- ------ ------ ------ ----- ------ ------ -----");
+            "--- ------ ------ ------ ----- ------ ------ -----");
     while (curBlock <= maxBlock)
     {
         fbp = &fblock[curBlock];
@@ -1201,7 +1198,7 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      length > max comm break length,"
-                                         " +20");
+                            " +20");
                 fbp->score += 20;
             }
 
@@ -1211,29 +1208,30 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      length > 4 && logoCount > "
-                                         "frames * 0.60 && bfCount < frames "
-                                         "* .10");
+                            "frames * 0.60 && bfCount < frames "
+                            "* .10");
                 if (fbp->length > commDetectMaxCommBreakLength)
                 {
                     if (verboseDebugging)
                         VERBOSE(VB_COMMFLAG, "      length > "
-                                             "max comm break length, +20");
+                                "max comm break length, +20");
                     fbp->score += 20;
                 }
                 else
                 {
                     if (verboseDebugging)
                         VERBOSE(VB_COMMFLAG, "      length <= "
-                                            "max comm break length, +10");
+                                "max comm break length, +10");
                     fbp->score += 10;
                 }
             }
 
-            if ((logoInfoAvailable) && (fbp->logoCount < (fbp->frames * 0.50)))
+            if ((logoInfoAvailable) &&
+                (fbp->logoCount < (fbp->frames * 0.50)))
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      logoInfoAvailable && logoCount"
-                                         " < frames * .50, -10");
+                            " < frames * .50, -10");
                 fbp->score -= 10;
             }
 
@@ -1241,7 +1239,7 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      rating symbol present > 5% "
-                                         "of time, +20");
+                            "of time, +20");
                 fbp->score += 20;
             }
 
@@ -1266,7 +1264,7 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      block appears to be standard "
-                                         "comm length, -10");
+                            "comm length, -10");
                 fbp->score -= 10;
             }
         }
@@ -1281,7 +1279,7 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      logoInfoAvailable && logoCount"
-                                         " == 0, -10");
+                            " == 0, -10");
                 fbp->score -= 10;
             }
 
@@ -1289,7 +1287,7 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      rating symbol present > 25% "
-                                         "of time, +10");
+                            "of time, +10");
                 fbp->score += 10;
             }
         }
@@ -1300,14 +1298,14 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      > 90% of frames match show "
-                                         "aspect, +10");
+                            "aspect, +10");
                 fbp->score += 10;
 
                 if (fbp->aspectMatch > (fbp->frames * .95))
                 {
                     if (verboseDebugging)
                         VERBOSE(VB_COMMFLAG, "      > 95% of frames match show "
-                                             "aspect, +10");
+                                "aspect, +10");
                     fbp->score += 10;
                 }
             }
@@ -1315,14 +1313,14 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      < 10% of frames match show "
-                                         "aspect, -10");
+                            "aspect, -10");
                 fbp->score -= 10;
 
                 if (fbp->aspectMatch < (fbp->frames * .05))
                 {
                     if (verboseDebugging)
                         VERBOSE(VB_COMMFLAG, "      < 5% of frames match show "
-                                             "aspect, -10");
+                                "aspect, -10");
                     fbp->score -= 10;
                 }
             }
@@ -1333,14 +1331,14 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      > 90% of frames match show "
-                                         "letter/pillar-box format, +10");
+                            "letter/pillar-box format, +10");
                 fbp->score += 10;
 
                 if (fbp->formatMatch > (fbp->frames * .95))
                 {
                     if (verboseDebugging)
                         VERBOSE(VB_COMMFLAG, "      > 95% of frames match show "
-                                             "letter/pillar-box format, +10");
+                                "letter/pillar-box format, +10");
                     fbp->score += 10;
                 }
             }
@@ -1348,14 +1346,14 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      < 10% of frames match show "
-                                         "letter/pillar-box format, -10");
+                            "letter/pillar-box format, -10");
                 fbp->score -= 10;
 
                 if (fbp->formatMatch < (fbp->frames * .05))
                 {
                     if (verboseDebugging)
                         VERBOSE(VB_COMMFLAG, "      < 5% of frames match show "
-                                             "letter/pillar-box format, -10");
+                                "letter/pillar-box format, -10");
                     fbp->score -= 10;
                 }
             }
@@ -1381,9 +1379,9 @@ void CommDetect::BuildAllMethodsCommList(void)
     VERBOSE(VB_COMMFLAG, "============================================");
     VERBOSE(VB_COMMFLAG, "Second Block pass");
     VERBOSE(VB_COMMFLAG, "Block StTime StFrm  EndFrm Frames Secs    "
-                         "Bf  Lg Cnt RT Cnt SC Cnt SC Rt FmtMch AspMch Score");
+            "Bf  Lg Cnt RT Cnt SC Cnt SC Rt FmtMch AspMch Score");
     VERBOSE(VB_COMMFLAG, "----- ------ ------ ------ ------ ------- "
-                         "--- ------ ------ ------ ----- ------ ------ -----");
+            "--- ------ ------ ------ ----- ------ ------ -----");
     while (curBlock <= maxBlock)
     {
         fbp = &fblock[curBlock];
@@ -1406,7 +1404,7 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      lastScore < 0 && nextScore < 0 "
-                                         "&& length < 35, setting -10");
+                            "&& length < 35, setting -10");
                 fbp->score -= 10;
             }
 
@@ -1416,8 +1414,8 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      blanks > frames * 0.95 && "
-                                         "frames < 2*fps && lastScore < 0 && "
-                                         "nextScore < 0, setting -10");
+                            "frames < 2*fps && lastScore < 0 && "
+                            "nextScore < 0, setting -10");
                 fbp->score -= 10;
             }
 
@@ -1429,8 +1427,8 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      frames < 120 * fps && (-20 < "
-                                         "lastScore < 0) && thisScore > 0 && "
-                                         "nextScore < 0, setting score = -10");
+                            "lastScore < 0) && thisScore > 0 && "
+                            "nextScore < 0, setting score = -10");
                 fbp->score = -10;
             }
 
@@ -1442,8 +1440,8 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      frames < 30 * fps && (0 < "
-                                         "lastScore < 20) && thisScore < 0 && "
-                                         "nextScore > 0, setting score = 10");
+                            "lastScore < 20) && thisScore < 0 && "
+                            "nextScore > 0, setting score = 10");
                 fbp->score = 10;
             }
         }
@@ -1452,8 +1450,8 @@ void CommDetect::BuildAllMethodsCommList(void)
         {
             int offset = 1;
             while(((curBlock + offset) <= maxBlock) &&
-                  (fblock[curBlock + offset].frames < (2 * fps)) &&
-                  (fblock[curBlock + offset].score == 0))
+                    (fblock[curBlock + offset].frames < (2 * fps)) &&
+                    (fblock[curBlock + offset].score == 0))
                 offset++;
 
             if ((curBlock + offset) <= maxBlock)
@@ -1467,7 +1465,7 @@ void CommDetect::BuildAllMethodsCommList(void)
                         if (verboseDebugging)
                             VERBOSE(VB_COMMFLAG, QString("      Setting block "
                                                          "%1 score +10")
-                                                         .arg(curBlock+offset));
+                                    .arg(curBlock+offset));
                     }
                 }
                 else if (fblock[curBlock + offset + 1].score < 0)
@@ -1478,7 +1476,7 @@ void CommDetect::BuildAllMethodsCommList(void)
                         if (verboseDebugging)
                             VERBOSE(VB_COMMFLAG, QString("      Setting block "
                                                          "%1 score -10")
-                                                         .arg(curBlock+offset));
+                                    .arg(curBlock+offset));
                     }
                 }
             }
@@ -1501,9 +1499,9 @@ void CommDetect::BuildAllMethodsCommList(void)
     VERBOSE(VB_COMMFLAG, "============================================");
     VERBOSE(VB_COMMFLAG, "FINAL Block stats");
     VERBOSE(VB_COMMFLAG, "Block StTime StFrm  EndFrm Frames Secs    "
-                         "Bf  Lg Cnt RT Cnt SC Cnt SC Rt FmtMch AspMch Score");
+            "Bf  Lg Cnt RT Cnt SC Cnt SC Rt FmtMch AspMch Score");
     VERBOSE(VB_COMMFLAG, "----- ------ ------ ------ ------ ------- "
-                         "--- ------ ------ ------ ----- ------ ------ -----");
+            "--- ------ ------ ------ ----- ------ ------ -----");
     curBlock = 0;
     lastScore = 0;
     breakStart = -1;
@@ -1516,7 +1514,7 @@ void CommDetect::BuildAllMethodsCommList(void)
             ((fbp->end - breakStart) > (commDetectMaxCommBreakLength * fps)))
         {
             if (((fbp->start - breakStart) >
-                               (commDetectMinCommBreakLength * fps)) || 
+                (commDetectMinCommBreakLength * fps)) ||
                 (breakStart == 0))
             {
                 if (verboseDebugging)
@@ -1525,9 +1523,9 @@ void CommDetect::BuildAllMethodsCommList(void)
                                     "frame block %1 with length %2, frame "
                                     "block length of %3 frames would put comm "
                                     "block length over max of %4 seconds.")
-                                    .arg(curBlock).arg(fbp->start - breakStart)
-                                    .arg(fbp->frames)
-                                    .arg(commDetectMaxCommBreakLength));
+                            .arg(curBlock).arg(fbp->start - breakStart)
+                            .arg(fbp->frames)
+                            .arg(commDetectMaxCommBreakLength));
 
                 commBreakMap[breakStart] = MARK_COMM_START;
                 commBreakMap[fbp->start] = MARK_COMM_END;
@@ -1543,10 +1541,10 @@ void CommDetect::BuildAllMethodsCommList(void)
                                     " block at frame %1 with length %2, "
                                     "length of %3 frames would put comm "
                                     "block length under min of %4 seconds.")
-                                    .arg((long)breakStart)
-                                    .arg(fbp->start - breakStart)
-                                    .arg(fbp->frames)
-                                    .arg(commDetectMinCommBreakLength));
+                            .arg((long)breakStart)
+                            .arg(fbp->start - breakStart)
+                            .arg(fbp->frames)
+                            .arg(commDetectMinCommBreakLength));
                 breakStart = -1;
             }
         }
@@ -1571,8 +1569,8 @@ void CommDetect::BuildAllMethodsCommList(void)
                                     QString("ReOpening commercial block at "
                                             "frame %1 because show less than "
                                             "%2 seconds")
-                                            .arg(breakStart)
-                                            .arg(commDetectMinShowLength));
+                                    .arg(breakStart)
+                                    .arg(commDetectMinShowLength));
                         else
                             VERBOSE(VB_COMMFLAG,
                                     QString("Opening initial commercial block "
@@ -1587,20 +1585,20 @@ void CommDetect::BuildAllMethodsCommList(void)
                         VERBOSE(VB_COMMFLAG,
                                 QString("Starting new commercial block at "
                                         "frame %1 from start of frame block %2")
-                                        .arg(fbp->start).arg(curBlock));
+                                .arg(fbp->start).arg(curBlock));
                 }
             }
             else if (curBlock == maxBlock)
             {
                 if ((fbp->end - breakStart) >
-                                (commDetectMinCommBreakLength * fps))
+                    (commDetectMinCommBreakLength * fps))
                 {
                     if (fbp->end <= (framesProcessed - (int)(2 * fps) - 2))
                     {
                         if (verboseDebugging)
                             VERBOSE(VB_COMMFLAG,
                                     QString("Closing final commercial block at "
-                                        "frame %1").arg(fbp->end));
+                                            "frame %1").arg(fbp->end));
 
                         commBreakMap[breakStart] = MARK_COMM_START;
                         commBreakMap[fbp->end] = MARK_COMM_END;
@@ -1617,18 +1615,20 @@ void CommDetect::BuildAllMethodsCommList(void)
                                         " block at frame %1 with length %2, "
                                         "length of %3 frames would put comm "
                                         "block length under min of %4 seconds.")
-                                        .arg((long)breakStart)
-                                        .arg(fbp->start - breakStart)
-                                        .arg(fbp->frames)
-                                        .arg(commDetectMinCommBreakLength));
+                                .arg((long)breakStart)
+                                .arg(fbp->start - breakStart)
+                                .arg(fbp->frames)
+                                .arg(commDetectMinCommBreakLength));
                     breakStart = -1;
                 }
             }
         }
-        else if ((thisScore > 0) && (lastScore < 0) && (breakStart != -1))
+        else if ((thisScore > 0) &&
+                 (lastScore < 0) &&
+                 (breakStart != -1))
         {
             if (((fbp->start - breakStart) >
-                               (commDetectMinCommBreakLength * fps)) || 
+                (commDetectMinCommBreakLength * fps)) ||
                 (breakStart == 0))
             {
                 commBreakMap[breakStart] = MARK_COMM_START;
@@ -1639,7 +1639,7 @@ void CommDetect::BuildAllMethodsCommList(void)
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG,
                             QString("Closing commercial block at frame %1")
-                                    .arg(fbp->start));
+                            .arg(fbp->start));
             }
             else
             {
@@ -1649,10 +1649,10 @@ void CommDetect::BuildAllMethodsCommList(void)
                                     "block at frame %1 with length %2, "
                                     "length of %3 frames would put comm block "
                                     "length under min of %4 seconds.")
-                                    .arg((long)breakStart)
-                                    .arg(fbp->start - breakStart)
-                                    .arg(fbp->frames)
-                                    .arg(commDetectMinCommBreakLength));
+                            .arg((long)breakStart)
+                            .arg(fbp->start - breakStart)
+                            .arg(fbp->frames)
+                            .arg(commDetectMinCommBreakLength));
             }
             breakStart = -1;
         }
@@ -1679,8 +1679,8 @@ void CommDetect::BuildAllMethodsCommList(void)
                     QString("Closing final commercial block started at "
                             "block %1 and going to end of program. length "
                             "is %2 frames")
-                            .arg(curBlock)
-                            .arg((long)(framesProcessed - breakStart - 1)));
+                    .arg(curBlock)
+                    .arg((long)(framesProcessed - breakStart - 1)));
 
         commBreakMap[breakStart] = MARK_COMM_START;
         commBreakMap[framesProcessed - (int)(2 * fps) - 2] = MARK_COMM_END;
@@ -1700,20 +1700,20 @@ void CommDetect::BuildAllMethodsCommList(void)
             if (skipAllBlanks)
             {
                 while ((lastStart > 0) &&
-                       (frameInfo[lastStart - 1].flagMask & COMM_FRAME_BLANK))
+                        (frameInfo[lastStart - 1].flagMask & COMM_FRAME_BLANK))
                     lastStart--;
             }
             else
             {
                 while ((lastStart < (framesProcessed - (2 * fps))) &&
-                       (frameInfo[lastStart + 1].flagMask & COMM_FRAME_BLANK))
+                        (frameInfo[lastStart + 1].flagMask & COMM_FRAME_BLANK))
                     lastStart++;
             }
 
             if (verboseDebugging)
                 VERBOSE(VB_COMMFLAG, QString("Start Mark: %1 -> %2")
-                                             .arg((long)it.key())
-                                             .arg((long)lastStart));
+                        .arg((long)it.key())
+                        .arg((long)lastStart));
 
             commBreakMap[lastStart] = MARK_COMM_START;
         }
@@ -1723,20 +1723,20 @@ void CommDetect::BuildAllMethodsCommList(void)
             if (skipAllBlanks)
             {
                 while ((lastEnd < (framesProcessed - (2 * fps))) &&
-                       (frameInfo[lastEnd + 1].flagMask & COMM_FRAME_BLANK))
+                        (frameInfo[lastEnd + 1].flagMask & COMM_FRAME_BLANK))
                     lastEnd++;
             }
             else
             {
                 while ((lastEnd > 0) &&
-                       (frameInfo[lastEnd - 1].flagMask & COMM_FRAME_BLANK))
+                        (frameInfo[lastEnd - 1].flagMask & COMM_FRAME_BLANK))
                     lastEnd--;
             }
 
             if (verboseDebugging)
                 VERBOSE(VB_COMMFLAG, QString("End Mark  : %1 -> %2")
-                                             .arg((long)it.key())
-                                             .arg((long)lastEnd));
+                        .arg((long)it.key())
+                        .arg((long)lastEnd));
 
             commBreakMap[lastEnd] = MARK_COMM_END;
         }
@@ -1745,7 +1745,8 @@ void CommDetect::BuildAllMethodsCommList(void)
     delete [] fblock;
 }
 
-void CommDetect::BuildBlankFrameCommList(void)
+
+void ClassicCommDetector::BuildBlankFrameCommList(void)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::BuildBlankFrameCommList()");
 
@@ -1777,16 +1778,16 @@ void CommDetect::BuildBlankFrameCommList(void)
             // end of breaks
             int gap_length = bframes[x] - bframes[i];
             if (((aggressiveDetection) &&
-                 ((abs((int)(gap_length - (5 * fps))) < 5 ) ||
-                  (abs((int)(gap_length - (10 * fps))) < 7 ) ||
-                  (abs((int)(gap_length - (15 * fps))) < 10 ) ||
-                  (abs((int)(gap_length - (20 * fps))) < 11 ) ||
-                  (abs((int)(gap_length - (30 * fps))) < 12 ) ||
-                  (abs((int)(gap_length - (40 * fps))) < 1 ) ||
-                  (abs((int)(gap_length - (45 * fps))) < 1 ) ||
-                  (abs((int)(gap_length - (60 * fps))) < 15 ) ||
-                  (abs((int)(gap_length - (90 * fps))) < 10 ) ||
-                  (abs((int)(gap_length - (120 * fps))) < 10 ))) ||
+                ((abs((int)(gap_length - (5 * fps))) < 5 ) ||
+                 (abs((int)(gap_length - (10 * fps))) < 7 ) ||
+                 (abs((int)(gap_length - (15 * fps))) < 10 ) ||
+                 (abs((int)(gap_length - (20 * fps))) < 11 ) ||
+                 (abs((int)(gap_length - (30 * fps))) < 12 ) ||
+                 (abs((int)(gap_length - (40 * fps))) < 1 ) ||
+                 (abs((int)(gap_length - (45 * fps))) < 1 ) ||
+                 (abs((int)(gap_length - (60 * fps))) < 15 ) ||
+                 (abs((int)(gap_length - (90 * fps))) < 10 ) ||
+                 (abs((int)(gap_length - (120 * fps))) < 10 ))) ||
                 ((!aggressiveDetection) &&
                  ((abs((int)(gap_length - (5 * fps))) < 11 ) ||
                   (abs((int)(gap_length - (10 * fps))) < 13 ) ||
@@ -1853,8 +1854,8 @@ void CommDetect::BuildBlankFrameCommList(void)
                 if (bframes[x] == r)
                     break;
             while((x < (frames-1)) &&
-                  ((bframes[x] + 1 ) == bframes[x+1]) &&
-                  (bframes[x+1] < c_start[i+1]))
+                    ((bframes[x] + 1 ) == bframes[x+1]) &&
+                    (bframes[x+1] < c_start[i+1]))
             {
                 r++;
                 x++;
@@ -1862,7 +1863,7 @@ void CommDetect::BuildBlankFrameCommList(void)
 
             if (skipAllBlanks)
                 while((blankFrameMap.contains(r+1)) &&
-                      (c_start[i+1] != (r+1)))
+                        (c_start[i+1] != (r+1)))
                     r++;
         }
         else
@@ -1892,7 +1893,8 @@ void CommDetect::BuildBlankFrameCommList(void)
                 .arg((long int)it.key()).arg(it.data()));
 }
 
-void CommDetect::BuildSceneChangeCommList(void)
+
+void ClassicCommDetector::BuildSceneChangeCommList(void)
 {
     int section_start = -1;
     int seconds = (int)(framesProcessed / fps);
@@ -1990,7 +1992,8 @@ void CommDetect::BuildSceneChangeCommList(void)
                 .arg((long int)it.key()).arg(it.data()));
 }
 
-void CommDetect::BuildLogoCommList()
+
+void ClassicCommDetector::BuildLogoCommList()
 {
     GetLogoCommBreakMap(logoCommBreakMap);
     CondenseMarkMap(logoCommBreakMap, (int)(25 * fps), (int)(30 * fps));
@@ -2003,7 +2006,7 @@ void CommDetect::BuildLogoCommList()
                 .arg((long int)it.key()).arg(it.data()));
 }
 
-void CommDetect::MergeBlankCommList(void)
+void ClassicCommDetector::MergeBlankCommList(void)
 {
     QMap<long long, int>::Iterator it;
     QMap<long long, int>::Iterator prev;
@@ -2029,7 +2032,7 @@ void CommDetect::MergeBlankCommList(void)
     {
         // if next commercial starts less than 15*fps frames away then merge
         if ((((prev.key() + 1) == it.key()) ||
-             ((prev.key() + (15 * fps)) > it.key())) &&
+            ((prev.key() + (15 * fps)) > it.key())) &&
             (prev.data() == MARK_COMM_END) &&
             (it.data() == MARK_COMM_START))
         {
@@ -2068,80 +2071,33 @@ void CommDetect::MergeBlankCommList(void)
     }
 }
 
-void CommDetect::DeleteCommAtFrame(QMap<long long, int> &commMap,
-                                   long long frame)
+bool ClassicCommDetector::FrameIsInBreakMap(long long f,
+                                            QMap<long long, int> &breakMap)
 {
-    long long start = -1;
-    long long end = -1;
-    QMap<long long, int>::Iterator it;
-    QMap<long long, int>::Iterator prev;
-
-    it = commMap.begin();
-    prev = it;
-    it++;
-    for(; it != commMap.end(); ++it, ++prev)
-    {
-        if ((prev.data() == MARK_COMM_START) &&
-            (prev.key() <= frame) &&
-            (it.data() == MARK_COMM_END) &&
-            (it.key() >= frame))
-        {
-            start = prev.key();
-            end = it.key();
-        }
-
-        if ((prev.key() > frame) && (start == -1))
-            return;
-    }
-
-    if (start != -1)
-    {
-        commMap.erase(start);
-        commMap.erase(end);
-    }
-}
-
-bool CommDetect::FrameIsInBreakMap(long long f, QMap<long long, int> &breakMap,
-                                   long long maxFrame)
-{
-    if (breakMap.isEmpty())
-        return(false);
-
-    for(long long i = f; i < maxFrame; i++)
-        if (breakMap.contains(i)) 
+    for(long long i = f; i < framesProcessed; i++)
+        if (breakMap.contains(i))
         {
             int type = breakMap[i];
-
-            if ((type == MARK_COMM_END) || (type == MARK_CUT_END) || (i == f))
+            if ((type == MARK_COMM_END) || (i == f))
                 return(true);
-
-            if ((type == MARK_COMM_START) || (type == MARK_CUT_START))
+            if (type == MARK_COMM_START)
                 return(false);
         }
 
     for(long long i = f; i >= 0; i--)
-        if (breakMap.contains(i)) 
+        if (breakMap.contains(i))
         {
             int type = breakMap[i];
-
-            if ((type == MARK_COMM_START) ||
-                (type == MARK_CUT_START) ||
-                (i == f))
+            if ((type == MARK_COMM_START) || (i == f))
                 return(true);
-
-            if ((type == MARK_COMM_END) || (type == MARK_CUT_END))
+            if (type == MARK_COMM_END)
                 return(false);
         }
 
     return(false);
 }
 
-bool CommDetect::FrameIsInBreakMap(long long f, QMap<long long, int> &breakMap)
-{
-    return FrameIsInBreakMap(f, breakMap, framesProcessed);
-}
-
-void CommDetect::DumpMap(QMap<long long, int> &map)
+void ClassicCommDetector::DumpMap(QMap<long long, int> &map)
 {
     QMap<long long, int>::Iterator it;
     QString msg;
@@ -2156,7 +2112,7 @@ void CommDetect::DumpMap(QMap<long long, int> &map)
         int min = (frame / my_fps) / 60 - (hour * 60);
         int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
         int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
-                    (hour * 60 * 60 * my_fps));
+                           (hour * 60 * 60 * my_fps));
         int my_sec = (int)(frame / my_fps);
         msg.sprintf("%7ld : %d (%02d:%02d:%02d.%02d) (%d)",
                     (long)frame, flag, hour, min, sec, frm, my_sec);
@@ -2165,93 +2121,52 @@ void CommDetect::DumpMap(QMap<long long, int> &map)
     VERBOSE(VB_COMMFLAG, "---------------------------------------------------");
 }
 
-void CommDetect::DumpLogo(bool fromCurrentFrame)
+void ClassicCommDetector::DumpLogo(bool fromCurrentFrame)
 {
     char scrPixels[] = " .oxX";
 
     if (!logoInfoAvailable)
         return;
 
-    printf( "\nLogo Data " );
+    cerr << "\nLogo Data ";
     if (fromCurrentFrame)
-        printf( "from current frame\n" );
+        cerr << "from current frame\n";
 
-    printf( "\n     " );
+    cerr << "\n     ";
 
     for(int x = logoMinX - 2; x <= (logoMaxX + 2); x++)
-        printf( "%d", x % 10);
-    printf( "\n" );
+        cerr << (x % 10);
+    cerr << "\n";
+
     for(int y = logoMinY - 2; y <= (logoMaxY + 2); y++)
     {
-        printf( "%3d: ", y );
+        cerr << QString::number(y).rightJustify(3, ' ') << ": ";
         for(int x = logoMinX - 2; x <= (logoMaxX + 2); x++)
         {
             if (fromCurrentFrame)
             {
-                printf( "%c", scrPixels[framePtr[y * width + x] / 50]);
+                cerr << scrPixels[framePtr[y * width + x] / 50];
             }
             else
             {
                 switch (logoMask[y * width + x])
                 {
-                    case 0:
-                    case 2: printf(" ");
-                            break;
-                    case 1: printf("*");
-                            break;
-                    case 3: printf(".");
-                            break;
+                        case 0:
+                        case 2: cerr << " ";
+                        break;
+                        case 1: cerr << "*";
+                        break;
+                        case 3: cerr << ".";
+                        break;
                 }
             }
         }
-        printf( "\n" );
+        cerr << "\n";
     }
+    cerr.flush();
 }
 
-void CommDetect::GetLogoMask(unsigned char *mask)
-{
-    logoFrameCount = 0;
-    memset(mask, 0, width * height);
-    memcpy(logoFrame, logoMinValues, width * height);
-
-    int maxValue = 0;
-    for(int i = 0; i < (width * height); i++)
-        if (logoFrame[i] > maxValue)
-            maxValue = logoFrame[i];
-
-    for(int i = 0; i < (width * height); i++)
-    {
-        if (logoFrame[i] > (maxValue - 70))
-            logoMask[i] = 255;
-        else
-            logoMask[i] = 0;
-    }
-
-    int exclMinX = (int)(width * .45);
-    int exclMaxX = (int)(width * .55);
-    int exclMinY = (int)(height * .35);
-    int exclMaxY = (int)(height * .65);
-
-    for (int y = 0; y < height; y++)
-    {
-        if ((y > exclMinY) && (y < exclMaxY))
-            continue;
-
-        for (int x = 0; x < width; x++)
-        {
-            if ((x > exclMinX) && (x < exclMaxX))
-                continue;
-
-            // need to add some detection for non-opaque logos here
-            if (logoMask[y * width + x] > 80)
-                mask[y * width + x] = 1;
-            else
-                mask[y * width + x] = 0;
-        }
-    }
-}
-
-void CommDetect::SetLogoMaskArea()
+void ClassicCommDetector::SetLogoMaskArea()
 {
     VERBOSE(VB_COMMFLAG, "SetLogoMaskArea()");
 
@@ -2293,7 +2208,7 @@ void CommDetect::SetLogoMaskArea()
         logoMaxY = (height-5);
 }
 
-void CommDetect::SetLogoMask(unsigned char *mask)
+void ClassicCommDetector::SetLogoMask(unsigned char *mask)
 {
     int pixels = 0;
 
@@ -2372,8 +2287,8 @@ void CommDetect::SetLogoMask(unsigned char *mask)
     logoInfoAvailable = true;
 }
 
-void CommDetect::CondenseMarkMap(QMap<long long, int>&map, int spacing,
-                                 int length)
+void ClassicCommDetector::CondenseMarkMap(QMap<long long, int>&map, int spacing,
+                                          int length)
 {
     QMap<long long, int>::Iterator it;
     QMap<long long, int>::Iterator prev;
@@ -2437,7 +2352,7 @@ void CommDetect::CondenseMarkMap(QMap<long long, int>&map, int spacing,
                 .arg((long int)it.key()).arg(it.data()));
 }
 
-void CommDetect::ConvertShowMapToCommMap(QMap<long long, int>&map)
+void ClassicCommDetector::ConvertShowMapToCommMap(QMap<long long, int>&map)
 {
     QMap<long long, int>::Iterator it;
 
@@ -2453,30 +2368,32 @@ void CommDetect::ConvertShowMapToCommMap(QMap<long long, int>&map)
     }
 
     it = map.begin();
-    if (it != map.end()) 
+    if (it != map.end())
     {
         switch (map[it.key()])
         {
-            case MARK_COMM_END:
-                    if (it.key() == 0)
-                        map.erase(0);
-                    else
-                        map[0] = MARK_COMM_START;
-                    break;
-            case MARK_COMM_START:
-                    break;
-            default:
+                case MARK_COMM_END:
+                if (it.key() == 0)
                     map.erase(0);
-                    break;
+                else
+                    map[0] = MARK_COMM_START;
+                break;
+                case MARK_COMM_START:
+                break;
+                default:
+                map.erase(0);
+                break;
         }
     }
 }
 
+
 /* ideas for this method ported back from comskip.c mods by Jere Jones
  * which are partially mods based on Myth's original commercial skip
  * code written by Chris Pinkham. */
-bool CommDetect::CheckEdgeLogo(void)
+bool ClassicCommDetector::CheckEdgeLogo(void)
 {
+
     int radius = 2;
     int x, y;
     int pos1, pos2, pos3;
@@ -2538,7 +2455,8 @@ bool CommDetect::CheckEdgeLogo(void)
         return false;
 }
 
-void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
+
+void ClassicCommDetector::SearchForLogo()
 {
     int seekIncrement = (int)(commDetectLogoSampleSpacing * fps);
     long long seekFrame;
@@ -2546,12 +2464,12 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
     int maxLoops = commDetectLogoSamplesNeeded;
     EdgeMaskEntry *edgeCounts;
     int pos, i, x, y, dx, dy;
-    int edgeDiffs[] = { 5, 7, 10, 15, 20, 30, 40, 50, 60, 0 };
+    int edgeDiffs[] = {5, 7, 10, 15, 20, 30, 40, 50, 60, 0 };
 
- 
+
     VERBOSE(VB_COMMFLAG, "Searching for Station Logo");
 
-    logoInfoAvailable = false;
+    logoInfoAvailable = false; 
 
     edgeCounts = new EdgeMaskEntry[width * height];
 
@@ -2560,30 +2478,26 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
         int pixelsInMask = 0;
 
         VERBOSE(VB_COMMFLAG, QString("Trying with edgeDiff == %1")
-                                     .arg(edgeDiffs[i]));
+                .arg(edgeDiffs[i]));
 
         memset(edgeCounts, 0, sizeof(EdgeMaskEntry) * width * height);
         memset(edgeMask, 0, sizeof(EdgeMaskEntry) * width * height);
 
-        nvp->JumpToFrame(0);
-        nvp->ClearAfterSeek();
-
-        nvp->GetFrame(1,true);
+        nvp->GetRawVideoFrame(0);
 
         loops = 0;
         seekFrame = seekIncrement;
 
-        while(loops < maxLoops && !nvp->eof) 
+        while(loops < maxLoops && !nvp->GetEof())
         {
-            nvp->JumpToFrame(seekFrame);
-            nvp->ClearAfterSeek();
-            nvp->GetFrame(1,true);
+            VideoFrame* vf = nvp->GetRawVideoFrame(seekFrame);
+
+            emit(breathe());
 
             if (!fullSpeed)
                 usleep(10000);
 
-            DetectEdges(nvp->videoOutput->GetLastDecodedFrame(), edgeCounts,
-                        edgeDiffs[i]);
+            DetectEdges(vf, edgeCounts, edgeDiffs[i]);
 
             seekFrame += seekIncrement;
             loops++;
@@ -2616,6 +2530,7 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
 #ifdef SHOW_DEBUG_WIN
                     fakeFrame[pos] = 0xff;
 #endif
+
                 }
 
                 if (edgeCounts[pos].horiz > (maxLoops * 0.66))
@@ -2696,8 +2611,8 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
 
             VERBOSE(VB_COMMFLAG, QString("Using Logo area: topleft "
                                          "(%1,%2), bottomright (%3,%4)")
-                                         .arg(logoMinX).arg(logoMinY)
-                                         .arg(logoMaxX).arg(logoMaxY));
+                    .arg(logoMinX).arg(logoMinY)
+                    .arg(logoMaxX).arg(logoMaxY));
         }
         else
         {
@@ -2705,9 +2620,9 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
                                          "(%1,%2), bottomright (%3,%4), "
                                          "pixelsInMask (%5). "
                                          "Not within specified limits.")
-                                         .arg(logoMinX).arg(logoMinY)
-                                         .arg(logoMaxX).arg(logoMaxY)
-                                         .arg(pixelsInMask));
+                    .arg(logoMinX).arg(logoMinY)
+                    .arg(logoMaxX).arg(logoMaxY)
+                    .arg(pixelsInMask));
         }
     }
 
@@ -2716,31 +2631,10 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
     if (!logoInfoAvailable)
         VERBOSE(VB_COMMFLAG, "No suitable logo area found.");
 
-    nvp->JumpToFrame(0);
-    nvp->ClearAfterSeek();
-    nvp->GetFrame(1,true);
+    nvp->GetRawVideoFrame(0);
 }
 
-bool CommDetect::CheckFrameIsInCommMap(long long frameNumber,
-                                       QMap<long long, int>)
-{
-    QMap<long long, int>::Iterator it;
-    long long lastStart = -1;
-
-    for (it = blankCommMap.begin(); it != blankCommMap.end(); ++it)
-    {
-        if ((it.data() == MARK_COMM_END) &&
-            (frameNumber <= it.key()) &&
-            (frameNumber >= lastStart))
-            return true;
-        else if (it.data() == MARK_COMM_START)
-            lastStart = it.key();
-    }
-
-    return false;
-}
-
-void CommDetect::CleanupFrameInfo(void)
+void ClassicCommDetector::CleanupFrameInfo(void)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::CleanupFrameInfo()");
 
@@ -2748,15 +2642,17 @@ void CommDetect::CleanupFrameInfo(void)
     int before, after;
 
     // try to account for noisy signal causing blank frames to be undetected
-    if (blankFrameCount < (framesProcessed * 0.0004))
+    if ((framesProcessed > (fps * 60)) &&
+        (blankFrameCount < (framesProcessed * 0.0004)))
     {
         int avgHistogram[256];
         int minAvg = -1;
         int newThreshold = -1;
 
         VERBOSE(VB_COMMFLAG,
-                QString("CommDetect: Only found %1 blank frames but wanted at "
-                        "least %2, rechecking data using higher threshold.")
+                QString("ClassicCommDetect: Only found %1 blank frames but "
+                        "wanted at least %2, rechecking data using higher "
+                        "threshold.")
                         .arg(blankFrameCount)
                         .arg((int)(framesProcessed * 0.0004)));
         blankFrameMap.clear();
@@ -2774,7 +2670,7 @@ void CommDetect::CleanupFrameInfo(void)
         newThreshold = minAvg + 3;
         VERBOSE(VB_COMMFLAG, QString("Minimum Average Brightness on a frame "
                                      "was %1, will use %2 as new threshold")
-                                     .arg(minAvg).arg(newThreshold));
+                .arg(minAvg).arg(newThreshold));
 
         for (long i = 1; i <= framesProcessed; i++)
         {
@@ -2791,8 +2687,8 @@ void CommDetect::CleanupFrameInfo(void)
         }
 
         VERBOSE(VB_COMMFLAG, QString("Found %1 blank frames using new value")
-                                     .arg(blankFrameCount));
-    }    
+                .arg(blankFrameCount));
+    }
 
     // try to account for fuzzy logo detection
     for (long i = 1; i <= framesProcessed; i++)
@@ -2827,8 +2723,8 @@ void CommDetect::CleanupFrameInfo(void)
     }
 }
 
-void CommDetect::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
-                             int edgeDiff)
+void ClassicCommDetector::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
+                                      int edgeDiff)
 {
     int r = 2;
     unsigned char *buf = frame->buf;
@@ -2884,7 +2780,7 @@ void CommDetect::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
     }
 }
 
-void CommDetect::GetLogoCommBreakMap(QMap<long long, int> &map)
+void ClassicCommDetector::GetLogoCommBreakMap(QMap<long long, int> &map)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::GetLogoCommBreakMap()");
 
@@ -2893,10 +2789,10 @@ void CommDetect::GetLogoCommBreakMap(QMap<long long, int> &map)
     int curFrame;
     bool PrevFrameLogo;
     bool CurrentFrameLogo;
-    
-    curFrame = 1;    
+
+    curFrame = 1;
     PrevFrameLogo = false;
-    
+
     while (curFrame <= framesProcessed)
     {
         if (frameInfo[curFrame].flagMask & COMM_FRAME_LOGO_PRESENT)

@@ -64,7 +64,6 @@ class RecorderBase
     virtual int GetVideoFd(void) = 0;
     
     virtual long long GetKeyframePosition(long long desired) = 0;
-    virtual void GetBlankFrameMap(QMap<long long, int> &blank_frame_map) = 0;
 
     virtual void ChannelNameChanged(const QString& new_name);
     QString GetCurChannelName() const;

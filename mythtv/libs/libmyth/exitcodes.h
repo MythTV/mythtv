@@ -113,7 +113,6 @@
 // Commercial flagging should return number of breaks,
 // or one of these exit codes
 #define COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS     GENERIC_EXIT_OK
-#define COMMFLAG_EXIT_TEST_MODE                   GENERIC_EXIT_OK
 
 #define COMMFLAG_EXIT_NO_MYTHCONTEXT              GENERIC_EXIT_NO_MYTHCONTEXT
 #define COMMFLAG_EXIT_DB_ERROR                    GENERIC_EXIT_DB_ERROR

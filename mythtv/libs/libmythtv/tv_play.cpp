@@ -26,7 +26,6 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 #include "udpnotify.h"
-#include "commercial_skip.h"
 #include "vsync.h"
 #include "lcddevice.h"
 #include "jobqueue.h"
@@ -179,7 +178,7 @@ TV::TV(void)
       stickykeys(0), ff_rew_repos(1.00), ff_rew_reverse(false),
       smartForward(false),
       // Configuration varibles from DB just before playback
-      autoCommercialSkip(false), tryUnflaggedSkip(false),
+      autoCommercialSkip(false),
       osd_display_time(0),
       // State variables
       internalState(kState_None), nextState(kState_None), changeState(false),
@@ -760,6 +759,11 @@ void TV::HandleStateChange(void)
             changed = true;
     
             StartPlayerAndRecorder(true, false);
+
+            QString message = "COMMFLAG_REQUEST ";
+            message += playbackinfo->chanid + " " +
+                       playbackinfo->startts.toString(Qt::ISODate);
+            RemoteSendMessage(message);
         }
         else
         {
@@ -914,11 +918,6 @@ void TV::SetupPlayer(void)
 
     autoCommercialSkip = gContext->GetNumSetting("AutoCommercialSkip", 0);
     nvp->SetAutoCommercialSkip(autoCommercialSkip);
-    nvp->SetCommercialSkipMethod(gContext->GetNumSetting("CommercialSkipMethod",
-                                                         COMM_DETECT_BLANKS));
-
-    tryUnflaggedSkip = gContext->GetNumSetting("TryUnflaggedSkip", 0);
-    nvp->SetTryUnflaggedSkip(tryUnflaggedSkip);
 
     osd_display_time = gContext->GetNumSetting("OSDDisplayTime");
 
@@ -3657,14 +3656,30 @@ void TV::customEvent(QCustomEvent *e)
             wantsToQuit = true;
             exitPlayer = true;
         }
-        else if (message.left(15) == "COMMFLAG_UPDATE")
+        else if (message.left(14) == "COMMFLAG_START")
         {
+            message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
             QString evchanid = tokens[1];
             QDateTime evstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
 
             if ((playbackinfo->chanid == evchanid) &&
-                (playbackinfo->recstartts == evstartts))
+                (playbackinfo->startts == evstartts))
+            {
+                QString msg = "COMMFLAG_REQUEST ";
+                msg += tokens[1] + " " + tokens[2];
+                RemoteSendMessage(msg);
+            }
+        }
+        else if (message.left(15) == "COMMFLAG_UPDATE")
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            QString evchanid = tokens[1];
+            QDateTime evstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
+
+            if ((playbackinfo->chanid == evchanid) &&
+                (playbackinfo->startts == evstartts))
             {
                 QMap<long long, int> newMap;
                 QStringList mark;
