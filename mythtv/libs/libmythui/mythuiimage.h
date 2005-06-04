@@ -28,10 +28,10 @@ class MythUIImage : public MythUIType
 
     QImage GetImage(void);
 
-    virtual void Draw(MythPainter *p, int xoffset, int yoffset, 
-                      int alphaMod = 255);
-
   protected:
+    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset, 
+                          int alphaMod);
+
     void Init(void);
 
     QString m_Filename;

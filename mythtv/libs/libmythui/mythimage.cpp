@@ -10,11 +10,30 @@ MythImage::MythImage(MythPainter *parent)
 
     m_Parent = parent;
     m_Changed = false;
+
+    m_RefCount = 0;
 }
 
 MythImage::~MythImage()
 {
     m_Parent->DeleteFormatImage(this);
+}
+
+// these technically should be locked, but all deletion should be happening in the UI thread, and nowhere else.
+void MythImage::UpRef(void)
+{
+    m_RefCount++;
+}
+
+bool MythImage::DownRef(void)
+{
+    m_RefCount--;
+    if (m_RefCount < 0)
+    {
+        delete this;
+        return true;
+    }
+    return false;
 }
 
 void MythImage::Assign(const QImage &img)

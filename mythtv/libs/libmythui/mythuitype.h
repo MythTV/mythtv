@@ -37,7 +37,7 @@ class MythUIType : public QObject
     // Called each draw pulse.  Will redraw automatically if dirty afterwards
     virtual void Pulse(void);
 
-    virtual void Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod = 255);
+    void Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod = 255);
 
     virtual void SetPosition(QPoint pos);
     virtual void SetArea(QRect rect);
@@ -83,6 +83,9 @@ class MythUIType : public QObject
     void FinishedFading();
 
   protected:
+    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                          int alphaMod);
+
     void AddFocusableChildrenToList(QPtrList<MythUIType> &focusList);
     void HandleAlphaPulse();
     void HandleMovementPulse();

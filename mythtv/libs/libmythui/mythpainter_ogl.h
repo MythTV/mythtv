@@ -4,8 +4,8 @@
 #include "mythpainter.h"
 #include "mythimage.h"
 
-class StringImageCache;
-class IntImageCache;
+#include <list>
+using namespace std;
 
 class MythOpenGLPainter : public MythPainter
 {
@@ -40,9 +40,11 @@ class MythOpenGLPainter : public MythPainter
     MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
                                   const MythFontProperties &font);
 
-    StringImageCache *m_StringImageCache;
-    IntImageCache *m_IntImageCache;
     QMap<MythImage *, unsigned int> m_ImageIntMap;
+    list<MythImage *> m_ImageExpireList;
+
+    QMap<QString, MythImage *> m_StringToImageMap;
+    list<QString> m_StringExpireList;
 
     int q_gl_texture;
     bool texture_rects;

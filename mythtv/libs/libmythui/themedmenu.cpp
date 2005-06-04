@@ -215,7 +215,7 @@ class ThemedMenuPrivate
     void paintButton(unsigned int button, MythPainter *p, int alpha);
     void paintWatermark(MythPainter *p, int alpha);
 
-    void Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset, int alphaMod);
 
     void clearToBackground(void);
     void drawInactiveButtons(void);
@@ -279,17 +279,17 @@ ThemedMenuState::~ThemedMenuState()
 void ThemedMenuState::Reset(void)
 {
     if (logo)
-        delete logo;
+        logo->DownRef();
     if (buttonnormal)
-        delete buttonnormal;
+        buttonnormal->DownRef();
     if (buttonactive)
-        delete buttonactive;
+        buttonactive->DownRef();
     if (uparrow)
-        delete uparrow;
+        uparrow->DownRef();
     if (downarrow)
-        delete downarrow;
+        downarrow->DownRef();
     if (buttonBackground)
-        delete buttonBackground;
+        buttonBackground->DownRef();
 
     logo = NULL;
     buttonnormal = NULL;
@@ -302,18 +302,18 @@ void ThemedMenuState::Reset(void)
     for (it = allButtonIcons.begin(); it != allButtonIcons.end(); ++it)
     {
         if (it.data().icon)
-            delete it.data().icon;
+            it.data().icon->DownRef();
         if (it.data().activeicon)
-            delete it.data().activeicon;
+            it.data().activeicon->DownRef();
         if (it.data().watermark)
-            delete it.data().watermark;
+            it.data().watermark->DownRef();
     }
     allButtonIcons.clear();
 
     QMap<QString, MythImage *>::Iterator jt;
     for (jt = titleIcons.begin(); jt != titleIcons.end(); ++jt)
     {
-        delete jt.data();
+        jt.data()->DownRef();
     }
     titleIcons.clear();
 
@@ -2197,10 +2197,10 @@ bool ThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
     return false;
 }
 
-void ThemedMenuPrivate::Draw(MythPainter *p, 
-                             int /* xoffset */, 
-                             int /* yoffset */, 
-                             int alphaMod)
+void ThemedMenuPrivate::DrawSelf(MythPainter *p, 
+                                 int /* xoffset */, 
+                                 int /* yoffset */, 
+                                 int alphaMod)
 {
     m_state->paintLogo(p, alphaMod);
     m_state->paintTitle(p, alphaMod);
@@ -2295,17 +2295,14 @@ void ThemedMenu::ReloadExitKey(void)
         d->exitModifier = -1;
 }
 
-void ThemedMenu::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
+void ThemedMenu::DrawSelf(MythPainter *p, int xoffset, int yoffset, int alphaMod)
 {
 #if 0
     d->paintLogo(p, alphaMod);
 #endif
 
     int alpha = CalcAlpha(alphaMod);
-
-    d->Draw(p, xoffset, yoffset, alpha);
-
-    MythScreenType::Draw(p, xoffset, yoffset, alphaMod);
+    d->DrawSelf(p, xoffset, yoffset, alpha);
 }
 
 void ThemedMenu::ReloadTheme(void)

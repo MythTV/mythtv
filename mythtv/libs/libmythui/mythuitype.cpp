@@ -49,12 +49,12 @@ MythUIType::~MythUIType()
     
     if(m_debug_hor_line)
     {
-        delete m_debug_hor_line;
+        m_debug_hor_line->DownRef();
         m_debug_hor_line = NULL;
     }
     if(m_debug_ver_line)
     {
-        delete m_debug_ver_line;
+        m_debug_ver_line->DownRef();
         m_debug_ver_line = NULL;
     }
 }
@@ -204,12 +204,18 @@ void MythUIType::makeDebugImages()
     m_debug_ver_line = MythImage::FromQImage(&temp_image);
 }
 
+void MythUIType::DrawSelf(MythPainter *, int, int, int)
+{
+}
+
 void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
 {
     if (!m_Visible)
     {
         return;
     }
+
+    DrawSelf(p, xoffset, yoffset, alphaMod);
 
     QValueVector<MythUIType *>::Iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)

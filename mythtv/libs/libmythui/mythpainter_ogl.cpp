@@ -19,6 +19,9 @@ using namespace std;
 #include "mythpainter_ogl.h"
 #include "mythfontproperties.h"
 
+#define MAX_GL_ITEMS 64
+#define MAX_STRING_ITEMS 8
+
 #ifndef GL_TEXTURE_RECTANGLE_ARB
 #define GL_TEXTURE_RECTANGLE_ARB 0x84F5 
 #endif
@@ -31,37 +34,13 @@ using namespace std;
 #define GL_TEXTURE_RECTANGLE_NV 0x84F5
 #endif
 
-class StringImageCache : public QCache<MythImage>
-{
-  public:
-    StringImageCache() : QCache<MythImage>(25, 31) 
-    {  setAutoDelete(true); }
-};
-
-class IntImageCache : public QIntCache<MythImage>
-{
-  public:
-    IntImageCache(MythOpenGLPainter *parent) 
-          : QIntCache<MythImage>(25, 31) 
-    { m_parent = parent; setAutoDelete(false); }
-
-  protected:
-    void deleteItem(MythImage *im) { printf("deleting item\n"); m_parent->DeleteFormatImage(im); }
-
-    MythOpenGLPainter *m_parent;   
-};
-
 MythOpenGLPainter::MythOpenGLPainter() 
                  : MythPainter()
 {
-    m_StringImageCache = new StringImageCache();
-    m_IntImageCache = new IntImageCache(this);
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
 {
-    delete m_StringImageCache;
-    delete m_IntImageCache;
 }
 
 void MythOpenGLPainter::Begin(QWidget *parent)
@@ -128,6 +107,8 @@ void MythOpenGLPainter::RemoveImageFromCache(MythImage *im)
 
         glDeleteTextures(1, textures);
         m_ImageIntMap.erase(im);
+
+        m_ImageExpireList.remove(im);
     }
 }
 
@@ -177,7 +158,8 @@ void MythOpenGLPainter::BindTextureFromCache(MythImage *im,
 
         if (!im->IsChanged())
         {
-            m_IntImageCache->find(val);
+            m_ImageExpireList.remove(im);
+            m_ImageExpireList.push_back(im);
             glBindTexture(q_gl_texture, val);
             return;
         }
@@ -229,7 +211,14 @@ void MythOpenGLPainter::BindTextureFromCache(MythImage *im,
                  GL_RGBA, GL_UNSIGNED_BYTE, tx.bits());
 
     m_ImageIntMap[im] = tx_id;
-    m_IntImageCache->insert((long)tx_id, im);
+    m_ImageExpireList.push_back(im);
+
+    if (m_ImageExpireList.size() > MAX_GL_ITEMS)
+    {
+        MythImage *im = m_ImageExpireList.front();
+        m_ImageExpireList.pop_front();
+        RemoveImageFromCache(im);
+    }
 }
 
 void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im, 
@@ -289,12 +278,15 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
                                                  int flags, const QRect &r, 
                                                  const MythFontProperties &font)
 {
-    MythImage *im;
+    if (m_StringToImageMap.contains(msg))
+    {
+        m_StringExpireList.remove(msg);
+        m_StringExpireList.push_back(msg);
 
-    if ((im = m_StringImageCache->find(msg)))
-        return im;
+        return m_StringToImageMap[msg];
+    }
 
-    im = GetFormatImage();
+    MythImage *im = GetFormatImage();
 
     qApp->lock();
 
@@ -335,7 +327,23 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
         colorTable[i] = qRgba(0, 0, 0, alpha);
     }
 
-    m_StringImageCache->insert(msg, im);
+    m_StringToImageMap[msg] = im;
+    m_StringExpireList.push_back(msg);
+
+    if (m_StringExpireList.size() > MAX_STRING_ITEMS)
+    {
+        QString oldmsg = m_StringExpireList.front();
+        m_StringExpireList.pop_front();
+
+        MythImage *oldim = NULL;
+        if (m_StringToImageMap.contains(oldmsg))
+            oldim = m_StringToImageMap[oldmsg];
+
+        m_StringToImageMap.erase(oldmsg);
+
+        if (oldim)
+            oldim->DownRef();
+    }
 
     return im;
 }

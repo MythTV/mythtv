@@ -89,8 +89,8 @@ void MythUIText::SetDisplayArea(const QRect &rect)
     SetRedraw();
 }
 
-void MythUIText::Draw(MythPainter *p, int xoffset, int yoffset, 
-                      int alphaMod)
+void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
+                          int alphaMod)
 {
     QRect area = m_Area;
     area.moveBy(xoffset, yoffset);
@@ -108,8 +108,6 @@ void MythUIText::Draw(MythPainter *p, int xoffset, int yoffset,
     }
 
     p->DrawText(area, m_CutMessage, m_Justification, *m_Font, alpha);
-
-    MythUIType::Draw(p, xoffset, yoffset, alphaMod);
 }
 
 void MythUIText::Pulse(void)

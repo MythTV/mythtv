@@ -34,13 +34,13 @@ class MythUIText : public MythUIType
 
     virtual void Pulse(void);
 
-    virtual void Draw(MythPainter *p, int xoffset, int yoffset, 
-                      int alphaMod = 255);
-
     void CycleColor(QColor startColor, QColor endColor, int numSteps);
     void StopCycling();
 
   protected:
+    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                          int alphaMod);
+
     int m_Justification;
     QRect m_OrigDisplayRect;
     QRect m_AltDisplayRect;

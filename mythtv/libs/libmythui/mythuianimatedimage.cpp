@@ -26,7 +26,7 @@ MythUIAnimatedImage::~MythUIAnimatedImage()
 {
     while (!m_Images.isEmpty())
     {
-        delete m_Images.back();
+        m_Images.back()->DownRef();
         m_Images.pop_back();
     }
 }
@@ -80,7 +80,7 @@ void MythUIAnimatedImage::Load(void)
         image->SetChanged();
 
         if (image->isNull())
-            delete image;
+            image->DownRef();
         else
             m_Images.push_back(image);
     }
@@ -102,8 +102,8 @@ void MythUIAnimatedImage::Pulse(void)
     }
 }
 
-void MythUIAnimatedImage::Draw(MythPainter *p, int xoffset, int yoffset, 
-                               int alphaMod)
+void MythUIAnimatedImage::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
+                                   int alphaMod)
 {
     if (m_Images.size() > 0)
     {
@@ -115,7 +115,5 @@ void MythUIAnimatedImage::Draw(MythPainter *p, int xoffset, int yoffset,
         QRect srcRect = m_Images[m_CurPos]->rect();
         p->DrawImage(area, m_Images[m_CurPos], srcRect, alpha);
     }
-
-    MythUIType::Draw(p, xoffset, yoffset, alphaMod);
 }
 

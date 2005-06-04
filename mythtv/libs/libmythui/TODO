@@ -1,0 +1,6 @@
+Stuff not to forget:
+
+Leaking on exit of opengl painter from caches
+Kill default copy constructors for ui types
+Better hash for strings in gl painter
+

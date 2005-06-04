@@ -23,7 +23,7 @@ MythUIImage::MythUIImage(MythUIType *parent, const char *name)
 
 MythUIImage::~MythUIImage()
 {
-    delete m_Image;
+    m_Image->DownRef();
 }
 
 void MythUIImage::Init(void)
@@ -86,9 +86,9 @@ void MythUIImage::Reset(void)
     m_Image->Assign(QImage());
 }
 
-void MythUIImage::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
+void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
+                           int alphaMod)
 {
-
     QRect area = m_Area;
     area.moveBy(xoffset, yoffset);
     
@@ -98,7 +98,5 @@ void MythUIImage::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
     srcRect.setTopLeft(QPoint(m_SkipX, m_SkipY));
 
     p->DrawImage(area, m_Image, srcRect, alpha);
-
-    MythUIType::Draw(p, xoffset, yoffset, alphaMod);
 }
 

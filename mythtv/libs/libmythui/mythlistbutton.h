@@ -7,6 +7,7 @@
 
 class MythListButtonItem;
 class MythFontProperties;
+class MythUIStateImage;
 
 class MythListButton : public MythUIType
 {
@@ -28,13 +29,6 @@ class MythListButton : public MythUIType
 
     void SetItemRegColor(const QColor& beg, const QColor& end, uint alpha);
     void SetItemSelColor(const QColor& beg, const QColor& end, uint alpha);
-
-    
-    virtual void Draw(MythPainter *p, int xoffset, int yoffset, 
-                      int alphaMod = 255);
-
-    void Draw(MythPainter *p, int xoffset, int yoffset, bool active_on,
-              int alphaMod);
 
     void SetActive(bool active);
     void Reset();
@@ -58,16 +52,19 @@ class MythListButton : public MythUIType
     void MoveUp(MovementUnit unit = MoveItem);
     bool MoveToNamedPosition(const QString &position_name);
 
-    bool IsVisible() { return m_visible; }
-    void SetVisible(bool vis) { m_visible = vis; }
-
     void SetDrawOffset(QPoint off) { m_drawoffset = off; }
     QPoint GetDrawOffset(void) { return m_drawoffset; }
 
-    QRect GetArea(void) { return m_rect; }
-
   signals:
     void itemSelected(MythListButtonItem* item);
+
+  protected:
+    // This needs fixed - shouldn't have an override for active
+    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                          int alphaMod);
+
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset, bool active_on,
+                  int alphaMod);
 
   private:
     void Init();
@@ -76,10 +73,11 @@ class MythListButton : public MythUIType
     void InsertItem(MythListButtonItem *item);
     void RemoveItem(MythListButtonItem *item);
 
+    void SetPositionArrowStates(void);
+
     int m_order;
     QRect m_rect;
     QRect m_contentsRect;
-    QRect m_arrowsRect;
 
     int m_itemHeight;
     int m_itemSpacing;
@@ -87,19 +85,16 @@ class MythListButton : public MythUIType
     uint m_itemsVisible;
 
     bool m_active;
-    bool m_visible;
     bool m_showScrollArrows;
     bool m_showArrow;
-    bool m_showUpArrow;
-    bool m_showDnArrow;
 
     MythImage *m_itemRegPix;
     MythImage *m_itemSelActPix;
     MythImage *m_itemSelInactPix;
-    MythImage *m_upArrowRegPix;
-    MythImage *m_dnArrowRegPix;
-    MythImage *m_upArrowActPix;
-    MythImage *m_dnArrowActPix;
+
+    MythUIStateImage *m_upArrow;
+    MythUIStateImage *m_downArrow;
+
     MythImage *m_arrowPix;
     MythImage *m_checkNonePix;
     MythImage *m_checkHalfPix;

@@ -6,6 +6,7 @@
 #include "mythuitext.h"
 #include "mythuianimatedimage.h"
 #include "mythmainwindow.h"
+#include "mythlistbutton.h"
 #include "dialogbox.h"
 #include "mythfontproperties.h"
 #include "mythcontext.h"
@@ -261,9 +262,11 @@ void TestScreen1::Launch8(void)
     diag->SetReturnEvent(this, "FINAL_DIALOG");
     diag->AddButton("Good-bye");
 
+    for (int i = 0; i < 20; i++)
+        diag->AddButton(QString("Test text item #%1").arg(i));
+    
     m_ScreenStack->AddScreen(diag);
 }
-
 
 ////////////////////////////////////////////////////////////////////////////
 

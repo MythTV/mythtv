@@ -35,7 +35,7 @@ MythDialogBox::MythDialogBox(const QString &text,
                            fullRect.width() - xpad * 2,
                            fullRect.height() / 3);
 
-    buttonList = new MythListButton(this, "listbutton", listarea, false, false);
+    buttonList = new MythListButton(this, "listbutton", listarea, true, true);
 
     buttonList->SetFontActive(fontProp);
     fontProp.color = QColor(qRgb(128, 128, 128));

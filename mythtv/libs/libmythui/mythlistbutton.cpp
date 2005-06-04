@@ -9,21 +9,19 @@
 #include "mythmainwindow.h"
 #include "mythcontext.h"
 #include "mythfontproperties.h"
+#include "mythuistateimage.h"
 
 MythListButton::MythListButton(MythUIType *parent, const char *name, 
                                const QRect& area, bool showArrow, 
                                bool showScrollArrows)
               : MythUIType(parent, name)
 {
-    m_rect             = area;
+    m_Area             = area;
 
     m_showArrow        = showArrow;
     m_showScrollArrows = showScrollArrows;
 
     m_active           = false;
-    m_visible          = true;
-    m_showUpArrow      = false;
-    m_showDnArrow      = false;
     m_drawFromBottom   = false;
 
     m_itemList.setAutoDelete(false);
@@ -42,8 +40,6 @@ MythListButton::MythListButton(MythUIType *parent, const char *name,
     m_itemHeight      = 0;
     m_itemsVisible    = 0;
 
-    m_drawoffset      = QPoint(0, 0);
-
     m_textFlags = Qt::AlignLeft | Qt::AlignVCenter;
 
     SetItemRegColor(QColor("#505050"), QColor("#000000"), 100);
@@ -52,10 +48,6 @@ MythListButton::MythListButton(MythUIType *parent, const char *name,
     m_itemRegPix = NULL;
     m_itemSelActPix = NULL;
     m_itemSelInactPix = NULL;
-    m_upArrowRegPix = NULL;
-    m_dnArrowRegPix = NULL;
-    m_upArrowActPix = NULL;
-    m_dnArrowActPix = NULL;
     m_arrowPix = NULL;
     m_checkNonePix = NULL;
     m_checkHalfPix = NULL;
@@ -65,34 +57,26 @@ MythListButton::MythListButton(MythUIType *parent, const char *name,
     m_fontInactive = new MythFontProperties();
 }
 
-    MythListButton::~MythListButton()
+MythListButton::~MythListButton()
 {    
     Reset();
     delete m_topIterator;
     delete m_selIterator;
 
     if (m_itemRegPix)
-        delete m_itemRegPix;
+        m_itemRegPix->DownRef();
     if (m_itemSelActPix)
-        delete m_itemSelActPix;
+        m_itemSelActPix->DownRef();
     if (m_itemSelInactPix)
-        delete m_itemSelInactPix;
-    if (m_upArrowRegPix)
-        delete m_upArrowRegPix;
-    if (m_dnArrowRegPix)
-        delete m_dnArrowRegPix;
-    if (m_upArrowActPix)
-        delete m_upArrowActPix;
-    if (m_dnArrowActPix)
-        delete m_dnArrowActPix;
+        m_itemSelInactPix->DownRef();
     if (m_arrowPix)
-        delete m_arrowPix;
+        m_arrowPix->DownRef();
     if (m_checkNonePix)
-        delete m_checkNonePix;
+        m_checkNonePix->DownRef();
     if (m_checkHalfPix)
-        delete m_checkHalfPix;
+        m_checkHalfPix->DownRef();
     if (m_checkFullPix)
-        delete m_checkFullPix;
+        m_checkFullPix->DownRef();
     if (m_fontActive)
        delete m_fontActive; 
     if (m_fontInactive)
@@ -172,10 +156,33 @@ void MythListButton::Reset()
     m_selIterator->toFirst(); 
     m_topIterator->toFirst();
 
-    m_showUpArrow = false;
-    m_showDnArrow = false;
+    SetPositionArrowStates();
 
     SetRedraw();
+}
+
+void MythListButton::SetPositionArrowStates(void)
+{
+    if (!m_showScrollArrows)
+        return;
+
+    if (m_itemCount == 0)
+    {
+        m_downArrow->DisplayImage(MythUIStateImage::Off);
+        m_upArrow->DisplayImage(MythUIStateImage::Off);
+    }
+    else
+    {
+        if (m_topItem != m_itemList.first())
+            m_upArrow->DisplayImage(MythUIStateImage::Full);
+        else
+            m_upArrow->DisplayImage(MythUIStateImage::Off);
+    
+        if (m_topPosition + (int)m_itemsVisible < m_itemCount)
+            m_downArrow->DisplayImage(MythUIStateImage::Full);
+        else
+            m_downArrow->DisplayImage(MythUIStateImage::Off);
+    }
 }
 
 void MythListButton::InsertItem(MythListButtonItem *item)
@@ -184,11 +191,6 @@ void MythListButton::InsertItem(MythListButtonItem *item)
     m_itemList.append(item);
 
     m_itemCount++;
-
-    if (m_showScrollArrows && m_itemCount > (int)m_itemsVisible)
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
 
     if (!lastItem) 
     {
@@ -199,6 +201,8 @@ void MythListButton::InsertItem(MythListButtonItem *item)
         m_selPosition = m_topPosition = 0;
         emit itemSelected(item);
     }
+
+    SetPositionArrowStates();
 
     SetRedraw();
 }
@@ -258,15 +262,7 @@ void MythListButton::RemoveItem(MythListButtonItem *item)
     m_itemList.remove(item);
     m_itemCount--;
 
-    if (m_topItem != m_itemList.first())
-        m_showUpArrow = true;
-    else
-        m_showUpArrow = false;
-
-    if (m_topPosition + (int)m_itemsVisible < m_itemCount)
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
+    SetPositionArrowStates();
 
     SetRedraw();
     if (m_selItem) 
@@ -302,10 +298,7 @@ void MythListButton::SetItemCurrent(MythListButtonItem* item)
     m_selItem = item;
     (*m_topIterator) = (*m_selIterator);
 
-    if (m_showScrollArrows && m_itemCount > (int)m_itemsVisible)
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
+    SetPositionArrowStates();
 
     SetRedraw();
     emit itemSelected(m_selItem);
@@ -404,15 +397,7 @@ void MythListButton::MoveUp(MovementUnit unit)
         m_topPosition = m_selPosition;
     }
 
-    if (m_topItem != m_itemList.first())
-        m_showUpArrow = true;
-    else
-        m_showUpArrow = false;
-
-    if (m_topPosition + (int)m_itemsVisible < m_itemCount)
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
+    SetPositionArrowStates();
 
     SetRedraw();
     emit itemSelected(m_selItem);
@@ -463,15 +448,7 @@ void MythListButton::MoveDown(MovementUnit unit)
    
     m_topItem = m_topIterator->current();
 
-    if (m_topItem != m_itemList.first())
-        m_showUpArrow = true;
-    else
-        m_showUpArrow = false;
-
-    if (m_topPosition + (int)m_itemsVisible < m_itemCount)
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
+    SetPositionArrowStates();
 
     SetRedraw(); 
     emit itemSelected(m_selItem);
@@ -518,15 +495,7 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
    
     m_topItem = m_topIterator->current();
 
-    if (m_topItem != m_itemList.first())
-        m_showUpArrow = true;
-    else
-        m_showUpArrow = false;
-
-    if (m_topPosition + (int)m_itemsVisible < m_itemCount)
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
+    SetPositionArrowStates();
 
     SetRedraw();
     return true;
@@ -585,18 +554,15 @@ bool MythListButton::MoveItemUpDown(MythListButtonItem *item, bool flag)
     return true;
 }
 
-void MythListButton::Draw(MythPainter *p, int xoffset, int yoffset, 
-                          int alphaMod)
+void MythListButton::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
+                              int alphaMod)
 {
-    Draw(p, xoffset, yoffset, true, alphaMod);
+    DrawSelf(p, xoffset, yoffset, true, alphaMod);
 }
 
-void MythListButton::Draw(MythPainter *p, int xoffset, int yoffset, 
-                          bool active_on, int alphaMod)
+void MythListButton::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
+                              bool active_on, int alphaMod)
 {
-    if (!m_visible)
-        return;
-
     if (!m_initialized)
         Init();
 
@@ -607,8 +573,8 @@ void MythListButton::Draw(MythPainter *p, int xoffset, int yoffset,
     if (!active_on)
         font = m_fontInactive;
     
-    int x = m_rect.x() + xoffset + m_drawoffset.x();
-    int y = m_rect.y() + yoffset + m_drawoffset.y();
+    int x = m_Area.x() + xoffset;
+    int y = m_Area.y() + yoffset;
     int basey = y;
 
     if (m_drawFromBottom)
@@ -637,27 +603,6 @@ void MythListButton::Draw(MythPainter *p, int xoffset, int yoffset,
 
         ++it;
     }
-
-    y = m_rect.y() + yoffset + m_drawoffset.y();
-
-    if (m_showScrollArrows) 
-    {
-        if (m_showUpArrow)
-            p->DrawImage(x + m_arrowsRect.x(), y + m_arrowsRect.y(),
-                         m_upArrowActPix, alpha);
-        else
-            p->DrawImage(x + m_arrowsRect.x(), y + m_arrowsRect.y(),
-                         m_upArrowRegPix, alpha);
-
-        if (m_showDnArrow)
-            p->DrawImage(x + m_arrowsRect.x() + m_upArrowRegPix->width() + 
-                         m_itemMargin, y + m_arrowsRect.y(),
-                         m_dnArrowActPix, alpha);
-        else
-            p->DrawImage(x + m_arrowsRect.x() + m_upArrowRegPix->width() + 
-                         m_itemMargin, y + m_arrowsRect.y(),
-                         m_dnArrowRegPix, alpha);
-    }
 }
 
 void MythListButton::Init()
@@ -675,21 +620,41 @@ void MythListButton::Init()
     QSize sz2 = fm.size(Qt::SingleLine, "XXXXX");
     m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMargin);
 
+    QRect arrowsRect;
     if (m_showScrollArrows) 
     {
-        LoadPixmap(&m_upArrowRegPix, "uparrow-reg");
-        LoadPixmap(&m_upArrowActPix, "uparrow-sel");
-        LoadPixmap(&m_dnArrowRegPix, "dnarrow-reg");
-        LoadPixmap(&m_dnArrowActPix, "dnarrow-sel");
+        m_upArrow = new MythUIStateImage(this, "upscrollarrow");
+        m_downArrow = new MythUIStateImage(this, "upscrollarrow");
 
-        m_arrowsRect = QRect(0, m_rect.height() - m_upArrowActPix->height() - 1,
-                             m_rect.width(), m_upArrowActPix->height());
+        MythImage *upReg, *upAct, *downReg, *downAct;
+        LoadPixmap(&upReg, "uparrow-reg");
+        LoadPixmap(&upAct, "uparrow-sel");
+        LoadPixmap(&downReg, "dnarrow-reg");
+        LoadPixmap(&downAct, "dnarrow-sel");
+
+        m_upArrow->AddImage(MythUIStateImage::Off, upReg);
+        m_upArrow->AddImage(MythUIStateImage::Full, upAct);
+        m_downArrow->AddImage(MythUIStateImage::Off, downReg);
+        m_downArrow->AddImage(MythUIStateImage::Full, downAct);
+
+        m_upArrow->SetPosition(QPoint(0, 
+                                      m_Area.height() - upAct->height() - 1));
+        m_downArrow->SetPosition(QPoint(upAct->width() + m_itemMargin,
+                                        m_Area.height() - upAct->height() - 1));
+
+        arrowsRect = QRect(0, m_Area.height() - upAct->height() - 1,
+                           m_Area.width(), upAct->height());
+
+        upAct->DownRef();
+        upReg->DownRef();
+        downReg->DownRef();
+        downAct->DownRef();
     }
     else 
-        m_arrowsRect = QRect(0, 0, 0, 0);
+        arrowsRect = QRect(0, 0, 0, 0);
         
-    m_contentsRect = QRect(0, 0, m_rect.width(), m_rect.height() -
-                           m_arrowsRect.height() - 2 * m_itemMargin);
+    m_contentsRect = QRect(0, 0, m_Area.width(), m_Area.height() -
+                           arrowsRect.height() - 2 * m_itemMargin);
 
     m_itemsVisible = 0;
     int y = 0;
@@ -706,7 +671,7 @@ void MythListButton::Init()
     
     LoadPixmap(&m_arrowPix, "arrow");
 
-    QImage img(m_rect.width(), m_itemHeight, 32);
+    QImage img(m_Area.width(), m_itemHeight, 32);
     img.setAlphaBuffer(true);
 
     for (int y = 0; y < img.height(); y++)
@@ -824,23 +789,14 @@ void MythListButton::Init()
 
     qApp->unlock();
 
-    if (m_itemList.count() > m_itemsVisible && m_showScrollArrows)
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
+    SetPositionArrowStates();
 }
 
 void MythListButton::LoadPixmap(MythImage **pix, const QString& fileName)
 {
     QString file = "lb-" + fileName + ".png";
-
-    *pix = GetMythPainter()->GetFormatImage(); 
     QImage *p = gContext->LoadScaleImage(file);
-    if (p) 
-    {
-        (*pix)->Assign(*p);
-        delete p;
-    }
+    *pix = MythImage::FromQImage(&p);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -875,7 +831,7 @@ void MythListButtonItem::CalcDimensions(void)
         m_parent->Init();
 
     int  margin    = m_parent->m_itemMargin;
-    int  width     = m_parent->m_rect.width();
+    int  width     = m_parent->m_Area.width();
     int  height    = m_parent->m_itemHeight;
     bool arrow = false;
 
@@ -1032,22 +988,7 @@ void MythListButtonItem::paint(MythPainter *p, MythFontProperties *font,
     }
     else
     {
-
         p->DrawImage(x, y, m_parent->m_itemRegPix, alpha);
-        /*
-        
-            Don't understand this
-                    - thor
-                    
-        if (m_parent->m_active && !m_overrideInactive)
-        {
-            p->drawPixmap(x, y, m_parent->m_itemRegPix);
-        }
-        else
-        {
-            p->drawPixmap(x, y, m_parent->m_itemRegPix);
-        }
-        */
     }
 
     if (m_checkable)

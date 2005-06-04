@@ -13,7 +13,9 @@ class MythImage : public QImage
 {
   public:
     MythImage(MythPainter *parent);
-    virtual ~MythImage();
+
+    void UpRef(void);
+    bool DownRef(void);
 
     virtual void SetChanged(bool change = true) { m_Changed = change; }
     bool IsChanged() { return m_Changed; }
@@ -27,8 +29,12 @@ class MythImage : public QImage
     bool Load(const QString &filename);
 
   protected:
+    virtual ~MythImage();
+
     bool m_Changed;
     MythPainter *m_Parent;
+
+    int m_RefCount;
 };
 
 #endif

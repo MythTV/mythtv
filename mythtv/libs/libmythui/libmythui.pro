@@ -15,14 +15,14 @@ VERSION = 0.18.0
 HEADERS  = mythmainwindow.h mythpainter.h mythimage.h
 HEADERS += mythpainter_ogl.h mythpainter_qt.h
 HEADERS += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
-HEADERS += mythuitext.h mythuianimatedimage.h mythlistbutton.h
-HEADERS += themedmenu.h dialogbox.h
+HEADERS += mythuitext.h mythuianimatedimage.h mythuistateimage.h
+HEADERS += mythlistbutton.h themedmenu.h dialogbox.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp
 SOURCES += mythpainter_ogl.cpp mythpainter_qt.cpp
 SOURCES += mythscreenstack.cpp mythscreentype.cpp 
 SOURCES += mythuitype.cpp mythuiimage.cpp mythuitext.cpp mythuianimatedimage.cpp
-SOURCES += mythlistbutton.cpp mythfontproperties.cpp
+SOURCES += mythuistateimage.cpp mythlistbutton.cpp mythfontproperties.cpp
 SOURCES += themedmenu.cpp dialogbox.cpp
 
 inc.path = $${PREFIX}/include/mythui/
