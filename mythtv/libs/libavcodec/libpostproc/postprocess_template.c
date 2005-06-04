@@ -2898,6 +2898,8 @@ asm volatile(
 
 		src+= step; // src points to begin of the 8x8 Block
 
+		dc_mask &= eq_mask;
+
 		asm volatile(
 		"movq %4, %%mm6					\n\t"
 		"pcmpeqb %%mm5, %%mm5				\n\t"
@@ -2930,7 +2932,7 @@ asm volatile(
 		" js 1b						\n\t"
 
 		: "+r"(offset), "+r"(temp_sums)
-		: "r" ((long)step), "r"(src - offset), "m"(dc_mask & eq_mask)
+		: "r" ((long)step), "r"(src - offset), "m"(dc_mask)
 		);
 	}else
 		src+= step; // src points to begin of the 8x8 Block
