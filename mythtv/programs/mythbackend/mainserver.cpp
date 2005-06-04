@@ -589,6 +589,20 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 {
     QStringList retlist = "OK";
 
+    vector<PlaybackSock *>::iterator iter = playbackList.begin();
+    for (; iter != playbackList.end(); iter++)
+    {
+        PlaybackSock *pbs = (*iter);
+        if (pbs->getSocket() == socket)
+        {
+            VERBOSE(VB_ALL, QString("Client %1 is trying to announce a socket "
+                                    "multiple times.")
+                                    .arg(commands[2]));
+            WriteStringList(socket, retlist);
+            return;
+        }
+    }
+
     if (commands[1] == "Playback")
     {
         bool wantevents = commands[3].toInt();
