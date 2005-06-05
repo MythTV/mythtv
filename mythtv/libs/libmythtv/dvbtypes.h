@@ -90,8 +90,12 @@ protected:
     QString coderate(fe_code_rate_t coderate) const;
 };
 
-typedef struct dvbchannel
+class dvb_channel_t
 {
+  public:
+    dvb_channel_t() : PMTSet(false), serviceID(0xffff), networkID(0xffff),
+        providerID(0xffff), transportID(0xffff), sistandard(""), version(255) {;}
+
     DVBTuning      tuning;
 
     PMTObject       pmt;
@@ -105,7 +109,7 @@ typedef struct dvbchannel
     QString         sistandard;
     uint8_t         version;
     pthread_mutex_t lock;
-} dvb_channel_t;
+};
 
 typedef struct dvbstats
 {
