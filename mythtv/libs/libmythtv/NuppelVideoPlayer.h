@@ -390,6 +390,7 @@ class NuppelVideoPlayer
     QMap<long long, int>::Iterator blankIter;
     QMap<long long, int> commBreakMap;
     QMap<long long, int>::Iterator commBreakIter;
+    QMutex commBreakMapLock;
     QString dialogname;
     int dialogtype;
     long long deleteframe;

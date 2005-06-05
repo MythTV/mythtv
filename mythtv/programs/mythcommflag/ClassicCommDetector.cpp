@@ -234,6 +234,8 @@ bool ClassicCommDetector::go()
         requiredHeadStart += commDetectLogoSecondsNeeded;
     }
 
+    emit(statusUpdate("Building Detection Buffer"));
+
     int a = 0;
     while (a < requiredHeadStart)
     {

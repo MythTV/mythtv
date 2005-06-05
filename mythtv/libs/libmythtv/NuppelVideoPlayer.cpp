@@ -1928,6 +1928,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             m_playbackinfo->SetBookmark(0);
     }
 
+    commBreakMapLock.lock();
     LoadCommBreakList();
     if (!commBreakMap.isEmpty())
     {
@@ -1936,6 +1937,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     }
 
     SetCommBreakIter();
+    commBreakMapLock.unlock();
 
     while (!eof && !killplayer && !errored)
     {
@@ -2821,6 +2823,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
         {
             if (hascommbreaktable)
             {
+                commBreakMapLock.lock();
                 QMap<long long, int>::Iterator it;
                 for (it = commBreakMap.begin(); it != commBreakMap.end(); ++it)
                 {
@@ -2832,6 +2835,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
                             AddMark(it.key(), 0);
                     }
                 }
+                commBreakMapLock.unlock();
                 UpdateEditSlider();
                 UpdateTimeDisplay();
             }
@@ -3380,9 +3384,12 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
             number = bookmarkseek;
     }
 
-    LoadCommBreakList();
-    LoadCutList();
     long long oldnumber = number;
+    LoadCutList();
+
+    commBreakMapLock.lock();
+    LoadCommBreakList();
+
     while ((FrameIsInMap(number, commBreakMap) || 
            (FrameIsInMap(number, deleteMap))))
     {
@@ -3393,6 +3400,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
             break;
         }
     }
+    commBreakMapLock.unlock();
 
     GetFrame(1, true);
 
@@ -3574,10 +3582,12 @@ void NuppelVideoPlayer::SetCommBreakMap(QMap<long long, int> &newMap)
             QString("Setting New Commercial Break List, old size %1, new %2")
                     .arg(commBreakMap.size()).arg(newMap.size()));
 
+    commBreakMapLock.lock();
     commBreakMap.clear();
     commBreakMap = newMap;
     hascommbreaktable = !commBreakMap.isEmpty();
     SetCommBreakIter();
+    commBreakMapLock.unlock();
 }
 
 bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb, void* cbData)
@@ -3836,13 +3846,17 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
 
 void NuppelVideoPlayer::AutoCommercialSkip(void)
 {
+    commBreakMapLock.lock();
     if (hascommbreaktable)
     {
         if (commBreakIter.data() == MARK_COMM_END)
             commBreakIter++;
 
         if (commBreakIter == commBreakMap.end())
+        {
+            commBreakMapLock.unlock();
             return;
+        }
 
         if ((commBreakIter.data() == MARK_COMM_START) &&
             (((autocommercialskip == 1) &&
@@ -3854,11 +3868,12 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                commBreakIter.key()))))
         {
             ++commBreakIter;
-            if (commBreakIter == commBreakMap.end())
+            if ((commBreakIter == commBreakMap.end()) ||
+                (commBreakIter.data() == MARK_COMM_START))
+            {
+                commBreakMapLock.unlock();
                 return;
-
-            if (commBreakIter.data() == MARK_COMM_START)
-                return;
+            }
 
             if (commBreakIter.key() == totalFrames)
             {
@@ -3907,6 +3922,8 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
             }
         }
     }
+
+    commBreakMapLock.unlock();
 }
 
 bool NuppelVideoPlayer::DoSkipCommercials(int direction)
@@ -3948,6 +3965,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
     lastCommSkipStart = framesPlayed;
     lastCommSkipTime = time(NULL);
 
+    commBreakMapLock.lock();
     SetCommBreakIter();
 
     if ((commBreakIter == commBreakMap.begin()) &&
@@ -3960,6 +3978,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             osd->StartPause(spos, false, comm_msg, desc, 2);
 
         JumpToFrame(0);
+        commBreakMapLock.unlock();
         return true;
     }
 
@@ -3973,6 +3992,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         int spos = calcSliderPos(desc);
         if (osd)
             osd->StartPause(spos, false, comm_msg, desc, 2);
+        commBreakMapLock.unlock();
         return false;
     }
 
@@ -3996,6 +4016,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
                     osd->StartPause(spos, false, comm_msg, desc, 2);
 
                 JumpToFrame(0);
+                commBreakMapLock.unlock();
                 return true;
             }
             else
@@ -4020,6 +4041,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
                 int spos = calcSliderPos(desc);
                 if (osd)
                     osd->StartPause(spos, false, comm_msg, desc, 2);
+                commBreakMapLock.unlock();
                 return false;
             }
         }
@@ -4043,7 +4065,9 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
                     (int)(commrewindamount * video_frame_rate));
     else
         JumpToFrame(commBreakIter.key());
+
     commBreakIter++;
+    commBreakMapLock.unlock();
 
     return true;
 }

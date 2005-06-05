@@ -344,7 +344,7 @@ void JobQueue::ProcessQueue(void)
                         //  are not currently queued and also not associated 
                         //  with a hostname so we must claim this job before we
                         //  can cancel it
-                        if (!ClaimJob(id))
+                        if (!ChangeJobHost(id, m_hostname))
                         {
                             message = QString("JobQueue: ERROR claiming '%1' job "
                                               "for chanid %2 @ %3.")
@@ -429,7 +429,7 @@ void JobQueue::ProcessQueue(void)
 
                 if ((inTimeWindow) &&
                     (hostname == "") &&
-                    (!ClaimJob(id)))
+                    (!ChangeJobHost(id, m_hostname)))
                 {
                     message = QString("JobQueue: ERROR claiming '%1' job "
                                       "for chanid %2 @ %3.")
@@ -1089,20 +1089,32 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
     return jobCount;
 }
 
-bool JobQueue::ClaimJob(int jobID)
+bool JobQueue::ChangeJobHost(int jobID, QString newHostname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("UPDATE jobqueue SET hostname = :HOSTNAME "
-                  "WHERE hostname = :EMPTY AND id = :ID;");
-    query.bindValue(":HOSTNAME", m_hostname);
-    query.bindValue(":EMPTY", "");
-    query.bindValue(":ID", jobID);
+    if (newHostname != "")
+    {
+        query.prepare("UPDATE jobqueue SET hostname = :NEWHOSTNAME "
+                      "WHERE hostname = :EMPTY AND id = :ID;");
+        query.bindValue(":NEWHOSTNAME", newHostname);
+        query.bindValue(":EMPTY", "");
+        query.bindValue(":ID", jobID);
+    }
+    else
+    {
+        query.prepare("UPDATE jobqueue SET hostname = :EMPTY "
+                      "WHERE id = :ID;");
+        query.bindValue(":EMPTY", "");
+        query.bindValue(":ID", jobID);
+    }
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::ClaimJob(), Unable to "
-                             "set hostname.", query);
+        MythContext::DBError(QString("Error in JobQueue::ChangeJobHost(), "
+                                     "Unable to set hostname to '%1' for "
+                                     "job %2.").arg(newHostname).arg(jobID),
+                             query);
         return false;
     }
 
@@ -1278,6 +1290,8 @@ void JobQueue::RecoverQueue(bool justOld)
                         
                 ChangeJobStatus(it.data().id, JOB_QUEUED, "");
                 ChangeJobCmds(it.data().id, JOB_RUN);
+                if (!gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+                    ChangeJobHost(it.data().id, "");
             }
             else
             {
@@ -1297,8 +1311,8 @@ void JobQueue::RecoverQueue(bool justOld)
 void JobQueue::CleanupOldJobsInQueue()
 {
     MSqlQuery delquery(MSqlQuery::InitCon());
-    QDateTime donePurgeDate = QDateTime::currentDateTime().addDays(-3);
-    QDateTime errorsPurgeDate = QDateTime::currentDateTime().addDays(-7);
+    QDateTime donePurgeDate = QDateTime::currentDateTime().addDays(-7);
+    QDateTime errorsPurgeDate = QDateTime::currentDateTime().addDays(-14);
 
     delquery.prepare("DELETE FROM jobqueue "
                      "WHERE (status in (:FINISHED, :ABORTED, :CANCELLED) "

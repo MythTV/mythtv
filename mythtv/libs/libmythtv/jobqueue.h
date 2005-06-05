@@ -119,6 +119,7 @@ class JobQueue : public QObject
     static bool ChangeJobFlags(int jobID, int newFlags);
     static bool ChangeJobStatus(int jobID, int newStatus,
                                 QString comment = "");
+    static bool ChangeJobHost(int jobID, QString newHostname);
     static bool ChangeJobComment(int jobID,
                                  QString comment = "");
     static bool IsJobQueuedOrRunning(int jobType, QString chanid,
@@ -158,7 +159,6 @@ class JobQueue : public QObject
     void ProcessJob(int id, int jobType, QString chanid, QDateTime starttime);
 
     bool AllowedToRun(JobQueueEntry job);
-    bool ClaimJob(int jobID);
 
     void StartChildJob(void *(*start_routine)(void *), ProgramInfo *tmpInfo);
 

@@ -83,7 +83,41 @@ void BuildVideoMarkup(QString& filename)
     delete program_info;
 }
 
-void CopySkipListToCutList(QString chanid, QString starttime)
+int QueueCommFlagJob(QString chanid, QString starttime)
+{
+    ProgramInfo *pginfo =
+        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+
+    if (!pginfo)
+    {
+        if (!quiet)
+            cerr << "Unable to find program info for chanid " << chanid
+                 << " @ " << starttime << endl;
+        return COMMFLAG_EXIT_NO_PROGRAM_DATA;
+    }
+
+    bool result = JobQueue::QueueJob(JOB_COMMFLAG, pginfo->chanid,
+                                     pginfo->recstartts);
+
+    if (result)
+    {
+        if (!quiet)
+            cerr << "Job Queued for chanid " << chanid << " @ "
+                 << starttime << endl;
+        return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+    }
+    else
+    {
+        if (!quiet)
+            cerr << "Error queueing job for chanid " << chanid
+                 << " @ " << starttime << endl;
+        return COMMFLAG_EXIT_DB_ERROR;
+    }
+
+    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+}
+
+int CopySkipListToCutList(QString chanid, QString starttime)
 {
     QMap<long long, int> cutlist;
     QMap<long long, int>::Iterator it;
@@ -96,7 +130,7 @@ void CopySkipListToCutList(QString chanid, QString starttime)
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
                 .arg(chanid.ascii()).arg(starttime.ascii()));
-        exit(COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA);
+        return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
     }
 
     pginfo->GetCommBreakList(cutlist);
@@ -106,6 +140,8 @@ void CopySkipListToCutList(QString chanid, QString starttime)
         else
             cutlist[it.key()] = MARK_CUT_END;
     pginfo->SetCutList(cutlist);
+
+    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
 void streamOutCommercialBreakList(ostream& output,
@@ -461,6 +497,7 @@ int main(int argc, char *argv[])
     time_t time_now;
     bool allRecorded = false;
     QString verboseString = QString("");
+    bool queueJobInstead = false;
 
     QFileInfo finfo(a.argv()[0]);
 
@@ -568,6 +605,10 @@ int main(int argc, char *argv[])
         {
             quiet = true;
             showPercentage = false;
+        }
+        else if (!strcmp(a.argv()[argpos], "--queue"))
+        {
+            queueJobInstead = true;
         }
         else if (!strcmp(a.argv()[argpos], "--sleep"))
         {
@@ -735,6 +776,8 @@ int main(int argc, char *argv[])
                     "                             Accepts any combination (separated by comma)\n" 
                     "                             of all,none,quiet,record,playback,\n"
                     "                             channel,osd,file,schedule,network,commflag\n"
+                    "--queue                      Insert flagging job into the JobQueue rather than\n"
+                    "                             running flagging in the foreground\n"
                     "--quiet                      Turn OFF display (also causes the program to\n"
                     "                             sleep a little every frame so it doesn't hog CPU)\n"
                     "                             takes precedence over --blanks if given first)\n"
@@ -783,11 +826,11 @@ int main(int argc, char *argv[])
         return COMMFLAG_EXIT_INVALID_CMDLINE;
     }
 
+    if (queueJobInstead)
+        return QueueCommFlagJob(chanid, starttime);
+
     if (copyToCutlist)
-    {
-        CopySkipListToCutList(chanid, starttime);
-        return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
-    }
+        return CopySkipListToCutList(chanid, starttime);
 
     if (inJobQueue)
     {
