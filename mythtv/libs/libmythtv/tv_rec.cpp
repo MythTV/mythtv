@@ -1,5 +1,4 @@
-#include <qapplication.h>
-
+// C headers
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -8,9 +7,14 @@
 #include <qsqldatabase.h>
 #include <qsocket.h>
 
+// C++ headers
 #include <iostream>
 using namespace std;
 
+// Qt headers
+#include <qapplication.h>
+
+// MythTV headers
 #include "mythconfig.h"
 #include "tv_rec.h"
 #include "osd.h"
@@ -43,49 +47,73 @@ using namespace std;
 #include "firewirechannel.h"
 #endif
 
-void *SpawnEncode(void *param)
-{
-    RecorderBase *nvr = (RecorderBase *)param;
-    nvr->StartRecording();
-    return NULL;
-}
+/** \class TVRec
+ *  \brief This is the coordinating class of the \ref recorder_subsystem.
+ *
+ *  TVRec is used by EncoderLink, which in turn is used by RemoteEncoder
+ *  which allows the TV class on the frontend to communicate with TVRec
+ *  and is used by MainServer to implement portions of the 
+ *  \ref myth_network_protocol on the backend.
+ *
+ *  TVRec contains an instance of RecorderBase, which actually handles the
+ *  recording of a program. It also contains an instance of RingBuffer, which
+ *  in this case is used to either stream an existing recording to the 
+ *  frontend, or to save a stream from the RecorderBase to disk. Finally,
+ *  if there is a tuner on the hardware RecorderBase is implementing then
+ *  TVRec contains a channel instance for that hardware, and possibly a
+ *  SignalMonitor instance which monitors the signal quality on a tuners
+ *  current input.
+ */
 
+/** \fn TVRec::TVRec(int)
+ *  \brief Performs instance initialiation not requiring access to database.
+ *
+ *  \sa Init()
+ *  \param capturecardnum Capture card number
+ */
+TVRec::TVRec(int capturecardnum)
+       // Various components TVRec coordinates
+    : rbuffer(NULL), recorder(NULL), channel(NULL),
 #ifdef USING_DVB
-void *SpawnScanner(void *param)
-{
-    SIScan *scanner = (SIScan *)param;
-    scanner->StartScanner();
-    return NULL;
-}
+      scanner(NULL),
 #endif
-
-TVRec::TVRec(int capturecardnum) 
+      // Configuration variables from database
+      transcodeFirst(false), earlyCommFlag(false), runJobOnHostOnly(false),
+      audioSampleRateDB(0), overrecordseconds(0),
+      liveTVRingBufSize(0), liveTVRingBufFill(0), liveTVRingBufLoc(""),
+      recprefix(""),
+      // Configuration variables from setup rutines
+      m_capturecardnum(capturecardnum), ispip(false),
+      // State variables
+      internalState(kState_None), nextState(kState_None), changeState(false),
+      frontendReady(false), runMainLoop(false), exitPlayer(false),
+      finishRecording(false), paused(false), prematurelystopped(false),
+      inoverrecord(false), errored(false),
+      frameRate(-1.0f), 
+      // Current recording info
+      curRecording(NULL), profileName(""),
+      askAllowRecording(false), autoTranscode(false),
+      // Pending recording info
+      pendingRecording(NULL), recordPending(false), cancelNextRecording(false),
+      // RingBuffer info
+      outputFilename(""), readthreadSock(NULL),
+      readthreadLock(false), readthreadlive(false),
+      // Current recorder info
+      videodev(""), vbidev(""), audiodev(""), cardtype(""),
+      audiosamplerate(-1), skip_btaudio(false)
 {
-    channel = NULL;
-    rbuffer = NULL;
-
+    event           = PTHREAD_CREATE_JOINABLE;
+    encode          = static_cast<pthread_t>(0);
 #ifdef USING_DVB
-    scanner = NULL;
+    scanner_thread  = PTHREAD_CREATE_JOINABLE;
 #endif
-
-    encode = static_cast<pthread_t>(0);
-    nvr = NULL;
-    readthreadSock = NULL;
-    readthreadlive = false;
-    m_capturecardnum = capturecardnum;
-    ispip = false;
-    curRecording = NULL;
-    pendingRecording = NULL;
-    profileName = "";
-    autoTranscode = false;
-
-    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
-
-    audiosamplerate = -1;
-    skip_btaudio = false;
-    errored = false;
 }
 
+/** \fn TVRec::Init()
+ *  \brief Performs instance initialization, returns true on success.
+ *
+ *  \return Returns true on success, false on failure.
+ */
 bool TVRec::Init(void)
 {
     QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
@@ -103,7 +131,7 @@ bool TVRec::Init(void)
         channel->Open();
 
         scanner = new SIScan((DVBChannel *)channel, 1);
-        pthread_create(&scanner_thread, NULL, SpawnScanner, scanner);
+        pthread_create(&scanner_thread, NULL, ScannerThread, scanner);
 
         if (inputname.isEmpty())
             channel->SetChannelByString(startchannel);
@@ -146,7 +174,7 @@ bool TVRec::Init(void)
     }
     else if ((cardtype == "MPEG") && (videodev.lower().left(5) == "file:"))
     {
-        channel = NULL;
+        // No need to initialize channel..
     }
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
     {
@@ -163,34 +191,29 @@ bool TVRec::Init(void)
         channel->Close();
     }
 
-    inoverrecord = false;
+    transcodeFirst    =
+        gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
+    earlyCommFlag     = gContext->GetNumSetting("AutoCommflagWhileRecording", 0);
+    runJobOnHostOnly  = gContext->GetNumSetting("JobsRunOnRecordHost", 0);
+    audioSampleRateDB = gContext->GetNumSetting("AudioSampleRate");
     overrecordseconds = gContext->GetNumSetting("RecordOverTime");
-
-    nvr = NULL;
-    rbuffer = NULL;
-
-    internalState = nextState = kState_None; 
-
-    runMainLoop = false;
-    changeState = false;
-
-    askAllowRecording = false;
-    recordPending = false;
-    frontendReady = false;
-    cancelNextRecording = false;
+    liveTVRingBufSize = gContext->GetNumSetting("BufferSize", 5);
+    liveTVRingBufFill = gContext->GetNumSetting("MaxBufferFill", 50);
+    liveTVRingBufLoc  = gContext->GetSetting("LiveBufferDir");
+    recprefix         = gContext->GetSetting("RecordFilePrefix");
 
     pthread_create(&event, NULL, EventThread, this);
 
     while (!runMainLoop)
         usleep(50);
 
-    curRecording = NULL;
-    prevRecording = NULL;
-    pendingRecording = NULL;
-
     return true;
 }
 
+/** \fn TVRec::~TVRec()
+ *  \brief Stops the event and scanning threads and deletes any ChannelBase,
+ *         RingBuffer, and RecorderBase instances.
+ */
 TVRec::~TVRec(void)
 {
     runMainLoop = false;
@@ -209,10 +232,16 @@ TVRec::~TVRec(void)
         delete channel;
     if (rbuffer)
         delete rbuffer;
-    if (nvr)
-        delete nvr;
+    if (recorder)
+        delete recorder;
 }
 
+/** \fn TVRec::GetState()
+ *  \brief Returns the TVState of the recorder.
+ *
+ *   If there is a pending state change kState_ChangingState is returned.
+ *  \sa EncoderLink::GetState(), \ref recorder_subsystem
+ */
 TVState TVRec::GetState(void)
 {
     if (changeState)
@@ -220,6 +249,13 @@ TVState TVRec::GetState(void)
     return internalState;
 }
 
+/** \fn TVRec::GetRecording(void)
+ *  \brief Allocates and returns a ProgramInfo for the current recording.
+ *
+ *  Note: The user of this function must free the %ProgramInfo this returns.
+ *  \return %ProgramInfo for the current recording, if it exists, blank
+ *          %ProgramInfo otherwise.
+ */
 ProgramInfo *TVRec::GetRecording(void)
 {
     ProgramInfo *tmppginfo = NULL;
@@ -232,7 +268,19 @@ ProgramInfo *TVRec::GetRecording(void)
     return tmppginfo;
 }
 
-void TVRec::RecordPending(ProgramInfo *rcinfo, int secsleft)
+/** \fn TVRec::RecordPending(const ProgramInfo*, int)
+ *  \brief Tells TVRec "rcinfo" is the next pending recording.
+ *
+ *   When there is a pending recording and the frontend is in "Live TV"
+ *   mode the TVRec event loop will send a "ASK_RECORDING" message to
+ *   it. Depending on what that query returns, the recording will be
+ *   started or not started.
+ *
+ *  \sa TV::AskAllowRecording(const QStringList&, int)
+ *  \param rcinfo   ProgramInfo on pending program.
+ *  \param secsleft Seconds left until pending recording begins.
+ */
+void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft)
 {
     if (pendingRecording)
         delete pendingRecording;
@@ -243,15 +291,21 @@ void TVRec::RecordPending(ProgramInfo *rcinfo, int secsleft)
     askAllowRecording = true;
 }
 
-int TVRec::StartRecording(ProgramInfo *rcinfo)
+/** \fn TVRec::StartRecording(const ProgramInfo*)
+ *  \brief Tells TVRec to Start recording the program "rcinfo"
+ *         as soon as possible.
+ *
+ *  \return +1 if the recording started successfully,
+ *          -1 if TVRec is busy doing something else, 0 otherwise.
+ *  \sa EncoderLink::StartRecording(const ProgramInfo*)
+ *      RecordPending(const ProgramInfo*, int), StopRecording()
+ */
+int TVRec::StartRecording(const ProgramInfo *rcinfo)
 {
-    int retval = 0; //  0 = recording canceled, 1 = recording started
-                    // -1 = other state/already recording
+    int retval = 0;
 
     recordPending = false;
     askAllowRecording = false;
-
-    QString recprefix = gContext->GetSetting("RecordFilePrefix");
 
     if (inoverrecord)
     {
@@ -304,8 +358,6 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
 
     if (internalState == kState_None)
     {
-        overrecordseconds = gContext->GetNumSetting("RecordOverTime");
-
         outputFilename = rcinfo->GetRecordFilename(recprefix);
         recordEndTime = rcinfo->recendts;
         curRecording = new ProgramInfo(*rcinfo);
@@ -316,17 +368,18 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
     }
     else if (!cancelNextRecording)
     {
-        cerr << QDateTime::currentDateTime().toString() 
-             << ":  wanted to record: " << endl;
-        cerr << rcinfo->title << " " << rcinfo->chanid << " " 
-             << rcinfo->startts.toString() << endl;
-        cerr << "But current state is: " << internalState << endl;
+        VERBOSE(VB_IMPORTANT, QString("Wanted to record: \n%1 %2 %3")
+                .arg(rcinfo->title).arg(rcinfo->chanid)
+                .arg(rcinfo->startts.toString()));
+        VERBOSE(VB_IMPORTANT, QString("But the current state is: %1")
+                .arg(StateToString(internalState)));
         if (curRecording)
         {
-            cerr << "currently: " << curRecording->title << " " 
-                 << curRecording->chanid << " " 
-                 << curRecording->startts.toString() << " " 
-                 << curRecording->endts.toString() << endl;
+            VERBOSE(VB_IMPORTANT,
+                    QString("currently recording: %1 %2 %3 %4")
+                    .arg(curRecording->title).arg(curRecording->chanid)
+                    .arg(curRecording->startts.toString())
+                    .arg(curRecording->endts.toString()));
         }
 
         retval = -1;
@@ -338,6 +391,10 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
     return retval;
 }
 
+/** \fn TVRec::StopRecording()
+ *  \brief Changes from kState_RecordingOnly to kState_None.
+ *  \sa StartRecording(const ProgramInfo *rec), FinishRecording()
+ */
 void TVRec::StopRecording(void)
 {
     if (StateIsRecording(internalState))
@@ -351,43 +408,44 @@ void TVRec::StopRecording(void)
     }
 }
 
-void TVRec::StateToString(TVState state, QString &statestr)
-{
-    switch (state) {
-        case kState_None: statestr = "None"; break;
-        case kState_WatchingLiveTV: statestr = "WatchingLiveTV"; break;
-        case kState_WatchingPreRecorded: statestr = "WatchingPreRecorded";
-                                         break;
-        case kState_RecordingOnly: statestr = "RecordingOnly"; break;
-        default: statestr = "Unknown"; break;
-    }
-}
-
+/** \fn TVRec::StateIsRecording(TVState)
+ *  \brief Returns "state == kState_RecordingOnly"
+ *  \param state TVState to check.
+ */
 bool TVRec::StateIsRecording(TVState state)
 {
     return (state == kState_RecordingOnly);
 }
 
+/** \fn TVRec::StateIsPlaying(TVState)
+ *  \brief Returns "state == kState_RecordingPreRecorded"
+ *  \param state TVState to check.
+ */
 bool TVRec::StateIsPlaying(TVState state)
 {
     return (state == kState_WatchingPreRecorded);
 }
 
+/** \fn TVRec::RemovePlaying(TVState)
+ *  \brief If "state" is kState_RecordingOnly, returns a kState_None,
+ *         otherwise returns kState_Error.
+ *  \param state TVState to check.
+ */
 TVState TVRec::RemoveRecording(TVState state)
 {
     if (StateIsRecording(state))
-    {
-        if (state == kState_RecordingOnly)
-            return kState_None;
-        else
-        {
-            cerr << "Unknown state in RemoveRecording: " << state << endl;
-            return kState_Error;
-        }
-    }
+        return kState_None;
+
+    VERBOSE(VB_IMPORTANT, QString("Unknown state in RemoveRecording: %1")
+            .arg(StateToString(state)));
     return kState_Error;
 }
 
+/** \fn TVRec::RemovePlaying(TVState)
+ *  \brief If "state" is kState_WatchingPreRecorded, returns a kState_None,
+ *         otherwise returns kState_Error.
+ *  \param state TVState to check.
+ */
 TVState TVRec::RemovePlaying(TVState state)
 {
     if (StateIsPlaying(state))
@@ -396,9 +454,16 @@ TVState TVRec::RemovePlaying(TVState state)
             return kState_None;
         return kState_RecordingOnly;
     }
+    VERBOSE(VB_IMPORTANT, QString("Unknown state in RemovePlaying: %1")
+            .arg(StateToString(state)));
     return kState_Error;
 }
 
+/** \fn TVRec::StartedRecording()
+ *  \brief Inserts a "curRecording" into the database, and issues a
+ *         "RECORDING_LIST_CHANGE" event.
+ *  \sa ProgramInfo::StartedRecording()
+ */
 void TVRec::StartedRecording(void)
 {
     if (!curRecording)
@@ -413,6 +478,13 @@ void TVRec::StartedRecording(void)
     gContext->dispatch(me);
 }
 
+/** \fn TVRec::FinishedRecording()
+ *  \brief If not a premature stop, adds program to history of recorded 
+ *         programs. If the recording type is kFindOneRecord this find
+ *         is removed.
+ *  \sa ProgramInfo::FinishedRecording(bool prematurestop)
+ *  \param prematurestop If true, we only fetch the recording status.
+ */
 void TVRec::FinishedRecording(void)
 {
     if (!curRecording)
@@ -421,6 +493,13 @@ void TVRec::FinishedRecording(void)
     curRecording->FinishedRecording(prematurelystopped);
 }
 
+/** \fn TVRec::HandleStateChange()
+ *  \brief Changes the internalState to the nextState if possible.
+ *
+ *   Note: There must exist a state transition from any state we can enter
+ *   to  the kState_None state, as this is used to shutdown TV in RunTV.
+ *
+ */
 void TVRec::HandleStateChange(void)
 {
     TVState tmpInternalState = internalState;
@@ -434,10 +513,8 @@ void TVRec::HandleStateChange(void)
     bool closeRecorder = false;
     bool killRecordingFile = false;
 
-    QString statename;
-    StateToString(nextState, statename);
-    QString origname;
-    StateToString(tmpInternalState, origname);
+    QString statename = StateToString(nextState);
+    QString origname = StateToString(tmpInternalState);
 
     if (nextState == kState_Error)
     {
@@ -524,8 +601,8 @@ void TVRec::HandleStateChange(void)
 
         if (curRecording)
         {
-            profileName = curRecording->GetScheduledRecording(
-                                                  )->getProfileName();
+            profileName = curRecording->
+                GetScheduledRecording()->getProfileName();
             bool foundProf = false;
             if (profileName != NULL)
                 foundProf = profile.loadByCard(profileName,
@@ -560,10 +637,10 @@ void TVRec::HandleStateChange(void)
 
         if (!error)
         {
-            nvr->SetRecording(curRecording);
+            recorder->SetRecording(curRecording);
             if (channel != NULL)
             {
-                nvr->ChannelNameChanged(channel->GetCurrentName());
+                recorder->ChannelNameChanged(channel->GetCurrentName());
 
                 SetVideoFiltersForChannel(channel, channel->GetCurrentName());
                 if (channel->Open())
@@ -575,20 +652,20 @@ void TVRec::HandleStateChange(void)
                     channel->Close();
                 }
             }
-            pthread_create(&encode, NULL, SpawnEncode, nvr);
+            pthread_create(&encode, NULL, RecorderThread, recorder);
 
-            while (!nvr->IsRecording() && !nvr->IsErrored())
+            while (!recorder->IsRecording() && !recorder->IsErrored())
                 usleep(50);
         } 
         else
             VERBOSE(VB_IMPORTANT, "Tuning Error -- aborting recording");
 
-        if (!error && nvr->IsRecording())
+        if (!error && recorder->IsRecording())
         {
             // evil.
             if (channel)
-                channel->SetFd(nvr->GetVideoFd());
-            frameRate = nvr->GetFrameRate();
+                channel->SetFd(recorder->GetVideoFd());
+            frameRate = recorder->GetFrameRate();
 
             int transcodeFirst =
                   gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
@@ -596,7 +673,7 @@ void TVRec::HandleStateChange(void)
             if ((tmpInternalState != kState_WatchingLiveTV) &&
                 (!curRecording->chancommfree) &&
                 (curRecording->GetAutoRunJobs() & JOB_COMMFLAG) &&
-                (gContext->GetNumSetting("AutoCommflagWhileRecording", 0)) &&
+                (earlyCommFlag) &&
                 ((autoTranscode && !transcodeFirst) || (!autoTranscode)))
             {
 
@@ -612,7 +689,7 @@ void TVRec::HandleStateChange(void)
         }
         else
         {
-            if (error || nvr->IsErrored()) {
+            if (error || recorder->IsErrored()) {
                 VERBOSE(VB_IMPORTANT, "TVRec: Recording Prematurely Stopped");
 
                 QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
@@ -639,23 +716,42 @@ void TVRec::HandleStateChange(void)
     changeState = false;
 }
 
+/** \fn TVRec::SetOption(RecordingProfile&, const QString&)
+ *  \brief Calls RecorderBase::SetOption(const QString&,int) with the "name"d
+ *         option from the recording profile.
+ *  \sa RecordingProfile, RecorderBase
+ *  \param "name" Profile/RecorderBase option to get/set.
+ */
 void TVRec::SetOption(RecordingProfile &profile, const QString &name)
 {
     int value = profile.byName(name)->getValue().toInt();
-    nvr->SetOption(name, value);
+    recorder->SetOption(name, value);
 }
 
-void TVRec::SetupRecorder(RecordingProfile &profile) 
+/** \fn TVRec::SetupRecorder(RecordingProfile&)
+ *  \brief Allocates and initializes the RecorderBase instance.
+ *
+ *  Based on the card type, one of the possible recorders are started.
+ *  If the card type is "MPEG" a MpegRecorder is started,
+ *  if the card type is "HDTV" a HDTVRecorder is started,
+ *  if the card type is "FIREWIRE" a FirewireRecorder is started,
+ *  if the card type is "DVB" a DVBRecorder is started,
+ *  otherwise a NuppelVideoRecorder is started.
+ *
+ *  If there is any error, "errored" will be set.
+ * \sa IsErrored()
+ */
+void TVRec::SetupRecorder(RecordingProfile &profile)
 {
     if (cardtype == "MPEG")
     {
 #ifdef USING_IVTV
-        nvr = new MpegRecorder();
-        nvr->SetRingBuffer(rbuffer);
+        recorder = new MpegRecorder();
+        recorder->SetRingBuffer(rbuffer);
 
-        nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
+        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
-        nvr->Initialize();
+        recorder->Initialize();
 #else
         VERBOSE(VB_IMPORTANT, "MPEG Recorder requested, but MythTV was "
                 "compiled without ivtv driver support.");
@@ -664,25 +760,25 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     else if (cardtype == "HDTV")
     {
         rbuffer->SetWriteBufferSize(4*1024*1024);
-        nvr = new HDTVRecorder();
-        nvr->SetRingBuffer(rbuffer);
+        recorder = new HDTVRecorder();
+        recorder->SetRingBuffer(rbuffer);
 
-        nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
+        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
-        nvr->Initialize();
+        recorder->Initialize();
     }
     else if (cardtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
-        nvr = new FirewireRecorder();
-        nvr->SetRingBuffer(rbuffer);
-        nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
-        nvr->SetOption("port", firewire_options.port);
-        nvr->SetOption("node", firewire_options.node);
-        nvr->SetOption("speed", firewire_options.speed);
-        nvr->SetOption("model", firewire_options.model);
-        nvr->SetOption("connection", firewire_options.connection);
-        nvr->Initialize();
+        recorder = new FirewireRecorder();
+        recorder->SetRingBuffer(rbuffer);
+        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
+        recorder->SetOption("port", firewire_options.port);
+        recorder->SetOption("node", firewire_options.node);
+        recorder->SetOption("speed", firewire_options.speed);
+        recorder->SetOption("model", firewire_options.model);
+        recorder->SetOption("connection", firewire_options.connection);
+        recorder->Initialize();
 #else
         VERBOSE(VB_IMPORTANT, "FireWire Recorder requested, but MythTV was "
                 "compiled without firewire support.");
@@ -691,22 +787,22 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     else if (cardtype == "DVB")
     {
 #ifdef USING_DVB
-        nvr = new DVBRecorder(dynamic_cast<DVBChannel*>(channel));
-        nvr->SetRingBuffer(rbuffer);
+        recorder = new DVBRecorder(dynamic_cast<DVBChannel*>(channel));
+        recorder->SetRingBuffer(rbuffer);
 
-        nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
+        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
-        nvr->SetOption("dvb_on_demand", dvb_options.dvb_on_demand);
-        nvr->SetOption("hw_decoder", dvb_options.hw_decoder);
-        nvr->SetOption("recordts", dvb_options.recordts);
-        nvr->SetOption("wait_for_seqstart", dvb_options.wait_for_seqstart);
-        nvr->SetOption("dmx_buf_size", dvb_options.dmx_buf_size);
-        nvr->SetOption("pkt_buf_size", dvb_options.pkt_buf_size);
-        nvr->SetOption("signal_monitor_interval", 
+        recorder->SetOption("dvb_on_demand", dvb_options.dvb_on_demand);
+        recorder->SetOption("hw_decoder", dvb_options.hw_decoder);
+        recorder->SetOption("recordts", dvb_options.recordts);
+        recorder->SetOption("wait_for_seqstart", dvb_options.wait_for_seqstart);
+        recorder->SetOption("dmx_buf_size", dvb_options.dmx_buf_size);
+        recorder->SetOption("pkt_buf_size", dvb_options.pkt_buf_size);
+        recorder->SetOption("signal_monitor_interval", 
                        gContext->GetNumSetting("DVBMonitorInterval", 0));
-        nvr->SetOption("expire_data_days",
+        recorder->SetOption("expire_data_days",
                        gContext->GetNumSetting("DVBMonitorRetention", 3));
-        nvr->Initialize();
+        recorder->Initialize();
 #else
         VERBOSE(VB_IMPORTANT, "DVB Recorder requested, but MythTV was "
                 "compiled without DVB support.");
@@ -716,51 +812,69 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     {
         // V4L/MJPEG/GO7007 from here on
 
-        nvr = new NuppelVideoRecorder(channel);
+        recorder = new NuppelVideoRecorder(channel);
 
-        nvr->SetRingBuffer(rbuffer);
+        recorder->SetRingBuffer(rbuffer);
 
-        nvr->SetOption("skipbtaudio", skip_btaudio);
-        nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
+        recorder->SetOption("skipbtaudio", skip_btaudio);
+        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
  
-        nvr->Initialize();
+        recorder->Initialize();
     }
 
-    if (nvr->IsErrored())
+    if (recorder->IsErrored())
         errored = true;
 }
 
+/** \fn TVRec::TeardownRecorder(bool)
+ *  \brief Tears down the recorder.
+ *  
+ *   If a "recorder" exists, RecorderBase::StopRecording() is called.
+ *   We then wait for "recorder_threa to exit, and finally we delete 
+ *   "recorder".
+ *
+ *   If a "rbuffer" exists, RingBuffer::StopReads() is called, and then
+ *   we delete "rbuffer".
+ *
+ *   If killfile is true, the recording is deleted.
+ *
+ *   A "RECORDING_LIST_CHANGE" message is dispatched.
+ *
+ *   Finally if there was a recording and it was not deleted
+ *   commercial flagging and user jobs are scheduled.
+ *
+ *  \param killFile if true the recorded file is deleted.
+ */
 void TVRec::TeardownRecorder(bool killFile)
 {
     QString oldProfileName = profileName;
 
     int filelen = -1;
 
+    ProgramInfo *prevRecording = NULL;
     if (curRecording)
         prevRecording = new ProgramInfo(*curRecording);
-    else
-        prevRecording = NULL;
 
     ispip = false;
 
-    if (nvr)
+    if (recorder)
     {
-        filelen = (int)(((float)nvr->GetFramesWritten() / frameRate));
+        filelen = (int)(((float)recorder->GetFramesWritten() / frameRate));
 
         QString message = QString("DONE_RECORDING %1 %2").arg(m_capturecardnum)
                                                          .arg(filelen);
         MythEvent me(message);
         gContext->dispatch(me);
 
-        nvr->StopRecording();
+        recorder->StopRecording();
         profileName = "";
 
         if (encode)
             pthread_join(encode, NULL);
         encode = static_cast<pthread_t>(0);
-        delete nvr;
+        delete recorder;
     }
-    nvr = NULL;
+    recorder = NULL;
 
     if (rbuffer)
     {
@@ -798,25 +912,21 @@ void TVRec::TeardownRecorder(bool killFile)
             int jobTypes;
 
             jobTypes = prevRecording->GetAutoRunJobs();
-            int transcodeFirst =
-                  gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
 
             if ((prevRecording->chancommfree) ||
-                ((gContext->GetNumSetting("AutoCommflagWhileRecording", 0)) &&
+                ((earlyCommFlag) &&
                  ((!autoTranscode) || (autoTranscode && !transcodeFirst))))
                 jobTypes = jobTypes & (~JOB_COMMFLAG);
 
+            // Only auto-transcode if recording profile allows it.
             if (!autoTranscode)
-            {
-                /* Only auto-transcode if recording profile allows it. */
                 jobTypes &= ~JOB_TRANSCODE;
-            }
 
             if (jobTypes)
             {
                 QString jobHost = "";
 
-                if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+                if (runJobOnHostOnly)
                     jobHost = gContext->GetHostName();
 
                 JobQueue::QueueJobs(jobTypes,
@@ -833,7 +943,19 @@ void TVRec::TeardownRecorder(bool killFile)
     }
 }    
 
-char *TVRec::GetScreenGrab(ProgramInfo *pginfo, const QString &filename, 
+/** \fn TVRec::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&)
+ *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
+ *
+ *  \param pginfo       Recording to grab from.
+ *  \param filename     File containing recording.
+ *  \param secondsin    Seconds into the video to seek before capturing a frame.
+ *  \param bufferlen    Returns size of buffer returned (in bytes).
+ *  \param video_width  Returns width of frame grabbed.
+ *  \param video_height Returns height of frame grabbed.
+ *  \return Buffer allocated with new containing frame in RGBA32 format if
+ *          successful, NULL otherwise.
+ */
+char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
                            int secondsin, int &bufferlen,
                            int &video_width, int &video_height)
 {
@@ -842,9 +964,10 @@ char *TVRec::GetScreenGrab(ProgramInfo *pginfo, const QString &filename,
     if (!MSqlQuery::testDBConnection())
         return NULL;
 
-    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer(pginfo);
+    NuppelVideoPlayer *nupvidplay =
+        new NuppelVideoPlayer((ProgramInfo*)pginfo);
     nupvidplay->SetRingBuffer(tmprbuf);
-    nupvidplay->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate"));
+    nupvidplay->SetAudioSampleRate(audioSampleRateDB);
 
     char *retbuf = nupvidplay->GetScreenGrab(secondsin, bufferlen, video_width,
                                              video_height);
@@ -855,6 +978,13 @@ char *TVRec::GetScreenGrab(ProgramInfo *pginfo, const QString &filename,
     return retbuf;
 }
 
+/** \fn TVRec::SetChannel(bool)
+ *  \brief If successful sets the channel to the channel needed to record the
+ *         "curRecording" program.
+ *
+ *  \param needopen Set to true if channel->Open() must be called before
+ *                  changing the channel.
+ */
 void TVRec::SetChannel(bool needopen)
 {
     if (needopen && channel)
@@ -893,14 +1023,43 @@ void TVRec::SetChannel(bool needopen)
         channel->Close();
 }
 
+/** \fn TVRec::EventThread(void*)
+ *  \brief Thunk that allows event pthread to call RunTV().
+ */
 void *TVRec::EventThread(void *param)
 {
     TVRec *thetv = (TVRec *)param;
     thetv->RunTV();
-
     return NULL;
 }
 
+/** \fn TVRec::RecorderThread(void*)
+ *  \brief Thunk that allows recorder pthread to
+ *         call RecorderBase::StartRecording().
+ */
+void *TVRec::RecorderThread(void *param)
+{
+    RecorderBase *recorder = (RecorderBase *)param;
+    recorder->StartRecording();
+    return NULL;
+}
+
+/** \fn TVRec::ScannerThread(void*)
+ *  \brief Thunk that allows scanner_thread pthread to
+ *         call SIScan::StartScanner().
+ */
+void *TVRec::ScannerThread(void *param)
+{
+#ifdef USING_DVB
+    SIScan *scanner = (SIScan *)param;
+    scanner->StartScanner();
+    return NULL;
+#endif
+}
+
+/** \fn TVRec::RunTV()
+ *  \brief Event handling method, contains event loop.
+ */
 void TVRec::RunTV(void)
 { 
     paused = false;
@@ -980,8 +1139,11 @@ void TVRec::RunTV(void)
         }
     }
   
-    nextState = kState_None;
-    HandleStateChange();
+    if (GetState() != kState_None)
+    {
+        nextState = kState_None;
+        HandleStateChange();
+    }
 }
 
 void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
@@ -1201,7 +1363,8 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
                   "FROM channel "
                   "WHERE channel.chanid = :CHANID;");
     query.bindValue(":CHANID", chanid);
-    if (!query.exec() || !query.isActive() || query.size() == 0) {
+    if (!query.exec() || !query.isActive() || query.size() == 0)
+    {
         MythContext::DBError("ShouldSwitchToAnotherCard", query);
         return false;
     }
@@ -1266,6 +1429,16 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
     return false;
 }
 
+/** \fn TVRec::CheckChannel(QString)
+ *  \brief Checks if named channel exists on current tuner.
+ *
+ *  \param name channel to verify against current tuner.
+ *  \return true if it succeeds, false otherwise.
+ *  \sa EncoderLink::CheckChannel(const QString&),
+ *      RemoteEncoder::CheckChannel(QString), 
+ *      CheckChannel(ChannelBase*,const QString&,QString&),
+ *      ShouldSwitchToAnotherCard(QString)
+ */
 bool TVRec::CheckChannel(QString name)
 {
     if (!channel)
@@ -1359,15 +1532,23 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
 }
 
 /** \fn TVRec::CheckChannelPrefix(QString name, bool &unique)
- *  \brief Returns true if name is either a valid channel name 
- *         or a valid channel prefix.
+ *  \brief Returns true if the numbers in prefix_num match the first digits
+ *         of any channel, if it unquely identifies a channel the unique
+ *         parameter is set.
  *
- * If name is a valid channel name and not a valid channel prefix
- * unique is set to true.
- * For example, if name == "36" and "36", "360", "361", "362", and "363" are
- * valid channel names, this function would return true but set *unique to
- * false.  However if name == "361" it would both return true and set *unique
- * to true.
+ *   If name is a valid channel name and not a valid channel prefix
+ *   unique is set to true.
+ *
+ *   For example, if name == "36" and "36", "360", "361", "362", and "363" are
+ *   valid channel names, this function would return true but set *unique to
+ *   false.  However if name == "361" it would both return true and set *unique
+ *   to true.
+ *
+ *  \param prefix_num Channel number prefix to check
+ *  \param unique     This is set to true if prefix uniquely identifies
+ *                    channel, false otherwise.
+ *  \return true if the prefix matches any channels.
+ *
  */
 bool TVRec::CheckChannelPrefix(QString name, bool &unique)
 {
@@ -1461,9 +1642,9 @@ bool TVRec::SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum)
 
         videoFilters = query.value(0).toString();
 
-        if (nvr != NULL)
+        if (recorder != NULL)
         {
-            nvr->SetVideoFilters(videoFilters);
+            recorder->SetVideoFilters(videoFilters);
         }
 
         return true;
@@ -1614,11 +1795,12 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
 
     if (channum[0].isLetter() && channelorder == "channum + 0")
     {
-        cerr << "Your channel ordering method \"channel number (numeric)\"\n"
-             << "will not work with channels like: " << channum << endl;
-        cerr << "Consider switching to order by \"database order\" or \n"
-             << "\"channel number (alpha)\" in the general settings section\n"
-             << "of the frontend setup\n";
+        VERBOSE(VB_IMPORTANT, QString(
+                "Your channel ordering method \"channel number (numeric)\"\n"
+                "\t\t\twill not work with channels like: %1\n"
+                "\t\t\tConsider switching to order by \"database order\" or \n"
+                "\t\t\t\"channel number (alpha)\" in the general settings section\n"
+                "\t\t\tof the frontend setup\n").arg(channum));
         channelorder = "channum";
     }
 
@@ -1647,10 +1829,12 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
     }
     else
     {
-        cerr << "Channel: \'" << channum << "\' was not found in the database.";
-        cerr << "\nMost likely, the default channel set for this input\n";
-        cerr << "(" << cardid << " " << channelinput << " )\n";
-        cerr << "in setup is wrong\n";
+        VERBOSE(VB_IMPORTANT, QString(
+                    "Channel: \'%1\' was not found in the database.\n"
+                    "\t\t\tMost likely, the default channel set for this input\n"
+                    "\t\t\t(%2 %3)\n"
+                    "\t\t\tin setup is wrong\n")
+                .arg(channum).arg(cardid).arg(channelinput));
 
         querystr = QString("SELECT %1 FROM channel,capturecard,cardinput "
                            "WHERE channel.sourceid = cardinput.sourceid AND "
@@ -1672,8 +1856,10 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
 
     if (id == QString::null) 
     {
-        cerr << "Couldn't find any channels in the database, please make sure "
-             << "\nyour inputs are associated properly with your cards.\n";
+        VERBOSE(VB_IMPORTANT, 
+                "Couldn't find any channels in the database,\n"
+                "\t\t\tplease make sure your inputs are associated\n"
+                "\t\t\tproperly with your cards.");
         channum = "";
         chanid = "";
         return;
@@ -1766,14 +1952,24 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
     return;
 }
 
+/** \fn TVRec::IsReallyRecording()
+ *  \brief Returns true if recorder exists and RecorderBase::IsRecording()
+ *         returns true.
+ *  \sa IsRecording()
+ */
 bool TVRec::IsReallyRecording(void)
 {
-    if (nvr && nvr->IsRecording())
+    if (recorder && recorder->IsRecording())
         return true;
 
     return false;
 }
 
+/** \fn TVRec::IsBusy()
+ *  \brief Returns true if the recorder is busy, or will be within
+ *         the next 5 seconds.
+ *  \sa EncoderLink::IsBusy(), 
+ */
 bool TVRec::IsBusy(void)
 {
     bool retval = (GetState() != kState_None);
@@ -1787,18 +1983,36 @@ bool TVRec::IsBusy(void)
     return retval;
 }
 
+/** \fn TVRec::GetFramerate()
+ *  \brief Returns recordering frame rate set by recorder.
+ *  \sa RemoteEncoder::GetFrameRate(), EncoderLink::GetFramerate(void),
+ *      RecorderBase::GetFrameRate()
+ *  \return Frames per second if query succeeds -1 otherwise.
+ */
 float TVRec::GetFramerate(void)
 {
     return frameRate;
 }
 
+/** \fn TVRec::GetFramesWritten()
+ *  \brief Returns number of frames written to disk by recorder.
+ *
+ *  \sa EncoderLink::GetFramesWritten(), RemoteEncoder::GetFramesWritten()
+ *  \return Number of frames if query succeeds, -1 otherwise.
+ */
 long long TVRec::GetFramesWritten(void)
 {
-    if (nvr)
-        return nvr->GetFramesWritten();
+    if (recorder)
+        return recorder->GetFramesWritten();
     return -1;
 }
 
+/** \fn TVRec::GetFilePosition()
+ *  \brief Returns total number of bytes written by RingBuffer.
+ *
+ *  \sa EncoderLink::GetFilePosition(), RemoteEncoder::GetFilePosition()
+ *  \return Bytes written if query succeeds, -1 otherwise.
+ */
 long long TVRec::GetFilePosition(void)
 {
     if (rbuffer)
@@ -1806,13 +2020,31 @@ long long TVRec::GetFilePosition(void)
     return -1;
 }
 
+/** \fn TVRec::GetKeyframePosition(long long)
+ *  \brief Returns byte position in RingBuffer of a keyframe according to recorder.
+ *
+ *  \sa EncoderLink::GetKeyframePosition(long long),
+ *      RemoteEncoder::GetKeyframePosition(long long)
+ *  \return Byte position of keyframe if query succeeds, -1 otherwise.
+ */
 long long TVRec::GetKeyframePosition(long long desired)
 {
-    if (nvr)
-        return nvr->GetKeyframePosition(desired);
+    if (recorder)
+        return recorder->GetKeyframePosition(desired);
     return -1;
 }
 
+/** \fn TVRec::GetFreeSpace(long long)
+ *  \brief Returns number of bytes beyond "totalreadpos" it is safe to read.
+ *
+ *  Note: This may return a negative number, including -1 if the call
+ *  succeeds. This means totalreadpos is past the "safe read" portion of
+ *  the file.
+ *
+ *  \sa EncoderLink::GetFreeSpace(long long), RemoteEncoder::GetFreeSpace(long long)
+ *  \return Returns number of bytes ahead of totalreadpos it is safe to read
+ *          if call succeeds, -1 otherwise.
+ */
 long long TVRec::GetFreeSpace(long long totalreadpos)
 {
     if (rbuffer)
@@ -1823,7 +2055,9 @@ long long TVRec::GetFreeSpace(long long totalreadpos)
 }
 
 /** \fn TVRec::GetMaxBitrate()
- *   Returns the maximum bits per second this recorder can produce.
+ *  \brief Returns the maximum bits per second this recorder can produce.
+ *
+ *  \sa EncoderLink::GetMaxBitrate(), RemoteEncoder::GetMaxBitrate()
  */
 long long TVRec::GetMaxBitrate()
 {
@@ -1842,28 +2076,45 @@ long long TVRec::GetMaxBitrate()
     return bitrate;
 }
 
+/** \fn TVRec::StopPlaying()
+ *  \brief Tells TVRec to stop streaming a recording to the frontend.
+ *
+ *  \sa EncoderLink::StopPlaying(), RemoteEncoder::StopPlaying()
+ */
 void TVRec::StopPlaying(void)
 {
     exitPlayer = true;
 }
 
+/** \fn TVRec::SetupRingBuffer(QString&,long long&,long long&,bool)
+ *  \brief Sets up RingBuffer for "Live TV" playback.
+ *
+ *  \sa EncoderLink::SetupRingBuffer(QString&,long long&,long long&,bool),
+ *      RemoteEncoder::SetupRingBuffer(QString&,long long&,long long&,bool),
+ *      StopLiveTV()
+ *
+ *  \param path Returns path to recording.
+ *  \param filesize Returns size of recording file in bytes.
+ *  \param fillamount Returns the maximum buffer fill in bytes.
+ *  \param pip Tells TVRec that this is for a Picture in Picture display.
+ *  \return true if successful, false otherwise.
+ */
 bool TVRec::SetupRingBuffer(QString &path, long long &filesize, 
                             long long &fillamount, bool pip)
 {
     if (rbuffer)
     {
-        VERBOSE(VB_ALL, "TVRec: Attempting to setup multiple ringbuffers on one connection.");
+        VERBOSE(VB_ALL, "TVRec: Attempting to setup "
+                "multiple ringbuffers on one connection.");
         return false;
     }
 
     ispip = pip;
-    filesize = gContext->GetNumSetting("BufferSize", 5);
-    fillamount = gContext->GetNumSetting("MaxBufferFill", 50);
+    filesize = liveTVRingBufSize;
+    fillamount = liveTVRingBufFill;
 
-    path = gContext->GetSetting("LiveBufferDir") + QString("/ringbuf%1.nuv")
-                                                       .arg(m_capturecardnum);
-
-    outputFilename = path;
+    outputFilename = path = QString("%1/ringbuf%2.nuv")
+        .arg(liveTVRingBufLoc).arg(m_capturecardnum);
 
     filesize = filesize * 1024 * 1024 * 1024;
     fillamount = fillamount * 1024 * 1024;
@@ -1883,6 +2134,10 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
     }
 }
 
+/** \fn TVRec::SpawnLiveTV()
+ *  \brief Tells Spawns a "Live TV" recorder.
+ *  \sa EncoderLink::SpawnLiveTV(), RemoteEncoder::SpawnLiveTV()
+ */
 void TVRec::SpawnLiveTV(void)
 {
     nextState = kState_WatchingLiveTV;
@@ -1892,6 +2147,10 @@ void TVRec::SpawnLiveTV(void)
         usleep(50);
 }
 
+/** \fn TVRec::StopLiveTV()
+ *  \brief Tells TVRec to stop a "Live TV" recorder.
+ *  \sa EncoderLink::StopLiveTV(), RemoteEncoder::StopLiveTV()
+ */
 void TVRec::StopLiveTV(void)
 {
     nextState = kState_None;
@@ -1901,20 +2160,25 @@ void TVRec::StopLiveTV(void)
         usleep(50);
 }
 
+/** \fn TVRec::PauseRecorder()
+ *  \brief Tells recorder to pause, used for channel and input changes.
+ *  \sa EncoderLink::PauseRecorder(), RemoteEncoder::PauseRecorder(),
+ *      RecorderBase::Pause()
+ */
 void TVRec::PauseRecorder(void)
 {
-    if (!nvr)
+    if (!recorder)
         return;
 
-    nvr->Pause();
+    recorder->Pause();
 } 
 
 void TVRec::ToggleInputs(void)
 {
-    if (!nvr || !channel || !rbuffer)
+    if (!recorder || !channel || !rbuffer)
         return;
 
-    nvr->WaitForPause();
+    recorder->WaitForPause();
 
     PauseClearRingBuffer();
 
@@ -1928,18 +2192,25 @@ void TVRec::ToggleInputs(void)
 
     channel->ToggleInputs();
 
-    nvr->Reset();
-    nvr->Unpause();
+    recorder->Reset();
+    recorder->Unpause();
 
     UnpauseRingBuffer();
 }
 
+/** \fn TVRec::ChangeChannel(ChannelChangeDirection)
+ *  \brief Changes to a channel in the 'dir' channel change direction.
+ *
+ *   You must call Pause() before calling this, and Unpause()
+ *   after this.
+ *  \param dir channel change direction \sa ChannelChangeDirection.
+ */
 void TVRec::ChangeChannel(int channeldirection)
 {
-    if (!nvr || !channel || !rbuffer)
+    if (!recorder || !channel || !rbuffer)
         return;
 
-    nvr->WaitForPause();
+    recorder->WaitForPause();
 
     PauseClearRingBuffer();
 
@@ -1958,13 +2229,16 @@ void TVRec::ChangeChannel(int channeldirection)
     else
         channel->ChannelDown();
 
-    nvr->ChannelNameChanged(channel->GetCurrentName());
-    nvr->Reset();
-    nvr->Unpause();
+    recorder->ChannelNameChanged(channel->GetCurrentName());
+    recorder->Reset();
+    recorder->Unpause();
 
     UnpauseRingBuffer();
 }
 
+/** \fn TVRec::ToggleChannelFavorite()
+ *  \brief Toggles whether the current channel should be on our favorites list.
+ */
 void TVRec::ToggleChannelFavorite(void)
 {
     if (!channel)
@@ -2001,9 +2275,10 @@ void TVRec::ToggleChannelFavorite(void)
     }
     else
     {
-        cerr << "Channel: \'" << channum << "\' was not found in the database.";
-        cerr << "\nMost likely, your DefaultTVChannel setting is wrong.";
-        cerr << "\nCould not toggle favorite.\n";
+        VERBOSE(VB_IMPORTANT, QString(
+                "Channel: \'%1\' was not found in the database.\n"
+                "\t\t\tMost likely, your DefaultTVChannel setting is wrong.\n"
+                "\t\t\tCould not toggle favorite.").arg(channum));
         return;
     }
 
@@ -2044,6 +2319,13 @@ void TVRec::ToggleChannelFavorite(void)
     }
 }
 
+/** \fn TVRec::ChangeContrast(bool)
+ *  \brief Changes contrast of a recording.
+ *
+ *  Note: In practice this only works with frame grabbing recorders.
+ *
+ *  \return contrast if it succeeds, -1 otherwise.
+ */
 int TVRec::ChangeContrast(bool direction)
 {
     if (!channel)
@@ -2053,6 +2335,13 @@ int TVRec::ChangeContrast(bool direction)
     return ret;
 }
 
+/** \fn TVRec::ChangeBrightness(bool)
+ *  \brief Changes the brightness of a recording.
+ *
+ *  Note: In practice this only works with frame grabbing recorders.
+ *
+ *  \return brightness if it succeeds, -1 otherwise.
+ */
 int TVRec::ChangeBrightness(bool direction)
 {
     if (!channel)
@@ -2062,6 +2351,13 @@ int TVRec::ChangeBrightness(bool direction)
     return ret;
 }
 
+/** \fn TVRec::ChangeColour(bool)
+ *  \brief Changes the colour phase of a recording.
+ *
+ *  Note: In practice this only works with frame grabbing recorders.
+ *
+ *  \return colour if it succeeds, -1 otherwise.
+ */
 int TVRec::ChangeColour(bool direction)
 {
     if (!channel)
@@ -2071,6 +2367,13 @@ int TVRec::ChangeColour(bool direction)
     return ret;
 }
 
+/** \fn TVRec::ChangeHue(bool)
+ *  \brief Changes the hue of a recording.
+ *
+ *  Note: In practice this only works with frame grabbing recorders.
+ *
+ *  \return hue if it succeeds, -1 otherwise.
+ */
 int TVRec::ChangeHue(bool direction)
 {
     if (!channel)
@@ -2080,12 +2383,19 @@ int TVRec::ChangeHue(bool direction)
     return ret;
 }
 
+/** \fn TVRec::SetChannel(QString name)
+ *  \brief Changes to a named channel on the current tuner.
+ *
+ *   You must call Pause() before calling this, and Unpause()
+ *   after this.
+ *  \param name channel to change to.
+ */
 void TVRec::SetChannel(QString name)
 {
-    if (!nvr || !channel || !rbuffer)
+    if (!recorder || !channel || !rbuffer)
         return;
 
-    nvr->WaitForPause();
+    recorder->WaitForPause();
 
     PauseClearRingBuffer();
 
@@ -2103,19 +2413,26 @@ void TVRec::SetChannel(QString name)
     if (!channel->SetChannelByString(chan))
         channel->SetChannelByString(prevchan);
 
-    nvr->ChannelNameChanged(channel->GetCurrentName());
-    nvr->Reset();
-    nvr->Unpause();
+    recorder->ChannelNameChanged(channel->GetCurrentName());
+    recorder->Reset();
+    recorder->Unpause();
 
     UnpauseRingBuffer();
 }
 
+/** \fn TVRec::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
+ *  \brief Returns information about the program that would be seen if we changed
+ *         the channel using ChangeChannel(int) with "direction".
+ *  \sa EncoderLink::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&),
+ *      RemoteEncoder::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
+ */
 void TVRec::GetNextProgram(int direction,
-                        QString &title, QString &subtitle, QString &desc,
-                        QString &category, QString &starttime,
-                        QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid)
+                           QString &title,       QString &subtitle,
+                           QString &desc,        QString &category,
+                           QString &starttime,   QString &endtime,
+                           QString &callsign,    QString &iconpath,
+                           QString &channelname, QString &chanid,
+                           QString &seriesid,    QString &programid)
 {
     QString querystr;
     QString nextchannum = channelname;
@@ -2222,13 +2539,19 @@ void TVRec::GetNextProgram(int direction,
 
 }
 
-void TVRec::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
-                        QString &category, QString &starttime,
-                        QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid,
-                        QString &outputFilters, QString &repeat, QString &airdate,
-                        QString &stars)
+/** \fn TVRec::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
+ *  \brief Returns information on the current program and current channel.
+ *  \sa EncoderLink::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&),
+ *      RemoteEncoder::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&),
+ */
+void TVRec::GetChannelInfo(QString &title,       QString &subtitle, 
+                           QString &desc,        QString &category, 
+                           QString &starttime,   QString &endtime, 
+                           QString &callsign,    QString &iconpath,
+                           QString &channelname, QString &chanid,
+                           QString &seriesid,    QString &programid, 
+                           QString &outputFilters, QString &repeat,
+                           QString &airdate,     QString &stars)
 {
     if (!channel)
         return;
@@ -2238,6 +2561,13 @@ void TVRec::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                    seriesid, programid, outputFilters, repeat, airdate, stars);
 }
 
+/** \fn TVRec::GetInputName(QString&)
+ *  \brief Sets inputname to the textual name of the current input,
+ *         if a tuner is being used.
+ *
+ *  \sa EncoderLink::GetInputName(), RemoteEncoder::GetInputName(QString&)
+ *  \return Sets input name if successful, does nothing if it isn't.
+ */
 void TVRec::GetInputName(QString &inputname)
 {
     if (!channel)
@@ -2246,6 +2576,9 @@ void TVRec::GetInputName(QString &inputname)
     inputname = channel->GetCurrentInput();
 }
 
+/** \fn TVRec::UnpauseRingBuffer()
+ *  \brief Calls RingBuffer::StartReads()
+ */
 void TVRec::UnpauseRingBuffer(void)
 {
     if (rbuffer)
@@ -2253,16 +2586,25 @@ void TVRec::UnpauseRingBuffer(void)
     readthreadLock.unlock();
 }
 
+/** \fn TVRec::PauseClearRingBuffer()
+ *  \brief Calls RingBuffer::StopReads()
+ */
 void TVRec::PauseClearRingBuffer(void)
 {
     readthreadLock.lock();
-
-    if (!rbuffer)
-        return;
-
-    rbuffer->StopReads();
+    if (rbuffer)
+        rbuffer->StopReads();
 }
 
+/** \fn TVRec::SeekRingBuffer(long long, long long, int)
+ *  \brief Tells TVRec to seek to a specific byte in RingBuffer.
+ *
+ *  \param curpos Current byte position in RingBuffer
+ *  \param pos    Desired position, or position delta.
+ *  \param whence One of SEEK_SET, or SEEK_CUR, or SEEK_END.
+ *                These work like the equivalent fseek parameters.
+ *  \return new position if seek is successful, -1 otherwise.
+ */
 long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
 {
     PauseClearRingBuffer();
@@ -2286,11 +2628,19 @@ long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
     return ret;
 }
 
+/** \fn TVRec::GetReadThreadSocket()
+ *  \brief Returns RingBuffer data socket, for A/V streaming.
+ *  \sa SetReadThreadSock(QSocket*)
+ */
 QSocket *TVRec::GetReadThreadSocket(void)
 {
     return readthreadSock;
 }
 
+/** \fn TVRec::GetReadThreadSocket()
+ *  \brief Sets RingBuffer data socket, for A/V streaming.
+ *  \sa GetReadThreadSocket()
+ */
 void TVRec::SetReadThreadSock(QSocket *sock)
 {
     if ((readthreadlive && sock) || (!readthreadlive && !sock))
@@ -2311,6 +2661,14 @@ void TVRec::SetReadThreadSock(QSocket *sock)
     }
 }
 
+/** \fn TVRec::RequestRingBufferBlock(int)
+ *  \brief Tells ring buffer to send data on the read thread sock, if the
+ *         ring buffer thread is alive and the ringbuffer isn't paused.
+ *
+ *  \param size Requested block size, may not be respected, but this many
+ *              bytes of data will be returned if it is available.
+ *  \return -1 if request does not succeed, amount of data sent otherwise.
+ */
 int TVRec::RequestRingBufferBlock(int size)
 {
     int tot = 0;
@@ -2354,6 +2712,9 @@ int TVRec::RequestRingBufferBlock(int size)
     return tot;
 }
 
+/** \fn  TVRec::RetrieveInputChannels(map<int,QString>&,map<int,QString>&,map<int,QString>&,map<int,QString>&)
+ *  \brief Returns all channels, used for channel browsing.
+ */
 void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
                                   map<int, QString> &inputTuneTo,
                                   map<int, QString> &externalChanger,
@@ -2379,8 +2740,9 @@ void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
     }
     else if (!query.size())
     {
-        cerr << "Error getting inputs for the capturecard.  Perhaps you have\n"
-                "forgotten to bind video sources to your card's inputs?\n";
+        VERBOSE(VB_IMPORTANT, "Error getting inputs for the capturecard.\n"
+                "\t\t\tPerhaps you have forgotten to bind video sources "
+                "to your card's inputs?");
     }
     else
     {
@@ -2398,6 +2760,12 @@ void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
 
 }
 
+/** \fn TVRec::StoreInputChannels(map<int, QString>&)
+ *  \brief Sets starting channel for the each input in the "inputChannel" map.
+ *
+ *  \param inputChannel Map from input number to channel, with an input and 
+ *                      default channel for each input to update.
+ */
 void TVRec::StoreInputChannels(map<int, QString> &inputChannel)
 {
     if (!channel)

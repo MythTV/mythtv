@@ -50,18 +50,18 @@ class EncoderLink
     bool IsBusyRecording(void);
 
     TVState GetState();
-    bool IsRecording(ProgramInfo *rec); // scheduler call only.
+    bool IsRecording(const ProgramInfo *rec); // scheduler call only.
 
     bool HasEnoughFreeSpace(const ProgramInfo *rec,
                             bool try_to_use_cache = false);
-    bool MatchesRecording(ProgramInfo *rec);
-    void RecordPending(ProgramInfo *rec, int secsleft);
-    int StartRecording(ProgramInfo *rec);
+    bool MatchesRecording(const ProgramInfo *rec);
+    void RecordPending(const ProgramInfo *rec, int secsleft);
+    int StartRecording(const ProgramInfo *rec);
     void StopRecording(void);
     void FinishRecording(void);
     void FrontendReady(void);
     void CancelNextRecording(void);
-    bool WouldConflict(ProgramInfo *rec);
+    bool WouldConflict(const ProgramInfo *rec);
 
     bool IsReallyRecording(void);
     ProgramInfo *GetRecording(void);
@@ -107,7 +107,7 @@ class EncoderLink
     int RequestRingBufferBlock(int size);
     long long SeekRingBuffer(long long curpos, long long pos, int whence);
 
-    char *GetScreenGrab(ProgramInfo *pginfo, const QString &filename, 
+    char *GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
                         int secondsin, int &bufferlen,
                         int &video_width, int &video_height);
 

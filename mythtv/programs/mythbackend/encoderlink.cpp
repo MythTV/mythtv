@@ -83,9 +83,9 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
 }
 
 /** \fn EncoderLink::IsBusy()
- *  \brief Returns true if the TVRec state is none and a recording is 
- *         not pending within the next 5 seconds.
- *  \sa IsBusyRecording()
+ *  \brief  Returns true if the recorder is busy, or will be within the 
+ *          next 5 seconds.
+ *  \sa IsBusyRecording(), TVRec::IsBusy()
  */
 bool EncoderLink::IsBusy(void)
 {
@@ -123,7 +123,7 @@ bool EncoderLink::IsBusyRecording(void)
 
 /** \fn EncoderLink::GetState()
  *  \brief Returns the TVState of the recorder.
- *  \sa TVRec, \ref recorder_subsystem
+ *  \sa TVRec::GetState(), \ref recorder_subsystem
  */
 TVState EncoderLink::GetState(void)
 {
@@ -142,12 +142,12 @@ TVState EncoderLink::GetState(void)
     return retval;
 }
 
-/** \fn EncoderLink::IsRecording(ProgramInfo *rec)
+/** \fn EncoderLink::IsRecording(const ProgramInfo *rec)
  *  \brief Returns true if rec is scheduled for recording.
  *  \param rec Recording to check.
- *  \sa MatchesRecording(ProgramInfo*)
+ *  \sa MatchesRecording(const ProgramInfo*)
  */
-bool EncoderLink::IsRecording(ProgramInfo *rec)
+bool EncoderLink::IsRecording(const ProgramInfo *rec)
 {
     bool retval = false;
 
@@ -157,15 +157,15 @@ bool EncoderLink::IsRecording(ProgramInfo *rec)
     return retval;
 }
 
-/** \fn EncoderLink::MatchesRecording(ProgramInfo *rec)
+/** \fn EncoderLink::MatchesRecording(const ProgramInfo *rec)
  *  \brief Returns true if rec is actually being recorded by TVRec.
  *  
  *   This waits for TVRec to enter a state other than kState_ChangingState
  *   Then it checks TVRec::GetRecording() against rec.
  *  \param rec Recording to check against TVRec::GetRecording().
- *  \sa IsRecording(ProgramInfo*)
+ *  \sa IsRecording(const ProgramInfo*)
  */
-bool EncoderLink::MatchesRecording(ProgramInfo *rec)
+bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
 {
     bool retval = false;
     ProgramInfo *tvrec = NULL;
@@ -199,13 +199,13 @@ bool EncoderLink::MatchesRecording(ProgramInfo *rec)
     return retval;
 }
 
-/** \fn RecordPending(ProgramInfo*, int)
+/** \fn RecordPending(const ProgramInfo*, int)
  *  \brief Tells TVRec there is a pending recording "rec" in "secsleft" seconds.
  *  \param rec      Recording to make.
  *  \param secsleft Seconds to wait before starting recording.
- *  \sa StartRecording(ProgramInfo*), CancelNextRecording()
+ *  \sa StartRecording(const ProgramInfo*), CancelNextRecording()
  */
-void EncoderLink::RecordPending(ProgramInfo *rec, int secsleft)
+void EncoderLink::RecordPending(const ProgramInfo *rec, int secsleft)
 {
     if (local)
         tv->RecordPending(rec, secsleft);
@@ -213,12 +213,12 @@ void EncoderLink::RecordPending(ProgramInfo *rec, int secsleft)
         sock->RecordPending(m_capturecardnum, rec, secsleft);
 }
 
-/** \fn EncoderLink::WouldConflict(ProgramInfo*)
+/** \fn EncoderLink::WouldConflict(const ProgramInfo*)
  *  \brief Checks a recording against any recording current or pending
  *         recordings on the recorder represented by this EncoderLink.
  *  \param rec Recording to check against current/pending recording.
  */
-bool EncoderLink::WouldConflict(ProgramInfo *rec)
+bool EncoderLink::WouldConflict(const ProgramInfo *rec)
 {
     if (!IsConnected())
         return true;
@@ -270,8 +270,9 @@ long long EncoderLink::GetFreeDiskSpace(bool use_cache)
 }
 
 /** \fn EncoderLink::GetMaxBitrate()
- *   Returns maximum bits per second this recorder might output.
+ *  \brief Returns maximum bits per second this recorder might output.
  * 
+ *  \sa TVRec::GetFreeSpace(long long), RemoteEncoder::GetFreeSpace(long long)
  *   May be a local or remote query.
  */
 long long EncoderLink::GetMaxBitrate()
@@ -364,14 +365,14 @@ bool EncoderLink::HasEnoughFreeSpace(const ProgramInfo *rec, bool try_to_use_cac
     return ok;
 }
 
-/** \fn EncoderLink::StartRecording(ProgramInfo*)
+/** \fn EncoderLink::StartRecording(const ProgramInfo*)
  *  \brief Tells TVRec to Start recording the program "rec" as soon as possible.
  *
  *  \return +1 if the recording started successfully,
  *          -1 if TVRec is busy doing something else, 0 otherwise.
- *  \sa RecordPending(ProgramInfo*, int), StopRecording()
+ *  \sa RecordPending(const ProgramInfo*, int), StopRecording()
  */
-int EncoderLink::StartRecording(ProgramInfo *rec)
+int EncoderLink::StartRecording(const ProgramInfo *rec)
 {
     int retval = 0;
 
@@ -402,7 +403,7 @@ int EncoderLink::StartRecording(ProgramInfo *rec)
 /** \fn EncoderLink::StopRecording()
  *  \brief Tells TVRec to stop recording immediately.
  *         <b>This only works on local recorders.</b>
- *  \sa StartRecording(ProgramInfo *rec), FinishRecording()
+ *  \sa StartRecording(const ProgramInfo *rec), FinishRecording()
  */
 void EncoderLink::StopRecording(void)
 {
@@ -450,8 +451,10 @@ bool EncoderLink::IsReallyRecording(void)
 }
 
 /** \fn EncoderLink::GetFramerate()
- *  \brief Returns frame rate from TVRec.
+ *  \brief Returns the recording frame rate from TVRec.
  *         <b>This only works on local recorders.</b>
+ *  \sa RemoteEncoder::GetFrameRate(), TVRec::GetFramerate(void),
+ *      RecorderBase::GetFrameRate()
  *  \return Frames per second if query succeeds -1 otherwise.
  */
 float EncoderLink::GetFramerate(void)
@@ -464,9 +467,11 @@ float EncoderLink::GetFramerate(void)
 }
 
 /** \fn EncoderLink::GetFramesWritten()
- *  \brief Returns number of frames written to disk by TVRec's RingBuffer.
- *         <b>This only works on local recorders.</b>
- *  \return Number of frames if query does succeeds, -1 otherwise.
+ *  \brief Returns number of frames written to disk by TVRec's RecorderBase
+ *         instance. <b>This only works on local recorders.</b>
+ *
+ *  \sa TVRec::GetFramesWritten(), RemoteEncoder::GetFramesWritten()
+ *  \return Number of frames if query succeeds, -1 otherwise.
  */
 long long EncoderLink::GetFramesWritten(void)
 {
@@ -480,6 +485,7 @@ long long EncoderLink::GetFramesWritten(void)
 /** \fn EncoderLink::GetFilePosition()
  *  \brief Returns total number of bytes written by TVRec's RingBuffer.
  *         <b>This only works on local recorders.</b>
+ *  \sa TVRec::GetFilePosition(), RemoteEncoder::GetFilePosition()
  *  \return Bytes written if query succeeds, -1 otherwise.
  */
 long long EncoderLink::GetFilePosition(void)
@@ -499,6 +505,7 @@ long long EncoderLink::GetFilePosition(void)
  *  succeeds. This means totalreadpos is past the "safe read" portion of
  *  the file.
  *
+ *  \sa TVRec::GetFreeSpace(long long), RemoteEncoder::GetFreeSpace(long long)
  *  \return Returns number of bytes ahead of totalreadpos it is safe to read
  *          if call succeeds, -1 otherwise.
  */
@@ -512,9 +519,11 @@ long long EncoderLink::GetFreeSpace(long long totalreadpos)
 }
 
 /** \fn EncoderLink::GetKeyframePosition(long long)
- *  \brief Returns byte position in file of a keyframe.
+ *  \brief Returns byte position in RingBuffer of a keyframe.
  *         <b>This only works on local recorders.</b>
- *  \return byte position of keyframe if -1 query succeeds, -1 otherwise.
+ *  \sa TVRec::GetKeyframePosition(long long),
+ *      RemoteEncoder::GetKeyframePosition(long long)
+ *  \return Byte position of keyframe if query succeeds, -1 otherwise.
  */
 long long EncoderLink::GetKeyframePosition(long long desired)
 {
@@ -528,6 +537,7 @@ long long EncoderLink::GetKeyframePosition(long long desired)
 /** \fn EncoderLink::FrontendReady()
  *  \brief Tells TVRec that the frontend is ready for data.
  *         <b>This only works on local recorders.</b> 
+ *  \sa TVRec::, RemoteEncoder::
  */
 void EncoderLink::FrontendReady(void)
 {
@@ -544,7 +554,7 @@ void EncoderLink::FrontendReady(void)
  *   This is used when the user is watching "Live TV" and does not
  *   want to allow the recorder to be taken for a pending recording.
  *
- *  \sa RecordPending(ProgramInfo*,int)
+ *  \sa RecordPending(const ProgramInfo*,int)
  */
 void EncoderLink::CancelNextRecording(void)
 {
@@ -580,9 +590,14 @@ void EncoderLink::StopPlaying(void)
         VERBOSE(VB_IMPORTANT, "Should be local only query: StopPlaying");
 }
 
-/** \fn EncoderLink::SetupRingBuffer(QString&,long long&,long long&, bool)
- *  \brief Sets up TVRec's RingBuffer for "LiveTV" playback.
+/** \fn EncoderLink::SetupRingBuffer(QString&,long long&,long long&,bool)
+ *  \brief Sets up TVRec's RingBuffer for "Live TV" playback.
  *         <b>This only works on local recorders.</b>
+ *
+ *  \sa TVRec::SetupRingBuffer(QString&,long long&,long long&,bool),
+ *      RemoteEncoder::SetupRingBuffer(QString&,long long&,long long&,bool),
+ *      StopLiveTV()
+ *
  *  \param path Returns path to recording.
  *  \param filesize Returns size of recording file in bytes.
  *  \param fillamount Returns the maximum buffer fill in bytes.
@@ -602,6 +617,7 @@ bool EncoderLink::SetupRingBuffer(QString &path, long long &filesize,
 /** \fn EncoderLink::SpawnLiveTV()
  *  \brief Tells TVRec to Spawn a "Live TV" recorder.
  *         <b>This only works on local recorders.</b>
+ *  \sa TVRec::SpawnLiveTV(), RemoteEncoder::SpawnLiveTV()
  */
 void EncoderLink::SpawnLiveTV(void)
 {
@@ -614,6 +630,7 @@ void EncoderLink::SpawnLiveTV(void)
 /** \fn EncoderLink::StopLiveTV()
  *  \brief Tells TVRec to stop a "Live TV" recorder.
  *         <b>This only works on local recorders.</b>
+ *  \sa TVRec::StopLiveTV(), RemoteEncoder::StopLiveTV()
  */
 void EncoderLink::StopLiveTV(void)
 {
@@ -626,6 +643,8 @@ void EncoderLink::StopLiveTV(void)
 /** \fn EncoderLink::PauseRecorder()
  *  \brief Tells TVRec to pause a recorder, used for channel and input changes.
  *         <b>This only works on local recorders.</b>
+ *  \sa TVRec::PauseRecorder(), RemoteEncoder::PauseRecorder(),
+ *      RecorderBase::Pause()
  */
 void EncoderLink::PauseRecorder(void)
 {
@@ -638,6 +657,7 @@ void EncoderLink::PauseRecorder(void)
 /** \fn EncoderLink::ToggleInputs()
  *  \brief Tells TVRec's recorder to change to the next input.
  *         <b>This only works on local recorders.</b>
+ *
  *  \sa PauseRecorder()
  */
 void EncoderLink::ToggleInputs(void)
@@ -664,13 +684,13 @@ void EncoderLink::ToggleChannelFavorite(void)
 /** \fn EncoderLink::ChangeChannel(int)
  *  \brief Changes to the next or previous channel.
  *         <b>This only works on local recorders.</b>
+ *
  *  \param channeldirection channel change direction \sa BrowseDirections.
- *  \sa PauseRecorder()
  */
 void EncoderLink::ChangeChannel(int channeldirection)
 {
     if (local)
-        tv->ChangeChannel(channeldirection);
+        tv->ChangeChannel((ChannelChangeDirection)channeldirection);
     else
         VERBOSE(VB_IMPORTANT, "Should be local only query: ChangeChannel");
 }
@@ -678,8 +698,8 @@ void EncoderLink::ChangeChannel(int channeldirection)
 /** \fn EncoderLink::SetChannel(const QString&)
  *  \brief Changes to a named channel on the current tuner.
  *         <b>This only works on local recorders.</b>
+ *
  *  \param name Name of channel to change to.
- *  \sa PauseRecorder()
  */
 void EncoderLink::SetChannel(const QString &name)
 {
@@ -690,13 +710,16 @@ void EncoderLink::SetChannel(const QString &name)
 }
 
 /** \fn EncoderLink::ChangeContrast(bool)
- *  \brief
+ *  \brief Changes contrast of a recording.
  *         <b>This only works on local recorders.</b>
- *  \return 0 if set does succeeds, otherwise.
+ *
+ *  Note: In practice this only works with frame grabbing recorders.
+ *
+ *  \return contrast if it succeeds, -1 otherwise.
  */
 int EncoderLink::ChangeContrast(bool direction)
 {
-    int ret = 0;
+    int ret = -1;
 
     if (local)
         ret = tv->ChangeContrast(direction);
@@ -712,11 +735,11 @@ int EncoderLink::ChangeContrast(bool direction)
  *
  *  Note: In practice this only works with frame grabbing recorders.
  *
- *  \return 0 if query does not succeed, -1 otherwise.
+ *  \return brightness if it succeeds, -1 otherwise.
  */
 int EncoderLink::ChangeBrightness(bool direction)
 {
-    int ret = 0;
+    int ret = -1;
 
     if (local)
         ret = tv->ChangeBrightness(direction);
@@ -729,15 +752,14 @@ int EncoderLink::ChangeBrightness(bool direction)
 /** \fn EncoderLink::ChangeColour(bool)
  *  \brief Changes the colour phase of a recording.
  *         <b>This only works on local recorders.</b>
-
  *
  *  Note: In practice this only works with frame grabbing recorders.
  *
- *  \return 0 if query does not succeed, -1 otherwise.
+ *  \return colour if it succeeds, -1 otherwise.
  */
 int EncoderLink::ChangeColour(bool direction)
 {
-    int ret = 0;
+    int ret = -1;
 
     if (local)
         ret = tv->ChangeColour(direction);
@@ -753,11 +775,11 @@ int EncoderLink::ChangeColour(bool direction)
  *
  *  Note: In practice this only works with frame grabbing recorders.
  *
- *  \return 0 if query does not succeed, -1 otherwise.
+ *  \return hue if it succeeds, -1 otherwise.
  */
 int EncoderLink::ChangeHue(bool direction)
 {
-    int ret = 0;
+    int ret = -1;
 
     if (local)
         ret = tv->ChangeHue(direction);
@@ -770,9 +792,11 @@ int EncoderLink::ChangeHue(bool direction)
 /** \fn EncoderLink::CheckChannel(const QString&)
  *  \brief Checks if named channel exists on current tuner.
  *         <b>This only works on local recorders.</b>
- *  \param name channel to verify against current tuner.
+ *  \param name Channel to verify against current tuner.
  *  \return true if it succeeds, false otherwise.
- *  \sa ShouldSwitchToAnotherCard(const QString&)
+ *  \sa TVRec::CheckChannel(QString),
+ *      RemoteEncoder::CheckChannel(QString), 
+ *      ShouldSwitchToAnotherCard(const QString&)
  */
 bool EncoderLink::CheckChannel(const QString &name)
 {
@@ -847,6 +871,8 @@ void EncoderLink::GetNextProgram(int direction,
 /** \fn EncoderLink::GetChannelInfo(QString&,QString&,QString&,QString&,QString&, QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
  *  \brief Returns information on the current program and current channel.
  *         <b>This only works on local recorders.</b>
+ *  \sa TVRec::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&),
+ *      RemoteEncoder::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
  *  \return -1 if query does not succeed, otherwise.
  */
 void EncoderLink::GetChannelInfo(QString &title,       QString &subtitle, 
@@ -867,10 +893,11 @@ void EncoderLink::GetChannelInfo(QString &title,       QString &subtitle,
         VERBOSE(VB_IMPORTANT, "Should be local only query: GetChannelInfo");
 }
 
-/** \fn EncoderLink::GetInputName(QString&)
- *  \brief Sets inputname to the textual name of the current input,
+/** \fn EncoderLink::GetInputName()
+ *  \brief Returns the textual name of the current input,
  *         if a tuner is being used.
  *         <b>This only works on local recorders.</b>
+ *  \sa TVRec::GetInputName(QString&), RemoteEncoder::GetInputName(QString&)
  *  \return Returns input name if successful, "" if not.
  */
 QString EncoderLink::GetInputName()
@@ -916,11 +943,12 @@ QSocket *EncoderLink::GetReadThreadSocket(void)
 }
 
 /** \fn EncoderLink::RequestRingBufferBlock(int)
- *  \brief Tells TVRec to stream a block of A/V data if it is available.
+ *  \brief Tells TVRec to stream A/V data if it is available.
  *         <b>This only works on local recorders.</b>
  *
- *  \param size Requested block size, may not be respected.
- *  \return -1 if query does not succeed, otherwise.
+ *  \param size Requested block size, may not be respected, but this many
+ *              bytes of data will be returned if it is available.
+ *  \return -1 if request does not succeed, amount of data sent otherwise.
  */
 int EncoderLink::RequestRingBufferBlock(int size)
 {
@@ -950,7 +978,7 @@ long long EncoderLink::SeekRingBuffer(long long curpos, long long pos,
     return -1;
 }
 
-/** \fn *EncoderLink::GetScreenGrab(ProgramInfo*,const QString&,int,int&,int&,int&)
+/** \fn EncoderLink::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&)
  *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
  *         <b>This only works on local recorders.</b>
  *  \param pginfo       Recording to grab from.
@@ -962,7 +990,8 @@ long long EncoderLink::SeekRingBuffer(long long curpos, long long pos,
  *  \return Buffer allocated with new containing frame in RGBA32 format if
  *          successful, NULL otherwise.
  */
-char *EncoderLink::GetScreenGrab(ProgramInfo *pginfo, const QString &filename, 
+char *EncoderLink::GetScreenGrab(const ProgramInfo *pginfo,
+                                 const QString &filename, 
                                  int secondsin, int &bufferlen, 
                                  int &video_width, int &video_height)
 {

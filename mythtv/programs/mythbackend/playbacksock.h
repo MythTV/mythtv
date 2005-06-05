@@ -38,20 +38,20 @@ class PlaybackSock
     QString getIP(void) { return ip; }
 
     void GetFreeDiskSpace(long long &totalspace, long long &usedspace);
-    int StopRecording(ProgramInfo *pginfo);
-    int CheckRecordingActive(ProgramInfo *pginfo);
-    int DeleteRecording(ProgramInfo *pginfo, bool forceMetadataDelete = false);
+    int StopRecording(const ProgramInfo *pginfo);
+    int CheckRecordingActive(const ProgramInfo *pginfo);
+    int DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataDelete = false);
     void FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost);
-    void GenPreviewPixmap(ProgramInfo *pginfo);
-    QString PixmapLastModified(ProgramInfo *pginfo);
-    bool CheckFile(ProgramInfo *pginfo);
+    void GenPreviewPixmap(const ProgramInfo *pginfo);
+    QString PixmapLastModified(const ProgramInfo *pginfo);
+    bool CheckFile(const ProgramInfo *pginfo);
 
     bool IsBusy(int capturecardnum);
     int GetEncoderState(int capturecardnum);
     long long GetMaxBitrate(int capturecardnum);
-    bool EncoderIsRecording(int capturecardnum, ProgramInfo *pginfo);
-    int StartRecording(int capturecardnum, ProgramInfo *pginfo);
-    void RecordPending(int capturecardnum, ProgramInfo *pginfo, int secsleft);
+    bool EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo);
+    int StartRecording(int capturecardnum, const ProgramInfo *pginfo);
+    void RecordPending(int capturecardnum, const ProgramInfo *pginfo, int secsleft);
 
   private:
     bool SendReceiveStringList(QStringList &strlist);

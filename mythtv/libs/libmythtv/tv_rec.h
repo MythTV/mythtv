@@ -51,31 +51,40 @@ typedef struct _firewire_options_t
 
 class TVRec
 {
- public:
+  public:
     TVRec(int capturecardnum);
    ~TVRec(void);
 
-    bool Init(void); // returns true if init is successful
+    bool Init(void);
 
-    void RecordPending(ProgramInfo *rcinfo, int secsleft);
-    int StartRecording(ProgramInfo *rcinfo);
+    void RecordPending(const ProgramInfo *rcinfo, int secsleft);
+    int StartRecording(const ProgramInfo *rcinfo);
 
     void StopRecording(void);
+    /// \brief Tells TVRec to finush the current recording as soon as possible.
     void FinishRecording(void) { finishRecording = true; }
-
+    /// \brief Tells TVRec that the frontend's TV class is ready for messages.
     void FrontendReady(void) { frontendReady = true; }
+    /** \brief Tells TVRec to cancel the upcoming recording.
+     *  \sa RecordPending(const ProgramInfo*,int),
+     *      TV::AskAllowRecording(const QStringList&,int) */
     void CancelNextRecording(void) { cancelNextRecording = true; }
     ProgramInfo *GetRecording(void);
 
-    char *GetScreenGrab(ProgramInfo *pginfo, const QString &filename, 
+    char *GetScreenGrab(const ProgramInfo *pginfo, const QString &filename, 
                         int secondsin, int &bufferlen,
                         int &video_width, int &video_height);
 
+    /// \brief Returns true if event loop has not been told to shut down
     bool IsRunning(void) { return runMainLoop; }
+    /// \brief Tells TVRec to stop event loop
     void Stop(void) { runMainLoop = false; }
 
     TVState GetState(void);
+    /// \brief Returns "state == kState_RecordingPreRecorded"
     bool IsPlaying(void) { return StateIsPlaying(internalState); }
+    /// \brief Returns "state == kState_RecordingRecordedOnly"
+    /// \sa IsReallyRecording()
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
     bool CheckChannel(ChannelBase *chan, const QString &channum, 
@@ -124,18 +133,20 @@ class TVRec
     bool ShouldSwitchToAnotherCard(QString chanid);
     bool CheckChannelPrefix(QString name, bool &unique);
     void GetNextProgram(int direction,
-                        QString &title, QString &subtitle, QString &desc,
-                        QString &category, QString &starttime, 
-                        QString &endtime, QString &callsign, QString &iconpath,
+                        QString &title,       QString &subtitle,
+                        QString &desc,        QString &category,
+                        QString &starttime,   QString &endtime,
+                        QString &callsign,    QString &iconpath,
                         QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid);
-    void GetChannelInfo(QString &title, QString &subtitle, QString &desc,
-                        QString &category, QString &starttime, 
-                        QString &endtime, QString &callsign, QString &iconpath,
+                        QString &seriesid,    QString &programid);
+    void GetChannelInfo(QString &title,       QString &subtitle,
+                        QString &desc,        QString &category,
+                        QString &starttime,   QString &endtime,
+                        QString &callsign,    QString &iconpath,
                         QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid,
-                        QString &chanFilters, QString& repeat, QString& airdate,
-                        QString &stars);
+                        QString &seriesid,    QString &programid,
+                        QString &chanFilters, QString &repeat,
+                        QString &airdate,     QString &stars);
     void GetInputName(QString &inputname);
 
     QSocket *GetReadThreadSocket(void);
@@ -146,34 +157,37 @@ class TVRec
     int RequestRingBufferBlock(int size);
     long long SeekRingBuffer(long long curpos, long long pos, int whence);
 
-    bool isParsingCommercials(ProgramInfo *pginfo);
-
+    /// \brief Returns the caputure card number
     int GetCaptureCardNum(void) { return m_capturecardnum; }
-
+    /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored() { return errored; }
- protected:
+  protected:
     void RunTV(void);
     static void *EventThread(void *param);
+    static void *RecorderThread(void *param);
+    static void *ScannerThread(void *param);
 
- private:
+  private:
     void SetChannel(bool needopen = false);
 
-    void GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle, 
-                        QString &desc, QString &category, QString &starttime, 
-                        QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid, QString &seriesid, 
-                        QString &programid, QString &outputFilters, QString& repeat, 
-                        QString& airdate, QString &stars);
+    void GetChannelInfo(ChannelBase *chan,  QString &title,
+                        QString &subtitle,  QString &desc,
+                        QString &category,  QString &starttime, 
+                        QString &endtime,   QString &callsign,
+                        QString &iconpath,  QString &channelname,
+                        QString &chanid,    QString &seriesid, 
+                        QString &programid, QString &outputFilters,
+                        QString &repeat,    QString &airdate,
+                        QString &stars);
 
     void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
                     int &rate, QString &defaultinput, QString &startchannel,
-                    QString &type, dvb_options_t &dvb_opts, firewire_options_t &firewire_opts,
-                    bool &skip_bt);
+                    QString &type, dvb_options_t &dvb_opts,
+                    firewire_options_t &firewire_opts, bool &skip_bt);
 
     void SetupRecorder(class RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);
     
-    void StateToString(TVState state, QString &statestr);
     void HandleStateChange(void);
     bool StateIsRecording(TVState state);
     bool StateIsPlaying(TVState state);
@@ -185,69 +199,86 @@ class TVRec
 
     void SetOption(RecordingProfile &profile, const QString &name);
 
-    RecorderBase *nvr;
-    RingBuffer *rbuffer;
-    ChannelBase *channel;
+    // Various components TVRec coordinates
+    RingBuffer    *rbuffer;
+    RecorderBase  *recorder;
+    ChannelBase   *channel;
+#ifdef USING_DVB
+    SIScan        *scanner;
+#endif
 
-    TVState internalState;
+    // Various threads
+    /// Event processing thread, runs RunTV().
+    pthread_t event;
+    /// Recorder thread, runs RecorderBase::StartRecording()
+    pthread_t encode;
+    pthread_t readthread;
+#ifdef USING_DVB
+    pthread_t scanner_thread;
+#endif
 
-    bool frontendReady;
-    bool runMainLoop;
-    bool exitPlayer;
-    bool finishRecording;
-    bool paused;
-    bool prematurelystopped;
-    QDateTime recordEndTime;
+    // Configuration variables from database
+    bool    transcodeFirst;
+    bool    earlyCommFlag;
+    bool    runJobOnHostOnly;
+    int     audioSampleRateDB;
+    int     overrecordseconds;
+    int     liveTVRingBufSize;
+    int     liveTVRingBufFill;
+    QString liveTVRingBufLoc;
+    QString recprefix;
 
-    float frameRate;
-
-    pthread_t event, encode, readthread, commercials;
-
-    bool changeState;
-    TVState nextState;
-    QString outputFilename;
-
-    bool watchingLiveTV;
-
-    ProgramInfo *curRecording;
-    ProgramInfo *prevRecording;
- 
-    QString videodev, vbidev, audiodev, cardtype;
-    int audiosamplerate;
-    bool skip_btaudio;
-
-    bool inoverrecord;
-    int overrecordseconds;
-
-    QSocket *readthreadSock;
-    bool readthreadlive;
-    QMutex readthreadLock;
-
-    int m_capturecardnum;
-
-    bool ispip;
-
-    bool askAllowRecording;
-    bool recordPending;
-    bool cancelNextRecording;
-
-    ProgramInfo *pendingRecording;
-    QDateTime recordPendingStart;
-
-    QString profileName;
-    bool autoTranscode;
-
+    // Configuration variables from setup rutines
+    int     m_capturecardnum;
+    bool    ispip;
     dvb_options_t dvb_options;
     firewire_options_t firewire_options;
 
-    bool errored;
+    // State variables
+    TVState internalState;
+    TVState nextState;
+    bool    changeState;
+    bool    frontendReady;
+    bool    runMainLoop;
+    bool    exitPlayer;
+    bool    finishRecording;
+    bool    paused;
+    bool    prematurelystopped;
+    bool    inoverrecord;
+    bool    errored;
+    float   frameRate;
 
-    char requestBuffer[256001];
+    // Current recording info
+    ProgramInfo *curRecording;
+    QDateTime    recordEndTime;
+    QString      profileName;
+    bool         askAllowRecording;
+    bool         autoTranscode;
 
-#ifdef USING_DVB
-    SIScan* scanner;
-    pthread_t scanner_thread;
-#endif
+    // Pending recording info
+    ProgramInfo *pendingRecording;
+    QDateTime    recordPendingStart;
+    bool         recordPending;
+    bool         cancelNextRecording;
+
+    // RingBuffer info
+    QString outputFilename;
+    char     requestBuffer[256001];
+    QSocket *readthreadSock;
+    QMutex   readthreadLock;
+    bool     readthreadlive;
+
+    // Current recorder info
+    QString  videodev;
+    QString  vbidev;
+    QString  audiodev;
+    QString  cardtype;
+    int      audiosamplerate;
+    bool     skip_btaudio;
+
+    // Other
+    bool watchingLiveTV;
+    ProgramInfo *prevRecording;
 };
 
 #endif
