@@ -65,6 +65,7 @@ const int DVBRecorder::PMT_PID = 0x10;
 
 DVBRecorder::DVBRecorder(DVBChannel* advbchannel): DTVRecorder()
 {
+    _stream_fd = -1;
     _card_number_option = 0;
     _reset_pid_filters = true;
     dvbchannel = advbchannel;
@@ -154,7 +155,7 @@ void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
     else
         pmt_version++;
 
-    dvbchannel->SetCAPMT(m_pmt);
+    dvbchannel->SetCAPMT(&m_pmt);
 
     _reset_pid_filters = true;
 
@@ -233,12 +234,12 @@ void DVBRecorder::CloseFilters()
 
 void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type, dmx_pes_type_t pes_type)
 {
-    VERBOSE(VB_RECORD, QString("DVB#%1 ").arg(_card_number_option) << QString("Adding pid %1").arg(pid));
-
     int cardnum = _card_number_option;
+    RECORD(QString("Adding pid %1 (0x%2)").arg(pid).arg((int)pid,0,16));
+
     if (pid < 0x10 || pid > 0x1fff)
-        WARNING(QString("PID value (%1) is outside DVB specification.")
-                        .arg(pid));
+        WARNING(QString("PID value (%1) is outside DVB specification.\n"
+                        "\t\t\tPerhaps this is an ATSC stream?").arg(pid));
 
     struct dmx_pes_filter_params params;
     memset(&params, 0, sizeof(params));
@@ -402,7 +403,9 @@ void DVBRecorder::AutoPID()
 
     isVideo.clear();
 
-    RECORD(QString("AutoPID for ServiceID=%1, PCRPID=%2").arg(m_pmt.ServiceID).arg(m_pmt.PCRPID));
+    RECORD(QString("AutoPID for ServiceID=%1, PCRPID=%2 (0x%3)")
+           .arg(m_pmt.ServiceID).arg(m_pmt.PCRPID)
+           .arg(((uint)m_pmt.PCRPID),0,16));
 
     // Wanted languages:
     QStringList Languages = QStringList::split(",", gContext->GetSetting("PreferredLanguages", ""));
@@ -462,14 +465,20 @@ void DVBRecorder::AutoPID()
             {
                 case ES_TYPE_VIDEO_MPEG1:
                 case ES_TYPE_VIDEO_MPEG2:
-                    if (flagged.contains(ES_TYPE_VIDEO_MPEG1) || flagged.contains(ES_TYPE_VIDEO_MPEG2))
+                    if (flagged.contains(ES_TYPE_VIDEO_MPEG1) ||
+                        flagged.contains(ES_TYPE_VIDEO_MPEG2))
+                    {
                         continue; // Ignore this stream
+                    }
                     break;
 
                 case ES_TYPE_AUDIO_MPEG1:
                 case ES_TYPE_AUDIO_MPEG2:
-                    if (flagged.contains(ES_TYPE_AUDIO_MPEG1) || flagged.contains(ES_TYPE_AUDIO_MPEG2))
+                    if (flagged.contains(ES_TYPE_AUDIO_MPEG1) ||
+                        flagged.contains(ES_TYPE_AUDIO_MPEG2))
+                    {
                         continue; // Ignore this stream
+                    }
                     break;
 
                 default:
@@ -496,8 +505,8 @@ void DVBRecorder::AutoPID()
 
         if ((*es).Record)
         {
-            VERBOSE(VB_RECORD, QString("DVB#%1 ").arg(_card_number_option)
-                << QString("AutoPID selecting PID %1, %2").arg((*es).PID).arg((*es).Description));
+            RECORD(QString("AutoPID selecting PID %1 (0x%2), %3")
+                   .arg((*es).PID).arg((*es).PID,0,16).arg((*es).Description));
 
             switch ((*es).Type)
             {
@@ -513,8 +522,8 @@ void DVBRecorder::AutoPID()
         }
         else
         {
-            VERBOSE(VB_RECORD, QString("DVB#%1 ").arg(_card_number_option)
-                << QString("AutoPID skipping PID %1, %2").arg((*es).PID).arg((*es).Description));
+            RECORD(QString("AutoPID skipping PID %1 (0x%2), %3")
+                   .arg((*es).PID).arg((*es).PID,0,16).arg((*es).Description));
         }
     }
 

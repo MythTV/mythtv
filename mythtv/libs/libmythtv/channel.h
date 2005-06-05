@@ -23,62 +23,59 @@ class Channel : public ChannelBase
     bool Open(void);
     void Close(void);
 
+    // Sets
+    void SetFd(int fd); 
     void SetFormat(const QString &format);
-    int SetDefaultFreqTable(const QString &name);
-
+    int  SetDefaultFreqTable(const QString &name);
     bool SetChannelByString(const QString &chan); 
-    bool ChannelUp(void);
-    bool ChannelDown(void);
+    bool SetChannelByDirection(ChannelChangeDirection);
 
-    int GetSignal(int &msecWait, int &requiredSignalPercentage);
-    bool CheckSignalFull(void);
-    bool CheckSignal(int msecWait = 5000, 
-                     int requiredSignalPercentage = 65,
-                     int input = 0);
-    unsigned short *Channel::GetV4L1Field(int attrib, 
-                                          struct video_picture &vid_pic);
-    int Channel::ChangeColourAttribute(int attrib, const char *name, bool up);
-    int ChangeColour(bool up);
-    int ChangeBrightness(bool up);
-    int ChangeContrast(bool up);
-    int ChangeHue(bool up);
-    void SetColourAttribute(int attrib, const char *name);
-    void SetContrast();
-    void SetBrightness();
-    void SetColour();
-    void SetHue();
+    // Gets
+    int  GetFd() const { return videofd; }
 
+    // Commands
     void SwitchToInput(int newcapchannel, bool setstarting);
 
-    void SetFd(int fd); 
-    int GetFd() { return videofd; }
-
-    bool IsCommercialFree() { return commfree; }
+    // Picture attributes.
+    void SetBrightness();
+    void SetContrast();
+    void SetColour();
+    void SetHue();
+    int  ChangeBrightness(bool up);
+    int  ChangeColour(bool up);
+    int  ChangeContrast(bool up);
+    int  ChangeHue(bool up);
 
   private:
+    // Helper Sets
+    void SetColourAttribute(int attrib, const char *name);
+    void SetFreqTable(const int index);
+    int  SetFreqTable(const QString &name);
+
+    // Helper Gets
+    unsigned short *GetV4L1Field(int attrib, struct video_picture &vid_pic);
     int GetCurrentChannelNum(const QString &channame);
 
-    void SetFreqTable(const int index);
-    int SetFreqTable(const QString &name);
+    // Helper Commands
+    int  ChangeColourAttribute(int attrib, const char *name, bool up);
     bool TuneTo(const QString &chan, int finetune);
     bool TuneToFrequency(int frequency);
 
-    QString device;
-    bool isopen;  
-    int videofd;
+  private:
+    // Data
+    QString     device;
+    int         videofd;
 
     struct CHANLIST *curList;  
-    int totalChannels;
+    int         totalChannels;
 
-    int videomode_v4l1;
-    v4l2_std_id videomode_v4l2;
-    bool usingv4l2;
+    bool        usingv4l2;      ///< Set to true if tuner accepts v4l2 commands
+    int         videomode_v4l1; ///< Current video mode if 'usingv4l2' is false
+    v4l2_std_id videomode_v4l2; ///< Current video mode if 'usingv4l2' is true
 
-    QString currentFormat;
+    QString     currentFormat;
 
-    int defaultFreqTable;
-
-    bool commfree;
+    int         defaultFreqTable;
 };
 
 #endif

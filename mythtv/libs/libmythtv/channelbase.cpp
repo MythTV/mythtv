@@ -19,90 +19,30 @@
 using namespace std;
 
 ChannelBase::ChannelBase(TVRec *parent)
+    : pParent(parent), channelorder("channum + 0"), curchannelname(""),
+      capchannels(0), currentcapchannel(-1), commfree(false)
 {
-    curchannelname = "";
-    pParent = parent;
-    capchannels = 0;
-    currentcapchannel = -1;
-    channelorder = "channum + 0";
-
-    //XXX from setformat pParent->RetrieveInputChannels(inputChannel,inputTuneTo,externalChanger);
 }
 
 ChannelBase::~ChannelBase(void)
 {
 }
 
-bool ChannelBase::ChannelUp(void)
+bool ChannelBase::SetChannelByDirection(ChannelChangeDirection dir)
 {
     bool fTune = false;
-    QString start;
-    QString nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_UP);
-    start = nextchan;
+    QString start, nextchan;
+    start = nextchan = pParent->GetNextChannel(this, dir);
 
     do
     {
        fTune = SetChannelByString(nextchan);
        if (!fTune)
-           nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_UP);
+           nextchan = pParent->GetNextChannel(this, dir);
     }
     while (!fTune && nextchan != start);
 
     return fTune;
-}
-
-bool ChannelBase::ChannelDown(void)
-{
-    bool fTune = false;
-    QString start;
-
-    QString nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_DOWN);
-    start = nextchan;
-
-    do
-    {
-       fTune = SetChannelByString(nextchan);
-       if (!fTune)
-           nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_DOWN);
-    }
-    while (!fTune && nextchan != start);
-
-    return fTune;
-}
-
-bool ChannelBase::NextFavorite(void)
-{
-    bool fTune = false;
-    QString start;
-
-    QString nextchan = pParent->GetNextChannel(this, 
-                                               CHANNEL_DIRECTION_FAVORITE);
-    start = nextchan;
-    do
-    {
-       fTune = SetChannelByString(nextchan);
-       if (!fTune)
-           nextchan = pParent->GetNextChannel(this,
-                                               CHANNEL_DIRECTION_FAVORITE);
-    }
-    while (!fTune && nextchan != start);
-
-    return fTune;
-}
-
-QString ChannelBase::GetCurrentName(void)
-{
-    return curchannelname;
-}
-
-QString ChannelBase::GetCurrentInput(void)
-{
-    return channelnames[currentcapchannel];
-}
-
-int ChannelBase::GetCurrentInputNum(void)
-{
-    return currentcapchannel;
 }
 
 void ChannelBase::ToggleInputs(void)
@@ -120,14 +60,14 @@ void ChannelBase::ToggleInputs(void)
     }
 }
 
-QString ChannelBase::GetInputByNum(int capchannel)
+QString ChannelBase::GetInputByNum(int capchannel) const
 {
     if (capchannel > capchannels)
         return "";
     return channelnames[capchannel];
 }
 
-int ChannelBase::GetInputByName(const QString &input)
+int ChannelBase::GetInputByName(const QString &input) const
 {
     for (int i = capchannels-1; i >= 0; i--)
         if (channelnames[i] == input)

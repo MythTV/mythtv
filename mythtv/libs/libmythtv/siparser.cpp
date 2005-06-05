@@ -238,19 +238,26 @@ void SIParser::CheckTrackers()
             switch (x)
             {
                 case PMT:
-                             while (Table[PMT]->GetEmitID(key0,key1))
-                                 emit NewPMT( ((PMTHandler *) Table[PMT])->pmt[key0] );
-                             break;
+                    while (Table[PMT]->GetEmitID(key0, key1))
+                    {
+                        PMTHandler *hdl = (PMTHandler*) Table[PMT];
+                        const PMTObject &pmt = hdl->pmt[key0];
+                        emit UpdatePMT(&pmt);
+                    }
+                    break;
                 case EVENTS:
-                             while (Table[EVENTS]->GetEmitID(key0,key1))
-                                 emit EventsReady( &((EventHandler *) Table[EVENTS])->Events[key0] );
-                             break;
+                    while (Table[EVENTS]->GetEmitID(key0,key1))
+                    {
+                        EventHandler *hdl = (EventHandler*) Table[EVENTS];
+                        emit EventsReady(&(hdl->Events[key0]));
+                    }
+                    break;
                 case NETWORK:
-                             while(Table[NETWORK]->GetEmitID(key0,key1))
-                                 emit FindTransportsComplete();
-
+                    while(Table[NETWORK]->GetEmitID(key0,key1))
+                        emit FindTransportsComplete();
+                    break;
                 default:
-                             break;
+                    break;
             }
         }
     }

@@ -20,19 +20,18 @@
 #include <iostream>
 using namespace std;
 
+/** \class Channel
+ *  \brief Class implementing ChannelBase interface to tuning hardware
+ *         when using Video4Linux based drivers.
+ */
+
+
 Channel::Channel(TVRec *parent, const QString &videodevice)
-       : ChannelBase(parent)
+    : ChannelBase(parent), device(videodevice), videofd(-1),
+      curList(NULL), totalChannels(0), usingv4l2(false),
+      videomode_v4l1(VIDEO_MODE_NTSC), videomode_v4l2(V4L2_STD_NTSC),
+      currentFormat(""), defaultFreqTable(1)
 {
-    device = videodevice;
-    isopen = false;
-    videofd = -1;
-    curList = 0;
-    defaultFreqTable = 1;
-    totalChannels = 0;
-    usingv4l2 = false;
-    videomode_v4l1 = VIDEO_MODE_NTSC;
-    videomode_v4l2 = V4L2_STD_NTSC;
-    currentFormat = "";
 }
 
 Channel::~Channel(void)
@@ -45,13 +44,11 @@ bool Channel::Open(void)
 #if FAKE_VIDEO
     return true;
 #endif
-    if (isopen)
+    if (videofd >= 0)
         return true;
 
     videofd = open(device.ascii(), O_RDWR);
-    if (videofd > 0)
-        isopen = true;
-    else
+    if (videofd < 0)
     {
          VERBOSE(VB_IMPORTANT,
                  QString("Channel(%1)::Open(): Can't open video device, "
@@ -69,29 +66,19 @@ bool Channel::Open(void)
             usingv4l2 = true;
     }
 
-    return isopen;
+    return true;
 }
 
 void Channel::Close(void)
 {
-    if (isopen)
+    if (videofd >= 0)
         close(videofd);
-    isopen = false;
     videofd = -1;
 }
 
 void Channel::SetFd(int fd)
 {
-    if (fd > 0)
-    {
-        videofd = fd;
-        isopen = true;
-    }
-    else
-    {
-        videofd = -1;
-        isopen = false;
-    }
+    videofd = (fd >= 0) ? fd : -1;
 }
 
 static int format_to_mode(const QString& fmt, int v4l_version)
@@ -322,73 +309,37 @@ int Channel::GetCurrentChannelNum(const QString &channame)
     return -1;
 }
 
-bool Channel::ChannelUp(void)
+bool Channel::SetChannelByDirection(ChannelChangeDirection dir)
 {
-    if (ChannelBase::ChannelUp())
+    if (ChannelBase::SetChannelByDirection(dir))
         return true;
+
+    if ((CHANNEL_DIRECTION_UP != dir) && (CHANNEL_DIRECTION_DOWN != dir))
+        return false;
 
     QString nextchan;
     bool finished = false;
     int chancount = 0;
     int curchannel = GetCurrentChannelNum(curchannelname);
+    int incrDir = (CHANNEL_DIRECTION_UP == dir) ? 1 : -1;
 
     while (!finished)
     {
-        curchannel++;
+        curchannel += incrDir;
+        curchannel = (curchannel < 0) ? totalChannels - 1 : curchannel;
+        curchannel = (curchannel > totalChannels) ? 0 : curchannel;
         chancount++;
 
-        if (curchannel == totalChannels)
-            curchannel = 0;
-
         nextchan = curList[curchannel].name;
-
         finished = SetChannelByString(nextchan);
 
         if (chancount > totalChannels)
         {
-            VERBOSE(VB_IMPORTANT, "Error, couldn't find any available "
-                                  "channels.");
-            VERBOSE(VB_IMPORTANT, "Your database is most likely setup "
-                                  "incorrectly.");
+            VERBOSE(VB_IMPORTANT, "Error, couldn't find any available channels."
+                    "\n\t\t\tYour database is most likely setup incorrectly.");
             break;
         }
     }
-
-    return finished;
-}
-
-bool Channel::ChannelDown(void)
-{
-    if (ChannelBase::ChannelDown())
-        return true;
-
-    QString nextchan;
-    bool finished = false;
-    int chancount = 0;
-    int curchannel = GetCurrentChannelNum(curchannelname);
-
-    while (!finished)
-    {
-        curchannel--;
-        chancount++;
-
-        if (curchannel < 0)
-            curchannel = totalChannels - 1;
-
-        nextchan = curList[curchannel].name;
-
-        finished = SetChannelByString(nextchan);
-
-        if (chancount > totalChannels)
-        {
-            VERBOSE(VB_IMPORTANT, "Error, couldn't find any available "
-                                  "channels.");
-            VERBOSE(VB_IMPORTANT, "Your database is most likely setup "
-                                  "incorrectly.");
-            break;
-        }
-    }
-
     return finished;
 }
 
@@ -408,7 +359,7 @@ bool Channel::SetChannelByString(const QString &chan)
     {
         VERBOSE(VB_IMPORTANT, QString(
                     "Channel(%1): CheckChannel failed. Please verify "
-                    "channel \"%2\" in the \"setup\" Channel Editor.").
+                    "channel \"%2\" in the \"mythtv-setup\" Channel Editor.").
                 arg(device).arg(chan));
         return false;
     }
@@ -437,6 +388,10 @@ bool Channel::SetChannelByString(const QString &chan)
         MythContext::DBError("fetchtuningparams", query);
     if (query.size() <= 0)
     {
+        VERBOSE(VB_IMPORTANT, QString(
+                    "Channel(%1): CheckChannel failed because it could not\n"
+                    "\t\t\tfind channel number '%2' in DB for source '%3'.")
+                .arg(device).arg(chan).arg(sourceid[currentcapchannel]));
         return false;
     }
     query.next();

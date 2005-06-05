@@ -11,9 +11,6 @@
 #include <qstring.h>
 #include <qsqldatabase.h>
 
-#include <map>
-using namespace std;
-
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "channelbase.h"
@@ -28,7 +25,7 @@ class DVBCam;
 class DVBChannel : public QObject, public ChannelBase
 {
     Q_OBJECT
-public:
+  public:
     DVBChannel(int cardnum, TVRec *parent = NULL);
     ~DVBChannel();
 
@@ -36,44 +33,50 @@ public:
     void Close() {};
     void CloseDVB();
 
-    fe_type_t GetCardType() { return info.type; };
-    bool GetTuningParams(DVBTuning &tuning);
-
+    // Sets
+    void SetCurrentTransportDBID(int _id) { currentTID = _id; };
     bool SetTransportByInt(int mplexid);
     bool SetChannelByString(const QString &chan);
-    void StopTuning();
     void SetFreqTable(const QString &name);
+    void SetCAPMT(const PMTObject *pmt);
+
+    // Gets
+    int  GetFd() const { return fd_frontend; }
+    int  GetCardNum() const { return cardnum; };
+    int  GetCurrentTransportDBID() const { return currentTID; };
+    const dvb_channel_t& GetCurrentChannel() const
+        { return chan_opts; };
+    bool GetTuningParams(DVBTuning &tuning) const;
+    fe_type_t   GetCardType()   const { return info.type; };
+    QString     GetSIStandard() const { return chan_opts.sistandard; }
+    uint        GetServiceID()  const { return chan_opts.serviceID; }
+    inline void SetPMTSet(bool);
+    inline bool GetPMTSet();
+
+    // Commands
     void SwitchToInput(const QString &inputname, const QString &chan);
     void SwitchToInput(int newcapchannel, bool setstarting)
-                      { (void)newcapchannel; (void)setstarting; }
-
-    int GetFd() { return fd_frontend; }
-
-    void GetCurrentChannel(dvb_channel_t *& chan)
-        { chan = &chan_opts; };
-
+        { (void)newcapchannel; (void)setstarting; }
     bool Tune(dvb_channel_t& channel, bool all=false);
     bool TuneTransport(dvb_channel_t& channel, bool all=false, int timeout=30000);
-    int  GetCurrentTransportDBID() { return currentTID; };
-    void SetCurrentTransportDBID(int _id) { currentTID = _id; };
-    int  GetCardNum() { return cardnum; };
-    void RecorderStarted();
+    void StopTuning();
 
-    void SetCAPMT(PMTObject pmt);
-
+    pthread_t           siparser_thread;
     DVBSIParser*        siparser;
 
-public slots:
-    void SetPMT(PMTObject NewPMT);
+    // Messages to DVBChannel
+  public slots:
+    void RecorderStarted();
+    void SetPMT(const PMTObject *pmt);
 
-signals:
+    // Messages from DVBChannel
+  signals:
     void ChannelChanged(dvb_channel_t& chan);
-    void Tuning(dvb_channel_t& channel);
 
-private:
+  private:
+    // Helper methods
     bool GetTransportOptions(int mplexid);
-
-    bool GetChannelOptions(QString channum);
+    bool GetChannelOptions(const QString &channum);
 
     void PrintChannelOptions();
 
@@ -91,23 +94,37 @@ private:
     static void *SpawnSectionReader(void *param);
     static void *SpawnSIParser(void *param);
 
-    DVBDiSEqC*          diseqc;
-    DVBCam*             dvbcam;
+  private:
+    // Data
+    DVBDiSEqC*        diseqc;
+    DVBCam*           dvbcam;
 
-    pthread_t           siparser_thread;
+    dvb_frontend_info info;
+    dvb_channel_t     chan_opts;
+    DVBTuning         prev_tuning;
 
-    dvb_frontend_info   info;
-    dvb_channel_t       chan_opts;
-    DVBTuning        prev_tuning;
+    volatile int      fd_frontend;
+    int               cardnum;
+    int               currentTID;
 
-    int     cardnum;
-    volatile int fd_frontend;
-    int     currentTID;
-
-
-    bool    stopTuning;
-    bool    force_channel_change;
-    bool    first_tune;
+    bool              stopTuning;
+    bool              force_channel_change;
+    bool              first_tune;
 };
+
+inline void DVBChannel::SetPMTSet(bool pmt_set)
+{
+    pthread_mutex_lock(&chan_opts.lock);
+    chan_opts.PMTSet = pmt_set;
+    pthread_mutex_unlock(&chan_opts.lock);
+}
+
+inline bool DVBChannel::GetPMTSet()
+{
+    pthread_mutex_lock(&chan_opts.lock);
+    bool pmt_set = chan_opts.PMTSet;
+    pthread_mutex_unlock(&chan_opts.lock);
+    return pmt_set;
+}
 
 #endif

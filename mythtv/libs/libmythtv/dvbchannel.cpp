@@ -131,8 +131,8 @@ bool DVBChannel::Open()
         siparser = new DVBSIParser(cardnum);
         pthread_create(&siparser_thread,NULL,SpawnSectionReader, siparser);
 
-        connect(siparser,SIGNAL(NewPMT(PMTObject)),this,
-                     SLOT(SetPMT(PMTObject)));
+        connect(siparser, SIGNAL(UpdatePMT(const PMTObject*)),
+                this, SLOT(SetPMT(const PMTObject*)));
     }
 
     if (fd_frontend >= 0)
@@ -181,9 +181,10 @@ bool DVBChannel::Open()
     return (fd_frontend >= 0 );
 }
 
-/*
- *  To be used by setup sdt/nit scanner and eit parser.
- *  mplexid is how the db indexes each transport
+/** \fn DVBChannel::SetTransportByInt(int mplexid)
+ *  \brief To be used by setup sdt/nit scanner and eit parser.
+ *
+ *   mplexid is how the db indexes each transport
  */
 bool DVBChannel::SetTransportByInt(int mplexid)
 {
@@ -249,7 +250,7 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 // TODO: Look at better communication with recorder so that only PMAP needs tobe passed
 void DVBChannel::RecorderStarted()
 {
-    ChannelChanged(chan_opts);
+    emit ChannelChanged(chan_opts);
 }
 
 void DVBChannel::SwitchToInput(const QString &input, const QString &chan)
@@ -261,13 +262,12 @@ void DVBChannel::SwitchToInput(const QString &input, const QString &chan)
     SetChannelByString(chan);
 }
 
-/*
- * This function called when tuning to a speficic program not just the transport
- * in general.
+/** \fn DVBChannel::GetChannelOptions(const QString&)
+ *  \brief This function called when tuning to a specific program not 
+ *         just the transport in general.
  */
-bool DVBChannel::GetChannelOptions(QString channum)
+bool DVBChannel::GetChannelOptions(const QString& channum)
 {
-
     QString         thequery;
     QString         inputName;
 
@@ -322,7 +322,6 @@ bool DVBChannel::GetChannelOptions(QString channum)
 
 bool DVBChannel::GetTransportOptions(int mplexid)
 {
-
     MSqlQuery query(MSqlQuery::InitCon());
     QString thequery;
 
@@ -649,11 +648,13 @@ void DVBChannel::CheckOptions()
     if (info.type != FE_OFDM &&
        (symbol_rate < info.symbol_rate_min ||
         symbol_rate > info.symbol_rate_max))
+    {
         WARNING(QString("Symbol Rate setting (%1) is "
                         "out of range (min/max:%2/%3)")
                         .arg(symbol_rate)
                         .arg(info.symbol_rate_min)
                         .arg(info.symbol_rate_max));
+    }
 }
 
 bool DVBChannel::CheckCodeRate(fe_code_rate_t& rate)
@@ -763,21 +764,20 @@ bool DVBChannel::ParseTransportQuery(MSqlQuery& query)
   PMT Handler Code 
 *****************************************************************************/
 
-void DVBChannel::SetPMT(PMTObject NewPMT)
+void DVBChannel::SetPMT(const PMTObject *pmt)
 {
     pthread_mutex_lock(&chan_opts.lock);
 
-    chan_opts.pmt = NewPMT;
+    chan_opts.pmt = *pmt;
     chan_opts.PMTSet = true;
 
     pthread_mutex_unlock(&chan_opts.lock);
 
     // Send the PMT to recorder (needs to be cleaned up some)
-    ChannelChanged(chan_opts);
-
+    emit ChannelChanged(chan_opts);
 }
 
-void DVBChannel::SetCAPMT(PMTObject pmt)
+void DVBChannel::SetCAPMT(const PMTObject *pmt)
 {
     // This is called from DVBRecorder
     // when AutoPID is complete
@@ -794,9 +794,7 @@ bool DVBChannel::Tune(dvb_channel_t& channel, bool all)
 {
     // This function allows you to tune to more than just a transport, and also
     // verifies the service exists, and get the PIDs if auto-pid is turned on
-    pthread_mutex_lock(&chan_opts.lock);
-    channel.PMTSet = false;
-    pthread_mutex_unlock(&chan_opts.lock);
+    SetPMTSet(false);
 
     if (!TuneTransport(channel,all))
         return false;
@@ -823,9 +821,13 @@ bool DVBChannel::Tune(dvb_channel_t& channel, bool all)
     return false;
 }
 
-/*
- *  Tunes the card to a transport but doesnt deal with PIDS.  This is used
- *  by DVB Setup Scanner and EIT Parser. timeout in millis
+/** \fn DVBChannel::TuneTransport(dvb_channel_t&, bool, int)
+ *  \brief Tunes the card to a transport but does not deal with PIDs.
+ *
+ *   This is used by DVB Channel Scanner, the EIT Parser, and by TVRec.
+ *
+ *  \param channel Info on transport to tune to
+ *  \param all     If true frequency tuning is done even if not strictly needed.
  */
 bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
 {
@@ -946,7 +948,7 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
     }
 }
 
-bool DVBChannel::GetTuningParams(DVBTuning& tuning)
+bool DVBChannel::GetTuningParams(DVBTuning& tuning) const
 {
     if (fd_frontend < 0)
     {

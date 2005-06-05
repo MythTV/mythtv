@@ -6,11 +6,9 @@
 #include <qdatetime.h>
 #include <qvaluelist.h>
 #include <qptrlist.h>
+#include <qmap.h>
 
 #include "tv.h"
-
-#include <map>
-using namespace std;
 
 class QSocket;
 class ChannelBase;
@@ -100,11 +98,11 @@ class TVRec
                           int cardid, QString channelorder,
                           int channeldirection, QString &chanid);
 
-    void RetrieveInputChannels(map<int, QString> &inputChannel,
-                               map<int, QString> &inputTuneTo,
-                               map<int, QString> &externalChanger,
-                               map<int, QString> &sourceid);
-    void StoreInputChannels(map<int, QString> &inputChannel);
+    void RetrieveInputChannels(QMap<int, QString> &inputChannel,
+                               QMap<int, QString> &inputTuneTo,
+                               QMap<int, QString> &externalChanger,
+                               QMap<int, QString> &sourceid);
+    void StoreInputChannels(QMap<int, QString> &inputChannel);
 
     bool IsBusy(void);
     bool IsReallyRecording(void);
@@ -123,7 +121,7 @@ class TVRec
     void PauseRecorder(void);
     void ToggleInputs(void);
     void ToggleChannelFavorite(void);
-    void ChangeChannel(int channeldirection);
+    void ChangeChannel(ChannelChangeDirection dir);
     void SetChannel(QString name);
     int ChangeColour(bool direction);
     int ChangeContrast(bool direction);

@@ -4,8 +4,6 @@
 #include <cstring>
 #include <unistd.h>
 #include <pthread.h>
-#include <qsqldatabase.h>
-#include <qsocket.h>
 
 // C++ headers
 #include <iostream>
@@ -13,6 +11,8 @@ using namespace std;
 
 // Qt headers
 #include <qapplication.h>
+#include <qsqldatabase.h>
+#include <qsocket.h>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -2201,11 +2201,9 @@ void TVRec::ToggleInputs(void)
 /** \fn TVRec::ChangeChannel(ChannelChangeDirection)
  *  \brief Changes to a channel in the 'dir' channel change direction.
  *
- *   You must call Pause() before calling this, and Unpause()
- *   after this.
  *  \param dir channel change direction \sa ChannelChangeDirection.
  */
-void TVRec::ChangeChannel(int channeldirection)
+void TVRec::ChangeChannel(ChannelChangeDirection dir)
 {
     if (!recorder || !channel || !rbuffer)
         return;
@@ -2222,12 +2220,7 @@ void TVRec::ChangeChannel(int channeldirection)
 
     rbuffer->Reset();
 
-    if (channeldirection == CHANNEL_DIRECTION_FAVORITE)
-        channel->NextFavorite();
-    else if (channeldirection == CHANNEL_DIRECTION_UP)
-        channel->ChannelUp();
-    else
-        channel->ChannelDown();
+    channel->SetChannelByDirection(dir);
 
     recorder->ChannelNameChanged(channel->GetCurrentName());
     recorder->Reset();
@@ -2386,8 +2379,6 @@ int TVRec::ChangeHue(bool direction)
 /** \fn TVRec::SetChannel(QString name)
  *  \brief Changes to a named channel on the current tuner.
  *
- *   You must call Pause() before calling this, and Unpause()
- *   after this.
  *  \param name channel to change to.
  */
 void TVRec::SetChannel(QString name)
@@ -2712,13 +2703,13 @@ int TVRec::RequestRingBufferBlock(int size)
     return tot;
 }
 
-/** \fn  TVRec::RetrieveInputChannels(map<int,QString>&,map<int,QString>&,map<int,QString>&,map<int,QString>&)
+/** \fn  TVRec::RetrieveInputChannels(QMap<int,QString>&,QMap<int,QString>&,QMap<int,QString>&,QMap<int,QString>&)
  *  \brief Returns all channels, used for channel browsing.
  */
-void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
-                                  map<int, QString> &inputTuneTo,
-                                  map<int, QString> &externalChanger,
-                                  map<int, QString> &sourceid)
+void TVRec::RetrieveInputChannels(QMap<int, QString> &inputChannel,
+                                  QMap<int, QString> &inputTuneTo,
+                                  QMap<int, QString> &externalChanger,
+                                  QMap<int, QString> &sourceid)
 {
     if (!channel)
         return;
@@ -2760,13 +2751,13 @@ void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
 
 }
 
-/** \fn TVRec::StoreInputChannels(map<int, QString>&)
+/** \fn TVRec::StoreInputChannels(QMap<int, QString>&)
  *  \brief Sets starting channel for the each input in the "inputChannel" map.
  *
  *  \param inputChannel Map from input number to channel, with an input and 
  *                      default channel for each input to update.
  */
-void TVRec::StoreInputChannels(map<int, QString> &inputChannel)
+void TVRec::StoreInputChannels(QMap<int, QString> &inputChannel)
 {
     if (!channel)
         return;

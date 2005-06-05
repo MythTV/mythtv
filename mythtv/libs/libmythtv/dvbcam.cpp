@@ -250,22 +250,22 @@ void DVBCam::CiHandlerLoop()
     GENERAL(QString("CA: CiHandler thread stopped"));
 }
 
-void DVBCam::SetPMT(PMTObject &pmt)
+void DVBCam::SetPMT(const PMTObject *pmt)
 {
-    GENERAL(QString("CA: SetPMT for ServiceID=%1").arg(pmt.ServiceID));
+    GENERAL(QString("CA: SetPMT for ServiceID=%1").arg(pmt->ServiceID));
     pthread_mutex_lock(&pmt_lock);
     PMTList.clear();
-    PMTList += pmt;
+    PMTList += *pmt;
     have_pmt = true;
     pmt_updated = true;
     pthread_mutex_unlock(&pmt_lock);
 }
 
-void DVBCam::AddPMT(PMTObject &pmt)
+void DVBCam::AddPMT(const PMTObject *pmt)
 {
-    GENERAL(QString("CA: AddPMT for ServiceID=%1").arg(pmt.ServiceID));
+    GENERAL(QString("CA: AddPMT for ServiceID=%1").arg(pmt->ServiceID));
     pthread_mutex_lock(&pmt_lock);
-    PMTAddList += pmt;
+    PMTAddList += *pmt;
     pmt_added = true;
     pthread_mutex_unlock(&pmt_lock);
 }

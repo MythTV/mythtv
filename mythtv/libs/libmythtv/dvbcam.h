@@ -17,8 +17,8 @@ public:
     bool Start();
     bool Stop();
     bool IsRunning();
-    void SetPMT(PMTObject &pmt);
-    void AddPMT(PMTObject &pmt);
+    void SetPMT(const PMTObject *pmt);
+    void AddPMT(const PMTObject *pmt);
 
 private:
     static void *CiHandlerThreadHelper(void*self);

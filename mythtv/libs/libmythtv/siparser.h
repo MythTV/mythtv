@@ -124,7 +124,7 @@ signals:
 
     void TableLoaded();
 
-    void NewPMT(PMTObject NewPMT);
+    void UpdatePMT(const PMTObject *pmt);
 
 private:
 
