@@ -78,6 +78,19 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
             ntsc_framerate = 1;
             video_frame_rate = 29.97;
         }
+        else if (value.lower() == "atsc")
+        {
+            // Here we set the TV format values for ATSC. ATSC isn't really 
+            // NTSC, but users who configure a non-ATSC-recorder as ATSC
+            // are far more likely to be using a mix of ATSC and NTSC than
+            // a mix of ATSC and PAL or SECAM. The atsc recorder itself
+            // does not care about these values, except in so much as tv_rec
+            // cares anout video_frame_rate which should be neither 29.97 
+            // nor 25.0, but based on the actual video.
+            ntsc = 1;
+            ntsc_framerate = 1;
+            video_frame_rate = 29.97;
+        }
         else
         {
             ntsc = 0;
