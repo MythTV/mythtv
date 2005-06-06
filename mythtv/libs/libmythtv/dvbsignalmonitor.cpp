@@ -301,7 +301,7 @@ void DVBSignalMonitor::UpdateValues(void)
     if (!dtvMonitorRunning && FillFrontendStats(fd, stats) &&
         !(stats.status & FE_TIMEDOUT))
     {
-        int wasLocked = signalLock.GetValue();
+        //int wasLocked = signalLock.GetValue();
         int locked = (stats.status & FE_HAS_LOCK) ? 1 : 0;
         signalLock.SetValue(locked);
         signalStrength.SetValue((int) stats.ss);

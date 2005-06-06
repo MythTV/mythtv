@@ -4,15 +4,16 @@
 #include "qobject.h"
 class QString;
 
-/* Abstract base class for all CommDetectors. Please use the CommDetectFactory
- * to make actual instances.
- */
-
 enum commMapValues {
     MARK_START = 0,
     MARK_END,
     MARK_PRESENT
 };
+
+/** \class CommDetectorBase
+ *  \brief Abstract base class for all CommDetectors.
+ *   Please use the CommDetectFactory to make actual instances.
+ */
 
 class CommDetectorBase : public QObject
 {
@@ -26,8 +27,9 @@ public:
     void pause();
     void resume();
 
-    virtual void getCommercialBreakList(QMap<long long, int> &comms) =0;
-    virtual void recordingFinished(long long totalFileSize) {};
+    virtual void getCommercialBreakList(QMap<long long, int> &comms) = 0;
+    virtual void recordingFinished(long long totalFileSize)
+        { (void)totalFileSize; };
     virtual void requestCommBreakMapUpdate(void) {};
 
 signals:
