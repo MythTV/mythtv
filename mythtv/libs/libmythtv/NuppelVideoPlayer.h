@@ -44,7 +44,7 @@ typedef  void (*StatusCallback)(int, void*);
 class NuppelVideoPlayer
 {
  public:
-    NuppelVideoPlayer(ProgramInfo *info = NULL);
+    NuppelVideoPlayer(const ProgramInfo *info = NULL);
    ~NuppelVideoPlayer();
 
     void SetParentWidget(QWidget *widget) { parentWidget = widget; }

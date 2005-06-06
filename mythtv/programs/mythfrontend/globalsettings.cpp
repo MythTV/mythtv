@@ -920,6 +920,17 @@ static HostCheckBox *CCWarnSetting()
     return gc;
 }
 
+static HostCheckBox *AudioNagSetting()
+{
+    HostCheckBox *gc = new HostCheckBox("AudioNag");
+    gc->setLabel(QObject::tr("Enable warning about missing audio output"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If enabled, MythTV will warn you "
+                                "whenever you try to watch a something "
+                                "and MythTV can't access the soundcard."));
+    return gc;
+}
+
 static HostLineEdit *UDPNotifyPort()
 {
     HostLineEdit *ge = new HostLineEdit("UDPNotifyPort");
@@ -2874,6 +2885,7 @@ PlaybackSettings::PlaybackSettings()
     gen2->addChild(AltClearSavedPosition());
     gen2->addChild(UsePicControls());
     gen2->addChild(CCWarnSetting());
+    gen2->addChild(AudioNagSetting());
     gen2->addChild(UDPNotifyPort());
     addChild(gen2);
 

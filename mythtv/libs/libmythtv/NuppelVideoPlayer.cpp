@@ -63,7 +63,7 @@ int isnan(double);
 }
 #endif
 
-NuppelVideoPlayer::NuppelVideoPlayer(ProgramInfo *info)
+NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
     : decoder_lock(true)
 {
     m_playbackinfo = NULL;
@@ -1806,39 +1806,56 @@ void NuppelVideoPlayer::StartPlaying(void)
                                              AUDIOOUTPUT_VIDEO,
                                              setVolume);
 
-        DialogBox *dialog = NULL;
+        QString errMsg = QString::null;
         if (audioOutput == NULL)
         {
-            qApp->lock();
-            dialog = new DialogBox(gContext->GetMainWindow(),
-                                   QObject::tr("Unable to create AudioOutput."));
+            errMsg = QObject::tr("Unable to create AudioOutput.");
         }
         else if (audioOutput->GetError() != QString::null)
         {
-            qApp->lock();
-            dialog = new DialogBox(gContext->GetMainWindow(),
-                                   audioOutput->GetError());
+            errMsg = audioOutput->GetError();
         }
 
-        if (dialog != NULL)
+        int ret = 1;
+        if ((errMsg != QString::null) && gContext->GetNumSetting("AudioNag", 1))
         {
-            dialog->AddButton(QObject::tr("Continue WITHOUT AUDIO!"));
-            dialog->AddButton(QObject::tr("Return to menu."));
-            int ret = dialog->exec();
-            delete dialog;
+            DialogBox dialog(gContext->GetMainWindow(), errMsg);
 
+            QString noaudio  = QObject::tr("Continue WITHOUT AUDIO!");
+            QString dontask  = noaudio + " " + 
+                QObject::tr("And, never ask again.");
+            QString neverask = noaudio + " " +
+                QObject::tr("And, don't ask again in this session.");
+            QString quit     = QObject::tr("Return to menu.");
+
+            dialog.AddButton(noaudio);
+            dialog.AddButton(dontask);
+            dialog.AddButton(neverask);
+            dialog.AddButton(quit);
+
+            qApp->lock();
+            ret = dialog.exec();
             qApp->unlock();
-
+        }
+        
+        if (errMsg != QString::null)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Disabling Audio, reason is: %1")
+                    .arg(errMsg));
             if (audioOutput)
             {
                 delete audioOutput;
                 audioOutput = NULL;
             }
             disableaudio = true;
-
-            if (ret == 2)
-                return;
         }
+            
+        if (ret == 2)
+            gContext->SaveSetting("AudioNag", 0);
+        if (ret == 3)
+            gContext->SetSetting("AudioNag", 0);
+        else if (ret == 4)
+            return;
     }
 
     if (!InitVideo())

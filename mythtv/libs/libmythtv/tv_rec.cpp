@@ -965,7 +965,7 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
         return NULL;
 
     NuppelVideoPlayer *nupvidplay =
-        new NuppelVideoPlayer((ProgramInfo*)pginfo);
+        new NuppelVideoPlayer(pginfo);
     nupvidplay->SetRingBuffer(tmprbuf);
     nupvidplay->SetAudioSampleRate(audioSampleRateDB);
 
