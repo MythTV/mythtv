@@ -347,7 +347,7 @@ package export::transcode;
                 elsif ($l =~ m/\[transcode\] warning/) {
                     $warnings .= $l;
                 }
-                elsif ($l =~ m/\[transcode\] critical/) {
+                elsif ($l =~ m/\[transcode\] critical/ || $l =~ m/segmentation fault/i) {
                     $warnings .= $l;
                     die "\n\nTranscode had critical errors:\n\n$warnings";
                 }
