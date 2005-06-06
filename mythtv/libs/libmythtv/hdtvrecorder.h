@@ -56,6 +56,9 @@ class HDTVRecorder : public DTVRecorder
 
     void ChannelNameChanged(const QString& new_freqid);
 
+    ATSCStreamData* StreamData() { return _atsc_stream_data; }
+    const ATSCStreamData* StreamData() const { return _atsc_stream_data; }
+
   private:
     int ProcessData(unsigned char *buffer, int len);
     bool ProcessTSPacket(const TSPacket& tspacket);
@@ -68,14 +71,11 @@ class HDTVRecorder : public DTVRecorder
     void fill_ringbuffer(void);
     int ringbuf_read(unsigned char *buffer, size_t count);
 
-    ATSCStreamData* StreamData() { return _atsc_stream_data; }
-    const ATSCStreamData* StreamData() const { return _atsc_stream_data; }
-
  private slots:
     void WritePAT(ProgramAssociationTable*);
     void WritePMT(ProgramMapTable*);
     void ProcessMGT(const MasterGuideTable*);
-    void ProcessVCT(uint pid, const VirtualChannelTable*);
+    void ProcessVCT(uint, const VirtualChannelTable*);
  private:
     ATSCStreamData* _atsc_stream_data;
 

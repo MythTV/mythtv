@@ -1,9 +1,13 @@
 #include <cerrno>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include "videodev_myth.h"
 #include "mythcontext.h"
 #include "pchdtvsignalmonitor.h"
 #include "channel.h"
+#include "atscstreamdata.h"
+#include "mpegtables.h"
+#include "atsctables.h"
 
 /** \fn pcHDTVSignalMonitor::pcHDTVSignalMonitor(int,uint,int)
  *  \brief Initializes signal lock and signal values.
@@ -15,16 +19,17 @@
  *   "ATSCCheckSignalThreshold" setting as a percentage.
  *
  *  \param _capturecardnum Recorder number to monitor,
- *                        if this is less than 0, SIGNAL events will not be
- *                        sent to the frontend even if SetNotifyFrontend(true)
- *                        is called.
+ *                         if this is less than 0, SIGNAL events will not be
+ *                         sent to the frontend even if SetNotifyFrontend(true)
+ *                         is called.
  *  \param _input          Input of device to monitor.
- *  \param _channel    File descriptor for device being monitored.
+ *  \param _channel        File descriptor for device being monitored.
  */
 pcHDTVSignalMonitor::pcHDTVSignalMonitor(int _capturecardnum, uint _input,
-                                         Channel *_channel):
-    DTVSignalMonitor(_capturecardnum, _channel->GetFd(), 0),
-    input(_input), usingv4l2(false), channel(_channel)
+                                         Channel *_channel, uint _flags):
+    DTVSignalMonitor(_capturecardnum, _channel->GetFd(), _flags),
+    input(_input), usingv4l2(false), dtvMonitorRunning(false),
+    channel(_channel)
 {
     int wait = gContext->GetNumSetting("ATSCCheckSignalWait", 5000);
     int threshold = gContext->GetNumSetting("ATSCCheckSignalThreshold", 65);
@@ -33,11 +38,7 @@ pcHDTVSignalMonitor::pcHDTVSignalMonitor(int _capturecardnum, uint _input,
     signalStrength.SetTimeout(wait);
     signalStrength.SetThreshold(threshold);
 
-    /*
-    cerr<<"pcHDTVSignalMonitor(input "<<input<<", fd "<<_fd_frontend<<")"<<endl;
-    cerr<<"("<<signalLock.GetName()<<", ("<<signalLock.GetStatus()<<"))"<<endl;
-    cerr<<"("<<signalStrength.GetName()<<", ("<<signalStrength.GetStatus()<<"))"<<endl;
-    */
+    table_monitor_thread = PTHREAD_CREATE_JOINABLE;
 
     struct v4l2_capability vcap;
     bzero(&vcap, sizeof(vcap));
@@ -45,18 +46,94 @@ pcHDTVSignalMonitor::pcHDTVSignalMonitor(int _capturecardnum, uint _input,
         (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE);
 }
 
+pcHDTVSignalMonitor::~pcHDTVSignalMonitor()
+{
+    Stop();
+}
+
+/** \fn pcHDTVSignalMonitor::Stop()
+ *  \brief Stops signal monitoring and table monitoring threads.
+ */
+void pcHDTVSignalMonitor::Stop()
+{
+    VERBOSE(VB_IMPORTANT, "pcHDTVSignalMonitor::Stop() -- begin");
+    SignalMonitor::Stop();
+    if (dtvMonitorRunning)
+    {
+        dtvMonitorRunning = false;
+        pthread_join(table_monitor_thread, NULL);
+    }
+    VERBOSE(VB_IMPORTANT, "pcHDTVSignalMonitor::Stop() -- end");
+}
+
+void *pcHDTVSignalMonitor::TableMonitorThread(void *param)
+{
+    pcHDTVSignalMonitor *mon = (pcHDTVSignalMonitor*) param;
+    mon->RunTableMonitor();
+    return NULL;
+}
+
+void pcHDTVSignalMonitor::RunTableMonitor()
+{
+    dtvMonitorRunning = true;
+    int remainder = 0;
+    int buffer_size = TSPacket::SIZE * 15000;
+    unsigned char *buffer = new unsigned char[buffer_size];
+    if (!buffer)
+        return;
+    bzero(buffer, buffer_size);
+
+    VERBOSE(VB_IMPORTANT, "RunTableMonitor() -- begin ("
+            <<GetStreamData()->ListeningPIDs().size()<<")");
+    while (dtvMonitorRunning && GetStreamData())
+    {
+        long long len = read(fd, &(buffer[remainder]), buffer_size - remainder);
+
+        if ((0 == len) || (-1 == len))
+        {
+            usleep(100);
+            continue;
+        }
+        cerr<<len<<endl;
+
+        len += remainder;
+        remainder = GetStreamData()->ProcessData(buffer, len);
+        if (remainder > 0) // leftover bytes
+            memmove(buffer, &(buffer[buffer_size - remainder]), remainder);
+    }
+    VERBOSE(VB_IMPORTANT, "RunTableMonitor() -- end");
+}
+
 /** \fn pcHDTVSignalMonitor::UpdateValues()
  *  \brief Queries signal strength and emits status Qt signals.
  *
- *  This uses GetSignal(int,uint,bool) to actually collect the signal values.
- *  It is automatically called by MonitorLoop(), after Start() has been uset
- *  to start the signal monitoring thread.
+ *   This uses GetSignal(int,uint,bool) to actually collect the signal values.
+ *   It is automatically called by MonitorLoop(), after Start() has been uset
+ *   to start the signal monitoring thread.
  */
 void pcHDTVSignalMonitor::UpdateValues()
 {
-    signalStrength.SetValue(GetSignal(fd, input, usingv4l2));
-    signalLock.SetValue(signalStrength.IsGood());
-    
+    if (!dtvMonitorRunning)
+    {
+        signalStrength.SetValue(GetSignal(fd, input, usingv4l2));
+        signalLock.SetValue(signalStrength.IsGood());
+        if (signalLock.IsGood() && GetStreamData() &&
+            HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
+                       kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
+                       kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
+        {
+            pthread_create(&table_monitor_thread, NULL,
+                           TableMonitorThread, this);
+            while (!dtvMonitorRunning)
+                usleep(50);
+        }
+    }
+    else
+    {
+        // TODO dtv signals...
+    }
+
+
     emit StatusSignalLock(signalLock.GetValue());
     emit StatusSignalStrength(signalStrength.GetValue());
 

@@ -1,15 +1,16 @@
 #include "dtvsignalmonitor.h"
 #include "atscstreamdata.h"
+#include "dvbstreamdata.h"
 #include "mpegtables.h"
 #include "atsctables.h"
+#include "dvbtables.h"
 
 /** \class DTVSignalMonitor
  *  \brief This class is intended to detect the presence of needed tables.
- *  \todo implement this class...
  */
 
-DTVSignalMonitor::DTVSignalMonitor(int capturecardnum, int fd, uint waitflags)
-    : SignalMonitor(capturecardnum, fd),
+DTVSignalMonitor::DTVSignalMonitor(int capturecardnum, int fd, uint wait_for_mask)
+    : SignalMonitor(capturecardnum, fd, wait_for_mask),
       atsc_stream_data(NULL), dvb_stream_data(NULL),
       seenPAT(QObject::tr("Seen PAT"), "seen_pat", 1, true, 0, 1, 0),
       seenPMT(QObject::tr("Seen PMT"), "seen_pmt", 1, true, 0, 1, 0),
@@ -23,23 +24,8 @@ DTVSignalMonitor::DTVSignalMonitor(int capturecardnum, int fd, uint waitflags)
       matchingVCT(QObject::tr("Matching VCT"), "matching_vct", 1, true, 0, 1, 0),
       matchingNIT(QObject::tr("Matching NIT"), "matching_nit", 1, true, 0, 1, 0),
       matchingSDT(QObject::tr("Matching SDT"), "matching_sdt", 1, true, 0, 1, 0),
-      flags(waitflags), majorChannel(-1), minorChannel(-1), programNumber(-1)
+      majorChannel(-1), minorChannel(-1), programNumber(-1)
 {
-}
-
-bool DTVSignalMonitor::ProcessTSPacket(const TSPacket& tspacket)
-{
-    if (GetATSCStreamData())
-    {
-        bool ok = !tspacket.TransportError();
-        if (ok && !tspacket.ScramplingControl() && tspacket.HasPayload() &&
-            GetATSCStreamData()->IsListeningPID(tspacket.PID()))
-        {
-            GetATSCStreamData()->HandleTables(&tspacket);
-        }
-        return ok;
-    }
-    return false;
 }
 
 QStringList DTVSignalMonitor::GetStatusList(bool kick)
@@ -83,40 +69,43 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
 
 void DTVSignalMonitor::AddFlags(uint _flags)
 {
-    flags |= _flags;
+    SignalMonitor::AddFlags(_flags);
     UpdateMonitorValues();
 }
 
 void DTVSignalMonitor::RemoveFlags(uint _flags)
 {
-    flags &= ~_flags;
+    SignalMonitor::RemoveFlags(_flags);
     UpdateMonitorValues();
 }
 
 void DTVSignalMonitor::UpdateMonitorValues()
 {
-    seenPAT.SetValue((flags & kDTVSigMon_PATSeen)?1:0);
-    seenPMT.SetValue((flags & kDTVSigMon_PMTSeen)?1:0);
-    seenMGT.SetValue((flags & kDTVSigMon_MGTSeen)?1:0);
-    seenVCT.SetValue((flags & kDTVSigMon_VCTSeen)?1:0);
-    seenNIT.SetValue((flags & kDTVSigMon_NITSeen)?1:0);
-    seenSDT.SetValue((flags & kDTVSigMon_SDTSeen)?1:0);
-    matchingPAT.SetValue((flags & kDTVSigMon_PATMatch)?1:0);
-    matchingPMT.SetValue((flags & kDTVSigMon_PMTMatch)?1:0);
-    matchingMGT.SetValue((flags & kDTVSigMon_MGTMatch)?1:0);
-    matchingVCT.SetValue((flags & kDTVSigMon_VCTMatch)?1:0);
-    matchingNIT.SetValue((flags & kDTVSigMon_NITMatch)?1:0);
-    matchingSDT.SetValue((flags & kDTVSigMon_SDTMatch)?1:0);
+    seenPAT.SetValue(    (flags & kDTVSigMon_PATSeen)  ? 1 : 0);
+    seenPMT.SetValue(    (flags & kDTVSigMon_PMTSeen)  ? 1 : 0);
+    seenMGT.SetValue(    (flags & kDTVSigMon_MGTSeen)  ? 1 : 0);
+    seenVCT.SetValue(    (flags & kDTVSigMon_VCTSeen)  ? 1 : 0);
+    seenNIT.SetValue(    (flags & kDTVSigMon_NITSeen)  ? 1 : 0);
+    seenSDT.SetValue(    (flags & kDTVSigMon_SDTSeen)  ? 1 : 0);
+    matchingPAT.SetValue((flags & kDTVSigMon_PATMatch) ? 1 : 0);
+    matchingPMT.SetValue((flags & kDTVSigMon_PMTMatch) ? 1 : 0);
+    matchingMGT.SetValue((flags & kDTVSigMon_MGTMatch) ? 1 : 0);
+    matchingVCT.SetValue((flags & kDTVSigMon_VCTMatch) ? 1 : 0);
+    matchingNIT.SetValue((flags & kDTVSigMon_NITMatch) ? 1 : 0);
+    matchingSDT.SetValue((flags & kDTVSigMon_SDTMatch) ? 1 : 0);
 }
 
 void DTVSignalMonitor::SetChannel(int major, int minor)
 {
-    if (majorChannel != major || minorChannel != minor)
+    if (GetATSCStreamData() && majorChannel != major || minorChannel != minor)
     {
-        RemoveFlags(kDTVSigMon_PATMatch|kDTVSigMon_PMTSeen|kDTVSigMon_VCTSeen);
+        RemoveFlags(kDTVSigMon_PATSeen | kDTVSigMon_PATMatch |
+                    kDTVSigMon_PMTSeen | kDTVSigMon_PMTMatch |
+                    kDTVSigMon_VCTSeen | kDTVSigMon_VCTMatch);
         majorChannel = major;
         minorChannel = minor;
-        GetATSCStreamData()->SetChannel(major, minor);
+        GetATSCStreamData()->SetDesiredChannel(major, minor);
+        AddFlags(kDTVSigMon_WaitForVCT);
     }
 }
 
@@ -124,50 +113,69 @@ void DTVSignalMonitor::SetProgramNumber(int progNum)
 {
     if (programNumber != progNum)
     {
-        RemoveFlags(kDTVSigMon_PMTSeen);
+        RemoveFlags(kDTVSigMon_PMTSeen | kDTVSigMon_PMTMatch);
         programNumber = progNum;
-        GetATSCStreamData()->SetDesiredProgram(programNumber);
+        if (GetStreamData())
+            GetStreamData()->SetDesiredProgram(programNumber);
+        AddFlags(kDTVSigMon_WaitForPMT);
     }
 }
 
 void DTVSignalMonitor::SetStreamData(ATSCStreamData *data)
 {
-    flags = 0;
-    atsc_stream_data = data;
-    dvb_stream_data  = NULL;
-    connect(atsc_stream_data, SIGNAL(UpdatePAT(ProgramAssociationTable*)),
-            this, SLOT(SetPAT(const ProgramAssociationTable*)));
-    connect(atsc_stream_data, SIGNAL(UpdatePMT(ProgramMapTable*)),
-            this, SLOT(SetPMT(const ProgramMapTable*)));
+    stream_data = atsc_stream_data = data;
+    dvb_stream_data = NULL;
+
+    connect(atsc_stream_data, SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
+            this,             SLOT(SetPAT(const ProgramAssociationTable*)));
+
+    connect(atsc_stream_data, SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
+            this,             SLOT(SetPMT(uint, const ProgramMapTable*)));
+
     connect(atsc_stream_data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
-            this, SLOT(SetMGT(const MasterGuideTable*)));
+            this,             SLOT(SetMGT(const MasterGuideTable*)));
+
     connect(atsc_stream_data,
-            SIGNAL(UpdateTVCT(const TerrestrialVirtualChannelTable*)),
-            this, SLOT(SetVCT(const TerrestrialVirtualChannelTable*)));
+            SIGNAL(UpdateTVCT(uint, const TerrestrialVirtualChannelTable*)),
+            this,
+            SLOT(SetVCT(uint, const TerrestrialVirtualChannelTable*)));
+
     connect(atsc_stream_data,
-            SIGNAL(UpdateCVCT(const CableVirtualChannelTable*)),
-            this, SLOT(SetVCT(const CableVirtualChannelTable*)));
+            SIGNAL(UpdateCVCT(uint, const CableVirtualChannelTable*)),
+            this,
+            SLOT(SetVCT(uint, const CableVirtualChannelTable*)));
 }
 
 void DTVSignalMonitor::SetStreamData(DVBStreamData *data)
 {
-    flags = 0;
     atsc_stream_data = NULL;
-    dvb_stream_data  = data;
+    stream_data = dvb_stream_data = data;
+
+    connect(dvb_stream_data, SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
+            this,            SLOT(SetPAT(const ProgramAssociationTable*)));
+
+    connect(dvb_stream_data, SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
+            this,            SLOT(SetPMT(uint, const ProgramMapTable*)));
+
+    connect(dvb_stream_data, SIGNAL(UpdateNIT(const NetworkInformationTable*)),
+            this,            SLOT(SetNIT(const NetworkInformationTable*)));
+
+    connect(dvb_stream_data, SIGNAL(UpdateSDT(const ServiceDescriptionTable*)),
+            this,            SLOT(SetSDT(const ServiceDescriptionTable*)));
 }
 
 void DTVSignalMonitor::SetPAT(const ProgramAssociationTable *pat)
 {
     AddFlags(kDTVSigMon_PATSeen);
     int pmt_pid = pat->FindPID(programNumber);
-    if (GetATSCStreamData() && pmt_pid)
+    if (GetStreamData() && pmt_pid)
     {
         AddFlags(kDTVSigMon_PATMatch);
-        GetATSCStreamData()->AddListeningPID(pmt_pid);
+        GetStreamData()->AddListeningPID(pmt_pid);
     }
 }
 
-void DTVSignalMonitor::SetPMT(const ProgramMapTable *pmt)
+void DTVSignalMonitor::SetPMT(uint, const ProgramMapTable *pmt)
 {
     AddFlags(kDTVSigMon_PMTSeen);
 
@@ -189,6 +197,10 @@ void DTVSignalMonitor::SetPMT(const ProgramMapTable *pmt)
 void DTVSignalMonitor::SetMGT(const MasterGuideTable* mgt)
 {
     AddFlags(kDTVSigMon_MGTSeen);
+
+    if (!GetATSCStreamData())
+        return;
+
     for (uint i=0; i<mgt->TableCount(); i++)
     {
         if ((TableClass::TVCTc == mgt->TableClass(i)) ||
@@ -200,7 +212,7 @@ void DTVSignalMonitor::SetMGT(const MasterGuideTable* mgt)
     }
 }
 
-void DTVSignalMonitor::SetVCT(const TerrestrialVirtualChannelTable* tvct)
+void DTVSignalMonitor::SetVCT(uint, const TerrestrialVirtualChannelTable* tvct)
 { 
     AddFlags(kDTVSigMon_VCTSeen | kDTVSigMon_TVCTSeen);
     int idx = tvct->Find(majorChannel, minorChannel);
@@ -211,7 +223,7 @@ void DTVSignalMonitor::SetVCT(const TerrestrialVirtualChannelTable* tvct)
     }
 }
 
-void DTVSignalMonitor::SetVCT(const CableVirtualChannelTable* cvct)
+void DTVSignalMonitor::SetVCT(uint, const CableVirtualChannelTable* cvct)
 {
     AddFlags(kDTVSigMon_VCTSeen | kDTVSigMon_CVCTSeen);
     int idx = cvct->Find(majorChannel, minorChannel);
@@ -221,3 +233,20 @@ void DTVSignalMonitor::SetVCT(const CableVirtualChannelTable* cvct)
         AddFlags(kDTVSigMon_VCTMatch | kDTVSigMon_CVCTMatch);
     }
 }
+
+void DTVSignalMonitor::SetNIT(uint, const NetworkInformationTable*)
+{
+    AddFlags(kDTVSigMon_NITSeen);
+    if (!GetDVBStreamData())
+        return;
+
+}
+
+void DTVSignalMonitor::SetSDT(uint, const ServiceDescriptionTable*)
+{
+    AddFlags(kDTVSigMon_SDTSeen);
+    if (!GetDVBStreamData())
+        return;
+
+}
+

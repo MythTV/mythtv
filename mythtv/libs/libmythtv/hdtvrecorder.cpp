@@ -106,15 +106,16 @@ HDTVRecorder::HDTVRecorder()
     : DTVRecorder(), _atsc_stream_data(0), _resync_count(0)
 {
     _atsc_stream_data = new ATSCStreamData(-1, DEFAULT_SUBCHANNEL);
-    connect(_atsc_stream_data, SIGNAL(UpdatePAT(ProgramAssociationTable*)),
+    connect(_atsc_stream_data, SIGNAL(UpdatePATSingleProgram(
+                                          ProgramAssociationTable*)),
             this, SLOT(WritePAT(ProgramAssociationTable*)));
+    connect(_atsc_stream_data, SIGNAL(UpdatePMTSingleProgram(ProgramMapTable*)),
+            this, SLOT(WritePMT(ProgramMapTable*)));
     connect(_atsc_stream_data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
             this, SLOT(ProcessMGT(const MasterGuideTable*)));
     connect(_atsc_stream_data,
             SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
             this, SLOT(ProcessVCT(uint, const VirtualChannelTable*)));
-    connect(_atsc_stream_data, SIGNAL(UpdatePMT(ProgramMapTable*)),
-            this, SLOT(WritePMT(ProgramMapTable*)));
 
     _buffer_size = TSPacket::SIZE * 1500;
     if ((_buffer = new unsigned char[_buffer_size])) {
@@ -694,7 +695,8 @@ static int WABA_wait_a_while = WABA_WAIT;
 bool WABA_started = false;
 #endif
 
-void HDTVRecorder::WritePMT(ProgramMapTable* pmt) {
+void HDTVRecorder::WritePMT(ProgramMapTable* pmt)
+{
     if (pmt) {
         int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
         pmt->tsheader()->SetContinuityCounter(next);
@@ -764,9 +766,9 @@ void HDTVRecorder::ProcessMGT(const MasterGuideTable *mgt)
 /** \fn HDTVRecorder::ProcessVCT(uint, const VirtualChannelTable*)
  *  \brief Processes Virtual Channel Tables by finding the program
  *         number to use.
- *  \bug Assumes there is only one VCT, will break on Cable.
+ *  \bug Assumes there is only one VCT, may break on Cable.
  */
-void HDTVRecorder::ProcessVCT(uint /*pid*/, const VirtualChannelTable *vct)
+void HDTVRecorder::ProcessVCT(uint /*tsid*/, const VirtualChannelTable *vct)
 {
     if (vct->ChannelCount() < 1)
     {
@@ -850,7 +852,7 @@ bool HDTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
         {
             const unsigned int lpid = tspacket.PID();
             // Pass or reject frames based on PID, and parse info from them
-            if (lpid == StreamData()->VideoPID())
+            if (lpid == StreamData()->VideoPIDSingleProgram())
                 HandleVideo(&tspacket);
             else if (StreamData()->IsAudioPID(lpid))
                 HandleAudio(&tspacket);

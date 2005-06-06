@@ -5,6 +5,37 @@
 #include "RingBuffer.h"
 #include "hdtvrecorder.h"
 
+/** \class ATSCStreamData
+ *  \brief Encapsulates data about ATSC stream and emits events for most tables.
+ */
+
+ATSCStreamData::ATSCStreamData(int desiredMajorChannel,
+                               int desiredMinorChannel,
+                               bool cacheTables)
+    : MPEGStreamData(-1, cacheTables),
+      _mgt_version(-1),
+      _GPS_UTC_offset(13 /* leap seconds as of 2004 */),
+      _desired_major_channel(desiredMajorChannel),
+      _desired_minor_channel(desiredMinorChannel)
+{
+    AddListeningPID(ATSC_PSIP_PID);
+}
+
+void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
+{
+    if (desiredMajorChannel > 0)
+        _desired_major_channel = desiredMajorChannel;
+    if (desiredMinorChannel >= 0)
+        _desired_minor_channel = desiredMinorChannel;
+    
+    MPEGStreamData::Reset(-1);
+    _mgt_version = -1;
+    _tvct_version.clear();
+    _cvct_version.clear();
+    _eit_version.clear();
+    _ett_version.clear();
+}
+
 /** \fn ATSCStreamData::IsRedundant(const PSIPTable&) const
  *  \brief Returns true if table already seen.
  *  \todo All RRT tables are ignored
@@ -17,48 +48,43 @@ bool ATSCStreamData::IsRedundant(const PSIPTable &psip) const
     const int table_id = psip.TableID();
     const int version = psip.Version();
 
-    if (TableID::PAT == table_id)
-        return (version == VersionPAT());
+    if (MPEGStreamData::IsRedundant(psip))
+        return true;
 
-    if (TableID::PMT == table_id)
-        return (version == VersionPMT());
+    if (TableID::EIT == table_id)
+    {
+        // HACK This isn't right, we should also check start_time..
+        // But this gives us a little sample.
+        return  VersionEIT(psip.tsheader()->PID()) == version;
+    }
 
-    if (TableID::MGT == table_id && VersionMGT() == version)
-        return true; // no need to resync stream
+    if (TableID::ETT == table_id)
+    {
+        // HACK This isn't right, we should also check start_time..
+        // But this gives us a little sample.
+        return VersionETT(psip.tsheader()->PID()) == version;
+    }
+
+    if (TableID::STT == table_id)
+        return false; // each SystemTimeTable matters
+
+    if (TableID::MGT == table_id)
+        return VersionMGT() == version;
 
     if (TableID::TVCT == table_id)
     {
         TerrestrialVirtualChannelTable tvct(psip);
-        if (VersionTVCT(tvct.TransportStreamID()) == version)
-            return true; // no need to resync stream
+        return VersionTVCT(tvct.TransportStreamID()) == version;
     }
 
     if (TableID::CVCT == table_id)
     {
         CableVirtualChannelTable cvct(psip);
-        if (VersionCVCT(cvct.TransportStreamID()) == version)
-            return true; // no need to resync stream
+        return VersionCVCT(cvct.TransportStreamID()) == version;
     }
 
     if (TableID::RRT == table_id)
         return true; // we ignore RatingRegionTables
-
-    if (TableID::STT == table_id)
-        return false; // each SystemTimeTable matters
-
-    if ((TableID::EIT == table_id) && (VersionEIT(psip.tsheader()->PID()) == version))
-    {
-        // HACK This isn't right, we should also check start_time..
-        // But this gives us a little sample.
-        return true; // no need to resync stream
-    }
-
-    if ((TableID::ETT == table_id) && (VersionETT(psip.tsheader()->PID()) == version))
-    {
-        // HACK This isn't right, we should also check start_time..
-        // But this gives us a little sample.
-        return true; // no need to resync stream
-    }
 
     return false;
 }
@@ -101,25 +127,34 @@ void ATSCStreamData::HandleTables(const TSPacket* tspacket)
     if (IsRedundant(*psip))
     {
         if (TableID::PAT == psip->TableID())
-            emit UpdatePAT(PAT());
+            emit UpdatePATSingleProgram(PATSingleProgram());
         if (TableID::PMT == psip->TableID())
-            emit UpdatePMT(PMT());
+            emit UpdatePMTSingleProgram(PMTSingleProgram());
         HT_RETURN; // already parsed this table, toss it.
     }
 
-    // If we get this far decode any PAT, PMT or MGT...
+    // If we get this far decode any table
     switch (psip->TableID())
     {
         case TableID::PAT:
         {
-            if (CreatePAT(ProgramAssociationTable(*psip)))
-                emit UpdatePAT(PAT());
+            ProgramAssociationTable pat(*psip);
+            emit UpdatePAT(&pat);
+            if (CreatePATSingleProgram(pat))
+            {
+                emit UpdatePATSingleProgram(PATSingleProgram());
+            }
             HT_RETURN;
         }
         case TableID::PMT:
         {
-            if (CreatePMT(ProgramMapTable(*psip)))
-                emit UpdatePMT(PMT());
+            ProgramMapTable pmt(*psip);
+            emit UpdatePMT(tspacket->PID(), &pmt);
+            if (tspacket->PID() == _pid_pmt_single_program)
+            {
+                if (CreatePMTSingleProgram(pmt))
+                    emit UpdatePMTSingleProgram(PMTSingleProgram());
+            }
             HT_RETURN;
         }
         case TableID::MGT:
@@ -129,15 +164,6 @@ void ATSCStreamData::HandleTables(const TSPacket* tspacket)
             emit UpdateMGT(&mgt);
             HT_RETURN;
         }
-    }
-
-    // Don't decode any non-PAT/PMT/MGT tables if we haven't send an MGT.
-    if (VersionMGT()<0)
-        HT_RETURN;
-
-    // Decode any tables we know about.
-    switch (psip->TableID())
-    {
         case TableID::TVCT:
         {
             TerrestrialVirtualChannelTable vct(*psip);
@@ -205,52 +231,52 @@ void ATSCStreamData::HandleTables(const TSPacket* tspacket)
 #undef HT_RETURN
 }
 
-void ATSCStreamData::PrintMGT(const MasterGuideTable *mgt)
+void ATSCStreamData::PrintMGT(const MasterGuideTable *mgt) const
 {
     VERBOSE(VB_RECORD, mgt->toString());
 }
 
-void ATSCStreamData::PrintSTT(const SystemTimeTable *stt)
+void ATSCStreamData::PrintSTT(const SystemTimeTable *stt) const
 {
     VERBOSE(VB_RECORD, stt->toString());
 }
 
-void ATSCStreamData::PrintRRT(const RatingRegionTable*)
+void ATSCStreamData::PrintRRT(const RatingRegionTable*) const
 {
     VERBOSE(VB_RECORD, QString("RRT"));
 }
 
-void ATSCStreamData::PrintDCCT(const DirectedChannelChangeTable*)
+void ATSCStreamData::PrintDCCT(const DirectedChannelChangeTable*) const
 {
     VERBOSE(VB_RECORD, QString("DCCT"));
 }
 
 void ATSCStreamData::PrintDCCSCT(
-    const DirectedChannelChangeSelectionCodeTable*)
+    const DirectedChannelChangeSelectionCodeTable*) const
 {
     VERBOSE(VB_RECORD, QString("DCCSCT"));
 }
 
 void ATSCStreamData::PrintTVCT(
-    uint /*pid*/, const TerrestrialVirtualChannelTable* tvct)
+    uint /*pid*/, const TerrestrialVirtualChannelTable* tvct) const
 {
     VERBOSE(VB_RECORD, tvct->toString());
 }
 
 void ATSCStreamData::PrintCVCT(
-    uint /*pid*/, const CableVirtualChannelTable* cvct)
+    uint /*pid*/, const CableVirtualChannelTable* cvct) const
 {
     VERBOSE(VB_RECORD, cvct->toString());
 }
 
-void ATSCStreamData::PrintEIT(uint pid, const EventInformationTable *eit)
+void ATSCStreamData::PrintEIT(uint pid, const EventInformationTable *eit) const
 {
-    VERBOSE(VB_RECORD, QString("EIT pid(%1) %2")
-            .arg(pid).arg(eit->toString()));
+    VERBOSE(VB_RECORD, QString("EIT pid(0x%1) %2")
+            .arg(pid, 0, 16).arg(eit->toString()));
 }
 
-void ATSCStreamData::PrintETT(uint pid, const ExtendedTextTable *ett)
+void ATSCStreamData::PrintETT(uint pid, const ExtendedTextTable *ett) const
 {
-    VERBOSE(VB_RECORD, QString("ETT pid(%1) %2")
-            .arg(pid).arg(ett->toString()));
+    VERBOSE(VB_RECORD, QString("ETT pid(0x%1) %2")
+            .arg(pid, 0, 16).arg(ett->toString()));
 }

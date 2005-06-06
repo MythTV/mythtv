@@ -8,16 +8,16 @@
  *  \brief Signal monitoring base class.
  *
  *   Signal monitors should extend this to add signal monitoring to their
- *   recorder. All signal monitors must implement two signals, the
- *   StatusSignalLock(int) and StatusSignalStrength(int). The lock signal
- *   should only be set to true when it is absolutely safe to begin
- *   or continue recording. The StatusSignalStrength signal should
- *   report the actual signal value.
+ *   recorder. All signal monitors must implement one signals, the
+ *   StatusSignalLock(int) signal. The lock signal should only be set to
+ *   true when it is absolutely safe to begin or to continue recording.
+ *   The optional StatusSignalStrength signal should report the actual
+ *   signal value.
  *
- *   Additional signals may be implemented, see DVBSignalMonitor
- *   for an example.
+ *   Additional signals may be implemented, see DTVSignalMonitor and 
+ *   DVBSignalMonitor for example.
  *
- *  \sa DVBSignalMonitor, HDTVSignalMonitor, SignalMonitorValue
+ *  \sa DTVSignalMonitor DVBSignalMonitor, HDTVSignalMonitor, SignalMonitorValue
  */
 
 void ALRMhandler(int /*sig*/)
@@ -37,9 +37,10 @@ void ALRMhandler(int /*sig*/)
  *         sent to the frontend even if SetNotifyFrontend(true)
  *         is called.
  *  \param fd file descriptor for device being monitored.
+ *  \param wait_for_mask SignalMonitorFlags to start with.
  */
-SignalMonitor::SignalMonitor(int _capturecardnum, int _fd):
-    capturecardnum(_capturecardnum), fd(_fd), update_rate(25),
+SignalMonitor::SignalMonitor(int _capturecardnum, int _fd, uint wait_for_mask):
+    capturecardnum(_capturecardnum), fd(_fd), flags(wait_for_mask), update_rate(25),
     running(false), exit(false), update_done(false), notify_frontend(true),
     signalLock(QObject::tr("Signal Lock"), "slock", 1, true, 0, 1, 0),
     signalStrength(QObject::tr("Signal Power"), "signal", 0, true, 0, 100, 0)
@@ -113,8 +114,9 @@ QStringList SignalMonitor::GetStatusList(bool kick)
         UpdateValues();
 
     QStringList list;
-    list<<signalStrength.GetName()<<signalStrength.GetStatus();
     list<<signalLock.GetName()<<signalLock.GetStatus();
+    if (HasFlags(kDTVSigMon_WaitForSig))
+        list<<signalStrength.GetName()<<signalStrength.GetStatus();
 
     return list;
 }

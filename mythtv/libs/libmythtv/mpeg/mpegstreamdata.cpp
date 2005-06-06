@@ -5,55 +5,86 @@
 #include "RingBuffer.h"
 #include "mpegtables.h"
 
+/** \class MPEGStreamData
+ *  \brief Encapsulates data about MPEG stream and emits events for each table.
+ */
+
+MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
+    : _cache_tables(cacheTables), _desired_program(desiredProgram),
+      _pat_single_program(0), _pmt_single_program(0)
+{
+    AddListeningPID(MPEG_PAT_PID);
+
+    _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
+}
+
 MPEGStreamData::~MPEGStreamData()
 {
-    if (_pat)
-        delete _pat;
-    if (_pmt)
-        delete _pmt;
+    SetPATSingleProgram(0);
+    SetPMTSingleProgram(0);
 }
 
 void MPEGStreamData::Reset(int desiredProgram)
 {
     _desired_program = desiredProgram;
-    SetPAT(0);
-    SetPMT(0);
-    //for (...) delete (partial_pes_packets::iterator); // TODO delete old PES packets
+
+    SetPATSingleProgram(0);
+    SetPMTSingleProgram(0);
+
+    pid_pes_map_t old = _partial_pes_packet_cache;
+    pid_pes_map_t::iterator it = old.begin();
+    for (; it != old.end(); ++it)
+        DeletePartialPES(it.key());
     _partial_pes_packet_cache.clear();
+
     _pids_listening.clear();
     
-    _pids_listening[MPEG_PAT_PID] = true;
-    _pids_listening[ATSC_PSIP_PID] = true;
+    AddListeningPID(MPEG_PAT_PID);
+    AddListeningPID(ATSC_PSIP_PID);
 
     _pids_notlistening.clear();
     _pids_writing.clear();
     
-    _pid_video = _pid_pmt = 0xffffffff;
+    _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
+    _pmt_version.clear();
 }
 
-void MPEGStreamData::DeletePartialPES(unsigned int pid) {
-    PESPacket *pkt = _partial_pes_packet_cache[pid];
-    if (pkt) {
+void MPEGStreamData::DeletePartialPES(uint pid)
+{
+    pid_pes_map_t::iterator it = _partial_pes_packet_cache.find(pid);
+    PESPacket *pkt = *it;
+    if (pkt)
+    {
+        _partial_pes_packet_cache.erase(it);
         delete pkt;
-        ClearPartialPES(pid);
     }
 }
 
-/// This only assembles PES packets when new PES packets
-/// start in their own TSPacket. This is always true of
-/// ATSC & DVB tables, but not true of Audio and Video
-/// PES packets.
-PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket) {
-    if (tspacket->PayloadStart()) {
-        const int offset = tspacket->AFCOffset() + tspacket->StartOfFieldPointer();
-        if (offset>181) {
-            VERBOSE(VB_IMPORTANT, "Error: offset>181, pes length & current can not be queried");
+/** \fn MPEGStreamData::AssemblePSIP(const TSPacket* tspacket)
+ *  \brief PES packet assembler.
+ *
+ *   This only assembles PES packets when new PES packets
+ *   start in their own TSPacket. This is always true of
+ *   ATSC & DVB tables, but not true of Audio and Video
+ *   PES packets.
+ */
+PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket)
+{
+    if (tspacket->PayloadStart())
+    {
+        const int offset = tspacket->AFCOffset() +
+            tspacket->StartOfFieldPointer();
+        if (offset>181)
+        {
+            VERBOSE(VB_IMPORTANT, "Error: offset>181, pes length & "
+                    "current can not be queried");
             return 0;
         }
         const unsigned char* pesdata = tspacket->data() + offset;
         const int pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
         const PESPacket pes = PESPacket::View(*tspacket);
-        if ((pes_length+offset)>188) {
+        if ((pes_length + offset)>188)
+        {
             if (!bool(pes.pesdata()[6]&1)/*current*/)
                 return 0; // we only care about current psip packets for now
             SavePartialPES(tspacket->PID(), new PESPacket(*tspacket));
@@ -63,8 +94,10 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket) {
     }
 
     PESPacket* partial = GetPartialPES(tspacket->PID());
-    if (partial) {
-        if (partial->AddTSPacket(tspacket)) {
+    if (partial)
+    {
+        if (partial->AddTSPacket(tspacket))
+        {
             PSIPTable* psip = new PSIPTable(*partial);
             DeletePartialPES(tspacket->PID());
             return psip;
@@ -76,22 +109,26 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket) {
     return 0;
 }
 
-bool MPEGStreamData::CreatePAT(const ProgramAssociationTable& pat)
+bool MPEGStreamData::CreatePATSingleProgram(
+    const ProgramAssociationTable& pat)
 {
-    VERBOSE(VB_RECORD, "CreatePAT()");
+    VERBOSE(VB_RECORD, "CreatePATSingleProgram()");
     VERBOSE(VB_RECORD, "PAT in input stream");
     VERBOSE(VB_RECORD, pat.toString());
-    if (_desired_program < 0) {
+    if (_desired_program < 0)
+    {
         VERBOSE(VB_RECORD, "Desired program not set yet");
         return false;
     }
-    _pid_pmt = pat.FindPID(_desired_program);
+    _pid_pmt_single_program = pat.FindPID(_desired_program);
     VERBOSE(VB_RECORD, QString("desired_program(%1) pid(0x%2)").
-            arg(_desired_program).arg(_pid_pmt, 0, 16));
+            arg(_desired_program).arg(_pid_pmt_single_program, 0, 16));
 
-    if (!_pid_pmt) {
-        _pid_pmt = pat.FindAnyPID();
-        if (!_pid_pmt) {
+    if (!_pid_pmt_single_program)
+    {
+        _pid_pmt_single_program = pat.FindAnyPID();
+        if (!_pid_pmt_single_program)
+        {
             VERBOSE(VB_IMPORTANT,
                     QString("No program found in PAT."
                             " This recording will not play in MythTV."));
@@ -99,15 +136,16 @@ bool MPEGStreamData::CreatePAT(const ProgramAssociationTable& pat)
         VERBOSE(VB_IMPORTANT,
                 QString("Desired program #%1 not found in PAT."
                         " Substituting program #%2").
-                arg(_desired_program).arg(pat.FindProgram(_pid_pmt)));
+                arg(_desired_program)
+                .arg(pat.FindProgram(_pid_pmt_single_program)));
     }
 
-    AddListeningPID(_pid_pmt);
+    AddListeningPID(_pid_pmt_single_program);
 
     vector<uint> pnums, pids;
 
     pnums.push_back(1);
-    pids.push_back(_pid_pmt);
+    pids.push_back(_pid_pmt_single_program);
 
     uint tsid = pat.TableIDExtension();
     uint ver = pat.Version();
@@ -116,30 +154,32 @@ bool MPEGStreamData::CreatePAT(const ProgramAssociationTable& pat)
 
     if (!pat2)
     {
-        VERBOSE(VB_IMPORTANT, "MPEGStreamData::CreatePAT: "
+        VERBOSE(VB_IMPORTANT, "MPEGStreamData::CreatePATSingleProgram: "
                 "Failed to create Program Association Table.");
         return false;
     }
 
     pat2->tsheader()->SetContinuityCounter(pat.tsheader()->ContinuityCounter());
 
-    VERBOSE(VB_RECORD, QString("pmt_pid(0x%1)").arg(_pid_pmt, 0, 16));
+    VERBOSE(VB_RECORD, QString("pmt_pid(0x%1)")
+            .arg(_pid_pmt_single_program, 0, 16));
     VERBOSE(VB_RECORD, "PAT for output stream");
     VERBOSE(VB_RECORD, pat2->toString());
 
-    SetPAT(pat2);
+    SetPATSingleProgram(pat2);
 
     return true;
 
 }
 
-bool MPEGStreamData::CreatePMT(const ProgramMapTable& pmt)
+bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
 {
-    VERBOSE(VB_RECORD, "CreatePMT()");
+    VERBOSE(VB_RECORD, "CreatePMTSingleProgram()");
     VERBOSE(VB_RECORD, "PMT in input stream");
     VERBOSE(VB_RECORD, pmt.toString());
 
-    if (!PAT()) {
+    if (!PATSingleProgram())
+    {
         VERBOSE(VB_RECORD, "no PAT yet...");
         return false; // no way to properly rewrite pids without PAT
     }
@@ -150,31 +190,35 @@ bool MPEGStreamData::CreatePMT(const ProgramMapTable& pmt)
 
     // Video
     pmt.FindPIDs(StreamID::MPEG2Video, videoPIDs);
-    if (videoPIDs.size()<1) 
+    if (videoPIDs.size() < 1) 
     {
-        VERBOSE(VB_RECORD, "No video found old PMT, can not construct new PMT");
+        VERBOSE(VB_RECORD,
+                "No video found old PMT, can not construct new PMT");
         return false;
     }
-    _pid_video = videoPIDs[0];
-    pids.push_back(_pid_video);
+    _pid_video_single_program = videoPIDs[0];
+    pids.push_back(_pid_video_single_program);
     types.push_back(StreamID::MPEG2Video);
 
     // Audio
     pmt.FindPIDs(StreamID::AC3Audio,   audioAC3);
     pmt.FindPIDs(StreamID::MPEG2Audio, audioMPEG);
 
-    if (audioAC3.size()+audioMPEG.size()<1)
+    if (audioAC3.size() + audioMPEG.size() < 1)
     {
-        VERBOSE(VB_RECORD, "No audio found in old PMT, can not construct new PMT");
+        VERBOSE(VB_RECORD,
+                "No audio found in old PMT, can not construct new PMT");
         return false;
     }
 
-    for (uint i=0; i<audioAC3.size(); i++) {
+    for (uint i = 0; i < audioAC3.size(); i++)
+    {
         AddAudioPID(audioAC3[i]);
         pids.push_back(audioAC3[i]);
         types.push_back(StreamID::AC3Audio);
     }
-    for (uint i=0; i<audioMPEG.size(); i++) {
+    for (uint i = 0; i < audioMPEG.size(); i++)
+    {
         AddAudioPID(audioMPEG[i]);
         pids.push_back(audioMPEG[i]);
         types.push_back(StreamID::MPEG2Audio);
@@ -182,8 +226,10 @@ bool MPEGStreamData::CreatePMT(const ProgramMapTable& pmt)
     
     // Timebase
     int pcrpidIndex = pmt.FindPID(pmt.PCRPID());
-    if (pcrpidIndex<0) {
-        // the timecode reference stream is not in the PMT, add stream to misc record streams
+    if (pcrpidIndex < 0)
+    {
+        // the timecode reference stream is not in the PMT, 
+        // add stream to misc record streams
         AddWritingPID(pmt.PCRPID());
     }
 
@@ -192,12 +238,13 @@ bool MPEGStreamData::CreatePMT(const ProgramMapTable& pmt)
 
     // Construct
     ProgramMapTable *pmt2 = ProgramMapTable::
-        Create(programNumber, _pid_pmt, pmt.PCRPID(), pmt.Version(), pids, types);
+        Create(programNumber, _pid_pmt_single_program,
+               pmt.PCRPID(), pmt.Version(), pids, types);
 
     // Set Continuity Header
     pmt2->tsheader()->SetContinuityCounter(pmt.tsheader()->ContinuityCounter());
 
-    SetPMT(pmt2);
+    SetPMTSingleProgram(pmt2);
 
     VERBOSE(VB_RECORD, "PMT for output stream");
     VERBOSE(VB_RECORD, pmt2->toString());
@@ -205,3 +252,185 @@ bool MPEGStreamData::CreatePMT(const ProgramMapTable& pmt)
     return true;
 }
 
+/** \fn MPEGStreamData::IsRedundant(const PSIPTable&) const
+ *  \brief Returns true if table already seen.
+ */
+bool MPEGStreamData::IsRedundant(const PSIPTable &psip) const
+{
+    const int table_id = psip.TableID();
+    const int version  = psip.Version();
+
+    if (TableID::PAT == table_id)
+        return (version == VersionPATSingleProgram());
+
+    if (TableID::PMT == table_id)
+        return VersionPMT(psip.tsheader()->PID()) == version;
+
+    return false;
+}
+
+/** \fn MPEGStreamData::HandleTables(const TSPacket*)
+ *  \brief Assembles PSIP packets and processes them.
+ */
+void MPEGStreamData::HandleTables(const TSPacket* tspacket)
+{
+#define HT_RETURN { delete psip; return; }
+    // Assemble PSIP
+    PSIPTable *psip = AssemblePSIP(tspacket);
+    if (!psip)
+        return;
+
+    // Validate PSIP
+    if (!psip->IsGood())
+    {
+        VERBOSE(VB_RECORD, QString("PSIP packet failed CRC check"));
+        HT_RETURN;
+    }
+
+    if (!psip->IsCurrent()) // we don't cache the next table, for now
+        HT_RETURN;
+
+    if (1!=tspacket->AdaptationFieldControl())
+    { // payload only, ATSC req.
+        VERBOSE(VB_RECORD,
+                "PSIP packet has Adaptation Field Control, not ATSC compiant");
+        HT_RETURN;
+    }
+
+    if (tspacket->ScramplingControl())
+    { // scrambled! ATSC, DVB require tables not to be scrambled
+        VERBOSE(VB_RECORD,
+                "PSIP packet is scrambled, not ATSC/DVB compiant");
+        HT_RETURN;
+    }
+
+    // Don't decode redundant packets,
+    // but if it is a desired PAT or PMT emit a "heartbeat" signal.
+    if (IsRedundant(*psip))
+    {
+        if (TableID::PAT == psip->TableID())
+            emit UpdatePATSingleProgram(PATSingleProgram());
+        if (TableID::PMT == psip->TableID() &&
+            tspacket->PID() == _pid_pmt_single_program)
+            emit UpdatePMTSingleProgram(PMTSingleProgram());
+        HT_RETURN; // already parsed this table, toss it.
+    }
+
+    // If we get this far decode table
+    switch (psip->TableID())
+    {
+        case TableID::PAT:
+        {
+            ProgramAssociationTable pat(*psip);
+            emit UpdatePAT(&pat);
+            if (CreatePATSingleProgram(pat))
+                emit UpdatePATSingleProgram(PATSingleProgram());
+            HT_RETURN;
+        }
+        case TableID::PMT:
+        {
+            ProgramMapTable pmt(*psip);
+            emit UpdatePMT(tspacket->PID(), &pmt);
+            if (tspacket->PID() == _pid_pmt_single_program)
+            {
+                if (CreatePMTSingleProgram(pmt))
+                    emit UpdatePMTSingleProgram(PMTSingleProgram());
+            }
+            HT_RETURN;
+        }
+    }
+}
+
+int MPEGStreamData::ProcessData(unsigned char *buffer, int len)
+{
+    int pos = 0;
+
+    while (pos + 187 < len) // while we have a whole packet left
+    {
+        if (buffer[pos] != SYNC_BYTE)
+        {
+            int newpos = ResyncStream(buffer, pos, len);
+            if (newpos == -1)
+                return len - pos;
+            if (newpos == -2)
+                return TSPacket::SIZE;
+
+            pos = newpos;
+        }
+
+        const TSPacket *pkt = reinterpret_cast<const TSPacket*>(&buffer[pos]);
+        if (ProcessTSPacket(*pkt))
+            pos += TSPacket::SIZE; // Advance to next TS packet
+        else // Let it resync in case of dropped bytes
+            buffer[pos] = SYNC_BYTE + 1;
+    }
+
+    return len - pos;
+}
+
+bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
+{
+    bool ok = !tspacket.TransportError();
+    if (ok && !tspacket.ScramplingControl() && tspacket.HasPayload() &&
+        IsListeningPID(tspacket.PID()))
+    {
+        HandleTables(&tspacket);
+    }
+    return ok;
+}
+
+int MPEGStreamData::ResyncStream(unsigned char *buffer, int curr_pos, int len)
+{
+    // Search for two sync bytes 188 bytes apart, 
+    int pos = curr_pos;
+    int nextpos = pos + TSPacket::SIZE;
+    if (nextpos >= len)
+        return -1; // not enough bytes; caller should try again
+    
+    while (buffer[pos] != SYNC_BYTE || buffer[nextpos] != SYNC_BYTE)
+    {
+        pos++;
+        nextpos++;
+        if (nextpos == len)
+            return -2; // not found
+    }
+
+    return pos;
+}
+
+bool MPEGStreamData::IsListeningPID(uint pid) const
+{
+    QMap<uint, bool>::const_iterator it = _pids_listening.find(pid);
+    return it != _pids_listening.end();
+}
+
+bool MPEGStreamData::IsNotListeningPID(uint pid) const
+{
+    QMap<uint, bool>::const_iterator it = _pids_notlistening.find(pid);
+    return it != _pids_notlistening.end();
+}
+
+bool MPEGStreamData::IsWritingPID(uint pid) const
+{
+    QMap<uint, bool>::const_iterator it = _pids_writing.find(pid);
+    return it != _pids_writing.end();
+}
+
+bool MPEGStreamData::IsAudioPID(uint pid) const
+{
+    QMap<uint, bool>::const_iterator it = _pids_audio.find(pid);
+    return it != _pids_audio.end();
+}
+
+void MPEGStreamData::SavePartialPES(uint pid, PESPacket* packet)
+{
+    pid_pes_map_t::iterator it = _partial_pes_packet_cache.find(pid);
+    if (it == _partial_pes_packet_cache.end())
+        _partial_pes_packet_cache[pid] = packet;
+    else
+    {
+        PESPacket *old = *it;
+        _partial_pes_packet_cache.replace(pid, packet);
+        delete old;
+    }
+}

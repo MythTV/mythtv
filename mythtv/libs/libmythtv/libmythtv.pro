@@ -80,7 +80,7 @@ unix {
     HEADERS += channel.h
     HEADERS += mpeg/tsstats.h mpeg/tspacket.h mpeg/pespacket.h
     HEADERS += mpeg/mpegtables.h mpeg/atsctables.h mpeg/dvbtables.h
-    HEADERS += mpeg/mpegstreamdata.h mpeg/atscstreamdata.h 
+    HEADERS += mpeg/mpegstreamdata.h mpeg/atscstreamdata.h mpeg/dvbstreamdata.h
     HEADERS += mpeg/atscdescriptors.h 
     HEADERS += signalmonitorvalue.h signalmonitor.h dtvsignalmonitor.h
     HEADERS += pchdtvsignalmonitor.h
@@ -89,6 +89,7 @@ unix {
     SOURCES += hdtvrecorder.cpp fifowriter.cpp
     SOURCES += mpeg/tspacket.cpp mpeg/pespacket.cpp
     SOURCES += mpeg/mpegstreamdata.cpp mpeg/atscstreamdata.cpp
+    SOURCES += mpeg/dvbstreamdata.cpp
     SOURCES += mpeg/mpegtables.cpp mpeg/atsctables.cpp mpeg/dvbtables.cpp
     SOURCES += mpeg/atscdescriptors.cpp mpeg/atscdescriptorsmap.cpp
     SOURCES += signalmonitorvalue.cpp signalmonitor.cpp dtvsignalmonitor.cpp
