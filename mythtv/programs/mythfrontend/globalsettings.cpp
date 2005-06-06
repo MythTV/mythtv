@@ -597,6 +597,44 @@ static GlobalSpinBox *RecordOverTime()
     return bs;
 }
 
+static GlobalLineEdit *OverTimeCategory()
+{
+    GlobalLineEdit *ge = new GlobalLineEdit("OverTimeCategory");
+    ge->setLabel(QObject::tr("Category of shows to be extended"));
+    ge->setValue("Sports event");
+    ge->setHelpText(QObject::tr("For a special category (e.g. "
+                                "\"Sports event\"), request that shows "
+                                "be autoextended.  Only works if a "
+                                "shows category can be determined."));
+    return ge;
+}
+
+static GlobalSpinBox *CategoryOverTime()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("CategoryOverTime",
+                                          0, 180, 60, true);
+    bs->setLabel(QObject::tr("Record past end of show (in minutes)"));
+    bs->setValue(30);
+    bs->setHelpText(QObject::tr("For the specified category, an attempt "
+                                "will be made to extend the recording "
+                                "by the specified time.  It is ignored "
+                                "when two shows have been scheduled "
+                                "without enough time in between."));
+    return bs;
+}
+
+static VerticalConfigurationGroup *CategoryOverTimeSettings()
+{
+    VerticalConfigurationGroup *vcg =
+        new VerticalConfigurationGroup(false, false);
+
+    vcg->setLabel(QObject::tr("Category record over-time"));
+    vcg->setUseLabel(true);
+    vcg->addChild(OverTimeCategory());
+    vcg->addChild(CategoryOverTime());
+    return vcg;
+}
+
 static HostCheckBox *PlayBoxOrdering()
 {
     HostCheckBox *gc = new HostCheckBox("PlayBoxOrdering");
@@ -3000,6 +3038,7 @@ GeneralSettings::GeneralSettings()
     general2->addChild(AutoExpireExtraSpace());
     general2->addChild(RecordPreRoll());
     general2->addChild(RecordOverTime());
+    general2->addChild(CategoryOverTimeSettings());
     general2->addChild(ATSCCheckSignalThreshold());
     general2->addChild(ATSCCheckSignalWait());
     general2->addChild(HDRingbufferSize());

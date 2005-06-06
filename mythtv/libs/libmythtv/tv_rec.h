@@ -220,7 +220,9 @@ class TVRec
     bool    earlyCommFlag;
     bool    runJobOnHostOnly;
     int     audioSampleRateDB;
-    int     overrecordseconds;
+    int     overRecordSecNrml;
+    int     overRecordSecCat;
+    QString overRecordCategory;
     int     liveTVRingBufSize;
     int     liveTVRingBufFill;
     QString liveTVRingBufLoc;
@@ -245,6 +247,7 @@ class TVRec
     bool    inoverrecord;
     bool    errored;
     float   frameRate;
+    int     overrecordseconds;
 
     // Current recording info
     ProgramInfo *curRecording;

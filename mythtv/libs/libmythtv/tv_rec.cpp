@@ -79,7 +79,8 @@ TVRec::TVRec(int capturecardnum)
 #endif
       // Configuration variables from database
       transcodeFirst(false), earlyCommFlag(false), runJobOnHostOnly(false),
-      audioSampleRateDB(0), overrecordseconds(0),
+      audioSampleRateDB(0), overRecordSecNrml(0), overRecordSecCat(0),
+      overRecordCategory(""),
       liveTVRingBufSize(0), liveTVRingBufFill(0), liveTVRingBufLoc(""),
       recprefix(""),
       // Configuration variables from setup rutines
@@ -89,7 +90,7 @@ TVRec::TVRec(int capturecardnum)
       frontendReady(false), runMainLoop(false), exitPlayer(false),
       finishRecording(false), paused(false), prematurelystopped(false),
       inoverrecord(false), errored(false),
-      frameRate(-1.0f), 
+      frameRate(-1.0f), overrecordseconds(0), 
       // Current recording info
       curRecording(NULL), profileName(""),
       askAllowRecording(false), autoTranscode(false),
@@ -196,7 +197,9 @@ bool TVRec::Init(void)
     earlyCommFlag     = gContext->GetNumSetting("AutoCommflagWhileRecording", 0);
     runJobOnHostOnly  = gContext->GetNumSetting("JobsRunOnRecordHost", 0);
     audioSampleRateDB = gContext->GetNumSetting("AudioSampleRate");
-    overrecordseconds = gContext->GetNumSetting("RecordOverTime");
+    overRecordSecNrml = gContext->GetNumSetting("RecordOverTime");
+    overRecordSecCat  = gContext->GetNumSetting("CategoryOverTime") * 60;
+    overRecordCategory= gContext->GetSetting("OverTimeCategory");
     liveTVRingBufSize = gContext->GetNumSetting("BufferSize", 5);
     liveTVRingBufFill = gContext->GetNumSetting("MaxBufferFill", 50);
     liveTVRingBufLoc  = gContext->GetSetting("LiveBufferDir");
@@ -362,6 +365,15 @@ int TVRec::StartRecording(const ProgramInfo *rcinfo)
         recordEndTime = rcinfo->recendts;
         curRecording = new ProgramInfo(*rcinfo);
 
+        overrecordseconds = overRecordSecNrml;
+        if (curRecording->category == overRecordCategory)
+        {
+            overrecordseconds = overRecordSecCat;
+            VERBOSE(VB_RECORD, QString("Show category \"%1\", "
+                                       "desired postroll %2")
+                    .arg(curRecording->category).arg(overrecordseconds));
+        }
+        
         nextState = kState_RecordingOnly;
         changeState = true;
         retval = 1;
