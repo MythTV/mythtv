@@ -61,7 +61,7 @@ class PIDFilterManager
 class DVBSIParser : public SIParser
 {
 public:
-    DVBSIParser(int cardnum);
+    DVBSIParser(int cardnum, bool start_thread = false);
     ~DVBSIParser();
 
     /* Control PIDs */
@@ -75,21 +75,24 @@ public:
     void StopSectionReader();
 
 private:
+    /// System information thread thunk, runs DVBSIParser::StartSectionReader()
+    static void *SystemInfoThread(void *param);
 
     int                                cardnum;
 
     /* Thread related */
     bool                               exitSectionThread;
     bool                               sectionThreadRunning;
+    bool                               selfStartedThread;
     pthread_mutex_t                    poll_lock;
+    pthread_t                          siparser_thread;
 
     /* Filter / fd management */
     typedef QMap<int,PIDFilterManager> PIDFDMap;
     PIDFDMap                           PIDfilterManager;
     int                                pollLength;
     pollfd                            *pollArray;
-    bool                   filterChange;
-
+    bool                               filterChange;
 };
 
 #endif //DVBSIPARSER_H

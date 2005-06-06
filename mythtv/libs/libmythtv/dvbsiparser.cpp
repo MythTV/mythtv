@@ -50,25 +50,47 @@ using namespace std;
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 
-DVBSIParser::DVBSIParser(int cardNum)
-    : cardnum(cardNum)
+DVBSIParser::DVBSIParser(int cardNum, bool start_thread)
+    : cardnum(cardNum), 
+      exitSectionThread(false), sectionThreadRunning(false),
+      selfStartedThread(false), pollLength(0), pollArray(NULL),
+      filterChange(false)
 {
-
-    pollArray = NULL;
-    pollLength = 0;
-    exitSectionThread = false;
-    filterChange = false;
-
     pthread_mutex_init(&poll_lock, NULL);
+
     GENERAL("DVB SI Table Parser Started");
+
+    siparser_thread = PTHREAD_CREATE_JOINABLE;
+    if (start_thread)
+    {
+        pthread_create(&siparser_thread, NULL, SystemInfoThread, this);
+    }
 }
 
 DVBSIParser::~DVBSIParser()
 {
+    if (selfStartedThread)
+    {
+        StopSectionReader();
+        pthread_join(siparser_thread, NULL);
+    }
     pthread_mutex_destroy(&poll_lock);
 }
 
-void DVBSIParser::AddPid(uint16_t pid,uint8_t mask,uint8_t filter, bool CheckCRC, int bufferFactor)
+/** \fn DVBSIParser::SystemInfoThread(void*)
+ *  \brief Thunk that allows siparser_thread pthread to
+ *         call DVBSIParser::StartSectionReader().
+ */
+void *DVBSIParser::SystemInfoThread(void *param)
+{
+    DVBSIParser *siparser = (DVBSIParser *)param;
+    siparser->selfStartedThread = true;
+    siparser->StartSectionReader();
+    return NULL;
+}
+
+void DVBSIParser::AddPid(uint16_t pid, uint8_t mask, uint8_t filter,
+                         bool CheckCRC, int bufferFactor)
 {
 
     struct dmx_sct_filter_params params;
@@ -76,7 +98,9 @@ void DVBSIParser::AddPid(uint16_t pid,uint8_t mask,uint8_t filter, bool CheckCRC
 
     int sect_buf_size = MAX_SECTION_SIZE * bufferFactor;
 
-    SIPARSER(QString("Adding PID %1 Filter %2 Mask %3 Buffer %4").arg(pid,4,16).arg(filter,2,16).arg(mask,2,16).arg(sect_buf_size));
+    SIPARSER(QString("Adding PID %1 Filter %2 Mask %3 Buffer %4")
+             .arg(pid, 4, 16).arg(filter, 2, 16)
+             .arg(mask, 2, 16).arg(sect_buf_size));
 
     /* Set flag so other processes can get past poll_lock */
     filterChange = true;
@@ -129,7 +153,8 @@ void DVBSIParser::AddPid(uint16_t pid,uint8_t mask,uint8_t filter, bool CheckCRC
     PIDfilterManager[fd].pid = pid;
 
     /* Re-allocate memory and add to the pollarray */
-    pollArray = (pollfd*)realloc((void*)pollArray, sizeof(pollfd) * (pollLength+1));
+    pollArray = (pollfd*)realloc((void*)pollArray,
+                                 sizeof(pollfd) * (pollLength+1));
     pollArray[pollLength].fd = fd;
     pollArray[pollLength].events = POLLIN | POLLPRI;
     pollArray[pollLength].revents = 0;
@@ -171,7 +196,8 @@ void DVBSIParser::DelPid(int pid)
          close(it.key());
          PIDfilterManager.remove(it);
     }
-    pollArray = (pollfd*)realloc((void*)pollArray, sizeof(pollfd) * (pollLength));
+    pollArray = (pollfd*)realloc((void*)pollArray,
+                                 sizeof(pollfd) * (pollLength));
     /* Re-construct the pollarray */
     for (it = PIDfilterManager.begin() ; it != PIDfilterManager.end() ; ++it)
     {
@@ -250,14 +276,16 @@ void DVBSIParser::StartSectionReader()
             for (int i=0; i<pollLength; i++)
             {
                 // FIXME: Handle POLLERR
-                if (! (pollArray[i].revents & POLLIN || pollArray[i].revents & POLLPRI) )
+                if (! (pollArray[i].revents & POLLIN || 
+                       pollArray[i].revents & POLLPRI) )
                     continue;
 
                 int rsz = read(pollArray[i].fd, &buffer, MAX_SECTION_SIZE);
 
                 if (rsz > 0)
                 {
-                    ParseTable(buffer,rsz,PIDfilterManager[pollArray[i].fd].pid);
+                    ParseTable(buffer, rsz,
+                               PIDfilterManager[pollArray[i].fd].pid);
                     processed = true;
                     continue;
                 }

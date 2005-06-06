@@ -448,6 +448,16 @@ bool SIParser::AddPMT(uint16_t ServiceID)
     return true;
 }
 
+/** \fn SIParser::ReinitSIParser(const QString&, uint)
+ *  \brief Convenience function that calls FillPMap(SISTANDARD) and AddPMT(uint)
+ */
+bool SIParser::ReinitSIParser(const QString& si_std, uint service_id)
+{
+    SISTANDARD std = (si_std == "atsc") ? SI_STANDARD_ATSC : SI_STANDARD_DVB;
+    return FillPMap(std) & AddPMT(service_id);
+}
+
+
 bool SIParser::FindTransports()
 {
     Table[NETWORK]->RequestEmit(0);

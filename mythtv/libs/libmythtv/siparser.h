@@ -1,3 +1,6 @@
+/*
+ *  Copyright 2004 - Taylor Jacob (rtjacob at earthlink.net)
+ */
 
 #ifndef SIPARSER_H
 #define SIPARSER_H
@@ -21,14 +24,17 @@ using namespace std;
 #define NumHandlers     7
 
 
-/*
+/**
  *  Custom descriptors allow or disallow
  *  HUFFMAN_TEXT - For North American DVB providers who use Huffman compressed
  *      guide in the 9x descriptors
+ */
+#define CUSTOM_DESC_HUFFMAN_TEXT               1
+/**
+ *  Custom descriptors allow or disallow
  *  CHANNEL_NUMBERS - For the UK where channel numbers are sent in one of the
  *      SDT tables (at least per scan.c docs)
  */
-#define CUSTOM_DESC_HUFFMAN_TEXT               1
 #define CUSTOM_DESC_CHANNEL_NUMBERS         2
 
 /*
@@ -36,15 +42,17 @@ using namespace std;
  *  this define will need to be changed as well.
  */
 
-/*
+/**
  * The guide source pid.
+ */
+#define GUIDE_STANDARD                0
+/**
  * GUIDE_DATA_PID is for nonstandard PID being used for EIT style guide this is seen
  *    in North America (this only applies to DVB)
  */
-#define GUIDE_STANDARD                0
 #define GUIDE_DATA_PID                1
 
-/*
+/**
  *  Post processing of the guide.  Some carriers put all of the event text
  *  into the description (subtitle, acotors, etc).  You can post processes these
  *  types of carriers EIT data using some simple RegExps to get more powerful
@@ -56,9 +64,7 @@ using namespace std;
 // functions since this is used by the dvbdatetime function
 #define bcdtoint(i) ((((i & 0xf0) >> 4) * 10) + (i & 0x0f))
 
-/*
- *  Copyright 2004 - Taylor Jacob (rtjacob at earthlink.net)
- *
+/** \class SIParser
  *  This class parses DVB SI and ATSC PSIP tables.
  *
  *  This class is generalized so it can be used with DVB Cards with a simple
@@ -92,6 +98,8 @@ public:
     bool FillPMap(SISTANDARD _SIStandard);
 
     bool AddPMT(uint16_t ServiceID);
+
+    bool ReinitSIParser(const QString& si_std, uint service_id);
 
     // Stops all collection of data and clears all values (on a channel change for example)
     void Reset();
