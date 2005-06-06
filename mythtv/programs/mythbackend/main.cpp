@@ -368,6 +368,7 @@ int main(int argc, char **argv)
                 !strcmp(a.argv()[argpos],"--help")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             cerr << "Valid options are: " << endl <<
+                    "-h or --help                   List valid command line parameters" << endl <<
                     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
                     "-p or --pidfile filename       Write PID of mythbackend " <<
                                                     "to filename" << endl <<
