@@ -23,6 +23,7 @@
 #include "libmythtv/channeleditor.h"
 #include "libmyth/themedmenu.h"
 #include "backendsettings.h"
+#include "checksetup.h"
 
 #include "libmythtv/dbcheck.h"
 
@@ -189,36 +190,78 @@ int main(int argc, char *argv[])
     LanguageSettings::prompt();
     LanguageSettings::load("mythfrontend");
 
-    DialogBox dboxCard(mainWindow, QObject::tr("Would you like to clear all "
+
+    DialogBox *dia;
+    dia = new DialogBox(mainWindow,
+                        QObject::tr("Would you like to clear all "
                                    "capture card settings before starting "
                                    "configuration?"));
-    dboxCard.AddButton(QObject::tr("No, leave my card settings alone"));
-    dboxCard.AddButton(QObject::tr("Yes, delete my card settings"));
-    if (dboxCard.exec() == 2)
+    dia->AddButton(QObject::tr("No, leave my card settings alone"));
+    dia->AddButton(QObject::tr("Yes, delete my card settings"));
+    if (dia->exec() == 2)
         clearCardDB();
+    delete dia;
     
     // Give the user time to realize the first dialog is gone
     // before we bring up a similar-looking one
     usleep(750000);
-    
-    DialogBox dboxProg(mainWindow, QObject::tr("Would you like to clear all "
+
+    dia = new DialogBox(mainWindow,
+                        QObject::tr("Would you like to clear all "
                                    "program data and channel settings before "
                                    "starting configuration? This will not "
                                    "affect any existing recordings."));
-    dboxProg.AddButton(QObject::tr("No, leave my channel settings alone"));
-    dboxProg.AddButton(QObject::tr("Yes, delete my channel settings"));
-    if (dboxProg.exec() == 2)
+    dia->AddButton(QObject::tr("No, leave my channel settings alone"));
+    dia->AddButton(QObject::tr("Yes, delete my channel settings"));
+    if (dia->exec() == 2)
         clearAllDB();
+    delete dia;
 
     REG_KEY("qt", "DELETE", "Delete", "D");
     REG_KEY("qt", "EDIT", "Edit", "E");
 
-    SetupMenu();
+    bool haveProblems = false;
+    do
+    {
+        // Let the user select buttons, type values, scan for channels, et c.
+        SetupMenu();
 
-    cout << "If this is the master backend server:\n";
-    cout << "Now, please run 'mythfilldatabase' to populate the database\n";
-    cout << "with channel information.\n";
-    cout << endl;
+        // Look for common problems
+        QString *problems = new QString("");
+        haveProblems = CheckSetup(problems);
+
+        if (haveProblems)
+        {
+            QString prompt;
+
+            if (problems->contains("\n") > 1)
+                prompt = QObject::tr("Do you want to fix these problems?");
+            else
+                prompt = QObject::tr("Do you want to fix this problem?");
+
+            dia = new DialogBox(mainWindow, problems->append("\n" + prompt));
+            dia->AddButton(QObject::tr("Yes please"));
+            dia->AddButton(QObject::tr("No, I know what I am doing"));
+
+            if (dia->exec() == 2)
+                haveProblems = false;
+            delete dia;
+        }
+
+        delete problems;
+
+    // Execute UI again until there are no more problems:
+    }
+    while (haveProblems);
+
+    dia = new DialogBox(mainWindow,
+                        QObject::tr("If this is the master backend server, "
+                                    "please run 'mythfilldatabase' "
+                                    "to populate the database "
+                                    "with channel information."));
+    dia->AddButton(QObject::tr("OK"));
+    dia->exec();
+    delete dia;
 
     return 0;
 }
