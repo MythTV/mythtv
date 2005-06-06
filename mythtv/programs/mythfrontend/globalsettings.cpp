@@ -601,11 +601,11 @@ static GlobalLineEdit *OverTimeCategory()
 {
     GlobalLineEdit *ge = new GlobalLineEdit("OverTimeCategory");
     ge->setLabel(QObject::tr("Category of shows to be extended"));
-    ge->setValue("Sports event");
-    ge->setHelpText(QObject::tr("For a special category (e.g. "
+    ge->setValue(QObject::tr("category name"));
+    ge->setHelpText(QObject::tr("For a specific category (e.g. "
                                 "\"Sports event\"), request that shows "
                                 "be autoextended.  Only works if a "
-                                "shows category can be determined."));
+                                "show's category can be determined."));
     return ge;
 }
 
