@@ -27,7 +27,7 @@ package export::generic;
 
 # Load the following extra parameters from the commandline
     add_arg('path:s',                        'Save path (only used with the noserver option).');
-    add_arg('name:s',                        'Format string for output names.');
+    add_arg('filename:s',                    'Format string for output names.');
     add_arg('underscores!',                  'Convert spaces to underscores for output filename.');
     add_arg('use_cutlist|cutlist!',          'Use the myth cutlist (or not)');
 
@@ -88,18 +88,18 @@ package export::generic;
         }
         else {
         # Specified a name format
-            if ($outfile = $self->val('name')) {
+            if ($outfile = $self->val('filename')) {
             # Generate a list
                 my %field;
-                ($field{'f'} = $episode->{'filename'})    =~ s/%/%%/g;
-                ($field{'c'} = $episode->{'channel'})     =~ s/%/%%/g;
-                ($field{'a'} = $episode->{'start_time'})  =~ s/%/%%/g;
-                ($field{'b'} = $episode->{'end_time'})    =~ s/%/%%/g;
-                ($field{'t'} = $episode->{'show_name'})   =~ s/%/%%/g;  # title
-                ($field{'s'} = $episode->{'title'})       =~ s/%/%%/g;  # subtitle/episode
-                ($field{'h'} = $episode->{'host'})        =~ s/%/%%/g;
-                ($field{'m'} = $episode->{'showtime'})    =~ s/%/%%/g;
-                ($field{'d'} = $episode->{'description'}) =~ s/%/%%/g;
+                ($field{'f'} = ($episode->{'filename'}    or '')) =~ s/%/%%/g;
+                ($field{'c'} = ($episode->{'channel'}     or '')) =~ s/%/%%/g;
+                ($field{'a'} = ($episode->{'start_time'}  or '')) =~ s/%/%%/g;
+                ($field{'b'} = ($episode->{'end_time'}    or '')) =~ s/%/%%/g;
+                ($field{'t'} = ($episode->{'show_name'}   or '')) =~ s/%/%%/g;  # title
+                ($field{'s'} = ($episode->{'title'}       or '')) =~ s/%/%%/g;  # subtitle/episode
+                ($field{'h'} = ($episode->{'host'}        or '')) =~ s/%/%%/g;
+                ($field{'m'} = ($episode->{'showtime'}    or '')) =~ s/%/%%/g;
+                ($field{'d'} = ($episode->{'description'} or '')) =~ s/%/%%/g;
             # Make the substitution
                 my $keys = join('', sort keys %field);
                 $outfile =~ s/(?<!%)(?:%([$keys]))/$field{$1}/g;

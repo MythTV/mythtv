@@ -4,7 +4,7 @@
 
 Name:       nuvexport
 Version:    0.2
-Release:    0.20050603.cvs
+Release:    0.20050605.cvs
 License:    GPL
 Summary:    mythtv nuv video file conversion script
 URL:        http://forevermore.net/nuvexport/
@@ -17,6 +17,7 @@ BuildArch:  noarch
 
 # Standard nuvexport modules:
 Requires:  perl >= 5.6
+Requires:  perl-DateManip
 Requires:  perl-DBD-MySQL
 Requires:  perl-DBI
 Requires:  perl-Time-HiRes

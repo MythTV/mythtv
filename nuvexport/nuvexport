@@ -5,7 +5,7 @@
 # $Author$
 
 # Version
-    $VERSION = '0.2 0.20050603.cvs';
+    $VERSION = '0.2 0.20050605.cvs';
 
 # Autoflush buffers
     $|++;

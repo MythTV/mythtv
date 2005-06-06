@@ -15,6 +15,7 @@ package mythtv::recordings;
     use nuv_export::cli;
     use mythtv::db;
     use mythtv::nuvinfo;
+    use Date::Manip;
 
     BEGIN {
         use Exporter;
@@ -34,6 +35,9 @@ package mythtv::recordings;
 
 # Make sure we have the db filehandle
     die "Not connected to the database.\n" unless ($dbh);
+
+# Load the following extra parameters from the commandline
+    add_arg('date:s', 'Date format used for human-readable dates.');
 
 #
 #   load_recordings:
@@ -146,7 +150,6 @@ package mythtv::recordings;
         }
     }
 
-
     sub load_finfo {
         my $episode = shift;
         return if ($episode->{'finfo'});
@@ -158,28 +161,37 @@ package mythtv::recordings;
 #   Returns a nicely-formatted timestamp from a specified time
 #
     sub generate_showtime {
-        $showtime = '';
+        my $showtime = '';
     # Get the requested date
         my ($year, $month, $day, $hour, $minute, $second) = @_;
         $month = int($month);
         $day   = int($day);
-    # Get the current time, so we know whether or not to display certain fields (eg. year)
-        my ($this_second, $this_minute, $this_hour, $ignore, $this_month, $this_year) = localtime;
-        $this_year += 1900;
-        $this_month++;
-    # Default the meridian to AM
-        my $meridian = 'AM';
-    # Generate the showtime string
-        $showtime .= "$month/$day";
-        $showtime .= "/$year" unless ($year == $this_year);
-        if ($hour == 0) {
-            $hour = 12;
+    # Special datetime format?
+        if ($showtime = arg('date')) {
+print "$year-$month-$day-$hour-$minute-$second -> ",ParseDate("$year-$month-$day $hour:$minute:$second"), "\n";
+            $showtime = UnixDate(ParseDate("$year-$month-$day $hour:$minute:$second"), $showtime);
+print "$showtime\n";exit;
         }
-        elsif ($hour > 12) {
-            $hour -= 12;
-            $meridian = 'PM';
+    # Default to the standard
+        else {
+        # Get the current time, so we know whether or not to display certain fields (eg. year)
+            my ($this_second, $this_minute, $this_hour, $ignore, $this_month, $this_year) = localtime;
+            $this_year += 1900;
+            $this_month++;
+        # Default the meridian to AM
+            my $meridian = 'AM';
+        # Generate the showtime string
+            $showtime .= "$month/$day";
+            $showtime .= "/$year" unless ($year == $this_year);
+            if ($hour == 0) {
+                $hour = 12;
+            }
+            elsif ($hour > 12) {
+                $hour -= 12;
+                $meridian = 'PM';
+            }
+            $showtime .= ", $hour:$minute $meridian";
         }
-        $showtime .= ", $hour:$minute $meridian";
     # Return
         return $showtime;
     }

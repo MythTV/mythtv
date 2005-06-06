@@ -68,11 +68,19 @@
 #    %t -> title (show name)
 #    %s -> subtitle (episode name)
 #    %h -> hostname where the file resides
-#    %m -> showtime in human-readable format
+#    %m -> showtime in human-readable format (see --date below)
 #    %d -> description
 #    %% -> a % character
 #
 #    name=%t - %s
+
+#
+#  By default, nuvexport uses an American-style date to represent showtimes in
+#    lists and filenames.  Use --date to override that with the format of your
+#    choosing.  See the UnixDate section `perldoc Date::Manip` for formatting
+#    options.
+#
+#    date=%m/%d, %i:%M %p
 
 </nuvexport>
 
