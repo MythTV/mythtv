@@ -8,7 +8,7 @@
 
 class MythListButtonItem;
 class MythFontProperties;
-class MythUIStateImage;
+class MythUIStateType;
 
 class MythListButton : public MythUIType
 {
@@ -81,8 +81,8 @@ class MythListButton : public MythUIType
     bool m_showScrollArrows;
     bool m_showArrow;
 
-    MythUIStateImage *m_upArrow;
-    MythUIStateImage *m_downArrow;
+    MythUIStateType *m_upArrow;
+    MythUIStateType *m_downArrow;
 
     QValueVector<MythUIButton *> m_ButtonList;
 

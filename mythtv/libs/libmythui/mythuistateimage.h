@@ -1,5 +1,5 @@
-#ifndef MYTHUI_STATEIMAGE_H_
-#define MYTHUI_STATEIMAGE_H_
+#ifndef MYTHUI_STATETYPE_H_
+#define MYTHUI_STATETYPE_H_
 
 #include <qstring.h>
 #include <qdatetime.h>
@@ -10,33 +10,32 @@
 
 // Image class that displays one of an array of images (either predefined states
 // or by typename).  Displays nothing if told to display a non-existant state
-class MythUIStateImage : public MythUIType
+class MythUIStateType : public MythUIType
 {
   public:
     enum StateType { None = 0, Off, Half, Full }; // Can be used for tri-state checks, two state toggles, etc.
 
-    MythUIStateImage(MythUIType *parent, const char *name);
-   ~MythUIStateImage();
+    MythUIStateType(MythUIType *parent, const char *name);
+   ~MythUIStateType();
 
-    // These passed in images are owned or not, depending on the autodelete
     bool AddImage(const QString &name, MythImage *image);
     bool AddImage(StateType type, MythImage *image);
 
-    bool DisplayImage(const QString &name);
-    bool DisplayImage(StateType type);
+    bool AddObject(const QString &name, MythUIType *object);
+    bool AddObject(StateType type, MythUIType *object);
+
+    bool DisplayState(const QString &name);
+    bool DisplayState(StateType type);
 
     void ClearImages();
 
   protected:
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
-
     void ClearMaps();
 
-    QMap<QString, MythImage *> m_ImagesByName;
-    QMap<int, MythImage *> m_ImagesByState;
+    QMap<QString, MythUIType *> m_ObjectsByName;
+    QMap<int, MythUIType *> m_ObjectsByState;
 
-    MythImage *m_CurrentImage;
+    MythUIType *m_CurrentState;
 };
 
 #endif

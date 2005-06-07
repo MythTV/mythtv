@@ -26,7 +26,7 @@ class MythUIButton : public MythUIType
    ~MythUIButton();
 
     void SetBackgroundImage(StateType state, MythImage *image);
-    void SetCheckImage(MythUIStateImage::StateType state, MythImage *image);
+    void SetCheckImage(MythUIStateType::StateType state, MythImage *image);
     void SetTextRect(const QRect &textRect);
     void SetFont(StateType state, MythFontProperties &prop);
     void SetButtonImage(MythImage *image);
@@ -36,16 +36,16 @@ class MythUIButton : public MythUIType
     void SetText(const QString &msg, int textFlags = -1);
 
     void SelectState(StateType newState);
-    void SetCheckState(MythUIStateImage::StateType state);
+    void SetCheckState(MythUIStateType::StateType state);
     void EnableCheck(bool enable);
     void EnableRightArrow(bool enable);
 
     void SetupPlacement(void);
 
   protected:
-    MythUIStateImage *m_BackgroundImage;
+    MythUIStateType *m_BackgroundImage;
     MythUIText *m_Text;
-    MythUIStateImage *m_CheckImage;
+    MythUIStateType *m_CheckImage;
     MythUIImage *m_ButtonImage;
     MythUIImage *m_ArrowImage;
 

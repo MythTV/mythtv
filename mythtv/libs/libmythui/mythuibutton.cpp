@@ -7,8 +7,8 @@ MythUIButton::MythUIButton(MythUIType *parent, const char *name)
             : MythUIType(parent, name)
 {
     m_State = None;
-    m_BackgroundImage = new MythUIStateImage(this, "buttonback");
-    m_CheckImage = new MythUIStateImage(this, "buttoncheck");
+    m_BackgroundImage = new MythUIStateType(this, "buttonback");
+    m_CheckImage = new MythUIStateType(this, "buttoncheck");
     m_Text = new MythUIText(this, "buttontext");
     m_ButtonImage = new MythUIImage(this, "buttonimage");
     m_ArrowImage = new MythUIImage(this, "arrowimage");
@@ -45,7 +45,7 @@ void MythUIButton::SetBackgroundImage(StateType state, MythImage *image)
     m_Area.setSize(aSize);
 }
 
-void MythUIButton::SetCheckImage(MythUIStateImage::StateType state, 
+void MythUIButton::SetCheckImage(MythUIStateType::StateType state, 
                                  MythImage *image)
 {
     m_CheckImage->AddImage(state, image);
@@ -100,8 +100,8 @@ void MythUIButton::SelectState(StateType newState)
 
     m_State = newState;
 
-    if (!m_BackgroundImage->DisplayImage(QString::number((int)m_State)))
-        m_BackgroundImage->DisplayImage(QString::number((int)Normal));
+    if (!m_BackgroundImage->DisplayState(QString::number((int)m_State)))
+        m_BackgroundImage->DisplayState(QString::number((int)Normal));
 
 /*
     if (!m_FontProps.contains((int)m_State))
@@ -111,9 +111,9 @@ void MythUIButton::SelectState(StateType newState)
 */
 }
 
-void MythUIButton::SetCheckState(MythUIStateImage::StateType state)
+void MythUIButton::SetCheckState(MythUIStateType::StateType state)
 {
-    m_CheckImage->DisplayImage(state);
+    m_CheckImage->DisplayState(state);
 }
 
 void MythUIButton::EnableCheck(bool enable)

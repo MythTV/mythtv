@@ -1,118 +1,135 @@
 #include "mythuistateimage.h"
+#include "mythuiimage.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 
-MythUIStateImage::MythUIStateImage(MythUIType *parent, const char *name)
+MythUIStateType::MythUIStateType(MythUIType *parent, const char *name)
                 : MythUIType(parent, name)
 {
-    m_CurrentImage = NULL;
+    m_CurrentState = NULL;
 }
 
-MythUIStateImage::~MythUIStateImage()
+MythUIStateType::~MythUIStateType()
 {
-    ClearMaps();
 }
 
-bool MythUIStateImage::AddImage(const QString &name, MythImage *image)
+bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 {
-    if (m_ImagesByName.contains(name))
+    if (m_ObjectsByName.contains(name))
         return false;
 
-    m_ImagesByName[name] = image;
-    image->UpRef();
+    MythUIImage *imType = new MythUIImage(this, name);
+    imType->SetImage(image);
+
+    return AddObject(name, imType);
+}
+
+bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
+{
+    if (m_ObjectsByName.contains(name) || !object)
+        return false;
+
+    object->SetVisible(false);
+    m_ObjectsByName[name] = object;
 
     QSize aSize = m_Area.size();
-    aSize = aSize.expandedTo(image->size());
+    aSize = aSize.expandedTo(object->GetArea().size());
     m_Area.setSize(aSize);
 
     return true;
 }
 
-bool MythUIStateImage::AddImage(StateType type, MythImage *image)
+bool MythUIStateType::AddImage(StateType type, MythImage *image)
 {
-    if (m_ImagesByState.contains((int)type))
+    if (m_ObjectsByState.contains((int)type))
         return false;
 
-    m_ImagesByState[(int)type] = image;
-    image->UpRef();
+    MythUIImage *imType = new MythUIImage(this, "stateimage");
+    imType->SetImage(image);
+
+    return AddObject(type, imType);
+}
+
+bool MythUIStateType::AddObject(StateType type, MythUIType *object)
+{
+    if (m_ObjectsByState.contains((int)type) || !object)
+        return false;
+
+    object->SetVisible(false);
+    m_ObjectsByState[(int)type] = object;
 
     QSize aSize = m_Area.size();
-    aSize = aSize.expandedTo(image->size());
+    aSize = aSize.expandedTo(object->GetArea().size());
     m_Area.setSize(aSize);
 
     return true;
 }
 
-bool MythUIStateImage::DisplayImage(const QString &name)
+bool MythUIStateType::DisplayState(const QString &name)
 {
-    MythImage *old = m_CurrentImage;
+    MythUIType *old = m_CurrentState;
 
-    QMap<QString, MythImage *>::Iterator i = m_ImagesByName.find(name);
-    if (i != m_ImagesByName.end())
-        m_CurrentImage = i.data();
+    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name);
+    if (i != m_ObjectsByName.end())
+        m_CurrentState = i.data();
     else
-        m_CurrentImage = NULL;
+        m_CurrentState = NULL;
 
-    if (m_CurrentImage != old)
-        SetRedraw();
-
-    return (m_CurrentImage != NULL);
-}
-
-bool MythUIStateImage::DisplayImage(StateType type)
-{
-    MythImage *old = m_CurrentImage;
-
-    QMap<int, MythImage *>::Iterator i = m_ImagesByState.find((int)type);
-    if (i != m_ImagesByState.end())
-        m_CurrentImage = i.data();
-    else
-        m_CurrentImage = NULL;
-
-    if (m_CurrentImage != old)
-        SetRedraw();
-
-    return (m_CurrentImage != NULL);
-}
-
-void MythUIStateImage::ClearMaps()
-{
-    QMap<QString, MythImage *>::Iterator i;
-    for (i = m_ImagesByName.begin(); i != m_ImagesByName.end(); ++i)
+    if (m_CurrentState != old)
     {
-        i.data()->DownRef();;
+        if (m_CurrentState)
+            m_CurrentState->SetVisible(true);
+        if (old)
+            old->SetVisible(false);
     }
 
-    QMap<int, MythImage *>::Iterator j;
-    for (j = m_ImagesByState.begin(); j != m_ImagesByState.end(); ++j)
-    {
-        j.data()->DownRef();
-    }
-
-    m_ImagesByName.clear();
-    m_ImagesByState.clear();
-
-    m_CurrentImage = NULL;
+    return (m_CurrentState != NULL);
 }
 
-void MythUIStateImage::ClearImages()
+bool MythUIStateType::DisplayState(StateType type)
+{
+    MythUIType *old = m_CurrentState;
+
+    QMap<int, MythUIType *>::Iterator i = m_ObjectsByState.find((int)type);
+    if (i != m_ObjectsByState.end())
+        m_CurrentState = i.data();
+    else
+        m_CurrentState = NULL;
+
+    if (m_CurrentState != old)
+    {
+        if (m_CurrentState)
+            m_CurrentState->SetVisible(true);
+        if (old)
+            old->SetVisible(false);
+    }
+
+    return (m_CurrentState != NULL);
+}
+
+void MythUIStateType::ClearMaps()
+{
+    QMap<QString, MythUIType *>::Iterator i;
+    for (i = m_ObjectsByName.begin(); i != m_ObjectsByName.end(); ++i)
+    {
+        delete i.data();
+    }
+
+    QMap<int, MythUIType *>::Iterator j;
+    for (j = m_ObjectsByState.begin(); j != m_ObjectsByState.end(); ++j)
+    {
+        delete j.data();
+    }
+
+    m_ObjectsByName.clear();
+    m_ObjectsByState.clear();
+
+    m_CurrentState = NULL;
+}
+
+void MythUIStateType::ClearImages()
 {
     ClearMaps();
     SetRedraw();
-}
-
-void MythUIStateImage::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
-                                int alphaMod, QRect clipRect)
-{
-    if (m_CurrentImage)
-    {
-        QRect area = m_Area;
-        area.moveBy(xoffset, yoffset);
-
-        int alpha = CalcAlpha(alphaMod); 
-
-        QRect srcRect = m_CurrentImage->rect();
-        p->DrawImage(area, m_CurrentImage, srcRect, alpha);
-    }
 }
 

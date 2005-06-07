@@ -181,6 +181,8 @@ void MythUIImage::Pulse(void)
         SetRedraw();
         m_LastDisplay = QTime::currentTime();
     }
+
+    MythUIType::Pulse();
 }
 
 void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset, 

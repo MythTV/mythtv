@@ -176,20 +176,20 @@ void MythListButton::SetPositionArrowStates(void)
 
     if (m_itemCount == 0)
     {
-        m_downArrow->DisplayImage(MythUIStateImage::Off);
-        m_upArrow->DisplayImage(MythUIStateImage::Off);
+        m_downArrow->DisplayState(MythUIStateType::Off);
+        m_upArrow->DisplayState(MythUIStateType::Off);
     }
     else
     {
         if (m_topItem != m_itemList.first())
-            m_upArrow->DisplayImage(MythUIStateImage::Full);
+            m_upArrow->DisplayState(MythUIStateType::Full);
         else
-            m_upArrow->DisplayImage(MythUIStateImage::Off);
+            m_upArrow->DisplayState(MythUIStateType::Off);
     
         if (m_topPosition + (int)m_itemsVisible < m_itemCount)
-            m_downArrow->DisplayImage(MythUIStateImage::Full);
+            m_downArrow->DisplayState(MythUIStateType::Full);
         else
-            m_downArrow->DisplayImage(MythUIStateImage::Off);
+            m_downArrow->DisplayState(MythUIStateType::Off);
     }
 }
 
@@ -573,8 +573,8 @@ void MythListButton::Init()
     QRect arrowsRect;
     if (m_showScrollArrows) 
     {
-        m_upArrow = new MythUIStateImage(this, "upscrollarrow");
-        m_downArrow = new MythUIStateImage(this, "downscrollarrow");
+        m_upArrow = new MythUIStateType(this, "upscrollarrow");
+        m_downArrow = new MythUIStateType(this, "downscrollarrow");
 
         MythImage *upReg, *upAct, *downReg, *downAct;
         LoadPixmap(&upReg, "uparrow-reg");
@@ -582,10 +582,10 @@ void MythListButton::Init()
         LoadPixmap(&downReg, "dnarrow-reg");
         LoadPixmap(&downAct, "dnarrow-sel");
 
-        m_upArrow->AddImage(MythUIStateImage::Off, upReg);
-        m_upArrow->AddImage(MythUIStateImage::Full, upAct);
-        m_downArrow->AddImage(MythUIStateImage::Off, downReg);
-        m_downArrow->AddImage(MythUIStateImage::Full, downAct);
+        m_upArrow->AddImage(MythUIStateType::Off, upReg);
+        m_upArrow->AddImage(MythUIStateType::Full, upAct);
+        m_downArrow->AddImage(MythUIStateType::Off, downReg);
+        m_downArrow->AddImage(MythUIStateType::Full, downAct);
 
         m_upArrow->SetPosition(QPoint(0, 
                                       m_Area.height() - upAct->height() - 1));
@@ -754,9 +754,9 @@ void MythListButton::Init()
 
         button->SetPaddingMargin(m_itemMargin);
 
-        button->SetCheckImage(MythUIStateImage::Off, checkNonePix);
-        button->SetCheckImage(MythUIStateImage::Half, checkHalfPix);
-        button->SetCheckImage(MythUIStateImage::Full, checkFullPix);
+        button->SetCheckImage(MythUIStateType::Off, checkNonePix);
+        button->SetCheckImage(MythUIStateType::Half, checkHalfPix);
+        button->SetCheckImage(MythUIStateType::Full, checkFullPix);
 
         button->SetRightArrowImage(arrowPix);
 
@@ -898,11 +898,11 @@ void MythListButtonItem::SetToRealButton(MythUIButton *button, bool active_on)
     button->SetButtonImage(m_image);
 
     if (m_state == NotChecked)
-        button->SetCheckState(MythUIStateImage::Off);
+        button->SetCheckState(MythUIStateType::Off);
     else if (m_state == HalfChecked)
-        button->SetCheckState(MythUIStateImage::Half);
+        button->SetCheckState(MythUIStateType::Half);
     else
-        button->SetCheckState(MythUIStateImage::Full);
+        button->SetCheckState(MythUIStateType::Full);
 
     button->EnableCheck(m_checkable);
 
