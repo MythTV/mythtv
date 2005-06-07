@@ -195,7 +195,7 @@ void OSDSet::Reinit(int screenwidth, int screenheight, int xoff, int yoff,
         }
         else if (OSDTypeImage *item = dynamic_cast<OSDTypeImage*>(type))
         {
-            item->Reinit(wmult, hmult);
+            item->Reinit(wchange, hchange, wmult, hmult);
         }
         else if (OSDTypeBox *item = dynamic_cast<OSDTypeBox*>(type))
         {
@@ -709,8 +709,6 @@ OSDTypeImage::OSDTypeImage(const QString &name, const QString &filename,
 
     m_scalew = scalew;
     m_scaleh = scaleh;
-    m_wmult = wmult;
-    m_hmult = hmult;
 
     LoadImage(filename, wmult, hmult, scalew, scaleh);
 }
@@ -796,18 +794,15 @@ void OSDTypeImage::SetName(const QString &name)
     m_name = name;
 }
 
-void OSDTypeImage::Reinit(float wmult, float hmult)
+void OSDTypeImage::Reinit(float wchange, float hchange, float wmult, float hmult)
 {
-    int x = (int)(m_displaypos.x() * wmult / m_wmult);
-    int y = (int)(m_displaypos.y() * hmult / m_hmult);
+    int x = (int)(m_displaypos.x() * wchange);
+    int y = (int)(m_displaypos.y() * hchange);
 
     m_displaypos.setX(x);
     m_displaypos.setY(y);
 
-    m_wmult = wmult;
-    m_hmult = hmult;
-
-    LoadImage(m_filename, m_wmult, m_hmult, m_scalew, m_scaleh);
+    LoadImage(m_filename, wmult, hmult, m_scalew, m_scaleh);
 }
 
 void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
@@ -1080,7 +1075,7 @@ void OSDTypePosSlider::Reinit(float wchange, float hchange, float wmult,
 
     m_displayrect = QRect(x, y, width, height);
 
-    OSDTypeImage::Reinit(wmult, hmult);
+    OSDTypeImage::Reinit(wchange, hchange, wmult, hmult);
 }
 
 void OSDTypePosSlider::SetPosition(int pos)
@@ -1129,7 +1124,7 @@ void OSDTypeFillSlider::Reinit(float wchange, float hchange, float wmult,
 
     m_displayrect = QRect(x, y, width, height);
 
-    OSDTypeImage::Reinit(wmult, hmult);
+    OSDTypeImage::Reinit(wchange, hchange, wmult, hmult);
 }
 
 void OSDTypeFillSlider::SetPosition(int pos)
@@ -1235,9 +1230,6 @@ void OSDTypeEditSlider::Reinit(float wchange, float hchange, float wmult,
         delete [] m_ryuv;
     if (m_ralpha)
         delete [] m_ralpha;
-
-    m_wmult = wmult;
-    m_hmult = hmult;
 
     LoadImage(m_redname, wmult, hmult, m_scalew, m_scaleh);
     if (m_isvalid)
@@ -1654,7 +1646,7 @@ OSDTypePositionImage::~OSDTypePositionImage()
 void OSDTypePositionImage::Reinit(float wchange, float hchange, float wmult, 
                                   float hmult)
 {
-    OSDTypeImage::Reinit(wmult, hmult);
+    OSDTypeImage::Reinit(wchange, hchange, wmult, hmult);
 
     for (int i = 0; i < m_numpositions; i++)
     {

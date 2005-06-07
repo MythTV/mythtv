@@ -226,7 +226,7 @@ class OSDTypeImage : public OSDType
     virtual ~OSDTypeImage();
 
     void SetName(const QString &name);
-    void Reinit(float wmult, float hmult);
+    void Reinit(float wchange, float hchange, float wmult, float hmult);
 
     void LoadImage(const QString &filename, float wmult, float hmult, 
                    int scalew = -1, int scaleh = -1);
@@ -262,7 +262,6 @@ class OSDTypeImage : public OSDType
     unsigned char *m_alpha;
 
     int m_scalew, m_scaleh;
-    float m_wmult, m_hmult;
 
     int m_drawwidth;
     bool m_onlyusefirst;
